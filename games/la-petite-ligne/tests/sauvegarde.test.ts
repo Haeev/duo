@@ -1,6 +1,6 @@
 // Sauvegarde du monde: JSON complet, reprise quelle que soit la machine qui héberge (SV-04).
 import { letterFrom, letterText, letterTitle } from '../src/etat/courrier';
-import type { Letter } from '../src/etat/types';
+import type { Letter, WorldState } from '../src/etat/types';
 import { describe, expect, it } from 'vitest';
 import { restoreWorld, SaveError, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { hashState as hash } from '@duo/sdk/sim';
@@ -28,7 +28,7 @@ describe('sauvegarde', () => {
     // Sacha héberge cette fois: chacun retrouve quand même son personnage.
     const restored = restoreWorld(content, map, JSON.parse(json) as unknown, snap.dataSchema, [B, A]);
     // Tout ce qui compte est retrouvé; seuls les menus, visées et trajets en cours sont remis à zéro (SV-02).
-    const lasting = (w: typeof snap.data): Record<string, unknown> => ({
+    const lasting = (w: Omit<WorldState, 'villagers'>): Record<string, unknown> => ({
       clock: w.clock,
       purse: w.purse,
       garden: w.garden,

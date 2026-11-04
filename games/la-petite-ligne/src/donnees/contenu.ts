@@ -5,6 +5,7 @@
  * les conditions qui comptent deviennent des conditions `counter`.
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
+import type { TasteLevel } from '../etat/types-voisins';
 import {
   DEFAULT_BENCHES,
   DEFAULT_DIALOGUES,
@@ -39,11 +40,13 @@ import { parseFishDef, parseFishingRules } from './poissons';
 import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
 import {
   checkHabits,
+  checkTastes,
   checkVillageReferences,
   habitExists,
   parseBondSettings,
   parseHabits,
   parseHabitSettings,
+  parseTastes,
   parseVillageCalendar,
   resolveSelf,
   revealDialogues,
@@ -372,6 +375,8 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return { type, decision: r.at('decision').string(), option: r.at('option').string() };
     case 'habit_known':
       return { type, villager: r.at('villager').string(), habit: r.at('habit').string() };
+    case 'bond_at_least':
+      return { type, villager: r.at('villager').string(), level: r.at('level').integer(0, 5) };
     case 'tenderness_at_least':
       return { type, level: r.at('level').oneOf(TENDERNESS) };
     case 'stage_due':
@@ -478,6 +483,12 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return counter(r, `given:${r.at('villager').string()}${suffix(r, 'item')}`, since);
     case 'talked_to':
       return counter(r, `talked:${r.at('villager').string()}`, since);
+    // 0.13 (lot H2, section 5.6): un cadeau offert (accepté), ou de ce goût (`deteste`: rendu).
+    case 'gift_given': {
+      const villager = r.at('villager').string();
+      const taste = r.opt('taste');
+      return counter(r, taste === null ? `gift:${villager}` : `gift:${villager}:${tasteLevelOf(taste)}`, since);
+    }
     case 'placed':
       return counter(r, `placed${suffix(r, 'item')}`, since);
     case 'ate':
@@ -571,6 +582,10 @@ export function parseEffect(r: Reader): Effect {
   switch (type) {
     case 'reveal_habit':
       return { type, villager: r.at('villager').string(), habit: r.at('habit').string() };
+    case 'add_bond':
+      return { type, villager: r.at('villager').string(), amount: r.at('amount').integer(0) };
+    case 'reveal_taste':
+      return { type, villager: r.at('villager').string(), item: r.at('item').string() };
     case 'give_item':
       return {
         type,
@@ -926,6 +941,7 @@ function parseVillager(v: Reader, base: VillagerDef | null, dialogues: Record<st
     dialogues: [...(base?.dialogues ?? []), ...own],
     habits: base !== null ? villagerField(v, base, 'habits', parseHabits, (b) => b.habits) : parseHabits(habitsRequired ? v.at('habits') : v.opt('habits')),
     birthday: base !== null ? villagerField(v, base, 'birthday', parseBirthday, (b) => b.birthday) : v.opt('birthday') === null ? null : parseBirthday(v.at('birthday')),
+    tastes: base !== null ? villagerField(v, base, 'tastes', parseTastes, (b) => b.tastes) : parseTastes(v.opt('tastes')),
   };
   resolveSelf(villager.schedule.flatMap((e) => e.when), id);
   for (const d of own) resolveSelf(d.when, id);
@@ -985,6 +1001,7 @@ function parseQuests(r: Reader): QuestDef[] {
         tier: tier(q),
         title: q.at('title').string(),
         giver: q.at('giver').string(),
+        story: parseStory(q.opt('story')),
         start: {
           when: conditions(start.opt('when'), 'game_start'),
           byEffect: optBoolean(start, 'byEffect', false),
@@ -998,6 +1015,18 @@ function parseQuests(r: Reader): QuestDef[] {
         expire: parseExpire(q.opt('expire')),
       };
     });
+}
+
+/** 0.13 (section 5.5): l'étape de l'histoire d'un habitant que porte la quête. */
+function parseStory(r: Reader | null): QuestDef['story'] {
+  if (r === null) return null;
+  return { villager: r.at('villager').string(), step: r.at('step').integer(1) };
+}
+
+/** Goût des conditions `gift_given` (`adore`, `aime`, `neutre`, `deteste`, section 5.6). */
+function tasteLevelOf(r: Reader): TasteLevel {
+  const french = { adore: 'loves', aime: 'likes', neutre: 'neutral', deteste: 'dislikes' } as const;
+  return french[r.oneOf(['adore', 'aime', 'neutre', 'deteste'] as const)];
 }
 
 /** 0.12: retrait sans reproche d'une quête au premier jour de la semaine et à l'heure donnés après son démarrage. */
@@ -2349,6 +2378,13 @@ function checkReferences(content: Content): void {
         case 'reveal_habit':
           if (!habitExists(content.villagers, e)) fail(`${where}: habitude inconnue « ${e.villager}.${e.habit} »`);
           break;
+        case 'add_bond':
+          if (!content.villagers.some((v) => v.id === e.villager)) fail(`${where}: habitant inconnu « ${e.villager} »`);
+          break;
+        case 'reveal_taste':
+          if (!content.villagers.some((v) => v.id === e.villager)) fail(`${where}: habitant inconnu « ${e.villager} »`);
+          if (!(e.item in content.items)) fail(`${where}: objet inconnu « ${e.item} »`);
+          break;
         case 'give_money':
         case 'take_money':
         case 'set_flag':
@@ -2544,6 +2580,7 @@ function annonceQuests(content: Content): QuestDef[] {
     tier: 'P0',
     title,
     giver,
+    story: null,
     start: { when: [], byEffect: true, effects: [] },
     steps,
     completionEffects: [],
@@ -2737,6 +2774,7 @@ export function loadContent(files: RawContentFiles): Content {
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
   checkVillageReferences(content);
+  checkTastes(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.
   const scale = content.settings.fishing?.rules.priceScale ?? 1;

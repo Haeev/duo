@@ -366,7 +366,16 @@
     "windowPoints": ["salon_window", "honorine_window", "rail_cottage_west_window", "church_bell_rope"],
     "knownInEarlierSaves": { "firmin": ["quay"], "odette": ["counter"], "basile": ["workbench"], "jeanne": ["morning_bench"], "achille": ["window"], "solange": ["salon"] }
   },
-  "bonds": { "earlierSaveStartPerQuest": 60, "earlierSaveStartMax": 250 },
+  "bonds": {
+    "earlierSaveStartPerQuest": 60, "earlierSaveStartMax": 250,
+    "levels": [0, 100, 250, 450, 700, 1000],
+    "gains": {
+      "talk": 10, "gift": { "loves": 60, "likes": 30, "neutral": 10 }, "birthdayGiftFactor": 2,
+      "birthdayWish": 20, "birthdayPresence": 20, "quest": 60, "story": 100, "annonce": 50, "allHabits": 50
+    },
+    "birthdayPresence": { "distance": 10, "seconds": 30 },
+    "giftExcluded": ["tool", "quest", "carried", "animal_order"]
+  },
 
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
   "fishing": {

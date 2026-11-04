@@ -4,6 +4,7 @@
  * stable des joueurs (jamais au rôle d'hôte ou d'invité).
  */
 import { compactDialoguesDone } from '../etat/dialogues-faits';
+import { fillVillagerDefaults, type WrittenWorld, writtenWorld } from '../etat/habitants-ecrits';
 import { emptyFishing } from '../etat/peche';
 import type { GameMap } from '../etat/carte';
 import type { CharacterId, Tree, WorldState } from '../etat/types';
@@ -42,7 +43,8 @@ export interface WorldSnapshot {
   label: string;
   progress: number;
   dataSchema: number;
-  data: WorldState;
+  /** 0.13 (lot H2): les habitants sans leurs valeurs par défaut (`habitants-ecrits.ts`). */
+  data: WrittenWorld;
 }
 
 const LABEL_MAX = 40;
@@ -92,7 +94,7 @@ export function snapshotOf(sim: Sim): WorldSnapshot {
     label: saveLabel(sim),
     progress: progressOf(sim),
     dataSchema: DATA_SCHEMA,
-    data: withoutTransientFishing(structuredClone(sim.world)),
+    data: writtenWorld(withoutTransientFishing(structuredClone(sim.world))),
   };
 }
 
@@ -727,7 +729,8 @@ export function restoreWorld(
   dataSchema: number,
   players: readonly [PlayerInfo, PlayerInfo],
 ): Sim {
-  const world = checkWorld(migrate(data, dataSchema, content, map));
+  // Habitants écrits sans leurs valeurs par défaut (0.13, lot H2): elles reviennent avant les contrôles.
+  const world = checkWorld(fillVillagerDefaults(migrate(data, dataSchema, content, map)));
   trialRun(content, map, structuredClone(world), dataSchema, players);
   return resume(content, map, world, dataSchema, players);
 }

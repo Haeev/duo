@@ -5,7 +5,7 @@
  */
 import { ContentError, type Reader } from './lecteur';
 import { SEASONS, weekdayOf } from './calendrier';
-import type { Condition, Content, DialogueDef, Season, Settings, VillagerDef } from './types';
+import type { Condition, Content, DialogueDef, Season, Settings, VillagerDef, VillagerTastes } from './types';
 import {
   HABIT_KINDS,
   type BondSettings,
@@ -274,7 +274,10 @@ export function checkVillageReferences(content: Content): void {
       else if (c.type === 'not') visit([c.condition], where);
       else if (c.type === 'special_day' && !days.has(c.id))
         throw new ContentError(`${where}: jour particulier inconnu « ${c.id} » (calendrier.json)`);
-      else if (c.type === 'birthday_of' && !content.villagers.some((v) => v.id === c.villager))
+      else if (
+        (c.type === 'birthday_of' || c.type === 'bond_at_least') &&
+        !content.villagers.some((v) => v.id === c.villager)
+      )
         throw new ContentError(`${where}: habitant inconnu « ${c.villager} »`);
       else if (c.type === 'habit_known' && !habitExists(content.villagers, c))
         throw new ContentError(`${where}: habitude inconnue « ${c.villager}.${c.habit} »`);
@@ -328,6 +331,23 @@ export const DEFAULT_HABIT_SETTINGS: HabitSettings = {
 export const DEFAULT_BOND_SETTINGS: BondSettings = {
   earlierSaveStartPerQuest: 60,
   earlierSaveStartMax: 250,
+  levels: [0, 100, 250, 450, 700, 1000],
+  max: 1000,
+  gains: {
+    talk: 10,
+    gift: { loves: 60, likes: 30, neutral: 10 },
+    birthdayGiftFactor: 2,
+    birthdayWish: 20,
+    birthdayPresence: 20,
+    // Comme le départ d'une partie reprise (60 par quête finie): une partie neuve et une partie
+    // reprise qui ont fini les mêmes quêtes de la démo partent du même lien.
+    quest: 60,
+    story: 100,
+    annonce: 50,
+    allHabits: 50,
+  },
+  birthdayPresence: { distance: 10, seconds: 30 },
+  giftExcluded: ['tool', 'quest', 'carried', 'animal_order'],
 };
 
 /** `reglages.json`: `habits` et `bonds` (absents: les valeurs de la conception). */
@@ -363,9 +383,72 @@ export function parseHabitSettings(r: Reader | null): HabitSettings {
 
 export function parseBondSettings(r: Reader | null): BondSettings {
   const d = DEFAULT_BOND_SETTINGS;
-  return {
+  const g = r?.opt('gains') ?? null;
+  const gift = g?.opt('gift') ?? null;
+  const gain = (key: keyof Omit<BondSettings['gains'], 'gift'>): number =>
+    g?.opt(key)?.number() ?? d.gains[key];
+  const levelsReader = r?.opt('levels') ?? null;
+  const levels = levelsReader?.numberList() ?? [...d.levels];
+  if (levels.length !== 6 || levels[0] !== 0 || levels.some((x, i) => i > 0 && x <= (levels[i - 1] ?? 0)))
+    levelsReader?.fail('six seuils croissants, le premier à 0');
+  const presence = r?.opt('birthdayPresence') ?? null;
+  const out: BondSettings = {
     earlierSaveStartPerQuest:
       r?.opt('earlierSaveStartPerQuest')?.integer(0) ?? d.earlierSaveStartPerQuest,
     earlierSaveStartMax: r?.opt('earlierSaveStartMax')?.integer(0) ?? d.earlierSaveStartMax,
+    levels,
+    max: levels[levels.length - 1] ?? d.max,
+    gains: {
+      talk: gain('talk'),
+      gift: {
+        loves: gift?.opt('loves')?.number() ?? d.gains.gift.loves,
+        likes: gift?.opt('likes')?.number() ?? d.gains.gift.likes,
+        neutral: gift?.opt('neutral')?.number() ?? d.gains.gift.neutral,
+      },
+      birthdayGiftFactor: gain('birthdayGiftFactor'),
+      birthdayWish: gain('birthdayWish'),
+      birthdayPresence: gain('birthdayPresence'),
+      quest: gain('quest'),
+      story: gain('story'),
+      annonce: gain('annonce'),
+      allHabits: gain('allHabits'),
+    },
+    birthdayPresence: {
+      distance: presence?.opt('distance')?.number() ?? d.birthdayPresence.distance,
+      seconds: presence?.opt('seconds')?.number() ?? d.birthdayPresence.seconds,
+    },
+    giftExcluded: r?.opt('giftExcluded')?.stringList() ?? [...d.giftExcluded],
   };
+  // Jamais de perte (section 6.2): aucun gain négatif.
+  const all = [out.gains.talk, out.gains.gift.loves, out.gains.gift.likes, out.gains.gift.neutral, out.gains.birthdayWish, out.gains.birthdayPresence, out.gains.quest, out.gains.story, out.gains.annonce, out.gains.allHabits];
+  if (all.some((x) => x < 0) || out.gains.birthdayGiftFactor < 1)
+    throw new ContentError('reglages.json: bonds.gains: aucun gain négatif, facteur d\'anniversaire au moins 1');
+  return out;
+}
+
+/** Goûts d'un habitant (`tastes { adore[], aime[], deteste[{ item, reply }] }`); absents: aucun. */
+export function parseTastes(r: Reader | null): VillagerTastes {
+  if (r === null) return { loves: [], likes: [], dislikes: [] };
+  return {
+    loves: r.opt('adore')?.stringList() ?? [],
+    likes: r.opt('aime')?.stringList() ?? [],
+    dislikes: (r.opt('deteste')?.items() ?? []).map((d) => ({
+      item: d.at('item').string(),
+      reply: d.at('reply').string(),
+    })),
+  };
+}
+
+/** Chaque goût désigne un objet connu, et un objet n'a qu'un goût par habitant. */
+export function checkTastes(content: Content): void {
+  for (const v of content.villagers) {
+    const seen = new Set<string>();
+    for (const item of [...v.tastes.loves, ...v.tastes.likes, ...v.tastes.dislikes.map((d) => d.item)]) {
+      if (!(item in content.items))
+        throw new ContentError(`habitants: ${v.id}.tastes: objet inconnu « ${item} »`);
+      if (seen.has(item))
+        throw new ContentError(`habitants: ${v.id}.tastes: « ${item} » a deux goûts`);
+      seen.add(item);
+    }
+  }
 }

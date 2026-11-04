@@ -19,6 +19,7 @@ import { standUp } from './bancs';
 import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeDecor, takeFurniture, toggleCurtains, topDecorOf, updatePlacement } from './amenagement';
 import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
+import { offerGift } from './amitie';
 import { answerProposal, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
 import { depositFamily, sortStorage, storageMove } from './rangement';
 import { roomDeposit } from './pieces';
@@ -236,6 +237,19 @@ function give(sim: Sim, c: Character, to: string, item: string, quality: Quality
   if (v === undefined || !v.visible || distance(c.pos, v.pos) > s.talk) return;
   faceToward(c, v.pos);
   giveToVillager(sim, c, to, item, count);
+}
+
+/**
+ * 0.13 (lot H2): offrir un objet du sac à un habitant visible, à portée de conversation, en
+ * journée, hors scène; on peut le faire en lui parlant.
+ */
+function gift(sim: Sim, c: Character, villager: string, item: string): void {
+  const v = sim.world.villagers.find((x) => x.id === villager);
+  if (v === undefined || !v.visible || sim.world.phase !== 'day' || sim.world.scene !== null) return;
+  const free = c.status === 'active' || (c.status === 'dialogue' && c.dialogue?.villager === villager);
+  if (!c.created || !free || distance(c.pos, v.pos) > sim.content.settings.ranges.talk) return;
+  faceToward(c, v.pos);
+  offerGift(sim, c, villager, item);
 }
 
 export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
@@ -469,6 +483,9 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'give':
       give(sim, c, intent.to, intent.item, intent.quality, Math.floor(intent.count));
+      return;
+    case 'gift':
+      gift(sim, c, intent.villager, intent.item);
       return;
     case 'read_letter': {
       const letter = sim.world.letters.find((l) => l.id === intent.letter);

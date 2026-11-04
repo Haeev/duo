@@ -433,3 +433,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Vitest garde en cache les `import.meta.glob`: un nouveau fichier de données (ex. `habitants-0-13.json`) reste invisible tant que `fichiers.ts` ne change pas; vider le cache ou toucher le fichier.
 - Tout nouvel événement de simulation oblige à ajouter son cas dans `audio/declencheurs.ts` (le typage l'exige).
 - `src/reseau/schemas.ts` plafonnait à 16 habitants les positions envoyées à l'invité; porté à 32 pour les 21 habitants de la 0.13.
+
+## Lot H2 de la 0.13: amitié, cadeaux, état écrit (La Petite Ligne, vérifié le 2026-11-04)
+
+- Habitants écrits sans leurs valeurs par défaut: le message d'état de l'hôte et la sauvegarde passent par `writtenWorld` (`etat/habitants-ecrits.ts`), l'invité relit par `worldFromWritten`, la reprise par `fillVillagerDefaults` avant `checkWorld`. En mémoire, l'habitant reste complet. `snap.data` est un `WrittenWorld`: un test qui le compare au monde passe par `worldFromWritten`; un test qui mesure l'état transmis mesure `writtenWorld(world)`.
+- Mesure de l'état transmis (8 graines de l'endurance, démo entière): 35 266 à 36 752 octets après le lot H2 (avant: 37 098 et 38 105 sur les graines 42 et 7). Il reste environ 1 Ko au pire pour passer sous 35 840: ne plus mettre `pos`, `prev`, `facing`, `speed` des habitants dans le message d'état (le canal `fast` les porte) donnerait 1,6 à 1,8 Ko; c'est du netcode (dev-reseau).
+- « Première conversation du jour »: `talkTo` compte déjà `talked:<habitant>` dans `countersToday[joueur]`; le lire avant le `bump` suffit, sans clé de plus. Même chose pour un cadeau par jour (`gift:<habitant>`).
+- TypeScript 5.5: `events.filter((e) => e.type === 'x')` rétrécit le type; re-tester `e.type` dans le `map` qui suit est une erreur ESLint (`no-unnecessary-condition`). Après `c.dialogue = null`, TypeScript garde `null` même après un `talkTo(c)`: lire la conversation par une petite fonction (`choicesOf(c)`).
+- Habitants pour un test qui fait tourner les plannings: Léon est à l'école (invisible) un jour de semaine à 15 h; Firmin reste visible à sa cloche de 8 h à 18 h (bon pour le réseau). Forcer `visible` ne tient que jusqu'à la mise à jour suivante des plannings.
+- Bash du membre isolé: une commande avec `python3 - <<EOF` contenant des f-strings, ou le `grep` des tirets avec `$'...'`, est refusée; écrire le script dans le scratchpad, et chercher les tirets avec l'outil Grep (classe de caractères avec U+2014 et U+2013).

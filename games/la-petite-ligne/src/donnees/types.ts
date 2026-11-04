@@ -134,6 +134,8 @@ export type Condition = { label?: string } & (
   | { type: 'birthday_of'; villager: string }
   | { type: 'decision_made'; decision: string; option: string }
   | { type: 'habit_known'; villager: string; habit: string }
+  /** 0.13 (lot H2): niveau d'amitié atteint avec cet habitant (0 à 5, section 6.1). */
+  | { type: 'bond_at_least'; villager: string; level: number }
 );
 
 export type Effect =
@@ -161,7 +163,11 @@ export type Effect =
   | { type: 'end_stage'; stage: StageId }
   | { type: 'if'; condition: Condition; then: Effect[]; else: Effect[] }
   /** 0.13: écrit l'habitude au carnet (fin de quête, décision). */
-  | { type: 'reveal_habit'; villager: string; habit: string };
+  | { type: 'reveal_habit'; villager: string; habit: string }
+  /** 0.13 (lot H2): lien avec l'habitant (jamais négatif, plafonné à `bonds.max`). */
+  | { type: 'add_bond'; villager: string; amount: number }
+  /** 0.13 (lot H2): écrit au carnet le goût de l'habitant pour cet objet (une rumeur, une réplique). */
+  | { type: 'reveal_taste'; villager: string; item: string };
 
 // ---------------------------------------------------------------------------
 // Objets
@@ -391,6 +397,16 @@ export interface VillagerDef {
   habits: HabitDef[];
   /** 0.13: son anniversaire (jour de saison), `null` s'il n'est pas écrit. */
   birthday: { season: Season; day: number } | null;
+  /** 0.13 (lot H2): ce qu'il adore, aime, n'aime pas (`tastes` des données); le reste lui est égal. */
+  tastes: VillagerTastes;
+}
+
+/** Goûts d'un habitant (`tastes { adore[], aime[], deteste[{ item, reply }] }` des données). */
+export interface VillagerTastes {
+  loves: string[];
+  likes: string[];
+  /** Avec sa réplique propre quand on le lui offre (il le rend). */
+  dislikes: { item: string; reply: string }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -429,6 +445,8 @@ export interface QuestDef {
   tier: 'P0' | 'P1';
   title: string;
   giver: string;
+  /** 0.13: étape de l'histoire d'un habitant (section 5.5), ou `null`. */
+  story: { villager: string; step: number } | null;
   /** Démarrage automatique quand `when` est vrai; `byEffect`: seulement par un effet. */
   start: { when: Condition[]; byEffect: boolean; effects: Effect[] };
   steps: QuestStepDef[];

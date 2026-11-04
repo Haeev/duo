@@ -17,6 +17,7 @@ import { improvementRemaining, openImprovements } from '../../src/simulation/cha
 import { weekdayOf } from '../../src/donnees/calendrier';
 import { treeGrowth } from '../../src/etat/repousse';
 import { hudSeason, questTitleOf, seasonCard, stageScreen, weatherLabel } from '../../src/etat/semaine';
+import { worldFromWritten } from '../../src/etat/habitants-ecrits';
 import type { CharacterId, Weather, WorldState } from '../../src/etat/types';
 import { restoreWorld, snapshotOf } from '../../src/sauvegarde/sauvegarde';
 import { NO_CONTEXT, evaluateAll } from '../../src/simulation/conditions';
@@ -647,7 +648,7 @@ export function playLong(options: LongOptions): LongRun {
       if (board !== null && day >= board.fromDay && possible && w.board.current?.posted !== day) run.boardProblems.push(`jour ${String(day)}: pas d'annonce`);
       // Sauvegarde et reprise à chaque aube, en inversant hôte et invité (L-02).
       const snap = snapshotOf(sim);
-      const before = hashState(lasting(snap.data));
+      const before = hashState(lasting(worldFromWritten(snap.data)));
       sim = restoreWorld(sim.content, sim.map, structuredClone(snap.data), snap.dataSchema, [B, A]);
       if (hashState(lasting(sim.world)) !== before) run.resumeMismatches.push(day);
       robot = createRobot({ stages: 'stay', profile });

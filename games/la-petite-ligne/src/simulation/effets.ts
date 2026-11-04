@@ -9,6 +9,7 @@ import { evaluate, NO_CONTEXT } from './conditions';
 import { type Sim, character, emit, point, notifyKey } from './contexte';
 import { sendLetter } from './courrier';
 import { startScene } from './dialogues';
+import { addBond, revealTaste } from './amitie';
 import { payOrder } from './economie';
 import { finishStage } from './fin';
 import { spawnHens } from './poules';
@@ -149,6 +150,12 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       return;
     case 'reveal_habit':
       revealHabit(sim, { villager: effect.villager, habit: effect.habit }, 'noted', null, null);
+      return;
+    case 'add_bond':
+      addBond(sim, effect.villager, effect.amount, actor);
+      return;
+    case 'reveal_taste':
+      revealTaste(sim, effect.villager, effect.item, actor);
       return;
   }
 }

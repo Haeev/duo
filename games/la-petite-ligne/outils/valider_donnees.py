@@ -173,6 +173,9 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "birthday_of": ({"villager"}, set()),
     "decision_made": ({"decision", "option"}, set()),
     "habit_known": ({"villager", "habit"}, set()),
+    # 0.13 (lot H2, README 2.13): niveau d'amitié, cadeau offert.
+    "bond_at_least": ({"villager", "level"}, set()),
+    "gift_given": ({"villager"}, {"taste", "count", "who", "since"}),
 }
 # 0.13: sortes d'habitudes (colonne « Sorte » de v0-13-habitants.md, en anglais).
 HABIT_KINDS = {"routine", "home", "rain", "season", "day", "after_quest", "market", "birthday"}
@@ -183,6 +186,9 @@ COMMON_CONDITION_KEYS = {"type", "label"}
 
 EFFECTS: dict[str, tuple[set[str], set[str]]] = {
     "reveal_habit": ({"villager", "habit"}, set()),
+    # 0.13 (lot H2): lien d'amitié, goût écrit au carnet.
+    "add_bond": ({"villager", "amount"}, set()),
+    "reveal_taste": ({"villager", "item"}, set()),
     "give_item": ({"item", "count", "to"}, set()),
     "take_item": ({"item", "count", "from"}, set()),
     "give_money": ({"amount"}, set()),
@@ -219,7 +225,7 @@ HINT_TRIGGERS: dict[str, set[str]] = {
     "fishing_hot_spot": set(), "fishing_watch": set(),
 }
 
-PLACEHOLDERS = {"habit", "speaker", "player", "startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
+PLACEHOLDERS = {"habit", "level", "speaker", "player", "startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
                 "count", "recipe", "envie", "quest", "title", "construction", "weekday", "day", "hours", "minutes",
                 "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase",
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
@@ -593,6 +599,12 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
         report.error(w, f"jour particulier inconnu {cond.get('id')!r} (calendrier.json)")
     if ctype == "habit_known":
         reg.habit_refs.append((str(cond.get("villager")), str(cond.get("habit")), w))
+    if ctype in ("bond_at_least", "gift_given"):
+        ref("villager", cond.get("villager"), w, reg, report)
+    if ctype == "bond_at_least" and (not isinstance(cond.get("level"), int) or not 0 <= cond["level"] <= 5):
+        report.error(w, f"niveau d'amitié de 0 à 5 attendu, pas {cond.get('level')!r}")
+    if ctype == "gift_given" and "taste" in cond and cond["taste"] not in ("adore", "aime", "neutre", "deteste"):
+        report.error(w, f"goût inconnu {cond['taste']!r}")
     if ctype == "decision_made":
         check_id(cond.get("decision"), w, report)
         check_id(cond.get("option"), w, report)
@@ -653,6 +665,12 @@ def check_effect(eff: Any, where: str, reg: Registry, report: Report) -> None:
         reg.flags_set.add(eff.get("flag", ""))
     if etype == "reveal_habit":
         reg.habit_refs.append((str(eff.get("villager")), str(eff.get("habit")), w))
+    if etype in ("add_bond", "reveal_taste"):
+        ref("villager", eff.get("villager"), w, reg, report)
+    if etype == "add_bond" and (not isinstance(eff.get("amount"), int) or eff["amount"] < 0):
+        report.error(w, "lien: un entier positif ou nul attendu")
+    if etype == "reveal_taste":
+        ref("item", eff.get("item"), w, reg, report)
     if etype == "start_quest":
         reg.quests_started_by_effect.add(eff.get("quest", ""))
     if etype == "set_world_state":

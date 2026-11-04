@@ -3,6 +3,7 @@
  * l'état de l'hôte, interpole les autres et prédit son propre déplacement pour
  * rester fluide, corrigé en douceur par les positions de l'hôte.
  */
+import { worldFromWritten } from '../etat/habitants-ecrits';
 import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
@@ -162,7 +163,7 @@ export function createGuest(
   }
 
   const offWorld = channels.world.onMessage((message) => {
-    const world = message.world;
+    const world = worldFromWritten(message.world);
     const mine = world.characters.find((c) => c.playerId === playerId);
     if (mine !== undefined) localId = mine.id;
     keepStanding(world, message.ack);

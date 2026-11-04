@@ -9,6 +9,7 @@ import { habitKnown, habitPossible } from '../etat/planning';
 import type { Character, CharacterId, VillagerState } from '../etat/types';
 import { type HabitSource, writeDiscovery } from '../etat/types-voisins';
 import { habitCount } from '../etat/voisins';
+import { allHabitsBond } from './amitie';
 import { SCHEDULE_PERIOD_TICKS, SIM_DT } from './constantes';
 import { type Sim, character, distance, emit, message, notifyKey, partnerOf } from './contexte';
 
@@ -16,7 +17,7 @@ import { type Sim, character, distance, emit, message, notifyKey, partnerOf } fr
 const HIDDEN_ACTIVITIES = new Set(['home', 'absent']);
 
 /** Un joueur qui regarde: créé, présent, éveillé, dans la journée (une scène n'empêche rien, 4.9). */
-function canObserve(sim: Sim, c: Character): boolean {
+export function canObserve(sim: Sim, c: Character): boolean {
   return (
     sim.world.phase === 'day' &&
     c.created &&
@@ -120,8 +121,10 @@ export function revealHabit(
     notifyDiscovery(sim, ref, def.label, source, by, from);
     emit(sim, { type: 'habit_found', villager: ref.villager, habit: ref.habit, source, by });
     const count = habitCount(sim.content, world, ref.villager);
-    if (count.known === count.total)
+    if (count.known === count.total) {
       notifyKey(sim, 'both', 'message', 'habits_all', { name: villagerName(sim, ref.villager) });
+      allHabitsBond(sim, ref.villager);
+    }
   }
   sim.runtime.changed = true;
   return true;

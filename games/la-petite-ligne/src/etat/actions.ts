@@ -122,6 +122,8 @@ export type Intent =
   // Donner (à l'autre ou à un habitant)
   // `to`: un habitant ou l'autre personnage (`p1`, `p2`).
   | { type: 'give'; to: string; item: ItemId; quality: Quality; count: number }
+  // 0.13 (lot H2): offrir un objet du sac à un habitant à portée (un par habitant, par joueur et par jour)
+  | { type: 'gift'; villager: VillagerId; item: ItemId }
   // Courrier lu
   | { type: 'read_letter'; letter: string }
   // Journée

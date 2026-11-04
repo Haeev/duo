@@ -1,12 +1,15 @@
 /**
  * Le carnet des voisins, lu sur l'état (0.13, lot H1; modèle pur pour l'onglet « Voisins » du lot
- * H3, conception `v0-13-habitants.md`, sections 4.2 à 4.7). Rien ici ne lit la vraie position
- * d'un habitant: seulement son planning et ce que le duo en sait.
+ * H3, conception `v0-13-habitants.md`, sections 4.2 à 4.7; amitié, goûts et anniversaire du lot
+ * H2, sections 4.2 et 6). Rien ici ne lit la vraie position d'un habitant: seulement son planning
+ * et ce que le duo en sait.
  */
-import type { Content, VillagerDef } from '../donnees/types';
+import type { Content, Season, VillagerDef } from '../donnees/types';
 import type { HabitDef } from '../donnees/types-voisins';
+import { bondLevel, bondOf } from './amitie';
 import { entryHolds, habitKnown, habitPossible, momentOf, type PlanningMoment } from './planning';
-import type { ReadonlyWorld } from './types';
+import type { ItemId, ReadonlyWorld } from './types';
+import type { TasteLevel } from './types-voisins';
 
 /** Une habitude telle que le carnet la connaît. */
 export interface HabitView {
@@ -143,4 +146,83 @@ export function habitsDuring(
   return [...minutes.entries()]
     .map(([habit, n]) => ({ habit, known: habitKnown(world, villager, habit), minutes: n }))
     .sort((a, b) => b.minutes - a.minutes);
+}
+
+// ---------------------------------------------------------------------------
+// Amitié, goûts et anniversaire au carnet (lot H2, pour le lot H3)
+
+/** Les lanternes d'un habitant (section 6.3): le lien, son niveau, la lanterne suivante par quarts. */
+export interface BondView {
+  bond: number;
+  /** 0 « De vue » à 5 « Comme la famille ». */
+  level: number;
+  /** Clé du nom du niveau dans `textes.messages` (`bond_level_2`: « Voisinage »). */
+  levelKey: string;
+  /** Seuil du niveau suivant, `null` au dernier. */
+  next: number | null;
+  /** La lanterne suivante remplie par quarts (0 à 3; 4 au dernier niveau). */
+  quarters: number;
+}
+
+export function bondView(content: Content, world: ReadonlyWorld, villager: string): BondView {
+  const s = content.settings.bonds;
+  const bond = bondOf(world, villager);
+  const level = bondLevel(s, bond);
+  const from = s.levels[level] ?? 0;
+  const next = s.levels[level + 1] ?? null;
+  const quarters = next === null ? 4 : Math.min(3, Math.floor(((bond - from) / (next - from)) * 4));
+  return { bond, level, levelKey: `bond_level_${String(level)}`, next, quarters };
+}
+
+/** Les goûts découverts d'un habitant (section 4.2, « Ses goûts »), dans l'ordre de découverte. */
+export interface TastesView {
+  loves: ItemId[];
+  likes: ItemId[];
+  /** « N'aime pas ». */
+  dislikes: ItemId[];
+  /** Offerts sans effet sur lui: le carnet ne les montre pas, mais on sait qu'ils sont essayés. */
+  neutral: ItemId[];
+}
+
+export function tastesView(world: ReadonlyWorld, villager: string): TastesView {
+  const out: TastesView = { loves: [], likes: [], dislikes: [], neutral: [] };
+  const by: Record<TasteLevel, ItemId[]> = {
+    loves: out.loves,
+    likes: out.likes,
+    dislikes: out.dislikes,
+    neutral: out.neutral,
+  };
+  for (const [item, taste] of Object.entries(world.tastesKnown[villager] ?? {})) by[taste].push(item);
+  return out;
+}
+
+/** Le goût de cet objet est-il au carnet ? */
+export function tasteKnown(world: ReadonlyWorld, villager: string, item: string): TasteLevel | null {
+  return world.tastesKnown[villager]?.[item] ?? null;
+}
+
+/** L'anniversaire au carnet (section 4.2): connu, « ? », ou rien s'il n'en a pas d'écrit. */
+export type BirthdayView =
+  | { kind: 'known'; season: Season; day: number }
+  | { kind: 'unknown' }
+  | { kind: 'none' };
+
+/**
+ * Connu quand l'une de ses habitudes d'anniversaire (`kind: birthday`) est au carnet: vue sur
+ * place, entendue dans une réplique, ou dite par lui quand on lui offre quelque chose ce jour-là.
+ */
+export function birthdayView(content: Content, world: ReadonlyWorld, villager: string): BirthdayView {
+  const def = villagerOf(content, villager);
+  const b = content.villageCalendar.birthdays[villager];
+  if (def === undefined || b === undefined) return { kind: 'none' };
+  return birthdayKnown(content, world, villager)
+    ? { kind: 'known', season: b.season, day: b.day }
+    : { kind: 'unknown' };
+}
+
+export function birthdayKnown(content: Content, world: ReadonlyWorld, villager: string): boolean {
+  const def = villagerOf(content, villager);
+  return (
+    def?.habits.some((h) => h.kind === 'birthday' && habitKnown(world, villager, h.id)) ?? false
+  );
 }
