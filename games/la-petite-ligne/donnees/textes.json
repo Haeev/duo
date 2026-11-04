@@ -349,6 +349,16 @@
     "stall_placed": "L'étal est posé sur la place, dos à l'épicerie.",
     "bricks_placed": "La caisse de briques est devant le fournil. Achille vous attend au guichet.",
     "goat_placed": "La chevrette sort de sa caisse et file dans la chevrerie.",
+    "station_clock_placed": "La pendule est chez Ambroise. Il la regarde comme une vieille connaissance.",
+    "emile_letter_page_text": "« Au prochain garde-barrière. Si tu lis ceci, la maisonnette a retrouvé du monde, et j'en suis content. » « Graisse la manivelle de la barrière à chaque saison. Elle grince au troisième tour: c'est sa façon de dire bonjour. » « Le chef de halte s'appelle Firmin. Il te parlera en horaires. Écoute ce qu'il y a entre les horaires. » « Ne cherche pas pourquoi je suis parti. Cherche plutôt pourquoi je suis resté si longtemps: c'est la meilleure histoire. » « Le quai, le matin, quand le premier train n'est pas encore là. Il n'y a rien de plus beau sur toute la ligne. » « Dis au petit Firmin que je lui laisse le quai. Il saura quoi en faire. Émile Lacombe. »",
+    "saw_blade_placed": "La lame est devant la forge. Mado siffle entre ses dents en la voyant.",
+    "saw_blade_back_placed": "La lame est revenue à la scierie. Basile passe le pouce sur les dents neuves.",
+    "hortense_bench_placed": "Le banc d'Hortense est sous le tilleul de la place. Basile le regarde de loin, sans s'approcher.",
+    "oak_log_placed": "La grume est au parc à grumes. Basile tape dessus du plat de la main, comme sur l'épaule d'un ami.",
+    "harvest_basket_placed": "Vingt miches dans la cour du Pré-Long. Margot en compte vingt et une, par habitude.",
+    "valley_flour_placed": "Le premier sac de farine de la vallée est devant le fournil. Achille le touche, pour y croire.",
+    "salon_chair_placed": "Le fauteuil est à la scierie. Basile tourne autour, les mains dans le dos.",
+    "salon_chair_back_placed": "Le fauteuil est de retour au salon. Solange s'y assoit aussitôt.",
     "rooster_crate_arrived": "Une cage est descendue du train: le coq du cousin d'Odette attend sur le quai."
   },
   "orderFormat": {
@@ -580,6 +590,7 @@
         "doer": "{partner} t'a confié la réponse de Firmin: « {secret} » Et tu l'as rapportée à Jeanne."
       },
       "barnabe_watch": {"vignette": "Une meule qui fume sous les étoiles.", "informed": "Tu as vu d'où sortait la fumée: « {secret} » {partner} a bouché le bon évent.", "doer": "{partner} t'a dit d'où sortait la fumée: « {secret} » Tu as bouché le bon évent."},
+      "firmin_letter": {"vignette": "Deux feuilles d'une écriture penchée, sur le banc du quai.", "informed": "Tu as lu à Firmin la première feuille de la lettre d'Émile, et {partner} la seconde.", "doer": "{partner} a lu à Firmin la première feuille de la lettre d'Émile, et toi la seconde."},
       "nour_visit": {"vignette": "Une poule dans les bras, un carnet ouvert.", "informed": "Le carnet disait: « {secret} » C'est {partner} qui l'a dit à Nour.", "doer": "{partner} t'a lu le carnet: « {secret} » Et tu l'as dit à Nour."}
     }
   },

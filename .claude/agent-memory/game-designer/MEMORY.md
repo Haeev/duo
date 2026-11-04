@@ -269,3 +269,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Une entrée partielle `{ "id", "dialogues" }` en fin de `habitants-0-13.json` ajoute des répliques à un habitant d'un autre lot sans toucher à son bloc (moins de conflits de fusion).
 - Le validateur refuse un `quest_done` vers une quête pas encore écrite; le lecteur du jeu, lui, ne le contrôle pas. Prouver le reste par une copie des données avec des quêtes factices.
 - Jour 1 = samedi: lundi = jour 3, jeudi = jour 6. Test ciblé hors du dépôt: `npx vitest run --dir <dossier>` depuis le jeu, avec des imports absolus.
+
+## Suites de quêtes des six habitants de la démo (lot H5, troisième groupe, vérifié le 2026-11-04)
+
+- Arbre isolé neuf: `node_modules` est vide. Un test qui importe la simulation échoue sur `@duo/sdk/sim` tant qu'on n'a pas lancé `pnpm install --frozen-lockfile --prefer-offline` à la racine de l'arbre (2 s, hors ligne); `tests/contenu.test.ts` passe sans. Un test placé hors du dépôt (`--dir` du scratchpad) ne résout pas `@duo/sdk`, même après: le poser dans `tests/` le temps de le lancer, puis le retirer.
+- `updateQuests` démarre les quêtes avant de faire avancer les étapes: une quête ouverte par la fin d'une autre ne démarre qu'à l'appel suivant (le pas d'après en jeu). Dans un test, rappeler `updateQuests`.
+- Monde d'essai (`newSim`): `world.beam` porte encore la poutre du jour 1 et des quêtes de la démo démarrent (`lucie_note` et sa réplique prioritaire chez Jeanne). Les neutraliser avant de tester une charge ou un choix de dialogue d'après le jour 16.
+- `reglages.carry.quests` retrouve sa charge par l'objet (`find(q => q.item === ...)`): un objet distinct par charge, même pour l'aller et le retour. Le modèle de l'objet décide de la prise (long si le modèle a un axe, comme `beam`; sinon tenu face à face).
+- Les effets d'une scène à deux tournent sans joueur (`actor` nul): `give_item` vers `actor` n'y donne rien. Donner l'objet par une réplique personnelle (`once` absent, garde `not item_owned`) à l'étape suivante.
+- À cette date, la règle 5.1 (deux histoires en cours, une neuve par jour, trois jours entre deux étapes) n'est pas codée: toutes les quêtes dont les conditions tiennent démarrent ensemble.
+- Six habitants de la démo: chaque quête porte `day_at_least 16` et chaque réplique est gardée par une étape de ces quêtes, pour ne rien changer aux jours 1 à 15. La grappe de sureau ne se cueille que du 1 au 14 de l'automne: ne pas en faire l'ingrédient d'une quête de printemps.
+- Le premier jour de classe de l'automne est le lundi 3 (le 1 est un samedi): une « rentrée » se cale sur `season_day_is [3]`.

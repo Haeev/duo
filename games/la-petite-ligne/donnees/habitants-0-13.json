@@ -1227,6 +1227,62 @@
       "dialogues": [
         {"id": "nour_fox_tracks_scene", "kind": "scene", "shared": true, "point": "lookout", "once": "duo", "priority": 85, "when": [{"type": "step_active", "quest": "nour_fox", "step": "tracks"}, {"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "time_is", "from": "06:00", "to": "09:00"}], "lines": [{"speaker": "ines", "text": "Là, dans la boue. Quatre doigts, et la patte arrière qui traîne. Un jeune renard qui boite."}, {"speaker": "ines", "text": "Il chasse au crépuscule, près de son terrier. Dites-le à Nour."}]}
       ]
+    },
+    {
+      "id": "ambroise",
+      "dialogues": [
+        {"id": "ambroise_watch_receive", "kind": "quest", "priority": 40, "when": [{"type": "step_active", "quest": "firmin_watch", "step": "bring"}], "lines": [{"speaker": "ambroise", "text": "Une montre de cheminot, dans un mouchoir à carreaux. C'est Lacombe qui vous envoie. Ne dites rien: le mouchoir parle pour lui."}, {"speaker": "ambroise", "text": "Laissez-la-moi. Une montre arrêtée, ça ne se brusque pas."}]},
+        {"id": "ambroise_clock_letter", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "firmin_clock", "step": "letter"}, {"type": "decision_made", "decision": "minute", "option": "letter"}], "lines": [{"speaker": "ambroise", "text": "Tenez. Une lettre pour Lacombe. Je l'ai recommencée onze fois. La douzième dira ce qu'elle pourra."}, {"speaker": "ambroise", "text": "Ne la lisez pas. Elle est mal écrite, et c'est la seule chose de travers que j'aie faite depuis trente ans."}], "effects": [{"type": "give_item", "item": "ambroise_letter", "count": 1, "to": "actor"}]},
+        {"id": "ambroise_brass_buttons", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "firmin_uniform", "step": "buttons"}], "lines": [{"speaker": "ambroise", "text": "Des boutons de laiton pour l'uniforme d'Émile ? J'en garde une boîte depuis ma dernière gare."}, {"speaker": "ambroise", "text": "Six. Comptez-les. Moi, je les ai comptés deux fois."}], "effects": [{"type": "give_item", "item": "brass_buttons", "count": 6, "to": "actor"}]}
+      ]
+    },
+    {
+      "id": "honorine",
+      "dialogues": [
+        {"id": "honorine_tart_half", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "odette_tart", "step": "halves"}, {"type": "not", "condition": {"type": "flag", "flag": "sisters_reconciled"}}], "lines": [{"speaker": "honorine", "text": "La tarte de Mme Ferrand ! Approche, mon petit cœur. La pâte, je m'en souviens: farine, beurre froid, une pincée de sel, et on la laisse dormir sous un torchon pendant la messe."}, {"speaker": "honorine", "text": "La garniture, c'est Marthe qui l'a. Elle a toujours eu la mémoire des choses sucrées. Moi, j'ai celle des choses qu'on pétrit."}]},
+        {"id": "sisters_tart_recipe", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "odette_tart", "step": "halves"}, {"type": "flag", "flag": "sisters_reconciled"}], "lines": [{"speaker": "honorine", "text": "La tarte de Mme Ferrand ? Marthe et moi, on l'a écrite dimanche, sur le même papier. Deux écritures sur une feuille: ça ne nous était pas arrivé depuis l'école."}, {"speaker": "honorine", "text": "La pâte, c'est moi. La garniture, c'est elle: trois œufs, de la crème, et du sureau en fleur. Le sureau, c'était le secret."}]}
+      ]
+    },
+    {
+      "id": "marthe",
+      "dialogues": [
+        {"id": "marthe_tart_half", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "odette_tart", "step": "halves"}, {"type": "not", "condition": {"type": "flag", "flag": "sisters_reconciled"}}], "lines": [{"speaker": "marthe", "text": "La tarte de la mère d'Odette ? La garniture: trois œufs, de la crème, et du sureau en fleur. Le sureau, c'était le secret."}, {"speaker": "marthe", "text": "Honorine croit que c'était de la vanille. Laissez-la croire. Elle a eu la pâte, je peux bien garder le secret."}]}
+      ]
+    },
+    {
+      "id": "mado",
+      "dialogues": [
+        {"id": "mado_mold_find", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "odette_mold", "step": "find"}], "lines": [{"speaker": "mado", "text": "Un moule cannelé ? Ho ! Il est pendu au-dessus de la porte depuis toujours. Je croyais que c'était une couronne."}, {"speaker": "mado", "text": "Il est noir comme mon tablier. On le rétame, si tu veux: l'un au soufflet, l'autre à l'étain. Reviens avec {partner}."}]},
+        {"id": "odette_mold_scene", "kind": "scene", "shared": true, "point": "forge_inside", "once": "duo", "priority": 85, "when": [{"type": "step_active", "quest": "odette_mold", "step": "tin"}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]}, {"type": "any", "conditions": [{"type": "time_is", "from": "07:00", "to": "12:00"}, {"type": "time_is", "from": "13:30", "to": "18:00"}]}], "lines": [{"speaker": "mado", "text": "Le moule au feu, l'étain dedans. Ça fond vite et ça prend aussi vite. Pas le temps de rêver."}, {"choices": [{"id": "bellows", "text": "Je tiens le soufflet.", "reply": []}, {"id": "tin", "text": "J'étale l'étain.", "reply": []}], "same": [{"speaker": "mado", "text": "Le même geste à deux ? Bon, je fais l'autre. Ha !"}, {"speaker": "narrator", "text": "Le moule ressort de la forge, brillant comme au premier jour."}, {"speaker": "mado", "text": "Venez le chercher à l'atelier, je l'emballe. Je pleure facilement devant les gens qui pleurent: c'est vous qui le rendrez à Odette."}], "different": [{"speaker": "mado", "text": "Souffle long, régulier. Le feu aime qu'on lui parle doucement."}, {"speaker": "mado", "text": "Étale du centre vers le bord, au chiffon. Vite !"}, {"speaker": "narrator", "text": "Le moule ressort de la forge, brillant comme au premier jour."}, {"speaker": "mado", "text": "Venez le chercher à l'atelier, je l'emballe. Je pleure facilement devant les gens qui pleurent: c'est vous qui le rendrez à Odette."}]}]},
+        {"id": "mado_mold_ready", "kind": "quest", "priority": 40, "when": [{"type": "step_active", "quest": "odette_mold", "step": "give"}, {"type": "not", "condition": {"type": "item_owned", "item": "ferrand_mold", "count": 1}}], "lines": [{"speaker": "mado", "text": "Le voilà, dans du papier journal. File, Odette t'attend sans le savoir."}], "effects": [{"type": "give_item", "item": "ferrand_mold", "count": 1, "to": "actor"}]},
+        {"id": "mado_blade_wait", "kind": "quest", "priority": 40, "when": [{"type": "step_active", "quest": "basile_blade", "step": "wait"}], "lines": [{"speaker": "mado", "text": "La lame de Basile ? Je lui refais les dents une par une. Deux nuits, pas une de moins. Le fer n'aime pas qu'on le presse, et moi non plus."}]}
+      ]
+    },
+    {
+      "id": "lucie",
+      "dialogues": [
+        {"id": "lucie_gustave_letter", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "odette_gustave", "step": "fetch"}], "lines": [{"speaker": "lucie", "text": "Dans ma sacoche, une lettre pour Odette. Elle vient de loin: le timbre a fait trois tours de tampon."}, {"speaker": "lucie", "text": "Porte-la-lui, toi. Moi, je ne saurais pas où mettre mes yeux quand elle l'ouvrira."}], "effects": [{"type": "give_item", "item": "gustave_letter", "count": 1, "to": "actor"}]},
+        {"id": "lucie_apprentice_ok", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "achille_apprentice", "step": "convince"}], "lines": [{"speaker": "lucie", "text": "Ma nièce au fournil à l'aube ? Je la dépose en partant pour ma tournée. Elle sentira le pain, et moi le courrier."}]}
+      ]
+    },
+    {
+      "id": "ines",
+      "dialogues": [
+        {"id": "ines_joinery_oak", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "basile_joinery", "step": "choose"}], "lines": [{"speaker": "ines", "text": "Le chêne de Basile ? J'en ai marqué un pour lui depuis longtemps: celui qui penche sur le chemin de la coupe. Cent vingt ans, et trois petits autour. Il peut partir."}, {"speaker": "ines", "text": "Dites à Basile qu'il porte une croix blanche. Il saura."}]},
+        {"id": "ines_hide_ok", "kind": "quest", "priority": 40, "once": "duo", "when": [{"type": "step_active", "quest": "jeanne_hide", "step": "ines"}], "lines": [{"speaker": "ines", "text": "Une cabane à la mare ? Basse, en bois du pays, sans peinture, et personne n'y crie. Alors oui."}, {"speaker": "ines", "text": "Je préviendrai les hérons. Ils sont susceptibles."}]}
+      ]
+    },
+    {
+      "id": "leon",
+      "dialogues": [
+        {"id": "leon_hide_claim", "kind": "quest", "priority": 40, "when": [{"type": "step_active", "quest": "jeanne_hide", "step": "decide"}], "lines": [{"speaker": "leon", "text": "La cabane de la mare ? Moi aussi, je veux guetter. J'ai même un sifflet pour appeler les oiseaux. Enfin, pour appeler les trains. C'est presque pareil."}]}
+      ]
+    },
+    {
+      "id": "berthe",
+      "dialogues": [
+        {"id": "berthe_valley_bread", "kind": "quest", "priority": 40, "when": [{"type": "step_active", "quest": "achille_valley_flour", "step": "give"}], "lines": [{"speaker": "berthe", "text": "Un pain d'Achille ? De ma farine ? Attends, je m'essuie les mains. Ha ! Mon père aurait pleuré. Moi, je ris: c'est pareil, en plus fort."}]}
+      ]
     }
   ]
 }
