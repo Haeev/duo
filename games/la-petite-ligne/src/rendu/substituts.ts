@@ -365,6 +365,17 @@ const ITEMS: Record<string, Builder> = {
     b.cylinder(0.12, 0.08, 0.09, [0, 0, 0], 'ceramic_blue', { base: true, segments: 10 });
     b.cylinder(0.105, 0.105, 0.01, [0, 0.085, 0], 'soup', { base: true, segments: 10 });
   },
+  // Bol de la soupe du café et du souper de la pension (même forme, le plat se lit à l'icône).
+  bowl: (b) => {
+    b.cylinder(0.1, 0.06, 0.08, [0, 0, 0], 'ceramic', { base: true, segments: 10 });
+    b.cylinder(0.085, 0.085, 0.01, [0, 0.075, 0], 'soup', { base: true, segments: 10 });
+  },
+  // Jumelles de l'aïeul de Jeanne: deux tubes côte à côte, un pont entre eux.
+  binoculars: (b) => {
+    b.cylinder(0.035, 0.04, 0.14, [-0.045, 0, 0], 'iron', { base: true, segments: 8 });
+    b.cylinder(0.035, 0.04, 0.14, [0.045, 0, 0], 'iron', { base: true, segments: 8 });
+    b.box([0.06, 0.03, 0.04], [0, 0.05, 0], 'iron', {});
+  },
   iron_box: (b) =>
     b.box([0.3, 0.16, 0.2], [0, 0, 0], { top: 'rust', side: 'iron' }, { base: true }),
   riddle_card: (b) => b.box([0.16, 0.01, 0.11], [0, 0, 0], 'paper', { base: true }),

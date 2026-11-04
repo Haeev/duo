@@ -49,7 +49,7 @@ function resolved(model: string): string | null {
 }
 
 /** Types de la carte sans modèle à ce jour, chacun avec son substitut dédié (signalés au compte rendu). */
-const KNOWN_SUBSTITUTES = ['cemetery_gate', 'field_gate', 'log_bench', 'straw_bale'];
+const KNOWN_SUBSTITUTES = ['cemetery_gate', 'clothesline', 'field_gate', 'log_bench', 'straw_bale'];
 
 describe('0.13: chaque type de la carte rendu par son modèle', () => {
   it('tous les types et ouvrages ont un nœud de l’artiste, sauf les substituts connus (dédiés)', () => {
