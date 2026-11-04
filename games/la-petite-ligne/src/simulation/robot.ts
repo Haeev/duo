@@ -8,7 +8,7 @@ import { questBaselines, questChecklist } from '../etat/quete';
 import { GRAIN_GIFT_FLAG, rationsNeeded } from './poules';
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
-import { groundAt } from '../etat/carte';
+import { cellX, cellY, groundAt } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
@@ -1052,12 +1052,11 @@ function carryBlockers(sim: Sim, holders: readonly CharacterId[]): Blockers {
   if (cached?.key !== key || tick - cached.tick >= CARRY_AVOID_TICKS || tick < cached.tick) {
     const { map } = sim;
     const avoid = cached?.avoid.length === map.width * map.height ? cached.avoid : new Uint8Array(map.width * map.height);
-    for (let cy = 0; cy < map.height; cy++) {
-      for (let cx = 0; cx < map.width; cx++) {
-        const x = cx + 0.5;
-        const y = cy + 0.5;
-        avoid[cy * map.width + cx] = offsets.some((o) => isDoorCell(map, x + o.x, y + o.y) || bodyCollides(base, x + o.x, y + o.y)) ? 1 : 0;
-      }
+    // Par index (`cellX`, `cellY`): la grille commence à son origine, négative depuis la 0.13.
+    for (let i = 0; i < avoid.length; i++) {
+      const x = cellX(map, i) + 0.5;
+      const y = cellY(map, i) + 0.5;
+      avoid[i] = offsets.some((o) => isDoorCell(map, x + o.x, y + o.y) || bodyCollides(base, x + o.x, y + o.y)) ? 1 : 0;
     }
     cached = { key, tick, avoid };
     carryAvoid.set(sim, cached);
