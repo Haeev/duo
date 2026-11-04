@@ -25,6 +25,8 @@ function daySim(day: number, minutes: number, seed = SEED): Sim {
   w.clock.day = day;
   w.clock.minutes = minutes;
   w.weather = 'sunny';
+  // Le chat est arrivé (histoire de Margot, section 7.4).
+  w.flags.push('cat_here');
   for (const c of w.characters) {
     c.created = true;
     c.status = 'active';
@@ -332,6 +334,7 @@ describe('vie du village, lot H7', () => {
       w.clock.running = false;
       w.scene = null;
       w.weather = 'sunny';
+      w.flags.push('cat_here');
       for (const c of w.characters) {
         c.created = true;
         c.status = 'active';

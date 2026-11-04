@@ -10,13 +10,17 @@ import { SIM_HZ, type Vec2, type VillagerState } from '../etat/types';
 import {
   lifePlace,
   partnersCenter,
+  sceneGroupOf,
   sceneSlotOf,
   sceneTarget,
+  SCENE_PREFIX,
+  shuttleLeg,
   villagePause,
   seatTarget,
   workPostOf,
 } from '../etat/vie';
-import { type Sim, distance, emit } from './contexte';
+import { unitDraw } from '../etat/tirage';
+import { type Runtime, type Sim, distance, emit } from './contexte';
 
 /** Ce que le planning donne à cet instant (forme de `currentEntry` d'`habitants.ts`). */
 export interface LifeEntry {
@@ -28,6 +32,8 @@ export interface LifeEntry {
 
 /** Deux places plus proches que cela sont la même place (chaise prise). */
 const SAME_PLACE = 0.3;
+/** Les deux porteurs d'un portage à deux sont ensemble à moins de cela (m): ils portent, sinon ils s'attendent. */
+const SHUTTLE_TOGETHER = 3;
 
 /**
  * L'entrée qui remplace celle du planning: une scène en cours dont il est membre, ou une place
@@ -42,6 +48,14 @@ export function lifeEntry(sim: Sim, def: VillagerDef, v: VillagerState, entry: L
     const group = slot.scene.groups[slot.group];
     if (group === undefined) return null;
     if (group.place.kind === 'planning') return group.activity === '' ? null : { ...entry, activity: group.activity };
+    if (group.place.kind === 'shuttle') {
+      // Portage à deux (S09): l'étape change toutes les `legMinutes`, et le point visé avec elle;
+      // tant que l'autre porteur n'est pas là, chacun l'attend au tas, à vide.
+      const partner = world.villagers.find((o) => o.id === group.who[1 - slot.rank]);
+      const together = partner !== undefined && partner.visible && distance(partner.pos, v.pos) <= SHUTTLE_TOGETHER;
+      const leg = together ? shuttleLeg(slot.scene, group.place.legMinutes, world.clock.minutes) : 0;
+      return { point: sceneTarget(slot.scene.id, slot.group, slot.rank, leg), activity: group.activity, habit: entry.habit, from: slot.scene.from };
+    }
     // Sortie d'un lieu (messe): l'habitude vue est celle d'où il sort, pas celle qui l'attend chez lui.
     let habit = entry.habit;
     if (slot.scene.cameFrom !== null) {
@@ -114,6 +128,65 @@ export function lifeFacing(sim: Sim, v: VillagerState): number | undefined {
     if (partnersCenter(sim.world, all, v.id, scratch)) return Math.atan2(scratch.y - v.pos.y, scratch.x - v.pos.x);
   }
   return undefined;
+}
+
+/**
+ * Cap en marchant: les porteurs d'un portage à deux (S09) avancent face à face, de côté; `null`:
+ * dans le sens de la marche.
+ */
+export function lifeWalkFacing(sim: Sim, v: VillagerState): number | null {
+  if (!v.target.startsWith(SCENE_PREFIX)) return null;
+  const s = sceneGroupOf(sim.content, v.target);
+  if (s?.group.place.kind !== 'shuttle') return null;
+  return lifePlace(sim.content, v.target)?.facing ?? null;
+}
+
+/** Paires déjà saluées (S01), par jour: mémoire de l'hôte hors sauvegarde (une reprise peut resaluer). */
+const greeted = new WeakMap<Runtime, { day: number; pairs: Set<string> }>();
+
+/**
+ * Saluts du matin (S01): deux habitants dehors qui se croisent à moins de `range` m, dont l'un
+ * marche, hors scène et hors conversation, se saluent si la paire est tirée ce jour-là. Deux
+ * événements `villager_greeting` (la bulle de chacun), reçus par l'invité comme les autres.
+ */
+export function villagerGreetings(sim: Sim): void {
+  const def = sim.content.village.greetings;
+  const { world } = sim;
+  if (def === null || world.phase !== 'day') return;
+  const m = world.clock.minutes;
+  if (m < def.from || m >= def.to) return;
+  let memory = greeted.get(sim.runtime);
+  if (memory?.day !== world.clock.day) {
+    memory = { day: world.clock.day, pairs: new Set() };
+    greeted.set(sim.runtime, memory);
+  }
+  const list = world.villagers;
+  for (let i = 0; i < list.length; i++) {
+    const a = list[i];
+    if (a === undefined || !greetable(a)) continue;
+    for (let j = i + 1; j < list.length; j++) {
+      const b = list[j];
+      if (b === undefined || !greetable(b) || (a.speed === 0 && b.speed === 0)) continue;
+      if (distance(a.pos, b.pos) > def.range) continue;
+      const pair = `${a.id}:${b.id}`;
+      if (memory.pairs.has(pair)) continue;
+      memory.pairs.add(pair);
+      if (unitDraw(world.seed, `greet:${pair}`, world.clock.day) >= def.chance) continue;
+      const pick = unitDraw(world.seed, `greet-line:${pair}`, world.clock.day);
+      const line = def.lines[Math.floor(pick * def.lines.length)] ?? '';
+      const reply = def.replies[Math.floor(pick * def.replies.length * 7) % def.replies.length] ?? '';
+      emit(sim, { type: 'villager_greeting', villager: a.id, other: b.id, text: line.replace('{name}', firstName(sim, b.id)) });
+      emit(sim, { type: 'villager_greeting', villager: b.id, other: a.id, text: reply.replace('{name}', firstName(sim, a.id)) });
+    }
+  }
+}
+
+function greetable(v: VillagerState): boolean {
+  return v.visible && v.inside === null && v.talkingWith.length === 0 && !v.target.startsWith(SCENE_PREFIX);
+}
+
+function firstName(sim: Sim, id: string): string {
+  return sim.content.villagers.find((d) => d.id === id)?.firstName ?? id;
 }
 
 /** Pause de l'angélus (S10) en cours ? */

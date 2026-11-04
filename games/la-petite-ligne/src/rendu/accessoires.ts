@@ -14,6 +14,7 @@
  * Les vélos et l'objet tenu devant soi sont posés par `VillagerCarry`, après l'animation.
  */
 import {
+  Box3,
   DataTexture,
   Mesh,
   NoColorSpace,
@@ -217,6 +218,8 @@ export class VillagerCarry {
   private hasLast = false;
   private chest: Object3D | null = null;
   private chestModel = '';
+  private chestReach = 0;
+  private chestDrop = 0;
 
   constructor(
     private readonly root: Object3D,
@@ -253,14 +256,26 @@ export class VillagerCarry {
     this.bike = bike;
   }
 
-  /** Objet tenu devant la poitrine (`model`) ou aucun. */
-  setChest(model: string | null): void {
+  /**
+   * Objet tenu devant la poitrine (`model`) ou aucun. `reach` (m): poussé d'autant devant les mains,
+   * en long (charge portée à deux, S09: son milieu entre les deux porteurs).
+   */
+  setChest(model: string | null, reach = 0): void {
     const name = model ?? '';
-    if (name === this.chestModel) return;
+    if (name === this.chestModel && reach === this.chestReach) return;
     this.chest?.removeFromParent();
+    this.chestReach = reach;
+    this.chestDrop = 0;
     this.chest = model === null ? null : this.library.instantiate(model);
     if (this.chest !== null) {
-      swapMaterial(this.chest, this.swap);
+      // Une charge portée à deux vient du décor (palette), pas de `personnages.png`: pas d'échange de
+      // matériau. Sa longueur (son X) va d'un porteur à l'autre.
+      if (reach === 0) swapMaterial(this.chest, this.swap);
+      else {
+        this.chest.rotation.y = Math.PI / 2;
+        // Tenue par les côtés: les mains à mi-hauteur de la charge (son origine est à sa base).
+        this.chestDrop = new Box3().setFromObject(this.chest).getSize(tmpRight).y / 2;
+      }
       this.chest.traverse((object) => {
         object.castShadow = true;
       });
@@ -293,6 +308,12 @@ export class VillagerCarry {
     if (this.chest !== null && hands(tmpLeft, tmpRight)) {
       tmpLeft.add(tmpRight).multiplyScalar(0.5);
       this.root.worldToLocal(tmpLeft);
+      const ahead = Math.hypot(tmpLeft.x, tmpLeft.z);
+      if (this.chestReach !== 0 && ahead > 1e-6) {
+        tmpLeft.x += (tmpLeft.x / ahead) * this.chestReach;
+        tmpLeft.z += (tmpLeft.z / ahead) * this.chestReach;
+      }
+      tmpLeft.y -= this.chestDrop;
       this.chest.position.copy(tmpLeft);
     }
   }

@@ -35,6 +35,7 @@ import { foldOldHeard } from './dialogues';
 import { morningBoard } from './annonces';
 import { morningImprovements } from './chantiers';
 import { catalogueClock } from './catalogue';
+import { morningCatGift } from './chat';
 import { secondsPerGameMinuteOn, seasonStartingOn } from '../donnees/calendrier';
 
 const BUSY: ReadonlySet<CharacterStatus> = new Set(['menu', 'dialogue', 'scene', 'breakfast']);
@@ -191,6 +192,8 @@ export function morning(sim: Sim): void {
   morningTrees(sim);
   // Avant la cueillette: une cueillette tombée d'un sac au pied d'un coin y reste (`tidyGround`).
   tidyGround(sim);
+  // 0.13: la trouvaille de la semaine du chat, devant la maisonnette (après le rangement de la nuit).
+  morningCatGift(sim);
   morningForage(sim);
   morningEggs(sim);
   morningGoats(sim);

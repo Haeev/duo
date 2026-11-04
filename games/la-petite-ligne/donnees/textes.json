@@ -20,6 +20,7 @@
     "habits_all": "Tu connais toutes les habitudes de {name}.",
     "decision_opened": "{name} vous demande: « {question} » À décider à deux.",
     "decision_taken": "Décidé ensemble: « {choice} »",
+    "cat_gift": "{name} a laissé {item} devant la porte de la maisonnette.",
     "habit_unknown_person": "une personne inconnue",
     "bond_level_0": "De vue",
     "bond_level_1": "Connaissance",

@@ -1663,6 +1663,12 @@ export type WorldEvent =
   | { type: WorkStrokeEvent; villager: VillagerId; at: Vec2 }
   /** Le chat se met à suivre ce joueur (miaulement, `AUDIO_SETTINGS.village.events`). */
   | { type: 'cat_follow'; by: CharacterId; at: Vec2 }
+  /** Un joueur caresse le chat (geste 30 de la table 7.1): ronronnement (`cat-purr`). */
+  | { type: 'cat_pet'; by: CharacterId; at: Vec2 }
+  /** La trouvaille de la semaine du chat, déposée devant la maisonnette à l'aube (section 7.4). */
+  | { type: 'cat_gift'; item: ItemId; at: Vec2 }
+  /** Deux habitants se croisent et se saluent (S01): la bulle de l'un, chez les deux joueurs. */
+  | { type: 'villager_greeting'; villager: VillagerId; other: VillagerId; text: string }
   // 0.13 (lot H2): amitié et cadeaux (sons du lot H8: `bond-chime`, `bond-level`, `gift-happy`, `gift-polite`, `birthday-chime`)
   /** Un cadeau offert depuis le sac: son goût, le gain; `returned`: il ne l'aime pas, l'objet reste au sac. */
   | { type: 'gift_offered'; by: CharacterId; villager: VillagerId; item: ItemId; taste: TasteLevel; gain: number; returned: boolean; birthday: boolean }

@@ -58,13 +58,14 @@ const vote = (by: CharacterId, option: string | null, decision = 'minute'): { by
 });
 
 describe('décisions à deux', () => {
-  it('donne les quatre décisions de la conception, avec leurs options', () => {
+  it('donne les cinq décisions de la conception (et le nom du chat), avec leurs options', () => {
     const { content } = contentAndMap();
     const ids = content.decisions.list.map((d) => [d.id, d.villager, d.options.map((o) => o.id)]);
     expect(ids).toEqual([
       ['minute', 'ambroise', ['now', 'letter']],
       ['mouture', 'berthe', ['weighing', 'watch']],
       ['robe', 'marthe', ['marthe', 'shared']],
+      ['cat_name', 'margot', ['pompon', 'grisaille', 'mistral']],
       ['cabane', 'jeanne', ['shared', 'jeanne']],
     ]);
     expect(content.decisions.agreeSeconds).toBe(2);

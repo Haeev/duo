@@ -28,6 +28,8 @@ export function applyVillageLifeExample(
   if (params.get('vie13') !== '1') return null;
   const sim: Sim = wrapWorld(content, map, world);
   world.phase = 'day';
+  // Le chat est arrivé (histoire de Margot) et Lucie est rentrée: toute la vie du village se voit.
+  for (const flag of ['cat_here', 'lucie_back', 'achille_here', 'solange_here']) if (!world.flags.includes(flag)) world.flags.push(flag);
   for (const v of world.villagers) v.talkingWith = [];
   placeVillagers(sim);
   let tick = world.tick;

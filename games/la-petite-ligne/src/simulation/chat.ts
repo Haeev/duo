@@ -14,8 +14,10 @@ import type { CatDef, CatHabitDef } from '../donnees/vie';
 import type { CatPoseName, CatSnapshot } from '../etat/chat';
 import { planningCondition } from '../etat/planning';
 import { unitDraw } from '../etat/tirage';
-import { SIM_HZ, type CharacterId, type Vec2 } from '../etat/types';
-import { type Sim, distance, emit } from './contexte';
+import { SIM_HZ, type Character, type CharacterId, type Vec2 } from '../etat/types';
+import { addHeart } from './besoins';
+import { type Runtime, type Sim, bump, distance, emit, newId, notifyKey, point } from './contexte';
+import { gesture } from './potager';
 import { villagerBlockers } from './deplacement';
 import { findPath } from './grille';
 
@@ -50,14 +52,43 @@ export interface CatState {
   rollUntil: number;
   /** Vitesse lissée de chaque joueur (m/s). */
   pace: Record<CharacterId, number>;
+  /** Dernière caresse de chaque joueur (pas de la simulation), -1: aucune. */
+  petAt: Record<CharacterId, number>;
 }
+
+/** Le chat est-il arrivé au bourg (conditions `when` de `vie.json`: l'histoire de Margot, section 7.4) ? */
+export function catHere(sim: Pick<Sim, 'content' | 'world'>, def: CatDef): boolean {
+  const { world, content } = sim;
+  const at = { day: world.clock.day, minutes: world.clock.minutes, weather: world.weather };
+  return def.when.every((c) => planningCondition(content, world, c, at));
+}
+
+/**
+ * Son nom, choisi à deux (`nameDecision`): l'étiquette de l'option prise, sans son point final;
+ * `null` tant qu'il n'est pas nommé.
+ */
+export function catName(sim: Pick<Sim, 'content' | 'world'>, def: CatDef): string | null {
+  if (def.nameDecision === null) return null;
+  const option = sim.world.decisions[def.nameDecision];
+  const label = sim.content.decisions.list.find((d) => d.id === def.nameDecision)?.options.find((o) => o.id === option)?.label;
+  return label === undefined ? null : label.replace(/[.!]+$/, '');
+}
+
+/**
+ * Vu absent pendant cette séance (avant l'histoire de Margot): à son arrivée, il sort du panier, au
+ * lieu d'apparaître à sa place. Mémoire de l'hôte hors sauvegarde: une reprise le pose à sa place.
+ */
+const absentSeen = new WeakMap<Runtime, true>();
 
 /** L'habitude du chat à cet instant (la première qui tient), ou `null`: il n'est pas au bourg. */
 export function catHabit(sim: Sim, def: CatDef): CatHabitDef | null {
   const { world, content } = sim;
   if (world.phase !== 'day') return null;
   const at = { day: world.clock.day, minutes: world.clock.minutes, weather: world.weather };
-  if (!def.when.every((c) => planningCondition(content, world, c, at))) return null;
+  if (!catHere(sim, def)) {
+    absentSeen.set(sim.runtime, true);
+    return null;
+  }
   return (
     def.habits.find(
       (h) => at.minutes >= h.from && at.minutes < h.to && h.when.every((c) => planningCondition(content, world, c, at)),
@@ -115,8 +146,11 @@ export function updateCat(sim: Sim, dt: number): void {
   let cat = sim.runtime.cat;
   if (cat === null) {
     // Il apparaît à sa place (début de journée, reprise): personne ne le voit arriver de nulle part en marchant.
+    // Le jour de son arrivée, il sort du panier de Margot et part de lui-même vers sa place.
     const spot = Math.floor(draw(sim, 'spot') * habit.spots.length);
-    const at = spotOf(habit, spot);
+    const arriving = def.arrival !== null && absentSeen.get(sim.runtime) === true;
+    absentSeen.delete(sim.runtime);
+    const at = arriving && def.arrival !== null ? { x: def.arrival.x, y: def.arrival.y } : spotOf(habit, spot);
     cat = {
       pos: { ...at },
       prev: { ...at },
@@ -135,8 +169,10 @@ export function updateCat(sim: Sim, dt: number): void {
       followBy: null,
       followUntil: -1,
       near: { p1: false, p2: false },
+      petAt: { p1: -1, p2: -1 },
     };
     sim.runtime.cat = cat;
+    if (arriving) goTo(sim, cat, spotOf(habit, spot), 'walk');
   }
   cat.prev.x = cat.pos.x;
   cat.prev.y = cat.pos.y;
@@ -249,6 +285,85 @@ export function updateCat(sim: Sim, dt: number): void {
   if (cat.mode !== 'rest') cat.mode = 'rest';
   // Assis, il tourne la tête vers qui approche doucement; endormi, il ne bouge pas.
   if (watched !== null && cat.pose === 'idle') cat.facing = Math.atan2(watched.y - cat.pos.y, watched.x - cat.pos.x);
+}
+
+/**
+ * Sa trouvaille de la semaine (section 7.4), à l'aube: un jour de chaque semaine tiré par la graine,
+ * s'il est au bourg, une plume de geai ou un bouton de laiton (à tour de rôle, jamais une bête)
+ * devant la maisonnette. Elle est par terre, comme un objet tombé: chacun peut la ramasser.
+ */
+export function morningCatGift(sim: Sim): void {
+  const def = sim.content.village.cat;
+  const gift = def?.gift ?? null;
+  const { world } = sim;
+  if (def === null || gift === null || gift.items.length === 0 || !catHere(sim, def)) return;
+  const week = Math.floor((world.clock.day - 1) / 7);
+  const giftDay = Math.floor(unitDraw(world.seed, `${CAT}:gift`, week) * 7);
+  if ((world.clock.day - 1) % 7 !== giftDay) return;
+  const item = gift.items[week % gift.items.length];
+  const itemDef = item === undefined ? undefined : sim.content.items[item];
+  if (item === undefined || itemDef === undefined) return;
+  const base = point(sim, gift.point);
+  const at = { x: base.x + gift.offset.x, y: base.y + gift.offset.y };
+  world.groundItems.push({ id: newId(sim, 'g'), item, quality: 'ordinary', count: 1, pos: at });
+  sim.runtime.changed = true;
+  const name = catName(sim, def) ?? 'Le chat';
+  notifyKey(sim, 'both', 'message', 'cat_gift', { name, item: itemDef.indefinite ?? itemDef.name });
+  emit(sim, { type: 'cat_gift', item, at });
+}
+
+/** Identifiant du geste « caresser le chat » dans la visée (cible `decor` d'`agir.ts`). */
+export const CAT_PET = 'cat_pet';
+
+/**
+ * Le chat à caresser pour ce joueur (geste 30): posé (assis, couché ou en roulade), ni en marche ni
+ * en fuite, à portée, dehors; `around`: un clic ou un survol près de lui. Rend sa place et l'invite.
+ */
+export function catPetTarget(
+  sim: Sim,
+  c: Character,
+  around: { at: Vec2; radius: number } | null = null,
+): { pos: Vec2; label: string } | null {
+  const def = sim.content.village.cat;
+  const cat = sim.runtime.cat;
+  const pet = def?.pet ?? null;
+  if (def === null || pet === null || cat === null || c.inside !== null || sim.world.phase !== 'day') return null;
+  if (cat.mode !== 'rest' && cat.mode !== 'follow') return null;
+  if (cat.speed > 0) return null;
+  const from = around?.at ?? c.pos;
+  if (distance(from, cat.pos) > (around?.radius ?? pet.range)) return null;
+  const name = catName(sim, def) ?? 'le chat';
+  return { pos: { x: cat.pos.x, y: cat.pos.y }, label: pet.label.replace('{name}', name) };
+}
+
+/**
+ * Caresser le chat: il ronronne (`cat_pet`, son `cat-purr`), lève la tête vers qui le caresse et
+ * reste un peu plus longtemps à sa place; Cœur une fois par jour; caressé par les deux presque
+ * ensemble, il se roule sur le dos. Le fuir reste la règle de `updateCat` (qui arrive vite).
+ */
+export function petCat(sim: Sim, c: Character): void {
+  const def = sim.content.village.cat;
+  const pet = def?.pet ?? null;
+  const cat = sim.runtime.cat;
+  if (def === null || pet === null || cat === null || catPetTarget(sim, c) === null) return;
+  const { world } = sim;
+  gesture(sim, c, 'decor_pet', pet.seconds, { x: cat.pos.x, y: cat.pos.y });
+  c.facing = Math.atan2(cat.pos.y - c.pos.y, cat.pos.x - c.pos.x);
+  cat.facing = Math.atan2(c.pos.y - cat.pos.y, c.pos.x - cat.pos.x);
+  cat.leaveAt = Math.max(cat.leaveAt, world.clock.minutes + def.stayMinutes[0] / 2);
+  cat.petAt[c.id] = world.tick;
+  const other = cat.petAt[c.id === 'p1' ? 'p2' : 'p1'];
+  if (other >= 0 && world.tick - other <= Math.round(pet.togetherSeconds * SIM_HZ)) {
+    cat.pose = 'roll';
+    cat.since = world.tick;
+    cat.rollUntil = world.tick + Math.round(def.rollSeconds * SIM_HZ);
+  } else if (cat.rollUntil < 0) {
+    // Il se frotte: couché, il se redresse.
+    setPose(sim, cat, 'idle');
+  }
+  if ((world.countersToday[c.id][CAT_PET] ?? 0) === 0) addHeart(sim, c, pet.heart);
+  bump(sim, CAT_PET, c.id);
+  emit(sim, { type: 'cat_pet', by: c.id, at: { x: cat.pos.x, y: cat.pos.y } });
 }
 
 /** Le chat tel que le rendu le lit chez l'hôte, ou `null`. */

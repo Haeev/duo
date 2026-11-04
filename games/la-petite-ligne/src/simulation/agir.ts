@@ -39,6 +39,7 @@ import { nearStall, stallPose, stallSetUp } from '../etat/marche';
 import { serveBuyer } from './marche';
 import { MAIL_POINT, deliverMail, mailWaiting, takeMail } from './plis';
 import { decorTargets, performDecor } from './decor';
+import { CAT_PET, catPetTarget, petCat } from './chat';
 
 /** Cible de l'étal du dimanche (pas forcément un point de la carte: `stallPose`). */
 const STALL_POINT = 'market_stall';
@@ -94,6 +95,8 @@ const BENCH_CLICK_RADIUS = 1.2;
 const GHOST_CLICK_RADIUS = 1.5;
 /** Un clic au sol à moins de tant d'un lieu de geste de décor (m) le vise. */
 const DECOR_CLICK_RADIUS = 1.2;
+/** Un clic au sol à moins de tant du chat (m) le vise (il est petit: un peu plus large que lui). */
+const CAT_CLICK_RADIUS = 0.6;
 const ACT_POINTS = [
   POINT.well,
   POINT.waterBarrel,
@@ -412,6 +415,9 @@ export function candidates(sim: Sim, c: Character): Target[] {
   const bag = sim.content.settings.mailRound;
   if (bag !== null && mailWaiting(sim, c)) out.push({ kind: 'point', point: MAIL_POINT, pos: point(sim, bag.point) });
   for (const g of decorTargets(sim, c)) out.push({ kind: 'decor', gesture: g.gesture, label: g.label, pos: g.pos, holdOnly: g.holdOnly });
+  // 0.13 (geste 30): le chat bouge, il n'est pas un lieu du décor; il se vise quand il est posé.
+  const cat = catPetTarget(sim, c);
+  if (cat !== null) out.push({ kind: 'decor', gesture: CAT_PET, label: cat.label, pos: cat.pos, holdOnly: false });
   const front = frontPoint(c, { x: 0, y: 0 });
   const cell = { cx: Math.floor(front.x), cy: Math.floor(front.y) };
   out.push({ kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } });
@@ -683,7 +689,8 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       if (t.kind === 'hold') takeHold(sim, c, t.point);
       return;
     case 'decor':
-      if (t.kind === 'decor') performDecor(sim, c, t.gesture, t.pos);
+      if (t.kind === 'decor' && t.gesture === CAT_PET) petCat(sim, c);
+      else if (t.kind === 'decor') performDecor(sim, c, t.gesture, t.pos);
       return;
     case 'light':
       if (t.kind === 'lantern') lightLantern(sim, c, t.place);
@@ -884,6 +891,8 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
         if (p !== undefined && distance(p, at) <= 1.2) return { kind: 'point', point: id, pos: p };
       }
       // 0.13: un geste avec le décor (cierges, puits, lavoir...), survolé ou cliqué même de loin.
+      const cat = catPetTarget(sim, c, { at, radius: CAT_CLICK_RADIUS });
+      if (cat !== null) return { kind: 'decor', gesture: CAT_PET, label: cat.label, pos: cat.pos, holdOnly: false };
       const decor = decorTargets(sim, c, { at, radius: DECOR_CLICK_RADIUS })[0];
       if (decor !== undefined) return { kind: 'decor', gesture: decor.gesture, label: decor.label, pos: decor.pos, holdOnly: decor.holdOnly };
       // 0.12: un clic sur une bête de l'élevage (ou tout près d'elle), après les points d'action.

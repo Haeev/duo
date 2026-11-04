@@ -72,6 +72,37 @@
       ]
     },
     {
+      "id": "cat_name",
+      "villager": "margot",
+      "question": "Quel nom pour le chaton du bourg ?",
+      "options": [
+        {
+          "id": "pompon",
+          "label": "Pompon.",
+          "change": "Pompon, comme la boule de poils qu'il est encore.",
+          "icon": "wool-scarf",
+          "villagers": ["margot"],
+          "effects": []
+        },
+        {
+          "id": "grisaille",
+          "label": "Grisaille.",
+          "change": "Grisaille, de la couleur des matins de brume sur l'Aubrune.",
+          "icon": "weather-cloud",
+          "villagers": ["margot"],
+          "effects": []
+        },
+        {
+          "id": "mistral",
+          "label": "Mistral.",
+          "change": "Mistral, parce qu'il file comme un coup de vent.",
+          "icon": "jay-feather",
+          "villagers": ["margot"],
+          "effects": []
+        }
+      ]
+    },
+    {
       "id": "cabane",
       "villager": "jeanne",
       "question": "Léon veut sa part de la cabane. Qu'en dites-vous ?",
