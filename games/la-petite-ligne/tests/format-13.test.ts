@@ -71,8 +71,8 @@ function defaultsWritten(world: unknown): string[] {
 }
 
 describe('format 13: aucune valeur par défaut écrite', () => {
-  it('le format en cours est le 13', () => {
-    expect(DATA_SCHEMA).toBe(13);
+  it('le format 13 est passé (0.13: format 14, carnet des habitudes), ses règles tiennent toujours', () => {
+    expect(DATA_SCHEMA).toBeGreaterThanOrEqual(13);
   });
 
   it.each([

@@ -12,6 +12,7 @@ import { countInBag, countInStacks, duoOwns } from './sac';
 import { seatedSeconds } from './bancs';
 import { dayOfSeason, seasonOfDay, stageDef, stageReached } from '../donnees/calendrier';
 import { weatherOf } from './meteo';
+import { momentOf, planningCondition } from '../etat/planning';
 
 /** D7, du moins au plus tendre. */
 const TENDERNESS_ORDER = ['none', 'accomplices', 'gentle'] as const;
@@ -242,6 +243,14 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return byCharacter(sim, condition.who, ctx, (id) => character(sim, id).inside === condition.building);
     case 'money_at_least':
       return world.purse >= condition.amount;
+    // 0.13 (lot H1): calendrier du bourg, décisions à deux, carnet; mêmes règles que le carnet (`etat/planning.ts`).
+    case 'school_day':
+    case 'special_day':
+    case 'season_day_is':
+    case 'birthday_of':
+    case 'decision_made':
+    case 'habit_known':
+      return planningCondition(sim.content, world, condition, momentOf(world));
   }
 }
 

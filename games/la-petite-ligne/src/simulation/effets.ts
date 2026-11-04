@@ -18,6 +18,7 @@ import { storeAtHome } from './rangement';
 import { gatherAt } from './deplacement';
 import { revealToBoth } from './secrets';
 import { secretEntry } from './conditions';
+import { revealHabit } from './voisins';
 
 /** Ajoute une suite d'effets et l'exécute tant qu'aucune scène ne l'arrête. */
 export function runEffects(sim: Sim, effects: readonly Effect[], actor: CharacterId | null): void {
@@ -145,6 +146,9 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       return;
     case 'end_stage':
       finishStage(sim, effect.stage);
+      return;
+    case 'reveal_habit':
+      revealHabit(sim, { villager: effect.villager, habit: effect.habit }, 'noted', null, null);
       return;
   }
 }

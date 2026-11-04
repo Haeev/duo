@@ -28,7 +28,10 @@ const MAX_STATE_BYTES = 64 * 1024;
 // champs vides dès le jour 1); plafond dur de 64 Kio inchangé.
 // 0.12.1: seuil gardé à 35 Kio; le format 13 n'écrit plus les valeurs par défaut (de 36 969 à
 // 39 424 octets en 0.12.0, 32 395 à 34 270 en 0.12.1 sur les dix graines de ce fichier).
-const ALERT_STATE_BYTES = 35 * 1024;
+// 0.13 (lot H1): relevé de 35 à 40 Kio, à trancher avec l'architecte: les 15 habitants nouveaux
+// (environ 3 Ko, surtout hors du bourg) et le carnet des habitudes (environ 1,7 Ko à la fin de la
+// démo) donnent 38 148 à 39 613 octets sur les dix graines; plafond dur de 64 Kio inchangé.
+const ALERT_STATE_BYTES = 40 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
 /** Contrôle de taille et de cohérence toutes les dix secondes réelles. */
@@ -151,7 +154,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
   expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
-  expect(run.maxBytes, `état transmis sous 35 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
+  expect(run.maxBytes, `état transmis sous 40 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
   expectMomentsAndSecrets(sim);
 }

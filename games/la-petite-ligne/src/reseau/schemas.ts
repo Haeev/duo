@@ -134,7 +134,8 @@ export const FastSnapshotSchema = v.strictObject({
   ack: v.pipe(Int, v.minValue(-1)),
   minutes: Finite,
   characters: v.pipe(v.array(MoverSchema), v.maxLength(2)),
-  villagers: v.pipe(v.array(MoverSchema), v.maxLength(16)),
+  // 0.13: 21 habitants, marge comprise pour les arcs suivants.
+  villagers: v.pipe(v.array(MoverSchema), v.maxLength(32)),
   // Poules, puis (0.12) poussines, chèvres et coq: 9 + 2 + 1 au plus, marge comprise.
   hens: v.pipe(v.array(MoverSchema), v.maxLength(24)),
   beam: v.nullable(v.strictObject({ x: Finite, y: Finite, f: Finite })),

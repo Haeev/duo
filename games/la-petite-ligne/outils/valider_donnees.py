@@ -166,10 +166,23 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "given_to_stall": (set(), {"item", "count", "who", "since"}),
     "market_served": (set(), {"together", "count", "who", "since"}),
     "money_at_least": ({"amount"}, set()),
+    # 0.13 (lot H1, README 2.12): calendrier du bourg, décisions à deux, carnet des habitudes.
+    "school_day": (set(), set()),
+    "special_day": ({"id"}, set()),
+    "season_day_is": ({"days"}, set()),
+    "birthday_of": ({"villager"}, set()),
+    "decision_made": ({"decision", "option"}, set()),
+    "habit_known": ({"villager", "habit"}, set()),
 }
+# 0.13: sortes d'habitudes (colonne « Sorte » de v0-13-habitants.md, en anglais).
+HABIT_KINDS = {"routine", "home", "rain", "season", "day", "after_quest", "market", "birthday"}
+# 0.13: champs d'un habitant lus par d'autres lots (âge, logis, appellation, goûts du lot H2).
+VILLAGER_EXTRA_KEYS = {"age", "homeLabel", "endearment", "tastes"}
+SEASON_IDS = ("spring", "summer", "autumn", "winter")
 COMMON_CONDITION_KEYS = {"type", "label"}
 
 EFFECTS: dict[str, tuple[set[str], set[str]]] = {
+    "reveal_habit": ({"villager", "habit"}, set()),
     "give_item": ({"item", "count", "to"}, set()),
     "take_item": ({"item", "count", "from"}, set()),
     "give_money": ({"amount"}, set()),
@@ -206,7 +219,7 @@ HINT_TRIGGERS: dict[str, set[str]] = {
     "fishing_hot_spot": set(), "fishing_watch": set(),
 }
 
-PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
+PLACEHOLDERS = {"habit", "speaker", "player", "startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
                 "count", "recipe", "envie", "quest", "title", "construction", "weekday", "day", "hours", "minutes",
                 "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase",
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
@@ -269,6 +282,10 @@ class Registry:
         self.animals: set[str] = set()
         self.crops: set[str] = set()
         self.villagers: set[str] = set()
+        # 0.13: habitudes (habitant, habitude), jours particuliers, références à vérifier à la fin.
+        self.habits: set[tuple[str, str]] = set()
+        self.special_days: set[str] = set()
+        self.habit_refs: list[tuple[str, str, str]] = []
         self.dialogues: set[str] = set()
         self.quests: dict[str, set[str]] = {}
         self.letters: set[str] = set()
@@ -313,7 +330,40 @@ def load(folder: Path, report: Report) -> dict[str, Any]:
             continue
         if data[name].get("version") != 1:
             report.error(path.name, "« version » doit valoir 1")
+    load_village(folder, data, report)
     return data
+
+
+def load_village(folder: Path, data: dict[str, Any], report: Report) -> None:
+    """0.13 (README 2.12): `calendrier.json`, et `habitants-0-13.json` fusionné par identifiant."""
+    for name, key in (("calendrier", "calendrier"), ("habitants-0-13", "habitants013")):
+        path = folder / f"{name}.json"
+        if not path.exists():
+            continue
+        try:
+            data[key] = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            report.error(path.name, f"JSON invalide ({exc})")
+            continue
+        if data[key].get("version") != 1:
+            report.error(path.name, "« version » doit valoir 1")
+    extra = data.pop("habitants013", None)
+    if extra is None or "habitants" not in data:
+        return
+    villagers = data["habitants"].setdefault("villagers", [])
+    for i, villager in enumerate(extra.get("villagers", [])):
+        vid = villager.get("id")
+        base = next((x for x in villagers if x.get("id") == vid), None)
+        if base is None:
+            if "habits" not in villager:
+                report.error(f"habitants-0-13.villagers[{i}]", "champ « habits » manquant (habitant nouveau)")
+            villagers.append(villager)
+            continue
+        for k, value in villager.items():
+            if k == "dialogues":
+                base.setdefault("dialogues", []).extend(value)
+            else:
+                base[k] = value
 
 
 def check_tour9(data: dict[str, Any], reg: Registry, report: Report) -> None:
@@ -483,7 +533,11 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
             check_condition(sub, f"{w}[{i}]", reg, report)
     if ctype == "not":
         check_condition(cond.get("condition"), w, reg, report)
-    if "days" in cond:
+    if ctype == "season_day_is":
+        days = cond.get("days")
+        if not isinstance(days, list) or not days or not all(isinstance(d, int) and 1 <= d <= 21 for d in days):
+            report.error(w, f"jours de saison de 1 à 21 attendus {days!r}")
+    elif "days" in cond:
         if not isinstance(cond["days"], list) or not all(d in DEMO_DAYS for d in cond["days"]):
             report.error(w, f"jours hors de la démo {cond['days']!r}")
     if ctype == "day_at_least" and cond.get("day") not in DEMO_DAYS:
@@ -535,6 +589,15 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
         report.error(w, f"événement inconnu {cond['event']!r}")
     if ctype == "flag":
         reg.flags_read.setdefault(cond.get("flag", ""), w)
+    if ctype == "special_day" and cond.get("id") not in reg.special_days:
+        report.error(w, f"jour particulier inconnu {cond.get('id')!r} (calendrier.json)")
+    if ctype == "habit_known":
+        reg.habit_refs.append((str(cond.get("villager")), str(cond.get("habit")), w))
+    if ctype == "decision_made":
+        check_id(cond.get("decision"), w, report)
+        check_id(cond.get("option"), w, report)
+    if ctype == "birthday_of" and cond.get("villager") == "self":
+        return
     for key, kind in (("item", "item"), ("villager", "villager"), ("quest", "quest"), ("dialogue", "dialogue"),
                       ("recipe", "recipe"), ("construction", "construction"), ("point", "point"),
                       ("atFurniture", "item"), ("tool", "item")):
@@ -588,6 +651,8 @@ def check_effect(eff: Any, where: str, reg: Registry, report: Report) -> None:
             report.error(w, f"« who » inconnu {eff.get('who')!r}")
     if etype == "set_flag":
         reg.flags_set.add(eff.get("flag", ""))
+    if etype == "reveal_habit":
+        reg.habit_refs.append((str(eff.get("villager")), str(eff.get("habit")), w))
     if etype == "start_quest":
         reg.quests_started_by_effect.add(eff.get("quest", ""))
     if etype == "set_world_state":
@@ -627,8 +692,12 @@ def collect(data: dict[str, Any], reg: Registry, report: Report) -> None:
         register(reg.crops, crop.get("id"), f"cultures.crops[{i}]", report)
     for i, villager in enumerate(data.get("habitants", {}).get("villagers", [])):
         register(reg.villagers, villager.get("id"), f"habitants.villagers[{i}]", report)
+        for habit in villager.get("habits", []):
+            reg.habits.add((str(villager.get("id")), str(habit.get("id"))))
         for j, dialogue in enumerate(villager.get("dialogues", [])):
             register(reg.dialogues, dialogue.get("id"), f"habitants.{villager.get('id')}.dialogues[{j}]", report)
+    for i, day in enumerate(data.get("calendrier", {}).get("specialDays", [])):
+        register(reg.special_days, day.get("id"), f"calendrier.specialDays[{i}]", report)
     for i, quest in enumerate(data.get("quetes", {}).get("quests", [])):
         steps: set[str] = set()
         for j, step in enumerate(quest.get("steps", [])):
@@ -771,6 +840,7 @@ def check_habitants(data: dict[str, Any], reg: Registry, report: Report) -> None
             check_conditions(entry.get("when", []), f"{ws}.when", reg, report)
         if not any(not e.get("when") for e in villager.get("schedule", [])):
             report.error(w, "aucune entrée d'emploi du temps sans condition (il faut un horaire par défaut)")
+        check_habits(villager, w, reg, report)
         if not any(d.get("kind") == "daily" and not d.get("when") for d in villager.get("dialogues", [])):
             report.error(w, "aucune réplique du quotidien sans condition (il faut une réplique par défaut)")
         for dialogue in villager.get("dialogues", []):
@@ -789,6 +859,89 @@ def check_habitants(data: dict[str, Any], reg: Registry, report: Report) -> None
             check_conditions(dialogue.get("when", []), f"{wd}.when", reg, report)
             check_lines(dialogue.get("lines", []), wd, reg, report)
             check_effects(dialogue.get("effects", []), f"{wd}.effects", reg, report)
+
+
+def check_habits(villager: dict[str, Any], w: str, reg: Registry, report: Report) -> None:
+    """0.13 (README 2.12): habitudes, champ `habit` des entrées, répliques et écriteaux, anniversaire."""
+    habits = villager.get("habits", [])
+    if not isinstance(habits, list):
+        report.error(w, "« habits » doit être une liste")
+        return
+    ids: set[str] = set()
+    for i, habit in enumerate(habits):
+        wh = f"{w}.habits[{i}]"
+        hid = habit.get("id")
+        if check_id(hid, wh, report):
+            if hid in ids:
+                report.error(wh, f"habitude en double {hid!r}")
+            ids.add(hid)
+        if habit.get("kind") not in HABIT_KINDS:
+            report.error(wh, f"sorte inconnue {habit.get('kind')!r} ({', '.join(sorted(HABIT_KINDS))})")
+        if not isinstance(habit.get("label"), str) or not habit.get("label"):
+            report.error(wh, "« label » attendu")
+        if "announce" in habit and not isinstance(habit["announce"], str):
+            report.error(wh, "« announce » doit être un texte")
+        reveals = habit.get("reveals", [])
+        if not reveals:
+            report.warn(wh, "aucune réplique ni écriteau pour l'apprendre")
+        for j, rev in enumerate(reveals if isinstance(reveals, list) else []):
+            wr = f"{wh}.reveals[{j}]"
+            if ("by" in rev) == ("sign" in rev) or not isinstance(rev.get("text"), str):
+                report.error(wr, "« by » ou « sign », et « text », attendus")
+            elif "by" in rev:
+                ref("villager", rev["by"], wr, reg, report)
+            else:
+                check_id(rev["sign"], wr, report)
+                reg.points_used.setdefault(rev["sign"], wr)
+    for i, entry in enumerate(villager.get("schedule", [])):
+        if "habit" in entry and entry["habit"] not in ids:
+            report.error(f"{w}.schedule[{i}]", f"habitude inconnue {entry['habit']!r}")
+    for habit in habits:
+        if habit.get("kind") != "market" and not any(e.get("habit") == habit.get("id") for e in villager.get("schedule", [])):
+            report.error(f"{w}.habits.{habit.get('id')}", "aucune entrée du planning")
+    birthday = villager.get("birthday")
+    if birthday is not None and (not isinstance(birthday, dict) or birthday.get("season") not in SEASON_IDS or not isinstance(birthday.get("day"), int) or not 1 <= birthday["day"] <= 21):
+        report.error(f"{w}.birthday", "« season » et « day » (1 à 21) attendus")
+
+
+def check_calendar(data: dict[str, Any], reg: Registry, report: Report) -> None:
+    """0.13: jours particuliers de `calendrier.json`, anniversaires des habitants, références aux habitudes."""
+    cal = data.get("calendrier")
+    blocked: set[tuple[str, int]] = set()
+    if cal is not None:
+        for i, day in enumerate(cal.get("specialDays", [])):
+            wd = f"calendrier.specialDays[{i}]"
+            weekdays = day.get("weekdays", [])
+            by_season = day.get("seasonDays", {})
+            if not weekdays and not by_season:
+                report.error(wd, "« weekdays » ou « seasonDays » attendu")
+            for s, days in by_season.items():
+                if s not in SEASON_IDS or not all(isinstance(d, int) and 1 <= d <= 21 for d in days):
+                    report.error(wd, f"seasonDays: saison ou jours invalides {s!r}")
+                elif day.get("noBirthday"):
+                    blocked.update((s, d) for d in days)
+            for key in ("from", "to"):
+                if key in day:
+                    check_time(day[key], wd, report)
+    taken: dict[tuple[str, int], str] = {}
+    for villager in data.get("habitants", {}).get("villagers", []):
+        b = villager.get("birthday")
+        if not isinstance(b, dict) or b.get("season") not in SEASON_IDS or not isinstance(b.get("day"), int):
+            if b is None:
+                report.warn(f"habitants.{villager.get('id')}", "pas d'anniversaire (« birthday »)")
+            continue
+        key = (b["season"], b["day"])
+        w = f"habitants.{villager.get('id')}.birthday"
+        if key in taken:
+            report.error(w, f"le même jour que celui de {taken[key]!r}")
+        taken[key] = str(villager.get("id"))
+        if (b["day"] - 1) % 7 == 0:
+            report.error(w, "un samedi (jour du train)")
+        if key in blocked:
+            report.error(w, "un jour de fête, de moisson ou de lumignons")
+    for villager, habit, where in reg.habit_refs:
+        if (villager, habit) not in reg.habits:
+            report.error(where, f"habitude inconnue {villager!r}.{habit!r}")
 
 
 def check_lines(lines: Any, where: str, reg: Registry, report: Report) -> None:
@@ -1632,6 +1785,7 @@ def main() -> int:
     check_poissons(reg, report, folder)
     check_cultures(data, reg, report)
     check_habitants(data, reg, report)
+    check_calendar(data, reg, report)
     check_quetes(data, reg, report)
     check_courrier(data, reg, report)
     check_astuces(data, reg, report)

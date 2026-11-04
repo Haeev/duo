@@ -51,9 +51,11 @@ export const MINUTES_PER_DAY = 1440;
  * sont pas sauvegardées). 11: garde-robe de la 0.12 (`appearance.wear` et `wardrobe` au lieu de
  * `appearance.outfit`). 12: élevage de la 0.12 (bonheur des poules, coq, couvée, poussines,
  * litière, grain entamé, chèvres, noms à choisir). L'économie de la 0.12 ne change pas le format:
- * ses champs prennent leur valeur de départ à la reprise (`fillEconomyFields`).
+ * ses champs prennent leur valeur de départ à la reprise (`fillEconomyFields`). 13: état allégé de
+ * la 0.12.1 (valeurs par défaut non écrites). 14: les habitants de la 0.13 (carnet des habitudes,
+ * liens, goûts, décisions à deux, étapes d'histoire).
  */
-export const DATA_SCHEMA = 13;
+export const DATA_SCHEMA = 14;
 
 /** Taille du sac et de la barre d'outils (définies avec l'état, lues aussi par l'interface). */
 export { BAG_SLOTS, TOOLBAR_SLOTS } from '../etat/types';

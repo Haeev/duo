@@ -14,6 +14,7 @@ import type {
   StorageSettings,
 } from './maison';
 import type { TownSettings } from './bourg';
+import type { BondSettings, HabitDef, HabitRef, HabitSettings, SignDef, VillageCalendar } from './types-voisins';
 import type { Currency } from './monnaie';
 import type { MarketSettings } from './marche';
 import type { MailRoundSettings } from './plis';
@@ -125,6 +126,14 @@ export type Condition = { label?: string } & (
   | { type: 'inside'; building: string; who: Who }
   // 0.12 (lot L-quêtes): la bourse commune a au moins cette somme (choix payants d'un dialogue).
   | { type: 'money_at_least'; amount: number }
+  // 0.13 (lot H1, `calendrier.json`): jour de classe, jour particulier, jour de saison, anniversaire,
+  // décision à deux prise avec cette option, habitude au carnet.
+  | { type: 'school_day' }
+  | { type: 'special_day'; id: string }
+  | { type: 'season_day_is'; days: number[] }
+  | { type: 'birthday_of'; villager: string }
+  | { type: 'decision_made'; decision: string; option: string }
+  | { type: 'habit_known'; villager: string; habit: string }
 );
 
 export type Effect =
@@ -150,7 +159,9 @@ export type Effect =
   | { type: 'pay_order' }
   /** Écran d'étape (tour 8); `end_demo` des données vaut `end_stage` de l'étape `demo`. */
   | { type: 'end_stage'; stage: StageId }
-  | { type: 'if'; condition: Condition; then: Effect[]; else: Effect[] };
+  | { type: 'if'; condition: Condition; then: Effect[]; else: Effect[] }
+  /** 0.13: écrit l'habitude au carnet (fin de quête, décision). */
+  | { type: 'reveal_habit'; villager: string; habit: string };
 
 // ---------------------------------------------------------------------------
 // Objets
@@ -319,6 +330,8 @@ export interface ScheduleEntry {
   to: number;
   point: string;
   activity: string;
+  /** 0.13: l'habitude de cet habitant à laquelle l'entrée appartient, `null`: aucune (jamais au carnet). */
+  habit: string | null;
 }
 
 export interface DialogueLineDef {
@@ -359,6 +372,8 @@ export interface DialogueDef {
    */
   agreement?: { same: DialogueLineDef[]; different: DialogueLineDef[] };
   effects: Effect[];
+  /** 0.13: réplique révélatrice (`habits[].reveals` des données): les habitudes qu'elle écrit au carnet. */
+  reveals?: HabitRef[];
 }
 
 export interface VillagerDef {
@@ -372,6 +387,10 @@ export interface VillagerDef {
   soundMotif: string;
   schedule: ScheduleEntry[];
   dialogues: DialogueDef[];
+  /** 0.13: les habitudes du carnet (README des données, 2.12), dans l'ordre des données. */
+  habits: HabitDef[];
+  /** 0.13: son anniversaire (jour de saison), `null` s'il n'est pas écrit. */
+  birthday: { season: Season; day: number } | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -877,6 +896,9 @@ export type Tenderness = 'none' | 'accomplices' | 'gentle';
 
 export interface Settings {
   profile: string;
+  /** 0.13: découverte des habitudes et lien de départ d'une partie reprise (absents: `defauts.ts`). */
+  habits: HabitSettings;
+  bonds: BondSettings;
   /** Calendrier (tour 8): saisons de `seasonDays` jours, le jour 1 ouvre le printemps. */
   calendar: { seasonDays: number; seasonsPerYear: number };
   clock: {
@@ -1391,4 +1413,8 @@ export interface Content {
   market: MarketSettings | null;
   /** 0.12: vêtements (`vetements.json`) et réglages de la garde-robe (`reglages.json`: `wardrobe`). */
   clothes: ClothesContent;
+  /** 0.13: jours particuliers et jours de classe (`calendrier.json`), anniversaires (champ `birthday` des habitants). */
+  villageCalendar: VillageCalendar;
+  /** 0.13: écriteaux qui révèlent des habitudes, par identifiant de point. */
+  signs: Record<string, SignDef>;
 }

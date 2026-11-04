@@ -352,6 +352,21 @@
     "knownHensFlag": "hen_names_known"
   },
   "memories": { "maxBytes": 1536 },
+  "habits": {
+    "seeDistance": 10,
+    "nightSeeDistance": 6,
+    "nightFrom": "21:00",
+    "watchSeconds": 2,
+    "arrivedDistance": 2,
+    "doorDistance": 10,
+    "signRange": 2,
+    "gossipAfterDays": 10,
+    "logKept": 30,
+    "announce": { "distance": 5, "minutes": 10, "bondAtLeast": 250 },
+    "windowPoints": ["salon_window", "honorine_window", "rail_cottage_west_window", "church_bell_rope"],
+    "knownInEarlierSaves": { "firmin": ["quay"], "odette": ["counter"], "basile": ["workbench"], "jeanne": ["morning_bench"], "achille": ["window"], "solange": ["salon"] }
+  },
+  "bonds": { "earlierSaveStartPerQuest": 60, "earlierSaveStartMax": 250 },
 
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
   "fishing": {

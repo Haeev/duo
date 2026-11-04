@@ -13,6 +13,7 @@ import { renameOldCurrency } from '../donnees/monnaie';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
+import { migrateToVillage, villageShapeError } from './voisins';
 import { stageCanContinue } from '../donnees/calendrier';
 import { type Sim, format, notifyKey, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
@@ -151,6 +152,8 @@ function checkWorld(data: unknown): WorldState {
   checkFishing(data.fishing);
   if (!wardrobeShapeOk(characters)) throw new SaveError('sauvegarde: garde-robe invalide');
   checkBreeding(data);
+  const village = villageShapeError(data);
+  if (village !== null) throw new SaveError(`sauvegarde: ${village} invalide`);
   return data as unknown as WorldState;
 }
 
@@ -511,6 +514,8 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 12 && isRecord(data)) migrateToBreeding(data, content);
   // Format 13 (0.12.1, taille de l'état transmis à l'invité): plus de valeurs par défaut écrites.
   if (dataSchema < 13 && isRecord(data)) migrateToFormat13(data);
+  // Format 14 (0.13, lot H1): carnet des habitudes et champs de l'amitié, avec le départ d'une partie reprise.
+  if (dataSchema < 14 && isRecord(data)) migrateToVillage(data, content);
   return data;
 }
 

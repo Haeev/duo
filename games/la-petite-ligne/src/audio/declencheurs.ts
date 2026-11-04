@@ -547,6 +547,11 @@ export function soundsForEvent(
     case 'tree_regrown':
     case 'secret_revealed':
       break;
+    // 0.13 (lot H1): crayon du carnet, écriteau lu, remarque en passant; sons du lot H8 (`pencil-note`).
+    case 'habit_found':
+    case 'sign_read':
+    case 'villager_remark':
+      break;
   }
 }
 

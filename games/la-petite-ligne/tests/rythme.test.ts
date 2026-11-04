@@ -4,7 +4,8 @@
 // récente » (R4 du plan des 100 heures): 60 % de redites (32 sur 53), graine 20261030.
 import { isHome } from '../src/etat/interieurs';
 import { describe, expect, it } from 'vitest';
-import type { Sim } from '../src/simulation/contexte';
+import { type Sim, character } from '../src/simulation/contexte';
+import { heardReveals } from '../src/simulation/voisins';
 import { SIM_HZ } from '../src/simulation/constantes';
 import { eligibleDailies, hearDialogue, pickDialogue } from '../src/simulation/dialogues';
 import { step } from '../src/simulation/pas';
@@ -64,6 +65,8 @@ function measure(seed: number): Measure {
       if (d.priority < story && known[d.id] !== undefined && never) out.avoidable++;
       heard.add(d.id);
       hearDialogue(sim, 'p1', d);
+      // 0.13: entendue jusqu'au bout, une réplique révélatrice écrit son habitude (fin de conversation).
+      heardReveals(sim, character(sim, 'p1'), d);
     }
   }
   return out;

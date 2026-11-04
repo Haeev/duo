@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "school": { "weekdays": ["monday", "tuesday", "thursday", "friday"], "holidaySeasons": ["summer"] },
+  "specialDays": [
+    { "id": "mass", "name": "la messe", "weekdays": ["sunday"], "from": "10:30", "to": "11:30" },
+    { "id": "market", "name": "le marché", "weekdays": ["sunday"], "from": "08:00", "to": "13:00" },
+    { "id": "skittles", "name": "les quilles", "weekdays": ["sunday"], "from": "15:00", "to": "18:00" },
+    { "id": "manille", "name": "la manille", "weekdays": ["wednesday"], "from": "20:00", "to": "22:00" },
+    { "id": "choir", "name": "la chorale", "weekdays": ["friday"], "from": "20:00", "to": "21:30" },
+    { "id": "washing", "name": "la lessive au lavoir", "weekdays": ["monday"], "from": "09:00", "to": "12:00" },
+    { "id": "cuite", "name": "la cuite de la meule", "seasonDays": { "summer": [8, 9, 10], "autumn": [3, 4, 5] } },
+    { "id": "harvest", "name": "la moisson", "seasonDays": { "summer": [17, 18] }, "noBirthday": true },
+    { "id": "threshing", "name": "le battage", "seasonDays": { "summer": [19] }, "from": "19:00", "to": "22:00", "noBirthday": true },
+    { "id": "lumignons", "name": "le Dimanche des lumignons", "seasonDays": { "autumn": [16] }, "from": "17:00", "to": "20:00", "noBirthday": true },
+    { "id": "sowing_fair", "name": "la fête des semailles", "seasonDays": { "spring": [16] }, "from": "10:00", "to": "22:00", "noSchool": true, "noBirthday": true, "tier": "P1" },
+    { "id": "midsummer_fires", "name": "les feux de la mi-été", "seasonDays": { "summer": [9] }, "from": "10:00", "to": "22:00", "noSchool": true, "noBirthday": true, "tier": "P1" }
+  ]
+}
