@@ -41,6 +41,7 @@ Règle d'or: **le rendu et l'interface lisent l'état, ils ne le modifient jamai
 
 - L'hôte fait autorité et simule tout le monde: horloge, cultures, habitants, poules, train, quêtes.
 - L'invité n'envoie que des intentions; il ne simule que le déplacement de son propre personnage (prédiction), corrigé par l'hôte.
+- L'état complet ne porte ni la position, ni le cap, ni la vitesse des habitants (`reseau/etat-transmis.ts`): les instantanés rapides les portent pour tous, visibles ou cachés. L'invité les reprend de la dernière valeur rapide connue, sinon du point de leur planning (`placeAtTarget`); `sendWorld()` de l'hôte envoie un instantané juste avant l'état. La sauvegarde garde les positions.
 - Les sauvegardes, l'historique et les résultats ne partent que de l'hôte, par le SDK.
 
 ## Lire l'état (rendu, interface)

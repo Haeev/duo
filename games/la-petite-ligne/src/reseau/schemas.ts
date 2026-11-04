@@ -5,7 +5,7 @@
  */
 import * as v from 'valibot';
 import type { ControlFrame, Intent } from '../etat/actions';
-import type { WrittenWorld } from '../etat/habitants-ecrits';
+import type { SentWorld } from './etat-transmis';
 import type { WorldEvent } from '../etat/types';
 
 /** Canaux (0 à 15), les mêmes chez les deux. */
@@ -149,7 +149,7 @@ export type FastSnapshot = v.InferOutput<typeof FastSnapshotSchema>;
  * L'état complet vient de l'hôte, qui fait autorité: on contrôle sa forme
  * générale (de quoi éviter un plantage sur un message abîmé), pas chaque champ.
  */
-function looksLikeWorld(value: unknown): value is WrittenWorld {
+function looksLikeWorld(value: unknown): value is SentWorld {
   if (typeof value !== 'object' || value === null) return false;
   const w = value as Record<string, unknown>;
   return (
@@ -168,7 +168,7 @@ function looksLikeWorld(value: unknown): value is WrittenWorld {
 export const WorldMessageSchema = v.strictObject({
   /** Dernière commande de l'invité appliquée quand cet état a été pris. */
   ack: v.pipe(Int, v.minValue(-1)),
-  world: v.custom<WrittenWorld>(looksLikeWorld, 'état du monde invalide'),
+  world: v.custom<SentWorld>(looksLikeWorld, 'état du monde invalide'),
 });
 export type WorldMessage = v.InferOutput<typeof WorldMessageSchema>;
 
