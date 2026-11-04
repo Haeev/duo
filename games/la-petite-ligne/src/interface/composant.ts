@@ -5,6 +5,7 @@
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld } from '../etat/types';
 import type { CameraCommand } from '../etat/vue';
+import type { GraphicsPort } from '../etat/options-graphiques';
 import type { UiContext } from './contexte';
 import type { UiSoundId } from './sons';
 
@@ -47,6 +48,10 @@ export interface UiHost {
   openRoomPanel(): void;
   /** Ouvre la garde-robe (bouton du rangement de la maison, 0.12): un panneau local, sans menu du jeu. */
   openWardrobe(): void;
+  /** Ouvre les options graphiques de cette machine (pied du carnet, 0.13): un panneau local, sans menu du jeu. */
+  openOptions(): void;
+  /** Options graphiques de cette machine (`main.ts` les a données), sinon `null`: le bouton est masqué. */
+  readonly graphics: GraphicsPort | null;
   /** Symboles des profils Duo des deux joueurs (`orb`, `crescent`...). */
   symbol(player: 'self' | 'other'): string;
 }

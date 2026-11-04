@@ -206,6 +206,8 @@ class ParticlePool {
   private readonly euler = new Euler();
   private readonly color = new Color();
   private seed = 1;
+  /** Part des options graphiques de la machine (0.13), en plus de `share`: la réserve ne change pas. */
+  optionShare = 1;
 
   constructor(
     materials: SharedMaterials,
@@ -244,7 +246,7 @@ class ParticlePool {
   emit(kind: BurstKind, x: number, y: number, z: number, countScale = 1): void {
     const burst: Burst = BURSTS[kind];
     this.paint(burst.cell, this.color);
-    const count = Math.max(1, Math.round(burst.count * countScale * this.share));
+    const count = Math.max(1, Math.round(burst.count * countScale * this.share * this.optionShare));
     for (let n = 0; n < count; n += 1) {
       const i = this.next;
       this.next = (this.next + 1) % this.capacity;
@@ -512,6 +514,15 @@ export class EffectsPart implements EventfulPart {
     object.scale.setScalar(FX.itemScale * size);
     this.group.add(object);
     this.jumps.push({ object, from: from.clone(), to, start: this.time, sparkle, size });
+  }
+
+  particleShare(): number {
+    return this.particles.optionShare;
+  }
+
+  /** Part des particules choisie par les options graphiques de la machine (0 à 1, à chaud). */
+  setParticleShare(share: number): void {
+    this.particles.optionShare = Math.min(1, Math.max(0, share));
   }
 
   handleEvent(event: WorldEvent, context: FrameContext): void {

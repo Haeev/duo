@@ -24,7 +24,13 @@ import { loadContent } from '../../donnees/contenu';
 import { CONTENT_FILES } from '../../donnees/fichiers';
 import { loadMap } from '../../donnees/carte';
 import { MAP_FILES } from '../../donnees/cartes-fichiers';
-import { createRenderer } from '../../rendu/index';
+import { RenderEngine } from '../../rendu/index';
+import {
+  type GraphicsOptions,
+  type GraphicsPort,
+  lowerOptions,
+  parseGraphicsOptions,
+} from '../../etat/options-graphiques';
 import { decodeSave, restoreWorld } from '../../sauvegarde/sauvegarde';
 import { createWorld } from '../../simulation/monde';
 import { step } from '../../simulation/pas';
@@ -46,6 +52,8 @@ declare global {
       partner(intent: Intent): void;
       /** Démonte et remonte l'interface `n` fois (contrôle des fuites). */
       remount(n: number): { nodes: number; layers: number; sprites: number };
+      /** Options graphiques et ce que le rendu en a fait (0.13), `null` sans rendu 3D. */
+      graphics(): (ReturnType<NonNullable<typeof renderer>['graphicsState']> & { options: GraphicsOptions }) | null;
       /** Durée moyenne de `frame()` de l'interface sur `n` appels (ms). */
       measure(n: number): Promise<number>;
       /** L'état de la simulation de la page (lecture par les tests). */
@@ -123,10 +131,49 @@ if (container === null || overlay === null) throw new Error('page de démonstrat
 
 const withRender = params.get('rendu') !== '0';
 // `rendu=leger`: le mode léger du rendu (captures sous SwiftShader, aperçu 3D de la mercerie).
-const renderer = withRender ? createRenderer({ view, container, reducedMotion: false, quality: params.get('rendu') === 'leger' ? 'light' : 'normal' }) : null;
+// `qualite=high|medium|low|auto`: préréglage des options graphiques au départ (0.13).
+const startGraphics = parseGraphicsOptions({ preset: params.get('qualite') ?? 'auto' });
+const renderer = withRender
+  ? new RenderEngine({ view, container, reducedMotion: false, quality: params.get('rendu') === 'leger' ? 'light' : 'normal', graphics: startGraphics })
+  : null;
+// 0.13: options graphiques; sans rendu 3D (`rendu=0`), une mémoire seule, pour voir le panneau.
+const demoGraphics = ((): GraphicsPort => {
+  const r = renderer;
+  if (r !== null) {
+    return {
+      persistent: false,
+      current: () => r.graphicsOptions(),
+      set: (options) => {
+        r.setGraphicsOptions(options);
+      },
+      onReduced: (listener) => r.onGraphicsReduced(listener),
+    };
+  }
+  let kept: GraphicsOptions = startGraphics;
+  const listeners = new Set<(options: GraphicsOptions) => void>();
+  // `?filet=1`: le filet descend d'un cran au bout de 2 s (notification à capturer).
+  if (params.get('filet') === '1') {
+    window.setTimeout(() => {
+      kept = lowerOptions(kept) ?? kept;
+      for (const l of listeners) l(kept);
+    }, 2000);
+  }
+  return {
+    persistent: false,
+    current: () => kept,
+    set: (options) => {
+      kept = options;
+    },
+    onReduced: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+})();
 const mountUi = (): GameInterface =>
   createInterface({
     view,
+    graphics: demoGraphics,
     overlay,
     uiScale: [1, 1.25, 1.5].includes(scale) ? scale : 1,
     reducedMotion: params.get('animations') === 'reduites',
@@ -260,6 +307,7 @@ async function start(): Promise<void> {
     },
     world: () => sim.world,
     pick: (clientX, clientY) => renderer?.pick(clientX, clientY) ?? null,
+    graphics: () => (renderer === null ? null : { options: renderer.graphicsOptions(), ...renderer.graphicsState() }),
     log,
     portraits: () => ({
       urls: Object.fromEntries(content.villagers.map((v) => [v.id, renderer?.villagerPortrait?.(v.id) ?? null])),

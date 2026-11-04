@@ -11,6 +11,14 @@ import { MAP_FILES } from './donnees/cartes-fichiers';
 import { CONTENT_FILES } from './donnees/fichiers';
 import type { AudioExtras } from './audio/index';
 import type { AudioOptions, CreateInterface, GameAudio, GameInterface, Renderer, RenderQuality } from './etat/vue';
+import {
+  DEFAULT_GRAPHICS_OPTIONS,
+  type GraphicsPort,
+  type GraphicsStorage,
+  loadGraphicsOptions,
+  saveGraphicsOptions,
+  sessionGraphicsStorage,
+} from './etat/options-graphiques';
 import { createControls } from './entrees/commandes';
 import { createFallbackInterface } from './plateforme/interface-secours';
 import { createRenderer } from './rendu/index';
@@ -77,6 +85,26 @@ async function pickRobot(): Promise<Robot | null> {
   return createRobot();
 }
 
+/**
+ * Options graphiques de cette machine (0.13) entre le rendu et l'interface: appliquées à chaud par
+ * le rendu, mémorisées à chaque choix et à chaque cran du filet. `null` si le rendu ne les connaît pas.
+ */
+function graphicsPort(r: Renderer, storage: GraphicsStorage, persistent: boolean): GraphicsPort | null {
+  if (r.setGraphicsOptions === undefined || r.graphicsOptions === undefined || r.onGraphicsReduced === undefined) return null;
+  r.onGraphicsReduced((options) => {
+    saveGraphicsOptions(storage, options);
+  });
+  return {
+    persistent,
+    current: () => r.graphicsOptions?.() ?? DEFAULT_GRAPHICS_OPTIONS,
+    set: (options) => {
+      r.setGraphicsOptions?.(options);
+      saveGraphicsOptions(storage, options);
+    },
+    onReduced: (listener) => r.onGraphicsReduced?.(listener) ?? ((): void => undefined),
+  };
+}
+
 async function main(): Promise<void> {
   const duo = await connect<GameAction>({ manifest });
   const container = byId('jeu');
@@ -100,15 +128,27 @@ async function main(): Promise<void> {
   });
 
   const quality = renderQuality();
+  // Le SDK n'offre pas encore de réglages par machine, et le stockage du navigateur est vidé à chaque
+  // partie (ADR 0004): les options valent pour la partie.
+  const graphicsStorage = sessionGraphicsStorage();
 
   const setup = async (): Promise<void> => {
-    const r = createRenderer({ view, container, reducedMotion: duo.ui.reducedMotion, quality, log: duo.log });
+    const r = createRenderer({
+      view,
+      container,
+      reducedMotion: duo.ui.reducedMotion,
+      quality,
+      log: duo.log,
+      graphics: loadGraphicsOptions(graphicsStorage),
+    });
     await r.load((ratio) => {
       duo.reportLoading(1 - RENDER_LOAD_SHARE + ratio * RENDER_LOAD_SHARE);
     });
     renderer = r;
     const createInterface = await pickInterface();
+    const graphics = quality === 'light' ? null : graphicsPort(r, graphicsStorage, false);
     ui = createInterface({
+      ...(graphics === null ? {} : { graphics }),
       view,
       overlay,
       uiScale: duo.ui.scale,

@@ -1017,6 +1017,55 @@
     "basileTitle": "Pour les bêtes: chevrerie et poulailler",
     "basileAllBuilt": "Basile a fini les abris des bêtes."
   },
+  "graphics": {
+    "title": "Options",
+    "subtitle": "Seulement sur cet ordinateur: chez {partner}, rien ne change.",
+    "open": "Options",
+    "openHelp": "Qualité de l'image sur ton ordinateur: ombres, netteté, particules.",
+    "closeLabel": "Fermer les options ({back})",
+    "quality": "Qualité",
+    "presets": {
+      "auto": "Auto",
+      "high": "Haute",
+      "medium": "Moyenne",
+      "low": "Basse",
+      "custom": "Personnalisée"
+    },
+    "presetHelp": {
+      "auto": "Le jeu s'adapte seul à ton ordinateur: s'il ralentit, il baisse la netteté, puis coupe les ombres.",
+      "high": "Ombres fines et image la plus nette. Pour un ordinateur à l'aise.",
+      "medium": "Ombres douces et image nette, sans adaptation.",
+      "low": "Sans ombres, image un peu moins nette, moins de particules: le plus fluide.",
+      "custom": "Tes propres réglages, ci-dessous."
+    },
+    "fine": "Réglages fins",
+    "shadows": "Ombres",
+    "shadowLevels": {
+      "off": "Aucune",
+      "soft": "Douces",
+      "fine": "Fines"
+    },
+    "resolution": "Netteté",
+    "resolutionLevels": {
+      "reduced": "Réduite",
+      "standard": "Standard",
+      "max": "Maximale"
+    },
+    "resolutionHelp": "Réduite: 80 % de l'écran, plus fluide mais plus flou. Maximale: pour les écrans Retina.",
+    "effects": "Particules",
+    "effectsLevels": {
+      "reduced": "Réduites",
+      "full": "Complètes"
+    },
+    "autoNote": "En Auto, le jeu part de ces réglages et les adapte pendant la partie. Choisis-en un pour le fixer toi-même.",
+    "neverReduce": "Ne jamais réduire",
+    "neverReduceHelp": "Sinon, si le jeu ralentit longtemps, la qualité baisse d'un cran toute seule.",
+    "neverReduceAuto": "Choisis Haute, Moyenne, Basse ou tes réglages pour t'en servir.",
+    "kept": "Tes réglages sont gardés jusqu'à la fin de la partie.",
+    "keptForGood": "Tes réglages sont gardés sur cet ordinateur pour les prochaines parties.",
+    "reduced": "Qualité réduite pour garder le jeu fluide",
+    "keysChoose": "choisir"
+  },
   "vitrine": {
     "previous": "Page précédente ({key})",
     "next": "Page suivante ({key})",

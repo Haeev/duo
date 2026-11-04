@@ -177,6 +177,15 @@ export class NotebookPanel extends Panel {
         this.close();
       }, { class: 'lpl-button', attrs: { title: ctx.t(n.unstickHelp), 'data-key': 'unstick' } }),
     );
+    // 0.13: les options graphiques de cette machine (le jeu n'a pas de pause à lui, Échap est à Duo).
+    if (host.graphics !== null) {
+      const g = ctx.texts.extra.graphics;
+      this.footer.append(
+        button([icon('ui-eye'), ` ${ctx.t(g.open)}`], () => {
+          this.host.openOptions();
+        }, { class: 'lpl-button', attrs: { title: ctx.t(g.openHelp), 'data-key': 'options' } }),
+      );
+    }
     this.markTabs();
   }
 

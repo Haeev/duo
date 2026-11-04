@@ -768,6 +768,21 @@ export class Hud {
     setText(this.buildRotation, ctx.t(ctx.texts.extra.common.orientation[placement.rotation % 4] ?? ''));
   }
 
+  /**
+   * Notification de cette machine seulement, hors de l'état (0.13: le filet des options graphiques
+   * a baissé la qualité). Même allure que les autres, partie seule au bout de `seconds`.
+   */
+  localToast(text: string, iconId: string, seconds: number): void {
+    const li = el('li', { class: 'lpl-toast', 'data-kind': 'local' }, [icon(iconId), typographier(text)]);
+    this.toasts.append(li);
+    window.setTimeout(() => {
+      li.setAttribute('data-state', 'leaving');
+      window.setTimeout(() => {
+        li.remove();
+      }, UI_SETTINGS.foldMs);
+    }, seconds * 1000);
+  }
+
   private toastDurationMs(): number {
     return (this.host.ctx.content.settings.hints.durationSeconds || UI_SETTINGS.toastSeconds) * 1000;
   }

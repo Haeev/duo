@@ -14,6 +14,7 @@ import type { GameMap } from './carte';
 import type { Appearance, Cell, CharacterId, DeepReadonly, ReadonlyWorld, WorldEvent } from './types';
 
 import type { Content } from '../donnees/types';
+import type { GraphicsOptions, GraphicsPort } from './options-graphiques';
 
 export interface GameView {
   /** Contenu du game designer, validé (objets, cultures, habitants, textes...). */
@@ -69,6 +70,8 @@ export interface RendererOptions {
   quality?: RenderQuality;
   /** Journal de la plateforme (repli automatique vers le mode léger). */
   log?: { info(message: string, data?: unknown): void };
+  /** Options graphiques de la machine au départ (0.13); Auto si absentes. */
+  graphics?: GraphicsOptions;
 }
 
 /**
@@ -122,6 +125,14 @@ export interface Renderer {
   villagerPortrait?(id: string): string | null;
   /** Mesure du rendu des portraits au chargement (habitants rendus, durée en ms), `null` avant. */
   portraitStats?(): { count: number; milliseconds: number } | null;
+  /**
+   * Options graphiques de cette machine (0.13, panneau « Options »), appliquées à chaud. Absentes du
+   * rendu de secours; sans effet en mode léger demandé.
+   */
+  setGraphicsOptions?(options: GraphicsOptions): void;
+  graphicsOptions?(): GraphicsOptions;
+  /** Le filet de sécurité vient de baisser la qualité d'un cran (nouvelles options). */
+  onGraphicsReduced?(listener: (options: GraphicsOptions) => void): () => void;
   dispose(): void;
 }
 
@@ -179,6 +190,8 @@ export interface InterfaceOptions {
   outfitPreview?: (options: OutfitPreviewOptions) => OutfitPreview | null;
   /** 0.13: portrait 3D d'un habitant (`Renderer.villagerPortrait`); `null`: le portrait dessiné (facultatif). */
   villagerPortrait?: (id: string) => string | null;
+  /** 0.13: options graphiques de cette machine (panneau « Options » du carnet), absent sans rendu 3D. */
+  graphics?: GraphicsPort;
 }
 
 export interface GameInterface {
