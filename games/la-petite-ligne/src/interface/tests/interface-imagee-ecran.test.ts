@@ -290,9 +290,9 @@ describe.skipIf(executable === undefined)('interface imagée 0.12.2 au clavier (
       const errors: string[] = [];
       const page = await open('quetes-0122', errors);
       expect(await noScroll(page)).toBe(true);
-      // Les sept quêtes en cours tiennent sur une page: A et E restent aux onglets.
+      // Les huit quêtes en cours (« La montre arrêtée », de Firmin, s'y est ajoutée) tiennent sur une page: A et E restent aux onglets.
       const cards = page.locator('.lpl-tile--quest');
-      expect(await cards.count()).toBe(7);
+      expect(await cards.count()).toBe(8);
       expect(await page.locator('.lpl-tile--quest[data-state="done"]').count()).toBe(0);
       expect(await page.locator('.lpl-pager').count()).toBe(0);
       expect(await focusKey(page)).toBe('quest:market_first');

@@ -94,9 +94,13 @@ describe.skipIf(executable === undefined)('onglet Voisins au clavier (Chromium)'
       expect(await selectedTab(page)).toBe('neighbours');
       expect(await page.locator('.lpl-tile--neighbour').count()).toBe(21);
       expect(await page.locator('.lpl-tile--neighbour[data-met="false"]').count()).toBe(7);
-      expect(await focusKey(page)).toBe('villager:lucie');
-      expect(await detailName(page)).toBe('Lucie');
+      // Le focus part du premier voisin rencontré qui a des habitudes au carnet (Firmin, depuis que
+      // la vie du village a étoffé ses habitudes); Lucie, septième de la grille, sert de point de départ.
+      expect(await focusKey(page)).toBe('villager:firmin');
+      expect(await detailName(page)).toBe('Firmin');
       expect(await noScroll(page)).toBe(true);
+      await page.locator('[data-key="villager:lucie"]').focus();
+      expect(await detailName(page)).toBe('Lucie');
 
       // Flèches: le portrait voisin, la fiche suit.
       await page.keyboard.press('ArrowRight');
@@ -142,7 +146,8 @@ describe.skipIf(executable === undefined)('onglet Voisins au clavier (Chromium)'
       // Entrée sur un lieu habité: retour aux voisins, sur le premier qu'on y trouve.
       await page.keyboard.press('Enter');
       await page.locator('.lpl-vitrine--neighbours').waitFor();
-      await expect.poll(() => focusKey(page)).toBe('villager:lucie');
+      // Le premier voisin de la grille présent à ce lieu: Jeanne y est aussi avec Lucie (école).
+      await expect.poll(() => focusKey(page)).toMatch(/^villager:(jeanne|lucie)$/);
 
       // A et E: les onglets voisins (une seule page de portraits).
       await page.keyboard.press('KeyQ');
@@ -171,10 +176,16 @@ describe.skipIf(executable === undefined)('onglet Voisins au clavier (Chromium)'
           const text = await page.locator('.lpl-panel').innerText();
           expect(text).not.toMatch(/\b[a-z]+_[a-z_]+\b/);
           expect(text).not.toMatch(/\{[a-zA-Z]+\}/);
-          if (scenario === 'voisins-pluie')
+          if (scenario === 'voisins-pluie') {
+            // Le bouton de météo n'existe que sur la fiche d'un voisin qui a une variante de pluie
+            // connue (Jeanne dans ce scénario); le focus part de Firmin, qui n'en a pas.
+            await page.locator('[data-key="villager:jeanne"]').focus();
+            await page.locator('[data-key="weather:rain"]').waitFor();
             expect(
               await page.locator('[data-key="weather:rain"]').getAttribute('aria-pressed'),
             ).toBe('true');
+            expect(await noScroll(page), `pluie ${String(viewport.width)}`).toBe(true);
+          }
           expect(errors).toEqual([]);
           await page.close();
         }
