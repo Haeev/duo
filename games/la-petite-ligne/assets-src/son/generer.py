@@ -50,6 +50,7 @@ import saisons  # noqa: E402
 import tour10  # noqa: E402
 import train  # noqa: E402
 import v0_13  # noqa: E402
+import v0_13_lieux  # noqa: E402
 from catalogue import SPATIAL, Son  # noqa: E402
 
 QUALITE_MUSIQUE = 3  # Vorbis VBR, environ 110 kbit/s en stéréo
@@ -233,7 +234,7 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
 
 def tous_les_sons() -> list[Son]:
     return (effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons() + saisons.sons()
-            + moments_tour9.sons() + bourg.sons() + tour10.sons() + v0_13.sons())
+            + moments_tour9.sons() + bourg.sons() + tour10.sons() + v0_13.sons() + v0_13_lieux.sons())
 
 
 PLAN = {
@@ -343,6 +344,7 @@ PLAN = {
         "go-to-bed": {"steps": [{"at": 0.0, "play": "sleep"}, {"at": 0.0, "stopMusic": "veillee", "fadeMs": 2000},
                                 {"at": 2.5, "play": "nuit", "kind": "music", "when": "les deux couchés"}]},
         "angelus": v0_13.SEQUENCE_ANGELUS,
+        "mass": v0_13_lieux.SEQUENCE_MESSE,
     },
 }
 
@@ -467,6 +469,8 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["plic", "well-drop", "well-echo", "lookout-echo", "lookout-echo-far", "step-leaves", "cat-purr", "cat-meow"],
         ["pencil-note", "bond-chime", "bond-level", "birthday-chime", "decision-agree"],
         [f"talk-{id_}" for id_ in v0_13.MOTIFS],
+        ["mass-peal", "mill-race", "washhouse-water", "cafe-terrace", "plane-stroke", "handsaw-stroke", "joinery-loop",
+         "gift-happy", "gift-polite", "train-whistle-crossing"],
     ]
     for groupe in groupes:
         for nom in groupe:

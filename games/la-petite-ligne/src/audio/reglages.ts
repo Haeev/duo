@@ -160,6 +160,126 @@ export interface AudioSettings {
      */
     departFloorDb: number;
   };
+  /** 0.13 (lot L4 bis): cloches, métiers, ambiances placées, forêt, passages à niveau (`village.ts`). */
+  village: VillageSoundSettings;
+}
+
+/** Lieu: un point de la carte (`point`) ou une zone (`zone`), avec une portée (m). */
+export interface VillagePlace {
+  point?: string;
+  zone?: string;
+  reachM: number;
+}
+
+/** Boucle placée tant qu'un habitant fait cette activité à l'un de ces points (forge, meules, menuiserie). */
+export interface VillageWorkLoop {
+  key: string;
+  sound: string;
+  points: readonly string[];
+  activities: readonly string[];
+}
+
+/** Coups joués à intervalle tiré tant qu'un habitant fait cette activité à l'un de ces points (lavoir). */
+export interface VillageWorkBeats {
+  key: string;
+  sound: string;
+  points: readonly string[];
+  activities: readonly string[];
+  intervalSeconds: readonly [number, number];
+}
+
+/** Ambiance placée (boucle du bus ambiance), à chaque point listé, sous condition. */
+export interface VillagePlacedAmbience {
+  key: string;
+  sound: string;
+  /** Points de la carte, ou rangée de sources le long d'une zone (`alongZone`, `count` sources sur sa longueur). */
+  points?: readonly string[];
+  alongZone?: { zone: string; count: number };
+  /** Heures [début, fin[ (au-delà de 24: le lendemain matin), `null`: toujours. */
+  hours: readonly [number, number] | null;
+  /** Seulement si un habitant est à l'un de ces points (`null`: sans condition). */
+  whenVillagerAt: readonly string[] | null;
+  /** Écouté au-delà de cette distance: la boucle s'arrête (m). */
+  reachM: number;
+}
+
+/** Ce que joue un événement du lot de la vie du village (son nom dans `WorldEvent.type`). */
+export interface VillageEventSound {
+  sound: string;
+  /**
+   * Où: `villager` (l'habitant de l'événement), `by` (le joueur), `at` (champ `at` de l'événement),
+   * `point:<id>` (point de la carte), `ui` (non placé, chez `by`), `ui-both` (non placé, chez les deux).
+   * Le premier qui existe dans la liste l'emporte.
+   */
+  where: readonly string[];
+  /** Variante imposée (index du fichier). */
+  variant?: number;
+}
+
+export interface VillageSoundSettings {
+  bells: {
+    /** Le clocher (x 87, y -12): toutes les cloches y sont placées. */
+    at: { x: number; y: number };
+    /** Angélus: heures de jeu, séquence de `plan.sequences`. */
+    angelusHours: readonly number[];
+    angelusSequence: string;
+    /** Messe du dimanche: jour de la semaine (`weekdayOf`: 0 samedi, 1 dimanche), sonnerie et volée de sortie. */
+    mass: { weekday: number; callMinutes: number; callSound: string; endMinutes: number; endSound: string };
+    /** Décodées tant de minutes de jeu avant de sonner, libérées tant après. */
+    decodeBeforeMinutes: number;
+    decodeAfterMinutes: number;
+  };
+  workLoops: readonly VillageWorkLoop[];
+  workBeats: readonly VillageWorkBeats[];
+  placedAmbiences: readonly VillagePlacedAmbience[];
+  /** Le moulin tourne: drapeau du monde (`world.flags`) ou état nommé (`worldStates`), puis ses heures. */
+  millWheel: {
+    sound: string;
+    at: { x: number; y: number };
+    flag: string;
+    worldState: { key: string; value: string };
+    hours: readonly [number, number];
+    notWeekdays: readonly number[];
+    reachM: number;
+  };
+  /** La forêt profonde (non placée): pleine à `fadeInM` dans les zones, baisse d'autres ambiances. */
+  forest: {
+    sound: string;
+    zones: readonly string[];
+    fadeInM: number;
+    hours: readonly [number, number];
+    lowerDb: Readonly<Record<string, number>>;
+    /** Décodée à moins de tant de la lisière (m). */
+    decodeMarginM: number;
+  };
+  /** Pas selon l'aspect de la case (`groundStyles` de la carte): sous-bois et sentiers de forêt. */
+  stepsByStyle: Readonly<Record<string, string>>;
+  /** Sons décodés quand l'écouteur approche du lieu (`decodeWhen` de `sons.json`). */
+  places: readonly (VillagePlace & { sounds: readonly string[] })[];
+  /** Événements du lot de la vie du village, par type (cas préparés avant leur arrivée dans `WorldEvent`). */
+  events: Readonly<Record<string, VillageEventSound>>;
+  /** Sifflet aux passages à niveau sans barrière, à l'arrivée du train. */
+  crossings: {
+    sound: string;
+    zones: readonly string[];
+    /** On siffle à tant de mètres avant le passage. */
+    leadM: number;
+    /** Pas avant tant de secondes après le début de l'arrivée (le sifflet d'annonce sonne alors). */
+    notBeforeSeconds: number;
+    /** Le train hors carte au début de l'arrivée: à tant du bord est (m), comme le rendu. */
+    offMapClearanceM: number;
+  };
+  /** Cadeaux (lot H2): réaction après `gift-give`. */
+  gifts: {
+    delaySeconds: number;
+    happy: string;
+    polite: string;
+    /** Variante de `happy`: il l'adore, il l'aime. */
+    lovesVariant: number;
+    likesVariant: number;
+  };
+  /** Anniversaire souhaité: entendu aussi par l'autre joueur à moins de tant (m). */
+  birthdayNearM: number;
 }
 
 export const AUDIO_SETTINGS: AudioSettings = {
@@ -299,6 +419,99 @@ export const AUDIO_SETTINGS: AudioSettings = {
     followed: ['geese_flight', 'train_slow_roll'],
     hensOnly: ['hens_alarm'],
     departFloorDb: -24,
+  },
+  village: {
+    bells: {
+      at: { x: 87, y: -12 },
+      angelusHours: [7, 12, 19],
+      angelusSequence: 'angelus',
+      // Tous les foyers partent vers la nef à 10 h 15 (v0-13-habitants.md, section 7): la sonnerie les appelle.
+      mass: { weekday: 1, callMinutes: 10 * 60 + 15, callSound: 'mass-peal', endMinutes: 11 * 60 + 30, endSound: 'bell-peal' },
+      decodeBeforeMinutes: 10,
+      decodeAfterMinutes: 5,
+    },
+    workLoops: [
+      { key: 'forge', sound: 'forge-loop', points: ['forge_yard', 'forge_inside'], activities: ['work'] },
+      { key: 'millstone', sound: 'millstone', points: ['mill_inside'], activities: ['work'] },
+      { key: 'joinery', sound: 'joinery-loop', points: ['joinery_yard', 'joinery_inside'], activities: ['work'] },
+    ],
+    workBeats: [{ key: 'washhouse', sound: 'washboard-beat', points: ['washhouse'], activities: ['work'], intervalSeconds: [1.5, 3] }],
+    placedAmbiences: [
+      { key: 'mill-race', sound: 'mill-race', alongZone: { zone: 'mill_race', count: 3 }, hours: null, whenVillagerAt: null, reachM: 45 },
+      { key: 'washhouse', sound: 'washhouse-water', points: ['washhouse'], hours: null, whenVillagerAt: null, reachM: 28 },
+      {
+        key: 'cafe',
+        sound: 'cafe-terrace',
+        points: ['cafe_terrace'],
+        hours: [7, 23],
+        whenVillagerAt: ['cafe_terrace', 'cafe_counter', 'skittles_alley'],
+        reachM: 45,
+      },
+      { key: 'farm', sound: 'farm', points: ['farmyard'], hours: [6, 21], whenVillagerAt: null, reachM: 120 },
+    ],
+    millWheel: {
+      sound: 'mill-wheel',
+      at: { x: -14, y: 34.5 },
+      flag: 'mill_running',
+      worldState: { key: 'mill', value: 'running' },
+      // Berthe lève la vanne à 6 h et la baisse à 17 h, sauf le dimanche (son habitude `sluice`).
+      hours: [6, 17],
+      notWeekdays: [1],
+      reachM: 45,
+    },
+    forest: {
+      sound: 'forest-deep',
+      zones: ['forest_cote', 'forest_cure', 'forest_west'],
+      fadeInM: 8,
+      hours: [5, 21],
+      lowerDb: { wind: -4, village: -6, 'birds-morning': -3 },
+      decodeMarginM: 15,
+    },
+    stepsByStyle: { undergrowth: 'step-leaves', forestPath: 'step-leaves' },
+    places: [
+      { point: 'church_porch', reachM: 50, sounds: ['angelus-toll', 'bell-peal', 'harmonium-note', 'harmonium-chord'] },
+      { point: 'forge_yard', reachM: 55, sounds: ['anvil-strike', 'forge-loop'] },
+      { point: 'joinery_yard', reachM: 55, sounds: ['plane-stroke', 'handsaw-stroke', 'joinery-loop'] },
+      { point: 'washhouse', reachM: 40, sounds: ['washboard-beat', 'washhouse-water'] },
+      { zone: 'mill_race', reachM: 55, sounds: ['mill-wheel', 'millstone', 'sluice-open', 'mill-race'] },
+      { point: 'cafe_terrace', reachM: 55, sounds: ['cafe-terrace'] },
+      { point: 'farmyard', reachM: 130, sounds: ['farm'] },
+      { point: 'well', reachM: 25, sounds: ['well-drop', 'well-echo'] },
+      { point: 'lookout', reachM: 35, sounds: ['lookout-echo'] },
+      { zone: 'river', reachM: 25, sounds: ['plic'] },
+      { zone: 'forest_cote', reachM: 20, sounds: ['step-leaves'] },
+      { zone: 'forest_cure', reachM: 20, sounds: ['step-leaves'] },
+      { zone: 'forest_west', reachM: 20, sounds: ['step-leaves'] },
+    ],
+    // Noms d'événements attendus du lot de la vie du village (compte rendu du 2026-11-04).
+    events: {
+      forge_strike: { sound: 'anvil-strike', where: ['villager', 'by', 'point:forge_yard'] },
+      joinery_plane: { sound: 'plane-stroke', where: ['villager', 'by', 'point:joinery_yard'] },
+      joinery_saw: { sound: 'handsaw-stroke', where: ['villager', 'by', 'point:joinery_yard'] },
+      bell_rope_pull: { sound: 'angelus-toll', where: ['point:church_bell_rope'] },
+      bells_rung: { sound: 'bell-peal', where: ['point:church_bell_rope'] },
+      harmonium_note: { sound: 'harmonium-note', where: ['point:church_harmonium', 'by'] },
+      harmonium_chord: { sound: 'harmonium-chord', where: ['point:church_harmonium', 'by'] },
+      washhouse_scrub: { sound: 'washboard-beat', where: ['point:washhouse', 'by'] },
+      skim_stone: { sound: 'plic', where: ['at', 'by'] },
+      well_peek: { sound: 'well-drop', where: ['point:well', 'by'] },
+      well_shout: { sound: 'well-echo', where: ['point:well', 'by'] },
+      lookout_shout: { sound: 'lookout-echo', where: ['point:lookout', 'by'] },
+      sluice_opened: { sound: 'sluice-open', where: ['point:mill_sluice'] },
+      cat_pet: { sound: 'cat-purr', where: ['at', 'by'] },
+      cat_follow: { sound: 'cat-meow', where: ['at', 'by'], variant: 0 },
+      cat_gift: { sound: 'cat-meow', where: ['at', 'point:house_door'], variant: 1 },
+      decision_agreed: { sound: 'decision-agree', where: ['ui-both'] },
+    },
+    crossings: {
+      sound: 'train-whistle-crossing',
+      zones: ['church_level_crossing', 'farm_level_crossing'],
+      leadM: 20,
+      notBeforeSeconds: 3,
+      offMapClearanceM: 19,
+    },
+    gifts: { delaySeconds: 0.35, happy: 'gift-happy', polite: 'gift-polite', lovesVariant: 0, likesVariant: 1 },
+    birthdayNearM: 8,
   },
 };
 

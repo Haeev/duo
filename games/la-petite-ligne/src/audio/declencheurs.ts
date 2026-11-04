@@ -13,7 +13,7 @@ import { isSheltered } from '../etat/interieurs';
 import { currentOrder } from '../donnees/commandes';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
-import { groundAt, inRect, type GameMap } from '../etat/carte';
+import { cellIndex, groundAt, inMap, inRect, type GameMap } from '../etat/carte';
 import { seasonOfDay, weekdayOf } from '../donnees/calendrier';
 import type { Cell, CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import type { AudioSettings } from './reglages';
@@ -178,10 +178,12 @@ class Emitter {
   }
 
   /** Son d'interface, chez son auteur seulement (`both`: chez les deux). */
-  ui(sound: string, owner: CharacterId | 'both', delay = 0): void {
+  ui(sound: string, owner: CharacterId | 'both', delay = 0, variant?: number): void {
     if (!this.ctx.hasSound(sound)) return;
     if (owner !== 'both' && owner !== this.ctx.local) return;
-    this.out.push({ sound, at: null, gainDb: 0, delay, offset: 0, tag: null });
+    const request: SoundRequest = { sound, at: null, gainDb: 0, delay, offset: 0, tag: null };
+    if (variant !== undefined) request.variant = variant;
+    this.out.push(request);
   }
 }
 
@@ -208,6 +210,8 @@ export function soundsForEvent(
   const { world, map, content, local } = ctx;
   const d = settings.delays;
   const emit = new Emitter(ctx, out);
+  // Les événements du lot de la vie du village encore absents de `WorldEvent` passent par `default`.
+  const raw: { readonly type: string } = event;
   switch (event.type) {
     case 'tilled':
       emit.world('hoe', cellCenter(event.cell), event.by);
@@ -549,20 +553,103 @@ export function soundsForEvent(
       break;
     // 0.13 (lot H1): crayon du carnet, écriteau lu, remarque en passant; sons du lot H8 (`pencil-note`).
     case 'habit_found':
+      // Le crayon du carnet, chez les deux (la notification « Carnet: … » arrive chez les deux).
+      emit.ui('pencil-note', 'both');
+      break;
     case 'sign_read':
     case 'villager_remark':
       break;
-    // 0.13 (lot H2): le cadeau prend le son existant en attendant `gift-happy` et `gift-polite` du
-    // lot H8; lanternes (`bond-chime`, `bond-level`), goûts et anniversaires (`birthday-chime`) attendent leurs sons.
-    case 'gift_offered':
+    // 0.13 (lot H2): le paquet change de mains, puis la réaction de l'habitant chez qui offre.
+    case 'gift_offered': {
+      const g = settings.village.gifts;
       emit.world('gift-give', villagerAt(world, event.villager) ?? characterAt(world, event.by), event.by);
+      if (event.taste === 'loves' || event.taste === 'likes') {
+        emit.ui(g.happy, event.by, g.delaySeconds, event.taste === 'loves' ? g.lovesVariant : g.likesVariant);
+      } else {
+        emit.ui(g.polite, event.by, g.delaySeconds);
+      }
       break;
+    }
     case 'bond_gain':
-    case 'bond_level':
-    case 'taste_found':
-    case 'birthday_wished':
-    case 'birthday_attended':
+      emit.ui('bond-chime', event.by ?? 'both');
       break;
+    case 'bond_level':
+      emit.ui('bond-level', 'both');
+      break;
+    case 'taste_found':
+      emit.ui('pencil-note', event.by ?? 'both');
+      break;
+    case 'birthday_wished': {
+      // Chez qui souhaite, et chez l'autre s'il est tout près.
+      const by = characterAt(world, event.by);
+      const me = characterAt(world, local);
+      const near = by !== null && me !== null && Math.hypot(by.x - me.x, by.y - me.y) <= settings.village.birthdayNearM;
+      emit.ui('birthday-chime', near ? 'both' : event.by);
+      break;
+    }
+    case 'birthday_attended':
+      emit.ui('birthday-chime', 'both');
+      break;
+    default:
+      villageEventSound(raw, ctx, settings, emit);
+      break;
+  }
+}
+
+/** Champ texte d'un événement lu sans type (événements du lot de la vie du village). */
+function textField(event: object, name: string): string | null {
+  const value: unknown = Reflect.get(event, name);
+  return typeof value === 'string' ? value : null;
+}
+
+function vecField(event: object, name: string): Vec2 | null {
+  const value: unknown = Reflect.get(event, name);
+  if (typeof value !== 'object' || value === null) return null;
+  const x: unknown = Reflect.get(value, 'x');
+  const y: unknown = Reflect.get(value, 'y');
+  return typeof x === 'number' && typeof y === 'number' && Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
+}
+
+function isCharacter(id: string | null): id is CharacterId {
+  return id === 'p1' || id === 'p2';
+}
+
+/**
+ * Événements de la vie du village (0.13) attendus avant d'exister dans `WorldEvent`
+ * (`settings.village.events`: `forge_strike`, `joinery_plane`, `joinery_saw`, `bell_rope_pull`...).
+ * Champs lus s'ils existent: `villager`, `by` (p1 ou p2), `at` ({ x, y }). Quand le type rejoint
+ * `WorldEvent` avec son propre `case`, celui-ci l'emporte et cette table ne joue plus.
+ */
+function villageEventSound(event: { readonly type: string }, ctx: TriggerContext, settings: AudioSettings, emit: Emitter): void {
+  const rule = settings.village.events[event.type];
+  if (rule === undefined) return;
+  const byField = textField(event, 'by');
+  const by = isCharacter(byField) ? byField : null;
+  for (const where of rule.where) {
+    if (where === 'ui-both') {
+      emit.ui(rule.sound, 'both', 0, rule.variant);
+      return;
+    }
+    if (where === 'ui') {
+      if (by === null) continue;
+      emit.ui(rule.sound, by, 0, rule.variant);
+      return;
+    }
+    let at: Vec2 | null = null;
+    if (where === 'villager') {
+      const id = textField(event, 'villager');
+      at = id === null ? null : villagerAt(ctx.world, id);
+    } else if (where === 'by') {
+      at = by === null ? null : characterAt(ctx.world, by);
+    } else if (where === 'at') {
+      at = vecField(event, 'at');
+    } else if (where.startsWith('point:')) {
+      at = pointAt(ctx.map, where.slice('point:'.length));
+    }
+    if (at !== null) {
+      emit.world(rule.sound, at, by, 0, rule.variant);
+      return;
+    }
   }
 }
 
@@ -579,7 +666,23 @@ interface CharacterTrack {
 }
 
 /** Sons d'interface qui couvrent déjà une notification arrivée dans la même image. */
-const COVERING_UI = new Set(['journal-new', 'duo-done', 'purchase-proposal', 'purchase-accept', 'purchase-decline', 'chantier-built', 'coins-drop']);
+const COVERING_UI = new Set([
+  'journal-new',
+  'duo-done',
+  'purchase-proposal',
+  'purchase-accept',
+  'purchase-decline',
+  'chantier-built',
+  'coins-drop',
+  // 0.13: le carnet et l'amitié portent eux-mêmes leur notification.
+  'pencil-note',
+  'bond-chime',
+  'bond-level',
+  'birthday-chime',
+  'gift-happy',
+  'gift-polite',
+  'decision-agree',
+]);
 /** Manivelles du passage à niveau (salut du mécanicien, tour 9). */
 const GATE_CRANKS: readonly string[] = ['gate_north_crank', 'gate_south_crank'];
 const NOTIFY_KINDS = new Set(['hint', 'message', 'letter', 'envie']);
@@ -820,6 +923,10 @@ export class StateWatcher {
     for (const crossing of map.crossings) {
       if (crossing.kind === 'footbridge' && inRect(crossing.rect, at.x, at.y)) return FOOTBRIDGE_STEPS;
     }
+    // 0.13: sous-bois et sentiers de forêt (litière de feuilles), d'après l'aspect de la case.
+    const style = inMap(map, cx, cy) ? map.groundStyles?.[cellIndex(map, cx, cy)] : undefined;
+    const leaves = style === undefined || style === null ? undefined : this.settings.village.stepsByStyle[style];
+    if (leaves !== undefined) return leaves;
     const ground = groundAt(map, cx, cy);
     return ground === undefined ? s.byGround.grass : s.byGround[ground];
   }

@@ -22,6 +22,7 @@ import { type BedWish, MUSIC, type MomentRules, type MusicCommand, MusicDirector
 import type { AudioSettings } from './reglages';
 import { type SequenceCatalogue, type SequenceShot, SequenceRun } from './sequences';
 import { type TrainGeometry, type TrainRules, type TrainTimeline, TrainTracker, locomotivePosition } from './train';
+import { VillageSounds } from './village';
 
 const SEQ = {
   arrival: 'train-arrival',
@@ -84,6 +85,8 @@ export interface BrainFrame {
   trainDay: boolean;
   /** Fichiers du moment rare du jour à garder décodés. */
   momentFiles: ReadonlySet<string>;
+  /** 0.13: sons des lieux proches et des cloches bientôt, à garder décodés (`village.ts`). */
+  villageFiles: ReadonlySet<string>;
   /** Musique atténuée pendant l'apogée d'un moment (dB, 0 sinon), et ses temps de descente et de remontée (s). */
   momentDuck: { db: number; attackSeconds: number; releaseSeconds: number };
   /** Diagnostic. */
@@ -103,6 +106,7 @@ interface ActiveSync {
 export class AudioBrain {
   private readonly watcher: StateWatcher;
   private readonly moments: MomentSounds;
+  private readonly village: VillageSounds;
   private readonly director: MusicDirector;
   private readonly tracker: TrainTracker;
   private readonly rules: MomentRules;
@@ -157,6 +161,7 @@ export class AudioBrain {
     const clock = content.settings.clock;
     this.watcher = new StateWatcher(settings, random);
     this.moments = new MomentSounds(catalogue, settings, content, map, random);
+    this.village = new VillageSounds(catalogue, settings, map, random);
     this.director = new MusicDirector({
       music: catalogue.music,
       restLoops: catalogue.rest.playLoops,
@@ -235,6 +240,7 @@ export class AudioBrain {
       syncs: [],
       trainDay: false,
       momentFiles: this.moments.files(),
+      villageFiles: this.village.wantedFiles(),
       momentDuck: {
         db: 0,
         attackSeconds: content.settings.moments.musicDuckInSeconds,
@@ -373,6 +379,14 @@ export class AudioBrain {
     f.ambienceNeeded.clear();
     for (const [id, gain] of f.ambience) if (gain > 0) f.ambienceNeeded.add(id);
     for (const [id, gain] of this.levelsSoon) if (gain > 0) f.ambienceNeeded.add(id);
+    // 0.13: cloches, métiers, ambiances placées, forêt, passages à niveau.
+    this.village.update(
+      { world, listener: f.listener.at, gameTime: input.gameTime, arrival: timeline.arrival },
+      f.shots,
+      f.loops,
+      f.ambience,
+      f.ambienceNeeded,
+    );
     return f;
   }
 
