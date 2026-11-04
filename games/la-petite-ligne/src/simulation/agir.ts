@@ -38,7 +38,7 @@ import { buildingOpen } from './interieurs';
 import { nearStall, stallPose, stallSetUp } from '../etat/marche';
 import { serveBuyer } from './marche';
 import { MAIL_POINT, deliverMail, mailWaiting, takeMail } from './plis';
-import { decorTargets, performDecor } from './decor';
+import { type DecorTarget, decorTargets, performDecor } from './decor';
 import { CAT_PET, catPetTarget, petCat } from './chat';
 
 /** Cible de l'étal du dimanche (pas forcément un point de la carte: `stallPose`). */
@@ -337,8 +337,11 @@ function tierOf(sim: Sim, c: Character, t: Target): number {
 }
 
 function inCone(c: Character, pos: Vec2): boolean {
-  const d = distance(c.pos, pos);
-  if (d < 0.6) return true;
+  return distance(c.pos, pos) < 0.6 || facesStrictly(c, pos);
+}
+
+/** Dans le regard au sens strict (sans la tolérance de ce qui est sous les pieds). */
+function facesStrictly(c: Character, pos: Vec2): boolean {
   const angle = Math.atan2(pos.y - c.pos.y, pos.x - c.pos.x);
   let diff = Math.abs(angle - c.facing) % (2 * Math.PI);
   if (diff > Math.PI) diff = 2 * Math.PI - diff;
@@ -458,6 +461,13 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
     if (c.seat !== null && verb !== null && !SEATED_VERBS.has(verb)) continue;
     scored.push({ target: t, verb, tier: verb === null ? 99 : tierOf(sim, c, t), d: distance(front, t.pos) });
   }
+  // Un geste du décor dont le point est sous les pieds, hors du regard, ne vole pas Espace à la
+  // place libre du banc qu'on regarde (la berge: le pissenlit et les ricochets sont devant le banc).
+  if (scored.some((e) => e.target.kind === 'bench' && facesStrictly(c, e.target.pos)))
+    for (let i = scored.length - 1; i >= 0; i--) {
+      const e = scored[i];
+      if (e?.target.kind === 'decor' && !facesStrictly(c, e.target.pos)) scored.splice(i, 1);
+    }
   // Un habitant ne vole pas la touche à l'objet qu'on vise de plus près (R06: Basile devant son
   // établi, ou à côté de la poutre): l'objet passe avant lui; tourné vers lui, on lui parle.
   const nearestObject = Math.min(...scored.filter((e) => e.verb !== null && OBJECT_KINDS.has(e.target.kind)).map((e) => e.d));
@@ -893,8 +903,13 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       // 0.13: un geste avec le décor (cierges, puits, lavoir...), survolé ou cliqué même de loin.
       const cat = catPetTarget(sim, c, { at, radius: CAT_CLICK_RADIUS });
       if (cat !== null) return { kind: 'decor', gesture: CAT_PET, label: cat.label, pos: cat.pos, holdOnly: false };
-      const decor = decorTargets(sim, c, { at, radius: DECOR_CLICK_RADIUS })[0];
-      if (decor !== undefined) return { kind: 'decor', gesture: decor.gesture, label: decor.label, pos: decor.pos, holdOnly: decor.holdOnly };
+      // Le geste le plus proche du clic; une place libre de banc plus proche encore passe avant lui
+      // (le bord du ponton et le banc de la berge sont à un pas des ricochets).
+      let decor: DecorTarget | undefined;
+      for (const d of decorTargets(sim, c, { at, radius: DECOR_CLICK_RADIUS }))
+        if (decor === undefined || distance(at, d.pos) < distance(at, decor.pos)) decor = d;
+      const nearSeat = freeSeatsNear(sim, at, BENCH_CLICK_RADIUS, c)[0];
+      if (decor !== undefined && (nearSeat === undefined || distance(at, decor.pos) <= distance(at, nearSeat.pos))) return { kind: 'decor', gesture: decor.gesture, label: decor.label, pos: decor.pos, holdOnly: decor.holdOnly };
       // 0.12: un clic sur une bête de l'élevage (ou tout près d'elle), après les points d'action.
       const animal = animalAt(sim, at);
       if (animal !== null) return animal;

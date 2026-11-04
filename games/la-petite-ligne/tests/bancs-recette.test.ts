@@ -84,7 +84,12 @@ describe('assise: cas de recette', () => {
     tick(sim);
     press(sim, 'p1');
     expect(character(sim, 'p1').seat).not.toBeNull();
-    for (let n = 0; sim.world.clock.minutes < 24 * 60 && n < SIM_HZ * 60 * 30; n++) tick(sim);
+    // Les deux joueurs sont là, sans toucher au clavier: l'absence (PA-04, 3 min sans entrée)
+    // n'arrête pas l'horloge avant minuit, quel que soit le temps qu'ont laissé les robots.
+    for (let n = 0; sim.world.clock.minutes < 24 * 60 && n < SIM_HZ * 60 * 30; n++) {
+      for (const c of sim.world.characters) c.lastInputTick = sim.world.tick;
+      tick(sim);
+    }
     tick(sim);
     const c = character(sim, 'p1');
     expect(c.seat).toBeNull();
