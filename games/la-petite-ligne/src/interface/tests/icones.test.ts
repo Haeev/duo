@@ -96,8 +96,8 @@ describe('sprite des icônes (0.12.2)', () => {
 
   it('chaque objet de objets.json a sa propre entrée, et la table ne cite que des objets du jeu', () => {
     const ids = items.map((d) => d.id);
-    // 0.13: le cordeau et la parcelle de la vitrine d'Odette (parcelles libres).
-    expect(ids.length).toBe(137);
+    // 0.13: 185 objets (cordeau, parcelle, quêtes des voisins, cadeaux, plats du bourg).
+    expect(ids.length).toBe(185);
     expect(ids.filter((id) => ITEM_ICONS[id] === undefined)).toEqual([]);
     expect(Object.keys(ITEM_ICONS).filter((id) => content.items[id] === undefined)).toEqual([]);
   });
