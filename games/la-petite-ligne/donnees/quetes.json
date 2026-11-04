@@ -795,6 +795,2578 @@
       "completionText": "L'argent de poche de Jeanne: 20 aubrins."
     },
     {
+      "id": "lucie_return",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le retour de Lucie",
+      "giver": "lucie",
+      "story": {
+        "villager": "lucie",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "day_at_least",
+            "day": 16
+          },
+          {
+            "type": "any",
+            "conditions": [
+              {
+                "type": "dialogue_done",
+                "dialogue": "armand_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "berthe_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "martial_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "marthe_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "honorine_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "ines_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "barnabe_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "mado_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "paulin_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "margot_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "leon_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "ambroise_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "nour_meet"
+              },
+              {
+                "type": "dialogue_done",
+                "dialogue": "colette_meet"
+              }
+            ]
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "welcome",
+          "objective": "Accueillir Lucie à deux devant la halte: dès 9 h, ou au train de 10 h le samedi.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_return_scene"
+            }
+          ]
+        },
+        {
+          "id": "carry",
+          "objective": "Porter à deux la sacoche de Lucie jusqu'à sa maison, en face de la mercerie.",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "lucie_satchel_carried"
+            }
+          ],
+          "effects": [
+            {
+              "type": "set_flag",
+              "flag": "lucie_back"
+            }
+          ]
+        },
+        {
+          "id": "firmin",
+          "objective": "Dire à Firmin que Lucie est rentrée.",
+          "conditions": [
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "dialogue_done",
+                  "dialogue": "firmin_lucie_back_note"
+                },
+                {
+                  "type": "dialogue_done",
+                  "dialogue": "firmin_lucie_back"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "lucie",
+          "amount": 100
+        }
+      ],
+      "completionText": "Lucie est rentrée, et sa tournée reprend. Firmin a sorti sa casquette du dimanche. 40 aubrins."
+    },
+    {
+      "id": "lucie_camera",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le vieil appareil",
+      "giver": "lucie",
+      "story": {
+        "villager": "lucie",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "lucie_return"
+          },
+          {
+            "type": "quest_done",
+            "quest": "ambroise_springs"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "lucie",
+            "level": 1
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Lucie: elle a trouvé quelque chose au grenier.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_camera_ask"
+            }
+          ]
+        },
+        {
+          "id": "bring",
+          "objective": "Porter le vieil appareil à Ambroise, à sa fenêtre de la maison des cheminots.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "ambroise",
+              "item": "old_camera",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "objective": "Laisser Ambroise travailler deux nuits.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "id": "photo",
+          "objective": "Un lundi ou un mercredi après-midi sans pluie, rejoindre Lucie à deux au belvédère.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_camera_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "lucie",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "ambroise",
+          "amount": 50
+        },
+        {
+          "type": "set_flag",
+          "flag": "lucie_camera_fixed"
+        }
+      ],
+      "completionText": "L'appareil de Lucie marche. Elle a déjà des idées pour toute la vallée. 40 aubrins."
+    },
+    {
+      "id": "lucie_darkroom",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La chambre noire",
+      "giver": "lucie",
+      "story": {
+        "villager": "lucie",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "lucie_camera"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "lucie",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "enter",
+          "objective": "Un jour de pluie en semaine, entre 14 h et 17 h, frapper à deux chez Lucie: elle développe.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_darkroom_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "give_item",
+          "item": "duo_photo",
+          "count": 1,
+          "to": "cellar"
+        },
+        {
+          "type": "add_bond",
+          "villager": "lucie",
+          "amount": 100
+        }
+      ],
+      "completionText": "La photo du belvédère est au cellier, dans son cadre. 60 aubrins."
+    },
+    {
+      "id": "lucie_exhibition",
+      "kind": "side",
+      "tier": "P0",
+      "title": "L'exposition de la halte",
+      "giver": "lucie",
+      "story": {
+        "villager": "lucie",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "lucie_darkroom"
+          },
+          {
+            "type": "quest_done",
+            "quest": "firmin_clock"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "lucie",
+            "level": 3
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "shoot",
+          "objective": "Photographier à deux avec Lucie quatre vues de la vallée, aux heures où elle y est.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_expo_lookout",
+              "label": "Le belvédère, lundi ou mercredi après-midi"
+            },
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_expo_pontoon",
+              "label": "Le ponton, mardi ou jeudi après-midi"
+            },
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_expo_church",
+              "label": "Le parvis, vendredi après-midi"
+            },
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_expo_quay",
+              "label": "Le quai, vers 17 h"
+            }
+          ]
+        },
+        {
+          "id": "ask",
+          "objective": "Demander à Firmin la permission d'exposer dans la salle d'attente.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "firmin_exhibition_ok"
+            }
+          ]
+        },
+        {
+          "id": "hang",
+          "objective": "Accrocher les photos à deux, devant la porte de la halte.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "station_door",
+              "seconds": 5,
+              "who": "both"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "add_bond",
+          "villager": "lucie",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "firmin",
+          "amount": 50
+        },
+        {
+          "type": "set_flag",
+          "flag": "halt_exhibition"
+        }
+      ],
+      "completionText": "Les photos de Lucie attendent les voyageurs à la halte. 80 aubrins."
+    },
+    {
+      "id": "armand_registers",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les registres mouillés",
+      "giver": "armand",
+      "story": {
+        "villager": "armand",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "dialogue_done",
+            "dialogue": "armand_meet"
+          },
+          {
+            "type": "weekday_is",
+            "weekdays": [
+              "wednesday"
+            ]
+          },
+          {
+            "type": "weather_is",
+            "weather": "sunny"
+          },
+          {
+            "type": "time_is",
+            "from": "06:00",
+            "to": "11:00"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Un mercredi matin, passer voir Armand à la mairie.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "armand_registers_ask"
+            }
+          ]
+        },
+        {
+          "id": "spread",
+          "objective": "Étaler les registres à deux dans la cour de l'école.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "school_yard",
+              "seconds": 5,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "store",
+          "objective": "Entre 15 h et 18 h, quand ils sont secs, les ranger à deux à la mairie.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "mairie_desk",
+              "seconds": 3,
+              "who": "both"
+            },
+            {
+              "type": "time_is",
+              "from": "15:00",
+              "to": "18:00"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "armand",
+          "amount": 100
+        }
+      ],
+      "completionText": "Quarante registres secs, rangés par année. Armand en rougit de soulagement. 40 aubrins."
+    },
+    {
+      "id": "armand_chronicle",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La chronique d'Honorine",
+      "giver": "armand",
+      "story": {
+        "villager": "armand",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "armand_registers"
+          },
+          {
+            "type": "quest_done",
+            "quest": "honorine_yarn"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "armand",
+            "level": 1
+          }
+        ],
+        "effects": [
+          {
+            "type": "set_flag",
+            "flag": "armand_chronicle"
+          },
+          {
+            "type": "reveal_habit",
+            "villager": "armand",
+            "habit": "chronicle"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "first",
+          "objective": "Dimanche à 14 h, retrouver à deux Armand chez Honorine, sous la glycine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "armand_chronicle_1"
+            }
+          ]
+        },
+        {
+          "id": "week_1",
+          "objective": "Attendre le dimanche suivant.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 6
+            }
+          ]
+        },
+        {
+          "id": "second",
+          "objective": "Dimanche à 14 h, deuxième séance chez Honorine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "armand_chronicle_2"
+            }
+          ]
+        },
+        {
+          "id": "week_2",
+          "objective": "Attendre encore un dimanche.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 6
+            }
+          ]
+        },
+        {
+          "id": "third",
+          "objective": "Dimanche à 14 h, dernière séance chez Honorine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "armand_chronicle_3"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "give_item",
+          "item": "halt_chronicle",
+          "count": 1,
+          "to": "cellar"
+        },
+        {
+          "type": "add_bond",
+          "villager": "armand",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "honorine",
+          "amount": 50
+        }
+      ],
+      "completionText": "La Chronique de la Halte a ses quarante premières pages. Armand continue le dimanche. 60 aubrins."
+    },
+    {
+      "id": "armand_choir",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La chorale du vendredi",
+      "giver": "armand",
+      "story": {
+        "villager": "armand",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "armand_registers"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "armand",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "sing",
+          "objective": "Un vendredi à 20 h, rejoindre à deux la chorale dans la nef.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "armand_choir_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "add_bond",
+          "villager": "armand",
+          "amount": 100
+        }
+      ],
+      "completionText": "La chorale du vendredi compte deux voix de plus. 60 aubrins."
+    },
+    {
+      "id": "armand_line_plan",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le plan de la ligne",
+      "giver": "armand",
+      "story": {
+        "villager": "armand",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "armand_chronicle"
+          },
+          {
+            "type": "quest_done",
+            "quest": "firmin_uniform"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "armand",
+            "level": 3
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "archives",
+          "objective": "Un mercredi matin, fouiller à deux les archives de la mairie avec Armand.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "armand_archives_scene"
+            }
+          ]
+        },
+        {
+          "id": "firmin",
+          "objective": "Porter à Firmin le plan et la lettre d'Émile.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "firmin_line_plan"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "give_item",
+          "item": "emile_plan",
+          "count": 1,
+          "to": "cellar"
+        },
+        {
+          "type": "add_bond",
+          "villager": "armand",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "firmin",
+          "amount": 50
+        },
+        {
+          "type": "set_flag",
+          "flag": "emile_keeper_letter"
+        }
+      ],
+      "completionText": "Le plan d'Émile est au cellier, à accrocher. Firmin garde la lettre pour plus tard. 80 aubrins."
+    },
+    {
+      "id": "berthe_sluice",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La vanne coincée",
+      "giver": "berthe",
+      "story": {
+        "villager": "berthe",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "dialogue_done",
+            "dialogue": "berthe_meet"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Berthe dans la cour du moulin.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_sluice_ask"
+            }
+          ]
+        },
+        {
+          "id": "lift",
+          "objective": "Lever la vanne du bief à deux: rester ensemble à la vanne.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "mill_sluice",
+              "seconds": 4,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "wheel",
+          "objective": "Regarder la roue repartir.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_wheel_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "berthe",
+          "amount": 100
+        },
+        {
+          "type": "set_flag",
+          "flag": "mill_running"
+        }
+      ],
+      "completionText": "Le moulin de la Vanne tourne de nouveau. 40 aubrins."
+    },
+    {
+      "id": "berthe_millstone",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La meule à rhabiller",
+      "giver": "berthe",
+      "story": {
+        "villager": "berthe",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "berthe_sluice"
+          },
+          {
+            "type": "quest_done",
+            "quest": "mado_bellows"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "berthe",
+            "level": 1
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Berthe au moulin.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_millstone_ask"
+            }
+          ]
+        },
+        {
+          "id": "bring",
+          "objective": "Porter à Mado, à la forge, 2 clous et 1 rondin pour le marteau.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "mado",
+              "item": "nail",
+              "count": 2,
+              "label": "2 clous"
+            },
+            {
+              "type": "given",
+              "villager": "mado",
+              "item": "log",
+              "count": 1,
+              "label": "1 rondin"
+            }
+          ]
+        },
+        {
+          "id": "forge",
+          "objective": "Laisser Mado forger une nuit.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "fetch",
+          "objective": "Chercher le marteau à la forge.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "mado_hammer_ready"
+            }
+          ]
+        },
+        {
+          "id": "dress",
+          "objective": "Un lundi matin, rhabiller la meule à deux avec Berthe, dans la cour du moulin.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_millstone_scene"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "dressing_hammer",
+              "count": 1,
+              "from": "either"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "berthe",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "mado",
+          "amount": 50
+        }
+      ],
+      "completionText": "La meule de la Vanne mord de nouveau. 40 aubrins."
+    },
+    {
+      "id": "berthe_share",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La part du meunier",
+      "giver": "berthe",
+      "story": {
+        "villager": "berthe",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "berthe_millstone"
+          },
+          {
+            "type": "quest_done",
+            "quest": "paulin_sacks"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "berthe",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "berthe",
+          "objective": "Un samedi entre 9 h et 10 h, écouter Berthe sur le quai.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_share_talk"
+            }
+          ]
+        },
+        {
+          "id": "paulin",
+          "objective": "Écouter Paulin, au champ du Haut en semaine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "paulin_share_talk"
+            }
+          ]
+        },
+        {
+          "id": "meet",
+          "objective": "Un samedi entre 9 h et 10 h, réunir Berthe et Paulin à la bascule de la halte, à deux.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_share_scene"
+            }
+          ]
+        },
+        {
+          "id": "decide",
+          "objective": "Décider à deux: comment Berthe et Paulin se feront-ils confiance ?",
+          "conditions": [
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "decision_made",
+                  "decision": "mouture",
+                  "option": "weighing"
+                },
+                {
+                  "type": "decision_made",
+                  "decision": "mouture",
+                  "option": "watch"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "add_bond",
+          "villager": "berthe",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "paulin",
+          "amount": 50
+        },
+        {
+          "type": "set_flag",
+          "flag": "mouture_settled"
+        }
+      ],
+      "completionText": "Berthe et Paulin se serrent la main. Le blé du hameau restera dans la vallée. 60 aubrins."
+    },
+    {
+      "id": "berthe_hamlet_sacks",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les sacs du hameau",
+      "giver": "berthe",
+      "story": {
+        "villager": "berthe",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "berthe_share"
+          },
+          {
+            "type": "quest_done",
+            "quest": "paulin_mill_again"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "berthe",
+            "level": 3
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "carry",
+          "objective": "Porter à deux les sacs de blé de Paulin, de l'étable au moulin.",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "wheat_sacks_carried"
+            }
+          ]
+        },
+        {
+          "id": "bag",
+          "objective": "Ensacher la farine avec Berthe, à la porte du moulin, un matin de mouture.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_bag_scene"
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "objective": "Laisser Achille cuire le premier pain, une nuit.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "share",
+          "objective": "Partager le premier pain avec Berthe et Paulin, sur la terrasse du café, à midi.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "berthe_bread_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "add_bond",
+          "villager": "berthe",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "paulin",
+          "amount": 50
+        }
+      ],
+      "completionText": "Le premier pain du blé du hameau, moulu à la Vanne. 80 aubrins."
+    },
+    {
+      "id": "martial_seeds",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les graines de la sacristie",
+      "giver": "martial",
+      "story": {
+        "villager": "martial",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "dialogue_done",
+            "dialogue": "martial_meet"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "receive",
+          "objective": "Passer voir l'abbé à son jardin, le matin ou le soir.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "martial_seeds_give"
+            }
+          ]
+        },
+        {
+          "id": "grow",
+          "objective": "Récolter un radis, une laitue et une carotte au potager.",
+          "conditions": [
+            {
+              "type": "harvested",
+              "item": "radish",
+              "count": 1,
+              "label": "1 radis"
+            },
+            {
+              "type": "harvested",
+              "item": "lettuce",
+              "count": 1,
+              "label": "1 laitue"
+            },
+            {
+              "type": "harvested",
+              "item": "carrot",
+              "count": 1,
+              "label": "1 carotte"
+            }
+          ]
+        },
+        {
+          "id": "bring",
+          "objective": "En rapporter un de chaque à l'abbé.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "martial",
+              "item": "radish",
+              "count": 1,
+              "label": "1 radis"
+            },
+            {
+              "type": "given",
+              "villager": "martial",
+              "item": "lettuce",
+              "count": 1,
+              "label": "1 laitue"
+            },
+            {
+              "type": "given",
+              "villager": "martial",
+              "item": "carrot",
+              "count": 1,
+              "label": "1 carotte"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "martial",
+          "amount": 100
+        }
+      ],
+      "completionText": "L'abbé goûte, ferme les yeux et approuve. 40 aubrins."
+    },
+    {
+      "id": "martial_chain",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La chaîne du vélo",
+      "giver": "martial",
+      "story": {
+        "villager": "martial",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "martial_seeds"
+          },
+          {
+            "type": "quest_done",
+            "quest": "mado_bellows"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "martial",
+            "level": 1
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter l'abbé: son vélo a un souci.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "martial_chain_ask"
+            }
+          ]
+        },
+        {
+          "id": "bring",
+          "objective": "Porter la chaîne cassée à Mado, à la forge.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "mado",
+              "item": "broken_chain",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "forge",
+          "objective": "Laisser Mado forger une nuit.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "fetch",
+          "objective": "Chercher la chaîne à la forge.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "mado_chain_ready"
+            }
+          ]
+        },
+        {
+          "id": "back",
+          "objective": "Rendre la chaîne à l'abbé, avant sa tournée.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "martial",
+              "item": "bike_chain",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "martial",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "mado",
+          "amount": 50
+        }
+      ],
+      "completionText": "L'abbé repart en tournée en sifflant. 40 aubrins."
+    },
+    {
+      "id": "martial_red_wheat",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le blé rouge",
+      "giver": "martial",
+      "story": {
+        "villager": "martial",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "martial_chain"
+          },
+          {
+            "type": "quest_done",
+            "quest": "paulin_field"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "martial",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "sow",
+          "objective": "Un soir entre 17 h et 19 h, semer à deux le blé rouge de l'abbé au champ du Haut.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "martial_sow_scene"
+            }
+          ]
+        },
+        {
+          "id": "harvest",
+          "objective": "Le jour de la moisson, revenir à deux au champ du Haut voir le blé rouge.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "martial_wheat_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "add_bond",
+          "villager": "martial",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "paulin",
+          "amount": 50
+        }
+      ],
+      "completionText": "Le blé rouge est rentré avec la moisson. L'abbé en garde pour l'an prochain. 60 aubrins."
+    },
+    {
+      "id": "martial_small_bell",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La petite cloche",
+      "giver": "martial",
+      "story": {
+        "villager": "martial",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "marthe_dahlias"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "martial",
+            "level": 3
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "climb",
+          "objective": "Après l'angélus de midi, monter à deux au clocher avec Marthe et l'abbé.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "martial_bell_scene"
+            }
+          ]
+        },
+        {
+          "id": "carry",
+          "objective": "Un samedi, porter à deux la petite cloche du parvis jusqu'au train.",
+          "conditions": [
+            {
+              "type": "flag",
+              "flag": "small_bell_shipped"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "add_bond",
+          "villager": "martial",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "marthe",
+          "amount": 50
+        }
+      ],
+      "completionText": "La petite cloche part pour la fonderie. Marthe regarde le train jusqu'au bout. 80 aubrins."
+    },
+    {
+      "id": "marthe_angelus",
+      "kind": "side",
+      "tier": "P0",
+      "title": "L'angélus à deux",
+      "giver": "marthe",
+      "story": {
+        "villager": "marthe",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "dialogue_done",
+            "dialogue": "marthe_meet"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Marthe.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_angelus_ask"
+            }
+          ]
+        },
+        {
+          "id": "ring",
+          "objective": "À 18 h 50, être à deux à la corde des cloches, pour l'angélus du soir.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_angelus_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "marthe",
+          "amount": 100
+        }
+      ],
+      "completionText": "Vous avez sonné l'angélus du soir. Marthe a presque souri. 40 aubrins."
+    },
+    {
+      "id": "marthe_dahlias",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les dahlias",
+      "giver": "marthe",
+      "story": {
+        "villager": "marthe",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "marthe_angelus"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "marthe",
+            "level": 1
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Marthe au cimetière.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_dahlias_ask"
+            }
+          ]
+        },
+        {
+          "id": "buy",
+          "objective": "Acheter 4 bulbes de dahlia chez Odette.",
+          "conditions": [
+            {
+              "type": "item_owned",
+              "item": "dahlia_bulb",
+              "count": 4,
+              "label": "4 bulbes de dahlia"
+            }
+          ]
+        },
+        {
+          "id": "plant_1",
+          "objective": "Planter à deux en même temps: l'un sur la tombe d'Hortense Cornu, l'autre sur celle d'Eugénie Mérigot.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "grave_cornu",
+              "seconds": 3,
+              "who": "either",
+              "label": "Hortense"
+            },
+            {
+              "type": "stayed_at",
+              "point": "grave_merigot",
+              "seconds": 3,
+              "who": "either",
+              "label": "Eugénie"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "dahlia_bulb",
+              "count": 2,
+              "from": "either"
+            }
+          ]
+        },
+        {
+          "id": "plant_2",
+          "objective": "Puis, de la même façon, sur la tombe d'Octave Valade et sur celle des Ferrand.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "grave_valade",
+              "seconds": 3,
+              "who": "either",
+              "label": "Octave"
+            },
+            {
+              "type": "stayed_at",
+              "point": "grave_ferrand",
+              "seconds": 3,
+              "who": "either",
+              "label": "Les Ferrand"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "dahlia_bulb",
+              "count": 2,
+              "from": "either"
+            }
+          ]
+        },
+        {
+          "id": "basile",
+          "objective": "Dire à Basile que la tombe d'Hortense a des fleurs.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "basile_dahlias_told"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "marthe",
+          "amount": 100
+        },
+        {
+          "type": "set_flag",
+          "flag": "dahlias_planted"
+        }
+      ],
+      "completionText": "Les dahlias de Marthe fleuriront tout l'été. 40 aubrins."
+    },
+    {
+      "id": "marthe_wedding_dress",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La robe de noces",
+      "giver": "marthe",
+      "story": {
+        "villager": "marthe",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "marthe_dahlias"
+          },
+          {
+            "type": "quest_done",
+            "quest": "honorine_photo"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "marthe",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "marthe",
+          "objective": "Écouter Marthe: la photo l'a remuée.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_dress_talk"
+            }
+          ]
+        },
+        {
+          "id": "honorine",
+          "objective": "Montrer la robe à Honorine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "honorine_dress_talk"
+            }
+          ]
+        },
+        {
+          "id": "solange",
+          "objective": "Porter la robe de noces à Solange, à la mercerie.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "solange",
+              "item": "wedding_dress",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "sew",
+          "objective": "Laisser Solange reprendre la dentelle, deux nuits.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 2
+            }
+          ]
+        },
+        {
+          "id": "face",
+          "objective": "Un dimanche à la sortie de la messe, entre 11 h 30 et midi, réunir à deux les sœurs sur le parvis.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_dress_scene"
+            }
+          ]
+        },
+        {
+          "id": "decide",
+          "objective": "Décider à deux: à qui revient la robe réparée ?",
+          "conditions": [
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "decision_made",
+                  "decision": "robe",
+                  "option": "marthe"
+                },
+                {
+                  "type": "decision_made",
+                  "decision": "robe",
+                  "option": "shared"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "add_bond",
+          "villager": "marthe",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "honorine",
+          "amount": 50
+        },
+        {
+          "type": "add_bond",
+          "villager": "solange",
+          "amount": 50
+        },
+        {
+          "type": "set_flag",
+          "flag": "sisters_reconciled"
+        }
+      ],
+      "completionText": "Les deux sœurs se reparlent. La robe a retrouvé sa dentelle. 60 aubrins."
+    },
+    {
+      "id": "marthe_lumignons",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le Dimanche des lumignons",
+      "giver": "marthe",
+      "story": {
+        "villager": "marthe",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "marthe_wedding_dress"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "marthe",
+            "level": 3
+          },
+          {
+            "type": "season_is",
+            "seasons": [
+              "autumn"
+            ]
+          },
+          {
+            "type": "season_day_is",
+            "days": [
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16
+            ]
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Marthe: le Dimanche des lumignons approche.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_lumignons_ask"
+            }
+          ]
+        },
+        {
+          "id": "bring",
+          "objective": "Apporter à Marthe 6 bocaux et 6 bougies.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "marthe",
+              "item": "jar",
+              "count": 6,
+              "label": "6 bocaux"
+            },
+            {
+              "type": "given",
+              "villager": "marthe",
+              "item": "candle",
+              "count": 6,
+              "label": "6 bougies"
+            }
+          ],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "lumignon",
+              "count": 3,
+              "to": "each"
+            }
+          ]
+        },
+        {
+          "id": "light_1",
+          "objective": "Le 16 de l'automne, de 17 h à 20 h: poser à deux, en même temps, les lumignons d'Hortense et d'Eugénie.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "grave_cornu",
+              "seconds": 3,
+              "who": "either",
+              "label": "Hortense"
+            },
+            {
+              "type": "stayed_at",
+              "point": "grave_merigot",
+              "seconds": 3,
+              "who": "either",
+              "label": "Eugénie"
+            },
+            {
+              "type": "special_day",
+              "id": "lumignons"
+            },
+            {
+              "type": "time_is",
+              "from": "17:00",
+              "to": "20:00"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "lumignon",
+              "count": 2,
+              "from": "either"
+            }
+          ]
+        },
+        {
+          "id": "light_2",
+          "objective": "Puis ceux d'Octave et des Ferrand.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "grave_valade",
+              "seconds": 3,
+              "who": "either",
+              "label": "Octave"
+            },
+            {
+              "type": "stayed_at",
+              "point": "grave_ferrand",
+              "seconds": 3,
+              "who": "either",
+              "label": "Les Ferrand"
+            },
+            {
+              "type": "special_day",
+              "id": "lumignons"
+            },
+            {
+              "type": "time_is",
+              "from": "17:00",
+              "to": "20:00"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "lumignon",
+              "count": 2,
+              "from": "either"
+            }
+          ]
+        },
+        {
+          "id": "light_3",
+          "objective": "Puis celui des Lacombe, et le dernier à la grille, pour ceux qu'on n'a pas connus.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "grave_lacombe",
+              "seconds": 3,
+              "who": "either",
+              "label": "Les Lacombe"
+            },
+            {
+              "type": "stayed_at",
+              "point": "cemetery_gate",
+              "seconds": 3,
+              "who": "either",
+              "label": "La grille"
+            },
+            {
+              "type": "special_day",
+              "id": "lumignons"
+            },
+            {
+              "type": "time_is",
+              "from": "17:00",
+              "to": "20:00"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "lumignon",
+              "count": 2,
+              "from": "either"
+            }
+          ]
+        },
+        {
+          "id": "soup",
+          "objective": "Finir la soirée à deux par la soupe, sur la place.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "marthe_soup_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "add_bond",
+          "villager": "marthe",
+          "amount": 100
+        }
+      ],
+      "completionText": "Toutes les tombes ont leur lumière ce soir. 80 aubrins."
+    },
+    {
+      "id": "honorine_yarn",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le fil qui manque",
+      "giver": "honorine",
+      "story": {
+        "villager": "honorine",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "dialogue_done",
+            "dialogue": "honorine_meet"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Honorine, sur sa chaise sous la glycine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "honorine_yarn_ask"
+            }
+          ]
+        },
+        {
+          "id": "pick",
+          "objective": "Choisir chez Solange la pelote couleur de ciel avant l'orage.",
+          "conditions": [
+            {
+              "type": "choice_made",
+              "dialogue": "solange_yarn_pick",
+              "choice": "slate"
+            }
+          ]
+        },
+        {
+          "id": "give",
+          "objective": "Porter la pelote à Honorine.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "honorine",
+              "item": "sky_yarn",
+              "count": 1
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "give_item",
+          "item": "mittens",
+          "count": 1,
+          "to": "cellar"
+        },
+        {
+          "type": "add_bond",
+          "villager": "honorine",
+          "amount": 100
+        }
+      ],
+      "completionText": "Honorine vous a tricoté une paire de moufles: elles sont au cellier. 40 aubrins."
+    },
+    {
+      "id": "honorine_photo",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La photo des deux sœurs",
+      "giver": "honorine",
+      "story": {
+        "villager": "honorine",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "honorine_yarn"
+          },
+          {
+            "type": "quest_done",
+            "quest": "lucie_camera"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "honorine",
+            "level": 1
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "take",
+          "objective": "Écouter Honorine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "honorine_photo_give"
+            }
+          ]
+        },
+        {
+          "id": "lucie",
+          "objective": "Porter la photo abîmée à Lucie.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "lucie",
+              "item": "sisters_photo",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "objective": "Laisser Lucie la rephotographier, une nuit.",
+          "conditions": [
+            {
+              "type": "nights_passed",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "prints",
+          "objective": "Chercher les tirages chez Lucie.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "lucie_photo_ready"
+            }
+          ]
+        },
+        {
+          "id": "deliver",
+          "objective": "Porter un tirage à Honorine, et l'autre à Marthe.",
+          "conditions": [
+            {
+              "type": "given",
+              "villager": "honorine",
+              "item": "sisters_print",
+              "count": 1,
+              "label": "Honorine"
+            },
+            {
+              "type": "given",
+              "villager": "marthe",
+              "item": "sisters_print",
+              "count": 1,
+              "label": "Marthe"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "honorine",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "lucie",
+          "amount": 50
+        }
+      ],
+      "completionText": "Marthe a pris la photo sans un mot. Elle l'a glissée dans son missel. 40 aubrins."
+    },
+    {
+      "id": "honorine_side_by_side",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Côte à côte",
+      "giver": "honorine",
+      "story": {
+        "villager": "honorine",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "marthe_wedding_dress"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "honorine",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "together",
+          "objective": "Retrouver les deux sœurs à deux: chez Honorine l'après-midi si la robe est à Marthe, à la chorale du vendredi si elle est à elles deux.",
+          "conditions": [
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "dialogue_done",
+                  "dialogue": "honorine_veil_scene"
+                },
+                {
+                  "type": "dialogue_done",
+                  "dialogue": "honorine_choir_scene"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "add_bond",
+          "villager": "honorine",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "marthe",
+          "amount": 50
+        }
+      ],
+      "completionText": "Côte à côte, enfin. 60 aubrins."
+    },
+    {
+      "id": "honorine_handcar",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La draisine d'Honorine",
+      "giver": "honorine",
+      "story": {
+        "villager": "honorine",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "honorine_side_by_side"
+          },
+          {
+            "type": "quest_done",
+            "quest": "handcar"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "honorine",
+            "level": 3
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Honorine.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "honorine_handcar_ask"
+            }
+          ]
+        },
+        {
+          "id": "ride",
+          "objective": "Un après-midi sans pluie, emmener Honorine en draisine: rendez-vous à deux devant la remise.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "honorine_handcar_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "add_bond",
+          "villager": "honorine",
+          "amount": 100
+        }
+      ],
+      "completionText": "Honorine a refait son premier voyage. 80 aubrins."
+    },
+    {
+      "id": "ines_trail",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le sentier balisé",
+      "giver": "ines",
+      "story": {
+        "villager": "ines",
+        "step": 1
+      },
+      "start": {
+        "when": [
+          {
+            "type": "dialogue_done",
+            "dialogue": "ines_meet"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Inès.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "ines_trail_ask"
+            }
+          ]
+        },
+        {
+          "id": "mark_1",
+          "objective": "Peindre à deux la première marque, au départ du sentier de la Côte.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "forest_edge_path",
+              "seconds": 3,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "mark_2",
+          "objective": "La deuxième, au tronc couché de la clairière du Vieux Chêne.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "clearing_center",
+              "seconds": 3,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "mark_3",
+          "objective": "La troisième, près de la source.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "spring",
+              "seconds": 3,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "mark_4",
+          "objective": "La dernière, au belvédère.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "lookout",
+              "seconds": 3,
+              "who": "both"
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "paint_pot",
+              "count": 1,
+              "from": "either"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "ines",
+          "amount": 100
+        }
+      ],
+      "completionText": "Quatre marques blanches et vertes: plus personne ne se perdra. Presque. 40 aubrins."
+    },
+    {
+      "id": "ines_keep_trees",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les arbres à garder",
+      "giver": "ines",
+      "story": {
+        "villager": "ines",
+        "step": 2
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "ines_trail"
+          },
+          {
+            "type": "quest_done",
+            "quest": "barnabe_first_kiln"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "ines",
+            "level": 1
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "choose",
+          "objective": "Un mardi ou un jeudi après-midi, à la coupe, choisir à deux avec Inès et Barnabé les arbres à garder.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "ines_trees_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 40
+        },
+        {
+          "type": "add_bond",
+          "villager": "ines",
+          "amount": 100
+        },
+        {
+          "type": "add_bond",
+          "villager": "barnabe",
+          "amount": 50
+        },
+        {
+          "type": "set_flag",
+          "flag": "trees_kept"
+        }
+      ],
+      "completionText": "Trois arbres resteront debout pour les bêtes de la Côte. 40 aubrins."
+    },
+    {
+      "id": "ines_owls",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La nuit des chouettes",
+      "giver": "ines",
+      "story": {
+        "villager": "ines",
+        "step": 3
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "ines_keep_trees"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "ines",
+            "level": 2
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "wait",
+          "objective": "Entre 22 h et minuit, rejoindre Inès au Vieux Chêne, et ne plus bouger, à deux.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "old_oak",
+              "seconds": 20,
+              "who": "both"
+            },
+            {
+              "type": "time_is",
+              "from": "22:00",
+              "to": "24:00"
+            }
+          ]
+        },
+        {
+          "id": "owls",
+          "objective": "Regarder les chouettes se poser.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "ines_owls_scene"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 60
+        },
+        {
+          "type": "add_bond",
+          "villager": "ines",
+          "amount": 100
+        }
+      ],
+      "completionText": "Les chouettes de la Côte ont accepté votre visite. 60 aubrins."
+    },
+    {
+      "id": "ines_question_marks",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les points d'interrogation",
+      "giver": "ines",
+      "story": {
+        "villager": "ines",
+        "step": 4
+      },
+      "start": {
+        "when": [
+          {
+            "type": "quest_done",
+            "quest": "ines_owls"
+          },
+          {
+            "type": "bond_at_least",
+            "villager": "ines",
+            "level": 3
+          }
+        ]
+      },
+      "steps": [
+        {
+          "id": "ask",
+          "objective": "Écouter Inès.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "ines_map_give"
+            }
+          ]
+        },
+        {
+          "id": "fairies",
+          "objective": "Trouver à deux le rond des fées, au bout d'une coulée entre deux houx.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "fairy_ring",
+              "seconds": 3,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "pit",
+          "objective": "Trouver à deux la charbonnière oubliée, à l'ouest de la coupe.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "charcoal_pit",
+              "seconds": 3,
+              "who": "both"
+            }
+          ]
+        },
+        {
+          "id": "pond",
+          "objective": "Voir la mare de la Côte au crépuscule, entre 19 h et 21 h.",
+          "conditions": [
+            {
+              "type": "stayed_at",
+              "point": "forest_pond",
+              "seconds": 10,
+              "who": "either"
+            },
+            {
+              "type": "time_is",
+              "from": "19:00",
+              "to": "21:00"
+            }
+          ]
+        },
+        {
+          "id": "back",
+          "objective": "Raconter à Inès.",
+          "conditions": [
+            {
+              "type": "dialogue_done",
+              "dialogue": "ines_map_back"
+            }
+          ]
+        }
+      ],
+      "completionEffects": [
+        {
+          "type": "give_money",
+          "amount": 80
+        },
+        {
+          "type": "give_item",
+          "item": "cote_map",
+          "count": 1,
+          "to": "cellar"
+        },
+        {
+          "type": "add_bond",
+          "villager": "ines",
+          "amount": 100
+        }
+      ],
+      "completionText": "La carte de la Côte d'Inès est au cellier. 80 aubrins."
+    },
+    {
       "id": "firmin_flowers",
       "kind": "side",
       "tier": "P0",
