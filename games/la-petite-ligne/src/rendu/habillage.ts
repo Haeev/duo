@@ -37,19 +37,19 @@ import {
   scarfMeshFor,
 } from './apparence';
 import { preparePaletteTexture } from './materiaux';
-import { CHARACTER_SLOTS, PALETTE_CELL_PIXELS, characterSlotColumn, type CharacterSlot } from './palette';
+import { CHARACTER_SLOTS, PALETTE_CELL_PIXELS, characterGridRows, characterSlotColumn, type CharacterSlot } from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 
 const VECTOR_SIZE = 3;
 const SKIN_SIZE = 4;
 const BODY = 'player_base';
-/** Cases par rangée de la texture des personnages, et rangées (64 x 64 px, cases de 4 px). */
-const GRID = CHARACTER_SLOTS.length;
+/** Cases par rangée de la texture des personnages (ses rangées se comptent sur la texture, `characterGridRows`). */
+const COLUMNS = CHARACTER_SLOTS.length;
 const BODY_ROW = 0;
 const WEAR_ROW = 1;
 /** Rôles de couleur d'un vêtement. */
-type Role = 'principale' | 'secondaire' | 'motif';
+export type Role = 'principale' | 'secondaire' | 'motif';
 /** Colonnes de la rangée 1 par emplacement (les chaussures n'ont pas de motif). */
 const WEAR_COLUMNS: Readonly<Record<ClothingSlot, Partial<Record<Role, number>>>> = {
   top: { principale: 0, secondaire: 1, motif: 2 },
@@ -88,6 +88,46 @@ const BYTE_MAX = 255;
 function cellColumn(slot: ClothingSlot, role: Role): number {
   const columns = WEAR_COLUMNS[slot];
   return columns[role] ?? columns.secondaire ?? 0;
+}
+
+/**
+ * Centre de la case d'un vêtement (rangée 1) dans la texture des personnages, en UV: `rows`
+ * rangées de cases (64 pour `personnages.png` de 256 px de haut, pas 16 comme les colonnes).
+ */
+export function wearCellUv(slot: ClothingSlot, role: Role, rows: number): { u: number; v: number } {
+  return { u: (cellColumn(slot, role) + HALF) / COLUMNS, v: (WEAR_ROW + HALF) / rows };
+}
+
+/**
+ * Couleurs de sommets blanches sur `geometry`, au format de celles de `like` (même tableau, même
+ * taille, même normalisation): Three.js multiplie la texture par elles, donc un maillage du
+ * matériau des personnages qui n'en a pas sort noir, et la fusion avec le corps exige les mêmes
+ * attributs. Sans couleurs sur `like` (ancien GLB), on retire les siennes.
+ */
+export function whiteColorsLike(geometry: BufferGeometry, like: BufferGeometry): void {
+  const reference = like.getAttribute('color') as BufferAttribute | undefined;
+  if (reference === undefined) {
+    geometry.deleteAttribute('color');
+    return;
+  }
+  const count = geometry.getAttribute('position').count;
+  const ArrayType = reference.array.constructor as new (length: number) => TypedArray;
+  const data = new ArrayType(count * reference.itemSize);
+  data.fill(reference.normalized ? normalizedMax(data) : 1);
+  geometry.setAttribute('color', new (reference.constructor as typeof BufferAttribute)(data, reference.itemSize, reference.normalized));
+}
+
+/** Valeur de 1 dans un tableau d'entiers normalisés (255, 65 535...). */
+function normalizedMax(array: TypedArray): number {
+  return array instanceof Uint8Array || array instanceof Uint8ClampedArray
+    ? 0xff
+    : array instanceof Uint16Array
+      ? 0xffff
+      : array instanceof Int8Array
+        ? 0x7f
+        : array instanceof Int16Array
+          ? 0x7fff
+          : 1;
 }
 
 /** Nom du nœud de l'écusson pour cette couleur de profil (`player_badge_<symbole>`). */
@@ -249,7 +289,8 @@ export class PlayerDresser {
       const source = geometryOf(def.modele);
       if (source !== null && (complete || def.slot === 'outer' || def.slot === 'hat')) parts.push(source);
       else if (def.slot === 'outer' || def.slot === 'hat') {
-        const substitute = isSkinned(base) ? this.substitute(def.slot, base, geometryOf(LEGACY_OUTFIT)) : null;
+        const rows = characterGridRows(figure.texture?.canvas.height);
+        const substitute = isSkinned(base) ? this.substitute(def.slot, base, geometryOf(LEGACY_OUTFIT), rows) : null;
         if (substitute !== null) parts.push(substitute);
       }
     }
@@ -387,18 +428,21 @@ export class PlayerDresser {
    * peint aux cases de l'emplacement: un chapeau rond lié à la tête, ou un gilet sans manches tiré
    * du torse de l'ancienne tenue (mêmes poids: il suit le corps), légèrement gonflé.
    */
-  private substitute(slot: 'outer' | 'hat', body: SkinnedMesh, clothed: BufferGeometry | null): BufferGeometry | null {
-    const known = this.substitutes.get(slot);
+  private substitute(slot: 'outer' | 'hat', body: SkinnedMesh, clothed: BufferGeometry | null, rows: number): BufferGeometry | null {
+    const key = `${slot}|${rows}`;
+    const known = this.substitutes.get(key);
     if (known !== undefined) return known;
-    const made = slot === 'hat' ? this.hatSubstitute(body) : clothed === null ? null : this.vestSubstitute(body, clothed);
+    const made = slot === 'hat' ? this.hatSubstitute(body, rows) : clothed === null ? null : this.vestSubstitute(body, clothed, rows);
     if (made !== null) {
+      // Blanc: ni occlusion ni pli peints sur une pièce de secours (la couleur vient de sa case).
+      whiteColorsLike(made, body.geometry);
       this.resources.track(made);
-      this.substitutes.set(slot, made);
+      this.substitutes.set(key, made);
     }
     return made;
   }
 
-  private hatSubstitute(body: SkinnedMesh): BufferGeometry | null {
+  private hatSubstitute(body: SkinnedMesh, rows: number): BufferGeometry | null {
     const h = this.headFrame(body);
     const bodyGeometry = body.geometry;
     const joints = bodyGeometry.getAttribute('skinIndex') as BufferAttribute | undefined;
@@ -419,7 +463,8 @@ export class PlayerDresser {
     ];
     for (const [geometry, role] of shapes) {
       const uv = geometry.getAttribute('uv');
-      for (let i = 0; i < uv.count; i += 1) uv.setXY(i, (cellColumn('hat', role) + HALF) / GRID, (WEAR_ROW + HALF) / GRID);
+      const cell = wearCellUv('hat', role, rows);
+      for (let i = 0; i < uv.count; i += 1) uv.setXY(i, cell.u, cell.v);
     }
     // Trois cylindres aux mêmes attributs: la fusion ne peut pas échouer.
     const merged = mergeGeometries(shapes.map(([geometry]) => geometry), false);
@@ -438,7 +483,7 @@ export class PlayerDresser {
     return merged;
   }
 
-  private vestSubstitute(body: SkinnedMesh, clothed: BufferGeometry): BufferGeometry | null {
+  private vestSubstitute(body: SkinnedMesh, clothed: BufferGeometry, rows: number): BufferGeometry | null {
     const bones = body.skeleton.bones.map((b) => b.name);
     const torso = new Set(VEST_BONES.map((name) => bones.indexOf(name)));
     const copy = clothed.clone();
@@ -474,7 +519,8 @@ export class PlayerDresser {
       const length = Math.hypot(dx, dz) || 1;
       position.setXYZ(i, position.getX(i) + (dx / length) * VEST_LIFT, position.getY(i), position.getZ(i) + (dz / length) * VEST_LIFT);
       const role: Role = position.getY(i) < VEST_FROM_Y + VEST_HEM ? 'secondaire' : 'principale';
-      uv.setXY(i, (cellColumn('outer', role) + HALF) / GRID, (WEAR_ROW + HALF) / GRID);
+      const cell = wearCellUv('outer', role, rows);
+      uv.setXY(i, cell.u, cell.v);
     }
     copy.setIndex(triangles);
     return triangles.length === 0 ? null : copy;
