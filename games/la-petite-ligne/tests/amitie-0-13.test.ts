@@ -481,7 +481,7 @@ describe('habitants écrits sans leurs valeurs par défaut', () => {
   });
 });
 
-describe('sauvegarde: format 14 sans nouveau format', () => {
+describe('sauvegarde: les formats 13 et 14 se reprennent au format en cours', () => {
   it.each([
     ['format-14-ete-jour-25.json', 14],
     ['format-14-fin-de-la-demo.json', 14],
@@ -491,7 +491,7 @@ describe('sauvegarde: format 14 sans nouveau format', () => {
     const file = fileURLToPath(new URL(`./donnees/sauvegardes/${name}`, import.meta.url));
     const raw = JSON.parse(readFileSync(file, 'utf8')) as { data: unknown };
     const sim = restoreWorld(content, map, decodeSave(structuredClone(raw.data)), schema, [A, B]);
-    expect(DATA_SCHEMA).toBe(14);
+    expect(DATA_SCHEMA).toBe(15);
     sim.world.tastesKnown.leon = { brioche: 'loves', lettuce: 'dislikes' };
     addBond(sim, 'leon', 75, 'p1');
     const snap = snapshotOf(sim);
