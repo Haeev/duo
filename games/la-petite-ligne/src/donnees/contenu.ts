@@ -21,6 +21,7 @@ import {
   DEFAULT_TREES,
   DEFAULT_WEATHER,
 } from './defauts';
+import { checkVillageScenes, parseVillageScenes } from './vie';
 import { ContentError, Reader } from './lecteur';
 import { agreeMoney } from './monnaie';
 import { parseMarket } from './marche';
@@ -147,6 +148,8 @@ export interface RawContentFiles {
   decisions?: unknown;
   /** 0.13 (lot H7, seconde moitié): gestes des habitants et réactions aux joueurs (`gestes-0-13.json`); absent: rien. */
   gestes013?: unknown;
+  /** 0.13 (lot H7): scènes, pauses, places assises, postes de métier, chat (`vie.json`); absent: rien de cela. */
+  vie?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -2464,6 +2467,8 @@ function checkReferences(content: Content): void {
         case 'pay_order':
         case 'end_stage':
           break;
+        case 'open_decision':
+          break;
       }
     }
   };
@@ -2844,12 +2849,14 @@ export function loadContent(files: RawContentFiles): Content {
       files.gestes013,
       files.habitants013 === undefined ? [files.habitants] : [files.habitants, files.habitants013],
     ),
+    village: parseVillageScenes(files.vie === undefined ? null : root('vie.json', files.vie), (r) => conditions(r, 'game_start')),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
   checkVillageReferences(content);
   checkDecisionVillagers(content.decisions, content.villagers);
+  checkVillageScenes(content.village, content.villagers.map((v) => v.id), null);
   checkTastes(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.

@@ -67,6 +67,10 @@ export const CHARACTER_IDS: readonly CharacterId[] = ['p1', 'p2'];
 /** Taille du sac (PE-10) et de la barre d'outils (ses premières cases). */
 /** Pas de simulation par seconde (cadence des ticks: `action.since`, `action.duration`, `pin.until`). */
 export const SIM_HZ = 30;
+
+/** 0.13 (lot H7): les coups d'outil des postes de métier, noms attendus par le son (`AUDIO_SETTINGS.village.events`). */
+export const WORK_STROKE_EVENTS = ['forge_strike', 'joinery_saw', 'joinery_plane'] as const;
+export type WorkStrokeEvent = (typeof WORK_STROKE_EVENTS)[number];
 export const BAG_SLOTS = 24;
 export const TOOLBAR_SLOTS = 10;
 /** Côté du coin à soi (MA-06 de la démo), en cases. */
@@ -1638,6 +1642,11 @@ export type WorldEvent =
   | { type: 'sign_read'; by: CharacterId; sign: PointId }
   /** Un habitant dit quelque chose en passant (annonce de son habitude, section 7.3): bulle au-dessus de lui. */
   | { type: 'villager_remark'; villager: VillagerId; to: CharacterId; text: string }
+  // 0.13 (lot H7): la vie du village (sons du lot H8)
+  /** Un coup d'outil à son poste (enclume, scie ou rabot de l'établi): `event` de `vie.json` (`workPosts`). */
+  | { type: WorkStrokeEvent; villager: VillagerId; at: Vec2 }
+  /** Le chat se met à suivre ce joueur (miaulement, `AUDIO_SETTINGS.village.events`). */
+  | { type: 'cat_follow'; by: CharacterId; at: Vec2 }
   // 0.13 (lot H2): amitié et cadeaux (sons du lot H8: `bond-chime`, `bond-level`, `gift-happy`, `gift-polite`, `birthday-chime`)
   /** Un cadeau offert depuis le sac: son goût, le gain; `returned`: il ne l'aime pas, l'objet reste au sac. */
   | { type: 'gift_offered'; by: CharacterId; villager: VillagerId; item: ItemId; taste: TasteLevel; gain: number; returned: boolean; birthday: boolean }

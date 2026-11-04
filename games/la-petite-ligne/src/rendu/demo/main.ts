@@ -51,6 +51,7 @@ import { applyTour9Example } from './tour9-exemple';
 import { applyTour10Example } from './tour10-exemple';
 import { createPeche12Demo } from './peche12-exemple';
 import { applyHabitants13Example } from './habitants13-exemple';
+import { applyVillageLifeExample } from './vie13-exemple';
 import { applyTemoinsExample } from './temoins-exemple';
 import { applyPlotsExample } from './parcelles13-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
@@ -271,6 +272,8 @@ async function main(): Promise<void> {
   if (breeding !== null) applyBreedingExample(world, map, breeding);
   // 0.13: les 21 habitants alignés ou à la sortie de la messe, et le chat (`habitants13-exemple.ts`).
   const habitants13 = applyHabitants13Example(world, params);
+  // 0.13 (lot H7): la vraie simulation des scènes et du chat (`vie13-exemple.ts`).
+  const vie13 = applyVillageLifeExample(world, content, map, params);
   // Étape A de la qualité visuelle: planche de décision des trois témoins (`temoins-exemple.ts`).
   const temoins = applyTemoinsExample(world, params);
   // 0.13: parcelles libres (`parcelles=6|20|40`, `friche=<n>`, `apercu=vert|rouge|rect|reprise`).
@@ -316,6 +319,7 @@ async function main(): Promise<void> {
     adaptive: params.get('adaptatif') === '1',
     ...(peche12 === null ? {} : { fishing: peche12.source }),
     ...(habitants13 === null ? {} : { cat: habitants13.cat }),
+    ...(vie13 === null ? {} : { cat: vie13.cat }),
     // `style=lisse|facettes`: style des personnages (étape A du plan de qualité visuelle, D1).
     ...(characterStyle === 'lisse' || characterStyle === 'facettes' ? { characterStyle } : {}),
   });
@@ -500,7 +504,7 @@ async function main(): Promise<void> {
       world,
       map,
       seconds,
-      lifeInput?.checked !== false && !steering && habitants13 === null && temoins === null,
+      lifeInput?.checked !== false && !steering && habitants13 === null && temoins === null && vie13 === null,
       options,
     )) {
       emit(event);
@@ -536,6 +540,7 @@ async function main(): Promise<void> {
     }
     peche12?.step(world, dt);
     habitants13?.step(world, seconds);
+    vie13?.step(world, seconds);
     temoins?.step(world, seconds);
     engine.frame(dt);
     handle.frames += 1;

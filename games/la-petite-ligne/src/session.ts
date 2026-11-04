@@ -205,6 +205,9 @@ export function createSession(options: SessionOptions): Session {
     alpha() {
       return guest === null ? alpha : 1;
     },
+    cat() {
+      return sim !== null ? sim.runtime.cat : (guest?.cat() ?? null);
+    },
     send(intent: Intent) {
       if (host !== null) host.queueLocal(intent);
       else guest?.queueIntent(intent);
