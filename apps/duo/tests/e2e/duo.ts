@@ -66,6 +66,8 @@ export async function launchDuo(options: {
   gamesDir?: string;
   /** Paramètres ajoutés à l'adresse du jeu (version de test), par exemple `rendu=leger`. */
   gameQuery?: string;
+  /** Variables d'environnement en plus (`DUO_TEST_CARNET_DIR`, par exemple). */
+  env?: Readonly<Record<string, string>>;
 }): Promise<DuoInstance> {
   const args = [
     APP_DIR,
@@ -84,6 +86,7 @@ export async function launchDuo(options: {
     if (value !== undefined) env[key] = value;
   }
   if (options.gameQuery !== undefined) env.DUO_TEST_GAME_QUERY = options.gameQuery;
+  Object.assign(env, options.env);
   const app = await electron.launch({ args, cwd: APP_DIR, env });
   const platform = await waitForPage(app, 'duo://app/');
   await platform.waitForSelector('[data-testid^="ecran-"]');

@@ -12,7 +12,9 @@ import {
   type Rectangle,
   type Session,
 } from 'electron';
+import { parseBridgeVersion, type NotebookStatus } from '@duo/protocol';
 import type { Journal } from '../journal';
+import type { NotebookFile, NotebookStore } from '../notebook';
 import type {
   BridgeCodec,
   GameMessage,
@@ -65,6 +67,10 @@ export interface GameHostDeps {
   readonly events: GameHostEvents;
   readonly isMac: boolean;
   readonly devTools: boolean;
+  /** Carnet de séance (pont 1.1); absent dans les tests du pont. */
+  readonly notebook?: NotebookStore;
+  /** Versions et système joints à chaque note du carnet. */
+  readonly notebookDetails?: () => Readonly<Record<string, unknown>>;
 }
 
 const STOP_SAVE_GRACE_MS = 2000;
@@ -78,6 +84,14 @@ export class GameHost {
   private failed = false;
   private stopWaiter: (() => void) | null = null;
   private pendingSaves = 0;
+  /** Carnet de séance ouvert dans le jeu: Échap lui revient (annuler la note). */
+  private notebookTyping = false;
+  /** Écran complet (interface du jeu comprise) pris à l'ouverture de la dernière note. */
+  private notebookShot: Promise<Uint8Array | null> | null = null;
+  /** `notebookShot` vient d'être pris sur Ctrl+N, pour la note qui s'ouvre. */
+  private notebookShotFromKey = false;
+  /** Le jeu en cours a reçu l'offre du carnet (pont 1.1). */
+  private notebookOffered = false;
   private readonly watchdog: Watchdog;
 
   constructor(private readonly deps: GameHostDeps) {
@@ -93,6 +107,9 @@ export class GameHost {
   launch(gameId: string, entryUrl: string, init: InitMessage, bounds: Rectangle): void {
     this.destroy();
     this.failed = false;
+    this.notebookTyping = false;
+    this.notebookShot = null;
+    this.notebookOffered = false;
     this.init = init;
     const { journal } = this.deps;
     const view = new WebContentsView({
@@ -129,7 +146,24 @@ export class GameHost {
       this.fail({ reason: 'load-failed', detail: `${code} ${description}` });
     });
     contents.on('before-input-event', (event, input) => {
+      if (
+        input.type === 'keyDown' &&
+        input.code === 'KeyN' &&
+        input.control &&
+        !input.shift &&
+        !input.alt &&
+        !input.meta &&
+        !input.isAutoRepeat &&
+        this.notebookOffered &&
+        !this.notebookTyping &&
+        this.deps.notebook?.enabled() === true
+      ) {
+        // Ctrl+N: l'écran est pris avant que le jeu n'affiche la zone de saisie par-dessus.
+        this.notebookShot = this.captureScreen();
+        this.notebookShotFromKey = true;
+      }
       if (input.code === 'Escape') {
+        if (this.notebookTyping) return;
         event.preventDefault();
         if (input.type === 'keyDown' && !input.isAutoRepeat) this.deps.events.escape();
       } else if (input.code === 'F11' && !this.deps.isMac) {
@@ -271,7 +305,7 @@ export class GameHost {
           bridge: message.bridge,
           sdk: message.sdk,
         });
-        if (this.init !== null) this.send(this.init);
+        if (this.init !== null) this.send(this.withNotebook(this.init, message.bridge));
         return;
       case 'loading':
         this.watchdog.heartbeat();
@@ -327,6 +361,104 @@ export class GameHost {
       case 'net':
         events.net(message.channel, message.mode, message.data);
         return;
+      case 'notebookTyping':
+        this.notebookTyping = message.active && this.deps.notebook?.enabled() === true;
+        // Repli quand la touche n'est pas passée par le principal (touches simulées des tests).
+        if (this.notebookTyping) {
+          if (!this.notebookShotFromKey) this.notebookShot = this.captureScreen();
+          this.notebookShotFromKey = false;
+        }
+        this.deps.journal.write('debug', 'game-host', 'notebook-typing', {
+          active: this.notebookTyping,
+        });
+        return;
+      case 'notebookEnable':
+        void this.deps.notebook?.setEnabled(message.enabled).catch(() => undefined);
+        this.deps.journal.write('info', 'game-host', 'notebook-enable', {
+          enabled: message.enabled,
+        });
+        return;
+      case 'notebookWrite': {
+        const store = this.deps.notebook;
+        const files: NotebookFile[] = message.files.map((file) => ({
+          name: file.name,
+          data: new Uint8Array(file.data),
+        }));
+        const done = (status: NotebookStatus): void => {
+          this.send({ type: 'notebookResult', requestId: message.requestId, status });
+          this.deps.journal.write('info', 'game-host', 'notebook-write', {
+            game: gameId,
+            files: files.length,
+            status,
+          });
+        };
+        if (!store?.available) {
+          done('disabled');
+          return;
+        }
+        // Le canevas ne montre pas l'interface du jeu (HTML): la plateforme joint l'écran entier,
+        // à l'ouverture de la note (premier envoi) et à la fin des images d'après (dernier envoi).
+        const first = files.some((file) => file.name === 'note.txt');
+        const last = files.some((file) => file.name === 'images.json');
+        const shot = first ? this.notebookShot : last ? this.captureScreen() : null;
+        if (first) this.notebookShot = null;
+        void (shot ?? Promise.resolve(null))
+          .then((jpeg) => {
+            if (jpeg !== null) {
+              files.push({ name: first ? 'ecran-ouverture.jpg' : 'ecran-fin.jpg', data: jpeg });
+            }
+          })
+          .then(() =>
+            store.write(
+              {
+                gameId,
+                details: {
+                  ...(this.deps.notebookDetails?.() ?? {}),
+                  jeu: this.init?.game ?? { id: gameId },
+                  role: this.init?.role ?? null,
+                },
+              },
+              message.entry,
+              files,
+            ),
+          )
+          .then(done, () => {
+            done('write-error');
+          });
+        return;
+      }
     }
+  }
+
+  /**
+   * Écran de la vue jeu, réduit à 1280 pixels de large, en JPEG. L'encodage est synchrone dans
+   * le principal (quelques millisecondes), mais n'a lieu que deux fois par note.
+   */
+  private captureScreen(): Promise<Uint8Array | null> {
+    const view = this.view;
+    if (view === null || view.webContents.isDestroyed()) return Promise.resolve(null);
+    return view.webContents
+      .capturePage()
+      .then((image) => {
+        if (image.isEmpty()) return null;
+        const width = image.getSize().width;
+        const scaled = width > 1280 ? image.resize({ width: 1280, quality: 'good' }) : image;
+        return new Uint8Array(scaled.toJPEG(80));
+      })
+      .catch(() => null);
+  }
+
+  /**
+   * `init` porte l'état du carnet de séance pour un jeu qui annonce le pont 1.1 ou plus; un jeu
+   * du pont 1.0 reçoit `init` sans ce champ, que son schéma strict refuserait.
+   */
+  private withNotebook(init: InitMessage, gameBridge: string): InitMessage {
+    const store = this.deps.notebook;
+    const version = parseBridgeVersion(gameBridge);
+    if (store === undefined || !store.available || version === null || version.minor < 1) {
+      return init;
+    }
+    this.notebookOffered = true;
+    return { ...init, notebook: { enabled: store.enabled() } };
   }
 }

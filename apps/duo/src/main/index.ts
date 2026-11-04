@@ -33,6 +33,7 @@ import { checkIntent } from './ipc-schemas';
 import { createJournal, systemSanitizer, type Journal } from './journal';
 import { NetworkLiaison } from './liaison/network-liaison';
 import { buildApplicationMenu } from './menu';
+import { createNotebookStore } from './notebook';
 import { Platform } from './platform';
 import { APP_ORIGIN, handleAppProtocol, handleGameProtocol, registerSchemes } from './protocols';
 import { hardenSession } from './security';
@@ -69,6 +70,17 @@ function gameRoots(): GameRoot[] {
   roots.push({ source: 'installed', dir: installedGamesDir() });
   roots.push({ source: 'bundled', dir: path.join(process.resourcesPath, 'games') });
   return roots;
+}
+
+/**
+ * Racine du carnet de séance: `Documents/Duo/carnet-de-seance`. Une version de test peut la
+ * déplacer et l'activer hors de macOS (`DUO_TEST_CARNET_DIR`).
+ */
+function notebookRoot(): { root: string; available: boolean } {
+  if (DUO_TEST && process.env.DUO_TEST_CARNET_DIR !== undefined) {
+    return { root: process.env.DUO_TEST_CARNET_DIR, available: true };
+  }
+  return { root: path.join(app.getPath('documents'), 'Duo', 'carnet-de-seance'), available: isMac };
 }
 
 function installedGamesDir(): string {
@@ -149,6 +161,18 @@ async function start(): Promise<void> {
   });
 
   Menu.setApplicationMenu(isMac ? buildApplicationMenu() : null);
+
+  const notebook = await createNotebookStore({
+    ...notebookRoot(),
+    settingsFile: path.join(userData, 'carnet-de-seance.json'),
+  });
+  const notebookDetails = (): Record<string, unknown> => ({
+    duo: app.getVersion(),
+    electron: process.versions.electron,
+    chrome: process.versions.chrome,
+    systeme: `${process.platform} ${os.release()}`,
+    arch: process.arch,
+  });
 
   const store = new MachineStore(userData);
   const loaded = await store.load();
@@ -348,6 +372,8 @@ async function start(): Promise<void> {
       events: platform.gameEvents,
       isMac,
       devTools,
+      notebook,
+      notebookDetails,
     });
     platform.attachGameHost(gameHost);
     platform.attachWindow(created);

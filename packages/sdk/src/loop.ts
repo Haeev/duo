@@ -9,6 +9,8 @@ export interface LoopHooks {
   isPaused(): boolean;
   /** Fin de chaque pas (consommation des appuis). */
   afterStep(): void;
+  /** Juste après le rendu de chaque image, dans la même tâche (lecture du canevas WebGL). */
+  afterRender?(): void;
 }
 
 export interface PerfSample {
@@ -76,6 +78,7 @@ export function createLoop(hooks: LoopHooks): LoopInternal {
       frameInfo.alpha = stepper.alpha();
       frameInfo.dt = dt;
       options.render(frameInfo);
+      hooks.afterRender?.();
     }
     rafId = requestAnimationFrame(onFrame);
   };

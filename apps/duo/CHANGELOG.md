@@ -6,6 +6,10 @@ Les changements de l'application Duo, version par version, écrits pour les deux
 
 ## [Non publié]
 
+### Ajouté
+
+- Sur le Mac, le carnet de séance: pendant une partie, Ctrl+N ouvre une note pour le studio par-dessus le jeu, qui continue (Entrée enregistre, Échap annule). La note, l'état du jeu, les images des 10 s d'avant et des 10 s d'après et deux captures de l'écran vont dans Documents > Duo > carnet-de-seance. Ctrl+Maj+N le coupe ou le rallume. Rien n'est envoyé sur Internet.
+
 ## [0.2.1] - 2026-11-03
 
 Duo propose le plein écran dans ses réglages et montre, dans le salon, ce qui a changé dans le jeu.

@@ -331,6 +331,35 @@ export interface UiSettings {
   readonly reducedMotion: boolean;
 }
 
+// Carnet de séance (pont 1.1).
+
+/** Ce que le jeu prête au carnet de séance. */
+export interface NotebookSource {
+  /** Canevas du jeu (WebGL ou 2D), lu juste après chaque rendu de la boucle. */
+  canvas(): HTMLCanvasElement | null;
+  /** Légende courte de chaque image et de la note: jour et heure du jeu, position du joueur. */
+  caption?(): string;
+  /** État utile au studio au moment de la note, sérialisable en JSON. */
+  snapshot?(): unknown;
+}
+
+/**
+ * Carnet de séance: Ctrl+N ouvre une note par-dessus le jeu (Entrée enregistre, Échap annule,
+ * le jeu continue); la note part avec les images des 10 s d'avant et des 10 s d'après, dans un
+ * dossier de la machine. Ctrl+Maj+N l'active ou le coupe. Inerte quand la plateforme ne l'offre
+ * pas (hors macOS, Duo trop ancien, faux hôte).
+ */
+export interface Notebook {
+  /** La plateforme offre le carnet sur cette machine. */
+  readonly available: boolean;
+  /** Activé par le joueur (réglage gardé par la plateforme). */
+  readonly enabled: boolean;
+  /** Branche le jeu: capture des images et raccourcis. */
+  attach(source: NotebookSource): Unsubscribe;
+  /** Événement récent joint aux notes (les 100 derniers sont gardés). */
+  trace(event: string, data?: unknown): void;
+}
+
 // Contexte remis au jeu.
 
 interface DuoContextBase<TAction extends string> {
@@ -367,6 +396,7 @@ interface DuoContextBase<TAction extends string> {
   readonly audio: Audio;
   readonly assets: Assets;
   readonly log: Logger;
+  readonly notebook: Notebook;
   /** Libère tout (boucle, écouteurs, minuteurs, audio, pont). Duo détruit la vue de toute façon. */
   dispose(): void;
 }

@@ -30,3 +30,11 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 
 - État publié complet à chaque changement (micro-tâche), notifications par clé (`ToastKind`): tous les textes restent dans `renderer/textes.ts`, typographie posée par `fr`.
 - Les touches de jeu simulées (Espace) passent par Playwright; Échap passe par `xdotool`.
+
+## Pont et tests à deux Duo (vérifié le 2026-11-04)
+
+- Le schéma `init` du SDK est strict: un champ ajouté à `init` (mineure du pont) ne part qu'aux jeux dont `hello` annonce cette mineure, sinon un jeu publié refuse `init`. Le principal connaît le pont du jeu avant d'envoyer `init`.
+- Deux La Petite Ligne en rendu logiciel: une image par seconde environ, et une page peut se figer plus de 8 s (chien de garde, « hung »). Alléger: `rendu=leger`, petites fenêtres (`setMinimumSize` puis `setSize` dans `app.evaluate`, taille en argument), fenêtre de l'invité cachée (`BaseWindow.hide()`: plus de rendu, la simulation suit au minuteur).
+- Une longue frappe Playwright touche par touche (`keyboard.type`, 60 caractères) dans la page de La Petite Ligne fige la page même dans une zone de saisie ordinaire, sans rien de nouveau: `keyboard.insertText` pour un texte long.
+- Un message du jeu peut mettre plus d'une demi-seconde à atteindre le principal en rendu logiciel: avant une vraie touche qui dépend d'un état annoncé par le jeu, attendre la trace dans le journal (`logs/*.jsonl`).
+- `xdotool key ctrl+n` passe par `before-input-event` comme Échap; `webContents.capturePage()` de la vue jeu inclut l'interface HTML du jeu, pas le canevas seul.
