@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "agreeSeconds": 2,
+  "decisions": [
+    {
+      "id": "minute",
+      "villager": "ambroise",
+      "question": "Dire à Firmin qui a réparé la montre ?",
+      "options": [
+        {
+          "id": "now",
+          "label": "Tout de suite.",
+          "change": "Firmin et Ambroise se réconcilient: la pendule de la halte se règle à quatre mains.",
+          "icon": "wall-clock",
+          "villagers": ["firmin", "ambroise"],
+          "effects": [{ "type": "set_flag", "flag": "clocks_reconciled" }]
+        },
+        {
+          "id": "letter",
+          "label": "Ambroise le dira à sa façon.",
+          "change": "Une lettre d'Ambroise à porter à Firmin; la paix se fera plus tard, sur le quai.",
+          "icon": "mail-letter",
+          "villagers": ["ambroise"],
+          "effects": []
+        }
+      ]
+    },
+    {
+      "id": "mouture",
+      "villager": "berthe",
+      "question": "Comment Berthe et Paulin se feront-ils confiance ?",
+      "options": [
+        {
+          "id": "weighing",
+          "label": "La pesée publique.",
+          "change": "Chaque samedi à 9 h, le blé se pèse sur la bascule de la halte, devant Firmin.",
+          "icon": "market-scale",
+          "villagers": ["berthe", "paulin"],
+          "effects": [{ "type": "set_flag", "flag": "mouture_settled" }]
+        },
+        {
+          "id": "watch",
+          "label": "La mouture à façon.",
+          "change": "Le jeudi après-midi, Paulin regarde moudre son blé au moulin.",
+          "icon": "place-mill",
+          "villagers": ["paulin"],
+          "effects": [{ "type": "set_flag", "flag": "mouture_settled" }]
+        }
+      ]
+    },
+    {
+      "id": "robe",
+      "villager": "marthe",
+      "question": "À qui revient la robe réparée par Solange ?",
+      "options": [
+        {
+          "id": "marthe",
+          "label": "À Marthe, comme leur mère l'avait voulu.",
+          "change": "Honorine lui offre en retour le voile du même trousseau.",
+          "icon": "gift",
+          "villagers": ["marthe"],
+          "effects": [{ "type": "set_flag", "flag": "sisters_reconciled" }]
+        },
+        {
+          "id": "shared",
+          "label": "Aux deux sœurs.",
+          "change": "La robe change de maison à chaque saison; elles la portent ensemble sur le parvis.",
+          "icon": "place-church",
+          "villagers": ["marthe", "honorine"],
+          "effects": [{ "type": "set_flag", "flag": "sisters_reconciled" }]
+        }
+      ]
+    },
+    {
+      "id": "cabane",
+      "villager": "jeanne",
+      "question": "Léon veut sa part de la cabane. Qu'en dites-vous ?",
+      "options": [
+        {
+          "id": "shared",
+          "label": "Une cabane pour deux.",
+          "change": "Le mercredi, Jeanne et Léon guettent ensemble à la cabane.",
+          "icon": "jeanne-notebook",
+          "villagers": ["jeanne", "leon"],
+          "effects": []
+        },
+        {
+          "id": "jeanne",
+          "label": "La cabane de Jeanne.",
+          "change": "Léon bâtit son affût au bout de la pâture.",
+          "icon": "place-field",
+          "villagers": ["leon"],
+          "effects": []
+        }
+      ]
+    }
+  ]
+}

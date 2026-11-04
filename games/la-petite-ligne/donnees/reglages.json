@@ -392,7 +392,8 @@
       "birthdayWish": 20, "birthdayPresence": 20, "quest": 60, "story": 100, "annonce": 50, "allHabits": 50
     },
     "birthdayPresence": { "distance": 10, "seconds": 30 },
-    "giftExcluded": ["tool", "quest", "carried", "animal_order"]
+    "giftExcluded": ["tool", "quest", "carried", "animal_order"],
+    "storyPace": { "maxActive": 2, "newPerDay": 1, "cooldownDays": 3 }
   },
 
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },

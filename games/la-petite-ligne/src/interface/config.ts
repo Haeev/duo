@@ -24,6 +24,8 @@ export const UI_SETTINGS = {
   staminaLowRatio: 0.25,
   /** Carte « D'accord » tamponnée, avant de disparaître (ms). */
   proposalStampMs: 2600,
+  /** Décision à deux (0.13): le tampon « Décidé ensemble » reste à l'écran, puis le panneau se replie (ms). */
+  decisionStampMs: 2600,
   /** Repli de la carte refusée ou retirée (ms, `--lpl-duration-slow`). */
   foldMs: 320,
   /** « Le train entre en gare… » reste affiché après les deux créations (ms). */

@@ -348,6 +348,7 @@ export const DEFAULT_BOND_SETTINGS: BondSettings = {
   },
   birthdayPresence: { distance: 10, seconds: 30 },
   giftExcluded: ['tool', 'quest', 'carried', 'animal_order'],
+  storyPace: { maxActive: 2, newPerDay: 1, cooldownDays: 3 },
 };
 
 /** `reglages.json`: `habits` et `bonds` (absents: les valeurs de la conception). */
@@ -418,6 +419,11 @@ export function parseBondSettings(r: Reader | null): BondSettings {
       seconds: presence?.opt('seconds')?.number() ?? d.birthdayPresence.seconds,
     },
     giftExcluded: r?.opt('giftExcluded')?.stringList() ?? [...d.giftExcluded],
+    storyPace: {
+      maxActive: r?.opt('storyPace')?.opt('maxActive')?.integer(1) ?? d.storyPace.maxActive,
+      newPerDay: r?.opt('storyPace')?.opt('newPerDay')?.integer(1) ?? d.storyPace.newPerDay,
+      cooldownDays: r?.opt('storyPace')?.opt('cooldownDays')?.integer(0) ?? d.storyPace.cooldownDays,
+    },
   };
   // Jamais de perte (section 6.2): aucun gain négatif.
   const all = [out.gains.talk, out.gains.gift.loves, out.gains.gift.likes, out.gains.gift.neutral, out.gains.birthdayWish, out.gains.birthdayPresence, out.gains.quest, out.gains.story, out.gains.annonce, out.gains.allHabits];

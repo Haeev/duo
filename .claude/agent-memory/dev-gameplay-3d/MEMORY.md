@@ -481,3 +481,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `ShapeBuilder.build()` vide le constructeur: le réutiliser pour un second semis plante `mergeGeometries` (« reading 'index' »), la page ne devient jamais prête. Sonde d'une page qui ne démarre pas: script qui affiche console et `pageerror` jusqu'à `ready` (90 s), au lieu d'attendre la capture.
 - Copie de référence de HEAD pour comparer: `git archive HEAD games/la-petite-ligne packages` dans le scratchpad, lien `node_modules` à la racine de la copie, `cp -a` des `node_modules` du jeu et des paquets (liens relatifs pnpm), Vite sur un autre port.
 - Fichier de script nommé `types.py` dans le scratchpad: il masque le module `types` de Python (`json` plante à l'import). Nommer autrement.
+
+## Décisions à deux et rythme des histoires (La Petite Ligne 0.13, vérifié le 2026-11-04)
+
+- Worktree sans `node_modules`: liens symboliques vers ceux du dépôt principal (racine, jeu, chaque `packages/*`), à retirer avant de rendre (ils apparaissent en non suivis). Vite y sert les polices en 403 (chemin hors de la racine permise): les captures tombent sur les polices de repli.
+- Page de démonstration de l'interface pour les captures d'un panneau: `src/interface/demo/index.html?scenario=...&joueur=p1&rendu=0` (sans 3D, la simulation avance en temps réel, deux secondes de jeu passent vraiment). Playwright: `NODE_PATH=/opt/node22/lib/node_modules`.
+- `pkill -f <motif>` dont le motif figure dans la commande elle-même tue le shell de l'outil (code 144): arrêter un serveur par son identifiant de tâche.
+- Les effets d'une étape (`steps[].effects`) jouent quand l'étape se FINIT (`advance`), pas quand elle commence: pour ouvrir quelque chose au début d'une étape, le mettre sur l'étape d'avant, ou le déduire de l'étape en cours (décisions: ouverture automatique quand l'étape cite `decision_made`, sous `all` et `any`).
+- Un test qui fait des pas sur un monde neuf: la scène d'arrivée de Firmin se lance d'elle-même et suspend tous les scripts d'effets (`world.scene`); la marquer vue (`dialoguesDone`) avant.
+- L'invité ne reçoit l'état qu'à cadence limitée: compter une quinzaine de pas avant de lire `guest.view.world()` dans un test réseau.

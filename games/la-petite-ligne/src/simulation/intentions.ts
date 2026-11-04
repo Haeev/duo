@@ -20,6 +20,7 @@ import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeDeco
 import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { offerGift } from './amitie';
+import { voteDecision } from './decisions';
 import { answerProposal, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
 import { depositFamily, sortStorage, storageMove } from './rangement';
 import { roomDeposit } from './pieces';
@@ -433,6 +434,9 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'proposal_answer':
       answerProposal(sim, c, intent.proposal, intent.accept);
+      return;
+    case 'decision_vote':
+      voteDecision(sim, c.id, intent.decision, intent.option);
       return;
     case 'proposal_withdraw':
       withdraw(sim, c.id, true);

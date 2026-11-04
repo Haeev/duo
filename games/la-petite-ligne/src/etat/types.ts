@@ -1288,6 +1288,8 @@ export interface QuestState {
   startedDay: number;
   /** Quête répétée à chaque train (`repeat: each_train`): jour du train de cette fois-ci. Absent sinon. */
   train?: number;
+  /** 0.13: jour où une quête d'histoire s'est finie (écart entre deux étapes d'un habitant, section 5.1). Absent sinon. */
+  doneDay?: number;
 }
 
 /**
@@ -1611,3 +1613,12 @@ export type WorldEvent =
   | { type: 'birthday_wished'; by: CharacterId; villager: VillagerId }
   /** Le duo est venu à son anniversaire (à son habitude d'anniversaire, assez longtemps). */
   | { type: 'birthday_attended'; villager: VillagerId }
+  // 0.13 (section 5.2): décisions à deux
+  /** Le panneau s'ouvre chez les deux. */
+  | { type: 'decision_opened'; decision: string; villager: VillagerId }
+  /** Un joueur a choisi (`null`: il a repris son choix). */
+  | { type: 'decision_vote'; decision: string; by: CharacterId; option: string | null }
+  /** Les deux choix sont les mêmes: la décision se prend dans `agreeSeconds`. */
+  | { type: 'decision_agreed'; decision: string; option: string }
+  /** Décidé ensemble: le tampon tombe, `world.decisions` est écrit. */
+  | { type: 'decision_taken'; decision: string; option: string }

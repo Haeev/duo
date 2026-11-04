@@ -97,6 +97,8 @@ export type Intent =
   | { type: 'improvement_planks'; improvement: string; count: number }
   | { type: 'proposal_answer'; proposal: string; accept: boolean }
   | { type: 'proposal_withdraw' }
+  // 0.13 (section 5.2): choisir une option d'une décision à deux ouverte (`null`: reprendre son choix)
+  | { type: 'decision_vote'; decision: string; option: string | null }
   | { type: 'crate_deposit'; item: ItemId; quality: Quality; count: number }
   | { type: 'crate_take'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_deposit'; item: ItemId; quality: Quality; count: number }
