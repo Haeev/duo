@@ -244,3 +244,17 @@ export function characterSlotColumn(slot: CharacterSlot): number {
 
 /** Pixels par case dans les textures palette (`CELL` de `palette.py`). */
 export const PALETTE_CELL_PIXELS = 4;
+
+/**
+ * Rangées de cases de `personnages.png` (`CHAR_GRID_H` de `palette.py`: 64 x 256 px depuis la
+ * qualité visuelle, cases de 4 px; les rangées 32 et suivantes portent les vignettes des yeux).
+ * Valeur par défaut: quand la texture est connue, on compte ses rangées (`characterGridRows`).
+ */
+export const CHARACTER_GRID_ROWS = 64;
+
+/** Rangées de cases d'une texture des personnages de `height` pixels de haut. */
+export function characterGridRows(height: number | undefined): number {
+  return height === undefined || !(height >= PALETTE_CELL_PIXELS)
+    ? CHARACTER_GRID_ROWS
+    : Math.round(height / PALETTE_CELL_PIXELS);
+}

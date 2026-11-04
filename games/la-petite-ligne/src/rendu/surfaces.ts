@@ -23,7 +23,7 @@ import {
   type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
 } from 'three';
-import { CHARACTER_SLOTS, PALETTE_CELLS, PALETTE_GRID, characterSlotColumn, type PaletteCell } from './palette';
+import { CHARACTER_SLOTS, PALETTE_CELLS, PALETTE_CELL_PIXELS, PALETTE_GRID, characterSlotColumn, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import { RIVER_BED_MIN, RIVER_BED_RANGE, RIVER_SAND_RANGE } from './riviere';
@@ -49,9 +49,8 @@ export const GROUND_CELLS = [
   'rock_dark',
 ] as const satisfies readonly PaletteCell[];
 
-/** Texture des personnages: 16 cases par rangée, 32 rangées (`CHAR_GRID_H` de `palette.py`). */
+/** Texture des personnages: 16 cases par rangée; ses rangées (`CHAR_GRID_H` de `palette.py`) se lisent sur sa taille. */
 const CHARACTER_SLOT_COUNT = CHARACTER_SLOTS.length;
-const CHARACTER_ROW_COUNT = 32;
 /** Rangée des vêtements dans la copie de la texture de chaque joueur (`habillage.ts`). */
 const PLAYER_WEAR_ROW = 1;
 const MOUTH_COLUMN = characterSlotColumn('mouth');
@@ -823,7 +822,8 @@ if (uShadeParams.x > 0.0) {
   {
     // Peau (cases peau, ombre de peau, bouche, joue des rangées de personnage; la rangée 1 des
     // joueurs porte leurs vêtements): ombre brique. Tissus: la teinte froide du décor, plus franche.
-    ivec2 rampCell = ivec2(floor(vMapUv * vec2(${CHARACTER_SLOT_COUNT}.0, ${CHARACTER_ROW_COUNT}.0)));
+    // Rangées comptées sur la texture (64 pour personnages.png de 256 px): elle a grandi avec les vignettes des yeux.
+    ivec2 rampCell = ivec2(floor(vMapUv * vec2(${CHARACTER_SLOT_COUNT}.0, float(textureSize(map, 0).y) / ${PALETTE_CELL_PIXELS}.0)));
     bool rampSkin = rampCell.y != ${PLAYER_WEAR_ROW} && (rampCell.x <= 1 || rampCell.x == ${MOUTH_COLUMN} || rampCell.x == ${CHEEK_COLUMN});
     lookTint = rampSkin ? uRampSkinTint : uShadeTint;
     lookTintPart = (rampSkin ? uRampShade.x : uRampShade.y) * step(1e-4, uShadeParams.x);

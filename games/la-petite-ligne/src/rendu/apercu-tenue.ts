@@ -26,12 +26,13 @@ import {
 } from 'three';
 import type { ClothesContent } from '../donnees/vetements';
 import type { OutfitPreview, OutfitPreviewLook, OutfitPreviewOptions } from '../etat/vue';
+import { applyBoneRest, boneRestOf, idleClipOf } from './gabarit';
 import { type DressedFigure, PlayerDresser, PlayerTexture, playerMeshNames } from './habillage';
 import { CHARACTERS_FILE, type ModelLibrary } from './modeles';
 import { ResourceTracker } from './ressources';
 
 const RIG_NODE = 'rig';
-const IDLE_CLIP = 'idle';
+const PLAYER_BODY = 'player_base';
 /** Papier des panneaux de l'interface (`--lpl-color-paper`). */
 const DEFAULT_BACKGROUND = '#f3ebd4';
 const MAX_PIXEL_RATIO = 2;
@@ -97,7 +98,12 @@ class OutfitPreviewScene implements OutfitPreview {
     this.resources.trackMaterial(material);
     this.figure = this.dresser.prepare(model, texture);
     this.mixer = new AnimationMixer(model);
-    const idle = sources.library.animations(CHARACTERS_FILE).find((clip) => clip.name === IDLE_CLIP);
+    // Gabarit du corps et pose de repos propre (`gabarit.ts`), comme en jeu.
+    const extras = sources.library.extras(PLAYER_BODY);
+    applyBoneRest(model, boneRestOf(extras));
+    const clips = sources.library.animations(CHARACTERS_FILE);
+    const idleName = idleClipOf(extras, new Set(clips.map((clip) => clip.name)));
+    const idle = clips.find((clip) => clip.name === idleName);
     if (idle !== undefined) {
       this.mixer.clipAction(idle).play();
       this.mixer.setTime(POSE_TIME);

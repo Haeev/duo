@@ -21,7 +21,8 @@
  * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Pêche de la 0.12: `peche12=1`, avec
  * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Habitants de la 0.13:
  * `habitants13=1|messe`, `chat=`, `loupe=oeil` (voir `habitants13-exemple.ts`). `style=lisse` (ou
- * `facettes`): style des personnages, pour comparer (plan de qualité visuelle, décision D1). Touches: G repère, J lancer,
+ * `facettes`): style des personnages, pour comparer (plan de qualité visuelle, décision D1).
+ * `temoins=1|marche`: les trois témoins de l'étape A parmi des habitants d'avant (`temoins-exemple.ts`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import { applyBreedingExample } from './elevage-exemple';
@@ -46,6 +47,7 @@ import { applyTour9Example } from './tour9-exemple';
 import { applyTour10Example } from './tour10-exemple';
 import { createPeche12Demo } from './peche12-exemple';
 import { applyHabitants13Example } from './habitants13-exemple';
+import { applyTemoinsExample } from './temoins-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
 import type { Wear, WorldState } from '../../etat/types';
 
@@ -263,6 +265,8 @@ async function main(): Promise<void> {
   if (breeding !== null) applyBreedingExample(world, map, breeding);
   // 0.13: les 21 habitants alignés ou à la sortie de la messe, et le chat (`habitants13-exemple.ts`).
   const habitants13 = applyHabitants13Example(world, params);
+  // Étape A de la qualité visuelle: planche de décision des trois témoins (`temoins-exemple.ts`).
+  const temoins = applyTemoinsExample(world, params);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
   const peche12 = createPeche12Demo(params, local);
@@ -487,7 +491,7 @@ async function main(): Promise<void> {
       world,
       map,
       seconds,
-      lifeInput?.checked !== false && !steering && habitants13 === null,
+      lifeInput?.checked !== false && !steering && habitants13 === null && temoins === null,
       options,
     )) {
       emit(event);
@@ -523,6 +527,7 @@ async function main(): Promise<void> {
     }
     peche12?.step(world, dt);
     habitants13?.step(world, seconds);
+    temoins?.step(world, seconds);
     engine.frame(dt);
     handle.frames += 1;
   };

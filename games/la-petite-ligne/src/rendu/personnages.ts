@@ -69,6 +69,7 @@ import { ShapeBuilder } from './geometrie';
 import { sleepPose, type SleepPose } from './coucher';
 import { holdSpecFor, ToolHolder } from './prise';
 import { plantedFootSpeed } from './foulee';
+import { IDLE_CLIP, applyBoneRest, boneRestOf, idleClipOf } from './gabarit';
 import { CLIP_FOR_ACTION } from './gestes';
 import {
   VillagerCarry,
@@ -84,6 +85,8 @@ import {
 const SETTINGS = RENDER_SETTINGS.characters;
 /** Nom du groupe animé (squelette et maillages) dans `personnages.glb`. */
 const RIG_NODE = 'rig';
+/** Corps des joueurs: ses extras disent leur gabarit et leur pose de repos. */
+const PLAYER_BODY = 'player_base';
 const HAND_SOCKET = 'socket_hand_r';
 const PICK_RADIUS = 0.42;
 const PICK_HEIGHT = 1.8;
@@ -329,6 +332,8 @@ class CharacterFigure {
     private readonly clips: ReadonlyMap<string, AnimationClip>,
     pick: PickTarget,
     scale: number,
+    /** Clip joué quand le rendu demande `idle` (pose de repos propre d'un personnage refait, `gabarit.ts`). */
+    private readonly idleClip: string = IDLE_CLIP,
   ) {
     this.root.name = `personnage ${id}`;
     this.root.add(model);
@@ -390,7 +395,7 @@ class CharacterFigure {
   /** Joue `clip` une fois par-dessus l'attente (salut). Faux s'il n'existe pas ou si autre chose joue. */
   playOnce(clip: string, time: number): boolean {
     const duration = this.clips.get(clip)?.duration ?? 0;
-    if (duration <= 0 || this.currentName !== 'idle') {
+    if (duration <= 0 || this.currentName !== this.idleClip) {
       return false;
     }
     this.variant = { name: clip, start: time, seconds: duration, procedural: false };
@@ -408,7 +413,7 @@ class CharacterFigure {
     dt: number,
     variants: readonly string[],
   ): ClipRequest {
-    if (request.name !== 'idle') {
+    if (request.name !== IDLE_CLIP) {
       this.idleFor = 0;
       this.variant = null;
       this.variantWasClip = false;
@@ -509,7 +514,8 @@ class CharacterFigure {
     if (this.mixer === null) {
       return;
     }
-    const clip = this.clips.get(request.name) ?? this.clips.get('idle');
+    const wanted = request.name === IDLE_CLIP ? this.idleClip : request.name;
+    const clip = this.clips.get(wanted) ?? this.clips.get(this.idleClip) ?? this.clips.get(IDLE_CLIP);
     if (clip === undefined) {
       return;
     }
@@ -1293,12 +1299,16 @@ export class CharactersPart implements EventfulPart {
       });
       dressed = this.dresser.prepare(model, texture);
     }
+    // Gabarit du corps des joueurs (moyen) et sa pose de repos, avant que la figure ne lise ses os.
+    const extras = this.library.extras(PLAYER_BODY);
+    if (model !== null) applyBoneRest(model, boneRestOf(extras));
     const figure = new CharacterFigure(
       character.id,
       model ?? this.substituteModel(character.appearance.scarf),
-      this.clips,
+      model === null ? NO_CLIPS : this.clips,
       pick,
       1,
+      idleClipOf(extras, this.clips),
     );
     this.group.add(figure.root);
     return { figure, dressed, seated: false, glide: { x: 0, y: 0, start: 0 } };
@@ -1334,13 +1344,17 @@ export class CharactersPart implements EventfulPart {
       if (dressed.size > 0) this.wornPieces.set(villager.id, { body, plain, dressed });
     }
     const pick = this.picks.add({ kind: 'villager', villager: villager.id });
+    const extras = this.library.extras(modelName);
+    // Habitant refait sur un gabarit (rond, trapu): ses os de repos, avant que la figure ne les lise.
+    if (rigged !== null) applyBoneRest(rigged, boneRestOf(extras));
     const figure = new CharacterFigure(
       villager.id,
       model,
       // Un substitut n'a pas d'os: aucun clip (le mélangeur se plaindrait de pistes sans cible).
       rigged === null ? NO_CLIPS : this.clips,
       pick,
-      villagerScale(definition?.scale, this.library.extras(modelName)),
+      villagerScale(definition?.scale, extras),
+      idleClipOf(extras, this.clips),
     );
     this.group.add(figure.root);
     const carry = new VillagerCarry(figure.root, this.library, SETTINGS.bikes, this.propSwap);
