@@ -12,6 +12,7 @@ import type { Intent } from './actions';
 import type { GameMap } from './carte';
 import type { Appearance, CharacterId, DeepReadonly, ReadonlyWorld, WorldEvent } from './types';
 import type { Content } from '../donnees/types';
+import type { GraphicsOptions, GraphicsPort } from './options-graphiques';
 
 export interface GameView {
   /** Contenu du game designer, validé (objets, cultures, habitants, textes...). */
@@ -65,6 +66,8 @@ export interface RendererOptions {
   quality?: RenderQuality;
   /** Journal de la plateforme (repli automatique vers le mode léger). */
   log?: { info(message: string, data?: unknown): void };
+  /** Options graphiques de la machine au départ (0.13); Auto si absentes. */
+  graphics?: GraphicsOptions;
 }
 
 export interface Renderer {
@@ -90,6 +93,14 @@ export interface Renderer {
    * personnage seul. `null` avant `load` ou sans modèle des personnages.
    */
   createOutfitPreview?(options: OutfitPreviewOptions): OutfitPreview | null;
+  /**
+   * Options graphiques de cette machine (0.13, panneau « Options »), appliquées à chaud. Absentes du
+   * rendu de secours; sans effet en mode léger demandé.
+   */
+  setGraphicsOptions?(options: GraphicsOptions): void;
+  graphicsOptions?(): GraphicsOptions;
+  /** Le filet de sécurité vient de baisser la qualité d'un cran (nouvelles options). */
+  onGraphicsReduced?(listener: (options: GraphicsOptions) => void): () => void;
   dispose(): void;
 }
 
@@ -145,6 +156,8 @@ export interface InterfaceOptions {
   sound?: (id: string) => void;
   /** 0.12: aperçu 3D d'une tenue pour la boutique (`Renderer.createOutfitPreview`), `null` sans rendu 3D (facultatif). */
   outfitPreview?: (options: OutfitPreviewOptions) => OutfitPreview | null;
+  /** 0.13: options graphiques de cette machine (panneau « Options » du carnet), absent sans rendu 3D. */
+  graphics?: GraphicsPort;
 }
 
 export interface GameInterface {

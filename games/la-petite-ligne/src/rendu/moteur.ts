@@ -41,15 +41,19 @@ import { InteriorsPart, readInteriorHooks } from './interieurs';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { PerfMonitor } from './perf';
 import {
-  AdaptiveQuality,
+  type AdaptiveQuality,
   renderPixelSize,
   shadowCutLog,
   usefulResolutionSteps,
   type DisplaySurface,
   type GraphicsInfo,
   type QualityChange,
+  type RenderSizeSettings,
 } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
+import type { GraphicsOptions } from '../etat/options-graphiques';
+import { DEFAULT_GRAPHICS_OPTIONS } from '../etat/options-graphiques';
+import { QualityGovernor, sizeSettingsOf, type GovernorChange, type RenderProfile } from './options-graphiques';
 import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
 import { Terrain } from './terrain';
@@ -158,8 +162,17 @@ export class RenderEngine implements Renderer {
   private readonly holes: SeeThroughHole[] = [];
   /** Mode léger demandé (`RendererOptions.quality`), pour toute la séance. */
   private readonly light: boolean;
-  /** Qualité adaptative (`qualite.ts`); `null` en mode léger demandé ou sans adaptation. */
-  private readonly quality: AdaptiveQuality | null;
+  /**
+   * Options graphiques de la machine et leur filet (`options-graphiques.ts`); `null` en mode léger
+   * demandé. En Auto, il tient la qualité adaptative de `qualite.ts`.
+   */
+  private readonly governor: QualityGovernor | null;
+  /** Mesure des images active (non: captures reproductibles, `adaptive: false`). */
+  private readonly adaptiveOn: boolean;
+  /** Taille du tampon selon la netteté choisie (`renderPixelSize`). */
+  private sizeSettings: RenderSizeSettings = RENDER_SETTINGS;
+  private effects: EffectsPart | null = null;
+  private readonly reducedListeners = new Set<(options: GraphicsOptions) => void>();
   private readonly log: RendererOptions['log'];
   private vegetation: Vegetation | null = null;
   private moments: MomentsPart | null = null;
@@ -175,12 +188,12 @@ export class RenderEngine implements Renderer {
     this.container = options.container;
     this.reducedMotion = options.reducedMotion;
     this.light = options.quality === 'light';
-    this.quality =
-      this.light || options.adaptive === false
-        ? null
-        : new AdaptiveQuality(RENDER_SETTINGS, () =>
-            usefulResolutionSteps(this.surface(), RENDER_SETTINGS.dynamicResolution.steps),
-          );
+    this.adaptiveOn = options.adaptive !== false;
+    this.governor = this.light
+      ? null
+      : new QualityGovernor(options.graphics ?? DEFAULT_GRAPHICS_OPTIONS, () =>
+          usefulResolutionSteps(this.surface(), RENDER_SETTINGS.dynamicResolution.steps),
+        );
     this.log = options.log;
     this.fishingSource = options.fishing ?? createStateFishingSource();
     const settings = RENDER_SETTINGS.renderer;
@@ -207,6 +220,13 @@ export class RenderEngine implements Renderer {
     this.daylight = new DaylightRig(this.scene);
     if (this.light) {
       this.daylight.sun.castShadow = false;
+    }
+    if (this.governor !== null) {
+      const profile = this.governor.currentProfile();
+      this.sizeSettings = sizeSettingsOf(profile.resolution);
+      this.daylight.setShadowMapSizes(profile.shadows.mapSize, profile.shadows.detailMapSize);
+      this.renderer.shadowMap.enabled = profile.shadows.enabled;
+      this.daylight.sun.castShadow = profile.shadows.enabled;
     }
     this.perf = new PerfMonitor(
       this.container,
@@ -281,7 +301,7 @@ export class RenderEngine implements Renderer {
     const surface = this.surface();
     const width = surface.cssWidth;
     const height = surface.cssHeight;
-    const size = renderPixelSize(surface, this.resolutionScale(), this.light);
+    const size = renderPixelSize(surface, this.resolutionScale(), this.light, this.sizeSettings);
     this.effectiveRatio = size.ratio;
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(size.width, size.height, false);
@@ -448,6 +468,8 @@ export class RenderEngine implements Renderer {
     );
     this.scene.add(effects.group);
     world.add(effects);
+    this.effects = effects;
+    effects.setParticleShare(this.governor?.currentProfile().effectsShare ?? 1);
     const fishing = new FishingPart(
       materials,
       terrain,
@@ -553,7 +575,9 @@ export class RenderEngine implements Renderer {
     this.updateFrame(0);
     await this.renderer.compileAsync(this.scene, this.rig.camera);
     this.renderer.render(this.scene, this.rig.camera);
-    if (this.quality !== null && !this.disposed) {
+    // Toute partie où les ombres peuvent changer (Auto, options de la machine) compile les deux variantes.
+    if (this.governor !== null && this.adaptiveOn && !this.disposed) {
+      const shadowsOn = this.renderer.shadowMap.enabled;
       // Repli automatique possible: ses variantes sans ombre se compilent aussi
       // maintenant. Three.js garde les deux programmes par matériau, la bascule
       // (dans un sens ou dans l'autre) n'en compile alors aucun en pleine partie.
@@ -562,6 +586,7 @@ export class RenderEngine implements Renderer {
       this.renderer.render(this.scene, this.rig.camera);
       this.setShadows(true);
       this.renderer.render(this.scene, this.rig.camera);
+      this.setShadows(shadowsOn);
     }
     for (const entry of hidden) {
       entry.object.visible = entry.visible;
@@ -840,10 +865,70 @@ export class RenderEngine implements Renderer {
     this.updateFrame(dtSeconds);
     this.draw();
     this.perf.record(this.renderer, Math.min(MAX_FRAME_SECONDS, Math.max(0, dtSeconds)));
-    const change = this.quality?.sample(dtSeconds) ?? null;
+    const change = this.adaptiveOn ? (this.governor?.sample(dtSeconds) ?? null) : null;
     if (change !== null) {
-      this.applyQuality(change);
+      this.applyGovernor(change);
     }
+  }
+
+  /** Qualité adaptative d'Auto (`qualite.ts`), `null` hors d'Auto, en mode léger ou sans mesure. */
+  private get quality(): AdaptiveQuality | null {
+    return this.adaptiveOn ? (this.governor?.adaptiveQuality() ?? null) : null;
+  }
+
+  private applyGovernor(change: GovernorChange): void {
+    if (change.kind === 'adaptive') {
+      this.applyQuality(change.change);
+      return;
+    }
+    this.applyProfile(this.governor?.currentProfile() ?? null);
+    this.log?.info('rendu: qualité réduite d\'un cran (filet des options graphiques)', { options: change.options });
+    for (const listener of this.reducedListeners) listener(change.options);
+  }
+
+  /** Applique à chaud un profil d'options graphiques: ombres, netteté, particules. */
+  private applyProfile(profile: RenderProfile | null): void {
+    if (profile === null || this.disposed) return;
+    this.sizeSettings = sizeSettingsOf(profile.resolution);
+    this.daylight.setShadowMapSizes(profile.shadows.mapSize, profile.shadows.detailMapSize);
+    this.setShadows(profile.shadows.enabled);
+    this.effects?.setParticleShare(profile.effectsShare);
+    this.resize();
+    this.perf.setResolutionScale(this.resolutionScale());
+  }
+
+  /**
+   * Options graphiques de cette machine (panneau « Options » du carnet), appliquées à chaud: ni
+   * contexte recréé, ni page rechargée. Sans effet en mode léger demandé (tests en rendu logiciel).
+   */
+  setGraphicsOptions(options: GraphicsOptions): void {
+    if (this.governor === null) return;
+    const profile = this.governor.set(options);
+    this.applyProfile(profile);
+    this.log?.info('rendu: options graphiques', { options, ombres: profile.shadows.enabled, pixelRatio: this.effectiveRatio });
+  }
+
+  /** Ce que les options ont posé (tests, page de démonstration): ombres, carte, tampon, particules. */
+  graphicsState(): { shadows: boolean; mapSize: number; buffer: [number, number]; particleShare: number } {
+    const buffer = this.renderer.getDrawingBufferSize(this.bufferSize);
+    return {
+      shadows: this.renderer.shadowMap.enabled && this.daylight.sun.castShadow,
+      mapSize: this.daylight.sun.shadow.mapSize.x,
+      buffer: [buffer.x, buffer.y],
+      particleShare: this.effects?.particleShare() ?? 1,
+    };
+  }
+
+  graphicsOptions(): GraphicsOptions {
+    return this.governor?.current() ?? DEFAULT_GRAPHICS_OPTIONS;
+  }
+
+  /** Le filet de sécurité a baissé la qualité d'un cran: les nouvelles options (à montrer, à mémoriser). */
+  onGraphicsReduced(listener: (options: GraphicsOptions) => void): () => void {
+    this.reducedListeners.add(listener);
+    return () => {
+      this.reducedListeners.delete(listener);
+    };
   }
 
   /** Une image, passe d'ombre réduite à ce qui ombre la vue (`ombre-tri.ts`). */
@@ -893,8 +978,12 @@ export class RenderEngine implements Renderer {
 
   /** Repli automatique imposé (page de démonstration, `adaptatif=1&repli=1`). */
   forceQualityFallback(): void {
-    if (this.quality !== null) {
-      this.applyQuality(this.quality.forceFallback());
+    if (!this.adaptiveOn) {
+      return;
+    }
+    const change = this.governor?.forceFallback() ?? null;
+    if (change !== null) {
+      this.applyGovernor(change);
     }
   }
 
@@ -918,8 +1007,11 @@ export class RenderEngine implements Renderer {
 
   /** Palier de résolution dynamique courant (1 = pleine résolution). */
   resolutionScale(): number {
-    const step = this.quality?.resolutionStep() ?? 0;
-    return RENDER_SETTINGS.dynamicResolution.steps[step] ?? 1;
+    const adaptive = this.quality;
+    if (adaptive === null) {
+      return this.governor?.currentProfile().resolution.scale ?? 1;
+    }
+    return RENDER_SETTINGS.dynamicResolution.steps[adaptive.resolutionStep()] ?? 1;
   }
 
   /** Rapport de pixels du rendu (résolution interne), pour les tests. */
@@ -1157,6 +1249,7 @@ export class RenderEngine implements Renderer {
     this.disposed = true;
     this.unsubscribe();
     this.resizeObserver.disconnect();
+    this.reducedListeners.clear();
     this.world?.dispose();
     this.daylight.dispose();
     this.scene.clear();

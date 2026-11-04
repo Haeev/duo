@@ -17,6 +17,8 @@ import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { CameraCommand, GameInterface, GameView, InterfaceOptions } from '../etat/vue';
 import { NotebookPanel, startMemorySession } from './carnet';
+import { OptionsPanel } from './options';
+import type { GraphicsPort } from '../etat/options-graphiques';
 import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { type ReadonlyCharacter, type UiContext, characterOf, createUiContext } from './contexte';
@@ -86,7 +88,9 @@ class GameUi implements GameInterface, UiHost {
    * Panneau local, sans menu du jeu (tour 10): le chantier d'une pièce, ou le carnet pendant la
    * sieste (la simulation ne prend pas de menu chez qui dort; le carnet reste ouvert quand même).
    */
-  private local: 'room' | 'notebook' | null = null;
+  private local: 'room' | 'notebook' | 'options' | null = null;
+  /** Options graphiques de cette machine (0.13), `null` sans rendu 3D. */
+  readonly graphics: GraphicsPort | null;
   private reading: string | null = null;
   private knownReadables: Set<string> | null = null;
   private titleDone: boolean;
@@ -99,6 +103,7 @@ class GameUi implements GameInterface, UiHost {
     this.view = options.view;
     this.cameraCommand = options.camera ?? null;
     this.outfitPreview = options.outfitPreview ?? null;
+    this.graphics = options.graphics ?? null;
     this.sounds = new UiSoundGate(options.sound ?? null);
     const texts = loadUiTexts(options.view.content);
     this.ctx = createUiContext(options.view.content, options.view.map, texts, options.view.localCharacter(), (code) =>
@@ -156,6 +161,12 @@ class GameUi implements GameInterface, UiHost {
       this.onEvent(event);
     });
     this.cleanups.push(off);
+    // Le filet des options graphiques a baissé la qualité: une notification discrète, ici seulement.
+    const offReduced = this.graphics?.onReduced(() => {
+      this.hud.localToast(this.ctx.t(this.ctx.texts.extra.graphics.reduced), 'ui-eye', UI_SETTINGS.toastSeconds);
+      this.dirty = true;
+    });
+    if (offReduced !== undefined) this.cleanups.push(offReduced);
     // Premier dessin tout de suite: aucun HUD vide pendant le chargement de la plateforme.
     this.frame();
   }
@@ -229,6 +240,14 @@ class GameUi implements GameInterface, UiHost {
 
   openRoomPanel(): void {
     this.local = 'room';
+    this.dirty = true;
+  }
+
+  openOptions(): void {
+    if (this.graphics === null) return;
+    // Le carnet se ferme (menu du jeu), les options prennent sa place sans menu de la simulation.
+    this.setMenu(null);
+    this.local = 'options';
     this.dirty = true;
   }
 
@@ -408,8 +427,10 @@ class GameUi implements GameInterface, UiHost {
           const tab = this.panelTab;
           kind = 'panel';
           key = `local:${local}`;
+          const graphics = this.graphics;
           build = () => {
             if (local === 'room') return new RoomPanel(this);
+            if (local === 'options' && graphics !== null) return new OptionsPanel(this, graphics);
             return new NotebookPanel(this, tab);
           };
         }

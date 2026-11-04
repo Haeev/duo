@@ -189,6 +189,12 @@ export class DaylightRig {
   rain = 0;
   cloudCover = 0;
   mist = 0;
+  /**
+   * Cartes d'ombre hors de l'heure de l'énigme, puis pendant (texels): celles d'`AMBIANCE_SETTINGS`,
+   * sauf option graphique de la machine (`setShadowMapSizes`).
+   */
+  private baseMapSize: number = AMBIANCE_SETTINGS.shadows.mapSize;
+  private detailMapSize: number = AMBIANCE_SETTINGS.shadows.detailMapSize;
   /** Point suivi par la caméra et rayon de la vue au sol, à cette image. */
   readonly focus = new Vector3();
   viewRadius = 1;
@@ -311,7 +317,7 @@ export class DaylightRig {
       Math.min(1, shadows.intensity * Math.max(0, curves.shadow.at(m))) * look.shadowFactor;
     this.sun.shadow.radius = curves.shadowRadius.at(m);
     this.setShadowMapSize(
-      m >= shadows.detailFrom && m <= shadows.detailTo ? shadows.detailMapSize : shadows.mapSize,
+      m >= shadows.detailFrom && m <= shadows.detailTo ? this.detailMapSize : this.baseMapSize,
     );
     this.fitShadow(focus, viewRadius);
   }
@@ -324,6 +330,12 @@ export class DaylightRig {
     const a = clamp01(amount);
     this.sun.color.lerp(color, a);
     this.hemi.color.lerp(color, a * 0.5);
+  }
+
+  /** Tailles des cartes d'ombre choisies par les options graphiques (prises à la prochaine `update`). */
+  setShadowMapSizes(base: number, detail: number): void {
+    this.baseMapSize = base;
+    this.detailMapSize = detail;
   }
 
   /** Change la taille de la carte d'ombre (le moteur la recrée à la prochaine image). */

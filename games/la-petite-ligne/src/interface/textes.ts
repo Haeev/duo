@@ -534,6 +534,35 @@ const SupplementSchema = v.object({
     /** Par identifiant d'élément de `pieces.json`, avec l'article (« le poteau sud »). */
     elements: v.record(str, str),
   }),
+  /** Options graphiques de la machine (0.13), ouvertes depuis le pied du carnet. */
+  graphics: v.object({
+    ...strings([
+      'title',
+      'subtitle',
+      'open',
+      'openHelp',
+      'closeLabel',
+      'quality',
+      'fine',
+      'shadows',
+      'resolution',
+      'resolutionHelp',
+      'effects',
+      'autoNote',
+      'neverReduce',
+      'neverReduceHelp',
+      'neverReduceAuto',
+      'kept',
+      'keptForGood',
+      'reduced',
+      'keysChoose',
+    ] as const).entries,
+    presets: strings(['auto', 'high', 'medium', 'low', 'custom'] as const),
+    presetHelp: strings(['auto', 'high', 'medium', 'low', 'custom'] as const),
+    shadowLevels: strings(['off', 'soft', 'fine'] as const),
+    resolutionLevels: strings(['reduced', 'standard', 'max'] as const),
+    effectsLevels: strings(['reduced', 'full'] as const),
+  }),
   /** Rideaux aux fenêtres (section 6.2): l'invite qui les ouvre ou les ferme. */
   curtains: strings(['open', 'close', 'label'] as const),
   /** Rêverie de la sieste (section 3.4). */
