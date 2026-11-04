@@ -1,0 +1,499 @@
+{
+  "version": 1,
+  "gestures": [
+    {
+      "id": "marthe_sweep_nave",
+      "label": "Marthe balaie la nef avant la messe et les jours de pluie",
+      "villagers": ["marthe"],
+      "habits": ["sunday_church", "rain"],
+      "points": ["church_nave"],
+      "steps": [
+        { "clip": "hoe", "seconds": 6 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "wantedClip": "sweep",
+      "prop": { "model": "broom", "mount": "hand" },
+      "face": { "heading": 180 },
+      "sound": { "id": "step-leaves", "everySeconds": 2.5, "range": 8 }
+    },
+    {
+      "id": "firmin_rain_door",
+      "label": "Firmin attend sous la porte de la halte quand il pleut, et lève les yeux vers le ciel",
+      "villagers": ["firmin"],
+      "habits": ["rain"],
+      "points": ["station_door"],
+      "steps": [
+        { "clip": "idle", "seconds": 9 },
+        { "clip": "look_up", "seconds": 3 }
+      ],
+      "face": { "heading": 180 }
+    },
+    {
+      "id": "basile_nest_box",
+      "label": "Basile pose et vérifie le nichoir du chêne",
+      "villagers": ["basile"],
+      "points": ["nest_oak_basile"],
+      "activities": ["work"],
+      "steps": [
+        { "clip": "reach_up", "seconds": 4 },
+        { "clip": "look_up", "seconds": 3 }
+      ],
+      "wantedClip": "nest_box_fix",
+      "face": { "object": "tree_oak_01" }
+    },
+    {
+      "id": "grave_visit",
+      "label": "Se pencher sur la tombe d'un proche et y poser des fleurs",
+      "villagers": ["firmin", "odette", "basile", "solange", "honorine"],
+      "habits": ["lumignons", "season_grave", "monday_grave", "thursday_grave", "friday_grave"],
+      "steps": [
+        { "clip": "pet", "seconds": 5 },
+        { "clip": "idle", "seconds": 12 }
+      ],
+      "wantedClip": "kneel_flowers"
+    },
+    {
+      "id": "marthe_water_graves",
+      "label": "Marthe arrose les fleurs des tombes près de la fontaine",
+      "villagers": ["marthe"],
+      "habits": ["cemetery"],
+      "steps": [
+        { "clip": "water", "seconds": 6 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "prop": { "model": "watering_can", "mount": "hand" },
+      "face": { "object": "grave_31" },
+      "sound": { "id": "water", "everySeconds": 10, "range": 10 }
+    },
+    {
+      "id": "marthe_bell_rope",
+      "label": "Marthe tire la corde des cloches pour l'angélus",
+      "villagers": ["marthe"],
+      "habits": ["angelus", "birthday"],
+      "points": ["church_bell_rope"],
+      "steps": [
+        { "clip": "pole_lower", "seconds": 1 },
+        { "clip": "pole_raise", "seconds": 1.2 }
+      ],
+      "wantedClip": "pull_bell_rope"
+    },
+    {
+      "id": "marthe_dahlias",
+      "label": "Marthe arrose ses dahlias, plein sud",
+      "villagers": ["marthe"],
+      "habits": ["garden"],
+      "notWeather": ["rain"],
+      "steps": [
+        { "clip": "water", "seconds": 6 },
+        { "clip": "harvest", "seconds": 4 }
+      ],
+      "prop": { "model": "watering_can", "mount": "hand" },
+      "face": { "heading": 180 },
+      "sound": { "id": "water", "everySeconds": 10, "range": 10 }
+    },
+    {
+      "id": "martial_vintage",
+      "label": "L'abbé vendange au bout du rang",
+      "villagers": ["martial"],
+      "habits": ["vintage"],
+      "clip": "harvest",
+      "wantedClip": "grape_cut",
+      "face": { "object": "vine_row_12" },
+      "sound": { "id": "pick-berries", "everySeconds": 5, "range": 10 }
+    },
+    {
+      "id": "martial_garden",
+      "label": "L'abbé bêche son potager sous les fenêtres du presbytère",
+      "villagers": ["martial"],
+      "habits": ["garden"],
+      "notWeather": ["rain"],
+      "steps": [
+        { "clip": "hoe", "seconds": 8 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "prop": { "model": "hoe", "mount": "hand" },
+      "face": { "heading": 0 },
+      "sound": { "id": "hoe", "everySeconds": 2, "range": 12 }
+    },
+    {
+      "id": "lucie_water_apples",
+      "label": "Lucie arrose le pied de ses pommiers le dimanche",
+      "villagers": ["lucie"],
+      "habits": ["sunday_garden"],
+      "notWeather": ["rain"],
+      "steps": [
+        { "clip": "water", "seconds": 6 },
+        { "clip": "idle", "seconds": 5 }
+      ],
+      "prop": { "model": "watering_can", "mount": "hand" },
+      "face": { "object": "tree_apple_01" },
+      "sound": { "id": "water", "everySeconds": 11, "range": 10 }
+    },
+    {
+      "id": "lucie_photo_church",
+      "label": "Lucie photographie Saint-Aubin depuis le parvis",
+      "villagers": ["lucie"],
+      "habits": ["photo_church"],
+      "clip": "carry_one_idle",
+      "wantedClip": "photograph",
+      "prop": { "model": "camera_box", "mount": "chest" },
+      "face": { "object": "church" }
+    },
+    {
+      "id": "ines_mark_trees",
+      "label": "Inès marque au marteau les arbres de la coupe",
+      "villagers": ["ines"],
+      "habits": ["patrol_coupe", "with_barnabe"],
+      "steps": [
+        { "clip": "hammer_tap", "seconds": 2.4 },
+        { "clip": "look_up", "seconds": 3 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "wantedClip": "mark_tree",
+      "prop": { "model": "hammer", "mount": "hand" },
+      "face": { "object": "stump_02" },
+      "sound": { "id": "hammer-tap", "everySeconds": 9.4, "range": 12 }
+    },
+    {
+      "id": "barnabe_fell",
+      "label": "Barnabé abat à la hache dans la coupe",
+      "villagers": ["barnabe"],
+      "habits": ["coupe", "with_ines"],
+      "steps": [
+        { "clip": "chop", "seconds": 6.4 },
+        { "clip": "idle", "seconds": 5 }
+      ],
+      "prop": { "model": "felling_axe", "mount": "hand" },
+      "face": { "object": "stump_02" },
+      "sound": { "id": "axe-chop", "everySeconds": 1.07, "range": 18 }
+    },
+    {
+      "id": "barnabe_kiln",
+      "label": "Barnabé couvre et tasse sa meule de charbon",
+      "villagers": ["barnabe"],
+      "habits": ["kiln", "cuite"],
+      "steps": [
+        { "clip": "hoe", "seconds": 5 },
+        { "clip": "idle", "seconds": 6 }
+      ],
+      "wantedClip": "rake_kiln",
+      "prop": { "model": "hoe", "mount": "hand" },
+      "face": { "heading": 270 },
+      "sound": { "id": "hoe", "everySeconds": 2, "range": 12 }
+    },
+    {
+      "id": "paulin_hoe_field",
+      "label": "Paulin bine son champ du Haut",
+      "villagers": ["paulin"],
+      "habits": ["field"],
+      "notWeather": ["rain"],
+      "steps": [
+        { "clip": "hoe", "seconds": 9 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "prop": { "model": "hoe", "mount": "hand" },
+      "face": { "heading": 90 },
+      "sound": { "id": "hoe", "everySeconds": 2, "range": 12 }
+    },
+    {
+      "id": "farm_harvest",
+      "label": "La famille Delmas moissonne au champ du Haut",
+      "villagers": ["paulin", "margot", "leon"],
+      "habits": ["harvest", "summer_field", "birthday"],
+      "points": ["field_high_01"],
+      "steps": [
+        { "clip": "harvest", "seconds": 7.2 },
+        { "clip": "idle", "seconds": 3 }
+      ],
+      "face": { "heading": 90 },
+      "sound": { "id": "harvest", "everySeconds": 5, "range": 12 }
+    },
+    {
+      "id": "paulin_threshing",
+      "label": "Paulin bat le blé sur l'aire, devant la grange",
+      "villagers": ["paulin"],
+      "habits": ["threshing"],
+      "points": ["threshing_floor"],
+      "steps": [
+        { "clip": "chop", "seconds": 6.4 },
+        { "clip": "idle", "seconds": 3 }
+      ],
+      "wantedClip": "flail",
+      "face": { "heading": 270 },
+      "sound": { "id": "axe-thud-soft", "everySeconds": 1.07, "range": 14 }
+    },
+    {
+      "id": "barn_hay",
+      "label": "Donner le foin aux vaches devant l'étable",
+      "villagers": ["paulin", "leon"],
+      "habits": ["milking", "rain", "winter"],
+      "points": ["barn_door"],
+      "steps": [
+        { "clip": "feed", "seconds": 4.8 },
+        { "clip": "idle", "seconds": 5 }
+      ],
+      "wantedClip": "pitchfork",
+      "face": { "object": "barn" }
+    },
+    {
+      "id": "margot_hens",
+      "label": "Margot jette le grain aux poules dans la cour",
+      "villagers": ["margot", "leon"],
+      "habits": ["poultry", "free_days"],
+      "points": ["farmyard"],
+      "steps": [
+        { "clip": "feed", "seconds": 3.6 },
+        { "clip": "idle", "seconds": 5 }
+      ],
+      "sound": { "id": "hen", "everySeconds": 9, "range": 10 }
+    },
+    {
+      "id": "washhouse_laundry",
+      "label": "Battre le linge au bord du bassin du lavoir",
+      "villagers": ["margot", "colette"],
+      "habits": ["laundry"],
+      "points": ["washhouse"],
+      "steps": [
+        { "clip": "pet", "seconds": 6.4 },
+        { "clip": "idle", "seconds": 3 }
+      ],
+      "wantedClip": "scrub_laundry",
+      "face": { "object": "washhouse" }
+    },
+    {
+      "id": "margot_kitchen_garden",
+      "label": "Margot bine le courtil de la ferme",
+      "villagers": ["margot"],
+      "habits": ["garden"],
+      "notWeather": ["rain"],
+      "steps": [
+        { "clip": "hoe", "seconds": 7 },
+        { "clip": "harvest", "seconds": 3.6 },
+        { "clip": "idle", "seconds": 3 }
+      ],
+      "prop": { "model": "hoe", "mount": "hand" },
+      "face": { "heading": 0 },
+      "sound": { "id": "hoe", "everySeconds": 2, "range": 12 }
+    },
+    {
+      "id": "colette_garden_water",
+      "label": "Colette arrose son carré des jardins de la Rive le mardi",
+      "villagers": ["colette"],
+      "habits": ["tuesday_garden"],
+      "notWeather": ["rain"],
+      "steps": [
+        { "clip": "water", "seconds": 6 },
+        { "clip": "harvest", "seconds": 3.6 },
+        { "clip": "idle", "seconds": 3 }
+      ],
+      "prop": { "model": "watering_can", "mount": "hand" },
+      "face": { "heading": 180 },
+      "sound": { "id": "water", "everySeconds": 12.6, "range": 10 }
+    },
+    {
+      "id": "ambroise_clockwork",
+      "label": "Ambroise règle un mouvement d'horloge à son établi, la loupe à l'œil",
+      "villagers": ["ambroise"],
+      "habits": ["shop"],
+      "steps": [
+        { "clip": "hammer_tap", "seconds": 1.8 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "wantedClip": "clockwork",
+      "sound": { "id": "clock-tick", "everySeconds": 6, "range": 6 }
+    },
+    {
+      "id": "berthe_millstone",
+      "label": "Berthe répare et rhabille la meule dans la cour du moulin",
+      "villagers": ["berthe"],
+      "habits": ["repair", "monday_dress"],
+      "steps": [
+        { "clip": "hammer", "seconds": 4 },
+        { "clip": "idle", "seconds": 4 }
+      ],
+      "prop": { "model": "hammer", "mount": "hand" },
+      "face": { "object": "mill" },
+      "sound": { "id": "hammer", "everySeconds": 1.34, "range": 14 }
+    },
+    {
+      "id": "flour_sacks",
+      "label": "Tenir un sac de farine ou de blé, à la trappe du fournil ou à la pesée du quai",
+      "villagers": ["berthe", "paulin"],
+      "habits": ["friday_flour", "weighing", "train"],
+      "activities": ["work"],
+      "clip": "carry_one_idle",
+      "prop": { "model": "grain_sack", "mount": "chest" }
+    },
+    {
+      "id": "armand_archives",
+      "label": "Armand range les archives de la mairie le mercredi",
+      "villagers": ["armand"],
+      "habits": ["wednesday_archives"],
+      "clip": "carry_one_idle",
+      "wantedClip": "file_papers",
+      "prop": { "model": "archive_box", "mount": "chest" }
+    },
+    {
+      "id": "fishing_line",
+      "label": "Pêcher à la ligne au ponton, au gué ou au bout de la pâture",
+      "villagers": ["achille", "leon"],
+      "habits": ["monday_pontoon", "evening_fish", "summer_fishing"],
+      "points": ["fishing_pontoon", "fishing_ford_north", "pasture_bank"],
+      "clip": "fish_wait",
+      "prop": { "model": "fishing_rod", "mount": "hand" },
+      "face": { "heading": 180 }
+    },
+    {
+      "id": "nour_animals",
+      "label": "Nour examine les bêtes, accroupie",
+      "villagers": ["nour"],
+      "habits": ["duo_visit", "farm", "yard"],
+      "steps": [
+        { "clip": "pet", "seconds": 4.8 },
+        { "clip": "idle", "seconds": 5 }
+      ],
+      "wantedClip": "vet_check"
+    },
+    {
+      "id": "honorine_window_lean",
+      "label": "Honorine regarde la route, accoudée à sa fenêtre",
+      "villagers": ["honorine"],
+      "habits": ["winter", "rain", "birthday"],
+      "points": ["honorine_window"],
+      "clip": "driver_lean",
+      "wantedClip": "lean_windowsill"
+    },
+    {
+      "id": "watch_birds",
+      "label": "Guetter et compter les oiseaux, la tête levée",
+      "villagers": ["jeanne", "leon"],
+      "habits": ["hide", "wednesday_birds"],
+      "steps": [
+        { "clip": "look_up", "seconds": 4.5 },
+        { "clip": "idle", "seconds": 6 }
+      ]
+    },
+    {
+      "id": "ambroise_station_clock",
+      "label": "Ambroise lève les yeux vers l'horloge de la halte, montre en main",
+      "villagers": ["ambroise"],
+      "habits": ["clockcheck", "clocks_together"],
+      "steps": [
+        { "clip": "look_up", "seconds": 3 },
+        { "clip": "idle", "seconds": 9 }
+      ],
+      "wantedClip": "check_watch",
+      "face": { "object": "station" }
+    }
+  ],
+  "reactions": {
+    "maxPerVillagerPerPlayerPerDay": 3,
+    "eveningFrom": "18:00",
+    "nightFrom": "22:00",
+    "seconds": 3,
+    "bubbleRange": 12,
+    "greet": {
+      "distance": 3,
+      "waveFromLevel": 2,
+      "waveDistance": 12,
+      "nameFromLevel": 1,
+      "endearmentFromLevel": 4,
+      "stranger": ["Bonjour !", "Bonjour à toi.", "Belle journée !", "Salut bien."],
+      "strangerEvening": ["Bonsoir !", "Bonne soirée."],
+      "named": ["Bonjour, {player} !", "Tiens, {player} ! Bonjour.", "Salut, {player}."],
+      "namedEvening": ["Bonsoir, {player} !", "Bonne soirée, {player}."],
+      "dear": ["Bonjour, {endearment} !", "Te voilà, {endearment}."],
+      "dearEvening": ["Bonsoir, {endearment}.", "Bonne soirée, {endearment}."]
+    },
+    "weather": {
+      "distance": 3,
+      "rain": [
+        "Quel temps de canard !",
+        "Ça mouille, hein ? Rentre vite te sécher.",
+        "Il en tombe, aujourd'hui. Le potager est content, lui.",
+        "Tu as vu cette pluie ? Même les poules restent dedans."
+      ]
+    },
+    "outfit": {
+      "distance": 4,
+      "fromLevel": 1,
+      "maxPerPlayerPerDay": 3,
+      "texts": [
+        "C'est neuf, ce que tu portes ? Ça te va bien.",
+        "Tiens, une nouvelle tenue. Elle te va bien.",
+        "Jolie pièce, ça. On ne voit que ça aujourd'hui."
+      ],
+      "byVillager": {
+        "solange": ["Je reconnais mon ourlet.", "Ce point-là, c'est le mien. Il tient bien ?"]
+      }
+    },
+    "haircut": {
+      "distance": 4,
+      "fromLevel": 1,
+      "texts": ["Solange est passée par là, ça se voit.", "Nouvelle coupe ? Ça change bien."],
+      "byVillager": {
+        "solange": ["Elle tient bien, ma coupe. Je suis contente."]
+      }
+    },
+    "catch": {
+      "distance": 6,
+      "minutes": 60,
+      "rarities": ["rare", "epic", "legendary", "mythic"],
+      "texts": ["Oh, {item} ! Belle prise.", "Regarde-moi ça, {item} ! Tu vas l'encadrer ?"],
+      "byVillager": {
+        "achille": ["{item} ! Je n'ai rien sorti de tel depuis trois ans."],
+        "leon": ["{item} ! Je t'ai vu faire, je le dirai à toute l'école !"],
+        "firmin": ["{item} ! Ça, je l'écris au registre de la halte."]
+      }
+    },
+    "held": {
+      "distance": 3,
+      "texts": ["Oh, c'est {item} ?", "Mais c'est {item} que tu tiens là ?"]
+    },
+    "night": {
+      "distance": 4,
+      "texts": ["Tu ne dors pas ? Moi non plus.", "Belle nuit, hein ?", "Chut, le bourg dort."]
+    },
+    "birthday": {
+      "distance": 3,
+      "texts": ["C'est mon anniversaire, aujourd'hui.", "Un an de plus ce matin, figure-toi."]
+    },
+    "together": {
+      "distance": 4,
+      "playersDistance": 4,
+      "texts": ["Toujours ensemble, vous deux !", "Vous voilà, vous deux.", "Le duo de la maisonnette !"]
+    },
+    "giftOther": {
+      "distance": 4,
+      "days": 1,
+      "tastes": ["loves", "likes"],
+      "texts": [
+        "Tu as apporté {item} à {name} ? {name} en a parlé toute la matinée.",
+        "Il paraît que tu as offert {item} à {name}. Ça lui a fait plaisir."
+      ],
+      "close": [
+        ["lucie", "jeanne"],
+        ["paulin", "margot"],
+        ["paulin", "leon"],
+        ["margot", "leon"],
+        ["mado", "barnabe"],
+        ["honorine", "marthe"],
+        ["firmin", "basile"],
+        ["firmin", "martial"],
+        ["basile", "martial"],
+        ["odette", "solange"],
+        ["odette", "honorine"],
+        ["lucie", "solange"],
+        ["lucie", "achille"],
+        ["lucie", "nour"],
+        ["nour", "ines"],
+        ["margot", "berthe"],
+        ["margot", "colette"],
+        ["jeanne", "leon"],
+        ["armand", "honorine"],
+        ["basile", "mado"],
+        ["firmin", "lucie"]
+      ]
+    }
+  }
+}

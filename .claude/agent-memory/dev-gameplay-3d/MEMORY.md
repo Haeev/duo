@@ -501,3 +501,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un point d'action à moins de 1,2 m du centre d'une case vole le clic au sol sur cette case (`resolveClick`): le puisage du bief est posé dans le bas de sa case d'eau.
 - Le cordeau est ajouté après la canne dans `createWorld`, pas dans `startingInventory.eachPlayer`: les cases des outils d'avant ne bougent pas.
 - Outil isolé: les gros remplacements passent par `rep.py` du scratchpad (spécification `FILE`, `%%%%`, `@@@@` écrite avec Write); une fusion avec conflit dans un fichier généré (`icones.js`): prendre l'autre côté puis relancer le générateur; vérifier ensuite les marqueurs dans tous les fichiers (`grep -rln '^<<<<<<< '`), la fusion en commit temporaire les garde.
+## Gestes des habitants et réactions (0.13, lot H7, vérifié le 2026-11-04)
+
+- L'état ne porte pas l'habitude d'un habitant (`villagerHabit` des accessoires rend toujours `null`): la retrouver par le planning, première entrée qui tient pour son `target` et son `activity` (`entryHolds` d'`etat/planning.ts`), en cache par minute (`etat/gestes-habitants.ts`). Même résultat chez l'hôte et l'invité.
+- Un point de planning posé sur un banc, une table ou un siège (`grocery_terrace`, `lookout`, `fishing_pontoon`, `riverbank`) assoit l'habitant dans le rendu (`onBench`): un geste debout n'y apparaît jamais. Le vérifier en capture, pas seulement par la sonde de simulation.
+- Outil sans prise de `toolHolds` (substitut): il pend de `socket_hand_r` repère identité, +Y vers le haut à l'arrêt. Un balai se dessine brosse vers -Y, manche au-dessus de la main.
+- `setTool` instancie à chaque changement de nom: ne jamais l'appeler deux fois par image avec deux noms (accessoire puis geste); décider une fois (`villagerAccessories(..., gesture)`).
+- Mémoire de la simulation hors sauvegarde sans toucher `Runtime`: `WeakMap<Runtime, ...>` dans le module (le `Sim` garde le même `runtime` d'un pas à l'autre).
+- Gros plans de la page de rendu: `vue=X+S,Y+T` avec (S, T) = (-0,9, -0,9) en orientation 0 et (+0,9, +0,9) en orientation 2; un habitant dans un intérieur ne se voit qu'avec le joueur local dans le même bâtiment (`c.inside = 'church'`).
+- Fusionner la branche de session avec des changements non commités qui touchent les mêmes fichiers: commit temporaire, `git rebase <branche>`, puis `git reset --soft HEAD~1` (puis `git reset` pour tout désindexer).

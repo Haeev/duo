@@ -11,6 +11,7 @@
 import type { BufferGeometry } from 'three';
 import { ShapeBuilder, type Paint, type Triple } from './geometrie';
 import type { PaletteCell } from './palette';
+import { GESTURE_PROPS } from './substituts-gestes';
 
 export interface SubstituteHints {
   /** Emprise au sol en cases (bâtiments, meubles), si la carte ou les données la donnent. */
@@ -1293,6 +1294,7 @@ const EXACT: Record<string, Builder> = {
   ...ANIMALS,
   ...VILLAGERS,
   ...VILLAGER_PROPS,
+  ...GESTURE_PROPS,
   ...TRAIN,
   ...DECOR,
   // 0.13: la parcelle en herbe piquetée (aussi le dessin de la parcelle de la vitrine d'Odette).
