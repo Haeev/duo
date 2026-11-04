@@ -172,7 +172,8 @@ export function aimPromptModel(world: ReadonlyWorld, ctx: UiContext): AimPromptM
   if (aim?.source !== 'pointer' || aim.verb === null || me?.placement !== null) return null;
   const txt = ctx.texts.extra.aim;
   // L'après-midi, un lit propose la sieste (tour 10, section 3.4).
-  const text = aim.verb === 'sleep' ? sleepVerbText(world, ctx) : txt.verbs[aim.verb];
+  // 0.13: un geste de décor porte son invite (« Allumer un cierge »), écrite dans `vie.json`.
+  const text = aim.verb === 'sleep' ? sleepVerbText(world, ctx) : aim.verb === 'decor' && aim.label !== undefined ? aim.label : txt.verbs[aim.verb];
   if (text === undefined) return null;
   return { key: txt.click, text: ctx.t(text) };
 }

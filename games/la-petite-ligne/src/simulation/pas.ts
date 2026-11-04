@@ -39,6 +39,7 @@ import { forageHints } from './lisiere';
 import { boardHints, updateBoard } from './annonces';
 import { updateGifts } from './catalogue';
 import { plotHints, updatePlotHolds } from './parcelles';
+import { updateDecor } from './decor';
 
 export interface StepInput {
   /** Commandes continues de chaque joueur pour ce pas (absent: rien de tenu). */
@@ -159,6 +160,8 @@ export function step(sim: Sim, input: StepInput): void {
     updateRoomWork(sim, controls, dt);
     updateGoats(sim, controls, dt);
     updatePlotHolds(sim);
+    // 0.13 (lot H7): maintiens, relâchements et séjours des gestes avec le décor (section 7.1).
+    updateDecor(sim, controls);
   }
   for (const c of world.characters) updateInside(sim, c);
   updateFishingWorld(sim);

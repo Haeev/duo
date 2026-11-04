@@ -27,6 +27,7 @@
 import type { MarketLevel } from '../donnees/marche';
 import type { MailKind } from '../donnees/plis';
 import type { Effect, Season, StageId } from '../donnees/types';
+import type { DecorSoundEvent } from '../donnees/vie-gestes';
 import type { BenchSeat } from './bancs';
 import type { PlotRefusal } from './parcelles';
 import type { HabitSource, TasteLevel, VillageWorldFields } from './types-voisins';
@@ -67,6 +68,9 @@ export const CHARACTER_IDS: readonly CharacterId[] = ['p1', 'p2'];
 /** Taille du sac (PE-10) et de la barre d'outils (ses premières cases). */
 /** Pas de simulation par seconde (cadence des ticks: `action.since`, `action.duration`, `pin.until`). */
 export const SIM_HZ = 30;
+/** 0.13 (lot H7): les coups d'outil des postes de métier, noms attendus par le son (`AUDIO_SETTINGS.village.events`). */
+export const WORK_STROKE_EVENTS = ['forge_strike', 'joinery_saw', 'joinery_plane'] as const;
+export type WorkStrokeEvent = (typeof WORK_STROKE_EVENTS)[number];
 export const BAG_SLOTS = 24;
 export const TOOLBAR_SLOTS = 10;
 /** Côté du coin à soi (MA-06 de la démo), en cases. */
@@ -618,7 +622,18 @@ export type ActionKind =
   | 'pickup'
   | 'refill'
   /** Lever la perche et allumer une lanterne (tour 9, `pole_raise`). */
-  | 'light';
+  | 'light'
+  // 0.13 (lot H7, gestes avec le décor, section 7.1): un clip par famille de gestes (`rendu/gestes.ts`).
+  | 'decor_lean'
+  | 'decor_tap'
+  | 'decor_crank'
+  | 'decor_offer'
+  | 'decor_look'
+  | 'decor_reach'
+  | 'decor_pet'
+  | 'decor_wave'
+  | 'decor_drink'
+  | 'decor_sit';
 
 export interface CharacterAction {
   kind: ActionKind;
@@ -677,6 +692,8 @@ export interface AimInfo {
   source?: 'pointer';
   /** Bête visée (poule, poussine, coq, chèvre): l'interface montre son nom et son humeur. */
   animal?: string;
+  /** Geste de décor visé (`verb: 'decor'`, 0.13): l'invite à montrer (« Allumer un cierge »). */
+  label?: string;
 }
 
 export type AimVerb =
@@ -721,7 +738,9 @@ export type AimVerb =
   | 'plant'
   | 'brush'
   | 'milk'
-  | 'goat_hold';
+  | 'goat_hold'
+  /** Geste avec le décor (0.13, section 7.1): le texte de l'invite est `AimInfo.label`. */
+  | 'decor';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -1657,3 +1676,10 @@ export type WorldEvent =
   | { type: 'decision_agreed'; decision: string; option: string }
   /** Décidé ensemble: le tampon tombe, `world.decisions` est écrit. */
   | { type: 'decision_taken'; decision: string; option: string }
+  // 0.13 (lot H7, section 7.1): gestes des joueurs avec le décor. Les noms de `DecorSoundEvent` sont
+  // ceux que le son attend (`AUDIO_SETTINGS.village.events`), avec `by` et `at` (le rebond du galet).
+  | { type: DecorSoundEvent; by: CharacterId; at: Vec2 }
+  /** Un geste de décor sans nom de son propre: le son du catalogue (`sound`) part de `at`. */
+  | { type: 'decor_gesture'; gesture: string; by: CharacterId; at: Vec2; sound: string | null }
+  /** Fait à deux (le même geste dans la fenêtre de la variante): image et son partagés. */
+  | { type: 'decor_together'; gesture: string; by: CharacterId; at: Vec2 }

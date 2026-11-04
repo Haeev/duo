@@ -39,6 +39,7 @@ import {
 } from './maison';
 import { townFrom } from './bourg';
 import { parseVillageLife } from './gestes-0-13';
+import { checkVillageLife, parseVillageLife as parseVillage } from './vie';
 import { parseFishDef, parseFishingRules } from './poissons';
 import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
 import {
@@ -146,6 +147,8 @@ export interface RawContentFiles {
   decisions?: unknown;
   /** 0.13 (lot H7, seconde moitié): gestes des habitants et réactions aux joueurs (`gestes-0-13.json`); absent: rien. */
   gestes013?: unknown;
+  /** 0.13 (lot H7): la vie du village (`vie.json`); absent: ni scène, ni poste, ni chat, ni geste de décor. */
+  vie?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -2838,6 +2841,7 @@ export function loadContent(files: RawContentFiles): Content {
     villageCalendar: parseVillageCalendar(files.calendrier === undefined ? null : root('calendrier.json', files.calendrier), settings, villagers),
     signs: signsOf(villagers),
     decisions: files.decisions === undefined ? NO_DECISIONS : parseDecisions(root('decisions.json', files.decisions), parseEffect),
+    village: parseVillage(files.vie === undefined ? null : root('vie.json', files.vie), (r) => conditions(r, 'game_start')),
     villageLife: parseVillageLife(
       files.gestes013,
       files.habitants013 === undefined ? [files.habitants] : [files.habitants, files.habitants013],
@@ -2848,6 +2852,7 @@ export function loadContent(files: RawContentFiles): Content {
   checkReferences(content);
   checkVillageReferences(content);
   checkDecisionVillagers(content.decisions, content.villagers);
+  checkVillageLife(content.village, content.villagers.map((v) => v.id), null);
   checkTastes(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.

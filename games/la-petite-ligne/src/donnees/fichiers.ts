@@ -9,6 +9,7 @@ import catalogue from '../../donnees/catalogue.json';
 import chantiers from '../../donnees/chantiers.json';
 import courrier from '../../donnees/courrier.json';
 import decisions from '../../donnees/decisions.json';
+import vie from '../../donnees/vie.json';
 import cultures from '../../donnees/cultures.json';
 import envies from '../../donnees/envies.json';
 import habitants from '../../donnees/habitants.json';
@@ -53,6 +54,7 @@ export const CONTENT_FILES: RawContentFiles = {
   vetements,
   calendrier,
   decisions,
+  vie,
   ...(habitants013 === undefined ? {} : { habitants013 }),
   ...(gestures013 === undefined ? {} : { gestes013: gestures013 }),
 };

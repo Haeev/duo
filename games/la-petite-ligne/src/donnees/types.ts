@@ -4,6 +4,7 @@
  */
 import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
 import type { VillageLife } from './gestes-0-13';
+import type { VillageLife as VillageSceneLife } from './vie';
 import type {
   AppearanceSettings,
   BakerySettings,
@@ -1504,4 +1505,6 @@ export interface Content {
   decisions: DecisionsContent;
   /** 0.13 (lot H7, seconde moitié): gestes des habitants avec le décor, réactions aux joueurs (`gestes-0-13.json`). */
   villageLife: VillageLife;
+  /** 0.13 (lot H7): scènes, postes de métier, chat, gestes de décor des joueurs (`vie.json`). */
+  village: VillageSceneLife;
 }

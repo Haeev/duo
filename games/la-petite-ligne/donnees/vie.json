@@ -1,0 +1,386 @@
+{
+  "version": 1,
+  "bubbles": { "seconds": 7, "range": 8 },
+  "scenes": [
+    {
+      "id": "mass", "ref": "S11", "tier": "P0", "from": "10:30", "to": "11:30",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }],
+      "cameFrom": { "points": ["church_nave"], "at": "10:30" },
+      "groups": [
+        { "who": ["martial"], "spots": [{ "x": 101.2, "y": -11.0, "cap": 270 }], "activity": "chat" },
+        {
+          "who": ["honorine", "armand", "berthe", "margot", "marthe", "ambroise", "leon"], "activity": "stand",
+          "spots": [
+            { "x": 97.8, "y": -11.6, "cap": 90 }, { "x": 97.8, "y": -10.5, "cap": 90 },
+            { "x": 96.8, "y": -11.6, "cap": 90 }, { "x": 96.8, "y": -10.5, "cap": 90 },
+            { "x": 95.8, "y": -11.6, "cap": 90 }, { "x": 95.8, "y": -10.5, "cap": 90 },
+            { "x": 94.8, "y": -11.6, "cap": 90 }
+          ]
+        }
+      ],
+      "lines": []
+    },
+    {
+      "id": "mass_exit", "ref": "S11", "tier": "P0", "from": "11:30", "to": "11:50",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }],
+      "cameFrom": { "points": ["church_nave"], "at": "11:29" },
+      "groups": [
+        { "who": ["martial", "honorine", "armand"], "at": { "x": 91.5, "y": -3.0 }, "radius": 0.7 },
+        { "who": ["berthe", "margot", "marthe"], "at": { "x": 99.0, "y": -2.8 }, "radius": 0.7 },
+        { "who": ["ambroise", "leon"], "at": { "x": 103.0, "y": -2.6 }, "radius": 0.55 }
+      ],
+      "lines": [
+        { "by": "martial", "text": "Merci d'être venus, et à dimanche prochain." },
+        { "by": "honorine", "text": "Vous avez prêché court, mon père. On vous en remercie." },
+        { "by": "armand", "text": "Le sermon sur la patience tombait bien, avec ma classe." },
+        { "by": "margot", "text": "Le chant du début était un peu haut pour moi." },
+        { "by": "berthe", "text": "Il manquait une voix grave, comme toujours." },
+        { "by": "marthe", "text": "J'ai sonné juste, cette fois. Vous avez entendu ?" },
+        { "by": "ambroise", "text": "Onze heures trente et deux minutes. Le clocher retarde." },
+        { "by": "leon", "text": "On peut aller jouer, maintenant ?" }
+      ]
+    },
+    {
+      "id": "sunday_cafe", "ref": "S11", "tier": "P0", "from": "11:50", "to": "12:40",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["church_nave"], "at": "11:29" },
+      "groups": [
+        {
+          "who": ["armand", "ambroise", "margot", "berthe"], "seated": true,
+          "spots": [
+            { "x": 87.1, "y": 21.5, "cap": 90 }, { "x": 87.9, "y": 21.5, "cap": 270 },
+            { "x": 89.1, "y": 21.5, "cap": 90 }, { "x": 89.9, "y": 21.5, "cap": 270 }
+          ]
+        }
+      ],
+      "lines": [
+        { "by": "armand", "text": "Un petit café après la messe, c'est presque une prière." },
+        { "by": "ambroise", "text": "Le café de Colette est à l'heure, lui." },
+        { "by": "margot", "text": "Je ne reste pas longtemps, les bêtes attendent." },
+        { "by": "berthe", "text": "Tu dis ça tous les dimanches, Margot." },
+        { "by": "armand", "text": "Qui a vu le chat ce matin ? Il dormait sur le muret." },
+        { "by": "ambroise", "text": "Encore une tasse et je retourne à mes pendules." }
+      ]
+    },
+    {
+      "id": "basket_at_odette", "ref": "S02", "tier": "P0", "from": "09:00", "to": "09:20",
+      "when": [{ "type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] }],
+      "groups": [
+        {
+          "who": ["achille", "odette"],
+          "spots": [{ "x": 31.0, "y": 30.6, "cap": 90 }, { "x": 32.0, "y": 30.6, "cap": 270 }]
+        }
+      ],
+      "lines": [
+        { "by": "achille", "text": "Six miches et une couronne, comme d'habitude." },
+        { "by": "odette", "text": "Tu as encore de la farine sur le nez." },
+        { "by": "achille", "text": "La couronne est pour toi. Ne dis rien." },
+        { "by": "odette", "text": "Elle est encore chaude, celle-là." },
+        { "by": "achille", "text": "Le four a bien tiré, ce matin." },
+        { "by": "odette", "text": "Mets-les sur l'étagère du haut, mon chou." }
+      ]
+    },
+    {
+      "id": "quay_five", "ref": "S03", "tier": "P0", "from": "17:00", "to": "17:20",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] }],
+      "groups": [
+        { "who": ["lucie"], "at": "planning" },
+        { "who": ["firmin"], "spots": [{ "x": 34.3, "y": 19.4, "cap": 290 }] }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Les hameaux ?" },
+        { "by": "lucie", "text": "Toujours là." },
+        { "by": "firmin", "text": "Et toi ?" },
+        { "by": "lucie", "text": "Toujours là aussi." },
+        { "by": "firmin", "text": "Le vent tourne." },
+        { "by": "lucie", "text": "Il tourne tous les soirs, Firmin." }
+      ]
+    },
+    {
+      "id": "bench_handover", "ref": "S04", "tier": "P0", "from": "18:00", "to": "18:06",
+      "when": [{ "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["quay_bell", "rail_cottage_west_window", "train_stop"], "at": "17:59" },
+      "groups": [
+        { "who": ["ambroise"], "at": "planning" },
+        { "who": ["firmin"], "spots": [{ "x": 34.3, "y": 19.4, "cap": 290 }] }
+      ],
+      "lines": [
+        { "by": "ambroise", "text": "Bonsoir." },
+        { "by": "firmin", "text": "Bonsoir. Le journal est d'hier." },
+        { "by": "ambroise", "text": "Celui d'hier me suffit." },
+        { "by": "firmin", "text": "Le banc est à toi, je rentre." }
+      ]
+    },
+    {
+      "id": "manille", "ref": "S05", "tier": "P0", "from": "20:00", "to": "22:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["wednesday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["firmin_house", "sawmill_yard", "presbytery_door", "priest_garden"], "at": "19:59" },
+      "groups": [
+        {
+          "who": ["martial", "firmin", "basile"], "seated": true,
+          "spots": [{ "x": 87.1, "y": 21.5, "cap": 90 }, { "x": 87.9, "y": 21.5, "cap": 270 }, { "x": 89.1, "y": 21.5, "cap": 90 }]
+        }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Atout cœur !" },
+        { "by": "basile", "text": "Firmin, ta manche." },
+        { "by": "martial", "text": "Je ne triche pas, je prie." },
+        { "by": "basile", "text": "Le dix de pique, c'était le mien." },
+        { "by": "firmin", "text": "Encore une, la dernière." },
+        { "by": "martial", "text": "Tu dis ça depuis neuf heures." }
+      ]
+    },
+    {
+      "id": "terrace_lunch", "ref": "S07", "tier": "P0", "from": "12:00", "to": "12:10",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "groups": [
+        {
+          "who": ["nour", "odette"],
+          "spots": [{ "x": 33.0, "y": 30.4, "cap": 90 }, { "x": 34.0, "y": 30.4, "cap": 270 }]
+        }
+      ],
+      "lines": [
+        { "by": "odette", "text": "Hier, tu as encore mangé debout." },
+        { "by": "nour", "text": "Je mange toujours debout." },
+        { "by": "odette", "text": "Assieds-toi dix minutes, les bêtes t'attendront." },
+        { "by": "nour", "text": "La vache des Moreau, elle, n'attend pas." },
+        { "by": "odette", "text": "Prends au moins une pomme pour la route." },
+        { "by": "nour", "text": "Merci, Odette. Demain, je m'assois. Promis." }
+      ]
+    },
+    {
+      "id": "kids_play", "ref": "S08", "tier": "P0", "from": "16:30", "to": "18:00",
+      "when": [{ "type": "school_day" }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "groups": [
+        { "who": ["jeanne", "leon"], "at": { "x": 38.0, "y": 30.6 }, "radius": 0.6, "activity": "play" }
+      ],
+      "lines": [
+        { "by": "jeanne", "text": "Un moineau, deux moineaux, trois !" },
+        { "by": "leon", "text": "Celui-là, c'est une mésange, ça ne compte pas." },
+        { "by": "jeanne", "text": "Le loup, c'est toi. Compte jusqu'à dix !" },
+        { "by": "leon", "text": "Huit, neuf, dix... J'arrive !" },
+        { "by": "jeanne", "text": "Tu as marché sur la ligne de la marelle." },
+        { "by": "leon", "text": "Non, c'est la craie qui a bougé." }
+      ]
+    },
+    {
+      "id": "skittles_sunday", "ref": "S12", "tier": "P0", "from": "15:00", "to": "18:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "groups": [
+        {
+          "who": ["mado", "paulin", "margot", "barnabe"],
+          "spots": [
+            { "x": 86.4, "y": 23.4, "cap": 90 }, { "x": 86.3, "y": 25.0, "cap": 50 },
+            { "x": 87.4, "y": 25.3, "cap": 20 }, { "x": 88.5, "y": 25.3, "cap": 340 }
+          ]
+        },
+        { "who": ["leon"], "spots": [{ "x": 92.6, "y": 24.4, "cap": 290 }], "activity": "play" }
+      ],
+      "lines": [
+        { "by": "mado", "text": "Regardez bien, je vise la reine." },
+        { "by": "margot", "text": "Sept ! Mado mène, encore une fois." },
+        { "by": "paulin", "text": "..." },
+        { "by": "barnabe", "text": "Mado a gagné, Mado a gagné, la la la !" },
+        { "by": "leon", "text": "Je les relève, ne lancez pas tout de suite !" },
+        { "by": "margot", "text": "Paulin, à toi. Et ne lance pas dans le fossé." }
+      ]
+    },
+    {
+      "id": "laundry_gossip", "ref": "S13", "tier": "P0", "from": "09:00", "to": "11:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday"] }],
+      "groups": [
+        {
+          "who": ["margot", "colette"],
+          "spots": [{ "x": 100.9, "y": 34.4, "cap": 150 }, { "x": 102.1, "y": 34.4, "cap": 210 }]
+        }
+      ],
+      "lines": [
+        { "by": "margot", "text": "Ambroise est à la lisière le lundi, il cueille." },
+        { "by": "colette", "text": "Berthe va voir partir le blé de Paulin, le samedi." },
+        { "by": "margot", "text": "Honorine allume son cierge tous les matins à huit heures." },
+        { "by": "colette", "text": "Achille ferme son fournil le lundi, il va pêcher." },
+        { "by": "margot", "text": "L'abbé part en tournée des hameaux à vélo, presque tous les jours." },
+        { "by": "colette", "text": "Mado prend sa sieste à la forge, l'été, après manger." },
+        { "by": "margot", "text": "Lucie trie son courrier sur le banc du quai, avant sept heures et demie." },
+        { "by": "colette", "text": "Inès déjeune sur son banc, devant la maison forestière." }
+      ]
+    },
+    {
+      "id": "choir_rehearsal", "ref": "S14", "tier": "P0", "from": "20:00", "to": "21:30",
+      "when": [{ "type": "weekday_is", "weekdays": ["friday"] }],
+      "cameFrom": { "points": ["church_nave"], "at": "20:00" },
+      "groups": [
+        { "who": ["armand"], "spots": [{ "x": 97.4, "y": -11.0, "cap": 270 }] },
+        {
+          "who": ["honorine", "margot", "barnabe", "marthe"],
+          "spots": [
+            { "x": 95.2, "y": -11.6, "cap": 90 }, { "x": 95.2, "y": -10.5, "cap": 90 },
+            { "x": 94.2, "y": -11.6, "cap": 90 }, { "x": 94.2, "y": -10.5, "cap": 90 }
+          ]
+        }
+      ],
+      "lines": [
+        { "by": "armand", "text": "On reprend au deuxième couplet. Les basses ?" },
+        { "by": "barnabe", "text": "Présent. Enfin, la basse, c'est moi." },
+        { "by": "honorine", "text": "Marthe chante trop fort, comme toujours." },
+        { "by": "marthe", "text": "Honorine traîne sur la fin, comme toujours." },
+        { "by": "margot", "text": "Mesdames, on est à l'église." },
+        { "by": "armand", "text": "Très bien. Encore une fois, plus doux." }
+      ]
+    },
+    {
+      "id": "milking_trio", "ref": "S17", "tier": "P0", "from": "18:00", "to": "19:00",
+      "when": [],
+      "groups": [
+        {
+          "who": ["paulin", "margot", "leon"],
+          "spots": [{ "x": 112.5, "y": 32.6, "cap": 270 }, { "x": 113.5, "y": 33.4, "cap": 250 }, { "x": 112.4, "y": 33.7, "cap": 330 }]
+        }
+      ],
+      "lines": [
+        { "by": "leon", "text": "Aïe ! Marguerite m'a encore donné un coup de queue." },
+        { "by": "margot", "text": "Elle t'aime bien." },
+        { "by": "leon", "text": "Elle a une drôle de façon de le dire." },
+        { "by": "paulin", "text": "Tiens le seau droit, Léon." },
+        { "by": "margot", "text": "Le pot est plein, je monte le lait." },
+        { "by": "leon", "text": "Demain, c'est moi qui trais. D'accord ?" }
+      ]
+    },
+    {
+      "id": "grain_quarrel", "ref": "S19", "tier": "P0", "from": "09:00", "to": "10:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["saturday"] }],
+      "groups": [
+        {
+          "who": ["firmin", "berthe", "paulin"],
+          "spots": [{ "x": 38.5, "y": 16.9, "cap": 180 }, { "x": 37.4, "y": 16.6, "cap": 120 }, { "x": 39.6, "y": 16.6, "cap": 240 }]
+        }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Beau temps pour le blé." },
+        { "by": "berthe", "text": "..." },
+        { "by": "paulin", "text": "Douze sacs, ce samedi." },
+        { "by": "firmin", "text": "Le train sera à l'heure. Presque." },
+        { "by": "berthe", "text": "Ils sont lourds, ces sacs, pour un blé qui part si loin." },
+        { "by": "paulin", "text": "..." }
+      ]
+    },
+    {
+      "id": "evening_windows", "ref": "S20", "tier": "P0", "from": "21:00", "to": "21:30",
+      "when": [{ "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["lucie_house_door", "salon_counter"], "at": "20:59" },
+      "groups": [
+        {
+          "who": ["solange", "lucie"],
+          "spots": [{ "x": 75.0, "y": 28.5, "cap": 90 }, { "x": 78.0, "y": 28.5, "cap": 270 }]
+        }
+      ],
+      "lines": [
+        { "by": "lucie", "text": "Jeanne dort ?" },
+        { "by": "solange", "text": "Comme un loir. Et toi ?" },
+        { "by": "lucie", "text": "Pas encore. J'écoute la rue." },
+        { "by": "solange", "text": "Elle est bien calme, ce soir." },
+        { "by": "lucie", "text": "Bonne nuit, Solange." },
+        { "by": "solange", "text": "Bonne nuit. Ferme bien tes volets." }
+      ]
+    }
+  ],
+  "pauses": [
+    { "id": "angelus_pause", "ref": "S10", "at": ["07:00", "12:00", "19:00"], "minutes": 3, "clip": "look_up" }
+  ],
+  "seating": [
+    {
+      "point": "cafe_terrace", "activities": ["stand"],
+      "seats": [
+        { "x": 87.1, "y": 21.5, "cap": 90 }, { "x": 87.9, "y": 21.5, "cap": 270 },
+        { "x": 89.1, "y": 21.5, "cap": 90 }, { "x": 89.9, "y": 21.5, "cap": 270 }
+      ]
+    }
+  ],
+  "workPosts": [
+    { "point": "forge_yard", "activity": "work", "at": { "x": 105.5, "y": 18.3 }, "cap": 0, "clip": "hammer", "tool": "hammer", "event": "forge_strike", "strokeSeconds": 0.667, "hearRange": 16 },
+    { "point": "forge_inside", "activity": "work", "clip": "hammer", "tool": "hammer", "event": "forge_strike", "strokeSeconds": 0.667, "hearRange": 12 },
+    { "point": "basile_at_workbench", "activity": "work", "at": { "x": 14.6, "y": 8.0 }, "cap": 270, "clip": "saw", "tool": "saw", "event": "joinery_saw", "strokeSeconds": 0.6, "hearRange": 12 },
+    { "point": "mill_yard", "activity": "work", "clip": "hammer", "tool": "hammer" },
+    { "point": "rail_cottage_west_window", "activity": "work", "clip": "hammer_tap" },
+    { "point": "priest_garden", "activity": "work", "clip": "hoe", "tool": "hoe" },
+    { "point": "farm_garden", "activity": "work", "clip": "hoe", "tool": "hoe" },
+    { "point": "field_high_01", "activity": "work", "clip": "hoe", "tool": "hoe" },
+    { "point": "sexton_garden", "activity": "work", "clip": "water", "tool": "watering_can" },
+    { "point": "cemetery_tap", "activity": "work", "clip": "water", "tool": "watering_can" },
+    { "point": "lucie_garden", "activity": "work", "clip": "water", "tool": "watering_can" },
+    { "point": "shared_garden_plot", "activity": "work", "clip": "water", "tool": "watering_can_copper" },
+    { "point": "barn_door", "activity": "work", "clip": "feed" },
+    { "point": "farmyard", "activity": "work", "clip": "feed" },
+    { "point": "vet_yard", "activity": "work", "clip": "feed" },
+    { "point": "chicken_coop", "activity": "work", "clip": "feed" },
+    { "point": "vineyard", "activity": "work", "clip": "harvest" },
+    { "point": "threshing_floor", "activity": "work", "clip": "harvest" },
+    { "point": "mill_sluice", "activity": "work", "clip": "crank_turn" },
+    { "point": "forest_cut", "activity": "work", "clip": "chop", "tool": "felling_axe" },
+    { "point": "charcoal_kiln", "activity": "work", "clip": "chop", "tool": "felling_axe" },
+    { "point": "church_bell_rope", "activity": "work", "clip": "reach_up" },
+    { "point": "church_nave", "activity": "work", "clip": "idle" },
+    { "point": "mill_door", "activity": "work", "clip": "idle" },
+    { "point": "mill_inside", "activity": "work", "clip": "idle" },
+    { "point": "mairie_desk", "activity": "work", "clip": "idle" },
+    { "point": "clearing_center", "activity": "work", "clip": "idle" },
+    { "point": "spring", "activity": "work", "clip": "idle" },
+    { "point": "bakery_back", "activity": "work", "clip": "idle" }
+  ],
+  "cat": {
+    "when": [],
+    "walkSpeed": 0.35,
+    "fleeSpeed": 1.1,
+    "stayMinutes": [25, 60],
+    "rollChance": 0.3,
+    "rollSeconds": 2.667,
+    "flee": { "range": 2.6, "speedAbove": 2.0, "smoothingSeconds": 0.8, "distance": 3.5 },
+    "watchRange": 4,
+    "follow": { "chance": 0.05, "seconds": 20, "distance": 1.2 },
+    "habits": [
+      { "id": "rain_well", "from": "07:00", "to": "19:00", "when": [{ "type": "weather_is", "weather": "rain" }], "pose": "sleep", "spots": [{ "x": 37.6, "y": 28.4 }] },
+      { "id": "odette_arbor", "from": "07:00", "to": "10:00", "pose": "sleep", "spots": [{ "x": 33.2, "y": 30.2 }, { "x": 35.4, "y": 29.6 }] },
+      { "id": "bakery_crumbs", "from": "10:00", "to": "12:00", "pose": "idle", "cap": 0, "spots": [{ "x": 70.6, "y": 21.4 }, { "x": 72.5, "y": 21.3 }] },
+      { "id": "quay_nap", "from": "12:00", "to": "15:00", "pose": "sleep", "spots": [{ "x": 32.1, "y": 19.6 }, { "x": 34.1, "y": 19.8 }] },
+      { "id": "ambroise_window", "from": "15:00", "to": "17:00", "pose": "idle", "cap": 0, "spots": [{ "x": -13.5, "y": 22.4 }, { "x": -12.6, "y": 22.5 }] },
+      { "id": "farmyard_mother", "from": "17:00", "to": "19:00", "pose": "idle", "spots": [{ "x": 116.4, "y": 34.6 }, { "x": 115.6, "y": 33.6 }, { "x": 118.4, "y": 36.5 }] }
+    ]
+  },
+  "gestures": [
+    {"id": "well_peek", "ref": 1, "tier": "P0", "points": ["well", "well_shelter"], "verb": "act", "label": "Se pencher sur le puits", "clip": "pickup", "clipSeconds": 1.0, "event": "well_peek", "cooldownSeconds": 2, "lines": [{"text": "Ton reflet a l'air content.", "when": [{"type": "time_is", "from": "05:00", "to": "21:00"}]}, {"text": "Tout au fond, ton reflet te fait un clin d'œil.", "when": [{"type": "time_is", "from": "05:00", "to": "21:00"}]}, {"text": "L'eau est loin, mais elle brille.", "when": [{"type": "time_is", "from": "05:00", "to": "21:00"}]}, {"text": "Une goutte tombe. Tu l'entends longtemps.", "when": [{"type": "time_is", "from": "05:00", "to": "21:00"}]}, {"text": "La lune est tombée dedans.", "when": [{"type": "any", "conditions": [{"type": "time_is", "from": "21:00", "to": "24:00"}, {"type": "time_is", "from": "00:00", "to": "05:00"}]}]}, {"text": "Le puits garde un morceau de nuit.", "when": [{"type": "any", "conditions": [{"type": "time_is", "from": "21:00", "to": "24:00"}, {"type": "time_is", "from": "00:00", "to": "05:00"}]}]}, {"text": "Il y a des étoiles au fond, ce soir.", "when": [{"type": "any", "conditions": [{"type": "time_is", "from": "21:00", "to": "24:00"}, {"type": "time_is", "from": "00:00", "to": "05:00"}]}]}], "duo": {"windowSeconds": 3, "lines": [{"text": "Deux têtes dans le puits, deux reflets contents."}], "heart": 1, "memory": "Souvenir : « Deux têtes dans le puits »."}},
+    {"id": "well_shout", "ref": 1, "tier": "P0", "points": ["well", "well_shelter"], "verb": "hold", "label": "Crier dans le puits (maintenir)", "clip": "pickup", "clipSeconds": 1.2, "event": "well_shout", "holdSeconds": 0.7, "cooldownSeconds": 10, "lines": [{"text": "hou… ou… ou…"}, {"text": "Ohé… é… é…"}, {"text": "Y a quelqu'un ?… un ?… un ?…"}, {"text": "Bonjour… jour… jour…"}]},
+    {"id": "bell_ring", "ref": 2, "tier": "P0", "points": ["quay_bell"], "verb": "act", "label": "Sonner la cloche du quai", "clip": "reach_up", "clipSeconds": 0.9, "sound": "quay-bell-once", "cooldownSeconds": 20, "lines": [{"text": "Pas de train, pas de cloche !", "near": "firmin"}]},
+    {"id": "station_register", "ref": 3, "tier": "P1", "points": ["station_door"], "verb": "examine", "kind": "pages", "pick": "cycle", "label": "Feuilleter le registre de la halte", "clip": "look_up", "clipSeconds": 1.2, "sound": "journal-open", "lines": [{"text": "Samedi 29 : train à 10 h 02, un voyageur, trois colis (dont celui d'Ambroise). Soleil. F. L."}, {"text": "Samedi 22 : train à 10 h 00, deux voyageurs, des sacs de blé pour la minoterie (Paulin les a comptés deux fois). Nuageux. F. L."}, {"text": "Samedi 15 : train à 10 h 05, personne ne descend, un colis pour Solange (du fil, encore). Pluie. F. L."}, {"text": "Samedi 8 : train à 10 h 01, la fanfare de la coopérative monte avec ses instruments. On les a entendus jusqu'au pont. Soleil. F. L."}]},
+    {"id": "quay_timetable", "ref": 27, "tier": "P1", "points": ["station_door"], "verb": "examine", "kind": "pages", "pick": "week", "label": "Lire l'horaire de la halte", "clip": "look_up", "clipSeconds": 1.0, "sound": "journal-open", "lines": [{"text": "Horaire du samedi : arrivée 10 h. Au crayon, de la main de Firmin : « Samedi : fanfare de la coopérative. »"}, {"text": "Horaire du samedi : arrivée 10 h. Au crayon : « Samedi : les sacs de blé de Paulin partent par ce train. »"}, {"text": "Horaire du samedi : arrivée 10 h. Au crayon : « Samedi : Mado attend ses barres de fer. »"}, {"text": "Horaire du samedi : arrivée 10 h. Au crayon : « Samedi : colis pour Ambroise, fragile. »"}]},
+    {"id": "skim_stone", "ref": 4, "tier": "P0", "points": ["riverbank", "fishing_pontoon", "fishing_ford_south"], "verb": "hold", "kind": "charge", "label": "Lancer un galet (maintenir, puis relâcher)", "clip": "give", "clipSeconds": 0.7, "event": "skim_stone", "chargeIdeal": 0.6, "chargeMax": 1.6, "maxScore": 7, "cooldownSeconds": 0, "lines": [{"text": "{n} ! Le record de la berge.", "tag": "record"}, {"text": "{n} rebonds ! Personne n'a fait mieux ici.", "tag": "record"}]},
+    {"id": "apple_shake", "ref": 5, "tier": "P1", "points": ["orchard", "lucie_garden"], "verb": "act", "label": "Secouer le pommier", "when": [{"type": "season_is", "seasons": ["autumn"]}], "clip": "reach_up", "clipSeconds": 0.9, "sound": "wind-leaves", "perDay": 1, "cooldownSeconds": 5, "lines": [{"text": "Le houppier frémit. Des feuilles tombent, rien d'autre."}, {"text": "Une pluie de feuilles rousses. Les pommes tiennent bon."}, {"text": "Mes pommes sont à qui les ramasse.", "near": "lucie"}]},
+    {"id": "awning_shelter", "ref": 6, "tier": "P1", "points": ["station_door", "bakery_door", "well_shelter", "washhouse", "grocery_terrace", "church_porch"], "verb": "act", "kind": "dwell", "rain": true, "dwellSeconds": 2, "label": "Se mettre à l'abri", "clip": "wave", "clipSeconds": 1.0, "cooldownSeconds": 60, "lines": [{"text": "La pluie tambourine sur l'auvent."}], "duo": {"windowSeconds": 4, "lines": [{"text": "À l'abri, côte à côte, pendant que ça tambourine."}], "heart": 2, "memory": "Souvenir : « À l'abri »."}},
+    {"id": "fence_lean", "ref": 7, "tier": "P1", "points": ["pasture_gate", "level_crossing", "lucie_garden"], "verb": "act", "label": "S'accouder", "clip": "look_up", "clipSeconds": 1.4, "cooldownSeconds": 8, "lines": [{"text": "Les vaches te regardent d'un air entendu."}, {"text": "Le vent passe dans l'herbe. Toi aussi, tu passes."}, {"text": "On voit loin d'ici. Et on s'y voit bien."}, {"text": "Un peu de silence, ça tient chaud."}, {"text": "La barrière est tiède du soleil."}]},
+    {"id": "mairie_poster", "ref": 8, "tier": "P0", "points": ["mairie_poster"], "verb": "examine", "kind": "pages", "pick": "week", "label": "Lire l'affiche de la mairie", "clip": "look_up", "clipSeconds": 1.0, "sound": "journal-open", "lines": [{"text": "Affiche de la semaine : « Battage au hameau le 19. Les bras sont les bienvenus. » A. M."}, {"text": "Affiche de la semaine : « Chorale : on cherche des basses. Répétition le vendredi, 20 h. » A. M."}, {"text": "Affiche de la semaine : « Objet trouvé : une clé de pendule. S'adresser à la mairie. » A. M."}, {"text": "Affiche de la semaine : « Le marché du dimanche se tient place du Puits, de 10 h à 13 h. » A. M."}, {"text": "Affiche de la semaine : « Rappel : les chiens se tiennent en laisse près de la pâture. » A. M."}, {"text": "Affiche de la semaine : « La coopérative cherche des bras pour la mise en sacs. » A. M."}, {"text": "Affiche de la semaine : « Concours de soupe : inscriptions au café. » A. M."}, {"text": "Affiche de la semaine : « Fermeture de la mairie jeudi : Armand taille ses rosiers. » A. M."}]},
+    {"id": "dandelion_blow", "ref": 9, "tier": "P1", "points": ["pasture_bank", "meadow_glow", "field_high_01", "riverbank"], "verb": "act", "label": "Souffler sur un pissenlit", "when": [{"type": "season_is", "seasons": ["spring", "summer"]}], "clip": "pickup", "clipSeconds": 0.9, "sound": "wind-leaves", "perDay": 1, "cooldownSeconds": 3, "lines": [{"text": "Les aigrettes s'envolent, toutes ensemble."}], "duo": {"windowSeconds": 2, "lines": [{"text": "Deux vœux d'un coup."}], "heart": 1, "memory": "Souvenir : « Deux vœux d'un coup »."}},
+    {"id": "church_candle", "ref": 10, "tier": "P0", "points": ["church_candles"], "verb": "act", "label": "Allumer un cierge", "clip": "give", "clipSeconds": 1.0, "sound": "lantern-light", "perDay": 1, "setFlag": "decor:candle:{by}", "flagDays": 1, "lines": [{"text": "Tu l'as allumé pour qui ?", "near": "honorine"}, {"text": "Une petite flamme. Elle tiendra jusqu'au soir."}, {"text": "Le cierge crépite, puis se calme."}], "duo": {"windowSeconds": 5, "lines": [{"text": "Deux flammes côte à côte."}], "heart": 1}},
+    {"id": "harmonium_note", "ref": 11, "tier": "P1", "points": ["church_harmonium"], "verb": "act", "label": "Jouer une note à l'harmonium", "when": [{"type": "not", "condition": {"type": "all", "conditions": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "time_is", "from": "10:00", "to": "12:00"}]}}, {"type": "not", "condition": {"type": "all", "conditions": [{"type": "weekday_is", "weekdays": ["friday"]}, {"type": "time_is", "from": "19:30", "to": "22:00"}]}}], "clip": "hammer_tap", "clipSeconds": 0.6, "event": "harmonium_note", "cooldownSeconds": 1, "lines": [{"text": "Pas trop fort, ils dorment.", "near": "marthe"}], "duo": {"windowSeconds": 1.5, "lines": [{"text": "Un accord tout doux, à deux mains."}], "heart": 1, "event": "harmonium_chord"}},
+    {"id": "bell_rope_pull", "ref": 12, "tier": "P1", "points": ["church_bell_rope"], "verb": "hold", "label": "Tirer la corde des cloches (maintenir)", "when": [{"type": "not", "condition": {"type": "any", "conditions": [{"type": "time_is", "from": "06:30", "to": "07:30"}, {"type": "time_is", "from": "11:30", "to": "12:30"}, {"type": "time_is", "from": "18:30", "to": "19:30"}]}}], "clip": "crank_turn", "clipSeconds": 1.6, "event": "bell_rope_pull", "holdSeconds": 1.0, "then": {"event": "bells_rung", "seconds": 1.2}, "perDay": 1, "cooldownSeconds": 60, "lines": [{"text": "La corde est lourde et chaude. Là-haut, les cloches partent."}]},
+    {"id": "grave_flower_lacombe", "ref": 13, "tier": "P1", "points": ["grave_lacombe"], "verb": "act", "label": "Poser une fleur sur la tombe des Lacombe", "heldItems": ["flower_pot", "dandelion"], "clip": "pickup", "clipSeconds": 1.2, "sound": "pick-herb", "onceFlag": "decor:flower:lacombe", "flagDays": 3, "bond": {"villager": "firmin", "amount": 10}, "cooldownSeconds": 5, "lines": [{"text": "Une fleur de plus, trois jours durant."}, {"text": "Le silence est doux, ici."}, {"text": "Tu as mis une fleur pour les Lacombe ? Mes parents auraient aimé ça.", "near": "firmin"}]},
+    {"id": "grave_flower_cornu", "ref": 13, "tier": "P1", "points": ["grave_cornu"], "verb": "act", "label": "Poser une fleur sur la tombe d'Hortense", "heldItems": ["flower_pot", "dandelion"], "clip": "pickup", "clipSeconds": 1.2, "sound": "pick-herb", "onceFlag": "decor:flower:cornu", "flagDays": 3, "bond": {"villager": "basile", "amount": 10}, "cooldownSeconds": 5, "lines": [{"text": "Une fleur de plus, trois jours durant."}, {"text": "Le silence est doux, ici."}, {"text": "Tu as mis une fleur pour Hortense ? Elle chantait faux, mais elle aimait les fleurs.", "near": "basile"}]},
+    {"id": "grave_flower_ferrand", "ref": 13, "tier": "P1", "points": ["grave_ferrand"], "verb": "act", "label": "Poser une fleur sur la tombe des Ferrand", "heldItems": ["flower_pot", "dandelion"], "clip": "pickup", "clipSeconds": 1.2, "sound": "pick-herb", "onceFlag": "decor:flower:ferrand", "flagDays": 3, "bond": {"villager": "odette", "amount": 10}, "cooldownSeconds": 5, "lines": [{"text": "Une fleur de plus, trois jours durant."}, {"text": "Le silence est doux, ici."}, {"text": "Une fleur chez les Ferrand ? Merci, chez nous on y pense toujours trop tard.", "near": "odette"}]},
+    {"id": "grave_flower_merigot", "ref": 13, "tier": "P1", "points": ["grave_merigot"], "verb": "act", "label": "Poser une fleur sur la tombe d'Eugénie", "heldItems": ["flower_pot", "dandelion"], "clip": "pickup", "clipSeconds": 1.2, "sound": "pick-herb", "onceFlag": "decor:flower:merigot", "flagDays": 3, "bond": {"villager": "solange", "amount": 10}, "cooldownSeconds": 5, "lines": [{"text": "Une fleur de plus, trois jours durant."}, {"text": "Le silence est doux, ici."}, {"text": "Une fleur pour Eugénie ? Elle les aimait en bouquet serré.", "near": "solange"}]},
+    {"id": "grave_flower_valade", "ref": 13, "tier": "P1", "points": ["grave_valade"], "verb": "act", "label": "Poser une fleur sur la tombe d'Octave", "heldItems": ["flower_pot", "dandelion"], "clip": "pickup", "clipSeconds": 1.2, "sound": "pick-herb", "onceFlag": "decor:flower:valade", "flagDays": 3, "bond": {"villager": "honorine", "amount": 10}, "cooldownSeconds": 5, "lines": [{"text": "Une fleur de plus, trois jours durant."}, {"text": "Le silence est doux, ici."}, {"text": "Tu as pensé à Octave. Il aimait qu'on pense à lui.", "near": "honorine"}]},
+    {"id": "washhouse_scrub", "ref": 14, "tier": "P0", "points": ["washhouse"], "verb": "hold", "label": "Battre le linge (maintenir)", "clip": "hammer_tap", "clipSeconds": 0.6, "event": "washhouse_scrub", "holdSeconds": 0.4, "repeatSeconds": 0.9, "lineEvery": 4, "cooldownSeconds": 0, "lines": [{"text": "Ta chemise sent l'Aubrune."}, {"text": "Plus on frotte, plus l'eau est grise."}, {"text": "Le battoir chante sur la pierre."}, {"text": "Le linge claque, les bras chauffent."}, {"text": "L'eau est froide, le soleil se rattrape."}, {"text": "Ça fait du bien aux bras, ce genre d'ouvrage."}]},
+    {"id": "pump_handle", "ref": 15, "tier": "P1", "points": ["shared_garden_pump"], "verb": "hold", "label": "Pomper (maintenir)", "clip": "crank_turn", "clipSeconds": 0.8, "sound": "water-fill", "holdSeconds": 0.3, "repeatSeconds": 0.9, "fillCan": true, "lineEvery": 3, "lines": [{"text": "La pompe grince, puis crache un beau jet."}, {"text": "Ça grince, ça gargouille, ça coule."}]},
+    {"id": "millwheel_watch", "ref": 16, "tier": "P1", "points": ["mill_race_bank"], "verb": "act", "kind": "dwell", "dwellSeconds": 10, "when": [{"type": "flag", "flag": "mill_running"}], "label": "S'asseoir et regarder la roue", "clip": "sit_ground", "clipSeconds": 1.0, "rest": 5, "perDay": 1, "cooldownSeconds": 30, "lines": [{"text": "Le bruit de l'eau, c'est la berceuse de Berthe."}, {"text": "La roue tourne, et le temps avec elle, sans bruit."}, {"text": "Tu comptes les palettes. Tu perds le compte, tant mieux."}, {"text": "L'eau passe, la roue repasse."}]},
+    {"id": "cafe_coffee", "ref": 17, "tier": "P0", "points": ["cafe_counter"], "verb": "act", "label": "Prendre un café (2 aubrins)", "villagerPresent": "colette", "cost": 2, "rest": 10, "perDay": 2, "effectsEvery": true, "clip": "drink", "clipSeconds": 1.6, "sound": "cup-sip", "cooldownSeconds": 4, "lines": [{"text": "Un café noir et chaud, servi sans un mot de trop."}, {"text": "Colette pose la tasse : « Attention, ça fume. »"}, {"text": "Le café te réveille jusqu'aux orteils."}], "duo": {"windowSeconds": 3, "lines": [{"text": "Deux cafés, deux cuillères."}], "heart": 5}},
+    {"id": "skittles_throw", "ref": 18, "tier": "P1", "points": ["skittles_alley"], "verb": "hold", "kind": "charge", "when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "time_is", "from": "15:00", "to": "18:00"}], "label": "Lancer la boule (maintenir, puis relâcher)", "clip": "give", "clipSeconds": 0.8, "sound": "hammer-tap", "chargeIdeal": 0.7, "chargeMax": 1.8, "maxScore": 9, "showScore": true, "cooldownSeconds": 0, "lines": [{"text": "Pas mal, pour une première partie.", "near": "mado", "tag": "score"}]},
+    {"id": "lookout_shout", "ref": 19, "tier": "P1", "points": ["lookout"], "verb": "act", "label": "Crier vers la vallée", "clip": "wave", "clipSeconds": 1.2, "event": "lookout_shout", "cooldownSeconds": 60, "lines": [{"text": "Ohé, la vallée !"}, {"text": "Ho hooo… et la vallée te répond."}]},
+    {"id": "oak_knock", "ref": 20, "tier": "P1", "points": ["old_oak"], "verb": "act", "label": "Frapper le Vieux Chêne", "clip": "hammer_tap", "clipSeconds": 0.8, "sound": "axe-thud-soft", "cooldownSeconds": 300, "lines": [{"text": "Toc, toc. Un pic répond, plus haut."}, {"text": "Le chêne est plus vieux que le village. Il ne dit rien."}]},
+    {"id": "spring_drink", "ref": 21, "tier": "P1", "points": ["spring"], "verb": "act", "label": "Boire à la source", "clip": "drink", "clipSeconds": 1.6, "sound": "water-pour-copper", "rest": 5, "cooldownSeconds": 6, "lines": [{"text": "L'eau a le goût de la pierre."}, {"text": "Si froide qu'elle fait mal aux dents, si bonne qu'on recommence."}, {"text": "La source chante petit."}, {"text": "Une gorgée de montagne, sans la montagne."}]},
+    {"id": "bench_carve", "ref": 22, "tier": "P1", "spots": [{"x": 7.0, "y": -24.9}], "reach": 1.4, "verb": "hold", "kind": "together", "holdSeconds": 1.0, "label": "Graver les initiales dans le banc (maintenir, à deux)", "clip": "hammer_tap", "clipSeconds": 1.0, "sound": "hammer-tap", "setFlag": "decor:carved", "onceFlag": "decor:carved", "heart": 3, "cooldownSeconds": 3, "lines": [{"text": "Vos initiales sont gravées dans le banc, pour toujours.", "tag": "win"}, {"text": "Il faut être deux pour graver : l'autre doit appuyer aussi.", "tag": "wait"}], "duo": {"windowSeconds": 5, "lines": [], "heart": 0, "memory": "Souvenir : « Nos initiales au belvédère »."}},
+    {"id": "leaf_pile", "ref": 23, "tier": "P1", "points": ["leaf_pile_square", "leaf_pile_edge"], "verb": "act", "label": "Sauter dans les feuilles", "when": [{"type": "season_is", "seasons": ["autumn"]}], "clip": "wave", "clipSeconds": 1.0, "sound": "wind-leaves", "cooldownSeconds": 30, "lines": [{"text": "Les feuilles volent dans tous les sens !"}, {"text": "Crac, crac, tout est doré."}, {"text": "Il y en avait plus que tu ne croyais."}]},
+    {"id": "puddle_jump", "ref": 24, "tier": "P1", "points": ["puddle_01", "puddle_02", "puddle_03", "puddle_04", "puddle_05"], "verb": "act", "label": "Sauter dans la flaque", "rain": true, "clip": "wave", "clipSeconds": 0.8, "sound": "fishing-splash", "cooldownSeconds": 10, "lines": [{"text": "Plouf ! Tes chaussures s'en souviendront."}, {"text": "Éclaboussure : toute la rue en a eu un peu."}, {"text": "Jeanne rit aux éclats.", "near": "jeanne"}]},
+    {"id": "weathervane", "ref": 25, "tier": "P1", "points": ["weathervane"], "verb": "examine", "kind": "forecast", "label": "Regarder la girouette", "clip": "look_up", "clipSeconds": 1.4, "lines": [{"text": "Le coq regarde l'est : il fera beau demain.", "tag": "sunny"}, {"text": "Le coq tourne en rond : le ciel sera gris demain.", "tag": "cloudy"}, {"text": "Le coq regarde l'ouest : il pleuvra demain.", "tag": "rain"}, {"text": "Le coq n'a pas bougé.", "tag": "again"}]},
+    {"id": "hay_nap", "ref": 26, "tier": "P1", "points": ["barn_door"], "verb": "act", "kind": "dwell", "dwellSeconds": 4, "label": "S'allonger dans le foin", "clip": "sit_ground", "clipSeconds": 1.0, "rest": 10, "perDay": 1, "cooldownSeconds": 30, "lines": [{"text": "Pas dans ma paille propre !", "near": "paulin"}, {"text": "Le foin sent l'été, même en novembre."}, {"text": "Une odeur de sec et de soleil. Tu fermes un œil."}], "duo": {"windowSeconds": 20, "lines": [{"text": "Côte à côte dans le foin."}], "heart": 2, "memory": "Souvenir : « Une sieste dans le foin »."}},
+    {"id": "stepping_stones", "ref": 28, "tier": "P1", "points": ["ru_stepping_stones"], "verb": "act", "kind": "rhythm", "rhythmSteps": 3, "rhythmSeconds": 1.6, "label": "Sauter de pierre en pierre", "clip": "wave", "clipSeconds": 0.6, "sound": "footbridge-steps", "cooldownSeconds": 0, "lines": [{"text": "Plouf. Juste un pied.", "tag": "fail"}, {"text": "Trois pierres, trois sauts, les pieds secs !", "tag": "win"}]},
+    {"id": "postcard_rack", "ref": 29, "tier": "P1", "points": ["postcard_rack"], "verb": "examine", "kind": "pages", "pick": "cycle", "label": "Faire tourner les cartes postales", "clip": "look_up", "clipSeconds": 1.0, "sound": "chair-creak", "lines": [{"text": "Carte postale : la vallée vue du belvédère, le matin."}, {"text": "Carte postale : le pont sur la rivière, avec le train au loin."}, {"text": "Carte postale : le Vieux Chêne, la clairière en automne."}, {"text": "Carte postale : la halte, vue du quai."}, {"text": "Carte postale : le lavoir, les draps aux fenêtres."}, {"text": "Carte postale : l'église Saint-Aubin, le jour de la fête."}, {"text": "Carte postale : le moulin de la Vanne, la roue en marche."}, {"text": "Carte postale : la source du ru, sous les fougères."}, {"text": "Carte postale : la pâture et ses vaches, en été."}, {"text": "Carte postale : la place du Puits, le dimanche de marché."}, {"text": "Carte postale : la gare à venir, dessinée à la main."}, {"text": "Carte postale : la route des hameaux au crépuscule."}]},
+    {"id": "mill_sluice", "ref": 31, "tier": "P1", "points": ["mill_sluice"], "verb": "act", "kind": "together", "label": "Lever la vanne du bief (à deux)", "clip": "crank_turn", "clipSeconds": 1.4, "event": "sluice_opened", "heart": 2, "cooldownSeconds": 20, "reach": 2.0, "lines": [{"text": "La vanne cède, l'eau file vers la roue.", "tag": "win"}, {"text": "La vanne est lourde : l'autre doit tirer en même temps.", "tag": "wait"}], "duo": {"windowSeconds": 5, "lines": [], "heart": 0}}
+  ]
+}
