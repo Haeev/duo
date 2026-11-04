@@ -122,7 +122,10 @@ export const RENDER_SETTINGS = {
       // champignon du rail (0,38 m: voie posée à 0,06 m, `rail_top` de 0,32 m). Les personnages y
       // marchent à cette hauteur; la rampe de terre (`crossing.rampLength`) rattrape la route.
       wood: 0.365,
-      floor: 0.12,
+      // Cases `s` (sol de bâtiment): entre les dalles des modèles (0,08 de la chambre, 0,10 de la
+      // salle à manger de la pension et de la mercerie, 0,11 du cellier, 0,12 des pièces), à 1 cm
+      // au moins de chacune. À 0,12, case et dalle se battaient à chaque image (retour R02).
+      floor: 0.09,
       water: -0.42,
       rail: 0.06,
       // Pavés et terre battue de la place au ras des chemins (tour 8): une bordure droite de
@@ -130,6 +133,34 @@ export const RENDER_SETTINGS = {
       stone: 0,
     },
     waterSurface: -0.16,
+    /**
+     * Ordre fixe des couches de sol (retour R02, 2026-11-03: sols qui scintillent). Deux surfaces
+     * qui peuvent se recouvrir ne sont jamais à moins de `minGap` m l'une de l'autre: le tampon de
+     * profondeur les départage à toutes les distances de caméra (vue orthographique, de 1 à 220 m;
+     * même avec un tampon de 16 bits, 3,4 mm le long du regard), sans `polygonOffset` à régler par
+     * matériau. Contrôle: `src/rendu/couches-sol.test.ts`. Le terrain ne dessine pas son dessus sous
+     * un sol posé (quai, ponton, pont de la rue): leur modèle couvre l'emprise, pied des rampes à 0.
+     * De bas en haut:
+     * - 0: herbe, chemins, terre, pavés, terre battue, grève (un seul maillage, une case un sol);
+     * - 0,02 à 0,03: cours et tabliers des modèles (cour de l'école, pont de la rue);
+     * - 0,08: dalle de la chambre (modèle);
+     * - `heights.floor` (0,09): cases de bâtiment;
+     * - 0,10 à 0,12: dalles des bâtiments (modèles), seuils des portes;
+     * - `roomFloors`: planchers des pièces où l'on entre, où se posent pieds, meubles et tapis
+     *   (tapis: 6 mm et plus au-dessus du plancher, dans le modèle).
+     */
+    minGap: 0.004,
+    /**
+     * Plancher de chaque pièce visitable (m, lu dans les nœuds `*_floor` des modèles par le test):
+     * personnages et meubles s'y posent, pas sur la case de bâtiment dessous.
+     */
+    roomFloors: {
+      house_main: 0.14,
+      house_cellar: 0.12,
+      house_bedroom: 0.12,
+      grocery_shop: 0.122,
+      salon_room: 0.12,
+    } as Readonly<Record<string, number>>,
     /**
      * Platelage des traversées (revue du directeur artistique, tour 5): lames
      * dans le sens des rails, posées sur les traverses, sur toute la largeur de
@@ -810,14 +841,17 @@ export const RENDER_SETTINGS = {
   },
 
   train: {
-    /** Distance parcourue pendant l'entrée et le départ (m). */
+    /** Distance parcourue au moins pendant l'entrée et le départ (m). */
     slideDistance: 70,
     /**
-     * Côté de la voie par où le train arrive et repart: -1 l'ouest (la carte:
-     * « le train arrive et repart par là »), comme `departureDirection` du son
-     * (`src/audio/reglages.ts`).
+     * Sens de marche du train le long de la voie (retour R06, 2026-11-03): -1 vers l'ouest. Il arrive
+     * par l'est, s'arrête au quai, puis continue tout droit vers l'ouest et sort par là (passage à
+     * niveau, salut du mécanicien), locomotive en tête, sans repartir à reculons. Même sens que
+     * `departureDirection` du son (`src/audio/reglages.ts`).
      */
-    sideDirection: -1 as -1 | 1,
+    travel: -1 as -1 | 1,
+    /** Hors de la carte au début de l'arrivée et à la fin du départ: le train est à autant du bord (m). */
+    offMapClearance: 19,
     wheelRadius: 0.42,
     /** Voie: rangée de la carte et décalage des voitures depuis `train_stop`. */
     carSpacing: 0.25,
@@ -1014,6 +1048,14 @@ export const RENDER_SETTINGS = {
     plankHeight: 0.03,
     plankWidth: 0.26,
     turntableSegments: 28,
+    /**
+     * Où posent les pieds sur la voie (retour R05, 2026-11-03): sur les traverses, pas sur le sol
+     * de la case (0,06 m), 22 cm plus bas, où rails et traverses coupaient les jambes. Repère du
+     * module `rail_straight` (lu dans le GLB par `voie.test.ts`): dessus des traverses `sleeperTop`
+     * jusqu'à `sleeperHalf` m de l'axe, puis le talus du ballast jusqu'au sol de la case à
+     * `shoulderHalf` m.
+     */
+    walk: { sleeperTop: 0.22, sleeperHalf: 0.84, shoulderHalf: 1.0 },
   },
   /** Passage d'une prise à l'autre (demi-vie, s), le temps du fondu des clips. */
   toolHoldBlendHalfLife: 0.06,
@@ -1098,6 +1140,13 @@ export const RENDER_SETTINGS = {
    * Un seul retour par séance: s'il faut se replier de nouveau, c'est définitif.
    */
   autoLight: {
+    /**
+     * Les ombres ne partent que sous ce rythme (ms par image: 25, soit 40 images par seconde), tenu
+     * `slowSeconds` au dernier palier utile (retour R13, 2026-11-03). À 18 ms, le PC de la cliente,
+     * fluide à 45-55 images par seconde, perdait ses ombres pour de bon au bout de 25 s: ses paliers
+     * de résolution ne changent rien en 1366x768 (plancher de netteté), le repli venait tout de suite.
+     */
+    cutFrameMs: 25,
     /** Au dernier palier, durée de lenteur continue avant le repli (s). */
     slowSeconds: 8,
     /**

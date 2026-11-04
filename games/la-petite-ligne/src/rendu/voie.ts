@@ -30,7 +30,7 @@ const RAIL_MODEL = 'rail_straight';
 const RAIL_MODULE_LENGTH = 4;
 const DEFAULT_RAIL_TOP = 0.32;
 const RAIL_CAPACITY = 64;
-/** Voitures du train, de l'arrière (ouest) à la locomotive (est), avec leur longueur par défaut (m). */
+/** Voitures du train, de la queue à la locomotive (en tête, dans le sens de marche), avec leur longueur par défaut (m). */
 const CARS = [
   { model: 'van', length: 7 },
   { model: 'coach', length: 9 },
@@ -54,13 +54,6 @@ const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DIAL = 12;
 const MINUTES_PER_DIAL = 720;
 
-/**
- * Décalage du train le long de la voie (m) depuis son arrêt au quai, selon la
- * phase et `progress` de la simulation: à l'arrivée `progress` va de 0 à 1
- * (le train ralentit jusqu'au quai), au départ il va de 1 à 0 (le train
- * accélère en s'éloignant du même côté, sans saut). `NaN` quand il est parti.
- */
-/** Les lisses barrent la route pendant que le train roule (arrivée et départ), pas à quai ni absent. */
 /** Rangées de la ligne (plus de la moitié de la largeur en voie) et axe de la voie (y, m). */
 export function mainLine(map: GameMap): { rows: Set<number>; trackY: number } {
   const railRows: number[] = [];
@@ -137,20 +130,55 @@ export function gateAngleStep(
   return angle + (target - angle) * smoothFactor(dt, reducedMotion ? 0 : GATE_HALF_LIFE);
 }
 
-export function trainOffset(phase: TrainPhase, progress: number): number {
+/** Distances de glissement (m): d'où le train arrive, jusqu'où il repart (retour R06). */
+export interface TrainSlides {
+  arrival: number;
+  departure: number;
+}
+
+/**
+ * Glissements qui font entrer et sortir le train de la carte entière (retour R06, 2026-11-03): il
+ * arrive par un bout et repart par l'autre, dans son sens de marche (`TRAIN.travel`), sans demi-tour.
+ * `rear` et `front`: bouts du train (m le long de la voie depuis son arrêt, `rear` < `front` dans le
+ * sens de marche). Au début de l'arrivée, sa tête est à `offMapClearance` m au-delà du bord amont;
+ * à la fin du départ, sa queue est à autant au-delà du bord aval. Jamais moins que `slideDistance`.
+ */
+export function trainSlides(stopX: number, rear: number, front: number, mapWidth: number): TrainSlides {
+  const travel = TRAIN.travel;
+  const clearance = TRAIN.offMapClearance;
+  // Bord amont: celui d'où l'on vient (ouest si l'on roule vers l'est, `travel` 1).
+  const upstreamEdge = travel > 0 ? -clearance : mapWidth + clearance;
+  const downstreamEdge = travel > 0 ? mapWidth + clearance : -clearance;
+  const frontX = stopX + travel * front;
+  const rearX = stopX + travel * rear;
+  return {
+    arrival: Math.max(TRAIN.slideDistance, Math.abs(frontX - upstreamEdge)),
+    departure: Math.max(TRAIN.slideDistance, Math.abs(downstreamEdge - rearX)),
+  };
+}
+
+/**
+ * Décalage du train le long de la voie (m, en x) depuis son arrêt au quai, selon la phase et
+ * `progress` de la simulation: à l'arrivée `progress` va de 0 à 1 (le train vient de l'amont et
+ * ralentit jusqu'au quai), au départ il va de 1 à 0 (le train accélère et continue vers l'aval, sans
+ * saut). `NaN` quand il est parti.
+ */
+export function trainOffset(phase: TrainPhase, progress: number, slides: TrainSlides = DEFAULT_SLIDES): number {
   const p = Math.min(1, Math.max(0, progress));
-  const away = TRAIN.slideDistance * TRAIN.sideDirection;
+  const travel = TRAIN.travel;
   switch (phase) {
     case 'away':
       return Number.NaN;
     case 'arriving':
-      return away * (1 - easeOut(p));
+      return -travel * slides.arrival * (1 - easeOut(p));
     case 'stopped':
       return 0;
     case 'departing':
-      return away * easeIn(1 - p);
+      return travel * slides.departure * easeIn(1 - p);
   }
 }
+
+const DEFAULT_SLIDES: TrainSlides = { arrival: TRAIN.slideDistance, departure: TRAIN.slideDistance };
 
 function easeOut(t: number): number {
   return 1 - (1 - t) * (1 - t) * (1 - t);
@@ -193,6 +221,7 @@ export class RailwayPart implements EventfulPart {
   private readonly cars: Object3D[] = [];
   private readonly trackY: number;
   private readonly stopX: number;
+  private slides: TrainSlides = DEFAULT_SLIDES;
   private readonly railTop: number;
   private readonly gates: { arm: Object3D | null; angle: number }[] = [];
   private shed: {
@@ -253,13 +282,17 @@ export class RailwayPart implements EventfulPart {
     this.train.name = 'train';
     let x = 0;
     const clips = library.animations(TRAIN_FILE);
+    const travel = TRAIN.travel;
     for (const car of CARS) {
       const name = library.resolve(car.model);
       const declared = library.extras(name).length_over_buffers;
       const length = typeof declared === 'number' ? declared : car.length;
-      // Les voitures de l'artiste sont dans l'axe X (avant vers +X): la voie va d'ouest en est.
+      // Les voitures de l'artiste sont dans l'axe X (avant vers +X). On les range de la queue à la
+      // tête dans le sens de marche; la locomotive regarde où elle va (demi-tour du modèle vers
+      // l'ouest). Voiture et fourgon gardent leur sens: portes et marchepieds des deux côtés.
       const object = library.instantiate(name);
-      object.position.set(x + length / 2, 0, 0);
+      object.position.set(travel * (x + length / 2), 0, 0);
+      if (car.model === 'locomotive' && travel < 0) object.rotation.y = Math.PI;
       applyShadows(object);
       this.train.add(object);
       this.cars.push(object);
@@ -281,6 +314,10 @@ export class RailwayPart implements EventfulPart {
     for (const car of this.cars) {
       car.position.x -= coachOffset;
     }
+    // Bouts du train dans le sens de marche (m depuis l'arrêt): la queue à 0 avant le recalage.
+    const trainLength = x - TRAIN.carSpacing;
+    const rear = -travel * coachOffset;
+    this.slides = trainSlides(this.stopX, rear, rear + trainLength, map.width);
     this.train.visible = false;
     this.group.add(this.train);
 
@@ -498,7 +535,7 @@ export class RailwayPart implements EventfulPart {
   update(context: FrameContext): void {
     const state = context.world.train;
     const progress = state.prevProgress + (state.progress - state.prevProgress) * context.alpha;
-    let offset = trainOffset(state.phase, progress);
+    let offset = trainOffset(state.phase, progress, this.slides);
     if (state.phase === 'departing' && state.slow === true && this.salute !== null) {
       // Départ au pas: la cabine suit la piste du mécanicien, le train suit la cabine.
       const seconds = this.salute.def.climax.seconds;

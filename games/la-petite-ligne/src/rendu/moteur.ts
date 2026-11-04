@@ -41,7 +41,15 @@ import { ShadowCasterCulling } from './ombre-tri';
 import { InteriorsPart, readInteriorHooks } from './interieurs';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { PerfMonitor } from './perf';
-import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
+import {
+  AdaptiveQuality,
+  renderPixelSize,
+  shadowCutLog,
+  usefulResolutionSteps,
+  type DisplaySurface,
+  type GraphicsInfo,
+  type QualityChange,
+} from './qualite';
 import { RENDER_SETTINGS, type CharacterStyle } from './reglages';
 import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
@@ -180,7 +188,12 @@ export class RenderEngine implements Renderer {
     this.container = options.container;
     this.reducedMotion = options.reducedMotion;
     this.light = options.quality === 'light';
-    this.quality = this.light || options.adaptive === false ? null : new AdaptiveQuality();
+    this.quality =
+      this.light || options.adaptive === false
+        ? null
+        : new AdaptiveQuality(RENDER_SETTINGS, () =>
+            usefulResolutionSteps(this.surface(), RENDER_SETTINGS.dynamicResolution.steps),
+          );
     this.log = options.log;
     this.fishingSource = options.fishing ?? createStateFishingSource();
     this.catSource = options.cat ?? NO_CAT;
@@ -255,19 +268,35 @@ export class RenderEngine implements Renderer {
    * netteté, pixels physiques exacts à pleine résolution. Le tampon est donné
    * en pixels (rapport 1 pour Three.js), le CSS l'étend au conteneur.
    */
+  /** La surface d'affichage du moment (conteneur, mise à l'échelle, pixels physiques). */
+  private surface(): DisplaySurface {
+    return {
+      cssWidth: Math.max(1, this.container.clientWidth),
+      cssHeight: Math.max(1, this.container.clientHeight),
+      devicePixelRatio: window.devicePixelRatio || 1,
+      devicePixels: this.devicePixels,
+    };
+  }
+
+  /** Carte graphique et navigateur, pour le journal (le nom réel quand le navigateur le donne). */
+  private graphicsInfo(): GraphicsInfo {
+    let name = '';
+    try {
+      const gl = this.renderer.getContext();
+      const debug = gl.getExtension('WEBGL_debug_renderer_info');
+      const value: unknown = gl.getParameter(debug === null ? gl.RENDERER : debug.UNMASKED_RENDERER_WEBGL);
+      name = typeof value === 'string' ? value : '';
+    } catch {
+      // Contexte perdu ou extension refusée: le journal dira « inconnue ».
+    }
+    return { userAgent: navigator.userAgent, renderer: name };
+  }
+
   private resize(): void {
-    const width = Math.max(1, this.container.clientWidth);
-    const height = Math.max(1, this.container.clientHeight);
-    const size = renderPixelSize(
-      {
-        cssWidth: width,
-        cssHeight: height,
-        devicePixelRatio: window.devicePixelRatio || 1,
-        devicePixels: this.devicePixels,
-      },
-      this.resolutionScale(),
-      this.light,
-    );
+    const surface = this.surface();
+    const width = surface.cssWidth;
+    const height = surface.cssHeight;
+    const size = renderPixelSize(surface, this.resolutionScale(), this.light);
     this.effectiveRatio = size.ratio;
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(size.width, size.height, false);
@@ -380,6 +409,8 @@ export class RenderEngine implements Renderer {
     this.scene.add(interiors.group);
     world.add(interiors);
     characters.setInteriorProbe(() => interiors.localInside());
+    // R14: la charge portée à deux se pose dans les mains des porteurs (personnages mis à jour avant).
+    farm.setCarryProbe((holders, out) => characters.carrierHands(holders, out));
     world.add(garden);
     world.add(farm);
     // 0.12: coq, poussines, chèvres, piquets et cordes, litière, herbe rase.
@@ -512,6 +543,18 @@ export class RenderEngine implements Renderer {
     this.missing = library.missingModels();
     await this.warmUp();
     this.loaded = true;
+    // Retour R13: de quoi comprendre au journal ce que voit chaque machine (ombres, écran, carte).
+    const surface = this.surface();
+    const graphics = this.graphicsInfo();
+    this.log?.info('rendu: qualité de départ', {
+      ombres: this.renderer.shadowMap.enabled,
+      adaptative: this.quality !== null,
+      paliersUtiles: this.quality === null ? 0 : usefulResolutionSteps(surface, RENDER_SETTINGS.dynamicResolution.steps),
+      ecranCss: `${String(surface.cssWidth)}x${String(surface.cssHeight)}`,
+      echelle: surface.devicePixelRatio,
+      carteGraphique: graphics.renderer === '' ? 'inconnue' : graphics.renderer,
+      navigateur: graphics.userAgent,
+    });
     onProgress(1);
   }
 
@@ -571,6 +614,8 @@ export class RenderEngine implements Renderer {
       this.rig.update(dt, this.rig.focus.x, this.rig.focus.z, 0, 0, null);
     }
     this.focus.copy(this.rig.focus);
+    // Planchers des pièces bâties (chambre, cellier): les pieds et les meubles s'y posent (R02).
+    this.terrain?.syncRooms(world.rooms);
     this.applySeason(world);
     this.daylight.setMorningMist(
       mistAmount(this.view.content.settings, world.morningMist, world.clock.minutes),
@@ -847,17 +892,21 @@ export class RenderEngine implements Renderer {
     if (change.kind === 'step') {
       return;
     }
-    this.log?.info(
-      change.kind === 'light'
-        ? 'rendu: mode léger automatique'
-        : 'rendu: retour à la qualité normale',
-      {
-        final: change.kind === 'light' && change.final,
-        averageFrameMs: Math.round(this.quality?.averageFrameMs() ?? 0),
-        refreshMs: Math.round(this.quality?.refreshMs() ?? 0),
-        pixelRatio: this.effectiveRatio,
-      },
-    );
+    const reason = this.quality?.lastReason() ?? null;
+    if (change.kind === 'light' && reason !== null) {
+      // Retour R13: la raison exacte dans le journal de Duo, pour la lire depuis le PC.
+      const buffer = this.renderer.getDrawingBufferSize(this.bufferSize);
+      this.log?.info(
+        'rendu: ombres coupées (mode léger automatique)',
+        shadowCutLog(reason, this.surface(), { width: buffer.x, height: buffer.y }, this.graphicsInfo(), change.final),
+      );
+      return;
+    }
+    this.log?.info('rendu: retour à la qualité normale, ombres rendues', {
+      averageFrameMs: Math.round(this.quality?.averageFrameMs() ?? 0),
+      refreshMs: Math.round(this.quality?.refreshMs() ?? 0),
+      pixelRatio: this.effectiveRatio,
+    });
   }
 
   /** Repli automatique imposé (page de démonstration, `adaptatif=1&repli=1`). */

@@ -16,6 +16,7 @@ import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacedDe
 import type { ItemDef } from '../donnees/types';
 import type { WindowDef, WindowSide } from '../donnees/maison';
 import { activeHouseRooms, curtainsAt, houseRoomAt, windowsNow } from '../etat/maison';
+import { wallPlacement } from '../etat/murs';
 import { addHeart } from './besoins';
 import { removalOverflows, storeAtHome } from './rangement';
 import { TOOLBAR_SLOTS } from './constantes';
@@ -93,6 +94,7 @@ function problemKey(sim: Sim, problem: PlacementProblem): string {
 export type PlacementProblem =
   | 'outside'
   | 'wall'
+  | 'wall_opening'
   | 'back_wall'
   | 'not_yours'
   | 'overlap'
@@ -105,6 +107,7 @@ export type PlacementProblem =
 const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   outside: 'placement_outside',
   wall: 'placement_wall',
+  wall_opening: 'placement_wall_opening',
   back_wall: 'placement_back_wall',
   not_yours: 'placement_not_yours',
   overlap: 'placement_overlap',
@@ -143,10 +146,11 @@ export function placementProblem(
   // L'étagère haute du cellier: seulement à l'une de ses deux places (section 5.2).
   if (sim.content.settings.storage !== null && item === RACK_ITEM && !onShelfPlace(home, cells)) return 'rack_place';
   if (def.wall) {
-    const onEdge = cells.some(
-      (k) => k.cx === room.x || k.cy === room.y || k.cx === room.x + room.w - 1 || k.cy === room.y + room.h - 1,
-    );
-    if (!onEdge) return 'wall';
+    // Objet mural (R15, R17): une place sur le mur, pas une case du sol. Refusé par une fenêtre, une
+    // porte, un autre objet mural ou un meuble haut à cet endroit du mur; le mobilier bas ne compte pas.
+    const placed = wallPlacement(sim.content, sim.map, sim.world, item, cell, rotation, ignore);
+    if (typeof placed === 'string') return placed;
+    return cornerOwnerOf(sim, cells, by) !== null ? 'not_yours' : null;
   }
   if (def.backToWall && !backAgainstWall(room, cells, rotation)) return 'back_wall';
   if (cornerOwnerOf(sim, cells, by) !== null) return 'not_yours';
@@ -154,14 +158,15 @@ export function placementProblem(
     if (f.id === ignore) continue;
     const other = sim.content.items[f.item];
     if (other?.footprint === null || other === undefined) continue;
-    // Un tapis va sous les autres meubles; deux tapis ne se chevauchent pas.
-    if (other.floor !== def.floor) continue;
+    // Un tapis va sous les autres meubles; deux tapis ne se chevauchent pas. Un objet mural est au
+    // mur, pas au sol (R17): il ne prend la case de personne.
+    if (other.floor !== def.floor || other.wall) continue;
     const taken = footprintCells(other.footprint, f.cell, f.rotation);
     if (taken.some((t) => cells.some((k) => k.cx === t.cx && k.cy === t.cy))) return 'overlap';
   }
-  // Ce qui barre le passage (ni tapis, ni lit, ni objet mural) ne touche aucun corps et ne coupe
+  // Ce qui barre le passage (ni tapis, ni lit; un objet mural est déjà validé) ne touche aucun corps et ne coupe
   // aucune case de la pièce de sa porte (R01: les deux personnages étaient restés enfermés).
-  if (!def.floor && !def.wall && def.bed === null) {
+  if (!def.floor && def.bed === null) {
     for (const ch of sim.world.characters) {
       if (cells.some((k) => touchesCell(ch.pos, k))) return 'occupied';
     }
@@ -181,16 +186,28 @@ export function updatePlacement(sim: Sim, c: Character): void {
     }
     return;
   }
-  const on = def.small ? surfaceAim(sim, c) : null;
-  if (on !== null) {
-    const host = sim.world.furniture.find((f) => f.id === on.furniture);
+  // Petit objet visé sur un meuble porteur (R11): il va dessus, ou l'aperçu reste rouge sur le
+  // meuble (plein, coin de l'autre); jamais au sol au pied du meuble, où la table le cachait.
+  const aimed = def.small ? surfaceHostAimed(sim, c) : null;
+  if (aimed !== null) {
+    const place = surfaceUsable(sim, c, aimed) ? nearestFreePlace(sim, aimed, c.pos) : null;
+    const on = { furniture: aimed.id, place: place ?? 0 };
+    const valid = place !== null;
+    const problem: PlacementProblem = surfaceUsable(sim, c, aimed) ? 'overlap' : 'not_yours';
+    const blocked = valid ? null : message(sim, problemKey(sim, problem), { partner: partnerName(sim, c.id) });
     const before = c.placement;
-    if (host !== undefined && (before?.on?.furniture !== on.furniture || before.on.place !== on.place || before.item !== item)) {
-      c.placement = { item, cell: { cx: host.cell.cx, cy: host.cell.cy }, rotation: host.rotation, valid: true, blocked: null, small: true, on };
+    if (
+      before?.on?.furniture !== on.furniture ||
+      before.on.place !== on.place ||
+      before.item !== item ||
+      before.valid !== valid ||
+      before.blocked !== blocked
+    ) {
+      c.placement = { item, cell: { cx: aimed.cell.cx, cy: aimed.cell.cy }, rotation: aimed.rotation, valid, blocked, small: true, on };
       sim.runtime.changed = true;
       if (before === null) queueHint(sim, c.id, { on: 'holding_furniture' });
     }
-    if (host !== undefined) return;
+    return;
   }
   let rotation = c.placement?.item === item && c.placement.on === undefined ? c.placement.rotation : 0;
   const size = rotatedSize(def.footprint, rotation);
@@ -359,30 +376,31 @@ function nearestFreePlace(sim: Sim, f: PlacedFurniture, from: Vec2): number | nu
 }
 
 /**
- * Le meuble porteur visé pour un petit objet en main: celui que survole la souris, sinon celui qui
- * couvre la case devant soi; et sa place libre la plus proche de soi. `null`: on pose au sol.
+ * Le meuble porteur (table, coffre) que vise un petit objet en main, utilisable ou non: celui que
+ * survole la souris (ou celui sous le point du sol survolé), sinon celui de la case devant soi.
+ * `null`: rien de porteur n'est visé, on pose au sol.
  */
-export function surfaceAim(sim: Sim, c: Character): { furniture: string; place: number } | null {
+export function surfaceHostAimed(sim: Sim, c: Character): PlacedFurniture | null {
   if (!isHome(c)) return null;
   const pointer = sim.runtime.pointer[c.id];
-  let host: PlacedFurniture | undefined;
+  const carrying = (f: PlacedFurniture): boolean => {
+    const def = sim.content.items[f.item];
+    return def !== undefined && def.footprint !== null && def.surface.length > 0 && f.window === undefined;
+  };
+  const covering = (cx: number, cy: number): PlacedFurniture | null =>
+    sim.world.furniture.find((f) => {
+      const footprint = sim.content.items[f.item]?.footprint ?? null;
+      return carrying(f) && footprint !== null && footprintCells(footprint, f.cell, f.rotation).some((k) => k.cx === cx && k.cy === cy);
+    }) ?? null;
   if (pointer?.kind === 'furniture') {
     // Survoler un petit objet déjà posé vise son meuble.
     const id = sim.world.decor.find((d) => d.id === pointer.furniture)?.on ?? pointer.furniture;
-    host = sim.world.furniture.find((f) => f.id === id);
+    const host = sim.world.furniture.find((f) => f.id === id);
+    return host !== undefined && carrying(host) ? host : null;
   }
-  else if (pointer?.kind === 'ground') host = undefined;
-  else {
-    const front = { cx: Math.floor(c.pos.x + Math.cos(c.facing)), cy: Math.floor(c.pos.y + Math.sin(c.facing)) };
-    host = sim.world.furniture.find((f) => {
-      const def = sim.content.items[f.item];
-      return def !== undefined && def.footprint !== null && def.surface.length > 0 && footprintCells(def.footprint, f.cell, f.rotation).some((k) => k.cx === front.cx && k.cy === front.cy);
-    });
-  }
-  // Comme au sol, la souris vise dans toute la pièce; le clavier, le meuble juste devant soi.
-  if (host === undefined || !surfaceUsable(sim, c, host)) return null;
-  const place = nearestFreePlace(sim, host, c.pos);
-  return place === null ? null : { furniture: host.id, place };
+  // La souris sur le sol, sous le plateau d'une table: c'est la table qu'on vise.
+  if (pointer?.kind === 'ground') return covering(Math.floor(pointer.x), Math.floor(pointer.y));
+  return covering(Math.floor(c.pos.x + Math.cos(c.facing)), Math.floor(c.pos.y + Math.sin(c.facing)));
 }
 
 /** Pose le petit objet tenu sur le meuble porteur, à la place visée. */

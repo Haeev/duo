@@ -20,7 +20,7 @@ import { type Sim, format, notifyKey, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
-import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
+import { type PlayerInfo, fillTour10Fields, moveToolRack } from '../simulation/monde';
 import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenagement';
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
 import { buildingAt, offstagePoint } from '../etat/carte';
@@ -34,6 +34,7 @@ import { startQuest } from '../simulation/quetes';
 import { emptyBoard } from '../simulation/annonces';
 import { emptyImprovements } from '../simulation/chantiers';
 import { freeStuck } from '../simulation/deblocage';
+import { settleRegrownTrees } from '../simulation/lisiere';
 import { migrateToWardrobe, settleWardrobe, wardrobeShapeOk } from './garde-robe';
 import { emptyBreeding } from '../etat/elevage';
 import { storeAtHome } from '../simulation/rangement';
@@ -833,9 +834,12 @@ function resume(
   if (dataSchema < 7) migrateToTour10(sim);
   // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
   settleDecor(sim);
+  moveToolRack(world);
   // Format 12 (0.12, élevage): un sac de grain au cellier, pour les jours où le grain compte.
   const grain = content.settings.hens.care?.grain.item;
   if (dataSchema < 12 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
+  // R19 (0.12.2): une souche que la règle de repousse rend déjà adulte se relève à la reprise.
+  settleRegrownTrees(sim);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état

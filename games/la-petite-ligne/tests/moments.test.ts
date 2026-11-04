@@ -16,7 +16,7 @@ import { isBlockedCell } from '../src/simulation/grille';
 import { morning } from '../src/simulation/horloge';
 import { drawToday, morningMoments, newToday, unitDraw } from '../src/simulation/moments';
 import { step } from '../src/simulation/pas';
-import { contentAndMap, createRobot, demoLastDay, newSim, play } from './aides';
+import { contentAndMap, createRobot, demoLastDay, newSim, parkBasile, play } from './aides';
 
 const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
 const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
@@ -342,6 +342,9 @@ describe('moments: l’échelle de Basile (geste « tenir », M-09)', () => {
     sim.world.quests.push({ id: 'basile_lost', status: 'active', step: 1, checklist: [], baselines: captureBaselines(sim, help.conditions), startedDay: 1 });
     const today = setMoment(sim, 'ladder', 'quest', 13 * 60);
     sim.world.clock.running = false;
+    // R20 (0.12.2): Basile ne grimpe qu'arrêté au pied de son échelle. Le toit posé (le jour 1, il
+    // attend sinon à la poutre), son emploi du temps de la quête l'y met; placé là d'emblée.
+    parkBasile(sim);
     return { sim, today };
   }
 

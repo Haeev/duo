@@ -1455,7 +1455,7 @@ export type WorldEvent =
   | { type: 'market_buyer_arrived'; villager: string }
   | { type: 'market_sale'; by: CharacterId; villager: string; items: { item: ItemId; count: number }[]; amount: number }
   | { type: 'market_refused'; by: CharacterId; villager: string }
-  | { type: 'market_closed' }
+  | { type: 'market_closed'; returned: number }
   /** 0.12, plis de Lucie: la sacoche est posée, un pli livré, Firmin reprend le reste à 18 h. */
   | { type: 'mail_ready'; count: number }
   | { type: 'mail_delivered'; by: CharacterId; villager: string; amount: number }

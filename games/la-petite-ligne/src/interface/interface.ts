@@ -11,6 +11,7 @@ import '@fontsource-variable/nunito-sans/wght.css';
 import '../../ui-maquettes/jeton.css';
 import '../../ui-maquettes/composants.css';
 import './interface.css';
+import './vitrine.css';
 import spriteIcones from '../../ui-maquettes/icones.svg?raw';
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld, WorldEvent } from '../etat/types';
@@ -43,6 +44,8 @@ import { loadUiTexts } from './textes';
 const SPRITE_ID = 'lpl-icones';
 /** Taille de départ de l'aperçu 3D des vêtements (points CSS), ajustée ensuite à sa place. */
 const PREVIEW_SIZE = { width: 240, height: 300 };
+/** Aperçu 3D du salon (0.12.2): la tête et le buste comptent, le panneau tient sans défiler à 1366x768. */
+const SALON_PREVIEW_SIZE = { width: 220, height: 260 };
 const ACTIVATION = new Set(['Enter', 'NumpadEnter', 'Space']);
 /** Touches de la caméra laissées au jeu pendant un dialogue ou un panneau (sauf le carnet, où A et E changent d'onglet). */
 const CAMERA_KEYS = new Set(['KeyQ', 'KeyE', 'KeyR', 'KeyF']);
@@ -455,6 +458,11 @@ class GameUi implements GameInterface, UiHost {
       },
       propose: (look) => { this.send({ type: 'hair_offer', ...look }); },
       answer: (accept) => { this.send({ type: 'hair_offer_answer', accept }); },
+      createPreview: () => {
+        // Aperçu 3D seulement: en mode secours (`null`), le salon garde un petit portrait.
+        const preview = this.outfitPreview === null ? null : createPanelPreview(this.outfitPreview, this.ctx.content.clothes, SALON_PREVIEW_SIZE);
+        return preview?.is3d === true ? preview : null;
+      },
     };
   }
 

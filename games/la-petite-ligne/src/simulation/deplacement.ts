@@ -398,6 +398,31 @@ function gripOffset(sim: Sim, beam: Beam, c: Character, blockers: Blockers): Vec
   return bodyCollides(blockers, beam.pos.x + x, beam.pos.y + y) ? here : { x, y };
 }
 
+/**
+ * Charge courte (colis, caisse, panière; retour R14): les deux porteurs se placent face à face de
+ * part et d'autre de son centre, à `carry.grip.apart` m l'un de l'autre, sur la ligne qui les
+ * joignait. Le rendu pose la charge entre leurs mains. Sans la place (mur, meuble), chacun garde la sienne.
+ */
+function holdFacing(sim: Sim, beam: Beam, a: Character, b: Character, blockers: Blockers): void {
+  const half = sim.content.settings.carry.grip.apart / 2;
+  let ux = b.pos.x - a.pos.x;
+  let uy = b.pos.y - a.pos.y;
+  const length = Math.hypot(ux, uy);
+  if (length < 1e-6) {
+    ux = Math.cos(beam.facing);
+    uy = Math.sin(beam.facing);
+  } else {
+    ux /= length;
+    uy /= length;
+  }
+  const offA = { x: -ux * half, y: -uy * half };
+  const offB = { x: ux * half, y: uy * half };
+  if (bodyCollides(blockers, beam.pos.x + offA.x, beam.pos.y + offA.y)) return;
+  if (bodyCollides(blockers, beam.pos.x + offB.x, beam.pos.y + offB.y)) return;
+  sim.runtime.beamOffsets[a.id] = offA;
+  sim.runtime.beamOffsets[b.id] = offB;
+}
+
 /** Vecteur d'entrée (borné à 1). */
 function inputOf(frame: ControlFrame | undefined): Vec2 {
   if (frame === undefined) return { x: 0, y: 0 };
@@ -450,8 +475,9 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
   if (!beam.carried) {
     beam.carried = true;
     const lifting = refreshBlockers(sim);
+    for (const c of holders) sim.runtime.beamOffsets[c.id] = gripOffset(sim, beam, c, lifting);
+    if (beamHalfLength(sim, beam) <= 0 && beam.purpose !== 'handcar') holdFacing(sim, beam, a, b, lifting);
     for (const c of holders) {
-      sim.runtime.beamOffsets[c.id] = gripOffset(sim, beam, c, lifting);
       c.pos.x = beam.pos.x + sim.runtime.beamOffsets[c.id].x;
       c.pos.y = beam.pos.y + sim.runtime.beamOffsets[c.id].y;
       c.status = 'gesture';

@@ -61,3 +61,19 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - Un détecteur de débordement par rapport à la fenêtre ne voit pas les collisions entre régions du HUD (barre d'aménagement sur le portrait et les boutons de caméra): tester aussi l'intersection des rectangles des régions ancrées, à 100, 125, 150 % et à 1280x720 avec `deviceScaleFactor: 1.5`.
 - Plus d'une douzaine de contextes à la suite dans le même navigateur Playwright a fini en « Target page, context or browser has been closed »: découper les balayages en lots.
 - Audit sonore d'une interface: comparer chaque interaction de l'interface du jeu aux sons 01 à 04 de `docs/plateforme/identite-sonore.md` (focus, validation, retour, erreur), et vérifier qu'un refus ne joue pas le son d'une bonne nouvelle (`say()` crée une notification `message`).
+
+## Interface imagée de La Petite Ligne (0.12.2)
+
+- Composants communs: `src/interface/vitrine.ts` (`Vitrine`: grille paginée et détail, focus = sélection, Entrée ou second clic agit; `pastille`, `gauge`, `need`, `iconRow`, `flyCoin`) et `vitrine.css`. Règles: `docs/jeux/jeu-1/interface-imagee-0-12-2.md`. Les cartes plus riches (recettes, bêtes) prennent la page à la vitrine puis remplacent les vignettes de sa grille.
+- Pages et onglets partagent A et E: la vitrine tourne d'abord ses pages (`turn()` faux au bout), puis le panneau passe à l'onglet voisin. Mettre la page dans la signature de `renderBody`, et `data-autofocus` sur la vignette choisie: c'est `renderBody` qui remet le focus après le changement de page.
+- Une étiquette au survol en position absolue sous une vignette ne fait pas défiler si elle reste dans le rembourrage du corps (1 rem); vérifié par le capteur `ui-maquettes/outils/capturer-0-12-2.cjs`, qui ignore les textes à `opacity: 0` et à points de suspension.
+- Scénarios de démonstration qui partent de la référence d'été du format 13 (poules, poissons au carnet): `src/interface/demo/scenarios-0-12-2.ts`; `rendu=leger` pour l'aperçu 3D du personnage (salon, mercerie), 4 s d'attente de plus.
+- Garde de l'arbre isolé: une commande `cd ... && python3 - <<EOF` est refusée; écrire le script dans le bloc-notes avec Write, puis `python3 chemin`.
+- `@typescript-eslint/no-unnecessary-condition` ne suit pas une variable booléenne modifiée dans une fermeture: utiliser un objet (`{ taken: false }`).
+- Chromium aligne aussi les blocs (`justify-items` en flux normal): une vignette `.lpl-tile` passée en `display: block` garde le `place-items: center` hérité et rétrécit son contenu au centre. Remettre `place-items: normal` (cartes de quêtes).
+- Grille `auto auto 1fr` avec des lignes en `overflow: hidden` et points de suspension: les rangées `auto` tombent à 0 face au `1fr` et les textes se chevauchent. Utiliser `max-content`.
+- Le port 5231 peut être pris par le Vite d'un autre arbre (autre code servi!): lancer le sien sur un autre port et le passer en `[base]` au capteur.
+- Le capteur réécrit toutes les captures « après » quand on ne filtre pas: restaurer celles des autres écrans (`git checkout -- <fichiers>`, arguments littéraux: la garde refuse `xargs git`).
+- `souvenirs-ecran.test.ts` (scénario `souvenirs-plusieurs`) attend que E passe d'onglet en onglet depuis les Quêtes: un onglet ne doit pas avoir de pages dans ce cas. D'où, aux quêtes, « en cours » et « terminées » séparées.
+- `secret-ecran.test.ts` veut lire la fiche du secret chez l'informé à l'ouverture du carnet: au détail d'une vitrine, la quête au secret « mine » doit être choisie d'emblée.
+- Sac et rangement: Vitrine ne gère ni case vide ni glisser-déposer; le sac garde ses cases à lui avec les classes `.lpl-tile`, le rangement assemble trois `Vitrine` sans détail (`noDetail`) et un détail commun mis à jour sur `focusin`.

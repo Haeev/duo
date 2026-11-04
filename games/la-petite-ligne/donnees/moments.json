@@ -210,7 +210,7 @@
       },
       "leave": null,
       "sounds": { "idle": [] },
-      "texts": { "hint": null, "climax": "moment_ladder_climax", "memory": "moment_ladder_memory", "vignette": "moment_ladder_vignette" },
+      "texts": { "hint": null, "climax": "moment_ladder_climax", "memory": "moment_ladder_memory", "vignette": "moment_ladder_vignette", "missed": "moment_ladder_missed" },
       "vignette": "memory-ladder",
       "hintFrom": null,
       "reward": { "heart": 10 }
@@ -655,7 +655,7 @@
       "watch": {"still": false, "facing": false, "seated": false, "bench": null, "hold": ["gate_north_crank", "gate_south_crank"], "target": "anchor", "radius": 4, "minRadius": 0, "holdSeconds": 1, "arm": {"seconds": 2.5, "climaxAt": "16:00", "liftAt": 18, "cells": {"x": 17, "y": 12, "w": 3, "h": 3}, "pushToward": [18.5, 16.5]}},
       "questWatch": null,
       "actors": [{"id": "driver", "model": "rail_crew_driver", "count": 1, "at": "train_stop", "facing": 3.1416, "idle": "driver_lean", "idleExtra": null, "collisionRadius": 0, "shy": null, "z": 1.6}, {"id": "stoker", "model": "rail_crew_stoker", "count": 1, "at": "train_stop", "facing": 3.1416, "idle": "driver_lean", "idleExtra": null, "collisionRadius": 0, "shy": null, "z": 1.6}],
-      "climax": {"seconds": 20.0, "keyframes": {"driver": [[0.0, 44.5, 14.2, 1.6, "train_depart"], [2.0, 43.5, 14.2, 1.6, null], [4.0, 40.5, 14.2, 1.6, null], [6.0, 35.5, 14.2, 1.6, null], [8.0, 29.5, 14.2, 1.6, null], [9.5, 25.0, 14.2, 1.6, "driver_wave"], [10.0, 24.2, 14.2, 1.6, null], [11.0, 21.6, 14.2, 1.6, null], [12.5, 19.0, 14.2, 1.6, null], [14.0, 16.6, 14.2, 1.6, "driver_lean"], [15.5, 13.6, 14.2, 1.6, null], [17.0, 9.0, 14.2, 1.6, null], [18.5, 2.0, 14.2, 1.6, null], [20.0, -8.0, 14.2, 1.6, null]], "stoker": [[0.0, 44.5, 12.2, 1.6, "train_depart"], [2.0, 43.5, 12.2, 1.6, null], [4.0, 40.5, 12.2, 1.6, null], [6.0, 35.5, 12.2, 1.6, null], [8.0, 29.5, 12.2, 1.6, null], [9.5, 25.0, 12.2, 1.6, "driver_wave"], [10.0, 24.2, 12.2, 1.6, null], [11.0, 21.6, 12.2, 1.6, null], [12.5, 19.0, 12.2, 1.6, null], [14.0, 16.6, 12.2, 1.6, "driver_lean"], [15.5, 13.6, 12.2, 1.6, null], [17.0, 9.0, 12.2, 1.6, null], [18.5, 2.0, 12.2, 1.6, null], [20.0, -8.0, 12.2, 1.6, null]]}, "sounds": [[8.0, "train_slow_roll"], [10.0, "train_whistle_salute"], [11.0, "cylinder_cocks"]], "lookers": []},
+      "climax": {"seconds": 20.0, "keyframes": {"driver": [[0.0, 32.5, 14.2, 1.6, "train_depart"], [2.0, 32.1, 14.2, 1.6, null], [4.0, 31.0, 14.2, 1.6, null], [6.0, 29.0, 14.2, 1.6, null], [8.0, 26.7, 14.2, 1.6, null], [9.5, 25.0, 14.2, 1.6, "driver_wave"], [10.0, 24.2, 14.2, 1.6, null], [11.0, 21.6, 14.2, 1.6, null], [12.5, 19.0, 14.2, 1.6, null], [14.0, 16.6, 14.2, 1.6, "driver_lean"], [15.5, 13.6, 14.2, 1.6, null], [17.0, 9.0, 14.2, 1.6, null], [18.5, 2.0, 14.2, 1.6, null], [20.0, -8.0, 14.2, 1.6, null]], "stoker": [[0.0, 32.5, 12.2, 1.6, "train_depart"], [2.0, 32.1, 12.2, 1.6, null], [4.0, 31.0, 12.2, 1.6, null], [6.0, 29.0, 12.2, 1.6, null], [8.0, 26.7, 12.2, 1.6, null], [9.5, 25.0, 12.2, 1.6, "driver_wave"], [10.0, 24.2, 12.2, 1.6, null], [11.0, 21.6, 12.2, 1.6, null], [12.5, 19.0, 12.2, 1.6, null], [14.0, 16.6, 12.2, 1.6, "driver_lean"], [15.5, 13.6, 12.2, 1.6, null], [17.0, 9.0, 12.2, 1.6, null], [18.5, 2.0, 12.2, 1.6, null], [20.0, -8.0, 12.2, 1.6, null]]}, "sounds": [[8.0, "train_slow_roll"], [10.0, "train_whistle_salute"], [11.0, "cylinder_cocks"]], "lookers": []},
       "after": {"actors": {"driver": {"at": null, "idle": null}, "stoker": {"at": null, "idle": null}}},
       "leave": null,
       "sounds": {"idle": []},
@@ -663,7 +663,7 @@
       "vignette": "memory-train-salute",
       "hintFrom": "firmin",
       "reward": {"heart": 10},
-      "render": {"trainOffsetFromCab": -44.5, "gatesDownSeconds": 2.5, "gatesUpAt": 18, "waveBackAt": 9.5, "waveBackSeconds": 2, "steamAt": [11.0, 13.5]}
+      "render": {"trainOffsetFromCab": -32.5, "gatesDownSeconds": 2.5, "gatesUpAt": 18, "waveBackAt": 9.5, "waveBackSeconds": 2, "steamAt": [11.0, 13.5]}
     },
     {
       "id": "barn_owl",

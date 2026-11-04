@@ -598,3 +598,4 @@ Voir la section 2.8; commande: `python3 -I docs/jeux/jeu-1/simulations/v0_12_eco
 | Version | Date | Changement |
 |---|---|---|
 | 1 | 2026-11-03 | première version (game-designer) |
+| 2 | 2026-11-03 | 0.12.2: prix de vente des transformations (confiture, gelée, noisettes grillées, poêlée, fromage frais, cagette, nichoir), prix de la croque-au-sel et de la soupe, sac de grain à 40: `economie-chaines-0-12-2.md` prime sur les sections 2.5, 4.2 et 4.3 pour ces valeurs |

@@ -6,6 +6,7 @@
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
 import type { TasteLevel } from '../etat/types-voisins';
+
 import {
   DEFAULT_BENCHES,
   DEFAULT_DIALOGUES,
@@ -107,6 +108,9 @@ import type {
   VillagerDef,
   Who,
 } from './types';
+
+/** Largeur d'un objet mural sans `wallWidth` (m): un cadre (R17). */
+const DEFAULT_WALL_WIDTH = 0.6;
 
 /** Les neuf fichiers, tels qu'importés (JSON brut). */
 export interface RawContentFiles {
@@ -275,6 +279,7 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             side: optNumber(grip, 'side', DEFAULT_CARRY_GRIP.side),
             fromEnd: optNumber(grip, 'fromEnd', DEFAULT_CARRY_GRIP.fromEnd),
             reach: optNumber(grip, 'reach', DEFAULT_CARRY_GRIP.reach),
+            apart: optNumber(grip, 'apart', DEFAULT_CARRY_GRIP.apart),
           },
     quests: (r?.opt('quests')?.items() ?? []).map((q) => ({
       item: q.at('item').string(),
@@ -706,6 +711,8 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       storage: optString(it, 'storage'),
       floor: optBoolean(it, 'floor', false),
       wall: optBoolean(it, 'wall', false),
+      wallWidth: optNumber(it, 'wallWidth', DEFAULT_WALL_WIDTH),
+      blocksWall: optBoolean(it, 'blocksWall', false),
       backToWall: optBoolean(it, 'backToWall', false),
       dining: optBoolean(it, 'dining', false),
       seat: optBoolean(it, 'seat', false),
@@ -1312,6 +1319,7 @@ function parseMoment(m: Reader): MomentDef {
       memory: texts.at('memory').string(),
       rumor: optString(texts, 'rumor'),
       vignette: optString(texts, 'vignette'),
+      missed: optString(texts, 'missed'),
     },
     vignette: optString(m, 'vignette'),
     hintFrom: optString(m, 'hintFrom'),
@@ -2431,7 +2439,7 @@ function checkReferences(content: Content): void {
     if (m.quest !== null && !questIds.has(m.quest)) fail(`${where}: quête inconnue « ${m.quest} »`);
     const steps = content.quests.find((q) => q.id === m.quest)?.steps ?? [];
     if (m.questStep !== null && !steps.some((s) => s.id === m.questStep)) fail(`${where}: étape inconnue « ${m.questStep} »`);
-    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory, m.texts.rumor, m.texts.vignette]) {
+    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory, m.texts.rumor, m.texts.vignette, m.texts.missed]) {
       if (key !== null && !(key in content.texts.messages)) fail(`${where}: message inconnu « ${key} »`);
     }
     if (m.hintFrom !== null && !content.villagers.some((v) => v.id === m.hintFrom)) fail(`${where}: habitant inconnu « ${m.hintFrom} »`);

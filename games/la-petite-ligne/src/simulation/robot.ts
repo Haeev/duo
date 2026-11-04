@@ -14,7 +14,8 @@ import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './c
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
 import { beamDistance, beamGrabRange, blockersFor, refreshBlockers } from './deplacement';
-import { findPath, isBlockedCell } from './grille';
+import { type Blockers, bodyCollides, findPath, isBlockedCell } from './grille';
+import { isDoorCell } from './interieurs';
 import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
 import { shopOpen } from './economie';
@@ -1031,6 +1032,50 @@ function nearestWater(sim: Sim, from: Vec2): Vec2 | null {
   return best;
 }
 
+/** Cases où le centre d'une charge portée ne tient pas, porteurs compris (`carryPath`), par partie. */
+const carryAvoid = new WeakMap<Sim, { key: string; tick: number; avoid: Uint8Array }>();
+/** Les cases à éviter sont recalculées chaque seconde (arbres qui repoussent, portes qui ferment). */
+const CARRY_AVOID_TICKS = SIM_HZ;
+
+/**
+ * Collisions pour le centre d'une charge portée: une case est évitée si un porteur, à son
+ * décalage fixe (`beamOffsets`, porteurs face à face à `carry.grip.apart` m), y toucherait un
+ * obstacle ou une porte. Le chemin du seul centre menait la caisse de briques dans la poche
+ * entre les buissons à l'est du quai, où les deux porteurs ne passent pas ensemble (0.12.2).
+ */
+function carryBlockers(sim: Sim, holders: readonly CharacterId[]): Blockers {
+  const base = refreshBlockers(sim);
+  const offsets = holders.map((id) => sim.runtime.beamOffsets[id]);
+  const key = offsets.map((o) => `${o.x},${o.y}`).join(';');
+  const tick = sim.world.tick;
+  let cached = carryAvoid.get(sim);
+  if (cached?.key !== key || tick - cached.tick >= CARRY_AVOID_TICKS || tick < cached.tick) {
+    const { map } = sim;
+    const avoid = cached?.avoid.length === map.width * map.height ? cached.avoid : new Uint8Array(map.width * map.height);
+    for (let cy = 0; cy < map.height; cy++) {
+      for (let cx = 0; cx < map.width; cx++) {
+        const x = cx + 0.5;
+        const y = cy + 0.5;
+        avoid[cy * map.width + cx] = offsets.some((o) => isDoorCell(map, x + o.x, y + o.y) || bodyCollides(base, x + o.x, y + o.y)) ? 1 : 0;
+      }
+    }
+    cached = { key, tick, avoid };
+    carryAvoid.set(sim, cached);
+  }
+  return { ...base, avoid: cached.avoid };
+}
+
+/**
+ * Chemin d'une charge portée hors rails: d'abord celui où les deux porteurs passent, s'il mène
+ * assez près du but pour l'y poser (`feel.beamDropRadius`); à défaut, celui du seul centre.
+ */
+function carryPath(sim: Sim, holders: readonly CharacterId[], from: Vec2, to: Vec2): Vec2[] | null {
+  const path = findPath(carryBlockers(sim, holders), from, to);
+  const last = path?.[path.length - 1];
+  if (path !== null && last !== undefined && distance(last, to) <= sim.content.settings.feel.beamDropRadius) return path;
+  return findPath(refreshBlockers(sim), from, to);
+}
+
 function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number; my: number }, out: Intent[]): boolean {
   const b = sim.world.beam;
   if (b === null) return false;
@@ -1048,7 +1093,7 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
   f.held = true;
   // Sur rails (la draisine), droit vers le prochain point de passage; sinon par le chemin de la grille.
   const waypoint = b.route?.[b.leg];
-  const next = waypoint ?? findPath(refreshBlockers(sim), b.pos, spot)?.[0] ?? spot;
+  const next = waypoint ?? carryPath(sim, b.holders, b.pos, spot)?.[0] ?? spot;
   const d = Math.hypot(next.x - b.pos.x, next.y - b.pos.y);
   if (d > 0.01) {
     f.mx = (next.x - b.pos.x) / d;

@@ -129,6 +129,8 @@ export interface DemoMoment {
   phase: 'waiting' | 'climax' | 'after';
   /** Secondes depuis le début de l'apogée (ou de la phase). */
   t: number;
+  /** En attente, les joueurs tiennent les places de l'échelle (vrai par défaut; `tenir=0`: personne). */
+  hold?: boolean;
 }
 
 /**
@@ -644,8 +646,13 @@ function placeMoment(
       c.facing = Math.atan2(anchor.y - y, anchor.x - x);
     }
   }
+  // En attente, l'étape de quête qui attend le moment est en cours (les places de l'échelle se marquent).
+  if (moment.phase === 'waiting' && def.quest !== null && def.questStep !== null && !world.quests.some((q) => q.id === def.quest)) {
+    const step = content.quests.find((q) => q.id === def.quest)?.steps.findIndex((s) => s.id === def.questStep) ?? -1;
+    if (step >= 0) world.quests.push({ id: def.quest, status: 'active', step, checklist: [], baselines: {}, startedDay: world.clock.day });
+  }
   const hold = def.watch.hold;
-  if (hold !== null && moment.phase !== 'after') {
+  if (hold !== null && moment.phase !== 'after' && moment.hold !== false) {
     // L'échelle: chacun tient sa place, face au montant (comme `takeHold`).
     [p1, p2].forEach((c, index) => {
       const place = hold[index];

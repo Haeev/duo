@@ -116,7 +116,7 @@ export const DEFAULT_WEATHER: WeatherSettings = {
 };
 
 /** Prise d'une charge longue (`reglages.carry.grip`): à 0,45 m de l'axe, à 0,3 m au moins des bouts, à 1,2 m au plus. */
-export const DEFAULT_CARRY_GRIP: { side: number; fromEnd: number; reach: number } = { side: 0.45, fromEnd: 0.3, reach: 1.2 };
+export const DEFAULT_CARRY_GRIP: { side: number; fromEnd: number; reach: number; apart: number } = { side: 0.45, fromEnd: 0.3, reach: 1.2, apart: 1.3 };
 
 export const DEFAULT_FEEL: FeelSettings = {
   // Durées des gestes simples (s), avant le doublement à endurance nulle.

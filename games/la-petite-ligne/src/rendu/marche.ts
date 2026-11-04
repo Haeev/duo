@@ -6,7 +6,8 @@
  * Modèles de l'artiste (`marche.glb`): `market_stall` (clients devant, +Z; extras `crate_spots`,
  * `scale_spot`), `market_crate` (fond à `goods_height`), `market_scale`, `mail_bag` (`rest_height`).
  * Tout se lit dans l'état: mêmes images chez les deux joueurs. Les copies partagent géométries et
- * matériaux avec la bibliothèque: rien à libérer.
+ * matériaux avec la bibliothèque: rien à libérer. À la fermeture (R18, 0.12.2), les produits
+ * restants s'enfoncent dans leurs cagettes avant de disparaître: on voit l'étal se ranger.
  */
 import { Group, type Object3D } from 'three';
 import type { Content } from '../donnees/types';
@@ -30,6 +31,9 @@ const BAG_ALONG = 0.65;
 /** Trois objets au plus par cagette, en rang (m entre deux). */
 const GOODS_PER_CRATE = 3;
 const GOODS_STEP = 0.11;
+/** Rangement de l'étal à 13 h: durée (s) et profondeur (m) dont les produits descendent dans la cagette. */
+const STOW_SECONDS = 0.7;
+const STOW_DROP = 0.08;
 
 type Triple = readonly [number, number, number];
 
@@ -50,6 +54,10 @@ export class MarketPart implements RenderPart {
   private readonly stallGoods = new Group();
   private readonly bag: Object3D | null = null;
   private signature = '';
+  /** Produits posés (pour le rangement de la fermeture), avec leur hauteur et leur taille de repos. */
+  private readonly goods: { object: Object3D; y: number; scale: number }[] = [];
+  /** Début du rangement en cours (temps du rendu), `null` sans rangement. */
+  private stowStart: number | null = null;
 
   constructor(
     map: GameMap,
@@ -101,9 +109,48 @@ export class MarketPart implements RenderPart {
     this.stall.visible = shown;
     if (!shown) return;
     const signature = this.goodsSignature(world);
+    if (this.stowStart !== null) {
+      if (!this.stow(context)) return;
+      this.signature = signature;
+      this.rebuildGoods(world);
+      return;
+    }
     if (signature === this.signature) return;
+    if (this.goods.length > 0 && this.justClosed(world) && !context.reducedMotion) {
+      // L'étal vient d'être rangé: les produits gardés à l'écran descendent dans leurs cagettes.
+      this.stowStart = context.time;
+      return;
+    }
     this.signature = signature;
     this.rebuildGoods(world);
+  }
+
+  /** L'étal du jour vient de fermer (heure de fermeture passée, plus rien dessus). */
+  private justClosed(world: ReadonlyWorld): boolean {
+    const m = this.content.market;
+    const market = world.market;
+    return (
+      m !== null &&
+      market !== null &&
+      market.day === world.clock.day &&
+      world.clock.minutes >= m.closes &&
+      market.stall.length === 0
+    );
+  }
+
+  /** Une image du rangement; vrai quand il est fini (les produits sont alors retirés). */
+  private stow(context: FrameContext): boolean {
+    const t = (context.time - (this.stowStart ?? context.time)) / STOW_SECONDS;
+    if (t >= 1) {
+      this.stowStart = null;
+      return true;
+    }
+    const k = t * t * (3 - 2 * t);
+    for (const g of this.goods) {
+      g.object.position.y = g.y - STOW_DROP * k;
+      g.object.scale.setScalar(g.scale * Math.max(0.01, 1 - k));
+    }
+    return false;
   }
 
   private goodsSignature(world: ReadonlyWorld): string {
@@ -122,6 +169,7 @@ export class MarketPart implements RenderPart {
 
   private rebuildGoods(world: ReadonlyWorld): void {
     this.stallGoods.clear();
+    this.goods.length = 0;
     const extras = this.library.extras(STALL);
     const spots = triples(extras.crate_spots).slice(0, stallSlots(this.content, world));
     const goodsHeight = Number(this.library.extras(CRATE).goods_height ?? 0.012);
@@ -138,6 +186,7 @@ export class MarketPart implements RenderPart {
         const good = this.library.instantiate(model);
         good.position.set(spot[0] + (k - (n - 1) / 2) * GOODS_STEP, spot[1] + goodsHeight, spot[2]);
         this.stallGoods.add(good);
+        this.goods.push({ object: good, y: good.position.y, scale: good.scale.x });
       }
     }
     const scaleSpot = triple(extras.scale_spot);

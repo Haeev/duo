@@ -2,6 +2,24 @@
   "version": 1,
   "notes": [
     {
+      "version": "0.12.2",
+      "titre": "Moins de texte, plus d'images",
+      "changements": [
+        "Les écrans parlent en images: comptoir, mercerie et catalogue en grilles, recettes avec leurs ingrédients en icônes, basse-cour en portraits et jauges, carnet des poissons, du sac et des quêtes en vignettes. Plus rien ne défile.",
+        "Une icône pour chaque objet, chaque poisson et chaque robe de poule.",
+        "Le fauteuil de Solange montre ton personnage en 3D, qui porte la coupe essayée.",
+        "Chaque transformation rapporte: confitures, gelée, fromage, poêlée, noisettes grillées, cagettes et nichoirs mieux payés; la croque-au-sel et la soupe se vendent; le sac de grain coûte 40 aubrins. Omelette, croque-au-sel et soupe vont deux fois plus vite à deux.",
+        "Basile attend au grand chêne pour l'échelle, et donne rendez-vous au lendemain midi s'il est tard.",
+        "Les arbres repoussent en 6 jours, dès le début de la partie.",
+        "À 13 h, l'étal dit combien d'objets il range au coffre.",
+        "Le colis porté à deux est tenu entre vos mains, face à face.",
+        "Les cadres et objets muraux se posent au-dessus des meubles, jamais sur une fenêtre ni une porte; le râtelier passe au mur ouest; la porte se voit de l'intérieur.",
+        "La petite déco se pose toujours sur le meuble visé.",
+        "Le train du samedi repart tout droit au lieu de reculer.",
+        "Corrections: sols qui scintillaient, jambes qui traversaient la voie, nattes et cheveux longs qui traversaient les vêtements, ombres coupées trop tôt sur les PC, nouveau panneau de la gare."
+      ]
+    },
+    {
       "version": "0.12.1",
       "titre": "Corrections",
       "changements": [

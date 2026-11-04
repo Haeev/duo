@@ -12,7 +12,8 @@
  * `scene=rencontre|place|repas|banc|banc-quai` (petites scènes, dont les deux joueurs assis au quai), `coins=1` (coin à soi des
  * deux joueurs, avec `interieur=1`), `moment=<id>` (moment rare: `heron`, `geese`, `ladder`, `tits`,
  * `fox`, `glowworms`) avec `t=<s>` (instant de l'apogée, figé), `phase=attente|apres` et `joue=1`
- * (la chorégraphie avance depuis `t`); l'heure par défaut est alors dans la fenêtre du moment.
+ * (la chorégraphie avance depuis `t`), `tenir=0` (en attente, personne ne tient l'échelle: ses places
+ * se marquent au sol); l'heure par défaut est alors dans la fenêtre du moment.
  * `vue=x,y` pose la caméra sur un point sans déplacer les joueurs; `noms=1`: Camille connaît le nom
  * des poules (étiquettes au-dessus d'elles, chez elle seule). `jour=<n>` ou
  * `saison=printemps|ete|automne|hiver` (tour 8: palette et lumière de la saison; le même jour de
@@ -171,6 +172,7 @@ async function main(): Promise<void> {
           id: momentDef.id,
           phase: phaseParam === 'attente' ? 'waiting' : phaseParam === 'apres' ? 'after' : 'climax',
           t: Math.max(0, Number(params.get('t') ?? '0') || 0),
+          hold: params.get('tenir') !== '0',
         };
   const options: DemoOptions = {
     minutes:

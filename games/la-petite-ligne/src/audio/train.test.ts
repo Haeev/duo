@@ -74,7 +74,9 @@ describe('horloge des séquences du train', () => {
     const g = { stop: { x: 47, y: 13.5 }, slideDistance: 70, departureDirection: -1 as const, offMapX: 0, maxX: 64 };
     const out = { x: 0, y: 0 };
     expect(locomotivePosition(g, 'away', 0, out).x).toBe(0);
-    expect(locomotivePosition(g, 'arriving', 0, out).x).toBe(0);
+    // Arrivée par l'est (le bord opposé au départ): toujours le même sens de marche (retour R06).
+    expect(locomotivePosition(g, 'arriving', 0, out).x).toBe(64);
+    expect(locomotivePosition(g, 'arriving', 0.5, out).x).toBeGreaterThan(47);
     expect(locomotivePosition(g, 'arriving', 1, out).x).toBe(47);
     expect(locomotivePosition(g, 'stopped', 1, out)).toEqual({ x: 47, y: 13.5 });
     expect(locomotivePosition(g, 'departing', 1, out).x).toBe(47);

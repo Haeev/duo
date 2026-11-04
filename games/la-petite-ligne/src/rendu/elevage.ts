@@ -215,7 +215,7 @@ export class BreedingPart implements EventfulPart {
       rope.visible = false;
       if (inside) return;
       const at = interpolate(g.prev, g.pos, context.alpha, this.point);
-      view.root.position.set(at.x, this.terrain.heightAt(at.x, at.y), at.y);
+      view.root.position.set(at.x, this.terrain.standHeight(at.x, at.y), at.y);
       const yaw = yawFromFacing(g.facing);
       view.facing =
         view.facing === null

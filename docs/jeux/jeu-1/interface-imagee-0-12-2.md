@@ -1,0 +1,50 @@
+# La Petite Ligne: interface imagée (patch 0.12.2)
+
+| Champ | Valeur |
+|---|---|
+| Statut | appliqué dans le jeu (comptoir, mercerie, catalogue, réchaud, établi, basse-cour, carnet des poissons, fauteuil de Solange; second lot: rangement de la maison, sac et quêtes du carnet) |
+| Rédaction | ux-ui-designer, 2026-11-03 |
+| Origine | retours du 3 novembre: R03, R08, R10, R12, et le fauteuil de Solange |
+| Code | `src/interface/vitrine.ts` et `vitrine.css` (composants), `modele-vitrine.ts` et `modele-quetes.ts` (modèles), `icones.ts` (icônes, lot de l'artiste 2D) |
+| Captures | `docs/jeux/jeu-1/gauntlet/captures/0-12-2-interface/avant/` et `apres/` |
+
+Le client: « Le jeu doit être léger en texte et jouer plus sur des icônes, des images, des animations. » Ces règles valent pour tout panneau nouveau ou refait.
+
+## 1. Les règles
+
+1. **Une icône et un nombre plutôt qu'une phrase.** « 3 radis pour 2 radis à la croque-au-sel » devient l'icône du radis « 3/3 », puis le plat « ×2 ». Un prix est une pastille dorée avec la pièce; une réserve est une jauge et « 9 j ».
+2. **Le nom de l'objet seulement à la sélection.** La grille ne montre que des dessins et des pastilles. Le nom apparaît en grand dans le panneau de détail de la vignette choisie, et en étiquette au survol de la souris. Le lecteur d'écran lit toujours le nom complet (`aria-label` de chaque vignette).
+3. **Une ligne de texte au plus.** Sous le nom, une seule phrase courte (usage d'un objet, première phrase de la description d'un poisson, indice d'un poisson pas encore pris). Tout le reste passe en pastilles.
+4. **Les manques en icônes, jamais en « Il manque : ... ».** Ce qui manque est grisé, en pointillé et barré d'un trait, avec un compteur « possédés / requis » (« 0/2 »). L'argent qui manque: la pièce barrée « 18/120 ». La couleur n'est jamais seule: trait, pointillé et compteur disent la même chose.
+5. **Pas de défilement à 1366x768 pour une page normale.** Au-delà, des pages: A et E (lettres lues par position, AZERTY), comme les onglets, avec des points de page et deux flèches cliquables. A et E tournent d'abord les pages de l'onglet, puis passent à l'onglet voisin: le pied dit « pages » pour les deux.
+6. **Clavier et souris complets.** Le focus est la sélection. Flèches ou Z Q S D: vignette voisine, et vers la droite le détail et ses boutons. Entrée sur la vignette choisie: l'action principale (acheter 1, commander, vendre 1, cuisiner). À la souris, un premier clic choisit, un clic sur la vignette déjà choisie agit; les boutons du détail agissent au premier clic. Retour arrière ferme, Échap reste à la pause de Duo.
+7. **De petites animations, toutes coupées par la réduction des animations** (réglage de Duo, sinon `prefers-reduced-motion`): rebond de la vignette choisie et du grand dessin du détail, pièce qui vole de la bourse à la vignette à l'achat (et l'inverse à la vente), jauges qui se remplissent à l'ouverture. Seulement `transform` et `opacity`, aucun flou ni filtre (PC de référence).
+
+## 2. Les composants
+
+| Composant | Classe | Rôle |
+|---|---|---|
+| Vitrine | `.lpl-vitrine` (`Vitrine` dans `vitrine.ts`) | grille de vignettes paginée et panneau de détail; garde page et sélection d'un rendu à l'autre |
+| Vignette | `.lpl-tile` | dessin, pastille en haut à droite (prix, quantité), marque en haut à gauche (coche, colis, sablier, cadenas, jeton de l'autre pour un gros achat), état `missing`, `wait`, `locked`, `done` |
+| Pastille | `.lpl-pastille` (`--price`, `--count`, `--ok`, `--missing`, `--wait`, `--info`) | une icône et un nombre; `data-crossed` barre l'icône |
+| Jauge | `.lpl-gauge` (`--heart`, `--food`, `--fresh`) | `role="meter"`; basse: hachures en plus de la longueur |
+| Compteur | `.lpl-need-count` | icône et « possédés / requis », barré s'il en manque |
+| Rangée d'icônes | `.lpl-icon-row` | saisons, moments: l'inactive en pointillé et barrée |
+| Carte de recette | `.lpl-recipe` | le plat en grand et « ×2 », les ingrédients en compteurs, un seul bouton |
+| Carte de bête | `.lpl-farm__card` | portrait selon la robe, nom, jauge du cœur, pastilles (nourrie, au nid, traite, eau), bouton « Couver » s'il y a lieu |
+
+## 3. Écran par écran
+
+- **Comptoir d'Odette, mercerie de Solange**: 5 colonnes, 20 vignettes par page. Détail: prix, pastilles d'usage (pousse « 2 j », récolte « ×3 », beauté, confort, endurance, ce qu'on en fabrique), « dans ton sac », puis Acheter 1, Acheter 4, ou Proposer à l'autre (jeton de son profil). Vendre: budget du jour d'Odette, taux, ardoise en pastilles; Vendre 1, Tout vendre.
+- **Catalogue du quai**: 6 colonnes, 24 par page; le rayon en surtitre du détail; commandés et seuil des gros achats en pastilles.
+- **Réchaud, établi**: 4 cartes par rangée, 8 par page; la rangée « Manger » en vignettes (quantité, endurance rendue, deux jetons quand on mange ensemble). À l'établi, les commandes de Basile passent dans un onglet à elles; les plans à venir sont une carte au cadenas « +3 ».
+- **Basse-cour**: l'état en tuiles (places en pictos « 4/5 », grain en jauge avec les jours de réserve, nourries ou pas aujourd'hui, mangeoire à trémie installée ou au catalogue, litière en jauge, couvée en nuits ou ses quatre conditions barrées); une carte par bête; la collection des six robes en portraits nommés, gris et « ? » pour celles à trouver.
+- **Carnet, Poissons**: 7 colonnes; liseré de rareté (couleur, épaisseur, double trait et écailles ◆), silhouette grise à la taille de l'ombre pour ceux pas encore pris. Détail: grand dessin, nom, une phrase, saisons, moments (matin, midi, soir, nuit), coins sur une petite carte de la rivière, prix, record (avec le jeton de qui l'a fait), nombre de prises.
+- **Fauteuil de Solange**: l'aperçu 3D du vrai personnage à gauche (A et E ou glisser pour tourner), les 15 coupes et les 4 barbes en mini-portraits, les 8 couleurs en pastilles, le prix en pastille et un seul bouton Valider (ou Proposer depuis le banc). En mode secours, un petit portrait.
+- **Rangement de la maison** (second lot): en haut, les places en pastilles (coffre « 18/26 », râtelier « 2/12 »), Ranger et Ma garde-robe. Dessous, la grille du rangement (7 colonnes, 28 cases par page, les cases libres en pointillé jusqu'à la capacité, les pages dans la rangée du titre) à côté de celle du sac (6 colonnes, les piles du sac regroupées), puis « Tout déposer » en icônes de famille et nombres (radis, poisson, mûres, soupe, planche). Le râtelier a sa rangée (12 crochets). Le détail, sous les grilles, montre le dessin, le nom, « au rangement ×n » ou « dans ton sac ×n », et Prendre ou Déposer (Entrée), Prendre 1 ou Déposer 1. Le côté du focus porte un liseré d'encre: il dit où va Entrée. Entrée sur une vignette, ou un clic sur la vignette déjà choisie, prend la case ou dépose la pile d'un geste. Plein ou débordé: une ligne en mots dit quoi faire (« Ça déborde : 30 sur 26. Reprends quelque chose avant d'en remettre. »), la pastille est barrée et les vignettes du sac passent en pointillé.
+- **Sac du carnet** (second lot): les 24 cases en vignettes (barre d'outils sur bois, puis le sac), quantité « ×4 » en pastille, étoile dorée en coin pour la belle qualité, niveau d'eau de l'arrosoir. Le focus est la sélection: le détail suit les flèches. Détail: grand dessin, nom, une ligne (la famille, ou pourquoi c'est une belle), puis en pastilles la belle qualité, « ×n dans ton sac », le prix chez Odette (pièce barrée si elle ne l'achète pas) et l'usage (pousse, récolte, endurance, beauté, confort, ce qu'on en fabrique). Entrée, ou un second clic, fait l'action principale (manger, lire, prendre en main); Espace ou le glisser-déposer déplacent.
+- **Quêtes du carnet** (second lot): deux pastilles à presser, « en cours » (drapeau et nombre) et « terminées » (coche et nombre), la pressée en encre pleine; les finies ne repoussent jamais les quêtes en cours en page 2. Une carte par quête sur deux colonnes (8 par page): le portrait de l'habitant (Achille et Solange, sans portrait dessiné: la panière et le peigne; la commande: le train), le titre, l'étape en une phrase, les conditions en compteurs (« 1/4 » plumes, barrés tant qu'ils manquent; au-delà de trois, un seul compteur « 3/4 »), le lieu en picto (le portrait de l'habitant à qui apporter, le poulailler, la caisse du quai) et la récompense en pastille dorée. L'objectif du HUD porte un filet de laiton; une quête à secret, la bulle en coin. La confidence du matin devient la première carte, « Aujourd'hui », au filet rouge. Le détail: le texte complet de l'étape, les conditions une à une, le lieu en mots, la récompense, et la fiche du secret. À l'ouverture: la confidence, sinon la quête dont on garde un secret à dire, sinon l'objectif du HUD. Le lieu d'une énigme (l'ombre de la cloche) ne s'affiche jamais: c'est la réponse.
+
+## 4. Ce qui reste en mots, et pourquoi
+
+Le nom à choisir pour une bête (trois prénoms à lire), les avis d'une ligne (boutique fermée, catalogue parti, rangement plein ou qui déborde), la proposition reçue au fauteuil. Au détail d'une quête seulement: le texte complet de l'étape, la confidence du matin et la fiche d'un secret (des phrases à répéter à l'autre, qu'aucune icône ne remplace). Les commandes de Basile (chantiers, abris, pièces) gardent leur forme dans leur onglet: hors du périmètre de ce patch.

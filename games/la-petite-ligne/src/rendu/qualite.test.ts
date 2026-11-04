@@ -1,6 +1,14 @@
 // Qualité adaptative (risque 1 du gauntlet, tour 2): durées d'image injectées, aucune carte graphique.
 import { describe, expect, it } from 'vitest';
-import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
+import {
+  AdaptiveQuality,
+  renderPixelSize,
+  shadowCutLog,
+  usefulResolutionSteps,
+  type DisplaySurface,
+  type GraphicsInfo,
+  type QualityChange,
+} from './qualite';
 import { RENDER_SETTINGS } from './reglages';
 
 const HZ_60 = 1 / 60;
@@ -224,5 +232,87 @@ describe('taille du rendu (R07)', () => {
     expect(size.width * size.height).toBeLessThanOrEqual(
       RENDER_SETTINGS.light.maxPhysicalPixels + 2000,
     );
+  });
+});
+
+// Retour R13 (2026-11-03): aucune ombre sur le PC Windows, très fluide, alors que le Mac en a.
+// La machine n'est pas accessible d'ici: on simule ce qu'elle annonce (agent utilisateur d'Electron
+// sous Windows, carte Intel UHD 620 par ANGLE et Direct3D 11, écran 1366x768 à 100, 125 et 150 %).
+describe('ombres sur le PC de la cliente (R13)', () => {
+  const STEPS = RENDER_SETTINGS.dynamicResolution.steps;
+  const PC_SCREENS = [
+    { dpr: 1, css: [1366, 728] },
+    { dpr: 1.25, css: [1093, 582] },
+    { dpr: 1.5, css: [911, 485] },
+  ] as const;
+  const PC: GraphicsInfo = {
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) duo/0.2.4 Chrome/142.0.7444.59 Electron/39.1.1 Safari/537.36',
+    renderer: 'ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00005917) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+  };
+  const pcSurface = (screen: (typeof PC_SCREENS)[number]): DisplaySurface => ({
+    cssWidth: screen.css[0],
+    cssHeight: screen.css[1],
+    devicePixelRatio: screen.dpr,
+    devicePixels: { width: Math.round(screen.css[0] * screen.dpr), height: Math.round(screen.css[1] * screen.dpr) },
+  });
+
+  it('en 1366x768, aucun palier de résolution ne change l’image (plancher de netteté): un seul utile', () => {
+    for (const screen of PC_SCREENS) {
+      expect(usefulResolutionSteps(pcSurface(screen), STEPS), `${String(screen.dpr * 100)} %`).toBe(1);
+    }
+    // Sur le Mac (Retina), les paliers servent: la résolution descend avant de toucher aux ombres.
+    const mac: DisplaySurface = { cssWidth: 800, cssHeight: 500, devicePixelRatio: 2, devicePixels: null };
+    expect(usefulResolutionSteps(mac, STEPS)).toBeGreaterThan(1);
+  });
+
+  /** Écran à 60 Hz synchronisé: une image sur trois (45 par seconde) ou sur cinq (50) manque la période. */
+  const FPS_45 = [HZ_60, HZ_60, 2 * HZ_60];
+  const FPS_50 = [HZ_60, HZ_60, HZ_60, HZ_60, 2 * HZ_60];
+
+  it('fluide à 45 ou 50 images par seconde sur un écran à 60 Hz: les ombres restent, une heure durant', () => {
+    for (const [label, frames] of [['45', FPS_45], ['50', FPS_50]] as const) {
+      const quality = new AdaptiveQuality(RENDER_SETTINGS, () => 1);
+      expect(run(quality, frames, 3600), `${label} images par seconde`).toEqual([]);
+      expect(quality.isLight()).toBe(false);
+    }
+  });
+
+  it('l’ancien seuil (18 ms, paliers inutiles comptés) coupait les ombres en moins de 30 s à 45 images par seconde', () => {
+    const before = new AdaptiveQuality(
+      { ...RENDER_SETTINGS, autoLight: { ...RENDER_SETTINGS.autoLight, cutFrameMs: RENDER_SETTINGS.dynamicResolution.slowFrameMs } },
+      () => STEPS.length,
+    );
+    const light = run(before, FPS_45, 60).find((c) => c.change.kind === 'light');
+    expect(light?.at).toBeLessThan(30);
+  });
+
+  it('une machine qui peine vraiment (30 images par seconde) perd ses ombres, et le journal dit pourquoi', () => {
+    const surface = pcSurface(PC_SCREENS[0]);
+    const quality = new AdaptiveQuality(RENDER_SETTINGS, () => usefulResolutionSteps(surface, STEPS));
+    const changes = run(quality, 1 / 30, 60);
+    // Pas de palier inutile: les ombres partent après l'échauffement et la lenteur tenue.
+    expect(changes.map((c) => c.change)).toEqual([{ kind: 'light', final: false }]);
+    const at = changes[0]?.at ?? 0;
+    expect(at).toBeGreaterThan(RENDER_SETTINGS.dynamicResolution.warmupSeconds + RENDER_SETTINGS.autoLight.slowSeconds - 0.1);
+    const reason = quality.lastReason();
+    expect(reason).not.toBeNull();
+    if (reason === null) return;
+    const log = shadowCutLog(reason, surface, { width: 1366, height: 728 }, PC, false);
+    expect(log.cause).toBe('images trop lentes');
+    expect(log.moyenneImageMs).toBeGreaterThan(RENDER_SETTINGS.autoLight.cutFrameMs);
+    expect(log.seuilMs).toBe(RENDER_SETTINGS.autoLight.cutFrameMs);
+    expect(log.carteGraphique).toBe(PC.renderer);
+    expect(log.navigateur).toContain('Windows NT 10.0');
+    expect(log.ecranCss).toBe('1366x728');
+    expect(log.paliersUtiles).toBe(1);
+  });
+
+  it('la décision ne lit que la durée des images: ni la carte graphique, ni le système, ni la mise à l’échelle', () => {
+    // Même suite d'images, deux écrans du PC: mêmes décisions (un seul palier utile partout).
+    const a = new AdaptiveQuality(RENDER_SETTINGS, () => usefulResolutionSteps(pcSurface(PC_SCREENS[0]), STEPS));
+    const b = new AdaptiveQuality(RENDER_SETTINGS, () => usefulResolutionSteps(pcSurface(PC_SCREENS[2]), STEPS));
+    const pattern = [0.016, 0.022, 0.019, 0.03, 0.017];
+    expect(run(a, pattern, 600)).toEqual(run(b, pattern, 600));
   });
 });

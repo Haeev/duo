@@ -231,6 +231,8 @@ PLACEHOLDERS = {"habit", "level", "speaker", "player", "startPurse", "order", "l
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
                 # 0.12 (élevage): qui a nommé la bête (message aux deux).
                 "player",
+                # 0.12.2: objets de l'étal posés au pied du coffre plein.
+                "ground",
                 "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret",
                 # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
                 "villager", "season", "year", "times", "seasonOf",
