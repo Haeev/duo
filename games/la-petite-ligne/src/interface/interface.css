@@ -2393,3 +2393,27 @@
   width: 1.5rem;
   height: 1.5rem;
 }
+
+/*
+  0.13, sept onglets au carnet (Voisins en plus): le nom ne s'écrit que sur l'onglet ouvert, les
+  autres gardent leur icône (bulle au survol, nom accessible complet). L'en-tête retient une
+  seule rangée et le corps garde sa hauteur à 1366x768.
+*/
+.lpl-notebook .lpl-tab[aria-selected='false'] .lpl-tab__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lpl-notebook .lpl-tab[aria-selected='false'] {
+  position: relative;
+  padding-inline: var(--lpl-space-2);
+}
+
+.lpl-notebook .lpl-tab[aria-selected='false'] > .lpl-icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}

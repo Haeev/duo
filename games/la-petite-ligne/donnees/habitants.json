@@ -11,6 +11,8 @@
       "scale": 1.0,
       "soundMotif": "motif_firmin",
       "birthday": { "season": "autumn", "day": 6 },
+      "age": "64 ans",
+      "homeLabel": "derrière la voie, la maison aux tuiles rondes",
       "schedule": [
         { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "18:00", "to": "20:00", "point": "quay_bench", "activity": "stand" },
         { "when": [{ "type": "day_is", "days": [1] }], "from": "06:00", "to": "18:00", "point": "train_stop", "activity": "wait_train" },
@@ -631,6 +633,8 @@
       "scale": 1.0,
       "soundMotif": "motif_odette",
       "birthday": { "season": "summer", "day": 5 },
+      "age": "61 ans",
+      "homeLabel": "au-dessus de l'épicerie",
       "schedule": [
         { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "20:00", "to": "21:00", "point": "grocery_terrace", "activity": "stand" },
         { "when": [{ "type": "step_active", "quest": "welcome_supper", "step": "supper" }, { "type": "day_at_least", "day": 5 }], "from": "19:00", "to": "21:00", "point": "grocery_terrace", "activity": "host" },
@@ -1116,6 +1120,8 @@
       "scale": 1.0,
       "soundMotif": "motif_basile",
       "birthday": { "season": "spring", "day": 4 },
+      "age": "72 ans",
+      "homeLabel": "au-dessus de la scierie",
       "schedule": [
         { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "18:00", "to": "19:30", "point": "sawmill_yard", "activity": "stand" },
         { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "basile_by_beam", "activity": "stand" },
@@ -1621,6 +1627,8 @@
       "scale": 0.75,
       "soundMotif": "motif_jeanne",
       "birthday": { "season": "spring", "day": 12 },
+      "age": "10 ans et demi",
+      "homeLabel": "chez sa tante Lucie, en face de la mercerie",
       "schedule": [
         {"when": [{"type": "flag", "flag": "solange_here"}, {"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}], "from": "08:00", "to": "16:30", "point": "school_gate", "activity": "absent"},
         {"when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}], "from": "08:00", "to": "08:30", "point": "village_exit", "activity": "stand"},
@@ -2130,6 +2138,8 @@
       "scale": 1.0,
       "soundMotif": "motif_achille",
       "birthday": { "season": "summer", "day": 13 },
+      "age": "38 ans",
+      "homeLabel": "au fournil de la rue Haute",
       "schedule": [
         {"when": [{"type": "not", "condition": {"type": "flag", "flag": "achille_here"}}], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent"},
         {"when": [{"type": "any", "conditions": [{"type": "step_active", "quest": "achille_basket", "step": "go_bakery"}, {"type": "step_active", "quest": "achille_basket", "step": "carry"}]}, {"type": "not", "condition": {"type": "weekday_is", "weekdays": ["monday"]}}], "from": "06:00", "to": "11:00", "point": "bakery_window", "activity": "stand"},
@@ -2192,6 +2202,8 @@
       "scale": 1.0,
       "soundMotif": "motif_solange",
       "birthday": { "season": "autumn", "day": 10 },
+      "age": "52 ans",
+      "homeLabel": "sous le toit de la mercerie",
       "schedule": [
         {"when": [{"type": "not", "condition": {"type": "flag", "flag": "solange_here"}}], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent"},
         {"when": [{"type": "weekday_is", "weekdays": ["saturday"]}], "from": "10:00", "to": "10:45", "point": "train_stop", "activity": "wait_train"},

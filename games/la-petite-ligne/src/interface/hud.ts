@@ -37,6 +37,8 @@ import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
 import { isWatching } from '../etat/peche';
+import { habitToast } from './modele-voisins';
+import { habitToastItem } from './voisins';
 
 /** Une icône de besoin du HUD (à côté du portrait, ou en petit sur la carte de l'autre). */
 interface NeedView {
@@ -741,6 +743,14 @@ export class Hud {
       if (known !== undefined) {
         // La plus récente passe en bas, comme une nouvelle arrivée.
         if (known !== this.toasts.lastElementChild && shown[shown.length - 1] === n) this.toasts.append(known);
+        continue;
+      }
+      // 0.13: une habitude notée, toutes connues, une lanterne de plus: la carte du carnet, avec le portrait.
+      const habit = habitToast(n, ctx);
+      if (habit !== null) {
+        const li = habitToastItem(habit, notificationSort(n, this.refusal));
+        this.toastItems.set(key, li);
+        this.toasts.append(li);
         continue;
       }
       const visual = toastVisual(n, ctx.texts.messages, this.refusal);

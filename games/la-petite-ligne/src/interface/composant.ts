@@ -16,6 +16,7 @@ export type PanelTab =
   | 'fish'
   | 'memories'
   | 'needs'
+  | 'neighbours'
   | 'buy'
   | 'sell'
   | 'catalogue'

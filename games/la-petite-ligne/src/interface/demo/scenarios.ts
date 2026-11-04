@@ -14,6 +14,7 @@ import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { benchById, seatPlace } from '../../etat/bancs';
 import { PATCH_0122_SCENARIOS, SUMMER_25_V13, setupPatch0122 } from './scenarios-0-12-2';
+import { NEIGHBOURS_SCENARIOS, setupNeighbours } from './scenarios-0-13';
 
 const HOUR = 60;
 const MAX_TICKS = 400_000;
@@ -236,7 +237,7 @@ function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { 
 
 /** Sauvegarde de référence d'où part un scénario du tour 8 ou 9, ou `null` (partie neuve). */
 export function scenarioSave(name: string): string | null {
-  if (PATCH_0122_SCENARIOS.includes(name)) return SUMMER_25_V13;
+  if (PATCH_0122_SCENARIOS.includes(name) || NEIGHBOURS_SCENARIOS.includes(name)) return SUMMER_25_V13;
   const t10 = TOUR10_SAVES[name];
   if (t10 !== undefined) return t10;
   const t9 = TOUR9_SAVES[name];
@@ -723,6 +724,8 @@ function tour8(sim: Sim, name: string, me: CharacterId, other: CharacterId): (()
 export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => void) | undefined {
   const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
   if (setupPatch0122(sim, name, me)) return undefined;
+  const neighbours = setupNeighbours(sim, name, me);
+  if (neighbours.done) return neighbours.after;
   const t10 = tour10(sim, name, me, other);
   if (t10 !== null) return t10;
   const later = tour9(sim, name, me, other);

@@ -60,7 +60,8 @@ describe.skipIf(executable === undefined)('interface au pointeur et au clavier (
     await page.waitForTimeout(350);
     expect(await page.evaluate(() => document.activeElement?.closest('.lpl-panel') !== null)).toBe(true);
     await page.keyboard.press('KeyE');
-    await expect.poll(() => page.evaluate(() => document.querySelector('.lpl-tab[aria-selected="true"]')?.getAttribute('data-tab'))).toBe('mail');
+    // 0.13: l'onglet Voisins suit les Quêtes (avant, le Courrier).
+    await expect.poll(() => page.evaluate(() => document.querySelector('.lpl-tab[aria-selected="true"]')?.getAttribute('data-tab'))).toBe('neighbours');
     await page.keyboard.press('Backspace');
     await page.locator('.lpl-panel').waitFor({ state: 'detached' });
     expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
