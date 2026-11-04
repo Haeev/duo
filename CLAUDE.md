@@ -71,6 +71,7 @@ Un même rôle peut tourner en plusieurs exemplaires en parallèle (deux devs ga
 5. **Contrôles avant livraison**: revue de code (architecte-technique), revue visuelle (directeur-artistique), recette avec preuves (qa-testeur).
 6. **Retours**: après chaque session de jeu du client, le manager transforme les retours en tâches.
 7. **Mise à jour du soir** (demande du client, 2026-11-03): la nouvelle version du jeu est en ligne et proposée par Duo chaque soir avant 21 h, heure de Paris. Le manager lance la publication au plus tard vers 20 h (19 h UTC en hiver, 18 h UTC en été), sur une version déjà testée ici, et vérifie le catalogue avant 21 h. Ce qui n'est pas prêt attend le lendemain plutôt que de retarder la soirée.
+8. **Tester en dernier** (demande du client, 2026-11-04): pendant la production, les membres produisent le contenu et ne lancent que les contrôles rapides de leur lot (types, validateurs de données, un test direct). Les longues parties de robots, les séries de tests et la suite complète tournent une seule fois, en fin de cycle, juste avant la publication (environ une heure réservée vers 18 h les jours de sortie).
 
 La plateforme suit le même processus. Son cahier des charges est le premier, écrit en phase 1.
 
