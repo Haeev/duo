@@ -75,7 +75,7 @@ import { IDLE_CLIP, applyBoneRest, boneRestOf, idleClipOf } from './gabarit';
 import { CLIP_FOR_ACTION } from './gestes';
 import { VillagerGestures, gestureClipAt } from '../etat/gestes-habitants';
 import type { GestureDef } from '../donnees/gestes-0-13';
-import { lifePlace, villagePause, workPostOf } from '../etat/vie';
+import { lifePlace, shuttleLoad, villagePause, workPostOf } from '../etat/vie';
 import {
   VillagerCarry,
   accessoryMaterial,
@@ -1450,6 +1450,21 @@ export class CharactersPart implements EventfulPart {
     const walk = { name: clip, timeScale: clip === WALK ? this.strideScale(villager.speed, this.walkReference, scale) : 1 };
     if (props === undefined) return walk;
     const rules = SETTINGS.villagerProps[villager.id] ?? NO_PROPS;
+    // 0.13 (S09): portage à deux entre habitants, face à face; le premier tient la charge devant lui,
+    // poussée vers le milieu des deux, l'autre la prend de l'autre côté (mêmes clips que les joueurs).
+    const load = onBench || gesture !== null ? null : shuttleLoad(this.content, villager.target);
+    const partner = load === null ? undefined : world.villagers.find((x) => x.id === load.partner);
+    const paired = partner !== undefined && partner.visible && Math.hypot(partner.pos.x - villager.pos.x, partner.pos.y - villager.pos.y) < SETTINGS.villagerLoadPairing;
+    if (load !== null && paired && this.library.has(load.load)) {
+      props.carried = null;
+      figure.setLookBody(false);
+      figure.setTool(this.library, null, this.propSwap);
+      props.carry.setBike(null);
+      props.carry.setChest(load.rank === 0 ? load.load : null, SETTINGS.villagerLoadReach);
+      return moving
+        ? { name: SETTINGS.carryOne.walk, timeScale: this.strideScale(villager.speed, this.carryOneReference, scale), fade: SETTINGS.walkFadeSeconds }
+        : { name: SETTINGS.carryOne.idle, timeScale: 1, fade: SETTINGS.walkFadeSeconds };
+    }
     const habit = villagerHabit(villager);
     const situation = props.situation;
     situation.moving = moving;

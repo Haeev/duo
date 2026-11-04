@@ -15,7 +15,7 @@ import { POINT, VILLAGER_BEHIND_POINTS } from './ids';
 import { newVillagerState } from './monde';
 import { marketEntry, marketPoint } from './marche';
 import { watchBirthdays } from './amitie';
-import { lifeEntry, lifeFacing, lifeGoal, villagePaused, workStrokes, type LifeEntry } from './vie';
+import { lifeEntry, lifeFacing, lifeGoal, lifeWalkFacing, villagePaused, villagerGreetings, workStrokes, type LifeEntry } from './vie';
 import { announceHabits, currentHabit, notePlanning, sawAtDoor, watchHabits } from './voisins';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
@@ -252,10 +252,12 @@ export function updateVillagers(sim: Sim, dt: number): void {
       v.pos.x += ((next.x - v.pos.x) / d) * stepLen;
       v.pos.y += ((next.y - v.pos.y) / d) * stepLen;
     }
-    v.facing = Math.atan2(next.y - v.prev.y, next.x - v.prev.x);
+    // 0.13 (S09): les porteurs d'un portage à deux avancent face à face.
+    v.facing = lifeWalkFacing(sim, v) ?? Math.atan2(next.y - v.prev.y, next.x - v.prev.x);
     v.speed = speed;
   }
   workStrokes(sim);
+  if (refresh) villagerGreetings(sim);
   // 0.13 (section 4.3, 7.3): ce que les joueurs voient d'eux, au rythme des plannings.
   if (refresh) {
     watchHabits(sim);

@@ -3,6 +3,320 @@
   "bubbles": { "seconds": 7, "range": 8 },
   "scenes": [
     {
+      "id": "birthday_lucie", "ref": "S18", "tier": "P1", "from": "14:30", "to": "15:30", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "lucie" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["lucie", "solange", "firmin", "jeanne"], "at": { "x": 37.5, "y": 30.5 }, "radius": 0.9 }],
+      "lines": [
+        { "by": "solange", "text": "Bon anniversaire, Lucie ! Ouvre, c'est un ruban pour ton appareil." },
+        { "by": "lucie", "text": "Vous êtes venus ! Ne bougez plus, je vous photographie." },
+        { "by": "firmin", "text": "Bon anniversaire. Le paquet vient de la halte, il est à l'heure." },
+        { "by": "jeanne", "text": "Bon anniversaire, tante Lucie ! Le dessin, c'est toi sur ton vélo." },
+        { "by": "lucie", "text": "Un an de plus, et toujours les mêmes côtes." },
+        { "by": "firmin", "text": "Souffle fort: le vent tourne, il t'aidera." }
+      ]
+    },
+    {
+      "id": "birthday_paulin", "ref": "S18", "tier": "P1", "from": "12:00", "to": "13:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "paulin" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["paulin", "margot", "nour"], "at": { "x": 111.5, "y": 7.0 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "margot", "text": "Bon anniversaire, Paulin. Le casse-croûte est dans le paquet, avec un ruban." },
+        { "by": "paulin", "text": "Un ruban. Pour un casse-croûte." },
+        { "by": "nour", "text": "Bon anniversaire ! Je passais pour la vache, je reste pour le gâteau." },
+        { "by": "paulin", "text": "..." },
+        { "by": "margot", "text": "Il est content. Chez lui, ça ne se voit qu'aux oreilles." },
+        { "by": "nour", "text": "Elles sont toutes rouges, en effet." }
+      ]
+    },
+    {
+      "id": "birthday_leon", "ref": "S18", "tier": "P1", "from": "16:40", "to": "17:40", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "leon" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["leon", "jeanne", "firmin", "lucie"], "at": { "x": 36.5, "y": 19.5 }, "radius": 0.9 }],
+      "lines": [
+        { "by": "jeanne", "text": "Bon anniversaire, Léon ! Le paquet, c'est un sifflet. Un vrai." },
+        { "by": "leon", "text": "Un sifflet de chef de gare ? Je peux siffler le train ?" },
+        { "by": "firmin", "text": "Une fois. Une seule. Et pas le samedi." },
+        { "by": "lucie", "text": "Bon anniversaire, Léon. Souris, je fais la photo." },
+        { "by": "leon", "text": "Un an de plus ! Je suis presque grand, maintenant." },
+        { "by": "jeanne", "text": "Moi, je suis grande depuis longtemps." }
+      ]
+    },
+    {
+      "id": "birthday_odette", "ref": "S18", "tier": "P1", "from": "18:00", "to": "19:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "odette" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["odette", "solange", "nour", "firmin"], "at": { "x": 36.35, "y": 29.6 }, "radius": 0.9 }],
+      "lines": [
+        { "by": "solange", "text": "Bon anniversaire, Odette ! Un tablier neuf, avec tes initiales." },
+        { "by": "odette", "text": "Oh, mon chou. Vous allez me faire pleurer dans ma tonnelle." },
+        { "by": "nour", "text": "Bon anniversaire ! Le paquet, ce sont des dattes. De chez ma mère." },
+        { "by": "firmin", "text": "Bon anniversaire, Odette. Je n'ai pas de paquet. J'ai mis ma casquette." },
+        { "by": "odette", "text": "Ta casquette du dimanche, un mercredi ? Alors c'est vraiment une fête." },
+        { "by": "solange", "text": "Ne pleure pas sur le tablier, il est neuf." }
+      ]
+    },
+    {
+      "id": "birthday_ambroise", "ref": "S18", "tier": "P1", "from": "15:00", "to": "16:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "ambroise" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["ambroise", "lucie", "jeanne"], "at": { "x": 55.5, "y": 23.2 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "lucie", "text": "Bon anniversaire, Ambroise. Le paquet, c'est une photo de ta vitrine." },
+        { "by": "ambroise", "text": "Quinze heures pile. Vous êtes à l'heure. C'est un beau cadeau." },
+        { "by": "jeanne", "text": "Bon anniversaire ! J'ai compté les tic-tac de ta boutique: trente et un." },
+        { "by": "ambroise", "text": "Trente-deux. Il y en a une qui retarde, je sais laquelle." },
+        { "by": "lucie", "text": "Tu souris, Ambroise. Ne bouge plus." },
+        { "by": "ambroise", "text": "Je ne souris pas. Je règle mon visage." }
+      ]
+    },
+    {
+      "id": "birthday_ines", "ref": "S18", "tier": "P1", "from": "12:00", "to": "13:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "ines" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["ines", "barnabe", "jeanne"], "at": { "x": 6.5, "y": -22.6 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "barnabe", "text": "Bon anniversaire, Inès ! Le paquet, c'est du miel de la clairière." },
+        { "by": "ines", "text": "Vous êtes montés jusqu'ici ? Pour moi ?" },
+        { "by": "jeanne", "text": "Bon anniversaire ! Je t'ai dessiné un pic vert. Il a l'air fâché, c'est normal." },
+        { "by": "ines", "text": "Il est très ressemblant. Ils sont toujours fâchés." },
+        { "by": "barnabe", "text": "On chante ? Je chante. Vous, vous tapez dans les mains." },
+        { "by": "ines", "text": "Doucement, Barnabé. Les chevreuils dorment." }
+      ]
+    },
+    {
+      "id": "birthday_achille", "ref": "S18", "tier": "P1", "from": "14:00", "to": "15:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "achille" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["achille", "odette", "lucie"], "at": { "x": 70.0, "y": 22.9 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "odette", "text": "Bon anniversaire, Achille ! Une boîte de sel fin, le meilleur." },
+        { "by": "achille", "text": "Du sel ? Pour un boulanger ? Tu sais parler aux gens, toi." },
+        { "by": "lucie", "text": "Bon anniversaire, Achille. Le paquet sent l'encre: c'est un carnet de recettes." },
+        { "by": "achille", "text": "Mes recettes sont dans mes mains. Mais j'y noterai les poissons." },
+        { "by": "odette", "text": "Tu as encore de la farine sur le nez. Même aujourd'hui." },
+        { "by": "achille", "text": "Surtout aujourd'hui. C'est ma façon de me faire beau." }
+      ]
+    },
+    {
+      "id": "birthday_armand", "ref": "S18", "tier": "P1", "from": "18:00", "to": "19:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "armand" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["armand", "martial", "honorine"], "at": { "x": 92.5, "y": -1.6 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "honorine", "text": "Bon anniversaire, Armand. Des chaussons pour l'harmonium, il fait froid à l'église." },
+        { "by": "armand", "text": "Vous m'avez entendu jouer ? Je croyais être seul." },
+        { "by": "martial", "text": "Bon anniversaire. Je n'ai rien entendu. Comme chaque année." },
+        { "by": "armand", "text": "Merci, mon père. Vous mentez très bien, pour un abbé." },
+        { "by": "honorine", "text": "Le paquet, ouvre-le chez toi. Octave disait que ça porte bonheur." },
+        { "by": "martial", "text": "Et l'an prochain, joue un peu plus fort. Le clocher aime ça." }
+      ]
+    },
+    {
+      "id": "birthday_firmin", "ref": "S18", "tier": "P1", "from": "18:00", "to": "19:00", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "firmin" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["firmin", "odette", "lucie", "basile"], "at": { "x": 36.35, "y": 29.6 }, "radius": 0.9 }],
+      "lines": [
+        { "by": "odette", "text": "Bon anniversaire, Firmin ! Ton gâteau t'attend, aux noix, comme Émile l'aimait." },
+        { "by": "firmin", "text": "Vous n'auriez pas dû. Enfin si. Merci." },
+        { "by": "lucie", "text": "Bon anniversaire, Firmin. Le paquet, c'est une carte des hameaux. Tu y es dessus." },
+        { "by": "basile", "text": "Bon anniversaire. Je t'ai taillé un sifflet neuf. L'ancien sifflait faux." },
+        { "by": "firmin", "text": "Il ne sifflait pas faux. Il sifflait à sa façon." },
+        { "by": "lucie", "text": "Souffle les bougies, chef. Le train n'attend pas." }
+      ]
+    },
+    {
+      "id": "birthday_solange", "ref": "S18", "tier": "P1", "from": "18:30", "to": "19:30", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "solange" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["solange", "odette", "jeanne", "lucie"], "at": { "x": 76.8, "y": 29.7 }, "radius": 0.9 }],
+      "lines": [
+        { "by": "lucie", "text": "Bon anniversaire, Solange ! Comme à dix ans: un paquet par la fenêtre." },
+        { "by": "solange", "text": "Cette fois, tu es descendue. On vieillit." },
+        { "by": "odette", "text": "Bon anniversaire, Solange. Des boutons de nacre, je les gardais pour toi." },
+        { "by": "jeanne", "text": "Bon anniversaire ! J'ai cousu le paquet moi-même. Ça se voit ?" },
+        { "by": "solange", "text": "Un point de croix tout de travers. C'est le plus beau." },
+        { "by": "odette", "text": "Tu nous coupes les cheveux gratis, ce soir ? Non ? Tant pis." }
+      ]
+    },
+    {
+      "id": "birthday_barnabe", "ref": "S18", "tier": "P1", "from": "18:00", "to": "19:30", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "barnabe" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["barnabe", "mado", "ines"], "at": { "x": 37.5, "y": 32.0 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "ines", "text": "Bon anniversaire, Barnabé ! Une pierre à aiguiser, pour ta hache." },
+        { "by": "barnabe", "text": "Merci ! Je vais chanter. Si, si. Je vais chanter." },
+        { "by": "mado", "text": "Bon anniversaire, mon grand. Le paquet, c'est une boucle de ceinture. Je l'ai forgée." },
+        { "by": "barnabe", "text": "Une boucle de Mado ! Je ne l'ôterai plus jamais." },
+        { "by": "ines", "text": "Il chante faux, mais il chante fort." },
+        { "by": "mado", "text": "Il chante comme il coupe: avec tout son cœur." }
+      ]
+    },
+    {
+      "id": "birthday_margot", "ref": "S18", "tier": "P1", "from": "15:00", "to": "16:30", "everyone": true,
+      "when": [{ "type": "birthday_of", "villager": "margot" }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["margot", "paulin", "leon"], "at": { "x": 115.6, "y": 37.0 }, "radius": 0.8 }],
+      "lines": [
+        { "by": "leon", "text": "Bon anniversaire, maman ! J'ai trouvé le paquet tout seul. Enfin, avec papa." },
+        { "by": "margot", "text": "Un paquet ? Paulin, tu as fait un paquet ?" },
+        { "by": "paulin", "text": "Un moule à beurre. Neuf." },
+        { "by": "margot", "text": "Avec une vache dessus ! Paulin, tu es un poète." },
+        { "by": "leon", "text": "La vache, c'est moi qui l'ai choisie. Elle ressemble à Marguerite." },
+        { "by": "paulin", "text": "..." }
+      ]
+    },
+    {
+      "id": "soup_dispute", "ref": "S06", "tier": "P1", "from": "11:00", "to": "12:40", "everyone": true,
+      "arc": { "season": "autumn", "rainBy": 5, "day": 1 },
+      "when": [{ "type": "day_at_least", "day": 16 }],
+      "groups": [
+        { "who": ["odette", "colette"], "spots": [{ "x": 88.4, "y": 23.0, "cap": 70 }, { "x": 89.5, "y": 22.6, "cap": 250 }] }
+      ],
+      "lines": [
+        { "by": "colette", "text": "Alors, ma soupe de potiron ? Dis-le franchement." },
+        { "by": "odette", "text": "Il manque du sel." },
+        { "by": "colette", "text": "Il manque surtout ta langue dans ta poche." },
+        { "by": "odette", "text": "Je dis ça pour toi, ma belle." },
+        { "by": "colette", "text": "Garde tes conseils pour ton épicerie." },
+        { "by": "odette", "text": "Très bien. Je ne dirai plus rien. Jamais." }
+      ]
+    },
+    {
+      "id": "soup_sulk", "ref": "S06", "tier": "P1", "from": "10:00", "to": "11:30", "everyone": true,
+      "arc": { "season": "autumn", "rainBy": 5, "day": 2 },
+      "when": [{ "type": "day_at_least", "day": 16 }],
+      "groups": [
+        { "who": ["odette"], "spots": [{ "x": 76.0, "y": 29.6, "cap": 0 }] },
+        { "who": ["colette"], "at": "planning" }
+      ],
+      "lines": [
+        { "by": "odette", "text": "Je passe par la rue Haute. L'air y est meilleur." },
+        { "by": "colette", "text": "Elle boude. Moi aussi." },
+        { "by": "odette", "text": "Solange, tu aurais du fil gris ? C'est pour recoudre ma patience." },
+        { "by": "colette", "text": "Si elle passe devant le café, je ne la vois pas." },
+        { "by": "odette", "text": "Il y a des cafés qui gagneraient à saler leur soupe." },
+        { "by": "colette", "text": "Qu'elle reste dans sa rue Haute, tiens." }
+      ]
+    },
+    {
+      "id": "soup_peace", "ref": "S06", "tier": "P1", "from": "15:00", "to": "16:40", "everyone": true,
+      "arc": { "season": "autumn", "rainBy": 5, "day": 3 },
+      "when": [{ "type": "day_at_least", "day": 16 }],
+      "groups": [
+        { "who": ["colette", "odette"], "spots": [{ "x": 33.0, "y": 30.4, "cap": 90 }, { "x": 34.0, "y": 30.4, "cap": 270 }] }
+      ],
+      "lines": [
+        { "by": "colette", "text": "Un bol de soupe, salée cette fois. Goûte." },
+        { "by": "odette", "text": "Elle est bonne. Je ne le dirai qu'une fois." },
+        { "by": "colette", "text": "À la tienne, Odette." },
+        { "by": "odette", "text": "À la tienne. Et à l'année prochaine." },
+        { "by": "colette", "text": "On recommencera ?" },
+        { "by": "odette", "text": "Évidemment. Sinon, de quoi parlerait-on ?" }
+      ]
+    },
+    {
+      "id": "cat_basket", "ref": "C01", "tier": "P0", "from": "08:50", "to": "11:30", "everyone": true,
+      "when": [{ "type": "step_active", "quest": "cat_arrival", "step": "basket" }],
+      "groups": [{ "who": ["margot"], "spots": [{ "x": 39.4, "y": 30.9, "cap": 270 }], "activity": "stand" }],
+      "lines": []
+    },
+    {
+      "id": "bike_race", "ref": "S15", "tier": "P1", "from": "08:02", "to": "08:20",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday", "wednesday", "friday"] }],
+      "cameFrom": { "points": ["offstage"], "at": "08:00" },
+      "groups": [
+        {
+          "who": ["lucie", "nour"], "activity": "bike_stop",
+          "spots": [{ "x": 121.2, "y": 22.6, "cap": 90 }, { "x": 121.2, "y": 23.6, "cap": 90 }]
+        }
+      ],
+      "lines": [
+        { "by": "nour", "text": "Prête ? Le premier au virage paie le café." },
+        { "by": "lucie", "text": "Tu me bats à la côte, je te bats à la descente." },
+        { "by": "nour", "text": "Au virage !" },
+        { "by": "lucie", "text": "Attends, ma sacoche n'est pas fermée !" },
+        { "by": "nour", "text": "Douze fermes, trois côtes et ton chien ?" },
+        { "by": "lucie", "text": "Ce n'est pas mon chien. Il me déteste." }
+      ]
+    },
+    {
+      "id": "bike_race_go", "ref": "S15", "tier": "P1", "from": "08:20", "to": "08:40",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday", "wednesday", "friday"] }],
+      "cameFrom": { "points": ["offstage"], "at": "08:00" },
+      "groups": [
+        {
+          "who": ["nour", "lucie"], "activity": "bike_stop",
+          "spots": [{ "x": 134.5, "y": 22.6, "cap": 90 }, { "x": 134.5, "y": 23.6, "cap": 90 }]
+        }
+      ],
+      "lines": [
+        { "by": "nour", "text": "Gagné ! Tu me dois un café." },
+        { "by": "lucie", "text": "Tu es partie avant le top !" }
+      ]
+    },
+    {
+      "id": "weather_shout", "ref": "S16", "tier": "P1", "from": "08:10", "to": "08:55",
+      "when": [{ "type": "weekday_is", "weekdays": ["tuesday", "thursday", "friday"] }],
+      "groups": [
+        { "who": ["martial"], "activity": "bike_stop", "spots": [{ "x": 104.6, "y": 21.4, "cap": 20 }] },
+        { "who": ["mado"], "at": "planning" }
+      ],
+      "lines": [
+        { "by": "martial", "text": "Pluie demain !" },
+        { "by": "mado", "text": "Tu disais ça la semaine dernière." },
+        { "by": "martial", "text": "Et la semaine dernière, il a plu. Une fois." },
+        { "by": "mado", "text": "Une fois sur deux, mon père. Comme mes clous." },
+        { "by": "martial", "text": "Ma roue avant chante. Tu l'entends ?" },
+        { "by": "mado", "text": "Laisse-la-moi, je te la fais taire." }
+      ]
+    },
+    {
+      "id": "weather_shout_go", "ref": "S16", "tier": "P1", "from": "08:55", "to": "09:25",
+      "when": [{ "type": "weekday_is", "weekdays": ["tuesday", "thursday", "friday"] }],
+      "cameFrom": { "points": ["priest_garden"], "at": "08:54" },
+      "groups": [{ "who": ["martial"], "activity": "bike_stop", "spots": [{ "x": 133.5, "y": 23.0, "cap": 90 }] }],
+      "lines": []
+    },
+    {
+      "id": "barnabe_to_quay", "ref": "S09", "tier": "P1", "from": "09:00", "to": "10:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["saturday"] }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["barnabe"], "spots": [{ "x": 47.8, "y": 16.05, "cap": 180 }], "activity": "stand" }],
+      "lines": []
+    },
+    {
+      "id": "carry_together", "ref": "S09", "tier": "P1", "from": "10:00", "to": "11:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["saturday"] }, { "type": "day_at_least", "day": 16 }],
+      "groups": [
+        {
+          "who": ["barnabe", "paulin"], "activity": "carry",
+          "shuttle": { "from": { "x": 47.8, "y": 16.7 }, "to": { "x": 43.4, "y": 16.7 }, "legMinutes": 8, "apart": 1.3, "load": "parcel" }
+        }
+      ],
+      "lines": [
+        { "by": "barnabe", "text": "À trois, on lève. Un, deux, trois !" },
+        { "by": "paulin", "text": "Droit. Le sac penche." },
+        { "by": "barnabe", "text": "Il pèse son poids, ton blé ! Il a mangé quoi ?" },
+        { "by": "paulin", "text": "Du soleil." },
+        { "by": "barnabe", "text": "Encore un, et je chante." },
+        { "by": "paulin", "text": "Alors on s'arrête là." }
+      ]
+    },
+    {
+      "id": "quay_mado", "ref": "S09", "tier": "P1", "from": "10:00", "to": "11:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["saturday"] }, { "type": "day_at_least", "day": 16 }],
+      "groups": [
+        { "who": ["firmin"], "spots": [{ "x": 36.6, "y": 19.0, "cap": 35 }] },
+        { "who": ["mado"], "spots": [{ "x": 37.6, "y": 17.6, "cap": 215 }], "activity": "stand" }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Doucement, Mado, le quai est neuf." },
+        { "by": "mado", "text": "Ton quai a vu passer pire que moi, Firmin." },
+        { "by": "firmin", "text": "Aïe, mon dos. Rien qu'à te regarder." },
+        { "by": "mado", "text": "Six barres de fer. Tu en veux une ?" },
+        { "by": "firmin", "text": "Merci bien. Je garde mes mains pour le sifflet." },
+        { "by": "mado", "text": "Seule, ça va plus vite. Et ça ne discute pas." }
+      ]
+    },
+    {
+      "id": "mado_to_quay", "ref": "S09", "tier": "P1", "from": "09:05", "to": "10:00", "everyone": true,
+      "when": [{ "type": "weekday_is", "weekdays": ["saturday"] }, { "type": "day_at_least", "day": 16 }],
+      "groups": [{ "who": ["mado"], "spots": [{ "x": 37.6, "y": 17.6, "cap": 215 }], "activity": "stand" }],
+      "lines": []
+    },
+    {
       "id": "mass", "ref": "S11", "tier": "P0", "from": "10:30", "to": "11:30",
       "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }],
       "cameFrom": { "points": ["church_nave"], "at": "10:30" },
@@ -320,8 +634,17 @@
     { "point": "spring", "activity": "work", "clip": "idle" },
     { "point": "bakery_back", "activity": "work", "clip": "idle" }
   ],
+  "greetings": {
+    "ref": "S01", "from": "06:00", "to": "10:00", "range": 3, "chance": 0.4,
+    "lines": ["Bonjour, {name} !", "Belle journée, {name}.", "Salut, {name} !", "Déjà debout, {name} ?", "Le bonjour, {name}.", "Tiens, {name} ! Bonjour."],
+    "replies": ["Belle journée à toi, {name}.", "Bonjour, {name} !", "Bonne journée, {name}.", "Salut, {name}.", "Bon matin, {name}.", "Le bonjour à toi, {name}."]
+  },
   "cat": {
-    "when": [],
+    "when": [{ "type": "flag", "flag": "cat_here" }],
+    "nameDecision": "cat_name",
+    "pet": { "range": 1.4, "seconds": 1.2, "heart": 3, "togetherSeconds": 3, "label": "Caresser {name}" },
+    "arrival": { "x": 39.0, "y": 31.4 },
+    "gift": { "point": "house_door", "offset": { "x": 0.9, "y": 0.7 }, "items": ["jay_feather", "cat_button"] },
     "walkSpeed": 0.35,
     "fleeSpeed": 1.1,
     "stayMinutes": [25, 60],

@@ -2861,6 +2861,9 @@ export function loadContent(files: RawContentFiles): Content {
   checkVillageReferences(content);
   checkDecisionVillagers(content.decisions, content.villagers);
   checkVillageScenes(content.village, content.villagers.map((v) => v.id), null);
+  for (const item of content.village.cat?.gift?.items ?? []) {
+    if (content.items[item] === undefined) throw new ContentError(`vie.json: chat: objet inconnu « ${item} »`);
+  }
   checkTastes(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.

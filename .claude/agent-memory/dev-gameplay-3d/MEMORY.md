@@ -518,3 +518,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Commit temporaire refusé par l'outil pour fusionner la branche de session: sauvegarder `git diff` dans le scratchpad, remettre seulement les fichiers en conflit (`git checkout -- <fichier>`), `merge --ff-only`, réappliquer les quelques lignes à la main.
 - Page de rendu avec la vraie simulation des habitants: `rendu.html?vie13=1&jour=&heure=&avance=` (`demo/vie13-exemple.ts`); `x`, `y` posent le joueur 1 (les bulles ne se montrent qu'à moins de 8 m de lui). Le port 6431 est pris par une autre séance: 6587.
 - Le son de la 0.13 joue les événements du village par leur nom (`AUDIO_SETTINGS.village.events`, champs `villager`, `by`, `at`) dans le `default` de `declencheurs.ts`; un type ajouté à `WorldEvent` doit avoir son `case` qui appelle `villageEventSound`, sinon il n'est plus joué.
+
+## Scènes de vie et chat de la 0.13 (La Petite Ligne, vérifié le 2026-11-04)
+
+- Vitesse des habitants 1,6 m/s pour 0,7 s par minute de jeu: 1,1 m par minute. Une scène dont un membre vient de loin (80 m) le voit arriver une heure après: chiffrer les distances (planning à la minute d'avant) avant de fixer `from`, ou ajouter une scène d'approche (`mado_to_quay`).
+- Une bulle de scène toutes les 10 minutes de jeu (`bubbleSeconds` 7 s réelles): une scène de 15 minutes n'en montre qu'une ou deux. Un test de bulles vérifie « au moins une, dite par un membre », pas « chacun a parlé ».
+- Venir du hors-carte: un habitant invisible dont la scène commence est posé directement à sa place (convention des retours de tournée). Scène à `cameFrom: offstage` à 2 minutes au moins après le départ du planning (au rythme « vif », un pas de planning de 15 ticks peut sauter une minute).
+- Jour de la semaine: le jour 1 est un samedi, `(jour - 1) % 7` (0 samedi, 1 dimanche, 2 lundi...).
+- `pkill -f` ou `until ! pgrep -f <motif>` dont le motif est dans la commande elle-même: le shell de l'outil se voit et ne finit jamais (ou se tue). Attendre une tâche de fond par sa notification.
+- Une variable lue dans un test après `sim.runtime.cat = null`: TypeScript la garde `null`; la lire par une petite fonction.
+- `tests/amitie-0-13.test.ts` (« format 14 sans nouveau format ») attend `DATA_SCHEMA` 14 alors qu'il vaut 15: rouge avant cette mission.

@@ -6,7 +6,8 @@
  */
 import { ContentError, type Reader } from './lecteur';
 import { WORK_STROKE_EVENTS, type WorkStrokeEvent } from '../etat/types';
-import type { Condition } from './types';
+import { SEASONS } from './calendrier';
+import type { Condition, Season } from './types';
 
 /** Lit une liste de conditions (`when`), avec la règle de `contenu.ts`. */
 export type ConditionsReader = (r: Reader | null) => Condition[];
@@ -24,7 +25,13 @@ export type SceneGroupPlace =
   /** Une place par membre, dans l'ordre de `who` (cap en radians, convention des personnages), assise ou debout. */
   | { kind: 'spots'; seated: boolean; spots: { x: number; y: number; facing: number }[] }
   /** Chacun reste au point de son planning et se tourne vers les autres membres. */
-  | { kind: 'planning' };
+  | { kind: 'planning' }
+  /**
+   * Portage à deux (S09): les deux membres, face à face à `apart` m, vont et viennent entre `from`
+   * (aller à vide) et `to` (retour chargé, la charge `load` entre leurs mains), une étape toutes
+   * les `legMinutes` minutes de jeu.
+   */
+  | { kind: 'shuttle'; from: PlanPoint; to: PlanPoint; legMinutes: number; apart: number; load: string };
 
 export interface SceneGroupDef {
   who: string[];
@@ -37,6 +44,17 @@ export interface SceneGroupDef {
 export interface SceneLineDef {
   by: string;
   text: string;
+}
+
+/**
+ * Scène d'une histoire sur plusieurs jours (S06, la soupe): elle tient le `day`-ième jour (1, 2,
+ * 3...) à partir du premier jour de pluie de `season` parmi ses `rainBy` premiers jours, ou du
+ * dernier de ces jours s'il n'a pas plu.
+ */
+export interface SceneArc {
+  season: Season;
+  rainBy: number;
+  day: number;
 }
 
 export interface SceneDef {
@@ -55,6 +73,13 @@ export interface SceneDef {
    * dans le bourg (ni chez lui ni hors de la carte) à cet instant.
    */
   cameFrom: { points: string[]; at: number } | null;
+  /**
+   * Sans `cameFrom`: un membre chez lui en sort pour venir (anniversaire, la soupe); faux: seulement
+   * s'il est déjà dans le bourg. Jamais depuis le hors-carte.
+   */
+  everyone: boolean;
+  /** Jour d'une histoire en plusieurs jours, `null`: chaque jour où `when` tient. */
+  arc: SceneArc | null;
   groups: SceneGroupDef[];
   lines: SceneLineDef[];
 }
@@ -138,6 +163,36 @@ export interface CatDef {
   watchRange: number;
   /** Il suit parfois (`chance` par approche douce) un joueur `seconds` secondes, à `distance` m derrière lui. */
   follow: { chance: number; seconds: number; distance: number };
+  /** Décision à deux qui lui donne son nom (`decisions.json`), `null`: il n'a pas de nom. */
+  nameDecision: string | null;
+  /** Où il sort du panier de Margot le jour de son arrivée (m), `null`: directement à sa place. */
+  arrival: PlanPoint | null;
+  /**
+   * Sa trouvaille de la semaine (section 7.4): un jour de chaque semaine tiré par la graine, à
+   * l'aube, il dépose l'un de ces objets devant `point` (décalé de `offset` m). `null`: aucune.
+   */
+  gift: { point: string; offset: PlanPoint; items: string[] } | null;
+  /**
+   * Le caresser (geste 30 de la table 7.1): Agir à moins de `range` m quand il est posé (assis ou
+   * couché); `heart` de Cœur une fois par jour; caressé par les deux à moins de `togetherSeconds`
+   * d'écart, il se roule sur le dos. `label`: l'invite (`{name}`: son nom, ou « le chat »).
+   */
+  pet: { range: number; seconds: number; heart: number; togetherSeconds: number; label: string } | null;
+}
+
+/**
+ * Saluts quand deux habitants se croisent (S01): de `from` à `to`, deux habitants dehors à moins de
+ * `range` m l'un de l'autre, dont l'un au moins marche, se saluent si la paire est tirée ce jour-là
+ * (`chance`), une fois par paire et par jour. `{name}`: le prénom de l'autre.
+ */
+export interface GreetingsDef {
+  ref: string;
+  from: number;
+  to: number;
+  range: number;
+  chance: number;
+  lines: string[];
+  replies: string[];
 }
 
 export interface VillageScenes {
@@ -146,6 +201,7 @@ export interface VillageScenes {
   seating: SeatingDef[];
   pauses: VillagePauseDef[];
   cat: CatDef | null;
+  greetings: GreetingsDef | null;
   /** Bulles des scènes: une toutes les `bubbleSeconds` (s), lue à moins de `bubbleRange` m. */
   bubbleSeconds: number;
   bubbleRange: number;
@@ -157,6 +213,7 @@ export const EMPTY_VILLAGE_SCENES: VillageScenes = {
   seating: [],
   pauses: [],
   cat: null,
+  greetings: null,
   bubbleSeconds: 7,
   bubbleRange: 8,
 };
@@ -183,8 +240,20 @@ function parseGroup(g: Reader): SceneGroupDef {
   if (who.length === 0) g.fail('au moins un habitant attendu');
   const at = g.opt('at');
   const spots = g.opt('spots');
+  const shuttle = g.opt('shuttle');
   let place: SceneGroupPlace;
-  if (spots !== null) {
+  if (shuttle !== null) {
+    if (who.length !== 2) g.fail('un portage à deux attend deux habitants');
+    place = {
+      kind: 'shuttle',
+      from: point(shuttle.at('from')),
+      to: point(shuttle.at('to')),
+      legMinutes: shuttle.at('legMinutes').number(),
+      apart: shuttle.opt('apart')?.number() ?? 1.3,
+      load: id(shuttle.at('load')),
+    };
+    if (place.legMinutes <= 0) shuttle.fail('« legMinutes » positif attendu');
+  } else if (spots !== null) {
     const list = seatList(spots);
     if (list.length < who.length) spots.fail('une place par habitant attendue');
     place = { kind: 'spots', seated: g.opt('seated')?.boolean() ?? false, spots: list };
@@ -213,6 +282,7 @@ function parseScenes(r: Reader | null, conditions: ConditionsReader): SceneDef[]
     if (new Set(members).size !== members.length) s.fail('un habitant dans deux groupes');
     const came = s.opt('cameFrom');
     const lines = s.opt('lines');
+    const arc = s.opt('arc');
     return {
       id: sceneId,
       ref: s.opt('ref')?.string() ?? '',
@@ -224,6 +294,15 @@ function parseScenes(r: Reader | null, conditions: ConditionsReader): SceneDef[]
         came === null
           ? null
           : { points: came.at('points').items().map(id), at: came.opt('at')?.time() ?? from - 1 },
+      everyone: s.opt('everyone')?.boolean() ?? false,
+      arc:
+        arc === null
+          ? null
+          : {
+              season: arc.at('season').oneOf(SEASONS),
+              rainBy: arc.at('rainBy').integer(1, 30),
+              day: arc.at('day').integer(1, 30),
+            },
       groups,
       lines:
         lines === null
@@ -273,6 +352,9 @@ function parseCat(r: Reader | null, conditions: ConditionsReader): CatDef | null
   const stay = r.at('stayMinutes').numberList();
   if (stay.length !== 2 || (stay[0] ?? 0) > (stay[1] ?? 0)) r.at('stayMinutes').fail('[min, max] attendu');
   const flee = r.at('flee');
+  const gift = r.opt('gift');
+  const nameDecision = r.opt('nameDecision');
+  const pet = r.opt('pet');
   return {
     when: conditions(r.opt('when')),
     habits: r
@@ -309,6 +391,42 @@ function parseCat(r: Reader | null, conditions: ConditionsReader): CatDef | null
       seconds: r.at('follow').at('seconds').number(),
       distance: r.at('follow').at('distance').number(),
     },
+    nameDecision: nameDecision === null ? null : id(nameDecision),
+    arrival: r.opt('arrival') === null ? null : point(r.at('arrival')),
+    gift:
+      gift === null
+        ? null
+        : {
+            point: id(gift.at('point')),
+            offset: gift.opt('offset') === null ? { x: 0, y: 0 } : point(gift.at('offset')),
+            items: gift.at('items').items().map(id),
+          },
+    pet:
+      pet === null
+        ? null
+        : {
+            range: pet.at('range').number(),
+            seconds: pet.at('seconds').number(),
+            heart: pet.at('heart').number(),
+            togetherSeconds: pet.at('togetherSeconds').number(),
+            label: pet.at('label').string(),
+          },
+  };
+}
+
+function parseGreetings(r: Reader | null): GreetingsDef | null {
+  if (r === null) return null;
+  const lines = r.at('lines').items().map((l) => l.string());
+  const replies = r.at('replies').items().map((l) => l.string());
+  if (lines.length === 0 || replies.length === 0) r.fail('au moins une réplique de chaque côté attendue');
+  return {
+    ref: r.opt('ref')?.string() ?? '',
+    from: r.at('from').time(),
+    to: r.at('to').time(),
+    range: r.at('range').number(),
+    chance: r.at('chance').number(),
+    lines,
+    replies,
   };
 }
 
@@ -328,6 +446,7 @@ export function parseVillageScenes(r: Reader | null, conditions: ConditionsReade
       clip: id(p.at('clip')),
     })),
     cat: parseCat(r.opt('cat'), conditions),
+    greetings: parseGreetings(r.opt('greetings')),
     bubbleSeconds: bubbles?.at('seconds').number() ?? EMPTY_VILLAGE_SCENES.bubbleSeconds,
     bubbleRange: bubbles?.at('range').number() ?? EMPTY_VILLAGE_SCENES.bubbleRange,
   };
@@ -351,4 +470,6 @@ export function checkVillageScenes(
   for (const p of [...life.workPosts, ...life.seating]) {
     if (!points.has(p.point)) throw new ContentError(`vie.json: point inconnu « ${p.point} »`);
   }
+  const gift = life.cat?.gift ?? null;
+  if (gift !== null && !points.has(gift.point)) throw new ContentError(`vie.json: chat: point inconnu « ${gift.point} »`);
 }

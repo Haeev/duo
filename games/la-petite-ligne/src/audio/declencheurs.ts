@@ -584,6 +584,7 @@ export function soundsForEvent(
       break;
     case 'sign_read':
     case 'villager_remark':
+    case 'villager_greeting':
       break;
     // 0.13 (lot H7, section 7.1): les gestes des joueurs avec le décor. Les dix noms du son
     // (`settings.village.events`) ont leur place `by`/`at`; les autres gestes jouent leur son du catalogue.
@@ -610,6 +611,8 @@ export function soundsForEvent(
     case 'joinery_saw':
     case 'joinery_plane':
     case 'cat_follow':
+    case 'cat_gift':
+    case 'cat_pet':
       villageEventSound(raw, ctx, settings, emit);
       break;
     // 0.13 (lot H2): le paquet change de mains, puis la réaction de l'habitant chez qui offre.

@@ -1,8 +1,9 @@
 /**
  * Bulles des habitants (0.13, lot H7, sections 7.2 et 7.3 de `v0-13-habitants.md`): les répliques
  * des scènes entre habitants (`sceneBubbles` de `etat/vie.ts`, lues dans l'état: les mêmes chez
- * l'hôte et chez l'invité) et les remarques faites à un joueur (événement `villager_remark`,
- * montrées chez ce joueur seulement). Une bulle se lit à moins de `bubbleRange` m, du même côté
+ * l'hôte et chez l'invité), les saluts entre habitants qui se croisent (événement
+ * `villager_greeting`, chez les deux) et les remarques faites à un joueur (événement
+ * `villager_remark`, montrées chez ce joueur seulement). Une bulle se lit à moins de `bubbleRange` m, du même côté
  * d'un mur.
  *
  * Même procédé que les étiquettes des poules (`etiquettes.ts`): un panneau tourné vers la caméra,
@@ -133,8 +134,10 @@ export class VillagerBubbles implements EventfulPart {
   }
 
   handleEvent(event: WorldEvent, context: FrameContext): void {
-    if (event.type !== 'villager_remark' || event.to !== context.local) return;
-    this.remarks.set(event.villager, { text: event.text, until: context.time + REMARK_SECONDS });
+    // Un salut entre deux habitants (S01) se voit chez les deux joueurs; une remarque, chez celui à qui elle est faite.
+    if (event.type === 'villager_greeting' || (event.type === 'villager_remark' && event.to === context.local)) {
+      this.remarks.set(event.villager, { text: event.text, until: context.time + REMARK_SECONDS });
+    }
   }
 
   update(context: FrameContext): void {

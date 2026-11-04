@@ -693,10 +693,13 @@ export const RENDER_SETTINGS = {
      */
     villagerProps: {
       lucie: [
+        villagerProp('bicycle_lucie', 'bike', { activities: ['bike_stop'], untracked: true, stillClip: 'push_bike_idle' }),
         villagerProp('bicycle_lucie', 'bike', { walking: true, habits: ['round', 'train', 'sorting'], untracked: true }),
         villagerProp('bicycle_lucie', 'bike', { activities: ['wait_train'], habits: ['train'], stillClip: 'push_bike_idle' }),
       ],
       martial: [
+        // 0.13 (S16): arrêté devant la forge, à vélo, pour la météo du lendemain.
+        villagerProp('bicycle_martial', 'bike', { activities: ['bike_stop'], untracked: true, stillClip: 'push_bike_idle' }),
         villagerProp('bicycle_martial', 'bike', {
           walking: true,
           habits: ['rounds', 'sunday_hamlets', 'birthday', 'wednesday_bike'],
@@ -708,7 +711,11 @@ export const RENDER_SETTINGS = {
           stillClip: 'push_bike_idle',
         }),
       ],
-      nour: [villagerProp('bicycle_nour', 'bike', { walking: true, habits: ['rounds'], untracked: true })],
+      nour: [
+        // 0.13 (S15): arrêtée au départ de la course avec Lucie, le vélo à la main.
+        villagerProp('bicycle_nour', 'bike', { activities: ['bike_stop'], untracked: true, stillClip: 'push_bike_idle' }),
+        villagerProp('bicycle_nour', 'bike', { walking: true, habits: ['rounds'], untracked: true }),
+      ],
       armand: [
         villagerProp('school_satchel', 'hand', { walking: true, habits: ['gate', 'class', 'recess', 'mairie'], untracked: true }),
         villagerProp('school_satchel', 'hand', { activities: ['stand'], habits: ['gate'], stillClip: 'idle' }),
@@ -744,6 +751,14 @@ export const RENDER_SETTINGS = {
       walkClip: 'push_bike',
       idleClip: 'push_bike_idle',
     } satisfies BikeSettings,
+    /**
+     * Portage à deux entre habitants (S09): la charge, tenue par le premier porteur, est poussée
+     * d'autant devant ses mains (m), pour tomber au milieu des deux porteurs, face à face à 1,3 m
+     * (`apart` de `vie.json`) quand chacun a les mains à 0,44 m devant lui.
+     */
+    villagerLoadReach: 0.21,
+    /** Au-delà (m), les deux porteurs ne sont pas ensemble: rien entre leurs mains. */
+    villagerLoadPairing: 2.2,
     /** Boire (le chocolat à la petite table d'Odette: action `eat` qui vise la table). */
     drinkClip: 'drink',
     /** Traire la chèvre ou la tenir pour l'autre: pas encore de clip de traite, celui de la caresse (accroupi). */

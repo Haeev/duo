@@ -9,9 +9,9 @@
  * - `seat:<point>:<rang>`: une place assise d'un point de planning (`seating` de `vie.json`).
  */
 import type { Content, ScheduleEntry, VillagerDef } from '../donnees/types';
-import type { SceneDef, SceneGroupDef } from '../donnees/vie';
+import type { SceneArc, SceneDef, SceneGroupDef } from '../donnees/vie';
 import { entryHolds, planningCondition, type PlanningMoment } from './planning';
-import { secondsPerGameMinuteOn } from '../donnees/calendrier';
+import { dayOfSeason, secondsPerGameMinuteOn, seasonOfDay } from '../donnees/calendrier';
 import type { ReadonlyWorld, Vec2 } from './types';
 import { unitDraw } from './tirage';
 
@@ -34,10 +34,35 @@ export interface LifePlace {
   inside: boolean;
 }
 
-/** La scène tient-elle à cet instant (plage horaire et conditions du jour) ? */
+/** La scène tient-elle à cet instant (plage horaire, jour de l'histoire, conditions du jour) ? */
 export function sceneHolds(content: Content, world: ReadonlyWorld, scene: SceneDef, at: PlanningMoment): boolean {
   if (at.minutes < scene.from || at.minutes >= scene.to) return false;
+  if (scene.arc !== null && arcDay(content, world, scene.arc, at.day) !== scene.arc.day) return false;
   return scene.when.every((c) => planningCondition(content, world, c, at));
+}
+
+/** Météo d'un jour passé ou du jour même, lue dans l'état (journal de la météo tirée), `null`: inconnue. */
+function weatherOn(content: Content, world: ReadonlyWorld, day: number): string | null {
+  if (day === world.clock.day) return world.weather;
+  if (day < content.settings.weather.fromDay) return content.settings.weatherByDay[day - 1] ?? null;
+  return world.weatherLog.find((e) => e.day === day)?.weather ?? null;
+}
+
+/**
+ * Le rang du jour `day` dans une histoire en plusieurs jours (S06): 1 le jour où elle commence (le
+ * premier jour de pluie de la saison parmi ses `rainBy` premiers, ou le dernier de ceux-là), 2 le
+ * lendemain... `null` avant qu'elle commence ou hors de la saison. Lu dans l'état seul: le même jour
+ * chez l'hôte et chez l'invité.
+ */
+export function arcDay(content: Content, world: ReadonlyWorld, arc: SceneArc, day: number): number | null {
+  const s = content.settings;
+  if (seasonOfDay(s, day) !== arc.season) return null;
+  const first = day - dayOfSeason(s, day) + 1;
+  for (let d = first; d < first + arc.rainBy; d++) {
+    if (d > day) return null;
+    if (d === first + arc.rainBy - 1 || weatherOn(content, world, d) === 'rain') return day - d + 1;
+  }
+  return null;
 }
 
 /** L'entrée du planning de cet habitant à cet instant (première vraie), ou `null`. */
@@ -63,7 +88,8 @@ export function joinsScene(
     return before !== null && scene.cameFrom.points.includes(before.point);
   }
   const now = planningEntryAt(content, world, def, at);
-  return now !== null && now.point !== OFFSTAGE && !HIDDEN.has(now.activity);
+  if (now === null || now.point === OFFSTAGE) return false;
+  return scene.everyone ? now.activity !== 'absent' : !HIDDEN.has(now.activity);
 }
 
 /** La scène et la place de cet habitant à cet instant, ou `null`. */
@@ -83,8 +109,20 @@ export function sceneSlotOf(
   return null;
 }
 
-export function sceneTarget(scene: string, group: number, rank: number): string {
-  return `${SCENE_PREFIX}${scene}:${String(group)}:${String(rank)}`;
+export function sceneTarget(scene: string, group: number, rank: number, leg: number | null = null): string {
+  const base = `${SCENE_PREFIX}${scene}:${String(group)}:${String(rank)}`;
+  return leg === null ? base : `${base}:${String(leg)}`;
+}
+
+/** Le point visé est-il cette place de scène (avec ou sans étape d'un portage) ? */
+export function atSceneTarget(target: string, scene: string, group: number, rank: number): boolean {
+  const base = sceneTarget(scene, group, rank);
+  return target === base || target.startsWith(`${base}:`);
+}
+
+/** Étape d'un portage à deux à cette minute: 0 à vide vers `from`, 1 chargé vers `to`. */
+export function shuttleLeg(scene: SceneDef, legMinutes: number, minutes: number): number {
+  return Math.floor((minutes - scene.from) / legMinutes) % 2;
 }
 
 export function seatTarget(point: string, rank: number): string {
@@ -99,21 +137,35 @@ export function seatBase(target: string): string | null {
   return cut < 0 ? null : rest.slice(0, cut);
 }
 
-function parseScene(target: string): { scene: string; group: number; rank: number } | null {
+function parseScene(target: string): { scene: string; group: number; rank: number; leg: number } | null {
   if (!target.startsWith(SCENE_PREFIX)) return null;
-  const [scene, group, rank] = target.slice(SCENE_PREFIX.length).split(':');
+  const [scene, group, rank, leg] = target.slice(SCENE_PREFIX.length).split(':');
   if (scene === undefined || group === undefined || rank === undefined) return null;
-  return { scene, group: Number(group), rank: Number(rank) };
+  return { scene, group: Number(group), rank: Number(rank), leg: leg === undefined ? 0 : Number(leg) };
 }
 
 /** Le groupe de scène d'un point virtuel `scene:...`, ou `null`. */
-export function sceneGroupOf(content: Content, target: string): { scene: SceneDef; group: SceneGroupDef; rank: number } | null {
+export function sceneGroupOf(
+  content: Content,
+  target: string,
+): { scene: SceneDef; group: SceneGroupDef; rank: number; leg: number } | null {
   const t = parseScene(target);
   if (t === null) return null;
   const scene = content.village.scenes.find((s) => s.id === t.scene);
   const group = scene?.groups[t.group];
   if (scene === undefined || group === undefined) return null;
-  return { scene, group, rank: t.rank };
+  return { scene, group, rank: t.rank, leg: t.leg };
+}
+
+/**
+ * La charge d'un portage à deux (S09) quand ce point virtuel est l'étape chargée: modèle, rang du
+ * porteur (le premier la tient, l'autre lui fait face) et l'autre porteur, ou `null`.
+ */
+export function shuttleLoad(content: Content, target: string): { load: string; rank: number; partner: string } | null {
+  const s = sceneGroupOf(content, target);
+  if (s?.group.place.kind !== 'shuttle' || s.leg !== 1) return null;
+  const partner = s.group.who[1 - s.rank];
+  return partner === undefined ? null : { load: s.group.place.load, rank: s.rank, partner };
 }
 
 /** La place d'un point virtuel (scène, siège), ou `null` pour un point ordinaire de la carte. */
@@ -124,6 +176,17 @@ export function lifePlace(content: Content, target: string): LifePlace | null {
     if (place.kind === 'spots') {
       const spot = place.spots[s.rank];
       return spot === undefined ? null : { x: spot.x, y: spot.y, facing: spot.facing, seated: place.seated, inside: place.seated };
+    }
+    if (place.kind === 'shuttle') {
+      // Face à face de part et d'autre du trajet, chacun tourné vers l'autre.
+      const end = s.leg === 1 ? place.to : place.from;
+      const dx = place.to.x - place.from.x;
+      const dy = place.to.y - place.from.y;
+      const len = Math.max(1e-6, Math.hypot(dx, dy));
+      const side = s.rank === 0 ? 0.5 : -0.5;
+      const px = (-dy / len) * place.apart * side;
+      const py = (dx / len) * place.apart * side;
+      return { x: end.x + px, y: end.y + py, facing: Math.atan2(-py, -px), seated: false, inside: false };
     }
     if (place.kind === 'circle') {
       const n = s.group.who.length;
@@ -190,7 +253,7 @@ export function sceneBubbles(content: Content, world: ReadonlyWorld, out: SceneB
         const there =
           g.place.kind === 'planning'
             ? !v.target.startsWith(SCENE_PREFIX) && (g.activity === '' || v.activity === g.activity)
-            : v.target === sceneTarget(scene.id, gi, rank);
+            : atSceneTarget(v.target, scene.id, gi, rank);
         if (there) present.add(who);
       });
     });
