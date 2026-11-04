@@ -129,7 +129,7 @@ export function planningCondition(
     case 'birthday_of':
       return isBirthday(content, c.villager, at.day);
     case 'decision_made':
-      return world.decisions[c.decision] === c.option;
+      return c.option === null ? world.decisions[c.decision] !== undefined : world.decisions[c.decision] === c.option;
     case 'habit_known':
       return habitKnown(world, c.villager, c.habit);
     case 'bond_at_least':

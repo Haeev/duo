@@ -8,6 +8,7 @@ import calendrier from '../../donnees/calendrier.json';
 import catalogue from '../../donnees/catalogue.json';
 import chantiers from '../../donnees/chantiers.json';
 import courrier from '../../donnees/courrier.json';
+import decisions from '../../donnees/decisions.json';
 import cultures from '../../donnees/cultures.json';
 import envies from '../../donnees/envies.json';
 import habitants from '../../donnees/habitants.json';
@@ -47,5 +48,6 @@ export const CONTENT_FILES: RawContentFiles = {
   marche,
   vetements,
   calendrier,
+  decisions,
   ...(habitants013 === undefined ? {} : { habitants013 }),
 };

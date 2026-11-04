@@ -24,6 +24,7 @@ import {
 import { ContentError, Reader } from './lecteur';
 import { agreeMoney } from './monnaie';
 import { parseMarket } from './marche';
+import { checkDecisionVillagers, NO_DECISIONS, parseDecisions } from './decisions';
 import { parseMailRound } from './plis';
 import {
   EMPTY_HOME,
@@ -139,6 +140,8 @@ export interface RawContentFiles {
   habitants013?: unknown;
   /** 0.13: jours particuliers et classe (`calendrier.json`); absent: aucun. */
   calendrier?: unknown;
+  /** 0.13: décisions à deux (`decisions.json`); absent: aucune. */
+  decisions?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -377,7 +380,7 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
     case 'birthday_of':
       return { type, villager: r.at('villager').string() };
     case 'decision_made':
-      return { type, decision: r.at('decision').string(), option: r.at('option').string() };
+      return { type, decision: r.at('decision').string(), option: optString(r, 'option') };
     case 'habit_known':
       return { type, villager: r.at('villager').string(), habit: r.at('habit').string() };
     case 'bond_at_least':
@@ -591,6 +594,8 @@ export function parseEffect(r: Reader): Effect {
       return { type, villager: r.at('villager').string(), amount: r.at('amount').integer(0) };
     case 'reveal_taste':
       return { type, villager: r.at('villager').string(), item: r.at('item').string() };
+    case 'open_decision':
+      return { type, decision: r.at('decision').string() };
     case 'give_item':
       return {
         type,
@@ -2779,11 +2784,13 @@ export function loadContent(files: RawContentFiles): Content {
         : parseClothes(files.vetements, parseWardrobeSettings(reglages.opt('wardrobe'))),
     villageCalendar: parseVillageCalendar(files.calendrier === undefined ? null : root('calendrier.json', files.calendrier), settings, villagers),
     signs: signsOf(villagers),
+    decisions: files.decisions === undefined ? NO_DECISIONS : parseDecisions(root('decisions.json', files.decisions), parseEffect),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
   checkVillageReferences(content);
+  checkDecisionVillagers(content.decisions, content.villagers);
   checkTastes(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.

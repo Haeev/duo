@@ -75,5 +75,21 @@ export function villageShapeError(data: Record<string, unknown>): string | null 
       return 'amitié';
   for (const list of Object.values(data.storyDone))
     if (!Array.isArray(list) || !list.every((x) => typeof x === 'string')) return 'amitié';
+  if (!Object.values(data.decisions).every((o) => typeof o === 'string')) return 'décisions';
+  // Décisions ouvertes (mission 0.13): absentes des premières sauvegardes du format 14.
+  const open = data.decisionsOpen;
+  if (open !== undefined) {
+    if (!isRecord(open)) return 'décisions';
+    for (const d of Object.values(open)) {
+      if (!isRecord(d)) return 'décisions';
+      if ((d.p1 !== undefined && typeof d.p1 !== 'string') || (d.p2 !== undefined && typeof d.p2 !== 'string')) return 'décisions';
+      if (d.agreedAt !== undefined && typeof d.agreedAt !== 'number') return 'décisions';
+    }
+  }
   return null;
+}
+
+/** Décisions ouvertes d'une sauvegarde du format 14 écrite avant elles: aucune. */
+export function fillOpenDecisions(world: { decisionsOpen?: unknown }): void {
+  if (!isRecord(world.decisionsOpen)) world.decisionsOpen = {};
 }

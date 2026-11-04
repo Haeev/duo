@@ -815,6 +815,22 @@ const SupplementSchema = v.object({
     places: strings(NEIGHBOUR_PLACE_KEYS),
     birthdaySeasons: strings(['spring', 'summer', 'autumn', 'winter'] as const),
   }),
+  /** Décision à deux (0.13, `v0-13-habitants.md` section 5.2): le panneau et son rappel dans le HUD. */
+  decision: strings([
+    'title',
+    'asks',
+    'choose',
+    'waitingPartner',
+    'waitingMe',
+    'disagree',
+    'agreed',
+    'stamp',
+    'later',
+    'reopen',
+    'mine',
+    'theirs',
+    'enterHint',
+  ] as const),
 });
 
 export type GameUiTexts = v.InferOutput<typeof GameUiSchema>;

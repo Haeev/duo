@@ -30,6 +30,7 @@ import { updateRoosterFlag, wanderHens } from './poules';
 import { updateGoatFlag, updateGoats } from './chevres';
 import { movingAnimals } from '../etat/elevage';
 import { updateQuests } from './quetes';
+import { updateDecisions } from './decisions';
 import { updateTrain } from './train';
 import { releaseHoldsOnMove, updateHolds, updateMoments } from './moments';
 import { updateHenCalls } from './secrets';
@@ -176,6 +177,7 @@ export function step(sim: Sim, input: StepInput): void {
 
   autoStartScenes(sim);
   pumpScripts(sim);
+  updateDecisions(sim);
   updateQuests(sim);
   // 0.12: le coq et la chevrette arrivent quand les quêtes posent leurs drapeaux.
   updateRoosterFlag(sim);

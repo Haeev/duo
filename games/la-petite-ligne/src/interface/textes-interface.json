@@ -1175,5 +1175,20 @@
       "away": "hors du bourg",
       "village": "dans le bourg"
     }
+  },
+  "decision": {
+    "title": "Décision à deux",
+    "asks": "{name} vous demande",
+    "choose": "Choisir",
+    "waitingPartner": "{partner} réfléchit encore.",
+    "waitingMe": "{partner} a choisi. À toi.",
+    "disagree": "Vous n'êtes pas du même avis: parlez-en.",
+    "agreed": "D'accord tous les deux !",
+    "stamp": "Décidé ensemble",
+    "later": "Plus tard",
+    "reopen": "Une décision vous attend",
+    "mine": "ton choix",
+    "theirs": "le choix de {partner}",
+    "enterHint": "{key} pour choisir. Tu peux continuer à jouer."
   }
 }

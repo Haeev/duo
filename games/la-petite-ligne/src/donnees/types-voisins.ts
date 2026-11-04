@@ -99,6 +99,18 @@ export interface BondSettings {
   birthdayPresence: { distance: number; seconds: number };
   /** Sortes d'objets qui ne s'offrent pas (outils, objets de quête, charges portées). */
   giftExcluded: string[];
+  /** Rythme des quêtes d'histoire (champ `story`, section 5.1). */
+  storyPace: StoryPace;
+}
+
+/** Rythme des quêtes d'histoire (section 5.1, mesuré en 5.7). */
+export interface StoryPace {
+  /** Histoires en cours au plus: les autres prêtes attendent. */
+  maxActive: number;
+  /** Quêtes d'histoire neuves au plus par jour de jeu. */
+  newPerDay: number;
+  /** Jours au moins entre la fin d'une étape d'un habitant et le début de la suivante. */
+  cooldownDays: number;
 }
 
 /** Gains de lien (section 6.2); aucun n'est négatif. */

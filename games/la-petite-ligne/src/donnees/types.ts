@@ -42,6 +42,7 @@ export interface GrocerPricing {
 }
 import type { FishDef, FishingRules } from './poissons';
 import type { ClothesContent } from './vetements';
+import type { DecisionsContent } from './decisions';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -132,7 +133,8 @@ export type Condition = { label?: string } & (
   | { type: 'special_day'; id: string }
   | { type: 'season_day_is'; days: number[] }
   | { type: 'birthday_of'; villager: string }
-  | { type: 'decision_made'; decision: string; option: string }
+  /** `option` nul: la décision est prise, quelle que soit l'option. */
+  | { type: 'decision_made'; decision: string; option: string | null }
   | { type: 'habit_known'; villager: string; habit: string }
   /** 0.13 (lot H2): niveau d'amitié atteint avec cet habitant (0 à 5, section 6.1). */
   | { type: 'bond_at_least'; villager: string; level: number }
@@ -167,7 +169,9 @@ export type Effect =
   /** 0.13 (lot H2): lien avec l'habitant (jamais négatif, plafonné à `bonds.max`). */
   | { type: 'add_bond'; villager: string; amount: number }
   /** 0.13 (lot H2): écrit au carnet le goût de l'habitant pour cet objet (une rumeur, une réplique). */
-  | { type: 'reveal_taste'; villager: string; item: string };
+  | { type: 'reveal_taste'; villager: string; item: string }
+  /** 0.13 (section 5.2): ouvre le panneau de la décision à deux chez les deux joueurs (rien si elle est prise). */
+  | { type: 'open_decision'; decision: string };
 
 // ---------------------------------------------------------------------------
 // Objets
@@ -1449,4 +1453,6 @@ export interface Content {
   villageCalendar: VillageCalendar;
   /** 0.13: écriteaux qui révèlent des habitudes, par identifiant de point. */
   signs: Record<string, SignDef>;
+  /** 0.13: décisions à deux (`decisions.json`), vides si le fichier manque. */
+  decisions: DecisionsContent;
 }

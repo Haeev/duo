@@ -57,6 +57,8 @@ const MESSAGE_VISUALS: Readonly<Record<string, ToastVisual>> = {
   partner_waits_scene: plain('ui-hourglass'),
   scene_waits: plain('ui-pin'),
   big_purchase_proposal: plain('ui-coin'),
+  decision_opened: plain('ui-neighbours'),
+  decision_taken: plain('ui-check'),
   big_purchase_accepted: plain('ui-check'),
   big_purchase_declined: plain('ui-cross'),
   big_purchase_cancelled: plain('ui-cross'),

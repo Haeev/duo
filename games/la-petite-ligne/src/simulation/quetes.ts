@@ -77,6 +77,7 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
   const next = quest.steps[state.step];
   if (next === undefined) {
     state.status = 'done';
+    if (quest.story !== null) state.doneDay = sim.world.clock.day;
     setQuestChecklist(state, []);
     // Les valeurs de départ ne servent qu'aux étapes en cours (format 8: rien de gardé une fois finie).
     setQuestBaselines(state, {});
@@ -138,6 +139,7 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
   let toolConsumed = false;
   for (const quest of sim.content.quests) {
     if (quest.start.byEffect || world.quests.some((q) => q.id === quest.id)) continue;
+    if (quest.story !== null && !storyMayStart(sim, quest.story.villager)) continue;
     if (evaluateAll(sim, quest.start.when, NO_CONTEXT)) startQuest(sim, quest.id);
   }
   withdrawExpired(sim);
@@ -179,6 +181,27 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
   }
   updateSecrets(sim);
   return toolConsumed;
+}
+
+/**
+ * Rythme des histoires (0.13, section 5.1): au plus `maxActive` histoires en cours, `newPerDay`
+ * neuves par jour, et `cooldownDays` jours depuis la fin de la dernière étape de cet habitant. Une
+ * quête d'histoire prête qui ne passe pas attend, sans rien perdre. Les autres quêtes n'y sont pas soumises.
+ */
+export function storyMayStart(sim: Sim, villager: string): boolean {
+  const pace = sim.content.settings.bonds.storyPace;
+  const today = sim.world.clock.day;
+  let active = 0;
+  let newToday = 0;
+  let lastDone = Number.NEGATIVE_INFINITY;
+  for (const state of sim.world.quests) {
+    const story = def(sim, state.id)?.story ?? null;
+    if (story === null) continue;
+    if (state.status === 'active') active += 1;
+    if (state.startedDay === today) newToday += 1;
+    if (story.villager === villager && state.status === 'done') lastDone = Math.max(lastDone, state.doneDay ?? state.startedDay);
+  }
+  return active < pace.maxActive && newToday < pace.newPerDay && today - lastDone >= pace.cooldownDays;
 }
 
 /** Jour et heure du retrait d'une quête `expire`: le premier `weekday` à `time` après son démarrage. */

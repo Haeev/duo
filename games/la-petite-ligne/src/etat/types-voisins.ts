@@ -68,6 +68,14 @@ export interface HabitsState {
 /** Goût découvert d'un habitant pour un objet (lot H2, section 6.2). */
 export type TasteLevel = 'loves' | 'likes' | 'neutral' | 'dislikes';
 
+/** Une décision à deux ouverte (section 5.2). */
+export interface OpenDecision {
+  p1?: string;
+  p2?: string;
+  /** Pas où les deux choix sont devenus les mêmes (absent: pas d'accord). */
+  agreedAt?: number;
+}
+
 /** Champs de la 0.13 dans l'état du monde (format 14). */
 export interface VillageWorldFields {
   habits: HabitsState;
@@ -77,6 +85,12 @@ export interface VillageWorldFields {
   tastesKnown: Record<VillagerId, Record<ItemId, TasteLevel>>;
   /** Décisions à deux prises (section 5.2): l'option retenue, par décision. */
   decisions: Record<string, string>;
+  /**
+   * Décisions à deux ouvertes, pas encore prises (section 5.2): le choix de chaque joueur (absent:
+   * pas encore choisi) et, quand les deux choix sont les mêmes, le pas de l'accord (la décision se
+   * prend `agreeSeconds` plus tard). Absent des sauvegardes du format 14 d'avant: vide à la reprise.
+   */
+  decisionsOpen: Record<string, OpenDecision>;
   /** Étapes d'histoire faites, par habitant (lot H5). */
   storyDone: Record<VillagerId, QuestId[]>;
 }
@@ -87,6 +101,7 @@ export function emptyVillageFields(): VillageWorldFields {
     bonds: {},
     tastesKnown: {},
     decisions: {},
+    decisionsOpen: {},
     storyDone: {},
   };
 }

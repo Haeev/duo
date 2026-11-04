@@ -4,6 +4,7 @@
  * n'est pas un mode de jeu. `p1` s'occupe surtout du potager, `p2` du bois;
  * les rendez-vous se font à deux.
  */
+import { decisionDef } from '../donnees/decisions';
 import { questBaselines, questChecklist } from '../etat/quete';
 import { GRAIN_GIFT_FLAG, rationsNeeded } from './poules';
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
@@ -1803,6 +1804,13 @@ export function createRobot(options: RobotOptions = {}): Robot {
     // Propositions de l'autre: d'accord.
     for (const p of w.proposals) {
       if (p.by !== c.id) out.push({ type: 'proposal_answer', proposal: p.id, accept: true });
+    }
+    // Décisions à deux (0.13): le choix de l'autre s'il en a un, sinon la première option.
+    for (const [id, open] of Object.entries(w.decisionsOpen)) {
+      const other = open[c.id === 'p1' ? 'p2' : 'p1'];
+      const first = decisionDef(sim.content.decisions, id)?.options[0]?.id;
+      const wanted = other ?? first;
+      if (wanted !== undefined && open[c.id] !== wanted) out.push({ type: 'decision_vote', decision: id, option: wanted });
     }
     if (busy(sim, c) || w.tick < m.waitUntil) return frame(m);
     // Assis sans rendez-vous assis (Espace près d'un banc pour autre chose): un pas le relève.

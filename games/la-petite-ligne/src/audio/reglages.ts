@@ -76,6 +76,8 @@ export interface AudioSettings {
     duoDoneSeconds: number;
     /** Le bouchon touche l'eau après le lancer (son.md 4). */
     fishingSplashSeconds: number;
+    /** Décision à deux: `decision-agree` après le tampon (son.md). */
+    decisionAgreeSeconds: number;
   };
   /** Une ligne de la commande se coche: tampon chez qui est près de la caisse (m). */
   stampNearCrateM: number;
@@ -219,6 +221,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
     gateLockSeconds: 2.5,
     duoDoneSeconds: 0.35,
     fishingSplashSeconds: 0.55,
+    decisionAgreeSeconds: 0.2,
   },
   stampNearCrateM: 4,
   train: {

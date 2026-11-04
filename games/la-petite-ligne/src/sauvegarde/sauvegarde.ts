@@ -14,7 +14,7 @@ import { renameOldCurrency } from '../donnees/monnaie';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
-import { migrateToVillage, villageShapeError } from './voisins';
+import { fillOpenDecisions, migrateToVillage, villageShapeError } from './voisins';
 import { stageCanContinue } from '../donnees/calendrier';
 import { type Sim, format, notifyKey, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
@@ -823,6 +823,7 @@ function resume(
   }
   renameSavedCurrency(world);
   fillEconomyFields(world);
+  fillOpenDecisions(world);
   world.stages.choice = { p1: null, p2: null };
   fillRegrowth(content, world);
   // Tour 10: `inside` se déduit de la position (pièces bâties comprises), quel que soit le format.

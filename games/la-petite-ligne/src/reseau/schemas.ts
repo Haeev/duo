@@ -96,6 +96,7 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('improvement_planks'), improvement: Id, count: Count }),
   v.strictObject({ type: v.literal('proposal_answer'), proposal: Id, accept: v.boolean() }),
   v.strictObject({ type: v.literal('proposal_withdraw') }),
+  v.strictObject({ type: v.literal('decision_vote'), decision: Id, option: v.nullable(Id) }),
   v.strictObject({ type: v.literal('crate_deposit'), ...stack }),
   v.strictObject({ type: v.literal('crate_take'), ...stack }),
   v.strictObject({ type: v.literal('chest_deposit'), ...stack }),

@@ -38,6 +38,7 @@ import { RoomPanel, StoragePanel } from './maison';
 import { isNapping } from '../etat/maison';
 import { BoardPanel } from './tableau';
 import { ProposalCards } from './proposition';
+import { DecisionPanel } from './decision';
 import { SOUND_ATTR, UiSoundGate, type UiSoundId, buttonSound, layerSounds } from './sons';
 import { loadUiTexts } from './textes';
 
@@ -65,6 +66,7 @@ class GameUi implements GameInterface, UiHost {
   private readonly root: HTMLDivElement;
   private readonly hud: Hud;
   private readonly proposals: ProposalCards;
+  private readonly decisions: DecisionPanel;
   private readonly cameraCommand: ((command: CameraCommand) => void) | null;
   /** Aperçu 3D des tenues (rendu), `null` sans rendu 3D: la silhouette 2D le remplace. */
   readonly outfitPreview: OutfitPreviewFactory | null;
@@ -118,7 +120,8 @@ class GameUi implements GameInterface, UiHost {
     this.insertedSprite = document.getElementById(SPRITE_ID) === null ? this.insertSprite() : null;
     this.hud = new Hud(this);
     this.proposals = new ProposalCards(this);
-    this.root = el('div', { class: 'lpl-ui' }, [this.hud.root, this.proposals.root]);
+    this.decisions = new DecisionPanel(this);
+    this.root = el('div', { class: 'lpl-ui' }, [this.hud.root, this.proposals.root, this.decisions.root]);
     options.overlay.append(this.root);
 
     this.listen(this.root, 'keydown', (e) => {
@@ -424,9 +427,14 @@ class GameUi implements GameInterface, UiHost {
     this.proposals.root.toggleAttribute('hidden', fullScreen);
     this.hud.setLayer(hudState(this.mounted?.kind ?? null, me.placement !== null));
     if (!fullScreen) {
+      // La décision à deux se retire sous un dialogue ou un panneau, et revient après.
+      this.decisions.setHidden(this.mounted !== null);
+      this.decisions.update(world);
       this.hud.update(world);
       this.proposals.update(world);
     } else {
+      this.decisions.setHidden(true);
+      this.decisions.update(world);
       this.hud.observeNotifications(world);
     }
 
@@ -434,7 +442,7 @@ class GameUi implements GameInterface, UiHost {
     // Tant qu'une couche est ouverte, le focus y reste (élément disparu, clic sur un fond):
     // le clavier lui arrive sans passer par le personnage.
     const active = document.activeElement;
-    if (this.mounted !== null && (active === null || active === document.body) && !this.proposals.contains(active)) {
+    if (this.mounted !== null && (active === null || active === document.body) && !this.proposals.contains(active) && !this.decisions.contains(active)) {
       focusElement(this.mounted.layer.defaultFocus());
     }
   }
@@ -562,6 +570,7 @@ class GameUi implements GameInterface, UiHost {
     // Écran d'étape: deux « Finir » puis deux « Rester » (la plateforme n'a pas encore fermé) font reprendre la partie.
     if (event.type === 'stage_continue') this.sessionFinished = false;
     this.proposals.onEvent(event);
+    this.decisions.onEvent(event);
     this.dirty = true;
   }
 
@@ -611,6 +620,7 @@ class GameUi implements GameInterface, UiHost {
     if (mounted === null || mounted.kind === 'panel') {
       if (info.inside && this.proposals.contains(active)) return this.proposals.key(code);
     }
+    if (mounted === null && info.inside && this.decisions.contains(active)) return this.decisions.key(code);
     if (mounted === null) {
       // Un bouton du HUD ne garde jamais le clavier: la touche va au jeu (Espace fait agir, sans réactiver le bouton).
       if (active instanceof HTMLElement && this.hud.root.contains(active)) active.blur();
@@ -685,6 +695,7 @@ class GameUi implements GameInterface, UiHost {
       case 'Enter':
       case 'NumpadEnter':
         if (!info.repeat && this.proposals.hasReceived()) return this.proposals.focusDefault();
+        if (!info.repeat && this.decisions.hasPanel()) return this.decisions.focusDefault();
         // L'invite de la maison: rideaux, chantier de la pièce.
         if (!info.repeat && me.status === 'active') return this.hud.activateInvite();
         return false;

@@ -10,6 +10,7 @@ import type { Sim } from '../../simulation/contexte';
 import { addBond, revealTaste } from '../../simulation/amitie';
 import { step } from '../../simulation/pas';
 import { revealHabit } from '../../simulation/voisins';
+import { openDecision } from '../../simulation/decisions';
 
 export const NEIGHBOURS_SCENARIOS: readonly string[] = [
   'voisins-debut',
@@ -17,6 +18,10 @@ export const NEIGHBOURS_SCENARIOS: readonly string[] = [
   'voisins-fin',
   'voisins-pluie',
   'voisins-notifications',
+  // Décisions à deux (mission 0.13): l'autre a choisi, désaccord, accord (le tampon tombe 2 s après).
+  'decision-choix',
+  'decision-desaccord',
+  'decision-accord',
 ];
 
 type Stage = 'debut' | 'milieu' | 'fin';
@@ -171,6 +176,27 @@ export function setupNeighbours(
         },
       };
     }
+    case 'decision-choix':
+    case 'decision-desaccord':
+    case 'decision-accord': {
+      fill(sim, 'milieu');
+      const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
+      const id = name === 'decision-choix' ? 'cabane' : name === 'decision-desaccord' ? 'mouture' : 'minute';
+      openDecision(sim, id);
+      const open = w.decisionsOpen[id];
+      if (open === undefined) return { done: true };
+      if (name === 'decision-choix') open[other] = 'shared';
+      if (name === 'decision-desaccord') {
+        open[me] = 'weighing';
+        open[other] = 'watch';
+      }
+      if (name === 'decision-accord') {
+        open[me] = 'now';
+        open[other] = 'now';
+        open.agreedAt = w.tick;
+      }
+      return { done: true };
+    }
     default:
       return { done: false };
   }
@@ -178,7 +204,7 @@ export function setupNeighbours(
 
 /** Onglet du carnet qu'ouvre un scénario de ce lot. */
 export function neighboursNotebookTab(name: string): 'neighbours' | null {
-  return NEIGHBOURS_SCENARIOS.includes(name) && name !== 'voisins-notifications'
+  return NEIGHBOURS_SCENARIOS.includes(name) && name.startsWith('voisins-') && name !== 'voisins-notifications'
     ? 'neighbours'
     : null;
 }

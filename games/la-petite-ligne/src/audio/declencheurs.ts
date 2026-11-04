@@ -563,6 +563,19 @@ export function soundsForEvent(
     case 'birthday_wished':
     case 'birthday_attended':
       break;
+    // 0.13 (section 5.2): l'ouverture sonne par sa notification; un choix de l'autre, le clic du
+    // panneau chez celui qui ne l'a pas fait; décidé ensemble, le tampon puis `decision-agree`
+    // 0,2 s après (son.md); aucun son pour un désaccord.
+    case 'decision_opened':
+    case 'decision_agreed':
+      break;
+    case 'decision_vote':
+      if (event.by !== local && event.option !== null) emit.ui('ui-click', 'both');
+      break;
+    case 'decision_taken':
+      emit.ui('order-stamp', 'both');
+      emit.ui('decision-agree', 'both', settings.delays.decisionAgreeSeconds);
+      break;
   }
 }
 
