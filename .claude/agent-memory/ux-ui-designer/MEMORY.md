@@ -77,3 +77,13 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - `souvenirs-ecran.test.ts` (scénario `souvenirs-plusieurs`) attend que E passe d'onglet en onglet depuis les Quêtes: un onglet ne doit pas avoir de pages dans ce cas. D'où, aux quêtes, « en cours » et « terminées » séparées.
 - `secret-ecran.test.ts` veut lire la fiche du secret chez l'informé à l'ouverture du carnet: au détail d'une vitrine, la quête au secret « mine » doit être choisie d'emblée.
 - Sac et rangement: Vitrine ne gère ni case vide ni glisser-déposer; le sac garde ses cases à lui avec les classes `.lpl-tile`, le rangement assemble trois `Vitrine` sans détail (`noDetail`) et un détail commun mis à jour sur `focusin`.
+
+## Carnet des voisins (0.13)
+
+- Un `<span class="lpl-portrait">` posé hors d'un conteneur flex ou grid reste en ligne: sa largeur ne s'applique pas et le SVG prend 100 % du bloc parent (portrait de 300 px). Mettre le parent en `display: flex`.
+- Les six habitants de la démo n'ont pas encore d'habitudes dans les données (lot H4): leur frise est toute en « ? » et leur compte « 0/0 ». Les scénarios de démonstration `voisins-*` partent de la référence d'été du format 13 et posent `lucie_back` (sinon Lucie est hors du bourg toute la journée).
+- Les états des habitants de la 0.13 n'existent qu'après un pas de simulation (`ensureVillagers`) quand on part d'une sauvegarde du format 13: faire un `step` avant de poser `met`.
+- La garde de l'arbre isolé refuse `grep ... --exclude-dir=.git` et `git show ... | ...`: utiliser l'outil Grep pour le contrôle des tirets, et écrire dans un fichier avant de comparer.
+- Les fichiers du jeu existants ne sont pas au format Prettier (lignes longues): ne passer `prettier --write` que sur les fichiers neufs.
+- `UI_SETTINGS` est `as const`: une boucle `m < v.dayTo` déclenche `no-unnecessary-condition`; typer une locale `const end: number`.
+- Hauteur à 125 % sur 1366x768: `min(4rem, 9.6vh)` pour la taille des vignettes garde 100 % intact et fait tenir la page.

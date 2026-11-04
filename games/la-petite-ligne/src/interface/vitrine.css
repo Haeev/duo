@@ -2172,3 +2172,618 @@
   background: #fff9e6;
   box-shadow: inset 0.3125rem 0 0 var(--lpl-color-error), var(--lpl-shadow-1);
 }
+
+/* ------------------------------------------------------------------ */
+/* Carnet: les voisins (0.13, lot H3)                                  */
+/* ------------------------------------------------------------------ */
+
+/*
+  Six colonnes de portraits sur quatre rangées (21 habitants, une seule page), les lanternes sous
+  chaque portrait, la pastille « maintenant » en coin; la fiche à droite, la frise de la journée en
+  bas de la fiche. Couleur jamais seule: silhouette et pointillé avant la rencontre, flamme dans
+  une lanterne allumée, « ? » et pointillé pour une habitude ou un goût inconnus.
+*/
+.lpl-vitrine--neighbours .lpl-vitrine__grid {
+  --lpl-tile-cols: 6;
+  /* À 125 % sur un portable (1366x768), les portraits se resserrent un peu: la page tient sans défiler. */
+  --lpl-tile-size: min(4rem, 9.6vh);
+  row-gap: 0.875rem;
+}
+
+.lpl-tile--neighbour .lpl-portrait {
+  --lpl-portrait-size: calc(var(--lpl-tile-size) - 0.875rem);
+  border-width: var(--lpl-border);
+  box-shadow: none;
+}
+
+.lpl-tile--neighbour[data-state='locked'] .lpl-tile__figure {
+  opacity: 1;
+}
+
+.lpl-tile--neighbour .lpl-tile__below {
+  bottom: -0.4375rem;
+  display: grid;
+  place-items: center;
+  padding: 0 0.1875rem;
+  border: 0.0625rem solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-tile--neighbour .lpl-tile__badge .lpl-pastille {
+  min-height: 1.375rem;
+  padding: 0.0625rem 0.1875rem;
+}
+
+.lpl-tile--neighbour .lpl-tile__badge .lpl-pastille__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-tile--neighbour[data-now='unknown'] .lpl-tile__badge .lpl-pastille {
+  border-style: dashed;
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Les lanternes d'amitié: verre vide, rempli par quarts, allumé (flamme), doré au dernier niveau. */
+.lpl-lanterns {
+  display: block;
+  width: 3.25rem;
+  height: auto;
+  overflow: visible;
+}
+
+.lpl-lanterns--large {
+  width: 3.75rem;
+}
+
+.lpl-lantern__hook,
+.lpl-lantern__cap,
+.lpl-lantern__glass,
+.lpl-lantern__base {
+  stroke: var(--lpl-color-ink);
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+}
+
+.lpl-lantern__hook {
+  fill: none;
+}
+
+.lpl-lantern__cap,
+.lpl-lantern__base {
+  fill: #6c7179;
+}
+
+.lpl-lantern__glass {
+  fill: var(--lpl-color-paper-raised);
+}
+
+.lpl-lantern__fill {
+  fill: #f2c74e;
+}
+
+.lpl-lantern[data-lit='true'] .lpl-lantern__glass {
+  fill: #f2c74e;
+}
+
+.lpl-lantern__flame {
+  fill: #c65b4b;
+  stroke: var(--lpl-color-ink);
+  stroke-width: 0.5;
+}
+
+.lpl-lantern[data-lit='gold'] .lpl-lantern__glass {
+  fill: #ffd27a;
+}
+
+.lpl-lantern[data-lit='gold'] .lpl-lantern__cap,
+.lpl-lantern[data-lit='gold'] .lpl-lantern__base {
+  fill: #c8a150;
+}
+
+/* La fiche: portrait, prénom, métier en picto et logis; pastilles; goûts; jours; frise. */
+/* La fiche se resserre quand la fenêtre est basse (taille d'interface à 125 % sur 1366x768): rien ne défile. */
+.lpl-vitrine--neighbours .lpl-vitrine__detail {
+  gap: min(var(--lpl-space-2), 0.8vh);
+  padding-block: min(var(--lpl-space-3), 1vh);
+  min-width: 0;
+}
+
+.lpl-neighbour__head {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.lpl-neighbour__portrait {
+  position: relative;
+  display: flex;
+  flex: none;
+  animation: lpl-detail-in var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-neighbour__portrait .lpl-portrait {
+  --lpl-portrait-size: min(4.5rem, 8vh);
+}
+
+.lpl-neighbour__stamp {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.25rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: var(--lpl-border) solid var(--lpl-color-success);
+  border-radius: var(--lpl-radius-round);
+  background: #dfe9dc;
+}
+
+.lpl-neighbour__stamp .lpl-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-neighbour__id {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.lpl-neighbour__line {
+  display: flex;
+  align-items: center;
+  gap: 0.3125rem;
+  min-width: 0;
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.3;
+}
+
+.lpl-neighbour__line > span {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lpl-neighbour__job {
+  flex: none;
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.lpl-neighbour__home .lpl-neighbour__job {
+  color: var(--lpl-color-ink);
+}
+
+.lpl-neighbour__bond .lpl-pastille__text {
+  font-size: var(--lpl-text-xs);
+}
+
+.lpl-neighbour__birthday {
+  gap: 0.125rem;
+}
+
+/* Goûts: un groupe par goût (cœur, sourire, moue), une case par objet, « ? » en pointillé. */
+.lpl-neighbour__tastes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-1) var(--lpl-space-2);
+}
+
+.lpl-taste {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  padding: 0.125rem 0.25rem 0.125rem 0.125rem;
+  border: 0.0625rem solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper);
+}
+
+.lpl-taste__mark {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.lpl-taste__slot {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0.0625rem solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-taste__slot[data-known='false'] {
+  border-style: dashed;
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-taste__icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.lpl-taste__unknown {
+  color: var(--lpl-color-ink-muted);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1;
+}
+
+/* Sélecteur de jour et bascule du temps: des pastilles à presser, la pressée en encre pleine. */
+.lpl-neighbour__picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-neighbour__days,
+.lpl-neighbour__weather {
+  display: inline-flex;
+  gap: 0.1875rem;
+}
+
+.lpl-day-chip {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.375rem;
+  min-height: 1.75rem;
+  padding: 0 0.3125rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  color: var(--lpl-color-ink);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lpl-day-chip--today {
+  border-color: var(--lpl-color-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.1875rem;
+}
+
+.lpl-day-chip--weather {
+  min-width: 2rem;
+}
+
+.lpl-day-chip--weather .lpl-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-day-chip[aria-pressed='true'] {
+  border-color: var(--lpl-color-ink);
+  background: var(--lpl-color-ink);
+  color: var(--lpl-color-paper-raised);
+}
+
+.lpl-day-chip--weather[aria-pressed='true'] {
+  background: var(--lpl-color-wood-new);
+  color: var(--lpl-color-ink);
+  box-shadow: inset 0 0 0 0.125rem var(--lpl-color-ink);
+}
+
+.lpl-day-chip:focus-visible {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: 0.125rem;
+}
+
+/* La frise: matin, midi, soir, nuit en tête; une case par habitude; les heures dessous; maintenant. */
+.lpl-frise {
+  display: grid;
+  gap: 0.1875rem;
+  width: 100%;
+  margin-top: auto;
+}
+
+.lpl-frise__moments,
+.lpl-frise__track,
+.lpl-frise__hours {
+  position: relative;
+  width: 100%;
+}
+
+.lpl-frise__moments {
+  height: 1.25rem;
+}
+
+.lpl-frise__moment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1875rem;
+  overflow: hidden;
+  border-left: 0.0625rem solid var(--lpl-color-line);
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  white-space: nowrap;
+}
+
+.lpl-frise__moment:first-child {
+  border-left: none;
+}
+
+.lpl-frise__moment-icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.lpl-frise__track {
+  height: min(2.75rem, 5vh);
+  overflow: hidden;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-frise__segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  border-right: 0.0625rem solid var(--lpl-color-line);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-frise__segment[data-known='false'] {
+  border: 0.0625rem dashed var(--lpl-color-ink-muted);
+  background: repeating-linear-gradient(135deg, var(--lpl-color-paper-sunken) 0 0.3125rem, var(--lpl-color-paper-shade) 0.3125rem 0.4375rem);
+}
+
+.lpl-frise__icon {
+  width: 1.625rem;
+  height: 1.625rem;
+}
+
+.lpl-frise__segment[data-narrow] .lpl-frise__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lpl-frise__activity {
+  position: absolute;
+  right: 0.0625rem;
+  bottom: 0.0625rem;
+  display: grid;
+  place-items: center;
+  width: 0.9375rem;
+  height: 0.9375rem;
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper);
+}
+
+.lpl-frise__activity .lpl-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.lpl-frise__unknown {
+  padding: 0 0.1875rem;
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper-raised);
+  color: var(--lpl-color-ink-muted);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1.1;
+}
+
+.lpl-frise__segment[data-narrow] .lpl-frise__unknown {
+  display: none;
+}
+
+.lpl-frise__now {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 0.1875rem;
+  margin-left: -0.09375rem;
+  background: var(--lpl-color-stamp);
+}
+
+.lpl-frise__hours {
+  height: 1rem;
+}
+
+.lpl-frise__hour {
+  position: absolute;
+  top: 0;
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.lpl-frise__hour:first-child {
+  transform: none;
+}
+
+.lpl-frise__hour:last-child {
+  transform: translateX(-100%);
+}
+
+/* Le bourg: les lieux à leur place sur un plan schématique, les voisins « sans doute » là. */
+.lpl-town {
+  display: grid;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-town__map {
+  position: relative;
+  height: clamp(15rem, 44vh, 26rem);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-l);
+  background: #dfe5c7;
+}
+
+.lpl-town__spot {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--lpl-color-ink);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.lpl-town__place {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: var(--lpl-border) dashed var(--lpl-color-line);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper);
+}
+
+.lpl-town__spot[data-lit='true'] .lpl-town__place {
+  border-style: solid;
+  border-color: var(--lpl-color-ink);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-town__spot[data-lit='false'] .lpl-town__icon {
+  opacity: 0.55;
+}
+
+.lpl-town__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lpl-town__people {
+  display: flex;
+}
+
+.lpl-town__people .lpl-portrait,
+.lpl-town__group .lpl-portrait {
+  --lpl-portrait-size: 1.75rem;
+  border-width: var(--lpl-border);
+  box-shadow: none;
+}
+
+.lpl-town__people .lpl-portrait + .lpl-portrait {
+  margin-left: -0.5rem;
+}
+
+.lpl-town__more {
+  padding: 0 0.25rem;
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-town__spot:focus-visible {
+  outline: none;
+}
+
+.lpl-town__spot:focus-visible .lpl-town__place,
+.lpl-town__spot[data-highlight] .lpl-town__place {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: 0.125rem;
+}
+
+.lpl-town__spot[data-highlight] .lpl-town__place {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-town__elsewhere {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-town__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem 0.125rem 0.25rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+}
+
+/* Notification d'une découverte: la carte du carnet, le portrait à gauche, le lieu à droite. */
+.lpl-toast--carnet {
+  max-width: min(26rem, 100%);
+  padding-block: 0.3125rem;
+}
+
+.lpl-toast--carnet > .lpl-portrait {
+  --lpl-portrait-size: 2.5rem;
+  border-width: var(--lpl-border);
+  box-shadow: none;
+}
+
+.lpl-toast-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+  min-width: 0;
+}
+
+.lpl-toast-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lpl-toast-card__pencil {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lpl-toast-card__source {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+}
+
+.lpl-toast-card__text {
+  display: -webkit-box;
+  overflow: hidden;
+  font-weight: var(--lpl-weight-regular);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.lpl-toast-card__place {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.lpl-toast-card__lanterns {
+  flex: none;
+  width: 3.5rem;
+}

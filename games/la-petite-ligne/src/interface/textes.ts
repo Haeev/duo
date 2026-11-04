@@ -8,6 +8,7 @@
 import * as v from 'valibot';
 import type { Content } from '../donnees/types';
 import supplement from './textes-interface.json';
+import { NEIGHBOUR_PLACE_KEYS } from './config';
 
 const str = v.string();
 const strings = <K extends string>(keys: readonly K[]): v.ObjectSchema<Record<K, typeof str>, undefined> =>
@@ -756,6 +757,63 @@ const SupplementSchema = v.object({
       'questSecret',
     ] as const).entries,
     momentNames: strings(['morning', 'noon', 'evening', 'night'] as const),
+  }),
+  /** Onglet Voisins du carnet (0.13, lot H3, `v0-13-habitants.md` section 4): portraits, fiche, frise, notifications. */
+  neighbours: v.object({
+    ...strings([
+      'tab',
+      'pageLabel',
+      'gridLabel',
+      'townLabel',
+      'metLabel',
+      'unknownPerson',
+      'unmetLine',
+      'nowLabel',
+      'nowUnknown',
+      'countLabel',
+      'allKnown',
+      'bondLabel',
+      'bondFullLabel',
+      'birthdayLabel',
+      'birthdayUnknown',
+      'birthdayToday',
+      'jobLabel',
+      'homeLabel',
+      'tastesLabel',
+      'loves',
+      'likes',
+      'dislikes',
+      'tasteListLabel',
+      'tasteUnknown',
+      'tastesUnknownCount',
+      'daysLabel',
+      'dayLabel',
+      'todayLabel',
+      'weatherLabel',
+      'weatherSun',
+      'weatherRain',
+      'timelineLabel',
+      'timelineToday',
+      'segmentKnown',
+      'segmentUnknown',
+      'segmentNobody',
+      'nowMarker',
+      'openHint',
+      'townView',
+      'townViewLabel',
+      'townHere',
+      'townNobody',
+      'gridView',
+      'toastSeen',
+      'toastTogether',
+      'toastHeard',
+      'toastHeardOther',
+      'toastRead',
+      'toastReadOther',
+      'toastNoted',
+    ] as const).entries,
+    places: strings(NEIGHBOUR_PLACE_KEYS),
+    birthdaySeasons: strings(['spring', 'summer', 'autumn', 'winter'] as const),
   }),
 });
 

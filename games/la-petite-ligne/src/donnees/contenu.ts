@@ -949,6 +949,8 @@ function parseVillager(v: Reader, base: VillagerDef | null, dialogues: Record<st
     habits: base !== null ? villagerField(v, base, 'habits', parseHabits, (b) => b.habits) : parseHabits(habitsRequired ? v.at('habits') : v.opt('habits')),
     birthday: base !== null ? villagerField(v, base, 'birthday', parseBirthday, (b) => b.birthday) : v.opt('birthday') === null ? null : parseBirthday(v.at('birthday')),
     tastes: base !== null ? villagerField(v, base, 'tastes', parseTastes, (b) => b.tastes) : parseTastes(v.opt('tastes')),
+    age: v.opt('age')?.string() ?? base?.age ?? null,
+    homeLabel: v.opt('homeLabel')?.string() ?? base?.homeLabel ?? null,
   };
   resolveSelf(villager.schedule.flatMap((e) => e.when), id);
   for (const d of own) resolveSelf(d.when, id);

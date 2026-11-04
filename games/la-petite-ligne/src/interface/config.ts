@@ -59,6 +59,12 @@ export const UI_SETTINGS = {
     storageBagPerPage: 24,
     /** Quêtes du carnet: deux colonnes de cartes sur quatre rangées, le détail à droite. */
     questsPerPage: 8,
+    /** Voisins du carnet (0.13): les 21 portraits sur une seule page (6 colonnes, 4 rangées). */
+    neighboursPerPage: 24,
+    /** Frise de la journée d'un habitant: de 6 h à minuit, lue par pas de 10 minutes. */
+    dayFrom: 360,
+    dayTo: 1440,
+    dayStep: 10,
   },
   /** Barre de progression (R10): un geste plus court que cette durée n'en a pas (s). */
   progressMinSeconds: 1,
@@ -434,7 +440,15 @@ export type HairStyle =
   | 'cap'
   | 'villager_bun'
   | 'beard'
-  | 'braids';
+  | 'braids'
+  // 0.13 (carnet des voisins): coiffures et couvre-chefs des habitants, d'après leurs fiches (`v0-13-habitants.md`, 2.3).
+  | 'bald'
+  | 'beanie'
+  | 'straw_hat'
+  | 'calot'
+  | 'kepi'
+  | 'round_hat'
+  | 'kid_cap';
 
 /** Barbe ou moustache des portraits (index `appearance.beard`). */
 export type BeardStyle = 'none' | 'short' | 'full' | 'moustache';
@@ -454,6 +468,8 @@ export interface PortraitColors {
   outer?: { main: string; second: string };
   /** Badge brodé à la couleur du profil Duo (joueurs, 0.12), à la place du foulard. */
   badge?: string;
+  /** Lunettes rondes cerclées de métal (habitants de la 0.13). */
+  glasses?: boolean;
 }
 
 /**
@@ -465,6 +481,25 @@ export const VILLAGER_PORTRAITS: Readonly<Record<string, PortraitColors>> = {
   odette: { skin: '#F0C7A6', shade: '#D9A585', hair: '#8D7F78', top: '#9C4F67', trim: '#F2EBDD', scarf: '#E7B04E', style: 'villager_bun', bg: '#F1E1E3' },
   basile: { skin: '#D7A27C', shade: '#BC8463', hair: '#E4E0D8', top: '#A8B6A0', trim: '#8E5B37', scarf: '#C2563F', style: 'beard', bg: '#E8E0D0' },
   jeanne: { skin: '#F1C8A3', shade: '#DBA684', hair: '#B5652F', top: '#F2D46B', trim: '#557FB0', scarf: '#D9584F', style: 'braids', bg: '#F3EAC8' },
+  // 0.13 (carnet des voisins): les dix-sept autres, couleurs des rangées de `palette.py` (CHAR_ROWS), sans
+  // foulard (bible: aucune couleur vive au cou chez les habitants); coiffure ou couvre-chef de leur fiche.
+  achille: { skin: '#E6B892', shade: '#CB9874', hair: '#4E3A2C', top: '#EEE8DC', trim: '#D9D1C2', scarf: '', style: 'calot', bg: '#EDE3D2' },
+  solange: { skin: '#EDC3A0', shade: '#D4A080', hair: '#9A4A2C', top: '#7FA595', trim: '#F1EAD9', scarf: '', style: 'bob', bg: '#E2ECE4' },
+  lucie: { skin: '#C68E68', shade: '#A9714F', hair: '#3B2A22', top: '#4E6F8F', trim: '#E0C25A', scarf: '', style: 'kepi', bg: '#DCE4EC' },
+  armand: { skin: '#E6BC98', shade: '#CC9C7A', hair: '#4A3326', top: '#7A5A3F', trim: '#F1ECE2', scarf: '', style: 'short', bg: '#ECE2D6', glasses: true },
+  berthe: { skin: '#E2B08A', shade: '#C79270', hair: '#A8A39C', top: '#E7D8B6', trim: '#F6F1E6', scarf: '', style: 'crop', bg: '#E4EADF', outer: { main: '#3F5A45', second: '#5B4636' } },
+  martial: { skin: '#DDAA85', shade: '#C08E6A', hair: '#A9A6A0', top: '#35373C', trim: '#F2EFE8', scarf: '', style: 'round_hat', bg: '#E2E2E4' },
+  marthe: { skin: '#EBC2A2', shade: '#D1A383', hair: '#CFCAC2', top: '#B9B4AC', trim: '#4A5A6A', scarf: '', style: 'villager_bun', bg: '#E1E5EA' },
+  honorine: { skin: '#EEC9AE', shade: '#D6AC90', hair: '#F0ECE4', top: '#F1E5C9', trim: '#8796BF', scarf: '', style: 'villager_bun', bg: '#E3E6F1', glasses: true },
+  ines: { skin: '#B9825C', shade: '#9C6646', hair: '#231C19', top: '#3F5A45', trim: '#556F59', scarf: '', style: 'braid', bg: '#DCE6DC' },
+  barnabe: { skin: '#D49F7A', shade: '#B5805E', hair: '#2B2522', top: '#A4463B', trim: '#6E2C26', scarf: '', style: 'beanie', bg: '#F0DDD8', beard: 'full' },
+  mado: { skin: '#E0AA84', shade: '#C48C66', hair: '#8E4A2A', top: '#E4DAC6', trim: '#4A3A30', scarf: '', style: 'curls', bg: '#EFE2D8', outer: { main: '#4A3A30', second: '#6E5640' } },
+  paulin: { skin: '#D8A27A', shade: '#BB845E', hair: '#5A4636', top: '#A3A8AB', trim: '#737A80', scarf: '', style: 'straw_hat', bg: '#EFE8D2', beard: 'moustache' },
+  margot: { skin: '#EDC09C', shade: '#D4A07D', hair: '#5A3B28', top: '#8BA37B', trim: '#6E7F8E', scarf: '', style: 'bun', bg: '#E4EDDD' },
+  leon: { skin: '#EFC5A2', shade: '#D8A584', hair: '#2B2522', top: '#F0ECE3', trim: '#6B4E37', scarf: '', style: 'kid_cap', bg: '#F1E0DC' },
+  ambroise: { skin: '#E7BE9E', shade: '#CDA080', hair: '#EDEAE4', top: '#8D8F94', trim: '#3A3B40', scarf: '', style: 'bald', bg: '#E4E4E6', outer: { main: '#2E2D30', second: '#C8A150' } },
+  nour: { skin: '#B9825C', shade: '#9C6646', hair: '#231C19', top: '#8C8556', trim: '#A39B6B', scarf: '', style: 'ponytail', bg: '#ECE9D8' },
+  colette: { skin: '#E8B993', shade: '#CD9A75', hair: '#221C1A', top: '#8E3F35', trim: '#2E2B2A', scarf: '', style: 'bob', bg: '#F1DEDA' },
 };
 
 /**
@@ -563,6 +598,201 @@ export const STORAGE_FAMILY_ICONS: Readonly<Record<string, string>> = {
 export const QUEST_GIVER_ICONS: Readonly<Record<string, string>> = {
   achille: 'bread-basket',
   solange: 'horn-comb',
+};
+
+/**
+ * Carnet des voisins (0.13, lot H3): les lieux des plannings, chacun avec son picto et son nom
+ * (`neighbours.places` de `textes-interface.json`, avec sa préposition: « à la halte »).
+ * `home` et `away` viennent de l'activité (`home`, `absent`), pas du point; `village` est le repli
+ * d'un point inconnu de cette table (donnée d'une version suivante).
+ */
+export type NeighbourPlace =
+  | 'halt'
+  | 'shop'
+  | 'square'
+  | 'sawmill'
+  | 'river'
+  | 'bakery'
+  | 'salon'
+  | 'school'
+  | 'church'
+  | 'presbytery'
+  | 'cemetery'
+  | 'cafe'
+  | 'forge'
+  | 'mill'
+  | 'farm'
+  | 'field'
+  | 'forest'
+  | 'lookout'
+  | 'gardens'
+  | 'washhouse'
+  | 'vet'
+  | 'hamlet'
+  | 'clockmaker'
+  | 'bench'
+  | 'coop'
+  | 'house'
+  | 'home'
+  | 'away'
+  | 'village';
+
+export const NEIGHBOUR_PLACE_ICONS: Readonly<Record<NeighbourPlace, string>> = {
+  halt: 'place-halt',
+  shop: 'place-shop',
+  square: 'place-square',
+  sawmill: 'place-sawmill',
+  river: 'place-river',
+  bakery: 'warm-bread',
+  salon: 'place-salon',
+  school: 'place-school',
+  church: 'place-church',
+  presbytery: 'place-church',
+  cemetery: 'place-cemetery',
+  cafe: 'place-cafe',
+  forge: 'place-forge',
+  mill: 'place-mill',
+  farm: 'place-farm',
+  field: 'place-field',
+  forest: 'place-forest',
+  lookout: 'place-forest',
+  gardens: 'place-garden',
+  washhouse: 'water-pail',
+  vet: 'place-vet',
+  hamlet: 'chair',
+  clockmaker: 'wall-clock',
+  bench: 'place-bench',
+  coop: 'hen',
+  house: 'ui-house',
+  home: 'ui-house',
+  away: 'place-road',
+  village: 'ui-pin',
+};
+
+export const NEIGHBOUR_PLACE_KEYS = Object.keys(NEIGHBOUR_PLACE_ICONS) as readonly NeighbourPlace[];
+
+/** Lieu de chaque point des plannings (`schedule[].point` des habitants). Les tombes (`grave_*`) vont au cimetière. */
+export const NEIGHBOUR_POINT_PLACES: Readonly<Record<string, NeighbourPlace>> = {
+  quay_bell: 'halt',
+  quay_bench: 'halt',
+  train_stop: 'halt',
+  station_door: 'halt',
+  handcar_shed: 'halt',
+  grocery_customer: 'shop',
+  grocery_door: 'shop',
+  grocery_inside_counter: 'shop',
+  grocery_table: 'shop',
+  grocery_terrace: 'shop',
+  village_square: 'square',
+  well_shelter: 'square',
+  hopscotch: 'square',
+  square_lime_tree: 'square',
+  sawmill_yard: 'sawmill',
+  basile_at_workbench: 'sawmill',
+  basile_by_beam: 'sawmill',
+  riverbank: 'river',
+  fishing_ford_north: 'river',
+  fishing_pontoon: 'river',
+  pasture_bank: 'river',
+  bakery_back: 'bakery',
+  bakery_window: 'bakery',
+  salon_counter: 'salon',
+  salon_window: 'salon',
+  school_gate: 'school',
+  school_yard: 'school',
+  mairie_desk: 'school',
+  school_lodging_door: 'school',
+  church_nave: 'church',
+  church_porch: 'church',
+  church_square: 'church',
+  church_bell_rope: 'church',
+  presbytery_door: 'presbytery',
+  priest_garden: 'presbytery',
+  vineyard: 'presbytery',
+  cemetery_bench: 'cemetery',
+  cemetery_gate: 'cemetery',
+  cemetery_tap: 'cemetery',
+  cafe_counter: 'cafe',
+  cafe_door: 'cafe',
+  cafe_terrace: 'cafe',
+  skittles_alley: 'cafe',
+  forge_door: 'forge',
+  forge_inside: 'forge',
+  forge_yard: 'forge',
+  mill_door: 'mill',
+  mill_inside: 'mill',
+  mill_race_bank: 'mill',
+  mill_sluice: 'mill',
+  mill_yard: 'mill',
+  farm_door: 'farm',
+  farmyard: 'farm',
+  barn_door: 'farm',
+  threshing_floor: 'farm',
+  farm_garden: 'farm',
+  field_high_01: 'field',
+  field_high_02: 'field',
+  forest_cut: 'forest',
+  forest_edge_path: 'forest',
+  clearing_center: 'forest',
+  charcoal_kiln: 'forest',
+  spring: 'forest',
+  bird_hide: 'forest',
+  forester_bench: 'forest',
+  forester_house_door: 'forest',
+  nest_oak_basile: 'forest',
+  lookout: 'lookout',
+  shared_garden_plot: 'gardens',
+  lucie_garden: 'gardens',
+  sexton_garden: 'gardens',
+  washhouse: 'washhouse',
+  vet_yard: 'vet',
+  hamlet_house_a_door: 'vet',
+  hamlet_house_c_door: 'hamlet',
+  honorine_doorstep: 'hamlet',
+  honorine_window: 'hamlet',
+  rail_cottage_west_window: 'clockmaker',
+  rail_cottage_west_door: 'clockmaker',
+  upper_street_bench: 'bench',
+  chicken_coop: 'coop',
+  firmin_house: 'house',
+  lucie_house_door: 'house',
+  sexton_house_door: 'house',
+  offstage: 'away',
+  village_exit: 'away',
+};
+
+/** Picto d'activité posé en coin d'une case de la frise (les autres activités n'en ont pas). */
+export const NEIGHBOUR_ACTIVITY_ICONS: Readonly<Record<string, string>> = {
+  work: 'ui-hammer',
+  serve: 'ui-coin',
+  play: 'chalk-box',
+  host: 'birthday-cake',
+  wait_train: 'ui-train',
+};
+
+/** Métier de chaque habitant en picto (fiche du carnet des voisins). */
+export const NEIGHBOUR_JOB_ICONS: Readonly<Record<string, string>> = {
+  firmin: 'place-halt',
+  odette: 'place-shop',
+  basile: 'place-sawmill',
+  jeanne: 'chalk-box',
+  achille: 'warm-bread',
+  solange: 'place-salon',
+  lucie: 'mail-letter',
+  armand: 'place-school',
+  berthe: 'place-mill',
+  martial: 'place-church',
+  marthe: 'job-bell',
+  honorine: 'job-knit',
+  ines: 'place-forest',
+  barnabe: 'axe',
+  mado: 'place-forge',
+  paulin: 'place-field',
+  margot: 'milk-can',
+  leon: 'job-satchel',
+  ambroise: 'wall-clock',
+  nour: 'place-vet',
+  colette: 'place-cafe',
 };
 
 /**

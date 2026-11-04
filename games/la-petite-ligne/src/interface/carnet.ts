@@ -1,5 +1,5 @@
 /**
- * Carnet (maquette `carnet.html`): onglets Quêtes, Courrier, Sac, Poissons (0.12), Souvenirs et Besoins.
+ * Carnet (maquette `carnet.html`): onglets Quêtes, Voisins (0.13), Courrier, Sac, Poissons (0.12), Souvenirs et Besoins.
  * A et E changent d'onglet (la caméra ne tourne pas pendant le carnet), Tab ou
  * Retour arrière le ferment.
  */
@@ -37,11 +37,17 @@ import {
   riverMap,
 } from './vitrine';
 import { Panel } from './panneau';
+import { NeighboursPage } from './voisins';
 import { needsMuted, setNeedsMuted } from './preferences';
 import { SOUND_ATTR } from './sons';
 
-type NotebookTab = 'quests' | 'mail' | 'bag' | 'fish' | 'memories' | 'needs';
-const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag', 'fish', 'memories', 'needs'];
+type NotebookTab = 'quests' | 'neighbours' | 'mail' | 'bag' | 'fish' | 'memories' | 'needs';
+// 0.13: « Voisins » juste après les quêtes (les habitants et leurs histoires vont ensemble).
+const TABS: readonly NotebookTab[] = ['quests', 'neighbours', 'mail', 'bag', 'fish', 'memories', 'needs'];
+
+function isNotebookTab(tab: string | undefined): tab is NotebookTab {
+  return TABS.some((t) => t === tab);
+}
 
 /** Dernier onglet ouvert, gardé d'une ouverture à l'autre. */
 let lastTab: NotebookTab = 'quests';
@@ -89,6 +95,8 @@ export class NotebookPanel extends Panel {
    */
   private readonly questPages: Record<'open' | 'done', Vitrine>;
   private questView: 'open' | 'done' = 'open';
+  /** 0.13: l'onglet Voisins (portraits, fiche, frise, carte du bourg). */
+  private readonly neighboursPage: NeighboursPage;
   /** La case du sac était déjà choisie au moment du clic (un second clic fait l'action principale). */
   private readonly pressed = { selected: false };
 
@@ -107,18 +115,21 @@ export class NotebookPanel extends Panel {
       },
       'Tab',
     );
-    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'fish' || tab === 'memories' || tab === 'needs' ? tab : lastTab;
+    this.tab = isNotebookTab(tab) ? tab : lastTab;
+    this.neighboursPage = new NeighboursPage(host);
     this.fishPage = new Vitrine(host, { perPage: UI_SETTINGS.vitrine.fishPerPage, label: ctx.t(ctx.texts.extra.fish.pageLabel), variant: 'lpl-vitrine--fish' });
     const questOptions = { perPage: UI_SETTINGS.vitrine.questsPerPage, label: ctx.t(ctx.texts.extra.vitrine.questsLabel), variant: 'lpl-vitrine--quests' };
     this.questPages = { open: new Vitrine(host, questOptions), done: new Vitrine(host, questOptions) };
     const g = ctx.texts.game.ui.notebookTabs;
     this.badge = el('span', { class: 'lpl-tab__badge', hidden: true });
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
-      button([icon(iconId), label, extra], () => {
+      // 0.13, sept onglets: le nom ne s'écrit que sur l'onglet ouvert (`interface.css`); les autres gardent l'icône, la bulle et le nom accessible.
+      button([icon(iconId), el('span', { class: 'lpl-tab__label', text: label }), extra], () => {
         this.select(id, true);
-      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1', 'data-tab': id, [SOUND_ATTR]: 'none' } });
+      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1', 'data-tab': id, title: label, [SOUND_ATTR]: 'none' } });
     this.tabButtons = {
       quests: make('quests', ctx.t(g.quests), 'ui-flag', null),
+      neighbours: make('neighbours', ctx.t(ctx.texts.extra.neighbours.tab), 'ui-neighbours', null),
       mail: make('mail', ctx.t(g.mail), 'ui-letter', this.badge),
       bag: make('bag', ctx.t(g.bag), 'grain-sack', null),
       // Pêche 0.12: le carnet des poissons, entre « Sac » et « Souvenirs » (section 7.4).
@@ -130,6 +141,7 @@ export class NotebookPanel extends Panel {
     const tabs = el('div', { class: 'lpl-tabs', role: 'tablist', 'aria-label': n.tabsLabel }, [
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyQ') }),
       this.tabButtons.quests,
+      this.tabButtons.neighbours,
       this.tabButtons.mail,
       this.tabButtons.bag,
       this.tabButtons.fish,
@@ -199,6 +211,7 @@ export class NotebookPanel extends Panel {
       // Poissons et quêtes: les pages d'abord (au-delà de 28 poissons, de 8 quêtes), puis l'onglet voisin.
       if (this.tab === 'fish' && this.fishPage.turn(code === 'KeyQ' ? -1 : 1)) return true;
       if (this.tab === 'quests' && this.questPages[this.questView].turn(code === 'KeyQ' ? -1 : 1)) return true;
+      if (this.tab === 'neighbours' && this.neighboursPage.turn(code === 'KeyQ' ? -1 : 1)) return true;
       const index = TABS.indexOf(this.tab);
       const next = TABS[(index + (code === 'KeyQ' ? -1 : 1) + TABS.length) % TABS.length] ?? 'quests';
       this.select(next, true);
@@ -275,11 +288,19 @@ export class NotebookPanel extends Panel {
     setText(this.badge, String(unread));
     setAttr(this.badge, 'aria-label', ctx.t(unread > 1 ? ctx.texts.extra.notebook.unreadMany : ctx.texts.extra.notebook.unread, { count: unread }));
     if (this.tab === 'quests') this.renderQuests(world);
+    else if (this.tab === 'neighbours') this.renderNeighbours(world);
     else if (this.tab === 'mail') this.renderMail(letters);
     else if (this.tab === 'bag') this.renderBag(world);
     else if (this.tab === 'needs') this.renderNeeds(world);
     else if (this.tab === 'fish') this.renderFish(world);
     else this.renderMemories(world);
+  }
+
+  /** Voisins (0.13, lot H3): la vitrine des portraits et la fiche, ou la carte du bourg (`voisins.ts`). */
+  private renderNeighbours(world: ReadonlyWorld): void {
+    const { sig, build } = this.neighboursPage.render(world);
+    this.renderBody(sig, build);
+    this.neighboursPage.afterRender();
   }
 
   /**

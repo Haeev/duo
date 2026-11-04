@@ -2029,6 +2029,222 @@
     <path class="lpl-ik" d="M6.2 25.4h26.4v2H6.2z" fill="#F0ECE3"/>
     <path d="M9.2 25.4h3v2h-3zM15.2 25.4h3v2h-3zM21.2 25.4h3v2h-3zM27.2 25.4h3v2h-3z" fill="#A4463B"/>
   </symbol>
+  <!-- Carnet des voisins (0.13, lot H3): lieux des plannings (place-*), métiers sans objet propre (job-*),
+       anniversaire, goûts (adore, aime, n'aime pas: un cœur, un sourire, une moue, la forme dit le goût)
+       et le crayon du carnet. Couleurs de palette.py. -->
+  <!-- La halte: le quai, son réverbère et la cloche du chef de halte. -->
+  <symbol id="place-halt" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2.5 17.5h19v3h-19z" fill="#C0B4A1"/>
+    <path d="M7 17.5V6" stroke="#2a2522" stroke-width="3" stroke-linecap="round"/>
+    <path d="M7 17.5V6" stroke="#44484E" stroke-width="1.4" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M7 7.5h6.7v1"/>
+    <path class="lpl-ik" d="M10.5 12.5V11a3.2 3.2 0 0 1 6.4 0v1.5z" fill="#C8A150"/>
+    <circle class="lpl-ik" cx="13.7" cy="14" r="1" fill="#C8A150"/>
+    <path class="lpl-ik" d="M5 3h4l-.6 3H5.6z" fill="#F2E4B6"/>
+  </symbol>
+  <!-- L'épicerie: la devanture sous son auvent rayé. -->
+  <symbol id="place-shop" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4 11h16v9.5H4z" fill="#EBDCBF"/>
+    <path d="M2.5 6.5h19l-1.5 5h-16z" fill="#F1E5C9"/>
+    <path d="M6.3 6.5 5.7 11.5M10.1 6.5v5M13.9 6.5v5M17.7 6.5l.6 5" stroke="#C65B4B" stroke-width="2.2"/>
+    <path class="lpl-ikf" d="M2.5 6.5h19l-1.5 5h-16z"/>
+    <path class="lpl-ik" d="M13.5 14h4v6.5h-4z" fill="#A97749"/>
+    <path class="lpl-ik" d="M6 14h5v3.5H6z" fill="#5F7D8C"/>
+  </symbol>
+  <!-- La place: le tilleul et le puits couvert. -->
+  <symbol id="place-square" viewBox="0 0 24 24">
+    <path d="M9 20.5v-6" stroke="#2a2522" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M9 20.5v-6" stroke="#6E5743" stroke-width="1.6" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="9" cy="9" r="6" fill="#6C9944"/>
+    <circle cx="7" cy="7.4" r="1.6" fill="#8DB556"/>
+    <path class="lpl-ik" d="M14.5 15.5h6v5h-6z" fill="#C0B4A1"/>
+    <path class="lpl-ikf" d="M15.2 15.5V11.5M19.8 15.5V11.5M13.8 11.5 17.5 9l3.7 2.5"/>
+    <path class="lpl-ikf" d="M2 20.5h20"/>
+  </symbol>
+  <!-- La scierie: la lame ronde et la planche qu'elle débite. -->
+  <symbol id="place-sawmill" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M12 3.2l1.4 1.9 2.2-.9.3 2.4 2.4.3-.9 2.2 1.9 1.4-1.9 1.4.9 2.2-2.4.3-.3 2.4-2.2-.9L12 16.8l-1.4-1.9-2.2.9-.3-2.4-2.4-.3.9-2.2L4.7 10l1.9-1.4-.9-2.2 2.4-.3.3-2.4 2.2.9z" fill="#C9CFD2"/>
+    <circle class="lpl-ik" cx="12" cy="10" r="1.6" fill="#44484E"/>
+    <path class="lpl-ik" d="M2.5 15.5h19v4.5h-19z" fill="#D3A66D"/>
+    <path d="M5 17.8h6M14 17.8h4" stroke="#A97749" stroke-width="1.1" stroke-linecap="round"/>
+  </symbol>
+  <!-- Le bord de l'Aubrune: l'eau et les massettes de la berge. -->
+  <symbol id="place-river" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M15.5 12.5V7.5M19 12.5V9M12.6 12.5c0-2.2.7-3.8 2-4.8M21.6 12.5c0-1.8-.5-3.1-1.4-3.9"/>
+    <rect class="lpl-ik" x="14.6" y="3.4" width="1.8" height="4.4" rx=".9" fill="#765130"/>
+    <rect class="lpl-ik" x="18.1" y="5" width="1.8" height="4" rx=".9" fill="#765130"/>
+    <path class="lpl-ik" d="M2 12.5h20v8H2z" fill="#6CAAB9"/>
+    <path d="M4 15.5c1.3-.9 2.6.9 3.9 0s2.6.9 3.9 0M12.5 18.2c1.3-.9 2.6.9 3.9 0" stroke="#D4ECEB" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- La mercerie: les ciseaux de la coiffeuse. -->
+  <symbol id="place-salon" viewBox="0 0 24 24">
+    <path d="M8.6 15.8 17.8 3.6M14.6 16 6.2 3.6" stroke="#2a2522" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M8.6 15.8 17.8 3.6M14.6 16 6.2 3.6" stroke="#C9CFD2" stroke-width="1.7" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="11.7" cy="11.7" r="1.1" fill="#C8A150"/>
+    <circle class="lpl-ik" cx="7.2" cy="18" r="2.8" fill="#BA554C"/>
+    <circle cx="7.2" cy="18" r="1.1" fill="#F3EBD4"/>
+    <circle class="lpl-ik" cx="16" cy="18.4" r="2.8" fill="#BA554C"/>
+    <circle cx="16" cy="18.4" r="1.1" fill="#F3EBD4"/>
+  </symbol>
+  <!-- L'école: le tableau noir sur son chevalet, deux lignes de craie. -->
+  <symbol id="place-school" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M7 15.5 5 21M17 15.5l2 5.5"/>
+    <path class="lpl-ik" d="M3.5 4.5h17v11h-17z" fill="#3F6453"/>
+    <path d="M6 8.5h5M6 11.5h8" stroke="#F0ECE3" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M15.5 12.5h3v1.6h-3z" fill="#F0ECE3"/>
+  </symbol>
+  <!-- L'église: la nef, le clocher, la croix. -->
+  <symbol id="place-church" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4 12h9v8.5H4z" fill="#DAD0BE"/>
+    <path class="lpl-ik" d="M3 12.5 8.5 8l5.5 4.5z" fill="#737B86"/>
+    <path class="lpl-ik" d="M13 9h6v11.5h-6z" fill="#C0B4A1"/>
+    <path class="lpl-ik" d="M12.5 9.5 16 4l3.5 5.5z" fill="#5D646F"/>
+    <path class="lpl-ikf" d="M16 4V1.4M14.9 2.5h2.2"/>
+    <path class="lpl-ik" d="M15 20.5V15a1 1 0 0 1 2 0v5.5z" fill="#765130"/>
+    <path class="lpl-ik" d="M7.5 17.5v-2a1 1 0 0 1 2 0v2z" fill="#5F7D8C"/>
+  </symbol>
+  <!-- Le cimetière: une stèle gravée, une croix, une fleur. -->
+  <symbol id="place-cemetery" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M16.5 5.5h2v3H21v2h-2.5v10h-2v-10H14v-2h2.5z" fill="#9B907F"/>
+    <path class="lpl-ik" d="M4 20.5V11a4 4 0 0 1 8 0v9.5z" fill="#BEB9AD"/>
+    <path d="M8 12.5v5M6.3 14.2h3.4" stroke="#7F7B73" stroke-width="1.3" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="14" cy="18.6" r="1.4" fill="#DA9BA4"/>
+    <path class="lpl-ikf" d="M2 20.5h20"/>
+  </symbol>
+  <!-- Le café de la Côte: la tasse fumante, son liseré brique. -->
+  <symbol id="place-cafe" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M8 8.5c-1-1.3 1-2.2 0-3.6M11.5 8.5c-1-1.3 1-2.2 0-3.6"/>
+    <path class="lpl-ikf" d="M15.5 12.5H17a2.2 2.2 0 0 1 0 4.4h-1.8"/>
+    <path class="lpl-ik" d="M4.5 11h11v4.5a4.5 4.5 0 0 1-4.5 4.5H9a4.5 4.5 0 0 1-4.5-4.5z" fill="#F0ECE3"/>
+    <path d="M5.4 12.6h9.2" stroke="#765130" stroke-width="1.6"/>
+    <path d="M5 15.4h10" stroke="#8E3F35" stroke-width="1.4"/>
+    <path class="lpl-ikf" d="M2.5 20.5h15"/>
+  </symbol>
+  <!-- La forge: l'enclume et une étincelle. -->
+  <symbol id="place-forge" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 9.5h13l3.5 1.5-3.5 1.5H15V14h-3v2.5h4V20H6v-3.5h4V14H8c-2.5 0-4.5-1.5-5-4.5z" fill="#6C7179"/>
+    <path d="M18.5 3.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="#FFD27A" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Le moulin de la Vanne: la roue à aubes dans le bief. -->
+  <symbol id="place-mill" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="12" cy="10.5" r="7.5" fill="#A97749"/>
+    <circle class="lpl-ik" cx="12" cy="10.5" r="4.5" fill="#D3A66D"/>
+    <path class="lpl-ikf" d="M12 3v15M4.5 10.5h15M6.7 5.2l10.6 10.6M17.3 5.2 6.7 15.8"/>
+    <circle class="lpl-ik" cx="12" cy="10.5" r="1.4" fill="#44484E"/>
+    <path class="lpl-ik" d="M2 16.5h20v4H2z" fill="#6CAAB9"/>
+    <path d="M4.5 18.6c1.2-.8 2.4.8 3.6 0M14.5 18.6c1.2-.8 2.4.8 3.6 0" stroke="#D4ECEB" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- La ferme du Pré-Long: la grange rouge, sa porte en croix, le foin au fenil. -->
+  <symbol id="place-farm" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4 11 12 4.5 20 11v9.5H4z" fill="#9B4C3B"/>
+    <path class="lpl-ik" d="M9 20.5v-6h6v6z" fill="#E8DDC4"/>
+    <path class="lpl-ikf" d="M9 14.5l6 6M15 14.5l-6 6"/>
+    <path class="lpl-ik" d="M10.5 8.5h3V11h-3z" fill="#E2C47C"/>
+  </symbol>
+  <!-- Les champs du Haut: trois épis de blé. -->
+  <symbol id="place-field" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M12 21V9M12 21c-.8-4-2.8-6.8-5.6-8.4M12 21c.8-4 2.8-6.8 5.6-8.4"/>
+    <ellipse class="lpl-ik" cx="12" cy="5.6" rx="1.9" ry="3.3" fill="#E2C47C"/>
+    <ellipse class="lpl-ik" cx="5.8" cy="10.4" rx="1.8" ry="3.1" fill="#E2C47C" transform="rotate(-40 5.8 10.4)"/>
+    <ellipse class="lpl-ik" cx="18.2" cy="10.4" rx="1.8" ry="3.1" fill="#E2C47C" transform="rotate(40 18.2 10.4)"/>
+  </symbol>
+  <!-- Le bois de la Côte: deux sapins. -->
+  <symbol id="place-forest" viewBox="0 0 24 24">
+    <path d="M8 16v4.5M16.5 17v3.5" stroke="#2a2522" stroke-width="3" stroke-linecap="round"/>
+    <path d="M8 16v4.5M16.5 17v3.5" stroke="#6E5743" stroke-width="1.4" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M8 3 3.5 10.5H6L2.5 16h11L10 10.5h2.5z" fill="#3F6C4D"/>
+    <path class="lpl-ik" d="M16.5 6.5l-4 6h2l-3 4.5h10l-3-4.5h2z" fill="#52845B"/>
+    <path class="lpl-ikf" d="M2 20.5h20"/>
+  </symbol>
+  <!-- Les jardins: trois pousses dans la terre bêchée. -->
+  <symbol id="place-garden" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M6 15v-3.5M12 15v-4.5M18 15v-3.5"/>
+    <path class="lpl-ik" d="M6 11.8c-2.2 0-3.4-1.5-3.4-3.3 2.2 0 3.4 1.5 3.4 3.3zM6 11.8c2.2 0 3.4-1.5 3.4-3.3-2.2 0-3.4 1.5-3.4 3.3zM12 10.8c-2.2 0-3.4-1.5-3.4-3.3 2.2 0 3.4 1.5 3.4 3.3zM12 10.8c2.2 0 3.4-1.5 3.4-3.3-2.2 0-3.4 1.5-3.4 3.3zM18 11.8c-2.2 0-3.4-1.5-3.4-3.3 2.2 0 3.4 1.5 3.4 3.3zM18 11.8c2.2 0 3.4-1.5 3.4-3.3-2.2 0-3.4 1.5-3.4 3.3z" fill="#6FAA47"/>
+    <path class="lpl-ik" d="M2.5 15h19v5.5h-19z" fill="#7C5A3C"/>
+    <path d="M4.5 17.8h15" stroke="#957150" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+  <!-- Hors du bourg: la route qui file vers l'horizon et son panneau. -->
+  <symbol id="place-road" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 10h20v10.5H2z" fill="#AEC874"/>
+    <path class="lpl-ik" d="M5.5 20.5 10.8 10h2.4l5.3 10.5z" fill="#CFB489"/>
+    <path d="M12 12.4v1.4M12 16.2v2.2" stroke="#F0ECE3" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M19.8 20.5V5" stroke="#2a2522" stroke-width="3" stroke-linecap="round"/>
+    <path d="M19.8 20.5V5" stroke="#A97749" stroke-width="1.4" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M14.5 3.5h5.3l2 2-2 2h-5.3z" fill="#D3A66D"/>
+  </symbol>
+  <!-- Le cabinet vétérinaire: une empreinte de patte. -->
+  <symbol id="place-vet" viewBox="0 0 24 24">
+    <ellipse class="lpl-ik" cx="12" cy="15.6" rx="5" ry="4.2" fill="#8A5A3A"/>
+    <ellipse class="lpl-ik" cx="5.6" cy="10.2" rx="1.9" ry="2.5" fill="#8A5A3A"/>
+    <ellipse class="lpl-ik" cx="9.5" cy="6.2" rx="1.9" ry="2.5" fill="#8A5A3A"/>
+    <ellipse class="lpl-ik" cx="14.5" cy="6.2" rx="1.9" ry="2.5" fill="#8A5A3A"/>
+    <ellipse class="lpl-ik" cx="18.4" cy="10.2" rx="1.9" ry="2.5" fill="#8A5A3A"/>
+  </symbol>
+  <!-- Un banc de bois (le banc de la rue Haute). -->
+  <symbol id="place-bench" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M5 12v8.5M19 12v8.5"/>
+    <path class="lpl-ik" d="M3 8.5h18V11H3z" fill="#A97749"/>
+    <path class="lpl-ik" d="M2.5 13.5h19V16h-19z" fill="#D3A66D"/>
+  </symbol>
+  <!-- La sonneuse: la cloche et son battant. -->
+  <symbol id="job-bell" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M12 2v3.5"/>
+    <path class="lpl-ik" d="M5.5 16.5c1.5-1 2-3 2-6.5a4.5 4.5 0 0 1 9 0c0 3.5.5 5.5 2 6.5z" fill="#C8A150"/>
+    <path class="lpl-ik" d="M4.5 16.5h15v2h-15z" fill="#C8A150"/>
+    <circle class="lpl-ik" cx="12" cy="20.4" r="1.5" fill="#8F5C40"/>
+    <path d="M9.6 10c0-1.6.8-2.7 2-3" stroke="#F2E4B6" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- La doyenne: la pelote et les aiguilles à tricoter. -->
+  <symbol id="job-knit" viewBox="0 0 24 24">
+    <path d="M13.5 9.5 20.5 2.5M16.5 11.5l5-6.5" stroke="#2a2522" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M13.5 9.5 20.5 2.5M16.5 11.5l5-6.5" stroke="#C8A150" stroke-width="1.1" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="10.5" cy="14.5" r="6.5" fill="#DA9BA4"/>
+    <path d="M5.4 12c3 1 7.2 1 10-1.2M4.6 15.4c3.6 1 8 .4 11.8-1.6M6.6 18.8c3 .5 6-.5 8.6-2.6" stroke="#9B4C3B" stroke-width="1" fill="none" stroke-linecap="round"/>
+  </symbol>
+  <!-- L'écolier: le cartable de cuir. -->
+  <symbol id="job-satchel" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M9 9V6.5a3 3 0 0 1 6 0V9"/>
+    <path class="lpl-ik" d="M4 9h16v11H4z" fill="#8A5A35"/>
+    <path class="lpl-ik" d="M4 9h16v5.5H4z" fill="#A97749"/>
+    <path class="lpl-ik" d="M11 13.5h2V16h-2z" fill="#C8A150"/>
+  </symbol>
+  <!-- Anniversaire: le gâteau et sa bougie. -->
+  <symbol id="birthday-cake" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M11 7.5h2V13h-2z" fill="#6B87B1"/>
+    <path d="M12 3c1.4 1.4 1.4 3 0 3.9-1.4-.9-1.4-2.5 0-3.9z" fill="#FFD27A" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M4 13h16v7.5H4z" fill="#F0E4CA"/>
+    <path d="M4 15.4c2 1.3 4-1.3 6 0s4 1.3 6 0 3-1.1 4 0" stroke="#DA9BA4" stroke-width="2" fill="none"/>
+    <path class="lpl-ikf" d="M4 13h16v7.5H4z"/>
+    <path class="lpl-ikf" d="M2.5 20.5h19"/>
+  </symbol>
+  <!-- Goûts: il adore (un cœur), il aime (un sourire), il n'aime pas (une moue, sourcils froncés). -->
+  <symbol id="taste-love" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M12 20.5s-8.5-5-8.5-11A4.6 4.6 0 0 1 12 7a4.6 4.6 0 0 1 8.5 2.5c0 6-8.5 11-8.5 11z" fill="#BA554C"/>
+    <path d="M7 9.4c.3-1.2 1.2-1.9 2.3-2" stroke="#DA9BA4" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <symbol id="taste-like" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="12" cy="12" r="8.5" fill="#E2B95B"/>
+    <circle cx="9.2" cy="10.2" r="1.2" fill="#2a2522"/>
+    <circle cx="14.8" cy="10.2" r="1.2" fill="#2a2522"/>
+    <path class="lpl-ikf" d="M8.3 13.8q3.7 3.4 7.4 0"/>
+  </symbol>
+  <symbol id="taste-dislike" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="12" cy="12" r="8.5" fill="#9DB2BE"/>
+    <circle cx="9.2" cy="10.6" r="1.2" fill="#2a2522"/>
+    <circle cx="14.8" cy="10.6" r="1.2" fill="#2a2522"/>
+    <path class="lpl-ikf" d="M8.4 16.4q1.2-1.4 2.4-.4t2.4 0 2.4.4"/>
+  </symbol>
+  <!-- L'onglet Voisins: deux bustes côte à côte. -->
+  <symbol id="ui-neighbours" viewBox="0 0 24 24">
+    <circle class="lpl-iu" cx="8.5" cy="8" r="3.2"/>
+    <path class="lpl-iu" d="M2.5 20c0-3.8 2.7-6.2 6-6.2s6 2.4 6 6.2"/>
+    <circle class="lpl-iu" cx="16.5" cy="9" r="2.6"/>
+    <path class="lpl-iu" d="M15.6 14.1c.3-.1.6-.1.9-.1 2.8 0 5 2.1 5 5.4"/>
+  </symbol>
+  <!-- Le crayon du carnet (notifications des habitudes notées). -->
+  <symbol id="ui-pencil" viewBox="0 0 24 24">
+    <path class="lpl-iu" d="M4 20l1-4.6L16 4.4l3.6 3.6-11 11zM13.8 6.6l3.6 3.6M5 15.4 8.6 19"/>
+  </symbol>
   <!-- Symboles des profils Duo -->
   <symbol id="player-orb" viewBox="0 0 24 24"><path d="M4.4 12A7.6 7.6 0 1 1 19.6 12A7.6 7.6 0 1 1 4.4 12Z" fill="currentColor"/></symbol>
   <symbol id="player-crescent" viewBox="0 0 24 24"><path d="M21.1 13.36A9.2 9.2 0 1 1 10.64 2.9A7.4 7.4 0 1 0 21.1 13.36Z" fill="currentColor"/></symbol>

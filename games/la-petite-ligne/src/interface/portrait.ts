@@ -106,7 +106,31 @@ const HAIRS: Readonly<Record<HairStyle, (c: string) => string>> = {
   beard: (c) => `<path d="M31 44c0-12 8-20 19-20s19 8 19 20c-4-5-10-7-19-7s-15 2-19 7z" fill="${c}"/>`,
   braids: (c) =>
     `<path d="M30 47c-2-15 8-25 20-25s22 10 20 25c-3-8-10-12-20-12s-17 4-20 12z" fill="${c}"/><path d="M29 46c-4 8-4 16-1 22h6c-2-7-1-14 1-20zM71 46c4 8 4 16 1 22h-6c2-7 1-14-1-20z" fill="${c}"/><circle cx="31" cy="70" r="3" fill="#557FB0"/><circle cx="69" cy="70" r="3" fill="#557FB0"/>`,
+  // 0.13: couronne de cheveux blancs et favoris autour d'un crâne chauve (Ambroise).
+  bald: (c) =>
+    `<path d="M30 54c-2-8 0-14 4-17l2 4c-2 3-3 7-2 13zM70 54c2-8 0-14-4-17l-2 4c2 3 3 7 2 13z" fill="${c}"/><path d="M32 54c0 6 2 9 4 10v-9zM68 54c0 6-2 9-4 10v-9z" fill="${c}"/><path d="M42 33q6-3 12-1" stroke="#FFF8EA" stroke-width="2" stroke-linecap="round" opacity="0.7" fill="none"/>`,
+  // Bonnet de laine brun à revers (Barnabé).
+  beanie: () =>
+    `<path d="M30 43c-1-14 8-22 20-22s21 8 20 22z" fill="#6B4A33"/><rect x="28.5" y="38" width="43" height="7" rx="3" fill="#563A27"/><path d="M36 30v6M43 26v10M50 25v11M57 26v10M64 30v6" stroke="#563A27" stroke-width="1.2" opacity="0.6"/>`,
+  // Chapeau de paille cabossé au ruban brique (Paulin).
+  straw_hat: (c) =>
+    `${CAP(c)}<ellipse cx="50" cy="37" rx="28" ry="5.5" fill="#E2C47C" stroke="${INK}" stroke-opacity="0.35" stroke-width="1"/><path d="M36 37c0-10 6-15 14-15s14 5 14 15z" fill="#E2C47C" stroke="${INK}" stroke-opacity="0.35" stroke-width="1"/><path d="M36.3 32.5h27.4v3.5H36.3z" fill="#9B4C3B"/><path d="M44 24l3 4" stroke="#C5A45F" stroke-width="1.4"/>`,
+  // Calot blanc de mitron (Achille).
+  calot: (c) =>
+    `${CAP(c)}<path d="M31 41c0-10 8-16 19-16s19 6 19 16z" fill="#F2EEE4" stroke="${INK}" stroke-opacity="0.35" stroke-width="1"/><path d="M31 41h38" stroke="#D9D1C2" stroke-width="3"/>`,
+  // Képi de la poste à galon doré (Lucie).
+  kepi: (c) =>
+    `${CAP(c)}<path d="M33 40l2.5-14h29l2.5 14z" fill="#3D5874"/><rect x="34.5" y="30" width="31" height="2.4" fill="#E0C25A"/><rect x="32" y="37.5" width="36" height="4" fill="#2E3A5C"/><path d="M46 41h24c0 3-3 4.5-8 4.5H48z" fill="#28344C"/>`,
+  // Chapeau rond à larges bords, noir (l'abbé Martial).
+  round_hat: (c) =>
+    `${CAP(c)}<ellipse cx="50" cy="36" rx="29" ry="5" fill="#2A2B2F"/><path d="M37 36c0-9 6-13 13-13s13 4 13 13z" fill="#2A2B2F"/><path d="M37.2 32.5h25.6v2.4H37.2z" fill="#43454B"/>`,
+  // Casquette de cheminot trop grande, rouge passé (Léon).
+  kid_cap: (c) =>
+    `${CAP(c)}<path d="M29 40c0-11 9-18 21-18s21 7 21 18z" fill="#A65A4E"/><rect x="29" y="36.5" width="42" height="4" fill="#8A4A40"/><path d="M46 40h28c0 3.5-3.5 5-9 5H48z" fill="#7A4038"/>`,
 };
+
+/** Lunettes rondes cerclées de métal, posées sur les yeux des expressions (cercles en 42 et 58). */
+const GLASSES = `<g fill="none" stroke="#6F6B66" stroke-width="1.6"><circle cx="42" cy="51" r="5.2"/><circle cx="58" cy="51" r="5.2"/><path d="M47.2 51h5.6M36.8 50l-5-1.5M63.2 50l5-1.5"/></g>`;
 
 const FACES: Readonly<Record<Expression, string>> = {
   low: `<path d="M38 50q4 -2 8 0M54 50q4 -2 8 0" stroke="${INK}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M38 47l7 -2M62 47l-7 -2" stroke="${INK}" stroke-width="2" stroke-linecap="round"/><path d="M44 63q6 -4 12 0" stroke="${MOUTH}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
@@ -195,6 +219,22 @@ export function villagerColors(id: string): PortraitColors | null {
 }
 
 /**
+ * Silhouette d'un habitant pas encore rencontré (carnet des voisins, 0.13): tête et épaules
+ * grises sur le papier creusé, un « ? » au milieu. Même cadre que `portraitSvg`.
+ */
+export function silhouetteSvg(): string {
+  return (
+    '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+    '<rect width="100" height="100" fill="#E4DCC8"/>' +
+    '<path d="M14 104c2-18 16-28 36-28s34 10 36 28z" fill="#B3AA99"/>' +
+    '<rect x="44" y="64" width="12" height="14" fill="#B3AA99"/>' +
+    '<ellipse cx="50" cy="48" rx="19" ry="21" fill="#B3AA99"/>' +
+    `<text x="50" y="58" text-anchor="middle" font-size="30" font-weight="800" font-family="sans-serif" fill="#F3EBD4">?</text>` +
+    '</svg>'
+  );
+}
+
+/**
  * Le portrait en SVG. `label`: nom accessible (forme du jour), vide pour un
  * portrait décoratif. Toutes les couleurs viennent de la configuration ou
  * passent par `safeColor`.
@@ -249,6 +289,7 @@ export function portraitSvg(p: PortraitColors, expression: Expression, label: st
     `<ellipse cx="31" cy="53" rx="3.5" ry="5" fill="${p.shade}"/><ellipse cx="69" cy="53" rx="3.5" ry="5" fill="${p.shade}"/>` +
     HAIRS[p.style](p.hair) +
     FACES[expression] +
+    (p.glasses === true ? GLASSES : '') +
     freckles +
     beard +
     BEARDS[p.beard ?? 'none'](p.hair) +

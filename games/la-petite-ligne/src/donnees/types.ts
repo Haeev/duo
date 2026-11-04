@@ -406,6 +406,9 @@ export interface VillagerDef {
   birthday: { season: Season; day: number } | null;
   /** 0.13 (lot H2): ce qu'il adore, aime, n'aime pas (`tastes` des données); le reste lui est égal. */
   tastes: VillagerTastes;
+  /** 0.13 (lot H3): son âge et son logis au carnet (« 64 ans », « derrière la voie »), `null` s'ils ne sont pas écrits. */
+  age: string | null;
+  homeLabel: string | null;
 }
 
 /** Goûts d'un habitant (`tastes { adore[], aime[], deteste[{ item, reply }] }` des données). */
