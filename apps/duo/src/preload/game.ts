@@ -10,7 +10,7 @@
 import { ipcRenderer } from 'electron';
 
 const PORT_CHANNEL = 'duo:bridge-port';
-const PAGE_MESSAGE = { type: 'duo:bridge-port', bridge: '1.0' } as const;
+const PAGE_MESSAGE = { type: 'duo:bridge-port', bridge: '1.1' } as const;
 
 const documentReady = new Promise<void>((resolve) => {
   if (document.readyState === 'loading') {

@@ -110,7 +110,7 @@ async function open(init: InitMessage): Promise<{ duo: DuoContext; platform: Pla
 describe('pont du SDK', () => {
   it('se présente, reçoit init et expose rôle, joueurs et graine', async () => {
     const { duo, platform: p } = await open(initMessage('guest'));
-    expect(p.received[0]).toEqual({ type: 'hello', bridge: '1.0', sdk: '1.0.0' });
+    expect(p.received[0]).toEqual({ type: 'hello', bridge: '1.1', sdk: '1.1.0' });
     expect(duo.role).toBe('guest');
     expect(duo.localPlayer).toMatchObject({ id: 'b', name: 'Sacha', local: true });
     expect(duo.remotePlayer).toMatchObject({ id: 'a', local: false });

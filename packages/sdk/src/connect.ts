@@ -23,6 +23,7 @@ import type {
   LifecycleState,
   LoadedSave,
   Logger,
+  Notebook,
   Player,
   SaveSnapshot,
   UiSettings,
@@ -33,6 +34,7 @@ import { createGameBridge, waitForPort, type GameBridge } from './bridge';
 import { createInput } from './input';
 import { createLoop } from './loop';
 import { createNet } from './net';
+import { createNotebook, type NotebookInternal } from './notebook';
 import { createRandom, deriveSeed } from './random';
 import { SDK_VERSION } from './version';
 
@@ -120,7 +122,10 @@ function createContext<TAction extends string>(
   };
   const disposers: (() => void)[] = [];
 
+  // Créé plus bas, après les entrées; le journal et Échap le consultent dès qu'il existe.
+  let notebook: NotebookInternal | null = null;
   const sendLog = (level: 'info' | 'warn' | 'error', message: string, data?: unknown): void => {
+    notebook?.recordLog(level, message, data);
     try {
       send(
         data === undefined
@@ -176,6 +181,7 @@ function createContext<TAction extends string>(
     onEscape: () => {
       send({ type: 'pauseRequest' });
     },
+    escapeTaken: () => notebook?.typing === true,
   });
   disposers.push(() => {
     input.dispose();
@@ -186,9 +192,37 @@ function createContext<TAction extends string>(
     afterStep: () => {
       input.endStep();
     },
+    afterRender: () => {
+      notebook?.afterRender();
+    },
   });
   disposers.push(() => {
     loop.dispose();
+  });
+
+  const localName = init.players.find((p) => p.id === init.localPlayerId)?.name ?? '';
+  const notebookInternal = createNotebook({
+    offer: init.notebook,
+    send: (message) => {
+      send(message);
+    },
+    releaseKeys: () => {
+      input.releaseAll();
+    },
+    describe: () => ({
+      jeu: `${manifest.name} ${init.game.version}`,
+      jeuId: init.game.id,
+      role: init.role === 'host' ? 'hôte' : 'invité',
+      joueur: localName,
+      partie: init.matchId,
+      sdk: SDK_VERSION,
+      pontPlateforme: init.bridge,
+      etatDuCycle: state,
+    }),
+  });
+  notebook = notebookInternal;
+  disposers.push(() => {
+    notebookInternal.dispose();
   });
 
   const audio = createAudio(settings.volumes, resolveUrl);
@@ -327,10 +361,13 @@ function createContext<TAction extends string>(
         state = 'stopped';
         loop.stop();
         input.releaseAll();
-        const exitSave =
+        const exitSave = Promise.all([
           init.role === 'host' && message.save && previous !== 'loading'
             ? withTimeout(saveFromProvider('exit'), EXIT_SAVE_TIMEOUT_MS)
-            : Promise.resolve();
+            : Promise.resolve(),
+          // Les images d'après d'une note en cours partent avant la fin de la partie.
+          withTimeout(notebookInternal.flush(), EXIT_SAVE_TIMEOUT_MS),
+        ]);
         void exitSave.then(() => {
           if (init.role === 'host' && manifest.play === 'session' && !sessionEnded) {
             sessionEnded = true;
@@ -347,6 +384,9 @@ function createContext<TAction extends string>(
       }
       case 'net':
         net.receive(message.channel, message.data);
+        return;
+      case 'notebookResult':
+        notebookInternal.receiveResult(message.requestId, message.status);
         return;
       case 'link':
         clockOffsetMs = message.clockOffsetMs;
@@ -447,6 +487,7 @@ function createContext<TAction extends string>(
     audio,
     assets: { url: resolveUrl },
     log,
+    notebook: notebookInternal as Notebook,
     dispose() {
       if (startTimer !== undefined) clearTimeout(startTimer);
       for (const dispose of disposers.splice(0).reverse()) dispose();

@@ -20,6 +20,7 @@ import {
   sessionGraphicsStorage,
 } from './etat/options-graphiques';
 import { createControls } from './entrees/commandes';
+import { createNotebookSource } from './plateforme/carnet';
 import { createFallbackInterface } from './plateforme/interface-secours';
 import { createRenderer } from './rendu/index';
 import { createSession, type GameAction } from './session';
@@ -59,7 +60,8 @@ function renderQuality(): RenderQuality {
   const light = (search: string): boolean => new URLSearchParams(search).get('rendu') === 'leger';
   if (light(window.location.search)) return 'light';
   try {
-    if (window.top !== null && window.top !== window && light(window.top.location.search)) return 'light';
+    if (window.top !== null && window.top !== window && light(window.top.location.search))
+      return 'light';
   } catch {
     // Page parente d'une autre origine (l'application Duo): pas de mode léger.
   }
@@ -80,7 +82,8 @@ async function pickAudio(): Promise<CreateAudioWithExtras | null> {
 
 /** Robot de test (`?robot=1`), seulement en développement: absent de la version livrée. */
 async function pickRobot(): Promise<Robot | null> {
-  if (!import.meta.env.DEV || new URLSearchParams(window.location.search).get('robot') !== '1') return null;
+  if (!import.meta.env.DEV || new URLSearchParams(window.location.search).get('robot') !== '1')
+    return null;
   const { createRobot } = await import('./simulation/robot');
   return createRobot();
 }
@@ -112,10 +115,19 @@ async function main(): Promise<void> {
   const status = byId('statut');
   const content = loadContent(CONTENT_FILES);
   const loadedMap = loadMap(MAP_FILES);
-  if (loadedMap.warning !== null) duo.log.warn('carte du level designer illisible, carte de secours', { reason: loadedMap.warning });
+  if (loadedMap.warning !== null)
+    duo.log.warn('carte du level designer illisible, carte de secours', {
+      reason: loadedMap.warning,
+    });
   duo.reportLoading(1 - RENDER_LOAD_SHARE);
 
-  const session = createSession({ duo, content, map: loadedMap.map, robot: await pickRobot(), now: () => performance.now() });
+  const session = createSession({
+    duo,
+    content,
+    map: loadedMap.map,
+    robot: await pickRobot(),
+    now: () => performance.now(),
+  });
   const view = session.view;
   let renderer: Renderer | null = null;
   let ui: GameInterface | null = null;
@@ -178,12 +190,23 @@ async function main(): Promise<void> {
         log: duo.log,
       });
       // Un son manquant ne doit jamais empêcher de jouer.
-      await a.load(() => undefined).catch((error: unknown) => {
-        duo.log.warn('sons non chargés', { message: error instanceof Error ? error.message : String(error) });
-      });
+      await a
+        .load(() => undefined)
+        .catch((error: unknown) => {
+          duo.log.warn('sons non chargés', {
+            message: error instanceof Error ? error.message : String(error),
+          });
+        });
       sound = a;
     }
     duo.input.attach(container);
+    // Carnet de séance (Ctrl+N, macOS): inerte quand la plateforme ne l'offre pas.
+    if (duo.notebook.available) {
+      duo.notebook.attach(createNotebookSource(view, container));
+      view.onEvent((event) => {
+        duo.notebook.trace(event.type, event);
+      });
+    }
     status.hidden = true;
   };
 

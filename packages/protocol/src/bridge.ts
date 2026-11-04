@@ -99,6 +99,12 @@ export const InitMessageSchema = v.strictObject({
   save: v.nullable(LoadedSaveSchema),
   /** Heure de session = `performance.timeOrigin + performance.now()` de la page + cet écart. */
   clockOffsetMs: Finite,
+  /**
+   * Pont 1.1: carnet de séance de cette machine (notes du joueur avec images du jeu). Absent:
+   * plateforme 1.0 ou carnet indisponible. N'est envoyé qu'à un jeu qui annonce le pont 1.1 dans
+   * `hello`: un SDK 1.0 refuserait ce champ inconnu.
+   */
+  notebook: v.exactOptional(v.strictObject({ enabled: v.boolean() })),
 });
 export type InitMessage = v.InferOutput<typeof InitMessageSchema>;
 
@@ -123,6 +129,20 @@ export const SaveStatusSchema = v.picklist([
 ]);
 export type SaveStatus = v.InferOutput<typeof SaveStatusSchema>;
 
+/** Carnet de séance (pont 1.1): les notes ne passent jamais par le réseau, elles restent sur la machine. */
+export const NOTEBOOK_MAX_FILES = 200;
+/** Taille totale d'un envoi `notebookWrite`: 24 Mio (20 s d'images JPEG en tiennent largement moins). */
+export const NOTEBOOK_MAX_BYTES = 24 * 1024 * 1024;
+/** Nom d'un fichier de note: minuscules, chiffres, tirets, une extension admise. */
+export const NotebookFileNameSchema = v.pipe(
+  v.string(),
+  v.regex(/^[a-z0-9][a-z0-9-]{0,47}\.(?:json|txt|jpg|webm)$/),
+);
+/** Identifiant d'une note, choisi par le SDK; le dossier, lui, est nommé par la plateforme. */
+export const NotebookEntryIdSchema = v.pipe(v.string(), v.regex(/^[a-z0-9-]{1,40}$/));
+export const NotebookStatusSchema = v.picklist(['ok', 'disabled', 'too-large', 'write-error']);
+export type NotebookStatus = v.InferOutput<typeof NotebookStatusSchema>;
+
 export const PlatformMessageSchema = v.variant('type', [
   InitMessageSchema,
   v.strictObject({ type: v.literal('start'), atSessionMs: Finite }),
@@ -137,6 +157,12 @@ export const PlatformMessageSchema = v.variant('type', [
   v.strictObject({ type: v.literal('saveResult'), requestId: Int, status: SaveStatusSchema }),
   v.strictObject({ type: v.literal('stop'), reason: StopReasonSchema, save: v.boolean() }),
   v.strictObject({ type: v.literal('net'), channel: NetChannelIdSchema, data: NetPayloadSchema }),
+  /** Pont 1.1: réponse à `notebookWrite`. */
+  v.strictObject({
+    type: v.literal('notebookResult'),
+    requestId: Int,
+    status: NotebookStatusSchema,
+  }),
   v.strictObject({
     type: v.literal('link'),
     rttMs: Finite,
@@ -199,6 +225,31 @@ export const GameMessageSchema = v.variant('type', [
     channel: NetChannelIdSchema,
     mode: v.picklist(['reliable', 'latest']),
     data: NetPayloadSchema,
+  }),
+  /**
+   * Pont 1.1: le carnet de séance s'ouvre ou se ferme. Ouvert, Échap revient au jeu (elle annule
+   * la note) au lieu d'ouvrir la pause de la plateforme.
+   */
+  v.strictObject({ type: v.literal('notebookTyping'), active: v.boolean() }),
+  /** Pont 1.1: le joueur active ou coupe le carnet de cette machine (réglage gardé par la plateforme). */
+  v.strictObject({ type: v.literal('notebookEnable'), enabled: v.boolean() }),
+  /**
+   * Pont 1.1: fichiers d'une note du carnet de séance. Plusieurs envois pour une même `entry`
+   * (la note et les images d'avant, puis les images d'après) vont dans le même dossier.
+   */
+  v.strictObject({
+    type: v.literal('notebookWrite'),
+    requestId: Int,
+    entry: NotebookEntryIdSchema,
+    files: v.pipe(
+      v.array(v.strictObject({ name: NotebookFileNameSchema, data: v.instance(ArrayBuffer) })),
+      v.minLength(1),
+      v.maxLength(NOTEBOOK_MAX_FILES),
+      v.check(
+        (files) => files.reduce((sum, file) => sum + file.data.byteLength, 0) <= NOTEBOOK_MAX_BYTES,
+        'notebookWrite trop gros',
+      ),
+    ),
   }),
   v.strictObject({
     type: v.literal('fatal'),

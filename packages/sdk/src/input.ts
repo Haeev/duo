@@ -9,6 +9,8 @@ const BUTTONS: readonly ('left' | 'middle' | 'right' | undefined)[] = ['left', '
 export interface InputHooks {
   /** Échap pressée: la plateforme décide de la pause (faux hôte; Duo l'intercepte avant le jeu). */
   onEscape(): void;
+  /** Vrai quand Échap appartient à un champ du SDK (carnet de séance ouvert): ni pause ni appui. */
+  escapeTaken?(): boolean;
 }
 
 export interface InputInternal<TAction extends string> extends Input<TAction> {
@@ -72,6 +74,7 @@ export function createInput<TAction extends string>(
 
   const onKeyDown = (event: KeyboardEvent): void => {
     if (event.code === 'Escape') {
+      if (hooks.escapeTaken?.() === true) return;
       event.preventDefault();
       if (!event.repeat) hooks.onEscape();
       return;

@@ -1,7 +1,7 @@
 // Versions du pont entre un jeu et la plateforme (ADR 0005, point 6; ADR 0006).
 
 /** Version du pont implémentée par ce paquet: `majeure.mineure`. */
-export const BRIDGE_VERSION = '1.0';
+export const BRIDGE_VERSION = '1.1';
 
 /** Une version de pont lue: majeure et mineure. */
 export interface BridgeVersion {
