@@ -29,7 +29,7 @@ import {
   timelineMoments,
   townModel,
 } from './modele-voisins';
-import { portraitSvg, silhouetteSvg, villagerColors } from './portrait';
+import { silhouetteSvg, villagerPortraitHtml } from './portrait';
 import { SOUND_ATTR } from './sons';
 import { type VitrineItem, Vitrine, pastille } from './vitrine';
 
@@ -101,8 +101,7 @@ export function lanterns(
 }
 
 function portraitOf(id: string, met: boolean, size: '' | 'small' | 'large'): HTMLSpanElement {
-  const colors = met ? villagerColors(id) : null;
-  return portrait(colors === null ? silhouetteSvg() : portraitSvg(colors, 'good', '', id), size);
+  return portrait((met ? villagerPortraitHtml(id, 'good') : null) ?? silhouetteSvg(), size);
 }
 
 /**
@@ -112,17 +111,13 @@ function portraitOf(id: string, met: boolean, size: '' | 'small' | 'large'): HTM
  * même sortie que les autres notifications du HUD (`lpl-toast`).
  */
 export function habitToastItem(t: HabitToastModel, sort: string): HTMLLIElement {
-  const colors = villagerColors(t.villager);
   const expression =
     t.kind === 'bond' || t.kind === 'all'
       ? 'great'
       : t.kind === 'taste' && t.mark === 'taste-dislike'
         ? 'ok'
         : 'good';
-  const face = portrait(
-    colors === null ? silhouetteSvg() : portraitSvg(colors, expression, '', t.villager),
-    'small',
-  );
+  const face = portrait(villagerPortraitHtml(t.villager, expression) ?? silhouetteSvg(), 'small');
   const trailing =
     t.kind === 'bond' && t.level !== null
       ? lanterns(

@@ -114,6 +114,14 @@ export interface Renderer {
    * personnage seul. `null` avant `load` ou sans modèle des personnages.
    */
   createOutfitPreview?(options: OutfitPreviewOptions): OutfitPreview | null;
+  /**
+   * 0.13: portrait d'un habitant tiré de son modèle 3D (buste de trois quarts, fond transparent),
+   * rendu une fois au chargement. Adresse d'image (`blob:`), `null` avant la fin du chargement ou
+   * sans modèle.
+   */
+  villagerPortrait?(id: string): string | null;
+  /** Mesure du rendu des portraits au chargement (habitants rendus, durée en ms), `null` avant. */
+  portraitStats?(): { count: number; milliseconds: number } | null;
   dispose(): void;
 }
 
@@ -169,6 +177,8 @@ export interface InterfaceOptions {
   sound?: (id: string) => void;
   /** 0.12: aperçu 3D d'une tenue pour la boutique (`Renderer.createOutfitPreview`), `null` sans rendu 3D (facultatif). */
   outfitPreview?: (options: OutfitPreviewOptions) => OutfitPreview | null;
+  /** 0.13: portrait 3D d'un habitant (`Renderer.villagerPortrait`); `null`: le portrait dessiné (facultatif). */
+  villagerPortrait?: (id: string) => string | null;
 }
 
 export interface GameInterface {

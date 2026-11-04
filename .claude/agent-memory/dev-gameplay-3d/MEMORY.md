@@ -500,8 +500,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `textHash` de chaînes voisines (« f-8:29 », « f-7:29 ») donne des valeurs presque linéaires: les ronciers sortaient alignés en pépinière. Prendre `hash2(cx, cy, graine)` de `bruit.ts`.
 - Un point d'action à moins de 1,2 m du centre d'une case vole le clic au sol sur cette case (`resolveClick`): le puisage du bief est posé dans le bas de sa case d'eau.
 - Le cordeau est ajouté après la canne dans `createWorld`, pas dans `startingInventory.eachPlayer`: les cases des outils d'avant ne bougent pas.
-- Outil isolé: les gros remplacements passent par `rep.py` du scratchpad (spécification `FILE`, `%%%%`, `@@@@` écrite avec Write); une fusion avec conflit dans un fichier généré (`icones.js`): prendre l'autre côté puis relancer le générateur; vérifier ensuite les marqueurs dans tous les fichiers (`grep -rln '^<<<<<<< '`), la fusion en commit temporaire les garde.
-## Gestes des habitants et réactions (0.13, lot H7, vérifié le 2026-11-04)
+- Outil isolé: les gros remplacements passent par `rep.py` du scratchpad (spécification `FILE`, `%%%%`, `@@@@` écrite avec Write); une fusion avec conflit dans un fichier généré (`icones.js`): prendre l'autre côté puis relancer le générateur; vérifier ensuite les marqueurs dans tous les fichiers (`grep -rln '^## Gestes des habitants et réactions (0.13, lot H7, vérifié le 2026-11-04)
 
 - L'état ne porte pas l'habitude d'un habitant (`villagerHabit` des accessoires rend toujours `null`): la retrouver par le planning, première entrée qui tient pour son `target` et son `activity` (`entryHolds` d'`etat/planning.ts`), en cache par minute (`etat/gestes-habitants.ts`). Même résultat chez l'hôte et l'invité.
 - Un point de planning posé sur un banc, une table ou un siège (`grocery_terrace`, `lookout`, `fishing_pontoon`, `riverbank`) assoit l'habitant dans le rendu (`onBench`): un geste debout n'y apparaît jamais. Le vérifier en capture, pas seulement par la sonde de simulation.
@@ -519,6 +518,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Page de rendu avec la vraie simulation des habitants: `rendu.html?vie13=1&jour=&heure=&avance=` (`demo/vie13-exemple.ts`); `x`, `y` posent le joueur 1 (les bulles ne se montrent qu'à moins de 8 m de lui). Le port 6431 est pris par une autre séance: 6587.
 - Le son de la 0.13 joue les événements du village par leur nom (`AUDIO_SETTINGS.village.events`, champs `villager`, `by`, `at`) dans le `default` de `declencheurs.ts`; un type ajouté à `WorldEvent` doit avoir son `case` qui appelle `villageEventSound`, sinon il n'est plus joué.
 
+<<<<<<< HEAD
 ## Scènes de vie et chat de la 0.13 (La Petite Ligne, vérifié le 2026-11-04)
 
 - Vitesse des habitants 1,6 m/s pour 0,7 s par minute de jeu: 1,1 m par minute. Une scène dont un membre vient de loin (80 m) le voit arriver une heure après: chiffrer les distances (planning à la minute d'avant) avant de fixer `from`, ou ajouter une scène d'approche (`mado_to_quay`).
@@ -528,3 +528,8 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `pkill -f` ou `until ! pgrep -f <motif>` dont le motif est dans la commande elle-même: le shell de l'outil se voit et ne finit jamais (ou se tue). Attendre une tâche de fond par sa notification.
 - Une variable lue dans un test après `sim.runtime.cat = null`: TypeScript la garde `null`; la lire par une petite fonction.
 - `tests/amitie-0-13.test.ts` (« format 14 sans nouveau format ») attend `DATA_SCHEMA` 14 alors qu'il vaut 15: rouge avant cette mission.
+## Portraits 3D des habitants (La Petite Ligne 0.13, vérifié le 2026-11-04)
+
+- `rendu/portraits.ts`: un `WebGLRenderer` à part (alpha, fond transparent) rend chaque buste au chargement, `drawImage` du canevas WebGL dans un canevas 2D dans la même tâche (pas besoin de `preserveDrawingBuffer`), puis `toBlob` et `URL.createObjectURL`. Sous SwiftShader l'encodage PNG des 21 images met plusieurs secondes après `ready`: un panneau ouvert tôt garde le SVG tant que sa signature ne change pas (le dialogue met `hasVillagerPhoto` dans sa signature).
+- Cadrage: os `neck` (`getObjectByName`) et sommets posés (`SkinnedMesh.getVertexPosition` puis `matrixWorld`): point le plus haut (chapeau, loupe relevée) et largeur au-dessus des épaules (bords de chapeau). Les enfants et les grands sortent à la même taille de tête.
+- Panneau du carnet capturé en plein fondu d'entrée (`lpl-detail-in`): portrait pâle, ce n'est pas un défaut; capturer avec `animations=reduites`.

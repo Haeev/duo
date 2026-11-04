@@ -13,7 +13,7 @@ import { itemDetail, bagEmpty, bagFull, grocerPrice } from './modele-panneaux';
 import { letterModels, slotModel } from './modele';
 import { type QuestCardModel, type QuestNeedModel, type QuestPlaceModel, questBoard } from './modele-quetes';
 import type { SecretView } from './modele-secrets';
-import { portraitSvg, villagerColors } from './portrait';
+import { villagerPortraitHtml } from './portrait';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
 import { type NeedsPageModel, needsPage } from './modele-maison';
@@ -579,15 +579,15 @@ export class NotebookPanel extends Panel {
 
   /** Visage de la quête: le portrait de l'habitant, sinon l'icône de son métier ou du thème. */
   private questFace(c: QuestCardModel, size: 'small' | 'large'): HTMLElement {
-    const colors = c.giver === null ? null : villagerColors(c.giver);
-    const inner = colors === null || c.giver === null ? icon(c.icon, 'lpl-icon lpl-quest-card__icon') : portrait(portraitSvg(colors, 'good', '', c.giver), size === 'small' ? 'small' : '');
+    const face = c.giver === null ? null : villagerPortraitHtml(c.giver, 'good');
+    const inner = face === null ? icon(c.icon, 'lpl-icon lpl-quest-card__icon') : portrait(face, size === 'small' ? 'small' : '');
     return el('span', { class: `lpl-quest-card__face lpl-quest-card__face--${size}`, 'aria-hidden': 'true' }, [inner]);
   }
 
   private questNeed(n: QuestNeedModel): HTMLElement {
     if (n.kind === 'count') return need({ icon: n.icon, have: n.have, need: n.need, label: n.label });
-    const colors = n.villager === null ? null : villagerColors(n.villager);
-    const figure = colors === null || n.villager === null ? icon(n.icon, 'lpl-icon lpl-quest-check__icon') : portrait(portraitSvg(colors, 'good', '', n.villager), 'small');
+    const face = n.villager === null ? null : villagerPortraitHtml(n.villager, 'good');
+    const figure = face === null ? icon(n.icon, 'lpl-icon lpl-quest-check__icon') : portrait(face, 'small');
     return el('span', { class: 'lpl-quest-check', 'data-done': n.done ? 'true' : 'false', role: 'img', 'aria-label': n.label, title: n.label }, [
       figure,
       n.done ? el('span', { class: 'lpl-quest-check__mark', 'aria-hidden': 'true' }, [icon('ui-check')]) : null,
@@ -595,8 +595,8 @@ export class NotebookPanel extends Panel {
   }
 
   private questPlace(p: QuestPlaceModel): HTMLElement {
-    const colors = p.villager === null ? null : villagerColors(p.villager);
-    const figure = colors === null || p.villager === null ? icon(p.icon, 'lpl-icon lpl-quest-place__icon') : portrait(portraitSvg(colors, 'good', '', p.villager), 'small');
+    const face = p.villager === null ? null : villagerPortraitHtml(p.villager, 'good');
+    const figure = face === null ? icon(p.icon, 'lpl-icon lpl-quest-place__icon') : portrait(face, 'small');
     return el('span', { class: 'lpl-quest-place', role: 'img', 'aria-label': p.label, title: p.label }, [icon('ui-pin', 'lpl-icon lpl-quest-place__pin'), figure]);
   }
 

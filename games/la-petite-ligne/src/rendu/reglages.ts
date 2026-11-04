@@ -78,6 +78,31 @@ export const RENDER_SETTINGS = {
     exposure: 1.0,
   },
 
+  /**
+   * Portraits des habitants tirés des modèles 3D (0.13, `portraits.ts`): rendus une fois au
+   * chargement, en buste de trois quarts, fond transparent.
+   */
+  portraits: {
+    /** Côté de l'image en points CSS (doublé sur Retina). */
+    size: 128,
+    fov: 20,
+    /** Trois quarts: le personnage tourné vers la gauche de l'image (rad, 0: de face). */
+    yaw: 0.5,
+    /** Caméra un peu au-dessus des yeux (rad). */
+    pitch: 0.06,
+    /** Instant de l'attente où le buste est posé (s), comme l'aperçu de la mercerie. */
+    poseTime: 0.4,
+    /** Sous le cou, ce qui compte encore pour la largeur du cadre (bords de chapeau, chignon), en m. */
+    shoulderDrop: 0.02,
+    /** Hauteur du cadre: hauteur de la tête au-dessus du cou, multipliée par ce facteur (épaules comprises). */
+    heightOverHead: 1.75,
+    /** Air au-dessus du chapeau (m). */
+    margin: 0.07,
+    /** Largeur du cadre: largeur de la tête et de son chapeau, multipliée par ce facteur. */
+    widthMargin: 1.12,
+    light: { sky: 1.5, key: 1.9, rim: 0.6 },
+  },
+
   camera: {
     /** Largeurs de vue des trois zooms (cahier, section 4.15). */
     viewWidths: [16, 24, 36] as const,
