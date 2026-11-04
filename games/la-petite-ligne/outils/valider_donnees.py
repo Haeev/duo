@@ -235,6 +235,8 @@ PLACEHOLDERS = {"habit", "level", "speaker", "player", "startPurse", "order", "l
                 "player",
                 # 0.12.2: objets de l'étal posés au pied du coffre plein.
                 "ground",
+                # 0.13: décisions à deux (question posée, option retenue).
+                "question", "choice",
                 "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret",
                 # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
                 "villager", "season", "year", "times", "seasonOf",
