@@ -37,6 +37,7 @@ import {
   parseStorageSettings,
 } from './maison';
 import { townFrom } from './bourg';
+import { parseFlagEffects } from './effets-drapeaux';
 import { parseFishDef, parseFishingRules } from './poissons';
 import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
 import {
@@ -2323,6 +2324,7 @@ function parseSettings(r: Reader): Settings {
     secrets: parseSecretSettings(r.opt('secrets')),
     memories: parseMemorySettings(r.opt('memories'), parseCalendar(r)),
     feel: parseFeel(r.opt('feel')),
+    flagEffects: parseFlagEffects(r.opt('flagEffects')),
   };
 }
 

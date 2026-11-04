@@ -2,6 +2,7 @@
  * Horloge partagée et cycle de la journée (TE-01 à TE-08, démo): journée,
  * veillée qui arrête le temps, coucher à deux, nuit, petit-déjeuner, minuit.
  */
+import { morningFlagEffects, raiseAutoFlags } from './drapeaux';
 import { reopenCrate } from './economie';
 import type { CharacterStatus, ClockStop } from '../etat/types';
 import { isHome } from '../etat/interieurs';
@@ -221,6 +222,8 @@ export function morning(sim: Sim): void {
   morningBoard(sim);
   // Tour 10: la nouveauté du jour de la rue Haute (avant les emplois du temps qui la lisent).
   morningTown(sim);
+  // 0.13: drapeaux d'office (moulin) et jumelles prêtées le mercredi.
+  morningFlagEffects(sim);
   placeVillagers(sim);
   // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.
   morningMoments(sim);
@@ -255,6 +258,7 @@ export function startGame(sim: Sim): void {
     queueHint(sim, c.id, { on: 'spawned' });
   }
   copyCounters(sim);
+  raiseAutoFlags(sim);
   placeVillagers(sim);
   morningMoments(sim);
   sim.runtime.changed = true;

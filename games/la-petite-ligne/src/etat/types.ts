@@ -703,6 +703,9 @@ export type AimVerb =
   | 'light'
   /** Boire un chocolat chaud à la petite table d'Odette (tour 10, section 1.6). */
   | 'drink'
+  /** Soupe du jour au comptoir du café, souper du dimanche à la pension (0.13, drapeaux de quête). */
+  | 'soup'
+  | 'supper'
   /** Ouvrir ou fermer des rideaux accrochés à une fenêtre (tour 10, section 6.2). */
   | 'curtains'
   // Élevage (0.12, section 4): caresser, paille, seau, piquet, brosse, traite, tenir la chèvre.

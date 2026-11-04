@@ -1283,6 +1283,60 @@
       "dialogues": [
         {"id": "berthe_valley_bread", "kind": "quest", "priority": 40, "when": [{"type": "step_active", "quest": "achille_valley_flour", "step": "give"}], "lines": [{"speaker": "berthe", "text": "Un pain d'Achille ? De ma farine ? Attends, je m'essuie les mains. Ha ! Mon père aurait pleuré. Moi, je ris: c'est pareil, en plus fort."}]}
       ]
+    },
+    {
+      "id": "firmin",
+      "dialogues": [
+        {"id": "firmin_uniform_worn", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "emile_uniform_worn"}], "lines": [{"speaker": "firmin", "text": "Je reçois le train dans l'uniforme d'Émile. La manche est un peu longue. Personne ne l'a dit, et personne ne le dira."}]}
+      ]
+    },
+    {
+      "id": "odette",
+      "dialogues": [
+        {"id": "odette_tart_known", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "ferrand_tart_known"}], "lines": [{"speaker": "odette", "text": "La tarte de Mme Ferrand mère est revenue sur ma table. J'en garde toujours une part pour Honorine, avant que vous ne me la finissiez."}]}
+      ]
+    },
+    {
+      "id": "odette",
+      "dialogues": [
+        {"id": "odette_gustave_sent", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "gustave_letter_sent"}], "lines": [{"speaker": "odette", "text": "Ma réponse à Gustave est partie par le train de 17 h. Il ne reste qu'à attendre, et c'est la partie la plus longue."}]}
+      ]
+    },
+    {
+      "id": "basile",
+      "dialogues": [
+        {"id": "basile_dovetail_known", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "basile_dovetail"}], "lines": [{"speaker": "basile", "text": "La queue d'aronde, vous la tenez de moi, maintenant. Une chaise sans un clou: elle tient parce que ses deux bouts se sont mis d'accord."}]}
+      ]
+    },
+    {
+      "id": "achille",
+      "dialogues": [
+        {"id": "achille_apprentice_named", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "jeanne_apprentice"}], "lines": [{"speaker": "achille", "text": "Mon levain a soixante ans, et une nouvelle gardienne. Jeanne le nourrit comme on berce: sans se presser, et sans oublier."}]}
+      ]
+    },
+    {
+      "id": "mado",
+      "dialogues": [
+        {"id": "mado_gate_done", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "cemetery_gate_finished"}], "lines": [{"speaker": "mado", "text": "La grille du père Joseph est achevée. Elle se ferme d'un geste, maintenant, et on l'entend à peine."}]}
+      ]
+    },
+    {
+      "id": "nour",
+      "dialogues": [
+        {"id": "nour_pen_built", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "vet_pen_built"}], "lines": [{"speaker": "nour", "text": "Le hérisson dort dans l'enclos que vous avez monté. Il ne dit pas merci, mais il ne se roule plus en boule quand j'approche."}]}
+      ]
+    },
+    {
+      "id": "colette",
+      "dialogues": [
+        {"id": "colette_ball_back", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "cafe_ball"}], "lines": [{"speaker": "colette", "text": "Le bal est revenu au café de la Côte. Les tables poussées contre le mur, les pieds qui battent la mesure: je ne m'en lasse pas."}]}
+      ]
+    },
+    {
+      "id": "paulin",
+      "dialogues": [
+        {"id": "paulin_field_promised", "kind": "daily", "priority": 2, "once": "duo", "when": [{"type": "flag", "flag": "field_high_02_promised"}], "lines": [{"speaker": "paulin", "text": "Le champ du Haut, le deuxième, je vous le garde pour le jour où l'on y sèmera du blé. Je n'en parle à personne d'autre."}]}
+      ]
     }
   ]
 }

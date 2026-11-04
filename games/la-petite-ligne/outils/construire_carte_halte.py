@@ -1057,6 +1057,13 @@ CHANTIERS = [
      "role": "banc à dossier contre le pignon est de la maisonnette, tourné vers l'est, le dossier contre le "
              "soubassement; on s'assoit et on se relève depuis les cases (12, 22) et (12, 23); soleil du "
              "matin, chemin du quai, passage des trains"},
+    # 0.13: le banc d'Hortense, levé par le drapeau `hortense_bench` (réglages `flagEffects.works`) et non
+    # payé au tableau. Au sud du tilleul de la place (50,5 ; 24,5), le dossier vers l'arbre, face à la
+    # place: Basile le voit de loin, et deux personnes s'y assoient à l'ombre. Herbe, rien d'autre sur ses cases.
+    {"id": "hortense_bench", "type": "bench", "x": 50.0, "y": 26.5, "rotation": 0,
+     "rect": {"x": 49, "y": 26, "w": 2, "h": 1}, "cases": [[49, 26], [50, 26]],
+     "role": "banc d'Hortense à deux places, deux mètres au sud du tronc du tilleul, tourné vers la place; "
+             "apparaît quand la quête `basile_bench` est finie"},
     {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": None, "cases": [],
      "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"},
     # 0.12, file `elevage` (conception section 4.3).

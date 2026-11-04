@@ -15,6 +15,7 @@
  * Tout se lit dans l'état (`improvements`, `giftsGiven`, `moments.today`): mêmes images chez
  * l'hôte et chez l'invité, et après une partie reprise.
  */
+import { isBuiltByFlag } from '../etat/drapeaux';
 import { BufferAttribute, BufferGeometry, Group, Matrix4, Mesh, Vector3, type InstancedMesh, type Object3D } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { seasonOfDay } from '../donnees/calendrier';
@@ -293,7 +294,7 @@ export class ImprovementsPart implements EventfulPart {
   }
 
   private built(world: ReadonlyWorld, id: string): boolean {
-    return (world.improvements[id]?.builtDay ?? null) !== null;
+    return (world.improvements[id]?.builtDay ?? null) !== null || isBuiltByFlag(this.content.settings.flagEffects, world.flags, id);
   }
 
   update(context: FrameContext): void {
