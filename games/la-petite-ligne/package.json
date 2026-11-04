@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:ete": "vitest run --config vitest.ete.config.ts",
+    "test:longues": "vitest run --config vitest.longues.config.ts",
     "test:longue-vie": "vitest run --config vitest.longue-vie.config.ts",
     "test:e2e": "playwright test"
   },
