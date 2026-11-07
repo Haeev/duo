@@ -135,7 +135,7 @@ class Corps:
         out = []
         out += g.sphere(0, -r * 0.08, zc + r * 0.12, r * 0.98, r * 1.0, r * 0.95, hair, segs=pans(14), rings=8, zcut=-r * 0.1)
         if style == "long":
-            out += g.sphere(0, -r * 0.45, zc - r * 0.55, r * 0.95, r * 0.55, r * 1.0, hair, segs=pans(12), rings=8)
+            out += g.sphere(0, -r * 0.5, zc - r * 0.35, r * 0.82, r * 0.42, r * 0.95, hair, segs=pans(12), rings=8)
         elif style == "bun":
             out += g.sphere(0, -r * 0.7, zc + r * 0.65, r * 0.42, r * 0.42, r * 0.42, hair, segs=10, rings=6)
         elif style == "curly":
@@ -295,7 +295,7 @@ def construire(PAL):
     c = Corps("char_client_register", {
         "height": 1.68, "skin": peaux[1], "hair": cheveux[2], "hair_style": "long", "top": C["presses_navy"], "bottom": C["presses_navy"],
         "coat": C["presses_coat"], "bag": C["presses_bag"], "mood": "content",
-        "arms": {1: (0.12, 0.4, 1.12), -1: "down"},
+        "arms": {1: (0.14, 0.3, 1.02), -1: "down"},
     }, J)
     c.build()
     poser(c, 10.55, 10.02, 0)

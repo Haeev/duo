@@ -22,7 +22,7 @@ const VUES = {
   // 2. depuis l'entrée vers le comptoir, l'ardoise et la caisse
   2: { pos: [9.4, 1.65, 12.1], cible: [8.75, 1.3, 7.1] },
   // 3. gros plan à hauteur de main: la machine et la tasse sous le premier groupe
-  3: { pos: [9.2, 1.32, 8.4], cible: [8.93, 1.05, 8.9] },
+  3: { pos: [9.22, 1.42, 8.3], cible: [8.95, 1.05, 8.9] },
 };
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -30,7 +30,7 @@ renderer.setPixelRatio(1);
 renderer.setSize(W, H);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.NeutralToneMapping;
-renderer.toneMappingExposure = V === 'A' ? 1.05 : 1.0;
+renderer.toneMappingExposure = V === 'A' ? 1.3 : 1.25;
 renderer.autoClear = false;
 renderer.info.autoReset = false;
 document.body.appendChild(renderer.domElement);
@@ -207,10 +207,10 @@ async function main() {
   }
   vivant.add(new THREE.HemisphereLight('#E8DCCB', '#A65A3E', V === 'A' ? 1.5 : 1.3));
   const soleil = new THREE.DirectionalLight('#FFC788', 1.0);
-  soleil.position.set(-8, 3.6, 18);
+  soleil.position.set(8 - 7.3, 3.6, 10 + 16.4);
   soleil.target.position.set(8, 0, 10);
   vivant.add(soleil, soleil.target);
-  for (const [x, z] of [[8.35, 9.0], [9.95, 9.0]]) {
+  for (const [x, z] of [[9.15, 8.72], [10.6, 8.85]]) {
     const l = new THREE.PointLight('#FFC27A', 1.6, 4.5, 2);
     l.position.set(x, 2.16, z);
     vivant.add(l);

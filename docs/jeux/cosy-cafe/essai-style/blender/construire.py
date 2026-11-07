@@ -96,7 +96,8 @@ def construire_scene():
     lamps = Geo("lamps")
     emit = Geo("lamps_emit", kind="emit")
     bulbs = []
-    for (x, y) in ((8.35, 9.0), (9.95, 9.0)):
+    # au-dessus de l'allée du barista, devant la passe et la machine: la lumière tombe sur le travail
+    for (x, y) in ((9.15, 8.72), (10.6, 8.85)):
         bulbs.append(S.suspension(lamps, emit, x, y, "enamel"))
     for (x, y) in ((4.8, 12.2), (6.4, 12.2), (8.0, 12.2)):
         bulbs.append(S.suspension(lamps, emit, x, y, "clay"))
@@ -109,7 +110,7 @@ def construire_scene():
     S.assiette(w, 8.3, 8.9, z)
     croissants = [(8.3, 8.9, z + 0.018, 20)]
     # tasse d'expresso sous le premier groupe, posée sur la grille du bac
-    S.tasse(w, 8.97, 8.9, z + 0.07 - 0.008, "espresso")
+    S.tasse(w, 8.96, 8.915, z + 0.066, "espresso", soucoupe=False)
     # tasses retournées sur le chauffe-tasses
     for i, x in enumerate((8.88, 9.02, 9.16, 9.3)):
         vs = []
@@ -245,16 +246,23 @@ for ob in baked:
 # 3. Lumière de fin d'après-midi (moment signature de la bible, 2.4) et cuisson
 
 mom = PAL["moments"]["afternoon"]
-SUN_AZ, SUN_EL = 235.0, float(mom["sunElevation"])  # soleil au sud-ouest, 16 degrés
+# soleil au sud-sud-ouest, 16 degrés: il passe entre les maisons de l'ouest et l'église et entre par les vitrines
+# jusqu'au pied du comptoir (à 235 degrés, la maison d'en face mettait toute la salle à l'ombre)
+SUN_AZ, SUN_EL = 205.0, float(mom["sunElevation"])
 world = bpy.data.worlds.new("ciel")
 sc.world = world
 wn = world.node_tree
 bg = wn.nodes["Background"]
 bg.inputs["Color"].default_value = M.lin("#D8CFCF")
-bg.inputs["Strength"].default_value = 1.6
+bg.inputs["Strength"].default_value = 2.4
 sun = bpy.data.lights.new("soleil", "SUN")
 sun.energy = 5.5
-sun.color = M.lin(mom["sun"])[:3]
+# couleurs de lumière rapprochées du blanc de moitié: dorées, sans noyer la palette dans l'orangé
+def demi_blanc(hx):
+    return tuple(0.5 + 0.5 * c for c in M.lin(hx)[:3])
+
+
+sun.color = demi_blanc(mom["sun"])
 sun.angle = math.radians(1.2)
 so = bpy.data.objects.new("soleil", sun)
 coll.objects.link(so)
@@ -267,7 +275,7 @@ for i, (x, y, z) in enumerate(bulbs):
     li = bpy.data.lights.new(f"lampe_{i}", "POINT")
     # suspensions du comptoir plus fortes que celles des tables: la lumière désigne le travail (bible 1)
     li.energy = (70.0 if i < 2 else 35.0) * mom["lamps"]
-    li.color = M.lin("#FFC27A")[:3]
+    li.color = demi_blanc("#FFC27A")
     li.shadow_soft_size = 0.04
     lo = bpy.data.objects.new(f"lampe_{i}", li)
     lo.location = G.P(x, y, z)

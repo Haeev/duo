@@ -212,56 +212,102 @@ def arriere_comptoir():
 
 
 def cafetiere():
-    """Machine à expresso à deux groupes, cuivre, sur le plan de travail; groupes tournés vers le barista (nord),
-    dos vers la salle (son dessus reste sous les yeux à 1,43 m)."""
+    """Machine à expresso à deux groupes, cuivre et laiton, sur le plan de travail (0,76 x 0,42 x 0,48 m, bible);
+    groupes tournés vers le barista (nord), dos vers la salle: son dessus reste sous les yeux (1,43 m).
+    Pièces lisibles de près: têtes de groupe en cloche, porte-filtres à panier et becs, poignées noires,
+    buse vapeur coudée et sa molette, robinet d'eau chaude, manomètre à cadran, grille d'égouttage, chauffe-tasses."""
     g = Geo("station_espresso_2g")
     cx = 9.15
-    x0, x1 = cx - 0.36, cx + 0.36
-    yb0, yb1 = 8.96, 9.2  # corps
+    x0, x1 = cx - 0.38, cx + 0.38
+    yf, yb = 8.98, 9.22  # façade (nord) et dos du corps
     z0 = WORK
-    # pieds et bac d'égouttage
-    for x in (x0 + 0.05, x1 - 0.05):
-        for y in (8.84, 9.15):
-            g.cyl(x, y, z0, z0 + 0.03, 0.02, 8, "steel_dark")
-    g.box(x0 + 0.02, x1 - 0.02, 8.79, yb0 + 0.02, z0 + 0.03, z0 + 0.065, "steel", bevel=0.008)
-    for i in range(9):
-        x = x0 + 0.06 + i * (x1 - x0 - 0.12) / 8
-        g.box(x - 0.006, x + 0.006, 8.8, yb0, z0 + 0.065, z0 + 0.07, "steel_dark", bevel=0)
-    # corps de cuivre, arrondi
-    g.box(x0, x1, yb0, yb1, z0 + 0.03, z0 + 0.43, "copper", bevel=0.06 if A() else 0.015, segs=3 if A() else 2,
-          edges="notop")
-    # façade inox recevant les groupes, manomètre
-    g.box(x0 + 0.05, x1 - 0.05, yb0 - 0.012, yb0 + 0.01, z0 + 0.2, z0 + 0.41, "steel", bevel=0.01)
-    gx = (cx - 0.18, cx + 0.18)
-    for x in gx:
-        # tête de groupe (laiton), porte-filtre et sa poignée vers le barista
-        g.cyl(x, yb0 - 0.05, z0 + 0.2, z0 + 0.27, 0.05, pans(12), "brass", bevel=0.008)
-        g.rod((x, yb0 - 0.012, z0 + 0.25), (x, yb0 - 0.05, z0 + 0.25), 0.03, pans(10), "brass")
-        g.cyl(x, yb0 - 0.05, z0 + 0.165, z0 + 0.2, 0.048, pans(12), "steel", bevel=0.006)
-        g.rod((x, yb0 - 0.09, z0 + 0.18), (x, yb0 - 0.24, z0 + 0.16), 0.016, 8, "steel_dark")
-        g.sphere(x, yb0 - 0.245, z0 + 0.16, 0.02, 0.02, 0.02, "steel_dark", segs=8, rings=5)
-        # robinet de vapeur sur le dessus de la façade
-        g.cyl(x, yb0 - 0.03, z0 + 0.36, z0 + 0.38, 0.022, 10, "brass")
-    g.cyl(cx, yb0 - 0.016, z0 + 0.29, z0 + 0.36, 0.045, 16, "brass", phase=0)
-    man = g.cyl(cx, 0, 0, 0.012, 0.045, 16, "brass")
-    face = g.cyl(cx, 0, 0.012, 0.016, 0.037, 16, "paper")
+    n = pans(16)
+    # pieds
+    for x in (x0 + 0.06, x1 - 0.06):
+        for y in (8.86, 9.16):
+            g.cyl(x, y, z0, z0 + 0.025, 0.022, pans(10), "steel_dark", bevel=0.005)
+    # socle et bac d'égouttage à grille fine
+    g.box(x0 + 0.01, x1 - 0.01, yf - 0.005, yb, z0 + 0.025, z0 + 0.06, "steel_dark", bevel=0.01)
+    g.box(x0 + 0.04, x1 - 0.04, 8.79, yf, z0 + 0.025, z0 + 0.06, "steel", bevel=0.01)
+    for i in range(15):
+        x = x0 + 0.07 + i * (x1 - x0 - 0.14) / 14
+        g.box(x - 0.004, x + 0.004, 8.805, yf - 0.01, z0 + 0.06, z0 + 0.066, "steel", bevel=0)
+    g.box(x0 + 0.06, x1 - 0.06, 8.805, yf - 0.01, z0 + 0.052, z0 + 0.058, "steel_dark", bevel=0)
+    # corps de cuivre aux angles très arrondis, bandeau de laiton en haut
+    zb0, zb1 = z0 + 0.06, z0 + 0.43
+    g.box(x0, x1, yf, yb, zb0, zb1, "copper", bevel=0.07 if A() else 0.04, segs=4 if A() else 3, edges="notop")
+    g.box(x0 + 0.005, x1 - 0.005, yf - 0.006, yb + 0.006, zb1 - 0.03, zb1 - 0.012, "brass", bevel=0.008, segs=2)
+    # façade inox arrondie qui porte les groupes
+    g.box(x0 + 0.07, x1 - 0.07, yf - 0.014, yf + 0.01, z0 + 0.15, zb1 - 0.04, "steel", bevel=0.025, segs=3)
+    zg = z0 + 0.3  # axe des bossages
+    for x in (cx - 0.19, cx + 0.19):
+        # bossage horizontal et tête de groupe en cloche (laiton)
+        g.rod((x, yf - 0.012, zg), (x, yf - 0.06, zg), 0.038, pans(14), "brass")
+        g.sphere(x, yf - 0.06, zg, 0.04, 0.04, 0.04, "brass", segs=pans(14), rings=8)
+        g.lathe(x, yf - 0.065, z0 + 0.205, [(0.04, 0), (0.052, 0.012), (0.058, 0.035), (0.052, 0.06), (0.036, 0.085), (0.0, 0.09)],
+                pans(16), "brass", cap_bottom=True, cap_top=False, smooth=True)
+        # porte-filtre: panier évasé, oreilles, deux becs, col d'acier et poignée noire tournée vers le barista
+        zp = z0 + 0.168
+        g.lathe(x, yf - 0.065, zp, [(0.03, 0), (0.044, 0.012), (0.05, 0.032), (0.052, 0.037)], pans(16), "steel",
+                cap_bottom=True, cap_top=True, smooth=True)
+        for dx in (-0.016, 0.016):
+            g.lathe(x + dx, yf - 0.065, zp - 0.016, [(0.004, 0), (0.008, 0.016)], 8, "steel", cap_bottom=True, cap_top=False, smooth=True)
+        g.rod((x, yf - 0.11, zp + 0.024), (x, yf - 0.15, zp + 0.02), 0.011, 10, "steel")
+        g.lathe(0, 0, 0, [(0.0, 0), (0.014, 0.004), (0.019, 0.04), (0.021, 0.1), (0.019, 0.125), (0.0, 0.13)], pans(12), "ink",
+                cap_bottom=False, cap_top=False, smooth=True)
+        # (la poignée est construite debout à l'origine puis couchée vers le nord, légèrement inclinée)
+        _coucher(g, x, yf - 0.148, zp + 0.02, -98)
+        # molette du robinet de vapeur au-dessus du groupe
+        g.cyl(x, yf - 0.03, zb1 - 0.075, zb1 - 0.055, 0.02, pans(12), "brass", bevel=0.004)
+    # manomètre au centre: lunette de laiton, cadran crème, aiguille
+    man = g.cyl(cx, 0, 0, 0.014, 0.05, pans(20), "brass", bevel=0.004)
+    face = g.cyl(cx, 0, 0.014, 0.017, 0.042, pans(20), "paper")
     for v in man + face:
-        # disque couché face au nord (vers le barista)
         x, y, z = v.co.x, -v.co.y, v.co.z
-        v.co = P(x, yb0 - 0.024 - z, z0 + 0.32 + y)
-    needle = g.box(cx - 0.003, cx + 0.003, yb0 - 0.042, yb0 - 0.04, z0 + 0.32, z0 + 0.35, "ink", bevel=0)
-    # buse vapeur côté droit du barista (ouest), plongée vers le bac
-    g.cyl(x0 + 0.08, yb0 - 0.02, z0 + 0.33, z0 + 0.36, 0.02, 8, "brass")
-    g.rod((x0 + 0.08, yb0 - 0.04, z0 + 0.345), (x0 + 0.04, yb0 - 0.12, z0 + 0.32), 0.009, 8, "steel")
-    g.rod((x0 + 0.04, yb0 - 0.12, z0 + 0.32), (x0 + 0.04, yb0 - 0.13, z0 + 0.12), 0.009, 8, "steel")
-    # chauffe-tasses (inox) et galerie de laiton
-    g.box(x0 + 0.03, x1 - 0.03, yb0 + 0.01, yb1 - 0.01, z0 + 0.43, z0 + 0.445, "steel", bevel=0.005)
-    for (a, b) in (((x0 + 0.04, yb0 + 0.02), (x1 - 0.04, yb0 + 0.02)), ((x0 + 0.04, yb1 - 0.02), (x1 - 0.04, yb1 - 0.02)),
-                   ((x0 + 0.04, yb0 + 0.02), (x0 + 0.04, yb1 - 0.02)), ((x1 - 0.04, yb0 + 0.02), (x1 - 0.04, yb1 - 0.02))):
-        g.rod((a[0], a[1], z0 + 0.5), (b[0], b[1], z0 + 0.5), 0.007, 6, "brass")
-    for (x, y) in ((x0 + 0.04, yb0 + 0.02), (x1 - 0.04, yb0 + 0.02), (x0 + 0.04, yb1 - 0.02), (x1 - 0.04, yb1 - 0.02)):
-        g.rod((x, y, z0 + 0.445), (x, y, z0 + 0.5), 0.007, 6, "brass")
+        v.co = P(x, yf - 0.014 - z, z0 + 0.32 + y)
+    g.quad([(cx - 0.003, yf - 0.0325, z0 + 0.318), (cx + 0.003, yf - 0.0325, z0 + 0.318), (cx + 0.022, yf - 0.0325, z0 + 0.345),
+            (cx + 0.018, yf - 0.0325, z0 + 0.348)], "ink", normal_hint=(0, -1, 0))
+    for k in range(7):
+        a = math.radians(-135 + k * 45)
+        px, pz = cx + 0.035 * math.sin(a), z0 + 0.32 + 0.035 * math.cos(a)
+        g.box(px - 0.002, px + 0.002, yf - 0.0325, yf - 0.031, pz - 0.002, pz + 0.002, "ink", bevel=0)
+    # buse vapeur (ouest, à droite du barista): molette, tube coudé, rotule, embout
+    xs = x0 + 0.075
+    g.cyl(xs, yf - 0.02, zb1 - 0.08, zb1 - 0.055, 0.022, pans(12), "brass", bevel=0.005)
+    pts = [(xs, yf - 0.014, zg + 0.04), (xs, yf - 0.05, zg + 0.035), (xs - 0.005, yf - 0.08, zg + 0.015), (xs - 0.012, yf - 0.095, zg - 0.02),
+           (xs - 0.018, yf - 0.1, z0 + 0.12), (xs - 0.02, yf - 0.1, z0 + 0.09)]
+    for a_, b_ in zip(pts, pts[1:]):
+        g.rod(a_, b_, 0.0085, 10, "steel")
+        g.sphere(*b_, 0.0085, 0.0085, 0.0085, "steel", segs=10, rings=5)
+    g.sphere(xs, yf - 0.05, zg + 0.035, 0.016, 0.016, 0.016, "steel", segs=10, rings=6)
+    # robinet d'eau chaude (est)
+    xh = x1 - 0.075
+    g.cyl(xh, yf - 0.02, zb1 - 0.08, zb1 - 0.055, 0.022, pans(12), "brass", bevel=0.005)
+    g.rod((xh, yf - 0.014, zg), (xh, yf - 0.06, zg - 0.01), 0.01, 10, "steel")
+    g.rod((xh, yf - 0.06, zg - 0.01), (xh, yf - 0.065, z0 + 0.17), 0.009, 10, "steel")
+    # chauffe-tasses et galerie de laiton
+    g.box(x0 + 0.03, x1 - 0.03, yf + 0.01, yb - 0.01, zb1, zb1 + 0.012, "steel", bevel=0.005)
+    zr = zb1 + 0.065
+    for (a, b) in (((x0 + 0.04, yf + 0.02), (x1 - 0.04, yf + 0.02)), ((x0 + 0.04, yb - 0.02), (x1 - 0.04, yb - 0.02)),
+                   ((x0 + 0.04, yf + 0.02), (x0 + 0.04, yb - 0.02)), ((x1 - 0.04, yf + 0.02), (x1 - 0.04, yb - 0.02))):
+        g.rod((a[0], a[1], zr), (b[0], b[1], zr), 0.006, 8, "brass")
+    for (x, y) in ((x0 + 0.04, yf + 0.02), (x1 - 0.04, yf + 0.02), (x0 + 0.04, yb - 0.02), (x1 - 0.04, yb - 0.02), (cx, yf + 0.02), (cx, yb - 0.02)):
+        g.rod((x, y, zb1 + 0.012), (x, y, zr), 0.006, 8, "brass")
+        g.sphere(x, y, zr, 0.009, 0.009, 0.009, "brass", segs=8, rings=5)
     return g
+
+
+def _coucher(g, x, y, z, deg):
+    """Couche le dernier tour (construit debout à l'origine) vers le nord, incliné de `deg` depuis la verticale."""
+    import bmesh as _bm
+    from mathutils import Matrix
+    vs = [v for v in g.bm.verts if abs(v.co.x) < 0.03 and abs(v.co.y) < 0.03 and -0.001 <= v.co.z <= 0.131]
+    R = Matrix.Rotation(math.radians(deg), 4, "X")
+    for v in vs:
+        v.co = R @ v.co
+        v.co.x += x
+        v.co.y += -y
+        v.co.z += z
 
 
 def moulin():
@@ -381,7 +427,7 @@ def symbole(g, clip, x, y, z, size, facing=-1):
 # ------------------------------------------------------------------------------------------------
 # Vaisselle et nourriture (120 %)
 
-def tasse(g, x, y, z, kind="cappuccino", contenu=True, anse_deg=0.0):
+def tasse(g, x, y, z, kind="cappuccino", contenu=True, anse_deg=0.0, soucoupe=True):
     """Tasse et soucoupe au liseré vert bouteille. kind: espresso (7 cm) ou cappuccino (10 cm)."""
     s = 1.2
     if kind == "espresso":
@@ -389,11 +435,12 @@ def tasse(g, x, y, z, kind="cappuccino", contenu=True, anse_deg=0.0):
     else:
         r0, r1, h, sr = 0.03 * s, 0.05 * s, 0.065 * s, 0.075 * s
     n12, n16 = pans(12), pans(16)
-    g.lathe(x, y, z, [(sr * 0.55, 0), (sr * 0.9, 0.004), (sr, 0.012), (sr * 0.97, 0.014), (sr * 0.5, 0.008)], n16, "porcelain",
-            keys=["porcelain", "porcelain", "rim", "porcelain"], cap_bottom=True, cap_top=True)
-    zc = z + 0.008
+    if soucoupe:
+        g.lathe(x, y, z, [(sr * 0.55, 0), (sr * 0.9, 0.004), (sr, 0.012), (sr * 0.97, 0.014), (sr * 0.5, 0.008)], n16, "porcelain",
+                keys=["porcelain", "porcelain", "rim", "porcelain"], cap_bottom=True, cap_top=True)
+    zc = z + (0.008 if soucoupe else 0.0)
     t = 0.004
-    g.lathe(x, y, zc, [(r0 * 0.8, 0), (r0, 0.006), (r1, h - 0.008), (r1, h), (r1 - t, h), (r0 - t, 0.012), (0.0, 0.01)], n12, "porcelain",
+    g.lathe(x, y, zc, [(r0 * 0.8, 0), (r0, 0.006), (r1, h - 0.005), (r1, h), (r1 - t, h), (r0 - t, 0.012), (0.0, 0.01)], n12, "porcelain",
             keys=["porcelain", "porcelain", "rim", "porcelain", "porcelain", "porcelain"], cap_bottom=True, cap_top=False)
     if contenu:
         top = "milk" if kind == "cappuccino" else "crema"

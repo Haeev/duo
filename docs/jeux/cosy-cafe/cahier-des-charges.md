@@ -1272,7 +1272,8 @@ Document de référence: `docs/jeux/cosy-cafe/bible-artistique.md`, planches dan
 
 - **Intention**: une « maquette peinte à la main », en vraie 3D temps réel. Trois piliers: chaleureux, arrondi, fait main. Les planches sont des dessins 2D qui fixent couleurs, placements et lisibilité, pas le rendu: le rendu se juge sur l'essai de style 3D (section 7.1).
 - **Lisibilité**: ce qui se prend, se sert ou se lit (porcelaine, papier, mousse de lait) est très clair, le café et l'encre très sombres, et tout se pose sur des surfaces moyennes à sombres; le décor reste au milieu de l'échelle. Vérifié en niveaux de gris et sous trois daltonismes.
-- **Les deux joueurs**: bandeau noué, tablier à bretelles croisées à la couleur de Duo bordé d'un liseré sombre, écusson au symbole dans le dos; le joueur à la couleur la plus claire porte un haut sombre, l'autre un haut clair. On se reconnaît de dos, pour les 15 paires de couleurs possibles.
+- **Les deux joueurs** (décision du client du 2026-11-08, Q14): une tenue de travail normale aux couleurs sourdes de la maison, comme l'équipe, avec au plus un détail discret. La couleur de chaque joueur dans Duo ne sert que là où le jeu en a besoin: la pince de son ticket sur le rail et les indicateurs de l'interface. La bible proposait un tablier et un écusson à la couleur du joueur: à reprendre.
+- **Les personnages** (même date): clients, habitués, employés et avatars au niveau de détail du décor: visages aux traits lisibles, mains formées, vêtements avec plis et volumes, coiffures et silhouettes variées.
 - **Caméra**: yeux à 1,65 m, champ vertical de 60°, ni roulis ni balancement par défaut.
 - **Lumière**: chaude, précalculée sur la coque, taches de soleil cuites, 4 lumières réelles au plus (C9), aucune ombre ni aucun reflet calculés en direct (C10, C11).
 - **Six styles** de décoration avec leur roue des compatibilités, identité propre à chaque adresse et à sa rue (tomettes et tilleul à Ormeval, zinc et pan coupé à Paris, verrière à la Graineterie), sans aucun monument ni aucune enseigne réelle.
@@ -1426,7 +1427,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | Q11 | Combien de musique en version 1 (son, S1) | 24 morceaux (une heure); moins; plus | 24 morceaux, environ 21 Mo, puis un second volume de 12 morceaux par une mise à jour si les listes lassent | | |
 | Q12 | Des voix dans le jeu (son, S2) | aucune voix: rumeur sans paroles, clients qui s'expriment par leurs gestes et quelques notes; des voix enregistrées | aucune voix, comme La Petite Ligne; on juge la rumeur à l'écoute dès le prototype | | |
 | Q13 | Mains visibles en vue subjective (bible) | mains stylisées; objet tenu seul | objet seul au prototype, mains stylisées à l'alpha | | |
-| Q14 | Les signes des joueurs (bible) | figés (bandeau, bretelles croisées, écusson) avec un haut clair ou sombre imposé selon la paire; libres | figés: c'est ce qui garantit qu'on se reconnaît de dos | | |
+| Q14 | Les signes des joueurs (bible) | figés (bandeau, bretelles croisées, écusson) avec un haut clair ou sombre imposé selon la paire; libres | figés: c'est ce qui garantit qu'on se reconnaît de dos | non: tenue de travail normale aux couleurs sourdes de la maison, au plus un détail discret; la couleur du joueur reste seulement là où elle sert au jeu (pince du ticket, indicateurs de l'interface). « On sait entre nous qui on est » | 2026-11-08 |
 | Q15 | La maison parisienne (bible, plans) | sous une verrière; sur un boulevard | la verrière, pour sa lumière unique (c'est celle des plans: la Graineterie) | | |
 | Q16 | Le second rang de terrasse au café d'angle (plans) | un seul rang (16 places); deux rangs (26) si l'architecte valide une foule lointaine simplifiée | un rang au prototype; on décide après la mesure sur le PC | | |
 | Q17 | La direction de rendu (essai de style 3D) | A stylisé chaleureux; B semi-réaliste; un mélange | à décider sur les images de l'essai, en cours | | |
@@ -1437,6 +1438,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
+| 2026-11-08 | 0.2.2 | Retours du client sur l'essai 3D: personnages (clients et avatars) au niveau de détail du décor (visages, mains, vêtements, coiffures variées); couleurs des joueurs retirées des tenues (Q14). La bible (section 4) est à reprendre en ce sens par le directeur artistique | client |
 | 2026-11-08 | 0.2.1 | Décision du client: titre « Deux Tabliers » (Q1) | client |
 | 2026-11-08 | 0.2 | Consolidation par le manager: résumés des sections 7 à 10, essai de style 3D (7.1), fabrication avec Meshy (7.2), questions Q11 à Q19 venues du son, de la bible, des plans et de l'UX, arbitrages entre membres (section 16) | manager |
 | 2026-11-07 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, 13, 14, proposition de la 12), à partir du cadrage du manager; simulation client par client jointe (`simulations/cosy_cafe.py`, `resultats.md`); alignement sur les plans des cinq adresses (level-designer: noms, places, extensions, équipes reprises), les contraintes C1 à C26 (architecte), la bible (roue des styles, fournisseurs, habitués) et les hypothèses du son (fenêtres du lait, aucun son de qualité) | game-designer, sur brief du manager |

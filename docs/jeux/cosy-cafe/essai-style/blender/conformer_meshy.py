@@ -116,7 +116,7 @@ def cle(f):
             return "beam"
         return "leaf_light" if n.z > 0.45 else "leaf"
     if ASSET == "food_croissant":
-        return "crust" if n.z > -0.2 or h > 0.35 else "crumb"
+        return "crumb" if n.z < -0.55 else "crust"
     return "pot"
 
 
