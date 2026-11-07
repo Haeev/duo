@@ -1,5 +1,5 @@
 {
-  "asset": "customer_01",
+  "asset": "char_essai_flaneur",
   "triangles": 2434,
   "triangle_budget": 5000,
   "within_budget": true,
@@ -88,6 +88,7 @@
       "mesh": "villager_odette",
       "parts": 1451,
       "cells": [
+        "flaneurs_cord",
         "flaneurs_paper",
         "hair_2",
         "hair_6",
@@ -98,8 +99,9 @@
         "skin_5",
         "skin_6"
       ],
-      "mixed_parts": []
+      "mixed_parts": [],
+      "area_where_final_differs_from_face_nearest": 0.0
     }
   ],
-  "file_bytes": 507996
+  "file_bytes": 508020
 }

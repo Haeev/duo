@@ -1,12 +1,16 @@
 {
-  "asset": "espresso_machine_village",
+  "asset": "station_espresso_2g",
   "raw": "espresso_brut.glb",
   "raw_triangles": 1504,
-  "triangles": 1504,
+  "decimated_from": null,
+  "triangles": 1472,
   "triangle_budget": 4000,
   "within_budget": true,
   "welded_vertices": 2386,
   "flipped_faces_fixed": 240,
+  "bottom_faces_removed": 32,
+  "symmetrized": null,
+  "bevel_m": null,
   "parts": 16,
   "dimensions_m": {
     "width_x": 0.76,
@@ -25,6 +29,7 @@
       ]
     }
   ],
+  "palette_rule": "CIEDE2000, poids de clarté 2.0, cases permises ['copper', 'brass', 'steel', 'steel_dark', 'ink', 'porcelain']",
   "palette_cells_used": [
     "brass",
     "copper",
@@ -35,14 +40,49 @@
   ],
   "mixed_parts": [
     1,
+    2,
+    3,
     6,
     10,
     11,
-    14,
-    15
+    13
+  ],
+  "color_stats": {
+    "area_where_final_differs_from_face_nearest": 0.145
+  },
+  "parts_under_1cm": [
+    {
+      "center_m": [
+        0.0,
+        -0.108,
+        0.37
+      ],
+      "smallest_size_m": 0.006,
+      "triangles": 60
+    }
+  ],
+  "floating_parts": [
+    {
+      "center_m": [
+        0.33,
+        -0.145,
+        0.23
+      ],
+      "gap_m": 0.043,
+      "triangles": 60
+    },
+    {
+      "center_m": [
+        0.0,
+        -0.155,
+        0.055
+      ],
+      "gap_m": 0.0026,
+      "triangles": 188
+    }
   ],
   "ambient_occlusion": "cuite (Cycles, 64 échantillons), ramenée à [0.55, 1]",
-  "file_bytes": 86536,
+  "file_bytes": 82660,
   "part_details": [
     {
       "part": 0,
@@ -53,11 +93,11 @@
         0.0789
       ],
       "votes": {
-        "steel": 0.697,
-        "steel_dark": 0.302,
+        "steel": 0.717,
+        "steel_dark": 0.282,
         "ink": 0.002
       },
-      "winner_share": 0.697,
+      "winner_share": 0.717,
       "mixed": false,
       "cell": "steel"
     },
@@ -70,14 +110,14 @@
         0.0132
       ],
       "votes": {
-        "ink": 0.448,
-        "steel_dark": 0.294,
+        "steel_dark": 0.526,
+        "ink": 0.216,
         "copper": 0.158,
         "steel": 0.1
       },
-      "winner_share": 0.448,
+      "winner_share": 0.526,
       "mixed": true,
-      "cell": "ink"
+      "cell": "steel_dark"
     },
     {
       "part": 2,
@@ -88,11 +128,11 @@
         0.0099
       ],
       "votes": {
-        "ink": 0.733,
-        "steel_dark": 0.267
+        "ink": 0.596,
+        "steel_dark": 0.404
       },
-      "winner_share": 0.733,
-      "mixed": false,
+      "winner_share": 0.596,
+      "mixed": true,
       "cell": "ink"
     },
     {
@@ -104,12 +144,12 @@
         0.0099
       ],
       "votes": {
-        "ink": 0.657,
-        "steel_dark": 0.343
+        "steel_dark": 0.513,
+        "ink": 0.487
       },
-      "winner_share": 0.657,
-      "mixed": false,
-      "cell": "ink"
+      "winner_share": 0.513,
+      "mixed": true,
+      "cell": "steel_dark"
     },
     {
       "part": 4,
@@ -137,10 +177,10 @@
         0.2895
       ],
       "votes": {
-        "steel": 0.973,
-        "steel_dark": 0.027
+        "steel": 0.974,
+        "steel_dark": 0.026
       },
-      "winner_share": 0.973,
+      "winner_share": 0.974,
       "mixed": false,
       "cell": "steel"
     },
@@ -153,14 +193,14 @@
         0.0132
       ],
       "votes": {
-        "ink": 0.43,
-        "steel_dark": 0.279,
+        "steel_dark": 0.364,
+        "ink": 0.344,
         "copper": 0.158,
         "steel": 0.133
       },
-      "winner_share": 0.43,
+      "winner_share": 0.364,
       "mixed": true,
-      "cell": "ink"
+      "cell": "steel_dark"
     },
     {
       "part": 7,
@@ -204,10 +244,10 @@
         -0.0132
       ],
       "votes": {
-        "steel": 0.909,
-        "steel_dark": 0.091
+        "steel": 0.939,
+        "steel_dark": 0.061
       },
-      "winner_share": 0.909,
+      "winner_share": 0.939,
       "mixed": false,
       "cell": "steel"
     },
@@ -220,10 +260,10 @@
         0.1718
       ],
       "votes": {
-        "steel": 0.515,
-        "porcelain": 0.485
+        "steel": 0.51,
+        "porcelain": 0.49
       },
-      "winner_share": 0.515,
+      "winner_share": 0.51,
       "mixed": true,
       "override": "porcelain",
       "cell": "porcelain"
@@ -237,12 +277,12 @@
         -0.2895
       ],
       "votes": {
-        "ink": 0.569,
-        "steel_dark": 0.431
+        "steel_dark": 0.534,
+        "ink": 0.466
       },
-      "winner_share": 0.569,
+      "winner_share": 0.534,
       "mixed": true,
-      "cell": "ink"
+      "cell": "steel_dark"
     },
     {
       "part": 12,
@@ -269,12 +309,12 @@
         -0.2895
       ],
       "votes": {
-        "ink": 0.629,
-        "steel_dark": 0.371
+        "steel_dark": 0.592,
+        "ink": 0.408
       },
-      "winner_share": 0.629,
-      "mixed": false,
-      "cell": "ink"
+      "winner_share": 0.592,
+      "mixed": true,
+      "cell": "steel_dark"
     },
     {
       "part": 14,
@@ -285,12 +325,12 @@
         -0.2895
       ],
       "votes": {
-        "ink": 0.542,
-        "steel_dark": 0.458
+        "steel_dark": 0.608,
+        "ink": 0.392
       },
-      "winner_share": 0.542,
-      "mixed": true,
-      "cell": "ink"
+      "winner_share": 0.608,
+      "mixed": false,
+      "cell": "steel_dark"
     },
     {
       "part": 15,
@@ -301,12 +341,12 @@
         -0.2895
       ],
       "votes": {
-        "ink": 0.532,
-        "steel_dark": 0.468
+        "steel_dark": 0.657,
+        "ink": 0.343
       },
-      "winner_share": 0.532,
-      "mixed": true,
-      "cell": "ink"
+      "winner_share": 0.657,
+      "mixed": false,
+      "cell": "steel_dark"
     }
   ]
 }

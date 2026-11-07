@@ -1,6 +1,6 @@
 {
   "frame": {
-    "triangles": 2088,
+    "triangles": 2056,
     "calls": 23,
     "programs": 2,
     "textures": 2,
@@ -12,10 +12,10 @@
   },
   "models": [
     {
-      "file": "espresso_machine_village.doublure.glb",
-      "fileBytes": 86536,
+      "file": "station_espresso_2g.doublure.glb",
+      "fileBytes": 82660,
       "url": "/modele-0.glb",
-      "triangles": 1504,
+      "triangles": 1472,
       "drawCalls": 1,
       "bones": 0,
       "clips": [],

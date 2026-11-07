@@ -1,9 +1,9 @@
 {
   "format": "duo-meshy-sheet/1",
-  "asset": "espresso_machine_village",
+  "asset": "station_espresso_2g",
   "note": "fiche de la doublure (scripts/doublure_meshy.py), pas d'une sortie de Meshy: elle éprouve conformite_accessoire.py tant que assets.meshy.ai est refusé par le proxy",
   "conformity": {
-    "node_name": "espresso_machine_village",
+    "node_name": "station_espresso_2g",
     "front_yaw_deg": -90,
     "target_size_m": { "axis": "width", "value": 0.76 },
     "max_triangles": 4000,

@@ -35,7 +35,7 @@ FICHE, PALETTE, OUT, REPORT, CHARACTER = sys.argv[1:6]
 ANIM_FILES = sys.argv[6:]
 with open(FICHE, encoding="utf-8") as fh:
     conf = json.load(fh)["conformity"]
-palette = Palette(PALETTE, conf.get("palette_allowed"))
+palette = Palette(PALETTE, conf.get("palette_allowed"), kl=conf.get("lightness_weight", 2.0))
 
 
 def gltf_animation_names(path):
@@ -180,13 +180,13 @@ for o in body:
     bm.faces.index_update()
     bm.faces.ensure_lookup_table()
     parts, part_of = split_parts(bm)
-    final, details = assign_cells(bm, parts, part_of, images, [m.name if m else "" for m in me.materials], palette, conf)
+    final, details, color_stats = assign_cells(bm, parts, part_of, images, [m.name if m else "" for m in me.materials], palette, conf)
     apply_palette_uv(bm, final, palette)
     bm.to_mesh(me)
     bm.free()
     me.materials.clear()
     me.materials.append(mat)
-    palette_report.append({"mesh": o.name, "parts": len(parts), "cells": sorted(set(final.values())), "mixed_parts": [p["part"] for p in details if p.get("mixed")]})
+    palette_report.append({"mesh": o.name, "parts": len(parts), "cells": sorted(set(final.values())), "mixed_parts": [p["part"] for p in details if p.get("mixed")], **color_stats})
 
 # --- Clips en pistes NLA, export et rapport ---------------------------------------------------------
 

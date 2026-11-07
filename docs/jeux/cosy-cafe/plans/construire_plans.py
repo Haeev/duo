@@ -1330,7 +1330,382 @@ def paris_quartier(state):
     return p
 
 
-ADDRESSES = [village, bourg, ville, paris_quartier]
+def paris_maison(state):
+    arrival = state == "arrivee"
+    cap = {"inside": 41, "outside": 12} if arrival else {"inside": 63, "outside": 36}
+    p = Plan(
+        f"paris-maison-{state}", "paris-maison", state, 5,
+        "Paris, la Graineterie du boulevard des Horticulteurs",
+        "À l'arrivée" if arrival else "La maison au complet",
+        0, cap, {"players": 2, "employees": 6 if arrival else 10},
+        ("Maison d'un ancien graineur, 330 m² sur deux niveaux: la boutique sur le boulevard, la halle sous "
+         "verrière, le laboratoire, le jardin; les salons à l'étage. "
+         + ("Le jardin est en friche, l'étage fermé, le laboratoire vide, pas encore de torréfacteur."
+            if arrival else "E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. "
+                            "E4: le jardin et sa serre.")),
+        scale_px=30,
+    )
+    L = p.level("rdc", "Rez-de-chaussée", (0, 0, 21.0, 34.0))
+
+    # Dehors: boulevard au sud, passage du graineur à l'est, voisins.
+    L.ground(rect(0, 0, 3.0, 25.5), "neighbour")
+    L.ground(rect(19.5, 0, 1.5, 25.5), "neighbour")
+    L.ground(rect(0, 0, 21.0, 0.5), "neighbour")
+    L.ground(rect(17.0, 0.5, 2.0, 25.0), "pavement")
+    L.ground(rect(0, 25.5, 21.0, 6.0), "sidewalk")
+    L.ground(rect(0, 31.5, 21.0, 2.5), "road")
+    for z in ((0, 0, 3.0, 25.5), (19.5, 0, 1.5, 25.5), (0, 0, 21.0, 0.5), (0, 31.5, 21.0, 2.5)):
+        L.zone("backdrop", rect(*z), "décor")
+    L.text(1.5, 13.0, "immeuble voisin", "street", rotate=-90)
+    L.text(18.0, 12.5, "passage du graineur (service)", "street", rotate=-90)
+    L.text(10.5, 31.1, "trottoir du boulevard (on y joue jusqu'ici)", "note")
+    L.text(10.5, 32.4, "boulevard des Horticulteurs: le terre-plein central,", "street")
+    L.text(10.5, 33.1, "marché le mercredi et le samedi", "street")
+    for x in (2.5, 8.5, 14.5):
+        L.tree(x, 30.4, 1.2, trunk=0.2, label=None)
+
+    # Murs de l'îlot: pierre de 0,5 m.
+    L.wall_v(0.5, 25.5, 3.0, 3.5)
+    L.wall_h(3.0, 17.0, 0.5, 1.0)
+    L.wall_v(0.5, 25.5, 16.5, 17.0, [
+        {"at": 2.0, "w": 1.4, "type": "door", "access": "staff", "label": "jardin",
+         "swing": {"leaves": 2, "hinge": "start", "side": "+"}},
+        {"at": 7.4, "w": 1.4, "type": "door", "access": "staff", "delivery": True, "label": "livraisons",
+         "swing": {"leaves": 2, "hinge": "start", "side": "-"}},
+        {"at": 17.5, "w": 1.4, "type": "door", "access": "public", "label": "issue",
+         "swing": {"leaves": 2, "hinge": "start", "side": "+"}},
+    ])
+    L.wall_v(0.5, 25.5, 19.0, 19.5)
+    L.wall_h(17.0, 19.5, 25.0, 25.5, [{"at": 17.0, "w": 2.0, "type": "door", "access": "public", "delivery": True,
+                                      "label": "portail", "swing": {"leaves": 2, "hinge": "start", "side": "-"}}])
+    L.hood(17.0, 19.0, 2.0, 6.0, label="")
+    L.point("delivery", 18.0, 24.0)
+
+    # Jardin du graineur (E4) et sa serre.
+    L.ground(rect(3.5, 1.0, 13.0, 5.2), "grass")
+    L.wall_h(3.0, 17.0, 6.2, 6.6, [{"at": 11.5, "w": 1.0, "type": "door", "access": "closed" if arrival else "public",
+                                    "glazed": True, "label": "jardin",
+                                    "swing": {"leaves": 1, "hinge": "start", "side": "-"}}])
+    L.tree(7.6, 4.6, 1.8, label="tilleul")
+    L.add("partition", rect(6.5, 1.0, 0.1, 2.8), height=2.6, glazed=True)
+    L.wall_h(3.5, 6.6, 3.7, 3.8, [{"at": 5.2, "w": 0.9, "type": "door", "access": "closed" if arrival else "public",
+                                   "glazed": True, "swing": {"leaves": 1, "hinge": "start", "side": "+"}}],
+             kind="partition", height=2.6, glazed=True)
+    if arrival:
+        L.zone("extension", rect(3.5, 1.0, 13.0, 5.2), "E4: le jardin et sa serre")
+    else:
+        L.zone("free", rect(3.5, 1.0, 13.0, 5.2), "jardin")
+        L.text(5.0, 1.35, "serre", "note")
+        L.table(4.6, 1.9, 0.8, 0.8, "N S E W", area="outside", room="serre")
+        for x in (8.6, 11.6):
+            L.table(x, 2.0, 0.8, 0.8, "N S E W", area="outside", room="jardin")
+        L.table(14.3, 2.6, 0.8, 0.8, "N S E W", area="outside", room="jardin")
+        L.zone("keep_clear", rect(11.0, 4.9, 2.0, 1.3), "porte du jardin")
+
+    # Bâtiment du fond: laboratoire, cuisine, couloir du jardin, toilettes, réserve.
+    L.wall_v(6.6, 10.6, 8.1, 8.2, [{"at": 9.5, "w": 0.9, "type": "door", "access": "staff",
+                                    "swing": {"leaves": 1, "hinge": "start", "side": "-"}}], kind="partition", height=3.2)
+    L.wall_v(6.6, 10.6, 11.2, 11.3, kind="partition", height=3.2)
+    L.wall_v(6.6, 10.6, 12.7, 12.8, [
+        {"at": 7.0, "w": 0.9, "type": "door", "access": "public", "label": "WC",
+         "swing": {"leaves": 1, "hinge": "start", "side": "+"}},
+        {"at": 9.3, "w": 0.9, "type": "door", "access": "public", "label": "WC",
+         "swing": {"leaves": 1, "hinge": "start", "side": "+"}},
+    ], kind="partition", height=3.2)
+    L.wall_h(12.8, 14.4, 8.6, 8.7, kind="partition", height=3.2)
+    L.wall_v(6.6, 10.6, 14.4, 14.5, kind="partition", height=3.2)
+    L.floor(rect(3.5, 6.6, 4.6, 4.0), "kitchen" if not arrival else "closed")
+    L.floor(rect(8.2, 6.6, 3.0, 4.0), "kitchen")
+    L.floor(rect(11.3, 6.6, 1.4, 4.0), "wood")
+    L.floor(rect(12.8, 6.6, 1.6, 4.0), "tiles")
+    L.floor(rect(14.5, 6.6, 2.0, 4.0), "tiles")
+    # Laboratoire de pâtisserie (E2), vitré sur la halle.
+    L.zone("private", rect(3.5, 6.6, 4.6, 4.0), "laboratoire")
+    if arrival:
+        L.zone("extension", rect(3.5, 6.6, 4.6, 4.0), "E2: le laboratoire")
+    else:
+        L.station(3.55, 6.65, 1.2, 1.0, "four à soles", "oven", height=1.7, post="four du labo",
+                  reason="Contre le mur mitoyen ouest, où monte le conduit de l'ancienne cheminée du graineur.")
+        L.hood(3.5, 6.6, 1.5, 1.3, label="hotte")
+        L.marker(3.75, 6.85, "duct")
+        L.station(6.0, 6.65, 0.9, 0.6, "évier", "sink", post="évier du labo")
+        L.marker(6.45, 7.35, "water")
+        L.station(7.2, 6.65, 0.85, 0.75, "cellule", "fridge", height=1.9, post="cellule de refroidissement")
+        L.station(4.9, 8.4, 2.0, 0.8, "marbre", "worktop", height=0.9, post="marbre du labo")
+        L.station(3.55, 9.7, 0.9, 0.85, "batteur", "worktop", height=1.0, post="batteur")
+    # Cuisine.
+    L.zone("private", rect(8.2, 6.6, 3.0, 4.0), "cuisine")
+    L.station(8.3, 6.65, 1.7, 0.7, "feux et plancha", "hob", height=0.9, post="feux",
+              reason="Sur le mur du jardin: la hotte rejoint le conduit qui monte en façade arrière.")
+    L.hood(8.2, 6.6, 1.9, 1.0, label="hotte")
+    L.marker(8.45, 6.85, "duct")
+    L.station(10.4, 6.65, 0.75, 0.75, "frigo", "fridge", height=1.9, post="frigo de la cuisine")
+    L.station(10.45, 8.0, 0.7, 0.6, "évier", "sink", post="évier de la cuisine")
+    L.marker(10.8, 8.75, "drain")
+    L.station(10.45, 8.75, 0.7, 0.6, "lave-vaisselle", "dishwasher", post="lave-vaisselle", label_at=[9.6, 8.95])
+    L.station(9.3, 9.9, 1.85, 0.65, "passe chaude", "pass", height=0.9, post="passe chaude")
+    # Couloir du jardin et toilettes.
+    L.zone("keep_clear", rect(11.3, 6.6, 1.4, 4.0), "couloir")
+    L.fixture(rect(13.9, 6.65, 0.4, 0.65), "wc", "WC", height=0.45)
+    L.fixture(rect(13.0, 8.2, 0.5, 0.35), "basin", "", height=0.85)
+    L.fixture(rect(13.9, 9.9, 0.4, 0.65), "wc", "WC", height=0.45)
+    L.fixture(rect(13.0, 8.75, 0.5, 0.3), "basin", "", height=0.85)
+    L.marker(14.1, 7.5, "drain")
+    L.point("wc", 13.6, 7.75)
+    L.point("wc", 13.45, 9.65)
+    # Réserve, sur le passage des livraisons.
+    L.zone("private", rect(14.5, 6.6, 2.0, 4.0), "réserve")
+    L.furniture(rect(14.55, 6.65, 1.9, 0.45), "shelf", "étagères", height=2.0)
+    L.station(14.55, 9.3, 0.8, 1.25, "chambre froide", "fridge", height=2.1, post="chambre froide")
+    L.furniture(rect(16.05, 9.2, 0.4, 1.35), "lockers", "", height=1.9)
+    L.marker(16.3, 8.95, "panel", "tableau")
+    L.point("stock", 15.3, 8.0)
+
+    # Mur entre le fond et la halle: vitrage du laboratoire, passe de la cuisine.
+    L.add("partition", rect(3.5, 10.6, 4.6, 0.4), height=3.2, glazed=True, screen_low=True,
+          reason="Vitrée sur une allège pleine de 1,20 m: depuis la halle, on regarde travailler les pâtissiers.")
+    L.wall_h(8.1, 16.5, 10.6, 11.0, [
+        {"at": 8.25, "w": 0.9, "type": "door", "access": "staff", "swing": {"leaves": 1, "hinge": "start", "side": "-"}},
+        {"at": 9.3, "w": 1.8, "type": "window", "sill": 0.9},
+        {"at": 11.4, "w": 1.2, "type": "door", "access": "public", "label": "couloir",
+         "swing": {"leaves": 2, "hinge": "start", "side": "-"}},
+        {"at": 15.0, "w": 0.9, "type": "door", "access": "staff", "swing": {"leaves": 1, "hinge": "start", "side": "-"}},
+    ])
+
+    # La halle aux graines, sous sa verrière.
+    L.floor(rect(3.5, 11.0, 13.0, 8.0), "tiles")
+    L.hood(3.5, 11.0, 13.0, 8.0, label="verrière")
+    L.add("column", circle(6.4, 15.0, 0.15), height=6.0)
+    L.add("column", circle(13.6, 15.0, 0.15), height=6.0)
+    L.zone("work", rect(8.2, 11.0, 3.0, 1.8), "office de la halle")
+    L.wall_v(11.0, 12.8, 8.1, 8.2, kind="partition", height=1.10)
+    L.wall_v(11.0, 12.8, 11.2, 11.3, kind="partition", height=1.10)
+    L.counter(9.1, 12.1, 2.1, 0.7, reason="Le poste des serveurs, devant la passe de la cuisine.")
+    L.station(9.15, 12.15, 0.85, 0.55, "machine", "machine", height=1.40, post="machine de la halle")
+    L.station(10.1, 12.15, 1.05, 0.6, "desserts", "display", height=1.25, post="desserts")
+    L.wall_h(8.2, 9.1, 12.1, 12.8, [{"at": 8.2, "w": 0.9, "type": "door", "access": "staff", "label": "portillon",
+                                     "swing": {"leaves": 1, "hinge": "start", "side": "+"}}], kind="partition")
+    L.fixture(rect(9.3, 14.2, 0.8, 3.4), "casses", "meubles à graines", height=2.1,
+              reason="Les meubles à tiroirs du graineur partagent la halle en deux salles qui ne se voient pas toutes.")
+    L.zone("free", rect(3.5, 12.8, 5.8, 6.2), "halle ouest")
+    L.zone("free", rect(10.1, 12.8, 6.4, 6.2), "halle est")
+    for y in (11.5, 13.0, 14.5, 16.0, 17.5):
+        L.seat(rect(3.5, y, 0.55, 0.6), "inside", "halle", style="banquette", back="W")
+        L.table(4.1, y, 0.6, 0.6, "E", room="halle")
+    for y in (12.6, 16.6):
+        L.table(6.8, y, 0.8, 0.8, "N S E W", room="halle")
+    for y in (12.2, 13.7, 15.2):
+        L.seat(rect(15.95, y, 0.55, 0.6), "inside", "halle", style="banquette", back="E")
+        L.table(15.3, y, 0.6, 0.6, "W", room="halle")
+    for y in (12.6, 16.6):
+        L.table(12.6, y, 0.8, 0.8, "N S E W", room="halle")
+    L.zone("keep_clear", rect(15.6, 17.4, 0.9, 1.6), "issue")
+
+    # Boutique sur le boulevard.
+    L.wall_h(3.0, 17.0, 19.0, 19.5, [
+        {"at": 5.0, "w": 2.3, "type": "opening", "label": "arche"},
+        {"at": 11.7, "w": 1.8, "type": "opening", "label": "arche"},
+    ])
+    L.floor(rect(3.5, 19.5, 13.0, 5.5), "wood")
+    L.zone("work", rect(7.4, 19.5, 4.2, 2.4), "zone de travail")
+    L.wall_v(19.5, 21.9, 7.3, 7.4, kind="partition", height=1.10)
+    L.wall_v(19.5, 21.9, 11.6, 11.7, kind="partition", height=1.10)
+    L.backbar(7.4, 19.5, 4.2, 0.6, reason="Contre le mur de la halle, entre les deux arches.")
+    L.station(7.45, 19.55, 0.55, 0.5, "monte-plats", "lift", height=1.0, post="monte-plats",
+              reason="Il monte à l'office de l'étage: les plateaux ne prennent pas l'escalier.")
+    L.station(8.1, 19.52, 0.75, 0.55, "frigo", "fridge", post="frigo de la boutique")
+    L.station(8.95, 19.52, 1.0, 0.55, "plonge", "sink", post="plonge de la boutique")
+    L.marker(9.2, 19.35, "water")
+    L.marker(9.5, 19.35, "drain")
+    L.station(10.05, 19.52, 0.75, 0.55, "thés", "tea", post="thés")
+    L.station(10.85, 19.52, 0.7, 0.55, "jus", "juicer", post="jus")
+    L.counter(8.3, 21.2, 3.3, 0.7, reason="Face à la porte du boulevard; la file arrive à la caisse en longeant la vitrine.")
+    L.station(8.35, 21.25, 0.65, 0.55, "passe", "pass", height=1.10, post="passe de la boutique")
+    L.station(9.1, 21.25, 1.0, 0.55, "machine", "machine", height=1.45, post="machine de la boutique")
+    L.station(10.15, 21.3, 0.35, 0.45, "moulin", "grinder", height=1.45, post="moulin", label_at=[10.33, 20.8])
+    L.station(10.8, 21.25, 0.75, 0.55, "caisse", "register", height=1.25, post="caisse")
+    L.marker(9.6, 21.05, "power")
+    L.wall_h(7.4, 8.3, 21.2, 21.9, [{"at": 7.4, "w": 0.9, "type": "door", "access": "staff", "label": "portillon",
+                                     "swing": {"leaves": 1, "hinge": "start", "side": "+"}}], kind="partition")
+    L.furniture(rect(3.55, 19.6, 0.45, 3.4), "shelf", "bocaux de grains", height=2.0)
+    if arrival:
+        L.zone("extension", rect(3.5, 23.1, 2.1, 1.9), "E1")
+    else:
+        L.station(3.6, 23.3, 1.8, 1.55, "torréfacteur", "roaster", height=1.9, post="torréfacteur",
+                  reason="En vitrine contre le mur mitoyen: on le voit du boulevard, sa fumée monte par le conduit du mur.")
+        L.marker(3.75, 23.15, "duct")
+        L.marker(5.55, 23.5, "power")
+    # Cage de l'escalier public, ouverte sur la boutique.
+    L.wall_v(19.5, 22.6, 13.5, 13.6, kind="partition", height=3.6)
+    L.wall_h(13.5, 16.5, 22.5, 22.6, [{"at": 14.0, "w": 1.4, "type": "opening", "label": "escalier"}],
+             kind="partition", height=3.6)
+    L.fixture(rect(13.7, 19.6, 2.7, 2.8), "stairs", "escalier (2 volées)", height=0.0, steps=9, up="N")
+    # Façade du boulevard.
+    L.wall_h(3.0, 17.0, 25.0, 25.5, [
+        {"at": 3.8, "w": 2.3, "type": "window", "sill": 0.45, "screen_low": True},
+        {"at": 6.3, "w": 2.3, "type": "window", "sill": 0.45, "screen_low": True},
+        {"at": 9.0, "w": 1.6, "type": "door", "access": "public", "glazed": True, "entrance": True,
+         "id": "porte-boulevard", "label": "entrée", "swing": {"leaves": 2, "hinge": "start", "side": "-"}},
+        {"at": 11.0, "w": 2.5, "type": "window", "sill": 0.45, "screen_low": True},
+        {"at": 13.7, "w": 2.5, "type": "window", "sill": 0.45, "screen_low": True},
+    ])
+    L.zone("keep_clear", rect(10.65, 21.9, 1.0, 3.1), "file")
+    L.zone("keep_clear", rect(7.4, 21.9, 3.25, 1.2), "devant le comptoir")
+    L.zone("keep_clear", rect(9.0, 23.1, 1.6, 1.9), "porte")
+    L.zone("keep_clear", rect(5.0, 19.5, 2.3, 3.6), "arche ouest")
+    L.zone("keep_clear", rect(11.7, 19.5, 1.8, 3.4), "arche est")
+    L.zone("keep_clear", rect(13.6, 22.6, 2.9, 1.2), "escalier")
+    L.zone("free", rect(11.7, 23.8, 4.8, 1.2), "boutique")
+    L.zone("free", rect(5.6, 23.1, 3.4, 1.9), "boutique")
+    L.furniture(rect(11.9, 24.65, 3.1, 0.35), "shelf_high", "tablette", height=1.05)
+    for x in (12.2, 12.8, 13.4, 14.0, 14.6):
+        L.stool(x, 24.25, room="boutique")
+    L.table(6.0, 23.9, 0.6, 0.6, "W E", round_=True, room="boutique")
+    L.table(7.7, 23.9, 0.6, 0.6, "W E", round_=True, room="boutique")
+
+    # Terrasse du boulevard, chaises côte à côte tournées vers le boulevard.
+    L.zone("keep_clear", rect(8.9, 25.5, 1.8, 3.3), "porte")
+    L.zone("keep_clear", rect(17.0, 25.5, 2.0, 2.0), "portail")
+    row_a = (3.8, 5.6, 7.4, 11.2, 13.0, 14.8)
+    L.zone("free", rect(3.5, 25.5, 13.0, 1.1), "terrasse")
+    for x in row_a:
+        L.table(x, 26.0, 0.9, 0.5, "N2", area="outside", room="terrasse")
+    L.zone("extension", rect(3.5, 27.3, 13.0, 1.2), "second rang: avec l'option B de l'architecte (foule lointaine)")
+    L.hood(3.5, 25.5, 13.0, 1.2, label="store")
+    L.furniture(rect(8.5, 25.6, 0.3, 0.5), "slate", "ardoise", height=1.2)
+
+    # Points, file, vues, espaces.
+    L.point("entrance", 9.8, 29.2)
+    L.point("exits", 9.8, 29.2)
+    L.point("exits", 18.0, 26.6)
+    L.point("staff_start", 9.5, 20.65)
+    L.point("staff_start", 9.7, 11.55)
+    L.queue("boutique", [(11.15, 24.45), (11.15, 22.35)], 1.0, 4, register=(11.15, 22.35), pickup=(8.65, 22.35),
+            doors=["porte-boulevard"])
+    L.view("caisse", "caisse de la boutique", 11.15, 20.65, 180, ["queue:boutique"])
+    L.view("machine", "machine de la boutique", 9.6, 20.65, 180, ["door:porte-boulevard"])
+    L.view("halle-office", "office de la halle", 9.7, 11.55, 180, [])
+    L.view("halle-ouest", "halle ouest", 6.0, 18.4, 0, [])
+    L.view("halle-est", "halle est", 12.6, 18.4, 0, [])
+    L.view("terrasse", "terrasse", 10.0, 28.6, 0, [])
+    L.zone("space", rect(3.5, 19.5, 13.0, 5.5), "boutique", extras=5 if not arrival else 4)
+    L.zone("space", rect(3.5, 11.0, 5.8, 8.0), "halle ouest", extras=2)
+    L.zone("space", rect(9.3, 11.0, 7.2, 8.0), "halle est", extras=3)
+    L.zone("space", rect(3.5, 6.6, 4.6, 4.0), "laboratoire", extras=2 if not arrival else 0)
+    L.zone("space", rect(8.2, 6.6, 3.0, 4.0), "cuisine", extras=1)
+    L.zone("space", rect(11.3, 6.6, 1.4, 4.0), "couloir", extras=1)
+    L.zone("space", rect(3.5, 1.0, 13.0, 5.2), "jardin", extras=1 if not arrival else 0)
+    L.zone("space", rect(0, 25.5, 21.0, 8.5), "boulevard", extras=8)
+    if not arrival:
+        L.view("jardin", "jardin", 12.0, 5.6, 180, [])
+
+    # Parcours.
+    L.route("clients", [(9.8, 29.0), (9.8, 25.7), (10.6, 24.7), (11.15, 24.2), (11.15, 22.6)])
+    L.route("clients", [(10.85, 22.35), (9.0, 22.35)])
+    L.route("clients", [(8.4, 22.6), (6.2, 21.9), (6.2, 18.6), (5.6, 16.0)])
+    L.route("clients", [(9.0, 22.8), (12.6, 21.9), (12.6, 18.6), (11.5, 15.5)])
+    L.route("clients", [(12.6, 21.0), (14.7, 23.2), (14.7, 22.8)])
+    L.route("clients", [(12.0, 13.6), (12.0, 11.2), (12.0, 7.0)])
+    L.route("staff", [(9.0, 20.65), (7.85, 20.65), (7.85, 22.4), (6.5, 22.6)])
+    L.route("staff", [(9.7, 11.55), (8.65, 11.55), (8.65, 13.3), (7.9, 15.0)])
+    L.route("delivery", [(18.0, 24.2), (18.0, 8.1), (16.0, 8.1)])
+
+    # Textes et cotes.
+    L.text(5.8, 9.9 if not arrival else 8.6, "laboratoire", "room")
+    L.text(9.7, 9.3, "cuisine", "room")
+    L.text(15.5, 8.4, "réserve", "room")
+    L.text(6.0, 18.6, "halle", "room")
+    L.text(12.8, 18.6, "halle", "room")
+    L.text(9.8, 23.4, "boutique", "room")
+    L.text(10.0, 6.0 if not arrival else 3.6, "jardin", "room")
+    L.text(9.8, 28.95, "terrasse", "room")
+    L.dim((3.5, 0.5), (16.5, 0.5), "13,00 m", offset=-0.25)
+
+    # Étage: les salons de l'appartement du graineur, au-dessus de la boutique.
+    E = p.level("etage", "Étage (au-dessus de la boutique)", (3.0, 19.0, 17.5, 25.6), draw_offset=(17.5, 0.0))
+    E.wall_h(3.0, 17.0, 19.0, 19.5)
+    E.wall_v(19.0, 25.5, 3.0, 3.5)
+    E.wall_v(19.0, 25.5, 16.5, 17.0)
+    E.wall_h(3.0, 17.0, 25.0, 25.5, [
+        {"at": 3.9, "w": 1.2, "type": "window", "sill": 0.0, "screen_low": True},
+        {"at": 5.9, "w": 1.2, "type": "window", "sill": 0.0, "screen_low": True},
+        {"at": 7.9, "w": 1.2, "type": "window", "sill": 0.0, "screen_low": True},
+        {"at": 10.0, "w": 1.2, "type": "window", "sill": 0.0, "screen_low": True},
+        {"at": 12.2, "w": 1.2, "type": "window", "sill": 0.0, "screen_low": True},
+        {"at": 14.6, "w": 1.2, "type": "window", "sill": 0.0, "screen_low": True},
+    ])
+    E.floor(rect(3.5, 19.5, 13.0, 5.5), "wood" if not arrival else "closed")
+    E.wall_v(19.5, 22.6, 13.5, 13.6, [{"at": 20.1, "w": 1.4, "type": "opening", "label": "palier"}],
+             kind="partition", height=3.2)
+    E.wall_h(13.5, 16.5, 22.5, 22.6, kind="partition", height=3.2)
+    E.fixture(rect(13.7, 19.6, 2.7, 2.8), "stairs", "escalier", height=0.0, steps=9, up="S")
+    E.wall_v(19.5, 22.6, 9.4, 9.5, [{"at": 21.2, "w": 1.2, "type": "door", "access": "closed" if arrival else "public",
+                                     "glazed": True, "label": "grand salon",
+                                     "swing": {"leaves": 2, "hinge": "start", "side": "-"}}],
+             kind="partition", height=3.2)
+    E.wall_h(9.5, 13.5, 22.5, 22.6, [{"at": 10.4, "w": 1.4, "type": "door", "access": "closed" if arrival else "public",
+                                      "glazed": True, "label": "petit salon",
+                                      "swing": {"leaves": 2, "hinge": "start", "side": "+"}}],
+             kind="partition", height=3.2)
+    E.wall_h(3.5, 9.4, 21.0, 21.1, [
+        {"at": 4.6, "w": 0.9, "type": "door", "access": "public", "label": "WC",
+         "swing": {"leaves": 1, "hinge": "start", "side": "+"}},
+        {"at": 8.4, "w": 0.9, "type": "door", "access": "staff", "label": "office",
+         "swing": {"leaves": 1, "hinge": "start", "side": "+"}},
+    ], kind="partition", height=3.2)
+    E.wall_v(19.5, 21.0, 5.9, 6.0, kind="partition", height=3.2)
+    # Office de l'étage, au-dessus du monte-plats.
+    E.zone("private", rect(6.0, 19.5, 3.4, 1.5), "office")
+    E.station(6.05, 19.55, 1.3, 0.55, "évier, thés", "tea", post="office")
+    E.marker(6.4, 20.25, "water")
+    E.station(7.45, 19.55, 0.55, 0.5, "monte-plats", "lift", height=1.0, post="monte-plats de l'étage")
+    E.station(8.1, 19.55, 1.25, 0.55, "frigo, desserts", "fridge", post="frigo de l'étage")
+    E.fixture(rect(3.55, 19.55, 0.4, 0.65), "wc", "WC", height=0.45)
+    E.fixture(rect(5.3, 19.55, 0.5, 0.35), "basin", "", height=0.85)
+    if not arrival:
+        E.point("wc", 4.8, 20.3)
+    E.point("staff_start", 7.7, 20.55)
+    if arrival:
+        E.zone("extension", rect(3.5, 21.1, 13.0, 3.9), "E3: les salons de l'étage, fermés")
+    else:
+        # Grand salon (sur le boulevard).
+        E.zone("free", rect(3.5, 21.1, 5.9, 3.9), "grand salon")
+        for y in (22.2, 23.8):
+            E.seat(rect(3.5, y, 0.55, 0.6), "inside", "grand salon", style="banquette", back="W")
+            E.table(4.1, y, 0.6, 0.6, "E", room="grand salon")
+        E.table(6.3, 22.0, 0.8, 0.8, "N S E W", room="grand salon")
+        E.table(6.3, 24.05, 0.8, 0.8, "W E", room="grand salon")
+        E.armchair(8.5, 23.1, back="E", room="grand salon")
+        E.armchair(8.5, 24.15, back="E", room="grand salon")
+        E.zone("keep_clear", rect(8.0, 21.1, 1.4, 1.3), "portes")
+        # Petit salon (salle de lecture).
+        E.zone("free", rect(9.5, 22.6, 7.0, 2.4), "petit salon")
+        E.armchair(9.6, 24.15, back="S", room="petit salon")
+        E.armchair(11.9, 24.15, back="S", room="petit salon")
+        E.furniture(circle(11.1, 24.5, 0.3), "low_table", None, height=0.45)
+        E.table(13.6, 23.95, 0.6, 0.6, "W E", room="petit salon", round_=True)
+        E.table(15.6, 23.5, 0.6, 0.6, "W N", room="petit salon")
+        E.zone("keep_clear", rect(10.4, 22.6, 1.4, 1.0), "portes")
+    E.view("palier", "palier", 11.5, 21.0, 180, [])
+    if not arrival:
+        E.view("grand-salon", "grand salon", 7.0, 21.5, 180, [])
+        E.view("petit-salon", "petit salon", 12.8, 23.0, 270, [])
+    E.zone("space", rect(3.5, 21.1, 5.9, 3.9), "grand salon", extras=2 if not arrival else 0)
+    E.zone("space", rect(9.5, 22.6, 7.0, 2.4), "petit salon", extras=1 if not arrival else 0)
+    E.zone("space", rect(9.5, 19.5, 4.0, 3.0), "palier", extras=1)
+    E.zone("space", rect(6.0, 19.5, 3.4, 1.5), "office", extras=1)
+    E.text(6.4, 24.65, "grand salon", "room")
+    E.text(13.0, 24.6 if not arrival else 23.8, "petit salon", "room")
+    E.text(11.5, 20.0, "palier", "room")
+    E.text(7.7, 20.75, "office", "note")
+    E.route("clients", [(14.7, 22.0), (12.9, 21.0), (10.0, 21.8), (8.6, 21.8)])
+    E.route("staff", [(7.7, 20.6), (8.85, 20.6), (8.85, 21.6)])
+    p.link("escalier", "Escalier public, deux volées de 9 marches de 17 x 28 cm", {"level": "rdc", "pos": [14.7, 23.2]},
+           {"level": "etage", "pos": [12.9, 20.8]}, 1.30, 9.0, True)
+    return p
+
+
+ADDRESSES = [village, bourg, ville, paris_quartier, paris_maison]
 
 
 # =====================================================================================

@@ -32,17 +32,60 @@ def hex_to_srgb(hex_color):
     return np.array([int(hex_color[i:i + 2], 16) / 255 for i in (1, 3, 5)])
 
 
-class Palette:
-    """Palette à cases; `allowed` restreint les cases candidates du choix automatique."""
+def ciede2000(lab1, lab2, kl=1.0, kc=1.0, kh=1.0):
+    """Écart CIEDE2000 (Sharma, Wu et Dalal, 2005). kl > 1 réduit le poids de la clarté."""
+    l1, a1, b1 = (float(x) for x in lab1)
+    l2, a2, b2 = (float(x) for x in lab2)
+    cm = (math.hypot(a1, b1) + math.hypot(a2, b2)) / 2
+    g = 0.5 * (1 - math.sqrt(cm ** 7 / (cm ** 7 + 25 ** 7)))
+    a1p, a2p = (1 + g) * a1, (1 + g) * a2
+    c1p, c2p = math.hypot(a1p, b1), math.hypot(a2p, b2)
+    h1p = math.degrees(math.atan2(b1, a1p)) % 360 if (b1 or a1p) else 0.0
+    h2p = math.degrees(math.atan2(b2, a2p)) % 360 if (b2 or a2p) else 0.0
+    dlp, dcp = l2 - l1, c2p - c1p
+    dhp = 0.0
+    if c1p * c2p != 0:
+        dhp = h2p - h1p
+        if dhp > 180:
+            dhp -= 360
+        elif dhp < -180:
+            dhp += 360
+    dh = 2 * math.sqrt(c1p * c2p) * math.sin(math.radians(dhp) / 2)
+    lpm, cpm = (l1 + l2) / 2, (c1p + c2p) / 2
+    if c1p * c2p == 0:
+        hpm = h1p + h2p
+    elif abs(h1p - h2p) <= 180:
+        hpm = (h1p + h2p) / 2
+    else:
+        hpm = (h1p + h2p + 360) / 2 if h1p + h2p < 360 else (h1p + h2p - 360) / 2
+    t = (1 - 0.17 * math.cos(math.radians(hpm - 30)) + 0.24 * math.cos(math.radians(2 * hpm))
+         + 0.32 * math.cos(math.radians(3 * hpm + 6)) - 0.20 * math.cos(math.radians(4 * hpm - 63)))
+    dtheta = 30 * math.exp(-(((hpm - 275) / 25) ** 2))
+    rc = 2 * math.sqrt(cpm ** 7 / (cpm ** 7 + 25 ** 7))
+    sl = 1 + 0.015 * (lpm - 50) ** 2 / math.sqrt(20 + (lpm - 50) ** 2)
+    sc = 1 + 0.045 * cpm
+    sh = 1 + 0.015 * cpm * t
+    rt = -math.sin(math.radians(2 * dtheta)) * rc
+    return math.sqrt((dlp / (kl * sl)) ** 2 + (dcp / (kc * sc)) ** 2 + (dh / (kh * sh)) ** 2 + rt * (dcp / (kc * sc)) * (dh / (kh * sh)))
 
-    def __init__(self, path, allowed=None):
+
+class Palette:
+    """Palette à cases; `allowed` restreint les cases candidates du choix automatique.
+
+    Choix par CIEDE2000 (règle 2 de la bible, 13.3) avec un poids de clarté `kl`: à 2, l'écart de
+    clarté compte pour moitié, parce que la texture de Meshy contient un éclairage peint (une face
+    à l'ombre ne doit pas passer à la couleur voisine plus sombre).
+    """
+
+    def __init__(self, path, allowed=None, kl=2.0):
         with open(path, encoding="utf-8") as fh:
             self.data = json.load(fh)
         self.cells = self.data["cells"]
         self.index = {c["id"]: i for i, c in enumerate(self.cells)}
-        self.allowed = list(allowed) if allowed else [c["id"] for c in self.cells]
+        self.allowed = list(allowed) if allowed else [c["id"] for c in self.cells if not c.get("retired")]
         for pid in self.allowed:
             self.check(pid)
+        self.kl = kl
         self.lab = {pid: linear_to_lab(srgb_to_linear(hex_to_srgb(self.cells[self.index[pid]]["hex"]))) for pid in self.allowed}
 
     def check(self, pid):
@@ -51,10 +94,9 @@ class Palette:
         return pid
 
     def nearest(self, lab):
-        """Case autorisée la plus proche; l'écart de clarté compte pour moitié (éclairage peint)."""
         best, best_d = None, 1e9
         for pid, ref in self.lab.items():
-            d = math.sqrt(((lab[0] - ref[0]) / 2) ** 2 + (lab[1] - ref[1]) ** 2 + (lab[2] - ref[2]) ** 2)
+            d = ciede2000(lab, ref, kl=self.kl)
             if d < best_d:
                 best, best_d = pid, d
         return best, best_d
@@ -157,6 +199,7 @@ def assign_cells(bm, parts, part_of, images, mat_names, palette, conf):
             v = (uvs[0].y * a + uvs[1].y * b + uvs[2].y * c) % 1.0
             col += data[min(h - 1, int(v * h)), min(w - 1, int(u * w))]
         face_cell[f.index] = palette.nearest(linear_to_lab(col / len(SAMPLES)))[0]
+    raw_cell = dict(face_cell)
     # Lissage des cases par face: vote pondéré entre une face et ses voisines par arête.
     for _ in range(conf.get("face_smoothing", 2)):
         smoothed = dict(face_cell)
@@ -195,7 +238,12 @@ def assign_cells(bm, parts, part_of, images, mat_names, palette, conf):
             per = pi in per_face and pi not in overrides and f.index in face_cell
             final[f.index] = face_cell[f.index] if per else pid
         details.append(entry)
-    return final, details
+    # Part de l'aire dont la case finale diffère de la case la plus proche de sa propre face: ce
+    # que coûterait en taches le choix face par face sans vote ni lissage.
+    sampled = sum(face_area[i] for i in raw_cell)
+    differ = sum(face_area[i] for i in raw_cell if raw_cell[i] != final[i])
+    stats = {"area_where_final_differs_from_face_nearest": round(differ / sampled, 3) if sampled else None}
+    return final, details, stats
 
 
 def apply_palette_uv(bm, final, palette):

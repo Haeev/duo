@@ -1,9 +1,9 @@
 {
   "format": "duo-meshy-sheet/1",
-  "asset": "customer_01",
+  "asset": "char_essai_flaneur",
   "note": "fiche des doublures (scripts/doublure_personnage.py, tirées des personnages de La Petite Ligne), pas de sorties de Meshy: elle éprouve conformite_personnage.py tant que assets.meshy.ai est refusé par le proxy",
   "conformity": {
-    "node_name": "customer_01",
+    "node_name": "char_essai_flaneur",
     "target_height_m": 1.70,
     "max_triangles": 5000,
     "clips": [

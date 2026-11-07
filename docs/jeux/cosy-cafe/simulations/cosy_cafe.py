@@ -179,12 +179,12 @@ EXTENSIONS: list[tuple[str, str, str, int, tuple[int, int, int, int], int, str]]
      "la cour de l'atelier, à l'abri de la rue"),
     ("paris-quartier", "pq_trottoir", "E1, la terrasse sur le trottoir", 5000, (0, 0, 0, 10), 3,
      "l'angle donne sur deux rues: la mairie d'arrondissement autorise la seconde"),
-    ("paris-quartier", "pq_mezzanine", "E2, la mezzanine", 9000, (0, 6, 2, 0), 5,
-     "un plancher sous la grande hauteur du café d'angle (second niveau, C17)"),
+    ("paris-quartier", "pq_arriere", "E2, l'arrière-salle", 9000, (0, 6, 2, 0), 5,
+     "l'ancienne réserve du café d'angle, rouverte sur la cour (pas de second niveau: C17)"),
     ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 6000, (0, 12, 6, 0), 8,
      "la grande salle sous la verrière, fermée depuis des années"),
-    ("paris-maison", "pm_etage", "E2, l'étage", 8000, (0, 12, 4, 0), 6,
-     "le salon du premier étage, ouvert par l'escalier de la maison"),
+    ("paris-maison", "pm_mezzanine", "E2, la mezzanine", 8000, (0, 12, 4, 0), 6,
+     "le plancher sous la verrière, rouvert par l'escalier de la maison (second niveau, C17)"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -1696,7 +1696,7 @@ ACHATS: list[tuple[str, str, str, int, str, int, int]] = [
     ("paris-quartier", "fiche_citron", "Fiche « tarte au citron meringuée »", 80, "recette:tarte_citron", 7, 8),
     ("paris-quartier", "tables", "Deux tabourets, deux tables, une banquette, une table dehors", 1500, "places:2,2,2,2", 8, 7),
     ("paris-quartier", "pq_trottoir", "E1, la terrasse sur le trottoir", 5000, "ext:pq_trottoir", 9, 9),
-    ("paris-quartier", "pq_mezzanine", "E2, la mezzanine", 9000, "ext:pq_mezzanine", 10, 10),
+    ("paris-quartier", "pq_arriere", "E2, l'arrière-salle", 9000, "ext:pq_arriere", 10, 10),
     ("paris-maison", "buse_auto", "Buses automatiques", 1200, "poste:vapeur:3", 1, 1),
     ("paris-maison", "douce", "Bar à méthodes douces et moulin de spécialité", 3200,
      "poste:douce:1;equip:moulin_specialite", 2, 2),
@@ -1705,7 +1705,7 @@ ACHATS: list[tuple[str, str, str, int, str, int, int]] = [
     ("paris-maison", "labo", "Laboratoire de pâtisserie", 4000, "poste:four:3;recette:entremets", 5, 6),
     ("paris-maison", "torrefaction", "Torréfacteur (notre mélange)", 4000, "recette:notre_melange", 6, 7),
     ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 6000, "ext:pm_verriere", 7, 5),
-    ("paris-maison", "pm_etage", "E2, l'étage", 8000, "ext:pm_etage", 8, 8),
+    ("paris-maison", "pm_mezzanine", "E2, la mezzanine", 8000, "ext:pm_mezzanine", 8, 8),
 ]
 AMBIANCE_HAUSSE = 1.2  # chaque palier de +10 d'ambiance coûte 20 % de plus que le précédent
 AMBIANCE_DEPART = {"village": 30, "bourg": 25, "ville": 30, "paris-quartier": 35, "paris-maison": 35}
@@ -1738,7 +1738,7 @@ DEFI: dict[str, tuple[str, str, str]] = {
     "paris-quartier": ("Le vide-grenier de la rue", "pq_trottoir", "dimanche"),
 }
 DEFI_AFFLUENCE = 1.6
-FIN = {"tasses": 4.5, "achats": ("labo", "torrefaction", "pm_verriere", "pm_etage")}
+FIN = {"tasses": 4.5, "achats": ("labo", "torrefaction", "pm_verriere", "pm_mezzanine")}
 RENOMMEE_FIN = 25000
 
 # Temps réel hors service (minutes): prologue, arrivée à une adresse, défi, fin.
@@ -1887,6 +1887,7 @@ class Partie:
     journal: list[dict] = field(default_factory=list)
     derniere_config: dict[str, tuple[Config, int, int, str]] = field(default_factory=dict)
     ext_jour: dict[str, int] = field(default_factory=dict)
+    report_max: float = 0.0
     caisse_depart: dict[str, float] = field(default_factory=dict)
 
 
@@ -2099,6 +2100,7 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         if p.caisse < 0:  # règle EC-06: jamais de faillite, le propriétaire et les fournisseurs attendent
             p.report += -p.caisse
             p.caisse = 0.0
+            p.report_max = max(p.report_max, p.report)
         elif p.report > 0:
             r = min(p.report, p.caisse)
             p.report -= r
@@ -2145,7 +2147,7 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
             p.demenagement = nxt
         if p.adresse == "paris-maison" and not p.guide_jour:
             if c.tasses >= FIN["tasses"] and all(x in c.achats for x in FIN["achats"]) and not c.travaux \
-                    and all(x in c.extensions for x in ("pm_verriere", "pm_etage")):
+                    and all(x in c.extensions for x in ("pm_verriere", "pm_mezzanine")):
                 k = d
                 while (k - 1) % 7 != 6:
                     k += 1
@@ -2196,6 +2198,19 @@ def t_adresses() -> list[str]:
                     "Charges par jour", "Installation", "Renommée de l'offre", "Tasses au départ", "Tasses du défi",
                     "Lignes d'ardoise", "Places à l'arrivée (dedans + dehors)", "Places au maximum", "Debout au comptoir",
                     "Présents au plus (C2)"], lignes)
+
+
+def t_depart() -> list[str]:
+    noms = {"espresso": "machine", "vapeur": "buse", "bouilloire": "bouilloire", "vitrine": "vitrine", "plan": "plan",
+            "frigo": "frigo du bar", "four": "four", "agrumes": "presse-agrumes"}
+    lignes = []
+    for a in ORDRE_ADRESSES:
+        d = DEPART[a]
+        postes = ", ".join(f"{noms.get(k, k)} {v}" for k, v in d["niveaux"].items())  # type: ignore[union-attr]
+        plonge = {1: "évier", 2: "lave-vaisselle", 3: "lave-vaisselle à capot"}[int(d["plonge"])]  # type: ignore[arg-type]
+        equip = ", ".join(d["equipements"]) or "aucun"  # type: ignore[arg-type]
+        lignes.append([f"`{a}`", postes, plonge, str(d["caisses"]), equip, str(EQUIPE_REPRISE[a]), str(ADR[a].vaisselle)])
+    return tableau(["Adresse", "Postes et niveaux", "Plonge", "Terminaux", "Équipements", "Employés repris", "Vaisselle"], lignes)
 
 
 def t_extensions() -> list[str]:
@@ -2405,7 +2420,7 @@ def t_divers() -> list[str]:
 
 
 TABLES_PARAMETRES = {
-    "reglages": t_reglages, "adresses": t_adresses, "extensions": t_extensions, "profils": t_profils, "flux": t_flux,
+    "reglages": t_reglages, "adresses": t_adresses, "depart": t_depart, "extensions": t_extensions, "profils": t_profils, "flux": t_flux,
     "courbes": t_courbes, "jours": t_jours, "meteo": t_meteo, "saisons": t_saisons, "attrait": t_attrait,
     "satisfaction": t_satisfaction, "reputation": t_reputation, "postes": t_postes, "recettes": t_recettes,
     "gestes": t_gestes, "employes": t_employes, "equipe": t_equipe, "achats": t_achats, "ambiance": t_ambiance,
@@ -2600,6 +2615,7 @@ def r_sans_employes(mc: dict[str, list[Partie]]) -> list[str]:
             if not res:
                 continue
             m = lambda key: statistics.fmean(r[key] for r in res)
+            _CLES[f"equipe_{a}_{'avec' if avec else 'sans'}"] = fr(100 * m("repartis"))
             lignes.append([nom_adresse(a), "avec l'équipe" if avec else "à deux, sans employés", fr(m("personnel") - 2),
                            fr(m("servis")), pct(m("repartis")), f"{fr(m('attente'))} s", fr(m("satisfaction")),
                            f"{fr(m('depassement'))} s"])
@@ -2629,6 +2645,7 @@ def r_aides(mc: dict[str, list[Partie]]) -> list[str]:
             if not res:
                 continue
             m = lambda key: statistics.fmean(r[key] for r in res)
+            _CLES[f"aides_{a}_{nom.replace(' ', '_')}"] = fr(100 * m("repartis"))
             duree = (ADR[a].fermeture - ADR[a].ouverture) * spm
             lignes.append([nom_adresse(a), nom, f"{fr(duree, 1)} min", fr(m("servis")), pct(m("repartis")),
                            f"{fr(m('attente'))} s", fr(m("satisfaction")), pct(m("charge"))])
@@ -2666,8 +2683,19 @@ def r_epargne(mc: dict[str, list[Partie]]) -> list[str]:
     return tableau(["Arrivée à", "Installation payée", "Caisse le jour de l'arrivée (médiane)", "9 duos sur 10 entre"], lignes)
 
 
+_CLES: dict[str, str] = {}
+
+
 def valeurs_cles(mc: dict[str, list[Partie]]) -> dict[str, str]:
-    out: dict[str, str] = {}
+    out: dict[str, str] = dict(sorted(_CLES.items()))
+    ouverts = [j for p in mc["median"] for j in p.journal]
+    d = DUO["median"]
+    out["journee_median_min"] = fr(statistics.fmean(
+        d.preparation + (ADR[ORDRE_ADRESSES[j["adresse"]]].fermeture - ADR[ORDRE_ADRESSES[j["adresse"]]].ouverture)
+        * REG["secondesParMinute"] + j["depassement"] / 60 + d.fermeture for j in ouverts))
+    out["seances_median"] = fr(statistics.median(p.fin.minutes for p in mc["median"] if p.fin) / 40)
+    out["parties"] = fr(sum(len(ps) for ps in mc.values()))
+    out["a_regler"] = fr(sum(1 for ps in mc.values() for p in ps if p.report_max > 0))
     for d in DUOS:
         ps = mc[d.id]
         hs = [p.fin.minutes / 60 for p in ps if p.fin]

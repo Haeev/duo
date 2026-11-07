@@ -13,7 +13,7 @@
   "models": [
     {
       "file": "customer_01.glb",
-      "fileBytes": 507996,
+      "fileBytes": 508020,
       "url": "/modele-0.glb",
       "triangles": 2434,
       "drawCalls": 1,
