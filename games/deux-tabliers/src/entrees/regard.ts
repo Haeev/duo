@@ -30,6 +30,8 @@ export interface LookControl {
   /** Le jeu rend le pointeur (pause de Duo, panneau ouvert). */
   release(): void;
   setPanelOpen(open: boolean): void;
+  /** Réglages par joueur: sensibilité (facteur, 1 par défaut) et inversion verticale. */
+  setSensitivity(factor: number, invertY: boolean): void;
   dispose(): void;
 }
 
@@ -41,16 +43,19 @@ export function createLookControl(
   const look: Look = { ...options.start };
   let panel = false;
   let swallowing = false;
+  let factor = 1;
+  let vertical = 1;
 
   const onMove = (event: PointerEvent): void => {
     if (document.pointerLockElement !== canvas) return;
     // Chromium envoie parfois un saut aberrant juste après le verrouillage: on l'ignore.
     if (Math.abs(event.movementX) > MOVEMENT_SPIKE || Math.abs(event.movementY) > MOVEMENT_SPIKE)
       return;
-    look.yawDeg = (((look.yawDeg - event.movementX * options.degPerPixel) % 360) + 360) % 360;
+    const k = options.degPerPixel * factor;
+    look.yawDeg = (((look.yawDeg - event.movementX * k) % 360) + 360) % 360;
     look.pitchDeg = Math.max(
       -options.pitchLimitDeg,
-      Math.min(options.pitchLimitDeg, look.pitchDeg - event.movementY * options.degPerPixel),
+      Math.min(options.pitchLimitDeg, look.pitchDeg - event.movementY * k * vertical),
     );
   };
   const onDown = (event: PointerEvent): void => {
@@ -77,6 +82,10 @@ export function createLookControl(
     },
     release() {
       input.unlockPointer();
+    },
+    setSensitivity(next, invertY) {
+      factor = Math.max(0.2, Math.min(3, next));
+      vertical = invertY ? -1 : 1;
     },
     setPanelOpen(open) {
       panel = open;

@@ -154,6 +154,10 @@ export function reportInspection(world: World, criterion: 'cups' | 'floor' | 'fr
 function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   const ctx = ctxOf(sim);
   const { s, cc } = ctx;
+  if (intent.type === 'clientele-ui-place') {
+    s.uiPlaces[player] = intent.place;
+    return;
+  }
   if (s.day === 0) return;
   if (intent.type === 'clientele-vote') {
     refuse(sim, player, vote(ctx, player, intent.topic, intent.yes));

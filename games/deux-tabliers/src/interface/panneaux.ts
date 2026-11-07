@@ -86,14 +86,3 @@ export function createPanels(
   };
 }
 
-/** Tablette provisoire: montre que Tab ouvre un panneau qui rend la souris. */
-export const TABLET_PLACEHOLDER: Panel = {
-  id: 'tablette',
-  open(root, view) {
-    const title = document.createElement('h2');
-    title.textContent = 'Tablette de la maison';
-    const text = document.createElement('p');
-    text.textContent = `${view.content.plan.title}. Les onglets arrivent bientôt.`;
-    root.append(title, text);
-  },
-};

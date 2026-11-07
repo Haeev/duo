@@ -229,6 +229,8 @@ export const ClienteleStateSchema = v.strictObject({
   conditions: v.array(Str),
   /** Ambiance du jour: valeur (0 à 95), style dominant, cohérence (0 à 1). */
   ambiance: v.tuple([N, Str, N]),
+  /** Où est chaque joueur dans l'interface (« Sur la tablette : catalogue »), `null`: en jeu. */
+  uiPlaces: v.optional(v.tuple([v.nullable(Str), v.nullable(Str)]), () => [null, null]),
   /**
    * Boîte de dépôt vers le service (chantier a), vidée par `takeServiceOutbox`: commandes à
    * mettre en tickets, vaisselle laissée sur les tables, cartons livrés à poser à la porte.
@@ -324,6 +326,7 @@ export function createClienteleState(): ClienteleState {
     servedTotal: 0,
     conditions: [],
     ambiance: [0, 'campagne', 0],
+    uiPlaces: [null, null],
     outbox: { orders: [], dishes: [], cartons: [] },
   };
 }

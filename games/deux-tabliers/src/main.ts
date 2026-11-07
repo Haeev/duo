@@ -11,8 +11,11 @@ import { createCustomerNodes } from './clientele/rendu3d';
 import { ContentError, loadContent } from './donnees/charger';
 import { DATA_FILES } from './donnees/fichiers';
 import { createLookControl } from './entrees/regard';
+import { wireInterface } from './branchement/interface';
+import { attachInterface } from './interface/branchement';
 import { createHud } from './interface/hud';
-import { createPanels, TABLET_PLACEHOLDER } from './interface/panneaux';
+import { createPanels } from './interface/panneaux';
+import { serviceStationPrompt } from './service';
 import { createArrangementClient } from './amenagement/client/mode';
 import { createLiveShell } from './amenagement/client/coque-vivante';
 import { createModelLibrary } from './rendu/modeles';
@@ -25,7 +28,8 @@ import { aim, type Aim } from './simulation/visee';
 
 const canvas = document.getElementById('scene');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas #scene absent');
-const hud = createHud(document.body);
+// HUD de secours: seulement pour dire une erreur de chargement, avant l'interface.
+const bootHud = createHud(document.body);
 
 const duo = await connect<GameAction>({ manifest });
 const content = (() => {
@@ -34,7 +38,7 @@ const content = (() => {
   } catch (error) {
     const text = error instanceof ContentError ? error.issues.join('\n') : String(error);
     duo.log.error('données invalides', { text });
-    hud.fail(`Le café ne peut pas ouvrir: données invalides.\n\n${text}`);
+    bootHud.fail(`Le café ne peut pas ouvrir: données invalides.\n\n${text}`);
     throw error;
   }
 })();
@@ -60,10 +64,22 @@ const look = createLookControl(canvas, duo.input, {
   start: { yawDeg: startPose.yawDeg, pitchDeg: startPose.pitchDeg },
   active: () => duo.state === 'running',
 });
+bootHud.dispose();
+const wired = wireInterface(view);
+const ui = attachInterface({
+  duo,
+  view,
+  look,
+  canvas,
+  camera: stage.camera,
+  sources: wired.sources,
+  intents: wired.intents,
+});
+// Le panneau provisoire de l'aménagement (Tab en mode aménagement, B pour y entrer) garde son
+// propre calque: la boutique de la tablette passe par `catalogView` pour le reste.
 const panels = createPanels(document.body, view, (open) => {
   look.setPanelOpen(open);
 });
-panels.register(TABLET_PLACEHOLDER);
 const arrange = createArrangementClient({
   input: duo.input,
   content,
@@ -82,7 +98,7 @@ const arrange = createArrangementClient({
     };
   },
   flash: (text) => {
-    hud.flash(text);
+    ui.ui.flash(text);
   },
   closePanel: () => {
     panels.close();
@@ -91,10 +107,8 @@ const arrange = createArrangementClient({
 panels.register(arrange.panel);
 
 view.onEvent((event) => {
-  if (event.type === 'refused') {
-    if (event.player !== view.local) return;
-    hud.flash(event.reason);
-  }
+  wired.onEvent(event);
+  ui.onEvent(event);
   sounds.onEvent(event);
 });
 
@@ -144,12 +158,20 @@ duo.loop.start({
     const playing = look.locked() && !look.panelOpen();
     const intents: Intent[] = [];
     const resumeClick = look.consumeResumeClick();
-    if (duo.input.wasPressed('confirm') && !look.locked() && !look.panelOpen()) look.grab();
-    if (duo.input.wasPressed('tablet'))
-      panels.toggle(arrange.active() ? arrange.panel.id : 'tablette');
-    if (duo.input.wasPressed('close')) panels.close();
+    const arranging = arrange.active();
+    const keys = arranging ? { swallowAct: false, swallowConfirm: false } : ui.step();
+    if (
+      duo.input.wasPressed('confirm') &&
+      !keys.swallowConfirm &&
+      !look.locked() &&
+      !look.panelOpen()
+    )
+      look.grab();
+    if (arranging && duo.input.wasPressed('tablet')) panels.toggle(arrange.panel.id);
+    if (panels.current() !== null && duo.input.wasPressed('close')) panels.close();
+    intents.push(...ui.drainIntents());
     intents.push(...arrange.step(playing && !resumeClick));
-    if (playing && !resumeClick && !arrange.active()) {
+    if (playing && !resumeClick && !arranging && !keys.swallowAct) {
       const target = currentAim?.target;
       if (duo.input.wasPressed('act') && target !== undefined)
         intents.push({ type: 'act', target });
@@ -191,20 +213,31 @@ duo.loop.start({
     const seconds =
       station === undefined || station === null ? 0 : (content.stations.get(station)?.seconds ?? 0);
     const arrangePrompt = arrange.prompt();
-    hud.update({
-      aiming: arrange.active() || (currentAim !== null && currentAim.plan.kind !== 'refuse'),
-      prompt:
-        arrangePrompt ??
-        (currentAim === null
-          ? null
-          : {
-              key: duo.input.actionLabel('act'),
-              text: planLabel(content, view.world(), currentAim.plan),
-              refused: currentAim.plan.kind === 'refuse',
-            }),
-      hold: use === null || seconds <= 0 ? null : Math.min(1, use.elapsed / seconds),
-      capsule: duo.state === 'running' && !look.locked() && !look.panelOpen(),
-    });
+    const target = currentAim?.target;
+    const servicePrompt =
+      target?.kind === 'station'
+        ? serviceStationPrompt(content, view.world(), target.furniture)
+        : null;
+    ui.frame(
+      {
+        aiming: arrange.active() || (currentAim !== null && currentAim.plan.kind !== 'refuse'),
+        prompt:
+          arrangePrompt ??
+          (currentAim === null
+            ? null
+            : {
+                key: duo.input.actionLabel('act'),
+                text:
+                  currentAim.plan.kind === 'refuse'
+                    ? planLabel(content, view.world(), currentAim.plan)
+                    : (servicePrompt ?? planLabel(content, view.world(), currentAim.plan)),
+                refused: currentAim.plan.kind === 'refuse',
+              }),
+        hold: use === null || seconds <= 0 ? null : Math.min(1, use.elapsed / seconds),
+        capsule: duo.state === 'running' && !look.locked() && !look.panelOpen(),
+      },
+      currentAim?.target ?? null,
+    );
     panels.update();
     stage.render();
   },
@@ -219,7 +252,7 @@ duo.on('stop', () => {
   models.dispose();
   shell.dispose();
   stage.dispose();
-  hud.dispose();
+  ui.dispose();
   session.dispose();
   duo.dispose();
 });

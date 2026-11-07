@@ -96,7 +96,9 @@ export function attachInterface(options: AttachOptions): AttachedInterface {
   });
 
   const applyView = (): void => {
-    const fov = ui.settings.get().fovDeg;
+    const settings = ui.settings.get();
+    look.setSensitivity(settings.sensitivity, settings.invertY);
+    const fov = settings.fovDeg;
     if (camera.fov !== fov) {
       camera.fov = fov;
       camera.updateProjectionMatrix();

@@ -53,4 +53,9 @@ export const CLIENTELE_INTENTS = [
   }),
   /** Rythme du duo: normal (1 s par minute de jeu) ou paisible (1,25 s). */
   v.strictObject({ type: v.literal('clientele-pace'), peaceful: v.boolean() }),
+  /** Où est ce joueur dans l'interface (« Sur la tablette : catalogue »), pour la carte de l'autre. */
+  v.strictObject({
+    type: v.literal('clientele-ui-place'),
+    place: v.nullable(v.pipe(v.string(), v.maxLength(60))),
+  }),
 ] as const;
