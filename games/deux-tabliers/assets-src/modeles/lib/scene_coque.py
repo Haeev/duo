@@ -231,17 +231,17 @@ def cafetiere():
     # socle et bac d'égouttage à grille fine
     g.box(x0 + 0.01, x1 - 0.01, yf - 0.005, yb, z0 + 0.025, z0 + 0.06, "steel_dark", bevel=0.01)
     g.box(x0 + 0.04, x1 - 0.04, 8.79, yf, z0 + 0.025, z0 + 0.06, "steel", bevel=0.01)
-    for i in range(15):
-        x = x0 + 0.07 + i * (x1 - x0 - 0.14) / 14
+    for i in range(11):
+        x = x0 + 0.07 + i * (x1 - x0 - 0.14) / 10
         g.box(x - 0.004, x + 0.004, 8.805, yf - 0.01, z0 + 0.06, z0 + 0.066, "steel", bevel=0)
     g.box(x0 + 0.06, x1 - 0.06, 8.805, yf - 0.01, z0 + 0.052, z0 + 0.058, "steel_dark", bevel=0)
     # corps de cuivre aux angles très arrondis, bandeau de laiton en haut
     zb0, zb1 = z0 + 0.06, z0 + 0.43
-    g.box(x0, x1, yf, yb, zb0, zb1, "copper", bevel=0.07 if A() else 0.04, segs=4 if A() else 3, edges="notop")
+    g.box(x0, x1, yf, yb, zb0, zb1, "copper", bevel=0.07 if A() else 0.04, segs=4 if A() else 2, edges="notop")
     g.box(x0 + 0.005, x1 - 0.005, yf - 0.006, yb + 0.006, zb1 - 0.03, zb1 - 0.012, "brass", bevel=0.008, segs=2)
     # façade de cuivre bordée de laiton, qui porte les groupes
-    g.box(x0 + 0.07, x1 - 0.07, yf - 0.016, yf + 0.01, z0 + 0.15, zb1 - 0.04, "brass", bevel=0.02, segs=3)
-    g.box(x0 + 0.085, x1 - 0.085, yf - 0.022, yf, z0 + 0.165, zb1 - 0.055, "copper", bevel=0.015, segs=3)
+    g.box(x0 + 0.07, x1 - 0.07, yf - 0.016, yf + 0.01, z0 + 0.15, zb1 - 0.04, "brass", bevel=0.02, segs=2)
+    g.box(x0 + 0.085, x1 - 0.085, yf - 0.022, yf, z0 + 0.165, zb1 - 0.055, "copper", bevel=0.015, segs=2)
     zg = z0 + 0.3  # axe des bossages
     for x in (cx - 0.19, cx + 0.19):
         # bossage horizontal et tête de groupe en cloche (laiton)
@@ -279,9 +279,8 @@ def cafetiere():
     pts = [(xs, yf - 0.014, zg + 0.04), (xs, yf - 0.05, zg + 0.035), (xs - 0.005, yf - 0.08, zg + 0.015), (xs - 0.012, yf - 0.095, zg - 0.02),
            (xs - 0.018, yf - 0.1, z0 + 0.12), (xs - 0.02, yf - 0.1, z0 + 0.09)]
     for a_, b_ in zip(pts, pts[1:]):
-        g.rod(a_, b_, 0.0085, 10, "steel")
-        g.sphere(*b_, 0.0085, 0.0085, 0.0085, "steel", segs=10, rings=5)
-    g.sphere(xs, yf - 0.05, zg + 0.035, 0.016, 0.016, 0.016, "steel", segs=10, rings=6)
+        g.rod(a_, b_, 0.0085, 8, "steel", cap=False)
+    g.sphere(xs, yf - 0.05, zg + 0.035, 0.016, 0.016, 0.016, "steel", segs=8, rings=5)
     # robinet d'eau chaude (est)
     xh = x1 - 0.075
     g.cyl(xh, yf - 0.02, zb1 - 0.08, zb1 - 0.055, 0.022, pans(12), "brass", bevel=0.005)
@@ -292,10 +291,10 @@ def cafetiere():
     zr = zb1 + 0.065
     for (a, b) in (((x0 + 0.04, yf + 0.02), (x1 - 0.04, yf + 0.02)), ((x0 + 0.04, yb - 0.02), (x1 - 0.04, yb - 0.02)),
                    ((x0 + 0.04, yf + 0.02), (x0 + 0.04, yb - 0.02)), ((x1 - 0.04, yf + 0.02), (x1 - 0.04, yb - 0.02))):
-        g.rod((a[0], a[1], zr), (b[0], b[1], zr), 0.006, 8, "brass")
+        g.rod((a[0], a[1], zr), (b[0], b[1], zr), 0.006, 6, "brass", cap=False)
     for (x, y) in ((x0 + 0.04, yf + 0.02), (x1 - 0.04, yf + 0.02), (x0 + 0.04, yb - 0.02), (x1 - 0.04, yb - 0.02), (cx, yf + 0.02), (cx, yb - 0.02)):
-        g.rod((x, y, zb1 + 0.012), (x, y, zr), 0.006, 8, "brass")
-        g.sphere(x, y, zr, 0.009, 0.009, 0.009, "brass", segs=8, rings=5)
+        g.rod((x, y, zb1 + 0.012), (x, y, zr), 0.006, 6, "brass", cap=False)
+        g.sphere(x, y, zr, 0.009, 0.009, 0.009, "brass", segs=6, rings=4)
     return g
 
 
@@ -471,7 +470,7 @@ def croissant_geo(g, x, y, z, deg=0.0, s=1.2):
     renflements des tours de pâte, dessous aplati. Doré (croûte), bouts un peu plus clairs (mie)."""
     bm = g.bm
     before = set(bm.verts)
-    n_t, n_r = 25, pans(10)
+    n_t, n_r = 15, pans(8)
     R = 0.055 * s
     rings = []
     for i in range(n_t):
@@ -599,10 +598,22 @@ def plante(g, x, y, z):
 
 def place():
     g = Geo("street", kind="ext")
-    # trottoir (y 13,0 à 14,6), bordure, place pavée plus bas
-    g.box(-14, 30, 13.0, 14.6, -0.08, -0.02, "paving", bevel=0, drop=("bottom",))
-    g.box(-14, 30, 14.6, 14.75, -0.16, -0.02, "stone_shade", bevel=0, drop=("bottom",))
-    g.box(-14, 30, 14.75, 48, -0.2, -0.14, "paving", bevel=0, drop=("bottom",))
+    # trottoir de la terrasse (y 13,0 à 15,8, dessus à 0 comme le sol du café: les meubles de la terrasse s'y posent à
+    # y = 0), bordure, place pavée 14 cm plus bas. La terrasse du plan va jusqu'à 15,50 (store) et ses tables à 14,75.
+    g.box(-14, 30, 13.0, 15.8, -0.06, 0.0, "paving", bevel=0, drop=("bottom",))
+    g.box(-14, 30, 15.8, 15.95, -0.16, 0.0, "stone_shade", bevel=0, drop=("bottom",))
+    g.box(-14, 30, 15.95, 48, -0.2, -0.14, "paving", bevel=0, drop=("bottom",))
+    # étages du café (le logement de Simone): pierre blonde de 2,80 à 6,50 m, trois fenêtres à volets, corniche
+    g.box(3.6, 11.5, 13.0, 13.1, 2.8, 6.5, "stone", bevel=0)
+    g.box(3.5, 11.6, 13.0, 13.3, 2.62, 2.8, "stone_shade", bevel=0.01)
+    g.box(3.5, 11.6, 13.0, 13.35, 6.5, 6.7, "stone_shade", bevel=0.01)
+    for xc in (5.4, 7.5, 9.6):
+        for (z0, z1) in ((3.4, 4.8),):
+            g.box(xc - 0.45, xc + 0.45, 13.1, 13.12, z0, z1, "ink", bevel=0)
+            for side in (-1, 1):
+                xs = xc + side * 0.75
+                g.box(xs - 0.27, xs + 0.27, 13.1, 13.16, z0, z1, "shutter", bevel=0)
+            g.box(xc - 0.55, xc + 0.55, 13.1, 13.18, z0 - 0.08, z0, "stone_shade", bevel=0)
     # façade extérieure du café et de ses voisins (pierre blonde), au-dessus de la vitrine
     g.box(-14, 3.6, 13.0, 13.1, -0.02, 6.5, "stone", bevel=0)
     g.box(11.5, 30, 13.0, 13.1, -0.02, 6.5, "stone", bevel=0)

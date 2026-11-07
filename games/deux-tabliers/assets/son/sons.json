@@ -114,13 +114,13 @@
     1500
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 1.75,
-    "startSample": 6000,
-    "endSample": 42000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.0,
+    "startSample": 12000,
+    "endSample": 48000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -25,
    "note": "fondu de 0,3 s vers grinder-empty-loop quand la dose est faite"
   },
@@ -153,13 +153,13 @@
     1500
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 1.75,
-    "startSample": 6000,
-    "endSample": 42000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.0,
+    "startSample": 12000,
+    "endSample": 48000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -27
   },
   "grinder-stop": {
@@ -420,13 +420,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -27
   },
   "extraction-thin-loop": {
@@ -458,13 +458,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -28,
    "note": "fondu depuis extraction-loop selon le temps d'extraction (fenêtre idéale du game designer)"
   },
@@ -530,13 +530,13 @@
     4000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 4.25,
-    "startSample": 6000,
-    "endSample": 102000,
+    "startSeconds": 0.5,
+    "endSeconds": 4.5,
+    "startSample": 12000,
+    "endSample": 108000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -42,
    "note": "départ tiré au hasard sur chaque machine"
   },
@@ -631,13 +631,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -27
   },
   "steam-roll-loop": {
@@ -669,13 +669,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -28
   },
   "steam-sing-loop": {
@@ -707,13 +707,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -31
   },
   "steam-hot-loop": {
@@ -745,13 +745,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -29
   },
   "steam-auto-stop": {
@@ -876,13 +876,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -33
   },
   "kettle-click": {
@@ -1101,13 +1101,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -31
   },
   "tap-off": {
@@ -1295,13 +1295,13 @@
     3000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 3.25,
-    "startSample": 6000,
-    "endSample": 78000,
+    "startSeconds": 0.5,
+    "endSeconds": 3.5,
+    "startSample": 12000,
+    "endSample": 84000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -39
   },
   "dishwasher-done": {
@@ -1488,13 +1488,13 @@
     3000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 3.25,
-    "startSample": 6000,
-    "endSample": 78000,
+    "startSeconds": 0.5,
+    "endSeconds": 3.5,
+    "startSample": 12000,
+    "endSample": 84000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -48,
    "note": "2 à 4 s entre deux morceaux, passe par le traitement de l'appareil"
   },
@@ -1527,13 +1527,13 @@
     1500
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 1.75,
-    "startSample": 6000,
-    "endSample": 42000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.0,
+    "startSample": 12000,
+    "endSample": 48000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -30,
    "note": "playbackRate de 1,0 à 1,5 avec le remplissage (la résonance monte: tasse de 700 Hz à 1,8 kHz)"
   },
@@ -1566,13 +1566,13 @@
     1500
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 1.75,
-    "startSample": 6000,
-    "endSample": 42000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.0,
+    "startSample": 12000,
+    "endSample": 48000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -30,
    "note": "playbackRate de 1,0 à 1,4 avec le remplissage"
   },
@@ -3539,13 +3539,13 @@
     6000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 6.25,
-    "startSample": 6000,
-    "endSample": 150000,
+    "startSeconds": 0.5,
+    "endSeconds": 6.5,
+    "startSample": 12000,
+    "endSample": 156000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -36,
    "note": "une boucle par table d'au moins deux clients, six au plus, départ tiré, vitesse plus ou moins 5 %"
   },
@@ -3572,13 +3572,13 @@
     10000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 10.25,
-    "startSample": 6000,
-    "endSample": 246000,
+    "startSeconds": 0.5,
+    "endSeconds": 10.5,
+    "startSample": 12000,
+    "endSample": 252000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -38,
    "note": "jouée deux fois (gauche, droite), décalée de 5 s"
   },
@@ -3605,13 +3605,13 @@
     10000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 10.25,
-    "startSample": 6000,
-    "endSample": 246000,
+    "startSeconds": 0.5,
+    "endSeconds": 10.5,
+    "startSample": 12000,
+    "endSample": 252000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -35,
    "note": "jouée deux fois (gauche, droite), décalée de 5 s"
   },
@@ -3638,13 +3638,13 @@
     10000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 10.25,
-    "startSample": 6000,
-    "endSample": 246000,
+    "startSeconds": 0.5,
+    "endSeconds": 10.5,
+    "startSample": 12000,
+    "endSample": 252000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -33,
    "note": "plafond: toute la rumeur sous -28 LUFS en momentanée (son.md, 8.3.6)"
   },
@@ -3671,13 +3671,13 @@
     12000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 12.25,
-    "startSample": 6000,
-    "endSample": 294000,
+    "startSeconds": 0.5,
+    "endSeconds": 12.5,
+    "startSample": 12000,
+    "endSample": 300000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -34,
    "note": "dedans: sort de la porte et des vitrines (plan.doorFilter); dehors: doublée gauche et droite, décalée de 6 s"
   },
@@ -3704,13 +3704,13 @@
     12000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 12.25,
-    "startSample": 6000,
-    "endSample": 294000,
+    "startSeconds": 0.5,
+    "endSeconds": 12.5,
+    "startSample": 12000,
+    "endSample": 300000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -35
   },
   "ext-village-sparrows": {
@@ -3923,13 +3923,13 @@
     6000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 6.25,
-    "startSample": 6000,
-    "endSample": 150000,
+    "startSeconds": 0.5,
+    "endSeconds": 6.5,
+    "startSample": 12000,
+    "endSample": 156000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -48
   },
   "clock-tick-village": {
@@ -3961,13 +3961,13 @@
     2000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 2.25,
-    "startSample": 6000,
-    "endSample": 54000,
+    "startSeconds": 0.5,
+    "endSeconds": 2.5,
+    "startSample": 12000,
+    "endSample": 60000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -44
   },
   "clock-chime-village": {
@@ -4031,13 +4031,13 @@
     3000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 3.25,
-    "startSample": 6000,
-    "endSample": 78000,
+    "startSeconds": 0.5,
+    "endSeconds": 3.5,
+    "startSample": 12000,
+    "endSample": 84000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -44
   },
   "rain-street": {
@@ -4063,13 +4063,13 @@
     8000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 8.25,
-    "startSample": 6000,
-    "endSample": 198000,
+    "startSeconds": 0.5,
+    "endSeconds": 8.5,
+    "startSample": 12000,
+    "endSample": 204000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -32
   },
   "rain-glass": {
@@ -4101,13 +4101,13 @@
     8000
    ],
    "loop": {
-    "startSeconds": 0.25,
-    "endSeconds": 8.25,
-    "startSample": 6000,
-    "endSample": 198000,
+    "startSeconds": 0.5,
+    "endSeconds": 8.5,
+    "startSample": 12000,
+    "endSample": 204000,
     "sampleRate": 24000
    },
-   "playFromSeconds": 0.25,
+   "playFromSeconds": 0.5,
    "integratedLufs": -37
   },
   "service-open": {

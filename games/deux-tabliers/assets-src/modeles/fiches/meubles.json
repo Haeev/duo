@@ -1176,7 +1176,7 @@
    "lampe_lin",
    "lampe_lin_glow"
   ],
-  "poids_octets": 17388,
+  "poids_octets": 18908,
   "avant": [
    0,
    0,
@@ -1300,7 +1300,7 @@
   "noeuds": [
    "vaisselier_sauge"
   ],
-  "poids_octets": 54988,
+  "poids_octets": 55148,
   "avant": [
    0,
    0,
@@ -1460,11 +1460,11 @@
   "categorie": "plante",
   "accroche": "surface",
   "dimensions_m": {
-   "x": 0.25,
-   "y": 0.385,
-   "z": 0.316
+   "x": 0.201,
+   "y": 0.24,
+   "z": 0.229
   },
-  "triangles": 458,
+  "triangles": 506,
   "budget_triangles": 600,
   "dans_budget": true,
   "materiaux": [
@@ -1473,13 +1473,13 @@
   "noeuds": [
    "pothos_etagere"
   ],
-  "poids_octets": 37032,
+  "poids_octets": 44752,
   "avant": [
    0,
    0,
    1
   ],
-  "note": "tiges retombantes devant (sud): poser au bord d'une étagère"
+  "note": "feuilles qui retombent sur le devant du pot (sud), sans passer sous son pied"
  },
  "bouquet_champetre": {
   "id": "bouquet_champetre",
@@ -1503,7 +1503,7 @@
   "noeuds": [
    "bouquet_champetre"
   ],
-  "poids_octets": 45784,
+  "poids_octets": 47584,
   "avant": [
    0,
    0,
@@ -1532,7 +1532,7 @@
   "noeuds": [
    "geraniums_vitrine"
   ],
-  "poids_octets": 64940,
+  "poids_octets": 65700,
   "avant": [
    0,
    0,
@@ -1564,7 +1564,7 @@
    "cloche_gateaux",
    "cloche_gateaux_glass"
   ],
-  "poids_octets": 21656,
+  "poids_octets": 23696,
   "avant": [
    0,
    0,
@@ -1608,7 +1608,7 @@
    "bocal_biscuits",
    "bocal_biscuits_glass"
   ],
-  "poids_octets": 30396,
+  "poids_octets": 31076,
   "avant": [
    0,
    0,
@@ -1637,7 +1637,7 @@
   "noeuds": [
    "pot_pourboires_gres"
   ],
-  "poids_octets": 15292,
+  "poids_octets": 17812,
   "avant": [
    0,
    0,
@@ -1666,7 +1666,7 @@
   "noeuds": [
    "caisse_ancienne"
   ],
-  "poids_octets": 44692,
+  "poids_octets": 45576,
   "avant": [
    0,
    0,
@@ -1696,7 +1696,7 @@
   "noeuds": [
    "enseigne_bois_peint"
   ],
-  "poids_octets": 6960,
+  "poids_octets": 7040,
   "avant": [
    0,
    0,

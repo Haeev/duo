@@ -1,6 +1,6 @@
 fichier,codec,frequence,canaux,duree_s,sonie_m_max_lufs,sonie_integree_lufs,crete_vraie_dbtp,echantillons_ecretes,silence_tete_ms,taille_ko,raccord
 adresses/village/clock-chime-village.ogg,vorbis,32000,1,2.525,-26.0,-27.2,-10.3,0,0.0,10.5,
-adresses/village/clock-tick-village.ogg,vorbis,24000,1,2.5,-46.7,-47.0,-20.4,0,737.38,4.2,"saut au centile 0.0, seconde différence au centile 0.0, continuation 0.0000"
+adresses/village/clock-tick-village.ogg,vorbis,24000,1,3.0,-47.0,-47.1,-19.5,0,0.0,4.6,"saut au centile 0.0, seconde différence au centile 0.0, continuation 0.0000"
 adresses/village/door-bell-village-1.ogg,vorbis,32000,1,0.964,-23.0,-26.9,-12.5,0,0.0,5.9,
 adresses/village/door-bell-village-2.ogg,vorbis,32000,1,1.487,-23.0,-26.2,-13.0,0,0.0,6.9,
 adresses/village/door-bell-village-3.ogg,vorbis,32000,1,1.439,-23.0,-29.4,-11.3,0,0.0,7.4,
@@ -15,13 +15,13 @@ adresses/village/ext-village-blackbird-1.ogg,vorbis,32000,1,1.552,-36.2,-40.5,-3
 adresses/village/ext-village-blackbird-2.ogg,vorbis,32000,1,1.73,-36.2,-39.0,-31.1,0,0.56,6.2,
 adresses/village/ext-village-church-bell.ogg,vorbis,32000,1,2.164,-33.0,-38.5,-20.1,0,0.0,6.5,
 adresses/village/ext-village-coach.ogg,vorbis,24000,1,5.943,-35.9,-38.5,-27.3,0,0.62,22.7,
-adresses/village/ext-village-evening.ogg,vorbis,24000,1,12.5,-36.5,-37.5,-24.7,0,0.0,47.6,"saut au centile 87.0, seconde différence au centile 99.2, continuation 0.0176"
+adresses/village/ext-village-evening.ogg,vorbis,24000,1,13.0,-36.6,-37.6,-24.7,0,0.0,53.1,"saut au centile 65.3, seconde différence au centile 98.4, continuation 0.0177"
 adresses/village/ext-village-moped.ogg,vorbis,24000,1,3.979,-36.9,-37.8,-27.7,0,0.54,17.9,
-adresses/village/ext-village-morning.ogg,vorbis,24000,1,12.5,-35.1,-36.5,-23.5,0,0.0,48.0,"saut au centile 74.0, seconde différence au centile 95.1, continuation 0.0217"
+adresses/village/ext-village-morning.ogg,vorbis,24000,1,13.0,-35.2,-36.6,-23.8,0,0.0,53.5,"saut au centile 77.8, seconde différence au centile 98.9, continuation 0.0176"
 adresses/village/ext-village-sparrows-1.ogg,vorbis,32000,1,1.66,-35.2,-37.1,-22.6,0,0.41,5.1,
 adresses/village/ext-village-sparrows-2.ogg,vorbis,32000,1,1.693,-35.8,-38.6,-23.9,0,0.0,5.2,
 adresses/village/ext-village-sparrows-3.ogg,vorbis,32000,1,1.818,-35.2,-37.8,-24.8,0,0.31,5.7,
-adresses/village/room-village.ogg,vorbis,24000,1,6.5,-49.7,-51.0,-37.4,0,0.0,31.0,"saut au centile 29.5, seconde différence au centile 25.0, continuation 0.0020"
+adresses/village/room-village.ogg,vorbis,24000,1,7.0,-49.7,-51.0,-37.5,0,0.0,36.2,"saut au centile 80.6, seconde différence au centile 92.7, continuation 0.0016"
 airs/event-fanfare.ogg,vorbis,32000,2,5.56,-19.0,-20.4,-10.1,0,0.0,77.8,
 airs/service-close.ogg,vorbis,32000,2,2.332,-20.0,-22.5,-8.1,0,0.0,21.2,
 airs/service-open.ogg,vorbis,32000,2,2.081,-19.0,-21.8,-8.7,0,0.0,19.0,
@@ -120,17 +120,17 @@ base/reserve/carton-set-2.ogg,vorbis,24000,1,0.251,-27.7,-29.9,-9.2,0,0.0,4.9,
 base/reserve/carton-set-3.ogg,vorbis,24000,1,0.227,-27.7,-29.9,-10.3,0,0.0,4.9,
 base/reserve/crate-set-1.ogg,vorbis,24000,1,0.144,-27.9,-27.9,-7.4,0,0.0,3.8,
 base/reserve/crate-set-2.ogg,vorbis,24000,1,0.111,-27.9,-27.9,-5.9,0,0.0,3.8,
-base/reserve/fridge-hum-loop.ogg,vorbis,24000,1,3.5,-46.6,-47.0,-33.2,0,0.0,19.2,"saut au centile 91.2, seconde différence au centile 99.9, continuation 0.0031"
+base/reserve/fridge-hum-loop.ogg,vorbis,24000,1,4.0,-46.7,-47.1,-33.3,0,0.0,23.4,"saut au centile 86.4, seconde différence au centile 99.8, continuation 0.0030"
 base/reserve/shelf-place-1.ogg,vorbis,24000,1,0.144,-31.0,-31.0,-6.1,0,0.0,4.2,
 base/reserve/shelf-place-2.ogg,vorbis,24000,1,0.112,-31.0,-31.0,-7.3,0,0.0,3.7,
 base/reserve/shelf-place-3.ogg,vorbis,24000,1,0.144,-31.1,-31.1,-5.4,0,0.0,4.5,
-base/salle/murmur-room-busy.ogg,vorbis,24000,1,10.5,-35.1,-37.8,-22.3,0,0.0,52.0,"saut au centile 97.2, seconde différence au centile 97.1, continuation 0.0117"
-base/salle/murmur-room-calm.ogg,vorbis,24000,1,10.5,-37.3,-40.9,-22.9,0,0.0,51.4,"saut au centile 96.0, seconde différence au centile 77.7, continuation 0.0067"
-base/salle/murmur-room-rush.ogg,vorbis,24000,1,10.5,-34.5,-35.9,-21.8,0,0.0,52.1,"saut au centile 60.5, seconde différence au centile 64.5, continuation 0.0122"
-base/salle/murmur-table-1.ogg,vorbis,24000,1,6.5,-35.0,-39.1,-22.9,0,0.0,33.1,"saut au centile 92.0, seconde différence au centile 12.5, continuation 0.0063"
-base/salle/murmur-table-2.ogg,vorbis,24000,1,6.5,-35.2,-39.0,-20.4,0,0.0,33.1,"saut au centile 40.0, seconde différence au centile 67.3, continuation 0.0075"
-base/salle/murmur-table-3.ogg,vorbis,24000,1,6.5,-32.9,-39.0,-20.0,0,0.0,33.1,"saut au centile 37.6, seconde différence au centile 59.8, continuation 0.0070"
-base/salle/murmur-table-4.ogg,vorbis,24000,1,6.5,-33.9,-39.1,-21.6,0,0.0,33.2,"saut au centile 62.3, seconde différence au centile 56.0, continuation 0.0083"
+base/salle/murmur-room-busy.ogg,vorbis,24000,1,11.0,-35.5,-37.8,-22.9,0,0.0,59.5,"saut au centile 42.7, seconde différence au centile 93.8, continuation 0.0088"
+base/salle/murmur-room-calm.ogg,vorbis,24000,1,11.0,-37.6,-41.0,-23.6,0,0.0,59.1,"saut au centile 70.6, seconde différence au centile 41.1, continuation 0.0068"
+base/salle/murmur-room-rush.ogg,vorbis,24000,1,11.0,-34.6,-36.0,-21.6,0,0.0,59.8,"saut au centile 58.6, seconde différence au centile 88.5, continuation 0.0106"
+base/salle/murmur-table-1.ogg,vorbis,24000,1,7.0,-35.3,-39.1,-22.9,0,0.0,38.9,"saut au centile 46.3, seconde différence au centile 92.0, continuation 0.0054"
+base/salle/murmur-table-2.ogg,vorbis,24000,1,7.0,-35.8,-39.0,-20.4,0,0.0,39.0,"saut au centile 39.1, seconde différence au centile 98.4, continuation 0.0063"
+base/salle/murmur-table-3.ogg,vorbis,24000,1,7.0,-33.0,-39.4,-20.4,0,0.0,38.9,"saut au centile 95.8, seconde différence au centile 99.7, continuation 0.0070"
+base/salle/murmur-table-4.ogg,vorbis,24000,1,7.0,-34.3,-39.3,-22.0,0,0.0,38.9,"saut au centile 69.7, seconde différence au centile 47.6, continuation 0.0069"
 base/service/clear-table-1.ogg,vorbis,24000,1,0.404,-28.0,-29.6,-13.0,0,0.0,4.7,
 base/service/clear-table-2.ogg,vorbis,24000,1,0.524,-28.0,-30.5,-10.8,0,0.0,4.9,
 base/service/clear-table-3.ogg,vorbis,24000,1,0.432,-27.9,-29.9,-11.9,0,0.0,4.7,
@@ -145,8 +145,8 @@ base/service/plate-set-1.ogg,vorbis,32000,1,0.154,-28.0,-28.0,-6.8,0,0.0,3.8,
 base/service/plate-set-2.ogg,vorbis,32000,1,0.144,-28.1,-28.1,-5.5,0,0.0,3.8,
 base/service/pour-end-1.ogg,vorbis,24000,1,0.181,-32.9,-34.4,-15.1,0,0.0,3.8,
 base/service/pour-end-2.ogg,vorbis,24000,1,0.311,-33.0,-36.0,-15.0,0,0.0,4.0,
-base/service/pour-thick-loop.ogg,vorbis,24000,1,2.0,-32.5,-33.1,-18.9,0,0.0,9.9,"saut au centile 73.0, seconde différence au centile 99.7, continuation 0.0291"
-base/service/pour-thin-loop.ogg,vorbis,24000,1,2.0,-32.0,-32.9,-19.5,0,0.0,9.9,"saut au centile 70.0, seconde différence au centile 96.1, continuation 0.0252"
+base/service/pour-thick-loop.ogg,vorbis,24000,1,2.5,-32.3,-33.0,-19.4,0,0.0,12.1,"saut au centile 40.3, seconde différence au centile 68.7, continuation 0.0189"
+base/service/pour-thin-loop.ogg,vorbis,24000,1,2.5,-32.2,-32.9,-19.3,0,0.04,12.0,"saut au centile 14.7, seconde différence au centile 48.7, continuation 0.0246"
 base/service/spoon-set-1.ogg,vorbis,32000,1,0.155,-31.2,-31.2,-10.7,0,0.0,4.1,
 base/service/spoon-set-2.ogg,vorbis,32000,1,0.154,-31.2,-31.2,-10.3,0,0.0,4.0,
 base/service/spoon-stir-1.ogg,vorbis,32000,1,0.945,-32.0,-34.4,-16.0,0,0.38,10.3,
@@ -160,8 +160,8 @@ matin/delivery-knock-1.ogg,vorbis,24000,1,0.514,-24.0,-25.3,-3.8,0,0.0,4.5,
 matin/delivery-knock-2.ogg,vorbis,24000,1,0.421,-23.9,-26.0,-1.7,0,0.0,4.4,
 matin/milk-crate.ogg,vorbis,32000,1,0.527,-27.0,-30.3,-10.7,0,0.0,5.5,
 moments/marche/market-bell.ogg,vorbis,32000,1,2.6,-31.0,-33.6,-19.1,0,0.0,11.3,
-moments/pluie/rain-glass.ogg,vorbis,24000,1,8.5,-39.4,-39.9,-26.5,0,0.0,42.8,"saut au centile 36.0, seconde différence au centile 53.9, continuation 0.0000"
-moments/pluie/rain-street.ogg,vorbis,24000,1,8.5,-33.1,-34.1,-21.8,0,0.0,47.0,"saut au centile 16.4, seconde différence au centile 78.3, continuation 0.0000"
+moments/pluie/rain-glass.ogg,vorbis,24000,1,9.0,-39.4,-39.9,-26.6,0,0.0,49.4,"saut au centile 37.2, seconde différence au centile 5.1, continuation 0.0000"
+moments/pluie/rain-street.ogg,vorbis,24000,1,9.0,-33.3,-34.3,-22.6,0,0.0,54.7,"saut au centile 41.2, seconde différence au centile 84.2, continuation 0.0000"
 musique/ecrans/evening-summary.ogg,opus,48000,2,16.131,-12.2,-16.0,-2.8,0,0.0,81.2,
 musique/ecrans/title.ogg,opus,48000,2,60.91,-12.9,-16.0,-1.5,0,0.0,305.3,
 musique/radio/bistrot-1.ogg,opus,48000,2,154.281,-12.5,-16.0,-4.8,0,0.0,772.6,
@@ -171,14 +171,14 @@ musique/radio/campagne-3.ogg,opus,48000,2,134.411,-13.0,-16.0,-4.8,0,0.0,673.2,
 postes/espresso/doser-clack-1.ogg,vorbis,24000,1,0.099,-26.9,-26.9,-3.6,0,0.0,4.1,
 postes/espresso/doser-clack-2.ogg,vorbis,24000,1,0.099,-26.9,-26.9,-4.2,0,0.0,4.1,
 postes/espresso/doser-clack-3.ogg,vorbis,24000,1,0.099,-27.0,-27.0,-3.4,0,0.0,4.1,
-postes/espresso/espresso-idle-loop.ogg,vorbis,24000,1,4.5,-42.8,-45.1,-31.3,0,0.0,23.9,"saut au centile 84.2, seconde différence au centile 78.5, continuation 0.0041"
+postes/espresso/espresso-idle-loop.ogg,vorbis,24000,1,5.0,-42.9,-45.2,-30.9,0,0.0,28.6,"saut au centile 8.9, seconde différence au centile 86.8, continuation 0.0044"
 postes/espresso/espresso-warmup.ogg,vorbis,24000,1,5.996,-32.6,-35.8,-18.0,0,0.0,31.1,
-postes/espresso/extraction-loop.ogg,vorbis,24000,1,2.5,-29.1,-30.0,-17.4,0,0.0,15.6,"saut au centile 97.4, seconde différence au centile 69.4, continuation 0.0374"
+postes/espresso/extraction-loop.ogg,vorbis,24000,1,3.0,-29.1,-30.0,-17.6,0,0.0,19.5,"saut au centile 92.8, seconde différence au centile 75.4, continuation 0.0312"
 postes/espresso/extraction-stop-1.ogg,vorbis,24000,1,0.708,-25.4,-27.8,-13.9,0,0.0,7.1,
 postes/espresso/extraction-stop-2.ogg,vorbis,24000,1,0.708,-25.4,-27.9,-12.6,0,0.0,7.1,
-postes/espresso/extraction-thin-loop.ogg,vorbis,24000,1,2.5,-29.4,-30.8,-14.6,0,0.0,20.8,"saut au centile 55.5, seconde différence au centile 77.4, continuation 0.0204"
-postes/espresso/grinder-empty-loop.ogg,vorbis,24000,1,2.0,-29.9,-30.3,-19.7,0,0.0,13.7,"saut au centile 99.8, seconde différence au centile 98.0, continuation 0.0139"
-postes/espresso/grinder-loop.ogg,vorbis,24000,1,2.0,-27.7,-28.1,-14.3,0,0.0,14.8,"saut au centile 27.1, seconde différence au centile 66.2, continuation 0.0375"
+postes/espresso/extraction-thin-loop.ogg,vorbis,24000,1,3.0,-29.8,-30.9,-14.7,0,0.0,27.2,"saut au centile 1.4, seconde différence au centile 55.9, continuation 0.0209"
+postes/espresso/grinder-empty-loop.ogg,vorbis,24000,1,2.5,-29.9,-30.2,-19.5,0,0.0,17.6,"saut au centile 99.9, seconde différence au centile 96.4, continuation 0.0147"
+postes/espresso/grinder-loop.ogg,vorbis,24000,1,2.5,-27.7,-28.1,-14.1,0,0.0,19.1,"saut au centile 41.7, seconde différence au centile 61.8, continuation 0.0350"
 postes/espresso/grinder-start-1.ogg,vorbis,24000,1,0.411,-27.0,-28.3,-16.8,0,0.0,5.3,
 postes/espresso/grinder-start-2.ogg,vorbis,24000,1,0.411,-27.0,-28.3,-15.1,0,0.0,5.3,
 postes/espresso/grinder-stop-1.ogg,vorbis,24000,1,0.613,-27.9,-31.6,-15.9,0,0.0,5.9,
@@ -197,14 +197,14 @@ postes/espresso/tamp-3.ogg,vorbis,24000,1,0.325,-27.8,-30.4,-6.0,0,0.0,4.9,
 postes/lait/milk-pour.ogg,vorbis,24000,1,1.195,-30.7,-31.9,-16.8,0,0.46,9.5,
 postes/lait/pitcher-set-1.ogg,vorbis,32000,1,0.131,-29.1,-29.1,-5.4,0,0.0,3.8,
 postes/lait/pitcher-set-2.ogg,vorbis,32000,1,0.129,-29.1,-29.1,-5.0,0,0.0,3.8,
-postes/lait/steam-aerate-loop.ogg,vorbis,24000,1,2.5,-29.1,-29.5,-18.7,0,0.0,16.0,"saut au centile 90.8, seconde différence au centile 96.3, continuation 0.0577"
+postes/lait/steam-aerate-loop.ogg,vorbis,24000,1,3.0,-29.1,-29.6,-18.2,0,0.0,20.3,"saut au centile 25.4, seconde différence au centile 75.4, continuation 0.0419"
 postes/lait/steam-auto-stop.ogg,vorbis,24000,1,0.272,-27.8,-29.0,-5.0,0,0.0,4.7,
-postes/lait/steam-hot-loop.ogg,vorbis,24000,1,2.5,-30.3,-31.4,-17.8,0,0.0,11.8,"saut au centile 34.6, seconde différence au centile 45.4, continuation 0.0383"
+postes/lait/steam-hot-loop.ogg,vorbis,24000,1,3.0,-30.8,-31.5,-18.0,0,0.0,14.2,"saut au centile 46.9, seconde différence au centile 55.5, continuation 0.0339"
 postes/lait/steam-purge-1.ogg,vorbis,24000,1,0.816,-27.0,-29.3,-17.2,0,0.0,7.5,
 postes/lait/steam-purge-2.ogg,vorbis,24000,1,0.816,-27.0,-29.3,-16.9,0,0.0,7.5,
-postes/lait/steam-roll-loop.ogg,vorbis,24000,1,2.5,-30.4,-31.0,-18.1,0,0.0,10.3,"saut au centile 71.9, seconde différence au centile 100.0, continuation 0.0374"
-postes/lait/steam-sing-loop.ogg,vorbis,24000,1,2.5,-33.4,-33.9,-21.8,0,0.0,10.1,"saut au centile 99.9, seconde différence au centile 100.0, continuation 0.0244"
-postes/musique/radio-hiss-loop.ogg,vorbis,24000,1,3.5,-49.4,-50.4,-38.2,0,0.04,14.4,"saut au centile 49.5, seconde différence au centile 26.3, continuation 0.0055"
+postes/lait/steam-roll-loop.ogg,vorbis,24000,1,3.0,-30.4,-31.0,-18.5,0,0.0,12.2,"saut au centile 83.6, seconde différence au centile 98.1, continuation 0.0293"
+postes/lait/steam-sing-loop.ogg,vorbis,24000,1,3.0,-33.4,-33.9,-21.8,0,0.0,11.8,"saut au centile 33.7, seconde différence au centile 99.4, continuation 0.0184"
+postes/musique/radio-hiss-loop.ogg,vorbis,24000,1,4.0,-49.6,-50.4,-38.1,0,0.0,16.9,"saut au centile 83.6, seconde différence au centile 86.4, continuation 0.0042"
 postes/musique/radio-knob-1.ogg,vorbis,24000,1,0.029,-35.0,-35.0,-7.9,0,0.0,3.6,
 postes/musique/radio-knob-2.ogg,vorbis,24000,1,0.029,-34.8,-34.8,-7.8,0,0.0,3.6,
 postes/musique/radio-off.ogg,vorbis,24000,1,0.155,-29.8,-29.8,-3.7,0,0.0,4.2,
@@ -224,15 +224,15 @@ postes/plonge/dish-wash-1.ogg,vorbis,24000,1,0.805,-31.9,-33.8,-15.1,0,0.0,6.8,
 postes/plonge/dish-wash-2.ogg,vorbis,24000,1,0.772,-31.8,-33.9,-18.4,0,0.0,6.8,
 postes/plonge/dishwasher-close.ogg,vorbis,24000,1,0.784,-26.9,-29.3,-8.0,0,0.0,7.2,
 postes/plonge/dishwasher-done.ogg,vorbis,24000,1,1.03,-26.9,-28.8,-5.6,0,0.0,8.1,
-postes/plonge/dishwasher-loop.ogg,vorbis,24000,1,3.5,-40.3,-42.0,-28.5,0,0.0,18.9,"saut au centile 99.1, seconde différence au centile 99.9, continuation 0.0074"
+postes/plonge/dishwasher-loop.ogg,vorbis,24000,1,4.0,-40.3,-42.1,-27.7,0,0.0,23.0,"saut au centile 62.3, seconde différence au centile 23.7, continuation 0.0057"
 postes/plonge/dishwasher-open.ogg,vorbis,24000,1,0.56,-27.9,-28.9,-5.6,0,0.0,5.8,
-postes/plonge/tap-loop.ogg,vorbis,24000,1,2.5,-33.2,-33.9,-20.7,0,0.0,11.6,"saut au centile 71.2, seconde différence au centile 75.6, continuation 0.0179"
+postes/plonge/tap-loop.ogg,vorbis,24000,1,3.0,-33.2,-33.9,-20.3,0,0.0,14.1,"saut au centile 74.0, seconde différence au centile 96.0, continuation 0.0182"
 postes/plonge/tap-off.ogg,vorbis,24000,1,0.24,-30.8,-33.0,-13.7,0,0.0,4.7,
 postes/plonge/tap-on.ogg,vorbis,24000,1,0.281,-30.8,-31.9,-12.9,0,0.0,5.3,
 postes/the/kettle-click-1.ogg,vorbis,24000,1,0.069,-28.0,-28.0,-1.5,0,0.0,3.7,
 postes/the/kettle-click-2.ogg,vorbis,24000,1,0.047,-27.8,-27.8,-2.6,0,0.0,3.7,
-postes/the/kettle-loop.ogg,vorbis,24000,1,2.5,-35.3,-36.1,-22.4,0,0.0,15.3,"saut au centile 47.6, seconde différence au centile 51.7, continuation 0.0097"
-design/son/deux-tabliers/ecoute.m4a,aac,48000,2,628.395,-18.9,-29.1,-1.5,0,0.0,4691.8,
+postes/the/kettle-loop.ogg,vorbis,24000,1,3.0,-35.3,-36.0,-22.0,0,0.0,19.1,"saut au centile 97.1, seconde différence au centile 98.4, continuation 0.0099"
+design/son/deux-tabliers/ecoute.m4a,aac,48000,2,628.395,-18.9,-29.1,-1.5,0,0.0,4691.3,
 design/son/deux-tabliers/musiques/bistrot-1.m4a,aac,48000,2,154.283,-14.6,-18.1,-7.2,0,0.0,2473.2,
 design/son/deux-tabliers/musiques/bistrot-4.m4a,aac,48000,2,147.349,-14.5,-18.0,-6.0,0,0.0,2359.8,
 design/son/deux-tabliers/musiques/campagne-1.m4a,aac,48000,2,155.392,-14.5,-18.1,-7.1,0,0.04,2485.4,

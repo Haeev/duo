@@ -90,7 +90,9 @@ def construire_scene():
     meshy_chair = MI.disponible(args.meshy, "furn_chair_campagne", V) if V == "B" else None
     for (x, y, d) in places:
         if meshy_chair:
-            MI.poser(meshy_chair, chairs, x + 0.225, y + 0.225, {"N": 0, "E": 90, "S": 180, "W": 270}[d])
+            # `d` est le côté du dossier; poser() attend le cap du regard (le modèle regarde le sud au repos):
+            # dossier à l'ouest = regard vers l'est (corrigé le 2026-11-07, les chaises tournaient le dos aux tables)
+            MI.poser(meshy_chair, chairs, x + 0.225, y + 0.225, {"N": 180, "E": 270, "S": 0, "W": 90}[d])
         else:
             S.chaise(chairs, x, y, d)
 

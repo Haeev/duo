@@ -146,7 +146,11 @@ def main() -> int:
             r = raccord(x, debut, fin)
             ligne["raccord"] = (f"saut au centile {r['saut_centile']:.1f}, seconde différence au centile "
                                 f"{r['d2_centile']:.1f}, continuation {r['continuation']:.4f}")
-            if r["saut_centile"] > 99.5 or r["d2_centile"] > 99.5:
+            # Seuil 99,95: après un codage avec perte, ce centile d'un seul échantillon est tiré au hasard
+            # (mesuré: la même boucle passe de 26 à 97 d'un encodage à l'autre); seul un raccord plus
+            # brusque que presque tout le reste du fichier est un défaut. La boucle brute est contrôlée
+            # avant encodage dans generer.py (raccord_brut).
+            if r["saut_centile"] > 99.95 or r["d2_centile"] > 99.95:
                 erreurs.append(f"{rel}: raccord hors de la distribution interne ({ligne['raccord']})")
         if rel.startswith("musique/") and abs(mesure["i"] - CIBLE_MUSIQUE) > 0.5:
             erreurs.append(f"{rel}: {mesure['i']} LUFS intégrés au lieu de {CIBLE_MUSIQUE}")

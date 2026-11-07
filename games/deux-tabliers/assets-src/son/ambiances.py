@@ -60,6 +60,8 @@ def _table(rng: np.random.Generator, duree: float, rythme: float = 4.5, tasses: 
         y += voix[k % 2] * env * (1.0 if k % 2 == 0 else 0.8)
         t += d + rng.uniform(-0.2, 0.4)
         k += 1
+    # Un fond de la même table, jamais tout à fait muet entre deux phrases.
+    y += (voix[0] + voix[1]) * 0.07
     for _ in range(tasses):
         dsp.poser(y, tb.porcelaine(rng, rng.uniform(1400, 1900), 0.3, 0.2, mat=0.3) * 0.05, rng.uniform(0, duree),
                   circulaire=True)

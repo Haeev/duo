@@ -1,0 +1,125 @@
+{
+ "shell_village": {
+  "id": "shell_village",
+  "fichier": "shell_village.glb",
+  "poids_octets": 654192,
+  "triangles": {
+   "shell_village": 4634,
+   "shell_village_glass": 10,
+   "shell_village_glow": 424,
+   "shell_village_street": 2559,
+   "shell_village_fond_ferme": 312
+  },
+  "materiaux": [
+   "dt_lampe",
+   "dt_verre",
+   "shell_atlas",
+   "shell_backbar_tiles",
+   "shell_beams",
+   "shell_ceiling",
+   "shell_floor",
+   "shell_wall_paint",
+   "shell_walnut",
+   "street_atlas",
+   "street_paving",
+   "street_stone"
+  ]
+ },
+ "shell_village_ext_fond": {
+  "id": "shell_village_ext_fond",
+  "fichier": "shell_village_ext_fond.glb",
+  "poids_octets": 100884,
+  "triangles": {
+   "shell_village_ext_fond": 1094
+  },
+  "materiaux": [
+   "shell_atlas",
+   "shell_beams",
+   "shell_ceiling",
+   "shell_floor_fond",
+   "shell_wall_paint",
+   "street_atlas",
+   "street_paving",
+   "street_stone"
+  ]
+ },
+ "cuisson": {
+  "lightmap_scale": 2.7633845806121826,
+  "bake_spp": 64,
+  "bake_res": 2048,
+  "soleil": {
+   "azimut_deg": 205.0,
+   "hauteur_deg": 16.0
+  },
+  "lampes": [
+   [
+    9.15,
+    8.72,
+    2.16
+   ],
+   [
+    10.6,
+    8.85,
+    2.16
+   ],
+   [
+    5.25,
+    3.8,
+    0.35
+   ],
+   [
+    6.0,
+    5.1,
+    2.3
+   ]
+  ]
+ },
+ "variantes": {
+  "sols": {
+   "sol_plancher": {
+    "fichier": "textures/sol_plancher.jpg",
+    "nom": "Plancher de chêne (à l'arrivée)"
+   },
+   "sol_tomettes": {
+    "fichier": "textures/sol_tomettes.jpg"
+   },
+   "sol_carreaux_ciment": {
+    "fichier": "textures/sol_carreaux_ciment.jpg"
+   },
+   "sol_damier": {
+    "fichier": "textures/sol_damier.jpg"
+   }
+  },
+  "murs": {
+   "peinture_chaux": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#D5C4A5",
+    "nom": "Chaux (à l'arrivée)"
+   },
+   "peinture_lin": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#D4C7AE"
+   },
+   "peinture_vert_eau": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#A9BDB1"
+   },
+   "peinture_lie_de_vin": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#6E3A40"
+   },
+   "papier_fleurs_champs": {
+    "fichier": "textures/papier_fleurs_champs.jpg",
+    "teinte": "#FFFFFF"
+   },
+   "papier_feuillage": {
+    "fichier": "textures/papier_feuillage.jpg",
+    "teinte": "#FFFFFF"
+   },
+   "papier_rayures_creme": {
+    "fichier": "textures/papier_rayures_creme.jpg",
+    "teinte": "#FFFFFF"
+   }
+  }
+ }
+}

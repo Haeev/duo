@@ -243,7 +243,7 @@ def _img(name):
     return bpy.data.images.load(p, check_existing=True)
 
 
-def mat_for(key):
+def mat_for(key, rue=False):
     if key in ("glass", "glass_ext"):
         return K.mat_verre()
     if key in ("glow", "emit"):
@@ -277,17 +277,18 @@ def mat_for(key):
         m["lightmapped"] = True
         _mats[name] = m
         return m
-    if "shell_atlas" in _mats:
-        return _mats["shell_atlas"]
+    nom = "street_atlas" if rue else "shell_atlas"
+    if nom in _mats:
+        return _mats[nom]
     m = K.mat_meubles().copy()
-    m.name = "shell_atlas"
+    m.name = nom
     # pas d'occlusion de sommets sur la coque: la carte de lumière la porte
     nt = m.node_tree
     for n in list(nt.nodes):
         if n.type == "VERTEX_COLOR":
             nt.nodes.remove(n)
     m["lightmapped"] = True
-    _mats["shell_atlas"] = m
+    _mats[nom] = m
     return m
 
 
@@ -310,6 +311,11 @@ def salle():
     S.mur_x(Y0, YR0, [(ARCH[0], ARCH[1], 0, ARCH[2]), (10.0, 10.9, 0, 2.1)], g, face="s")
     # façade: vitrines (allège 0,45), porte vitrée, petite fenêtre (allège 0,90)
     S.mur_x(12.5, 13.0, [(4.4, 6.4, 0.45, 2.4), (6.5, 8.5, 0.45, 2.4), (8.8, 10.0, 0.0, 2.1), (10.2, 10.8, 0.9, 2.4)], g, face="n", x_a=3.6, x_b=11.5, ext=True)
+    # la face extérieure de la façade (y = 13,0) est en pierre: les peintures du catalogue ne la touchent pas
+    for f in g.bm.faces:
+        c = f.calc_center_median()
+        if f.normal.y < -0.9 and abs(-c.y - 13.0) < 0.01:
+            f.material_index = g.mi("stone_big")
     # plinthes de chêne
     for (a, b) in ((4.0, 5.7), (ARCH[1], 7.0)):
         g.box(a, b, Y0, Y0 + 0.015, 0, 0.1, "beam", bevel=0.004, drop=("bottom", "n"))
@@ -335,17 +341,18 @@ def fond_ferme():
     """Pan du refend qui ferme la pièce du fond à l'arrivée: mur plein et porte de chêne fermée (porte door-4 du plan)."""
     g = Geo("shell_village_fond_ferme")
     a, b, hh = ARCH
-    g.box(a, 5.95, YR0, Y0, 0, hh, "lime", bevel=0, drop=("bottom", "top"))
-    g.box(6.85, b, YR0, Y0, 0, hh, "lime", bevel=0, drop=("bottom", "top"))
-    g.box(5.95, 6.85, YR0, Y0, 2.1, hh, "lime", bevel=0, drop=("top",))
-    g.box(5.95, 6.85, 6.86, 6.94, 0, 2.1, "beam", bevel=0.008, drop=("bottom",))
+    yp = Y0 - 0.12  # cloison de 12 cm au nu du refend côté salle: les tableaux de l'arche restent éclairés depuis le fond
+    g.box(a, 5.95, yp, Y0, 0, hh, "lime", bevel=0, drop=("bottom", "top"))
+    g.box(6.85, b, yp, Y0, 0, hh, "lime", bevel=0, drop=("bottom", "top"))
+    g.box(5.95, 6.85, yp, Y0, 2.1, hh, "lime", bevel=0, drop=("top",))
+    # vantail de chêne en feuillure, 5 cm en retrait du nu du mur côté salle, panneaux moulurés côté salle
+    g.box(5.95, 6.85, 7.0, 7.05, 0, 2.1, "beam", bevel=0.008, drop=("bottom",))
     for (z0, z1) in ((0.15, 0.95), (1.1, 1.95)):
-        g.box(6.05, 6.75, 6.94, 6.955, z0, z1, "beam", bevel=0.005)
+        g.box(6.05, 6.75, 7.05, 7.065, z0, z1, "beam", bevel=0.005)
     g.box(5.88, 5.95, Y0, Y0 + 0.02, 0, 2.17, "frame", bevel=0.006, drop=("bottom",))
     g.box(6.85, 6.92, Y0, Y0 + 0.02, 0, 2.17, "frame", bevel=0.006, drop=("bottom",))
     g.box(5.88, 6.92, Y0, Y0 + 0.02, 2.1, 2.17, "frame", bevel=0.006)
     g.cyl(6.75, 7.14, 0.98, 1.02, 0.025, 8, "brass")
-    g.box(5.95, 6.85, 6.955, Y0, 0, 2.1, "beam", bevel=0, drop=("bottom", "n"))
     return g
 
 
@@ -392,7 +399,7 @@ def cour():
     g.cyl(3.2, 1.2, -0.02, 2.4, 0.15, 7, "bark", r_top=0.1)
     for (dx, dy, dz, r) in ((0, 0, 3.4, 1.1), (0.7, 0.3, 3.0, 0.8), (-0.6, -0.2, 3.1, 0.8)):
         g.sphere(3.2 + dx, 1.2 + dy, dz, r, r, r * 0.85, "tree" if r > 1 else "tree_light", segs=10, rings=6)
-    g.box(6.4, 8.2, 0.3, 1.0, -0.02, 1.1, "steel_dark", bevel=0.02)
+    g.box(6.4, 8.2, 0.3, 1.0, -0.02, 1.1, "village_shutter", bevel=0.02)
     return g
 
 
@@ -431,7 +438,8 @@ def main():
     objs = {}
     for name, g in geos.items():
         remap_keys(g)
-        ob = K.finir(g, seed=7, tiled=TILED, matfn=mat_for)
+        rue = name in ("rue", "tilleul", "cour")
+        ob = K.finir(g, seed=7, tiled=TILED, matfn=(lambda k, r=rue: mat_for(k, r)))
         objs[name] = ob
     print(f"géométrie: {time.time() - t0:.0f} s")
     baked = [o for n, o in objs.items() if n not in ("vitrages", "glow")]

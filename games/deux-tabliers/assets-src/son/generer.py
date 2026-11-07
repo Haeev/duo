@@ -90,6 +90,19 @@ def souffle_de_raccord(x: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     return x + (souffle if x.ndim == 1 else souffle[:, None])
 
 
+def raccord_brut(ident: str, x: np.ndarray) -> None:
+    """La boucle synthétisée, avant tout codage, doit se raccorder comme n'importe quel autre point:
+    saut et seconde différence au raccord sous le centile 99,5 de la boucle (bloquant)."""
+    y = dsp.stereo(x)
+    sauts = np.abs(np.diff(y, axis=0)).max(axis=1)
+    d2 = np.abs(y[2:] - 2 * y[1:-1] + y[:-2]).max(axis=1)
+    saut = np.abs(y[0] - y[-1]).max()
+    d2_r = max(np.abs(y[0] - 2 * y[-1] + y[-2]).max(), np.abs(y[1] - 2 * y[0] + y[-1]).max())
+    c1, c2 = 100 * np.mean(sauts < saut), 100 * np.mean(d2 < d2_r)
+    if c1 > 99.5 or c2 > 99.5:
+        raise SystemExit(f"{ident}: raccord de la boucle brute aux centiles {c1:.1f} et {c2:.1f}")
+
+
 def traiter(son: Son, v: int) -> np.ndarray:
     rng = np.random.default_rng(graine(f"{son.id}/{v}"))
     x = son.fabrique(v, rng)
@@ -99,6 +112,7 @@ def traiter(son: Son, v: int) -> np.ndarray:
             x = dsp.circ(lambda y: dsp.ph(y, son.passe_haut, 2), x)
         x = souffle_de_raccord(x, rng)
         x = dsp.amener_integree(x, son.sonie, circulaire=True)
+        raccord_brut(son.id, x)
         tp = dsp.crete_vraie_db(np.concatenate([x, x[:4800]]))
         if tp > PLAFOND_DBTP:
             x = dsp.limiter_circulaire(x, PLAFOND_DBTP)

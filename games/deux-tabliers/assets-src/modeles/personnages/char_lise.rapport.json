@@ -1,0 +1,108 @@
+{
+  "asset": "char_lise",
+  "triangles": 3756,
+  "triangle_budget": 4200,
+  "within_budget": true,
+  "bones": 24,
+  "bone_names": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+  ],
+  "root_bone": "Hips",
+  "height_before_m": 1.7,
+  "scale_applied": 1.0,
+  "clips": {
+    "walk": {
+      "seconds": 1.033,
+      "frames": [
+        0.8000000715255737,
+        25.599998474121094
+      ],
+      "root_move_m": [
+        -0.0,
+        -0.001,
+        -0.002
+      ]
+    },
+    "idle": {
+      "seconds": 4.0,
+      "frames": [
+        0.0,
+        96.0
+      ],
+      "root_move_m": [
+        -0.0,
+        0.0,
+        -0.0
+      ]
+    },
+    "sit": {
+      "seconds": 10.667,
+      "frames": [
+        0.0,
+        256.0
+      ],
+      "root_move_m": [
+        -0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "drink": {
+      "seconds": 8.867,
+      "frames": [
+        0.0,
+        212.8000030517578
+      ],
+      "root_move_m": [
+        -0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "sit_drink": {
+      "seconds": 11.167,
+      "frames": [
+        0.0,
+        268.0
+      ],
+      "root_move_m": [
+        -0.0,
+        -0.0,
+        0.0
+      ]
+    }
+  },
+  "clip_bones_missing_on_character": {},
+  "palette": [
+    {
+      "mode": "texture de Meshy gardée",
+      "taille_px": 512
+    }
+  ],
+  "decimation": {},
+  "badge": null,
+  "file_bytes": 671932
+}

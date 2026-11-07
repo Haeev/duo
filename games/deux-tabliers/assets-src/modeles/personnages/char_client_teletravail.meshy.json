@@ -1,0 +1,83 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "char_client_teletravail",
+ "game": "deux-tabliers",
+ "family": "char",
+ "purpose": "client, profil télétravail (gilet chiné, sacoche)",
+ "author": "artiste-3d",
+ "date": "2026-11-07",
+ "license": "offre payante de Meshy du client: licence privée, usage commercial, propriété du client",
+ "inputs": [
+  {
+   "chemin": "référence générée par Meshy (texte vers image, nano-banana), sortie brute hors dépôt: teletravail/reference.png"
+  }
+ ],
+ "tasks": [
+  {
+   "asset": "char_teletravail",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b801-2db5-7606-bcda-87a5fbb3dafd",
+   "statut": "SUCCEEDED"
+  },
+  {
+   "asset": "char_teletravail",
+   "etape": "image vers 3D",
+   "task_id": "01a1b802-1513-777c-8da5-206d3c09dced",
+   "parent_task_id": "01a1b801-2db5-7606-bcda-87a5fbb3dafd",
+   "statut": "SUCCEEDED",
+   "target_polycount": 3800
+  },
+  {
+   "asset": "char_teletravail",
+   "etape": "rig",
+   "task_id": "01a1b803-5bd4-7185-a216-2a585142d510",
+   "parent_task_id": "01a1b802-1513-777c-8da5-206d3c09dced",
+   "statut": "SUCCEEDED",
+   "height_meters": 1.76
+  }
+ ],
+ "reused_clips": "clips walk (rig 01a1b7b4-e3e0-766c-8083-24dc96bb9a5b) et idle, sit, drink, sit_drink (animation 01a1b7c7-08dc-769b-8f38-8bc4dda6f7ef) du tech-artist, sans nouvel achat",
+ "credits_total": 0,
+ "conformity": {
+  "node_name": "char_client_teletravail",
+  "target_height_m": 1.76,
+  "max_triangles": 4200,
+  "decimate_to": 3950,
+  "texture_mode": "meshy",
+  "texture_size": 512,
+  "root_bone": "Hips",
+  "clips": [
+   {
+    "file": "Animation_Walking_withSkin.glb",
+    "index": 0,
+    "name": "walk",
+    "in_place": true
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 0,
+    "name": "idle"
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 1,
+    "name": "sit"
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 2,
+    "name": "drink"
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 3,
+    "name": "sit_drink"
+   }
+  ]
+ },
+ "status": "conforme pour la démo v0.1",
+ "pending": [
+  "squelette commun du studio et cibles de morphose (technique 4.1): pas encore",
+  "accessoires fondus au corps (sacs)"
+ ]
+}

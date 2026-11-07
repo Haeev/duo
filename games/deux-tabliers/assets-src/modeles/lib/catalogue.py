@@ -44,6 +44,8 @@ def produire(catalogue, ids, fiche_path, ao=True):
         info = spec["fn"](g) or {}
         ob = K.finir(g, seed=zlib.crc32(ident.encode()))
         parts = K.separer_par_materiau(ob)
+        for eg in info.get("extra_geos", []):
+            parts.append(K.finir(eg, seed=1))
         main = next(o for o in parts if o.name == ident)
         built.append((ident, spec, info, parts, main))
     # pose en grille pour l'occlusion (sol sous les meubles posés)
@@ -52,7 +54,7 @@ def produire(catalogue, ids, fiche_path, ao=True):
         off = Vector(((i % 10) * SPACING, -(i // 10) * SPACING, 0))
         for o in parts:
             o.location = off
-        if spec["accroche"] == "sol":
+        if spec["accroche"] in ("sol", "surface", "appui"):
             bpy.ops.mesh.primitive_plane_add(size=2.5, location=off)
             planes.append(bpy.context.active_object)
         elif spec["accroche"] == "mur":

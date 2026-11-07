@@ -3,6 +3,10 @@
 Meshy rend le personnage riggé (Character_output.glb), la marche et la course offertes avec le rig
 (un GLB par clip), puis un GLB par appel d'animation (jusqu'à 10 clips). Ce script en fait un seul
 GLB aux conventions du studio:
+Options de la fiche (ajoutées par l'artiste 3D le 2026-11-07, sans effet si absentes): `decimate_to` (triangles visés),
+`texture_mode: "meshy"` et `texture_size` (garder la texture de Meshy réduite, rendu semi-réaliste choisi par le client),
+`badge` (disque de 3 cm à la couleur du joueur, matériau à part `dt_badge_joueur`).
+
 1. importe le personnage, puis chaque fichier d'animation; prend les clips demandés par la fiche
    (fichier, index du clip dans le fichier), les renomme (`walk`, `idle`, `sit`, `drink`...) et les
    rattache au squelette du personnage (les pistes visent les os par leur nom: on vérifie qu'ils
@@ -19,6 +23,7 @@ Usage:
 """
 
 import json
+import math
 import os
 import struct
 import sys
@@ -157,23 +162,135 @@ if abs(factor - 1.0) > 0.01:
     for o in bpy.context.scene.objects:
         o.select_set(o == rig or o in body)
     bpy.context.view_layer.objects.active = rig
+    # l'échelle d'objet du squelette (0,01 chez Meshy, héritée du FBX) est appliquée avec le facteur: les translations des
+    # clips, exprimées dans l'ancienne unité du squelette, prennent les deux (corrigé le 2026-11-07: avec le seul facteur,
+    # un personnage mis à une autre taille que celle du rig s'envolait, hanches à 100 fois leur hauteur)
+    s_old = rig.scale[0]
     rig.scale = rig.scale * factor
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    k_loc = factor * s_old
     for act, _ in clips.values():
         for fc in fcurves_of(act):
             if fc.data_path.endswith(".location"):
                 for kp in fc.keyframe_points:
                     for pt in (kp.co, kp.handle_left, kp.handle_right):
-                        pt.y *= factor
+                        pt.y *= k_loc
                 fc.update()
 rig.data.pose_position = "POSE"
 
-# --- Palette ----------------------------------------------------------------------------------------
+# --- Réduction (option `decimate_to`: nombre de triangles visé, décimation par fusion d'arêtes) ------
 
-mat, tex, bsdf = palette_material(palette, "cosy_characters")
-mat.node_tree.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
-palette_report = []
-for o in body:
+decimated = {}
+if conf.get("decimate_to"):
+    total = sum(sum(len(p.vertices) - 2 for p in o.data.polygons) for o in body)
+    ratio = conf["decimate_to"] / max(1, total)
+    if ratio < 1.0:
+        for o in body:
+            before_t = sum(len(p.vertices) - 2 for p in o.data.polygons)
+            bpy.context.view_layer.objects.active = o
+            mod = o.modifiers.new("reduction", "DECIMATE")
+            mod.ratio = ratio
+            mod.use_collapse_triangulate = True
+            # la décimation passe avant l'armature dans la pile (sinon on décimerait le maillage posé)
+            while o.modifiers[0] != mod:
+                bpy.ops.object.modifier_move_up(modifier=mod.name)
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+            decimated[o.name] = [before_t, sum(len(p.vertices) - 2 for p in o.data.polygons)]
+
+# --- Couleurs: palette du studio, ou texture de Meshy gardée et réduite (option `texture_mode: "meshy"`) ---
+
+if conf.get("texture_mode") == "meshy":
+    size = int(conf.get("texture_size", 512))
+    kept = []
+    for o in body:
+        for slot in o.material_slots:
+            m = slot.material
+            if m is None or m.name in kept:
+                continue
+            for node in m.node_tree.nodes:
+                if node.type == "TEX_IMAGE" and node.image and node.image.size[0] > size:
+                    node.image.scale(size, size)
+            # une seule texture de couleur: on retire normales, rugosité et métal éventuels de Meshy (bible 6)
+            bsdf_n = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+            for inp in ("Normal", "Roughness", "Metallic"):
+                for link in list(bsdf_n.inputs[inp].links):
+                    m.node_tree.links.remove(link)
+            bsdf_n.inputs["Roughness"].default_value = 0.8
+            bsdf_n.inputs["Metallic"].default_value = 0.0
+            m.name = conf["node_name"] + "_mat"
+            kept.append(m.name)
+    palette_report = [{"mode": "texture de Meshy gardée", "taille_px": size}]
+else:
+    palette_report = None
+
+# --- Badge du joueur (option `badge`): disque de 3 cm sur la bavette, lié à un os, matériau à part à teinter par le jeu ---
+
+badge_info = None
+if conf.get("badge"):
+    from mathutils.bvhtree import BVHTree
+    b = conf["badge"]
+    deps = bpy.context.evaluated_depsgraph_get()
+    o = body[0]
+    rig.data.pose_position = "REST"
+    bpy.context.view_layer.update()
+    deps = bpy.context.evaluated_depsgraph_get()
+    ev = o.evaluated_get(deps)
+    me_ev = ev.to_mesh()
+    bvh = BVHTree.FromPolygons([o.matrix_world @ v.co for v in me_ev.vertices], [tuple(p.vertices) for p in me_ev.polygons])
+    ev.to_mesh_clear()
+    # rayon depuis l'avant du personnage (avant glTF +Z = -Y Blender), à la hauteur donnée en part de la taille
+    zs = [(o.matrix_world @ v.co).z for v in o.data.vertices]
+    zb = min(zs) + (max(zs) - min(zs)) * b.get("height_ratio", 0.73)
+    hit, normal, _, _ = bvh.ray_cast(Vector((b.get("x", 0.06), -2.0, zb)), Vector((0, 1, 0)))
+    if hit is not None:
+        bm = bmesh.new()
+        r = b.get("radius", 0.015)
+        n = 12
+        up = Vector((0, 0, 1))
+        tx = normal.cross(up).normalized()
+        ty = normal.cross(tx).normalized()
+        c = hit + normal * 0.004
+        ring = [bm.verts.new(c + (tx * math.cos(2 * math.pi * i / n) + ty * math.sin(2 * math.pi * i / n)) * r) for i in range(n)]
+        back = [bm.verts.new(v.co - normal * 0.003) for v in ring]
+        faces = [bm.faces.new(ring)]
+        for i in range(n):
+            j = (i + 1) % n
+            faces.append(bm.faces.new([ring[i], back[i], back[j], ring[j]]))
+        bmesh.ops.recalc_face_normals(bm, faces=faces)
+        if faces[0].normal.dot(normal) < 0:
+            for f in faces:
+                f.normal_flip()
+        me_b = bpy.data.meshes.new("badge")
+        bm.to_mesh(me_b)
+        bm.free()
+        bmat = bpy.data.materials.new(b.get("material", "dt_badge_joueur"))
+        bmat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (1, 1, 1, 1)
+        bmat.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.5
+        me_b.materials.append(bmat)
+        # dans le maillage du personnage: même peau, un primitif de plus (le jeu teinte ce matériau à la couleur du joueur)
+        before_n = len(o.data.vertices)
+        ob_b = bpy.data.objects.new("badge", me_b)
+        bpy.context.scene.collection.objects.link(ob_b)
+        bone = b.get("bone", "Spine02")
+        vg = ob_b.vertex_groups.new(name=bone)
+        vg.add(list(range(len(me_b.vertices))), 1.0, "REPLACE")
+        mw = o.matrix_world.copy()
+        for v in me_b.vertices:
+            v.co = mw.inverted() @ v.co
+        ob_b.matrix_world = mw
+        bpy.ops.object.select_all(action="DESELECT")
+        ob_b.select_set(True)
+        o.select_set(True)
+        bpy.context.view_layer.objects.active = o
+        bpy.ops.object.join()
+        badge_info = {"centre_m": [round(c.x, 3), round(c.z, 3), round(-c.y, 3)], "rayon_m": r, "os": bone, "materiau": bmat.name}
+    rig.data.pose_position = "POSE"
+
+mat, tex, bsdf = palette_material(palette, "cosy_characters") if palette_report is None else (None, None, None)
+if palette_report is None:
+    mat.node_tree.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+palette_report = [] if palette_report is None else palette_report
+for o in (body if mat is not None else []):
     me = o.data
     bm = bmesh.new()
     bm.from_mesh(me)
@@ -219,6 +336,7 @@ bpy.ops.export_scene.gltf(
     export_animation_mode="NLA_TRACKS",
     export_vertex_color="NONE",
     export_materials="EXPORT",
+    export_image_format="JPEG" if conf.get("texture_mode") == "meshy" else "AUTO",
 )
 fps = scene.render.fps / scene.render.fps_base
 report = {
@@ -234,6 +352,8 @@ report = {
     "clips": {n: {"seconds": round((a.frame_range[1] - a.frame_range[0]) / fps, 3), **drift[n]} for n, (a, _) in clips.items()},
     "clip_bones_missing_on_character": unknown_bones,
     "palette": palette_report,
+    "decimation": decimated,
+    "badge": badge_info,
     "file_bytes": os.path.getsize(OUT),
 }
 with open(REPORT, "w", encoding="utf-8") as fh:

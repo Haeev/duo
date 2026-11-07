@@ -1,0 +1,125 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "char_avatar_2",
+ "game": "deux-tabliers",
+ "family": "char",
+ "purpose": "avatar de joueur en tenue de la maison (tablier vert bouteille), badge de 3 cm",
+ "author": "artiste-3d",
+ "date": "2026-11-07",
+ "license": "offre payante de Meshy du client: licence privée, usage commercial, propriété du client",
+ "inputs": [
+  {
+   "chemin": "référence générée par Meshy (texte vers image, nano-banana), sortie brute hors dépôt: barista2/reference.png"
+  }
+ ],
+ "tasks": [
+  {
+   "asset": "char_barista2",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b7d7-5a44-757f-ac91-d416fd84f56d",
+   "endpoint": "POST /openapi/v1/text-to-image",
+   "prompt": "A young adult woman barista with curly auburn hair tied back, light skin, cream long-sleeve work shirt, a plain dark bottle-green cotton bib apron with waist ties, dark blue jeans, brown shoes. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   },
+   "credits": 3,
+   "statut": "SUCCEEDED",
+   "telecharge": true,
+   "reprise": "tâche de l'essai de style, déjà payée"
+  },
+  {
+   "asset": "char_barista2",
+   "etape": "image vers 3D",
+   "task_id": "01a1b7d7-cd3a-776a-8ec3-be485176197a",
+   "parent_task_id": "01a1b7d7-5a44-757f-ac91-d416fd84f56d",
+   "endpoint": "POST /openapi/v1/image-to-3d",
+   "parametres": {
+    "input_task_id": "01a1b7d7-5a44-757f-ac91-d416fd84f56d",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 5000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   },
+   "credits": 15,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345002362,
+   "telecharge": false,
+   "reprise": "tâche de l'essai de style, déjà payée"
+  },
+  {
+   "asset": "char_barista2",
+   "etape": "rig",
+   "task_id": "01a1b7d9-46e6-7663-ac56-f422a20100ec",
+   "parent_task_id": "01a1b7d7-cd3a-776a-8ec3-be485176197a",
+   "endpoint": "POST /openapi/v1/rigging",
+   "parametres": {
+    "input_task_id": "01a1b7d7-cd3a-776a-8ec3-be485176197a",
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345042288,
+   "telecharge": true,
+   "reprise": "tâche de l'essai de style, déjà payée"
+  }
+ ],
+ "reused_clips": "clips walk (rig 01a1b7b4-e3e0-766c-8083-24dc96bb9a5b) et idle, sit, drink, sit_drink (animation 01a1b7c7-08dc-769b-8f38-8bc4dda6f7ef) du tech-artist, sans nouvel achat",
+ "credits_total": 0,
+ "conformity": {
+  "node_name": "char_avatar_2",
+  "target_height_m": 1.66,
+  "max_triangles": 4200,
+  "decimate_to": 3950,
+  "texture_mode": "meshy",
+  "texture_size": 512,
+  "root_bone": "Hips",
+  "clips": [
+   {
+    "file": "Animation_Walking_withSkin.glb",
+    "index": 0,
+    "name": "walk",
+    "in_place": true
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 0,
+    "name": "idle"
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 1,
+    "name": "sit"
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 2,
+    "name": "drink"
+   },
+   {
+    "file": "merged_animations.glb",
+    "index": 3,
+    "name": "sit_drink"
+   }
+  ],
+  "badge": {
+   "height_ratio": 0.72,
+   "x": 0.07,
+   "radius": 0.015,
+   "bone": "Spine02",
+   "material": "dt_badge_joueur"
+  }
+ },
+ "status": "conforme pour la démo v0.1",
+ "pending": [
+  "squelette commun du studio et cibles de morphose (technique 4.1): pas encore",
+  "accessoires fondus au corps (sacs)"
+ ]
+}
