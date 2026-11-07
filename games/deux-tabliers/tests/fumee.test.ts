@@ -10,6 +10,7 @@ import { DATA_FILES } from '../src/donnees/fichiers';
 import { createRobot, type Robot } from '../src/robots/robot';
 import { createSession } from '../src/session';
 import type { GameEvent } from '../src/simulation/evenements';
+import { WORLD_FORMAT } from '../src/etat/monde';
 import { heldObject } from '../src/simulation/monde';
 
 const DT = 1 / 60;
@@ -102,7 +103,7 @@ describe('Deux Tabliers, fumée', () => {
       expect(
         guestEvents.some((e) => e.type === 'refused' && e.player === 1 && e.reason === 'Déjà pris'),
       ).toBe(true);
-      expect(host.snapshot()?.dataSchema).toBe(1);
+      expect(host.snapshot()?.dataSchema).toBe(WORLD_FORMAT);
     } finally {
       duo.dispose();
     }
