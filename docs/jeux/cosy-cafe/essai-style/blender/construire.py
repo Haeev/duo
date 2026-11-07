@@ -38,6 +38,8 @@ ap.add_argument("--res", type=int, default=2048)
 ap.add_argument("--spp", type=int, default=48)
 ap.add_argument("--sans-cuisson", action="store_true")
 ap.add_argument("--travail", default=os.path.join(tempfile.gettempdir(), "cosy-essai-style"))
+ap.add_argument("--rigs", default=os.path.join(ICI, "..", "meshy_output", "rigs"),
+                help="personnages riggés par Meshy (sorties brutes hors du dépôt: lecteur, attente, barista1, barista2 .glb)")
 ap.add_argument("--meshy", default=os.path.join(ICI, "..", "meshy"), help="dossier des modèles Meshy mis en conformité")
 args = ap.parse_args(argv)
 V = args.variante
@@ -144,7 +146,8 @@ def construire_scene():
     w.box(4.28, 4.46, 10.05, 10.29, 0.75, 0.762, "rim", bevel=0.003)
     # croissants (modèle Meshy mis en conformité, sinon forme scriptée)
     food = Geo("food", smooth=True)
-    mc = MI.disponible(args.meshy, "food_croissant", V)
+    # le croissant de Meshy (droit, trop haut, à facettes sombres) n'a pas tenu à la revue: forme scriptée
+    mc = None
     for (x, y, zz, d) in croissants:
         if mc:
             MI.poser(mc, food, x, y, d, z=zz)
@@ -164,7 +167,11 @@ def construire_scene():
                     v.co.x = x + (v.co.x - x) * sc_
                     v.co.y = -y + (v.co.y + y) * sc_
                     v.co.z = zz + (v.co.z - zz) * sc_
-    PERS.construire(PAL)
+    # personnages de Meshy (riggés, posés par les clips du client pressé), sinon les silhouettes scriptées
+    import personnages_meshy as PM
+    if PM.construire(PAL, V, args.rigs) is None:
+        print("personnages: modèles riggés de Meshy absents, silhouettes scriptées")
+        PERS.construire(PAL)
     return bulbs
 
 

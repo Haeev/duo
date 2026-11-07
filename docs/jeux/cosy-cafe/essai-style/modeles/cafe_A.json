@@ -1,13 +1,13 @@
 {
  "variante": "A",
  "triangles": {
-  "cafe_static": 38912,
+  "cafe_static": 45301,
   "cafe_glass": 246,
-  "char_client_register": 3132,
-  "char_client_reading": 3092,
-  "char_client_waiting": 2820,
-  "char_player_orb": 4846,
-  "char_player_crescent": 4248
+  "char_client_register": 5256,
+  "char_client_reading": 5252,
+  "char_client_waiting": 5267,
+  "char_player_orb": 5241,
+  "char_player_crescent": 5246
  },
  "materiaux": [
   "char_palette",
@@ -16,24 +16,24 @@
   "palette"
  ],
  "cuisson": {
-  "lightmap_scale": 1.8277950286865234,
+  "lightmap_scale": 2.750134229660034,
   "bake_spp": 96,
   "bake_res": 2048
  },
  "soleil": {
-  "azimut_deg": 235.0,
+  "azimut_deg": 205.0,
   "hauteur_deg": 16.0,
   "couleur": "#FFC788"
  },
  "lampes": [
   [
-   8.35,
-   9.0,
+   9.15,
+   8.72,
    2.16
   ],
   [
-   9.95,
-   9.0,
+   10.6,
+   8.85,
    2.16
   ],
   [
@@ -52,5 +52,5 @@
    2.16
   ]
  ],
- "poids_octets": 6604120
+ "poids_octets": 7390232
 }

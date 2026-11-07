@@ -18,11 +18,11 @@ const H = Number(q.get('h')) || innerHeight;
 // Points de vue (coordonnées du plan: x vers l'est, z vers le sud; yeux à 1,65 m, champ vertical de 60 degrés)
 const VUES = {
   // 1. derrière le comptoir, près de la passe, face à la salle et à la place (la vue de la planche de la bible)
-  1: { pos: [7.75, 1.65, 7.95], cible: [8.55, 1.32, 12.5] },
+  1: { pos: [7.75, 1.65, 7.95], cible: [8.25, 1.32, 12.5] },
   // 2. depuis l'entrée vers le comptoir, l'ardoise et la caisse
   2: { pos: [9.4, 1.65, 12.1], cible: [8.75, 1.3, 7.1] },
   // 3. gros plan à hauteur de main: la machine et la tasse sous le premier groupe
-  3: { pos: [9.22, 1.42, 8.3], cible: [8.95, 1.05, 8.9] },
+  3: { pos: [9.32, 1.5, 8.18], cible: [9.02, 1.06, 8.95] },
 };
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -30,7 +30,7 @@ renderer.setPixelRatio(1);
 renderer.setSize(W, H);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.NeutralToneMapping;
-renderer.toneMappingExposure = V === 'A' ? 1.3 : 1.25;
+renderer.toneMappingExposure = V === 'A' ? 1.55 : 1.5;
 renderer.autoClear = false;
 renderer.info.autoReset = false;
 document.body.appendChild(renderer.domElement);
@@ -226,13 +226,15 @@ async function main() {
   rendre();
 
   // mesures
-  const textures = new Set();
+  // une image partagée par plusieurs matériaux n'est envoyée qu'une fois au GPU (Source commune): comptée une fois
+  const parSource = new Map();
   const visite = (s) => s.traverse((o) => {
     if (!o.isMesh) return;
-    for (const k of ['map', 'lightMap', 'envMap', 'alphaMap']) if (o.material[k]) textures.add(o.material[k]);
+    for (const k of ['map', 'lightMap', 'envMap', 'alphaMap']) if (o.material[k]) parSource.set(o.material[k].source ? o.material[k].source.uuid : o.material[k].uuid, o.material[k]);
   });
   visite(fixe);
   visite(vivant);
+  const textures = new Set(parSource.values());
   let octets = 0;
   const liste = [];
   for (const t of textures) {
@@ -263,6 +265,7 @@ async function main() {
       triangles_dessines: renderer.info.render.triangles,
       triangles_charges: tris,
       programmes: renderer.info.programs.length,
+      programmes_noms: renderer.info.programs.map((p) => p.name),
       textures: liste,
       memoire_textures_mo: Math.round((octets / 1048576) * 10) / 10,
       lumieres_dynamiques: 4,

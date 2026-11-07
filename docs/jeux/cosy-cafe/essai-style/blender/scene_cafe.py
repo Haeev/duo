@@ -237,26 +237,26 @@ def cafetiere():
     zb0, zb1 = z0 + 0.06, z0 + 0.43
     g.box(x0, x1, yf, yb, zb0, zb1, "copper", bevel=0.07 if A() else 0.04, segs=4 if A() else 3, edges="notop")
     g.box(x0 + 0.005, x1 - 0.005, yf - 0.006, yb + 0.006, zb1 - 0.03, zb1 - 0.012, "brass", bevel=0.008, segs=2)
-    # façade inox arrondie qui porte les groupes
-    g.box(x0 + 0.07, x1 - 0.07, yf - 0.014, yf + 0.01, z0 + 0.15, zb1 - 0.04, "steel", bevel=0.025, segs=3)
+    # façade de cuivre bordée de laiton, qui porte les groupes
+    g.box(x0 + 0.07, x1 - 0.07, yf - 0.016, yf + 0.01, z0 + 0.15, zb1 - 0.04, "brass", bevel=0.02, segs=3)
+    g.box(x0 + 0.085, x1 - 0.085, yf - 0.022, yf, z0 + 0.165, zb1 - 0.055, "copper", bevel=0.015, segs=3)
     zg = z0 + 0.3  # axe des bossages
     for x in (cx - 0.19, cx + 0.19):
         # bossage horizontal et tête de groupe en cloche (laiton)
-        g.rod((x, yf - 0.012, zg), (x, yf - 0.06, zg), 0.038, pans(14), "brass")
-        g.sphere(x, yf - 0.06, zg, 0.04, 0.04, 0.04, "brass", segs=pans(14), rings=8)
-        g.lathe(x, yf - 0.065, z0 + 0.205, [(0.04, 0), (0.052, 0.012), (0.058, 0.035), (0.052, 0.06), (0.036, 0.085), (0.0, 0.09)],
-                pans(16), "brass", cap_bottom=True, cap_top=False, smooth=True)
-        # porte-filtre: panier évasé, oreilles, deux becs, col d'acier et poignée noire tournée vers le barista
+        g.rod((x, yf - 0.02, zg), (x, yf - 0.06, zg), 0.026, pans(14), "steel")
+        # tête de groupe chromée, cylindrique, bague de laiton
+        g.lathe(x, yf - 0.065, z0 + 0.205, [(0.046, 0), (0.05, 0.008), (0.05, 0.045), (0.042, 0.06), (0.03, 0.075), (0.028, 0.095)],
+                pans(16), "steel", cap_bottom=True, cap_top=True, smooth=True)
+        g.cyl(x, yf - 0.065, z0 + 0.235, z0 + 0.247, 0.053, pans(16), "brass", bevel=0.003)
+        # porte-filtre: panier évasé, deux becs, col d'acier et poignée noire tournée vers le barista
         zp = z0 + 0.168
         g.lathe(x, yf - 0.065, zp, [(0.03, 0), (0.044, 0.012), (0.05, 0.032), (0.052, 0.037)], pans(16), "steel",
                 cap_bottom=True, cap_top=True, smooth=True)
         for dx in (-0.016, 0.016):
             g.lathe(x + dx, yf - 0.065, zp - 0.016, [(0.004, 0), (0.008, 0.016)], 8, "steel", cap_bottom=True, cap_top=False, smooth=True)
         g.rod((x, yf - 0.11, zp + 0.024), (x, yf - 0.15, zp + 0.02), 0.011, 10, "steel")
-        g.lathe(0, 0, 0, [(0.0, 0), (0.014, 0.004), (0.019, 0.04), (0.021, 0.1), (0.019, 0.125), (0.0, 0.13)], pans(12), "ink",
-                cap_bottom=False, cap_top=False, smooth=True)
-        # (la poignée est construite debout à l'origine puis couchée vers le nord, légèrement inclinée)
-        _coucher(g, x, yf - 0.148, zp + 0.02, -98)
+        g.rod((x, yf - 0.15, zp + 0.02), (x, yf - 0.27, zp + 0.005), 0.019, pans(12), "ink", smooth=True)
+        g.sphere(x, yf - 0.272, zp + 0.005, 0.021, 0.021, 0.021, "ink", segs=pans(12), rings=6)
         # molette du robinet de vapeur au-dessus du groupe
         g.cyl(x, yf - 0.03, zb1 - 0.075, zb1 - 0.055, 0.02, pans(12), "brass", bevel=0.004)
     # manomètre au centre: lunette de laiton, cadran crème, aiguille
@@ -469,14 +469,16 @@ def assiette(g, x, y, z, r=0.12):
 def croissant_geo(g, x, y, z, deg=0.0, s=1.2):
     """Croissant de 16 cm à 120 %: chapelet d'ellipsoïdes le long d'un arc (remplacé par le modèle Meshy s'il est là)."""
     vs = []
-    n = 7
+    n = 9
     for i in range(n):
         t = (i / (n - 1)) * 2 - 1
-        ang = t * 1.05
-        r = 0.055 * s
-        px, py = r * math.sin(ang), -r * math.cos(ang) + r * 0.6
-        rad = (0.024 - 0.012 * abs(t) ** 1.6) * s
-        vs += g.sphere(x + px, y + py, z + rad * 0.75, rad * 1.1, rad, rad * 0.8, "crust", segs=8, rings=6)
+        ang = t * 1.15
+        r = 0.06 * s
+        px, py = r * math.sin(ang), -r * math.cos(ang) + r * 0.7
+        rad = (0.026 - 0.016 * abs(t) ** 1.4) * s
+        vv = g.sphere(x + px, y + py, z + rad * 0.72, rad * 1.05, rad, rad * 0.75, "crust", segs=pans(10), rings=6, smooth=True)
+        Geo.rotate_z(vv, x + px, y + py, math.degrees(ang))
+        vs += vv
     Geo.rotate_z(vs, x, y, deg)
     return vs
 

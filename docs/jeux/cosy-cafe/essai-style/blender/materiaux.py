@@ -281,6 +281,9 @@ def mat_emit():
     return m
 
 
+TEXTURES_PERSOS = {}  # clé « tex:<personnage> » -> image de Meshy (variante B)
+
+
 class Materiaux:
     """Construit les matériaux d'une variante et donne le matériau de chaque clé."""
 
@@ -294,6 +297,8 @@ class Materiaux:
         """UV constant de la face (case de palette), ou None si la face garde sa projection (texture de matière)."""
         if key == "emit" or key == "glass":
             return (0.5, 0.5)
+        if key.startswith("tex:"):
+            return None
         if self.variant == "B" and kind != "char" and key in B_SPEC and B_SPEC[key][0]:
             return None
         return self.palette.cell(key)
@@ -306,6 +311,10 @@ class Materiaux:
             return mat_glass()
         if key == "emit":
             return mat_emit()
+        if key.startswith("tex:"):
+            m = mat_texture(f"char_{key[4:]}", TEXTURES_PERSOS[key], None, 0.8, 0.0)
+            m["kind"] = "char"
+            return m
         if kind == "char":
             return mat_palette("char_palette", self.palette_img, rough=0.8, kind="char")
         if self.variant == "A":

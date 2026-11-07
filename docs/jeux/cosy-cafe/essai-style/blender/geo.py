@@ -348,9 +348,16 @@ def finish(geo, collection, uv_scale=lambda key: 1.0):
     bm = geo.bm
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
     bm.normal_update()
+    for lay in [l for l in bm.loops.layers.uv.values() if l.name not in ("orig",)]:
+        bm.loops.layers.uv.remove(lay)
     uv = bm.loops.layers.uv.new("UVMap")
     gl = geo.gl
+    orig = bm.loops.layers.uv.get("orig")
     for f in bm.faces:
+        if orig is not None and geo.keys[f.material_index].startswith("tex:"):
+            for lp in f.loops:
+                lp[uv].uv = lp[orig].uv
+            continue
         n = f.normal
         ax = max(range(3), key=lambda i: abs(n[i]))
         a, b = {2: (0, 1), 1: (0, 2), 0: (1, 2)}[ax]
@@ -361,6 +368,8 @@ def finish(geo, collection, uv_scale=lambda key: 1.0):
         for lp in f.loops:
             co = lp.vert.co
             lp[uv].uv = (co[a] * sc, co[b] * sc)
+    if orig is not None:
+        bm.loops.layers.uv.remove(orig)
     smooth_all = STYLE.smooth_all or geo.smooth
     if smooth_all:
         lim = math.radians(STYLE.sharp_deg if not geo.smooth else 60)
