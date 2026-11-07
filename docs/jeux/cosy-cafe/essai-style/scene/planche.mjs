@@ -25,7 +25,7 @@ const colonnes = variantes.map((v) => {
   const m2 = mesures[`${v}-vue2-1366x768`] || {};
   const cells = [1, 2, 3].map((n) => `<figure><img src="/captures/${v}-vue${n}-1366x768.png"><figcaption>${n}. ${VUES[n - 1]}</figcaption></figure>`).join('');
   return `<section><h2>${NOMS[v]}</h2><p class="resume">${RESUMES[v]}</p>${cells}
-  <p class="mesures">Vue 1: ${m.triangles_dessines ?? '?'} triangles, ${m.appels ?? '?'} appels, ${m.programmes ?? '?'} programmes. Vue 2: ${m2.triangles_dessines ?? '?'} triangles, ${m2.appels ?? '?'} appels. Textures: ${m.memoire_textures_mo ?? '?'} Mo. Budget du village: 150 000 triangles, 80 appels, 10 programmes, 128 Mo.</p></section>`;
+  <p class="mesures">Vue 1: ${m.triangles_dessines ?? '?'} triangles, ${m.appels ?? '?'} appels, ${m.programmes ?? '?'} programmes. Vue 2: ${m2.triangles_dessines ?? '?'} triangles, ${m2.appels ?? '?'} appels. Textures: ${m.memoire_textures_mo ?? '?'} Mo. Budget du village: 150 000 triangles, 80 appels, 10 programmes, 128 Mo de textures.</p></section>`;
 }).join('');
 
 const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><style>
