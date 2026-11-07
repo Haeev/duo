@@ -19341,8 +19341,8 @@
    "state_label": "À l'arrivée",
    "north_deg": 0,
    "capacity": {
-    "inside": 19,
-    "outside": 8
+    "inside": 18,
+    "outside": 6
    },
    "staff": {
     "players": 2,
@@ -19700,7 +19700,46 @@
         "rect": [
          5.2,
          10.0,
+         0.9,
+         0.5
+        ]
+       },
+       "blocks": true,
+       "opaque": true
+      },
+      {
+       "id": "porte-terrasse",
+       "kind": "door",
+       "shape": {
+        "rect": [
+         6.1,
+         10.0,
          1.2,
+         0.5
+        ]
+       },
+       "access": "public",
+       "glazed": true,
+       "label": "terrasse",
+       "swing": {
+        "leaves": 2,
+        "hinge": "start",
+        "side": "+"
+       },
+       "orient": "h",
+       "width": 1.2,
+       "height": 2.1,
+       "blocks": false,
+       "opaque": false
+      },
+      {
+       "id": "wall-9",
+       "kind": "wall",
+       "shape": {
+        "rect": [
+         7.3,
+         10.0,
+         0.2,
          0.5
         ]
        },
@@ -19712,26 +19751,26 @@
        "kind": "window",
        "shape": {
         "rect": [
-         6.4,
+         7.5,
          10.0,
-         3.0,
+         2.8,
          0.5
         ]
        },
        "sill": 0.45,
        "screen_low": true,
        "orient": "h",
-       "width": 3.0,
+       "width": 2.8,
        "height": 2.4,
        "blocks": true,
        "opaque": false
       },
       {
-       "id": "wall-9",
+       "id": "wall-10",
        "kind": "wall",
        "shape": {
         "rect": [
-         9.4,
+         10.3,
          10.0,
          0.2,
          0.5
@@ -19745,28 +19784,28 @@
        "kind": "window",
        "shape": {
         "rect": [
-         9.6,
+         10.5,
          10.0,
-         3.0,
+         2.8,
          0.5
         ]
        },
        "sill": 0.45,
        "screen_low": true,
        "orient": "h",
-       "width": 3.0,
+       "width": 2.8,
        "height": 2.4,
        "blocks": true,
        "opaque": false
       },
       {
-       "id": "wall-10",
+       "id": "wall-11",
        "kind": "wall",
        "shape": {
         "rect": [
-         12.6,
+         13.3,
          10.0,
-         1.4,
+         0.7,
          0.5
         ]
        },
@@ -19774,7 +19813,7 @@
        "opaque": true
       },
       {
-       "id": "wall-11",
+       "id": "wall-12",
        "kind": "wall",
        "shape": {
         "poly": [
@@ -19829,6 +19868,7 @@
        "access": "public",
        "glazed": true,
        "entrance": true,
+       "screen_low": true,
        "label": "entrée",
        "orient": "diag",
        "width": 1.584,
@@ -19837,7 +19877,7 @@
        "opaque": false
       },
       {
-       "id": "wall-12",
+       "id": "wall-13",
        "kind": "wall",
        "shape": {
         "poly": [
@@ -19867,7 +19907,7 @@
        "opaque": true
       },
       {
-       "id": "wall-13",
+       "id": "wall-14",
        "kind": "wall",
        "shape": {
         "rect": [
@@ -20423,7 +20463,7 @@
        "kind": "table",
        "shape": {
         "circle": [
-         6.8,
+         8.2,
          9.7,
          0.3
         ]
@@ -20438,7 +20478,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         6.0,
+         7.4,
          9.475,
          0.45,
          0.45
@@ -20459,7 +20499,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.15,
+         8.55,
          9.475,
          0.45,
          0.45
@@ -20480,7 +20520,7 @@
        "kind": "table",
        "shape": {
         "circle": [
-         8.4,
+         9.8,
          9.7,
          0.3
         ]
@@ -20495,7 +20535,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.6,
+         9.0,
          9.475,
          0.45,
          0.45
@@ -20516,7 +20556,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.75,
+         10.15,
          9.475,
          0.45,
          0.45
@@ -20537,7 +20577,7 @@
        "kind": "table",
        "shape": {
         "circle": [
-         10.0,
+         11.4,
          9.7,
          0.3
         ]
@@ -20552,7 +20592,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         9.2,
+         10.6,
          9.475,
          0.45,
          0.45
@@ -20573,7 +20613,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         10.35,
+         11.75,
          9.475,
          0.45,
          0.45
@@ -20593,14 +20633,14 @@
        "id": "table-4",
        "kind": "table",
        "shape": {
-        "circle": [
-         11.6,
-         9.7,
-         0.3
+        "rect": [
+         7.2,
+         7.15,
+         0.6,
+         0.6
         ]
        },
        "height": 0.75,
-       "round": true,
        "blocks": true,
        "opaque": false
       },
@@ -20609,8 +20649,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         10.8,
-         9.475,
+         7.275,
+         6.65,
          0.45,
          0.45
         ]
@@ -20620,7 +20660,7 @@
         "room": "salle"
        },
        "style": "chair",
-       "back": "W",
+       "back": "N",
        "height": 0.9,
        "blocks": true,
        "opaque": false
@@ -20630,8 +20670,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         11.95,
-         9.475,
+         7.275,
+         7.8,
          0.45,
          0.45
         ]
@@ -20641,7 +20681,7 @@
         "room": "salle"
        },
        "style": "chair",
-       "back": "E",
+       "back": "S",
        "height": 0.9,
        "blocks": true,
        "opaque": false
@@ -20651,7 +20691,7 @@
        "kind": "table",
        "shape": {
         "rect": [
-         7.2,
+         8.8,
          7.15,
          0.6,
          0.6
@@ -20666,7 +20706,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.275,
+         8.875,
          6.65,
          0.45,
          0.45
@@ -20687,7 +20727,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.275,
+         8.875,
          7.8,
          0.45,
          0.45
@@ -20708,7 +20748,7 @@
        "kind": "table",
        "shape": {
         "rect": [
-         8.8,
+         10.4,
          7.15,
          0.6,
          0.6
@@ -20723,7 +20763,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.875,
+         10.475,
          6.65,
          0.45,
          0.45
@@ -20744,7 +20784,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.875,
+         10.475,
          7.8,
          0.45,
          0.45
@@ -20765,63 +20805,6 @@
        "kind": "table",
        "shape": {
         "rect": [
-         10.4,
-         7.15,
-         0.6,
-         0.6
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-13",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.475,
-         6.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-14",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.475,
-         7.8,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle"
-       },
-       "style": "chair",
-       "back": "S",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-8",
-       "kind": "table",
-       "shape": {
-        "rect": [
          12.0,
          7.15,
          0.6,
@@ -20833,7 +20816,7 @@
        "opaque": false
       },
       {
-       "id": "seat-15",
+       "id": "seat-13",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -20854,7 +20837,7 @@
        "opaque": false
       },
       {
-       "id": "seat-16",
+       "id": "seat-14",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -20892,12 +20875,52 @@
        "opaque": false
       },
       {
+       "id": "seat-15",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         15.4,
+         6.0,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "salle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-16",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         15.4,
+         6.6,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "salle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
        "id": "seat-17",
        "kind": "seat",
        "shape": {
         "circle": [
          15.4,
-         6.15,
+         7.2,
          0.2
         ]
        },
@@ -20917,27 +20940,7 @@
        "shape": {
         "circle": [
          15.4,
-         6.8,
-         0.2
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle"
-       },
-       "style": "stool",
-       "back": null,
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-19",
-       "kind": "seat",
-       "shape": {
-        "circle": [
-         15.4,
-         7.45,
+         7.8,
          0.2
         ]
        },
@@ -20969,11 +20972,11 @@
        "opaque": false
       },
       {
-       "id": "table-9",
+       "id": "table-8",
        "kind": "table",
        "shape": {
         "rect": [
-         6.2,
+         7.8,
          11.25,
          0.9,
          0.5
@@ -20984,11 +20987,11 @@
        "opaque": false
       },
       {
-       "id": "seat-20",
+       "id": "seat-19",
        "kind": "seat",
        "shape": {
         "rect": [
-         6.2,
+         7.8,
          10.75,
          0.45,
          0.45
@@ -21005,11 +21008,68 @@
        "opaque": false
       },
       {
+       "id": "seat-20",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         8.25,
+         10.75,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-9",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         9.6,
+         11.25,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
        "id": "seat-21",
        "kind": "seat",
        "shape": {
         "rect": [
-         6.65,
+         9.6,
+         10.75,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-22",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         10.05,
          10.75,
          0.45,
          0.45
@@ -21030,34 +21090,13 @@
        "kind": "table",
        "shape": {
         "rect": [
-         8.0,
+         11.4,
          11.25,
          0.9,
          0.5
         ]
        },
        "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-22",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         8.0,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
        "blocks": true,
        "opaque": false
       },
@@ -21066,7 +21105,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.45,
+         11.4,
          10.75,
          0.45,
          0.45
@@ -21079,21 +21118,6 @@
        "style": "chair",
        "back": "N",
        "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-11",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         9.8,
-         11.25,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
        "blocks": true,
        "opaque": false
       },
@@ -21102,85 +21126,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         9.8,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-25",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.25,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-12",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         11.6,
-         11.25,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-26",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         11.6,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-27",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         12.05,
+         11.85,
          10.75,
          0.45,
          0.45
@@ -21201,9 +21147,9 @@
        "kind": "hood",
        "shape": {
         "rect": [
-         6.0,
+         7.4,
          10.5,
-         7.6,
+         6.2,
          1.5
         ]
        },
@@ -21354,13 +21300,26 @@
        "kind": "free",
        "shape": {
         "rect": [
-         6.0,
+         7.4,
          6.6,
-         6.6,
+         5.2,
          3.4
         ]
        },
        "label": "salle"
+      },
+      {
+       "id": "zone-keep_clear-5",
+       "kind": "keep_clear",
+       "shape": {
+        "rect": [
+         6.0,
+         8.6,
+         1.4,
+         1.4
+        ]
+       },
+       "label": "porte de la terrasse"
       },
       {
        "id": "zone-extension-1",
@@ -21376,7 +21335,7 @@
        "label": "E1: la salle du fond"
       },
       {
-       "id": "zone-keep_clear-5",
+       "id": "zone-keep_clear-6",
        "kind": "keep_clear",
        "shape": {
         "rect": [
@@ -21389,17 +21348,30 @@
        "label": "porte"
       },
       {
+       "id": "zone-keep_clear-7",
+       "kind": "keep_clear",
+       "shape": {
+        "rect": [
+         6.1,
+         10.5,
+         1.2,
+         1.4
+        ]
+       },
+       "label": "porte de la terrasse"
+      },
+      {
        "id": "zone-extension-2",
        "kind": "extension",
        "shape": {
         "rect": [
          1.5,
-         12.2,
-         12.0,
-         1.6
+         10.5,
+         4.0,
+         1.5
         ]
        },
-       "label": "E2: la grande terrasse (second rang)"
+       "label": "E2"
       },
       {
        "id": "zone-extension-3",
@@ -21419,9 +21391,9 @@
        "kind": "free",
        "shape": {
         "rect": [
-         6.0,
+         7.4,
          10.5,
-         7.6,
+         6.2,
          1.5
         ]
        },
@@ -21501,6 +21473,10 @@
        [
         16.2,
         11.4
+       ],
+       [
+        6.7,
+        12.4
        ]
       ],
       "staff_start": [
@@ -21673,8 +21649,16 @@
          6.2
         ],
         [
+         6.9,
+         8.0
+        ],
+        [
+         6.7,
+         11.6
+        ],
+        [
          7.6,
-         8.4
+         12.3
         ]
        ],
        "label": null
@@ -22403,14 +22387,14 @@
    "state_label": "Agrandi au maximum",
    "north_deg": 0,
    "capacity": {
-    "inside": 31,
-    "outside": 28
+    "inside": 29,
+    "outside": 16
    },
    "staff": {
     "players": 2,
     "employees": 6
    },
-   "summary": "Café d'angle de 68 m² au pied d'un immeuble de rapport, entrée dans le pan coupé, cave dessous. E1: la salle du fond (98 m² en tout). E2: la grande terrasse, sur les deux rues.",
+   "summary": "Café d'angle de 68 m² au pied d'un immeuble de rapport, entrée dans le pan coupé, cave dessous. E1: la salle du fond (98 m² en tout). E2: la terrasse sur les deux rues; un second rang attend la décision de l'architecte sur la foule lointaine.",
    "scale_px": 36,
    "levels": [
     {
@@ -22763,7 +22747,46 @@
         "rect": [
          5.2,
          10.0,
+         0.9,
+         0.5
+        ]
+       },
+       "blocks": true,
+       "opaque": true
+      },
+      {
+       "id": "porte-terrasse",
+       "kind": "door",
+       "shape": {
+        "rect": [
+         6.1,
+         10.0,
          1.2,
+         0.5
+        ]
+       },
+       "access": "public",
+       "glazed": true,
+       "label": "terrasse",
+       "swing": {
+        "leaves": 2,
+        "hinge": "start",
+        "side": "+"
+       },
+       "orient": "h",
+       "width": 1.2,
+       "height": 2.1,
+       "blocks": false,
+       "opaque": false
+      },
+      {
+       "id": "wall-9",
+       "kind": "wall",
+       "shape": {
+        "rect": [
+         7.3,
+         10.0,
+         0.2,
          0.5
         ]
        },
@@ -22775,26 +22798,26 @@
        "kind": "window",
        "shape": {
         "rect": [
-         6.4,
+         7.5,
          10.0,
-         3.0,
+         2.8,
          0.5
         ]
        },
        "sill": 0.45,
        "screen_low": true,
        "orient": "h",
-       "width": 3.0,
+       "width": 2.8,
        "height": 2.4,
        "blocks": true,
        "opaque": false
       },
       {
-       "id": "wall-9",
+       "id": "wall-10",
        "kind": "wall",
        "shape": {
         "rect": [
-         9.4,
+         10.3,
          10.0,
          0.2,
          0.5
@@ -22808,28 +22831,28 @@
        "kind": "window",
        "shape": {
         "rect": [
-         9.6,
+         10.5,
          10.0,
-         3.0,
+         2.8,
          0.5
         ]
        },
        "sill": 0.45,
        "screen_low": true,
        "orient": "h",
-       "width": 3.0,
+       "width": 2.8,
        "height": 2.4,
        "blocks": true,
        "opaque": false
       },
       {
-       "id": "wall-10",
+       "id": "wall-11",
        "kind": "wall",
        "shape": {
         "rect": [
-         12.6,
+         13.3,
          10.0,
-         1.4,
+         0.7,
          0.5
         ]
        },
@@ -22837,7 +22860,7 @@
        "opaque": true
       },
       {
-       "id": "wall-11",
+       "id": "wall-12",
        "kind": "wall",
        "shape": {
         "poly": [
@@ -22892,6 +22915,7 @@
        "access": "public",
        "glazed": true,
        "entrance": true,
+       "screen_low": true,
        "label": "entrée",
        "orient": "diag",
        "width": 1.584,
@@ -22900,7 +22924,7 @@
        "opaque": false
       },
       {
-       "id": "wall-12",
+       "id": "wall-13",
        "kind": "wall",
        "shape": {
         "poly": [
@@ -22930,7 +22954,7 @@
        "opaque": true
       },
       {
-       "id": "wall-13",
+       "id": "wall-14",
        "kind": "wall",
        "shape": {
         "rect": [
@@ -22944,8 +22968,8 @@
        "opaque": true
       },
       {
-       "id": "opening-1",
-       "kind": "opening",
+       "id": "door-2",
+       "kind": "door",
        "shape": {
         "rect": [
          5.5,
@@ -22954,14 +22978,21 @@
          1.4
         ]
        },
-       "label": "baie",
+       "access": "public",
+       "label": "salle du fond",
+       "swing": {
+        "leaves": 2,
+        "hinge": "start",
+        "side": "-"
+       },
        "orient": "v",
        "width": 1.4,
+       "height": 2.1,
        "blocks": false,
-       "opaque": false
+       "opaque": true
       },
       {
-       "id": "wall-14",
+       "id": "wall-15",
        "kind": "wall",
        "shape": {
         "rect": [
@@ -23050,7 +23081,7 @@
        "opaque": true
       },
       {
-       "id": "door-2",
+       "id": "door-3",
        "kind": "door",
        "shape": {
         "rect": [
@@ -23474,7 +23505,7 @@
        "opaque": false
       },
       {
-       "id": "door-3",
+       "id": "door-4",
        "kind": "door",
        "shape": {
         "rect": [
@@ -23517,7 +23548,7 @@
        "kind": "table",
        "shape": {
         "circle": [
-         6.8,
+         8.2,
          9.7,
          0.3
         ]
@@ -23532,7 +23563,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         6.0,
+         7.4,
          9.475,
          0.45,
          0.45
@@ -23553,7 +23584,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.15,
+         8.55,
          9.475,
          0.45,
          0.45
@@ -23574,7 +23605,7 @@
        "kind": "table",
        "shape": {
         "circle": [
-         8.4,
+         9.8,
          9.7,
          0.3
         ]
@@ -23589,7 +23620,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.6,
+         9.0,
          9.475,
          0.45,
          0.45
@@ -23610,7 +23641,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.75,
+         10.15,
          9.475,
          0.45,
          0.45
@@ -23631,7 +23662,7 @@
        "kind": "table",
        "shape": {
         "circle": [
-         10.0,
+         11.4,
          9.7,
          0.3
         ]
@@ -23646,7 +23677,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         9.2,
+         10.6,
          9.475,
          0.45,
          0.45
@@ -23667,7 +23698,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         10.35,
+         11.75,
          9.475,
          0.45,
          0.45
@@ -23687,14 +23718,14 @@
        "id": "table-4",
        "kind": "table",
        "shape": {
-        "circle": [
-         11.6,
-         9.7,
-         0.3
+        "rect": [
+         7.2,
+         7.15,
+         0.6,
+         0.6
         ]
        },
        "height": 0.75,
-       "round": true,
        "blocks": true,
        "opaque": false
       },
@@ -23703,8 +23734,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         10.8,
-         9.475,
+         7.275,
+         6.65,
          0.45,
          0.45
         ]
@@ -23714,7 +23745,7 @@
         "room": "salle"
        },
        "style": "chair",
-       "back": "W",
+       "back": "N",
        "height": 0.9,
        "blocks": true,
        "opaque": false
@@ -23724,8 +23755,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         11.95,
-         9.475,
+         7.275,
+         7.8,
          0.45,
          0.45
         ]
@@ -23735,7 +23766,7 @@
         "room": "salle"
        },
        "style": "chair",
-       "back": "E",
+       "back": "S",
        "height": 0.9,
        "blocks": true,
        "opaque": false
@@ -23745,7 +23776,7 @@
        "kind": "table",
        "shape": {
         "rect": [
-         7.2,
+         8.8,
          7.15,
          0.6,
          0.6
@@ -23760,7 +23791,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.275,
+         8.875,
          6.65,
          0.45,
          0.45
@@ -23781,7 +23812,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.275,
+         8.875,
          7.8,
          0.45,
          0.45
@@ -23802,7 +23833,7 @@
        "kind": "table",
        "shape": {
         "rect": [
-         8.8,
+         10.4,
          7.15,
          0.6,
          0.6
@@ -23817,7 +23848,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.875,
+         10.475,
          6.65,
          0.45,
          0.45
@@ -23838,7 +23869,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         8.875,
+         10.475,
          7.8,
          0.45,
          0.45
@@ -23859,63 +23890,6 @@
        "kind": "table",
        "shape": {
         "rect": [
-         10.4,
-         7.15,
-         0.6,
-         0.6
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-13",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.475,
-         6.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-14",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.475,
-         7.8,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle"
-       },
-       "style": "chair",
-       "back": "S",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-8",
-       "kind": "table",
-       "shape": {
-        "rect": [
          12.0,
          7.15,
          0.6,
@@ -23927,7 +23901,7 @@
        "opaque": false
       },
       {
-       "id": "seat-15",
+       "id": "seat-13",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -23948,7 +23922,7 @@
        "opaque": false
       },
       {
-       "id": "seat-16",
+       "id": "seat-14",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -23986,12 +23960,52 @@
        "opaque": false
       },
       {
+       "id": "seat-15",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         15.4,
+         6.0,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "salle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-16",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         15.4,
+         6.6,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "salle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
        "id": "seat-17",
        "kind": "seat",
        "shape": {
         "circle": [
          15.4,
-         6.15,
+         7.2,
          0.2
         ]
        },
@@ -24011,7 +24025,7 @@
        "shape": {
         "circle": [
          15.4,
-         6.8,
+         7.8,
          0.2
         ]
        },
@@ -24029,18 +24043,34 @@
        "id": "seat-19",
        "kind": "seat",
        "shape": {
-        "circle": [
-         15.4,
-         7.45,
-         0.2
+        "rect": [
+         1.5,
+         3.4,
+         0.55,
+         0.6
         ]
        },
        "seat": {
         "area": "inside",
-        "room": "salle"
+        "room": "salle du fond"
        },
-       "style": "stool",
-       "back": null,
+       "style": "banquette",
+       "back": "W",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-8",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         2.1,
+         3.4,
+         0.6,
+         0.6
+        ]
+       },
        "height": 0.75,
        "blocks": true,
        "opaque": false
@@ -24050,8 +24080,29 @@
        "kind": "seat",
        "shape": {
         "rect": [
+         2.75,
+         3.475,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "salle du fond"
+       },
+       "style": "chair",
+       "back": "E",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-21",
+       "kind": "seat",
+       "shape": {
+        "rect": [
          1.5,
-         3.4,
+         5.0,
          0.55,
          0.6
         ]
@@ -24072,74 +24123,17 @@
        "shape": {
         "rect": [
          2.1,
-         3.4,
+         5.0,
          0.6,
          0.6
         ]
        },
        "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-21",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         2.75,
-         3.475,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle du fond"
-       },
-       "style": "chair",
-       "back": "E",
-       "height": 0.9,
        "blocks": true,
        "opaque": false
       },
       {
        "id": "seat-22",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         1.5,
-         5.0,
-         0.55,
-         0.6
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "salle du fond"
-       },
-       "style": "banquette",
-       "back": "W",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-10",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         2.1,
-         5.0,
-         0.6,
-         0.6
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-23",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24160,7 +24154,7 @@
        "opaque": false
       },
       {
-       "id": "seat-24",
+       "id": "seat-23",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24181,7 +24175,7 @@
        "opaque": false
       },
       {
-       "id": "table-11",
+       "id": "table-10",
        "kind": "table",
        "shape": {
         "rect": [
@@ -24196,7 +24190,7 @@
        "opaque": false
       },
       {
-       "id": "seat-25",
+       "id": "seat-24",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24217,7 +24211,7 @@
        "opaque": false
       },
       {
-       "id": "table-12",
+       "id": "table-11",
        "kind": "table",
        "shape": {
         "rect": [
@@ -24232,7 +24226,7 @@
        "opaque": false
       },
       {
-       "id": "seat-26",
+       "id": "seat-25",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24253,7 +24247,7 @@
        "opaque": false
       },
       {
-       "id": "table-13",
+       "id": "table-12",
        "kind": "table",
        "shape": {
         "rect": [
@@ -24268,7 +24262,7 @@
        "opaque": false
       },
       {
-       "id": "seat-27",
+       "id": "seat-26",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24306,7 +24300,7 @@
        "opaque": false
       },
       {
-       "id": "seat-28",
+       "id": "seat-27",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -24326,7 +24320,7 @@
        "opaque": false
       },
       {
-       "id": "seat-29",
+       "id": "seat-28",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -24346,7 +24340,7 @@
        "opaque": false
       },
       {
-       "id": "seat-30",
+       "id": "seat-29",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -24383,7 +24377,7 @@
        "opaque": false
       },
       {
-       "id": "table-14",
+       "id": "table-13",
        "kind": "table",
        "shape": {
         "rect": [
@@ -24398,7 +24392,7 @@
        "opaque": false
       },
       {
-       "id": "seat-31",
+       "id": "seat-30",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24419,7 +24413,7 @@
        "opaque": false
       },
       {
-       "id": "seat-32",
+       "id": "seat-31",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24440,7 +24434,7 @@
        "opaque": false
       },
       {
-       "id": "table-15",
+       "id": "table-14",
        "kind": "table",
        "shape": {
         "rect": [
@@ -24455,7 +24449,7 @@
        "opaque": false
       },
       {
-       "id": "seat-33",
+       "id": "seat-32",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24476,7 +24470,7 @@
        "opaque": false
       },
       {
-       "id": "seat-34",
+       "id": "seat-33",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -24497,11 +24491,11 @@
        "opaque": false
       },
       {
-       "id": "table-16",
+       "id": "table-15",
        "kind": "table",
        "shape": {
         "rect": [
-         6.2,
+         7.8,
          11.25,
          0.9,
          0.5
@@ -24512,11 +24506,11 @@
        "opaque": false
       },
       {
-       "id": "seat-35",
+       "id": "seat-34",
        "kind": "seat",
        "shape": {
         "rect": [
-         6.2,
+         7.8,
          10.75,
          0.45,
          0.45
@@ -24533,11 +24527,68 @@
        "opaque": false
       },
       {
+       "id": "seat-35",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         8.25,
+         10.75,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-16",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         9.6,
+         11.25,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
        "id": "seat-36",
        "kind": "seat",
        "shape": {
         "rect": [
-         6.65,
+         9.6,
+         10.75,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-37",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         10.05,
          10.75,
          0.45,
          0.45
@@ -24558,7 +24609,7 @@
        "kind": "table",
        "shape": {
         "rect": [
-         8.0,
+         11.4,
          11.25,
          0.9,
          0.5
@@ -24569,11 +24620,11 @@
        "opaque": false
       },
       {
-       "id": "seat-37",
+       "id": "seat-38",
        "kind": "seat",
        "shape": {
         "rect": [
-         8.0,
+         11.4,
          10.75,
          0.45,
          0.45
@@ -24590,11 +24641,11 @@
        "opaque": false
       },
       {
-       "id": "seat-38",
+       "id": "seat-39",
        "kind": "seat",
        "shape": {
         "rect": [
-         8.45,
+         11.85,
          10.75,
          0.45,
          0.45
@@ -24615,405 +24666,6 @@
        "kind": "table",
        "shape": {
         "rect": [
-         9.8,
-         11.25,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-39",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         9.8,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-40",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.25,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-19",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         11.6,
-         11.25,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-41",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         11.6,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-42",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         12.05,
-         10.75,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-20",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         2.7,
-         13.15,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-43",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         2.7,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-44",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         3.15,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-21",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         4.5,
-         13.15,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-45",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         4.5,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-46",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         4.95,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-22",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         7.1,
-         13.15,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-47",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         7.1,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-48",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         7.55,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-23",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         8.9,
-         13.15,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-49",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         8.9,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-50",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         9.35,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-24",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         10.7,
-         13.15,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-51",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         10.7,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-52",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         11.15,
-         12.65,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-25",
-       "kind": "table",
-       "shape": {
-        "rect": [
          17.05,
          3.7,
          0.5,
@@ -25025,7 +24677,7 @@
        "opaque": false
       },
       {
-       "id": "seat-53",
+       "id": "seat-40",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -25046,7 +24698,7 @@
        "opaque": false
       },
       {
-       "id": "seat-54",
+       "id": "seat-41",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -25067,7 +24719,7 @@
        "opaque": false
       },
       {
-       "id": "table-26",
+       "id": "table-19",
        "kind": "table",
        "shape": {
         "rect": [
@@ -25082,7 +24734,7 @@
        "opaque": false
       },
       {
-       "id": "seat-55",
+       "id": "seat-42",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -25103,7 +24755,7 @@
        "opaque": false
       },
       {
-       "id": "seat-56",
+       "id": "seat-43",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -25124,7 +24776,7 @@
        "opaque": false
       },
       {
-       "id": "table-27",
+       "id": "table-20",
        "kind": "table",
        "shape": {
         "rect": [
@@ -25139,7 +24791,7 @@
        "opaque": false
       },
       {
-       "id": "seat-57",
+       "id": "seat-44",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -25160,7 +24812,7 @@
        "opaque": false
       },
       {
-       "id": "seat-58",
+       "id": "seat-45",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -25188,7 +24840,7 @@
          1.5,
          10.5,
          12.1,
-         3.3
+         1.5
         ]
        },
        "label": "store",
@@ -25338,13 +24990,26 @@
        "kind": "free",
        "shape": {
         "rect": [
-         6.0,
+         7.4,
          6.6,
-         6.6,
+         5.2,
          3.4
         ]
        },
        "label": "salle"
+      },
+      {
+       "id": "zone-keep_clear-5",
+       "kind": "keep_clear",
+       "shape": {
+        "rect": [
+         6.0,
+         8.6,
+         1.4,
+         1.4
+        ]
+       },
+       "label": "porte de la terrasse"
       },
       {
        "id": "zone-free-2",
@@ -25360,7 +25025,7 @@
        "label": "salle du fond"
       },
       {
-       "id": "zone-keep_clear-5",
+       "id": "zone-keep_clear-6",
        "kind": "keep_clear",
        "shape": {
         "rect": [
@@ -25373,7 +25038,7 @@
        "label": "baie"
       },
       {
-       "id": "zone-keep_clear-6",
+       "id": "zone-keep_clear-7",
        "kind": "keep_clear",
        "shape": {
         "rect": [
@@ -25384,6 +25049,32 @@
         ]
        },
        "label": "porte"
+      },
+      {
+       "id": "zone-keep_clear-8",
+       "kind": "keep_clear",
+       "shape": {
+        "rect": [
+         6.1,
+         10.5,
+         1.2,
+         1.4
+        ]
+       },
+       "label": "porte de la terrasse"
+      },
+      {
+       "id": "zone-extension-1",
+       "kind": "extension",
+       "shape": {
+        "rect": [
+         1.5,
+         12.2,
+         12.0,
+         1.5
+        ]
+       },
+       "label": "second rang: avec l'option B de l'architecte (foule lointaine)"
       },
       {
        "id": "zone-free-3",
@@ -25400,19 +25091,6 @@
       },
       {
        "id": "zone-free-4",
-       "kind": "free",
-       "shape": {
-        "rect": [
-         1.5,
-         12.2,
-         12.1,
-         1.6
-        ]
-       },
-       "label": "terrasse"
-      },
-      {
-       "id": "zone-free-5",
        "kind": "free",
        "shape": {
         "rect": [
@@ -25500,8 +25178,12 @@
         11.4
        ],
        [
+        6.7,
+        12.4
+       ],
+       [
         4.7,
-        11.0
+        12.4
        ]
       ],
       "staff_start": [
@@ -25702,8 +25384,16 @@
          6.2
         ],
         [
+         6.9,
+         8.0
+        ],
+        [
+         6.7,
+         11.6
+        ],
+        [
          7.6,
-         8.4
+         12.3
         ]
        ],
        "label": null

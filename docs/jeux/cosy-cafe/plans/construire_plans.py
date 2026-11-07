@@ -1096,7 +1096,7 @@ def ville(state):
 
 def paris_quartier(state):
     arrival = state == "arrivee"
-    cap = {"inside": 19, "outside": 8} if arrival else {"inside": 31, "outside": 28}
+    cap = {"inside": 18, "outside": 6} if arrival else {"inside": 29, "outside": 16}
     p = Plan(
         f"paris-quartier-{state}", "paris-quartier", state, 4,
         "Paris, le café de l'angle des Plumassiers",
@@ -1104,7 +1104,8 @@ def paris_quartier(state):
         0, cap, {"players": 2, "employees": 4 if arrival else 6},
         ("Café d'angle de 68 m² au pied d'un immeuble de rapport, entrée dans le pan coupé, cave dessous. "
          + ("Une rangée de terrasse sur la rue des Plumassiers; la cordonnerie voisine est à vendre."
-            if arrival else "E1: la salle du fond (98 m² en tout). E2: la grande terrasse, sur les deux rues.")),
+            if arrival else "E1: la salle du fond (98 m² en tout). E2: la terrasse sur les deux rues; un second "
+                            "rang attend la décision de l'architecte sur la foule lointaine.")),
         scale_px=36,
     )
     L = p.level("rdc", "Rez-de-chaussée", (0, 0, 20.5, 17.5))
@@ -1145,19 +1146,22 @@ def paris_quartier(state):
                       {"at": 4.2, "w": 1.0, "type": "door", "access": "public", "glazed": True, "label": "sortie",
                        "swing": {"leaves": 1, "hinge": "start", "side": "+"}}]
     L.wall_h(1.0, 14.0, 10.0, 10.5, fond_front + [
-        {"at": 6.4, "w": 3.0, "type": "window", "sill": 0.45, "screen_low": True},
-        {"at": 9.6, "w": 3.0, "type": "window", "sill": 0.45, "screen_low": True},
+        {"at": 6.1, "w": 1.2, "type": "door", "access": "public", "glazed": True, "label": "terrasse",
+         "id": "porte-terrasse", "swing": {"leaves": 2, "hinge": "start", "side": "+"}},
+        {"at": 7.5, "w": 2.8, "type": "window", "sill": 0.45, "screen_low": True},
+        {"at": 10.5, "w": 2.8, "type": "window", "sill": 0.45, "screen_low": True},
     ])
     # Pan coupé: porte d'entrée vitrée à deux vantaux.
     L.diag_wall((14.0, 10.0), (16.0, 8.0), (14.5, 10.5), (16.5, 8.5),
                 door={"t0": 0.22, "t1": 0.78, "access": "public", "glazed": True, "entrance": True,
-                      "id": "porte-angle", "label": "entrée"},
+                      "screen_low": True, "id": "porte-angle", "label": "entrée"},
                 cap_a=[(14.0, 10.5)], cap_b=[(16.5, 8.0)])
     # Mur mitoyen avec l'ancienne cordonnerie.
     if arrival:
         L.wall_v(3.0, 10.0, 5.5, 6.0)
     else:
-        L.wall_v(3.0, 10.0, 5.5, 6.0, [{"at": 5.8, "w": 1.4, "type": "opening", "label": "baie"}])
+        L.wall_v(3.0, 10.0, 5.5, 6.0, [{"at": 5.8, "w": 1.4, "type": "door", "access": "public", "label": "salle du fond",
+                                        "swing": {"leaves": 2, "hinge": "start", "side": "-"}}])
 
     L.floor(rect(6.0, 3.0, 10.0, 7.0), "wood")
     L.floor(rect(1.5, 3.0, 4.0, 7.0), "closed" if arrival else "wood")
@@ -1203,13 +1207,14 @@ def paris_quartier(state):
     L.zone("keep_clear", rect(14.0, 5.4, 1.0, 2.9), "file")
     L.zone("keep_clear", rect(12.6, 6.6, 1.4, 3.4), "allée")
     L.zone("keep_clear", rect(6.0, 5.8, 1.2, 1.4), "baie")
-    L.zone("free", rect(6.0, 6.6, 6.6, 3.4), "salle")
-    for x in (6.5, 8.1, 9.7, 11.3):
+    L.zone("free", rect(7.4, 6.6, 5.2, 3.4), "salle")
+    L.zone("keep_clear", rect(6.0, 8.6, 1.4, 1.4), "porte de la terrasse")
+    for x in (7.9, 9.5, 11.1):
         L.table(x, 9.4, 0.6, 0.6, "W E", round_=True)
     for x in (7.2, 8.8, 10.4, 12.0):
         L.table(x, 7.15, 0.6, 0.6, "N S")
     L.furniture(rect(15.65, 5.8, 0.35, 2.0), "shelf_high", "tablette", height=1.05)
-    for y in (6.15, 6.8, 7.45):
+    for y in (6.0, 6.6, 7.2, 7.8):
         L.stool(15.4, y, room="salle")
 
     # Salle du fond (ancienne cordonnerie).
@@ -1231,30 +1236,31 @@ def paris_quartier(state):
 
     # Terrasse: chaises côte à côte, tournées vers la rue, à la parisienne.
     L.zone("keep_clear", rect(13.6, 10.5, 2.9, 2.0), "porte")
+    L.zone("keep_clear", rect(6.1, 10.5, 1.2, 1.4), "porte de la terrasse")
     if arrival:
-        L.zone("extension", rect(1.5, 12.2, 12.0, 1.6), "E2: la grande terrasse (second rang)")
+        L.zone("extension", rect(1.5, 10.5, 4.0, 1.5), "E2")
         L.zone("extension", rect(16.5, 3.6, 1.2, 4.9), "E2")
-    terrace_a = (6.2, 8.0, 9.8, 11.6) if arrival else (1.8, 3.6, 6.2, 8.0, 9.8, 11.6)
-    L.zone("free", rect(1.5 if not arrival else 6.0, 10.5, 12.1 if not arrival else 7.6, 1.5), "terrasse")
+    else:
+        L.zone("extension", rect(1.5, 12.2, 12.0, 1.5), "second rang: avec l'option B de l'architecte (foule lointaine)")
+    terrace_a = (7.8, 9.6, 11.4) if arrival else (1.8, 3.6, 7.8, 9.6, 11.4)
+    L.zone("free", rect(1.5 if not arrival else 7.4, 10.5, 12.1 if not arrival else 6.2, 1.5), "terrasse")
     for x in terrace_a:
         L.table(x, 11.25, 0.9, 0.5, "N2", area="outside", room="terrasse")
     if not arrival:
-        L.zone("free", rect(1.5, 12.2, 12.1, 1.6), "terrasse")
-        for x in (2.7, 4.5, 7.1, 8.9, 10.7):
-            L.table(x, 13.15, 0.9, 0.5, "N2", area="outside", room="terrasse")
         L.zone("free", rect(16.5, 3.6, 1.2, 4.9), "terrasse des Coudriers")
         for y in (3.7, 5.5, 7.3):
             L.table(17.05, y, 0.5, 0.9, "W2", area="outside", room="terrasse des Coudriers")
-        L.hood(1.5, 10.5, 12.1, 3.3, label="store")
+        L.hood(1.5, 10.5, 12.1, 1.5, label="store")
     else:
-        L.hood(6.0, 10.5, 7.6, 1.5, label="store")
+        L.hood(7.4, 10.5, 6.2, 1.5, label="store")
     L.furniture(rect(13.2, 10.6, 0.3, 0.5), "slate", "ardoise", height=1.2)
 
     # Points, file, vues, espaces.
     L.point("entrance", 16.2, 11.4)
     L.point("exits", 16.2, 11.4)
+    L.point("exits", 6.7, 12.4)
     if not arrival:
-        L.point("exits", 4.7, 11.0)
+        L.point("exits", 4.7, 12.4)
     L.point("staff_start", 12.5, 4.15)
     L.queue("zinc", [(14.5, 8.25), (14.5, 5.85)], 1.0, 5, register=(14.5, 5.85), pickup=(12.75, 5.85),
             doors=["porte-angle"])
@@ -1276,7 +1282,7 @@ def paris_quartier(state):
     L.route("clients", [(9.0, 6.0), (6.75, 6.0), (6.75, 5.3)])
     if not arrival:
         L.route("clients", [(7.0, 6.4), (5.2, 6.5), (3.6, 6.0)])
-    L.route("staff", [(12.0, 4.15), (8.35, 4.15), (8.35, 6.2), (7.6, 8.4)])
+    L.route("staff", [(12.0, 4.15), (8.35, 4.15), (8.35, 6.2), (6.9, 8.0), (6.7, 11.6), (7.6, 12.3)])
     L.route("staff", [(11.5, 4.6), (11.5, 3.9)])
 
     # Textes et cotes.

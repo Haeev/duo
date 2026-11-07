@@ -308,6 +308,11 @@
       "id": "house_olive",
       "hex": "#5E6234",
       "fr": "olive"
+    },
+    {
+      "id": "glass_tint",
+      "hex": "#DCE6E4",
+      "fr": "voile des vitres"
     }
   ]
 }
