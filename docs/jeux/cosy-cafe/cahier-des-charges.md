@@ -1413,7 +1413,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | # | Question | Options | Recommandation | Décision du client | Date |
 |---|---|---|---|---|---|
-| Q1 | Le titre | « Cosy Café »; « Deux Tabliers »; « L'Ardoise du jour »; « Comptoir à deux »; « Petit noir, grand crème »; « Les Deux Tasses » | « Deux Tabliers »: aucun jeu, livre, film ni marque trouvés sous ce nom; il dit le couple, le métier et la douceur. « Cosy Café » se perdrait parmi des jeux existants (section 1.1). L'identifiant `cosy-cafe` peut rester | | |
+| Q1 | Le titre | « Cosy Café »; « Deux Tabliers »; « L'Ardoise du jour »; « Comptoir à deux »; « Petit noir, grand crème »; « Les Deux Tasses » | « Deux Tabliers »: aucun jeu, livre, film ni marque trouvés sous ce nom; il dit le couple, le métier et la douceur. « Cosy Café » se perdrait parmi des jeux existants (section 1.1). L'identifiant `cosy-cafe` peut rester | « Deux Tabliers » | 2026-11-08 |
 | Q2 | La durée de l'histoire principale | environ 34 h (ce cahier: 34,0 h pour un duo médian, 28,3 à 53,1 h selon les duos); plus courte (environ 25 h: seuils et coûts allégés); plus longue (environ 50 h: une semaine de plus par adresse) | environ 34 h: une cinquantaine de soirées de 40 minutes, puis le jeu libre; on recale au prototype sur vos vraies séances (CA-51) | | |
 | Q3 | Paris réel ou métropole inventée | Paris réel, avec des rues, des commerces et des personnes inventés; une grande ville inventée | Paris réel aux rues inventées: c'est le rêve de la demande (« jusqu'à Paris »); la bible le rend reconnaissable par sa matière seule, sans aucun lieu réel | | |
 | Q4 | Les deux joueurs toujours dans le même café | toujours ensemble; libres d'être dans deux cafés à la fois | toujours ensemble en version 1: le coup de feu à deux est le cœur du jeu, et deux cafés à la fois coûteraient un lot de développement et doubleraient les tests (technique, section 7.2, C24); à rouvrir après la bêta si vous le souhaitez en jouant | | |
@@ -1437,6 +1437,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
+| 2026-11-08 | 0.2.1 | Décision du client: titre « Deux Tabliers » (Q1) | client |
 | 2026-11-08 | 0.2 | Consolidation par le manager: résumés des sections 7 à 10, essai de style 3D (7.1), fabrication avec Meshy (7.2), questions Q11 à Q19 venues du son, de la bible, des plans et de l'UX, arbitrages entre membres (section 16) | manager |
 | 2026-11-07 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, 13, 14, proposition de la 12), à partir du cadrage du manager; simulation client par client jointe (`simulations/cosy_cafe.py`, `resultats.md`); alignement sur les plans des cinq adresses (level-designer: noms, places, extensions, équipes reprises), les contraintes C1 à C26 (architecte), la bible (roue des styles, fournisseurs, habitués) et les hypothèses du son (fenêtres du lait, aucun son de qualité) | game-designer, sur brief du manager |
 

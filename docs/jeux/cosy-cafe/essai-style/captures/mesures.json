@@ -1,0 +1,113 @@
+{
+ "A-vue1-1366x768": {
+  "appels": 11,
+  "triangles_dessines": 51494,
+  "triangles_charges": {
+   "fixe": 40120,
+   "personnages": 18238
+  },
+  "programmes": 7,
+  "textures": [
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "lightmap_A",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 26.1,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 1.8277950286865234,
+  "duree_chargement_ms": 1483,
+  "erreurs": []
+ },
+ "A-vue2-1366x768": {
+  "appels": 12,
+  "triangles_dessines": 55724,
+  "triangles_charges": {
+   "fixe": 40120,
+   "personnages": 18238
+  },
+  "programmes": 8,
+  "textures": [
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "lightmap_A",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 26.1,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 1.8277950286865234,
+  "duree_chargement_ms": 1311,
+  "erreurs": []
+ },
+ "A-vue3-1366x768": {
+  "appels": 13,
+  "triangles_dessines": 58562,
+  "triangles_charges": {
+   "fixe": 40120,
+   "personnages": 18238
+  },
+  "programmes": 7,
+  "textures": [
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "lightmap_A",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 26.1,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 1.8277950286865234,
+  "duree_chargement_ms": 1250,
+  "erreurs": []
+ }
+}

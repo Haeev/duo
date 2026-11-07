@@ -122,11 +122,11 @@ def construire_scene():
         import bmesh
         bmesh.ops.reverse_faces(w.bm, faces=list({f for v in vs for f in v.link_faces}))
     # étagères: tasses de cappuccino et piles d'assiettes
-    for i in range(5):
-        S.tasse(w, 8.95 + i * 0.19, 7.25, 1.32, "cappuccino", contenu=False, anse_deg=90)
-    for i in range(3):
+    for i in range(6):
+        S.tasse(w, 7.36 + i * 0.235, 7.25, 1.32, "cappuccino", contenu=False, anse_deg=90)
+    for i in range(4):
         for k in range(4):
-            S.assiette(w, 9.03 + i * 0.3, 7.25, 1.71 + k * 0.018)
+            S.assiette(w, 7.42 + i * 0.36, 7.25, 1.71 + k * 0.018)
     # pichets à lait sur l'arrière-comptoir
     for x in (8.2, 8.36):
         w.lathe(x, 7.4, 0.9, [(0.04, 0), (0.05, 0.005), (0.052, 0.09), (0.045, 0.13), (0.048, 0.14)], G.pans(12), "steel",
@@ -265,7 +265,8 @@ from mathutils import Vector  # noqa: E402
 so.rotation_euler = Vector(to_sun).to_track_quat("Z", "Y").to_euler()
 for i, (x, y, z) in enumerate(bulbs):
     li = bpy.data.lights.new(f"lampe_{i}", "POINT")
-    li.energy = 18.0 * mom["lamps"] * 2
+    # suspensions du comptoir plus fortes que celles des tables: la lumière désigne le travail (bible 1)
+    li.energy = (70.0 if i < 2 else 35.0) * mom["lamps"]
     li.color = M.lin("#FFC27A")[:3]
     li.shadow_soft_size = 0.04
     lo = bpy.data.objects.new(f"lampe_{i}", li)

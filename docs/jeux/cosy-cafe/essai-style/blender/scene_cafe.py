@@ -198,12 +198,14 @@ def arriere_comptoir():
     # faïence vert sombre derrière: fond sombre pour la vaisselle rangée (bible, règle 2)
     g.box(7.1, 9.9, Y0, Y0 + 0.012, 0.9, 2.0, "tiles_dark", bevel=0, drop=("n",))
     # étagères de chêne ciré sur consoles
+    # étagères au-dessus de la plonge et du réfrigérateur (les tasses près de l'évier et de la machine)
     for z in (1.32, 1.71):
-        g.box(8.85, 9.85, Y0 + 0.012, Y0 + 0.29, z - 0.03, z, "shelf", bevel=0.008)
-        for x in (8.95, 9.75):
+        g.box(7.22, 8.68, Y0 + 0.012, Y0 + 0.29, z - 0.03, z, "shelf", bevel=0.008)
+        for x in (7.32, 8.58):
             g.box(x - 0.015, x + 0.015, Y0 + 0.012, Y0 + 0.22, z - 0.18, z - 0.03, "steel_dark", bevel=0.004)
-    # ardoise murale: lue depuis la porte et la file (texte posé par la scène Three.js, police Caveat)
-    sx0, sx1, sz0, sz1 = 7.42, 8.68, 1.28, 2.26
+    # ardoise murale face à la porte et à la file, à côté de la porte de la réserve: depuis l'entrée, ni le rail
+    # à tickets (au-dessus de la passe) ni les suspensions ne la cachent (texte posé par la scène Three.js, Caveat)
+    sx0, sx1, sz0, sz1 = 8.78, 9.9, 1.22, 2.22
     g.box(sx0, sx1, Y0 + 0.012, Y0 + 0.04, sz0, sz1, "oak_dark", bevel=0.012)
     g.box(sx0 + 0.05, sx1 - 0.05, Y0 + 0.04, Y0 + 0.045, sz0 + 0.05, sz1 - 0.05, "slate", bevel=0)
     return g

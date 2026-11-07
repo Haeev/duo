@@ -1,7 +1,7 @@
 {
  "variante": "A",
  "triangles": {
-  "cafe_static": 37251,
+  "cafe_static": 38912,
   "cafe_glass": 246,
   "char_client_register": 3132,
   "char_client_reading": 3092,
@@ -16,9 +16,9 @@
   "palette"
  ],
  "cuisson": {
-  "lightmap_scale": 1.8846405744552612,
-  "bake_spp": 8,
-  "bake_res": 512
+  "lightmap_scale": 1.8277950286865234,
+  "bake_spp": 96,
+  "bake_res": 2048
  },
  "soleil": {
   "azimut_deg": 235.0,
@@ -52,5 +52,5 @@
    2.16
   ]
  ],
- "poids_octets": 3622172
+ "poids_octets": 6604120
 }
