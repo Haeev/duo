@@ -22,6 +22,7 @@ import {
 } from './schemas';
 import { lerpPose } from './hote';
 import { createEventHub, type GameView, type Pose } from './vue';
+import { createClienteleGuestNet } from '../clientele/reseau';
 
 /** Pas par message d'entrées (30 messages par seconde à 60 Hz). */
 const STEPS_PER_MESSAGE = 2;
@@ -90,6 +91,8 @@ export function createGuest(net: Net, content: Content, world: World, now: () =>
   };
 
   const unsubscribers = [
+    // Canal 7: positions des clients debout (chantier clientèle).
+    createClienteleGuestNet(net, world, now),
     moves.onMessage(onMoves),
     core.onMessage((c) => {
       haveCore = true;

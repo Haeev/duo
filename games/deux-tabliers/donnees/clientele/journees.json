@@ -1,0 +1,304 @@
+{
+  "open": 480,
+  "close": 1080,
+  "secondsPerGameMinute": 1,
+  "peacefulSecondsPerGameMinute": 1.25,
+  "weekdays": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+  "days": [
+    {
+      "day": 1,
+      "weekday": "mon",
+      "open": false,
+      "title": "Les clés",
+      "new": [
+        "prologue: Simone sur le seuil, visite (machine, rail, plonge, réserve)",
+        "nommer la maison à deux, emblème et couleurs",
+        "premier noisette pour Simone (geste guidé)",
+        "écrire la première ardoise (8 lignes)",
+        "première commande aux fournisseurs (la tablette propose)"
+      ],
+      "regulars": ["simone"],
+      "event": null,
+      "dayEvent": null,
+      "projects": ["un_nom_sur_la_porte", "notre_ardoise"],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 2,
+      "weekday": "tue",
+      "open": true,
+      "title": "On ouvre",
+      "new": [
+        "retourner la pancarte à deux",
+        "prendre une commande, encaisser, servir au comptoir",
+        "laver à l'évier",
+        "bilan du soir et premier mot du livre d'or"
+      ],
+      "regulars": ["simone"],
+      "event": null,
+      "dayEvent": null,
+      "projects": ["notre_premier_client", "un_premier_mot"],
+      "simone": ["extraction", "dishes"],
+      "endOfDemo": false
+    },
+    {
+      "day": 3,
+      "weekday": "wed",
+      "open": true,
+      "title": "Le mercredi des enfants",
+      "new": [
+        "le goûter du mercredi: les familles l'après-midi",
+        "débarrasser les tables",
+        "le carnet des clients (envies des profils)"
+      ],
+      "regulars": ["simone", "mathis", "farida_noe"],
+      "event": null,
+      "dayEvent": null,
+      "projects": ["comme_d_habitude"],
+      "simone": ["milk", "slate"],
+      "endOfDemo": false
+    },
+    {
+      "day": 4,
+      "weekday": "thu",
+      "open": true,
+      "title": "Le car de 8 h 12",
+      "new": ["premier client pressé à enjeu"],
+      "regulars": ["simone", "mathis"],
+      "event": "le_car_de_8h12",
+      "dayEvent": null,
+      "projects": [],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 5,
+      "weekday": "fri",
+      "open": true,
+      "title": "Une lectrice",
+      "new": [
+        "les fauteuils et le confort (Lise)",
+        "ranger la livraison à deux (sacs de grains lourds)"
+      ],
+      "regulars": ["simone", "mathis", "lise"],
+      "event": null,
+      "dayEvent": null,
+      "projects": ["deux_tasses"],
+      "simone": ["guestbook"],
+      "endOfDemo": false
+    },
+    {
+      "day": 6,
+      "weekday": "sat",
+      "open": true,
+      "title": "Le marché aux fleurs",
+      "new": ["plantes à -20 % jusqu'au jour 12", "panne et réparation à deux"],
+      "regulars": ["simone", "mathis", "farida_noe", "lise"],
+      "event": "la_vieille_dame_tousse",
+      "dayEvent": "le_marche_aux_fleurs",
+      "projects": [],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 7,
+      "weekday": "sun",
+      "open": true,
+      "title": "Les Godillots",
+      "new": [
+        "une commande de groupe",
+        "la terrasse devient achetable (palier « Deux tasses » ou jour 7)"
+      ],
+      "regulars": ["simone", "bastien"],
+      "event": "les_godillots",
+      "dayEvent": null,
+      "projects": [],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 8,
+      "weekday": "mon",
+      "open": false,
+      "title": "Le premier lundi",
+      "new": [
+        "la brocante de la place (6 pièces, -30 %)",
+        "les travaux du lundi",
+        "le bilan de la semaine sur la tablette"
+      ],
+      "regulars": [],
+      "event": null,
+      "dayEvent": null,
+      "projects": [],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 9,
+      "weekday": "tue",
+      "open": true,
+      "title": "Le carnet vert",
+      "new": [
+        "la critique déguisée",
+        "palier « Deux tasses et demie » (ou jour 9): crêpière, coin des enfants, range-vélos, pièce du fond"
+      ],
+      "regulars": ["simone", "mathis", "lise"],
+      "event": "le_carnet_vert",
+      "dayEvent": null,
+      "projects": ["sous_le_store"],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 10,
+      "weekday": "wed",
+      "open": true,
+      "title": "Jules",
+      "new": ["l'enfant perdu: indices partagés"],
+      "regulars": ["simone", "mathis", "farida_noe"],
+      "event": "jules_a_perdu_sa_mamie",
+      "dayEvent": null,
+      "projects": ["la_chandeleur_avant_l_heure"],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 11,
+      "weekday": "thu",
+      "open": true,
+      "title": "L'inspection",
+      "new": [
+        "propreté et ordre sous le regard de l'inspectrice",
+        "le soir: demande des mariés (proposition à deux)"
+      ],
+      "regulars": ["simone", "mathis"],
+      "event": "l_inspection",
+      "dayEvent": null,
+      "projects": ["au_coin_du_feu"],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 12,
+      "weekday": "fri",
+      "open": true,
+      "title": "Le café d'honneur",
+      "new": [
+        "la pièce montée portée à deux",
+        "palier « Trois tasses » (ou jour 12): bouilloire à température"
+      ],
+      "regulars": ["simone", "mathis"],
+      "event": "le_cafe_d_honneur",
+      "dayEvent": null,
+      "projects": ["trois_tasses_au_village"],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 13,
+      "weekday": "sat",
+      "open": true,
+      "title": "Le cœur de lait",
+      "new": ["le concours de dessin sur le lait"],
+      "regulars": ["simone", "mathis", "farida_noe", "lise"],
+      "event": "le_coeur_de_lait",
+      "dayEvent": null,
+      "projects": [],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 14,
+      "weekday": "sun",
+      "open": true,
+      "title": "La fête du Tilleul",
+      "new": ["le défi du village, affluence x1,6"],
+      "regulars": ["simone", "bastien", "farida_noe", "lise", "mathis"],
+      "event": "la_fete_du_tilleul",
+      "dayEvent": null,
+      "projects": ["la_fete_du_tilleul"],
+      "simone": [],
+      "endOfDemo": false
+    },
+    {
+      "day": 15,
+      "weekday": "mon",
+      "open": false,
+      "title": "La lettre de Mérelles",
+      "new": [
+        "René au comptoir: sa boutique de la place de la Halle, son four éteint",
+        "proposition à deux « Partir pour Mérelles ? »: les deux réponses mènent à l'écran de fin de démo",
+        "travaux, brocante (la démo laisse jouer ce lundi)"
+      ],
+      "regulars": ["simone", "rene"],
+      "event": null,
+      "dayEvent": null,
+      "projects": ["partir_pour_merelles"],
+      "simone": [],
+      "endOfDemo": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "un_nom_sur_la_porte",
+      "name": "Un nom sur la porte",
+      "condition": "nommer la maison"
+    },
+    {
+      "id": "notre_ardoise",
+      "name": "Notre ardoise",
+      "condition": "écrire la première ardoise"
+    },
+    {
+      "id": "notre_premier_client",
+      "name": "Notre premier client",
+      "condition": "servir Simone"
+    },
+    {
+      "id": "un_premier_mot",
+      "name": "Un premier mot",
+      "condition": "un mot au livre d'or"
+    },
+    {
+      "id": "comme_d_habitude",
+      "name": "Comme d'habitude",
+      "condition": "servir une fétiche avant la commande"
+    },
+    {
+      "id": "deux_tasses",
+      "name": "Deux tasses",
+      "condition": "2 tasses à Ormeval"
+    },
+    {
+      "id": "la_chandeleur_avant_l_heure",
+      "name": "La Chandeleur avant l'heure",
+      "condition": "crêpière et 20 crêpes servies"
+    },
+    {
+      "id": "sous_le_store",
+      "name": "Sous le store",
+      "condition": "ouvrir la terrasse"
+    },
+    {
+      "id": "au_coin_du_feu",
+      "name": "Au coin du feu",
+      "condition": "ouvrir la pièce du fond"
+    },
+    {
+      "id": "trois_tasses_au_village",
+      "name": "Trois tasses au village",
+      "condition": "3 tasses à Ormeval"
+    },
+    {
+      "id": "la_fete_du_tilleul",
+      "name": "La fête du Tilleul",
+      "condition": "tenir la fête"
+    },
+    {
+      "id": "partir_pour_merelles",
+      "name": "Partir pour Mérelles",
+      "condition": "recevoir la lettre de René (dans la démo, le projet s'arrête là)"
+    }
+  ]
+}

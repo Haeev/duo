@@ -1,0 +1,325 @@
+{
+  "bondLevels": [
+    {
+      "level": 1,
+      "points": 50,
+      "name": "Connaissance"
+    },
+    {
+      "level": 2,
+      "points": 150,
+      "name": "Voisinage"
+    },
+    {
+      "level": 3,
+      "points": 300,
+      "name": "Amitié"
+    },
+    {
+      "level": 4,
+      "points": 500,
+      "name": "Grande amitié"
+    },
+    {
+      "level": 5,
+      "points": 800,
+      "name": "Comme la famille"
+    }
+  ],
+  "bondGains": {
+    "visitServed": 10,
+    "favoriteServed": 15,
+    "asUsual": 20,
+    "chat": 10,
+    "extraItemGift": 10
+  },
+  "regulars": [
+    {
+      "id": "simone",
+      "name": "Simone",
+      "profile": "voisins",
+      "size": 1,
+      "favorite": ["noisette"],
+      "fallbackFavorite": [],
+      "schedule": [
+        [
+          ["tue", "wed", "thu", "fri", "sat", "sun"],
+          [510, 1020]
+        ]
+      ],
+      "firstDay": 2,
+      "unlockedBy": null,
+      "lines": {
+        "greeting": [
+          "Bonjour, vous deux. Comme d'habitude, si vous vous en souvenez.",
+          "Il sent bon, ce matin, votre café.",
+          "Je ne reste pas, j'ai mes aquarelles. Enfin, je reste un peu."
+        ],
+        "favoriteServed": [
+          "Un noisette, une larme de lait, pas plus. Parfait.",
+          "Vous voyez, vous savez déjà."
+        ],
+        "asUsual": ["Vous l'aviez préparé avant que je pousse la porte ? Oh, vous deux..."],
+        "chat": [
+          "Le tilleul a quatre-vingts ans. Il en a vu, des patrons.",
+          "Lucas met trop de beurre dans ses croissants. Ne lui dites pas que j'adore ça.",
+          "La machine, il faut lui parler. Elle aime qu'on lui dise bonjour."
+        ]
+      },
+      "tips": {
+        "extraction": "Attends que la crème soit dorée, et coupe.",
+        "milk": "Le lait chante, puis il siffle. Arrête-toi quand il chante.",
+        "dishes": "Une tasse sale ne sert à personne. Un tour à la plonge entre deux clients.",
+        "slate": "L'ardoise, c'est ce qui fait entrer les gens. Écris ce que tu aimerais boire.",
+        "guestbook": "Le soir, lisez le livre d'or. On apprend plus qu'on ne croit."
+      },
+      "story": [
+        {
+          "level": 0,
+          "id": "simone_cles",
+          "scene": "Jour 1: elle tend les clés sur le seuil et fait la visite.",
+          "reward": {
+            "recipe": "noisette"
+          },
+          "minCups": 0
+        },
+        {
+          "level": 1,
+          "id": "simone_jardin",
+          "scene": "« Mon jardin déborde. Je vous apporte mes plantes, faites-en une infusion. »",
+          "reward": {
+            "recipe": "infusion"
+          },
+          "minCups": 0
+        },
+        {
+          "level": 2,
+          "id": "simone_aquarelle",
+          "scene": "Elle pose une aquarelle sur le comptoir: la place du Tilleul vue de son banc. « Pour votre mur. »",
+          "reward": {
+            "item": "aquarelle_simone"
+          },
+          "minCups": 0
+        },
+        {
+          "level": 2,
+          "id": "simone_piece_du_fond",
+          "scene": "« La pièce du fond... J'y gardais mes affaires. Je les ai montées à l'étage. Elle est à vous, si vous voulez la rouvrir. »",
+          "reward": {
+            "unlock": "village_fond"
+          },
+          "minCups": 2.5
+        },
+        {
+          "level": 3,
+          "id": "simone_trente_ans",
+          "scene": "Elle raconte la première fête du Tilleul qu'elle a régalée, en 1994, sous une pluie battante.",
+          "reward": {
+            "guestbookPin": true
+          },
+          "minCups": 0
+        }
+      ],
+      "model": "habitue-simone"
+    },
+    {
+      "id": "mathis",
+      "name": "Mathis",
+      "profile": "presses",
+      "size": 1,
+      "favorite": ["espresso", "pain_chocolat"],
+      "fallbackFavorite": [],
+      "schedule": [[["tue", "wed", "thu", "fri", "sat"], [490]]],
+      "firstDay": 3,
+      "unlockedBy": null,
+      "lines": {
+        "greeting": [
+          "Salut ! Je suis en retard, comme d'hab.",
+          "Vite, vite, la tournée n'attend pas."
+        ],
+        "favoriteServed": ["Petit noir, pain au chocolat: la journée peut commencer."],
+        "asUsual": ["Déjà prêt ? Vous êtes des magiciens."],
+        "chat": [
+          "Je révise un concours le soir. Les impôts. Oui, je sais.",
+          "Le chien de Bastien m'aboie dessus tous les matins. C'est notre accord."
+        ]
+      },
+      "tips": {},
+      "story": [
+        {
+          "level": 1,
+          "id": "mathis_concours",
+          "scene": "Il sort ses fiches au comptoir: « Je peux réviser ici, le soir ? C'est plus calme que chez moi. »",
+          "reward": {
+            "unlock": "lampe_lin",
+            "note": "il apporte une lampe pour lire au comptoir"
+          },
+          "minCups": 0
+        }
+      ],
+      "model": "habitue-mathis"
+    },
+    {
+      "id": "farida_noe",
+      "name": "Farida et Noé",
+      "profile": "familles",
+      "size": 2,
+      "favorite": ["chocolat", "crepe"],
+      "fallbackFavorite": ["chocolat", "tartine"],
+      "schedule": [
+        [["wed"], [960]],
+        [["sat"], [600]]
+      ],
+      "firstDay": 3,
+      "unlockedBy": null,
+      "lines": {
+        "greeting": [
+          "Noé voulait absolument venir. Moi aussi, en fait.",
+          "Bonjour ! On a couru depuis l'école."
+        ],
+        "favoriteServed": ["Un chocolat et une crêpe: Noé a les yeux qui brillent."],
+        "asUsual": ["Vous vous souvenez de nous ? Noé, dis merci."],
+        "chat": [
+          "Noé dessine partout. Sur l'ardoise aussi, pardon.",
+          "Le mercredi, c'est notre moment à nous."
+        ]
+      },
+      "tips": {},
+      "story": [
+        {
+          "level": 1,
+          "id": "noe_ardoise",
+          "scene": "Un matin, un petit dessin à la craie dans le coin de l'ardoise de trottoir: le tilleul et deux tabliers.",
+          "reward": {
+            "slateDoodle": true
+          },
+          "minCups": 0
+        },
+        {
+          "level": 2,
+          "id": "noe_dessins",
+          "scene": "Noé vous tend une pochette: « C'est pour le mur. » Farida: « Il y a passé tout le week-end. »",
+          "reward": {
+            "item": "dessins_noe"
+          },
+          "minCups": 0
+        }
+      ],
+      "model": "habitue-farida_noe"
+    },
+    {
+      "id": "bastien",
+      "name": "Bastien et Gribouille",
+      "profile": "promeneurs",
+      "size": 1,
+      "favorite": ["jus_orange", "tartine"],
+      "fallbackFavorite": ["the_noir", "tartine"],
+      "schedule": [[["sun"], [660]]],
+      "firstDay": 7,
+      "unlockedBy": null,
+      "lines": {
+        "greeting": [
+          "Gribouille a reconnu la porte avant moi.",
+          "On descend des crêtes. Il fait soif !"
+        ],
+        "favoriteServed": ["Un jus pressé, enfin un vrai !"],
+        "asUsual": ["Vous l'aviez vu venir de loin, hein ?"],
+        "chat": [
+          "Je balise un sentier qui passera par la place.",
+          "Les cyclistes de la voie verte cherchent où poser leurs vélos."
+        ]
+      },
+      "tips": {},
+      "story": [
+        {
+          "level": 0,
+          "id": "bastien_club",
+          "scene": "Il annonce son club pour midi: les Godillots de l'Arvelle.",
+          "reward": {
+            "event": "les_godillots"
+          },
+          "minCups": 0
+        },
+        {
+          "level": 1,
+          "id": "bastien_citronnade",
+          "scene": "« Ma recette de citronnade: un citron, du sucre, la menthe de Simone. Ne la donnez à personne. »",
+          "reward": {
+            "recipe": "citronnade",
+            "item": "ecuelle_gribouille"
+          },
+          "minCups": 0
+        }
+      ],
+      "model": "habitue-bastien"
+    },
+    {
+      "id": "lise",
+      "name": "Lise",
+      "profile": "flaneurs",
+      "size": 1,
+      "favorite": ["creme", "tarte_fruits"],
+      "fallbackFavorite": [],
+      "schedule": [
+        [["sat"], [600]],
+        [["tue"], [900]]
+      ],
+      "firstDay": 5,
+      "unlockedBy": null,
+      "lines": {
+        "greeting": [
+          "Bonjour. Un crème, et le calme de votre salle.",
+          "Je vous ai apporté un livre, pour l'étagère. Enfin, quand vous en aurez une."
+        ],
+        "favoriteServed": ["La tarte du jour et un crème: le bonheur tient à peu de choses."],
+        "asUsual": ["Vous lisez dans les pensées, maintenant ?"],
+        "chat": [
+          "J'écris l'histoire du café pour le bulletin du village.",
+          "Un fauteuil près de la vitrine, et je ne bouge plus de l'après-midi."
+        ]
+      },
+      "tips": {},
+      "story": [
+        {
+          "level": 1,
+          "id": "lise_livres",
+          "scene": "« Si vous montez une étagère, je la remplis. La bibliothèque de l'école a des doubles. »",
+          "reward": {
+            "unlock": "etagere_livres_equip",
+            "note": "l'étagère arrive avec ses livres"
+          },
+          "minCups": 0
+        },
+        {
+          "level": 2,
+          "id": "lise_bulletin",
+          "scene": "Elle lit à voix haute la première page de son article sur le café, devant la vitrine.",
+          "reward": {
+            "guestbookPin": true
+          },
+          "minCups": 0
+        }
+      ],
+      "model": "habitue-lise"
+    },
+    {
+      "id": "odile_jules",
+      "name": "Mamie Odile et Jules",
+      "profile": "familles",
+      "size": 2,
+      "favorite": ["the_noir", "chocolat"],
+      "fallbackFavorite": [],
+      "schedule": [[["wed"], [900]]],
+      "firstDay": 0,
+      "unlockedBy": "jules_a_perdu_sa_mamie",
+      "lines": {
+        "greeting": ["Mon lapin voulait revenir voir ses sauveurs."],
+        "favoriteServed": ["Un thé pour moi, un chocolat pour le lapin."],
+        "chat": ["Je ne le quitte plus des yeux, promis."]
+      },
+      "tips": {},
+      "story": [],
+      "model": "habitue-odile_jules"
+    }
+  ]
+}
