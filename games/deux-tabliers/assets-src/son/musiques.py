@@ -105,8 +105,8 @@ def pompe(accords: list[Accord], vel: int = 56) -> list[Note]:
 
 
 def tenu_final(acc: Accord, t: float, duree: float, bas: int, haut: int, vel: int, nb: int = 3) -> list[Note]:
-    return [Note(t, duree, p, vel) for p in nappe([Accord(t, duree, acc.symbole, acc.racine, acc.pcs, acc.basse)],
-                                                  vel, nb, bas, haut)]
+    seul = Accord(t, duree, acc.symbole, acc.racine, acc.pcs, acc.basse)
+    return [Note(t, duree, n.p, vel) for n in nappe([seul], vel, nb, bas, haut)]
 
 
 def balais(debut: float, fin: float, mesure: float, vel: int = 34) -> list[Note]:
@@ -141,11 +141,9 @@ def rosee() -> Morceau:
     b = lambda k, v=80, tr=0: mel(ROSEE_B, p.t(k), v, M34, transpo=tr)  # noqa: E731
     fin_outro = mel("D5:2 B4:1 | E5:2 C5:1 | B4:2 G4:1 | A4:1 F#4:1 A4:1 | G4:3 | r:3 | r:3 | r:3 |",
                     p.t(7), 74, M34)
-    violon = a(1, 84) + a(2, 80) + b(4 - 1 + 1, 78) + a(4, 84) + b(5, 80) + a(6, 86) + fin_outro
-    violon = [n for n in violon if n.t < p.t(3) or n.t >= p.t(4)] + b(3, 0)[:0]
-    # La flûte à bec répond: deuxième A en tierce (sixte basse), B en tête, dernier A à l'octave.
-    flute = (decaler(a(2, 64), transpo=12)[:0] + b(3, 80) + decaler(b(5, 60), transpo=12)
-             + decaler(a(6, 58), transpo=12))
+    violon = a(1, 84) + a(2, 80) + a(4, 84) + b(5, 80) + a(6, 86) + fin_outro
+    # La flûte à bec prend le premier B, puis double le violon à l'unisson (couleur de bal folk).
+    flute = b(3, 80) + b(5, 66) + a(6, 62)
     basse, gtr = valse(p.sauf_fin(3 * M34), vel_b=72, vel_c=52, bas_c=52, haut_c=67)
     gtr += tenu_final(p.accords[-1], p.fin - 3 * M34, 3 * M34, 52, 67, 56, 4)
     basse.append(Note(p.fin - 3 * M34, 3 * M34, 43, 70))
@@ -288,7 +286,7 @@ def garcon_presse() -> Morceau:
     outro = mel("E5:.67 A5:.33 r:.67 E5:.33 C5:1 A4:1 | B4:1 G#4:1 E4:2 | A4:1 r:3 | r:4 |", p.t(7), 84, M44,
                 legato=0.9)
     guitare_solo = a(1) + a(4, 86) + decaler(a(4, 70), transpo=-12) + a(6, 82) + outro
-    accordeon = a(2, 82) + b(3) + b(5, 70)[:0] + a(6, 80) + outro
+    accordeon = a(2, 82) + b(3) + a(6, 80) + outro
     clarinette = b(5, 80)
     fin_t = p.fin - 2 * M44
     gtr = pompe([x for x in p.accords if x.t < fin_t - 1e-6], vel=54)
@@ -366,9 +364,11 @@ def caisse_faite() -> Morceau:
     acc = grille("F | Dm7 | Bbmaj7 C | F", 0.0, M44)
     piano = mel("G4:1 A4:1 C5:2 | D5:2 C5:2 | D5:1 C5:1 A4:1 G4:1 | A4:4 |", 0.0, 68, M44)
     nylon = []
-    for a in acc[:-1]:
-        nylon += [Note(a.t + k * 0.5, 1.2, p, 50) for k, p in
-                  enumerate(nappe([a], 50, 3, 53, 69)[0:0] and [] or [n.p for n in nappe([a], 50, 3, 53, 69)])]
+    for a in acc[:-1]:  # arpège en croches sur les notes de l'accord, de bas en haut puis retour
+        voix = sorted(n.p for n in nappe([a], 50, 3, 53, 69))
+        ordre = voix + voix[-2:0:-1]
+        nylon += [Note(a.t + 0.5 * k, 1.2, ordre[k % len(ordre)], 50 - (4 if k % 2 else 0))
+                  for k in range(int(round(a.d / 0.5)))]
     nylon += [Note(acc[-1].t + 0.12 * k, 4.0, n.p, 52 - 3 * k) for k, n in enumerate(nappe([acc[-1]], 52, 4, 53, 72))]
     cello = [Note(0.0, 3.9, 41, 64), Note(4.0, 3.9, 38, 62), Note(8.0, 1.9, 46, 62), Note(10.0, 1.9, 48, 62),
              Note(12.0, 4.0, 41, 60)]
