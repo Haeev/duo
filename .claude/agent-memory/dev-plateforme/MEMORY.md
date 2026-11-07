@@ -38,3 +38,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Une longue frappe Playwright touche par touche (`keyboard.type`, 60 caractères) dans la page de La Petite Ligne fige la page même dans une zone de saisie ordinaire, sans rien de nouveau: `keyboard.insertText` pour un texte long.
 - Un message du jeu peut mettre plus d'une demi-seconde à atteindre le principal en rendu logiciel: avant une vraie touche qui dépend d'un état annoncé par le jeu, attendre la trace dans le journal (`logs/*.jsonl`).
 - `xdotool key ctrl+n` passe par `before-input-event` comme Échap; `webContents.capturePage()` de la vue jeu inclut l'interface HTML du jeu, pas le canevas seul.
+
+## Interfaces DOM des jeux (vérifié le 2026-11-08, Deux Tabliers)
+
+- Le SDK lit le clavier en capture sur `window` et fait `preventDefault` sur toute touche liée à une action (Tab, Entrée, Espace, E, flèches...), sauf dans un champ de saisie: dans un panneau du jeu, ni Tab ni Entrée ni Espace n'agissent seuls. Le gestionnaire de panneaux fait tout lui-même (focus suivant, `click()` du bouton focalisé, navigation spatiale).
+- L'attribut `hidden` perd contre une règle CSS `display: flex`: poser `[hidden] { display: none !important; }` dans la feuille du jeu.
+- L'outil d'écriture de fichiers transforme les échappements d'espaces insécables (U+00A0) et fines (U+202F) écrits dans un source en caractères réels (ESLint: `no-irregular-whitespace`); les remettre en échappements par un script après coup.
+- Un champ de texte focalisé par programme a son curseur au début: `setSelectionRange(fin, fin)` pour l'avoir à la fin.
+- Panneau reconstruit à chaque changement du modèle: retrouver le focus par une clé (balise, nom, rang) et garder tel quel le champ en cours de saisie (`data-keep`), sinon la frappe se perd.
+- Le faux hôte (`servir.ts`) sert `dist/` du jeu: reconstruire le jeu avant d'essayer; ports 8080 à 8100 souvent pris par d'autres sessions, prendre un port plus haut.
