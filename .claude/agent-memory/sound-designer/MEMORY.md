@@ -119,3 +119,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - La géométrie du train du son (`slideDistanceM` 70) ne suit pas le rendu depuis R06 (`trainSlides` de `rendu/voie.ts`: entrée depuis le bord est de la carte): ce qui dépend de la position visible (sifflet aux passages à niveau) se calcule à part.
 - Prettier n'est pas appliqué aux fichiers de `src/audio` (27 fichiers hors format avant toute retouche): ne pas reformater, seuls `tsc` et `eslint` comptent.
 - Commande refusée dans un worktree isolé: `git show HEAD:...` suivi d'une redirection; `magick` absent (ImageMagick 6: `convert`).
+
+## Budgets et Chromium (vérifié le 2026-11-07, direction sonore de Cosy Café)
+
+- Mémoire décodée: `new OfflineAudioContext(1, 1, 24000).decodeAudioData()` rend un tampon à 24 kHz (deux fois moins de mémoire qu'à 48 kHz) qui se joue juste dans un contexte à 48 ou 44,1 kHz (sinus de 1 kHz, durée exacte). Le `load` du SDK décode dans le contexte principal: il faut une option de fréquence.
+- Ogg Opus dans Chromium: `canPlayType` « probably », décodage à la longueur exacte à 48 et 44,1 kHz, lecture en flux par `createMediaElementSource`, `preservesPitch` présent; une vitesse de 1,01 donne 1,0096 mesuré sur 6 s (sur 2 s, la mesure n'est pas fiable).
+- libopus en débit variable libre dépasse sa consigne sur un rendu FluidR3 court (48k demandés, 56,8 kbit/s réels); `-vbr constrained` reste juste dessous (40k: 37,7; 48k: 45,0). Énergie par octave à 0,12 dB de la source jusqu'à 12 kHz dès 32 à 40 kbit/s (ne mesure pas tous les défauts: faire comparer à l'oreille).
+- Poids des sons courts en Vorbis: environ 3,6 Ko d'en-têtes par fichier mono (qualité 3) plus 6,5 Ko/s; stéréo qualité 4 environ 4 Ko plus 12 Ko/s (bruit décroissant, majorant).
+- Un budget se calcule à partir des tableaux du document sonore (colonne Fichiers « n × d s », « boucle d s », « st. », « 32 kHz », « par adresse »), par un script qui lit le Markdown: une première version à 48 kHz, trois ou quatre variantes et longues queues donnait 150 Mo de pic; leviers: musiques finies lues en flux (pas de raccord), décodage à 24 ou 32 kHz, groupes décodés par moment, variantes et queues resserrées.
+- Inventaire de FluidR3_GM (lecture du bloc `phdr`, script de 30 lignes): batteries Brush 128:40 à 42 et Jazz 128:32 à 36; Italian Accordion 8:21, Mandolin 16:25, Ukulele 8:24, Slow Violin 8:40, Fiddle 0:110, Rhodes EP 0:4, Honky Tonk 0:3, Calliope Lead 0:82, Reed Organ 0:20, Bandoneon 0:23, Kalimba 0:108; pas de clarinette basse.
+- SDK audio (`packages/sdk/src/audio.ts`): trois bus (`music`, `effects`, `interface`), aucun limiteur, `playMusic` démarre tout de suite un `HTMLAudioElement` sans position ni départ programmé.
