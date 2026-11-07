@@ -1,0 +1,44 @@
+{
+  "frame": {
+    "triangles": 1564,
+    "calls": 6,
+    "programs": 2,
+    "textures": 2,
+    "geometries": 6
+  },
+  "decor": {
+    "triangles": 616,
+    "calls": 23
+  },
+  "models": [
+    {
+      "file": "espresso_machine_village.doublure.glb",
+      "fileBytes": 86536,
+      "url": "/modele-0.glb",
+      "triangles": 1504,
+      "drawCalls": 1,
+      "bones": 0,
+      "clips": [],
+      "playing": null,
+      "sizeM": [
+        0.76,
+        0.48,
+        0.65
+      ],
+      "textures": [
+        {
+          "slot": "map",
+          "w": 64,
+          "h": 64
+        }
+      ],
+      "textureBytesWithMips": 21845
+    }
+  ],
+  "viewport": [
+    1366,
+    768
+  ],
+  "fovVertical": 60,
+  "pageErrors": []
+}

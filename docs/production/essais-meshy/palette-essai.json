@@ -1,0 +1,313 @@
+{
+  "cell_px": 4,
+  "grid": 16,
+  "size_px": 64,
+  "source": "docs/jeux/cosy-cafe/bible/source/palette.cjs",
+  "cells": [
+    {
+      "id": "porcelain",
+      "hex": "#F5F0E6",
+      "fr": "porcelaine"
+    },
+    {
+      "id": "paper",
+      "hex": "#FBF6EA",
+      "fr": "papier"
+    },
+    {
+      "id": "milk",
+      "hex": "#FAF4EA",
+      "fr": "lait et mousse"
+    },
+    {
+      "id": "ink",
+      "hex": "#2B2622",
+      "fr": "encre"
+    },
+    {
+      "id": "espresso",
+      "hex": "#3B2318",
+      "fr": "café"
+    },
+    {
+      "id": "crema",
+      "hex": "#B57844",
+      "fr": "crème du café"
+    },
+    {
+      "id": "chocolate",
+      "hex": "#5A3426",
+      "fr": "chocolat"
+    },
+    {
+      "id": "tea",
+      "hex": "#A65A2C",
+      "fr": "thé infusé"
+    },
+    {
+      "id": "crust",
+      "hex": "#C68845",
+      "fr": "croûte dorée"
+    },
+    {
+      "id": "crumb",
+      "hex": "#EBD5A2",
+      "fr": "mie et pâte"
+    },
+    {
+      "id": "berry",
+      "hex": "#9E3647",
+      "fr": "fruits rouges"
+    },
+    {
+      "id": "citrus",
+      "hex": "#E5AE38",
+      "fr": "agrumes"
+    },
+    {
+      "id": "kraft",
+      "hex": "#B48C5E",
+      "fr": "kraft"
+    },
+    {
+      "id": "walnut",
+      "hex": "#5E4130",
+      "fr": "noyer"
+    },
+    {
+      "id": "oak_dark",
+      "hex": "#7A5A3E",
+      "fr": "chêne foncé"
+    },
+    {
+      "id": "slate",
+      "hex": "#343938",
+      "fr": "ardoise"
+    },
+    {
+      "id": "zinc",
+      "hex": "#858C91",
+      "fr": "zinc"
+    },
+    {
+      "id": "marble_dark",
+      "hex": "#4F5A55",
+      "fr": "marbre vert-gris"
+    },
+    {
+      "id": "tray",
+      "hex": "#4A3A31",
+      "fr": "plateau"
+    },
+    {
+      "id": "oak_honey",
+      "hex": "#B3834F",
+      "fr": "chêne miel"
+    },
+    {
+      "id": "plaster",
+      "hex": "#D5C4A5",
+      "fr": "enduit crème"
+    },
+    {
+      "id": "linen",
+      "hex": "#CBBEA6",
+      "fr": "lin"
+    },
+    {
+      "id": "leaf",
+      "hex": "#5D7D47",
+      "fr": "feuillage"
+    },
+    {
+      "id": "leaf_light",
+      "hex": "#8A9C5E",
+      "fr": "feuillage clair"
+    },
+    {
+      "id": "pot",
+      "hex": "#A5603F",
+      "fr": "terre cuite"
+    },
+    {
+      "id": "copper",
+      "hex": "#A2643D",
+      "fr": "cuivre"
+    },
+    {
+      "id": "brass",
+      "hex": "#C2A05A",
+      "fr": "laiton"
+    },
+    {
+      "id": "steel",
+      "hex": "#A3A8AC",
+      "fr": "inox"
+    },
+    {
+      "id": "steel_dark",
+      "hex": "#4C5156",
+      "fr": "acier sombre"
+    },
+    {
+      "id": "glass",
+      "hex": "#C9D6D3",
+      "fr": "verre"
+    },
+    {
+      "id": "shadow_contact",
+      "hex": "#2A1E18",
+      "fr": "ombre de contact"
+    },
+    {
+      "id": "lamp_warm",
+      "hex": "#FFC27A",
+      "fr": "lampe chaude"
+    },
+    {
+      "id": "lamp_shade",
+      "hex": "#FFE0B0",
+      "fr": "abat-jour allumé"
+    },
+    {
+      "id": "sun_patch",
+      "hex": "#FFD9A0",
+      "fr": "tache de soleil"
+    },
+    {
+      "id": "alert",
+      "hex": "#E0A030",
+      "fr": "ambre"
+    },
+    {
+      "id": "alert_ink",
+      "hex": "#5A3A10",
+      "fr": "ambre foncé"
+    },
+    {
+      "id": "skin_1",
+      "hex": "#F2D3BC",
+      "fr": "peau 1"
+    },
+    {
+      "id": "skin_2",
+      "hex": "#E4B897",
+      "fr": "peau 2"
+    },
+    {
+      "id": "skin_3",
+      "hex": "#CC9871",
+      "fr": "peau 3"
+    },
+    {
+      "id": "skin_4",
+      "hex": "#AD7852",
+      "fr": "peau 4"
+    },
+    {
+      "id": "skin_5",
+      "hex": "#87583A",
+      "fr": "peau 5"
+    },
+    {
+      "id": "skin_6",
+      "hex": "#5C3C29",
+      "fr": "peau 6"
+    },
+    {
+      "id": "hair_1",
+      "hex": "#2B2320",
+      "fr": "cheveux 1"
+    },
+    {
+      "id": "hair_2",
+      "hex": "#4A3324",
+      "fr": "cheveux 2"
+    },
+    {
+      "id": "hair_3",
+      "hex": "#6E4A30",
+      "fr": "cheveux 3"
+    },
+    {
+      "id": "hair_4",
+      "hex": "#A3663A",
+      "fr": "cheveux 4"
+    },
+    {
+      "id": "hair_5",
+      "hex": "#CDAA6E",
+      "fr": "cheveux 5"
+    },
+    {
+      "id": "hair_6",
+      "hex": "#B9B4AE",
+      "fr": "cheveux 6"
+    },
+    {
+      "id": "hair_7",
+      "hex": "#E0DCD4",
+      "fr": "cheveux 7"
+    },
+    {
+      "id": "flaneurs_scarf",
+      "hex": "#B39656",
+      "fr": "écharpe moutarde douce"
+    },
+    {
+      "id": "flaneurs_cord",
+      "hex": "#7A5A44",
+      "fr": "velours brun"
+    },
+    {
+      "id": "flaneurs_knit",
+      "hex": "#707A86",
+      "fr": "pull gris bleuté"
+    },
+    {
+      "id": "flaneurs_paper",
+      "hex": "#D9D0BE",
+      "fr": "journal"
+    },
+    {
+      "id": "house_bordeaux",
+      "hex": "#6E2E35",
+      "fr": "bordeaux"
+    },
+    {
+      "id": "house_bottle",
+      "hex": "#2F4F3E",
+      "fr": "vert bouteille"
+    },
+    {
+      "id": "house_duck",
+      "hex": "#2F5560",
+      "fr": "bleu canard"
+    },
+    {
+      "id": "house_navy",
+      "hex": "#313D5B",
+      "fr": "bleu nuit"
+    },
+    {
+      "id": "house_terracotta",
+      "hex": "#934B33",
+      "fr": "terre de Sienne"
+    },
+    {
+      "id": "house_mustard",
+      "hex": "#94742A",
+      "fr": "moutarde"
+    },
+    {
+      "id": "house_plum",
+      "hex": "#5A3450",
+      "fr": "prune"
+    },
+    {
+      "id": "house_olive",
+      "hex": "#5E6234",
+      "fr": "olive"
+    }
+  ]
+}

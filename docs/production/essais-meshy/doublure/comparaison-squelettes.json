@@ -1,0 +1,109 @@
+{
+  "a": {
+    "file": "customer_01.glb",
+    "skin": 0,
+    "joints": 18
+  },
+  "b": {
+    "file": "Character_output_b.glb",
+    "skin": 0,
+    "joints": 18
+  },
+  "same_bone_names": true,
+  "only_in_a": [],
+  "only_in_b": [],
+  "hierarchy_differences": [],
+  "same_skeleton": true,
+  "largest_bone_length_differences": [
+    {
+      "bone": "chest",
+      "a_m": 0.1541,
+      "b_m": 0.16,
+      "relative": 0.038
+    },
+    {
+      "bone": "foot_l",
+      "a_m": 0.3805,
+      "b_m": 0.395,
+      "relative": 0.038
+    },
+    {
+      "bone": "foot_r",
+      "a_m": 0.3805,
+      "b_m": 0.395,
+      "relative": 0.038
+    },
+    {
+      "bone": "forearm_l",
+      "a_m": 0.256,
+      "b_m": 0.2658,
+      "relative": 0.038
+    },
+    {
+      "bone": "forearm_r",
+      "a_m": 0.256,
+      "b_m": 0.2658,
+      "relative": 0.038
+    },
+    {
+      "bone": "hand_l",
+      "a_m": 0.2266,
+      "b_m": 0.2352,
+      "relative": 0.038
+    },
+    {
+      "bone": "hand_r",
+      "a_m": 0.2266,
+      "b_m": 0.2352,
+      "relative": 0.038
+    },
+    {
+      "bone": "head",
+      "a_m": 0.0771,
+      "b_m": 0.08,
+      "relative": 0.038
+    }
+  ],
+  "clips_of_a_on_b": [
+    {
+      "clip": "walk",
+      "tracks_targets": 18,
+      "missing_in_b": []
+    },
+    {
+      "clip": "idle",
+      "tracks_targets": 18,
+      "missing_in_b": []
+    },
+    {
+      "clip": "sit",
+      "tracks_targets": 18,
+      "missing_in_b": []
+    },
+    {
+      "clip": "drink",
+      "tracks_targets": 18,
+      "missing_in_b": []
+    }
+  ],
+  "bone_names_a": [
+    "chest",
+    "foot_l",
+    "foot_r",
+    "forearm_l",
+    "forearm_r",
+    "hand_l",
+    "hand_r",
+    "head",
+    "hips",
+    "neck",
+    "root",
+    "shin_l",
+    "shin_r",
+    "spine",
+    "thigh_l",
+    "thigh_r",
+    "upper_arm_l",
+    "upper_arm_r"
+  ]
+}

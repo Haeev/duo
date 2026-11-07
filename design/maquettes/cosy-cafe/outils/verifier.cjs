@@ -198,14 +198,15 @@ function analyser() {
       if (!rects.length) return;
       const u = rects.reduce((a, r) => ({ left: Math.min(a.left, r.left), top: Math.min(a.top, r.top), right: Math.max(a.right, r.right), bottom: Math.max(a.bottom, r.bottom) }), { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
       if (!dedans(u, ecran, 1)) problemes.push(`élément du HUD hors de l'écran : ${decrire(m)}`);
-      regions.push({ nom: decrire(m), r: u, centre: region.matches('.hud-centre') });
+      regions.push({ nom: decrire(m), r: u, centre: region.matches('.hud-centre'), repere: m.matches('.repere') });
     });
   });
   for (let i = 0; i < regions.length; i += 1) {
     for (let j = i + 1; j < regions.length; j += 1) {
       const a = regions[i];
       const b = regions[j];
-      if (a.centre && b.centre) continue;
+      // Au centre, seuls les repères des sons doivent rester à l'écart des autres éléments.
+      if (a.centre && b.centre && !a.repere && !b.repere) continue;
       const recouvre = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left) > 2 && Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top) > 2;
       if (recouvre) problemes.push(`régions du HUD qui se chevauchent : ${a.nom} et ${b.nom}`);
     }
@@ -442,6 +443,8 @@ async function parcours(navigateur, largeur, hauteur) {
           });
         }
         await page.waitForTimeout(options.police ? 260 : 140);
+        // La police ou les pseudos changent la mise en page après l'ouverture: on replace le focus comme le ferait l'écran.
+        if (options.police || options.pseudos) await page.evaluate(() => window.Maquette && window.Maquette.focusParDefaut());
         const r = await page.evaluate(analyser);
         total += 1;
         if (r.minTexte < minTexte) {

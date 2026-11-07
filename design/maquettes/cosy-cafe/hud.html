@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="support/commun.css">
 <style>
   body[data-etat='rail'] .scene__vue { --px: 60.2; --py: 20; --s: 1.6; }
-  body[data-etat='caisse'] .scene__vue { --px: 17.2; --py: 55.1; --s: 1.5; }
+  body[data-etat='caisse'] .scene__vue { --px: 33.9; --py: 55.1; --s: 1.5; }
   body[data-etat='preparation'] .scene__vue, body[data-etat='fermeture'] .scene__vue { --px: 83.9; --py: 28.8; --s: 2.2; }
   body[data-etat='tasses'] .scene__vue { --px: 50; --py: 7.4; --s: 1.6; }
   body[data-etat='amenagement'] .scene__vue { --px: 56.3; --py: 64.8; --s: 1.45; }
@@ -40,7 +40,7 @@
     </div>
     <div class="horloge horloge--arretee carte-hud" data-si="reprendre">
       <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">11 h 20</span></p>
-      <p class="horloge__moment">L’horloge repart quand vous avez repris la souris tous les deux</p>
+      <p class="horloge__moment">L’horloge repart quand vous avez repris la souris</p>
     </div>
     <div class="horloge horloge--arretee carte-hud" data-si="absence">
       <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">11 h 20</span></p>
@@ -130,49 +130,49 @@
   <div class="hud-haut-droite">
     <div class="autre carte-hud" data-si="service proposition-ouverte reprendre">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 45deg"></span>derrière toi, à droite</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi, à droite"><span class="icone" data-icone="fleche" style="--angle: 45deg"></span></span>
       <p class="autre__ou">À la plonge</p><p class="autre__tient">Tient 3 assiettes sales</p>
     </div>
     <div class="autre carte-hud" data-si="rail caisse">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span>derrière toi</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
       <p class="autre__ou">À la machine</p><p class="autre__tient">Tient un pichet de lait</p>
     </div>
     <div class="autre carte-hud" data-si="preparation">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span>derrière toi</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
       <p class="autre__ou">À l’ardoise</p><p class="autre__tient">Écrit la carte du jour</p>
     </div>
     <div class="autre carte-hud" data-si="ouverture ouverture-ouverte">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span>derrière toi</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
       <p class="autre__ou">À la porte</p><p class="autre__tient">Tient la pancarte</p>
     </div>
     <div class="autre carte-hud" data-si="fermeture">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span>derrière toi</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
       <p class="autre__ou">Au livre d’or</p><p class="autre__tient">Lit les mots du jour</p>
     </div>
     <div class="autre carte-hud" data-si="vide proposition envoyee">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: -45deg"></span>devant toi, à droite</p>
+      <span class="autre__direction" role="img" aria-label="devant toi, à droite"><span class="icone" data-icone="fleche" style="--angle: -45deg"></span></span>
       <p class="autre__ou">Dans la réserve</p>
       <p class="autre__tient" data-si="vide">Tient un carton de lait</p>
-      <p class="autre__tient" data-si="proposition envoyee">Regarde la tablette : catalogue</p>
+      <p class="autre__tient" data-si="proposition envoyee">Sur la tablette : catalogue</p>
     </div>
     <div class="autre carte-hud" data-si="tasses geste geste-simplifie">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span>derrière toi</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
       <p class="autre__ou">En salle</p><p class="autre__tient">Tient 2 tasses sales</p>
     </div>
     <div class="autre carte-hud" data-si="absence">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 180deg"></span>à ta gauche</p>
+      <span class="autre__direction" role="img" aria-label="à ta gauche"><span class="icone" data-icone="fleche" style="--angle: 180deg"></span></span>
       <p class="autre__ou">À la caisse</p><p class="autre__tient">Fait une pause depuis 1 min</p>
     </div>
     <div class="autre carte-hud" data-si="amenagement amenagement-ok amenagement-eau">
       <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
-      <p class="autre__direction"><span class="icone" data-icone="fleche" style="--angle: 180deg"></span>à ta gauche</p>
+      <span class="autre__direction" role="img" aria-label="à ta gauche"><span class="icone" data-icone="fleche" style="--angle: 180deg"></span></span>
       <p class="autre__ou">Aménage aussi</p><p class="autre__tient">Déplace une chaise</p>
     </div>
 
@@ -217,13 +217,13 @@
       <p class="arc-geste__libelle capsule" data-si="geste-simplifie"><span class="icone" data-icone="thermometre"></span>Mousser le lait · tout seul</p>
     </div>
 
-    <div class="lecture-ticket carte-hud" data-si="rail">
-      <p class="lecture-ticket__tete">Ticket 15 · Table 5 <span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>2 min</span></p>
-      <p>2 chocolats chauds</p><p>1 pain au chocolat</p>
-      <p class="aide">Libre : personne ne le prépare</p>
-    </div>
 
     <div class="invite">
+      <div class="lecture-ticket carte-hud" data-si="rail">
+        <p class="lecture-ticket__tete">Ticket 15 · Table 5 <span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>2 min</span></p>
+        <p>2 chocolats chauds</p><p>1 pain au chocolat</p>
+        <p class="aide">Libre : personne ne le prépare</p>
+      </div>
       <p class="invite__ligne capsule" data-si="service proposition envoyee"><kbd>E</kbd><span data-souris="gauche"></span>Servir la table 3</p>
       <p class="invite__detail" data-si="service proposition envoyee">Cappuccino, tarte aux fruits · ticket 12</p>
       <p class="invite__ligne capsule" data-si="rail"><kbd>E</kbd><span data-souris="gauche"></span>Prendre le ticket 15</p>
@@ -236,7 +236,7 @@
       <p class="invite__ligne capsule invite__refus" data-si="tasses"><span class="icone" data-icone="info"></span>Plus de tasse propre ici</p>
       <p class="invite__detail" data-si="tasses">Il y en a dans le lave-vaisselle, à la plonge.</p>
       <p class="invite__ligne capsule" data-si="geste">Relâche <kbd>E</kbd> dans la zone : 58 à 65 °C</p>
-      <p class="invite__detail" data-si="geste">Presque… le pichet chante quand c’est juste.</p>
+      <p class="invite__detail" data-si="geste">Presque…</p>
       <p class="invite__ligne capsule" data-si="geste-simplifie">Le geste se fait tout seul</p>
       <p class="invite__detail" data-si="geste-simplifie">Gestes simplifiés : résultat « bien » assuré</p>
       <p class="invite__ligne capsule" data-si="absence"><kbd>E</kbd><span data-souris="gauche"></span>Débarrasser la table 3</p>
@@ -255,7 +255,7 @@
 
     <div class="capsule-souris" data-si="reprendre" role="status">
       <p class="capsule"><span data-souris="gauche" aria-hidden="true"></span>Clique pour reprendre la souris</p>
-      <p class="invite__detail">ou appuie sur <kbd>Entrée</kbd> · ce clic n’agit pas dans le café</p>
+      <p class="invite__detail">ou appuie sur <kbd>Entrée</kbd>. Ce clic n’agit pas dans le café.</p>
     </div>
   </div>
 
@@ -263,9 +263,8 @@
   <div class="hud-bas-droite">
     <div class="en-main carte-hud" data-si="service proposition proposition-ouverte envoyee reprendre absence">
       <p class="en-main__titre">En main</p>
-      <p class="en-main__objet">Plateau · 2 sur 4</p>
-      <p class="en-main__ligne">Cappuccino, tarte aux fruits</p>
-      <p class="en-main__ligne">pour le ticket 12</p>
+      <p class="en-main__objet">Plateau : cappuccino, tarte aux fruits</p>
+      <p class="en-main__ligne">Ticket 12 · 2 sur 4 places</p>
     </div>
     <div class="en-main carte-hud" data-si="geste geste-simplifie">
       <p class="en-main__titre">En main</p>

@@ -204,7 +204,7 @@ kbd, .touche {
 .hud-haut-gauche { top: 1em; left: 1em; display: grid; gap: 0.5em; justify-items: start; width: 15em; }
 .hud-haut-centre { top: 1em; left: 50%; transform: translateX(-50%); display: grid; gap: 0.5em; justify-items: center; width: 19em; }
 .hud-haut-droite { top: 1em; right: 1em; display: grid; gap: 0.5em; justify-items: end; width: 14.5em; }
-.hud-bas-droite { bottom: 4em; right: 1em; width: 14em; }
+.hud-bas-droite { bottom: 3.5em; right: 1em; width: 14em; }
 .hud-centre { left: 50%; top: 50%; width: 0; height: 0; }
 
 /* Point de visée et invite */
@@ -229,7 +229,7 @@ kbd, .touche {
   gap: 0.35em;
 }
 .invite__ligne { font-size: 1.05em; }
-.invite__detail { font-size: 0.875em; color: var(--encre-2); background: var(--papier); border: 2px solid var(--encre); border-radius: 0.5em; padding: 0.15em 0.6em; white-space: nowrap; }
+.invite__detail { font-size: 0.875em; color: var(--encre-2); background: var(--papier); border: 2px solid var(--encre); border-radius: 0.5em; padding: 0.15em 0.6em; white-space: normal; text-align: center; max-width: 20em; width: max-content; }
 .invite__refus { border-style: dashed; }
 .qualite { position: absolute; left: 4.6em; top: -3.4em; font-weight: 700; }
 
@@ -267,11 +267,12 @@ kbd, .touche {
 
 /* L'autre joueur, hors de vue */
 .autre { display: grid; grid-template-columns: auto 1fr auto; gap: 0.1em 0.5em; align-items: center; width: 100%; }
+.autre .autre__direction { grid-row: 1; grid-column: 3; }
 .autre__nom { font-weight: 700; }
 .autre__ou { grid-column: 2; font-size: 0.9375em; }
 .autre__tient { grid-column: 2; font-size: 0.875em; color: var(--encre-2); }
-.autre__direction { grid-row: 1 / span 3; grid-column: 3; display: grid; justify-items: center; gap: 0.1em; font-size: 0.8125em; color: var(--encre-2); }
-.autre__direction .icone { width: 1.8em; height: 1.8em; }
+.autre__direction { display: inline-flex; }
+.autre__direction .icone { width: 1.6em; height: 1.6em; }
 
 /* Propositions (accord des deux) */
 .proposition { width: 100%; display: grid; gap: 0.35em; }
@@ -308,9 +309,9 @@ kbd, .touche {
 /* Repères des sons: une icône sur un anneau autour du point de visée, dans la direction du son. */
 .repere { position: absolute; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 0.2em; padding: 0.25em 0.45em; }
 .repere .icone { width: 1.35em; height: 1.35em; }
-.repere--gauche { left: -7.5em; top: 0; }
-.repere--droite { left: 7.5em; top: 0; }
-.repere--derriere { left: 0; top: 8.5em; }
+.repere--gauche { left: -9em; top: 0; }
+.repere--droite { left: 9em; top: 0; }
+.repere--derriere { left: 0; top: 10em; }
 
 /* Étiquette au-dessus d'une personne (dans le monde) et bulle d'un client */
 .etiquette-monde { font-size: 0.9375em; padding: 0.15em 0.6em; }
@@ -326,12 +327,13 @@ kbd, .touche {
 }
 
 /* Lecture d'un ticket visé (le texte du monde à la taille de l'interface) */
-.lecture-ticket { position: absolute; left: 1.6em; bottom: 1.4em; width: 15em; display: grid; gap: 0.2em; }
+.lecture-ticket { width: 16em; display: grid; gap: 0.2em; }
 .lecture-ticket__tete { display: flex; align-items: center; gap: 0.45em; font-weight: 700; }
 
 /* Capsule « reprendre la souris » */
 .capsule-souris { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 0.3em; }
-.capsule-souris .capsule { font-size: 1.2em; font-weight: 700; padding: 0.55em 1.2em; }
+.capsule-souris .capsule { font-size: 1.05em; font-weight: 700; padding: 0.5em 1em; }
+.capsule-souris .invite__detail { max-width: 16em; }
 .curseur-systeme { position: fixed; left: 58%; top: 40%; width: 22px; height: 32px; z-index: 5; pointer-events: none; }
 
 /* ================================================================

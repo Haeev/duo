@@ -13,9 +13,8 @@ Ce que le script mesure:
    charge des postes, nombre de personnes présentes à la fois (plafond provisoire de 40);
 3. l'économie d'une journée par adresse (recettes, matières, loyer, salaires, charges, pourboires);
 4. la progression de duos lents, médians et rapides (Monte-Carlo): jour et heures de jeu à chaque
-   adresse et jusqu'à la fête de la maison, épargne, condition qui bloque chaque départ;
-5. l'écart entre le modèle rapide de la progression (file par heure) et la simulation client par
-   client, qui justifie le premier.
+   adresse et jusqu'à la fête de la maison, épargne, condition qui bloque chaque départ. Chaque
+   journée ouverte de chaque duo est jouée client par client (point 2): aucun modèle simplifié.
 
 Lancement, depuis la racine du dépôt (bibliothèque standard, Python 3.10 ou plus):
   python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py                 résumé
@@ -68,8 +67,14 @@ def heure(h: float) -> str:
     return f"{hh} h" if mm == 0 else f"{hh} h {mm:02d}"
 
 
+def dec(x: float, d: int = 3) -> str:
+    """Nombre sans zéros inutiles: 1,075; 1,3; 1."""
+    t = fr(x, d)
+    return t.rstrip("0").rstrip(",") if "," in t else t
+
+
 def mult(x: float) -> str:
-    return "x" + fr(x, 2).rstrip("0").rstrip(",")
+    return "x" + dec(x, 2)
 
 
 # ---------------------------------------------------------------------------
@@ -143,14 +148,14 @@ class Adresse:
 ADRESSES: list[Adresse] = [
     Adresse("village", "Ormeval, le café de la place du Tilleul", 38, 8.0, 18.0, 1.00, 1.00, 520, 8, 0,
             0, 3.0, 1.5, 8, (), (0, 8, 0, 2), (0, 8, 0, 2), 36, 2.0, 1.5, 250, 3, 24),
-    Adresse("bourg", "Mérelles, la boutique de la place de la Halle", 81, 7.5, 19.0, 1.10, 1.00, 1150, 16, 900,
+    Adresse("bourg", "Mérelles, la boutique de la place de la Halle", 81, 7.5, 19.0, 1.10, 1.00, 1150, 16, 600,
             500, 3.5, 2.0, 12, ("jeudi",), (0, 12, 0, 0), (0, 13, 0, 0), 70, 2.6, 2.0, 500, 4, 48),
-    Adresse("ville", "L'atelier", 140, 8.0, 20.0, 1.30, 1.05, 2900, 34, 1500,
+    Adresse("ville", "L'atelier", 140, 8.0, 20.0, 1.30, 1.05, 2900, 34, 1200,
             2200, 4.0, 2.5, 16, ("samedi",), (4, 16, 4, 0), (4, 18, 6, 0), 120, 3.2, 2.4, 1000, 6, 72),
-    Adresse("paris-quartier", "Le café d'angle", 92, 7.5, 20.5, 1.80, 1.15, 6500, 60, 4000,
+    Adresse("paris-quartier", "Le café d'angle", 92, 7.5, 20.5, 1.80, 1.15, 6500, 60, 2500,
             4500, 4.0, 3.0, 16, ("mardi", "vendredi"), (6, 14, 2, 8), (8, 16, 4, 10), 160, 2.8, 2.2, 1800, 8, 80),
-    Adresse("paris-maison", "La maison du boulevard", 310, 8.0, 21.0, 2.00, 1.20, 15000, 140, 5000,
-            10000, 4.5, 3.5, 20, ("dimanche",), (8, 20, 6, 12), (8, 24, 8, 16), 260, 3.6, 2.6, 1500, 8, 120),
+    Adresse("paris-maison", "La maison du boulevard", 310, 8.0, 21.0, 2.00, 1.20, 15000, 140, 3000,
+            10000, 4.5, 3.5, 20, ("dimanche",), (8, 20, 6, 12), (8, 24, 8, 16), 260, 3.6, 2.6, 1200, 8, 120),
 ]
 ADR: dict[str, Adresse] = {a.id: a for a in ADRESSES}
 ORDRE_ADRESSES = [a.id for a in ADRESSES]
@@ -168,7 +173,7 @@ EXTENSIONS: list[tuple[str, str, str, int, tuple[int, int, int, int], int, str]]
      "la remise débarrassée, avec sa grande table de ferme"),
     ("bourg", "bourg_cour", "E3, la cour sous la treille", 1400, (0, 0, 0, 8), 4,
      "la cour derrière la boutique, à l'ombre de la treille"),
-    ("ville", "ville_salle2", "E1, la deuxième salle", 3000, (0, 8, 4, 0), 5,
+    ("ville", "ville_salle2", "E1, la deuxième salle", 2500, (0, 8, 4, 0), 5,
      "l'ancien atelier au fond de la cour"),
     ("ville", "ville_cour", "E2, la cour pavée", 2600, (0, 0, 0, 12), 4,
      "la cour de l'atelier, à l'abri de la rue"),
@@ -176,9 +181,9 @@ EXTENSIONS: list[tuple[str, str, str, int, tuple[int, int, int, int], int, str]]
      "l'angle donne sur deux rues: la mairie d'arrondissement autorise la seconde"),
     ("paris-quartier", "pq_mezzanine", "E2, la mezzanine", 9000, (0, 6, 2, 0), 5,
      "un plancher sous la grande hauteur du café d'angle (second niveau, C17)"),
-    ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 9000, (0, 12, 6, 0), 8,
+    ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 6000, (0, 12, 6, 0), 8,
      "la grande salle sous la verrière, fermée depuis des années"),
-    ("paris-maison", "pm_etage", "E2, l'étage", 11000, (0, 12, 4, 0), 6,
+    ("paris-maison", "pm_etage", "E2, l'étage", 8000, (0, 12, 4, 0), 6,
      "le salon du premier étage, ouvert par l'escalier de la maison"),
 ]
 
@@ -260,7 +265,7 @@ FLUX_BASE: dict[str, dict[str, float]] = {
     "paris-quartier": {"presses": 30, "voisins": 10, "flaneurs": 15, "familles": 7, "gourmands": 13,
                        "promeneurs": 15, "etudiants": 8, "teletravail": 14, "brunch": 8, "connaisseurs": 10},
     "paris-maison": {"presses": 30, "voisins": 8, "flaneurs": 18, "familles": 8, "gourmands": 16,
-                     "promeneurs": 18, "etudiants": 8, "teletravail": 16, "brunch": 10, "connaisseurs": 16},
+                     "promeneurs": 14, "etudiants": 8, "teletravail": 16, "brunch": 8, "connaisseurs": 16},
 }
 
 # Poids horaires (heure de jeu entière: poids), normalisés sur les heures d'ouverture de l'adresse.
@@ -377,13 +382,14 @@ REPUTATION_PIVOT = 50
 REPUTATION_DIVISEUR = 10
 # Points cumulés dans un café pour chaque demi-tasse au-dessus de la réputation de départ, par adresse.
 # Le seuil de la demi-tasse k (k = 1, 2...) vaut pas * k * (k + 1) / 2: chaque palier un peu plus long.
-REPUTATION_PAS: dict[str, int] = {"village": 180, "bourg": 130, "ville": 300, "paris-quartier": 700,
+REPUTATION_PAS: dict[str, int] = {"village": 150, "bourg": 130, "ville": 300, "paris-quartier": 700,
                                   "paris-maison": 1400}
+RATTRAPAGE = {"apres": 12, "parJour": 0.05, "plafond": 2.0}  # jours ouverts à l'adresse, +5 % par jour au-delà
 RENOMMEE_PAR_POINT = 1  # la renommée de la maison est la somme des points de tous ses cafés
 RENOMMEE_DEFI = {"village": 150, "bourg": 300, "ville": 600, "paris-quartier": 1000}
 # Prix en salle (service à table, dès le bourg): +20 % sur le prix au comptoir, à la française.
 PRIX_SALLE = 1.20
-POURBOIRE = {"seuil": 80, "taux": 0.08, "tauxRavi": 0.14, "seuilRavi": 90, "probabilite": 0.6}
+POURBOIRE = {"seuil": 75, "taux": 0.05, "tauxRavi": 0.10, "seuilRavi": 88, "probabilite": 0.5}
 LIVRE_DOR = {"ravi": 85, "pRavi": 0.12, "decu": 45, "pDecu": 0.10, "habitue": 0.35}
 
 # ---------------------------------------------------------------------------
@@ -515,7 +521,7 @@ RECETTES: list[Recette] = [
     Recette("fondant", "Fondant au chocolat", "patisserie", (E("vitrine", (2.0, 2.0, 1.5)),), False,
             3.50, 0.55, 0, 1, "bourg", "fiche, 40 €", ""),
     Recette("madeleines", "Madeleines", "patisserie", (E("vitrine", (1.5, 1.5, 1.2)),), False,
-            2.40, 0.30, 0, 1, "bourg", "Josiane, lien 2", ""),
+            2.40, 0.30, 0, 1, "bourg", "René, lien 1", ""),
     Recette("cookie", "Cookie", "patisserie", (E("vitrine", (1.2, 1.2, 1.0)),), False,
             2.20, 0.30, 0, 1, "ville", "Thao, lien 1", ""),
     Recette("cannele", "Cannelé", "patisserie", (E("vitrine", (1.2, 1.2, 1.0)),), False,
@@ -591,8 +597,8 @@ EMPLOYES: list[tuple[str, str, int, str, str]] = [
 ]
 SALAIRE = {r: s for r, _, s, _, _ in EMPLOYES}
 SALAIRE_PARIS = 1.2
-VITESSE_EMPLOYE = {1: 0.85, 2: 1.0, 3: 1.1}
-JOURS_NIVEAU_EMPLOYE = (0, 10, 30)  # jours travaillés pour les niveaux 1, 2, 3
+VITESSE_EMPLOYE = {1: 1.0, 2: 1.2, 3: 1.35}
+JOURS_NIVEAU_EMPLOYE = (0, 8, 24)  # jours travaillés pour les niveaux 1, 2, 3
 
 ROLES_TACHES: dict[str, set[str]] = {
     "joueur": {"finir", "servir", "commande", "prep", "laver", "debarrasser"},
@@ -984,7 +990,7 @@ class Service:
             self.travailleurs.append(Travailleur(f"joueur{i + 1}", "joueur", duo.vitesse, duo.hesitation, duo.parfait,
                                                  PRIO_JOUEUR_SALLE if i == 0 else PRIO_JOUEUR_BAR))
         for k, (role, niv) in enumerate(cfg.employes):
-            self.travailleurs.append(Travailleur(f"{role}{k + 1}", role, VITESSE_EMPLOYE[niv], 0.3, 0.15 + 0.1 * niv,
+            self.travailleurs.append(Travailleur(f"{role}{k + 1}", role, VITESSE_EMPLOYE[niv], 0.2, 0.15 + 0.1 * niv,
                                                  PRIO_ROLE[role]))
         self.n_libres = len(self.travailleurs)
         # mesures
@@ -1585,271 +1591,33 @@ class Service:
             "attente90": att[int(0.9 * (len(att) - 1))],
             "satisfaction": statistics.fmean(sat),
             "charge": statistics.fmean(min(1.0, w.occupe / duree) for w in joueurs),
-            "presents_max": self.max_presents,
-            "presents_95": rel[int(0.95 * (len(rel) - 1))],
+            "presents_max": self.max_presents + len(self.travailleurs),
+            "presents_95": rel[int(0.95 * (len(rel) - 1))] + len(self.travailleurs),
             "recette": self.recette_jour,
             "cout": self.cout_jour,
             "pourboires": self.pourboires,
             "personnel": len(self.travailleurs),
             "complets": self.complets / n if n else 0.0,
             "depassement": max(0.0, self.dernier_service - self.fin),
+            "clients_max": max(self.releves) if self.releves else 0,
         }
 
-
-# ---------------------------------------------------------------------------
-# 11. Modèle rapide d'une journée (file par heure), calé sur la simulation client par client
-# ---------------------------------------------------------------------------
-
-# Calage (section 5 du script, `calage()`): charge atteignable des personnes et des machines, part de
-# l'excédent qui renonce dans l'heure, attente moyenne selon la charge.
-CALAGE = {"u": 0.86, "uMachine": 0.80, "renonce": 0.55, "attente0": 22.0, "attenteK": 70.0, "attenteSeuil": 0.55,
-          "attenteMax": 260.0}
-
-
-@dataclass
-class ChargeProfil:
-    travail: float  # secondes de travail (vitesse 1) par groupe, hésitation comprise
-    machines: dict[str, float]  # secondes de poste occupé par groupe (espresso, vapeur)
-    personnes: float
-    articles: float
-    recette: float  # euros par groupe, à l'indice de prix 1
-    cout: float
-    assis: float  # part des groupes qui s'assoient
-    sejour: float  # minutes de jeu assises
-    qualite: float  # points de satisfaction dus à la qualité, en moyenne
-
-
-def moyenne_taille(profil: str) -> float:
-    return sum(t * w for t, w in PROF[profil].tailles)
-
-
-def articles_par_personne(profil: str, carte: list[str]) -> list[tuple[str, float]]:
-    """Espérance des recettes commandées par personne (recette, probabilité)."""
-    fam = familles_de(carte)
-    par_famille: dict[str, list[str]] = {}
-    for rid in carte:
-        par_famille.setdefault(REC[rid].famille, []).append(rid)
-    p = PROF[profil]
-    out: dict[str, float] = {}
-
-    def ajoute_famille(parmi: tuple[str, ...], proba: float, repli: bool) -> None:
-        choix = []
-        for f in parmi:
-            if fam.get(f, 0) == 0:
-                continue
-            if f == p.principal:
-                choix.append((f, 3.0))
-            elif f in p.secondaires:
-                choix.append((f, 1.0))
-        if not choix and repli:
-            choix = [(f, 1.0) for f in parmi if fam.get(f, 0)]
-        tot = sum(w for _, w in choix)
-        for f, w in choix:
-            recs = par_famille[f]
-            for r in recs:
-                out[r] = out.get(r, 0.0) + proba * w / tot / len(recs)
-
-    if profil == "brunch" and fam.get("brunch", 0):
-        for r in par_famille["brunch"]:
-            out[r] = out.get(r, 0.0) + 0.85 / len(par_famille["brunch"])
-        ajoute_famille(BOISSONS, 0.15, True)
-        ajoute_famille(NOURRITURES, 0.15 * p.p_nourriture, False)
-    else:
-        ajoute_famille(BOISSONS, 1.0, True)
-        ajoute_famille(NOURRITURES, p.p_nourriture, False)
-    return list(out.items())
-
-
-def charge_profil(adr: Adresse, niveaux: dict[str, int], plonge: int, service_table: bool, carte: list[str],
-                  profil: str, hesitation: float, parfait: float, emporter_ok: bool, four: bool) -> ChargeProfil:
-    p = PROF[profil]
-    taille = moyenne_taille(profil)
-    arts = articles_par_personne(profil, carte)
-    emporter = p.emporter if emporter_ok else 0.0
-    a_table = service_table and p.place != "comptoir"
-    travail = 0.0
-    machines = {"espresso": 0.0, "vapeur": 0.0}
-    n_art = 0.0
-    recette = 0.0
-    cout = 0.0
-    pieces = 0.0
-    qual = 0.0
-    qv = {"parfait": SATISFACTION["parfait"], "bien": SATISFACTION["bien"], "correct": SATISFACTION["correct"]}
-    for rid, pr in arts:
-        r = REC[rid]
-        if any(e.poste not in niveaux for e in r.etapes):
-            continue
-        n_art += pr
-        recette += pr * r.prix
-        cout += pr * (r.cout_maison if (r.cout_maison and four) else r.cout)
-        pieces += pr * r.vaisselle * (1 - emporter)
-        q_art = 0.0
-        for e in r.etapes:
-            n = niveaux[e.poste]
-            travail += pr * (GESTES["marcheBar"] + e.actif[n - 1] + hesitation)
-            if e.fin[n - 1] > 0:
-                travail += pr * (GESTES["marcheBar"] * 0.5 + e.fin[n - 1] + hesitation)
-            if e.poste in machines:
-                machines[e.poste] += pr * (e.actif[n - 1] + e.passif[n - 1] + e.fin[n - 1] + 2.0 * (e.fin[n - 1] > 0))
-            if e.passif[n - 1] > 0 and e.fin[n - 1] == 0:
-                q_art += 0.25 * qv["parfait"] + 0.75 * qv["bien"]
-            else:
-                pp = parfait if e.passif[n - 1] > 0 else parfait * 0.8
-                q_art += pp * qv["parfait"] + (1 - pp) * qv["bien"]
-        qual += pr * q_art / len(r.etapes)
-    if n_art <= 0:
-        return ChargeProfil(0.0, machines, taille, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-    qual /= n_art
-    n_groupe = n_art * taille
-    travail *= taille
-    for k in machines:
-        machines[k] *= taille
-    # commande, service, débarrasser, vaisselle
-    if a_table:
-        travail += adr.marche_table + GESTES["commandeTable"] + 0.4 * (n_groupe - 1) + hesitation
-        travail += adr.marche_table * max(1.0, n_groupe / GESTES["plateau"]) + GESTES["servirTable"] \
-            + GESTES["servirParArticle"] * (n_groupe - 1) + hesitation
-    else:
-        travail += GESTES["marcheBar"] + GESTES["commandeComptoir"] + 0.4 * (n_groupe - 1) + hesitation
-        travail += GESTES["marcheBar"] + GESTES["servirComptoir"] + 0.3 * (n_groupe - 1) + hesitation
-    assis = 1 - emporter
-    marche = adr.marche_table if a_table else (adr.marche_table + GESTES["marcheBar"]) / 2
-    travail += assis * (marche + adr.marche_plonge * 0.5 + GESTES["debarrasser"] + hesitation)
-    n_pieces = pieces * taille
-    if plonge == 1:
-        travail += n_pieces * (GESTES["laverMain"] + (adr.marche_plonge + hesitation) / GESTES["laverLot"])
-    else:
-        lot = 12.0
-        travail += n_pieces * (GESTES["chargerLave"] + (2 * adr.marche_plonge + GESTES["viderLave"] + 2 * hesitation) / lot)
-    # recommandes: une boisson de plus, prise et servie
-    iv, pr = p.recommande
-    sejour = (p.sejour[0] + p.sejour[1]) / 2
-    if iv > 0 and assis > 0:
-        n_re = max(0.0, (sejour - 10) / iv) * pr * assis
-        unite = (adr.marche_table if a_table else GESTES["marcheBar"]) * 2 + GESTES["commandeTable"] + 1.0 + 2 * hesitation
-        travail += n_re * (unite + 4.0)
-        machines["espresso"] += n_re * 10.0
-        recette += n_re * 2.5 / taille
-        cout += n_re * 0.4 / taille
-    if a_table:
-        recette *= PRIX_SALLE
-    return ChargeProfil(travail, machines, taille, n_groupe, recette * taille, cout * taille, assis, sejour, qual)
-
-
-def phi(x: float) -> float:
-    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
-
-
-SAT_ECART = 7.0  # écart type de la satisfaction des groupes autour de la moyenne (mesuré: 6 à 9)
-
-
-def journee_rapide(cfg: Config, duo: Duo, rng: random.Random | None, jour: int, saison: int, meteo: str,
-                   spm: float = 1.0) -> dict[str, float]:
-    """Une journée par créneaux d'une heure. `rng` nul: espérances sans tirage."""
-    adr = ADR[cfg.adresse]
-    e = cfg.etat
-    dem = demande(adr, e, jour, saison, meteo)
-    four = "four" in cfg.niveaux
-    emporter_ok = "gobelets" in e.equipements
-    ch = {p: charge_profil(adr, cfg.niveaux, cfg.plonge, cfg.service_table, e.carte, p, duo.hesitation, duo.parfait,
-                           emporter_ok, four) for p in ORDRE_PROFILS}
-    vitesse = 2 * duo.vitesse + sum(VITESSE_EMPLOYE[n] for _, n in cfg.employes)
-    n_esp = POSTES["espresso"][1][cfg.niveaux.get("espresso", 1) - 1]
-    n_vap = POSTES["vapeur"][1][cfg.niveaux.get("vapeur", 1) - 1]
-    cr = creneaux(adr)
-    places_int = cfg.places[0] + cfg.places[1] + cfg.places[2]
-    places = places_int + (cfg.places[3] if TERRASSE_OUVERTE[meteo] else 0)
-    occupation = [0.0] * (len(cr) + 12)
-    backlog = 0.0
-    out = {"arrives": 0.0, "servis": 0.0, "personnes": 0.0, "perdus": 0.0, "recette": 0.0, "cout": 0.0,
-           "pourboires": 0.0, "points": 0.0, "sat_somme": 0.0, "attente_somme": 0.0, "charge_max": 0.0,
-           "presents_max": 0.0}
-    ip = adr.indice_prix * e.indice_prix
-    ic = adr.indice_cout
-    amb = (e.ambiance - 50) / SATISFACTION["ambianceDiviseur"]
-    for i, (h, d) in enumerate(cr):
-        if rng is not None:
-            arr = {p: float(poisson(rng, dem[p][i])) for p in ORDRE_PROFILS}
-        else:
-            arr = {p: dem[p][i] for p in ORDRE_PROFILS}
-        arr = {p: a for p, a in arr.items() if a > 0 and ch[p].articles > 0}
-        tot = sum(arr.values())
-        out["arrives"] += tot
-        if tot <= 0 and backlog <= 0:
-            continue
-        sec = d * 60 * spm
-        w = sum(a * ch[p].travail for p, a in arr.items())
-        m_esp = sum(a * ch[p].machines["espresso"] for p, a in arr.items())
-        m_vap = sum(a * ch[p].machines["vapeur"] for p, a in arr.items())
-        rho = max(w / (vitesse * sec * CALAGE["u"]), m_esp / (n_esp * sec * CALAGE["uMachine"]),
-                  m_vap / (n_vap * sec * CALAGE["uMachine"])) if tot > 0 else 0.0
-        demande_g = tot + backlog
-        cap_g = tot / rho if rho > 0 else demande_g
-        servis = min(demande_g, cap_g)
-        excedent = demande_g - servis
-        perdus = excedent * CALAGE["renonce"]
-        backlog = excedent - perdus
-        out["perdus"] += perdus
-        frac = servis / demande_g if demande_g > 0 else 0.0
-        charge = demande_g / cap_g if cap_g > 0 else 0.0
-        out["charge_max"] = max(out["charge_max"], charge)
-        att = min(CALAGE["attenteMax"], CALAGE["attente0"] + CALAGE["attenteK"] * max(0.0, charge - CALAGE["attenteSeuil"]) ** 2)
-        # places: ceux qui s'assoient occupent leur place pendant leur séjour
-        assis_nouveaux = sum(arr.get(p, 0) * frac * ch[p].assis * ch[p].personnes for p in arr)
-        debout = 0.0
-        libre = places - occupation[i]
-        if assis_nouveaux > 0 and libre < assis_nouveaux:
-            debout = max(0.0, min(1.0, (assis_nouveaux - max(0.0, libre)) / assis_nouveaux))
-        for p, a in arr.items():
-            c = ch[p]
-            s_p = a * frac
-            if s_p <= 0:
-                continue
-            reste = c.sejour / 60 * spm / (d * spm) if d > 0 else 0
-            pers = s_p * c.assis * c.personnes * (1 - debout)
-            k = i
-            r = c.sejour / 60.0
-            while r > 0 and k < len(occupation):
-                occupation[k] += pers * min(1.0, r)
-                r -= 1.0
-                k += 1
-            prof = PROF[p]
-            sat = SATISFACTION["base"] + c.qualite * (2.0 if p == "connaisseurs" else 1.0) + amb
-            sat += max(-SATISFACTION["prixBorne"], min(SATISFACTION["prixBorne"],
-                       (1 - e.indice_prix) * prof.sensibilite * SATISFACTION["prixPente"]))
-            sat += SATISFACTION["placeVoulue"] * 0.6 * (1 - debout) + SATISFACTION["debout"] * debout * (prof.place != "comptoir")
-            if att > prof.confort:
-                sat += max(SATISFACTION["attenteMax"], SATISFACTION["parSeconde"] * (att - prof.confort))
-            sat = max(0.0, min(100.0, sat))
-            out["servis"] += s_p
-            out["personnes"] += s_p * c.personnes
-            out["recette"] += s_p * c.recette * ip
-            out["cout"] += s_p * c.cout * ic
-            out["sat_somme"] += s_p * sat
-            out["attente_somme"] += s_p * att
-            z80 = (sat - POURBOIRE["seuil"]) / SAT_ECART
-            z90 = (sat - POURBOIRE["seuilRavi"]) / SAT_ECART
-            p80, p90 = phi(z80), phi(z90)
-            taux = POURBOIRE["taux"] * (p80 - p90) + POURBOIRE["tauxRavi"] * p90
-            out["pourboires"] += s_p * c.recette * ip * taux * POURBOIRE["probabilite"] * prof.pourboire
-            # points de réputation: espérance de max(0, (S - 50) / 10) pour S normale
-            mu = (sat - REPUTATION_PIVOT) / REPUTATION_DIVISEUR
-            sd = SAT_ECART / REPUTATION_DIVISEUR
-            z = mu / sd
-            out["points"] += s_p * (mu * phi(z) + sd * math.exp(-z * z / 2) / math.sqrt(2 * math.pi))
-        out["presents_max"] = max(out["presents_max"], occupation[i] + backlog * 1.5)
-    if backlog > 0:
-        out["servis"] += backlog
-        out["perdus"] += 0.0
-    n = out["servis"]
-    out["satisfaction"] = out["sat_somme"] / n if n else 0.0
-    out["attente"] = out["attente_somme"] / n if n else 0.0
-    out["repartis"] = out["perdus"] / out["arrives"] if out["arrives"] else 0.0
-    return out
+    def par_heure(self) -> list[dict[str, float]]:
+        """Arrivées, servis, repartis, attente moyenne et présents au plus, par créneau d'une heure de jeu."""
+        out = []
+        n = len(self.par_heure_arrivees)
+        pas = 60 * self.spm / 5.0
+        for i in range(n):
+            rel = self.releves[int(i * pas):int((i + 1) * pas)] or [0]
+            att = self.attente_par_heure[i]
+            out.append({"arrivees": self.par_heure_arrivees[i], "servis": self.par_heure_servis[i],
+                        "repartis": self.par_heure_repartis[i], "attente": statistics.fmean(att) if att else 0.0,
+                        "presents": max(rel) + len(self.travailleurs)})
+        return out
 
 
 # ---------------------------------------------------------------------------
-# 12. Catalogue d'achats, équipement de départ (cahier, sections 4.15 et 6.2)
+# 11. Catalogue d'achats, équipement de départ (cahier, sections 4.15 et 6.2)
 # ---------------------------------------------------------------------------
 
 # Ce que chaque adresse fournit à l'arrivée (compris dans le coût d'installation).
@@ -1906,18 +1674,18 @@ ACHATS: list[tuple[str, str, str, int, str, int, int]] = [
     ("bourg", "bourg_remise", "E2, la salle de la remise", 1800, "ext:bourg_remise;equip:grande_table", 14, 14),
     ("bourg", "bourg_cour", "E3, la cour sous la treille", 1400, "ext:bourg_cour", 16, 16),
     ("bourg", "vaisselle", "Service de vaisselle (+24 pièces)", 160, "vaisselle:24", 15, 15),
-    ("ville", "trois_groupes", "Machine à trois groupes, arrêt programmé", 6500, "poste:espresso:3", 3, 1),
+    ("ville", "trois_groupes", "Machine à trois groupes d'occasion, arrêt programmé", 3800, "poste:espresso:3", 1, 1),
     ("ville", "buse_auto", "Buses automatiques", 1200, "poste:vapeur:3", 5, 2),
-    ("ville", "capot", "Lave-vaisselle à capot", 4200, "plonge:3", 7, 4),
-    ("ville", "blender", "Blender", 300, "poste:blender:1", 1, 3),
-    ("ville", "douce", "Bar à méthodes douces et moulin de spécialité", 3200, "poste:douce:1;equip:moulin_specialite", 2, 5),
+    ("ville", "capot", "Lave-vaisselle à capot", 2800, "plonge:3", 7, 4),
+    ("ville", "blender", "Blender", 300, "poste:blender:1", 2, 3),
+    ("ville", "douce", "Bar à méthodes douces et moulin de spécialité", 2400, "poste:douce:1;equip:moulin_specialite", 3, 5),
     ("ville", "grande_table", "Grande table d'atelier", 900, "equip:grande_table", 4, 6),
     ("ville", "fiches_ville", "Fiches de la ville (latte, milk-shake, cannelé, tartine avocat-œuf)", 210,
      "recette:latte;recette:milkshake;recette:cannele;recette:tartine_avocat", 6, 7),
     ("ville", "four2", "Four ventilé", 3500, "poste:four:2", 9, 9),
     ("ville", "tables", "Deux tables et deux fauteuils", 520, "places:0,2,2,0", 8, 8),
     ("ville", "ville_cour", "E2, la cour pavée", 2600, "ext:ville_cour", 10, 10),
-    ("ville", "ville_salle2", "E1, la deuxième salle", 3000, "ext:ville_salle2", 11, 11),
+    ("ville", "ville_salle2", "E1, la deuxième salle", 2500, "ext:ville_salle2", 11, 11),
     ("paris-quartier", "trois_groupes", "Machine à trois groupes, arrêt programmé", 6500, "poste:espresso:3", 1, 1),
     ("paris-quartier", "buse_auto", "Buses automatiques", 1200, "poste:vapeur:3", 2, 2),
     ("paris-quartier", "caisse2", "Second terminal de paiement", 600, "caisse:2", 3, 3),
@@ -1933,29 +1701,29 @@ ACHATS: list[tuple[str, str, str, int, str, int, int]] = [
     ("paris-maison", "douce", "Bar à méthodes douces et moulin de spécialité", 3200,
      "poste:douce:1;equip:moulin_specialite", 2, 2),
     ("paris-maison", "blender", "Blender", 300, "poste:blender:1", 3, 3),
-    ("paris-maison", "tables", "Quatre tables, une banquette, deux tables dehors", 1800, "places:0,4,2,4", 4, 4),
-    ("paris-maison", "labo", "Laboratoire de pâtisserie", 5000, "poste:four:3;recette:entremets", 5, 6),
-    ("paris-maison", "torrefaction", "Torréfacteur (notre mélange)", 5000, "recette:notre_melange", 6, 7),
-    ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 9000, "ext:pm_verriere", 7, 5),
-    ("paris-maison", "pm_etage", "E2, l'étage", 11000, "ext:pm_etage", 8, 8),
+    ("paris-maison", "tables", "Quatre tables, une banquette, deux tables dehors", 1200, "places:0,4,2,4", 4, 4),
+    ("paris-maison", "labo", "Laboratoire de pâtisserie", 4000, "poste:four:3;recette:entremets", 5, 6),
+    ("paris-maison", "torrefaction", "Torréfacteur (notre mélange)", 4000, "recette:notre_melange", 6, 7),
+    ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 6000, "ext:pm_verriere", 7, 5),
+    ("paris-maison", "pm_etage", "E2, l'étage", 8000, "ext:pm_etage", 8, 8),
 ]
 AMBIANCE_HAUSSE = 1.2  # chaque palier de +10 d'ambiance coûte 20 % de plus que le précédent
 AMBIANCE_DEPART = {"village": 30, "bourg": 25, "ville": 30, "paris-quartier": 35, "paris-maison": 35}
 AMBIANCE_MAX = 95
 # Un palier d'ambiance après tant d'achats du catalogue (duo lent, médian, rapide).
-AMBIANCE_RYTHME = {"lent": 1, "median": 2, "rapide": 3}
+AMBIANCE_RYTHME = {"lent": 1, "median": 2, "rapide": 4}
 
 # Équipe visée par adresse, dans l'ordre d'embauche. « affluence »: seulement les jours de marché et le
 # week-end (renfort payé à ces seuls jours).
 EQUIPE: dict[str, list[tuple[str, str]]] = {
     "village": [],
     "bourg": [("commis", "affluence")],
-    "ville": [("salle", "tous"), ("plonge", "tous"), ("barista", "tous"), ("salle", "affluence")],
+    "ville": [("salle", "tous"), ("plonge", "tous"), ("barista", "tous"), ("salle", "affluence"), ("commis", "tous")],
     "paris-quartier": [("salle", "tous"), ("salle", "tous"), ("barista", "tous"), ("plonge", "tous"),
-                       ("commis", "tous"), ("salle", "affluence"), ("barista", "affluence")],
+                       ("commis", "tous"), ("salle", "affluence"), ("barista", "affluence"), ("salle", "tous")],
     "paris-maison": [("salle", "tous"), ("salle", "tous"), ("salle", "tous"), ("barista", "tous"), ("plonge", "tous"),
                      ("barista", "tous"), ("commis", "tous"), ("patisserie", "tous"), ("salle", "affluence"),
-                     ("salle", "affluence"), ("commis", "affluence")],
+                     ("salle", "affluence"), ("commis", "affluence"), ("barista", "affluence")],
 }
 EMBAUCHE = {"perteSeuil": 0.12, "joursObserves": 3, "reserveSalaires": 5}
 # Employés repris avec le café (les premiers du plan): aucun avant Paris.
@@ -1979,7 +1747,7 @@ SCENES = {"prologue": 6.0, "arrivee": 3.0, "defi": 2.0, "fin": 6.0}
 # Recettes apprises d'un habitué: (adresse, recette, jours ouverts passés à l'adresse).
 HABITUE_RECETTES: list[tuple[str, str, int]] = [
     ("village", "noisette", 1), ("village", "infusion", 4), ("village", "citronnade", 6),
-    ("bourg", "chausson", 4), ("bourg", "madeleines", 6), ("bourg", "pain_raisins", 8),
+    ("bourg", "chausson", 4), ("bourg", "madeleines", 4), ("bourg", "pain_raisins", 8),
     ("ville", "filtre", 4), ("ville", "cookie", 4), ("ville", "chai", 8), ("ville", "flat_white", 8),
 ]
 # Recettes qu'une machine apporte avec elle.
@@ -1987,7 +1755,7 @@ RECETTES_MACHINE = {"agrumes": "jus_orange", "creperie": "crepe", "gaufrier": "g
                     "four": "croque", "douce": "espresso_origine"}
 
 # ---------------------------------------------------------------------------
-# 13. Progression d'un duo (Monte-Carlo, une journée ouverte = une simulation client par client)
+# 12. Progression d'un duo (Monte-Carlo, une journée ouverte = une simulation client par client)
 # ---------------------------------------------------------------------------
 
 
@@ -2116,7 +1884,10 @@ class Partie:
     epargne_jour: dict[str, int] = field(default_factory=dict)
     fin: Duree | None = None
     guide_jour: int = 0
-    journal: list[dict[str, float]] = field(default_factory=list)
+    journal: list[dict] = field(default_factory=list)
+    derniere_config: dict[str, tuple[Config, int, int, str]] = field(default_factory=dict)
+    ext_jour: dict[str, int] = field(default_factory=dict)
+    caisse_depart: dict[str, float] = field(default_factory=dict)
 
 
 CAISSE_DEPART = 300.0  # l'argent que Simone laisse dans la caisse « pour la monnaie et le premier lait »
@@ -2255,6 +2026,7 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
                         c.places = [u + v for u, v in zip(c.places, x[4])]
                         c.ambiance = min(AMBIANCE_MAX, c.ambiance + x[5])
                         c.extensions.add(ext)
+                        p.ext_jour[ext] = d
             c.travaux.clear()
             p.caisse -= a.loyer_mois / REG["joursParSaison"]
             if p.guide_jour and d > p.guide_jour:
@@ -2265,6 +2037,7 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
                 nxt = p.demenagement
                 p.demenagement = ""
                 p.cafes[nxt] = nouveau_cafe(nxt)
+                p.caisse_depart[nxt] = p.caisse
                 p.adresse = nxt
                 p.arrivees[nxt] = Duree(d, p.minutes)
                 p.minutes += SCENES["arrivee"]
@@ -2282,7 +2055,9 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         etat = Etat(carte, 1.0, c.ambiance, style[p.adresse], coherence_de(c), set(c.equipements), c.tasses, c.sat_hier,
                     duo.affluence * (DEFI_AFFLUENCE if defi else 1.0))
         employes = [(r, niveau_employe(n)) for r, j, n in c.employes if j == "tous" or jour_affluence(a, js)]
-        cfg = Config(p.adresse, c.niveaux, c.plonge, c.service_table, tuple(c.places), c.vaisselle, employes, etat, c.caisses)
+        cfg = Config(p.adresse, dict(c.niveaux), c.plonge, c.service_table, tuple(c.places), c.vaisselle, employes, etat,
+                     c.caisses)
+        p.derniere_config[p.adresse] = (cfg, js, saison, meteo)
         s = Service(cfg, duo, rng, js, saison, meteo)
         s.run(demande(a, etat, js, saison, meteo))
         b = s.bilan()
@@ -2292,6 +2067,10 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         fixes = charges_fixes(c, js)
         net = b["recette"] + b["pourboires"] - b["cout"] - fixes
         pts = sum(max(0.0, (x - REPUTATION_PIVOT) / REPUTATION_DIVISEUR) for x in s.satisfactions)
+        # Règle RE-05: rattrapage, le bouche-à-oreille des habitués après deux semaines à une adresse.
+        au_dela = c.jours_ouverts + 1 - RATTRAPAGE["apres"]
+        if au_dela > 0:
+            pts *= min(RATTRAPAGE["plafond"], 1 + RATTRAPAGE["parJour"] * au_dela)
         c.points += pts
         c.tasses = tasses_de(c)
         c.sat_hier = b["satisfaction"] if s.satisfactions else c.sat_hier
@@ -2301,18 +2080,22 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         c.jours_ouverts += 1
         p.renommee += pts
         # succursales (règle SU-02): une part du résultat moyen des sept dernières journées jouées
+        succ_jour = 0.0
         for autre, cs in p.cafes.items():
             if autre == p.adresse or not cs.nets:
                 continue
-            p.caisse += max(0.0, REG["partSuccursale"] * statistics.fmean(cs.nets))
+            gain = max(0.0, REG["partSuccursale"] * statistics.fmean(cs.nets))
+            succ_jour += gain
+            p.caisse += gain
             p.renommee += REG["partSuccursale"] * statistics.fmean(cs.pts)
-        # épargne pour l'adresse suivante (règle EC-08)
+        # épargne pour l'adresse suivante (règle EC-08), une fois l'extension du défi payée
         nxt = adresse_suivante(p.adresse)
-        if nxt and nxt in p.offres and net > 0 and not p.demenagement:
-            mise = min(net * duo.epargne, max(0.0, ADR[nxt].installation - p.epargne))
-            p.epargne += mise
-            net -= mise
-        p.caisse += net
+        defi_paye = p.adresse not in DEFI or DEFI[p.adresse][1] in c.achats
+        mise_jour = 0.0
+        if nxt and nxt in p.offres and net > 0 and not p.demenagement and defi_paye:
+            mise_jour = min(net * duo.epargne, max(0.0, ADR[nxt].installation - p.epargne))
+            p.epargne += mise_jour
+        p.caisse += net - mise_jour
         if p.caisse < 0:  # règle EC-06: jamais de faillite, le propriétaire et les fournisseurs attendent
             p.report += -p.caisse
             p.caisse = 0.0
@@ -2323,11 +2106,16 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         minutes_service = (a.fermeture - a.ouverture) * REG["secondesParMinute"] + b["depassement"] / 60
         p.minutes += duo.preparation + minutes_service + duo.fermeture + (SCENES["defi"] if defi else 0.0)
         p.journal.append({"jour": d, "adresse": ORDRE_ADRESSES.index(p.adresse), "servis": b["servis"],
-                          "repartis": b["repartis"], "satisfaction": b["satisfaction"], "net": net,
-                          "recette": b["recette"], "presents": b["presents_max"], "tasses": c.tasses,
+                          "arrives": b["arrives"], "personnes": b["personnes"],
+                          "repartis": b["repartis"], "satisfaction": b["satisfaction"], "net": net, "mise": mise_jour,
+                          "recette": b["recette"], "cout": b["cout"], "pourboires": b["pourboires"], "fixes": fixes,
+                          "loyer": a.loyer_mois / REG["joursParSaison"], "salaires": fixes - a.loyer_mois / REG["joursParSaison"] - a.charges_jour,
+                          "presents": b["presents_max"], "tasses": c.tasses, "succursales": succ_jour,
                           "caisse": p.caisse, "epargne": p.epargne, "renommee": p.renommee,
                           "personnel": b["personnel"], "minutes": p.minutes, "attente": b["attente"],
-                          "depassement": b["depassement"]})
+                          "attente90": b["attente90"], "charge": b["charge"], "js": js, "ouverts": c.jours_ouverts,
+                          "depassement": b["depassement"], "meteo": METEOS.index(meteo), "heures": s.par_heure(),
+                          "defi": defi})
         if defi:
             p.defis.add(p.adresse)
             p.defis_faits_jour[p.adresse] = d
@@ -2358,8 +2146,704 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         if p.adresse == "paris-maison" and not p.guide_jour:
             if c.tasses >= FIN["tasses"] and all(x in c.achats for x in FIN["achats"]) and not c.travaux \
                     and all(x in c.extensions for x in ("pm_verriere", "pm_etage")):
-                k = d + 1
-                while (k - 1) % 7 != 0:
+                k = d
+                while (k - 1) % 7 != 6:
                     k += 1
-                p.guide_jour = k + 6  # la semaine qui suit: le guide passe, la fête a lieu le lundi d'après
+                p.guide_jour = k  # le guide passe dans la semaine; la fête a lieu le lundi qui suit
     return p
+
+
+# ---------------------------------------------------------------------------
+# 13. Tables du cahier (rendues depuis les données) et résultats
+# ---------------------------------------------------------------------------
+
+
+def tableau(entetes: list[str], lignes: list[list[str]]) -> list[str]:
+    out = ["| " + " | ".join(entetes) + " |", "|" + "|".join("---" for _ in entetes) + "|"]
+    for l in lignes:
+        out.append("| " + " | ".join(l) + " |")
+    return out
+
+
+def nom_adresse(a: str) -> str:
+    return {"village": "village", "bourg": "bourg", "ville": "ville", "paris-quartier": "Paris, quartier",
+            "paris-maison": "Paris, maison"}[a]
+
+
+def t_reglages() -> list[str]:
+    def v(x: float) -> str:
+        return fr(x, 2).rstrip("0").rstrip(",") if x != int(x) else fr(x)
+    return tableau(["Clé", "Paramètre", "Valeur", "Unité", "Plage", "Raison"],
+                   [[f"`{k}`", lib, v(val), u, pl, r] for k, lib, val, u, pl, r in REGLAGES])
+
+
+def t_adresses() -> list[str]:
+    lignes = []
+    for a in ADRESSES:
+        dep = a.places_depart
+        plan = a.places_plan
+        ext = [x for x in EXTENSIONS if x[0] == a.id]
+        tot = list(plan)
+        for x in ext:
+            tot = [u + w for u, w in zip(tot, x[4])]
+        lignes.append([f"`{a.id}`", a.nom, f"{a.surface} m²", f"{heure(a.ouverture)} à {heure(a.fermeture)}",
+                       ", ".join(a.marche) if a.marche else "aucun", mult(a.indice_prix), mult(a.indice_cout),
+                       eur(a.loyer_mois, 0), eur(a.charges_jour, 0), eur(a.installation, 0) if a.installation else "aucune",
+                       fr(a.renommee_offre), fr(a.tasses_depart, 1), fr(a.tasses_defi, 1),
+                       str(a.lignes_ardoise),
+                       f"{sum(dep[:3])} + {dep[3]}", f"{sum(tot[:3])} + {tot[3]}", str(a.debout), str(a.presents_max)])
+    return tableau(["Adresse", "Nom (plans)", "Surface", "Ouverture", "Marché", "Prix", "Coûts", "Loyer par mois",
+                    "Charges par jour", "Installation", "Renommée de l'offre", "Tasses au départ", "Tasses du défi",
+                    "Lignes d'ardoise", "Places à l'arrivée (dedans + dehors)", "Places au maximum", "Debout au comptoir",
+                    "Présents au plus (C2)"], lignes)
+
+
+def t_extensions() -> list[str]:
+    return tableau(["Adresse", "Extension", "Coût", "Places (comptoir, tables, confort, terrasse)", "Ambiance", "Raison"],
+                   [[f"`{a}`", nom, eur(c, 0), ", ".join(f"+{x}" if x > 0 else str(x) for x in pl), f"+{amb}", r]
+                    for a, _, nom, c, pl, amb, r in EXTENSIONS])
+
+
+def t_profils() -> list[str]:
+    lignes = []
+    for p in PROFILS:
+        tailles = ", ".join(f"{t} ({pct(w)})" for t, w in p.tailles)
+        iv, pr = p.recommande
+        lignes.append([f"`{p.id}`", p.nom, p.cherche, FAMILLES[p.principal], ", ".join(FAMILLES[x] for x in p.secondaires),
+                       p.place, fr(p.sensibilite, 1), f"{p.patience} s", f"{p.confort} s", f"{p.sejour[0]} à {p.sejour[1]} min",
+                       tailles, pct(p.p_nourriture), pct(p.emporter), f"{iv} min, {pct(pr)}" if iv else "non",
+                       ", ".join(p.styles), ", ".join(p.equipements), fr(p.pourboire, 1)])
+    return tableau(["Profil", "Nom", "Ce qu'il cherche", "Envie principale (3 points)", "Envies secondaires (1 point)",
+                    "Place voulue", "Sensibilité au prix", "Patience", "Attente sans gêne", "Séjour", "Taille du groupe",
+                    "Prend à manger", "Emporte", "Recommande", "Styles aimés", "Équipements recherchés", "Pourboire"], lignes)
+
+
+def t_flux() -> list[str]:
+    return tableau(["Profil"] + [nom_adresse(a) for a in ORDRE_ADRESSES],
+                   [[f"`{p}`"] + [fr(FLUX_BASE[a][p], 1).replace(",0", "") for a in ORDRE_ADRESSES] for p in ORDRE_PROFILS]
+                   + [["total"] + [fr(sum(FLUX_BASE[a].values()), 1).replace(",0", "") for a in ORDRE_ADRESSES]])
+
+
+def t_courbes() -> list[str]:
+    heures = list(range(7, 21))
+    return tableau(["Profil"] + [f"{h} h" for h in heures],
+                   [[f"`{p}`"] + [fr(COURBES[p].get(h, 0.0), 1) if COURBES[p].get(h) else "" for h in heures] for p in ORDRE_PROFILS])
+
+
+def t_jours() -> list[str]:
+    return tableau(["Profil", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche", "jour de marché"],
+                   [[f"`{p}`"] + [fr(x, 2).rstrip("0").rstrip(",") for x in JOUR_MULT[p]] for p in ORDRE_PROFILS])
+
+
+def t_meteo() -> list[str]:
+    lignes = [["probabilité au " + s if s == "printemps" else "probabilité en " + s]
+              + [pct(METEO_PROBA[m][i]) for m in METEOS] for i, s in enumerate(SAISONS)]
+    lignes.append(["terrasse ouverte"] + ["oui" if TERRASSE_OUVERTE[m] else "non" for m in METEOS])
+    lignes += [[f"`{p}`"] + [fr(x, 2).rstrip("0").rstrip(",") for x in METEO_MULT[p]] for p in ORDRE_PROFILS]
+    return tableau(["", *METEOS], lignes)
+
+
+def t_saisons() -> list[str]:
+    return tableau(["Profil", *SAISONS], [[f"`{p}`"] + [fr(x, 2).rstrip("0").rstrip(",") for x in SAISON_MULT[p]]
+                                         for p in ORDRE_PROFILS])
+
+
+def t_attrait() -> list[str]:
+    lignes = [["Carte: points d'envie 0 à 7 et plus", " ; ".join(f"{i}: {fr(x, 2)}" for i, x in enumerate(FACTEUR_CARTE)),
+               "envie principale 3 points, chaque envie secondaire 1, variété (trois recettes de l'envie principale) 1"],
+              ["Réputation: tasses", " ; ".join(f"{fr(k, 1)}: {dec(v)}" for k, v in FACTEUR_TASSES.items()),
+               "de x0,7 à x1,3: la réputation compte sans tout écraser"],
+              ["Lieu", f"{fr(LIEU['base'], 2)} + {fr(LIEU['ambiance'], 2)} x ambiance / 100; style aimé +{fr(LIEU['style50'], 2)} "
+               f"(cohérence 50 %) ou +{fr(LIEU['style75'], 2)} (75 %); +{fr(LIEU['equipement'], 2)} par équipement recherché, "
+               f"{int(LIEU['equipementsMax'])} au plus", "de x0,75 (lieu nu) à x1,31"],
+              ["Prix", f"1 - sensibilité x (indice de prix - 1), borné de {fr(PRIX_BORNES[0], 2)} à {fr(PRIX_BORNES[1], 2)}",
+               "l'indice est le prix choisi sur le prix conseillé"],
+              ["Humeur de la veille", f"1 + (satisfaction moyenne d'hier - {HUMEUR['pivot']}) x {fr(HUMEUR['pente'], 2)}, "
+               f"borné à ±{pct(HUMEUR['borne'])}", "une bonne journée se dit au village le lendemain"],
+              ["Estimation de l'attente à l'entrée", f"{CLIENTS['secondesParGroupe']} s par groupe qui attend, divisées par les "
+               f"personnes qui servent; file de {CLIENTS['file']} places au plus (C4)", "on n'entre pas devant une attente plus longue que sa patience"]]
+    return tableau(["Facteur", "Valeur", "Raison"], lignes)
+
+
+def t_satisfaction() -> list[str]:
+    S = SATISFACTION
+    lignes = [["base", f"{S['base']}", "un client servi normalement est content"],
+              ["attente au-delà de l'attente sans gêne du profil", f"{fr(S['parSeconde'], 1)} par seconde, {S['attenteMax']} au plus", "l'attente pèse sans jamais tout gâcher"],
+              ["qualité (moyenne des articles): parfait, bien, correct", f"+{S['parfait']}, +{S['bien']}, {S['correct']}", "la précision récompense; « correct » n'est pas un échec"],
+              ["dessin sur le lait", f"+{S['dessin']}", "geste de savoir-faire facultatif"],
+              ["fait maison", f"+{S['faitMaison']}", "à partir du four du bourg"],
+              ["prix ressenti", f"(1 - indice) x sensibilité x {S['prixPente']}, borné à ±{S['prixBorne']}", "un prix doux plaît surtout aux sensibles"],
+              ["place: voulue, autre, debout alors qu'on voulait s'asseoir, table pas débarrassée",
+               f"+{S['placeVoulue']}, {S['autrePlace']}, {S['debout']}, {S['tableSale']}", "le livre d'or dit ce qui a manqué"],
+              ["ambiance", f"(ambiance - 50) / {S['ambianceDiviseur']}", "de -10 à +10"],
+              ["deux mots échangés (voisins, habitués)", f"+{S['conversation']}", "le poste calme compte autant que le bar"],
+              ["« Comme d'habitude ? » (fétiche servi sans attendre la commande)", f"+{S['commeDHabitude']}", "se souvenir de ses habitués"],
+              ["pourboire", f"satisfaction {POURBOIRE['seuil']} et plus: {pct(POURBOIRE['taux'])} de l'addition, {POURBOIRE['seuilRavi']} et plus: "
+               f"{pct(POURBOIRE['tauxRavi'])}, une fois sur {fr(1 / POURBOIRE['probabilite'], 2)}, x le pourboire du profil", "la tirelire du comptoir se remplit à vue"],
+              ["mot au livre d'or", f"{pct(LIVRE_DOR['pRavi'])} des clients à {LIVRE_DOR['ravi']} et plus, {pct(LIVRE_DOR['pDecu'])} à {LIVRE_DOR['decu']} et moins; "
+               f"habitués {pct(LIVRE_DOR['habitue'])}", "assez de mots pour lire chaque soir, pas trop pour qu'ils restent précieux"]]
+    return tableau(["Composante (0 à 100)", "Valeur", "Raison"], lignes)
+
+
+def t_reputation() -> list[str]:
+    lignes = []
+    for a in ADRESSES:
+        pas = REPUTATION_PAS[a.id]
+        paliers = []
+        t = a.tasses_depart
+        while t < 5.0:
+            t += 0.5
+            paliers.append(f"{fr(t, 1)}: {fr(seuil_points(a.id, t))}")
+        lignes.append([f"`{a.id}`", fr(a.tasses_depart, 1), fr(pas), " ; ".join(paliers)])
+    return tableau(["Adresse", "Tasses à l'arrivée", "Pas (points)", "Points cumulés pour chaque demi-tasse"], lignes)
+
+
+def t_postes() -> list[str]:
+    return tableau(["Poste", "Nom", "Places à la main, avec machine, machine avancée", "Remarque"],
+                   [[f"`{k}`", nom, " / ".join(str(x) for x in slots), rem] for k, (nom, slots, rem) in POSTES.items()])
+
+
+def gestes_txt(r: Recette) -> str:
+    parts = []
+    for e in r.etapes:
+        a = "/".join(fr(x, 1).replace(",0", "") for x in e.actif)
+        t = f"{e.poste} {a} s"
+        if any(e.passif):
+            t += " + " + "/".join(fr(x, 1).replace(",0", "") for x in e.passif) + " s seul"
+        if any(e.fin):
+            t += ", finir " + "/".join(fr(x, 1).replace(",0", "") for x in e.fin) + " s"
+        parts.append(t)
+    return (" puis " if r.sequentiel else " ; ").join(parts)
+
+
+def t_recettes() -> list[str]:
+    lignes = []
+    for r in RECETTES:
+        prix = " / ".join(eur(r.prix * ADR[a].indice_prix) for a in ("village", "paris-maison"))
+        cout = eur(r.cout) + (f" (maison {eur(r.cout_maison)})" if r.cout_maison else "")
+        lignes.append([f"`{r.id}`", r.nom, FAMILLES[r.famille], gestes_txt(r), prix, cout, str(r.vaisselle),
+                       nom_adresse(r.adresse), r.deblocage, r.saison or "toute l'année"])
+    return tableau(["Recette", "Nom", "Famille", "Gestes (à la main / machine / machine avancée)",
+                    "Prix conseillé au comptoir (village / Paris, maison)", "Matières", "Vaisselle", "Adresse", "Déblocage", "Saison"], lignes)
+
+
+def t_gestes() -> list[str]:
+    noms = {"commandeComptoir": "prendre une commande au comptoir et encaisser", "commandeTable": "prendre une commande à table",
+            "servirComptoir": "servir au comptoir", "servirTable": "servir à table", "servirParArticle": "par article de plus",
+            "plateau": "articles par plateau", "debarrasser": "débarrasser une table", "laverMain": "laver une pièce à l'évier",
+            "laverLot": "pièces par passage à l'évier", "chargerLave": "charger une pièce au lave-vaisselle",
+            "cycleLave": "cycle du lave-vaisselle (évier, lave-vaisselle, à capot)", "capaciteLave": "pièces par cycle",
+            "viderLave": "vider le lave-vaisselle", "marcheBar": "pas entre deux postes du bar",
+            "parfaitRetard": "retard toléré pour un geste parfait", "correctRetard": "au-delà, le geste est « correct »"}
+    lignes = []
+    for k, v in GESTES.items():
+        val = " / ".join(fr(x, 1).replace(",0", "") for x in v) if isinstance(v, tuple) else fr(v, 1).replace(",0", "")
+        unite = "" if k in ("plateau", "laverLot", "capaciteLave") else "s"
+        lignes.append([f"`{k}`", noms[k], val, unite])
+    return tableau(["Clé", "Geste", "Valeur", "Unité"], lignes)
+
+
+def t_employes() -> list[str]:
+    lignes = [[f"`{r}`", nom, eur(sal, 0), eur(sal * SALAIRE_PARIS, 0), postes, raison] for r, nom, sal, postes, raison in EMPLOYES]
+    return tableau(["Rôle", "Nom", "Salaire et charges par jour travaillé", "À Paris", "Postes", "Raison"], lignes)
+
+
+def t_equipe() -> list[str]:
+    lignes = []
+    for a in ORDRE_ADRESSES:
+        plan = EQUIPE[a]
+        rep = EQUIPE_REPRISE[a]
+        txt = [f"{r} ({'tous les jours' if j == 'tous' else 'marché et week-end'})" + (", repris" if i < rep else "")
+               for i, (r, j) in enumerate(plan)]
+        lignes.append([f"`{a}`", str(len(plan)), "; ".join(txt) if txt else "aucun employé"])
+    return tableau(["Adresse", "Employés au plus (plan du duo simulé)", "Ordre d'embauche"], lignes)
+
+
+def t_achats() -> list[str]:
+    lignes = []
+    for a, i, nom, prix, effet, r1, r2 in ACHATS:
+        lignes.append([f"`{a}`", f"`{i}`", nom, eur(prix, 0), effet.replace(";", "; "), str(r1), str(r2)])
+    return tableau(["Adresse", "Achat", "Nom", "Prix", "Effet", "Rang (duo équilibré)", "Rang (duo capacité)"], lignes)
+
+
+def t_ambiance() -> list[str]:
+    lignes = [[f"`{a.id}`", str(AMBIANCE_DEPART[a.id]), eur(a.pas_ambiance, 0),
+               f"+{pct(AMBIANCE_HAUSSE - 1)} par palier, {AMBIANCE_MAX} au plus"] for a in ADRESSES]
+    return tableau(["Adresse", "Ambiance à l'arrivée", "Premier palier de +10", "Paliers suivants"], lignes)
+
+
+def t_duos() -> list[str]:
+    return tableau(["Duo", "Nom", "Vitesse des gestes", "Hésitation par tâche", "Gestes parfaits", "Préparation", "Fermeture",
+                    "Lundi", "Épargne après l'offre", "Palier d'ambiance", "Achats d'abord"],
+                   [[f"`{d.id}`", d.nom, mult(d.vitesse), f"{fr(d.hesitation, 1)} s", pct(d.parfait), f"{fr(d.preparation, 1)} min",
+                     f"{fr(d.fermeture, 1)} min", f"{fr(d.lundi, 1)} min", pct(d.epargne),
+                     "après chaque achat" if AMBIANCE_RYTHME[d.id] == 1 else f"tous les {AMBIANCE_RYTHME[d.id]} achats",
+                     "capacité" if d.priorite_capacite else "équilibre"] for d in DUOS])
+
+
+def t_defis() -> list[str]:
+    lignes = [[f"`{a}`", nom, f"`{ext}`", jour, fr(ADR[a].tasses_defi, 1), fr(RENOMMEE_DEFI[a])] for a, (nom, ext, jour) in DEFI.items()]
+    lignes.append(["`paris-maison`", "La visite du guide, puis la fête de la maison", " et ".join(f"`{x}`" for x in FIN["achats"]),
+                   "la semaine où tout est prêt, fête le lundi", fr(FIN["tasses"], 1), "fin de l'histoire principale"])
+    return tableau(["Adresse", "Défi", "Lieu (extension ou achats)", "Jour", "Tasses", "Renommée gagnée"], lignes)
+
+
+def t_divers() -> list[str]:
+    lignes = [["Rattrapage de réputation", f"après {RATTRAPAGE['apres']} jours ouverts à l'adresse, +{pct(RATTRAPAGE['parJour'])} de points par jour, "
+               f"x{fr(RATTRAPAGE['plafond'], 1)} au plus", "aide les duos qui prennent leur temps; ne change presque rien au duo médian"],
+              ["Points de réputation d'un groupe servi", f"(satisfaction - {REPUTATION_PIVOT}) / {REPUTATION_DIVISEUR}, jamais négatif",
+               "un client content fait monter la réputation; un client déçu ne la fait pas baisser"],
+              ["Caisse au départ", eur(CAISSE_DEPART, 0), "Simone la laisse « pour la monnaie et le premier lait »"],
+              ["Affluence d'un défi", mult(DEFI_AFFLUENCE), "tout le pays vient: le coup de feu de l'adresse"],
+              ["Prix en salle", mult(PRIX_SALLE), "à la française: le comptoir est moins cher que la salle et la terrasse"],
+              ["Employés: vitesse aux niveaux 1, 2, 3", " / ".join(mult(VITESSE_EMPLOYE[k]) for k in (1, 2, 3)),
+               "des professionnels, plus rapides que nous au départ"],
+              ["Employés: jours travaillés pour les niveaux 2 et 3", f"{JOURS_NIVEAU_EMPLOYE[1]} et {JOURS_NIVEAU_EMPLOYE[2]}", "on les voit progresser"],
+              ["Embauche du duo simulé", f"pertes de plus de {pct(EMBAUCHE['perteSeuil'])} sur {EMBAUCHE['joursObserves']} jours et "
+               f"{EMBAUCHE['reserveSalaires']} jours de salaire en caisse", "comportement prudent, pas une règle du jeu"]]
+    return tableau(["Paramètre", "Valeur", "Raison"], lignes)
+
+
+TABLES_PARAMETRES = {
+    "reglages": t_reglages, "adresses": t_adresses, "extensions": t_extensions, "profils": t_profils, "flux": t_flux,
+    "courbes": t_courbes, "jours": t_jours, "meteo": t_meteo, "saisons": t_saisons, "attrait": t_attrait,
+    "satisfaction": t_satisfaction, "reputation": t_reputation, "postes": t_postes, "recettes": t_recettes,
+    "gestes": t_gestes, "employes": t_employes, "equipe": t_equipe, "achats": t_achats, "ambiance": t_ambiance,
+    "duos": t_duos, "defis": t_defis, "divers": t_divers,
+}
+
+
+def empreinte() -> str:
+    import hashlib
+    h = hashlib.sha256()
+    for k in sorted(TABLES_PARAMETRES):
+        h.update("\n".join(TABLES_PARAMETRES[k]()).encode("utf-8"))
+    return h.hexdigest()[:12]
+
+
+def quantile(vals: list[float], f: float) -> float:
+    v = sorted(vals)
+    return v[int(round(f * (len(v) - 1)))]
+
+
+def monte_carlo(n: int, graine0: int = 1000) -> dict[str, list[Partie]]:
+    """Mêmes graines pour les trois duos: les écarts viennent des duos, pas du hasard."""
+    return {d.id: [jouer_partie(d, graine0 + i) for i in range(n)] for d in DUOS}
+
+
+def r_progression(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for d in DUOS:
+        ps = mc[d.id]
+        cells = [d.nom]
+        for a in ORDRE_ADRESSES[1:]:
+            js = [p.arrivees[a].jour for p in ps if a in p.arrivees]
+            hs = [p.arrivees[a].minutes / 60 for p in ps if a in p.arrivees]
+            cells.append(f"jour {fr(statistics.median(js))} [{fr(quantile(js, .1))}-{fr(quantile(js, .9))}], "
+                         f"{fr(statistics.median(hs), 1)} h [{fr(quantile(hs, .1), 1)}-{fr(quantile(hs, .9), 1)}]")
+        js = [p.fin.jour for p in ps if p.fin]
+        hs = [p.fin.minutes / 60 for p in ps if p.fin]
+        cells.append(f"jour {fr(statistics.median(js))} [{fr(quantile(js, .1))}-{fr(quantile(js, .9))}], "
+                     f"{fr(statistics.median(hs), 1)} h [{fr(quantile(hs, .1), 1)}-{fr(quantile(hs, .9), 1)}]")
+        cells.append(f"{len(js)} sur {len(ps)}")
+        lignes.append(cells)
+    return tableau(["Duo", "Arrivée au bourg", "En ville", "À Paris (quartier)", "À la maison parisienne", "Fête de la maison",
+                    "Parties finies"], lignes)
+
+
+def condition_bloquante(p: Partie, a: str) -> str:
+    nxt = adresse_suivante(a)
+    if not nxt or nxt not in p.arrivees:
+        return ""
+    i = ORDRE_ADRESSES.index(a)
+    jours = [j for j in p.journal if j["adresse"] == i]
+    seuil = ADR[a].tasses_defi
+    t_ok = next((j["jour"] for j in jours if j["tasses"] >= seuil), 10 ** 6)
+    ext = DEFI[a][1]
+    e_ok = p.ext_jour.get(ext, 10 ** 6)
+    ep = p.epargne_jour.get(nxt, 10 ** 6)
+    defi = p.defis_faits_jour.get(a, 10 ** 6)
+    off = p.offres_jour.get(nxt, 10 ** 6)
+    dernier = max(defi, ep, off)
+    if dernier == ep and ep > defi:
+        return "épargne"
+    if dernier == off and off > defi:
+        return "offre"
+    return "réputation" if t_ok >= e_ok else "extension"
+
+
+def r_blocage(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for d in DUOS:
+        for a in ORDRE_ADRESSES[:-1]:
+            c = [condition_bloquante(p, a) for p in mc[d.id]]
+            c = [x for x in c if x]
+            if not c:
+                continue
+            parts = {k: c.count(k) / len(c) for k in ("réputation", "extension", "épargne", "offre")}
+            lignes.append([d.nom, f"{nom_adresse(a)} vers {nom_adresse(adresse_suivante(a))}"]
+                          + [pct(parts[k]) for k in ("réputation", "extension", "épargne", "offre")])
+    return tableau(["Duo", "Départ", "Réputation du défi", "Extension du défi", "Épargne", "Offre"], lignes)
+
+
+def jours_adresse(p: Partie, a: str) -> list[dict]:
+    i = ORDRE_ADRESSES.index(a)
+    return [j for j in p.journal if j["adresse"] == i]
+
+
+def r_service(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for a in ORDRE_ADRESSES:
+        for nom_periode, prem in (("première semaine", True), ("dernière semaine", False)):
+            js = []
+            for p in mc["median"]:
+                ja = jours_adresse(p, a)
+                if a == "paris-maison" and not prem:
+                    ja = [j for j in ja if j["jour"] < (p.fin.jour if p.fin else 10 ** 6)]
+                js += ja[:6] if prem else ja[-6:]
+            if not js:
+                continue
+            m = lambda k: statistics.fmean(j[k] for j in js)
+            lignes.append([nom_adresse(a), nom_periode, fr(m("arrives")), fr(m("servis")), pct(m("repartis")),
+                           f"{fr(m('attente'))} s", f"{fr(m('attente90'))} s", fr(m("satisfaction")), pct(m("charge")),
+                           fr(m("personnel") - 2), f"{fr(m('presents'))} / {fr(max(j['presents'] for j in js))}",
+                           str(ADR[a].presents_max)])
+    return tableau(["Adresse", "Période", "Groupes venus par jour", "Groupes servis", "Repartis sans entrer",
+                    "Attente moyenne", "Attente, 9 sur 10 en dessous", "Satisfaction", "Charge de chaque joueur",
+                    "Employés présents", "Personnages présents (moyenne des pointes / plus haut)", "Plafond C2"], lignes)
+
+
+def r_economie(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for a in ORDRE_ADRESSES:
+        js = [j for p in mc["median"] for j in jours_adresse(p, a)]
+        m = lambda k: statistics.fmean(j[k] for j in js)
+        charges = ADR[a].charges_jour
+        loyer_ouvert = m("loyer") * 7 / 6
+        res = m("recette") + m("pourboires") - m("cout") - m("fixes") - m("loyer") / 6
+        lignes.append([nom_adresse(a), eur(m("recette"), 0), eur(m("pourboires"), 0), eur(m("cout"), 0),
+                       eur(loyer_ouvert, 0), eur(m("salaires"), 0), eur(charges, 0), eur(res, 0), eur(m("succursales"), 0)])
+    return tableau(["Adresse", "Recettes", "Pourboires", "Matières", "Loyer (lundi compris)", "Salaires", "Charges",
+                    "Résultat", "Succursales (en plus)"], lignes)
+
+
+def r_heures(mc: dict[str, list[Partie]], a: str, js_cible: int) -> list[str]:
+    jours = []
+    for p in mc["median"]:
+        ja = jours_adresse(p, a)
+        dern = ja[-12:]
+        jours += [j for j in dern if j["js"] == js_cible]
+    adr = ADR[a]
+    lignes = []
+    for i, (h, d) in enumerate(creneaux(adr)):
+        vals = [j["heures"][i] for j in jours if i < len(j["heures"])]
+        if not vals:
+            continue
+        m = lambda k: statistics.fmean(v[k] for v in vals)
+        lignes.append([heure(h), fr(m("arrivees"), 1), fr(m("servis"), 1), fr(m("repartis"), 1), f"{fr(m('attente'))} s",
+                       fr(m("presents"))])
+    return tableau(["Heure de jeu", "Groupes venus", "Servis", "Repartis", "Attente moyenne", "Personnages présents au plus"], lignes)
+
+
+def r_presence(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for a in ORDRE_ADRESSES:
+        js = [j for ps in mc.values() for p in ps for j in jours_adresse(p, a)]
+        pmax = max(j["presents"] for j in js)
+        p99 = quantile([j["presents"] for j in js], 0.99)
+        emax = max(j["personnel"] for j in js) - 2
+        lignes.append([nom_adresse(a), fr(p99), fr(pmax), str(ADR[a].presents_max), fr(emax), "12",
+                       "oui" if pmax <= ADR[a].presents_max and emax <= 12 else "non"])
+    return tableau(["Adresse", "Présents au plus, 99 jours sur 100", "Présents au plus", "Plafond C2", "Employés au plus",
+                    "Plafond C5", "Respecté"], lignes)
+
+
+def r_rythme(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for d in DUOS:
+        cells = [d.nom]
+        for a in ORDRE_ADRESSES:
+            mins = []
+            jours = []
+            for p in mc[d.id]:
+                if a not in p.arrivees:
+                    continue
+                debut = p.arrivees[a]
+                nxt = adresse_suivante(a)
+                fin = p.arrivees[nxt] if nxt and nxt in p.arrivees else p.fin
+                if fin is None:
+                    continue
+                mins.append((fin.minutes - debut.minutes) / 60)
+                jours.append(fin.jour - debut.jour)
+            cells.append(f"{fr(statistics.median(jours))} jours, {fr(statistics.median(mins), 1)} h" if jours else "")
+        ouverts = [j for p in mc[d.id] for j in p.journal]
+        cells.append(f"{fr(statistics.fmean(d.preparation + (ADR[ORDRE_ADRESSES[j['adresse']]].fermeture - ADR[ORDRE_ADRESSES[j['adresse']]].ouverture) + j['depassement'] / 60 + d.fermeture for j in ouverts), 1)} min")
+        lignes.append(cells)
+    return tableau(["Duo"] + [nom_adresse(a) for a in ORDRE_ADRESSES] + ["Journée ouverte moyenne"], lignes)
+
+
+def r_sans_employes(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for a in ("ville", "paris-quartier", "paris-maison"):
+        for avec in (True, False):
+            res = []
+            for k, p in enumerate(mc["median"][:8]):
+                if a not in p.derniere_config:
+                    continue
+                cfg, _, saison, _ = p.derniere_config[a]
+                c2 = Config(cfg.adresse, cfg.niveaux, cfg.plonge, cfg.service_table, cfg.places, cfg.vaisselle,
+                            cfg.employes if avec else [], cfg.etat, cfg.caisses)
+                for js in (1, 5):
+                    srv = Service(c2, DUO["median"], random.Random(5000 + k * 7 + js), js, saison, "soleil")
+                    srv.run(demande(ADR[a], c2.etat, js, saison, "soleil"))
+                    res.append(srv.bilan())
+            if not res:
+                continue
+            m = lambda key: statistics.fmean(r[key] for r in res)
+            lignes.append([nom_adresse(a), "avec l'équipe" if avec else "à deux, sans employés", fr(m("personnel") - 2),
+                           fr(m("servis")), pct(m("repartis")), f"{fr(m('attente'))} s", fr(m("satisfaction")),
+                           f"{fr(m('depassement'))} s"])
+    return tableau(["Adresse", "Équipe", "Employés", "Groupes servis par jour", "Repartis", "Attente moyenne",
+                    "Satisfaction", "Service fini après la fermeture"], lignes)
+
+
+REGLAGES_DUO = [("normal", 1.0, 1.0), ("rythme paisible", 1.25, 1.0), ("patience grande", 1.0, 1.5),
+                ("les deux", 1.25, 1.5)]
+
+
+def r_aides(mc: dict[str, list[Partie]]) -> list[str]:
+    """Réglages du duo (règle TE-02 et CL-05) sur la dernière configuration d'un duo tranquille."""
+    lignes = []
+    for a in ("bourg", "paris-quartier"):
+        for nom, spm, pat in REGLAGES_DUO:
+            res = []
+            for k, p in enumerate(mc["lent"][:8]):
+                if a not in p.derniere_config:
+                    continue
+                cfg, _, saison, _ = p.derniere_config[a]
+                for js in (1, 5):
+                    srv = Service(cfg, DUO["lent"], random.Random(7000 + k * 7 + js), js, saison, "soleil", spm=spm,
+                                  aide_patience=pat)
+                    srv.run(demande(ADR[a], cfg.etat, js, saison, "soleil"))
+                    res.append(srv.bilan())
+            if not res:
+                continue
+            m = lambda key: statistics.fmean(r[key] for r in res)
+            duree = (ADR[a].fermeture - ADR[a].ouverture) * spm
+            lignes.append([nom_adresse(a), nom, f"{fr(duree, 1)} min", fr(m("servis")), pct(m("repartis")),
+                           f"{fr(m('attente'))} s", fr(m("satisfaction")), pct(m("charge"))])
+    return tableau(["Adresse", "Réglage du duo", "Service réel", "Groupes servis", "Repartis", "Attente moyenne",
+                    "Satisfaction", "Charge de chaque joueur"], lignes)
+
+
+def r_exemple() -> list[str]:
+    """Règle AT-07, exemple chiffré: le village, un mardi de printemps, temps couvert, la première semaine."""
+    adr = ADR["village"]
+    carte = ["espresso", "allonge", "noisette", "creme", "the_noir", "chocolat", "croissant", "pain_chocolat"]
+    e = Etat(carte, 1.0, 40.0, "campagne", 0.5, {"gobelets"}, 2.0, 74.0)
+    lignes = []
+    fam = familles_de(carte)
+    for pid, h_cible in (("presses", 8), ("voisins", 8), ("familles", 16), ("gourmands", 16)):
+        i = next(k for k, (h, _) in enumerate(creneaux(adr)) if int(h) == h_cible)
+        pas_ = passants_heure(adr, pid, 1, 0, "couvert")[i]
+        pts = points_carte(pid, fam)
+        fc, fp = facteur_carte(pts), facteur_prix(pid, e.indice_prix)
+        fl = facteur_lieu(pid, e.ambiance, e.style, e.coherence, e.equipements)
+        ft, fh = facteur_tasses(e.tasses), facteur_humeur(e.satisfaction_hier)
+        lignes.append([PROF[pid].nom, f"{h_cible} h", fr(pas_, 2), f"{pts} points: {mult(fc)}", mult(fp), mult(round(fl, 3)),
+                       mult(ft), mult(round(fh, 3)), fr(pas_ * fc * fp * fl * ft * fh, 2)])
+    return tableau(["Profil", "Heure", "Passants intéressés dans l'heure", "Carte", "Prix", "Lieu", "Réputation (2 tasses)",
+                    "Humeur d'hier (74)", "Groupes attendus dans l'heure"], lignes)
+
+
+def r_epargne(mc: dict[str, list[Partie]]) -> list[str]:
+    lignes = []
+    for a in ORDRE_ADRESSES[1:]:
+        vals = [p.caisse_depart[a] for p in mc["median"] if a in p.caisse_depart]
+        if vals:
+            lignes.append([nom_adresse(a), eur(ADR[a].installation, 0), eur(statistics.median(vals), 0),
+                           f"{eur(quantile(vals, .1), 0)} à {eur(quantile(vals, .9), 0)}"])
+    return tableau(["Arrivée à", "Installation payée", "Caisse le jour de l'arrivée (médiane)", "9 duos sur 10 entre"], lignes)
+
+
+def valeurs_cles(mc: dict[str, list[Partie]]) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for d in DUOS:
+        ps = mc[d.id]
+        hs = [p.fin.minutes / 60 for p in ps if p.fin]
+        js = [p.fin.jour for p in ps if p.fin]
+        out[f"fin_h_{d.id}"] = fr(statistics.median(hs), 1)
+        out[f"fin_j_{d.id}"] = fr(statistics.median(js))
+        for a in ORDRE_ADRESSES[1:]:
+            h = [p.arrivees[a].minutes / 60 for p in ps if a in p.arrivees]
+            out[f"arr_h_{a}_{d.id}"] = fr(statistics.median(h), 1)
+    return out
+
+
+RESULTATS = [
+    ("res_progression", "Progression: jour et heures de jeu à chaque arrivée, médiane [1er et 9e déciles]", r_progression),
+    ("res_blocage", "Ce qui décide du jour de chaque départ (part des parties)", r_blocage),
+    ("res_service", "Service du duo médian: première et dernière semaine à chaque adresse", r_service),
+    ("res_economie", "Une journée ouverte moyenne du duo médian, par adresse", r_economie),
+    ("res_sans_employes", "Ce que l'équipe change: dernière configuration du duo médian, un mardi et un samedi", r_sans_employes),
+    ("res_presence", "Personnages présents à la fois (joueurs et employés compris) et employés, toutes parties", r_presence),
+    ("res_rythme", "Rythme réel: durée de chaque adresse (médiane) et d'une journée ouverte", r_rythme),
+    ("res_epargne", "Argent en caisse à l'arrivée à chaque adresse (duo médian)", r_epargne),
+    ("res_aides", "Réglages du duo sur la dernière configuration d'un duo tranquille, un mardi et un samedi", r_aides),
+]
+
+
+def calculer(n: int) -> tuple[dict[str, list[str]], dict[str, str], float]:
+    t0 = time.time()
+    mc = monte_carlo(n)
+    tables: dict[str, list[str]] = {}
+    for cle, _, f in RESULTATS:
+        tables[cle] = f(mc)
+    tables["res_heures_village"] = r_heures(mc, "village", 6)
+    tables["res_heures_maison"] = r_heures(mc, "paris-maison", 1)
+    tables["res_exemple"] = r_exemple()
+    cles = valeurs_cles(mc)
+    return tables, cles, time.time() - t0
+
+
+# ---------------------------------------------------------------------------
+# 14. Fichier de résultats, contrôle croisé, ligne de commande
+# ---------------------------------------------------------------------------
+
+LECTURES = {
+    "res_progression": "Chaque arrivée tombe un lundi (on déménage le jour de fermeture): les écarts entre duos se comptent en semaines.",
+    "res_blocage": "« Réputation » et « extension »: le défi attendait la réputation ou son lieu; « épargne »: le défi était fait, "
+                   "il manquait l'installation; « offre »: la lettre de l'adresse suivante n'était pas arrivée.",
+    "res_service": "Première semaine: gestes à la main, peu d'équipement; dernière semaine: machines achetées et, dès la ville, "
+                   "employés. Repartis: groupes qui n'entrent pas (file pleine, attente estimée trop longue, café complet).",
+    "res_economie": "Montants par journée ouverte; le loyer court aussi le lundi. Les succursales s'ajoutent au résultat du café joué.",
+    "res_sans_employes": "Même café, même carte, même jour: à deux seulement, les grandes adresses refusent une bonne part de leurs clients.",
+    "res_presence": "Le plafond C2 de l'architecte compte tous les personnages présents dans l'adresse; le plafond des visibles (C1, C3) "
+                    "relève du validateur des plans.",
+    "res_rythme": "Temps réel joué, préparation et fermeture comprises, lundis compris.",
+    "res_epargne": "Ce qui reste en caisse une fois l'installation payée: de quoi acheter les premières machines de la nouvelle adresse.",
+    "res_aides": "Rythme paisible: une heure de jeu dure 75 s au lieu de 60, le même flux est moins serré. Patience grande: les "
+                 "clients attendent une fois et demie plus longtemps avant de renoncer.",
+    "res_heures_village": "Un dimanche de la dernière semaine au village (duo médian): le coup de feu du matin, puis celui du goûter.",
+    "res_heures_maison": "Un mardi de la dernière semaine à la maison parisienne (duo médian).",
+    "res_exemple": "Règle AT-07: groupes attendus = passants x carte x prix x lieu x réputation x humeur, ici le premier mardi au village.",
+}
+
+
+def ecrire_resultats(chemin: str, n: int) -> None:
+    tables, cles, duree = calculer(n)
+    L = ["# Cosy Café (titre de travail): résultats de la simulation", "",
+         f"<!-- empreinte:{empreinte()} -->",
+         "Fichier écrit par `docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats` (bibliothèque standard de Python, "
+         f"graines fixes). {n} parties par duo; chaque journée ouverte de chaque partie est jouée client par client. "
+         "Ne pas retoucher à la main: relancer le script, puis `--croise` sur le cahier.", "",
+         "## Méthode", "",
+         "- Une journée ouverte est une simulation à événements discrets: chaque groupe de clients arrive selon l'attrait de "
+         "la carte (règle AT-07), entre ou renonce (CL-03), commande, attend que chaque étape de chaque recette passe par son "
+         "poste, s'assoit, reste, recommande parfois, part; joueurs et employés prennent les tâches par priorités (finir un geste, "
+         "servir, prendre les commandes, préparer, laver, débarrasser).",
+         "- Entre les journées: achats selon le duo (catalogue et paliers d'ambiance), embauches, épargne après l'offre de "
+         "l'adresse suivante, défi local, déménagement le lundi, succursales (SU-02), rattrapage de réputation (RE-05).",
+         "- Trois duos: tranquille, médian et rapide (vitesse des gestes, hésitation, gestes parfaits, temps de préparation et "
+         "de fermeture, part épargnée, goût pour la décoration). Ce sont des hypothèses, à recaler au prototype (CA-58).", ""]
+    titres = {k: t for k, t, _ in RESULTATS}
+    titres.update({"res_heures_village": "Profil horaire, village", "res_heures_maison": "Profil horaire, maison parisienne",
+                   "res_exemple": "Exemple chiffré de l'attrait"})
+    ordre = [k for k, _, _ in RESULTATS] + ["res_heures_village", "res_heures_maison", "res_exemple"]
+    for i, k in enumerate(ordre, 1):
+        L += [f"## {i}. {titres[k]}", "", f"<!-- table:{k} -->"] + tables[k] + ["", LECTURES[k], ""]
+    L += [f"## {len(ordre) + 1}. Valeurs clés citées dans le cahier", "", "<!-- table:res_cles -->"]
+    L += tableau(["Clé", "Valeur"], [[f"`{k}`", v] for k, v in cles.items()])
+    L += ["", f"Calcul: {fr(duree)} s sur la machine de l'environnement cloud.", ""]
+    with open(chemin, "w", encoding="utf-8") as f:
+        f.write("\n".join(L))
+
+
+def lire_tableau(texte: str, pos: int) -> list[str]:
+    out = []
+    for ligne in texte[pos:].split("\n"):
+        if ligne.startswith("|"):
+            out.append(ligne.rstrip())
+        elif out or ligne.strip():
+            break
+    return out
+
+
+def croise(cahier: str, resultats: str) -> list[str]:
+    with open(cahier, encoding="utf-8") as f:
+        texte = f.read()
+    with open(resultats, encoding="utf-8") as f:
+        res = f.read()
+    ecarts: list[str] = []
+    m = re.search(r"<!-- empreinte:([0-9a-f]+) -->", res)
+    if not m or m.group(1) != empreinte():
+        ecarts.append("résultats périmés: les données ont changé depuis l'écriture de resultats.md (relancer --resultats)")
+    vus = set()
+    for m in re.finditer(r"<!-- table:([a-z_]+) -->[ \t]*\n", texte):
+        cle = m.group(1)
+        vus.add(cle)
+        lu = lire_tableau(texte, m.end())
+        if cle in TABLES_PARAMETRES:
+            attendu = TABLES_PARAMETRES[cle]()
+        else:
+            mr = re.search(r"<!-- table:" + re.escape(cle) + r" -->[ \t]*\n", res)
+            if mr is None:
+                ecarts.append(f"table `{cle}`: absente de resultats.md")
+                continue
+            attendu = lire_tableau(res, mr.end())
+        if lu != attendu:
+            for i, (x, y) in enumerate(zip(lu + [""] * len(attendu), attendu + [""] * len(lu))):
+                if x != y:
+                    ecarts.append(f"table `{cle}`, ligne {i + 1}: cahier « {x[:90]} », script « {y[:90]} »")
+                    break
+    for cle in TABLES_PARAMETRES:
+        if cle not in vus:
+            ecarts.append(f"table `{cle}` absente du cahier")
+    mres = re.search(r"<!-- table:res_cles -->[ \t]*\n", res)
+    valeurs = {}
+    if mres:
+        for l in lire_tableau(res, mres.end())[2:]:
+            parts = [x.strip() for x in l.strip("|").split("|")]
+            valeurs[parts[0].strip("`")] = parts[1]
+    for m in re.finditer(r"<!-- val:([a-z_\-]+) -->([0-9][0-9 ]*(?:,[0-9]+)?)", texte):
+        cle, v = m.group(1), m.group(2).strip()
+        if valeurs.get(cle) != v:
+            ecarts.append(f"valeur `{cle}`: cahier {v}, résultats {valeurs.get(cle)}")
+    return ecarts
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Simulation de Cosy Café (titre de travail)")
+    ap.add_argument("--tableaux", action="store_true", help="imprime les tables de paramètres du cahier")
+    ap.add_argument("--resultats", metavar="FICHIER", help="écrit le fichier de résultats")
+    ap.add_argument("--duos", type=int, default=40, help="parties par duo (40 par défaut, 12 pour un essai)")
+    ap.add_argument("--croise", metavar="CAHIER", help="compare le cahier aux données et au fichier de résultats")
+    ap.add_argument("--avec", metavar="RESULTATS", default="docs/jeux/cosy-cafe/simulations/resultats.md")
+    args = ap.parse_args()
+    if args.tableaux:
+        for k, f in TABLES_PARAMETRES.items():
+            print(f"<!-- table:{k} -->")
+            print("\n".join(f()))
+            print()
+        return 0
+    if args.resultats:
+        ecrire_resultats(args.resultats, args.duos)
+        print(f"Résultats écrits dans {args.resultats}.")
+        return 0
+    if args.croise:
+        ecarts = croise(args.croise, args.avec)
+        if ecarts:
+            print("Écarts entre le cahier, le script et les résultats:")
+            for e in ecarts:
+                print("  - " + e)
+            return 1
+        print(f"Cahier conforme: {len(TABLES_PARAMETRES)} tables de paramètres et les tables de résultats relues.")
+        return 0
+    tables, cles, duree = calculer(args.duos)
+    print("\n".join(tables["res_progression"]))
+    print(f"\n{args.duos} parties par duo, {fr(duree)} s.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

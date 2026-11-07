@@ -53,6 +53,7 @@
     pause: `<circle cx="12" cy="12" r="9" ${T}/><path d="M10 8.5v7M14 8.5v7" ${T} stroke-width="2.6"/>`,
     cloche: `<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z" ${T}/><path d="M10 20.5a2 2 0 0 0 4 0" ${T}/>`,
     carton: `<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z" ${T}/><path d="M3 7.5l9 4.5 9-4.5M12 12v9" ${T}/>`,
+    tassePleine: `<path d="M4 8h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" fill="currentColor" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16" ${T}/>`,
     tasse: `<path d="M4 8h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" ${T}/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16" ${T}/><path d="M7 3.5c0 1.2 1 1.2 1 2.4M11 3.5c0 1.2 1 1.2 1 2.4" ${T}/>`,
     fleche: `<path d="M4 12h15M13 6l6 6-6 6" ${T} stroke-width="2.6"/>`,
     main: `<path d="M8 12V6a1.5 1.5 0 0 1 3 0v5M11 11V4.5a1.5 1.5 0 0 1 3 0V11M14 11V6a1.5 1.5 0 0 1 3 0v8a7 7 0 0 1-7 7h-.5A6.5 6.5 0 0 1 4 15.5V12a1.5 1.5 0 0 1 3 0v1" ${T} stroke-width="1.8"/>`,
@@ -147,6 +148,8 @@
       return;
     }
     cible.focus({ preventScroll: true });
+    // L'action par défaut reste visible: on fait défiler son conteneur, jamais la page.
+    cible.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     if (cible.matches('input[type="text"]')) cible.setSelectionRange(cible.value.length, cible.value.length);
   }
 

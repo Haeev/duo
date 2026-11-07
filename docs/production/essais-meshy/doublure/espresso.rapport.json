@@ -1,0 +1,312 @@
+{
+  "asset": "espresso_machine_village",
+  "raw": "espresso_brut.glb",
+  "raw_triangles": 1504,
+  "triangles": 1504,
+  "triangle_budget": 4000,
+  "within_budget": true,
+  "welded_vertices": 2386,
+  "flipped_faces_fixed": 240,
+  "parts": 16,
+  "dimensions_m": {
+    "width_x": 0.76,
+    "depth_y_blender": 0.65,
+    "height": 0.48
+  },
+  "scale_applied": 0.76,
+  "front_yaw_deg": -90,
+  "source_textures": [
+    {
+      "material": "Material_0",
+      "image": "espresso_brut_basecolor",
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  ],
+  "palette_cells_used": [
+    "brass",
+    "copper",
+    "ink",
+    "porcelain",
+    "steel",
+    "steel_dark"
+  ],
+  "mixed_parts": [
+    1,
+    6,
+    10,
+    11,
+    14,
+    15
+  ],
+  "ambient_occlusion": "cuite (Cycles, 64 échantillons), ramenée à [0.55, 1]",
+  "file_bytes": 86536,
+  "part_details": [
+    {
+      "part": 0,
+      "triangles": 60,
+      "center_raw": [
+        0.3289,
+        -0.2368,
+        0.0789
+      ],
+      "votes": {
+        "steel": 0.697,
+        "steel_dark": 0.302,
+        "ink": 0.002
+      },
+      "winner_share": 0.697,
+      "mixed": false,
+      "cell": "steel"
+    },
+    {
+      "part": 1,
+      "triangles": 60,
+      "center_raw": [
+        0.3553,
+        -0.2368,
+        0.0132
+      ],
+      "votes": {
+        "ink": 0.448,
+        "steel_dark": 0.294,
+        "copper": 0.158,
+        "steel": 0.1
+      },
+      "winner_share": 0.448,
+      "mixed": true,
+      "cell": "ink"
+    },
+    {
+      "part": 2,
+      "triangles": 188,
+      "center_raw": [
+        0.4671,
+        -0.2368,
+        0.0099
+      ],
+      "votes": {
+        "ink": 0.733,
+        "steel_dark": 0.267
+      },
+      "winner_share": 0.733,
+      "mixed": false,
+      "cell": "ink"
+    },
+    {
+      "part": 3,
+      "triangles": 188,
+      "center_raw": [
+        0.4671,
+        0.2368,
+        0.0099
+      ],
+      "votes": {
+        "ink": 0.657,
+        "steel_dark": 0.343
+      },
+      "winner_share": 0.657,
+      "mixed": false,
+      "cell": "ink"
+    },
+    {
+      "part": 4,
+      "triangles": 188,
+      "center_raw": [
+        -0.0,
+        0.0,
+        0.0
+      ],
+      "votes": {
+        "copper": 0.816,
+        "steel": 0.176,
+        "steel_dark": 0.009
+      },
+      "winner_share": 0.816,
+      "mixed": false,
+      "cell": "copper"
+    },
+    {
+      "part": 5,
+      "triangles": 188,
+      "center_raw": [
+        0.0,
+        -0.0,
+        0.2895
+      ],
+      "votes": {
+        "steel": 0.973,
+        "steel_dark": 0.027
+      },
+      "winner_share": 0.973,
+      "mixed": false,
+      "cell": "steel"
+    },
+    {
+      "part": 6,
+      "triangles": 60,
+      "center_raw": [
+        0.3553,
+        0.2368,
+        0.0132
+      ],
+      "votes": {
+        "ink": 0.43,
+        "steel_dark": 0.279,
+        "copper": 0.158,
+        "steel": 0.133
+      },
+      "winner_share": 0.43,
+      "mixed": true,
+      "cell": "ink"
+    },
+    {
+      "part": 7,
+      "triangles": 60,
+      "center_raw": [
+        0.3289,
+        0.2362,
+        0.0789
+      ],
+      "votes": {
+        "steel": 0.717,
+        "steel_dark": 0.265,
+        "ink": 0.018
+      },
+      "winner_share": 0.717,
+      "mixed": false,
+      "cell": "steel"
+    },
+    {
+      "part": 8,
+      "triangles": 60,
+      "center_raw": [
+        0.2829,
+        0.0,
+        0.1711
+      ],
+      "votes": {
+        "brass": 0.628,
+        "steel": 0.372
+      },
+      "winner_share": 0.628,
+      "mixed": false,
+      "cell": "brass"
+    },
+    {
+      "part": 9,
+      "triangles": 60,
+      "center_raw": [
+        0.3421,
+        0.4342,
+        -0.0132
+      ],
+      "votes": {
+        "steel": 0.909,
+        "steel_dark": 0.091
+      },
+      "winner_share": 0.909,
+      "mixed": false,
+      "cell": "steel"
+    },
+    {
+      "part": 10,
+      "triangles": 60,
+      "center_raw": [
+        0.2934,
+        -0.0008,
+        0.1718
+      ],
+      "votes": {
+        "steel": 0.515,
+        "porcelain": 0.485
+      },
+      "winner_share": 0.515,
+      "mixed": true,
+      "override": "porcelain",
+      "cell": "porcelain"
+    },
+    {
+      "part": 11,
+      "triangles": 36,
+      "center_raw": [
+        0.2241,
+        -0.4334,
+        -0.2895
+      ],
+      "votes": {
+        "ink": 0.569,
+        "steel_dark": 0.431
+      },
+      "winner_share": 0.569,
+      "mixed": true,
+      "cell": "ink"
+    },
+    {
+      "part": 12,
+      "triangles": 188,
+      "center_raw": [
+        0.3553,
+        0.0,
+        -0.2434
+      ],
+      "votes": {
+        "steel_dark": 0.981,
+        "steel": 0.019
+      },
+      "winner_share": 0.981,
+      "mixed": false,
+      "cell": "steel_dark"
+    },
+    {
+      "part": 13,
+      "triangles": 36,
+      "center_raw": [
+        0.2241,
+        0.4347,
+        -0.2895
+      ],
+      "votes": {
+        "ink": 0.629,
+        "steel_dark": 0.371
+      },
+      "winner_share": 0.629,
+      "mixed": false,
+      "cell": "ink"
+    },
+    {
+      "part": 14,
+      "triangles": 36,
+      "center_raw": [
+        -0.2236,
+        -0.4344,
+        -0.2895
+      ],
+      "votes": {
+        "ink": 0.542,
+        "steel_dark": 0.458
+      },
+      "winner_share": 0.542,
+      "mixed": true,
+      "cell": "ink"
+    },
+    {
+      "part": 15,
+      "triangles": 36,
+      "center_raw": [
+        -0.2231,
+        0.4338,
+        -0.2895
+      ],
+      "votes": {
+        "ink": 0.532,
+        "steel_dark": 0.468
+      },
+      "winner_share": 0.532,
+      "mixed": true,
+      "cell": "ink"
+    }
+  ]
+}

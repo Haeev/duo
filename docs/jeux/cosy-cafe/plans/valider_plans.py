@@ -370,6 +370,13 @@ def los(grid, opaque, ax, ay, bx, by):
     return True
 
 
+def door_face(shape, vx, vy):
+    """Point de la porte le plus proche de l'observateur, 5 cm de son côté: on vise la face vue."""
+    _, qx, qy = dist_to_shape(shape, vx, vy)
+    L = math.hypot(vx - qx, vy - qy) or 1.0
+    return qx + (vx - qx) / L * 0.05, qy + (vy - qy) / L * 0.05
+
+
 def angle_of(vx, vy, tx, ty):
     """Angle du plan (0 = haut du dessin, 90 = droite), en degrés."""
     return math.degrees(math.atan2(tx - vx, -(ty - vy))) % 360
@@ -512,9 +519,11 @@ def check_plan(plan, norms, with_grid=True):
     rep.info(f"meubles dessinés: {n_furn}; il en reste {fcap - n_furn} pour la décoration (C6: {fcap})")
 
     # 2. Rasters: clients, joueurs, file pleine, opacité.
-    def obstacles(lv, network, with_queues=False):
+    def obstacles(lv, network, with_queues=False, fixed_only=False):
         out = []
         for e in lv["elements"]:
+            if fixed_only and e["kind"] in MOVABLE:
+                continue
             if e["kind"] == "door":
                 acc = e.get("access", "public")
                 if acc == "closed" or (network == "clients" and acc == "staff"):
@@ -537,10 +546,18 @@ def check_plan(plan, norms, with_grid=True):
     ok_leak = [passable(c, r_leak) for c in clr_c]
     ok_s = [passable(c, r_pass) for c in clr_s]
     ok_s_main = [passable(c, r_main) for c in clr_s]
+    # Meubles portés à deux: la coque seule (murs, portes, comptoirs, postes), avant l'aménagement.
+    clr_shell = [g.clearance2(obstacles(lv, "staff", fixed_only=True), cap_d) for g, lv in zip(grids, levels)]
+    ok_shell_main = [passable(c, r_main) for c in clr_shell]
     ok_q_main = [passable(c, r_main) for c in clr_q]
     solid_c = [bytearray(1 if v <= EPS else 0 for v in c) for c in clr_c]
     solid_s = [bytearray(1 if v <= EPS else 0 for v in c) for c in clr_s]
     opaque = [g.mask([e["shape"] for e in lv["elements"] if e.get("opaque")]) for g, lv in zip(grids, levels)]
+    # Brise-bise et vitrines garnies: ils cachent les clients assis, pas ceux qui sont debout.
+    opaque_seated = []
+    for g, lv, op in zip(grids, levels, opaque):
+        low = g.mask([e["shape"] for e in lv["elements"] if e.get("screen_low")])
+        opaque_seated.append(bytearray(a | b for a, b in zip(op, low)))
 
     def make_links(ok_list, public_only):
         links = {}
@@ -703,8 +720,10 @@ def check_plan(plan, norms, with_grid=True):
     for li, p in pts_of("stock"):
         if dist_point(li, p, ok_s_main, dist_dl, radius=0.6) == INF:
             rep.err(f"pas de passage de 1,20 m de la livraison à la réserve {p}")
-    src_big = deliveries + [(li, nearest_ok(grids[li], ok_s_main[li], *p, radius=0.6)) for li, p in entrances]
-    dist_big = search(grids, ok_s_main, src_big, links_sm, weighted=False)
+    links_shell = make_links(ok_shell_main, False)
+    src_big = [(li, nearest_ok(grids[li], ok_shell_main[li], *p, radius=0.6))
+               for li, p in pts_of("delivery") + entrances]
+    dist_big = search(grids, ok_shell_main, src_big, links_shell, weighted=False)
     bad_free = []
     for li, lv in enumerate(levels):
         g = grids[li]
@@ -790,8 +809,8 @@ def check_plan(plan, norms, with_grid=True):
     crowd_cap = norms["crowd_cap"]
     level_targets = []
     for lv in levels:
-        tg = {"people": [center(e["shape"]) for e in lv["elements"] if e["kind"] == "seat"]
-              + [s for q in lv.get("queues", []) for s in queue_slots(q, norms["queue_pitch"])],
+        tg = {"seated": [center(e["shape"]) for e in lv["elements"] if e["kind"] == "seat"],
+              "standing": [s for q in lv.get("queues", []) for s in queue_slots(q, norms["queue_pitch"])],
               "furn": [center(e["shape"]) for e in lv["elements"] if e["kind"] in MOVABLE],
               "spaces": []}
         for z in lv["zones"]:
@@ -812,7 +831,9 @@ def check_plan(plan, norms, with_grid=True):
 
     def crowd_at(li, vx, vy):
         g, op, tg = grids[li], opaque[li], level_targets[li]
-        ang_people = sorted(angle_of(vx, vy, x, y) for x, y in tg["people"] if los(g, op, vx, vy, x, y))
+        ops = opaque_seated[li]
+        ang_people = sorted([angle_of(vx, vy, x, y) for x, y in tg["seated"] if los(g, ops, vx, vy, x, y)]
+                            + [angle_of(vx, vy, x, y) for x, y in tg["standing"] if los(g, op, vx, vy, x, y)])
         space_angles = []
         for z, pts in tg["spaces"]:
             angs = sorted(angle_of(vx, vy, x, y) for x, y in pts if los(g, op, vx, vy, x, y))
@@ -842,7 +863,7 @@ def check_plan(plan, norms, with_grid=True):
                         rep.err(f"vue « {v['label']} »: file « {ident} » inconnue")
                         continue
                     pts = [tuple(s) for s in queue_slots(q, norms["queue_pitch"])]
-                    doors = [center(e["shape"]) for e in lv["elements"]
+                    doors = [door_face(e["shape"], vx, vy) for e in lv["elements"]
                              if e["kind"] == "door" and e["id"] in q["doors"]]
                     hidden = [p for p in pts + doors if not los(g, op, vx, vy, p[0], p[1])]
                     width, _ = covering_arc([angle_of(vx, vy, x, y) for x, y in pts + doors])
@@ -857,7 +878,7 @@ def check_plan(plan, norms, with_grid=True):
                     if e is None:
                         rep.err(f"vue « {v['label']} »: porte « {ident} » inconnue")
                         continue
-                    dx, dy = center(e["shape"])
+                    dx, dy = door_face(e["shape"], vx, vy)
                     dd = angdiff(angle_of(vx, vy, dx, dy), v["facing_deg"])
                     if dd > half_fov or not los(g, op, vx, vy, dx, dy):
                         rep.err(f"vue « {v['label']} »: la porte n'est pas dans l'axe de travail ou elle est cachée")

@@ -37,18 +37,20 @@
     padding: 0.7rem 0.9rem;
     overflow-y: auto;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.5rem;
     align-content: start;
   }
   .planche__tete { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.3rem 1rem; align-items: baseline; }
-  .planche__compte { font-size: 0.9375rem; color: var(--craie-2); }
+  .planche__tete > * { min-width: 0; }
+  .planche__compte { font-size: 0.9375rem; color: var(--craie-2); flex: 1 1 12rem; text-align: right; }
   .mot-du-jour { display: grid; gap: 0.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid #63676b; }
   .mot-du-jour label, .mot-du-jour__titre { font-weight: 700; font-size: 0.9375rem; }
   .mot-du-jour input { font: inherit; font-size: 1.0625rem; color: var(--craie); background: var(--ardoise-2); border: 2px solid var(--craie); border-radius: 0.4rem; padding: 0.35rem 0.6rem; width: 100%; }
   .mot-du-jour input::placeholder { color: #c8cac4; opacity: 1; }
   .mot-du-jour__aide { font-size: 0.875rem; color: var(--craie-2); }
   .mot-du-jour__texte { font-size: 1.0625rem; }
-  .ligne-ardoise { display: grid; grid-template-columns: minmax(7rem, 1fr) auto auto auto; gap: 0.2rem 0.6rem; align-items: center; padding: 0.3rem 0; border-bottom: 2px dashed #63676b; }
+  .ligne-ardoise { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 0.2rem 0.6rem; align-items: center; padding: 0.3rem 0; border-bottom: 2px dashed #63676b; }
   .ligne-ardoise__nom { font-size: 1.125rem; font-weight: 700; }
   .ligne-ardoise__avis { grid-column: 1; font-size: 0.875rem; color: var(--craie-2); }
   .ligne-ardoise .prix { display: inline-flex; align-items: center; gap: 0.25rem; white-space: nowrap; }

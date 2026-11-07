@@ -63,7 +63,7 @@
 <rect x="210.0" y="1312.0" width="88.0" height="40.0" fill="#ddd2bf" stroke="#6d6d6d" stroke-width="1"/>
 <rect x="346.0" y="1312.0" width="88.0" height="40.0" fill="#ddd2bf" stroke="#6d6d6d" stroke-width="1"/>
 <circle cx="450.0" cy="1216.0" r="7.2" fill="#ddd6c9" stroke="#666" stroke-width="1"/>
-<rect x="360.0" y="432.0" width="30.0" height="52.0" fill="#9aa48f" stroke="#555" stroke-width="1"/>
+<rect x="304.0" y="296.0" width="24.0" height="56.0" fill="#9aa48f" stroke="#555" stroke-width="1"/>
 <rect x="276.0" y="666.0" width="62.0" height="16.0" fill="#d3bf9c" stroke="#7a6545" stroke-width="1"/>
 <rect x="326.0" y="688.0" width="12.0" height="76.0" fill="#d3bf9c" stroke="#7a6545" stroke-width="1"/>
 <rect x="276.0" y="822.0" width="16.0" height="26.0" fill="#ffffff" stroke="#555" stroke-width="1" rx="4"/>
@@ -101,11 +101,11 @@
 <rect x="126.0" y="272.0" width="80.0" height="48.0" fill="#ddd2bf" stroke="#6d6d6d" stroke-width="1"/>
 <rect x="154.0" y="472.0" width="72.0" height="40.0" fill="#ddd2bf" stroke="#6d6d6d" stroke-width="1"/>
 <rect x="206.0" y="1154.0" width="10.0" height="20.0" fill="#3f4a45" stroke="#222" stroke-width="1"/>
-<rect x="116.0" y="716.0" width="38.0" height="40.0" fill="#a14d2a" stroke="#2f2f2f" stroke-width="1"/>
-<rect x="190.0" y="752.0" width="72.0" height="32.0" fill="#d9c7a7" stroke="#2f2f2f" stroke-width="1"/>
-<rect x="184.0" y="666.0" width="30.0" height="30.0" fill="#cfe0ec" stroke="#2f2f2f" stroke-width="1"/>
-<rect x="218.0" y="666.0" width="36.0" height="24.0" fill="#a9cbe6" stroke="#2f2f2f" stroke-width="1"/>
-<rect x="206.0" y="816.0" width="40.0" height="34.0" fill="#d9c7a7" stroke="#2f2f2f" stroke-width="1"/>
+<rect x="116.0" y="736.0" width="40.0" height="48.0" fill="#a14d2a" stroke="#2f2f2f" stroke-width="1"/>
+<rect x="190.0" y="760.0" width="72.0" height="32.0" fill="#d9c7a7" stroke="#2f2f2f" stroke-width="1"/>
+<rect x="190.0" y="666.0" width="36.0" height="24.0" fill="#a9cbe6" stroke="#2f2f2f" stroke-width="1"/>
+<rect x="232.0" y="666.0" width="30.0" height="30.0" fill="#cfe0ec" stroke="#2f2f2f" stroke-width="1"/>
+<rect x="206.0" y="818.0" width="40.0" height="32.0" fill="#d9c7a7" stroke="#2f2f2f" stroke-width="1"/>
 <rect x="152.0" y="856.8" width="32.0" height="22.0" fill="#9d8f6a" stroke="#2f2f2f" stroke-width="1"/>
 <rect x="264.0" y="856.8" width="30.0" height="22.0" fill="#cfe0ec" stroke="#2f2f2f" stroke-width="1"/>
 <rect x="296.0" y="856.8" width="42.0" height="22.0" fill="#a9cbe6" stroke="#2f2f2f" stroke-width="1"/>
@@ -115,7 +115,7 @@
 <rect x="258.0" y="928.0" width="14.0" height="18.0" fill="#6d6d6d" stroke="#2f2f2f" stroke-width="1"/>
 <rect x="276.0" y="926.0" width="26.0" height="22.0" fill="#e9d6ae" stroke="#2f2f2f" stroke-width="1"/>
 <rect x="302.0" y="232.0" width="92.0" height="192.0" fill="none" stroke="#9c4a2a" stroke-width="1.4" stroke-dasharray="6,4"/>
-<rect x="114.0" y="708.0" width="50.0" height="56.0" fill="none" stroke="#9c4a2a" stroke-width="1.4" stroke-dasharray="6,4"/>
+<rect x="114.0" y="728.0" width="52.0" height="64.0" fill="none" stroke="#9c4a2a" stroke-width="1.4" stroke-dasharray="6,4"/>
 <rect x="94.0" y="232.0" width="60.0" height="20.0" fill="#3b3b3b"/>
 <rect x="202.0" y="232.0" width="100.0" height="20.0" fill="#3b3b3b"/>
 <rect x="394.0" y="232.0" width="20.0" height="20.0" fill="#3b3b3b"/>
@@ -127,8 +127,8 @@
 <rect x="282.0" y="412.0" width="20.0" height="12.0" fill="#3b3b3b"/>
 <rect x="94.0" y="424.0" width="20.0" height="220.0" fill="#3b3b3b"/>
 <rect x="94.0" y="644.0" width="32.0" height="20.0" fill="#3b3b3b"/>
-<rect x="182.0" y="644.0" width="36.0" height="20.0" fill="#3b3b3b"/>
-<rect x="258.0" y="644.0" width="94.0" height="20.0" fill="#3b3b3b"/>
+<rect x="182.0" y="644.0" width="8.0" height="20.0" fill="#3b3b3b"/>
+<rect x="230.0" y="644.0" width="122.0" height="20.0" fill="#3b3b3b"/>
 <rect x="388.0" y="644.0" width="26.0" height="20.0" fill="#3b3b3b"/>
 <rect x="94.0" y="644.0" width="20.0" height="504.0" fill="#3b3b3b"/>
 <rect x="270.0" y="664.0" width="4.0" height="36.0" fill="#777777"/>
@@ -161,9 +161,9 @@
 <path d="M154.0,644.0 A28.0,28.0 0 0 0 126.0,616.0" fill="none" stroke="#d4761c" stroke-width="0.9" stroke-dasharray="3,2"/>
 <line x1="182.0" y1="644.0" x2="182.0" y2="616.0" stroke="#d4761c" stroke-width="2"/>
 <path d="M154.0,644.0 A28.0,28.0 0 0 1 182.0,616.0" fill="none" stroke="#d4761c" stroke-width="0.9" stroke-dasharray="3,2"/>
-<rect x="218.0" y="644.0" width="40.0" height="20.0" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
-<line x1="218.0" y1="650.0" x2="258.0" y2="650.0" stroke="#3f7fc0" stroke-width="1.6"/>
-<line x1="218.0" y1="658.0" x2="258.0" y2="658.0" stroke="#3f7fc0" stroke-width="1.6"/>
+<rect x="190.0" y="644.0" width="40.0" height="20.0" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
+<line x1="190.0" y1="650.0" x2="230.0" y2="650.0" stroke="#3f7fc0" stroke-width="1.6"/>
+<line x1="190.0" y1="658.0" x2="230.0" y2="658.0" stroke="#3f7fc0" stroke-width="1.6"/>
 <rect x="352.0" y="644.0" width="36.0" height="20.0" fill="#fbf8f1"/>
 <line x1="388.0" y1="644.0" x2="388.0" y2="608.0" stroke="#d4761c" stroke-width="2"/>
 <path d="M352.0,644.0 A36.0,36.0 0 0 1 388.0,608.0" fill="none" stroke="#d4761c" stroke-width="0.9" stroke-dasharray="3,2"/>
@@ -192,9 +192,9 @@
 <rect x="300.0" y="1128.0" width="82.0" height="20.0" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
 <line x1="300.0" y1="1134.0" x2="382.0" y2="1134.0" stroke="#3f7fc0" stroke-width="1.6"/>
 <line x1="300.0" y1="1142.0" x2="382.0" y2="1142.0" stroke="#3f7fc0" stroke-width="1.6"/>
-<circle cx="124.0" cy="700.0" r="5" fill="#9c4a2a" stroke="#ffffff" stroke-width="1"/>
-<rect x="159.5" y="731.5" width="9" height="9" fill="#e8a317" stroke="#7a5200" stroke-width="1"/>
-<circle cx="236.0" cy="698.0" r="4.2" fill="#2f7fd1" stroke="#ffffff" stroke-width="1"/>
+<circle cx="124.0" cy="724.0" r="5" fill="#9c4a2a" stroke="#ffffff" stroke-width="1"/>
+<rect x="161.5" y="755.5" width="9" height="9" fill="#e8a317" stroke="#7a5200" stroke-width="1"/>
+<circle cx="208.0" cy="696.0" r="4.2" fill="#2f7fd1" stroke="#ffffff" stroke-width="1"/>
 <rect x="281.0" y="756.0" width="10" height="8" fill="#ffffff" stroke="#7a5200" stroke-width="1.4"/>
 <circle cx="284.0" cy="810.0" r="4.2" fill="#ffffff" stroke="#2f7fd1" stroke-width="2"/>
 <circle cx="310.0" cy="848.0" r="4.2" fill="#2f7fd1" stroke="#ffffff" stroke-width="1"/>
@@ -225,7 +225,7 @@
 <polyline points="350.0,976.0 370.0,912.0 370.0,808.0 354.0,808.0" fill="none" stroke="#2563a8" stroke-width="2.2" marker-end="url(#arrow-clients)" stroke-linejoin="round"/>
 <polyline points="198.0,902.0 322.0,902.0 322.0,964.0 338.0,1068.0" fill="none" stroke="#d4761c" stroke-width="2.2" stroke-dasharray="6,3" marker-end="url(#arrow-staff)" stroke-linejoin="round"/>
 <polyline points="132.0,896.0 132.0,828.0 170.0,808.0" fill="none" stroke="#d4761c" stroke-width="2.2" stroke-dasharray="6,3" marker-end="url(#arrow-staff)" stroke-linejoin="round"/>
-<polyline points="348.0,260.0 338.0,496.0 338.0,616.0 154.0,616.0 154.0,724.0 290.0,724.0" fill="none" stroke="#2f8a3a" stroke-width="2.2" stroke-dasharray="10,3,2,3" marker-end="url(#arrow-delivery)" stroke-linejoin="round"/>
+<polyline points="354.0,260.0 346.0,496.0 338.0,616.0 154.0,616.0 154.0,708.0 210.0,722.0 290.0,722.0" fill="none" stroke="#2f8a3a" stroke-width="2.2" stroke-dasharray="10,3,2,3" marker-end="url(#arrow-delivery)" stroke-linejoin="round"/>
 <circle cx="136.0" cy="902.0" r="5" fill="#f2c94c" stroke="#7a5d00" stroke-width="1.2"/>
 <circle cx="136.0" cy="902.0" r="1.8" fill="#3b2c00"/>
 <circle cx="240.0" cy="902.0" r="5" fill="#f2c94c" stroke="#7a5d00" stroke-width="1.2"/>
@@ -237,13 +237,13 @@
 <text x="118.0" y="1332.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">étal du jeudi</text>
 <text x="254.0" y="1332.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">étal du jeudi</text>
 <text x="390.0" y="1332.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">étal du jeudi</text>
-<text x="375.0" y="458.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 375.0 458.0)">poubelles</text>
-<text x="135.0" y="736.0" font-size="8" fill="#ffffff" font-weight="normal" text-anchor="middle" dominant-baseline="middle">four</text>
-<text x="139.0" y="718.0" font-size="9" fill="#9c4a2a" font-weight="normal" text-anchor="middle" dominant-baseline="middle">hotte</text>
-<text x="226.0" y="768.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">marbre</text>
-<text x="199.0" y="681.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">frigo</text>
-<text x="236.0" y="678.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">évier</text>
-<text x="226.0" y="833.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">batteur</text>
+<text x="316.0" y="324.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 316.0 324.0)">poubelles</text>
+<text x="136.0" y="760.0" font-size="8" fill="#ffffff" font-weight="normal" text-anchor="middle" dominant-baseline="middle">four</text>
+<text x="140.0" y="738.0" font-size="9" fill="#9c4a2a" font-weight="normal" text-anchor="middle" dominant-baseline="middle">hotte</text>
+<text x="226.0" y="776.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">marbre</text>
+<text x="208.0" y="678.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">évier</text>
+<text x="247.0" y="681.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">frigo</text>
+<text x="226.0" y="834.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">batteur</text>
 <text x="307.0" y="674.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">étagères</text>
 <text x="286.0" y="748.8" font-size="7" fill="#7a5200" font-weight="normal" text-anchor="middle" dominant-baseline="middle">tableau</text>
 <text x="284.0" y="835.0" font-size="8" fill="#222" font-weight="normal" text-anchor="middle" dominant-baseline="middle">WC</text>
@@ -284,7 +284,7 @@
 <line x1="430.0" y1="664.0" x2="442.0" y2="664.0" stroke="#555" stroke-width="1.2"/>
 <line x1="430.0" y1="1128.0" x2="442.0" y2="1128.0" stroke="#555" stroke-width="1.2"/>
 <text x="444.8" y="896.0" font-size="9" fill="#333" font-weight="normal" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 444.8 896.0)">11,60 m (laboratoire et boutique)</text>
-<rect x="506" y="144" width="320" height="767" fill="#ffffff" stroke="#cfc9bd" stroke-width="1"/>
+<rect x="506" y="144" width="320" height="788" fill="#ffffff" stroke="#cfc9bd" stroke-width="1"/>
 <text x="514" y="162" font-size="13" font-weight="bold" fill="#222">Légende</text>
 <rect x="514" y="178" width="28" height="8" fill="#3b3b3b"/>
 <text x="552" y="182" font-size="11" fill="#222" dominant-baseline="middle">Mur porteur</text>
@@ -292,67 +292,69 @@
 <text x="552" y="203" font-size="11" fill="#222" dominant-baseline="middle">Cloison (joue basse du comptoir comprise)</text>
 <rect x="514" y="219" width="28" height="10" fill="#fff" stroke="#3b3b3b" stroke-width="0.8"/><line x1="514" y1="222" x2="542" y2="222" stroke="#3f7fc0" stroke-width="1.6"/><line x1="514" y1="226" x2="542" y2="226" stroke="#3f7fc0" stroke-width="1.6"/>
 <text x="552" y="224" font-size="11" fill="#222" dominant-baseline="middle">Vitrine ou fenêtre</text>
-<line x1="514" y1="252" x2="514" y2="232" stroke="#2b2b2b" stroke-width="2"/><path d="M534,252 A20,20 0 0 0 514,232" fill="none" stroke="#2b2b2b" stroke-width="0.9" stroke-dasharray="3,2"/>
-<text x="552" y="245" font-size="11" fill="#222" dominant-baseline="middle">Porte des clients (battant et débattement)</text>
-<line x1="514" y1="273" x2="514" y2="253" stroke="#d4761c" stroke-width="2"/><path d="M534,273 A20,20 0 0 0 514,253" fill="none" stroke="#d4761c" stroke-width="0.9" stroke-dasharray="3,2"/>
-<text x="552" y="266" font-size="11" fill="#222" dominant-baseline="middle">Porte ou portillon du personnel</text>
-<line x1="514" y1="292" x2="536" y2="292" stroke="#8a8a8a" stroke-width="3"/>
-<text x="552" y="287" font-size="11" fill="#222" dominant-baseline="middle">Porte fermée à clé</text>
-<rect x="514" y="302" width="28" height="12" fill="#a8743c" stroke="#5b3f1d"/>
-<text x="552" y="308" font-size="11" fill="#222" dominant-baseline="middle">Comptoir (1,10 m côté clients)</text>
-<rect x="514" y="323" width="28" height="12" fill="#c9a271" stroke="#6b4e2c"/>
-<text x="552" y="329" font-size="11" fill="#222" dominant-baseline="middle">Arrière-comptoir (0,90 m)</text>
-<rect x="514" y="344" width="14" height="12" fill="#4b4b4b" stroke="#222"/><rect x="529" y="344" width="13" height="12" fill="#a9cbe6" stroke="#222"/>
-<text x="552" y="350" font-size="11" fill="#222" dominant-baseline="middle">Poste fixe (libellé dessus)</text>
-<rect x="518" y="364" width="16" height="14" fill="#fff" stroke="#4d4d4d" stroke-width="1.2"/>
-<text x="552" y="371" font-size="11" fill="#222" dominant-baseline="middle">Table</text>
-<rect x="520" y="386" width="12" height="12" fill="#d6cfc3" stroke="#4d4d4d"/><rect x="520" y="386" width="12" height="3" fill="#5a5148"/>
-<text x="552" y="392" font-size="11" fill="#222" dominant-baseline="middle">Place assise (dossier en trait épais)</text>
-<rect x="514" y="406" width="28" height="14" fill="#f6d7ad"/>
-<text x="552" y="413" font-size="11" fill="#222" dominant-baseline="middle">Zone de travail (joueurs, employés)</text>
-<rect x="514" y="427" width="28" height="14" fill="#e4dccd"/>
-<text x="552" y="434" font-size="11" fill="#222" dominant-baseline="middle">Réserve, cuisine, locaux du personnel</text>
-<rect x="514" y="448" width="28" height="14" fill="url(#hatch-free)" stroke="#cfe3c4"/>
-<text x="552" y="455" font-size="11" fill="#222" dominant-baseline="middle">Zone libre: meubles du duo</text>
-<rect x="514" y="469" width="28" height="14" fill="url(#hatch-clear)" stroke="#ddd2ee"/>
-<text x="552" y="476" font-size="11" fill="#222" dominant-baseline="middle">Passage à garder libre</text>
-<rect x="514" y="490" width="28" height="14" fill="none" stroke="#2e7d32" stroke-width="2" stroke-dasharray="6,3"/>
-<text x="552" y="497" font-size="11" fill="#222" dominant-baseline="middle">Extension possible (pointillés)</text>
-<rect x="514" y="511" width="28" height="14" fill="#efebe3"/><rect x="514" y="511" width="28" height="14" fill="url(#hatch-backdrop)" stroke="#cfc9bd"/>
-<text x="552" y="518" font-size="11" fill="#222" dominant-baseline="middle">Décor de fond, hors du jeu (C18)</text>
-<rect x="514" y="532" width="28" height="14" fill="#7b57b3" fill-opacity="0.22"/><circle cx="522" cy="539" r="6" fill="#fff" stroke="#7b57b3" stroke-width="1.4"/><text x="522" y="539" font-size="8" text-anchor="middle" dominant-baseline="middle" fill="#7b57b3" font-weight="bold">1</text>
-<text x="552" y="539" font-size="11" fill="#222" dominant-baseline="middle">File d'attente, places numérotées</text>
-<line x1="514" y1="560" x2="540" y2="560" stroke="#2563a8" stroke-width="2.2" marker-end="url(#arrow-clients)"/>
-<text x="552" y="560" font-size="11" fill="#222" dominant-baseline="middle">Parcours des clients</text>
-<line x1="514" y1="581" x2="540" y2="581" stroke="#d4761c" stroke-width="2.2" stroke-dasharray="6,3" marker-end="url(#arrow-staff)"/>
-<text x="552" y="581" font-size="11" fill="#222" dominant-baseline="middle">Parcours des joueurs</text>
-<line x1="514" y1="602" x2="540" y2="602" stroke="#2f8a3a" stroke-width="2.2" stroke-dasharray="10,3,2,3" marker-end="url(#arrow-delivery)"/>
-<text x="552" y="602" font-size="11" fill="#222" dominant-baseline="middle">Livraisons</text>
-<circle cx="524" cy="623" r="4.2" fill="#2f7fd1" stroke="#fff"/>
-<text x="552" y="623" font-size="11" fill="#222" dominant-baseline="middle">Arrivée d'eau</text>
-<circle cx="524" cy="644" r="4.2" fill="#fff" stroke="#2f7fd1" stroke-width="2"/>
-<text x="552" y="644" font-size="11" fill="#222" dominant-baseline="middle">Évacuation</text>
-<rect x="519.5" y="660.5" width="9" height="9" fill="#e8a317" stroke="#7a5200"/>
-<text x="552" y="665" font-size="11" fill="#222" dominant-baseline="middle">Prise de force (32 A ou 400 V)</text>
-<rect x="519" y="682" width="10" height="8" fill="#fff" stroke="#7a5200" stroke-width="1.4"/>
-<text x="552" y="686" font-size="11" fill="#222" dominant-baseline="middle">Tableau électrique</text>
-<rect x="514" y="700" width="28" height="14" fill="none" stroke="#9c4a2a" stroke-width="1.4" stroke-dasharray="6,4"/>
-<text x="552" y="707" font-size="11" fill="#222" dominant-baseline="middle">Hotte, store ou verrière (au-dessus)</text>
-<path d="M518,734 L540,719 A22,22 0 0 1 540,737 z" fill="#f2c94c" fill-opacity="0.25" stroke="#c99a06"/><circle cx="518" cy="728" r="5" fill="#f2c94c" stroke="#7a5d00"/>
-<text x="552" y="728" font-size="11" fill="#222" dominant-baseline="middle">Point de vue contrôlé (champ de 100 degrés)</text>
-<text x="514" y="763" font-size="11" fill="#222">Échelle</text>
-<rect x="514" y="775" width="40" height="8" fill="#3b3b3b" stroke="#3b3b3b" stroke-width="0.8"/>
-<rect x="554" y="775" width="40" height="8" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
-<rect x="594" y="775" width="40" height="8" fill="#3b3b3b" stroke="#3b3b3b" stroke-width="0.8"/>
-<rect x="634" y="775" width="40" height="8" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
-<rect x="674" y="775" width="40" height="8" fill="#3b3b3b" stroke="#3b3b3b" stroke-width="0.8"/>
-<text x="514" y="795" font-size="9" text-anchor="middle" fill="#333">0</text>
-<text x="554" y="795" font-size="9" text-anchor="middle" fill="#333">1</text>
-<text x="594" y="795" font-size="9" text-anchor="middle" fill="#333">2</text>
-<text x="634" y="795" font-size="9" text-anchor="middle" fill="#333">3</text>
-<text x="674" y="795" font-size="9" text-anchor="middle" fill="#333">4</text>
-<text x="714" y="795" font-size="9" text-anchor="middle" fill="#333">5</text>
-<text x="724" y="783" font-size="10" fill="#333">m</text>
-<g transform="rotate(90 784 779)"><circle cx="784" cy="779" r="22" fill="#fff" stroke="#3b3b3b" stroke-width="1.2"/><path d="M784,760 L791,787 L784,782 L777,787 z" fill="#3b3b3b"/><text x="784" y="753" font-size="12" font-weight="bold" text-anchor="middle" fill="#3b3b3b">N</text></g>
-<text x="514" y="821" font-size="10" fill="#444">Joueurs: 2; employés au plus: 0.</text>
+<rect x="514" y="240" width="28" height="10" fill="#c9a96e" fill-opacity="0.55" stroke="#3b3b3b" stroke-width="0.8"/><line x1="514" y1="243" x2="542" y2="243" stroke="#3f7fc0" stroke-width="1.6"/><line x1="514" y1="247" x2="542" y2="247" stroke="#3f7fc0" stroke-width="1.6"/>
+<text x="552" y="245" font-size="11" fill="#222" dominant-baseline="middle">Vitrine à brise-bise ou garnie (cache les assis)</text>
+<line x1="514" y1="273" x2="514" y2="253" stroke="#2b2b2b" stroke-width="2"/><path d="M534,273 A20,20 0 0 0 514,253" fill="none" stroke="#2b2b2b" stroke-width="0.9" stroke-dasharray="3,2"/>
+<text x="552" y="266" font-size="11" fill="#222" dominant-baseline="middle">Porte des clients (battant et débattement)</text>
+<line x1="514" y1="294" x2="514" y2="274" stroke="#d4761c" stroke-width="2"/><path d="M534,294 A20,20 0 0 0 514,274" fill="none" stroke="#d4761c" stroke-width="0.9" stroke-dasharray="3,2"/>
+<text x="552" y="287" font-size="11" fill="#222" dominant-baseline="middle">Porte ou portillon du personnel</text>
+<line x1="514" y1="313" x2="536" y2="313" stroke="#8a8a8a" stroke-width="3"/>
+<text x="552" y="308" font-size="11" fill="#222" dominant-baseline="middle">Porte fermée à clé</text>
+<rect x="514" y="323" width="28" height="12" fill="#a8743c" stroke="#5b3f1d"/>
+<text x="552" y="329" font-size="11" fill="#222" dominant-baseline="middle">Comptoir (1,10 m côté clients)</text>
+<rect x="514" y="344" width="28" height="12" fill="#c9a271" stroke="#6b4e2c"/>
+<text x="552" y="350" font-size="11" fill="#222" dominant-baseline="middle">Arrière-comptoir (0,90 m)</text>
+<rect x="514" y="365" width="14" height="12" fill="#4b4b4b" stroke="#222"/><rect x="529" y="365" width="13" height="12" fill="#a9cbe6" stroke="#222"/>
+<text x="552" y="371" font-size="11" fill="#222" dominant-baseline="middle">Poste fixe (libellé dessus)</text>
+<rect x="518" y="385" width="16" height="14" fill="#fff" stroke="#4d4d4d" stroke-width="1.2"/>
+<text x="552" y="392" font-size="11" fill="#222" dominant-baseline="middle">Table</text>
+<rect x="520" y="407" width="12" height="12" fill="#d6cfc3" stroke="#4d4d4d"/><rect x="520" y="407" width="12" height="3" fill="#5a5148"/>
+<text x="552" y="413" font-size="11" fill="#222" dominant-baseline="middle">Place assise (dossier en trait épais)</text>
+<rect x="514" y="427" width="28" height="14" fill="#f6d7ad"/>
+<text x="552" y="434" font-size="11" fill="#222" dominant-baseline="middle">Zone de travail (joueurs, employés)</text>
+<rect x="514" y="448" width="28" height="14" fill="#e4dccd"/>
+<text x="552" y="455" font-size="11" fill="#222" dominant-baseline="middle">Réserve, cuisine, locaux du personnel</text>
+<rect x="514" y="469" width="28" height="14" fill="url(#hatch-free)" stroke="#cfe3c4"/>
+<text x="552" y="476" font-size="11" fill="#222" dominant-baseline="middle">Zone libre: meubles du duo</text>
+<rect x="514" y="490" width="28" height="14" fill="url(#hatch-clear)" stroke="#ddd2ee"/>
+<text x="552" y="497" font-size="11" fill="#222" dominant-baseline="middle">Passage à garder libre</text>
+<rect x="514" y="511" width="28" height="14" fill="none" stroke="#2e7d32" stroke-width="2" stroke-dasharray="6,3"/>
+<text x="552" y="518" font-size="11" fill="#222" dominant-baseline="middle">Extension possible (pointillés)</text>
+<rect x="514" y="532" width="28" height="14" fill="#efebe3"/><rect x="514" y="532" width="28" height="14" fill="url(#hatch-backdrop)" stroke="#cfc9bd"/>
+<text x="552" y="539" font-size="11" fill="#222" dominant-baseline="middle">Décor de fond, hors du jeu (C18)</text>
+<rect x="514" y="553" width="28" height="14" fill="#7b57b3" fill-opacity="0.22"/><circle cx="522" cy="560" r="6" fill="#fff" stroke="#7b57b3" stroke-width="1.4"/><text x="522" y="560" font-size="8" text-anchor="middle" dominant-baseline="middle" fill="#7b57b3" font-weight="bold">1</text>
+<text x="552" y="560" font-size="11" fill="#222" dominant-baseline="middle">File d'attente, places numérotées</text>
+<line x1="514" y1="581" x2="540" y2="581" stroke="#2563a8" stroke-width="2.2" marker-end="url(#arrow-clients)"/>
+<text x="552" y="581" font-size="11" fill="#222" dominant-baseline="middle">Parcours des clients</text>
+<line x1="514" y1="602" x2="540" y2="602" stroke="#d4761c" stroke-width="2.2" stroke-dasharray="6,3" marker-end="url(#arrow-staff)"/>
+<text x="552" y="602" font-size="11" fill="#222" dominant-baseline="middle">Parcours des joueurs</text>
+<line x1="514" y1="623" x2="540" y2="623" stroke="#2f8a3a" stroke-width="2.2" stroke-dasharray="10,3,2,3" marker-end="url(#arrow-delivery)"/>
+<text x="552" y="623" font-size="11" fill="#222" dominant-baseline="middle">Livraisons</text>
+<circle cx="524" cy="644" r="4.2" fill="#2f7fd1" stroke="#fff"/>
+<text x="552" y="644" font-size="11" fill="#222" dominant-baseline="middle">Arrivée d'eau</text>
+<circle cx="524" cy="665" r="4.2" fill="#fff" stroke="#2f7fd1" stroke-width="2"/>
+<text x="552" y="665" font-size="11" fill="#222" dominant-baseline="middle">Évacuation</text>
+<rect x="519.5" y="681.5" width="9" height="9" fill="#e8a317" stroke="#7a5200"/>
+<text x="552" y="686" font-size="11" fill="#222" dominant-baseline="middle">Prise de force (32 A ou 400 V)</text>
+<rect x="519" y="703" width="10" height="8" fill="#fff" stroke="#7a5200" stroke-width="1.4"/>
+<text x="552" y="707" font-size="11" fill="#222" dominant-baseline="middle">Tableau électrique</text>
+<rect x="514" y="721" width="28" height="14" fill="none" stroke="#9c4a2a" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="552" y="728" font-size="11" fill="#222" dominant-baseline="middle">Hotte, store ou verrière (au-dessus)</text>
+<path d="M518,755 L540,740 A22,22 0 0 1 540,758 z" fill="#f2c94c" fill-opacity="0.25" stroke="#c99a06"/><circle cx="518" cy="749" r="5" fill="#f2c94c" stroke="#7a5d00"/>
+<text x="552" y="749" font-size="11" fill="#222" dominant-baseline="middle">Point de vue contrôlé (champ de 100 degrés)</text>
+<text x="514" y="784" font-size="11" fill="#222">Échelle</text>
+<rect x="514" y="796" width="40" height="8" fill="#3b3b3b" stroke="#3b3b3b" stroke-width="0.8"/>
+<rect x="554" y="796" width="40" height="8" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
+<rect x="594" y="796" width="40" height="8" fill="#3b3b3b" stroke="#3b3b3b" stroke-width="0.8"/>
+<rect x="634" y="796" width="40" height="8" fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"/>
+<rect x="674" y="796" width="40" height="8" fill="#3b3b3b" stroke="#3b3b3b" stroke-width="0.8"/>
+<text x="514" y="816" font-size="9" text-anchor="middle" fill="#333">0</text>
+<text x="554" y="816" font-size="9" text-anchor="middle" fill="#333">1</text>
+<text x="594" y="816" font-size="9" text-anchor="middle" fill="#333">2</text>
+<text x="634" y="816" font-size="9" text-anchor="middle" fill="#333">3</text>
+<text x="674" y="816" font-size="9" text-anchor="middle" fill="#333">4</text>
+<text x="714" y="816" font-size="9" text-anchor="middle" fill="#333">5</text>
+<text x="724" y="804" font-size="10" fill="#333">m</text>
+<g transform="rotate(90 784 800)"><circle cx="784" cy="800" r="22" fill="#fff" stroke="#3b3b3b" stroke-width="1.2"/><path d="M784,781 L791,808 L784,803 L777,808 z" fill="#3b3b3b"/><text x="784" y="774" font-size="12" font-weight="bold" text-anchor="middle" fill="#3b3b3b">N</text></g>
+<text x="514" y="842" font-size="10" fill="#444">Joueurs: 2; employés au plus: 0.</text>
 </svg>
