@@ -103,6 +103,22 @@ Copie telle quelle d'un plan de `docs/jeux/cosy-cafe/plans/plans.json` (format `
 
 Chaque chantier ajoute ses fichiers ici (`recettes.json`, `profils.json`, `catalogue.json`...), les lit dans `src/<chantier>/donnees.ts` avec `readFile` et les décrit dans une section de ce document. Un fichier `service.json`, `clientele.json` ou `amenagement.json` déposé avant son lecteur est signalé au chargement.
 
-## Régénérer le départ
+## Clientèle (`clientele/`, chantier b)
+
+Générés par `outils/importer-clientele.py` depuis les données de la démo (`docs/jeux/cosy-cafe/demo/donnees/`) et les constantes de la simulation du cahier (`simulations/cosy_cafe.py`); ne pas les retoucher à la main: modifier la source ou le script, relancer, puis `npx prettier --write games/deux-tabliers/donnees/clientele`. Lus par `src/clientele/donnees.ts` (clés inconnues ignorées). Sommes en euros dans les fichiers, en centimes dans l'état.
+
+| Fichier | Contenu |
+|---|---|
+| `profils.json` | les 10 profils: envies (`mainCraving`, `secondaryCravings`, familles de `carte.json`), place voulue (`counter`, `table`, `comfort`, `terrace`), sensibilité au prix, patience et attente sans gêne (s réelles), séjour (min de jeu), tailles de groupe `[taille, part]`, part qui mange, part à emporter, recommande `[toutes les n min, probabilité]`, styles, équipements recherchés, générosité, flux d'Ormeval (`groupsPerDay`), poids horaires `[heure, poids]`, facteurs des jours (mardi à dimanche), de la météo et de la saison, couleur du substitut, modèles (`client-<profil>`) |
+| `regles.json` | lignes de l'ardoise (8), présents au plus (24, C2, joueurs compris), places debout au zinc, file (6, C4), estimation de l'attente, fermeture douce, points et facteurs de l'ardoise, bornes du prix, facteur du lieu, facteurs de réputation `[tasses, facteur]`, humeur, satisfaction, pourboires, livre d'or, replis des places, météo du printemps (chances, terrasse ouverte, jours forcés), portée pour parler, habitués par jour, marche des clients (grille de 25 cm, vitesse, zones interdites), places debout, attente au passe, pique-nique de la fontaine, passage de la place, vitrine, `fallbackPrepSeconds` (service d'office sans chantier a; `null` en jeu), délai de grâce de la fermeture |
+| `carte.json` | les 17 recettes vues de la caisse: famille, prix conseillé, coût des matières, ingrédients `[id, quantité]`, postes, pièces de vaisselle, déblocage (`start`, `purchase` et `item`, `regular` et `level`) |
+| `fournisseurs.json` | fournisseurs (heure de livraison, dépannage), 21 ingrédients (coût unitaire, rangement, conservation, unités par carton, carton lourd), règles de commande (dépannage, panier du soir, portions de base du premier jour, jours d'historique, marge) |
+| `economie.json` | caisse de départ, loyer, charges, réserve, pas de prix (-3 à +5, 10 %), seuil des achats importants, réputation (pas, pivot, rattrapage), offre de Mérelles, fête du Tilleul, ambiance (démo 6.3), brocante, marché aux fleurs, fin de la démo, paliers t0 à t3, postes et vaisselle de départ, équipements (`effects`: `poste:<poste>:<niveau>`, `equip:<x>`, `recette:<id>`, `vaisselle:<n>`, `renovate:<meuble>`), extensions (prix, palier, nuits de travaux, places), catalogue de la démo (catégorie, style, prix, charme, palier ou source), décor de départ |
+| `journees.json` | heures d'ouverture et de fermeture (min de jeu), secondes par minute de jeu (et rythme paisible), jours de la semaine, les 15 jours (ouvert, titre, habitués, événement, événement du village, projets, conseils de Simone, fin de la démo), « Nos projets » |
+| `habitues.json` | niveaux de lien, gains, les 6 habitués: profil, taille, fétiche et repli, horaires `[[jours], [minutes]]`, premier jour ou événement qui l'amène, répliques, conseils (Simone), étapes d'histoire (niveau, scène, récompense, tasses au moins), modèle (`habitue-<id>`) |
+| `evenements.json` | les 11 événements: jour, à partir du jour, jour de repli, minute de jeu, annonce de la veille, distribution, scène, but, limite et aide (s réelles), critères, issues, récompenses (`euros`, `points`, `renown`, `affluence` `[facteur, jours]`), objets offerts, mot du livre d'or, effets du jour, `staging` (mise en scène chiffrée du studio: profil et taille des groupes, commandes, fenêtres, indices) |
+| `textes.json` | dialogues (prologue, lettre de René), mots du livre d'or par raison, textes d'interface de la démo |
+
+
 
 Régénérer après un changement du plan: `python3 games/deux-tabliers/outils/importer-plan.py`, puis `npx prettier --write games/deux-tabliers/donnees`. Le départ est régénéré en entier: une retouche à la main de `departs/` se perd, la faire dans le script.

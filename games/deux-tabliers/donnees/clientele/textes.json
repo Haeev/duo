@@ -1,0 +1,143 @@
+{
+  "dialogues": {
+    "prologue": [
+      {
+        "who": "simone",
+        "text": "Vous voilà chez vous. Faites de ce café l'endroit où l'on aime s'arrêter: écrivez votre carte, servez vos clients, et la maison grandira."
+      },
+      {
+        "who": "simone",
+        "text": "Demain, on retourne la pancarte à 8 heures."
+      },
+      {
+        "who": "simone",
+        "text": "Avant ça, il lui faut un nom, à cette maison. À vous deux de choisir."
+      }
+    ],
+    "rene_letter": [
+      {
+        "who": "rene",
+        "text": "J'ai été pâtissier quarante ans, place de la Halle, à Mérelles. Mon four est froid depuis trois hivers."
+      },
+      {
+        "who": "rene",
+        "text": "Je vous ai regardé faire, à la fête. Je cherche quelqu'un pour le rallumer. Vous, par exemple."
+      },
+      {
+        "who": "simone",
+        "text": "Allez-y quand vous voudrez. Je vous le garde au chaud, le café de la place."
+      }
+    ]
+  },
+  "guestbook": {
+    "positive": {
+      "latteArt": [
+        "Le cappuccino avait un cœur dessus !",
+        "Une feuille dans mon crème. Je n'ai pas osé le boire tout de suite."
+      ],
+      "quality": [
+        "Le meilleur petit noir de la vallée, et je m'y connais.",
+        "Un crème comme chez ma grand-mère, en mieux."
+      ],
+      "asUsual": [
+        "Ils se souviennent de ma commande. Je me sens d'ici.",
+        "« Comme d'habitude ? » Oui, merci !"
+      ],
+      "chat": [
+        "On a parlé du tilleul pendant dix minutes. Je reviendrai.",
+        "Accueil adorable, on se sent attendu."
+      ],
+      "ambiance": [
+        "Quelle salle ! On dirait la cuisine d'une maison de famille.",
+        "Les fauteuils près de la vitrine: le bonheur."
+      ],
+      "terrace": [
+        "Un jus pressé au soleil, sous le tilleul. Parfait.",
+        "La terrasse sous le store, c'est le meilleur coin du village."
+      ],
+      "price": ["Des prix doux, et c'est bon. Merci.", "Pas cher pour un café de cette qualité."],
+      "homemade": ["La tarte du jour était fondante.", "Les crêpes ! On en a repris deux."],
+      "kids": [
+        "Les enfants ont adoré le coin des crayons.",
+        "Une chaise haute, enfin un café qui pense aux petits."
+      ],
+      "bikes": ["Merci pour le range-vélos !", "Une écuelle pour le chien: merci pour lui."]
+    },
+    "negative": {
+      "wait": [
+        "Un peu d'attente au comptoir, mais le café valait le coup.",
+        "Beaucoup de monde ce matin, j'ai failli rater mon car."
+      ],
+      "noSeat": [
+        "Pas trouvé de place pour m'asseoir, dommage.",
+        "Tout était pris, on a bu debout."
+      ],
+      "dirtyTable": [
+        "Notre table n'était pas débarrassée.",
+        "Quelques tasses oubliées sur les tables."
+      ],
+      "option": [
+        "C'était avec du lait d'avoine, mais ce n'est pas grave.",
+        "J'avais demandé un déca. Il était bon quand même."
+      ],
+      "price": ["Un peu cher pour un village.", "Bon, mais les prix grimpent vite."],
+      "dark": ["La salle est un peu sombre l'après-midi.", "On y voit mal pour lire."],
+      "empty": ["Un peu vide, il manque des choses aux murs.", "On s'y sent un peu seul."]
+    },
+    "regulars": {
+      "simone": [
+        "Mes clés sont entre de bonnes mains. S.",
+        "Il y a de nouveau de la vie sur la place. S."
+      ],
+      "lise": [
+        "Un café qui donne envie d'écrire. L.",
+        "Le calme de quinze heures, la tarte du jour, et ce fauteuil. L."
+      ],
+      "farida_noe": ["Noé a dessiné le café toute la soirée. F.", "Un mercredi parfait. F. et N."],
+      "bastien": ["Gribouille approuve. B.", "Le meilleur arrêt du sentier des crêtes. B."],
+      "mathis": ["En retard, mais réveillé. M.", "Le pain au chocolat de la victoire. M."]
+    }
+  },
+  "ui": {
+    "evening": {
+      "title": "Le bilan du soir",
+      "rows": {
+        "revenue": "Recettes",
+        "tips": "Pourboires",
+        "materials": "Matières",
+        "rent": "Loyer",
+        "charges": "Charges",
+        "result": "Résultat du jour",
+        "served": "Clients servis",
+        "left": "Repartis sans entrer"
+      },
+      "goodNight": "À demain",
+      "notYet": "Encore un instant",
+      "endSession": "Finir la séance",
+      "keepPlaying": "Continuer",
+      "radioWeather": "La radio annonce pour demain: {weather}"
+    },
+    "demoEnd": {
+      "title": "Fin de la démo",
+      "text": "La fête du Tilleul est finie, René vous attend à Mérelles. La suite, c'est dans le jeu complet: le four de René, la halle du jeudi, et tout ce que vous déciderez à deux.",
+      "stats": "{days} journées tenues, {served} clients servis, {words} mots au livre d'or",
+      "stay": "Rester à Ormeval",
+      "toLounge": "Retour au salon"
+    },
+    "events": {
+      "announceTitle": "Demain au café",
+      "outcomeFormidable": "Formidable !",
+      "outcomeReussi": "Réussi !",
+      "rewardItem": "Nouvel objet dans la remise: {item}",
+      "rewardMoney": "{amount} dans la caisse",
+      "rewardReputation": "Le village en parle"
+    },
+    "sign": {
+      "open": "Ouvert",
+      "closed": "Fermé",
+      "askOpen": "On ouvre ?",
+      "answerOpen": "Oui, on ouvre",
+      "pause": "Petite pause, on revient vite"
+    }
+  }
+}

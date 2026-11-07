@@ -1,0 +1,738 @@
+{
+  "events": [
+    {
+      "id": "le_car_de_8h12",
+      "name": "Le car de 8 h 12",
+      "kind": "client_presse",
+      "day": 4,
+      "fromDay": null,
+      "fallbackDay": 5,
+      "time": 485,
+      "announce": "Demain, le car du matin passe avec un remplaçant au volant. Il ne s'arrête que trois minutes.",
+      "cast": [
+        {
+          "id": "octave_brissac",
+          "name": "Octave Brissac"
+        },
+        {
+          "id": "chauffeur_car",
+          "name": "Le chauffeur du car"
+        }
+      ],
+      "scene": [
+        {
+          "who": "octave_brissac",
+          "text": "Bonjour ! Un double crème au lait d'avoine, mousse épaisse, dans ma tasse, pas trop chaud, avec un sucre à côté, et un croissant coupé en deux. Le car repart dans trois minutes."
+        },
+        {
+          "who": "octave_brissac",
+          "text": "Et si vous pouvez écrire « Courage » sur le couvercle, c'est un grand jour pour moi."
+        },
+        {
+          "who": "chauffeur_car",
+          "text": "Trois minutes, pas une de plus, j'ai un horaire !"
+        }
+      ],
+      "goal": "Servir la commande complète avant que le car reparte.",
+      "timeLimit": 75,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Le car repart, Octave lève sa tasse derrière la vitre.",
+        "reussi": "« Vous m'avez sauvé la matinée ! »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 6,
+          "points": 8,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 10,
+          "points": 12,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["carte_postale_brissac"],
+      "guestbook": "Arrivé à l'heure à mon entretien, et embauché. Le café m'a porté chance. O. B.",
+      "effects": null,
+      "staging": {
+        "lines": {
+          "clue": [
+            "",
+            "Le chauffeur du car attend devant la vitrine: tu peux lui demander trente secondes de plus."
+          ],
+          "choice": ["", "Demander au chauffeur"],
+          "driver": ["Le chauffeur du car", "Bon, trente secondes. Pas une de plus !"]
+        },
+        "profile": "presses",
+        "groups": [1],
+        "orders": [["creme", "croissant"]],
+        "extension": 30,
+        "helpAfter": 135,
+        "itemDelayDays": 4,
+        "seat": "takeaway"
+      }
+    },
+    {
+      "id": "la_vieille_dame_tousse",
+      "name": "La vieille dame tousse",
+      "kind": "panne",
+      "day": 6,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": null,
+      "announce": "Demain, marché aux fleurs sur la place du Tilleul: du monde dès l'ouverture.",
+      "cast": [
+        {
+          "id": "simone",
+          "name": "Simone"
+        },
+        {
+          "id": "gaby",
+          "name": "Gaby, plombier du village"
+        }
+      ],
+      "scene": [
+        {
+          "who": "system",
+          "text": "La machine siffle, crachote, et le groupe de droite ne donne plus qu'un filet d'eau."
+        },
+        {
+          "who": "simone",
+          "text": "Elle fait ça tous les printemps, la vieille dame. C'est le joint du groupe. Il y en a un neuf dans la boîte à outils, à la réserve."
+        },
+        {
+          "who": "simone",
+          "text": "Il faut être deux: l'un tient le levier en bas, l'autre change le joint. Et ne vous brûlez pas."
+        }
+      ],
+      "goal": "Réparer le groupe de droite à deux pendant que la place se remplit.",
+      "timeLimit": null,
+      "helpAfter": 180,
+      "help": "Si la réparation n'est pas faite après 3 minutes réelles, Gaby passe acheter ses fleurs et la fait en deux répliques.",
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Simone: « Elle vous a adoptés. »",
+        "reussi": "Gaby: « Un joint de 1987 ! Gardez-le, c'est une relique. »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 5,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 0,
+          "points": 10,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["joint_encadre"],
+      "guestbook": null,
+      "effects": null,
+      "staging": {
+        "lines": {
+          "help": ["Gaby", "Montre-moi ça. Un joint neuf, et elle repart comme en 87."],
+          "hold": ["", "Tu tiens le levier: il faut que l'autre change le joint en même temps."]
+        },
+        "pairWindow": 3,
+        "reach": 1.8,
+        "formidableBefore": 540,
+        "station": "machine-espresso"
+      }
+    },
+    {
+      "id": "le_marche_aux_fleurs",
+      "name": "Le marché aux fleurs",
+      "kind": "jour_du_village",
+      "day": 6,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": null,
+      "announce": "Demain, marché aux fleurs sur la place du Tilleul: du monde dès l'ouverture.",
+      "cast": [],
+      "scene": [
+        {
+          "who": "system",
+          "text": "Les étals de plants couvrent la place. Tout le catalogue des plantes est à -20 % jusqu'à vendredi."
+        }
+      ],
+      "goal": null,
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {},
+      "rewards": {},
+      "items": [],
+      "guestbook": null,
+      "effects": {
+        "profiles": {
+          "flaneurs": 1.2,
+          "promeneurs": 1.1
+        },
+        "catalogPlantDiscount": 0.2,
+        "discountUntilDay": 12
+      },
+      "staging": {}
+    },
+    {
+      "id": "les_godillots",
+      "name": "Les Godillots de l'Arvelle",
+      "kind": "commande_de_groupe",
+      "day": 7,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": 700,
+      "announce": "Bastien a prévenu: dimanche, son club de randonnée descend des crêtes vers midi. Ils seront neuf.",
+      "cast": [
+        {
+          "id": "bastien",
+          "name": "Bastien"
+        },
+        {
+          "id": "colette_godillots",
+          "name": "Colette, présidente des Godillots"
+        }
+      ],
+      "scene": [
+        {
+          "who": "colette_godillots",
+          "text": "Neuf Godillots assoiffés ! Je vous lis la liste: on a voté dans le car."
+        },
+        {
+          "who": "colette_godillots",
+          "text": "Et nos gourdes, vous pourriez les remplir ? On repart dans vingt minutes."
+        }
+      ],
+      "goal": "Servir les neuf randonneurs et remplir leurs neuf gourdes avant leur départ.",
+      "timeLimit": 240,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Colette siffle trois fois: le salut des Godillots.",
+        "reussi": "« On a pris du retard, mais quel déjeuner ! »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 20,
+          "points": 20,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 30,
+          "points": 30,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["fanion_godillots"],
+      "guestbook": "Neuf Godillots repus, neuf gourdes pleines. On repassera à l'automne. Le club.",
+      "effects": null,
+      "staging": {
+        "lines": {
+          "list": ["", "Colette te lit la liste: {list}. Dicte-la à l'autre !"]
+        },
+        "profile": "promeneurs",
+        "groups": [9],
+        "seat": "outside",
+        "helpAfter": 420,
+        "families": [
+          ["cold_drink", 4, "tea"],
+          ["milk_coffee", 3, "black_coffee"],
+          ["chocolate", 2, "tea"],
+          ["pastry_bread", 9, null]
+        ]
+      }
+    },
+    {
+      "id": "le_carnet_vert",
+      "name": "Le carnet vert",
+      "kind": "critique_deguisee",
+      "day": null,
+      "fromDay": 9,
+      "fallbackDay": 10,
+      "time": 630,
+      "announce": null,
+      "cast": [
+        {
+          "id": "plume_echo",
+          "name": "Une cliente au carnet vert"
+        }
+      ],
+      "scene": [
+        {
+          "who": "plume_echo",
+          "text": "Un cappuccino, s'il vous plaît. Et que me conseillez-vous avec ?"
+        },
+        {
+          "who": "system",
+          "text": "Elle ouvre un carnet vert et note quelque chose en regardant la machine."
+        }
+      ],
+      "goal": "Repérer la cliente au carnet et la soigner sans en faire trop.",
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [
+        "qualité du cappuccino « Bien » ou « Parfait »",
+        "dessin sur le lait",
+        "table propre au moment où elle s'assoit",
+        "deux mots échangés (parler à la table)",
+        "le conseil de la caisse"
+      ],
+      "outcomes": {
+        "formidable": "L'article titre: « À Ormeval, le café de la place a retrouvé son âme ».",
+        "reussi": "L'article titre: « Le café de la place rouvre, et c'est une bonne nouvelle »."
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 25,
+          "renown": 0,
+          "affluence": [1.08, 3]
+        },
+        "formidable": {
+          "euros": 0,
+          "points": 40,
+          "renown": 0,
+          "affluence": [1.15, 3]
+        }
+      },
+      "items": ["coupure_echo"],
+      "guestbook": null,
+      "effects": null,
+      "staging": {
+        "writeGameMinutes": 20,
+        "profile": "flaneurs",
+        "groups": [1],
+        "orders": [["cappuccino"]],
+        "fallbackOrders": [["creme"]],
+        "minCups": 2.0,
+        "formidableCriteria": 4,
+        "itemDelayDays": 1,
+        "advice": [
+          "Une part de tarte de l'ardoise",
+          "La tartine de la maison",
+          "Rien, le café se suffit"
+        ],
+        "clueCounter": "Elle demande: « Que me conseillez-vous avec ? »",
+        "clueBar": "Elle ouvre un carnet vert à élastique et note en regardant la machine."
+      }
+    },
+    {
+      "id": "jules_a_perdu_sa_mamie",
+      "name": "Jules a perdu sa mamie",
+      "kind": "enfant_perdu",
+      "day": 10,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": 910,
+      "announce": null,
+      "cast": [
+        {
+          "id": "jules",
+          "name": "Jules, cinq ans"
+        },
+        {
+          "id": "mamie_odile",
+          "name": "Mamie Odile"
+        }
+      ],
+      "scene": [
+        {
+          "who": "jules",
+          "text": "J'ai perdu ma mamie. Elle a un parapluie... je sais plus de quelle couleur."
+        },
+        {
+          "who": "jules",
+          "text": "Elle achète toujours du pain. Et elle dit « mon lapin »."
+        }
+      ],
+      "goal": "Rassurer Jules et retrouver sa mamie, à deux.",
+      "timeLimit": null,
+      "helpAfter": 150,
+      "help": "Après 2 minutes et demie réelles, Lucas le boulanger traverse la ruelle avec Mamie Odile: « Elle cherche un petit lapin en ciré jaune ! »",
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Mamie Odile: « Mon lapin ! » Jules rend sa petite voiture... puis la reprend.",
+        "reussi": "Mamie Odile: « Je ne l'ai quitté des yeux qu'une seconde, chez le boulanger. »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 15,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 0,
+          "points": 25,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["moulin_mamie_odile"],
+      "guestbook": "Merci d'avoir gardé mon lapin. Le chocolat était meilleur que le mien, il me l'a dit. Odile.",
+      "effects": null,
+      "staging": {
+        "lines": {
+          "help": ["Lucas", "Elle cherche un petit lapin en ciré jaune !"],
+          "wrong": ["Une dame", "Bonjour ! Non, je ne cherche personne, merci."],
+          "found": ["Mamie Odile", "Mon lapin !"],
+          "window": [
+            "",
+            "Trois dames passent sur la place: fais signe à la bonne depuis la vitrine."
+          ]
+        },
+        "profile": "familles",
+        "groups": [1],
+        "orders": [["chocolat"]],
+        "formidableWithin": 90,
+        "clues": [
+          "Le parapluie de Mamie est lilas, comme les fleurs de la maîtresse.",
+          "Elle a un cabas à carreaux pour le pain."
+        ],
+        "passersby": [
+          "Une dame au parapluie lilas",
+          "Une dame au parapluie vert et au cabas à carreaux",
+          "Une dame au parapluie lilas et au cabas à carreaux"
+        ],
+        "correct": 2,
+        "returnGroup": 2
+      }
+    },
+    {
+      "id": "l_inspection",
+      "name": "L'inspection",
+      "kind": "inspection",
+      "day": 11,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": null,
+      "announce": "Lettre de la préfecture: « Contrôle d'hygiène de votre établissement demain, dans la journée. »",
+      "cast": [
+        {
+          "id": "mme_ferrand",
+          "name": "Madame Ferrand, inspectrice"
+        }
+      ],
+      "scene": [
+        {
+          "who": "mme_ferrand",
+          "text": "Bonjour, contrôle sanitaire. Ne vous arrêtez pas pour moi, faites comme d'habitude."
+        },
+        {
+          "who": "mme_ferrand",
+          "text": "Je regarde, je note, je ne touche à rien."
+        }
+      ],
+      "goal": "Tenir le café propre pendant qu'elle observe (6 minutes réelles).",
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [
+        "aucune table sale depuis plus de 30 s",
+        "une pile de tasses propres jamais vide",
+        "la livraison du matin rangée (aucun carton à la porte de service)",
+        "le sol balayé dans la journée",
+        "le frigo du bar fermé (il se ferme seul après 5 s, sauf si on le laisse ouvert en le tenant)"
+      ],
+      "outcomes": {
+        "formidable": "« Très satisfaisant. C'est rare, un comptoir aussi bien tenu. »",
+        "reussi": "« Satisfaisant. Je vous laisse deux petits conseils. »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 10,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 0,
+          "points": 20,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["plaque_hygiene"],
+      "guestbook": null,
+      "effects": null,
+      "staging": {
+        "lines": {
+          "advice": ["Madame Ferrand", "Un conseil: {text}."]
+        },
+        "window": [540, 960],
+        "duration": 360,
+        "dirtyLimit": 30,
+        "profile": "voisins"
+      }
+    },
+    {
+      "id": "le_cafe_d_honneur",
+      "name": "Le café d'honneur",
+      "kind": "mariage",
+      "day": 12,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": 930,
+      "announce": "Nadia et Paul se marient demain à la mairie et vous demandent le café d'honneur pour quatorze personnes, à 15 h 30. Lucas livre la pièce montée. Pensez au lait.",
+      "cast": [
+        {
+          "id": "nadia",
+          "name": "Nadia"
+        },
+        {
+          "id": "paul",
+          "name": "Paul"
+        },
+        {
+          "id": "lucas",
+          "name": "Lucas, le boulanger"
+        }
+      ],
+      "scene": [
+        {
+          "who": "lucas",
+          "text": "La pièce montée ! Elle est lourde, on la porte à deux, doucement, et droit."
+        },
+        {
+          "who": "nadia",
+          "text": "Tout le village est là ! Et Paul veut un café. Paul veut toujours un café."
+        },
+        {
+          "who": "paul",
+          "text": "Un noisette. Et pour la table d'honneur, la surprise de la maison."
+        }
+      ],
+      "goal": "Porter la pièce montée à deux, servir quatorze invités sur la terrasse ou dans la salle, puis la « surprise de la maison ».",
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Les mariés lèvent leur tasse: « Au café de la place ! »",
+        "reussi": "« Le plus beau café d'honneur du canton. »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 160,
+          "points": 20,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 200,
+          "points": 30,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["photo_maries"],
+      "guestbook": "Merci d'avoir fait de notre café d'honneur un vrai moment. On reviendra pour notre premier anniversaire. Nadia et Paul",
+      "effects": null,
+      "staging": {
+        "lines": {
+          "surprise": ["Paul", "La surprise de la maison ! Merci, vous deux."],
+          "ask": ["", "Les mariés attendent la surprise de la maison: choisissez-la à deux."]
+        },
+        "profile": "familles",
+        "groups": [7, 7],
+        "seat": "outside",
+        "formidableWithin": 300
+      }
+    },
+    {
+      "id": "le_coeur_de_lait",
+      "name": "Le concours du cœur de lait",
+      "kind": "concours",
+      "day": 13,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": 600,
+      "announce": "Demain matin, Simone organise le premier concours du cœur de lait. Le jury: Noé, Lise et Simone.",
+      "cast": [
+        {
+          "id": "simone",
+          "name": "Simone"
+        },
+        {
+          "id": "lise",
+          "name": "Lise"
+        },
+        {
+          "id": "noe",
+          "name": "Noé"
+        }
+      ],
+      "scene": [
+        {
+          "who": "simone",
+          "text": "Entre 10 h et midi, chaque boisson au lait de la salle passe au jury. Cœur, feuille ou tulipe: c'est vous qui voyez."
+        },
+        {
+          "who": "noe",
+          "text": "Moi je veux un chat."
+        },
+        {
+          "who": "simone",
+          "text": "Un chat, ce sera pour le prochain concours, mon grand."
+        }
+      ],
+      "goal": "Réussir 10 dessins sur le lait à deux entre 10 h et midi (heure de jeu).",
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Lise: « Je mets la tulipe dans le bulletin du village. »",
+        "reussi": "Noé: « C'était pas un chat, mais c'était bien. »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 15,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 0,
+          "points": 25,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": ["pichet_argent"],
+      "guestbook": null,
+      "effects": null,
+      "staging": {
+        "lines": {
+          "perfect": ["Noé", "Oh, c'est trop beau !"],
+          "good": ["Noé", "C'est pas un chat, mais c'est joli."]
+        },
+        "from": 600,
+        "to": 720,
+        "goal": 20,
+        "milkFamilies": ["milk_coffee"]
+      }
+    },
+    {
+      "id": "l_averse_de_trois_heures",
+      "name": "L'averse de trois heures",
+      "kind": "meteo",
+      "day": null,
+      "fromDay": 9,
+      "fallbackDay": null,
+      "time": 900,
+      "announce": "La radio: « Couvert demain, avec une averse possible dans l'après-midi. »",
+      "cast": [],
+      "scene": [
+        {
+          "who": "system",
+          "text": "Les premières gouttes tombent sur le store. Les clients de la terrasse prennent leur tasse et cherchent une place dedans."
+        }
+      ],
+      "goal": "Rentrer la terrasse: accueillir dedans les clients du dehors (ils gardent leur commande) et rentrer les coussins.",
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {
+        "formidable": "« On est mieux dedans, finalement. »",
+        "reussi": "« Un peu mouillés, mais au chaud. »"
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 5,
+          "renown": 0,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 0,
+          "points": 10,
+          "renown": 0,
+          "affluence": null
+        }
+      },
+      "items": [],
+      "guestbook": null,
+      "effects": null,
+      "staging": {
+        "durationGameMinutes": 60,
+        "standLimit": 20,
+        "lastDay": 13
+      }
+    },
+    {
+      "id": "la_fete_du_tilleul",
+      "name": "La fête du Tilleul",
+      "kind": "defi_local",
+      "day": 14,
+      "fromDay": null,
+      "fallbackDay": null,
+      "time": null,
+      "announce": "Demain, c'est la fête du Tilleul. Tout le village sera sur la place, et René viendra de Mérelles.",
+      "cast": [
+        {
+          "id": "simone",
+          "name": "Simone"
+        },
+        {
+          "id": "rene",
+          "name": "René"
+        },
+        {
+          "id": "maire",
+          "name": "Madame la maire, Josette Arnoux"
+        }
+      ],
+      "scene": [
+        {
+          "who": "maire",
+          "text": "Comme chaque année, le café de la place régale la fête. Cette année, c'est vous !"
+        },
+        {
+          "who": "simone",
+          "text": "Trente ans que je la fais. Ce soir, c'est la vôtre."
+        }
+      ],
+      "goal": "Tenir le coup de feu de la fête: affluence x1,6 toute la journée.",
+      "timeLimit": null,
+      "helpAfter": null,
+      "help": null,
+      "criteria": [],
+      "outcomes": {
+        "formidable": "Toute la place applaudit quand le store s'allume.",
+        "reussi": "La place chante jusqu'à la nuit."
+      },
+      "rewards": {
+        "reussi": {
+          "euros": 0,
+          "points": 0,
+          "renown": 150,
+          "affluence": null
+        },
+        "formidable": {
+          "euros": 50,
+          "points": 0,
+          "renown": 150,
+          "affluence": null
+        }
+      },
+      "items": ["lanterne_tilleul"],
+      "guestbook": null,
+      "effects": null,
+      "staging": {}
+    }
+  ]
+}

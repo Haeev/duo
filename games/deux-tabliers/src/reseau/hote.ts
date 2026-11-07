@@ -23,6 +23,7 @@ import {
   type Moves,
 } from './schemas';
 import { createEventHub, type GameView, type Pose } from './vue';
+import { createClienteleHostNet } from '../clientele/reseau';
 
 /** Au-delà de ce retard (en pas), l'hôte joue deux entrées de l'invité par pas pour le rattraper. */
 const CATCH_UP_QUEUE = 4;
@@ -77,6 +78,8 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
     ),
   ];
   const hub = createEventHub();
+  // Canal 7: positions des clients debout (chantier clientèle).
+  const customers = createClienteleHostNet(net, world, content.settings.net.movesEvery);
 
   const pendingInputs: StepInput[] = [];
   const pendingIntents: QueuedIntent[] = [];
@@ -169,6 +172,7 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
         };
         moves.send(message);
       }
+      customers.afterStep();
       if (world.tick % content.settings.net.domainsEvery === 0)
         sendState(world.tick % RESEND_TICKS === 0);
       if (outbox.length > 0) {

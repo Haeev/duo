@@ -1,0 +1,1171 @@
+{
+  "startCash": 300,
+  "rentPerMonth": 520,
+  "rentDaysPerMonth": 28,
+  "chargesPerOpenDay": 8,
+  "reserveDaysOfCharges": 2,
+  "priceSteps": {
+    "min": -3,
+    "max": 5,
+    "step": 0.1
+  },
+  "bigPurchase": {
+    "minimum": 150,
+    "shareOfDailyRevenue": 1.0
+  },
+  "reputation": {
+    "startCups": 1.5,
+    "stepPoints": 150,
+    "pivot": 50,
+    "divisor": 10,
+    "catchUp": [12, 0.05, 2.0],
+    "maxCups": 5.0
+  },
+  "offer": {
+    "renown": 850,
+    "fallbackEvent": "la_fete_du_tilleul"
+  },
+  "challenge": {
+    "event": "la_fete_du_tilleul",
+    "day": 14,
+    "affluence": 1.6,
+    "renown": 150,
+    "groups": 45,
+    "cups": 3.0,
+    "trestleSeats": 4
+  },
+  "ambiance": {
+    "surfaces": {
+      "salle": 26.0,
+      "village_terrasse": 0.0,
+      "village_fond": 12.8
+    },
+    "decorMax": 40,
+    "charmPerM2ForMax": 1.2,
+    "coherenceMax": 20,
+    "comfortFactor": 30,
+    "comfortMax": 15,
+    "lightPerM2": 8,
+    "lightMax": 10,
+    "musicMatching": 5,
+    "musicOther": 2,
+    "radioStyle": "campagne",
+    "cleanliness": 8,
+    "wornCharmFactor": 0.5,
+    "max": 95,
+    "wheel": ["campagne", "jardin", "nordique", "retro", "bistrot", "atelier"],
+    "extensionDecor": {
+      "village_fond": [["cheminee", 4, "campagne", 1]],
+      "village_terrasse": [["store", 2, "neutre", 0]]
+    },
+    "coatMultiplier": {
+      "paint": 3,
+      "wallpaper": 3
+    }
+  },
+  "brocante": {
+    "pieces": 6,
+    "discount": 0.3,
+    "charmFactor": 1.5
+  },
+  "flowerMarket": {
+    "day": 6,
+    "discount": 0.2,
+    "untilDay": 12
+  },
+  "demoEndDay": 15,
+  "demoMaxDay": 28,
+  "tiers": [
+    {
+      "id": "t0",
+      "name": "À l'arrivée",
+      "cups": 1.5,
+      "orDay": 1
+    },
+    {
+      "id": "t1",
+      "name": "Deux tasses",
+      "cups": 2.0,
+      "orDay": 7
+    },
+    {
+      "id": "t2",
+      "name": "Deux tasses et demie",
+      "cups": 2.5,
+      "orDay": 9
+    },
+    {
+      "id": "t3",
+      "name": "Trois tasses",
+      "cups": 3.0,
+      "orDay": 12
+    }
+  ],
+  "stationsAtStart": {
+    "espresso": 1,
+    "vapeur": 1,
+    "bouilloire": 1,
+    "vitrine": 1,
+    "plan": 1,
+    "frigo": 1
+  },
+  "dishesAtStart": 36,
+  "purchases": [
+    {
+      "id": "gobelets",
+      "name": "Gobelets et couvercles (vente à emporter)",
+      "price": 40,
+      "tier": "t0",
+      "effects": ["equip:gobelets"]
+    },
+    {
+      "id": "fiche_cappuccino",
+      "name": "Fiche « cappuccino »",
+      "price": 30,
+      "tier": "t0",
+      "effects": ["recette:cappuccino"]
+    },
+    {
+      "id": "fiche_the_vert",
+      "name": "Fiche « thé vert »",
+      "price": 20,
+      "tier": "t0",
+      "effects": ["recette:the_vert"]
+    },
+    {
+      "id": "pichet_thermometre",
+      "name": "Pichet thermomètre",
+      "price": 60,
+      "tier": "t0",
+      "effects": ["poste:vapeur:2"]
+    },
+    {
+      "id": "tabourets_zinc",
+      "name": "Deux tabourets de comptoir",
+      "price": 120,
+      "tier": "t0",
+      "effects": ["equip:tabourets"]
+    },
+    {
+      "id": "service_vaisselle",
+      "name": "Service de vaisselle (+24 pièces)",
+      "price": 90,
+      "tier": "t0",
+      "effects": ["vaisselle:24"]
+    },
+    {
+      "id": "moulin_dose",
+      "name": "Moulin à dose",
+      "price": 380,
+      "tier": "t1",
+      "effects": ["poste:espresso:2"]
+    },
+    {
+      "id": "presse_levier",
+      "name": "Presse-agrumes à levier",
+      "price": 120,
+      "tier": "t1",
+      "effects": ["poste:agrumes:1"]
+    },
+    {
+      "id": "etagere_livres_equip",
+      "name": "Étagère à livres (avec les livres de Lise)",
+      "price": 150,
+      "tier": "t1",
+      "effects": ["equip:livres"]
+    },
+    {
+      "id": "creperie",
+      "name": "Crêpière",
+      "price": 180,
+      "tier": "t2",
+      "effects": ["poste:creperie:1"]
+    },
+    {
+      "id": "range_velos",
+      "name": "Range-vélos",
+      "price": 180,
+      "tier": "t2",
+      "effects": ["equip:range_velos"]
+    },
+    {
+      "id": "coin_enfants",
+      "name": "Chaise haute et coin des enfants",
+      "price": 260,
+      "tier": "t2",
+      "effects": ["equip:chaise_haute", "equip:coin_enfants"]
+    },
+    {
+      "id": "frigo_vitre",
+      "name": "Réfrigérateur vitré",
+      "price": 350,
+      "tier": "t2",
+      "effects": ["recette:limonade"]
+    },
+    {
+      "id": "bouilloire_temperature",
+      "name": "Bouilloire à température",
+      "price": 90,
+      "tier": "t3",
+      "effects": ["poste:bouilloire:2"]
+    },
+    {
+      "id": "renover_chaise_paillee",
+      "name": "Rénover: Chaise paillée (8)",
+      "price": 120,
+      "tier": "t0",
+      "effects": ["renovate:chaise_paillee"]
+    },
+    {
+      "id": "renover_gueridon_marbre",
+      "name": "Rénover: Guéridon au plateau de marbre (3)",
+      "price": 90,
+      "tier": "t0",
+      "effects": ["renovate:gueridon_marbre"]
+    },
+    {
+      "id": "renover_table_ferme",
+      "name": "Rénover: Table de ferme pour quatre (1)",
+      "price": 40,
+      "tier": "t0",
+      "effects": ["renovate:table_ferme"]
+    },
+    {
+      "id": "renover_applique_laiton",
+      "name": "Rénover: Applique de laiton (1)",
+      "price": 20,
+      "tier": "t0",
+      "effects": ["renovate:applique_laiton"]
+    }
+  ],
+  "extensions": [
+    {
+      "id": "village_terrasse",
+      "name": "La terrasse sous le store",
+      "price": 450,
+      "tier": "t1",
+      "nights": 1,
+      "seats": [0, 0, 0, 4],
+      "text": "Autorisation de la mairie, un store banne et deux guéridons sous le tilleul: 4 places dehors de plus."
+    },
+    {
+      "id": "village_fond",
+      "name": "La pièce du fond, au coin du feu",
+      "price": 600,
+      "tier": "t2",
+      "nights": 2,
+      "seats": [0, 2, 2, 0],
+      "text": "Une arche percée dans le refend, la cheminée rallumée, deux fauteuils et une table pour deux: 4 places."
+    }
+  ],
+  "catalogue": [
+    {
+      "id": "chaise_paillee",
+      "name": "Chaise paillée",
+      "category": "seat",
+      "style": "campagne",
+      "price": 45,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "chaise_cintree",
+      "name": "Chaise cintrée de bistrot",
+      "category": "seat",
+      "style": "bistrot",
+      "price": 60,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "chaise_fer_peint",
+      "name": "Chaise de jardin en fer peint",
+      "category": "seat",
+      "style": "jardin",
+      "price": 55,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "tabouret_bois",
+      "name": "Tabouret haut en chêne",
+      "category": "seat",
+      "style": "campagne",
+      "price": 50,
+      "charm": 1,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "banc_ferme",
+      "name": "Banc de ferme à coussins",
+      "category": "seat",
+      "style": "campagne",
+      "price": 220,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "banquette_moleskine",
+      "name": "Banquette de moleskine",
+      "category": "seat",
+      "style": "bistrot",
+      "price": 520,
+      "charm": 4,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "fauteuil_crapaud",
+      "name": "Fauteuil crapaud en velours",
+      "category": "seat",
+      "style": "campagne",
+      "price": 220,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": true
+    },
+    {
+      "id": "fauteuil_rotin",
+      "name": "Fauteuil de rotin",
+      "category": "seat",
+      "style": "jardin",
+      "price": 190,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": true
+    },
+    {
+      "id": "fauteuil_club",
+      "name": "Fauteuil club",
+      "category": "seat",
+      "style": "bistrot",
+      "price": 280,
+      "charm": 3,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": true
+    },
+    {
+      "id": "gueridon_marbre",
+      "name": "Guéridon au plateau de marbre",
+      "category": "table",
+      "style": "bistrot",
+      "price": 110,
+      "charm": 2,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "table_ferme",
+      "name": "Table de ferme pour quatre",
+      "category": "table",
+      "style": "campagne",
+      "price": 180,
+      "charm": 2,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "table_fer_mosaique",
+      "name": "Table de fer à mosaïque",
+      "category": "table",
+      "style": "jardin",
+      "price": 140,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "table_basse_malle",
+      "name": "Malle de voyage en table basse",
+      "category": "table",
+      "style": "campagne",
+      "price": 90,
+      "charm": 1,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "table_bistrot_quatre",
+      "name": "Table de bistrot pour quatre",
+      "category": "table",
+      "style": "bistrot",
+      "price": 190,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "suspension_osier",
+      "name": "Suspension d'osier",
+      "category": "light",
+      "style": "campagne",
+      "price": 70,
+      "charm": 2,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "globe_opalin",
+      "name": "Globe opalin",
+      "category": "light",
+      "style": "bistrot",
+      "price": 95,
+      "charm": 2,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "cloche_verre",
+      "name": "Suspension-cloche de verre",
+      "category": "light",
+      "style": "jardin",
+      "price": 85,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "applique_laiton",
+      "name": "Applique de laiton",
+      "category": "light",
+      "style": "bistrot",
+      "price": 60,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "lampe_lin",
+      "name": "Lampe à poser, abat-jour de lin",
+      "category": "light",
+      "style": "campagne",
+      "price": 80,
+      "charm": 1,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "guirlande_guinguette",
+      "name": "Guirlande de guinguette",
+      "category": "light",
+      "style": "jardin",
+      "price": 70,
+      "charm": 1,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "fougere_suspendue",
+      "name": "Fougère suspendue",
+      "category": "plant",
+      "style": "neutre",
+      "price": 25,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "pothos_etagere",
+      "name": "Pothos qui retombe",
+      "category": "plant",
+      "style": "neutre",
+      "price": 15,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "bouquet_champetre",
+      "name": "Bouquet des champs",
+      "category": "plant",
+      "style": "neutre",
+      "price": 12,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "geraniums_vitrine",
+      "name": "Jardinière de géraniums",
+      "category": "plant",
+      "style": "neutre",
+      "price": 40,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "citronnier_pot",
+      "name": "Citronnier en pot de terre cuite",
+      "category": "plant",
+      "style": "jardin",
+      "price": 160,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "olivier_pot",
+      "name": "Grand olivier en pot",
+      "category": "plant",
+      "style": "jardin",
+      "price": 340,
+      "charm": 6,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "affiche_tilleul_1962",
+      "name": "Affiche de la fête du Tilleul, 1962",
+      "category": "frame",
+      "style": "neutre",
+      "price": 35,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "assiettes_faience",
+      "name": "Assiettes de faïence au mur",
+      "category": "frame",
+      "style": "campagne",
+      "price": 55,
+      "charm": 2,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "herbier_encadre",
+      "name": "Herbier encadré",
+      "category": "frame",
+      "style": "jardin",
+      "price": 45,
+      "charm": 1,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "miroir_peint",
+      "name": "Miroir de bistrot à lettres peintes",
+      "category": "frame",
+      "style": "bistrot",
+      "price": 240,
+      "charm": 3,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "horloge_ecole",
+      "name": "Horloge d'école",
+      "category": "frame",
+      "style": "neutre",
+      "price": 50,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "tapis_lirette",
+      "name": "Tapis de lirette",
+      "category": "rug",
+      "style": "campagne",
+      "price": 60,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "tapis_jonc",
+      "name": "Tapis de jonc",
+      "category": "rug",
+      "style": "jardin",
+      "price": 70,
+      "charm": 1,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "etagere_pots",
+      "name": "Étagère de planches et de pots",
+      "category": "shelf",
+      "style": "campagne",
+      "price": 90,
+      "charm": 2,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "vaisselier_sauge",
+      "name": "Vaisselier peint en sauge",
+      "category": "shelf",
+      "style": "campagne",
+      "price": 650,
+      "charm": 6,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "desserte_zinc",
+      "name": "Desserte de zinc",
+      "category": "shelf",
+      "style": "bistrot",
+      "price": 210,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "peinture_lin",
+      "name": "Peinture lin écru (un mur)",
+      "category": "paint",
+      "style": "campagne",
+      "price": 40,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "peinture_vert_eau",
+      "name": "Peinture vert d'eau (un mur)",
+      "category": "paint",
+      "style": "jardin",
+      "price": 40,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "peinture_lie_de_vin",
+      "name": "Peinture lie-de-vin (un mur)",
+      "category": "paint",
+      "style": "bistrot",
+      "price": 40,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "peinture_chaux",
+      "name": "Badigeon de chaux blanche (un mur)",
+      "category": "paint",
+      "style": "neutre",
+      "price": 30,
+      "charm": 0,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "papier_fleurs_champs",
+      "name": "Papier peint fleurs des champs (un mur)",
+      "category": "wallpaper",
+      "style": "campagne",
+      "price": 90,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "papier_feuillage",
+      "name": "Papier peint feuillage (un mur)",
+      "category": "wallpaper",
+      "style": "jardin",
+      "price": 90,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "papier_rayures_creme",
+      "name": "Papier peint rayures crème (un mur)",
+      "category": "wallpaper",
+      "style": "bistrot",
+      "price": 90,
+      "charm": 3,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "sol_tomettes",
+      "name": "Tomettes (le m²)",
+      "category": "floor",
+      "style": "campagne",
+      "price": 25,
+      "charm": 0.2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "sol_carreaux_ciment",
+      "name": "Carreaux de ciment (le m²)",
+      "category": "floor",
+      "style": "jardin",
+      "price": 25,
+      "charm": 0.2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "sol_damier",
+      "name": "Carrelage en damier (le m²)",
+      "category": "floor",
+      "style": "bistrot",
+      "price": 25,
+      "charm": 0.2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "cloche_gateaux",
+      "name": "Cloche à gâteaux",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 45,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "caisse_ancienne",
+      "name": "Caisse enregistreuse ancienne",
+      "category": "counter_object",
+      "style": "bistrot",
+      "price": 140,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "bocal_biscuits",
+      "name": "Bocal à biscuits de verre",
+      "category": "counter_object",
+      "style": "neutre",
+      "price": 20,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "pot_pourboires_gres",
+      "name": "Pot à pourboires en grès",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 25,
+      "charm": 1,
+      "tier": "t0",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "enseigne_bois_peint",
+      "name": "Enseigne de bois peint, au nom de la maison",
+      "category": "sign",
+      "style": "campagne",
+      "price": 180,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "enseigne_fer_forge",
+      "name": "Enseigne potence de fer forgé, au nom de la maison",
+      "category": "sign",
+      "style": "jardin",
+      "price": 220,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "enseigne_lettres_dorees",
+      "name": "Lettres dorées sur la vitrine, au nom de la maison",
+      "category": "sign",
+      "style": "bistrot",
+      "price": 200,
+      "charm": 2,
+      "tier": "t1",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "jardinieres_terrasse",
+      "name": "Jardinières de terrasse",
+      "category": "terrace",
+      "style": "neutre",
+      "price": 60,
+      "charm": 1,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "parasol_toile",
+      "name": "Parasol de toile écrue",
+      "category": "terrace",
+      "style": "jardin",
+      "price": 120,
+      "charm": 1,
+      "tier": "t2",
+      "source": null,
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "brocante_lampe_champignon",
+      "name": "Lampe champignon orange",
+      "category": "light",
+      "style": "retro",
+      "price": 49,
+      "charm": 3,
+      "tier": null,
+      "source": "brocante",
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "brocante_chaises_coques",
+      "name": "Deux chaises coques",
+      "category": "seat",
+      "style": "retro",
+      "price": 84,
+      "charm": 3,
+      "tier": null,
+      "source": "brocante",
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "brocante_banc_nordique",
+      "name": "Banc de frêne à coussins",
+      "category": "seat",
+      "style": "nordique",
+      "price": 133,
+      "charm": 4,
+      "tier": null,
+      "source": "brocante",
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "brocante_horloge_comtoise",
+      "name": "Horloge comtoise",
+      "category": "frame",
+      "style": "campagne",
+      "price": 245,
+      "charm": 9,
+      "tier": null,
+      "source": "brocante",
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "brocante_moulin_cafe",
+      "name": "Moulin à café de cuivre",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 35,
+      "charm": 3,
+      "tier": null,
+      "source": "brocante",
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "brocante_plaque_emaillee",
+      "name": "Plaque émaillée « Chocolat chaud »",
+      "category": "frame",
+      "style": "bistrot",
+      "price": 56,
+      "charm": 4,
+      "tier": null,
+      "source": "brocante",
+      "ref": null,
+      "comfort": false
+    },
+    {
+      "id": "aquarelle_simone",
+      "name": "L'aquarelle de Simone: la place du Tilleul",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 5,
+      "tier": null,
+      "source": "regular",
+      "ref": "simone:2",
+      "comfort": false
+    },
+    {
+      "id": "dessins_noe",
+      "name": "Les dessins de Noé, encadrés",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 4,
+      "tier": null,
+      "source": "regular",
+      "ref": "farida_noe:2",
+      "comfort": false
+    },
+    {
+      "id": "ecuelle_gribouille",
+      "name": "L'écuelle de Gribouille",
+      "category": "terrace",
+      "style": "neutre",
+      "price": 0,
+      "charm": 1,
+      "tier": null,
+      "source": "regular",
+      "ref": "bastien:1",
+      "comfort": false
+    },
+    {
+      "id": "carte_postale_brissac",
+      "name": "La carte postale d'Octave Brissac",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 2,
+      "tier": null,
+      "source": "event",
+      "ref": "le_car_de_8h12",
+      "comfort": false
+    },
+    {
+      "id": "joint_encadre",
+      "name": "Le vieux joint de la machine, encadré",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 2,
+      "tier": null,
+      "source": "event",
+      "ref": "la_vieille_dame_tousse",
+      "comfort": false
+    },
+    {
+      "id": "fanion_godillots",
+      "name": "Le fanion des Godillots de l'Arvelle",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 2,
+      "tier": null,
+      "source": "event",
+      "ref": "les_godillots",
+      "comfort": false
+    },
+    {
+      "id": "coupure_echo",
+      "name": "L'article de « L'Écho de l'Arvelle »",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 3,
+      "tier": null,
+      "source": "event",
+      "ref": "le_carnet_vert",
+      "comfort": false
+    },
+    {
+      "id": "moulin_mamie_odile",
+      "name": "Le moulin à poivre de Mamie Odile",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 0,
+      "charm": 3,
+      "tier": null,
+      "source": "event",
+      "ref": "jules_a_perdu_sa_mamie",
+      "comfort": false
+    },
+    {
+      "id": "plaque_hygiene",
+      "name": "La plaque « Hygiène: très satisfaisant »",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 1,
+      "tier": null,
+      "source": "event",
+      "ref": "l_inspection",
+      "comfort": false
+    },
+    {
+      "id": "photo_maries",
+      "name": "La photo des mariés sous le tilleul",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 3,
+      "tier": null,
+      "source": "event",
+      "ref": "le_cafe_d_honneur",
+      "comfort": false
+    },
+    {
+      "id": "pichet_argent",
+      "name": "Le pichet d'argent du concours",
+      "category": "counter_object",
+      "style": "neutre",
+      "price": 0,
+      "charm": 3,
+      "tier": null,
+      "source": "event",
+      "ref": "le_coeur_de_lait",
+      "comfort": false
+    },
+    {
+      "id": "lanterne_tilleul",
+      "name": "La lanterne de la fête du Tilleul",
+      "category": "light",
+      "style": "jardin",
+      "price": 0,
+      "charm": 4,
+      "tier": null,
+      "source": "event",
+      "ref": "la_fete_du_tilleul",
+      "comfort": false
+    }
+  ],
+  "startDecor": [
+    {
+      "id": "chaise_paillee",
+      "count": 8,
+      "worn": true
+    },
+    {
+      "id": "gueridon_marbre",
+      "count": 3,
+      "worn": true
+    },
+    {
+      "id": "table_ferme",
+      "count": 1,
+      "worn": true
+    },
+    {
+      "id": "applique_laiton",
+      "count": 1,
+      "worn": true
+    },
+    {
+      "id": "horloge_ecole",
+      "count": 1,
+      "worn": false
+    },
+    {
+      "id": "bocal_biscuits",
+      "count": 1,
+      "worn": false
+    }
+  ]
+}

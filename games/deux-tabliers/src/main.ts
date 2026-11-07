@@ -7,6 +7,7 @@ import { connect } from '@duo/sdk';
 import manifest from '../duo-game.json';
 import type { GameAction } from './actions';
 import { createSounds } from './audio/sons';
+import { createCustomerNodes } from './clientele/rendu3d';
 import { ContentError, loadContent } from './donnees/charger';
 import { DATA_FILES } from './donnees/fichiers';
 import { createLookControl } from './entrees/regard';
@@ -49,6 +50,7 @@ const models = createModelLibrary((message, data) => {
   duo.log.warn(message, data);
 });
 const nodes = createWorldNodes(stage.scene, models, [duo.host.colorHex, duo.guest.colorHex]);
+const customers = createCustomerNodes(stage.scene);
 const sounds = createSounds(duo.audio, duo.log, DATA_FILES);
 const startPose = view.world().players[view.local];
 const look = createLookControl(canvas, duo.input, {
@@ -147,6 +149,7 @@ duo.loop.start({
       0,
     );
     nodes.update(view, look.look);
+    customers.update(view, now(), dt);
     currentAim = session.ready() ? localAim() : null;
     const use = view.world().players[view.local].use;
     const station =
@@ -179,6 +182,7 @@ duo.on('stop', () => {
   look.dispose();
   panels.dispose();
   nodes.dispose();
+  customers.dispose();
   models.dispose();
   shell.dispose();
   stage.dispose();
