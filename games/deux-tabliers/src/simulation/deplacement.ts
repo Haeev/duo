@@ -8,6 +8,7 @@ import type { PlayerState, World } from '../etat/monde';
 import type { StepInput } from './entrees';
 import { furnitureObstacles, shellObstacles } from './collisions';
 import { pushOut, type Vec2 } from './geometrie';
+import { isCarrying } from '../amenagement/port';
 
 const scratch: Vec2 = { x: 0, z: 0 };
 
@@ -25,6 +26,8 @@ export function walk(
   dt: number,
 ): void {
   applyLook(player, input, content);
+  // Port à deux: la charge mène les deux porteurs (chez l'hôte), rien à prédire (technique 5.7).
+  if (isCarrying(world, player)) return;
   const len = Math.hypot(input.moveX, input.moveZ);
   if (len === 0) return;
   const speed = input.fast ? content.settings.player.fastSpeed : content.settings.player.walkSpeed;
@@ -42,7 +45,7 @@ export function walk(
 /** Repousse un point hors des obstacles (trois passes suffisent aux coins de la coque). */
 export function resolve(content: Content, world: World, p: Vec2): void {
   const r = content.settings.player.radius;
-  const shell = shellObstacles(content);
+  const shell = shellObstacles(content, world);
   const furniture = furnitureObstacles(content, world);
   for (let pass = 0; pass < 3; pass++) {
     let touched = false;

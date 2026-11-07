@@ -103,6 +103,49 @@ Copie telle quelle d'un plan de `docs/jeux/cosy-cafe/plans/plans.json` (format `
 
 Chaque chantier ajoute ses fichiers ici (`recettes.json`, `profils.json`, `catalogue.json`...), les lit dans `src/<chantier>/donnees.ts` avec `readFile` et les décrit dans une section de ce document. Un fichier `service.json`, `clientele.json` ou `amenagement.json` déposé avant son lecteur est signalé au chargement.
 
+## Aménagement (chantier c): `catalogue.json` et `amenagement.json`
+
+Lus par `src/amenagement/donnees.ts`. Chaque objet posable du catalogue devient aussi un type de meuble (même identifiant), ajouté au catalogue des meubles au chargement: le cœur le dessine et en tient compte aux collisions. Deux types de plus: `carton` et `carton-lourd`.
+
+### `catalogue.json` (généré)
+
+Converti de `docs/jeux/cosy-cafe/demo/donnees/` par `python3 games/deux-tabliers/outils/convertir-catalogue.py`, puis prettier. Ne pas retoucher à la main: changer la démo ou le script.
+
+| Clé | Sens |
+|---|---|
+| `styles` | la roue des styles dans l'ordre du cahier (AM-02): campagne, jardin, nordique, rétro, bistrot, atelier. Voisins à 1 cran (comptent à moitié), opposé à 3 crans (moitié en moins), les autres se côtoient (ne comptent pas) |
+| `tiers` | paliers `t0` à `t3`: `cups` (réputation) ou `orDay` (jour), le premier des deux. Le pont de l'économie (clientèle) décide; sans lui, le jour seul |
+| `brocante` | `piecesPerMonday`, `discount` (-30 %), `charmFactor` (x1,5) |
+| `ambiance` | barème de la démo 6.3 (décor, cohérence, confort, lumière, musique, propreté) et `words` (« Un peu vide » à « Exceptionnelle », AM-03) |
+| `extensions` | `village-terrasse` (450 €, `t1`, une nuit) et `village-fond` (600 €, `t2`, deux nuits), surface ouverte au public |
+| `items[]` | `id` (traits d'union), `label`, `model` (identifiant d'origine, nom du GLB de l'artiste), `category`, `style` (ou `neutre`), `price`, `charm`, `size` `[largeur, profondeur, hauteur]` (m; `null` pour un revêtement), `placement`, `rotationStep` (90, 15, ou 0 pour un objet mural), `heavy` (se porte à deux), `unlock` (`tier`, `brocante`, `regular` ou `event` avec `ref`), `text`, `color` (substitut, teinte des revêtements), `seats` (`type`: `table`, `comfort`, `counter`; `count`), `renovationPrice`, `priceUnit` (`wall`: prix par mur de la pièce; `m2`), `charmPerM2`, `unique` |
+
+`placement`: `floor` (sol de la salle et des pièces ouvertes), `floor_terrace` (aussi la terrasse), `floor_wall` (sol, dos au mur), `floor_under` (tapis, sous les meubles), `terrace` (terrasse seulement), `wall` (pan de mur libre), `ceiling`, `surface` (dessus d'un meuble), `counter` et `counter_tip` (comptoir côté clients), `window_sill` (appui de la vitrine), `vitrine` (sur la vitre), `facade` (au-dessus de la vitrine), `terrace_store` (sous le store), `wall_cover` et `floor_cover` (revêtements, appliqués directement). `street` n'est pas encore posable.
+
+### `amenagement.json` (à la main)
+
+| Clé | Sens |
+|---|---|
+| `rules.grid` | m, grille de pose et de passage (0,25) |
+| `rules.clearanceToSeat`, `rules.mainAisle`, `rules.minPassage`, `rules.seatReach` | m: passage jusqu'à chaque place (0,9), allée de la porte au comptoir (1,2), étroiture des derniers pas (0,6), longueur de ces derniers pas (0,7), C13 |
+| `rules.outletReach`, `rules.waterReach` | m: distance à une prise, à un point d'eau (DE-04) |
+| `rules.objectLimit` | meubles et objets posés au plus (60 au village, C6; revêtements, postes fixes et cartons ne comptent pas) |
+| `rules.bigPurchase` | € : seuil d'un achat proposé à l'autre (DE-10), si la clientèle ne fixe pas le sien |
+| `rules.wallSnap` | m: un bord à moins de cette distance d'un mur s'y colle |
+| `rules.reach` | m: portée du mode aménagement (visée et pose) |
+| `rules.ceiling`, `rules.storeHeight`, `rules.facadeY`, `rules.vitrineY`, `rules.wallItemMinY`, `rules.wallItemMaxY` | m: hauteurs de pose (plafond, store, enseigne, lettres sur la vitre, cadres) |
+| `carry` | port à deux: `maxSpeed` (1,2 m/s au plus, C14), `turnDegPerSecond`, `handleGap` (poignée à cette distance du bord), `grabReach` |
+| `cartons` | `small` et `heavy`: libellé, taille, couleur |
+| `delivery.areas` | rectangles `[x, z, largeur, profondeur]` de la cour où le livreur dépose les cartons, et `why` |
+| `rooms[]` | pièces: `space` (rectangle), `free` (où poser au sol), `outdoor`, `walls` (murs à peindre), `surfaceM2`, `extension` (qui l'ouvre, `null` pour la salle), `why` |
+| `keepClear[]` | zone du plan à laisser libre (`zone`) et la phrase du refus |
+| `entrance`, `aisleTargets` | point d'entrée des clients, points à rejoindre par l'allée (passe, caisse) |
+| `outlets`, `waterPoints`, `needs` | prises, points d'eau, et articles qui en ont besoin (`power` ou `water`) |
+| `surfaces` | par type de meuble: dessus où poser la décoration (`x`, `z`, `y`, `w`, `d` dans le repère du meuble; `placement`: `surface` ou `counter`) |
+| `simone` | mobilier de départ (types de `meubles.json`) relié au catalogue: `item` (style, charme, modèle), sinon `style` et `charm`; `worn` (charme à moitié jusqu'à la rénovation), `renovationPrice` |
+| `startPieces` | objets posés à l'arrivée (horloge, applique, bocal), avec leur raison (`why`) |
+| `extensionWorks` | par extension: éléments du plan retirés, ajoutés ou restylés (arche, store), meubles de Simone retirés, meubles posés à l'ouverture, raison |
+
 ## Régénérer le départ
 
 Régénérer après un changement du plan: `python3 games/deux-tabliers/outils/importer-plan.py`, puis `npx prettier --write games/deux-tabliers/donnees`. Le départ est régénéré en entier: une retouche à la main de `departs/` se perd, la faire dans le script.

@@ -2,6 +2,7 @@
 import type { Content } from '../donnees/charger';
 import type { PlanElement } from '../donnees/schemas';
 import type { World } from '../etat/monde';
+import { currentPlan } from '../amenagement/extensions';
 import { box, type Obstacle } from './geometrie';
 
 /** Éléments du plan qui arrêtent un joueur (les meubles du plan viennent de `departs/`). */
@@ -22,12 +23,14 @@ function elementObstacle(el: PlanElement): Obstacle {
   return { kind: 'disc', x, z, r };
 }
 
-const shellCache = new WeakMap<Content, readonly Obstacle[]>();
+const shellCache = new WeakMap<Content['plan'], readonly Obstacle[]>();
 
-export function shellObstacles(content: Content): readonly Obstacle[] {
-  const cached = shellCache.get(content);
+/** Coque du plan en vigueur: les extensions finies (aménagement) ouvrent l'arche, la terrasse. */
+export function shellObstacles(content: Content, world?: World): readonly Obstacle[] {
+  const plan = world === undefined ? content.plan : currentPlan(content, world);
+  const cached = shellCache.get(plan);
   if (cached !== undefined) return cached;
-  const level = content.plan.levels[0];
+  const level = plan.levels[0];
   const list = (level?.elements ?? []).filter(isShellObstacle).map(elementObstacle);
   // Cadre du plan: on ne sort pas de la carte.
   if (level !== undefined) {
@@ -39,7 +42,7 @@ export function shellObstacles(content: Content): readonly Obstacle[] {
     );
     list.push(box(fx - t / 2, fz + fd / 2, t, fd, 0), box(fx + fw + t / 2, fz + fd / 2, t, fd, 0));
   }
-  shellCache.set(content, list);
+  shellCache.set(plan, list);
   return list;
 }
 

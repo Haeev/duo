@@ -7,6 +7,7 @@
 import type { Net, NetChannel } from '@duo/sdk';
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex, World } from '../etat/monde';
+import { isCarrying } from '../amenagement/port';
 import { walk } from '../simulation/deplacement';
 import type { Intent, StepInput } from '../simulation/entrees';
 import {
@@ -139,13 +140,14 @@ export function createGuest(net: Net, content: Content, world: World, now: () =>
       }
     },
     beforeFrame(nowMs, frameDt) {
-      // Correction résorbée à 30 % de la vitesse de marche au plus.
+      // Correction résorbée à 30 % de la vitesse de marche au plus. En portant à deux, la position
+      // vient de la charge (non prédite, technique 5.7): on la rejoint au double de son allure.
       const len = Math.hypot(offset.x, offset.z);
       if (len > 0) {
-        const step = Math.min(
-          len,
-          content.settings.player.walkSpeed * CORRECTION_WALK_SHARE * frameDt,
-        );
+        const speed = isCarrying(world, world.players[me])
+          ? content.arrangement.carry.maxSpeed * 2
+          : content.settings.player.walkSpeed * CORRECTION_WALK_SHARE;
+        const step = Math.min(len, speed * frameDt);
         offset.x -= (offset.x / len) * step;
         offset.z -= (offset.z / len) * step;
       }

@@ -1,0 +1,1546 @@
+{
+  "source": "docs/jeux/cosy-cafe/demo/donnees (demo-0.1), converti par outils/convertir-catalogue.py",
+  "styles": ["campagne", "jardin", "nordique", "retro", "bistrot", "atelier"],
+  "tiers": [
+    {
+      "id": "t0",
+      "label": "À l'arrivée",
+      "cups": 1.5,
+      "orDay": 1
+    },
+    {
+      "id": "t1",
+      "label": "Deux tasses",
+      "cups": 2.0,
+      "orDay": 7
+    },
+    {
+      "id": "t2",
+      "label": "Deux tasses et demie",
+      "cups": 2.5,
+      "orDay": 9
+    },
+    {
+      "id": "t3",
+      "label": "Trois tasses",
+      "cups": 3.0,
+      "orDay": 12
+    }
+  ],
+  "brocante": {
+    "piecesPerMonday": 6,
+    "discount": 0.3,
+    "charmFactor": 1.5
+  },
+  "ambiance": {
+    "decorMax": 40,
+    "charmPerM2ForMax": 1.2,
+    "coherenceMax": 20,
+    "comfortFactor": 30,
+    "comfortMax": 15,
+    "lightPerM2": 8,
+    "lightMax": 10,
+    "musicMatching": 5,
+    "musicOther": 2,
+    "cleanlinessMax": 10,
+    "wornCharmFactor": 0.5,
+    "words": [
+      {
+        "from": 0,
+        "label": "Un peu vide"
+      },
+      {
+        "from": 30,
+        "label": "Sympathique"
+      },
+      {
+        "from": 50,
+        "label": "Chaleureuse"
+      },
+      {
+        "from": 70,
+        "label": "Charmante"
+      },
+      {
+        "from": 85,
+        "label": "Exceptionnelle"
+      }
+    ]
+  },
+  "extensions": [
+    {
+      "id": "village-terrasse",
+      "label": "La terrasse sous le store",
+      "price": 450,
+      "tier": "t1",
+      "nights": 1,
+      "publicSurfaceM2": 0.0,
+      "text": "Autorisation de la mairie, un store banne et deux guéridons sous le tilleul: 4 places dehors de plus."
+    },
+    {
+      "id": "village-fond",
+      "label": "La pièce du fond, au coin du feu",
+      "price": 600,
+      "tier": "t2",
+      "nights": 2,
+      "publicSurfaceM2": 12.8,
+      "text": "Une arche percée dans le refend, la cheminée rallumée, deux fauteuils et une table pour deux: 4 places."
+    }
+  ],
+  "items": [
+    {
+      "id": "chaise-paillee",
+      "label": "Chaise paillée",
+      "model": "chaise_paillee",
+      "category": "seat",
+      "style": "campagne",
+      "price": 45,
+      "charm": 1,
+      "size": [0.45, 0.45, 0.9],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Le paillage fait main d'un artisan de la vallée.",
+      "color": "#b08458",
+      "seats": {
+        "type": "table",
+        "count": 1
+      },
+      "renovationPrice": 15
+    },
+    {
+      "id": "chaise-cintree",
+      "label": "Chaise cintrée de bistrot",
+      "model": "chaise_cintree",
+      "category": "seat",
+      "style": "bistrot",
+      "price": 60,
+      "charm": 1,
+      "size": [0.45, 0.48, 0.88],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Bois courbé à la vapeur, dossier en boucle.",
+      "color": "#6b3a2e",
+      "seats": {
+        "type": "table",
+        "count": 1
+      }
+    },
+    {
+      "id": "chaise-fer-peint",
+      "label": "Chaise de jardin en fer peint",
+      "model": "chaise_fer_peint",
+      "category": "seat",
+      "style": "jardin",
+      "price": 55,
+      "charm": 1,
+      "size": [0.45, 0.48, 0.85],
+      "placement": "floor_terrace",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Vert d'eau, ajourée: dedans comme dehors.",
+      "color": "#7f9f6a",
+      "seats": {
+        "type": "table",
+        "count": 1
+      }
+    },
+    {
+      "id": "tabouret-bois",
+      "label": "Tabouret haut en chêne",
+      "model": "tabouret_bois",
+      "category": "seat",
+      "style": "campagne",
+      "price": 50,
+      "charm": 1,
+      "size": [0.4, 0.4, 0.75],
+      "placement": "floor",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Pour s'accouder au zinc à hauteur de conversation.",
+      "color": "#b08458",
+      "seats": {
+        "type": "counter",
+        "count": 1
+      }
+    },
+    {
+      "id": "banc-ferme",
+      "label": "Banc de ferme à coussins",
+      "model": "banc_ferme",
+      "category": "seat",
+      "style": "campagne",
+      "price": 220,
+      "charm": 3,
+      "size": [1.4, 0.45, 0.45],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Deux places, des coussins de lin: lourd, il se porte à deux.",
+      "color": "#b08458",
+      "seats": {
+        "type": "table",
+        "count": 2
+      }
+    },
+    {
+      "id": "banquette-moleskine",
+      "label": "Banquette de moleskine",
+      "model": "banquette_moleskine",
+      "category": "seat",
+      "style": "bistrot",
+      "price": 520,
+      "charm": 4,
+      "size": [1.8, 0.55, 0.9],
+      "placement": "floor_wall",
+      "rotationStep": 90,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Contre un mur, trois places capitonnées couleur lie-de-vin.",
+      "color": "#6b3a2e",
+      "seats": {
+        "type": "table",
+        "count": 3
+      }
+    },
+    {
+      "id": "fauteuil-crapaud",
+      "label": "Fauteuil crapaud en velours",
+      "model": "fauteuil_crapaud",
+      "category": "seat",
+      "style": "campagne",
+      "price": 220,
+      "charm": 3,
+      "size": [0.75, 0.75, 0.8],
+      "placement": "floor",
+      "rotationStep": 15,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Bas et profond: on y oublie l'heure.",
+      "color": "#b08458",
+      "seats": {
+        "type": "comfort",
+        "count": 1
+      }
+    },
+    {
+      "id": "fauteuil-rotin",
+      "label": "Fauteuil de rotin",
+      "model": "fauteuil_rotin",
+      "category": "seat",
+      "style": "jardin",
+      "price": 190,
+      "charm": 3,
+      "size": [0.75, 0.75, 0.85],
+      "placement": "floor_terrace",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Léger, il passe de la salle à la terrasse.",
+      "color": "#7f9f6a",
+      "seats": {
+        "type": "comfort",
+        "count": 1
+      }
+    },
+    {
+      "id": "fauteuil-club",
+      "label": "Fauteuil club",
+      "model": "fauteuil_club",
+      "category": "seat",
+      "style": "bistrot",
+      "price": 280,
+      "charm": 3,
+      "size": [0.8, 0.8, 0.8],
+      "placement": "floor",
+      "rotationStep": 15,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Cuir patiné, accoudoirs ronds: lourd, il se porte à deux.",
+      "color": "#6b3a2e",
+      "seats": {
+        "type": "comfort",
+        "count": 1
+      }
+    },
+    {
+      "id": "gueridon-marbre",
+      "label": "Guéridon au plateau de marbre",
+      "model": "gueridon_marbre",
+      "category": "table",
+      "style": "bistrot",
+      "price": 110,
+      "charm": 2,
+      "size": [0.6, 0.6, 0.75],
+      "placement": "floor_terrace",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Le marbre vert-gris d'un café de quartier.",
+      "color": "#6b3a2e",
+      "renovationPrice": 30
+    },
+    {
+      "id": "table-ferme",
+      "label": "Table de ferme pour quatre",
+      "model": "table_ferme",
+      "category": "table",
+      "style": "campagne",
+      "price": 180,
+      "charm": 2,
+      "size": [1.2, 0.7, 0.75],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Chêne miel, tiroir à couverts: elle se porte à deux.",
+      "color": "#b08458",
+      "renovationPrice": 40
+    },
+    {
+      "id": "table-fer-mosaique",
+      "label": "Table de fer à mosaïque",
+      "model": "table_fer_mosaique",
+      "category": "table",
+      "style": "jardin",
+      "price": 140,
+      "charm": 2,
+      "size": [0.6, 0.6, 0.75],
+      "placement": "floor_terrace",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Un plateau de carreaux de ciment, un pied de fer peint.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "table-basse-malle",
+      "label": "Malle de voyage en table basse",
+      "model": "table_basse_malle",
+      "category": "table",
+      "style": "campagne",
+      "price": 90,
+      "charm": 1,
+      "size": [0.8, 0.45, 0.45],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Devant les fauteuils: on y pose sa tasse et son livre.",
+      "color": "#b08458"
+    },
+    {
+      "id": "table-bistrot-quatre",
+      "label": "Table de bistrot pour quatre",
+      "model": "table_bistrot_quatre",
+      "category": "table",
+      "style": "bistrot",
+      "price": 190,
+      "charm": 2,
+      "size": [0.8, 0.8, 0.75],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Pied de fonte, plateau de bois sombre.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "suspension-osier",
+      "label": "Suspension d'osier",
+      "model": "suspension_osier",
+      "category": "light",
+      "style": "campagne",
+      "price": 70,
+      "charm": 2,
+      "size": [0.45, 0.45, 0.35],
+      "placement": "ceiling",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Elle dessine des losanges de lumière sur les tables.",
+      "color": "#b08458"
+    },
+    {
+      "id": "globe-opalin",
+      "label": "Globe opalin",
+      "model": "globe_opalin",
+      "category": "light",
+      "style": "bistrot",
+      "price": 95,
+      "charm": 2,
+      "size": [0.3, 0.3, 0.45],
+      "placement": "ceiling",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "La lumière laiteuse des cafés d'autrefois.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "cloche-verre",
+      "label": "Suspension-cloche de verre",
+      "model": "cloche_verre",
+      "category": "light",
+      "style": "jardin",
+      "price": 85,
+      "charm": 2,
+      "size": [0.35, 0.35, 0.4],
+      "placement": "ceiling",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Verre soufflé légèrement vert, comme une serre.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "applique-laiton",
+      "label": "Applique de laiton",
+      "model": "applique_laiton",
+      "category": "light",
+      "style": "bistrot",
+      "price": 60,
+      "charm": 1,
+      "size": [0.2, 0.25, 0.35],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Un bras de laiton et un abat-jour plissé.",
+      "color": "#6b3a2e",
+      "renovationPrice": 20
+    },
+    {
+      "id": "lampe-lin",
+      "label": "Lampe à poser, abat-jour de lin",
+      "model": "lampe_lin",
+      "category": "light",
+      "style": "campagne",
+      "price": 80,
+      "charm": 1,
+      "size": [0.3, 0.3, 0.55],
+      "placement": "surface",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Posée sur une étagère ou au bout du comptoir.",
+      "color": "#b08458"
+    },
+    {
+      "id": "guirlande-guinguette",
+      "label": "Guirlande de guinguette",
+      "model": "guirlande_guinguette",
+      "category": "light",
+      "style": "jardin",
+      "price": 70,
+      "charm": 1,
+      "size": [6.0, 0.1, 0.1],
+      "placement": "terrace_store",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Sous le store, quand le soir tombe sur la place.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "fougere-suspendue",
+      "label": "Fougère suspendue",
+      "model": "fougere_suspendue",
+      "category": "plant",
+      "style": "neutre",
+      "price": 25,
+      "charm": 1,
+      "size": [0.4, 0.4, 0.6],
+      "placement": "ceiling",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Elle aime la lumière de la vitrine.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "pothos-etagere",
+      "label": "Pothos qui retombe",
+      "model": "pothos_etagere",
+      "category": "plant",
+      "style": "neutre",
+      "price": 15,
+      "charm": 1,
+      "size": [0.25, 0.25, 0.3],
+      "placement": "surface",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "À poser en hauteur: il descend en cascade.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "bouquet-champetre",
+      "label": "Bouquet des champs",
+      "model": "bouquet_champetre",
+      "category": "plant",
+      "style": "neutre",
+      "price": 12,
+      "charm": 1,
+      "size": [0.2, 0.2, 0.35],
+      "placement": "surface",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Coquelicots et marguerites dans un pot à lait.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "geraniums-vitrine",
+      "label": "Jardinière de géraniums",
+      "model": "geraniums_vitrine",
+      "category": "plant",
+      "style": "neutre",
+      "price": 40,
+      "charm": 1,
+      "size": [0.8, 0.2, 0.25],
+      "placement": "window_sill",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Sur l'appui de la vitrine, côté place.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "citronnier-pot",
+      "label": "Citronnier en pot de terre cuite",
+      "model": "citronnier_pot",
+      "category": "plant",
+      "style": "jardin",
+      "price": 160,
+      "charm": 3,
+      "size": [0.6, 0.6, 1.4],
+      "placement": "floor_terrace",
+      "rotationStep": 15,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Il fleurit au printemps: la salle sent bon.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "olivier-pot",
+      "label": "Grand olivier en pot",
+      "model": "olivier_pot",
+      "category": "plant",
+      "style": "jardin",
+      "price": 340,
+      "charm": 6,
+      "size": [0.9, 0.9, 2.0],
+      "placement": "floor_terrace",
+      "rotationStep": 15,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Pièce maîtresse du jardin: lourd, il se porte à deux.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "affiche-tilleul-1962",
+      "label": "Affiche de la fête du Tilleul, 1962",
+      "model": "affiche_tilleul_1962",
+      "category": "frame",
+      "style": "neutre",
+      "price": 35,
+      "charm": 1,
+      "size": [0.5, 0.03, 0.7],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Trouvée au grenier de la mairie.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "assiettes-faience",
+      "label": "Assiettes de faïence au mur",
+      "model": "assiettes_faience",
+      "category": "frame",
+      "style": "campagne",
+      "price": 55,
+      "charm": 2,
+      "size": [0.9, 0.04, 0.6],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Bleu faïence et fleurs naïves, cinq assiettes.",
+      "color": "#b08458"
+    },
+    {
+      "id": "herbier-encadre",
+      "label": "Herbier encadré",
+      "model": "herbier_encadre",
+      "category": "frame",
+      "style": "jardin",
+      "price": 45,
+      "charm": 1,
+      "size": [0.4, 0.03, 0.55],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Les plantes de la vallée, nommées à la plume.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "miroir-peint",
+      "label": "Miroir de bistrot à lettres peintes",
+      "model": "miroir_peint",
+      "category": "frame",
+      "style": "bistrot",
+      "price": 240,
+      "charm": 3,
+      "size": [1.2, 0.05, 0.9],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "« Café, thé, chocolat » en lettres d'or sur le tain.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "horloge-ecole",
+      "label": "Horloge d'école",
+      "model": "horloge_ecole",
+      "category": "frame",
+      "style": "neutre",
+      "price": 50,
+      "charm": 1,
+      "size": [0.35, 0.06, 0.35],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Visible du comptoir: on sait quand passe le car.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "tapis-lirette",
+      "label": "Tapis de lirette",
+      "model": "tapis_lirette",
+      "category": "rug",
+      "style": "campagne",
+      "price": 60,
+      "charm": 1,
+      "size": [1.2, 1.8, 0.01],
+      "placement": "floor_under",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Tissé de vieux draps colorés.",
+      "color": "#b08458"
+    },
+    {
+      "id": "tapis-jonc",
+      "label": "Tapis de jonc",
+      "model": "tapis_jonc",
+      "category": "rug",
+      "style": "jardin",
+      "price": 70,
+      "charm": 1,
+      "size": [1.4, 2.0, 0.01],
+      "placement": "floor_under",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Il sent l'été, même en avril.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "etagere-pots",
+      "label": "Étagère de planches et de pots",
+      "model": "etagere_pots",
+      "category": "shelf",
+      "style": "campagne",
+      "price": 90,
+      "charm": 2,
+      "size": [1.0, 0.25, 0.9],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Pots de confiture, bocaux, une louche de cuivre.",
+      "color": "#b08458"
+    },
+    {
+      "id": "vaisselier-sauge",
+      "label": "Vaisselier peint en sauge",
+      "model": "vaisselier_sauge",
+      "category": "shelf",
+      "style": "campagne",
+      "price": 650,
+      "charm": 6,
+      "size": [1.4, 0.5, 2.0],
+      "placement": "floor_wall",
+      "rotationStep": 90,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Pièce maîtresse de la campagne: il se porte à deux.",
+      "color": "#b08458"
+    },
+    {
+      "id": "desserte-zinc",
+      "label": "Desserte de zinc",
+      "model": "desserte_zinc",
+      "category": "shelf",
+      "style": "bistrot",
+      "price": 210,
+      "charm": 3,
+      "size": [1.0, 0.45, 0.95],
+      "placement": "floor_wall",
+      "rotationStep": 90,
+      "heavy": true,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Un plateau de zinc, des bouteilles de sirop alignées.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "peinture-lin",
+      "label": "Peinture lin écru (un mur)",
+      "model": "peinture_lin",
+      "category": "paint",
+      "style": "campagne",
+      "price": 40,
+      "charm": 1,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Doux et clair: la salle paraît plus grande.",
+      "color": "#e6d9bf",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "peinture-vert-eau",
+      "label": "Peinture vert d'eau (un mur)",
+      "model": "peinture_vert_eau",
+      "category": "paint",
+      "style": "jardin",
+      "price": 40,
+      "charm": 1,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "La couleur des volets du village.",
+      "color": "#b7d1c2",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "peinture-lie-de-vin",
+      "label": "Peinture lie-de-vin (un mur)",
+      "model": "peinture_lie_de_vin",
+      "category": "paint",
+      "style": "bistrot",
+      "price": 40,
+      "charm": 1,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Sombre et chaude, sous les appliques.",
+      "color": "#7a3b45",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "peinture-chaux",
+      "label": "Badigeon de chaux blanche (un mur)",
+      "model": "peinture_chaux",
+      "category": "paint",
+      "style": "neutre",
+      "price": 30,
+      "charm": 0,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Il rafraîchit la pierre sans rien dire.",
+      "color": "#f1eee6",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "papier-fleurs-champs",
+      "label": "Papier peint fleurs des champs (un mur)",
+      "model": "papier_fleurs_champs",
+      "category": "wallpaper",
+      "style": "campagne",
+      "price": 90,
+      "charm": 3,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Petites fleurs sur fond lin.",
+      "color": "#eadfc4",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "papier-feuillage",
+      "label": "Papier peint feuillage (un mur)",
+      "model": "papier_feuillage",
+      "category": "wallpaper",
+      "style": "jardin",
+      "price": 90,
+      "charm": 3,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "De grandes feuilles vert profond.",
+      "color": "#a2b99c",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "papier-rayures-creme",
+      "label": "Papier peint rayures crème (un mur)",
+      "model": "papier_rayures_creme",
+      "category": "wallpaper",
+      "style": "bistrot",
+      "price": 90,
+      "charm": 3,
+      "size": null,
+      "placement": "wall_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Rayures crème et caramel, sous une cimaise.",
+      "color": "#efe2c4",
+      "priceUnit": "wall"
+    },
+    {
+      "id": "sol-tomettes",
+      "label": "Tomettes (le m²)",
+      "model": "sol_tomettes",
+      "category": "floor",
+      "style": "campagne",
+      "price": 25,
+      "charm": 0.2,
+      "size": null,
+      "placement": "floor_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Terre cuite hexagonale, patinée.",
+      "color": "#b4613d",
+      "priceUnit": "m2",
+      "charmPerM2": true
+    },
+    {
+      "id": "sol-carreaux-ciment",
+      "label": "Carreaux de ciment (le m²)",
+      "model": "sol_carreaux_ciment",
+      "category": "floor",
+      "style": "jardin",
+      "price": 25,
+      "charm": 0.2,
+      "size": null,
+      "placement": "floor_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Motifs de rosaces vert et crème.",
+      "color": "#c8c2b2",
+      "priceUnit": "m2",
+      "charmPerM2": true
+    },
+    {
+      "id": "sol-damier",
+      "label": "Carrelage en damier (le m²)",
+      "model": "sol_damier",
+      "category": "floor",
+      "style": "bistrot",
+      "price": 25,
+      "charm": 0.2,
+      "size": null,
+      "placement": "floor_cover",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Noir et crème, comme au zinc d'autrefois.",
+      "color": "#d9d5cd",
+      "priceUnit": "m2",
+      "charmPerM2": true
+    },
+    {
+      "id": "cloche-gateaux",
+      "label": "Cloche à gâteaux",
+      "model": "cloche_gateaux",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 45,
+      "charm": 1,
+      "size": [0.3, 0.3, 0.35],
+      "placement": "counter",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "La tarte du jour se voit dès la porte.",
+      "color": "#b08458"
+    },
+    {
+      "id": "caisse-ancienne",
+      "label": "Caisse enregistreuse ancienne",
+      "model": "caisse_ancienne",
+      "category": "counter_object",
+      "style": "bistrot",
+      "price": 140,
+      "charm": 2,
+      "size": [0.4, 0.4, 0.35],
+      "placement": "counter",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Elle ne sert plus, mais quel tintement.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "bocal-biscuits",
+      "label": "Bocal à biscuits de verre",
+      "model": "bocal_biscuits",
+      "category": "counter_object",
+      "style": "neutre",
+      "price": 20,
+      "charm": 1,
+      "size": [0.2, 0.2, 0.3],
+      "placement": "counter",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Les sablés de Lucas, à la pièce.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "pot-pourboires-gres",
+      "label": "Pot à pourboires en grès",
+      "model": "pot_pourboires_gres",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 25,
+      "charm": 1,
+      "size": [0.15, 0.15, 0.18],
+      "placement": "counter_tip",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t0"
+      },
+      "text": "Le tintement des pièces s'entend des deux côtés du comptoir.",
+      "color": "#b08458"
+    },
+    {
+      "id": "enseigne-bois-peint",
+      "label": "Enseigne de bois peint, au nom de la maison",
+      "model": "enseigne_bois_peint",
+      "category": "sign",
+      "style": "campagne",
+      "price": 180,
+      "charm": 2,
+      "size": [1.8, 0.05, 0.5],
+      "placement": "facade",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Le nom choisi à deux, peint à la main.",
+      "color": "#b08458"
+    },
+    {
+      "id": "enseigne-fer-forge",
+      "label": "Enseigne potence de fer forgé, au nom de la maison",
+      "model": "enseigne_fer_forge",
+      "category": "sign",
+      "style": "jardin",
+      "price": 220,
+      "charm": 2,
+      "size": [0.7, 0.7, 0.08],
+      "placement": "facade",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Une tasse découpée dans le fer, qui se balance au vent.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "enseigne-lettres-dorees",
+      "label": "Lettres dorées sur la vitrine, au nom de la maison",
+      "model": "enseigne_lettres_dorees",
+      "category": "sign",
+      "style": "bistrot",
+      "price": 200,
+      "charm": 2,
+      "size": [2.0, 0.01, 0.4],
+      "placement": "vitrine",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t1"
+      },
+      "text": "Dorure à la feuille, comme les cafés de la ville.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "jardinieres-terrasse",
+      "label": "Jardinières de terrasse",
+      "model": "jardinieres_terrasse",
+      "category": "terrace",
+      "style": "neutre",
+      "price": 60,
+      "charm": 1,
+      "size": [0.8, 0.3, 0.4],
+      "placement": "terrace",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Elles bordent la terrasse côté fontaine.",
+      "color": "#c9b99a"
+    },
+    {
+      "id": "parasol-toile",
+      "label": "Parasol de toile écrue",
+      "model": "parasol_toile",
+      "category": "terrace",
+      "style": "jardin",
+      "price": 120,
+      "charm": 1,
+      "size": [2.0, 2.0, 2.3],
+      "placement": "terrace",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "tier",
+        "tier": "t2"
+      },
+      "text": "Pour la table qui dépasse du store.",
+      "color": "#7f9f6a"
+    },
+    {
+      "id": "brocante-lampe-champignon",
+      "label": "Lampe champignon orange",
+      "model": "brocante_lampe_champignon",
+      "category": "light",
+      "style": "retro",
+      "price": 49,
+      "charm": 3,
+      "size": [0.3, 0.3, 0.4],
+      "placement": "surface",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "brocante"
+      },
+      "text": "Années soixante-dix pur jus: elle jure avec la campagne.",
+      "color": "#d08a3c"
+    },
+    {
+      "id": "brocante-chaises-coques",
+      "label": "Deux chaises coques",
+      "model": "brocante_chaises_coques",
+      "category": "seat",
+      "style": "retro",
+      "price": 84,
+      "charm": 3,
+      "size": [0.5, 0.5, 0.8],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": false,
+      "unlock": {
+        "kind": "brocante"
+      },
+      "text": "Moutarde et pied de teck.",
+      "color": "#d08a3c",
+      "seats": {
+        "type": "table",
+        "count": 2
+      }
+    },
+    {
+      "id": "brocante-banc-nordique",
+      "label": "Banc de frêne à coussins",
+      "model": "brocante_banc_nordique",
+      "category": "seat",
+      "style": "nordique",
+      "price": 133,
+      "charm": 4,
+      "size": [1.2, 0.4, 0.45],
+      "placement": "floor",
+      "rotationStep": 90,
+      "heavy": true,
+      "unlock": {
+        "kind": "brocante"
+      },
+      "text": "Frêne miel et laine grise.",
+      "color": "#d8cfc0",
+      "seats": {
+        "type": "table",
+        "count": 2
+      }
+    },
+    {
+      "id": "brocante-horloge-comtoise",
+      "label": "Horloge comtoise",
+      "model": "brocante_horloge_comtoise",
+      "category": "frame",
+      "style": "campagne",
+      "price": 245,
+      "charm": 9,
+      "size": [0.5, 0.3, 2.2],
+      "placement": "floor_wall",
+      "rotationStep": 0,
+      "heavy": true,
+      "unlock": {
+        "kind": "brocante"
+      },
+      "text": "Elle sonne les heures, un peu en retard.",
+      "color": "#b08458"
+    },
+    {
+      "id": "brocante-moulin-cafe",
+      "label": "Moulin à café de cuivre",
+      "model": "brocante_moulin_cafe",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 35,
+      "charm": 3,
+      "size": [0.2, 0.2, 0.35],
+      "placement": "counter",
+      "rotationStep": 15,
+      "heavy": false,
+      "unlock": {
+        "kind": "brocante"
+      },
+      "text": "Il ne moud plus, il fait rêver.",
+      "color": "#b08458"
+    },
+    {
+      "id": "brocante-plaque-emaillee",
+      "label": "Plaque émaillée « Chocolat chaud »",
+      "model": "brocante_plaque_emaillee",
+      "category": "frame",
+      "style": "bistrot",
+      "price": 56,
+      "charm": 4,
+      "size": [0.6, 0.02, 0.4],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "brocante"
+      },
+      "text": "Un peu écaillée, d'autant plus belle.",
+      "color": "#6b3a2e"
+    },
+    {
+      "id": "aquarelle-simone",
+      "label": "L'aquarelle de Simone: la place du Tilleul",
+      "model": "aquarelle_simone",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 5,
+      "size": [0.5, 0.03, 0.4],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "regular",
+        "ref": "simone-2"
+      },
+      "text": "Simone la peint depuis son banc, au printemps.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "dessins-noe",
+      "label": "Les dessins de Noé, encadrés",
+      "model": "dessins_noe",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 4,
+      "size": [0.7, 0.03, 0.5],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "regular",
+        "ref": "farida-noe-2"
+      },
+      "text": "Le café vu par Noé: le chien de Bastien est plus grand que la maison.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "ecuelle-gribouille",
+      "label": "L'écuelle de Gribouille",
+      "model": "ecuelle_gribouille",
+      "category": "terrace",
+      "style": "neutre",
+      "price": 0,
+      "charm": 1,
+      "size": [0.25, 0.25, 0.08],
+      "placement": "terrace",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "regular",
+        "ref": "bastien-1"
+      },
+      "text": "Une écuelle d'eau sous la terrasse: les chiens des randonneurs la trouvent seuls.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "carte-postale-brissac",
+      "label": "La carte postale d'Octave Brissac",
+      "model": "carte_postale_brissac",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 2,
+      "size": [0.15, 0.01, 0.1],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "le-car-de-8h12"
+      },
+      "text": "« Arrivé à l'heure. Merci, le café de la place. »",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "joint-encadre",
+      "label": "Le vieux joint de la machine, encadré",
+      "model": "joint_encadre",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 2,
+      "size": [0.25, 0.03, 0.25],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "la-vieille-dame-tousse"
+      },
+      "text": "Simone a insisté pour qu'on le garde.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "fanion-godillots",
+      "label": "Le fanion des Godillots de l'Arvelle",
+      "model": "fanion_godillots",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 2,
+      "size": [0.4, 0.02, 0.3],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "les-godillots"
+      },
+      "text": "Brodé main, offert par le club.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "coupure-echo",
+      "label": "L'article de « L'Écho de l'Arvelle »",
+      "model": "coupure_echo",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 3,
+      "size": [0.3, 0.02, 0.4],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "le-carnet-vert"
+      },
+      "text": "Encadré par Lise, bien sûr.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "moulin-mamie-odile",
+      "label": "Le moulin à poivre de Mamie Odile",
+      "model": "moulin_mamie_odile",
+      "category": "counter_object",
+      "style": "campagne",
+      "price": 0,
+      "charm": 3,
+      "size": [0.08, 0.08, 0.25],
+      "placement": "counter",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "jules-a-perdu-sa-mamie"
+      },
+      "text": "« Pour vous remercier, et ne riez pas, il a cent ans. »",
+      "color": "#b08458",
+      "unique": true
+    },
+    {
+      "id": "plaque-hygiene",
+      "label": "La plaque « Hygiène: très satisfaisant »",
+      "model": "plaque_hygiene",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 1,
+      "size": [0.2, 0.01, 0.15],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "l-inspection"
+      },
+      "text": "Officielle, et un peu fière.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "photo-maries",
+      "label": "La photo des mariés sous le tilleul",
+      "model": "photo_maries",
+      "category": "frame",
+      "style": "neutre",
+      "price": 0,
+      "charm": 3,
+      "size": [0.3, 0.02, 0.4],
+      "placement": "wall",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "le-cafe-d-honneur"
+      },
+      "text": "Nadia et Paul, et tout le village derrière.",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "pichet-argent",
+      "label": "Le pichet d'argent du concours",
+      "model": "pichet_argent",
+      "category": "counter_object",
+      "style": "neutre",
+      "price": 0,
+      "charm": 3,
+      "size": [0.12, 0.12, 0.18],
+      "placement": "counter",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "le-coeur-de-lait"
+      },
+      "text": "Gravé « Ormeval, premier concours du cœur de lait ».",
+      "color": "#c9b99a",
+      "unique": true
+    },
+    {
+      "id": "lanterne-tilleul",
+      "label": "La lanterne de la fête du Tilleul",
+      "model": "lanterne_tilleul",
+      "category": "light",
+      "style": "jardin",
+      "price": 0,
+      "charm": 4,
+      "size": [0.3, 0.3, 0.5],
+      "placement": "terrace_store",
+      "rotationStep": 0,
+      "heavy": false,
+      "unlock": {
+        "kind": "event",
+        "ref": "la-fete-du-tilleul"
+      },
+      "text": "Celle qui pendait au-dessus de l'orchestre.",
+      "color": "#7f9f6a",
+      "unique": true
+    }
+  ]
+}

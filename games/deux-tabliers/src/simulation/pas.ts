@@ -49,23 +49,21 @@ function inReach(sim: SimContext, player: PlayerIndex, target: Target): boolean 
 }
 
 function applyIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
-  switch (intent.type) {
-    case 'act':
-    case 'drop': {
-      if (!inReach(sim, player, intent.target)) {
-        sim.emit({ type: 'refused', player, reason: 'Trop loin' });
-        return;
-      }
-      const plan =
-        intent.type === 'act'
-          ? planAct(sim.content, sim.world, player, intent.target)
-          : planDrop(sim.world, player, intent.target);
-      execute(sim, player, plan);
+  // Des `if` plutôt qu'un `switch`: les intentions des chantiers s'ajoutent sans toucher ici
+  // (la règle d'exhaustivité du lint demanderait chaque cas).
+  if (intent.type === 'act' || intent.type === 'drop') {
+    if (!inReach(sim, player, intent.target)) {
+      sim.emit({ type: 'refused', player, reason: 'Trop loin' });
       return;
     }
-    default:
-      for (const c of CHANTIERS) c.system.intent?.(sim, player, intent);
+    const plan =
+      intent.type === 'act'
+        ? planAct(sim.content, sim.world, player, intent.target)
+        : planDrop(sim.world, player, intent.target);
+    execute(sim, player, plan);
+    return;
   }
+  for (const c of CHANTIERS) c.system.intent?.(sim, player, intent);
 }
 
 function execute(sim: SimContext, player: PlayerIndex, plan: ActPlan): void {

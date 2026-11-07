@@ -1,0 +1,250 @@
+{
+  "rules": {
+    "grid": 0.25,
+    "clearanceToSeat": 0.9,
+    "mainAisle": 1.2,
+    "minPassage": 0.6,
+    "seatReach": 0.7,
+    "outletReach": 1.5,
+    "waterReach": 2.0,
+    "objectLimit": 60,
+    "bigPurchase": 150,
+    "wallSnap": 0.3,
+    "reach": 3.5,
+    "ceiling": 2.7,
+    "wallItemMinY": 0.9,
+    "wallItemMaxY": 2.5,
+    "storeHeight": 2.35,
+    "facadeY": 2.2,
+    "vitrineY": 1.55
+  },
+  "carry": {
+    "maxSpeed": 1.2,
+    "turnDegPerSecond": 60,
+    "handleGap": 0.35,
+    "grabReach": 1.6
+  },
+  "cartons": {
+    "small": { "label": "Carton", "size": [0.5, 0.4, 0.4], "color": "#b98b57" },
+    "heavy": { "label": "Gros carton", "size": [1.0, 0.6, 0.6], "color": "#a8784a" }
+  },
+  "delivery": {
+    "areas": [
+      [8.3, 0.3, 3.0, 0.9],
+      [8.3, 1.9, 1.0, 1.0]
+    ],
+    "why": "Le livreur dépose les cartons derrière le portail de la cour, le long de la clôture, sans barrer le chemin du portail à la porte de la réserve (adresses.md, circulation)."
+  },
+  "rooms": [
+    {
+      "id": "salle",
+      "label": "la salle",
+      "space": [4.0, 7.1, 7.0, 5.4],
+      "free": [[4.0, 9.2, 7.0, 3.3]],
+      "why": "Toute la largeur de la salle au sud du comptoir et des toilettes: la porte, la file et la passe sont gardées par leurs zones à laisser libres, ce qui permet de dire pourquoi une pose est refusée.",
+      "outdoor": false,
+      "walls": 3,
+      "surfaceM2": 26,
+      "extension": null
+    },
+    {
+      "id": "fond",
+      "label": "la pièce du fond",
+      "space": [4.0, 3.5, 4.0, 3.2],
+      "free": [[4.0, 4.05, 4.0, 2.65]],
+      "outdoor": false,
+      "walls": 3,
+      "surfaceM2": 12.8,
+      "extension": "village-fond"
+    },
+    {
+      "id": "terrasse",
+      "label": "la terrasse",
+      "space": [4.0, 13.0, 4.8, 2.5],
+      "free": [[4.0, 13.0, 4.8, 2.5]],
+      "outdoor": true,
+      "walls": 0,
+      "surfaceM2": 12,
+      "extension": "village-terrasse"
+    }
+  ],
+  "keepClear": [
+    {
+      "zone": "zone-keep_clear-1",
+      "reason": "Ça ne passe pas : le passage vers les toilettes doit rester libre."
+    },
+    { "zone": "zone-keep_clear-2", "reason": "Ça ne passe pas : la passe doit rester libre." },
+    { "zone": "zone-keep_clear-3", "reason": "Ça ne passe pas : ça bloque la file des clients." },
+    { "zone": "zone-keep_clear-4", "reason": "Ça ne passe pas : la porte doit rester libre." },
+    { "zone": "zone-keep_clear-5", "reason": "Ça ne passe pas : la porte doit rester libre." }
+  ],
+  "entrance": [9.4, 13.4],
+  "aisleTargets": [
+    [8.35, 9.95],
+    [10.5, 10.2]
+  ],
+  "outlets": [[9.15, 8.65]],
+  "needs": {},
+  "waterPoints": [[7.4, 6.95]],
+  "surfaces": {
+    "comptoir": [{ "x": 0, "z": 0.2, "y": 1.1, "w": 3.0, "d": 0.3, "placement": "counter" }],
+    "arriere-comptoir": [{ "x": 0, "z": 0, "y": 0.9, "w": 2.8, "d": 0.6, "placement": "surface" }],
+    "gueridon": [{ "x": 0, "z": 0, "y": 0.75, "w": 0.5, "d": 0.5, "placement": "surface" }],
+    "table-carree": [{ "x": 0, "z": 0, "y": 0.75, "w": 0.6, "d": 0.6, "placement": "surface" }],
+    "etagere": [
+      { "x": 0, "z": 0, "y": 0.9, "w": 0.8, "d": 0.4, "placement": "surface" },
+      { "x": 0, "z": 0, "y": 1.4, "w": 0.8, "d": 0.4, "placement": "surface" }
+    ],
+    "etagere-longue": [
+      { "x": 0, "z": 0, "y": 0.9, "w": 1.15, "d": 0.4, "placement": "surface" },
+      { "x": 0, "z": 0, "y": 1.4, "w": 1.15, "d": 0.4, "placement": "surface" }
+    ],
+    "gueridon-marbre": [{ "x": 0, "z": 0, "y": 0.75, "w": 0.5, "d": 0.5, "placement": "surface" }],
+    "table-ferme": [{ "x": 0, "z": 0, "y": 0.75, "w": 1.1, "d": 0.6, "placement": "surface" }],
+    "table-fer-mosaique": [
+      { "x": 0, "z": 0, "y": 0.75, "w": 0.5, "d": 0.5, "placement": "surface" }
+    ],
+    "table-basse-malle": [
+      { "x": 0, "z": 0, "y": 0.45, "w": 0.7, "d": 0.4, "placement": "surface" }
+    ],
+    "table-bistrot-quatre": [
+      { "x": 0, "z": 0, "y": 0.75, "w": 0.7, "d": 0.7, "placement": "surface" }
+    ],
+    "etagere-pots": [{ "x": 0, "z": 0, "y": 0.9, "w": 0.95, "d": 0.22, "placement": "surface" }],
+    "vaisselier-sauge": [{ "x": 0, "z": 0, "y": 0.9, "w": 1.3, "d": 0.45, "placement": "surface" }],
+    "desserte-zinc": [{ "x": 0, "z": 0, "y": 0.95, "w": 0.95, "d": 0.4, "placement": "surface" }]
+  },
+  "simone": {
+    "chaise": { "item": "chaise-paillee", "worn": true },
+    "gueridon": { "item": "gueridon-marbre", "worn": true },
+    "table-carree": {
+      "item": null,
+      "style": "campagne",
+      "charm": 2,
+      "worn": true,
+      "renovationPrice": 40,
+      "why": "La table carrée du coin des toilettes est la table de ferme de Simone en petit: même bois, même usure (catalogue de la démo, table_ferme)."
+    },
+    "banc": { "item": null, "style": "campagne", "charm": 1, "worn": false, "renovationPrice": 0 }
+  },
+  "startPieces": [
+    {
+      "item": "horloge-ecole",
+      "at": { "kind": "wall", "x": 4.0, "z": 11.0, "y": 1.85, "rotDeg": 90 },
+      "why": "Sur le mur ouest, en face du comptoir: on lit l'heure du car en servant."
+    },
+    {
+      "item": "applique-laiton",
+      "at": { "kind": "wall", "x": 4.0, "z": 12.05, "y": 1.7, "rotDeg": 90 },
+      "worn": true,
+      "why": "Au-dessus de la table de la vitrine ouest, qui manque de lumière le soir."
+    },
+    {
+      "item": "bocal-biscuits",
+      "at": {
+        "kind": "surface",
+        "x": 10.05,
+        "z": 9.4,
+        "y": 1.1,
+        "rotDeg": 0,
+        "support": "counter-1"
+      },
+      "why": "Sur le comptoir côté clients, entre le moulin et la caisse: on le voit en payant."
+    }
+  ],
+  "extensionWorks": {
+    "village-terrasse": {
+      "planRemove": [],
+      "planAdd": [
+        {
+          "id": "hood-1",
+          "kind": "hood",
+          "shape": { "rect": [4.0, 13.0, 4.8, 2.5] },
+          "label": "store banne",
+          "blocks": false
+        }
+      ],
+      "removeFurniture": [],
+      "furniture": [
+        { "id": "terrasse-table-1", "type": "gueridon-marbre", "x": 5.5, "z": 14.75, "rotDeg": 0 },
+        {
+          "id": "terrasse-chaise-1",
+          "type": "chaise-fer-peint",
+          "x": 4.925,
+          "z": 14.75,
+          "rotDeg": 90
+        },
+        {
+          "id": "terrasse-chaise-2",
+          "type": "chaise-fer-peint",
+          "x": 6.075,
+          "z": 14.75,
+          "rotDeg": 270
+        },
+        { "id": "terrasse-table-2", "type": "gueridon-marbre", "x": 7.4, "z": 14.75, "rotDeg": 0 },
+        {
+          "id": "terrasse-chaise-3",
+          "type": "chaise-fer-peint",
+          "x": 6.825,
+          "z": 14.75,
+          "rotDeg": 90
+        },
+        {
+          "id": "terrasse-chaise-4",
+          "type": "chaise-fer-peint",
+          "x": 7.975,
+          "z": 14.75,
+          "rotDeg": 270
+        }
+      ],
+      "why": "Plan village-maximum: deux guéridons sous le store, chaises face à face, l'allée de la porte (zone porte) laissée libre."
+    },
+    "village-fond": {
+      "planRemove": ["door-4", "wall-13", "wall-14"],
+      "planAdd": [
+        {
+          "id": "wall-13",
+          "kind": "wall",
+          "shape": { "rect": [4.0, 6.7, 1.8, 0.4] },
+          "blocks": true
+        },
+        {
+          "id": "opening-1",
+          "kind": "opening",
+          "shape": { "rect": [5.8, 6.7, 1.2, 0.4] },
+          "label": "arche",
+          "blocks": false
+        },
+        {
+          "id": "wall-14",
+          "kind": "wall",
+          "shape": { "rect": [7.0, 6.7, 3.0, 0.4] },
+          "blocks": true
+        }
+      ],
+      "planRestyle": { "floor-3": "wood" },
+      "removeFurniture": ["furniture-3"],
+      "furniture": [
+        {
+          "id": "fond-fauteuil-1",
+          "type": "fauteuil-crapaud",
+          "x": 4.475,
+          "z": 4.675,
+          "rotDeg": 90
+        },
+        { "id": "fond-table-basse", "type": "table-basse-malle", "x": 5.25, "z": 4.7, "rotDeg": 0 },
+        {
+          "id": "fond-fauteuil-2",
+          "type": "fauteuil-crapaud",
+          "x": 6.025,
+          "z": 4.675,
+          "rotDeg": 270
+        },
+        { "id": "fond-table", "type": "table-carree", "x": 7.65, "z": 4.95, "rotDeg": 0 },
+        { "id": "fond-chaise-1", "type": "chaise", "x": 7.65, "z": 4.325, "rotDeg": 0 },
+        { "id": "fond-chaise-2", "type": "chaise", "x": 7.65, "z": 5.575, "rotDeg": 180 }
+      ],
+      "why": "Plan village-maximum: l'arche de 1,20 m dans le refend (on y passe une table portée à deux), deux fauteuils au coin du feu autour d'une table basse, une table pour deux contre la cloison de la réserve; les caisses de Simone partent."
+    }
+  }
+}

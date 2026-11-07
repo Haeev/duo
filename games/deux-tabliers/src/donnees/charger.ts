@@ -100,7 +100,12 @@ export function loadContent(files: DataFiles, address = 'village'): Content {
     throw new ContentError(issues);
   }
   const objects = byId(objectsFile.objects, 'objets.json', issues);
-  const furniture = byId(furnitureFile.furniture, 'meubles.json', issues);
+  // Objets posables du catalogue de l'aménagement: des meubles comme les autres pour le cœur.
+  const furniture = byId(
+    [...furnitureFile.furniture, ...arrangement.furnitureTypes],
+    'meubles.json',
+    issues,
+  );
   const stations = byId(stationsFile.stations, 'postes.json', issues);
 
   for (const f of furniture.values()) {
