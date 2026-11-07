@@ -65,4 +65,6 @@ export const WorldSchema = v.strictObject({
 export type World = v.InferOutput<typeof WorldSchema>;
 
 /** Version du format de `World` dans les sauvegardes (`dataSchema`). */
-export const WORLD_FORMAT = 1;
+// 2: domaines service, clientèle et aménagement complets (démo du 2026-11-08). Une sauvegarde du
+// squelette (format 1) ne se relit pas: la maison repart du jour 1.
+export const WORLD_FORMAT = 2;

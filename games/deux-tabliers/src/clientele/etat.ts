@@ -103,6 +103,8 @@ const DayStats = v.strictObject({
   points: N,
   basket: Nat,
   euros: Nat,
+  /** Achats du jour (équipements, meubles, décoration, travaux), en centimes. */
+  spent: v.optional(Nat, 0),
 });
 export type DayStatsState = v.InferOutput<typeof DayStats>;
 
@@ -115,6 +117,8 @@ export const ReportSchema = v.strictObject({
   materials: Nat,
   rent: Nat,
   charges: Nat,
+  /** Achats du jour (hors résultat: ils sortent de la caisse). */
+  purchases: v.optional(Nat, 0),
   eventEuros: Nat,
   result: Int,
   served: Nat,
@@ -257,6 +261,7 @@ export function emptyDayStats(): DayStatsState {
     points: 0,
     basket: 0,
     euros: 0,
+    spent: 0,
   };
 }
 

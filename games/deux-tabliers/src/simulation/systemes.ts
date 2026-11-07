@@ -38,7 +38,7 @@ export interface GameSystem {
 }
 
 export interface Chantier {
-  readonly id: 'service' | 'clientele' | 'amenagement';
+  readonly id: 'service' | 'clientele' | 'branchement' | 'amenagement';
   readonly system: GameSystem;
   /** Postes pris en charge, par identifiant de `postes.json`. */
   readonly stations?: Readonly<Record<string, StationHandler>>;

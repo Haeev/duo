@@ -67,6 +67,7 @@ import type { Chantier, SimContext } from '../simulation/systemes';
 import {
   clockMinutes,
   deliverOrder,
+  prepareOrder,
   groupById,
   hostWalkers,
   placePoint,
@@ -80,7 +81,8 @@ import { talk } from './habitues';
 import { dawn, startHouse, stepDay, vote } from './journee';
 import { onTalk, sceneAct } from './scenes';
 
-export { clockMinutes, deliverOrder, type ServeResult };
+export { clockMinutes, deliverOrder, prepareOrder, type ServeResult };
+export { ctxOf };
 export {
   offerOf,
   suggestedOrder,
@@ -109,8 +111,12 @@ function distanceToType(sim: SimContext, player: PlayerIndex, type: string): num
   return best;
 }
 
-export function takeOrderAt(sim: SimContext, player: PlayerIndex | null): string | null {
-  const r = takeOrder(ctxOf(sim), player);
+export function takeOrderAt(
+  sim: SimContext,
+  player: PlayerIndex | null,
+  groupId: number | null = null,
+): string | null {
+  const r = takeOrder(ctxOf(sim), player, groupId);
   return typeof r === 'string' ? r : null;
 }
 

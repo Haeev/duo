@@ -1,5 +1,6 @@
 // Les chantiers branchés dans la simulation, dans l'ordre de leurs pas.
 import { amenagementChantier } from '../amenagement';
+import { branchementChantier } from '../branchement';
 import { clienteleChantier } from '../clientele';
 import { serviceChantier } from '../service';
 import type { Chantier, StationHandler } from './systemes';
@@ -7,6 +8,7 @@ import type { Chantier, StationHandler } from './systemes';
 export const CHANTIERS: readonly Chantier[] = [
   serviceChantier,
   clienteleChantier,
+  branchementChantier,
   amenagementChantier,
 ];
 

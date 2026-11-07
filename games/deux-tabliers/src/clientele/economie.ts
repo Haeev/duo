@@ -247,6 +247,7 @@ function applyEffects(ctx: Ctx, effects: readonly string[]): void {
 export function completePurchase(ctx: Ctx, offer: Offer, by: PlayerIndex | null): void {
   const { s, cc } = ctx;
   s.cash -= offer.price;
+  s.today.spent += offer.price;
   const nights = offer.kind === 'extension' ? (cc.extensions.get(offer.id)?.nights ?? 1) : 0;
   s.purchases.push([offer.id, s.day, s.day + nights]);
   if (offer.kind === 'purchase') applyEffects(ctx, cc.purchases.get(offer.id)?.effects ?? []);

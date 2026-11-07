@@ -13,7 +13,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, en vue à la première personne, vous reprenez le petit café d'Ormeval et vous le tenez ensemble.",
-  "whatsNew": "Premier squelette jouable: marcher dans le café, prendre, poser et se passer les tasses.",
+  "whatsNew": "Bienvenue à Ormeval ! Le café ouvre ses portes: prenez les commandes, faites les cafés à deux, servez les clients et lisez votre bilan du soir, quinze jours durant.",
   "actions": [
     { "id": "forward", "label": "Avancer", "keys": ["KeyW", "ArrowUp"] },
     { "id": "back", "label": "Reculer", "keys": ["KeyS", "ArrowDown"] },

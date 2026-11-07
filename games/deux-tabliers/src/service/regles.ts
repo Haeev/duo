@@ -989,7 +989,7 @@ export function openTicket(
     }
   }
   s.tickets.push(ticket);
-  s.receipts.push({ ticket: ticket.id, customer, amount: ticket.total });
+  s.receipts.push({ ticket: ticket.id, customer, amount: ticket.total, player });
   if (player !== null)
     sim.emit({ type: 'service-order-taken', player, ticket: ticket.id, customer });
   sim.emit({ type: 'service-paid', ticket: ticket.id, amount: ticket.total });

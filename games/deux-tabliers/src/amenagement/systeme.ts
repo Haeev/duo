@@ -108,7 +108,7 @@ export function purchaseRefusal(
   }
   const price = priceOf(content, world, id, room);
   if (price === null) return 'Article inconnu.';
-  if (price > eco.available(world)) return `Pas assez dans la caisse : il faut ${price} €.`;
+  if (price > eco.available(world, content)) return `Pas assez dans la caisse : il faut ${price} €.`;
   return null;
 }
 
@@ -661,7 +661,7 @@ function renovate(sim: SimContext, player: PlayerIndex, furnitureId: string): vo
     return;
   }
   const price = content.arrangement.pieces.get(f.type)?.renovationPrice ?? 0;
-  if (price > economy().available(world)) {
+  if (price > economy().available(world, content)) {
     refuse(sim, player, `Pas assez dans la caisse : il faut ${price} €.`);
     return;
   }

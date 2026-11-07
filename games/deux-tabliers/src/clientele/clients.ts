@@ -241,18 +241,32 @@ function arrive(ctx: Ctx, profileId: string, size: number, takeAway: boolean): v
 }
 
 /** Prendre la commande du groupe à la caisse: il paie, le service reçoit le ticket. */
-export function takeOrder(ctx: Ctx, player: PlayerIndex | null): Group | string {
-  const g = ctx.s.groups.find((x) => x.stage === 'register');
-  if (g === undefined) return 'Personne à la caisse';
+/**
+ * Ce que le groupe à la caisse va commander (habitué: sa commande; rupture: autre chose de ses
+ * envies, ST-05), sans payer: le service en fait la commande en attente à la caisse.
+ */
+export function prepareOrder(ctx: Ctx, g: Group): readonly string[] {
   if (g.regular !== null && g.items.length === 0) g.items = regularOrder(ctx, g.regular);
   const items = g.items.filter((id) => inStock(ctx.cc, ctx.s, id));
   if (items.length === 0) {
-    // Plus rien de ce qu'il voulait: il choisit autre chose de ses envies (ST-05).
     const p = profileOf(ctx, g);
     items.push(...groupOrder(ctx.cc, ctx.sim.random, p, g.size, availableRecipes(ctx)));
   }
+  if (items.length > 0) g.items = items;
+  return items;
+}
+
+export function takeOrder(
+  ctx: Ctx,
+  player: PlayerIndex | null,
+  groupId: number | null = null,
+): Group | string {
+  const g = ctx.s.groups.find(
+    (x) => x.stage === 'register' && (groupId === null || x.id === groupId),
+  );
+  if (g === undefined) return 'Personne à la caisse';
+  const items = [...prepareOrder(ctx, g)];
   if (items.length === 0) return 'Plus rien à servir sur l’ardoise';
-  g.items = items;
   pay(ctx, g, items, player, false);
   g.stage = 'waiting';
   g.since = ctx.s.serviceSec;

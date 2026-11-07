@@ -15,7 +15,7 @@ import type { CatalogItem } from './donnees';
 
 export interface ArrangementEconomy {
   /** Ce qu'on peut dépenser maintenant (caisse moins la réserve de charges, EC et démo 6.1). */
-  available(world: World): number;
+  available(world: World, content: Content): number;
   /** Débite un achat déjà permis par `available` (`what`: article ou extension, pour le bilan). */
   spend(sim: SimContext, amount: number, what: string, player: PlayerIndex): void;
   /** Le palier est ouvert (réputation ou jour, le premier des deux, démo D-04). */

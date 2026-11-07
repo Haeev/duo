@@ -110,6 +110,8 @@ const ReceiptSchema = v.strictObject({
   ticket: Int,
   customer: v.nullable(v.string()),
   amount: v.number(),
+  /** Joueur qui a pris la commande, `null` sans joueur (recommande, commande de l'interface). */
+  player: v.optional(v.nullable(PlayerIndexSchema), null),
 });
 export type Receipt = v.InferOutput<typeof ReceiptSchema>;
 
