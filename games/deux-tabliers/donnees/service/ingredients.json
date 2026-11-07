@@ -1,0 +1,235 @@
+{
+  "ingredients": [
+    {
+      "id": "grains-maison",
+      "label": "Grains, mélange de la vallée",
+      "unit": "g",
+      "unitCost": 0.02,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 30,
+      "cartonUnits": 1000,
+      "heavy": true
+    },
+    {
+      "id": "lait-entier",
+      "label": "Lait entier",
+      "unit": "ml",
+      "unitCost": 0.0013,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 7,
+      "cartonUnits": 6000,
+      "heavy": true
+    },
+    {
+      "id": "lait-avoine",
+      "label": "Lait d'avoine",
+      "unit": "ml",
+      "unitCost": 0.0028,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 10,
+      "cartonUnits": 3000,
+      "heavy": false
+    },
+    {
+      "id": "beurre",
+      "label": "Beurre",
+      "unit": "g",
+      "unitCost": 0.008,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 14,
+      "cartonUnits": 500,
+      "heavy": false
+    },
+    {
+      "id": "oeufs",
+      "label": "Œufs",
+      "unit": "piece",
+      "unitCost": 0.25,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 14,
+      "cartonUnits": 12,
+      "heavy": false
+    },
+    {
+      "id": "cacao",
+      "label": "Chocolat en poudre",
+      "unit": "g",
+      "unitCost": 0.012,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 60,
+      "cartonUnits": 1000,
+      "heavy": false
+    },
+    {
+      "id": "the-noir",
+      "label": "Thé noir en vrac (une dose)",
+      "unit": "dose",
+      "unitCost": 0.18,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 90,
+      "cartonUnits": 50,
+      "heavy": false
+    },
+    {
+      "id": "the-vert",
+      "label": "Thé vert en vrac (une dose)",
+      "unit": "dose",
+      "unitCost": 0.22,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 90,
+      "cartonUnits": 50,
+      "heavy": false
+    },
+    {
+      "id": "plantes-simone",
+      "label": "Plantes du jardin de Simone (un bouquet)",
+      "unit": "dose",
+      "unitCost": 0.1,
+      "supplier": "simone-jardin",
+      "storage": "reserve",
+      "shelfDays": 7,
+      "cartonUnits": 20,
+      "heavy": false
+    },
+    {
+      "id": "menthe",
+      "label": "Menthe du jardin",
+      "unit": "brin",
+      "unitCost": 0.05,
+      "supplier": "simone-jardin",
+      "storage": "frigo",
+      "shelfDays": 4,
+      "cartonUnits": 20,
+      "heavy": false
+    },
+    {
+      "id": "oranges",
+      "label": "Oranges à presser",
+      "unit": "piece",
+      "unitCost": 0.3,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 10,
+      "cartonUnits": 30,
+      "heavy": true
+    },
+    {
+      "id": "citrons",
+      "label": "Citrons",
+      "unit": "piece",
+      "unitCost": 0.25,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 14,
+      "cartonUnits": 20,
+      "heavy": false
+    },
+    {
+      "id": "sucre",
+      "label": "Sucre",
+      "unit": "g",
+      "unitCost": 0.002,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 365,
+      "cartonUnits": 2000,
+      "heavy": false
+    },
+    {
+      "id": "farine",
+      "label": "Farine",
+      "unit": "g",
+      "unitCost": 0.0012,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 120,
+      "cartonUnits": 5000,
+      "heavy": true
+    },
+    {
+      "id": "confiture",
+      "label": "Confiture d'abricot",
+      "unit": "g",
+      "unitCost": 0.004,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 60,
+      "cartonUnits": 1000,
+      "heavy": false
+    },
+    {
+      "id": "limonade-bouteille",
+      "label": "Limonade de la vallée (bouteille)",
+      "unit": "piece",
+      "unitCost": 1.1,
+      "supplier": "mireille",
+      "storage": "frigo",
+      "shelfDays": 180,
+      "cartonUnits": 12,
+      "heavy": true
+    },
+    {
+      "id": "accompagnement",
+      "label": "Sucre et carré de chocolat servis avec la boisson",
+      "unit": "piece",
+      "unitCost": 0.06,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 365,
+      "cartonUnits": 200,
+      "heavy": false
+    },
+    {
+      "id": "pain-campagne",
+      "label": "Pain de campagne (une tranche)",
+      "unit": "piece",
+      "unitCost": 0.12,
+      "supplier": "lucas",
+      "storage": "reserve",
+      "shelfDays": 1,
+      "cartonUnits": 20,
+      "heavy": false
+    },
+    {
+      "id": "croissant-boulanger",
+      "label": "Croissant du boulanger",
+      "unit": "piece",
+      "unitCost": 0.7,
+      "supplier": "lucas",
+      "storage": "vitrine",
+      "shelfDays": 1,
+      "cartonUnits": 10,
+      "heavy": false
+    },
+    {
+      "id": "pain-chocolat-boulanger",
+      "label": "Pain au chocolat du boulanger",
+      "unit": "piece",
+      "unitCost": 0.75,
+      "supplier": "lucas",
+      "storage": "vitrine",
+      "shelfDays": 1,
+      "cartonUnits": 10,
+      "heavy": false
+    },
+    {
+      "id": "tarte-boulanger",
+      "label": "Tarte aux fruits du boulanger (une part)",
+      "unit": "piece",
+      "unitCost": 1.6,
+      "supplier": "lucas",
+      "storage": "vitrine",
+      "shelfDays": 1,
+      "cartonUnits": 8,
+      "heavy": false
+    }
+  ]
+}

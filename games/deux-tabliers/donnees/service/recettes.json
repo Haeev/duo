@@ -1,0 +1,834 @@
+{
+  "recipes": [
+    {
+      "id": "espresso",
+      "label": "Espresso (petit noir)",
+      "family": "black-coffee",
+      "price": 1.4,
+      "cost": 0.2,
+      "vessel": "tasse",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "grains-maison",
+          "qty": 7
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "espresso",
+          "activeSeconds": [
+            3.5,
+            2,
+            1.5
+          ],
+          "passiveSeconds": [
+            12,
+            12,
+            12
+          ],
+          "finishSeconds": [
+            0.5,
+            0.5,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": [
+        "decaf"
+      ]
+    },
+    {
+      "id": "allonge",
+      "label": "Café allongé",
+      "family": "black-coffee",
+      "price": 1.6,
+      "cost": 0.22,
+      "vessel": "tasse",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "grains-maison",
+          "qty": 8
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "espresso",
+          "activeSeconds": [
+            4,
+            2.5,
+            2
+          ],
+          "passiveSeconds": [
+            14,
+            14,
+            14
+          ],
+          "finishSeconds": [
+            0.5,
+            0.5,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": [
+        "decaf"
+      ]
+    },
+    {
+      "id": "creme",
+      "label": "Café crème",
+      "family": "milk-coffee",
+      "price": 2.4,
+      "cost": 0.4,
+      "vessel": "tasse",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "grains-maison",
+          "qty": 7
+        },
+        {
+          "id": "lait-entier",
+          "qty": 150
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "espresso",
+          "activeSeconds": [
+            3.5,
+            2,
+            1.5
+          ],
+          "passiveSeconds": [
+            12,
+            12,
+            12
+          ],
+          "finishSeconds": [
+            0.5,
+            0.5,
+            0
+          ]
+        },
+        {
+          "station": "vapeur",
+          "activeSeconds": [
+            5,
+            4,
+            1
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            5
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": [
+        "oat-milk",
+        "decaf"
+      ]
+    },
+    {
+      "id": "the-noir",
+      "label": "Thé noir",
+      "family": "tea",
+      "price": 2.5,
+      "cost": 0.24,
+      "vessel": "tasse",
+      "dishes": 2,
+      "ingredients": [
+        {
+          "id": "the-noir",
+          "qty": 1
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "bouilloire",
+          "activeSeconds": [
+            4,
+            2.5,
+            2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ],
+          "waterC": 95
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": []
+    },
+    {
+      "id": "chocolat",
+      "label": "Chocolat chaud",
+      "family": "chocolate",
+      "price": 2.8,
+      "cost": 0.44,
+      "vessel": "tasse",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "lait-entier",
+          "qty": 200
+        },
+        {
+          "id": "cacao",
+          "qty": 15
+        }
+      ],
+      "steps": [
+        {
+          "station": "vapeur",
+          "activeSeconds": [
+            6.5,
+            5.5,
+            1.5
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            6
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": [
+        "oat-milk"
+      ]
+    },
+    {
+      "id": "croissant",
+      "label": "Croissant",
+      "family": "pastry-bread",
+      "price": 1.2,
+      "cost": 0.7,
+      "vessel": "assiette",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "croissant-boulanger",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "vitrine",
+          "activeSeconds": [
+            1.5,
+            1.5,
+            1.2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": []
+    },
+    {
+      "id": "pain-chocolat",
+      "label": "Pain au chocolat",
+      "family": "pastry-bread",
+      "price": 1.3,
+      "cost": 0.75,
+      "vessel": "assiette",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "pain-chocolat-boulanger",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "vitrine",
+          "activeSeconds": [
+            1.5,
+            1.5,
+            1.2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": []
+    },
+    {
+      "id": "tartine",
+      "label": "Tartine beurre-confiture",
+      "family": "pastry-bread",
+      "price": 2.2,
+      "cost": 0.4,
+      "vessel": "assiette",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "pain-campagne",
+          "qty": 2
+        },
+        {
+          "id": "beurre",
+          "qty": 10
+        },
+        {
+          "id": "confiture",
+          "qty": 20
+        }
+      ],
+      "steps": [
+        {
+          "station": "plan",
+          "activeSeconds": [
+            4,
+            3,
+            2.5
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": []
+    },
+    {
+      "id": "tarte-fruits",
+      "label": "Tarte aux fruits de saison",
+      "family": "cake",
+      "price": 3.2,
+      "cost": 1.6,
+      "vessel": "assiette",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "tarte-boulanger",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "vitrine",
+          "activeSeconds": [
+            2,
+            2,
+            1.5
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "start"
+      },
+      "options": []
+    },
+    {
+      "id": "noisette",
+      "label": "Noisette",
+      "family": "black-coffee",
+      "price": 1.7,
+      "cost": 0.23,
+      "vessel": "tasse",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "grains-maison",
+          "qty": 7
+        },
+        {
+          "id": "lait-entier",
+          "qty": 20
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "espresso",
+          "activeSeconds": [
+            3.5,
+            2,
+            1.5
+          ],
+          "passiveSeconds": [
+            12,
+            12,
+            12
+          ],
+          "finishSeconds": [
+            0.5,
+            0.5,
+            0
+          ]
+        },
+        {
+          "station": "vapeur",
+          "activeSeconds": [
+            2,
+            1.5,
+            1
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            2
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "regular",
+        "regular": "simone",
+        "level": 0
+      },
+      "options": [
+        "oat-milk",
+        "decaf"
+      ]
+    },
+    {
+      "id": "cappuccino",
+      "label": "Cappuccino",
+      "family": "milk-coffee",
+      "price": 2.9,
+      "cost": 0.37,
+      "vessel": "tasse",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "grains-maison",
+          "qty": 7
+        },
+        {
+          "id": "lait-entier",
+          "qty": 120
+        },
+        {
+          "id": "cacao",
+          "qty": 1
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "espresso",
+          "activeSeconds": [
+            3.5,
+            2,
+            1.5
+          ],
+          "passiveSeconds": [
+            12,
+            12,
+            12
+          ],
+          "finishSeconds": [
+            0.5,
+            0.5,
+            0
+          ]
+        },
+        {
+          "station": "vapeur",
+          "activeSeconds": [
+            6,
+            5,
+            1
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            6
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "purchase",
+        "item": "fiche-cappuccino"
+      },
+      "options": [
+        "oat-milk",
+        "decaf"
+      ]
+    },
+    {
+      "id": "the-vert",
+      "label": "Thé vert",
+      "family": "tea",
+      "price": 2.6,
+      "cost": 0.28,
+      "vessel": "tasse",
+      "dishes": 2,
+      "ingredients": [
+        {
+          "id": "the-vert",
+          "qty": 1
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "bouilloire",
+          "activeSeconds": [
+            4.5,
+            2.5,
+            2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ],
+          "waterC": 80
+        }
+      ],
+      "unlock": {
+        "kind": "purchase",
+        "item": "fiche-the-vert"
+      },
+      "options": []
+    },
+    {
+      "id": "infusion",
+      "label": "Infusion du jardin de Simone",
+      "family": "tea",
+      "price": 2.4,
+      "cost": 0.16,
+      "vessel": "tasse",
+      "dishes": 2,
+      "ingredients": [
+        {
+          "id": "plantes-simone",
+          "qty": 1
+        },
+        {
+          "id": "accompagnement",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "bouilloire",
+          "activeSeconds": [
+            4,
+            2.5,
+            2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ],
+          "waterC": 95
+        }
+      ],
+      "unlock": {
+        "kind": "regular",
+        "regular": "simone",
+        "level": 1
+      },
+      "options": []
+    },
+    {
+      "id": "citronnade",
+      "label": "Citronnade maison",
+      "family": "cold-drink",
+      "price": 3,
+      "cost": 0.33,
+      "vessel": "verre",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "citrons",
+          "qty": 1
+        },
+        {
+          "id": "sucre",
+          "qty": 15
+        },
+        {
+          "id": "menthe",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "frigo",
+          "activeSeconds": [
+            2.5,
+            2,
+            2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "regular",
+        "regular": "bastien",
+        "level": 1
+      },
+      "options": []
+    },
+    {
+      "id": "jus-orange",
+      "label": "Jus d'orange pressé",
+      "family": "cold-drink",
+      "price": 3.5,
+      "cost": 0.9,
+      "vessel": "verre",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "oranges",
+          "qty": 3
+        }
+      ],
+      "steps": [
+        {
+          "station": "agrumes",
+          "activeSeconds": [
+            5,
+            2.5,
+            2
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "purchase",
+        "item": "presse-levier"
+      },
+      "options": []
+    },
+    {
+      "id": "limonade",
+      "label": "Limonade artisanale",
+      "family": "cold-drink",
+      "price": 3.2,
+      "cost": 1.1,
+      "vessel": "verre",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "limonade-bouteille",
+          "qty": 1
+        }
+      ],
+      "steps": [
+        {
+          "station": "frigo",
+          "activeSeconds": [
+            1.5,
+            1.5,
+            1.5
+          ],
+          "passiveSeconds": [
+            0,
+            0,
+            0
+          ],
+          "finishSeconds": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "purchase",
+        "item": "frigo-vitre"
+      },
+      "options": []
+    },
+    {
+      "id": "crepe",
+      "label": "Crêpe",
+      "family": "cake",
+      "price": 2.5,
+      "cost": 0.3,
+      "vessel": "assiette",
+      "dishes": 1,
+      "ingredients": [
+        {
+          "id": "farine",
+          "qty": 30
+        },
+        {
+          "id": "lait-entier",
+          "qty": 60
+        },
+        {
+          "id": "oeufs",
+          "qty": 0.5
+        },
+        {
+          "id": "sucre",
+          "qty": 10
+        },
+        {
+          "id": "beurre",
+          "qty": 5
+        }
+      ],
+      "steps": [
+        {
+          "station": "creperie",
+          "activeSeconds": [
+            3,
+            2.5,
+            2
+          ],
+          "passiveSeconds": [
+            9,
+            8,
+            7
+          ],
+          "finishSeconds": [
+            1.5,
+            1.5,
+            1.5
+          ]
+        }
+      ],
+      "unlock": {
+        "kind": "purchase",
+        "item": "creperie"
+      },
+      "options": []
+    }
+  ]
+}
