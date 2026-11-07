@@ -241,7 +241,6 @@ def cafetiere():
         # robinet de vapeur sur le dessus de la façade
         g.cyl(x, yb0 - 0.03, z0 + 0.36, z0 + 0.38, 0.022, 10, "brass")
     g.cyl(cx, yb0 - 0.016, z0 + 0.29, z0 + 0.36, 0.045, 16, "brass", phase=0)
-    G.Geo.rotate_x_face = None
     man = g.cyl(cx, 0, 0, 0.012, 0.045, 16, "brass")
     face = g.cyl(cx, 0, 0.012, 0.016, 0.037, 16, "paper")
     for v in man + face:
@@ -337,53 +336,44 @@ def rail_tickets(joueurs):
     return g
 
 
-def symbole(g, clip, x, y, z, size, facing=-1):
-    """Symbole d'un joueur (astre: disque; croissant: disque moins un disque décalé), posé dans un plan vertical
-    face au nord (facing=-1) ou au sud (+1), couleur « player_on »."""
-    pts = []
-    n = 20
+def _run(pts, flags):
+    """Plus longue suite contiguë (sur un cercle) des points marqués, dans l'ordre."""
+    n = len(pts)
+    start = next(i for i in range(n) if flags[i] and not flags[i - 1])
+    out = []
+    i = start
+    while flags[i % n]:
+        out.append(pts[i % n])
+        i += 1
+        if len(out) >= n:
+            break
+    return out
+
+
+def symbole_contour(clip, size):
+    """Contour du symbole d'un joueur (repère du symbole: u à droite, v en haut, centré)."""
+    n = 40
     if clip == "orb":
         r = size * 7.6 / 24
-        pts = [(r * math.cos(2 * math.pi * i / n), r * math.sin(2 * math.pi * i / n)) for i in range(n)]
-    else:
-        # croissant de Duo: cercle de 9,2 centré (12, 12) moins le cercle de 7,4 qui passe par les deux pointes
-        R = size * 9.2 / 24
-        r2 = size * 7.4 / 24
-        off = (size * 4.6 / 24, -size * 4.6 / 24)
-        for i in range(n * 2):
-            a = 2 * math.pi * i / (n * 2)
-            p = (R * math.cos(a), R * math.sin(a))
-            if (p[0] - off[0]) ** 2 + (p[1] - off[1]) ** 2 > r2 ** 2:
-                pts.append(p)
-        # bord intérieur (arc du petit cercle), à l'envers
-        inner = []
-        for i in range(n * 2):
-            a = 2 * math.pi * i / (n * 2)
-            p = (off[0] + r2 * math.cos(a), off[1] + r2 * math.sin(a))
-            if p[0] ** 2 + p[1] ** 2 < R ** 2:
-                inner.append(p)
-        # ordonner: arc extérieur dans le sens trigonométrique depuis la pointe, puis arc intérieur en retour
-        ang = lambda p: math.atan2(p[1] - off[1], p[0] - off[0])
-        pts = sorted(pts, key=lambda p: (math.atan2(p[1], p[0]) - math.atan2(off[1], off[0]) + 2 * math.pi) % (2 * math.pi))
-        inner = sorted(inner, key=lambda p: -((ang(p) - math.atan2(-off[1], -off[0]) + 3 * math.pi) % (2 * math.pi)))
-        pts = pts + inner
-    # éventail depuis le centre de gravité (le croissant n'est pas convexe: triangles depuis le centre de chaque bande)
-    if clip == "orb":
-        g.quad([(x + facing * -px, y, z + pz) for px, pz in pts], "player_on", normal_hint=(0, facing, 0))
-    else:
-        half = len(pts) // 2
-        outer, inner = pts[:half + (len(pts) % 2)], pts[half + (len(pts) % 2):]
-        # bande entre l'arc extérieur et l'arc intérieur, en quadrilatères
-        o = outer
-        i_ = list(reversed(inner))
-        m = min(len(o), len(i_))
-        for k in range(m - 1):
-            ka = int(k * (len(o) - 1) / (m - 1))
-            kb = int((k + 1) * (len(o) - 1) / (m - 1))
-            ia = int(k * (len(i_) - 1) / (m - 1))
-            ib = int((k + 1) * (len(i_) - 1) / (m - 1))
-            quad = [o[ka], o[kb], i_[ib], i_[ia]]
-            g.quad([(x + facing * -px, y, z + pz) for px, pz in quad], "player_on", normal_hint=(0, facing, 0))
+        return [(r * math.cos(2 * math.pi * i / n), r * math.sin(2 * math.pi * i / n)) for i in range(n)]
+    # croissant de Duo: cercle de rayon 9,2 moins un cercle de rayon 7,4 décalé vers le haut à droite
+    R, r2 = size * 9.2 / 24, size * 7.4 / 24
+    off = (size * 4.1 / 24, size * 4.1 / 24)
+    big = [(R * math.cos(2 * math.pi * i / n), R * math.sin(2 * math.pi * i / n)) for i in range(n)]
+    outer = _run(big, [(p[0] - off[0]) ** 2 + (p[1] - off[1]) ** 2 > r2 ** 2 for p in big])
+    small = [(off[0] + r2 * math.cos(2 * math.pi * i / n), off[1] + r2 * math.sin(2 * math.pi * i / n)) for i in range(n)]
+    inner = list(reversed(_run(small, [p[0] ** 2 + p[1] ** 2 < R ** 2 for p in small])))
+    d = lambda a, b: (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+    if d(outer[-1], inner[0]) > d(outer[-1], inner[-1]):
+        inner.reverse()
+    return outer + inner
+
+
+def symbole(g, clip, x, y, z, size, facing=-1):
+    """Symbole d'un joueur dans un plan vertical face au nord (facing=-1) ou au sud (+1), en « player_on »."""
+    pts = symbole_contour(clip, size)
+    # vu de face, u va vers la droite de l'observateur: vers l'ouest (-x) pour qui regarde vers le sud (face nord)
+    g.quad([(x + facing * u, y, z + v) for u, v in pts], "player_on", normal_hint=(0, facing, 0))
 
 
 # ------------------------------------------------------------------------------------------------

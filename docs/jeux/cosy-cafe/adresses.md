@@ -13,10 +13,10 @@
 ## En bref
 
 - **Cinq adresses**, du village à Paris, chacune dessinée à l'arrivée et agrandie au maximum: Ormeval (village, le Café de la place), Mérelles (bourg, la boutique de la place de la Halle), Montaurel (ville universitaire, l'Imprimerie), Paris (le café de l'angle des Plumassiers), Paris (la Graineterie du boulevard des Horticulteurs). Lieux, rues et commerces sont inventés; aucun ne reprend un lieu connu.
-- **Capacités** (places assises, intérieur + dehors), à l'arrivée puis au maximum: village 8 + 2 puis 12 + 6; bourg 11 + 0 puis 21 + 18; ville 23 + 4 puis 35 + 10; Paris quartier 18 + 6 puis 29 + 16; Graineterie 41 + 12 puis 62 + 26.
+- **Capacités** (places assises, intérieur + dehors), à l'arrivée puis au maximum: village 8 + 2 puis 12 + 6; bourg 11 + 0 puis 21 + 18; ville 23 + 4 puis 35 + 10; Paris quartier 18 + 6 puis 29 + 16; Graineterie 41 + 12 puis 62 + 34.
 - **Une seule règle de lisibilité, vérifiée partout**: depuis chaque caisse, d'un seul regard (100 degrés), on voit le client qui paie, toute la file et la porte. La file longe un mur ou le devant du comptoir et ne passe jamais derrière; une allée de 1,20 m mène de la porte à la passe à côté de la file pleine.
 - **Plafonds de l'architecte tenus** (C1 à C18): au pire 37 personnages dans le champ (bourg agrandi, un jour de marché), sur les points de vue déclarés et sur une grille d'un point par mètre jouable; présents au pire sous C2 sans compter sur un taux d'occupation (le village et le bourg agrandis sont pile au plafond, 24 et 48); files de 6 places au plus; deux niveaux au plus; dehors jouable limité à la terrasse et au trottoir.
-- **Deux terrasses parisiennes limitées par la foule**: vues depuis le trottoir, deux rangs de terrasse et les passants dépassent 40 personnages. Le second rang (10 places à l'angle, 8 à la Graineterie) attend la décision de l'architecte sur la foule lointaine (option B de `technique.md`, section 4.1).
+- **Une terrasse limitée par la foule**: à l'angle des Plumassiers, vu depuis le trottoir, un second rang de terrasse ferait dépasser 40 personnages (42). Ce second rang (10 places) attend la décision de l'architecte sur la foule lointaine (option B de `technique.md`, section 4.1). À la Graineterie, les vitrines garnies du graineur laissent tenir deux rangs.
 - **Contrôles**: `python3 -I docs/jeux/cosy-cafe/plans/valider_plans.py` (0 erreur sur les dix plans, 21 s) et `python3 -I docs/jeux/cosy-cafe/plans/eprouver_validateur.py` (8 cas cassés sur 8 détectés). Sortie complète en annexe.
 
 ## 1. Normes d'aménagement communes
@@ -87,10 +87,10 @@ Mesurées par le validateur, du premier poste des joueurs à la place la plus lo
 
 ### 2.1 Règles
 
-1. **D'un seul regard depuis la caisse**: le client qui paie, chaque place de la file et la porte d'où elle vient tiennent dans le champ de la caméra (100 degrés), sans rien d'opaque entre. Le validateur cherche le plus petit angle qui les contient tous: de 5 à 20 degrés selon les adresses.
+1. **D'un seul regard depuis la caisse**: le client qui paie, chaque place de la file et la porte d'où elle vient tiennent dans le champ de la caméra (100 degrés), sans rien d'opaque entre. Le validateur cherche le plus petit angle qui les contient tous: de 6 à 32 degrés selon les adresses.
 2. **La caisse est au bout de la file**, et la passe (où l'on prend sa commande) au-delà: le client paie puis glisse le long du comptoir, il ne revient jamais sur la file.
 3. **La file longe un mur ou le devant du comptoir**, jamais derrière (vérifié); elle laisse à côté d'elle une allée de 1,20 m de la porte à la passe, pour ceux qui ressortent avec leur tasse.
-4. **Le barista voit la porte** dans son axe de travail, face à sa machine (de 0 à 45 degrés selon les adresses).
+4. **Le barista voit la porte** dans son axe de travail, face à sa machine (de 3 à 45 degrés selon les adresses).
 5. **Ce qui est haut** (plus de 1,60 m: étagères, réfrigérateurs, casiers à casses, meubles à graines, plantes hautes) est adossé aux murs ou sert à séparer deux espaces, jamais entre le comptoir et la porte.
 6. **Au-dessus du comptoir**, rien entre 1,40 et 2,00 m: le rail des tickets court au-dessus de la passe à 1,90 m (on le lit d'un coup d'œil vers le haut), les lampes pendent au-dessus de 2,00 m. Les visages restent visibles.
 7. **Un repère par salle**, vu depuis sa porte: le tilleul par la vitrine du village, la halle en face du bourg, la presse de l'Imprimerie, le zinc du café d'angle, la verrière et le laboratoire de la Graineterie.
@@ -103,14 +103,14 @@ Sortie du validateur (annexe), au maximum de chaque adresse. « Au pire » compt
 
 | Adresse | Caisse: client, file et porte d'un regard | Barista: porte depuis l'axe de travail | Foule au pire depuis la caisse | Ce qu'on ne voit pas d'un poste |
 |---|---|---|---|---|
-| Village | 6 degrés (4 places de file) | 0 degré | 19 | la pièce du fond (derrière le refend), la réserve |
-| Bourg | 5 degrés (6 places) | 10 degrés | 37 | la remise et la cour (il faut y passer la tête par le couloir), le laboratoire seulement par la vitre |
-| Ville, boutique | 7 degrés (5 places) | 2 degrés | 24 | tout l'atelier |
-| Ville, atelier | 20 degrés (6 places, deux portes) | 27 degrés | 25 | la boutique, le coin lecture derrière les casses, la cuisine |
-| Café d'angle | 14 degrés (5 places) | 45 degrés | 34 | la salle du fond (portes battantes), la cave |
-| Graineterie, boutique | 7 degrés (4 places) | 0 degré | 16 | la halle (par les arches seulement), l'étage, le boulevard (vitrines garnies) |
+| Village | 14 degrés (4 places de file) | 3 degrés | 19 | la pièce du fond (derrière le refend), la réserve |
+| Bourg | 11 degrés (6 places) | 15 degrés | 37 | la remise et la cour (il faut y passer la tête par le couloir), le laboratoire seulement par la vitre |
+| Ville, boutique | 13 degrés (5 places) | 9 degrés | 24 | tout l'atelier |
+| Ville, atelier | 32 degrés (6 places, deux portes) | 33 degrés | 25 | la boutique, le coin lecture derrière les casses, la cuisine |
+| Café d'angle | 6 degrés (5 places) | 45 degrés | 34 | la salle du fond (portes battantes), la cave |
+| Graineterie, boutique | 17 degrés (4 places) | 3 degrés | 16 | la halle (par les arches seulement), l'étage, le boulevard (vitrines garnies) |
 
-Les postes techniques (four, plonge, cuisine, laboratoire) tournent le dos à la salle: c'est voulu, la vue subjective fait de la parole l'outil du duo (« trois personnes attendent à la caisse »). Ils restent à moins de 4 m de la passe, sauf la cuisine de la Graineterie, reliée à la halle par sa passe vitrée.
+Les postes techniques (four, plonge, cuisine, laboratoire) tournent le dos à la salle: c'est voulu, la vue subjective fait de la parole l'outil du duo (« trois personnes attendent à la caisse »). Ils restent à quelques pas de la passe; la cuisine de la Graineterie est reliée à la halle par sa passe vitrée.
 
 ## 3. La coque: éléments fixes et zones libres
 
@@ -345,10 +345,11 @@ Plans: `plans/paris-maison-arrivee.png`, `plans/paris-maison-maximum.png` (rez-d
 | E2, le laboratoire de pâtisserie | four à soles, marbre, cellule de refroidissement, batteur | la pâtisserie maison, vue depuis la halle |
 | E3, les salons de l'étage | grand salon et petit salon: 17 places, servis par l'office et le monte-plats | le thé de l'après-midi au calme |
 | E4, le jardin et sa serre | deux fauteuils dans la serre, trois tables pour quatre sous le tilleul: 14 places | la fête finale, les familles l'été |
+| E5, le second rang de terrasse | quatre tables de plus sur le boulevard: 8 places | les jours de marché |
 
-Au maximum, une tablette de quatre tabourets s'ajoute contre les meubles à graines. Un second rang de terrasse (8 places) attend la décision de l'architecte sur la foule lointaine.
+Au maximum, une tablette de quatre tabourets s'ajoute contre les meubles à graines.
 
-**Capacité.** À l'arrivée 41 à l'intérieur et 12 dehors; au maximum 62 et 26. Six employés à l'arrivée, dix au maximum. Présents au pire 104 (plafond C2: 120), sans compter sur un taux d'occupation.
+**Capacité.** À l'arrivée 41 à l'intérieur et 12 dehors; au maximum 62 et 34. Six employés à l'arrivée, dix au maximum. Présents au pire 112 (plafond C2: 120), sans compter sur un taux d'occupation.
 
 **Circulation.** Clients: la porte du boulevard; la file à emporter (4 places) jusqu'à la caisse; la halle par les arches, où un employé place les clients; l'étage par l'escalier; le jardin par le couloir du fond, qui passe devant les toilettes. Joueurs et employés: la zone de travail de la boutique et son monte-plats, l'office de la halle, la cuisine et le laboratoire derrière, la réserve. Livraisons: le portail du passage, la porte de la réserve.
 
@@ -368,7 +369,7 @@ Au maximum, une tablette de quatre tabourets s'ajoute contre les meubles à grai
 | `bourg`, Mérelles | le four et les fournées, le service à table au loin (la remise), le jour de marché, les gros meubles portés à deux | 21 + 18 | 2 | 6 h |
 | `ville`, Montaurel | deux salles et deux comptoirs, les employés, le brunch et sa cuisine, le café de spécialité; le village devient une succursale | 35 + 10 | 3 | 8 h |
 | `paris-quartier`, l'angle des Plumassiers | le flux du métro, le zinc debout, l'équipe complète, la cave et la trappe, la terrasse parisienne, plusieurs cafés à suivre | 29 + 16 | 4 | 7 h |
-| `paris-maison`, la Graineterie | deux niveaux, la torréfaction, le laboratoire, les salons, le jardin, la maison au complet | 62 + 26 | 5 | 10 h |
+| `paris-maison`, la Graineterie | deux niveaux, la torréfaction, le laboratoire, les salons, le jardin, la maison au complet | 62 + 34 | 5 | 10 h |
 | **Total** | | | | **35 h** |
 
 Les durées sont des ordres de grandeur pour un duo médian; le game designer les fixe par simulation (cadrage, 4.10).
@@ -391,13 +392,13 @@ Les durées sont des ordres de grandeur pour un duo médian; le game designer le
 | Bourg | 37 | 48 sur 48 | 63 sur 120 | salle et laboratoire (par la vitre), couloir, cour, remise |
 | Ville | 28 | 63 sur 72 | 68 sur 200 | boutique, atelier, coin lecture (derrière les casses), cuisine, cour |
 | Café d'angle | 34 | 58 sur 80 | 73 sur 180 | salle, salle du fond (portes pleines), cave, terrasse (brise-bise) |
-| Graineterie | 36 | 104 sur 120 | 125 sur 350 | boutique, halle ouest et halle est (meubles à graines), laboratoire (allège), cuisine, étage (cage d'escalier), jardin |
+| Graineterie | 36 | 112 sur 120 | 137 sur 350 | boutique, halle ouest et halle est (meubles à graines), laboratoire (allège), cuisine, étage (cage d'escalier), jardin |
 
-Les meubles dessinés ne comptent ni la décoration ni les luminaires: le reste du plafond C6 est pour eux. Au plus 49 meubles dessinés sont visibles d'un même point (plafond: 150).
+Les meubles dessinés ne comptent ni la décoration ni les luminaires: le reste du plafond C6 est pour eux. Depuis les points de vue déclarés, au plus 49 meubles dessinés sont visibles à la fois (plafond: 150).
 
 ### 6.3 Ce qui limite les terrasses
 
-Une grande vitrine sur une terrasse pleine additionne deux salles (`technique.md`, section 4.4). Deux parades tiennent les plans sous 40: le brise-bise (Paris) et la vitrine garnie (Graineterie). Mais vues depuis le trottoir, une terrasse de deux rangs et les passants dépassent 40 personnages: jusqu'à 56 à l'angle des Plumassiers, sur un premier essai. Les terrasses parisiennes sont donc d'un rang dans ces plans (16 places à l'angle, 12 à la Graineterie), et le second rang est dessiné en pointillés. Si l'architecte retient l'option B pour la foule lointaine (personnages cuits dans une texture, au-delà d'une distance), le second rang revient: 10 places de plus à l'angle, 8 à la Graineterie.
+Une grande vitrine sur une terrasse pleine additionne deux salles (`technique.md`, section 4.4). Deux parades tiennent les plans sous 40: le brise-bise (café d'angle) et la vitrine garnie (Graineterie). À la Graineterie, elles suffisent pour deux rangs de terrasse (20 places, 36 personnages au pire). À l'angle des Plumassiers, la terrasse court sur deux rues et se voit d'un seul coup depuis le coin du trottoir: avec un second rang, 42 personnages au pire (mesure du validateur, le second rang ajouté en mémoire). La terrasse de l'angle reste donc d'un rang (16 places), et le second rang est dessiné en pointillés. Si l'architecte retient l'option B pour la foule lointaine (personnages cuits dans une texture, au-delà d'une distance), il revient: 10 places de plus.
 
 ## 7. Validation
 
@@ -411,7 +412,7 @@ Sortie complète en annexe; résultat le 2026-11-07: 0 erreur sur les dix plans,
 
 - **Ville**: 165 m² au lieu de 120 à 150 m², à cause des services (35 m²) qu'exigent deux salles et des employés; places dans la fourchette (35).
 - **Café d'angle**: 29 places assises au lieu de 30 à 36, plus 3 ou 4 debout au zinc; une table de plus fermerait l'allée de 1,20 m ou la porte de la terrasse.
-- **Terrasses parisiennes**: un rang au lieu d'une « grande terrasse » (section 6.3), en attendant la décision de l'architecte.
+- **Terrasse du café d'angle**: un rang au lieu d'une « grande terrasse » (section 6.3), en attendant la décision de l'architecte.
 - **Village et bourg** sont pile au plafond C2 au maximum (24 et 48): un employé de plus au village, ou une place de file de plus au bourg, demanderaient un taux d'occupation ou un plafond relevé.
 - **Étage de la Graineterie**: une seule cage d'escalier pour 17 places; une seconde issue (escalier de service, passerelle sur le passage) est à étudier avec l'architecte si l'étage dépasse 19 personnes.
 - **Vue d'un niveau à l'autre**: le validateur ne compte pas ce qu'on voit d'un étage par une fenêtre (la terrasse en plongée depuis les salons); les portes-fenêtres de l'étage ont des voilages, et rien ne s'ouvre en mezzanine.
@@ -420,5 +421,218 @@ Sortie complète en annexe; résultat le 2026-11-07: 0 erreur sur les dix plans,
 ## Annexe: sortie du validateur (2026-11-07)
 
 ```text
-SORTIE_DU_VALIDATEUR
+== village-arrivee: Ormeval, le Café de la place, à l'arrivée
+  places dessinées: 8 à l'intérieur, 2 dehors (annoncées: 8 et 2)
+  présents au pire: 16 (10 places, 4 en file, 0 employés, 2 joueurs; C2: 24)
+  meubles dessinés: 18; il en reste 42 pour la décoration (C6: 60)
+  file « comptoir »: caisse à 6,5 m de marche de l'entrée la plus proche
+  10/10 places atteintes par 0,90 m; la plus lointaine à 9,1 m d'une entrée (salle)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  10 personnes au plus à l'intérieur: 1 sortie(s)
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  7/7 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 10,3 m du comptoir (terrasse)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « comptoir »: 4 personnes sur 2,10 m, hors des zones de travail
+  grille de 84 points jouables (un par mètre): au pire 17 personnages dans le champ, en (10,5 ; 7,5) du niveau rdc
+  vue « caisse »; client, file (4 places) et porte d'un seul regard: 14 degrés sur 100; foule au pire 17 dans le champ (regard vers le sud), 17 en se retournant; 12 meubles dessinés en vue
+  vue « machine »; porte à 3 degrés de l'axe de travail; foule au pire 16 dans le champ (regard vers le sud), 17 en se retournant; 12 meubles dessinés en vue
+  vue « entrée »; foule au pire 13 dans le champ (regard vers le ouest), 18 en se retournant; 13 meubles dessinés en vue
+  0 erreur(s)
+== village-maximum: Ormeval, le Café de la place, agrandi au maximum
+  places dessinées: 12 à l'intérieur, 6 dehors (annoncées: 12 et 6)
+  présents au pire: 24 (18 places, 4 en file, 0 employés, 2 joueurs; C2: 24)
+  meubles dessinés: 31; il en reste 29 pour la décoration (C6: 60)
+  file « comptoir »: caisse à 6,5 m de marche de l'entrée la plus proche
+  18/18 places atteintes par 0,90 m; la plus lointaine à 13,1 m d'une entrée (fond)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  14 personnes au plus à l'intérieur: 1 sortie(s)
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  7/7 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 10,8 m du comptoir (terrasse)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « comptoir »: 4 personnes sur 2,10 m, hors des zones de travail
+  grille de 83 points jouables (un par mètre): au pire 21 personnages dans le champ, en (7,5 ; 15,5) du niveau rdc
+  vue « caisse »; client, file (4 places) et porte d'un seul regard: 14 degrés sur 100; foule au pire 19 dans le champ (regard vers le sud), 19 en se retournant; 15 meubles dessinés en vue
+  vue « machine »; porte à 3 degrés de l'axe de travail; foule au pire 19 dans le champ (regard vers le sud), 20 en se retournant; 17 meubles dessinés en vue
+  vue « entrée »; foule au pire 14 dans le champ (regard vers le ouest), 20 en se retournant; 15 meubles dessinés en vue
+  0 erreur(s)
+== bourg-arrivee: Mérelles, la boutique de la place de la Halle, à l'arrivée
+  places dessinées: 11 à l'intérieur, 0 dehors (annoncées: 11 et 0)
+  présents au pire: 19 (11 places, 6 en file, 0 employés, 2 joueurs; C2: 48)
+  meubles dessinés: 25; il en reste 95 pour la décoration (C6: 120)
+  file « comptoir »: caisse à 8,1 m de marche de l'entrée la plus proche
+  11/11 places atteintes par 0,90 m; la plus lointaine à 9,3 m d'une entrée (salle)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  13 personnes au plus à l'intérieur: 1 sortie(s)
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  13/13 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 8,3 m du comptoir (salle)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « comptoir »: 6 personnes sur 3,30 m, hors des zones de travail
+  grille de 102 points jouables (un par mètre): au pire 25 personnages dans le champ, en (3,5 ; 14,5) du niveau rdc
+  vue « caisse »; client, file (6 places) et porte d'un seul regard: 11 degrés sur 100; foule au pire 25 dans le champ (regard vers le nord-est), 25 en se retournant; 18 meubles dessinés en vue
+  vue « machine »; porte à 15 degrés de l'axe de travail; foule au pire 24 dans le champ (regard vers le est), 26 en se retournant; 22 meubles dessinés en vue
+  vue « fond de salle »; foule au pire 25 dans le champ (regard vers le sud-est), 27 en se retournant; 21 meubles dessinés en vue
+  vue « couloir »; foule au pire 9 dans le champ (regard vers le nord-est), 9 en se retournant; 7 meubles dessinés en vue
+  0 erreur(s)
+== bourg-maximum: Mérelles, la boutique de la place de la Halle, agrandie au maximum
+  places dessinées: 21 à l'intérieur, 18 dehors (annoncées: 21 et 18)
+  présents au pire: 48 (39 places, 6 en file, 1 employés, 2 joueurs; C2: 48)
+  meubles dessinés: 63; il en reste 57 pour la décoration (C6: 120)
+  file « comptoir »: caisse à 8,1 m de marche de l'entrée la plus proche
+  39/39 places atteintes par 0,90 m; la plus lointaine à 34,7 m d'une entrée (remise)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  24 personnes au plus à l'intérieur: 2 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  13/13 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 28,1 m du comptoir (remise)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « comptoir »: 6 personnes sur 3,30 m, hors des zones de travail
+  grille de 76 points jouables (un par mètre): au pire 37 personnages dans le champ, en (2,5 ; 18,5) du niveau rdc
+  vue « caisse »; client, file (6 places) et porte d'un seul regard: 11 degrés sur 100; foule au pire 37 dans le champ (regard vers le nord-est), 38 en se retournant; 32 meubles dessinés en vue
+  vue « machine »; porte à 15 degrés de l'axe de travail; foule au pire 36 dans le champ (regard vers le est), 45 en se retournant; 42 meubles dessinés en vue
+  vue « fond de salle »; foule au pire 35 dans le champ (regard vers le sud-est), 38 en se retournant; 34 meubles dessinés en vue
+  vue « couloir »; foule au pire 13 dans le champ (regard vers le nord-est), 14 en se retournant; 14 meubles dessinés en vue
+  vue « remise »; foule au pire 16 dans le champ (regard vers le sud-est), 24 en se retournant; 19 meubles dessinés en vue
+  vue « cour »; foule au pire 17 dans le champ (regard vers le sud), 28 en se retournant; 31 meubles dessinés en vue
+  vue « terrasse »; foule au pire 32 dans le champ (regard vers le nord-ouest), 37 en se retournant; 37 meubles dessinés en vue
+  0 erreur(s)
+== ville-arrivee: Montaurel, l'Imprimerie, à l'arrivée
+  places dessinées: 23 à l'intérieur, 4 dehors (annoncées: 23 et 4)
+  présents au pire: 42 (27 places, 11 en file, 2 employés, 2 joueurs; C2: 72)
+  meubles dessinés: 49; il en reste 151 pour la décoration (C6: 200)
+  file « boutique »: caisse à 6,6 m de marche de l'entrée la plus proche
+  file « atelier »: caisse à 20,2 m de marche de l'entrée la plus proche
+  27/27 places atteintes par 0,90 m; la plus lointaine à 27,6 m d'une entrée (atelier)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  27 personnes au plus à l'intérieur: 2 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  19/19 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 25,3 m du comptoir (atelier)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « boutique »: 5 personnes sur 2,90 m, hors des zones de travail
+  file « atelier »: 6 personnes sur 3,15 m, hors des zones de travail
+  grille de 132 points jouables (un par mètre): au pire 25 personnages dans le champ, en (7,5 ; 15,5) du niveau rdc
+  vue « caisse de la boutique »; client, file (5 places) et porte d'un seul regard: 13 degrés sur 100; foule au pire 24 dans le champ (regard vers le sud-est), 24 en se retournant; 16 meubles dessinés en vue
+  vue « machine de la boutique »; porte à 9 degrés de l'axe de travail; foule au pire 22 dans le champ (regard vers le sud), 25 en se retournant; 17 meubles dessinés en vue
+  vue « caisse de l'atelier »; client, file (6 places) et porte d'un seul regard: 32 degrés sur 100; foule au pire 17 dans le champ (regard vers le sud), 18 en se retournant; 10 meubles dessinés en vue
+  vue « machine de l'atelier »; porte à 33 degrés de l'axe de travail; foule au pire 17 dans le champ (regard vers le sud), 18 en se retournant; 10 meubles dessinés en vue
+  vue « porte de l'atelier »; foule au pire 19 dans le champ (regard vers le ouest), 24 en se retournant; 14 meubles dessinés en vue
+  vue « couloir »; foule au pire 3 dans le champ (regard vers le nord), 3 en se retournant; 1 meubles dessinés en vue
+  vue « cour »; foule au pire 4 dans le champ (regard vers le nord), 7 en se retournant; 2 meubles dessinés en vue
+  vue « trottoir »; foule au pire 18 dans le champ (regard vers le nord), 25 en se retournant; 16 meubles dessinés en vue
+  0 erreur(s)
+== ville-maximum: Montaurel, l'Imprimerie, agrandie au maximum
+  places dessinées: 35 à l'intérieur, 10 dehors (annoncées: 35 et 10)
+  présents au pire: 63 (45 places, 11 en file, 5 employés, 2 joueurs; C2: 72)
+  meubles dessinés: 68; il en reste 132 pour la décoration (C6: 200)
+  file « boutique »: caisse à 6,6 m de marche de l'entrée la plus proche
+  file « atelier »: caisse à 20,2 m de marche de l'entrée la plus proche
+  45/45 places atteintes par 0,90 m; la plus lointaine à 27,6 m d'une entrée (atelier)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  42 personnes au plus à l'intérieur: 2 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  25/25 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 14,2 m du comptoir (atelier)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « boutique »: 5 personnes sur 2,90 m, hors des zones de travail
+  file « atelier »: 6 personnes sur 3,15 m, hors des zones de travail
+  grille de 134 points jouables (un par mètre): au pire 28 personnages dans le champ, en (5,5 ; 2,5) du niveau rdc
+  vue « caisse de la boutique »; client, file (5 places) et porte d'un seul regard: 13 degrés sur 100; foule au pire 24 dans le champ (regard vers le sud-est), 24 en se retournant; 16 meubles dessinés en vue
+  vue « machine de la boutique »; porte à 9 degrés de l'axe de travail; foule au pire 22 dans le champ (regard vers le sud), 25 en se retournant; 17 meubles dessinés en vue
+  vue « caisse de l'atelier »; client, file (6 places) et porte d'un seul regard: 32 degrés sur 100; foule au pire 25 dans le champ (regard vers le sud-est), 36 en se retournant; 31 meubles dessinés en vue
+  vue « machine de l'atelier »; porte à 33 degrés de l'axe de travail; foule au pire 26 dans le champ (regard vers le sud-est), 34 en se retournant; 29 meubles dessinés en vue
+  vue « porte de l'atelier »; foule au pire 26 dans le champ (regard vers le nord-ouest), 42 en se retournant; 35 meubles dessinés en vue
+  vue « couloir »; foule au pire 8 dans le champ (regard vers le est), 9 en se retournant; 8 meubles dessinés en vue
+  vue « cour »; foule au pire 20 dans le champ (regard vers le nord-est), 24 en se retournant; 23 meubles dessinés en vue
+  vue « trottoir »; foule au pire 18 dans le champ (regard vers le nord), 25 en se retournant; 16 meubles dessinés en vue
+  0 erreur(s)
+== paris-quartier-arrivee: Paris, le café de l'angle des Plumassiers, à l'arrivée
+  places dessinées: 18 à l'intérieur, 6 dehors (annoncées: 18 et 6)
+  présents au pire: 35 (24 places, 5 en file, 4 employés, 2 joueurs; C2: 80)
+  meubles dessinés: 41; il en reste 139 pour la décoration (C6: 180)
+  file « zinc »: caisse à 6,3 m de marche de l'entrée la plus proche
+  24/24 places atteintes par 0,90 m; la plus lointaine à 10,7 m d'une entrée (salle)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  24 personnes au plus à l'intérieur: 2 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  12/12 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 18,3 m du comptoir (terrasse)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « zinc »: 5 personnes sur 2,40 m, hors des zones de travail
+  grille de 150 points jouables (un par mètre): au pire 33 personnages dans le champ, en (15,5 ; 4,5) du niveau rdc
+  vue « caisse »; client, file (5 places) et porte d'un seul regard: 6 degrés sur 100; foule au pire 33 dans le champ (regard vers le sud), 35 en se retournant; 34 meubles dessinés en vue
+  vue « machine »; porte à 45 degrés de l'axe de travail; foule au pire 30 dans le champ (regard vers le sud-est), 35 en se retournant; 36 meubles dessinés en vue
+  vue « milieu de la salle »; foule au pire 23 dans le champ (regard vers le est), 36 en se retournant; 36 meubles dessinés en vue
+  vue « terrasse »; foule au pire 17 dans le champ (regard vers le nord), 23 en se retournant; 27 meubles dessinés en vue
+  0 erreur(s)
+== paris-quartier-maximum: Paris, le café de l'angle des Plumassiers, agrandi au maximum
+  places dessinées: 29 à l'intérieur, 16 dehors (annoncées: 29 et 16)
+  présents au pire: 58 (45 places, 5 en file, 6 employés, 2 joueurs; C2: 80)
+  meubles dessinés: 73; il en reste 107 pour la décoration (C6: 180)
+  file « zinc »: caisse à 6,3 m de marche de l'entrée la plus proche
+  45/45 places atteintes par 0,90 m; la plus lointaine à 17,7 m d'une entrée (salle du fond)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  37 personnes au plus à l'intérieur: 3 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  12/12 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 22,8 m du comptoir (terrasse des Coudriers)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « zinc »: 5 personnes sur 2,40 m, hors des zones de travail
+  grille de 151 points jouables (un par mètre): au pire 34 personnages dans le champ, en (6,5 ; 6,5) du niveau rdc
+  vue « caisse »; client, file (5 places) et porte d'un seul regard: 6 degrés sur 100; foule au pire 34 dans le champ (regard vers le sud), 36 en se retournant; 40 meubles dessinés en vue
+  vue « machine »; porte à 45 degrés de l'axe de travail; foule au pire 30 dans le champ (regard vers le sud-est), 36 en se retournant; 42 meubles dessinés en vue
+  vue « milieu de la salle »; foule au pire 23 dans le champ (regard vers le est), 37 en se retournant; 43 meubles dessinés en vue
+  vue « terrasse »; foule au pire 18 dans le champ (regard vers le nord), 28 en se retournant; 33 meubles dessinés en vue
+  vue « salle du fond »; foule au pire 9 dans le champ (regard vers le sud-ouest), 16 en se retournant; 22 meubles dessinés en vue
+  0 erreur(s)
+== paris-maison-arrivee: Paris, la Graineterie du boulevard des Horticulteurs, à l'arrivée
+  places dessinées: 41 à l'intérieur, 12 dehors (annoncées: 41 et 12)
+  présents au pire: 65 (53 places, 4 en file, 6 employés, 2 joueurs; C2: 120)
+  meubles dessinés: 78; il en reste 272 pour la décoration (C6: 350)
+  file « boutique »: caisse à 7,4 m de marche de l'entrée la plus proche
+  53/53 places atteintes par 0,90 m; la plus lointaine à 19,8 m d'une entrée (halle)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  49 personnes au plus à l'intérieur: 2 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  20/20 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 14,6 m du comptoir (terrasse)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « boutique »: 4 personnes sur 2,10 m, hors des zones de travail
+  grille de 318 points jouables (un par mètre): au pire 32 personnages dans le champ, en (15,5 ; 11,5) du niveau rdc
+  vue « caisse de la boutique »; client, file (4 places) et porte d'un seul regard: 17 degrés sur 100; foule au pire 16 dans le champ (regard vers le sud), 26 en se retournant; 24 meubles dessinés en vue
+  vue « machine de la boutique »; porte à 3 degrés de l'axe de travail; foule au pire 17 dans le champ (regard vers le sud), 22 en se retournant; 13 meubles dessinés en vue
+  vue « office de la halle »; foule au pire 22 dans le champ (regard vers le sud-est), 40 en se retournant; 45 meubles dessinés en vue
+  vue « halle ouest »; foule au pire 19 dans le champ (regard vers le nord), 35 en se retournant; 33 meubles dessinés en vue
+  vue « halle est »; foule au pire 20 dans le champ (regard vers le nord), 35 en se retournant; 30 meubles dessinés en vue
+  vue « terrasse »; foule au pire 11 dans le champ (regard vers le nord-est), 22 en se retournant; 19 meubles dessinés en vue
+  vue « palier »; foule au pire 2 dans le champ (regard vers le nord), 2 en se retournant; 0 meubles dessinés en vue
+  0 erreur(s)
+== paris-maison-maximum: Paris, la Graineterie du boulevard des Horticulteurs, la maison au complet
+  places dessinées: 62 à l'intérieur, 34 dehors (annoncées: 62 et 34)
+  présents au pire: 112 (96 places, 4 en file, 10 employés, 2 joueurs; C2: 120)
+  meubles dessinés: 137; il en reste 213 pour la décoration (C6: 350)
+  file « boutique »: caisse à 7,4 m de marche de l'entrée la plus proche
+  96/96 places atteintes par 0,90 m; la plus lointaine à 36,4 m d'une entrée (serre)
+  allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine
+  74 personnes au plus à l'intérieur: 2 sorties éloignées
+  aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel
+  26/26 postes atteints par les joueurs par des passages de 0,90 m
+  service: place la plus lointaine à 27,7 m du comptoir (serre)
+  livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m
+  file « boutique »: 4 personnes sur 2,10 m, hors des zones de travail
+  grille de 254 points jouables (un par mètre): au pire 36 personnages dans le champ, en (15,5 ; 11,5) du niveau rdc
+  vue « caisse de la boutique »; client, file (4 places) et porte d'un seul regard: 17 degrés sur 100; foule au pire 16 dans le champ (regard vers le sud), 27 en se retournant; 24 meubles dessinés en vue
+  vue « machine de la boutique »; porte à 3 degrés de l'axe de travail; foule au pire 17 dans le champ (regard vers le sud), 22 en se retournant; 13 meubles dessinés en vue
+  vue « office de la halle »; foule au pire 26 dans le champ (regard vers le sud-est), 45 en se retournant; 49 meubles dessinés en vue
+  vue « halle ouest »; foule au pire 21 dans le champ (regard vers le nord), 38 en se retournant; 33 meubles dessinés en vue
+  vue « halle est »; foule au pire 23 dans le champ (regard vers le nord), 39 en se retournant; 35 meubles dessinés en vue
+  vue « terrasse »; foule au pire 15 dans le champ (regard vers le nord-est), 31 en se retournant; 31 meubles dessinés en vue
+  vue « jardin »; foule au pire 13 dans le champ (regard vers le nord), 17 en se retournant; 18 meubles dessinés en vue
+  vue « palier »; foule au pire 14 dans le champ (regard vers le sud-ouest), 14 en se retournant; 13 meubles dessinés en vue
+  vue « grand salon »; foule au pire 14 dans le champ (regard vers le sud), 19 en se retournant; 20 meubles dessinés en vue
+  vue « petit salon »; foule au pire 17 dans le champ (regard vers le sud-ouest), 21 en se retournant; 23 meubles dessinés en vue
+  0 erreur(s)
+Total: 0 erreur(s)
 ```
