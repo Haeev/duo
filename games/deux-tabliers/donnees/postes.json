@@ -1,0 +1,22 @@
+{
+  "stations": [
+    {
+      "id": "machine",
+      "label": "Machine à espresso",
+      "verb": "Faire un espresso",
+      "use": "hold",
+      "seconds": 1.5,
+      "slot": "bec",
+      "transforms": [{ "from": "tasse", "to": "tasse-espresso" }]
+    },
+    {
+      "id": "plonge",
+      "label": "Plonge",
+      "verb": "Laver la tasse",
+      "use": "click",
+      "seconds": 0,
+      "slot": "bac",
+      "transforms": [{ "from": "tasse-sale", "to": "tasse" }]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "objects": [
+    {
+      "id": "tasse",
+      "label": "Tasse",
+      "model": "tasse",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#f2ece0",
+      "tray": null
+    },
+    {
+      "id": "tasse-espresso",
+      "label": "Espresso",
+      "model": "tasse-espresso",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#6b3e1f",
+      "tray": null
+    },
+    {
+      "id": "tasse-sale",
+      "label": "Tasse sale",
+      "model": "tasse-sale",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#a89a80",
+      "tray": null
+    },
+    {
+      "id": "plateau",
+      "label": "Plateau",
+      "model": "plateau",
+      "size": [0.4, 0.3, 0.02],
+      "color": "#8c6b4a",
+      "tray": { "places": 4 }
+    }
+  ]
+}

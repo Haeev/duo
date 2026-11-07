@@ -11,6 +11,27 @@ export interface InputHooks {
   onEscape(): void;
   /** Vrai quand Échap appartient à un champ du SDK (carnet de séance ouvert): ni pause ni appui. */
   escapeTaken?(): boolean;
+  /**
+   * Pointeur rendu sans que le jeu l'ait demandé, fenêtre visible et active: c'est l'Échap que
+   * Chromium avale pour rendre la souris (technique de Deux Tabliers, section 2.2).
+   */
+  onPointerEscape?(): void;
+}
+
+/** Ce qu'on sait d'un déverrouillage du pointeur, une image après l'événement. */
+export interface UnlockFacts {
+  /** Le jeu l'a demandé (`unlockPointer`). */
+  readonly requested: boolean;
+  readonly visible: boolean;
+  readonly focused: boolean;
+}
+
+/**
+ * Un déverrouillage involontaire, page visible et document actif, vaut Échap; avec perte du focus
+ * (Alt+Tab, Cmd+Tab, notification), ce n'est pas une pause (ADR 0004, point 4).
+ */
+export function unlockMeansEscape(facts: UnlockFacts): boolean {
+  return !facts.requested && facts.visible && facts.focused;
 }
 
 export interface InputInternal<TAction extends string> extends Input<TAction> {
@@ -133,8 +154,24 @@ export function createInput<TAction extends string>(
   const onVisibility = (): void => {
     if (document.visibilityState === 'hidden') releaseAll();
   };
+  // Vrai entre `unlockPointer` et l'événement qui le confirme.
+  let unlockRequested = false;
   const onLockChange = (): void => {
+    const wasLocked = pointer.locked;
     pointer.locked = document.pointerLockElement !== null;
+    if (!wasLocked || pointer.locked) return;
+    const requested = unlockRequested;
+    unlockRequested = false;
+    // L'ordre de `blur` et de `pointerlockchange` varie: on décide une image plus tard,
+    // quand `document.hasFocus()` est fixé.
+    requestAnimationFrame(() => {
+      const facts: UnlockFacts = {
+        requested,
+        visible: document.visibilityState === 'visible',
+        focused: document.hasFocus(),
+      };
+      if (unlockMeansEscape(facts)) hooks.onPointerEscape?.();
+    });
   };
 
   if (hasDom) {
@@ -181,7 +218,9 @@ export function createInput<TAction extends string>(
       void target?.requestPointerLock();
     },
     unlockPointer() {
-      if (hasDom && document.pointerLockElement !== null) document.exitPointerLock();
+      if (!hasDom || document.pointerLockElement === null) return;
+      unlockRequested = true;
+      document.exitPointerLock();
     },
     keyLabel: (code) => keyLabel(code, layout),
     actionLabel: firstLabel,
