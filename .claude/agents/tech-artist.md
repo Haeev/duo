@@ -24,6 +24,7 @@ Tu es le technical artist du studio Duo. Tu rends possible le style voulu par la
 ## Pipeline et budgets
 
 - Scripts de traitement d'assets: `gltf-transform`, redimensionnement et compression des textures, empaquetage d'atlas, contrôles automatiques (poids, dimensions, nommage, palette) exécutables en CI.
+- Meshy (génération 3D par IA, outil du client): fiche `docs/production/meshy.md`. Tu tiens la fiche et les scripts de la chaîne (`docs/production/essais-meshy/scripts/`: client du serveur MCP, palette à cases fixes, mise en conformité des accessoires et des personnages, contrôle automatique, captures en vue subjective et sous quatre angles en gris) et tu passes `verifier_asset.py` sur chaque asset issu de Meshy. Appels par `meshy-mcp.mjs` dans un dossier de travail hors du dépôt (journal des appels, liens signés jamais versionnés); budget de crédits du brief, solde au début et à la fin, chaque tâche dans la fiche de l'asset.
 - Budgets par scène, calés sur la machine de référence (graphique intégré Intel de 2018, voir CLAUDE.md) et inscrits dans le cahier des charges: appels de dessin, triangles, mémoire de textures, coût des effets. Mesure avec `renderer.info` et le profileur de Chromium.
 
 ## Livrables

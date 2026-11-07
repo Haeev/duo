@@ -402,7 +402,7 @@ Une grande vitrine sur une terrasse pleine additionne deux salles (`technique.md
 
 ## 7. Validation
 
-- `python3 -I docs/jeux/cosy-cafe/plans/construire_plans.py` recompose les dix plans, réécrit `plans.json`, les SVG et les PNG (rsvg-convert; `--sans-png` s'il manque). Ne jamais retoucher `plans.json` à la main: il se régénère.
+- `python3 -I docs/jeux/cosy-cafe/plans/construire_plans.py` recompose les dix plans, réécrit `plans.json` (un élément par ligne), les SVG et les PNG (rsvg-convert, puis ImageMagick en 256 couleurs; `--sans-png` si rsvg-convert manque). Deux passes donnent les mêmes fichiers à l'octet. Ne jamais retoucher `plans.json` à la main: il se régénère.
 - `python3 -I docs/jeux/cosy-cafe/plans/valider_plans.py` contrôle `plans.json` (raster de 5 cm): capacité annoncée égale à la capacité dessinée; plafonds C2, C4, C5, C6 et C17; passages de 0,90 m vers la caisse, la passe, chaque place, les toilettes et les sorties; allée principale de 1,20 m à côté de la file pleine; livraisons et meubles portés à deux par 1,20 m; seconde sortie; aucune fuite d'un client mince (0,50 m) dans une zone de travail ou un local du personnel; postes, réserve et livraison atteints par les joueurs; files (porte, caisse, longueur, hors des zones de travail); passages à garder libres; largeur des portes et des escaliers; regard de la caisse et du barista; foule (C1, C3) depuis chaque point de vue et chaque point jouable. Options: `--plan <id>`, `--sans-grille`. Code de sortie 0 sans erreur.
 - `python3 -I docs/jeux/cosy-cafe/plans/eprouver_validateur.py` casse exprès une copie du village de huit façons (table dans la file, portillon ouvert aux clients, porte des toilettes de 0,80 m, étagère haute entre la caisse et la porte, capacité fausse, place enfermée, file derrière le comptoir, foule au-dessus du plafond) et vérifie que chaque faute est trouvée. Il a déjà servi: le contrôle de fuite et celui de la file derrière le comptoir ne pouvaient pas échouer avant lui.
 
@@ -413,7 +413,7 @@ Sortie complète en annexe; résultat le 2026-11-07: 0 erreur sur les dix plans,
 - **Ville**: 165 m² au lieu de 120 à 150 m², à cause des services (35 m²) qu'exigent deux salles et des employés; places dans la fourchette (35).
 - **Café d'angle**: 29 places assises au lieu de 30 à 36, plus 3 ou 4 debout au zinc; une table de plus fermerait l'allée de 1,20 m ou la porte de la terrasse.
 - **Terrasse du café d'angle**: un rang au lieu d'une « grande terrasse » (section 6.3), en attendant la décision de l'architecte.
-- **Village et bourg** sont pile au plafond C2 au maximum (24 et 48): un employé de plus au village, ou une place de file de plus au bourg, demanderaient un taux d'occupation ou un plafond relevé.
+- **Village et bourg** sont pile au plafond C2 au maximum (24 et 48): un employé de plus (au village, ou un second coup de main les jours de marché au bourg) demanderait un taux d'occupation inférieur à 100 % ou un plafond relevé.
 - **Étage de la Graineterie**: une seule cage d'escalier pour 17 places; une seconde issue (escalier de service, passerelle sur le passage) est à étudier avec l'architecte si l'étage dépasse 19 personnes.
 - **Vue d'un niveau à l'autre**: le validateur ne compte pas ce qu'on voit d'un étage par une fenêtre (la terrasse en plongée depuis les salons); les portes-fenêtres de l'étage ont des voilages, et rien ne s'ouvre en mezzanine.
 - **Ascenseur de la Graineterie**: à prévoir dans la cage de l'escalier (cabine de 1,10 x 1,40 m) pour les fauteuils et les poussettes; non dessiné.

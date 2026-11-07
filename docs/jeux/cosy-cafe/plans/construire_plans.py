@@ -2387,6 +2387,19 @@ def legend_notes(plan):
 # Sorties
 # =====================================================================================
 
+def dump_json(obj, depth=0):
+    """JSON lisible en diff: un élément, une zone ou un point par ligne, le reste indenté."""
+    compact = json.dumps(obj, ensure_ascii=False, separators=(", ", ": "))
+    if not isinstance(obj, (dict, list)) or depth >= 6 or len(compact) <= 100:
+        return compact
+    pad, inner = " " * depth, " " * (depth + 1)
+    if isinstance(obj, dict):
+        items = [f'{inner}{json.dumps(k, ensure_ascii=False)}: {dump_json(v, depth + 1)}' for k, v in obj.items()]
+        return "{\n" + ",\n".join(items) + "\n" + pad + "}"
+    items = [inner + dump_json(v, depth + 1) for v in obj]
+    return "[\n" + ",\n".join(items) + "\n" + pad + "]"
+
+
 def main(argv):
     plans = []
     for fn in ADDRESSES:
@@ -2394,11 +2407,12 @@ def main(argv):
             plans.append(fn(state).export())
     data = {"format": "cosy-cafe-plans", "version": 1, "unit": "m", "norms": NORMS, "plans": plans}
     with open(os.path.join(HERE, "plans.json"), "w", encoding="utf-8", newline="\n") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
+        f.write(dump_json(data))
         f.write("\n")
     with open(os.path.join(HERE, "plans.json"), encoding="utf-8") as f:
         data = json.load(f)
     rsvg = shutil.which("rsvg-convert") if "--sans-png" not in argv else None
+    magick = shutil.which("convert")  # ImageMagick: PNG en 256 couleurs, trois fois plus léger
     for plan in data["plans"]:
         svg = draw_plan(plan)
         path = os.path.join(HERE, plan["id"] + ".svg")
@@ -2406,7 +2420,10 @@ def main(argv):
             f.write(svg)
             f.write("\n")
         if rsvg:
-            subprocess.run([rsvg, "-o", os.path.join(HERE, plan["id"] + ".png"), path], check=True)
+            png = os.path.join(HERE, plan["id"] + ".png")
+            subprocess.run([rsvg, "-o", png, path], check=True)
+            if magick:
+                subprocess.run([magick, png, "-strip", "-colors", "256", "PNG8:" + png], check=True)
     print(f"{len(data['plans'])} plans écrits dans {HERE}" + (" (SVG et PNG)" if rsvg else " (SVG)"))
     return 0
 

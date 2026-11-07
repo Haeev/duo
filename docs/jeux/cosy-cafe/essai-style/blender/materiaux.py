@@ -69,6 +69,7 @@ CLES = {
     "linen": "linen",
     "kraft": "kraft",
     "glass": "glass",
+    "glass_ext": "glass",
     "alert": "alert",
     "alert_ink": "alert_ink",
     "player_on": "player_on",

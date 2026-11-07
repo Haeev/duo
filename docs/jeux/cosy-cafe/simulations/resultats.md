@@ -1,6 +1,6 @@
 # Cosy Café (titre de travail): résultats de la simulation
 
-<!-- empreinte:3bca446691ba -->
+<!-- empreinte:4d4995c8a570 -->
 Fichier écrit par `docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats` (bibliothèque standard de Python, graines fixes). 40 parties par duo; chaque journée ouverte de chaque partie est jouée client par client. Ne pas retoucher à la main: relancer le script, puis `--croise` sur le cahier.
 
 ## Méthode
@@ -14,9 +14,9 @@ Fichier écrit par `docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats` (b
 <!-- table:res_progression -->
 | Duo | Arrivée au bourg | En ville | À Paris (quartier) | À la maison parisienne | Fête de la maison | Parties finies |
 |---|---|---|---|---|---|---|
-| Duo tranquille | jour 36 [29-36], 11,7 h [9,4-11,8] | jour 64 [57-64], 21,6 h [19,3-21,7] | jour 92 [85-92], 31,9 h [29,7-32,2] | jour 120 [106-127], 42,8 h [38,1-45,5] | jour 155 [148-169], 56,2 h [53,1-61,1] | 40 sur 40 |
-| Duo médian | jour 22 [22-22], 5,8 h [5,7-5,8] | jour 43 [43-43], 11,9 h [11,9-12,0] | jour 64 [64-64], 18,4 h [18,3-18,5] | jour 85 [85-92], 25,4 h [25,1-27,6] | jour 120 [120-127], 36,4 h [36,0-38,6] | 40 sur 40 |
-| Duo rapide | jour 22 [22-22], 4,7 h [4,6-4,7] | jour 43 [43-43], 9,7 h [9,7-9,8] | jour 64 [64-64], 15,1 h [15,0-15,2] | jour 85 [78-85], 21,0 h [19,1-21,1] | jour 113 [106-120], 28,5 h [26,7-30,5] | 40 sur 40 |
+| Duo tranquille | jour 36 [29-36], 11,7 h [9,4-11,8] | jour 64 [57-64], 21,6 h [19,2-21,7] | jour 92 [85-92], 31,8 h [29,4-31,9] | jour 113 [106-120], 40,0 h [37,6-42,4] | jour 148 [141-155], 53,1 h [50,7-55,5] | 40 sur 40 |
+| Duo médian | jour 22 [22-22], 5,8 h [5,7-5,8] | jour 43 [43-50], 11,9 h [11,9-13,8] | jour 64 [64-71], 18,3 h [18,2-20,2] | jour 85 [85-92], 25,0 h [24,9-27,0] | jour 113 [113-120], 34,0 h [33,8-36,2] | 40 sur 40 |
+| Duo rapide | jour 22 [22-22], 4,7 h [4,6-4,7] | jour 43 [43-43], 9,8 h [9,7-9,8] | jour 64 [64-64], 15,0 h [15,0-15,1] | jour 85 [78-85], 20,7 h [18,9-20,8] | jour 113 [106-113], 28,3 h [26,4-28,4] | 40 sur 40 |
 
 Chaque arrivée tombe un lundi (on déménage le jour de fermeture): les écarts entre duos se comptent en semaines.
 
@@ -27,16 +27,16 @@ Chaque arrivée tombe un lundi (on déménage le jour de fermeture): les écarts
 |---|---|---|---|---|---|
 | Duo tranquille | village vers bourg | 0 % | 25 % | 75 % | 0 % |
 | Duo tranquille | bourg vers ville | 0 % | 0 % | 100 % | 0 % |
-| Duo tranquille | ville vers Paris, quartier | 92 % | 0 % | 8 % | 0 % |
-| Duo tranquille | Paris, quartier vers Paris, maison | 40 % | 0 % | 60 % | 0 % |
+| Duo tranquille | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
+| Duo tranquille | Paris, quartier vers Paris, maison | 30 % | 0 % | 70 % | 0 % |
 | Duo médian | village vers bourg | 80 % | 12 % | 8 % | 0 % |
-| Duo médian | bourg vers ville | 20 % | 0 % | 80 % | 0 % |
+| Duo médian | bourg vers ville | 18 % | 0 % | 82 % | 0 % |
 | Duo médian | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
-| Duo médian | Paris, quartier vers Paris, maison | 52 % | 5 % | 42 % | 0 % |
+| Duo médian | Paris, quartier vers Paris, maison | 80 % | 20 % | 0 % | 0 % |
 | Duo rapide | village vers bourg | 90 % | 10 % | 0 % | 0 % |
-| Duo rapide | bourg vers ville | 28 % | 55 % | 18 % | 0 % |
+| Duo rapide | bourg vers ville | 32 % | 57 % | 10 % | 0 % |
 | Duo rapide | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
-| Duo rapide | Paris, quartier vers Paris, maison | 38 % | 0 % | 62 % | 0 % |
+| Duo rapide | Paris, quartier vers Paris, maison | 68 % | 8 % | 25 % | 0 % |
 
 « Réputation » et « extension »: le défi attendait la réputation ou son lieu; « épargne »: le défi était fait, il manquait l'installation; « offre »: la lettre de l'adresse suivante n'était pas arrivée.
 
@@ -47,14 +47,14 @@ Chaque arrivée tombe un lundi (on déménage le jour de fermeture): les écarts
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | village | première semaine | 24 | 23 | 2 % | 33 s | 49 s | 76 | 58 % | 0 | 14 / 24 | 24 |
 | village | dernière semaine | 38 | 33 | 10 % | 44 s | 71 s | 79 | 77 % | 0 | 18 / 24 | 24 |
-| bourg | première semaine | 36 | 33 | 7 % | 41 s | 65 s | 73 | 73 % | 0 | 18 / 38 | 48 |
-| bourg | dernière semaine | 53 | 44 | 15 % | 56 s | 94 s | 73 | 81 % | 0 | 25 / 42 | 48 |
-| ville | première semaine | 63 | 48 | 22 % | 65 s | 108 s | 70 | 78 % | 0 | 28 / 41 | 72 |
-| ville | dernière semaine | 97 | 80 | 16 % | 84 s | 159 s | 67 | 80 % | 3 | 49 / 59 | 72 |
-| Paris, quartier | première semaine | 122 | 94 | 22 % | 66 s | 119 s | 69 | 74 % | 4 | 43 / 51 | 80 |
-| Paris, quartier | dernière semaine | 144 | 116 | 18 % | 66 s | 130 s | 69 | 72 % | 7 | 54 / 72 | 80 |
-| Paris, maison | première semaine | 148 | 129 | 11 % | 49 s | 81 s | 74 | 84 % | 5 | 56 / 76 | 120 |
-| Paris, maison | dernière semaine | 235 | 180 | 23 % | 100 s | 194 s | 77 | 84 % | 9 | 97 / 120 | 120 |
+| bourg | première semaine | 35 | 32 | 6 % | 40 s | 63 s | 72 | 72 % | 0 | 18 / 36 | 48 |
+| bourg | dernière semaine | 54 | 44 | 16 % | 59 s | 98 s | 73 | 82 % | 0 | 25 / 38 | 48 |
+| ville | première semaine | 63 | 48 | 22 % | 63 s | 102 s | 71 | 78 % | 0 | 27 / 38 | 72 |
+| ville | dernière semaine | 96 | 73 | 23 % | 65 s | 113 s | 69 | 79 % | 3 | 40 / 47 | 72 |
+| Paris, quartier | première semaine | 121 | 89 | 26 % | 60 s | 107 s | 70 | 74 % | 4 | 39 / 47 | 80 |
+| Paris, quartier | dernière semaine | 147 | 101 | 29 % | 70 s | 132 s | 68 | 75 % | 5 | 46 / 59 | 80 |
+| Paris, maison | première semaine | 144 | 130 | 8 % | 51 s | 88 s | 74 | 83 % | 6 | 61 / 78 | 120 |
+| Paris, maison | dernière semaine | 221 | 160 | 26 % | 110 s | 200 s | 75 | 83 % | 9 | 90 / 115 | 120 |
 
 Première semaine: gestes à la main, peu d'équipement; dernière semaine: machines achetées et, dès la ville, employés. Repartis: groupes qui n'entrent pas (file pleine, attente estimée trop longue, café complet).
 
@@ -64,10 +64,10 @@ Première semaine: gestes à la main, peu d'équipement; dernière semaine: mach
 | Adresse | Recettes | Pourboires | Matières | Loyer (lundi compris) | Salaires | Charges | Résultat | Succursales (en plus) |
 |---|---|---|---|---|---|---|---|---|
 | village | 197 € | 3 € | 43 € | 22 € | 0 € | 8 € | 127 € | 0 € |
-| bourg | 314 € | 3 € | 46 € | 48 € | 18 € | 16 € | 190 € | 71 € |
-| ville | 788 € | 7 € | 91 € | 121 € | 187 € | 34 € | 363 € | 176 € |
-| Paris, quartier | 1 523 € | 10 € | 134 € | 271 € | 613 € | 60 € | 456 € | 374 € |
-| Paris, maison | 2 887 € | 49 € | 249 € | 625 € | 850 € | 140 € | 1 072 € | 590 € |
+| bourg | 313 € | 3 € | 45 € | 48 € | 17 € | 16 € | 190 € | 71 € |
+| ville | 781 € | 6 € | 95 € | 121 € | 169 € | 34 € | 368 € | 178 € |
+| Paris, quartier | 1 549 € | 9 € | 147 € | 271 € | 482 € | 60 € | 597 € | 385 € |
+| Paris, maison | 3 068 € | 51 € | 285 € | 625 € | 806 € | 140 € | 1 263 € | 708 € |
 
 Montants par journée ouverte; le loyer court aussi le lundi. Les succursales s'ajoutent au résultat du café joué.
 
@@ -76,12 +76,12 @@ Montants par journée ouverte; le loyer court aussi le lundi. Les succursales s'
 <!-- table:res_sans_employes -->
 | Adresse | Équipe | Employés | Groupes servis par jour | Repartis | Attente moyenne | Satisfaction | Service fini après la fermeture |
 |---|---|---|---|---|---|---|---|
-| ville | avec l'équipe | 4 | 103 | 32 % | 87 s | 66 | 139 s |
-| ville | à deux, sans employés | 0 | 53 | 65 % | 97 s | 66 | 152 s |
-| Paris, quartier | avec l'équipe | 8 | 142 | 21 % | 69 s | 69 | 100 s |
-| Paris, quartier | à deux, sans employés | 0 | 66 | 63 % | 79 s | 70 | 107 s |
-| Paris, maison | avec l'équipe | 12 | 186 | 19 % | 112 s | 76 | 146 s |
-| Paris, maison | à deux, sans employés | 0 | 68 | 70 % | 73 s | 86 | 40 s |
+| ville | avec l'équipe | 3 | 95 | 40 % | 63 s | 69 | 61 s |
+| ville | à deux, sans employés | 0 | 52 | 67 % | 99 s | 64 | 135 s |
+| Paris, quartier | avec l'équipe | 5 | 139 | 43 % | 64 s | 71 | 59 s |
+| Paris, quartier | à deux, sans employés | 0 | 63 | 74 % | 91 s | 67 | 102 s |
+| Paris, maison | avec l'équipe | 10 | 159 | 26 % | 128 s | 74 | 142 s |
+| Paris, maison | à deux, sans employés | 0 | 63 | 71 % | 81 s | 85 | 45 s |
 
 Même café, même carte, même jour: à deux seulement, les grandes adresses refusent une bonne part de leurs clients.
 
@@ -91,10 +91,10 @@ Même café, même carte, même jour: à deux seulement, les grandes adresses re
 | Adresse | Présents au plus, 99 jours sur 100 | Présents au plus | Plafond C2 | Employés au plus | Plafond C5 | Respecté |
 |---|---|---|---|---|---|---|
 | village | 24 | 24 | 24 | 0 | 12 | oui |
-| bourg | 35 | 42 | 48 | 1 | 12 | oui |
-| ville | 56 | 62 | 72 | 5 | 12 | oui |
-| Paris, quartier | 68 | 73 | 80 | 8 | 12 | oui |
-| Paris, maison | 118 | 120 | 120 | 12 | 12 | oui |
+| bourg | 34 | 39 | 48 | 1 | 12 | oui |
+| ville | 45 | 47 | 72 | 5 | 12 | oui |
+| Paris, quartier | 58 | 65 | 80 | 7 | 12 | oui |
+| Paris, maison | 111 | 119 | 120 | 10 | 12 | oui |
 
 Le plafond C2 de l'architecte compte tous les personnages présents dans l'adresse; le plafond des visibles (C1, C3) relève du validateur des plans.
 
@@ -103,9 +103,9 @@ Le plafond C2 de l'architecte compte tous les personnages présents dans l'adres
 <!-- table:res_rythme -->
 | Duo | village | bourg | ville | Paris, quartier | Paris, maison | Journée ouverte moyenne |
 |---|---|---|---|---|---|---|
-| Duo tranquille | 35 jours, 11,7 h | 28 jours, 9,9 h | 28 jours, 10,5 h | 28 jours, 10,7 h | 42 jours, 15,6 h | 24,5 min |
-| Duo médian | 21 jours, 5,8 h | 21 jours, 6,2 h | 21 jours, 6,4 h | 21 jours, 6,9 h | 35 jours, 11,1 h | 20,6 min |
-| Duo rapide | 21 jours, 4,7 h | 21 jours, 5,1 h | 21 jours, 5,4 h | 21 jours, 5,9 h | 28 jours, 7,6 h | 17,3 min |
+| Duo tranquille | 35 jours, 11,7 h | 28 jours, 9,9 h | 28 jours, 10,2 h | 28 jours, 10,5 h | 35 jours, 13,1 h | 24,3 min |
+| Duo médian | 21 jours, 5,8 h | 21 jours, 6,2 h | 21 jours, 6,3 h | 21 jours, 6,7 h | 28 jours, 8,9 h | 20,4 min |
+| Duo rapide | 21 jours, 4,7 h | 21 jours, 5,1 h | 21 jours, 5,3 h | 21 jours, 5,7 h | 28 jours, 7,6 h | 17,1 min |
 
 Temps réel joué, préparation et fermeture comprises, lundis compris.
 
@@ -115,9 +115,9 @@ Temps réel joué, préparation et fermeture comprises, lundis compris.
 | Arrivée à | Installation payée | Caisse le jour de l'arrivée (médiane) | 9 duos sur 10 entre |
 |---|---|---|---|
 | bourg | 600 € | 252 € | 110 € à 347 € |
-| ville | 1 200 € | 491 € | 299 € à 766 € |
-| Paris, quartier | 2 500 € | 1 678 € | 1 032 € à 4 581 € |
-| Paris, maison | 3 000 € | 2 662 € | 2 299 € à 7 937 € |
+| ville | 1 200 € | 477 € | 273 € à 787 € |
+| Paris, quartier | 2 500 € | 966 € | 767 € à 1 473 € |
+| Paris, maison | 3 000 € | 2 196 € | 1 729 € à 2 938 € |
 
 Ce qui reste en caisse une fois l'installation payée: de quoi acheter les premières machines de la nouvelle adresse.
 
@@ -126,14 +126,14 @@ Ce qui reste en caisse une fois l'installation payée: de quoi acheter les premi
 <!-- table:res_aides -->
 | Adresse | Réglage du duo | Service réel | Groupes servis | Repartis | Attente moyenne | Satisfaction | Charge de chaque joueur |
 |---|---|---|---|---|---|---|---|
-| bourg | normal | 11,5 min | 41 | 15 % | 82 s | 69 | 81 % |
-| bourg | rythme paisible | 14,4 min | 45 | 9 % | 70 s | 72 | 77 % |
-| bourg | patience grande | 11,5 min | 44 | 11 % | 95 s | 67 | 81 % |
-| bourg | les deux | 14,4 min | 47 | 5 % | 79 s | 70 | 76 % |
-| Paris, quartier | normal | 13,0 min | 142 | 25 % | 77 s | 70 | 76 % |
-| Paris, quartier | rythme paisible | 16,2 min | 154 | 19 % | 67 s | 71 | 76 % |
-| Paris, quartier | patience grande | 13,0 min | 144 | 24 % | 87 s | 68 | 76 % |
-| Paris, quartier | les deux | 16,2 min | 156 | 17 % | 70 s | 70 | 77 % |
+| bourg | normal | 11,5 min | 42 | 14 % | 82 s | 70 | 80 % |
+| bourg | rythme paisible | 14,4 min | 45 | 6 % | 70 s | 72 | 76 % |
+| bourg | patience grande | 11,5 min | 44 | 9 % | 96 s | 67 | 81 % |
+| bourg | les deux | 14,4 min | 47 | 3 % | 77 s | 70 | 76 % |
+| Paris, quartier | normal | 13,0 min | 123 | 31 % | 80 s | 69 | 77 % |
+| Paris, quartier | rythme paisible | 16,2 min | 138 | 24 % | 63 s | 71 | 77 % |
+| Paris, quartier | patience grande | 13,0 min | 128 | 29 % | 86 s | 69 | 77 % |
+| Paris, quartier | les deux | 16,2 min | 139 | 23 % | 70 s | 70 | 76 % |
 
 Rythme paisible: une heure de jeu dure 75 s au lieu de 60, le même flux est moins serré. Patience grande: les clients attendent une fois et demie plus longtemps avant de renoncer.
 
@@ -160,19 +160,19 @@ Un dimanche de la dernière semaine au village (duo médian): le coup de feu du 
 <!-- table:res_heures_maison -->
 | Heure de jeu | Groupes venus | Servis | Repartis | Attente moyenne | Personnages présents au plus |
 |---|---|---|---|---|---|
-| 8 h | 17,7 | 8,6 | 0,1 | 31 s | 25 |
-| 9 h | 20,1 | 15,5 | 1,0 | 44 s | 37 |
-| 10 h | 20,5 | 15,8 | 1,2 | 58 s | 52 |
-| 11 h | 18,0 | 15,7 | 2,0 | 66 s | 63 |
-| 12 h | 13,8 | 13,2 | 2,4 | 74 s | 66 |
-| 13 h | 14,4 | 12,1 | 2,2 | 75 s | 64 |
-| 14 h | 18,9 | 12,5 | 1,6 | 85 s | 66 |
-| 15 h | 19,6 | 13,4 | 3,1 | 100 s | 74 |
-| 16 h | 21,4 | 12,9 | 6,1 | 120 s | 81 |
-| 17 h | 16,9 | 12,4 | 5,6 | 132 s | 81 |
-| 18 h | 10,8 | 11,0 | 3,6 | 127 s | 78 |
-| 19 h | 5,2 | 9,4 | 1,2 | 112 s | 69 |
-| 20 h | 2,2 | 16,9 | 0,1 | 80 s | 57 |
+| 8 h | 17,5 | 8,6 | 0,1 | 31 s | 24 |
+| 9 h | 19,1 | 14,7 | 1,1 | 44 s | 35 |
+| 10 h | 19,4 | 15,7 | 1,3 | 54 s | 48 |
+| 11 h | 15,7 | 13,8 | 1,2 | 69 s | 58 |
+| 12 h | 12,8 | 12,7 | 2,3 | 75 s | 60 |
+| 13 h | 13,3 | 10,6 | 1,8 | 79 s | 59 |
+| 14 h | 16,5 | 11,4 | 1,9 | 83 s | 60 |
+| 15 h | 19,1 | 12,1 | 3,3 | 102 s | 67 |
+| 16 h | 19,8 | 11,6 | 6,0 | 125 s | 72 |
+| 17 h | 16,3 | 11,0 | 5,9 | 136 s | 75 |
+| 18 h | 9,3 | 9,8 | 3,1 | 133 s | 72 |
+| 19 h | 4,3 | 9,7 | 1,0 | 114 s | 65 |
+| 20 h | 2,4 | 15,0 | 0,1 | 87 s | 52 |
 
 Un mardi de la dernière semaine à la maison parisienne (duo médian).
 
@@ -193,41 +193,41 @@ Règle AT-07: groupes attendus = passants x carte x prix x lieu x réputation x 
 <!-- table:res_cles -->
 | Clé | Valeur |
 |---|---|
-| `aides_bourg_les_deux` | 5 |
-| `aides_bourg_normal` | 15 |
-| `aides_bourg_patience_grande` | 11 |
-| `aides_bourg_rythme_paisible` | 9 |
-| `aides_paris-quartier_les_deux` | 17 |
-| `aides_paris-quartier_normal` | 25 |
-| `aides_paris-quartier_patience_grande` | 24 |
-| `aides_paris-quartier_rythme_paisible` | 19 |
-| `equipe_paris-maison_avec` | 19 |
-| `equipe_paris-maison_sans` | 70 |
-| `equipe_paris-quartier_avec` | 21 |
-| `equipe_paris-quartier_sans` | 63 |
-| `equipe_ville_avec` | 32 |
-| `equipe_ville_sans` | 65 |
-| `journee_median_min` | 21 |
-| `seances_median` | 55 |
+| `aides_bourg_les_deux` | 3 |
+| `aides_bourg_normal` | 14 |
+| `aides_bourg_patience_grande` | 9 |
+| `aides_bourg_rythme_paisible` | 6 |
+| `aides_paris-quartier_les_deux` | 23 |
+| `aides_paris-quartier_normal` | 31 |
+| `aides_paris-quartier_patience_grande` | 29 |
+| `aides_paris-quartier_rythme_paisible` | 24 |
+| `equipe_paris-maison_avec` | 26 |
+| `equipe_paris-maison_sans` | 71 |
+| `equipe_paris-quartier_avec` | 43 |
+| `equipe_paris-quartier_sans` | 74 |
+| `equipe_ville_avec` | 40 |
+| `equipe_ville_sans` | 67 |
+| `journee_median_min` | 20 |
+| `seances_median` | 51 |
 | `parties` | 120 |
 | `a_regler` | 0 |
-| `fin_h_lent` | 56,2 |
-| `fin_j_lent` | 155 |
+| `fin_h_lent` | 53,1 |
+| `fin_j_lent` | 148 |
 | `arr_h_bourg_lent` | 11,7 |
 | `arr_h_ville_lent` | 21,6 |
-| `arr_h_paris-quartier_lent` | 31,9 |
-| `arr_h_paris-maison_lent` | 42,8 |
-| `fin_h_median` | 36,4 |
-| `fin_j_median` | 120 |
+| `arr_h_paris-quartier_lent` | 31,8 |
+| `arr_h_paris-maison_lent` | 40,0 |
+| `fin_h_median` | 34,0 |
+| `fin_j_median` | 113 |
 | `arr_h_bourg_median` | 5,8 |
 | `arr_h_ville_median` | 11,9 |
-| `arr_h_paris-quartier_median` | 18,4 |
-| `arr_h_paris-maison_median` | 25,4 |
-| `fin_h_rapide` | 28,5 |
+| `arr_h_paris-quartier_median` | 18,3 |
+| `arr_h_paris-maison_median` | 25,0 |
+| `fin_h_rapide` | 28,3 |
 | `fin_j_rapide` | 113 |
 | `arr_h_bourg_rapide` | 4,7 |
-| `arr_h_ville_rapide` | 9,7 |
-| `arr_h_paris-quartier_rapide` | 15,1 |
-| `arr_h_paris-maison_rapide` | 21,0 |
+| `arr_h_ville_rapide` | 9,8 |
+| `arr_h_paris-quartier_rapide` | 15,0 |
+| `arr_h_paris-maison_rapide` | 20,7 |
 
-Calcul: 157 s sur la machine de l'environnement cloud.
+Calcul: 136 s sur la machine de l'environnement cloud.

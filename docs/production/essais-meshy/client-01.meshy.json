@@ -4,11 +4,15 @@
   "game": "cosy-cafe",
   "family": "personnages (essai: personnage entier par Meshy; la bible, 13.2, réserve Meshy aux coiffures et accessoires)",
   "purpose": "essai de la chaîne Meshy du studio: un client par texte vers 3D (profil flâneur), riggé par Meshy",
-  "status": "aperçu et rig générés le 2026-11-07, non téléchargés: fichiers servis par assets.meshy.ai, refusé par le proxy de l'environnement cloud",
+  "status": "téléchargé le 2026-11-07; non mis en conformité (aperçu sans texture: couleurs à poser à la main); sert à la comparaison des squelettes",
   "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
   "author": "tech-artist",
   "date": "2026-11-07",
-  "client": { "server": "@meshy-ai/meshy-mcp-server@0.6.9", "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs", "api": "https://api.meshy.ai" },
+  "client": {
+    "server": "@meshy-ai/meshy-mcp-server@0.6.9",
+    "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+    "api": "https://api.meshy.ai"
+  },
   "credits_budget": 100,
   "tasks": [
     {
@@ -23,7 +27,9 @@
         "target_polycount": 5000,
         "topology": "triangle",
         "pose_mode": "t-pose",
-        "target_formats": ["glb"],
+        "target_formats": [
+          "glb"
+        ],
         "auto_size": true,
         "origin_at": "bottom"
       },
@@ -33,8 +39,17 @@
       "finished": "2026-11-07T20:06:28.201Z",
       "duration_s": 40.9,
       "files_expire": "2026-11-10T20:06:28.201Z",
-      "outputs": ["GLB sans texture", "vignette"],
-      "downloaded": false
+      "outputs": [
+        "GLB sans texture",
+        "vignette"
+      ],
+      "downloaded": true,
+      "measured": {
+        "triangles": 5099,
+        "target": 5000,
+        "textures": 0,
+        "auto_size_height_m": 1.3
+      }
     },
     {
       "step": "rig",
@@ -42,7 +57,10 @@
       "endpoint": "POST /openapi/v1/rigging",
       "task_id": "01a1b79e-ca78-70c9-80ef-3726b55f0dd0",
       "parent_task_id": "01a1b79d-f767-750f-a2bc-46f8a0899654",
-      "params": { "input_task_id": "01a1b79d-f767-750f-a2bc-46f8a0899654", "height_meters": 1.7 },
+      "params": {
+        "input_task_id": "01a1b79d-f767-750f-a2bc-46f8a0899654",
+        "height_meters": 1.7
+      },
       "credits": 5,
       "created": "2026-11-07T20:06:42.168Z",
       "finished": "2026-11-07T20:06:48.625Z",
@@ -53,24 +71,54 @@
         "Animation_Walking_withSkin.glb, .fbx, Animation_Walking_withSkin_armature.glb (marche offerte)",
         "Animation_Running_withSkin.glb, .fbx, Animation_Running_withSkin_armature.glb (course offerte)"
       ],
-      "downloaded": false,
-      "note": "rig accepté et réussi sur un aperçu sans texture, alors que la documentation demande un humanoïde texturé: qualité des poids et des articulations à vérifier au téléchargement"
+      "downloaded": true,
+      "note": "rig accepté et réussi sur un aperçu sans texture, alors que la documentation demande un humanoïde texturé: qualité des poids et des articulations à vérifier au téléchargement",
+      "measured": {
+        "triangles": 5099,
+        "bones": 24,
+        "height_m": 1.7,
+        "walk_clip": "Armature|walking_man|baselayer, 1,067 s, 30 i/s, sur place",
+        "armature_node_scale": 0.01
+      }
     }
   ],
   "credits_total": 10,
   "next_steps": [
-    "télécharger Character_output.glb et Animation_Walking_withSkin.glb une fois assets.meshy.ai ouvert, avant le 2026-11-10T20:06Z",
-    "comparer son squelette à celui de char_essai_presse (scripts/comparer_squelettes.py): mêmes noms et même hiérarchie, ou non",
-    "aperçu sans texture: couleurs posées à la main par pièce (palette_overrides), ou affinage de l'aperçu (10 crédits) pour le choix automatique"
+    "si l'on garde ce personnage: couleurs par pièce (palette_overrides) puis conformite_personnage.py"
   ],
   "conformity": {
     "node_name": "char_essai_flaneur",
-    "target_height_m": 1.70,
+    "target_height_m": 1.7,
     "max_triangles": 4000,
     "clips": [
-      { "file": "Animation_Walking_withSkin.glb", "index": 0, "name": "walk", "in_place": true }
+      {
+        "file": "Animation_Walking_withSkin.glb",
+        "index": 0,
+        "name": "walk",
+        "in_place": true
+      }
     ],
-    "palette_allowed": ["skin_1", "skin_2", "skin_3", "skin_4", "skin_5", "skin_6", "hair_1", "hair_2", "hair_3", "hair_4", "hair_5", "hair_6", "hair_7", "flaneurs_scarf", "flaneurs_cord", "flaneurs_knit", "flaneurs_paper", "ink", "porcelain"],
+    "palette_allowed": [
+      "skin_1",
+      "skin_2",
+      "skin_3",
+      "skin_4",
+      "skin_5",
+      "skin_6",
+      "hair_1",
+      "hair_2",
+      "hair_3",
+      "hair_4",
+      "hair_5",
+      "hair_6",
+      "hair_7",
+      "flaneurs_scarf",
+      "flaneurs_cord",
+      "flaneurs_knit",
+      "flaneurs_paper",
+      "ink",
+      "porcelain"
+    ],
     "per_face_all": true,
     "face_smoothing": 2
   }

@@ -579,7 +579,7 @@ def maison(g, x, y0, y1, h, face, seed):
                 z0, z1 = 0.0, 2.3  # porte
                 g.box(xf - 0.05 * s if s < 0 else xf - 0.02, xf + 0.02 if s > 0 else xf + 0.05, yc - 0.5, yc + 0.5, -0.02, z1, "beam", bevel=0)
                 continue
-            g.box(min(xf, xf + 0.02 * s), max(xf, xf + 0.02 * s), yc - 0.45, yc + 0.45, z0, z1, "ink" if (seed + k) % 3 else "glass", bevel=0)
+            g.box(min(xf, xf + 0.02 * s), max(xf, xf + 0.02 * s), yc - 0.45, yc + 0.45, z0, z1, "ink" if (seed + k) % 3 else "glass_ext", bevel=0)
             for side in (-1, 1):
                 ys = yc + side * 0.75
                 g.box(min(xf, xf + 0.06 * s), max(xf, xf + 0.06 * s), ys - 0.27, ys + 0.27, z0, z1, "shutter", bevel=0)

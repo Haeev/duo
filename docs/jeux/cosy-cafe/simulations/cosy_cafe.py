@@ -20,6 +20,7 @@ Lancement, depuis la racine du dépôt (bibliothèque standard, Python 3.10 ou p
   python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py                 résumé
   python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --tableaux      tables du cahier
   python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats docs/jeux/cosy-cafe/simulations/resultats.md
+  python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --remplir docs/jeux/cosy-cafe/cahier-des-charges.md
   python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --croise docs/jeux/cosy-cafe/cahier-des-charges.md
 
 Unités: une minute de jeu dure `secondesParMinute` secondes réelles (1 par défaut). Les gestes sont
@@ -2856,12 +2857,62 @@ def croise(cahier: str, resultats: str) -> list[str]:
     return ecarts
 
 
+def remplir(cahier: str, resultats: str) -> tuple[int, int]:
+    """Recopie dans le cahier chaque table marquée et chaque valeur citée (jamais à la main)."""
+    with open(cahier, encoding="utf-8") as f:
+        texte = f.read()
+    with open(resultats, encoding="utf-8") as f:
+        res = f.read()
+    lignes = texte.split("\n")
+    out: list[str] = []
+    i = n_tables = 0
+    while i < len(lignes):
+        out.append(lignes[i])
+        m = re.match(r"\s*<!-- table:([a-z_]+) -->\s*$", lignes[i])
+        i += 1
+        if not m:
+            continue
+        cle = m.group(1)
+        if cle in TABLES_PARAMETRES:
+            t = TABLES_PARAMETRES[cle]()
+        else:
+            mr = re.search(r"<!-- table:" + re.escape(cle) + r" -->[ \t]*\n", res)
+            if mr is None:
+                continue
+            t = lire_tableau(res, mr.end())
+        while i < len(lignes) and lignes[i].startswith("|"):
+            i += 1
+        out.extend(t)
+        n_tables += 1
+    texte = "\n".join(out)
+    valeurs: dict[str, str] = {}
+    mres = re.search(r"<!-- table:res_cles -->[ \t]*\n", res)
+    if mres:
+        for l in lire_tableau(res, mres.end())[2:]:
+            parts = [x.strip() for x in l.strip("|").split("|")]
+            valeurs[parts[0].strip("`")] = parts[1]
+    n_val = 0
+
+    def remplace(m: re.Match[str]) -> str:
+        nonlocal n_val
+        if m.group(1) not in valeurs:
+            return m.group(0)
+        n_val += 1
+        return f"<!-- val:{m.group(1)} -->{valeurs[m.group(1)]}"
+
+    texte = re.sub(r"<!-- val:([a-z_\-]+) -->([0-9]+(?: [0-9]{3})*(?:,[0-9]+)?)", remplace, texte)
+    with open(cahier, "w", encoding="utf-8") as f:
+        f.write(texte)
+    return n_tables, n_val
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Simulation de Cosy Café (titre de travail)")
     ap.add_argument("--tableaux", action="store_true", help="imprime les tables de paramètres du cahier")
     ap.add_argument("--resultats", metavar="FICHIER", help="écrit le fichier de résultats")
     ap.add_argument("--duos", type=int, default=40, help="parties par duo (40 par défaut, 12 pour un essai)")
     ap.add_argument("--croise", metavar="CAHIER", help="compare le cahier aux données et au fichier de résultats")
+    ap.add_argument("--remplir", metavar="CAHIER", help="recopie dans le cahier les tables et les valeurs citées")
     ap.add_argument("--avec", metavar="RESULTATS", default="docs/jeux/cosy-cafe/simulations/resultats.md")
     args = ap.parse_args()
     if args.tableaux:
@@ -2873,6 +2924,10 @@ def main() -> int:
     if args.resultats:
         ecrire_resultats(args.resultats, args.duos)
         print(f"Résultats écrits dans {args.resultats}.")
+        return 0
+    if args.remplir:
+        n_t, n_v = remplir(args.remplir, args.avec)
+        print(f"{n_t} tables et {n_v} valeurs recopiées dans {args.remplir}.")
         return 0
     if args.croise:
         ecarts = croise(args.croise, args.avec)

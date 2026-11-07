@@ -4,7 +4,7 @@
   "game": "cosy-cafe",
   "family": "postes et machines (bible, 13.2: mixte, esquisse par Meshy puis reprise dans Blender aux cotes, avec douilles)",
   "purpose": "essai de la chaîne Meshy du studio: machine à expresso à deux groupes du café du village, cuivre (objet vedette, plafond de 4 000 triangles, C8 de technique.md)",
-  "status": "deux générations le 2026-11-07 (texte vers 3D, puis image vers 3D d'après la référence du directeur artistique), non téléchargées: les fichiers sont servis par assets.meshy.ai, refusé par le proxy de l'environnement cloud (403 au CONNECT)",
+  "status": "téléchargé et mis en conformité le 2026-11-07 (route image retenue): modeles/station_espresso_2g.glb; variante texte: modeles/station_espresso_texte_essai.glb",
   "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
   "author": "tech-artist",
   "date": "2026-11-07",
@@ -50,7 +50,19 @@
         "GLB sans texture (un aperçu de texte vers 3D n'est jamais texturé)",
         "vignette"
       ],
-      "downloaded": false
+      "downloaded": true,
+      "measured": {
+        "triangles": 3945,
+        "materials": 0,
+        "textures": 0,
+        "open_edges": 239,
+        "auto_size_m": [
+          0.249,
+          0.32,
+          0.268
+        ],
+        "note": "machine domestique à un seul groupe (consigne demandait deux), formes arrondies propres; auto_size très sous-estimé (0,25 m de large au lieu de 0,76)"
+      }
     },
     {
       "step": "image vers 3D (route retenue par la bible)",
@@ -79,21 +91,30 @@
         "texture_0.png (couleur de base seule, Meshy N1)",
         "preview.png"
       ],
-      "downloaded": false
+      "downloaded": true,
+      "measured": {
+        "triangles": 2399,
+        "target": 4000,
+        "texture": "PNG 2048 x 2048 (1,02 Mo), couleur de base",
+        "open_edges": 317,
+        "auto_size_m": [
+          1.178,
+          0.9,
+          1.067
+        ],
+        "parts": 12,
+        "note": "fidèle à la référence (deux groupes, cuivre, trois tasses fondues dessus); auto_size surestimé; la texture n'a peint que la face vue: dos et côté droit gris"
+      }
     }
   ],
   "credits_total": 20,
   "next_steps": [
-    "télécharger les deux GLB une fois assets.meshy.ai ouvert, avant le 2026-11-10T20:04Z (aperçu texte) et 20:29Z (image)",
-    "comparer les deux routes: silhouette, pièces séparées, triangles réels, taille estimée par auto_size; garder la meilleure",
-    "fixer front_yaw_deg, retirer ou séparer les tasses du dessus, nommer les pièces utiles au jeu (porte-filtres, buse) et poser les douilles avec l'artiste 3D, puis scripts/conformite_accessoire.py"
+    "reprise dans Blender par l'artiste 3D (bible 13.2): plateau du dessus (pans sans épaisseur, triangle sombre), dos et côté droit à recolorer en cuivre, douilles des porte-filtres et de la buse",
+    "ou nouvelle référence dessinée sous trois quarts et de dos, en image à plusieurs vues"
   ],
   "conformity": {
     "node_name": "station_espresso_2g",
     "front_yaw_deg": 0,
-    "pending": [
-      "arrière et côté droit gris: la texture meshy-n1 ne connaît que la vue de face; reprise dans Blender (bible, 13.2) ou retexture par vues multiples"
-    ],
     "target_size_m": {
       "axis": "width",
       "value": 0.76
@@ -124,6 +145,9 @@
     "per_face_parts": [
       5
     ],
-    "fill_holes_max_sides": 12
+    "fill_holes_max_sides": 12,
+    "notes": [
+      "dos et côté droit gris: la texture meshy-n1 ne connaît que la vue de face"
+    ]
   }
 }

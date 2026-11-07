@@ -4,9 +4,9 @@
 |---|---|
 | Identifiant | `cosy-cafe` (provisoire; l'architecte rappelle qu'il peut rester même si le titre change, section 1.1) |
 | Statut | brouillon |
-| Version du document | 0.1 |
+| Version du document | 0.2 |
 | Dernière mise à jour | 2026-11-07 |
-| Rédaction | game-designer: sections 1 à 6, 11, 13, 14 et proposition de la section 12; sections 7 à 10: renvois vers les documents de leurs responsables, résumés à écrire par le manager |
+| Rédaction | game-designer: sections 1 à 6, 11, 13, 14 et proposition de la section 12; manager: consolidation, résumés des sections 7 à 10, questions Q11 à Q19, section 16 |
 | Documents liés | cadrage: `docs/jeux/cosy-cafe/cadrage.md`; plans et adresses: `docs/jeux/cosy-cafe/plans/`, `docs/jeux/cosy-cafe/adresses.md`; bible: `docs/jeux/cosy-cafe/bible-artistique.md`; son: `docs/jeux/cosy-cafe/son.md`; interface: `docs/jeux/cosy-cafe/ux.md`; technique: `docs/jeux/cosy-cafe/technique.md`; simulation: `docs/jeux/cosy-cafe/simulations/cosy_cafe.py` et `resultats.md`; plateforme: `docs/plateforme/cahier-des-charges.md` (F05 à F09) |
 
 > Mode d'emploi: copier ce modèle dans `docs/jeux/<id-du-jeu>/cahier-des-charges.md`. Chaque section indique ses responsables. Le manager consolide, le client valide. Une fois validé, ce document est le contrat: toute modification passe par le manager et s'inscrit dans l'historique (section 15).
@@ -15,10 +15,10 @@
 
 - **Le jeu**: à deux, en vue à la première personne, vous reprenez le petit café d'un village et vous le tenez ensemble: l'un au comptoir, l'autre à la machine, ou l'inverse, comme vous voulez. Ce que vous écrivez sur l'ardoise décide de qui pousse la porte; les meubles, la décoration et la musique décident de l'envie de rester. On sert, on encaisse, on débarrasse, on lave, on range la livraison du matin, on lit le livre d'or le soir.
 - **La progression**: cinq adresses, chacune plus grande et plus vivante. Ormeval, le café de la place du Tilleul (38 m², 8 places à l'arrivée); Mérelles, l'ancienne pâtisserie face à la halle (le four, le service en salle, le marché du jeudi); Montaurel, l'Imprimerie d'une ville universitaire (les employés, le brunch, le café de spécialité); le café de l'angle des Plumassiers, à Paris (l'équipe reprise, les touristes); la Graineterie du boulevard des Horticulteurs, une maison sous verrière sur deux niveaux (notre mélange, le laboratoire de pâtisserie, la visite d'un guide). Chaque café quitté reste ouvert, confié à quelqu'un: à la fin, la maison en tient cinq.
-- **La durée**: l'histoire principale dure <!-- val:fin_h_median -->36,4 h pour un duo médian (de <!-- val:fin_h_rapide -->28,5 h pour un duo rapide à <!-- val:fin_h_lent -->56,2 h pour un duo qui prend son temps), soit <!-- val:seances_median -->55 séances de 40 minutes; puis le jeu continue sans fin. Une journée ouverte dure environ 21 minutes réelles: un service de 10 à 13 minutes entre une préparation et une fermeture à votre rythme.
+- **La durée**: l'histoire principale dure <!-- val:fin_h_median -->34,0 h pour un duo médian (de <!-- val:fin_h_rapide -->28,3 h pour un duo rapide à <!-- val:fin_h_lent -->53,1 h pour un duo qui prend son temps), soit <!-- val:seances_median -->51 séances de 40 minutes; puis le jeu continue sans fin. Une journée ouverte dure environ <!-- val:journee_median_min -->20 minutes réelles: un service de 10 à 13 minutes entre une préparation et une fermeture à votre rythme.
 - **Ce qui le rend unique**: l'ardoise qui fait la clientèle; le coup de feu à deux, réglé à la voix parce que chacun ne voit que ce qu'il regarde; des habitués qui ont un prénom, une commande fétiche et une histoire; un style de décoration cohérent qui compte vraiment; des fournisseurs qui ont un visage; aucune faillite, aucune partie perdue, rien qui compare les deux joueurs.
 - **Chiffres sortis d'une simulation**: chaque journée de chaque partie simulée est jouée client par client (`simulations/cosy_cafe.py`, 120 parties); les tables de ce cahier en sont la copie exacte, vérifiée par un contrôle automatique.
-- **À trancher** (section 14): le titre (cinq propositions), la durée de l'histoire, Paris réel ou inventé, deux cafés à la fois, garder ou revendre les anciens cafés, les options de commande (lait d'avoine, déca), la place des aides.
+- **À trancher** (section 14): le titre (cinq propositions), la durée de l'histoire, Paris réel ou inventé, deux cafés à la fois, garder ou revendre les anciens cafés, les options de commande (lait d'avoine, déca), la place des aides, puis Q11 à Q19 (musique, voix, mains, signes des joueurs, maison parisienne, terrasse, direction de rendu après l'essai 3D, réglages, annonce de départ).
 
 ## 1. Résumé (game-designer)
 
@@ -65,8 +65,8 @@ Le client cite deux simulateurs de commerce en vue subjective. On garde le genre
 | Cadrage | Ce cahier | Raison |
 |---|---|---|
 | Neuf profils de clients | dix: ajout des **voisins** [`voisins`], qui viennent pour deux mots au comptoir | donne un vrai poids au poste calme (parler aux gens) et fait vivre le zinc à chaque adresse; un profil de plus à habiller pour la bible (7.2) |
-| Journée de 15 à 20 minutes | journée ouverte de 21 minutes en moyenne (17 à 25 selon le duo), lundi de fermeture en plus | mesuré par la simulation: service de 10 à 13 minutes selon l'adresse, préparation et fermeture du duo médian (4 et 3,5 minutes) |
-| Saisons de 28 jours, 35 h pour l'histoire | 28 jours confirmés; histoire principale en 36,4 h pour un duo médian | simulation, section 4.21 |
+| Journée de 15 à 20 minutes | journée ouverte de <!-- val:journee_median_min -->20 minutes en moyenne (17 à 24 selon le duo), lundi de fermeture en plus | mesuré par la simulation: service de 10 à 13 minutes selon l'adresse, préparation et fermeture du duo médian (4 et 3,5 minutes) |
+| Saisons de 28 jours, 35 h pour l'histoire | 28 jours confirmés; histoire principale en <!-- val:fin_h_median -->34,0 h pour un duo médian | simulation, section 4.21 |
 | Places assises (ordre de grandeur) | les plans du level designer, repris tels quels (table `adresses`): Ormeval 10 places à l'arrivée, 18 au maximum; Mérelles 11 puis 39; l'Imprimerie 27 puis 45; les Plumassiers 24 puis 45; la Graineterie 53 puis 88 | les plans font foi; tous restent sous les plafonds de l'architecte (C2) |
 | Le bourg, une boutique de la grand-rue | Mérelles, l'ancienne pâtisserie face à la halle (plans) | le level designer a placé l'adresse; le four y attend dans son laboratoire, d'où le personnage de René, l'ancien pâtissier |
 | Réputation « de une à cinq tasses » | en demi-tasses, sans jamais baisser | aucune perte, rien à reprocher à l'autre joueur après un service difficile |
@@ -116,7 +116,7 @@ En vue subjective, chacun ne voit que ce qu'il regarde. Le jeu n'ajoute presque 
 
 - **Des postes d'exigence différente** (2.1): chacun prend celui qui lui va, sans que l'autre le voie ou le compte.
 - **Des aides propres à chaque joueur**, invisibles pour l'autre (CO-07): gestes simplifiés (un clic par geste, qualité « Bien » assurée), rappel des options (la bouteille de lait d'avoine s'éclaire), guide du poste (le prochain objet à prendre brille).
-- **Des réglages du duo**, décidés à deux: rythme paisible (une heure de jeu dure 75 secondes au lieu de 60), patience des clients grande (une fois et demie), affluence douce (x0,8). Mesuré sur un duo tranquille au bourg: les clients repartis passent de 15 % à 5 % avec le rythme paisible et la patience grande (section 4.21).
+- **Des réglages du duo**, décidés à deux: rythme paisible (une heure de jeu dure 75 secondes au lieu de 60), patience des clients grande (une fois et demie), affluence douce (x0,8). Mesuré sur un duo tranquille au bourg: les clients repartis passent de <!-- val:aides_bourg_normal -->14 % à <!-- val:aides_bourg_les_deux -->3 % avec le rythme paisible et la patience grande (section 4.21).
 - **Des rattrapages automatiques**: la réputation monte plus vite quand on reste longtemps à une adresse (RE-05); les fournisseurs livrent même quand la caisse est vide (EC-06).
 - **Rien ne compare les joueurs**: aucune statistique par joueur, aucune qualité affichée chez l'autre, aucun son de réussite ou d'échec d'un geste (son.md), tout va au pot commun; l'historique ne retient que des faits partagés.
 - **Rien ne demande de réflexe**: la meilleure fenêtre d'extraction dure 2 secondes, la machine s'arrête seule à 20 secondes, et « Correct » reste un bon café.
@@ -137,7 +137,7 @@ En vue subjective, chacun ne voit que ce qu'il regarde. Le jeu n'ajoute presque 
 ## 3. Boucles de jeu (game-designer)
 
 - **Boucle de 30 secondes**: une commande au comptoir, un espresso lancé, le lait moussé pendant que l'extraction coule, le service, une table débarrassée. « Deux crèmes et un chocolat ! », « Ça part ! ». Chaque geste a son retour visuel et sonore (section 5.2).
-- **Boucle d'une journée** (21 minutes réelles en moyenne):
+- **Boucle d'une journée** (<!-- val:journee_median_min -->20 minutes réelles en moyenne):
   1. **Préparation**, horloge arrêtée à l'heure d'ouverture: ranger la livraison du matin, fournées et carafes, ardoise du jour (la tablette propose une carte, on la retouche), décoration, achats. 2 à 6 minutes.
   2. **Service**, horloge en marche dès que la pancarte se retourne: trois coups de feu dans la journée (le café du matin, le déjeuner dès le bourg, le goûter), des heures plus calmes entre eux. 10 à 13 minutes selon l'adresse.
   3. **Fermeture**, horloge arrêtée: les derniers clients finissent tranquillement, puis le bilan (caisse, clients, mots du livre d'or), la commande aux fournisseurs, les achats et travaux, « Nos projets ». 2 à 5 minutes. La journée finit quand les deux joueurs ont dit « À demain ».
@@ -455,10 +455,10 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | Adresse | Nom (plans) | Surface | Ouverture | Marché | Prix | Coûts | Loyer par mois | Charges par jour | Installation | Renommée de l'offre | Tasses au départ | Tasses du défi | Lignes d'ardoise | Places à l'arrivée (dedans + dehors) | Places au maximum | Debout au comptoir | Présents au plus (C2) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `village` | Ormeval, le café de la place du Tilleul | 38 m² | 8 h à 18 h | aucun | x1 | x1 | 520 € | 8 € | aucune | 0 | 1,5 | 3,0 | 8 | 8 + 2 | 12 + 6 | 3 | 24 |
-| `bourg` | Mérelles, la boutique de la place de la Halle | 81 m² | 7 h 30 à 19 h | jeudi | x1,1 | x1 | 1 150 € | 16 € | 600 € | 500 | 2,0 | 3,5 | 12 | 12 + 0 | 21 + 18 | 4 | 48 |
-| `ville` | L'atelier | 140 m² | 8 h à 20 h | samedi | x1,3 | x1,05 | 2 900 € | 34 € | 1 200 € | 2 200 | 2,5 | 4,0 | 16 | 24 + 0 | 40 + 12 | 6 | 72 |
-| `paris-quartier` | Le café d'angle | 92 m² | 7 h 30 à 20 h 30 | mardi, vendredi | x1,8 | x1,15 | 6 500 € | 60 € | 2 500 € | 4 500 | 3,0 | 4,0 | 16 | 22 + 8 | 36 + 20 | 8 | 80 |
-| `paris-maison` | La maison du boulevard | 310 m² | 8 h à 21 h | dimanche | x2 | x1,2 | 15 000 € | 140 € | 3 000 € | 10 000 | 3,5 | 4,5 | 20 | 34 + 12 | 74 + 16 | 8 | 120 |
+| `bourg` | Mérelles, la boutique de la place de la Halle | 81 m² | 7 h 30 à 19 h | jeudi | x1,1 | x1 | 1 150 € | 16 € | 600 € | 500 | 2,0 | 3,5 | 12 | 11 + 0 | 21 + 18 | 4 | 48 |
+| `ville` | Montaurel, l'Imprimerie | 165 m² | 8 h à 20 h | samedi | x1,3 | x1,05 | 2 900 € | 34 € | 1 200 € | 2 200 | 2,5 | 4,0 | 16 | 23 + 4 | 35 + 10 | 6 | 72 |
+| `paris-quartier` | Paris, le café de l'angle des Plumassiers | 96 m² | 7 h 30 à 20 h 30 | mardi, vendredi | x1,8 | x1,15 | 6 500 € | 60 € | 2 500 € | 4 500 | 3,0 | 4,0 | 16 | 18 + 6 | 29 + 16 | 8 | 80 |
+| `paris-maison` | Paris, la Graineterie du boulevard des Horticulteurs | 300 m² | 8 h à 21 h | dimanche | x2 | x1,2 | 15 000 € | 140 € | 3 000 € | 10 000 | 3,5 | 4,5 | 20 | 41 + 12 | 64 + 24 | 8 | 120 |
 
 **Équipement fourni à l'arrivée** (compris dans l'installation)
 
@@ -468,8 +468,8 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | `village` | machine 1, buse 1, bouilloire 1, vitrine 1, plan 1, frigo du bar 1 | évier | 1 | aucun | 0 | 36 |
 | `bourg` | machine 1, buse 1, bouilloire 1, vitrine 1, plan 1, frigo du bar 1 | évier | 1 | gobelets | 0 | 70 |
 | `ville` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi | 0 | 120 |
-| `paris-quartier` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi, mange_debout | 3 | 160 |
-| `paris-maison` | machine 3, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 2, presse-agrumes 2 | lave-vaisselle à capot | 2 | gobelets, wifi | 5 | 260 |
+| `paris-quartier` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi, mange_debout | 4 | 160 |
+| `paris-maison` | machine 3, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 2, presse-agrumes 2 | lave-vaisselle à capot | 2 | gobelets, wifi | 6 | 260 |
 
 **Extensions**
 
@@ -481,12 +481,15 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | `bourg` | E1, la terrasse de la halle | 800 € | 0, 0, 0, +10 | +3 | sous le store, face à la halle: le jeudi, le marché passe devant |
 | `bourg` | E2, la salle de la remise | 1 800 € | 0, +8, 0, 0 | +5 | la remise débarrassée, avec sa grande table de ferme |
 | `bourg` | E3, la cour sous la treille | 1 400 € | 0, 0, 0, +8 | +4 | la cour derrière la boutique, à l'ombre de la treille |
-| `ville` | E1, la deuxième salle | 2 500 € | 0, +8, +4, 0 | +5 | l'ancien atelier au fond de la cour |
-| `ville` | E2, la cour pavée | 2 600 € | 0, 0, 0, +12 | +4 | la cour de l'atelier, à l'abri de la rue |
-| `paris-quartier` | E1, la terrasse sur le trottoir | 5 000 € | 0, 0, 0, +10 | +3 | l'angle donne sur deux rues: la mairie d'arrondissement autorise la seconde |
-| `paris-quartier` | E2, l'arrière-salle | 9 000 € | 0, +6, +2, 0 | +5 | l'ancienne réserve du café d'angle, rouverte sur la cour (pas de second niveau: C17) |
-| `paris-maison` | E1, la verrière restaurée | 6 000 € | 0, +12, +6, 0 | +8 | la grande salle sous la verrière, fermée depuis des années |
-| `paris-maison` | E2, la mezzanine | 8 000 € | 0, +12, +4, 0 | +6 | le plancher sous la verrière, rouvert par l'escalier de la maison (second niveau, C17) |
+| `ville` | E1, l'atelier entier | 2 500 € | 0, +8, +4, 0 | +5 | les presses rangées, l'atelier sous ses sheds s'ouvre en entier |
+| `ville` | E2, la cuisine du brunch | 2 000 € | 0, 0, 0, 0 | +2 | la salle de composition devenue cuisine: le brunch a besoin de ses feux |
+| `ville` | E3, la cour sous la glycine | 2 000 € | 0, 0, 0, +6 | +4 | la cour de l'imprimerie, à l'abri de la rue des Facultés |
+| `paris-quartier` | E1, la salle du fond | 6 000 € | +3, +5, +3, 0 | +5 | la cordonnerie voisine rachetée et ouverte sur le café (96 m² en tout) |
+| `paris-quartier` | E2, la terrasse sur les deux rues | 5 000 € | 0, 0, 0, +10 | +3 | l'angle donne sur deux rues: la mairie d'arrondissement autorise la rue des Coudriers |
+| `paris-maison` | E1, la torréfaction | 4 000 € | +4, 0, 0, 0 | +5 | le torréfacteur sous la verrière, et son comptoir de dégustation |
+| `paris-maison` | E2, le laboratoire de pâtisserie | 4 000 € | 0, 0, 0, 0 | +2 | le laboratoire vide du graineur, équipé d'un four à soles |
+| `paris-maison` | E3, les salons de l'étage | 8 000 € | 0, +11, +6, 0 | +6 | le grand et le petit salon, fermés depuis des années, par l'escalier de la maison (second niveau, C17) |
+| `paris-maison` | E4, le jardin et sa serre | 6 000 € | 0, 0, +2, +12 | +6 | le jardin en friche derrière la halle, et sa serre où l'on s'assoit par tous les temps |
 
 **Flux de base** (groupes intéressés par jour, à attrait 1, jour ordinaire, temps couvert)
 
@@ -622,9 +625,9 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 |---|---|---|---|---|---|
 | `village` | La fête du Tilleul | `village_terrasse` | dimanche | 3,0 | 150 |
 | `bourg` | La foire de la halle | `bourg_terrasse` | jeudi | 3,5 | 300 |
-| `ville` | Le grand brunch de l'atelier | `ville_salle2` | dimanche | 4,0 | 600 |
-| `paris-quartier` | Le vide-grenier de la rue | `pq_trottoir` | dimanche | 4,0 | 1 000 |
-| `paris-maison` | La visite du guide, puis la fête de la maison | `labo` et `torrefaction` et `pm_verriere` et `pm_mezzanine` | la semaine où tout est prêt, fête le lundi | 4,5 | fin de l'histoire principale |
+| `ville` | Le grand brunch de l'Imprimerie | `ville_cuisine` | dimanche | 4,0 | 600 |
+| `paris-quartier` | Le vide-grenier de la rue des Plumassiers | `pq_terrasse` | dimanche | 4,0 | 1 000 |
+| `paris-maison` | La visite du guide, puis la fête de la maison | `pm_torrefaction` et `pm_labo` et `pm_salons` et `pm_jardin` | la semaine où tout est prêt, fête le lundi | 4,5 | fin de l'histoire principale |
 
 **Postes** (places simultanées par niveau)
 
@@ -687,8 +690,8 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | `village` | 0 | aucun employé |
 | `bourg` | 1 | commis (marché et week-end) |
 | `ville` | 5 | salle (tous les jours); plonge (tous les jours); barista (tous les jours); salle (marché et week-end); commis (tous les jours) |
-| `paris-quartier` | 8 | salle (tous les jours), repris; salle (tous les jours), repris; barista (tous les jours), repris; plonge (tous les jours); commis (tous les jours); salle (marché et week-end); barista (marché et week-end); salle (tous les jours) |
-| `paris-maison` | 12 | salle (tous les jours), repris; salle (tous les jours), repris; salle (tous les jours), repris; barista (tous les jours), repris; plonge (tous les jours), repris; barista (tous les jours); commis (tous les jours); patisserie (tous les jours); salle (marché et week-end); salle (marché et week-end); commis (marché et week-end); barista (marché et week-end) |
+| `paris-quartier` | 7 | salle (tous les jours), repris; salle (tous les jours), repris; barista (tous les jours), repris; plonge (tous les jours), repris; commis (tous les jours); salle (marché et week-end); barista (marché et week-end) |
+| `paris-maison` | 10 | salle (tous les jours), repris; salle (tous les jours), repris; salle (tous les jours), repris; barista (tous les jours), repris; plonge (tous les jours), repris; barista (tous les jours), repris; commis (tous les jours); patisserie (tous les jours); salle (marché et week-end); salle (marché et week-end) |
 
 **Ambiance achetée** (paliers de la simulation, AM-01)
 
@@ -729,7 +732,7 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 Un script en Python, bibliothèque standard, graines fixes: `docs/jeux/cosy-cafe/simulations/cosy_cafe.py`. Résultats complets: `docs/jeux/cosy-cafe/simulations/resultats.md`.
 
 - **Ce qu'il fait**: chaque journée ouverte est une simulation à événements discrets, client par client: arrivées selon l'attrait (AT-07), entrée ou renoncement (CL-02, CL-03), commande, chaque étape de chaque recette à son poste, service, séjour, recommandes, départ, débarrassage, plonge; deux joueurs et les employés prennent les tâches par priorités. Entre les journées: achats, embauches, épargne, offres, défis, déménagements, succursales. <!-- val:parties -->120 parties (40 par duo), soit plus de 12 000 journées jouées client par client.
-- **Commandes**, depuis la racine du dépôt: `python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats docs/jeux/cosy-cafe/simulations/resultats.md` (environ 3 minutes); `--croise docs/jeux/cosy-cafe/cahier-des-charges.md` (moins d'une seconde) compare chaque table de ce cahier aux données du script et aux résultats, vérifie que les résultats correspondent aux données (empreinte), et sort en erreur au premier écart; `--tableaux` réimprime les tables; sans option, un résumé de la progression.
+- **Commandes**, depuis la racine du dépôt: `python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats docs/jeux/cosy-cafe/simulations/resultats.md` (environ 3 minutes); `--croise docs/jeux/cosy-cafe/cahier-des-charges.md` (moins d'une seconde) compare chaque table de ce cahier aux données du script et aux résultats, vérifie que les résultats correspondent aux données (empreinte), et sort en erreur au premier écart; `--remplir` recopie dans ce cahier les tables et les valeurs citées après un changement de données (jamais à la main); `--tableaux` réimprime les tables; sans option, un résumé de la progression.
 - **Hypothèses**: les trois duos (table `duos`) et la conduite du duo simulé (ordre d'achat, embauches, épargne) sont des suppositions raisonnables, à recaler au prototype (CA-51). Non simulés: options de commande (CO-08), traits des employés (sauf la vitesse), ruptures de stock (le duo commande assez), événements de saison au-delà des multiplicateurs, dessin sur le lait, brocante.
 
 **Progression** (jour du jeu et heures réelles à chaque arrivée, médiane, entre crochets le premier et le neuvième décile)
@@ -737,11 +740,11 @@ Un script en Python, bibliothèque standard, graines fixes: `docs/jeux/cosy-cafe
 <!-- table:res_progression -->
 | Duo | Arrivée au bourg | En ville | À Paris (quartier) | À la maison parisienne | Fête de la maison | Parties finies |
 |---|---|---|---|---|---|---|
-| Duo tranquille | jour 36 [29-36], 11,7 h [9,4-11,8] | jour 64 [57-64], 21,6 h [19,3-21,7] | jour 92 [85-92], 31,9 h [29,7-32,2] | jour 120 [106-127], 42,8 h [38,1-45,5] | jour 155 [148-169], 56,2 h [53,1-61,1] | 40 sur 40 |
-| Duo médian | jour 22 [22-22], 5,8 h [5,7-5,8] | jour 43 [43-43], 11,9 h [11,9-12,0] | jour 64 [64-64], 18,4 h [18,3-18,5] | jour 85 [85-92], 25,4 h [25,1-27,6] | jour 120 [120-127], 36,4 h [36,0-38,6] | 40 sur 40 |
-| Duo rapide | jour 22 [22-22], 4,7 h [4,6-4,7] | jour 43 [43-43], 9,7 h [9,7-9,8] | jour 64 [64-64], 15,1 h [15,0-15,2] | jour 85 [78-85], 21,0 h [19,1-21,1] | jour 113 [106-120], 28,5 h [26,7-30,5] | 40 sur 40 |
+| Duo tranquille | jour 36 [29-36], 11,7 h [9,4-11,8] | jour 64 [57-64], 21,6 h [19,2-21,7] | jour 92 [85-92], 31,8 h [29,4-31,9] | jour 113 [106-120], 40,0 h [37,6-42,4] | jour 148 [141-155], 53,1 h [50,7-55,5] | 40 sur 40 |
+| Duo médian | jour 22 [22-22], 5,8 h [5,7-5,8] | jour 43 [43-50], 11,9 h [11,9-13,8] | jour 64 [64-71], 18,3 h [18,2-20,2] | jour 85 [85-92], 25,0 h [24,9-27,0] | jour 113 [113-120], 34,0 h [33,8-36,2] | 40 sur 40 |
+| Duo rapide | jour 22 [22-22], 4,7 h [4,6-4,7] | jour 43 [43-43], 9,8 h [9,7-9,8] | jour 64 [64-64], 15,0 h [15,0-15,1] | jour 85 [78-85], 20,7 h [18,9-20,8] | jour 113 [106-113], 28,3 h [26,4-28,4] | 40 sur 40 |
 
-Lectures: le duo médian passe trois semaines dans chacune des quatre premières adresses et cinq à la maison parisienne; il arrive à Paris après <!-- val:arr_h_paris-quartier_median -->18,4 h et fête la maison après <!-- val:fin_h_median -->36,4 h, soit <!-- val:seances_median -->55 séances de 40 minutes. On déménage le lundi: les écarts entre duos se comptent en semaines. Un duo tranquille met <!-- val:fin_h_lent -->56,2 h, surtout parce que ses journées sont plus longues (préparation et fermeture flâneuses) et que son épargne vient plus lentement.
+Lectures: le duo médian passe trois semaines dans chacune des quatre premières adresses et quatre à la Graineterie; il arrive à Paris après <!-- val:arr_h_paris-quartier_median -->18,3 h et fête la maison après <!-- val:fin_h_median -->34,0 h, soit <!-- val:seances_median -->51 séances de 40 minutes. On déménage le lundi: les écarts entre duos se comptent en semaines. Un duo tranquille met <!-- val:fin_h_lent -->53,1 h, surtout parce que ses journées sont plus longues (préparation et fermeture flâneuses) et que son épargne vient plus lentement.
 
 **Ce qui décide de chaque départ** (part des parties où la dernière condition remplie était celle-ci)
 
@@ -750,18 +753,18 @@ Lectures: le duo médian passe trois semaines dans chacune des quatre premières
 |---|---|---|---|---|---|
 | Duo tranquille | village vers bourg | 0 % | 25 % | 75 % | 0 % |
 | Duo tranquille | bourg vers ville | 0 % | 0 % | 100 % | 0 % |
-| Duo tranquille | ville vers Paris, quartier | 92 % | 0 % | 8 % | 0 % |
-| Duo tranquille | Paris, quartier vers Paris, maison | 40 % | 0 % | 60 % | 0 % |
+| Duo tranquille | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
+| Duo tranquille | Paris, quartier vers Paris, maison | 30 % | 0 % | 70 % | 0 % |
 | Duo médian | village vers bourg | 80 % | 12 % | 8 % | 0 % |
-| Duo médian | bourg vers ville | 20 % | 0 % | 80 % | 0 % |
+| Duo médian | bourg vers ville | 18 % | 0 % | 82 % | 0 % |
 | Duo médian | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
-| Duo médian | Paris, quartier vers Paris, maison | 52 % | 5 % | 42 % | 0 % |
+| Duo médian | Paris, quartier vers Paris, maison | 80 % | 20 % | 0 % | 0 % |
 | Duo rapide | village vers bourg | 90 % | 10 % | 0 % | 0 % |
-| Duo rapide | bourg vers ville | 28 % | 55 % | 18 % | 0 % |
+| Duo rapide | bourg vers ville | 32 % | 57 % | 10 % | 0 % |
 | Duo rapide | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
-| Duo rapide | Paris, quartier vers Paris, maison | 38 % | 0 % | 62 % | 0 % |
+| Duo rapide | Paris, quartier vers Paris, maison | 68 % | 8 % | 25 % | 0 % |
 
-Lectures: au village, c'est la réputation du défi qui fixe le départ du duo médian; au bourg, l'épargne pour l'Imprimerie; en ville, la réputation; à Paris, l'une ou l'autre. L'offre n'est jamais ce qui retient: la lettre arrive toujours avant que le duo soit prêt.
+Lectures: au village, c'est la réputation du défi qui fixe le départ du duo médian; au bourg, l'épargne pour l'Imprimerie; en ville et à Paris, la réputation surtout. L'offre n'est jamais ce qui retient: la lettre arrive toujours avant que le duo soit prêt.
 
 **Le service, à la main puis avec machines, puis avec employés** (duo médian, six premières et six dernières journées à chaque adresse)
 
@@ -770,30 +773,30 @@ Lectures: au village, c'est la réputation du défi qui fixe le départ du duo m
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | village | première semaine | 24 | 23 | 2 % | 33 s | 49 s | 76 | 58 % | 0 | 14 / 24 | 24 |
 | village | dernière semaine | 38 | 33 | 10 % | 44 s | 71 s | 79 | 77 % | 0 | 18 / 24 | 24 |
-| bourg | première semaine | 36 | 33 | 7 % | 41 s | 65 s | 73 | 73 % | 0 | 18 / 38 | 48 |
-| bourg | dernière semaine | 53 | 44 | 15 % | 56 s | 94 s | 73 | 81 % | 0 | 25 / 42 | 48 |
-| ville | première semaine | 63 | 48 | 22 % | 65 s | 108 s | 70 | 78 % | 0 | 28 / 41 | 72 |
-| ville | dernière semaine | 97 | 80 | 16 % | 84 s | 159 s | 67 | 80 % | 3 | 49 / 59 | 72 |
-| Paris, quartier | première semaine | 122 | 94 | 22 % | 66 s | 119 s | 69 | 74 % | 4 | 43 / 51 | 80 |
-| Paris, quartier | dernière semaine | 144 | 116 | 18 % | 66 s | 130 s | 69 | 72 % | 7 | 54 / 72 | 80 |
-| Paris, maison | première semaine | 148 | 129 | 11 % | 49 s | 81 s | 74 | 84 % | 5 | 56 / 76 | 120 |
-| Paris, maison | dernière semaine | 235 | 180 | 23 % | 100 s | 194 s | 77 | 84 % | 9 | 97 / 120 | 120 |
+| bourg | première semaine | 35 | 32 | 6 % | 40 s | 63 s | 72 | 72 % | 0 | 18 / 36 | 48 |
+| bourg | dernière semaine | 54 | 44 | 16 % | 59 s | 98 s | 73 | 82 % | 0 | 25 / 38 | 48 |
+| ville | première semaine | 63 | 48 | 22 % | 63 s | 102 s | 71 | 78 % | 0 | 27 / 38 | 72 |
+| ville | dernière semaine | 96 | 73 | 23 % | 65 s | 113 s | 69 | 79 % | 3 | 40 / 47 | 72 |
+| Paris, quartier | première semaine | 121 | 89 | 26 % | 60 s | 107 s | 70 | 74 % | 4 | 39 / 47 | 80 |
+| Paris, quartier | dernière semaine | 147 | 101 | 29 % | 70 s | 132 s | 68 | 75 % | 5 | 46 / 59 | 80 |
+| Paris, maison | première semaine | 144 | 130 | 8 % | 51 s | 88 s | 74 | 83 % | 6 | 61 / 78 | 120 |
+| Paris, maison | dernière semaine | 221 | 160 | 26 % | 110 s | 200 s | 75 | 83 % | 9 | 90 / 115 | 120 |
 
-Lectures: au village, les deux joueurs sont occupés à 58 % la première semaine et 77 % la dernière; le coup de feu est tendu (un groupe sur dix repart sans entrer, surtout aux heures de pointe et faute de place) mais tenable (44 s d'attente en moyenne). À chaque adresse, la dernière semaine sert plus de monde que la première avec une charge des joueurs presque égale: machines et employés absorbent la croissance. Les dimanches de la maison parisienne sont de vrais coups de feu, jusqu'au plafond de 120 personnages.
+Lectures: au village, les deux joueurs sont occupés à 58 % la première semaine et 77 % la dernière; le coup de feu est tendu (un groupe sur dix repart sans entrer, surtout aux heures de pointe et faute de place) mais tenable (44 s d'attente en moyenne). Au village et au bourg, c'est la charge des deux joueurs qui monte d'une semaine à l'autre (de 58 à 77 %, de 72 à 82 %); à partir de la ville, la dernière semaine sert bien plus de monde que la première avec une charge presque égale: machines et employés absorbent la croissance. Au café des Plumassiers, près de trois groupes sur dix trouvent en dernière semaine le café complet ou l'attente trop longue: la demande parisienne dépasse ce que 45 places peuvent accueillir, et l'adresse suivante se fait désirer. Les dimanches de la maison parisienne sont de vrais coups de feu, jusqu'au plafond de 120 personnages.
 
 **Ce que l'équipe change**
 
 <!-- table:res_sans_employes -->
 | Adresse | Équipe | Employés | Groupes servis par jour | Repartis | Attente moyenne | Satisfaction | Service fini après la fermeture |
 |---|---|---|---|---|---|---|---|
-| ville | avec l'équipe | 4 | 103 | 32 % | 87 s | 66 | 139 s |
-| ville | à deux, sans employés | 0 | 53 | 65 % | 97 s | 66 | 152 s |
-| Paris, quartier | avec l'équipe | 8 | 142 | 21 % | 69 s | 69 | 100 s |
-| Paris, quartier | à deux, sans employés | 0 | 66 | 63 % | 79 s | 70 | 107 s |
-| Paris, maison | avec l'équipe | 12 | 186 | 19 % | 112 s | 76 | 146 s |
-| Paris, maison | à deux, sans employés | 0 | 68 | 70 % | 73 s | 86 | 40 s |
+| ville | avec l'équipe | 3 | 95 | 40 % | 63 s | 69 | 61 s |
+| ville | à deux, sans employés | 0 | 52 | 67 % | 99 s | 64 | 135 s |
+| Paris, quartier | avec l'équipe | 5 | 139 | 43 % | 64 s | 71 | 59 s |
+| Paris, quartier | à deux, sans employés | 0 | 63 | 74 % | 91 s | 67 | 102 s |
+| Paris, maison | avec l'équipe | 10 | 159 | 26 % | 128 s | 74 | 142 s |
+| Paris, maison | à deux, sans employés | 0 | 63 | 71 % | 81 s | 85 | 45 s |
 
-Lecture: à deux seulement, l'Imprimerie refuse <!-- val:equipe_ville_sans -->65 % de ses groupes et la maison parisienne <!-- val:equipe_paris-maison_sans -->70 %; les employés ne remplacent pas les joueurs, ils rendent les grandes adresses possibles.
+Lecture: à deux seulement, l'Imprimerie refuse <!-- val:equipe_ville_sans -->67 % de ses groupes et la maison parisienne <!-- val:equipe_paris-maison_sans -->71 %; les employés ne remplacent pas les joueurs, ils rendent les grandes adresses possibles.
 
 **Une journée moyenne, par adresse** (duo médian)
 
@@ -801,10 +804,10 @@ Lecture: à deux seulement, l'Imprimerie refuse <!-- val:equipe_ville_sans -->65
 | Adresse | Recettes | Pourboires | Matières | Loyer (lundi compris) | Salaires | Charges | Résultat | Succursales (en plus) |
 |---|---|---|---|---|---|---|---|---|
 | village | 197 € | 3 € | 43 € | 22 € | 0 € | 8 € | 127 € | 0 € |
-| bourg | 314 € | 3 € | 46 € | 48 € | 18 € | 16 € | 190 € | 71 € |
-| ville | 788 € | 7 € | 91 € | 121 € | 187 € | 34 € | 363 € | 176 € |
-| Paris, quartier | 1 523 € | 10 € | 134 € | 271 € | 613 € | 60 € | 456 € | 374 € |
-| Paris, maison | 2 887 € | 49 € | 249 € | 625 € | 850 € | 140 € | 1 072 € | 590 € |
+| bourg | 313 € | 3 € | 45 € | 48 € | 17 € | 16 € | 190 € | 71 € |
+| ville | 781 € | 6 € | 95 € | 121 € | 169 € | 34 € | 368 € | 178 € |
+| Paris, quartier | 1 549 € | 9 € | 147 € | 271 € | 482 € | 60 € | 597 € | 385 € |
+| Paris, maison | 3 068 € | 51 € | 285 € | 625 € | 806 € | 140 € | 1 263 € | 708 € |
 
 **Argent à l'arrivée**
 
@@ -812,25 +815,25 @@ Lecture: à deux seulement, l'Imprimerie refuse <!-- val:equipe_ville_sans -->65
 | Arrivée à | Installation payée | Caisse le jour de l'arrivée (médiane) | 9 duos sur 10 entre |
 |---|---|---|---|
 | bourg | 600 € | 252 € | 110 € à 347 € |
-| ville | 1 200 € | 491 € | 299 € à 766 € |
-| Paris, quartier | 2 500 € | 1 678 € | 1 032 € à 4 581 € |
-| Paris, maison | 3 000 € | 2 662 € | 2 299 € à 7 937 € |
+| ville | 1 200 € | 477 € | 273 € à 787 € |
+| Paris, quartier | 2 500 € | 966 € | 767 € à 1 473 € |
+| Paris, maison | 3 000 € | 2 196 € | 1 729 € à 2 938 € |
 
 **Réglages du duo** (un duo tranquille, sa dernière configuration)
 
 <!-- table:res_aides -->
 | Adresse | Réglage du duo | Service réel | Groupes servis | Repartis | Attente moyenne | Satisfaction | Charge de chaque joueur |
 |---|---|---|---|---|---|---|---|
-| bourg | normal | 11,5 min | 41 | 15 % | 82 s | 69 | 81 % |
-| bourg | rythme paisible | 14,4 min | 45 | 9 % | 70 s | 72 | 77 % |
-| bourg | patience grande | 11,5 min | 44 | 11 % | 95 s | 67 | 81 % |
-| bourg | les deux | 14,4 min | 47 | 5 % | 79 s | 70 | 76 % |
-| Paris, quartier | normal | 13,0 min | 142 | 25 % | 77 s | 70 | 76 % |
-| Paris, quartier | rythme paisible | 16,2 min | 154 | 19 % | 67 s | 71 | 76 % |
-| Paris, quartier | patience grande | 13,0 min | 144 | 24 % | 87 s | 68 | 76 % |
-| Paris, quartier | les deux | 16,2 min | 156 | 17 % | 70 s | 70 | 77 % |
+| bourg | normal | 11,5 min | 42 | 14 % | 82 s | 70 | 80 % |
+| bourg | rythme paisible | 14,4 min | 45 | 6 % | 70 s | 72 | 76 % |
+| bourg | patience grande | 11,5 min | 44 | 9 % | 96 s | 67 | 81 % |
+| bourg | les deux | 14,4 min | 47 | 3 % | 77 s | 70 | 76 % |
+| Paris, quartier | normal | 13,0 min | 123 | 31 % | 80 s | 69 | 77 % |
+| Paris, quartier | rythme paisible | 16,2 min | 138 | 24 % | 63 s | 71 | 77 % |
+| Paris, quartier | patience grande | 13,0 min | 128 | 29 % | 86 s | 69 | 77 % |
+| Paris, quartier | les deux | 16,2 min | 139 | 23 % | 70 s | 70 | 76 % |
 
-Lecture: au bourg, le rythme paisible et la patience grande ensemble font passer les groupes repartis de <!-- val:aides_bourg_normal -->15 % à <!-- val:aides_bourg_les_deux -->5 %, contre un service réel de 14,4 minutes au lieu de 11,5.
+Lecture: au bourg, le rythme paisible et la patience grande ensemble font passer les groupes repartis de <!-- val:aides_bourg_normal -->14 % à <!-- val:aides_bourg_les_deux -->3 %, contre un service réel de 14,4 minutes au lieu de 11,5.
 
 **Personnages présents et plafonds de l'architecte**
 
@@ -838,10 +841,10 @@ Lecture: au bourg, le rythme paisible et la patience grande ensemble font passer
 | Adresse | Présents au plus, 99 jours sur 100 | Présents au plus | Plafond C2 | Employés au plus | Plafond C5 | Respecté |
 |---|---|---|---|---|---|---|
 | village | 24 | 24 | 24 | 0 | 12 | oui |
-| bourg | 35 | 42 | 48 | 1 | 12 | oui |
-| ville | 56 | 62 | 72 | 5 | 12 | oui |
-| Paris, quartier | 68 | 73 | 80 | 8 | 12 | oui |
-| Paris, maison | 118 | 120 | 120 | 12 | 12 | oui |
+| bourg | 34 | 39 | 48 | 1 | 12 | oui |
+| ville | 45 | 47 | 72 | 5 | 12 | oui |
+| Paris, quartier | 58 | 65 | 80 | 7 | 12 | oui |
+| Paris, maison | 111 | 119 | 120 | 10 | 12 | oui |
 
 **Profils horaires** (un dimanche de la dernière semaine au village; un mardi de la dernière semaine à la maison parisienne)
 
@@ -862,30 +865,30 @@ Lecture: au bourg, le rythme paisible et la patience grande ensemble font passer
 <!-- table:res_heures_maison -->
 | Heure de jeu | Groupes venus | Servis | Repartis | Attente moyenne | Personnages présents au plus |
 |---|---|---|---|---|---|
-| 8 h | 17,7 | 8,6 | 0,1 | 31 s | 25 |
-| 9 h | 20,1 | 15,5 | 1,0 | 44 s | 37 |
-| 10 h | 20,5 | 15,8 | 1,2 | 58 s | 52 |
-| 11 h | 18,0 | 15,7 | 2,0 | 66 s | 63 |
-| 12 h | 13,8 | 13,2 | 2,4 | 74 s | 66 |
-| 13 h | 14,4 | 12,1 | 2,2 | 75 s | 64 |
-| 14 h | 18,9 | 12,5 | 1,6 | 85 s | 66 |
-| 15 h | 19,6 | 13,4 | 3,1 | 100 s | 74 |
-| 16 h | 21,4 | 12,9 | 6,1 | 120 s | 81 |
-| 17 h | 16,9 | 12,4 | 5,6 | 132 s | 81 |
-| 18 h | 10,8 | 11,0 | 3,6 | 127 s | 78 |
-| 19 h | 5,2 | 9,4 | 1,2 | 112 s | 69 |
-| 20 h | 2,2 | 16,9 | 0,1 | 80 s | 57 |
+| 8 h | 17,5 | 8,6 | 0,1 | 31 s | 24 |
+| 9 h | 19,1 | 14,7 | 1,1 | 44 s | 35 |
+| 10 h | 19,4 | 15,7 | 1,3 | 54 s | 48 |
+| 11 h | 15,7 | 13,8 | 1,2 | 69 s | 58 |
+| 12 h | 12,8 | 12,7 | 2,3 | 75 s | 60 |
+| 13 h | 13,3 | 10,6 | 1,8 | 79 s | 59 |
+| 14 h | 16,5 | 11,4 | 1,9 | 83 s | 60 |
+| 15 h | 19,1 | 12,1 | 3,3 | 102 s | 67 |
+| 16 h | 19,8 | 11,6 | 6,0 | 125 s | 72 |
+| 17 h | 16,3 | 11,0 | 5,9 | 136 s | 75 |
+| 18 h | 9,3 | 9,8 | 3,1 | 133 s | 72 |
+| 19 h | 4,3 | 9,7 | 1,0 | 114 s | 65 |
+| 20 h | 2,4 | 15,0 | 0,1 | 87 s | 52 |
 
 **Rythme réel**
 
 <!-- table:res_rythme -->
 | Duo | village | bourg | ville | Paris, quartier | Paris, maison | Journée ouverte moyenne |
 |---|---|---|---|---|---|---|
-| Duo tranquille | 35 jours, 11,7 h | 28 jours, 9,9 h | 28 jours, 10,5 h | 28 jours, 10,7 h | 42 jours, 15,6 h | 24,5 min |
-| Duo médian | 21 jours, 5,8 h | 21 jours, 6,2 h | 21 jours, 6,4 h | 21 jours, 6,9 h | 35 jours, 11,1 h | 20,6 min |
-| Duo rapide | 21 jours, 4,7 h | 21 jours, 5,1 h | 21 jours, 5,4 h | 21 jours, 5,9 h | 28 jours, 7,6 h | 17,3 min |
+| Duo tranquille | 35 jours, 11,7 h | 28 jours, 9,9 h | 28 jours, 10,2 h | 28 jours, 10,5 h | 35 jours, 13,1 h | 24,3 min |
+| Duo médian | 21 jours, 5,8 h | 21 jours, 6,2 h | 21 jours, 6,3 h | 21 jours, 6,7 h | 28 jours, 8,9 h | 20,4 min |
+| Duo rapide | 21 jours, 4,7 h | 21 jours, 5,1 h | 21 jours, 5,3 h | 21 jours, 5,7 h | 28 jours, 7,6 h | 17,1 min |
 
-Lecture: une journée ouverte du duo médian dure <!-- val:journee_median_min -->21 minutes réelles; une séance de 40 minutes en fait près de deux. Aucun duo simulé n'a jamais eu de somme à régler (<!-- val:a_regler -->0 partie sur 120).
+Lecture: une journée ouverte du duo médian dure <!-- val:journee_median_min -->20 minutes réelles; une séance de 40 minutes en fait près de deux. Aucun duo simulé n'a jamais eu de somme à régler (<!-- val:a_regler -->0 partie sur 120).
 
 ## 5. Contrôles (game-designer, ux-ui-designer)
 
@@ -1014,16 +1017,16 @@ Dix familles. Prix conseillé au comptoir du village et de la maison parisienne 
 | `cannele` | Cannelé | Pâtisseries | vitrine 1,2/1,2/1 s | 2,20 € / 4,40 € | 0,35 € | 1 | ville | fiche, 50 € | toute l'année |
 | `eclair` | Éclair au café | Pâtisseries | vitrine 1,5/1,5/1,2 s | 4,00 € / 8,00 € | 0,70 € | 1 | Paris, quartier | employé pâtissier | toute l'année |
 | `tarte_citron` | Tarte au citron meringuée | Pâtisseries | vitrine 2/2/1,5 s | 4,20 € / 8,40 € | 0,75 € | 1 | Paris, quartier | fiche, 80 € | toute l'année |
-| `entremets` | Le gâteau de la maison | Pâtisseries | vitrine 2,5/2/2 s | 6,00 € / 12,00 € | 1,20 € | 1 | Paris, maison | laboratoire de pâtisserie | toute l'année |
+| `entremets` | Le gâteau de la maison | Pâtisseries | vitrine 2,5/2/2 s | 6,00 € / 12,00 € | 1,20 € | 1 | Paris, maison | E2, le laboratoire | toute l'année |
 | `croque` | Croque-monsieur | Salé | plan 4/3/2,5 s puis four 1/1/1 s + 15/12/10 s seul, finir 1,5/1,5/1 s | 5,50 € / 11,00 € | 1,10 € | 1 | bourg | four | toute l'année |
 | `quiche` | Part de quiche | Salé | four 1,5/1,5/1 s + 8/7/6 s seul, finir 1/1/1 s | 5,00 € / 10,00 € | 0,90 € | 1 | bourg | fiche, 40 € | toute l'année |
 | `soupe` | Soupe du jour | Salé | plan 3/2,5/2 s | 4,50 € / 9,00 € | 0,70 € | 1 | bourg | découverte de l'hiver | hiver |
 | `salade` | Salade composée | Salé | plan 8/7/6 s | 7,50 € / 15,00 € | 2,00 € | 1 | ville | découverte de l'été | été |
 | `tartine_avocat` | Tartine avocat-œuf | Salé | plan 6/5/4 s | 7,00 € / 14,00 € | 1,80 € | 1 | ville | fiche, 60 € | toute l'année |
-| `brunch` | Formule brunch | Brunch | plan 6/5/4 s ; frigo 1,5/1,5/1,5 s ; espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 4/3/1 s + 0/0/4 s seul | 19,00 € / 38,00 € | 5,00 € | 4 | ville | arrivée à l'atelier | toute l'année |
+| `brunch` | Formule brunch | Brunch | plan 6/5/4 s ; frigo 1,5/1,5/1,5 s ; espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 4/3/1 s + 0/0/4 s seul | 19,00 € / 38,00 € | 5,00 € | 4 | ville | E2, la cuisine du brunch | toute l'année |
 | `filtre` | Café filtre de spécialité | Café de spécialité | douce 9/6/4 s + 15/15/12 s seul, finir 1/1/1 s | 3,80 € / 7,60 € | 0,80 € | 1 | ville | Aïcha, lien 1 | toute l'année |
 | `espresso_origine` | Espresso d'origine | Café de spécialité | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 2,60 € / 5,20 € | 0,50 € | 1 | ville | bar à méthodes douces | toute l'année |
-| `notre_melange` | Notre mélange | Café de spécialité | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 3,00 € / 6,00 € | 0,45 € | 1 | Paris, maison | torréfaction | toute l'année |
+| `notre_melange` | Notre mélange | Café de spécialité | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 3,00 € / 6,00 € | 0,45 € | 1 | Paris, maison | E1, la torréfaction | toute l'année |
 
 ### 6.3 Catalogue
 
@@ -1087,9 +1090,10 @@ Postes, machines et extensions achetés par le duo simulé (table du script; les
 | `ville` | `grande_table` | Grande table d'atelier | 900 € | equip:grande_table | 4 | 6 |
 | `ville` | `fiches_ville` | Fiches de la ville (latte, milk-shake, cannelé, tartine avocat-œuf) | 210 € | recette:latte; recette:milkshake; recette:cannele; recette:tartine_avocat | 6 | 7 |
 | `ville` | `four2` | Four ventilé | 3 500 € | poste:four:2 | 9 | 9 |
-| `ville` | `tables` | Deux tables et deux fauteuils | 520 € | places:0,2,2,0 | 8 | 8 |
-| `ville` | `ville_cour` | E2, la cour pavée | 2 600 € | ext:ville_cour | 10 | 10 |
-| `ville` | `ville_salle2` | E1, la deuxième salle | 2 500 € | ext:ville_salle2 | 11 | 11 |
+| `ville` | `tables` | Deux fauteuils (à la place de deux chaises) | 380 € | places:0,-2,2,0; equip:fauteuils | 8 | 8 |
+| `ville` | `ville_cuisine` | E2, la cuisine du brunch | 2 000 € | ext:ville_cuisine | 10 | 10 |
+| `ville` | `ville_atelier` | E1, l'atelier entier | 2 500 € | ext:ville_atelier | 11 | 11 |
+| `ville` | `ville_cour` | E3, la cour sous la glycine | 2 000 € | ext:ville_cour | 12 | 12 |
 | `paris-quartier` | `trois_groupes` | Machine à trois groupes, arrêt programmé | 6 500 € | poste:espresso:3 | 1 | 1 |
 | `paris-quartier` | `buse_auto` | Buses automatiques | 1 200 € | poste:vapeur:3 | 2 | 2 |
 | `paris-quartier` | `caisse2` | Second terminal de paiement | 600 € | caisse:2 | 3 | 3 |
@@ -1097,17 +1101,17 @@ Postes, machines et extensions achetés par le duo simulé (table du script; les
 | `paris-quartier` | `blender` | Blender | 300 € | poste:blender:1 | 5 | 5 |
 | `paris-quartier` | `douce` | Bar à méthodes douces et moulin de spécialité | 3 200 € | poste:douce:1; equip:moulin_specialite | 6 | 6 |
 | `paris-quartier` | `fiche_citron` | Fiche « tarte au citron meringuée » | 80 € | recette:tarte_citron | 7 | 8 |
-| `paris-quartier` | `tables` | Deux tabourets, deux tables, une banquette, une table dehors | 1 500 € | places:2,2,2,2 | 8 | 7 |
-| `paris-quartier` | `pq_trottoir` | E1, la terrasse sur le trottoir | 5 000 € | ext:pq_trottoir | 9 | 9 |
-| `paris-quartier` | `pq_arriere` | E2, l'arrière-salle | 9 000 € | ext:pq_arriere | 10 | 10 |
+| `paris-quartier` | `tables` | Une banquette (à la place de trois chaises) | 600 € | places:0,-3,3,0 | 8 | 7 |
+| `paris-quartier` | `pq_terrasse` | E2, la terrasse sur les deux rues | 5 000 € | ext:pq_terrasse | 9 | 9 |
+| `paris-quartier` | `pq_fond` | E1, la salle du fond | 6 000 € | ext:pq_fond | 10 | 10 |
 | `paris-maison` | `buse_auto` | Buses automatiques | 1 200 € | poste:vapeur:3 | 1 | 1 |
 | `paris-maison` | `douce` | Bar à méthodes douces et moulin de spécialité | 3 200 € | poste:douce:1; equip:moulin_specialite | 2 | 2 |
 | `paris-maison` | `blender` | Blender | 300 € | poste:blender:1 | 3 | 3 |
-| `paris-maison` | `tables` | Quatre tables, une banquette, deux tables dehors | 1 200 € | places:0,4,2,4 | 4 | 4 |
-| `paris-maison` | `labo` | Laboratoire de pâtisserie | 4 000 € | poste:four:3; recette:entremets | 5 | 6 |
-| `paris-maison` | `torrefaction` | Torréfacteur (notre mélange) | 4 000 € | recette:notre_melange | 6 | 7 |
-| `paris-maison` | `pm_verriere` | E1, la verrière restaurée | 6 000 € | ext:pm_verriere | 7 | 5 |
-| `paris-maison` | `pm_mezzanine` | E2, la mezzanine | 8 000 € | ext:pm_mezzanine | 8 | 8 |
+| `paris-maison` | `tables` | Deux banquettes de halle (à la place de quatre chaises) | 1 200 € | places:0,-4,4,0 | 4 | 4 |
+| `paris-maison` | `pm_torrefaction` | E1, la torréfaction | 4 000 € | ext:pm_torrefaction | 5 | 6 |
+| `paris-maison` | `pm_labo` | E2, le laboratoire de pâtisserie | 4 000 € | ext:pm_labo | 6 | 7 |
+| `paris-maison` | `pm_salons` | E3, les salons de l'étage | 8 000 € | ext:pm_salons | 7 | 5 |
+| `paris-maison` | `pm_jardin` | E4, le jardin et sa serre | 6 000 € | ext:pm_jardin | 8 | 8 |
 
 ### 6.4 Profils de clients (10)
 
@@ -1176,12 +1180,14 @@ Candidats de la version 1 (les petites annonces en tirent trois chaque lundi; le
 | Josiane | service en salle, reprise | Bonne mémoire, Sang-froid | café d'angle, vingt-cinq ans de maison |
 | Dimitri | barista, repris | Main sûre, Couche-tard | café d'angle |
 | Awa | service en salle, reprise | Sourire, Pied léger | café d'angle |
+| Gaspard | plonge, repris | Patience d'ange, Lève-tôt | café d'angle |
 | Arthur | pâtisserie | Curiosité, Main sûre | candidatures de Paris (il apporte l'éclair au café) |
 | Mathilde | service en salle, reprise | Patience d'ange, Sourire | maison parisienne |
 | Yusuf | barista, repris | Sang-froid, Main sûre | maison parisienne |
 | Clara | service en salle, reprise | Sourire, Lève-tôt | maison parisienne |
 | Lucien | plonge, repris | Lève-tôt, Patience d'ange | maison parisienne |
 | Ninon | service en salle, reprise | Bonne mémoire, Douceur | maison parisienne |
+| Rayan | barista, repris | Main sûre, Couche-tard | maison parisienne |
 | Elsa | gérance | Sang-froid, Bonne mémoire | candidatures de Paris (pour une succursale) |
 
 ### 6.7 Fournisseurs
@@ -1262,19 +1268,61 @@ Total de la version 1: 60 projets.
 
 ## 7. Direction artistique (directeur-artistique)
 
-Voir `docs/jeux/cosy-cafe/bible-artistique.md` et `docs/jeux/cosy-cafe/bible/` (résumé à écrire par le manager).
+Document de référence: `docs/jeux/cosy-cafe/bible-artistique.md`, planches dans `docs/jeux/cosy-cafe/bible/` (vues des cinq adresses, palette, moments, styles, silhouettes, caméra et échelle, contrôles en gris et daltoniens).
+
+- **Intention**: une « maquette peinte à la main », en vraie 3D temps réel. Trois piliers: chaleureux, arrondi, fait main. Les planches sont des dessins 2D qui fixent couleurs, placements et lisibilité, pas le rendu: le rendu se juge sur l'essai de style 3D (section 7.1).
+- **Lisibilité**: ce qui se prend, se sert ou se lit (porcelaine, papier, mousse de lait) est très clair, le café et l'encre très sombres, et tout se pose sur des surfaces moyennes à sombres; le décor reste au milieu de l'échelle. Vérifié en niveaux de gris et sous trois daltonismes.
+- **Les deux joueurs**: bandeau noué, tablier à bretelles croisées à la couleur de Duo bordé d'un liseré sombre, écusson au symbole dans le dos; le joueur à la couleur la plus claire porte un haut sombre, l'autre un haut clair. On se reconnaît de dos, pour les 15 paires de couleurs possibles.
+- **Caméra**: yeux à 1,65 m, champ vertical de 60°, ni roulis ni balancement par défaut.
+- **Lumière**: chaude, précalculée sur la coque, taches de soleil cuites, 4 lumières réelles au plus (C9), aucune ombre ni aucun reflet calculés en direct (C10, C11).
+- **Six styles** de décoration avec leur roue des compatibilités, identité propre à chaque adresse et à sa rue (tomettes et tilleul à Ormeval, zinc et pan coupé à Paris, verrière à la Graineterie), sans aucun monument ni aucune enseigne réelle.
+- **Liste des assets de la version 1** avec specs et budgets: environ 65 meubles sur six styles, 22 postes, 15 modules de comptoir, 24 pièces de vaisselle, 30 de nourriture, 40 décorations.
+
+### 7.1 Essai de style 3D (en cours, 2026-11-07)
+
+Le client a demandé à voir le rendu réel avant de choisir. L'artiste 3D construit le café d'Ormeval dans le moteur du jeu (Three.js, vue subjective, trois points de vue), en deux variantes de la même scène: **A stylisé chaleureux** (formes arrondies, couleurs douces, lumière dorée) et **B semi-réaliste** (proportions et matières réelles, textures réduites), avec les mesures de budget de chacune. Le choix du client (question Q17) fixe la direction de la bible avant l'alpha.
+
+### 7.2 Fabrication des assets 3D avec Meshy
+
+Fiche de référence du studio: `docs/production/meshy.md` (inventaire des 28 outils, coûts, limites, chaîne de fabrication), essai réel dans `docs/production/essais-meshy/`.
+
+- **Ce qui se fait par Meshy**, depuis une image de référence du directeur artistique, en topologie intelligente au plafond de triangles de la catégorie (C8): meubles aux formes organiques, plantes, décoration, nourriture, ébauches des machines, accessoires et coiffures des personnages. **Par Blender scripté**: les coques des adresses aux cotes des plans, les modules de comptoir, tout ce qui demande une cote exacte. **En mixte**: les machines (ébauche Meshy, reprise dans Blender).
+- **Personnages**: corps et squelette communs du studio, accessoires à part. L'essai a montré qu'un personnage entier fait par Meshy fond ses accessoires au corps (le gobelet ne quitte pas la main). Les squelettes de Meshy sont identiques d'un personnage à l'autre (24 os): une animation de sa bibliothèque (678 actions) achetée une fois peut servir à tous.
+- **Mise en conformité** obligatoire (scripts de l'essai): échelle réelle (la taille donnée par Meshy est fausse), trous bouchés, couleurs ramenées à la palette, pièces de jeu séparées, contrôle automatique et revue visuelle sur quatre angles en gris. Mesuré sur l'essai: machine à espresso de 1 358 triangles (135 Ko), client de 3 960 triangles avec 5 animations (624 Ko).
+- **Crédits**: budget fixé dans chaque brief, aperçu le moins cher avant tout affinage, jamais de texture 8K. Estimation pour la version 1: environ 3 600 crédits, soit un peu plus d'un mois de l'abonnement du client (3 058 crédits par mois). Essai du 2026-11-07: 62 crédits.
+- **Licence**: offre payante du client, les modèles lui appartiennent (page des tarifs de Meshy). Chaque asset garde sa fiche de génération versionnée à côté de lui; les fichiers bruts ne se versionnent pas.
 
 ## 8. Direction sonore (sound-designer)
 
-Voir `docs/jeux/cosy-cafe/son.md` (résumé à écrire par le manager).
+Document de référence: `docs/jeux/cosy-cafe/son.md` (sections 8.1 à 8.12).
+
+- **Piliers**: le geste s'entend; douillet même au coup de feu; la salle vit sans couvrir les gestes; la musique sort d'un appareil du café; un son n'est jamais secret (les deux machines sont dans la même pièce); on se parle par-dessus.
+- **Ambiances** des cinq adresses sous 16 moments (pluie, hiver, marché, sortie d'école, brunch, fête...), porte ouverte ou fermée; une rumeur de salle sans paroles, qui suit le nombre de clients et reste sous les gestes.
+- **Musique diégétique**: radio au village, tourne-disque au bourg, platines en ville, sonorisation à Paris; six listes, une par style de décoration, 24 morceaux originaux (une heure) en version 1, synchronisés sur les deux machines.
+- **Environ 300 événements sonores** avec leur priorité; la buse vapeur change de son avec la température du lait. Aucun son ne juge la qualité d'un geste ni ne signale un client déçu, pour ne jamais comparer les deux joueurs.
+- **Budget**: 58,7 Mo de son décodé au pire (plafond 64 Mo), environ 30 Mo dans le paquet du jeu.
 
 ## 9. Interface et HUD (ux-ui-designer)
 
-Voir `docs/jeux/cosy-cafe/ux.md` et `design/maquettes/cosy-cafe/` (résumé à écrire par le manager).
+Document de référence: `docs/jeux/cosy-cafe/ux.md`; maquettes basse fidélité dans `design/maquettes/cosy-cafe/` (HUD, tablette, ardoise, bilan; planche `planche.png`). En cas d'écart avec la section 5 de ce cahier, `ux.md` fait foi pour les touches et le HUD.
+
+- **Parcours**: salon de Duo, première fois (nom de la maison choisi à deux, avatars, confort), matin et choix de l'adresse, préparation, « On ouvre ? », service, bilan du soir (le livre d'or avant les chiffres), fin de séance, déménagement.
+- **HUD minimal**: point de visée, invite contextuelle, objet en main en bas à droite, heure, tickets pris, où est l'autre et ce qu'il tient quand on ne le voit pas, alertes douces. Le reste vit dans le monde: ardoise, rail à tickets aux pinces de couleur, caisse, livre d'or, tablette de la maison.
+- **À deux**: proposition d'achat et accord de l'autre, panneaux partagés, absence, déconnexion gérée par Duo.
+- **Échap**: Chromium l'avale pour rendre la souris; le jeu le change en pause de Duo chez les deux; au retour, « Clique pour reprendre la souris », sans effet dans le café. Les panneaux du jeu se ferment par leur touche, Retour arrière ou un clic à côté.
+- **Confort et accessibilité**: champ de vision réglable, balancement coupé par défaut, aide à viser sans jamais tourner la caméra, gestes simplifiés, lettres du monde d'au moins 18 px à 1366x768, couleurs des joueurs toujours doublées de leur symbole.
+- **Vérifié**: 616 contrôles de mise en page de 911x512 à 1920x1080 à 150 %, 92 au clavier seul, contrastes AA, daltonismes.
 
 ## 10. Technique (architecte-technique, dev-reseau, tech-artist)
 
-Voir `docs/jeux/cosy-cafe/technique.md`, dont la section 11 (contraintes C1 à C26) que ce cahier respecte (résumé à écrire par le manager).
+Document de référence: `docs/jeux/cosy-cafe/technique.md`, dont la section 11 (contraintes C1 à C26) que ce cahier respecte.
+
+- **Moteur**: Three.js en vue subjective dans Duo (Electron); l'hôte fait autorité (ADR 0007), chaque joueur prédit son propre avatar, l'autre et les clients sont interpolés.
+- **Plafonds principaux pour le design**: 40 personnages animés visibles à la fois (C1); personnages présents au plus 24, 48, 72, 80 et 120 selon l'adresse (C2); file de 6 places (C4); 12 employés au plus (C5); meubles posés 60 à 350 selon l'adresse, 150 visibles (C6); triangles par catégorie (C8); aucune physique, ombre ni reflet calculés (C10 à C12); un seul café à la fois pour les deux (C24).
+- **Mesures d'essai**: animer 40 personnages coûte environ 0,35 ms par image sur le processeur du cloud; les messages réseau de la plus grande adresse tiennent sous 9 Ko par domaine. Le coût de dessin sur l'Intel UHD 620 ne se mesure que sur le PC: un banc de mesure part chez le client dès le prototype.
+- **Sauvegarde** toutes les 2 minutes, reprise en plein service, succursales calculées une fois par jour (C23, C25). Paquet du jeu: 40 Mo au prototype, 80 Mo à la 1.0.
+- **Piège trouvé dans le code de Chromium**: le premier Échap rend la souris au lieu de mettre en pause; parade dans le SDK (section 9).
+- **À écrire avant le prototype**: quatre ADR, dont celle de la vue subjective pour toute la plateforme.
 
 ## 11. Périmètre (game-designer, manager)
 
@@ -1345,12 +1393,12 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | CA-43 | tous les textes du jeu | relecture et contrôle automatique | aucun accord au genre d'un joueur, tutoiement de chaque joueur, « vous » pour les deux, aucune marque ni aucun lieu réel, aucun tiret cadratin ni demi-cadratin | D, U |
 | CA-44 | le jeu complet | on le joue à la souris seule, puis au clavier seul | tout est faisable; aucune touche de la rangée des chiffres n'est exigée; Échap ne ferme jamais un panneau du jeu | P2, M |
 | CA-45 | `cosy_cafe.py --croise` lancé sur ce cahier | il s'exécute | aucun écart: chaque table d'équilibrage est la copie des données, chaque résultat celui du fichier de résultats, et les résultats correspondent aux données | U |
-| CA-46 | les tables de configuration du jeu, relues par le script | `cosy_cafe.py --resultats` s'exécute | le duo médian fête la maison entre 33 et 40 h; neuf duos tranquilles sur dix avant 62 h; tous les plafonds C2 et C5 tenus | U |
+| CA-46 | les tables de configuration du jeu, relues par le script | `cosy_cafe.py --resultats` s'exécute | le duo médian fête la maison entre 32 et 38 h; neuf duos tranquilles sur dix avant 58 h; tous les plafonds C2 et C5 tenus | U |
 | CA-47 | le service du village, deux joueurs, la dernière semaine du duo médian | on le simule | moins de 15 % de groupes repartis et moins de 60 s d'attente moyenne: tendu mais tenable | U |
-| CA-48 | dix séances de prototype chez le client | on mesure la durée d'une journée ouverte | 21 minutes à 4 minutes près; sinon on recale la minute de jeu ou les heures d'ouverture | M |
+| CA-48 | dix séances de prototype chez le client | on mesure la durée d'une journée ouverte | 20 minutes à 4 minutes près; sinon on recale la minute de jeu ou les heures d'ouverture | M |
 | CA-49 | les séances de prototype | on observe le duo pendant les coups de feu | les deux se parlent pour se répartir le travail (au moins une phrase par minute de pointe); les deux disent n'avoir jamais attendu sans rien faire | M |
 | CA-50 | le livre d'or d'une journée où des clients n'ont pas trouvé de place | on le lit à la fermeture | au moins un mot en donne la raison, si un client déçu a écrit; aucun mot ne nomme un joueur | U, P2 |
-| CA-51 | les mesures du prototype (gestes par minute, durée de préparation et de fermeture, part épargnée) | on les reporte dans la table `duos` | la simulation relancée redonne une durée médiane entre 33 et 40 h, ou l'on recale les seuils (réputation, installations) et l'on met ce cahier à jour | U, M |
+| CA-51 | les mesures du prototype (gestes par minute, durée de préparation et de fermeture, part épargnée) | on les reporte dans la table `duos` | la simulation relancée redonne une durée médiane entre 32 et 38 h, ou l'on recale les seuils (réputation, installations) et l'on met ce cahier à jour | U, M |
 
 ## 13. Jalons (manager)
 
@@ -1366,7 +1414,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | # | Question | Options | Recommandation | Décision du client | Date |
 |---|---|---|---|---|---|
 | Q1 | Le titre | « Cosy Café »; « Deux Tabliers »; « L'Ardoise du jour »; « Comptoir à deux »; « Petit noir, grand crème »; « Les Deux Tasses » | « Deux Tabliers »: aucun jeu, livre, film ni marque trouvés sous ce nom; il dit le couple, le métier et la douceur. « Cosy Café » se perdrait parmi des jeux existants (section 1.1). L'identifiant `cosy-cafe` peut rester | | |
-| Q2 | La durée de l'histoire principale | environ 36 h (ce cahier: 36,4 h pour un duo médian, 28,5 à 56 h selon les duos); plus courte (environ 25 h: seuils et coûts allégés); plus longue (environ 50 h: une semaine de plus par adresse) | environ 36 h: environ 55 soirées de 40 minutes, puis le jeu libre; on recale au prototype sur vos vraies séances (CA-51) | | |
+| Q2 | La durée de l'histoire principale | environ 34 h (ce cahier: 34,0 h pour un duo médian, 28,3 à 53,1 h selon les duos); plus courte (environ 25 h: seuils et coûts allégés); plus longue (environ 50 h: une semaine de plus par adresse) | environ 34 h: une cinquantaine de soirées de 40 minutes, puis le jeu libre; on recale au prototype sur vos vraies séances (CA-51) | | |
 | Q3 | Paris réel ou métropole inventée | Paris réel, avec des rues, des commerces et des personnes inventés; une grande ville inventée | Paris réel aux rues inventées: c'est le rêve de la demande (« jusqu'à Paris »); la bible le rend reconnaissable par sa matière seule, sans aucun lieu réel | | |
 | Q4 | Les deux joueurs toujours dans le même café | toujours ensemble; libres d'être dans deux cafés à la fois | toujours ensemble en version 1: le coup de feu à deux est le cœur du jeu, et deux cafés à la fois coûteraient un lot de développement et doubleraient les tests (technique, section 7.2, C24); à rouvrir après la bêta si vous le souhaitez en jouant | | |
 | Q5 | Les anciens cafés | gardés en succursales; revendus pour financer le suivant; au choix | gardés en succursales: on ne perd rien de ce qu'on a construit, on peut y retourner jouer, et la maison grandit vraiment (cinq cafés à la fin); la revente ne serait qu'une perte déguisée | | |
@@ -1375,9 +1423,36 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | Q8 | Les prix | plausibles en euros, plus chers à Paris (ce cahier: espresso à 1,40 € au village, 2,80 € à la maison parisienne); sans unité (« pièces ») | plausibles en euros: ils parlent tout de suite et rendent Paris crédible; les loyers et les salaires sont réalistes, seules les installations et les travaux sont modestes, justifiés par l'histoire (les lieux sont confiés) | | |
 | Q9 | Le dixième profil, « les voisins » (deux mots au comptoir) | le garder; s'en tenir aux neuf profils du cadrage | le garder: il donne au poste calme (parler aux gens) un vrai effet sur le jeu, et fait vivre le zinc à chaque adresse | | |
 | Q10 | Les textes s'accordent-ils au genre de vos avatars ? | rédaction neutre pour tous (comme Duo et La Petite Ligne); un choix « il » ou « elle » | rédaction neutre: un seul texte à écrire et à tester, déjà éprouvé au jeu 1 | | |
+| Q11 | Combien de musique en version 1 (son, S1) | 24 morceaux (une heure); moins; plus | 24 morceaux, environ 21 Mo, puis un second volume de 12 morceaux par une mise à jour si les listes lassent | | |
+| Q12 | Des voix dans le jeu (son, S2) | aucune voix: rumeur sans paroles, clients qui s'expriment par leurs gestes et quelques notes; des voix enregistrées | aucune voix, comme La Petite Ligne; on juge la rumeur à l'écoute dès le prototype | | |
+| Q13 | Mains visibles en vue subjective (bible) | mains stylisées; objet tenu seul | objet seul au prototype, mains stylisées à l'alpha | | |
+| Q14 | Les signes des joueurs (bible) | figés (bandeau, bretelles croisées, écusson) avec un haut clair ou sombre imposé selon la paire; libres | figés: c'est ce qui garantit qu'on se reconnaît de dos | | |
+| Q15 | La maison parisienne (bible, plans) | sous une verrière; sur un boulevard | la verrière, pour sa lumière unique (c'est celle des plans: la Graineterie) | | |
+| Q16 | Le second rang de terrasse au café d'angle (plans) | un seul rang (16 places); deux rangs (26) si l'architecte valide une foule lointaine simplifiée | un rang au prototype; on décide après la mesure sur le PC | | |
+| Q17 | La direction de rendu (essai de style 3D) | A stylisé chaleureux; B semi-réaliste; un mélange | à décider sur les images de l'essai, en cours | | |
+| Q18 | Les réglages de souris et de champ de vision (UX, U1) | dans Duo, communs à tous les jeux; dans chaque jeu | dans Duo, par ordinateur; d'ici là, dans la tablette | | |
+| Q19 | L'annonce du départ (UX, U2) | « Café de la place cherche repreneurs »; « Café de la place à reprendre » | « à reprendre »: l'autre forme suppose des joueurs au masculin | | |
 
 ## 15. Historique
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
-| 2026-11-07 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, 13, 14, proposition de la 12), à partir du cadrage du manager; simulation client par client jointe (`simulations/cosy_cafe.py`, `resultats.md`); alignement sur les plans du village et du bourg (level-designer), les contraintes C1 à C26 (architecte), la bible (roue des styles, fournisseurs, habitués) et les hypothèses du son (fenêtres du lait, aucun son de qualité) | game-designer, sur brief du manager |
+| 2026-11-08 | 0.2 | Consolidation par le manager: résumés des sections 7 à 10, essai de style 3D (7.1), fabrication avec Meshy (7.2), questions Q11 à Q19 venues du son, de la bible, des plans et de l'UX, arbitrages entre membres (section 16) | manager |
+| 2026-11-07 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, 13, 14, proposition de la 12), à partir du cadrage du manager; simulation client par client jointe (`simulations/cosy_cafe.py`, `resultats.md`); alignement sur les plans des cinq adresses (level-designer: noms, places, extensions, équipes reprises), les contraintes C1 à C26 (architecte), la bible (roue des styles, fournisseurs, habitués) et les hypothèses du son (fenêtres du lait, aucun son de qualité) | game-designer, sur brief du manager |
+
+## 16. Arbitrages du manager (2026-11-08)
+
+Écarts relevés entre les documents de l'équipe, et ce qui fait foi.
+
+| Sujet | Écart | Décision | Raison |
+|---|---|---|---|
+| Touches et HUD | section 5 de ce cahier et `ux.md` | `ux.md` fait foi: balancement de tête coupé par défaut, pancarte « Ouvert » par E maintenu (pas de touche F), aperçu de pose qui dit par sa forme et un texte si la pose est possible | confort en vue subjective et une touche de moins à apprendre |
+| Horaires | `son.md` suppose 8 h à 19 h partout | les horaires par adresse de la section 4.2 font foi; le son suit | les règles de jeu priment |
+| Employés à l'arrivée en ville | 2 sur le plan, 0 dans ce cahier | 0: la première embauche est un moment de jeu; le plan s'ajuste à l'alpha | progression voulue |
+| Coup de main au bourg | jours de marché (plan) ou aussi le week-end (cahier) | le cahier (marché et week-end) | la simulation l'emploie ainsi et tient le plafond C2 |
+| Progression commune dans Duo (F09) | formule par adresse (technique) ou projets réalisés (cahier) | projets réalisés sur les 60 de « Nos projets » | elle continue de monter dans le jeu libre |
+| Signe du profil « voisins » | absent de la bible | journal plié ou cabas, accoudé au comptoir, à dessiner à l'alpha | cohérent avec les autres profils |
+| Surfaces | ville à 165 m² et café d'angle à 29 places assises (plus 3 ou 4 debout au zinc), hors des fourchettes du cadrage | les plans font foi | tenus par le validateur et par les plafonds C1 à C3 |
+| Sorties brutes de Meshy | la bible demande de les versionner, la fiche Meshy non | non versionnées (fiche de génération seulement) | plusieurs Mo par modèle, et l'asset conformé se reprend sans elles |
+| Couleur des modèles Meshy | une couleur par face (bible) ou par pièce (fiche Meshy) | par pièce par défaut, par face pour les pièces vraiment multicolores | l'éclairage peint dans les textures de Meshy tache les couleurs face par face |
+| Critères d'acceptation | proposés ici (CA-01 à CA-51) | à rendre testables par le qa-testeur après la validation du client | le contenu peut encore bouger |

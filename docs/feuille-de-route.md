@@ -1,6 +1,6 @@
 # Feuille de route
 
-Tenue par le manager. Dernière mise à jour: 2026-10-31.
+Tenue par le manager. Dernière mise à jour: 2026-11-08.
 
 ## Phase 0: constitution du studio (terminée)
 
@@ -53,10 +53,18 @@ Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta,
 - Fait: cahier des charges complet en brouillon (`docs/jeux/jeu-1/cahier-des-charges.md`, version 0.1), périmètre de la démo (`demo.md`), bible artistique, direction sonore, carte du bourg. La démo de la nuit du 2026-10-31 sert de prototype: le plaisir de jeu se valide dessus.
 - Ensuite: retours du client sur la démo, puis validation du cahier des charges complet (objectif de 100 heures) avant l'alpha.
 
+### Deuxième jeu: Cosy Café (titre de travail, cadrage du 2026-11-07)
+
+- Demande du client: un café à ouvrir à deux, en vue à la première personne, d'une petite cellule de village jusqu'à Paris, avec des employés.
+- Fait: cadrage (`docs/jeux/cosy-cafe/cadrage.md`); cahier des charges 0.2 consolidé (`docs/jeux/cosy-cafe/cahier-des-charges.md`) avec sa simulation (34 h pour un duo médian, cinq adresses), plans des cinq adresses, bible artistique, direction sonore, parcours et maquettes de l'interface, technique et plafonds C1 à C26.
+- Fait: Meshy branché (serveur MCP, clé sur l'environnement cloud « duo »), fiche du studio `docs/production/meshy.md`, essai réel de bout en bout (62 crédits).
+- En cours: essai de style 3D du café du village, deux variantes (stylisé chaleureux, semi-réaliste), pour la question Q17.
+- Ensuite: décisions du client (Q1 à Q19), critères testables (qa-testeur), ADR de la vue subjective, puis prototype au café d'Ormeval.
+
 ## En attente du client
 
 - Publier la préversion v0.1.0 de Duo (page publique de téléchargement avec les installateurs). Recommandation: oui. En attendant, les installateurs se téléchargent depuis la page du workflow « Systèmes » de `main` (compte GitHub connecté).
 - Relevé des machines (Q4) avant le prototype, dont l'état de Smart App Control sur le PC (hypothèse retenue en attendant: i3 de 2018).
 - Basculer la branche par défaut du dépôt sur `main` dans les réglages GitHub.
-- Facultatif: coller `outils/installer-outils.sh` dans le « Setup script » de l'environnement cloud, pour que les outils soient prêts au démarrage de chaque session.
+- Démarrer les sessions de Duo sur l'environnement cloud « duo » (son script de démarrage installe la boîte à outils).
 - Facultatif: autoriser le connecteur SpriteCook dans les réglages claude.ai (sprites générés par IA, consomme des crédits SpriteCook).

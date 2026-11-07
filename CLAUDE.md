@@ -56,6 +56,7 @@ Un même rôle peut tourner en plusieurs exemplaires en parallèle (deux devs ga
 - Aucun livrable transmis au client sans vérification par le manager (fichiers relus, tests relancés).
 - Carnets: chaque membre a une mémoire persistante dans `.claude/agent-memory/<membre>/`, versionnée avec le dépôt. On y note les apprentissages durables (pièges, conventions, astuces vérifiées), jamais l'avancement ni de secret.
 - Les membres tournent sur le modèle de la session (aucun champ `model` dans les fiches). Pour réduire les coûts, on pourra affecter un modèle plus léger à certains rôles.
+- Outils de génération payants (Meshy, SpriteCook): un budget de crédits dans chaque brief; le membre relève le solde au début et à la fin et liste ses tâches avec leur coût dans le compte rendu.
 - Les fiches évoluent: quand un manque apparaît (outil, convention, piège), le manager met la fiche à jour.
 
 ## Processus de production
@@ -99,6 +100,7 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 
 - Sources admises: créations du studio (code, SVG, scripts de génération, modèles Blender scriptés, synthèse sonore), génération par IA avec les outils fournis par le client, ressources externes sous CC0 ou CC-BY, polices sous OFL, code tiers sous licence permissive (MIT, BSD, ISC, Apache-2.0). GPL et licences non commerciales exclues.
 - Toute ressource externe est inscrite dans `CREDITS.md` (fichier, auteur, source, licence).
+- Génération par IA: chaque asset généré a sa fiche versionnée à côté de lui (outil, consigne, images d'entrée, paramètres, identifiants des tâches, crédits, date); les sorties brutes ne se versionnent pas. Les modèles Meshy de l'offre payante du client lui appartiennent (licence privée).
 - Les sources des assets générés (scripts, SVG, données) sont versionnées à côté des fichiers produits, pour pouvoir les régénérer et les retoucher.
 - Ces règles visent ce qui est livré dans Duo. Les outils de production (Blender, FluidSynth, ffmpeg, pedalboard) peuvent être sous GPL ou LGPL: ce qu'ils produisent appartient au studio. Exception: les échantillons d'une banque de sons se retrouvent dans les musiques rendues, donc la banque utilisée (FluidR3_GM, licence MIT) est inscrite dans `CREDITS.md` dès la première musique livrée.
 
@@ -135,6 +137,8 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
   - 3D: modélisation par script dans Blender, export GLB, rendu Cycles sur CPU (960x540 en 9 s), puis le même GLB chargé dans Three.js 0.187 sous Chromium, animation comprise.
   - Son: composition MIDI (mido), rendu FluidSynth, mastering (pedalboard), normalisation à -16 LUFS et encodage OGG avec ffmpeg; effets synthétisés avec numpy.
 - Réseau: npm, PyPI, les dépôts apt d'Ubuntu, raw.githubusercontent.com et les fichiers de release GitHub (dont le binaire Electron) sont accessibles. Les sites d'assets libres (kenney.nl, polyhaven.com, quaternius.com, opengameart.org) sont refusés par la politique réseau. SpriteCook devrait passer par son connecteur claude.ai une fois que le client l'aura autorisé, car le trafic des connecteurs ne dépend pas de cette politique (non vérifié).
+- Environnement cloud « duo » (créé le 2026-11-07, personnel, rattaché au dépôt): à choisir pour les sessions de Duo. Même réseau que « Default », plus `assets.meshy.ai` et `docs.meshy.ai`; script de démarrage qui lance `outils/installer-outils.sh` (à confirmer au démarrage d'une session neuve); secret réseau Meshy pour `api.meshy.ai`.
+- Meshy (génération 3D par IA, offre payante du client, vérifié le 2026-11-07): serveur MCP officiel `@meshy-ai/meshy-mcp-server` 0.6.9 déclaré dans `.mcp.json` et approuvé dans `.claude/settings.json`. La clé n'est jamais dans le dépôt: le proxy l'injecte pour `api.meshy.ai`, le serveur reçoit la valeur fictive `proxy-injected` (sur le Mac du client, une `MESHY_API_KEY` exportée prend le relais). Fichiers servis par `assets.meshy.ai` et effacés 3 jours après la tâche; sorties brutes dans `meshy_output/` (ignoré par git). Les membres passent par `docs/production/essais-meshy/scripts/meshy-mcp.mjs` (leurs fiches ferment les outils MCP). Fiche du studio: `docs/production/meshy.md`.
 - Les machines cibles (macOS, Windows) ne sont pas accessibles d'ici.
 
 ### Compte rendu au manager (fin de chaque mission)
