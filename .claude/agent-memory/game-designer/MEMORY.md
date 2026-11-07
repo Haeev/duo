@@ -303,3 +303,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Contrôle croisé rapide: marqueurs `<!-- table:id -->` et `<!-- val:clé -->` dans le cahier; `resultats.md` porte l'empreinte des tables de paramètres; `--croise` relit les résultats sans relancer le Monte-Carlo. Un script de remplissage dans le scratchpad recopie les tables (jamais à la main).
 - Documents des autres membres à lire tôt: `plans/plans.json` (noms, places par pièce, extensions: Ormeval, place du Tilleul; Mérelles, ancienne pâtisserie, marché du jeudi), bible (roue des styles, fournisseurs, signes des profils), `son.md` (aucun son de qualité ni de client déçu), `technique.md` section 11 (C1 à C26).
 - Titres vérifiés le 2026-11-07, sans résultat sous le nom exact: « Deux Tabliers », « L'Ardoise du jour », « Comptoir à deux », « Petit noir, grand crème », « Les Deux Tasses », « Guide de la Tasse », « Tasse d'or ». « Cosy Café »: pris (Tailside: Cozy Cafe Sim, Steam 2026; itch.io).
+
+## Démo de Deux Tabliers (vérifié le 2026-11-07, `docs/jeux/cosy-cafe/demo/simulations/demo_v0_1.py`)
+
+- Une extension construite « le lundi suivant » ne sert jamais à un défi tenu six jours plus tard: dans une démo courte, mesurer le jour d'achat contre le jour où elle doit servir (terrasse posée dans la nuit, pièce du fond en deux nuits).
+- Compter la surface de la terrasse dans le décor dilue la salle: ouvrir la terrasse faisait perdre 12 points d'ambiance. La terrasse ne compte pas dans la surface du décor.
+- Paliers « réputation ou jour fixe, le premier des deux » et défi à date fixe: la démo ne bloque jamais, l'argent reste la seule limite.
+- Le script de démo importe `cosy_cafe.py` par `importlib` (enregistrer le module dans `sys.modules` avant `exec_module`, sinon les dataclasses plantent) et relit les JSON générés: c'est le contrôle croisé.
+- Consigne du client (nuit du 2026-11-07): simulations courtes, 8 parties par duo et par ordre suffisent (3 s en tout).

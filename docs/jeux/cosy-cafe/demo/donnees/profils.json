@@ -1,0 +1,452 @@
+{
+  "format": "deux-tabliers.profiles",
+  "version": "demo-0.1",
+  "note": "copie du cahier (table profils) avec le flux d'Ormeval; étudiants, télétravailleurs, bruncheurs et connaisseurs sont presque absents du village",
+  "profiles": [
+    {
+      "id": "presses",
+      "name": "Les pressés",
+      "seeks": "un bon café, vite, au comptoir ou à emporter",
+      "mainCraving": "black_coffee",
+      "secondaryCravings": [
+        "pastry_bread",
+        "milk_coffee"
+      ],
+      "seat": "comptoir",
+      "priceSensitivity": 1.2,
+      "patienceSeconds": 35,
+      "waitWithoutPenaltySeconds": 30,
+      "stayGameMinutes": [
+        5,
+        10
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 1.0
+        }
+      ],
+      "eatsShare": 0.4,
+      "takeAwayShare": 0.5,
+      "reorder": null,
+      "styles": [
+        "bistrot",
+        "atelier"
+      ],
+      "wantedEquipment": [
+        "mange_debout",
+        "gobelets"
+      ],
+      "tipFactor": 0.6,
+      "villageGroupsPerDay": 6,
+      "visualSign": "sacoche ou mallette, montre regardée"
+    },
+    {
+      "id": "voisins",
+      "name": "Les voisins",
+      "seeks": "deux mots avec vous et un petit noir au comptoir",
+      "mainCraving": "black_coffee",
+      "secondaryCravings": [
+        "pastry_bread",
+        "tea"
+      ],
+      "seat": "comptoir",
+      "priceSensitivity": 1.3,
+      "patienceSeconds": 120,
+      "waitWithoutPenaltySeconds": 90,
+      "stayGameMinutes": [
+        20,
+        35
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 0.85
+        },
+        {
+          "size": 2,
+          "share": 0.15
+        }
+      ],
+      "eatsShare": 0.3,
+      "takeAwayShare": 0.0,
+      "reorder": {
+        "everyGameMinutes": 20,
+        "probability": 0.3
+      },
+      "styles": [
+        "bistrot",
+        "campagne"
+      ],
+      "wantedEquipment": [
+        "tabourets",
+        "journal"
+      ],
+      "tipFactor": 0.8,
+      "villageGroupsPerDay": 7,
+      "visualSign": "journal plié ou cabas, accoudé au comptoir"
+    },
+    {
+      "id": "flaneurs",
+      "name": "Les flâneurs",
+      "seeks": "prendre le temps: un crème, un fauteuil, un livre, la rue qui passe",
+      "mainCraving": "milk_coffee",
+      "secondaryCravings": [
+        "tea",
+        "cake",
+        "pastry_bread"
+      ],
+      "seat": "confort",
+      "priceSensitivity": 0.8,
+      "patienceSeconds": 90,
+      "waitWithoutPenaltySeconds": 90,
+      "stayGameMinutes": [
+        70,
+        130
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 0.6
+        },
+        {
+          "size": 2,
+          "share": 0.4
+        }
+      ],
+      "eatsShare": 0.5,
+      "takeAwayShare": 0.0,
+      "reorder": {
+        "everyGameMinutes": 50,
+        "probability": 0.5
+      },
+      "styles": [
+        "retro",
+        "bistrot"
+      ],
+      "wantedEquipment": [
+        "livres",
+        "fauteuils"
+      ],
+      "tipFactor": 1.0,
+      "villageGroupsPerDay": 5,
+      "visualSign": "livre sous le bras"
+    },
+    {
+      "id": "familles",
+      "name": "Les familles",
+      "seeks": "un goûter tous ensemble, une grande table, de quoi occuper les enfants",
+      "mainCraving": "chocolate",
+      "secondaryCravings": [
+        "cold_drink",
+        "cake",
+        "pastry_bread"
+      ],
+      "seat": "table",
+      "priceSensitivity": 1.1,
+      "patienceSeconds": 60,
+      "waitWithoutPenaltySeconds": 75,
+      "stayGameMinutes": [
+        40,
+        60
+      ],
+      "groupSizes": [
+        {
+          "size": 2,
+          "share": 0.25
+        },
+        {
+          "size": 3,
+          "share": 0.45
+        },
+        {
+          "size": 4,
+          "share": 0.3
+        }
+      ],
+      "eatsShare": 0.8,
+      "takeAwayShare": 0.0,
+      "reorder": null,
+      "styles": [
+        "campagne",
+        "jardin"
+      ],
+      "wantedEquipment": [
+        "chaise_haute",
+        "coin_enfants"
+      ],
+      "tipFactor": 0.9,
+      "villageGroupsPerDay": 3,
+      "visualSign": "enfants, poussette ou cartable"
+    },
+    {
+      "id": "gourmands",
+      "name": "Les gourmands",
+      "seeks": "une belle part de gâteau, choisie dans une vitrine qui donne envie",
+      "mainCraving": "cake",
+      "secondaryCravings": [
+        "chocolate",
+        "milk_coffee",
+        "pastry_bread"
+      ],
+      "seat": "table",
+      "priceSensitivity": 0.7,
+      "patienceSeconds": 70,
+      "waitWithoutPenaltySeconds": 90,
+      "stayGameMinutes": [
+        35,
+        55
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 0.4
+        },
+        {
+          "size": 2,
+          "share": 0.6
+        }
+      ],
+      "eatsShare": 1.0,
+      "takeAwayShare": 0.1,
+      "reorder": null,
+      "styles": [
+        "retro",
+        "campagne"
+      ],
+      "wantedEquipment": [
+        "vitrine"
+      ],
+      "tipFactor": 1.1,
+      "villageGroupsPerDay": 4,
+      "visualSign": "regard posé sur la vitrine"
+    },
+    {
+      "id": "promeneurs",
+      "name": "Les promeneurs",
+      "seeks": "une pause en chemin: à boire frais, à manger, une terrasse au soleil",
+      "mainCraving": "cold_drink",
+      "secondaryCravings": [
+        "savory",
+        "pastry_bread",
+        "black_coffee"
+      ],
+      "seat": "terrasse",
+      "priceSensitivity": 1.0,
+      "patienceSeconds": 60,
+      "waitWithoutPenaltySeconds": 75,
+      "stayGameMinutes": [
+        30,
+        50
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 0.2
+        },
+        {
+          "size": 2,
+          "share": 0.5
+        },
+        {
+          "size": 3,
+          "share": 0.3
+        }
+      ],
+      "eatsShare": 0.6,
+      "takeAwayShare": 0.15,
+      "reorder": null,
+      "styles": [
+        "jardin",
+        "bistrot"
+      ],
+      "wantedEquipment": [
+        "range_velos",
+        "ardoise_traduite"
+      ],
+      "tipFactor": 0.9,
+      "villageGroupsPerDay": 4,
+      "visualSign": "sac à dos, bâtons ou casque de vélo"
+    },
+    {
+      "id": "etudiants",
+      "name": "Les étudiants",
+      "seeks": "un prix doux, une grande table, du wifi et des prises pour réviser longtemps",
+      "mainCraving": "milk_coffee",
+      "secondaryCravings": [
+        "cold_drink",
+        "savory",
+        "pastry_bread"
+      ],
+      "seat": "table",
+      "priceSensitivity": 1.6,
+      "patienceSeconds": 80,
+      "waitWithoutPenaltySeconds": 90,
+      "stayGameMinutes": [
+        100,
+        200
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 0.4
+        },
+        {
+          "size": 2,
+          "share": 0.35
+        },
+        {
+          "size": 3,
+          "share": 0.25
+        }
+      ],
+      "eatsShare": 0.5,
+      "takeAwayShare": 0.1,
+      "reorder": {
+        "everyGameMinutes": 70,
+        "probability": 0.5
+      },
+      "styles": [
+        "atelier",
+        "nordique"
+      ],
+      "wantedEquipment": [
+        "wifi",
+        "prises",
+        "grande_table"
+      ],
+      "tipFactor": 0.5,
+      "villageGroupsPerDay": 0,
+      "visualSign": "sac couvert de badges"
+    },
+    {
+      "id": "teletravail",
+      "name": "Les télétravailleurs",
+      "seeks": "une table au calme près d'une prise, une théière qui dure, un déjeuner sur place",
+      "mainCraving": "tea",
+      "secondaryCravings": [
+        "milk_coffee",
+        "savory",
+        "cake"
+      ],
+      "seat": "table",
+      "priceSensitivity": 0.9,
+      "patienceSeconds": 90,
+      "waitWithoutPenaltySeconds": 100,
+      "stayGameMinutes": [
+        150,
+        270
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 1.0
+        }
+      ],
+      "eatsShare": 0.4,
+      "takeAwayShare": 0.0,
+      "reorder": {
+        "everyGameMinutes": 75,
+        "probability": 0.7
+      },
+      "styles": [
+        "nordique",
+        "atelier"
+      ],
+      "wantedEquipment": [
+        "wifi",
+        "prises"
+      ],
+      "tipFactor": 0.8,
+      "villageGroupsPerDay": 1.5,
+      "visualSign": "sacoche d'ordinateur"
+    },
+    {
+      "id": "brunch",
+      "name": "Les bruncheurs",
+      "seeks": "le grand repas du week-end, à plusieurs, sans se presser",
+      "mainCraving": "brunch",
+      "secondaryCravings": [
+        "cold_drink",
+        "milk_coffee",
+        "savory"
+      ],
+      "seat": "table",
+      "priceSensitivity": 0.8,
+      "patienceSeconds": 90,
+      "waitWithoutPenaltySeconds": 150,
+      "stayGameMinutes": [
+        70,
+        110
+      ],
+      "groupSizes": [
+        {
+          "size": 2,
+          "share": 0.5
+        },
+        {
+          "size": 3,
+          "share": 0.2
+        },
+        {
+          "size": 4,
+          "share": 0.3
+        }
+      ],
+      "eatsShare": 0.0,
+      "takeAwayShare": 0.0,
+      "reorder": null,
+      "styles": [
+        "jardin",
+        "nordique"
+      ],
+      "wantedEquipment": [
+        "grande_table"
+      ],
+      "tipFactor": 1.1,
+      "villageGroupsPerDay": 0,
+      "visualSign": "groupe du dimanche"
+    },
+    {
+      "id": "connaisseurs",
+      "name": "Les connaisseurs",
+      "seeks": "un café d'exception et le plaisir de voir le geste du barista",
+      "mainCraving": "specialty",
+      "secondaryCravings": [
+        "black_coffee",
+        "cake"
+      ],
+      "seat": "comptoir",
+      "priceSensitivity": 0.5,
+      "patienceSeconds": 60,
+      "waitWithoutPenaltySeconds": 120,
+      "stayGameMinutes": [
+        25,
+        45
+      ],
+      "groupSizes": [
+        {
+          "size": 1,
+          "share": 0.7
+        },
+        {
+          "size": 2,
+          "share": 0.3
+        }
+      ],
+      "eatsShare": 0.3,
+      "takeAwayShare": 0.1,
+      "reorder": null,
+      "styles": [
+        "atelier",
+        "nordique"
+      ],
+      "wantedEquipment": [
+        "moulin_specialite"
+      ],
+      "tipFactor": 1.2,
+      "villageGroupsPerDay": 1,
+      "visualSign": "carnet de dégustation"
+    }
+  ]
+}

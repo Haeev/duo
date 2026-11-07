@@ -1,0 +1,267 @@
+{
+  "format": "deux-tabliers.equipment",
+  "version": "demo-0.1",
+  "stationsAtStart": {
+    "espresso": 1,
+    "vapeur": 1,
+    "bouilloire": 1,
+    "vitrine": 1,
+    "plan": 1,
+    "frigo": 1,
+    "sink": 1,
+    "registers": 1,
+    "dishes": 36
+  },
+  "stationNames": {
+    "espresso": "La vieille machine de Simone (deux groupes)",
+    "vapeur": "Buse vapeur",
+    "bouilloire": "Bouilloire",
+    "vitrine": "Vitrine du comptoir",
+    "plan": "Plan de travail",
+    "frigo": "Réfrigérateur du bar",
+    "agrumes": "Presse-agrumes",
+    "creperie": "Crêpière"
+  },
+  "purchases": [
+    {
+      "id": "gobelets",
+      "name": "Gobelets et couvercles (vente à emporter)",
+      "price": 40,
+      "effect": "equip:gobelets",
+      "tier": "t0",
+      "size": null,
+      "placement": "stock",
+      "text": "La moitié des pressés repartent avec leur café, sans tasse à laver."
+    },
+    {
+      "id": "fiche_cappuccino",
+      "name": "Fiche « cappuccino »",
+      "price": 30,
+      "effect": "recette:cappuccino",
+      "tier": "t0",
+      "size": null,
+      "placement": "none",
+      "text": "Mousse épaisse et cacao: le préféré des flâneurs."
+    },
+    {
+      "id": "fiche_the_vert",
+      "name": "Fiche « thé vert »",
+      "price": 20,
+      "effect": "recette:the_vert",
+      "tier": "t0",
+      "size": null,
+      "placement": "none",
+      "text": "Eau à 80 degrés, pas plus: sinon il devient amer."
+    },
+    {
+      "id": "pichet_thermometre",
+      "name": "Pichet thermomètre",
+      "price": 60,
+      "effect": "poste:vapeur:2",
+      "tier": "t0",
+      "size": [
+        0.1,
+        0.1,
+        0.15
+      ],
+      "placement": "counter",
+      "text": "Le lait se lit d'un coup d'œil: deux laits à la fois sur la buse."
+    },
+    {
+      "id": "tabourets_zinc",
+      "name": "Deux tabourets de comptoir",
+      "price": 120,
+      "effect": "equip:tabourets",
+      "tier": "t0",
+      "size": [
+        0.4,
+        0.4,
+        0.75
+      ],
+      "placement": "floor",
+      "text": "Les voisins s'accoudent et restent un peu plus."
+    },
+    {
+      "id": "service_vaisselle",
+      "name": "Service de vaisselle (+24 pièces)",
+      "price": 90,
+      "effect": "vaisselle:24",
+      "tier": "t0",
+      "size": null,
+      "placement": "stock",
+      "text": "Moins de courses à la plonge au coup de feu."
+    },
+    {
+      "id": "moulin_dose",
+      "name": "Moulin à dose",
+      "price": 380,
+      "effect": "poste:espresso:2",
+      "tier": "t1",
+      "size": [
+        0.22,
+        0.35,
+        0.55
+      ],
+      "placement": "counter",
+      "text": "La mouture tombe juste: on prépare deux cafés plus vite."
+    },
+    {
+      "id": "presse_levier",
+      "name": "Presse-agrumes à levier",
+      "price": 120,
+      "effect": "poste:agrumes:1",
+      "tier": "t1",
+      "size": [
+        0.25,
+        0.25,
+        0.45
+      ],
+      "placement": "counter",
+      "text": "Le jus d'orange pressé arrive à l'ardoise."
+    },
+    {
+      "id": "etagere_livres_equip",
+      "name": "Étagère à livres (avec les livres de Lise)",
+      "price": 150,
+      "effect": "equip:livres",
+      "tier": "t1",
+      "size": [
+        1.0,
+        0.3,
+        1.8
+      ],
+      "placement": "floor_wall",
+      "text": "Les flâneurs restent, un livre à la main."
+    },
+    {
+      "id": "creperie",
+      "name": "Crêpière",
+      "price": 180,
+      "effect": "poste:creperie:1",
+      "tier": "t2",
+      "size": [
+        0.45,
+        0.45,
+        0.2
+      ],
+      "placement": "counter",
+      "text": "Une plaque, une louche, et la salle sent le beurre."
+    },
+    {
+      "id": "range_velos",
+      "name": "Range-vélos",
+      "price": 180,
+      "effect": "equip:range_velos",
+      "tier": "t2",
+      "size": [
+        1.8,
+        0.5,
+        0.8
+      ],
+      "placement": "street",
+      "text": "Les cyclistes de la voie verte s'arrêtent enfin."
+    },
+    {
+      "id": "coin_enfants",
+      "name": "Chaise haute et coin des enfants",
+      "price": 260,
+      "effect": "equip:chaise_haute;equip:coin_enfants",
+      "tier": "t2",
+      "size": [
+        1.2,
+        1.2,
+        0.6
+      ],
+      "placement": "floor",
+      "text": "Des crayons, un tapis, une chaise haute: les familles restent au goûter."
+    },
+    {
+      "id": "frigo_vitre",
+      "name": "Réfrigérateur vitré",
+      "price": 350,
+      "effect": "recette:limonade",
+      "tier": "t2",
+      "size": [
+        0.6,
+        0.6,
+        0.85
+      ],
+      "placement": "work_area",
+      "text": "Les bouteilles fraîches se voient du comptoir."
+    },
+    {
+      "id": "bouilloire_temperature",
+      "name": "Bouilloire à température",
+      "price": 90,
+      "effect": "poste:bouilloire:2",
+      "tier": "t3",
+      "size": [
+        0.2,
+        0.2,
+        0.3
+      ],
+      "placement": "counter",
+      "text": "Elle s'arrête seule à la bonne température."
+    }
+  ],
+  "extensions": [
+    {
+      "id": "village_terrasse",
+      "name": "La terrasse sous le store",
+      "price": 450,
+      "effect": "ext:village_terrasse",
+      "tier": "t1",
+      "seats": {
+        "counter": 0,
+        "table": 0,
+        "comfort": 0,
+        "terrace": 4
+      },
+      "publicSurfaceM2": 12.0,
+      "nightsOfWork": 1,
+      "text": "Autorisation de la mairie, un store banne et deux guéridons sous le tilleul: 4 places dehors de plus."
+    },
+    {
+      "id": "village_fond",
+      "name": "La pièce du fond, au coin du feu",
+      "price": 600,
+      "effect": "ext:village_fond",
+      "tier": "t2",
+      "seats": {
+        "counter": 0,
+        "table": 2,
+        "comfort": 2,
+        "terrace": 0
+      },
+      "publicSurfaceM2": 12.8,
+      "nightsOfWork": 2,
+      "text": "Une arche percée dans le refend, la cheminée rallumée, deux fauteuils et une table pour deux: 4 places."
+    }
+  ],
+  "tiers": [
+    {
+      "id": "t0",
+      "name": "À l'arrivée",
+      "cups": 1.5,
+      "orDay": 1
+    },
+    {
+      "id": "t1",
+      "name": "Deux tasses",
+      "cups": 2.0,
+      "orDay": 7
+    },
+    {
+      "id": "t2",
+      "name": "Deux tasses et demie",
+      "cups": 2.5,
+      "orDay": 9
+    },
+    {
+      "id": "t3",
+      "name": "Trois tasses",
+      "cups": 3.0,
+      "orDay": 12
+    }
+  ]
+}
