@@ -101,7 +101,7 @@
   <header class="tablette__tete">
     <p class="tablette__maison"><span class="icone" data-icone="tablette"></span>La Tasse Bleue · place du Tilleul</p>
     <p>Mardi 9 · printemps · <span class="chiffre">11 h 20</span></p>
-    <p class="fort">Caisse : 1 482 €<span data-si="catalogue-proposer accueil">&nbsp;· dont 980 € réservés</span><span data-si="catalogue-attente">&nbsp;· dont 1 240 € réservés</span></p>
+    <p class="fort">Caisse : 1 482 €<span data-si="catalogue-proposer accueil">&nbsp;· dont 980 € réservés</span><span data-si="catalogue-attente">&nbsp;· dont 1 320 € réservés</span></p>
     <p class="tablette__autre" data-si="catalogue catalogue-proposer catalogue-attente"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha regarde aussi : Catalogue</p>
     <p class="tablette__autre" data-si="commandes commandes-envoyee"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha regarde aussi : Commandes</p>
   </header>
@@ -158,14 +158,14 @@
     <!-- Commandes -->
     <div class="pile" data-si="commandes commandes-envoyee" role="tabpanel" aria-label="Commandes">
       <h2>Commandes pour demain</h2>
-      <p class="aide">Livrées demain à 7 h, à la porte de service. « Conseillé » tient compte de votre carte et de la pluie annoncée.</p>
+      <p class="aide">Livrées demain à 7 h, à la porte de service. « Habituelle » : d’après vos trois dernières journées et l’ardoise prévue.</p>
       <p class="bandeau" data-si="commandes-envoyee" role="status"><span class="fort"><span class="icone" data-icone="coche"></span> Commande envoyée : livrée demain à 7 h.</span><span class="aide">Tu peux la modifier jusqu’à la fermeture à clé.</span></p>
-      <div class="rangee"><button class="bouton bouton--petit" data-action="hier">Reprendre la commande d’hier</button></div>
+      <div class="rangee"><button class="bouton bouton--petit" data-action="hier">Revenir à la commande habituelle</button></div>
 
       <div class="fournisseur">
         <p class="fournisseur__tete"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Joëlle, laitière</span><br><span class="aide">Ferme des Prés, à 3 km</span></span></p>
         <table>
-          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Conseillé</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
+          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Habituelle</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
           <tbody>
             <tr><td>Lait entier</td><td class="nombre">3 L</td><td class="nombre">12 L</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de lait entier" data-pas="-1" data-cible="q-lait"><span class="icone" data-icone="moins"></span></button><output id="q-lait" data-valeur="12" data-min="0" data-max="40" data-format="litre" data-prix="0.9">12 L</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de lait entier" data-pas="1" data-cible="q-lait"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-lait">10,80 €</td></tr>
             <tr><td>Crème</td><td class="nombre">0,5 L</td><td class="nombre">1 L</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de crème" data-pas="-0.5" data-cible="q-creme"><span class="icone" data-icone="moins"></span></button><output id="q-creme" data-valeur="1" data-min="0" data-max="5" data-format="litre" data-prix="2.4">1 L</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de crème" data-pas="0.5" data-cible="q-creme"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-creme">2,40 €</td></tr>
@@ -175,7 +175,7 @@
       <div class="fournisseur">
         <p class="fournisseur__tete"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Fournil Morel, boulangerie</span><br><span class="aide">Sur la place</span></span></p>
         <table>
-          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Conseillé</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
+          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Habituelle</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
           <tbody>
             <tr><td>Croissants</td><td class="nombre">4</td><td class="nombre">30</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de croissants" data-pas="-5" data-cible="q-croissants"><span class="icone" data-icone="moins"></span></button><output id="q-croissants" data-valeur="30" data-min="0" data-max="80" data-prix="0.7">30</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de croissants" data-pas="5" data-cible="q-croissants"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-croissants">21,00 €</td></tr>
             <tr><td>Pains au chocolat</td><td class="nombre">2</td><td class="nombre">20</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de pains au chocolat" data-pas="-5" data-cible="q-pains"><span class="icone" data-icone="moins"></span></button><output id="q-pains" data-valeur="20" data-min="0" data-max="80" data-prix="0.8">20</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de pains au chocolat" data-pas="5" data-cible="q-pains"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-pains">16,00 €</td></tr>
@@ -185,7 +185,7 @@
       <div class="fournisseur">
         <p class="fournisseur__tete"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Torréfaction Lamy</span><br><span class="aide">Livre le mardi et le vendredi</span></span></p>
         <table>
-          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Conseillé</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
+          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Habituelle</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
           <tbody>
             <tr><td>Café en grains, mélange du Tilleul</td><td class="nombre">0,8 kg</td><td class="nombre">1 kg</td><td><span class="verrou"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha modifie cette ligne</span></td><td class="nombre">18,00 €</td></tr>
           </tbody>
@@ -207,7 +207,7 @@
         <p><span class="reglage__nom">Style</span>
           <button class="bouton" data-groupe-choix="style" aria-pressed="true">Tous</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Campagne</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Bistrot</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Nordique</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Jardin</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Atelier</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Rétro</button></p>
       </div>
-      <p class="aide">À partir de 200 €, un achat attend l’accord de Sacha. Les meubles arrivent tout de suite dans la réserve, les machines demain à 7 h.</p>
+      <p class="aide">À partir de 300 €, un achat attend l’accord de Sacha. Tout achat arrive demain matin, avec les livraisons.</p>
       <div class="cartes">
         <article class="carte" aria-label="Machine à espresso deux groupes">
           <div class="vignette" aria-hidden="true"></div>
@@ -223,8 +223,8 @@
           <div class="vignette" aria-hidden="true"></div>
           <h3>Banquette en velours</h3>
           <p class="aide">Assises · rétro · 3 places, très confortable</p>
-          <p class="article__prix">260 €</p>
-          <button class="bouton bouton--petit" data-focus data-si="catalogue catalogue-proposer" data-ouvrir-proposition="Banquette en velours|260">Proposer à Sacha</button>
+          <p class="article__prix">340 €</p>
+          <button class="bouton bouton--petit" data-focus data-si="catalogue catalogue-proposer" data-ouvrir-proposition="Banquette en velours|340">Proposer à Sacha</button>
           <p class="article__etat" data-si="catalogue-attente"><span class="icone" data-icone="sablier"></span>Ta proposition · en attente de Sacha</p>
           <button class="bouton bouton--petit" data-focus data-si="catalogue-attente" data-aller="#catalogue">Retirer ma proposition</button>
         </article>
@@ -366,6 +366,8 @@
       <div class="groupe-reglages">
         <h3>Gestes</h3>
         <div class="reglage"><span class="reglage__nom">Gestes simplifiés</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Gestes simplifiés"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Un clic par geste : il se fait tout seul, avec un résultat « bien » assuré. Sacha ne le voit pas.</p></div>
+        <div class="reglage"><span class="reglage__nom">Rappel des options</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Rappel des options"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Le lait d’avoine ou le moulin à déca s’éclairent quand le ticket les demande.</p></div>
+        <div class="reglage"><span class="reglage__nom">Guide du poste</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Guide du poste"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Le prochain objet à prendre brille doucement.</p></div>
         <div class="reglage"><span class="reglage__nom">Gestes à maintenir</span><span class="segments" role="group" aria-label="Gestes à maintenir"><button class="bouton" data-groupe-choix="maintien" aria-pressed="true">Garder appuyé</button><button class="bouton" data-groupe-choix="maintien" aria-pressed="false">Un appui pour commencer, un pour finir</button></span></div>
         <div class="reglage"><span class="reglage__nom">Marcher vite</span><span class="segments" role="group" aria-label="Marcher vite"><button class="bouton" data-groupe-choix="vite" aria-pressed="true">Garder Maj appuyée</button><button class="bouton" data-groupe-choix="vite" aria-pressed="false">Un appui pour basculer</button></span></div>
       </div>
@@ -401,8 +403,8 @@
 
 <dialog class="fenetre" id="fenetre-proposer" aria-labelledby="fp-titre">
   <h2 id="fp-titre">Proposer l’achat à Sacha ?</h2>
-  <p class="fort" id="fp-objet">Banquette en velours · 260 €</p>
-  <p id="fp-texte">La somme est réservée en attendant la réponse de Sacha. Il resterait 242 € dans la caisse.</p>
+  <p class="fort" id="fp-objet">Banquette en velours · 340 €</p>
+  <p id="fp-texte">La somme est réservée en attendant la réponse de Sacha. Il resterait 162 € dans la caisse.</p>
   <div class="rangee rangee--fin">
     <button class="bouton" data-fermer-fenetre="annuler">Annuler</button>
     <button class="bouton bouton--principal" data-focus data-action="proposer">Proposer à Sacha</button>
@@ -471,8 +473,8 @@
       Maquette.aller('catalogue-attente');
       Maquette.note('Proposition envoyée : Sacha la voit en haut à droite, avec « Entrée : voir et répondre ».');
     }
-    if (a === 'acheter') Maquette.note('Achat sous 200 € : fait tout de suite. L’objet attend dans la réserve (B pour aménager).');
-    if (a === 'hier') Maquette.note('Quantités d’hier reprises. Tu peux encore les ajuster.');
+    if (a === 'acheter') Maquette.note('Achat fait : livré demain matin, avec les livraisons.');
+    if (a === 'hier') Maquette.note('Commande habituelle remise. Tu peux encore l’ajuster.');
     if (a === 'renommer') Maquette.note('Renommer la maison ouvre « Notre maison » et demande l’accord de Sacha.');
   });
 </script>

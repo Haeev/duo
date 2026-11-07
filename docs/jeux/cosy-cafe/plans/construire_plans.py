@@ -43,7 +43,6 @@ NORMS = {
     "present_cap": {"village": 24, "bourg": 48, "ville": 72, "paris-quartier": 80, "paris-maison": 120},  # C2
     "furniture_cap": {"village": 60, "bourg": 120, "ville": 200, "paris-quartier": 180, "paris-maison": 350},  # C6
     "furniture_visible_max": 150,  # C6
-    "technical_min": 0.60,  # C13
 }
 
 CHAIR = 0.45  # emprise d'une chaise
@@ -790,8 +789,8 @@ def ville(state):
         "Montaurel, l'Imprimerie",
         "À l'arrivée" if arrival else "Agrandie au maximum",
         0, cap, {"players": 2, "employees": 2 if arrival else 5},
-        ("Ancienne imprimerie de 152 m²: la boutique sur la rue des Facultés (43 m²), l'atelier sous ses sheds "
-         "(86 m²), les services entre les deux. "
+        ("Ancienne imprimerie de 165 m²: la boutique sur la rue des Facultés (43 m²), l'atelier sous ses sheds "
+         "(86 m², cuisine comprise), les services entre les deux (35 m²). "
          + ("Les presses occupent la moitié de l'atelier; la salle de composition et la cour attendent."
             if arrival else "E1: l'atelier entier. E2: la cuisine du brunch. E3: la cour sous la glycine.")),
         scale_px=40,
@@ -809,7 +808,7 @@ def ville(state):
     for zone in ((0, 0, 16.5, 1.0), (0, 1.0, 0.6, 20.0), (13.4, 1.0, 3.1, 8.0), (13.4, 9.0, 3.1, 5.0),
                  (11.6, 14.0, 4.9, 7.0), (0, 24.0, 16.5, 3.0)):
         L.zone("backdrop", rect(*zone), "décor")
-    L.text(8.0, 0.5, "jardins des maisons de la rue Haute", "street")
+    L.text(8.0, 0.22, "jardins des maisons de la rue du Collège", "street")
     L.text(14.0, 17.5, "librairie", "street")
     L.text(14.9, 5.0, "garage voisin", "street", rotate=-90)
     L.text(8.0, 23.6, "trottoir de la rue des Facultés (on y joue jusqu'ici)", "note")
@@ -1089,7 +1088,7 @@ def ville(state):
     L.text(9.8, 17.0, "porche", "room", rotate=-90)
     L.text(5.4, 19.0, "boutique", "room")
     L.text(5.4, 22.5, "trottoir", "room")
-    L.dim((1.0, 1.0), (13.0, 1.0), "12,00 m (atelier)", offset=-0.5)
+    L.dim((1.0, 1.0), (13.0, 1.0), "12,00 m (atelier)", offset=-0.2)
     L.dim((1.0, 21.0), (8.0, 21.0), "7,00 m (boutique)", offset=2.25)
     return p
 
@@ -1104,7 +1103,7 @@ def paris_quartier(state):
         0, cap, {"players": 2, "employees": 4 if arrival else 6},
         ("Café d'angle de 68 m² au pied d'un immeuble de rapport, entrée dans le pan coupé, cave dessous. "
          + ("Une rangée de terrasse sur la rue des Plumassiers; la cordonnerie voisine est à vendre."
-            if arrival else "E1: la salle du fond (98 m² en tout). E2: la terrasse sur les deux rues; un second "
+            if arrival else "E1: la salle du fond (96 m² en tout). E2: la terrasse sur les deux rues; un second "
                             "rang attend la décision de l'architecte sur la foule lointaine.")),
         scale_px=36,
     )
@@ -1191,12 +1190,12 @@ def paris_quartier(state):
     L.counter(8.8, 4.7, 6.2, 0.7, label="zinc", reason="Le long du mur du fond, face à la porte d'angle et aux vitrines.")
     L.station(8.85, 4.75, 0.65, 0.55, "passe", "pass", height=1.10, post="passe des serveurs")
     L.station(9.7, 4.75, 1.0, 0.55, "machine", "machine", height=1.45, post="machine")
-    L.station(10.75, 4.8, 0.35, 0.45, "moulin", "grinder", height=1.45, post="moulin", label_at=[10.93, 4.25])
+    L.station(10.75, 4.8, 0.35, 0.45, "moulin", "grinder", height=1.45, post="moulin", label_at=[10.93, 5.62])
     L.station(12.45, 4.75, 0.65, 0.55, "retrait", "pass", height=1.10, post="retrait")
     L.station(13.15, 4.75, 0.9, 0.6, "viennoiseries", "display", height=1.25, post="vitrine")
     L.station(14.15, 4.75, 0.7, 0.55, "caisse", "register", height=1.25, post="caisse",
               reason="Au bout du zinc, en face du pan coupé: la caisse voit la porte et toute la file.")
-    L.text(11.95, 5.85, "on boit debout au zinc", "note")
+    L.text(11.9, 6.35, "on boit debout au zinc", "note")
     L.marker(10.2, 4.55, "power")
     L.wall_h(7.9, 8.8, 4.7, 5.4, [{"at": 7.9, "w": 0.9, "type": "door", "access": "staff", "label": "portillon",
                                    "swing": {"leaves": 1, "hinge": "start", "side": "+"}}], kind="partition")
@@ -1332,13 +1331,13 @@ def paris_quartier(state):
 
 def paris_maison(state):
     arrival = state == "arrivee"
-    cap = {"inside": 41, "outside": 12} if arrival else {"inside": 63, "outside": 36}
+    cap = {"inside": 41, "outside": 12} if arrival else {"inside": 62, "outside": 26}
     p = Plan(
         f"paris-maison-{state}", "paris-maison", state, 5,
         "Paris, la Graineterie du boulevard des Horticulteurs",
         "À l'arrivée" if arrival else "La maison au complet",
         0, cap, {"players": 2, "employees": 6 if arrival else 10},
-        ("Maison d'un ancien graineur, 330 m² sur deux niveaux: la boutique sur le boulevard, la halle sous "
+        ("Maison d'un ancien graineur, 300 m² sur deux niveaux: la boutique sur le boulevard, la halle sous "
          "verrière, le laboratoire, le jardin; les salons à l'étage. "
          + ("Le jardin est en friche, l'étage fermé, le laboratoire vide, pas encore de torréfacteur."
             if arrival else "E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. "
@@ -1396,7 +1395,9 @@ def paris_maison(state):
     else:
         L.zone("free", rect(3.5, 1.0, 13.0, 5.2), "jardin")
         L.text(5.0, 1.35, "serre", "note")
-        L.table(4.6, 1.9, 0.8, 0.8, "N S E W", area="outside", room="serre")
+        L.armchair(3.7, 1.1, area="outside", room="serre", back="N")
+        L.armchair(5.0, 1.1, area="outside", room="serre", back="N")
+        L.furniture(circle(4.72, 2.2, 0.22), "low_table", None, height=0.45)
         for x in (8.6, 11.6):
             L.table(x, 2.0, 0.8, 0.8, "N S E W", area="outside", room="jardin")
         L.table(14.3, 2.6, 0.8, 0.8, "N S E W", area="outside", room="jardin")
@@ -1500,6 +1501,10 @@ def paris_maison(state):
     for y in (12.6, 16.6):
         L.table(12.6, y, 0.8, 0.8, "N S E W", room="halle")
     L.zone("keep_clear", rect(15.6, 17.4, 0.9, 1.6), "issue")
+    if not arrival:
+        L.furniture(rect(10.1, 14.3, 0.35, 3.2), "shelf_high", "tablette", height=1.05)
+        for y in (14.7, 15.4, 16.1, 16.8):
+            L.stool(10.65, y, room="halle")
 
     # Boutique sur le boulevard.
     L.wall_h(3.0, 17.0, 19.0, 19.5, [
@@ -1542,12 +1547,12 @@ def paris_maison(state):
     L.fixture(rect(13.7, 19.6, 2.7, 2.8), "stairs", "escalier (2 volées)", height=0.0, steps=9, up="N")
     # Façade du boulevard.
     L.wall_h(3.0, 17.0, 25.0, 25.5, [
-        {"at": 3.8, "w": 2.3, "type": "window", "sill": 0.45, "screen_low": True},
-        {"at": 6.3, "w": 2.3, "type": "window", "sill": 0.45, "screen_low": True},
-        {"at": 9.0, "w": 1.6, "type": "door", "access": "public", "glazed": True, "entrance": True,
+        {"at": 3.8, "w": 2.3, "type": "window", "sill": 0.45, "opaque": True, "dressed": True},
+        {"at": 6.3, "w": 2.3, "type": "window", "sill": 0.45, "opaque": True, "dressed": True},
+        {"at": 9.0, "w": 1.6, "type": "door", "access": "public", "glazed": True, "entrance": True, "screen_low": True,
          "id": "porte-boulevard", "label": "entrée", "swing": {"leaves": 2, "hinge": "start", "side": "-"}},
-        {"at": 11.0, "w": 2.5, "type": "window", "sill": 0.45, "screen_low": True},
-        {"at": 13.7, "w": 2.5, "type": "window", "sill": 0.45, "screen_low": True},
+        {"at": 11.0, "w": 2.5, "type": "window", "sill": 0.45, "opaque": True, "dressed": True},
+        {"at": 13.7, "w": 2.5, "type": "window", "sill": 0.45, "opaque": True, "dressed": True},
     ])
     L.zone("keep_clear", rect(10.65, 21.9, 1.0, 3.1), "file")
     L.zone("keep_clear", rect(7.4, 21.9, 3.25, 1.2), "devant le comptoir")
@@ -1572,7 +1577,7 @@ def paris_maison(state):
         L.table(x, 26.0, 0.9, 0.5, "N2", area="outside", room="terrasse")
     L.zone("extension", rect(3.5, 27.3, 13.0, 1.2), "second rang: avec l'option B de l'architecte (foule lointaine)")
     L.hood(3.5, 25.5, 13.0, 1.2, label="store")
-    L.furniture(rect(8.5, 25.6, 0.3, 0.5), "slate", "ardoise", height=1.2)
+    L.furniture(rect(8.55, 28.75, 0.3, 0.5), "slate", "ardoise", height=1.2)
 
     # Points, file, vues, espaces.
     L.point("entrance", 9.8, 29.2)
@@ -1656,10 +1661,11 @@ def paris_maison(state):
     E.wall_v(19.5, 21.0, 5.9, 6.0, kind="partition", height=3.2)
     # Office de l'étage, au-dessus du monte-plats.
     E.zone("private", rect(6.0, 19.5, 3.4, 1.5), "office")
-    E.station(6.05, 19.55, 1.3, 0.55, "évier, thés", "tea", post="office")
+    E.station(6.05, 19.55, 1.3, 0.55, "évier", "tea", post="office")
     E.marker(6.4, 20.25, "water")
-    E.station(7.45, 19.55, 0.55, 0.5, "monte-plats", "lift", height=1.0, post="monte-plats de l'étage")
-    E.station(8.1, 19.55, 1.25, 0.55, "frigo, desserts", "fridge", post="frigo de l'étage")
+    E.station(7.45, 19.55, 0.55, 0.5, "monte-plats", "lift", height=1.0, post="monte-plats de l'étage",
+              label_at=[7.72, 20.75])
+    E.station(8.1, 19.55, 1.25, 0.55, "frigo", "fridge", post="frigo de l'étage")
     E.fixture(rect(3.55, 19.55, 0.4, 0.65), "wc", "WC", height=0.45)
     E.fixture(rect(5.3, 19.55, 0.5, 0.35), "basin", "", height=0.85)
     if not arrival:
@@ -1670,14 +1676,14 @@ def paris_maison(state):
     else:
         # Grand salon (sur le boulevard).
         E.zone("free", rect(3.5, 21.1, 5.9, 3.9), "grand salon")
-        for y in (22.2, 23.8):
+        for y in (22.4, 24.0):
             E.seat(rect(3.5, y, 0.55, 0.6), "inside", "grand salon", style="banquette", back="W")
             E.table(4.1, y, 0.6, 0.6, "E", room="grand salon")
-        E.table(6.3, 22.0, 0.8, 0.8, "N S E W", room="grand salon")
-        E.table(6.3, 24.05, 0.8, 0.8, "W E", room="grand salon")
+        E.table(6.6, 22.6, 0.8, 0.8, "N S E W", room="grand salon")
+        E.table(6.6, 24.35, 0.6, 0.6, "W", room="grand salon", round_=True)
         E.armchair(8.5, 23.1, back="E", room="grand salon")
         E.armchair(8.5, 24.15, back="E", room="grand salon")
-        E.zone("keep_clear", rect(8.0, 21.1, 1.4, 1.3), "portes")
+        E.zone("keep_clear", rect(3.5, 21.1, 5.9, 1.0), "passage")
         # Petit salon (salle de lecture).
         E.zone("free", rect(9.5, 22.6, 7.0, 2.4), "petit salon")
         E.armchair(9.6, 24.15, back="S", room="petit salon")
@@ -1697,7 +1703,7 @@ def paris_maison(state):
     E.text(6.4, 24.65, "grand salon", "room")
     E.text(13.0, 24.6 if not arrival else 23.8, "petit salon", "room")
     E.text(11.5, 20.0, "palier", "room")
-    E.text(7.7, 20.75, "office", "note")
+    E.text(6.6, 20.75, "office", "note")
     E.route("clients", [(14.7, 22.0), (12.9, 21.0), (10.0, 21.8), (8.6, 21.8)])
     E.route("staff", [(7.7, 20.6), (8.85, 20.6), (8.85, 21.6)])
     p.link("escalier", "Escalier public, deux volées de 9 marches de 17 x 28 cm", {"level": "rdc", "pos": [14.7, 23.2]},
@@ -1978,6 +1984,8 @@ def draw_plan(plan):
                 a(shape_svg(e["shape"], lv, 'fill="#ffffff" stroke="#3b3b3b" stroke-width="0.8"'))
                 if e.get("screen_low"):
                     a(shape_svg(e["shape"], lv, 'fill="#c9a96e" fill-opacity="0.55"'))
+                if e.get("dressed"):
+                    a(shape_svg(e["shape"], lv, 'fill="#8a5a2b" fill-opacity="0.85"'))
                 if e["orient"] == "h":
                     for f in (0.3, 0.7):
                         a(f'<line x1="{X(x, lv):.1f}" y1="{Y(y + h * f, lv):.1f}" x2="{X(x + w, lv):.1f}" '
@@ -2224,7 +2232,8 @@ LEGEND = [
     ("wall", "Mur porteur"),
     ("partition", "Cloison (joue basse du comptoir comprise)"),
     ("window", "Vitrine ou fenêtre"),
-    ("screen", "Vitrine à brise-bise ou garnie (cache les assis)"),
+    ("screen", "Vitrine à brise-bise (cache les clients assis)"),
+    ("dressed", "Vitrine garnie à hauteur d'homme (opaque)"),
     ("door_public", "Porte des clients (battant et débattement)"),
     ("door_staff", "Porte ou portillon du personnel"),
     ("door_closed", "Porte fermée à clé"),
@@ -2272,6 +2281,9 @@ def draw_legend(a, plan, x, y, w, S):
               f'stroke-width="0.8"/><line x1="{sx}" y1="{sy + 5}" x2="{sx + 28}" y2="{sy + 5}" stroke="#3f7fc0" '
               f'stroke-width="1.6"/><line x1="{sx}" y1="{sy + 9}" x2="{sx + 28}" y2="{sy + 9}" stroke="#3f7fc0" '
               f'stroke-width="1.6"/>')
+        elif key == "dressed":
+            a(f'<rect x="{sx}" y="{sy + 2}" width="28" height="10" fill="#8a5a2b" fill-opacity="0.85" '
+              f'stroke="#3b3b3b" stroke-width="0.8"/>')
         elif key.startswith("door"):
             col = {"door_public": "#2b2b2b", "door_staff": COLORS["staff"], "door_closed": "#8a8a8a"}[key]
             if key == "door_closed":
@@ -2336,12 +2348,13 @@ def draw_legend(a, plan, x, y, w, S):
     yy += 14
     a(f'<text x="{x}" y="{yy}" font-size="11" fill="#222">Échelle</text>')
     yy += 12
-    for i in range(5):
+    n_m = max(3, min(5, int(200 // S)))  # la barre ne dépasse pas 200 pixels: la flèche du nord reste libre
+    for i in range(n_m):
         fill = "#3b3b3b" if i % 2 == 0 else "#ffffff"
         a(f'<rect x="{x + i * S}" y="{yy}" width="{S}" height="8" fill="{fill}" stroke="#3b3b3b" stroke-width="0.8"/>')
-    for i in range(6):
+    for i in range(n_m + 1):
         a(f'<text x="{x + i * S}" y="{yy + 20}" font-size="9" text-anchor="middle" fill="#333">{i}</text>')
-    a(f'<text x="{x + 5 * S + 10}" y="{yy + 8}" font-size="10" fill="#333">m</text>')
+    a(f'<text x="{x + n_m * S + 10}" y="{yy + 8}" font-size="10" fill="#333">m</text>')
     # Nord.
     cx, cy = x + w - 40, yy + 4
     ang = plan["north_deg"]
@@ -2350,7 +2363,7 @@ def draw_legend(a, plan, x, y, w, S):
       f'fill="#3b3b3b"/><text x="{cx}" y="{cy - 26}" font-size="12" font-weight="bold" text-anchor="middle" '
       f'fill="#3b3b3b">N</text></g>')
     yy += 46
-    lines = legend_notes(plan)
+    lines = [part for ln in legend_notes(plan) for part in wrap(ln, 52)]
     for ln in lines:
         a(f'<text x="{x}" y="{yy}" font-size="10" fill="#444">{esc(ln)}</text>')
         yy += 14

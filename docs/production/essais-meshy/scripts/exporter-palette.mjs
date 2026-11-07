@@ -1,5 +1,5 @@
-// Palette de l'essai Meshy: les couleurs communes, peaux, cheveux, tenues des flâneurs et couleurs
-// de la maison de la bible de Cosy Café (source unique: docs/jeux/cosy-cafe/bible/source/palette.cjs),
+// Palette de l'essai Meshy: les couleurs communes, peaux, cheveux, tenues des flâneurs et des pressés,
+// couleurs de la maison de la bible de Cosy Café (source unique: docs/jeux/cosy-cafe/bible/source/palette.cjs),
 // rangées en cases de 4 px sur une texture de 64 x 64 (16 cases par rangée), comme La Petite Ligne.
 // Ce n'est pas la palette du jeu: celle-ci reste à fixer par le directeur artistique et l'artiste 3D.
 //
@@ -26,6 +26,7 @@ const wanted = [
   ...bible.skins.map((hex, i) => ({ id: `skin_${i + 1}`, hex, fr: `peau ${i + 1}` })),
   ...bible.hair.map((hex, i) => ({ id: `hair_${i + 1}`, hex, fr: `cheveux ${i + 1}` })),
   ...bible.profiles.flaneurs.colors.map((c) => ({ id: c.id, hex: c.hex, fr: c.fr })),
+  ...bible.profiles.presses.colors.map((c) => ({ id: c.id, hex: c.hex, fr: c.fr })),
   ...bible.house.map((c) => ({ id: c.id, hex: c.hex, fr: c.fr })),
 ];
 const byId = new Map();

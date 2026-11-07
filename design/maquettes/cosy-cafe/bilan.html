@@ -62,7 +62,7 @@
     <p class="aide" data-si="plusieurs">Mardi 2 · été · La Tasse Bleue, place de la Halle, Mérelles</p>
     <p class="partenaire" data-si="livre livre-vide premier"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha lit la page 2</p>
     <p class="partenaire" data-si="appris chiffres plusieurs"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha lit la page 1</p>
-    <p class="partenaire" data-si="demain"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha a fermé le bilan</p>
+    <p class="partenaire" data-si="demain"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha a dit « À demain »</p>
   </header>
 
   <div class="bilan__page">
@@ -180,7 +180,7 @@
         <li><span class="icone" data-icone="coeur"></span><span>Lucette a promis de passer avec sa petite-fille.</span></li>
       </ul>
       <div class="rangee"><button class="bouton" data-aller="tablette.html#commandes">Préparer la commande</button></div>
-      <p class="aide">Tu retrouveras ce bilan sur la tablette, onglet Bilans.</p>
+      <p class="aide">« Encore un instant » te ramène dans le café ; tu retrouveras ce bilan sur la tablette, section Bilans. La journée finit quand vous avez dit « À demain » tous les deux.</p>
     </div>
   </div>
 
@@ -196,9 +196,9 @@
         <button class="point" role="tab" data-section-etats="demain" data-aller="#demain" aria-label="Dernière page : demain"><span data-si="livre livre-vide premier appris chiffres demain">4</span><span data-si="plusieurs">5</span></button>
       </div>
       <button class="bouton bouton--principal" data-page="suivante" data-focus data-si="livre livre-vide premier appris chiffres plusieurs">Page suivante<span class="icone" data-icone="fleche"></span></button>
-      <button class="bouton bouton--principal" data-focus data-si="demain" data-fermer-interface>Fermer le bilan</button>
+      <span class="rangee" data-si="demain"><button class="bouton" data-fermer-interface>Encore un instant</button><button class="bouton bouton--principal" data-focus data-action="demain">À demain</button></span>
     </div>
-    <p class="pied-touches"><span><kbd>←</kbd><kbd>→</kbd> ou <kbd>A</kbd><kbd>E</kbd> tourner les pages</span><span><kbd>Entrée</kbd> valider</span><span><kbd>Retour arrière</kbd> fermer</span><span>Le café est fermé : rien ne presse.</span></p>
+    <p class="pied-touches"><span><kbd>←</kbd><kbd>→</kbd> ou <kbd>A</kbd><kbd>E</kbd> tourner les pages</span><span><kbd>Entrée</kbd> valider</span><span><kbd>Retour arrière</kbd> encore un instant</span><span>Le café est fermé : rien ne presse.</span></p>
   </footer>
 </section>
 
@@ -222,6 +222,9 @@
     if (!b) return;
     const cible = voisine(b.dataset.page === 'suivante' ? 1 : -1);
     if (cible) Maquette.aller(cible);
+  });
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-action="demain"]')) Maquette.note('Vous avez dit « À demain » tous les deux : la nuit tombe sur le café.');
   });
   Maquette.surTouche = function (e) {
     if (e.key === 'ArrowRight' || e.code === 'KeyD') { const c = voisine(1); if (c) Maquette.aller(c); return true; }

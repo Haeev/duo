@@ -36,7 +36,7 @@
     }
     return `<circle cx="${cx}" cy="${cy}" r="56" fill="#f6f6f6" stroke="#555" stroke-width="6"/>${graduations}` +
       `<g data-si="service proposition proposition-ouverte envoyee reprendre absence accueil commandes commandes-envoyee catalogue catalogue-proposer catalogue-attente carte equipe cafes bilans projets reglages">${aiguilles(cx, cy, 11, 20)}</g>` +
-      `<g data-si="vide ouverture ouverture-ouverte composer pleine ensemble">${aiguilles(cx, cy, 7, 30)}</g>` +
+      `<g data-si="ouverture ouverture-ouverte composer pleine ensemble">${aiguilles(cx, cy, 7, 30)}</g><g data-si="vide">${aiguilles(cx, cy, 8, 0)}</g>` +
       `<circle cx="${cx}" cy="${cy}" r="6" fill="#222"/>`;
   }
 

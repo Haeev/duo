@@ -1,13 +1,13 @@
 # Cosy Café (titre de travail): résultats de la simulation
 
-<!-- empreinte:82123c3f8313 -->
+<!-- empreinte:3bca446691ba -->
 Fichier écrit par `docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats` (bibliothèque standard de Python, graines fixes). 40 parties par duo; chaque journée ouverte de chaque partie est jouée client par client. Ne pas retoucher à la main: relancer le script, puis `--croise` sur le cahier.
 
 ## Méthode
 
 - Une journée ouverte est une simulation à événements discrets: chaque groupe de clients arrive selon l'attrait de la carte (règle AT-07), entre ou renonce (CL-03), commande, attend que chaque étape de chaque recette passe par son poste, s'assoit, reste, recommande parfois, part; joueurs et employés prennent les tâches par priorités (finir un geste, servir, prendre les commandes, préparer, laver, débarrasser).
 - Entre les journées: achats selon le duo (catalogue et paliers d'ambiance), embauches, épargne après l'offre de l'adresse suivante, défi local, déménagement le lundi, succursales (SU-02), rattrapage de réputation (RE-05).
-- Trois duos: tranquille, médian et rapide (vitesse des gestes, hésitation, gestes parfaits, temps de préparation et de fermeture, part épargnée, goût pour la décoration). Ce sont des hypothèses, à recaler au prototype (CA-58).
+- Trois duos: tranquille, médian et rapide (vitesse des gestes, hésitation, gestes parfaits, temps de préparation et de fermeture, part épargnée, goût pour la décoration). Ce sont des hypothèses, à recaler au prototype (CA-51).
 
 ## 1. Progression: jour et heures de jeu à chaque arrivée, médiane [1er et 9e déciles]
 
@@ -179,12 +179,12 @@ Un mardi de la dernière semaine à la maison parisienne (duo médian).
 ## 12. Exemple chiffré de l'attrait
 
 <!-- table:res_exemple -->
-| Profil | Passants intéressés dans l'heure | Carte | Prix | Lieu | Réputation (2 tasses) | Humeur d'hier (74) | Groupes attendus dans l'heure |
-|---|---|---|---|---|---|---|---|
-| Les pressés | 1,62 | 6 points: x1,1 | x1 | x0,93 | x0,85 | x1,04 | 1,47 |
-| Les voisins | 1,22 | 6 points: x1,1 | x1 | x0,95 | x0,85 | x1,04 | 1,13 |
-| Les familles | 0,07 | 4 points: x0,9 | x1 | x0,95 | x0,85 | x1,04 | 0,05 |
-| Les gourmands | 0,00 | 3 points: x0,75 | x1 | x0,95 | x0,85 | x1,04 | 0,00 |
+| Profil | Heure | Passants intéressés dans l'heure | Carte | Prix | Lieu | Réputation (2 tasses) | Humeur d'hier (74) | Groupes attendus dans l'heure |
+|---|---|---|---|---|---|---|---|---|
+| Les pressés | 8 h | 1,62 | 6 points: x1,1 | x1 | x0,93 | x0,85 | x1,04 | 1,47 |
+| Les voisins | 8 h | 1,22 | 6 points: x1,1 | x1 | x0,95 | x0,85 | x1,04 | 1,13 |
+| Les familles | 16 h | 0,60 | 4 points: x0,9 | x1 | x0,95 | x0,85 | x1,04 | 0,45 |
+| Les gourmands | 16 h | 0,84 | 3 points: x0,75 | x1 | x0,95 | x0,85 | x1,04 | 0,53 |
 
 Règle AT-07: groupes attendus = passants x carte x prix x lieu x réputation x humeur, ici le premier mardi au village.
 
@@ -193,6 +193,24 @@ Règle AT-07: groupes attendus = passants x carte x prix x lieu x réputation x 
 <!-- table:res_cles -->
 | Clé | Valeur |
 |---|---|
+| `aides_bourg_les_deux` | 5 |
+| `aides_bourg_normal` | 15 |
+| `aides_bourg_patience_grande` | 11 |
+| `aides_bourg_rythme_paisible` | 9 |
+| `aides_paris-quartier_les_deux` | 17 |
+| `aides_paris-quartier_normal` | 25 |
+| `aides_paris-quartier_patience_grande` | 24 |
+| `aides_paris-quartier_rythme_paisible` | 19 |
+| `equipe_paris-maison_avec` | 19 |
+| `equipe_paris-maison_sans` | 70 |
+| `equipe_paris-quartier_avec` | 21 |
+| `equipe_paris-quartier_sans` | 63 |
+| `equipe_ville_avec` | 32 |
+| `equipe_ville_sans` | 65 |
+| `journee_median_min` | 21 |
+| `seances_median` | 55 |
+| `parties` | 120 |
+| `a_regler` | 0 |
 | `fin_h_lent` | 56,2 |
 | `fin_j_lent` | 155 |
 | `arr_h_bourg_lent` | 11,7 |
@@ -212,4 +230,4 @@ Règle AT-07: groupes attendus = passants x carte x prix x lieu x réputation x 
 | `arr_h_paris-quartier_rapide` | 15,1 |
 | `arr_h_paris-maison_rapide` | 21,0 |
 
-Calcul: 162 s sur la machine de l'environnement cloud.
+Calcul: 157 s sur la machine de l'environnement cloud.

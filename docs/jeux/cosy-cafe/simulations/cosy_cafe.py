@@ -2294,7 +2294,7 @@ def t_satisfaction() -> list[str]:
               ["deux mots échangés (voisins, habitués)", f"+{S['conversation']}", "le poste calme compte autant que le bar"],
               ["« Comme d'habitude ? » (fétiche servi sans attendre la commande)", f"+{S['commeDHabitude']}", "se souvenir de ses habitués"],
               ["pourboire", f"satisfaction {POURBOIRE['seuil']} et plus: {pct(POURBOIRE['taux'])} de l'addition, {POURBOIRE['seuilRavi']} et plus: "
-               f"{pct(POURBOIRE['tauxRavi'])}, une fois sur {fr(1 / POURBOIRE['probabilite'], 2)}, x le pourboire du profil", "la tirelire du comptoir se remplit à vue"],
+               f"{pct(POURBOIRE['tauxRavi'])}, une fois sur {dec(1 / POURBOIRE['probabilite'], 2)}, x le pourboire du profil", "le pot à pourboires du comptoir se remplit à vue"],
               ["mot au livre d'or", f"{pct(LIVRE_DOR['pRavi'])} des clients à {LIVRE_DOR['ravi']} et plus, {pct(LIVRE_DOR['pDecu'])} à {LIVRE_DOR['decu']} et moins; "
                f"habitués {pct(LIVRE_DOR['habitue'])}", "assez de mots pour lire chaque soir, pas trop pour qu'ils restent précieux"]]
     return tableau(["Composante (0 à 100)", "Valeur", "Raison"], lignes)
@@ -2773,7 +2773,7 @@ def ecrire_resultats(chemin: str, n: int) -> None:
          "- Entre les journées: achats selon le duo (catalogue et paliers d'ambiance), embauches, épargne après l'offre de "
          "l'adresse suivante, défi local, déménagement le lundi, succursales (SU-02), rattrapage de réputation (RE-05).",
          "- Trois duos: tranquille, médian et rapide (vitesse des gestes, hésitation, gestes parfaits, temps de préparation et "
-         "de fermeture, part épargnée, goût pour la décoration). Ce sont des hypothèses, à recaler au prototype (CA-58).", ""]
+         "de fermeture, part épargnée, goût pour la décoration). Ce sont des hypothèses, à recaler au prototype (CA-51).", ""]
     titres = {k: t for k, t, _ in RESULTATS}
     titres.update({"res_heures_village": "Profil horaire, village", "res_heures_maison": "Profil horaire, maison parisienne",
                    "res_exemple": "Exemple chiffré de l'attrait"})

@@ -121,6 +121,17 @@ def inside(shape, px, py, tol=1e-9):
     return dist_to_shape(shape, px, py)[0] <= tol
 
 
+def inside_strict(shape, px, py):
+    """Strictement à l'intérieur (le bord ne compte pas): une zone qui touche le comptoir n'est pas traversée."""
+    if "rect" in shape:
+        x, y, w, h = shape["rect"]
+        return x + 1e-9 < px < x + w - 1e-9 and y + 1e-9 < py < y + h - 1e-9
+    if "circle" in shape:
+        cx, cy, r = shape["circle"]
+        return math.hypot(px - cx, py - cy) < r - 1e-9
+    return point_in_poly(px, py, shape["poly"]) and dist_to_shape(shape, px, py)[0] == 0.0
+
+
 def overlap_area_rect(a, b):
     ax0, ay0, ax1, ay1 = a
     bx0, by0, bx1, by1 = b
@@ -370,11 +381,19 @@ def los(grid, opaque, ax, ay, bx, by):
     return True
 
 
-def door_face(shape, vx, vy):
-    """Point de la porte le plus proche de l'observateur, 5 cm de son côté: on vise la face vue."""
-    _, qx, qy = dist_to_shape(shape, vx, vy)
-    L = math.hypot(vx - qx, vy - qy) or 1.0
-    return qx + (vx - qx) / L * 0.05, qy + (vy - qy) / L * 0.05
+def door_face(e, vx, vy):
+    """Milieu de la porte, sur sa face tournée vers l'observateur (5 cm devant): on vise le centre
+    de l'ouverture, pas un de ses coins."""
+    shape = e["shape"]
+    if "rect" in shape:
+        x, y, w, h = shape["rect"]
+        if e.get("orient") == "v":
+            return (x - 0.05 if vx < x else x + w + 0.05), y + h / 2
+        return x + w / 2, (y - 0.05 if vy < y else y + h + 0.05)
+    (ax, ay), (bx, by) = shape["poly"][0], shape["poly"][1]
+    mx, my = (ax + bx) / 2, (ay + by) / 2
+    L = math.hypot(vx - mx, vy - my) or 1.0
+    return mx + (vx - mx) / L * 0.05, my + (vy - my) / L * 0.05
 
 
 def angle_of(vx, vy, tx, ty):
@@ -620,7 +639,7 @@ def check_plan(plan, norms, with_grid=True):
     for li, e in seats:
         d = reach_shape(grids[li], ok_c[li], dist_c[li], solid_c[li], e["shape"], reach)
         if d == INF:
-            unreached.append(e["id"])
+            unreached.append(f"{levels[li]['id']}/{e['id']}")
         else:
             seat_dist.append((d, e))
     if unreached:
@@ -669,7 +688,7 @@ def check_plan(plan, norms, with_grid=True):
             for j in range(max(0, int((y0 - g.y0) / RES)), min(g.ny, int((y1 - g.y0) / RES) + 1)):
                 for i in range(max(0, int((x0 - g.x0) / RES)), min(g.nx, int((x1 - g.x0) / RES) + 1)):
                     k = j * g.nx + i
-                    if dist_leak[li][k] < INF and inside(z["shape"], *g.xy(k), tol=-1e-9):
+                    if dist_leak[li][k] < INF and inside_strict(z["shape"], *g.xy(k)):
                         found = True
                         break
                 if found:
@@ -705,7 +724,7 @@ def check_plan(plan, norms, with_grid=True):
     for li, e in seats:
         d = reach_shape(grids[li], ok_s[li], dist_s[li], solid_s[li], e["shape"], reach)
         if d == INF:
-            rep.err(f"place {e['id']} hors d'atteinte des joueurs (service, débarrassage)")
+            rep.err(f"place {levels[li]['id']}/{e['id']} hors d'atteinte des joueurs (service, débarrassage)")
         else:
             serv.append((d, e))
     rep.info(f"{posts - missed}/{posts} postes atteints par les joueurs par des passages de 0,90 m")
@@ -753,7 +772,7 @@ def check_plan(plan, norms, with_grid=True):
         samples = polyline_samples(q["points"], RES)
         works = [z["shape"] for z in lv["zones"] if z["kind"] in ("work", "private")]
         half = q["width"] / 2
-        crosses = any(inside(w, x + (-uy) * s, y + ux * s, tol=-1e-9)
+        crosses = any(inside_strict(w, x + (-uy) * s, y + ux * s)
                       for x, y, ux, uy in samples for s in (-half, 0.0, half) for w in works)
         off_net = sum(1 for x, y, _, _ in samples
                       if (lambda k: k is None or not ok_c[li][k] or dist_c[li][k] == INF)(g.cell(x, y)))
@@ -834,20 +853,22 @@ def check_plan(plan, norms, with_grid=True):
         ops = opaque_seated[li]
         ang_people = sorted([angle_of(vx, vy, x, y) for x, y in tg["seated"] if los(g, ops, vx, vy, x, y)]
                             + [angle_of(vx, vy, x, y) for x, y in tg["standing"] if los(g, op, vx, vy, x, y)])
+        # Les figurants d'un espace sont répartis sur sa surface: on compte la part de l'espace
+        # visible dans le champ, arrondie au-dessus (un espace vu par une porte en montre peu).
         space_angles = []
         for z, pts in tg["spaces"]:
             angs = sorted(angle_of(vx, vy, x, y) for x, y in pts if los(g, op, vx, vy, x, y))
             if angs:
-                space_angles.append((z["extras"], angs))
+                space_angles.append((z["extras"], len(pts), angs))
         furn = sum(1 for x, y in tg["furn"] if los(g, op, vx, vy, x, y))
         worst, worst_dir = -1, 0
         for step in range(0, 360, 5):
             lo, hi = step - half_fov, step + half_fov
             c = count_window(ang_people, lo, hi) + 1
-            c += sum(ex for ex, angs in space_angles if count_window(angs, lo, hi) > 0)
+            c += sum(math.ceil(ex * count_window(angs, lo, hi) / n) for ex, n, angs in space_angles)
             if c > worst:
                 worst, worst_dir = c, step
-        around = len(ang_people) + sum(ex for ex, _ in space_angles) + 1
+        around = len(ang_people) + sum(math.ceil(ex * len(angs) / n) for ex, n, angs in space_angles) + 1
         return worst, worst_dir, around, furn
 
     for li, lv in enumerate(levels):
@@ -863,7 +884,7 @@ def check_plan(plan, norms, with_grid=True):
                         rep.err(f"vue « {v['label']} »: file « {ident} » inconnue")
                         continue
                     pts = [tuple(s) for s in queue_slots(q, norms["queue_pitch"])]
-                    doors = [door_face(e["shape"], vx, vy) for e in lv["elements"]
+                    doors = [door_face(e, vx, vy) for e in lv["elements"]
                              if e["kind"] == "door" and e["id"] in q["doors"]]
                     hidden = [p for p in pts + doors if not los(g, op, vx, vy, p[0], p[1])]
                     width, _ = covering_arc([angle_of(vx, vy, x, y) for x, y in pts + doors])
@@ -878,7 +899,7 @@ def check_plan(plan, norms, with_grid=True):
                     if e is None:
                         rep.err(f"vue « {v['label']} »: porte « {ident} » inconnue")
                         continue
-                    dx, dy = door_face(e["shape"], vx, vy)
+                    dx, dy = door_face(e, vx, vy)
                     dd = angdiff(angle_of(vx, vy, dx, dy), v["facing_deg"])
                     if dd > half_fov or not los(g, op, vx, vy, dx, dy):
                         rep.err(f"vue « {v['label']} »: la porte n'est pas dans l'axe de travail ou elle est cachée")
@@ -887,6 +908,8 @@ def check_plan(plan, norms, with_grid=True):
             line.update(crowd=worst, crowd_dir=wdir, crowd_around=around, furn=furn)
             if worst > crowd_cap:
                 rep.err(f"vue « {v['label']} »: {worst} personnages au pire dans le champ (C3: {crowd_cap})")
+            if furn > norms["furniture_visible_max"]:
+                rep.err(f"vue « {v['label']} »: {furn} meubles dessinés en vue (C6: {norms['furniture_visible_max']})")
             rep.views.append(line)
 
     if with_grid:

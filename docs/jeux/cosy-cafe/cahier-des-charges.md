@@ -15,7 +15,7 @@
 
 - **Le jeu**: à deux, en vue à la première personne, vous reprenez le petit café d'un village et vous le tenez ensemble: l'un au comptoir, l'autre à la machine, ou l'inverse, comme vous voulez. Ce que vous écrivez sur l'ardoise décide de qui pousse la porte; les meubles, la décoration et la musique décident de l'envie de rester. On sert, on encaisse, on débarrasse, on lave, on range la livraison du matin, on lit le livre d'or le soir.
 - **La progression**: cinq adresses, chacune plus grande et plus vivante. Ormeval, le café de la place du Tilleul (38 m², 8 places à l'arrivée); Mérelles, l'ancienne pâtisserie face à la halle (le four, le service en salle, le marché du jeudi); l'atelier d'une ville universitaire (les employés, le brunch, le café de spécialité); un café d'angle à Paris (l'équipe reprise, les touristes); la grande maison parisienne sous sa verrière (notre mélange, le laboratoire de pâtisserie, la visite d'un guide). Chaque café quitté reste ouvert, confié à quelqu'un: à la fin, la maison en tient cinq.
-- **La durée**: l'histoire principale dure <!-- val:fin_h_median -->36,4 h pour un duo médian (de <!-- val:fin_h_rapide -->28,5 h pour un duo rapide à <!-- val:fin_h_lent -->56,2 h pour un duo qui prend son temps), soit une soixantaine de séances de 40 minutes; puis le jeu continue sans fin. Une journée ouverte dure environ 21 minutes réelles: un service de 10 à 13 minutes entre une préparation et une fermeture à votre rythme.
+- **La durée**: l'histoire principale dure <!-- val:fin_h_median -->36,4 h pour un duo médian (de <!-- val:fin_h_rapide -->28,5 h pour un duo rapide à <!-- val:fin_h_lent -->56,2 h pour un duo qui prend son temps), soit <!-- val:seances_median -->55 séances de 40 minutes; puis le jeu continue sans fin. Une journée ouverte dure environ 21 minutes réelles: un service de 10 à 13 minutes entre une préparation et une fermeture à votre rythme.
 - **Ce qui le rend unique**: l'ardoise qui fait la clientèle; le coup de feu à deux, réglé à la voix parce que chacun ne voit que ce qu'il regarde; des habitués qui ont un prénom, une commande fétiche et une histoire; un style de décoration cohérent qui compte vraiment; des fournisseurs qui ont un visage; aucune faillite, aucune partie perdue, rien qui compare les deux joueurs.
 - **Chiffres sortis d'une simulation**: chaque journée de chaque partie simulée est jouée client par client (`simulations/cosy_cafe.py`, 120 parties); les tables de ce cahier en sont la copie exacte, vérifiée par un contrôle automatique.
 - **À trancher** (section 14): le titre (cinq propositions), la durée de l'histoire, Paris réel ou inventé, deux cafés à la fois, garder ou revendre les anciens cafés, les options de commande (lait d'avoine, déca), la place des aides.
@@ -55,7 +55,7 @@ Le client cite deux simulateurs de commerce en vue subjective. On garde le genre
 
 - pas d'ordinateur de commande qui fait tomber des cartons devant la porte: on commande à la fermeture, les fournisseurs livrent le matin en personne (une laitière à triporteur, un boulanger, une livreuse en vélo cargo à Paris), et l'on porte les gros cartons à deux;
 - pas de caisse où l'on scanne des articles, pas de rendu de monnaie en mini-jeu: on écoute la commande, le ticket s'imprime et rejoint le rail au-dessus du comptoir;
-- pas de prix fixés article par article sur des étagères: une ardoise de six à vingt lignes, écrite chaque matin, qui décide des profils qui entrent;
+- pas de prix fixés article par article sur des étagères: une ardoise de huit à vingt lignes, écrite chaque matin, qui décide des profils qui entrent;
 - pas de note étoilée qui tombe après une mauvaise journée: une réputation en tasses qui ne baisse jamais, et un livre d'or écrit à la main qui dit ce qui a plu ou manqué;
 - pas de dette ni de faillite: le pire est une journée calme;
 - le couple au centre: deux postes qui ne se voient pas, des gros meubles portés à deux, les grandes décisions prises ensemble, et rien qui compare les deux joueurs.
@@ -67,7 +67,7 @@ Le client cite deux simulateurs de commerce en vue subjective. On garde le genre
 | Neuf profils de clients | dix: ajout des **voisins** [`voisins`], qui viennent pour deux mots au comptoir | donne un vrai poids au poste calme (parler aux gens) et fait vivre le zinc à chaque adresse; un profil de plus à habiller pour la bible (7.2) |
 | Journée de 15 à 20 minutes | journée ouverte de 21 minutes en moyenne (17 à 25 selon le duo), lundi de fermeture en plus | mesuré par la simulation: service de 10 à 13 minutes selon l'adresse, préparation et fermeture du duo médian (4 et 3,5 minutes) |
 | Saisons de 28 jours, 35 h pour l'histoire | 28 jours confirmés; histoire principale en 36,4 h pour un duo médian | simulation, section 4.21 |
-| Places assises (ordre de grandeur) | village et bourg: plans du level designer (8 puis 18 places; 12 puis 39); ville, Paris: hypothèses de la simulation (table `adresses`), sous les plafonds de l'architecte (C2) | les plans font foi; la ville et Paris attendent les leurs |
+| Places assises (ordre de grandeur) | village et bourg: plans du level designer (Ormeval: 10 places à l'arrivée, 8 dedans et le banc dehors, 18 au maximum; Mérelles: 12 à l'arrivée, 39 au maximum); ville, Paris: hypothèses de la simulation (table `adresses`), sous les plafonds de l'architecte (C2) | les plans font foi; la ville et Paris attendent les leurs |
 | Le bourg, une boutique de la grand-rue | Mérelles, l'ancienne pâtisserie face à la halle (plans) | le level designer a placé l'adresse; le four y attend dans son laboratoire, d'où le personnage de René, l'ancien pâtissier |
 | Réputation « de une à cinq tasses » | en demi-tasses, sans jamais baisser | aucune perte, rien à reprocher à l'autre joueur après un service difficile |
 | Employés à la troisième adresse | confirmé, avec un coup de main au bourg les jours de marché et le week-end, et une équipe reprise avec chaque café parisien | à deux, une grande adresse refuse près des deux tiers de ses clients (section 4.21); un café d'angle se reprend d'ordinaire avec son personnel |
@@ -203,7 +203,12 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **AT-07** Groupes attendus d'un profil dans l'heure = **passants intéressés x carte x prix x lieu x réputation x humeur** (x affluence, réglage du duo). Les arrivées suivent une loi de Poisson autour de cette valeur. Exemple chiffré, un mardi de printemps couvert, la première semaine à Ormeval (deux tasses, ambiance 40, style campagne à 50 % de cohérence, gobelets à emporter achetés; ardoise: espresso, allongé, noisette, café crème, thé noir, chocolat chaud, croissant, pain au chocolat):
 
 <!-- table:res_exemple -->
-| à remplir |
+| Profil | Heure | Passants intéressés dans l'heure | Carte | Prix | Lieu | Réputation (2 tasses) | Humeur d'hier (74) | Groupes attendus dans l'heure |
+|---|---|---|---|---|---|---|---|---|
+| Les pressés | 8 h | 1,62 | 6 points: x1,1 | x1 | x0,93 | x0,85 | x1,04 | 1,47 |
+| Les voisins | 8 h | 1,22 | 6 points: x1,1 | x1 | x0,95 | x0,85 | x1,04 | 1,13 |
+| Les familles | 16 h | 0,60 | 4 points: x0,9 | x1 | x0,95 | x0,85 | x1,04 | 0,45 |
+| Les gourmands | 16 h | 0,84 | 3 points: x0,75 | x1 | x0,95 | x0,85 | x1,04 | 0,53 |
 
   Lecture: entre 8 h et 9 h, un groupe et demi de pressés et un groupe de voisins sont attendus; au goûter, les gourmands trouvent trois envies secondaires mais aucune pâtisserie: écrire une tarte sur l'ardoise les ferait passer de 3 à 6 points (de x0,75 à x1,1).
 - **AT-08** Réglage du duo « Affluence »: douce (x0,8), normale (x1), vive (x1,2). Il multiplie les passants; il ne change ni les prix ni les seuils de la progression (une affluence douce allonge donc l'histoire).
@@ -247,7 +252,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 
 - **SE-01** **Servir au comptoir**: poser la commande complète sur le passe (1 s); le client la prend et va s'asseoir. **Servir à table**: charger le plateau (quatre articles), aller à la table, poser (0,8 s, plus 0,4 s par article); un plateau plein ou un second voyage pour une grande table.
 - **SE-02** **Encaisser**: au comptoir, à la commande; en salle, en servant (terminal portable). Aucun rendu de monnaie: le client paie par carte ou laisse le compte juste dans la soucoupe.
-- **SE-03** **Pourboires**: un groupe content (satisfaction de 75 et plus) laisse un pourboire une fois sur deux, 5 % de l'addition (10 % à 88 et plus), multiplié par la générosité du profil (table `profils`). Les pièces tombent dans la tirelire du comptoir, visible des deux; elles rejoignent la caisse au bilan. Comme en France, les pourboires restent modestes (section 4.21).
+- **SE-03** **Pourboires**: un groupe content (satisfaction de 75 et plus) laisse un pourboire une fois sur deux, 5 % de l'addition (10 % à 88 et plus), multiplié par la générosité du profil (table `profils`). Les pièces tombent dans le pot à pourboires du comptoir, visible des deux; elles rejoignent la caisse au bilan. Comme en France, les pourboires restent modestes (section 4.21).
 - **SE-04** **Parler**: regarder un client à 2,5 m au plus et agir ouvre deux répliques (2 s). Un voisin ou un habitué à qui l'on a parlé pendant son séjour gagne +12 de satisfaction; un habitué gagne aussi du lien (HA-02).
 - **SE-05** **« Comme d'habitude ? »**: servir à un habitué sa commande fétiche avant qu'il ne l'ait passée (préparée en le voyant entrer) donne +10 de satisfaction et du lien.
 
@@ -297,7 +302,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **RE-02** Le **livre d'or** est posé sur le comptoir. Un client ravi (85 et plus) y écrit une fois sur huit, un client déçu (45 et moins) une fois sur dix, un habitué une fois sur trois. Chaque mot est écrit à la main et dit la raison principale, bonne ou mauvaise (« Le cappuccino avait un cœur dessus ! », « Pas trouvé de place pour m'asseoir, dommage »). Il se lit à la fermeture, chez les deux. Les mots préférés s'épinglent (« Nos mots préférés »); la maison en garde 300 (technique, section 6.1). Aucun mot ne nomme un joueur.
 - **RE-03** La **réputation** d'un café se compte en demi-tasses, de une à cinq. Chaque groupe servi lui apporte (satisfaction - 50) / 10 points, jamais moins de zéro: un client content la fait monter, un client déçu ne la fait pas baisser. Les points se cumulent par café; la demi-tasse k au-dessus de la réputation d'arrivée demande pas x k x (k + 1) / 2 points (table `reputation`): chaque palier est un peu plus long que le précédent. **La réputation ne baisse jamais.** Raison: aucun service raté ne se paie plus tard, et rien ne désigne le joueur « responsable » d'une mauvaise journée.
 - **RE-04** L'**humeur de la veille** (satisfaction moyenne d'hier) ajoute ou retire jusqu'à 10 % de passants le lendemain (AT-05): la seule trace, passagère, d'une journée difficile.
-- **RE-05** **Rattrapage**: à partir du 12e jour ouvert à une adresse, les points de réputation du jour comptent 5 % de plus par jour au-delà, jusqu'au double (le bouche-à-oreille des habitués). Effet mesuré: les duos médians n'y arrivent presque jamais; les duos tranquilles y gagnent une semaine à certaines adresses.
+- **RE-05** **Rattrapage**: après 12 jours ouverts à une adresse, les points de réputation du jour comptent 5 % de plus par jour au-delà, jusqu'au double (le bouche-à-oreille des habitués). Effet mesuré: les duos médians n'y arrivent presque jamais; les duos tranquilles y gagnent une semaine à certaines adresses.
 - **RE-06** La **renommée de la maison** est la somme des points de réputation gagnés dans tous ses cafés, plus 45 % des points quotidiens moyens de chaque succursale et une prime à chaque défi local (table `defis`). Elle ne baisse jamais. Elle fait arriver la lettre de l'adresse suivante (PR-01).
 - **RE-07** **Réputation d'arrivée**: la maison est connue avant d'ouvrir (1,5 tasse au village, 2 au bourg, 2,5 en ville, 3 au café d'angle, 3,5 à la maison parisienne).
 
@@ -402,7 +407,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **SV-05** **Taille**: environ 200 Ko en fin d'histoire (estimation de l'architecte, technique, section 6.1); `maxBytes` à 4 Mio.
 - **SV-06** **Versions**: format daté (`dataSchema`), migrations testées sur des sauvegardes de référence. Un service en cours ne se migre pas: une sauvegarde faite en plein service par une version plus ancienne reprend à la fin de cette journée, le reste du service calculé par la règle des succursales (technique, section 6.2). Tout identifiant de contenu (recette, meuble, habitué) reste valable pour toujours.
 - **SV-07** **Historique** (F08, `play: "session"`): chaque séance s'inscrit avec ses journées (« du mardi 3 au jeudi 5 du printemps, année 1 »), l'adresse jouée, trois statistiques (journées tenues, clients servis, mots au livre d'or, proposition de l'architecte retenue) et au plus trois faits marquants partagés de 60 caractères au plus, par priorité: arrivée à une adresse (« Ouverture de l'atelier »), défi tenu (« La fête du Tilleul »), Tasse d'or, nouvelle tasse de réputation (« Quatre tasses à Mérelles »), habitué à un nouveau niveau (« Simone: Comme la famille »), extension ouverte, première embauche, recette apprise. Aucun fait individuel, aucune statistique par joueur.
-- **SV-08** **Progression commune** (F09): `progress` = projets réalisés / projets de « Nos projets » dans la version installée, affichée « Nos projets: 23 sur 64 ». Raison, plutôt que la formule par adresse proposée par l'architecte: elle continue de monter dans le jeu libre, ne reste jamais à 1 tant qu'il reste quelque chose à faire, et dit en mots ce que le duo a accompli. Quand une version ajoute des projets, le total grandit.
+- **SV-08** **Progression commune** (F09): `progress` = projets réalisés / projets de « Nos projets » dans la version installée, affichée « Nos projets: 23 sur 59 ». Raison, plutôt que la formule par adresse proposée par l'architecte: elle continue de monter dans le jeu libre, ne reste jamais à 1 tant qu'il reste quelque chose à faire, et dit en mots ce que le duo a accompli. Quand une version ajoute des projets, le total grandit.
 
 ### 4.19 Métriques de jeu
 
@@ -429,173 +434,456 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 **Temps, séance, mémoire**
 
 <!-- table:reglages -->
-| à remplir |
+| Clé | Paramètre | Valeur | Unité | Plage | Raison |
+|---|---|---|---|---|---|
+| `secondesParMinute` | Durée d'une minute de jeu | 1 | s réelle | 0,8 à 1,25 | une heure de jeu = une minute réelle: le service du village dure 10 min, celui de Paris 13 min |
+| `rythmePaisible` | Rythme paisible (réglage du duo) | 1,25 | s par minute de jeu | 1,0 à 1,5 | 25 % de temps réel en plus par heure de jeu: le même flux, moins serré |
+| `joursParSaison` | Jours par saison | 28 | jours | 21 à 35 | quatre semaines, chaque saison commence un lundi (jour de fermeture) |
+| `joursParSemaine` | Jours ouverts par semaine | 6 | jours | fixe | fermé le lundi: travaux, brocante, visite des autres cafés |
+| `fermetureDouce` | Fermeture douce | 15 | min de jeu | 0 à 30 | après l'heure de fermeture, les clients installés finissent tranquillement |
+| `seuilAbsenceService` | Seuil d'absence pendant le service | 60 | s réelles sans entrée | 30 à 180 | en plein service, une minute sans rien toucher n'arrive que si l'on s'est levé |
+| `seuilAbsenceCalme` | Seuil d'absence hors service | 180 | s réelles sans entrée | 60 à 600 | horloge déjà arrêtée: seul l'indicateur « absent » change |
+| `sauvegardeService` | Sauvegarde automatique pendant le service | 120 | s réelles | 60 à 300 | au plus deux minutes rejouées si l'hôte s'arrête net |
+| `decompteReprise` | Décompte à la reprise d'un service | 3 | s réelles | 0 à 5 | le temps de reprendre la souris avant que les clients ne bougent |
+| `reserveCharges` | Réserve pour les charges | 2 | jours de charges fixes | 0 à 5 | un achat ne peut entamer ce qu'il faut pour payer loyer, salaires et charges |
+| `partSuccursale` | Résultat d'une succursale | 0,45 | part de vos sept dernières journées | 0,3 à 0,6 | sans vous, le café tourne bien mais moins bien: y revenir reste utile |
+| `partEpargne` | Épargne conseillée après une offre | 0,6 | part du résultat du jour | 0,4 à 0,8 | la tablette propose de mettre de côté pour le déménagement (simulation: duo médian) |
 
 **Adresses** (village et bourg: plans du level designer; ville et Paris: hypothèses, sous les plafonds de l'architecte)
 
 <!-- table:adresses -->
-| à remplir |
+| Adresse | Nom (plans) | Surface | Ouverture | Marché | Prix | Coûts | Loyer par mois | Charges par jour | Installation | Renommée de l'offre | Tasses au départ | Tasses du défi | Lignes d'ardoise | Places à l'arrivée (dedans + dehors) | Places au maximum | Debout au comptoir | Présents au plus (C2) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `village` | Ormeval, le café de la place du Tilleul | 38 m² | 8 h à 18 h | aucun | x1 | x1 | 520 € | 8 € | aucune | 0 | 1,5 | 3,0 | 8 | 8 + 2 | 12 + 6 | 3 | 24 |
+| `bourg` | Mérelles, la boutique de la place de la Halle | 81 m² | 7 h 30 à 19 h | jeudi | x1,1 | x1 | 1 150 € | 16 € | 600 € | 500 | 2,0 | 3,5 | 12 | 12 + 0 | 21 + 18 | 4 | 48 |
+| `ville` | L'atelier | 140 m² | 8 h à 20 h | samedi | x1,3 | x1,05 | 2 900 € | 34 € | 1 200 € | 2 200 | 2,5 | 4,0 | 16 | 24 + 0 | 40 + 12 | 6 | 72 |
+| `paris-quartier` | Le café d'angle | 92 m² | 7 h 30 à 20 h 30 | mardi, vendredi | x1,8 | x1,15 | 6 500 € | 60 € | 2 500 € | 4 500 | 3,0 | 4,0 | 16 | 22 + 8 | 36 + 20 | 8 | 80 |
+| `paris-maison` | La maison du boulevard | 310 m² | 8 h à 21 h | dimanche | x2 | x1,2 | 15 000 € | 140 € | 3 000 € | 10 000 | 3,5 | 4,5 | 20 | 34 + 12 | 74 + 16 | 8 | 120 |
 
 **Équipement fourni à l'arrivée** (compris dans l'installation)
 
 <!-- table:depart -->
-| à remplir |
+| Adresse | Postes et niveaux | Plonge | Terminaux | Équipements | Employés repris | Vaisselle |
+|---|---|---|---|---|---|---|
+| `village` | machine 1, buse 1, bouilloire 1, vitrine 1, plan 1, frigo du bar 1 | évier | 1 | aucun | 0 | 36 |
+| `bourg` | machine 1, buse 1, bouilloire 1, vitrine 1, plan 1, frigo du bar 1 | évier | 1 | gobelets | 0 | 70 |
+| `ville` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi | 0 | 120 |
+| `paris-quartier` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi, mange_debout | 3 | 160 |
+| `paris-maison` | machine 3, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 2, presse-agrumes 2 | lave-vaisselle à capot | 2 | gobelets, wifi | 5 | 260 |
 
 **Extensions**
 
 <!-- table:extensions -->
-| à remplir |
+| Adresse | Extension | Coût | Places (comptoir, tables, confort, terrasse) | Ambiance | Raison |
+|---|---|---|---|---|---|
+| `village` | E1, la terrasse sous le store | 450 € | 0, 0, 0, +4 | +3 | autorisation de la mairie et deux tables sous le store: la place du Tilleul est la richesse du village |
+| `village` | E2, la pièce du fond, au coin du feu | 900 € | 0, +2, +2, 0 | +4 | la pièce fermée derrière la salle, rouverte avec sa cheminée |
+| `bourg` | E1, la terrasse de la halle | 800 € | 0, 0, 0, +10 | +3 | sous le store, face à la halle: le jeudi, le marché passe devant |
+| `bourg` | E2, la salle de la remise | 1 800 € | 0, +8, 0, 0 | +5 | la remise débarrassée, avec sa grande table de ferme |
+| `bourg` | E3, la cour sous la treille | 1 400 € | 0, 0, 0, +8 | +4 | la cour derrière la boutique, à l'ombre de la treille |
+| `ville` | E1, la deuxième salle | 2 500 € | 0, +8, +4, 0 | +5 | l'ancien atelier au fond de la cour |
+| `ville` | E2, la cour pavée | 2 600 € | 0, 0, 0, +12 | +4 | la cour de l'atelier, à l'abri de la rue |
+| `paris-quartier` | E1, la terrasse sur le trottoir | 5 000 € | 0, 0, 0, +10 | +3 | l'angle donne sur deux rues: la mairie d'arrondissement autorise la seconde |
+| `paris-quartier` | E2, l'arrière-salle | 9 000 € | 0, +6, +2, 0 | +5 | l'ancienne réserve du café d'angle, rouverte sur la cour (pas de second niveau: C17) |
+| `paris-maison` | E1, la verrière restaurée | 6 000 € | 0, +12, +6, 0 | +8 | la grande salle sous la verrière, fermée depuis des années |
+| `paris-maison` | E2, la mezzanine | 8 000 € | 0, +12, +4, 0 | +6 | le plancher sous la verrière, rouvert par l'escalier de la maison (second niveau, C17) |
 
 **Flux de base** (groupes intéressés par jour, à attrait 1, jour ordinaire, temps couvert)
 
 <!-- table:flux -->
-| à remplir |
+| Profil | village | bourg | ville | Paris, quartier | Paris, maison |
+|---|---|---|---|---|---|
+| `presses` | 6 | 10 | 15 | 30 | 30 |
+| `voisins` | 7 | 7 | 6 | 10 | 8 |
+| `flaneurs` | 5 | 6 | 8 | 15 | 18 |
+| `familles` | 3 | 4,5 | 6 | 7 | 8 |
+| `gourmands` | 4 | 5 | 8 | 13 | 16 |
+| `promeneurs` | 4 | 4 | 5 | 15 | 14 |
+| `etudiants` | 0 | 2 | 18 | 8 | 8 |
+| `teletravail` | 1,5 | 2 | 8 | 14 | 16 |
+| `brunch` | 0 | 0 | 4 | 8 | 8 |
+| `connaisseurs` | 1 | 1 | 5 | 10 | 16 |
+| total | 31,5 | 41,5 | 83 | 130 | 142 |
 
 **Poids horaires** (ramenés aux heures d'ouverture de l'adresse)
 
 <!-- table:courbes -->
-| à remplir |
+| Profil | 7 h | 8 h | 9 h | 10 h | 11 h | 12 h | 13 h | 14 h | 15 h | 16 h | 17 h | 18 h | 19 h | 20 h |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `presses` | 1,6 | 2,0 | 1,2 | 0,5 | 0,4 | 0,8 | 0,8 | 0,4 | 0,3 | 0,4 | 0,6 | 0,6 | 0,3 | 0,1 |
+| `voisins` | 1,0 | 1,4 | 1,2 | 1,0 | 0,8 | 0,4 | 0,4 | 0,5 | 0,6 | 0,7 | 1,0 | 0,9 | 0,4 | 0,1 |
+| `flaneurs` | 0,1 | 0,4 | 0,9 | 1,3 | 1,2 | 0,6 | 0,6 | 1,0 | 1,3 | 1,2 | 0,9 | 0,6 | 0,4 | 0,2 |
+| `familles` |  | 0,2 | 0,3 | 0,6 | 0,6 | 0,3 | 0,3 | 0,6 | 0,9 | 1,8 | 1,6 | 0,6 | 0,2 |  |
+| `gourmands` |  |  | 0,3 | 0,7 | 0,6 | 0,3 | 0,4 | 0,8 | 1,4 | 1,8 | 1,4 | 0,6 | 0,3 | 0,2 |
+| `promeneurs` |  | 0,2 | 0,5 | 1,0 | 1,3 | 1,2 | 1,0 | 1,1 | 1,3 | 1,2 | 0,8 | 0,4 | 0,2 |  |
+| `etudiants` |  | 0,3 | 0,6 | 0,9 | 0,9 | 1,2 | 1,0 | 1,3 | 1,4 | 1,4 | 1,2 | 1,0 | 0,7 | 0,4 |
+| `teletravail` |  | 0,4 | 1,4 | 1,6 | 1,0 | 0,6 | 1,0 | 1,4 | 1,0 | 0,6 | 0,3 |  |  |  |
+| `brunch` |  |  | 0,4 | 1,4 | 2,0 | 2,0 | 1,4 | 0,6 |  |  |  |  |  |  |
+| `connaisseurs` | 0,5 | 1,3 | 1,4 | 1,1 | 0,8 | 0,4 | 0,5 | 1,0 | 1,1 | 0,9 | 0,5 | 0,3 |  |  |
 
 **Jours de la semaine** (multiplicateurs; le jour de marché s'ajoute)
 
 <!-- table:jours -->
-| à remplir |
+| Profil | mardi | mercredi | jeudi | vendredi | samedi | dimanche | jour de marché |
+|---|---|---|---|---|---|---|---|
+| `presses` | 1 | 1 | 1 | 1 | 0,5 | 0,3 | 1 |
+| `voisins` | 1 | 1 | 1 | 1 | 1 | 1,1 | 1,3 |
+| `flaneurs` | 1 | 1 | 1 | 1 | 1,2 | 1,3 | 1,3 |
+| `familles` | 0,8 | 1,6 | 0,8 | 0,8 | 1,5 | 1,7 | 1,1 |
+| `gourmands` | 0,9 | 0,9 | 0,9 | 0,9 | 1,3 | 1,5 | 1,1 |
+| `promeneurs` | 0,7 | 0,7 | 0,7 | 0,7 | 1,5 | 1,8 | 1,2 |
+| `etudiants` | 1,15 | 1,15 | 1,15 | 1,15 | 0,6 | 0,4 | 1 |
+| `teletravail` | 1,2 | 1,2 | 1,2 | 1,2 | 0,2 | 0,1 | 1 |
+| `brunch` | 0 | 0 | 0 | 0 | 1,8 | 2,2 | 1 |
+| `connaisseurs` | 1 | 1 | 1 | 1 | 1,2 | 1 | 1 |
 
 **Météo** (probabilités par saison, terrasse, multiplicateurs par profil)
 
 <!-- table:meteo -->
-| à remplir |
+|  | soleil | couvert | pluie | chaleur | froid | neige |
+|---|---|---|---|---|---|---|
+| probabilité au printemps | 40 % | 35 % | 25 % | 0 % | 0 % | 0 % |
+| probabilité en été | 55 % | 20 % | 10 % | 15 % | 0 % | 0 % |
+| probabilité en automne | 25 % | 40 % | 35 % | 0 % | 0 % | 0 % |
+| probabilité en hiver | 20 % | 35 % | 25 % | 0 % | 15 % | 5 % |
+| terrasse ouverte | oui | oui | non | oui | non | non |
+| `presses` | 1 | 1 | 1,05 | 1 | 1 | 0,9 |
+| `voisins` | 1 | 1 | 0,9 | 1 | 1 | 0,8 |
+| `flaneurs` | 1,1 | 1 | 1,15 | 0,9 | 1,1 | 1 |
+| `familles` | 1,1 | 1 | 0,8 | 1 | 0,9 | 0,9 |
+| `gourmands` | 1 | 1 | 1,1 | 0,8 | 1,15 | 1,2 |
+| `promeneurs` | 1,4 | 1 | 0,35 | 1,1 | 0,6 | 0,4 |
+| `etudiants` | 1 | 1 | 1,1 | 1 | 1 | 1 |
+| `teletravail` | 1 | 1 | 1,1 | 1 | 1 | 1 |
+| `brunch` | 1,2 | 1 | 0,8 | 1,1 | 0,9 | 0,9 |
+| `connaisseurs` | 1 | 1 | 1 | 1 | 1 | 1 |
 
 **Saisons** (multiplicateurs par profil)
 
 <!-- table:saisons -->
-| à remplir |
+| Profil | printemps | été | automne | hiver |
+|---|---|---|---|---|
+| `presses` | 1 | 0,9 | 1 | 1 |
+| `voisins` | 1 | 1 | 1 | 1 |
+| `flaneurs` | 1 | 1,1 | 1 | 1 |
+| `familles` | 1 | 1,2 | 1 | 0,9 |
+| `gourmands` | 1 | 0,9 | 1 | 1,2 |
+| `promeneurs` | 1,1 | 1,5 | 0,9 | 0,5 |
+| `etudiants` | 1 | 0,35 | 1,3 | 1,1 |
+| `teletravail` | 1 | 0,8 | 1 | 1 |
+| `brunch` | 1 | 1,1 | 1 | 0,9 |
+| `connaisseurs` | 1 | 1 | 1 | 1 |
 
 **Attrait**
 
 <!-- table:attrait -->
-| à remplir |
+| Facteur | Valeur | Raison |
+|---|---|---|
+| Carte: points d'envie 0 à 7 et plus | 0: 0,00 ; 1: 0,35 ; 2: 0,55 ; 3: 0,75 ; 4: 0,90 ; 5: 1,00 ; 6: 1,10 ; 7: 1,20 | envie principale 3 points, chaque envie secondaire 1, variété (trois recettes de l'envie principale) 1 |
+| Réputation: tasses | 1,0: 0,7 ; 1,5: 0,775 ; 2,0: 0,85 ; 2,5: 0,925 ; 3,0: 1 ; 3,5: 1,075 ; 4,0: 1,15 ; 4,5: 1,225 ; 5,0: 1,3 | de x0,7 à x1,3: la réputation compte sans tout écraser |
+| Lieu | 0,75 + 0,25 x ambiance / 100; style aimé +0,10 (cohérence 50 %) ou +0,15 (75 %); +0,08 par équipement recherché, 2 au plus | de x0,75 (lieu nu) à x1,31 |
+| Prix | 1 - sensibilité x (indice de prix - 1), borné de 0,40 à 1,25 | l'indice est le prix choisi sur le prix conseillé |
+| Humeur de la veille | 1 + (satisfaction moyenne d'hier - 70) x 0,01, borné à ±10 % | une bonne journée se dit au village le lendemain |
+| Estimation de l'attente à l'entrée | 25 s par groupe qui attend, divisées par les personnes qui servent; file de 6 places au plus (C4) | on n'entre pas devant une attente plus longue que sa patience |
 
 **Satisfaction, pourboires, livre d'or**
 
 <!-- table:satisfaction -->
-| à remplir |
+| Composante (0 à 100) | Valeur | Raison |
+|---|---|---|
+| base | 70 | un client servi normalement est content |
+| attente au-delà de l'attente sans gêne du profil | -0,5 par seconde, -30 au plus | l'attente pèse sans jamais tout gâcher |
+| qualité (moyenne des articles): parfait, bien, correct | +10, +4, -4 | la précision récompense; « correct » n'est pas un échec |
+| dessin sur le lait | +4 | geste de savoir-faire facultatif |
+| fait maison | +3 | à partir du four du bourg |
+| prix ressenti | (1 - indice) x sensibilité x 40, borné à ±12 | un prix doux plaît surtout aux sensibles |
+| place: voulue, autre, debout alors qu'on voulait s'asseoir, table pas débarrassée | +5, 0, -10, -6 | le livre d'or dit ce qui a manqué |
+| ambiance | (ambiance - 50) / 5 | de -10 à +10 |
+| deux mots échangés (voisins, habitués) | +12 | le poste calme compte autant que le bar |
+| « Comme d'habitude ? » (fétiche servi sans attendre la commande) | +10 | se souvenir de ses habitués |
+| pourboire | satisfaction 75 et plus: 5 % de l'addition, 88 et plus: 10 %, une fois sur 2, x le pourboire du profil | le pot à pourboires du comptoir se remplit à vue |
+| mot au livre d'or | 12 % des clients à 85 et plus, 10 % à 45 et moins; habitués 35 % | assez de mots pour lire chaque soir, pas trop pour qu'ils restent précieux |
 
 **Réputation** (points cumulés par café pour chaque demi-tasse)
 
 <!-- table:reputation -->
-| à remplir |
+| Adresse | Tasses à l'arrivée | Pas (points) | Points cumulés pour chaque demi-tasse |
+|---|---|---|---|
+| `village` | 1,5 | 150 | 2,0: 150 ; 2,5: 450 ; 3,0: 900 ; 3,5: 1 500 ; 4,0: 2 250 ; 4,5: 3 150 ; 5,0: 4 200 |
+| `bourg` | 2,0 | 130 | 2,5: 130 ; 3,0: 390 ; 3,5: 780 ; 4,0: 1 300 ; 4,5: 1 950 ; 5,0: 2 730 |
+| `ville` | 2,5 | 300 | 3,0: 300 ; 3,5: 900 ; 4,0: 1 800 ; 4,5: 3 000 ; 5,0: 4 500 |
+| `paris-quartier` | 3,0 | 700 | 3,5: 700 ; 4,0: 2 100 ; 4,5: 4 200 ; 5,0: 7 000 |
+| `paris-maison` | 3,5 | 1 400 | 4,0: 1 400 ; 4,5: 4 200 ; 5,0: 8 400 |
 
 **Défis et fin de l'histoire**
 
 <!-- table:defis -->
-| à remplir |
+| Adresse | Défi | Lieu (extension ou achats) | Jour | Tasses | Renommée gagnée |
+|---|---|---|---|---|---|
+| `village` | La fête du Tilleul | `village_terrasse` | dimanche | 3,0 | 150 |
+| `bourg` | La foire de la halle | `bourg_terrasse` | jeudi | 3,5 | 300 |
+| `ville` | Le grand brunch de l'atelier | `ville_salle2` | dimanche | 4,0 | 600 |
+| `paris-quartier` | Le vide-grenier de la rue | `pq_trottoir` | dimanche | 4,0 | 1 000 |
+| `paris-maison` | La visite du guide, puis la fête de la maison | `labo` et `torrefaction` et `pm_verriere` et `pm_mezzanine` | la semaine où tout est prêt, fête le lundi | 4,5 | fin de l'histoire principale |
 
 **Postes** (places simultanées par niveau)
 
 <!-- table:postes -->
-| à remplir |
+| Poste | Nom | Places à la main, avec machine, machine avancée | Remarque |
+|---|---|---|---|
+| `caisse` | Comptoir et caisse | 1 / 1 / 2 | un terminal, deux à Paris |
+| `espresso` | Machine à espresso | 2 / 2 / 3 | deux groupes (la vieille machine de Simone), trois ensuite |
+| `vapeur` | Buse vapeur | 1 / 2 / 2 | une buse par machine, deux dès la machine à deux groupes |
+| `bouilloire` | Eau chaude et thés | 1 / 2 / 2 | bouilloire, puis bouilloire à température |
+| `vitrine` | Vitrine | 2 / 2 / 3 | deux personnes s'y servent à la fois |
+| `agrumes` | Presse-agrumes | 1 / 1 / 2 | à levier, puis électrique |
+| `blender` | Blender | 1 / 2 / 2 |  |
+| `creperie` | Crêpière | 1 / 2 / 2 | une plaque, puis deux |
+| `gaufrier` | Gaufrier | 1 / 2 / 2 |  |
+| `plan` | Plan de travail | 1 / 2 / 3 | chaque place est un mètre de plan |
+| `four` | Four | 6 / 12 / 24 | pièces à la fois |
+| `douce` | Bar à méthodes douces | 2 / 3 / 4 | cônes |
+| `frigo` | Réfrigérateur du bar | 2 / 2 / 3 | bouteilles et carafes |
 
 **Gestes autour des commandes**
 
 <!-- table:gestes -->
-| à remplir |
+| Clé | Geste | Valeur | Unité |
+|---|---|---|---|
+| `commandeComptoir` | prendre une commande au comptoir et encaisser | 2,5 | s |
+| `commandeTable` | prendre une commande à table | 2,5 | s |
+| `servirComptoir` | servir au comptoir | 1 | s |
+| `servirTable` | servir à table | 0,8 | s |
+| `servirParArticle` | par article de plus | 0,4 | s |
+| `plateau` | articles par plateau | 4 |  |
+| `debarrasser` | débarrasser une table | 1,5 | s |
+| `laverMain` | laver une pièce à l'évier | 1,5 | s |
+| `laverLot` | pièces par passage à l'évier | 4 |  |
+| `chargerLave` | charger une pièce au lave-vaisselle | 0,3 | s |
+| `cycleLave` | cycle du lave-vaisselle (évier, lave-vaisselle, à capot) | 0 / 45 / 25 | s |
+| `capaciteLave` | pièces par cycle | 0 / 24 / 40 |  |
+| `viderLave` | vider le lave-vaisselle | 4 | s |
+| `marcheBar` | pas entre deux postes du bar | 0,6 | s |
+| `parfaitRetard` | retard toléré pour un geste parfait | 2 | s |
+| `correctRetard` | au-delà, le geste est « correct » | 6 | s |
 
 **Employés**
 
 <!-- table:employes -->
-| à remplir |
+| Rôle | Nom | Salaire et charges par jour travaillé | À Paris | Postes | Raison |
+|---|---|---|---|---|---|
+| `salle` | Service en salle | 95 € | 114 € | commandes, service, débarrasser, encaisser | le rôle le plus demandé dès deux salles |
+| `barista` | Barista | 105 € | 126 € | machine, buse, thés, presse, blender, méthodes douces | libère le bar aux heures de pointe |
+| `commis` | Commis | 85 € | 102 € | plonge, débarrasser, réserve, livraisons, vitrine | le premier coup de main, le moins cher |
+| `patisserie` | Pâtisserie | 110 € | 132 € | four, plan, crêpière, gaufrier, fournées | rend le fait maison possible à grande échelle |
+| `plonge` | Plonge | 80 € | 96 € | vaisselle et débarrasser | à partir de deux salles, la vaisselle devient un poste |
+| `gerance` | Gérance | 130 € | 156 € | tient une succursale | la personne à qui l'on confie un café |
 
 **Équipe du duo simulé** (conduite de la simulation, pas une règle)
 
 <!-- table:equipe -->
-| à remplir |
+| Adresse | Employés au plus (plan du duo simulé) | Ordre d'embauche |
+|---|---|---|
+| `village` | 0 | aucun employé |
+| `bourg` | 1 | commis (marché et week-end) |
+| `ville` | 5 | salle (tous les jours); plonge (tous les jours); barista (tous les jours); salle (marché et week-end); commis (tous les jours) |
+| `paris-quartier` | 8 | salle (tous les jours), repris; salle (tous les jours), repris; barista (tous les jours), repris; plonge (tous les jours); commis (tous les jours); salle (marché et week-end); barista (marché et week-end); salle (tous les jours) |
+| `paris-maison` | 12 | salle (tous les jours), repris; salle (tous les jours), repris; salle (tous les jours), repris; barista (tous les jours), repris; plonge (tous les jours), repris; barista (tous les jours); commis (tous les jours); patisserie (tous les jours); salle (marché et week-end); salle (marché et week-end); commis (marché et week-end); barista (marché et week-end) |
 
 **Ambiance achetée** (paliers de la simulation, AM-01)
 
 <!-- table:ambiance -->
-| à remplir |
+| Adresse | Ambiance à l'arrivée | Premier palier de +10 | Paliers suivants |
+|---|---|---|---|
+| `village` | 30 | 250 € | +20 % par palier, 95 au plus |
+| `bourg` | 25 | 500 € | +20 % par palier, 95 au plus |
+| `ville` | 30 | 1 000 € | +20 % par palier, 95 au plus |
+| `paris-quartier` | 35 | 1 800 € | +20 % par palier, 95 au plus |
+| `paris-maison` | 35 | 1 200 € | +20 % par palier, 95 au plus |
 
-**Duos simulés** (hypothèses à recaler au prototype, CA-58)
+**Duos simulés** (hypothèses à recaler au prototype, CA-51)
 
 <!-- table:duos -->
-| à remplir |
+| Duo | Nom | Vitesse des gestes | Hésitation par tâche | Gestes parfaits | Préparation | Fermeture | Lundi | Épargne après l'offre | Palier d'ambiance | Achats d'abord |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `lent` | Duo tranquille | x0,8 | 0,8 s | 20 % | 6,0 min | 5,0 min | 4,0 min | 50 % | après chaque achat | équilibre |
+| `median` | Duo médian | x1 | 0,3 s | 40 % | 4,0 min | 3,5 min | 2,5 min | 60 % | tous les 2 achats | équilibre |
+| `rapide` | Duo rapide | x1,2 | 0,0 s | 60 % | 2,5 min | 2,0 min | 1,0 min | 70 % | tous les 4 achats | capacité |
 
 **Divers**
 
 <!-- table:divers -->
-| à remplir |
+| Paramètre | Valeur | Raison |
+|---|---|---|
+| Rattrapage de réputation | après 12 jours ouverts à l'adresse, +5 % de points par jour, x2,0 au plus | aide les duos qui prennent leur temps; ne change presque rien au duo médian |
+| Points de réputation d'un groupe servi | (satisfaction - 50) / 10, jamais négatif | un client content fait monter la réputation; un client déçu ne la fait pas baisser |
+| Caisse au départ | 300 € | Simone la laisse « pour la monnaie et le premier lait » |
+| Affluence d'un défi | x1,6 | tout le pays vient: le coup de feu de l'adresse |
+| Prix en salle | x1,2 | à la française: le comptoir est moins cher que la salle et la terrasse |
+| Employés: vitesse aux niveaux 1, 2, 3 | x1 / x1,2 / x1,35 | des professionnels, plus rapides que nous au départ |
+| Employés: jours travaillés pour les niveaux 2 et 3 | 8 et 24 | on les voit progresser |
+| Embauche du duo simulé | pertes de plus de 12 % sur 3 jours et 5 jours de salaire en caisse | comportement prudent, pas une règle du jeu |
 
 ### 4.21 Simulation
 
 Un script en Python, bibliothèque standard, graines fixes: `docs/jeux/cosy-cafe/simulations/cosy_cafe.py`. Résultats complets: `docs/jeux/cosy-cafe/simulations/resultats.md`.
 
-- **Ce qu'il fait**: chaque journée ouverte est une simulation à événements discrets, client par client: arrivées selon l'attrait (AT-07), entrée ou renoncement (CL-02, CL-03), commande, chaque étape de chaque recette à son poste, service, séjour, recommandes, départ, débarrassage, plonge; deux joueurs et les employés prennent les tâches par priorités. Entre les journées: achats, embauches, épargne, offres, défis, déménagements, succursales. <!-- val:parties -->120 parties (40 par duo), soit environ 15 000 journées jouées client par client.
-- **Commandes**, depuis la racine du dépôt: `python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats docs/jeux/cosy-cafe/simulations/resultats.md` (environ 5 minutes); `--croise docs/jeux/cosy-cafe/cahier-des-charges.md` (moins d'une seconde) compare chaque table de ce cahier aux données du script et aux résultats, vérifie que les résultats correspondent aux données (empreinte), et sort en erreur au premier écart; `--tableaux` réimprime les tables; sans option, un résumé de la progression.
-- **Hypothèses**: les trois duos (table `duos`) et la conduite du duo simulé (ordre d'achat, embauches, épargne) sont des suppositions raisonnables, à recaler au prototype (CA-58). Non simulés: options de commande (CO-08), traits des employés (sauf la vitesse), ruptures de stock (le duo commande assez), événements de saison au-delà des multiplicateurs, dessin sur le lait, brocante.
+- **Ce qu'il fait**: chaque journée ouverte est une simulation à événements discrets, client par client: arrivées selon l'attrait (AT-07), entrée ou renoncement (CL-02, CL-03), commande, chaque étape de chaque recette à son poste, service, séjour, recommandes, départ, débarrassage, plonge; deux joueurs et les employés prennent les tâches par priorités. Entre les journées: achats, embauches, épargne, offres, défis, déménagements, succursales. <!-- val:parties -->120 parties (40 par duo), soit plus de 12 000 journées jouées client par client.
+- **Commandes**, depuis la racine du dépôt: `python3 -I docs/jeux/cosy-cafe/simulations/cosy_cafe.py --resultats docs/jeux/cosy-cafe/simulations/resultats.md` (environ 3 minutes); `--croise docs/jeux/cosy-cafe/cahier-des-charges.md` (moins d'une seconde) compare chaque table de ce cahier aux données du script et aux résultats, vérifie que les résultats correspondent aux données (empreinte), et sort en erreur au premier écart; `--tableaux` réimprime les tables; sans option, un résumé de la progression.
+- **Hypothèses**: les trois duos (table `duos`) et la conduite du duo simulé (ordre d'achat, embauches, épargne) sont des suppositions raisonnables, à recaler au prototype (CA-51). Non simulés: options de commande (CO-08), traits des employés (sauf la vitesse), ruptures de stock (le duo commande assez), événements de saison au-delà des multiplicateurs, dessin sur le lait, brocante.
 
 **Progression** (jour du jeu et heures réelles à chaque arrivée, médiane, entre crochets le premier et le neuvième décile)
 
 <!-- table:res_progression -->
-| à remplir |
+| Duo | Arrivée au bourg | En ville | À Paris (quartier) | À la maison parisienne | Fête de la maison | Parties finies |
+|---|---|---|---|---|---|---|
+| Duo tranquille | jour 36 [29-36], 11,7 h [9,4-11,8] | jour 64 [57-64], 21,6 h [19,3-21,7] | jour 92 [85-92], 31,9 h [29,7-32,2] | jour 120 [106-127], 42,8 h [38,1-45,5] | jour 155 [148-169], 56,2 h [53,1-61,1] | 40 sur 40 |
+| Duo médian | jour 22 [22-22], 5,8 h [5,7-5,8] | jour 43 [43-43], 11,9 h [11,9-12,0] | jour 64 [64-64], 18,4 h [18,3-18,5] | jour 85 [85-92], 25,4 h [25,1-27,6] | jour 120 [120-127], 36,4 h [36,0-38,6] | 40 sur 40 |
+| Duo rapide | jour 22 [22-22], 4,7 h [4,6-4,7] | jour 43 [43-43], 9,7 h [9,7-9,8] | jour 64 [64-64], 15,1 h [15,0-15,2] | jour 85 [78-85], 21,0 h [19,1-21,1] | jour 113 [106-120], 28,5 h [26,7-30,5] | 40 sur 40 |
 
 Lectures: le duo médian passe trois semaines dans chacune des quatre premières adresses et cinq à la maison parisienne; il arrive à Paris après <!-- val:arr_h_paris-quartier_median -->18,4 h et fête la maison après <!-- val:fin_h_median -->36,4 h, soit <!-- val:seances_median -->55 séances de 40 minutes. On déménage le lundi: les écarts entre duos se comptent en semaines. Un duo tranquille met <!-- val:fin_h_lent -->56,2 h, surtout parce que ses journées sont plus longues (préparation et fermeture flâneuses) et que son épargne vient plus lentement.
 
 **Ce qui décide de chaque départ** (part des parties où la dernière condition remplie était celle-ci)
 
 <!-- table:res_blocage -->
-| à remplir |
+| Duo | Départ | Réputation du défi | Extension du défi | Épargne | Offre |
+|---|---|---|---|---|---|
+| Duo tranquille | village vers bourg | 0 % | 25 % | 75 % | 0 % |
+| Duo tranquille | bourg vers ville | 0 % | 0 % | 100 % | 0 % |
+| Duo tranquille | ville vers Paris, quartier | 92 % | 0 % | 8 % | 0 % |
+| Duo tranquille | Paris, quartier vers Paris, maison | 40 % | 0 % | 60 % | 0 % |
+| Duo médian | village vers bourg | 80 % | 12 % | 8 % | 0 % |
+| Duo médian | bourg vers ville | 20 % | 0 % | 80 % | 0 % |
+| Duo médian | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
+| Duo médian | Paris, quartier vers Paris, maison | 52 % | 5 % | 42 % | 0 % |
+| Duo rapide | village vers bourg | 90 % | 10 % | 0 % | 0 % |
+| Duo rapide | bourg vers ville | 28 % | 55 % | 18 % | 0 % |
+| Duo rapide | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
+| Duo rapide | Paris, quartier vers Paris, maison | 38 % | 0 % | 62 % | 0 % |
 
 Lectures: au village, c'est la réputation du défi qui fixe le départ du duo médian; au bourg, l'épargne pour l'atelier; en ville, la réputation; à Paris, l'une ou l'autre. L'offre n'est jamais ce qui retient: la lettre arrive toujours avant que le duo soit prêt.
 
 **Le service, à la main puis avec machines, puis avec employés** (duo médian, six premières et six dernières journées à chaque adresse)
 
 <!-- table:res_service -->
-| à remplir |
+| Adresse | Période | Groupes venus par jour | Groupes servis | Repartis sans entrer | Attente moyenne | Attente, 9 sur 10 en dessous | Satisfaction | Charge de chaque joueur | Employés présents | Personnages présents (moyenne des pointes / plus haut) | Plafond C2 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| village | première semaine | 24 | 23 | 2 % | 33 s | 49 s | 76 | 58 % | 0 | 14 / 24 | 24 |
+| village | dernière semaine | 38 | 33 | 10 % | 44 s | 71 s | 79 | 77 % | 0 | 18 / 24 | 24 |
+| bourg | première semaine | 36 | 33 | 7 % | 41 s | 65 s | 73 | 73 % | 0 | 18 / 38 | 48 |
+| bourg | dernière semaine | 53 | 44 | 15 % | 56 s | 94 s | 73 | 81 % | 0 | 25 / 42 | 48 |
+| ville | première semaine | 63 | 48 | 22 % | 65 s | 108 s | 70 | 78 % | 0 | 28 / 41 | 72 |
+| ville | dernière semaine | 97 | 80 | 16 % | 84 s | 159 s | 67 | 80 % | 3 | 49 / 59 | 72 |
+| Paris, quartier | première semaine | 122 | 94 | 22 % | 66 s | 119 s | 69 | 74 % | 4 | 43 / 51 | 80 |
+| Paris, quartier | dernière semaine | 144 | 116 | 18 % | 66 s | 130 s | 69 | 72 % | 7 | 54 / 72 | 80 |
+| Paris, maison | première semaine | 148 | 129 | 11 % | 49 s | 81 s | 74 | 84 % | 5 | 56 / 76 | 120 |
+| Paris, maison | dernière semaine | 235 | 180 | 23 % | 100 s | 194 s | 77 | 84 % | 9 | 97 / 120 | 120 |
 
-Lectures: au village, les deux joueurs sont occupés à 58 % la première semaine et 77 % la dernière; le coup de feu est tendu (un groupe sur dix repart aux heures de pointe, faute de place) mais tenable (44 s d'attente en moyenne). À chaque adresse, la dernière semaine sert plus de monde que la première avec une charge des joueurs presque égale: machines et employés absorbent la croissance. Les dimanches de la maison parisienne sont de vrais coups de feu, jusqu'au plafond de 120 personnages.
+Lectures: au village, les deux joueurs sont occupés à 58 % la première semaine et 77 % la dernière; le coup de feu est tendu (un groupe sur dix repart sans entrer, surtout aux heures de pointe et faute de place) mais tenable (44 s d'attente en moyenne). À chaque adresse, la dernière semaine sert plus de monde que la première avec une charge des joueurs presque égale: machines et employés absorbent la croissance. Les dimanches de la maison parisienne sont de vrais coups de feu, jusqu'au plafond de 120 personnages.
 
 **Ce que l'équipe change**
 
 <!-- table:res_sans_employes -->
-| à remplir |
+| Adresse | Équipe | Employés | Groupes servis par jour | Repartis | Attente moyenne | Satisfaction | Service fini après la fermeture |
+|---|---|---|---|---|---|---|---|
+| ville | avec l'équipe | 4 | 103 | 32 % | 87 s | 66 | 139 s |
+| ville | à deux, sans employés | 0 | 53 | 65 % | 97 s | 66 | 152 s |
+| Paris, quartier | avec l'équipe | 8 | 142 | 21 % | 69 s | 69 | 100 s |
+| Paris, quartier | à deux, sans employés | 0 | 66 | 63 % | 79 s | 70 | 107 s |
+| Paris, maison | avec l'équipe | 12 | 186 | 19 % | 112 s | 76 | 146 s |
+| Paris, maison | à deux, sans employés | 0 | 68 | 70 % | 73 s | 86 | 40 s |
 
 Lecture: à deux seulement, l'atelier refuse <!-- val:equipe_ville_sans -->65 % de ses groupes et la maison parisienne <!-- val:equipe_paris-maison_sans -->70 %; les employés ne remplacent pas les joueurs, ils rendent les grandes adresses possibles.
 
 **Une journée moyenne, par adresse** (duo médian)
 
 <!-- table:res_economie -->
-| à remplir |
+| Adresse | Recettes | Pourboires | Matières | Loyer (lundi compris) | Salaires | Charges | Résultat | Succursales (en plus) |
+|---|---|---|---|---|---|---|---|---|
+| village | 197 € | 3 € | 43 € | 22 € | 0 € | 8 € | 127 € | 0 € |
+| bourg | 314 € | 3 € | 46 € | 48 € | 18 € | 16 € | 190 € | 71 € |
+| ville | 788 € | 7 € | 91 € | 121 € | 187 € | 34 € | 363 € | 176 € |
+| Paris, quartier | 1 523 € | 10 € | 134 € | 271 € | 613 € | 60 € | 456 € | 374 € |
+| Paris, maison | 2 887 € | 49 € | 249 € | 625 € | 850 € | 140 € | 1 072 € | 590 € |
 
 **Argent à l'arrivée**
 
 <!-- table:res_epargne -->
-| à remplir |
+| Arrivée à | Installation payée | Caisse le jour de l'arrivée (médiane) | 9 duos sur 10 entre |
+|---|---|---|---|
+| bourg | 600 € | 252 € | 110 € à 347 € |
+| ville | 1 200 € | 491 € | 299 € à 766 € |
+| Paris, quartier | 2 500 € | 1 678 € | 1 032 € à 4 581 € |
+| Paris, maison | 3 000 € | 2 662 € | 2 299 € à 7 937 € |
 
 **Réglages du duo** (un duo tranquille, sa dernière configuration)
 
 <!-- table:res_aides -->
-| à remplir |
+| Adresse | Réglage du duo | Service réel | Groupes servis | Repartis | Attente moyenne | Satisfaction | Charge de chaque joueur |
+|---|---|---|---|---|---|---|---|
+| bourg | normal | 11,5 min | 41 | 15 % | 82 s | 69 | 81 % |
+| bourg | rythme paisible | 14,4 min | 45 | 9 % | 70 s | 72 | 77 % |
+| bourg | patience grande | 11,5 min | 44 | 11 % | 95 s | 67 | 81 % |
+| bourg | les deux | 14,4 min | 47 | 5 % | 79 s | 70 | 76 % |
+| Paris, quartier | normal | 13,0 min | 142 | 25 % | 77 s | 70 | 76 % |
+| Paris, quartier | rythme paisible | 16,2 min | 154 | 19 % | 67 s | 71 | 76 % |
+| Paris, quartier | patience grande | 13,0 min | 144 | 24 % | 87 s | 68 | 76 % |
+| Paris, quartier | les deux | 16,2 min | 156 | 17 % | 70 s | 70 | 77 % |
 
 Lecture: au bourg, le rythme paisible et la patience grande ensemble font passer les groupes repartis de <!-- val:aides_bourg_normal -->15 % à <!-- val:aides_bourg_les_deux -->5 %, contre un service réel de 14,4 minutes au lieu de 11,5.
 
 **Personnages présents et plafonds de l'architecte**
 
 <!-- table:res_presence -->
-| à remplir |
+| Adresse | Présents au plus, 99 jours sur 100 | Présents au plus | Plafond C2 | Employés au plus | Plafond C5 | Respecté |
+|---|---|---|---|---|---|---|
+| village | 24 | 24 | 24 | 0 | 12 | oui |
+| bourg | 35 | 42 | 48 | 1 | 12 | oui |
+| ville | 56 | 62 | 72 | 5 | 12 | oui |
+| Paris, quartier | 68 | 73 | 80 | 8 | 12 | oui |
+| Paris, maison | 118 | 120 | 120 | 12 | 12 | oui |
 
 **Profils horaires** (un dimanche de la dernière semaine au village; un mardi de la dernière semaine à la maison parisienne)
 
 <!-- table:res_heures_village -->
-| à remplir |
+| Heure de jeu | Groupes venus | Servis | Repartis | Attente moyenne | Personnages présents au plus |
+|---|---|---|---|---|---|
+| 8 h | 2,9 | 1,6 | 0,0 | 23 s | 5 |
+| 9 h | 4,2 | 3,0 | 0,2 | 32 s | 9 |
+| 10 h | 5,4 | 3,5 | 0,8 | 45 s | 13 |
+| 11 h | 5,5 | 3,6 | 1,3 | 58 s | 15 |
+| 12 h | 3,4 | 3,5 | 0,8 | 55 s | 15 |
+| 13 h | 3,5 | 2,8 | 0,6 | 55 s | 13 |
+| 14 h | 4,8 | 3,2 | 1,0 | 60 s | 14 |
+| 15 h | 6,3 | 3,4 | 2,1 | 72 s | 16 |
+| 16 h | 7,8 | 3,3 | 3,7 | 87 s | 18 |
+| 17 h | 7,0 | 8,9 | 3,4 | 89 s | 18 |
 
 <!-- table:res_heures_maison -->
-| à remplir |
+| Heure de jeu | Groupes venus | Servis | Repartis | Attente moyenne | Personnages présents au plus |
+|---|---|---|---|---|---|
+| 8 h | 17,7 | 8,6 | 0,1 | 31 s | 25 |
+| 9 h | 20,1 | 15,5 | 1,0 | 44 s | 37 |
+| 10 h | 20,5 | 15,8 | 1,2 | 58 s | 52 |
+| 11 h | 18,0 | 15,7 | 2,0 | 66 s | 63 |
+| 12 h | 13,8 | 13,2 | 2,4 | 74 s | 66 |
+| 13 h | 14,4 | 12,1 | 2,2 | 75 s | 64 |
+| 14 h | 18,9 | 12,5 | 1,6 | 85 s | 66 |
+| 15 h | 19,6 | 13,4 | 3,1 | 100 s | 74 |
+| 16 h | 21,4 | 12,9 | 6,1 | 120 s | 81 |
+| 17 h | 16,9 | 12,4 | 5,6 | 132 s | 81 |
+| 18 h | 10,8 | 11,0 | 3,6 | 127 s | 78 |
+| 19 h | 5,2 | 9,4 | 1,2 | 112 s | 69 |
+| 20 h | 2,2 | 16,9 | 0,1 | 80 s | 57 |
 
 **Rythme réel**
 
 <!-- table:res_rythme -->
-| à remplir |
+| Duo | village | bourg | ville | Paris, quartier | Paris, maison | Journée ouverte moyenne |
+|---|---|---|---|---|---|---|
+| Duo tranquille | 35 jours, 11,7 h | 28 jours, 9,9 h | 28 jours, 10,5 h | 28 jours, 10,7 h | 42 jours, 15,6 h | 24,5 min |
+| Duo médian | 21 jours, 5,8 h | 21 jours, 6,2 h | 21 jours, 6,4 h | 21 jours, 6,9 h | 35 jours, 11,1 h | 20,6 min |
+| Duo rapide | 21 jours, 4,7 h | 21 jours, 5,1 h | 21 jours, 5,4 h | 21 jours, 5,9 h | 28 jours, 7,6 h | 17,3 min |
 
 Lecture: une journée ouverte du duo médian dure <!-- val:journee_median_min -->21 minutes réelles; une séance de 40 minutes en fait près de deux. Aucun duo simulé n'a jamais eu de somme à régler (<!-- val:a_regler -->0 partie sur 120).
 
@@ -647,7 +935,7 @@ Principe du sound-designer, repris ici: aucun son ne juge la qualité d'un geste
 | Poser une commande sur le passe | l'article rejoint son ticket, qui se coche | petit « clac » sur le zinc |
 | Servir à table | les articles se posent un à un | porcelaine sur le bois |
 | Encaisser | le terminal s'allume, le ticket se tamponne « Payé » | bip doux du terminal |
-| Pourboire | les pièces tombent dans la tirelire du comptoir | tintement des pièces (un plus beau pour un gros pourboire, son.md) |
+| Pourboire | les pièces tombent dans le pot à pourboires du comptoir | tintement des pièces (un plus beau pour un gros pourboire, son.md) |
 | Parler à un client | il se tourne, deux répliques en bulles | aucun mot prononcé; murmure de la salle |
 | « Comme d'habitude ? » | l'habitué sourit, son prénom s'affiche, le lien progresse | motif musical de l'habitué |
 | Débarrasser | la vaisselle passe sur le plateau, la table redevient propre | tasses empilées |
@@ -665,3 +953,431 @@ Principe du sound-designer, repris ici: aucun son ne juge la qualité d'un geste
 | Lettre d'une nouvelle adresse | une enveloppe au courrier du matin, sur le comptoir | papier, motif de l'adresse |
 | Absence de l'autre | son avatar s'assoit; pancarte « Petite pause » | aucun (pour ne pas réveiller la pièce) |
 | Enregistrement | indicateur « Progression enregistrée » de la plateforme | aucun |
+
+## 6. Contenu de la version 1 (game-designer, level-designer)
+
+### 6.1 Les adresses
+
+Plans, éléments fixes, circulation, extensions et quartiers: `docs/jeux/cosy-cafe/adresses.md` et `docs/jeux/cosy-cafe/plans/` (level-designer), qui font foi. Résumé:
+
+| Ordre | Adresse | Lieu | Intention | Ce qui arrive | Difficulté (1 à 5) |
+|---|---|---|---|---|---|
+| 1 | `village` | Ormeval, le café de la place du Tilleul: 38 m², vitrine au sud, banc de la patronne, pièce du fond fermée, logement à l'étage | apprendre ensemble, sans presse: tout est à portée de main | le service au comptoir, la machine à deux groupes, l'ardoise, le livre d'or, les habitués, la décoration; E1 la terrasse sous le store, E2 la pièce du fond au coin du feu | 1 |
+| 2 | `bourg` | Mérelles, l'ancienne pâtisserie de la place de la Halle: 81 m², vitrine à l'est face à la halle, laboratoire qui attend son four | le premier vrai coup de feu, le fait maison | le four et les fournées, le service en salle, le marché du jeudi, le coup de main, les gros meubles portés à deux; E1 la terrasse de la halle, E2 la salle de la remise, E3 la cour sous la treille | 2 |
+| 3 | `ville` | l'atelier: ancienne imprimerie d'une ville universitaire, brique et sheds, 140 m² | apprendre à mener une équipe | les employés, le brunch, le café de spécialité, la rentrée des étudiants, la première succursale; E1 la deuxième salle, E2 la cour pavée | 3 |
+| 4 | `paris-quartier` | le café d'angle d'un quartier inventé de Paris, sur deux rues, zinc et mosaïque, 92 m² | le flux parisien, les touristes, l'équipe reprise | loyer et prix parisiens, l'ardoise traduite, trois cafés à tenir; E1 la terrasse sur le trottoir, E2 l'arrière-salle | 4 |
+| 5 | `paris-maison` | la maison du boulevard: une halle sous verrière, deux niveaux, 310 m², torréfacteur en pièce maîtresse | la maison au complet, la reconnaissance | notre mélange, le laboratoire de pâtisserie, la visite du Guide de la Tasse, la fête de la maison; E1 la verrière restaurée, E2 la mezzanine | 4 |
+
+La ville et Paris attendent leurs plans: les places et les surfaces de la table `adresses` sont des hypothèses de simulation, sous les plafonds de l'architecte (C2, C6). Paris se reconnaît à sa matière, jamais à un lieu réel (bible, section 9): rues, commerces et personnes sont inventés (question Q3).
+
+### 6.2 Recettes (47)
+
+Dix familles. Prix conseillé au comptoir du village et de la maison parisienne (les autres adresses suivent l'indice de la table `adresses`; en salle, x1,2). Gestes: secondes réelles à la main, avec machine, avec machine avancée. Vaisselle: pièces par article.
+
+<!-- table:recettes -->
+| Recette | Nom | Famille | Gestes (à la main / machine / machine avancée) | Prix conseillé au comptoir (village / Paris, maison) | Matières | Vaisselle | Adresse | Déblocage | Saison |
+|---|---|---|---|---|---|---|---|---|---|
+| `espresso` | Espresso (petit noir) | Cafés noirs | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s | 1,40 € / 2,80 € | 0,22 € | 1 | village | départ | toute l'année |
+| `allonge` | Café allongé | Cafés noirs | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 1,60 € / 3,20 € | 0,24 € | 1 | village | départ | toute l'année |
+| `noisette` | Noisette | Cafés noirs | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 2/1,5/1 s + 0/0/2 s seul | 1,70 € / 3,40 € | 0,27 € | 1 | village | Simone, jour 2 | toute l'année |
+| `double` | Double espresso | Cafés noirs | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 2,50 € / 5,00 € | 0,40 € | 1 | bourg | fiche, 40 € | toute l'année |
+| `creme` | Café crème | Cafés au lait | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 5/4/1 s + 0/0/5 s seul | 2,40 € / 4,80 € | 0,38 € | 1 | village | départ | toute l'année |
+| `cappuccino` | Cappuccino | Cafés au lait | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 6/5/1 s + 0/0/6 s seul | 2,90 € / 5,80 € | 0,42 € | 1 | village | fiche, 30 € | toute l'année |
+| `viennois` | Café viennois | Cafés au lait | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; plan 2,5/2/1,5 s | 3,20 € / 6,40 € | 0,55 € | 1 | bourg | fiche, 40 € | toute l'année |
+| `latte` | Latte | Cafés au lait | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 6,5/5,5/1 s + 0/0/6 s seul | 3,10 € / 6,20 € | 0,48 € | 1 | ville | fiche, 50 € | toute l'année |
+| `flat_white` | Flat white | Cafés au lait | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s ; vapeur 5/4/1 s + 0/0/5 s seul | 3,30 € / 6,60 € | 0,50 € | 1 | ville | Aïcha, lien 2 | toute l'année |
+| `the_noir` | Thé noir | Thés et infusions | bouilloire 4/2,5/2 s | 2,50 € / 5,00 € | 0,25 € | 2 | village | départ | toute l'année |
+| `the_vert` | Thé vert | Thés et infusions | bouilloire 4,5/2,5/2 s | 2,60 € / 5,20 € | 0,28 € | 2 | village | fiche, 20 € | toute l'année |
+| `infusion` | Infusion du jardin de Simone | Thés et infusions | bouilloire 4/2,5/2 s | 2,40 € / 4,80 € | 0,18 € | 2 | village | Simone, lien 1 | toute l'année |
+| `chai` | Chaï latte | Thés et infusions | bouilloire 2,5/2/1,5 s ; vapeur 5/4/1 s + 0/0/5 s seul | 3,40 € / 6,80 € | 0,55 € | 1 | ville | Agathe, lien 2 | toute l'année |
+| `the_glace` | Thé glacé maison | Thés et infusions | frigo 2,5/2/2 s | 3,00 € / 6,00 € | 0,35 € | 1 | bourg | découverte de l'été | été |
+| `chocolat` | Chocolat chaud | Chocolats | vapeur 6,5/5,5/1,5 s + 0/0/6 s seul | 2,80 € / 5,60 € | 0,45 € | 1 | village | départ | toute l'année |
+| `chocolat_viennois` | Chocolat viennois | Chocolats | vapeur 6,5/5,5/1,5 s + 0/0/6 s seul ; plan 2,5/2/1,5 s | 3,40 € / 6,80 € | 0,60 € | 1 | bourg | fiche, 40 € | toute l'année |
+| `chocolat_epices` | Chocolat aux épices | Chocolats | vapeur 7/6/1,5 s + 0/0/6 s seul | 3,60 € / 7,20 € | 0,65 € | 1 | village | découverte de l'hiver | hiver |
+| `jus_orange` | Jus d'orange pressé | Boissons fraîches | agrumes 5/2,5/2 s | 3,50 € / 7,00 € | 1,00 € | 1 | village | presse-agrumes | toute l'année |
+| `citronnade` | Citronnade maison | Boissons fraîches | frigo 2,5/2/2 s | 3,00 € / 6,00 € | 0,40 € | 1 | village | Bastien, lien 1 | toute l'année |
+| `limonade` | Limonade artisanale | Boissons fraîches | frigo 1,5/1,5/1,5 s | 3,20 € / 6,40 € | 1,20 € | 1 | village | réfrigérateur vitré | toute l'année |
+| `smoothie` | Smoothie de saison | Boissons fraîches | blender 3/2,5/2 s + 8/8/6 s seul, finir 1/1/1 s | 4,20 € / 8,40 € | 1,20 € | 1 | ville | blender | toute l'année |
+| `milkshake` | Milk-shake | Boissons fraîches | blender 3/2,5/2 s + 8/8/6 s seul, finir 1/1/1 s | 4,00 € / 8,00 € | 0,90 € | 1 | ville | fiche, 50 € | toute l'année |
+| `frappe` | Café frappé | Boissons fraîches | espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; blender 2/1,5/1,5 s + 6/6/5 s seul, finir 1/1/1 s | 3,80 € / 7,60 € | 0,60 € | 1 | ville | découverte de l'été | été |
+| `croissant` | Croissant | Viennoiseries et tartines | vitrine 1,5/1,5/1,2 s | 1,20 € / 2,40 € | 0,70 € (maison 0,30 €) | 1 | village | départ (boulanger), maison dès le four | toute l'année |
+| `pain_chocolat` | Pain au chocolat | Viennoiseries et tartines | vitrine 1,5/1,5/1,2 s | 1,30 € / 2,60 € | 0,75 € (maison 0,32 €) | 1 | village | départ (boulanger), maison dès le four | toute l'année |
+| `tartine` | Tartine beurre-confiture | Viennoiseries et tartines | plan 4/3/2,5 s | 2,20 € / 4,40 € | 0,35 € | 1 | village | départ | toute l'année |
+| `pain_raisins` | Pain aux raisins | Viennoiseries et tartines | vitrine 1,5/1,5/1,2 s | 1,50 € / 3,00 € | 0,38 € | 1 | bourg | René, lien 2 | toute l'année |
+| `chausson` | Chausson aux pommes | Viennoiseries et tartines | vitrine 1,5/1,5/1,2 s | 1,60 € / 3,20 € | 0,40 € | 1 | bourg | Marion, lien 1 | toute l'année |
+| `tarte_fruits` | Tarte aux fruits de saison | Pâtisseries | vitrine 2/2/1,5 s | 3,20 € / 6,40 € | 1,60 € (maison 0,55 €) | 1 | village | départ (boulanger), maison dès le four | toute l'année |
+| `crepe` | Crêpe | Pâtisseries | creperie 3/2,5/2 s + 9/8/7 s seul, finir 1,5/1,5/1,5 s | 2,50 € / 5,00 € | 0,25 € | 1 | village | crêpière | toute l'année |
+| `gaufre` | Gaufre | Pâtisseries | gaufrier 1,5/1,5/1,2 s + 10/9/8 s seul, finir 1/1/1 s | 2,80 € / 5,60 € | 0,30 € | 1 | bourg | gaufrier | toute l'année |
+| `fondant` | Fondant au chocolat | Pâtisseries | vitrine 2/2/1,5 s | 3,50 € / 7,00 € | 0,55 € | 1 | bourg | fiche, 40 € | toute l'année |
+| `madeleines` | Madeleines | Pâtisseries | vitrine 1,5/1,5/1,2 s | 2,40 € / 4,80 € | 0,30 € | 1 | bourg | René, lien 1 | toute l'année |
+| `cookie` | Cookie | Pâtisseries | vitrine 1,2/1,2/1 s | 2,20 € / 4,40 € | 0,30 € | 1 | ville | Thao, lien 1 | toute l'année |
+| `cannele` | Cannelé | Pâtisseries | vitrine 1,2/1,2/1 s | 2,20 € / 4,40 € | 0,35 € | 1 | ville | fiche, 50 € | toute l'année |
+| `eclair` | Éclair au café | Pâtisseries | vitrine 1,5/1,5/1,2 s | 4,00 € / 8,00 € | 0,70 € | 1 | Paris, quartier | employé pâtissier | toute l'année |
+| `tarte_citron` | Tarte au citron meringuée | Pâtisseries | vitrine 2/2/1,5 s | 4,20 € / 8,40 € | 0,75 € | 1 | Paris, quartier | fiche, 80 € | toute l'année |
+| `entremets` | Le gâteau de la maison | Pâtisseries | vitrine 2,5/2/2 s | 6,00 € / 12,00 € | 1,20 € | 1 | Paris, maison | laboratoire de pâtisserie | toute l'année |
+| `croque` | Croque-monsieur | Salé | plan 4/3/2,5 s puis four 1/1/1 s + 15/12/10 s seul, finir 1,5/1,5/1 s | 5,50 € / 11,00 € | 1,10 € | 1 | bourg | four | toute l'année |
+| `quiche` | Part de quiche | Salé | four 1,5/1,5/1 s + 8/7/6 s seul, finir 1/1/1 s | 5,00 € / 10,00 € | 0,90 € | 1 | bourg | fiche, 40 € | toute l'année |
+| `soupe` | Soupe du jour | Salé | plan 3/2,5/2 s | 4,50 € / 9,00 € | 0,70 € | 1 | bourg | découverte de l'hiver | hiver |
+| `salade` | Salade composée | Salé | plan 8/7/6 s | 7,50 € / 15,00 € | 2,00 € | 1 | ville | découverte de l'été | été |
+| `tartine_avocat` | Tartine avocat-œuf | Salé | plan 6/5/4 s | 7,00 € / 14,00 € | 1,80 € | 1 | ville | fiche, 60 € | toute l'année |
+| `brunch` | Formule brunch | Brunch | plan 6/5/4 s ; frigo 1,5/1,5/1,5 s ; espresso 3,5/2/1,5 s + 12/12/12 s seul, finir 0,5/0,5/0 s ; vapeur 4/3/1 s + 0/0/4 s seul | 19,00 € / 38,00 € | 5,00 € | 4 | ville | arrivée à l'atelier | toute l'année |
+| `filtre` | Café filtre de spécialité | Café de spécialité | douce 9/6/4 s + 15/15/12 s seul, finir 1/1/1 s | 3,80 € / 7,60 € | 0,80 € | 1 | ville | Aïcha, lien 1 | toute l'année |
+| `espresso_origine` | Espresso d'origine | Café de spécialité | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 2,60 € / 5,20 € | 0,50 € | 1 | ville | bar à méthodes douces | toute l'année |
+| `notre_melange` | Notre mélange | Café de spécialité | espresso 4/2,5/2 s + 14/14/14 s seul, finir 0,5/0,5/0 s | 3,00 € / 6,00 € | 0,45 € | 1 | Paris, maison | torréfaction | toute l'année |
+
+### 6.3 Catalogue
+
+Meubles et objets se modélisent selon la bible (section 13.4); chacun existe dans un seul style ou reste neutre. Les prix ne dépendent pas de l'adresse. Charme: points comptés par la règle AM-01 (décor) et AM-02 (cohérence). Ces valeurs deviendront `meubles.json`.
+
+| Famille | Contenu de la version 1 | Par style | Prix | Charme |
+|---|---|---|---|---|
+| Assises | chaise, tabouret, banc ou banquette, fauteuil | 4 x 6 styles = 24 | chaise 40 à 90 €, tabouret 50 à 80 €, banquette 400 à 700 €, fauteuil 180 à 320 € | 1, 1, 4, 3 |
+| Tables | table de deux, table de quatre, grande table (bourg et ville) | 2 x 6 = 12, plus 2 grandes tables | 90 à 160 €, 150 à 260 €, 900 € | 2, 2, 4 |
+| Luminaires | suspension, applique ou lampe | 2 x 6 = 12 | 40 à 180 € | 2, 1 (quatre éclairent vraiment à la fois, C9) |
+| Rangements et pièces maîtresses | étagère; vaisselier (campagne), banquette sous miroir peint (bistrot), poêle à bois (nordique), olivier en pot et treillage (jardin), établi devenu comptoir (atelier), enfilade et tourne-disque (rétro) | 2 à 3 x 6 = 15 | étagère 80 à 200 €, pièce maîtresse 300 à 900 € | 2, 6 |
+| Décoration neutre | plantes (8), cadres et affiches (8), miroirs à reflet peint (2, C11), tapis (4), objets (vases, livres, horloges simples, boîte à livres: 10) | 32 | 10 à 300 € | 1 à 3 |
+| Revêtements | peintures (12 teintes), papiers peints (un par style), sols (un par style) | 24 | peinture 40 € le mur, papier peint 90 € le mur, sol 25 € le m² | papier peint 3 par mur, sol 1 par 5 m² |
+| Extérieur | store, jardinières, enseigne (au nom de la maison), ardoise de trottoir, parasol, mange-debout, range-vélos, plaids de terrasse | 10 | 40 à 600 € | 1 à 3 |
+| Musique | radio à deux stations (village), tourne-disque (bourg), platine (une par salle, ville), sonorisation (Paris); la maison garde ses disques (son.md) | 4 | 60 à 1 200 € | 0 (la musique compte en AM-01) |
+| Équipements recherchés par les profils | gobelets, tabourets de comptoir, mange-debout, journal du jour, étagère à livres, fauteuils, chaise haute, coin des enfants, vitrine réfrigérée, range-vélos, ardoise traduite (Oscar), wifi, prises, grande table, moulin de spécialité | 15 | 40 à 3 200 € | 0 à 2 |
+| Pièces uniques | cadeaux des habitués (l'aquarelle de Simone, les dessins de Noé, l'horloge de gare de Karim, les affiches de l'atelier, les photos d'autrefois d'Antoine...) et pièces de brocante | 15 environ | offertes, ou -30 % à la brocante | 4 à 6 (x1,5 à la brocante) |
+
+Postes, machines et extensions achetés par le duo simulé (table du script; les rangs disent l'ordre d'achat d'un duo qui équilibre, puis d'un duo qui veut d'abord servir plus):
+
+<!-- table:achats -->
+| Adresse | Achat | Nom | Prix | Effet | Rang (duo équilibré) | Rang (duo capacité) |
+|---|---|---|---|---|---|---|
+| `village` | `gobelets` | Gobelets et couvercles (vente à emporter) | 40 € | equip:gobelets | 1 | 1 |
+| `village` | `fiche_cappuccino` | Fiche « cappuccino » | 30 € | recette:cappuccino | 2 | 3 |
+| `village` | `fiche_the_vert` | Fiche « thé vert » | 20 € | recette:the_vert | 3 | 9 |
+| `village` | `moulin_dose` | Moulin à dose | 380 € | poste:espresso:2 | 6 | 2 |
+| `village` | `pichet` | Pichet thermomètre | 60 € | poste:vapeur:2 | 4 | 4 |
+| `village` | `presse` | Presse-agrumes à levier | 120 € | poste:agrumes:1 | 5 | 5 |
+| `village` | `creperie` | Crêpière | 180 € | poste:creperie:1 | 7 | 7 |
+| `village` | `tabourets` | Deux tabourets de comptoir | 120 € | equip:tabourets | 8 | 10 |
+| `village` | `frigo_vitre` | Réfrigérateur vitré | 350 € | recette:limonade | 12 | 12 |
+| `village` | `fauteuils` | Deux fauteuils (à la place de deux chaises) | 380 € | places:0,-2,2,0; equip:fauteuils | 9 | 11 |
+| `village` | `livres` | Étagère à livres | 150 € | equip:livres | 10 | 13 |
+| `village` | `velos` | Range-vélos | 180 € | equip:range_velos | 11 | 8 |
+| `village` | `enfants` | Chaise haute et coin des enfants | 260 € | equip:chaise_haute; equip:coin_enfants | 13 | 14 |
+| `village` | `village_terrasse` | E1, la terrasse sous le store | 450 € | ext:village_terrasse | 15 | 15 |
+| `village` | `village_fond` | E2, la pièce du fond, au coin du feu | 900 € | ext:village_fond | 16 | 16 |
+| `village` | `bouilloire` | Bouilloire à température | 90 € | poste:bouilloire:2 | 17 | 17 |
+| `bourg` | `four` | Four de pâtissier d'occasion | 700 € | poste:four:1 | 1 | 1 |
+| `bourg` | `lave` | Lave-vaisselle d'occasion | 900 € | plonge:2 | 2 | 2 |
+| `bourg` | `salle` | Service en salle (carnet et plateaux) | 80 € | salle | 3 | 6 |
+| `bourg` | `moulin_dose` | Moulin à dose | 380 € | poste:espresso:2 | 4 | 3 |
+| `bourg` | `presse` | Presse-agrumes à levier | 120 € | poste:agrumes:1 | 5 | 5 |
+| `bourg` | `tables` | Une table de plus | 160 € | places:0,1,0,0 | 6 | 4 |
+| `bourg` | `gaufrier` | Gaufrier | 250 € | poste:gaufrier:1 | 7 | 9 |
+| `bourg` | `vitrine` | Vitrine réfrigérée | 900 € | poste:vitrine:2; equip:vitrine | 8 | 8 |
+| `bourg` | `buse2` | Seconde buse vapeur | 450 € | poste:vapeur:2 | 9 | 7 |
+| `bourg` | `fiches_bourg` | Fiches du bourg (double, viennois, chocolat viennois, fondant, quiche) | 200 € | recette:double; recette:viennois; recette:chocolat_viennois; recette:fondant; recette:quiche | 10 | 10 |
+| `bourg` | `wifi` | Wifi et prises (électricien) | 420 € | equip:wifi; equip:prises | 11 | 11 |
+| `bourg` | `fauteuils` | Deux fauteuils (à la place de deux chaises) | 380 € | places:0,-2,2,0; equip:fauteuils | 12 | 13 |
+| `bourg` | `bourg_terrasse` | E1, la terrasse de la halle | 800 € | ext:bourg_terrasse | 13 | 12 |
+| `bourg` | `bourg_remise` | E2, la salle de la remise | 1 800 € | ext:bourg_remise; equip:grande_table | 14 | 14 |
+| `bourg` | `bourg_cour` | E3, la cour sous la treille | 1 400 € | ext:bourg_cour | 16 | 16 |
+| `bourg` | `vaisselle` | Service de vaisselle (+24 pièces) | 160 € | vaisselle:24 | 15 | 15 |
+| `ville` | `trois_groupes` | Machine à trois groupes d'occasion, arrêt programmé | 3 800 € | poste:espresso:3 | 1 | 1 |
+| `ville` | `buse_auto` | Buses automatiques | 1 200 € | poste:vapeur:3 | 5 | 2 |
+| `ville` | `capot` | Lave-vaisselle à capot | 2 800 € | plonge:3 | 7 | 4 |
+| `ville` | `blender` | Blender | 300 € | poste:blender:1 | 2 | 3 |
+| `ville` | `douce` | Bar à méthodes douces et moulin de spécialité | 2 400 € | poste:douce:1; equip:moulin_specialite | 3 | 5 |
+| `ville` | `grande_table` | Grande table d'atelier | 900 € | equip:grande_table | 4 | 6 |
+| `ville` | `fiches_ville` | Fiches de la ville (latte, milk-shake, cannelé, tartine avocat-œuf) | 210 € | recette:latte; recette:milkshake; recette:cannele; recette:tartine_avocat | 6 | 7 |
+| `ville` | `four2` | Four ventilé | 3 500 € | poste:four:2 | 9 | 9 |
+| `ville` | `tables` | Deux tables et deux fauteuils | 520 € | places:0,2,2,0 | 8 | 8 |
+| `ville` | `ville_cour` | E2, la cour pavée | 2 600 € | ext:ville_cour | 10 | 10 |
+| `ville` | `ville_salle2` | E1, la deuxième salle | 2 500 € | ext:ville_salle2 | 11 | 11 |
+| `paris-quartier` | `trois_groupes` | Machine à trois groupes, arrêt programmé | 6 500 € | poste:espresso:3 | 1 | 1 |
+| `paris-quartier` | `buse_auto` | Buses automatiques | 1 200 € | poste:vapeur:3 | 2 | 2 |
+| `paris-quartier` | `caisse2` | Second terminal de paiement | 600 € | caisse:2 | 3 | 3 |
+| `paris-quartier` | `capot` | Lave-vaisselle à capot | 4 200 € | plonge:3 | 4 | 4 |
+| `paris-quartier` | `blender` | Blender | 300 € | poste:blender:1 | 5 | 5 |
+| `paris-quartier` | `douce` | Bar à méthodes douces et moulin de spécialité | 3 200 € | poste:douce:1; equip:moulin_specialite | 6 | 6 |
+| `paris-quartier` | `fiche_citron` | Fiche « tarte au citron meringuée » | 80 € | recette:tarte_citron | 7 | 8 |
+| `paris-quartier` | `tables` | Deux tabourets, deux tables, une banquette, une table dehors | 1 500 € | places:2,2,2,2 | 8 | 7 |
+| `paris-quartier` | `pq_trottoir` | E1, la terrasse sur le trottoir | 5 000 € | ext:pq_trottoir | 9 | 9 |
+| `paris-quartier` | `pq_arriere` | E2, l'arrière-salle | 9 000 € | ext:pq_arriere | 10 | 10 |
+| `paris-maison` | `buse_auto` | Buses automatiques | 1 200 € | poste:vapeur:3 | 1 | 1 |
+| `paris-maison` | `douce` | Bar à méthodes douces et moulin de spécialité | 3 200 € | poste:douce:1; equip:moulin_specialite | 2 | 2 |
+| `paris-maison` | `blender` | Blender | 300 € | poste:blender:1 | 3 | 3 |
+| `paris-maison` | `tables` | Quatre tables, une banquette, deux tables dehors | 1 200 € | places:0,4,2,4 | 4 | 4 |
+| `paris-maison` | `labo` | Laboratoire de pâtisserie | 4 000 € | poste:four:3; recette:entremets | 5 | 6 |
+| `paris-maison` | `torrefaction` | Torréfacteur (notre mélange) | 4 000 € | recette:notre_melange | 6 | 7 |
+| `paris-maison` | `pm_verriere` | E1, la verrière restaurée | 6 000 € | ext:pm_verriere | 7 | 5 |
+| `paris-maison` | `pm_mezzanine` | E2, la mezzanine | 8 000 € | ext:pm_mezzanine | 8 | 8 |
+
+### 6.4 Profils de clients (10)
+
+Un profil se définit par ce qu'il cherche, jamais par un stéréotype; chaque profil mêle toutes les statures, peaux, âges adultes et coiffures (bible, 7.2). Le profil `voisins` est nouveau (section 1.3): proposition de signe pour la bible, le cabas du marché ou le journal plié sous le bras, accoudé au comptoir.
+
+<!-- table:profils -->
+| Profil | Nom | Ce qu'il cherche | Envie principale (3 points) | Envies secondaires (1 point) | Place voulue | Sensibilité au prix | Patience | Attente sans gêne | Séjour | Taille du groupe | Prend à manger | Emporte | Recommande | Styles aimés | Équipements recherchés | Pourboire |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `presses` | Les pressés | un bon café, vite, au comptoir ou à emporter | Cafés noirs | Viennoiseries et tartines, Cafés au lait | comptoir | 1,2 | 35 s | 30 s | 5 à 10 min | 1 (100 %) | 40 % | 50 % | non | bistrot, atelier | mange_debout, gobelets | 0,6 |
+| `voisins` | Les voisins | deux mots avec vous et un petit noir au comptoir | Cafés noirs | Viennoiseries et tartines, Thés et infusions | comptoir | 1,3 | 120 s | 90 s | 20 à 35 min | 1 (85 %), 2 (15 %) | 30 % | 0 % | 20 min, 30 % | bistrot, campagne | tabourets, journal | 0,8 |
+| `flaneurs` | Les flâneurs | prendre le temps: un crème, un fauteuil, un livre, la rue qui passe | Cafés au lait | Thés et infusions, Pâtisseries, Viennoiseries et tartines | confort | 0,8 | 90 s | 90 s | 70 à 130 min | 1 (60 %), 2 (40 %) | 50 % | 0 % | 50 min, 50 % | retro, bistrot | livres, fauteuils | 1,0 |
+| `familles` | Les familles | un goûter tous ensemble, une grande table, de quoi occuper les enfants | Chocolats | Boissons fraîches, Pâtisseries, Viennoiseries et tartines | table | 1,1 | 60 s | 75 s | 40 à 60 min | 2 (25 %), 3 (45 %), 4 (30 %) | 80 % | 0 % | non | campagne, jardin | chaise_haute, coin_enfants | 0,9 |
+| `gourmands` | Les gourmands | une belle part de gâteau, choisie dans une vitrine qui donne envie | Pâtisseries | Chocolats, Cafés au lait, Viennoiseries et tartines | table | 0,7 | 70 s | 90 s | 35 à 55 min | 1 (40 %), 2 (60 %) | 100 % | 10 % | non | retro, campagne | vitrine | 1,1 |
+| `promeneurs` | Les promeneurs | une pause en chemin: à boire frais, à manger, une terrasse au soleil | Boissons fraîches | Salé, Viennoiseries et tartines, Cafés noirs | terrasse | 1,0 | 60 s | 75 s | 30 à 50 min | 1 (20 %), 2 (50 %), 3 (30 %) | 60 % | 15 % | non | jardin, bistrot | range_velos, ardoise_traduite | 0,9 |
+| `etudiants` | Les étudiants | un prix doux, une grande table, du wifi et des prises pour réviser longtemps | Cafés au lait | Boissons fraîches, Salé, Viennoiseries et tartines | table | 1,6 | 80 s | 90 s | 100 à 200 min | 1 (40 %), 2 (35 %), 3 (25 %) | 50 % | 10 % | 70 min, 50 % | atelier, nordique | wifi, prises, grande_table | 0,5 |
+| `teletravail` | Les télétravailleurs | une table au calme près d'une prise, une théière qui dure, un déjeuner sur place | Thés et infusions | Cafés au lait, Salé, Pâtisseries | table | 0,9 | 90 s | 100 s | 150 à 270 min | 1 (100 %) | 40 % | 0 % | 75 min, 70 % | nordique, atelier | wifi, prises | 0,8 |
+| `brunch` | Les bruncheurs | le grand repas du week-end, à plusieurs, sans se presser | Brunch | Boissons fraîches, Cafés au lait, Salé | table | 0,8 | 90 s | 150 s | 70 à 110 min | 2 (50 %), 3 (20 %), 4 (30 %) | 0 % | 0 % | non | jardin, nordique | grande_table | 1,1 |
+| `connaisseurs` | Les connaisseurs | un café d'exception et le plaisir de voir le geste du barista | Café de spécialité | Cafés noirs, Pâtisseries | comptoir | 0,5 | 60 s | 120 s | 25 à 45 min | 1 (70 %), 2 (30 %) | 30 % | 10 % | non | atelier, nordique | moulin_specialite | 1,2 |
+
+### 6.5 Habitués (24, et ceux qui suivent la maison)
+
+Chaque habitué est rattaché à une adresse; ses cinq étapes s'ouvrent aux niveaux de lien (HA-02). Trait visible: proposition à caler avec la bible (7.3), qui en donne déjà trois (l'ancienne patronne, le randonneur et son chien, la maraîchère du jeudi).
+
+| Habitué | Adresse | Profil | Commande fétiche | Quand | Trait visible (proposition) | Son histoire | Suit la maison |
+|---|---|---|---|---|---|---|---|
+| Simone | village | voisins | noisette, au comptoir | tous les jours, 8 h 30 et 17 h | long gilet prune, chignon piqué d'un crayon, lunettes à chaînette, panier d'osier; son banc sous la vitrine | elle vous confie les clés et vous montre les gestes; libérée du comptoir, elle se met à l'aquarelle et vous offre la place du Tilleul peinte; elle reprend la gérance quand vous partez | oui: chaque inauguration, « Un an déjà », la fête |
+| Mathis | village | pressés | espresso et pain au chocolat | du mardi au samedi, 8 h 10 | sacoche de facteur jaune moutarde, vélo appuyé à la vitrine | toujours en retard sur sa tournée, il prépare un concours le soir au café; le jour où il le réussit, il offre une tournée de cafés à la salle; muté en ville, il retrouve votre comptoir à l'atelier | oui: l'atelier |
+| Farida et Noé | village | familles | chocolat chaud et crêpe au sucre | mercredi 16 h, samedi 10 h | ciré moutarde (Farida), bonnet à pompon (Noé) | Noé, timide, dessine sur un coin de l'ardoise; ses dessins finissent encadrés au mur; sa classe vient goûter un mercredi | non |
+| Bastien et Gribouille | village | promeneurs | jus d'orange pressé et tartine | dimanche 11 h | bâtons de marche, chien couché sous la table (pose fixe) | il balise un sentier qui passe par la place; le range-vélos et l'écuelle installés, il amène son club; il vous donne sa recette de citronnade | non |
+| Lise | village | flâneurs | café crème et tarte du jour | samedi 10 h, mardi 15 h | cardigan vert bouteille, piles de livres | bibliothécaire de l'école, elle remplit l'étagère à livres et monte une boîte à livres avec vous; elle écrit l'histoire du café pour le bulletin du village | non |
+| René | bourg | gourmands | tarte aux fruits et café crème | tous les jours, 15 h 30 | toque pliée dans la poche, moustache blanche, canne | l'ancien pâtissier vous loue sa boutique; il regarde le premier feu de son four, vous apprend les madeleines puis le pain aux raisins; « La boutique sent de nouveau le beurre » | oui: le laboratoire parisien |
+| Marion | bourg | voisins | café allongé et chausson aux pommes | jeudi 7 h 45, avant le marché | tablier de marché vert, cagette sous le bras | ses pommes donnent le chausson; elle vous propose ses paniers de saison (fruits moins chers); sa nièce Léa devient votre coup de main | non |
+| Karim | bourg | pressés | double espresso | du mardi au samedi, 7 h 35 | casquette et gilet de la gare | la salle d'attente de la gare est froide: vous lui préparez un thermos chaque matin; il vous offre la vieille horloge de la gare | non |
+| Yanis et sa bande | bourg | étudiants | chocolat viennois et gaufre | mardi et vendredi, 17 h | casques audio, sacs couverts de badges | ils révisent le bac sur la grande table de la remise; le jour des résultats, la bande dessine la boutique et la signe | non |
+| Chantal | bourg | flâneurs | thé noir et madeleines | samedi 16 h, après la répétition | écharpe de chœur rouge, partitions | sa chorale répète à la halle; à la foire de la halle, elle chante sur la terrasse; elle vous offre une partition encadrée | non |
+| Agathe | ville | télétravail | chaï latte | du mardi au vendredi, 9 h | lunettes rondes, mains tachées d'encre | l'atelier était l'imprimerie de sa famille; elle garde un coin de la grande table, imprime vos cartes et vos affiches sur la vieille presse, vous apprend le chaï | non |
+| Thao | ville | étudiants | latte et cookie | du mardi au jeudi, 14 h | rouleau de plans, carnet de croquis | étudiante en architecture, elle dessine le café, vous donne sa recette de cookies; en stage à Paris, elle suit la restauration de la verrière | oui: la maison parisienne |
+| Oscar | ville | télétravail | thé vert et part de quiche | du mardi au vendredi, 10 h | écharpe longue, ordinateur couvert d'autocollants | traducteur, toujours à la table près de la prise; il traduit l'ardoise pour les touristes (l'ardoise traduite de Paris) | oui: le café d'angle, puis la maison |
+| Aïcha | ville | connaisseurs | café filtre de spécialité | mercredi et samedi, 10 h | tablier de toile kaki, sac de jute | torréfactrice, elle goûte votre espresso, vous apprend les méthodes douces puis le flat white; à Paris, elle crée avec vous notre mélange | oui: la maison parisienne |
+| La famille Martin-Diallo | ville | brunch | formule brunch | dimanche 11 h | grands-parents compris, la grand-mère en chapeau | ils fêtent les 80 ans de la grand-mère au café et reviennent nombreux au grand brunch de l'atelier | non |
+| Antoine | Paris, quartier | voisins | espresso au zinc | tous les jours, 7 h 30 | béret, mouchoir à carreaux | l'ancien patron vous cède son café d'angle avec son équipe; il garde les photos du café en 1960 (décor « Le café d'autrefois »); il organise avec vous le vide-grenier | oui: la fête |
+| Clémence | Paris, quartier | promeneurs | jus d'orange pressé et éclair au café | samedi 11 h, avec un groupe | parapluie levé de guide | guide-conférencière, elle amène ses groupes le samedi, demande l'ardoise traduite, vous montre un passage oublié du quartier | non |
+| Malik | Paris, quartier | pressés | café allongé à emporter et pain aux raisins | tous les jours, 7 h 35 | le kiosque d'en face, gants mitaines | il échange le journal du jour contre son café; il garde un double de vos clés | non |
+| Louise | Paris, quartier | flâneurs | thé noir et tarte au citron | mardi et jeudi, 15 h | étui à partitions | pianiste du conservatoire voisin, elle joue au vide-grenier, puis à la fête de la maison | oui: la fête |
+| Hugo et Samir | Paris, quartier | gourmands | chocolat chaud et éclair au café | vendredi 16 h | sacs de la librairie | ils ouvrent une librairie à côté; un coin lecture se partage entre les deux boutiques; pour leurs dix ans ensemble, ils commandent un gâteau | non |
+| Éliane | Paris, maison | connaisseurs | thé vert et le gâteau de la maison | mardi et samedi, 16 h | gants de fil, broche ancienne | sa grand-mère tenait un salon de thé sous la verrière; elle vous confie la maison; la verrière restaurée, elle reconnaît le lieu de son enfance | non (c'est chez elle) |
+| Bérénice | Paris, maison | brunch | formule brunch et jus pressé | dimanche 11 h 30 | lunettes de soleil sur la tête, foulard | styliste du quartier, elle fait de la maison le rendez-vous du dimanche et prête des tissus pour la fête | non |
+| Jo | Paris, maison | télétravail | notre mélange et part de quiche | du mardi au vendredi, 13 h | sacoche de régie, ruban adhésif au poignet | à la régie du théâtre voisin, Jo vient avant les représentations et règle les lumières de la fête | non |
+| Wu Lan | Paris, maison | flâneurs | espresso d'origine et cannelé | jeudi 10 h | carnet de dégustation, châle bleu nuit | ancienne professeure de chimie, elle parle des grains comme d'une expérience et vous aide à régler la torréfaction | non |
+
+Les prénoms évitent ceux de La Petite Ligne et ceux qui servent d'exemples de pseudos (Camille, Sacha).
+
+### 6.6 Employés
+
+Candidats de la version 1 (les petites annonces en tirent trois chaque lundi; les employés repris sont fixes). Prénoms variés, traits épicènes (EM-08).
+
+| Prénom | Rôle | Traits | Où |
+|---|---|---|---|
+| Léa | commis (coup de main), puis gérance du bourg | Lève-tôt, Sourire | Mérelles, nièce de Marion |
+| Tom | service en salle | Pied léger, Bonne mémoire | candidatures de l'atelier |
+| Inaya | plonge | Patience d'ange, Sang-froid | candidatures de l'atelier |
+| Baptiste | barista | Main sûre, Curiosité | candidatures de l'atelier |
+| Maëlle | service en salle | Sourire, Couche-tard | candidatures de l'atelier |
+| Sofiane | commis | Pied léger, Lève-tôt | candidatures de l'atelier |
+| Capucine | pâtisserie | Main sûre, Douceur | candidatures de l'atelier et de Paris |
+| Josiane | service en salle, reprise | Bonne mémoire, Sang-froid | café d'angle, vingt-cinq ans de maison |
+| Dimitri | barista, repris | Main sûre, Couche-tard | café d'angle |
+| Awa | service en salle, reprise | Sourire, Pied léger | café d'angle |
+| Arthur | pâtisserie | Curiosité, Main sûre | candidatures de Paris (il apporte l'éclair au café) |
+| Mathilde | service en salle, reprise | Patience d'ange, Sourire | maison parisienne |
+| Yusuf | barista, repris | Sang-froid, Main sûre | maison parisienne |
+| Clara | service en salle, reprise | Sourire, Lève-tôt | maison parisienne |
+| Lucien | plonge, repris | Lève-tôt, Patience d'ange | maison parisienne |
+| Ninon | service en salle, reprise | Bonne mémoire, Douceur | maison parisienne |
+| Elsa | gérance | Sang-froid, Bonne mémoire | candidatures de Paris (pour une succursale) |
+
+### 6.7 Fournisseurs
+
+| Fournisseur | Ce qu'il livre | Adresses | Visage et véhicule (bible, 7.5) |
+|---|---|---|---|
+| Armelle, la laitière | lait, crème, beurre, œufs | village, bourg | foulard rouge doux, bouteilles de verre dans un panier, triporteur |
+| Lucas, le boulanger de la place | viennoiseries et tartes (tant qu'il n'y a pas de four), pain | village | tablier fariné, panière |
+| Joseph, le petit torréfacteur de la vallée | grains, thés | village, bourg | casquette, sacs de jute |
+| Marion, la maraîchère du jeudi | fruits et légumes de saison | bourg | tablier de marché vert, cagette |
+| Aïcha Benali | cafés de spécialité, puis grains verts pour notre mélange | ville, Paris | tablier de toile kaki, sac de jute |
+| Rémi, le grossiste | tout le sec et le frais en gros | Paris | blouse, diable |
+| Zoé, la livreuse en vélo cargo | les commandes du matin dans Paris, le dépannage dans l'heure | Paris | caisse à la couleur de sa coopérative inventée |
+
+### 6.8 Événements
+
+| Quand | Événement | Effet |
+|---|---|---|
+| Chaque lundi | Fermeture: travaux, brocante, visite d'une succursale | TE-08 |
+| Jour de marché (Mérelles le jeudi, l'atelier le samedi, le café d'angle le mardi et le vendredi, la maison parisienne le dimanche) | Le marché | voisins, flâneurs et promeneurs plus nombreux (table `jours`) |
+| Mercredi après-midi; mardi, jeudi, vendredi à 16 h 30 | Les enfants: après-midi libre, sortie d'école | le goûter des familles |
+| Samedi et dimanche | Le week-end | promeneurs, familles, gourmands; brunch dès l'atelier |
+| Premier jour de soleil du printemps | « Les premières terrasses » | terrasse pleine, x1,2 ce jour-là |
+| Un samedi du printemps | « Le marché aux fleurs » | plantes du catalogue à -20 % la semaine |
+| Été (toute la saison) | « Les grandes vacances » | étudiants x0,35, promeneurs x1,5, familles x1,2 (table `saisons`) |
+| 21e jour de l'été | « La soirée des musiciens » | une heure d'ouverture de plus, musique en terrasse, flâneurs x1,3 |
+| Premier lundi de l'automne | « La rentrée » | une lettre de l'université; étudiants x1,3 toute la saison |
+| Deuxième semaine de l'automne | « La semaine des pommes » | chausson et tarte aux pommes à l'honneur, chez Marion |
+| 8e jour de l'hiver | « La Chandeleur » | les crêpes demandées deux fois plus ce jour-là |
+| Troisième week-end de l'hiver | « Le marché d'hiver » | chocolat aux épices à l'honneur, gourmands x1,2 |
+| Jour 113 (premier jour du printemps de l'année 2) | « Un an déjà » | une lettre de Simone et son aquarelle; gâteau offert aux clients de la journée |
+| Défis locaux | La fête du Tilleul (village, dimanche), la foire de la halle (bourg, jeudi), le grand brunch de l'atelier (dimanche), le vide-grenier de la rue (café d'angle, dimanche), la semaine du Guide de la Tasse et la fête de la maison | PR-02, PR-08 |
+
+Les événements de saison ne sont pas simulés au-delà des multiplicateurs (effets bornés à une journée, ±30 %).
+
+### 6.9 Fil conducteur: les scènes clés
+
+Toutes en place, par dialogues, sans cinématique (C22); un fondu seulement pour changer de lieu.
+
+1. **Jour 1, un lundi**: l'annonce « Café de la place cherche repreneurs » sur la tablette. Simone attend sur le seuil, les clés à la main. Les trois phrases du but (section 3), puis la visite: la machine, le rail, la plonge, la réserve. On fait à Simone son premier noisette; on écrit la première ardoise; on nomme la maison à deux (l'un propose, l'autre accepte ou propose à son tour), puis l'emblème et les couleurs.
+2. **Jour 2**: la pancarte se retourne. Simone est la première cliente (« Comme d'habitude ? »). Le soir, le premier mot du livre d'or.
+3. **La première semaine**: Mathis, Farida et Noé, Bastien et son chien, Lise; Simone se tait peu à peu.
+4. **La lettre de Mérelles**: René, l'ancien pâtissier, cherche quelqu'un pour rallumer son four.
+5. **La fête du Tilleul**, un dimanche, sous le store: tout le village; le soir, Simone: « Je vous le garde au chaud. »
+6. **Mérelles**: le laboratoire vide; le four d'occasion livré et porté à deux; la première fournée sous l'œil de René. La foire de la halle, la chorale de Chantal sur la terrasse.
+7. **La lettre de l'atelier**: Agathe cherche à qui confier l'imprimerie de sa famille.
+8. **L'atelier**: la première embauche (un entretien au comptoir, trois candidatures); le premier brunch; Mathis au comptoir; la rentrée. Le grand brunch de l'atelier.
+9. **La lettre de Paris**: Antoine prend sa retraite et veut que son café d'angle reste un café.
+10. **Paris**: l'équipe d'Antoine vous accueille; Zoé et son vélo cargo; l'ardoise traduite d'Oscar; le vide-grenier de la rue.
+11. **La lettre d'Éliane**: la maison sous la verrière, fermée depuis des années.
+12. **La maison**: la verrière restaurée (Éliane se souvient); notre mélange, torréfié avec Aïcha et Wu Lan; le laboratoire, que René vient visiter.
+13. **« Un an déjà »**, si le jour 113 tombe pendant l'histoire: la lettre de Simone.
+14. **La semaine du Guide**: un client au carnet de cuir revient chaque jour; le lundi, la lettre: « La Tasse d'or, pour la maison … ».
+15. **La fête de la maison**: les habitués de toutes les adresses dans la cour de la maison; Louise au piano; Simone lève sa tasse: « À vous deux, et à la maison. » Puis le jeu continue.
+
+### 6.10 « Nos projets »
+
+Le carnet commun des rêves du duo, sur la tablette; il sert de liste d'objectifs et de progression commune (SV-08). Trois projets à la fois sont épinglés (choisis par le duo, sinon les trois prochains de l'histoire). Un projet réussi ne se perd jamais; certains donnent une pièce unique.
+
+| Adresse | Projets (condition) |
+|---|---|
+| Village (12) | « Un nom sur la porte » (nommer la maison); « Notre ardoise » (écrire la première ardoise); « Notre premier client » (servir Simone); « Un premier mot » (un mot au livre d'or); « Comme d'habitude » (servir une fétiche sans commande); « Deux tasses » (2 tasses à Ormeval); « La Chandeleur avant l'heure » (crêpière et 20 crêpes servies); « Sous le store » (E1); « Au coin du feu » (E2); « Trois tasses au village »; « La fête du Tilleul » (défi); « Partir pour Mérelles » |
+| Bourg (10) | « Le four de René » (four et première fournée); « Croissants maison » (50 servis); « Le jeudi de Marion » (50 groupes un jour de marché); « En salle » (service en salle); « La terrasse de la halle » (E1); « La salle de la remise » (E2); « Sous la treille » (E3); « Un coup de main » (embaucher Léa); « La foire de la halle » (défi); « Partir pour l'atelier » |
+| Ville (9) | « Notre première embauche »; « Le brunch du dimanche » (30 brunchs un dimanche); « Café de spécialité » (méthodes douces et 20 filtres); « Trois groupes » (la machine à trois groupes); « Deux salles pleines » (E1 et 40 personnes assises à la fois); « La cour pavée » (E2); « Deux cafés, une maison » (le village tourne en succursale); « Le grand brunch » (défi); « Partir pour Paris » |
+| Paris, quartier (8) | « Ouvrir à Paris »; « L'équipe au complet » (8 employés); « Sur le trottoir » (E1); « L'ardoise en trois langues »; « L'arrière-salle » (E2); « Trois cafés »; « Le vide-grenier » (défi); « Partir pour la maison » |
+| Paris, maison (8) | « La maison du boulevard »; « Notre mélange » (torréfaction et 50 tasses); « Le laboratoire » (le gâteau de la maison servi); « La verrière » (E1); « La mezzanine » (E2); « Cinq tasses à Paris »; « La Tasse d'or »; « La fête de la maison » |
+| Partout, et le jeu libre (12) | « Cent clients en un jour »; « Mille sourires » (1 000 clients ravis); « Le livre d'or plein » (100 mots); « Toutes les recettes » (47); « Quatre styles » (quatre cafés harmonieux, de quatre styles différents); « Comme la famille » (cinq habitués au dernier niveau); « Tous nos habitués » (toutes les histoires finies); « Cinq tasses partout »; « Une année ensemble » (jour 113); « Le dessin parfait » (100 dessins sur le lait); « Rien ne se perd » (500 articles au panier du soir); « La maison au complet » (toutes les extensions) |
+
+Total de la version 1: 59 projets.
+
+### 6.11 Écriture
+
+- **Ton**: chaleureux, simple, un humour doux; des phrases courtes, des gens qui ont une vie. Aucune moquerie d'un profil; aucun texte ne compare les deux joueurs.
+- **Adresse aux joueurs**: le jeu tutoie chaque joueur (« Tu tiens le plateau »); un personnage qui parle aux deux dit « vous » (« Vous voilà chez vous »).
+- **Écriture neutre**: rien ne s'accorde au genre d'un joueur. Formes à proscrire et leurs remplacements (carnet du game designer): « prêt » ou « prête » (« On ouvre ? », « Oui, on ouvre »), « tous les deux » (« à deux »), « chacun » (« chaque joueur », « l'un et l'autre »), « fatigué » (« La fatigue se fait sentir »), un participe après « vous » (« Vous avez fait la fête » plutôt que « Vous êtes venus »).
+- **Exemples**: ticket « Table 4: deux crèmes (un au lait d'avoine), un chocolat »; tablette « Disponible: 1 240 €. Gardé pour les charges: 180 € »; livre d'or « Le cappuccino avait un cœur dessus ! », « Pas trouvé de place pour m'asseoir, dommage », « On reviendra pour la tarte aux mirabelles »; refus de pose « Les clients ne pourraient plus passer jusqu'à la fenêtre »; employé « J'ai besoin de quelqu'un au bar ! »; Simone « Attends que la crème soit dorée, et coupe. »
+- **Aucune marque réelle**, aucun établissement réel; Paris sans nom de rue réel.
+
+## 7. Direction artistique (directeur-artistique)
+
+Voir `docs/jeux/cosy-cafe/bible-artistique.md` et `docs/jeux/cosy-cafe/bible/` (résumé à écrire par le manager).
+
+## 8. Direction sonore (sound-designer)
+
+Voir `docs/jeux/cosy-cafe/son.md` (résumé à écrire par le manager).
+
+## 9. Interface et HUD (ux-ui-designer)
+
+Voir `docs/jeux/cosy-cafe/ux.md` et `design/maquettes/cosy-cafe/` (résumé à écrire par le manager).
+
+## 10. Technique (architecte-technique, dev-reseau, tech-artist)
+
+Voir `docs/jeux/cosy-cafe/technique.md`, dont la section 11 (contraintes C1 à C26) que ce cahier respecte (résumé à écrire par le manager).
+
+## 11. Périmètre (game-designer, manager)
+
+- **Version 1** (jusqu'à Paris, comme demandé):
+  - les cinq adresses et leurs extensions (onze), leurs défis, la visite du Guide de la Tasse et la fête de la maison; le jeu libre ensuite;
+  - la journée en trois temps, le lundi, la semaine, quatre saisons, la météo et l'annonce du lendemain, les événements de la section 6.8;
+  - l'ardoise, les prix, l'attrait des dix profils, la découverte des goûts;
+  - le service au comptoir et en salle, le rail des tickets, les gestes à la main et leurs fenêtres, trois niveaux d'équipement par poste, la qualité sans échec, le dessin sur le lait, les options lait d'avoine et déca (si Q6 les garde);
+  - la plonge, le stock, les sept fournisseurs, les livraisons à ranger, le dépannage, le panier du soir;
+  - 47 recettes, le catalogue de la section 6.3, la brocante, l'aménagement et ses règles de circulation et de raccordement, la roue des styles;
+  - l'ambiance, la satisfaction, le livre d'or, la réputation en tasses, la renommée;
+  - 24 habitués et leurs histoires en cinq étapes, ceux qui suivent la maison;
+  - les employés (six rôles, dix traits, trois niveaux), l'équipe reprise à Paris, les succursales;
+  - la caisse, la réserve, la tirelire, les achats à deux, l'absence de faillite;
+  - « Nos projets » (59), les aides de chaque joueur et les réglages du duo;
+  - trois maisons, sauvegardes en plein service, séances à l'historique, progression commune.
+- **Plus tard** (bonus, mises à jour du soir): une sixième adresse ou une ville étrangère; des saisons de plus (fêtes, recettes); des commandes spéciales d'habitués (gâteaux d'anniversaire préparés à la demande); des concours (le croissant de l'arrondissement); un mode « café du dimanche » plus lent; des tenues et coiffures en plus; des disques en plus; un carnet de photos souvenirs.
+- **Hors périmètre**, avec la raison: alcool et tabac (un café et salon de thé douillet, des clients de tous âges); combat, vol, dangers, salissures dégoûtantes, clients méchants (le ton); faillite, perte définitive, note qui baisse (le ton, et rien à reprocher à l'autre joueur); licenciements secs, grèves (« gérer sans dureté »); deux joueurs dans deux cafés à la fois en version 1 (C24, pilier 1); physique des objets, vaisselle cassée, liquides renversés (C12); mode solo, plus de deux joueurs, jeu par Internet (plateforme); manette (plateforme); voix enregistrées (question S2 du son); marques réelles, lieux et établissements réels (création originale); génération procédurale des adresses (les plans sont dessinés); cinématiques en vue subjective (C22); achats dans le jeu, publicité, classements.
+
+## 12. Critères d'acceptation (qa-testeur)
+
+Proposition de critères de conception, que qa-testeur reprendra, rendra testables dans sa forme et complétera avec les critères techniques. Modes proposés: U (simulation sous Node à graine fixe), P2 (deux contextes dans le faux hôte), E ou EL (application), M (chez le client), D (relecture).
+
+| # | Étant donné | Quand | Alors | Vérification |
+|---|---|---|---|---|
+| CA-01 | un nouveau duo | la première scène s'achève | chaque joueur peut dire le but en une phrase (servir, faire venir du monde par l'ardoise, faire grandir la maison), en moins d'une minute | M |
+| CA-02 | le service ouvert, les deux joueurs actifs | 60 s réelles passent | l'horloge avance d'une heure de jeu, identique chez les deux (1,25 s par minute avec le rythme paisible) | U, P2 |
+| CA-03 | la préparation | un seul joueur retourne la pancarte | elle ne se retourne pas; l'autre voit « On ouvre ? »; elle s'ouvre quand l'autre répond | P2 |
+| CA-04 | l'heure de fermeture | elle sonne | plus aucun groupe n'entre; les commandes prises sont servies; les clients partent au plus tard 15 minutes de jeu après (5 après leur service s'ils sont servis plus tard) | U |
+| CA-05 | une partie à la même graine, le même état et les mêmes réglages | on rejoue la même journée deux fois | même nombre de groupes par profil et par heure (loi de Poisson autour de AT-07); même empreinte d'état | U |
+| CA-06 | un profil sans aucune de ses envies à l'ardoise | une journée passe | aucun groupe de ce profil n'entre | U |
+| CA-07 | l'exemple de la règle AT-07 | on calcule les groupes attendus | on retrouve les valeurs de la table `res_exemple`, à 0,01 près | U |
+| CA-08 | une file de six places pleine | un groupe arrive | il n'entre pas et compte parmi les repartis | U, P2 |
+| CA-09 | un café au plafond C2 de son adresse | un groupe arrive | il n'entre pas; jamais plus de personnages présents que le plafond (village 24, bourg 48, ville 72, café d'angle 80, maison 120) | U |
+| CA-10 | un groupe qui a commandé | sa commande tarde de 5 minutes | il attend, ne repart pas, n'affiche jamais la colère; sa satisfaction baisse au plus de 30 | U, P2 |
+| CA-11 | un espresso lancé à la main | le joueur l'arrête à 13 s, à 16 s, à 19 s, ou ne fait rien | qualités « Parfait », « Bien », « Correct », « Correct » (arrêt seul à 20 s), affichées chez ce joueur seul | P2 |
+| CA-12 | le lait à la buse | le joueur relâche à 60 °C, 68 °C, ou attend | « Parfait », « Bien », « Correct » (coupure à 72 °C) | P2 |
+| CA-13 | un geste jugé chez l'invité avec 150 ms de latence | il arrête l'extraction à 13 s sur son écran | la qualité est « Parfait » chez lui comme chez l'hôte (C16) | EL |
+| CA-14 | l'aide « Gestes simplifiés » chez un joueur | il fait vingt gestes | tous « Bien »; aucune trace de l'aide sur l'écran de l'autre | P2 |
+| CA-15 | n'importe quel geste raté de toutes les façons possibles | on termine la recette | l'article existe et se sert; aucun état d'échec | U |
+| CA-16 | toutes les actions de la section 5.2 | chacune est déclenchée | chacune a son retour visuel et son retour sonore (relevés par le crochet de test); aucun son ne dépend de la qualité d'un geste ni d'un client déçu | P2, M |
+| CA-17 | les deux joueurs prennent la même tasse à moins de 50 ms d'écart | l'hôte traite les deux intentions | une seule tasse dans une seule main; l'autre lit « Déjà pris par … »; une pile en donne une à chacun | P2 |
+| CA-18 | deux joueurs préparent le même article | les deux le posent sur le passe | un seul rejoint le ticket, l'autre reste « en trop » et part au prochain client qui le commande | U, P2 |
+| CA-19 | une caisse de 600 € | les deux achètent chacun un objet à 400 € en même temps | un achat passe, l'autre est refusé sans débit; la caisse finit à 200 € | U, P2 |
+| CA-20 | un achat important | un joueur le lance | une proposition s'affiche chez l'autre, la somme est réservée; un refus ne débite rien | P2 |
+| CA-21 | un meuble que l'on pose en coupant l'accès à une place ou à la porte | on tente la pose | elle est refusée avec sa raison; passages de 0,9 m jusqu'aux places, 1,2 m pour l'allée principale, jamais moins de 0,6 m | U |
+| CA-22 | une machine à espresso et un emplacement sans eau ni prise renforcée | on tente la pose | refusée, avec la raison | U |
+| CA-23 | un meuble lourd | un joueur seul tente de le porter | il ne peut que le faire glisser d'un mètre au plus; à deux, il se porte à 1,2 m/s au plus, sans demi-tour sur place | P2 |
+| CA-24 | un café au plafond C6 de meubles et objets | on tente d'en poser un de plus | refusé avec « Plus de place pour un objet de plus ici »; aucune vue n'en montre plus de 150 | U |
+| CA-25 | une cohérence calculée sur l'exemple AM-02 (40 campagne, 12 jardin, 8 rétro, 10 bistrot) | on calcule | 60 % | U |
+| CA-26 | cent journées d'un même café | on relit la réputation chaque soir | elle ne baisse jamais; elle suit les seuils de la table `reputation` | U |
+| CA-27 | un habitué dont c'est le jour | le duo lui sert sa fétiche avant qu'il commande | +10 de satisfaction, +20 de lien, son prénom s'affiche, « Comme d'habitude ? » | P2 |
+| CA-28 | une journée quelconque | elle se termine | jamais plus de huit habitués venus | U |
+| CA-29 | une caisse vide et des charges à payer | la fermeture arrive | la différence devient « à régler »; les fournisseurs livrent la commande habituelle; le service du lendemain a lieu; aucun écran d'échec | U, P2 |
+| CA-30 | une succursale aux sept dernières journées jouées connues | une journée passe ailleurs | elle rapporte 45 % de leur résultat moyen, jamais moins de zéro, calculé une fois | U |
+| CA-31 | la maison avec plusieurs cafés | l'aube d'une journée | l'écran du choix de l'adresse s'affiche chez les deux; le chargement prend 5 s au plus | P2, EL |
+| CA-32 | une lettre d'offre reçue, le défi tenu, la tirelire pleine | les deux acceptent le déménagement | il a lieu le lundi suivant, par un fondu; l'ancien café devient une succursale avec sa gérance | U, P2 |
+| CA-33 | le défi local d'une adresse | sa réputation et son extension sont là | il se tient le prochain jour prévu, à l'affluence x1,6; il ne peut pas échouer | U |
+| CA-34 | les aides et réglages de chaque joueur | on parcourt l'écran de l'autre (HUD, tablette, panneaux) | aucune trace des aides de l'autre; aucune statistique par joueur nulle part | P2, D |
+| CA-35 | un joueur sans entrée depuis 60 s en plein service | la 60e seconde passe | la pancarte « Petite pause »; plus personne n'entre, l'horloge et la patience s'arrêtent; l'autre finit les commandes en cours; une entrée de l'absent relance tout après 3 s | U, P2 |
+| CA-36 | une coupure réseau en plein port à deux | le lien revient | la charge est posée, rien n'est perdu, chacun à sa place; le service reprend à la seconde | EL |
+| CA-37 | « Retour au salon » en plein service | on relance la séance | elle reprend à la même seconde après le décompte; l'historique inscrit une séance normale, pas une partie interrompue | P2, EL |
+| CA-38 | l'application de l'hôte tuée en plein service | Duo est relancé | la maison reprend à la dernière sauvegarde, 2 minutes au plus avant l'arrêt | EL |
+| CA-39 | une sauvegarde écrite par le Mac hôte | le PC héberge et la charge | chaque joueur retrouve son avatar; empreinte d'état identique | EL, M |
+| CA-40 | une sauvegarde d'une version ancienne, faite en plein service | la version suivante la charge | elle reprend en fin de journée, le reste du service calculé comme une succursale; rien de durable ne disparaît | U, CI |
+| CA-41 | la fin d'une séance | la plateforme reçoit le résultat | journées, adresse, trois statistiques (journées tenues, clients servis, mots au livre d'or), au plus trois faits partagés de 60 caractères; aucun fait individuel | U, EL |
+| CA-42 | 100 séances simulées | on relit la progression | `progress` vaut projets réalisés / projets de la version; affichée « Nos projets: n sur 59 » | U |
+| CA-43 | tous les textes du jeu | relecture et contrôle automatique | aucun accord au genre d'un joueur, tutoiement de chaque joueur, « vous » pour les deux, aucune marque ni aucun lieu réel, aucun tiret cadratin ni demi-cadratin | D, U |
+| CA-44 | le jeu complet | on le joue à la souris seule, puis au clavier seul | tout est faisable; aucune touche de la rangée des chiffres n'est exigée; Échap ne ferme jamais un panneau du jeu | P2, M |
+| CA-45 | `cosy_cafe.py --croise` lancé sur ce cahier | il s'exécute | aucun écart: chaque table d'équilibrage est la copie des données, chaque résultat celui du fichier de résultats, et les résultats correspondent aux données | U |
+| CA-46 | les tables de configuration du jeu, relues par le script | `cosy_cafe.py --resultats` s'exécute | le duo médian fête la maison entre 33 et 40 h; neuf duos tranquilles sur dix avant 62 h; tous les plafonds C2 et C5 tenus | U |
+| CA-47 | le service du village, deux joueurs, la dernière semaine du duo médian | on le simule | moins de 15 % de groupes repartis et moins de 60 s d'attente moyenne: tendu mais tenable | U |
+| CA-48 | dix séances de prototype chez le client | on mesure la durée d'une journée ouverte | 21 minutes à 4 minutes près; sinon on recale la minute de jeu ou les heures d'ouverture | M |
+| CA-49 | les séances de prototype | on observe le duo pendant les coups de feu | les deux se parlent pour se répartir le travail (au moins une phrase par minute de pointe); les deux disent n'avoir jamais attendu sans rien faire | M |
+| CA-50 | le livre d'or d'une journée où des clients n'ont pas trouvé de place | on le lit à la fermeture | au moins un mot en donne la raison, si un client déçu a écrit; aucun mot ne nomme un joueur | U, P2 |
+| CA-51 | les mesures du prototype (gestes par minute, durée de préparation et de fermeture, part épargnée) | on les reporte dans la table `duos` | la simulation relancée redonne une durée médiane entre 33 et 40 h, ou l'on recale les seuils (réputation, installations) et l'on met ce cahier à jour | U, M |
+
+## 13. Jalons (manager)
+
+| Jalon | Contenu attendu | Date visée | Validé le |
+|---|---|---|---|
+| Prototype | jouable à deux en réseau, formes simples, au café d'Ormeval seulement: la machine à deux groupes, la buse, la bouilloire, la vitrine, la caisse, le rail, le passe, la plonge à l'évier; huit recettes (espresso, allongé, noisette, crème, cappuccino, thé noir, chocolat, croissant); le service au comptoir; l'ardoise et son attrait pour quatre profils (pressés, voisins, flâneurs, familles); les gestes à la main avec leurs fenêtres et l'aide « Gestes simplifiés »; la satisfaction, le livre d'or (dix mots), la réputation; Simone et Mathis; la livraison du matin (un carton lourd à deux); la caisse et deux achats (moulin à dose, terrasse); la pause, l'absence, la sauvegarde en plein service et la reprise en changeant d'hôte; la séance à l'historique. Questions à trancher: le coup de feu à deux est-il amusant, tendu sans être stressant ? se parle-t-on ? les gestes ont-ils du goût ? Mesures: CA-48, CA-49, et les paramètres de la table `duos` (CA-51) | | |
+| Alpha | toutes les fonctions et tout le contenu de la version 1 (section 11), assets provisoires, textes en premier jet, plans de la ville et de Paris du level designer, simulation relancée sur les fichiers de configuration du jeu (CA-45, CA-46) | | |
+| Bêta | assets définitifs, son et musiques, textes relus, budgets tenus sur le PC (C1 à C26), aucun bug bloquant; l'histoire complète jouable du village à la fête | | |
+| 1.0 | recette réussie sur les deux machines, jeu publié dans Duo | | |
+
+## 14. Questions ouvertes et décisions
+
+| # | Question | Options | Recommandation | Décision du client | Date |
+|---|---|---|---|---|---|
+| Q1 | Le titre | « Cosy Café »; « Deux Tabliers »; « L'Ardoise du jour »; « Comptoir à deux »; « Petit noir, grand crème »; « Les Deux Tasses » | « Deux Tabliers »: aucun jeu, livre, film ni marque trouvés sous ce nom; il dit le couple, le métier et la douceur. « Cosy Café » se perdrait parmi des jeux existants (section 1.1). L'identifiant `cosy-cafe` peut rester | | |
+| Q2 | La durée de l'histoire principale | environ 36 h (ce cahier: 36,4 h pour un duo médian, 28,5 à 56 h selon les duos); plus courte (environ 25 h: seuils et coûts allégés); plus longue (environ 50 h: une semaine de plus par adresse) | environ 36 h: environ 55 soirées de 40 minutes, puis le jeu libre; on recale au prototype sur vos vraies séances (CA-51) | | |
+| Q3 | Paris réel ou métropole inventée | Paris réel, avec des rues, des commerces et des personnes inventés; une grande ville inventée | Paris réel aux rues inventées: c'est le rêve de la demande (« jusqu'à Paris »); la bible le rend reconnaissable par sa matière seule, sans aucun lieu réel | | |
+| Q4 | Les deux joueurs toujours dans le même café | toujours ensemble; libres d'être dans deux cafés à la fois | toujours ensemble en version 1: le coup de feu à deux est le cœur du jeu, et deux cafés à la fois coûteraient un lot de développement et doubleraient les tests (technique, section 7.2, C24); à rouvrir après la bêta si vous le souhaitez en jouant | | |
+| Q5 | Les anciens cafés | gardés en succursales; revendus pour financer le suivant; au choix | gardés en succursales: on ne perd rien de ce qu'on a construit, on peut y retourner jouer, et la maison grandit vraiment (cinq cafés à la fin); la revente ne serait qu'une perte déguisée | | |
+| Q6 | Les options de commande (lait d'avoine, déca) | en version 1; plus tard; jamais | en version 1: elles donnent une raison de lire le ticket et un petit soin à apporter, sans jamais faire échouer une commande (CO-08) | | |
+| Q7 | Les aides de gestes | proposées dès la première séance à chaque joueur; cachées dans les réglages | proposées au premier geste de chaque joueur, sur son seul écran (« Veux-tu des gestes simplifiés ? »), puis réglables à tout moment: personne n'a à le demander devant l'autre | | |
+| Q8 | Les prix | plausibles en euros, plus chers à Paris (ce cahier: espresso à 1,40 € au village, 2,80 € à la maison parisienne); sans unité (« pièces ») | plausibles en euros: ils parlent tout de suite et rendent Paris crédible; les loyers et les salaires sont réalistes, seules les installations et les travaux sont modestes, justifiés par l'histoire (les lieux sont confiés) | | |
+| Q9 | Le dixième profil, « les voisins » (deux mots au comptoir) | le garder; s'en tenir aux neuf profils du cadrage | le garder: il donne au poste calme (parler aux gens) un vrai effet sur le jeu, et fait vivre le zinc à chaque adresse | | |
+| Q10 | Les textes s'accordent-ils au genre de vos avatars ? | rédaction neutre pour tous (comme Duo et La Petite Ligne); un choix « il » ou « elle » | rédaction neutre: un seul texte à écrire et à tester, déjà éprouvé au jeu 1 | | |
+
+## 15. Historique
+
+| Date | Version | Changement | Demandé par |
+|---|---|---|---|
+| 2026-11-07 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, 13, 14, proposition de la 12), à partir du cadrage du manager; simulation client par client jointe (`simulations/cosy_cafe.py`, `resultats.md`); alignement sur les plans du village et du bourg (level-designer), les contraintes C1 à C26 (architecte), la bible (roue des styles, fournisseurs, habitués) et les hypothèses du son (fenêtres du lait, aucun son de qualité) | game-designer, sur brief du manager |

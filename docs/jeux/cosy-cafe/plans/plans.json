@@ -33,8 +33,7 @@
    "paris-quartier": 180,
    "paris-maison": 350
   },
-  "furniture_visible_max": 150,
-  "technical_min": 0.6
+  "furniture_visible_max": 150
  },
  "plans": [
   {
@@ -10805,7 +10804,7 @@
     "players": 2,
     "employees": 2
    },
-   "summary": "Ancienne imprimerie de 152 m²: la boutique sur la rue des Facultés (43 m²), l'atelier sous ses sheds (86 m²), les services entre les deux. Les presses occupent la moitié de l'atelier; la salle de composition et la cour attendent.",
+   "summary": "Ancienne imprimerie de 165 m²: la boutique sur la rue des Facultés (43 m²), l'atelier sous ses sheds (86 m², cuisine comprise), les services entre les deux (35 m²). Les presses occupent la moitié de l'atelier; la salle de composition et la cour attendent.",
    "scale_px": 40,
    "levels": [
     {
@@ -14551,9 +14550,9 @@
       {
        "pos": [
         8.0,
-        0.5
+        0.22
        ],
-       "text": "jardins des maisons de la rue Haute",
+       "text": "jardins des maisons de la rue du Collège",
        "style": "street",
        "rotate": 0,
        "anchor": "middle"
@@ -14730,7 +14729,7 @@
         1.0
        ],
        "text": "12,00 m (atelier)",
-       "offset": -0.5
+       "offset": -0.2
       },
       {
        "from": [
@@ -14765,7 +14764,7 @@
     "players": 2,
     "employees": 5
    },
-   "summary": "Ancienne imprimerie de 152 m²: la boutique sur la rue des Facultés (43 m²), l'atelier sous ses sheds (86 m²), les services entre les deux. E1: l'atelier entier. E2: la cuisine du brunch. E3: la cour sous la glycine.",
+   "summary": "Ancienne imprimerie de 165 m²: la boutique sur la rue des Facultés (43 m²), l'atelier sous ses sheds (86 m², cuisine comprise), les services entre les deux (35 m²). E1: l'atelier entier. E2: la cuisine du brunch. E3: la cour sous la glycine.",
    "scale_px": 40,
    "levels": [
     {
@@ -19134,9 +19133,9 @@
       {
        "pos": [
         8.0,
-        0.5
+        0.22
        ],
-       "text": "jardins des maisons de la rue Haute",
+       "text": "jardins des maisons de la rue du Collège",
        "style": "street",
        "rotate": 0,
        "anchor": "middle"
@@ -19313,7 +19312,7 @@
         1.0
        ],
        "text": "12,00 m (atelier)",
-       "offset": -0.5
+       "offset": -0.2
       },
       {
        "from": [
@@ -20337,7 +20336,7 @@
        "fixed": true,
        "label_at": [
         10.93,
-        4.25
+        5.62
        ],
        "blocks": true,
        "opaque": false
@@ -21741,8 +21740,8 @@
       },
       {
        "pos": [
-        11.95,
-        5.85
+        11.9,
+        6.35
        ],
        "text": "on boit debout au zinc",
        "style": "note",
@@ -22394,7 +22393,7 @@
     "players": 2,
     "employees": 6
    },
-   "summary": "Café d'angle de 68 m² au pied d'un immeuble de rapport, entrée dans le pan coupé, cave dessous. E1: la salle du fond (98 m² en tout). E2: la terrasse sur les deux rues; un second rang attend la décision de l'architecte sur la foule lointaine.",
+   "summary": "Café d'angle de 68 m² au pied d'un immeuble de rapport, entrée dans le pan coupé, cave dessous. E1: la salle du fond (96 m² en tout). E2: la terrasse sur les deux rues; un second rang attend la décision de l'architecte sur la foule lointaine.",
    "scale_px": 36,
    "levels": [
     {
@@ -23422,7 +23421,7 @@
        "fixed": true,
        "label_at": [
         10.93,
-        4.25
+        5.62
        ],
        "blocks": true,
        "opaque": false
@@ -25476,8 +25475,8 @@
       },
       {
        "pos": [
-        11.95,
-        5.85
+        11.9,
+        6.35
        ],
        "text": "on boit debout au zinc",
        "style": "note",
@@ -26129,7 +26128,7 @@
     "players": 2,
     "employees": 6
    },
-   "summary": "Maison d'un ancien graineur, 330 m² sur deux niveaux: la boutique sur le boulevard, la halle sous verrière, le laboratoire, le jardin; les salons à l'étage. Le jardin est en friche, l'étage fermé, le laboratoire vide, pas encore de torréfacteur.",
+   "summary": "Maison d'un ancien graineur, 300 m² sur deux niveaux: la boutique sur le boulevard, la halle sous verrière, le laboratoire, le jardin; les salons à l'étage. Le jardin est en friche, l'étage fermé, le laboratoire vide, pas encore de torréfacteur.",
    "scale_px": 30,
    "levels": [
     {
@@ -29020,12 +29019,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.3,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-20",
@@ -29053,12 +29052,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.3,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-21",
@@ -29088,6 +29087,7 @@
        "access": "public",
        "glazed": true,
        "entrance": true,
+       "screen_low": true,
        "label": "entrée",
        "swing": {
         "leaves": 2,
@@ -29126,12 +29126,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.5,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-23",
@@ -29159,12 +29159,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.5,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-24",
@@ -29775,8 +29775,8 @@
        "kind": "furniture",
        "shape": {
         "rect": [
-         8.5,
-         25.6,
+         8.55,
+         28.75,
          0.3,
          0.5
         ]
@@ -31332,7 +31332,7 @@
          0.55
         ]
        },
-       "label": "évier, thés",
+       "label": "évier",
        "style": "tea",
        "height": 0.9,
        "post": "office",
@@ -31375,6 +31375,10 @@
        "post": "monte-plats de l'étage",
        "reason": null,
        "fixed": true,
+       "label_at": [
+        7.72,
+        20.75
+       ],
        "blocks": true,
        "opaque": false
       },
@@ -31389,7 +31393,7 @@
          0.55
         ]
        },
-       "label": "frigo, desserts",
+       "label": "frigo",
        "style": "fridge",
        "height": 0.9,
        "post": "frigo de l'étage",
@@ -31617,7 +31621,7 @@
       },
       {
        "pos": [
-        7.7,
+        6.6,
         20.75
        ],
        "text": "office",
@@ -31662,14 +31666,14 @@
    "state_label": "La maison au complet",
    "north_deg": 0,
    "capacity": {
-    "inside": 63,
-    "outside": 36
+    "inside": 62,
+    "outside": 26
    },
    "staff": {
     "players": 2,
     "employees": 10
    },
-   "summary": "Maison d'un ancien graineur, 330 m² sur deux niveaux: la boutique sur le boulevard, la halle sous verrière, le laboratoire, le jardin; les salons à l'étage. E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. E4: le jardin et sa serre.",
+   "summary": "Maison d'un ancien graineur, 300 m² sur deux niveaux: la boutique sur le boulevard, la halle sous verrière, le laboratoire, le jardin; les salons à l'étage. E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. E4: le jardin et sa serre.",
    "scale_px": 30,
    "levels": [
     {
@@ -32215,38 +32219,23 @@
        "opaque": false
       },
       {
-       "id": "table-1",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         4.6,
-         1.9,
-         0.8,
-         0.8
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
        "id": "seat-1",
        "kind": "seat",
        "shape": {
         "rect": [
-         4.775,
-         1.4,
-         0.45,
-         0.45
+         3.7,
+         1.1,
+         0.75,
+         0.75
         ]
        },
        "seat": {
         "area": "outside",
         "room": "serre"
        },
-       "style": "chair",
+       "style": "armchair",
        "back": "N",
-       "height": 0.9,
+       "height": 0.8,
        "blocks": true,
        "opaque": false
       },
@@ -32255,66 +32244,40 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         4.775,
-         2.75,
-         0.45,
-         0.45
+         5.0,
+         1.1,
+         0.75,
+         0.75
         ]
        },
        "seat": {
         "area": "outside",
         "room": "serre"
        },
-       "style": "chair",
-       "back": "S",
-       "height": 0.9,
+       "style": "armchair",
+       "back": "N",
+       "height": 0.8,
        "blocks": true,
        "opaque": false
       },
       {
-       "id": "seat-3",
-       "kind": "seat",
+       "id": "furniture-1",
+       "kind": "furniture",
        "shape": {
-        "rect": [
-         5.45,
-         2.075,
-         0.45,
-         0.45
+        "circle": [
+         4.72,
+         2.2,
+         0.22
         ]
        },
-       "seat": {
-        "area": "outside",
-        "room": "serre"
-       },
-       "style": "chair",
-       "back": "E",
-       "height": 0.9,
+       "style": "low_table",
+       "label": null,
+       "height": 0.45,
        "blocks": true,
        "opaque": false
       },
       {
-       "id": "seat-4",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         4.1,
-         2.075,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "serre"
-       },
-       "style": "chair",
-       "back": "W",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-2",
+       "id": "table-1",
        "kind": "table",
        "shape": {
         "rect": [
@@ -32329,7 +32292,7 @@
        "opaque": false
       },
       {
-       "id": "seat-5",
+       "id": "seat-3",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32350,7 +32313,7 @@
        "opaque": false
       },
       {
-       "id": "seat-6",
+       "id": "seat-4",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32371,7 +32334,7 @@
        "opaque": false
       },
       {
-       "id": "seat-7",
+       "id": "seat-5",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32392,7 +32355,7 @@
        "opaque": false
       },
       {
-       "id": "seat-8",
+       "id": "seat-6",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32413,7 +32376,7 @@
        "opaque": false
       },
       {
-       "id": "table-3",
+       "id": "table-2",
        "kind": "table",
        "shape": {
         "rect": [
@@ -32428,7 +32391,7 @@
        "opaque": false
       },
       {
-       "id": "seat-9",
+       "id": "seat-7",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32449,7 +32412,7 @@
        "opaque": false
       },
       {
-       "id": "seat-10",
+       "id": "seat-8",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32470,7 +32433,7 @@
        "opaque": false
       },
       {
-       "id": "seat-11",
+       "id": "seat-9",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32491,7 +32454,7 @@
        "opaque": false
       },
       {
-       "id": "seat-12",
+       "id": "seat-10",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32512,7 +32475,7 @@
        "opaque": false
       },
       {
-       "id": "table-4",
+       "id": "table-3",
        "kind": "table",
        "shape": {
         "rect": [
@@ -32527,7 +32490,7 @@
        "opaque": false
       },
       {
-       "id": "seat-13",
+       "id": "seat-11",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32548,7 +32511,7 @@
        "opaque": false
       },
       {
-       "id": "seat-14",
+       "id": "seat-12",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32569,7 +32532,7 @@
        "opaque": false
       },
       {
-       "id": "seat-15",
+       "id": "seat-13",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -32590,7 +32553,7 @@
        "opaque": false
       },
       {
-       "id": "seat-16",
+       "id": "seat-14",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33276,7 +33239,7 @@
        "opaque": false
       },
       {
-       "id": "furniture-1",
+       "id": "furniture-2",
        "kind": "furniture",
        "shape": {
         "rect": [
@@ -33313,7 +33276,7 @@
        "opaque": true
       },
       {
-       "id": "furniture-2",
+       "id": "furniture-3",
        "kind": "furniture",
        "shape": {
         "rect": [
@@ -33714,7 +33677,7 @@
        "opaque": true
       },
       {
-       "id": "seat-17",
+       "id": "seat-15",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33735,7 +33698,7 @@
        "opaque": false
       },
       {
-       "id": "table-5",
+       "id": "table-4",
        "kind": "table",
        "shape": {
         "rect": [
@@ -33750,7 +33713,7 @@
        "opaque": false
       },
       {
-       "id": "seat-18",
+       "id": "seat-16",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33771,7 +33734,7 @@
        "opaque": false
       },
       {
-       "id": "seat-19",
+       "id": "seat-17",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33792,7 +33755,7 @@
        "opaque": false
       },
       {
-       "id": "table-6",
+       "id": "table-5",
        "kind": "table",
        "shape": {
         "rect": [
@@ -33807,7 +33770,7 @@
        "opaque": false
       },
       {
-       "id": "seat-20",
+       "id": "seat-18",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33828,7 +33791,7 @@
        "opaque": false
       },
       {
-       "id": "seat-21",
+       "id": "seat-19",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33849,7 +33812,7 @@
        "opaque": false
       },
       {
-       "id": "table-7",
+       "id": "table-6",
        "kind": "table",
        "shape": {
         "rect": [
@@ -33864,7 +33827,7 @@
        "opaque": false
       },
       {
-       "id": "seat-22",
+       "id": "seat-20",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33885,7 +33848,7 @@
        "opaque": false
       },
       {
-       "id": "seat-23",
+       "id": "seat-21",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33906,7 +33869,7 @@
        "opaque": false
       },
       {
-       "id": "table-8",
+       "id": "table-7",
        "kind": "table",
        "shape": {
         "rect": [
@@ -33921,7 +33884,7 @@
        "opaque": false
       },
       {
-       "id": "seat-24",
+       "id": "seat-22",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33942,7 +33905,7 @@
        "opaque": false
       },
       {
-       "id": "seat-25",
+       "id": "seat-23",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33963,7 +33926,7 @@
        "opaque": false
       },
       {
-       "id": "table-9",
+       "id": "table-8",
        "kind": "table",
        "shape": {
         "rect": [
@@ -33978,7 +33941,7 @@
        "opaque": false
       },
       {
-       "id": "seat-26",
+       "id": "seat-24",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -33999,7 +33962,7 @@
        "opaque": false
       },
       {
-       "id": "table-10",
+       "id": "table-9",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34014,7 +33977,7 @@
        "opaque": false
       },
       {
-       "id": "seat-27",
+       "id": "seat-25",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34035,7 +33998,7 @@
        "opaque": false
       },
       {
-       "id": "seat-28",
+       "id": "seat-26",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34056,7 +34019,7 @@
        "opaque": false
       },
       {
-       "id": "seat-29",
+       "id": "seat-27",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34077,7 +34040,7 @@
        "opaque": false
       },
       {
-       "id": "seat-30",
+       "id": "seat-28",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34098,7 +34061,7 @@
        "opaque": false
       },
       {
-       "id": "table-11",
+       "id": "table-10",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34113,7 +34076,7 @@
        "opaque": false
       },
       {
-       "id": "seat-31",
+       "id": "seat-29",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34134,7 +34097,7 @@
        "opaque": false
       },
       {
-       "id": "seat-32",
+       "id": "seat-30",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34155,7 +34118,7 @@
        "opaque": false
       },
       {
-       "id": "seat-33",
+       "id": "seat-31",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34176,7 +34139,7 @@
        "opaque": false
       },
       {
-       "id": "seat-34",
+       "id": "seat-32",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34197,7 +34160,7 @@
        "opaque": false
       },
       {
-       "id": "seat-35",
+       "id": "seat-33",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34218,7 +34181,7 @@
        "opaque": false
       },
       {
-       "id": "table-12",
+       "id": "table-11",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34233,7 +34196,7 @@
        "opaque": false
       },
       {
-       "id": "seat-36",
+       "id": "seat-34",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34254,7 +34217,7 @@
        "opaque": false
       },
       {
-       "id": "seat-37",
+       "id": "seat-35",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34275,7 +34238,7 @@
        "opaque": false
       },
       {
-       "id": "table-13",
+       "id": "table-12",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34290,7 +34253,7 @@
        "opaque": false
       },
       {
-       "id": "seat-38",
+       "id": "seat-36",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34311,7 +34274,7 @@
        "opaque": false
       },
       {
-       "id": "seat-39",
+       "id": "seat-37",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34332,7 +34295,7 @@
        "opaque": false
       },
       {
-       "id": "table-14",
+       "id": "table-13",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34347,7 +34310,7 @@
        "opaque": false
       },
       {
-       "id": "seat-40",
+       "id": "seat-38",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34368,7 +34331,7 @@
        "opaque": false
       },
       {
-       "id": "table-15",
+       "id": "table-14",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34383,7 +34346,7 @@
        "opaque": false
       },
       {
-       "id": "seat-41",
+       "id": "seat-39",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34404,7 +34367,7 @@
        "opaque": false
       },
       {
-       "id": "seat-42",
+       "id": "seat-40",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34425,7 +34388,7 @@
        "opaque": false
       },
       {
-       "id": "seat-43",
+       "id": "seat-41",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34446,7 +34409,7 @@
        "opaque": false
       },
       {
-       "id": "seat-44",
+       "id": "seat-42",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34467,7 +34430,7 @@
        "opaque": false
       },
       {
-       "id": "table-16",
+       "id": "table-15",
        "kind": "table",
        "shape": {
         "rect": [
@@ -34482,7 +34445,7 @@
        "opaque": false
       },
       {
-       "id": "seat-45",
+       "id": "seat-43",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34503,7 +34466,7 @@
        "opaque": false
       },
       {
-       "id": "seat-46",
+       "id": "seat-44",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34524,7 +34487,7 @@
        "opaque": false
       },
       {
-       "id": "seat-47",
+       "id": "seat-45",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34545,7 +34508,7 @@
        "opaque": false
       },
       {
-       "id": "seat-48",
+       "id": "seat-46",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -34562,6 +34525,103 @@
        "style": "chair",
        "back": "W",
        "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "furniture-4",
+       "kind": "furniture",
+       "shape": {
+        "rect": [
+         10.1,
+         14.3,
+         0.35,
+         3.2
+        ]
+       },
+       "style": "shelf_high",
+       "label": "tablette",
+       "height": 1.05,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-47",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         10.65,
+         14.7,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "halle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-48",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         10.65,
+         15.4,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "halle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-49",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         10.65,
+         16.1,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "halle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-50",
+       "kind": "seat",
+       "shape": {
+        "circle": [
+         10.65,
+         16.8,
+         0.2
+        ]
+       },
+       "seat": {
+        "area": "inside",
+        "room": "halle"
+       },
+       "style": "stool",
+       "back": null,
+       "height": 0.75,
        "blocks": true,
        "opaque": false
       },
@@ -34982,7 +35042,7 @@
        "blocks": false
       },
       {
-       "id": "furniture-3",
+       "id": "furniture-5",
        "kind": "furniture",
        "shape": {
         "rect": [
@@ -35161,12 +35221,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.3,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-20",
@@ -35194,12 +35254,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.3,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-21",
@@ -35229,6 +35289,7 @@
        "access": "public",
        "glazed": true,
        "entrance": true,
+       "screen_low": true,
        "label": "entrée",
        "swing": {
         "leaves": 2,
@@ -35267,12 +35328,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.5,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-23",
@@ -35300,12 +35361,12 @@
         ]
        },
        "sill": 0.45,
-       "screen_low": true,
+       "opaque": true,
+       "dressed": true,
        "orient": "h",
        "width": 2.5,
        "height": 2.4,
-       "blocks": true,
-       "opaque": false
+       "blocks": true
       },
       {
        "id": "wall-24",
@@ -35322,7 +35383,7 @@
        "opaque": true
       },
       {
-       "id": "furniture-4",
+       "id": "furniture-6",
        "kind": "furniture",
        "shape": {
         "rect": [
@@ -35339,7 +35400,7 @@
        "opaque": false
       },
       {
-       "id": "seat-49",
+       "id": "seat-51",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -35359,7 +35420,7 @@
        "opaque": false
       },
       {
-       "id": "seat-50",
+       "id": "seat-52",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -35379,7 +35440,7 @@
        "opaque": false
       },
       {
-       "id": "seat-51",
+       "id": "seat-53",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -35399,7 +35460,7 @@
        "opaque": false
       },
       {
-       "id": "seat-52",
+       "id": "seat-54",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -35419,7 +35480,7 @@
        "opaque": false
       },
       {
-       "id": "seat-53",
+       "id": "seat-55",
        "kind": "seat",
        "shape": {
         "circle": [
@@ -35439,7 +35500,7 @@
        "opaque": false
       },
       {
-       "id": "table-17",
+       "id": "table-16",
        "kind": "table",
        "shape": {
         "circle": [
@@ -35454,7 +35515,7 @@
        "opaque": false
       },
       {
-       "id": "seat-54",
+       "id": "seat-56",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -35475,7 +35536,7 @@
        "opaque": false
       },
       {
-       "id": "seat-55",
+       "id": "seat-57",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -35496,7 +35557,7 @@
        "opaque": false
       },
       {
-       "id": "table-18",
+       "id": "table-17",
        "kind": "table",
        "shape": {
         "circle": [
@@ -35511,7 +35572,7 @@
        "opaque": false
       },
       {
-       "id": "seat-56",
+       "id": "seat-58",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -35532,7 +35593,7 @@
        "opaque": false
       },
       {
-       "id": "seat-57",
+       "id": "seat-59",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -35553,68 +35614,11 @@
        "opaque": false
       },
       {
-       "id": "table-19",
+       "id": "table-18",
        "kind": "table",
        "shape": {
         "rect": [
          3.8,
-         26.0,
-         0.9,
-         0.5
-        ]
-       },
-       "height": 0.75,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-58",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         3.8,
-         25.5,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-59",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         4.25,
-         25.5,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "outside",
-        "room": "terrasse"
-       },
-       "style": "chair",
-       "back": "N",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "table-20",
-       "kind": "table",
-       "shape": {
-        "rect": [
-         5.6,
          26.0,
          0.9,
          0.5
@@ -35629,7 +35633,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         5.6,
+         3.8,
          25.5,
          0.45,
          0.45
@@ -35650,7 +35654,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         6.05,
+         4.25,
          25.5,
          0.45,
          0.45
@@ -35667,11 +35671,11 @@
        "opaque": false
       },
       {
-       "id": "table-21",
+       "id": "table-19",
        "kind": "table",
        "shape": {
         "rect": [
-         7.4,
+         5.6,
          26.0,
          0.9,
          0.5
@@ -35686,7 +35690,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.4,
+         5.6,
          25.5,
          0.45,
          0.45
@@ -35707,7 +35711,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.85,
+         6.05,
          25.5,
          0.45,
          0.45
@@ -35724,11 +35728,11 @@
        "opaque": false
       },
       {
-       "id": "table-22",
+       "id": "table-20",
        "kind": "table",
        "shape": {
         "rect": [
-         11.2,
+         7.4,
          26.0,
          0.9,
          0.5
@@ -35743,7 +35747,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         11.2,
+         7.4,
          25.5,
          0.45,
          0.45
@@ -35764,7 +35768,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         11.65,
+         7.85,
          25.5,
          0.45,
          0.45
@@ -35781,11 +35785,11 @@
        "opaque": false
       },
       {
-       "id": "table-23",
+       "id": "table-21",
        "kind": "table",
        "shape": {
         "rect": [
-         13.0,
+         11.2,
          26.0,
          0.9,
          0.5
@@ -35800,7 +35804,7 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         13.0,
+         11.2,
          25.5,
          0.45,
          0.45
@@ -35821,6 +35825,63 @@
        "kind": "seat",
        "shape": {
         "rect": [
+         11.65,
+         25.5,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-22",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         13.0,
+         26.0,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-68",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         13.0,
+         25.5,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-69",
+       "kind": "seat",
+       "shape": {
+        "rect": [
          13.45,
          25.5,
          0.45,
@@ -35838,7 +35899,7 @@
        "opaque": false
       },
       {
-       "id": "table-24",
+       "id": "table-23",
        "kind": "table",
        "shape": {
         "rect": [
@@ -35853,7 +35914,7 @@
        "opaque": false
       },
       {
-       "id": "seat-68",
+       "id": "seat-70",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -35874,7 +35935,7 @@
        "opaque": false
       },
       {
-       "id": "seat-69",
+       "id": "seat-71",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -35912,12 +35973,12 @@
        "opaque": false
       },
       {
-       "id": "furniture-5",
+       "id": "furniture-7",
        "kind": "furniture",
        "shape": {
         "rect": [
-         8.5,
-         25.6,
+         8.55,
+         28.75,
          0.3,
          0.5
         ]
@@ -37480,7 +37541,7 @@
          0.55
         ]
        },
-       "label": "évier, thés",
+       "label": "évier",
        "style": "tea",
        "height": 0.9,
        "post": "office",
@@ -37523,6 +37584,10 @@
        "post": "monte-plats de l'étage",
        "reason": null,
        "fixed": true,
+       "label_at": [
+        7.72,
+        20.75
+       ],
        "blocks": true,
        "opaque": false
       },
@@ -37537,7 +37602,7 @@
          0.55
         ]
        },
-       "label": "frigo, desserts",
+       "label": "frigo",
        "style": "fridge",
        "height": 0.9,
        "post": "frigo de l'étage",
@@ -37590,7 +37655,7 @@
        "shape": {
         "rect": [
          3.5,
-         22.2,
+         22.4,
          0.55,
          0.6
         ]
@@ -37611,7 +37676,7 @@
        "shape": {
         "rect": [
          4.1,
-         22.2,
+         22.4,
          0.6,
          0.6
         ]
@@ -37626,7 +37691,7 @@
        "shape": {
         "rect": [
          4.75,
-         22.275,
+         22.475,
          0.45,
          0.45
         ]
@@ -37647,7 +37712,7 @@
        "shape": {
         "rect": [
          3.5,
-         23.8,
+         24.0,
          0.55,
          0.6
         ]
@@ -37668,7 +37733,7 @@
        "shape": {
         "rect": [
          4.1,
-         23.8,
+         24.0,
          0.6,
          0.6
         ]
@@ -37683,7 +37748,7 @@
        "shape": {
         "rect": [
          4.75,
-         23.875,
+         24.075,
          0.45,
          0.45
         ]
@@ -37703,8 +37768,8 @@
        "kind": "table",
        "shape": {
         "rect": [
-         6.3,
-         22.0,
+         6.6,
+         22.6,
          0.8,
          0.8
         ]
@@ -37718,8 +37783,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         6.475,
-         21.5,
+         6.775,
+         22.1,
          0.45,
          0.45
         ]
@@ -37739,8 +37804,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         6.475,
-         22.85,
+         6.775,
+         23.45,
          0.45,
          0.45
         ]
@@ -37760,8 +37825,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         7.15,
-         22.175,
+         7.45,
+         22.775,
          0.45,
          0.45
         ]
@@ -37781,8 +37846,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         5.8,
-         22.175,
+         6.1,
+         22.775,
          0.45,
          0.45
         ]
@@ -37801,14 +37866,14 @@
        "id": "table-4",
        "kind": "table",
        "shape": {
-        "rect": [
-         6.3,
-         24.05,
-         0.8,
-         0.8
+        "circle": [
+         6.9,
+         24.65,
+         0.3
         ]
        },
        "height": 0.75,
+       "round": true,
        "blocks": true,
        "opaque": false
       },
@@ -37817,8 +37882,8 @@
        "kind": "seat",
        "shape": {
         "rect": [
-         5.8,
-         24.225,
+         6.1,
+         24.425,
          0.45,
          0.45
         ]
@@ -37835,27 +37900,6 @@
       },
       {
        "id": "seat-10",
-       "kind": "seat",
-       "shape": {
-        "rect": [
-         7.15,
-         24.225,
-         0.45,
-         0.45
-        ]
-       },
-       "seat": {
-        "area": "inside",
-        "room": "grand salon"
-       },
-       "style": "chair",
-       "back": "E",
-       "height": 0.9,
-       "blocks": true,
-       "opaque": false
-      },
-      {
-       "id": "seat-11",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -37876,7 +37920,7 @@
        "opaque": false
       },
       {
-       "id": "seat-12",
+       "id": "seat-11",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -37897,7 +37941,7 @@
        "opaque": false
       },
       {
-       "id": "seat-13",
+       "id": "seat-12",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -37918,7 +37962,7 @@
        "opaque": false
       },
       {
-       "id": "seat-14",
+       "id": "seat-13",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -37970,7 +38014,7 @@
        "opaque": false
       },
       {
-       "id": "seat-15",
+       "id": "seat-14",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -37991,7 +38035,7 @@
        "opaque": false
       },
       {
-       "id": "seat-16",
+       "id": "seat-15",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -38027,7 +38071,7 @@
        "opaque": false
       },
       {
-       "id": "seat-17",
+       "id": "seat-16",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -38048,7 +38092,7 @@
        "opaque": false
       },
       {
-       "id": "seat-18",
+       "id": "seat-17",
        "kind": "seat",
        "shape": {
         "rect": [
@@ -38101,13 +38145,13 @@
        "kind": "keep_clear",
        "shape": {
         "rect": [
-         8.0,
+         3.5,
          21.1,
-         1.4,
-         1.3
+         5.9,
+         1.0
         ]
        },
-       "label": "portes"
+       "label": "passage"
       },
       {
        "id": "zone-free-2",
@@ -38314,7 +38358,7 @@
       },
       {
        "pos": [
-        7.7,
+        6.6,
         20.75
        ],
        "text": "office",

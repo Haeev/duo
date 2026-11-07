@@ -313,6 +313,26 @@
       "id": "glass_tint",
       "hex": "#DCE6E4",
       "fr": "voile des vitres"
+    },
+    {
+      "id": "presses_coat",
+      "hex": "#A6927A",
+      "fr": "manteau mastic"
+    },
+    {
+      "id": "presses_charcoal",
+      "hex": "#4E5258",
+      "fr": "anthracite"
+    },
+    {
+      "id": "presses_navy",
+      "hex": "#3E4A66",
+      "fr": "marine"
+    },
+    {
+      "id": "presses_bag",
+      "hex": "#8A5A38",
+      "fr": "sacoche cognac"
     }
   ]
 }

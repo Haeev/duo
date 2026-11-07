@@ -209,6 +209,9 @@ me.polygons.foreach_set("use_smooth", [True] * len(me.polygons))
 # --- 6. Occlusion cuite, export et rapport ---------------------------------------------------------
 
 ao_note = "non cuite"
+# Couleurs de sommets d'origine (une sortie déjà conformée en porte): remplacées par l'occlusion.
+for old_attr in list(me.color_attributes):
+    me.color_attributes.remove(old_attr)
 if conf.get("bake_ao", True):
     attr = me.color_attributes.new("Color", "BYTE_COLOR", "CORNER")
     me.color_attributes.active_color = attr
@@ -254,6 +257,7 @@ bpy.ops.export_scene.gltf(
     export_apply=True,
     export_animations=False,
     export_vertex_color="ACTIVE",
+    export_all_vertex_colors=False,
     export_image_format="AUTO",
     export_materials="EXPORT",
 )

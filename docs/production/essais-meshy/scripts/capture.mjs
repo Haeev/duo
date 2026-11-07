@@ -7,7 +7,11 @@
 //   <dossier de three>: le paquet three@0.187.0 (dossier qui contient build/ et examples/)
 //   config.json: { width, height, fov, eye: [x,y,z], target: [x,y,z], counter: bool,
 //                  marker: [x,z], models: [{ file (relatif à config.json), position: [x,y,z],
-//                  rotationY (degrés), clip (nom ou null), time (s) }] }
+//                  rotationY (degrés), clip (nom ou null), time (s) }], orbit: bool }
+//   orbit: true remplace la vue subjective par une planche de quatre vues rapprochées (azimuts 45,
+//   135, 225 et 315 degrés, élévation 25 degrés) autour du premier modèle, repère de 1,80 m à côté,
+//   écrite en couleur dans <sortie.png> et en gris dans <sortie>-gris.png (règle 6 de la bible,
+//   section 13.3).
 import { createServer } from "node:http";
 import { readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
@@ -137,12 +141,48 @@ renderer.info.reset();
 renderer.render(scene, camera);
 let decorTriangles = 0, decorCalls = 0;
 decor.traverse((o) => { if (o.isMesh) { decorCalls += 1; decorTriangles += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; } });
-window.__result = {
-  frame: { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls, programs: renderer.info.programs.length, textures: renderer.info.memory.textures, geometries: renderer.info.memory.geometries },
-  decor: { triangles: decorTriangles, calls: decorCalls },
-  models: perModel,
-  png: renderer.domElement.toDataURL("image/png"),
-};
+const frame = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls, programs: renderer.info.programs.length, textures: renderer.info.memory.textures, geometries: renderer.info.memory.geometries };
+let png = renderer.domElement.toDataURL("image/png");
+let gray = null;
+if (cfg.orbit) {
+  // Quatre vues rapprochées autour du premier modèle, repère posé à côté, sur un fond neutre.
+  const root = scene.children[scene.children.length - cfg.models.length];
+  const box = new THREE.Box3().setFromObject(root);
+  marker.position.set(box.max.x + 0.2, box.min.y, (box.min.z + box.max.z) / 2);
+  floor.position.y = box.min.y;
+  floor.material.color.set("#8f877b");
+  wall.visible = false;
+  scene.background = new THREE.Color("#d9d2c5");
+  // Cadrage sur le modèle et le repère ensemble: le repère entier reste dans chaque vue.
+  box.union(new THREE.Box3().setFromObject(marker));
+  const center = box.getCenter(new THREE.Vector3());
+  const radius = box.getBoundingSphere(new THREE.Sphere()).radius;
+  const w = cfg.width / 2, h = cfg.height / 2;
+  const sheet = document.createElement("canvas");
+  sheet.width = cfg.width;
+  sheet.height = cfg.height;
+  const ctx = sheet.getContext("2d");
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  const dist = radius / Math.sin(THREE.MathUtils.degToRad(cfg.fov / 2)) * 1.05;
+  [45, 135, 225, 315].forEach((az, i) => {
+    const a = THREE.MathUtils.degToRad(az), e = THREE.MathUtils.degToRad(25);
+    camera.position.set(center.x + dist * Math.cos(e) * Math.sin(a), center.y + dist * Math.sin(e), center.z + dist * Math.cos(e) * Math.cos(a));
+    camera.lookAt(center);
+    camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+    ctx.drawImage(renderer.domElement, (i % 2) * w, Math.floor(i / 2) * h);
+  });
+  png = sheet.toDataURL("image/png");
+  const grayCanvas = document.createElement("canvas");
+  grayCanvas.width = cfg.width;
+  grayCanvas.height = cfg.height;
+  const gctx = grayCanvas.getContext("2d");
+  gctx.filter = "grayscale(1)";
+  gctx.drawImage(sheet, 0, 0);
+  gray = grayCanvas.toDataURL("image/png");
+}
+window.__result = { frame, decor: { triangles: decorTriangles, calls: decorCalls }, models: perModel, png, gray };
 </script></body></html>`;
 
 const types = { ".js": "text/javascript", ".glb": "model/gltf-binary", ".html": "text/html" };
@@ -183,7 +223,9 @@ try {
   await tab.waitForFunction(() => window.__result !== undefined || false, null, { timeout: 180_000 });
   const result = await tab.evaluate(() => window.__result);
   writeFileSync(outPng, Buffer.from(result.png.split(",")[1], "base64"));
+  if (result.gray) writeFileSync(outPng.replace(/\.png$/, "-gris.png"), Buffer.from(result.gray.split(",")[1], "base64"));
   delete result.png;
+  delete result.gray;
   result.models = result.models.map((m, i) => ({ file: models[i].file.split("/").pop(), fileBytes: models[i].bytes, ...m }));
   result.viewport = [config.width, config.height];
   result.fovVertical = config.fov;

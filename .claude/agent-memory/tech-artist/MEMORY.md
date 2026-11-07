@@ -76,3 +76,22 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Vue de la messe (zoom 2, 11 h): 319 000 triangles et 174 appels avant contour, dont 60 000 pour les personnages et autant dans l'ombre: le contour de tout le monde (+60 000) dépasserait 350 000, d'où le plafond en triangles de coque.
 
 - `simplifyPath` (simulation) rend des points de passage espacés: pour vérifier qu'un trajet suit une ligne, l'échantillonner tous les 10 cm le long des segments.
+
+## Meshy (vérifié le 2026-11-07, fiche `docs/production/meshy.md`)
+
+- Les membres n'ont pas les outils `mcp__meshy__*` (fiche: `disallowedTools: mcp__*`): passer par `docs/production/essais-meshy/scripts/meshy-mcp.mjs` (serveur 0.6.9 par stdio, `MESHY_API_KEY=proxy-injected`, journal JSONL des appels). Dossier de travail hors du dépôt: le serveur y écrit `meshy_output/` et y charge un `.env` s'il en trouve un.
+- Réseau: `api.meshy.ai` ouvert, clé injectée par le proxy; `assets.meshy.ai` (tous les fichiers produits), `cdn.meshy.ai`, `docs.meshy.ai`, `help.meshy.ai` refusés (403 au CONNECT). Vérifier l'hôte des fichiers sur une tâche existante (lecture gratuite) avant de dépenser des crédits.
+- Fichiers effacés 72 h après la fin d'une tâche (`expires_at`). L'état d'une tâche en topologie intelligente ne donne ni faces ni dimensions: mesurer sur le fichier. Aperçu de texte vers 3D: jamais de texture. Image vers 3D avec `meshy-n1`: `texture_0.png`, couleur de base seule.
+- Le rig accepte un aperçu sans texture (6,5 s, 5 crédits) et rend marche et course en GLB, FBX et squelette seul (`_armature.glb`). `meshy_list_usage` refusé (offre ni Studio ni Enterprise): suivre les crédits par le solde et `consumed_credits`.
+- Couleur de palette tirée d'une texture générée: choisir face par face suit l'éclairage peint (groupes zébrés, 14,5 % de la surface de la doublure); vote à l'aire par pièce, CIEDE2000 avec `kL` = 2 (`meshy_commun.py`, vérifié sur six paires de Sharma 2005).
+- Palette à cases: la bible insère des couleurs au milieu de ses listes; garder les cases fixes (`exporter-palette.mjs`: ajout en fin, couleur retirée marquée), sinon tous les UV pointent la mauvaise case.
+
+## Blender 5.2 et glTF (vérifié le 2026-11-07)
+
+- bmesh: après `delete` ou `triangulate`, les `f.index` sont faux tant qu'on n'appelle pas `bm.faces.index_update()` (`ensure_lookup_table` ne suffit pas). Un dictionnaire indexé par `f.index` se corrompt sans bruit.
+- `Image.pixels` d'une image 8 bits: valeurs telles qu'enregistrées (sRGB, de 0 à 1), rangées de bas en haut, cohérentes avec les UV de Blender (`data[int(v*h), int(u*w)]`).
+- L'import glTF d'un personnage ajoute un objet `Icosphere` (forme des os) dans la scène: filtrer les maillages qui ont un modificateur Armature.
+- Export glTF: `export_all_vertex_colors` vaut vrai par défaut et sort chaque attribut de couleur (COLOR_0, COLOR_1...): le mettre à faux et retirer les anciens attributs avant d'en cuire un.
+- Faces retournées d'une sortie générée: `bmesh.ops.recalc_face_normals`, et compter les retournées par le signe du produit scalaire avant et après.
+- Pièces qui flottent: `BVHTree.overlap` entre pièces (une pièce enfoncée dans une autre ne flotte pas), puis distance au plus proche; seuil de 2 mm.
+- Capture Three.js d'un personnage: `renderer.info.memory.textures` compte aussi la texture des os et celle des cibles de morphose.

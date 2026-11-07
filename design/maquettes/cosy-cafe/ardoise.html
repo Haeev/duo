@@ -64,6 +64,7 @@
   .planche__resume { border-top: 2px solid #63676b; padding-top: 0.5rem; font-size: 0.9375rem; color: var(--craie); }
   .planche__vide { border: 2px dashed var(--craie-2); border-radius: 0.6rem; padding: 0.9rem; display: grid; gap: 0.35rem; }
   .planche__plein { border: 3px solid var(--craie); border-radius: 0.6rem; padding: 0.5rem 0.7rem; font-weight: 600; }
+  .proposee { flex-basis: 100%; display: flex; gap: 0.4rem; align-items: center; font-size: 0.9375rem; border: 2px dashed var(--trait); border-radius: 0.5rem; padding: 0.2rem 0.6rem; }
   .partenaire { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9375rem; border: 2px solid var(--encre); border-radius: 999px; padding: 0.1rem 0.7rem 0.1rem 0.25rem; }
 </style>
 </head>
@@ -76,8 +77,9 @@
   <header class="ardoise-ecran__tete">
     <h1 id="titre-ardoise">L’ardoise</h1>
     <p class="aide" data-si="composer vide pleine ensemble">La carte du jour : ce que vous proposez, et à quel prix. Les vedettes et le mot du jour s’affichent aussi sur l’ardoise de trottoir.</p>
-    <p class="aide" data-si="service">Le café est ouvert : tu peux seulement marquer une ligne épuisée, ou la remettre.</p>
+    <p class="aide" data-si="service">Le café est ouvert : l’ardoise se retouche après la fermeture. Une recette en rupture se grise toute seule.</p>
     <p class="partenaire" data-si="ensemble"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha écrit aussi sur l’ardoise</p>
+    <p class="proposee" data-si="composer ensemble"><span class="icone" data-icone="tablette"></span>Proposée par la tablette ce matin, d’après votre stock et la météo. Retouche-la si tu veux.</p>
   </header>
 
   <div class="ardoise-ecran__corps">
@@ -196,13 +198,13 @@
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
 
-      <!-- Pendant le service: seulement « épuisé » -->
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Café crème</p><span class="prix"><output>2,40 €</output></span><span></span><button class="bouton bouton--petit" data-focus data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Cappuccino</p><span class="prix"><output>3,00 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Chocolat chaud</p><span class="prix"><output>3,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Thé vert</p><span class="prix"><output>2,60 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Croissant</p><span class="prix"><output>1,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise ligne-ardoise--epuise" data-si="service"><p class="ligne-ardoise__nom">Tarte aux fruits de saison</p><span class="prix"><output>3,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="true">Épuisé : remettre</button><p class="ligne-ardoise__avis">Épuisé depuis 11 h 05</p></div>
+      <!-- Pendant le service: lecture seule, ruptures automatiques -->
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Café crème</p><span class="prix"><output>2,40 €</output></span></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Cappuccino</p><span class="prix"><output>3,00 €</output></span></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Chocolat chaud</p><span class="prix"><output>3,20 €</output></span></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Thé vert</p><span class="prix"><output>2,60 €</output></span></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Croissant</p><span class="prix"><output>1,20 €</output></span></div>
+      <div class="ligne-ardoise ligne-ardoise--epuise" data-si="service"><p class="ligne-ardoise__nom">Tarte aux fruits de saison</p><span class="prix"><output>3,20 €</output></span><button class="bouton bouton--petit" data-focus data-aller="tablette.html#commandes">Dépanner sur la tablette</button><p class="ligne-ardoise__avis">Épuisé depuis 11 h 05 : la vitrine est vide</p></div>
 
       <p class="planche__resume" data-si="composer ensemble pleine service">Ce que dit votre ardoise : boissons chaudes et douceurs du matin. Elle attire surtout les flâneurs et les pressés.</p>
     </section>
@@ -242,14 +244,6 @@
     if (!action) return;
     if (action.dataset.action === 'ecrire') Maquette.note('La recette s’écrit à la craie, au prix conseillé. Sacha la voit apparaître.');
     if (action.dataset.action === 'effacer') Maquette.note('Ligne effacée. La recette reste dans « Vos recettes ».');
-  });
-  document.addEventListener('bascule', (e) => {
-    const b = e.target;
-    if (/puis/.test(b.textContent)) {
-      const epuise = b.getAttribute('aria-pressed') === 'true';
-      b.textContent = epuise ? 'Épuisé : remettre' : 'Marquer épuisé';
-      b.closest('.ligne-ardoise').classList.toggle('ligne-ardoise--epuise', epuise);
-    }
   });
 </script>
 </body>

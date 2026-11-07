@@ -35,8 +35,8 @@
   <!-- Haut gauche: le temps et ton travail (horloge, minuteries, tes tickets) -->
   <div class="hud-haut-gauche">
     <div class="horloge carte-hud" data-si="service rail caisse tasses geste geste-simplifie proposition proposition-ouverte envoyee">
-      <p class="horloge__heure"><span class="icone" data-icone="horloge"></span><span class="chiffre">11 h 20</span></p>
-      <p class="horloge__moment">Service · fermeture à 18 h</p>
+      <p class="horloge__heure"><span class="icone" data-icone="horloge"></span><span class="chiffre">11 h 20</span><span class="icone" data-icone="soleil" role="img" aria-label="soleil"></span></p>
+      <p class="horloge__moment">Mardi · fermeture à 19 h</p>
     </div>
     <div class="horloge horloge--arretee carte-hud" data-si="reprendre">
       <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">11 h 20</span></p>
@@ -46,13 +46,17 @@
       <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">11 h 20</span></p>
       <p class="horloge__moment">L’horloge attend Sacha</p>
     </div>
-    <div class="horloge horloge--arretee carte-hud" data-si="preparation ouverture ouverture-ouverte vide">
-      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">7 h 30</span></p>
-      <p class="horloge__moment">Préparation · l’horloge démarre à l’ouverture</p>
+    <div class="horloge horloge--arretee carte-hud" data-si="preparation ouverture ouverture-ouverte">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">7 h 30</span><span class="icone" data-icone="soleil" role="img" aria-label="soleil"></span></p>
+      <p class="horloge__moment">Mardi · préparation</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="vide">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">8 h 00</span><span class="icone" data-icone="soleil" role="img" aria-label="soleil"></span></p>
+      <p class="horloge__moment">Mardi · préparation</p>
     </div>
     <div class="horloge horloge--arretee carte-hud" data-si="amenagement amenagement-ok amenagement-eau porter">
       <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">7 h 30</span></p>
-      <p class="horloge__moment">Préparation · aménagement</p>
+      <p class="horloge__moment">Mardi · préparation, aménagement</p>
     </div>
     <div class="horloge horloge--arretee carte-hud" data-si="fermeture">
       <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">18 h 10</span></p>
@@ -109,8 +113,8 @@
       <p class="fort">Aménager</p>
       <p class="barre-amenagement__touches">
         <span><kbd>E</kbd><span data-souris="gauche"></span>poser</span>
-        <span><kbd>R</kbd><span data-souris="molette"></span>tourner</span>
-        <span><kbd>X</kbd>ranger dans la réserve</span>
+        <span><kbd>A</kbd><span data-souris="molette"></span>tourner</span>
+        <span><kbd>R</kbd><span data-souris="droit"></span>ranger dans la réserve</span>
         <span><kbd>Retour arrière</kbd>annuler</span>
         <span><kbd>B</kbd>terminer</span>
       </p>
@@ -119,9 +123,9 @@
       <p class="fort">Porter à deux</p>
       <p class="barre-amenagement__touches">
         <span><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd>avancer ensemble</span>
-        <span><kbd>R</kbd><span data-souris="molette"></span>tourner</span>
+        <span><kbd>A</kbd><span data-souris="molette"></span>tourner</span>
         <span><kbd>E</kbd><span data-souris="gauche"></span>poser</span>
-        <span><kbd>Retour arrière</kbd>lâcher ton côté</span>
+        <span><kbd>R</kbd><span data-souris="droit"></span>lâcher ton côté</span>
       </p>
     </div>
   </div>
@@ -182,12 +186,13 @@
       <p class="proposition__aide"><kbd>Entrée</kbd> voir et répondre</p>
     </section>
     <section class="proposition carte-hud interactif" data-si="ouverture" aria-label="Proposition de Sacha">
-      <p class="proposition__titre"><span class="icone" data-icone="bulle"></span>Sacha veut ouvrir le café</p>
+      <p class="proposition__titre"><span class="icone" data-icone="bulle"></span>On ouvre ?</p>
+      <p class="proposition__objet">Sacha a retourné la pancarte.</p>
       <p class="proposition__aide"><kbd>Entrée</kbd> répondre</p>
     </section>
     <section class="proposition proposition--envoyee carte-hud" data-si="envoyee" aria-label="Ta proposition">
       <p class="proposition__titre"><span class="icone" data-icone="sablier"></span>Ta proposition</p>
-      <p class="proposition__objet">Banquette en velours · 260 €</p>
+      <p class="proposition__objet">Banquette en velours · 340 €</p>
       <p class="proposition__aide">En attente de Sacha…</p>
     </section>
   </div>
@@ -221,18 +226,18 @@
     <div class="invite">
       <div class="lecture-ticket carte-hud" data-si="rail">
         <p class="lecture-ticket__tete">Ticket 15 · Table 5 <span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>2 min</span></p>
-        <p>2 chocolats chauds</p><p>1 pain au chocolat</p>
+        <p>2 chocolats chauds, dont 1 au lait d’avoine</p><p>1 pain au chocolat</p>
         <p class="aide">Libre : personne ne le prépare</p>
       </div>
       <p class="invite__ligne capsule" data-si="service proposition envoyee"><kbd>E</kbd><span data-souris="gauche"></span>Servir la table 3</p>
       <p class="invite__detail" data-si="service proposition envoyee">Cappuccino, tarte aux fruits · ticket 12</p>
       <p class="invite__ligne capsule" data-si="rail"><kbd>E</kbd><span data-souris="gauche"></span>Prendre le ticket 15</p>
-      <p class="invite__ligne capsule" data-si="caisse"><kbd>E</kbd><span data-souris="gauche"></span>Encaisser 4,20 €</p>
-      <p class="invite__detail" data-si="caisse">Cappuccino, croissant · le ticket part au rail</p>
+      <p class="invite__ligne capsule" data-si="caisse"><kbd>E</kbd><span data-souris="gauche"></span>Prendre la commande</p>
+      <p class="invite__detail" data-si="caisse">Cappuccino, croissant · 4,20 € · le ticket part au rail</p>
       <p class="invite__ligne capsule" data-si="preparation">Maintiens <kbd>E</kbd><span data-souris="gauche"></span>Retourner la pancarte : ouvrir</p>
-      <p class="invite__detail" data-si="preparation">Côté rue : fermé · Sacha recevra ta proposition d’ouvrir</p>
-      <p class="invite__ligne capsule" data-si="fermeture">Maintiens <kbd>E</kbd><span data-souris="gauche"></span>Fermer à clé : finir la journée</p>
-      <p class="invite__detail" data-si="fermeture">Sacha recevra ta proposition · les rangements peuvent attendre demain</p>
+      <p class="invite__detail" data-si="preparation">Côté rue : fermé · Sacha verra « On ouvre ? »</p>
+      <p class="invite__ligne capsule" data-si="fermeture">Maintiens <kbd>E</kbd><span data-souris="gauche"></span>À demain</p>
+      <p class="invite__detail" data-si="fermeture">La journée finit quand vous avez dit « À demain » tous les deux.</p>
       <p class="invite__ligne capsule invite__refus" data-si="tasses"><span class="icone" data-icone="info"></span>Plus de tasse propre ici</p>
       <p class="invite__detail" data-si="tasses">Il y en a dans le lave-vaisselle, à la plonge.</p>
       <p class="invite__ligne capsule" data-si="geste">Relâche <kbd>E</kbd> dans la zone : 58 à 65 °C</p>
@@ -304,10 +309,10 @@
 </section>
 <section class="interface fenetre-jeu" data-si="ouverture-ouverte" data-panneau-jeu data-piege data-nav role="dialog" aria-modal="true" aria-labelledby="titre-ouverture">
   <p class="surtitre">Proposition de Sacha</p>
-  <h2 id="titre-ouverture">Sacha veut ouvrir le café</h2>
-  <p>L’horloge démarre et les premiers clients arrivent dès que la pancarte est retournée.</p>
+  <h2 id="titre-ouverture">On ouvre ?</h2>
+  <p>Sacha a retourné la pancarte. L’horloge démarre et les premiers clients arrivent dès que vous l’avez retournée tous les deux.</p>
   <div class="rangee">
-    <button class="bouton bouton--principal" data-focus data-action="ouvrir"><span class="icone" data-icone="coche"></span>On ouvre !</button>
+    <button class="bouton bouton--principal" data-focus data-action="ouvrir"><span class="icone" data-icone="coche"></span>Oui, on ouvre</button>
     <button class="bouton" data-action="attendre">Pas encore</button>
   </div>
   <p class="aide"><kbd>Retour arrière</kbd> répondre plus tard.</p>
@@ -369,7 +374,7 @@
       if (a === 'accepter') { Maquette.aller('service'); Maquette.note('D’accord ! Machine à espresso deux groupes achetée : livrée demain à 7 h.'); }
       if (a === 'refuser') { Maquette.aller('service'); Maquette.note('Chez Sacha : « Camille préfère attendre : rien n’a été dépensé. »'); }
       if (a === 'ouvrir') { Maquette.aller('service'); Maquette.note('La pancarte se retourne : ouvert. L’horloge tourne.'); }
-      if (a === 'attendre') { Maquette.aller('ouverture'); Maquette.note('Chez Sacha : « Camille demande d’attendre un peu. »'); }
+      if (a === 'attendre') { Maquette.aller('ouverture'); Maquette.note('Chez Sacha : « Camille dit : pas encore. »'); }
       return;
     }
     if (etat() === 'reprendre') {

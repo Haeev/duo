@@ -82,7 +82,7 @@
     }
   ],
   "ambient_occlusion": "cuite (Cycles, 64 échantillons), ramenée à [0.55, 1]",
-  "file_bytes": 82660,
+  "file_bytes": 82688,
   "part_details": [
     {
       "part": 0,

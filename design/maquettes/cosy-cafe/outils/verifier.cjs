@@ -408,11 +408,11 @@ async function parcours(navigateur, largeur, hauteur) {
   await touche(page, 'Enter');
   await touche(page, 'Enter');
   f = await focusInfo(page);
-  verifier(await etat(page) === 'bilan.html#demain' && f.nom === 'Fermer le bilan', 'Entrée, Entrée : dernière page, focus sur « Fermer le bilan »', f.nom);
+  verifier(await etat(page) === 'bilan.html#demain' && f.nom === 'À demain', 'Entrée, Entrée : dernière page, focus sur « À demain »', f.nom);
   await touche(page, 'ArrowRight');
   verifier(await etat(page) === 'bilan.html#demain', 'pas de page après la dernière', await etat(page));
   await touche(page, 'Backspace');
-  verifier(await etat(page) === 'hud.html#fermeture', 'Retour arrière ferme le bilan', await etat(page));
+  verifier(await etat(page) === 'hud.html#fermeture', 'Retour arrière : « Encore un instant », retour au café', await etat(page));
 
   verifier(erreurs.length === 0, 'aucune erreur de script', erreurs.join(' | '));
   await contexte.close();
