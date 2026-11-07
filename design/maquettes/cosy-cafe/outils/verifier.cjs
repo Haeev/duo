@@ -15,7 +15,7 @@ const path = require('path');
 
 const ICI = path.join(__dirname, '..');
 const ETATS = {
-  'hud.html': ['service', 'rail', 'caisse', 'preparation', 'ouverture', 'ouverture-ouverte', 'fermeture', 'vide', 'tasses', 'geste', 'geste-simplifie', 'proposition', 'proposition-ouverte', 'envoyee', 'reprendre', 'amenagement', 'amenagement-ok', 'amenagement-eau', 'porter'],
+  'hud.html': ['service', 'rail', 'caisse', 'preparation', 'ouverture', 'ouverture-ouverte', 'fermeture', 'vide', 'tasses', 'geste', 'geste-simplifie', 'proposition', 'proposition-ouverte', 'envoyee', 'reprendre', 'absence', 'amenagement', 'amenagement-ok', 'amenagement-eau', 'porter'],
   'tablette.html': ['accueil', 'commandes', 'commandes-envoyee', 'catalogue', 'catalogue-proposer', 'catalogue-attente', 'carte', 'equipe', 'cafes', 'bilans', 'projets', 'reglages'],
   'ardoise.html': ['composer', 'vide', 'pleine', 'ensemble', 'service'],
   'bilan.html': ['livre', 'livre-vide', 'premier', 'appris', 'chiffres', 'plusieurs', 'demain']
@@ -28,6 +28,7 @@ const AFFICHAGES = [
   [1280, 720, 100, '1080p réglé à 150 % dans Windows'],
   [1366, 689, 100, '1366x768 en fenêtre agrandie'],
   [1093, 615, 100, '1366x768 à 125 % dans Windows'],
+  [911, 512, 100, '1366x768 à 150 % dans Windows (technique.md, 2.4)'],
   [1366, 768, 125, '1366x768, interface à 125 %'],
   [1366, 768, 150, '1366x768, interface à 150 %'],
   [1280, 720, 150, '1280x720, interface à 150 %'],
@@ -146,6 +147,19 @@ function analyser() {
       pireTexte = decrire(el);
     }
   }
+
+  // Texte indicatif des champs.
+  document.querySelectorAll('input[placeholder]').forEach((el) => {
+    if (!visible(el) || el.value) return;
+    const f = fond(el);
+    if (!f) return;
+    const ratio = rapport(couleur(getComputedStyle(el, '::placeholder').color), f);
+    if (ratio < 4.5) problemes.push(`texte indicatif ${ratio.toFixed(2)}:1 : ${decrire(el)}`);
+    if (ratio < minTexte) {
+      minTexte = ratio;
+      pireTexte = `${decrire(el)} (indicatif)`;
+    }
+  });
 
   // Boîtes qui laissent déborder leur contenu (boutons, cartes, capsules, lignes).
   document.querySelectorAll('.bouton, .carte, .carte-hud, .capsule, .puce, .recette, .ligne-ardoise, .mot, .projet, .verrou, .onglet').forEach((el) => {
@@ -351,7 +365,7 @@ async function parcours(navigateur, largeur, hauteur) {
   // 5. Ardoise: écrire, changer un prix, pause, Tab qui boucle, fermeture.
   await ouvrir(page, 'ardoise.html', 'vide');
   f = await focusInfo(page);
-  verifier(f.nom === 'Écrire' && f.visible, 'ardoise vide : focus sur « Écrire » (grand crème)', f.nom);
+  verifier(f.nom === 'Écrire' && f.visible, 'ardoise vide : focus sur « Écrire » (café crème)', f.nom);
   await touche(page, 'ArrowDown');
   const ligne = await page.evaluate(() => document.activeElement.closest('.recette').querySelector('.recette__nom').textContent);
   verifier(ligne === 'Cappuccino', 'flèche bas : recette suivante', ligne);

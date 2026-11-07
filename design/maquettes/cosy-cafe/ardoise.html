@@ -42,6 +42,12 @@
   }
   .planche__tete { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.3rem 1rem; align-items: baseline; }
   .planche__compte { font-size: 0.9375rem; color: var(--craie-2); }
+  .mot-du-jour { display: grid; gap: 0.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid #63676b; }
+  .mot-du-jour label, .mot-du-jour__titre { font-weight: 700; font-size: 0.9375rem; }
+  .mot-du-jour input { font: inherit; font-size: 1.0625rem; color: var(--craie); background: var(--ardoise-2); border: 2px solid var(--craie); border-radius: 0.4rem; padding: 0.35rem 0.6rem; width: 100%; }
+  .mot-du-jour input::placeholder { color: #c8cac4; opacity: 1; }
+  .mot-du-jour__aide { font-size: 0.875rem; color: var(--craie-2); }
+  .mot-du-jour__texte { font-size: 1.0625rem; }
   .ligne-ardoise { display: grid; grid-template-columns: minmax(7rem, 1fr) auto auto auto; gap: 0.2rem 0.6rem; align-items: center; padding: 0.3rem 0; border-bottom: 2px dashed #63676b; }
   .ligne-ardoise__nom { font-size: 1.125rem; font-weight: 700; }
   .ligne-ardoise__avis { grid-column: 1; font-size: 0.875rem; color: var(--craie-2); }
@@ -62,12 +68,12 @@
 <body data-etats="composer vide pleine ensemble service" data-retour="hud.html#preparation">
 
 <div class="scene scene--sombre" aria-hidden="true"><div class="scene__vue" data-scene="salleVersComptoir"></div></div>
-<p class="etiquette-maquette" aria-hidden="true">Maquette basse fidélité · la vue se cadre sur l’ardoise, derrière le comptoir</p>
+<p class="etiquette-maquette" aria-hidden="true">Maquette basse fidélité · l’ardoise s’ouvre par-dessus la vue, qui ne bouge pas</p>
 
 <section class="interface ardoise-ecran" data-panneau-jeu data-nav data-piege aria-labelledby="titre-ardoise">
   <header class="ardoise-ecran__tete">
     <h1 id="titre-ardoise">L’ardoise</h1>
-    <p class="aide" data-si="composer vide pleine ensemble">La carte du jour : ce que vous proposez, et à quel prix. Les vedettes s’affichent aussi sur l’ardoise de trottoir.</p>
+    <p class="aide" data-si="composer vide pleine ensemble">La carte du jour : ce que vous proposez, et à quel prix. Les vedettes et le mot du jour s’affichent aussi sur l’ardoise de trottoir.</p>
     <p class="aide" data-si="service">Le café est ouvert : tu peux seulement marquer une ligne épuisée, ou la remettre.</p>
     <p class="partenaire" data-si="ensemble"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha écrit aussi sur l’ardoise</p>
   </header>
@@ -77,25 +83,27 @@
       <h2 id="titre-recettes">Vos recettes</h2>
       <div class="famille">
         <h3>Boissons chaudes</h3>
-        <div class="recette"><p class="recette__nom">Grand crème</p><p class="recette__detail">conseillé 2,40 € · attire : pressés, flâneurs</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-focus data-action="ecrire">Écrire</button></div>
-        <div class="recette"><p class="recette__nom">Cappuccino</p><p class="recette__detail">conseillé 3,00 € · attire : flâneurs, étudiants</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
-        <div class="recette"><p class="recette__nom">Chocolat chaud</p><p class="recette__detail">conseillé 2,60 € · attire : familles, gourmands</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
-        <div class="recette"><p class="recette__nom">Thé vert</p><p class="recette__detail">conseillé 2,50 € · attire : flâneurs, télétravail</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
-        <div class="recette"><p class="recette__nom">Infusion verveine</p><p class="recette__detail">conseillé 2,20 € · attire : flâneurs, familles</p><button class="bouton bouton--petit" data-si="composer ensemble" data-focus="4" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Café crème</p><p class="recette__detail">conseillé 2,40 € · attire : pressés, flâneurs</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-focus data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Cappuccino</p><p class="recette__detail">conseillé 2,90 € · attire : flâneurs, étudiants</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Chocolat chaud</p><p class="recette__detail">conseillé 2,80 € · attire : familles, gourmands</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Thé vert</p><p class="recette__detail">conseillé 2,60 € · attire : flâneurs, télétravail</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Infusion du jardin de Simone</p><p class="recette__detail">conseillé 2,40 € · attire : flâneurs, familles</p><button class="bouton bouton--petit" data-si="composer ensemble" data-focus="4" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Thé noir</p><p class="recette__detail">conseillé 2,50 € · attire : pressés, télétravail</p><button class="bouton bouton--petit" data-si="composer ensemble vide" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine">Ardoise pleine</p></div>
       </div>
       <div class="famille">
         <h3>Boisson froide</h3>
-        <div class="recette"><p class="recette__nom">Citronnade maison</p><p class="recette__detail">conseillé 2,80 € · attire : promeneurs, familles · meilleure l’été</p><button class="bouton bouton--petit" data-si="composer ensemble vide" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p></div>
+        <div class="recette"><p class="recette__nom">Citronnade maison</p><p class="recette__detail">à apprendre : Bastien a une idée pour l’été</p><button class="bouton bouton--petit" aria-disabled="true">Pas encore apprise</button></div>
       </div>
       <div class="famille">
         <h3>Sucré</h3>
         <div class="recette"><p class="recette__nom">Croissant</p><p class="recette__detail">du Fournil Morel · conseillé 1,20 € · attire : pressés</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
-        <div class="recette"><p class="recette__nom">Tartelette aux pommes</p><p class="recette__detail">maison · conseillé 3,50 € · attire : gourmands, flâneurs</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
-        <div class="recette"><p class="recette__nom">Brioche maison</p><p class="recette__detail">attire : familles, gourmands</p><button class="bouton bouton--petit" aria-disabled="true">Il faut un four</button></div>
+        <div class="recette"><p class="recette__nom">Tarte aux fruits de saison</p><p class="recette__detail">du Fournil Morel · conseillé 3,20 € · attire : gourmands, flâneurs</p><p class="etat-recette" data-si="composer pleine ensemble"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p><button class="bouton bouton--petit" data-si="vide" data-action="ecrire">Écrire</button></div>
+        <div class="recette"><p class="recette__nom">Pain au chocolat</p><p class="recette__detail">du Fournil Morel · conseillé 1,30 € · attire : pressés, familles</p><button class="bouton bouton--petit" data-si="composer ensemble vide" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine"><span class="icone" data-icone="coche"></span>Sur l’ardoise</p></div>
       </div>
       <div class="famille">
         <h3>Salé</h3>
-        <div class="recette"><p class="recette__nom">Tartine du jour</p><p class="recette__detail">conseillé 4,50 € · attire : promeneurs, télétravail</p><button class="bouton bouton--petit" data-si="composer ensemble vide" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine">Ardoise pleine</p></div>
+        <div class="recette"><p class="recette__nom">Tartine beurre-confiture</p><p class="recette__detail">conseillé 2,20 € · attire : promeneurs, familles</p><button class="bouton bouton--petit" data-si="composer ensemble vide" data-action="ecrire">Écrire</button><p class="etat-recette" data-si="pleine">Ardoise pleine</p></div>
+        <div class="recette"><p class="recette__nom">Croque-monsieur</p><p class="recette__detail">attire : promeneurs, télétravail</p><button class="bouton bouton--petit" aria-disabled="true">Il faut un four</button></div>
       </div>
     </section>
 
@@ -107,6 +115,16 @@
         <p class="planche__compte" data-si="vide">0 ligne sur 8</p>
       </div>
 
+      <div class="mot-du-jour" data-si="composer pleine ensemble vide">
+        <label for="mot-du-jour">Mot du jour</label>
+        <input type="text" id="mot-du-jour" maxlength="40" value="Bienvenue aux randonneurs !" placeholder="Un petit mot pour la rue, si tu veux">
+        <p class="mot-du-jour__aide">Facultatif, 40 caractères au plus. Il s’écrit aussi sur l’ardoise de trottoir.</p>
+      </div>
+      <div class="mot-du-jour" data-si="service">
+        <p class="mot-du-jour__titre">Mot du jour</p>
+        <p class="mot-du-jour__texte">Bienvenue aux randonneurs !</p>
+      </div>
+
       <div class="planche__vide" data-si="vide">
         <p class="fort">L’ardoise est vide.</p>
         <p>Écris ce que vous proposez aujourd’hui : c’est l’ardoise qui fait entrer les clients.</p>
@@ -114,36 +132,36 @@
       <p class="planche__plein" data-si="pleine" role="status">L’ardoise est pleine : efface une ligne pour en écrire une autre.</p>
 
       <div class="ligne-ardoise" data-si="composer ensemble pleine">
-        <p class="ligne-ardoise__nom">Grand crème</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du grand crème" data-pas="-0.1" data-cible="p-creme"><span class="icone" data-icone="moins"></span></button><output id="p-creme" data-valeur="2.4" data-min="0.5" data-max="9.9" data-format="euro">2,40 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du grand crème" data-pas="0.1" data-cible="p-creme"><span class="icone" data-icone="plus"></span></button></span>
-        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : grand crème"><span class="icone" data-icone="etoile"></span></button>
+        <p class="ligne-ardoise__nom">Café crème</p>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du café crème" data-pas="-0.1" data-cible="p-creme"><span class="icone" data-icone="moins"></span></button><output id="p-creme" data-valeur="2.4" data-min="0.5" data-max="9.9" data-format="euro">2,40 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du café crème" data-pas="0.1" data-cible="p-creme"><span class="icone" data-icone="plus"></span></button></span>
+        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : café crème"><span class="icone" data-icone="etoile"></span></button>
         <button class="bouton bouton--petit" data-action="effacer" data-focus="3" data-si="pleine">Effacer</button><button class="bouton bouton--petit" data-action="effacer" data-si="composer ensemble">Effacer</button>
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
       <div class="ligne-ardoise" data-si="composer ensemble pleine">
         <p class="ligne-ardoise__nom">Cappuccino</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du cappuccino" data-pas="-0.1" data-cible="p-cappu"><span class="icone" data-icone="moins"></span></button><output id="p-cappu" data-valeur="3.2" data-min="0.5" data-max="9.9" data-format="euro">3,20 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du cappuccino" data-pas="0.1" data-cible="p-cappu"><span class="icone" data-icone="plus"></span></button></span>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du cappuccino" data-pas="-0.1" data-cible="p-cappu"><span class="icone" data-icone="moins"></span></button><output id="p-cappu" data-valeur="3" data-min="0.5" data-max="9.9" data-format="euro">3,00 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du cappuccino" data-pas="0.1" data-cible="p-cappu"><span class="icone" data-icone="plus"></span></button></span>
         <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="true" aria-label="Vedette : cappuccino"><span class="icone" data-icone="etoilePleine"></span></button>
         <button class="bouton bouton--petit" data-action="effacer">Effacer</button>
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
       <div class="ligne-ardoise" data-si="composer ensemble pleine">
         <p class="ligne-ardoise__nom">Chocolat chaud</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du chocolat chaud" data-pas="-0.1" data-cible="p-choco"><span class="icone" data-icone="moins"></span></button><output id="p-choco" data-valeur="2.8" data-min="0.5" data-max="9.9" data-format="euro">2,80 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du chocolat chaud" data-pas="0.1" data-cible="p-choco"><span class="icone" data-icone="plus"></span></button></span>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du chocolat chaud" data-pas="-0.1" data-cible="p-choco"><span class="icone" data-icone="moins"></span></button><output id="p-choco" data-valeur="3.2" data-min="0.5" data-max="9.9" data-format="euro">3,20 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du chocolat chaud" data-pas="0.1" data-cible="p-choco"><span class="icone" data-icone="plus"></span></button></span>
         <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="true" aria-label="Vedette : chocolat chaud"><span class="icone" data-icone="etoilePleine"></span></button>
         <button class="bouton bouton--petit" data-action="effacer">Effacer</button>
         <p class="ligne-ardoise__avis">Un peu cher pour le village : les familles hésiteront</p>
       </div>
       <div class="ligne-ardoise" data-si="composer pleine">
         <p class="ligne-ardoise__nom">Thé vert</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du thé vert" data-pas="-0.1" data-cible="p-the"><span class="icone" data-icone="moins"></span></button><output id="p-the" data-valeur="2.5" data-min="0.5" data-max="9.9" data-format="euro">2,50 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du thé vert" data-pas="0.1" data-cible="p-the"><span class="icone" data-icone="plus"></span></button></span>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du thé vert" data-pas="-0.1" data-cible="p-the"><span class="icone" data-icone="moins"></span></button><output id="p-the" data-valeur="2.6" data-min="0.5" data-max="9.9" data-format="euro">2,60 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du thé vert" data-pas="0.1" data-cible="p-the"><span class="icone" data-icone="plus"></span></button></span>
         <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : thé vert"><span class="icone" data-icone="etoile"></span></button>
         <button class="bouton bouton--petit" data-action="effacer">Effacer</button>
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
       <div class="ligne-ardoise ligne-ardoise--verrou" data-si="ensemble">
         <p class="ligne-ardoise__nom">Thé vert</p>
-        <span class="prix"><output>2,70 €</output></span>
+        <span class="prix"><output>2,80 €</output></span>
         <p class="verrou"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha modifie cette ligne</p>
         <p class="ligne-ardoise__avis">Un peu cher pour le village</p>
       </div>
@@ -155,34 +173,34 @@
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
       <div class="ligne-ardoise" data-si="composer ensemble pleine">
-        <p class="ligne-ardoise__nom">Tartelette aux pommes</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix de la tartelette aux pommes" data-pas="-0.1" data-cible="p-tarte"><span class="icone" data-icone="moins"></span></button><output id="p-tarte" data-valeur="3.5" data-min="0.5" data-max="9.9" data-format="euro">3,50 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix de la tartelette aux pommes" data-pas="0.1" data-cible="p-tarte"><span class="icone" data-icone="plus"></span></button></span>
-        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="true" aria-label="Vedette : tartelette aux pommes"><span class="icone" data-icone="etoilePleine"></span></button>
+        <p class="ligne-ardoise__nom">Tarte aux fruits de saison</p>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix de la tarte aux fruits de saison" data-pas="-0.1" data-cible="p-tarte"><span class="icone" data-icone="moins"></span></button><output id="p-tarte" data-valeur="3.2" data-min="0.5" data-max="9.9" data-format="euro">3,20 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix de la tarte aux fruits de saison" data-pas="0.1" data-cible="p-tarte"><span class="icone" data-icone="plus"></span></button></span>
+        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="true" aria-label="Vedette : tarte aux fruits de saison"><span class="icone" data-icone="etoilePleine"></span></button>
         <button class="bouton bouton--petit" data-action="effacer">Effacer</button>
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
       <div class="ligne-ardoise" data-si="pleine">
-        <p class="ligne-ardoise__nom">Infusion verveine</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix de l’infusion verveine" data-pas="-0.1" data-cible="p-verveine"><span class="icone" data-icone="moins"></span></button><output id="p-verveine" data-valeur="2.2" data-min="0.5" data-max="9.9" data-format="euro">2,20 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix de l’infusion verveine" data-pas="0.1" data-cible="p-verveine"><span class="icone" data-icone="plus"></span></button></span>
-        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : infusion verveine"><span class="icone" data-icone="etoile"></span></button>
+        <p class="ligne-ardoise__nom">Infusion du jardin de Simone</p>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix de l’infusion du jardin de Simone" data-pas="-0.1" data-cible="p-infusion"><span class="icone" data-icone="moins"></span></button><output id="p-infusion" data-valeur="2.4" data-min="0.5" data-max="9.9" data-format="euro">2,40 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix de l’infusion du jardin de Simone" data-pas="0.1" data-cible="p-infusion"><span class="icone" data-icone="plus"></span></button></span>
+        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : infusion du jardin de Simone"><span class="icone" data-icone="etoile"></span></button>
         <button class="bouton bouton--petit" data-action="effacer">Effacer</button>
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
       <div class="ligne-ardoise" data-si="pleine">
-        <p class="ligne-ardoise__nom">Citronnade maison</p>
-        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix de la citronnade maison" data-pas="-0.1" data-cible="p-citron"><span class="icone" data-icone="moins"></span></button><output id="p-citron" data-valeur="2.8" data-min="0.5" data-max="9.9" data-format="euro">2,80 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix de la citronnade maison" data-pas="0.1" data-cible="p-citron"><span class="icone" data-icone="plus"></span></button></span>
-        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : citronnade maison"><span class="icone" data-icone="etoile"></span></button>
+        <p class="ligne-ardoise__nom">Pain au chocolat</p>
+        <span class="prix"><button class="bouton bouton--icone bouton--petit" aria-label="Baisser le prix du pain au chocolat" data-pas="-0.1" data-cible="p-pain"><span class="icone" data-icone="moins"></span></button><output id="p-pain" data-valeur="1.3" data-min="0.5" data-max="9.9" data-format="euro">1,30 €</output><button class="bouton bouton--icone bouton--petit" aria-label="Monter le prix du pain au chocolat" data-pas="0.1" data-cible="p-pain"><span class="icone" data-icone="plus"></span></button></span>
+        <button class="bouton bouton--icone bouton--petit" data-bascule aria-pressed="false" aria-label="Vedette : pain au chocolat"><span class="icone" data-icone="etoile"></span></button>
         <button class="bouton bouton--petit" data-action="effacer">Effacer</button>
         <p class="ligne-ardoise__avis">Prix juste pour le village</p>
       </div>
 
       <!-- Pendant le service: seulement « épuisé » -->
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Grand crème</p><span class="prix"><output>2,40 €</output></span><span></span><button class="bouton bouton--petit" data-focus data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Cappuccino</p><span class="prix"><output>3,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Chocolat chaud</p><span class="prix"><output>2,80 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Thé vert</p><span class="prix"><output>2,50 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Café crème</p><span class="prix"><output>2,40 €</output></span><span></span><button class="bouton bouton--petit" data-focus data-bascule aria-pressed="false">Marquer épuisé</button></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Cappuccino</p><span class="prix"><output>3,00 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Chocolat chaud</p><span class="prix"><output>3,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
+      <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Thé vert</p><span class="prix"><output>2,60 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
       <div class="ligne-ardoise" data-si="service"><p class="ligne-ardoise__nom">Croissant</p><span class="prix"><output>1,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="false">Marquer épuisé</button></div>
-      <div class="ligne-ardoise ligne-ardoise--epuise" data-si="service"><p class="ligne-ardoise__nom">Tartelette aux pommes</p><span class="prix"><output>3,50 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="true">Épuisé : remettre</button><p class="ligne-ardoise__avis">Épuisé depuis 11 h 05</p></div>
+      <div class="ligne-ardoise ligne-ardoise--epuise" data-si="service"><p class="ligne-ardoise__nom">Tarte aux fruits de saison</p><span class="prix"><output>3,20 €</output></span><span></span><button class="bouton bouton--petit" data-bascule aria-pressed="true">Épuisé : remettre</button><p class="ligne-ardoise__avis">Épuisé depuis 11 h 05</p></div>
 
       <p class="planche__resume" data-si="composer ensemble pleine service">Ce que dit votre ardoise : boissons chaudes et douceurs du matin. Elle attire surtout les flâneurs et les pressés.</p>
     </section>
@@ -191,7 +209,7 @@
   <footer class="pied-touches">
     <span>flèches ou <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> choisir</span>
     <span><kbd>Entrée</kbd> écrire, effacer, changer le prix</span>
-    <span><kbd>Retour arrière</kbd> fermer</span>
+    <span><kbd>Retour arrière</kbd> fermer (dans le mot du jour : effacer)</span>
     <span>Chaque changement s’écrit tout de suite à la craie.</span>
   </footer>
 </section>
@@ -204,6 +222,18 @@
   Maquette.surEtat = function (etat) {
     // Pendant le service, la planche prend toute la largeur: plus de liste de recettes.
     document.documentElement.style.setProperty('--colonne-planche', etat === 'service' ? '1 / -1' : 'auto');
+    const champ = document.getElementById('mot-du-jour');
+    champ.value = etat === 'vide' ? '' : 'Bienvenue aux randonneurs !';
+  };
+  // Dans le mot du jour, Entrée écrit le mot et rend la main à la navigation.
+  Maquette.surTouche = function (e) {
+    if (e.target.id === 'mot-du-jour' && e.key === 'Enter') {
+      const suivant = document.querySelector('.ligne-ardoise:not([hidden]) .bouton, .planche__vide');
+      if (suivant && suivant.focus) suivant.focus();
+      Maquette.note('Mot du jour écrit à la craie, ici et sur l’ardoise de trottoir.');
+      return true;
+    }
+    return false;
   };
   document.addEventListener('click', (e) => {
     const action = e.target.closest('[data-action]');
@@ -213,7 +243,7 @@
   });
   document.addEventListener('bascule', (e) => {
     const b = e.target;
-    if (b.textContent.includes('épuisé') || b.textContent.includes('Épuisé')) {
+    if (/puis/.test(b.textContent)) {
       const epuise = b.getAttribute('aria-pressed') === 'true';
       b.textContent = epuise ? 'Épuisé : remettre' : 'Marquer épuisé';
       b.closest('.ligne-ardoise').classList.toggle('ligne-ardoise--epuise', epuise);

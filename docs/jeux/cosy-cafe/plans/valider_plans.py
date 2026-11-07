@@ -1,29 +1,39 @@
 #!/usr/bin/env python3
 """Validateur des plans des adresses de Cosy Café.
 
-Lit plans.json (écrit par construire_plans.py, même source que les SVG) et vérifie,
-pour chaque plan:
+Lit plans.json (écrit par construire_plans.py, même source que les SVG) et vérifie, pour
+chaque plan, les normes du document des adresses et les plafonds de l'architecte
+(docs/jeux/cosy-cafe/technique.md, section 11, contraintes C1 à C18):
 
 1. capacité: les places dessinées (intérieur, dehors) égalent les places annoncées;
-2. passages: un gabarit de 0,90 m de large va de l'entrée à la caisse, à la passe, à chaque
-   place, aux toilettes et à chaque sortie (centre du gabarit à 0,45 m au moins de tout
-   obstacle); une place est atteinte quand le bord du passage est à 0,25 m au plus de l'assise
-   (un pas), sans rien entre les deux;
-3. sorties: une seconde sortie, à 5 m au moins de la première, dès 20 personnes présentes;
-4. zone de travail: la file ne la traverse jamais, et aucun client, même mince (0,50 m), n'y
-   entre ni dans les locaux du personnel; les joueurs atteignent chaque poste, la réserve et
-   le point de livraison par des passages de 0,90 m;
-5. file: elle part de la porte, finit à la caisse, tient ses places et reste dans les passages;
-6. lisibilité: depuis la caisse (et les postes qui le demandent), la porte d'entrée et chaque
-   place de la file sont dans le champ (100 degrés) et rien d'opaque ne les cache;
-7. foule: pour chaque point de vue, le nombre de personnages au pire dans le champ (places
-   occupées, file pleine, figurants des espaces vus, l'autre joueur) reste sous le plafond;
-8. passages à garder libres: aucun meuble n'y est posé; portes et escaliers à la bonne largeur.
+   présents au plus (C2: places occupées, files pleines, employés, joueurs), employés (C5),
+   places de file (C4), meubles posés (C6), niveaux (C17);
+2. passages de 0,90 m: un gabarit de 0,90 m de large va de l'entrée à chaque caisse, à chaque
+   passe, à chaque place, aux toilettes et à chaque sortie (centre du gabarit à 0,45 m au
+   moins de tout obstacle); une place est atteinte quand le bord du passage est à 0,25 m au
+   plus de l'assise, sans rien entre les deux;
+3. allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file et non dedans
+   (C13); livraisons de 1,20 m du point de livraison à la réserve; chaque zone libre atteinte
+   par 1,20 m depuis l'entrée ou la livraison (meubles portés à deux);
+4. sorties: une seconde sortie, à 5 m au moins de la première, dès 20 personnes à l'intérieur;
+5. zone de travail: aucune file ne la traverse; aucun client, même mince (0,50 m), n'y entre
+   ni dans les locaux du personnel; les joueurs atteignent chaque poste, la réserve, la
+   livraison et chaque place;
+6. files: chacune part de sa porte, finit à sa caisse, tient ses places, reste dans les passages;
+7. passages à garder libres sans meuble; portes et escaliers à la bonne largeur;
+8. lisibilité: depuis chaque caisse, d'un seul regard (100 degrés), on voit le client qui paie,
+   toute la file et sa porte, sans rien d'opaque entre; un poste qui le demande voit la porte
+   dans son axe de travail;
+9. foule (C1, C3): depuis chaque point de vue déclaré et depuis une grille de points jouables
+   (un tous les mètres), le nombre de personnages au pire dans le champ (places occupées,
+   files pleines, figurants des espaces vus, l'autre joueur) reste sous 40; les meubles
+   dessinés visibles d'un même point sont comptés (C6: 150 avec la décoration).
 
-Usage: python3 -I valider_plans.py [plans.json] [--plan <id>]
+Usage: python3 -I valider_plans.py [plans.json] [--plan <id>] [--sans-grille]
 Code de sortie 0 si aucune erreur. Bibliothèque standard seulement.
 """
 
+import bisect
 import heapq
 import json
 import math
@@ -33,8 +43,10 @@ from collections import deque
 
 RES = 0.05  # côté d'une case du raster de contrôle (m); les cotes des plans tombent sur ce pas
 EPS = 1e-6
+INF = float("inf")
+SQ2 = math.sqrt(2)
 NEIGH = [(1, 0, 1.0), (-1, 0, 1.0), (0, 1, 1.0), (0, -1, 1.0),
-         (1, 1, math.sqrt(2)), (1, -1, math.sqrt(2)), (-1, 1, math.sqrt(2)), (-1, -1, math.sqrt(2))]
+         (1, 1, SQ2), (1, -1, SQ2), (-1, 1, SQ2), (-1, -1, SQ2)]
 
 
 # Géométrie ---------------------------------------------------------------------------
@@ -67,7 +79,7 @@ def seg_dist(px, py, ax, ay, bx, by):
 
 
 def point_in_poly(px, py, pts):
-    inside = False
+    inside_ = False
     n = len(pts)
     for i in range(n):
         x1, y1 = pts[i]
@@ -75,8 +87,8 @@ def point_in_poly(px, py, pts):
         if (y1 > py) != (y2 > py):
             xi = x1 + (py - y1) * (x2 - x1) / (y2 - y1)
             if px < xi:
-                inside = not inside
-    return inside
+                inside_ = not inside_
+    return inside_
 
 
 def dist_to_shape(shape, px, py):
@@ -95,7 +107,7 @@ def dist_to_shape(shape, px, py):
     pts = shape["poly"]
     if point_in_poly(px, py, pts):
         return 0.0, px, py
-    best = (float("inf"), px, py)
+    best = (INF, px, py)
     for i in range(len(pts)):
         ax, ay = pts[i]
         bx, by = pts[(i + 1) % len(pts)]
@@ -115,6 +127,19 @@ def overlap_area_rect(a, b):
     w = min(ax1, bx1) - max(ax0, bx0)
     h = min(ay1, by1) - max(ay0, by0)
     return w * h if w > 1e-6 and h > 1e-6 else 0.0
+
+
+def lane_shapes(q):
+    """La file pleine comme une suite de bandes de sa largeur, une par segment."""
+    out = []
+    half = q["width"] / 2
+    for (x0, y0), (x1, y1) in zip(q["points"], q["points"][1:]):
+        L = math.hypot(x1 - x0, y1 - y0) or 1
+        ux, uy = (x1 - x0) / L, (y1 - y0) / L
+        nx_, ny_ = -uy * half, ux * half
+        out.append({"poly": [[x0 + nx_, y0 + ny_], [x1 + nx_, y1 + ny_],
+                             [x1 - nx_, y1 - ny_], [x0 - nx_, y0 - ny_]]})
+    return out
 
 
 # Raster -------------------------------------------------------------------------------
@@ -143,7 +168,6 @@ class Grid:
         cap2 = cap * cap
         clr = [cap2] * self.n
         capc = int(math.ceil(cap / RES))
-        # Bord du cadre: au-delà, rien n'existe.
         for j in range(ny):
             dj = min(j, ny - 1 - j)
             row = j * nx
@@ -176,22 +200,16 @@ class Grid:
                         d2 = v + dy2
                         if d2 < clr[base + t]:
                             clr[base + t] = d2
-            elif "circle" in shape:
-                cx, cy, r = shape["circle"]
-                for j in range(j0, j1 + 1):
-                    y = self.y0 + j * RES
-                    base = j * nx + i0
-                    for t, x in enumerate(xs):
-                        d = max(0.0, math.hypot(x - cx, y - cy) - r)
-                        d2 = d * d
-                        if d2 < clr[base + t]:
-                            clr[base + t] = d2
             else:
                 for j in range(j0, j1 + 1):
                     y = self.y0 + j * RES
                     base = j * nx + i0
                     for t, x in enumerate(xs):
-                        d = dist_to_shape(shape, x, y)[0]
+                        if "circle" in shape:
+                            cx, cy, r = shape["circle"]
+                            d = max(0.0, math.hypot(x - cx, y - cy) - r)
+                        else:
+                            d = dist_to_shape(shape, x, y)[0]
                         d2 = d * d
                         if d2 < clr[base + t]:
                             clr[base + t] = d2
@@ -224,7 +242,6 @@ def passable(clr2, r):
 
 def search(grids, ok, sources, links, weighted=True):
     """Dijkstra (ou parcours en largeur) sur plusieurs niveaux reliés par des escaliers."""
-    INF = float("inf")
     dist = [[INF] * g.n for g in grids]
     heap = []
     dq = deque()
@@ -280,7 +297,7 @@ def nearest_ok(grid, ok, x, y, radius=0.35):
     k = grid.cell(x, y)
     if k is not None and ok[k]:
         return k
-    best, bestd = None, float("inf")
+    best, bestd = None, INF
     rc = int(math.ceil(radius / RES))
     i0 = int(round((x - grid.x0) / RES))
     j0 = int(round((y - grid.y0) / RES))
@@ -291,35 +308,6 @@ def nearest_ok(grid, ok, x, y, radius=0.35):
                 d = math.hypot(di, dj)
                 if d < bestd and d * RES <= radius:
                     best, bestd = j * grid.nx + i, d
-    return best
-
-
-def reach_shape(grid, ok, dist, solid, shape, reach, extra_free=()):
-    """Plus courte distance d'approche d'une forme: une case franchissable atteinte, à
-    `reach` au plus de la forme, reliée à elle par un segment sans obstacle."""
-    x0, y0, x1, y1 = bbox(shape)
-    i0 = max(0, int(math.floor((x0 - reach - grid.x0) / RES)))
-    i1 = min(grid.nx - 1, int(math.ceil((x1 + reach - grid.x0) / RES)))
-    j0 = max(0, int(math.floor((y0 - reach - grid.y0) / RES)))
-    j1 = min(grid.ny - 1, int(math.ceil((y1 + reach - grid.y0) / RES)))
-    best = float("inf")
-    cands = []
-    for j in range(j0, j1 + 1):
-        for i in range(i0, i1 + 1):
-            k = j * grid.nx + i
-            if not ok[k] or dist[k] == float("inf"):
-                continue
-            px, py = grid.x0 + i * RES, grid.y0 + j * RES
-            d, qx, qy = dist_to_shape(shape, px, py)
-            if d <= reach + EPS:
-                cands.append((dist[k], px, py, qx, qy))
-    cands.sort()
-    for dk, px, py, qx, qy in cands:
-        if dk >= best:
-            break
-        if segment_clear(grid, solid, px, py, qx, qy, [shape] + list(extra_free)):
-            best = dk
-            break
     return best
 
 
@@ -342,17 +330,42 @@ def segment_clear(grid, solid, ax, ay, bx, by, free_shapes):
     return True
 
 
-def visible(grid, opaque, ax, ay, bx, by, skip_end=0.0):
+def reach_shape(grid, ok, dist, solid, shape, reach, extra_free=()):
+    """Plus courte distance d'approche d'une forme: une case franchissable atteinte, à
+    `reach` au plus de la forme, reliée à elle par un segment sans obstacle."""
+    x0, y0, x1, y1 = bbox(shape)
+    i0 = max(0, int(math.floor((x0 - reach - grid.x0) / RES)))
+    i1 = min(grid.nx - 1, int(math.ceil((x1 + reach - grid.x0) / RES)))
+    j0 = max(0, int(math.floor((y0 - reach - grid.y0) / RES)))
+    j1 = min(grid.ny - 1, int(math.ceil((y1 + reach - grid.y0) / RES)))
+    cands = []
+    for j in range(j0, j1 + 1):
+        for i in range(i0, i1 + 1):
+            k = j * grid.nx + i
+            if not ok[k] or dist[k] == INF:
+                continue
+            px, py = grid.x0 + i * RES, grid.y0 + j * RES
+            d, qx, qy = dist_to_shape(shape, px, py)
+            if d <= reach + EPS:
+                cands.append((dist[k], px, py, qx, qy))
+    cands.sort()
+    for dk, px, py, qx, qy in cands:
+        if segment_clear(grid, solid, px, py, qx, qy, [shape] + list(extra_free)):
+            return dk
+    return INF
+
+
+def los(grid, opaque, ax, ay, bx, by):
+    """Ligne de vue: rien d'opaque entre deux points (pas d'une demi-case)."""
     L = math.hypot(bx - ax, by - ay)
-    if L < 1e-9:
-        return True
-    n = max(1, int(L / (RES / 2)))
-    for s in range(1, n):
-        t = s / n
-        if L * (1 - t) < skip_end:
-            break
-        k = grid.cell(ax + (bx - ax) * t, ay + (by - ay) * t)
-        if k is None or opaque[k]:
+    n = int(L / (RES * 0.5)) + 1
+    dx, dy = (bx - ax) / n, (by - ay) / n
+    x0, y0, inv, nx = grid.x0, grid.y0, 1.0 / RES, grid.nx
+    x, y = ax, ay
+    for _ in range(1, n):
+        x += dx
+        y += dy
+        if opaque[int((y - y0) * inv + 0.5) * nx + int((x - x0) * inv + 0.5)]:
             return False
     return True
 
@@ -364,6 +377,29 @@ def angle_of(vx, vy, tx, ty):
 
 def angdiff(a, b):
     return abs((a - b + 180) % 360 - 180)
+
+
+def covering_arc(angles):
+    """Plus petit arc qui contient tous les angles: (largeur, milieu)."""
+    if not angles:
+        return 0.0, 0.0
+    s = sorted(a % 360 for a in angles)
+    if len(s) == 1:
+        return 0.0, s[0]
+    gaps = [(s[(i + 1) % len(s)] - s[i]) % 360 for i in range(len(s))]
+    k = max(range(len(s)), key=lambda i: gaps[i])
+    width = 360 - gaps[k]
+    start = s[(k + 1) % len(s)]
+    return width, (start + width / 2) % 360
+
+
+def count_window(sorted_angles, lo, hi):
+    """Nombre d'angles dans [lo, hi] modulo 360 (liste triée)."""
+    lo %= 360
+    hi %= 360
+    if lo <= hi:
+        return bisect.bisect_right(sorted_angles, hi) - bisect.bisect_left(sorted_angles, lo)
+    return (len(sorted_angles) - bisect.bisect_left(sorted_angles, lo)) + bisect.bisect_right(sorted_angles, hi)
 
 
 def queue_slots(q, pitch):
@@ -408,36 +444,34 @@ class Report:
     def __init__(self, plan):
         self.plan = plan
         self.errors = []
-        self.warnings = []
         self.lines = []
         self.views = []
+        self.grid_worst = None
 
     def err(self, s):
         self.errors.append(s)
-
-    def warn(self, s):
-        self.warnings.append(s)
 
     def info(self, s):
         self.lines.append(s)
 
 
-def check_plan(plan, norms):
+MOVABLE = ("table", "seat", "furniture")
+
+
+def check_plan(plan, norms, with_grid=True):
     rep = Report(plan)
     levels = plan["levels"]
+    addr = plan["address"]
     lid = {lv["id"]: i for i, lv in enumerate(levels)}
     grids = [Grid(lv) for lv in levels]
     r_pass = norms["passage_min"] / 2
     r_main = norms["main_aisle"] / 2
     r_leak = norms["leak_width"] / 2
     reach = norms["seat_reach"]
+    staff = plan["staff"]
 
-    # 1. Capacité.
-    seats = []
-    for li, lv in enumerate(levels):
-        for e in lv["elements"]:
-            if e["kind"] == "seat":
-                seats.append((li, e))
+    # 1. Capacité et plafonds de l'architecte.
+    seats = [(li, e) for li, lv in enumerate(levels) for e in lv["elements"] if e["kind"] == "seat"]
     count = {"inside": 0, "outside": 0}
     for _, e in seats:
         count[e["seat"]["area"]] += 1
@@ -447,9 +481,38 @@ def check_plan(plan, norms):
                 f"{cap['inside']} + {cap['outside']}")
     rep.info(f"places dessinées: {count['inside']} à l'intérieur, {count['outside']} dehors "
              f"(annoncées: {cap['inside']} et {cap['outside']})")
+    queues = [(li, q) for li, lv in enumerate(levels) for q in lv.get("queues", [])]
+    q_places = sum(q["places"] for _, q in queues)
+    for _, q in queues:
+        if q["places"] > norms["queue_max"]:
+            rep.err(f"file « {q['id']} » de {q['places']} places (C4: {norms['queue_max']} au plus)")
+    if staff["employees"] > norms["employees_max"]:
+        rep.err(f"{staff['employees']} employés (C5: {norms['employees_max']} au plus)")
+    if len(levels) > norms["levels_max"]:
+        rep.err(f"{len(levels)} niveaux (C17: {norms['levels_max']} au plus)")
+    n_seats = count["inside"] + count["outside"]
+    present = n_seats + q_places + staff["employees"] + staff["players"]
+    pcap = norms["present_cap"][addr]
+    if present > pcap:
+        rate = (pcap - q_places - staff["employees"] - staff["players"]) / max(1, n_seats)
+        occ = plan.get("occupancy_max")
+        if occ is None or occ > rate + 1e-9:
+            rep.err(f"{present} présents si tout est plein (C2: {pcap}); il faudrait déclarer une "
+                    f"occupation de {rate * 100:.0f} % au plus")
+        else:
+            rep.info(f"présents: {present} si tout est plein; sous le plafond C2 de {pcap} avec "
+                     f"{occ * 100:.0f} % des places occupées au plus (seuil: {rate * 100:.0f} %)")
+    else:
+        rep.info(f"présents au pire: {present} ({n_seats} places, {q_places} en file, "
+                 f"{staff['employees']} employés, {staff['players']} joueurs; C2: {pcap})")
+    n_furn = sum(1 for lv in levels for e in lv["elements"] if e["kind"] in MOVABLE)
+    fcap = norms["furniture_cap"][addr]
+    if n_furn > fcap:
+        rep.err(f"{n_furn} meubles dessinés (C6: {fcap} au plus)")
+    rep.info(f"meubles dessinés: {n_furn}; il en reste {fcap - n_furn} pour la décoration (C6: {fcap})")
 
-    # Obstacles par réseau.
-    def obstacles(lv, network):
+    # 2. Rasters: clients, joueurs, file pleine, opacité.
+    def obstacles(lv, network, with_queues=False):
         out = []
         for e in lv["elements"]:
             if e["kind"] == "door":
@@ -458,39 +521,40 @@ def check_plan(plan, norms):
                     out.append(e["shape"])
             elif e.get("blocks"):
                 out.append(e["shape"])
+        for z in lv["zones"]:
+            if z["kind"] == "backdrop":
+                out.append(z["shape"])
+        if with_queues:
+            for q in lv.get("queues", []):
+                out.extend(lane_shapes(q))
         return out
 
-    cap_d = 0.75  # au-delà, la largeur ne change plus rien aux contrôles (1,40 m au plus)
+    cap_d = 0.75
     clr_c = [g.clearance2(obstacles(lv, "clients"), cap_d) for g, lv in zip(grids, levels)]
     clr_s = [g.clearance2(obstacles(lv, "staff"), cap_d) for g, lv in zip(grids, levels)]
+    clr_q = [g.clearance2(obstacles(lv, "clients", True), cap_d) for g, lv in zip(grids, levels)]
     ok_c = [passable(c, r_pass) for c in clr_c]
     ok_leak = [passable(c, r_leak) for c in clr_c]
     ok_s = [passable(c, r_pass) for c in clr_s]
+    ok_s_main = [passable(c, r_main) for c in clr_s]
+    ok_q_main = [passable(c, r_main) for c in clr_q]
     solid_c = [bytearray(1 if v <= EPS else 0 for v in c) for c in clr_c]
     solid_s = [bytearray(1 if v <= EPS else 0 for v in c) for c in clr_s]
-    opaque = []
-    for g, lv in zip(grids, levels):
-        opaque.append(g.mask([e["shape"] for e in lv["elements"] if e.get("opaque")]))
+    opaque = [g.mask([e["shape"] for e in lv["elements"] if e.get("opaque")]) for g, lv in zip(grids, levels)]
 
-    # Liaisons entre niveaux (escaliers).
     def make_links(ok_list, public_only):
         links = {}
         for lk in plan["links"]:
             if public_only and not lk["public"]:
                 continue
             la, lb = lid[lk["from"]["level"]], lid[lk["to"]["level"]]
-            ka = nearest_ok(grids[la], ok_list[la], *lk["from"]["pos"])
-            kb = nearest_ok(grids[lb], ok_list[lb], *lk["to"]["pos"])
+            ka = nearest_ok(grids[la], ok_list[la], *lk["from"]["pos"], radius=0.6)
+            kb = nearest_ok(grids[lb], ok_list[lb], *lk["to"]["pos"], radius=0.6)
             if ka is None or kb is None:
-                rep.err(f"escalier {lk['id']}: palier injoignable")
                 continue
             links.setdefault((la, ka), []).append(((lb, kb), lk["length"]))
             links.setdefault((lb, kb), []).append(((la, ka), lk["length"]))
         return links
-
-    links_c = make_links(ok_c, True)
-    links_s = make_links(ok_s, False)
-    links_leak = make_links(ok_leak, True)
 
     def pts_of(name):
         out = []
@@ -504,46 +568,41 @@ def check_plan(plan, norms):
                 out.append((li, v))
         return out
 
+    def dist_point(li, p, ok_list, dist, radius=0.35):
+        k = nearest_ok(grids[li], ok_list[li], p[0], p[1], radius)
+        return INF if k is None else dist[li][k]
+
     entrances = pts_of("entrance")
     if not entrances:
         rep.err("aucune entrée")
         return rep
+    links_c = make_links(ok_c, True)
     src_c = [(li, nearest_ok(grids[li], ok_c[li], *p)) for li, p in entrances]
     for (li, p), (_, k) in zip(entrances, src_c):
         if k is None:
             rep.err(f"entrée {p} hors des passages de 0,90 m")
     dist_c = search(grids, ok_c, src_c, links_c)
 
-    def dist_point(li, p, ok_list, dist, radius=0.35):
-        k = nearest_ok(grids[li], ok_list[li], p[0], p[1], radius)
-        if k is None:
-            return float("inf")
-        return dist[li][k]
-
-    # 2. Passages de 0,90 m: caisse, passe, toilettes, sorties, places.
+    # 3. Passages de 0,90 m.
     targets = []
-    for name, label in (("register", "caisse"), ("pickup", "passe")):
-        for li, p in pts_of(name):
-            targets.append((label, li, p))
+    for li, q in queues:
+        targets.append((f"caisse « {q['id']} »", li, q["register"]))
+        targets.append((f"passe « {q['id']} »", li, q["pickup"]))
     for li, p in pts_of("wc"):
         targets.append(("toilettes", li, p))
     for li, p in pts_of("exits"):
         targets.append(("sortie", li, p))
-    found = {}
     for label, li, p in targets:
-        d = dist_point(li, p, ok_c, dist_c)
-        if d == float("inf"):
+        if dist_point(li, p, ok_c, dist_c) == INF:
             rep.err(f"{label} {p} injoignable par un passage de 0,90 m depuis l'entrée")
-        else:
-            found.setdefault(label, []).append(d)
-    if "caisse" in found:
-        rep.info(f"entrée vers caisse: {fmt(min(found['caisse']))} m de marche")
-
-    seat_dist = []
-    unreached = []
+    for li, q in queues:
+        d = dist_point(li, q["register"], ok_c, dist_c)
+        if d < INF:
+            rep.info(f"file « {q['id']} »: caisse à {fmt(d)} m de marche de l'entrée la plus proche")
+    seat_dist, unreached = [], []
     for li, e in seats:
         d = reach_shape(grids[li], ok_c[li], dist_c[li], solid_c[li], e["shape"], reach)
-        if d == float("inf"):
+        if d == INF:
             unreached.append(e["id"])
         else:
             seat_dist.append((d, e))
@@ -552,149 +611,159 @@ def check_plan(plan, norms):
     if seat_dist:
         far = max(seat_dist, key=lambda t: t[0])
         rep.info(f"{len(seat_dist)}/{len(seats)} places atteintes par 0,90 m; la plus lointaine "
-                 f"à {fmt(far[0])} m de l'entrée ({far[1]['seat']['room']})")
+                 f"à {fmt(far[0])} m d'une entrée ({far[1]['seat']['room']})")
 
-    # Passage le plus étroit entre l'entrée et la caisse (mesure, pas une règle).
-    regs = pts_of("register")
-    if regs:
-        li_r, p_r = regs[0]
-        widest = None
-        for width in (1.40, 1.20, 1.10, 1.00, 0.90):
-            okw = [passable(c, width / 2) for c in clr_c]
-            lk = make_links(okw, True)
-            srcw = [(li, nearest_ok(grids[li], okw[li], *p, radius=0.6)) for li, p in entrances]
-            dw = search(grids, okw, srcw, lk, weighted=False)
-            if dist_point(li_r, p_r, okw, dw, radius=0.6) < float("inf"):
-                widest = width
-                break
-        if widest is None:
-            rep.info("entrée vers caisse: passage le plus étroit sous 0,90 m")
-        else:
-            rep.info(f"entrée vers caisse: passage le plus étroit de {fmt(widest, 2)} m au moins")
+    # Allée principale de 1,20 m, de l'entrée à chaque passe, à côté des files pleines.
+    links_qm = make_links(ok_q_main, True)
+    src_qm = [(li, nearest_ok(grids[li], ok_q_main[li], *p, radius=0.6)) for li, p in entrances]
+    dist_qm = search(grids, ok_q_main, src_qm, links_qm, weighted=False)
+    bad_main = [q["id"] for li, q in queues if dist_point(li, q["pickup"], ok_q_main, dist_qm, radius=0.6) == INF]
+    for qid in bad_main:
+        rep.err(f"pas d'allée de 1,20 m de l'entrée à la passe « {qid} » à côté de la file pleine")
+    if queues and not bad_main:
+        rep.info("allée principale de 1,20 m de l'entrée à chaque passe, à côté de la file pleine")
 
-    # 3. Sorties.
+    # 4. Sorties.
     exits = pts_of("exits")
-    people = cap["inside"] + plan["staff"]["players"] + plan["staff"]["employees"]
-    if people >= norms["second_exit_from"]:
-        ok_pair = False
-        for i in range(len(exits)):
-            for j in range(i + 1, len(exits)):
-                (la, pa), (lb, pb) = exits[i], exits[j]
-                if la == lb and math.hypot(pa[0] - pb[0], pa[1] - pb[1]) >= 5.0:
-                    ok_pair = True
+    inside_people = cap["inside"] + staff["players"] + staff["employees"]
+    if inside_people >= norms["second_exit_from"]:
+        ok_pair = any(exits[i][0] == exits[j][0] and
+                      math.hypot(exits[i][1][0] - exits[j][1][0], exits[i][1][1] - exits[j][1][1]) >= 5.0
+                      for i in range(len(exits)) for j in range(i + 1, len(exits)))
         if not ok_pair:
-            rep.err(f"{people} personnes à l'intérieur: deux sorties éloignées de 5 m au moins sont dues")
+            rep.err(f"{inside_people} personnes à l'intérieur: deux sorties éloignées de 5 m au moins sont dues")
         else:
-            rep.info(f"{people} personnes au plus à l'intérieur: {len(exits)} sorties")
+            rep.info(f"{inside_people} personnes au plus à l'intérieur: {len(exits)} sorties éloignées")
     else:
-        rep.info(f"{people} personnes au plus à l'intérieur: {len(exits)} sortie(s)")
+        rep.info(f"{inside_people} personnes au plus à l'intérieur: {len(exits)} sortie(s)")
 
-    # 4. Zone de travail et locaux du personnel.
+    # 5. Zones de travail et locaux du personnel.
+    links_leak = make_links(ok_leak, True)
     dist_leak = search(grids, ok_leak, [(li, nearest_ok(grids[li], ok_leak[li], *p)) for li, p in entrances],
                        links_leak, weighted=False)
+    leaks = 0
     for li, lv in enumerate(levels):
+        g = grids[li]
         for z in lv["zones"]:
             if z["kind"] not in ("work", "private"):
                 continue
-            g = grids[li]
             x0, y0, x1, y1 = bbox(z["shape"])
-            leak = False
+            found = False
             for j in range(max(0, int((y0 - g.y0) / RES)), min(g.ny, int((y1 - g.y0) / RES) + 1)):
                 for i in range(max(0, int((x0 - g.x0) / RES)), min(g.nx, int((x1 - g.x0) / RES) + 1)):
                     k = j * g.nx + i
-                    if dist_leak[li][k] < float("inf") and inside(z["shape"], *g.xy(k), tol=-1e-9):
-                        leak = True
+                    if dist_leak[li][k] < INF and inside(z["shape"], *g.xy(k), tol=-1e-9):
+                        found = True
                         break
-                if leak:
+                if found:
                     break
-            if leak:
+            if found:
+                leaks += 1
                 rep.err(f"un client peut entrer dans « {z['label']} »")
-    rep.info("aucun client ne peut entrer dans la zone de travail ni dans les locaux du personnel"
-             if not any("peut entrer" in e for e in rep.errors) else "fuite dans une zone du personnel")
+    if not leaks:
+        rep.info("aucun client ne peut entrer dans les zones de travail ni dans les locaux du personnel")
 
     staff_pts = pts_of("staff_start")
+    links_s = make_links(ok_s, False)
     if not staff_pts:
         rep.err("pas de point de départ des joueurs (staff_start)")
+        dist_s = [[INF] * g.n for g in grids]
     else:
-        src_s = [(li, nearest_ok(grids[li], ok_s[li], *p)) for li, p in staff_pts]
-        dist_s = search(grids, ok_s, src_s, links_s)
-        posts = 0
-        missed_posts = 0
-        for li, lv in enumerate(levels):
-            # Un poste posé sur un comptoir s'atteint par-dessus ce comptoir.
-            supports = [e["shape"] for e in lv["elements"] if e["kind"] in ("counter", "backbar")]
-            for e in lv["elements"]:
-                if e["kind"] == "station" and e.get("post"):
-                    posts += 1
-                    under = [s for s in supports if overlap_area_rect(bbox(s), bbox(e["shape"])) > 0]
-                    d = reach_shape(grids[li], ok_s[li], dist_s[li], solid_s[li], e["shape"], reach, under)
-                    if d == float("inf"):
-                        missed_posts += 1
-                        rep.err(f"poste « {e['label']} » ({e['id']}) hors d'atteinte des joueurs")
-        for name, label in (("stock", "réserve"), ("delivery", "livraison")):
-            for li, p in pts_of(name):
-                if dist_point(li, p, ok_s, dist_s) == float("inf"):
-                    rep.err(f"{label} {p} hors d'atteinte des joueurs")
-        serv = []
-        for li, e in seats:
-            d = reach_shape(grids[li], ok_s[li], dist_s[li], solid_s[li], e["shape"], reach)
-            if d == float("inf"):
-                rep.err(f"place {e['id']} hors d'atteinte des joueurs (service, débarrassage)")
-            else:
-                serv.append((d, e))
-        rep.info(f"{posts - missed_posts}/{posts} postes atteints par les joueurs par des passages de 0,90 m")
-        if serv:
-            far = max(serv, key=lambda t: t[0])
-            rep.info(f"service: place la plus lointaine à {fmt(far[0])} m de la zone de travail "
-                     f"({far[1]['seat']['room']})")
-
-    # 5. File.
+        dist_s = search(grids, ok_s, [(li, nearest_ok(grids[li], ok_s[li], *p)) for li, p in staff_pts], links_s)
+    posts = missed = 0
     for li, lv in enumerate(levels):
-        q = lv.get("queue")
-        if not q:
-            continue
+        supports = [e["shape"] for e in lv["elements"] if e["kind"] in ("counter", "backbar")]
+        for e in lv["elements"]:
+            if e["kind"] == "station" and e.get("post"):
+                posts += 1
+                under = [s for s in supports if overlap_area_rect(bbox(s), bbox(e["shape"])) > 0]
+                if reach_shape(grids[li], ok_s[li], dist_s[li], solid_s[li], e["shape"], reach, under) == INF:
+                    missed += 1
+                    rep.err(f"poste « {e['label']} » ({e['id']}) hors d'atteinte des joueurs")
+    for name, label in (("stock", "réserve"), ("delivery", "livraison")):
+        for li, p in pts_of(name):
+            if dist_point(li, p, ok_s, dist_s) == INF:
+                rep.err(f"{label} {p} hors d'atteinte des joueurs")
+    serv = []
+    for li, e in seats:
+        d = reach_shape(grids[li], ok_s[li], dist_s[li], solid_s[li], e["shape"], reach)
+        if d == INF:
+            rep.err(f"place {e['id']} hors d'atteinte des joueurs (service, débarrassage)")
+        else:
+            serv.append((d, e))
+    rep.info(f"{posts - missed}/{posts} postes atteints par les joueurs par des passages de 0,90 m")
+    if serv:
+        far = max(serv, key=lambda t: t[0])
+        rep.info(f"service: place la plus lointaine à {fmt(far[0])} m du comptoir ({far[1]['seat']['room']})")
+
+    # Livraisons et meubles portés à deux: 1,20 m.
+    links_sm = make_links(ok_s_main, False)
+    deliveries = [(li, nearest_ok(grids[li], ok_s_main[li], *p, radius=0.6)) for li, p in pts_of("delivery")]
+    dist_dl = search(grids, ok_s_main, deliveries, links_sm, weighted=False)
+    for li, p in pts_of("stock"):
+        if dist_point(li, p, ok_s_main, dist_dl, radius=0.6) == INF:
+            rep.err(f"pas de passage de 1,20 m de la livraison à la réserve {p}")
+    src_big = deliveries + [(li, nearest_ok(grids[li], ok_s_main[li], *p, radius=0.6)) for li, p in entrances]
+    dist_big = search(grids, ok_s_main, src_big, links_sm, weighted=False)
+    bad_free = []
+    for li, lv in enumerate(levels):
+        g = grids[li]
+        for z in lv["zones"]:
+            if z["kind"] != "free":
+                continue
+            x0, y0, x1, y1 = bbox(z["shape"])
+            hit = False
+            for j in range(max(0, int((y0 - g.y0) / RES)), min(g.ny, int((y1 - g.y0) / RES) + 1)):
+                for i in range(max(0, int((x0 - g.x0) / RES)), min(g.nx, int((x1 - g.x0) / RES) + 1)):
+                    if dist_big[li][j * g.nx + i] < INF:
+                        hit = True
+                        break
+                if hit:
+                    break
+            if not hit:
+                bad_free.append(z["label"])
+    if bad_free:
+        rep.err(f"zone(s) libre(s) sans passage de 1,20 m pour un meuble porté à deux: {', '.join(bad_free)}")
+    else:
+        rep.info("livraison vers la réserve et meubles vers chaque zone libre: passages de 1,20 m")
+
+    # 6. Files.
+    for li, q in queues:
+        lv = levels[li]
         g = grids[li]
         samples = polyline_samples(q["points"], RES)
         works = [z["shape"] for z in lv["zones"] if z["kind"] in ("work", "private")]
         half = q["width"] / 2
-        crosses = False
-        off_net = 0
-        for x, y, ux, uy in samples:
-            nxv, nyv = -uy, ux
-            for s in (-half, 0.0, half):
-                px, py = x + nxv * s, y + nyv * s
-                if any(inside(w, px, py, tol=-1e-9) for w in works):
-                    crosses = True
-            k = g.cell(x, y)
-            if k is None or not ok_c[li][k] or dist_c[li][k] == float("inf"):
-                off_net += 1
+        crosses = any(inside(w, x + (-uy) * s, y + ux * s, tol=-1e-9)
+                      for x, y, ux, uy in samples for s in (-half, 0.0, half) for w in works)
+        off_net = sum(1 for x, y, _, _ in samples
+                      if (lambda k: k is None or not ok_c[li][k] or dist_c[li][k] == INF)(g.cell(x, y)))
         if crosses:
-            rep.err("la file traverse la zone de travail")
+            rep.err(f"la file « {q['id']} » traverse une zone de travail")
         if off_net:
-            rep.err(f"la file sort des passages de 0,90 m sur {fmt(off_net * RES, 2)} m")
+            rep.err(f"la file « {q['id']} » sort des passages de 0,90 m sur {fmt(off_net * RES, 2)} m")
         length = sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(q["points"], q["points"][1:]))
         if length + 1e-6 < (q["places"] - 1) * norms["queue_pitch"]:
-            rep.err(f"file de {fmt(length, 2)} m trop courte pour {q['places']} personnes")
-        reg = lv["points"].get("register")
-        if reg and math.hypot(q["points"][-1][0] - reg[0], q["points"][-1][1] - reg[1]) > 0.6:
-            rep.err("la file ne finit pas à la caisse")
-        doors = [e for e in lv["elements"] if e["kind"] == "door" and e.get("entrance")]
-        if doors:
+            rep.err(f"file « {q['id']} » de {fmt(length, 2)} m, trop courte pour {q['places']} personnes")
+        reg = q["register"]
+        if math.hypot(q["points"][-1][0] - reg[0], q["points"][-1][1] - reg[1]) > 0.6:
+            rep.err(f"la file « {q['id']} » ne finit pas à sa caisse")
+        doors = [e for e in lv["elements"] if e["kind"] == "door" and e["id"] in q["doors"]]
+        if len(doors) != len(q["doors"]):
+            rep.err(f"file « {q['id']} »: porte inconnue")
+        elif doors:
             d0 = min(dist_to_shape(e["shape"], *q["points"][0])[0] for e in doors)
             if d0 > 2.5:
-                rep.err(f"la file commence à {fmt(d0)} m de la porte d'entrée (2,5 m au plus)")
-        pk = lv["points"].get("pickup")
-        if pk:
-            for x, y, ux, uy in samples:
-                if math.hypot(pk[0] - x, pk[1] - y) < half - 0.05:
-                    rep.err("la passe est dans la file: le client revient sur ses pas")
-                    break
-        rep.info(f"file: {q['places']} personnes sur {fmt(length, 2)} m, hors de la zone de travail"
-                 if not crosses else "file: traverse la zone de travail")
+                rep.err(f"la file « {q['id']} » commence à {fmt(d0)} m de sa porte (2,5 m au plus)")
+        pk = q["pickup"]
+        if any(math.hypot(pk[0] - x, pk[1] - y) < half - 0.05 for x, y, _, _ in samples):
+            rep.err(f"la passe « {q['id']} » est dans la file: le client reviendrait sur ses pas")
+        if not crosses:
+            rep.info(f"file « {q['id']} »: {q['places']} personnes sur {fmt(length, 2)} m, hors des zones de travail")
 
-    # 8. Passages à garder libres, portes, escaliers.
+    # 7. Passages à garder libres, portes, escaliers.
     for li, lv in enumerate(levels):
-        movable = [e for e in lv["elements"] if e["kind"] in ("table", "seat", "furniture") and e.get("blocks")]
+        movable = [e for e in lv["elements"] if e["kind"] in MOVABLE and e.get("blocks")]
         for z in lv["zones"]:
             if z["kind"] != "keep_clear":
                 continue
@@ -707,89 +776,127 @@ def check_plan(plan, norms):
                 continue
             w = e.get("width", 0)
             if e.get("access") == "public" and w + EPS < norms["public_door_min"]:
-                rep.err(f"porte {e['id']} de {fmt(w, 2)} m (0,90 m au moins)")
-            if e.get("delivery") and w + EPS < norms["delivery_door_min"]:
-                rep.err(f"porte de livraison {e['id']} de {fmt(w, 2)} m (1,20 m au moins)")
+                rep.err(f"porte {e['id']} de {fmt(w, 2)} m ({fmt(norms['public_door_min'], 2)} m au moins)")
+            if (e.get("delivery") or e.get("entrance")) and w + EPS < norms["delivery_door_min"]:
+                rep.err(f"porte {e['id']} ({e.get('label')}) de {fmt(w, 2)} m: entrées et livraisons "
+                        f"demandent {fmt(norms['delivery_door_min'], 2)} m")
     for lk in plan["links"]:
         if lk["public"] and lk["width"] + EPS < norms["public_stair_min"]:
-            rep.err(f"escalier {lk['id']} de {fmt(lk['width'], 2)} m (1,20 m au moins)")
+            rep.err(f"escalier {lk['id']} de {fmt(lk['width'], 2)} m ({fmt(norms['public_stair_min'], 2)} m au moins)")
 
-    # 6 et 7. Vues: porte, file, foule.
+    # 8 et 9. Vues: caisse, porte, foule; puis grille de points jouables.
     fov = norms["fov_deg"]
-    for li, lv in enumerate(levels):
-        g = grids[li]
-        op = opaque[li]
-        q = lv.get("queue")
-        slots = queue_slots(q, norms["queue_pitch"]) if q else []
-        doors = [e for e in lv["elements"] if e["kind"] == "door" and e.get("entrance")]
-        lv_seats = [e for e in lv["elements"] if e["kind"] == "seat"]
-        spaces = [z for z in lv["zones"] if z["kind"] == "space"]
-        space_samples = []
-        for z in spaces:
+    half_fov = fov / 2
+    crowd_cap = norms["crowd_cap"]
+    level_targets = []
+    for lv in levels:
+        tg = {"people": [center(e["shape"]) for e in lv["elements"] if e["kind"] == "seat"]
+              + [s for q in lv.get("queues", []) for s in queue_slots(q, norms["queue_pitch"])],
+              "furn": [center(e["shape"]) for e in lv["elements"] if e["kind"] in MOVABLE],
+              "spaces": []}
+        for z in lv["zones"]:
+            if z["kind"] != "space":
+                continue
             x0, y0, x1, y1 = bbox(z["shape"])
             pts = []
-            yy = y0 + 0.25
+            yy = y0 + 0.5
             while yy < y1:
-                xx = x0 + 0.25
+                xx = x0 + 0.5
                 while xx < x1:
                     if inside(z["shape"], xx, yy):
                         pts.append((xx, yy))
-                    xx += 0.5
-                yy += 0.5
-            space_samples.append(pts)
+                    xx += 1.0
+                yy += 1.0
+            tg["spaces"].append((z, pts or [center(z["shape"])]))
+        level_targets.append(tg)
+
+    def crowd_at(li, vx, vy):
+        g, op, tg = grids[li], opaque[li], level_targets[li]
+        ang_people = sorted(angle_of(vx, vy, x, y) for x, y in tg["people"] if los(g, op, vx, vy, x, y))
+        space_angles = []
+        for z, pts in tg["spaces"]:
+            angs = sorted(angle_of(vx, vy, x, y) for x, y in pts if los(g, op, vx, vy, x, y))
+            if angs:
+                space_angles.append((z["extras"], angs))
+        furn = sum(1 for x, y in tg["furn"] if los(g, op, vx, vy, x, y))
+        worst, worst_dir = -1, 0
+        for step in range(0, 360, 5):
+            lo, hi = step - half_fov, step + half_fov
+            c = count_window(ang_people, lo, hi) + 1
+            c += sum(ex for ex, angs in space_angles if count_window(angs, lo, hi) > 0)
+            if c > worst:
+                worst, worst_dir = c, step
+        around = len(ang_people) + sum(ex for ex, _ in space_angles) + 1
+        return worst, worst_dir, around, furn
+
+    for li, lv in enumerate(levels):
+        g, op = grids[li], opaque[li]
         for v in lv["views"]:
             vx, vy = v["pos"]
-            face = v["facing_deg"]
-            vis_seats = []
-            for e in lv_seats:
-                sx, sy = center(e["shape"])
-                if visible(g, op, vx, vy, sx, sy):
-                    vis_seats.append(angle_of(vx, vy, sx, sy))
-            vis_slots = []
-            for i, (sx, sy) in enumerate(slots):
-                ok = visible(g, op, vx, vy, sx, sy)
-                vis_slots.append((i, angle_of(vx, vy, sx, sy), ok))
-            vis_spaces = []
-            for z, pts in zip(spaces, space_samples):
-                angs = [angle_of(vx, vy, px, py) for px, py in pts if visible(g, op, vx, vy, px, py)]
-                vis_spaces.append((z, angs))
-            line = {"plan": plan["id"], "level": lv["id"], "view": v["id"], "label": v["label"]}
-            if "door" in v["checks"]:
-                best = None
-                for e in doors:
+            line = {"level": lv["id"], "view": v["id"], "label": v["label"]}
+            for chk in v["checks"]:
+                kind, _, ident = chk.partition(":")
+                if kind == "queue":
+                    q = next((q for q in lv.get("queues", []) if q["id"] == ident), None)
+                    if q is None:
+                        rep.err(f"vue « {v['label']} »: file « {ident} » inconnue")
+                        continue
+                    pts = [tuple(s) for s in queue_slots(q, norms["queue_pitch"])]
+                    doors = [center(e["shape"]) for e in lv["elements"]
+                             if e["kind"] == "door" and e["id"] in q["doors"]]
+                    hidden = [p for p in pts + doors if not los(g, op, vx, vy, p[0], p[1])]
+                    width, _ = covering_arc([angle_of(vx, vy, x, y) for x, y in pts + doors])
+                    if hidden:
+                        rep.err(f"vue « {v['label']} »: {len(hidden)} point(s) de la file ou de la porte cachés")
+                    if width > fov + 1e-6:
+                        rep.err(f"vue « {v['label']} »: la file et la porte tiennent dans {width:.0f} degrés, "
+                                f"plus que le champ de {fov}")
+                    line["queue_arc"] = (width, len(pts))
+                elif kind == "door":
+                    e = next((e for e in lv["elements"] if e["kind"] == "door" and e["id"] == ident), None)
+                    if e is None:
+                        rep.err(f"vue « {v['label']} »: porte « {ident} » inconnue")
+                        continue
                     dx, dy = center(e["shape"])
-                    a_ = angle_of(vx, vy, dx, dy)
-                    dd = angdiff(a_, face)
-                    vis = visible(g, op, vx, vy, dx, dy, skip_end=0.3)
-                    if vis and dd <= fov / 2 and (best is None or dd < best):
-                        best = dd
-                if best is None:
-                    rep.err(f"vue « {v['label']} »: la porte d'entrée n'est pas dans le champ, ou elle est cachée")
-                line["door_deg"] = best
-            if "queue" in v["checks"]:
-                seen = sum(1 for i, a_, ok in vis_slots if ok and angdiff(a_, face) <= fov / 2)
-                if seen < len(slots):
-                    rep.err(f"vue « {v['label']}  »: {len(slots) - seen} place(s) de la file hors du champ ou cachées")
-                line["queue_seen"] = (seen, len(slots))
-            line["seats_front"] = sum(1 for a_ in vis_seats if angdiff(a_, face) <= fov / 2)
-            line["seats_total"] = len(lv_seats)
-            worst, worst_dir = -1, 0
-            for step in range(0, 360, 5):
-                c = sum(1 for a_ in vis_seats if angdiff(a_, step) <= fov / 2)
-                c += sum(1 for i, a_, ok in vis_slots if ok and angdiff(a_, step) <= fov / 2)
-                c += sum(z["extras"] for z, angs in vis_spaces if any(angdiff(a_, step) <= fov / 2 for a_ in angs))
-                c += 1  # l'autre joueur, compté partout
-                if c > worst:
-                    worst, worst_dir = c, step
-            around = len(vis_seats) + sum(1 for _, _, ok in vis_slots if ok)
-            around += sum(z["extras"] for z, angs in vis_spaces if angs) + 1
-            line["crowd"] = worst
-            line["crowd_dir"] = worst_dir
-            line["crowd_around"] = around
-            if worst > norms["crowd_cap"]:
-                rep.err(f"vue « {v['label']} »: {worst} personnages au pire dans le champ "
-                        f"(plafond {norms['crowd_cap']})")
+                    dd = angdiff(angle_of(vx, vy, dx, dy), v["facing_deg"])
+                    if dd > half_fov or not los(g, op, vx, vy, dx, dy):
+                        rep.err(f"vue « {v['label']} »: la porte n'est pas dans l'axe de travail ou elle est cachée")
+                    line["door_deg"] = dd
+            worst, wdir, around, furn = crowd_at(li, vx, vy)
+            line.update(crowd=worst, crowd_dir=wdir, crowd_around=around, furn=furn)
+            if worst > crowd_cap:
+                rep.err(f"vue « {v['label']} »: {worst} personnages au pire dans le champ (C3: {crowd_cap})")
             rep.views.append(line)
+
+    if with_grid:
+        worst_pt, n_pts, over = None, 0, 0
+        for li, lv in enumerate(levels):
+            g = grids[li]
+            fx0, fy0, fx1, fy1 = lv["frame"]
+            yy = math.floor(fy0) + 0.5
+            while yy < fy1:
+                xx = math.floor(fx0) + 0.5
+                while xx < fx1:
+                    k = g.cell(xx, yy)
+                    if k is not None and (dist_c[li][k] < INF or dist_s[li][k] < INF):
+                        n_pts += 1
+                        w, d, around, furn = crowd_at(li, xx, yy)
+                        if worst_pt is None or w > worst_pt[0]:
+                            worst_pt = (w, d, li, xx, yy, furn)
+                        if w > crowd_cap:
+                            over += 1
+                            if over <= 5:
+                                rep.err(f"point jouable ({fmt(xx)} ; {fmt(yy)}) du niveau {lv['id']}: "
+                                        f"{w} personnages au pire dans le champ (C3: {crowd_cap})")
+                    xx += 1.0
+                yy += 1.0
+        if over > 5:
+            rep.err(f"et {over - 5} autre(s) point(s) jouable(s) au-dessus du plafond C3")
+        if worst_pt:
+            rep.grid_worst = worst_pt
+            w, d, li, x, y, furn = worst_pt
+            rep.info(f"grille de {n_pts} points jouables (un par mètre): au pire {w} personnages dans le champ, "
+                     f"en ({fmt(x)} ; {fmt(y)}) du niveau {levels[li]['id']}")
     return rep
 
 
@@ -804,8 +911,10 @@ def compass(plan_deg, north_deg):
 
 def main(argv):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plans.json")
-    only = None
     args = list(argv)
+    with_grid = "--sans-grille" not in args
+    args = [a for a in args if a != "--sans-grille"]
+    only = None
     if "--plan" in args:
         i = args.index("--plan")
         only = args[i + 1]
@@ -819,23 +928,22 @@ def main(argv):
     for plan in data["plans"]:
         if only and plan["id"] != only:
             continue
-        rep = check_plan(plan, norms)
+        rep = check_plan(plan, norms, with_grid)
         total_err += len(rep.errors)
         print(f"== {plan['id']}: {plan['title']}, {plan['state_label'].lower()}")
         for s in rep.lines:
             print(f"  {s}")
         for v in rep.views:
             parts = [f"vue « {v['label']} »"]
+            if "queue_arc" in v:
+                w, n = v["queue_arc"]
+                parts.append(f"client, file ({n} places) et porte d'un seul regard: {w:.0f} degrés sur {norms['fov_deg']}")
             if "door_deg" in v:
-                parts.append("porte dans le champ" + (f" à {v['door_deg']:.0f} degrés de l'axe" if v["door_deg"] is not None else ": NON"))
-            if "queue_seen" in v:
-                parts.append(f"file vue {v['queue_seen'][0]}/{v['queue_seen'][1]}")
-            parts.append(f"places devant soi {v['seats_front']}/{v['seats_total']}")
+                parts.append(f"porte à {v['door_deg']:.0f} degrés de l'axe de travail")
             parts.append(f"foule au pire {v['crowd']} dans le champ (regard vers le "
-                         f"{compass(v['crowd_dir'], plan['north_deg'])}), {v['crowd_around']} en se retournant")
+                         f"{compass(v['crowd_dir'], plan['north_deg'])}), {v['crowd_around']} en se retournant; "
+                         f"{v['furn']} meubles dessinés en vue")
             print("  " + "; ".join(parts))
-        for w in rep.warnings:
-            print(f"  attention: {w}")
         for e in rep.errors:
             print(f"  ERREUR: {e}")
         print(f"  {len(rep.errors)} erreur(s)")

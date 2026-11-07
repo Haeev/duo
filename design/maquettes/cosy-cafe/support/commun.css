@@ -200,11 +200,11 @@ kbd, .touche {
 }
 
 /* Régions ancrées aux coins: aucune ne pousse les autres. */
-.hud-haut-gauche { top: 1em; left: 1em; display: grid; gap: 0.5em; justify-items: start; max-width: 22em; }
-.hud-haut-droite { top: 1em; right: 1em; display: grid; gap: 0.5em; justify-items: end; max-width: 22em; }
-.hud-bas-gauche { bottom: 1em; left: 1em; max-width: 19em; }
-.hud-bas-droite { bottom: 4em; right: 1em; max-width: 19em; }
-.hud-bas-centre { bottom: 1em; left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 0.5em; }
+/* Le bas de l'écran reste aux mains et au plan de travail: seul « En main » s'y tient, dans le coin. */
+.hud-haut-gauche { top: 1em; left: 1em; display: grid; gap: 0.5em; justify-items: start; width: 15em; }
+.hud-haut-centre { top: 1em; left: 50%; transform: translateX(-50%); display: grid; gap: 0.5em; justify-items: center; width: 19em; }
+.hud-haut-droite { top: 1em; right: 1em; display: grid; gap: 0.5em; justify-items: end; width: 14.5em; }
+.hud-bas-droite { bottom: 4em; right: 1em; width: 14em; }
 .hud-centre { left: 50%; top: 50%; width: 0; height: 0; }
 
 /* Point de visée et invite */
@@ -254,19 +254,19 @@ kbd, .touche {
 .minuterie__anneau { width: 1.3em; height: 1.3em; }
 
 /* Alertes douces */
-.alertes { display: grid; gap: 0.4em; justify-items: start; }
+.alertes { display: grid; gap: 0.4em; justify-items: center; width: 100%; }
 .alerte {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.15em 0.55em;
   align-items: start;
-  max-width: 21em;
+  width: 100%;
   font-size: 0.9375em;
 }
 .alerte__texte { white-space: normal; }
 
 /* L'autre joueur, hors de vue */
-.autre { display: grid; grid-template-columns: auto 1fr auto; gap: 0.1em 0.6em; align-items: center; min-width: 15em; }
+.autre { display: grid; grid-template-columns: auto 1fr auto; gap: 0.1em 0.5em; align-items: center; width: 100%; }
 .autre__nom { font-weight: 700; }
 .autre__ou { grid-column: 2; font-size: 0.9375em; }
 .autre__tient { grid-column: 2; font-size: 0.875em; color: var(--encre-2); }
@@ -274,14 +274,14 @@ kbd, .touche {
 .autre__direction .icone { width: 1.8em; height: 1.8em; }
 
 /* Propositions (accord des deux) */
-.proposition { max-width: 21em; display: grid; gap: 0.35em; }
+.proposition { width: 100%; display: grid; gap: 0.35em; }
 .proposition__titre { display: flex; align-items: center; gap: 0.45em; font-weight: 700; }
 .proposition__objet { font-size: 0.9375em; }
 .proposition__aide { font-size: 0.875em; color: var(--encre-2); display: flex; align-items: center; gap: 0.35em; flex-wrap: wrap; }
 .proposition--envoyee { border-style: dashed; }
 
 /* Tickets pris par soi */
-.tickets { display: grid; gap: 0.4em; }
+.tickets { display: grid; gap: 0.4em; width: 100%; }
 .tickets__titre { font-size: 0.8125em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #fff; background: #333; justify-self: start; padding: 0.05em 0.5em; border-radius: 0.3em; }
 .ticket-hud { display: grid; gap: 0.15em; padding: 0.45em 0.7em; border-radius: 0.5em; }
 .ticket-hud__tete { display: flex; align-items: center; gap: 0.45em; font-weight: 700; }
@@ -297,18 +297,20 @@ kbd, .touche {
 .en-main__ligne { font-size: 0.9375em; display: flex; gap: 0.4em; }
 
 /* Astuce et barre d'aménagement */
-.astuce { max-width: 36em; white-space: normal; text-align: center; }
-.barre-amenagement { display: grid; gap: 0.35em; justify-items: center; }
+.astuce { width: 100%; white-space: normal; text-align: center; border-radius: 0.75em; padding: 0.45em 0.8em; }
+.barre-amenagement { display: grid; gap: 0.35em; justify-items: center; width: 100%; }
 .barre-amenagement__touches { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35em 0.9em; font-size: 0.9em; }
 .barre-amenagement__touches span { display: inline-flex; align-items: center; gap: 0.3em; white-space: nowrap; }
 .statut-pose { font-weight: 700; }
 .statut-pose--non { border-style: dashed; border-width: 3px; }
 
 /* Repères au bord de l'écran (sons et autre joueur): bande centrale des bords seulement. */
-.repere { display: inline-flex; align-items: center; gap: 0.4em; font-size: 0.875em; }
-.repere--droite { right: 0.6em; top: 44%; }
-.repere--gauche { left: 0.6em; top: 52%; }
-.repere--bas { bottom: 5.5em; left: 50%; transform: translateX(-50%); }
+/* Repères des sons: une icône sur un anneau autour du point de visée, dans la direction du son. */
+.repere { position: absolute; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 0.2em; padding: 0.25em 0.45em; }
+.repere .icone { width: 1.35em; height: 1.35em; }
+.repere--gauche { left: -7.5em; top: 0; }
+.repere--droite { left: 7.5em; top: 0; }
+.repere--derriere { left: 0; top: 8.5em; }
 
 /* Étiquette au-dessus d'une personne (dans le monde) et bulle d'un client */
 .etiquette-monde { font-size: 0.9375em; padding: 0.15em 0.6em; }

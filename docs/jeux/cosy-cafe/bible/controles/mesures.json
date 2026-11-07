@@ -3388,9 +3388,9 @@
     },
     {
       "family": "adresse village",
-      "id": "village_plane",
+      "id": "village_tree",
       "hex": "#6E8A4C",
-      "fr": "platane",
+      "fr": "tilleul",
       "bande": "dehors",
       "L": 54,
       "C": 36.7,
@@ -3418,28 +3418,28 @@
     {
       "family": "adresse village",
       "id": "village_bark",
-      "hex": "#BDB39A",
-      "fr": "écorce de platane",
+      "hex": "#9E9580",
+      "fr": "écorce du tilleul",
       "bande": "dehors",
-      "L": 73.1,
-      "C": 14.1,
-      "h": 92,
-      "gray": 70.3,
+      "L": 61.9,
+      "C": 12.3,
+      "h": 91,
+      "gray": 58.6,
       "nearestPlayer": {
-        "d": 23,
-        "id": "star"
+        "d": 24.8,
+        "id": "comet"
       },
       "nearestPlayerSimulated": {
         "deuteranopie": {
-          "d": 9.3,
+          "d": 0.3,
           "id": "comet"
         },
         "protanopie": {
-          "d": 6.6,
+          "d": 7.4,
           "id": "comet"
         },
         "tritanopie": {
-          "d": 19.1,
+          "d": 19.6,
           "id": "planet"
         }
       }

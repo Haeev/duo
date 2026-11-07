@@ -35,7 +35,7 @@
       graduations += `<line x1="${(cx + 44 * Math.sin(a)).toFixed(1)}" y1="${(cy - 44 * Math.cos(a)).toFixed(1)}" x2="${(cx + 50 * Math.sin(a)).toFixed(1)}" y2="${(cy - 50 * Math.cos(a)).toFixed(1)}" stroke="#444" stroke-width="4"/>`;
     }
     return `<circle cx="${cx}" cy="${cy}" r="56" fill="#f6f6f6" stroke="#555" stroke-width="6"/>${graduations}` +
-      `<g data-si="service proposition proposition-ouverte envoyee reprendre">${aiguilles(cx, cy, 11, 20)}</g>` +
+      `<g data-si="service proposition proposition-ouverte envoyee reprendre absence">${aiguilles(cx, cy, 11, 20)}</g>` +
       `<g data-si="vide ouverture ouverture-ouverte">${aiguilles(cx, cy, 7, 30)}</g>` +
       `<circle cx="${cx}" cy="${cy}" r="6" fill="#222"/>`;
   }
@@ -81,7 +81,7 @@
       <line x1="200" y1="190" x2="420" y2="190" stroke="#f4f4f4" stroke-width="8" stroke-linecap="round"/>${craie}
       <rect x="600" y="300" width="260" height="120" rx="10" fill="#8c8c8c"/>
       <rect x="604" y="284" width="252" height="16" fill="#777"/>
-      <g data-si="service proposition proposition-ouverte envoyee reprendre vide ouverture ouverture-ouverte">${tasses}</g>
+      <g data-si="service proposition proposition-ouverte envoyee reprendre absence vide ouverture ouverture-ouverte">${tasses}</g>
       <circle cx="660" cy="335" r="15" fill="#e6e6e6"/><circle cx="800" cy="335" r="15" fill="#e6e6e6"/>
       <rect x="645" y="420" width="50" height="16" fill="#666"/><rect x="765" y="420" width="50" height="16" fill="#666"/>
       <line x1="860" y1="340" x2="902" y2="418" stroke="#555" stroke-width="8" stroke-linecap="round"/>
@@ -99,13 +99,13 @@
       <rect x="360" y="372" width="110" height="58" fill="#6f6f6f"/>
       <rect x="1190" y="362" width="250" height="68" fill="#e8e8e8" stroke="#8a8a8a" stroke-width="4"/>
       <g fill="#b9b9b9"><ellipse cx="1235" cy="408" rx="24" ry="10"/><ellipse cx="1295" cy="408" rx="24" ry="10"/><ellipse cx="1355" cy="408" rx="24" ry="10"/><ellipse cx="1405" cy="408" rx="20" ry="10"/></g>
-      <g data-si="service proposition proposition-ouverte envoyee reprendre">${rail}</g>
+      <g data-si="service proposition proposition-ouverte envoyee reprendre absence">${rail}</g>
       <g data-si="vide ouverture ouverture-ouverte"><line x1="560" y1="110" x2="560" y2="128" stroke="#666" stroke-width="4"/><line x1="1380" y1="110" x2="1380" y2="128" stroke="#666" stroke-width="4"/><rect x="540" y="128" width="860" height="10" fill="#6f6f6f"/></g>
-      <g data-si="service proposition proposition-ouverte envoyee reprendre" fill="#808080">
+      <g data-si="service proposition proposition-ouverte envoyee reprendre absence" fill="#808080">
         <circle cx="560" cy="362" r="34" fill="#7a7a7a"/><path d="M505 410 Q560 392 615 410 L628 640 L492 640 Z"/>
         <circle cx="705" cy="374" r="32" fill="#7a7a7a"/><path d="M652 420 Q705 404 758 420 L770 640 L640 640 Z"/>
       </g>
-      <g data-si="service proposition proposition-ouverte envoyee reprendre">
+      <g data-si="service proposition proposition-ouverte envoyee reprendre absence">
         <rect x="1040" y="470" width="140" height="92" fill="#9a9a9a"/>
         <circle cx="1110" cy="440" r="38" fill="#7a7a7a"/><rect x="1050" y="478" width="120" height="110" rx="26" fill="#888"/>
       </g>
@@ -115,13 +115,13 @@
       <rect x="1050" y="566" width="40" height="28" fill="#fff" stroke="#555" stroke-width="2"/><text x="1062" y="588" font-size="20" fill="#111" font-family="system-ui, sans-serif">3</text>
       <ellipse cx="250" cy="812" rx="240" ry="56" fill="#a3a3a3" stroke="#6a6a6a" stroke-width="4"/>
       <g fill="#dedede" stroke="#888" stroke-width="2"><rect x="190" y="772" width="34" height="30"/><rect x="290" y="778" width="34" height="30"/></g>
-      <g data-si="service proposition proposition-ouverte envoyee reprendre">
-        <polygon points="1210,1080 1290,970 1380,990 1330,1080" fill="#9d9d9d"/>
-        <polygon points="1830,1080 1700,975 1780,960 1920,1050 1920,1080" fill="#9d9d9d"/>
-        <ellipse cx="1500" cy="975" rx="300" ry="84" fill="#8a8a8a" stroke="#555" stroke-width="5"/>
-        <ellipse cx="1435" cy="950" rx="56" ry="13" fill="#e6e6e6" stroke="#888" stroke-width="2"/>
-        <rect x="1400" y="888" width="70" height="60" fill="#f0f0f0" stroke="#777" stroke-width="3"/><ellipse cx="1435" cy="888" rx="35" ry="10" fill="#cfcfcf" stroke="#777" stroke-width="2"/>
-        <ellipse cx="1590" cy="942" rx="82" ry="20" fill="#ececec" stroke="#888" stroke-width="2"/><ellipse cx="1590" cy="932" rx="46" ry="13" fill="#b4b4b4"/>
+      <g data-si="service proposition proposition-ouverte envoyee reprendre absence">
+        <polygon points="960,1080 1040,970 1130,990 1080,1080" fill="#9d9d9d"/>
+        <polygon points="1560,1080 1450,975 1530,960 1660,1080" fill="#9d9d9d"/>
+        <ellipse cx="1250" cy="975" rx="300" ry="84" fill="#8a8a8a" stroke="#555" stroke-width="5"/>
+        <ellipse cx="1185" cy="950" rx="56" ry="13" fill="#e6e6e6" stroke="#888" stroke-width="2"/>
+        <rect x="1150" y="888" width="70" height="60" fill="#f0f0f0" stroke="#777" stroke-width="3"/><ellipse cx="1185" cy="888" rx="35" ry="10" fill="#cfcfcf" stroke="#777" stroke-width="2"/>
+        <ellipse cx="1340" cy="942" rx="82" ry="20" fill="#ececec" stroke="#888" stroke-width="2"/><ellipse cx="1340" cy="932" rx="46" ry="13" fill="#b4b4b4"/>
       </g>
       ${etiquette(1180, 256, 'Rail à tickets (dos)')}${etiquette(160, 420, 'Ardoise')}${etiquette(1180, 520, 'Table 3')}${etiquette(1622, 470, 'Porte de service')}
     </svg>`;
@@ -130,12 +130,12 @@
   // ---------- 2. Derrière le comptoir, vers la salle et la porte ----------
   function comptoir() {
     const tickets = [
-      ['11', 'Table 1', ['2 grands crèmes'], null],
-      ['12', 'Table 3', ['1 cappuccino', '1 tartelette'], 'orb'],
+      ['11', 'Table 1', ['2 cafés crème'], null],
+      ['12', 'Table 3', ['1 cappuccino', '1 tarte fruits'], 'orb'],
       ['13', 'Comptoir', ['1 thé vert'], 'crescent'],
       ['14', 'Comptoir', ['1 chocolat'], 'orb'],
       ['15', 'Table 5', ['2 chocolats', '1 pain choc.'], null],
-      ['16', 'À emporter', ['1 grand crème'], null]
+      ['16', 'À emporter', ['1 café crème'], null]
     ];
     const barreRail = `<line x1="540" y1="90" x2="540" y2="120" stroke="#666" stroke-width="4"/><line x1="1380" y1="90" x2="1380" y2="120" stroke="#666" stroke-width="4"/>` +
       `<rect x="520" y="120" width="880" height="12" fill="#6f6f6f"/>`;
@@ -174,7 +174,7 @@
       <g data-si="rail caisse vide">
         <rect x="200" y="650" width="260" height="70" fill="#6a6a6a"/>
         <rect x="225" y="540" width="210" height="110" fill="#f0f0f0" stroke="#555" stroke-width="5"/>
-        <g data-si="caisse" font-family="system-ui, sans-serif" fill="#111"><text x="238" y="568" font-size="17">Cappuccino 3,20</text><text x="238" y="594" font-size="17">Croissant 1,20</text><text x="238" y="630" font-size="19" font-weight="700">Total 4,40 €</text></g>
+        <g data-si="caisse" font-family="system-ui, sans-serif" fill="#111"><text x="238" y="568" font-size="17">Cappuccino 3,00</text><text x="238" y="594" font-size="17">Croissant 1,20</text><text x="238" y="630" font-size="19" font-weight="700">Total 4,20 €</text></g>
         <g data-si="rail vide" font-family="system-ui, sans-serif" fill="#333"><text x="250" y="600" font-size="19">La Tasse Bleue</text></g>
         <rect x="0" y="700" width="1920" height="120" fill="#8f8f8f"/>
         <rect x="0" y="820" width="1920" height="22" fill="#7a7a7a"/>
@@ -196,9 +196,9 @@
     const centre = [780, 470];
     const angle = (t) => ((-135 + (t / 80) * 270) * Math.PI) / 180;
     const pt = (t, r) => [centre[0] + r * Math.sin(angle(t)), centre[1] - r * Math.cos(angle(t))].map((v) => v.toFixed(1));
-    const [ax, ay] = pt(60, 40);
+    const [ax, ay] = pt(58, 40);
     const [bx, by] = pt(65, 40);
-    const [nx, ny] = pt(58, 36);
+    const [nx, ny] = pt(55, 36);
     return `<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${DEFS}
       <rect x="0" y="0" width="1920" height="1080" fill="${GRIS.mur}"/>
       <rect x="260" y="90" width="1400" height="30" fill="#777"/>

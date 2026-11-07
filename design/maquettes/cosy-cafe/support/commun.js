@@ -246,7 +246,8 @@
     if (!depart || depart === corps) return false;
     const groupe = depart.closest('[data-nav]');
     if (!groupe) return false;
-    if (depart.matches('input[type="text"], textarea')) return false;
+    // Un champ d'une ligne garde ses flèches gauche et droite (curseur) et ses lettres; haut et bas en sortent.
+    if (depart.matches('input[type="text"], textarea') && e.code !== 'ArrowUp' && e.code !== 'ArrowDown') return false;
     // Un curseur garde ses flèches gauche et droite pour changer sa valeur.
     if (depart.matches('input[type="range"]') && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) return false;
     const elements = [...groupe.querySelectorAll(FOCALISABLES)].filter((el) => visible(el) && !el.closest('[data-hors-nav]'));
@@ -364,7 +365,7 @@
       e.preventDefault();
       return;
     }
-    if (!champ && (fenetre || interfaceOuverte()) && navigationSpatiale(e)) {
+    if ((!champ || e.code === 'ArrowUp' || e.code === 'ArrowDown') && (fenetre || interfaceOuverte()) && navigationSpatiale(e)) {
       e.preventDefault();
       return;
     }

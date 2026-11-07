@@ -1,7 +1,7 @@
 'use strict';
 // Petit moteur de dessin en perspective pour les planches de la bible de Cosy Café.
 // Il projette des polygones 3D (mètres, Y en haut) avec la caméra subjective de la bible (champ vertical de 60 degrés,
-// yeux à 1,68 m, image de 1366 x 768 comme l'écran du PC de référence), les éclaire grossièrement comme le ferait
+// yeux à 1,65 m comme les plans du level designer, image de 1366 x 768 comme l'écran du PC de référence), les éclaire grossièrement comme le ferait
 // la lumière cuite (ciel, vitrines, lampes, occlusion près du sol), les trie du plus loin au plus proche
 // (algorithme du peintre) et écrit du SVG. Ce n'est pas le moteur du jeu: c'est un outil d'illustration à l'échelle.
 
@@ -36,7 +36,7 @@ const shadeHex = (h, k) => toHex(toLin(h).map((x) => x * k));
 const r1 = (x) => Math.round(x * 10) / 10;
 
 class Camera {
-  constructor({ x, y = 1.68, z, yaw = 0, pitch = 0, vfov = 60, width = 1366, height = 768 }) {
+  constructor({ x, y = 1.65, z, yaw = 0, pitch = 0, vfov = 60, width = 1366, height = 768 }) {
     Object.assign(this, { pos: [x, y, z], yaw, pitch, vfov, width, height });
     const ya = (yaw * Math.PI) / 180;
     const pa = (pitch * Math.PI) / 180;

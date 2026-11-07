@@ -447,4 +447,43 @@ function sunPatch(s, x0, x1, y0, y1, zw, dir, room, color = '#FFD9A0', opacity =
   if (d) s.layers.overlays.push(d);
 }
 
-module.exports = { obj, cup, cupParts, roundTable, squareTable, chair, stool, pendant, plant, cupRow, cupColumn, espressoMachine, grinder, slateBoard, ticketRail, pastryCase, register, guestbook, windowZ, doorZ, facade, tree, ground, sunPatch, C, PORCELAIN, INK };
+
+// machine à expresso posée sur un comptoir parallèle à la façade, face au barista (facing '-z') ou aux clients
+function espressoMachineZ(s, x, y, z, o = {}) {
+  const body = o.body || C('copper');
+  const steel = C('steel');
+  const dark = C('steel_dark');
+  const w = (o.groups || 2) === 1 ? 0.24 : 0.36;
+  const sgn = o.facing === '+z' ? 1 : -1;
+  const zf = z + sgn * 0.22;
+  const zb = z - sgn * 0.22;
+  const z0 = Math.min(zf, zb);
+  const z1 = Math.max(zf, zb);
+  const parts = [
+    [1, s.box(x - w, y, z0, x + w, y + 0.42, z1, { top: steel, side: body })],
+    [1, s.box(x - w + 0.02, y + 0.42, z0 + 0.02, x + w - 0.02, y + 0.47, z1 - 0.02, steel)],
+    [1, s.box(x - w, y + 0.02, Math.min(zf, zf + sgn * 0.12), x + w, y + 0.05, Math.max(zf, zf + sgn * 0.12), dark)],
+  ];
+  const groups = o.groups === 1 ? [0] : [-0.16, 0.16];
+  for (const gx of groups) {
+    // groupes, porte-filtres et buse: même ordre que le corps, la profondeur décide (vus de dos, ils sont cachés)
+    parts.push([1, s.box(x + gx - 0.04, y + 0.24, Math.min(zf, zf + sgn * 0.07), x + gx + 0.04, y + 0.3, Math.max(zf, zf + sgn * 0.07), steel)]);
+    parts.push([1, s.box(x + gx - 0.015, y + 0.2, Math.min(zf, zf + sgn * 0.2), x + gx + 0.015, y + 0.23, Math.max(zf, zf + sgn * 0.2), dark)]);
+  }
+  parts.push([1, s.box(x + w - 0.04, y + 0.12, Math.min(zf, zf + sgn * 0.03), x + w - 0.025, y + 0.36, Math.max(zf, zf + sgn * 0.03), steel)]);
+  for (const cx of [-0.18, 0, 0.18]) parts.push([2, s.cylinder(x + cx, y + 0.47, z, 0.048, 0.06, 10, PORCELAIN, { r1: 0.035 })]);
+  obj(s, parts);
+}
+
+// cloche de verre à viennoiseries sur son plateau de bois
+function pastryDome(s, x, y, z) {
+  const goods = [s.box(x - 0.09, y + 0.03, z - 0.05, x - 0.01, y + 0.08, z + 0.03, C('crust')), s.box(x + 0.01, y + 0.03, z - 0.02, x + 0.1, y + 0.08, z + 0.06, C('crust')), s.box(x - 0.04, y + 0.08, z - 0.03, x + 0.05, y + 0.12, z + 0.04, C('crumb'))];
+  obj(s, [
+    [1, s.cylinder(x, y, z, 0.17, 0.03, 14, C('oak_dark'))],
+    [2, goods.flat()],
+    [3, s.cylinder(x, y + 0.03, z, 0.155, 0.18, 14, '#DCE6E4', { r1: 0.09, opacity: 0.18 })],
+    [3, s.cylinder(x, y + 0.21, z, 0.02, 0.04, 6, C('brass'))],
+  ]);
+}
+
+module.exports = { espressoMachineZ, pastryDome, obj, cup, cupParts, roundTable, squareTable, chair, stool, pendant, plant, cupRow, cupColumn, espressoMachine, grinder, slateBoard, ticketRail, pastryCase, register, guestbook, windowZ, doorZ, facade, tree, ground, sunPatch, C, PORCELAIN, INK };

@@ -1,6 +1,6 @@
 'use strict';
 // Vues subjectives des cinq adresses de Cosy Café pour les planches de la bible.
-// Ce sont des intentions d'ambiance à l'échelle (caméra de la bible: yeux à 1,68 m, champ vertical de 60 degrés,
+// Ce sont des intentions d'ambiance à l'échelle (caméra de la bible: yeux à 1,65 m, champ vertical de 60 degrés,
 // 1366 x 768), pas des plans: les plans et les cotes sont ceux du level designer (docs/jeux/cosy-cafe/plans/).
 // Repère de chaque salle: x de gauche à droite en regardant la rue, z du fond (0) vers la façade sur rue (D), y en haut.
 const { Camera, Scene, mixHex, shadeHex, vnorm, r1 } = require('./scene3d.cjs');
@@ -101,7 +101,10 @@ function figureAt(s, x, z, spec, o = {}) {
   const tint = (h) => (h ? shadeHex(h, lightK) : h);
   let svg = F.person({ ...spec, skin: tint(spec.skin), top: tint(spec.top), bottom: tint(spec.bottom), hair: tint(spec.hair), coat: tint(spec.coat) });
   // liseré de lumière (terme de Fresnel du shader des personnages): plus marqué sur un client qui attend
-  if (o.rim) svg = `<g stroke="#FFF1D6" stroke-opacity="${o.rim}" stroke-width="2.2" stroke-linejoin="round">${F.person({ ...spec, silhouette: '#FFF1D6' })}</g>` + svg;
+  // épaisseur constante à l'écran (environ 2,4 pixels), quelle que soit la distance
+  const zc = s.cam.view([x, 1, z])[2];
+  const rimW = Math.round(((2.4 * zc * 100) / s.cam.focal) * 100) / 100;
+  if (o.rim && zc > 0.1) svg = `<g stroke="#FFF1D6" stroke-opacity="${o.rim}" stroke-width="${rimW * 2}" stroke-linejoin="round">${F.person({ ...spec, silhouette: '#FFF1D6' })}</g>` + svg;
   s.billboard(x, 0, z, svg, 'objects', o.depthBias || 0);
 }
 
@@ -165,54 +168,58 @@ const PLAYER_B = { id: 'crescent', top: '#EEE6D6' };
 const avatar = (pl, view, extra = {}) => ({ view, skin: extra.skin || '#CC9871', hair: extra.hair || '#2B2320', hairStyle: extra.hairStyle || 'short', top: pl.top, bottom: extra.bottom || '#3A3A40', shoes: '#2B2320', apron: { kind: 'player', color: F.PLAYER[pl.id].color, player: pl.id }, headscarf: pl.id, expr: extra.expr || 'content', pose: extra.pose, acc: extra.acc || [] });
 
 // ------------------------------------------------------------------------------------------------
-// 1. Village: café de la place (37 m², poutres, tomettes, chaux, vitrine à petits bois sur la place)
+// 1. Village: le café de la place du Tilleul (plan village-arrivee du level designer, 7,00 x 5,40 m).
+// Passage du plan à ce repère: x = 11,0 - x du plan, z = y du plan - 7,1 (on regarde la place).
+// Vue « a »: point de vue « machine » du plan (derrière le comptoir, face à la place);
+// vue « b »: point de vue « entrée » (face au comptoir, à l'ardoise et à la file).
 function village(momentId = 'afternoon', opts = {}) {
-  const W = 6.6;
-  const D = 5.6;
+  const W = 7.0;
+  const D = 5.4;
   const H = 2.8;
-  const cam = new Camera({ x: 6.0, z: 0.5, yaw: -36, pitch: -10, width: opts.width || 1366, height: opts.height || 768 });
-  const lamps = [
-    { pos: [1.85, 2.1, 2.0] }, { pos: [1.85, 2.1, 3.6] },
-    { pos: [4.0, 2.1, 2.6], power: 0.5 }, { pos: [3.35, 2.1, 4.58], power: 0.5 }, { pos: [5.2, 2.1, 4.63], power: 0.5 },
-  ];
-  const windows = [{ center: [4.5, 1.6, D], normal: [0, 0, -1], power: 1.0 }, { center: [2.1, 1.6, D], normal: [0, 0, -1], power: 0.35 }];
+  const view = opts.view || 'a';
+  const cams = {
+    a: { x: 3.25, z: 0.8, yaw: -9, pitch: -9 },
+    b: { x: 2.3, z: 5.0, yaw: 196, pitch: -8 },
+    c: { x: 2.05, z: 1.0, yaw: 2, pitch: -30 },
+  };
+  const cam = new Camera({ ...cams[view], width: opts.width || 1366, height: opts.height || 768 });
+  const lamps = [{ pos: [0.9, 2.1, 2.15] }, { pos: [2.5, 2.1, 2.15] }, { pos: [3.6, 2.1, 5.1], power: 0.5 }, { pos: [5.2, 2.1, 5.1], power: 0.5 }, { pos: [6.6, 2.1, 2.9], power: 0.5 }];
+  const windows = [{ center: [3.5, 1.5, D], normal: [0, 0, -1], power: 0.9 }, { center: [5.5, 1.5, D], normal: [0, 0, -1], power: 0.9 }, { center: [1.6, 1.4, D], normal: [0, 0, -1], power: 0.3 }];
   const s = new Scene(cam, lighting(momentId, lamps, windows));
   const m = P.moments[momentId];
   const night = momentId === 'evening';
   const winter = momentId === 'winter';
   const rain = momentId === 'rain';
-  const ext = (h) => h;
+  const roofC = winter ? '#EEF1F3' : A('village', 'village_roof');
 
-  // dehors: la place, la fontaine, les platanes, les façades de pierre blonde et leurs volets
+  // dehors: la place du Tilleul (arrêt du car, mairie-école à gauche, église en face, boulangerie à côté)
   const pave = winter ? '#E9EDF0' : rain ? shadeHex(A('village', 'village_paving'), 0.62) : A('village', 'village_paving');
-  M.ground(s, -12, 22, D + 0.4, 40, pave);
-  M.ground(s, -12, 22, D + 0.4, D + 1.8, winter ? '#E3E7EA' : rain ? shadeHex('#B9AE9A', 0.65) : '#B9AE9A');
-  M.facade(s, -9, -2.5, 21, 7.2, { wall: A('village', 'village_stone'), roof: winter ? '#EEF1F3' : A('village', 'village_roof'), shutters: A('village', 'village_shutter'), floors: 2, perFloor: 2, lit: night || rain, seed: 1, sunlit: !!m.sun });
-  M.facade(s, -2.4, 4.2, 20.5, 8.0, { wall: mixHex(A('village', 'village_stone'), '#D9C7A0', 0.4), roof: winter ? '#EEF1F3' : A('village', 'village_roof'), shutters: '#8DA287', floors: 2, perFloor: 2, lit: night || rain, seed: 2, ground: 0.6, shop: '#6B4B35', shopLit: night, sunlit: !!m.sun });
-  M.facade(s, 4.3, 10, 21.5, 6.6, { wall: A('village', 'village_stone_shade'), roof: winter ? '#EEF1F3' : A('village', 'village_roof'), shutters: A('village', 'village_shutter'), floors: 2, perFloor: 2, lit: night, seed: 0, sunlit: !!m.sun });
-  M.facade(s, 10.1, 18, 20, 9.5, { wall: A('village', 'village_stone'), roof: winter ? '#EEF1F3' : '#9C5E45', floors: 3, perFloor: 2, lit: night || rain, seed: 4, shutters: '#B5A58A', sunlit: !!m.sun });
-  // clocher au loin, derrière les toits (repère du village, aucun monument réel)
-  const bell = s.box(6.4, 8, 30, 8.6, 16, 32, { front: A('village', 'village_stone_shade'), left: shadeHex(A('village', 'village_stone_shade'), 0.85), right: shadeHex(A('village', 'village_stone_shade'), 0.85), top: A('village', 'village_roof') }, { exterior: true });
-  s.layers.exterior.push({ depth: 9000, svg: bell.map((f) => f.svg).join('') });
-  const bellRoof = s.face([[6.2, 16, 29.8], [7.5, 19.5, 31], [8.8, 16, 29.8]], winter ? '#EEF1F3' : '#7E8A93', { exterior: true, cull: false });
-  if (bellRoof) s.layers.exterior.push({ depth: 8999, svg: bellRoof.svg });
-  // fontaine
+  M.ground(s, -16, 24, D + 0.5, 48, pave);
+  M.ground(s, -16, 24, D + 0.5, D + 1.9, winter ? '#E3E7EA' : rain ? shadeHex('#B9AE9A', 0.65) : '#B9AE9A');
+  M.facade(s, -14, -4.5, 13.5, 7.8, { wall: mixHex(A('village', 'village_stone'), '#D9C7A0', 0.3), roof: roofC, shutters: A('village', 'village_shutter'), floors: 2, perFloor: 3, lit: night || rain, seed: 1, sunlit: !!m.sun });
+  M.facade(s, -4, 5.5, 22, 7.0, { wall: A('village', 'village_stone'), roof: roofC, shutters: '#8DA287', floors: 2, perFloor: 3, lit: night || rain, seed: 2, sunlit: !!m.sun });
+  M.facade(s, 12.5, 22, 21, 6.6, { wall: A('village', 'village_stone_shade'), roof: roofC, shutters: A('village', 'village_shutter'), floors: 2, perFloor: 2, lit: night, seed: 0, sunlit: !!m.sun });
+  // l'église au fond de la place (façade simple et clocher, aucun édifice réel)
+  const church = [...s.box(5.8, 0, 26, 12, 8.5, 34, { front: A('village', 'village_stone'), left: A('village', 'village_stone_shade'), right: A('village', 'village_stone_shade'), top: roofC }, { exterior: true }), ...s.box(8.0, 8.5, 26.2, 9.8, 15.5, 28, { front: A('village', 'village_stone'), left: A('village', 'village_stone_shade'), right: A('village', 'village_stone_shade') }, { exterior: true })].filter(Boolean);
+  const spire = s.face([[7.8, 15.5, 26.1], [8.9, 19.5, 27.1], [10.0, 15.5, 26.1]], winter ? '#EEF1F3' : '#7E8A93', { exterior: true, cull: false });
+  const portal = s.face([[8.4, 0, 25.98], [8.4, 2.8, 25.98], [9.4, 2.8, 25.98], [9.4, 0, 25.98]], '#6B4B35', { exterior: true, cull: false });
+  s.layers.exterior.push({ depth: 9000, svg: church.sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') + (spire ? spire.svg : '') + (portal ? portal.svg : '') });
+  // la fontaine (à gauche) et le tilleul (à droite), comme sur le plan
   const fountain = [
-    ...s.cylinder(5.2, 0, 12.5, 1.4, 0.55, 14, A('village', 'village_stone'), { exterior: true }),
-    ...s.cylinder(5.2, 0.5, 12.5, 1.25, 0.02, 14, rain ? '#6F8C93' : winter ? '#DDE5EA' : A('village', 'village_water'), { exterior: true }),
-    ...s.cylinder(5.2, 0.5, 12.5, 0.16, 1.3, 8, A('village', 'village_stone_shade'), { exterior: true }),
-    ...s.cylinder(5.2, 1.8, 12.5, 0.45, 0.18, 10, A('village', 'village_stone'), { exterior: true, r1: 0.55 }),
+    ...s.cylinder(-2.6, 0, 9.5, 0.8, 0.55, 14, A('village', 'village_stone'), { exterior: true }),
+    ...s.cylinder(-2.6, 0.5, 9.5, 0.7, 0.02, 14, rain ? '#6F8C93' : winter ? '#DDE5EA' : A('village', 'village_water'), { exterior: true }),
+    ...s.cylinder(-2.6, 0.5, 9.5, 0.12, 1.1, 8, A('village', 'village_stone_shade'), { exterior: true }),
+    ...s.cylinder(-2.6, 1.6, 9.5, 0.3, 0.14, 10, A('village', 'village_stone'), { exterior: true, r1: 0.38 }),
   ].filter(Boolean);
-  s.layers.exterior.push({ depth: s.cam.view([5.2, 0.5, 12.5])[2], svg: fountain.sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
-  M.tree(s, 1.0, 11.5, { h: 6.5, bark: A('village', 'village_bark'), leaves: momentId === 'winter' ? null : [A('village', 'village_plane'), '#8AA35E'], bare: winter });
-  M.tree(s, 10.5, 12.5, { h: 7, bark: A('village', 'village_bark'), leaves: [A('village', 'village_plane'), '#8AA35E'], bare: winter });
-  // l'ardoise de trottoir devant la vitrine (on en voit le dos)
-  const aframe = [s.face([[4.0, 0, 6.3], [4.15, 0.95, 6.45], [4.75, 0.95, 6.45], [4.9, 0, 6.3]], '#6B4B35', { exterior: true, cull: false })].filter(Boolean);
-  s.layers.exterior.push({ depth: s.cam.view([4.4, 0.5, 6.3])[2], svg: aframe.map((f) => f.svg).join('') });
-  // passants sur la place
-  const pass = F.person({ view: 'front', skin: '#AD7852', hair: '#2B2320', hairStyle: 'curly', top: '#3F5E4A', bottom: '#8A8463', acc: ['backpack', 'cap'], expr: 'content' });
-  s.billboard(7.5, 0, 9.5, `<g opacity="0.97">${pass}</g>`, 'exterior');
-  if (winter) snowfall(s, -2, 14, 6.5, 22);
+  s.layers.exterior.push({ depth: s.cam.view([-2.6, 0.5, 9.5])[2], svg: fountain.sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
+  M.tree(s, 8.4, 9.8, { h: 6.0, bark: A('village', 'village_bark'), leaves: [A('village', 'village_tree'), '#8AA35E'], bare: winter });
+  // banc de la patronne sous la vitrine, ardoise de trottoir près de la porte (on en voit le dos)
+  const bench = [...s.box(5.0, 0.42, 5.95, 6.2, 0.47, 6.35, '#6B4B35', { exterior: true }), ...s.box(5.0, 0.47, 6.3, 6.2, 0.85, 6.36, '#6B4B35', { exterior: true }), ...s.box(5.05, 0, 6.0, 5.12, 0.42, 6.3, '#3A3330', { exterior: true }), ...s.box(6.08, 0, 6.0, 6.15, 0.42, 6.3, '#3A3330', { exterior: true })].filter(Boolean);
+  s.layers.exterior.push({ depth: s.cam.view([5.6, 0.5, 6.1])[2], svg: bench.sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
+  const aframe = s.face([[2.25, 0, 6.15], [2.35, 1.0, 6.3], [2.75, 1.0, 6.3], [2.85, 0, 6.15]], '#6B4B35', { exterior: true, cull: false });
+  if (aframe) s.layers.exterior.push({ depth: s.cam.view([2.5, 0.5, 6.2])[2], svg: aframe.svg });
+  s.billboard(4.2, 0, 10.5, F.person({ view: 'front', skin: '#AD7852', hair: '#2B2320', hairStyle: 'curly', top: '#3F5E4A', bottom: '#8A8463', acc: ['backpack', 'cap'], expr: 'content' }), 'exterior');
+  if (winter) snowfall(s, -6, 14, 6.5, 22);
 
   // la salle
   room(s, {
@@ -220,106 +227,134 @@ function village(momentId = 'afternoon', opts = {}) {
     floor: A('village', 'village_tomette'),
     ceiling: A('village', 'village_ceiling'),
     walls: A('village', 'village_lime'),
-    frontHoles: [[3.0, 0.7, 6.0, 2.45], [1.6, 0, 2.55, 2.25]],
+    frontHoles: [[0.2, 0.9, 0.9, 2.4], [1.1, 0, 2.1, 2.25], [2.5, 0.45, 4.45, 2.4], [4.55, 0.45, 6.5, 2.4]],
+    backHoles: [[0.1, 0, 1.0, 2.1], [4.2, 0, 5.1, 2.1]],
     floorLines: { step: 0.22, color: A('village', 'village_tomette_joint'), opacity: 0.3 },
   });
-  // poutre maîtresse et solives (portent le plancher du dessus)
+  // portes du fond: réserve (personnel) et pièce du fond (fermée à l'arrivée)
+  for (const [x0, x1, c2] of [[0.1, 1.0, '#7E937B'], [4.2, 5.1, '#6B4B35']]) {
+    const leaf = s.face([[x0, 0, 0.03], [x1, 0, 0.03], [x1, 2.1, 0.03], [x0, 2.1, 0.03]], c2, { cull: false });
+    if (leaf) s.layers.shell.push(leaf);
+  }
+  // solives et poutre maîtresse (elles portent le plancher du logement au-dessus)
   const beam = A('village', 'village_beam');
   const beams = [];
-  for (let x = 0.35; x < W; x += 0.62) beams.push(...s.box(x - 0.06, H - 0.15, 0, x + 0.06, H, D, beam));
+  for (let z = 0.35; z < D; z += 0.62) beams.push(...s.box(0, H - 0.15, z - 0.06, W, H, z + 0.06, beam));
   s.layers.shell.push({ depth: 0, svg: beams.filter(Boolean).sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
-  const main = s.box(0, H - 0.37, 2.68, W, H - 0.15, 2.92, beam);
+  const main = s.box(3.35, H - 0.37, 0, 3.65, H - 0.15, D, beam);
   s.layers.shell.push({ depth: 0, svg: main.sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
-
-  // vitrine et porte
-  M.windowZ(s, 3.0, 6.0, 0.7, 2.45, D, 0.45, { frame: '#E6DDCB', reveal: A('village', 'village_lime'), cols: 4, rows: 3, glassOpacity: night ? 0.3 : 0.12, glassTint: night ? '#3A4466' : '#DCE6E4' });
-  M.doorZ(s, 1.6, 2.55, D, 0.45, { frame: A('village', 'village_counter'), reveal: A('village', 'village_lime'), glassOpacity: night ? 0.3 : 0.14 });
+  // vitrines, porte et petite fenêtre
+  const gOp = night ? 0.3 : 0.12;
+  const gT = night ? '#3A4466' : '#DCE6E4';
+  M.windowZ(s, 2.5, 4.45, 0.45, 2.4, D, 0.45, { frame: '#E6DDCB', reveal: A('village', 'village_lime'), cols: 3, rows: 3, glassOpacity: gOp, glassTint: gT });
+  M.windowZ(s, 4.55, 6.5, 0.45, 2.4, D, 0.45, { frame: '#E6DDCB', reveal: A('village', 'village_lime'), cols: 3, rows: 3, glassOpacity: gOp, glassTint: gT });
+  M.windowZ(s, 0.2, 0.9, 0.9, 2.4, D, 0.45, { frame: '#E6DDCB', reveal: A('village', 'village_lime'), cols: 1, rows: 3, glassOpacity: gOp, glassTint: gT });
+  M.doorZ(s, 1.1, 2.1, D, 0.45, { frame: A('village', 'village_counter'), reveal: A('village', 'village_lime'), glassOpacity: night ? 0.3 : 0.14 });
   if (rain) {
-    rainOnGlass(s, 3.05, 5.95, 0.75, 2.4, D + 0.2, 7);
-    rainOnGlass(s, 1.75, 2.4, 0.95, 2.1, D + 0.22, 11);
+    rainOnGlass(s, 2.55, 6.45, 0.5, 2.35, D + 0.2, 7);
+    rainOnGlass(s, 1.25, 1.95, 0.95, 2.1, D + 0.22, 11);
   }
 
-  // mur du fond de comptoir: carreaux sombres, étagères de tasses, ardoise
+  // arrière-comptoir (0,90 m) contre la cloison du fond: plonge, frigo; carreaux sombres, étagères de tasses, ardoise
   const back = A('village', 'village_backbar');
-  const tiles = s.face([[0.002, 0.9, 0.4], [0.002, 1.95, 0.4], [0.002, 1.95, 4.4], [0.002, 0.9, 4.4]].reverse(), back, { cull: false, gradient: true });
+  const tiles = s.face([[0.95, 0.9, 0.003], [3.4, 0.9, 0.003], [3.4, 1.95, 0.003], [0.95, 1.95, 0.003]], back, { cull: false, gradient: true });
   if (tiles) s.layers.shell.push(tiles);
-  M.obj(s, [[1, s.box(0, 0, 0.4, 0.55, 0.9, 4.4, { top: C('walnut'), right: A('village', 'village_shelf'), front: A('village', 'village_shelf'), back: A('village', 'village_shelf') })]]);
-  for (const y of [1.3, 1.66]) M.obj(s, [[1, s.box(0, y - 0.03, 3.0, 0.28, y, 4.35, A('village', 'village_shelf'))]]);
-  M.cupColumn(s, 0.14, 1.3, 3.05, 4.3, 8);
-  M.cupColumn(s, 0.14, 1.66, 3.05, 4.3, 8);
-  M.slateBoard(s, [[0.02, 2.5, 2.75], [0.02, 2.5, 4.3], [0.02, 1.96, 2.75]], [
+  M.obj(s, [[1, s.box(1.0, 0, 0, 3.4, 0.9, 0.6, { top: C('walnut'), side: A('village', 'village_shelf') })], [2, s.box(1.1, 0.9, 0.1, 1.75, 0.92, 0.5, C('steel'))]]);
+  M.obj(s, [[1, s.box(1.0, 1.32, 0, 2.1, 1.35, 0.28, A('village', 'village_shelf'))], [1, s.box(1.0, 1.68, 0, 2.1, 1.71, 0.28, A('village', 'village_shelf'))]]);
+  M.cupRow(s, 1.05, 2.05, 1.35, 0.14, 'x', 8);
+  M.cupRow(s, 1.05, 2.05, 1.71, 0.14, 'x', 8);
+  M.slateBoard(s, [[3.35, 2.2, 0.02], [2.2, 2.2, 0.02], [3.35, 1.45, 0.02]], [
     { t: 'La carte du jour', size: 50, x: 300, anchor: 'middle', y: 64, color: '#E9C98A' },
-    { t: 'Café  1,80', size: 40, x: 60, y: 128 },
-    { t: 'Cappuccino  3,20', size: 40, x: 60, y: 178 },
-    { t: 'Chocolat chaud  3,50', size: 40, x: 60, y: 228 },
-    { t: 'Tarte aux pommes  4', size: 40, x: 60, y: 278 },
-  ], { w: 600, h: 320, frame: C('oak_dark') });
-  M.espressoMachine(s, 0.05, 0.9, 2.2, { body: C('copper') });
-  M.grinder(s, 0.08, 0.9, 1.45);
+    { t: 'Café  1,80', size: 40, x: 50, y: 130 },
+    { t: 'Cappuccino  3,20', size: 40, x: 50, y: 182 },
+    { t: 'Chocolat chaud  3,50', size: 40, x: 50, y: 234 },
+    { t: 'Tarte aux pommes  4', size: 40, x: 50, y: 286 },
+    { t: 'Croissant du boulanger  1,30', size: 40, x: 50, y: 338 },
+  ], { w: 600, h: 380, frame: C('oak_dark') });
 
-  // comptoir de service (1,05 m), façade peinte en sauge, dessus en noyer
-  const cx0 = 1.55;
-  const cx1 = 2.2;
+  // comptoir à deux niveaux: plan de travail à 0,95 m côté barista, tablette des clients à 1,10 m
+  const cz0 = 1.7;
+  const cz1 = 2.4;
   M.obj(s, [
-    [0, s.box(cx0, 0, 1.0, cx1, 1.0, 4.35, { right: A('village', 'village_counter'), front: A('village', 'village_counter'), back: A('village', 'village_counter'), top: C('walnut') })],
-    [1, s.box(cx0 - 0.03, 1.0, 0.97, cx1 + 0.05, 1.05, 4.4, C('walnut'))],
-    [0, s.box(cx1 - 0.002, 0.05, 1.0, cx1 + 0.002, 0.12, 4.35, '#5E4130')],
+    [0, s.box(0, 0, cz0, 3.1, 0.92, cz1, { front: A('village', 'village_counter'), back: A('village', 'village_counter'), right: A('village', 'village_counter'), top: C('walnut') })],
+    [1, s.box(0, 0.92, cz0, 3.12, 0.95, cz0 + 0.42, C('walnut'))],
+    [1, s.box(0, 0.92, cz0 + 0.42, 3.1, 1.06, cz1, A('village', 'village_counter'))],
+    [1, s.box(0, 1.06, cz0 + 0.4, 3.14, 1.1, cz1 + 0.04, C('walnut'))],
   ]);
-  M.ticketRail(s, cx0 + 0.3, 1.95, 1.15, 2.2, [{ clip: F.PLAYER.orb.color }, { clip: F.PLAYER.crescent.color }, {}, { alert: true }]);
-  M.pastryCase(s, cx0 + 0.05, 1.05, 2.75, cx1 - 0.02, 3.45);
-  M.register(s, cx0 + 0.1, 1.05, 4.05);
-  M.guestbook(s, cx0 + 0.15, 1.05, 3.65);
-  M.cup(s, cx0 + 0.42, 1.05, 2.2, 'cappuccino', { rim: '#2F4F3E' });
-  steam(s, cx0 + 0.42, 1.14, 2.2, 1.4);
-  M.cup(s, cx0 + 0.4, 1.05, 1.8, 'espresso', { rim: '#2F4F3E' });
-  M.plant(s, cx0 + 0.32, 1.05, 4.27, { potH: 0.14, potR: 0.08, blobs: [[0, 0.1, 0, 0.1], [-0.07, 0.17, 0, 0.07], [0.07, 0.18, 0, 0.07]] });
-  for (const z of [2.0, 3.6]) M.pendant(s, 1.85, z, H, 2.12, { shade: '#3F5248', halo: 0.22 });
+  M.espressoMachineZ(s, 1.9, 0.95, cz0 + 0.24, { body: C('copper'), facing: '-z' });
+  M.grinder(s, 1.27, 0.95, cz0 + 0.2);
+  // caisse et livre d'or près de la file, cloche à viennoiseries, passe à droite
+  M.obj(s, [[1, s.box(0.15, 0.95, cz0 + 0.06, 0.65, 1.05, cz0 + 0.38, C('walnut'))], [2, s.box(0.2, 1.05, cz0 + 0.1, 0.6, 1.2, cz0 + 0.32, C('brass'))], [2, s.box(0.24, 1.12, cz0 + 0.09, 0.56, 1.19, cz0 + 0.1, '#2F3634', { emissive: true })]]);
+  M.obj(s, [[1, s.box(0.75, 1.1, cz1 - 0.3, 1.15, 1.125, cz1 - 0.05, '#6E2E35')], [2, s.box(0.76, 1.125, cz1 - 0.29, 0.945, 1.13, cz1 - 0.06, '#F2E8D2')], [2, s.box(0.955, 1.125, cz1 - 0.29, 1.14, 1.13, cz1 - 0.06, '#F2E8D2')]]);
+  M.pastryDome(s, 2.45, 1.1, cz1 - 0.15);
+  M.cup(s, 2.85, 0.95, cz0 + 0.18, 'cappuccino', { rim: '#2F4F3E' });
+  steam(s, 2.85, 1.04, cz0 + 0.18, 1.4);
+  M.cup(s, 2.62, 0.95, cz0 + 0.12, 'espresso', { rim: '#2F4F3E' });
+  M.ticketRail(s, 2.75, 1.9, cz0 + 0.1, cz0 + 0.1, []);
+  // rail à tickets au-dessus de la passe (le long du comptoir)
+  const railY = 1.88;
+  M.obj(s, [[1, s.box(2.3, railY - 0.012, cz0 + 0.3, 3.1, railY + 0.012, cz0 + 0.32, C('steel'))]]);
+  [[2.42, F.PLAYER.orb.color], [2.62, F.PLAYER.crescent.color], [2.82, null], [3.0, 'alert']].forEach(([x, clip]) => {
+    const t = s.face([[x - 0.06, railY - 0.01, cz0 + 0.33], [x + 0.06, railY - 0.01, cz0 + 0.33], [x + 0.06, railY - 0.18, cz0 + 0.33], [x - 0.06, railY - 0.18, cz0 + 0.33]], '#FBF6EA', { cull: false });
+    const l1 = s.face([[x - 0.045, railY - 0.07, cz0 + 0.328], [x + 0.03, railY - 0.07, cz0 + 0.328], [x + 0.03, railY - 0.08, cz0 + 0.328], [x - 0.045, railY - 0.08, cz0 + 0.328]], M.INK, { cull: false, emissive: true });
+    const l2 = s.face([[x - 0.045, railY - 0.1, cz0 + 0.328], [x + 0.015, railY - 0.1, cz0 + 0.328], [x + 0.015, railY - 0.11, cz0 + 0.328], [x - 0.045, railY - 0.11, cz0 + 0.328]], M.INK, { cull: false, emissive: true });
+    const extra = [];
+    if (clip === 'alert') {
+      extra.push(s.face([[x - 0.06, railY - 0.01, cz0 + 0.329], [x + 0.06, railY - 0.01, cz0 + 0.329], [x + 0.06, railY - 0.05, cz0 + 0.329], [x - 0.06, railY - 0.05, cz0 + 0.329]], '#E0A030', { cull: false, emissive: true }));
+      extra.push(s.face([[x - 0.012, railY - 0.015, cz0 + 0.327], [x + 0.012, railY - 0.015, cz0 + 0.327], [x - 0.012, railY - 0.045, cz0 + 0.327], [x + 0.012, railY - 0.045, cz0 + 0.327]], '#5A3A10', { cull: false, emissive: true }));
+    } else if (clip) {
+      extra.push(s.face([[x - 0.03, railY + 0.025, cz0 + 0.327], [x + 0.03, railY + 0.025, cz0 + 0.327], [x + 0.03, railY - 0.03, cz0 + 0.327], [x - 0.03, railY - 0.03, cz0 + 0.327]], clip, { cull: false, emissive: true, stroke: '#1C1A26', strokeWidth: 1.5 }));
+    }
+    M.obj(s, [[2, [t, l1, l2, ...extra]]]);
+  });
+  for (const x of [0.9, 2.5]) M.pendant(s, x, 2.15, H, 2.12, { shade: '#3F5248', halo: 0.2 });
 
-  // salle: tables rondes, chaises paillées, clients
+  // la file le long du mur de gauche, vers la caisse: clients qui attendent (liseré de lumière)
+  figureAt(s, 0.55, 2.85, { view: 'front', skin: '#E4B897', hair: '#6E4A30', hairStyle: 'long', coat: '#A6927A', coatLength: 62, top: '#A6927A', bottom: '#3E4A66', acc: ['shoulderBag', 'phone'], expr: 'content' }, { rim: 0.8 });
+  figureAt(s, 0.6, 3.5, { view: 'front', skin: '#87583A', hair: '#2B2320', hairStyle: 'short', coat: '#4E5258', coatLength: 60, top: '#4E5258', bottom: '#3E4A66', acc: ['takeaway'], expr: 'impatient' }, { rim: 0.8 });
+  figureAt(s, 0.55, 4.15, { view: 'front', skin: '#F2D3BC', hair: '#B9B4AE', hairStyle: 'bun', top: '#707A86', bottom: '#4E5258', acc: ['scarf', 'newspaper'], expr: 'attend', pose: 'pockets' }, { rim: 0.8 });
+
+  // salle: tables rondes le long de la vitrine, chaises paillées
   const chairOpts = { kind: 'paille', wood: S('campagne', 'campagne_oak'), seat: S('campagne', 'campagne_straw') };
-  // client qui attend sa commande (carte fermée posée, regard vers le comptoir), assis face à nous
-  M.chair(s, 3.35, 4.98, '-z', chairOpts);
-  figureAt(s, 3.35, 5.03, { view: 'front', pose: 'sit', skin: '#F2D3BC', hair: '#B9B4AE', hairStyle: 'bun', top: '#707A86', bottom: '#4E5258', acc: ['scarf'], expr: 'attend' }, { depthBias: -0.25, rim: 0.85 });
-  M.roundTable(s, 3.35, 4.58, { items: [[0.12, -0.08, 'empty']], rim: '#2F4F3E' });
-  M.obj(s, [[2, s.box(3.15, 0.75, 4.42, 3.31, 0.758, 4.62, '#FBF6EA')]]);
-  // lecture de la carte, à la table de la vitrine
-  M.chair(s, 5.2, 5.03, '-z', chairOpts);
-  figureAt(s, 5.2, 5.08, { view: 'front', pose: 'sitRead', skin: '#87583A', hair: '#2B2320', hairStyle: 'short', top: '#B39656', bottom: '#4D5F7D', acc: ['menuOpen'], expr: 'lit' }, { depthBias: -0.25 });
-  M.roundTable(s, 5.2, 4.63, { items: [], rim: '#2F4F3E' });
-  // table du milieu: une cliente de dos et ses deux tasses
-  figureAt(s, 4.0, 2.2, { view: 'back', pose: 'sit', skin: '#CC9871', hair: '#A3663A', hairStyle: 'bob', top: '#9E4E63', bottom: '#4D5F7D' }, { depthBias: -0.02 });
-  M.chair(s, 4.0, 2.15, '+z', chairOpts);
-  M.roundTable(s, 4.0, 2.6, { items: [[0.1, 0.06, 'cappuccino'], [-0.12, 0.0, 'espresso']], rim: '#2F4F3E' });
-  M.chair(s, 4.0, 3.05, '-z', chairOpts);
-  for (const [x, z] of [[3.35, 4.58], [5.2, 4.63], [4.0, 2.6]]) M.pendant(s, x, z, H, 2.12, { shade: '#A65A3D', r: 0.15, halo: night || rain ? 0.28 : 0.14 });
-  // cliente à la caisse, de dos, face au comptoir
-  figureAt(s, 2.65, 4.05, { view: 'back', skin: '#E4B897', hair: '#6E4A30', hairStyle: 'long', coat: '#A6927A', coatLength: 62, top: '#A6927A', bottom: '#3E4A66', acc: ['shoulderBag'] }, { rim: 0.85 });
-  // le partenaire, de dos, porte un plateau vers la vitrine: bretelles croisées, écusson, foulard
-  figureAt(s, 4.85, 3.45, avatar(PLAYER_A, 'back', { pose: 'tray', acc: ['tray'], hairStyle: 'short', hair: '#4A3324' }));
-  M.plant(s, 6.2, 0, 5.15, { potH: 0.34, potR: 0.17, pot: C('pot') });
-
-  // taches de soleil sur les tomettes
-  const sd = sunDir(momentId, true);
-  if (sd) {
-    const op = momentId === 'noon' ? 0.3 : momentId === 'winter' ? 0.28 : 0.4;
-    for (let i = 0; i < 4; i++) M.sunPatch(s, 3.05 + i * 0.73, 3.05 + (i + 1) * 0.73 - 0.04, 0.75, 2.4, D + 0.2, sd, { x0: 0, x1: W, z0: 0, z1: D }, momentId === 'afternoon' ? '#FFD39A' : '#FFF0D6', op);
+  for (const [x, items] of [[3.15, [[0.08, -0.06, 'cappuccino']]], [4.75, []], [6.35, [[0, 0, 'tea']]]]) {
+    M.chair(s, x, 5.0, '-z', chairOpts);
+    M.roundTable(s, x, 4.6, { r: 0.3, items, rim: '#2F4F3E' });
   }
-  // flaques de lumière des lampes au sol (le soir surtout)
-  for (const [x, z] of [[3.35, 4.58], [5.2, 4.63], [4.0, 2.6], [1.85, 2.8]]) {
-    const pool = s.ellipseDecal(x, 0.004, z, 0.9, 0.9, '#FFC27A', (night ? 0.36 : rain ? 0.22 : 0.1) * P.moments[momentId].lamps);
+  M.chair(s, 3.15, 4.15, '+z', chairOpts);
+  figureAt(s, 3.15, 5.0, { view: 'front', pose: 'sit', skin: '#CC9871', hair: '#A3663A', hairStyle: 'bob', top: '#9E4E63', bottom: '#4D5F7D', expr: 'ravi' }, { depthBias: -0.25 });
+  figureAt(s, 4.75, 5.0, { view: 'front', pose: 'sitRead', skin: '#87583A', hair: '#2B2320', hairStyle: 'short', top: '#B39656', bottom: '#4D5F7D', acc: ['menuOpen'], expr: 'lit' }, { depthBias: -0.25 });
+  // carte fermée posée, regard vers le comptoir: prêt à commander
+  figureAt(s, 6.35, 5.0, { view: 'front', pose: 'sit', skin: '#E4B897', hair: '#4A3324', hairStyle: 'curly', top: '#7A5A44', bottom: '#4E5258', acc: ['scarf'], expr: 'attend' }, { depthBias: -0.25, rim: 0.8 });
+  M.obj(s, [[2, s.box(6.2, 0.75, 4.45, 6.36, 0.758, 4.65, '#FBF6EA')]]);
+  // petite table carrée contre le mur de droite
+  M.chair(s, 6.6, 2.35, '+z', chairOpts);
+  M.squareTable(s, 6.6, 2.85, { w: 0.65, d: 0.65, top: C('oak_dark'), leg: S('campagne', 'campagne_oak'), items: [[0, 0, 'espresso']], rim: '#2F4F3E' });
+  M.chair(s, 6.6, 3.35, '-z', chairOpts);
+  for (const [x, z] of [[3.15, 4.6], [4.75, 4.6], [6.35, 4.6], [6.6, 2.85]]) M.pendant(s, x, z, H, 2.12, { shade: '#A65A3D', r: 0.14, halo: night || rain ? 0.28 : 0.12 });
+  // le partenaire, de dos, porte un plateau vers la vitrine: bretelles croisées, écusson, bandeau
+  figureAt(s, 3.95, 3.45, avatar(PLAYER_A, 'back', { pose: 'tray', acc: ['tray'], hairStyle: 'short', hair: '#4A3324' }));
+  M.plant(s, 5.6, 0, 0.35, { potH: 0.34, potR: 0.17 });
+
+  // taches de soleil (cuites dans les états du jour de la coque) et flaques de lumière des lampes
+  const sd = sunDir(momentId, false);
+  if (sd) {
+    const op = momentId === 'noon' ? 0.28 : momentId === 'winter' ? 0.26 : 0.36;
+    for (const [x0, x1] of [[2.55, 3.2], [3.2, 3.85], [3.85, 4.4], [4.6, 5.25], [5.25, 5.9], [5.9, 6.45]]) M.sunPatch(s, x0, x1, 0.5, 2.35, D + 0.2, sd, { x0: 0, x1: W, z0: cz1, z1: D }, momentId === 'afternoon' ? '#FFD39A' : '#FFF0D6', op);
+  }
+  for (const [x, z] of [[3.15, 4.6], [4.75, 4.6], [6.35, 4.6], [1.6, 2.6], [6.6, 2.85]]) {
+    const pool = s.ellipseDecal(x, 0.004, z, 0.8, 0.8, '#FFC27A', (night ? 0.36 : rain ? 0.22 : 0.1) * m.lamps);
     if (pool) s.layers.overlays.push(pool);
   }
-  if (opts.markers) {
-    marker(s, [0.02, 2.62, 3.5], 1);
-    marker(s, [0.14, 1.5, 3.7], 2);
-    marker(s, [cx0 + 0.42, 1.3, 2.2], 3);
-    marker(s, [4.85, 2.05, 3.45], 4);
-    marker(s, [3.35, 1.5, 5.03], 5);
-    marker(s, [5.6, 2.3, D], 6);
+  if (opts.markers && view === 'a') {
+    marker(s, [2.45, 1.5, cz1 - 0.15], 1);
+    marker(s, [2.42, 2.02, cz0 + 0.32], 2);
+    marker(s, [0.6, 2.15, 3.5], 3);
+    marker(s, [3.95, 2.0, 3.45], 4);
+    marker(s, [6.35, 1.5, 5.0], 5);
+    marker(s, [8.4, 4.6, 9.8], 6);
   }
-  return s.toSVG({ sky: m.sky, clipId: `v-village-${momentId}` });
+  return s.toSVG({ sky: m.sky, clipId: `v-village-${view}-${momentId}` });
 }
-
 
 // rangée d'étal de marché sous la halle (jour de marché du bourg)
 function stall(s, x, z, cloth) {
@@ -335,144 +370,137 @@ function stall(s, x, z, cloth) {
 }
 
 // ------------------------------------------------------------------------------------------------
-// 2. Bourg: boutique de la grand-rue, jour de marché (72 m², parquet, lambris vert-de-gris, four à sole, devanture peinte)
+// 2. Bourg: la boutique de la place de la Halle (plan bourg-maximum du level designer, salle de 7,00 x 6,80 m).
+// Passage du plan à ce repère: x = 9,0 - x du plan, z = y du plan - 17,6. Le four est au laboratoire, derrière.
+// Vue « a »: depuis l'entrée, face au comptoir (vitrine à gâteaux, ardoise, file); vue « b »: derrière le comptoir, face à la halle.
 function bourg(momentId = 'morning', opts = {}) {
-  const W = 9.0;
-  const D = 7.6;
+  const W = 7.0;
+  const D = 6.8;
   const H = 3.3;
-  const cam = new Camera({ x: 8.3, z: 0.6, yaw: -40, pitch: -5, width: opts.width || 1366, height: opts.height || 768 });
-  const lamps = [{ pos: [2.0, 2.35, 3.6] }, { pos: [2.0, 2.35, 5.6] }, { pos: [5.0, 2.35, 3.4], power: 0.5 }, { pos: [4.4, 2.35, 6.2], power: 0.5 }, { pos: [7.0, 2.35, 6.1], power: 0.5 }, { pos: [0.9, 1.0, 1.4], power: 0.35, radius: 0.9 }];
-  const windows = [{ center: [2.3, 1.7, D], normal: [0, 0, -1], power: 0.8 }, { center: [6.8, 1.7, D], normal: [0, 0, -1], power: 0.8 }];
+  const view = opts.view || 'a';
+  const cam = view === 'a'
+    ? new Camera({ x: 4.6, z: 6.25, yaw: 186, pitch: -9, width: opts.width || 1366, height: opts.height || 768 })
+    : new Camera({ x: 3.85, z: 1.0, yaw: -6, pitch: -8, width: opts.width || 1366, height: opts.height || 768 });
+  const lamps = [{ pos: [3.2, 2.35, 2.05] }, { pos: [5.4, 2.35, 2.05] }, { pos: [2.7, 2.35, 4.05], power: 0.5 }, { pos: [5.1, 2.35, 4.05], power: 0.5 }, { pos: [2.0, 2.35, 6.4], power: 0.5 }];
+  const windows = [{ center: [3.5, 1.5, D], normal: [0, 0, -1], power: 0.8 }, { center: [1.3, 1.5, D], normal: [0, 0, -1], power: 0.8 }];
   const s = new Scene(cam, lighting(momentId, lamps, windows));
   const m = P.moments[momentId];
   const night = momentId === 'evening';
-  // dehors: grand-rue pavée, la halle et ses étals, façades ocre et rose
-  M.ground(s, -14, 24, D + 0.35, 45, A('bourg', 'bourg_cobble'));
-  M.ground(s, -14, 24, D + 0.35, D + 1.9, '#B5AC9C');
-  M.ground(s, -14, 24, 17.5, 45, '#9C9384');
+  // dehors: la place de la Halle un jeudi de marché, la halle aux grains en face
+  M.ground(s, -14, 24, D + 0.5, 50, A('bourg', 'bourg_cobble'));
+  M.ground(s, -14, 24, D + 0.5, D + 2.0, '#B5AC9C');
   const halle = [];
-  for (let x = -4; x <= 14; x += 3) halle.push(...s.box(x - 0.18, 0, 15.5, x + 0.18, 4.4, 15.86, A('bourg', 'bourg_hall_timber'), { exterior: true }));
-  halle.push(...s.box(-4.5, 4.2, 15.3, 14.5, 4.5, 16.2, A('bourg', 'bourg_hall_timber'), { exterior: true }));
-  const roof = s.face([[-5.5, 4.4, 14.8], [-5.5, 8.2, 21], [15.5, 8.2, 21], [15.5, 4.4, 14.8]], A('bourg', 'bourg_hall_roof'), { exterior: true, cull: false, sunlit: true });
-  s.layers.exterior.push({ depth: s.cam.view([5, 6, 18])[2], svg: (roof ? roof.svg : '') });
-  s.layers.exterior.push({ depth: s.cam.view([5, 2, 15.5])[2] - 0.5, svg: halle.filter(Boolean).sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
-  for (const [x, c2] of [[-1.5, A('bourg', 'bourg_awning')], [2.5, '#C9A8A0'], [6.5, A('bourg', 'bourg_awning')], [10.5, '#A9BDB1']]) stall(s, x, 17.0, c2);
-  M.facade(s, -14, -5.5, 15, 7.5, { wall: A('bourg', 'bourg_render_rose'), roof: A('bourg', 'bourg_hall_roof'), shutters: '#7F979B', floors: 2, perFloor: 2, lit: night, sunlit: !!m.sun });
-  M.facade(s, 15.5, 24, 15, 8.2, { wall: A('bourg', 'bourg_render_ochre'), roof: A('bourg', 'bourg_hall_roof'), shutters: '#8DA287', floors: 2, perFloor: 2, lit: night, sunlit: !!m.sun });
-  M.facade(s, -6, 16, 30, 9, { wall: mixHex(A('bourg', 'bourg_render_ochre'), '#D6CBB5', 0.5), roof: '#8F5A44', floors: 3, perFloor: 5, lit: night, sunlit: !!m.sun });
-  const shopper = F.person({ view: 'back', skin: '#E4B897', hair: '#CDAA6E', hairStyle: 'bob', top: '#BE9F55', bottom: '#4D5F7D', acc: ['basket'] });
-  s.billboard(3.0, 0, 14.0, shopper, 'exterior');
-  const shopper2 = F.person({ view: 'front', skin: '#5C3C29', hair: '#2B2320', hairStyle: 'short', top: '#6E3238', bottom: '#8A8463', acc: ['tote'], expr: 'content' });
-  s.billboard(7.6, 0, 13.0, shopper2, 'exterior');
+  for (let x = -6; x <= 14; x += 3.2) halle.push(...s.box(x - 0.2, 0, 15.5, x + 0.2, 4.4, 15.9, A('bourg', 'bourg_hall_timber'), { exterior: true }));
+  halle.push(...s.box(-6.5, 4.2, 15.3, 14.5, 4.55, 16.2, A('bourg', 'bourg_hall_timber'), { exterior: true }));
+  const roof = s.face([[-7.5, 4.45, 14.8], [-7.5, 8.6, 21.5], [15.5, 8.6, 21.5], [15.5, 4.45, 14.8]], A('bourg', 'bourg_hall_roof'), { exterior: true, cull: false, sunlit: true });
+  s.layers.exterior.push({ depth: s.cam.view([4, 6, 19])[2] + 50, svg: roof ? roof.svg : '' });
+  s.layers.exterior.push({ depth: s.cam.view([4, 2, 15.6])[2], svg: halle.filter(Boolean).sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
+  for (const [x, c2] of [[-1.0, A('bourg', 'bourg_awning')], [2.3, '#C9A8A0'], [5.6, A('bourg', 'bourg_awning')]]) stall(s, x, 12.2, c2);
+  M.facade(s, -16, -7, 15, 7.5, { wall: A('bourg', 'bourg_render_rose'), roof: A('bourg', 'bourg_hall_roof'), shutters: '#7F979B', floors: 2, perFloor: 2, lit: night, sunlit: !!m.sun });
+  M.facade(s, 15, 24, 15, 8.2, { wall: A('bourg', 'bourg_render_ochre'), roof: A('bourg', 'bourg_hall_roof'), shutters: '#8DA287', floors: 2, perFloor: 2, lit: night, sunlit: !!m.sun });
+  M.facade(s, -8, 16, 30, 9, { wall: mixHex(A('bourg', 'bourg_render_ochre'), '#D6CBB5', 0.5), roof: '#8F5A44', floors: 3, perFloor: 5, lit: night, sunlit: !!m.sun });
+  s.billboard(1.6, 0, 11.4, F.person({ view: 'back', skin: '#E4B897', hair: '#CDAA6E', hairStyle: 'bob', top: '#BE9F55', bottom: '#4D5F7D', acc: ['basket'] }), 'exterior');
+  s.billboard(4.6, 0, 11.0, F.person({ view: 'front', skin: '#5C3C29', hair: '#2B2320', hairStyle: 'short', top: '#6E3238', bottom: '#8A8463', acc: ['tote'], expr: 'content' }), 'exterior');
+  // réverbère de la place (plan: x 10,4, y 26,6)
+  const post = [...s.cylinder(-1.4, 0, 9.0, 0.07, 3.8, 6, '#2B3230', { exterior: true })].filter(Boolean);
+  s.layers.exterior.push({ depth: s.cam.view([-1.4, 2, 9])[2], svg: post.map((f) => f.svg).join('') });
 
   room(s, {
     W, D, H,
     floor: A('bourg', 'bourg_parquet'),
     ceiling: A('bourg', 'bourg_moulding'),
     walls: A('bourg', 'bourg_wall'),
-    frontHoles: [[0.8, 0.55, 3.8, 2.75], [4.0, 0, 5.1, 2.3], [5.3, 0.55, 8.3, 2.75]],
+    frontHoles: [[0.3, 0.55, 2.35, 2.75], [2.45, 0.55, 4.5, 2.75], [4.8, 0, 6.0, 2.3]],
+    backHoles: [[6.1, 0, 7.0, 2.1]],
     wainscot: { h: 1.1, color: A('bourg', 'bourg_panelling') },
     floorLines: { step: 0.17, color: shadeHex(A('bourg', 'bourg_parquet'), 0.75), opacity: 0.45, alongX: false },
   });
-  // corniche
-  const cornice = [...s.box(0, H - 0.12, 0, 0.12, H, D, A('bourg', 'bourg_moulding')), ...s.box(W - 0.12, H - 0.12, 0, W, H, D, A('bourg', 'bourg_moulding')), ...s.box(0, H - 0.12, D - 0.12, W, H, D, A('bourg', 'bourg_moulding'))];
+  const cornice = [...s.box(0, H - 0.12, 0, 0.12, H, D, A('bourg', 'bourg_moulding')), ...s.box(W - 0.12, H - 0.12, 0, W, H, D, A('bourg', 'bourg_moulding')), ...s.box(0, H - 0.12, D - 0.12, W, H, D, A('bourg', 'bourg_moulding')), ...s.box(0, H - 0.12, 0, W, H, 0.12, A('bourg', 'bourg_moulding'))];
   s.layers.shell.push({ depth: 0, svg: cornice.filter(Boolean).sort((a, b) => b.depth - a.depth).map((f) => f.svg).join('') });
-  M.windowZ(s, 0.8, 3.8, 0.55, 2.75, D, 0.3, { frame: A('bourg', 'bourg_shopfront'), reveal: A('bourg', 'bourg_panelling'), cols: 2, rows: 2 });
-  M.windowZ(s, 5.3, 8.3, 0.55, 2.75, D, 0.3, { frame: A('bourg', 'bourg_shopfront'), reveal: A('bourg', 'bourg_panelling'), cols: 2, rows: 2 });
-  M.doorZ(s, 4.0, 5.1, D, 0.3, { frame: A('bourg', 'bourg_shopfront'), reveal: A('bourg', 'bourg_panelling') });
+  M.windowZ(s, 0.3, 2.35, 0.55, 2.75, D, 0.3, { frame: A('bourg', 'bourg_shopfront'), reveal: A('bourg', 'bourg_panelling'), cols: 2, rows: 2 });
+  M.windowZ(s, 2.45, 4.5, 0.55, 2.75, D, 0.3, { frame: A('bourg', 'bourg_shopfront'), reveal: A('bourg', 'bourg_panelling'), cols: 2, rows: 2 });
+  M.doorZ(s, 4.8, 6.0, D, 0.3, { frame: A('bourg', 'bourg_shopfront'), reveal: A('bourg', 'bourg_panelling') });
+  // porte du laboratoire (au fond à droite), entrouverte sur la lueur du four
+  const labGlow = s.face([[6.1, 0, 0.02], [7.0, 0, 0.02], [7.0, 2.1, 0.02], [6.1, 2.1, 0.02]], '#E9B27A', { cull: false, emissive: true });
+  const labLeaf = s.face([[6.1, 0, 0.03], [6.55, 0, 0.45], [6.55, 2.1, 0.45], [6.1, 2.1, 0.03]], A('bourg', 'bourg_panelling'), { cull: false });
+  s.layers.shell.push({ depth: 0, svg: (labGlow ? labGlow.svg : '') + (labLeaf ? labLeaf.svg : '') });
 
-  // le four à sole contre le mur de gauche, dans sa faïence vert d'eau, et le chariot à pain
-  const tile = s.face([[0.003, 0, 0.3], [0.003, 2.4, 0.3], [0.003, 2.4, 2.5], [0.003, 0, 2.5]].reverse(), A('bourg', 'bourg_kitchen_tile'), { cull: false, gradient: true });
-  if (tile) s.layers.shell.push(tile);
+  // arrière-comptoir (0,90 m): plonge, frigo, thés; lambris, étagères de tasses, ardoise au-dessus
+  M.obj(s, [[1, s.box(1.35, 0, 0, 6.1, 0.9, 0.6, { top: C('walnut'), side: S('nordique', 'nordique_ash') })]]);
+  for (const y of [1.35, 1.72]) M.obj(s, [[1, s.box(1.4, y - 0.03, 0, 3.4, y, 0.3, S('nordique', 'nordique_ash'))]]);
+  M.cupRow(s, 1.45, 3.35, 1.35, 0.15, 'x', 10);
+  M.cupRow(s, 1.45, 3.35, 1.72, 0.15, 'x', 10);
+  const jars = [];
+  for (let k = 0; k < 6; k++) jars.push(...s.cylinder(5.3 + k * 0.13, 0.9, 0.3, 0.05, 0.16, 8, '#C9D6D3', { opacity: 0.85 }), ...s.cylinder(5.3 + k * 0.13, 0.9, 0.3, 0.045, 0.1, 8, k % 2 ? '#7D7F45' : '#A65A2C'));
+  M.obj(s, [[2, jars]]);
+  M.slateBoard(s, [[5.65, 2.55, 0.02], [3.75, 2.55, 0.02], [5.65, 1.45, 0.02]], [
+    { t: 'Jour de marché', size: 54, x: 330, anchor: 'middle', y: 68, color: '#E9C98A' },
+    { t: 'Fournée de 8 h: croissants, pains aux raisins', size: 36, x: 40, y: 130 },
+    { t: 'Chausson aux pommes  2,20', size: 38, x: 40, y: 180 },
+    { t: 'Café crème  2,90', size: 38, x: 40, y: 230 },
+    { t: 'Thé des moissons  3,20', size: 38, x: 40, y: 280 },
+    { t: 'Chocolat chaud  3,40', size: 38, x: 40, y: 330 },
+  ], { w: 660, h: 380 });
+  // comptoir de frêne (1,10 m côté clients): caisse, vitrine à gâteaux, machine, moulin, passe; portillon à gauche
+  const cz0 = 1.7;
+  const cz1 = 2.4;
   M.obj(s, [
-    [1, s.box(0, 0, 0.5, 0.95, 1.65, 2.3, A('bourg', 'bourg_oven'))],
-    [2, s.box(0.95, 0.75, 0.9, 0.97, 1.25, 1.9, '#2B2622')],
-    [3, s.box(0.97, 0.85, 1.05, 0.98, 1.05, 1.75, '#FF9A4A', { emissive: true })],
-    [2, s.box(0.95, 1.4, 0.7, 1.05, 1.44, 2.1, C('brass'))],
+    [0, s.box(2.25, 0, cz0, 7.0, 0.92, cz1, { side: S('nordique', 'nordique_ash'), top: C('walnut') })],
+    [1, s.box(2.25, 0.92, cz0, 7.0, 0.95, cz0 + 0.42, C('walnut'))],
+    [1, s.box(2.25, 0.92, cz0 + 0.42, 7.0, 1.06, cz1, S('nordique', 'nordique_ash'))],
+    [1, s.box(2.21, 1.06, cz0 + 0.4, 7.0, 1.1, cz1 + 0.04, C('walnut'))],
   ]);
-  const rack = [];
-  for (const y of [0.3, 0.75, 1.2, 1.65]) rack.push(...s.box(0.1, y, 2.45, 0.6, y + 0.03, 2.95, S('nordique', 'nordique_ash')));
-  for (const y of [0.33, 0.78, 1.23]) for (let k = 0; k < 3; k++) rack.push(...s.box(0.15 + k * 0.15, y + 0.03, 2.55, 0.27 + k * 0.15, y + 0.11, 2.85, C('crust')));
-  M.obj(s, [[1, rack]]);
-  // arrière-bar: étagères de tasses, ardoise, machine
-  M.obj(s, [[1, s.box(0, 0, 3.1, 0.6, 0.9, 6.9, { top: C('walnut'), right: S('nordique', 'nordique_ash'), front: S('nordique', 'nordique_ash'), back: S('nordique', 'nordique_ash') })]]);
-  const backTiles = s.face([[0.004, 0.9, 3.1], [0.004, 2.0, 3.1], [0.004, 2.0, 6.9], [0.004, 0.9, 6.9]].reverse(), A('bourg', 'bourg_panelling'), { cull: false, gradient: true });
-  if (backTiles) s.layers.shell.push(backTiles);
-  for (const y of [1.35, 1.72]) M.obj(s, [[1, s.box(0, y - 0.03, 4.9, 0.3, y, 6.8, S('nordique', 'nordique_ash'))]]);
-  M.cupColumn(s, 0.15, 1.35, 4.95, 6.75, 10);
-  M.cupColumn(s, 0.15, 1.72, 4.95, 6.75, 10);
-  M.slateBoard(s, [[0.02, 2.75, 4.7], [0.02, 2.75, 6.8], [0.02, 2.08, 4.7]], [
-    { t: 'Jour de marché', size: 52, x: 320, anchor: 'middle', y: 66, color: '#E9C98A' },
-    { t: 'Fournée de 8 h: croissants', size: 40, x: 50, y: 132 },
-    { t: 'Pain aux noix, chausson', size: 40, x: 50, y: 184 },
-    { t: 'Café crème  2,90', size: 40, x: 50, y: 236 },
-    { t: 'Chocolat chaud  3,40', size: 40, x: 50, y: 288 },
-  ], { w: 640, h: 330 });
-  M.espressoMachine(s, 0.05, 0.9, 3.75, { body: '#A3A8AC' });
-  M.grinder(s, 0.08, 0.9, 3.2);
-  // comptoir: façade de frêne, dessus de noyer (surface de travail sombre)
-  const cx0 = 1.65;
-  const cx1 = 2.35;
-  M.obj(s, [
-    [0, s.box(cx0, 0, 3.1, cx1, 1.0, 6.9, { right: S('nordique', 'nordique_ash'), front: S('nordique', 'nordique_ash'), back: S('nordique', 'nordique_ash'), top: C('walnut') })],
-    [1, s.box(cx0 - 0.03, 1.0, 3.07, cx1 + 0.05, 1.05, 6.95, C('walnut'))],
-  ]);
-  M.pastryCase(s, cx0 + 0.05, 1.05, 5.2, cx1 - 0.02, 6.3);
-  M.register(s, cx0 + 0.1, 1.05, 6.55);
-  M.guestbook(s, cx0 + 0.15, 1.05, 4.75);
-  M.cup(s, cx0 + 0.45, 1.05, 3.6, 'cappuccino', { rim: '#2F5560' });
-  M.cup(s, cx0 + 0.45, 1.05, 3.95, 'tea', { rim: '#2F5560' });
-  steam(s, cx0 + 0.45, 1.14, 3.6, 1.3);
-  for (const z of [3.6, 5.6]) M.pendant(s, 2.0, z, H, 2.25, { kind: 'globe', r: 0.2, halo: 0.2 });
+  M.espressoMachineZ(s, 3.85, 0.95, cz0 + 0.24, { body: C('steel'), facing: '-z' });
+  M.grinder(s, 3.22, 0.95, cz0 + 0.2);
+  M.pastryCase(s, 4.5, 0.95, cz0 + 0.04, 5.95, cz1 - 0.02, { glass: 0.14 });
+  M.obj(s, [[1, s.box(6.1, 0.95, cz0 + 0.06, 6.8, 1.05, cz0 + 0.38, C('walnut'))], [2, s.box(6.2, 1.05, cz0 + 0.1, 6.7, 1.2, cz0 + 0.32, '#A3A8AC')], [2, s.box(6.24, 1.12, cz0 + 0.33, 6.66, 1.19, cz0 + 0.34, '#2F3634', { emissive: true })]]);
+  M.obj(s, [[1, s.box(5.95, 1.1, cz1 - 0.28, 6.35, 1.125, cz1 - 0.04, '#2F5560')], [2, s.box(5.96, 1.125, cz1 - 0.27, 6.145, 1.13, cz1 - 0.05, '#F2E8D2')], [2, s.box(6.155, 1.125, cz1 - 0.27, 6.34, 1.13, cz1 - 0.05, '#F2E8D2')]]);
+  M.cup(s, 2.6, 0.95, cz0 + 0.2, 'cappuccino', { rim: '#2F5560' });
+  M.cup(s, 2.8, 0.95, cz0 + 0.14, 'tea', { rim: '#2F5560' });
+  steam(s, 2.6, 1.04, cz0 + 0.2, 1.3);
+  for (const x of [3.2, 5.4]) M.pendant(s, x, 2.05, H, 2.25, { kind: 'globe', r: 0.2, halo: 0.2 });
   // la partenaire derrière le comptoir, de face: bavette, poche au symbole, bandeau
-  figureAt(s, 1.1, 5.0, avatar(PLAYER_B, 'front', { hairStyle: 'bob', hair: '#6E4A30', skin: '#E4B897', expr: 'content' }), { depthBias: 0.3 });
+  figureAt(s, 4.6, 1.05, avatar(PLAYER_B, 'front', { hairStyle: 'bob', hair: '#6E4A30', skin: '#E4B897', expr: 'content' }), { depthBias: 0.3 });
 
+  // la file le long du mur de droite, de la porte à la caisse: un promeneur, une gourmande devant les gâteaux
+  figureAt(s, 6.45, 2.9, { view: 'back', skin: '#CC9871', hair: '#4A3324', hairStyle: 'short', top: '#3F5E4A', bottom: '#8A8463', acc: ['backpack', 'cap'] }, { rim: 0.8 });
+  figureAt(s, 6.5, 3.55, { view: 'back', skin: '#E4B897', hair: '#B9B4AE', hairStyle: 'bun', top: '#AF7A4D', bottom: '#4E5258', acc: [{ kind: 'shoulderBag', color: '#9E4E63' }] }, { rim: 0.8 });
   // salle nordique: plateaux de linoléum sapin sur piétement de frêne, coussins de laine
   const ash = S('nordique', 'nordique_ash');
   const fir = S('nordique', 'nordique_fir');
   const nchair = { kind: 'bistrot', wood: ash, seat: S('nordique', 'nordique_wool') };
-  // famille: un adulte et un enfant, poussette
-  M.chair(s, 4.4, 6.7, '-z', nchair);
-  figureAt(s, 4.4, 6.75, { view: 'front', pose: 'sit', skin: '#AD7852', hair: '#2B2320', hairStyle: 'curly', top: '#7E9CC0', bottom: '#4D5F7D', expr: 'ravi' }, { depthBias: -0.25 });
-  M.squareTable(s, 4.4, 6.2, { top: fir, leg: ash, items: [[0.12, 0.05, 'cappuccino'], [-0.15, -0.1, 'tea']], rim: '#2F5560' });
-  const kid = F.child({ view: 'front', skin: '#AD7852', hair: '#2B2320', hairStyle: 'curly', top: '#B0574D', bottom: '#97A866', expr: 'ravi' });
-  s.billboard(3.65, 0, 6.2, kid, 'objects', -0.1);
-  s.billboard(5.25, 0, 6.55, F.stroller('#3F5E4A'), 'objects', 0);
-  M.chair(s, 7.0, 6.6, '-z', nchair);
-  figureAt(s, 7.0, 6.65, { view: 'front', pose: 'sitRead', skin: '#F2D3BC', hair: '#CDAA6E', hairStyle: 'long', top: '#9E4E63', bottom: '#4E5258', acc: ['menuOpen'], expr: 'lit' }, { depthBias: -0.25 });
-  M.squareTable(s, 7.0, 6.1, { top: fir, leg: ash, items: [], rim: '#2F5560' });
-  M.chair(s, 4.4, 3.4, '+x', nchair);
-  M.squareTable(s, 5.0, 3.4, { top: fir, leg: ash, items: [[0.1, 0.1, 'espresso'], [-0.1, -0.12, 'cappuccino']], rim: '#2F5560' });
-  M.chair(s, 5.6, 3.4, '-x', nchair);
-  for (const [x, z] of [[4.4, 6.2], [7.0, 6.1], [5.0, 3.4]]) M.pendant(s, x, z, H, 2.25, { kind: 'globe', r: 0.2, halo: 0.16 });
-  // promeneur au comptoir, de dos, sac au dos (client qui attend)
-  figureAt(s, 2.85, 6.55, { view: 'back', skin: '#CC9871', hair: '#4A3324', hairStyle: 'short', top: '#3F5E4A', bottom: '#8A8463', acc: ['backpack', 'cap'] }, { rim: 0.85 });
-  // gourmande devant la vitrine à gâteaux
-  figureAt(s, 2.9, 5.75, { view: 'back', skin: '#E4B897', hair: '#B9B4AE', hairStyle: 'bun', top: '#AF7A4D', bottom: '#4E5258' });
-  M.plant(s, 8.5, 0, 6.9, { potH: 0.4, potR: 0.2 });
-  // premier plan: table de deux, un client pressé déjà servi
-  M.chair(s, 6.6, 2.2, '+x', nchair);
-  M.squareTable(s, 7.15, 2.2, { top: fir, leg: ash, w: 0.6, d: 0.6, items: [[0.05, 0.08, 'espresso']], rim: '#2F5560' });
-  M.chair(s, 7.7, 2.2, '-x', nchair);
-  M.chair(s, 3.9, 3.8, '+z', nchair);
-  M.squareTable(s, 3.9, 4.3, { top: fir, leg: ash, items: [[0.1, -0.05, 'tea']], rim: '#2F5560' });
-  const sd = sunDir(momentId, false);
-  if (sd) {
-    for (const [x0, x1] of [[0.85, 2.27], [2.33, 3.75], [5.35, 6.77], [6.83, 8.25]]) M.sunPatch(s, x0, x1, 0.6, 2.7, D + 0.15, sd, { x0: 1.8, x1: W, z0: 0, z1: D }, momentId === 'morning' ? '#FFF0D6' : '#FFD39A', 0.22);
+  for (const [x, items, who] of [[5.1, [[0.1, 0.05, 'cappuccino'], [-0.12, -0.08, 'tea']], 'famille'], [3.5, [], 'lecture'], [1.9, [[0, 0, 'espresso']], null], [0.4, [], null]]) {
+    M.chair(s, x, 3.55, '+z', nchair);
+    M.squareTable(s, x, 4.05, { w: 0.6, d: 0.6, top: fir, leg: ash, items, rim: '#2F5560' });
+    M.chair(s, x, 4.6, '-z', nchair);
+    if (who === 'famille') {
+      figureAt(s, x, 4.6, { view: 'front', pose: 'sit', skin: '#AD7852', hair: '#2B2320', hairStyle: 'curly', top: '#7E9CC0', bottom: '#4D5F7D', expr: 'ravi' }, { depthBias: 0.25 });
+      s.billboard(x + 0.55, 0, 4.3, F.child({ view: 'front', skin: '#AD7852', hair: '#2B2320', hairStyle: 'curly', top: '#B0574D', bottom: '#97A866', expr: 'ravi' }), 'objects', 0.1);
+    }
+    if (who === 'lecture') figureAt(s, x, 4.6, { view: 'front', pose: 'sitRead', skin: '#F2D3BC', hair: '#CDAA6E', hairStyle: 'long', top: '#9E4E63', bottom: '#4E5258', acc: ['menuOpen'], expr: 'lit' }, { depthBias: 0.25 });
   }
-  for (const [x, z] of [[4.4, 6.2], [7.0, 6.1], [5.0, 3.4]]) {
-    const pool = s.ellipseDecal(x, 0.004, z, 0.9, 0.9, '#FFC27A', (night ? 0.36 : 0.12) * m.lamps);
+  for (const x of [3.55, 1.95]) {
+    M.chair(s, x - 0.4, 6.4, '+x', nchair);
+    M.roundTable(s, x, 6.4, { r: 0.3, top: fir, leg: ash, items: [], rim: '#2F5560' });
+  }
+  s.billboard(5.75, 0, 4.9, F.stroller('#3F5E4A'), 'objects', 0);
+  for (const [x, z] of [[5.1, 4.05], [3.5, 4.05], [1.9, 4.05], [3.55, 6.4]]) M.pendant(s, x, z, H, 2.25, { kind: 'globe', r: 0.18, halo: 0.14 });
+  M.plant(s, 0.35, 0, 6.4, { potH: 0.4, potR: 0.2 });
+  const sd = sunDir(momentId, false);
+  if (sd) for (const [x0, x1] of [[0.35, 1.3], [1.35, 2.3], [2.5, 3.45], [3.5, 4.45]]) M.sunPatch(s, x0, x1, 0.6, 2.7, D + 0.15, sd, { x0: 0, x1: W, z0: cz1, z1: D }, momentId === 'morning' ? '#FFF0D6' : '#FFD39A', 0.24);
+  for (const [x, z] of [[5.1, 4.05], [3.5, 4.05], [1.9, 4.05], [4.3, 2.0]]) {
+    const pool = s.ellipseDecal(x, 0.004, z, 0.85, 0.85, '#FFC27A', (night ? 0.36 : 0.12) * m.lamps);
     if (pool) s.layers.overlays.push(pool);
   }
-  if (opts.markers) {
-    marker(s, [0.95, 1.9, 1.4], 1);
-    marker(s, [0.02, 2.88, 5.75], 2);
-    marker(s, [1.1, 1.95, 5.0], 3);
-    marker(s, [2.85, 1.95, 6.55], 4);
-    marker(s, [5.5, 3.1, 12], 5);
-    marker(s, [4.4, 1.55, 6.75], 6);
+  if (opts.markers && view === 'a') {
+    marker(s, [4.7, 2.75, 0.02], 1);
+    marker(s, [5.2, 1.45, cz0 + 0.3], 2);
+    marker(s, [4.6, 2.0, 1.05], 3);
+    marker(s, [6.45, 1.95, 2.9], 4);
+    marker(s, [6.55, 2.3, 0.02], 5);
+    marker(s, [5.1, 1.55, 4.6], 6);
   }
-  return s.toSVG({ sky: m.sky, clipId: `v-bourg-${momentId}` });
+  return s.toSVG({ sky: m.sky, clipId: `v-bourg-${view}-${momentId}` });
 }
 
 // ------------------------------------------------------------------------------------------------
