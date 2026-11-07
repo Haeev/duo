@@ -1,0 +1,209 @@
+{
+  "purchases": [
+    {
+      "id": "gobelets",
+      "label": "Gobelets et couvercles (vente à emporter)",
+      "price": 40,
+      "tier": "t0",
+      "effects": [
+        {
+          "kind": "equip",
+          "equip": "gobelets"
+        }
+      ],
+      "furniture": null,
+      "text": "La moitié des pressés repartent avec leur café, sans tasse à laver."
+    },
+    {
+      "id": "fiche-cappuccino",
+      "label": "Fiche « cappuccino »",
+      "price": 30,
+      "tier": "t0",
+      "effects": [
+        {
+          "kind": "recipe",
+          "recipe": "cappuccino"
+        }
+      ],
+      "furniture": null,
+      "text": "Mousse épaisse et cacao: le préféré des flâneurs."
+    },
+    {
+      "id": "fiche-the-vert",
+      "label": "Fiche « thé vert »",
+      "price": 20,
+      "tier": "t0",
+      "effects": [
+        {
+          "kind": "recipe",
+          "recipe": "the-vert"
+        }
+      ],
+      "furniture": null,
+      "text": "Eau à 80 degrés, pas plus: sinon il devient amer."
+    },
+    {
+      "id": "pichet-thermometre",
+      "label": "Pichet thermomètre",
+      "price": 60,
+      "tier": "t0",
+      "effects": [
+        {
+          "kind": "station-level",
+          "station": "vapeur",
+          "level": 2
+        }
+      ],
+      "furniture": null,
+      "text": "Le lait se lit d'un coup d'œil: deux laits à la fois sur la buse."
+    },
+    {
+      "id": "tabourets-zinc",
+      "label": "Deux tabourets de comptoir",
+      "price": 120,
+      "tier": "t0",
+      "effects": [
+        {
+          "kind": "equip",
+          "equip": "tabourets"
+        }
+      ],
+      "furniture": null,
+      "text": "Les voisins s'accoudent et restent un peu plus."
+    },
+    {
+      "id": "service-vaisselle",
+      "label": "Service de vaisselle (+24 pièces)",
+      "price": 90,
+      "tier": "t0",
+      "effects": [
+        {
+          "kind": "dishes",
+          "count": 24
+        }
+      ],
+      "furniture": null,
+      "text": "Moins de courses à la plonge au coup de feu."
+    },
+    {
+      "id": "moulin-dose",
+      "label": "Moulin à dose",
+      "price": 380,
+      "tier": "t1",
+      "effects": [
+        {
+          "kind": "station-level",
+          "station": "espresso",
+          "level": 2
+        }
+      ],
+      "furniture": "moulin-dose",
+      "text": "La mouture tombe juste: on prépare deux cafés plus vite."
+    },
+    {
+      "id": "presse-levier",
+      "label": "Presse-agrumes à levier",
+      "price": 120,
+      "tier": "t1",
+      "effects": [
+        {
+          "kind": "station-level",
+          "station": "agrumes",
+          "level": 1
+        }
+      ],
+      "furniture": "presse-agrumes",
+      "text": "Le jus d'orange pressé arrive à l'ardoise."
+    },
+    {
+      "id": "etagere-livres-equip",
+      "label": "Étagère à livres (avec les livres de Lise)",
+      "price": 150,
+      "tier": "t1",
+      "effects": [
+        {
+          "kind": "equip",
+          "equip": "livres"
+        }
+      ],
+      "furniture": null,
+      "text": "Les flâneurs restent, un livre à la main."
+    },
+    {
+      "id": "creperie",
+      "label": "Crêpière",
+      "price": 180,
+      "tier": "t2",
+      "effects": [
+        {
+          "kind": "station-level",
+          "station": "creperie",
+          "level": 1
+        }
+      ],
+      "furniture": "crepiere",
+      "text": "Une plaque, une louche, et la salle sent le beurre."
+    },
+    {
+      "id": "range-velos",
+      "label": "Range-vélos",
+      "price": 180,
+      "tier": "t2",
+      "effects": [
+        {
+          "kind": "equip",
+          "equip": "range-velos"
+        }
+      ],
+      "furniture": null,
+      "text": "Les cyclistes de la voie verte s'arrêtent enfin."
+    },
+    {
+      "id": "coin-enfants",
+      "label": "Chaise haute et coin des enfants",
+      "price": 260,
+      "tier": "t2",
+      "effects": [
+        {
+          "kind": "equip",
+          "equip": "chaise-haute"
+        },
+        {
+          "kind": "equip",
+          "equip": "coin-enfants"
+        }
+      ],
+      "furniture": null,
+      "text": "Des crayons, un tapis, une chaise haute: les familles restent au goûter."
+    },
+    {
+      "id": "frigo-vitre",
+      "label": "Réfrigérateur vitré",
+      "price": 350,
+      "tier": "t2",
+      "effects": [
+        {
+          "kind": "recipe",
+          "recipe": "limonade"
+        }
+      ],
+      "furniture": null,
+      "text": "Les bouteilles fraîches se voient du comptoir."
+    },
+    {
+      "id": "bouilloire-temperature",
+      "label": "Bouilloire à température",
+      "price": 90,
+      "tier": "t3",
+      "effects": [
+        {
+          "kind": "station-level",
+          "station": "bouilloire",
+          "level": 2
+        }
+      ],
+      "furniture": "bouilloire-temperature",
+      "text": "Elle s'arrête seule à la bonne température."
+    }
+  ]
+}

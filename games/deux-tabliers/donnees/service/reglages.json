@@ -1,0 +1,146 @@
+{
+  "stationOf": {
+    "espresso": "groupe",
+    "vapeur": "vapeur",
+    "bouilloire": "bouilloire",
+    "vitrine": "vitrine",
+    "plan": "frigo",
+    "frigo": "frigo",
+    "agrumes": "presse-agrumes",
+    "creperie": "crepiere"
+  },
+  "levels": {
+    "moulin-dose": { "station": "espresso", "level": 2 },
+    "bouilloire-temperature": { "station": "bouilloire", "level": 2 }
+  },
+  "installation": [
+    {
+      "id": "groupe-1",
+      "type": "groupe-espresso",
+      "anchor": "station-4",
+      "x": -0.2,
+      "z": -0.25,
+      "y": 0.15,
+      "rotDeg": 0
+    },
+    {
+      "id": "groupe-2",
+      "type": "groupe-espresso",
+      "anchor": "station-4",
+      "x": 0.1,
+      "z": -0.25,
+      "y": 0.15,
+      "rotDeg": 0
+    },
+    {
+      "id": "buse-1",
+      "type": "buse-vapeur",
+      "anchor": "station-4",
+      "x": 0.34,
+      "z": -0.25,
+      "y": 0.13,
+      "rotDeg": 0
+    },
+    {
+      "id": "bouilloire-1",
+      "type": "bouilloire",
+      "anchor": "backbar-1",
+      "x": -0.4,
+      "z": 0,
+      "y": 0.91,
+      "rotDeg": 0
+    },
+    {
+      "id": "vitrine-1",
+      "type": "vitrine",
+      "anchor": "backbar-1",
+      "x": 0.13,
+      "z": 0,
+      "y": 0.91,
+      "rotDeg": 0
+    },
+    {
+      "id": "rail-1",
+      "type": "rail-tickets",
+      "anchor": "station-3",
+      "x": 0,
+      "z": 0.25,
+      "y": 1.105,
+      "rotDeg": 0
+    },
+    {
+      "id": "palette-1",
+      "type": "palette-livraison",
+      "anchor": null,
+      "x": 8.9,
+      "z": 2.4,
+      "y": 0,
+      "rotDeg": 0
+    }
+  ],
+  "purchaseSpots": {
+    "moulin-dose": { "replaces": "moulin" },
+    "bouilloire-temperature": { "replaces": "bouilloire" },
+    "presse-agrumes": {
+      "id": "presse-1",
+      "anchor": "backbar-1",
+      "x": 0.97,
+      "z": 0,
+      "y": 0.9,
+      "rotDeg": 0
+    },
+    "lave-vaisselle": {
+      "id": "lave-vaisselle-1",
+      "anchor": "backbar-1",
+      "x": 0.65,
+      "z": 0,
+      "y": 0,
+      "rotDeg": 0
+    }
+  },
+  "gestures": {
+    "grind": { "holdSeconds": 2.5, "maxDoses": 2, "dosesPerClick": 2 },
+    "extraction": {
+      "underSeconds": 10,
+      "perfectSeconds": 2,
+      "goodSeconds": 6,
+      "autoStopSeconds": 20,
+      "assistStopAfterSeconds": 1
+    },
+    "steam": {
+      "startC": 4,
+      "minC": 40,
+      "perfectC": [58, 65],
+      "goodC": [52, 70],
+      "cutC": 72,
+      "assistC": 62
+    },
+    "kettle": {
+      "startC": 20,
+      "maxC": 100,
+      "degreesPerSecond": 10,
+      "perfectDeltaC": 3,
+      "goodDeltaC": 8
+    },
+    "cook": { "goldenSeconds": 2, "autoStopSeconds": 6 },
+    "order": { "seconds": 2.5, "perExtraArticle": 0.4 },
+    "wash": { "secondsPerPiece": 1.5 },
+    "dishwasher": { "capacity": 24, "cycleSeconds": 45 }
+  },
+  "vessels": {
+    "tasse": { "clean": "tasse", "dirty": "tasse-sale" },
+    "verre": { "clean": "verre", "dirty": "verre-sale" },
+    "assiette": { "clean": "assiette", "dirty": "assiette-sale" }
+  },
+  "cleanAtStart": { "tasse": 16, "verre": 8, "assiette": 12 },
+  "afterEspresso": "tasse-cafe",
+  "storage": {
+    "frigo": ["frigo-armoire"],
+    "reserve": ["etagere", "etagere-longue"],
+    "vitrine": ["vitrine"]
+  },
+  "passe": ["passe"],
+  "palette": "palette-livraison",
+  "cartons": { "light": "carton", "heavy": "carton-lourd" },
+  "startCartons": 1
+}

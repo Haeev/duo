@@ -63,9 +63,9 @@
       "fixed": true,
       "carry": "none",
       "price": 0,
-      "station": null,
+      "station": "frigo",
       "source": null,
-      "slots": []
+      "slots": [{ "id": "plan", "x": 0.05, "y": 0.91, "z": 0 }]
     },
     {
       "id": "passe",
@@ -82,8 +82,10 @@
       "station": null,
       "source": null,
       "slots": [
-        { "id": "p1", "x": -0.15, "y": 1.105, "z": 0 },
-        { "id": "p2", "x": 0.15, "y": 1.105, "z": 0 }
+        { "id": "p1", "x": -0.15, "y": 1.105, "z": -0.12 },
+        { "id": "p2", "x": 0.15, "y": 1.105, "z": -0.12 },
+        { "id": "p3", "x": -0.15, "y": 1.105, "z": 0.12 },
+        { "id": "p4", "x": 0.15, "y": 1.105, "z": 0.12 }
       ]
     },
     {
@@ -98,9 +100,9 @@
       "fixed": true,
       "carry": "none",
       "price": 0,
-      "station": "machine",
+      "station": null,
       "source": null,
-      "slots": [{ "id": "bec", "x": 0, "y": 0.02, "z": -0.2 }]
+      "slots": []
     },
     {
       "id": "moulin",
@@ -114,9 +116,9 @@
       "fixed": true,
       "carry": "none",
       "price": 0,
-      "station": null,
+      "station": "moulin",
       "source": null,
-      "slots": []
+      "slots": [{ "id": "bac", "x": 0, "y": 0.02, "z": -0.12 }]
     },
     {
       "id": "caisse",
@@ -130,9 +132,9 @@
       "fixed": true,
       "carry": "none",
       "price": 0,
-      "station": null,
+      "station": "caisse",
       "source": null,
-      "slots": []
+      "slots": [{ "id": "terminal", "x": 0, "y": 0.15, "z": 0 }]
     },
     {
       "id": "frigo-armoire",
@@ -146,9 +148,9 @@
       "fixed": true,
       "carry": "none",
       "price": 0,
-      "station": null,
+      "station": "rangement",
       "source": null,
-      "slots": []
+      "slots": [{ "id": "pied", "x": 0, "y": 0, "z": -0.6 }]
     },
     {
       "id": "etagere",
@@ -156,15 +158,15 @@
       "model": "etagere",
       "color": "#9c7a52",
       "footprint": [0.85, 0.45],
-      "height": 2.0,
+      "height": 2,
       "kind": "other",
       "blocks": true,
       "fixed": false,
       "carry": "two",
       "price": 40,
-      "station": null,
+      "station": "rangement",
       "source": null,
-      "slots": []
+      "slots": [{ "id": "pied", "x": 0, "y": 0, "z": 0.4 }]
     },
     {
       "id": "etagere-longue",
@@ -172,15 +174,15 @@
       "model": "etagere-longue",
       "color": "#9c7a52",
       "footprint": [1.2, 0.45],
-      "height": 2.0,
+      "height": 2,
       "kind": "other",
       "blocks": true,
       "fixed": false,
       "carry": "two",
       "price": 55,
-      "station": null,
+      "station": "rangement",
       "source": null,
-      "slots": []
+      "slots": [{ "id": "pied", "x": 0, "y": 0, "z": -0.4 }]
     },
     {
       "id": "caisses-patronne",
@@ -286,7 +288,7 @@
     },
     {
       "id": "pile-tasses",
-      "label": "Pile de tasses",
+      "label": "Vaisselle propre",
       "model": "pile-tasses",
       "color": "#f2ece0",
       "footprint": [0.2, 0.2],
@@ -296,9 +298,179 @@
       "fixed": true,
       "carry": "none",
       "price": 0,
-      "station": null,
-      "source": "tasse",
-      "slots": []
+      "station": "vaisselle",
+      "source": null,
+      "slots": [{ "id": "dessus", "x": 0, "y": 0.25, "z": 0 }]
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "groupe-espresso",
+      "label": "Groupe de la machine",
+      "color": "#9aa0a6",
+      "footprint": [0.1, 0.1],
+      "height": 0.1,
+      "slots": [{ "id": "bec", "x": 0, "y": -0.13, "z": -0.04 }],
+      "station": "groupe"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "buse-vapeur",
+      "label": "Buse vapeur",
+      "color": "#c7ccd1",
+      "footprint": [0.08, 0.08],
+      "height": 0.14,
+      "slots": [{ "id": "bec", "x": 0, "y": -0.13, "z": -0.04 }],
+      "station": "vapeur"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "bouilloire",
+      "label": "Bouilloire",
+      "color": "#d7d2c8",
+      "footprint": [0.2, 0.2],
+      "height": 0.28,
+      "slots": [{ "id": "tasse", "x": 0.17, "y": 0, "z": 0 }],
+      "station": "bouilloire"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 90,
+      "source": null,
+      "id": "bouilloire-temperature",
+      "label": "Bouilloire à température",
+      "color": "#a9b8c0",
+      "footprint": [0.2, 0.2],
+      "height": 0.3,
+      "slots": [{ "id": "tasse", "x": 0.17, "y": 0, "z": 0 }],
+      "station": "bouilloire"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "vitrine",
+      "label": "Cloche à viennoiseries",
+      "color": "#e8e2d0",
+      "footprint": [0.28, 0.28],
+      "height": 0.32,
+      "slots": [{ "id": "assiette", "x": 0, "y": 0, "z": 0.2 }],
+      "station": "vitrine"
+    },
+    {
+      "kind": "other",
+      "blocks": true,
+      "fixed": true,
+      "carry": "none",
+      "price": 380,
+      "source": null,
+      "id": "moulin-dose",
+      "label": "Moulin à dose",
+      "color": "#5b5f63",
+      "footprint": [0.22, 0.35],
+      "height": 0.55,
+      "slots": [{ "id": "bac", "x": 0, "y": 0.02, "z": -0.1 }],
+      "station": "moulin-dose"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 120,
+      "source": null,
+      "id": "presse-agrumes",
+      "label": "Presse-agrumes à levier",
+      "color": "#e3a33b",
+      "footprint": [0.25, 0.25],
+      "height": 0.45,
+      "slots": [{ "id": "verre", "x": 0, "y": 0.02, "z": -0.06 }],
+      "station": "presse-agrumes"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 180,
+      "source": null,
+      "id": "crepiere",
+      "label": "Crêpière",
+      "color": "#3a3a3a",
+      "footprint": [0.45, 0.45],
+      "height": 0.2,
+      "slots": [{ "id": "assiette", "x": 0, "y": 0.2, "z": 0 }],
+      "station": "crepiere"
+    },
+    {
+      "kind": "other",
+      "blocks": true,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "lave-vaisselle",
+      "label": "Lave-vaisselle",
+      "color": "#c9cfd2",
+      "footprint": [0.6, 0.55],
+      "height": 0.85,
+      "slots": [{ "id": "panier", "x": 0, "y": 0.45, "z": 0.4 }],
+      "station": "lave-vaisselle"
+    },
+    {
+      "kind": "other",
+      "blocks": false,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "rail-tickets",
+      "label": "Rail à tickets",
+      "color": "#8a8f94",
+      "footprint": [0.6, 0.03],
+      "height": 0.05,
+      "slots": [{ "id": "pince", "x": 0, "y": 0.05, "z": 0 }],
+      "station": "rail"
+    },
+    {
+      "kind": "other",
+      "blocks": true,
+      "fixed": true,
+      "carry": "none",
+      "price": 0,
+      "source": null,
+      "id": "palette-livraison",
+      "label": "Palette des livraisons",
+      "color": "#a88a5c",
+      "footprint": [0.8, 0.6],
+      "height": 0.15,
+      "slots": [
+        { "id": "s1", "x": -0.2, "y": 0.15, "z": -0.15 },
+        { "id": "s2", "x": 0.2, "y": 0.15, "z": -0.15 },
+        { "id": "s3", "x": -0.2, "y": 0.15, "z": 0.15 },
+        { "id": "s4", "x": 0.2, "y": 0.15, "z": 0.15 }
+      ],
+      "station": null
     }
   ]
 }

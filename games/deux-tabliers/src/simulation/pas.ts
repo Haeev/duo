@@ -49,6 +49,7 @@ function inReach(sim: SimContext, player: PlayerIndex, target: Target): boolean 
 }
 
 function applyIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
+  // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- les intentions des chantiers passent toutes par le défaut
   switch (intent.type) {
     case 'act':
     case 'drop': {

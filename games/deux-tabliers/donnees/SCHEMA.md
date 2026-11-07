@@ -103,6 +103,57 @@ Copie telle quelle d'un plan de `docs/jeux/cosy-cafe/plans/plans.json` (format `
 
 Chaque chantier ajoute ses fichiers ici (`recettes.json`, `profils.json`, `catalogue.json`...), les lit dans `src/<chantier>/donnees.ts` avec `readFile` et les décrit dans une section de ce document. Un fichier `service.json`, `clientele.json` ou `amenagement.json` déposé avant son lecteur est signalé au chargement.
 
+## Service (chantier a): `service/*.json`
+
+Lu par `src/service/donnees.ts`. `recettes.json`, `ingredients.json` et `equipements.json` sont **générés** depuis les données de la démo du game designer (`docs/jeux/cosy-cafe/demo/donnees/`) par `node games/deux-tabliers/outils/service-donnees.mjs`, puis `npx prettier --write games/deux-tabliers/donnees/service games/deux-tabliers/donnees/*.json`: ne pas les retoucher à la main. Le même script tient à jour, par identifiant et sans réécrire le reste, les objets, meubles et postes du service dans `objets.json`, `meubles.json` et `postes.json` (relançable après une fusion). Identifiants du game designer (`pain_chocolat`) écrits avec des traits d'union (`pain-chocolat`).
+
+### `service/recettes.json`
+
+`{ "recipes": [Recipe, ...] }`
+
+| Clé | Type | Sens |
+|---|---|---|
+| `id`, `label` | | recette, et objet du même identifiant dans `objets.json` (l'article fini) |
+| `family` | identifiant | famille du cahier (`black-coffee`, `milk-coffee`, `tea`, `chocolate`, `cold-drink`, `pastry-bread`, `cake`) |
+| `price`, `cost` | euros | prix conseillé, coût des matières (somme des ingrédients) |
+| `vessel` | `tasse`, `verre`, `assiette` | vaisselle de l'article (boissons chaudes, froides, le reste) |
+| `dishes` | entier | pièces de vaisselle (un thé: la tasse et sa théière, 2) |
+| `ingredients` | liste de `{ "id", "qty" }` | prélevés au stock quand l'article commence |
+| `steps` | liste | étapes dans l'ordre: `station` (poste du game designer: `espresso`, `vapeur`, `bouilloire`, `vitrine`, `plan`, `frigo`, `agrumes`, `creperie`), `activeSeconds`, `passiveSeconds`, `finishSeconds` (trois valeurs: niveau 1, 2, 3 du poste), `waterC` (thé: eau visée, CO-05) |
+| `unlock` | `{ "kind": "start" }`, `{ "kind": "purchase", "item" }`, `{ "kind": "regular", "regular", "level" }` | déblocage |
+| `options` | liste | options possibles (`oat-milk`, `decaf`), écrites sur le ticket |
+
+### `service/ingredients.json`
+
+`{ "ingredients": [{ "id", "label", "unit", "unitCost", "supplier", "storage", "shelfDays", "cartonUnits", "heavy" }] }`: `storage` (`frigo`, `reserve`, `vitrine`) dit où le carton se range; `cartonUnits`, ce qu'apporte un carton; `heavy`, un gros carton; `shelfDays` 1 au plus: part au panier du soir.
+
+### `service/equipements.json`
+
+`{ "purchases": [{ "id", "label", "price", "tier", "effects", "furniture", "text" }] }`. `effects`: `{ "kind": "recipe", "recipe" }`, `{ "kind": "dishes", "count" }`, `{ "kind": "station-level", "station", "level" }`, `{ "kind": "equip", "equip" }`. `furniture`: meuble du service posé par l'achat (`moulin-dose`, `presse-agrumes`, `crepiere`, `bouilloire-temperature`), ou `null`.
+
+### `service/reglages.json` (écrit à la main)
+
+| Clé | Sens |
+|---|---|
+| `stationOf` | poste du game designer vers poste de `postes.json` (`espresso` et `vapeur`: `groupe` et `vapeur`, pièces de la machine; `plan` et `frigo`: le réfrigérateur et son plan) |
+| `levels` | meuble posé qui monte un poste de niveau (`moulin-dose`: espresso 2) |
+| `installation` | matériel posé au premier pas: `{ "id", "type", "anchor", "x", "z", "y", "rotDeg" }`, en coordonnées du meuble `anchor` (identifiant de `departs/`, `y` depuis sa base), ou du monde si `anchor` est `null` |
+| `purchaseSpots` | place d'un meuble acheté: `{ "replaces": "<type>" }` (le moulin à dose prend la place du moulin) ou une place comme `installation` |
+| `gestures.grind` | moulin: maintien (s), doses au plus, doses du moulin à dose |
+| `gestures.extraction` | s: sous-extrait avant `underSeconds` (Correct); prête à `passiveSeconds` de la recette (12); « Parfait » pendant `perfectSeconds`, « Bien » jusqu'à `goodSeconds` après; coupure à `autoStopSeconds`; l'aide arrête `assistStopAfterSeconds` après « prête » |
+| `gestures.steam` | °C: départ, relâché trop tôt sous `minC` (rien n'est fait), zones `perfectC` et `goodC`, coupure `cutC`, arrêt de l'aide `assistC`; la montée dure `activeSeconds` de l'étape jusqu'à `assistC` |
+| `gestures.kettle` | °C: départ, maximum, degrés par seconde, écarts « Parfait » et « Bien » autour de `waterC` |
+| `gestures.cook` | crêpe: fenêtre dorée (s), maintien au chaud au-delà |
+| `gestures.order`, `wash`, `dishwasher` | caisse (2,5 s plus 0,4 s par article, CO-01), plonge (1,5 s par pièce, PL-02), lave-vaisselle (24 pièces, 45 s, PL-03) |
+| `vessels` | objets propre et sale de chaque vaisselle |
+| `cleanAtStart` | vaisselle propre à l'arrivée (36 pièces, `stationsAtStart.dishes`) |
+| `afterEspresso` | objet d'une tasse dont le café est fait et qui attend son lait |
+| `storage` | types de meubles où se range chaque sorte de carton |
+| `passe`, `palette`, `cartons` | meubles du passe et de la palette des livraisons, objets carton léger et lourd |
+| `startCartons` | cartons de chaque ingrédient déjà rangés à l'arrivée |
+
+Postes du service dans `postes.json`: tous `"use": "click"`; le service mène lui-même les maintiens et écrit leur avancement dans `players[].use` pour l'anneau du HUD (`seconds`: 600, l'échelle de l'anneau, jamais atteinte). Un poste dont `transforms` recopie un objet à l'identique (`tasse` vers `tasse`) n'est une cible que si cet objet est posé sur son emplacement.
+
 ## Régénérer le départ
 
 Régénérer après un changement du plan: `python3 games/deux-tabliers/outils/importer-plan.py`, puis `npx prettier --write games/deux-tabliers/donnees`. Le départ est régénéré en entier: une retouche à la main de `departs/` se perd, la faire dans le script.
