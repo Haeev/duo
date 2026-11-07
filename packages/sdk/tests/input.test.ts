@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { unlockMeansEscape } from '../src/input';
 import { createInputState } from '../src/input-state';
 import { keyLabel } from '../src/keys';
 
@@ -83,5 +84,14 @@ describe('état des actions', () => {
     expect(s.isDown('up') || s.isDown('act')).toBe(false);
     expect(s.wasReleased('up') && s.wasReleased('act')).toBe(true);
     expect(s.frame()).toEqual({ down: [], pressed: [], released: ['up', 'act'] });
+  });
+});
+
+describe('pointeur rendu sans demande du jeu', () => {
+  it('vaut Échap fenêtre active, pas après Alt+Tab ni quand le jeu l’a rendu', () => {
+    expect(unlockMeansEscape({ requested: false, visible: true, focused: true })).toBe(true);
+    expect(unlockMeansEscape({ requested: false, visible: true, focused: false })).toBe(false);
+    expect(unlockMeansEscape({ requested: false, visible: false, focused: true })).toBe(false);
+    expect(unlockMeansEscape({ requested: true, visible: true, focused: true })).toBe(false);
   });
 });

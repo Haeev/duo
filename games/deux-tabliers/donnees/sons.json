@@ -1,0 +1,9 @@
+{
+  "events": {
+    "taken": "cup-pick",
+    "placed": "cup-set",
+    "given": "hand-off",
+    "refused": "ui-refusal",
+    "station-done": "cup-saucer"
+  }
+}

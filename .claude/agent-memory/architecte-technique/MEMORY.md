@@ -83,3 +83,11 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Three.js 0.187: `Skeleton.update` marque `boneTexture.needsUpdate` à chaque image (un envoi par personnage); `BatchedMesh` offre `addGeometry`, `addInstance`, `setMatrixAt`, `setColorAt`, `perObjectFrustumCulled` (vrai par défaut) et le multi-draw; un même matériau sur un `Mesh` et un `BatchedMesh` donne deux programmes.
 - Mesurer l'animation sans rendu: `GLTFLoader.parse` marche dans Node une fois retirés du JSON du GLB `images`, `textures`, `samplers` et les références de textures (GLB reconstruit: en-tête, JSON complété d'espaces jusqu'à un multiple de 4, BIN inchangé); three installé par `npm install` dans le scratchpad, importé par URL de fichier. Repère: 6 à 13 µs par personnage et par image (18 os) sur le Xeon cloud (famille 6, modèle 207, 2,1 GHz, KVM); script `docs/jeux/cosy-cafe/essais/foule-animation-cpu.mjs`.
 - Le level designer de Cosy Café a son validateur des plans (`docs/jeux/cosy-cafe/plans/valider_plans.py`): foule au pire dans un champ de 100°, normes de passage. S'y aligner plutôt que de fixer des seuils concurrents.
+
+## Squelette de Deux Tabliers (vérifié le 2026-11-07)
+
+- Copie isolée: le garde refuse les heredocs (`cat <<EOF`) et les commandes composées complexes; écrire les scripts par l'outil Write (scratchpad) et les lancer seuls.
+- Playwright, pointeur verrouillé dans une iframe (`deux-vues.html`): chaque `mouse.move` arrive en paire de sauts opposés (+1073/+425 puis -1073/-425); un test du regard passe par un robot, pas par la souris. Le jeu ignore tout saut de plus de 300 px en un événement.
+- Plans du level designer: une `door` peut être un portillon de comptoir (hauteur 1,1) ou un portail de clôture: pas de linteau sauf si un `wall` la jouxte dans le même alignement.
+- La CI des jeux filtre par chemin (`pnpm --filter "./games/$ID"`): le nom npm du paquet est libre (`deux-tabliers` sans portée marche aussi avec `--filter deux-tabliers`).
+- Valibot: un tableau vide `[] as const` s'étale dans `v.variant` (intentions et événements extensibles par chantier sans toucher au fichier commun).

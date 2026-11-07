@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "deux-tabliers",
+  "name": "Deux Tabliers",
+  "version": "0.1.0",
+  "sdk": "1.1",
+  "view": "3d",
+  "engine": "three",
+  "mode": "coop",
+  "play": "session",
+  "durationMinutes": [10, 45],
+  "network": "host-authority",
+  "entry": "index.html",
+  "thumbnail": "vignette.png",
+  "description": "À deux, en vue à la première personne, vous reprenez le petit café d'Ormeval et vous le tenez ensemble.",
+  "whatsNew": "Premier squelette jouable: marcher dans le café, prendre, poser et se passer les tasses.",
+  "actions": [
+    { "id": "forward", "label": "Avancer", "keys": ["KeyW", "ArrowUp"] },
+    { "id": "back", "label": "Reculer", "keys": ["KeyS", "ArrowDown"] },
+    { "id": "left", "label": "Aller à gauche", "keys": ["KeyA", "ArrowLeft"] },
+    { "id": "right", "label": "Aller à droite", "keys": ["KeyD", "ArrowRight"] },
+    { "id": "fast", "label": "Marcher vite", "keys": ["ShiftLeft", "ShiftRight"] },
+    { "id": "act", "label": "Agir", "keys": ["KeyE", "Space"], "mouse": ["left"] },
+    { "id": "drop", "label": "Reposer, ranger, lâcher", "keys": ["KeyR"], "mouse": ["right"] },
+    {
+      "id": "rotate",
+      "label": "Tourner le meuble ou la charge",
+      "keys": ["KeyQ"],
+      "mouse": ["wheel-up", "wheel-down"]
+    },
+    { "id": "wave", "label": "Faire signe à l'autre", "keys": ["KeyG"], "mouse": ["middle"] },
+    { "id": "tablet", "label": "Tablette", "keys": ["Tab"] },
+    { "id": "arrange", "label": "Aménager", "keys": ["KeyB"] },
+    { "id": "close", "label": "Fermer, annuler", "keys": ["Backspace"] },
+    { "id": "confirm", "label": "Valider, reprendre la souris", "keys": ["Enter", "NumpadEnter"] }
+  ],
+  "saves": {
+    "slots": 3,
+    "maxBytes": 4194304,
+    "moments": ["level-end", "auto", "exit"],
+    "autosaveSeconds": 120,
+    "help": "Le jeu enregistre à la fin de chaque journée, toutes les deux minutes et en quittant."
+  },
+  "credits": null
+}
