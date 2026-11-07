@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-07T19:32:52.278Z",
+  "node": "v22.23.4",
+  "three": "187",
+  "model": "villager_odette",
+  "bones": 18,
+  "triangles": 2434,
+  "clips": [
+    "walk",
+    "idle",
+    "sit",
+    "sit_eat",
+    "drink",
+    "talk",
+    "give",
+    "carry_one"
+  ],
+  "frames": 1200,
+  "repeats": 5,
+  "results": [
+    {
+      "count": 1,
+      "bestCpuMsPerFrame": 0.0061,
+      "medianCpuMsPerFrame": 0.01,
+      "bestWallMsPerFrame": 0.006,
+      "microsecondsPerCharacter": 10,
+      "gcMsDuringBestRun": 0
+    },
+    {
+      "count": 10,
+      "bestCpuMsPerFrame": 0.0598,
+      "medianCpuMsPerFrame": 0.0604,
+      "bestWallMsPerFrame": 0.0597,
+      "microsecondsPerCharacter": 6,
+      "gcMsDuringBestRun": 0.68
+    },
+    {
+      "count": 20,
+      "bestCpuMsPerFrame": 0.1155,
+      "medianCpuMsPerFrame": 0.1194,
+      "bestWallMsPerFrame": 0.1155,
+      "microsecondsPerCharacter": 6,
+      "gcMsDuringBestRun": 1.27
+    },
+    {
+      "count": 40,
+      "bestCpuMsPerFrame": 0.3176,
+      "medianCpuMsPerFrame": 0.343,
+      "bestWallMsPerFrame": 0.3175,
+      "microsecondsPerCharacter": 8.6,
+      "gcMsDuringBestRun": 1.28
+    },
+    {
+      "count": 60,
+      "bestCpuMsPerFrame": 0.5395,
+      "medianCpuMsPerFrame": 0.573,
+      "bestWallMsPerFrame": 0.5406,
+      "microsecondsPerCharacter": 9.5,
+      "gcMsDuringBestRun": 1.56
+    },
+    {
+      "count": 80,
+      "bestCpuMsPerFrame": 0.8279,
+      "medianCpuMsPerFrame": 0.8843,
+      "bestWallMsPerFrame": 0.8338,
+      "microsecondsPerCharacter": 11.1,
+      "gcMsDuringBestRun": 2.52
+    },
+    {
+      "count": 120,
+      "bestCpuMsPerFrame": 1.5582,
+      "medianCpuMsPerFrame": 1.5916,
+      "bestWallMsPerFrame": 1.5647,
+      "microsecondsPerCharacter": 13.3,
+      "gcMsDuringBestRun": 13.78
+    }
+  ]
+}

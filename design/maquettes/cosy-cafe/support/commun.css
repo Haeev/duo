@@ -1,0 +1,382 @@
+/*
+  Cosy Café · maquettes basse fidélité de l'interface en jeu (v0.1).
+  Gris et polices du système: le style final appartient à la bible artistique du jeu.
+  Seules couleurs: celles des deux profils Duo (design/identite/b/joueurs.json), toujours avec leur symbole.
+  Aucune ressource réseau. Tailles en rem (taille de l'interface de Duo), HUD en em (plafonné par la hauteur).
+*/
+:root {
+  --encre: #111111;
+  --encre-2: #333333;
+  --encre-3: #555555;
+  --papier: #ffffff;
+  --papier-2: #f1f1f1;
+  --papier-3: #e1e1e1;
+  --trait: #6b6b6b;
+  --ardoise: #2b2d2f;
+  --ardoise-2: #3a3d40;
+  --craie: #f4f4f0;
+  --craie-2: #d6d8d2;
+  --nuit: #1a1f3d;
+  --voile: rgba(0, 0, 0, 0.5);
+  --ui: 1;
+  font-size: calc(16px * var(--ui));
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--encre);
+  background: #9a9a9a;
+  line-height: 1.35;
+  overflow: hidden;
+}
+h1, h2, h3, h4, p, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; }
+
+/* Focus clavier: anneau noir et liseré blanc, visible sur la scène claire comme sur l'ardoise. */
+:focus { outline: none; }
+:focus-visible {
+  outline: 3px solid #000;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px #fff;
+}
+.sur-ardoise :focus-visible { outline-color: #fff; box-shadow: 0 0 0 3px #000; }
+
+/* ---------- Scène provisoire (le jeu en 3D, dessous) ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #cfcfcf;
+}
+.scene__vue {
+  position: absolute;
+  inset: 0;
+  --px: 50;
+  --py: 50;
+  --s: 1;
+  transform-origin: calc(var(--px) * 1vw) calc(var(--py) * 1vh);
+  transform: translate(calc(50vw - var(--px) * 1vw), calc(50vh - var(--py) * 1vh)) scale(var(--s));
+}
+.scene__vue svg { width: 100%; height: 100%; display: block; }
+.scene--sombre::after { content: ''; position: absolute; inset: 0; background: var(--voile); }
+.etiquette-maquette {
+  position: fixed;
+  left: 50%;
+  bottom: 0.4rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #fff;
+  background: #333;
+  padding: 0.1rem 0.6rem;
+  border-radius: 0.3rem;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* ---------- Touches et souris affichées ---------- */
+kbd, .touche {
+  font: inherit;
+  font-size: 0.82em;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7em;
+  height: 1.55em;
+  padding: 0 0.4em;
+  border: 0.09em solid currentColor;
+  border-bottom-width: 0.2em;
+  border-radius: 0.35em;
+  line-height: 1;
+  white-space: nowrap;
+  background: inherit;
+}
+.souris { display: inline-flex; width: 1.15em; height: 1.55em; flex: none; vertical-align: middle; }
+.souris svg { width: 100%; height: 100%; }
+
+/* ---------- Jetons des joueurs (symbole Duo sur un disque de nuit, cerclé d'encre) ---------- */
+.jeton { display: inline-flex; width: 1.6em; height: 1.6em; flex: none; }
+.jeton svg { width: 100%; height: 100%; display: block; }
+.jeton--petit { width: 1.2em; height: 1.2em; }
+.jeton--grand { width: 2.6em; height: 2.6em; }
+
+/* ---------- Icônes provisoires ---------- */
+.icone { display: inline-flex; width: 1.25em; height: 1.25em; flex: none; }
+.icone svg { width: 100%; height: 100%; display: block; }
+
+/* ---------- Boutons ---------- */
+.bouton {
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--encre);
+  background: var(--papier);
+  color: var(--encre);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  white-space: nowrap;
+  text-align: left;
+}
+.bouton:hover { background: var(--papier-2); }
+.bouton--principal { background: var(--encre); color: #fff; }
+.bouton--principal:hover { background: #333; }
+.bouton--discret { border-color: var(--trait); }
+.bouton--petit { min-height: 2.25rem; padding: 0.3rem 0.75rem; font-size: 0.9375rem; }
+.bouton--icone { min-width: 2.75rem; padding: 0.3rem; }
+.bouton[aria-disabled='true'], .bouton:disabled { border-style: dashed; color: var(--encre-3); background: var(--papier-2); cursor: not-allowed; }
+.bouton[aria-pressed='true'] { background: var(--papier-3); }
+.bouton kbd { font-size: 0.78em; }
+.pile { display: grid; gap: 0.8rem; align-content: start; }
+.pile.serree { gap: 0.4rem; }
+.rangee { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+.rangee--fin { justify-content: flex-end; }
+.rangee--entre { justify-content: space-between; }
+
+/* ---------- Puces d'état (reprennent les libellés des boutons) ---------- */
+.puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.15em 0.7em 0.15em 0.45em;
+  border-radius: 999px;
+  border: 2px solid var(--encre);
+  background: var(--papier);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.puce--ok { background: var(--encre); color: #fff; }
+.puce--attente { border-style: dashed; }
+
+/* ---------- Textes ---------- */
+.aide { font-size: 0.9375rem; color: var(--encre-3); }
+.petit { font-size: 0.875rem; }
+.fort { font-weight: 700; }
+.surtitre { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--encre-2); }
+.chiffre { font-variant-numeric: tabular-nums; }
+.visuellement-cache { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ================================================================
+   HUD (vue à la première personne)
+   ================================================================ */
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  /* La taille de l'interface de Duo s'applique, plafonnée pour que le HUD tienne en hauteur. */
+  font-size: min(1rem, calc(100vh / 30));
+  z-index: 2;
+}
+.hud > * { position: absolute; }
+.hud .interactif { pointer-events: auto; }
+.capsule {
+  background: var(--papier);
+  color: var(--encre);
+  border: 2px solid var(--encre);
+  border-radius: 999px;
+  padding: 0.3em 0.9em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1em;
+  white-space: nowrap;
+}
+.carte-hud {
+  background: var(--papier);
+  color: var(--encre);
+  border: 2px solid var(--encre);
+  border-radius: 0.75em;
+  padding: 0.55em 0.8em;
+  box-shadow: 0.2em 0.2em 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Régions ancrées aux coins: aucune ne pousse les autres. */
+.hud-haut-gauche { top: 1em; left: 1em; display: grid; gap: 0.5em; justify-items: start; max-width: 22em; }
+.hud-haut-droite { top: 1em; right: 1em; display: grid; gap: 0.5em; justify-items: end; max-width: 22em; }
+.hud-bas-gauche { bottom: 1em; left: 1em; max-width: 19em; }
+.hud-bas-droite { bottom: 4em; right: 1em; max-width: 19em; }
+.hud-bas-centre { bottom: 1em; left: 50%; transform: translateX(-50%); display: grid; justify-items: center; gap: 0.5em; }
+.hud-centre { left: 50%; top: 50%; width: 0; height: 0; }
+
+/* Point de visée et invite */
+.viseur {
+  position: absolute;
+  left: -0.3em;
+  top: -0.3em;
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0.13em #111;
+}
+.viseur--cible { left: -0.75em; top: -0.75em; width: 1.5em; height: 1.5em; background: transparent; border: 0.2em solid #fff; box-shadow: 0 0 0 0.13em #111, inset 0 0 0 0.13em #111; }
+.invite {
+  position: absolute;
+  top: 2.6em;
+  left: 0;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.35em;
+}
+.invite__ligne { font-size: 1.05em; }
+.invite__detail { font-size: 0.875em; color: var(--encre-2); background: var(--papier); border: 2px solid var(--encre); border-radius: 0.5em; padding: 0.15em 0.6em; white-space: nowrap; }
+.invite__refus { border-style: dashed; }
+.qualite { position: absolute; left: 4.6em; top: -3.4em; font-weight: 700; }
+
+/* Arc d'un geste (maintien, jauge, minuterie) autour du point de visée */
+.arc-geste { position: absolute; left: -4.6em; top: -4.6em; width: 9.2em; height: 9.2em; }
+.arc-geste svg { width: 100%; height: 100%; overflow: visible; }
+.arc-geste__libelle {
+  position: absolute;
+  left: 50%;
+  top: -2.4em;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Horloge (rappel discret de l'horloge murale) */
+.horloge { display: grid; gap: 0.1em; padding: 0.4em 0.9em 0.45em; border-radius: 0.75em; }
+.horloge__heure { font-size: 1.5em; font-weight: 700; line-height: 1.1; display: flex; align-items: center; gap: 0.35em; }
+.horloge__moment { font-size: 0.875em; color: var(--encre-2); }
+.horloge--arretee { border-style: dashed; }
+
+.minuterie { font-size: 0.9em; }
+.minuterie__anneau { width: 1.3em; height: 1.3em; }
+
+/* Alertes douces */
+.alertes { display: grid; gap: 0.4em; justify-items: start; }
+.alerte {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15em 0.55em;
+  align-items: start;
+  max-width: 21em;
+  font-size: 0.9375em;
+}
+.alerte__texte { white-space: normal; }
+
+/* L'autre joueur, hors de vue */
+.autre { display: grid; grid-template-columns: auto 1fr auto; gap: 0.1em 0.6em; align-items: center; min-width: 15em; }
+.autre__nom { font-weight: 700; }
+.autre__ou { grid-column: 2; font-size: 0.9375em; }
+.autre__tient { grid-column: 2; font-size: 0.875em; color: var(--encre-2); }
+.autre__direction { grid-row: 1 / span 3; grid-column: 3; display: grid; justify-items: center; gap: 0.1em; font-size: 0.8125em; color: var(--encre-2); }
+.autre__direction .icone { width: 1.8em; height: 1.8em; }
+
+/* Propositions (accord des deux) */
+.proposition { max-width: 21em; display: grid; gap: 0.35em; }
+.proposition__titre { display: flex; align-items: center; gap: 0.45em; font-weight: 700; }
+.proposition__objet { font-size: 0.9375em; }
+.proposition__aide { font-size: 0.875em; color: var(--encre-2); display: flex; align-items: center; gap: 0.35em; flex-wrap: wrap; }
+.proposition--envoyee { border-style: dashed; }
+
+/* Tickets pris par soi */
+.tickets { display: grid; gap: 0.4em; }
+.tickets__titre { font-size: 0.8125em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #fff; background: #333; justify-self: start; padding: 0.05em 0.5em; border-radius: 0.3em; }
+.ticket-hud { display: grid; gap: 0.15em; padding: 0.45em 0.7em; border-radius: 0.5em; }
+.ticket-hud__tete { display: flex; align-items: center; gap: 0.45em; font-weight: 700; }
+.ticket-hud__attente { margin-left: auto; font-weight: 600; font-size: 0.875em; display: inline-flex; gap: 0.25em; align-items: center; }
+.ticket-hud__ligne { display: flex; gap: 0.4em; align-items: center; font-size: 0.9375em; }
+.ticket-hud__etat { font-size: 0.875em; font-weight: 700; }
+.ticket-hud--replie { padding: 0.3em 0.7em; }
+
+/* Objet en main */
+.en-main { display: grid; gap: 0.2em; }
+.en-main__titre { font-size: 0.8125em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--encre-2); }
+.en-main__objet { font-weight: 700; }
+.en-main__ligne { font-size: 0.9375em; display: flex; gap: 0.4em; }
+
+/* Astuce et barre d'aménagement */
+.astuce { max-width: 36em; white-space: normal; text-align: center; }
+.barre-amenagement { display: grid; gap: 0.35em; justify-items: center; }
+.barre-amenagement__touches { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35em 0.9em; font-size: 0.9em; }
+.barre-amenagement__touches span { display: inline-flex; align-items: center; gap: 0.3em; white-space: nowrap; }
+.statut-pose { font-weight: 700; }
+.statut-pose--non { border-style: dashed; border-width: 3px; }
+
+/* Repères au bord de l'écran (sons et autre joueur): bande centrale des bords seulement. */
+.repere { display: inline-flex; align-items: center; gap: 0.4em; font-size: 0.875em; }
+.repere--droite { right: 0.6em; top: 44%; }
+.repere--gauche { left: 0.6em; top: 52%; }
+.repere--bas { bottom: 5.5em; left: 50%; transform: translateX(-50%); }
+
+/* Étiquette au-dessus d'une personne (dans le monde) et bulle d'un client */
+.etiquette-monde { font-size: 0.9375em; padding: 0.15em 0.6em; }
+.bulle {
+  background: var(--papier);
+  color: var(--encre);
+  border: 2px solid var(--encre);
+  border-radius: 0.8em;
+  padding: 0.4em 0.75em;
+  max-width: 17em;
+  font-size: 0.9375em;
+  white-space: normal;
+}
+
+/* Lecture d'un ticket visé (le texte du monde à la taille de l'interface) */
+.lecture-ticket { position: absolute; left: 1.6em; bottom: 1.4em; width: 15em; display: grid; gap: 0.2em; }
+.lecture-ticket__tete { display: flex; align-items: center; gap: 0.45em; font-weight: 700; }
+
+/* Capsule « reprendre la souris » */
+.capsule-souris { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 0.3em; }
+.capsule-souris .capsule { font-size: 1.2em; font-weight: 700; padding: 0.55em 1.2em; }
+.curseur-systeme { position: fixed; left: 58%; top: 40%; width: 22px; height: 32px; z-index: 5; pointer-events: none; }
+
+/* ================================================================
+   Interfaces posées (tablette, ardoise, livre d'or, bilan, détails d'une proposition)
+   ================================================================ */
+.interface {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: grid;
+}
+.pied-touches { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; font-size: 0.875rem; align-items: center; }
+.pied-touches span { display: inline-flex; gap: 0.3rem; align-items: center; white-space: nowrap; }
+
+/* Fenêtre du jeu (détail d'une proposition, confirmation) */
+dialog.fenetre {
+  border: 3px solid var(--encre);
+  border-radius: 1rem;
+  padding: 1.4rem 1.6rem;
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  color: var(--encre);
+  background: var(--papier);
+}
+dialog.fenetre::backdrop { background: rgba(0, 0, 0, 0.45); }
+dialog.fenetre h2 { font-size: 1.375rem; line-height: 1.25; }
+dialog.fenetre p { margin-top: 0.6rem; }
+dialog.fenetre .rangee { margin-top: 1.2rem; }
+
+/* Superposition de Duo simulée (la vraie appartient à la plateforme) */
+.duo-pause { position: fixed; inset: 0; z-index: 20; background: rgba(14, 17, 38, 0.72); display: grid; place-items: center; }
+.duo-pause__panneau { background: #fff; border: 3px solid #111; border-radius: 1rem; padding: 1.4rem 1.8rem; width: min(30rem, calc(100vw - 2rem)); display: grid; gap: 0.8rem; }
+.duo-pause__panneau h2 { font-size: 1.75rem; }
+.duo-pause__note { font-size: 0.875rem; color: var(--encre-3); border-top: 2px dashed var(--trait); padding-top: 0.6rem; }
+
+/* Note de maquette: ce que ferait le jeu (hors interface) */
+.note-maquette { position: fixed; left: 50%; top: 1rem; transform: translateX(-50%); z-index: 30; background: #333; color: #fff; border-radius: 0.5rem; padding: 0.4rem 0.9rem; font-size: 0.9375rem; max-width: calc(100vw - 2rem); }
+
+/* Choix à deux (puces sur les cartes des joueurs) */
+.joueurs-mini { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.joueur-mini { display: inline-flex; align-items: center; gap: 0.45rem; border: 2px solid var(--trait); border-radius: 0.6rem; padding: 0.3rem 0.6rem; background: var(--papier); }
+.joueur-mini--moi { border: 3px solid var(--encre); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+:root[data-motion='reduced'] * { transition: none !important; animation: none !important; }

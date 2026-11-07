@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-07T19:32:55.050Z",
+  "node": "v22.23.4",
+  "valibot": "1.5.0",
+  "rows": [
+    {
+      "address": "village",
+      "counts": {
+        "id": "village",
+        "characters": 24,
+        "objects": 90,
+        "furniture": 60,
+        "tickets": 8
+      },
+      "bytes": {
+        "fastLoose": 2559,
+        "fastCompact": 640,
+        "objects": 1848,
+        "furniture": 1418,
+        "service": 990
+      },
+      "readMicroseconds": {
+        "fastLoose": 24.4,
+        "fastCompact": 9.5,
+        "objects": 32.2,
+        "furniture": 20.8,
+        "service": 17
+      }
+    },
+    {
+      "address": "bourg",
+      "counts": {
+        "id": "bourg",
+        "characters": 46,
+        "objects": 160,
+        "furniture": 120,
+        "tickets": 14
+      },
+      "bytes": {
+        "fastLoose": 4851,
+        "fastCompact": 1138,
+        "objects": 3338,
+        "furniture": 2822,
+        "service": 1779
+      },
+      "readMicroseconds": {
+        "fastLoose": 45.2,
+        "fastCompact": 15.7,
+        "objects": 55.7,
+        "furniture": 40.4,
+        "service": 29.1
+      }
+    },
+    {
+      "address": "ville",
+      "counts": {
+        "id": "ville",
+        "characters": 70,
+        "objects": 240,
+        "furniture": 180,
+        "tickets": 20
+      },
+      "bytes": {
+        "fastLoose": 7361,
+        "fastCompact": 1683,
+        "objects": 5049,
+        "furniture": 4286,
+        "service": 2622
+      },
+      "readMicroseconds": {
+        "fastLoose": 71,
+        "fastCompact": 22.5,
+        "objects": 77.5,
+        "furniture": 58.5,
+        "service": 41
+      }
+    },
+    {
+      "address": "paris-quartier",
+      "counts": {
+        "id": "paris-quartier",
+        "characters": 74,
+        "objects": 240,
+        "furniture": 170,
+        "tickets": 22
+      },
+      "bytes": {
+        "fastLoose": 7777,
+        "fastCompact": 1776,
+        "objects": 5048,
+        "furniture": 4043,
+        "service": 2839
+      },
+      "readMicroseconds": {
+        "fastLoose": 72.3,
+        "fastCompact": 23,
+        "objects": 77.4,
+        "furniture": 55.6,
+        "service": 44.1
+      }
+    },
+    {
+      "address": "paris-maison",
+      "counts": {
+        "id": "paris-maison",
+        "characters": 120,
+        "objects": 420,
+        "furniture": 320,
+        "tickets": 30
+      },
+      "bytes": {
+        "fastLoose": 12585,
+        "fastCompact": 2869,
+        "objects": 8877,
+        "furniture": 7720,
+        "service": 4236
+      },
+      "readMicroseconds": {
+        "fastLoose": 120.6,
+        "fastCompact": 36.6,
+        "objects": 141.9,
+        "furniture": 107.7,
+        "service": 66.4
+      }
+    }
+  ]
+}
