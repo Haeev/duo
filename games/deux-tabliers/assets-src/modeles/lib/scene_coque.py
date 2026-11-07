@@ -335,7 +335,7 @@ def caisse_et_livre():
     g.box(cx - 0.2, cx + 0.2, 8.88, 9.12, z0 + 0.09, z0 + 0.17, "brass", bevel=0.015)
     for i in range(4):
         for j in range(3):
-            g.box(cx - 0.15 + i * 0.09, cx - 0.09 + i * 0.09, 8.9 + j * 0.055, 8.94 + j * 0.055, z0 + 0.17, z0 + 0.185, "porcelain", bevel=0.004)
+            g.box(cx - 0.15 + i * 0.09, cx - 0.09 + i * 0.09, 8.9 + j * 0.055, 8.94 + j * 0.055, z0 + 0.17, z0 + 0.185, "porcelain", bevel=0, drop=("bottom",))
     # afficheur sombre tourné vers les clients
     g.cyl(cx, 9.12, z0 + 0.17, z0 + 0.3, 0.012, 6, "brass")
     g.box(cx - 0.09, cx + 0.09, 9.1, 9.14, z0 + 0.3, z0 + 0.36, "slate", bevel=0.006)

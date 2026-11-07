@@ -47,6 +47,10 @@ Les avatars portent la tenue de travail de la maison (chemise, tablier vert bout
 
 Variante A (arrêtée), pour comparaison: 61 000 à 75 000 triangles, 16 à 18 appels, 7 à 8 programmes, 27,7 Mo de textures, `modeles/cafe_A.glb` de 1,3 Mo.
 
+## Corrections
+
+- 2026-11-07, soir: les chaises paillées de Meshy tournaient le dos à leur table (le script passait le côté du dossier là où `poser()` attend la direction du regard). Corrigé dans `blender/construire.py`, scène reconstruite et captures refaites.
+
 ## Ce qui est provisoire
 
 - Une seule lumière cuite (fin d'après-midi); les états matin et soir, le mélange selon l'heure et le canal séparé des taches de soleil sont au tech-artist.

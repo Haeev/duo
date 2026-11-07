@@ -114,5 +114,11 @@
  "pending": [
   "squelette commun du studio et cibles de morphose (technique 4.1): pas encore",
   "accessoires fondus au corps (sacs)"
- ]
+ ],
+ "credits_budget": 900,
+ "solde": {
+  "debut_mission": 2871,
+  "fin_mission": 2641,
+  "note": "solde commun du studio; 230 crédits = les 30 tâches de cette mission (10 personnages x 23)"
+ }
 }

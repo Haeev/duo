@@ -2,13 +2,13 @@
  "shell_village": {
   "id": "shell_village",
   "fichier": "shell_village.glb",
-  "poids_octets": 654192,
+  "poids_octets": 677952,
   "triangles": {
    "shell_village": 4634,
    "shell_village_glass": 10,
    "shell_village_glow": 424,
-   "shell_village_street": 2559,
-   "shell_village_fond_ferme": 312
+   "shell_village_street": 2803,
+   "shell_village_fond_ferme": 304
   },
   "materiaux": [
    "dt_lampe",
@@ -28,9 +28,9 @@
  "shell_village_ext_fond": {
   "id": "shell_village_ext_fond",
   "fichier": "shell_village_ext_fond.glb",
-  "poids_octets": 100884,
+  "poids_octets": 99656,
   "triangles": {
-   "shell_village_ext_fond": 1094
+   "shell_village_ext_fond": 1082
   },
   "materiaux": [
    "shell_atlas",
@@ -44,7 +44,7 @@
   ]
  },
  "cuisson": {
-  "lightmap_scale": 2.7633845806121826,
+  "lightmap_scale": 2.762397527694702,
   "bake_spp": 64,
   "bake_res": 2048,
   "soleil": {

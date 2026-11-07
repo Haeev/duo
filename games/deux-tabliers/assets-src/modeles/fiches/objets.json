@@ -21,7 +21,7 @@
   "noeuds": [
    "station_espresso_2g"
   ],
-  "poids_octets": 244712,
+  "poids_octets": 244592,
   "avant": [
    0,
    0,
@@ -125,7 +125,7 @@
    "moulin_dose",
    "moulin_dose_glass"
   ],
-  "poids_octets": 36644,
+  "poids_octets": 36604,
   "avant": [
    0,
    0,
@@ -301,16 +301,16 @@
    "y": 0.36,
    "z": 0.345
   },
-  "triangles": 692,
+  "triangles": 284,
   "budget_triangles": 600,
-  "dans_budget": false,
+  "dans_budget": true,
   "materiaux": [
    "dt_meubles"
   ],
   "noeuds": [
    "station_caisse"
   ],
-  "poids_octets": 58488,
+  "poids_octets": 24272,
   "avant": [
    0,
    0,
@@ -1132,10 +1132,10 @@
   "accroche": "surface",
   "dimensions_m": {
    "x": 0.144,
-   "y": 0.044,
-   "z": 0.094
+   "y": 0.042,
+   "z": 0.09
   },
-  "triangles": 250,
+  "triangles": 158,
   "budget_triangles": 250,
   "dans_budget": true,
   "materiaux": [
@@ -1144,7 +1144,7 @@
   "noeuds": [
    "food_pain_chocolat"
   ],
-  "poids_octets": 20224,
+  "poids_octets": 11388,
   "avant": [
    0,
    0,
@@ -1380,7 +1380,7 @@
   "noeuds": [
    "shell_village_ext_terrasse"
   ],
-  "poids_octets": 20728,
+  "poids_octets": 20768,
   "avant": [
    0,
    0,
@@ -2049,7 +2049,7 @@
   "noeuds": [
    "event_gourde"
   ],
-  "poids_octets": 10204,
+  "poids_octets": 10324,
   "avant": [
    0,
    0,
@@ -2086,7 +2086,7 @@
   "noeuds": [
    "event_boite_outils"
   ],
-  "poids_octets": 20060,
+  "poids_octets": 20860,
   "avant": [
    0,
    0,
@@ -2116,7 +2116,7 @@
   "noeuds": [
    "event_table_treteaux"
   ],
-  "poids_octets": 17576,
+  "poids_octets": 17856,
   "avant": [
    0,
    0,
@@ -2153,7 +2153,7 @@
   "noeuds": [
    "event_balai"
   ],
-  "poids_octets": 10216,
+  "poids_octets": 10416,
   "avant": [
    0,
    0,

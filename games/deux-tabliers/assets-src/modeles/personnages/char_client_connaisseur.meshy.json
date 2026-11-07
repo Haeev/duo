@@ -17,7 +17,16 @@
    "asset": "char_connaisseur",
    "etape": "texte vers image (référence)",
    "task_id": "01a1b801-3514-72c8-af9d-798391029c64",
-   "statut": "SUCCEEDED"
+   "statut": "SUCCEEDED",
+   "credits": 3,
+   "expire_ms": null,
+   "telecharge": true,
+   "prompt": "A tall man in his fifties, a coffee connoisseur, short salt-and-pepper hair and trimmed beard, dark brown skin, charcoal turtleneck sweater under an olive corduroy jacket, dark trousers, polished brown shoes. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   }
   },
   {
    "asset": "char_connaisseur",
@@ -25,7 +34,22 @@
    "task_id": "01a1b802-131b-773d-a79d-baf964cf84dd",
    "parent_task_id": "01a1b801-3514-72c8-af9d-798391029c64",
    "statut": "SUCCEEDED",
-   "target_polycount": 3800
+   "target_polycount": 3800,
+   "credits": 15,
+   "expire_ms": null,
+   "telecharge": false,
+   "parametres": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 3800,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   }
   },
   {
    "asset": "char_connaisseur",
@@ -33,11 +57,14 @@
    "task_id": "01a1b803-31cf-7528-bbc7-d36b9ff172e3",
    "parent_task_id": "01a1b802-131b-773d-a79d-baf964cf84dd",
    "statut": "SUCCEEDED",
-   "height_meters": 1.85
+   "height_meters": 1.85,
+   "credits": 5,
+   "expire_ms": null,
+   "telecharge": true
   }
  ],
  "reused_clips": "clips walk (rig 01a1b7b4-e3e0-766c-8083-24dc96bb9a5b) et idle, sit, drink, sit_drink (animation 01a1b7c7-08dc-769b-8f38-8bc4dda6f7ef) du tech-artist, sans nouvel achat",
- "credits_total": 0,
+ "credits_total": 23,
  "conformity": {
   "node_name": "char_client_connaisseur",
   "target_height_m": 1.85,
@@ -79,5 +106,11 @@
  "pending": [
   "squelette commun du studio et cibles de morphose (technique 4.1): pas encore",
   "accessoires fondus au corps (sacs)"
- ]
+ ],
+ "credits_budget": 900,
+ "solde": {
+  "debut_mission": 2871,
+  "fin_mission": 2641,
+  "note": "solde commun du studio; 230 crédits = les 30 tâches de cette mission (10 personnages x 23)"
+ }
 }

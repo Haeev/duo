@@ -46,7 +46,7 @@
   "lamp_emit"
  ],
  "cuisson": {
-  "lightmap_scale": 2.7497870922088623,
+  "lightmap_scale": 2.749513626098633,
   "bake_spp": 96,
   "bake_res": 2048
  },
@@ -82,5 +82,5 @@
    2.16
   ]
  ],
- "poids_octets": 8511808
+ "poids_octets": 8519232
 }

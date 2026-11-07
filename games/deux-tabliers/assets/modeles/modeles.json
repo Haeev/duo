@@ -1,1 +1,5847 @@
-{}
+{
+ "format": "deux-tabliers.modeles",
+ "version": "demo-0.1",
+ "repere": {
+  "unite": "mètre",
+  "haut": "+Y",
+  "avant": "+Z (glTF): l'avant d'un meuble est le côté où l'on s'assoit, où l'on travaille, ou la face vue",
+  "coques": "coordonnées du plan (plans.json, village): x = x du plan, z = y du plan; se posent sans transformation",
+  "pivots": {
+   "sol": "centre de l'emprise au sol, y = 0",
+   "surface": "centre du dessous de l'objet",
+   "mur": "au dos de l'objet, au milieu du bas (le mur est derrière, côté -Z)",
+   "plafond": "point d'accroche au plafond, l'objet pend vers -Y",
+   "store": "au milieu du câble ou de l'attache, l'objet pend vers -Y",
+   "facade": "comme mur, sur la façade (côté rue)",
+   "vitrine": "au dos, sur la vitre",
+   "appui": "centre du dessous, sur l'appui d'une fenêtre"
+  },
+  "rotation_dispositions": "rotation_deg autour de +Y: l'avant (+Z) devient (sin r, 0, cos r); 0 = sud, 90 = est, 180 = nord, -90 = ouest"
+ },
+ "materiaux": {
+  "dt_meubles": "matériau partagé de tous les meubles et objets (atlas couleur textures/meubles_atlas.jpg, rugosité et métal textures/meubles_orm.png, même UV); occlusion cuite dans COLOR_0 à multiplier. Un seul programme pour un BatchedMesh",
+  "dt_verre": "transparent (vitrines, verres, cloches): programme verre et liquides",
+  "dt_lampe": "abat-jour et ampoules allumés (émissif lamp_shade): à éteindre ou rallumer par le jeu",
+  "dt_badge_joueur": "badge de 3 cm des avatars: matériau blanc à teinter à la couleur du joueur (Duo)",
+  "shell_*": "coque: texture de matière répétée (1 m par tuile) + carte de lumière cuite (textures/shell_village_lightmap.png) en occlusion sur TEXCOORD_1, à rebrancher en lightMap avec lightMapIntensity = lightmap_scale x PI (extra du nœud)",
+  "street_*": "la rue et la cour: même carte de lumière, intensité x 0,42 (dehors en plein soleil, sinon la place sort blanche)",
+  "metaux": "cuivre, laiton, inox ont metalness 1: il leur faut un environnement (capture de la salle au chargement, comme l'essai), sinon ils sortent noirs"
+ },
+ "variantes_coque": {
+  "materiau_murs": "shell_wall_paint (murs de la salle et de la pièce du fond; le plafond est shell_ceiling, la façade côté rue est en pierre)",
+  "materiau_sol": "shell_floor (salle); shell_floor_fond (pièce du fond, tomettes)",
+  "regle": "peinture: garder textures/mur_enduit.jpg et mettre la teinte en couleur du matériau (sRGB, divisée par 0,70 en linéaire comme à l'export); papier peint: remplacer la texture et mettre la couleur en blanc; sol: remplacer la texture du sol (même UV, 1 m par tuile)",
+  "sols": {
+   "sol_plancher": {
+    "fichier": "textures/sol_plancher.jpg",
+    "nom": "Plancher de chêne (à l'arrivée)"
+   },
+   "sol_tomettes": {
+    "fichier": "textures/sol_tomettes.jpg"
+   },
+   "sol_carreaux_ciment": {
+    "fichier": "textures/sol_carreaux_ciment.jpg"
+   },
+   "sol_damier": {
+    "fichier": "textures/sol_damier.jpg"
+   }
+  },
+  "murs": {
+   "peinture_chaux": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#D5C4A5",
+    "nom": "Chaux (à l'arrivée)"
+   },
+   "peinture_lin": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#D4C7AE"
+   },
+   "peinture_vert_eau": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#A9BDB1"
+   },
+   "peinture_lie_de_vin": {
+    "fichier": "textures/mur_enduit.jpg",
+    "teinte": "#6E3A40"
+   },
+   "papier_fleurs_champs": {
+    "fichier": "textures/papier_fleurs_champs.jpg",
+    "teinte": "#FFFFFF"
+   },
+   "papier_feuillage": {
+    "fichier": "textures/papier_feuillage.jpg",
+    "teinte": "#FFFFFF"
+   },
+   "papier_rayures_creme": {
+    "fichier": "textures/papier_rayures_creme.jpg",
+    "teinte": "#FFFFFF"
+   }
+  }
+ },
+ "coques": [
+  {
+   "id": "shell_village",
+   "fichier": "shell_village.glb",
+   "noeuds": {
+    "shell_village": "salle, comptoir fixe et arrière-comptoir, poutres, menuiseries, cabinet de toilette, ardoise murale, deux suspensions fixes",
+    "shell_village_glass": "vitrages",
+    "shell_village_glow": "abat-jour allumés des suspensions fixes",
+    "shell_village_street": "la place du Tilleul, les étages du café, le banc de Simone",
+    "shell_village_fond_ferme": "pan qui ferme l'arche avec la porte de la pièce du fond: le cacher quand village_fond est acheté"
+   },
+   "triangles": {
+    "shell_village": 4634,
+    "shell_village_glass": 10,
+    "shell_village_glow": 424,
+    "shell_village_street": 2803,
+    "shell_village_fond_ferme": 304
+   },
+   "materiaux": [
+    "dt_lampe",
+    "dt_verre",
+    "shell_atlas",
+    "shell_backbar_tiles",
+    "shell_beams",
+    "shell_ceiling",
+    "shell_floor",
+    "shell_wall_paint",
+    "shell_walnut",
+    "street_atlas",
+    "street_paving",
+    "street_stone"
+   ],
+   "poids_octets": 677952
+  },
+  {
+   "id": "shell_village_ext_fond",
+   "fichier": "shell_village_ext_fond.glb",
+   "extension": "village_fond",
+   "noeuds": {
+    "shell_village_ext_fond": "pièce du fond (arche, cheminée, fenêtre sur la cour) et la cour vue par la fenêtre"
+   },
+   "triangles": {
+    "shell_village_ext_fond": 1082
+   },
+   "materiaux": [
+    "shell_atlas",
+    "shell_beams",
+    "shell_ceiling",
+    "shell_floor_fond",
+    "shell_wall_paint",
+    "street_atlas",
+    "street_paving",
+    "street_stone"
+   ],
+   "poids_octets": 99656
+  },
+  {
+   "id": "shell_village_ext_terrasse",
+   "fichier": "shell_village_ext_terrasse.glb",
+   "extension": "village_terrasse",
+   "noeuds": {
+    "shell_village_ext_terrasse": "store banne rayé (matériau dt_meubles, lumière dynamique)"
+   },
+   "triangles": 292,
+   "poids_octets": 20768
+  }
+ ],
+ "cuisson": {
+  "lightmap_scale": 2.762397527694702,
+  "bake_spp": 64,
+  "bake_res": 2048,
+  "soleil": {
+   "azimut_deg": 205.0,
+   "hauteur_deg": 16.0
+  },
+  "lampes": [
+   [
+    9.15,
+    8.72,
+    2.16
+   ],
+   [
+    10.6,
+    8.85,
+    2.16
+   ],
+   [
+    5.25,
+    3.8,
+    0.35
+   ],
+   [
+    6.0,
+    5.1,
+    2.3
+   ]
+  ]
+ },
+ "postes_dans_la_coque": {
+  "machine": {
+   "modele": "station_espresso_2g",
+   "position": [
+    9.15,
+    0.95,
+    9.005
+   ],
+   "rotation_deg": 180
+  },
+  "moulin": {
+   "modele": "station_grinder",
+   "position": [
+    9.78,
+    0.95,
+    9.04
+   ],
+   "rotation_deg": 180
+  },
+  "caisse": {
+   "modele": "station_caisse",
+   "position": [
+    10.6,
+    0.95,
+    9.01
+   ],
+   "rotation_deg": 180
+  },
+  "plonge": {
+   "modele": "station_sink",
+   "position": [
+    7.55,
+    0.9,
+    7.4
+   ],
+   "rotation_deg": 0
+  },
+  "lave_verres": {
+   "modele": "station_dishwasher",
+   "position": [
+    7.555,
+    0.0,
+    7.7
+   ],
+   "rotation_deg": 0
+  },
+  "frigo": "dans la coque (façade inox sous l'arrière-comptoir, x 8,00 à 8,75)",
+  "ardoise_murale": "dans la coque: x 8,83 à 9,85, y 1,27 à 2,17 m, plan z = 7,145 (zone d'écriture, Caveat)"
+ },
+ "dispositions": [
+  "dispositions/village_arrivee.json",
+  "dispositions/village_terrasse.json",
+  "dispositions/village_fond.json"
+ ],
+ "objets": [
+  {
+   "id": "affiche_tilleul_1962",
+   "nom": "Affiche de la fête du Tilleul, 1962",
+   "fichier": "affiche_tilleul_1962.glb",
+   "famille": "affiche",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.5,
+    "y": 0.7,
+    "z": 0.033
+   },
+   "triangles": 62,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "affiche_tilleul_1962"
+   ],
+   "poids_octets": 6476,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "bandeau bordeaux en haut: place du titre, écrit par le jeu si on le souhaite",
+   "catalogue_size": {
+    "w": 0.5,
+    "d": 0.03,
+    "h": 0.7
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.003,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "applique_laiton",
+   "nom": "Applique de laiton",
+   "fichier": "applique_laiton.glb",
+   "famille": "applique",
+   "style": "bistrot",
+   "categorie": "luminaire",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.16,
+    "y": 0.27,
+    "z": 0.26
+   },
+   "triangles": 154,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "applique_laiton",
+    "applique_laiton_glow"
+   ],
+   "poids_octets": 13208,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    0.22,
+    0
+   ],
+   "note": "tulipe opaline tournée vers le haut",
+   "catalogue_size": {
+    "w": 0.2,
+    "d": 0.25,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": -0.04,
+    "d": 0.01,
+    "h": -0.08
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "aquarelle_simone",
+   "nom": "Aquarelle de Simone (la place vue de son banc)",
+   "fichier": "aquarelle_simone.glb",
+   "famille": "aquarelle",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.5,
+    "y": 0.4,
+    "z": 0.032
+   },
+   "triangles": 52,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "aquarelle_simone"
+   ],
+   "poids_octets": 5880,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.5,
+    "d": 0.03,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ardoise_trottoir",
+   "nom": "Ardoise de trottoir",
+   "fichier": "ardoise_trottoir.glb",
+   "famille": "ardoise",
+   "style": "neutre",
+   "categorie": "rue",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.4,
+    "y": 1.042,
+    "z": 0.331
+   },
+   "triangles": 112,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ardoise_trottoir"
+   ],
+   "poids_octets": 10352,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "zones d'écriture: ardoises de 0,34 x 0,62 m sur chaque face (texte du jeu, Caveat)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "assiettes_faience",
+   "nom": "Assiettes de faïence au mur",
+   "fichier": "assiettes_faience.glb",
+   "famille": "assiettes",
+   "style": "campagne",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.9,
+    "y": 0.52,
+    "z": 0.016
+   },
+   "triangles": 600,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "assiettes_faience"
+   ],
+   "poids_octets": 34856,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.9,
+    "d": 0.04,
+    "h": 0.6
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.024,
+    "h": -0.08
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "banc_ferme",
+   "nom": "Banc de ferme",
+   "fichier": "banc_ferme.glb",
+   "famille": "banc",
+   "style": "campagne",
+   "categorie": "banc",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.4,
+    "y": 0.45,
+    "z": 0.42
+   },
+   "triangles": 264,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "banc_ferme"
+   ],
+   "poids_octets": 22400,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      -0.35,
+      0.45,
+      0
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    },
+    {
+     "position": [
+      0.35,
+      0.45,
+      0
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "note": "sans dossier: on s'y assoit des deux côtés (avant déclaré au sud)",
+   "catalogue_size": {
+    "w": 1.4,
+    "d": 0.45,
+    "h": 0.45
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.03,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "banquette_moleskine",
+   "nom": "Banquette de moleskine",
+   "fichier": "banquette_moleskine.glb",
+   "famille": "banquette",
+   "style": "bistrot",
+   "categorie": "banquette",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.82,
+    "y": 0.9,
+    "z": 0.56
+   },
+   "triangles": 444,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "banquette_moleskine"
+   ],
+   "poids_octets": 33464,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      -0.55,
+      0.45,
+      0.06
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    },
+    {
+     "position": [
+      0.0,
+      0.45,
+      0.06
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    },
+    {
+     "position": [
+      0.55,
+      0.45,
+      0.06
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "note": "dos au mur (dossier au nord)",
+   "catalogue_size": {
+    "w": 1.8,
+    "d": 0.55,
+    "h": 0.9
+   },
+   "ecart_catalogue_m": {
+    "w": 0.02,
+    "d": 0.01,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "bocal_biscuits",
+   "nom": "Bocal à biscuits",
+   "fichier": "bocal_biscuits.glb",
+   "famille": "bocal",
+   "style": "neutre",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.18,
+    "y": 0.305,
+    "z": 0.175
+   },
+   "triangles": 512,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "bocal_biscuits",
+    "bocal_biscuits_glass"
+   ],
+   "poids_octets": 31076,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.2,
+    "d": 0.2,
+    "h": 0.3
+   },
+   "ecart_catalogue_m": {
+    "w": -0.02,
+    "d": -0.025,
+    "h": 0.005
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "bouilloire_temperature",
+   "nom": "Bouilloire à température (équipement t3)",
+   "fichier": "bouilloire_temperature.glb",
+   "famille": "bouilloire",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.2,
+    "y": 0.275,
+    "z": 0.343
+   },
+   "triangles": 266,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "bouilloire_temperature"
+   ],
+   "poids_octets": 19420,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "col de cygne pour verser lentement",
+   "douilles": {
+    "socket_spout": [
+     0.0,
+     0.24,
+     0.18
+    ]
+   },
+   "catalogue_size": {
+    "w": 0.2,
+    "d": 0.2,
+    "h": 0.3
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.143,
+    "h": -0.025
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "bouquet_champetre",
+   "nom": "Bouquet champêtre",
+   "fichier": "bouquet_champetre.glb",
+   "famille": "bouquet",
+   "style": "neutre",
+   "categorie": "plante",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.134,
+    "y": 0.349,
+    "z": 0.15
+   },
+   "triangles": 550,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "bouquet_champetre"
+   ],
+   "poids_octets": 47584,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.2,
+    "d": 0.2,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": -0.066,
+    "d": -0.05,
+    "h": -0.001
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "brocante_banc_nordique",
+   "nom": "Banc nordique (brocante)",
+   "fichier": "brocante_banc_nordique.glb",
+   "famille": "brocante",
+   "style": "nordique",
+   "categorie": "banc",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 0.502,
+    "z": 0.4
+   },
+   "triangles": 212,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "brocante_banc_nordique"
+   ],
+   "poids_octets": 16860,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      -0.3,
+      0.5,
+      0
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    },
+    {
+     "position": [
+      0.3,
+      0.5,
+      0
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "catalogue_size": {
+    "w": 1.2,
+    "d": 0.4,
+    "h": 0.45
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.052
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "brocante_chaises_coques",
+   "nom": "Chaise coque (brocante, vendue par deux)",
+   "fichier": "brocante_chaises_coques.glb",
+   "famille": "brocante",
+   "style": "retro",
+   "categorie": "chaise",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.46,
+    "y": 0.801,
+    "z": 0.441
+   },
+   "triangles": 152,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "brocante_chaises_coques"
+   ],
+   "poids_octets": 12832,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.45,
+      0.02
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "note": "à poser par deux (count 2)",
+   "catalogue_size": {
+    "w": 0.5,
+    "d": 0.5,
+    "h": 0.8
+   },
+   "ecart_catalogue_m": {
+    "w": -0.04,
+    "d": -0.059,
+    "h": 0.001
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "brocante_horloge_comtoise",
+   "nom": "Horloge comtoise (brocante)",
+   "fichier": "brocante_horloge_comtoise.glb",
+   "famille": "brocante",
+   "style": "campagne",
+   "categorie": "horloge",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.52,
+    "y": 2.2,
+    "z": 0.323
+   },
+   "triangles": 364,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "brocante_horloge_comtoise"
+   ],
+   "poids_octets": 28040,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "dos au mur; balancier fixe en v0.1",
+   "catalogue_size": {
+    "w": 0.5,
+    "d": 0.3,
+    "h": 2.2
+   },
+   "ecart_catalogue_m": {
+    "w": 0.02,
+    "d": 0.023,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "brocante_lampe_champignon",
+   "nom": "Lampe champignon (brocante)",
+   "fichier": "brocante_lampe_champignon.glb",
+   "famille": "brocante",
+   "style": "retro",
+   "categorie": "luminaire",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.4,
+    "z": 0.292
+   },
+   "triangles": 236,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "brocante_lampe_champignon",
+    "brocante_lampe_champignon_glow"
+   ],
+   "poids_octets": 15816,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    0.25,
+    0
+   ],
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.3,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.008,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "brocante_moulin_cafe",
+   "nom": "Moulin à café à manivelle (brocante)",
+   "fichier": "brocante_moulin_cafe.glb",
+   "famille": "brocante",
+   "style": "campagne",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.184,
+    "y": 0.33,
+    "z": 0.165
+   },
+   "triangles": 204,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "brocante_moulin_cafe"
+   ],
+   "poids_octets": 16432,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.2,
+    "d": 0.2,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": -0.016,
+    "d": -0.035,
+    "h": -0.02
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "brocante_plaque_emaillee",
+   "nom": "Plaque émaillée (brocante)",
+   "fichier": "brocante_plaque_emaillee.glb",
+   "famille": "brocante",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.6,
+    "y": 0.4,
+    "z": 0.022
+   },
+   "triangles": 48,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "brocante_plaque_emaillee"
+   ],
+   "poids_octets": 5548,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.6,
+    "d": 0.02,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "caisse_ancienne",
+   "nom": "Caisse enregistreuse ancienne",
+   "fichier": "caisse_ancienne.glb",
+   "famille": "caisse",
+   "style": "bistrot",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.437,
+    "y": 0.33,
+    "z": 0.363
+   },
+   "triangles": 556,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "caisse_ancienne"
+   ],
+   "poids_octets": 45576,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "touches vers le barista (sud du modèle): la tourner vers l'arrière-comptoir; afficheur vers les clients",
+   "catalogue_size": {
+    "w": 0.4,
+    "d": 0.4,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": 0.037,
+    "d": -0.037,
+    "h": -0.02
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "carte_postale_brissac",
+   "nom": "Carte postale d'Octave Brissac",
+   "fichier": "carte_postale_brissac.glb",
+   "famille": "carte",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.15,
+    "y": 0.1,
+    "z": 0.012
+   },
+   "triangles": 48,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carte_postale_brissac"
+   ],
+   "poids_octets": 5744,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.15,
+    "d": 0.01,
+    "h": 0.1
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "chaise_cintree",
+   "nom": "Chaise cintrée",
+   "fichier": "chaise_cintree.glb",
+   "famille": "chaise",
+   "style": "bistrot",
+   "categorie": "chaise",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.401,
+    "y": 0.892,
+    "z": 0.463
+   },
+   "triangles": 560,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "chaise_cintree"
+   ],
+   "poids_octets": 46584,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.45,
+      0.02
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "catalogue_size": {
+    "w": 0.45,
+    "d": 0.48,
+    "h": 0.88
+   },
+   "ecart_catalogue_m": {
+    "w": -0.049,
+    "d": -0.017,
+    "h": 0.012
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "chaise_fer_peint",
+   "nom": "Chaise de fer peint",
+   "fichier": "chaise_fer_peint.glb",
+   "famille": "chaise",
+   "style": "jardin",
+   "categorie": "chaise",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.423,
+    "y": 0.871,
+    "z": 0.473
+   },
+   "triangles": 504,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "chaise_fer_peint"
+   ],
+   "poids_octets": 38684,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.45,
+      0.02
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "catalogue_size": {
+    "w": 0.45,
+    "d": 0.48,
+    "h": 0.85
+   },
+   "ecart_catalogue_m": {
+    "w": -0.027,
+    "d": -0.007,
+    "h": 0.021
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "chaise_paillee",
+   "nom": "Chaise paillée",
+   "fichier": "chaise_paillee.glb",
+   "famille": "chaise",
+   "style": "campagne",
+   "categorie": "chaise",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.453,
+    "y": 0.901,
+    "z": 0.447
+   },
+   "triangles": 594,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "chaise_paillee"
+   ],
+   "poids_octets": 57612,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.45,
+      0.02
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "meshy": "essai-style (furn_chair_campagne, tâche 01a1b7c5-0d20-7475-93dd-5a36ff5456fe)",
+   "catalogue_size": {
+    "w": 0.45,
+    "d": 0.45,
+    "h": 0.9
+   },
+   "ecart_catalogue_m": {
+    "w": 0.003,
+    "d": -0.003,
+    "h": 0.001
+   },
+   "source": "Meshy (essai de style) puis conformité"
+  },
+  {
+   "id": "citronnier_pot",
+   "nom": "Citronnier en pot",
+   "fichier": "citronnier_pot.glb",
+   "famille": "citronnier",
+   "style": "jardin",
+   "categorie": "plante",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.708,
+    "y": 1.36,
+    "z": 0.667
+   },
+   "triangles": 1084,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "citronnier_pot"
+   ],
+   "poids_octets": 67256,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "1,40 m",
+   "catalogue_size": {
+    "w": 0.6,
+    "d": 0.6,
+    "h": 1.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.108,
+    "d": 0.067,
+    "h": -0.04
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "cloche_gateaux",
+   "nom": "Cloche à gâteaux",
+   "fichier": "cloche_gateaux.glb",
+   "famille": "cloche",
+   "style": "campagne",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.32,
+    "z": 0.3
+   },
+   "triangles": 440,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "cloche_gateaux",
+    "cloche_gateaux_glass"
+   ],
+   "poids_octets": 23696,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "plateau de noyer et cloche de verre; douilles des viennoiseries dessous",
+   "douilles": {
+    "socket_food_0": [
+     -0.05,
+     0.03,
+     0.0
+    ],
+    "socket_food_1": [
+     0.05,
+     0.03,
+     0.02
+    ]
+   },
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.3,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": -0.03
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "cloche_verre",
+   "nom": "Suspension cloche de verre",
+   "fichier": "cloche_verre.glb",
+   "famille": "cloche",
+   "style": "jardin",
+   "categorie": "luminaire",
+   "accroche": "plafond",
+   "dimensions_m": {
+    "x": 0.34,
+    "y": 0.6,
+    "z": 0.331
+   },
+   "triangles": 424,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "cloche_verre",
+    "cloche_verre_glass",
+    "cloche_verre_glow"
+   ],
+   "poids_octets": 24252,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    -0.44,
+    0
+   ],
+   "note": "cloche de 0,35 x 0,40 m, bas à 2,20 m sous un plafond de 2,80 m",
+   "catalogue_size": {
+    "w": 0.35,
+    "d": 0.35,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": -0.01,
+    "d": -0.019,
+    "h": 0.2
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "coin_enfants",
+   "nom": "Chaise haute et coin des enfants",
+   "fichier": "coin_enfants.glb",
+   "famille": "coin",
+   "style": "neutre",
+   "categorie": "jeu",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 0.882,
+    "z": 1.2
+   },
+   "triangles": 464,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "coin_enfants"
+   ],
+   "poids_octets": 36044,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0.35,
+      0.58,
+      -0.22
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "note": "tapis de 1,20 m, cubes, crayons, chaise haute (assise 0,58 m)",
+   "catalogue_size": {
+    "w": 1.2,
+    "d": 1.2,
+    "h": 0.6
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.282
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "coupure_echo",
+   "nom": "Coupure de L'Écho de l'Arvelle",
+   "fichier": "coupure_echo.glb",
+   "famille": "coupure",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.4,
+    "z": 0.022
+   },
+   "triangles": 52,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "coupure_echo"
+   ],
+   "poids_octets": 6060,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.02,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "crate_box_l",
+   "nom": "Grand carton lourd (se porte à deux)",
+   "fichier": "crate_box_l.glb",
+   "famille": "crate",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.6,
+    "y": 0.401,
+    "z": 0.403
+   },
+   "triangles": 68,
+   "budget_triangles": 100,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "crate_box_l"
+   ],
+   "poids_octets": 7016,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "crate_box_m",
+   "nom": "Carton moyen",
+   "fichier": "crate_box_m.glb",
+   "famille": "crate",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.4,
+    "y": 0.301,
+    "z": 0.303
+   },
+   "triangles": 68,
+   "budget_triangles": 100,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "crate_box_m"
+   ],
+   "poids_octets": 6972,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "crate_box_s",
+   "nom": "Petit carton (ingrédients secs)",
+   "fichier": "crate_box_s.glb",
+   "famille": "crate",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.201,
+    "z": 0.203
+   },
+   "triangles": 68,
+   "budget_triangles": 100,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "crate_box_s"
+   ],
+   "poids_octets": 7056,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "creperie",
+   "nom": "Crêpière",
+   "fichier": "creperie.glb",
+   "famille": "creperie",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.44,
+    "y": 0.15,
+    "z": 0.458
+   },
+   "triangles": 240,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "creperie"
+   ],
+   "poids_octets": 18924,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "douilles": {
+    "socket_plate": [
+     0.0,
+     0.15,
+     0.0
+    ]
+   },
+   "catalogue_size": {
+    "w": 0.45,
+    "d": 0.45,
+    "h": 0.2
+   },
+   "ecart_catalogue_m": {
+    "w": -0.01,
+    "d": 0.008,
+    "h": -0.05
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "desserte_zinc",
+   "nom": "Desserte à dessus de zinc",
+   "fichier": "desserte_zinc.glb",
+   "famille": "desserte",
+   "style": "bistrot",
+   "categorie": "etagere",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.008,
+    "y": 0.95,
+    "z": 0.456
+   },
+   "triangles": 288,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "desserte_zinc"
+   ],
+   "poids_octets": 23868,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": [
+    {
+     "hauteur": 0.95,
+     "largeur_x": 1.0,
+     "profondeur_z": 0.45,
+     "centre_z": 0.0
+    },
+    {
+     "hauteur": 0.525,
+     "largeur_x": 0.92,
+     "profondeur_z": 0.38,
+     "centre_z": 0.0
+    },
+    {
+     "hauteur": 0.145,
+     "largeur_x": 0.92,
+     "profondeur_z": 0.38,
+     "centre_z": 0.0
+    }
+   ],
+   "note": "dos au mur (nord)",
+   "catalogue_size": {
+    "w": 1.0,
+    "d": 0.45,
+    "h": 0.95
+   },
+   "ecart_catalogue_m": {
+    "w": 0.008,
+    "d": 0.006,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "dessins_noe",
+   "nom": "Dessins de Noé",
+   "fichier": "dessins_noe.glb",
+   "famille": "dessins",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.7,
+    "y": 0.5,
+    "z": 0.032
+   },
+   "triangles": 52,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "dessins_noe"
+   ],
+   "poids_octets": 5916,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.7,
+    "d": 0.03,
+    "h": 0.5
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ecuelle_gribouille",
+   "nom": "Écuelle de Gribouille",
+   "fichier": "ecuelle_gribouille.glb",
+   "famille": "ecuelle",
+   "style": "neutre",
+   "categorie": "terrasse",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.24,
+    "y": 0.07,
+    "z": 0.234
+   },
+   "triangles": 150,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ecuelle_gribouille"
+   ],
+   "poids_octets": 10852,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.25,
+    "d": 0.25,
+    "h": 0.08
+   },
+   "ecart_catalogue_m": {
+    "w": -0.01,
+    "d": -0.016,
+    "h": -0.01
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "enseigne_bois_peint",
+   "nom": "Enseigne de bois peint",
+   "fichier": "enseigne_bois_peint.glb",
+   "famille": "enseigne",
+   "style": "campagne",
+   "categorie": "enseigne",
+   "accroche": "facade",
+   "dimensions_m": {
+    "x": 1.8,
+    "y": 0.5,
+    "z": 0.06
+   },
+   "triangles": 80,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "enseigne_bois_peint"
+   ],
+   "poids_octets": 7040,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "nom de la maison écrit par le jeu (toile 2D) sur le panneau crème: zone de 1,72 x 0,42 m, plan à 0,056 m du mur",
+   "catalogue_size": {
+    "w": 1.8,
+    "d": 0.05,
+    "h": 0.5
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.01,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "enseigne_fer_forge",
+   "nom": "Enseigne de fer forgé (potence)",
+   "fichier": "enseigne_fer_forge.glb",
+   "famille": "enseigne",
+   "style": "jardin",
+   "categorie": "enseigne",
+   "accroche": "facade",
+   "dimensions_m": {
+    "x": 0.12,
+    "y": 0.765,
+    "z": 0.7
+   },
+   "triangles": 512,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "enseigne_fer_forge"
+   ],
+   "poids_octets": 40872,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "origine au bas de la platine fixée sur la façade; le disque de 0,6 m pend sous la potence (jusqu'à 0,60 m sous l'origine): poser la platine à 2,90 m au moins. Fond crème des deux côtés pour le nom écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.7,
+    "d": 0.7,
+    "h": 0.08
+   },
+   "ecart_catalogue_m": {
+    "w": -0.58,
+    "d": 0.0,
+    "h": 0.685
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "enseigne_lettres_dorees",
+   "nom": "Lettres dorées sur la vitrine",
+   "fichier": "enseigne_lettres_dorees.glb",
+   "famille": "enseigne",
+   "style": "bistrot",
+   "categorie": "enseigne",
+   "accroche": "vitrine",
+   "dimensions_m": {
+    "x": 2.0,
+    "y": 0.4,
+    "z": 0.004
+   },
+   "triangles": 48,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "enseigne_lettres_dorees"
+   ],
+   "poids_octets": 4916,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "cadre fin, le texte doré est une toile du jeu (police de la bible)",
+   "catalogue_size": {
+    "w": 2.0,
+    "d": 0.01,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.006,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "etagere_livres_equip",
+   "nom": "Étagère à livres (livres de Lise)",
+   "fichier": "etagere_livres_equip.glb",
+   "famille": "etagere",
+   "style": "neutre",
+   "categorie": "etagere",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.0,
+    "y": 1.8,
+    "z": 0.3
+   },
+   "triangles": 888,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "etagere_livres_equip"
+   ],
+   "poids_octets": 77228,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "dos au mur (nord)",
+   "catalogue_size": {
+    "w": 1.0,
+    "d": 0.3,
+    "h": 1.8
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "etagere_pots",
+   "nom": "Étagère à pots",
+   "fichier": "etagere_pots.glb",
+   "famille": "etagere",
+   "style": "campagne",
+   "categorie": "etagere",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 1.0,
+    "y": 0.9,
+    "z": 0.24
+   },
+   "triangles": 252,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "etagere_pots"
+   ],
+   "poids_octets": 20600,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": [
+    {
+     "hauteur": 0.045,
+     "largeur_x": 0.95,
+     "profondeur_z": 0.2,
+     "centre_z": 0.13
+    },
+    {
+     "hauteur": 0.405,
+     "largeur_x": 0.95,
+     "profondeur_z": 0.2,
+     "centre_z": 0.13
+    },
+    {
+     "hauteur": 0.9,
+     "largeur_x": 1.0,
+     "profondeur_z": 0.23,
+     "centre_z": 0.12
+    }
+   ],
+   "catalogue_size": {
+    "w": 1.0,
+    "d": 0.25,
+    "h": 0.9
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.01,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_balai",
+   "nom": "Balai",
+   "fichier": "event_balai.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.32,
+    "y": 1.4,
+    "z": 0.05
+   },
+   "triangles": 108,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_balai"
+   ],
+   "poids_octets": 10416,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "rangé debout dans la réserve; tenu à deux mains pour « sol balayé » (l_inspection)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_boite_outils",
+   "nom": "Boîte à outils de la réserve",
+   "fichier": "event_boite_outils.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.46,
+    "y": 0.262,
+    "z": 0.222
+   },
+   "triangles": 244,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_boite_outils"
+   ],
+   "poids_octets": 20860,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "le joint neuf est dedans (événement la_vieille_dame_tousse)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_carnet_vert",
+   "nom": "Carnet vert de la critique",
+   "fichier": "event_carnet_vert.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.14,
+    "y": 0.019,
+    "z": 0.202
+   },
+   "triangles": 68,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_carnet_vert"
+   ],
+   "poids_octets": 7284,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_gourde",
+   "nom": "Gourde de randonneur (les Godillots)",
+   "fichier": "event_gourde.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.08,
+    "y": 0.24,
+    "z": 0.076
+   },
+   "triangles": 144,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_gourde"
+   ],
+   "poids_octets": 10324,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "à remplir à l'évier (événement les_godillots)",
+   "douilles": {
+    "socket_bouchon": [
+     0.0,
+     0.24,
+     0.0
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_piece_montee",
+   "nom": "Pièce montée du café d'honneur",
+   "fichier": "event_piece_montee.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.44,
+    "y": 0.58,
+    "z": 0.44
+   },
+   "triangles": 736,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_piece_montee"
+   ],
+   "poids_octets": 57624,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "se porte à deux (événement le_cafe_d_honneur)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_table_treteaux",
+   "nom": "Table à tréteaux de la mairie",
+   "fichier": "event_table_treteaux.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.8,
+    "y": 0.755,
+    "z": 0.7
+   },
+   "triangles": 212,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_table_treteaux"
+   ],
+   "poids_octets": 17856,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 0.75,
+    "forme": "rect",
+    "largeur_x": 1.8,
+    "profondeur_z": 0.7
+   },
+   "places": 4,
+   "note": "fête du Tilleul sans terrasse (4 places dehors)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "event_valise_octave",
+   "nom": "Valise à roulettes d'Octave",
+   "fichier": "event_valise_octave.glb",
+   "famille": "event",
+   "style": "neutre",
+   "categorie": "evenement",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.4,
+    "y": 0.96,
+    "z": 0.24
+   },
+   "triangles": 152,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "event_valise_octave"
+   ],
+   "poids_octets": 13088,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "fanion_godillots",
+   "nom": "Fanion des Godillots",
+   "fichier": "fanion_godillots.glb",
+   "famille": "fanion",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.4,
+    "y": 0.3,
+    "z": 0.022
+   },
+   "triangles": 48,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "fanion_godillots"
+   ],
+   "poids_octets": 5568,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.4,
+    "d": 0.02,
+    "h": 0.3
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "fauteuil_club",
+   "nom": "Fauteuil club",
+   "fichier": "fauteuil_club.glb",
+   "famille": "fauteuil",
+   "style": "bistrot",
+   "categorie": "fauteuil",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.8,
+    "y": 0.8,
+    "z": 0.8
+   },
+   "triangles": 972,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "fauteuil_club"
+   ],
+   "poids_octets": 59952,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.42,
+      0.08
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "catalogue_size": {
+    "w": 0.8,
+    "d": 0.8,
+    "h": 0.8
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "fauteuil_crapaud",
+   "nom": "Fauteuil crapaud",
+   "fichier": "fauteuil_crapaud.glb",
+   "famille": "fauteuil",
+   "style": "campagne",
+   "categorie": "fauteuil",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.761,
+    "y": 0.83,
+    "z": 0.754
+   },
+   "triangles": 416,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "fauteuil_crapaud"
+   ],
+   "poids_octets": 30136,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.46,
+      0.06
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "catalogue_size": {
+    "w": 0.75,
+    "d": 0.75,
+    "h": 0.8
+   },
+   "ecart_catalogue_m": {
+    "w": 0.011,
+    "d": 0.004,
+    "h": 0.03
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "fauteuil_rotin",
+   "nom": "Fauteuil de rotin",
+   "fichier": "fauteuil_rotin.glb",
+   "famille": "fauteuil",
+   "style": "jardin",
+   "categorie": "fauteuil",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.664,
+    "y": 0.85,
+    "z": 0.663
+   },
+   "triangles": 380,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "fauteuil_rotin"
+   ],
+   "poids_octets": 26468,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.43,
+      0.06
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "catalogue_size": {
+    "w": 0.75,
+    "d": 0.75,
+    "h": 0.85
+   },
+   "ecart_catalogue_m": {
+    "w": -0.086,
+    "d": -0.087,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "food_crepe",
+   "nom": "Crêpe pliée",
+   "fichier": "food_crepe.glb",
+   "famille": "food",
+   "style": "neutre",
+   "categorie": "nourriture",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.13,
+    "y": 0.022,
+    "z": 0.184
+   },
+   "triangles": 88,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "food_crepe"
+   ],
+   "poids_octets": 7140,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "pliée en quatre",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "food_croissant",
+   "nom": "Croissant",
+   "fichier": "food_croissant.glb",
+   "famille": "food",
+   "style": "neutre",
+   "categorie": "nourriture",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.137,
+    "y": 0.038,
+    "z": 0.079
+   },
+   "triangles": 236,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "food_croissant"
+   ],
+   "poids_octets": 16168,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "16 cm à 120 %",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "food_pain_chocolat",
+   "nom": "Pain au chocolat",
+   "fichier": "food_pain_chocolat.glb",
+   "famille": "food",
+   "style": "neutre",
+   "categorie": "nourriture",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.144,
+    "y": 0.042,
+    "z": 0.09
+   },
+   "triangles": 158,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "food_pain_chocolat"
+   ],
+   "poids_octets": 11388,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "14 x 9 cm (120 %), barres de chocolat visibles aux deux bouts",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "food_tarte_fruits",
+   "nom": "Part de tarte aux fruits",
+   "fichier": "food_tarte_fruits.glb",
+   "famille": "food",
+   "style": "neutre",
+   "categorie": "nourriture",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.156,
+    "y": 0.038,
+    "z": 0.119
+   },
+   "triangles": 172,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "food_tarte_fruits"
+   ],
+   "poids_octets": 13832,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "pointe vers l'ouest dans le modèle; recentrée sur son emprise",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "food_tartine",
+   "nom": "Tartine beurre-confiture",
+   "fichier": "food_tartine.glb",
+   "famille": "food",
+   "style": "neutre",
+   "categorie": "nourriture",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.216,
+    "y": 0.026,
+    "z": 0.096
+   },
+   "triangles": 88,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "food_tartine"
+   ],
+   "poids_octets": 9228,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "fougere_suspendue",
+   "nom": "Fougère suspendue",
+   "fichier": "fougere_suspendue.glb",
+   "famille": "fougere",
+   "style": "neutre",
+   "categorie": "plante",
+   "accroche": "plafond",
+   "dimensions_m": {
+    "x": 0.648,
+    "y": 0.673,
+    "z": 0.648
+   },
+   "triangles": 208,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "fougere_suspendue"
+   ],
+   "poids_octets": 18684,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "pend à 0,60 m sous le plafond (bas des frondes vers 2,05 m)",
+   "catalogue_size": {
+    "w": 0.4,
+    "d": 0.4,
+    "h": 0.6
+   },
+   "ecart_catalogue_m": {
+    "w": 0.248,
+    "d": 0.248,
+    "h": 0.073
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "frigo_vitre",
+   "nom": "Réfrigérateur vitré",
+   "fichier": "frigo_vitre.glb",
+   "famille": "frigo",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.6,
+    "y": 0.85,
+    "z": 0.629
+   },
+   "triangles": 626,
+   "budget_triangles": 2000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "frigo_vitre",
+    "frigo_vitre_glass"
+   ],
+   "poids_octets": 50048,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "sous le plan ou dans l'allée (work_area); bouteilles de limonade visibles",
+   "catalogue_size": {
+    "w": 0.6,
+    "d": 0.6,
+    "h": 0.85
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.029,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "geraniums_vitrine",
+   "nom": "Géraniums de la vitrine",
+   "fichier": "geraniums_vitrine.glb",
+   "famille": "geraniums",
+   "style": "neutre",
+   "categorie": "plante",
+   "accroche": "appui",
+   "dimensions_m": {
+    "x": 0.804,
+    "y": 0.265,
+    "z": 0.18
+   },
+   "triangles": 776,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "geraniums_vitrine"
+   ],
+   "poids_octets": 65700,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "appui intérieur de la vitrine (0,45 m) ou de la petite fenêtre (0,90 m)",
+   "catalogue_size": {
+    "w": 0.8,
+    "d": 0.2,
+    "h": 0.25
+   },
+   "ecart_catalogue_m": {
+    "w": 0.004,
+    "d": -0.02,
+    "h": 0.015
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "globe_opalin",
+   "nom": "Globe opalin",
+   "fichier": "globe_opalin.glb",
+   "famille": "globe",
+   "style": "bistrot",
+   "categorie": "luminaire",
+   "accroche": "plafond",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.45,
+    "z": 0.285
+   },
+   "triangles": 312,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "globe_opalin",
+    "globe_opalin_glow"
+   ],
+   "poids_octets": 18572,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    -0.3,
+    0
+   ],
+   "note": "bas du globe à 2,35 m sous un plafond de 2,80 m",
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.3,
+    "h": 0.45
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.015,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "gueridon_marbre",
+   "nom": "Guéridon de marbre",
+   "fichier": "gueridon_marbre.glb",
+   "famille": "gueridon",
+   "style": "bistrot",
+   "categorie": "table",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.61,
+    "y": 0.75,
+    "z": 0.61
+   },
+   "triangles": 470,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "gueridon_marbre"
+   ],
+   "poids_octets": 29448,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 0.75,
+    "forme": "rond",
+    "largeur_x": 0.6,
+    "profondeur_z": 0.6
+   },
+   "places": 2,
+   "catalogue_size": {
+    "w": 0.6,
+    "d": 0.6,
+    "h": 0.75
+   },
+   "ecart_catalogue_m": {
+    "w": 0.01,
+    "d": 0.01,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "guirlande_guinguette",
+   "nom": "Guirlande guinguette",
+   "fichier": "guirlande_guinguette.glb",
+   "famille": "guirlande",
+   "style": "jardin",
+   "categorie": "luminaire",
+   "accroche": "store",
+   "dimensions_m": {
+    "x": 6.001,
+    "y": 0.298,
+    "z": 0.052
+   },
+   "triangles": 768,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "guirlande_guinguette",
+    "guirlande_guinguette_glow"
+   ],
+   "poids_octets": 56524,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "6 m, flèche de 18 cm au milieu",
+   "catalogue_size": {
+    "w": 6.0,
+    "d": 0.1,
+    "h": 0.1
+   },
+   "ecart_catalogue_m": {
+    "w": 0.001,
+    "d": -0.048,
+    "h": 0.198
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "herbier_encadre",
+   "nom": "Herbier encadré",
+   "fichier": "herbier_encadre.glb",
+   "famille": "herbier",
+   "style": "jardin",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.4,
+    "y": 0.55,
+    "z": 0.034
+   },
+   "triangles": 68,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "herbier_encadre"
+   ],
+   "poids_octets": 7248,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.4,
+    "d": 0.03,
+    "h": 0.55
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.004,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "horloge_ecole",
+   "nom": "Horloge d'école",
+   "fichier": "horloge_ecole.glb",
+   "famille": "horloge",
+   "style": "neutre",
+   "categorie": "horloge",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.35,
+    "y": 0.35,
+    "z": 0.066
+   },
+   "triangles": 380,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "horloge_ecole"
+   ],
+   "poids_octets": 31004,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "heure fixe (7 h): aiguilles fixes en v0.1",
+   "catalogue_size": {
+    "w": 0.35,
+    "d": 0.06,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.006,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "jardinieres_terrasse",
+   "nom": "Jardinière de terrasse",
+   "fichier": "jardinieres_terrasse.glb",
+   "famille": "jardinieres",
+   "style": "neutre",
+   "categorie": "terrasse",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.84,
+    "y": 0.616,
+    "z": 0.3
+   },
+   "triangles": 1022,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "jardinieres_terrasse"
+   ],
+   "poids_octets": 84424,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.8,
+    "d": 0.3,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.04,
+    "d": 0.0,
+    "h": 0.216
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "joint_encadre",
+   "nom": "Le vieux joint du groupe, encadré",
+   "fichier": "joint_encadre.glb",
+   "famille": "joint",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.25,
+    "y": 0.25,
+    "z": 0.032
+   },
+   "triangles": 48,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "joint_encadre"
+   ],
+   "poids_octets": 5556,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.25,
+    "d": 0.03,
+    "h": 0.25
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "lampe_lin",
+   "nom": "Lampe à abat-jour de lin",
+   "fichier": "lampe_lin.glb",
+   "famille": "lampe",
+   "style": "campagne",
+   "categorie": "luminaire",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.54,
+    "z": 0.292
+   },
+   "triangles": 258,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "lampe_lin",
+    "lampe_lin_glow"
+   ],
+   "poids_octets": 18908,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    0.4,
+    0
+   ],
+   "note": "0,55 m: sur une table, une desserte ou un appui",
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.3,
+    "h": 0.55
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.008,
+    "h": -0.01
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "lanterne_tilleul",
+   "nom": "Lanterne de la fête du Tilleul (pièce unique)",
+   "fichier": "lanterne_tilleul.glb",
+   "famille": "lanterne",
+   "style": "jardin",
+   "categorie": "luminaire",
+   "accroche": "store",
+   "dimensions_m": {
+    "x": 0.31,
+    "y": 0.52,
+    "z": 0.285
+   },
+   "triangles": 308,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "lanterne_tilleul",
+    "lanterne_tilleul_glass",
+    "lanterne_tilleul_glow"
+   ],
+   "poids_octets": 20480,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    -0.32,
+    0
+   ],
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.3,
+    "h": 0.5
+   },
+   "ecart_catalogue_m": {
+    "w": 0.01,
+    "d": -0.015,
+    "h": 0.02
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "mange_debout_zinc",
+   "nom": "Mange-debout de zinc (hors catalogue)",
+   "fichier": "mange_debout_zinc.glb",
+   "famille": "mange",
+   "style": "bistrot",
+   "categorie": "table",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.6,
+    "y": 1.1,
+    "z": 0.6
+   },
+   "triangles": 506,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "mange_debout_zinc"
+   ],
+   "poids_octets": 32484,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 1.1,
+    "forme": "rond",
+    "largeur_x": 0.6,
+    "profondeur_z": 0.6
+   },
+   "places": 2,
+   "note": "debout: repose-pieds de laiton à 0,30 m",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "miroir_peint",
+   "nom": "Miroir peint",
+   "fichier": "miroir_peint.glb",
+   "famille": "miroir",
+   "style": "bistrot",
+   "categorie": "miroir",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 0.9,
+    "z": 0.058
+   },
+   "triangles": 62,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "miroir_peint"
+   ],
+   "poids_octets": 7044,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "reflet peint (C11). Bas du cadre conseillé à 1,00 m: au-dessus du dossier de la banquette (0,90 m)",
+   "catalogue_size": {
+    "w": 1.2,
+    "d": 0.05,
+    "h": 0.9
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.008,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "moulin_dose",
+   "nom": "Moulin à dose (équipement t1)",
+   "fichier": "moulin_dose.glb",
+   "famille": "moulin",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.275,
+    "y": 0.55,
+    "z": 0.33
+   },
+   "triangles": 504,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "moulin_dose",
+    "moulin_dose_glass"
+   ],
+   "poids_octets": 36604,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "doseur vitré à l'avant, levier à droite",
+   "douilles": {
+    "socket_dose": [
+     0.0,
+     0.06,
+     0.1
+    ]
+   },
+   "catalogue_size": {
+    "w": 0.22,
+    "d": 0.35,
+    "h": 0.55
+   },
+   "ecart_catalogue_m": {
+    "w": 0.055,
+    "d": -0.02,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "moulin_mamie_odile",
+   "nom": "Moulin à poivre de Mamie Odile",
+   "fichier": "moulin_mamie_odile.glb",
+   "famille": "moulin",
+   "style": "campagne",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.064,
+    "y": 0.25,
+    "z": 0.061
+   },
+   "triangles": 136,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "moulin_mamie_odile"
+   ],
+   "poids_octets": 9680,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.08,
+    "d": 0.08,
+    "h": 0.25
+   },
+   "ecart_catalogue_m": {
+    "w": -0.016,
+    "d": -0.019,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "olivier_pot",
+   "nom": "Olivier en pot",
+   "fichier": "olivier_pot.glb",
+   "famille": "olivier",
+   "style": "jardin",
+   "categorie": "plante",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.279,
+    "y": 1.96,
+    "z": 0.824
+   },
+   "triangles": 896,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "olivier_pot"
+   ],
+   "poids_octets": 66276,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "2,00 m: sur la terrasse, ou sous le plafond de 2,80 m",
+   "catalogue_size": {
+    "w": 0.9,
+    "d": 0.9,
+    "h": 2.0
+   },
+   "ecart_catalogue_m": {
+    "w": 0.379,
+    "d": -0.076,
+    "h": -0.04
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "parasol_toile",
+   "nom": "Parasol de toile",
+   "fichier": "parasol_toile.glb",
+   "famille": "parasol",
+   "style": "jardin",
+   "categorie": "terrasse",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 2.0,
+    "y": 2.37,
+    "z": 2.0
+   },
+   "triangles": 304,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "parasol_toile"
+   ],
+   "poids_octets": 23932,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "toile à 1,95 m au bord, 1,83 m au lambrequin: passer dessous demande de baisser un peu la tête (à poser au-dessus d'une table)",
+   "catalogue_size": {
+    "w": 2.0,
+    "d": 2.0,
+    "h": 2.3
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.07
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "photo_maries",
+   "nom": "Photo des mariés",
+   "fichier": "photo_maries.glb",
+   "famille": "photo",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.3,
+    "y": 0.4,
+    "z": 0.022
+   },
+   "triangles": 50,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "photo_maries"
+   ],
+   "poids_octets": 5884,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.3,
+    "d": 0.02,
+    "h": 0.4
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "pichet_argent",
+   "nom": "Pichet d'argent (concours du cœur de lait)",
+   "fichier": "pichet_argent.glb",
+   "famille": "pichet",
+   "style": "neutre",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.14,
+    "y": 0.17,
+    "z": 0.11
+   },
+   "triangles": 138,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "pichet_argent"
+   ],
+   "poids_octets": 11532,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.12,
+    "d": 0.12,
+    "h": 0.18
+   },
+   "ecart_catalogue_m": {
+    "w": 0.02,
+    "d": -0.01,
+    "h": -0.01
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "pichet_thermometre",
+   "nom": "Pichet thermomètre (équipement t0)",
+   "fichier": "pichet_thermometre.glb",
+   "famille": "pichet",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.132,
+    "y": 0.17,
+    "z": 0.104
+   },
+   "triangles": 248,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "pichet_thermometre",
+    "pichet_thermometre_liquid"
+   ],
+   "poids_octets": 19160,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.1,
+    "d": 0.1,
+    "h": 0.15
+   },
+   "ecart_catalogue_m": {
+    "w": 0.032,
+    "d": 0.004,
+    "h": 0.02
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "plaque_hygiene",
+   "nom": "Plaque de l'inspection",
+   "fichier": "plaque_hygiene.glb",
+   "famille": "plaque",
+   "style": "neutre",
+   "categorie": "cadre",
+   "accroche": "mur",
+   "dimensions_m": {
+    "x": 0.2,
+    "y": 0.15,
+    "z": 0.012
+   },
+   "triangles": 48,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "plaque_hygiene"
+   ],
+   "poids_octets": 5680,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "image figurée en aplats; texte éventuel écrit par le jeu",
+   "catalogue_size": {
+    "w": 0.2,
+    "d": 0.01,
+    "h": 0.15
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.002,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "pot_pourboires_gres",
+   "nom": "Pot à pourboires en grès",
+   "fichier": "pot_pourboires_gres.glb",
+   "famille": "pot",
+   "style": "campagne",
+   "categorie": "comptoir",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.14,
+    "y": 0.175,
+    "z": 0.14
+   },
+   "triangles": 248,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "pot_pourboires_gres"
+   ],
+   "poids_octets": 17812,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "catalogue_size": {
+    "w": 0.15,
+    "d": 0.15,
+    "h": 0.18
+   },
+   "ecart_catalogue_m": {
+    "w": -0.01,
+    "d": -0.01,
+    "h": -0.005
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "pothos_etagere",
+   "nom": "Pothos d'étagère",
+   "fichier": "pothos_etagere.glb",
+   "famille": "pothos",
+   "style": "neutre",
+   "categorie": "plante",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.201,
+    "y": 0.24,
+    "z": 0.229
+   },
+   "triangles": 506,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "pothos_etagere"
+   ],
+   "poids_octets": 44752,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "feuilles qui retombent sur le devant du pot (sud), sans passer sous son pied",
+   "catalogue_size": {
+    "w": 0.25,
+    "d": 0.25,
+    "h": 0.3
+   },
+   "ecart_catalogue_m": {
+    "w": -0.049,
+    "d": -0.021,
+    "h": -0.06
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "presse_levier",
+   "nom": "Presse-agrumes à levier",
+   "fichier": "presse_levier.glb",
+   "famille": "presse",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.24,
+    "y": 0.44,
+    "z": 0.319
+   },
+   "triangles": 404,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "presse_levier"
+   ],
+   "poids_octets": 27624,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "verre posé sous le bec (douille glass)",
+   "douilles": {
+    "socket_glass": [
+     0.0,
+     0.03,
+     0.11
+    ]
+   },
+   "catalogue_size": {
+    "w": 0.25,
+    "d": 0.25,
+    "h": 0.45
+   },
+   "ecart_catalogue_m": {
+    "w": -0.01,
+    "d": 0.069,
+    "h": -0.01
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "range_velos",
+   "nom": "Range-vélos",
+   "fichier": "range_velos.glb",
+   "famille": "range",
+   "style": "neutre",
+   "categorie": "terrasse",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.7,
+    "y": 0.758,
+    "z": 0.4
+   },
+   "triangles": 256,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "range_velos"
+   ],
+   "poids_octets": 23596,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "sur le trottoir, contre la façade (street); 1,80 x 0,50 m",
+   "catalogue_size": {
+    "w": 1.8,
+    "d": 0.5,
+    "h": 0.8
+   },
+   "ecart_catalogue_m": {
+    "w": -0.1,
+    "d": -0.1,
+    "h": -0.042
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "shell_village_ext_terrasse",
+   "nom": "Terrasse sous le store (extension)",
+   "fichier": "shell_village_ext_terrasse.glb",
+   "famille": "shell",
+   "style": "neutre",
+   "categorie": "extension",
+   "accroche": "plan",
+   "dimensions_m": {
+    "x": 4.9,
+    "y": 0.71,
+    "z": 2.52
+   },
+   "triangles": 292,
+   "budget_triangles": 3000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "shell_village_ext_terrasse"
+   ],
+   "poids_octets": 20768,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "coordonnées du plan, à poser sans transformation; bord du lambrequin à 1,99 m (au-dessus des têtes: 2,05 m au plus bas des bras)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_bouilloire",
+   "nom": "Bouilloire",
+   "fichier": "station_bouilloire.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.2,
+    "y": 0.26,
+    "z": 0.309
+   },
+   "triangles": 358,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_bouilloire"
+   ],
+   "poids_octets": 23764,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "bec vers l'avant, poignée derrière",
+   "douilles": {
+    "socket_spout": [
+     0.0,
+     0.2,
+     0.15
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_caisse",
+   "nom": "Caisse du comptoir",
+   "fichier": "station_caisse.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.48,
+    "y": 0.36,
+    "z": 0.345
+   },
+   "triangles": 284,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_caisse"
+   ],
+   "poids_octets": 24272,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "touches vers le barista; afficheur vers les clients. Dans la coque: x 10,6, z 9,01, tourné vers le nord",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_cup_shelf",
+   "nom": "Étagère à tasses",
+   "fichier": "station_cup_shelf.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.6,
+    "y": 0.4,
+    "z": 0.25
+   },
+   "triangles": 168,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_cup_shelf"
+   ],
+   "poids_octets": 16144,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "16 places de tasse (douilles cup_niveau_colonne_rangée)",
+   "douilles": {
+    "socket_cup_0_0_0": [
+     -0.21,
+     0.032,
+     -0.06
+    ],
+    "socket_cup_0_0_1": [
+     -0.21,
+     0.032,
+     0.06
+    ],
+    "socket_cup_0_1_0": [
+     -0.07,
+     0.032,
+     -0.06
+    ],
+    "socket_cup_0_1_1": [
+     -0.07,
+     0.032,
+     0.06
+    ],
+    "socket_cup_0_2_0": [
+     0.07,
+     0.032,
+     -0.06
+    ],
+    "socket_cup_0_2_1": [
+     0.07,
+     0.032,
+     0.06
+    ],
+    "socket_cup_0_3_0": [
+     0.21,
+     0.032,
+     -0.06
+    ],
+    "socket_cup_0_3_1": [
+     0.21,
+     0.032,
+     0.06
+    ],
+    "socket_cup_1_0_0": [
+     -0.21,
+     0.232,
+     -0.06
+    ],
+    "socket_cup_1_0_1": [
+     -0.21,
+     0.232,
+     0.06
+    ],
+    "socket_cup_1_1_0": [
+     -0.07,
+     0.232,
+     -0.06
+    ],
+    "socket_cup_1_1_1": [
+     -0.07,
+     0.232,
+     0.06
+    ],
+    "socket_cup_1_2_0": [
+     0.07,
+     0.232,
+     -0.06
+    ],
+    "socket_cup_1_2_1": [
+     0.07,
+     0.232,
+     0.06
+    ],
+    "socket_cup_1_3_0": [
+     0.21,
+     0.232,
+     -0.06
+    ],
+    "socket_cup_1_3_1": [
+     0.21,
+     0.232,
+     0.06
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_dishwasher",
+   "nom": "Lave-verres sous le plan",
+   "fichier": "station_dishwasher.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.76,
+    "y": 0.74,
+    "z": 0.08
+   },
+   "triangles": 208,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_dishwasher"
+   ],
+   "poids_octets": 17000,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "origine au dos de la façade, en bas; dans la coque: x 7,555, z 7,70",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_espresso_2g",
+   "nom": "La vieille machine de Simone (deux groupes)",
+   "fichier": "station_espresso_2g.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.76,
+    "y": 0.504,
+    "z": 0.539
+   },
+   "triangles": 3682,
+   "budget_triangles": 4000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_espresso_2g"
+   ],
+   "poids_octets": 244592,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "dans la coque: centre à x 9,15, z 9,005, plan de travail à 0,95 m, avant tourné vers le nord (rotation 180°)",
+   "usage": "barista face à la façade de la machine (avant du modèle)",
+   "douilles": {
+    "socket_cup_0": [
+     0.19,
+     0.066,
+     0.09
+    ],
+    "socket_group_0": [
+     0.19,
+     0.205,
+     0.09
+    ],
+    "socket_cup_1": [
+     -0.19,
+     0.066,
+     0.09
+    ],
+    "socket_group_1": [
+     -0.19,
+     0.205,
+     0.09
+    ],
+    "socket_steam_wand": [
+     0.325,
+     0.09,
+     0.125
+    ],
+    "socket_cup_warmer": [
+     0.0,
+     0.443,
+     0.0
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_grinder",
+   "nom": "Moulin de la machine",
+   "fichier": "station_grinder.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.2,
+    "y": 0.48,
+    "z": 0.26
+   },
+   "triangles": 360,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "station_grinder",
+    "station_grinder_glass"
+   ],
+   "poids_octets": 25876,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "dans la coque: x 9,78, z 9,04, sur le plan de 0,95 m, tourné vers le nord",
+   "douilles": {
+    "socket_dose": [
+     0.0,
+     0.05,
+     0.13
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_sink",
+   "nom": "Évier de la plonge",
+   "fichier": "station_sink.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.7,
+    "y": 0.263,
+    "z": 0.423
+   },
+   "triangles": 196,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_sink"
+   ],
+   "poids_octets": 17212,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "robinet au nord (contre le refend), avant du modèle = côté du plongeur; ne pas tourner dans la coque",
+   "douilles": {
+    "socket_tap": [
+     0.0,
+     0.14,
+     -0.01
+    ],
+    "socket_basin": [
+     0.0,
+     0.006,
+     0.01
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_ticket_rail",
+   "nom": "Rail à tickets",
+   "fichier": "station_ticket_rail.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "plafond",
+   "dimensions_m": {
+    "x": 0.8,
+    "y": 0.782,
+    "z": 0.042
+   },
+   "triangles": 388,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_ticket_rail"
+   ],
+   "poids_octets": 30024,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "tickets face au nord (barista) dans la coque: poser tourné de 180°; rail à 1,88 m (solive à 2,65 m)",
+   "douilles": {
+    "socket_ticket_0": [
+     -0.33,
+     -0.79,
+     -0.024
+    ],
+    "socket_ticket_1": [
+     -0.198,
+     -0.79,
+     -0.024
+    ],
+    "socket_ticket_2": [
+     -0.066,
+     -0.79,
+     -0.024
+    ],
+    "socket_ticket_3": [
+     0.066,
+     -0.79,
+     -0.024
+    ],
+    "socket_ticket_4": [
+     0.198,
+     -0.79,
+     -0.024
+    ],
+    "socket_ticket_5": [
+     0.33,
+     -0.79,
+     -0.024
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "station_vitrine",
+   "nom": "Vitrine réfrigérée du comptoir",
+   "fichier": "station_vitrine.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.9,
+    "y": 0.32,
+    "z": 0.45
+   },
+   "triangles": 208,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "station_vitrine",
+    "station_vitrine_glass"
+   ],
+   "poids_octets": 20460,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "avant (sud du modèle) = côté barista, portes; vitre bombée vers les clients",
+   "douilles": {
+    "socket_shelf_low_0": [
+     -0.3,
+     0.085,
+     0.0
+    ],
+    "socket_shelf_low_1": [
+     -0.1,
+     0.085,
+     0.0
+    ],
+    "socket_shelf_low_2": [
+     0.1,
+     0.085,
+     0.0
+    ],
+    "socket_shelf_low_3": [
+     0.3,
+     0.085,
+     0.0
+    ],
+    "socket_shelf_high_0": [
+     -0.3,
+     0.2,
+     0.05
+    ],
+    "socket_shelf_high_1": [
+     -0.1,
+     0.2,
+     0.05
+    ],
+    "socket_shelf_high_2": [
+     0.1,
+     0.2,
+     0.05
+    ],
+    "socket_shelf_high_3": [
+     0.3,
+     0.2,
+     0.05
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "suspension_osier",
+   "nom": "Suspension en osier",
+   "fichier": "suspension_osier.glb",
+   "famille": "suspension",
+   "style": "campagne",
+   "categorie": "luminaire",
+   "accroche": "plafond",
+   "dimensions_m": {
+    "x": 0.45,
+    "y": 0.7,
+    "z": 0.439
+   },
+   "triangles": 432,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_lampe",
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "suspension_osier",
+    "suspension_osier_glow"
+   ],
+   "poids_octets": 21756,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "lumiere": [
+    0,
+    -0.62,
+    0
+   ],
+   "note": "abat-jour de 0,45 x 0,35 m et cordon de 0,35 m: bas à 2,10 m sous un plafond de 2,80 m",
+   "catalogue_size": {
+    "w": 0.45,
+    "d": 0.45,
+    "h": 0.35
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": -0.011,
+    "h": 0.35
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "table_basse_malle",
+   "nom": "Table basse malle",
+   "fichier": "table_basse_malle.glb",
+   "famille": "table",
+   "style": "campagne",
+   "categorie": "table",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.816,
+    "y": 0.454,
+    "z": 0.474
+   },
+   "triangles": 572,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "table_basse_malle"
+   ],
+   "poids_octets": 47488,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 0.45,
+    "forme": "rect",
+    "largeur_x": 0.8,
+    "profondeur_z": 0.45
+   },
+   "places": 0,
+   "note": "table basse des fauteuils",
+   "catalogue_size": {
+    "w": 0.8,
+    "d": 0.45,
+    "h": 0.45
+   },
+   "ecart_catalogue_m": {
+    "w": 0.016,
+    "d": 0.024,
+    "h": 0.004
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "table_bistrot_quatre",
+   "nom": "Table de bistrot pour quatre",
+   "fichier": "table_bistrot_quatre.glb",
+   "famille": "table",
+   "style": "bistrot",
+   "categorie": "table",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.808,
+    "y": 0.75,
+    "z": 0.808
+   },
+   "triangles": 338,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "table_bistrot_quatre"
+   ],
+   "poids_octets": 22832,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 0.75,
+    "forme": "rect",
+    "largeur_x": 0.8,
+    "profondeur_z": 0.8
+   },
+   "places": 4,
+   "catalogue_size": {
+    "w": 0.8,
+    "d": 0.8,
+    "h": 0.75
+   },
+   "ecart_catalogue_m": {
+    "w": 0.008,
+    "d": 0.008,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "table_fer_mosaique",
+   "nom": "Table de fer à mosaïque",
+   "fichier": "table_fer_mosaique.glb",
+   "famille": "table",
+   "style": "jardin",
+   "categorie": "table",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.61,
+    "y": 0.758,
+    "z": 0.61
+   },
+   "triangles": 440,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "table_fer_mosaique"
+   ],
+   "poids_octets": 31348,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 0.75,
+    "forme": "rond",
+    "largeur_x": 0.6,
+    "profondeur_z": 0.6
+   },
+   "places": 2,
+   "catalogue_size": {
+    "w": 0.6,
+    "d": 0.6,
+    "h": 0.75
+   },
+   "ecart_catalogue_m": {
+    "w": 0.01,
+    "d": 0.01,
+    "h": 0.008
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "table_ferme",
+   "nom": "Table de ferme",
+   "fichier": "table_ferme.glb",
+   "famille": "table",
+   "style": "campagne",
+   "categorie": "table",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 0.75,
+    "z": 0.7
+   },
+   "triangles": 332,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "table_ferme"
+   ],
+   "poids_octets": 24888,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": {
+    "hauteur": 0.75,
+    "forme": "rect",
+    "largeur_x": 1.2,
+    "profondeur_z": 0.7
+   },
+   "places": 4,
+   "catalogue_size": {
+    "w": 1.2,
+    "d": 0.7,
+    "h": 0.75
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "tabouret_bois",
+   "nom": "Tabouret de bois",
+   "fichier": "tabouret_bois.glb",
+   "famille": "tabouret",
+   "style": "campagne",
+   "categorie": "tabouret",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.378,
+    "y": 0.752,
+    "z": 0.378
+   },
+   "triangles": 316,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "tabouret_bois"
+   ],
+   "poids_octets": 23624,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.75,
+      0
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "note": "assise de comptoir (0,75 m) pour la tablette de 1,10 m",
+   "catalogue_size": {
+    "w": 0.4,
+    "d": 0.4,
+    "h": 0.75
+   },
+   "ecart_catalogue_m": {
+    "w": -0.022,
+    "d": -0.022,
+    "h": 0.002
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "tabourets_zinc",
+   "nom": "Tabouret de comptoir zinc (équipement, vendu par deux)",
+   "fichier": "tabourets_zinc.glb",
+   "famille": "tabourets",
+   "style": "bistrot",
+   "categorie": "tabouret",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.36,
+    "y": 0.756,
+    "z": 0.36
+   },
+   "triangles": 362,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "tabourets_zinc"
+   ],
+   "poids_octets": 24876,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "assises": [
+    {
+     "position": [
+      0,
+      0.75,
+      0
+     ],
+     "avant": [
+      0,
+      0.0,
+      1
+     ]
+    }
+   ],
+   "note": "assise à 0,75 m: pour la tablette de 1,10 m. L'équipement en compte deux: poser deux exemplaires",
+   "catalogue_size": {
+    "w": 0.4,
+    "d": 0.4,
+    "h": 0.75
+   },
+   "ecart_catalogue_m": {
+    "w": -0.04,
+    "d": -0.04,
+    "h": 0.006
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "tapis_jonc",
+   "nom": "Tapis de jonc",
+   "fichier": "tapis_jonc.glb",
+   "famille": "tapis",
+   "style": "jardin",
+   "categorie": "tapis",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.4,
+    "y": 0.01,
+    "z": 2.0
+   },
+   "triangles": 20,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "tapis_jonc"
+   ],
+   "poids_octets": 3356,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "se pose sous les meubles (floor_under)",
+   "catalogue_size": {
+    "w": 1.4,
+    "d": 2.0,
+    "h": 0.01
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "tapis_lirette",
+   "nom": "Tapis lirette",
+   "fichier": "tapis_lirette.glb",
+   "famille": "tapis",
+   "style": "campagne",
+   "categorie": "tapis",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 0.01,
+    "z": 1.8
+   },
+   "triangles": 20,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "tapis_lirette"
+   ],
+   "poids_octets": 3404,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "se pose sous les meubles (floor_under)",
+   "catalogue_size": {
+    "w": 1.2,
+    "d": 1.8,
+    "h": 0.01
+   },
+   "ecart_catalogue_m": {
+    "w": 0.0,
+    "d": 0.0,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "vaisselier_sauge",
+   "nom": "Vaisselier peint en sauge",
+   "fichier": "vaisselier_sauge.glb",
+   "famille": "vaisselier",
+   "style": "campagne",
+   "categorie": "etagere",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.44,
+    "y": 2.0,
+    "z": 0.557
+   },
+   "triangles": 728,
+   "budget_triangles": 1500,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "vaisselier_sauge"
+   ],
+   "poids_octets": 54988,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "pose_dessus": [
+    {
+     "hauteur": 0.94,
+     "largeur_x": 1.4,
+     "profondeur_z": 0.5,
+     "centre_z": 0.0
+    },
+    {
+     "hauteur": 1.3,
+     "largeur_x": 1.24,
+     "profondeur_z": 0.26,
+     "centre_z": -0.1
+    },
+    {
+     "hauteur": 1.65,
+     "largeur_x": 1.24,
+     "profondeur_z": 0.26,
+     "centre_z": -0.1
+    }
+   ],
+   "note": "dos au mur (nord); deux tablettes à 1,30 et 1,65 m",
+   "catalogue_size": {
+    "w": 1.4,
+    "d": 0.5,
+    "h": 2.0
+   },
+   "ecart_catalogue_m": {
+    "w": 0.04,
+    "d": 0.057,
+    "h": 0.0
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_cup_cappuccino",
+   "nom": "Tasse à cappuccino",
+   "fichier": "ware_cup_cappuccino.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.143,
+    "y": 0.078,
+    "z": 0.12
+   },
+   "triangles": 216,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_cup_cappuccino",
+    "ware_cup_cappuccino_liquid"
+   ],
+   "poids_octets": 16812,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "sert aussi au café crème, au chocolat et au noisette (teinter ou remplacer le contenu, nœud _liquid)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_cup_espresso",
+   "nom": "Tasse à espresso",
+   "fichier": "ware_cup_espresso.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.096,
+    "y": 0.061,
+    "z": 0.072
+   },
+   "triangles": 216,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_cup_espresso",
+    "ware_cup_espresso_liquid"
+   ],
+   "poids_octets": 16604,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "7 cm à 120 %; anse vers l'est (+X); contenu: nœud ware_cup_espresso_liquid (crème d'espresso)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_glass",
+   "nom": "Verre (citronnade, jus, limonade)",
+   "fichier": "ware_glass.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.08,
+    "y": 0.13,
+    "z": 0.08
+   },
+   "triangles": 152,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_verre"
+   ],
+   "noeuds": [
+    "ware_glass",
+    "ware_glass_liquid"
+   ],
+   "poids_octets": 10368,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "13 cm; contenu opaque sous le bord (bible 6), nœud _liquid",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_plate",
+   "nom": "Assiette à dessert",
+   "fichier": "ware_plate.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.24,
+    "y": 0.018,
+    "z": 0.24
+   },
+   "triangles": 220,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_plate"
+   ],
+   "poids_octets": 14136,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "24 cm (120 %)",
+   "douilles": {
+    "socket_food": [
+     0.0,
+     0.009,
+     0.0
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_saucer",
+   "nom": "Soucoupe",
+   "fichier": "ware_saucer.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.18,
+    "y": 0.014,
+    "z": 0.18
+   },
+   "triangles": 156,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_saucer"
+   ],
+   "poids_octets": 9832,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "douilles": {
+    "socket_cup": [
+     0.0,
+     0.008,
+     0.0
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_takeaway_cup",
+   "nom": "Gobelet à emporter",
+   "fichier": "ware_takeaway_cup.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.084,
+    "y": 0.118,
+    "z": 0.084
+   },
+   "triangles": 140,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_takeaway_cup"
+   ],
+   "poids_octets": 9800,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "couvercle crème: le jeu peut y écrire (événement du car de 8 h 12)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_teapot",
+   "nom": "Théière",
+   "fichier": "ware_teapot.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.252,
+    "y": 0.142,
+    "z": 0.16
+   },
+   "triangles": 194,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_teapot"
+   ],
+   "poids_octets": 14340,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "le thé compte deux pièces de vaisselle (tasse et théière)",
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "ware_tray",
+   "nom": "Plateau",
+   "fichier": "ware_tray.glb",
+   "famille": "ware",
+   "style": "neutre",
+   "categorie": "vaisselle",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.4,
+    "y": 0.03,
+    "z": 0.3
+   },
+   "triangles": 220,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "ware_tray"
+   ],
+   "poids_octets": 21296,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "40 x 30 cm, six emplacements",
+   "douilles": {
+    "socket_slot_0": [
+     -0.12,
+     0.008,
+     -0.06
+    ],
+    "socket_slot_1": [
+     0.0,
+     0.008,
+     -0.06
+    ],
+    "socket_slot_2": [
+     0.12,
+     0.008,
+     -0.06
+    ],
+    "socket_slot_3": [
+     -0.12,
+     0.008,
+     0.06
+    ],
+    "socket_slot_4": [
+     0.0,
+     0.008,
+     0.06
+    ],
+    "socket_slot_5": [
+     0.12,
+     0.008,
+     0.06
+    ]
+   },
+   "source": "Blender scripté (meubles.py ou objets.py)"
+  }
+ ],
+ "personnages": [
+  {
+   "id": "char_avatar_1",
+   "fichier": "char_avatar_1.glb",
+   "role": "avatar de joueur en tenue de la maison (tablier vert bouteille), badge de 3 cm",
+   "taille_m": 1.78,
+   "triangles": 3983,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_avatar_1_mat",
+    "dt_badge_joueur"
+   ],
+   "badge_joueur": {
+    "centre_m": [
+     0.071,
+     1.282,
+     0.126
+    ],
+    "rayon_m": 0.015,
+    "os": "Spine02",
+    "materiau": "dt_badge_joueur"
+   },
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 652980,
+   "fiche_meshy": "assets-src/modeles/personnages/char_avatar_1.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_avatar_2",
+   "fichier": "char_avatar_2.glb",
+   "role": "avatar de joueur en tenue de la maison (tablier vert bouteille), badge de 3 cm",
+   "taille_m": 1.66,
+   "triangles": 3983,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_avatar_2_mat",
+    "dt_badge_joueur"
+   ],
+   "badge_joueur": {
+    "centre_m": [
+     0.07,
+     1.196,
+     0.144
+    ],
+    "rayon_m": 0.015,
+    "os": "Spine02",
+    "materiau": "dt_badge_joueur"
+   },
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 674704,
+   "fiche_meshy": "assets-src/modeles/personnages/char_avatar_2.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_bastien",
+   "fichier": "char_bastien.glb",
+   "role": "habitué: Bastien, promeneur (polaire, sac à dos, casquette)",
+   "taille_m": 1.78,
+   "triangles": 3949,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_bastien_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 644736,
+   "fiche_meshy": "assets-src/modeles/personnages/char_bastien.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_brunch",
+   "fichier": "char_client_brunch.glb",
+   "role": "cliente, profil brunch (lunettes de soleil sur la tête)",
+   "taille_m": 1.68,
+   "triangles": 3687,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_brunch_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 663268,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_brunch.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_connaisseur",
+   "fichier": "char_client_connaisseur.glb",
+   "role": "client, profil connaisseurs (col roulé, velours olive)",
+   "taille_m": 1.85,
+   "triangles": 3950,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_connaisseur_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 624996,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_connaisseur.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_etudiante",
+   "fichier": "char_client_etudiante.glb",
+   "role": "cliente, profil étudiants (casque au cou, sac de toile)",
+   "taille_m": 1.64,
+   "triangles": 3950,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_etudiante_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 658208,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_etudiante.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_flaneur",
+   "fichier": "char_client_flaneur.glb",
+   "role": "client, profil flâneurs (écharpe moutarde), de l'essai de style",
+   "taille_m": 1.74,
+   "triangles": 3949,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_flaneur_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 650420,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_flaneur.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_gourmand",
+   "fichier": "char_client_gourmand.glb",
+   "role": "client, profil gourmands (pull caramel, écharpe framboise)",
+   "taille_m": 1.66,
+   "triangles": 3949,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_gourmand_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 656616,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_gourmand.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_pressee",
+   "fichier": "char_client_pressee.glb",
+   "role": "cliente, profil pressés (trench, sacoche cognac), de l'essai de style",
+   "taille_m": 1.68,
+   "triangles": 3949,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_pressee_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 691780,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_pressee.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_teletravail",
+   "fichier": "char_client_teletravail.glb",
+   "role": "client, profil télétravail (gilet chiné, sacoche)",
+   "taille_m": 1.76,
+   "triangles": 3904,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_teletravail_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 659776,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_teletravail.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_client_voisine",
+   "fichier": "char_client_voisine.glb",
+   "role": "cliente, profil voisins (gilet framboise), de l'essai de style",
+   "taille_m": 1.6,
+   "triangles": 3950,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_client_voisine_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 656164,
+   "fiche_meshy": "assets-src/modeles/personnages/char_client_voisine.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_farida",
+   "fichier": "char_farida.glb",
+   "role": "habituée: Farida (ciré moutarde, sac à dos d'enfant), profil familles",
+   "taille_m": 1.62,
+   "triangles": 3949,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_farida_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 667728,
+   "fiche_meshy": "assets-src/modeles/personnages/char_farida.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_lise",
+   "fichier": "char_lise.glb",
+   "role": "habituée: Lise, la lectrice (cardigan vert bouteille, sac à livres)",
+   "taille_m": 1.7,
+   "triangles": 3756,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_lise_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 671932,
+   "fiche_meshy": "assets-src/modeles/personnages/char_lise.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_mathis",
+   "fichier": "char_mathis.glb",
+   "role": "habitué: Mathis, le facteur pressé (sacoche moutarde)",
+   "taille_m": 1.8,
+   "triangles": 3934,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_mathis_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 651296,
+   "fiche_meshy": "assets-src/modeles/personnages/char_mathis.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  },
+  {
+   "id": "char_simone",
+   "fichier": "char_simone.glb",
+   "role": "habituée: Simone, l'ancienne patronne (long gilet prune, chignon au crayon, lunettes à chaînette)",
+   "taille_m": 1.6,
+   "triangles": 3944,
+   "os": 24,
+   "noms_os": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+   ],
+   "clips": {
+    "walk": 1.033,
+    "idle": 4.0,
+    "sit": 10.667,
+    "drink": 8.867,
+    "sit_drink": 11.167
+   },
+   "clips_sur_place": true,
+   "materiaux": [
+    "char_simone_mat"
+   ],
+   "badge_joueur": null,
+   "texture": "texture de Meshy réduite à 512 px, intégrée",
+   "poids_octets": 657888,
+   "fiche_meshy": "assets-src/modeles/personnages/char_simone.meshy.json",
+   "avant": [
+    0,
+    0,
+    1
+   ]
+  }
+ ],
+ "non_modelises": {
+  "revetements": {
+   "peinture_lin": "texture (variantes_coque)",
+   "peinture_vert_eau": "texture (variantes_coque)",
+   "peinture_lie_de_vin": "texture (variantes_coque)",
+   "peinture_chaux": "texture (variantes_coque)",
+   "papier_fleurs_champs": "texture (variantes_coque)",
+   "papier_feuillage": "texture (variantes_coque)",
+   "papier_rayures_creme": "texture (variantes_coque)",
+   "sol_tomettes": "texture (variantes_coque)",
+   "sol_carreaux_ciment": "texture (variantes_coque)",
+   "sol_damier": "texture (variantes_coque)"
+  },
+  "a_remplacer_par_un_substitut": []
+ }
+}

@@ -226,3 +226,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Import glTF d'un rig Meshy: une icosphère de 2 m est créée pour dessiner les os; ne garder que les maillages qui ont un modificateur Armature. Rigs Meshy: 24 os aux mêmes noms d'un personnage à l'autre, les clips achetés sur l'un (idle, sit, drink) se posent sur tous. `use_nla = False` avant de poser une action sur un rig importé.
 - Soleil rasant (16 degrés) et place bâtie: vérifier par calcul que la maison d'en face ne met pas toute la salle à l'ombre (à 235 degrés c'était le cas).
 - `renderer.info.programs` compte aussi les programmes de la capture d'environnement (PMREM) faite au chargement. Compter la mémoire des textures par `texture.source` (GLTFLoader crée une Texture par matériau pour une même image).
+
+## Deux Tabliers, démo v0.1 (vérifié le 2026-11-07)
+
+- Orientation des assises: l'avant de tout modèle est +Z glTF (sud du plan); contrôler par la géométrie (sommets au-dessus de l'assise + 0,15 m derrière, z moyen négatif) et par une capture de dessus. Piège de l'essai: `poser()` attend le cap du regard, on lui passait le côté du dossier (chaises dos aux tables).
+- GLB à textures externes partagées: export `GLTF_SEPARATE` dans un dossier temporaire, puis réassemblage en GLB en gardant `uri: "textures/<fichier>"` pour les images présentes dans `textures/` (`commun.exporter_glb`). gltf-validator les lit par `externalResourceFunction`.
+- Atlas partagé entre plusieurs scripts: les cases de palette doivent être fixes (`CASES_FIXES`, gelé ensuite), sinon l'ordre de construction déplace les cases et casse les UV des GLB faits par l'autre script. Graine d'UV par `zlib.crc32` (le `hash()` de Python change à chaque lancement).
+- `conformite_personnage.py`: appliquer l'échelle d'un rig Meshy (objet à 0,01) demande de multiplier les translations des clips par facteur x 0,01, sinon le personnage s'envole (hanches à 100 fois leur hauteur) dès que la taille visée diffère de celle du rig. Corrigé; options `decimate_to`, `texture_mode: "meshy"`, `badge` ajoutées.
+- Three.js: cuivre, laiton, inox (metalness 1) sortent noirs sans environnement; la visionneuse de contrôle prend `RoomEnvironment` par PMREM (intensité 0,45).
+- Planche Cycles: un objet de façade ou de plafond pend sous son origine; un sol à z = 0 le cache (le disque de l'enseigne à potence semblait absent).
+- Rue de l'essai: trottoir à -0,02 et bordure à 14,60 ne collaient pas aux plans (terrasse à 14,75): dessus du trottoir à 0 et bordure à 15,80. Toujours confronter le décor de l'essai au plan des extensions.
+- Pan qui se cache (porte fermée devant une arche): le faire mince, côté salle, sinon les tableaux de l'arche sont cuits noirs derrière lui.
+- Budgets C8: avec les pans x 2 de l'essai B, presque tout dépassait; pans de la bible (x 1) et lissage suffisent. Tiges en chaîne `rod(..., cap=False)`, pas de boules aux coudes; capitons en losanges plats.

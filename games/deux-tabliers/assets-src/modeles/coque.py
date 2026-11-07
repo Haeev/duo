@@ -368,7 +368,6 @@ def piece_du_fond():
     S.mur_x(y0, 3.0, [(6.6, 7.7, 0.9, 2.4)], g, face="s", x_a=3.6, x_b=8.1)
     # tableaux de l'arche (épaisseur du refend), linteau de chêne apparent
     a, b, hh = ARCH
-    g.box(a - 0.001, a, YR0, Y0, 0, hh, "lime", bevel=0)
     g.box(a, b, YR0 - 0.02, Y0 + 0.02, hh - 0.0, hh + 0.18, "beam", bevel=0.01)
     # solives et poutre maîtresse (même rythme que la salle)
     for y in (3.85, 4.47, 5.09, 5.71, 6.33):

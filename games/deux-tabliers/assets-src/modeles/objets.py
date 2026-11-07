@@ -464,14 +464,13 @@ def o_croissant(g):
 
 @objet("food_pain_chocolat", "neutre", "nourriture", 250, nom="Pain au chocolat")
 def o_pac(g):
-    s = 1.2
-    w, d, h = 0.12 * s, 0.075 * s, 0.035 * s
-    g.box(-w / 2, w / 2, -d / 2, d / 2, 0, h, "crust", bevel=0.012, segs=1)
-    for x in (-0.025, 0.025):
-        g.box(x - 0.007, x + 0.007, -d / 2 - 0.002, -d / 2 + 0.01, h * 0.35, h * 0.65, "chocolate_bar", bevel=0.002)
-        g.box(x - 0.007, x + 0.007, d / 2 - 0.01, d / 2 + 0.002, h * 0.35, h * 0.65, "chocolate_bar", bevel=0.002)
-    for i in range(3):
-        g.box(-w / 2 + 0.01, w / 2 - 0.01, -d / 2 + 0.01 + i * 0.03, -d / 2 + 0.02 + i * 0.03, h - 0.002, h + 0.002, "pastry", bevel=0, drop=("bottom",))
+    """Pâte feuilletée roulée: dôme allongé et aplati (dessous plat), barres de chocolat qui dépassent des deux bouts."""
+    s_ = 1.2
+    w, d, h = 0.12 * s_, 0.075 * s_, 0.035 * s_
+    g.sphere(0, 0, 0.0, w / 2, d / 2, h, "crust", segs=12, rings=6, zcut=0.0)
+    # deux barres de chocolat en travers, qui pointent de chaque côté de la pâte
+    for x in (-0.022, 0.022):
+        g.box(x - 0.007, x + 0.007, -d / 2 + 0.006, d / 2 - 0.006, 0.006, h * 0.5, "chocolate_bar", bevel=0.002)
     return {"note": "14 x 9 cm (120 %), barres de chocolat visibles aux deux bouts"}
 
 

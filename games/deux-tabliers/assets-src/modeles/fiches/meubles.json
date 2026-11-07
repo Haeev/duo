@@ -237,7 +237,7 @@
   "dimensions_m": {
    "x": 1.4,
    "y": 0.45,
-   "z": 0.36
+   "z": 0.42
   },
   "triangles": 264,
   "budget_triangles": 1200,
@@ -248,7 +248,7 @@
   "noeuds": [
    "banc_ferme"
   ],
-  "poids_octets": 22280,
+  "poids_octets": 22400,
   "avant": [
    0,
    0,
@@ -1300,7 +1300,7 @@
   "noeuds": [
    "vaisselier_sauge"
   ],
-  "poids_octets": 55148,
+  "poids_octets": 54988,
   "avant": [
    0,
    0,
@@ -1726,13 +1726,13 @@
   "noeuds": [
    "enseigne_fer_forge"
   ],
-  "poids_octets": 40952,
+  "poids_octets": 40872,
   "avant": [
    0,
    0,
    1
   ],
-  "note": "disque de 0,6 m vu des deux côtés (est et ouest), fond crème pour le nom écrit par le jeu"
+  "note": "origine au bas de la platine fixée sur la façade; le disque de 0,6 m pend sous la potence (jusqu'à 0,60 m sous l'origine): poser la platine à 2,90 m au moins. Fond crème des deux côtés pour le nom écrit par le jeu"
  },
  "enseigne_lettres_dorees": {
   "id": "enseigne_lettres_dorees",

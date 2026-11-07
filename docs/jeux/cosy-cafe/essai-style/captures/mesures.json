@@ -343,8 +343,8 @@
   "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7497870922088623,
-  "duree_chargement_ms": 3495,
+  "echelle_carte_lumiere": 2.749513626098633,
+  "duree_chargement_ms": 3302,
   "erreurs": []
  },
  "B-vue2-1366x768": {
@@ -491,8 +491,8 @@
   "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7497870922088623,
-  "duree_chargement_ms": 2976,
+  "echelle_carte_lumiere": 2.749513626098633,
+  "duree_chargement_ms": 4230,
   "erreurs": []
  },
  "B-vue3-1366x768": {
@@ -638,8 +638,8 @@
   "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7497870922088623,
-  "duree_chargement_ms": 3249,
+  "echelle_carte_lumiere": 2.749513626098633,
+  "duree_chargement_ms": 3935,
   "erreurs": []
  },
  "A-vue1-1920x1080": {
@@ -853,8 +853,303 @@
   "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7497870922088623,
-  "duree_chargement_ms": 4098,
+  "echelle_carte_lumiere": 2.749513626098633,
+  "duree_chargement_ms": 3805,
+  "erreurs": []
+ },
+ "B-vue2-1920x1080": {
+  "appels": 36,
+  "triangles_dessines": 70816,
+  "triangles_charges": {
+   "fixe": 54837,
+   "personnages": 30342
+  },
+  "programmes": 14,
+  "programmes_noms": [
+   "",
+   "b_tomette",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "b_tomette",
+   "",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  "textures": [
+   {
+    "nom": "tomettes",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "lightmap_B",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "environnement (PMREM)",
+    "w": 768,
+    "h": 1024
+   },
+   {
+    "nom": "pierre",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "chaux",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "bois",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "peinture",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "faience",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "paves",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "paille",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "tex_char_client_reading",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_client_register",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_client_waiting",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_passerby",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "tex_char_player_crescent",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_player_orb",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 47.1,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 2.749513626098633,
+  "duree_chargement_ms": 3996,
+  "erreurs": []
+ },
+ "B-vue3-1920x1080": {
+  "appels": 39,
+  "triangles_dessines": 85591,
+  "triangles_charges": {
+   "fixe": 54837,
+   "personnages": 30342
+  },
+  "programmes": 13,
+  "programmes_noms": [
+   "",
+   "b_tomette",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "b_tomette",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  "textures": [
+   {
+    "nom": "tomettes",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "lightmap_B",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "environnement (PMREM)",
+    "w": 768,
+    "h": 1024
+   },
+   {
+    "nom": "pierre",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "chaux",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "bois",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "peinture",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "faience",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "paves",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "paille",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "tex_char_client_reading",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_client_register",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_client_waiting",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_passerby",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "tex_char_player_crescent",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_player_orb",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 47.1,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 2.749513626098633,
+  "duree_chargement_ms": 5846,
   "erreurs": []
  }
 }

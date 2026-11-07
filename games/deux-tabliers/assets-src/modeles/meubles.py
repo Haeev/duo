@@ -121,7 +121,7 @@ def m_table_campagne_4(g):
 
 @meuble("banc_ferme", "campagne", "banc", 1200, nom="Banc de ferme")
 def m_bench_campagne(g):
-    w, d, h = 1.4, 0.36, 0.45
+    w, d, h = 1.4, 0.42, 0.45
     for x in (-w / 2 + 0.1, w / 2 - 0.15):
         g.box(x, x + 0.05, -d / 2 + 0.03, d / 2 - 0.03, 0, h - 0.04, OAK)
         g.box(x - 0.01, x + 0.06, -d / 2 + 0.02, d / 2 - 0.02, 0, 0.05, OAK)
@@ -835,7 +835,7 @@ def m_enseigne_fer(g):
     vs += g.cyl(0, 0, -0.018, -0.015, 0.27, pans(16), "top_light_cream")
     M = Matrix.Translation(K.P(0, 0.375, -0.3)) @ Matrix.Rotation(math.radians(90), 4, "Y")
     Geo.transform(set(vs), M)
-    return {"note": "disque de 0,6 m vu des deux côtés (est et ouest), fond crème pour le nom écrit par le jeu"}
+    return {"note": "origine au bas de la platine fixée sur la façade; le disque de 0,6 m pend sous la potence (jusqu'à 0,60 m sous l'origine): poser la platine à 2,90 m au moins. Fond crème des deux côtés pour le nom écrit par le jeu"}
 
 
 @meuble("enseigne_lettres_dorees", "bistrot", "enseigne", 150, accroche="vitrine", nom="Lettres dorées sur la vitrine")
