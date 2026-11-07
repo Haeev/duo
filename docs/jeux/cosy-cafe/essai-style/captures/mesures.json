@@ -1,56 +1,10 @@
 {
  "A-vue1-1366x768": {
-  "appels": 11,
-  "triangles_dessines": 62562,
+  "appels": 18,
+  "triangles_dessines": 64714,
   "triangles_charges": {
-   "fixe": 46509,
-   "personnages": 26362
-  },
-  "programmes": 7,
-  "programmes_noms": [
-   "",
-   "",
-   "",
-   "",
-   "",
-   "",
-   ""
-  ],
-  "textures": [
-   {
-    "nom": "palette",
-    "w": 64,
-    "h": 64
-   },
-   {
-    "nom": "lightmap_A",
-    "w": 2048,
-    "h": 2048
-   },
-   {
-    "nom": "HTMLCanvasElement",
-    "w": 1024,
-    "h": 904
-   },
-   {
-    "nom": "HTMLCanvasElement",
-    "w": 64,
-    "h": 64
-   }
-  ],
-  "memoire_textures_mo": 26.1,
-  "lumieres_dynamiques": 4,
-  "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.750134229660034,
-  "duree_chargement_ms": 1476,
-  "erreurs": []
- },
- "A-vue2-1366x768": {
-  "appels": 11,
-  "triangles_dessines": 62538,
-  "triangles_charges": {
-   "fixe": 46509,
-   "personnages": 26362
+   "fixe": 44681,
+   "personnages": 30342
   },
   "programmes": 8,
   "programmes_noms": [
@@ -81,23 +35,110 @@
    },
    {
     "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
     "w": 64,
     "h": 64
    }
   ],
-  "memoire_textures_mo": 26.1,
+  "memoire_textures_mo": 27.7,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.750134229660034,
-  "duree_chargement_ms": 1329,
+  "echelle_carte_lumiere": 2.7512154579162598,
+  "duree_chargement_ms": 1507,
+  "erreurs": []
+ },
+ "A-vue2-1366x768": {
+  "appels": 16,
+  "triangles_dessines": 60710,
+  "triangles_charges": {
+   "fixe": 44681,
+   "personnages": 30342
+  },
+  "programmes": 8,
+  "programmes_noms": [
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  "textures": [
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "lightmap_A",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 27.7,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 2.7512154579162598,
+  "duree_chargement_ms": 1602,
   "erreurs": []
  },
  "A-vue3-1366x768": {
-  "appels": 14,
-  "triangles_dessines": 73095,
+  "appels": 17,
+  "triangles_dessines": 75239,
   "triangles_charges": {
-   "fixe": 46509,
-   "personnages": 26362
+   "fixe": 44681,
+   "personnages": 30342
   },
   "programmes": 7,
   "programmes_noms": [
@@ -127,145 +168,43 @@
    },
    {
     "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
     "w": 64,
     "h": 64
    }
   ],
-  "memoire_textures_mo": 26.1,
+  "memoire_textures_mo": 27.7,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.750134229660034,
-  "duree_chargement_ms": 1336,
+  "echelle_carte_lumiere": 2.7512154579162598,
+  "duree_chargement_ms": 1678,
   "erreurs": []
  },
  "B-vue1-1366x768": {
-  "appels": 30,
-  "triangles_dessines": 74938,
+  "appels": 40,
+  "triangles_dessines": 75106,
   "triangles_charges": {
-   "fixe": 58649,
-   "personnages": 26362
-  },
-  "programmes": 13,
-  "programmes_noms": [
-   "",
-   "b_tomette",
-   "",
-   "",
-   "",
-   "",
-   "",
-   "b_tomette",
-   "",
-   "",
-   "",
-   "",
-   ""
-  ],
-  "textures": [
-   {
-    "nom": "tomettes",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "lightmap_B",
-    "w": 2048,
-    "h": 2048
-   },
-   {
-    "nom": "environnement (PMREM)",
-    "w": 768,
-    "h": 1024
-   },
-   {
-    "nom": "pierre",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "chaux",
-    "w": 256,
-    "h": 256
-   },
-   {
-    "nom": "bois",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "peinture",
-    "w": 256,
-    "h": 256
-   },
-   {
-    "nom": "palette",
-    "w": 64,
-    "h": 64
-   },
-   {
-    "nom": "faience",
-    "w": 256,
-    "h": 256
-   },
-   {
-    "nom": "paves",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "paille",
-    "w": 256,
-    "h": 256
-   },
-   {
-    "nom": "HTMLCanvasElement",
-    "w": 1024,
-    "h": 904
-   },
-   {
-    "nom": "tex_char_client_reading",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "tex_char_client_register",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "tex_char_client_waiting",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "tex_char_player_crescent",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "tex_char_player_orb",
-    "w": 512,
-    "h": 512
-   },
-   {
-    "nom": "HTMLCanvasElement",
-    "w": 64,
-    "h": 64
-   }
-  ],
-  "memoire_textures_mo": 45.4,
-  "lumieres_dynamiques": 4,
-  "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7604358196258545,
-  "duree_chargement_ms": 3162,
-  "erreurs": []
- },
- "B-vue2-1366x768": {
-  "appels": 30,
-  "triangles_dessines": 74662,
-  "triangles_charges": {
-   "fixe": 58649,
-   "personnages": 26362
+   "fixe": 54837,
+   "personnages": 30342
   },
   "programmes": 14,
   "programmes_noms": [
@@ -346,6 +285,26 @@
     "h": 904
    },
    {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
     "nom": "tex_char_client_reading",
     "w": 512,
     "h": 512
@@ -359,6 +318,11 @@
     "nom": "tex_char_client_waiting",
     "w": 512,
     "h": 512
+   },
+   {
+    "nom": "tex_char_passerby",
+    "w": 64,
+    "h": 64
    },
    {
     "nom": "tex_char_player_crescent",
@@ -376,19 +340,167 @@
     "h": 64
    }
   ],
-  "memoire_textures_mo": 45.4,
+  "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7604358196258545,
-  "duree_chargement_ms": 3088,
+  "echelle_carte_lumiere": 2.7497870922088623,
+  "duree_chargement_ms": 3495,
+  "erreurs": []
+ },
+ "B-vue2-1366x768": {
+  "appels": 36,
+  "triangles_dessines": 70816,
+  "triangles_charges": {
+   "fixe": 54837,
+   "personnages": 30342
+  },
+  "programmes": 14,
+  "programmes_noms": [
+   "",
+   "b_tomette",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "b_tomette",
+   "",
+   "",
+   "",
+   "",
+   "",
+   ""
+  ],
+  "textures": [
+   {
+    "nom": "tomettes",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "lightmap_B",
+    "w": 2048,
+    "h": 2048
+   },
+   {
+    "nom": "environnement (PMREM)",
+    "w": 768,
+    "h": 1024
+   },
+   {
+    "nom": "pierre",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "chaux",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "bois",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "peinture",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "palette",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "faience",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "paves",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "paille",
+    "w": 256,
+    "h": 256
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 1024,
+    "h": 904
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "tex_char_client_reading",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_client_register",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_client_waiting",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_passerby",
+    "w": 64,
+    "h": 64
+   },
+   {
+    "nom": "tex_char_player_crescent",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "tex_char_player_orb",
+    "w": 512,
+    "h": 512
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 64,
+    "h": 64
+   }
+  ],
+  "memoire_textures_mo": 47.1,
+  "lumieres_dynamiques": 4,
+  "cartes_ombre": 0,
+  "echelle_carte_lumiere": 2.7497870922088623,
+  "duree_chargement_ms": 2976,
   "erreurs": []
  },
  "B-vue3-1366x768": {
-  "appels": 33,
-  "triangles_dessines": 85431,
+  "appels": 39,
+  "triangles_dessines": 85591,
   "triangles_charges": {
-   "fixe": 58649,
-   "personnages": 26362
+   "fixe": 54837,
+   "personnages": 30342
   },
   "programmes": 13,
   "programmes_noms": [
@@ -468,6 +580,26 @@
     "h": 904
    },
    {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
     "nom": "tex_char_client_reading",
     "w": 512,
     "h": 512
@@ -481,6 +613,11 @@
     "nom": "tex_char_client_waiting",
     "w": 512,
     "h": 512
+   },
+   {
+    "nom": "tex_char_passerby",
+    "w": 64,
+    "h": 64
    },
    {
     "nom": "tex_char_player_crescent",
@@ -498,22 +635,23 @@
     "h": 64
    }
   ],
-  "memoire_textures_mo": 45.4,
+  "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7604358196258545,
-  "duree_chargement_ms": 3091,
+  "echelle_carte_lumiere": 2.7497870922088623,
+  "duree_chargement_ms": 3249,
   "erreurs": []
  },
  "A-vue1-1920x1080": {
-  "appels": 11,
-  "triangles_dessines": 62562,
+  "appels": 18,
+  "triangles_dessines": 64714,
   "triangles_charges": {
-   "fixe": 46509,
-   "personnages": 26362
+   "fixe": 44681,
+   "personnages": 30342
   },
-  "programmes": 7,
+  "programmes": 8,
   "programmes_noms": [
+   "",
    "",
    "",
    "",
@@ -540,25 +678,45 @@
    },
    {
     "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
     "w": 64,
     "h": 64
    }
   ],
-  "memoire_textures_mo": 26.1,
+  "memoire_textures_mo": 27.7,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.750134229660034,
-  "duree_chargement_ms": 1779,
+  "echelle_carte_lumiere": 2.7512154579162598,
+  "duree_chargement_ms": 1771,
   "erreurs": []
  },
  "B-vue1-1920x1080": {
-  "appels": 30,
-  "triangles_dessines": 74938,
+  "appels": 40,
+  "triangles_dessines": 75106,
   "triangles_charges": {
-   "fixe": 58649,
-   "personnages": 26362
+   "fixe": 54837,
+   "personnages": 30342
   },
-  "programmes": 13,
+  "programmes": 14,
   "programmes_noms": [
    "",
    "b_tomette",
@@ -568,6 +726,7 @@
    "",
    "",
    "b_tomette",
+   "",
    "",
    "",
    "",
@@ -636,6 +795,26 @@
     "h": 904
    },
    {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
+    "nom": "HTMLCanvasElement",
+    "w": 240,
+    "h": 340
+   },
+   {
     "nom": "tex_char_client_reading",
     "w": 512,
     "h": 512
@@ -649,6 +828,11 @@
     "nom": "tex_char_client_waiting",
     "w": 512,
     "h": 512
+   },
+   {
+    "nom": "tex_char_passerby",
+    "w": 64,
+    "h": 64
    },
    {
     "nom": "tex_char_player_crescent",
@@ -666,11 +850,11 @@
     "h": 64
    }
   ],
-  "memoire_textures_mo": 45.4,
+  "memoire_textures_mo": 47.1,
   "lumieres_dynamiques": 4,
   "cartes_ombre": 0,
-  "echelle_carte_lumiere": 2.7604358196258545,
-  "duree_chargement_ms": 3908,
+  "echelle_carte_lumiere": 2.7497870922088623,
+  "duree_chargement_ms": 4098,
   "erreurs": []
  }
 }

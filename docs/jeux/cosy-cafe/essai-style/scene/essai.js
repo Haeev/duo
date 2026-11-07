@@ -154,7 +154,7 @@ async function tickets() {
     const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: new THREE.Color(0.9, 0.86, 0.8) });
     const p = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.17), m);
     p.rotation.y = Math.PI;
-    p.position.set(x, 1.88 - 0.105, 9.2945);
+    p.position.set(x, 1.88 - 0.105, 9.2925);
     groupe.add(p);
   });
   return groupe;

@@ -369,9 +369,7 @@ def rail_tickets(joueurs):
     yt = yr - 0.012  # face nord du ticket, vers le barista
     for x, clip in tickets:
         g.box(x - 0.06, x + 0.06, yt - 0.002, yt, zr - 0.19, zr - 0.02, "paper", bevel=0)
-        for k, w in enumerate((0.08, 0.06, 0.07)):
-            z = zr - 0.09 - k * 0.028
-            g.box(x - 0.045, x - 0.045 + w, yt - 0.004, yt - 0.002, z - 0.005, z + 0.005, "ink", bevel=0)
+        # le texte du ticket est écrit par le jeu (toile posée par la scène Three.js, Patrick Hand)
         if clip == "alert":
             g.box(x - 0.06, x + 0.06, yt - 0.004, yt - 0.002, zr - 0.06, zr - 0.02, "alert", bevel=0)
             # sablier (deux triangles)

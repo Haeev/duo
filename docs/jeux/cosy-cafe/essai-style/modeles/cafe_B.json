@@ -1,13 +1,14 @@
 {
  "variante": "B",
  "triangles": {
-  "cafe_static": 57205,
+  "cafe_static": 53385,
   "cafe_glass": 482,
   "char_client_register": 5256,
   "char_client_reading": 5252,
   "char_client_waiting": 5267,
   "char_player_orb": 5241,
-  "char_player_crescent": 5246
+  "char_player_crescent": 5246,
+  "char_passerby": 3960
  },
  "materiaux": [
   "b_beam",
@@ -21,9 +22,7 @@
   "b_oak_dark",
   "b_oak_honey",
   "b_palette",
-  "b_paving",
   "b_shelf",
-  "b_stone",
   "b_stone_shade",
   "b_straw",
   "b_tiles_dark",
@@ -33,14 +32,21 @@
   "char_char_client_reading",
   "char_char_client_register",
   "char_char_client_waiting",
+  "char_char_passerby",
   "char_char_player_crescent",
   "char_char_player_orb",
   "char_palette",
+  "ext_beam",
+  "ext_oak_dark",
+  "ext_palette",
+  "ext_paving",
+  "ext_stone",
+  "ext_stone_shade",
   "glass",
   "lamp_emit"
  ],
  "cuisson": {
-  "lightmap_scale": 2.7604358196258545,
+  "lightmap_scale": 2.7497870922088623,
   "bake_spp": 96,
   "bake_res": 2048
  },
@@ -76,5 +82,5 @@
    2.16
   ]
  ],
- "poids_octets": 8535548
+ "poids_octets": 8511808
 }
