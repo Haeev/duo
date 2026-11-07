@@ -63,11 +63,34 @@ function urlOf(name: string): string | undefined {
   return MODEL_URLS[`../../assets/modeles/${name}.glb`];
 }
 
+/** Modèles livrés (`char_*`): un habitué a le sien, un profil prend le plus proche. */
+const REGULAR_MODEL: Readonly<Record<string, string>> = {
+  simone: 'char_simone',
+  mathis: 'char_mathis',
+  farida_noe: 'char_farida',
+  lise: 'char_lise',
+  bastien: 'char_bastien',
+};
+const PROFILE_MODEL: Readonly<Record<string, string>> = {
+  presses: 'char_client_pressee',
+  voisins: 'char_client_voisine',
+  flaneurs: 'char_client_flaneur',
+  familles: 'char_client_voisine',
+  gourmands: 'char_client_gourmand',
+  promeneurs: 'char_client_flaneur',
+  etudiants: 'char_client_etudiante',
+  teletravail: 'char_client_teletravail',
+  brunch: 'char_client_brunch',
+  connaisseurs: 'char_client_connaisseur',
+};
+
 function modelName(g: CustomerGroup): string | null {
   const names = [
     g.regular === null ? null : `habitue-${g.regular}`,
+    g.regular === null ? null : (REGULAR_MODEL[g.regular] ?? null),
     g.role === null ? null : `scene-${g.role}`,
     `client-${g.profile}`,
+    PROFILE_MODEL[g.profile] ?? 'char_client_flaneur',
   ];
   for (const n of names) if (n !== null && urlOf(n) !== undefined) return n;
   return null;

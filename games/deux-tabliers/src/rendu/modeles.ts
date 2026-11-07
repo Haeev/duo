@@ -8,7 +8,15 @@
  * (`{ "<nom>": { "avant": "+z" } }`, valeurs `+z`, `-z`, `+x`, `-x`; `+z` par défaut):
  * le jeu le tourne pour que son avant suive l'avant du meuble posé (sud à 0°).
  */
-import { BoxGeometry, Group, Mesh, MeshLambertMaterial, type Material, type Object3D } from 'three';
+import {
+  BoxGeometry,
+  Group,
+  Mesh,
+  MeshLambertMaterial,
+  type AnimationClip,
+  type Material,
+  type Object3D,
+} from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { v } from '@duo/sdk';
 
@@ -67,6 +75,8 @@ export interface SubstituteHint {
 export interface ModelLibrary {
   /** Un exemplaire du modèle (substitut tout de suite, remplacé par le GLB dès qu'il est chargé). */
   instance(name: string | undefined, hint: SubstituteHint): Group;
+  /** Le GLB complet (scène et clips), chargé une fois, `null` s'il manque ou se lit mal. */
+  gltf(name: string): Promise<{ scene: Object3D; clips: AnimationClip[] } | null>;
   dispose(): void;
 }
 
@@ -97,25 +107,34 @@ export function createModelLibrary(
     return m;
   };
 
-  const load = (name: string): Promise<Object3D | null> => {
-    let p = loaded.get(name);
+  const full = new Map<string, Promise<{ scene: Object3D; clips: AnimationClip[] } | null>>();
+  const gltf = (name: string): Promise<{ scene: Object3D; clips: AnimationClip[] } | null> => {
+    let p = full.get(name);
     if (p !== undefined) return p;
     const url = urlOf(name);
     p =
       url === undefined
         ? Promise.resolve(null)
         : loader.loadAsync(url).then(
-            (gltf) => gltf.scene,
+            (g) => ({ scene: g.scene, clips: g.animations }),
             (error: unknown) => {
               onError('modèle illisible, substitut affiché', { name, error: String(error) });
               return null;
             },
           );
+    full.set(name, p);
+    return p;
+  };
+  const load = (name: string): Promise<Object3D | null> => {
+    let p = loaded.get(name);
+    if (p !== undefined) return p;
+    p = gltf(name).then((g) => g?.scene ?? null);
     loaded.set(name, p);
     return p;
   };
 
   return {
+    gltf,
     instance(name, hint) {
       const group = new Group();
       const substitute = new Mesh(box, material(hint.color));
@@ -134,9 +153,9 @@ export function createModelLibrary(
     },
     dispose() {
       for (const d of owned) d.dispose();
-      for (const p of loaded.values()) {
-        void p.then((o) => {
-          o?.traverse((child) => {
+      for (const p of full.values()) {
+        void p.then((g) => {
+          g?.scene.traverse((child) => {
             if (child instanceof Mesh) {
               (child.geometry as { dispose(): void }).dispose();
               const mats: Material[] = Array.isArray(child.material)

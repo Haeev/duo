@@ -215,7 +215,14 @@ export function createInput<TAction extends string>(
       target = element;
     },
     lockPointer() {
-      void target?.requestPointerLock();
+      // Un refus (Échap il y a moins de 1,25 s, page sans focus, autre document qui tient le
+      // pointeur) n'est pas une erreur du jeu: le joueur reprendra la souris d'un clic.
+      try {
+        const pending: unknown = target?.requestPointerLock();
+        if (pending instanceof Promise) pending.catch(() => undefined);
+      } catch {
+        // Refus immédiat: même suite que ci-dessus.
+      }
     },
     unlockPointer() {
       if (!hasDom || document.pointerLockElement === null) return;

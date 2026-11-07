@@ -12,6 +12,8 @@ import { wallFaces } from '../regles';
 
 export interface LiveShell {
   update(): void;
+  /** Coque en blocs visible ou non (cachée dès que la coque cuite est posée). */
+  setBaseVisible(visible: boolean): void;
   dispose(): void;
 }
 
@@ -20,6 +22,7 @@ const LAYER = 0.006;
 export function createLiveShell(scene: Scene, content: Content, view: GameView): LiveShell {
   let plan = currentPlan(content, view.world());
   let shell = buildShell(plan);
+  let baseVisible = true;
   scene.add(shell.group);
   const extras = new Group();
   extras.name = 'revetements';
@@ -101,6 +104,7 @@ export function createLiveShell(scene: Scene, content: Content, view: GameView):
         shell.dispose();
         plan = next;
         shell = buildShell(plan);
+        shell.group.visible = baseVisible;
         scene.add(shell.group);
         key = '';
       }
@@ -112,6 +116,13 @@ export function createLiveShell(scene: Scene, content: Content, view: GameView):
         key = k;
         rebuildExtras();
       }
+    },
+    setBaseVisible(visible) {
+      if (visible === baseVisible) return;
+      baseVisible = visible;
+      shell.group.visible = visible;
+      // La coque cuite a ses propres arches et son store; ses murs prennent la peinture.
+      extras.visible = visible;
     },
     dispose() {
       clearExtras();

@@ -18,6 +18,7 @@ import { createPanels } from './interface/panneaux';
 import { serviceStationPrompt } from './service';
 import { createArrangementClient } from './amenagement/client/mode';
 import { createLiveShell } from './amenagement/client/coque-vivante';
+import { createBakedShell } from './rendu/coque-glb';
 import { createModelLibrary } from './rendu/modeles';
 import { createWorldNodes } from './rendu/monde3d';
 import { createStage } from './rendu/scene';
@@ -54,6 +55,7 @@ const shell = createLiveShell(stage.scene, content, view);
 const models = createModelLibrary((message, data) => {
   duo.log.warn(message, data);
 });
+const baked = createBakedShell(stage.scene, stage.renderer, models, view);
 const nodes = createWorldNodes(stage.scene, models, [duo.host.colorHex, duo.guest.colorHex]);
 const customers = createCustomerNodes(stage.scene);
 const sounds = createSounds(duo.audio, duo.log, DATA_FILES);
@@ -201,6 +203,8 @@ duo.loop.start({
     nodes.update(view, look.look);
     customers.update(view, now(), dt);
     shell.update();
+    baked.update();
+    shell.setBaseVisible(!baked.ready());
     arrange.render();
     currentAim = session.ready() && !arrange.active() ? localAim() : null;
     const use = view.world().players[view.local].use;
@@ -251,6 +255,7 @@ duo.on('stop', () => {
   customers.dispose();
   models.dispose();
   shell.dispose();
+  baked.dispose();
   stage.dispose();
   ui.dispose();
   session.dispose();

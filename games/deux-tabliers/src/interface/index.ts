@@ -219,6 +219,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       eveningDay = day;
       layers.open(eveningLayer(ctx));
     }
+    // Le lendemain s'est levé: le bilan de la veille se range.
+    if (model.evening === null && layers.isOpen('bilan')) layers.close('bilan');
     if (model.night !== null && !layers.isOpen('nuit')) layers.open(nightLayer(ctx));
     if (model.night === null && layers.isOpen('nuit')) layers.close('nuit');
     if (model.demoEnd !== null && !demoEndShown) {
@@ -276,7 +278,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       let swallowAct = false;
       let swallowConfirm = false;
       if (keys.tablet) ctx.openTablet();
-      if (keys.confirm && keys.locked) {
+      if (keys.confirm) {
         const scene = model.scene;
         const received = model.proposals.find((p) => p.from !== model.local);
         if (scene?.outcome !== null && scene !== null) {

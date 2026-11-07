@@ -179,7 +179,9 @@ export function firstTimeLayer(ctx: UiContext, onDone: () => void): LayerSpec {
           h('p', { class: 'dt-second' }, T.first.houseHelp),
           h('p', { class: 'dt-second' }, T.first.houseLater),
         );
-        if (setup !== null && setup.ready[0] && setup.ready[1] && !houseDone) {
+        // La maison a son nom (l'autre a confirmé): on passe à la suite sans attendre de clic.
+        const named = setup === null && model.clock !== null && model.clock.phase !== 'first-time';
+        if (((setup !== null && setup.ready[0] && setup.ready[1]) || named) && !houseDone) {
           houseDone = true;
           queueMicrotask(() => {
             if (step === 'house') go('me');

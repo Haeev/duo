@@ -4,10 +4,24 @@
  * tant que rien ne change. Les meubles passeront en `BatchedMesh` (technique 3.3) quand les
  * modèles définitifs arriveront.
  */
-import { CapsuleGeometry, Group, Mesh, MeshLambertMaterial, BoxGeometry, type Scene } from 'three';
+import {
+  AnimationMixer,
+  BoxGeometry,
+  CapsuleGeometry,
+  Color,
+  Group,
+  Mesh,
+  MeshLambertMaterial,
+  MeshStandardMaterial,
+  type AnimationAction,
+  type Material,
+  type Scene,
+} from 'three';
+import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { PlacedFurniture, PlayerIndex } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
 import { objectPosition } from '../simulation/monde';
+import { AVATAR_MODEL, FURNITURE_MODEL, OBJECT_MODEL } from './correspondances';
 import type { ModelLibrary } from './modeles';
 
 interface FurnitureNode {
@@ -47,6 +61,49 @@ export function createWorldNodes(
     root.add(g);
     return g;
   });
+  // Avatars livrés (`char_avatar_*`): marche et attente, badge teinté à la couleur du joueur.
+  const rigs: ({
+    mixer: AnimationMixer;
+    walk: AnimationAction | undefined;
+    idle: AnimationAction | undefined;
+    walking: boolean;
+  } | null)[] = [null, null];
+  const owned: Material[] = [];
+  let disposed = false;
+  for (const i of [0, 1] as const) {
+    void models.gltf(AVATAR_MODEL[i]).then((src) => {
+      const holder = avatars[i];
+      if (src === null || disposed || holder === undefined) return;
+      const node = cloneSkinned(src.scene);
+      node.traverse((child) => {
+        if (!(child instanceof Mesh)) return;
+        const m = child.material as Material;
+        if (m.name === 'dt_badge_joueur') {
+          const tinted = new MeshStandardMaterial({
+            color: new Color(colors[i]),
+            roughness: 0.4,
+          });
+          owned.push(tinted);
+          child.material = tinted;
+        }
+      });
+      holder.clear();
+      holder.add(node);
+      const mixer = new AnimationMixer(node);
+      const clip = (name: string): AnimationAction | undefined => {
+        const c = src.clips.find((x) => x.name === name);
+        return c === undefined ? undefined : mixer.clipAction(c);
+      };
+      const rig = { mixer, walk: clip('walk'), idle: clip('idle'), walking: false };
+      rig.idle?.play();
+      rigs[i] = rig;
+    });
+  }
+  const last = [
+    { x: 0, z: 0 },
+    { x: 0, z: 0 },
+  ];
+  let lastTime = performance.now();
 
   const syncFurniture = (view: GameView): void => {
     const world = view.world();
@@ -63,13 +120,17 @@ export function createWorldNodes(
         const type = view.content.furniture.get(f.type);
         if (type === undefined) continue;
         // Meuble de départ reconnu par l'aménagement: son modèle du catalogue (chaise paillée...).
-        const model = view.content.arrangement.pieces.get(f.type)?.model ?? type.model;
-        const node = models.instance(model, {
-          width: type.footprint[0],
-          depth: type.footprint[1],
-          height: type.height,
-          color: type.color,
-        });
+        const mapped = FURNITURE_MODEL[f.type];
+        const model = mapped ?? view.content.arrangement.pieces.get(f.type)?.model ?? type.model;
+        const node =
+          mapped === null
+            ? new Group()
+            : models.instance(model, {
+                width: type.footprint[0],
+                depth: type.footprint[1],
+                height: type.height,
+                color: type.color,
+              });
         node.name = f.id;
         root.add(node);
         entry = { node, key };
@@ -97,7 +158,7 @@ export function createWorldNodes(
       if (entry === undefined) {
         const type = view.content.objects.get(o.type);
         if (type === undefined) continue;
-        const node = models.instance(type.model, {
+        const node = models.instance(OBJECT_MODEL[o.type] ?? type.model, {
           width: type.size[0],
           depth: type.size[1],
           height: type.size[2],
@@ -154,16 +215,38 @@ export function createWorldNodes(
     update(view, look) {
       syncFurniture(view);
       syncObjects(view, look);
+      const now = performance.now();
+      const dt = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
       for (const i of [0, 1] as const) {
         const avatar = avatars[i];
-        if (avatar === undefined) continue;
+        const prev = last[i];
+        if (avatar === undefined || prev === undefined) continue;
         avatar.visible = i !== view.local;
         const pose = view.pose(i);
         avatar.position.set(pose.x, 0, pose.z);
-        avatar.rotation.y = (pose.yawDeg * Math.PI) / 180;
+        // L'avant du modèle est +Z, le cap 0 regarde -Z: demi-tour.
+        avatar.rotation.y = (pose.yawDeg * Math.PI) / 180 + (rigs[i] === null ? 0 : Math.PI);
+        const rig = rigs[i];
+        if (rig !== null && rig !== undefined) {
+          const moving = dt > 0 && Math.hypot(pose.x - prev.x, pose.z - prev.z) / dt > 0.3;
+          if (moving !== rig.walking) {
+            rig.walking = moving;
+            const next = moving ? rig.walk : rig.idle;
+            const before = moving ? rig.idle : rig.walk;
+            next?.reset().fadeIn(0.2).play();
+            before?.fadeOut(0.2);
+          }
+          if (avatar.visible) rig.mixer.update(dt);
+        }
+        prev.x = pose.x;
+        prev.z = pose.z;
       }
     },
     dispose() {
+      disposed = true;
+      for (const m of owned) m.dispose();
+      for (const r of rigs) r?.mixer.stopAllAction();
       scene.remove(root);
       body.dispose();
       visor.dispose();
