@@ -84,7 +84,7 @@ async function montage(browser, base, label, width, out) {
       const cropFile = path.join(ROOT, crop.png);
       execFileSync('convert', [out, '-crop', `${crop.w}x${crop.h}+${crop.x}+${crop.y}`, '+repage', cropFile]);
       if (crop.gray) sim(cropFile, 'gris', path.join(ROOT, crop.gray));
-      if (crop.montage) await montage(browser, cropFile, crop.montageLabel, 1800, path.join(ROOT, crop.montage));
+      if (crop.montage) await montage(browser, cropFile, crop.montageLabel, 1400, path.join(ROOT, crop.montage));
       if (crop.temporary) fs.rmSync(cropFile);
     }
     if (p.montage) await montage(browser, out, p.montageLabel, p.montageWidth || 1800, path.join(ROOT, p.montage));

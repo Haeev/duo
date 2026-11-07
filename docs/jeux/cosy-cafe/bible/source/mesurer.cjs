@@ -33,6 +33,7 @@ const check = (ok, message) => {
 const all = [];
 const push = (family, entry) => all.push({ family, ...entry });
 pal.common.forEach((e) => push('commune', e));
+pal.seasons.forEach((e) => push('saisons', e));
 pal.ui.forEach((e) => push('interface', e));
 pal.topsLight.forEach((e) => push('joueurs', e));
 pal.topsDark.forEach((e) => push('joueurs', e));

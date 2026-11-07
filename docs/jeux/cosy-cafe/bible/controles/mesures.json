@@ -894,6 +894,35 @@
     },
     {
       "family": "commune",
+      "id": "glass_tint",
+      "hex": "#DCE6E4",
+      "fr": "voile des vitres",
+      "bande": "jeu",
+      "L": 90.5,
+      "C": 3.7,
+      "h": 183,
+      "gray": 89.3,
+      "nearestPlayer": {
+        "d": 20.1,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.7,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 8.4,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 7,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "commune",
       "id": "shadow_contact",
       "hex": "#2A1E18",
       "fr": "ombre de contact",
@@ -1063,6 +1092,93 @@
         "tritanopie": {
           "d": 32.4,
           "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "saisons",
+      "id": "season_autumn_leaf",
+      "hex": "#A86F3E",
+      "fr": "feuillage d'automne",
+      "bande": "dehors",
+      "L": 51.9,
+      "C": 40.1,
+      "h": 64,
+      "gray": 46.9,
+      "nearestPlayer": {
+        "d": 18.9,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 5.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "saisons",
+      "id": "season_autumn_ochre",
+      "hex": "#C08A4A",
+      "fr": "feuillage ocre",
+      "bande": "dehors",
+      "L": 61.5,
+      "C": 44,
+      "h": 72,
+      "gray": 56.8,
+      "nearestPlayer": {
+        "d": 20.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 4.3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 8.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "saisons",
+      "id": "season_snow",
+      "hex": "#EEF1F3",
+      "fr": "neige",
+      "bande": "dehors",
+      "L": 95,
+      "C": 1.5,
+      "h": 244,
+      "gray": 94.3,
+      "nearestPlayer": {
+        "d": 23.5,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.5,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 8.4,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 8.7,
+          "id": "star"
         }
       }
     },

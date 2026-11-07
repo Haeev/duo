@@ -49,7 +49,8 @@ const common = [
   c('brass', '#C2A05A', 'laiton', 'decor', 'robinets, rampes, pieds de lampe, poignées'),
   c('steel', '#A3A8AC', 'inox', 'decor', 'machines, éviers, réfrigérateurs'),
   c('steel_dark', '#4C5156', 'acier sombre', 'decor', 'pieds de tabourets, porte-filtres, grilles'),
-  c('glass', '#C9D6D3', 'verre', 'jeu', 'teinte des vitres, des vitrines et des verres (reflet peint)'),
+  c('glass', '#C9D6D3', 'verre', 'jeu', 'verres, carafes, vitrines à gâteaux'),
+  c('glass_tint', '#DCE6E4', 'voile des vitres', 'jeu', 'voile des vitres de la coque, à 12 à 18 % (reflet peint)'),
   c('shadow_contact', '#2A1E18', 'ombre de contact', 'decor', 'décalques sous les meubles et les personnages (multiplication)'),
   // lumière
   c('lamp_warm', '#FFC27A', 'lampe chaude', 'lumiere', 'ampoules et lampes (2 700 K environ)'),
@@ -58,6 +59,13 @@ const common = [
   // alerte douce: jamais seule, toujours avec son pictogramme (sablier, thermomètre)
   c('alert', '#E0A030', 'ambre', 'ui', 'alerte douce: ticket qui attend, lait trop chaud, stock bas'),
   c('alert_ink', '#5A3A10', 'ambre foncé', 'ui', 'pictogramme posé sur l\'ambre'),
+];
+
+// saisons de la rue (décor de fond et plantes extérieures seulement)
+const seasons = [
+  c('season_autumn_leaf', '#A86F3E', 'feuillage d\'automne', 'dehors', 'arbres d\'alignement et feuilles au sol en automne'),
+  c('season_autumn_ochre', '#C08A4A', 'feuillage ocre', 'dehors', 'second ton d\'automne'),
+  c('season_snow', '#EEF1F3', 'neige', 'dehors', 'toits, chaussée et rebords en hiver'),
 ];
 
 // hauts des avatars: deux familles de clarté (section 7.1 de la bible)
@@ -272,4 +280,4 @@ const ui = [
   c('ticket_rail', '#8E9499', 'rail à tickets', 'ui', 'rail en inox au-dessus du passe'),
 ];
 
-module.exports = { common, topsLight, topsDark, playerPiping, playerOn, skins, hair, house, profiles, staffShirts, addresses, moments, styles, ui };
+module.exports = { common, seasons, topsLight, topsDark, playerPiping, playerOn, skins, hair, house, profiles, staffShirts, addresses, moments, styles, ui };
