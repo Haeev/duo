@@ -124,6 +124,42 @@ async function ardoise() {
   return plan;
 }
 
+// Tickets du rail (papier, encre, Patrick Hand): le contenu est écrit par le jeu; ici quatre commandes
+async function tickets() {
+  await document.fonts.load('40px "Patrick Hand"');
+  const groupe = new THREE.Group();
+  const contenus = [
+    ['Table 3', '2 crèmes', '1 croissant'],
+    ['Comptoir', '1 café', '1 chocolat'],
+    ['Table 1', '1 thé', '1 tartine'],
+    ['Caisse', '2 cafés', 'à emporter'],
+  ];
+  // centres des tickets (x du plan, de l'est à l'ouest vus du barista), face nord à z = 9,2955
+  [8.06, 8.25, 8.44, 8.62].forEach((x, i) => {
+    const c = document.createElement('canvas');
+    c.width = 240;
+    c.height = 340;
+    const g = c.getContext('2d');
+    g.fillStyle = '#2B2622';
+    g.textBaseline = 'alphabetic';
+    const [titre, l1, l2] = contenus[i];
+    g.font = '56px "Patrick Hand"';
+    g.fillText(titre, 18, i === 3 ? 150 : 110);
+    g.font = '50px "Patrick Hand"';
+    g.fillText(l1, 18, i === 3 ? 220 : 190);
+    g.fillText(l2, 18, i === 3 ? 285 : 255);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 4;
+    const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: new THREE.Color(0.9, 0.86, 0.8) });
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.17), m);
+    p.rotation.y = Math.PI;
+    p.position.set(x, 1.88 - 0.105, 9.2945);
+    groupe.add(p);
+  });
+  return groupe;
+}
+
 // Ombre ronde sous chaque personnage (décalque, bible 6)
 function ombreRonde() {
   const c = document.createElement('canvas');
@@ -168,17 +204,20 @@ async function main() {
       lm.colorSpace = THREE.SRGBColorSpace;
       lm.channel = 1;
       lm.needsUpdate = true;
+      // dehors en plein soleil: la lumière cuite y est ramenée, sinon la place sort blanche derrière les vitres
+      const k = m.name.startsWith('ext_') ? K * Math.PI * 0.42 : K * Math.PI;
       if (V === 'A') {
-        o.material = new THREE.MeshBasicMaterial({ map: m.map, color: m.color, lightMap: lm, lightMapIntensity: K * Math.PI });
+        o.material = new THREE.MeshBasicMaterial({ map: m.map, color: m.color, lightMap: lm, lightMapIntensity: k });
       } else {
         m.lightMap = lm;
-        m.lightMapIntensity = K * Math.PI;
+        m.lightMapIntensity = k;
         m.aoMap = null;
         aRemplacer.push(m);
       }
     }
   });
   fixe.add(await ardoise());
+  fixe.add(await tickets());
 
   if (V === 'B') {
     const env = environnement([8.6, 1.4, 10.2]);

@@ -237,6 +237,9 @@ def construire(PAL, variante, dossier_rigs):
         {"nom": "char_player_crescent", "glb": rig("barista2"), "clip": "idle", "image": 0, "hauteur": 1.66, "x": 10.35, "y": 8.3, "cap": 180,
          "badge": J["crescent"]["couleur"], "couleurs": base + [C["house_bottle"], C["top_light_cream"], C["etudiants_denim"]]},
     ]
+    # un passant sur la place, qui traverse vers l'est (le client pressé du tech-artist, clip de marche)
+    specs.append({"nom": "char_passerby", "glb": CLIPS_GLB, "clip": "walk", "image": 6, "hauteur": 1.72, "x": 7.2, "y": 17.6, "cap": 95,
+                  "couleurs": base + [C["presses_coat"], C["presses_charcoal"], C["presses_navy"], C["presses_bag"], C["kraft"]]})
     out = []
     for sp in specs:
         g = poser_personnage(sp, variante, None)

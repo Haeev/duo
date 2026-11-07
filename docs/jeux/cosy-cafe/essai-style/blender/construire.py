@@ -117,7 +117,7 @@ def construire_scene():
     for i, x in enumerate((8.88, 9.02, 9.16, 9.3)):
         vs = []
         before = set(w.bm.verts)
-        S.tasse(w, x, 9.08, 0, "espresso", contenu=False)
+        S.tasse(w, x, 9.08, 0, "espresso", contenu=False, soucoupe=False)
         vs = [v for v in w.bm.verts if v not in before]
         top = max(v.co.z for v in vs)
         for v in vs:

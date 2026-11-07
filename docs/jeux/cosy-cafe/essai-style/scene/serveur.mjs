@@ -15,6 +15,7 @@ const depot = path.resolve(racine, '..', '..', '..', '..');
 const candidats = [process.env.THREE_DIR, path.join(depot, 'games', 'la-petite-ligne', 'node_modules', 'three'), path.join(depot, 'node_modules', 'three')].filter(Boolean);
 const threeDir = candidats.find((d) => existsSync(path.join(d, 'package.json')));
 const polices = path.resolve(racine, '..', 'bible', 'node_modules', '@fontsource-variable');
+const polices2 = path.resolve(racine, '..', 'bible', 'node_modules', '@fontsource');
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.woff2': 'font/woff2' };
 
 export function demarrer(port = 0) {
@@ -25,8 +26,9 @@ export function demarrer(port = 0) {
       let fichier;
       if (url.startsWith('/three/')) fichier = path.join(threeDir, url.slice(7));
       else if (url.startsWith('/polices/')) fichier = path.join(polices, url.slice(9));
+      else if (url.startsWith('/polices2/')) fichier = path.join(polices2, url.slice(10));
       else fichier = path.join(racine, url);
-      const base = url.startsWith('/three/') ? threeDir : url.startsWith('/polices/') ? polices : racine;
+      const base = url.startsWith('/three/') ? threeDir : url.startsWith('/polices/') ? polices : url.startsWith('/polices2/') ? polices2 : racine;
       if (!path.resolve(fichier).startsWith(base)) throw new Error('hors racine');
       if ((await stat(fichier)).isDirectory()) fichier = path.join(fichier, 'index.html');
       const data = await readFile(fichier);

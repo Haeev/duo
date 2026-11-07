@@ -6,6 +6,9 @@ plafond à 2,80 (bible, adresses.cjs). Chaque élément porte sa raison quand el
 
 import math
 
+import bpy  # noqa: F401
+import bmesh
+
 from geo import Geo, P, pans, STYLE  # noqa: F401
 import geo as G
 
@@ -467,18 +470,49 @@ def assiette(g, x, y, z, r=0.12):
 
 
 def croissant_geo(g, x, y, z, deg=0.0, s=1.2):
-    """Croissant de 16 cm à 120 %: chapelet d'ellipsoïdes le long d'un arc (remplacé par le modèle Meshy s'il est là)."""
-    vs = []
-    n = 9
-    for i in range(n):
-        t = (i / (n - 1)) * 2 - 1
-        ang = t * 1.15
-        r = 0.06 * s
-        px, py = r * math.sin(ang), -r * math.cos(ang) + r * 0.7
-        rad = (0.026 - 0.016 * abs(t) ** 1.4) * s
-        vv = g.sphere(x + px, y + py, z + rad * 0.72, rad * 1.05, rad, rad * 0.75, "crust", segs=pans(10), rings=6, smooth=True)
-        Geo.rotate_z(vv, x + px, y + py, math.degrees(ang))
-        vs += vv
+    """Croissant de 16 cm à 120 %: tube balayé le long d'un arc en lune, pointes effilées et recourbées,
+    renflements des tours de pâte, dessous aplati. Doré (croûte), bouts un peu plus clairs (mie)."""
+    bm = g.bm
+    before = set(bm.verts)
+    n_t, n_r = 25, pans(10)
+    R = 0.055 * s
+    rings = []
+    for i in range(n_t):
+        t = i / (n_t - 1) * 2 - 1
+        a = t * 1.25
+        cx, cy = R * math.sin(a), R * (1 - math.cos(a)) * 0.9 - R * 0.35
+        tx, ty = math.cos(a), math.sin(a) * 0.9
+        ln = math.hypot(tx, ty)
+        nx, ny = -ty / ln, tx / ln  # normale horizontale à l'arc
+        rad = 0.028 * s * (1 - abs(t) ** 1.7 * 0.82) * (1 + 0.09 * math.cos(t * math.pi * 3.5))
+        ring = []
+        for j in range(n_r):
+            b = 2 * math.pi * j / n_r
+            u, w = math.cos(b), math.sin(b)
+            hz = rad * 0.72 * w
+            if hz < -rad * 0.32:
+                hz = -rad * 0.32  # dessous posé à plat
+            px, py = cx + nx * rad * u, cy + ny * rad * u
+            ring.append(bm.verts.new(P(x + px, y + py, z + rad * 0.32 + hz)))
+        rings.append((ring, abs(t)))
+    faces = []
+    for k in range(n_t - 1):
+        ra, ta = rings[k]
+        rb, _ = rings[k + 1]
+        key = "crumb" if ta > 0.85 else "crust"
+        for j in range(n_r):
+            jj = (j + 1) % n_r
+            f = bm.faces.new([ra[j], ra[jj], rb[jj], rb[j]])
+            f.material_index = g.mi(key)
+            faces.append(f)
+    for ring, _ in (rings[0], rings[-1]):
+        f = bm.faces.new(ring)
+        f.material_index = g.mi("crumb")
+        faces.append(f)
+    bmesh.ops.recalc_face_normals(bm, faces=faces)
+    for f in faces:
+        f.smooth = True
+    vs = [v for v in bm.verts if v not in before]
     Geo.rotate_z(vs, x, y, deg)
     return vs
 

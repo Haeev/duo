@@ -317,6 +317,15 @@ class Materiaux:
             return m
         if kind == "char":
             return mat_palette("char_palette", self.palette_img, rough=0.8, kind="char")
+        if kind == "ext":
+            # la rue a ses propres matériaux: la scène y règle l'intensité de la lumière cuite (dehors plein soleil)
+            if self.variant == "A" or key not in B_SPEC or not B_SPEC[key][0]:
+                return mat_palette("ext_palette", self.palette_img, rough=0.85)
+            tex, rough, metal, _ = B_SPEC[key]
+            img, mean_lin = self.textures[tex]
+            target = lin(hex_of(key))
+            fac = tuple(min(1.0, target[i] / max(1e-4, mean_lin)) for i in range(3)) + (1.0,)
+            return mat_texture(f"ext_{key}", img, fac, rough, metal)
         if self.variant == "A":
             return mat_palette("palette", self.palette_img, rough=0.85)
         spec = B_SPEC.get(key)

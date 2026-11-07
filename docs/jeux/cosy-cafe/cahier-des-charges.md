@@ -1281,7 +1281,7 @@ Document de référence: `docs/jeux/cosy-cafe/bible-artistique.md`, planches dan
 
 ### 7.1 Essai de style 3D (en cours, 2026-11-07)
 
-Le client a demandé à voir le rendu réel avant de choisir. L'artiste 3D construit le café d'Ormeval dans le moteur du jeu (Three.js, vue subjective, trois points de vue), en deux variantes de la même scène: **A stylisé chaleureux** (formes arrondies, couleurs douces, lumière dorée) et **B semi-réaliste** (proportions et matières réelles, textures réduites), avec les mesures de budget de chacune. Le choix du client (question Q17) fixe la direction de la bible avant l'alpha.
+Le client a demandé à voir le rendu réel avant de choisir. L'artiste 3D construit le café d'Ormeval dans le moteur du jeu (Three.js, vue subjective, trois points de vue), en deux variantes de la même scène: **A stylisé chaleureux** (formes arrondies, couleurs douces, lumière dorée) et **B semi-réaliste** (proportions et matières réelles, textures réduites), avec les mesures de budget de chacune. **Décision du client (2026-11-08, Q17): variante B, semi-réaliste.** La bible est à reprendre en ce sens par le directeur artistique avant l'alpha: matières réelles et textures réduites à la place des aplats, personnages détaillés (Meshy), même palette de lumière chaude, budgets du PC à tenir (mesures de l'essai dans `docs/jeux/cosy-cafe/essai-style/`).
 
 ### 7.2 Fabrication des assets 3D avec Meshy
 
@@ -1430,7 +1430,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | Q14 | Les signes des joueurs (bible) | figés (bandeau, bretelles croisées, écusson) avec un haut clair ou sombre imposé selon la paire; libres | figés: c'est ce qui garantit qu'on se reconnaît de dos | non: tenue de travail normale aux couleurs sourdes de la maison, au plus un détail discret; la couleur du joueur reste seulement là où elle sert au jeu (pince du ticket, indicateurs de l'interface). « On sait entre nous qui on est » | 2026-11-08 |
 | Q15 | La maison parisienne (bible, plans) | sous une verrière; sur un boulevard | la verrière, pour sa lumière unique (c'est celle des plans: la Graineterie) | | |
 | Q16 | Le second rang de terrasse au café d'angle (plans) | un seul rang (16 places); deux rangs (26) si l'architecte valide une foule lointaine simplifiée | un rang au prototype; on décide après la mesure sur le PC | | |
-| Q17 | La direction de rendu (essai de style 3D) | A stylisé chaleureux; B semi-réaliste; un mélange | à décider sur les images de l'essai, en cours | | |
+| Q17 | La direction de rendu (essai de style 3D) | A stylisé chaleureux; B semi-réaliste; un mélange | à décider sur les images de l'essai, en cours | B semi-réaliste | 2026-11-08 |
 | Q18 | Les réglages de souris et de champ de vision (UX, U1) | dans Duo, communs à tous les jeux; dans chaque jeu | dans Duo, par ordinateur; d'ici là, dans la tablette | | |
 | Q19 | L'annonce du départ (UX, U2) | « Café de la place cherche repreneurs »; « Café de la place à reprendre » | « à reprendre »: l'autre forme suppose des joueurs au masculin | | |
 
@@ -1438,6 +1438,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
+| 2026-11-08 | 0.2.3 | Décision du client: direction de rendu B, semi-réaliste (Q17) | client |
 | 2026-11-08 | 0.2.2 | Retours du client sur l'essai 3D: personnages (clients et avatars) au niveau de détail du décor (visages, mains, vêtements, coiffures variées); couleurs des joueurs retirées des tenues (Q14). La bible (section 4) est à reprendre en ce sens par le directeur artistique | client |
 | 2026-11-08 | 0.2.1 | Décision du client: titre « Deux Tabliers » (Q1) | client |
 | 2026-11-08 | 0.2 | Consolidation par le manager: résumés des sections 7 à 10, essai de style 3D (7.1), fabrication avec Meshy (7.2), questions Q11 à Q19 venues du son, de la bible, des plans et de l'UX, arbitrages entre membres (section 16) | manager |
