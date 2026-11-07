@@ -52,7 +52,4192 @@
   },
   "pitchVariationIsPlaybackRate": true
  },
- "sounds": {},
+ "sounds": {
+  "grinder-start": {
+   "event": "Le moulin démarre",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/grinder-start-1.ogg",
+    "postes/espresso/grinder-start-2.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    400,
+    400
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "grinder-loop": {
+   "event": "Le moulin moud (tant qu'on maintient)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/grinder-loop.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    1500
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 1.75,
+    "startSample": 6000,
+    "endSample": 42000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -25,
+   "note": "fondu de 0,3 s vers grinder-empty-loop quand la dose est faite"
+  },
+  "grinder-empty-loop": {
+   "event": "La dose est faite: les grains ne craquent plus, le moteur s'allège; aussi moulin vide",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/grinder-empty-loop.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    1500
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 1.75,
+    "startSample": 6000,
+    "endSample": 42000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -27
+  },
+  "grinder-stop": {
+   "event": "Le moulin s'arrête",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/grinder-stop-1.ogg",
+    "postes/espresso/grinder-stop-2.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    600,
+    600
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "doser-clack": {
+   "event": "Le levier du doseur (moulin du village)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/doser-clack-1.ogg",
+    "postes/espresso/doser-clack-2.ogg",
+    "postes/espresso/doser-clack-3.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    110,
+    110,
+    110
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "tamp": {
+   "event": "Tasser la mouture",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/tamp-1.ogg",
+    "postes/espresso/tamp-2.ogg",
+    "postes/espresso/tamp-3.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    308,
+    306,
+    308
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "portafilter-lock": {
+   "event": "Fixer le porte-filtre",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/portafilter-lock-1.ogg",
+    "postes/espresso/portafilter-lock-2.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    312,
+    311
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "portafilter-unlock": {
+   "event": "Retirer le porte-filtre",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/portafilter-unlock-1.ogg",
+    "postes/espresso/portafilter-unlock-2.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    227,
+    227
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "knock-box": {
+   "event": "Taper le marc dans le bac (barre caoutchoutée: mat, jamais un claquement)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/knock-box-1.ogg",
+    "postes/espresso/knock-box-2.ogg",
+    "postes/espresso/knock-box-3.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    220,
+    230,
+    240
+   ],
+   "momentaryMaxLufs": -22
+  },
+  "pump-start": {
+   "event": "La pompe démarre",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/pump-start.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    400
+   ],
+   "momentaryMaxLufs": -25,
+   "note": "enchaîner extraction-loop à 0,35 s"
+  },
+  "extraction-loop": {
+   "event": "L'extraction coule: le ruban",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/extraction-loop.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -27
+  },
+  "extraction-thin-loop": {
+   "event": "L'extraction blondit: le filet s'amincit et crachote",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/extraction-thin-loop.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -28,
+   "note": "fondu depuis extraction-loop selon le temps d'extraction (fenêtre idéale du game designer)"
+  },
+  "extraction-stop": {
+   "event": "La pompe se tait, la vanne souffle (fin d'extraction)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/espresso/extraction-stop-1.ogg",
+    "postes/espresso/extraction-stop-2.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 250,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    719,
+    718
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "espresso-idle-loop": {
+   "event": "La machine au repos: chaudière, déclic du pressostat",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "postes/espresso/espresso-idle-loop.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 8.0,
+    "cullBeyondM": 8.0
+   },
+   "looping": true,
+   "durationMs": [
+    4000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 4.25,
+    "startSample": 6000,
+    "endSample": 102000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -42,
+   "note": "départ tiré au hasard sur chaque machine"
+  },
+  "espresso-warmup": {
+   "event": "La machine chauffe le matin: remplissage, souffle, déclics",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/espresso/espresso-warmup.ogg"
+   ],
+   "group": "postes/espresso",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    5996
+   ],
+   "momentaryMaxLufs": -30
+  },
+  "steam-purge": {
+   "event": "Purger la buse, avant et après",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/steam-purge-1.ogg",
+    "postes/lait/steam-purge-2.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    800,
+    800
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "steam-aerate-loop": {
+   "event": "Aérer: la buse affleure, papier qu'on déchire (4 à 35 °C)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/steam-aerate-loop.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -27
+  },
+  "steam-roll-loop": {
+   "event": "Texturer: le roulement (35 à 58 °C)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/steam-roll-loop.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -28
+  },
+  "steam-sing-loop": {
+   "event": "La cible: le pichet chante (58 à 65 °C)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/steam-sing-loop.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -31
+  },
+  "steam-hot-loop": {
+   "event": "Trop chaud: le souffle s'amincit, petits bouillons (65 à 72 °C)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/steam-hot-loop.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -29
+  },
+  "steam-auto-stop": {
+   "event": "La buse s'arrête d'elle-même à la température (72 °C)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/steam-auto-stop.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 250,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    261
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "pitcher-set": {
+   "event": "Poser le pichet",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/lait/pitcher-set-1.ogg",
+    "postes/lait/pitcher-set-2.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    135,
+    133
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "milk-pour": {
+   "event": "Verser le lait de la bouteille dans le pichet",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/lait/milk-pour.ogg"
+   ],
+   "group": "postes/lait",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    1195
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "kettle-loop": {
+   "event": "La bouilloire chauffe",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/the/kettle-loop.ogg"
+   ],
+   "group": "postes/the",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -33
+  },
+  "kettle-click": {
+   "event": "L'eau est chaude: le déclic",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/the/kettle-click-1.ogg",
+    "postes/the/kettle-click-2.ogg"
+   ],
+   "group": "postes/the",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 250,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    57,
+    57
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "vitrine-open": {
+   "event": "Ouvrir la vitrine (porte de verre coulissante)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/patisserie/vitrine-open.ogg"
+   ],
+   "group": "postes/patisserie",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    414
+   ],
+   "momentaryMaxLufs": -27
+  },
+  "vitrine-close": {
+   "event": "Fermer la vitrine",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/patisserie/vitrine-close.ogg"
+   ],
+   "group": "postes/patisserie",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    386
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "tongs": {
+   "event": "Pince à pâtisserie",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/patisserie/tongs-1.ogg",
+    "postes/patisserie/tongs-2.ogg"
+   ],
+   "group": "postes/patisserie",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    80,
+    79
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "paper-bag": {
+   "event": "Sac en papier, à emporter",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/patisserie/paper-bag-1.ogg",
+    "postes/patisserie/paper-bag-2.ogg"
+   ],
+   "group": "postes/patisserie",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    593,
+    594
+   ],
+   "momentaryMaxLufs": -27
+  },
+  "tap-on": {
+   "event": "Ouvrir le robinet",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/plonge/tap-on.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    291
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "tap-loop": {
+   "event": "L'eau coule",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/plonge/tap-loop.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -31
+  },
+  "tap-off": {
+   "event": "Fermer le robinet",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/plonge/tap-off.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    229
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "dish-wash": {
+   "event": "Laver à la main (éponge, tasses dans l'eau)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/plonge/dish-wash-1.ogg",
+    "postes/plonge/dish-wash-2.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    789,
+    783
+   ],
+   "momentaryMaxLufs": -29
+  },
+  "dish-rack": {
+   "event": "Une tasse sur l'égouttoir",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/plonge/dish-rack-1.ogg",
+    "postes/plonge/dish-rack-2.ogg",
+    "postes/plonge/dish-rack-3.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    173,
+    181,
+    176
+   ],
+   "momentaryMaxLufs": -27
+  },
+  "dishwasher-open": {
+   "event": "Ouvrir le lave-vaisselle",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/plonge/dishwasher-open.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    543
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "dishwasher-close": {
+   "event": "Fermer le lave-vaisselle: le cycle démarre",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/plonge/dishwasher-close.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    795
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "dishwasher-loop": {
+   "event": "Le cycle tourne (eau brassée)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "postes/plonge/dishwasher-loop.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 8.0,
+    "cullBeyondM": 8.0
+   },
+   "looping": true,
+   "durationMs": [
+    3000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 3.25,
+    "startSample": 6000,
+    "endSample": 78000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -39
+  },
+  "dishwasher-done": {
+   "event": "Le cycle est fini: vidange, déclic",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/plonge/dishwasher-done.ogg"
+   ],
+   "group": "postes/plonge",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    1030
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "radio-on": {
+   "event": "Allumer la radio: le clic, le poste chauffe (la musique monte en 1 s)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/musique/radio-on.ogg"
+   ],
+   "group": "postes/musique",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    990
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "radio-off": {
+   "event": "Éteindre la radio",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/musique/radio-off.ogg"
+   ],
+   "group": "postes/musique",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    135
+   ],
+   "momentaryMaxLufs": -27
+  },
+  "radio-tune": {
+   "event": "Changer de station: un court souffle d'accord",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "postes/musique/radio-tune-1.ogg",
+    "postes/musique/radio-tune-2.ogg"
+   ],
+   "group": "postes/musique",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    700,
+    700
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "radio-knob": {
+   "event": "Tourner le bouton du volume (un cran)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "postes/musique/radio-knob-1.ogg",
+    "postes/musique/radio-knob-2.ogg"
+   ],
+   "group": "postes/musique",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 40,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    39,
+    40
+   ],
+   "momentaryMaxLufs": -32
+  },
+  "radio-hiss-loop": {
+   "event": "Le souffle de la radio entre deux morceaux",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "postes/musique/radio-hiss-loop.ogg"
+   ],
+   "group": "postes/musique",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    3000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 3.25,
+    "startSample": 6000,
+    "endSample": 78000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -48,
+   "note": "2 à 4 s entre deux morceaux, passe par le traitement de l'appareil"
+  },
+  "pour-thin-loop": {
+   "event": "Verser un liquide clair (eau, thé, café filtre)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/pour-thin-loop.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    1500
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 1.75,
+    "startSample": 6000,
+    "endSample": 42000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -30,
+   "note": "playbackRate de 1,0 à 1,5 avec le remplissage (la résonance monte: tasse de 700 Hz à 1,8 kHz)"
+  },
+  "pour-thick-loop": {
+   "event": "Verser un liquide épais (lait moussé, chocolat)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/pour-thick-loop.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": true,
+   "durationMs": [
+    1500
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 1.75,
+    "startSample": 6000,
+    "endSample": 42000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -30,
+   "note": "playbackRate de 1,0 à 1,4 avec le remplissage"
+  },
+  "pour-end": {
+   "event": "Dernières gouttes",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/service/pour-end-1.ogg",
+    "base/service/pour-end-2.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    192,
+    322
+   ],
+   "momentaryMaxLufs": -30
+  },
+  "cup-saucer": {
+   "event": "Tasse posée sur sa soucoupe",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/cup-saucer-1.ogg",
+    "base/service/cup-saucer-2.ogg",
+    "base/service/cup-saucer-3.ogg",
+    "base/service/cup-saucer-4.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    189,
+    203,
+    193,
+    192
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "cup-set": {
+   "event": "Tasse posée sur le comptoir ou une table",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/cup-set-1.ogg",
+    "base/service/cup-set-2.ogg",
+    "base/service/cup-set-3.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    85,
+    90,
+    89
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "spoon-stir": {
+   "event": "Remuer à la cuillère",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/service/spoon-stir-1.ogg",
+    "base/service/spoon-stir-2.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    949,
+    951
+   ],
+   "momentaryMaxLufs": -29
+  },
+  "spoon-set": {
+   "event": "Cuillère posée sur la soucoupe",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/service/spoon-set-1.ogg",
+    "base/service/spoon-set-2.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    159,
+    158
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "plate-set": {
+   "event": "Assiette posée (une part, une viennoiserie)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/plate-set-1.ogg",
+    "base/service/plate-set-2.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    158,
+    148
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "tray-set": {
+   "event": "Plateau posé, chargé",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/tray-set-1.ogg",
+    "base/service/tray-set-2.ogg",
+    "base/service/tray-set-3.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    219,
+    221,
+    208
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "clear-table": {
+   "event": "Débarrasser une table (la vaisselle sur le plateau)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/service/clear-table-1.ogg",
+    "base/service/clear-table-2.ogg",
+    "base/service/clear-table-3.ogg"
+   ],
+   "group": "base/service",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    414,
+    535,
+    416
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "till-open": {
+   "event": "Ouvrir le tiroir-caisse (bois, petite sonnette en la)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/till-open-1.ogg",
+    "base/caisse/till-open-2.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    698,
+    698
+   ],
+   "momentaryMaxLufs": -23,
+   "note": "hauteur fixe: la sonnette est accordée"
+  },
+  "till-close": {
+   "event": "Fermer le tiroir",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/till-close.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    305
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "coins-hand": {
+   "event": "Pièces rendues ou reçues",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/coins-hand-1.ogg",
+    "base/caisse/coins-hand-2.ogg",
+    "base/caisse/coins-hand-3.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    283,
+    280,
+    273
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "coins-drawer": {
+   "event": "Pièces rangées dans le tiroir",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/coins-drawer-1.ogg",
+    "base/caisse/coins-drawer-2.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    355,
+    360
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "tip-saucer": {
+   "event": "Un client laisse un pourboire sur la soucoupe en partant",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/caisse/tip-saucer-1.ogg",
+    "base/caisse/tip-saucer-2.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.5,
+    "rolloffFactor": 1.0,
+    "maxDistance": 10.0,
+    "cullBeyondM": 10.0
+   },
+   "looping": false,
+   "durationMs": [
+    207,
+    214
+   ],
+   "momentaryMaxLufs": -27
+  },
+  "tip-jar-1": {
+   "event": "Le pourboire tombe dans le bocal presque vide",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/tip-jar-1-1.ogg",
+    "base/caisse/tip-jar-1-2.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    244,
+    256
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "tip-jar-2": {
+   "event": "Le pourboire tombe dans le bocal à moitié plein",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/tip-jar-2-1.ogg",
+    "base/caisse/tip-jar-2-2.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    235,
+    216
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "tip-jar-3": {
+   "event": "Le pourboire tombe dans le bocal plein",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/tip-jar-3-1.ogg",
+    "base/caisse/tip-jar-3-2.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    295,
+    330
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "tip-big": {
+   "event": "Un gros pourboire (habitué ravi, commande parfaite)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/caisse/tip-big.ogg"
+   ],
+   "group": "base/caisse",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    924
+   ],
+   "momentaryMaxLufs": -22,
+   "note": "hauteur fixe: la note de porcelaine est accordée (sol)"
+  },
+  "door-open-village": {
+   "event": "Ouvrir la porte d'entrée (vieille porte de bois)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "adresses/village/door-open-village-1.ogg",
+    "adresses/village/door-open-village-2.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 15.0,
+    "cullBeyondM": 15.0
+   },
+   "looping": false,
+   "durationMs": [
+    594,
+    595
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "door-close-village": {
+   "event": "Fermer la porte d'entrée",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "adresses/village/door-close-village-1.ogg",
+    "adresses/village/door-close-village-2.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 15.0,
+    "cullBeyondM": 15.0
+   },
+   "looping": false,
+   "durationMs": [
+    353,
+    354
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "door-bell-village": {
+   "event": "La clochette de laiton sur ressort de la porte (mi)",
+   "bus": "effects",
+   "priority": 1,
+   "files": [
+    "adresses/village/door-bell-village-1.ogg",
+    "adresses/village/door-bell-village-2.ogg",
+    "adresses/village/door-bell-village-3.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 250,
+   "maxVoices": 1,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    968,
+    1487,
+    1439
+   ],
+   "momentaryMaxLufs": -20,
+   "note": "hauteur fixe; une voix: relancée si un second client entre pendant qu'elle sonne"
+  },
+  "door-inner-village": {
+   "event": "La porte de la réserve",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "adresses/village/door-inner-village-1.ogg",
+    "adresses/village/door-inner-village-2.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    288,
+    284
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "delivery-knock": {
+   "event": "On frappe à la porte: la livraison est là (préparation)",
+   "bus": "effects",
+   "priority": 1,
+   "files": [
+    "matin/delivery-knock-1.ogg",
+    "matin/delivery-knock-2.ogg"
+   ],
+   "group": "matin",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    525,
+    410
+   ],
+   "momentaryMaxLufs": -21
+  },
+  "milk-crate": {
+   "event": "La laitière: le casier de bouteilles",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "matin/milk-crate.ogg"
+   ],
+   "group": "matin",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    531
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "bread-basket": {
+   "event": "Le boulanger: le panier d'osier, le papier",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "matin/bread-basket.ogg"
+   ],
+   "group": "matin",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    797
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "coffee-sack": {
+   "event": "Le torréfacteur: le sac de jute, les grains qui glissent",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "matin/coffee-sack.ogg"
+   ],
+   "group": "matin",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    884
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "carton-set": {
+   "event": "Un carton posé",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/reserve/carton-set-1.ogg",
+    "base/reserve/carton-set-2.ogg",
+    "base/reserve/carton-set-3.ogg"
+   ],
+   "group": "base/reserve",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    231,
+    237,
+    238
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "carton-open": {
+   "event": "Ouvrir un carton (les rabats, aucun ruban arraché)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/reserve/carton-open-1.ogg",
+    "base/reserve/carton-open-2.ogg"
+   ],
+   "group": "base/reserve",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    374,
+    380
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "crate-set": {
+   "event": "Une caisse en bois posée",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/reserve/crate-set-1.ogg",
+    "base/reserve/crate-set-2.ogg"
+   ],
+   "group": "base/reserve",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    126,
+    122
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "shelf-place": {
+   "event": "Ranger sur une étagère",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/reserve/shelf-place-1.ogg",
+    "base/reserve/shelf-place-2.ogg",
+    "base/reserve/shelf-place-3.ogg"
+   ],
+   "group": "base/reserve",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    131,
+    100,
+    136
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "furniture-pick": {
+   "event": "Soulever un meuble",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/amenagement/furniture-pick-1.ogg",
+    "base/amenagement/furniture-pick-2.ogg"
+   ],
+   "group": "base/amenagement",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    231,
+    238
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "furniture-place-wood": {
+   "event": "Poser un meuble en bois (sur les tomettes)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/amenagement/furniture-place-wood-1.ogg",
+    "base/amenagement/furniture-place-wood-2.ogg",
+    "base/amenagement/furniture-place-wood-3.ogg"
+   ],
+   "group": "base/amenagement",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    187,
+    197,
+    182
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "furniture-place-soft": {
+   "event": "Poser un meuble garni (banquette, fauteuil)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/amenagement/furniture-place-soft-1.ogg",
+    "base/amenagement/furniture-place-soft-2.ogg"
+   ],
+   "group": "base/amenagement",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    340,
+    340
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "furniture-slide": {
+   "event": "Glisser un meuble sur les tomettes (patins de feutre, sans crissement)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/amenagement/furniture-slide-1.ogg",
+    "base/amenagement/furniture-slide-2.ogg"
+   ],
+   "group": "base/amenagement",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    598,
+    598
+   ],
+   "momentaryMaxLufs": -27,
+   "note": "ajouté au document sonore pour la démo; relancé tant que le meuble glisse, 0,6 s"
+  },
+  "furniture-rotate": {
+   "event": "Tourner un meuble",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/amenagement/furniture-rotate-1.ogg",
+    "base/amenagement/furniture-rotate-2.ogg"
+   ],
+   "group": "base/amenagement",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    248,
+    248
+   ],
+   "momentaryMaxLufs": -29
+  },
+  "furniture-refuse": {
+   "event": "Pose impossible: un double toc feutré, sans mélodie",
+   "bus": "interface",
+   "priority": 2,
+   "files": [
+    "base/amenagement/furniture-refuse-1.ogg",
+    "base/amenagement/furniture-refuse-2.ogg"
+   ],
+   "group": "base/amenagement",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    186,
+    186
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "carry-grab": {
+   "event": "Saisir un bout d'un meuble lourd",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/joueurs/carry-grab-1.ogg",
+    "base/joueurs/carry-grab-2.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    160,
+    159
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "carry-wait": {
+   "event": "Le meuble attend l'autre: deux petits coups sur le bois, toutes les 4 s",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/joueurs/carry-wait-1.ogg",
+    "base/joueurs/carry-wait-2.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    234,
+    237
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "carry-lift": {
+   "event": "Soulever à deux: le bois craque, vos deux timbres ensemble",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/joueurs/carry-lift.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    681
+   ],
+   "momentaryMaxLufs": -22
+  },
+  "carry-creak": {
+   "event": "Porter à deux: le meuble craque au rythme des pas",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/joueurs/carry-creak-1.ogg",
+    "base/joueurs/carry-creak-2.ogg",
+    "base/joueurs/carry-creak-3.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    286,
+    287,
+    286
+   ],
+   "momentaryMaxLufs": -29
+  },
+  "chalk-tick": {
+   "event": "La craie: un caractère, pendant qu'on écrit la carte",
+   "bus": "effects",
+   "priority": 4,
+   "files": [
+    "base/ecrit/chalk-tick-1.ogg",
+    "base/ecrit/chalk-tick-2.ogg",
+    "base/ecrit/chalk-tick-3.ogg",
+    "base/ecrit/chalk-tick-4.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 35,
+   "maxVoices": 1,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    60,
+    65,
+    70,
+    75
+   ],
+   "momentaryMaxLufs": -33
+  },
+  "chalk-stroke": {
+   "event": "La craie: une ligne validée (un trait)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/ecrit/chalk-stroke-1.ogg",
+    "base/ecrit/chalk-stroke-2.ogg",
+    "base/ecrit/chalk-stroke-3.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    280,
+    280,
+    280
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "chalk-erase": {
+   "event": "Effacer l'ardoise",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/ecrit/chalk-erase-1.ogg",
+    "base/ecrit/chalk-erase-2.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    697,
+    696
+   ],
+   "momentaryMaxLufs": -29
+  },
+  "slate-street-set": {
+   "event": "Sortir l'ardoise sur le trottoir",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/ecrit/slate-street-set.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    175
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "ticket-new": {
+   "event": "Un nouveau ticket sur le rail: la pince, un petit tintement (la)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "base/ecrit/ticket-new-1.ogg",
+    "base/ecrit/ticket-new-2.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 250,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    481,
+    498
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "ticket-take": {
+   "event": "Prendre un ticket",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/ecrit/ticket-take-1.ogg",
+    "base/ecrit/ticket-take-2.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    200,
+    200
+   ],
+   "momentaryMaxLufs": -27
+  },
+  "ticket-done": {
+   "event": "Ticket terminé, piqué sur la pique",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/ecrit/ticket-done-1.ogg",
+    "base/ecrit/ticket-done-2.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    96,
+    96
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "guestbook-open": {
+   "event": "Ouvrir le livre d'or",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/ecrit/guestbook-open.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    607
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "guestbook-page": {
+   "event": "Tourner une page du livre d'or",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "base/ecrit/guestbook-page-1.ogg",
+    "base/ecrit/guestbook-page-2.ogg",
+    "base/ecrit/guestbook-page-3.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    390,
+    386,
+    397
+   ],
+   "momentaryMaxLufs": -28
+  },
+  "tablet-wake": {
+   "event": "Tablette: réveil (deux notes feutrées, sol puis do)",
+   "bus": "interface",
+   "priority": 3,
+   "files": [
+    "base/ecrit/tablet-wake.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    376
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "tablet-tap": {
+   "event": "Tablette: toucher",
+   "bus": "interface",
+   "priority": 4,
+   "files": [
+    "base/ecrit/tablet-tap-1.ogg",
+    "base/ecrit/tablet-tap-2.ogg",
+    "base/ecrit/tablet-tap-3.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 40,
+   "maxVoices": 1,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    31,
+    30,
+    31
+   ],
+   "momentaryMaxLufs": -33
+  },
+  "tablet-swipe": {
+   "event": "Tablette: glisser",
+   "bus": "interface",
+   "priority": 4,
+   "files": [
+    "base/ecrit/tablet-swipe-1.ogg",
+    "base/ecrit/tablet-swipe-2.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    250,
+    250
+   ],
+   "momentaryMaxLufs": -33
+  },
+  "tablet-sleep": {
+   "event": "Tablette: mise en veille",
+   "bus": "interface",
+   "priority": 4,
+   "files": [
+    "base/ecrit/tablet-sleep.ogg"
+   ],
+   "group": "base/ecrit",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    272
+   ],
+   "momentaryMaxLufs": -29
+  },
+  "step-tile": {
+   "event": "Pas sur les tomettes (tes pas; ceux des autres +6 dB à 2 m)",
+   "bus": "effects",
+   "priority": 4,
+   "files": [
+    "base/joueurs/step-tile-1.ogg",
+    "base/joueurs/step-tile-2.ogg",
+    "base/joueurs/step-tile-3.ogg",
+    "base/joueurs/step-tile-4.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 1.5,
+   "volumeDb": 0.0,
+   "minIntervalMs": 120,
+   "maxVoices": 6,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.5,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    125,
+    128,
+    128,
+    123
+   ],
+   "momentaryMaxLufs": -35
+  },
+  "step-wood": {
+   "event": "Pas sur le bois (plancher de la réserve, estrade)",
+   "bus": "effects",
+   "priority": 4,
+   "files": [
+    "base/joueurs/step-wood-1.ogg",
+    "base/joueurs/step-wood-2.ogg",
+    "base/joueurs/step-wood-3.ogg",
+    "base/joueurs/step-wood-4.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 1.5,
+   "volumeDb": 0.0,
+   "minIntervalMs": 120,
+   "maxVoices": 6,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.5,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    115,
+    112,
+    115,
+    124
+   ],
+   "momentaryMaxLufs": -35
+  },
+  "step-stone": {
+   "event": "Pas sur la pierre de la place (terrasse, dehors)",
+   "bus": "effects",
+   "priority": 4,
+   "files": [
+    "base/joueurs/step-stone-1.ogg",
+    "base/joueurs/step-stone-2.ogg",
+    "base/joueurs/step-stone-3.ogg",
+    "base/joueurs/step-stone-4.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 1.5,
+   "volumeDb": 0.0,
+   "minIntervalMs": 120,
+   "maxVoices": 6,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.5,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    176,
+    179,
+    174,
+    182
+   ],
+   "momentaryMaxLufs": -35
+  },
+  "ping-self": {
+   "event": "Faire signe: ton repère, la tasse frappée (sol, do)",
+   "bus": "effects",
+   "priority": 1,
+   "files": [
+    "base/joueurs/ping-self.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 4.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 60.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -5.0
+   },
+   "looping": false,
+   "durationMs": [
+    757
+   ],
+   "momentaryMaxLufs": -19
+  },
+  "ping-peer": {
+   "event": "Le repère de l'autre: le bol de bois, une octave plus bas",
+   "bus": "effects",
+   "priority": 1,
+   "files": [
+    "base/joueurs/ping-peer.ogg"
+   ],
+   "group": "base/joueurs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 4.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 60.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -5.0
+   },
+   "looping": false,
+   "durationMs": [
+    712
+   ],
+   "momentaryMaxLufs": -19
+  },
+  "ui-confirm": {
+   "event": "Valider: un tok de porcelaine",
+   "bus": "interface",
+   "priority": 3,
+   "files": [
+    "base/interface/ui-confirm-1.ogg",
+    "base/interface/ui-confirm-2.ogg",
+    "base/interface/ui-confirm-3.ogg"
+   ],
+   "group": "base/interface",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    159,
+    155,
+    150
+   ],
+   "momentaryMaxLufs": -23
+  },
+  "ui-back": {
+   "event": "Revenir, fermer: une feuille qui glisse, un tok plus mat",
+   "bus": "interface",
+   "priority": 3,
+   "files": [
+    "base/interface/ui-back-1.ogg",
+    "base/interface/ui-back-2.ogg"
+   ],
+   "group": "base/interface",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    123,
+    127
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "ui-refusal": {
+   "event": "Refus doux: un double toc feutré, à la même hauteur",
+   "bus": "interface",
+   "priority": 2,
+   "files": [
+    "base/interface/ui-refusal-1.ogg",
+    "base/interface/ui-refusal-2.ogg"
+   ],
+   "group": "base/interface",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    186,
+    187
+   ],
+   "momentaryMaxLufs": -24
+  },
+  "ui-notify": {
+   "event": "Notification: deux notes de porcelaine (mi, sol)",
+   "bus": "interface",
+   "priority": 2,
+   "files": [
+    "base/interface/ui-notify.ogg"
+   ],
+   "group": "base/interface",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": -3.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    615
+   ],
+   "momentaryMaxLufs": -21
+  },
+  "murmur-table": {
+   "event": "Rumeur d'une table: conversation sans mots, avec ses tasses",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "base/salle/murmur-table-1.ogg",
+    "base/salle/murmur-table-2.ogg",
+    "base/salle/murmur-table-3.ogg",
+    "base/salle/murmur-table-4.ogg"
+   ],
+   "group": "base/salle",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.5,
+    "rolloffFactor": 1.0,
+    "maxDistance": 14.0,
+    "cullBeyondM": 14.0
+   },
+   "looping": true,
+   "durationMs": [
+    6000,
+    6000,
+    6000,
+    6000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 6.25,
+    "startSample": 6000,
+    "endSample": 150000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -36,
+   "note": "une boucle par table d'au moins deux clients, six au plus, départ tiré, vitesse plus ou moins 5 %"
+  },
+  "murmur-room-calm": {
+   "event": "Nappe de salle, peu de monde (3 à 7 clients)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "base/salle/murmur-room-calm.ogg"
+   ],
+   "group": "base/salle",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    10000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 10.25,
+    "startSample": 6000,
+    "endSample": 246000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -38,
+   "note": "jouée deux fois (gauche, droite), décalée de 5 s"
+  },
+  "murmur-room-busy": {
+   "event": "Nappe de salle, bien remplie (7 à 12 clients)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "base/salle/murmur-room-busy.ogg"
+   ],
+   "group": "base/salle",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    10000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 10.25,
+    "startSample": 6000,
+    "endSample": 246000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -35,
+   "note": "jouée deux fois (gauche, droite), décalée de 5 s"
+  },
+  "murmur-room-rush": {
+   "event": "Nappe de salle, coup de feu (12 clients et plus)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "base/salle/murmur-room-rush.ogg"
+   ],
+   "group": "base/salle",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    10000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 10.25,
+    "startSample": 6000,
+    "endSample": 246000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -33,
+   "note": "plafond: toute la rumeur sous -28 LUFS en momentanée (son.md, 8.3.6)"
+  },
+  "ext-village-morning": {
+   "event": "La place du Tilleul le matin: fontaine, tilleul, moineaux au loin",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-morning.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    12000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 12.25,
+    "startSample": 6000,
+    "endSample": 294000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -34,
+   "note": "dedans: sort de la porte et des vitrines (plan.doorFilter); dehors: doublée gauche et droite, décalée de 6 s"
+  },
+  "ext-village-evening": {
+   "event": "La place du Tilleul en fin d'après-midi: plus calme, la vallée au loin",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-evening.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    12000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 12.25,
+    "startSample": 6000,
+    "endSample": 294000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -35
+  },
+  "ext-village-sparrows": {
+   "event": "Moineaux sur la place",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-sparrows-1.ogg",
+    "adresses/village/ext-village-sparrows-2.ogg",
+    "adresses/village/ext-village-sparrows-3.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    1660,
+    1693,
+    1818
+   ],
+   "momentaryMaxLufs": -32
+  },
+  "ext-village-blackbird": {
+   "event": "Le merle chante dans le tilleul (surtout le soir)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-blackbird-1.ogg",
+    "adresses/village/ext-village-blackbird-2.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 32000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    1552,
+    1730
+   ],
+   "momentaryMaxLufs": -33
+  },
+  "ext-village-moped": {
+   "event": "Une mobylette passe au loin",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-moped.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    3979
+   ],
+   "momentaryMaxLufs": -34
+  },
+  "ext-village-bakery-door": {
+   "event": "La porte de la boulangerie d'en face et son grelot (sol)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-bakery-door.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    1243
+   ],
+   "momentaryMaxLufs": -33
+  },
+  "ext-village-coach": {
+   "event": "Le car départemental s'arrête devant la fontaine et repart",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/ext-village-coach.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    5943
+   ],
+   "momentaryMaxLufs": -33
+  },
+  "ext-village-church-bell": {
+   "event": "Un coup de la cloche de l'église (midi: douze coups, un toutes les 1,6 s)",
+   "bus": "ambience",
+   "priority": 3,
+   "files": [
+    "adresses/village/ext-village-church-bell.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 2,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    2164
+   ],
+   "momentaryMaxLufs": -30,
+   "note": "hauteur fixe (sol)"
+  },
+  "room-village": {
+   "event": "La pièce: souffle de la salle vide (poutres et tomettes)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/room-village.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    6000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 6.25,
+    "startSample": 6000,
+    "endSample": 150000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -48
+  },
+  "clock-tick-village": {
+   "event": "Pendule: le tic-tac",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "adresses/village/clock-tick-village.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 6.0,
+    "cullBeyondM": 6.0
+   },
+   "looping": true,
+   "durationMs": [
+    2000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 2.25,
+    "startSample": 6000,
+    "endSample": 54000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -44
+  },
+  "clock-chime-village": {
+   "event": "Pendule: midi et la dernière heure du service (ré, la, do, sol)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "adresses/village/clock-chime-village.ogg"
+   ],
+   "group": "adresses/village",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 3.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 40.0,
+    "cullBeyondM": 100000.0,
+    "minGainDb": -7.0
+   },
+   "looping": false,
+   "durationMs": [
+    2525
+   ],
+   "momentaryMaxLufs": -23,
+   "note": "hauteur fixe"
+  },
+  "fridge-hum-loop": {
+   "event": "Le vieux réfrigérateur ronronne",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "base/reserve/fridge-hum-loop.ogg"
+   ],
+   "group": "base/reserve",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 6.0,
+    "cullBeyondM": 6.0
+   },
+   "looping": true,
+   "durationMs": [
+    3000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 3.25,
+    "startSample": 6000,
+    "endSample": 78000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -44
+  },
+  "rain-street": {
+   "event": "Pluie dans la rue (dehors, et par la porte ouverte)",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "moments/pluie/rain-street.ogg"
+   ],
+   "group": "moments/pluie",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    8000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 8.25,
+    "startSample": 6000,
+    "endSample": 198000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -32
+  },
+  "rain-glass": {
+   "event": "Pluie sur les vitrines, du dedans",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "moments/pluie/rain-glass.ogg"
+   ],
+   "group": "moments/pluie",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 20.0,
+    "cullBeyondM": 20.0
+   },
+   "looping": true,
+   "durationMs": [
+    8000
+   ],
+   "loop": {
+    "startSeconds": 0.25,
+    "endSeconds": 8.25,
+    "startSample": 6000,
+    "endSample": 198000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.25,
+   "integratedLufs": -37
+  },
+  "service-open": {
+   "event": "Le service commence: le motif de la maison (sol, la, do, ré, do)",
+   "bus": "interface",
+   "priority": 1,
+   "files": [
+    "airs/service-open.ogg"
+   ],
+   "group": "airs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": -4.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    2081
+   ],
+   "momentaryMaxLufs": -19
+  },
+  "service-close": {
+   "event": "Le service se termine: le motif qui se pose",
+   "bus": "interface",
+   "priority": 1,
+   "files": [
+    "airs/service-close.ogg"
+   ],
+   "group": "airs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": -4.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    2332
+   ],
+   "momentaryMaxLufs": -20
+  },
+  "event-fanfare": {
+   "event": "Fanfare légère: un événement de la journée (défi, fête, bonne nouvelle)",
+   "bus": "interface",
+   "priority": 1,
+   "files": [
+    "airs/event-fanfare.ogg"
+   ],
+   "group": "airs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": -6.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    5560
+   ],
+   "momentaryMaxLufs": -19
+  },
+  "special-guest": {
+   "event": "Un client spécial entre (le guide, un habitué attendu): motif mystérieux et bienveillant",
+   "bus": "interface",
+   "priority": 1,
+   "files": [
+    "airs/special-guest.ogg"
+   ],
+   "group": "airs",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": -6.0,
+   "channels": 2,
+   "spatial": null,
+   "looping": false,
+   "durationMs": [
+    6900
+   ],
+   "momentaryMaxLufs": -20
+  },
+  "market-bell": {
+   "event": "La clochette à main du marché, au loin (sol)",
+   "bus": "ambience",
+   "priority": 3,
+   "files": [
+    "moments/marche/market-bell.ogg"
+   ],
+   "group": "moments/marche",
+   "decodeSampleRate": 32000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    2600
+   ],
+   "momentaryMaxLufs": -28,
+   "note": "Ormeval n'a pas de marché (cahier, TE-09): à jouer pour une tournée de marchand ambulant ou à Mérelles"
+  }
+ },
  "music": {
   "campagne-1": {
    "event": "radio du village",

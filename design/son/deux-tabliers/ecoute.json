@@ -1,0 +1,647 @@
+[
+ {
+  "id": "grinder-start",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "grinder-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "grinder-empty-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "grinder-stop",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "doser-clack",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "tamp",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "portafilter-lock",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "portafilter-unlock",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "knock-box",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "pump-start",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "extraction-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "extraction-thin-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "extraction-stop",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "espresso-idle-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "espresso-warmup",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "steam-purge",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "steam-aerate-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "steam-roll-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "steam-sing-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "steam-hot-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "steam-auto-stop",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "pitcher-set",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "milk-pour",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "kettle-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "kettle-click",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "vitrine-open",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "vitrine-close",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "tongs",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "paper-bag",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tap-on",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "tap-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "tap-off",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "dish-wash",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "dish-rack",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "dishwasher-open",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "dishwasher-close",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "dishwasher-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "dishwasher-done",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "radio-on",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "radio-off",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "radio-tune",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "radio-knob",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "radio-hiss-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "pour-thin-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "pour-thick-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "pour-end",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "cup-saucer",
+  "variants": 4,
+  "loop": false
+ },
+ {
+  "id": "cup-set",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "spoon-stir",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "spoon-set",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "plate-set",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tray-set",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "clear-table",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "till-open",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "till-close",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "coins-hand",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "coins-drawer",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tip-saucer",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tip-jar-1",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tip-jar-2",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tip-jar-3",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tip-big",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "door-open-village",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "door-close-village",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "door-bell-village",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "door-inner-village",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "delivery-knock",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "milk-crate",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "bread-basket",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "coffee-sack",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "carton-set",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "carton-open",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "crate-set",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "shelf-place",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "furniture-pick",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "furniture-place-wood",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "furniture-place-soft",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "furniture-slide",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "furniture-rotate",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "furniture-refuse",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "carry-grab",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "carry-wait",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "carry-lift",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "carry-creak",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "chalk-tick",
+  "variants": 4,
+  "loop": false
+ },
+ {
+  "id": "chalk-stroke",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "chalk-erase",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "slate-street-set",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "ticket-new",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "ticket-take",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "ticket-done",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "guestbook-open",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "guestbook-page",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "tablet-wake",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "tablet-tap",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "tablet-swipe",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "tablet-sleep",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "step-tile",
+  "variants": 4,
+  "loop": false
+ },
+ {
+  "id": "step-wood",
+  "variants": 4,
+  "loop": false
+ },
+ {
+  "id": "step-stone",
+  "variants": 4,
+  "loop": false
+ },
+ {
+  "id": "ping-self",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "ping-peer",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "ui-confirm",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "ui-back",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "ui-refusal",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "ui-notify",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "murmur-table",
+  "variants": 4,
+  "loop": true
+ },
+ {
+  "id": "murmur-room-calm",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "murmur-room-busy",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "murmur-room-rush",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "ext-village-morning",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "ext-village-evening",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "ext-village-sparrows",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "ext-village-blackbird",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "ext-village-moped",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "ext-village-bakery-door",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "ext-village-coach",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "ext-village-church-bell",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "room-village",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "clock-tick-village",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "clock-chime-village",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "fridge-hum-loop",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "rain-street",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "rain-glass",
+  "variants": 1,
+  "loop": true
+ },
+ {
+  "id": "service-open",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "service-close",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "event-fanfare",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "special-guest",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "market-bell",
+  "variants": 1,
+  "loop": false
+ }
+]

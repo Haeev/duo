@@ -77,6 +77,19 @@ def graine(texte: str) -> int:
     return zlib.crc32(texte.encode("utf-8"))
 
 
+def souffle_de_raccord(x: np.ndarray, rng: np.random.Generator) -> np.ndarray:
+    """Un fond de boucle très lisse (presque rien au-dessus de 2,5 kHz) laisse le bruit de codage
+    Vorbis marquer le raccord (carnet, LPL 0.13); un souffle aigu périodique 22 dB sous le fond,
+    de 2,5 à 10 kHz, le couvre sans s'entendre."""
+    m = dsp.mono(x)
+    f = np.fft.rfftfreq(len(m), 1.0 / dsp.SR)
+    p = np.abs(np.fft.rfft(m)) ** 2
+    if p[f > 2500].sum() / (p.sum() + 1e-20) > 0.02:
+        return x
+    souffle = dsp.bruit_spectral(len(m), rng, -3.0, 2500, 10000) * np.sqrt(np.mean(m ** 2)) * 10 ** (-22 / 20)
+    return x + (souffle if x.ndim == 1 else souffle[:, None])
+
+
 def traiter(son: Son, v: int) -> np.ndarray:
     rng = np.random.default_rng(graine(f"{son.id}/{v}"))
     x = son.fabrique(v, rng)
@@ -84,6 +97,7 @@ def traiter(son: Son, v: int) -> np.ndarray:
     if son.boucle:
         if son.passe_haut > 0:
             x = dsp.circ(lambda y: dsp.ph(y, son.passe_haut, 2), x)
+        x = souffle_de_raccord(x, rng)
         x = dsp.amener_integree(x, son.sonie, circulaire=True)
         tp = dsp.crete_vraie_db(np.concatenate([x, x[:4800]]))
         if tp > PLAFOND_DBTP:
@@ -185,7 +199,10 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> dict:
         wav = tmp / f"{id_}.wav"
         dsp.ecrire_wav(wav, y)
         dsp.encoder_opus(wav, fichier, DEBIT_MUSIQUE)
-        dsp.encoder_m4a(wav, DESIGN / "musiques" / f"{id_}.m4a", DEBIT_M4A, f"Deux Tabliers: {m.titre}")
+        # Copie d'écoute 2 dB plus bas: l'AAC dépasse la crête de la source (mesuré: -0,4 dBTP à 0 dB, -0,7 à -1 dB).
+        wav_m4a = tmp / f"{id_}-m4a.wav"
+        dsp.ecrire_wav(wav_m4a, y * 10 ** (-2 / 20))
+        dsp.encoder_m4a(wav_m4a, DESIGN / "musiques" / f"{id_}.m4a", DEBIT_M4A, f"Deux Tabliers: {m.titre}")
         d = {"event": infos.get("screen", "radio du village"), "bus": "music",
              "file": f"musique/{dossier}/{id_}.ogg", "codec": "opus", "streamed": True, "loop": None,
              "durationSeconds": round(len(y) / dsp.SR, 3), "tempoBpm": m.tempo,

@@ -33,8 +33,9 @@ RACINE = os.path.normpath(os.path.join(SRC, "..", "..", "..", ".."))
 ASSETS = os.path.normpath(os.path.join(SRC, "..", "..", "assets", "modeles"))
 TEXDIR = os.path.join(ASSETS, "textures")
 
-# Variante B de l'essai: chanfreins de la bible x 0,18 (3 à 5 mm), pièces rondes à 2 fois les pans, lissage à 40 degrés
-STYLE_B = G.Style("B", 0.18, 0.002, 1, 1, 2.0, True, 40)
+# Variante B de l'essai: chanfreins de la bible x 0,18 (3 à 5 mm), lissage à 40 degrés. Les pans des pièces rondes
+# restent ceux de la bible (x 1): les budgets de triangles C8 de la technique priment; le lissage arrondit à l'oeil.
+STYLE_B = G.Style("B", 0.18, 0.002, 1, 1, 1.0, True, 40)
 G.set_style(STYLE_B)
 
 
@@ -85,7 +86,10 @@ EXTRA = {
     "sage_paint": C["village_counter"], "slate_frame": C["oak_dark"], "cardboard": C["kraft"], "tape": "#C9A86A", "label": C["paper"],
     "chocolate_bar": C["chocolate"], "glaze_apricot": "#D9963F", "apricot": "#E0A040", "custard": "#E9C77A", "pastry": C["crust"],
     "leaf_dark": "#46623A", "flower_white": "#EEE8DA", "flower_yellow": "#E1B64A", "flower_rose": "#C98A8C",
-    "bulb": C["lamp_shade"], "screen": "#2E3436", "rubber": "#2B2B2D", "fridge_white": "#E4E0D6",
+    "bulb": C["lamp_shade"], "flower_red": "#B8453B", "lemon": "#E3C04A", "olive_green": "#6F7A4A", "soil": "#4A3A2E",
+    "faience_white": "#ECE6D8", "faience_blue": "#5D7FA3", "enamel_white": "#E9E5DA", "gold": "#C9A24E", "book_red": "#8E3B35", "book_green": "#3F5E48",
+    "book_blue": "#3E5068", "book_ochre": "#B08A3E", "poster_sky": "#D9C9A0", "poster_tree": "#5E7A45", "poster_ground": "#B07A4A", "paper_old": "#E6D8B8",
+    "wicker_dark": "#8C6A3E", "bottle_green_glass": "#4E6B52", "child_red": "#C0504A", "child_yellow": "#E0B640", "child_blue": "#5C86B0", "felt": "#7A6F64", "screen": "#2E3436", "rubber": "#2B2B2D", "fridge_white": "#E4E0D6",
 }
 
 # tuiles de matière: nom -> (générateur, teinte, rugosité, métal, mètres par tuile)
@@ -93,19 +97,19 @@ TUILES = [
     ("palette", None, None, None, None, None),
     ("oak_campagne", "bois", C["campagne_oak"], 0.55, 0.0, 1.0),
     ("wood_bistrot", "bois", C["bistrot_wood"], 0.38, 0.0, 1.0),
-    ("ash_nordique", "bois", C["nordique_ash"], 0.6, 0.0, 1.0),
+    ("rattan", "rotin", C["jardin_rattan"], 0.7, 0.0, 0.5),
     ("walnut", "bois", C["walnut"], 0.38, 0.0, 1.0),
     ("straw", "paille", C["campagne_straw"], 0.85, 0.0, 0.5),
     ("linen", "lin", C["campagne_linen"], 0.9, 0.0, 0.5),
     ("moleskine", "cuir", C["bistrot_moleskine"], 0.45, 0.0, 1.0),
-    ("wool", "laine", C["nordique_wool"], 0.95, 0.0, 0.5),
+    ("leather", "cuir", C["atelier_leather"], 0.5, 0.0, 1.0),
     ("marble", "marbre", C["bistrot_marble"], 0.2, 0.0, 1.0),
     ("terracotta", "terre", C["campagne_clay"], 0.8, 0.0, 0.5),
-    ("rug_bistrot", "tapis_losanges", None, 0.95, 0.0, 1.0),
+    ("jonc", "jonc", C["jardin_tile"], 0.9, 0.0, 1.0),
     ("stripes", "rayures", None, 0.85, 0.0, 1.0),
     ("zinc", "zinc", C["bistrot_zinc"], 0.45, 0.8, 1.0),
     ("kraft", "kraft", C["kraft"], 0.9, 0.0, 0.5),
-    ("rug_campagne", "tapis_chiffons", None, 0.95, 0.0, 1.0),
+    ("lirette", "tapis_chiffons", None, 0.95, 0.0, 1.0),
 ]
 TUILE_INDEX = {t[0]: i for i, t in enumerate(TUILES)}
 
@@ -139,6 +143,8 @@ class Atlas:
         return 0.72, 0.0
 
     def cell_uv(self, key):
+        if key not in self.cells and getattr(self, "gele", False):
+            raise KeyError(f"case de palette absente de CASES_FIXES (l'atlas est partagé): {key}")
         if key not in self.cells:
             self.cells[key] = len(self.cells)
             if len(self.cells) > 32 * 32:
@@ -166,12 +172,16 @@ CASES_FIXES = ["porcelain", "rim", "paper", "milk", "ink", "espresso", "crema", 
                "apricot", "custard", "pastry", "leaf_dark", "flower_white", "flower_yellow", "flower_rose", "bulb", "screen", "rubber",
                "fridge_white", "campagne_oak", "campagne_linen", "campagne_clay", "campagne_sage", "campagne_faience", "campagne_straw",
                "bistrot_moleskine", "bistrot_wood", "bistrot_brass", "bistrot_zinc", "bistrot_tile_dark", "bistrot_tile_light", "bistrot_marble",
-               "nordique_ash", "nordique_white", "nordique_wool", "nordique_blue", "nordique_rose", "nordique_fir", "house_bottle",
+               "nordique_ash", "nordique_white", "nordique_wool", "nordique_blue", "nordique_rose", "nordique_fir", "jardin_leaf", "jardin_water", "jardin_tile", "atelier_leather", "retro_orange", "retro_cream", "retro_mustard", "atelier_workblue", "house_bottle",
                "house_bordeaux", "house_mustard", "house_terracotta", "village_counter", "village_beam", "plaster", "marble_dark",
                "citrus", "season_autumn_leaf", "jardin_iron", "jardin_rattan", "jardin_pot", "shadow_contact", "village_stone", "village_shutter",
-               "top_light_cream", "presses_coat", "familles_sky", "gourmands_raspberry", "promeneurs_forest", "lamp_warm"]
+               "top_light_cream", "presses_coat", "familles_sky", "gourmands_raspberry", "promeneurs_forest", "lamp_warm",
+               "pq_mirror", "flower_red", "lemon", "olive_green", "soil", "faience_white", "faience_blue", "enamel_white", "gold", "book_red",
+               "book_green", "book_blue", "book_ochre", "poster_sky", "poster_tree", "poster_ground", "paper_old", "wicker_dark", "bottle_green_glass",
+               "child_red", "child_yellow", "child_blue", "felt", "village_bark", "village_shelf", "village_stone_shade", "village_roof", "village_water", "village_tree", "village_paving"]
 for _k in CASES_FIXES:
     ATLAS.cell_uv(_k)
+ATLAS.gele = True
 
 
 # --- générateurs supplémentaires (en plus de ceux de l'essai: bois, paille, chaux, peinture, pierre, pavés, tomettes, faïence)
@@ -243,6 +253,29 @@ def gen_rayures(n=512, seed=35):
     return l2s(col)
 
 
+def gen_rotin(n=512, seed=41):
+    """Rotin tressé: brins diagonaux serrés, contraste doux."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:n, 0:n] / n
+    k = 24
+    a = 0.5 + 0.5 * np.cos(((x + y) * k) * 2 * math.pi)
+    b = 0.5 + 0.5 * np.cos(((x - y) * k) * 2 * math.pi)
+    over = (((x + y) * k / 2) % 1.0) < 0.5
+    v = 0.8 + 0.12 * np.where(over, a, b) + 0.03 * _noise((n, n), 0.8, rng)
+    return np.stack([v, v * 0.98, v * 0.93], -1)
+
+
+def gen_jonc(n=512, seed=43):
+    """Tapis de jonc: tresses parallèles de 4 cm, bordure plus sombre."""
+    rng = np.random.default_rng(seed)
+    y, x = np.mgrid[0:n, 0:n] / n
+    k = 25
+    rope = np.abs(((y * k) % 1.0) - 0.5) * 2
+    twist = 0.5 + 0.5 * np.cos((x * 60 + (np.floor(y * k) % 2) * 0.5) * 2 * math.pi)
+    v = 0.78 + 0.1 * (1 - rope ** 2) + 0.06 * twist + 0.03 * _noise((n, n), 1.0, rng)
+    return np.stack([v, v * 0.97, v * 0.88], -1)
+
+
 def gen_tapis_losanges(n=512, seed=37):
     """Tapis du bistrot: losanges bordeaux et crème, bordure sombre (tuile d'un mètre)."""
     rng = np.random.default_rng(seed)
@@ -269,7 +302,7 @@ def gen_tapis_chiffons(n=512, seed=39):
 
 
 GENS = {"bois": TX.bois, "paille": TX.paille, "lin": gen_lin, "cuir": gen_cuir, "laine": gen_laine, "marbre": gen_marbre, "terre": gen_terre,
-        "zinc": gen_zinc, "kraft": gen_kraft, "rayures": gen_rayures, "tapis_losanges": gen_tapis_losanges, "tapis_chiffons": gen_tapis_chiffons}
+        "zinc": gen_zinc, "kraft": gen_kraft, "rayures": gen_rayures, "rotin": gen_rotin, "jonc": gen_jonc, "tapis_losanges": gen_tapis_losanges, "tapis_chiffons": gen_tapis_chiffons}
 
 
 def construire_atlas():
@@ -404,7 +437,7 @@ def _islands(bm, keys):
     return out
 
 
-def finir(geo, coll=None, seed=1):
+def finir(geo, coll=None, seed=1, tiled=None, matfn=None):
     """Crée l'objet Blender d'un Geo: lissage de la variante B, UV de l'atlas (case de palette au centre pour les clés
     simples; projection en mètres pour les tuiles, chaque îlot placé dans sa tuile à un décalage tiré au sort)."""
     rng = random.Random(seed)
@@ -420,6 +453,17 @@ def finir(geo, coll=None, seed=1):
     proj = {}
     for f in bm.faces:
         k = keys[f.material_index]
+        if tiled and k in tiled:
+            n = f.normal
+            ax = max(range(3), key=lambda i: abs(n[i]))
+            a, b = {2: (0, 1), 1: (0, 2), 0: (1, 2)}[ax]
+            g = f[gl] - 1
+            if g == b:
+                a, b = b, a
+            sc = tiled[k]
+            for lp in f.loops:
+                lp[uv].uv = (lp.vert.co[a] * sc, lp.vert.co[b] * sc)
+            continue
         if not k.startswith("t:"):
             c = ATLAS.cell_uv(k) if k not in ("glass", "glow") else (0.5, 0.5)
             for lp in f.loops:
@@ -463,7 +507,7 @@ def finir(geo, coll=None, seed=1):
     # matériaux: un par famille
     fam = []
     for k in keys:
-        fam.append({"glass": mat_verre, "glow": mat_lampe}.get(k, mat_meubles)())
+        fam.append(matfn(k) if matfn else {"glass": mat_verre, "glow": mat_lampe}.get(k, mat_meubles)())
     uniq = []
     remap = []
     for m in fam:
@@ -574,9 +618,10 @@ def exporter_glb(objs, chemin, extras=None, externes=True):
     g["buffers"][0]["byteLength"] = len(data)
     for im in g.get("images", []):
         base = os.path.splitext(os.path.basename(im.get("uri", "")))[0]
-        if externes and base in URIS:
-            im["uri"] = URIS[base]
-            im["mimeType"] = "image/jpeg" if URIS[base].endswith(".jpg") else "image/png"
+        ext_file = next((f for f in sorted(os.listdir(TEXDIR)) if os.path.splitext(f)[0] == base), None) if os.path.isdir(TEXDIR) else None
+        if externes and ext_file:
+            im["uri"] = "textures/" + ext_file
+            im["mimeType"] = "image/jpeg" if ext_file.endswith(".jpg") else "image/png"
         else:
             # image propre au modèle: on l'embarque
             with open(os.path.join(tmp, im["uri"]), "rb") as fh:

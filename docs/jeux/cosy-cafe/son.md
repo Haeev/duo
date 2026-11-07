@@ -1015,6 +1015,13 @@ Je ne peux pas écouter: chaque son se prouve par la mesure, avant que le client
 - Mémoire par groupe de décodage et poids total recalculés à chaque génération (le contrôle échoue au-delà des plafonds de 8.8).
 - Rumeur: niveau de la rumeur pleine contre celui des gestes au banc (la rumeur reste 4 dB au moins sous le geste le plus discret de priorité 2).
 
+### 8.9.4 Démo d'Ormeval (Deux Tabliers), livrée le 2026-11-08
+
+- **Où**: le jeu s'appelle désormais Deux Tabliers; les chemins `games/cosy-cafe/` de ce document deviennent `games/deux-tabliers/`. Sons et musiques dans `games/deux-tabliers/assets/son/`, définitions dans `sons.json` (généré), sources dans `games/deux-tabliers/assets-src/son/` (`generer.py` régénère tout, `controler.py` mesure), copies d'écoute dans `design/son/deux-tabliers/`.
+- **Contenu**: les postes du café d'Ormeval (moulin, porte-filtre, extraction, vapeur selon la température, bouilloire, vitrine, plonge et lave-vaisselle, radio), le service, la caisse et les pourboires, la porte et sa clochette, la livraison et la réserve, les meubles et le port à deux, l'ardoise, les tickets, la tablette, le livre d'or, les pas, les repères, l'interface, la rumeur, la place du Tilleul (matin, fin d'après-midi, événements), la pluie, la pendule, les airs du service, une fanfare légère, un client spécial, la clochette du marché; quatre morceaux de la radio (« Les Prés » n° 1 et 3, « Le Zinc » n° 1 et 4), le thème du titre en version courte (1 min) et le jingle du bilan (16 s).
+- **Écarts à ce document**: `furniture-slide` (glisser un meuble sur les tomettes) ajouté; la nappe de salle en trois densités (`murmur-room-calm`, `-busy`, `-rush`) au lieu d'une seule; le clocher en un coup (`ext-village-church-bell`) répété douze fois à midi au lieu d'un fichier long; `market-bell` alors qu'Ormeval n'a pas de marché (cahier, TE-09); musiques en Ogg Opus avec l'extension `.ogg` (même conteneur que les sons, lu par Chromium), pas `.opus`.
+- **Décodage**: les fichiers sont encodés à leur fréquence de décodage (24 ou 32 kHz, champ `decodeSampleRate`). Tant que le SDK décode dans son contexte principal (48 kHz), chaque son coûte deux fois plus de mémoire que prévu: le contrôle donne les deux chiffres.
+
 ## 8.10 À écouter en priorité chez le client
 
 1. **La buse vapeur** de bout en bout: entend-on le bon moment sans regarder ?
@@ -1062,3 +1069,4 @@ Je ne peux pas écouter: chaque son se prouve par la mesure, avant que le client
 | Date | Version | Changement | Auteur |
 |---|---|---|---|
 | 2026-11-07 | 0.1 | Première version: intention et piliers, palette et tonalité, ambiances des cinq adresses et des moments, rumeur, musique diégétique (appareils, six listes, 24 morceaux, écrans), événements sonores, information et même pièce, mixage, mémoire et poids, plan de production | sound-designer |
+| 2026-11-08 | 0.2 | Production de la démo d'Ormeval (Deux Tabliers): section 8.9.4 | sound-designer |

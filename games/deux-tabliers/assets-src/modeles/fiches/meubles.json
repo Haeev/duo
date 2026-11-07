@@ -1,0 +1,1767 @@
+{
+ "chaise_paillee": {
+  "id": "chaise_paillee",
+  "nom": "Chaise paillée",
+  "fichier": "chaise_paillee.glb",
+  "famille": "chaise",
+  "style": "campagne",
+  "categorie": "chaise",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.453,
+   "y": 0.901,
+   "z": 0.447
+  },
+  "triangles": 594,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "chaise_paillee"
+  ],
+  "poids_octets": 57612,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.45,
+     0.02
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ],
+  "meshy": "essai-style (furn_chair_campagne, tâche 01a1b7c5-0d20-7475-93dd-5a36ff5456fe)"
+ },
+ "gueridon_marbre": {
+  "id": "gueridon_marbre",
+  "nom": "Guéridon de marbre",
+  "fichier": "gueridon_marbre.glb",
+  "famille": "gueridon",
+  "style": "bistrot",
+  "categorie": "table",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.61,
+   "y": 0.75,
+   "z": 0.61
+  },
+  "triangles": 470,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "gueridon_marbre"
+  ],
+  "poids_octets": 29448,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": {
+   "hauteur": 0.75,
+   "forme": "rond",
+   "largeur_x": 0.6,
+   "profondeur_z": 0.6
+  },
+  "places": 2
+ },
+ "horloge_ecole": {
+  "id": "horloge_ecole",
+  "nom": "Horloge d'école",
+  "fichier": "horloge_ecole.glb",
+  "famille": "horloge",
+  "style": "neutre",
+  "categorie": "horloge",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 0.35,
+   "y": 0.35,
+   "z": 0.066
+  },
+  "triangles": 380,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "horloge_ecole"
+  ],
+  "poids_octets": 31004,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "heure fixe (7 h): aiguilles fixes en v0.1"
+ },
+ "tabouret_bois": {
+  "id": "tabouret_bois",
+  "nom": "Tabouret de bois",
+  "fichier": "tabouret_bois.glb",
+  "famille": "tabouret",
+  "style": "campagne",
+  "categorie": "tabouret",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.378,
+   "y": 0.752,
+   "z": 0.378
+  },
+  "triangles": 316,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "tabouret_bois"
+  ],
+  "poids_octets": 23624,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.75,
+     0
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ],
+  "note": "assise de comptoir (0,75 m) pour la tablette de 1,10 m"
+ },
+ "table_basse_malle": {
+  "id": "table_basse_malle",
+  "nom": "Table basse malle",
+  "fichier": "table_basse_malle.glb",
+  "famille": "table",
+  "style": "campagne",
+  "categorie": "table",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.816,
+   "y": 0.454,
+   "z": 0.474
+  },
+  "triangles": 572,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "table_basse_malle"
+  ],
+  "poids_octets": 47488,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": {
+   "hauteur": 0.45,
+   "forme": "rect",
+   "largeur_x": 0.8,
+   "profondeur_z": 0.45
+  },
+  "places": 0,
+  "note": "table basse des fauteuils"
+ },
+ "table_ferme": {
+  "id": "table_ferme",
+  "nom": "Table de ferme",
+  "fichier": "table_ferme.glb",
+  "famille": "table",
+  "style": "campagne",
+  "categorie": "table",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.2,
+   "y": 0.75,
+   "z": 0.7
+  },
+  "triangles": 332,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "table_ferme"
+  ],
+  "poids_octets": 24888,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": {
+   "hauteur": 0.75,
+   "forme": "rect",
+   "largeur_x": 1.2,
+   "profondeur_z": 0.7
+  },
+  "places": 4
+ },
+ "banc_ferme": {
+  "id": "banc_ferme",
+  "nom": "Banc de ferme",
+  "fichier": "banc_ferme.glb",
+  "famille": "banc",
+  "style": "campagne",
+  "categorie": "banc",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.4,
+   "y": 0.45,
+   "z": 0.36
+  },
+  "triangles": 264,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "banc_ferme"
+  ],
+  "poids_octets": 22280,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     -0.35,
+     0.45,
+     0
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   },
+   {
+    "position": [
+     0.35,
+     0.45,
+     0
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ],
+  "note": "sans dossier: on s'y assoit des deux côtés (avant déclaré au sud)"
+ },
+ "fauteuil_crapaud": {
+  "id": "fauteuil_crapaud",
+  "nom": "Fauteuil crapaud",
+  "fichier": "fauteuil_crapaud.glb",
+  "famille": "fauteuil",
+  "style": "campagne",
+  "categorie": "fauteuil",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.761,
+   "y": 0.83,
+   "z": 0.754
+  },
+  "triangles": 416,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "fauteuil_crapaud"
+  ],
+  "poids_octets": 30136,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.46,
+     0.06
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ]
+ },
+ "suspension_osier": {
+  "id": "suspension_osier",
+  "nom": "Suspension en osier",
+  "fichier": "suspension_osier.glb",
+  "famille": "suspension",
+  "style": "campagne",
+  "categorie": "luminaire",
+  "accroche": "plafond",
+  "dimensions_m": {
+   "x": 0.45,
+   "y": 0.7,
+   "z": 0.439
+  },
+  "triangles": 432,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "suspension_osier",
+   "suspension_osier_glow"
+  ],
+  "poids_octets": 21756,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "lumiere": [
+   0,
+   -0.62,
+   0
+  ],
+  "note": "abat-jour de 0,45 x 0,35 m et cordon de 0,35 m: bas à 2,10 m sous un plafond de 2,80 m"
+ },
+ "etagere_pots": {
+  "id": "etagere_pots",
+  "nom": "Étagère à pots",
+  "fichier": "etagere_pots.glb",
+  "famille": "etagere",
+  "style": "campagne",
+  "categorie": "etagere",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 1.0,
+   "y": 0.9,
+   "z": 0.24
+  },
+  "triangles": 252,
+  "budget_triangles": 1000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "etagere_pots"
+  ],
+  "poids_octets": 20600,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": [
+   {
+    "hauteur": 0.045,
+    "largeur_x": 0.95,
+    "profondeur_z": 0.2,
+    "centre_z": 0.13
+   },
+   {
+    "hauteur": 0.405,
+    "largeur_x": 0.95,
+    "profondeur_z": 0.2,
+    "centre_z": 0.13
+   },
+   {
+    "hauteur": 0.9,
+    "largeur_x": 1.0,
+    "profondeur_z": 0.23,
+    "centre_z": 0.12
+   }
+  ]
+ },
+ "chaise_cintree": {
+  "id": "chaise_cintree",
+  "nom": "Chaise cintrée",
+  "fichier": "chaise_cintree.glb",
+  "famille": "chaise",
+  "style": "bistrot",
+  "categorie": "chaise",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.401,
+   "y": 0.892,
+   "z": 0.463
+  },
+  "triangles": 560,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "chaise_cintree"
+  ],
+  "poids_octets": 46584,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.45,
+     0.02
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ]
+ },
+ "tabourets_zinc": {
+  "id": "tabourets_zinc",
+  "nom": "Tabouret de comptoir zinc (équipement, vendu par deux)",
+  "fichier": "tabourets_zinc.glb",
+  "famille": "tabourets",
+  "style": "bistrot",
+  "categorie": "tabouret",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.36,
+   "y": 0.756,
+   "z": 0.36
+  },
+  "triangles": 362,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "tabourets_zinc"
+  ],
+  "poids_octets": 24876,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.75,
+     0
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ],
+  "note": "assise à 0,75 m: pour la tablette de 1,10 m. L'équipement en compte deux: poser deux exemplaires"
+ },
+ "table_bistrot_quatre": {
+  "id": "table_bistrot_quatre",
+  "nom": "Table de bistrot pour quatre",
+  "fichier": "table_bistrot_quatre.glb",
+  "famille": "table",
+  "style": "bistrot",
+  "categorie": "table",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.808,
+   "y": 0.75,
+   "z": 0.808
+  },
+  "triangles": 338,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "table_bistrot_quatre"
+  ],
+  "poids_octets": 22832,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": {
+   "hauteur": 0.75,
+   "forme": "rect",
+   "largeur_x": 0.8,
+   "profondeur_z": 0.8
+  },
+  "places": 4
+ },
+ "banquette_moleskine": {
+  "id": "banquette_moleskine",
+  "nom": "Banquette de moleskine",
+  "fichier": "banquette_moleskine.glb",
+  "famille": "banquette",
+  "style": "bistrot",
+  "categorie": "banquette",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.82,
+   "y": 0.9,
+   "z": 0.56
+  },
+  "triangles": 444,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "banquette_moleskine"
+  ],
+  "poids_octets": 33464,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     -0.55,
+     0.45,
+     0.06
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   },
+   {
+    "position": [
+     0.0,
+     0.45,
+     0.06
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   },
+   {
+    "position": [
+     0.55,
+     0.45,
+     0.06
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ],
+  "note": "dos au mur (dossier au nord)"
+ },
+ "mange_debout_zinc": {
+  "id": "mange_debout_zinc",
+  "nom": "Mange-debout de zinc (hors catalogue)",
+  "fichier": "mange_debout_zinc.glb",
+  "famille": "mange",
+  "style": "bistrot",
+  "categorie": "table",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.6,
+   "y": 1.1,
+   "z": 0.6
+  },
+  "triangles": 506,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "mange_debout_zinc"
+  ],
+  "poids_octets": 32484,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": {
+   "hauteur": 1.1,
+   "forme": "rond",
+   "largeur_x": 0.6,
+   "profondeur_z": 0.6
+  },
+  "places": 2,
+  "note": "debout: repose-pieds de laiton à 0,30 m"
+ },
+ "globe_opalin": {
+  "id": "globe_opalin",
+  "nom": "Globe opalin",
+  "fichier": "globe_opalin.glb",
+  "famille": "globe",
+  "style": "bistrot",
+  "categorie": "luminaire",
+  "accroche": "plafond",
+  "dimensions_m": {
+   "x": 0.3,
+   "y": 0.45,
+   "z": 0.285
+  },
+  "triangles": 312,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "globe_opalin",
+   "globe_opalin_glow"
+  ],
+  "poids_octets": 18572,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "lumiere": [
+   0,
+   -0.3,
+   0
+  ],
+  "note": "bas du globe à 2,35 m sous un plafond de 2,80 m"
+ },
+ "miroir_peint": {
+  "id": "miroir_peint",
+  "nom": "Miroir peint",
+  "fichier": "miroir_peint.glb",
+  "famille": "miroir",
+  "style": "bistrot",
+  "categorie": "miroir",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 1.2,
+   "y": 0.9,
+   "z": 0.058
+  },
+  "triangles": 62,
+  "budget_triangles": 150,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "miroir_peint"
+  ],
+  "poids_octets": 7044,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "reflet peint (C11). Bas du cadre conseillé à 1,00 m: au-dessus du dossier de la banquette (0,90 m)"
+ },
+ "chaise_fer_peint": {
+  "id": "chaise_fer_peint",
+  "nom": "Chaise de fer peint",
+  "fichier": "chaise_fer_peint.glb",
+  "famille": "chaise",
+  "style": "jardin",
+  "categorie": "chaise",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.423,
+   "y": 0.871,
+   "z": 0.473
+  },
+  "triangles": 504,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "chaise_fer_peint"
+  ],
+  "poids_octets": 38684,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.45,
+     0.02
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ]
+ },
+ "table_fer_mosaique": {
+  "id": "table_fer_mosaique",
+  "nom": "Table de fer à mosaïque",
+  "fichier": "table_fer_mosaique.glb",
+  "famille": "table",
+  "style": "jardin",
+  "categorie": "table",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.61,
+   "y": 0.758,
+   "z": 0.61
+  },
+  "triangles": 440,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "table_fer_mosaique"
+  ],
+  "poids_octets": 31348,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": {
+   "hauteur": 0.75,
+   "forme": "rond",
+   "largeur_x": 0.6,
+   "profondeur_z": 0.6
+  },
+  "places": 2
+ },
+ "fauteuil_rotin": {
+  "id": "fauteuil_rotin",
+  "nom": "Fauteuil de rotin",
+  "fichier": "fauteuil_rotin.glb",
+  "famille": "fauteuil",
+  "style": "jardin",
+  "categorie": "fauteuil",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.664,
+   "y": 0.85,
+   "z": 0.663
+  },
+  "triangles": 380,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "fauteuil_rotin"
+  ],
+  "poids_octets": 26468,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.43,
+     0.06
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ]
+ },
+ "cloche_verre": {
+  "id": "cloche_verre",
+  "nom": "Suspension cloche de verre",
+  "fichier": "cloche_verre.glb",
+  "famille": "cloche",
+  "style": "jardin",
+  "categorie": "luminaire",
+  "accroche": "plafond",
+  "dimensions_m": {
+   "x": 0.34,
+   "y": 0.6,
+   "z": 0.331
+  },
+  "triangles": 424,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles",
+   "dt_verre"
+  ],
+  "noeuds": [
+   "cloche_verre",
+   "cloche_verre_glass",
+   "cloche_verre_glow"
+  ],
+  "poids_octets": 24252,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "lumiere": [
+   0,
+   -0.44,
+   0
+  ],
+  "note": "cloche de 0,35 x 0,40 m, bas à 2,20 m sous un plafond de 2,80 m"
+ },
+ "citronnier_pot": {
+  "id": "citronnier_pot",
+  "nom": "Citronnier en pot",
+  "fichier": "citronnier_pot.glb",
+  "famille": "citronnier",
+  "style": "jardin",
+  "categorie": "plante",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.708,
+   "y": 1.36,
+   "z": 0.667
+  },
+  "triangles": 1084,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "citronnier_pot"
+  ],
+  "poids_octets": 67256,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "1,40 m"
+ },
+ "olivier_pot": {
+  "id": "olivier_pot",
+  "nom": "Olivier en pot",
+  "fichier": "olivier_pot.glb",
+  "famille": "olivier",
+  "style": "jardin",
+  "categorie": "plante",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.279,
+   "y": 1.96,
+   "z": 0.824
+  },
+  "triangles": 896,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "olivier_pot"
+  ],
+  "poids_octets": 66276,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "2,00 m: sur la terrasse, ou sous le plafond de 2,80 m"
+ },
+ "herbier_encadre": {
+  "id": "herbier_encadre",
+  "nom": "Herbier encadré",
+  "fichier": "herbier_encadre.glb",
+  "famille": "herbier",
+  "style": "jardin",
+  "categorie": "cadre",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 0.4,
+   "y": 0.55,
+   "z": 0.034
+  },
+  "triangles": 68,
+  "budget_triangles": 150,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "herbier_encadre"
+  ],
+  "poids_octets": 7248,
+  "avant": [
+   0,
+   0,
+   1
+  ]
+ },
+ "tapis_jonc": {
+  "id": "tapis_jonc",
+  "nom": "Tapis de jonc",
+  "fichier": "tapis_jonc.glb",
+  "famille": "tapis",
+  "style": "jardin",
+  "categorie": "tapis",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.4,
+   "y": 0.01,
+   "z": 2.0
+  },
+  "triangles": 20,
+  "budget_triangles": 150,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "tapis_jonc"
+  ],
+  "poids_octets": 3356,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "se pose sous les meubles (floor_under)"
+ },
+ "parasol_toile": {
+  "id": "parasol_toile",
+  "nom": "Parasol de toile",
+  "fichier": "parasol_toile.glb",
+  "famille": "parasol",
+  "style": "jardin",
+  "categorie": "terrasse",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 2.0,
+   "y": 2.37,
+   "z": 2.0
+  },
+  "triangles": 304,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "parasol_toile"
+  ],
+  "poids_octets": 23932,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "toile à 1,95 m au bord, 1,83 m au lambrequin: passer dessous demande de baisser un peu la tête (à poser au-dessus d'une table)"
+ },
+ "jardinieres_terrasse": {
+  "id": "jardinieres_terrasse",
+  "nom": "Jardinière de terrasse",
+  "fichier": "jardinieres_terrasse.glb",
+  "famille": "jardinieres",
+  "style": "neutre",
+  "categorie": "terrasse",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.84,
+   "y": 0.616,
+   "z": 0.3
+  },
+  "triangles": 1022,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "jardinieres_terrasse"
+  ],
+  "poids_octets": 84424,
+  "avant": [
+   0,
+   0,
+   1
+  ]
+ },
+ "guirlande_guinguette": {
+  "id": "guirlande_guinguette",
+  "nom": "Guirlande guinguette",
+  "fichier": "guirlande_guinguette.glb",
+  "famille": "guirlande",
+  "style": "jardin",
+  "categorie": "luminaire",
+  "accroche": "store",
+  "dimensions_m": {
+   "x": 6.001,
+   "y": 0.298,
+   "z": 0.052
+  },
+  "triangles": 768,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "guirlande_guinguette",
+   "guirlande_guinguette_glow"
+  ],
+  "poids_octets": 56524,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "6 m, flèche de 18 cm au milieu"
+ },
+ "lanterne_tilleul": {
+  "id": "lanterne_tilleul",
+  "nom": "Lanterne de la fête du Tilleul (pièce unique)",
+  "fichier": "lanterne_tilleul.glb",
+  "famille": "lanterne",
+  "style": "jardin",
+  "categorie": "luminaire",
+  "accroche": "store",
+  "dimensions_m": {
+   "x": 0.31,
+   "y": 0.52,
+   "z": 0.285
+  },
+  "triangles": 308,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles",
+   "dt_verre"
+  ],
+  "noeuds": [
+   "lanterne_tilleul",
+   "lanterne_tilleul_glass",
+   "lanterne_tilleul_glow"
+  ],
+  "poids_octets": 20480,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "lumiere": [
+   0,
+   -0.32,
+   0
+  ]
+ },
+ "applique_laiton": {
+  "id": "applique_laiton",
+  "nom": "Applique de laiton",
+  "fichier": "applique_laiton.glb",
+  "famille": "applique",
+  "style": "bistrot",
+  "categorie": "luminaire",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 0.16,
+   "y": 0.27,
+   "z": 0.26
+  },
+  "triangles": 154,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "applique_laiton",
+   "applique_laiton_glow"
+  ],
+  "poids_octets": 13208,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "lumiere": [
+   0,
+   0.22,
+   0
+  ],
+  "note": "tulipe opaline tournée vers le haut"
+ },
+ "lampe_lin": {
+  "id": "lampe_lin",
+  "nom": "Lampe à abat-jour de lin",
+  "fichier": "lampe_lin.glb",
+  "famille": "lampe",
+  "style": "campagne",
+  "categorie": "luminaire",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.3,
+   "y": 0.54,
+   "z": 0.292
+  },
+  "triangles": 258,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_lampe",
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "lampe_lin",
+   "lampe_lin_glow"
+  ],
+  "poids_octets": 17388,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "lumiere": [
+   0,
+   0.4,
+   0
+  ],
+  "note": "0,55 m: sur une table, une desserte ou un appui"
+ },
+ "affiche_tilleul_1962": {
+  "id": "affiche_tilleul_1962",
+  "nom": "Affiche de la fête du Tilleul, 1962",
+  "fichier": "affiche_tilleul_1962.glb",
+  "famille": "affiche",
+  "style": "neutre",
+  "categorie": "cadre",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 0.5,
+   "y": 0.7,
+   "z": 0.033
+  },
+  "triangles": 62,
+  "budget_triangles": 150,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "affiche_tilleul_1962"
+  ],
+  "poids_octets": 6476,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "bandeau bordeaux en haut: place du titre, écrit par le jeu si on le souhaite"
+ },
+ "assiettes_faience": {
+  "id": "assiettes_faience",
+  "nom": "Assiettes de faïence au mur",
+  "fichier": "assiettes_faience.glb",
+  "famille": "assiettes",
+  "style": "campagne",
+  "categorie": "cadre",
+  "accroche": "mur",
+  "dimensions_m": {
+   "x": 0.9,
+   "y": 0.52,
+   "z": 0.016
+  },
+  "triangles": 600,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "assiettes_faience"
+  ],
+  "poids_octets": 34856,
+  "avant": [
+   0,
+   0,
+   1
+  ]
+ },
+ "tapis_lirette": {
+  "id": "tapis_lirette",
+  "nom": "Tapis lirette",
+  "fichier": "tapis_lirette.glb",
+  "famille": "tapis",
+  "style": "campagne",
+  "categorie": "tapis",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.2,
+   "y": 0.01,
+   "z": 1.8
+  },
+  "triangles": 20,
+  "budget_triangles": 150,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "tapis_lirette"
+  ],
+  "poids_octets": 3404,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "se pose sous les meubles (floor_under)"
+ },
+ "vaisselier_sauge": {
+  "id": "vaisselier_sauge",
+  "nom": "Vaisselier peint en sauge",
+  "fichier": "vaisselier_sauge.glb",
+  "famille": "vaisselier",
+  "style": "campagne",
+  "categorie": "etagere",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.44,
+   "y": 2.0,
+   "z": 0.557
+  },
+  "triangles": 728,
+  "budget_triangles": 1500,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "vaisselier_sauge"
+  ],
+  "poids_octets": 54988,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": [
+   {
+    "hauteur": 0.94,
+    "largeur_x": 1.4,
+    "profondeur_z": 0.5,
+    "centre_z": 0.0
+   },
+   {
+    "hauteur": 1.3,
+    "largeur_x": 1.24,
+    "profondeur_z": 0.26,
+    "centre_z": -0.1
+   },
+   {
+    "hauteur": 1.65,
+    "largeur_x": 1.24,
+    "profondeur_z": 0.26,
+    "centre_z": -0.1
+   }
+  ],
+  "note": "dos au mur (nord); deux tablettes à 1,30 et 1,65 m"
+ },
+ "desserte_zinc": {
+  "id": "desserte_zinc",
+  "nom": "Desserte à dessus de zinc",
+  "fichier": "desserte_zinc.glb",
+  "famille": "desserte",
+  "style": "bistrot",
+  "categorie": "etagere",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.008,
+   "y": 0.95,
+   "z": 0.456
+  },
+  "triangles": 288,
+  "budget_triangles": 1000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "desserte_zinc"
+  ],
+  "poids_octets": 23868,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "pose_dessus": [
+   {
+    "hauteur": 0.95,
+    "largeur_x": 1.0,
+    "profondeur_z": 0.45,
+    "centre_z": 0.0
+   },
+   {
+    "hauteur": 0.525,
+    "largeur_x": 0.92,
+    "profondeur_z": 0.38,
+    "centre_z": 0.0
+   },
+   {
+    "hauteur": 0.145,
+    "largeur_x": 0.92,
+    "profondeur_z": 0.38,
+    "centre_z": 0.0
+   }
+  ],
+  "note": "dos au mur (nord)"
+ },
+ "fauteuil_club": {
+  "id": "fauteuil_club",
+  "nom": "Fauteuil club",
+  "fichier": "fauteuil_club.glb",
+  "famille": "fauteuil",
+  "style": "bistrot",
+  "categorie": "fauteuil",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.8,
+   "y": 0.8,
+   "z": 0.8
+  },
+  "triangles": 972,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "fauteuil_club"
+  ],
+  "poids_octets": 59952,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "assises": [
+   {
+    "position": [
+     0,
+     0.42,
+     0.08
+    ],
+    "avant": [
+     0,
+     0.0,
+     1
+    ]
+   }
+  ]
+ },
+ "fougere_suspendue": {
+  "id": "fougere_suspendue",
+  "nom": "Fougère suspendue",
+  "fichier": "fougere_suspendue.glb",
+  "famille": "fougere",
+  "style": "neutre",
+  "categorie": "plante",
+  "accroche": "plafond",
+  "dimensions_m": {
+   "x": 0.648,
+   "y": 0.673,
+   "z": 0.648
+  },
+  "triangles": 208,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "fougere_suspendue"
+  ],
+  "poids_octets": 18684,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "pend à 0,60 m sous le plafond (bas des frondes vers 2,05 m)"
+ },
+ "pothos_etagere": {
+  "id": "pothos_etagere",
+  "nom": "Pothos d'étagère",
+  "fichier": "pothos_etagere.glb",
+  "famille": "pothos",
+  "style": "neutre",
+  "categorie": "plante",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.25,
+   "y": 0.385,
+   "z": 0.316
+  },
+  "triangles": 458,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "pothos_etagere"
+  ],
+  "poids_octets": 37032,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "tiges retombantes devant (sud): poser au bord d'une étagère"
+ },
+ "bouquet_champetre": {
+  "id": "bouquet_champetre",
+  "nom": "Bouquet champêtre",
+  "fichier": "bouquet_champetre.glb",
+  "famille": "bouquet",
+  "style": "neutre",
+  "categorie": "plante",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.134,
+   "y": 0.349,
+   "z": 0.15
+  },
+  "triangles": 550,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "bouquet_champetre"
+  ],
+  "poids_octets": 45784,
+  "avant": [
+   0,
+   0,
+   1
+  ]
+ },
+ "geraniums_vitrine": {
+  "id": "geraniums_vitrine",
+  "nom": "Géraniums de la vitrine",
+  "fichier": "geraniums_vitrine.glb",
+  "famille": "geraniums",
+  "style": "neutre",
+  "categorie": "plante",
+  "accroche": "appui",
+  "dimensions_m": {
+   "x": 0.804,
+   "y": 0.265,
+   "z": 0.18
+  },
+  "triangles": 776,
+  "budget_triangles": 1200,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "geraniums_vitrine"
+  ],
+  "poids_octets": 64940,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "appui intérieur de la vitrine (0,45 m) ou de la petite fenêtre (0,90 m)"
+ },
+ "cloche_gateaux": {
+  "id": "cloche_gateaux",
+  "nom": "Cloche à gâteaux",
+  "fichier": "cloche_gateaux.glb",
+  "famille": "cloche",
+  "style": "campagne",
+  "categorie": "comptoir",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.3,
+   "y": 0.32,
+   "z": 0.3
+  },
+  "triangles": 440,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles",
+   "dt_verre"
+  ],
+  "noeuds": [
+   "cloche_gateaux",
+   "cloche_gateaux_glass"
+  ],
+  "poids_octets": 21656,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "plateau de noyer et cloche de verre; douilles des viennoiseries dessous",
+  "douilles": {
+   "socket_food_0": [
+    -0.05,
+    0.03,
+    0.0
+   ],
+   "socket_food_1": [
+    0.05,
+    0.03,
+    0.02
+   ]
+  }
+ },
+ "bocal_biscuits": {
+  "id": "bocal_biscuits",
+  "nom": "Bocal à biscuits",
+  "fichier": "bocal_biscuits.glb",
+  "famille": "bocal",
+  "style": "neutre",
+  "categorie": "comptoir",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.18,
+   "y": 0.305,
+   "z": 0.175
+  },
+  "triangles": 512,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles",
+   "dt_verre"
+  ],
+  "noeuds": [
+   "bocal_biscuits",
+   "bocal_biscuits_glass"
+  ],
+  "poids_octets": 30396,
+  "avant": [
+   0,
+   0,
+   1
+  ]
+ },
+ "pot_pourboires_gres": {
+  "id": "pot_pourboires_gres",
+  "nom": "Pot à pourboires en grès",
+  "fichier": "pot_pourboires_gres.glb",
+  "famille": "pot",
+  "style": "campagne",
+  "categorie": "comptoir",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.14,
+   "y": 0.175,
+   "z": 0.14
+  },
+  "triangles": 248,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "pot_pourboires_gres"
+  ],
+  "poids_octets": 15292,
+  "avant": [
+   0,
+   0,
+   1
+  ]
+ },
+ "caisse_ancienne": {
+  "id": "caisse_ancienne",
+  "nom": "Caisse enregistreuse ancienne",
+  "fichier": "caisse_ancienne.glb",
+  "famille": "caisse",
+  "style": "bistrot",
+  "categorie": "comptoir",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.437,
+   "y": 0.33,
+   "z": 0.363
+  },
+  "triangles": 556,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "caisse_ancienne"
+  ],
+  "poids_octets": 44692,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "touches vers le barista (sud du modèle): la tourner vers l'arrière-comptoir; afficheur vers les clients"
+ },
+ "enseigne_bois_peint": {
+  "id": "enseigne_bois_peint",
+  "nom": "Enseigne de bois peint",
+  "fichier": "enseigne_bois_peint.glb",
+  "famille": "enseigne",
+  "style": "campagne",
+  "categorie": "enseigne",
+  "accroche": "facade",
+  "dimensions_m": {
+   "x": 1.8,
+   "y": 0.5,
+   "z": 0.06
+  },
+  "triangles": 80,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "enseigne_bois_peint"
+  ],
+  "poids_octets": 6960,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "nom de la maison écrit par le jeu (toile 2D) sur le panneau crème: zone de 1,72 x 0,42 m, plan à 0,056 m du mur"
+ },
+ "enseigne_fer_forge": {
+  "id": "enseigne_fer_forge",
+  "nom": "Enseigne de fer forgé (potence)",
+  "fichier": "enseigne_fer_forge.glb",
+  "famille": "enseigne",
+  "style": "jardin",
+  "categorie": "enseigne",
+  "accroche": "facade",
+  "dimensions_m": {
+   "x": 0.12,
+   "y": 0.765,
+   "z": 0.7
+  },
+  "triangles": 512,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "enseigne_fer_forge"
+  ],
+  "poids_octets": 40952,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "disque de 0,6 m vu des deux côtés (est et ouest), fond crème pour le nom écrit par le jeu"
+ },
+ "enseigne_lettres_dorees": {
+  "id": "enseigne_lettres_dorees",
+  "nom": "Lettres dorées sur la vitrine",
+  "fichier": "enseigne_lettres_dorees.glb",
+  "famille": "enseigne",
+  "style": "bistrot",
+  "categorie": "enseigne",
+  "accroche": "vitrine",
+  "dimensions_m": {
+   "x": 2.0,
+   "y": 0.4,
+   "z": 0.004
+  },
+  "triangles": 48,
+  "budget_triangles": 150,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "enseigne_lettres_dorees"
+  ],
+  "poids_octets": 4916,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "cadre fin, le texte doré est une toile du jeu (police de la bible)"
+ }
+}

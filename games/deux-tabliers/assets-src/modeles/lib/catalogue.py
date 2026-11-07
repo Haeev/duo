@@ -4,6 +4,7 @@ import json
 import math
 import os
 import time
+import zlib
 
 import bpy
 from mathutils import Vector
@@ -41,7 +42,7 @@ def produire(catalogue, ids, fiche_path, ao=True):
         spec = catalogue[ident]
         g = Geo(ident)
         info = spec["fn"](g) or {}
-        ob = K.finir(g, seed=hash(ident) % 10000)
+        ob = K.finir(g, seed=zlib.crc32(ident.encode()))
         parts = K.separer_par_materiau(ob)
         main = next(o for o in parts if o.name == ident)
         built.append((ident, spec, info, parts, main))
