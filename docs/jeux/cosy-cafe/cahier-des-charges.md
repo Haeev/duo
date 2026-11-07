@@ -614,7 +614,7 @@ Les touches définitives, les panneaux et le HUD relèvent de `docs/jeux/cosy-ca
 | Reposer ce qu'on tient à sa place, ou lâcher une charge à deux | R (`KeyR`) | clic droit |
 | Dessiner sur le lait | | tracer en tenant le clic gauche |
 | Tablette de la maison (ardoise, commandes, catalogue, équipe, bilan, « Nos projets ») | Tab | |
-| Aménagement (poser, tourner, ranger) | B (`KeyB`); tourner: A et E (`KeyQ`, `KeyE`) en mode aménagement | molette pour tourner |
+| Aménagement (poser, tourner, ranger) | B (`KeyB`) pour entrer et sortir; poser E, ranger R, tourner A (`KeyQ`) | clic gauche pose, clic droit range, molette tourne |
 | Faire signe (repère chez les deux) | G (`KeyG`) | clic molette |
 | Ouvrir ou fermer (pancarte), « À demain » | F (`KeyF`) en regardant la pancarte | clic sur la pancarte |
 | Fermer un panneau du jeu | sa touche, ou Retour arrière | clic hors du panneau |

@@ -1,18 +1,21 @@
 {
   "format": "duo-meshy-sheet/1",
-  "asset": "espresso_machine_village",
+  "asset": "station_espresso_2g",
   "game": "cosy-cafe",
-  "family": "machines",
-  "purpose": "essai de la chaîne Meshy du studio: machine à expresso à deux groupes du café du village (objet vedette, plafond de 4 000 triangles, C8 de technique.md)",
-  "status": "aperçu généré le 2026-11-07, non téléchargé: les fichiers sont servis par assets.meshy.ai, refusé par le proxy de l'environnement cloud (403 au CONNECT); fichiers disponibles chez Meshy jusqu'au 2026-11-10T20:04:49Z",
-  "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 6)",
+  "family": "postes et machines (bible, 13.2: mixte, esquisse par Meshy puis reprise dans Blender aux cotes, avec douilles)",
+  "purpose": "essai de la chaîne Meshy du studio: machine à expresso à deux groupes du café du village, cuivre (objet vedette, plafond de 4 000 triangles, C8 de technique.md)",
+  "status": "deux générations le 2026-11-07 (texte vers 3D, puis image vers 3D d'après la référence du directeur artistique), non téléchargées: les fichiers sont servis par assets.meshy.ai, refusé par le proxy de l'environnement cloud (403 au CONNECT)",
+  "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
   "author": "tech-artist",
   "date": "2026-11-07",
   "client": { "server": "@meshy-ai/meshy-mcp-server@0.6.9", "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs", "api": "https://api.meshy.ai" },
   "credits_budget": 100,
+  "inputs": [
+    { "file": "docs/jeux/cosy-cafe/bible/references/machine-expresso.png", "sha256": "15fe7c953756bc0a5b24855a810dfe287a1973f989b74624713faef934d9ef8f", "author": "directeur-artistique", "note": "trois quarts, fond uni, trois tasses posées sur le dessus (Meshy les fond dans la machine: à séparer ou retirer à la mise en conformité)" }
+  ],
   "tasks": [
     {
-      "step": "preview",
+      "step": "apercu texte",
       "tool": "meshy_text_to_3d",
       "endpoint": "POST /openapi/v2/text-to-3d (mode preview)",
       "task_id": "01a1b79c-afc3-7589-b419-f472bb49b307",
@@ -32,28 +35,52 @@
       "finished": "2026-11-07T20:04:49.080Z",
       "duration_s": 24.9,
       "files_expire": "2026-11-10T20:04:49.080Z",
-      "outputs": ["glb (sans texture: un aperçu de texte vers 3D n'est jamais texturé)", "vignette"],
+      "outputs": ["GLB sans texture (un aperçu de texte vers 3D n'est jamais texturé)", "vignette"],
+      "downloaded": false
+    },
+    {
+      "step": "image vers 3D (route retenue par la bible)",
+      "tool": "meshy_image_to_3d",
+      "endpoint": "POST /openapi/v1/image-to-3d",
+      "task_id": "01a1b7b3-5172-7405-b35e-33b10ff359a6",
+      "params": {
+        "file_path": "docs/jeux/cosy-cafe/bible/references/machine-expresso.png",
+        "ai_model": "meshy-t2.5",
+        "model_type": "smart-topology",
+        "target_polycount": 4000,
+        "texture_model": "meshy-n1",
+        "target_formats": ["glb"],
+        "auto_size": true,
+        "origin_at": "bottom"
+      },
+      "credits": 15,
+      "created": "2026-11-07T20:29:05.047Z",
+      "finished": "2026-11-07T20:29:34.261Z",
+      "duration_s": 29.2,
+      "files_expire": "2026-11-10T20:29:34.261Z",
+      "outputs": ["model.glb", "texture_0.png (couleur de base seule, Meshy N1)", "preview.png"],
       "downloaded": false
     }
   ],
-  "credits_total": 5,
+  "credits_total": 20,
   "next_steps": [
-    "télécharger le GLB de l'aperçu (task_id ci-dessus) une fois assets.meshy.ai ouvert, avant le 2026-11-10T20:04:49Z",
-    "mesurer triangles, pièces et taille réelle (auto_size), puis regarder les quatre vues",
-    "si l'aperçu convient: affinage meshy_text_to_3d_refine (10 crédits, texture 2K), ou couleurs posées à la main par pièce sans affinage (palette_overrides)",
-    "fixer front_yaw_deg et lancer scripts/conformite_accessoire.py"
+    "télécharger les deux GLB une fois assets.meshy.ai ouvert, avant le 2026-11-10T20:04Z (aperçu texte) et 20:29Z (image)",
+    "comparer les deux routes: silhouette, pièces séparées, triangles réels, taille estimée par auto_size; garder la meilleure",
+    "fixer front_yaw_deg, retirer ou séparer les tasses du dessus, nommer les pièces utiles au jeu (porte-filtres, buse) et poser les douilles avec l'artiste 3D, puis scripts/conformite_accessoire.py"
   ],
   "conformity": {
-    "node_name": "espresso_machine_village",
+    "node_name": "station_espresso_2g",
     "front_yaw_deg": 0,
-    "pending": ["front_yaw_deg à fixer après examen du GLB brut"],
+    "pending": ["front_yaw_deg à fixer après examen du GLB brut", "tasses du dessus: pièces à retirer ou à séparer"],
     "target_size_m": { "axis": "width", "value": 0.76 },
     "size_source": "maquette de la bible (docs/jeux/cosy-cafe/bible/source/mobilier.cjs, espressoMachine: 0,76 m de large, 0,48 m de haut, corps de 0,42 m de profondeur)",
     "max_triangles": 4000,
     "palette_allowed": ["copper", "brass", "steel", "steel_dark", "ink", "porcelain"],
     "palette_default": "steel",
     "palette_overrides": {},
+    "lightness_weight": 2.0,
     "smooth_angle_deg": 35,
+    "remove_bottom_faces": true,
     "bake_ao": true,
     "ao_floor": 0.55
   }
