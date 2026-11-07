@@ -15,7 +15,8 @@ interface FurnitureNode {
   key: string;
 }
 
-const furnitureKey = (f: PlacedFurniture): string => `${f.type}|${f.x}|${f.z}|${f.y}|${f.rotDeg}`;
+// Un meuble qui ne change que de place (porté à deux, déplacé) garde son nœud: on le bouge.
+const furnitureKey = (f: PlacedFurniture): string => f.type;
 
 export interface WorldNodes {
   update(view: GameView, localLook: { yawDeg: number; pitchDeg: number }): void;
@@ -61,18 +62,21 @@ export function createWorldNodes(
       if (entry === undefined) {
         const type = view.content.furniture.get(f.type);
         if (type === undefined) continue;
-        const node = models.instance(type.model, {
+        // Meuble de départ reconnu par l'aménagement: son modèle du catalogue (chaise paillée...).
+        const model = view.content.arrangement.pieces.get(f.type)?.model ?? type.model;
+        const node = models.instance(model, {
           width: type.footprint[0],
           depth: type.footprint[1],
           height: type.height,
           color: type.color,
         });
-        node.position.set(f.x, f.y, f.z);
-        node.rotation.y = (f.rotDeg * Math.PI) / 180;
         node.name = f.id;
         root.add(node);
-        furniture.set(f.id, { node, key });
+        entry = { node, key };
+        furniture.set(f.id, entry);
       }
+      entry.node.position.set(f.x, f.y, f.z);
+      entry.node.rotation.y = (f.rotDeg * Math.PI) / 180;
     }
     for (const [id, entry] of furniture) {
       if (!seen.has(id)) {

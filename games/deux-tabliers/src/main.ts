@@ -13,7 +13,8 @@ import { DATA_FILES } from './donnees/fichiers';
 import { createLookControl } from './entrees/regard';
 import { createHud } from './interface/hud';
 import { createPanels, TABLET_PLACEHOLDER } from './interface/panneaux';
-import { buildShell } from './rendu/coque';
+import { createArrangementClient } from './amenagement/client/mode';
+import { createLiveShell } from './amenagement/client/coque-vivante';
 import { createModelLibrary } from './rendu/modeles';
 import { createWorldNodes } from './rendu/monde3d';
 import { createStage } from './rendu/scene';
@@ -44,8 +45,8 @@ const now = (): number => performance.now() - t0;
 const session = createSession({ duo, content, now });
 const view = session.view;
 const stage = createStage(canvas, content.settings);
-const shell = buildShell(content.plan);
-stage.scene.add(shell.group);
+// Coque du plan en vigueur (extensions ouvertes, revêtements), chantier aménagement.
+const shell = createLiveShell(stage.scene, content, view);
 const models = createModelLibrary((message, data) => {
   duo.log.warn(message, data);
 });
@@ -63,6 +64,31 @@ const panels = createPanels(document.body, view, (open) => {
   look.setPanelOpen(open);
 });
 panels.register(TABLET_PLACEHOLDER);
+const arrange = createArrangementClient({
+  input: duo.input,
+  content,
+  view,
+  scene: stage.scene,
+  models,
+  colors: [duo.host.colorHex, duo.guest.colorHex],
+  eye: () => {
+    const pose = view.pose(view.local);
+    return {
+      x: pose.x,
+      y: content.settings.player.eyeHeight,
+      z: pose.z,
+      yawDeg: look.look.yawDeg,
+      pitchDeg: look.look.pitchDeg,
+    };
+  },
+  flash: (text) => {
+    hud.flash(text);
+  },
+  closePanel: () => {
+    panels.close();
+  },
+});
+panels.register(arrange.panel);
 
 view.onEvent((event) => {
   if (event.type === 'refused') {
@@ -119,9 +145,11 @@ duo.loop.start({
     const intents: Intent[] = [];
     const resumeClick = look.consumeResumeClick();
     if (duo.input.wasPressed('confirm') && !look.locked() && !look.panelOpen()) look.grab();
-    if (duo.input.wasPressed('tablet')) panels.toggle('tablette');
+    if (duo.input.wasPressed('tablet'))
+      panels.toggle(arrange.active() ? arrange.panel.id : 'tablette');
     if (duo.input.wasPressed('close')) panels.close();
-    if (playing && !resumeClick) {
+    intents.push(...arrange.step(playing && !resumeClick));
+    if (playing && !resumeClick && !arrange.active()) {
       const target = currentAim?.target;
       if (duo.input.wasPressed('act') && target !== undefined)
         intents.push({ type: 'act', target });
@@ -150,7 +178,9 @@ duo.loop.start({
     );
     nodes.update(view, look.look);
     customers.update(view, now(), dt);
-    currentAim = session.ready() ? localAim() : null;
+    shell.update();
+    arrange.render();
+    currentAim = session.ready() && !arrange.active() ? localAim() : null;
     const use = view.world().players[view.local].use;
     const station =
       use === null
@@ -160,16 +190,18 @@ duo.loop.start({
           )?.station;
     const seconds =
       station === undefined || station === null ? 0 : (content.stations.get(station)?.seconds ?? 0);
+    const arrangePrompt = arrange.prompt();
     hud.update({
-      aiming: currentAim !== null && currentAim.plan.kind !== 'refuse',
+      aiming: arrange.active() || (currentAim !== null && currentAim.plan.kind !== 'refuse'),
       prompt:
-        currentAim === null
+        arrangePrompt ??
+        (currentAim === null
           ? null
           : {
               key: duo.input.actionLabel('act'),
               text: planLabel(content, view.world(), currentAim.plan),
               refused: currentAim.plan.kind === 'refuse',
-            },
+            }),
       hold: use === null || seconds <= 0 ? null : Math.min(1, use.elapsed / seconds),
       capsule: duo.state === 'running' && !look.locked() && !look.panelOpen(),
     });
@@ -180,6 +212,7 @@ duo.loop.start({
 
 duo.on('stop', () => {
   look.dispose();
+  arrange.dispose();
   panels.dispose();
   nodes.dispose();
   customers.dispose();

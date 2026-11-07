@@ -17,6 +17,17 @@ const MODEL_URLS = import.meta.glob<string>('../../assets/modeles/*.glb', {
   import: 'default',
   eager: true,
 });
+// Textures des GLB (`textures/<nom>` relatif au modèle): à la construction, Vite renomme chaque
+// fichier; le chargeur demande l'URL construite, sinon le modèle s'affiche sans texture (noir).
+const TEXTURE_URLS = import.meta.glob<string>('../../assets/modeles/textures/*', {
+  query: '?url',
+  import: 'default',
+  eager: true,
+});
+const TEXTURE_BY_NAME = new Map(
+  Object.entries(TEXTURE_URLS).map(([path, url]) => [path.slice(path.lastIndexOf('/') + 1), url]),
+);
+
 const MODEL_INFO = import.meta.glob<unknown>('../../assets/modeles/modeles.json', {
   eager: true,
   import: 'default',
@@ -63,6 +74,12 @@ export function createModelLibrary(
   onError: (message: string, data: unknown) => void,
 ): ModelLibrary {
   const loader = new GLTFLoader();
+  loader.manager.setURLModifier((url) => {
+    const match = /textures\/([^/?#]+)$/.exec(url);
+    return (
+      (match === null ? undefined : TEXTURE_BY_NAME.get(decodeURIComponent(match[1] ?? ''))) ?? url
+    );
+  });
   const loaded = new Map<string, Promise<Object3D | null>>();
   const owned: { dispose(): void }[] = [];
   const box = new BoxGeometry(1, 1, 1);

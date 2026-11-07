@@ -49,8 +49,8 @@ function inReach(sim: SimContext, player: PlayerIndex, target: Target): boolean 
 }
 
 function applyIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
-  // Un `if` plutôt qu'un `switch`: la règle d'exhaustivité d'ESLint exigerait chaque intention
-  // des chantiers ici.
+  // Des `if` plutôt qu'un `switch`: les intentions des chantiers s'ajoutent sans toucher ici
+  // (la règle d'exhaustivité du lint demanderait chaque cas).
   if (intent.type === 'act' || intent.type === 'drop') {
     if (!inReach(sim, player, intent.target)) {
       sim.emit({ type: 'refused', player, reason: 'Trop loin' });

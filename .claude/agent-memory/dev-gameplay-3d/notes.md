@@ -26,3 +26,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Ajouter des intentions de chantier fait échouer le lint de `simulation/pas.ts` (`switch` sans les nouveaux cas): une ligne `eslint-disable-next-line ... -- raison` suffit, identique pour chaque chantier.
 - `prettier --write` sur `donnees/` réaligne les tableaux de `SCHEMA.md`: ne formater que les JSON. Pour toucher un JSON commun sans conflit, remplacer les éléments par identifiant en gardant le texte des autres (`outils/service-donnees.mjs`, `mergeFile`).
 - Worktree isolée: les commandes Bash avec heredoc, `$(...)` ou enchaînements longs sont refusées; écrire les scripts avec Write et lancer des commandes simples.
+
+## Deux Tabliers, aménagement (vérifié le 2026-11-07)
+
+- GLB à textures externes (`textures/<nom>.jpg` à côté des modèles): importés par `?url`, Vite renomme le GLB mais ne copie pas ses textures (404, meubles noirs). `rendu/modeles.ts` les importe aussi par `import.meta.glob` et les sert par `loader.manager.setURLModifier`.
+- Lint du dépôt: un `switch` avec `default` sur l'union des intentions casse dès qu'un chantier ajoute les siennes (`switch-exhaustiveness-check`): des `if` dans le cœur. `a.carry === null || a.carry.handles[i] === null` déclenche `prefer-optional-chain` alors que l'optionnel changerait le sens (`undefined`): passer par une petite aide.
+- Grille de passages (C13) de 1 700 cases sur 70 obstacles: 3,3 ms par vérification avec `Math.cos` à chaque test, 1,1 ms avec les obstacles aplatis (cosinus et sinus calculés une fois). Ne revérifier le fantôme que quand sa pose aimantée change.
+- Invité qui porte à deux: sa position vient de la charge; la correction douce à 30 % de la marche le laisse 60 cm en arrière à 1,2 m/s. La rattraper au double de la vitesse de port.
+- Banc de captures sans le faux hôte: une page Vite temporaire (`banc.html` et un script dans le dossier du jeu, `vite build --config` copié dans le jeu, sortie dans le scratchpad), le monde construit par les vraies intentions (`stepWorld`), servie par `python3 -m http.server`. Supprimer les fichiers du banc avant de rendre.
+- Le scratchpad est partagé entre membres en parallèle: un autre a réécrit `capture.cjs` pendant la mission. Toujours un sous-dossier à soi.
+- Faux hôte sous Playwright: un clic sur le canevas de l'iframe verrouille bien le pointeur en headless; les touches (`KeyB`, `Tab`) arrivent ensuite au jeu, et les boutons d'un panneau se cliquent par `frame.evaluate`.
