@@ -30151,7 +30151,7 @@
          1.2
         ]
        },
-       "label": "second rang: avec l'option B de l'architecte (foule lointaine)"
+       "label": "E5: le second rang de terrasse"
       },
       {
        "id": "zone-space-1",
@@ -31667,13 +31667,13 @@
    "north_deg": 0,
    "capacity": {
     "inside": 62,
-    "outside": 26
+    "outside": 34
    },
    "staff": {
     "players": 2,
     "employees": 10
    },
-   "summary": "Maison d'un ancien graineur, 300 m² sur deux niveaux: la boutique sur le boulevard, la halle sous verrière, le laboratoire, le jardin; les salons à l'étage. E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. E4: le jardin et sa serre.",
+   "summary": "Maison d'un ancien graineur, 300 m² sur deux niveaux: la boutique sur le boulevard, la halle sous verrière, le laboratoire, le jardin; les salons à l'étage. E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. E4: le jardin et sa serre. E5: le second rang de terrasse.",
    "scale_px": 30,
    "levels": [
     {
@@ -35956,6 +35956,234 @@
        "opaque": false
       },
       {
+       "id": "table-24",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         4.7,
+         27.9,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-72",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         4.7,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-73",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         5.15,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-25",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         6.5,
+         27.9,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-74",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         6.5,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-75",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         6.95,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-26",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         12.1,
+         27.9,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-76",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         12.1,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-77",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         12.55,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "table-27",
+       "kind": "table",
+       "shape": {
+        "rect": [
+         13.9,
+         27.9,
+         0.9,
+         0.5
+        ]
+       },
+       "height": 0.75,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-78",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         13.9,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
+       "id": "seat-79",
+       "kind": "seat",
+       "shape": {
+        "rect": [
+         14.35,
+         27.4,
+         0.45,
+         0.45
+        ]
+       },
+       "seat": {
+        "area": "outside",
+        "room": "terrasse"
+       },
+       "style": "chair",
+       "back": "N",
+       "height": 0.9,
+       "blocks": true,
+       "opaque": false
+      },
+      {
        "id": "hood-5",
        "kind": "hood",
        "shape": {
@@ -35963,7 +36191,7 @@
          3.5,
          25.5,
          13.0,
-         1.2
+         3.0
         ]
        },
        "label": "store",
@@ -36330,8 +36558,8 @@
        "label": "terrasse"
       },
       {
-       "id": "zone-extension-1",
-       "kind": "extension",
+       "id": "zone-free-7",
+       "kind": "free",
        "shape": {
         "rect": [
          3.5,
@@ -36340,7 +36568,7 @@
          1.2
         ]
        },
-       "label": "second rang: avec l'option B de l'architecte (foule lointaine)"
+       "label": "terrasse"
       },
       {
        "id": "zone-space-1",

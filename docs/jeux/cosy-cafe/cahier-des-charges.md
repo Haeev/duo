@@ -14,7 +14,7 @@
 ## En bref
 
 - **Le jeu**: à deux, en vue à la première personne, vous reprenez le petit café d'un village et vous le tenez ensemble: l'un au comptoir, l'autre à la machine, ou l'inverse, comme vous voulez. Ce que vous écrivez sur l'ardoise décide de qui pousse la porte; les meubles, la décoration et la musique décident de l'envie de rester. On sert, on encaisse, on débarrasse, on lave, on range la livraison du matin, on lit le livre d'or le soir.
-- **La progression**: cinq adresses, chacune plus grande et plus vivante. Ormeval, le café de la place du Tilleul (38 m², 8 places à l'arrivée); Mérelles, l'ancienne pâtisserie face à la halle (le four, le service en salle, le marché du jeudi); l'atelier d'une ville universitaire (les employés, le brunch, le café de spécialité); un café d'angle à Paris (l'équipe reprise, les touristes); la grande maison parisienne sous sa verrière (notre mélange, le laboratoire de pâtisserie, la visite d'un guide). Chaque café quitté reste ouvert, confié à quelqu'un: à la fin, la maison en tient cinq.
+- **La progression**: cinq adresses, chacune plus grande et plus vivante. Ormeval, le café de la place du Tilleul (38 m², 8 places à l'arrivée); Mérelles, l'ancienne pâtisserie face à la halle (le four, le service en salle, le marché du jeudi); Montaurel, l'Imprimerie d'une ville universitaire (les employés, le brunch, le café de spécialité); le café de l'angle des Plumassiers, à Paris (l'équipe reprise, les touristes); la Graineterie du boulevard des Horticulteurs, une maison sous verrière sur deux niveaux (notre mélange, le laboratoire de pâtisserie, la visite d'un guide). Chaque café quitté reste ouvert, confié à quelqu'un: à la fin, la maison en tient cinq.
 - **La durée**: l'histoire principale dure <!-- val:fin_h_median -->36,4 h pour un duo médian (de <!-- val:fin_h_rapide -->28,5 h pour un duo rapide à <!-- val:fin_h_lent -->56,2 h pour un duo qui prend son temps), soit <!-- val:seances_median -->55 séances de 40 minutes; puis le jeu continue sans fin. Une journée ouverte dure environ 21 minutes réelles: un service de 10 à 13 minutes entre une préparation et une fermeture à votre rythme.
 - **Ce qui le rend unique**: l'ardoise qui fait la clientèle; le coup de feu à deux, réglé à la voix parce que chacun ne voit que ce qu'il regarde; des habitués qui ont un prénom, une commande fétiche et une histoire; un style de décoration cohérent qui compte vraiment; des fournisseurs qui ont un visage; aucune faillite, aucune partie perdue, rien qui compare les deux joueurs.
 - **Chiffres sortis d'une simulation**: chaque journée de chaque partie simulée est jouée client par client (`simulations/cosy_cafe.py`, 120 parties); les tables de ce cahier en sont la copie exacte, vérifiée par un contrôle automatique.
@@ -67,7 +67,7 @@ Le client cite deux simulateurs de commerce en vue subjective. On garde le genre
 | Neuf profils de clients | dix: ajout des **voisins** [`voisins`], qui viennent pour deux mots au comptoir | donne un vrai poids au poste calme (parler aux gens) et fait vivre le zinc à chaque adresse; un profil de plus à habiller pour la bible (7.2) |
 | Journée de 15 à 20 minutes | journée ouverte de 21 minutes en moyenne (17 à 25 selon le duo), lundi de fermeture en plus | mesuré par la simulation: service de 10 à 13 minutes selon l'adresse, préparation et fermeture du duo médian (4 et 3,5 minutes) |
 | Saisons de 28 jours, 35 h pour l'histoire | 28 jours confirmés; histoire principale en 36,4 h pour un duo médian | simulation, section 4.21 |
-| Places assises (ordre de grandeur) | village et bourg: plans du level designer (Ormeval: 10 places à l'arrivée, 8 dedans et le banc dehors, 18 au maximum; Mérelles: 12 à l'arrivée, 39 au maximum); ville, Paris: hypothèses de la simulation (table `adresses`), sous les plafonds de l'architecte (C2) | les plans font foi; la ville et Paris attendent les leurs |
+| Places assises (ordre de grandeur) | les plans du level designer, repris tels quels (table `adresses`): Ormeval 10 places à l'arrivée, 18 au maximum; Mérelles 11 puis 39; l'Imprimerie 27 puis 45; les Plumassiers 24 puis 45; la Graineterie 53 puis 88 | les plans font foi; tous restent sous les plafonds de l'architecte (C2) |
 | Le bourg, une boutique de la grand-rue | Mérelles, l'ancienne pâtisserie face à la halle (plans) | le level designer a placé l'adresse; le four y attend dans son laboratoire, d'où le personnage de René, l'ancien pâtissier |
 | Réputation « de une à cinq tasses » | en demi-tasses, sans jamais baisser | aucune perte, rien à reprocher à l'autre joueur après un service difficile |
 | Employés à la troisième adresse | confirmé, avec un coup de main au bourg les jours de marché et le week-end, et une équipe reprise avec chaque café parisien | à deux, une grande adresse refuse près des deux tiers de ses clients (section 4.21); un café d'angle se reprend d'ordinaire avec son personnel |
@@ -183,10 +183,10 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **TE-07** Les saisons durent 28 jours (quatre semaines) et commencent un lundi: printemps, été, automne, hiver. L'année compte 112 jours.
 - **TE-08** Le lundi, l'horloge est arrêtée toute la journée: travaux (les extensions commandées se construisent), brocante (des pièces uniques à prix doux), visite d'une succursale (dialogue avec la gérance, réglages), commandes. La journée finit quand les deux ont choisi « Passer à mardi ». Raison: un vrai café ferme un jour par semaine; c'est le jour des chantiers et des flâneries.
 - **TE-09** Jours particuliers de la semaine (multiplicateurs: table `jours`):
-  - jour de marché: Mérelles le jeudi, l'atelier le samedi, le café d'angle le mardi et le vendredi, la maison parisienne le dimanche; Ormeval n'a pas de marché;
+  - jour de marché: Mérelles le jeudi, Montaurel le samedi, les Plumassiers le mardi et le vendredi, le boulevard des Horticulteurs le dimanche; Ormeval n'a pas de marché;
   - mercredi: les enfants n'ont pas classe l'après-midi, les familles viennent;
   - mardi, jeudi, vendredi: la sortie d'école à 16 h 30 fait le goûter;
-  - samedi et dimanche: promeneurs, familles et, dès l'atelier, brunch; les pressés se font rares.
+  - samedi et dimanche: promeneurs, familles et, dès que la cuisine de l'Imprimerie est ouverte, brunch; les pressés se font rares.
 - **TE-10** La météo du jour se tire à l'aube selon la saison (table `meteo`): soleil, couvert, pluie, chaleur (été), froid et neige (hiver). Celle du lendemain s'annonce à la fermeture, à la radio du café: on peut préparer une carafe de citronnade la veille d'une chaleur. La terrasse n'accueille personne sous la pluie, le froid ou la neige (une fois les plaids achetés, elle rouvre par froid sec).
 - **TE-11** Événements (calendrier en section 6.8): de semaine, de saison, d'adresse (défis). Ils n'interrompent jamais un geste et s'annoncent la veille.
 - **TE-12** Aucune horloge réelle: rien ne se passe entre deux séances. Le monde ne bouge que quand les deux jouent ensemble.
@@ -330,7 +330,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 
 ### 4.13 Employés
 
-- **EM-01** **Quand**: aucun au village; au bourg, un coup de main (rôle commis) pour les jours d'affluence (marché du jeudi et week-end); à partir de la ville, une équipe (12 personnes au plus par adresse, C5). Chaque café parisien se reprend avec une partie de son équipe (trois personnes au café d'angle, cinq à la maison parisienne, déjà au niveau 2): un café d'angle se vend d'ordinaire avec son personnel.
+- **EM-01** **Quand**: aucun au village; au bourg, un coup de main (rôle commis) pour les jours d'affluence (marché du jeudi et week-end); à partir de la ville, une équipe (12 personnes au plus par adresse, C5). Chaque café parisien se reprend avec une partie de son équipe (quatre personnes au café des Plumassiers, six à la Graineterie, déjà au niveau 2): un café d'angle se vend d'ordinaire avec son personnel.
 - **EM-02** **Embaucher**: la tablette affiche chaque lundi trois candidatures (prénom, rôle, deux traits, niveau). On embauche d'un geste; le salaire se paie par jour travaillé. Le duo de la simulation embauche quand plus de 12 % des groupes repartent trois jours de suite et qu'il a cinq jours de salaire en caisse (table `equipe`): c'est une conduite prudente, pas une règle du jeu.
 - **EM-03** **Rôles** (table `employes`): service en salle (commandes, service, débarrasser), barista (machine, buse, thés, presse, blender, méthodes douces), commis (plonge, débarrasser, réserve, livraisons, vitrine), pâtisserie (four, plan, crêpière, gaufrier, fournées), plonge (vaisselle et débarrasser), gérance (une succursale). Un employé ne fait que les tâches de son rôle et laisse les autres aux joueurs.
 - **EM-04** **Horaires**: tous les jours d'ouverture, ou seulement les jours d'affluence (marché et week-end), ou des jours choisis. Chacun prend une pause d'une heure de jeu au milieu de la journée, à tour de rôle.
@@ -366,8 +366,8 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **PR-04** **Le déménagement**: quand l'offre est là, le défi tenu et la tirelire suffisante, le duo choisit de partir (accord des deux); il part le lundi suivant. Rien ne presse: on peut rester aussi longtemps qu'on veut. L'ancien café devient une succursale (SU-01).
 - **PR-05** **Recettes** (table `recettes`): connues au départ; fiches du catalogue (20 à 80 €); offertes par un habitué à un niveau de lien; apportées par une machine (presse-agrumes: le jus pressé); découvertes de saison (offertes par un fournisseur le premier jour de la saison, si l'adresse convient); propres à une adresse (le brunch arrive avec l'atelier, notre mélange avec la torréfaction).
 - **PR-06** **Équipement**: chaque poste a trois niveaux (à la main, machine, machine avancée, table `postes`); chaque adresse s'équipe à neuf (le café quitté garde ses machines); la table `achats` donne le catalogue des machines et leurs effets.
-- **PR-07** **Extensions**: deux ou trois par adresse (table `extensions`), commandées sur la tablette, construites le lundi suivant.
-- **PR-08** **La fin de l'histoire**: à la maison parisienne, quand la réputation atteint 4,5 tasses et que la verrière restaurée, la mezzanine, le laboratoire et la torréfaction sont ouverts, le Guide de la Tasse passe incognito dans la semaine (un client au carnet de cuir qui revient chaque jour); le lundi suivant, la lettre annonce la Tasse d'or, et la fête de la maison réunit les habitués de toutes les adresses.
+- **PR-07** **Extensions**: deux à quatre par adresse, celles des plans du level designer (table `extensions`), commandées sur la tablette, construites le lundi suivant. Certaines apportent un poste ou une recette (la cuisine du brunch, la torréfaction, le laboratoire).
+- **PR-08** **La fin de l'histoire**: à la maison parisienne, quand la réputation atteint 4,5 tasses et que la maison est au complet (la torréfaction, le laboratoire, les salons de l'étage, le jardin et sa serre), le Guide de la Tasse passe incognito dans la semaine (un client au carnet de cuir qui revient chaque jour); le lundi suivant, la lettre annonce la Tasse d'or, et la fête de la maison réunit les habitués de toutes les adresses.
 - **PR-09** **Le jeu libre**: après la fête, rien ne s'arrête. Les cafés restent, « Nos projets » garde ses objectifs de jeu libre (section 6.10), les saisons tournent.
 - **PR-10** **Jamais bloqué**: aucune condition ne peut devenir impossible (réputation qui ne baisse pas, rattrapage, fournisseurs qui font crédit, tirelire qui grossit chaque jour ouvert).
 
@@ -407,7 +407,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **SV-05** **Taille**: environ 200 Ko en fin d'histoire (estimation de l'architecte, technique, section 6.1); `maxBytes` à 4 Mio.
 - **SV-06** **Versions**: format daté (`dataSchema`), migrations testées sur des sauvegardes de référence. Un service en cours ne se migre pas: une sauvegarde faite en plein service par une version plus ancienne reprend à la fin de cette journée, le reste du service calculé par la règle des succursales (technique, section 6.2). Tout identifiant de contenu (recette, meuble, habitué) reste valable pour toujours.
 - **SV-07** **Historique** (F08, `play: "session"`): chaque séance s'inscrit avec ses journées (« du mardi 3 au jeudi 5 du printemps, année 1 »), l'adresse jouée, trois statistiques (journées tenues, clients servis, mots au livre d'or, proposition de l'architecte retenue) et au plus trois faits marquants partagés de 60 caractères au plus, par priorité: arrivée à une adresse (« Ouverture de l'atelier »), défi tenu (« La fête du Tilleul »), Tasse d'or, nouvelle tasse de réputation (« Quatre tasses à Mérelles »), habitué à un nouveau niveau (« Simone: Comme la famille »), extension ouverte, première embauche, recette apprise. Aucun fait individuel, aucune statistique par joueur.
-- **SV-08** **Progression commune** (F09): `progress` = projets réalisés / projets de « Nos projets » dans la version installée, affichée « Nos projets: 23 sur 59 ». Raison, plutôt que la formule par adresse proposée par l'architecte: elle continue de monter dans le jeu libre, ne reste jamais à 1 tant qu'il reste quelque chose à faire, et dit en mots ce que le duo a accompli. Quand une version ajoute des projets, le total grandit.
+- **SV-08** **Progression commune** (F09): `progress` = projets réalisés / projets de « Nos projets » dans la version installée, affichée « Nos projets: 23 sur 60 ». Raison, plutôt que la formule par adresse proposée par l'architecte: elle continue de monter dans le jeu libre, ne reste jamais à 1 tant qu'il reste quelque chose à faire, et dit en mots ce que le duo a accompli. Quand une version ajoute des projets, le total grandit.
 
 ### 4.19 Métriques de jeu
 
@@ -761,7 +761,7 @@ Lectures: le duo médian passe trois semaines dans chacune des quatre premières
 | Duo rapide | ville vers Paris, quartier | 100 % | 0 % | 0 % | 0 % |
 | Duo rapide | Paris, quartier vers Paris, maison | 38 % | 0 % | 62 % | 0 % |
 
-Lectures: au village, c'est la réputation du défi qui fixe le départ du duo médian; au bourg, l'épargne pour l'atelier; en ville, la réputation; à Paris, l'une ou l'autre. L'offre n'est jamais ce qui retient: la lettre arrive toujours avant que le duo soit prêt.
+Lectures: au village, c'est la réputation du défi qui fixe le départ du duo médian; au bourg, l'épargne pour l'Imprimerie; en ville, la réputation; à Paris, l'une ou l'autre. L'offre n'est jamais ce qui retient: la lettre arrive toujours avant que le duo soit prêt.
 
 **Le service, à la main puis avec machines, puis avec employés** (duo médian, six premières et six dernières journées à chaque adresse)
 
@@ -793,7 +793,7 @@ Lectures: au village, les deux joueurs sont occupés à 58 % la première semain
 | Paris, maison | avec l'équipe | 12 | 186 | 19 % | 112 s | 76 | 146 s |
 | Paris, maison | à deux, sans employés | 0 | 68 | 70 % | 73 s | 86 | 40 s |
 
-Lecture: à deux seulement, l'atelier refuse <!-- val:equipe_ville_sans -->65 % de ses groupes et la maison parisienne <!-- val:equipe_paris-maison_sans -->70 %; les employés ne remplacent pas les joueurs, ils rendent les grandes adresses possibles.
+Lecture: à deux seulement, l'Imprimerie refuse <!-- val:equipe_ville_sans -->65 % de ses groupes et la maison parisienne <!-- val:equipe_paris-maison_sans -->70 %; les employés ne remplacent pas les joueurs, ils rendent les grandes adresses possibles.
 
 **Une journée moyenne, par adresse** (duo médian)
 
@@ -964,11 +964,11 @@ Plans, éléments fixes, circulation, extensions et quartiers: `docs/jeux/cosy-c
 |---|---|---|---|---|---|
 | 1 | `village` | Ormeval, le café de la place du Tilleul: 38 m², vitrine au sud, banc de la patronne, pièce du fond fermée, logement à l'étage | apprendre ensemble, sans presse: tout est à portée de main | le service au comptoir, la machine à deux groupes, l'ardoise, le livre d'or, les habitués, la décoration; E1 la terrasse sous le store, E2 la pièce du fond au coin du feu | 1 |
 | 2 | `bourg` | Mérelles, l'ancienne pâtisserie de la place de la Halle: 81 m², vitrine à l'est face à la halle, laboratoire qui attend son four | le premier vrai coup de feu, le fait maison | le four et les fournées, le service en salle, le marché du jeudi, le coup de main, les gros meubles portés à deux; E1 la terrasse de la halle, E2 la salle de la remise, E3 la cour sous la treille | 2 |
-| 3 | `ville` | l'atelier: ancienne imprimerie d'une ville universitaire, brique et sheds, 140 m² | apprendre à mener une équipe | les employés, le brunch, le café de spécialité, la rentrée des étudiants, la première succursale; E1 la deuxième salle, E2 la cour pavée | 3 |
-| 4 | `paris-quartier` | le café d'angle d'un quartier inventé de Paris, sur deux rues, zinc et mosaïque, 92 m² | le flux parisien, les touristes, l'équipe reprise | loyer et prix parisiens, l'ardoise traduite, trois cafés à tenir; E1 la terrasse sur le trottoir, E2 l'arrière-salle | 4 |
-| 5 | `paris-maison` | la maison du boulevard: une halle sous verrière, deux niveaux, 310 m², torréfacteur en pièce maîtresse | la maison au complet, la reconnaissance | notre mélange, le laboratoire de pâtisserie, la visite du Guide de la Tasse, la fête de la maison; E1 la verrière restaurée, E2 la mezzanine | 4 |
+| 3 | `ville` | Montaurel, l'Imprimerie: ancienne imprimerie de la rue des Facultés, une boutique sur la rue et un atelier sous ses sheds, 165 m² | apprendre à mener une équipe | les employés, le brunch, le café de spécialité, la rentrée des étudiants, la première succursale; E1 l'atelier entier, E2 la cuisine du brunch, E3 la cour sous la glycine | 3 |
+| 4 | `paris-quartier` | le café de l'angle des Plumassiers, au pied d'un immeuble de rapport d'un quartier inventé, entrée dans le pan coupé, 68 m² (96 avec la salle du fond) | le flux parisien, les touristes, l'équipe reprise | loyer et prix parisiens, l'ardoise traduite, trois cafés à tenir; E1 la salle du fond, E2 la terrasse sur les deux rues | 4 |
+| 5 | `paris-maison` | la Graineterie du boulevard des Horticulteurs: la maison d'un ancien graineur, boutique sur le boulevard, halle sous verrière, salons à l'étage, jardin, 300 m² sur deux niveaux | la maison au complet, la reconnaissance | notre mélange, le laboratoire de pâtisserie, la visite du Guide de la Tasse, la fête de la maison; E1 la torréfaction, E2 le laboratoire de pâtisserie, E3 les salons de l'étage, E4 le jardin et sa serre | 4 |
 
-La ville et Paris attendent leurs plans: les places et les surfaces de la table `adresses` sont des hypothèses de simulation, sous les plafonds de l'architecte (C2, C6). Paris se reconnaît à sa matière, jamais à un lieu réel (bible, section 9): rues, commerces et personnes sont inventés (question Q3).
+Les places et les surfaces de la table `adresses` reprennent les plans du level designer du 2026-11-07, sous les plafonds de l'architecte (C2, C6). Paris se reconnaît à sa matière, jamais à un lieu réel (bible, section 9): rues, commerces et personnes sont inventés (question Q3).
 
 ### 6.2 Recettes (47)
 
@@ -1040,7 +1040,7 @@ Meubles et objets se modélisent selon la bible (section 13.4); chacun existe da
 | Extérieur | store, jardinières, enseigne (au nom de la maison), ardoise de trottoir, parasol, mange-debout, range-vélos, plaids de terrasse | 10 | 40 à 600 € | 1 à 3 |
 | Musique | radio à deux stations (village), tourne-disque (bourg), platine (une par salle, ville), sonorisation (Paris); la maison garde ses disques (son.md) | 4 | 60 à 1 200 € | 0 (la musique compte en AM-01) |
 | Équipements recherchés par les profils | gobelets, tabourets de comptoir, mange-debout, journal du jour, étagère à livres, fauteuils, chaise haute, coin des enfants, vitrine réfrigérée, range-vélos, ardoise traduite (Oscar), wifi, prises, grande table, moulin de spécialité | 15 | 40 à 3 200 € | 0 à 2 |
-| Pièces uniques | cadeaux des habitués (l'aquarelle de Simone, les dessins de Noé, l'horloge de gare de Karim, les affiches de l'atelier, les photos d'autrefois d'Antoine...) et pièces de brocante | 15 environ | offertes, ou -30 % à la brocante | 4 à 6 (x1,5 à la brocante) |
+| Pièces uniques | cadeaux des habitués (l'aquarelle de Simone, les dessins de Noé, l'horloge de gare de Karim, les affiches de l'Imprimerie, les photos d'autrefois d'Antoine...) et pièces de brocante | 15 environ | offertes, ou -30 % à la brocante | 4 à 6 (x1,5 à la brocante) |
 
 Postes, machines et extensions achetés par le duo simulé (table du script; les rangs disent l'ordre d'achat d'un duo qui équilibre, puis d'un duo qui veut d'abord servir plus):
 
@@ -1134,7 +1134,7 @@ Chaque habitué est rattaché à une adresse; ses cinq étapes s'ouvrent aux niv
 | Habitué | Adresse | Profil | Commande fétiche | Quand | Trait visible (proposition) | Son histoire | Suit la maison |
 |---|---|---|---|---|---|---|---|
 | Simone | village | voisins | noisette, au comptoir | tous les jours, 8 h 30 et 17 h | long gilet prune, chignon piqué d'un crayon, lunettes à chaînette, panier d'osier; son banc sous la vitrine | elle vous confie les clés et vous montre les gestes; libérée du comptoir, elle se met à l'aquarelle et vous offre la place du Tilleul peinte; elle reprend la gérance quand vous partez | oui: chaque inauguration, « Un an déjà », la fête |
-| Mathis | village | pressés | espresso et pain au chocolat | du mardi au samedi, 8 h 10 | sacoche de facteur jaune moutarde, vélo appuyé à la vitrine | toujours en retard sur sa tournée, il prépare un concours le soir au café; le jour où il le réussit, il offre une tournée de cafés à la salle; muté en ville, il retrouve votre comptoir à l'atelier | oui: l'atelier |
+| Mathis | village | pressés | espresso et pain au chocolat | du mardi au samedi, 8 h 10 | sacoche de facteur jaune moutarde, vélo appuyé à la vitrine | toujours en retard sur sa tournée, il prépare un concours le soir au café; le jour où il le réussit, il offre une tournée de cafés à la salle; muté en ville, il retrouve votre comptoir à l'Imprimerie | oui: l'Imprimerie |
 | Farida et Noé | village | familles | chocolat chaud et crêpe au sucre | mercredi 16 h, samedi 10 h | ciré moutarde (Farida), bonnet à pompon (Noé) | Noé, timide, dessine sur un coin de l'ardoise; ses dessins finissent encadrés au mur; sa classe vient goûter un mercredi | non |
 | Bastien et Gribouille | village | promeneurs | jus d'orange pressé et tartine | dimanche 11 h | bâtons de marche, chien couché sous la table (pose fixe) | il balise un sentier qui passe par la place; le range-vélos et l'écuelle installés, il amène son club; il vous donne sa recette de citronnade | non |
 | Lise | village | flâneurs | café crème et tarte du jour | samedi 10 h, mardi 15 h | cardigan vert bouteille, piles de livres | bibliothécaire de l'école, elle remplit l'étagère à livres et monte une boîte à livres avec vous; elle écrit l'histoire du café pour le bulletin du village | non |
@@ -1143,17 +1143,17 @@ Chaque habitué est rattaché à une adresse; ses cinq étapes s'ouvrent aux niv
 | Karim | bourg | pressés | double espresso | du mardi au samedi, 7 h 35 | casquette et gilet de la gare | la salle d'attente de la gare est froide: vous lui préparez un thermos chaque matin; il vous offre la vieille horloge de la gare | non |
 | Yanis et sa bande | bourg | étudiants | chocolat viennois et gaufre | mardi et vendredi, 17 h | casques audio, sacs couverts de badges | ils révisent le bac sur la grande table de la remise; le jour des résultats, la bande dessine la boutique et la signe | non |
 | Chantal | bourg | flâneurs | thé noir et madeleines | samedi 16 h, après la répétition | écharpe de chœur rouge, partitions | sa chorale répète à la halle; à la foire de la halle, elle chante sur la terrasse; elle vous offre une partition encadrée | non |
-| Agathe | ville | télétravail | chaï latte | du mardi au vendredi, 9 h | lunettes rondes, mains tachées d'encre | l'atelier était l'imprimerie de sa famille; elle garde un coin de la grande table, imprime vos cartes et vos affiches sur la vieille presse, vous apprend le chaï | non |
-| Thao | ville | étudiants | latte et cookie | du mardi au jeudi, 14 h | rouleau de plans, carnet de croquis | étudiante en architecture, elle dessine le café, vous donne sa recette de cookies; en stage à Paris, elle suit la restauration de la verrière | oui: la maison parisienne |
+| Agathe | ville | télétravail | chaï latte | du mardi au vendredi, 9 h | lunettes rondes, mains tachées d'encre | l'Imprimerie était celle de sa famille; elle garde un coin de la grande table de l'atelier, imprime vos cartes et vos affiches sur la vieille presse, vous apprend le chaï | non |
+| Thao | ville | étudiants | latte et cookie | du mardi au jeudi, 14 h | rouleau de plans, carnet de croquis | étudiante en architecture, elle dessine le café, vous donne sa recette de cookies; en stage à Paris, elle dessine la réouverture des salons de l'étage de la Graineterie | oui: la maison parisienne |
 | Oscar | ville | télétravail | thé vert et part de quiche | du mardi au vendredi, 10 h | écharpe longue, ordinateur couvert d'autocollants | traducteur, toujours à la table près de la prise; il traduit l'ardoise pour les touristes (l'ardoise traduite de Paris) | oui: le café d'angle, puis la maison |
 | Aïcha | ville | connaisseurs | café filtre de spécialité | mercredi et samedi, 10 h | tablier de toile kaki, sac de jute | torréfactrice, elle goûte votre espresso, vous apprend les méthodes douces puis le flat white; à Paris, elle crée avec vous notre mélange | oui: la maison parisienne |
-| La famille Martin-Diallo | ville | brunch | formule brunch | dimanche 11 h | grands-parents compris, la grand-mère en chapeau | ils fêtent les 80 ans de la grand-mère au café et reviennent nombreux au grand brunch de l'atelier | non |
+| La famille Martin-Diallo | ville | brunch | formule brunch | dimanche 11 h | grands-parents compris, la grand-mère en chapeau | ils fêtent les 80 ans de la grand-mère au café et reviennent nombreux au grand brunch de l'Imprimerie | non |
 | Antoine | Paris, quartier | voisins | espresso au zinc | tous les jours, 7 h 30 | béret, mouchoir à carreaux | l'ancien patron vous cède son café d'angle avec son équipe; il garde les photos du café en 1960 (décor « Le café d'autrefois »); il organise avec vous le vide-grenier | oui: la fête |
 | Clémence | Paris, quartier | promeneurs | jus d'orange pressé et éclair au café | samedi 11 h, avec un groupe | parapluie levé de guide | guide-conférencière, elle amène ses groupes le samedi, demande l'ardoise traduite, vous montre un passage oublié du quartier | non |
 | Malik | Paris, quartier | pressés | café allongé à emporter et pain aux raisins | tous les jours, 7 h 35 | le kiosque d'en face, gants mitaines | il échange le journal du jour contre son café; il garde un double de vos clés | non |
 | Louise | Paris, quartier | flâneurs | thé noir et tarte au citron | mardi et jeudi, 15 h | étui à partitions | pianiste du conservatoire voisin, elle joue au vide-grenier, puis à la fête de la maison | oui: la fête |
-| Hugo et Samir | Paris, quartier | gourmands | chocolat chaud et éclair au café | vendredi 16 h | sacs de la librairie | ils ouvrent une librairie à côté; un coin lecture se partage entre les deux boutiques; pour leurs dix ans ensemble, ils commandent un gâteau | non |
-| Éliane | Paris, maison | connaisseurs | thé vert et le gâteau de la maison | mardi et samedi, 16 h | gants de fil, broche ancienne | sa grand-mère tenait un salon de thé sous la verrière; elle vous confie la maison; la verrière restaurée, elle reconnaît le lieu de son enfance | non (c'est chez elle) |
+| Hugo et Samir | Paris, quartier | gourmands | chocolat chaud et éclair au café | vendredi 16 h | sacs de la librairie | libraires de la rue des Coudriers, ils prêtent des livres au coin lecture du café; pour leurs dix ans ensemble, ils commandent un gâteau | non |
+| Éliane | Paris, maison | connaisseurs | thé vert et le gâteau de la maison | mardi et samedi, 16 h | gants de fil, broche ancienne | petite-fille du graineur, elle vous confie la maison de son grand-père; quand les salons de l'étage rouvrent, elle y retrouve les goûters de son enfance | non (c'est chez elle) |
 | Bérénice | Paris, maison | brunch | formule brunch et jus pressé | dimanche 11 h 30 | lunettes de soleil sur la tête, foulard | styliste du quartier, elle fait de la maison le rendez-vous du dimanche et prête des tissus pour la fête | non |
 | Jo | Paris, maison | télétravail | notre mélange et part de quiche | du mardi au vendredi, 13 h | sacoche de régie, ruban adhésif au poignet | à la régie du théâtre voisin, Jo vient avant les représentations et règle les lumières de la fête | non |
 | Wu Lan | Paris, maison | flâneurs | espresso d'origine et cannelé | jeudi 10 h | carnet de dégustation, châle bleu nuit | ancienne professeure de chimie, elle parle des grains comme d'une expérience et vous aide à régler la torréfaction | non |
@@ -1167,12 +1167,12 @@ Candidats de la version 1 (les petites annonces en tirent trois chaque lundi; le
 | Prénom | Rôle | Traits | Où |
 |---|---|---|---|
 | Léa | commis (coup de main), puis gérance du bourg | Lève-tôt, Sourire | Mérelles, nièce de Marion |
-| Tom | service en salle | Pied léger, Bonne mémoire | candidatures de l'atelier |
-| Inaya | plonge | Patience d'ange, Sang-froid | candidatures de l'atelier |
-| Baptiste | barista | Main sûre, Curiosité | candidatures de l'atelier |
-| Maëlle | service en salle | Sourire, Couche-tard | candidatures de l'atelier |
-| Sofiane | commis | Pied léger, Lève-tôt | candidatures de l'atelier |
-| Capucine | pâtisserie | Main sûre, Douceur | candidatures de l'atelier et de Paris |
+| Tom | service en salle | Pied léger, Bonne mémoire | candidatures de l'Imprimerie |
+| Inaya | plonge | Patience d'ange, Sang-froid | candidatures de l'Imprimerie |
+| Baptiste | barista | Main sûre, Curiosité | candidatures de l'Imprimerie |
+| Maëlle | service en salle | Sourire, Couche-tard | candidatures de l'Imprimerie |
+| Sofiane | commis | Pied léger, Lève-tôt | candidatures de l'Imprimerie |
+| Capucine | pâtisserie | Main sûre, Douceur | candidatures de l'Imprimerie et de Paris |
 | Josiane | service en salle, reprise | Bonne mémoire, Sang-froid | café d'angle, vingt-cinq ans de maison |
 | Dimitri | barista, repris | Main sûre, Couche-tard | café d'angle |
 | Awa | service en salle, reprise | Sourire, Pied léger | café d'angle |
@@ -1201,9 +1201,9 @@ Candidats de la version 1 (les petites annonces en tirent trois chaque lundi; le
 | Quand | Événement | Effet |
 |---|---|---|
 | Chaque lundi | Fermeture: travaux, brocante, visite d'une succursale | TE-08 |
-| Jour de marché (Mérelles le jeudi, l'atelier le samedi, le café d'angle le mardi et le vendredi, la maison parisienne le dimanche) | Le marché | voisins, flâneurs et promeneurs plus nombreux (table `jours`) |
+| Jour de marché (Mérelles le jeudi, Montaurel le samedi, les Plumassiers le mardi et le vendredi, le boulevard des Horticulteurs le dimanche) | Le marché | voisins, flâneurs et promeneurs plus nombreux (table `jours`) |
 | Mercredi après-midi; mardi, jeudi, vendredi à 16 h 30 | Les enfants: après-midi libre, sortie d'école | le goûter des familles |
-| Samedi et dimanche | Le week-end | promeneurs, familles, gourmands; brunch dès l'atelier |
+| Samedi et dimanche | Le week-end | promeneurs, familles, gourmands; brunch dès la cuisine de l'Imprimerie |
 | Premier jour de soleil du printemps | « Les premières terrasses » | terrasse pleine, x1,2 ce jour-là |
 | Un samedi du printemps | « Le marché aux fleurs » | plantes du catalogue à -20 % la semaine |
 | Été (toute la saison) | « Les grandes vacances » | étudiants x0,35, promeneurs x1,5, familles x1,2 (table `saisons`) |
@@ -1213,7 +1213,7 @@ Candidats de la version 1 (les petites annonces en tirent trois chaque lundi; le
 | 8e jour de l'hiver | « La Chandeleur » | les crêpes demandées deux fois plus ce jour-là |
 | Troisième week-end de l'hiver | « Le marché d'hiver » | chocolat aux épices à l'honneur, gourmands x1,2 |
 | Jour 113 (premier jour du printemps de l'année 2) | « Un an déjà » | une lettre de Simone et son aquarelle; gâteau offert aux clients de la journée |
-| Défis locaux | La fête du Tilleul (village, dimanche), la foire de la halle (bourg, jeudi), le grand brunch de l'atelier (dimanche), le vide-grenier de la rue (café d'angle, dimanche), la semaine du Guide de la Tasse et la fête de la maison | PR-02, PR-08 |
+| Défis locaux | La fête du Tilleul (village, dimanche), la foire de la halle (bourg, jeudi), le grand brunch de l'Imprimerie (dimanche), le vide-grenier de la rue des Plumassiers (dimanche), la semaine du Guide de la Tasse et la fête de la maison | PR-02, PR-08 |
 
 Les événements de saison ne sont pas simulés au-delà des multiplicateurs (effets bornés à une journée, ±30 %).
 
@@ -1227,15 +1227,15 @@ Toutes en place, par dialogues, sans cinématique (C22); un fondu seulement pour
 4. **La lettre de Mérelles**: René, l'ancien pâtissier, cherche quelqu'un pour rallumer son four.
 5. **La fête du Tilleul**, un dimanche, sous le store: tout le village; le soir, Simone: « Je vous le garde au chaud. »
 6. **Mérelles**: le laboratoire vide; le four d'occasion livré et porté à deux; la première fournée sous l'œil de René. La foire de la halle, la chorale de Chantal sur la terrasse.
-7. **La lettre de l'atelier**: Agathe cherche à qui confier l'imprimerie de sa famille.
-8. **L'atelier**: la première embauche (un entretien au comptoir, trois candidatures); le premier brunch; Mathis au comptoir; la rentrée. Le grand brunch de l'atelier.
-9. **La lettre de Paris**: Antoine prend sa retraite et veut que son café d'angle reste un café.
-10. **Paris**: l'équipe d'Antoine vous accueille; Zoé et son vélo cargo; l'ardoise traduite d'Oscar; le vide-grenier de la rue.
-11. **La lettre d'Éliane**: la maison sous la verrière, fermée depuis des années.
-12. **La maison**: la verrière restaurée (Éliane se souvient); notre mélange, torréfié avec Aïcha et Wu Lan; le laboratoire, que René vient visiter.
+7. **La lettre de Montaurel**: Agathe cherche à qui confier l'imprimerie de sa famille.
+8. **L'Imprimerie**: la première embauche (un entretien au comptoir, trois candidatures); la cuisine du brunch et le premier brunch; Mathis au comptoir; la rentrée. Le grand brunch de l'Imprimerie.
+9. **La lettre de Paris**: Antoine prend sa retraite et veut que son café de l'angle des Plumassiers reste un café.
+10. **Paris**: l'équipe d'Antoine vous accueille; Zoé et son vélo cargo; l'ardoise traduite d'Oscar; la cordonnerie voisine devenue salle du fond; le vide-grenier de la rue des Plumassiers.
+11. **La lettre d'Éliane**: la Graineterie de son grand-père, fermée depuis des années: le jardin en friche, l'étage fermé, le laboratoire vide.
+12. **La Graineterie**: notre mélange, torréfié avec Aïcha et Wu Lan; le laboratoire, que René vient visiter; les salons de l'étage rouverts (Éliane se souvient); le jardin et sa serre.
 13. **« Un an déjà »**, si le jour 113 tombe pendant l'histoire: la lettre de Simone.
 14. **La semaine du Guide**: un client au carnet de cuir revient chaque jour; le lundi, la lettre: « La Tasse d'or, pour la maison … ».
-15. **La fête de la maison**: les habitués de toutes les adresses dans la cour de la maison; Louise au piano; Simone lève sa tasse: « À vous deux, et à la maison. » Puis le jeu continue.
+15. **La fête de la maison**: les habitués de toutes les adresses dans la halle et le jardin de la Graineterie; Louise au piano; Simone lève sa tasse: « À vous deux, et à la maison. » Puis le jeu continue.
 
 ### 6.10 « Nos projets »
 
@@ -1244,13 +1244,13 @@ Le carnet commun des rêves du duo, sur la tablette; il sert de liste d'objectif
 | Adresse | Projets (condition) |
 |---|---|
 | Village (12) | « Un nom sur la porte » (nommer la maison); « Notre ardoise » (écrire la première ardoise); « Notre premier client » (servir Simone); « Un premier mot » (un mot au livre d'or); « Comme d'habitude » (servir une fétiche sans commande); « Deux tasses » (2 tasses à Ormeval); « La Chandeleur avant l'heure » (crêpière et 20 crêpes servies); « Sous le store » (E1); « Au coin du feu » (E2); « Trois tasses au village »; « La fête du Tilleul » (défi); « Partir pour Mérelles » |
-| Bourg (10) | « Le four de René » (four et première fournée); « Croissants maison » (50 servis); « Le jeudi de Marion » (50 groupes un jour de marché); « En salle » (service en salle); « La terrasse de la halle » (E1); « La salle de la remise » (E2); « Sous la treille » (E3); « Un coup de main » (embaucher Léa); « La foire de la halle » (défi); « Partir pour l'atelier » |
-| Ville (9) | « Notre première embauche »; « Le brunch du dimanche » (30 brunchs un dimanche); « Café de spécialité » (méthodes douces et 20 filtres); « Trois groupes » (la machine à trois groupes); « Deux salles pleines » (E1 et 40 personnes assises à la fois); « La cour pavée » (E2); « Deux cafés, une maison » (le village tourne en succursale); « Le grand brunch » (défi); « Partir pour Paris » |
-| Paris, quartier (8) | « Ouvrir à Paris »; « L'équipe au complet » (8 employés); « Sur le trottoir » (E1); « L'ardoise en trois langues »; « L'arrière-salle » (E2); « Trois cafés »; « Le vide-grenier » (défi); « Partir pour la maison » |
-| Paris, maison (8) | « La maison du boulevard »; « Notre mélange » (torréfaction et 50 tasses); « Le laboratoire » (le gâteau de la maison servi); « La verrière » (E1); « La mezzanine » (E2); « Cinq tasses à Paris »; « La Tasse d'or »; « La fête de la maison » |
+| Bourg (10) | « Le four de René » (four et première fournée); « Croissants maison » (50 servis); « Le jeudi de Marion » (50 groupes un jour de marché); « En salle » (service en salle); « La terrasse de la halle » (E1); « La salle de la remise » (E2); « Sous la treille » (E3); « Un coup de main » (embaucher Léa); « La foire de la halle » (défi); « Partir pour Montaurel » |
+| Ville (10) | « Notre première embauche »; « La cuisine du brunch » (E2); « Le brunch du dimanche » (30 brunchs un dimanche); « Café de spécialité » (méthodes douces et 20 filtres); « Trois groupes » (la machine à trois groupes); « L'atelier entier » (E1); « Sous la glycine » (E3); « Deux cafés, une maison » (le village tourne en succursale); « Le grand brunch » (défi); « Partir pour Paris » |
+| Paris, quartier (8) | « Ouvrir à Paris »; « L'équipe au complet » (7 employés); « La salle du fond » (E1); « Sur deux rues » (E2); « L'ardoise en trois langues »; « Trois cafés »; « Le vide-grenier » (défi); « Partir pour la Graineterie » |
+| Paris, maison (8) | « La Graineterie »; « Notre mélange » (E1 et 50 tasses); « Le laboratoire » (E2 et le gâteau de la maison servi); « Les salons de l'étage » (E3); « Le jardin et sa serre » (E4); « Cinq tasses à Paris »; « La Tasse d'or »; « La fête de la maison » |
 | Partout, et le jeu libre (12) | « Cent clients en un jour »; « Mille sourires » (1 000 clients ravis); « Le livre d'or plein » (100 mots); « Toutes les recettes » (47); « Quatre styles » (quatre cafés harmonieux, de quatre styles différents); « Comme la famille » (cinq habitués au dernier niveau); « Tous nos habitués » (toutes les histoires finies); « Cinq tasses partout »; « Une année ensemble » (jour 113); « Le dessin parfait » (100 dessins sur le lait); « Rien ne se perd » (500 articles au panier du soir); « La maison au complet » (toutes les extensions) |
 
-Total de la version 1: 59 projets.
+Total de la version 1: 60 projets.
 
 ### 6.11 Écriture
 
@@ -1279,7 +1279,7 @@ Voir `docs/jeux/cosy-cafe/technique.md`, dont la section 11 (contraintes C1 à C
 ## 11. Périmètre (game-designer, manager)
 
 - **Version 1** (jusqu'à Paris, comme demandé):
-  - les cinq adresses et leurs extensions (onze), leurs défis, la visite du Guide de la Tasse et la fête de la maison; le jeu libre ensuite;
+  - les cinq adresses et leurs extensions (quatorze), leurs défis, la visite du Guide de la Tasse et la fête de la maison; le jeu libre ensuite;
   - la journée en trois temps, le lundi, la semaine, quatre saisons, la météo et l'annonce du lendemain, les événements de la section 6.8;
   - l'ardoise, les prix, l'attrait des dix profils, la découverte des goûts;
   - le service au comptoir et en salle, le rail des tickets, les gestes à la main et leurs fenêtres, trois niveaux d'équipement par poste, la qualité sans échec, le dessin sur le lait, les options lait d'avoine et déca (si Q6 les garde);
@@ -1289,7 +1289,7 @@ Voir `docs/jeux/cosy-cafe/technique.md`, dont la section 11 (contraintes C1 à C
   - 24 habitués et leurs histoires en cinq étapes, ceux qui suivent la maison;
   - les employés (six rôles, dix traits, trois niveaux), l'équipe reprise à Paris, les succursales;
   - la caisse, la réserve, la tirelire, les achats à deux, l'absence de faillite;
-  - « Nos projets » (59), les aides de chaque joueur et les réglages du duo;
+  - « Nos projets » (60), les aides de chaque joueur et les réglages du duo;
   - trois maisons, sauvegardes en plein service, séances à l'historique, progression commune.
 - **Plus tard** (bonus, mises à jour du soir): une sixième adresse ou une ville étrangère; des saisons de plus (fêtes, recettes); des commandes spéciales d'habitués (gâteaux d'anniversaire préparés à la demande); des concours (le croissant de l'arrondissement); un mode « café du dimanche » plus lent; des tenues et coiffures en plus; des disques en plus; un carnet de photos souvenirs.
 - **Hors périmètre**, avec la raison: alcool et tabac (un café et salon de thé douillet, des clients de tous âges); combat, vol, dangers, salissures dégoûtantes, clients méchants (le ton); faillite, perte définitive, note qui baisse (le ton, et rien à reprocher à l'autre joueur); licenciements secs, grèves (« gérer sans dureté »); deux joueurs dans deux cafés à la fois en version 1 (C24, pilier 1); physique des objets, vaisselle cassée, liquides renversés (C12); mode solo, plus de deux joueurs, jeu par Internet (plateforme); manette (plateforme); voix enregistrées (question S2 du son); marques réelles, lieux et établissements réels (création originale); génération procédurale des adresses (les plans sont dessinés); cinématiques en vue subjective (C22); achats dans le jeu, publicité, classements.
@@ -1341,7 +1341,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | CA-39 | une sauvegarde écrite par le Mac hôte | le PC héberge et la charge | chaque joueur retrouve son avatar; empreinte d'état identique | EL, M |
 | CA-40 | une sauvegarde d'une version ancienne, faite en plein service | la version suivante la charge | elle reprend en fin de journée, le reste du service calculé comme une succursale; rien de durable ne disparaît | U, CI |
 | CA-41 | la fin d'une séance | la plateforme reçoit le résultat | journées, adresse, trois statistiques (journées tenues, clients servis, mots au livre d'or), au plus trois faits partagés de 60 caractères; aucun fait individuel | U, EL |
-| CA-42 | 100 séances simulées | on relit la progression | `progress` vaut projets réalisés / projets de la version; affichée « Nos projets: n sur 59 » | U |
+| CA-42 | 100 séances simulées | on relit la progression | `progress` vaut projets réalisés / projets de la version; affichée « Nos projets: n sur 60 » | U |
 | CA-43 | tous les textes du jeu | relecture et contrôle automatique | aucun accord au genre d'un joueur, tutoiement de chaque joueur, « vous » pour les deux, aucune marque ni aucun lieu réel, aucun tiret cadratin ni demi-cadratin | D, U |
 | CA-44 | le jeu complet | on le joue à la souris seule, puis au clavier seul | tout est faisable; aucune touche de la rangée des chiffres n'est exigée; Échap ne ferme jamais un panneau du jeu | P2, M |
 | CA-45 | `cosy_cafe.py --croise` lancé sur ce cahier | il s'exécute | aucun écart: chaque table d'équilibrage est la copie des données, chaque résultat celui du fichier de résultats, et les résultats correspondent aux données | U |

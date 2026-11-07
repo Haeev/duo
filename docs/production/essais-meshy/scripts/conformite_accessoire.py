@@ -5,13 +5,14 @@ Entrées: la fiche de l'asset (section « conformity »), la sortie brute de Mes
 suivent les règles imposées aux sorties de Meshy par la bible de Cosy Café (section 13.3):
 
 1. import, fusion des maillages, transformations appliquées, soudure, faces dégénérées et sommets
-   isolés retirés, faces retournées réorientées vers l'extérieur;
+   isolés retirés, petits trous bouchés, faces retournées réorientées vers l'extérieur;
 2. budget (règle 1): décimation si le maillage dépasse le plafond de la fiche;
 3. couleurs (règle 2): la texture de Meshy est lue sous chaque face puis jetée; chaque face prend
    la case de palette la plus proche (CIEDE2000, poids de clarté `lightness_weight`) parmi les cases
    permises; par défaut la case gagnante à l'aire de chaque pièce (îlot de faces) l'emporte pour
    toute la pièce, sinon case par face (`per_face_parts`, `per_face_all`, lissage `face_smoothing`);
-   une seule couleur par face, coordonnées de texture au centre de la case;
+   une seule couleur par face, coordonnées de texture au centre de la case; pièces retirées sur
+   demande (`remove_parts`: objets fondus dans le modèle qui seront des objets de jeu à part);
 4. échelle et repère (règle 3): avant tourné vers +Z glTF (-Y dans Blender), cote réelle de la
    fiche, origine au centre de l'emprise au sol;
 5. formes (règle 4): symétrie rétablie sur demande, faces du dessous posé retirées, chanfrein
@@ -78,6 +79,12 @@ bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=weld)
 merged = count - len(bm.verts)
 bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.calc_area() < 1e-12], context="FACES")
 bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+# Trous: la topologie intelligente rend des maillages ouverts (arêtes de bord); avec un matériau à
+# une face, on voit l'intérieur par le trou. Les petits trous se bouchent (`fill_holes_max_sides`).
+open_before = sum(1 for e in bm.edges if e.is_boundary)
+if conf.get("fill_holes_max_sides", 12):
+    bmesh.ops.holes_fill(bm, edges=[e for e in bm.edges if e.is_boundary], sides=conf.get("fill_holes_max_sides", 12))
+open_after = sum(1 for e in bm.edges if e.is_boundary)
 bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
 # Faces retournées: invisibles de face avec un matériau à une face, elles laissent voir l'intérieur
 # de la pièce. Chaque îlot est réorienté vers l'extérieur.
@@ -109,6 +116,12 @@ bm.faces.ensure_lookup_table()
 parts, part_of = split_parts(bm)
 final, details, color_stats = assign_cells(bm, parts, part_of, images, [m.name if m else "" for m in me.materials], palette, conf)
 apply_palette_uv(bm, final, palette)
+# Pièces retirées par la fiche (numéros du rapport): objets fondus dans le modèle qui seront des
+# objets de jeu à part (tasses posées sur une machine), éclats sans épaisseur.
+removed_parts = sorted(int(i) for i in conf.get("remove_parts", []))
+removed_faces = [f for i in removed_parts for f in parts[i]]
+bmesh.ops.delete(bm, geom=removed_faces, context="FACES")
+bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
 bm.to_mesh(me)
 bm.free()
 me.materials.clear()
@@ -273,10 +286,13 @@ report = {
     "within_budget": budget is None or triangles <= budget,
     "welded_vertices": merged,
     "flipped_faces_fixed": flipped,
+    "open_edges_before_after_fill": [open_before, open_after],
     "bottom_faces_removed": removed_bottom,
     "symmetrized": symmetry,
     "bevel_m": conf.get("bevel_m"),
     "parts": len(parts),
+    "removed_parts": removed_parts,
+    "removed_triangles": len(removed_faces),
     "dimensions_m": {"width_x": round(float(hi[0] - lo[0]), 3), "depth_y_blender": round(float(hi[1] - lo[1]), 3), "height": round(float(hi[2] - lo[2]), 3)},
     "scale_applied": round(scale, 5),
     "front_yaw_deg": conf.get("front_yaw_deg", 0.0),

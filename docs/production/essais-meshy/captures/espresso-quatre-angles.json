@@ -1,0 +1,2 @@
+{ "width": 1366, "height": 768, "fov": 60, "eye": [0, 1.65, 1.8], "target": [0, 1.05, -0.05], "counter": false, "marker": [0.8, 0.5], "orbit": true,
+  "models": [{ "file": "../modeles/station_espresso_2g.glb", "position": [0, 0, 0], "rotationY": 0, "clip": null, "time": 0 }] }

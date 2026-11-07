@@ -8,10 +8,19 @@
   "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
   "author": "tech-artist",
   "date": "2026-11-07",
-  "client": { "server": "@meshy-ai/meshy-mcp-server@0.6.9", "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs", "api": "https://api.meshy.ai" },
+  "client": {
+    "server": "@meshy-ai/meshy-mcp-server@0.6.9",
+    "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+    "api": "https://api.meshy.ai"
+  },
   "credits_budget": 100,
   "inputs": [
-    { "file": "docs/jeux/cosy-cafe/bible/references/machine-expresso.png", "sha256": "15fe7c953756bc0a5b24855a810dfe287a1973f989b74624713faef934d9ef8f", "author": "directeur-artistique", "note": "trois quarts, fond uni, trois tasses posées sur le dessus (Meshy les fond dans la machine: à séparer ou retirer à la mise en conformité)" }
+    {
+      "file": "docs/jeux/cosy-cafe/bible/references/machine-expresso.png",
+      "sha256": "15fe7c953756bc0a5b24855a810dfe287a1973f989b74624713faef934d9ef8f",
+      "author": "directeur-artistique",
+      "note": "trois quarts, fond uni, trois tasses posées sur le dessus (Meshy les fond dans la machine: à séparer ou retirer à la mise en conformité)"
+    }
   ],
   "tasks": [
     {
@@ -25,7 +34,9 @@
         "model_type": "smart-topology",
         "target_polycount": 4000,
         "topology": "triangle",
-        "target_formats": ["glb"],
+        "target_formats": [
+          "glb"
+        ],
         "auto_size": true,
         "origin_at": "bottom"
       },
@@ -35,7 +46,10 @@
       "finished": "2026-11-07T20:04:49.080Z",
       "duration_s": 24.9,
       "files_expire": "2026-11-10T20:04:49.080Z",
-      "outputs": ["GLB sans texture (un aperçu de texte vers 3D n'est jamais texturé)", "vignette"],
+      "outputs": [
+        "GLB sans texture (un aperçu de texte vers 3D n'est jamais texturé)",
+        "vignette"
+      ],
       "downloaded": false
     },
     {
@@ -49,7 +63,9 @@
         "model_type": "smart-topology",
         "target_polycount": 4000,
         "texture_model": "meshy-n1",
-        "target_formats": ["glb"],
+        "target_formats": [
+          "glb"
+        ],
         "auto_size": true,
         "origin_at": "bottom"
       },
@@ -58,7 +74,11 @@
       "finished": "2026-11-07T20:29:34.261Z",
       "duration_s": 29.2,
       "files_expire": "2026-11-10T20:29:34.261Z",
-      "outputs": ["model.glb", "texture_0.png (couleur de base seule, Meshy N1)", "preview.png"],
+      "outputs": [
+        "model.glb",
+        "texture_0.png (couleur de base seule, Meshy N1)",
+        "preview.png"
+      ],
       "downloaded": false
     }
   ],
@@ -71,17 +91,39 @@
   "conformity": {
     "node_name": "station_espresso_2g",
     "front_yaw_deg": 0,
-    "pending": ["front_yaw_deg à fixer après examen du GLB brut", "tasses du dessus: pièces à retirer ou à séparer"],
-    "target_size_m": { "axis": "width", "value": 0.76 },
+    "pending": [
+      "arrière et côté droit gris: la texture meshy-n1 ne connaît que la vue de face; reprise dans Blender (bible, 13.2) ou retexture par vues multiples"
+    ],
+    "target_size_m": {
+      "axis": "width",
+      "value": 0.76
+    },
     "size_source": "maquette de la bible (docs/jeux/cosy-cafe/bible/source/mobilier.cjs, espressoMachine: 0,76 m de large, 0,48 m de haut, corps de 0,42 m de profondeur)",
     "max_triangles": 4000,
-    "palette_allowed": ["copper", "brass", "steel", "steel_dark", "ink", "porcelain"],
+    "palette_allowed": [
+      "copper",
+      "brass",
+      "steel",
+      "steel_dark",
+      "ink",
+      "porcelain"
+    ],
     "palette_default": "steel",
     "palette_overrides": {},
     "lightness_weight": 2.0,
-    "smooth_angle_deg": 35,
+    "smooth_angle_deg": 20,
     "remove_bottom_faces": true,
     "bake_ao": true,
-    "ao_floor": 0.55
+    "ao_floor": 0.75,
+    "remove_parts": [
+      0,
+      1,
+      4,
+      10
+    ],
+    "per_face_parts": [
+      5
+    ],
+    "fill_holes_max_sides": 12
   }
 }

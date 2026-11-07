@@ -1331,7 +1331,7 @@ def paris_quartier(state):
 
 def paris_maison(state):
     arrival = state == "arrivee"
-    cap = {"inside": 41, "outside": 12} if arrival else {"inside": 62, "outside": 26}
+    cap = {"inside": 41, "outside": 12} if arrival else {"inside": 62, "outside": 34}
     p = Plan(
         f"paris-maison-{state}", "paris-maison", state, 5,
         "Paris, la Graineterie du boulevard des Horticulteurs",
@@ -1341,7 +1341,7 @@ def paris_maison(state):
          "verrière, le laboratoire, le jardin; les salons à l'étage. "
          + ("Le jardin est en friche, l'étage fermé, le laboratoire vide, pas encore de torréfacteur."
             if arrival else "E1: la torréfaction. E2: le laboratoire de pâtisserie. E3: les salons de l'étage. "
-                            "E4: le jardin et sa serre.")),
+                            "E4: le jardin et sa serre. E5: le second rang de terrasse.")),
         scale_px=30,
     )
     L = p.level("rdc", "Rez-de-chaussée", (0, 0, 21.0, 34.0))
@@ -1575,8 +1575,14 @@ def paris_maison(state):
     L.zone("free", rect(3.5, 25.5, 13.0, 1.1), "terrasse")
     for x in row_a:
         L.table(x, 26.0, 0.9, 0.5, "N2", area="outside", room="terrasse")
-    L.zone("extension", rect(3.5, 27.3, 13.0, 1.2), "second rang: avec l'option B de l'architecte (foule lointaine)")
-    L.hood(3.5, 25.5, 13.0, 1.2, label="store")
+    if arrival:
+        L.zone("extension", rect(3.5, 27.3, 13.0, 1.2), "E5: le second rang de terrasse")
+        L.hood(3.5, 25.5, 13.0, 1.2, label="store")
+    else:
+        L.zone("free", rect(3.5, 27.3, 13.0, 1.2), "terrasse")
+        for x in (4.7, 6.5, 12.1, 13.9):
+            L.table(x, 27.9, 0.9, 0.5, "N2", area="outside", room="terrasse")
+        L.hood(3.5, 25.5, 13.0, 3.0, label="store")
     L.furniture(rect(8.55, 28.75, 0.3, 0.5), "slate", "ardoise", height=1.2)
 
     # Points, file, vues, espaces.

@@ -1,0 +1,124 @@
+{
+  "asset": "char_essai_presse",
+  "triangles": 3960,
+  "triangle_budget": 4000,
+  "within_budget": true,
+  "bones": 24,
+  "bone_names": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+  ],
+  "root_bone": "Hips",
+  "height_before_m": 1.7,
+  "scale_applied": 1.0,
+  "clips": {
+    "walk": {
+      "seconds": 1.033,
+      "frames": [
+        0.8000000715255737,
+        25.599998474121094
+      ],
+      "root_move_m": [
+        -0.0,
+        -0.001,
+        -0.002
+      ]
+    },
+    "idle": {
+      "seconds": 4.0,
+      "frames": [
+        0.0,
+        96.0
+      ],
+      "root_move_m": [
+        -0.0,
+        0.0,
+        -0.0
+      ]
+    },
+    "sit": {
+      "seconds": 10.667,
+      "frames": [
+        0.0,
+        256.0
+      ],
+      "root_move_m": [
+        -0.0,
+        -0.0,
+        0.0
+      ]
+    },
+    "drink": {
+      "seconds": 8.867,
+      "frames": [
+        0.0,
+        212.8000030517578
+      ],
+      "root_move_m": [
+        -0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "sit_drink": {
+      "seconds": 11.167,
+      "frames": [
+        0.0,
+        268.0
+      ],
+      "root_move_m": [
+        -0.0,
+        -0.0,
+        0.0
+      ]
+    }
+  },
+  "clip_bones_missing_on_character": {},
+  "palette": [
+    {
+      "mesh": "char1",
+      "parts": 360,
+      "cells": [
+        "hair_1",
+        "hair_2",
+        "hair_3",
+        "kraft",
+        "presses_bag",
+        "presses_charcoal",
+        "presses_navy",
+        "skin_2",
+        "skin_3"
+      ],
+      "mixed_parts": [
+        22,
+        77,
+        85,
+        87
+      ],
+      "area_where_final_differs_from_face_nearest": 0.006
+    }
+  ],
+  "file_bytes": 624456
+}

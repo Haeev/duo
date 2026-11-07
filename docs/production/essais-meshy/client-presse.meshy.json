@@ -8,10 +8,19 @@
   "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
   "author": "tech-artist",
   "date": "2026-11-07",
-  "client": { "server": "@meshy-ai/meshy-mcp-server@0.6.9", "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs", "api": "https://api.meshy.ai" },
+  "client": {
+    "server": "@meshy-ai/meshy-mcp-server@0.6.9",
+    "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+    "api": "https://api.meshy.ai"
+  },
   "credits_budget": 100,
   "inputs": [
-    { "file": "docs/jeux/cosy-cafe/bible/references/client-presse-face.png", "sha256": "3efd4288ee26f46aba20bd6279f231baced87408a2f61bdd1f8ef0c8aaee3c3b", "author": "directeur-artistique", "note": "de face, bras le long du corps, dessin à plat; la vue de dos (client-presse-dos.png) ne sert qu'en image vers 3D à plusieurs vues, sans topologie intelligente" }
+    {
+      "file": "docs/jeux/cosy-cafe/bible/references/client-presse-face.png",
+      "sha256": "3efd4288ee26f46aba20bd6279f231baced87408a2f61bdd1f8ef0c8aaee3c3b",
+      "author": "directeur-artistique",
+      "note": "de face, bras le long du corps, dessin à plat; la vue de dos (client-presse-dos.png) ne sert qu'en image vers 3D à plusieurs vues, sans topologie intelligente"
+    }
   ],
   "tasks": [
     {
@@ -26,7 +35,9 @@
         "target_polycount": 4000,
         "texture_model": "meshy-n1",
         "pose_mode": "t-pose",
-        "target_formats": ["glb"],
+        "target_formats": [
+          "glb"
+        ],
         "auto_size": true,
         "origin_at": "bottom"
       },
@@ -35,7 +46,11 @@
       "finished": "2026-11-07T20:30:38.017Z",
       "duration_s": 84.9,
       "files_expire": "2026-11-10T20:30:38.017Z",
-      "outputs": ["model.glb", "texture_0.png (couleur de base seule, Meshy N1)", "preview.png"],
+      "outputs": [
+        "model.glb",
+        "texture_0.png (couleur de base seule, Meshy N1)",
+        "preview.png"
+      ],
       "downloaded": false
     },
     {
@@ -44,7 +59,10 @@
       "endpoint": "POST /openapi/v1/rigging",
       "task_id": "01a1b7b4-e3e0-766c-8083-24dc96bb9a5b",
       "parent_task_id": "01a1b7b3-6ffd-75f1-8d72-7594465c4592",
-      "params": { "input_task_id": "01a1b7b3-6ffd-75f1-8d72-7594465c4592", "height_meters": 1.7 },
+      "params": {
+        "input_task_id": "01a1b7b3-6ffd-75f1-8d72-7594465c4592",
+        "height_meters": 1.7
+      },
       "credits": 5,
       "created": "2026-11-07T20:30:50.483Z",
       "finished": "2026-11-07T20:30:57.663Z",
@@ -67,18 +85,60 @@
   ],
   "conformity": {
     "node_name": "char_essai_presse",
-    "target_height_m": 1.70,
+    "target_height_m": 1.7,
     "max_triangles": 4000,
     "clips": [
-      { "file": "Animation_Walking_withSkin.glb", "index": 0, "name": "walk", "in_place": true },
-      { "file": "Animation_Actions_withSkin.glb", "index": 0, "name": "idle" },
-      { "file": "Animation_Actions_withSkin.glb", "index": 1, "name": "sit" },
-      { "file": "Animation_Actions_withSkin.glb", "index": 2, "name": "drink" },
-      { "file": "Animation_Actions_withSkin.glb", "index": 3, "name": "sit_drink" }
+      {
+        "file": "Animation_Walking_withSkin.glb",
+        "index": 0,
+        "name": "walk",
+        "in_place": true
+      },
+      {
+        "file": "merged_animations.glb",
+        "index": 0,
+        "name": "idle"
+      },
+      {
+        "file": "merged_animations.glb",
+        "index": 1,
+        "name": "sit"
+      },
+      {
+        "file": "merged_animations.glb",
+        "index": 2,
+        "name": "drink"
+      },
+      {
+        "file": "merged_animations.glb",
+        "index": 3,
+        "name": "sit_drink"
+      }
     ],
-    "pending": ["nom réel du fichier rendu par meshy_animate à reporter dans clips[].file"],
-    "palette_allowed": ["skin_1", "skin_2", "skin_3", "skin_4", "skin_5", "skin_6", "hair_1", "hair_2", "hair_3", "hair_4", "hair_5", "hair_6", "hair_7", "presses_coat", "presses_charcoal", "presses_navy", "presses_bag", "ink", "porcelain", "kraft"],
+    "palette_allowed": [
+      "skin_1",
+      "skin_2",
+      "skin_3",
+      "skin_4",
+      "skin_5",
+      "skin_6",
+      "hair_1",
+      "hair_2",
+      "hair_3",
+      "hair_4",
+      "hair_5",
+      "hair_6",
+      "hair_7",
+      "presses_coat",
+      "presses_charcoal",
+      "presses_navy",
+      "presses_bag",
+      "ink",
+      "porcelain",
+      "kraft"
+    ],
     "per_face_all": true,
-    "face_smoothing": 2
+    "face_smoothing": 2,
+    "root_bone": "Hips"
   }
 }

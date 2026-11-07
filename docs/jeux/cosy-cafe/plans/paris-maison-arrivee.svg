@@ -388,7 +388,7 @@
 <rect x="139.0" y="845.0" width="63.0" height="57.0" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-dasharray="9,5"/>
 <text x="143.5" y="893.0" font-size="10" fill="#2e7d32" font-weight="bold" text-anchor="start" dominant-baseline="middle">E1</text>
 <rect x="139.0" y="971.0" width="390.0" height="36.0" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-dasharray="9,5"/>
-<text x="143.5" y="998.0" font-size="10" fill="#2e7d32" font-weight="bold" text-anchor="start" dominant-baseline="middle">second rang: avec l'option B de l'architecte (foule lointaine)</text>
+<text x="143.5" y="998.0" font-size="10" fill="#2e7d32" font-weight="bold" text-anchor="start" dominant-baseline="middle">E5: le second rang de terrasse</text>
 <polyline points="368.5,885.5 368.5,822.5" fill="none" stroke="#7b57b3" stroke-opacity="0.22" stroke-width="30.0" stroke-linecap="butt" stroke-linejoin="round"/>
 <circle cx="368.5" cy="822.5" r="7" fill="#ffffff" stroke="#7b57b3" stroke-width="1.5"/>
 <text x="368.5" y="822.5" font-size="8" fill="#7b57b3" font-weight="bold" text-anchor="middle" dominant-baseline="middle">1</text>

@@ -149,13 +149,13 @@ ADRESSES: list[Adresse] = [
     Adresse("village", "Ormeval, le café de la place du Tilleul", 38, 8.0, 18.0, 1.00, 1.00, 520, 8, 0,
             0, 3.0, 1.5, 8, (), (0, 8, 0, 2), (0, 8, 0, 2), 36, 2.0, 1.5, 250, 3, 24),
     Adresse("bourg", "Mérelles, la boutique de la place de la Halle", 81, 7.5, 19.0, 1.10, 1.00, 1150, 16, 600,
-            500, 3.5, 2.0, 12, ("jeudi",), (0, 12, 0, 0), (0, 13, 0, 0), 70, 2.6, 2.0, 500, 4, 48),
-    Adresse("ville", "L'atelier", 140, 8.0, 20.0, 1.30, 1.05, 2900, 34, 1200,
-            2200, 4.0, 2.5, 16, ("samedi",), (4, 16, 4, 0), (4, 18, 6, 0), 120, 3.2, 2.4, 1000, 6, 72),
-    Adresse("paris-quartier", "Le café d'angle", 92, 7.5, 20.5, 1.80, 1.15, 6500, 60, 2500,
-            4500, 4.0, 3.0, 16, ("mardi", "vendredi"), (6, 14, 2, 8), (8, 16, 4, 10), 160, 2.8, 2.2, 1800, 8, 80),
-    Adresse("paris-maison", "La maison du boulevard", 310, 8.0, 21.0, 2.00, 1.20, 15000, 140, 3000,
-            10000, 4.5, 3.5, 20, ("dimanche",), (8, 20, 6, 12), (8, 24, 8, 16), 260, 3.6, 2.6, 1200, 8, 120),
+            500, 3.5, 2.0, 12, ("jeudi",), (0, 11, 0, 0), (0, 13, 0, 0), 70, 2.6, 2.0, 500, 4, 48),
+    Adresse("ville", "Montaurel, l'Imprimerie", 165, 8.0, 20.0, 1.30, 1.05, 2900, 34, 1200,
+            2200, 4.0, 2.5, 16, ("samedi",), (9, 11, 3, 4), (9, 11, 3, 4), 120, 3.2, 2.4, 1000, 6, 72),
+    Adresse("paris-quartier", "Paris, le café de l'angle des Plumassiers", 96, 7.5, 20.5, 1.80, 1.15, 6500, 60, 2500,
+            4500, 4.0, 3.0, 16, ("mardi", "vendredi"), (4, 14, 0, 6), (4, 14, 0, 6), 160, 2.8, 2.2, 1800, 8, 80),
+    Adresse("paris-maison", "Paris, la Graineterie du boulevard des Horticulteurs", 300, 8.0, 21.0, 2.00, 1.20, 15000,
+            140, 3000, 10000, 4.5, 3.5, 20, ("dimanche",), (5, 28, 8, 12), (5, 28, 8, 12), 260, 3.6, 2.6, 1200, 8, 120),
 ]
 ADR: dict[str, Adresse] = {a.id: a for a in ADRESSES}
 ORDRE_ADRESSES = [a.id for a in ADRESSES]
@@ -173,19 +173,31 @@ EXTENSIONS: list[tuple[str, str, str, int, tuple[int, int, int, int], int, str]]
      "la remise débarrassée, avec sa grande table de ferme"),
     ("bourg", "bourg_cour", "E3, la cour sous la treille", 1400, (0, 0, 0, 8), 4,
      "la cour derrière la boutique, à l'ombre de la treille"),
-    ("ville", "ville_salle2", "E1, la deuxième salle", 2500, (0, 8, 4, 0), 5,
-     "l'ancien atelier au fond de la cour"),
-    ("ville", "ville_cour", "E2, la cour pavée", 2600, (0, 0, 0, 12), 4,
-     "la cour de l'atelier, à l'abri de la rue"),
-    ("paris-quartier", "pq_trottoir", "E1, la terrasse sur le trottoir", 5000, (0, 0, 0, 10), 3,
-     "l'angle donne sur deux rues: la mairie d'arrondissement autorise la seconde"),
-    ("paris-quartier", "pq_arriere", "E2, l'arrière-salle", 9000, (0, 6, 2, 0), 5,
-     "l'ancienne réserve du café d'angle, rouverte sur la cour (pas de second niveau: C17)"),
-    ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 6000, (0, 12, 6, 0), 8,
-     "la grande salle sous la verrière, fermée depuis des années"),
-    ("paris-maison", "pm_mezzanine", "E2, la mezzanine", 8000, (0, 12, 4, 0), 6,
-     "le plancher sous la verrière, rouvert par l'escalier de la maison (second niveau, C17)"),
+    ("ville", "ville_atelier", "E1, l'atelier entier", 2500, (0, 8, 4, 0), 5,
+     "les presses rangées, l'atelier sous ses sheds s'ouvre en entier"),
+    ("ville", "ville_cuisine", "E2, la cuisine du brunch", 2000, (0, 0, 0, 0), 2,
+     "la salle de composition devenue cuisine: le brunch a besoin de ses feux"),
+    ("ville", "ville_cour", "E3, la cour sous la glycine", 2000, (0, 0, 0, 6), 4,
+     "la cour de l'imprimerie, à l'abri de la rue des Facultés"),
+    ("paris-quartier", "pq_fond", "E1, la salle du fond", 6000, (3, 5, 3, 0), 5,
+     "la cordonnerie voisine rachetée et ouverte sur le café (96 m² en tout)"),
+    ("paris-quartier", "pq_terrasse", "E2, la terrasse sur les deux rues", 5000, (0, 0, 0, 10), 3,
+     "l'angle donne sur deux rues: la mairie d'arrondissement autorise la rue des Coudriers"),
+    ("paris-maison", "pm_torrefaction", "E1, la torréfaction", 4000, (4, 0, 0, 0), 5,
+     "le torréfacteur sous la verrière, et son comptoir de dégustation"),
+    ("paris-maison", "pm_labo", "E2, le laboratoire de pâtisserie", 4000, (0, 0, 0, 0), 2,
+     "le laboratoire vide du graineur, équipé d'un four à soles"),
+    ("paris-maison", "pm_salons", "E3, les salons de l'étage", 8000, (0, 11, 6, 0), 6,
+     "le grand et le petit salon, fermés depuis des années, par l'escalier de la maison (second niveau, C17)"),
+    ("paris-maison", "pm_jardin", "E4, le jardin et sa serre", 6000, (0, 0, 2, 12), 6,
+     "le jardin en friche derrière la halle, et sa serre où l'on s'assoit par tous les temps"),
 ]
+# Ce qu'une extension apporte en plus de ses places, une fois construite.
+EXTENSION_APPORTS: dict[str, tuple[tuple[str, ...], tuple[tuple[str, int], ...]]] = {
+    "ville_cuisine": (("brunch",), ()),
+    "pm_torrefaction": (("notre_melange",), ()),
+    "pm_labo": (("entremets",), (("four", 3),)),
+}
 
 # ---------------------------------------------------------------------------
 # 3. Profils de clients (cahier, section 4.3 et 6.3)
@@ -531,7 +543,7 @@ RECETTES: list[Recette] = [
     Recette("tarte_citron", "Tarte au citron meringuée", "patisserie", (E("vitrine", (2.0, 2.0, 1.5)),), False,
             4.20, 0.75, 0, 1, "paris-quartier", "fiche, 80 €", ""),
     Recette("entremets", "Le gâteau de la maison", "patisserie", (E("vitrine", (2.5, 2.0, 2.0)),), False,
-            6.00, 1.20, 0, 1, "paris-maison", "laboratoire de pâtisserie", ""),
+            6.00, 1.20, 0, 1, "paris-maison", "E2, le laboratoire", ""),
     # Salé
     Recette("croque", "Croque-monsieur", "sale", (E("plan", (4.0, 3.0, 2.5)), E("four", (1, 1, 1), (15, 12, 10), (1.5, 1.5, 1))),
             True, 5.50, 1.10, 0, 1, "bourg", "four", ""),
@@ -546,14 +558,14 @@ RECETTES: list[Recette] = [
     # Brunch
     Recette("brunch", "Formule brunch", "brunch",
             (E("plan", (6.0, 5.0, 4.0)), E("frigo", (1.5, 1.5, 1.5)), SHOT, E("vapeur", (4.0, 3.0, 1.0), (0, 0, 4))),
-            False, 19.00, 5.00, 0, 4, "ville", "arrivée à l'atelier", ""),
+            False, 19.00, 5.00, 0, 4, "ville", "E2, la cuisine du brunch", ""),
     # Café de spécialité
     Recette("filtre", "Café filtre de spécialité", "specialite", (E("douce", (9.0, 6.0, 4.0), (15, 15, 12), (1, 1, 1)),),
             False, 3.80, 0.80, 0, 1, "ville", "Aïcha, lien 1", ""),
     Recette("espresso_origine", "Espresso d'origine", "specialite", (SHOT_LONG,), False, 2.60, 0.50, 0, 1,
             "ville", "bar à méthodes douces", ""),
     Recette("notre_melange", "Notre mélange", "specialite", (SHOT_LONG,), False, 3.00, 0.45, 0, 1,
-            "paris-maison", "torréfaction", ""),
+            "paris-maison", "E1, la torréfaction", ""),
 ]
 REC: dict[str, Recette] = {r.id: r for r in RECETTES}
 FAMILLES = {
@@ -1683,9 +1695,10 @@ ACHATS: list[tuple[str, str, str, int, str, int, int]] = [
     ("ville", "fiches_ville", "Fiches de la ville (latte, milk-shake, cannelé, tartine avocat-œuf)", 210,
      "recette:latte;recette:milkshake;recette:cannele;recette:tartine_avocat", 6, 7),
     ("ville", "four2", "Four ventilé", 3500, "poste:four:2", 9, 9),
-    ("ville", "tables", "Deux tables et deux fauteuils", 520, "places:0,2,2,0", 8, 8),
-    ("ville", "ville_cour", "E2, la cour pavée", 2600, "ext:ville_cour", 10, 10),
-    ("ville", "ville_salle2", "E1, la deuxième salle", 2500, "ext:ville_salle2", 11, 11),
+    ("ville", "tables", "Deux fauteuils (à la place de deux chaises)", 380, "places:0,-2,2,0;equip:fauteuils", 8, 8),
+    ("ville", "ville_cuisine", "E2, la cuisine du brunch", 2000, "ext:ville_cuisine", 10, 10),
+    ("ville", "ville_atelier", "E1, l'atelier entier", 2500, "ext:ville_atelier", 11, 11),
+    ("ville", "ville_cour", "E3, la cour sous la glycine", 2000, "ext:ville_cour", 12, 12),
     ("paris-quartier", "trois_groupes", "Machine à trois groupes, arrêt programmé", 6500, "poste:espresso:3", 1, 1),
     ("paris-quartier", "buse_auto", "Buses automatiques", 1200, "poste:vapeur:3", 2, 2),
     ("paris-quartier", "caisse2", "Second terminal de paiement", 600, "caisse:2", 3, 3),
@@ -1694,18 +1707,18 @@ ACHATS: list[tuple[str, str, str, int, str, int, int]] = [
     ("paris-quartier", "douce", "Bar à méthodes douces et moulin de spécialité", 3200,
      "poste:douce:1;equip:moulin_specialite", 6, 6),
     ("paris-quartier", "fiche_citron", "Fiche « tarte au citron meringuée »", 80, "recette:tarte_citron", 7, 8),
-    ("paris-quartier", "tables", "Deux tabourets, deux tables, une banquette, une table dehors", 1500, "places:2,2,2,2", 8, 7),
-    ("paris-quartier", "pq_trottoir", "E1, la terrasse sur le trottoir", 5000, "ext:pq_trottoir", 9, 9),
-    ("paris-quartier", "pq_arriere", "E2, l'arrière-salle", 9000, "ext:pq_arriere", 10, 10),
+    ("paris-quartier", "tables", "Une banquette (à la place de trois chaises)", 600, "places:0,-3,3,0", 8, 7),
+    ("paris-quartier", "pq_terrasse", "E2, la terrasse sur les deux rues", 5000, "ext:pq_terrasse", 9, 9),
+    ("paris-quartier", "pq_fond", "E1, la salle du fond", 6000, "ext:pq_fond", 10, 10),
     ("paris-maison", "buse_auto", "Buses automatiques", 1200, "poste:vapeur:3", 1, 1),
     ("paris-maison", "douce", "Bar à méthodes douces et moulin de spécialité", 3200,
      "poste:douce:1;equip:moulin_specialite", 2, 2),
     ("paris-maison", "blender", "Blender", 300, "poste:blender:1", 3, 3),
-    ("paris-maison", "tables", "Quatre tables, une banquette, deux tables dehors", 1200, "places:0,4,2,4", 4, 4),
-    ("paris-maison", "labo", "Laboratoire de pâtisserie", 4000, "poste:four:3;recette:entremets", 5, 6),
-    ("paris-maison", "torrefaction", "Torréfacteur (notre mélange)", 4000, "recette:notre_melange", 6, 7),
-    ("paris-maison", "pm_verriere", "E1, la verrière restaurée", 6000, "ext:pm_verriere", 7, 5),
-    ("paris-maison", "pm_mezzanine", "E2, la mezzanine", 8000, "ext:pm_mezzanine", 8, 8),
+    ("paris-maison", "tables", "Deux banquettes de halle (à la place de quatre chaises)", 1200, "places:0,-4,4,0", 4, 4),
+    ("paris-maison", "pm_torrefaction", "E1, la torréfaction", 4000, "ext:pm_torrefaction", 5, 6),
+    ("paris-maison", "pm_labo", "E2, le laboratoire de pâtisserie", 4000, "ext:pm_labo", 6, 7),
+    ("paris-maison", "pm_salons", "E3, les salons de l'étage", 8000, "ext:pm_salons", 7, 5),
+    ("paris-maison", "pm_jardin", "E4, le jardin et sa serre", 6000, "ext:pm_jardin", 8, 8),
 ]
 AMBIANCE_HAUSSE = 1.2  # chaque palier de +10 d'ambiance coûte 20 % de plus que le précédent
 AMBIANCE_DEPART = {"village": 30, "bourg": 25, "ville": 30, "paris-quartier": 35, "paris-maison": 35}
@@ -1720,25 +1733,25 @@ EQUIPE: dict[str, list[tuple[str, str]]] = {
     "bourg": [("commis", "affluence")],
     "ville": [("salle", "tous"), ("plonge", "tous"), ("barista", "tous"), ("salle", "affluence"), ("commis", "tous")],
     "paris-quartier": [("salle", "tous"), ("salle", "tous"), ("barista", "tous"), ("plonge", "tous"),
-                       ("commis", "tous"), ("salle", "affluence"), ("barista", "affluence"), ("salle", "tous")],
+                       ("commis", "tous"), ("salle", "affluence"), ("barista", "affluence")],
     "paris-maison": [("salle", "tous"), ("salle", "tous"), ("salle", "tous"), ("barista", "tous"), ("plonge", "tous"),
                      ("barista", "tous"), ("commis", "tous"), ("patisserie", "tous"), ("salle", "affluence"),
-                     ("salle", "affluence"), ("commis", "affluence"), ("barista", "affluence")],
+                     ("salle", "affluence")],
 }
 EMBAUCHE = {"perteSeuil": 0.12, "joursObserves": 3, "reserveSalaires": 5}
 # Employés repris avec le café (les premiers du plan): aucun avant Paris.
-EQUIPE_REPRISE = {"village": 0, "bourg": 0, "ville": 0, "paris-quartier": 3, "paris-maison": 5}
+EQUIPE_REPRISE = {"village": 0, "bourg": 0, "ville": 0, "paris-quartier": 4, "paris-maison": 6}
 
 # Conditions de départ (règles PR-01 à PR-06): l'offre de l'adresse suivante arrive à une renommée; le défi
 # local demande une réputation et l'extension où il se tient; on déménage le lundi, l'épargne réunie.
 DEFI: dict[str, tuple[str, str, str]] = {
     "village": ("La fête du Tilleul", "village_terrasse", "dimanche"),
     "bourg": ("La foire de la halle", "bourg_terrasse", "jeudi"),
-    "ville": ("Le grand brunch de l'atelier", "ville_salle2", "dimanche"),
-    "paris-quartier": ("Le vide-grenier de la rue", "pq_trottoir", "dimanche"),
+    "ville": ("Le grand brunch de l'Imprimerie", "ville_cuisine", "dimanche"),
+    "paris-quartier": ("Le vide-grenier de la rue des Plumassiers", "pq_terrasse", "dimanche"),
 }
 DEFI_AFFLUENCE = 1.6
-FIN = {"tasses": 4.5, "achats": ("labo", "torrefaction", "pm_verriere", "pm_mezzanine")}
+FIN = {"tasses": 4.5, "achats": ("pm_torrefaction", "pm_labo", "pm_salons", "pm_jardin")}
 RENOMMEE_FIN = 25000
 
 # Temps réel hors service (minutes): prologue, arrivée à une adresse, défi, fin.
@@ -2028,6 +2041,10 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
                         c.ambiance = min(AMBIANCE_MAX, c.ambiance + x[5])
                         c.extensions.add(ext)
                         p.ext_jour[ext] = d
+                        recettes, postes = EXTENSION_APPORTS.get(ext, ((), ()))
+                        p.connues |= set(recettes)
+                        for poste, n in postes:
+                            c.niveaux[poste] = max(c.niveaux.get(poste, 0), n)
             c.travaux.clear()
             p.caisse -= a.loyer_mois / REG["joursParSaison"]
             if p.guide_jour and d > p.guide_jour:
@@ -2075,7 +2092,7 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
         c.points += pts
         c.tasses = tasses_de(c)
         c.sat_hier = b["satisfaction"] if s.satisfactions else c.sat_hier
-        c.pertes.append(b["repartis"])
+        c.pertes.append(b["repartis"] - b["complets"])  # l'attente fait embaucher, pas un café complet
         c.nets = (c.nets + [net])[-7:]
         c.pts = (c.pts + [pts])[-7:]
         c.jours_ouverts += 1
@@ -2146,8 +2163,7 @@ def jouer_partie(duo: Duo, graine: int, jours_max: int = 260, depart: str = "vil
             p.epargne = 0.0
             p.demenagement = nxt
         if p.adresse == "paris-maison" and not p.guide_jour:
-            if c.tasses >= FIN["tasses"] and all(x in c.achats for x in FIN["achats"]) and not c.travaux \
-                    and all(x in c.extensions for x in ("pm_verriere", "pm_mezzanine")):
+            if c.tasses >= FIN["tasses"] and not c.travaux and all(x in c.extensions for x in FIN["achats"]):
                 k = d
                 while (k - 1) % 7 != 6:
                     k += 1
