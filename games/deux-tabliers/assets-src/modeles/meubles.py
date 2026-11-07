@@ -720,13 +720,15 @@ def m_fougere(g):
 def m_pothos(g):
     pot(g, 0.08, 0.11, key="glaze_sage")
     feuillage(g, 0, 0, 0.17, 0.09, 0.07, "leaf", "leaf_light", n=3, seed=11, segs=6, rings=4)
+    # tiges retombantes serrées contre le pot, feuilles en cœur le long de la tige (pas de boule au bout: pattes d'araignée)
     for i in range(3):
-        a = 0.6 + i * 0.9
-        pts = [(0.08 * math.cos(a), 0.08 * math.sin(a) + 0.02, 0.12), (0.12 * math.cos(a), 0.12 * math.sin(a) + 0.06, 0.02), (0.13 * math.cos(a), 0.13 * math.sin(a) + 0.08, -0.12)]
-        for p, q in zip(pts, pts[1:]):
-            g.rod(p, q, 0.004, 4, "leaf_dark")
-            g.sphere(*q, 0.03, 0.012, 0.025, "leaf", segs=5, rings=3)
-    return {"note": "tiges retombantes devant (sud): poser au bord d'une étagère"}
+        a = 1.2 + i * 0.4
+        r0 = 0.085
+        for j in range(4):
+            z = 0.115 - j * 0.03
+            x, y = (r0 + 0.012 * j) * math.cos(a), (r0 + 0.012 * j) * math.sin(a)
+            g.sphere(x, y, z, 0.026, 0.014, 0.022, "leaf" if (i + j) % 2 else "leaf_light", segs=5, rings=3)
+    return {"note": "feuilles qui retombent sur le devant du pot (sud), sans passer sous son pied"}
 
 
 @meuble("bouquet_champetre", "neutre", "plante", 600, accroche="surface", nom="Bouquet champêtre")

@@ -51,7 +51,7 @@ QUALITE_STEREO = 4
 DEBIT_MUSIQUE = "40k"  # Opus, débit variable contraint (son.md, 8.4.7)
 DEBIT_M4A = "128k"
 PLAFOND_DBTP = -1.5  # avant encodage; le contrôle exige -1,0 dBTP après décodage
-AMORCE_BOUCLE = 0.25  # secondes de part et d'autre d'une boucle dans le fichier livré (son.md, 8.5.0)
+AMORCE_BOUCLE = 0.5  # secondes de part et d'autre d'une boucle (son.md, 8.9.3: 0,25 s ne suffisait pas au raccord)
 
 BUS = {"music": 0.8, "effects": 1.0, "interface": 0.9, "ambience": 0.9}
 
@@ -134,7 +134,7 @@ def produire_sons(tous: list[Son], tmp: Path) -> tuple[dict, dict[str, np.ndarra
         for v in range(son.variantes):
             x = traiter(son, v)
             fichier = SORTIE / son.fichiers()[v]
-            q = QUALITE_STEREO if son.canaux == 2 else QUALITE_MONO
+            q = QUALITE_STEREO if son.canaux == 2 or son.boucle else QUALITE_MONO
             wav = tmp / (fichier.stem + ".wav")
             if son.boucle:
                 a = dsp.n_ech(AMORCE_BOUCLE)
