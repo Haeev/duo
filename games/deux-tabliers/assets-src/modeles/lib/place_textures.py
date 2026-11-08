@@ -377,7 +377,7 @@ def feuillage_decoupe(seed=131, n=512):
     d = ImageDraw.Draw(im)
 
     def leaf(x, y, s, a, lum):
-        c = (int(214 * lum), int(236 * lum), int(178 * lum), 255)
+        c = (int(214 * lum), int(230 * lum), int(186 * lum), 255)
         pts = []
         for kk in range(16):
             t = kk / 16 * 2 * math.pi
@@ -386,7 +386,7 @@ def feuillage_decoupe(seed=131, n=512):
         for (ox, oy) in ((0, 0), (-big, 0), (big, 0), (0, -big), (0, big)):
             d.polygon([(px + ox, py + oy) for px, py in pts], fill=c)
             d.line([(x + ox, y + oy), (x + ox + s * 0.8 * math.cos(a + math.pi), y + oy + s * 0.8 * math.sin(a + math.pi) * 0.8)],
-                   fill=(int(170 * lum), int(192 * lum), int(140 * lum), 255), width=3)
+                   fill=(int(172 * lum), int(188 * lum), int(148 * lum), 255), width=3)
 
     # rameaux: chaque grappe de feuilles part d'un point et s'étale dans une direction
     for _ in range(130):

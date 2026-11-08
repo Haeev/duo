@@ -43,9 +43,9 @@
  "shell_village_place": {
   "id": "shell_village_place",
   "fichier": "shell_village_place.glb",
-  "poids_octets": 2162084,
+  "poids_octets": 3669596,
   "triangles": {
-   "shell_village_place": 21969,
+   "shell_village_place": 22356,
    "shell_village_sky": 3888,
    "shell_village_place_foliage": 22000
   },
@@ -58,14 +58,13 @@
    "street_place_paves",
    "street_place_pierre",
    "street_place_tuiles"
-  ],
-  "compression": "quantifier.cjs (KHR_mesh_quantization), à relancer après coque.py"
+  ]
  },
  "cuisson": {
-  "bake_spp": 48,
+  "bake_spp": 64,
   "bake_res": 2048,
-  "lightmap_scale": 3.0816824436187744,
-  "place_lightmap_scale": 2.7769620418548584,
+  "lightmap_scale": 3.0691049098968506,
+  "place_lightmap_scale": 2.7789223194122314,
   "soleil": {
    "azimut_deg": 205.0,
    "hauteur_deg": 16.0

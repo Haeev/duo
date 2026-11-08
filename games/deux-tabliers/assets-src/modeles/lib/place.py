@@ -22,7 +22,7 @@ import math
 import random
 
 import bmesh
-from mathutils import Vector, noise
+from mathutils import Matrix, Vector, noise
 
 from geo import Geo, P
 
@@ -31,7 +31,7 @@ STONE_LIGHT = "#DCCBA6"
 STONE_SHADE = "#B7A27E"
 SHUTTER = "#7F979B"  # volets gris-bleu
 ROOF = "#A9674A"
-TREE = "#86A65A"
+TREE = "#7D8F5C"  # vert tilleul de fin d'après-midi, entre feuillage clair et olive de la bible
 PAVING = "#A49B8A"
 ZINC = "#8E9496"
 IRON = "#33373A"
@@ -452,17 +452,25 @@ def mairie_ecole(g, rng):
         u = uc - 0.75 + i * 0.1875
         f.box(u - 0.012, u + 0.012, 0.66, 0.69, 4.05, 4.95, k("pal", IRON))
     f.box(uc - 0.8, uc + 0.8, 0.62, 0.72, 4.92, 4.98, k("pal", IRON))
-    # hampe inclinée et drapeau tricolore (au repos, il pend un peu)
-    xb, yb = f.pt(uc, 0.4)
-    g.rod((xb, yb, 6.6), (xb - 1.4, yb, 7.6), 0.025, 6, k("pal", "#E8E2D2"))
-    fx0, fy0 = xb - 1.4, yb
+    # hampe et drapeau tricolore à l'angle nord de la façade, penchés vers la place et vers le nord: vus de la terrasse
+    # (nord-ouest) comme du parvis (sud-ouest), ils se projettent loin de « MAIRIE » (avant-corps, 2,5 m plus au sud)
+    bx, by = f.pt(0.35, 0.06)
+    tx_, ty_ = f.pt(-0.3, 1.05)
+    base, tipp = Vector((bx, by, 6.3)), Vector((tx_, ty_, 7.05))
+    g.rod(tuple(base), tuple(tipp), 0.025, 6, k("pal", "#E8E2D2"))
+    g.sphere(tipp.x, tipp.y, tipp.z + 0.02, 0.045, 0.045, 0.045, k("pal", "#C9A24A"), segs=6, rings=4)
+    ax = (tipp - base).normalized()
+    hoist0, hoist1 = tipp - ax * 0.08, tipp - ax * 0.68  # guindant de 60 cm lacé le long de la hampe
+    side = ax.cross(Vector((0, 0, 1))).normalized() * 0.004
+    # le drapeau pend (90 cm): bandes bleue, blanche, rouge du guindant vers le battant, léger ondoiement
     for (c0, c1, col) in ((0.0, 1 / 3, "#2A408C"), (1 / 3, 2 / 3, "#F0F0EC"), (2 / 3, 1.0, "#C82E32")):
-        g.quad([(fx0 + 0.5 * c0, fy0, 7.55 - c0 * 0.3), (fx0 + 0.5 * c1, fy0, 7.55 - c1 * 0.3),
-                (fx0 + 0.5 * c1 + 0.06, fy0 + 0.02, 6.75 - c1 * 0.3), (fx0 + 0.5 * c0 + 0.06, fy0 + 0.02, 6.75 - c0 * 0.3)],
-               k("pal", col), normal_hint=(0, -1, 0))
-        g.quad([(fx0 + 0.5 * c0, fy0 + 0.004, 7.55 - c0 * 0.3), (fx0 + 0.5 * c1, fy0 + 0.004, 7.55 - c1 * 0.3),
-                (fx0 + 0.5 * c1 + 0.06, fy0 + 0.024, 6.75 - c1 * 0.3), (fx0 + 0.5 * c0 + 0.06, fy0 + 0.024, 6.75 - c0 * 0.3)],
-               k("pal", col), normal_hint=(0, 1, 0))
+        def pt(h, c):
+            q = h + Vector((0, 0, -0.9 * c)) + side * (8 * math.sin(c * 5.0))
+            return (q.x, q.y, q.z)
+        for sgn in (1, -1):
+            o = side * (0.5 + 0.5 * sgn)
+            pts = [pt(hoist0 + o, c0), pt(hoist1 + o, c0), pt(hoist1 + o, c1), pt(hoist0 + o, c1)]
+            g.quad(pts, k("pal", col), normal_hint=tuple(side * sgn))
     # ailes: fenêtres hautes (salles de classe au sud, salle du conseil au nord)
     for uu in (0.9, 2.4, f.length - 2.4, f.length - 0.9):
         fenetre(f, uu, 0.95, 1.0, 1.9, rng, volet=None, cadre="#E6D8B8", rideau=False)
@@ -494,13 +502,40 @@ def mairie_ecole(g, rng):
     g.box(x0 + 0.1, x0 + 0.2, y1, y1 + 6.0, 1.7, 1.76, k("pal", "#2F4A3C"))
     g.box(x0 + 0.1, x0 + 0.2, y1, y1 + 6.0, 0.7, 0.76, k("pal", "#2F4A3C"))
     # marronnier de la cour, derrière la grille
-    arbre_simple(g, x0 + 3.0, y1 + 3.2, -0.3, 4.2, 2.8, "#5F7F4A", rng)
+    arbre_simple(g, x0 + 3.0, y1 + 3.2, -0.3, 4.2, 2.8, "#5E7250", rng)
     # panneau d'affichage municipal, contre le mur nord de l'avant-corps
     xs, ys = f.pt(uc - 2.9, 0.12)
     g.box(xs - 0.06, xs + 0.06, ys - 0.75, ys + 0.75, 0.9, 2.1, k("pal", "#5E4630"))
     g.quad([(xs - 0.07, ys - 0.68, 0.98), (xs - 0.07, ys + 0.68, 0.98), (xs - 0.07, ys + 0.68, 2.02), (xs - 0.07, ys - 0.68, 2.02)],
            k("img:affiches"), normal_hint=(-1, 0, 0))
     g.box(xs - 0.14, xs + 0.06, ys - 0.8, ys + 0.8, 2.1, 2.2, k("pal", "#4A3828"))
+
+
+def branche(g, a, b, r0, r1, segs, key):
+    """Branche effilée de a (rayon r0) à b (rayon r1), close par un bout arrondi qui dépasse b de r1: vue de dessous,
+    aucune section tranchée (le départ, lui, naît dans la pièce porteuse)."""
+    bm = g.bm
+    A, B = P(*a), P(*b)
+    d = B - A
+    ln = d.length
+    q = d.to_track_quat("Z", "Y")
+    M = Matrix.Translation(A) @ q.to_matrix().to_4x4()
+    rings = []
+    for (z, r) in ((0.0, r0), (ln, r1), (ln + 0.55 * r1, 0.8 * r1)):
+        rings.append([bm.verts.new(M @ Vector((r * math.cos(2 * math.pi * i / segs), r * math.sin(2 * math.pi * i / segs), z)))
+                      for i in range(segs)])
+    tip = bm.verts.new(M @ Vector((0, 0, ln + r1)))
+    faces = []
+    for r_a, r_b in zip(rings, rings[1:]):
+        for i in range(segs):
+            j = (i + 1) % segs
+            faces.append(bm.faces.new([r_a[i], r_a[j], r_b[j], r_b[i]]))
+    for i in range(segs):
+        faces.append(bm.faces.new([rings[-1][i], rings[-1][(i + 1) % segs], tip]))
+    for f in faces:
+        f.material_index = g.mi(key)
+        f.smooth = True
+    bmesh.ops.recalc_face_normals(bm, faces=faces)
 
 
 def arbre_simple(g, x, y, z, h, r, tint, rng, segs=10):
@@ -510,7 +545,7 @@ def arbre_simple(g, x, y, z, h, r, tint, rng, segs=10):
     for i in range(3):
         a = 2 * math.pi * i / 3 + rng.uniform(-0.3, 0.3)
         tip = (x + math.cos(a) * r * 0.55, y + math.sin(a) * r * 0.55, z + h * 0.85)
-        g.rod((x, y, z + h * 0.5), tip, 0.08, 5, k("img:ecorce", "#8A7A68"), cap=False)
+        branche(g, (x, y, z + h * 0.5), tip, 0.08, 0.05, 5, k("img:ecorce", "#8A7A68"))
         tips.append(tip)
     COURONNES.append({"centre": (x, y, z + h * 0.78), "rx": r, "rys": r, "ryn": r, "rz": r * 0.75, "zmin": z + h * 0.5,
                       "ymin": -1e9, "tips": tips + [(x, y, z + h * 0.78 + r * 0.6)], "n": 70, "r": (0.4, 0.7), "tint": tint,
@@ -665,12 +700,12 @@ def tilleul(g, rng):
         b0 = (tx + 0.25 * math.cos(a), ty + 0.25 * math.sin(a), z0 + 3.0 + rng.uniform(-0.2, 0.3))
         b1 = (tx + reach * 0.55 * math.cos(a), ty + reach * 0.55 * math.sin(a), z0 + 5.2 + rng.uniform(-0.3, 0.4))
         b2 = (tx + reach * math.cos(a + 0.2), ty + reach * math.sin(a + 0.2), z0 + 7.0 + rng.uniform(-0.4, 0.5))
-        g.rod(b0, b1, 0.17, 6, k("img:ecorce", "#857B6E"), cap=False)
-        g.rod(b1, b2, 0.1, 5, k("img:ecorce", "#857B6E"), cap=False)
+        branche(g, b0, b1, 0.17, 0.13, 6, k("img:ecorce", "#857B6E"))
+        branche(g, b1, b2, 0.1, 0.06, 5, k("img:ecorce", "#857B6E"))
         b3 = (tx + reach * 0.85 * math.cos(a - 0.35), ty + reach * 0.85 * math.sin(a - 0.35), z0 + 5.6)
-        g.rod(b1, b3, 0.07, 5, k("img:ecorce", "#857B6E"), cap=False)
+        branche(g, b1, b3, 0.07, 0.045, 5, k("img:ecorce", "#857B6E"))
         branches += [b1, b2, b3]
-    g.rod((tx, ty, z0 + 3.0), (tx + 0.1, ty + 0.2, z0 + 8.6), 0.2, 6, k("img:ecorce", "#857B6E"), cap=False)
+    branche(g, (tx, ty, z0 + 3.0), (tx + 0.1, ty + 0.2, z0 + 8.6), 0.2, 0.09, 6, k("img:ecorce", "#857B6E"))
     # houppier: bouquets de feuillage découpé (objet à part, voir `feuillage`), groupés au bout des rameaux
     COURONNES.append({"centre": (tx, ty + 0.5, z0 + 7.2), "rx": 4.4, "rys": 4.6, "ryn": 3.3, "rz": 3.3, "zmin": z0 + 4.3,
                       "ymin": 14.1, "tips": branches + [(tx + 0.1, ty + 0.2, z0 + 8.6)], "n": 205, "r": (0.42, 0.78),
@@ -781,6 +816,9 @@ def feuillage(sun_dir):
             col = (min(1, base.x * (0.55 + 1.1 * light) + warm), min(1, base.y * (0.52 + 1.05 * light) + warm * 0.7),
                    min(1, base.z * (0.5 + light) * 0.92))
             col = tuple(cc_ * (0.94 + 0.12 * jit) for cc_ in col)
+            # le rendu ACES pousse la saturation des verts: on ramène 30 % vers le gris de même luminance
+            lum_ = 0.2126 * col[0] + 0.7152 * col[1] + 0.0722 * col[2]
+            col = tuple(lum_ + 0.7 * (cc_ - lum_) for cc_ in col)
             shade[v] = _srgb(col)
     # UV (projection sur le plan dominant, continue d'une face à l'autre, décalage par bouquet) et couleurs de coin
     blob_of = {}
