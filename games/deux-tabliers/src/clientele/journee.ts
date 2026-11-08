@@ -36,6 +36,7 @@ import {
 import { emptyDayStats, type Report } from './etat';
 import { planRegulars, stepRegulars, storySteps } from './habitues';
 import { closeDiscounts, hourlyAttraction, openDiscounts } from './remises';
+import { calmArrivals, calmEndSec, warmupAffluence } from './prise-en-main';
 import { closeDayEvents, dayAffluence, planEvents, stepEvents } from './scenes';
 
 export function weekday(ctx: Ctx, day = ctx.s.day): string {
@@ -216,15 +217,19 @@ function generateArrivals(ctx: Ctx): void {
     satYesterday: s.satYesterday,
     affluence: 1,
   };
-  const out: [number, string, number, boolean][] = [];
+  // Prise en main (`warmup`): les groupes calmes d'abord, puis l'affluence du jour, réduite.
+  const calmEnd = calmEndSec(cc, s.day, spm(ctx));
+  const ramp = warmupAffluence(cc, s.day);
+  const out = calmArrivals(cc, s.day, spm(ctx), ctx.sim.random);
   for (const p of cc.profileList) {
-    const perHour = passersPerHour(cc, p, wdi, s.weather, dayAffluence(ctx, p.id));
+    const perHour = passersPerHour(cc, p, wdi, s.weather, dayAffluence(ctx, p.id) * ramp);
     // Remises v0.2: attrait heure par heure (heure douce, tarif, carte); sans remise, le même.
     const k = hourlyAttraction(cc, s, p, att, attraction, perHour.length);
     perHour.forEach((lam, i) => {
       const n = poisson(ctx.sim.random, lam * (k[i] ?? 1));
       for (let j = 0; j < n; j++) {
         const t = (i + ctx.sim.random.next()) * 60 * spm(ctx);
+        if (t < calmEnd) continue;
         const size = drawGroupSize(ctx.sim.random, p);
         const take =
           p.takeAwayShare > 0 &&

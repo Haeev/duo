@@ -28,6 +28,8 @@ import {
   type InterfaceSources,
   type IntentFor,
 } from './adaptateur';
+import { guideOf } from '../branchement/guide';
+import { createGuideCard } from './guide-carte';
 import type { HudState } from './hud';
 import { createInterface, type GameInterface, type StepResult } from './index';
 import { horizontalFov } from './reglages';
@@ -100,6 +102,23 @@ export function attachInterface(options: AttachOptions): AttachedInterface {
     },
   });
 
+  const guideCard = createGuideCard(document.body);
+  /** Guide du premier service, puis aide de la recette du ticket qu'on tient (astuces activées). */
+  const paintGuide = (): void => {
+    const w = view.world();
+    if (!ui.settings.get().tips) {
+      guideCard.update(null, false);
+      return;
+    }
+    const first = guideOf(view.content, w, view.local);
+    if (first !== null) {
+      guideCard.update(first, true);
+      return;
+    }
+    const mine = w.service.tickets.some((t) => t.taker === view.local && t.status === 'open');
+    guideCard.update(mine ? guideOf(view.content, w, view.local, true) : null, false);
+  };
+
   const applyView = (): void => {
     const settings = ui.settings.get();
     look.setSensitivity(settings.sensitivity, settings.invertY);
@@ -132,6 +151,7 @@ export function attachInterface(options: AttachOptions): AttachedInterface {
       target = aimTarget;
       const hFov = horizontalFov(camera.fov, aspect());
       ui.frame(performance.now(), centre, partnerBearing(view, look.look.yawDeg, hFov));
+      paintGuide();
     },
     onEvent(event) {
       if (event.type === 'refused' && event.player === view.local) ui.flash(event.reason);
@@ -143,6 +163,7 @@ export function attachInterface(options: AttachOptions): AttachedInterface {
     dispose() {
       offSettings();
       offDuo();
+      guideCard.dispose();
       ui.dispose();
     },
   };

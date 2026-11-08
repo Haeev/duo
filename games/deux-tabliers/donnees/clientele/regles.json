@@ -195,5 +195,55 @@
   "closingGraceGameMinutes": 30,
   "extensionZones": {
     "E2": "village_fond"
-  }
+  },
+  "warmup": [
+    {
+      "day": 2,
+      "calmUntil": 1080,
+      "calmGroups": 7,
+      "calmProfiles": ["voisins", "flaneurs", "gourmands"],
+      "maxGroupSize": 2,
+      "firstSeconds": 15,
+      "gapSeconds": 12,
+      "affluence": 0,
+      "patience": 4,
+      "announced": 0.3
+    },
+    {
+      "day": 3,
+      "calmUntil": 660,
+      "calmGroups": 3,
+      "calmProfiles": ["voisins", "flaneurs", "gourmands"],
+      "maxGroupSize": 2,
+      "firstSeconds": 15,
+      "gapSeconds": 10,
+      "affluence": 0.5,
+      "patience": 2,
+      "announced": 0.5
+    },
+    {
+      "day": 4,
+      "calmUntil": 480,
+      "calmGroups": 0,
+      "calmProfiles": [],
+      "maxGroupSize": 4,
+      "firstSeconds": 0,
+      "gapSeconds": 0,
+      "affluence": 0.7,
+      "patience": 1.5,
+      "announced": 0.7
+    },
+    {
+      "day": 5,
+      "calmUntil": 480,
+      "calmGroups": 0,
+      "calmProfiles": [],
+      "maxGroupSize": 4,
+      "firstSeconds": 0,
+      "gapSeconds": 0,
+      "affluence": 0.85,
+      "patience": 1.2,
+      "announced": 0.85
+    }
+  ]
 }

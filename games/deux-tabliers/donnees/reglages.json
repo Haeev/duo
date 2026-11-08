@@ -9,7 +9,7 @@
     "reach": 1.9,
     "giveReach": 1.5
   },
-  "aim": { "coneDeg": 3, "targetRadius": 0.07 },
+  "aim": { "coneDeg": 8, "targetRadius": 0.12, "stationRadius": 0.18 },
   "mouse": { "degPerPixel": 0.12 },
   "seating": {
     "tableReach": 1.0,

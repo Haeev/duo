@@ -16,6 +16,14 @@ Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre cha
 - La note est celle du SDK, habillée par `theme.ts` (fond expresso, crème, DM Sans, bord or au focus). Le jeu rend le pointeur juste avant (sinon Duo y verrait un Échap et ferait la pause), ne reprend pas la souris d'un clic pendant la saisie, cache la capsule, garde le focus dans la note quand un écran du jeu se redessine, et reprend le pointeur à la fermeture s'il l'avait.
 - Preuves: `tests/carnet.test.ts` (légende et instantané); `apps/duo/tests/e2e/carnet-deux-tabliers.spec.ts` (deux Duo, vraies touches Ctrl+N et Échap, note écrite, pas de pause).
 
+## Prise en main (retours de la séance du 2026-11-08)
+
+- Montée de l'affluence (`warmup` de `regles.json`, `src/clientele/prise-en-main.ts`): mardi 2, sept groupes patients (voisins, flâneurs, gourmands, deux personnes au plus) un à la fois, le suivant quand tous les présents sont servis et 12 s après; mercredi 3, trois groupes calmes jusqu'à 11 h puis la moitié de l'affluence; jeudi 0,7, vendredi 0,85, la normale ensuite. Patience multipliée (x4, x2, x1,5, x1,2). La commande proposée suit (`announced`).
+- Guide de Simone (`src/branchement/guide.ts`, pur, déduit du monde): carte « À faire » à gauche (`src/interface/guide-carte.ts`) pendant tout le premier jour ouvert, de la caisse à la plonge, étapes de la recette du ticket cochées; les jours suivants, la carte redit la recette du ticket qu'on a pris (astuces activées). Poste demandé encadré en vert, poste visé (si « Agir » y fait quelque chose) encadré en or (`src/rendu/surlignage.ts`, un programme de plus).
+- Visée plus tolérante: cône de 8° (au lieu de 3°), sphère de 0,12 m, 0,18 m au moins pour un poste (`aim` de `reglages.json`).
+- Ardoise: une ligne sans stock se grise (« En rupture : plus de … », `soldOutNote`), « Dépanner » proposé; les clients ne la commandent pas.
+- Limite connue: la coque cuite s'arrête au mur de l'arrière-comptoir (z 6,7). Réserve et cour (étagères, grand frigo, palette de livraison) ne sont pas modélisées alors que la porte de l'arrière-comptoir (`door-5`, `staff`) y mène.
+
 ## Gestion du café (réalisme v0.2, `docs/jeux/cosy-cafe/demo/realisme-v0-2.md`)
 
 - Argent: la marchandise se paie à la livraison du matin (cartons et port sous le franco), la vente rapporte son prix entier; la commande de la prochaine livraison est mise de côté dans la caisse (`availableCents`, « dont … réservés »). La caisse ne passe jamais sous zéro: ce qu'elle ne couvre pas (livraison, loyer, dépannage) devient aussitôt « à régler » (`coverShortfall`, EC-06), montré dans la barre du téléphone et repris sur les recettes du soir; « Commandes » prévient quand la commande dépasse ce que la caisse pourra payer. Dépannage par Mireille pour tout ingrédient, carton entier à +30 %. Réserve de Simone offerte au jour 1 (`startStock`). Charges détaillées (9 € par jour ouvert), pas de TVA (dit au bilan), pas de cotisations.

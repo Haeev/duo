@@ -38,6 +38,7 @@ import {
 } from './assis';
 import type { ModelLibrary } from './modeles';
 import { memberDrink } from '../clientele/gestes';
+import { createHighlight } from './surlignage';
 
 interface FurnitureNode {
   readonly node: Group;
@@ -60,6 +61,7 @@ export function createWorldNodes(
   const root = new Group();
   root.name = 'monde';
   scene.add(root);
+  const highlight = createHighlight(scene);
   const furniture = new Map<string, FurnitureNode>();
   const objects = new Map<number, { node: Group; type: string }>();
   /** Tasses et verres servis que tient le client assis (`clientele/rendu3d.ts`): pas en double. */
@@ -285,6 +287,7 @@ export function createWorldNodes(
       syncFurniture(view);
       syncObjects(view, look);
       const now = performance.now();
+      highlight.update(view, look, now);
       const dt = Math.min(0.1, (now - lastTime) / 1000);
       lastTime = now;
       for (const i of [0, 1] as const) {
@@ -320,6 +323,7 @@ export function createWorldNodes(
     },
     dispose() {
       disposed = true;
+      highlight.dispose();
       for (const m of owned) m.dispose();
       white.dispose();
       for (const r of rigs) r?.blend.stop();

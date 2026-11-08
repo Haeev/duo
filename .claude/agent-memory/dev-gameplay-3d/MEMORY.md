@@ -583,3 +583,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Repère d'un os mesuré par `boneInverses[i] · bindMatrix`: il peut être à l'échelle du squelette (centimètres); multiplier les points par `bone.getWorldScale().x` avant de les utiliser en mètres.
 - Les mains des personnages Meshy n'ont pas d'os de doigts et sont modelées doigts ouverts (pose de liaison en croix, paume vers le bas): une prise vue de face reste imparfaite; de profil, tasse inclinée bord aux lèvres et anse dans la main se voient bien.
 - Banc de gros plans sans faux hôte: page jetable `banc-gorgee.html` dans le jeu (monde de `createWorld`, groupe posé par `spawnGroup`, `stage`, `createWorldNodes`, `createCustomerNodes`), instant de gorgée choisi en cherchant `nowMs` où `sipTime` vaut t; servie par `node_modules/.bin/vite --port <p>`, capture Playwright 520x520, une page par vue.
+
+## Deux Tabliers (vérifié le 2026-11-08)
+
+- Le jour 1 des données est le lundi fermé: le « jour 1 » du client est le mardi (`day` 2), premier jour ouvert. `world.clientele.openDays` vaut 0 pendant tout ce premier service.
+- Plusieurs tests (`realisme`, `file`, `clientele`, `recette-quinze-jours`) comparent des chiffres relevés: une règle qui change l'aléa ou le flux des premiers jours les décale tous. Leur donner un contenu sans la règle (fichier de données surchargé dans `loadContent`) et tester la règle à part.
+- Le stock de départ offert (`startStock`) part dans le panier du soir s'il est frais: il change les points de réputation et la caisse. Ne pas y mettre de viennoiseries.
+- La coque cuite `shell_village.glb` couvre z 6,7 à 13 seulement: réserve et cour derrière l'arrière-comptoir ne sont pas modélisées (bornes lues dans le JSON du GLB, accesseurs `POSITION`).
+- `main.ts` n'est pas indispensable pour brancher un rendu ou une carte: `createWorldNodes` (rendu) reçoit la vue et le regard, `attachInterface` (interface) reçoit la vue et chaque image.
