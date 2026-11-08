@@ -5,7 +5,7 @@
  */
 import type { PlayerIndex } from '../etat/monde';
 import type { SimContext } from '../simulation/systemes';
-import type { CatalogItem, ClienteleContent } from './donnees';
+import type { CatalogItem, ClienteleContent, Ingredient } from './donnees';
 import type { ClienteleState } from './etat';
 import { seatList } from './places';
 
@@ -21,18 +21,27 @@ export function rentCents(cc: ClienteleContent): number {
   return cents(cc.economy.rentPerMonth / cc.economy.rentDaysPerMonth);
 }
 
+/** Charges d'un jour ouvert (électricité, eau, assurance, banque, radio), en centimes. */
+export function chargesCents(cc: ClienteleContent): number {
+  return cc.economy.charges.reduce((sum, c) => sum + cents(c.perOpenDay), 0);
+}
+
 /** Réserve jamais entamée par un achat: deux jours de loyer et de charges (EC-04, D-05). */
 export function reserveCents(cc: ClienteleContent): number {
+  const charges = cc.economy.charges.reduce((sum, c) => sum + c.perOpenDay, 0);
   return cents(
     cc.economy.reserveDaysOfCharges *
-      (cc.economy.rentPerMonth / cc.economy.rentDaysPerMonth + cc.economy.chargesPerOpenDay),
+      (cc.economy.rentPerMonth / cc.economy.rentDaysPerMonth + charges),
   );
 }
 
-/** Ce qu'on peut dépenser: caisse moins la réserve et les sommes réservées par les propositions. */
+/**
+ * Ce qu'on peut dépenser: caisse moins la réserve, les propositions en attente et la commande du
+ * prochain jour de livraison (envoyée, sinon l'habituelle), payée à la livraison (P0-1).
+ */
 export function availableCents(cc: ClienteleContent, s: ClienteleState): number {
   const held = s.proposals.reduce((sum, p) => sum + p.price, 0);
-  return s.cash - reserveCents(cc) - held - s.debt;
+  return s.cash - reserveCents(cc) - held - s.debt - orderReservedCents(cc, s);
 }
 
 export function cupsFromPoints(cc: ClienteleContent, points: number): number {
@@ -297,7 +306,103 @@ export function answerProposal(
 }
 
 // ---------------------------------------------------------------------------------------------
-// Fournisseurs (ST-02 à ST-06)
+// Fournisseurs (ST-02 à ST-06; réalisme v0.2, P0-1 à P0-3)
+
+/** Jour de la semaine d'un jour de la maison (`mon`...), format de `journees.json`. */
+export function weekdayId(cc: ClienteleContent, day: number): string {
+  return cc.days.weekdays[(((day - 1) % 7) + 7) % 7] ?? 'mon';
+}
+
+/** Le café ouvre-t-il ce jour-là (déroulé de la démo, sinon tous les jours sauf le lundi) ? */
+export function openDay(cc: ClienteleContent, day: number): boolean {
+  return cc.days.days.find((d) => d.day === day)?.open ?? weekdayId(cc, day) !== 'mon';
+}
+
+/** Premier jour ouvert après `after`: celui pour lequel vaut la commande du soir. */
+export function nextOpenDay(cc: ClienteleContent, after: number): number {
+  for (let d = after + 1; d <= after + 14; d++) if (openDay(cc, d)) return d;
+  return after + 1;
+}
+
+/** Le fournisseur passe-t-il ce jour-là ? Personne ne livre un jour fermé (le lundi). */
+export function supplierPasses(cc: ClienteleContent, supplier: string, day: number): boolean {
+  const sup = cc.supplies.suppliers.find((x) => x.id === supplier);
+  return sup !== undefined && openDay(cc, day) && sup.days.includes(weekdayId(cc, day));
+}
+
+/** Prochain passage du fournisseur après `after`, `null` s'il ne passe jamais. */
+export function nextPassage(cc: ClienteleContent, supplier: string, after: number): number | null {
+  for (let d = after + 1; d <= after + 14; d++) if (supplierPasses(cc, supplier, d)) return d;
+  return null;
+}
+
+/** Prix d'un carton, en centimes: la même valeur pour l'affichage et pour la caisse (R2-01). */
+export function cartonCents(ing: Ingredient): number {
+  return cents(ing.cartonUnits * ing.unitCost);
+}
+
+/** Dernier jour où un lot livré le jour `day` se vend encore. */
+export function lastGoodDay(ing: Ingredient, day: number): number {
+  return day + Math.max(1, ing.shelfDays) - 1;
+}
+
+/** Ajoute un lot daté (fusionné avec un lot de même date), en gardant l'ordre du plus ancien. */
+export function addLot(s: ClienteleState, ing: string, qty: number, lastDay: number): void {
+  if (qty <= 0) return;
+  const lots = (s.lots[ing] ??= []);
+  const same = lots.find((l) => l[1] === lastDay);
+  if (same !== undefined) same[0] += qty;
+  else {
+    const at = lots.findIndex((l) => l[1] > lastDay);
+    lots.splice(at < 0 ? lots.length : at, 0, [qty, lastDay]);
+  }
+  s.stock[ing] = lotsTotal(s, ing);
+}
+
+export function lotsTotal(s: ClienteleState, ing: string): number {
+  return (s.lots[ing] ?? []).reduce((sum, l) => sum + l[0], 0);
+}
+
+/** Prend `qty` dans les lots, du plus ancien au plus récent (premier entré, premier sorti). */
+function takeFromLots(s: ClienteleState, ing: string, qty: number): void {
+  const lots = s.lots[ing] ?? [];
+  let left = qty;
+  while (left > 1e-9 && lots.length > 0) {
+    const lot = lots[0];
+    if (lot === undefined) break;
+    const k = Math.min(lot[0], left);
+    lot[0] -= k;
+    left -= k;
+    if (lot[0] <= 1e-9) lots.shift();
+  }
+  s.stock[ing] = lotsTotal(s, ing);
+}
+
+/**
+ * Lots et stock d'accord: `stock` reste la somme des lots (le service et l'ardoise le lisent). Ce
+ * qui a été rendu au stock directement (ticket purgé) rejoint le lot le plus ancien encore bon;
+ * une sauvegarde v0.1 (stock sans lots) devient un lot par ingrédient, daté d'aujourd'hui.
+ */
+export function reconcileLots(cc: ClienteleContent, s: ClienteleState): void {
+  for (const ing of cc.supplies.ingredients) {
+    const stock = s.stock[ing.id] ?? 0;
+    const total = lotsTotal(s, ing.id);
+    if (Math.abs(stock - total) < 1e-6) continue;
+    if (stock < total) takeFromLots(s, ing.id, total - stock);
+    else {
+      const good = (s.lots[ing.id] ?? []).find((l) => l[1] >= s.day);
+      if (good !== undefined) {
+        good[0] += stock - total;
+        s.stock[ing.id] = lotsTotal(s, ing.id);
+      } else addLot(s, ing.id, stock - total, lastGoodDay(ing, s.day));
+    }
+  }
+}
+
+/** Ce qui sera encore bon le jour `day`. */
+function goodOn(s: ClienteleState, ing: string, day: number): number {
+  return (s.lots[ing] ?? []).reduce((sum, l) => sum + (l[1] >= day ? l[0] : 0), 0);
+}
 
 /** Unités servies d'un ingrédient par une recette de l'ardoise. */
 function slateNeeds(cc: ClienteleContent, s: ClienteleState): Map<string, number> {
@@ -311,23 +416,102 @@ function slateNeeds(cc: ClienteleContent, s: ClienteleState): Map<string, number
   return need;
 }
 
-/** Commande habituelle: moyenne des derniers jours (ou une base pour l'ardoise), moins le stock. */
-export function suggestedOrder(cc: ClienteleContent, s: ClienteleState): Record<string, number> {
+/** Affluence annoncée d'un jour (la fête: `challenge.affluence`). */
+function announcedAffluence(cc: ClienteleContent, day: number): number {
+  return day === cc.economy.challenge.day ? cc.economy.challenge.affluence : 1;
+}
+
+/**
+ * Commande habituelle pour le jour de livraison `day` (le prochain jour ouvert par défaut): par
+ * ingrédient dont le fournisseur passe ce jour-là, de quoi tenir jusqu'à son prochain passage
+ * (limité à la conservation), fêtes annoncées comprises, moins ce qui sera encore bon.
+ */
+export function suggestedOrder(
+  cc: ClienteleContent,
+  s: ClienteleState,
+  day = nextOpenDay(cc, s.day),
+): Record<string, number> {
   const o = cc.supplies.ordering;
   const days = s.usage.slice(-o.historyDays);
   const base = slateNeeds(cc, s);
   const out: Record<string, number> = {};
   for (const ing of cc.supplies.ingredients) {
+    if (!supplierPasses(cc, ing.supplier, day)) continue;
     let use = 0;
     if (days.length > 0) use = days.reduce((sum, d) => sum + (d[ing.id] ?? 0), 0) / days.length;
     if (use === 0) use = base.get(ing.id) ?? 0;
-    const want = use * o.margin - (s.stock[ing.id] ?? 0);
-    if (want > 0) out[ing.id] = Math.ceil(want / ing.cartonUnits);
+    if (use <= 0) continue;
+    const next = nextPassage(cc, ing.supplier, day) ?? day + 7;
+    const until = Math.min(next - 1, lastGoodDay(ing, day));
+    let need = 0;
+    let last = day;
+    for (let d = day; d <= until; d++) {
+      if (!openDay(cc, d)) continue;
+      need += use * announcedAffluence(cc, d);
+      last = d;
+    }
+    need *= ing.shelfDays <= 2 ? o.freshMargin : o.margin;
+    const want = need - goodOn(s, ing.id, last);
+    if (want > 1e-9) out[ing.id] = Math.ceil(want / ing.cartonUnits);
   }
   return out;
 }
 
-/** Livraison du matin: le stock monte, les cartons attendent d'être rangés (chantier a). */
+export interface SupplierCost {
+  /** Marchandise, en centimes. */
+  readonly goods: number;
+  /** Port (sous le franco), en centimes. */
+  readonly shipping: number;
+  /** Ce qui manque pour le port offert, en centimes (0 si atteint ou sans franco). */
+  readonly toFranco: number;
+}
+
+export interface OrderCost {
+  readonly goods: number;
+  readonly shipping: number;
+  readonly suppliers: Readonly<Record<string, SupplierCost>>;
+}
+
+/** Ce que coûte une commande livrée le jour `day`: seules les lignes des fournisseurs qui passent. */
+export function orderCost(
+  cc: ClienteleContent,
+  order: Readonly<Record<string, number>>,
+  day: number,
+): OrderCost {
+  const bySupplier = new Map<string, number>();
+  for (const [id, n] of Object.entries(order)) {
+    const ing = cc.ingredients.get(id);
+    if (ing === undefined || n <= 0 || !supplierPasses(cc, ing.supplier, day)) continue;
+    bySupplier.set(ing.supplier, (bySupplier.get(ing.supplier) ?? 0) + n * cartonCents(ing));
+  }
+  const suppliers: Record<string, SupplierCost> = {};
+  let goods = 0;
+  let shipping = 0;
+  for (const sup of cc.supplies.suppliers) {
+    const g = bySupplier.get(sup.id) ?? 0;
+    const franco = cents(sup.franco);
+    const under = g > 0 && g < franco;
+    const cost = {
+      goods: g,
+      shipping: under ? cents(sup.shipping) : 0,
+      toFranco: under ? franco - g : 0,
+    };
+    suppliers[sup.id] = cost;
+    goods += cost.goods;
+    shipping += cost.shipping;
+  }
+  return { goods, shipping, suppliers };
+}
+
+/** La commande du prochain jour de livraison, mise de côté dans la caisse (P0-1). */
+export function orderReservedCents(cc: ClienteleContent, s: ClienteleState): number {
+  if (s.day === 0) return 0;
+  const day = nextOpenDay(cc, s.day);
+  const cost = orderCost(cc, s.order ?? suggestedOrder(cc, s, day), day);
+  return cost.goods + cost.shipping;
+}
+
+/** Cartons qui arrivent: lots datés, cartons à ranger (chantier a). Rien n'est débité ici. */
 export function deliver(
   ctx: Ctx,
   order: Readonly<Record<string, number>>,
@@ -337,7 +521,7 @@ export function deliver(
   for (const [id, n] of Object.entries(order)) {
     const ing = ctx.cc.ingredients.get(id);
     if (ing === undefined || n <= 0) continue;
-    ctx.s.stock[id] = (ctx.s.stock[id] ?? 0) + n * ing.cartonUnits;
+    addLot(ctx.s, id, n * ing.cartonUnits, lastGoodDay(ing, ctx.s.day));
     cartons.push([id, n, ing.cartonHeavy]);
     const pending = ctx.s.cartons.find(([c]) => c === id);
     if (pending === undefined) ctx.s.cartons.push([id, n, ing.cartonHeavy]);
@@ -346,6 +530,73 @@ export function deliver(
   if (cartons.length === 0) return;
   ctx.s.outbox.cartons.push(...cartons.map((c): [string, number, boolean] => [c[0], c[1], c[2]]));
   ctx.sim.emit({ type: 'clientele-delivery', cartons, emergency });
+}
+
+/**
+ * Livraison du matin (P0-1, P0-2): les fournisseurs qui passent aujourd'hui livrent leurs lignes,
+ * payées à la livraison, port compris. La caisse peut passer sous zéro: le manque devient « à
+ * régler » le soir (EC-06), jamais de livraison refusée.
+ */
+export function receiveMorningOrder(ctx: Ctx, order: Readonly<Record<string, number>>): void {
+  const { cc, s } = ctx;
+  const cost = orderCost(cc, order, s.day);
+  const passing: Record<string, number> = {};
+  for (const [id, n] of Object.entries(order)) {
+    const ing = cc.ingredients.get(id);
+    if (ing !== undefined && n > 0 && supplierPasses(cc, ing.supplier, s.day)) passing[id] = n;
+  }
+  s.cash -= cost.goods + cost.shipping;
+  s.today.goods += cost.goods;
+  s.today.shipping += cost.shipping;
+  deliver(ctx, passing, false);
+}
+
+/** Prix d'un dépannage (un carton, prix entier majoré, sans port), en centimes. */
+export function emergencyCents(cc: ClienteleContent, ing: Ingredient): number {
+  return Math.round(cartonCents(ing) * (1 + cc.supplies.ordering.emergencySurcharge));
+}
+
+/**
+ * Le matin, avant la livraison (lundi compris): les lots dont le dernier jour est passé partent.
+ * Seule pénalité, leur valeur, inscrite en « Perdu » au bilan (P0-3).
+ */
+export function throwExpired(ctx: Ctx): void {
+  const { cc, s } = ctx;
+  for (const ing of cc.supplies.ingredients) {
+    const lots = s.lots[ing.id];
+    if (lots === undefined) continue;
+    const gone = lots.filter((l) => l[1] < s.day);
+    if (gone.length === 0) continue;
+    s.lots[ing.id] = lots.filter((l) => l[1] >= s.day);
+    s.stock[ing.id] = lotsTotal(s, ing.id);
+    const qty = gone.reduce((sum, l) => sum + l[0], 0);
+    if (qty <= 1e-9) continue;
+    s.today.lost += cents(qty * ing.unitCost);
+    if (!s.today.lostItems.includes(ing.id)) s.today.lostItems.push(ing.id);
+  }
+}
+
+/**
+ * Panier du soir (ST-06, P0-3): les pièces du boulanger qui finissent ce soir sont données aux
+ * voisins. Elles ont été payées; 1 point par pièce, `basketMaxPerDay` au plus. Rend les pièces.
+ */
+export function eveningBasket(ctx: Ctx): number {
+  const { cc, s } = ctx;
+  const o = cc.supplies.ordering;
+  let pieces = 0;
+  for (const ing of cc.supplies.ingredients) {
+    if (ing.supplier !== o.basketSupplier || ing.unit !== 'piece') continue;
+    const lots = s.lots[ing.id];
+    if (lots === undefined) continue;
+    const ending = lots.filter((l) => l[1] <= s.day);
+    if (ending.length === 0) continue;
+    s.lots[ing.id] = lots.filter((l) => l[1] > s.day);
+    s.stock[ing.id] = lotsTotal(s, ing.id);
+    const qty = ending.reduce((sum, l) => sum + l[0], 0);
+    pieces += Math.floor(qty + 1e-9);
+    s.today.basketValue += cents(qty * ing.unitCost);
+  }
+  return pieces;
 }
 
 /** Une recette se sert-elle encore avec le stock (ST-05: sinon grisée sur l'ardoise) ? */
@@ -360,12 +611,16 @@ export function inStock(
   return r.ingredients.every(([ing, qty]) => (s.stock[ing] ?? 0) + 1e-9 >= qty * portions);
 }
 
-/** Consomme le stock d'une recette vendue et rend son coût en matières (centimes). */
+/**
+ * Consomme le stock d'une recette vendue, lots les plus anciens d'abord, et rend son coût en
+ * matières (centimes): le coût des ventes, pour la marge; la caisse a payé à la livraison.
+ */
 export function consume(cc: ClienteleContent, s: ClienteleState, recipe: string): number {
   const r = cc.recipes.get(recipe);
   if (r === undefined) return 0;
   for (const [ing, qty] of r.ingredients) {
-    s.stock[ing] = Math.max(0, (s.stock[ing] ?? 0) - qty);
+    if ((s.lots[ing] ?? []).length > 0) takeFromLots(s, ing, qty);
+    else s.stock[ing] = Math.max(0, (s.stock[ing] ?? 0) - qty);
     s.todayUse[ing] = (s.todayUse[ing] ?? 0) + qty;
   }
   return cents(r.costMaterials);

@@ -172,6 +172,8 @@ export type Recipe = v.InferOutput<typeof RecipeSchema>;
 const IngredientSchema = v.object({
   id: Str,
   name: Str,
+  /** Conditionnement d'un carton, pour la tablette (« caisse de 6 bouteilles d'1 L »). */
+  pack: v.optional(Str, ''),
   unit: Str,
   unitCost: Pos,
   supplier: Str,
@@ -184,7 +186,18 @@ export type Ingredient = v.InferOutput<typeof IngredientSchema>;
 
 const SuppliesSchema = v.object({
   suppliers: v.array(
-    v.object({ id: Str, name: Str, deliveryTime: Nat, line: Str, emergency: v.boolean() }),
+    v.object({
+      id: Str,
+      name: Str,
+      deliveryTime: Nat,
+      line: Str,
+      emergency: v.boolean(),
+      /** Jours de passage (`tue`...), format de `journees.json`; personne ne livre un jour fermé. */
+      days: v.array(Str),
+      /** Port offert à partir de `franco` euros commandés; sinon `shipping` euros à la livraison. */
+      franco: v.pipe(v.number(), v.minValue(0)),
+      shipping: v.pipe(v.number(), v.minValue(0)),
+    }),
   ),
   ingredients: v.array(IngredientSchema),
   ordering: v.object({
@@ -195,6 +208,10 @@ const SuppliesSchema = v.object({
     baselineServingsPerRecipe: Pos,
     historyDays: Nat,
     margin: Pos,
+    /** Marge de la commande habituelle pour ce qui se garde deux jours au plus. */
+    freshMargin: Pos,
+    /** Fournisseur dont les pièces invendues partent au panier du soir. */
+    basketSupplier: v.optional(Str, 'lucas'),
   }),
 });
 
@@ -234,7 +251,10 @@ const EconomySchema = v.object({
   startCash: Pos,
   rentPerMonth: Pos,
   rentDaysPerMonth: Pos,
-  chargesPerOpenDay: Pos,
+  /** Charges d'un jour ouvert, détaillées au bilan (euros). */
+  charges: v.array(v.object({ id: Str, name: Str, perOpenDay: Pos })),
+  /** Réserve laissée par Simone: ingrédient, cartons (offerts, datés du premier jour ouvert). */
+  startStock: v.array(v.tuple([Str, Nat])),
   reserveDaysOfCharges: Pos,
   priceSteps: v.object({ min: v.pipe(v.number(), v.integer()), max: Nat, step: Pos }),
   bigPurchase: v.object({ minimum: Pos, shareOfDailyRevenue: Pos }),
@@ -523,6 +543,11 @@ export function loadClienteleContent(files: DataFiles, issues: string[]): Client
   for (const r of content.recipeList)
     for (const [ing] of r.ingredients)
       if (!content.ingredients.has(ing)) p(`carte.json (${r.id})`, ing);
+  for (const [ing] of economy.startStock)
+    if (!content.ingredients.has(ing)) p('economie.json (startStock)', ing);
+  for (const i of supplies.ingredients)
+    if (!supplies.suppliers.some((x) => x.id === i.supplier))
+      p(`fournisseurs.json (${i.id})`, i.supplier);
   for (const r of content.regulars.regulars) {
     if (!content.profiles.has(r.profile)) p(`habitues.json (${r.id})`, r.profile);
     for (const f of [...r.favorite, ...r.fallbackFavorite])

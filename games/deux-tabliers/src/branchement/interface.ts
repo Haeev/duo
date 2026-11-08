@@ -12,7 +12,18 @@
 import { catalogView } from '../amenagement';
 import { clockMinutes, suggestedOrder } from '../clientele';
 import type { ClienteleContent } from '../clientele/donnees';
-import { availableCents, bigPurchaseCents, linePrice, offerOf } from '../clientele/economie';
+import {
+  availableCents,
+  bigPurchaseCents,
+  cartonCents,
+  linePrice,
+  nextOpenDay,
+  nextPassage,
+  offerOf,
+  orderCost,
+  orderReservedCents,
+  supplierPasses,
+} from '../clientele/economie';
 import type { ClienteleState } from '../clientele/etat';
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex, World } from '../etat/monde';
@@ -278,6 +289,7 @@ function slateView(content: Content, world: World): SlateView {
     lines: s.slate.map(([id]) => ({
       recipe: id,
       priceCents: linePrice(cc, s, id),
+      costCents: Math.round((cc.recipes.get(id)?.costMaterials ?? 0) * 100),
       star: false,
       priceNote: '',
       soldOut: null,
@@ -292,28 +304,68 @@ function slateView(content: Content, world: World): SlateView {
   };
 }
 
+/** Quantité en réserve lisible: « 4,5 L », « 800 g », « 12 ». */
+function stockText(qty: number, unit: string): string {
+  const one = (x: number): string => String(Math.round(x * 10) / 10).replace('.', ',');
+  if (qty < 1e-6) return '0';
+  if (unit === 'ml') return qty >= 1000 ? `${one(qty / 1000)} L` : `${String(Math.round(qty))} ml`;
+  if (unit === 'g') return qty >= 1000 ? `${one(qty / 1000)} kg` : `${String(Math.round(qty))} g`;
+  if (unit === 'piece') return String(Math.floor(qty + 1e-9));
+  return `${String(Math.round(qty))} ${unit}${qty >= 2 && !unit.endsWith('s') ? 's' : ''}`;
+}
+
 function ordersView(content: Content, world: World): OrdersView {
   const cc = content.clientele;
   const s = world.clientele;
-  const usual = suggestedOrder(cc, s);
+  // La commande du soir vaut pour le prochain jour ouvert (P0-2).
+  const day = nextOpenDay(cc, s.day);
+  const usual = suggestedOrder(cc, s, day);
+  const order = s.order ?? usual;
+  const cost = orderCost(cc, order, day);
+  const days = (id: string): number[] => {
+    const sup = cc.supplies.suppliers.find((x) => x.id === id);
+    return (sup?.days ?? []).map((d) => cc.days.weekdays.indexOf(d)).filter((d) => d >= 0);
+  };
   return {
-    suppliers: cc.supplies.suppliers.map((sup) => ({
-      id: sup.id,
-      name: sup.name,
-      place: '',
-      products: cc.supplies.ingredients
-        .filter((i) => i.supplier === sup.id)
-        .map((i) => ({
-          id: i.id,
-          name: i.name,
-          stock: `${String(Math.round(s.stock[i.id] ?? 0))} ${i.unit}`,
-          usual: usual[i.id] ?? 0,
-          quantity: s.order?.[i.id] ?? usual[i.id] ?? 0,
-          unit: 'carton',
-          unitCents: Math.round(i.cartonUnits * i.unitCost * 100),
-          lockedBy: null,
-        })),
-    })),
+    today: s.day,
+    deliveryWeekday: weekdayOf(day),
+    overMonday: day - s.day > 1,
+    totalCents: cost.goods + cost.shipping,
+    suppliers: cc.supplies.suppliers.map((sup) => {
+      const next = nextPassage(cc, sup.id, day - 1);
+      const passes = supplierPasses(cc, sup.id, day);
+      const c = cost.suppliers[sup.id];
+      return {
+        id: sup.id,
+        name: sup.name,
+        place: '',
+        days: days(sup.id),
+        passes,
+        next: next === null ? null : weekdayOf(next),
+        shippingCents: c?.shipping ?? 0,
+        toFrancoCents: c?.toFranco ?? 0,
+        hasFranco: sup.franco > 0,
+        products: cc.supplies.ingredients
+          .filter((i) => i.supplier === sup.id)
+          .map((i) => {
+            const lots = s.lots[i.id] ?? [];
+            const first = lots.find((l) => l[0] > 1e-9);
+            return {
+              id: i.id,
+              name: i.name,
+              pack: i.pack,
+              stock: stockText(s.stock[i.id] ?? 0, i.unit),
+              goodUntil: first === undefined ? null : first[1],
+              useFirst: first?.[1] === s.day + 1,
+              usual: passes ? (usual[i.id] ?? 0) : 0,
+              quantity: passes ? (order[i.id] ?? 0) : 0,
+              unit: 'carton',
+              unitCents: cartonCents(i),
+              lockedBy: null,
+            };
+          }),
+      };
+    }),
     sent: s.order !== null,
     emergencyOpen: s.phase === 'service',
   };
@@ -527,11 +579,26 @@ function eveningView(content: Content, world: World, player: PlayerIndex): Eveni
       served: r.served,
       previousServed:
         previous === undefined ? null : { weekday: weekdayOf(previous[0]), served: previous[2] },
+      open: r.open,
       revenueCents: r.revenue,
       tipsCents: r.tips,
-      purchasesCents: r.purchases + r.materials,
+      eventCents: r.eventEuros,
+      goodsCents: r.goods,
+      shippingCents: r.shipping,
+      emergencyCents: r.emergency,
+      rentCents: r.rent,
+      chargesCents: r.charges,
+      chargeLines: r.open
+        ? cc.economy.charges.map((c) => ({ name: c.name, cents: Math.round(c.perOpenDay * 100) }))
+        : [],
+      purchasesCents: r.purchases,
       resultCents: r.result,
       cashCents: s.cash,
+      costOfSalesCents: r.materials,
+      lostCents: r.lost,
+      lostItems: r.lostItems.map((id) => cc.ingredients.get(id)?.name ?? id),
+      basketCents: r.basketValue,
+      basketPieces: r.open && r.day === s.day ? s.today.basket : 0,
     },
     halfCups: Math.round(s.cups * 2),
     reputationHint: r.open
@@ -541,6 +608,7 @@ function eveningView(content: Content, world: World, player: PlayerIndex): Eveni
       line: `Demain : ${weather}.`,
       event: announce,
       orderSent: s.order !== null,
+      deliveryWeekday: weekdayOf(nextOpenDay(cc, s.day)),
       project: null,
       regular: null,
     },
@@ -671,7 +739,10 @@ export function wireInterface(view: GameView): WiredInterface {
         name: s.houseName ?? 'Le café d’Ormeval',
         place: 'Ormeval',
         cashCents: s.cash,
-        reservedCents: s.proposals.reduce((sum, p) => sum + p.price, 0),
+        // Propositions en attente et commande de la prochaine livraison, mise de côté (P0-1).
+        reservedCents:
+          s.proposals.reduce((sum, p) => sum + p.price, 0) +
+          orderReservedCents(content.clientele, s),
         halfCups: Math.round(s.cups * 2),
       };
     },

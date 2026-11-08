@@ -7,11 +7,27 @@
       },
       {
         "who": "simone",
+        "text": "Je vous laisse la réserve : du café, du thé, du sucre. Le frais, c'est à vous de le commander."
+      },
+      {
+        "who": "simone",
         "text": "Demain, on retourne la pancarte à 8 heures."
       },
       {
         "who": "simone",
         "text": "Avant ça, il lui faut un nom, à cette maison. À vous deux de choisir."
+      }
+    ],
+    "simone_fete_order": [
+      {
+        "who": "simone",
+        "text": "Armelle passe demain, et c'est la fête dimanche. Prenez large en lait."
+      }
+    ],
+    "simone_first_loss": [
+      {
+        "who": "simone",
+        "text": "Le lait ne se garde pas : la tablette te dit ce qui est à finir."
       }
     ],
     "rene_letter": [

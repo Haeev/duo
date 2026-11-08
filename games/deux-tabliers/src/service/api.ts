@@ -199,9 +199,13 @@ export function stockOf(world: World, ingredient: string): number {
  */
 export function takeUnsoldFresh(sim: SimContext): { ingredient: string; qty: number }[] {
   const out: { ingredient: string; qty: number }[] = [];
+  const c = sim.world.clientele;
   for (const i of sim.content.service.ingredients.values()) {
     const qty = sim.world.service.stock[i.id] ?? 0;
-    if (i.shelfDays <= 1 && qty > 0) {
+    // Réalisme v0.2 (P0-3): ce qui ne se garde qu'un jour, ou dont le lot finit ce soir.
+    const lots = c.lots[i.id.replaceAll('-', '_')] ?? [];
+    const ending = lots.some((l) => l[1] <= c.day && l[0] > 0);
+    if ((i.shelfDays <= 1 || ending) && qty > 0) {
       out.push({ ingredient: i.id, qty });
       sim.world.service.stock[i.id] = 0;
     }

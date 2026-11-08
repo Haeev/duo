@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Données du chantier clientèle (Deux Tabliers) depuis celles du game designer.
 
-Sources: `docs/jeux/cosy-cafe/demo/donnees/*.json` (démo v0.1) et les constantes de la
+Sources: `docs/jeux/cosy-cafe/demo/donnees/*.json` (démo v0.1, réalisme v0.2) et les constantes de la
 simulation du cahier (`docs/jeux/cosy-cafe/simulations/cosy_cafe.py`, que relit aussi
 `demo_v0_1.py`): flux, courbes, multiplicateurs, attrait, satisfaction, pourboires, livre d'or.
 Sortie: `games/deux-tabliers/donnees/clientele/*.json` (format décrit dans `donnees/SCHEMA.md`).
@@ -198,16 +198,21 @@ def fournisseurs() -> dict:
     src = lire("ingredients-fournisseurs.json")
     o = src["ordering"]
     return {
+        # v0.2 (realisme-v0-2.md, P0-2): jours de passage, franco et port par fournisseur.
         "suppliers": [{"id": s["id"], "name": s["name"], "deliveryTime": minutes(s["deliveryTime"]),
-                       "line": s["line"], "emergency": bool(s.get("emergency", False))} for s in src["suppliers"]],
-        "ingredients": [{"id": i["id"], "name": i["name"], "unit": i["unit"], "unitCost": i["unitCost"],
-                         "supplier": i["supplier"], "storage": i["storage"], "shelfDays": i["shelfDays"],
-                         "cartonUnits": i["cartonUnits"], "cartonHeavy": i["cartonHeavy"]} for i in src["ingredients"]],
+                       "line": s["line"], "emergency": bool(s.get("emergency", False)),
+                       "days": s.get("days", JOURS_SEMAINE), "franco": s.get("franco", 0),
+                       "shipping": s.get("shipping", 0)} for s in src["suppliers"]],
+        "ingredients": [{"id": i["id"], "name": i["name"], "pack": i.get("pack", ""), "unit": i["unit"],
+                         "unitCost": i["unitCost"], "supplier": i["supplier"], "storage": i["storage"],
+                         "shelfDays": i["shelfDays"], "cartonUnits": i["cartonUnits"],
+                         "cartonHeavy": i["cartonHeavy"]} for i in src["ingredients"]],
         "ordering": {
             "emergencyGameMinutes": o["emergencyDeliveryGameMinutes"], "emergencySurcharge": o["emergencySurcharge"],
             "basketReputationPerItem": o["eveningBasketReputationPerItem"], "basketMaxPerDay": o["eveningBasketMaxPerDay"],
             # Premier jour sans historique (choix du studio): portions supposées par recette de l'ardoise.
-            "baselineServingsPerRecipe": 14, "historyDays": 3, "margin": 1.2,
+            "baselineServingsPerRecipe": 14, "historyDays": 3, "margin": o.get("margin", 1.2),
+            "freshMargin": o.get("freshMargin", 1.1), "basketSupplier": "lucas",
         },
     }
 
@@ -223,7 +228,11 @@ def economie() -> dict:
     a = eco["ambiance"]
     return {
         "startCash": eco["startCash"], "rentPerMonth": eco["rentPerMonth"], "rentDaysPerMonth": eco["rentDaysPerMonth"],
-        "chargesPerOpenDay": eco["chargesPerOpenDay"], "reserveDaysOfCharges": eco["reserveDaysOfCharges"],
+        # v0.2 (P0-1, P0-4): réserve de Simone et charges détaillées (`chargesPerOpenDay` de la source
+        # reste celui de la simulation v0.1).
+        "startStock": eco.get("startStock", []),
+        "charges": eco.get("charges", [{"id": "charges", "name": "Charges", "perOpenDay": eco["chargesPerOpenDay"]}]),
+        "reserveDaysOfCharges": eco["reserveDaysOfCharges"],
         "priceSteps": {"min": -3, "max": 5, "step": eco["priceAdjust"]["step"]},
         "bigPurchase": {"minimum": eco["bigPurchaseThreshold"]["minimum"], "shareOfDailyRevenue": eco["bigPurchaseThreshold"]["shareOfDailyRevenue"]},
         "reputation": {"startCups": eco["reputation"]["startCups"], "stepPoints": eco["reputation"]["stepPoints"],

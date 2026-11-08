@@ -6,7 +6,7 @@ import { v, type DuoContext, type SaveSnapshot } from '@duo/sdk';
 import type { GameAction } from './actions';
 import { purgeOrphanTickets } from './branchement';
 import type { Content } from './donnees/charger';
-import { WORLD_FORMAT, WorldSchema, type World } from './etat/monde';
+import { WORLD_FORMAT, WORLD_FORMATS_READ, WorldSchema, type World } from './etat/monde';
 import { createGuest, type Guest } from './reseau/invite';
 import { createHost, type Host } from './reseau/hote';
 import type { GameView } from './reseau/vue';
@@ -56,7 +56,7 @@ export function restoreWorld(
   dataSchema: number,
   memberIds: readonly [string, string],
 ): World | null {
-  if (dataSchema !== WORLD_FORMAT) return null;
+  if (!WORLD_FORMATS_READ.includes(dataSchema)) return null;
   const parsed = v.safeParse(WorldSchema, data);
   if (!parsed.success) return null;
   const world = parsed.output;

@@ -345,7 +345,8 @@ function pay(
     amount += g.flatRate ? 0 : linePrice(ctx.cc, ctx.s, id);
     materials += consume(ctx.cc, ctx.s, id);
   }
-  ctx.s.cash += amount - materials;
+  // La marchandise est payée à la livraison (P0-1): la vente n'enlève plus rien à la caisse.
+  ctx.s.cash += amount;
   ctx.s.today.revenue += amount;
   ctx.s.today.materials += materials;
   g.paid = (g.paid ?? 0) + amount;

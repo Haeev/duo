@@ -353,26 +353,67 @@ export function cupsRow(halfCups: number): HTMLElement {
   return row;
 }
 
+/** « mardi, jeudi et samedi ». */
+function daysText(days: readonly number[]): string {
+  const names = days.map((d) => WEEKDAYS[d] ?? '');
+  if (names.length <= 1) return names.join('');
+  return `${names.slice(0, -1).join(', ')} et ${names[names.length - 1] ?? ''}`;
+}
+
 function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel): void {
   const orders = model.orders;
+  const weekday = orders === null ? '' : (WEEKDAYS[orders.deliveryWeekday] ?? '');
   body.append(
-    h('h3', null, T.tablet.orders.title),
+    h('h3', null, fill(T.tablet.orders.title, { weekday })),
     h('p', { class: 'dt-second' }, T.tablet.orders.intro),
   );
   if (orders === null) {
     body.append(h('p', null, T.tablet.orders.empty));
     return;
   }
+  if (orders.overMonday)
+    body.append(h('p', { class: 'dt-alert' }, icon('info'), T.tablet.orders.monday));
   if (orders.sent)
-    body.append(h('div', { class: 'dt-banner' }, icon('check'), T.tablet.orders.sent));
+    body.append(
+      h('div', { class: 'dt-banner' }, icon('check'), fill(T.tablet.orders.sent, { weekday })),
+    );
   body.append(
     button(T.tablet.orders.usual, () => {
       ctx.send({ type: 'order-usual' });
     }),
   );
-  let total = 0;
   for (const supplier of orders.suppliers) {
-    body.append(h('h4', null, `${supplier.name} · ${supplier.place}`));
+    body.append(
+      h(
+        'h4',
+        null,
+        fill(T.tablet.orders.supplier, { name: supplier.name, days: daysText(supplier.days) }),
+      ),
+    );
+    if (!supplier.passes)
+      body.append(
+        h(
+          'p',
+          { class: 'dt-second' },
+          fill(T.tablet.orders.notTomorrow, {
+            weekday,
+            next: supplier.next === null ? '' : (WEEKDAYS[supplier.next] ?? ''),
+          }),
+        ),
+      );
+    else if (supplier.hasFranco)
+      body.append(
+        h(
+          'p',
+          { class: 'dt-second' },
+          supplier.toFrancoCents > 0
+            ? fill(T.tablet.orders.franco, {
+                shipping: euros(supplier.shippingCents),
+                amount: euros(supplier.toFrancoCents),
+              })
+            : T.tablet.orders.francoOk,
+        ),
+      );
     const table = h('table', { class: 'dt-table' });
     const head = h('tr');
     T.tablet.orders.cols.forEach((c, i) => {
@@ -381,8 +422,8 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
     table.append(h('thead', null, head));
     const tbody = h('tbody');
     for (const p of supplier.products) {
-      total += p.quantity * p.unitCents;
       const locked = p.lockedBy !== null && p.lockedBy !== model.local;
+      const readOnly = !supplier.passes;
       const qty = h('span', { class: 'dt-stepper' });
       const set = (q: number): void => {
         ctx.send({
@@ -400,20 +441,19 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
           },
           {
             name: fill(T.tablet.orders.less, { item: p.name.toLowerCase() }),
-            disabled: locked || p.quantity <= 0,
+            disabled: readOnly || locked || p.quantity <= 0,
           },
         ),
-        h(
-          'span',
-          { class: 'dt-num', style: 'min-width: 3.5em' },
-          `${String(p.quantity)} ${p.unit}`,
-        ),
+        h('span', { class: 'dt-num', style: 'min-width: 1.6em' }, String(p.quantity)),
         button(
           '',
           () => {
             set(p.quantity + 1);
           },
-          { name: fill(T.tablet.orders.more, { item: p.name.toLowerCase() }), disabled: locked },
+          {
+            name: fill(T.tablet.orders.more, { item: p.name.toLowerCase() }),
+            disabled: readOnly || locked,
+          },
         ),
       );
       const btns = qty.querySelectorAll('button');
@@ -427,6 +467,7 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
             'td',
             null,
             p.name,
+            h('div', { class: 'dt-second', style: 'font-size: 0.85em' }, p.pack),
             locked
               ? h(
                   'div',
@@ -436,18 +477,19 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
               : null,
           ),
           h('td', { class: 'dt-num' }, p.stock),
-          h('td', { class: 'dt-num' }, `${String(p.usual)} ${p.unit}`),
-          h('td', { class: 'dt-num' }, qty),
-          h('td', { class: 'dt-num' }, euros(p.quantity * p.unitCents)),
+          h('td', { class: 'dt-num' }, readOnly ? '' : String(p.usual)),
+          h('td', { class: 'dt-num' }, readOnly ? '' : qty),
+          h('td', { class: 'dt-num' }, readOnly ? '' : euros(p.quantity * p.unitCents)),
         ),
       );
     }
     table.append(tbody);
     body.append(table);
   }
+  inventory(body, orders);
   if (orders.emergencyOpen) body.append(h('p', { class: 'dt-second' }, T.tablet.orders.emergency));
   const send = button(
-    orders.sent ? T.tablet.orders.edit : T.tablet.orders.send,
+    orders.sent ? T.tablet.orders.edit : fill(T.tablet.orders.send, { weekday }),
     () => {
       ctx.send({ type: 'order-send' });
     },
@@ -460,12 +502,64 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
       {
         class: 'dt-row',
         style:
-          'position: sticky; bottom: 0; background: var(--dt-expresso); padding: 0.6em 0; justify-content: flex-end',
+          'position: sticky; bottom: 0; background: var(--dt-expresso); padding: 0.6em 0; justify-content: flex-end; flex-wrap: wrap',
       },
-      h('strong', null, fill(T.tablet.orders.total, { amount: euros(total) })),
+      h(
+        'span',
+        { style: 'display: flex; flex-direction: column; align-items: flex-end' },
+        h('strong', null, fill(T.tablet.orders.total, { amount: euros(orders.totalCents) })),
+        h(
+          'span',
+          { class: 'dt-second', style: 'font-size: 0.875em' },
+          fill(T.tablet.orders.reserved, { amount: euros(orders.totalCents) }),
+        ),
+      ),
       send,
     ),
   );
+}
+
+/** « bon jusqu'à jeudi 4 », ou « se garde longtemps » au-delà de deux semaines. */
+function goodUntilText(day: number, today: number): string {
+  if (day - today > 13) return T.tablet.orders.stockLong;
+  return fill(T.tablet.orders.stockDate, {
+    weekday: `${WEEKDAYS[(((day - 1) % 7) + 7) % 7] ?? ''} ${String(day)}`,
+  });
+}
+
+/** « La réserve ce soir » (P0-3): quantité et date du lot le plus proche, rien à compter. */
+function inventory(body: HTMLElement, orders: NonNullable<InterfaceModel['orders']>): void {
+  const rows = orders.suppliers.flatMap((s) => s.products).filter((p) => p.goodUntil !== null);
+  body.append(h('h4', null, T.tablet.orders.inventory));
+  if (rows.length === 0) {
+    body.append(h('p', { class: 'dt-second' }, T.tablet.orders.inventoryEmpty));
+    return;
+  }
+  const table = h('table', { class: 'dt-table' });
+  const head = h('tr');
+  T.tablet.orders.inventoryCols.forEach((c, i) => {
+    head.append(h('th', { class: i > 0 ? 'dt-num' : null }, c));
+  });
+  table.append(h('thead', null, head));
+  const tbody = h('tbody');
+  for (const p of rows)
+    tbody.append(
+      h(
+        'tr',
+        null,
+        h('td', null, p.name),
+        h('td', { class: 'dt-num' }, p.stock),
+        h(
+          'td',
+          { class: 'dt-num' },
+          p.useFirst
+            ? h('strong', { style: 'color: var(--dt-or)' }, T.tablet.orders.useFirst)
+            : goodUntilText(p.goodUntil ?? 0, orders.today),
+        ),
+      ),
+    );
+  table.append(tbody);
+  body.append(table);
 }
 
 function catalogueSection(
@@ -660,6 +754,7 @@ function menuSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel): 
   body.append(
     h('h3', null, T.tablet.menu.title),
     h('p', { class: 'dt-second' }, T.tablet.menu.intro),
+    h('p', { class: 'dt-second' }, T.tablet.menu.help),
   );
   const edit = button(
     T.tablet.menu.edit,
@@ -691,6 +786,18 @@ function menuSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel): 
         null,
         h('td', null, recipe?.name ?? line.recipe),
         h('td', { class: 'dt-num' }, euros(line.priceCents)),
+        h('td', { class: 'dt-num' }, euros(line.costCents)),
+        h(
+          'td',
+          { class: 'dt-num' },
+          fill(T.tablet.menu.margin, {
+            amount: euros(line.priceCents - line.costCents),
+            pct:
+              line.priceCents > 0
+                ? Math.round((100 * (line.priceCents - line.costCents)) / line.priceCents)
+                : 0,
+          }),
+        ),
         h('td', { class: 'dt-num' }, line.star ? icon('star', T.tablet.menu.star, true) : ''),
       ),
     );

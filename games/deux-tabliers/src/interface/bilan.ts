@@ -21,6 +21,81 @@ const TONE_ICON: Readonly<Record<GuestbookEntryView['tone'], IconName>> = {
   pricey: 'info',
 };
 
+/**
+ * Le compte du jour (P0-4): chaque ligne, dans l'ordre, et le résultat qui en est la somme;
+ * achats et caisse à part; en petit, coût des ventes, perdu, panier du soir et la TVA.
+ */
+function accounts(f: EveningView['figures']): HTMLElement {
+  const table = h('table', { class: 'dt-table dt-compte', style: 'margin-top: 0.6em' });
+  const tbody = h('tbody');
+  const row = (label: string, cents: number, sign: 1 | -1, strong = false): void => {
+    if (cents === 0 && !strong) return;
+    const value = sign * cents;
+    const text = `${value > 0 ? '+ ' : ''}${euros(value)}`;
+    tbody.append(
+      h(
+        'tr',
+        null,
+        h('td', null, strong ? h('strong', null, label) : label),
+        h('td', { class: 'dt-num' }, strong ? h('strong', null, text) : text),
+      ),
+    );
+  };
+  row(T.evening.revenue, f.revenueCents, 1);
+  row(T.evening.tips, f.tipsCents, 1);
+  row(T.evening.eventEuros, f.eventCents, 1);
+  row(T.evening.goods, f.goodsCents, -1);
+  row(T.evening.shipping, f.shippingCents, -1);
+  row(T.evening.emergency, f.emergencyCents, -1);
+  row(T.evening.rent, f.rentCents, -1);
+  row(T.evening.charges, f.chargesCents, -1);
+  // Le détail des charges tient sur une ligne: le bilan reste lisible à 1366 x 768.
+  if (f.chargeLines.length > 0)
+    tbody.append(
+      h(
+        'tr',
+        { class: 'dt-second', style: 'font-size: 0.8em' },
+        h(
+          'td',
+          { colspan: '2', style: 'padding-left: 1.4em' },
+          f.chargeLines.map((c) => `${c.name} ${euros(c.cents)}`).join(' · '),
+        ),
+      ),
+    );
+  row(T.evening.result, f.resultCents, 1, true);
+  table.append(tbody);
+  const notes: string[] = [];
+  if (f.open) notes.push(fill(T.evening.costOfSales, { amount: euros(f.costOfSalesCents) }));
+  if (f.open || f.lostCents > 0)
+    notes.push(fill(T.evening.lostShort, { amount: euros(f.lostCents) }));
+  if (f.open) notes.push(fill(T.evening.basketShort, { amount: euros(f.basketCents) }));
+  const wrap = h(
+    'div',
+    null,
+    table,
+    f.purchasesCents > 0
+      ? h(
+          'p',
+          { class: 'dt-row', style: 'justify-content: space-between; margin-top: 0.4em' },
+          h('span', null, T.evening.purchases),
+          h('span', { class: 'dt-num' }, euros(-f.purchasesCents)),
+        )
+      : null,
+    h(
+      'p',
+      { class: 'dt-second', style: 'font-size: 0.85em; margin-top: 0.6em' },
+      notes.join(' · '),
+    ),
+  );
+  const more: string[] = [];
+  if (f.lostItems.length > 0)
+    more.push(fill(T.evening.lostHelp, { items: capital(f.lostItems.join(', ')) }));
+  if (f.basketPieces > 0) more.push(fill(T.evening.basketHelp, { n: f.basketPieces }));
+  more.push(T.evening.vat);
+  wrap.append(h('p', { class: 'dt-second', style: 'font-size: 0.85em' }, more.join(' ')));
+  return wrap;
+}
+
 export function eveningLayer(ctx: UiContext): LayerSpec {
   let page = 0;
   const goTo = (next: number): void => {
@@ -252,12 +327,8 @@ function pageContent(body: HTMLElement, ctx: UiContext, evening: EveningView, pa
               n: f.previousServed.served,
             }),
       );
-      fig(T.evening.revenue, euros(f.revenueCents));
-      fig(T.evening.tips, euros(f.tipsCents));
-      fig(T.evening.purchases, euros(f.purchasesCents));
-      fig(T.evening.result, `${f.resultCents > 0 ? '+ ' : ''}${euros(f.resultCents)}`);
       fig(T.evening.cash, euros(f.cashCents, true));
-      body.append(grid);
+      body.append(grid, accounts(f));
       body.append(
         h(
           'p',
@@ -274,7 +345,15 @@ function pageContent(body: HTMLElement, ctx: UiContext, evening: EveningView, pa
       body.append(h('p', null, t.line));
       if (t.event !== null) body.append(h('p', null, t.event));
       if (t.regular !== null) body.append(h('p', null, t.regular));
-      if (t.orderSent) body.append(h('p', { class: 'dt-ok' }, icon('check'), T.evening.orderSent));
+      if (t.orderSent)
+        body.append(
+          h(
+            'p',
+            { class: 'dt-ok' },
+            icon('check'),
+            fill(T.evening.orderSent, { weekday: WEEKDAYS[t.deliveryWeekday] ?? '' }),
+          ),
+        );
       else
         body.append(
           h('p', null, T.evening.orderPending),

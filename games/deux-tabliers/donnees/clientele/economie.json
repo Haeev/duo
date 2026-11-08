@@ -2,7 +2,42 @@
   "startCash": 300,
   "rentPerMonth": 520,
   "rentDaysPerMonth": 28,
-  "chargesPerOpenDay": 8,
+  "startStock": [
+    ["grains_maison", 2],
+    ["cacao", 1],
+    ["the_noir", 1],
+    ["sucre", 1],
+    ["confiture", 1],
+    ["accompagnement", 1],
+    ["beurre", 1]
+  ],
+  "charges": [
+    {
+      "id": "electricite",
+      "name": "Électricité (machine, frigo, lumière)",
+      "perOpenDay": 4.6
+    },
+    {
+      "id": "eau",
+      "name": "Eau",
+      "perOpenDay": 1.1
+    },
+    {
+      "id": "assurance",
+      "name": "Assurance du café",
+      "perOpenDay": 1.8
+    },
+    {
+      "id": "banque",
+      "name": "Banque et terminal de carte",
+      "perOpenDay": 1.0
+    },
+    {
+      "id": "radio",
+      "name": "Droits de la radio (Sacem)",
+      "perOpenDay": 0.5
+    }
+  ],
   "reserveDaysOfCharges": 2,
   "priceSteps": {
     "min": -3,

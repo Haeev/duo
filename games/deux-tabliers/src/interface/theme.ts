@@ -141,6 +141,7 @@ export const CSS = `
 .dt-table { width: 100%; border-collapse: collapse; }
 .dt-table th { text-align: left; font-size: 0.85em; color: var(--dt-creme-2); font-weight: 600; padding: 0.3em 0.4em; border-bottom: 1px solid var(--dt-filet); }
 .dt-table td { padding: 0.35em 0.4em; border-bottom: 1px solid var(--dt-filet); }
+.dt-compte td { padding: 0.18em 0.4em; }
 .dt-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .dt-stepper { display: inline-flex; align-items: center; gap: 0.35em; }
 .dt-stepper .dt-btn { padding: 0.2em 0.45em; min-height: 1.9em; min-width: 1.9em; }

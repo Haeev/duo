@@ -115,6 +115,16 @@ const DayStats = v.strictObject({
   /** Ce qui a plu (`latteArt`, `quality`...) et ce qui a manqué (`noSeat`, `full`...): nombre. */
   liked: v.optional(v.record(Str, Nat), () => ({})),
   missed: v.optional(v.record(Str, Nat), () => ({})),
+  /**
+   * Réalisme v0.2 (centimes, 0 pour relire les sauvegardes v0.1): marchandise livrée ce matin,
+   * port, dépannages, périmé jeté ce matin (et ses ingrédients), valeur du panier du soir.
+   */
+  goods: v.optional(Nat, 0),
+  shipping: v.optional(Nat, 0),
+  emergency: v.optional(Nat, 0),
+  lost: v.optional(Nat, 0),
+  lostItems: v.optional(v.array(Str), () => []),
+  basketValue: v.optional(Nat, 0),
 });
 export type DayStatsState = v.InferOutput<typeof DayStats>;
 
@@ -130,6 +140,14 @@ export const ReportSchema = v.strictObject({
   /** Achats du jour (hors résultat: ils sortent de la caisse). */
   purchases: v.optional(Nat, 0),
   eventEuros: Nat,
+  /** Réalisme v0.2: voir `DayStats` (`materials` y devient le coût des ventes, hors résultat). */
+  goods: v.optional(Nat, 0),
+  shipping: v.optional(Nat, 0),
+  emergency: v.optional(Nat, 0),
+  lost: v.optional(Nat, 0),
+  lostItems: v.optional(v.array(Str), () => []),
+  basketValue: v.optional(Nat, 0),
+  /** Recette + pourboires + événement - marchandise - port - dépannages - loyer - charges. */
   result: Int,
   served: Nat,
   left: Nat,
@@ -199,8 +217,17 @@ export const ClienteleStateSchema = v.strictObject({
   brocante: v.array(Str),
   /** Achats importants proposés à l'autre (un par joueur, SI-10), prix en centimes. */
   proposals: v.array(v.strictObject({ by: Player, item: Str, price: Nat })),
+  /** Somme des lots de chaque ingrédient (le service et l'ardoise le lisent). */
   stock: v.record(Str, N),
-  /** Commande du soir pour le lendemain (cartons par ingrédient), `null`: commande habituelle. */
+  /**
+   * Lots datés (réalisme v0.2, P0-3): quantité et dernier jour de vente, du plus ancien au plus
+   * récent. Absent des sauvegardes v0.1: `reconcileLots` les crée depuis `stock` à la reprise.
+   */
+  lots: v.optional(v.record(Str, v.array(v.tuple([N, Nat]))), () => ({})),
+  /**
+   * Commande du soir pour le prochain jour ouvert (cartons par ingrédient), `null`: commande
+   * habituelle. Seuls les fournisseurs qui passent ce jour-là livrent; le lundi, elle attend.
+   */
   order: v.nullable(v.record(Str, Nat)),
   usage: v.array(v.record(Str, N)),
   todayUse: v.record(Str, N),
@@ -282,6 +309,12 @@ export function emptyDayStats(): DayStatsState {
     visits: [],
     liked: {},
     missed: {},
+    goods: 0,
+    shipping: 0,
+    emergency: 0,
+    lost: 0,
+    lostItems: [],
+    basketValue: 0,
   };
 }
 
@@ -318,6 +351,7 @@ export function createClienteleState(): ClienteleState {
     brocante: [],
     proposals: [],
     stock: {},
+    lots: {},
     order: null,
     usage: [],
     todayUse: {},

@@ -167,6 +167,21 @@ describe('Deux Tabliers, recette des quinze jours', () => {
       expect(world.clientele.phase, `soir du jour ${String(day)}`).toBe('evening');
       log.served = world.clientele.report?.served ?? -1;
       checkMoney(`soir ${String(day)}`);
+      // R2-03: le résultat du bilan est la somme de ses lignes; R2-13: caisse jamais sous zéro.
+      const r = world.clientele.report;
+      expect(r, `bilan du jour ${String(day)}`).not.toBeNull();
+      if (r !== null)
+        expect(r.result, `résultat du jour ${String(day)}`).toBe(
+          r.revenue +
+            r.tips +
+            r.eventEuros -
+            r.goods -
+            r.shipping -
+            r.emergency -
+            r.rent -
+            r.charges,
+        );
+      expect(world.clientele.cash, `caisse du soir ${String(day)}`).toBeGreaterThanOrEqual(0);
       // Le soir: achats proposés par l'un, acceptés par l'autre.
       if (day >= 7 && terraceBoughtDay === 0) {
         // Le robot ne sert que six groupes par jour: la caisse est renflouée pour l'achat.

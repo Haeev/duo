@@ -25,7 +25,7 @@ Données de la démo (Ormeval, jours 1 à 15), prêtes à charger. Le schéma de
 | `journees.json` | horaires, coups de feu, déroulé des 15 jours, « Nos projets » de la démo | écrit à la main |
 | `textes.json` | textes de l'interface, dialogues du prologue et de la lettre, livre d'or | écrit à la main |
 
-Ne retouchez pas à la main les fichiers générés: modifiez `demo_v0_1.py`, puis relancez `--donnees` et `--simuler`. La simulation relit les JSON (pas ses constantes) et vérifie que chaque coût de recette égale la somme de ses ingrédients et que chaque objet cité par un événement existe (code de sortie 1 sinon).
+Ne retouchez pas à la main les fichiers générés: modifiez `demo_v0_1.py`, puis relancez `--donnees` et `--simuler`. Exception, le réalisme v0.2 (`realisme-v0-2.md`, version `demo-0.2`): ses clés sont écrites directement dans `ingredients-fournisseurs.json` (`days`, `franco`, `shipping`, `emergency` des fournisseurs; `name`, `pack`, `shelfDays` des ingrédients; `freshMargin`, `eveningBasketMaxPerDay` 6), `reglages-economie.json` (`startStock`, `charges`; `chargesPerOpenDay` y reste pour la simulation v0.1) et `textes.json` (réplique de la réserve au prologue, `simone_fete_order`, `simone_first_loss`). Relancer `demo_v0_1.py --donnees` les effacerait: reporter d'abord ces valeurs dans le script. La simulation relit les JSON (pas ses constantes) et vérifie que chaque coût de recette égale la somme de ses ingrédients et que chaque objet cité par un événement existe (code de sortie 1 sinon).
 
 ## Vocabulaire
 

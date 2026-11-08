@@ -185,6 +185,8 @@ export interface RecipeView {
 export interface SlateLineView {
   readonly recipe: string;
   readonly priceCents: number;
+  /** Coût de revient d'une portion (ingrédients), en centimes (P0-4). */
+  readonly costCents: number;
   readonly star: boolean;
   /** « Prix juste pour le village ». */
   readonly priceNote: string;
@@ -212,8 +214,14 @@ export interface SlateView {
 export interface OrderProductView {
   readonly id: string;
   readonly name: string;
+  /** Conditionnement d'un carton: « caisse de 6 bouteilles d'1 L ». */
+  readonly pack: string;
   /** « 4 L ». */
   readonly stock: string;
+  /** Dernier jour de vente (jour de la maison) du lot le plus proche, `null` sans stock. */
+  readonly goodUntil: number | null;
+  /** Un lot finit demain: « À finir demain ». */
+  readonly useFirst: boolean;
   readonly usual: number;
   readonly quantity: number;
   readonly unit: string;
@@ -225,10 +233,29 @@ export interface SupplierView {
   readonly id: string;
   readonly name: string;
   readonly place: string;
+  /** Jours de passage (0 lundi). */
+  readonly days: readonly number[];
+  /** Passe le jour de livraison de la commande; sinon lignes en lecture seule. */
+  readonly passes: boolean;
+  /** Prochain passage (jour de la semaine, 0 lundi), `null` s'il ne passe jamais. */
+  readonly next: number | null;
+  /** Port à payer à cette livraison et ce qui manque pour le port offert (centimes). */
+  readonly shippingCents: number;
+  readonly toFrancoCents: number;
+  /** Le fournisseur a un franco (sinon aucune ligne de port). */
+  readonly hasFranco: boolean;
   readonly products: readonly OrderProductView[];
 }
 
 export interface OrdersView {
+  /** Jour de la maison, pour dater la réserve. */
+  readonly today: number;
+  /** Jour de la semaine de la livraison (0 lundi): « Commandes pour mardi ». */
+  readonly deliveryWeekday: number;
+  /** La commande attend un lundi sans livraison (dimanche soir, lundi). */
+  readonly overMonday: boolean;
+  /** À payer à la livraison, port compris, et mis de côté dans la caisse (centimes). */
+  readonly totalCents: number;
   readonly suppliers: readonly SupplierView[];
   readonly sent: boolean;
   /** Dépannage dans l'heure (+30 %), seulement pendant le service. */
@@ -293,14 +320,30 @@ export interface GuestbookEntryView {
 }
 
 export interface EveningFigures {
+  readonly open: boolean;
   readonly served: number;
   /** Clients servis le dernier jour ouvert (« dimanche : 52 »), `null` le premier soir. */
   readonly previousServed: { readonly weekday: number; readonly served: number } | null;
   readonly revenueCents: number;
   readonly tipsCents: number;
+  readonly eventCents: number;
+  readonly goodsCents: number;
+  readonly shippingCents: number;
+  readonly emergencyCents: number;
+  readonly rentCents: number;
+  readonly chargesCents: number;
+  /** Détail des charges: nom et montant (centimes). */
+  readonly chargeLines: readonly { readonly name: string; readonly cents: number }[];
+  /** Hors résultat: achats du jour (catalogue, équipements). */
   readonly purchasesCents: number;
   readonly resultCents: number;
   readonly cashCents: number;
+  /** En petit: coût des ventes, périmé jeté ce matin (et quoi), panier du soir. */
+  readonly costOfSalesCents: number;
+  readonly lostCents: number;
+  readonly lostItems: readonly string[];
+  readonly basketCents: number;
+  readonly basketPieces: number;
 }
 
 export interface EveningView {
@@ -319,6 +362,8 @@ export interface EveningView {
     readonly line: string;
     readonly event: string | null;
     readonly orderSent: boolean;
+    /** Jour de la semaine de la prochaine livraison (0 lundi). */
+    readonly deliveryWeekday: number;
     readonly project: string | null;
     readonly regular: string | null;
   };
