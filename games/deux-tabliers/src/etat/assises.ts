@@ -155,9 +155,10 @@ export function seatPlaces(
     // Égalité (deux bouts d'un banc à même distance): l'ordre déclaré, stable d'une image à l'autre.
     .sort((p, q) => (Math.abs(p.d - q.d) < 1e-6 ? p.i - q.i : p.d - q.d));
   const count = content.arrangement.pieces.get(f.type)?.seats?.count ?? ranked.length;
-  return ranked
-    .slice(0, Math.max(1, Math.min(count, ranked.length)))
-    .map((r, k) => ({ id: placeId(f.id, k), anchor: anchorOf(content, f, model, table, r.a) }));
+  return ranked.slice(0, Math.max(1, Math.min(count, ranked.length))).map((r, k) => ({
+    id: placeId(f.id, k),
+    anchor: anchorOf(content, f, model, table, r.a, list.length > 1),
+  }));
 }
 
 function anchorOf(
@@ -166,6 +167,7 @@ function anchorOf(
   model: string | undefined,
   table: PlacedFurniture | null,
   chosen: Assise,
+  shared = false,
 ): SeatAnchor {
   const [x, z] = toWorld(f, chosen.position[0] ?? 0, chosen.position[2] ?? 0);
   const [ex, ez] = toWorld(f, chosen.avant[0] ?? 0, chosen.avant[2] ?? 1);
@@ -180,6 +182,7 @@ function anchorOf(
       fz = -fz;
     }
   }
+  if (shared && table !== null) [fx, fz] = turnToTable(content, table, x, z, fx, fz);
   const type = content.furniture.get(f.type);
   return {
     x,
@@ -191,6 +194,48 @@ function anchorOf(
     halfWidth: (type?.footprint[0] ?? 0.45) / 2,
     halfDepth: (type?.footprint[1] ?? 0.45) / 2,
   };
+}
+
+/**
+ * Place d'un meuble à plusieurs places qui n'est pas en face de sa table (bout de banquette ou
+ * de banc, plus large que la table): la personne se tourne vers le plateau, au plus de
+ * `seating.endSeatTurnMaxDeg`. Ses genoux rentrent vers le milieu de l'assise (loin de
+ * l'accoudoir et du bout) et ses mains vont vers la table, pas dans le vide à côté. Visée: le
+ * point du plateau le plus proche, gardé à `endSeatInset` du bord.
+ */
+function turnToTable(
+  content: Content,
+  table: PlacedFurniture,
+  x: number,
+  z: number,
+  fx: number,
+  fz: number,
+): [number, number] {
+  const type = content.furniture.get(table.type);
+  if (type === undefined) return [fx, fz];
+  const seating = content.settings.seating;
+  const r = (table.rotDeg * Math.PI) / 180;
+  const cos = Math.cos(r);
+  const sin = Math.sin(r);
+  const dx = x - table.x;
+  const dz = z - table.z;
+  const mx = Math.max(0, type.footprint[0] / 2 - seating.endSeatInset);
+  const mz = Math.max(0, type.footprint[1] / 2 - seating.endSeatInset);
+  const lx = Math.max(-mx, Math.min(mx, dx * cos - dz * sin));
+  const lz = Math.max(-mz, Math.min(mz, dx * sin + dz * cos));
+  // Point visé, repère du monde, vu depuis la place.
+  const px = table.x + lx * cos + lz * sin - x;
+  const pz = table.z - lx * sin + lz * cos - z;
+  const ahead = px * fx + pz * fz;
+  // Côté droit de la personne assise, comme `approachCandidates`.
+  const side = px * -fz + pz * fx;
+  if (ahead <= 1e-3 || Math.abs(side) < 1e-3) return [fx, fz];
+  const max = (seating.endSeatTurnMaxDeg * Math.PI) / 180;
+  const a = Math.max(-max, Math.min(max, Math.atan2(side, ahead)));
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  // Avant tourné de `a` vers la droite: c * avant + s * droite.
+  return [c * fx - s * fz, c * fz + s * fx];
 }
 
 /** Première place d'un meuble (la plus près de la table). */

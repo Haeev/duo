@@ -38,6 +38,12 @@ export const SettingsSchema = v.strictObject({
     glanceSeconds: v.tuple([Positive, Positive]),
     /** Rotation de tête au plus, de part et d'autre du regard droit devant (degrés). */
     glanceMaxDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(80)),
+    /**
+     * Bout de banquette ou de banc, au-delà du bord de la table: rotation au plus vers le plateau
+     * (degrés), et retrait du point visé depuis le bord du plateau (m).
+     */
+    endSeatTurnMaxDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(45)),
+    endSeatInset: v.pipe(v.number(), v.minValue(0)),
   }),
   net: v.strictObject({
     movesEvery: v.pipe(v.number(), v.integer(), v.minValue(1)),

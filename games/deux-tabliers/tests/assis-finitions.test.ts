@@ -63,11 +63,22 @@ describe('Deux Tabliers, places des meubles', () => {
     const places = seatPlaces(content, world.furniture, bench);
     expect(places.map((p) => p.id)).toEqual(['bq', 'bq#1', 'bq#2']);
     expect(seatPlaces(content, world.furniture, farm)).toHaveLength(2);
-    // Trois points distincts, à 55 cm l'un de l'autre, tous tournés vers la table (est).
+    // Trois points distincts, à 55 cm l'un de l'autre, tous tournés vers la table (est). Celle
+    // du milieu est en face; les bouts, au-delà du bord du plateau, se tournent vers lui (au plus
+    // `endSeatTurnMaxDeg`): genoux vers le milieu de la banquette, loin des accoudoirs.
     const xs = new Set(places.map((p) => p.anchor.z.toFixed(2)));
     expect(xs.size).toBe(3);
+    const table = world.furniture.find((f) => f.id === 'table-4');
+    if (table === undefined) throw new Error('table absente');
+    const maxTurn = (content.settings.seating.endSeatTurnMaxDeg * Math.PI) / 180;
     for (const p of places) {
-      expect(p.anchor.fx).toBeGreaterThan(0.99);
+      const off = p.anchor.z - table.z;
+      if (Math.abs(off) < 0.2) expect(p.anchor.fx).toBeGreaterThan(0.99);
+      else {
+        expect(p.anchor.fx).toBeGreaterThanOrEqual(Math.cos(maxTurn) - 1e-6);
+        expect(p.anchor.fx).toBeLessThan(0.99);
+        expect(Math.sign(p.anchor.fz)).toBe(-Math.sign(off));
+      }
       expect(placeAnchor(content, world.furniture, p.id)).toEqual(p.anchor);
       expect(placeFurniture(p.id)).toBe('bq');
     }

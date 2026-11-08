@@ -17,7 +17,9 @@
     "seatedPitchDeg": -20,
     "sipGapSeconds": [6, 14],
     "glanceSeconds": [4, 9],
-    "glanceMaxDeg": 55
+    "glanceMaxDeg": 55,
+    "endSeatTurnMaxDeg": 25,
+    "endSeatInset": 0.12
   },
   "net": { "movesEvery": 3, "domainsEvery": 6, "interpolationMs": 110 }
 }
