@@ -51,6 +51,23 @@ for rp in sorted(glob.glob(os.path.join(ICI, "personnages", "*.rapport.json"))):
         "poids_octets": os.path.getsize(os.path.join(ASSETS, ident + ".glb")), "fiche_meshy": f"assets-src/modeles/personnages/{ident}.meshy.json",
         "avant": [0, 0, 1],
     })
+    dp = rp.replace(".rapport.json", ".doigts.json")
+    if os.path.exists(dp):
+        # os des doigts et poses de main (personnages/doigts.py); sans ce fichier, le personnage n'a pas de doigts
+        dg = json.load(open(dp))
+        persos[-1]["os"] = dg["os_total"]
+        persos[-1]["noms_os"] = r["bone_names"] + list(dg["os"])
+        persos[-1]["clips"].update({k: 0.1 for k in dg["poses"]})
+        persos[-1]["doigts"] = {
+            "os": dg["os"],
+            "repere_des_os": "Y le long du segment, Z vers la paume, X = Y x Z; flexion = rotation autour de X local, positive vers la paume",
+            "poses": {k: {os_: v["quaternion_local_xyzw"] for os_, v in pose.items()} for k, pose in dg["poses"].items()},
+            "angles_deg": {k: {os_: [v["flexion_x_deg"], v["rotation_z_deg"]] for os_, v in pose.items()} for k, pose in dg["poses"].items()},
+            "prises": {k: {kk: vv for kk, vv in v.items()} for k, v in dg["prises"].items()},
+            "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)",
+        }
+    else:
+        persos[-1]["doigts"] = None
 
 covers = [i["id"] for i in cat["items"] if i["category"] in ("paint", "wallpaper", "floor")]
 ids_modeles = {o["id"] for o in objets}

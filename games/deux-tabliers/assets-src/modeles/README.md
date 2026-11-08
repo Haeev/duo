@@ -29,10 +29,11 @@ duo-python games/deux-tabliers/assets-src/modeles/coque.py            # 3 min en
 duo-python games/deux-tabliers/assets-src/modeles/meubles.py          # 10 s
 duo-python games/deux-tabliers/assets-src/modeles/objets.py           # 10 s (lancer après meubles.py: il importe ses fonctions)
 python3 games/deux-tabliers/assets-src/modeles/personnages/conformer.py   # 15 x 20 s; sorties brutes de Meshy requises (hors dépôt)
+duo-python games/deux-tabliers/assets-src/modeles/personnages/doigts.py    # 4 min; os des doigts et poses de main, après conformer.py
 python3 games/deux-tabliers/assets-src/modeles/dispositions.py        # contrôle des assises, code 1 en cas d'erreur
 python3 games/deux-tabliers/assets-src/modeles/modeles_json.py
 ```
 
-Contrôles: `verifier/valider.cjs` (gltf-validator, images externes comprises), `verifier/inspecter_glb.py`, `verifier/planche.py` (planche Cycles avec mannequin de 1,80 m), `verifier/vue/` (visionneuse Three.js 0.187 et `capturer.mjs` sous Chromium: coque cuite, dispositions, personnages, vue de dessus).
+Contrôles: `verifier/valider.cjs` (gltf-validator, images externes comprises), `verifier/inspecter_glb.py`, `verifier/mains.py` (clips intacts, prises sans traversée, gros plans des mains), `verifier/planche.py` (planche Cycles avec mannequin de 1,80 m), `verifier/vue/` (visionneuse Three.js 0.187 et `capturer.mjs` sous Chromium: coque cuite, dispositions, personnages, vue de dessus).
 
 Les sorties brutes de Meshy (références, modèles, rigs) ne sont pas versionnées; leurs tâches, crédits et réglages sont dans les fiches `personnages/*.meshy.json`. Les liens de Meshy expirent trois jours après la génération (le 2026-11-10).

@@ -54,6 +54,7 @@ BONES = [f"{s}Hand{c}{k}" for s in SIDES for c in CHAINS for k in (1, 2)]
 POSES = ("relaxed", "grip_handle", "grip_glass")
 # angles en degrés: (flexion autour de X, rotation autour de Z) par segment
 RELAXED = {"Thumb1": (8, 6), "Thumb2": (12, 0), "Index1": (12, 0), "Index2": (22, 0), "Fingers1": (18, 0), "Fingers2": (30, 0)}
+MARGIN = 0.0005  # jeu gardé entre la main et le récipient (m)
 BLEND = 0.008  # demi-largeur de la transition des poids autour d'une articulation (m)
 
 
@@ -66,7 +67,10 @@ def read_body(path):
     """Maillage du récipient (sans le contenu `_liquid`) en mètres, repère du modèle."""
     g = Glb(path)
     pr = g.g["meshes"][0]["primitives"][0]
-    return g.read(pr["attributes"]["POSITION"]).astype(np.float64), g.read(pr["indices"]).reshape(-1, 3)
+    V = g.read(pr["attributes"]["POSITION"]).astype(np.float64)
+    N = g.read(pr["attributes"]["NORMAL"]).astype(np.float64)
+    # gonflé de 0,5 mm le long des normales: marge contre les écarts de calcul (float32 dans le moteur)
+    return V + N * MARGIN, g.read(pr["indices"]).reshape(-1, 3)
 
 
 # --- retrait d'un passage précédent ---------------------------------------------------------------
@@ -189,7 +193,11 @@ def landmarks(A, sel, thumb_sign, I):
     for name, a0 in (("Fingers1", a_k), ("Fingers2", a_k + 0.45 * (tipf - a_k)), ("FingersTip", tipf - 0.004)):
         pts[name] = center_at(a0, tcf, half)
     # pouce: sommets au-delà de l'index côté pouce, sous la palmure
-    th = sel & (pt > t_idx + 0.25 * spacing) & (pa < a_k - 0.005)
+    # seuil abaissé pas à pas si le pouce colle à la paume (Farida): au moins 8 sommets
+    for k in (0.25, 0.0, -0.25, -0.5):
+        th = sel & (pt > t_idx + k * spacing) & (pa < a_k - 0.005)
+        if th.sum() >= 8:
+            break
     P = np.stack([pa[th], pt[th], pn[th]], 1)
     c = P.mean(0)
     u = np.linalg.svd(P - c)[2][0]
@@ -267,7 +275,7 @@ def process(ident, cup, glass):
         pts, info = landmarks(A, sel, thumb_sign, d0["I"])
         report["reperes"][side] = {k: round(float(v), 4) for k, v in info.items()}
         report["reperes"][side]["signe_pouce"] = thumb_sign
-        hands[side] = {"spacing": info["spacing"], "hj": hj, "H": H, "Hm": Hm, "unit": unit, "B": B, "pts": pts, "A": A, "sign": thumb_sign}
+        hands[side] = {"spacing": info["spacing"], "hj": hj, "fj": joints.index(g.node(side + "ForeArm")), "H": H, "Hm": Hm, "unit": unit, "B": B, "pts": pts, "A": A, "sign": thumb_sign}
         # os: repère local dans (a, t, n), puis dans le repère de l'os de la main
         frames = {}
         for c in CHAINS:
@@ -326,9 +334,11 @@ def process(ident, cup, glass):
                 s2 = (A - p2) @ u2
                 f = smooth((s1 + BLEND) / (2 * BLEND))
                 f2 = smooth((s2 + BLEND * 0.75) / (1.5 * BLEND))
-                on = (near == ci) & (dist[:, ci] < 0.035)
+                # seuls les sommets surtout portés par la main reçoivent des doigts (pas le poignet ni la manche)
+                on = (near == ci) & (dist[:, ci] < 0.06) & (wh > 0.5)
                 share[:, ci * 2] = np.where(on, f * (1 - f2), 0)
                 share[:, ci * 2 + 1] = np.where(on, f * f2, 0)
+            share *= smooth((wh - 0.5) / 0.3)[:, None]
             for k in range(6):
                 jidx = jbase + si * 6 + k
                 addJ.append(np.full(len(A), jidx))
@@ -427,7 +437,8 @@ def posed_hand(ctx, side, angles):
         fw += np.where((J[:, slot] >= ctx["jbase"] + si * 6) & (J[:, slot] < ctx["jbase"] + si * 6 + 6), W[:, slot], 0)
     # tout ce qui n'est pas un doigt reste fixe dans le repère de la main
     out = A * (1 - fw)[:, None]
-    tot = (W * (J == h["hj"])).sum(1) + fw
+    # partie contrôlée: main, doigts et avant-bras (la manche peut toucher le récipient)
+    tot = (W * ((J == h["hj"]) | (J == h["fj"]))).sum(1) + fw
     for slot in range(4):
         j = J[:, slot]
         w = W[:, slot]
@@ -467,8 +478,9 @@ def close_until_contact(ctx, side, angles, vessel_bvh, chain, seg_max, axis=0, m
             v = list(base)
             v[axis] = base[axis] + direction * step
             trial[key] = tuple(v)
-            V, _ = posed_hand(ctx, side, trial)
-            if bvh_of(V, I, mask).overlap(vessel_bvh):
+            V, part = posed_hand(ctx, side, trial)
+            # toute la main compte: des triangles de palmure relient pouce et index sur certains maillages
+            if bvh_of(V, I, part).overlap(vessel_bvh):
                 contact = True
                 break
             angles = trial
@@ -496,47 +508,148 @@ def to_bone(ctx, side, R, p):
     return {"position_m": [round(float(x), 4) for x in pb], "quaternion_xyzw": [round(v, 6) for v in (q.x, q.y, q.z, q.w)]}
 
 
+def dominant(ctx, side, names, thr=0.5):
+    """Sommets dont la part des os nommés (suffixes `Thumb2`...) dépasse `thr`."""
+    d = ctx["data"][0]
+    si = SIDES.index(side)
+    order = [f"{c}{k}" for c in CHAINS for k in (1, 2)]
+    ids = [ctx["jbase"] + si * 6 + order.index(n) for n in names]
+    return (np.isin(d["J2"], ids) * d["W2"]).sum(1) > thr
+
+
+def clearance(V, mask, vb):
+    """Plus petite distance des sommets `mask` à l'arbre `vb` (m)."""
+    best = 1.0
+    for v in V[mask]:
+        hit = vb.find_nearest(Vector(v))
+        if hit[0] is not None:
+            best = min(best, hit[3])
+    return best
+
+
+def cup_frame(u, phi, e1, e2):
+    """Repère de la tasse dans (a, t, n): Z = u (axe de la pince), X tourné de phi dans le plan (e1, e2)."""
+    x = math.cos(phi) * e1 + math.sin(phi) * e2
+    return np.stack([x, np.cross(u, x), u], 1)
+
+
+HANDLE_GRIP = np.array([0.0785, 0.052, 0.0])  # point pincé: barre extérieure de l'anse, un peu au-dessus du milieu
+HANDLE_HALF = 0.005  # demi-épaisseur de l'anse (z de -0,005 à 0,005 dans la tasse)
+
+
 def fit_handle(ctx, cup):
+    """Prise en pince: la barre de l'anse serrée entre la pulpe du pouce et le côté (côté pouce) de la deuxième
+    phalange de l'index; majeur replié sous l'anse, annulaire et auriculaire repliés dans la paume."""
     side = "Right"
     h = ctx["hands"][side]
     s = h["sign"]
-    pts = h["pts"]
     V, I = cup
-    # repère de la tasse dans (a, t, n): X (anse) = -n, Y (haut) = t côté pouce, Z = -a
-    R = np.stack([np.array([0, 0, -1.0]), np.array([0, s, 0.0]), np.array([-1.0, 0, 0])], 1)
-    if np.linalg.det(R) < 0:
-        R[:, 2] *= -1
-    # barre de l'anse (x 0,074 à 0,083, y 0,023 à 0,070) contre la paume juste sous les jointures, entre index et majeur
-    bar = np.array([0.0785, 0.0465, 0.0])
-    Vh, part = posed_hand(ctx, side, {})
-    near_k = part & (np.abs(Vh[:, 0] - pts["Index1"][0]) < 0.012) & (np.abs(Vh[:, 1] - pts["Index1"][1]) < 0.012)
-    palm_n = Vh[near_k, 2].max() if near_k.any() else pts["Index1"][2] + 0.01
-    target = np.array([pts["Index1"][0] - 0.004, pts["Index1"][1] - s * 0.5 * h["spacing"], palm_n + 0.0045 + 0.004])
-    p = target - R @ bar
-    angles = {}
-    VV, II = vessel_in_hand(V, I, R, p)
-    n_ov, vb = hand_overlap(ctx, side, angles, VV, II)
-    # si la paume touche déjà, on écarte la tasse par pas de 1 mm
-    tries = 0
-    while n_ov and tries < 30:
-        p = p + np.array([0, 0, 0.001])
-        VV, II = vessel_in_hand(V, I, R, p)
-        n_ov, vb = hand_overlap(ctx, side, angles, VV, II)
-        tries += 1
-    angles, c_i = close_until_contact(ctx, side, angles, vb, "Index", (100, 100))
-    angles, c_f = close_until_contact(ctx, side, angles, vb, "Fingers", (100, 110))
-    # pouce: d'abord vers l'index (Z), puis posé sur l'anse (X)
-    angles, c_tz = close_until_contact(ctx, side, angles, vb, "Thumb", (35, 0), axis=1, direction=-s)
-    angles, c_tx = close_until_contact(ctx, side, angles, vb, "Thumb", (45, 40))
-    final, _ = hand_overlap(ctx, side, angles, VV, II)
+    base = {f"RightHand{k}": v for k, v in {"Index1": (80, 0), "Index2": (85, 0), "Fingers1": (85, 0), "Fingers2": (95, 0)}.items()}
+    idx2 = dominant(ctx, side, ["Index2"])
+    th2 = dominant(ctx, side, ["Thumb2"])
+    # 1. pouce: ouverture de pince d environ 1,6 cm (le pouce se referme ensuite sur l anse) entre pulpe et côté de l'index (épaisseur de l'anse 1 cm)
+    best = None
+    # prise « en clé »: index replié à fond, sa deuxième phalange revient sous la pulpe du pouce (le pouce de ces
+    # maillages est court: il n'atteint pas un index à demi plié)
+    grid = [(i1, i2, fz, fx, fx2) for i1 in (70, 80, 90) for i2 in (70, 85, 100)
+            for fz in range(-60, 61, 10) for fx in range(-20, 71, 10) for fx2 in (0, 20, 40)]
+    for i1, i2, fz, fx, fx2 in grid:
+        if True:
+            if True:
+                ang = dict(base, RightHandIndex1=(i1, 0), RightHandIndex2=(i2, 0), RightHandThumb1=(fx, -s * fz), RightHandThumb2=(fx2, 0))
+                Vh, _ = posed_hand(ctx, side, ang)
+                lat = idx2 & (Vh[:, 1] * s >= np.quantile(Vh[idx2, 1] * s, 0.7))
+                Pi, Pt = Vh[lat], Vh[th2]
+                dd = np.linalg.norm(Pi[:, None, :] - Pt[None, :, :], axis=2)
+                i, j = np.unravel_index(np.argmin(dd), dd.shape)
+                score = abs(dd[i, j] - 0.016)
+                if best is None or score < best[0]:
+                    best = (score, ang, Pi[i], Pt[j])
+    pinch_err, angles, pi, pt_ = best
+    u = (pt_ - pi) / np.linalg.norm(pt_ - pi)
+    e1 = np.cross(u, [1.0, 0, 0]) if abs(u[0]) < 0.9 else np.cross(u, [0, 1.0, 0])
+    e1 /= np.linalg.norm(e1)
+    e2 = np.cross(u, e1)
+    Vh, part = posed_hand(ctx, side, angles)
+    hb = bvh_of(Vh, ctx["data"][0]["I"], part)
+    # 2. orientation de la tasse autour de l'axe de la pince: sans traversée, bol le plus loin possible de la main
+    cands = []
+    bowl = V[:, 0] < 0.062
+    # essais du plus serré au plus lâche: hauteur du point pincé sur la barre, puis jeu le long de la pince
+    for off in (0.0005, 0.0015, 0.003, 0.005, 0.008):
+        for hy in (0.052, 0.045, 0.06, 0.038):
+            grip = np.array([HANDLE_GRIP[0], hy, 0.0])
+            for k in range(24):
+                phi = 2 * math.pi * k / 24
+                R = cup_frame(u, phi, e1, e2)
+                p = pi + u * (HANDLE_HALF + off) - R @ grip
+                VV = (R @ V.T).T + p
+                vb = bvh_of(VV, I)
+                if hb.overlap(vb):
+                    continue
+                bb = bvh_of(VV, I, bowl)
+                cands.append((clearance(Vh, part, bb), phi, R, p, grip))
+        if cands:
+            break
+    if not cands:
+        raise RuntimeError("anse: aucune orientation sans traversée")
+    cands.sort(key=lambda c: -c[0])
+    th = chain_mask(ctx, side, ["Thumb"])
+    idx_chain = chain_mask(ctx, side, ["Index"])
+    Ih = ctx["data"][0]["I"]
+    hb_idx = bvh_of(Vh, Ih, idx_chain)
+    pose0 = angles
+
+    def finish(R, p):
+        """Contacts: la tasse glisse le long de la pince jusqu'au côté de l'index, puis pouce et doigts se ferment."""
+        for _ in range(30):
+            p2 = p - u * 0.0005
+            if hb_idx.overlap(bvh_of((R @ V.T).T + p2, I)):
+                break
+            p = p2
+        VV = (R @ V.T).T + p
+        vb = bvh_of(VV, I)
+        ang0 = dict(pose0)
+        fx0, fz0 = ang0["RightHandThumb1"]
+        fx20 = ang0["RightHandThumb2"][0]
+        tbest = None
+        for dz in range(-12, 25, 3):
+            for dx in range(-12, 25, 3):
+                for fx2 in (fx20 - 10, fx20, fx20 + 10, fx20 + 20):
+                    ang = dict(ang0, RightHandThumb1=(fx0 + dx, fz0 - s * dz), RightHandThumb2=(fx2, 0))
+                    Vt, pt_ = posed_hand(ctx, side, ang)
+                    if bvh_of(Vt, Ih, pt_).overlap(vb):
+                        continue
+                    gap = clearance(Vt, th2, vb)
+                    if tbest is None or gap < tbest[0]:
+                        tbest = (gap, ang)
+        ang = tbest[1] if tbest is not None else ang0
+        ang, _ = close_until_contact(ctx, side, ang, vb, "Fingers", (95, 100))
+        ang, _ = close_until_contact(ctx, side, ang, vb, "Index", (95, 100))
+        Vf, _ = posed_hand(ctx, side, ang)
+        final, _ = hand_overlap(ctx, side, ang, VV, I)
+        return final, clearance(Vf, idx2, vb), clearance(Vf, th2, vb), ang, p
+
+    best_c = None
+    for _, phi, R, p, grip in cands[:8]:
+        final, gap_i, gap_t, ang, p = finish(R, p)
+        key = (final > 0, final, max(gap_i, gap_t))
+        if best_c is None or key < best_c[0]:
+            best_c = (key, final, gap_i, gap_t, ang, R, p, grip)
+        if final == 0 and max(gap_i, gap_t) < 0.0015:
+            break
+    _, final, gap_i, gap_t, angles, R, p, grip = best_c
     place = to_bone(ctx, side, R, p)
-    place.update({"modele": "ware_cup_cappuccino", "contacts": {"index": c_i, "majeur_annulaire_auriculaire": c_f, "pouce": c_tx or c_tz},
-                  "traversees": final, "point_de_prise_anse_m": [round(float(x), 4) for x in (h["B"] @ target)],
-                  "note": "point de prise: milieu de la barre extérieure de l'anse (0,0785; 0,0465; 0) dans le repère de la tasse"})
+    place.update({"modele": "ware_cup_cappuccino", "traversees": final, "ecart_pince_initial_mm": round(pinch_err * 1000, 1),
+                  "ecart_pouce_mm": round(gap_t * 1000, 1), "ecart_index_mm": round(gap_i * 1000, 1),
+                  "point_de_prise_anse_m": [round(float(x), 4) for x in (h["B"] @ ((R @ grip) + p))],
+                  "point_de_prise_dans_la_tasse_m": [float(x) for x in grip],
+                  "axe_de_pince_dans_la_main": [round(float(x), 4) for x in (h["B"] @ u)]})
     return {k: (round(v[0], 1), round(v[1], 1)) for k, v in angles.items()}, place
 
 
 def fit_glass(ctx, glass):
+    """Main en C: paume contre le verre, doigts fermés jusqu'au contact, pouce qui enveloppe le côté opposé."""
     side = "Right"
     h = ctx["hands"][side]
     s = h["sign"]
@@ -548,39 +661,98 @@ def fit_glass(ctx, glass):
     radius = 0.04
     Vh, part = posed_hand(ctx, side, {})
     a_c = pts["Index1"][0] - 0.022
-    palm = part & (np.abs(Vh[:, 0] - a_c) < 0.012)
-    palm_n = Vh[palm, 2].max()
+    palm = part & (np.abs(Vh[:, 0] - a_c) < 0.015)
+    palm_n = Vh[palm, 2].max() if palm.any() else Vh[part, 2].max()
     t_c = (pts["Index1"][1] + pts["Fingers1"][1]) / 2
     center = np.array([a_c, t_c, palm_n + radius + 0.002])
-    # le verre (axe vertical = t) tenu au tiers de sa hauteur (13 cm)
     p = center - R @ np.array([0.0, 0.05, 0.0])
-    VV, II = vessel_in_hand(V, I, R, p)
-    n_ov, vb = hand_overlap(ctx, side, {}, VV, II)
+    VV = (R @ V.T).T + p
+    n_ov, vb = hand_overlap(ctx, side, {}, VV, I)
     tries = 0
-    while n_ov and tries < 30:
+    while n_ov and tries < 40:
         p = p + np.array([0, 0, 0.001])
-        VV, II = vessel_in_hand(V, I, R, p)
-        n_ov, vb = hand_overlap(ctx, side, {}, VV, II)
+        VV = (R @ V.T).T + p
+        n_ov, vb = hand_overlap(ctx, side, {}, VV, I)
         tries += 1
-    angles = {}
-    angles, c_i = close_until_contact(ctx, side, angles, vb, "Index", (70, 70))
-    angles, c_f = close_until_contact(ctx, side, angles, vb, "Fingers", (70, 75))
-    angles, c_t = close_until_contact(ctx, side, angles, vb, "Thumb", (45, 40))
-    final, _ = hand_overlap(ctx, side, angles, VV, II)
+    for _retry in range(12):
+        result = glass_fingers(ctx, side, s, V, I, R, p)
+        if result[0] == 0:
+            break
+        p = p + np.array([0, 0, 0.001])
+    final, angles, c_i, c_f, c_t, vb, VV = result
+    Vh, _ = posed_hand(ctx, side, angles)
+    th2 = dominant(ctx, side, ["Thumb2"])
     place = to_bone(ctx, side, R, p)
-    place.update({"modele": "ware_glass", "contacts": {"index": c_i, "majeur_annulaire_auriculaire": c_f, "pouce": c_t}, "traversees": final})
+    place.update({"modele": "ware_glass", "traversees": final, "ecart_pouce_mm": round(clearance(Vh, th2, vb) * 1000, 1),
+                  "contacts": {"index": c_i, "majeur_annulaire_auriculaire": c_f, "pouce": c_t}})
     return {k: (round(v[0], 1), round(v[1], 1)) for k, v in angles.items()}, place
+
+
+def glass_fingers(ctx, side, s, V, I, R, p):
+    VV = (R @ V.T).T + p
+    vb = bvh_of(VV, I)
+    angles = {}
+    angles, c_i = close_until_contact(ctx, side, angles, vb, "Index", (75, 75))
+    angles, c_f = close_until_contact(ctx, side, angles, vb, "Fingers", (75, 80))
+    # pouce: parmi les poses sans traversée, celle qui pose la pulpe sur le verre le plus loin autour de lui
+    th = chain_mask(ctx, side, ["Thumb"])
+    th2 = dominant(ctx, side, ["Thumb2"])
+    Ih = ctx["data"][0]["I"]
+    best = None
+    fallback = None
+    axis_c = p + R @ np.array([0, 0.05, 0])
+    for fz in range(-30, 41, 5):
+        for fx in range(0, 71, 5):
+            for fx2 in (0, 15, 30):
+                ang = dict(angles, RightHandThumb1=(fx, -s * fz), RightHandThumb2=(fx2, 0))
+                Vt, pt_ = posed_hand(ctx, side, ang)
+                if bvh_of(Vt, Ih, pt_).overlap(vb):
+                    continue
+                gap = clearance(Vt, th2, vb)
+                if gap > 0.004:
+                    if fallback is None or gap < fallback[0]:
+                        fallback = (gap, ang)
+                    continue
+                tip = Vt[th2].mean(0)
+                wrap = (tip - axis_c)[2]  # plus la pulpe passe du côté opposé à la paume (n), plus la main enveloppe
+                if best is None or wrap > best[0]:
+                    best = (wrap, ang)
+    c_t = best is not None
+    if c_t:
+        angles = best[1]
+    elif fallback is not None:
+        angles = fallback[1]
+    final, _ = hand_overlap(ctx, side, angles, VV, I)
+    return final, angles, c_i, c_f, c_t, vb, VV
 
 
 def main():
     cup = read_body(os.path.join(ASSETS, "ware_cup_cappuccino.glb"))
     glass = read_body(os.path.join(ASSETS, "ware_glass.glb"))
+    echecs = []
     for ident in sys.argv[1:] or IDS:
-        r = process(ident, cup, glass)
+        try:
+            r = process(ident, cup, glass)
+        except Exception as exc:  # le GLB n'est écrit qu'en fin de traitement: il reste tel quel
+            echecs.append(ident)
+            # GLB ramené sans doigts (un passage précédent est retiré), rapport supprimé
+            path = os.path.join(ASSETS, ident + ".glb")
+            g = Glb(path)
+            strip(g)
+            g.save(path)
+            rp = os.path.join(ICI, ident + ".doigts.json")
+            if os.path.exists(rp):
+                os.remove(rp)
+            print(f"{ident}: ÉCHEC ({exc}), GLB laissé sans doigts")
+            continue
         gh = r["prises"]["grip_handle"]
         gg = r["prises"]["grip_glass"]
-        print(f"{ident}: {r['os_total']} os, {r['file_bytes']} octets; anse: contacts {gh['contacts']} traversées {gh['traversees']}; "
-              f"verre: contacts {gg['contacts']} traversées {gg['traversees']}")
+        print(f"{ident}: {r['os_total']} os, {r['file_bytes']} octets; anse: traversées {gh['traversees']}, écarts pouce "
+              f"{gh['ecart_pouce_mm']} mm, index {gh['ecart_index_mm']} mm; verre: traversées {gg['traversees']}, pouce {gg['ecart_pouce_mm']} mm")
+
+    if echecs:
+        print("échecs:", echecs)
+        sys.exit(1)
 
 
 main()

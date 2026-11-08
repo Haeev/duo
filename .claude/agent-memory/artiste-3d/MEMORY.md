@@ -261,3 +261,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 
 - `coque.py --sans-cuisson` après une modification de géométrie de la place (même de couleurs de sommets seules, relancé derrière une cuisson complète): carte de lumière décalée, façades noires et inscriptions effacées. Toujours une cuisson complète (5 min), puis restaurer `shell_village.glb`, `shell_village_ext_fond.glb` et `textures/shell_village_lightmap.png` si seule la place est en jeu, puis `quantifier.cjs` et corriger `fiches/coque.json` (poids quantifié, ligne `compression`).
 - Visionneuse `verifier/vue/capturer.mjs` (paramètre `cam=px,hauteur,pz;cible`): 5 vues en 20 s. Terrasse vers l'est: `cam=8,1.55,14.6;22,4.5,26`.
+
+## Doigts des personnages Meshy (Deux Tabliers, vérifié le 2026-11-08)
+
+- Ajouter des os à un GLB sans aller-retour Blender: `personnages/glb.py` (lecture et réécriture numpy, identique à l'octet près sans modification). Les clips restent intacts (écart 0,001 mm, `verifier/mains.py --avant`).
+- Import glTF dans Blender: le premier clip est actif et les os sans courbe gardent la pose précédente; remettre toutes les pose bones à zéro avant d'appliquer un clip partiel (doigts seuls).
+- Repère de la main: analyse en composantes principales des sommets de la main (la direction « bas » de la liaison n'est pas la normale de la paume). Pouce: côté où la moitié basse déborde le plus. Palmure introuvable sur ces maillages (doigts qui se touchent): jointures à 56 % de la longueur.
+- Doigts: ne pondérer que les sommets surtout portés par la main (sinon la manche suit le pouce), rayon de capture 6 cm (sinon le bout de l'auriculaire reste à la main: pointe étirée). Contrôle de traversée sur toute la main et l'avant-bras: des triangles de palmure relient pouce et index.
+- Le pouce de ces maillages est court: prise en clé (index replié à fond) et non en pince à demi pliée. Récipient gonflé de 0,5 mm pendant la recherche (sinon le moteur en float32 voit des contacts comme traversées).
