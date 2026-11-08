@@ -19,6 +19,7 @@ import { serviceStationPrompt } from './service';
 import { createArrangementClient } from './amenagement/client/mode';
 import { createLiveShell } from './amenagement/client/coque-vivante';
 import { createBakedShell } from './rendu/coque-glb';
+import { AVATAR_MODEL } from './rendu/correspondances';
 import { createModelLibrary } from './rendu/modeles';
 import { createWorldNodes } from './rendu/monde3d';
 import { createStage } from './rendu/scene';
@@ -123,6 +124,10 @@ duo.notebook.attach({
   snapshot: () => session.hostWorld(),
 });
 
+// La coque et les avatars se chargent pendant l'écran de chargement (délai de 30 s), pas en
+// pleine partie: le lecteur de GLB occupe le fil principal par à-coups.
+duo.reportLoading(0.6);
+await Promise.all([models.gltf('shell_village'), ...AVATAR_MODEL.map((name) => models.gltf(name))]);
 duo.reportLoading(1);
 await duo.ready();
 duo.input.attach(canvas);
