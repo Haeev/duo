@@ -25,16 +25,14 @@ const WITH_FINGERS = [
   'char_lise',
   'char_client_etudiante',
   'char_client_brunch',
-  'char_client_connaisseur',
   'char_client_gourmand',
-  'char_client_flaneur',
   'char_client_pressee',
   'char_avatar_1',
   'char_avatar_2',
 ];
 
 describe('Deux Tabliers, mains à doigts', () => {
-  it('prises lues pour les 11 personnages à doigts, aucune pour les 4 autres', () => {
+  it('prises lues pour les 9 personnages à doigts, aucune pour les 6 autres', () => {
     for (const id of WITH_FINGERS) {
       const h = fingerHolds(id);
       expect(h, id).not.toBeNull();
@@ -46,6 +44,8 @@ describe('Deux Tabliers, mains à doigts', () => {
       'char_bastien',
       'char_client_teletravail',
       'char_client_voisine',
+      'char_client_flaneur',
+      'char_client_connaisseur',
     ])
       expect(fingerHolds(id)).toBeNull();
   });

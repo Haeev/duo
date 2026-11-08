@@ -5790,10 +5790,10 @@
      },
      "grip_handle": {
       "RightHandThumb1": [
-       0.156061,
-       -0.567079,
-       0.469099,
-       0.658796
+       0.141163,
+       -0.57097,
+       0.486183,
+       0.646291
       ],
       "RightHandThumb2": [
        0.258819,
@@ -5991,7 +5991,7 @@
      "grip_handle": {
       "RightHandThumb1": [
        38,
-       43.0
+       46.0
       ],
       "RightHandThumb2": [
        30,
@@ -6092,25 +6092,25 @@
     "prises": {
      "grip_handle": {
       "position_m": [
-       -0.0673,
-       0.1468,
-       0.0584
+       -0.0547,
+       0.1535,
+       0.079
       ],
       "quaternion_xyzw": [
-       0.476163,
-       0.085197,
-       -0.541454,
-       0.687632
+       0.460969,
+       0.14662,
+       -0.626576,
+       0.611075
       ],
       "modele": "ware_cup_cappuccino",
       "traversees": 0,
       "ecart_pince_initial_mm": 0.0,
-      "ecart_pouce_mm": 0.9,
-      "ecart_index_mm": 1.2,
+      "ecart_pouce_mm": 0.4,
+      "ecart_index_mm": 4.4,
       "point_de_prise_anse_m": [
-       -0.0046,
-       0.0932,
-       0.0301
+       -0.007,
+       0.096,
+       0.034
       ],
       "point_de_prise_dans_la_tasse_m": [
        0.0785,
@@ -7010,10 +7010,10 @@
      },
      "grip_handle": {
       "RightHandThumb1": [
-       0.191646,
-       -0.503382,
-       0.053001,
-       0.840874
+       0.088552,
+       -0.529138,
+       0.170483,
+       0.826503
       ],
       "RightHandThumb2": [
        -0.087156,
@@ -7022,10 +7022,10 @@
        0.996195
       ],
       "RightHandIndex1": [
-       0.486479,
-       -0.423206,
-       0.329616,
-       0.689629
+       0.62421,
+       -0.341832,
+       0.413402,
+       0.567989
       ],
       "RightHandIndex2": [
        0.810461,
@@ -7210,15 +7210,15 @@
      },
      "grip_handle": {
       "RightHandThumb1": [
-       24,
-       -11.0
+       21,
+       7.0
       ],
       "RightHandThumb2": [
        -10,
        0
       ],
       "RightHandIndex1": [
-       70,
+       95,
        0
       ],
       "RightHandIndex2": [
@@ -7312,35 +7312,35 @@
     "prises": {
      "grip_handle": {
       "position_m": [
-       -0.1215,
-       0.113,
-       0.041
+       -0.1177,
+       0.1276,
+       -0.0149
       ],
       "quaternion_xyzw": [
-       -0.491031,
-       0.024664,
-       -0.353872,
-       0.795647
+       0.870503,
+       -0.022454,
+       -0.210696,
+       0.444215
       ],
       "modele": "ware_cup_cappuccino",
       "traversees": 0,
       "ecart_pince_initial_mm": 0.0,
-      "ecart_pouce_mm": 1.8,
-      "ecart_index_mm": 1.7,
+      "ecart_pouce_mm": 0.3,
+      "ecart_index_mm": 8.0,
       "point_de_prise_anse_m": [
-       -0.0278,
-       0.0843,
-       0.0133
+       -0.0374,
+       0.0736,
+       0.0048
       ],
       "point_de_prise_dans_la_tasse_m": [
        0.0785,
-       0.065,
+       0.06,
        0.0
       ],
       "axe_de_pince_dans_la_main": [
-       0.3868,
-       0.7639,
-       0.5166
+       -0.3868,
+       -0.7639,
+       -0.5166
       ]
      },
      "grip_glass": {
@@ -8539,7 +8539,7 @@
    "role": "client, profil télétravail (gilet chiné, sacoche)",
    "taille_m": 1.76,
    "triangles": 3904,
-   "os": 36,
+   "os": 24,
    "noms_os": [
     "Hips",
     "Spine02",
@@ -8564,29 +8564,14 @@
     "RightUpLeg",
     "RightLeg",
     "RightFoot",
-    "RightToeBase",
-    "RightHandThumb1",
-    "RightHandThumb2",
-    "RightHandIndex1",
-    "RightHandIndex2",
-    "RightHandFingers1",
-    "RightHandFingers2",
-    "LeftHandThumb1",
-    "LeftHandThumb2",
-    "LeftHandIndex1",
-    "LeftHandIndex2",
-    "LeftHandFingers1",
-    "LeftHandFingers2"
+    "RightToeBase"
    ],
    "clips": {
     "walk": 1.033,
     "idle": 4.0,
     "sit": 10.667,
     "drink": 8.867,
-    "sit_drink": 11.167,
-    "relaxed": 0.1,
-    "grip_handle": 0.1,
-    "grip_glass": 0.1
+    "sit_drink": 11.167
    },
    "clips_sur_place": true,
    "materiaux": [
@@ -8594,499 +8579,14 @@
    ],
    "badge_joueur": null,
    "texture": "texture de Meshy réduite à 512 px, intégrée",
-   "poids_octets": 672536,
+   "poids_octets": 659776,
    "fiche_meshy": "assets-src/modeles/personnages/char_client_teletravail.meshy.json",
    "avant": [
     0,
     0,
     1
    ],
-   "doigts": {
-    "os": {
-     "RightHandThumb1": {
-      "parent": "RightHand",
-      "longueur_m": 0.0367
-     },
-     "RightHandThumb2": {
-      "parent": "RightHandThumb1",
-      "longueur_m": 0.0367
-     },
-     "RightHandIndex1": {
-      "parent": "RightHand",
-      "longueur_m": 0.0286
-     },
-     "RightHandIndex2": {
-      "parent": "RightHandIndex1",
-      "longueur_m": 0.0364
-     },
-     "RightHandFingers1": {
-      "parent": "RightHand",
-      "longueur_m": 0.0437
-     },
-     "RightHandFingers2": {
-      "parent": "RightHandFingers1",
-      "longueur_m": 0.0517
-     },
-     "LeftHandThumb1": {
-      "parent": "LeftHand",
-      "longueur_m": 0.0243
-     },
-     "LeftHandThumb2": {
-      "parent": "LeftHandThumb1",
-      "longueur_m": 0.0243
-     },
-     "LeftHandIndex1": {
-      "parent": "LeftHand",
-      "longueur_m": 0.0385
-     },
-     "LeftHandIndex2": {
-      "parent": "LeftHandIndex1",
-      "longueur_m": 0.0423
-     },
-     "LeftHandFingers1": {
-      "parent": "LeftHand",
-      "longueur_m": 0.0461
-     },
-     "LeftHandFingers2": {
-      "parent": "LeftHandFingers1",
-      "longueur_m": 0.0445
-     }
-    },
-    "repere_des_os": "Y le long du segment, Z vers la paume, X = Y x Z; flexion = rotation autour de X local, positive vers la paume",
-    "poses": {
-     "relaxed": {
-      "RightHandThumb1": [
-       0.054666,
-       -0.408134,
-       0.032465,
-       0.910706
-      ],
-      "RightHandThumb2": [
-       0.104528,
-       -0.0,
-       -0.0,
-       0.994522
-      ],
-      "RightHandIndex1": [
-       0.165549,
-       -0.394864,
-       0.13313,
-       0.893842
-      ],
-      "RightHandIndex2": [
-       0.444571,
-       0.028984,
-       0.057051,
-       0.893455
-      ],
-      "RightHandFingers1": [
-       0.416737,
-       -0.336048,
-       0.250138,
-       0.806743
-      ],
-      "RightHandFingers2": [
-       0.150277,
-       0.162705,
-       0.211864,
-       0.951871
-      ],
-      "LeftHandThumb1": [
-       0.251451,
-       0.502275,
-       0.036551,
-       0.826533
-      ],
-      "LeftHandThumb2": [
-       0.104528,
-       0.0,
-       0.0,
-       0.994522
-      ],
-      "LeftHandIndex1": [
-       -0.069368,
-       0.467783,
-       0.057366,
-       0.879248
-      ],
-      "LeftHandIndex2": [
-       0.520486,
-       0.008497,
-       0.053034,
-       0.852179
-      ],
-      "LeftHandFingers1": [
-       0.323869,
-       0.495665,
-       0.102497,
-       0.799324
-      ],
-      "LeftHandFingers2": [
-       0.232687,
-       -0.077563,
-       -0.174946,
-       0.953538
-      ]
-     },
-     "grip_handle": {
-      "RightHandThumb1": [
-       0.150225,
-       -0.389288,
-       0.028622,
-       0.908333
-      ],
-      "RightHandThumb2": [
-       -0.087156,
-       0.0,
-       -0.0,
-       0.996195
-      ],
-      "RightHandIndex1": [
-       0.696295,
-       -0.220006,
-       0.35389,
-       0.584408
-      ],
-      "RightHandIndex2": [
-       0.907766,
-       0.058429,
-       0.026096,
-       0.414568
-      ],
-      "RightHandFingers1": [
-       0.828351,
-       -0.107279,
-       0.404954,
-       0.371939
-      ],
-      "RightHandFingers2": [
-       0.66907,
-       0.2548,
-       0.080225,
-       0.693531
-      ],
-      "LeftHandThumb1": [
-       0.251451,
-       0.502275,
-       0.036551,
-       0.826533
-      ],
-      "LeftHandThumb2": [
-       0.104528,
-       0.0,
-       0.0,
-       0.994522
-      ],
-      "LeftHandIndex1": [
-       -0.069368,
-       0.467783,
-       0.057366,
-       0.879248
-      ],
-      "LeftHandIndex2": [
-       0.520486,
-       0.008497,
-       0.053034,
-       0.852179
-      ],
-      "LeftHandFingers1": [
-       0.323869,
-       0.495665,
-       0.102497,
-       0.799324
-      ],
-      "LeftHandFingers2": [
-       0.232687,
-       -0.077563,
-       -0.174946,
-       0.953538
-      ]
-     },
-     "grip_glass": {
-      "RightHandThumb1": [
-       0.221688,
-       -0.350071,
-       -0.21054,
-       0.885425
-      ],
-      "RightHandThumb2": [
-       0.258819,
-       -0.0,
-       -0.0,
-       0.965926
-      ],
-      "RightHandIndex1": [
-       0.474877,
-       -0.320928,
-       0.265794,
-       0.775146
-      ],
-      "RightHandIndex2": [
-       0.265923,
-       0.017566,
-       0.061533,
-       0.961868
-      ],
-      "RightHandFingers1": [
-       0.634396,
-       -0.248231,
-       0.337459,
-       0.64965
-      ],
-      "RightHandFingers2": [
-       -0.101206,
-       0.102327,
-       0.246756,
-       0.958331
-      ],
-      "LeftHandThumb1": [
-       0.251451,
-       0.502275,
-       0.036551,
-       0.826533
-      ],
-      "LeftHandThumb2": [
-       0.104528,
-       0.0,
-       0.0,
-       0.994522
-      ],
-      "LeftHandIndex1": [
-       -0.069368,
-       0.467783,
-       0.057366,
-       0.879248
-      ],
-      "LeftHandIndex2": [
-       0.520486,
-       0.008497,
-       0.053034,
-       0.852179
-      ],
-      "LeftHandFingers1": [
-       0.323869,
-       0.495665,
-       0.102497,
-       0.799324
-      ],
-      "LeftHandFingers2": [
-       0.232687,
-       -0.077563,
-       -0.174946,
-       0.953538
-      ]
-     }
-    },
-    "angles_deg": {
-     "relaxed": {
-      "RightHandThumb1": [
-       8,
-       -6.0
-      ],
-      "RightHandThumb2": [
-       12,
-       -0.0
-      ],
-      "RightHandIndex1": [
-       12,
-       -0.0
-      ],
-      "RightHandIndex2": [
-       22,
-       -0.0
-      ],
-      "RightHandFingers1": [
-       18,
-       -0.0
-      ],
-      "RightHandFingers2": [
-       30,
-       -0.0
-      ],
-      "LeftHandThumb1": [
-       8,
-       -6.0
-      ],
-      "LeftHandThumb2": [
-       12,
-       -0.0
-      ],
-      "LeftHandIndex1": [
-       12,
-       -0.0
-      ],
-      "LeftHandIndex2": [
-       22,
-       -0.0
-      ],
-      "LeftHandFingers1": [
-       18,
-       -0.0
-      ],
-      "LeftHandFingers2": [
-       30,
-       -0.0
-      ]
-     },
-     "grip_handle": {
-      "RightHandThumb1": [
-       18,
-       -11.0
-      ],
-      "RightHandThumb2": [
-       -10,
-       0
-      ],
-      "RightHandIndex1": [
-       91,
-       0
-      ],
-      "RightHandIndex2": [
-       100,
-       0
-      ],
-      "RightHandFingers1": [
-       95,
-       0
-      ],
-      "RightHandFingers2": [
-       100,
-       0
-      ],
-      "LeftHandThumb1": [
-       8,
-       -6.0
-      ],
-      "LeftHandThumb2": [
-       12,
-       -0.0
-      ],
-      "LeftHandIndex1": [
-       12,
-       -0.0
-      ],
-      "LeftHandIndex2": [
-       22,
-       -0.0
-      ],
-      "LeftHandFingers1": [
-       18,
-       -0.0
-      ],
-      "LeftHandFingers2": [
-       30,
-       -0.0
-      ]
-     },
-     "grip_glass": {
-      "RightHandThumb1": [
-       15,
-       -40.0
-      ],
-      "RightHandThumb2": [
-       30,
-       0
-      ],
-      "RightHandIndex1": [
-       54,
-       0
-      ],
-      "RightHandIndex2": [
-       0,
-       0
-      ],
-      "RightHandFingers1": [
-       52,
-       0
-      ],
-      "RightHandFingers2": [
-       0,
-       0
-      ],
-      "LeftHandThumb1": [
-       8,
-       -6.0
-      ],
-      "LeftHandThumb2": [
-       12,
-       -0.0
-      ],
-      "LeftHandIndex1": [
-       12,
-       -0.0
-      ],
-      "LeftHandIndex2": [
-       22,
-       -0.0
-      ],
-      "LeftHandFingers1": [
-       18,
-       -0.0
-      ],
-      "LeftHandFingers2": [
-       30,
-       -0.0
-      ]
-     }
-    },
-    "prises": {
-     "grip_handle": {
-      "position_m": [
-       -0.0654,
-       0.1506,
-       -0.0448
-      ],
-      "quaternion_xyzw": [
-       -0.404916,
-       -0.048616,
-       -0.673675,
-       0.616313
-      ],
-      "modele": "ware_cup_cappuccino",
-      "traversees": 0,
-      "ecart_pince_initial_mm": 0.0,
-      "ecart_pouce_mm": 2.9,
-      "ecart_index_mm": 3.2,
-      "point_de_prise_anse_m": [
-       -0.0315,
-       0.0812,
-       -0.0107
-      ],
-      "point_de_prise_dans_la_tasse_m": [
-       0.0785,
-       0.031,
-       0.0
-      ],
-      "axe_de_pince_dans_la_main": [
-       0.4856,
-       0.5646,
-       0.6674
-      ]
-     },
-     "grip_glass": {
-      "position_m": [
-       -0.0176,
-       0.0867,
-       0.0877
-      ],
-      "quaternion_xyzw": [
-       -0.678377,
-       0.165883,
-       0.330995,
-       0.63461
-      ],
-      "modele": "ware_glass",
-      "traversees": 0,
-      "ecart_pouce_mm": 1.5,
-      "contacts": {
-       "index": true,
-       "majeur_annulaire_auriculaire": true,
-       "pouce": true
-      }
-     }
-    },
-    "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
-   }
+   "doigts": null
   },
   {
    "id": "char_client_voisine",
@@ -9094,7 +8594,7 @@
    "role": "cliente, profil voisins (gilet framboise), de l'essai de style",
    "taille_m": 1.6,
    "triangles": 3950,
-   "os": 36,
+   "os": 24,
    "noms_os": [
     "Hips",
     "Spine02",
@@ -9119,29 +8619,14 @@
     "RightUpLeg",
     "RightLeg",
     "RightFoot",
-    "RightToeBase",
-    "RightHandThumb1",
-    "RightHandThumb2",
-    "RightHandIndex1",
-    "RightHandIndex2",
-    "RightHandFingers1",
-    "RightHandFingers2",
-    "LeftHandThumb1",
-    "LeftHandThumb2",
-    "LeftHandIndex1",
-    "LeftHandIndex2",
-    "LeftHandFingers1",
-    "LeftHandFingers2"
+    "RightToeBase"
    ],
    "clips": {
     "walk": 1.033,
     "idle": 4.0,
     "sit": 10.667,
     "drink": 8.867,
-    "sit_drink": 11.167,
-    "relaxed": 0.1,
-    "grip_handle": 0.1,
-    "grip_glass": 0.1
+    "sit_drink": 11.167
    },
    "clips_sur_place": true,
    "materiaux": [
@@ -9149,499 +8634,14 @@
    ],
    "badge_joueur": null,
    "texture": "texture de Meshy réduite à 512 px, intégrée",
-   "poids_octets": 668988,
+   "poids_octets": 656164,
    "fiche_meshy": "assets-src/modeles/personnages/char_client_voisine.meshy.json",
    "avant": [
     0,
     0,
     1
    ],
-   "doigts": {
-    "os": {
-     "RightHandThumb1": {
-      "parent": "RightHand",
-      "longueur_m": 0.0255
-     },
-     "RightHandThumb2": {
-      "parent": "RightHandThumb1",
-      "longueur_m": 0.0255
-     },
-     "RightHandIndex1": {
-      "parent": "RightHand",
-      "longueur_m": 0.0249
-     },
-     "RightHandIndex2": {
-      "parent": "RightHandIndex1",
-      "longueur_m": 0.0263
-     },
-     "RightHandFingers1": {
-      "parent": "RightHand",
-      "longueur_m": 0.0236
-     },
-     "RightHandFingers2": {
-      "parent": "RightHandFingers1",
-      "longueur_m": 0.0303
-     },
-     "LeftHandThumb1": {
-      "parent": "LeftHand",
-      "longueur_m": 0.02
-     },
-     "LeftHandThumb2": {
-      "parent": "LeftHandThumb1",
-      "longueur_m": 0.02
-     },
-     "LeftHandIndex1": {
-      "parent": "LeftHand",
-      "longueur_m": 0.0232
-     },
-     "LeftHandIndex2": {
-      "parent": "LeftHandIndex1",
-      "longueur_m": 0.0258
-     },
-     "LeftHandFingers1": {
-      "parent": "LeftHand",
-      "longueur_m": 0.0286
-     },
-     "LeftHandFingers2": {
-      "parent": "LeftHandFingers1",
-      "longueur_m": 0.0321
-     }
-    },
-    "repere_des_os": "Y le long du segment, Z vers la paume, X = Y x Z; flexion = rotation autour de X local, positive vers la paume",
-    "poses": {
-     "relaxed": {
-      "RightHandThumb1": [
-       -0.343335,
-       -0.4386,
-       0.381759,
-       0.737571
-      ],
-      "RightHandThumb2": [
-       0.104528,
-       -0.0,
-       0.0,
-       0.994522
-      ],
-      "RightHandIndex1": [
-       0.023943,
-       -0.122072,
-       0.608557,
-       0.783698
-      ],
-      "RightHandIndex2": [
-       0.173982,
-       -0.169462,
-       -0.210839,
-       0.946868
-      ],
-      "RightHandFingers1": [
-       0.119502,
-       -0.183508,
-       0.511459,
-       0.830936
-      ],
-      "RightHandFingers2": [
-       0.22966,
-       0.23132,
-       0.280653,
-       0.902763
-      ],
-      "LeftHandThumb1": [
-       0.111399,
-       0.338805,
-       -0.181506,
-       0.916437
-      ],
-      "LeftHandThumb2": [
-       0.104528,
-       0.0,
-       -0.0,
-       0.994522
-      ],
-      "LeftHandIndex1": [
-       0.08764,
-       0.266491,
-       -0.428918,
-       0.85868
-      ],
-      "LeftHandIndex2": [
-       0.305342,
-       0.063601,
-       0.099347,
-       0.944908
-      ],
-      "LeftHandFingers1": [
-       0.215808,
-       0.30747,
-       -0.279463,
-       0.883623
-      ],
-      "LeftHandFingers2": [
-       0.309766,
-       -0.096226,
-       -0.148389,
-       0.93422
-      ]
-     },
-     "grip_handle": {
-      "RightHandThumb1": [
-       -0.200712,
-       -0.311367,
-       0.517108,
-       0.771599
-      ],
-      "RightHandThumb2": [
-       0.5,
-       0.0,
-       0.0,
-       0.866025
-      ],
-      "RightHandIndex1": [
-       0.537226,
-       0.311816,
-       0.53667,
-       0.57109
-      ],
-      "RightHandIndex2": [
-       0.731093,
-       -0.264382,
-       -0.057207,
-       0.626365
-      ],
-      "RightHandFingers1": [
-       0.610793,
-       0.174776,
-       0.514508,
-       0.575905
-      ],
-      "RightHandFingers2": [
-       0.70593,
-       0.350462,
-       0.097218,
-       0.607773
-      ],
-      "LeftHandThumb1": [
-       0.111399,
-       0.338805,
-       -0.181506,
-       0.916437
-      ],
-      "LeftHandThumb2": [
-       0.104528,
-       0.0,
-       -0.0,
-       0.994522
-      ],
-      "LeftHandIndex1": [
-       0.08764,
-       0.266491,
-       -0.428918,
-       0.85868
-      ],
-      "LeftHandIndex2": [
-       0.305342,
-       0.063601,
-       0.099347,
-       0.944908
-      ],
-      "LeftHandFingers1": [
-       0.215808,
-       0.30747,
-       -0.279463,
-       0.883623
-      ],
-      "LeftHandFingers2": [
-       0.309766,
-       -0.096226,
-       -0.148389,
-       0.93422
-      ]
-     },
-     "grip_glass": {
-      "RightHandThumb1": [
-       -0.28208,
-       -0.503873,
-       0.24604,
-       0.778464
-      ],
-      "RightHandThumb2": [
-       0.0,
-       -0.0,
-       0.0,
-       1.0
-      ],
-      "RightHandIndex1": [
-       0.206232,
-       0.023365,
-       0.62024,
-       0.756455
-      ],
-      "RightHandIndex2": [
-       -0.009886,
-       -0.126119,
-       -0.239301,
-       0.962669
-      ],
-      "RightHandFingers1": [
-       0.275857,
-       -0.082545,
-       0.537077,
-       0.792867
-      ],
-      "RightHandFingers2": [
-       -0.003689,
-       0.153682,
-       0.329631,
-       0.93151
-      ],
-      "LeftHandThumb1": [
-       0.111399,
-       0.338805,
-       -0.181506,
-       0.916437
-      ],
-      "LeftHandThumb2": [
-       0.104528,
-       0.0,
-       -0.0,
-       0.994522
-      ],
-      "LeftHandIndex1": [
-       0.08764,
-       0.266491,
-       -0.428918,
-       0.85868
-      ],
-      "LeftHandIndex2": [
-       0.305342,
-       0.063601,
-       0.099347,
-       0.944908
-      ],
-      "LeftHandFingers1": [
-       0.215808,
-       0.30747,
-       -0.279463,
-       0.883623
-      ],
-      "LeftHandFingers2": [
-       0.309766,
-       -0.096226,
-       -0.148389,
-       0.93422
-      ]
-     }
-    },
-    "angles_deg": {
-     "relaxed": {
-      "RightHandThumb1": [
-       8,
-       -6.0
-      ],
-      "RightHandThumb2": [
-       12,
-       -0.0
-      ],
-      "RightHandIndex1": [
-       12,
-       -0.0
-      ],
-      "RightHandIndex2": [
-       22,
-       -0.0
-      ],
-      "RightHandFingers1": [
-       18,
-       -0.0
-      ],
-      "RightHandFingers2": [
-       30,
-       -0.0
-      ],
-      "LeftHandThumb1": [
-       8,
-       6.0
-      ],
-      "LeftHandThumb2": [
-       12,
-       0.0
-      ],
-      "LeftHandIndex1": [
-       12,
-       0.0
-      ],
-      "LeftHandIndex2": [
-       22,
-       0.0
-      ],
-      "LeftHandFingers1": [
-       18,
-       0.0
-      ],
-      "LeftHandFingers2": [
-       30,
-       0.0
-      ]
-     },
-     "grip_handle": {
-      "RightHandThumb1": [
-       34,
-       2.0
-      ],
-      "RightHandThumb2": [
-       60,
-       0
-      ],
-      "RightHandIndex1": [
-       95,
-       0
-      ],
-      "RightHandIndex2": [
-       100,
-       0
-      ],
-      "RightHandFingers1": [
-       95,
-       0
-      ],
-      "RightHandFingers2": [
-       100,
-       0
-      ],
-      "LeftHandThumb1": [
-       8,
-       6.0
-      ],
-      "LeftHandThumb2": [
-       12,
-       0.0
-      ],
-      "LeftHandIndex1": [
-       12,
-       0.0
-      ],
-      "LeftHandIndex2": [
-       22,
-       0.0
-      ],
-      "LeftHandFingers1": [
-       18,
-       0.0
-      ],
-      "LeftHandFingers2": [
-       30,
-       0.0
-      ]
-     },
-     "grip_glass": {
-      "RightHandThumb1": [
-       5,
-       -25.0
-      ],
-      "RightHandThumb2": [
-       0,
-       0
-      ],
-      "RightHandIndex1": [
-       39,
-       0
-      ],
-      "RightHandIndex2": [
-       0,
-       0
-      ],
-      "RightHandFingers1": [
-       40,
-       0
-      ],
-      "RightHandFingers2": [
-       1,
-       0
-      ],
-      "LeftHandThumb1": [
-       8,
-       6.0
-      ],
-      "LeftHandThumb2": [
-       12,
-       0.0
-      ],
-      "LeftHandIndex1": [
-       12,
-       0.0
-      ],
-      "LeftHandIndex2": [
-       22,
-       0.0
-      ],
-      "LeftHandFingers1": [
-       18,
-       0.0
-      ],
-      "LeftHandFingers2": [
-       30,
-       0.0
-      ]
-     }
-    },
-    "prises": {
-     "grip_handle": {
-      "position_m": [
-       -0.0817,
-       0.1007,
-       0.0747
-      ],
-      "quaternion_xyzw": [
-       -0.633227,
-       0.244656,
-       -0.210274,
-       0.703529
-      ],
-      "modele": "ware_cup_cappuccino",
-      "traversees": 0,
-      "ecart_pince_initial_mm": 0.0,
-      "ecart_pouce_mm": 0.7,
-      "ecart_index_mm": 1.2,
-      "point_de_prise_anse_m": [
-       -0.0204,
-       0.0603,
-       0.0039
-      ],
-      "point_de_prise_dans_la_tasse_m": [
-       0.0785,
-       0.065,
-       0.0
-      ],
-      "axe_de_pince_dans_la_main": [
-       0.6105,
-       0.7881,
-       0.0783
-      ]
-     },
-     "grip_glass": {
-      "position_m": [
-       -0.0222,
-       0.1211,
-       0.0544
-      ],
-      "quaternion_xyzw": [
-       -0.900903,
-       0.107452,
-       0.340311,
-       0.247017
-      ],
-      "modele": "ware_glass",
-      "traversees": 0,
-      "ecart_pouce_mm": 0.7,
-      "contacts": {
-       "index": true,
-       "majeur_annulaire_auriculaire": true,
-       "pouce": true
-      }
-     }
-    },
-    "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
-   }
+   "doigts": null
   },
   {
    "id": "char_farida",
@@ -10314,7 +9314,7 @@
    ],
    "badge_joueur": null,
    "texture": "texture de Meshy réduite à 512 px, intégrée",
-   "poids_octets": 664004,
+   "poids_octets": 664012,
    "fiche_meshy": "assets-src/modeles/personnages/char_mathis.meshy.json",
    "avant": [
     0,
@@ -10325,11 +9325,11 @@
     "os": {
      "RightHandThumb1": {
       "parent": "RightHand",
-      "longueur_m": 0.0141
+      "longueur_m": 0.0095
      },
      "RightHandThumb2": {
       "parent": "RightHandThumb1",
-      "longueur_m": 0.0141
+      "longueur_m": 0.0095
      },
      "RightHandIndex1": {
       "parent": "RightHand",
@@ -10376,15 +9376,15 @@
     "poses": {
      "relaxed": {
       "RightHandThumb1": [
-       0.524349,
-       -0.621865,
-       -0.22488,
-       0.536443
+       0.625357,
+       -0.711723,
+       -0.219095,
+       0.233188
       ],
       "RightHandThumb2": [
        0.104528,
-       -0.0,
-       -0.0,
+       0.0,
+       0.0,
        0.994522
       ],
       "RightHandIndex1": [
@@ -10450,22 +9450,22 @@
      },
      "grip_handle": {
       "RightHandThumb1": [
-       0.652173,
-       -0.737872,
-       0.139354,
-       0.103898
+       0.243813,
+       -0.961368,
+       0.032051,
+       -0.123694
       ],
       "RightHandThumb2": [
-       0.087156,
-       -0.0,
-       -0.0,
+       -0.087156,
+       0.0,
+       0.0,
        0.996195
       ],
       "RightHandIndex1": [
-       0.738298,
-       -0.297646,
-       0.412629,
-       0.442788
+       0.742133,
+       -0.294034,
+       0.415211,
+       0.436328
       ],
       "RightHandIndex2": [
        0.676116,
@@ -10524,15 +9524,15 @@
      },
      "grip_glass": {
       "RightHandThumb1": [
-       0.698457,
-       -0.572174,
-       -0.16981,
-       0.394892
+       0.615279,
+       -0.687746,
+       -0.26582,
+       0.278884
       ],
       "RightHandThumb2": [
+       -0.0,
        0.0,
-       -0.0,
-       -0.0,
+       0.0,
        1.0
       ],
       "RightHandIndex1": [
@@ -10650,15 +9650,15 @@
      },
      "grip_handle": {
       "RightHandThumb1": [
-       76,
-       17.0
+       60,
+       60.0
       ],
       "RightHandThumb2": [
-       10,
+       -10,
        0
       ],
       "RightHandIndex1": [
-       94,
+       95,
        0
       ],
       "RightHandIndex2": [
@@ -10700,8 +9700,8 @@
      },
      "grip_glass": {
       "RightHandThumb1": [
-       30,
-       -10.0
+       0,
+       5.0
       ],
       "RightHandThumb2": [
        0,
@@ -10752,35 +9752,35 @@
     "prises": {
      "grip_handle": {
       "position_m": [
-       -0.0319,
-       0.1809,
-       0.0721
+       -0.0351,
+       0.0403,
+       0.0977
       ],
       "quaternion_xyzw": [
-       0.865845,
-       -0.20359,
-       -0.42857,
-       0.158721
+       0.008161,
+       0.461778,
+       0.146843,
+       0.874718
       ],
       "modele": "ware_cup_cappuccino",
       "traversees": 0,
-      "ecart_pince_initial_mm": 4.0,
-      "ecart_pouce_mm": 3.7,
-      "ecart_index_mm": 3.8,
+      "ecart_pince_initial_mm": 9.6,
+      "ecart_pouce_mm": 14.4,
+      "ecart_index_mm": 1.6,
       "point_de_prise_anse_m": [
-       0.003,
-       0.1096,
-       0.036
+       -0.0047,
+       0.1041,
+       0.0412
       ],
       "point_de_prise_dans_la_tasse_m": [
        0.0785,
-       0.038,
+       0.045,
        0.0
       ],
       "axe_de_pince_dans_la_main": [
-       -0.8068,
-       -0.1004,
-       -0.5823
+       0.8102,
+       0.1213,
+       0.5734
       ]
      },
      "grip_glass": {
@@ -10797,7 +9797,7 @@
       ],
       "modele": "ware_glass",
       "traversees": 0,
-      "ecart_pouce_mm": 0.3,
+      "ecart_pouce_mm": 0.2,
       "contacts": {
        "index": true,
        "majeur_annulaire_auriculaire": true,

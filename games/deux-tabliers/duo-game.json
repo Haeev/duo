@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "deux-tabliers",
   "name": "Deux Tabliers",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "sdk": "1.1",
   "view": "3d",
   "engine": "three",
@@ -13,7 +13,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, en vue à la première personne, vous reprenez le petit café d'Ormeval et vous le tenez ensemble.",
-  "whatsNew": "Finitions: les clients au bout d'une banquette se tournent vers la table, le drapeau ne cache plus « MAIRIE », les branches du tilleul sont arrondies et son feuillage d'un vert plus doux. Rappel de la 0.2: gestion réaliste, remises, « Faire connaître » et tous les menus dans ton téléphone (Tab).",
+  "whatsNew": "Des gorgées plus vraies: les clients tiennent la tasse par l'anse (ou le verre à pleine main), la portent aux lèvres et la penchent vers la bouche, puis la reposent; le café baisse à chaque gorgée. Leurs mains sont détendues au repos. Rappel de la 0.2: gestion réaliste, remises, « Faire connaître » et menus dans ton téléphone (Tab).",
   "actions": [
     {
       "id": "forward",
