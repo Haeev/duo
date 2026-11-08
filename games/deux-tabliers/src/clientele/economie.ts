@@ -8,6 +8,7 @@ import type { SimContext } from '../simulation/systemes';
 import type { CatalogItem, ClienteleContent, Ingredient } from './donnees';
 import type { ClienteleState } from './etat';
 import { seatList } from './places';
+import { announcedWarmup } from './prise-en-main';
 
 export interface Ctx {
   readonly sim: SimContext;
@@ -416,9 +417,10 @@ function slateNeeds(cc: ClienteleContent, s: ClienteleState): Map<string, number
   return need;
 }
 
-/** Affluence annoncée d'un jour (la fête: `challenge.affluence`). */
+/** Affluence annoncée d'un jour (la fête: `challenge.affluence`; prise en main: `warmup`). */
 function announcedAffluence(cc: ClienteleContent, day: number): number {
-  return day === cc.economy.challenge.day ? cc.economy.challenge.affluence : 1;
+  const k = day === cc.economy.challenge.day ? cc.economy.challenge.affluence : 1;
+  return k * announcedWarmup(cc, day);
 }
 
 /**

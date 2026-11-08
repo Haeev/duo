@@ -40,6 +40,26 @@ const ProfileSchema = v.object({
 });
 export type Profile = v.InferOutput<typeof ProfileSchema>;
 
+/**
+ * Un jour de prise en main. Jusqu'à `calmUntil` (minute de jeu), `calmGroups` groupes patients
+ * des `calmProfiles`, un à la fois: le suivant n'entre que quand tous les présents sont servis,
+ * `gapSeconds` après le dernier servi. Ensuite, l'affluence habituelle multipliée par `affluence`.
+ * `patience` multiplie la patience des profils toute la journée; `announced` est la part de
+ * l'affluence habituelle que la commande proposée prévoit pour ce jour.
+ */
+const WarmupDaySchema = v.object({
+  day: Nat,
+  calmUntil: Nat,
+  calmGroups: Nat,
+  calmProfiles: v.array(Str),
+  maxGroupSize: v.pipe(Nat, v.minValue(1)),
+  firstSeconds: Pos,
+  gapSeconds: Pos,
+  affluence: Pos,
+  patience: v.pipe(v.number(), v.minValue(1)),
+  announced: Pos,
+});
+
 const RulesSchema = v.object({
   slateLines: Nat,
   presentMax: Nat,
@@ -148,8 +168,11 @@ const RulesSchema = v.object({
   fallbackPrepSeconds: v.nullable(Pos),
   closingGraceGameMinutes: Pos,
   extensionZones: v.record(Str, Str),
+  /** Prise en main des premiers jours ouverts (retours du 2026-11-08): calme, puis montée. */
+  warmup: v.optional(v.array(WarmupDaySchema), []),
 });
 export type Rules = v.InferOutput<typeof RulesSchema>;
+export type WarmupDay = Rules['warmup'][number];
 
 const RecipeSchema = v.object({
   id: Str,

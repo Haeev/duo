@@ -20,7 +20,15 @@ import type { GameEvent } from '../src/simulation/evenements';
 import { createWorld } from '../src/simulation/monde';
 import type { SimContext } from '../src/simulation/systemes';
 
-const content = loadContent(DATA_FILES);
+// Sans la prise en main des premiers jours (`warmup`, testée par `premier-jour.test.ts`): ce
+// fichier vérifie d'autres règles sur des chiffres relevés avec l'affluence pleine dès le mardi.
+const content = loadContent({
+  ...DATA_FILES,
+  'clientele/regles.json': {
+    ...(DATA_FILES['clientele/regles.json'] as Record<string, unknown>),
+    warmup: [],
+  },
+});
 const cc = content.clientele;
 
 function house(): { ctx: Ctx; events: GameEvent[] } {

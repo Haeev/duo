@@ -286,6 +286,24 @@ function gaugeView(content: Content, world: World, player: PlayerIndex): GaugeVi
   }
 }
 
+/**
+ * Ligne de l'ardoise qu'on ne peut pas servir (retours du 2026-11-08): « Plus de lait entier »,
+ * ou le poste qui manque; `null` si la recette se fait. La clientèle ne la commande pas.
+ */
+export function soldOutNote(
+  cc: ClienteleContent,
+  s: ClienteleState,
+  recipe: string,
+): string | null {
+  const r = cc.recipes.get(recipe);
+  if (r === undefined) return null;
+  if (!r.stations.every((x) => (s.stations[x] ?? 0) > 0)) return 'Il manque le poste';
+  const missing = r.ingredients.find(([ing, qty]) => (s.stock[ing] ?? 0) + 1e-9 < qty);
+  if (missing === undefined) return null;
+  const name = cc.ingredients.get(missing[0])?.name ?? missing[0];
+  return `En rupture : plus de ${name.charAt(0).toLowerCase()}${name.slice(1)}`;
+}
+
 function slateView(content: Content, world: World): SlateView {
   const cc = content.clientele;
   const s = world.clientele;
@@ -313,7 +331,7 @@ function slateView(content: Content, world: World): SlateView {
       costCents: Math.round((cc.recipes.get(id)?.costMaterials ?? 0) * 100),
       star: false,
       priceNote: '',
-      soldOut: null,
+      soldOut: soldOutNote(cc, s, id),
       lockedBy: null,
       discountedCents: remises.discounted(id),
     })),

@@ -23,6 +23,12 @@ function fastContent(): Content {
   const days = DATA_FILES['clientele/journees.json'] as Record<string, unknown>;
   const content = loadContent({
     ...DATA_FILES,
+    // Sans la prise en main des premiers jours (`warmup`, testée par `premier-jour.test.ts`):
+    // la caisse de chaque soir reste celle relevée en v0.2, affluence pleine dès le mardi.
+    'clientele/regles.json': {
+      ...(DATA_FILES['clientele/regles.json'] as Record<string, unknown>),
+      warmup: [],
+    },
     'clientele/journees.json': {
       ...days,
       secondsPerGameMinute: 0.05,

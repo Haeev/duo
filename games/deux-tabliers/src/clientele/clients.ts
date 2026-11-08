@@ -23,6 +23,7 @@ import {
   type Seat,
 } from './places';
 import { placeAnchor, type SeatAnchor } from '../etat/assises';
+import { calmEndSec, holdCalmArrival, patienceOf } from './prise-en-main';
 import { sceneHooks } from './scenes';
 
 // ---------------------------------------------------------------------------------------------
@@ -315,7 +316,7 @@ function refuses(ctx: Ctx, p: Profile, size: number): 'wait' | 'full' | 'queue' 
   const inQueue = queueGroups(ctx).reduce((sum, g) => sum + g.size, 0);
   if (full) return 'full';
   if (inQueue + size > r.queuePlaces) return 'queue';
-  if (estimated > p.patienceSeconds) return 'wait';
+  if (estimated > patienceOf(ctx.cc, ctx.s.day, p)) return 'wait';
   return null;
 }
 
@@ -903,7 +904,7 @@ function stepQueued(ctx: Ctx, g: Group, p: Profile, line: readonly Group[]): voi
     }
   }
   // Patience (CL-05): les habitués et les invités d'une scène attendent toujours.
-  if (g.regular === null && g.role === null && now - g.arrivedAt > p.patienceSeconds) {
+  if (g.regular === null && g.role === null && now - g.arrivedAt > patienceOf(cc, s.day, p)) {
     rt.aside.delete(g.id);
     countReason(s.today.missed, 'patience');
     abandon(ctx, g);
@@ -914,7 +915,11 @@ export function stepCustomers(ctx: Ctx, arrivalsOpen: boolean): void {
   const { s, cc } = ctx;
   const now = s.serviceSec;
   if (arrivalsOpen) {
+    const calmEnd = calmEndSec(cc, s.day, spm(ctx));
     while (s.arrivals.length > 0 && (s.arrivals[0]?.[0] ?? Infinity) <= now) {
+      // Prise en main: un groupe calme attend que les présents soient servis.
+      const head = s.arrivals[0]?.[0] ?? Infinity;
+      if (head < calmEnd && holdCalmArrival(cc, s.day, s.groups, now)) break;
       const a = s.arrivals.shift();
       if (a !== undefined) arrive(ctx, a[1], a[2], a[3]);
     }

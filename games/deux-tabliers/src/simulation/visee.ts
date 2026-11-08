@@ -107,7 +107,11 @@ export function aim(content: Content, world: World, player: PlayerIndex, eye: Ey
     if (type.source !== null)
       consider({ kind: 'source', furniture: f.id }, f.x, f.y + type.height * 0.7, f.z, 0.12);
     if (type.station !== null) {
-      const r = Math.min(type.footprint[0], type.footprint[1]) / 2;
+      // Retours du 2026-11-08: plus besoin d'être pile sur une petite pièce de la machine.
+      const r = Math.max(
+        content.settings.aim.stationRadius,
+        Math.min(type.footprint[0], type.footprint[1]) / 2,
+      );
       consider({ kind: 'station', furniture: f.id }, f.x, f.y + type.height * 0.6, f.z, r);
     }
   }

@@ -16,6 +16,16 @@ import { createWorld } from '../src/simulation/monde';
 import { stepWorld, type QueuedIntent } from '../src/simulation/pas';
 import type { SimContext } from '../src/simulation/systemes';
 
+// Sans la prise en main des premiers jours (`warmup`, testée par `premier-jour.test.ts`): ce
+// fichier vérifie d'autres règles sur des chiffres relevés avec l'affluence pleine dès le mardi.
+const FULL_FILES = {
+  ...DATA_FILES,
+  'clientele/regles.json': {
+    ...(DATA_FILES['clientele/regles.json'] as Record<string, unknown>),
+    warmup: [],
+  },
+};
+
 const DT = 1 / 60;
 
 function withAutoService(content: Content): Content {
@@ -25,7 +35,7 @@ function withAutoService(content: Content): Content {
 
 describe('Deux Tabliers, clientèle', () => {
   it('jour 1 fermé, « On ouvre ? » à deux, une journée servie, bilan, lundi suivant', () => {
-    const content = withAutoService(loadContent(DATA_FILES));
+    const content = withAutoService(loadContent(FULL_FILES));
     const world = createWorld(content, ['a', 'b']);
     const random = createRandom(7);
     const events: GameEvent[] = [];
@@ -93,7 +103,7 @@ describe('Deux Tabliers, clientèle', () => {
   }, 60_000);
 
   it('chaque événement de la démo finit « Réussi » ou « Formidable » sans geste du duo (D-07), puis la fin', () => {
-    const content = withAutoService(loadContent(DATA_FILES));
+    const content = withAutoService(loadContent(FULL_FILES));
     const world = createWorld(content, ['a', 'b']);
     const random = createRandom(11);
     const events: GameEvent[] = [];
@@ -161,7 +171,7 @@ describe('Deux Tabliers, clientèle', () => {
   }, 60_000);
 
   it('à deux: le domaine et les positions des clients debout (canal 7) arrivent chez l’invité', async () => {
-    const content = withAutoService(loadContent(DATA_FILES));
+    const content = withAutoService(loadContent(FULL_FILES));
     const duo = await startLocalDuo<GameAction>({
       manifest,
       conditions: { latencyMs: 5, jitterMs: 0, spikeProbability: 0 },

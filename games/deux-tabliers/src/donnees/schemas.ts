@@ -24,6 +24,8 @@ export const SettingsSchema = v.strictObject({
   aim: v.strictObject({
     coneDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(15)),
     targetRadius: Positive,
+    /** Rayon de visée minimal d'un poste (groupe, buse, rail): on n'a pas à viser pile. */
+    stationRadius: v.optional(Positive, 0.15),
   }),
   mouse: v.strictObject({ degPerPixel: Positive }),
   seating: v.strictObject({
