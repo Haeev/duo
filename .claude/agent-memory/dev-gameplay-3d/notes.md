@@ -51,3 +51,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Deux Tabliers: `outils/importer-clientele.py` régénère tous les fichiers de `donnees/clientele/`; `regles.json` a des clés écrites à la main que le script ne connaît pas: le restaurer par `git checkout` après l'avoir relancé.
 - Deux Tabliers, aperçu de l'interface (`src/interface/apercu/`): on peut y brancher les vrais lecteurs sur une vraie maison (`loadContent(DATA_FILES)` marche dans le navigateur), plus fiable qu'un modèle écrit à la main. Le bilan est long: défiler les conteneurs (`scrollTop = scrollHeight`) avant la capture.
 - valibot `v.optional(x, défaut)`: le type de sortie rend le champ obligatoire; tout littéral `Report` ou `Group` doit l'écrire (le typecheck le dit).
+
+## Deux Tabliers, mains à doigts (vérifié le 2026-11-08)
+
+- Poses des doigts (`relaxed`, `grip_handle`, `grip_glass`, clips sur les seuls os des doigts) jouées dans le même mélangeur que le corps, toujours toutes les trois, en pause, poids complémentaires (`createClipBlend().grip`): les os ne se recouvrent pas, aucune pose de liaison ne revient.
+- Prises de l'artiste (`doigts.prises`): main = récipient · prise⁻¹, poignet = récipient − main · position. Les prises varient beaucoup d'un personnage à l'autre (poignet au-dessus, à côté ou devant l'anse): orienter le récipient par la direction du poignet (`wristDirection`), pas par l'anse. Poignet tourné vers soi: il descend quand la tasse s'incline vers la bouche, la main reste sous l'œil.
+- Banc de captures de la gorgée: page Vite temporaire qui monte `createCustomerNodes` sur un faux `GameView` (monde de `createWorld`, groupe `spawnGroup` passé à `seated`, `servedAt` posé), et cherche l'instant où `sipTime` vaut le temps voulu. Viser `headfront` plus 4 cm devant pour la vue de profil: centrée sur la tête, la main sort du cadre.
+- Lint: une variable `let` relue après un `await` est jugée « toujours fausse » (`no-unnecessary-condition`, rétrécissement d'avant l'attente): la relire par une petite fonction.

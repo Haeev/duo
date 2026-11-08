@@ -48,15 +48,23 @@ import {
 } from '../rendu/assis';
 import { DRINK_VESSEL } from '../rendu/correspondances';
 import {
+  adaptHold,
   cupFromHand,
+  fingerHolds,
+  handForVessel,
   handFrame,
   handQuaternion,
   setLiquid,
+  vesselInHand,
   vesselShape,
+  wristDirection,
   wristFor,
+  type FingerHolds,
   type HandFrame,
+  type VesselHold,
   type VesselShape,
 } from '../rendu/tenue';
+import type { HandGrip } from '../rendu/melange';
 import { placeAnchor, placeFurniture, seatTable, type SeatAnchor } from '../etat/assises';
 import { memberLook, type Anim } from './clients';
 import {
@@ -107,6 +115,8 @@ interface Figure {
   readonly face: Object3D | undefined;
   /** Main droite mesurée (creux de la main, doigts, paume), à la première gorgée. */
   grip: HandFrame | null | undefined;
+  /** Prises de l'artiste (personnage à doigts), sinon `null`: la main mesurée sert. */
+  readonly holds: FingerHolds | null;
   /** Boisson suivie et instant où on l'a vue (s): la tasse se vide de gorgée en gorgée. */
   drinkOf: string | null;
   drinkSince: number;
@@ -116,6 +126,9 @@ interface Figure {
     readonly node: Object3D;
     readonly shape: VesselShape;
     readonly liquid: Object3D | undefined;
+    /** Prise de ce récipient par les doigts (adaptée à sa taille) et pose des doigts. */
+    readonly hold: VesselHold | null;
+    readonly fingers: HandGrip;
   } | null;
 }
 
@@ -287,6 +300,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   const loaded = new Map<string, Promise<Loaded | null>>();
   const figures = new Map<string, Figure>();
   let disposed = false;
+  const isDisposed = (): boolean => disposed;
 
   const load = (name: string): Promise<Loaded | null> => {
     let p = loaded.get(name);
@@ -356,6 +370,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
         head: node.getObjectByName('Head'),
         face: node.getObjectByName('headfront'),
         grip: undefined,
+        holds: blend.hasFingers() ? fingerHolds(name) : null,
         drinkOf: null,
         drinkSince: 0,
         cup: null,
@@ -384,6 +399,8 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   const mouthCup = new Vector3();
   const wrist = new Vector3();
   const pole = new Vector3();
+  const aim = new Vector3();
+  const local = new Vector3();
   const yawQ = new Quaternion();
   const cupQ = new Quaternion();
   const handQ = new Quaternion();
@@ -403,12 +420,22 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
     if (cupPending.has(vessel + fig.node.uuid)) return null;
     cupPending.add(vessel + fig.node.uuid);
     const sip = view.content.settings.seating.sip;
-    void load(vessel).then((src) => {
-      cupPending.delete(vessel + fig.node.uuid);
-      if (src === null || disposed || fig.cup?.model === vessel) return;
+    void load(vessel).then(async (src) => {
+      if (src === null || disposed || fig.cup?.model === vessel) {
+        cupPending.delete(vessel + fig.node.uuid);
+        return;
+      }
       const node = src.scene.clone();
       const shape = vesselShape(node, sip);
-      if (shape === null) return;
+      // Prise des doigts mesurée sur un récipient voisin (cappuccino pour l'espresso): adaptée.
+      const fingers: HandGrip = shape?.handle === null ? 'grip_glass' : 'grip_handle';
+      const base =
+        fig.holds === null ? null : fingers === 'grip_glass' ? fig.holds.glass : fig.holds.handle;
+      const ref = base === null || base.model === vessel ? shape : await shapeOf(base.model);
+      cupPending.delete(vessel + fig.node.uuid);
+      // `disposed` relu après l'attente: le rendu a pu être libéré entre-temps.
+      if (shape === null || isDisposed() || fig.cup?.model === vessel) return;
+      const hold = base === null ? null : ref === null ? base : adaptHold(base, ref, shape);
       if (fig.cup !== null) root.remove(fig.cup.node);
       node.visible = false;
       root.add(node);
@@ -416,9 +443,22 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       node.traverse((o) => {
         if (o.name.endsWith('_liquid')) liquid ??= o;
       });
-      fig.cup = { model: vessel, node, shape, liquid };
+      fig.cup = { model: vessel, node, shape, liquid, hold, fingers };
     });
     return null;
+  };
+
+  /** Forme d'un récipient du catalogue (mesurée une fois), pour adapter une prise. */
+  const shapes = new Map<string, Promise<VesselShape | null>>();
+  const shapeOf = (model: string): Promise<VesselShape | null> => {
+    let p = shapes.get(model);
+    if (p === undefined) {
+      p = load(model).then((src) =>
+        src === null ? null : vesselShape(src.scene, { palmGap: 0, glassGripHeight: 0 }),
+      );
+      shapes.set(model, p);
+    }
+    return p;
   };
 
   /** Contenu de la tasse avant la gorgée en cours (ou la prochaine), suivi par figure. */
@@ -460,25 +500,44 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
     axis.crossVectors(fwd, up).normalize();
     tiltHead(fig.head, axis, sipNow.headDeg * DEG);
     const cup = cupOf(view, fig, drink);
-    fig.grip ??=
-      fig.rightHand === undefined ? null : handFrame(fig.node, fig.rightHand, s.gripAlongHand);
-    if (cup === null || fig.grip === null || fig.face === undefined || fig.head === undefined) {
+    // Personnage à doigts: la prise de l'artiste; sinon la main mesurée sur le squelette.
+    const hold = fig.holds === null ? null : (cup?.hold ?? null);
+    if (hold === null && fig.holds === null)
+      fig.grip ??=
+        fig.rightHand === undefined ? null : handFrame(fig.node, fig.rightHand, s.gripAlongHand);
+    const frame = fig.grip ?? null;
+    if (
+      cup === null ||
+      (hold === null && frame === null) ||
+      fig.face === undefined ||
+      fig.head === undefined
+    ) {
+      fig.blend.grip(null, 0);
       reachWithPole(fig.rightArm, fig.rightForeArm, fig.rightHand, wrist, pole, 0);
       orientInWorld(fig.rightHand, handQ, 0);
       if (cup !== null) cup.node.visible = false;
       return;
     }
+    // Doigts: de la main détendue à la prise, au rythme de la main qui va au récipient.
+    fig.blend.grip(cup.fingers, sipNow.hand);
     if (rest === null) {
       // Tenue devant soi, à hauteur du ventre, un peu à droite.
       (fig.hips ?? fig.node).getWorldPosition(heldAt);
       heldAt.y += s.heldAboveHips;
       heldAt.addScaledVector(fwd, s.heldAhead).addScaledVector(right, s.heldRight);
     } else heldAt.copy(rest);
-    // Anse vers la droite, tournée un peu vers l'avant; inclinaison autour de l'axe des épaules.
-    const a = s.handleForwardDeg * DEG;
-    const hx = right.x * Math.cos(a) + fwd.x * Math.sin(a);
-    const hz = right.z * Math.cos(a) + fwd.z * Math.sin(a);
-    yawQ.setFromAxisAngle(up, Math.atan2(-hz, hx));
+    // Anse vers la droite, tournée un peu vers l'avant (doigts: le poignet autour du récipient,
+    // à droite, un peu vers soi); inclinaison autour de l'axe des épaules.
+    const a =
+      (hold === null
+        ? s.handleForwardDeg
+        : cup.fingers === 'grip_glass'
+          ? s.fingerGlassWristDeg
+          : s.fingerCupWristDeg) * DEG;
+    aim.copy(right).multiplyScalar(Math.cos(a)).addScaledVector(fwd, Math.sin(a));
+    if (hold !== null) wristDirection(hold, local);
+    else local.set(1, 0, 0);
+    yawQ.setFromUnitVectors(local, aim);
     cupQ.setFromAxisAngle(right, sipNow.tiltDeg * DEG).multiply(yawQ);
     // Lèvres: au-dessus de `headfront` et devant le visage, dans le repère de la tête.
     fig.face.getWorldPosition(lips);
@@ -496,19 +555,24 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
     const node = cup.node;
     node.position.copy(heldAt).lerp(mouthCup, sipNow.lift);
     node.quaternion.copy(cupQ);
-    // La main droite va à l'anse: poignet placé pour que l'anse soit au creux de la main.
-    handQuaternion(fig.grip, cupQ, handQ);
-    wristFor(fig.grip, cup.shape, node.position, cupQ, handQ, wrist);
+    // La main droite va à l'anse: poignet placé pour que l'anse soit au creux de la main (prise
+    // de l'artiste: anse pincée entre pouce et index; verre dans la main en C).
+    if (hold !== null) handForVessel(hold, node.position, cupQ, wrist, handQ);
+    else if (frame !== null) {
+      handQuaternion(frame, cupQ, handQ);
+      wristFor(frame, cup.shape, node.position, cupQ, handQ, wrist);
+    }
     fig.rightArm?.getWorldPosition(pole);
-    pole.addScaledVector(right, 0.35).addScaledVector(fwd, -0.15);
-    pole.y -= 0.6;
+    pole.addScaledVector(right, s.elbowOut).addScaledVector(fwd, -s.elbowBack);
+    pole.y -= s.elbowDown;
     reachWithPole(fig.rightArm, fig.rightForeArm, fig.rightHand, wrist, pole, sipNow.hand);
     orientInWorld(fig.rightHand, handQ, sipNow.hand);
     // Tasse en main: elle suit la main réelle (bras trop court, coude retenu), sans écart.
     if (sipNow.hand >= 0.999 && (sipNow.lift > 0 || rest === null) && fig.rightHand !== undefined) {
       fig.rightHand.getWorldPosition(wrist);
       fig.rightHand.getWorldQuaternion(handQ);
-      cupFromHand(fig.grip, cup.shape, wrist, handQ, cupQ, node.position);
+      if (hold !== null) vesselInHand(hold, wrist, handQ, node.position, node.quaternion);
+      else if (frame !== null) cupFromHand(frame, cup.shape, wrist, handQ, cupQ, node.position);
     }
     setLiquid(cup.liquid, cup.shape, sipNow.fill, sipNow.tiltDeg < s.liquidHideDeg);
     node.visible = true;
