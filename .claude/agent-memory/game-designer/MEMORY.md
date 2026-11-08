@@ -311,3 +311,9 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Paliers « réputation ou jour fixe, le premier des deux » et défi à date fixe: la démo ne bloque jamais, l'argent reste la seule limite.
 - Le script de démo importe `cosy_cafe.py` par `importlib` (enregistrer le module dans `sys.modules` avant `exec_module`, sinon les dataclasses plantent) et relit les JSON générés: c'est le contrôle croisé.
 - Consigne du client (nuit du 2026-11-07): simulations courtes, 8 parties par duo et par ordre suffisent (3 s en tout).
+
+## Deux Tabliers: économie et stock (vérifié le 2026-11-08)
+
+- Dans la v0.1, `deliver` ne débite rien: les matières sont payées à la vente (`clients.ts`), et le panier du soir donne de la réputation pour des invendus gratuits. Toujours vérifier qui paie quoi et quand avant de régler une économie de stock.
+- Simuler une variante d'économie sans copier `demo_v0_1.py`: remplacer `cc.Service.encaisser` (noter les recettes vendues) et `cc.Service.bilan` (rendre un autre `cout`), puis appeler `d1.jouer` (script `demo/simulations/demo_v0_2.py`, 5 s pour 96 parties).
+- Une commande habituelle par moyenne des trois derniers jours rate les recettes nouvelles (aucun historique): reprendre la base de l'ardoise ingrédient par ingrédient, sinon les ruptures doublent. Monter la marge n'y change presque rien.
