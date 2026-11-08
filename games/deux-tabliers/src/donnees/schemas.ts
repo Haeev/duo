@@ -44,6 +44,47 @@ export const SettingsSchema = v.strictObject({
      */
     endSeatTurnMaxDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(45)),
     endSeatInset: v.pipe(v.number(), v.minValue(0)),
+    /**
+     * Gorgée d'un client (assis ou au zinc), en secondes par temps: la main va à la tasse, la
+     * monte aux lèvres, l'incline vers la bouche, la tient, la redresse, la repose, la lâche.
+     */
+    sip: v.strictObject({
+      reachSec: Positive,
+      liftSec: Positive,
+      tiltSec: Positive,
+      holdSec: Positive,
+      untiltSec: Positive,
+      lowerSec: Positive,
+      releaseSec: Positive,
+      /** Inclinaison vers la bouche, tasse pleine puis presque vide (degrés). */
+      tiltFullDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(80)),
+      tiltEmptyDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(80)),
+      /** Tête penchée en arrière au plus fort de l'inclinaison (degrés). */
+      headBackDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(30)),
+      /** Part de la tasse bue à chaque gorgée, et ce qui reste au fond à la fin (0 à 1). */
+      sipShare: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+      emptyFill: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+      /** Au-delà de cette inclinaison, le contenu est masqué (il ne suivrait pas l'horizontale). */
+      liquidHideDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(30)),
+      /** Lèvres: au-dessus de l'os `headfront` et devant lui, dans le repère de la tête (m). */
+      mouthUp: v.number(),
+      mouthAhead: v.number(),
+      /**
+       * Anse tournée vers la main droite, puis de tant de degrés vers l'avant: le poignet reste
+       * dehors, à droite du visage, quand la tasse est aux lèvres.
+       */
+      handleForwardDeg: v.pipe(v.number(), v.minValue(-60), v.maxValue(60)),
+      /** Paume contre la tasse ou le verre: jeu entre la paume et la paroi (m). */
+      palmGap: Positive,
+      /** Anse au creux de la main fermée: part de la longueur de la main depuis le poignet. */
+      gripAlongHand: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+      /** Verre tenu par le corps: hauteur de la main, en part de la hauteur du verre. */
+      glassGripHeight: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+      /** Tasse tenue debout (zinc) ou assis par terre: devant, à droite, au-dessus du bassin (m). */
+      heldAhead: v.number(),
+      heldRight: v.number(),
+      heldAboveHips: v.number(),
+    }),
   }),
   net: v.strictObject({
     movesEvery: v.pipe(v.number(), v.integer(), v.minValue(1)),

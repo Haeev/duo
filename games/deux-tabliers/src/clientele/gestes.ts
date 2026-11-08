@@ -74,3 +74,123 @@ export function glanceWeight(seating: Seating, group: number, k: number, nowSec:
   const t = Math.min(1, edge);
   return t * t * (3 - 2 * t);
 }
+
+type Sip = Seating['sip'];
+
+/** Durée d'une gorgée entière (s), de la main qui part vers la tasse à la main qui la lâche. */
+export function sipDuration(sip: Sip): number {
+  return (
+    sip.reachSec +
+    sip.liftSec +
+    sip.tiltSec +
+    sip.holdSec +
+    sip.untiltSec +
+    sip.lowerSec +
+    sip.releaseSec
+  );
+}
+
+/**
+ * Nombre de gorgées commencées entre `sinceSec` et `nowSec` (même horloge que `sipTime`): la
+ * tasse se vide de gorgée en gorgée sans rien garder dans le monde.
+ */
+export function sipCount(
+  seating: Seating,
+  group: number,
+  k: number,
+  sinceSec: number,
+  nowSec: number,
+  sipSec: number,
+): number {
+  const [lo, hi] = seating.sipGapSeconds;
+  const period = sipSec + lo + (hi - lo) * hash01(group, k, 1);
+  const offset = period * hash01(group, k, 2);
+  // Une gorgée commence quand la phase de `sipTime` repasse à zéro.
+  const n = (t: number): number => Math.floor((t + offset) / period);
+  return Math.max(0, n(nowSec) - n(sinceSec));
+}
+
+/** Contenu de la tasse (1 pleine) avant la gorgée numéro `n` (0 la première). */
+export function fillBefore(sip: Sip, n: number): number {
+  return Math.max(sip.emptyFill, 1 - n * sip.sipShare);
+}
+
+/** Inclinaison la plus forte d'une gorgée (degrés): plus la tasse est vide, plus on incline. */
+export function sipTiltDeg(sip: Sip, fill: number): number {
+  const span = 1 - sip.emptyFill;
+  const drunk = span <= 0 ? 1 : Math.max(0, Math.min(1, (1 - fill) / span));
+  return sip.tiltFullDeg + (sip.tiltEmptyDeg - sip.tiltFullDeg) * drunk;
+}
+
+export interface SipPose {
+  /** Main sur la tasse (0 au repos, 1 qui la tient). */
+  hand: number;
+  /** Tasse levée (0 posée ou au repos, 1 aux lèvres). */
+  lift: number;
+  /** Inclinaison vers la bouche (degrés) et tête penchée en arrière (degrés). */
+  tiltDeg: number;
+  headDeg: number;
+  /** Contenu montré (1 pleine): il baisse au milieu de la tenue, quand on boit. */
+  fill: number;
+}
+
+function ease(x: number): number {
+  const t = Math.max(0, Math.min(1, x));
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Pose de la gorgée à l'instant `t` (s depuis son début), pour une tasse pleine à `fill`:
+ * la main va à la tasse, la monte (bord aux lèvres, à plat), l'incline vers la bouche en
+ * penchant un peu la tête, la tient, la redresse, la repose à plat et la lâche.
+ */
+export function sipPose(sip: Sip, t: number, fill: number, out: SipPose): SipPose {
+  const tilt = sipTiltDeg(sip, fill);
+  const after = Math.max(sip.emptyFill, fill - sip.sipShare);
+  let s = t;
+  out.hand = 1;
+  out.lift = 1;
+  out.tiltDeg = 0;
+  out.headDeg = 0;
+  out.fill = fill;
+  if (s < sip.reachSec) {
+    out.hand = ease(s / sip.reachSec);
+    out.lift = 0;
+    return out;
+  }
+  s -= sip.reachSec;
+  if (s < sip.liftSec) {
+    out.lift = ease(s / sip.liftSec);
+    return out;
+  }
+  s -= sip.liftSec;
+  const lean = (k: number): void => {
+    out.tiltDeg = tilt * k;
+    out.headDeg = sip.headBackDeg * k;
+  };
+  if (s < sip.tiltSec) {
+    lean(ease(s / sip.tiltSec));
+    return out;
+  }
+  s -= sip.tiltSec;
+  if (s < sip.holdSec) {
+    lean(1);
+    if (s >= sip.holdSec / 2) out.fill = after;
+    return out;
+  }
+  s -= sip.holdSec;
+  out.fill = after;
+  if (s < sip.untiltSec) {
+    lean(1 - ease(s / sip.untiltSec));
+    return out;
+  }
+  s -= sip.untiltSec;
+  if (s < sip.lowerSec) {
+    out.lift = 1 - ease(s / sip.lowerSec);
+    return out;
+  }
+  s -= sip.lowerSec;
+  out.lift = 0;
+  out.hand = 1 - ease(s / sip.releaseSec);
+  return out;
+}

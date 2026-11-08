@@ -19,7 +19,31 @@
     "glanceSeconds": [4, 9],
     "glanceMaxDeg": 55,
     "endSeatTurnMaxDeg": 25,
-    "endSeatInset": 0.12
+    "endSeatInset": 0.12,
+    "sip": {
+      "reachSec": 0.5,
+      "liftSec": 0.9,
+      "tiltSec": 0.7,
+      "holdSec": 0.6,
+      "untiltSec": 0.6,
+      "lowerSec": 0.9,
+      "releaseSec": 0.5,
+      "tiltFullDeg": 30,
+      "tiltEmptyDeg": 55,
+      "headBackDeg": 12,
+      "sipShare": 0.14,
+      "emptyFill": 0.1,
+      "liquidHideDeg": 4,
+      "mouthUp": -0.01,
+      "mouthAhead": -0.008,
+      "handleForwardDeg": 45,
+      "palmGap": 0.003,
+      "gripAlongHand": 0.45,
+      "glassGripHeight": 0.42,
+      "heldAhead": 0.3,
+      "heldRight": 0.12,
+      "heldAboveHips": 0.22
+    }
   },
   "net": { "movesEvery": 3, "domainsEvery": 6, "interpolationMs": 110 }
 }

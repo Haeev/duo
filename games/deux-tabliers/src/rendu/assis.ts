@@ -263,61 +263,94 @@ export function pinHips(
   node.updateMatrixWorld(true);
 }
 
-const reachFrom = new Vector3();
-const reachElbow = new Vector3();
-const reachHand = new Vector3();
-const reachGoal = new Vector3();
-const reachU = new Vector3();
-const reachV = new Vector3();
-const reachQ = new Quaternion();
 const identity = new Quaternion();
 
+const poleS = new Vector3();
+const poleE = new Vector3();
+const poleH = new Vector3();
+const poleN = new Vector3();
+const poleU = new Vector3();
+const poleGoal = new Vector3();
+const poleTip = new Vector3();
+const poleA = new Vector3();
+const poleB = new Vector3();
+const poleQ = new Quaternion();
+const poleFull = new Quaternion();
+
 /**
- * Porte la main (os `RightHand`) vers `target` (monde), d'une part `weight` (0 rien, 1 tout):
- * le coude se plie pour que l'épaule soit à la bonne distance de la cible (loi des cosinus), puis
- * le bras vise la cible (RV-05: la tasse à la bouche, pas au front). Après le mélangeur; avec un
- * poids nul, efface la retouche de l'image d'avant (pose tenue que le mélangeur ne réécrit pas).
+ * Porte le poignet (os `hand`) en `target` (monde) d'une part `weight`, coude plié du côté de
+ * `pole` (point du monde: en bas et en dehors pour boire). Deux os, loi des cosinus: le bras
+ * vise le coude voulu, puis l'avant-bras vise la cible. Avec un poids nul, efface la retouche.
  */
-export function reachTo(
+export function reachWithPole(
   arm: Object3D | undefined,
   forearm: Object3D | undefined,
   hand: Object3D | undefined,
   target: Vector3,
+  pole: Vector3,
   weight: number,
 ): void {
   if (arm === undefined || forearm === undefined) return;
-  if (hand === undefined || weight <= 0) {
-    rotateInWorld(forearm, identity);
-    rotateInWorld(arm, identity);
-    return;
-  }
-  const w = Math.min(1, weight);
-  // 1. Le coude: distance épaule-main égale à la distance épaule-cible (dans les limites du bras).
   rotateInWorld(forearm, identity);
-  arm.getWorldPosition(reachFrom);
-  forearm.getWorldPosition(reachElbow);
-  hand.getWorldPosition(reachHand);
-  const a = reachFrom.distanceTo(reachElbow);
-  const b = reachElbow.distanceTo(reachHand);
-  if (a < 1e-4 || b < 1e-4) return;
-  const d = Math.max(Math.abs(a - b) + 0.01, Math.min(a + b - 0.01, reachFrom.distanceTo(target)));
-  reachU.copy(reachElbow).sub(reachFrom).normalize();
-  reachV.copy(reachHand).sub(reachElbow).normalize();
-  const current = Math.PI - Math.acos(Math.max(-1, Math.min(1, reachU.dot(reachV))));
-  const wanted = Math.acos(Math.max(-1, Math.min(1, (a * a + b * b - d * d) / (2 * a * b))));
-  reachU.cross(reachV);
-  if (reachU.lengthSq() > 1e-10) {
-    reachU.normalize();
-    reachQ.setFromAxisAngle(reachU, (current - wanted) * w);
-    rotateInWorld(forearm, reachQ);
-  } else rotateInWorld(forearm, identity);
-  // 2. Le bras vise la cible.
   rotateInWorld(arm, identity);
-  hand.getWorldPosition(reachHand);
-  reachHand.sub(reachFrom);
-  reachGoal.copy(target).sub(reachFrom);
-  if (reachHand.lengthSq() < 1e-8 || reachGoal.lengthSq() < 1e-8) return;
-  reachQ.setFromUnitVectors(reachHand.normalize(), reachGoal.normalize());
-  reachQ.slerpQuaternions(identity, reachQ, w);
-  rotateInWorld(arm, reachQ);
+  if (hand === undefined || weight <= 0) return;
+  const w = Math.min(1, weight);
+  arm.getWorldPosition(poleS);
+  forearm.getWorldPosition(poleE);
+  hand.getWorldPosition(poleH);
+  const a = poleS.distanceTo(poleE);
+  const b = poleE.distanceTo(poleH);
+  poleN.copy(target).sub(poleS);
+  const far = poleN.length();
+  if (a < 1e-4 || b < 1e-4 || far < 1e-4) return;
+  poleN.divideScalar(far);
+  const d = Math.max(Math.abs(a - b) + 0.01, Math.min(a + b - 0.001, far));
+  const cosA = Math.max(-1, Math.min(1, (a * a + d * d - b * b) / (2 * a * d)));
+  poleU.copy(pole).sub(poleS);
+  poleU.addScaledVector(poleN, -poleU.dot(poleN));
+  if (poleU.lengthSq() < 1e-8) poleU.set(0, -1, 0);
+  poleU.normalize();
+  poleGoal
+    .copy(poleS)
+    .addScaledVector(poleN, a * cosA)
+    .addScaledVector(poleU, a * Math.sqrt(1 - cosA * cosA));
+  // Le bras vise le coude voulu.
+  poleA.copy(poleE).sub(poleS).normalize();
+  poleB.copy(poleGoal).sub(poleS).normalize();
+  poleFull.setFromUnitVectors(poleA, poleB);
+  poleQ.slerpQuaternions(identity, poleFull, w);
+  rotateInWorld(arm, poleQ);
+  // L'avant-bras vise la cible (ramenée à portée).
+  forearm.getWorldPosition(poleE);
+  hand.getWorldPosition(poleH);
+  poleTip.copy(poleS).addScaledVector(poleN, d);
+  poleA.copy(poleH).sub(poleE).normalize();
+  poleB.copy(poleTip).sub(poleE).normalize();
+  poleFull.setFromUnitVectors(poleA, poleB);
+  poleQ.slerpQuaternions(identity, poleFull, w);
+  rotateInWorld(forearm, poleQ);
+}
+
+const orientNow = new Quaternion();
+const orientWant = new Quaternion();
+
+/**
+ * Tourne l'os pour que son orientation dans le monde aille vers `world` d'une part `weight`
+ * (main qui tient la tasse). Avec un poids nul, efface la retouche de l'image d'avant.
+ */
+export function orientInWorld(bone: Object3D | undefined, world: Quaternion, weight: number): void {
+  if (bone === undefined) return;
+  rotateInWorld(bone, identity);
+  if (weight <= 0) return;
+  bone.getWorldQuaternion(orientNow);
+  orientWant.slerpQuaternions(orientNow, world, Math.min(1, weight));
+  // Rotation du monde qui mène de l'orientation actuelle à la voulue.
+  rotateInWorld(bone, orientWant.multiply(orientNow.invert()));
+}
+
+/** Penche la tête (os `Head`) de `angle` autour de l'axe `axisWorld` du monde, après le mélangeur. */
+export function tiltHead(head: Object3D | undefined, axisWorld: Vector3, angle: number): void {
+  if (head === undefined) return;
+  qAxis.setFromAxisAngle(axisWorld, angle);
+  rotateInWorld(head, qAxis);
 }
