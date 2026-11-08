@@ -33,6 +33,7 @@ import type {
   WeatherKind,
   WeatherView,
 } from '../interface/modele';
+import { standingPose, type CustomerPose } from '../clientele/reseau';
 import type { GameView } from '../reseau/vue';
 import { articleLabel, QUALITY_LABEL, serviceGauge } from '../service';
 import { recipeOf } from '../service/regles';
@@ -40,6 +41,17 @@ import type { Intent } from '../simulation/entrees';
 import type { GameEvent } from '../simulation/evenements';
 
 const DT = 1 / 60;
+
+/** Geste de scène de chaque genre d'événement (`clientele-scene`). */
+const SCENE_ACTION: Readonly<
+  Record<string, 'driver' | 'repair' | 'signal' | 'advice' | 'surprise'>
+> = {
+  client_presse: 'driver',
+  panne: 'repair',
+  enfant_perdu: 'signal',
+  critique_deguisee: 'advice',
+  mariage: 'surprise',
+};
 
 const WEEKDAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
@@ -482,12 +494,19 @@ export interface WiredInterface {
   onEvent(event: GameEvent): void;
   /** Une réplique lue: la suivante, ou plus rien. */
   next(id: string): void;
+  /**
+   * G (faire signe): le geste de l'événement du jour (rallonge du chauffeur, réparation à deux,
+   * surprise), sinon quelques mots au groupe de clients le plus proche.
+   */
+  wave(): Intent | null;
 }
 
 export function wireInterface(view: GameView): WiredInterface {
   const content = view.content;
   const cc = content.clientele;
   const queue: DialogueView[] = [];
+  /** Genre d'événement des répliques à réponses (indices à choix). */
+  const clueKinds = new Map<string, string>();
   let scene: EventSceneView | null = null;
   let counter = 0;
   const world = (): World => view.world();
@@ -763,8 +782,13 @@ export function wireInterface(view: GameView): WiredInterface {
       return null;
     },
     'dialogue-answer': (a) => {
+      const clue = queue.find((d) => d.id === a.id);
       next(a.id);
-      return null;
+      const kind = clue === undefined ? undefined : clueKinds.get(clue.id);
+      const action = kind === undefined ? undefined : SCENE_ACTION[kind];
+      return action === undefined
+        ? null
+        : { type: 'clientele-scene', action, choice: Math.max(0, Math.min(20, a.answer)) };
     },
     'scene-dismiss': () => {
       scene = null;
@@ -777,10 +801,35 @@ export function wireInterface(view: GameView): WiredInterface {
     if (i >= 0) queue.splice(i, 1);
   };
 
+  const wave = (): Intent | null => {
+    const w = world();
+    const ev = w.clientele.event;
+    const kind = ev === null ? undefined : cc.events.get(ev.id)?.kind;
+    const action = kind === undefined ? undefined : SCENE_ACTION[kind];
+    if (action === 'driver' || action === 'repair' || action === 'surprise')
+      return { type: 'clientele-scene', action, choice: 0 };
+    const me = view.pose(local);
+    let best: { id: number; d: number } | null = null;
+    const pose: CustomerPose = { x: 0, z: 0, yawDeg: 0, anim: 'idle' };
+    for (const g of w.clientele.groups) {
+      if (g.stage === 'leaving') continue;
+      const seat = g.seats[0];
+      const placed = seat === undefined ? undefined : w.furniture.find((f) => f.id === seat);
+      const at = placed ?? (standingPose(w, g.id, performance.now(), pose) ? pose : undefined);
+      if (at === undefined) continue;
+      const d = Math.hypot(at.x - me.x, at.z - me.z);
+      if (best === null || d < best.d) best = { id: g.id, d };
+    }
+    return best === null || best.d > cc.rules.talkReach
+      ? null
+      : { type: 'clientele-talk', group: best.id };
+  };
+
   return {
     sources,
     intents,
     next,
+    wave,
     onEvent(event) {
       if (event.type === 'clientele-say' && (event.player === null || event.player === local)) {
         counter++;
@@ -792,6 +841,21 @@ export function wireInterface(view: GameView): WiredInterface {
             answers: [],
             privateHint: null,
           });
+      } else if (
+        event.type === 'clientele-clue' &&
+        event.player === local &&
+        event.choices.length > 0
+      ) {
+        counter++;
+        const id = `clue-${String(counter)}`;
+        clueKinds.set(id, cc.events.get(event.event)?.kind ?? '');
+        queue.push({
+          id,
+          speaker: cc.events.get(event.event)?.name ?? 'Un indice',
+          text: event.text,
+          answers: event.choices.slice(0, 3),
+          privateHint: event.text,
+        });
       } else if (event.type === 'clientele-clue' && event.player === local) {
         scene = {
           id: `clue-${event.event}`,

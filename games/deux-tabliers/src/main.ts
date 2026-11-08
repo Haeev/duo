@@ -179,6 +179,10 @@ duo.loop.start({
         intents.push({ type: 'act', target });
       if (duo.input.wasPressed('drop') && target !== undefined)
         intents.push({ type: 'drop', target });
+      if (duo.input.wasPressed('wave')) {
+        const intent = wired.wave();
+        if (intent !== null) intents.push(intent);
+      }
     }
     const input: StepInput = {
       seq,
