@@ -8,7 +8,10 @@ Pour chaque personnage:
 2. prises: pose `grip_handle` (tasse à cappuccino) et `grip_glass` (verre) appliquées par Blender lui-même (clip du GLB),
    récipient placé avec la transformation du rapport `<id>.doigts.json` (repère métrique de RightHand), puis test de
    traversée main contre récipient (arbres BVH sur le maillage déformé évalué) et distance des bouts de doigts;
-3. avec `--rendu`: gros plans Cycles de la main (de face, de profil, de dessus) pour chaque prise et pour `relaxed`.
+3. étirement des arêtes dans les poses de main (relaxed, grip_handle, grip_glass): rapport des longueurs posée et au
+   repos, arêtes de plus de 2 mm, seuil 2,5; une déchirure (sommets confondus au repos qui s'écartent de plus de
+   0,5 mm) compte 99;
+4. avec `--rendu`: gros plans Cycles de la main (de face, de profil, de dessus) pour chaque prise et pour `relaxed`.
 """
 import json
 import math
@@ -187,9 +190,44 @@ for ident in ids:
         res["ecart_clips_mm"] = clips
         for o in objs0:
             bpy.data.objects.remove(o, do_unlink=True)
-    # 2. prises
+    # 2. étirement des arêtes dans chaque pose de main (seuil 2,5; arêtes de plus de 2 mm au repos)
+    ad = rig.animation_data_create()
+    ad.action = None
+    for pb in rig.pose.bones:
+        pb.location = (0, 0, 0)
+        pb.rotation_mode = "QUATERNION"
+        pb.rotation_quaternion = (1, 0, 0, 0)
+        pb.scale = (1, 1, 1)
+    bpy.context.view_layer.update()
+    p0, t0 = deformed(meshes)
+    edges = {(min(a, b), max(a, b)) for t in t0 for a, b in ((t[0], t[1]), (t[1], t[2]), (t[2], t[0]))}
+    edges = [(a, b, (p0[a] - p0[b]).length) for a, b in edges]
+    edges = [e for e in edges if e[2] > 0.002]
+    first = {}
+    twins = []
+    for i_, v in enumerate(p0):
+        k_ = (round(v.x * 1e5), round(v.y * 1e5), round(v.z * 1e5))
+        if k_ in first:
+            twins.append((first[k_], i_))
+        else:
+            first[k_] = i_
+    res["etirement_max"] = {}
+    for pose in ("relaxed", "grip_handle", "grip_glass"):
+        if not any(a.name.startswith(pose) for a in bpy.data.actions):
+            continue
+        set_clip(rig, pose, 0)
+        p1, _ = deformed(meshes)
+        r_ = max((p1[a] - p1[b]).length / l for a, b, l in edges)
+        # déchirure: sommets confondus au repos (coutures d'UV) qui s'écartent dans la pose
+        if max((p1[a] - p1[b]).length for a, b in twins) > 0.0005 if twins else False:
+            r_ = 99.0
+        res["etirement_max"][pose] = round(r_, 2)
+    res["etirement_ok"] = all(v <= 2.5 for v in res["etirement_max"].values())
+    # 3. prises
     res["prises"] = {}
-    for grip, model in (("grip_handle", "ware_cup_cappuccino"), ("grip_glass", "ware_glass")):
+    grips = [g_ for g_ in (("grip_handle", "ware_cup_cappuccino"), ("grip_glass", "ware_glass"))
+             if any(a.name.startswith(g_[0]) for a in bpy.data.actions)]
+    for grip, model in grips:
         _, vmeshes, vobjs = load(os.path.join(ASSETS, model + ".glb"))
         vmeshes = [o for o in vobjs if o.type == "MESH" and not o.name.endswith("_liquid")]
         for o in vobjs:

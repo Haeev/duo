@@ -113,6 +113,29 @@ def strip(g):
     g.g["animations"] = [a for a in g.g["animations"] if a["name"] not in POSES]
 
 
+def fold_fingers(J, W, jbase, hand_joints):
+    """Plus de 4 influences: les plus petites parts des doigts reviennent à l'os de la main de leur côté (rigide avec
+    elle au repos), pour que la troncature à 4 ne retire jamais de poids au bras (clips inchangés)."""
+    J = J.copy()
+    W = W.copy()
+    for i in np.nonzero((W > 0).sum(1) > 4)[0]:
+        acc = {}
+        for j, w in zip(J[i], W[i]):
+            if w > 0:
+                acc[int(j)] = acc.get(int(j), 0.0) + float(w)
+        while len(acc) > 4:
+            fingers = [j for j in acc if j >= jbase]
+            j = min(fingers, key=lambda x: acc[x])
+            hand = hand_joints[(j - jbase) // 6]
+            acc[hand] = acc.get(hand, 0.0) + acc.pop(j)
+        J[i] = 0
+        W[i] = 0
+        for k, (j, w) in enumerate(acc.items()):
+            J[i, k] = j
+            W[i, k] = w
+    return J, W
+
+
 def merge_top4(J, W):
     """Fusionne les doublons d'articulation par sommet, garde les 4 plus forts, renormalise."""
     outJ = np.zeros((len(J), 4), dtype=np.int64)
@@ -347,7 +370,7 @@ def process(ident, cup, glass):
                 on = (near == ci) & (dist[:, ci] < 0.06) & (wh > 0.5)
                 share[:, ci * 2] = np.where(on, f * (1 - f2), 0)
                 share[:, ci * 2 + 1] = np.where(on, f * f2, 0)
-            share = smooth_shares(share, d["I"], wh > 0.5)
+            share = smooth_shares(share, d["I"], wh > 0.5, d["P"])
             share *= smooth((wh - 0.5) / 0.3)[:, None]
             for k in range(6):
                 jidx = jbase + si * 6 + k
@@ -358,7 +381,7 @@ def process(ident, cup, glass):
             W = np.where(J == h["hj"], W * keep[:, None], W)
         J2 = np.concatenate([J, np.stack(addJ, 1)], 1)
         W2 = np.concatenate([W, np.stack(addW, 1)], 1)
-        J3, W3 = merge_top4(J2, W2)
+        J3, W3 = merge_top4(*fold_fingers(J2, W2, jbase, [hands[sd]["hj"] for sd in SIDES]))
         d["J2"], d["W2"] = J3, W3
         prims[di]["attributes"]["JOINTS_0"] = g.add(J3.astype(np.uint8), 34962)
         prims[di]["attributes"]["WEIGHTS_0"] = g.add(W3.astype(np.float32), 34962)
@@ -417,23 +440,35 @@ def process(ident, cup, glass):
     return report
 
 
-def smooth_shares(share, I, region, passes=6):
-    """Lisse les parts des doigts le long du maillage (moyenne des voisins), seulement sur la main (`region`)."""
-    n = len(share)
-    nb = [[] for _ in range(n)]
+def smooth_shares(share, I, region, P, passes=6):
+    """Lisse les parts des doigts le long du maillage (moyenne des voisins), seulement sur la main (`region`).
+    Le lissage se fait sur les positions soudées: les sommets dédoublés par les coutures d'UV gardent les mêmes poids
+    (sinon la peau se déchire en éclats)."""
+    _, weld, = np.unique(np.round(P * 1e5).astype(np.int64), axis=0, return_inverse=True)
+    weld = weld.ravel()
+    m = weld.max() + 1
+    cnt = np.bincount(weld, minlength=m).astype(float)
+    S = np.zeros((m, share.shape[1]))
+    np.add.at(S, weld, share)
+    S /= cnt[:, None]
+    R = np.zeros(m, dtype=bool)
+    R[weld[region]] = True
+    nb = [set() for _ in range(m)]
     for f in I:
         for i in range(3):
-            a, b = int(f[i]), int(f[(i + 1) % 3])
-            nb[a].append(b)
-            nb[b].append(a)
-    out = share.copy()
+            a, b = weld[int(f[i])], weld[int(f[(i + 1) % 3])]
+            if a != b:
+                nb[a].add(b)
+                nb[b].add(a)
     for _ in range(passes):
-        new = out.copy()
-        for v in np.nonzero(region)[0]:
-            ns = [w for w in nb[v] if region[w]]
+        new = S.copy()
+        for v in np.nonzero(R)[0]:
+            ns = [w for w in nb[v] if R[w]]
             if ns:
-                new[v] = 0.5 * out[v] + 0.5 * out[ns].mean(0)
-        out = new
+                new[v] = 0.5 * S[v] + 0.5 * S[ns].mean(0)
+        S = new
+    out = share.copy()
+    out[region] = S[weld[region]]
     return out
 
 
@@ -447,7 +482,16 @@ def stretch(ctx, side, angles):
     l0 = np.linalg.norm(V0[E[:, 0]] - V0[E[:, 1]], axis=1)
     l1 = np.linalg.norm(V1[E[:, 0]] - V1[E[:, 1]], axis=1)
     m = l0 > 0.002
-    return float((l1[m] / l0[m]).max()) if m.any() else 1.0
+    ratio = float((l1[m] / l0[m]).max()) if m.any() else 1.0
+    # déchirure: des sommets confondus au repos qui s'écartent comptent comme un étirement infini
+    key = np.round(V0 * 1e5).astype(np.int64)
+    _, weld = np.unique(key, axis=0, return_inverse=True)
+    weld = weld.ravel()
+    ref = np.zeros((weld.max() + 1, 3))
+    ref[weld] = V1
+    if np.linalg.norm(V1 - ref[weld], axis=1).max() > 0.0005:
+        ratio = 99.0
+    return ratio
 
 
 def rest_q(node):

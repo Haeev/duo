@@ -63,7 +63,9 @@ for rp in sorted(glob.glob(os.path.join(ICI, "personnages", "*.rapport.json"))):
             "repere_des_os": "Y le long du segment, Z vers la paume, X = Y x Z; flexion = rotation autour de X local, positive vers la paume",
             "poses": {k: {os_: v["quaternion_local_xyzw"] for os_, v in pose.items()} for k, pose in dg["poses"].items()},
             "angles_deg": {k: {os_: [v["flexion_x_deg"], v["rotation_z_deg"]] for os_, v in pose.items()} for k, pose in dg["poses"].items()},
-            "prises": {k: {kk: vv for kk, vv in v.items()} for k, v in dg["prises"].items()},
+            # null: prise refusée (introuvable ou peau trop étirée), le personnage n'a que `relaxed`
+            "prises": None if dg["prises"] is None else {k: dict(v) for k, v in dg["prises"].items()},
+            "etirement_max": dg.get("etirement_max"),
             "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)",
         }
     else:
