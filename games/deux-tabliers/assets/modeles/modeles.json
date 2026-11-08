@@ -24,7 +24,8 @@
   "dt_lampe": "abat-jour et ampoules allumés (émissif lamp_shade): à éteindre ou rallumer par le jeu",
   "dt_badge_joueur": "badge de 3 cm des avatars: matériau blanc à teinter à la couleur du joueur (Duo)",
   "shell_*": "coque: texture de matière répétée (1 m par tuile) + carte de lumière cuite (textures/shell_village_lightmap.png) en occlusion sur TEXCOORD_1, à rebrancher en lightMap avec lightMapIntensity = lightmap_scale x PI (extra du nœud)",
-  "street_*": "la rue et la cour: même carte de lumière, intensité x 0,42 (dehors en plein soleil, sinon la place sort blanche)",
+  "street_*": "la cour (carte de la coque) et la place du Tilleul (street_place_*, sa propre carte textures/shell_village_place_lightmap.png et son lightmap_scale): intensité x 0,42 (dehors en plein soleil, sinon la place sort blanche). Les street_place_* portent leurs teintes en COLOR_0 (pierre, enduits, volets): vertexColors",
+  "dt_ciel": "ciel (dôme de 70 m, image textures/place_ciel.jpg) et lointain (toits au-delà de la place, collines; couleurs de sommets sur le bandeau blanc de la même image): sans lumière (MeshBasicMaterial, vertexColors), un seul appel",
   "metaux": "cuivre, laiton, inox ont metalness 1: il leur faut un environnement (capture de la salle au chargement, comme l'essai), sinon ils sortent noirs"
  },
  "variantes_coque": {
@@ -86,14 +87,12 @@
     "shell_village": "salle, comptoir fixe et arrière-comptoir, poutres, menuiseries, cabinet de toilette, ardoise murale, deux suspensions fixes",
     "shell_village_glass": "vitrages",
     "shell_village_glow": "abat-jour allumés des suspensions fixes",
-    "shell_village_street": "la place du Tilleul, les étages du café, le banc de Simone",
     "shell_village_fond_ferme": "pan qui ferme l'arche avec la porte de la pièce du fond: le cacher quand village_fond est acheté"
    },
    "triangles": {
     "shell_village": 4634,
     "shell_village_glass": 10,
     "shell_village_glow": 424,
-    "shell_village_street": 2803,
     "shell_village_fond_ferme": 304
    },
    "materiaux": [
@@ -106,11 +105,31 @@
     "shell_floor",
     "shell_wall_paint",
     "shell_walnut",
-    "street_atlas",
-    "street_paving",
     "street_stone"
    ],
-   "poids_octets": 677952
+   "poids_octets": 448844
+  },
+  {
+   "id": "shell_village_place",
+   "fichier": "shell_village_place.glb",
+   "noeuds": {
+    "shell_village_place": "la place du Tilleul cuite: étages et toit du café, banc de la patronne, boulangerie, ruelle du Lavoir, maisons, mairie-école, église, fontaine, tilleul, arrêt du car, bancs, réverbères, vélos, sols",
+    "shell_village_sky": "ciel de fin d'après-midi et lointain (toits du village, coteau, collines), sans lumière"
+   },
+   "triangles": {
+    "shell_village_place": 24023,
+    "shell_village_sky": 2160
+   },
+   "materiaux": [
+    "dt_ciel",
+    "street_place_atlas",
+    "street_place_dalles",
+    "street_place_enduit",
+    "street_place_paves",
+    "street_place_pierre",
+    "street_place_tuiles"
+   ],
+   "poids_octets": 2777768
   },
   {
    "id": "shell_village_ext_fond",
@@ -146,9 +165,10 @@
   }
  ],
  "cuisson": {
-  "lightmap_scale": 2.762397527694702,
-  "bake_spp": 64,
+  "bake_spp": 48,
   "bake_res": 2048,
+  "lightmap_scale": 3.0941176414489746,
+  "place_lightmap_scale": 2.780296802520752,
   "soleil": {
    "azimut_deg": 205.0,
    "hauteur_deg": 16.0

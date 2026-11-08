@@ -238,3 +238,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Rue de l'essai: trottoir à -0,02 et bordure à 14,60 ne collaient pas aux plans (terrasse à 14,75): dessus du trottoir à 0 et bordure à 15,80. Toujours confronter le décor de l'essai au plan des extensions.
 - Pan qui se cache (porte fermée devant une arche): le faire mince, côté salle, sinon les tableaux de l'arche sont cuits noirs derrière lui.
 - Budgets C8: avec les pans x 2 de l'essai B, presque tout dépassait; pans de la bible (x 1) et lissage suffisent. Tiges en chaîne `rod(..., cap=False)`, pas de boules aux coudes; capitons en losanges plats.
+
+## Deux Tabliers, place du Tilleul (vérifié le 2026-11-08)
+
+- Décor extérieur cuit dans un GLB à part (`shell_village_place.glb`), avec sa propre carte de lumière: une seule cuisson Cycles suffit pour deux images (chaque matériau a son nœud image actif; intérieur et place n'ont aucun matériau commun). `lightmap_scale` propre au GLB, relu par `lightmapScale(root)`.
+- Le dôme du ciel cache le ciel de la cuisson: `hide_render` sur le ciel et le lointain pendant `bake`, puis le remettre.
+- Teintes par face sans multiplier les matériaux: attribut de coin « ao » en BYTE_COLOR rempli par `foreach_set("color_srgb", ...)`, multiplié à la texture pour la cuisson (rebonds teintés), puis le nœud Mix retiré avant l'export (texture seule en couleur de base, COLOR_0 à part). Côté Three.js: `vertexColors: m.vertexColors` sur le MeshBasicMaterial de la coque (les coques ont déjà un COLOR_0 blanc: aucun programme de plus).
+- Panneaux d'une façade (fenêtre, porte, enseigne): toujours devant le mur (décalage de 6 mm), jamais en retrait dans une boîte pleine (invisibles). Le relief vient des encadrements et appuis saillants.
+- UV des cases d'atlas: base (t = up x n, b = n x t) par face; texte lisible de dehors sans cas particulier. Feuillage et écorce: fenêtre de la case à l'échelle (1,4 m par case), sinon feuilles de 2 cm.
+- Houppier: une trentaine de grosses icosphères (subdiv 2) se lit en brocoli sombre (auto-ombrage cuit). Mieux: 80 à 90 bouquets plus petits (subdiv 1, déplacés par `mathutils.noise`), près de la surface, teintes claires.
+- Visionneuse `verifier/vue/`: charge aussi la place (paramètre `far` du plan lointain, 80 m comme le jeu).

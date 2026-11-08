@@ -1,7 +1,9 @@
 /**
  * Coque cuite du village (`shell_village.glb` et ses extensions): posée sans transformation
  * (x et z du plan), éclairée par sa carte de lumière (occlusion sur TEXCOORD_1 dans le GLB,
- * rebranchée en `lightMap`, intensité `lightmap_scale` × π, × 0,42 pour la rue et la cour).
+ * rebranchée en `lightMap`, intensité `lightmap_scale` × π, × 0,42 pour la rue et la cour). La place du
+ * Tilleul (`shell_village_place.glb`) a sa propre carte et son propre `lightmap_scale`; son ciel et son
+ * lointain (`dt_ciel`) sont sans lumière.
  * Les matériaux de la coque passent en `MeshBasicMaterial`: la lumière est déjà cuite, les
  * lumières de la scène n'éclairent que meubles et personnages (moins de programmes, rien de
  * surexposé). Une fois la coque là, une capture de la salle sert d'environnement aux métaux.
@@ -92,6 +94,14 @@ function bake(root: Object3D, scale: number, owned: { dispose(): void }[]): void
       o.material = lamp;
       return;
     }
+    if (m.name === 'dt_ciel' && m instanceof MeshStandardMaterial) {
+      // Ciel et lointain de la place: sans lumière (couleurs de l'image et des sommets).
+      const sky = new MeshBasicMaterial({ name: m.name, map: m.map, vertexColors: true, fog: false });
+      owned.push(sky);
+      o.material = sky;
+      o.frustumCulled = false;
+      return;
+    }
     if (!(m instanceof MeshStandardMaterial) || m.aoMap === null) return;
     const light: Texture = m.aoMap;
     light.colorSpace = SRGBColorSpace;
@@ -103,6 +113,8 @@ function bake(root: Object3D, scale: number, owned: { dispose(): void }[]): void
       map: m.map,
       lightMap: light,
       lightMapIntensity: (m.name.startsWith('street_') ? 0.42 : 1) * scale * Math.PI,
+      // Teintes de la place (pierre, enduits, volets) en couleurs de sommets; blanches ailleurs.
+      vertexColors: m.vertexColors,
     });
     owned.push(basic);
     o.material = basic;
@@ -155,6 +167,14 @@ export function createBakedShell(
     scene.add(src.scene);
     key = '';
     capture();
+  });
+  // La place du Tilleul (décor de fond cuit, sa propre carte de lumière), le ciel et le lointain.
+  let place: Object3D | null = null;
+  void models.gltf('shell_village_place').then((src) => {
+    if (src === null || disposed) return;
+    bake(src.scene, lightmapScale(src.scene), owned);
+    place = src.scene;
+    scene.add(src.scene);
   });
 
   // Textures des revêtements, chargées à la première pose (une fois chacune).
@@ -244,6 +264,7 @@ export function createBakedShell(
     dispose() {
       disposed = true;
       if (base !== null) scene.remove(base);
+      if (place !== null) scene.remove(place);
       for (const p of parts.values()) if (p !== base) scene.remove(p);
       scene.environment = null;
       for (const d of owned) d.dispose();

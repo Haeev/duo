@@ -5,8 +5,11 @@ Usage: duo-python games/deux-tabliers/assets-src/modeles/coque.py [-- --res 2048
 Sorties (assets/modeles/):
 - shell_village.glb: nœuds `shell_village` (murs, sol, plafond, poutres, menuiseries, comptoir fixe et arrière-comptoir,
   ardoise murale, deux suspensions fixes du comptoir), `shell_village_glass` (vitrages), `shell_village_glow` (abat-jour
-  allumés), `shell_village_street` (la place du Tilleul vue par les vitrines), `shell_village_fond_ferme` (pan du refend avec
-  la porte fermée de la pièce du fond: à cacher quand l'extension « village_fond » est achetée);
+  allumés), `shell_village_fond_ferme` (pan du refend avec la porte fermée de la pièce du fond: à cacher quand l'extension
+  « village_fond » est achetée);
+- shell_village_place.glb: la place du Tilleul (lib/place.py, textures lib/place_textures.py), nœuds `shell_village_place`
+  (cuit, sa propre carte de lumière textures/shell_village_place_lightmap.png) et `shell_village_sky` (ciel et lointain,
+  sans lumière);
 - shell_village_ext_fond.glb: la pièce du fond (arche, cheminée, fenêtre sur la cour), même carte de lumière;
 - shell_village_ext_terrasse.glb: le store banne de la terrasse (matériau des meubles, lumière dynamique);
 - textures/: carte de lumière, textures de murs et de sols (variantes de peinture, papiers peints et sols du catalogue).
@@ -404,6 +407,177 @@ def cour():
     return g
 
 
+# ------------------------------------------------------------------------------------------------
+# La place du Tilleul: matières répétées et atlas propres à la place, teintes en couleurs de sommets
+
+PLACE_REPEAT = {"pierre": 2.0, "enduit": 2.0, "tuiles": 2.0, "paves": 2.0, "dalles": 2.0}  # mètres par tuile de texture
+PLACE_SPAN = {"feuillage": 1.4, "ecorce": 1.2, "fleurs": 0.7}  # cases de l'atlas plaquées à l'échelle (et non ajustées)
+
+
+def _place_mat(name, image, rough, lit=True):
+    m = bpy.data.materials.get(name)
+    if m:
+        return m
+    m = bpy.data.materials.new(name)
+    m.use_backface_culling = True
+    nt = m.node_tree
+    b = nt.nodes["Principled BSDF"]
+    t = nt.nodes.new("ShaderNodeTexImage")
+    t.image = bpy.data.images.load(os.path.join(K.TEXDIR, image), check_existing=True)
+    uvn = nt.nodes.new("ShaderNodeUVMap")
+    uvn.uv_map = "UVMap"
+    nt.links.new(uvn.outputs["UV"], t.inputs["Vector"])
+    b.inputs["Roughness"].default_value = rough
+    if lit:
+        ca = nt.nodes.new("ShaderNodeVertexColor")
+        ca.layer_name = "ao"
+        mix = nt.nodes.new("ShaderNodeMix")
+        mix.data_type = "RGBA"
+        mix.blend_type = "MULTIPLY"
+        mix.inputs["Factor"].default_value = 1.0
+        mix["teinte_sommets"] = 1
+        nt.links.new(t.outputs["Color"], mix.inputs["A"])
+        nt.links.new(ca.outputs["Color"], mix.inputs["B"])
+        nt.links.new(mix.outputs["Result"], b.inputs["Base Color"])
+        m["lightmapped"] = True
+    else:
+        nt.links.new(t.outputs["Color"], b.inputs["Base Color"])
+    return m
+
+
+def _uv_basis(n):
+    up = Vector((0, 0, 1))
+    if abs(n.z) > 0.92:
+        t = Vector((1, 0, 0))
+    else:
+        t = up.cross(n).normalized()
+    return t, n.cross(t).normalized()
+
+
+def finir_place(g, nom, far=None):
+    """Objet Blender d'un Geo de la place: UV (matières répétées en mètres, cases d'atlas ajustées à la face, ciel en
+    azimut et hauteur), matériaux par famille, teintes en couleurs de sommets (attribut « ao », exporté en COLOR_0)."""
+    import bmesh
+    rng = __import__("random").Random(3)
+    geos = [g] + ([far] if far is not None else [])
+    obs = []
+    for gi, geo in enumerate(geos):
+        bm = geo.bm
+        if not nom.endswith("_sky"):
+            bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+        bm.normal_update()
+        uv = bm.loops.layers.uv.new("UVMap")
+        tints = []
+        fams = []
+        meta = getattr(geo, "sky_meta", None)
+        for f in bm.faces:
+            fam, tint = geo.keys[f.material_index].split("|")
+            tints.append(tint)
+            n = f.normal
+            if fam == "ciel":
+                c = Vector(meta["centre"])
+                uvs = []
+                for lp in f.loops:
+                    p = lp.vert.co
+                    dx, dy, dz = p.x - c.x, p.y - (-c.y), p.z + 4.0
+                    az = math.degrees(math.atan2(dx, dy)) % 360.0
+                    el = math.degrees(math.atan2(dz, math.hypot(dx, dy)))
+                    wf = PT.SKY_WHITE_ROWS / PT.SKY_H
+                    v = wf + 0.004 + max(0.0, el) / 90.0 * (1 - wf - 0.006)
+                    uvs.append([az / 360.0, v])
+                us = [q[0] for q in uvs]
+                if max(us) - min(us) > 0.5:
+                    for q in uvs:
+                        if q[0] < 0.5:
+                            q[0] += 1.0
+                for lp, q in zip(f.loops, uvs):
+                    lp[uv].uv = q
+                fams.append("ciel")
+                continue
+            if fam == "lointain":
+                for lp in f.loops:
+                    lp[uv].uv = (0.5, (PT.SKY_WHITE_ROWS / 2) / PT.SKY_H)
+                fams.append("ciel")
+                continue
+            t, b = _uv_basis(n)
+            if fam in PLACE_REPEAT:
+                s = 1.0 / PLACE_REPEAT[fam]
+                for lp in f.loops:
+                    lp[uv].uv = (lp.vert.co.dot(t) * s, lp.vert.co.dot(b) * s)
+                fams.append(fam)
+                continue
+            if fam == "pal":
+                u0, v0, u1, v1 = PT.tile_rect("blanc")
+                for lp in f.loops:
+                    lp[uv].uv = ((u0 + u1) / 2, (v0 + v1) / 2)
+                fams.append("atlas")
+                continue
+            assert fam.startswith("img:"), fam
+            tile = fam[4:]
+            sub = (0.0, 0.0, 1.0, 1.0)
+            if "@" in tile:
+                tile, rest = tile.split("@")
+                sub = tuple(float(x) for x in rest.split(","))
+            u0, v0, u1, v1 = PT.tile_rect(tile)
+            pts = [(lp.vert.co.dot(t), lp.vert.co.dot(b)) for lp in f.loops]
+            a0, a1 = min(p[0] for p in pts), max(p[0] for p in pts)
+            b0, b1 = min(p[1] for p in pts), max(p[1] for p in pts)
+            if tile in PLACE_SPAN:
+                span = PLACE_SPAN[tile]
+                wu, wv = min(1.0, (a1 - a0) / span), min(1.0, (b1 - b0) / span)
+                ou, ov = rng.uniform(0, 1 - wu), rng.uniform(0, 1 - wv)
+                sub = (ou, ov, ou + wu, ov + wv)
+            su0, sv0, su1, sv1 = sub
+            for lp, (pa, pb) in zip(f.loops, pts):
+                fu = su0 + (su1 - su0) * ((pa - a0) / max(1e-6, a1 - a0))
+                fv = sv0 + (sv1 - sv0) * ((pb - b0) / max(1e-6, b1 - b0))
+                lp[uv].uv = (u0 + (u1 - u0) * fu, v0 + (v1 - v0) * fv)
+            fams.append("atlas")
+        me = bpy.data.meshes.new(f"{nom}_{gi}")
+        bm.to_mesh(me)
+        bm.free()
+        ob = bpy.data.objects.new(f"{nom}_{gi}", me)
+        bpy.context.scene.collection.objects.link(ob)
+        mats = {"pierre": ("street_place_pierre", "place_pierre.jpg", 0.9), "enduit": ("street_place_enduit", "place_enduit.jpg", 0.92),
+                "tuiles": ("street_place_tuiles", "place_tuiles.jpg", 0.8), "paves": ("street_place_paves", "place_paves.jpg", 0.85),
+                "dalles": ("street_place_dalles", "place_dalles.jpg", 0.85), "atlas": ("street_place_atlas", "place_atlas.jpg", 0.75)}
+        order = []
+        for fm in fams:
+            if fm not in order:
+                order.append(fm)
+        for fm in order:
+            if fm == "ciel":
+                me.materials.append(_place_mat("dt_ciel", "place_ciel.jpg", 1.0, lit=False))
+            else:
+                me.materials.append(_place_mat(*mats[fm]))
+        idx = {fm: i for i, fm in enumerate(order)}
+        mi = [idx[fm] for fm in fams]
+        me.polygons.foreach_set("material_index", mi)
+        att = me.color_attributes.new("ao", "BYTE_COLOR", "CORNER")
+        cols = []
+        cache = {}
+        for p_ in me.polygons:
+            h = tints[p_.index]
+            if h not in cache:
+                cache[h] = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)] + [1.0]
+            cols.extend(cache[h] * p_.loop_total)
+        att.data.foreach_set("color_srgb", cols)
+        me.color_attributes.active_color = att
+        me.color_attributes.render_color_index = 0
+        obs.append(ob)
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in obs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = obs[0]
+    if len(obs) > 1:
+        bpy.ops.object.join()
+    ob = bpy.context.view_layer.objects.active
+    ob.name = ob.data.name = nom
+    if nom.endswith("_sky"):
+        ob.visible_shadow = False
+    return ob
+
+
 def remap_keys(g):
     g.keys = [KEYMAP.get(k, k) for k in g.keys]
 
@@ -445,7 +619,6 @@ def main():
     az, el = math.radians(SUN_AZ), math.radians(SUN_EL)
     sun_plan = (math.sin(az) * math.cos(el), -math.cos(az) * math.cos(el), math.sin(el))
     place = finir_place(PL.place(), "shell_village_place")
-    far = Geo("shell_village_sky")
     sky = finir_place(PL.ciel(), "shell_village_sky", far=PL.lointain(sun_plan))
     print(f"géométrie: {time.time() - t0:.0f} s")
     baked = [o for n, o in objs.items() if n not in ("vitrages", "glow")]
@@ -612,14 +785,24 @@ def main():
     grp = bpy.data.node_groups.get("glTF Material Output") or bpy.data.node_groups.new("glTF Material Output", "ShaderNodeTree")
     if not grp.interface.items_tree:
         grp.interface.new_socket("Occlusion", in_out="INPUT", socket_type="NodeSocketFloat")
-    for m in {s.material for o in baked for s in o.material_slots}:
+    place_lm_img = bpy.data.images.load(place_lm_png, check_existing=True)
+    place_lm_img.colorspace_settings.name = "sRGB"
+    lm_of = {m: lm_img for o in baked for m in (s.material for s in o.material_slots)}
+    lm_of.update({s.material: place_lm_img for s in place.material_slots})
+    for m, im_ in lm_of.items():
         if not m.get("lightmapped"):
             continue
         nt = m.node_tree
+        # export: texture seule en couleur de base (les couleurs de sommets partent en COLOR_0)
+        mix = next((n for n in nt.nodes if n.get("teinte_sommets")), None)
+        if mix is not None:
+            tex0 = next(n for n in nt.nodes if n.type == "TEX_IMAGE")
+            nt.links.new(tex0.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
+            nt.nodes.remove(mix)
         uvn = nt.nodes.new("ShaderNodeUVMap")
         uvn.uv_map = "lightmap"
         tex = nt.nodes.new("ShaderNodeTexImage")
-        tex.image = lm_img
+        tex.image = im_
         nt.links.new(uvn.outputs["UV"], tex.inputs["Vector"])
         sep = nt.nodes.new("ShaderNodeSeparateColor")
         nt.links.new(tex.outputs["Color"], sep.inputs["Color"])
@@ -640,21 +823,24 @@ def main():
         return ob
 
     shell = joindre([objs[n] for n in ("salle", "poutres", "menuiseries", "comptoir", "arriere", "lampes")], "shell_village")
-    street = joindre([objs["rue"], objs["tilleul"]], "shell_village_street")
     glass = objs["vitrages"]
     glass.name = glass.data.name = "shell_village_glass"
     glow = objs["glow"]
     ferme = objs["fond_ferme"]
     fond = joindre([objs["fond"], objs["cour"]], "shell_village_ext_fond")
-    for o in (shell, street, glass, glow, ferme, fond):
+    for o in (shell, glass, glow, ferme, fond, place, sky):
         o.data.uv_layers.active_index = 0
-    K.ao_blanc([shell, street, glass, glow, ferme, fond])
-    for o in (shell, street, ferme, fond):
+    K.ao_blanc([shell, glass, glow, ferme, fond])
+    for o in (shell, ferme, fond):
         o["lightmap_scale"] = meta["lightmap_scale"]
+    for o in (place, sky):
+        o["lightmap_scale"] = meta["place_lightmap_scale"]
     fiches = {}
-    for nom, objs_ in (("shell_village", [shell, glass, glow, street, ferme]), ("shell_village_ext_fond", [fond])):
+    for nom, objs_, lmk, lmn in (("shell_village", [shell, glass, glow, ferme], "lightmap_scale", lm_name),
+                                 ("shell_village_ext_fond", [fond], "lightmap_scale", lm_name),
+                                 ("shell_village_place", [place, sky], "place_lightmap_scale", place_lm_name)):
         path = os.path.join(K.ASSETS, nom + ".glb")
-        size = K.exporter_glb(objs_, path, extras={"lightmap_scale": meta["lightmap_scale"], "lightmap": f"textures/{lm_name}.png"})
+        size = K.exporter_glb(objs_, path, extras={"lightmap_scale": meta[lmk], "lightmap": f"textures/{lmn}.png"})
         fiches[nom] = {"id": nom, "fichier": nom + ".glb", "poids_octets": size,
                        "triangles": {o.name: K.tris(o) for o in objs_},
                        "materiaux": sorted({s.material.name for o in objs_ for s in o.material_slots})}

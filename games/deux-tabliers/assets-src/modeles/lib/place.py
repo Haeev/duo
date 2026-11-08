@@ -31,7 +31,7 @@ STONE_LIGHT = "#DCCBA6"
 STONE_SHADE = "#B7A27E"
 SHUTTER = "#7F979B"  # volets gris-bleu
 ROOF = "#A9674A"
-TREE = "#6E8A4C"
+TREE = "#86A65A"
 PAVING = "#A49B8A"
 ZINC = "#8E9496"
 IRON = "#33373A"
@@ -289,6 +289,15 @@ def maison_du_cafe(g, rng):
         fenetre(f, xc - 1.9, 3.55, 0.9, 1.4, rng, volet=SHUTTER, jardiniere=i in (1, 2, 3), rideau=True)
     gouttiere(f, 6.6, 0.15)
     f.box(-0.1, 0.0, 0.0, 0.06, -0.02, 6.6, k("pierre", STONE_LIGHT))
+    # banc de la patronne sous la vitrine, dos au mur (plan seat-13 et seat-14: x 5,00 à 6,20, y 13,05 à 13,50,
+    # assise à 0,45 m): pieds de fonte, lattes de chêne, dossier contre l'allège
+    for x in (5.08, 6.12):
+        g.box(x - 0.03, x + 0.03, 13.12, 13.45, -0.02, 0.42, k("pal", IRON), bevel=0.008)
+    for i in range(4):
+        yy = 13.14 + i * 0.1
+        g.box(5.0, 6.2, yy - 0.04, yy + 0.04, 0.42, 0.47, k("img:ecorce", "#B08A5E"), bevel=0.006)
+    for zz in (0.55, 0.72):
+        g.box(5.0, 6.2, 13.1, 13.15, zz, zz + 0.1, k("img:ecorce", "#B08A5E"), bevel=0.006)
     # applique de la rue au coin est (lanterne de fonte sur potence)
     lanterne_murale(g, 11.2, 13.0, 3.5)
     toit(g, 1.9, 11.5, 3.0, 13.0, 6.6, "x", chem=[(5.25, 3.6), (9.6, 9.0)])
@@ -641,12 +650,12 @@ def tilleul(g, rng):
     cx, cy, cz = tx, ty + 0.5, z0 + 7.2
     rx, rys, ryn, rz = 4.4, 4.6, 3.3, 3.3
     pts = []
-    for i in range(46):
+    for i in range(84):
         while True:
             d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1)))
             if 0.35 < d.length <= 1.0:
                 break
-        d = d / d.length * (0.62 + 0.38 * rng.random() ** 0.5)
+        d = d / d.length * (0.78 + 0.22 * rng.random() ** 0.5)
         ry = rys if d.y > 0 else ryn
         p = (cx + d.x * rx, cy + d.y * ry, cz + d.z * rz)
         if p[2] < z0 + 4.4:
@@ -654,15 +663,14 @@ def tilleul(g, rng):
         pts.append((p, d))
     bm = g.bm
     for (p, d) in pts:
-        r = rng.uniform(1.05, 1.6) * (1.12 if d.z > 0.2 else 1.0)
-        before = set(bm.verts)
-        res = bmesh.ops.create_icosphere(bm, subdivisions=2, radius=r)
+        r = rng.uniform(0.85, 1.25) * (1.12 if d.z > 0.2 else 1.0)
+        res = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=r)
         vs = res["verts"]
         c = P(*p)
         seed = Vector((rng.uniform(0, 100), rng.uniform(0, 100), rng.uniform(0, 100)))
         for v in vs:
             n = v.co.normalized()
-            disp = 0.22 * noise.noise(n * 2.2 + seed) + 0.1 * noise.noise(n * 5.0 + seed)
+            disp = 0.3 * noise.noise(n * 2.2 + seed) + 0.12 * noise.noise(n * 5.0 + seed)
             v.co = c + Vector((n.x * r * (1 + disp), n.y * r * (1 + disp), n.z * r * 0.82 * (1 + disp)))
         faces = list({f for v in vs for f in v.link_faces})
         for f in faces:
@@ -670,7 +678,7 @@ def tilleul(g, rng):
             f.smooth = True
             up = f.normal.z
             out = (f.calc_center_median() - P(cx, cy, cz)).normalized().dot(f.normal)
-            lum = 0.8 + 0.22 * max(0.0, up) + 0.08 * out - (0.12 if p[2] < cz - 1.0 else 0)
+            lum = 1.0 + 0.25 * max(0.0, up) + 0.1 * out - (0.08 if p[2] < cz - 1.0 else 0) + rng.uniform(-0.06, 0.06)
             hexs = _scale_hex(TREE, lum, warm=0.05 * max(0.0, up))
             f.material_index = g.mi(k("img:feuillage", hexs))
         bmesh.ops.recalc_face_normals(bm, faces=faces)
@@ -769,7 +777,7 @@ def place(rng=None):
     banc(g, 1.5, 3.1, 27.0, "n")
     banc(g, 14.0, 15.6, 27.0, "n")
     # réverbères: bord nord de la route (devant le café et la fontaine), parvis, coin de la mairie
-    for (x, y) in ((7.4, 18.9), (-3.0, 18.9), (11.2, 25.1), (21.3, 25.0), (-2.0, 25.1)):
+    for (x, y) in ((8.65, 18.9), (-3.0, 18.9), (11.2, 25.1), (21.3, 25.0), (-2.0, 25.1)):
         reverbere(g, x, y)
     # vélo d'un randonneur contre la margelle de la fontaine (côté place)
     velo(g, 12.15, 16.75, -0.2, along="x", color="#9C3B32")
@@ -782,7 +790,7 @@ def place(rng=None):
 # ------------------------------------------------------------------------------------------------
 # Lointain (sans lumière cuite): toits du village au-delà de la place, coteau, collines; dôme du ciel
 
-def _shade(hexs, nrm, sun, haze, fog="#C9C2BE"):
+def _shade(hexs, nrm, sun, haze, fog="#B7B3B4"):
     """Couleur d'une face du lointain: lambert doux vers le soleil, voile de l'air vers la couleur de l'horizon."""
     r, gg, b = (int(hexs[i:i + 2], 16) / 255 for i in (1, 3, 5))
     lam = 0.62 + 0.45 * max(0.0, nrm.dot(sun))
@@ -798,7 +806,7 @@ def lointain(sun_dir, rng=None):
     lumière (couleurs de sommets calculées ici)."""
     rng = rng or random.Random(5)
     g = Geo("shell_village_far")
-    sun = Vector(sun_dir).normalized()
+    sun = P(*sun_dir).normalized()
     centre = (7.5, 16.0)
     # toits du village: anneau de maisons simples, hors de la place
     for i in range(34):
@@ -807,7 +815,7 @@ def lointain(sun_dir, rng=None):
         x, y = centre[0] + math.cos(a) * d, centre[1] + math.sin(a) * d
         w, dd, h = rng.uniform(6, 10), rng.uniform(6, 9), rng.uniform(5.5, 8.5)
         base = rng.choice(ENDUITS + [STONE, STONE])
-        haze = min(0.55, (d - 30) / 40)
+        haze = min(0.4, (d - 30) / 50)
         before = len(g.bm.faces)
         g.box(x - w / 2, x + w / 2, y - dd / 2, y + dd / 2, -0.5, h, k("lointain", base), bevel=0, drop=("bottom",))
         axis = "x" if rng.random() < 0.5 else "y"

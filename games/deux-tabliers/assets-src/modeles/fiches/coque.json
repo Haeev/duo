@@ -2,12 +2,11 @@
  "shell_village": {
   "id": "shell_village",
   "fichier": "shell_village.glb",
-  "poids_octets": 677952,
+  "poids_octets": 448844,
   "triangles": {
    "shell_village": 4634,
    "shell_village_glass": 10,
    "shell_village_glow": 424,
-   "shell_village_street": 2803,
    "shell_village_fond_ferme": 304
   },
   "materiaux": [
@@ -20,8 +19,6 @@
    "shell_floor",
    "shell_wall_paint",
    "shell_walnut",
-   "street_atlas",
-   "street_paving",
    "street_stone"
   ]
  },
@@ -43,10 +40,29 @@
    "street_stone"
   ]
  },
+ "shell_village_place": {
+  "id": "shell_village_place",
+  "fichier": "shell_village_place.glb",
+  "poids_octets": 2777768,
+  "triangles": {
+   "shell_village_place": 24023,
+   "shell_village_sky": 2160
+  },
+  "materiaux": [
+   "dt_ciel",
+   "street_place_atlas",
+   "street_place_dalles",
+   "street_place_enduit",
+   "street_place_paves",
+   "street_place_pierre",
+   "street_place_tuiles"
+  ]
+ },
  "cuisson": {
-  "lightmap_scale": 2.762397527694702,
-  "bake_spp": 64,
+  "bake_spp": 48,
   "bake_res": 2048,
+  "lightmap_scale": 3.0941176414489746,
+  "place_lightmap_scale": 2.780296802520752,
   "soleil": {
    "azimut_deg": 205.0,
    "hauteur_deg": 16.0

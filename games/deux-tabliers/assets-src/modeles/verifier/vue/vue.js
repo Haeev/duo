@@ -33,6 +33,9 @@ function lumiereCuite(racine) {
     if (m.name === 'dt_verre') {
       o.material = new THREE.MeshBasicMaterial({ color: m.color, transparent: true, opacity: 0.14, depthWrite: false, side: THREE.DoubleSide });
       o.renderOrder = 2;
+    } else if (m.name === 'dt_ciel') {
+      o.material = new THREE.MeshBasicMaterial({ map: m.map, vertexColors: true, fog: false });
+      o.frustumCulled = false;
     } else if (m.name === 'dt_lampe') {
       o.material = new THREE.MeshBasicMaterial({ color: new THREE.Color('#FFE6BE') });
     } else if (m.aoMap) {
@@ -63,6 +66,14 @@ async function principal() {
   }
   lumiereCuite(coque.scene);
   fixe.add(coque.scene);
+  // la place du Tilleul: sa propre carte de lumière (lightmap_scale du nœud)
+  const place = q.get('place') === '0' ? null : await charger(BASE + 'shell_village_place.glb').catch(() => null);
+  if (place) {
+    const Kp = place.scene.children.find((c) => c.userData.lightmap_scale)?.userData.lightmap_scale || 1;
+    place.scene.traverse((o) => { o.userData.lightmap_scale = Kp; });
+    lumiereCuite(place.scene);
+    fixe.add(place.scene);
+  }
   if (ext.includes('terrasse')) {
     const t = await charger(BASE + 'shell_village_ext_terrasse.glb');
     vivant.add(t.scene);
@@ -137,10 +148,12 @@ async function principal() {
     camera.lookAt(cx, 0, cz);
   } else {
     const [p, c] = (q.get('cam') || '9.5,1.65,8.2;7,1.0,12').split(';').map((s) => s.split(',').map(Number));
-    camera = new THREE.PerspectiveCamera(Number(q.get('fov') || 70), W / H, 0.05, 200);
+    camera = new THREE.PerspectiveCamera(Number(q.get('fov') || 70), W / H, 0.05, Number(q.get('far') || 80));
     camera.position.set(...p);
     camera.lookAt(new THREE.Vector3(...c));
   }
+  renderer.info.autoReset = false;
+  renderer.info.reset();
   renderer.clear();
   renderer.render(fixe, camera);
   renderer.render(vivant, camera);

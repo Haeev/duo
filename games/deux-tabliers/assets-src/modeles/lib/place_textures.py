@@ -329,23 +329,23 @@ def horloge():
 
 
 def feuillage(seed=117):
-    """Feuilles de tilleul en cœur, serrées, lumière du dessus; teinte claire (la couleur vient des sommets)."""
+    """Feuilles de tilleul en cœur, serrées, lumière du dessus; claires (la couleur vient des sommets), trous d'ombre."""
     rng = np.random.default_rng(seed)
-    im = Image.new("RGB", (N, N), (70, 84, 62))
+    im = Image.new("RGB", (N, N), (120, 140, 104))
     d = ImageDraw.Draw(im)
-    for i in range(900):
+    for i in range(1100):
         x, y = rng.uniform(-20, N + 20), rng.uniform(-20, N + 20)
-        s = rng.uniform(14, 26)
+        s = rng.uniform(16, 30)
         a = rng.uniform(0, 2 * math.pi)
-        lum = rng.uniform(0.62, 1.0)
-        c = (int(196 * lum), int(222 * lum), int(160 * lum))
+        lum = rng.uniform(0.72, 1.0)
+        c = (int(232 * lum), int(250 * lum), int(196 * lum))
         pts = []
         for k in range(14):
             t = k / 14 * 2 * math.pi
             r = s * (0.55 + 0.45 * abs(math.sin(t / 2)) ** 0.5) * (1 - 0.25 * max(0, math.cos(t)))
             pts.append((x + r * math.cos(t + a), y + r * math.sin(t + a) * 0.8))
         d.polygon(pts, fill=c)
-        d.line([(x, y), (x + s * 0.8 * math.cos(a + math.pi), y + s * 0.8 * math.sin(a + math.pi) * 0.8)], fill=(int(150 * lum), int(176 * lum), int(120 * lum)), width=2)
+        d.line([(x, y), (x + s * 0.8 * math.cos(a + math.pi), y + s * 0.8 * math.sin(a + math.pi) * 0.8)], fill=(int(190 * lum), int(210 * lum), int(150 * lum)), width=2)
     return im.filter(ImageFilter.GaussianBlur(0.6))
 
 
@@ -428,16 +428,23 @@ def fleurs(seed=125):
 
 
 def rosace():
-    """Rosace de l'église (haut) et porte de chêne cloutée du portail (bas)."""
+    """Rosace de l'église (haut: remplage de pierre, vitraux sombres où brillent quelques couleurs) et porte de chêne
+    cloutée du portail (bas)."""
     im, d = _canvas("#CDBB98")
-    c, r = N / 2, 120
-    cy = 128
-    d.ellipse([c - r - 8, cy - r - 8, c + r + 8, cy + r + 8], fill=(170, 152, 120))
-    cols = [(60, 70, 120), (150, 50, 50), (70, 110, 80), (190, 150, 60)]
+    c, cy, r = N / 2, 128, 122
+    d.ellipse([c - r, cy - r, c + r, cy + r], fill=(182, 164, 130))
+    d.ellipse([c - r + 14, cy - r + 14, c + r - 14, cy + r - 14], fill=(44, 46, 62))
+    rng = np.random.default_rng(7)
+    glass = [(70, 80, 140), (140, 50, 52), (62, 100, 76), (176, 140, 60), (54, 60, 96)]
     for k in range(12):
-        a0 = k * 30
-        d.pieslice([c - r, cy - r, c + r, cy + r], a0, a0 + 30, fill=cols[k % 4], outline=(60, 54, 44), width=4)
-    d.ellipse([c - 40, cy - 40, c + 40, cy + 40], fill=(200, 170, 70), outline=(60, 54, 44), width=4)
+        a = math.radians(k * 30 + 15)
+        px, py = c + math.cos(a) * 72, cy + math.sin(a) * 72
+        col = glass[int(rng.integers(0, len(glass)))]
+        d.ellipse([px - 24, py - 24, px + 24, py + 24], fill=col, outline=(182, 164, 130), width=7)
+        a2 = math.radians(k * 30)
+        d.line([(c + math.cos(a2) * 34, cy + math.sin(a2) * 34), (c + math.cos(a2) * (r - 12), cy + math.sin(a2) * (r - 12))], fill=(182, 164, 130), width=7)
+    d.ellipse([c - 34, cy - 34, c + 34, cy + 34], fill=(182, 164, 130))
+    d.ellipse([c - 22, cy - 22, c + 22, cy + 22], fill=(150, 120, 60))
     d.rectangle([0, 256, N, N], fill=(96, 66, 44))
     for x in range(0, N, 32):
         d.line([(x, 256), (x, N)], fill=(76, 52, 34), width=3)
