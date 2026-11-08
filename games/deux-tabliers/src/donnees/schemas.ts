@@ -74,6 +74,18 @@ export const SettingsSchema = v.strictObject({
        * dehors, à droite du visage, quand la tasse est aux lèvres.
        */
       handleForwardDeg: v.pipe(v.number(), v.minValue(-60), v.maxValue(60)),
+      /**
+       * Personnages à doigts (prise de l'artiste): poignet placé autour de la tasse, puis du
+       * verre, à tant de degrés de la droite vers l'avant (négatif: vers soi). Chaque prise met
+       * le poignet ailleurs autour de l'anse: on place le poignet, pas l'anse. Vers soi, il
+       * descend quand la tasse s'incline: aux lèvres, la main reste à côté de la joue, sous l'œil.
+       */
+      fingerCupWristDeg: v.pipe(v.number(), v.minValue(-90), v.maxValue(90)),
+      fingerGlassWristDeg: v.pipe(v.number(), v.minValue(-90), v.maxValue(90)),
+      /** Coude visé par le bras qui boit: en dehors, en arrière et sous l'épaule (m). */
+      elbowOut: v.number(),
+      elbowBack: v.number(),
+      elbowDown: v.number(),
       /** Paume contre la tasse ou le verre: jeu entre la paume et la paroi (m). */
       palmGap: Positive,
       /** Anse au creux de la main fermée: part de la longueur de la main depuis le poignet. */

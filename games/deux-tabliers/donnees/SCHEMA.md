@@ -25,6 +25,8 @@ Conventions:
 | `aim.targetRadius` | m | rayon de la sphère de visée d'un objet ou d'un emplacement |
 | `mouse.degPerPixel` | degrés | sensibilité du regard |
 | `seating.tableReach` | m | portée, de centre à centre, entre une assise et la table qu'elle regarde |
+| `seating.sip.fingerCupWristDeg`, `seating.sip.fingerGlassWristDeg` | degrés | personnages à doigts: place du poignet autour de la tasse, du verre, de la droite vers l'avant (négatif: vers soi, la main reste sous l'œil aux lèvres) |
+| `seating.sip.elbowOut`, `seating.sip.elbowBack`, `seating.sip.elbowDown` | m | coude visé par le bras qui boit, depuis l'épaule |
 | `net.movesEvery` | pas | un instantané de déplacements tous les N pas (3: 20 par seconde) |
 | `net.domainsEvery` | pas | examen des domaines changés tous les N pas (6: 10 par seconde) |
 | `net.interpolationMs` | ms | retard d'affichage de l'autre joueur chez l'invité |
