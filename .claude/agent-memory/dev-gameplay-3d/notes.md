@@ -36,3 +36,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Banc de captures sans le faux hôte: une page Vite temporaire (`banc.html` et un script dans le dossier du jeu, `vite build --config` copié dans le jeu, sortie dans le scratchpad), le monde construit par les vraies intentions (`stepWorld`), servie par `python3 -m http.server`. Supprimer les fichiers du banc avant de rendre.
 - Le scratchpad est partagé entre membres en parallèle: un autre a réécrit `capture.cjs` pendant la mission. Toujours un sous-dossier à soi.
 - Faux hôte sous Playwright: un clic sur le canevas de l'iframe verrouille bien le pointeur en headless; les touches (`KeyB`, `Tab`) arrivent ensuite au jeu, et les boutons d'un panneau se cliquent par `frame.evaluate`.
+
+## Programmes et animations (Deux Tabliers, vérifié le 2026-11-08)
+
+- Three.js 0.187: un `InstancedMesh` visible se compile même à `count = 0` (`setProgram` avant le test du nombre d'instances); `instanceColor` créé plus tard change de variante de programme. Créer les couleurs d'instance d'emblée et `visible = count > 0`.
+- Matériau transparent à deux faces: deux passes (faces arrière puis avant) et un programme de plus (`FLIP_SIDED`). `forceSinglePass = true` sur le verre peu opaque.
+- Lister les programmes vivants avec leur nom: `addInitScript` qui enveloppe `shaderSource`, `attachShader`, `createProgram` et `deleteProgram` de `WebGL2RenderingContext.prototype`, puis lit `#define SHADER_TYPE`, `#define SHADER_NAME` (nom du matériau) et les `#define USE_*` du nuanceur de sommets. `scene.environment` donne aussi `USE_ENVMAP` aux `MeshLambertMaterial`.
+- Matériau teint sur un personnage squeletté (badge): `clone()` du matériau du corps avec une texture blanche 1x1 en sRGB garde le programme des personnages.
+- `AnimationAction.reset().fadeIn()` à chaque changement de clip: si marche et attente alternent d'une image à l'autre (pose de l'invité qui n'avance qu'à l'arrivée des états), tous les poids restent près de zéro et le personnage montre sa pose de liaison (bras écartés). Tenir les poids soi-même, somme à 1 (`src/rendu/melange.ts` de Deux Tabliers), avec un court délai avant de repasser à l'attente.
+- Manifeste de Deux Tabliers: `act` porte E, Espace et le clic gauche; ce qui ne doit pas voler un geste passe par `confirm` (Entrée).
+- Outil Bash isolé: un `cat >> fichier <<EOF` vers le carnet est refusé; passer par Edit. Un `python3 /dev/stdin <<'EOF'` lancé après `cd` dans le jeu passe.

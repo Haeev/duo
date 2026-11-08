@@ -9,11 +9,12 @@ import {
   BoxGeometry,
   CapsuleGeometry,
   Color,
+  DataTexture,
   Group,
   Mesh,
   MeshLambertMaterial,
   MeshStandardMaterial,
-  type AnimationAction,
+  SRGBColorSpace,
   type Material,
   type Scene,
 } from 'three';
@@ -22,6 +23,7 @@ import type { PlacedFurniture, PlayerIndex } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
 import { objectPosition } from '../simulation/monde';
 import { AVATAR_MODEL, FURNITURE_MODEL, MODEL_TURN_DEG, OBJECT_MODEL } from './correspondances';
+import { createClipBlend, type ClipBlend } from './melange';
 import type { ModelLibrary } from './modeles';
 
 interface FurnitureNode {
@@ -62,41 +64,45 @@ export function createWorldNodes(
     return g;
   });
   // Avatars livrés (`char_avatar_*`): marche et attente, badge teinté à la couleur du joueur.
-  const rigs: ({
-    mixer: AnimationMixer;
-    walk: AnimationAction | undefined;
-    idle: AnimationAction | undefined;
-    walking: boolean;
-  } | null)[] = [null, null];
+  // `still`: secondes sans bouger; on ne repasse à l'attente qu'après un court délai, car la pose
+  // de l'autre n'avance qu'à l'arrivée des états (une image sur deux ou trois sans déplacement).
+  const rigs: ({ blend: ClipBlend; still: number } | null)[] = [null, null];
   const owned: Material[] = [];
+  const white = new DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+  white.colorSpace = SRGBColorSpace;
+  white.needsUpdate = true;
   let disposed = false;
   for (const i of [0, 1] as const) {
     void models.gltf(AVATAR_MODEL[i]).then((src) => {
       const holder = avatars[i];
       if (src === null || disposed || holder === undefined) return;
       const node = cloneSkinned(src.scene);
+      // Badge teinté: copie du matériau du corps (texture blanche), pour garder le programme des
+      // personnages au lieu d'en compiler un de plus (budget de 12 programmes).
+      let bodyMaterial: MeshStandardMaterial | null = null;
+      node.traverse((child) => {
+        const m = child instanceof Mesh ? (child.material as Material) : null;
+        if (m instanceof MeshStandardMaterial && m.map !== null) bodyMaterial ??= m;
+      });
       node.traverse((child) => {
         if (!(child instanceof Mesh)) return;
         const m = child.material as Material;
-        if (m.name === 'dt_badge_joueur') {
-          const tinted = new MeshStandardMaterial({
-            color: new Color(colors[i]),
-            roughness: 0.4,
-          });
-          owned.push(tinted);
-          child.material = tinted;
-        }
+        if (m.name !== 'dt_badge_joueur') return;
+        const base: MeshStandardMaterial | null = bodyMaterial;
+        const tinted = base === null ? new MeshStandardMaterial() : base.clone();
+        tinted.name = m.name;
+        tinted.map = base === null ? null : white;
+        tinted.color = new Color(colors[i]);
+        tinted.roughness = 0.4;
+        tinted.metalness = 0;
+        owned.push(tinted);
+        child.material = tinted;
       });
       holder.clear();
       holder.add(node);
-      const mixer = new AnimationMixer(node);
-      const clip = (name: string): AnimationAction | undefined => {
-        const c = src.clips.find((x) => x.name === name);
-        return c === undefined ? undefined : mixer.clipAction(c);
-      };
-      const rig = { mixer, walk: clip('walk'), idle: clip('idle'), walking: false };
-      rig.idle?.play();
-      rigs[i] = rig;
+      const blend = createClipBlend(new AnimationMixer(node), src.clips, 0.2);
+      blend.update(0);
+      rigs[i] = { blend, still: 0 };
     });
   }
   const last = [
@@ -234,14 +240,9 @@ export function createWorldNodes(
         const rig = rigs[i];
         if (rig !== null && rig !== undefined) {
           const moving = dt > 0 && Math.hypot(pose.x - prev.x, pose.z - prev.z) / dt > 0.3;
-          if (moving !== rig.walking) {
-            rig.walking = moving;
-            const next = moving ? rig.walk : rig.idle;
-            const before = moving ? rig.idle : rig.walk;
-            next?.reset().fadeIn(0.2).play();
-            before?.fadeOut(0.2);
-          }
-          if (avatar.visible) rig.mixer.update(dt);
+          rig.still = moving ? 0 : rig.still + dt;
+          rig.blend.set(rig.still < 0.15 ? 'walk' : 'idle');
+          if (avatar.visible) rig.blend.update(dt);
         }
         prev.x = pose.x;
         prev.z = pose.z;
@@ -250,7 +251,8 @@ export function createWorldNodes(
     dispose() {
       disposed = true;
       for (const m of owned) m.dispose();
-      for (const r of rigs) r?.mixer.stopAllAction();
+      white.dispose();
+      for (const r of rigs) r?.blend.stop();
       scene.remove(root);
       body.dispose();
       visor.dispose();

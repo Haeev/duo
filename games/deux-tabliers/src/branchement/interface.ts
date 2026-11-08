@@ -17,6 +17,7 @@ import type { ClienteleState } from '../clientele/etat';
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex, World } from '../etat/monde';
 import type { InterfaceSources, IntentFor } from '../interface/adaptateur';
+import { T } from '../interface/textes';
 import type {
   CatalogueItemView,
   ClockView,
@@ -432,6 +433,69 @@ function offerName(content: Content, id: string): string {
   );
 }
 
+function clockText(minutes: number): string {
+  const m = Math.floor(minutes);
+  return `${String(Math.floor(m / 60))} h ${String(m % 60).padStart(2, '0')}`;
+}
+
+/** Une ligne au singulier ou au pluriel (`{n}`). */
+function counted(forms: readonly [string, string], n: number): string {
+  return (n > 1 ? forms[1] : forms[0]).replace('{n}', String(n));
+}
+
+/**
+ * Page « Ce qu'on retient » du bilan: les habitués servis aujourd'hui (heure, commande), puis ce
+ * qui a plu aux clients ravis et ce qui a manqué (clients déçus, groupes pas entrés ou repartis),
+ * les plus nombreux d'abord, quatre lignes au plus par bloc.
+ */
+export function eveningNotes(
+  cc: ClienteleContent,
+  s: ClienteleState,
+): Pick<EveningView, 'regulars' | 'liked' | 'missed'> {
+  const E = T.evening;
+  const byRegular = new Map<string, [number, string[]][]>();
+  for (const [id, minute, items] of s.today.visits) {
+    const list = byRegular.get(id) ?? [];
+    list.push([minute, items]);
+    byRegular.set(id, list);
+  }
+  const regulars: string[] = [];
+  for (const [id, list] of byRegular) {
+    const name = cc.regularById.get(id)?.name ?? id;
+    const [first, ...again] = list;
+    if (first === undefined) continue;
+    const items = first[1].map((x) => cc.recipes.get(x)?.name.toLowerCase() ?? x).join(', ');
+    const vars = {
+      name,
+      time: clockText(first[0]),
+      items: items === '' ? 'sa commande' : items,
+      times: again.map(([m]) => clockText(m)).join(', '),
+    };
+    regulars.push(
+      (again.length > 0 ? E.visitAgain : E.visit).replace(
+        /\{(\w+)\}/g,
+        (m, k: string) => (vars as Record<string, string>)[k] ?? m,
+      ),
+    );
+  }
+  const sorted = (counts: Readonly<Record<string, number>>): [string, number][] =>
+    Object.entries(counts)
+      .filter(([, n]) => n > 0)
+      .sort((a, b) => b[1] - a[1]);
+  const liked: string[] = [];
+  for (const [key, n] of sorted(s.today.liked)) {
+    const forms = E.likedLines[key];
+    if (forms !== undefined && liked.length < 4) liked.push(counted(forms, n));
+  }
+  const missed: { text: string; link: string | null }[] = [];
+  for (const [key, n] of sorted(s.today.missed)) {
+    const forms = E.missedLines[key];
+    if (forms !== undefined && missed.length < 4)
+      missed.push({ text: counted(forms, n), link: key === 'noSeat' ? E.seatsLink : null });
+  }
+  return { regulars, liked, missed };
+}
+
 function eveningView(content: Content, world: World, player: PlayerIndex): EveningView | null {
   const s = world.clientele;
   const cc = content.clientele;
@@ -452,9 +516,7 @@ function eveningView(content: Content, world: World, player: PlayerIndex): Eveni
       subject: '',
       tone: w.good ? 'liked' : 'missed',
     })),
-    regulars: [],
-    liked: [],
-    missed: [],
+    ...eveningNotes(cc, s),
     figures: {
       served: r.served,
       previousServed:

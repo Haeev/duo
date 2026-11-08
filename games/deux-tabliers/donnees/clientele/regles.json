@@ -2,7 +2,13 @@
   "slateLines": 8,
   "presentMax": 24,
   "standingAtCounter": 3,
-  "queuePlaces": 6,
+  "queuePlaces": 5,
+  "queue": {
+    "spacing": 0.6,
+    "stepAsideSeconds": 20,
+    "asideReturnSeconds": 30,
+    "asideLine": "Servez donc les suivants, je patiente au zinc."
+  },
   "estimatedSecondsPerGroup": 25,
   "softClosingGameMinutes": 15,
   "servedAfterSoftCloseGameMinutes": 5,
@@ -78,7 +84,8 @@
     "disappointed": 45,
     "disappointedChance": 0.1,
     "regularChance": 0.35,
-    "kept": 24
+    "kept": 24,
+    "reportMissedBelow": 60
   },
   "seatFallbacks": {
     "counter": ["counter", "table", "comfort", "terrace"],
@@ -129,6 +136,17 @@
     "blockedZones": ["work", "private", "extension"],
     "terraceZoneLabel": "E1"
   },
+  "looks": [
+    { "model": "char_client_pressee", "profiles": ["presses", "connaisseurs"] },
+    { "model": "char_client_voisine", "profiles": ["voisins", "familles", "flaneurs"] },
+    { "model": "char_client_flaneur", "profiles": ["flaneurs", "promeneurs", "voisins"] },
+    { "model": "char_client_gourmand", "profiles": ["gourmands", "familles", "brunch"] },
+    { "model": "char_client_etudiante", "profiles": ["etudiants", "promeneurs", "teletravail"] },
+    { "model": "char_client_teletravail", "profiles": ["teletravail", "presses", "etudiants"] },
+    { "model": "char_client_brunch", "profiles": ["brunch", "gourmands", "flaneurs"] },
+    { "model": "char_client_connaisseur", "profiles": ["connaisseurs", "voisins", "presses"] }
+  ],
+  "lookWindow": 3,
   "standingSpots": [
     [8.75, 10.0],
     [9.25, 10.0],

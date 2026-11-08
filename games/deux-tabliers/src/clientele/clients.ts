@@ -11,7 +11,7 @@ import type { ClienteleContent, Profile, Recipe } from './donnees';
 import { addPoints, consume, inStock, linePrice, type Ctx } from './economie';
 import type { Group, PlaceKind, Quality } from './etat';
 import { onRegularServed, regularOrder } from './habitues';
-import { findPath, navGrid, planPoint, queueSpot, seatList, type Seat } from './places';
+import { findPath, groupRows, navGrid, planPoint, queueSpot, seatList, type Seat } from './places';
 import { sceneHooks } from './scenes';
 
 // ---------------------------------------------------------------------------------------------
@@ -30,6 +30,13 @@ export interface Walker {
 
 interface Runtime {
   readonly walkers: Map<number, Walker>;
+  /**
+   * Groupes pas encore servis qui ont laissé passer les suivants (à l'écart, au zinc): secondes de
+   * service au moment où ils se sont écartés. Hors du monde: après une reprise, ils refont la file.
+   */
+  readonly aside: Map<number, number>;
+  /** Allures des dernières personnes entrées (la plus récente à la fin). */
+  readonly recentLooks: string[];
 }
 
 const runtimes = new WeakMap<World, Runtime>();
@@ -37,7 +44,7 @@ const runtimes = new WeakMap<World, Runtime>();
 export function runtimeOf(world: World): Runtime {
   let r = runtimes.get(world);
   if (r === undefined) {
-    r = { walkers: new Map() };
+    r = { walkers: new Map(), aside: new Map(), recentLooks: [] };
     runtimes.set(world, r);
   }
   return r;
@@ -58,7 +65,11 @@ function walkerOf(ctx: Ctx, g: Group): Walker {
   if (w === undefined) {
     // Reprise d'une sauvegarde: le marcheur repart d'un point logique de son étape.
     const seat = g.stage === 'seated' ? placePoint(ctx, g) : null;
-    const start = seat ?? (g.stage === 'entering' ? entrance(ctx) : queueSpot(ctx.sim.content, 0));
+    const start =
+      seat ??
+      (g.stage === 'entering'
+        ? entrance(ctx)
+        : queueSpot(ctx.sim.content, 0, ctx.cc.rules.queue.spacing));
     w = { x: start.x, z: start.z, yawDeg: 0, path: [], key: '', moving: false };
     rt.walkers.set(g.id, w);
   }
@@ -174,6 +185,45 @@ export interface SpawnOptions {
   readonly flatRate?: boolean;
 }
 
+/** Allures possibles d'un profil (`looks` de `regles.json`), dans l'ordre du fichier. */
+export function looksOf(cc: ClienteleContent, profile: string): string[] {
+  return cc.rules.looks.filter((l) => l.profiles.includes(profile)).map((l) => l.model);
+}
+
+/**
+ * Allure d'un client de passage: une de celles de son profil, absente des `lookWindow` dernières
+ * entrées (sinon la moins récente). Sans tirage au sort, pour ne pas décaler l'aléa de la journée.
+ */
+function chooseLook(ctx: Ctx, o: SpawnOptions, id: number): string {
+  if ((o.regular ?? null) !== null || (o.role ?? null) !== null) return '';
+  const candidates = looksOf(ctx.cc, o.profile);
+  if (candidates.length === 0) return '';
+  const recent = runtimeOf(ctx.sim.world).recentLooks;
+  let best = '';
+  let bestAge = -1;
+  for (let i = 0; i < candidates.length; i++) {
+    const look = candidates[(id + i) % candidates.length] ?? '';
+    const at = recent.lastIndexOf(look);
+    const age = at < 0 ? Infinity : recent.length - at;
+    if (age > bestAge) {
+      best = look;
+      bestAge = age;
+    }
+    if (age > ctx.cc.rules.lookWindow) break;
+  }
+  for (let k = 0; k < o.size; k++) recent.push(memberLook(ctx.cc, o.profile, best, k));
+  if (recent.length > 16) recent.splice(0, recent.length - 16);
+  return best;
+}
+
+/** Allure du membre `k` d'un groupe: le premier a celle du groupe, les autres les suivantes. */
+export function memberLook(cc: ClienteleContent, profile: string, look: string, k: number): string {
+  if (k === 0 || look === '') return look;
+  const candidates = looksOf(cc, profile);
+  const i = candidates.indexOf(look);
+  return i < 0 ? look : (candidates[(i + k) % candidates.length] ?? look);
+}
+
 /** Un groupe entre (file d'attente); rend son identifiant. */
 export function spawnGroup(ctx: Ctx, o: SpawnOptions): Group {
   const g: Group = {
@@ -203,6 +253,7 @@ export function spawnGroup(ctx: Ctx, o: SpawnOptions): Group {
     chat: false,
     asUsual: false,
     dirtySeat: false,
+    look: chooseLook(ctx, o, ctx.s.nextGroupId),
   };
   ctx.s.groups.push(g);
   const w = walkerOf(ctx, g);
@@ -214,16 +265,22 @@ export function spawnGroup(ctx: Ctx, o: SpawnOptions): Group {
 }
 
 /** Règles CL-02 et CL-03: on n'entre pas devant une attente trop longue ni dans un café plein. */
-function refuses(ctx: Ctx, p: Profile, size: number): 'wait' | 'full' | null {
+function refuses(ctx: Ctx, p: Profile, size: number): 'wait' | 'full' | 'queue' | null {
   const r = ctx.cc.rules;
   const waiting = ctx.s.groups.filter((g) => g.open > 0 && g.servedAt === null).length;
   const visible = queueGroups(ctx).length + waiting;
   const estimated = (visible * r.estimatedSecondsPerGroup) / 2;
   const full = presentPeople(ctx) + size > r.presentMax - 2;
   const inQueue = queueGroups(ctx).reduce((sum, g) => sum + g.size, 0);
-  if (full || inQueue + size > r.queuePlaces) return 'full';
+  if (full) return 'full';
+  if (inQueue + size > r.queuePlaces) return 'queue';
   if (estimated > p.patienceSeconds) return 'wait';
   return null;
+}
+
+/** Une raison de plus au bilan du soir (« Ce qui a plu », « Ce qui a manqué »). */
+function countReason(into: Record<string, number>, key: string): void {
+  into[key] = (into[key] ?? 0) + 1;
 }
 
 function arrive(ctx: Ctx, profileId: string, size: number, takeAway: boolean): void {
@@ -234,7 +291,8 @@ function arrive(ctx: Ctx, profileId: string, size: number, takeAway: boolean): v
   const why = refuses(ctx, p, size);
   if (why !== null) {
     ctx.s.today.left++;
-    ctx.sim.emit({ type: 'clientele-passed-by', profile: profileId, full: why === 'full' });
+    countReason(ctx.s.today.missed, why === 'wait' ? 'queueLong' : why);
+    ctx.sim.emit({ type: 'clientele-passed-by', profile: profileId, full: why !== 'wait' });
     return;
   }
   spawnGroup(ctx, { profile: profileId, size, items, takeAway });
@@ -505,6 +563,35 @@ export function satisfaction(ctx: Ctx, g: Group): number {
 
 const SIGNS = 'ABCDEFGHIJLMNOPRSTV';
 
+/** Ce qui a plu au groupe, dans l'ordre du livre d'or (`ambiance` en dernier, toujours là). */
+function likedReasons(ctx: Ctx, g: Group): string[] {
+  const p = profileOf(ctx, g);
+  const reasons: string[] = [];
+  if (g.latteArt) reasons.push('latteArt');
+  if (g.asUsual) reasons.push('asUsual');
+  if (g.chat) reasons.push('chat');
+  if (g.qualities.filter((q) => q === 'perfect').length * 2 > g.qualities.length)
+    reasons.push('quality');
+  if (g.place === 'terrace') reasons.push('terrace');
+  if (g.homemade) reasons.push('homemade');
+  if (p.id === 'familles' && ctx.s.equipment.includes('coin_enfants')) reasons.push('kids');
+  if (p.id === 'promeneurs' && ctx.s.equipment.includes('range_velos')) reasons.push('bikes');
+  if (priceIndex(ctx.cc, p, ctx.s.slate) < 0.95) reasons.push('price');
+  reasons.push('ambiance');
+  return reasons;
+}
+
+/** Ce qui a manqué au groupe, la raison principale (`null`: rien de précis). */
+function missedReason(ctx: Ctx, g: Group): string | null {
+  const p = profileOf(ctx, g);
+  const wait = (g.servedAt ?? 0) - g.arrivedAt;
+  if (wait > p.waitWithoutPenaltySeconds + 20) return 'wait';
+  if (g.place === 'none' && !g.takeAway) return 'noSeat';
+  if (g.dirtySeat) return 'dirtyTable';
+  if (priceIndex(ctx.cc, p, ctx.s.slate) > 1.1) return 'price';
+  return null;
+}
+
 function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
   const r = ctx.cc.rules.guestbook;
   const texts = ctx.cc.texts.guestbook;
@@ -522,31 +609,11 @@ function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
   }
   if (text === null) {
     if (sat >= r.delighted && random.chance(r.delightedChance)) {
-      const p = profileOf(ctx, g);
-      const reasons: string[] = [];
-      if (g.latteArt) reasons.push('latteArt');
-      if (g.asUsual) reasons.push('asUsual');
-      if (g.chat) reasons.push('chat');
-      if (g.qualities.filter((q) => q === 'perfect').length * 2 > g.qualities.length)
-        reasons.push('quality');
-      if (g.place === 'terrace') reasons.push('terrace');
-      if (g.homemade) reasons.push('homemade');
-      if (p.id === 'familles' && ctx.s.equipment.includes('coin_enfants')) reasons.push('kids');
-      if (p.id === 'promeneurs' && ctx.s.equipment.includes('range_velos')) reasons.push('bikes');
-      if (priceIndex(ctx.cc, p, ctx.s.slate) < 0.95) reasons.push('price');
-      reasons.push('ambiance');
-      const lines = texts.positive[reasons[0] ?? 'ambiance'];
+      const lines = texts.positive[likedReasons(ctx, g)[0] ?? 'ambiance'];
       if (lines !== undefined && lines.length > 0) text = random.pick(lines);
       good = true;
     } else if (sat <= r.disappointed && random.chance(r.disappointedChance)) {
-      const p = profileOf(ctx, g);
-      const wait = (g.servedAt ?? 0) - g.arrivedAt;
-      let reason = 'empty';
-      if (wait > p.waitWithoutPenaltySeconds + 20) reason = 'wait';
-      else if (g.place === 'none' && !g.takeAway) reason = 'noSeat';
-      else if (g.dirtySeat) reason = 'dirtyTable';
-      else if (priceIndex(ctx.cc, p, ctx.s.slate) > 1.1) reason = 'price';
-      const lines = texts.negative[reason];
+      const lines = texts.negative[missedReason(ctx, g) ?? 'empty'];
       if (lines !== undefined && lines.length > 0) text = random.pick(lines);
       good = false;
     }
@@ -587,6 +654,12 @@ function depart(ctx: Ctx, g: Group): void {
   const beyond = ctx.s.openDays + 1 - after;
   if (beyond > 0) pts *= Math.min(max, 1 + perDay * beyond);
   addPoints(ctx, pts);
+  // Bilan du soir: ce qui a plu à un client content, ce qui a manqué à un client déçu.
+  const k = ctx.cc.rules.guestbook;
+  if (sat >= k.delighted)
+    for (const why of likedReasons(ctx, g)) countReason(ctx.s.today.liked, why);
+  const missed = sat <= k.reportMissedBelow ? missedReason(ctx, g) : null;
+  if (missed !== null) countReason(ctx.s.today.missed, missed);
   guestbookWord(ctx, g, sat);
   if (!g.takeAway && g.place !== 'outside') {
     const pieces = g.items.reduce((sum, id) => sum + (ctx.cc.recipes.get(id)?.dishes ?? 1), 0);
@@ -628,6 +701,95 @@ export function sendHome(ctx: Ctx, g: Group): void {
 // ---------------------------------------------------------------------------------------------
 // Pas
 
+/** File en marche: groupes pas encore servis, sauf ceux qui se sont écartés, dans l'ordre. */
+function queueLine(ctx: Ctx): Group[] {
+  const aside = runtimeOf(ctx.sim.world).aside;
+  const queued = queueGroups(ctx);
+  for (const id of aside.keys()) if (!queued.some((g) => g.id === id)) aside.delete(id);
+  return queued.filter((g) => !aside.has(g.id));
+}
+
+/** Un joueur tient la caisse (prise de commande en cours): on ne change pas de client. */
+function registerHeld(ctx: Ctx): boolean {
+  const { world, content } = ctx.sim;
+  return world.players.some((pl) => {
+    const use = pl.use;
+    if (use === null) return false;
+    const f = world.furniture.find((x) => x.id === use.furniture);
+    return f !== undefined && content.furniture.get(f.type)?.station === 'caisse';
+  });
+}
+
+/** Où attend un groupe écarté: une place libre au zinc, sinon au bout des places du passe. */
+function asideSpot(ctx: Ctx, g: Group): Vec2 {
+  const r = ctx.cc.rules;
+  const taken = occupied(ctx);
+  const i = [...runtimeOf(ctx.sim.world).aside.keys()].indexOf(g.id);
+  const free = r.standingSpots.filter((_, k) => !taken.has(`standing-${String(k)}`));
+  const n = r.waitingSpots.length;
+  const at = free[i] ?? (n > 0 ? r.waitingSpots[(n - 1 - (i % n) + n) % n] : undefined);
+  return at === undefined ? queueSpot(ctx.sim.content, 0, r.queue.spacing) : { x: at[0], z: at[1] };
+}
+
+/**
+ * File à la caisse (CL-05): chacun à son rang, le premier à la caisse. Personne ne bloque la file:
+ * un client pas servi au bout de `queue.stepAsideSeconds` à la caisse, avec du monde derrière lui,
+ * s'écarte au zinc (un habitué y attend sans perdre patience, les autres gardent la leur); il
+ * revient juste derrière le client en tête après `queue.asideReturnSeconds`, ou dès que la file
+ * est vide. Jamais pendant qu'un joueur tient la caisse.
+ */
+function stepQueued(ctx: Ctx, g: Group, p: Profile, line: readonly Group[]): void {
+  const { s, cc } = ctx;
+  const now = s.serviceSec;
+  const rules = cc.rules.queue;
+  const rt = runtimeOf(ctx.sim.world);
+  const asideSince = rt.aside.get(g.id);
+  if (asideSince !== undefined) {
+    const head = line[0];
+    g.stage = 'queue';
+    if (head === undefined || now - asideSince >= rules.asideReturnSeconds) {
+      rt.aside.delete(g.id);
+      // Retour juste derrière la tête: l'ordre du tableau des groupes fait l'ordre de la file.
+      s.groups.splice(s.groups.indexOf(g), 1);
+      const at = head === undefined ? s.groups.length : s.groups.indexOf(head) + 1;
+      s.groups.splice(at, 0, g);
+      g.since = now;
+    } else goTo(ctx, g, asideSpot(ctx, g), `a${String(g.id)}`);
+  } else {
+    const k = line.indexOf(g);
+    let row = 0;
+    for (let i = 0; i < k; i++) row += groupRows(line[i]?.size ?? 1);
+    const w = goTo(ctx, g, queueSpot(ctx.sim.content, row, rules.spacing), `q${String(row)}`);
+    if (arrived(w)) {
+      if (k === 0 && g.stage !== 'register') {
+        g.stage = 'register';
+        g.since = now;
+        sceneHooks.onRegister?.(ctx, g);
+      } else if (k > 0) g.stage = 'queue';
+    }
+    if (
+      k === 0 &&
+      g.stage === 'register' &&
+      line.length > 1 &&
+      now - g.since >= rules.stepAsideSeconds &&
+      !registerHeld(ctx)
+    ) {
+      rt.aside.set(g.id, now);
+      g.stage = 'queue';
+      g.since = now;
+      const r = g.regular === null ? undefined : cc.regularById.get(g.regular);
+      if (r !== undefined)
+        ctx.sim.emit({ type: 'clientele-say', who: r.name, text: rules.asideLine, player: null });
+    }
+  }
+  // Patience (CL-05): les habitués et les invités d'une scène attendent toujours.
+  if (g.regular === null && g.role === null && now - g.arrivedAt > p.patienceSeconds) {
+    rt.aside.delete(g.id);
+    countReason(s.today.missed, 'patience');
+    abandon(ctx, g);
+  }
+}
+
 export function stepCustomers(ctx: Ctx, arrivalsOpen: boolean): void {
   const { s, cc } = ctx;
   const now = s.serviceSec;
@@ -637,26 +799,14 @@ export function stepCustomers(ctx: Ctx, arrivalsOpen: boolean): void {
       if (a !== undefined) arrive(ctx, a[1], a[2], a[3]);
     }
   }
-  const queue = queueGroups(ctx);
+  const line = queueLine(ctx);
   for (const g of [...s.groups]) {
     const p = profileOf(ctx, g);
     switch (g.stage) {
       case 'entering':
       case 'queue':
       case 'register': {
-        const k = queue.indexOf(g);
-        const spot = queueSpot(ctx.sim.content, Math.max(0, k));
-        const w = goTo(ctx, g, spot, `q${String(k)}`);
-        if (arrived(w)) {
-          if (k === 0 && g.stage !== 'register') {
-            g.stage = 'register';
-            g.since = now;
-            sceneHooks.onRegister?.(ctx, g);
-          } else if (k > 0) g.stage = 'queue';
-        }
-        // Patience (CL-05): les habitués et les invités d'une scène attendent toujours.
-        if (g.regular === null && g.role === null && now - g.arrivedAt > p.patienceSeconds)
-          abandon(ctx, g);
+        stepQueued(ctx, g, p, line);
         break;
       }
       case 'waiting': {

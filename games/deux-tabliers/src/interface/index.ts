@@ -32,7 +32,7 @@ import { eveningLayer } from './bilan';
 import { slateLayer } from './ardoise';
 import { createLayers, type Layers } from './calques';
 import type { Person, TabletSection, UiContext } from './contexte';
-import { answersLayer, createDialogueOverlay } from './dialogue';
+import { answersLayer, createDialogueOverlay, dialogueReadMs } from './dialogue';
 import { demoEndLayer, firstTimeLayer, morningLayer, nightLayer, proposalLayer } from './ecrans';
 import { createHud, type Hud, type HudState } from './hud';
 import type { AlertView, InterfaceModel } from './modele';
@@ -268,6 +268,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   });
   applySettings();
   let lastBearing: number | null = null;
+  /** Réplique simple affichée et depuis quand (elle passe seule une fois lue). */
+  let shown: { id: string; at: number } | null = null;
 
   return {
     hud,
@@ -275,9 +277,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     layers,
     step(keys) {
       if (layers.any()) return { swallowAct: true, swallowConfirm: true };
-      let swallowAct = false;
+      const swallowAct = false;
       let swallowConfirm = false;
       if (keys.tablet) ctx.openTablet();
+      // E (et Espace, et le clic) agit toujours dans le café: une réplique avance par Entrée, ou
+      // seule après le temps de la lire (`dialogueReadMs`).
+      const d = model.dialogue;
       if (keys.confirm) {
         const scene = model.scene;
         const received = model.proposals.find((p) => p.from !== model.local);
@@ -286,6 +291,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
           swallowConfirm = true;
         } else if (received !== undefined) {
           ctx.openProposal(received.id);
+          swallowConfirm = true;
+        } else if (keys.locked && d !== null && d.answers.length === 0) {
+          options.send({ type: 'dialogue-next', id: d.id });
+          read(performance.now(), lastBearing, true);
           swallowConfirm = true;
         } else if (
           keys.locked &&
@@ -297,16 +306,19 @@ export function createInterface(options: InterfaceOptions): GameInterface {
           swallowConfirm = true;
         }
       }
-      const d = model.dialogue;
-      if (keys.act && keys.locked && d !== null && d.answers.length === 0) {
-        options.send({ type: 'dialogue-next', id: d.id });
-        swallowAct = true;
-      }
       return { swallowAct, swallowConfirm };
     },
     frame(now, centre, bearing) {
       lastBearing = bearing;
       read(now, bearing, false);
+      const d = model.dialogue;
+      if (d === null || d.answers.length > 0) shown = null;
+      else if (shown?.id !== d.id) shown = { id: d.id, at: now };
+      else if (now - shown.at >= dialogueReadMs(d.text)) {
+        options.send({ type: 'dialogue-next', id: d.id });
+        shown = null;
+        read(now, bearing, true);
+      }
       hud.update(centre);
       if (settings.get().showFps) {
         if (fpsSince < 0) fpsSince = now;

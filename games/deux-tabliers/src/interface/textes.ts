@@ -325,6 +325,61 @@ export const T = {
     goodNight: 'À demain',
     footer: 'Le café est fermé : rien ne presse.',
     nothing: 'Rien à noter ce soir.',
+    /** « Nos habitués »: un passage servi (heure de jeu, commande). */
+    visit: 'Visite de {name} à {time} : {items}.',
+    visitAgain: 'Visite de {name} à {time} : {items}, et de nouveau à {times}.',
+    /** « Ce qui a plu », d'après les clients ravis: une forme au singulier, une au pluriel. */
+    likedLines: {
+      quality: [
+        '1 client a trouvé sa tasse parfaite.',
+        '{n} clients ont trouvé leur tasse parfaite.',
+      ],
+      latteArt: [
+        '1 client a aimé le dessin sur la mousse.',
+        '{n} clients ont aimé le dessin sur la mousse.',
+      ],
+      asUsual: [
+        '1 habitué a eu sa commande sans la demander.',
+        '{n} habitués ont eu leur commande sans la demander.',
+      ],
+      chat: ['1 client a aimé vos quelques mots.', '{n} clients ont aimé vos quelques mots.'],
+      terrace: ['1 client a profité de la terrasse.', '{n} clients ont profité de la terrasse.'],
+      homemade: ['1 client a goûté au fait maison.', '{n} clients ont goûté au fait maison.'],
+      kids: ['1 famille a aimé le coin des enfants.', '{n} familles ont aimé le coin des enfants.'],
+      bikes: ['1 promeneur a aimé le range-vélos.', '{n} promeneurs ont aimé le range-vélos.'],
+      price: ['1 client a trouvé vos prix doux.', '{n} clients ont trouvé vos prix doux.'],
+      ambiance: ['La salle a plu à 1 client ravi.', 'La salle a plu à {n} clients ravis.'],
+    } as Readonly<Record<string, readonly [string, string]>>,
+    /** « Ce qui a manqué », d'après les clients déçus et ceux qui ne sont pas restés. */
+    missedLines: {
+      wait: ['1 client a trouvé l’attente longue.', '{n} clients ont trouvé l’attente longue.'],
+      noSeat: [
+        '1 client n’a pas trouvé de place assise.',
+        '{n} clients n’ont pas trouvé de place assise.',
+      ],
+      dirtyTable: [
+        '1 table n’était pas débarrassée à l’arrivée des suivants.',
+        '{n} tables n’étaient pas débarrassées à l’arrivée des suivants.',
+      ],
+      price: ['1 client a trouvé l’ardoise chère.', '{n} clients ont trouvé l’ardoise chère.'],
+      full: [
+        '1 groupe n’est pas entré : le café était plein.',
+        '{n} groupes ne sont pas entrés : le café était plein.',
+      ],
+      queue: [
+        '1 groupe n’est pas entré : la file allait jusqu’à la porte.',
+        '{n} groupes ne sont pas entrés : la file allait jusqu’à la porte.',
+      ],
+      queueLong: [
+        '1 groupe a renoncé en voyant l’attente.',
+        '{n} groupes ont renoncé en voyant l’attente.',
+      ],
+      patience: [
+        '1 client est reparti de la file sans être servi.',
+        '{n} clients sont repartis de la file sans être servis.',
+      ],
+    } as Readonly<Record<string, readonly [string, string]>>,
+    seatsLink: 'Voir des tables dans le catalogue',
   },
   night: {
     title: 'Fin de la journée',

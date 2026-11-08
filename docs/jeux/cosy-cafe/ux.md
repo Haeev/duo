@@ -603,7 +603,7 @@ Interface posée, **Tab** l'ouvre partout (comme le carnet de La Petite Ligne) e
 
 ### 4.8 Parler à un habitué
 
-- E ou clic sur une personne: sa réplique s'affiche en bas au centre au-dessus des mains (bulle, texte à la taille de l'interface), deux ou trois réponses possibles au plus. Flèches haut et bas et Entrée pour choisir, E ou clic pour la suite, Retour arrière « Au revoir ». Le pointeur reste verrouillé pendant une réplique simple; il se libère seulement pour choisir une réponse.
+- E ou clic sur une personne: sa réplique s'affiche en bas au centre au-dessus des mains (bulle, texte à la taille de l'interface), deux ou trois réponses possibles au plus. Flèches haut et bas et Entrée pour choisir, Entrée pour la suite (la réplique simple passe aussi seule une fois lue, 4 s plus 60 ms par signe), Retour arrière « Au revoir ». E, Espace et le clic agissent toujours dans le café, même pendant une réplique (demande du client, 2026-11-08). Le pointeur reste verrouillé pendant une réplique simple; il se libère seulement pour choisir une réponse.
 - Le service ne s'arrête pas (une conversation courte); les scènes plus longues (arrivée de Simone, fête) se jouent café fermé.
 - L'autre voit la conversation dans le monde (ta tête tournée vers l'habitué); il peut s'approcher et l'entendre (bulles visibles des deux).
 
