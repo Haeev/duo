@@ -85,8 +85,40 @@ export const GroupSchema = v.strictObject({
    * répéter les dernières; vide pour un habitué, un invité de scène ou une ancienne sauvegarde.
    */
   look: v.optional(Str, ''),
+  /**
+   * Remises v0.2: part du prix affiché remisée sur la commande (0 à 1, café offert à part), pour
+   * la satisfaction; lignes du ticket (`happyHour`, `dailyOffer`, `profile:<tarif>` et le montant
+   * en centimes, `freeCoffee` et le montant, `stamps` et le nombre de tampons, `stamped`).
+   */
+  off: v.optional(N, 0),
+  receipt: v.optional(v.array(v.tuple([Str, Int])), () => []),
 });
 export type Group = v.InferOutput<typeof GroupSchema>;
+
+/** Réglage des remises (onglet « Remises »): pris à l'ouverture suivante. */
+export const DiscountSettingsSchema = v.strictObject({
+  happyHour: v.strictObject({
+    on: v.boolean(),
+    start: Nat,
+    length: Nat,
+    rate: N,
+    days: v.array(Str),
+  }),
+  loyalty: v.boolean(),
+  profiles: v.record(Str, v.strictObject({ on: v.boolean(), rate: N, days: v.array(Str) })),
+  /** Recette et taux de l'offre du jour, `null` sans offre (elle s'efface chaque jour). */
+  dailyOffer: v.nullable(v.tuple([Str, N])),
+});
+export type DiscountSettings = v.InferOutput<typeof DiscountSettingsSchema>;
+
+/** Action de marketing lancée: soir du lancement, premier jour d'effet, facteur (lassitude). */
+export const CampaignSchema = v.strictObject({
+  id: Str,
+  launchedDay: Nat,
+  firstDay: Nat,
+  factor: N,
+});
+export type Campaign = v.InferOutput<typeof CampaignSchema>;
 
 export const GuestbookEntrySchema = v.strictObject({
   day: Nat,
@@ -125,6 +157,20 @@ const DayStats = v.strictObject({
   lost: v.optional(Nat, 0),
   lostItems: v.optional(v.array(Str), () => []),
   basketValue: v.optional(Nat, 0),
+  /**
+   * Remises et marketing v0.2 (0 et vides pour relire les sauvegardes v0.2): écart entre prix
+   * affiché et prix payé (centimes), par sorte de remise, commandes remisées; publicité payée
+   * aujourd'hui; clients venus grâce à chaque action (fractionnaire) et au bouche-à-oreille;
+   * mots du livre d'or déjà écrits pour une action ou une remise; portions vendues par recette.
+   */
+  discounts: v.optional(Nat, 0),
+  discountBy: v.optional(v.record(Str, Nat), () => ({})),
+  discountOrders: v.optional(Nat, 0),
+  marketing: v.optional(Nat, 0),
+  fromCampaigns: v.optional(v.record(Str, N), () => ({})),
+  fromWord: v.optional(N, 0),
+  campaignWords: v.optional(v.array(Str), () => []),
+  sold: v.optional(v.record(Str, Nat), () => ({})),
 });
 export type DayStatsState = v.InferOutput<typeof DayStats>;
 
@@ -147,7 +193,18 @@ export const ReportSchema = v.strictObject({
   lost: v.optional(Nat, 0),
   lostItems: v.optional(v.array(Str), () => []),
   basketValue: v.optional(Nat, 0),
-  /** Recette + pourboires + événement - marchandise - port - dépannages - loyer - charges. */
+  /** Remises consenties (pour mémoire: la recette en est déjà nette), voir `DayStats`. */
+  discounts: v.optional(Nat, 0),
+  discountBy: v.optional(v.record(Str, Nat), () => ({})),
+  discountOrders: v.optional(Nat, 0),
+  /** Publicité payée ce jour-là (soir du lancement compris): une ligne du résultat. */
+  marketing: v.optional(Nat, 0),
+  fromCampaigns: v.optional(v.record(Str, N), () => ({})),
+  fromWord: v.optional(N, 0),
+  /**
+   * Recette + pourboires + événement - marchandise - port - dépannages - loyer - charges -
+   * publicité.
+   */
   result: Int,
   served: Nat,
   left: Nat,
@@ -266,6 +323,18 @@ export const ClienteleStateSchema = v.strictObject({
   conditions: v.array(Str),
   /** Ambiance du jour: valeur (0 à 95), style dominant, cohérence (0 à 1). */
   ambiance: v.tuple([N, Str, N]),
+  /**
+   * Remises v0.2: réglage de l'onglet (`null`: jamais touché, les valeurs par défaut de
+   * `remises.json`), copie prise à l'ouverture (`null` hors service), tampons des habitués, jours
+   * ouverts avec la carte de fidélité, portions vendues des trois derniers jours.
+   */
+  discounts: v.optional(v.nullable(DiscountSettingsSchema), null),
+  activeDiscounts: v.optional(v.nullable(DiscountSettingsSchema), null),
+  stamps: v.optional(v.record(Str, Nat), () => ({})),
+  loyaltyDays: v.optional(Nat, 0),
+  soldHistory: v.optional(v.array(v.record(Str, Nat)), () => []),
+  /** Actions de marketing lancées (marketing v0.2), les plus anciennes d'abord. */
+  campaigns: v.optional(v.array(CampaignSchema), () => []),
   /** Où est chaque joueur dans l'interface (« Sur la tablette : catalogue »), `null`: en jeu. */
   uiPlaces: v.optional(v.tuple([v.nullable(Str), v.nullable(Str)]), () => [null, null]),
   /** Page du bilan que lit chaque joueur: jour du bilan, page (à partir de 1). */
@@ -315,6 +384,14 @@ export function emptyDayStats(): DayStatsState {
     lost: 0,
     lostItems: [],
     basketValue: 0,
+    discounts: 0,
+    discountBy: {},
+    discountOrders: 0,
+    marketing: 0,
+    fromCampaigns: {},
+    fromWord: 0,
+    campaignWords: [],
+    sold: {},
   };
 }
 
@@ -378,6 +455,12 @@ export function createClienteleState(): ClienteleState {
     servedTotal: 0,
     conditions: [],
     ambiance: [0, 'campagne', 0],
+    discounts: null,
+    activeDiscounts: null,
+    stamps: {},
+    loyaltyDays: 0,
+    soldHistory: [],
+    campaigns: [],
     uiPlaces: [null, null],
     eveningPages: [
       [0, 1],

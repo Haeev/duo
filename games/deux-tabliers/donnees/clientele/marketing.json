@@ -1,0 +1,216 @@
+{
+  "maxBoost": 0.35,
+  "repeatFactor": 0.6,
+  "repeatCooldownDays": 7,
+  "guestbookChance": 0.25,
+  "guestbookMinSatisfaction": 70,
+  "bigProposalEuros": 30,
+  "actions": [
+    {
+      "id": "affiche_boulangerie",
+      "tier": "P0",
+      "cost": 8,
+      "delayDays": 1,
+      "durationDays": 7,
+      "peak": 0.08,
+      "halfLifeDays": 5,
+      "profiles": {
+        "voisins": 1,
+        "presses": 1,
+        "flaneurs": 0.5,
+        "familles": 0.5
+      },
+      "name": "Une affiche chez Lucas, le boulanger",
+      "blurb": "Les gens du village la voient en prenant leur pain.",
+      "guestbook": [
+        "J'ai vu votre affiche chez Lucas en prenant ma baguette. Bonne idée !",
+        "L'affiche disait vrai : le crème est bon."
+      ]
+    },
+    {
+      "id": "affiche_mairie",
+      "tier": "P0",
+      "cost": 8,
+      "delayDays": 1,
+      "durationDays": 10,
+      "peak": 0.07,
+      "halfLifeDays": 6,
+      "profiles": {
+        "familles": 1,
+        "voisins": 0.6,
+        "promeneurs": 0.6
+      },
+      "name": "Une affiche au panneau de la mairie-école",
+      "blurb": "Les parents à la sortie de l'école, les randonneurs qui cherchent un sentier.",
+      "guestbook": [
+        "Vu l'affiche à la sortie de l'école. Les enfants ont adoré le chocolat.",
+        "Le panneau de la mairie m'a donné l'idée, je reviendrai."
+      ]
+    },
+    {
+      "id": "prospectus_marche",
+      "tier": "P0",
+      "cost": 20,
+      "delayDays": 1,
+      "launchWeekdays": ["fri"],
+      "durationDays": 4,
+      "peak": 0.2,
+      "halfLifeDays": 1.5,
+      "profiles": {
+        "flaneurs": 1,
+        "familles": 1,
+        "promeneurs": 0.8,
+        "gourmands": 0.6
+      },
+      "name": "Des prospectus au marché du samedi",
+      "blurb": "Mireille les glisse dans les cabas. Fort, mais bref.",
+      "guestbook": [
+        "Le prospectus était dans mon cabas, entre les poireaux.",
+        "Merci Mireille pour le prospectus, et merci à vous pour la tarte."
+      ]
+    },
+    {
+      "id": "encart_echo",
+      "tier": "P0",
+      "cost": 45,
+      "publishWeekday": "thu",
+      "deadlineWeekday": "tue",
+      "durationDays": 10,
+      "peak": 0.14,
+      "halfLifeDays": 4,
+      "profiles": {
+        "flaneurs": 1,
+        "gourmands": 1,
+        "promeneurs": 1,
+        "connaisseurs": 1,
+        "familles": 0.8,
+        "voisins": 0.5,
+        "teletravail": 0.5
+      },
+      "name": "Un encart dans L'Écho de l'Arvelle",
+      "blurb": "Toute la vallée le lit le jeudi.",
+      "guestbook": [
+        "Vu dans L'Écho ! Et le crème est à la hauteur.",
+        "On a traversé la vallée, grâce à L'Écho."
+      ]
+    },
+    {
+      "id": "ardoise_trottoir",
+      "tier": "P1",
+      "cost": 0,
+      "requires": "ardoise_trottoir",
+      "delayDays": 0,
+      "durationDays": 1,
+      "peak": 0.06,
+      "halfLifeDays": 1,
+      "withDiscount": 1.5,
+      "rain": 0.5,
+      "rainUnderAwning": 1.0,
+      "profiles": {
+        "presses": 1,
+        "flaneurs": 1,
+        "promeneurs": 1,
+        "familles": 0.5
+      },
+      "name": "L'ardoise de trottoir",
+      "blurb": "Écrite chaque matin. La pluie l'efface, sauf sous le store.",
+      "guestbook": []
+    },
+    {
+      "id": "degustation",
+      "tier": "P1",
+      "cost": 4,
+      "costIsMaterials": true,
+      "delayDays": 0,
+      "burstGameMinutes": 120,
+      "burst": 0.25,
+      "durationDays": 3,
+      "peak": 0.05,
+      "halfLifeDays": 3,
+      "profiles": {
+        "presses": 1,
+        "flaneurs": 1,
+        "promeneurs": 1,
+        "familles": 1
+      },
+      "name": "Une dégustation sur la place",
+      "blurb": "Un plateau de petits cafés, pendant que l'autre tient le comptoir.",
+      "guestbook": []
+    },
+    {
+      "id": "partenariat_godillots",
+      "tier": "P1",
+      "cost": 30,
+      "unlockEvent": "les_godillots",
+      "requiresDiscount": "randonneurs",
+      "delayDays": 1,
+      "durationDays": 99,
+      "peak": 0.12,
+      "halfLifeDays": 999,
+      "weekdays": ["sat", "sun"],
+      "profiles": {
+        "promeneurs": 1
+      },
+      "name": "Sur la carte des sentiers des Godillots",
+      "blurb": "Le club recommande ta maison pour la pause des randonnées.",
+      "guestbook": []
+    },
+    {
+      "id": "gouter_ecole",
+      "tier": "P1",
+      "cost": 4.4,
+      "costIsMaterials": true,
+      "unlockEvent": "jules_a_perdu_sa_mamie",
+      "everyWeekday": "wed",
+      "durationDays": 7,
+      "peak": 0.05,
+      "halfLifeDays": 999,
+      "weekdayPeak": {
+        "wed": 0.1
+      },
+      "profiles": {
+        "familles": 1
+      },
+      "name": "Le goûter de l'école",
+      "blurb": "Dix chocolats pour la classe, chaque mercredi.",
+      "guestbook": []
+    },
+    {
+      "id": "vitrine_arvelle",
+      "tier": "P1",
+      "cost": 10,
+      "perWeek": true,
+      "delayDays": 1,
+      "durationDays": 7,
+      "peak": 0.06,
+      "halfLifeDays": 999,
+      "ambianceDivisor": 60,
+      "ambianceBounds": [0.6, 1.3],
+      "profiles": {
+        "promeneurs": 1,
+        "connaisseurs": 1,
+        "flaneurs": 0.7,
+        "gourmands": 0.7
+      },
+      "name": "Une page sur La Vitrine de l'Arvelle",
+      "blurb": "Le site des commerces de la vallée. Une jolie salle fait une jolie photo.",
+      "guestbook": []
+    },
+    {
+      "id": "babillard",
+      "tier": "P1",
+      "cost": 0,
+      "delayDays": 1,
+      "durationDays": 2,
+      "peak": 0.03,
+      "halfLifeDays": 1,
+      "profiles": {
+        "voisins": 1,
+        "familles": 1
+      },
+      "name": "Un mot sur le Babillard d'Ormeval",
+      "blurb": "La page d'entraide du village. Gratuit, une fois par jour.",
+      "guestbook": []
+    }
+  ]
+}

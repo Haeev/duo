@@ -29,4 +29,12 @@ export interface UiContext {
 }
 
 export type TabletSection =
-  'home' | 'orders' | 'catalogue' | 'menu' | 'reports' | 'projects' | 'settings';
+  | 'home'
+  | 'orders'
+  | 'catalogue'
+  | 'menu'
+  | 'discounts'
+  | 'marketing'
+  | 'reports'
+  | 'projects'
+  | 'settings';

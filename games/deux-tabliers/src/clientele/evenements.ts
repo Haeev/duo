@@ -102,6 +102,14 @@ export const CLIENTELE_EVENTS = [
     item: v.string(),
     price: Nat,
   }),
+  /** Action de marketing lancée et payée (marketing v0.2): premier jour d'effet. */
+  v.strictObject({
+    type: v.literal('clientele-campaign'),
+    action: v.string(),
+    by: v.nullable(Player),
+    price: Nat,
+    firstDay: Nat,
+  }),
   v.strictObject({ type: v.literal('clientele-gift'), item: v.string(), from: v.string() }),
   v.strictObject({ type: v.literal('clientele-tier'), tier: v.string() }),
   v.strictObject({ type: v.literal('clientele-cups'), cups: v.number() }),

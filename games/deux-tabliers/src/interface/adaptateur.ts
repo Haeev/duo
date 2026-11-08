@@ -23,7 +23,9 @@ import type {
   ClockView,
   DemoEndView,
   DialogueView,
+  DiscountsView,
   DuoSettingsView,
+  MarketingView,
   EveningView,
   EventSceneView,
   GaugeView,
@@ -74,6 +76,10 @@ export interface InterfaceSources {
   slate?(world: World, content: Content): SlateView | null;
   /** b: commandes aux fournisseurs. */
   orders?(world: World, content: Content): OrdersView | null;
+  /** b: onglet « Remises » (v0.2). */
+  discounts?(world: World, content: Content): DiscountsView | null;
+  /** b: onglet « Faire connaître » (v0.2), états par joueur. */
+  marketing?(world: World, content: Content, player: PlayerIndex): MarketingView | null;
   /** c: catalogue et achats (états par joueur). */
   catalogue?(world: World, content: Content, player: PlayerIndex): CatalogueView | null;
   /** b: nos projets. */
@@ -214,6 +220,8 @@ export function readInterfaceModel(view: GameView, options: ReadOptions): Interf
     morning: s.morning?.(world, content) ?? null,
     slate: s.slate?.(world, content) ?? null,
     orders: s.orders?.(world, content) ?? null,
+    discounts: s.discounts?.(world, content) ?? null,
+    marketing: s.marketing?.(world, content, local) ?? null,
     catalogue: s.catalogue?.(world, content, local) ?? null,
     projects: s.projects?.(world, content) ?? null,
     evening: s.evening?.(world, local) ?? null,

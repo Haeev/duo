@@ -4,7 +4,7 @@
  * (`Intent`) pour l'hôte par `toIntent` (adaptateur.ts). Les actions `local-*` ne quittent pas
  * cette machine (réglages par joueur, compteur d'images).
  */
-import type { NightChoice } from './modele';
+import type { DiscountSettingsView, NightChoice } from './modele';
 
 export type UiAction =
   // Première fois (CC02 à CC04)
@@ -32,6 +32,12 @@ export type UiAction =
     }
   | { readonly type: 'order-usual' }
   | { readonly type: 'order-send' }
+  /** Dépannage par Mireille d'un produit en rupture (pendant le service). */
+  | { readonly type: 'emergency'; readonly product: string }
+  /** Remises (v0.2): tout le réglage de l'onglet, pour la prochaine ouverture. */
+  | { readonly type: 'discounts-set'; readonly settings: DiscountSettingsView }
+  /** Faire connaître (v0.2): lancer une action (proposée à l'autre au-delà du seuil). */
+  | { readonly type: 'campaign-launch'; readonly action: string }
   | { readonly type: 'buy'; readonly item: string }
   | { readonly type: 'propose-buy'; readonly item: string }
   | { readonly type: 'project-pin'; readonly project: string; readonly pinned: boolean }

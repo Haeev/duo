@@ -17,6 +17,13 @@ Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre cha
 - Stock: lots datés (`world.clientele.lots`), vendus du plus ancien au plus récent, périmé jeté le matin (« Perdu » au bilan), panier du soir payé et plafonné à 6 points; `stock` reste la somme des lots (`reconcileLots` à chaque pas: tickets rendus, sauvegardes v0.1).
 - Écrans: « Commandes pour mardi » (passages, port, conditionnement, réserve du soir datée), « Carte et prix » (revient et marge), bilan ligne par ligne dont le résultat est la somme. Sauvegardes au format 3; le format 2 se relit sans perte.
 
+## Remises et marketing (P0, `docs/jeux/cosy-cafe/demo/remises-marketing-v0-2.md`)
+
+- Simulation pure: `src/clientele/remises.ts` (heure douce, carte de fidélité, tarif randonneur, offre du jour, actions P0 avec effet décroissant et plafond, lassitude, compteur « Venus grâce à », mots du livre d'or), branchée dans `clients.ts` (prix payé, satisfaction, compteur), `journee.ts` (attrait heure par heure, ouverture et soir, ligne « Publicité » du résultat) et `scenes.ts` (`dayAffluence`). Intentions `clientele-discounts` et `clientele-campaign`; une action de 30 € ou plus est proposée à l'autre (`proposals`, réponse `clientele-answer`).
+- Lecteurs: `src/branchement/remises.ts` (`DiscountsView`, `MarketingView`, lignes de l'ardoise, du ticket et du bilan dans `modele.ts`). Rendu provisoire: deux sections de la tablette (`src/interface/tablette-remises.ts`, à porter dans le téléphone), remises en tête de l'ardoise et prix barrés pendant l'heure douce, lignes du ticket, « Publicité », « Remises consenties » et « Ce qui a fait venir du monde » au bilan. Commandes: « Dépannage par Mireille » sur une ligne en rupture pendant le service.
+- Aperçu: `src/interface/apercu/index.html#tablette-remises`, `#tablette-faire-connaitre`, `#ardoise-remises`, `#ticket-remises`, `#bilan-remises`, `#tablette-commandes-rupture` (vrais lecteurs sur une vraie maison pour les quatre premiers).
+- Pas encore: formules et actions P1, petit marché visible, bilan de la semaine par action (`week.marketing`), astuces de Simone sur les remises, avertissement de la veille quand une remise tombe le jour de la fête (seul l'onglet prévient).
+
 ## Branchement (`src/branchement/`)
 
 - `index.ts`: le chantier `branchement`, entre la clientèle et l'aménagement dans `CHANTIERS`. Autorités: carte et prix de `donnees/clientele/carte.json` (prix de l'ardoise recopié dans chaque article), gestes de `donnees/service/recettes.json`; mêmes recettes et ingrédients aux identifiants près (`pain_chocolat` contre `pain-chocolat`, `serviceId`), vérifié par `tests/journee.test.ts`. Le stock de la clientèle fait foi pendant les jours ouverts; café fermé, le service garde le sien (on s'exerce sans rien vendre). Caisse en centimes dans la clientèle; l'aménagement y puise par `connectArrangementEconomy`.
@@ -34,7 +41,7 @@ Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre cha
 
 ## Preuves
 
-- `pnpm --filter deux-tabliers test`: 20 tests en une douzaine de secondes, dont `file.test.ts` (file qui ne bloque pas, écarts, allures, bilan), `melange.test.ts` (clips) et `journee.test.ts` (une journée accélérée à deux joueurs: commande à la caisse, ticket, geste « Parfait », service, encaissement, bilan, lendemain).
+- `pnpm --filter deux-tabliers test`: 63 tests en une douzaine de secondes, dont `remises.test.ts` (critères RM des remises et du marketing), `file.test.ts` (file qui ne bloque pas, écarts, allures, bilan), `melange.test.ts` (clips) et `journee.test.ts` (une journée accélérée à deux joueurs: commande à la caisse, ticket, geste « Parfait », service, encaissement, bilan, lendemain).
 - Faux hôte (`deux-vues.html`): parcours à deux par l'interface jusqu'au service, geste au moulin et à la machine, tablette, bilan (captures du 2026-11-08).
 
 ## Limites connues et suites

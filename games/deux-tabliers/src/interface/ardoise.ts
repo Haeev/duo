@@ -202,6 +202,28 @@ function boardElement(
   } else if (slate.word !== '') {
     board.append(h('p', { style: 'font: 1.4em/1.2 var(--dt-main)' }, slate.word));
   }
+  // Remises annoncées à la craie, en tête (remises v0.2): soulignées pendant l'heure douce.
+  const remises = slate.discountLines ?? [];
+  if (slate.happyHourNow !== null && slate.happyHourNow !== undefined)
+    board.append(
+      h(
+        'p',
+        { style: 'margin: 0.4em 0 0; font-weight: 700; text-decoration: underline' },
+        slate.happyHourNow,
+      ),
+    );
+  if (remises.length > 0)
+    board.append(
+      h(
+        'div',
+        {
+          'data-remises': '',
+          style:
+            'margin: 0.4em 0 0.6em; padding: 0.4em 0.6em; border: 1px dashed currentColor; border-radius: 0.4em',
+        },
+        ...remises.map((line) => h('div', { style: 'font: 1.1em/1.35 var(--dt-main)' }, line)),
+      ),
+    );
   if (slate.lines.length === 0) board.append(h('p', { class: 'dt-second' }, T.slate.empty));
   for (const line of slate.lines) board.append(lineElement(ctx, slate, line, stars, hold));
   return board;
@@ -266,7 +288,13 @@ function lineElement(
   );
   erase.dataset.erase = '';
   const controls = h('div', { class: 'dt-row', style: 'gap: 0.4em; flex-wrap: nowrap' });
-  if (slate.readOnly)
+  const now = line.discountedCents ?? null;
+  if (slate.readOnly && now !== null)
+    controls.append(
+      h('s', { class: 'dt-line-price', style: 'opacity: 0.6' }, euros(line.priceCents)),
+      h('strong', { class: 'dt-line-price' }, euros(now)),
+    );
+  else if (slate.readOnly)
     controls.append(h('span', { class: 'dt-line-price' }, euros(line.priceCents)));
   else
     controls.append(

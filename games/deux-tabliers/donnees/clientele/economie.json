@@ -271,6 +271,13 @@
       "price": 20,
       "tier": "t0",
       "effects": ["renovate:applique_laiton"]
+    },
+    {
+      "id": "cartes_fidelite",
+      "name": "Cartes de fidélité (200)",
+      "price": 15,
+      "tier": "t0",
+      "effects": ["remise:fidelite"]
     }
   ],
   "extensions": [

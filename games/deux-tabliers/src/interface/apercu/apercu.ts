@@ -7,6 +7,11 @@
 import { createInterface } from '../index';
 import type { UiAction } from '../actions';
 import type { InterfaceModel, SlateView } from '../modele';
+import { remisesPreview } from './remises-apercu';
+
+let preview: ReturnType<typeof remisesPreview> | null = null;
+/** Vraie maison du mardi 2 lue par les vrais lecteurs, construite à la première demande. */
+const remises = (): ReturnType<typeof remisesPreview> => (preview ??= remisesPreview());
 
 const params = new URLSearchParams(location.search);
 const scale = Number(params.get('taille') ?? '100') / 100;
@@ -688,6 +693,88 @@ function modelFor(name: string): InterfaceModel {
           ],
         }),
       };
+    case 'tablette-remises':
+    case 'tablette-faire-connaitre':
+      return { ...base, discounts: remises().discounts, marketing: remises().marketing };
+    case 'ardoise-remises': {
+      // Identifiants des maquettes vers ceux de la carte (`carte.json`).
+      const real: Readonly<Record<string, string>> = {
+        'cafe-creme': 'creme',
+        tarte: 'tarte_fruits',
+      };
+      const r = remises();
+      return {
+        ...base,
+        slate: slate({
+          readOnly: true,
+          discountLines: r.slateLines,
+          happyHourNow: r.happyHourNow,
+          lines: slate().lines.map((l) => ({
+            ...l,
+            priceCents: r.listed(real[l.recipe] ?? l.recipe) || l.priceCents,
+            discountedCents: r.discounted(real[l.recipe] ?? l.recipe),
+          })),
+        }),
+      };
+    }
+    case 'ticket-remises':
+      return {
+        ...base,
+        aimedTicket: {
+          id: 16,
+          destination: 'Table 3',
+          waitMinutes: 1,
+          takenBy: null,
+          lines: [
+            { label: '1 café crème', done: false },
+            { label: '1 tarte aux fruits', done: false },
+          ],
+          receipt: remises().receipt,
+        },
+        held: [null, base.held[1]],
+      };
+    case 'bilan-remises':
+      return {
+        ...base,
+        clock:
+          base.clock === null
+            ? null
+            : { ...base.clock, phase: 'evening', minutes: 18 * 60 + 25, stop: { kind: 'closed' } },
+        myTickets: [],
+        evening:
+          evening === null
+            ? null
+            : {
+                ...evening,
+                ownPage: 3,
+                figures: {
+                  ...evening.figures,
+                  ...remises().figures,
+                  resultCents: evening.figures.resultCents - 800,
+                },
+              },
+      };
+    case 'tablette-commandes-rupture': {
+      const o = base.orders;
+      if (o === null) return base;
+      return {
+        ...base,
+        orders: {
+          ...o,
+          emergencyOpen: true,
+          suppliers: o.suppliers.map((sup, i) =>
+            i !== 0
+              ? sup
+              : {
+                  ...sup,
+                  products: sup.products.map((p, j) =>
+                    j === 0 ? { ...p, stock: '0', outOfStock: true, emergencyCents: 858 } : p,
+                  ),
+                },
+          ),
+        },
+      };
+    }
     case 'ardoise-ensemble':
       return {
         ...base,
@@ -900,6 +987,18 @@ const open: Record<string, () => void> = {
   },
   'tablette-reglages': () => {
     ui.openTablet('settings');
+  },
+  'tablette-remises': () => {
+    ui.openTablet('discounts');
+  },
+  'tablette-faire-connaitre': () => {
+    ui.openTablet('marketing');
+  },
+  'tablette-commandes-rupture': () => {
+    ui.openTablet('orders');
+  },
+  'ardoise-remises': () => {
+    ui.openSlate();
   },
   ardoise: () => {
     ui.openSlate();

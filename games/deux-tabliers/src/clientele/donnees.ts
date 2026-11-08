@@ -452,6 +452,95 @@ const TextsSchema = v.object({
 });
 export type Texts = v.InferOutput<typeof TextsSchema>;
 
+// ---------------------------------------------------------------------------------------------
+// Remises et marketing (v0.2, `remises-marketing-v0-2.md`, section 7)
+
+const Weekday = v.picklist(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+const Tier = v.picklist(['P0', 'P1']);
+const Rate = v.pipe(v.number(), v.minValue(0), v.maxValue(0.9));
+
+const DiscountsSchema = v.object({
+  floorAtCost: v.boolean(),
+  satisfactionWeight: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+  happyHour: v.object({
+    tier: Tier,
+    starts: v.array(Nat),
+    lengths: v.array(Nat),
+    rates: v.array(Rate),
+    default: v.object({ start: Nat, length: Nat, rate: Rate, days: v.array(Weekday) }),
+    families: v.array(Str),
+  }),
+  dailyOffer: v.object({
+    tier: Tier,
+    rates: v.array(Rate),
+    default: Rate,
+    familyWeightBonus: Pos,
+    pickWeight: Pos,
+    maxRecipes: Nat,
+    suggestWhenLeftOverUsual: Pos,
+  }),
+  profileRates: v.array(
+    v.object({
+      id: Str,
+      tier: Tier,
+      profile: Str,
+      rates: v.array(Rate),
+      default: Rate,
+      defaultDays: v.array(Weekday),
+    }),
+  ),
+  loyaltyCard: v.object({
+    tier: Tier,
+    price: Pos,
+    purchase: Str,
+    stamps: v.pipe(Nat, v.minValue(1)),
+    families: v.array(Str),
+    profiles: v.array(Str),
+    holderShareStart: Pos,
+    holderSharePerDay: Pos,
+    holderShareMax: v.pipe(v.number(), v.minValue(0.01), v.maxValue(1)),
+    attractionBonusMax: Pos,
+    freeSatisfaction: N,
+    guestbookChance: Pos,
+  }),
+  texts: v.object({
+    names: v.record(Str, Str),
+    profileLabels: v.record(Str, Str),
+    absent: v.record(Str, Str),
+    guestbook: v.record(Str, v.array(Str)),
+  }),
+});
+export type Discounts = v.InferOutput<typeof DiscountsSchema>;
+
+const MarketingActionSchema = v.object({
+  id: Str,
+  tier: Tier,
+  name: Str,
+  blurb: Str,
+  cost: Pos,
+  delayDays: v.optional(Nat),
+  launchWeekdays: v.optional(v.array(Weekday)),
+  publishWeekday: v.optional(Weekday),
+  deadlineWeekday: v.optional(Weekday),
+  durationDays: v.pipe(Nat, v.minValue(1)),
+  peak: Pos,
+  halfLifeDays: v.pipe(v.number(), v.minValue(0.1)),
+  profiles: v.record(Str, Pos),
+  guestbook: v.array(Str),
+});
+export type MarketingAction = v.InferOutput<typeof MarketingActionSchema>;
+
+const MarketingSchema = v.object({
+  maxBoost: v.pipe(v.number(), v.minValue(0.01)),
+  repeatFactor: Pos,
+  repeatCooldownDays: Nat,
+  guestbookChance: Pos,
+  guestbookMinSatisfaction: N,
+  bigProposalEuros: Pos,
+  actions: v.array(MarketingActionSchema),
+});
+export type Marketing = v.InferOutput<typeof MarketingSchema>;
+
 export interface ClienteleContent {
   readonly profiles: ReadonlyMap<string, Profile>;
   readonly profileList: readonly Profile[];
@@ -469,6 +558,9 @@ export interface ClienteleContent {
   readonly regularById: ReadonlyMap<string, Regular>;
   readonly events: ReadonlyMap<string, EventDef>;
   readonly texts: Texts;
+  readonly discounts: Discounts;
+  readonly marketing: Marketing;
+  readonly actions: ReadonlyMap<string, MarketingAction>;
 }
 
 const DIR = 'clientele/';
@@ -505,6 +597,8 @@ export function loadClienteleContent(files: DataFiles, issues: string[]): Client
     issues,
   );
   const texts = readFile(files, `${DIR}textes.json`, TextsSchema, issues);
+  const discounts = readFile(files, `${DIR}remises.json`, DiscountsSchema, issues);
+  const marketing = readFile(files, `${DIR}marketing.json`, MarketingSchema, issues);
   if (
     profiles === null ||
     rules === null ||
@@ -514,7 +608,9 @@ export function loadClienteleContent(files: DataFiles, issues: string[]): Client
     days === null ||
     regulars === null ||
     events === null ||
-    texts === null
+    texts === null ||
+    discounts === null ||
+    marketing === null
   ) {
     return EMPTY;
   }
@@ -535,6 +631,9 @@ export function loadClienteleContent(files: DataFiles, issues: string[]): Client
     regularById: mapOf(regulars.regulars),
     events: mapOf(events.events),
     texts,
+    discounts,
+    marketing,
+    actions: mapOf(marketing.actions),
   };
   // Références croisées: une donnée qui en cite une autre absente arrête le chargement.
   const p = (where: string, what: string): void => {
@@ -566,6 +665,15 @@ export function loadClienteleContent(files: DataFiles, issues: string[]): Client
     if (e.staging.profile !== undefined && !content.profiles.has(e.staging.profile))
       p(`evenements.json (${e.id})`, e.staging.profile);
   }
+  for (const r of discounts.profileRates)
+    if (!content.profiles.has(r.profile)) p(`remises.json (${r.id})`, r.profile);
+  for (const id of discounts.loyaltyCard.profiles)
+    if (!content.profiles.has(id)) p('remises.json (loyaltyCard)', id);
+  if (!content.purchases.has(discounts.loyaltyCard.purchase))
+    p('remises.json (loyaltyCard)', discounts.loyaltyCard.purchase);
+  for (const a of marketing.actions)
+    for (const id of Object.keys(a.profiles))
+      if (!content.profiles.has(id)) p(`marketing.json (${a.id})`, id);
   if (issues.length > before) return EMPTY;
   return content;
 }
@@ -588,4 +696,7 @@ const EMPTY: ClienteleContent = {
   regularById: new Map(),
   events: new Map(),
   texts: undefined as unknown as Texts,
+  discounts: undefined as unknown as Discounts,
+  marketing: undefined as unknown as Marketing,
+  actions: new Map(),
 };

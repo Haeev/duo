@@ -8,7 +8,8 @@ import type { PlayerIndex, World } from '../etat/monde';
 import type { Vec2 } from '../simulation/geometrie';
 import { groupOrder, priceIndex } from './attrait';
 import type { ClienteleContent, Profile, Recipe } from './donnees';
-import { addPoints, consume, inStock, linePrice, type Ctx } from './economie';
+import { addPoints, consume, inStock, type Ctx } from './economie';
+import { campaignWord, countServed, featuredRecipe, priceOrder } from './remises';
 import type { Group, PlaceKind, Quality } from './etat';
 import { onRegularServed, regularOrder } from './habitues';
 import {
@@ -293,6 +294,8 @@ export function spawnGroup(ctx: Ctx, o: SpawnOptions): Group {
     asUsual: false,
     dirtySeat: false,
     look: chooseLook(ctx, o, ctx.s.nextGroupId),
+    off: 0,
+    receipt: [],
   };
   ctx.s.groups.push(g);
   const w = walkerOf(ctx, g);
@@ -325,7 +328,14 @@ function countReason(into: Record<string, number>, key: string): void {
 function arrive(ctx: Ctx, profileId: string, size: number, takeAway: boolean): void {
   const p = ctx.cc.profiles.get(profileId);
   if (p === undefined) return;
-  const items = groupOrder(ctx.cc, ctx.sim.random, p, size, availableRecipes(ctx));
+  const items = groupOrder(
+    ctx.cc,
+    ctx.sim.random,
+    p,
+    size,
+    availableRecipes(ctx),
+    featuredRecipe(ctx.s),
+  );
   if (items.length === 0) return;
   const why = refuses(ctx, p, size);
   if (why !== null) {
@@ -347,7 +357,16 @@ export function prepareOrder(ctx: Ctx, g: Group): readonly string[] {
   const items = g.items.filter((id) => inStock(ctx.cc, ctx.s, id));
   if (items.length === 0) {
     const p = profileOf(ctx, g);
-    items.push(...groupOrder(ctx.cc, ctx.sim.random, p, g.size, availableRecipes(ctx)));
+    items.push(
+      ...groupOrder(
+        ctx.cc,
+        ctx.sim.random,
+        p,
+        g.size,
+        availableRecipes(ctx),
+        featuredRecipe(ctx.s),
+      ),
+    );
   }
   if (items.length > 0) g.items = items;
   return items;
@@ -380,9 +399,27 @@ function pay(
 ): void {
   let amount = 0;
   let materials = 0;
-  for (const id of items) {
-    amount += g.flatRate ? 0 : linePrice(ctx.cc, ctx.s, id);
-    materials += consume(ctx.cc, ctx.s, id);
+  for (const id of items) materials += consume(ctx.cc, ctx.s, id);
+  if (!g.flatRate) {
+    // Remises v0.2: l'heure douce se lit à l'arrivée du groupe (la file ne lui fait pas rater
+    // la remise), à l'heure de la recommande pour une recommande.
+    const minute = clockMinutes(ctx.cc, {
+      serviceSec: reorder ? ctx.s.serviceSec : g.arrivedAt,
+      pace: ctx.s.pace,
+    });
+    const order = priceOrder(ctx, g, items, minute, reorder);
+    amount = order.amount;
+    const off = order.list - order.amount;
+    if (off > 0) {
+      ctx.s.today.discounts += off;
+      ctx.s.today.discountOrders++;
+      for (const [k, n] of Object.entries(order.by))
+        ctx.s.today.discountBy[k] = (ctx.s.today.discountBy[k] ?? 0) + n;
+    }
+    if (!reorder) {
+      g.off = order.off;
+      g.receipt = order.receipt;
+    }
   }
   // La marchandise est payée à la livraison (P0-1): la vente n'enlève plus rien à la caisse.
   ctx.s.cash += amount;
@@ -425,6 +462,7 @@ export function deliverOrder(ctx: Ctx, groupId: number, result: ServeResult = {}
   ctx.s.today.served++;
   ctx.s.today.people += g.size;
   ctx.s.servedTotal++;
+  countServed(ctx, g);
   ctx.sim.emit({ type: 'clientele-served', group: g.id });
   if (g.regular !== null) onRegularServed(ctx, g);
   seat(ctx, g);
@@ -588,7 +626,8 @@ export function satisfaction(ctx: Ctx, g: Group): number {
     const weight = p.id === 'connaisseurs' ? k.connoisseurQualityWeight : 1;
     sat += (weight * g.qualities.reduce((sum, q) => sum + val[q], 0)) / g.qualities.length;
   }
-  const ip = priceIndex(ctx.cc, p, ctx.s.slate);
+  // Une remise plaît, moins qu'un prix juste: la moitié de l'écart (`satisfactionWeight`).
+  const ip = priceIndex(ctx.cc, p, ctx.s.slate) * (1 - ctx.cc.discounts.satisfactionWeight * g.off);
   sat += Math.max(
     -k.priceBound,
     Math.min(k.priceBound, (1 - ip) * p.priceSensitivity * k.priceSlope),
@@ -602,6 +641,8 @@ export function satisfaction(ctx: Ctx, g: Group): number {
   if (g.asUsual) sat += k.asUsual;
   if (g.latteArt) sat += k.latteArt;
   if (g.homemade) sat += k.homemade;
+  if (g.receipt.some(([kind]) => kind === 'freeCoffee'))
+    sat += ctx.cc.discounts.loyaltyCard.freeSatisfaction;
   return Math.max(0, Math.min(100, sat));
 }
 
@@ -736,7 +777,10 @@ function depart(ctx: Ctx, g: Group): void {
     for (const why of likedReasons(ctx, g)) countReason(ctx.s.today.liked, why);
   const missed = sat <= k.reportMissedBelow ? missedReason(ctx, g) : null;
   if (missed !== null) countReason(ctx.s.today.missed, missed);
-  guestbookWord(ctx, g, sat);
+  const word = campaignWord(ctx, g, sat);
+  if (word !== null)
+    addGuestbook(ctx, word, `${SIGNS.charAt(ctx.sim.random.int(0, SIGNS.length))}.`, true);
+  else guestbookWord(ctx, g, sat);
   if (!g.takeAway && g.place !== 'outside') {
     const pieces = g.items.reduce((sum, id) => sum + (ctx.cc.recipes.get(id)?.dishes ?? 1), 0);
     const dishes = {

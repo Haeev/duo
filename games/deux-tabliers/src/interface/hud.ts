@@ -107,6 +107,8 @@ function ticketCard(
         line.label,
       ),
     );
+  for (const line of ticket.receipt ?? [])
+    card.append(h('div', { class: 'dt-ticket-line dt-second', 'data-receipt': '' }, line));
   card.append(
     h(
       'div',
@@ -485,6 +487,10 @@ export function createHud(root: HTMLElement): Hud {
               ),
             ),
             ...reading.lines.map((l) => h('div', { class: 'dt-ticket-line' }, l.label)),
+            // Remises du ticket (remises v0.2): nom et montant, café offert, tampons.
+            ...(reading.receipt ?? []).map((line) =>
+              h('div', { class: 'dt-ticket-line dt-second', 'data-receipt': '' }, line),
+            ),
             h(
               'div',
               { class: 'dt-ticket-status' },

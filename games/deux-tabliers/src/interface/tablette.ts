@@ -10,6 +10,7 @@ import type { TabletSection, UiContext } from './contexte';
 import { button, h, icon, keycap, type IconName } from './dom';
 import type { CatalogueItemView, InterfaceModel, ProjectView } from './modele';
 import { horizontalFov, TEXT_SCALE, type PlayerSettings, type SettingKey } from './reglages';
+import { discountsSection, marketingSection } from './tablette-remises';
 import { T, WEEKDAYS } from './textes';
 import { capital, euros, fill, heure } from './typo';
 
@@ -18,6 +19,8 @@ const SECTIONS: readonly (readonly [TabletSection, string, IconName])[] = [
   ['orders', T.tablet.sections.orders, 'box'],
   ['catalogue', T.tablet.sections.catalogue, 'star'],
   ['menu', T.tablet.sections.menu, 'chat'],
+  ['discounts', T.tablet.sections.discounts, 'ticket'],
+  ['marketing', T.tablet.sections.marketing, 'bell'],
   ['reports', T.tablet.sections.reports, 'book'],
   ['projects', T.tablet.sections.projects, 'heart'],
   ['settings', T.tablet.sections.settings, 'gear'],
@@ -142,6 +145,12 @@ export function tabletLayer(ctx: UiContext, start: TabletSection = 'home'): Laye
         },
         menu: () => {
           menuSection(body, ctx, model);
+        },
+        discounts: () => {
+          discountsSection(body, ctx, model);
+        },
+        marketing: () => {
+          marketingSection(body, ctx, model);
         },
         reports: () => {
           reportsSection(body, ctx, model);
@@ -468,6 +477,7 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
             null,
             p.name,
             h('div', { class: 'dt-second', style: 'font-size: 0.85em' }, p.pack),
+            emergencyLine(ctx, orders.emergencyOpen, p),
             locked
               ? h(
                   'div',
@@ -517,6 +527,33 @@ function ordersSection(body: HTMLElement, ctx: UiContext, model: InterfaceModel)
       send,
     ),
   );
+}
+
+/** Ligne en rupture pendant le service: « Dépannage par Mireille (x €) » (`clientele-emergency`). */
+function emergencyLine(
+  ctx: UiContext,
+  open: boolean,
+  p: NonNullable<InterfaceModel['orders']>['suppliers'][number]['products'][number],
+): HTMLElement | null {
+  if (p.outOfStock !== true) return null;
+  const line = h('div', {
+    class: 'dt-row',
+    style: 'gap: 0.5em; align-items: center; flex-wrap: wrap',
+  });
+  line.append(h('strong', { style: 'color: var(--dt-or)' }, T.tablet.orders.outOfStock));
+  if (p.emergencyOnTheWay === true)
+    line.append(h('span', { class: 'dt-second' }, T.tablet.orders.emergencyOnTheWay));
+  else if (open)
+    line.append(
+      button(
+        fill(T.tablet.orders.emergencyButton, { amount: euros(p.emergencyCents ?? 0) }),
+        () => {
+          ctx.send({ type: 'emergency', product: p.id });
+        },
+        { name: fill(T.tablet.orders.emergencyName, { item: p.name.toLowerCase() }) },
+      ),
+    );
+  return line;
 }
 
 /** « bon jusqu'à jeudi 4 », ou « se garde longtemps » au-delà de deux semaines. */

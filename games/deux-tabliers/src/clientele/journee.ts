@@ -34,6 +34,7 @@ import {
 } from './economie';
 import { emptyDayStats, type Report } from './etat';
 import { planRegulars, stepRegulars, storySteps } from './habitues';
+import { closeDiscounts, hourlyAttraction, openDiscounts } from './remises';
 import { closeDayEvents, dayAffluence, planEvents, stepEvents } from './scenes';
 
 export function weekday(ctx: Ctx, day = ctx.s.day): string {
@@ -171,7 +172,13 @@ function mondayReport(ctx: Ctx): Report {
     lost: s.today.lost,
     lostItems: [...s.today.lostItems],
     basketValue: 0,
-    result: -rent,
+    discounts: 0,
+    discountBy: {},
+    discountOrders: 0,
+    marketing: s.today.marketing,
+    fromCampaigns: {},
+    fromWord: 0,
+    result: -rent - s.today.marketing,
     served: 0,
     left: 0,
     satisfaction: 0,
@@ -209,10 +216,11 @@ function generateArrivals(ctx: Ctx): void {
   };
   const out: [number, string, number, boolean][] = [];
   for (const p of cc.profileList) {
-    const k = attraction(cc, p, att);
     const perHour = passersPerHour(cc, p, wdi, s.weather, dayAffluence(ctx, p.id));
+    // Remises v0.2: attrait heure par heure (heure douce, tarif, carte); sans remise, le même.
+    const k = hourlyAttraction(cc, s, p, att, attraction, perHour.length);
     perHour.forEach((lam, i) => {
-      const n = poisson(ctx.sim.random, lam * k);
+      const n = poisson(ctx.sim.random, lam * (k[i] ?? 1));
       for (let j = 0; j < n; j++) {
         const t = (i + ctx.sim.random.next()) * 60 * spm(ctx);
         const size = drawGroupSize(ctx.sim.random, p);
@@ -234,6 +242,7 @@ function openNow(ctx: Ctx): void {
   s.serviceSec = 0;
   const a = ambiance(ctx);
   s.ambiance = [Math.round(a.value * 10) / 10, a.style, Math.round(a.coherence * 1000) / 1000];
+  openDiscounts(ctx);
   generateArrivals(ctx);
   ctx.sim.emit({ type: 'clientele-opened' });
 }
@@ -251,6 +260,7 @@ function evening(ctx: Ctx): void {
   const { s, cc } = ctx;
   closeDayEvents(ctx);
   const t = s.today;
+  closeDiscounts(ctx);
   const cupsBefore =
     s.history.length > 0
       ? (s.history[s.history.length - 1]?.[4] ?? s.cups)
@@ -309,7 +319,22 @@ function evening(ctx: Ctx): void {
     lost: t.lost,
     lostItems: [...t.lostItems],
     basketValue: t.basketValue,
-    result: t.revenue + t.tips + t.euros - t.goods - t.shipping - t.emergency - rent - charges,
+    discounts: t.discounts,
+    discountBy: { ...t.discountBy },
+    discountOrders: t.discountOrders,
+    marketing: t.marketing,
+    fromCampaigns: { ...t.fromCampaigns },
+    fromWord: t.fromWord,
+    result:
+      t.revenue +
+      t.tips +
+      t.euros -
+      t.goods -
+      t.shipping -
+      t.emergency -
+      rent -
+      charges -
+      t.marketing,
     served: t.served,
     left: t.left,
     satisfaction: Math.round(sat * 10) / 10,
