@@ -108,7 +108,8 @@ export function purchaseRefusal(
   }
   const price = priceOf(content, world, id, room);
   if (price === null) return 'Article inconnu.';
-  if (price > eco.available(world, content)) return `Pas assez dans la caisse : il faut ${price} €.`;
+  if (price > eco.available(world, content))
+    return `Pas assez dans la caisse : il faut ${price} €.`;
   return null;
 }
 
