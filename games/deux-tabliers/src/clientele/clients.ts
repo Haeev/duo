@@ -21,7 +21,7 @@ import {
   seatList,
   type Seat,
 } from './places';
-import { seatAnchor, type SeatAnchor } from '../etat/assises';
+import { placeAnchor, type SeatAnchor } from '../etat/assises';
 import { sceneHooks } from './scenes';
 
 // ---------------------------------------------------------------------------------------------
@@ -105,13 +105,12 @@ function goTo(ctx: Ctx, g: Group, to: Vec2, key: string): Walker {
   return w;
 }
 
-/** Assise du premier membre d'un groupe installé sur un meuble, ou `null` (zinc, fontaine). */
+/** Place du premier membre d'un groupe installé sur un meuble, ou `null` (zinc, fontaine). */
 function firstSeatAnchor(ctx: Ctx, g: Group): SeatAnchor | null {
   const first = g.seats[0];
   if (first === undefined || first.startsWith('standing-') || first.startsWith('picnic-'))
     return null;
-  const f = ctx.sim.world.furniture.find((x) => x.id === first);
-  return f === undefined ? null : seatAnchor(ctx.sim.content, ctx.sim.world.furniture, f);
+  return placeAnchor(ctx.sim.content, ctx.sim.world.furniture, first);
 }
 
 /** Vers l'assise: par le point d'approche libre, puis le dernier pas jusqu'à l'assise. */
@@ -569,10 +568,8 @@ export function placePoint(
     const p = r.picnicSpots[Number(first.slice(7))];
     return p === undefined ? null : { x: p[0], z: p[1] };
   }
-  const f = ctx.sim.world.furniture.find((x) => x.id === first);
-  if (f === undefined) return null;
-  const a = seatAnchor(ctx.sim.content, ctx.sim.world.furniture, f);
-  return { x: a.x, z: a.z };
+  const a = placeAnchor(ctx.sim.content, ctx.sim.world.furniture, first);
+  return a === null ? null : { x: a.x, z: a.z };
 }
 
 export function satisfaction(ctx: Ctx, g: Group): number {

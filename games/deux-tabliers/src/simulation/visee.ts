@@ -8,7 +8,7 @@ import type { Content } from '../donnees/charger';
 import type { PlayerIndex, World } from '../etat/monde';
 import type { Target } from './entrees';
 import { planAct, type ActPlan } from './interactions';
-import { seatAnchor } from '../etat/assises';
+import { seatPlaces } from '../etat/assises';
 import { eyeHeightOf } from './assise';
 import { furnitureType, heldObject, objectOnSlot, objectPosition, slotPosition } from './monde';
 
@@ -93,8 +93,9 @@ export function aim(content: Content, world: World, player: PlayerIndex, eye: Ey
   for (const f of world.furniture) {
     const type = furnitureType(content, f);
     if (type.kind === 'seat' && !holding) {
-      const a = seatAnchor(content, world.furniture, f);
-      seats.push([f.id, a.x, a.y, a.z]);
+      // Une cible par place (banquette de trois, banc de deux): on s'assoit où l'on regarde.
+      for (const { id, anchor: a } of seatPlaces(content, world.furniture, f))
+        seats.push([id, a.x, a.y, a.z]);
     }
     if (holding) {
       for (const slot of type.slots) {

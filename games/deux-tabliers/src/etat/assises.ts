@@ -25,10 +25,12 @@ export interface SeatAnchor {
   readonly halfDepth: number;
 }
 
+// `objets` est une liste (fiche par modèle, clé `id`): un schéma en dictionnaire passait à
+// côté et toutes les assises prenaient la place par défaut.
 const SeatsSchema = v.looseObject({
-  objets: v.record(
-    v.string(),
+  objets: v.array(
     v.looseObject({
+      id: v.string(),
       assises: v.optional(
         v.array(
           v.looseObject({
@@ -50,8 +52,8 @@ const MODEL_SEATS: ReadonlyMap<string, readonly Assise[]> = (() => {
   const parsed = v.safeParse(SeatsSchema, rawModelInfo);
   const out = new Map<string, readonly Assise[]>();
   if (!parsed.success) return out;
-  for (const [name, o] of Object.entries(parsed.output.objets))
-    if (o.assises !== undefined && o.assises.length > 0) out.set(name, o.assises);
+  for (const o of parsed.output.objets)
+    if (o.assises !== undefined && o.assises.length > 0) out.set(o.id, o.assises);
   return out;
 })();
 
@@ -103,31 +105,68 @@ function toWorld(f: PlacedFurniture, lx: number, lz: number): [number, number] {
   return [f.x + lx * Math.cos(r) + lz * Math.sin(r), f.z - lx * Math.sin(r) + lz * Math.cos(r)];
 }
 
+/** Séparateur d'une place dans son meuble: `seat-9` (première place), `seat-9#1`, `seat-9#2`. */
+const PLACE_SEP = '#';
+
+/** Identifiant d'une place: le meuble seul pour la première (sauvegardes d'avant les places). */
+export function placeId(furniture: string, index: number): string {
+  return index === 0 ? furniture : `${furniture}${PLACE_SEP}${String(index)}`;
+}
+
+/** Meuble d'une place (`seat-9#1` donne `seat-9`). */
+export function placeFurniture(place: string): string {
+  const i = place.indexOf(PLACE_SEP);
+  return i < 0 ? place : place.slice(0, i);
+}
+
+function placeIndex(place: string): number {
+  const i = place.indexOf(PLACE_SEP);
+  const n = i < 0 ? 0 : Number(place.slice(i + 1));
+  return Number.isInteger(n) && n >= 0 ? n : 0;
+}
+
+export interface SeatPlace {
+  readonly id: string;
+  readonly anchor: SeatAnchor;
+}
+
 /**
- * Place assise d'un meuble: un client ou un avatar par meuble. Plusieurs assises déclarées
- * (banquette, banc): celle qui est le plus près de la table, sinon la plus centrale.
+ * Places d'un meuble, la première la plus près de la table (puis la plus centrale): une par
+ * assise déclarée du modèle (banquette de trois, banc de deux), sans dépasser le nombre de
+ * places du catalogue (`seats.count`, que compte aussi l'ambiance). Chacune face à la table.
  */
-export function seatAnchor(
+export function seatPlaces(
   content: Content,
   furniture: readonly PlacedFurniture[],
   f: PlacedFurniture,
-): SeatAnchor {
+): SeatPlace[] {
   const model = furnitureModel(content, f.type);
   const list = (model === undefined ? undefined : MODEL_SEATS.get(model)) ?? [DEFAULT_SEAT];
   const table = seatTable(content, furniture, f);
-  let chosen = list[0] ?? DEFAULT_SEAT;
-  let best = Infinity;
-  for (const a of list) {
-    const [wx, wz] = toWorld(f, a.position[0] ?? 0, a.position[2] ?? 0);
-    const d =
-      table === null
-        ? Math.hypot(a.position[0] ?? 0, a.position[2] ?? 0)
-        : Math.hypot(table.x - wx, table.z - wz);
-    if (d < best - 1e-6) {
-      best = d;
-      chosen = a;
-    }
-  }
+  const ranked = list
+    .map((a, i) => {
+      const [wx, wz] = toWorld(f, a.position[0] ?? 0, a.position[2] ?? 0);
+      const d =
+        table === null
+          ? Math.hypot(a.position[0] ?? 0, a.position[2] ?? 0)
+          : Math.hypot(table.x - wx, table.z - wz);
+      return { a, i, d };
+    })
+    // Égalité (deux bouts d'un banc à même distance): l'ordre déclaré, stable d'une image à l'autre.
+    .sort((p, q) => (Math.abs(p.d - q.d) < 1e-6 ? p.i - q.i : p.d - q.d));
+  const count = content.arrangement.pieces.get(f.type)?.seats?.count ?? ranked.length;
+  return ranked
+    .slice(0, Math.max(1, Math.min(count, ranked.length)))
+    .map((r, k) => ({ id: placeId(f.id, k), anchor: anchorOf(content, f, model, table, r.a) }));
+}
+
+function anchorOf(
+  content: Content,
+  f: PlacedFurniture,
+  model: string | undefined,
+  table: PlacedFurniture | null,
+  chosen: Assise,
+): SeatAnchor {
   const [x, z] = toWorld(f, chosen.position[0] ?? 0, chosen.position[2] ?? 0);
   const [ex, ez] = toWorld(f, chosen.avant[0] ?? 0, chosen.avant[2] ?? 1);
   let fx = ex - f.x;
@@ -152,6 +191,29 @@ export function seatAnchor(
     halfWidth: (type?.footprint[0] ?? 0.45) / 2,
     halfDepth: (type?.footprint[1] ?? 0.45) / 2,
   };
+}
+
+/** Première place d'un meuble (la plus près de la table). */
+export function seatAnchor(
+  content: Content,
+  furniture: readonly PlacedFurniture[],
+  f: PlacedFurniture,
+): SeatAnchor {
+  const first = seatPlaces(content, furniture, f)[0];
+  return first === undefined ? anchorOf(content, f, undefined, null, DEFAULT_SEAT) : first.anchor;
+}
+
+/** Point d'une place (`seat-9#1`), `null` si son meuble n'est plus là. */
+export function placeAnchor(
+  content: Content,
+  furniture: readonly PlacedFurniture[],
+  place: string,
+): SeatAnchor | null {
+  const id = placeFurniture(place);
+  const f = furniture.find((x) => x.id === id);
+  if (f === undefined) return null;
+  const list = seatPlaces(content, furniture, f);
+  return (list[placeIndex(place)] ?? list[0])?.anchor ?? null;
 }
 
 /**

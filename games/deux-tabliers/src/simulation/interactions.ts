@@ -7,6 +7,7 @@
 import type { Content } from '../donnees/charger';
 import type { ObjectState, PlayerIndex, World } from '../etat/monde';
 import type { Target } from './entrees';
+import { placeFurniture } from '../etat/assises';
 import { seatTaken } from './assise';
 import {
   furnitureById,
@@ -143,7 +144,8 @@ export function planAct(
       return { kind: 'use', furniture: target.furniture, station };
     }
     case 'seat': {
-      const placed = furnitureById(world, target.furniture);
+      // `furniture` d'une assise visée est une place du meuble (`seat-9#1`, etat/assises.ts).
+      const placed = furnitureById(world, placeFurniture(target.furniture));
       if (placed === undefined || furnitureType(content, placed).kind !== 'seat')
         return { kind: 'refuse', reason: 'Rien à faire ici' };
       if (seatTaken(world, target.furniture, player))
@@ -221,7 +223,9 @@ export function targetDistance(
     y = 1.2;
     z = q.z;
   } else {
-    const placed = furnitureById(world, target.furniture);
+    // Une assise visée nomme sa place (`seat-9#1`): on mesure jusqu'au meuble.
+    const id = target.kind === 'seat' ? placeFurniture(target.furniture) : target.furniture;
+    const placed = furnitureById(world, id);
     if (placed === undefined) return null;
     x = placed.x;
     z = placed.z;

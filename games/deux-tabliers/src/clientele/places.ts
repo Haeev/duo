@@ -13,7 +13,7 @@ import type { SimContext } from '../simulation/systemes';
 import type { ClienteleContent, SeatKind } from './donnees';
 import type { ClienteleState } from './etat';
 import { extensionReady } from './economie';
-import { approachCandidates, seatAnchor, type SeatAnchor } from '../etat/assises';
+import { approachCandidates, seatPlaces, type SeatAnchor } from '../etat/assises';
 
 export interface Seat {
   readonly id: string;
@@ -153,9 +153,10 @@ export function seatList(
         table = t.id;
       }
     }
-    // Assise déclarée du modèle et sens de la personne assise (`etat/assises.ts`).
-    const a = seatAnchor(content, world.furniture, f);
-    out.push({ id: f.id, kind, x: a.x, z: a.z, yawDeg: a.yawDeg, table });
+    // Une place par assise déclarée du modèle (banquette de trois, banc de deux), chacune face
+    // à la table (`etat/assises.ts`): la clientèle compte des places, pas des meubles.
+    for (const { id, anchor: a } of seatPlaces(content, world.furniture, f))
+      out.push({ id, kind, x: a.x, z: a.z, yawDeg: a.yawDeg, table });
   }
   return out;
 }

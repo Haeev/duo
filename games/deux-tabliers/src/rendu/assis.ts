@@ -8,11 +8,11 @@
  * limite (tabouret de comptoir: les pieds pendent, comme sur un vrai tabouret).
  */
 import {
+  AnimationClip,
   AnimationMixer,
   Quaternion,
   SkinnedMesh,
   Vector3,
-  type AnimationClip,
   type BufferGeometry,
   type Object3D,
 } from 'three';
@@ -154,19 +154,37 @@ const qParent = new Quaternion();
 const qNode = new Quaternion();
 const axis = new Vector3();
 
+/**
+ * Retouches d'os après le mélangeur. Le mélangeur de Three.js ne réécrit une propriété que si
+ * sa valeur change (`PropertyMixer.apply`): sur une pose tenue (`sit_rest`), la retouche de
+ * l'image précédente resterait et s'ajouterait (jambes qui montent, tête qui tourne sans fin).
+ * On garde la valeur d'avant retouche et on la remet si le mélangeur n'y a pas touché.
+ */
+const touched = new WeakMap<Object3D, { base: Quaternion; out: Quaternion }>();
+
+function rotateInWorld(bone: Object3D, rotation: Quaternion): void {
+  let rec = touched.get(bone);
+  if (rec !== undefined && bone.quaternion.equals(rec.out)) bone.quaternion.copy(rec.base);
+  if (rec === undefined) {
+    rec = { base: new Quaternion(), out: new Quaternion() };
+    touched.set(bone, rec);
+  }
+  rec.base.copy(bone.quaternion);
+  const parent = bone.parent;
+  if (parent !== null) {
+    parent.getWorldQuaternion(qParent);
+    // Rotation du monde exprimée dans le repère du parent: q' = P⁻¹ · R · P · q.
+    bone.quaternion.premultiply(qParent).premultiply(rotation).premultiply(qParent.invert());
+  }
+  rec.out.copy(bone.quaternion);
+}
+
 /** Tourne les cuisses de `angle` (après la mise à jour du mélangeur, chaque image). */
 export function bendThighs(node: Object3D, thighs: readonly Object3D[], angle: number): void {
-  if (Math.abs(angle) < 1e-4) return;
   node.getWorldQuaternion(qNode);
   axis.set(1, 0, 0).applyQuaternion(qNode);
   qAxis.setFromAxisAngle(axis, angle);
-  for (const t of thighs) {
-    const parent = t.parent;
-    if (parent === null) continue;
-    parent.getWorldQuaternion(qParent);
-    // Rotation du monde exprimée dans le repère du parent: q' = P⁻¹ · R · P · q.
-    t.quaternion.premultiply(qParent).premultiply(qAxis).premultiply(qParent.invert());
-  }
+  for (const t of thighs) rotateInWorld(t, qAxis);
 }
 
 /** Les deux cuisses d'un personnage riggé sur le squelette commun. */
@@ -177,4 +195,35 @@ export function thighsOf(node: Object3D): Object3D[] {
     if (b !== undefined) out.push(b);
   }
   return out;
+}
+
+/** Pose assise de repos, tirée de `sit` (voir `restClip`). */
+export const SIT_REST = 'sit_rest';
+
+/**
+ * Pose assise calme: la première image du clip `sit` (buste droit, mains sur les cuisses), tenue.
+ * Le clip `sit` livré s'assoit, se penche de 50° vers l'avant (tête vers la table, avant-bras
+ * dans le plateau) puis se relève: on n'en garde que l'assise droite du début.
+ */
+export function restClip(clips: readonly AnimationClip[]): AnimationClip | null {
+  const sit = clips.find((c) => c.name === 'sit');
+  if (sit === undefined) return null;
+  const tracks = sit.tracks.map((track) => {
+    const size = track.getValueSize();
+    const first = Array.from(track.values.slice(0, size));
+    const t = track.clone();
+    t.times = new Float32Array([0, 1]);
+    t.values = new Float32Array([...first, ...first]);
+    return t;
+  });
+  return new AnimationClip(SIT_REST, 1, tracks);
+}
+
+const up = new Vector3(0, 1, 0);
+
+/** Tourne la tête (os du cou) de `angle` autour de la verticale, après le mélangeur. */
+export function turnHead(neck: Object3D | undefined, angle: number): void {
+  if (neck === undefined) return;
+  qAxis.setFromAxisAngle(up, angle);
+  rotateInWorld(neck, qAxis);
 }

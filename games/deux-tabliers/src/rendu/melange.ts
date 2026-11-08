@@ -13,6 +13,10 @@ export interface ClipBlend {
   update(dt: number): void;
   /** Clip vers lequel on va. */
   target(): string;
+  /** Poids du clip dans le mélange (0 s'il ne joue pas). */
+  weight(name: string): number;
+  /** Cale le temps du clip (s), avant `update`: un geste suivi par une horloge à soi. */
+  seek(name: string, time: number): void;
   stop(): void;
 }
 
@@ -76,6 +80,11 @@ export function createClipBlend(
       mixer.update(dt);
     },
     target: () => target,
+    weight: (name) => weights.get(name) ?? 0,
+    seek(name, time) {
+      const action = actions.get(name);
+      if (action !== undefined) action.time = time;
+    },
     stop() {
       mixer.stopAllAction();
       weights.clear();

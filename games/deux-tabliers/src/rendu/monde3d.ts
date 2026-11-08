@@ -25,10 +25,12 @@ import type { GameView } from '../reseau/vue';
 import { objectPosition } from '../simulation/monde';
 import { AVATAR_MODEL, FURNITURE_MODEL, MODEL_TURN_DEG, OBJECT_MODEL } from './correspondances';
 import { createClipBlend, type ClipBlend } from './melange';
-import { seatAnchor } from '../etat/assises';
+import { placeAnchor } from '../etat/assises';
 import {
   bendThighs,
+  restClip,
   seatPlacement,
+  SIT_REST,
   sitCalibration,
   thighsOf,
   type SeatPlacement,
@@ -116,14 +118,13 @@ export function createWorldNodes(
         child.material = tinted;
       });
       // Pose assise mesurée avant de poser le personnage (à l'origine, sans rotation).
-      const sit = sitCalibration(
-        `${AVATAR_MODEL[i]}:sit`,
-        node,
-        src.clips.find((c) => c.name === 'sit'),
-      );
+      // Pose droite tenue (`sit_rest`): le clip `sit` livré se penche tête vers la table.
+      const rest = restClip(src.clips);
+      const clips = rest === null ? src.clips : [...src.clips, rest];
+      const sit = sitCalibration(`${AVATAR_MODEL[i]}:${SIT_REST}`, node, rest ?? undefined);
       holder.clear();
       holder.add(node);
-      const blend = createClipBlend(new AnimationMixer(node), src.clips, 0.2);
+      const blend = createClipBlend(new AnimationMixer(node), clips, 0.2);
       blend.update(0);
       rigs[i] = { blend, still: 0, sit, thighs: thighsOf(node), node };
     });
@@ -259,14 +260,9 @@ export function createWorldNodes(
         avatar.visible = i !== view.local;
         const pose = view.pose(i);
         const rig = rigs[i];
-        // Assis: sur l'assise déclarée, tourné comme elle (face à sa table), clip `sit`.
+        // Assis: sur sa place du meuble, tourné comme elle (face à sa table), pose droite.
         const seatId = world.players[i].seat ?? null;
-        const seatFurniture =
-          seatId === null ? undefined : world.furniture.find((f) => f.id === seatId);
-        const anchor =
-          seatFurniture === undefined
-            ? null
-            : seatAnchor(view.content, world.furniture, seatFurniture);
+        const anchor = seatId === null ? null : placeAnchor(view.content, world.furniture, seatId);
         const yaw = anchor === null ? pose.yawDeg : anchor.yawDeg;
         // L'avant du modèle est +Z, le cap 0 regarde -Z: demi-tour.
         avatar.rotation.y = (yaw * Math.PI) / 180 + (rig === null ? 0 : Math.PI);
@@ -278,7 +274,7 @@ export function createWorldNodes(
         if (rig !== null && rig !== undefined) {
           const moving = dt > 0 && Math.hypot(pose.x - prev.x, pose.z - prev.z) / dt > 0.3;
           rig.still = moving ? 0 : rig.still + dt;
-          rig.blend.set(sitting ? 'sit' : rig.still < 0.15 ? 'walk' : 'idle');
+          rig.blend.set(sitting ? SIT_REST : rig.still < 0.15 ? 'walk' : 'idle');
           if (avatar.visible) {
             rig.blend.update(dt);
             if (sitting) bendThighs(rig.node, rig.thighs, placed.thigh);
