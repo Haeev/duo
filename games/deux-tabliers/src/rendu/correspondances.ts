@@ -75,3 +75,12 @@ export const MODEL_TURN_DEG: Readonly<Record<string, number>> = {
 
 /** Avatars des joueurs: l'hôte, puis l'invité. */
 export const AVATAR_MODEL = ['char_avatar_1', 'char_avatar_2'] as const;
+
+/** Tasse ou verre d'une boisson servie, par famille de la carte (`carte.json`). */
+export const DRINK_VESSEL: Readonly<Record<string, string>> = {
+  black_coffee: 'ware_cup_espresso',
+  milk_coffee: 'ware_cup_cappuccino',
+  chocolate: 'ware_cup_cappuccino',
+  tea: 'ware_cup_cappuccino',
+  cold_drink: 'ware_glass',
+};

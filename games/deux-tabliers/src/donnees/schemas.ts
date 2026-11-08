@@ -32,6 +32,12 @@ export const SettingsSchema = v.strictObject({
     eyeAboveSeat: Positive,
     /** Inclinaison du regard en s'asseyant (vers la table), en degrés. */
     seatedPitchDeg: v.pipe(v.number(), v.minValue(-60), v.maxValue(0)),
+    /** Pause d'un client assis entre deux gorgées (s, bornes du tirage par client). */
+    sipGapSeconds: v.tuple([Positive, Positive]),
+    /** Durée d'un regard d'un client qui attend, vers le comptoir ou son voisin (s, bornes). */
+    glanceSeconds: v.tuple([Positive, Positive]),
+    /** Rotation de tête au plus, de part et d'autre du regard droit devant (degrés). */
+    glanceMaxDeg: v.pipe(v.number(), v.minValue(0), v.maxValue(80)),
   }),
   net: v.strictObject({
     movesEvery: v.pipe(v.number(), v.integer(), v.minValue(1)),

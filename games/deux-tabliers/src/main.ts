@@ -28,7 +28,7 @@ import type { Intent, StepInput } from './simulation/entrees';
 import { planLabel } from './simulation/interactions';
 import { aim, type Aim } from './simulation/visee';
 import { eyeHeightOf } from './simulation/assise';
-import { seatAnchor } from './etat/assises';
+import { placeAnchor } from './etat/assises';
 
 const canvas = document.getElementById('scene');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas #scene absent');
@@ -212,9 +212,9 @@ duo.loop.start({
     const seatId = view.world().players[view.local].seat ?? null;
     if (seatId !== lastSeat) {
       lastSeat = seatId;
-      const f = seatId === null ? undefined : view.world().furniture.find((x) => x.id === seatId);
-      if (f !== undefined) {
-        look.look.yawDeg = seatAnchor(content, view.world().furniture, f).yawDeg;
+      const a = seatId === null ? null : placeAnchor(content, view.world().furniture, seatId);
+      if (a !== null) {
+        look.look.yawDeg = a.yawDeg;
         look.look.pitchDeg = content.settings.seating.seatedPitchDeg;
       }
     }

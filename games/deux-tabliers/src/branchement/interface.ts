@@ -49,6 +49,7 @@ import { standingPose, type CustomerPose } from '../clientele/reseau';
 import type { GameView } from '../reseau/vue';
 import { articleLabel, QUALITY_LABEL, serviceGauge } from '../service';
 import { recipeOf } from '../service/regles';
+import { placeFurniture } from '../etat/assises';
 import type { Intent } from '../simulation/entrees';
 import type { GameEvent } from '../simulation/evenements';
 
@@ -986,7 +987,8 @@ export function wireInterface(view: GameView): WiredInterface {
     for (const g of w.clientele.groups) {
       if (g.stage === 'leaving') continue;
       const seat = g.seats[0];
-      const placed = seat === undefined ? undefined : w.furniture.find((f) => f.id === seat);
+      const placed =
+        seat === undefined ? undefined : w.furniture.find((f) => f.id === placeFurniture(seat));
       const at = placed ?? (standingPose(w, g.id, performance.now(), pose) ? pose : undefined);
       if (at === undefined) continue;
       const d = Math.hypot(at.x - me.x, at.z - me.z);

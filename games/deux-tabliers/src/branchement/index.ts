@@ -53,6 +53,7 @@ import {
 import type { Quality, Ticket } from '../service/etat';
 import { openTicket, recipeOf } from '../service/regles';
 import type { Chantier, SimContext } from '../simulation/systemes';
+import { placeFurniture } from '../etat/assises';
 
 /** Identifiant du service pour une recette ou un ingrédient de la clientèle. */
 export function serviceId(id: string): string {
@@ -385,5 +386,7 @@ connectArrangementEconomy({
   needsAgreement: (world, content, amount) =>
     Math.round(amount * 100) >= bigPurchaseCents(content.clientele, world.clientele),
   occupied: (world, furniture) =>
-    world.clientele.groups.some((g) => g.seats.includes(furniture) || g.table === furniture),
+    world.clientele.groups.some(
+      (g) => g.seats.some((s) => placeFurniture(s) === furniture) || g.table === furniture,
+    ),
 });

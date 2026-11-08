@@ -552,7 +552,6 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `donnees/clientele/*.json` est régénéré depuis `docs/jeux/cosy-cafe/demo/donnees/` par `outils/importer-clientele.py`: un texte ou une règle changé dans le jeu se change aussi dans la source du game designer et dans l'importeur, sinon le prochain import l’efface.
 - Ce qui naît d'un événement (carte de scène, réplique) disparaît à la reprise et chez un invité qui rejoint: le remonter aussi depuis l'état du monde, une fois par scène (clé jour et événement).
 - `fill` de `interface/typo.ts` élide « de » et « que » devant une valeur à voyelle: écrire les gabarits avec « de {partner} », jamais « d'{partner} ».
-<<<<<<< HEAD
 
 ## Assises et personnages assis (Deux Tabliers, vérifié le 2026-11-08)
 
@@ -562,7 +561,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le regard local (`look.look`) est à part du monde: s'asseoir doit aussi tourner la caméra locale vers la table, sinon le corps regarde la table et la vue la fenêtre.
 - Captures de près sans jouer: sauvegarde fabriquée dans Node (test Vitest jetable qui écrit le `StoredSave`, `data` = `JSON.stringify(world)`), posée dans `localStorage` sous `duo-sdk-dev:<jeu>:sauvegarde:1`, page rechargée; serveur `pnpm --filter @duo/sdk-dev servir <jeu> --construire --port <p>`, puis `pnpm build` du jeu pour reprendre un changement. 30 s par capture, sans erreur.
 - Un texte des scènes se change à trois endroits: `donnees/clientele/evenements.json`, la source du game designer (`docs/jeux/cosy-cafe/demo/donnees/evenements.json`) et la mise en scène écrite dans `outils/importer-clientele.py` (répliques du chauffeur). Horloge du café: 1 s réelle par minute de jeu; une durée dite par un personnage se compte en minutes de l'horloge.
+<<<<<<< HEAD
 
 - Deux Tabliers, importeurs (vérifié le 2026-11-08): `importer-clientele.py` réécrit aussi `regles.json`, et `service-donnees.mjs` réécrit `meubles.json` et `service/recettes.json`, avec des écarts anciens (retouches faites à la main dans le jeu). Après un import, ne garder que les fichiers visés (`git checkout` des autres) et le signaler.
 - Deux Tabliers, faux hôte jusqu'à la tablette au jour 1 (Playwright, deux cadres `/jeu/`): « Continuer » des deux, nom de la maison (`input`), « C’est notre maison » chez l'hôte puis « C’est notre maison ! » exact chez l'invité (le texte non exact attrape l'étiquette d'état), Retour arrière des deux (le bilan du lundi couvre l'écran du prénom), prénom, « C’est parti » deux fois chez chacun (prénom puis « Ton confort »), Tab chez l'hôte. Le bilan d'un jour ouvert se regarde sur la page d'aperçu (`apercu/index.html#bilan-3`, deux clics « Page suivante »).
 - Worktree isolé: un script Python en heredoc passe, mais pas une commande qui mêle `git show` et une boucle ou une redirection: mettre ces commandes dans un script du scratchpad.
+
+- `PropertyMixer.apply` de Three.js ne réécrit un os que si la valeur du clip change: sur une pose tenue (clip constant), une retouche d'os faite après le mélangeur (cuisses, cou) s'additionne d'une image à l'autre (jambes qui montent jusqu'à la table). Garder la valeur d'avant retouche et la remettre si le mélangeur n'y a pas touché (`rotateInWorld` de `src/rendu/assis.ts`).
+- Le clip `sit` livré (10,7 s) s'assoit, se penche de 50° (tête vers la table) puis se relève; sa première image est une assise droite, mains sur les cuisses: pose calme `sit_rest` tirée de là. `sit_drink` (11,2 s): la main droite va chercher la tasse loin sur le côté au début et à la fin; la gorgée utile va de 12 % à 72 % du clip.
+- `modeles.json`: `objets` est une liste de fiches (clé `id`), pas un dictionnaire; un schéma en `v.record` passait à côté sans erreur et toutes les assises prenaient la place par défaut. Vérifier une lecture de données par un test qui voit une valeur propre au fichier (2 cm d'avance de la chaise paillée).
+- Captures du faux hôte en rendu logiciel: fenêtre de 1300x460 et 2,5 s d'attente après `running`, une page par vue; au-delà, « Le jeu ne répond plus » arrête la partie. Bandeaux du jeu masqués par une feuille de style ajoutée aux cadres enfants seulement (`page.frames()` sans le cadre principal, sinon l'iframe n'est jamais stable).

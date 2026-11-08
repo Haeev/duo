@@ -4,7 +4,10 @@
  *
  * Modèles par nom (`assets/modeles/<nom>.glb`): `habitue-<id>` pour un habitué, `scene-<rôle>`
  * pour un invité de scène, sinon `client-<profil>`. Personnages riggés sur le squelette commun,
- * clips `walk`, `idle`, `sit`, `drink`, `sit_drink` (fondu de 0,25 s). Sans fichier: substitut
+ * clips `walk`, `idle`, `sit`, `drink`, `sit_drink` (fondu de 0,25 s). Assis, un client ne boit
+ * que si sa boisson est servie (`gestes.ts`): sa tasse est devant lui sur la table et passe dans
+ * sa main le temps de la gorgée; sinon il attend dans la pose droite (`sit_rest`) et tourne la
+ * tête vers son voisin ou le comptoir. Sans fichier: substitut
  * instancié (corps et tête, deux appels de dessin pour tous) à la couleur du profil.
  * Rien n'est alloué par image tant que la foule ne change pas.
  */
@@ -30,14 +33,20 @@ import type { GameView } from '../reseau/vue';
 import { createClipBlend, type ClipBlend } from '../rendu/melange';
 import {
   bendThighs,
+  restClip,
   seatPlacement,
+  SIT_REST,
   sitCalibration,
   thighsOf,
+  turnHead,
   type SeatPlacement,
   type SitCalibration,
 } from '../rendu/assis';
-import { seatAnchor } from '../etat/assises';
+import { DRINK_VESSEL } from '../rendu/correspondances';
+import { placeAnchor, placeFurniture, seatTable, type SeatAnchor } from '../etat/assises';
 import { memberLook, type Anim } from './clients';
+import { glanceWeight, memberDrink, sipTime } from './gestes';
+import { queueLine } from './places';
 import type { ClienteleContent } from './donnees';
 import type { Group as CustomerGroup } from './etat';
 import { standingPose, type CustomerPose } from './reseau';
@@ -61,12 +70,31 @@ interface Figure {
   readonly node: Object3D;
   readonly blend: ClipBlend;
   readonly clips: ReadonlySet<string>;
-  /** Pose assise mesurée par clip (`sit`, `sit_drink`), et les cuisses à baisser. */
+  /** Pose assise mesurée par clip (`sit_rest`, `sit_drink`), et les cuisses à baisser. */
   readonly sit: ReadonlyMap<string, SitCalibration | null>;
   readonly thighs: readonly Object3D[];
+  readonly neck: Object3D | undefined;
+  readonly rightHand: Object3D | undefined;
+  readonly leftHand: Object3D | undefined;
+  /** Durée du clip `sit_drink` (s), 0 sans lui. */
+  readonly drinkSec: number;
+  /** Tasse ou verre de sa boisson (clone du modèle), créé à son premier service. */
+  cup: { readonly model: string; readonly node: Object3D } | null;
 }
 
-const SIT_CLIPS = ['sit', 'sit_drink'] as const;
+const SIT_CLIPS = [SIT_REST, 'sit_drink'] as const;
+/**
+ * Gorgée tirée de `sit_drink` (11,2 s livrées): de 12 % (main droite devant, à hauteur de
+ * poitrine) à 72 % (revenue au même point). Avant et après, le clip va chercher et reposer la
+ * tasse loin sur le côté, hors de toute table: on n'en joue que le milieu.
+ */
+const SIP_FROM = 0.12;
+const SIP_TO = 0.72;
+/** Passage de la tasse de la table à la main (et retour), en secondes. */
+const CUP_MOVE = 0.35;
+/** Prise de la tasse dans la main: sous le poignet, un peu en avant (m). */
+const GRIP_DOWN = 0.09;
+const GRIP_AHEAD = 0.06;
 
 export interface CustomerNodes {
   update(view: GameView, nowMs: number, frameDt: number): void;
@@ -136,8 +164,14 @@ function modelName(cc: ClienteleContent, g: CustomerGroup, k: number): string | 
   return null;
 }
 
-/** Hauteur de l'assise occupée (m), `null` hors d'un meuble (zinc, fontaine, debout). */
-const seatAt = { y: null as number | null };
+/**
+ * Où se tient le membre placé par `memberPose`: sur la place d'un meuble (son point), assis au
+ * sol (fontaine), debout au zinc, ou en marche.
+ */
+const seatAt = {
+  kind: 'walk' as 'seat' | 'ground' | 'zinc' | 'walk',
+  anchor: null as SeatAnchor | null,
+};
 
 /** Position et cap du membre `k` d'un groupe; `seated` vrai s'il est assis. */
 function memberPose(
@@ -148,7 +182,8 @@ function memberPose(
   nowMs: number,
   out: CustomerPose,
 ): boolean | null {
-  seatAt.y = null;
+  seatAt.kind = 'walk';
+  seatAt.anchor = null;
   const rules = view.content.clientele.rules;
   if (g.stage === 'seated') {
     const id = g.seats[k] ?? g.seats[0];
@@ -161,18 +196,19 @@ function memberPose(
       out.z = p[1];
       // Au zinc, on regarde le comptoir (nord); à la fontaine, la place (nord aussi).
       out.yawDeg = 0;
+      seatAt.kind = id.startsWith('picnic-') ? 'ground' : 'zinc';
       out.anim = id.startsWith('picnic-') ? 'sit_drink' : 'drink';
       return id.startsWith('picnic-');
     }
-    const f = world.furniture.find((x) => x.id === id);
-    if (f === undefined) return null;
-    // Sur l'assise déclarée du meuble, tourné comme elle (face à sa table).
-    const a = seatAnchor(view.content, world.furniture, f);
+    // Sur sa place du meuble (banquette, banc: chacun la sienne), tourné comme elle.
+    const a = placeAnchor(view.content, world.furniture, id);
+    if (a === null) return null;
     out.x = a.x;
     out.z = a.z;
     out.yawDeg = a.yawDeg;
-    seatAt.y = a.y;
-    out.anim = 'sit_drink';
+    seatAt.kind = 'seat';
+    seatAt.anchor = a;
+    out.anim = 'sit';
     return true;
   }
   if (!standingPose(world, g.id, nowMs, out)) return null;
@@ -264,6 +300,8 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       const node = cloneSkinned(src.scene);
       // Ajouté à la scène au premier `update` qui le place: jamais vu à l'origine ni sans clip.
       node.visible = false;
+      const rest = restClip(src.clips);
+      const clips = rest === null ? src.clips : [...src.clips, rest];
       const sit = new Map<string, SitCalibration | null>();
       for (const c of SIT_CLIPS)
         sit.set(
@@ -271,18 +309,23 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
           sitCalibration(
             `${name}:${c}`,
             node,
-            src.clips.find((x) => x.name === c),
+            clips.find((x) => x.name === c),
           ),
         );
-      const blend = createClipBlend(new AnimationMixer(node), src.clips, FADE);
+      const blend = createClipBlend(new AnimationMixer(node), clips, FADE);
       blend.update(0);
       root.add(node);
       figures.set(key, {
         node,
         blend,
-        clips: new Set(src.clips.map((c) => c.name)),
+        clips: new Set(clips.map((c) => c.name)),
         sit,
         thighs: thighsOf(node),
+        neck: node.getObjectByName('neck'),
+        rightHand: node.getObjectByName('RightHand'),
+        leftHand: node.getObjectByName('LeftHand'),
+        drinkSec: src.clips.find((c) => c.name === 'sit_drink')?.duration ?? 0,
+        cup: null,
       });
     });
     return null;
@@ -290,6 +333,150 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
 
   const play = (f: Figure, anim: Anim): void => {
     f.blend.set(f.clips.has(anim) ? anim : anim === 'sit_drink' ? 'sit' : 'idle');
+  };
+
+  const placedRest: SeatPlacement = { x: 0, y: 0, z: 0, thigh: 0 };
+  const handAt = new Vector3();
+  const restAt = new Vector3();
+  const cupPending = new Set<string>();
+
+  /** Tasse de `drink`: sur la table (`table`), dans la main (`hand`), ou entre les deux (`h`). */
+  const placeCup = (
+    view: GameView,
+    fig: Figure,
+    drink: string | null,
+    hand: Object3D | undefined,
+    table: Vector3 | null,
+    h: number,
+    rotY: number,
+  ): void => {
+    const family = drink === null ? undefined : view.content.clientele.recipes.get(drink)?.family;
+    const vessel = family === undefined ? undefined : DRINK_VESSEL[family];
+    if (vessel === undefined) {
+      if (fig.cup !== null) fig.cup.node.visible = false;
+      return;
+    }
+    if (fig.cup?.model !== vessel) {
+      if (fig.cup !== null) fig.cup.node.visible = false;
+      if (cupPending.has(vessel + fig.node.uuid)) return;
+      cupPending.add(vessel + fig.node.uuid);
+      void load(vessel).then((src) => {
+        cupPending.delete(vessel + fig.node.uuid);
+        if (src === null || disposed || fig.cup?.model === vessel) return;
+        if (fig.cup !== null) root.remove(fig.cup.node);
+        const node = src.scene.clone();
+        node.visible = false;
+        root.add(node);
+        fig.cup = { model: vessel, node };
+      });
+      return;
+    }
+    const cup = fig.cup.node;
+    if (hand !== undefined && h > 0) {
+      hand.getWorldPosition(handAt);
+      handAt.y -= GRIP_DOWN;
+      handAt.x += Math.sin(rotY) * GRIP_AHEAD;
+      handAt.z += Math.cos(rotY) * GRIP_AHEAD;
+    }
+    if (table === null || (hand !== undefined && h >= 1)) {
+      if (hand === undefined) {
+        cup.visible = false;
+        return;
+      }
+      cup.position.copy(handAt);
+    } else if (hand === undefined || h <= 0) cup.position.copy(table);
+    else cup.position.copy(table).lerp(handAt, h);
+    cup.rotation.set(0, rotY, 0);
+    cup.visible = true;
+  };
+
+  /** Client sur la place d'un meuble: pose calme ou gorgée, tête, tasse. */
+  const seatedFigure = (
+    view: GameView,
+    fig: Figure,
+    g: CustomerGroup,
+    k: number,
+    a: SeatAnchor,
+    nowMs: number,
+    frameDt: number,
+    rotY: number,
+  ): void => {
+    const seating = view.content.settings.seating;
+    const drink = memberDrink(view.content.clientele, g, k);
+    const sipSec = fig.drinkSec * (SIP_TO - SIP_FROM);
+    const sip =
+      drink === null || sipSec <= 0 ? null : sipTime(seating, g.id, k, nowMs / 1000, sipSec);
+    fig.blend.set(sip === null ? SIT_REST : 'sit_drink');
+    if (sip !== null) fig.blend.seek('sit_drink', fig.drinkSec * SIP_FROM + sip);
+    // Les deux poses n'ont pas le bassin au même endroit: on mêle les placements comme le
+    // mélangeur mêle les clips, et les fesses restent sur l'assise pendant le fondu.
+    const wd = fig.blend.weight('sit_drink');
+    const cr = fig.sit.get(SIT_REST) ?? null;
+    const cd = fig.sit.get('sit_drink') ?? null;
+    if (cr !== null) seatPlacement(cr, a.x, a.y, a.z, rotY, placedRest);
+    if (cd !== null) seatPlacement(cd, a.x, a.y, a.z, rotY, placed);
+    const t = cr === null ? 1 : cd === null ? 0 : wd;
+    if (cr !== null || cd !== null) {
+      fig.node.position.set(
+        placedRest.x + (placed.x - placedRest.x) * t,
+        placedRest.y + (placed.y - placedRest.y) * t,
+        placedRest.z + (placed.z - placedRest.z) * t,
+      );
+    } else fig.node.position.set(a.x, a.y - 0.45, a.z);
+    fig.blend.update(frameDt);
+    bendThighs(fig.node, fig.thighs, placedRest.thigh + (placed.thigh - placedRest.thigh) * t);
+    // En attendant (ou entre deux gorgées), un regard vers le voisin, sinon vers le comptoir.
+    const w = glanceWeight(seating, g.id, k, nowMs / 1000) * (1 - wd);
+    if (w <= 0.01) turnHead(fig.neck, 0);
+    else {
+      const other = k % 2 === 0 ? k + 1 : k - 1;
+      const id = other < g.size ? g.seats[other] : undefined;
+      const n = id === undefined ? null : placeAnchor(view.content, view.world().furniture, id);
+      const target = n ?? queueLine(view.content).register;
+      const dx = target.x - a.x;
+      const dz = target.z - a.z;
+      const angle = Math.atan2(a.fz * dx - a.fx * dz, a.fx * dx + a.fz * dz);
+      const max = (seating.glanceMaxDeg * Math.PI) / 180;
+      turnHead(fig.neck, Math.max(-max, Math.min(max, angle)) * w);
+    }
+    // Tasse sur la table devant lui, dans sa main pendant la gorgée (montée et descente douces).
+    const table = cupSpot(view, g.seats[k], a);
+    let h = 0;
+    if (sip !== null) {
+      const edge = Math.min(1, Math.min(sip, sipSec - sip) / CUP_MOVE);
+      h = edge * edge * (3 - 2 * edge);
+    }
+    placeCup(view, fig, drink, fig.rightHand, table, table === null ? 1 : h, rotY);
+  };
+
+  /**
+   * Place de la tasse sur la table: à 12 cm du bord devant le client, un peu à sa droite (la
+   * main qui boit), gardée sur le plateau. `null` sans table à portée.
+   */
+  const cupSpot = (view: GameView, place: string | undefined, a: SeatAnchor): Vector3 | null => {
+    if (place === undefined) return null;
+    const world = view.world();
+    const id = placeFurniture(place);
+    const f = world.furniture.find((x) => x.id === id);
+    const t = f === undefined ? null : seatTable(view.content, world.furniture, f);
+    const type = t === null ? undefined : view.content.furniture.get(t.type);
+    if (t === null || type === undefined) return null;
+    const along = (t.x - a.x) * a.fx + (t.z - a.z) * a.fz;
+    const half = Math.min(type.footprint[0], type.footprint[1]) / 2;
+    const reach = Math.max(0.05, along - half + 0.12);
+    let sx = a.x + a.fx * reach - a.fz * 0.1;
+    let sz = a.z + a.fz * reach + a.fx * 0.1;
+    // Gardée sur le plateau (repère de la table, à 6 cm du bord).
+    const r = (t.rotDeg * Math.PI) / 180;
+    const dx = sx - t.x;
+    const dz = sz - t.z;
+    const mx = type.footprint[0] / 2 - 0.06;
+    const mz = type.footprint[1] / 2 - 0.06;
+    const lx = Math.max(-mx, Math.min(mx, dx * Math.cos(r) - dz * Math.sin(r)));
+    const lz = Math.max(-mz, Math.min(mz, dx * Math.sin(r) + dz * Math.cos(r)));
+    sx = t.x + lx * Math.cos(r) + lz * Math.sin(r);
+    sz = t.z - lx * Math.sin(r) + lz * Math.cos(r);
+    return restAt.set(sx, t.y + type.height, sz);
   };
 
   const seen = new Set<string>();
@@ -313,16 +500,27 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
           if (fig !== null) {
             seen.add(key);
             const rotY = (pose.yawDeg * Math.PI) / 180 + Math.PI;
-            play(fig, pose.anim);
-            const cal = seatAt.y === null ? null : (fig.sit.get(fig.blend.target()) ?? null);
-            if (cal !== null && seatAt.y !== null) {
-              seatPlacement(cal, pose.x, seatAt.y, pose.z, rotY, placed);
-              fig.node.position.set(placed.x, placed.y, placed.z);
-            } else fig.node.position.set(pose.x, 0, pose.z);
             fig.node.rotation.y = rotY;
             fig.node.visible = true;
+            const anchor = seatAt.anchor;
+            if (seatAt.kind === 'seat' && anchor !== null) {
+              seatedFigure(view, fig, g, k, anchor, nowMs, frameDt, rotY);
+              continue;
+            }
+            // Au zinc ou à la fontaine: le geste de boire seulement avec sa boisson en main.
+            const drink = seatAt.kind === 'walk' ? null : memberDrink(view.content.clientele, g, k);
+            const anim: Anim =
+              seatAt.kind === 'walk' || drink !== null
+                ? pose.anim
+                : seatAt.kind === 'ground'
+                  ? 'sit'
+                  : 'idle';
+            if (anim === 'sit') fig.blend.set(SIT_REST);
+            else play(fig, anim);
+            fig.node.position.set(pose.x, 0, pose.z);
             fig.blend.update(frameDt);
-            if (cal !== null) bendThighs(fig.node, fig.thighs, placed.thigh);
+            const hand = seatAt.kind === 'zinc' ? fig.leftHand : fig.rightHand;
+            placeCup(view, fig, drink, hand, null, 1, rotY);
             continue;
           }
           // Modèle en cours de chargement: rien plutôt qu'un substitut d'un instant.
@@ -403,6 +601,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       for (const [key, f] of figures) {
         if (seen.has(key)) continue;
         root.remove(f.node);
+        if (f.cup !== null) root.remove(f.cup.node);
         f.blend.stop();
         figures.delete(key);
       }

@@ -1,34 +1,34 @@
 /**
- * Avatars assis: « Agir » sur une assise libre (mains vides) assoit l'avatar sur l'assise
- * déclarée du meuble, tourné comme elle (face à sa table); un pas le relève, à côté de l'assise
- * et jamais à travers la table. Même code chez l'hôte et pour la prédiction de l'invité.
+ * Avatars assis: « Agir » sur une place libre (mains vides) assoit l'avatar sur cette place du
+ * meuble (banquette, banc: la place visée), tourné comme elle (face à sa table); un pas le
+ * relève, à côté de l'assise et jamais à travers la table. Même code chez l'hôte et pour la
+ * prédiction de l'invité. Une place se nomme comme dans `etat/assises.ts` (`seat-9#1`).
  */
 import type { Content } from '../donnees/charger';
-import { approachCandidates, seatAnchor } from '../etat/assises';
+import { approachCandidates, placeAnchor } from '../etat/assises';
 import type { PlayerIndex, PlayerState, World } from '../etat/monde';
 import { resolve } from './deplacement';
 import type { Vec2 } from './geometrie';
 
-/** Assise prise par un client ou par l'autre joueur. */
-export function seatTaken(world: World, furniture: string, except: PlayerIndex | null): boolean {
-  if (world.players.some((p, i) => i !== except && p.seat === furniture)) return true;
-  return world.clientele.groups.some((g) => g.seats.includes(furniture));
+/** Place prise par un client ou par l'autre joueur. */
+export function seatTaken(world: World, place: string, except: PlayerIndex | null): boolean {
+  if (world.players.some((p, i) => i !== except && p.seat === place)) return true;
+  return world.clientele.groups.some((g) => g.seats.includes(place));
 }
 
 /** Hauteur des yeux du joueur (assis: au-dessus de son assise). */
 export function eyeHeightOf(content: Content, world: World, player: PlayerIndex): number {
   const id = world.players[player].seat ?? null;
-  const f = id === null ? undefined : world.furniture.find((x) => x.id === id);
-  if (f === undefined) return content.settings.player.eyeHeight;
-  return seatAnchor(content, world.furniture, f).y + content.settings.seating.eyeAboveSeat;
+  const a = id === null ? null : placeAnchor(content, world.furniture, id);
+  if (a === null) return content.settings.player.eyeHeight;
+  return a.y + content.settings.seating.eyeAboveSeat;
 }
 
-export function sitDown(content: Content, world: World, player: PlayerIndex, id: string): void {
-  const f = world.furniture.find((x) => x.id === id);
-  if (f === undefined) return;
-  const a = seatAnchor(content, world.furniture, f);
+export function sitDown(content: Content, world: World, player: PlayerIndex, place: string): void {
+  const a = placeAnchor(content, world.furniture, place);
+  if (a === null) return;
   const p = world.players[player];
-  p.seat = id;
+  p.seat = place;
   p.use = null;
   p.x = a.x;
   p.z = a.z;
@@ -41,9 +41,8 @@ const probe: Vec2 = { x: 0, z: 0 };
 export function standUp(content: Content, world: World, p: PlayerState): void {
   const id = p.seat ?? null;
   p.seat = null;
-  const f = id === null ? undefined : world.furniture.find((x) => x.id === id);
-  if (f === undefined) return;
-  const a = seatAnchor(content, world.furniture, f);
+  const a = id === null ? null : placeAnchor(content, world.furniture, id);
+  if (a === null) return;
   let bestX = a.x;
   let bestZ = a.z;
   let bestShift = Infinity;
