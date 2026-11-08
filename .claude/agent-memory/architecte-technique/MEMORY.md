@@ -91,3 +91,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Plans du level designer: une `door` peut être un portillon de comptoir (hauteur 1,1) ou un portail de clôture: pas de linteau sauf si un `wall` la jouxte dans le même alignement.
 - La CI des jeux filtre par chemin (`pnpm --filter "./games/$ID"`): le nom npm du paquet est libre (`deux-tabliers` sans portée marche aussi avec `--filter deux-tabliers`).
 - Valibot: un tableau vide `[] as const` s'étale dans `v.variant` (intentions et événements extensibles par chantier sans toucher au fichier commun).
+
+## Branchement de Deux Tabliers (vérifié le 2026-11-08)
+
+- SDK: `requestPointerLock()` rend une promesse; son rejet (Échap récent, autre document qui tient le pointeur) remontait en erreur fatale et arrêtait la partie des deux côtés. `lockPointer` l'avale désormais (`packages/sdk/src/input.ts`). Dans `deux-vues.html`, les deux iframes se disputent le verrou: c'est là que ça se voit.
+- Compter les programmes WebGL vivants sans toucher au jeu: `page.addInitScript` qui enveloppe `createProgram` et `deleteProgram` de `WebGL2RenderingContext.prototype` (s'applique aussi aux iframes), lu par `frame.evaluate`.
+- Three.js 0.187: une capture par `CubeCamera` compile une variante de chaque programme pour la cible cubique (19 programmes au lieu de 8); `PMREMGenerator.fromScene(new RoomEnvironment())` puis `dispose` ne laisse rien.
+- Coque cuite: matériaux passés en `MeshBasicMaterial` avec `map` et `lightMap` (canal 1): la lumière de la scène n'y touche plus, un seul programme pour toute la coque.
+- Piloter le regard dans le faux hôte: un vrai clic Playwright (coordonnées de page, hors des bulles du HUD qui interceptent) verrouille le pointeur, puis des `PointerEvent('pointermove', { movementX, movementY })` synthétiques sur `window` de l'iframe (moins de 300 px chacun) tournent la tête; les touches par `KeyboardEvent` synthétiques (`code`) sur `window`.
+- Ne pas modifier `src/` pendant une capture longue: le serveur de Vite recharge les deux vues et la partie repart à zéro.
