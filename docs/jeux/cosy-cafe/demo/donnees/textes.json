@@ -130,6 +130,10 @@
       "farida_noe": ["Noé a dessiné le café toute la soirée. F.", "Un mercredi parfait. F. et N."],
       "bastien": ["Gribouille approuve. B.", "Le meilleur arrêt du sentier des crêtes. B."],
       "mathis": ["En retard, mais réveillé. M.", "Le pain au chocolat de la victoire. M."]
+    },
+    "requires": {
+      "Les fauteuils près de la vitrine: le bonheur.": "fauteuil",
+      "Le calme de quinze heures, la tarte du jour, et ce fauteuil. L.": "fauteuil"
     }
   }
 }

@@ -326,14 +326,15 @@ export const T = {
     footer: 'Le café est fermé : rien ne presse.',
     nothing: 'Rien à noter ce soir.',
   },
+  // Écran de nuit du dernier lundi: la réponse à la lettre de René (RN-05).
   night: {
-    title: 'Fin de la journée',
-    continue: 'Continuer',
-    finish: 'Finir la séance',
-    chips: { none: 'Pas encore', continue: 'Veut continuer', finish: 'Veut finir la séance' },
-    help: "Vous continuez quand vous avez choisi « Continuer » sur les deux ordinateurs. Tu peux changer d'avis tant que {partner} n'a pas choisi.",
+    title: 'La lettre de René',
+    continue: 'Partir',
+    finish: 'Rester',
+    chips: { none: 'Pas encore', continue: 'Veut partir', finish: 'Veut rester à Ormeval' },
+    help: "René aura votre réponse quand vous aurez choisi tous les deux. Tu peux changer d'avis tant que {partner} n'a pas choisi.",
     waiting: 'En attente du choix de {partner}...',
-    disagree: '{partner} veut finir la séance. Parlez-en, puis choisissez.',
+    disagree: '{partner} veut rester à Ormeval. Parlez-en, puis choisissez.',
   },
   morning: {
     thisMorning: 'Ce matin',

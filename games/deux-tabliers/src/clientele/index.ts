@@ -159,6 +159,10 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
     return;
   }
   if (s.day === 0) return;
+  if (intent.type === 'clientele-evening-page') {
+    s.eveningPages[player] = [s.report?.day ?? s.day, intent.page];
+    return;
+  }
   if (intent.type === 'clientele-vote') {
     refuse(sim, player, vote(ctx, player, intent.topic, intent.yes));
     return;

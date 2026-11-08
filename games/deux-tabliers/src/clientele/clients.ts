@@ -505,6 +505,29 @@ export function satisfaction(ctx: Ctx, g: Group): number {
 
 const SIGNS = 'ABCDEFGHIJLMNOPRSTV';
 
+/** « Il y a de la vie sur la place. S. »: le texte, et la signature mise sous le mot. */
+function splitSign(line: string): [string, string] {
+  const m = /^(.*\S)\s+([A-Z]\.(?: et [A-Z]\.)?)$/.exec(line);
+  return m === null ? [line, ''] : [m[1] ?? line, m[2] ?? ''];
+}
+
+/**
+ * Mots qu'on peut écrire ce soir (RN-06): pas deux fois le même le même jour, et un mot qui
+ * parle d'un meuble (`requires`) seulement si ce meuble est au café.
+ */
+export function guestbookLines(ctx: Ctx, lines: readonly string[]): string[] {
+  const { s } = ctx;
+  const requires = ctx.cc.texts.guestbook.requires;
+  const today = new Set(s.guestbook.filter((w) => w.day === s.day).map((w) => w.text));
+  const has = (need: string): boolean =>
+    ctx.sim.world.furniture.some((f) => f.type.startsWith(need)) ||
+    s.equipment.some((e) => e.startsWith(need));
+  return lines.filter((line) => {
+    const need = requires[line];
+    return !today.has(splitSign(line)[0]) && (need === undefined || has(need));
+  });
+}
+
 function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
   const r = ctx.cc.rules.guestbook;
   const texts = ctx.cc.texts.guestbook;
@@ -513,10 +536,15 @@ function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
   let sign = `${SIGNS.charAt(random.int(0, SIGNS.length))}.`;
   let good = sat >= 60;
   if (g.regular !== null && random.chance(r.regularChance)) {
-    const lines = texts.regulars[g.regular];
-    if (lines !== undefined && lines.length > 0) {
-      text = random.pick(lines);
-      sign = '';
+    const all = texts.regulars[g.regular] ?? [];
+    const mine = new Set(all.flatMap((l) => [l, splitSign(l)[0]]));
+    // Un habitué espace ses mots: Simone passe chaque jour, elle n'écrit pas chaque soir.
+    const recent = ctx.s.guestbook.some(
+      (w) => w.day > ctx.s.day - r.regularGapDays && mine.has(w.text),
+    );
+    const lines = recent ? [] : guestbookLines(ctx, all);
+    if (lines.length > 0) {
+      [text, sign] = splitSign(random.pick(lines));
       good = true;
     }
   }
@@ -535,8 +563,8 @@ function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
       if (p.id === 'promeneurs' && ctx.s.equipment.includes('range_velos')) reasons.push('bikes');
       if (priceIndex(ctx.cc, p, ctx.s.slate) < 0.95) reasons.push('price');
       reasons.push('ambiance');
-      const lines = texts.positive[reasons[0] ?? 'ambiance'];
-      if (lines !== undefined && lines.length > 0) text = random.pick(lines);
+      const lines = guestbookLines(ctx, texts.positive[reasons[0] ?? 'ambiance'] ?? []);
+      if (lines.length > 0) text = random.pick(lines);
       good = true;
     } else if (sat <= r.disappointed && random.chance(r.disappointedChance)) {
       const p = profileOf(ctx, g);
@@ -546,8 +574,8 @@ function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
       else if (g.place === 'none' && !g.takeAway) reason = 'noSeat';
       else if (g.dirtySeat) reason = 'dirtyTable';
       else if (priceIndex(ctx.cc, p, ctx.s.slate) > 1.1) reason = 'price';
-      const lines = texts.negative[reason];
-      if (lines !== undefined && lines.length > 0) text = random.pick(lines);
+      const lines = guestbookLines(ctx, texts.negative[reason] ?? []);
+      if (lines.length > 0) text = random.pick(lines);
       good = false;
     }
   }
@@ -555,6 +583,7 @@ function guestbookWord(ctx: Ctx, g: Group, sat: number): void {
 }
 
 export function addGuestbook(ctx: Ctx, text: string, sign: string, good: boolean): void {
+  if (ctx.s.guestbook.some((w) => w.day === ctx.s.day && w.text === text)) return;
   ctx.s.guestbook.push({ day: ctx.s.day, text, sign, good });
   ctx.s.guestbookCount++;
   const kept = ctx.cc.rules.guestbook.kept;

@@ -42,12 +42,28 @@ export function heure(minutes: number): string {
   return mm === 0 ? `${h}${NBSP}h` : `${h}${NBSP}h${NBSP}${String(mm).padStart(2, '0')}`;
 }
 
-/** Remplace `{cle}` par sa valeur. */
+/** Commence par une voyelle (« Alex », « Émilie »): « de », « que » s'élident devant. */
+function vowelStart(value: string): boolean {
+  return /^[AEIOUYÀÂÆÉÈÊËÎÏÔŒÙÛÜaeiouyàâæéèêëîïôœùûü]/.test(value);
+}
+
+/**
+ * Remplace `{cle}` par sa valeur, avec l'élision de « de » et « que » devant un prénom à
+ * voyelle (« l'accord d'Alex », « tant qu'Alex n'a pas choisi »).
+ */
 export function fill(template: string, values: Readonly<Record<string, string | number>>): string {
-  return template.replace(/\{(\w+)\}/g, (all, key: string) => {
-    const value = values[key];
-    return value === undefined ? all : String(value);
-  });
+  return template.replace(
+    /(\b(?:de|que|De|Que) )?\{(\w+)\}/g,
+    (all, before: string | undefined, key: string) => {
+      const value = values[key];
+      if (value === undefined) return all;
+      const text = String(value);
+      if (before === undefined) return text;
+      return typeof value === 'string' && vowelStart(text)
+        ? `${before.slice(0, -2)}'${text}`
+        : `${before}${text}`;
+    },
+  );
 }
 
 /** Première lettre en capitale (« mardi » vers « Mardi »). */

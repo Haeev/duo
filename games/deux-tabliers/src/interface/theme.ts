@@ -85,7 +85,7 @@ export const CSS = `
 .dt-reading { position: absolute; left: 50%; bottom: calc(50% + 1.6em); transform: translateX(-50%); width: 16em; background: var(--dt-papier); color: var(--dt-encre); border: 2px solid var(--dt-encre); }
 .dt-reading .dt-ticket-line, .dt-reading .dt-hand { font-family: var(--dt-ticket); font-size: 1.1em; }
 .dt-quality { position: absolute; left: calc(50% + 2.4em); top: calc(50% - 0.8em); padding: 0.15em 0.6em; border-radius: 1em; }
-.dt-capsule { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0.9em 1.5em; border-radius: 2em; text-align: center; font-size: 1.1em; }
+.dt-capsule { position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0.9em 1.5em; border-radius: 2em; text-align: center; font-size: 1.1em; }
 .dt-capsule small { display: block; margin-top: 0.3em; font-size: 0.85em; color: var(--dt-creme-2); }
 .dt-flash { position: absolute; left: 50%; top: 38%; transform: translateX(-50%); border: 2px dashed var(--dt-creme-2); border-radius: 2em; display: flex; gap: 0.4em; align-items: center; }
 .dt-fail { position: absolute; inset: 10%; padding: 20px; background: var(--dt-expresso); border: 1px solid var(--dt-filet); white-space: pre-wrap; overflow: auto; pointer-events: auto; }

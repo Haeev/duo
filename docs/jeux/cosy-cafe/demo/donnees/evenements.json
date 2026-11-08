@@ -14,15 +14,15 @@
       "name": "Le car de 8 h 12",
       "kind": "client_presse",
       "trigger": { "day": 4, "time": "8:05", "fallbackDay": 5 },
-      "announce": "Demain, le car du matin passe avec un remplaçant au volant. Il ne s'arrête que trois minutes.",
+      "announce": "Demain, le car du matin passe avec un remplaçant au volant. Il ne s'arrête qu'un instant.",
       "cast": [
         { "id": "octave_brissac", "name": "Octave Brissac", "look": "imperméable mastic, valise à roulettes, tasse de voyage cabossée à la main" },
         { "id": "chauffeur_car", "name": "Le chauffeur du car", "look": "chemisette bleue, casquette, klaxon poli" }
       ],
       "scene": [
-        { "who": "octave_brissac", "text": "Bonjour ! Un double crème au lait d'avoine, mousse épaisse, dans ma tasse, pas trop chaud, avec un sucre à côté, et un croissant coupé en deux. Le car repart dans trois minutes." },
+        { "who": "octave_brissac", "text": "Bonjour ! Un double crème au lait d'avoine, mousse épaisse, dans ma tasse, pas trop chaud, avec un sucre à côté, et un croissant coupé en deux. Le car repart tout de suite." },
         { "who": "octave_brissac", "text": "Et si vous pouvez écrire « Courage » sur le couvercle, c'est un grand jour pour moi." },
-        { "who": "chauffeur_car", "text": "Trois minutes, pas une de plus, j'ai un horaire !" }
+        { "who": "chauffeur_car", "text": "Je ne peux pas attendre, j'ai un horaire !" }
       ],
       "goal": {
         "text": "Servir la commande complète avant que le car reparte.",

@@ -36,7 +36,7 @@ import {
   takeOrderAt,
   takeServiceOutbox,
 } from '../clientele';
-import { linePrice, tierOpen as clienteleTierOpen } from '../clientele/economie';
+import { linePrice, owns, tierOpen as clienteleTierOpen } from '../clientele/economie';
 import type { Group, Quality as ClienteleQuality } from '../clientele/etat';
 import type { World } from '../etat/monde';
 import {
@@ -287,6 +287,54 @@ function stepPurchases(sim: SimContext): void {
   }
 }
 
+/**
+ * Extensions achetées par l'aménagement (tablette, `village-terrasse`): la clientèle les connaît
+ * sous `village_terrasse` dans `clientele.purchases` (places dehors, averse, fête, ambiance).
+ * Recopiées à chaque pas, ce qui répare aussi les sauvegardes faites avant ce branchement.
+ */
+function stepExtensions(sim: SimContext): void {
+  const { world, content } = sim;
+  const c = world.clientele;
+  const bought: [string, number][] = [
+    ...world.arrangement.extensions.map((id): [string, number] => [id, c.day]),
+    ...world.arrangement.works.map((w): [string, number] => [w.extension, w.readyDay]),
+  ];
+  for (const [id, ready] of bought) {
+    const ext = content.clientele.extensions.get(id.replaceAll('-', '_'));
+    if (ext === undefined || owns(c, ext.id)) continue;
+    c.purchases.push([ext.id, Math.min(c.day, ready), ready]);
+  }
+}
+
+/**
+ * Tickets dont le groupe est parti sans être servi (RN-02): retirés du rail. Les articles pas
+ * encore commencés rendent leurs ingrédients au stock de la clientèle (déjà comptés à la
+ * commande); ceux qui sont commencés restent sur les postes, libres pour le suivant (CO-09).
+ * `content` à `null` (reprise d'une sauvegarde): rien n'est rendu, les tickets ont des jours.
+ */
+export function purgeOrphanTickets(world: World, content: SimContext['content'] | null): number {
+  const s = world.service;
+  const orphans = s.tickets.filter(
+    (t) => ours(t.customer) && groupOfCustomer(world, t.customer) === undefined,
+  );
+  if (orphans.length === 0) return 0;
+  const gone = new Set(orphans.map((t) => t.id));
+  for (const t of orphans) {
+    if (content === null) continue;
+    for (const a of t.articles) {
+      if (a.object !== null) continue;
+      for (const i of recipeOf(content, a.recipe)?.ingredients ?? []) {
+        const id = i.id.replaceAll('-', '_');
+        if (content.clientele.supplies.ingredients.some((x) => x.id === id))
+          world.clientele.stock[id] = (world.clientele.stock[id] ?? 0) + i.qty;
+      }
+    }
+  }
+  for (const i of s.items) if (i.ticket !== null && gone.has(i.ticket)) i.ticket = null;
+  s.tickets = s.tickets.filter((t) => !gone.has(t.id));
+  return orphans.length;
+}
+
 /** Panne du jour 6: un groupe de la machine sur deux; l'inspection relève la pile de tasses. */
 function stepConditions(sim: SimContext): void {
   const { world } = sim;
@@ -308,8 +356,10 @@ export const branchementChantier: Chantier = {
       ticketsFromOutbox(sim);
       presentAtRegister(sim);
       serveReady(sim);
+      purgeOrphanTickets(sim.world, sim.content);
       stepDepartures(sim);
       stepCartons(sim);
+      stepExtensions(sim);
       stepPurchases(sim);
       stepConditions(sim);
     },
