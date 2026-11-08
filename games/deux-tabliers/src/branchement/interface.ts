@@ -550,7 +550,7 @@ export function wireInterface(view: GameView): WiredInterface {
       const s = w.clientele;
       if (s.day > 4 || player !== local) return null;
       if (s.phase === 'prep')
-        return 'L’horloge est arrêtée : prépare le café, puis retournez la pancarte à deux (Tab, puis le matin).';
+        return 'L’horloge est arrêtée : prépare le café, puis appuie sur Entrée pour retourner la pancarte, à deux.';
       if (s.phase === 'service' && w.service.waiting.length > 0)
         return 'Un client attend à la caisse : maintiens E sur la caisse.';
       if (s.phase === 'service' && w.service.tickets.some((t) => t.taker === null))
@@ -789,4 +789,3 @@ export function wireInterface(view: GameView): WiredInterface {
     },
   };
 }
-

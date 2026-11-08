@@ -287,6 +287,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         } else if (received !== undefined) {
           ctx.openProposal(received.id);
           swallowConfirm = true;
+        } else if (
+          keys.locked &&
+          model.morning !== null &&
+          !model.proposals.some((p) => p.kind === 'open' && p.from === model.local)
+        ) {
+          // Préparation: Entrée rouvre l'écran du matin, d'où l'on retourne la pancarte.
+          layers.open(morningLayer(ctx, () => undefined));
+          swallowConfirm = true;
         }
       }
       const d = model.dialogue;

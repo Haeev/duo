@@ -1,31 +1,37 @@
 # Deux Tabliers: état du code
 
-Squelette jouable du 2026-11-07 (version 0.1.0).
+Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre chantiers (service, clientèle, aménagement, interface) jouent ensemble, du « On ouvre ? » au bilan, sur les quinze jours de la démo.
 
-## Ce qui marche
+## Comment ça se joue
 
-- Chargement à deux par le SDK, manifeste valide (13 actions de `docs/jeux/cosy-cafe/ux.md`, section 9.1).
-- Données JSON validées au chargement, avec contrôles croisés (meubles, postes, objets, départ) et la règle des assises face à leur table.
-- Coque du café d'Ormeval aux cotes du plan `village-arrivee` (`docs/jeux/cosy-cafe/plans/plans.json`), en blocs: sols, plafonds, murs, cloisons, allèges et linteaux, éléments fixes, arbres. Meubles et postes du plan posés depuis `donnees/departs/village.json`.
-- Vue subjective: yeux à 1,65 m, champ vertical 60°, ZQSD par position de touche, regard à la souris pointeur verrouillé, capsule « Clique pour reprendre la souris », clic de reprise sans effet, Entrée reprend aussi, collisions contre murs et meubles (rayon 0,3 m), aucun joueur ne bloque l'autre.
-- Échap pointeur verrouillé: le SDK (`packages/sdk/src/input.ts`) prend un déverrouillage non demandé, page visible et active, partie en cours, pour Échap et envoie la demande de pause.
-- Interaction: visée par rayon et aimant (3°), invite contextuelle, une main, plateau à 4 places, pile de tasses inépuisable, poser sur un emplacement déclaré, donner à l'autre (1,5 m), postes au clic (plonge) ou au maintien (machine, 1,5 s, anneau), arbitrage chez l'hôte (« Déjà pris »).
-- Réseau: l'hôte fait autorité à 60 Hz, l'invité prédit ses pas et réconcilie en douceur (30 % de la vitesse de marche), interpole l'hôte (110 ms).
-- Sauvegarde par `saves.provide` (monde complet, format 1), reprise validée par schéma, joueurs replacés par identifiant de membre; la séance s'inscrit à l'historique par le SDK.
-- Sons par identifiant, sans blocage si un fichier manque; modèles GLB par nom, avec substitut.
-- Tablette provisoire (Tab) pour montrer un panneau qui rend la souris.
+- Jour 1 (lundi, fermé): l'annonce, « Notre maison » (l'un écrit le nom, l'autre clique « C'est notre maison »), son prénom, puis le bilan du jour de repos et « À demain ».
+- Chaque matin: l'écran du matin (météo, livraison, événement); « Commencer la journée » retourne la pancarte; quand les deux l'ont fait (ou que l'autre accepte « On ouvre ? » avec Entrée), le service commence. L'horloge est arrêtée avant.
+- Service: un client arrive en tête de file; maintenir E sur la caisse prend sa commande (il paie, le ticket monte au rail). E sur le rail prend le ticket. On prépare (moulin maintenu, tasse de la pile, sous le groupe, E lance puis arrête l'extraction; buse maintenue, relâchée dans la zone; vitrine, plan, bouilloire), on pose sur le passe: le client prend son plateau et s'assoit, puis repart en laissant sa vaisselle sale sur la table (E pour la prendre, plonge maintenue pour laver).
+- Le soir: le bilan (4 pages), « À demain » à deux. Le lundi suivant: brocante, travaux, aménagement (B). Jour 15: « Partir pour Mérelles ? », puis l'écran de fin; on peut rester jusqu'au jour 28.
+- Touches (position des touches, AZERTY): ZQSD marcher, Maj vite, souris regarder, E ou clic gauche agir (maintenir pour les postes), R ou clic droit reposer, Tab tablette (ardoise, commandes, catalogue, bilans), B aménager (café fermé), A tourner le meuble, Retour arrière fermer, Entrée valider ou reprendre la souris, Échap pause de Duo.
+
+## Branchement (`src/branchement/`)
+
+- `index.ts`: le chantier `branchement`, entre la clientèle et l'aménagement dans `CHANTIERS`. Autorités: carte et prix de `donnees/clientele/carte.json` (prix de l'ardoise recopié dans chaque article), gestes de `donnees/service/recettes.json`; mêmes recettes et ingrédients aux identifiants près (`pain_chocolat` contre `pain-chocolat`, `serviceId`), vérifié par `tests/journee.test.ts`. Le stock de la clientèle fait foi pendant les jours ouverts; café fermé, le service garde le sien (on s'exerce sans rien vendre). Caisse en centimes dans la clientèle; l'aménagement y puise par `connectArrangementEconomy`.
+- `interface.ts`: lecteurs `InterfaceSources` et table `IntentFor`; répliques et scènes nées des événements.
+- Le panneau provisoire de l'aménagement (`amenagement/client/panneau.ts`, Tab en mode B) reste: la tablette montre aussi le catalogue (`catalogView` et équipements), l'achat passe par la même intention.
+
+## Rendu et son
+
+- Coque cuite `shell_village.glb` et ses extensions (carte de lumière en `lightMap`, `lightmap_scale` × π, × 0,42 pour la rue), matériaux de la coque en `MeshBasicMaterial`; la coque en blocs ne sert plus que si le GLB manque. Environnement des métaux: `RoomEnvironment` calculé une fois.
+- Meubles, objets, personnages: correspondances dans `src/rendu/correspondances.ts` et `clientele/rendu3d.ts` (`char_*`). Avatars animés (marche, attente), badge à la couleur du joueur.
+- Sons: `assets/son/sons.json` (fichiers tirés, bus, volume), boucles de la buse selon la température, nappe de rumeur selon le nombre de clients, ambiance de la place, radio du village à deux stations pendant le service.
 
 ## Preuves
 
-- `pnpm --filter deux-tabliers test`: test de fumée (données, chargement à deux, déplacement prédit, prise, arbitrage simultané) en environ 1 s.
-- Faux hôte (`deux-vues.html`) sous Chromium: coque et meubles visibles chez les deux, pointeur verrouillé, déplacement de l'invité.
+- `pnpm --filter deux-tabliers test`: 16 tests en quelques secondes, dont `journee.test.ts` (une journée accélérée à deux joueurs: commande à la caisse, ticket, geste « Parfait », service, encaissement, bilan, lendemain).
+- Faux hôte (`deux-vues.html`): parcours à deux par l'interface jusqu'au service, geste au moulin et à la machine, tablette, bilan (captures du 2026-11-08).
 
 ## Limites connues et suites
 
-- Prise d'objet non prédite chez l'invité: l'objet arrive dans sa main après un aller-retour (technique 5.5 demande l'affichage immédiat, avec retour en 0,2 s si perdu).
-- Visée: pas d'occlusion par les murs (portée de 1,9 m); quelques petites allocations par image dans `aim` et `monde3d` (à reprendre au premier profilage).
-- Collisions: un seul niveau, pas d'escaliers; les meubles posés sur le comptoir (y > 0) comptent encore comme obstacles au sol (sans effet: ils sont sur le comptoir).
-- Rendu: un appel de dessin par meuble et par objet (passer en `BatchedMesh`, technique 3.3); pas de lumière cuite; pas de vitres.
-- Les mouvements de souris de Playwright sous pointeur verrouillé, dans des iframes, arrivent en paires de sauts opposés: un test automatique du regard doit passer par le robot, pas par la souris.
-- Réglages par joueur (sensibilité, champ de vision) non gardés d'une séance à l'autre (ADR à écrire, technique 2.2).
-- Avertissement de taille du lot JavaScript (735 Ko, 193 Ko compressé): Three.js entier, à découper plus tard.
+- Sons non placés dans l'espace; pas de pas, ni de rumeur par table, ni d'événements de la place tirés au hasard.
+- Les revêtements achetés teignent la peinture de la salle; papiers peints et sols ne changent pas encore la texture de la coque cuite.
+- Les avatars ne s'assoient pas et ne portent rien visiblement; les clients au comptoir boivent sans tasse posée devant eux.
+- Le bilan ne nomme pas encore les habitués venus ni ce qui a plu ou manqué (pages vides proprement).
+- Lot JavaScript de 1,37 Mo (364 Ko compressé): Three.js entier, à découper plus tard.
+- Prise d'objet non prédite chez l'invité (un aller-retour), comme au squelette.
