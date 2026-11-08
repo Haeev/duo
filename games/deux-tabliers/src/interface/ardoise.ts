@@ -53,7 +53,7 @@ export function slateLayer(ctx: UiContext): LayerSpec {
         body.append(h('div', { class: 'dt-banner' }, icon('info'), T.slate.empty));
       else if (full) body.append(h('div', { class: 'dt-banner' }, icon('info'), T.slate.fullNote));
       else if (slate.proposedThisMorning)
-        body.append(h('div', { class: 'dt-banner' }, icon('tablet'), T.slate.proposed));
+        body.append(h('div', { class: 'dt-banner' }, icon('phone'), T.slate.proposed));
 
       const board = boardElement(ctx, slate, partner, hold);
       if (slate.readOnly) {
@@ -322,7 +322,7 @@ function lineElement(
     );
   if (line.soldOut !== null) {
     const rescue = button(T.slate.rescue, () => {
-      ctx.openTablet('orders');
+      ctx.openPhone('stock');
     });
     rescue.dataset.rescue = '';
     el.append(h('div', { style: 'grid-column: 1 / -1' }, rescue));

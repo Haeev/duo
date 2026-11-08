@@ -91,7 +91,7 @@ export interface InterfaceSources {
   /** b: écran « Notre maison » tant que la maison n'a pas de nom. */
   houseSetup?(world: World): HouseSetupView | null;
   duoSettings?(world: World): DuoSettingsView | null;
-  /** Où est un joueur dans l'interface (« Sur la tablette : catalogue »), partagé par le réseau. */
+  /** Où est un joueur dans l'interface (« Sur son téléphone : Catalogue »), partagé par le réseau. */
   uiPlace?(world: World, player: PlayerIndex): string | null;
   /** a, b, c: alerte douce tirée d'un événement, pour ce joueur (`null`: rien à montrer). */
   alert?(event: GameEvent, local: PlayerIndex): AlertView | null;

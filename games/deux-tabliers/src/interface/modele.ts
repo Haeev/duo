@@ -1,5 +1,5 @@
 /**
- * Contrat de lecture de l'interface (chantier d): tout ce que le HUD, la tablette, l'ardoise,
+ * Contrat de lecture de l'interface (chantier d): tout ce que le HUD, le téléphone, l'ardoise,
  * le bilan et les écrans affichent, sous une forme prête à montrer, sans DOM ni Three.js.
  *
  * L'interface ne lit jamais le monde directement en dehors de `adaptateur.ts`: les chantiers
@@ -109,7 +109,7 @@ export interface TimerView {
 
 /** Ce que fait l'autre, pour sa carte quand il est hors de vue (ux 3.2). */
 export interface PartnerActivity {
-  /** « À la plonge », « Sur la tablette : catalogue ». */
+  /** « À la plonge », « Sur son téléphone : Catalogue ». */
   readonly place: string | null;
   /** « Tient 3 assiettes sales », « Fait une pause depuis 1 min », « Pas encore la main ». */
   readonly doing: string | null;

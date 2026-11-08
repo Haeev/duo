@@ -29,7 +29,7 @@
       "mouse": ["wheel-up", "wheel-down"]
     },
     { "id": "wave", "label": "Faire signe à l'autre", "keys": ["KeyG"], "mouse": ["middle"] },
-    { "id": "tablet", "label": "Tablette", "keys": ["Tab"] },
+    { "id": "tablet", "label": "Téléphone", "keys": ["Tab"] },
     { "id": "arrange", "label": "Aménager", "keys": ["KeyB"] },
     { "id": "close", "label": "Fermer, annuler", "keys": ["Backspace"] },
     { "id": "confirm", "label": "Valider, reprendre la souris", "keys": ["Enter", "NumpadEnter"] }

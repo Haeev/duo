@@ -25,6 +25,7 @@ const SettingsSchema = v.object({
   tips: v.optional(v.boolean(), true),
   textSize: v.optional(v.picklist(['normal', 'large', 'larger']), 'normal'),
   showFps: v.optional(v.boolean(), false),
+  phoneKeys: v.optional(v.boolean(), true),
 });
 
 export type PlayerSettings = v.InferOutput<typeof SettingsSchema>;

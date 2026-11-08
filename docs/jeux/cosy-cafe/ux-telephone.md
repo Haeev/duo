@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposition de ux-ui-designer, à valider par le manager; remplace la tablette de la maison (`ux.md`, 4.7, CC10) une fois validée |
+| Statut | validée par le manager (H1, H2 en v0.2, H3), implémentée le 2026-11-08 (`src/interface/telephone.ts`); remplace la tablette de la maison (`ux.md`, 4.7, CC10) |
 | Version | 0.1 |
 | Date | 2026-11-08 |
 | Demande du client | « Tous les menus, commandes, etc. se font sur un écran de téléphone: pense l'UI pour correspondre à celle d'un téléphone portable dans le jeu. » |
@@ -59,7 +59,7 @@ Mesures relevées par `verifier.cjs` (téléphone entier, coque comprise):
 |---|---|---|---|
 | 1280 x 720 | 100 % | 16 px | 368 x 622 |
 | 1366 x 768 (portable) | 100 % | 16 px | 368 x 670 |
-| 1366 x 768 | 150 % | 24 px | 552 x 620 |
+| 1366 x 768 | 150 % | 24 px | 552 x 620 (jeu: 512 x 626, voir plus bas) |
 | 1920 x 1080 | 100 % | 20 px | 460 x 920 |
 
 Règles CSS (reprises telles quelles dans le jeu):
@@ -78,6 +78,7 @@ Règles CSS (reprises telles quelles dans le jeu):
 - **Taille du texte à 125 et 150 %**: le texte grossit, le téléphone s'élargit (jusqu'à 46 % de la largeur) et sa hauteur reste bornée par l'écran; la proportion passe de 1:1,8 à 1:1,1. On garde la lisibilité plutôt que la silhouette.
 - **Écrans Retina et Windows à 150 %**: tout est en unités CSS, la netteté vient du facteur d'échelle (captures à 2x examinées).
 - **Rien sous 14 px** dans le téléphone (contrôlé).
+- **Dans le jeu**, la largeur est aussi bornée pour ne jamais passer sur « En main » (coin bas droit du HUD, plus large que dans la maquette): `min(23em, 46vw, 2 x (46vw - 15,5 em du HUD))`, soit 512 px à 1366 x 768 et 150 % (vérifié par `games/deux-tabliers/outils/telephone/verifier.cjs`).
 
 ### 2.3 Le café autour
 
@@ -409,3 +410,4 @@ Les autres textes (Commandes, Catalogue, Remises, Faire connaître, propositions
 | Date | Version | Changement | Par |
 |---|---|---|---|
 | 2026-11-08 | 0.1 | Première proposition: téléphone en main, dix applis, notifications, ce qui reste hors du téléphone | ux-ui-designer |
+| 2026-11-08 | 0.2 | Implémentation dans le jeu; largeur bornée par « En main » à 150 %; décisions du manager H1, H2 (v0.2), H3 | dev-plateforme |

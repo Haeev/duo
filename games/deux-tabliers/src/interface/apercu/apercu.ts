@@ -693,9 +693,42 @@ function modelFor(name: string): InterfaceModel {
           ],
         }),
       };
-    case 'tablette-remises':
-    case 'tablette-faire-connaitre':
+    case 'telephone-remises':
+    case 'telephone-faire-connaitre':
+    case 'telephone-accueil':
+    case 'telephone-carte':
+    case 'telephone-catalogue':
+    case 'telephone-projets':
+    case 'telephone-reglages':
+    case 'telephone-bilans':
+    case 'telephone-commandes':
+    case 'telephone-notif':
       return { ...base, discounts: remises().discounts, marketing: remises().marketing };
+    case 'telephone-messages':
+    case 'telephone-range':
+      return {
+        ...base,
+        discounts: remises().discounts,
+        marketing: remises().marketing,
+        house:
+          base.house === null ? null : { ...base.house, cashCents: 48_600, reservedCents: 4_500 },
+        proposals: [
+          {
+            id: 'achat:1',
+            from: 1,
+            kind: 'purchase',
+            item: remises().marketing.actions.find((a) => a.costCents >= 3000)?.name ?? 'Un encart',
+            amountCents:
+              remises().marketing.actions.find((a) => a.costCents >= 3000)?.costCents ?? 4500,
+            remainingCents: 44_100,
+            benefit:
+              'Toute la vallée le lit le jeudi : il paraît après-demain, juste avant la fête.',
+            when: null,
+          },
+        ],
+      };
+    case 'telephone-autre':
+      return { ...base, partner: { place: 'Sur son téléphone : Commandes', doing: null } };
     case 'ardoise-remises': {
       // Identifiants des maquettes vers ceux de la carte (`carte.json`).
       const real: Readonly<Record<string, string>> = {
@@ -754,7 +787,7 @@ function modelFor(name: string): InterfaceModel {
                 },
               },
       };
-    case 'tablette-commandes-rupture': {
+    case 'telephone-reserve': {
       const o = base.orders;
       if (o === null) return base;
       return {
@@ -956,46 +989,67 @@ const centre = {
   hold: state === 'ouverture' ? 0.45 : null,
   capsule: state === 'reprendre' || state === 'dialogue-reprendre',
 };
-const bearing = ['service', 'rail', 'reprendre', 'preparation', 'dialogue-reprendre'].includes(
-  state,
-)
+const bearing = [
+  'service',
+  'rail',
+  'reprendre',
+  'preparation',
+  'dialogue-reprendre',
+  'telephone-autre',
+].includes(state)
   ? 160
   : null;
 if (params.has('fps')) ui.settings.set('showFps', true);
 
 const loop = (now: number): void => {
+  // Un pas de jeu sans touche par image, comme dans le jeu.
+  ui.step({ tablet: false, confirm: false, act: false, locked: true });
   ui.frame(now, centre, bearing);
   requestAnimationFrame(loop);
 };
 requestAnimationFrame(loop);
 
 const open: Record<string, () => void> = {
-  'tablette-accueil': () => {
-    ui.openTablet('home');
+  'telephone-accueil': () => {
+    ui.openPhone('home');
   },
-  'tablette-commandes': () => {
-    ui.openTablet('orders');
+  'telephone-commandes': () => {
+    ui.openPhone('orders');
   },
-  'tablette-catalogue': () => {
-    ui.openTablet('catalogue');
+  'telephone-reserve': () => {
+    ui.openPhone('stock');
   },
-  'tablette-carte': () => {
-    ui.openTablet('menu');
+  'telephone-catalogue': () => {
+    ui.openPhone('catalogue');
   },
-  'tablette-projets': () => {
-    ui.openTablet('projects');
+  'telephone-carte': () => {
+    ui.openPhone('menu');
   },
-  'tablette-reglages': () => {
-    ui.openTablet('settings');
+  'telephone-projets': () => {
+    ui.openPhone('projects');
   },
-  'tablette-remises': () => {
-    ui.openTablet('discounts');
+  'telephone-reglages': () => {
+    ui.openPhone('settings');
   },
-  'tablette-faire-connaitre': () => {
-    ui.openTablet('marketing');
+  'telephone-bilans': () => {
+    ui.openPhone('reports');
   },
-  'tablette-commandes-rupture': () => {
-    ui.openTablet('orders');
+  'telephone-remises': () => {
+    ui.openPhone('discounts');
+  },
+  'telephone-faire-connaitre': () => {
+    ui.openPhone('marketing');
+  },
+  'telephone-messages': () => {
+    ui.openPhone('messages', 'partner');
+  },
+  'telephone-notif': () => {
+    ui.openPhone('home');
+    ui.alert({
+      id: 'livraison',
+      icon: 'delivery',
+      text: 'Livraison de Lucas · Le dépannage de croissants est à la porte de service.',
+    });
   },
   'ardoise-remises': () => {
     ui.openSlate();
@@ -1014,7 +1068,8 @@ const open: Record<string, () => void> = {
   },
 };
 if (state === 'proposition-carte') model = modelFor('proposition');
-if (state === 'tablette-accueil') model = { ...modelFor('proposition') };
+if (state === 'telephone-accueil')
+  model = { ...modelFor('telephone-messages'), clock: base.clock, orders: base.orders };
 setTimeout(() => {
   open[state]?.();
   ui.refresh();
@@ -1024,6 +1079,25 @@ setTimeout(() => {
       ?.click();
   document.body.dataset.ready = '1';
 }, 50);
+
+// Tab et Entrée comme dans le jeu (le SDK les lit d'ordinaire): à la capture, avant les calques,
+// pour ne pas ressortir le téléphone que Tab vient de ranger.
+window.addEventListener(
+  'keydown',
+  (event) => {
+    if (ui.panelOpen() || event.repeat) return;
+    const tablet = event.code === 'Tab';
+    const confirm = event.code === 'Enter';
+    if (!tablet && !confirm) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    // Le jeu lit ces touches à son pas suivant, pas pendant l'appui.
+    setTimeout(() => {
+      ui.step({ tablet, confirm, act: false, locked: true });
+    }, 0);
+  },
+  true,
+);
 
 // Pages et étapes: un appui simulé suffit pour les captures (A et E, Entrée).
 (window as unknown as { apercu: unknown }).apercu = {

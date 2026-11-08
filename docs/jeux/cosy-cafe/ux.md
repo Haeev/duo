@@ -569,6 +569,8 @@ Interface posée, ouverte sur le comptoir (E ou clic), « livre » d'une double 
 
 ### 4.7 La tablette de la maison (CC10)
 
+> Remplacée le 2026-11-08 par le téléphone tenu en main: `ux-telephone.md` fait foi (navigation, applis, notifications). Les textes de cette section restent ceux des applis Commandes, Catalogue, Carte et prix, Nos projets et Réglages.
+
 Interface posée, **Tab** l'ouvre partout (comme le carnet de La Petite Ligne) et la ferme; elle est aussi posée sur son support derrière le comptoir. Le café continue pendant qu'on la regarde. Maquette `tablette.html`.
 
 - **En-tête**: maison et lieu, jour et heure, caisse (« dont 980 € réservés » pendant une proposition), et « Sacha regarde aussi : Catalogue » quand l'autre est dans la même section.

@@ -654,7 +654,7 @@ function checkFloor(
       if (!roomOpen(world, terrace.extension))
         return refuse(
           "La terrasse n'est pas encore ouverte.",
-          'Elle s’achète sur la tablette, au palier « Deux tasses ».',
+          'Elle s’achète au catalogue du téléphone, au palier « Deux tasses ».',
         );
       if (placement === 'floor' || placement === 'floor_wall' || placement === 'floor_under')
         return refuse(

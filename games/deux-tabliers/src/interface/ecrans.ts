@@ -510,7 +510,7 @@ export function proposalLayer(ctx: UiContext, id: string): LayerSpec {
             }),
             button(T.proposal.seeCatalogue, () => {
               ctx.layers.close('proposition');
-              ctx.openTablet('catalogue');
+              ctx.openPhone('catalogue');
             }),
           ),
           h('p', { class: 'dt-second' }, T.proposal.help),

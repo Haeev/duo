@@ -1,5 +1,5 @@
 /**
- * Interface de Deux Tabliers (chantier d): HUD, tablette, ardoise, bilan, écrans de choix,
+ * Interface de Deux Tabliers (chantier d): HUD, téléphone, ardoise, bilan, écrans de choix,
  * répliques et scènes, en DOM par-dessus la vue 3D. Point d'entrée unique pour `main.ts`.
  *
  * Branchement (à faire par le manager dans `main.ts`, à la place de `createHud` et
@@ -31,13 +31,16 @@ import type { UiAction } from './actions';
 import { eveningLayer } from './bilan';
 import { slateLayer } from './ardoise';
 import { createLayers, type Layers } from './calques';
-import type { Person, TabletSection, UiContext } from './contexte';
+import type { Person, PhoneApp, ThreadId, UiContext } from './contexte';
 import { answersLayer, createDialogueOverlay, dialogueReadMs } from './dialogue';
 import { demoEndLayer, firstTimeLayer, morningLayer, nightLayer, proposalLayer } from './ecrans';
 import { createHud, type Hud, type HudState } from './hud';
 import type { AlertView, InterfaceModel } from './modele';
 import { createSettingsStore, TEXT_SCALE, type SettingsStore } from './reglages';
-import { tabletLayer } from './tablette';
+import { PHONE_LAYER, phoneLayer, threadName, type PhoneBanner } from './telephone';
+import { addMessage, createPhoneState, resetForNight, type PhoneState } from './telephone-etat';
+import { T } from './textes';
+import { euros, fill } from './typo';
 import { applyScale, installStyle } from './theme';
 
 export type { UiAction } from './actions';
@@ -65,6 +68,8 @@ export interface InterfaceOptions {
   actLabel(): string;
   /** Lecture du modèle, en millisecondes (100 par défaut: dix fois par seconde). */
   readonly modelEveryMs?: number;
+  /** Son d'interface de `assets/son/sons.json` (sortie du téléphone, notification). */
+  sound?(id: string): void;
 }
 
 export interface StepKeys {
@@ -94,7 +99,8 @@ export interface GameInterface {
   /** Refus d'une action, chez ce joueur. */
   flash(text: string): void;
   panelOpen(): boolean;
-  openTablet(section?: TabletSection): void;
+  openPhone(app?: PhoneApp, thread?: ThreadId): void;
+  readonly phone: PhoneState;
   openSlate(): void;
   /** Relit le modèle tout de suite (après une action locale). */
   refresh(): void;
@@ -104,7 +110,7 @@ export interface GameInterface {
 /** Tranches du modèle qui redessinent chaque calque (le reste ne le touche pas). */
 function sliceFor(id: string, m: InterfaceModel): unknown {
   switch (id) {
-    case 'tablette':
+    case PHONE_LAYER:
       return [
         m.house,
         m.clock?.minutes,
@@ -115,6 +121,10 @@ function sliceFor(id: string, m: InterfaceModel): unknown {
         m.projects,
         m.proposals,
         m.duoSettings,
+        m.discounts,
+        m.marketing,
+        m.evening === null,
+        m.partner.place,
       ];
     case 'ardoise':
       return m.slate;
@@ -162,6 +172,16 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   let fpsFrames = 0;
   let fpsSince = -1;
   let fpsValue: number | null = null;
+  const phone = createPhoneState();
+  /** Tab pendant un geste: le téléphone sort juste après (ux-telephone 2.1). */
+  let phoneWaiting = false;
+  let closedSinceStep = false;
+  let seenProposals = new Set<string>();
+  let lastHint: string | null = null;
+  let nightReset = false;
+  const sound = (id: string): void => {
+    options.sound?.(id);
+  };
 
   const applySettings = (): void => {
     const s = settings.get();
@@ -182,12 +202,30 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     settings,
     layers,
     aspect: () => options.aspect(),
-    openTablet: (section) => {
-      layers.close('tablette');
-      layers.open(tabletLayer(ctx, section));
+    phone,
+    openPhone: (app, thread) => {
+      if (app !== undefined) phone.stack = app === 'home' ? [] : [{ app, thread }];
+      if (app !== undefined && app !== 'home') phone.lastApp = app;
+      if (layers.isOpen(PHONE_LAYER)) {
+        phoneSpec?.changed();
+        return;
+      }
+      phoneSpec = phoneLayer(ctx, notices);
+      const announceClose = phoneSpec.onClose?.bind(phoneSpec);
+      phoneSpec.onClose = () => {
+        announceClose?.();
+        // Le Tab qui vient de ranger le téléphone arrive aussi au pas suivant: il ne le ressort pas.
+        closedSinceStep = true;
+      };
+      layers.open(phoneSpec);
+      hud.setPhoneOpen(true);
+      sound('tablet-wake');
     },
     openSlate: () => {
       layers.open(slateLayer(ctx));
+    },
+    flash: (text) => {
+      hud.flash(text);
     },
     openProposal: (id) => {
       layers.close('proposition');
@@ -196,6 +234,114 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     openEvening: () => {
       layers.open(eveningLayer(ctx));
     },
+  };
+
+  let phoneSpec: ReturnType<typeof phoneLayer> | null = null;
+
+  /**
+   * Notifications du téléphone (ux-telephone 5): une seule file; téléphone sorti, une bannière
+   * à la fois (5 s, 1 s d'écart, le survol arrête le délai); rangé, une alerte du HUD avec une
+   * vibration douce. Aucune ne prend le focus; toutes restent dans Messages.
+   */
+  const queue: PhoneBanner[] = [];
+  let banner: PhoneBanner | null = null;
+  let bannerTimer: ReturnType<typeof setTimeout> | null = null;
+  let bannerHeld = false;
+  const refreshPhone = (): void => {
+    if (layers.isOpen(PHONE_LAYER)) layers.refresh(PHONE_LAYER);
+  };
+  const clearBanner = (): void => {
+    if (bannerTimer !== null) clearTimeout(bannerTimer);
+    bannerTimer = null;
+    banner = null;
+  };
+  const pump = (): void => {
+    if (banner !== null || !layers.isOpen(PHONE_LAYER)) return;
+    const next = queue.shift();
+    if (next === undefined) return;
+    banner = next;
+    refreshPhone();
+    const expire = (): void => {
+      if (bannerHeld) {
+        bannerTimer = setTimeout(expire, 500);
+        return;
+      }
+      clearBanner();
+      refreshPhone();
+      bannerTimer = setTimeout(pump, 1000);
+    };
+    bannerTimer = setTimeout(expire, 5000);
+  };
+  const notices = {
+    banner: () => banner,
+    holdBanner: (held: boolean) => {
+      bannerHeld = held;
+    },
+    dismissBanner: () => {
+      clearBanner();
+      bannerTimer = setTimeout(pump, 1000);
+    },
+  };
+  const notify = (b: PhoneBanner, hudText: string, icon: AlertView['icon']): void => {
+    if (layers.isOpen(PHONE_LAYER)) {
+      queue.push(b);
+      pump();
+      return;
+    }
+    hud.alert(
+      { id: `tel-${String(phone.nextId)}`, icon, text: fill(T.notif.hudAlert, { text: hudText }) },
+      { buzz: true, ms: 4000 },
+    );
+    sound('ui-notify');
+  };
+
+  /** Ce que le téléphone retient du modèle: propositions, astuces, prix préparés, nuit. */
+  const watchPhone = (): void => {
+    const day = model.clock?.day ?? 0;
+    const minutes = model.clock?.minutes ?? 0;
+    const theirs = model.proposals.filter(
+      (p) => p.from !== model.local && (p.kind === 'purchase' || p.kind === 'move'),
+    );
+    const ids = new Set(theirs.map((p) => p.id));
+    for (const p of theirs) {
+      if (seenProposals.has(p.id)) continue;
+      if (layers.isOpen(PHONE_LAYER)) {
+        queue.push({
+          title: fill(T.notif.proposal, { player: options.partner.name }),
+          text: `${p.item ?? ''}, ${euros(p.amountCents ?? 0, true)}`,
+          app: 'messages',
+          thread: 'partner',
+        });
+        pump();
+      } else sound('ui-notify');
+    }
+    seenProposals = ids;
+    // Astuce de Simone: un badge sur Messages, rien d'autre (ux-telephone 5).
+    if (model.hint !== null && model.hint !== lastHint)
+      addMessage(phone, 'simone', model.hint, day, minutes);
+    lastHint = model.hint;
+    // H1: les prix préparés pendant le service s'écrivent sur l'ardoise dès la fermeture.
+    const slate = model.slate;
+    if (slate !== null && !slate.readOnly && phone.pending.size > 0) {
+      for (const [recipe, line] of phone.pending) {
+        if (line.priceCents !== undefined)
+          options.send({ type: 'slate-price', recipe, priceCents: line.priceCents });
+        if (line.star !== undefined) options.send({ type: 'slate-star', recipe, star: line.star });
+      }
+      phone.pending.clear();
+    }
+    if (model.night !== null && !nightReset) {
+      nightReset = true;
+      resetForNight(phone);
+    }
+    if (model.night === null) nightReset = false;
+    const open = layers.isOpen(PHONE_LAYER);
+    hud.setPhoneOpen(open);
+    // Téléphone rangé: les bannières en attente restent dans Messages.
+    if (!open && (banner !== null || queue.length > 0)) {
+      clearBanner();
+      queue.length = 0;
+    }
   };
 
   const people = (bearing: number | null): Parameters<Hud['setModel']>[1] => ({
@@ -240,8 +386,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     model = options.readModel();
     hud.setModel(model, people(bearing));
     overlay.update(model.dialogue, model.scene, options.actLabel());
+    watchPhone();
     for (const id of [
-      'tablette',
+      PHONE_LAYER,
       'ardoise',
       'bilan',
       'proposition',
@@ -279,7 +426,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       if (layers.any()) return { swallowAct: true, swallowConfirm: true };
       const swallowAct = false;
       let swallowConfirm = false;
-      if (keys.tablet) ctx.openTablet();
+      if (keys.tablet && !closedSinceStep) phoneWaiting = true;
+      closedSinceStep = false;
+      if (phoneWaiting && model.gauge === null) {
+        phoneWaiting = false;
+        ctx.openPhone();
+        return { swallowAct: true, swallowConfirm: true };
+      }
       // E (et Espace, et le clic) agit toujours dans le café: une réplique avance par Entrée, ou
       // seule après le temps de la lire (`dialogueReadMs`).
       const d = model.dialogue;
@@ -290,7 +443,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
           options.send({ type: 'scene-dismiss', id: scene.id });
           swallowConfirm = true;
         } else if (received !== undefined) {
-          ctx.openProposal(received.id);
+          // Un achat ou une action de l'autre: le téléphone sort sur Messages, focus « D'accord ».
+          if (received.kind === 'purchase' || received.kind === 'move')
+            ctx.openPhone('messages', 'partner');
+          else ctx.openProposal(received.id);
           swallowConfirm = true;
         } else if (keys.locked && d !== null && d.answers.length === 0) {
           options.send({ type: 'dialogue-next', id: d.id });
@@ -335,7 +491,24 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       }
     },
     alert(a) {
-      hud.alert(a);
+      // Livraisons et habitués arrivent par le téléphone (ux-telephone 5); le reste au HUD.
+      const thread: ThreadId | null =
+        a.icon === 'delivery' || a.icon === 'order'
+          ? 'suppliers'
+          : a.icon === 'regular'
+            ? 'regulars'
+            : null;
+      if (thread === null) {
+        hud.alert(a);
+        return;
+      }
+      addMessage(phone, thread, a.text, model.clock?.day ?? 0, model.clock?.minutes ?? 0);
+      // « Livraison de Lucas · Le dépannage ... »: le titre de la bannière avant le point médian.
+      const cut = a.text.indexOf(' · ');
+      const title = cut > 0 ? a.text.slice(0, cut) : threadName(ctx, thread);
+      const text = cut > 0 ? a.text.slice(cut + 3) : a.text;
+      notify({ title, text, app: 'messages', thread }, a.text, a.icon);
+      refreshPhone();
     },
     quality(word) {
       hud.quality(word);
@@ -344,9 +517,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       hud.flash(text);
     },
     panelOpen: () => layers.any(),
-    openTablet: (section) => {
-      ctx.openTablet(section);
+    openPhone: (app, thread) => {
+      ctx.openPhone(app, thread);
     },
+    phone,
     openSlate: () => {
       ctx.openSlate();
     },
@@ -354,6 +528,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       read(performance.now(), lastBearing, true);
     },
     dispose() {
+      clearBanner();
       unsubscribe();
       layers.dispose();
       overlay.dispose();
