@@ -2,6 +2,9 @@
  * L'hôte fait autorité (ADR 0007): il simule tout, joue les entrées de l'invité dans l'ordre
  * de leurs numéros (une entrée en retard est devinée: la dernière connue, sans avancer l'`ack`),
  * applique les intentions dans leur ordre d'arrivée et diffuse l'état par domaines.
+ * Une intention de l'invité attend que l'hôte joue l'entrée du pas où elle est née: un geste à
+ * maintien (prendre la commande, moudre, laver) lit « Agir tenu » dans cette entrée, et une entrée
+ * plus ancienne (Agir encore relâché) l'annulerait aussitôt (bug du PC invité, 2026-11-08).
  */
 import type { Net, NetChannel, RandomSource } from '@duo/sdk';
 import type { Content } from '../donnees/charger';
@@ -83,6 +86,8 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
 
   const pendingInputs: StepInput[] = [];
   const pendingIntents: QueuedIntent[] = [];
+  /** Intentions de l'invité et numéro de l'entrée du pas où elles sont nées. */
+  const guestIntents: { atSeq: number; intent: Intent }[] = [];
   let lastGuest: StepInput | null = null;
   let ack = 0;
   let lastCore = '';
@@ -92,8 +97,19 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
     for (const input of message.inputs)
       if (input.seq > ack && !pendingInputs.some((i) => i.seq === input.seq))
         pendingInputs.push(input);
-    for (const intent of message.intents) pendingIntents.push({ player: 1, intent });
+    // L'invité envoie ses intentions au pas même où elles naissent: elles suivent la dernière
+    // entrée du message. Une entrée déjà jouée (ou refusée comme ancienne) les libère tout de suite.
+    const atSeq = message.inputs.reduce((max, input) => Math.max(max, input.seq), 0);
+    for (const intent of message.intents) guestIntents.push({ atSeq, intent });
   });
+  const releaseGuestIntents = (): void => {
+    while (guestIntents.length > 0) {
+      const next = guestIntents[0];
+      if (next === undefined || (next.atSeq > ack && pendingInputs.length > 0)) return;
+      guestIntents.shift();
+      pendingIntents.push({ player: 1, intent: next.intent });
+    }
+  };
 
   // Poses du pas précédent et du pas courant, pour interpoler l'affichage.
   const previous: [Pose, Pose] = [poseOf(world, 0), poseOf(world, 1)];
@@ -168,6 +184,7 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
         walk(content, world, world.players[1], guest, dt);
         guest = nextGuestInput();
       }
+      releaseGuestIntents();
       const queued = pendingIntents.splice(0, pendingIntents.length);
       stepWorld(content, world, [local, guest], queued, dt, random, emit);
       if (world.tick % content.settings.net.movesEvery === 0) {

@@ -102,7 +102,7 @@ export function createInput<TAction extends string>(
     }
     // Un champ de saisie du jeu (prénom du personnage) garde ses touches.
     if (isTypingTarget(event)) return;
-    if (state.keyDown(event.code)) event.preventDefault();
+    if (state.keyDown(event.code, event.repeat)) event.preventDefault();
   };
   const onKeyUp = (event: KeyboardEvent): void => {
     state.keyUp(event.code);
