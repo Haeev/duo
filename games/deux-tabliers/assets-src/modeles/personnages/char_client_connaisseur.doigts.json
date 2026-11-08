@@ -176,12 +176,12 @@
   "grip_handle": {
    "RightHandThumb1": {
     "flexion_x_deg": 65,
-    "rotation_z_deg": -35.0,
+    "rotation_z_deg": -38.0,
     "quaternion_local_xyzw": [
-     -0.133887,
-     -0.474129,
-     0.3128,
-     0.812054
+     -0.121429,
+     -0.477471,
+     0.291436,
+     0.819964
     ]
    },
    "RightHandThumb2": {
@@ -421,35 +421,35 @@
  "prises": {
   "grip_handle": {
    "position_m": [
-    -0.1076,
-    0.1592,
-    -0.0716
+    -0.1178,
+    0.083,
+    -0.0815
    ],
    "quaternion_xyzw": [
-    -0.953237,
-    0.035621,
-    -0.29618,
-    0.048461
+    0.086705,
+    -0.28732,
+    -0.159739,
+    0.940432
    ],
    "modele": "ware_cup_cappuccino",
    "traversees": 0,
    "ecart_pince_initial_mm": 0.0,
-   "ecart_pouce_mm": 0.9,
-   "ecart_index_mm": 5.6,
+   "ecart_pouce_mm": 0.0,
+   "ecart_index_mm": 2.4,
    "point_de_prise_anse_m": [
-    -0.0454,
-    0.0921,
-    -0.0344
+    -0.0485,
+    0.0845,
+    -0.0333
    ],
    "point_de_prise_dans_la_tasse_m": [
     0.0785,
-    0.06,
+    0.031,
     0.0
    ],
    "axe_de_pince_dans_la_main": [
-    0.5681,
-    0.0713,
-    -0.8199
+    -0.5681,
+    -0.0713,
+    0.8199
    ]
   },
   "grip_glass": {

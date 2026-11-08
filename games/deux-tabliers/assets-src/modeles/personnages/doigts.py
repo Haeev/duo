@@ -208,6 +208,14 @@ def landmarks(A, sel, thumb_sign, I):
     baseT = c + u * s.min()
     # base du pouce: un peu dans la paume, côté pouce de l'index (pivot de l'articulation)
     base = baseT + u * 0.004
+    if np.linalg.norm(tipT - base) < 0.03:
+        # pouce trop court (seul le bout a été isolé, Mathis): bout = sommet le plus loin côté pouce, base anatomique
+        # au bord de la paume, au quart de la main depuis le poignet
+        far = sel & (pa < a_k)
+        k = np.argmax(pt * far - 1e9 * (~far))
+        tipT = np.array([pa[k], pt[k], pn[k]]) - np.array([0.0, 0.004, 0.0])
+        edge = sel & (np.abs(pa - 0.28 * amax) < 0.01)
+        base = np.array([0.28 * amax, t_idx + 0.5 * spacing, (pn[edge].min() + pn[edge].max()) / 2 if edge.any() else 0.0])
     pts["Thumb1"] = base
     pts["Thumb2"] = base + (tipT - base) * 0.5
     pts["ThumbTip"] = tipT
@@ -548,47 +556,47 @@ def fit_handle(ctx, cup):
     idx2 = dominant(ctx, side, ["Index2"])
     th2 = dominant(ctx, side, ["Thumb2"])
     # 1. pouce: ouverture de pince d environ 1,6 cm (le pouce se referme ensuite sur l anse) entre pulpe et côté de l'index (épaisseur de l'anse 1 cm)
-    best = None
     # prise « en clé »: index replié à fond, sa deuxième phalange revient sous la pulpe du pouce (le pouce de ces
     # maillages est court: il n'atteint pas un index à demi plié)
     grid = [(i1, i2, fz, fx, fx2) for i1 in (70, 80, 90) for i2 in (70, 85, 100)
             for fz in range(-60, 61, 10) for fx in range(-20, 71, 10) for fx2 in (0, 20, 40)]
+    pinches = []
     for i1, i2, fz, fx, fx2 in grid:
-        if True:
-            if True:
-                ang = dict(base, RightHandIndex1=(i1, 0), RightHandIndex2=(i2, 0), RightHandThumb1=(fx, -s * fz), RightHandThumb2=(fx2, 0))
-                Vh, _ = posed_hand(ctx, side, ang)
-                lat = idx2 & (Vh[:, 1] * s >= np.quantile(Vh[idx2, 1] * s, 0.7))
-                Pi, Pt = Vh[lat], Vh[th2]
-                dd = np.linalg.norm(Pi[:, None, :] - Pt[None, :, :], axis=2)
-                i, j = np.unravel_index(np.argmin(dd), dd.shape)
-                score = abs(dd[i, j] - 0.016)
-                if best is None or score < best[0]:
-                    best = (score, ang, Pi[i], Pt[j])
-    pinch_err, angles, pi, pt_ = best
-    u = (pt_ - pi) / np.linalg.norm(pt_ - pi)
-    e1 = np.cross(u, [1.0, 0, 0]) if abs(u[0]) < 0.9 else np.cross(u, [0, 1.0, 0])
-    e1 /= np.linalg.norm(e1)
-    e2 = np.cross(u, e1)
-    Vh, part = posed_hand(ctx, side, angles)
-    hb = bvh_of(Vh, ctx["data"][0]["I"], part)
-    # 2. orientation de la tasse autour de l'axe de la pince: sans traversée, bol le plus loin possible de la main
-    cands = []
+        ang = dict(base, RightHandIndex1=(i1, 0), RightHandIndex2=(i2, 0), RightHandThumb1=(fx, -s * fz), RightHandThumb2=(fx2, 0))
+        Vh, _ = posed_hand(ctx, side, ang)
+        lat = idx2 & (Vh[:, 1] * s >= np.quantile(Vh[idx2, 1] * s, 0.7))
+        Pi, Pt = Vh[lat], Vh[th2]
+        dd = np.linalg.norm(Pi[:, None, :] - Pt[None, :, :], axis=2)
+        i, j = np.unravel_index(np.argmin(dd), dd.shape)
+        pinches.append((abs(dd[i, j] - 0.016), ang, Pi[i], Pt[j]))
+    pinches.sort(key=lambda x: x[0])
     bowl = V[:, 0] < 0.062
-    # essais du plus serré au plus lâche: hauteur du point pincé sur la barre, puis jeu le long de la pince
-    for off in (0.0005, 0.0015, 0.003, 0.005, 0.008):
-        for hy in (0.052, 0.045, 0.06, 0.038):
-            grip = np.array([HANDLE_GRIP[0], hy, 0.0])
-            for k in range(24):
-                phi = 2 * math.pi * k / 24
-                R = cup_frame(u, phi, e1, e2)
-                p = pi + u * (HANDLE_HALF + off) - R @ grip
-                VV = (R @ V.T).T + p
-                vb = bvh_of(VV, I)
-                if hb.overlap(vb):
-                    continue
-                bb = bvh_of(VV, I, bowl)
-                cands.append((clearance(Vh, part, bb), phi, R, p, grip))
+    # recherche élargie (2026-11-08): plusieurs pinces, tasse dans les deux sens le long de la pince, six hauteurs sur
+    # la barre, jeu croissant; on s'arrête à la première pince qui laisse une orientation sans traversée
+    cands = []
+    for pinch_err, angles, pi, pt_ in pinches[:6]:
+        u = (pt_ - pi) / np.linalg.norm(pt_ - pi)
+        e1 = np.cross(u, [1.0, 0, 0]) if abs(u[0]) < 0.9 else np.cross(u, [0, 1.0, 0])
+        e1 /= np.linalg.norm(e1)
+        e2 = np.cross(u, e1)
+        Vh, part = posed_hand(ctx, side, angles)
+        hb = bvh_of(Vh, ctx["data"][0]["I"], part)
+        for off in (0.0005, 0.0015, 0.003, 0.005, 0.008, 0.012):
+            for hy in (0.052, 0.045, 0.06, 0.038, 0.065, 0.031):
+                grip = np.array([HANDLE_GRIP[0], hy, 0.0])
+                for zs in (1.0, -1.0):
+                    for k in range(24):
+                        phi = 2 * math.pi * k / 24
+                        R = cup_frame(zs * u, phi, e1, e2)
+                        p = pi + u * (HANDLE_HALF + off) - R @ grip
+                        VV = (R @ V.T).T + p
+                        vb = bvh_of(VV, I)
+                        if hb.overlap(vb):
+                            continue
+                        bb = bvh_of(VV, I, bowl)
+                        cands.append((clearance(Vh, part, bb), phi, R, p, grip))
+            if cands:
+                break
         if cands:
             break
     if not cands:
@@ -626,7 +634,24 @@ def fit_handle(ctx, cup):
         ang = tbest[1] if tbest is not None else ang0
         ang, _ = close_until_contact(ctx, side, ang, vb, "Fingers", (95, 100))
         ang, _ = close_until_contact(ctx, side, ang, vb, "Index", (95, 100))
-        Vf, _ = posed_hand(ctx, side, ang)
+        Vf, partf = posed_hand(ctx, side, ang)
+        hbf = bvh_of(Vf, Ih, partf)
+        # resserrage: la tasse se déplace sur une grille de 1,5 mm (12 mm de côté) sans traversée, au plus petit des
+        # deux écarts (pulpe du pouce, côté de l'index)
+        bestm = (max(clearance(Vf, idx2, vb), clearance(Vf, th2, vb)), p)
+        for dx in range(-4, 5):
+            for dy in range(-4, 5):
+                for dz in range(-4, 5):
+                    p2 = p + np.array([dx, dy, dz]) * 0.0015
+                    vb2 = bvh_of((R @ V.T).T + p2, I)
+                    if hbf.overlap(vb2):
+                        continue
+                    sc = max(clearance(Vf, idx2, vb2), clearance(Vf, th2, vb2))
+                    if sc < bestm[0] - 1e-5:
+                        bestm = (sc, p2)
+        p = bestm[1]
+        VV = (R @ V.T).T + p
+        vb = bvh_of(VV, I)
         final, _ = hand_overlap(ctx, side, ang, VV, I)
         return final, clearance(Vf, idx2, vb), clearance(Vf, th2, vb), ang, p
 
@@ -644,7 +669,7 @@ def fit_handle(ctx, cup):
                   "ecart_pouce_mm": round(gap_t * 1000, 1), "ecart_index_mm": round(gap_i * 1000, 1),
                   "point_de_prise_anse_m": [round(float(x), 4) for x in (h["B"] @ ((R @ grip) + p))],
                   "point_de_prise_dans_la_tasse_m": [float(x) for x in grip],
-                  "axe_de_pince_dans_la_main": [round(float(x), 4) for x in (h["B"] @ u)]})
+                  "axe_de_pince_dans_la_main": [round(float(x), 4) for x in (h["B"] @ (R[:, 2]))]})
     return {k: (round(v[0], 1), round(v[1], 1)) for k, v in angles.items()}, place
 
 
