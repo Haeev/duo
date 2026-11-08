@@ -256,3 +256,8 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Panneau d'atlas (inscription, rosace): garder les proportions du panneau égales à celles de la zone de texture, sinon lettres écrasées illisibles; rosace en disque à 24 pans pris dans le cercle de la case (plus de carré de fond).
 - Compression avec textures externes partagées: `assets-src/modeles/quantifier.cjs` (gltf-transform 4 par API, GLB réassemblé à la main pour garder `uri: textures/...`). `dedup({propertyTypes:['ACCESSOR']})` est refusé en 4.5: `dedup()` seul. Les UV répétées hors [0,1] ne sont pas quantifiées (message « Skipping TEXCOORD_0 »), sans gravité.
 - `coque.py` complet: 4 min 30 (cuisson 48 échantillons, 2048 px).
+
+## Deux Tabliers, place du Tilleul (vérifié le 2026-11-08)
+
+- `coque.py --sans-cuisson` après une modification de géométrie de la place (même de couleurs de sommets seules, relancé derrière une cuisson complète): carte de lumière décalée, façades noires et inscriptions effacées. Toujours une cuisson complète (5 min), puis restaurer `shell_village.glb`, `shell_village_ext_fond.glb` et `textures/shell_village_lightmap.png` si seule la place est en jeu, puis `quantifier.cjs` et corriger `fiches/coque.json` (poids quantifié, ligne `compression`).
+- Visionneuse `verifier/vue/capturer.mjs` (paramètre `cam=px,hauteur,pz;cible`): 5 vues en 20 s. Terrasse vers l'est: `cam=8,1.55,14.6;22,4.5,26`.
