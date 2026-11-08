@@ -4,8 +4,8 @@
 |---|---|
 | Identifiant | `cosy-cafe` (provisoire; l'architecte rappelle qu'il peut rester même si le titre change, section 1.1) |
 | Statut | brouillon |
-| Version du document | 0.2 |
-| Dernière mise à jour | 2026-11-07 |
+| Version du document | 0.2.4 |
+| Dernière mise à jour | 2026-11-08 |
 | Rédaction | game-designer: sections 1 à 6, 11, 13, 14 et proposition de la section 12; manager: consolidation, résumés des sections 7 à 10, questions Q11 à Q19, section 16 |
 | Documents liés | cadrage: `docs/jeux/cosy-cafe/cadrage.md`; plans et adresses: `docs/jeux/cosy-cafe/plans/`, `docs/jeux/cosy-cafe/adresses.md`; bible: `docs/jeux/cosy-cafe/bible-artistique.md`; son: `docs/jeux/cosy-cafe/son.md`; interface: `docs/jeux/cosy-cafe/ux.md`; technique: `docs/jeux/cosy-cafe/technique.md`; simulation: `docs/jeux/cosy-cafe/simulations/cosy_cafe.py` et `resultats.md`; plateforme: `docs/plateforme/cahier-des-charges.md` (F05 à F09) |
 
@@ -13,12 +13,12 @@
 
 ## En bref
 
-- **Le jeu**: à deux, en vue à la première personne, vous reprenez le petit café d'un village et vous le tenez ensemble: l'un au comptoir, l'autre à la machine, ou l'inverse, comme vous voulez. Ce que vous écrivez sur l'ardoise décide de qui pousse la porte; les meubles, la décoration et la musique décident de l'envie de rester. On sert, on encaisse, on débarrasse, on lave, on range la livraison du matin, on lit le livre d'or le soir.
-- **La progression**: cinq adresses, chacune plus grande et plus vivante. Ormeval, le café de la place du Tilleul (38 m², 8 places à l'arrivée); Mérelles, l'ancienne pâtisserie face à la halle (le four, le service en salle, le marché du jeudi); Montaurel, l'Imprimerie d'une ville universitaire (les employés, le brunch, le café de spécialité); le café de l'angle des Plumassiers, à Paris (l'équipe reprise, les touristes); la Graineterie du boulevard des Horticulteurs, une maison sous verrière sur deux niveaux (notre mélange, le laboratoire de pâtisserie, la visite d'un guide). Chaque café quitté reste ouvert, confié à quelqu'un: à la fin, la maison en tient cinq.
+- **Le jeu**: à deux, en vue à la première personne, vous rouvrez le petit café d'un village, fermé depuis trois ans: une boutique vide que vous équipez avec votre épargne (machine, comptoir, tables, vaisselle, premier stock), puis que vous tenez ensemble: l'un au comptoir, l'autre à la machine, ou l'inverse, comme vous voulez. Ce que vous écrivez sur l'ardoise décide de qui pousse la porte; les meubles, la décoration et la musique décident de l'envie de rester. On sert, on encaisse, on débarrasse, on lave, on range la livraison du matin, on lit le livre d'or le soir.
+- **La progression**: cinq adresses, chacune plus grande et plus vivante. Ormeval, le café de la place du Tilleul (38 m², une boutique vide à équiper); Mérelles, l'ancienne pâtisserie face à la halle (le four, le service en salle, le marché du jeudi); Montaurel, l'Imprimerie d'une ville universitaire (les employés, le brunch, le café de spécialité); le café de l'angle des Plumassiers, à Paris (l'équipe reprise, les touristes); la Graineterie du boulevard des Horticulteurs, une maison sous verrière sur deux niveaux (notre mélange, le laboratoire de pâtisserie, la visite d'un guide). Chaque café quitté reste ouvert, confié à quelqu'un: à la fin, la maison en tient cinq.
 - **La durée**: l'histoire principale dure <!-- val:fin_h_median -->34,0 h pour un duo médian (de <!-- val:fin_h_rapide -->28,3 h pour un duo rapide à <!-- val:fin_h_lent -->53,1 h pour un duo qui prend son temps), soit <!-- val:seances_median -->51 séances de 40 minutes; puis le jeu continue sans fin. Une journée ouverte dure environ <!-- val:journee_median_min -->20 minutes réelles: un service de 10 à 13 minutes entre une préparation et une fermeture à votre rythme.
 - **Ce qui le rend unique**: l'ardoise qui fait la clientèle; le coup de feu à deux, réglé à la voix parce que chacun ne voit que ce qu'il regarde; des habitués qui ont un prénom, une commande fétiche et une histoire; un style de décoration cohérent qui compte vraiment; des fournisseurs qui ont un visage; aucune faillite, aucune partie perdue, rien qui compare les deux joueurs.
 - **Chiffres sortis d'une simulation**: chaque journée de chaque partie simulée est jouée client par client (`simulations/cosy_cafe.py`, 120 parties); les tables de ce cahier en sont la copie exacte, vérifiée par un contrôle automatique.
-- **À trancher** (section 14): le titre (cinq propositions), la durée de l'histoire, Paris réel ou inventé, deux cafés à la fois, garder ou revendre les anciens cafés, les options de commande (lait d'avoine, déca), la place des aides, puis Q11 à Q19 (musique, voix, mains, signes des joueurs, maison parisienne, terrasse, direction de rendu après l'essai 3D, réglages, annonce de départ).
+- **À trancher** (section 14): le titre (cinq propositions), la durée de l'histoire, Paris réel ou inventé, deux cafés à la fois, garder ou revendre les anciens cafés, les options de commande (lait d'avoine, déca), la place des aides, puis Q11 à Q19 (musique, voix, mains, signes des joueurs, maison parisienne, terrasse, direction de rendu après l'essai 3D, réglages, annonce de départ), Q20 à Q26 (le départ dans une boutique vide: Simone, l'épargne, le prêt, ses meubles, les livraisons du premier jour, les adresses suivantes, le ménage).
 
 ## 1. Résumé (game-designer)
 
@@ -67,7 +67,7 @@ Le client cite deux simulateurs de commerce en vue subjective. On garde le genre
 | Neuf profils de clients | dix: ajout des **voisins** [`voisins`], qui viennent pour deux mots au comptoir | donne un vrai poids au poste calme (parler aux gens) et fait vivre le zinc à chaque adresse; un profil de plus à habiller pour la bible (7.2) |
 | Journée de 15 à 20 minutes | journée ouverte de <!-- val:journee_median_min -->20 minutes en moyenne (17 à 24 selon le duo), lundi de fermeture en plus | mesuré par la simulation: service de 10 à 13 minutes selon l'adresse, préparation et fermeture du duo médian (4 et 3,5 minutes) |
 | Saisons de 28 jours, 35 h pour l'histoire | 28 jours confirmés; histoire principale en <!-- val:fin_h_median -->34,0 h pour un duo médian | simulation, section 4.21 |
-| Places assises (ordre de grandeur) | les plans du level designer, repris tels quels (table `adresses`): Ormeval 10 places à l'arrivée, 18 au maximum; Mérelles 11 puis 39; l'Imprimerie 27 puis 45; les Plumassiers 24 puis 45; la Graineterie 53 puis 88 | les plans font foi; tous restent sous les plafonds de l'architecte (C2) |
+| Places assises (ordre de grandeur) | les plans du level designer, repris tels quels (table `adresses`): Ormeval 10 places à l'arrivée, 18 au maximum (depuis la démo v0.3, les places d'Ormeval s'achètent: `demo/depart-cellule-vide-v0-3.md`); Mérelles 11 puis 39; l'Imprimerie 27 puis 45; les Plumassiers 24 puis 45; la Graineterie 53 puis 88 | les plans font foi; tous restent sous les plafonds de l'architecte (C2) |
 | Le bourg, une boutique de la grand-rue | Mérelles, l'ancienne pâtisserie face à la halle (plans) | le level designer a placé l'adresse; le four y attend dans son laboratoire, d'où le personnage de René, l'ancien pâtissier |
 | Réputation « de une à cinq tasses » | en demi-tasses, sans jamais baisser | aucune perte, rien à reprocher à l'autre joueur après un service difficile |
 | Employés à la troisième adresse | confirmé, avec un coup de main au bourg les jours de marché et le week-end, et une équipe reprise avec chaque café parisien | à deux, une grande adresse refuse près des deux tiers de ses clients (section 4.21); un café d'angle se reprend d'ordinaire avec son personnel |
@@ -129,6 +129,7 @@ En vue subjective, chacun ne voit que ce qu'il regarde. Le jeu n'ajoute presque 
 | L'autre consulte la tablette | le service continue; on prend ses tickets |
 | Préparation (horloge arrêtée) | chacun a de quoi faire: ranger la livraison (les gros cartons à deux), fournées, carafes, ardoise, décoration, achats |
 | Fermeture (horloge arrêtée) | l'un lit le livre d'or, l'autre passe la commande aux fournisseurs; le bilan s'affiche chez les deux |
+| Le jour de l'installation (jour 1, Ormeval) | toujours deux tâches indépendantes ouvertes: l'un au téléphone pendant que l'autre découvre le local; un balai et une éponge, un outil chacun; la livraison de Gaby arrive pendant le ménage; la chauffe de la machine (20 s) tombe quand il reste la salle à installer (`demo/depart-cellule-vide-v0-3.md`, 5.3) |
 | Le lundi (fermé) | brocante, travaux, visite d'une succursale: activités faites ensemble, ou « Passer à mardi » d'un commun accord |
 | Un client parle longuement à l'un | l'autre continue; l'horloge ne s'arrête pas pour une conversation |
 | L'un s'absente du clavier | après 60 secondes de service sans entrée, la pancarte passe à « Petite pause »; l'autre finit les commandes en cours (PA-04) |
@@ -143,11 +144,11 @@ En vue subjective, chacun ne voit que ce qu'il regarde. Le jeu n'ajoute presque 
   3. **Fermeture**, horloge arrêtée: les derniers clients finissent tranquillement, puis le bilan (caisse, clients, mots du livre d'or), la commande aux fournisseurs, les achats et travaux, « Nos projets ». 2 à 5 minutes. La journée finit quand les deux joueurs ont dit « À demain ».
 - **Boucle d'une semaine**: lundi fermé (brocante, travaux, visite d'une succursale), jour de marché, mercredi des familles, sorties d'école, week-end des promeneurs et, dès la ville, du brunch. Un défi local tombe un dimanche ou un jour de marché.
 - **Boucle d'une saison** (28 jours, quatre semaines): météo et envies de saison (boissons chaudes l'hiver, terrasse et boissons glacées l'été), une recette découverte chaque saison, deux événements.
-- **Boucle d'une adresse** (trois à cinq semaines pour un duo médian): arriver et rencontrer la personne qui vous confie le lieu; équiper et décorer; gagner la réputation; ouvrir la première extension; tenir le défi local (une journée de fête, toujours réussie); recevoir la lettre de l'adresse suivante, mettre de côté, déménager un lundi. Le café quitté devient une succursale.
+- **Boucle d'une adresse** (trois à cinq semaines pour un duo médian): arriver et rencontrer la personne qui vous confie le lieu; équiper et décorer (à Ormeval, tout part d'une boutique vide: `demo/depart-cellule-vide-v0-3.md`); gagner la réputation; ouvrir la première extension; tenir le défi local (une journée de fête, toujours réussie); recevoir la lettre de l'adresse suivante, mettre de côté, déménager un lundi. Le café quitté devient une succursale.
 - **Long terme**: la maison et ses cinq cafés, les histoires des habitués, les recettes, la visite du Guide de la Tasse et la fête de la maison; puis le jeu libre: retourner jouer dans chaque café, finir « Nos projets », tout décorer.
 - **Entre les séances**: rien ne bouge. Pas d'horloge réelle, pas de succursale qui tourne sans vous. On retrouve la maison à la seconde près, quelle que soit la machine qui héberge.
 
-**Comprendre le but en moins d'une minute**: la première scène le dit en trois phrases. Simone, l'ancienne patronne, tend les clés sur le seuil: « Vous voilà chez vous. Faites de ce café l'endroit où l'on aime s'arrêter: écrivez votre carte, servez vos clients, et la maison grandira. Demain, on retourne la pancarte à 8 heures. » Ensuite, « Nos projets » affiche toujours les trois prochains objectifs.
+**Comprendre le but en moins d'une minute**: la première scène le dit en trois phrases, sur la place, devant le rideau baissé. Simone, l'ancienne patronne, propriétaire des murs, tend les clés: « Ah, vous voilà. Le café dort depuis trois ans, depuis ma retraite. Les murs sont à moi, j'habite juste au-dessus. » « Vous voilà chez vous. Faites de ce café l'endroit où l'on aime s'arrêter : équipez-le, écrivez votre carte, servez vos clients, et la maison grandira. » « Tenez, les clés. Le rideau de la porte est dur : levez-le à deux. » Pendant l'installation, le guide de Simone tient la liste « À faire »; ensuite, « Nos projets » affiche toujours les trois prochains objectifs.
 
 ## 4. Règles (game-designer)
 
@@ -181,7 +182,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **TE-05** Finir la journée: au bilan, chaque joueur choisit « À demain » ou « Encore un instant »; la journée suivante commence quand les deux ont choisi « À demain » (puis PA-08 propose de finir la séance).
 - **TE-06** La semaine compte sept jours. Le jour 1 de la maison est le lundi du printemps de l'année 1. Le lundi, la maison est fermée (TE-08); mardi à dimanche, elle ouvre.
 - **TE-07** Les saisons durent 28 jours (quatre semaines) et commencent un lundi: printemps, été, automne, hiver. L'année compte 112 jours.
-- **TE-08** Le lundi, l'horloge est arrêtée toute la journée: travaux (les extensions commandées se construisent), brocante (des pièces uniques à prix doux), visite d'une succursale (dialogue avec la gérance, réglages), commandes. La journée finit quand les deux ont choisi « Passer à mardi ». Raison: un vrai café ferme un jour par semaine; c'est le jour des chantiers et des flâneries.
+- **TE-08** Le lundi, l'horloge est arrêtée toute la journée: travaux (les extensions commandées se construisent), brocante (des pièces uniques à prix doux), visite d'une succursale (dialogue avec la gérance, réglages), commandes. La journée finit quand les deux ont choisi « Passer à mardi ». Raison: un vrai café ferme un jour par semaine; c'est le jour des chantiers et des flâneries. Le jour 1, ce lundi est celui de l'installation dans la boutique vide d'Ormeval (`demo/depart-cellule-vide-v0-3.md`); les achats de ce jour-là sont livrés dans la journée par Gaby, devant la vitrine.
 - **TE-09** Jours particuliers de la semaine (multiplicateurs: table `jours`):
   - jour de marché: Mérelles le jeudi, Montaurel le samedi, les Plumassiers le mardi et le vendredi, le boulevard des Horticulteurs le dimanche; Ormeval n'a pas de marché;
   - mercredi: les enfants n'ont pas classe l'après-midi, les familles viennent;
@@ -356,7 +357,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **EC-05** **Achats importants**: un achat supérieur aux recettes moyennes d'une journée du café joué (300 € au moins) se propose à l'autre joueur, qui l'accepte ou le refuse; la somme est réservée pendant la proposition. Les déménagements et les embauches demandent toujours l'accord des deux.
 - **EC-06** **Pas de faillite.** Si la caisse ne suffit pas à payer les charges du jour à la fermeture, le reste devient « à régler », sans intérêt ni pénalité: il se retire d'abord des résultats des jours suivants. Tant qu'il reste quelque chose à régler, les achats du catalogue et les embauches attendent, mais les fournisseurs livrent la commande habituelle (« On vous fait confiance »), et l'on peut toujours servir, ce qui rapporte toujours plus que les matières. La tablette propose une piste (« Votre équipe est plus grande que ce que la salle demande en semaine »). Il n'existe aucun état d'échec: le pire est une journée calme. Mesuré: aucun duo simulé n'a jamais eu de somme à régler.
 - **EC-07** **Tirelire du déménagement**: quand la lettre de l'adresse suivante est arrivée et l'extension du défi payée, la tablette propose de mettre de côté une part du résultat de chaque journée (60 % par défaut, réglable de 0 à 100 %). L'argent de la tirelire sort quand on veut, d'un commun accord.
-- **EC-08** **Installation**: s'installer à une adresse coûte une somme (table `adresses`: caution et premiers frais, 600 € au bourg à 3 000 € à la maison parisienne), modeste parce que chaque lieu est confié par quelqu'un qui veut qu'il revive (René, Agathe, Antoine, Éliane). Elle comprend l'équipement de départ (table `depart`).
+- **EC-08** **Installation**: s'installer à une adresse coûte une somme (table `adresses`: caution et premiers frais, 600 € au bourg à 3 000 € à la maison parisienne), modeste parce que chaque lieu est confié par quelqu'un qui veut qu'il revive (René, Agathe, Antoine, Éliane). Elle comprend l'équipement de départ (table `depart`). **Ormeval fait exception** (demande du client du 2026-11-08): pas d'installation à payer, mais une boutique vide et 1 800 € d'épargne; ce qui tient aux murs reste (comptoir, évier, toilettes, arrivées techniques, rideaux), tout le reste s'achète, en partie à Simone pour pas cher (sa vieille machine, ses tables et ses chaises), et rien ne permet d'ouvrir sans caisse, sans vaisselle et sans au moins une ligne servable à l'ardoise (`demo/depart-cellule-vide-v0-3.md`, sections 4 et 7).
 
 ### 4.16 Progression et déblocages
 
@@ -460,6 +461,8 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | `paris-quartier` | Paris, le café de l'angle des Plumassiers | 96 m² | 7 h 30 à 20 h 30 | mardi, vendredi | x1,8 | x1,15 | 6 500 € | 60 € | 2 500 € | 4 500 | 3,0 | 4,0 | 16 | 18 + 6 | 29 + 16 | 8 | 80 |
 | `paris-maison` | Paris, la Graineterie du boulevard des Horticulteurs | 300 m² | 8 h à 21 h | dimanche | x2 | x1,2 | 15 000 € | 140 € | 3 000 € | 10 000 | 3,5 | 4,5 | 20 | 41 + 12 | 64 + 24 | 8 | 120 |
 
+Ormeval depuis la démo v0.3 (2026-11-08): « Installation: aucune » et « Places à l'arrivée: 8 + 2 » décrivent l'ancien départ équipé, gardé ici parce que la simulation longue le lit. Dans le jeu, la boutique est vide: 0 + 2 places (le banc de Simone), 1 800 € d'épargne, tout à équiper (`demo/depart-cellule-vide-v0-3.md`).
+
 **Équipement fourni à l'arrivée** (compris dans l'installation)
 
 <!-- table:depart -->
@@ -470,6 +473,8 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | `ville` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi | 0 | 120 |
 | `paris-quartier` | machine 2, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 1, presse-agrumes 1 | lave-vaisselle | 1 | gobelets, wifi, mange_debout | 4 | 160 |
 | `paris-maison` | machine 3, buse 2, bouilloire 2, vitrine 2, plan 2, frigo du bar 2, four 2, presse-agrumes 2 | lave-vaisselle à capot | 2 | gobelets, wifi | 6 | 260 |
+
+Ormeval depuis la démo v0.3: rien de cette ligne n'est fourni, tout s'achète le jour 1 (`demo/depart-cellule-vide-v0-3.md`, section 4.2: la vieille dame de Simone 450 € ou une machine révisée 800 €, moulin 140 €, caisse 80 €, vaisselle 24 pièces 30 € ou 36 pièces 110 €, réfrigérateur 180 €, bouilloire 25 €, cloche 35 €). Seuls l'évier et le rail à tickets restent avec le local.
 
 **Extensions**
 
@@ -726,6 +731,8 @@ Toutes ces valeurs deviendront des fichiers de configuration typés (CLAUDE.md, 
 | Employés: vitesse aux niveaux 1, 2, 3 | x1 / x1,2 / x1,35 | des professionnels, plus rapides que nous au départ |
 | Employés: jours travaillés pour les niveaux 2 et 3 | 8 et 24 | on les voit progresser |
 | Embauche du duo simulé | pertes de plus de 12 % sur 3 jours et 5 jours de salaire en caisse | comportement prudent, pas une règle du jeu |
+
+Caisse au départ, Ormeval depuis la démo v0.3: 1 800 € d'épargne, celle du duo, et plus de réserve de Simone; la valeur de 300 € ci-dessus reste celle de la simulation longue, à recaler à sa prochaine relance.
 
 ### 4.21 Simulation
 
@@ -1137,7 +1144,7 @@ Chaque habitué est rattaché à une adresse; ses cinq étapes s'ouvrent aux niv
 
 | Habitué | Adresse | Profil | Commande fétiche | Quand | Trait visible (proposition) | Son histoire | Suit la maison |
 |---|---|---|---|---|---|---|---|
-| Simone | village | voisins | noisette, au comptoir | tous les jours, 8 h 30 et 17 h | long gilet prune, chignon piqué d'un crayon, lunettes à chaînette, panier d'osier; son banc sous la vitrine | elle vous confie les clés et vous montre les gestes; libérée du comptoir, elle se met à l'aquarelle et vous offre la place du Tilleul peinte; elle reprend la gérance quand vous partez | oui: chaque inauguration, « Un an déjà », la fête |
+| Simone | village | voisins | noisette, au comptoir | tous les jours, 8 h 30 et 17 h | long gilet prune, chignon piqué d'un crayon, lunettes à chaînette, panier d'osier; son banc sous la vitrine | propriétaire des murs, elle habite au-dessus du café qu'elle a fermé il y a trois ans; elle vous loue la boutique vide, vous vend pour pas cher sa vieille machine (« la vieille dame ») et ses tables, et vous montre les gestes; libérée du comptoir, elle se met à l'aquarelle et vous offre la place du Tilleul peinte; elle reprend la gérance quand vous partez | oui: chaque inauguration, « Un an déjà », la fête |
 | Mathis | village | pressés | espresso et pain au chocolat | du mardi au samedi, 8 h 10 | sacoche de facteur jaune moutarde, vélo appuyé à la vitrine | toujours en retard sur sa tournée, il prépare un concours le soir au café; le jour où il le réussit, il offre une tournée de cafés à la salle; muté en ville, il retrouve votre comptoir à l'Imprimerie | oui: l'Imprimerie |
 | Farida et Noé | village | familles | chocolat chaud et crêpe au sucre | mercredi 16 h, samedi 10 h | ciré moutarde (Farida), bonnet à pompon (Noé) | Noé, timide, dessine sur un coin de l'ardoise; ses dessins finissent encadrés au mur; sa classe vient goûter un mercredi | non |
 | Bastien et Gribouille | village | promeneurs | jus d'orange pressé et tartine | dimanche 11 h | bâtons de marche, chien couché sous la table (pose fixe) | il balise un sentier qui passe par la place; le range-vélos et l'écuelle installés, il amène son club; il vous donne sa recette de citronnade | non |
@@ -1227,8 +1234,8 @@ Les événements de saison ne sont pas simulés au-delà des multiplicateurs (ef
 
 Toutes en place, par dialogues, sans cinématique (C22); un fondu seulement pour changer de lieu.
 
-1. **Jour 1, un lundi**: l'annonce « Café de la place cherche repreneurs » sur la tablette. Simone attend sur le seuil, les clés à la main. Les trois phrases du but (section 3), puis la visite: la machine, le rail, la plonge, la réserve. On fait à Simone son premier noisette; on écrit la première ardoise; on nomme la maison à deux (l'un propose, l'autre accepte ou propose à son tour), puis l'emblème et les couleurs.
-2. **Jour 2**: la pancarte se retourne. Simone est la première cliente (« Comme d'habitude ? »). Le soir, le premier mot du livre d'or.
+1. **Jour 1, un lundi: l'installation**. Sur la place, devant le café fermé depuis trois ans, rideaux baissés, vitrines passées au blanc. Simone sort de chez elle, au-dessus, les clés à la main: les trois phrases du but (section 3). On lève le rideau à deux; dedans, des draps sur le comptoir et sur les tables, chaises retournées, poussière, trois ans de courrier. On choisit à deux sur le téléphone, avec 1 800 € d'épargne, la machine (la vieille dame de Simone ou une machine révisée), le moulin, la caisse, la vaisselle, les tables (celles de Simone pour pas cher, ou neuves); Gaby livre devant la vitrine; on porte, on pose, on raccorde; la machine chauffe et l'on fait à Simone son premier noisette. On balaie, on lave les vitrines, on écrit la première ardoise, on commande le stock pour mardi, on nomme la maison à deux (l'un propose, l'autre accepte ou propose à son tour), puis l'emblème et les couleurs. Détail: `demo/depart-cellule-vide-v0-3.md`.
+2. **Jour 2, le grand jour**: on lève le rideau à deux, puis la pancarte se retourne. Simone est la première cliente (« Comme d'habitude ? »). Le soir, le premier mot du livre d'or.
 3. **La première semaine**: Mathis, Farida et Noé, Bastien et son chien, Lise; Simone se tait peu à peu.
 4. **La lettre de Mérelles**: René, l'ancien pâtissier, cherche quelqu'un pour rallumer son four.
 5. **La fête du Tilleul**, un dimanche, sous le store: tout le village; le soir, Simone: « Je vous le garde au chaud. »
@@ -1432,12 +1439,20 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | Q16 | Le second rang de terrasse au café d'angle (plans) | un seul rang (16 places); deux rangs (26) si l'architecte valide une foule lointaine simplifiée | un rang au prototype; on décide après la mesure sur le PC | | |
 | Q17 | La direction de rendu (essai de style 3D) | A stylisé chaleureux; B semi-réaliste; un mélange | à décider sur les images de l'essai, en cours | B semi-réaliste | 2026-11-08 |
 | Q18 | Les réglages de souris et de champ de vision (UX, U1) | dans Duo, communs à tous les jeux; dans chaque jeu | dans Duo, par ordinateur; d'ici là, dans la tablette | | |
-| Q19 | L'annonce du départ (UX, U2) | « Café de la place cherche repreneurs »; « Café de la place à reprendre » | « à reprendre »: l'autre forme suppose des joueurs au masculin | | |
+| Q19 | L'annonce du départ (UX, U2) | « Café de la place cherche repreneurs »; « Café de la place à reprendre » | « à reprendre »: l'autre forme suppose des joueurs au masculin. Si Q20 est validée, la question tombe: l'annonce devient l'inscription « À LOUER · s'adresser au-dessus » tracée dans le blanc de la vitrine | | |
+| Q20 | Simone dans le nouveau départ | ancienne patronne propriétaire des murs, qui habite au-dessus et loue la boutique vide; une autre voisine (l'épicière fait doublon avec Mireille) | ancienne patronne propriétaire des murs: elle garde son rôle (première cliente, guide, future gérante) et rend le départ chaleureux | | |
+| Q21 | Un prêt pour démarrer | aucun en démo; un prêt avec mensualité | aucun dans la démo (deux mensualités en deux semaines: tout le monde le prendrait, le choix disparaît); à proposer à partir de Mérelles | | |
+| Q22 | L'épargne de départ et les prix d'installation | 1 800 €, prix de village et d'occasion (vieille machine 450 €, machine révisée 800 €); plus; moins | 1 800 €: la simulation y trouve quatre façons d'ouvrir qui se valent sans piège (1 500 € est trop dur pour un duo tranquille, 2 100 € ôte le choix) | | |
+| Q23 | Les meubles et la machine de Simone sous les draps | à racheter pour pas cher; une boutique tout à fait nue | les garder: l'image du café fermé, la voie économique pour un duo prudent, des modèles déjà faits | | |
+| Q24 | Les livraisons du jour de l'installation | le jour même, par Gaby, en moins d'une minute; le lendemain matin | le jour même: sinon le premier jour se passerait à attendre | | |
+| Q25 | Les adresses suivantes | à équiper de zéro aussi; équipées comme aujourd'hui; à moitié | à moitié: on garde ce qui tient aux murs et fait l'histoire du lieu (le four de René, les presses de l'Imprimerie), le reste s'achète; à décider avant de produire Mérelles | | |
+| Q26 | Le ménage de l'installation | facultatif mais visible (ambiance, passants); obligatoire; absent | facultatif mais visible: on le fait volontiers à deux, personne n'est bloqué | | |
 
 ## 15. Historique
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
+| 2026-11-08 | 0.2.4 | Retour du client sur la démo: « le jeu devait commencer sur une cellule vide et le café fermé, un budget pour démarrer et acheter meubles, et stock pour commencer ». Ormeval devient une boutique fermée depuis trois ans: arrivée sur la place, rideau levé à deux, installation le jour 1 (13 à 24 minutes), 1 800 € d'épargne au lieu de l'équipement fourni et des 300 € de caisse, aucune réserve offerte, Simone propriétaire des murs qui vend sa vieille machine et ses tables, garde-fous d'ouverture, guide de l'installation. Conception et simulation: `demo/depart-cellule-vide-v0-3.md`, `demo/simulations/depart_v0_3.py`. Mis à jour: En bref, 1.3, 2.5, 3, TE-08, EC-08, notes sous les tables `adresses`, `depart` et `divers`, 6.5 (Simone), 6.9 (scènes 1 et 2), Q19 à Q26. Les tables marquées de la simulation longue ne changent pas (contrôle `--croise`), à recaler à la prochaine relance | client |
 | 2026-11-08 | 0.2.3 | Décision du client: direction de rendu B, semi-réaliste (Q17) | client |
 | 2026-11-08 | 0.2.2 | Retours du client sur l'essai 3D: personnages (clients et avatars) au niveau de détail du décor (visages, mains, vêtements, coiffures variées); couleurs des joueurs retirées des tenues (Q14). La bible (section 4) est à reprendre en ce sens par le directeur artistique | client |
 | 2026-11-08 | 0.2.1 | Décision du client: titre « Deux Tabliers » (Q1) | client |
