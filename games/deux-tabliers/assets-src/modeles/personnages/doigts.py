@@ -55,6 +55,7 @@ POSES = ("relaxed", "grip_handle", "grip_glass")
 # angles en degrés: (flexion autour de X, rotation autour de Z) par segment
 RELAXED = {"Thumb1": (8, 6), "Thumb2": (12, 0), "Index1": (12, 0), "Index2": (22, 0), "Fingers1": (18, 0), "Fingers2": (30, 0)}
 MARGIN = 0.0005  # jeu gardé entre la main et le récipient (m)
+STRETCH_MAX = 2.5  # allongement maximal admis d'une arête de la main dans une pose
 BLEND = 0.008  # demi-largeur de la transition des poids autour d'une articulation (m)
 
 
@@ -346,6 +347,7 @@ def process(ident, cup, glass):
                 on = (near == ci) & (dist[:, ci] < 0.06) & (wh > 0.5)
                 share[:, ci * 2] = np.where(on, f * (1 - f2), 0)
                 share[:, ci * 2 + 1] = np.where(on, f * f2, 0)
+            share = smooth_shares(share, d["I"], wh > 0.5)
             share *= smooth((wh - 0.5) / 0.3)[:, None]
             for k in range(6):
                 jidx = jbase + si * 6 + k
@@ -369,14 +371,28 @@ def process(ident, cup, glass):
     # rotation Z du pouce vers l'index: signe opposé au côté du pouce sur t (voir l'en-tête)
     rel = {f"{sd}Hand{k}": (RELAXED[k][0], -hands[sd]["sign"] * RELAXED[k][1]) for sd in SIDES for k in RELAXED}
     poses = {"relaxed": rel}
-    gh, place_h = fit_handle(ctx, cup)
-    gg, place_g = fit_glass(ctx, glass)
-    # segments que la prise n'a pas eu à fermer: droits (0), comme pendant l'essai de contact
-    zero = {f"RightHand{c}{k}": (0.0, 0.0) for c in CHAINS for k in (1, 2)}
-    gh, gg = dict(zero, **gh), dict(zero, **gg)
-    poses["grip_handle"] = dict(rel, **gh)
-    poses["grip_glass"] = dict(rel, **gg)
-    report["prises"] = {"grip_handle": place_h, "grip_glass": place_g}
+    try:
+        gh, place_h = fit_handle(ctx, cup)
+        gg, place_g = fit_glass(ctx, glass)
+    except RuntimeError as exc:
+        # prise introuvable: le personnage garde les doigts et `relaxed` seule, `prises` vaut null
+        report["prises"] = None
+        report["prises_refusees"] = str(exc)
+        report["etirement_max"] = {"relaxed": round(max(stretch(ctx, sd, rel) for sd in SIDES), 2)}
+    else:
+        # segments que la prise n'a pas eu à fermer: droits (0), comme pendant l'essai de contact
+        zero = {f"RightHand{c}{k}": (0.0, 0.0) for c in CHAINS for k in (1, 2)}
+        gh, gg = dict(zero, **gh), dict(zero, **gg)
+        poses["grip_handle"] = dict(rel, **gh)
+        poses["grip_glass"] = dict(rel, **gg)
+        report["prises"] = {"grip_handle": place_h, "grip_glass": place_g}
+        # contrôle d'étirement des arêtes de la main (seuil STRETCH_MAX): une prise qui étire trop la peau n'est pas
+        # livrée; le personnage garde alors `relaxed` seule et `prises` vaut null (le jeu garde la tenue sans doigts)
+        report["etirement_max"] = {k: round(max(stretch(ctx, sd, v) for sd in SIDES), 2) for k, v in poses.items()}
+        if any(report["etirement_max"][k] > STRETCH_MAX for k in ("grip_handle", "grip_glass")):
+            report["prises_refusees"] = report["prises"]
+            report["prises"] = None
+            poses = {"relaxed": poses["relaxed"]}
     for pname, angles in poses.items():
         chans, samplers = [], []
         times = g.add(np.array([0.0, 0.1], dtype=np.float32), minmax=True)
@@ -399,6 +415,39 @@ def process(ident, cup, glass):
         json.dump(report, fh, ensure_ascii=False, indent=1)
         fh.write("\n")
     return report
+
+
+def smooth_shares(share, I, region, passes=6):
+    """Lisse les parts des doigts le long du maillage (moyenne des voisins), seulement sur la main (`region`)."""
+    n = len(share)
+    nb = [[] for _ in range(n)]
+    for f in I:
+        for i in range(3):
+            a, b = int(f[i]), int(f[(i + 1) % 3])
+            nb[a].append(b)
+            nb[b].append(a)
+    out = share.copy()
+    for _ in range(passes):
+        new = out.copy()
+        for v in np.nonzero(region)[0]:
+            ns = [w for w in nb[v] if region[w]]
+            if ns:
+                new[v] = 0.5 * out[v] + 0.5 * out[ns].mean(0)
+        out = new
+    return out
+
+
+def stretch(ctx, side, angles):
+    """Plus fort allongement relatif des arêtes de la main posée (arêtes de plus de 2 mm au repos)."""
+    V0, part = posed_hand(ctx, side, {})
+    V1, _ = posed_hand(ctx, side, angles)
+    I = ctx["data"][0]["I"]
+    T = I[part[I].all(1)]
+    E = np.concatenate([T[:, [0, 1]], T[:, [1, 2]], T[:, [2, 0]]])
+    l0 = np.linalg.norm(V0[E[:, 0]] - V0[E[:, 1]], axis=1)
+    l1 = np.linalg.norm(V1[E[:, 0]] - V1[E[:, 1]], axis=1)
+    m = l0 > 0.002
+    return float((l1[m] / l0[m]).max()) if m.any() else 1.0
 
 
 def rest_q(node):
@@ -770,8 +819,12 @@ def main():
                 os.remove(rp)
             print(f"{ident}: ÉCHEC ({exc}), GLB laissé sans doigts")
             continue
+        if r["prises"] is None:
+            print(f"{ident}: prises refusées (étirement {r['etirement_max']}; {str(r.get('prises_refusees'))[:60]}), relaxed seule")
+            continue
         gh = r["prises"]["grip_handle"]
         gg = r["prises"]["grip_glass"]
+        print(f"   étirement {r['etirement_max']}")
         print(f"{ident}: {r['os_total']} os, {r['file_bytes']} octets; anse: traversées {gh['traversees']}, écarts pouce "
               f"{gh['ecart_pouce_mm']} mm, index {gh['ecart_index_mm']} mm; verre: traversées {gg['traversees']}, pouce {gg['ecart_pouce_mm']} mm")
 
