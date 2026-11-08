@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "deux-tabliers",
   "name": "Deux Tabliers",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "sdk": "1.1",
   "view": "3d",
   "engine": "three",
@@ -13,7 +13,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, en vue à la première personne, vous reprenez le petit café d'Ormeval et vous le tenez ensemble.",
-  "whatsNew": "Premier jour au calme: un client après l'autre le mardi, puis l'affluence monte jusqu'au vendredi. Simone te guide pas à pas et encadre le poste à utiliser. Viser un poste est bien plus facile. Les gestes à maintenir (commande, moulin, plonge) marchent enfin sur la machine qui rejoint. Une recette sans stock se grise. Ctrl+N sur Mac: note pour le studio.",
+  "whatsNew": "La porte derrière le comptoir mène enfin à une vraie réserve, puis à la cour. Rappel de la 0.2.3: mardi au calme, Simone te guide pas à pas et encadre le poste à utiliser, visée plus facile, gestes à maintenir réparés sur la machine qui rejoint, recette sans stock grisée, Ctrl+N sur Mac pour une note au studio.",
   "actions": [
     {
       "id": "forward",

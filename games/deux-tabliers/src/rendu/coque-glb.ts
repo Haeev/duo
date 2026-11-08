@@ -11,6 +11,7 @@
 import {
   Color,
   DoubleSide,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -18,6 +19,8 @@ import {
   RepeatWrapping,
   SRGBColorSpace,
   TextureLoader,
+  Vector3,
+  type BufferGeometry,
   type Material,
   type Object3D,
   type Scene,
@@ -26,6 +29,8 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { GameView } from '../reseau/vue';
+import { BAKED_DOOR_LEAF, PLACE_RUELLE_COPING } from './arriere-cotes';
+import { createBackRooms, type BackRooms } from './arriere';
 import { textureUrl, type ModelLibrary } from './modeles';
 
 /**
@@ -134,6 +139,55 @@ function bake(root: Object3D, scale: number, owned: { dispose(): void }[]): void
   });
 }
 
+interface Box3Like {
+  readonly min: readonly number[];
+  readonly max: readonly number[];
+}
+
+/**
+ * Déplace les sommets d'un modèle cuit compris dans une boîte (repère du monde): `move` reçoit le
+ * point du monde et le modifie. Une fois au chargement; la géométrie du GLB n'est pas partagée.
+ */
+function moveVertices(root: Object3D, box: Box3Like, move: (p: Vector3) => void): void {
+  const p = new Vector3();
+  const inverse = new Matrix4();
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    if (!(o instanceof Mesh)) return;
+    const geometry = o.geometry as BufferGeometry;
+    const pos = geometry.getAttribute('position');
+    inverse.copy(o.matrixWorld).invert();
+    let changed = false;
+    for (let i = 0; i < pos.count; i++) {
+      p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+      const [x0 = 0, y0 = 0, z0 = 0] = box.min;
+      const [x1 = 0, y1 = 0, z1 = 0] = box.max;
+      if (p.x < x0 || p.x > x1 || p.y < y0 || p.y > y1 || p.z < z0 || p.z > z1) continue;
+      move(p);
+      p.applyMatrix4(inverse);
+      pos.setXYZ(i, p.x, p.y, p.z);
+      changed = true;
+    }
+    if (changed) pos.needsUpdate = true;
+  });
+}
+
+/**
+ * Vantail de la porte de l'arrière-comptoir, cuit fermé alors qu'on passe: ses sommets sont
+ * repliés en un point (triangles vides), la réserve dessine le vantail ouvert.
+ */
+function foldBakedDoorLeaf(root: Object3D): void {
+  const [x, y, z] = BAKED_DOOR_LEAF.min;
+  moveVertices(root, BAKED_DOOR_LEAF, (p) => p.set(x, y, z));
+}
+
+/** Chaperon du mur de la ruelle (place): son débord au-dessus de la cour est ramené au nu du mur. */
+function trimRuelleCoping(root: Object3D): void {
+  moveVertices(root, PLACE_RUELLE_COPING, (p) => {
+    p.x = PLACE_RUELLE_COPING.x;
+  });
+}
+
 function lightmapScale(root: Object3D): number {
   let scale = 1;
   root.traverse((o) => {
@@ -156,6 +210,8 @@ export function createBakedShell(
   let disposed = false;
   let failed = false;
   let key = '';
+  // Réserve et cour, hors de la coque cuite (posées avec elle, jamais avec la coque en blocs).
+  let backRooms: BackRooms | null = null;
 
   // Environnement des métaux: une pièce neutre calculée une fois au chargement, comme l'essai
   // de style (une capture de la salle par six vues compilerait une variante de chaque
@@ -176,8 +232,10 @@ export function createBakedShell(
     if (src === null || disposed) return;
     scale = lightmapScale(src.scene);
     bake(src.scene, scale, owned);
+    foldBakedDoorLeaf(src.scene);
     base = src.scene;
     scene.add(src.scene);
+    backRooms = createBackRooms(scene);
     key = '';
     capture();
   });
@@ -185,6 +243,7 @@ export function createBakedShell(
   let place: Object3D | null = null;
   void models.gltf('shell_village_place').then((src) => {
     if (src === null || disposed) return;
+    trimRuelleCoping(src.scene);
     bake(src.scene, lightmapScale(src.scene), owned);
     place = src.scene;
     scene.add(src.scene);
@@ -255,6 +314,7 @@ export function createBakedShell(
     const next = open.join(',');
     if (next === key || base === null) return;
     key = next;
+    backRooms?.setFondOpen(open.includes('village-fond'));
     const closing = base.getObjectByName('shell_village_fond_ferme');
     if (closing !== undefined) closing.visible = !open.includes('village-fond');
     for (const ext of EXTENSIONS) {
@@ -279,6 +339,7 @@ export function createBakedShell(
       if (base !== null) scene.remove(base);
       if (place !== null) scene.remove(place);
       for (const p of parts.values()) if (p !== base) scene.remove(p);
+      backRooms?.dispose();
       scene.environment = null;
       for (const d of owned) d.dispose();
     },
