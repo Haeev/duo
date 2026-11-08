@@ -4,7 +4,16 @@
  * de Simone. Deux `LineSegments` sur la même boîte unitaire, dessinés par-dessus le décor pour
  * rester lisibles derrière une pièce de la machine; aucune allocation par image.
  */
-import { BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, type Scene } from 'three';
+import {
+  Box3,
+  BoxGeometry,
+  EdgesGeometry,
+  LineBasicMaterial,
+  LineSegments,
+  Vector3,
+  type Object3D,
+  type Scene,
+} from 'three';
 import { guideOf, type GuideFocus } from '../branchement/guide';
 import type { Content } from '../donnees/charger';
 import type { World } from '../etat/monde';
@@ -31,8 +40,37 @@ interface Frame {
 }
 
 const MARGIN = 0.04;
+const bounds = new Box3();
+const boundsSize = new Vector3();
+const boundsCenter = new Vector3();
 
-function frameOf(content: Content, world: World, t: Target | GuideFocus, out: Frame): boolean {
+/**
+ * Cadre d'un meuble pris sur son modèle affiché quand il existe: l'empreinte des données est celle
+ * des collisions (la caisse: 70 cm de large pour 15 cm de haut), plus large et plus basse que le
+ * modèle, et le cadre traversait la caisse. Boîte alignée sur les axes: exacte au quart de tour.
+ */
+function fitToNode(node: Object3D | undefined, out: Frame): void {
+  if (node === undefined) return;
+  bounds.setFromObject(node);
+  if (bounds.isEmpty()) return;
+  bounds.getSize(boundsSize);
+  bounds.getCenter(boundsCenter);
+  out.x = boundsCenter.x;
+  out.y = boundsCenter.y;
+  out.z = boundsCenter.z;
+  out.w = boundsSize.x + MARGIN;
+  out.h = boundsSize.y + MARGIN;
+  out.d = boundsSize.z + MARGIN;
+  out.rotDeg = 0;
+}
+
+function frameOf(
+  content: Content,
+  world: World,
+  t: Target | GuideFocus,
+  nodeOf: (furnitureId: string) => Object3D | undefined,
+  out: Frame,
+): boolean {
   if (t.kind === 'station' || t.kind === 'furniture') {
     const id = t.kind === 'station' ? t.furniture : t.id;
     const f = world.furniture.find((x) => x.id === id);
@@ -45,6 +83,7 @@ function frameOf(content: Content, world: World, t: Target | GuideFocus, out: Fr
     out.h = type.height + MARGIN;
     out.y = f.y + type.height / 2;
     out.rotDeg = f.rotDeg;
+    fitToNode(nodeOf(id), out);
     return true;
   }
   if (t.kind === 'slot') {
@@ -79,7 +118,10 @@ function frameOf(content: Content, world: World, t: Target | GuideFocus, out: Fr
   return false;
 }
 
-export function createHighlight(scene: Scene): Highlight {
+export function createHighlight(
+  scene: Scene,
+  nodeOf: (furnitureId: string) => Object3D | undefined,
+): Highlight {
   const box = new BoxGeometry(1, 1, 1);
   const edges = new EdgesGeometry(box);
   box.dispose();
@@ -112,10 +154,10 @@ export function createHighlight(scene: Scene): Highlight {
         pitchDeg: look.pitchDeg,
       });
       aimLines.visible =
-        a !== null && a.plan.kind !== 'refuse' && frameOf(content, world, a.target, frame);
+        a !== null && a.plan.kind !== 'refuse' && frameOf(content, world, a.target, nodeOf, frame);
       if (aimLines.visible) place(aimLines, 1);
       const focus = guideOf(content, world, view.local)?.focus ?? null;
-      guideLines.visible = focus !== null && frameOf(content, world, focus, frame);
+      guideLines.visible = focus !== null && frameOf(content, world, focus, nodeOf, frame);
       if (guideLines.visible) place(guideLines, 1.06 + 0.04 * Math.sin(nowMs / 250));
     },
     dispose() {

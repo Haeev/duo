@@ -61,8 +61,8 @@ export function createWorldNodes(
   const root = new Group();
   root.name = 'monde';
   scene.add(root);
-  const highlight = createHighlight(scene);
   const furniture = new Map<string, FurnitureNode>();
+  const highlight = createHighlight(scene, (id) => furniture.get(id)?.node);
   const objects = new Map<number, { node: Group; type: string }>();
   /** Tasses et verres servis que tient le client assis (`clientele/rendu3d.ts`): pas en double. */
   const inHands = new Set<number>();
