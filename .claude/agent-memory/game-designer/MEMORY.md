@@ -317,3 +317,9 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Dans la v0.1, `deliver` ne débite rien: les matières sont payées à la vente (`clients.ts`), et le panier du soir donne de la réputation pour des invendus gratuits. Toujours vérifier qui paie quoi et quand avant de régler une économie de stock.
 - Simuler une variante d'économie sans copier `demo_v0_1.py`: remplacer `cc.Service.encaisser` (noter les recettes vendues) et `cc.Service.bilan` (rendre un autre `cout`), puis appeler `d1.jouer` (script `demo/simulations/demo_v0_2.py`, 5 s pour 96 parties).
 - Une commande habituelle par moyenne des trois derniers jours rate les recettes nouvelles (aucun historique): reprendre la base de l'ardoise ingrédient par ingrédient, sinon les ruptures doublent. Monter la marge n'y change presque rien.
+
+## Remises et marketing (Deux Tabliers, 2026-11-08)
+
+- Le facteur de prix du jeu (`priceFactor` linéaire, pente = sensibilité, borné 0,4 à 1,25) rend une remise rentable seulement si sensibilité x part remisée de l'indice > part remisée du ticket / taux de marge: avec l'indice moyenné sur toutes les envies, aucune remise ne paie jamais. Lire l'indice d'une heure douce sur les seules lignes remisées (ce qu'annonce l'ardoise).
+- Valoriser un groupe en plus au ticket de son profil, pas au ticket moyen du jour: un pressé vaut 2,5 €, une famille 14 €; l'erreur inversait le verdict (heure douce du matin « rentable »).
+- Au village, le week-end et la fête sont presque pleins (capacité douce 42 puis 46 groupes par jour): un levier ne paie qu'en semaine; c'est ce qui crée le choix du moment. Simulation: `docs/jeux/cosy-cafe/demo/simulations/remises_marketing_v0_2.py` (lit les JSON dans le document).
