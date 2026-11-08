@@ -31,7 +31,7 @@
 
   function annoncer() {
     // Ce que l'autre joueur lit dans sa carte du HUD (ici simulé dans la même page).
-    document.body.dataset.place = sorti() ? `Sur son téléphone : ${NOMS[app]}` : '';
+    document.body.dataset.place = sorti() ? `Sur son téléphone : ${NOMS[app]}` : '';
   }
 
   function montrer(nom, opts) {
@@ -166,7 +166,7 @@
     const h = (location.hash || '#accueil').slice(1);
     document.querySelector('.banniere').hidden = h !== 'notif';
     document.querySelector('.hud__alerte').hidden = h !== 'range';
-    document.querySelector('[data-autre]').textContent = h === 'autre' ? 'Sur son téléphone : Commandes' : 'À la caisse';
+    document.querySelector('[data-autre]').textContent = h === 'autre' ? 'Sur son téléphone : Commandes' : 'À la caisse';
     if (h === 'range' || h === 'autre') {
       ranger();
       document.querySelectorAll('[data-si="range"]').forEach((e) => { e.hidden = h !== 'range' && e.classList.contains('hud__alerte'); });

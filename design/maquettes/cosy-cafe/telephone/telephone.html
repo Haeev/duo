@@ -13,16 +13,16 @@
 <!-- HUD du jeu: reste visible et vivant pendant que le téléphone est sorti -->
 <div class="hud" aria-label="Le café">
   <div class="capsule hud__horloge">
-    <p class="hud__heure"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span data-heure>17 h 25</span></p>
-    <p class="hud__sous">Mardi 9 · fermeture à 18 h</p>
+    <p class="hud__heure"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span data-heure>17 h 25</span></p>
+    <p class="hud__sous">Mardi 9 · fermeture à 18 h</p>
   </div>
   <div class="capsule hud__ticket">
     <b>Table 2 · 2 crèmes, 1 croissant</b>
-    <span>Ton ticket · attend depuis 2 min</span>
+    <span>Ton ticket · attend depuis 2 min</span>
   </div>
   <div class="capsule hud__alerte" data-si="range" hidden>
     <svg class="ico" viewBox="0 0 24 24"><rect x="7" y="2.8" width="10" height="18.4" rx="2.2"/><path d="M10.5 18h3"/><path d="M3.5 9.5v5M20.5 9.5v5"/></svg>
-    <span><b>Téléphone</b> · Sacha propose : un encart dans L'Écho, 45 €</span>
+    <span><b>Téléphone</b> · Sacha propose : un encart dans L’Écho, 45 €</span>
     <span class="touche">Entrée</span><span>voir et répondre</span>
   </div>
   <div class="capsule hud__autre">
@@ -40,7 +40,7 @@
   <p><span class="touche">Retour arrière</span> revenir</p>
   <p><span class="touche">A</span><span class="touche">E</span> appli voisine</p>
   <p><span class="touche">Entrée</span> choisir</p>
-  <p>flèches ou Z Q S D : se déplacer</p>
+  <p>flèches ou Z Q S D : se déplacer</p>
   <p class="second">Le café continue pendant que tu regardes.</p>
 </div>
 
@@ -59,10 +59,10 @@
   </svg>
   <div class="tel__coque">
     <div class="tel__ecran">
-      <div class="etat" aria-label="Barre d'état">
-        <span class="etat__heure" data-heure>17 h 25</span>
+      <div class="etat" aria-label="Barre d’état">
+        <span class="etat__heure" data-heure>17 h 25</span>
         <span class="etat__jour">mar. 9</span>
-        <span class="etat__caisse"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M6 9V5h9l3 4M7 14h4"/></svg>Caisse 486 €</span>
+        <span class="etat__caisse"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M6 9V5h9l3 4M7 14h4"/></svg>Caisse 486 €</span>
       </div>
 
       <button class="banniere" data-si="notif" hidden data-aller="commandes" data-cle="banniere">
@@ -82,8 +82,8 @@
           <div class="carte">
             <h3>À faire</h3>
             <ul class="afaire">
-              <li><span class="jeton" data-joueur="crescent"></span><span>Sacha propose : un encart dans L'Écho, 45 €</span><button class="btn btn--or" data-aller="messages" data-cle="a-repondre" data-focus="1">Répondre</button></li>
-              <li><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4v8L12 20l-8.5-4z"/><path d="M3.5 8 12 12l8.5-4M12 12v8"/></svg><span>Commande de mercredi : pas encore passée</span><button class="btn" data-aller="commandes" data-cle="a-commande">Préparer la commande</button></li>
+              <li><button class="tache" data-aller="messages" data-cle="a-repondre" data-focus="1"><span class="jeton" data-joueur="crescent"></span><span>Sacha propose : un encart dans L’Écho, 45 €<b>Répondre</b></span><svg class="ico" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></svg></button></li>
+              <li><button class="tache" data-aller="commandes" data-cle="a-commande"><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4v8L12 20l-8.5-4z"/><path d="M3.5 8 12 12l8.5-4M12 12v8"/></svg><span>Commande de mercredi : pas encore passée<b>Préparer la commande</b></span><svg class="ico" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></svg></button></li>
             </ul>
           </div>
           <nav class="grille" aria-label="Applications">
@@ -103,42 +103,42 @@
         <!-- ===================== Commandes ===================== -->
         <section data-app="commandes" aria-labelledby="t-commandes" hidden>
           <div class="appli-tete"><span class="pastille-app c-commandes"><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4v8L12 20l-8.5-4z"/><path d="M3.5 8 12 12l8.5-4M12 12v8"/></svg></span><h1 id="t-commandes">Commandes pour mercredi</h1></div>
-          <p class="intro">Chaque fournisseur passe ses jours à lui, vers 7 h. Tu paies à la livraison. « Habituelle » : de quoi tenir jusqu'à son prochain passage.</p>
+          <p class="intro">Chaque fournisseur passe ses jours à lui, vers 7 h. Tu paies à la livraison. « Habituelle » : de quoi tenir jusqu’à son prochain passage.</p>
 
           <article class="carte">
             <div class="fournisseur-tete"><span class="portrait" style="background:#E9C98A">L</span><div><h3>Lucas, le boulanger</h3><p>passe du mardi au dimanche</p></div></div>
             <div class="ligne"><span class="ligne__nom">Croissants du boulanger</span>
               <span class="pas"><button class="btn rond" aria-label="Moins de croissants" data-cle="c-moins">−</button><output>3</output><button class="btn rond" aria-label="Plus de croissants" data-cle="c-plus">+</button></span>
-              <span class="ligne__info"><span>par 10</span><span>en réserve : 4</span><span>habituelle : 3</span><span class="prix">21,00 €</span></span></div>
+              <span class="ligne__info"><span>par 10</span><span>en réserve : 4</span><span>habituelle : 3</span><span class="prix">21,00 €</span></span></div>
             <div class="ligne"><span class="ligne__nom">Pains au chocolat du boulanger</span>
               <span class="pas"><button class="btn rond" aria-label="Moins de pains au chocolat" data-cle="pc-moins">−</button><output>2</output><button class="btn rond" aria-label="Plus de pains au chocolat" data-cle="pc-plus">+</button></span>
-              <span class="ligne__info"><span>par 10</span><span>en réserve : 2</span><span>habituelle : 2</span><span class="prix">15,00 €</span></span></div>
+              <span class="ligne__info"><span>par 10</span><span>en réserve : 2</span><span>habituelle : 2</span><span class="prix">15,00 €</span></span></div>
             <div class="ligne"><span class="ligne__nom">Tarte aux fruits du boulanger</span>
               <span class="pas"><button class="btn rond" aria-label="Moins de tartes" data-cle="t-moins">−</button><output>0</output><button class="btn rond" aria-label="Plus de tartes" data-cle="t-plus">+</button></span>
-              <span class="ligne__info"><span>tarte de 8 parts</span><span class="ambre">en réserve : 6 parts, à finir demain</span><span>habituelle : 0</span><span class="prix">0,00 €</span></span></div>
+              <span class="ligne__info"><span>tarte de 8 parts</span><span class="ambre">en réserve : 6 parts, à finir demain</span><span>habituelle : 0</span><span class="prix">0,00 €</span></span></div>
             <p class="port ok"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Port offert.</p>
           </article>
 
           <article class="carte">
-            <div class="fournisseur-tete"><span class="portrait" style="background:#C9D7B0">M</span><div><h3>Mireille, l'épicerie</h3><p>passe du mardi au dimanche</p></div></div>
+            <div class="fournisseur-tete"><span class="portrait" style="background:#C9D7B0">M</span><div><h3>Mireille, l’épicerie</h3><p>passe du mardi au dimanche</p></div></div>
             <div class="ligne ligne--tenue"><span class="ligne__nom">Citrons</span>
               <span class="pas"><button class="btn rond" aria-label="Moins de citrons" disabled>−</button><output>1</output><button class="btn rond" aria-label="Plus de citrons" disabled>+</button></span>
-              <span class="ligne__info"><span>filet de 20</span><span>en réserve : 7</span><span>habituelle : 1</span><span class="prix">5,00 €</span></span>
+              <span class="ligne__info"><span>filet de 20</span><span>en réserve : 7</span><span>habituelle : 1</span><span class="prix">5,00 €</span></span>
               <span class="verrou"><span class="jeton" data-joueur="crescent"></span>Sacha modifie cette ligne</span></div>
             <p class="port ok"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Port offert.</p>
           </article>
 
           <article class="carte carte--lue">
             <div class="fournisseur-tete"><span class="portrait" style="background:#F1EDE3">A</span><div><h3>Armelle, la laitière</h3><p>passe mardi, jeudi et samedi</p></div></div>
-            <p class="port second">Ne passe pas mercredi. Prochain passage : jeudi.</p>
+            <p class="port second">Ne passe pas mercredi. Prochain passage : jeudi.</p>
           </article>
           <article class="carte carte--lue">
             <div class="fournisseur-tete"><span class="portrait" style="background:#E6C2A6">J</span><div><h3>Joseph, le torréfacteur</h3><p>passe mardi et vendredi</p></div></div>
-            <p class="port second">Ne passe pas mercredi. Prochain passage : vendredi.</p>
+            <p class="port second">Ne passe pas mercredi. Prochain passage : vendredi.</p>
           </article>
 
           <div class="collant">
-            <p><span>À payer à la livraison</span><span class="prix">41,00 €</span></p>
+            <p><span>À payer à la livraison</span><span class="prix">41,00 €</span></p>
             <button class="btn btn--or btn--plein" data-cle="commander" data-focus="1">Commander pour mercredi</button>
             <button class="btn btn--lien btn--plein" data-cle="habituelle">Revenir à la commande habituelle</button>
           </div>
@@ -147,27 +147,27 @@
         <!-- ===================== Carte et prix ===================== -->
         <section data-app="carte" aria-labelledby="t-carte" hidden>
           <div class="appli-tete"><span class="pastille-app c-carte"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="1.5"/><path d="M8 8.5h8M8 12h5M8 15.5h6"/></svg></span><h1 id="t-carte">Carte et prix</h1></div>
-          <p class="intro">Le revient, c'est ce que coûtent les ingrédients d'une portion. Le reste paie le loyer, les charges et vos projets.</p>
-          <div class="alerte-douce"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Le café est ouvert : un nouveau prix s'écrit sur l'ardoise ce soir, à la fermeture.</span></div>
-          <h2 class="rubrique">Sur l'ardoise · 6 lignes sur 8</h2>
+          <p class="intro">Le revient, c’est ce que coûtent les ingrédients d’une portion. Le reste paie le loyer, les charges et vos projets.</p>
+          <div class="alerte-douce"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Le café est ouvert : un nouveau prix s’écrit sur l’ardoise ce soir, à la fermeture.</span></div>
+          <h2 class="rubrique">Sur l’ardoise · 6 lignes sur 8</h2>
           <div class="ligne"><span class="ligne__nom">Café crème</span>
-            <button class="puce" aria-pressed="true" aria-label="Vedette : café crème" data-cle="v-creme">★ Vedette</button>
-            <span class="pas"><button class="btn rond" aria-label="Baisser le prix du café crème" data-cle="p-creme-moins" data-focus="1">−</button><output>2,40 €</output><button class="btn rond" aria-label="Monter le prix du café crème" data-cle="p-creme-plus">+</button></span><span></span>
-            <span class="ligne__info"><span>revient 0,40 €</span><span class="ok">marge 2,00 € (83 %)</span><span>prix juste pour le village</span></span></div>
+            <button class="puce" aria-pressed="true" aria-label="Vedette : café crème" data-cle="v-creme">★ Vedette</button>
+            <span class="pas"><button class="btn rond" aria-label="Baisser le prix du café crème" data-cle="p-creme-moins" data-focus="1">−</button><output>2,40 €</output><button class="btn rond" aria-label="Monter le prix du café crème" data-cle="p-creme-plus">+</button></span><span></span>
+            <span class="ligne__info"><span>revient 0,40 €</span><span class="ok">marge 2,00 € (83 %)</span><span>prix juste pour le village</span></span></div>
           <div class="ligne"><span class="ligne__nom">Espresso (petit noir)</span>
-            <button class="puce" aria-pressed="false" aria-label="Vedette : espresso" data-cle="v-espresso">☆ Vedette</button>
-            <span class="pas"><button class="btn rond" aria-label="Baisser le prix de l'espresso" data-cle="p-esp-moins">−</button><output>1,40 €</output><button class="btn rond" aria-label="Monter le prix de l'espresso" data-cle="p-esp-plus">+</button></span><span></span>
-            <span class="ligne__info"><span>revient 0,20 €</span><span class="ok">marge 1,20 € (86 %)</span></span></div>
+            <button class="puce" aria-pressed="false" aria-label="Vedette : espresso" data-cle="v-espresso">☆ Vedette</button>
+            <span class="pas"><button class="btn rond" aria-label="Baisser le prix de l’espresso" data-cle="p-esp-moins">−</button><output>1,40 €</output><button class="btn rond" aria-label="Monter le prix de l’espresso" data-cle="p-esp-plus">+</button></span><span></span>
+            <span class="ligne__info"><span>revient 0,20 €</span><span class="ok">marge 1,20 € (86 %)</span></span></div>
           <div class="ligne"><span class="ligne__nom">Croissant</span>
-            <button class="puce" aria-pressed="false" aria-label="Vedette : croissant" data-cle="v-croissant">☆ Vedette</button>
-            <span class="pas"><button class="btn rond" aria-label="Baisser le prix du croissant" data-cle="p-cr-moins">−</button><output>1,30 €</output><button class="btn rond" aria-label="Monter le prix du croissant" data-cle="p-cr-plus">+</button></span><span class="second petit">demain</span>
-            <span class="ligne__info"><span>aujourd'hui 1,20 €</span><span>revient 0,70 €</span><span>marge 0,60 € (46 %)</span></span></div>
+            <button class="puce" aria-pressed="false" aria-label="Vedette : croissant" data-cle="v-croissant">☆ Vedette</button>
+            <span class="pas"><button class="btn rond" aria-label="Baisser le prix du croissant" data-cle="p-cr-moins">−</button><output>1,30 €</output><button class="btn rond" aria-label="Monter le prix du croissant" data-cle="p-cr-plus">+</button></span><span class="second petit">demain</span>
+            <span class="ligne__info"><span>aujourd’hui 1,20 €</span><span>revient 0,70 €</span><span>marge 0,60 € (46 %)</span></span></div>
           <div class="ligne"><span class="ligne__nom">Tarte aux fruits de saison</span>
-            <button class="puce" aria-pressed="true" aria-label="Vedette : tarte aux fruits" data-cle="v-tarte">★ Vedette</button>
-            <span class="pas"><button class="btn rond" aria-label="Baisser le prix de la tarte" data-cle="p-ta-moins">−</button><output>3,20 €</output><button class="btn rond" aria-label="Monter le prix de la tarte" data-cle="p-ta-plus">+</button></span><span></span>
-            <span class="ligne__info"><span>revient 1,60 €</span><span>marge 1,60 € (50 %)</span></span></div>
+            <button class="puce" aria-pressed="true" aria-label="Vedette : tarte aux fruits" data-cle="v-tarte">★ Vedette</button>
+            <span class="pas"><button class="btn rond" aria-label="Baisser le prix de la tarte" data-cle="p-ta-moins">−</button><output>3,20 €</output><button class="btn rond" aria-label="Monter le prix de la tarte" data-cle="p-ta-plus">+</button></span><span></span>
+            <span class="ligne__info"><span>revient 1,60 €</span><span>marge 1,60 € (50 %)</span></span></div>
           <div class="collant">
-            <button class="btn btn--plein" data-cle="ardoise">Écrire sur l'ardoise</button>
+            <button class="btn btn--plein" data-cle="ardoise">Écrire sur l’ardoise</button>
           </div>
         </section>
 
@@ -175,67 +175,67 @@
         <section data-app="remises" aria-labelledby="t-remises" hidden>
           <div class="appli-tete"><span class="pastille-app c-remises"><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 12.5 12 4h7.5v7.5L11 20z"/><circle cx="15.5" cy="8.5" r="1.4"/><path d="M8.5 15.5l4.5-4.5"/></svg></span><h1 id="t-remises">Remises</h1></div>
           <p class="intro">Une remise fait venir du monde quand il reste de la place. Elle prend effet à la prochaine ouverture.</p>
-          <p class="petit second" style="margin-bottom:0.6em">Hier, les remises t'ont coûté 6,40 €.</p>
+          <p class="petit second" style="margin-bottom:0.6em">Hier, les remises t’ont coûté 6,40 €.</p>
           <article class="carte">
             <div class="remise-tete"><h3>Heure douce</h3><button class="inter" role="switch" aria-checked="true" aria-label="Heure douce" data-cle="r-douce" data-focus="1"><span class="inter__piste"></span>Active</button></div>
             <p class="petit second">Les boissons moins chères sur un créneau. Les mets ne changent pas.</p>
-            <p style="margin-top:0.4em;font-weight:600">De 15 h à 17 h, boissons -20 %</p>
-            <div class="choix" role="group" aria-label="Taux"><button class="puce" aria-pressed="false" data-cle="t10">-10 %</button><button class="puce" aria-pressed="true" data-cle="t20">-20 %</button><button class="puce" aria-pressed="false" data-cle="t30">-30 %</button></div>
+            <p style="margin-top:0.4em;font-weight:600">De 15 h à 17 h, boissons -20 %</p>
+            <div class="choix" role="group" aria-label="Taux"><button class="puce" aria-pressed="false" data-cle="t10">-10 %</button><button class="puce" aria-pressed="true" data-cle="t20">-20 %</button><button class="puce" aria-pressed="false" data-cle="t30">-30 %</button></div>
             <div class="choix" role="group" aria-label="Jours"><button class="puce" aria-pressed="true">mar.</button><button class="puce" aria-pressed="true">mer.</button><button class="puce" aria-pressed="true">jeu.</button><button class="puce" aria-pressed="true">ven.</button><button class="puce" aria-pressed="false">sam.</button><button class="puce" aria-pressed="false">dim.</button></div>
           </article>
           <article class="carte">
             <div class="remise-tete"><h3>Carte de fidélité</h3><button class="inter" role="switch" aria-checked="false" aria-label="Carte de fidélité" disabled><span class="inter__piste"></span>Coupée</button></div>
-            <p class="petit second">Huit cafés tamponnés, le neuvième offert. Les gens d'ici la gardent dans leur portefeuille.</p>
-            <p class="petit" style="margin-top:0.35em">Achète d'abord les cartes au catalogue (15 €).</p>
+            <p class="petit second">Huit cafés tamponnés, le neuvième offert. Les gens d’ici la gardent dans leur portefeuille.</p>
+            <p class="petit" style="margin-top:0.35em">Achète d’abord les cartes au catalogue (15 €).</p>
             <button class="btn" style="margin-top:0.45em" data-aller="catalogue" data-cle="r-cartes">Voir au catalogue</button>
           </article>
           <article class="carte">
             <div class="remise-tete"><h3>Offre du jour</h3><button class="inter" role="switch" aria-checked="false" aria-label="Offre du jour" data-cle="r-offre"><span class="inter__piste"></span>Coupée</button></div>
             <p class="petit second">Une recette mise en avant toute la journée. Idéal pour finir un lot.</p>
-            <div class="alerte-douce"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3.5a6 6 0 0 1 3.5 10.9V17h-7v-2.6A6 6 0 0 1 12 3.5zM9.5 20h5"/></svg><span>Il reste 6 parts de tarte à finir demain, tu en vends 3 d'habitude. En offre du jour ?</span></div>
-            <button class="btn" data-cle="r-offre-oui">Tarte aux fruits à -30 %, demain</button>
+            <div class="alerte-douce"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3.5a6 6 0 0 1 3.5 10.9V17h-7v-2.6A6 6 0 0 1 12 3.5zM9.5 20h5"/></svg><span>Il reste 6 parts de tarte à finir demain, tu en vends 3 d’habitude. En offre du jour ?</span></div>
+            <button class="btn" data-cle="r-offre-oui">Tarte aux fruits à -30 %, demain</button>
           </article>
           <article class="carte">
             <div class="remise-tete"><h3>Tarif réduit</h3></div>
             <div class="remise-tete" style="margin-top:0.3em"><p class="petit">Tarif randonneur, sur présentation de ta carte des sentiers</p><button class="inter" role="switch" aria-checked="false" aria-label="Tarif randonneur" data-cle="r-rando"><span class="inter__piste"></span></button></div>
-            <p class="petit second" style="margin-top:0.4em">Pas d'étudiants au village : le car du lycée ne s'arrête qu'à Mérelles.</p>
+            <p class="petit second" style="margin-top:0.4em">Pas d’étudiants au village : le car du lycée ne s’arrête qu’à Mérelles.</p>
           </article>
         </section>
 
         <!-- ===================== Faire connaître ===================== -->
         <section data-app="connaitre" aria-labelledby="t-connaitre" hidden>
           <div class="appli-tete"><span class="pastille-app c-connaitre"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="1"/><path d="M12 3.5V2M8.5 8h7M8.5 11.5h7M8.5 15h4"/></svg></span><h1 id="t-connaitre">Faire connaître</h1></div>
-          <p class="intro">Une action se paie ce soir. Son effet monte, puis s'estompe. Trop d'actions à la fois se marchent dessus.</p>
+          <p class="intro">Une action se paie ce soir. Son effet monte, puis s’estompe. Trop d’actions à la fois se marchent dessus.</p>
           <article class="carte carte--lue">
             <div class="remise-tete"><h3>Le bouche-à-oreille</h3><span class="petit">gratuit</span></div>
-            <p class="petit second">Tes clients contents en parlent : chaque demi-tasse de réputation fait venir du monde.</p>
-            <p class="petit" style="margin-top:0.3em">Hier : environ 8 clients</p>
+            <p class="petit second">Tes clients contents en parlent : chaque demi-tasse de réputation fait venir du monde.</p>
+            <p class="petit" style="margin-top:0.3em">Hier : environ 8 clients</p>
           </article>
           <article class="carte">
-            <div class="remise-tete"><h3>Une affiche chez Lucas, le boulanger</h3><span class="prix">8 €</span></div>
+            <div class="remise-tete"><h3>Une affiche chez Lucas, le boulanger</h3><span class="prix">8 €</span></div>
             <p class="petit second">Les gens du village la voient en prenant leur pain.</p>
-            <p class="petit" style="margin-top:0.3em">Pour : voisins, pressés · 7 jours</p>
-            <p class="petit ok" style="margin-top:0.3em;display:flex;gap:0.3em;align-items:center"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>En cours jusqu'à samedi</p>
+            <p class="petit" style="margin-top:0.3em">Pour : voisins, pressés · 7 jours</p>
+            <p class="petit ok" style="margin-top:0.3em;display:flex;gap:0.3em;align-items:center"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>En cours jusqu’à samedi</p>
             <button class="btn" disabled style="margin-top:0.45em">Déjà en cours</button>
           </article>
           <article class="carte carte--attente">
-            <div class="remise-tete"><h3>Un encart dans L'Écho de l'Arvelle</h3><span class="prix">45 €</span></div>
+            <div class="remise-tete"><h3>Un encart dans L’Écho de l’Arvelle</h3><span class="prix">45 €</span></div>
             <p class="petit second">Toute la vallée le lit le jeudi.</p>
-            <p class="petit" style="margin-top:0.3em">Pour : flâneurs, gourmands, promeneurs · 10 jours</p>
-            <p class="petit ambre" style="margin-top:0.3em">Bouclage ce soir : paraît jeudi.</p>
-            <p class="petit" style="margin-top:0.35em;display:flex;gap:0.4em;align-items:center"><span class="jeton" data-joueur="crescent"></span>Proposée par Sacha · 45 € réservés</p>
+            <p class="petit" style="margin-top:0.3em">Pour : flâneurs, gourmands, promeneurs · 10 jours</p>
+            <p class="petit ambre" style="margin-top:0.3em">Bouclage ce soir : paraît jeudi.</p>
+            <p class="petit" style="margin-top:0.35em;display:flex;gap:0.4em;align-items:center"><span class="jeton" data-joueur="crescent"></span>Proposée par Sacha · 45 € réservés</p>
             <button class="btn btn--or" style="margin-top:0.45em" data-aller="messages" data-cle="m-repondre" data-focus="1">Répondre à Sacha</button>
           </article>
           <article class="carte">
-            <div class="remise-tete"><h3>Une affiche au panneau de la mairie-école</h3><span class="prix">8 €</span></div>
-            <p class="petit second">Les parents à la sortie de l'école, les randonneurs qui cherchent un sentier.</p>
-            <p class="petit" style="margin-top:0.3em">Pour : familles, voisins, promeneurs · 10 jours</p>
+            <div class="remise-tete"><h3>Une affiche au panneau de la mairie-école</h3><span class="prix">8 €</span></div>
+            <p class="petit second">Les parents à la sortie de l’école, les randonneurs qui cherchent un sentier.</p>
+            <p class="petit" style="margin-top:0.3em">Pour : familles, voisins, promeneurs · 10 jours</p>
             <button class="btn" style="margin-top:0.45em" data-cle="m-lancer-mairie">Lancer ce soir</button>
           </article>
           <article class="carte">
-            <div class="remise-tete"><h3>Des prospectus au marché du samedi</h3><span class="prix">20 €</span></div>
+            <div class="remise-tete"><h3>Des prospectus au marché du samedi</h3><span class="prix">20 €</span></div>
             <p class="petit second">Mireille les glisse dans les cabas. Fort, mais bref.</p>
-            <p class="petit" style="margin-top:0.3em">Pour : flâneurs, familles, promeneurs · 4 jours</p>
+            <p class="petit" style="margin-top:0.3em">Pour : flâneurs, familles, promeneurs · 4 jours</p>
             <button class="btn" style="margin-top:0.45em" data-cle="m-lancer-marche">Lancer ce soir</button>
           </article>
         </section>
@@ -244,22 +244,22 @@
         <section data-app="messages" aria-labelledby="t-messages" hidden>
           <div class="appli-tete"><span class="jeton" data-joueur="crescent" style="font-size:1.35em"></span><h1 id="t-messages">Sacha</h1></div>
           <div class="fil">
-            <p class="bulle bulle--nouvelle">Hier, 18 h 10</p>
-            <p class="bulle bulle--nouvelle">Tu as lancé : une affiche chez Lucas, 8 €.</p>
-            <p class="bulle bulle--nouvelle">Aujourd'hui, 17 h 21</p>
+            <p class="bulle bulle--nouvelle">Hier, 18 h 10</p>
+            <p class="bulle bulle--nouvelle">Tu as lancé : une affiche chez Lucas, 8 €.</p>
+            <p class="bulle bulle--nouvelle">Aujourd’hui, 17 h 21</p>
             <div class="proposition" role="group" aria-labelledby="prop-titre">
               <p class="qui"><span class="jeton" data-joueur="crescent"></span>Proposition de Sacha</p>
-              <h3 id="prop-titre">Un encart dans L'Écho de l'Arvelle</h3>
-              <p class="montant">45 € · il resterait 441 € dans la caisse</p>
-              <p class="petit" style="margin-top:0.35em">Toute la vallée le lit le jeudi : il paraît après-demain, juste avant la fête.</p>
+              <h3 id="prop-titre">Un encart dans L’Écho de l’Arvelle</h3>
+              <p class="montant">45 € · il resterait 441 € dans la caisse</p>
+              <p class="petit" style="margin-top:0.35em">Toute la vallée le lit le jeudi : il paraît après-demain, juste avant la fête.</p>
               <p class="petit second" style="margin-top:0.35em">Payé ce soir, à la fermeture.</p>
               <div class="actions">
-                <button class="btn btn--or" data-cle="d-accord" data-focus="1">D'accord</button>
+                <button class="btn btn--or" data-cle="d-accord" data-focus="1">D’accord</button>
                 <button class="btn" data-cle="pas-maintenant">Pas maintenant</button>
                 <button class="btn btn--lien" data-aller="connaitre" data-cle="voir-connaitre">Voir dans Faire connaître</button>
               </div>
             </div>
-            <p class="petit second">Retour arrière : répondre plus tard. La somme reste réservée jusqu'à ta réponse, ou jusqu'à la fin de la journée.</p>
+            <p class="petit second">Retour arrière : répondre plus tard. La somme reste réservée jusqu’à ta réponse, ou jusqu’à la fin de la journée.</p>
           </div>
         </section>
 
