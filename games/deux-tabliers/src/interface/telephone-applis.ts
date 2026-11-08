@@ -192,6 +192,19 @@ export function ordersApp(body: HTMLElement, ctx: UiContext, model: InterfaceMod
       ),
     ),
   );
+  const missing = orders.totalCents - Math.max(0, orders.payableCents);
+  if (missing > 0)
+    body.querySelector('.dt-collant')?.before(
+      h(
+        'p',
+        { class: 'dt-douce', role: 'status' },
+        icon('info'),
+        fill(O.overCash, {
+          payable: euros(Math.max(0, orders.payableCents)),
+          missing: euros(missing),
+        }),
+      ),
+    );
 }
 
 function orderLine(
@@ -535,7 +548,10 @@ function buyConfirm(
 ): void {
   const partner = ctx.partner.name;
   const remaining =
-    (model.house?.cashCents ?? 0) - (model.house?.reservedCents ?? 0) - item.priceCents;
+    (model.house?.cashCents ?? 0) -
+    (model.house?.reservedCents ?? 0) -
+    (model.house?.dueCents ?? 0) -
+    item.priceCents;
   const send = button(
     fill(C.propose, { partner }),
     () => {

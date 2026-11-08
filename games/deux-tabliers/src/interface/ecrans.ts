@@ -7,12 +7,12 @@
  */
 import { focusElement, type LayerSpec } from './calques';
 import type { UiContext } from './contexte';
-import { button, h, icon, token } from './dom';
+import { button, h, icon, keycap, token } from './dom';
 import type { LetterView, NightChoice, ProposalView } from './modele';
 import { horizontalFov } from './reglages';
 import { PLAYER_SYMBOLS } from './symboles';
 import { T } from './textes';
-import { euros, fill } from './typo';
+import { euros, fill, lowerFirst } from './typo';
 
 /** Nom de la maison: lettres, chiffres, espace, apostrophe, trait d'union, « & » et point (ux 1.4). */
 const HOUSE_NAME = /^[\p{L}\p{N} '’&.-]*$/u;
@@ -355,6 +355,67 @@ function profileName(color: Parameters<typeof token>[0]): string {
   return names[color] ?? color;
 }
 
+/** Achat ou action de l'autre qui attend une réponse (elle se donne dans le téléphone). */
+function waitingProposal(ctx: UiContext): ProposalView | null {
+  const m = ctx.model();
+  return (
+    m.proposals.find((p) => p.from !== m.local && (p.kind === 'purchase' || p.kind === 'move')) ??
+    null
+  );
+}
+
+/**
+ * Écran du matin et bilan (RV-03): Tab sort le téléphone par-dessus, Entrée l'ouvre sur la
+ * proposition de l'autre quand il y en a une (elle passe avant le bouton focalisé); Retour arrière
+ * range ensuite le téléphone et rend l'écran.
+ */
+export function phoneOverScreen(ctx: UiContext): Pick<LayerSpec, 'tab' | 'enter'> {
+  return {
+    tab() {
+      ctx.openPhone();
+      return true;
+    },
+    enter() {
+      if (waitingProposal(ctx) === null) return false;
+      ctx.openPhone('messages', 'partner');
+      return true;
+    },
+  };
+}
+
+/** Alerte de la proposition, en tête de l'écran: lisible au premier plan, clic pour répondre. */
+export function screenProposalNotice(ctx: UiContext): HTMLElement | null {
+  const p = waitingProposal(ctx);
+  if (p === null) return null;
+  const card = h(
+    'button',
+    {
+      type: 'button',
+      class: 'dt-card dt-alert dt-phone-alert dt-screen-proposal',
+      'data-proposal': p.id,
+    },
+    icon('phone'),
+    h(
+      'span',
+      null,
+      fill(T.notif.screenProposal, {
+        player: ctx.partner.name,
+        name: lowerFirst(p.item ?? ''),
+        amount: euros(p.amountCents ?? 0, true),
+      }),
+      ' · ',
+      keycap(T.notif.hudProposalKey),
+      T.notif.screenProposalTail,
+      keycap(T.notif.screenPhoneKey),
+      T.notif.screenPhoneTail,
+    ),
+  );
+  card.addEventListener('click', () => {
+    ctx.openPhone('messages', 'partner');
+  });
+  return card;
+}
+
 export function morningLayer(ctx: UiContext, onStart: () => void): LayerSpec {
   return {
     id: 'matin',
@@ -363,6 +424,8 @@ export function morningLayer(ctx: UiContext, onStart: () => void): LayerSpec {
     render(root) {
       const m = ctx.model().morning;
       const body = h('div', { class: 'dt-panel-body' });
+      const notice = screenProposalNotice(ctx);
+      if (notice !== null) body.append(notice);
       if (m === null) {
         body.append(h('p', null, T.morning.nothing));
       } else {
@@ -425,6 +488,7 @@ export function morningLayer(ctx: UiContext, onStart: () => void): LayerSpec {
       root.append(body);
     },
     back: () => true,
+    ...phoneOverScreen(ctx),
     defaultFocus(root) {
       return root.querySelector<HTMLElement>('[data-default]');
     },

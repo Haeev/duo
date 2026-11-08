@@ -534,8 +534,8 @@ export function deliver(
 
 /**
  * Livraison du matin (P0-1, P0-2): les fournisseurs qui passent aujourd'hui livrent leurs lignes,
- * payées à la livraison, port compris. La caisse peut passer sous zéro: le manque devient « à
- * régler » le soir (EC-06), jamais de livraison refusée.
+ * payées à la livraison, port compris. Ce que la caisse ne couvre pas devient aussitôt « à régler »
+ * (EC-06), jamais de livraison refusée.
  */
 export function receiveMorningOrder(ctx: Ctx, order: Readonly<Record<string, number>>): void {
   const { cc, s } = ctx;
@@ -546,9 +546,20 @@ export function receiveMorningOrder(ctx: Ctx, order: Readonly<Record<string, num
     if (ing !== undefined && n > 0 && supplierPasses(cc, ing.supplier, s.day)) passing[id] = n;
   }
   s.cash -= cost.goods + cost.shipping;
+  coverShortfall(s);
   s.today.goods += cost.goods;
   s.today.shipping += cost.shipping;
   deliver(ctx, passing, false);
+}
+
+/**
+ * EC-06 dès le débit (RV-02): la caisse ne passe jamais sous zéro; ce qu'elle ne couvre pas
+ * (livraison, loyer, dépannage) devient aussitôt « à régler », repris sur les recettes du soir.
+ */
+export function coverShortfall(s: ClienteleState): void {
+  if (s.cash >= 0) return;
+  s.debt += -s.cash;
+  s.cash = 0;
 }
 
 /** Prix d'un dépannage (un carton, prix entier majoré, sans port), en centimes. */

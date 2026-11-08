@@ -353,6 +353,7 @@ function ordersView(content: Content, world: World): OrdersView {
     deliveryWeekday: weekdayOf(day),
     overMonday: day - s.day > 1,
     totalCents: cost.goods + cost.shipping,
+    payableCents: s.cash - s.debt - s.proposals.reduce((sum, p) => sum + p.price, 0),
     suppliers: cc.supplies.suppliers.map((sup) => {
       const next = nextPassage(cc, sup.id, day - 1);
       const passes = supplierPasses(cc, sup.id, day);
@@ -775,6 +776,7 @@ export function wireInterface(view: GameView): WiredInterface {
         name: s.houseName ?? 'Le café d’Ormeval',
         place: 'Ormeval',
         cashCents: s.cash,
+        dueCents: s.debt,
         // Propositions en attente et commande de la prochaine livraison, mise de côté (P0-1).
         reservedCents:
           s.proposals.reduce((sum, p) => sum + p.price, 0) +

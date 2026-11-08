@@ -3,9 +3,12 @@
   Vérifications du téléphone en jeu sur la page d'aperçu (modèle: la maquette, outils/verifier.cjs).
   node games/deux-tabliers/outils/telephone/verifier.cjs
   1. Parcours au clavier seul: Entrée sur la proposition, Retour arrière jusqu'à ranger, Tab, flèches,
-     Entrée et Espace, A et E en boucle, Origine, Échap qui ne range pas, clic à côté.
+     Entrée et Espace, A et E en boucle, Origine, Échap qui ne range pas, clic à côté. Puis, sur
+     l'écran du matin et le bilan (RV-03): alerte de la proposition au premier plan, Entrée qui
+     l'ouvre par-dessus, Retour arrière qui rend l'écran, Tab qui sort et range le téléphone.
   2. Débordements (textes hors de l'écran du téléphone), textes sous 14 px, contrastes WCAG,
-     capsules du HUD sous le téléphone, à 1366x768, 1920x1080, 1366x768 à 150 % et 1280x720.
+     capsules du HUD sous le téléphone, à 1366x768, 1920x1080, 1366x768 à 150 % et 1280x720, puis
+     en fenêtre réduite (RV-06): 1152x648, 1024x600 (100 et 150 %) et 640x510.
 */
 const { chromium } = require('playwright');
 const { demarrer } = require('./serveur.cjs');
@@ -173,6 +176,71 @@ const pause = (p) => p.waitForTimeout(120);
       const place = await page.evaluate(() => document.body.dataset.sent);
       ok(/ui-place/.test(place || ''), "chaque écran annonce sa place à l'autre (ui-place)");
     }
+    // RV-03: écran du matin et bilan; la proposition de l'autre reste lisible et se répond.
+    for (const ecran of ['matin', 'bilan']) {
+      const page = await (
+        await nav.newContext({ viewport: { width: 1366, height: 768 } })
+      ).newPage();
+      await page.goto(`${url}?animations=reduites#${ecran}-proposition`);
+      await page.waitForSelector('body[data-ready="1"]');
+      await page.waitForTimeout(400);
+      const dessus = () =>
+        page.evaluate(() => {
+          const visible = (sel) => {
+            const el = document.querySelector(sel);
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+            return !!top && el.contains(top);
+          };
+          const ouvre = [...document.querySelectorAll('.dt-hud .dt-proposal')].map(
+            (c) => c.textContent,
+          );
+          return {
+            alerte: visible('.dt-screen-proposal'),
+            texte: (document.querySelector('.dt-screen-proposal') || {}).textContent || '',
+            ecranOuvert: !!document.querySelector('.dt-screen, .dt-backdrop'),
+            telDessus: visible('.dt-tel:not(.out) .dt-tel-ecran'),
+            ouvre,
+          };
+        });
+      let d = await dessus();
+      ok(
+        d.alerte && /Sacha propose/.test(d.texte),
+        `${ecran} : alerte de la proposition au premier plan (« ${d.texte.slice(0, 70)} »)`,
+      );
+      if (ecran === 'matin')
+        ok(
+          d.ouvre.length > 0 && d.ouvre.every((t) => !/Entrée/.test(t)),
+          `matin : « On ouvre ? » ne réclame pas Entrée en même temps (${d.ouvre.join(' / ').slice(0, 80)})`,
+        );
+      await page.keyboard.press('Enter');
+      await pause(page);
+      let f = await etat(page);
+      d = await dessus();
+      ok(
+        f.sorti && f.ecran === 'Sacha' && /accord/.test(f.cle || '') && d.telDessus,
+        `${ecran} : Entrée sort le téléphone par-dessus, Messages, focus « D'accord » (${f.ecran}, ${f.cle})`,
+      );
+      await page.keyboard.press('Backspace');
+      await pause(page);
+      f = await etat(page);
+      d = await dessus();
+      ok(
+        !f.sorti && d.ecranOuvert && d.alerte,
+        `${ecran} : Retour arrière range le téléphone et rend l'écran du dessous`,
+      );
+      await page.keyboard.press('Tab');
+      await page.waitForTimeout(350);
+      f = await etat(page);
+      d = await dessus();
+      ok(f.sorti && d.telDessus, `${ecran} : Tab sort le téléphone par-dessus l'écran`);
+      await page.keyboard.press('Tab');
+      await pause(page);
+      f = await etat(page);
+      d = await dessus();
+      ok(!f.sorti && d.ecranOuvert, `${ecran} : Tab le range, l'écran reste`);
+    }
     // Notification: bannière dans le téléphone, qui ne prend pas le focus.
     {
       const page = await (
@@ -196,6 +264,11 @@ const pause = (p) => p.waitForTimeout(120);
       { w: 1920, h: 1080, q: '' },
       { w: 1366, h: 768, q: '&taille=150' },
       { w: 1280, h: 720, q: '' },
+      // RV-06: fenêtre réduite, jusqu'à 1024x600 (et la vue d'environ 630x510 du faux hôte).
+      { w: 1152, h: 648, q: '' },
+      { w: 1024, h: 600, q: '' },
+      { w: 1024, h: 600, q: '&taille=150' },
+      { w: 640, h: 510, q: '' },
     ];
     for (const c of cas) {
       const page = await (
@@ -219,7 +292,7 @@ const pause = (p) => p.waitForTimeout(120);
         await page.goto(`${url}?animations=reduites${c.q}#telephone-${e}`);
         await page.waitForSelector('body[data-ready="1"]');
         await page.evaluate(() => document.fonts.ready);
-        await page.waitForTimeout(80);
+        await page.waitForTimeout(300);
         const r = await page.evaluate(() => {
           const telEl = document.querySelector('.dt-tel');
           const ecran = document.querySelector('.dt-tel-ecran').getBoundingClientRect();

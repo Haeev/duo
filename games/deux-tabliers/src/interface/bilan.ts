@@ -7,6 +7,7 @@
 import type { LayerSpec } from './calques';
 import { footer } from './calques';
 import type { UiContext } from './contexte';
+import { phoneOverScreen, screenProposalNotice } from './ecrans';
 import { button, h, icon, token, type IconName } from './dom';
 import type { EveningView, GuestbookEntryView } from './modele';
 import { cupsRow, cupsText } from './telephone-applis';
@@ -169,6 +170,8 @@ export function eveningLayer(ctx: UiContext): LayerSpec {
         );
       }
       root.append(head);
+      const notice = screenProposalNotice(ctx);
+      if (notice !== null) root.append(h('div', { style: 'padding: 0.6em 1.3em 0' }, notice));
       const body = h('div', { class: 'dt-panel-body', 'data-scroll': `bilan-${String(page)}` });
       root.append(body);
       if (evening === null) body.append(h('p', null, T.evening.nothing));
@@ -236,6 +239,7 @@ export function eveningLayer(ctx: UiContext): LayerSpec {
       notYet();
       return true;
     },
+    ...phoneOverScreen(ctx),
     section(delta) {
       goTo(page + delta);
     },

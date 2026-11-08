@@ -63,7 +63,7 @@ function driver(content: Content, start: World): Driver {
     const now = new Set<string>();
     const at = `jour ${String(s.day)} ${s.phase}`;
     if (!Number.isInteger(s.cash)) violations.push(`caisse non entière ${at}`);
-    // EC-06: un manque à la livraison devient « à régler » au soir seulement (voir RV-02).
+    // EC-06: un manque à la livraison devient aussitôt « à régler » (RV-02).
     if (s.cash < 0 && s.phase !== 'evening') negativeCash.push(`${at}: ${String(s.cash)}`);
     if (s.cash < 0 && s.phase === 'evening') violations.push(`caisse négative ${at}`);
     for (const [id, n] of Object.entries(s.stock)) {
@@ -296,6 +296,8 @@ describe('Deux Tabliers, recette v0.2', () => {
         ),
       );
     expect(d.violations.slice(0, 10), d.violations.slice(0, 10).join('\n')).toEqual([]);
+    // RV-02: la caisse ne passe plus sous zéro en journée.
+    expect(d.negativeCash.slice(0, 5)).toEqual([]);
     expect(resumedV02).toBe(true);
     expect(s.demoEnded).toBe(true);
     for (const id of CAMPAIGNS)
@@ -353,9 +355,9 @@ describe('Deux Tabliers, recette v0.2', () => {
     expect(d.violations.slice(0, 10)).toEqual([]);
   });
 
-  // RV-02 (mineur): EC-06 et P0-1 veulent qu'un manque à la livraison passe en « à régler »;
-  // aujourd'hui la caisse reste négative de l'aube au soir (téléphone et bilan la montrent ainsi).
-  it.fails('RV-02: une livraison plus chère que la caisse ne la rend pas négative', () => {
+  // RV-02 (mineur, corrigé): EC-06 et P0-1 veulent qu'un manque à la livraison passe en « à
+  // régler » dès la livraison, pas au soir seulement.
+  it('RV-02: une livraison plus chère que la caisse ne la rend pas négative', () => {
     const content = fastContent();
     const d = driver(content, createWorld(content, ['membre-a', 'membre-b']));
     d.step();
@@ -380,5 +382,6 @@ describe('Deux Tabliers, recette v0.2', () => {
     expect(d.world().clientele.phase).toBe('prep');
     expect(d.world().clientele.today.goods, 'livraison reçue').toBeGreaterThan(2_000);
     expect(d.world().clientele.cash).toBeGreaterThanOrEqual(0);
+    expect(d.world().clientele.debt, 'manque en « à régler »').toBeGreaterThan(0);
   });
 });

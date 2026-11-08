@@ -33,6 +33,8 @@ import type { GameView } from '../reseau/vue';
 import { createClipBlend, type ClipBlend } from '../rendu/melange';
 import {
   bendThighs,
+  pinHips,
+  reachTo,
   restClip,
   seatPlacement,
   SIT_REST,
@@ -76,6 +78,12 @@ interface Figure {
   readonly neck: Object3D | undefined;
   readonly rightHand: Object3D | undefined;
   readonly leftHand: Object3D | undefined;
+  /** Os du bassin, du bras droit et du visage (`headfront`): gorgée à la bouche (RV-05). */
+  readonly hips: Object3D | undefined;
+  readonly rightArm: Object3D | undefined;
+  readonly rightForeArm: Object3D | undefined;
+  readonly head: Object3D | undefined;
+  readonly face: Object3D | undefined;
   /** Durée du clip `sit_drink` (s), 0 sans lui. */
   readonly drinkSec: number;
   /** Tasse ou verre de sa boisson (clone du modèle), créé à son premier service. */
@@ -95,6 +103,14 @@ const CUP_MOVE = 0.35;
 /** Prise de la tasse dans la main: sous le poignet, un peu en avant (m). */
 const GRIP_DOWN = 0.09;
 const GRIP_AHEAD = 0.06;
+/**
+ * Bouche: au-dessus de `headfront` (devant le visage, à la hauteur de l'os `Head`, sous le
+ * menton) dans le repère de la tête. Tasse à la gorgée: son bord près des lèvres, donc sa base
+ * un peu devant et en dessous (m).
+ */
+const MOUTH_UP = 0.045;
+const SIP_CUP_AHEAD = 0.05;
+const SIP_CUP_BELOW = 0.07;
 
 export interface CustomerNodes {
   update(view: GameView, nowMs: number, frameDt: number): void;
@@ -324,6 +340,11 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
         neck: node.getObjectByName('neck'),
         rightHand: node.getObjectByName('RightHand'),
         leftHand: node.getObjectByName('LeftHand'),
+        hips: node.getObjectByName('Hips'),
+        rightArm: node.getObjectByName('RightArm'),
+        rightForeArm: node.getObjectByName('RightForeArm'),
+        head: node.getObjectByName('Head'),
+        face: node.getObjectByName('headfront'),
         drinkSec: src.clips.find((c) => c.name === 'sit_drink')?.duration ?? 0,
         cup: null,
       });
@@ -337,6 +358,8 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
 
   const placedRest: SeatPlacement = { x: 0, y: 0, z: 0, thigh: 0 };
   const handAt = new Vector3();
+  const mouthAt = new Vector3();
+  const headQ = new Quaternion();
   const restAt = new Vector3();
   const cupPending = new Set<string>();
 
@@ -425,6 +448,17 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
     } else fig.node.position.set(a.x, a.y - 0.45, a.z);
     fig.blend.update(frameDt);
     bendThighs(fig.node, fig.thighs, placedRest.thigh + (placed.thigh - placedRest.thigh) * t);
+    // Bassin tenu sur l'assise pendant la gorgée (RV-05): mesure mêlée comme les placements.
+    const hr = cr ?? cd;
+    const hd = cd ?? cr;
+    if (hr !== null && hd !== null)
+      pinHips(
+        fig.node,
+        fig.hips,
+        hr.hipX + (hd.hipX - hr.hipX) * t,
+        hr.hipY + (hd.hipY - hr.hipY) * t,
+        hr.hipZ + (hd.hipZ - hr.hipZ) * t,
+      );
     // En attendant (ou entre deux gorgées), un regard vers le voisin, sinon vers le comptoir.
     const w = glanceWeight(seating, g.id, k, nowMs / 1000) * (1 - wd);
     if (w <= 0.01) turnHead(fig.neck, 0);
@@ -446,6 +480,18 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       const edge = Math.min(1, Math.min(sip, sipSec - sip) / CUP_MOVE);
       h = edge * edge * (3 - 2 * edge);
     }
+    // La main porte la tasse à la bouche (le clip la monte au front chez certains modèles).
+    if (sip !== null && fig.face !== undefined && fig.head !== undefined) {
+      fig.head.getWorldQuaternion(headQ);
+      fig.face.getWorldPosition(mouthAt);
+      handAt.set(0, MOUTH_UP, 0).applyQuaternion(headQ);
+      mouthAt.add(handAt);
+      // Main voulue: la base de la tasse devant et sous les lèvres, plus la prise (voir placeCup).
+      mouthAt.x += Math.sin(rotY) * (SIP_CUP_AHEAD - GRIP_AHEAD);
+      mouthAt.z += Math.cos(rotY) * (SIP_CUP_AHEAD - GRIP_AHEAD);
+      mouthAt.y += GRIP_DOWN - SIP_CUP_BELOW;
+      reachTo(fig.rightArm, fig.rightForeArm, fig.rightHand, mouthAt, h);
+    } else reachTo(fig.rightArm, fig.rightForeArm, fig.rightHand, mouthAt, 0);
     placeCup(view, fig, drink, fig.rightHand, table, table === null ? 1 : h, rotY);
   };
 

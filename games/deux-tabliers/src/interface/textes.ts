@@ -74,6 +74,9 @@ export const T = {
     closeLine: '{partner} propose de fermer maintenant.',
     enterAnswer: 'Entrée répondre',
     mine: 'Ta proposition',
+    /** Tes propositions de pancarte, nommées pour ne pas se confondre avec un achat (RV-07). */
+    mineOpenLine: 'Tu as retourné la pancarte.',
+    mineCloseLine: 'Tu proposes de fermer maintenant.',
     waiting: 'En attente de {partner}...',
     detailTitle: "{partner} propose d'acheter : {item}",
     detailAmount: '{amount} · il resterait {remaining} dans la caisse',
@@ -106,6 +109,9 @@ export const T = {
       usual: 'Revenir à la commande habituelle',
       total: 'À payer à la livraison',
       reserved: 'Mis de côté pour cette commande : {amount}',
+      /** RV-02: la commande dépasse ce que la caisse pourra payer à la livraison. */
+      overCash:
+        'La caisse ne pourra payer que {payable} : il manquera {missing} à la livraison. Le manque passera « à régler » et se reprendra sur les recettes du soir.',
       send: 'Commander pour {weekday}',
       edit: 'Modifier la commande',
       sent: "Commande envoyée : livrée {weekday} vers 7 h. Tu peux la modifier jusqu'à la fermeture à clé.",
@@ -283,6 +289,8 @@ export const T = {
     name: 'Ton téléphone',
     status: "Barre d'état",
     cash: 'Caisse {amount}',
+    /** EC-06: la livraison n'a pas été couverte entièrement (RV-02). */
+    due: '{amount} à régler',
     back: 'Retour',
     home: 'Accueil',
     apps: {
@@ -355,6 +363,13 @@ export const T = {
     hudProposal: 'Téléphone · {player} propose : {name}, {amount} · ',
     hudProposalKey: 'Entrée',
     hudProposalTail: ' voir et répondre',
+    /** Écran du matin ou bilan: la proposition reste au premier plan (RV-03). */
+    screenProposal: '{player} propose : {name}, {amount}',
+    screenProposalTail: ' voir et répondre · ',
+    screenPhoneKey: 'Tab',
+    screenPhoneTail: ' ton téléphone',
+    /** « On ouvre ? » quand une proposition du téléphone tient déjà Entrée. */
+    enterAfter: 'Réponds d’abord à la proposition du téléphone.',
   },
   settings: {
     mine: 'Réglages pour toi',

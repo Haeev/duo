@@ -22,6 +22,7 @@ export interface SitCalibration {
   readonly bottom: number;
   /** Bassin dans le repère du personnage (x à sa gauche, z devant lui). */
   readonly hipX: number;
+  readonly hipY: number;
   readonly hipZ: number;
   /** Point le plus bas (pieds), à l'origine du personnage. */
   readonly lowest: number;
@@ -97,6 +98,7 @@ export function sitCalibration(
       result = {
         bottom,
         hipX: hip.x,
+        hipY: hip.y,
         hipZ: hip.z,
         lowest: Number.isFinite(lowest) ? lowest : 0,
         toeY: n > 0 ? ty / n : 0,
@@ -226,4 +228,96 @@ export function turnHead(neck: Object3D | undefined, angle: number): void {
   if (neck === undefined) return;
   qAxis.setFromAxisAngle(up, angle);
   rotateInWorld(neck, qAxis);
+}
+
+const pinWant = new Vector3();
+const pinHave = new Vector3();
+
+/**
+ * Garde le bassin (os `Hips`) là où la mesure l'a posé, pendant tout le clip (RV-05): `sit_drink`
+ * soulève le bassin quand le buste se penche vers la tasse; on redescend le personnage d'autant,
+ * et les fesses restent sur l'assise. `hipX`, `hipY`, `hipZ`: bassin attendu dans le repère du
+ * personnage (mêlé selon le fondu des clips). Après le mélangeur, chaque image.
+ */
+export function pinHips(
+  node: Object3D,
+  hips: Object3D | undefined,
+  hipX: number,
+  hipY: number,
+  hipZ: number,
+): void {
+  if (hips === undefined) return;
+  node.updateWorldMatrix(true, false);
+  pinWant.set(hipX, hipY, hipZ).applyMatrix4(node.matrixWorld);
+  hips.getWorldPosition(pinHave);
+  pinWant.sub(pinHave);
+  const parent = node.parent;
+  if (parent !== null) {
+    // Écart du monde exprimé dans le repère du parent (translation seule).
+    pinHave.copy(node.position);
+    parent.localToWorld(pinHave);
+    pinHave.add(pinWant);
+    parent.worldToLocal(pinHave);
+    node.position.copy(pinHave);
+  } else node.position.add(pinWant);
+  node.updateMatrixWorld(true);
+}
+
+const reachFrom = new Vector3();
+const reachElbow = new Vector3();
+const reachHand = new Vector3();
+const reachGoal = new Vector3();
+const reachU = new Vector3();
+const reachV = new Vector3();
+const reachQ = new Quaternion();
+const identity = new Quaternion();
+
+/**
+ * Porte la main (os `RightHand`) vers `target` (monde), d'une part `weight` (0 rien, 1 tout):
+ * le coude se plie pour que l'épaule soit à la bonne distance de la cible (loi des cosinus), puis
+ * le bras vise la cible (RV-05: la tasse à la bouche, pas au front). Après le mélangeur; avec un
+ * poids nul, efface la retouche de l'image d'avant (pose tenue que le mélangeur ne réécrit pas).
+ */
+export function reachTo(
+  arm: Object3D | undefined,
+  forearm: Object3D | undefined,
+  hand: Object3D | undefined,
+  target: Vector3,
+  weight: number,
+): void {
+  if (arm === undefined || forearm === undefined) return;
+  if (hand === undefined || weight <= 0) {
+    rotateInWorld(forearm, identity);
+    rotateInWorld(arm, identity);
+    return;
+  }
+  const w = Math.min(1, weight);
+  // 1. Le coude: distance épaule-main égale à la distance épaule-cible (dans les limites du bras).
+  rotateInWorld(forearm, identity);
+  arm.getWorldPosition(reachFrom);
+  forearm.getWorldPosition(reachElbow);
+  hand.getWorldPosition(reachHand);
+  const a = reachFrom.distanceTo(reachElbow);
+  const b = reachElbow.distanceTo(reachHand);
+  if (a < 1e-4 || b < 1e-4) return;
+  const d = Math.max(Math.abs(a - b) + 0.01, Math.min(a + b - 0.01, reachFrom.distanceTo(target)));
+  reachU.copy(reachElbow).sub(reachFrom).normalize();
+  reachV.copy(reachHand).sub(reachElbow).normalize();
+  const current = Math.PI - Math.acos(Math.max(-1, Math.min(1, reachU.dot(reachV))));
+  const wanted = Math.acos(Math.max(-1, Math.min(1, (a * a + b * b - d * d) / (2 * a * b))));
+  reachU.cross(reachV);
+  if (reachU.lengthSq() > 1e-10) {
+    reachU.normalize();
+    reachQ.setFromAxisAngle(reachU, (current - wanted) * w);
+    rotateInWorld(forearm, reachQ);
+  } else rotateInWorld(forearm, identity);
+  // 2. Le bras vise la cible.
+  rotateInWorld(arm, identity);
+  hand.getWorldPosition(reachHand);
+  reachHand.sub(reachFrom);
+  reachGoal.copy(target).sub(reachFrom);
+  if (reachHand.lengthSq() < 1e-8 || reachGoal.lengthSq() < 1e-8) return;
+  reachQ.setFromUnitVectors(reachHand.normalize(), reachGoal.normalize());
+  reachQ.slerpQuaternions(identity, reachQ, w);
+  rotateInWorld(arm, reachQ);
 }

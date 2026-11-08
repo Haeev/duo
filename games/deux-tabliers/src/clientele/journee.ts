@@ -20,6 +20,7 @@ import {
   ambiance,
   cents,
   chargesCents,
+  coverShortfall,
   deliver,
   eveningBasket,
   lastGoodDay,
@@ -84,6 +85,7 @@ export function dawn(ctx: Ctx, day: number): void {
   s.votes = {};
   s.proposals = [];
   s.cash -= rentCents(cc);
+  coverShortfall(s);
   s.weather = forcedWeather(ctx, day) ?? s.tomorrowWeather;
   s.serviceSec = 0;
   s.closingAt = 0;

@@ -463,10 +463,14 @@ export function createHud(root: HTMLElement): Hud {
               ),
             );
           }
+          // Une seule invite sur Entrée: la proposition du téléphone passe avant les autres.
+          const enterTaken = model.proposals.some(
+            (p) => p.from !== model.local && (p.kind === 'purchase' || p.kind === 'move'),
+          );
           for (const p of model.proposals) {
             // Les achats proposés par l'autre passent par le téléphone (alerte au centre, Messages).
             if (p.from !== model.local && (p.kind === 'purchase' || p.kind === 'move')) continue;
-            out.push(proposalCard(p, model.local, people));
+            out.push(proposalCard(p, model.local, people, enterTaken));
           }
           return out;
         },
@@ -631,13 +635,27 @@ function proposalCard(
   p: InterfaceModel['proposals'][number],
   local: number,
   people: HudPeople,
+  enterTaken: boolean,
 ): HTMLElement {
   const partner = people.partnerName;
   if (p.from === local) {
     return h(
       'div',
       { class: 'dt-card dashed' },
-      h('strong', null, T.proposal.mine),
+      h(
+        'strong',
+        null,
+        p.kind === 'open'
+          ? T.proposal.openTitle
+          : p.kind === 'close-early'
+            ? T.proposal.closeTitle
+            : T.proposal.mine,
+      ),
+      p.kind === 'open'
+        ? h('div', null, T.proposal.mineOpenLine)
+        : p.kind === 'close-early'
+          ? h('div', null, T.proposal.mineCloseLine)
+          : null,
       p.item === null ? null : h('div', null, p.item),
       p.amountCents === null ? null : h('div', null, euroText(p.amountCents)),
       h('div', { class: 'dt-second' }, fill(T.proposal.waiting, { partner })),
@@ -659,12 +677,14 @@ function proposalCard(
     if (p.amountCents !== null) card.append(h('div', null, euroText(p.amountCents)));
   }
   card.append(
-    h(
-      'div',
-      { class: 'dt-second' },
-      keycap('Entrée'),
-      p.kind === 'purchase' || p.kind === 'move' ? ' voir et répondre' : ' répondre',
-    ),
+    enterTaken
+      ? h('div', { class: 'dt-second' }, T.notif.enterAfter)
+      : h(
+          'div',
+          { class: 'dt-second' },
+          keycap('Entrée'),
+          p.kind === 'purchase' || p.kind === 'move' ? ' voir et répondre' : ' répondre',
+        ),
   );
   return card;
 }

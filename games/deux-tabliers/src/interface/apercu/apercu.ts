@@ -177,6 +177,7 @@ const base: InterfaceModel = {
     place: 'place du Tilleul',
     cashCents: 48_200,
     reservedCents: 0,
+    dueCents: 0,
     halfCups: 5,
   },
   myTickets: [
@@ -219,6 +220,7 @@ const base: InterfaceModel = {
     deliveryWeekday: 1,
     overMonday: false,
     totalCents: 5_490,
+    payableCents: 33_300,
     suppliers: [
       {
         id: 'joelle',
@@ -631,6 +633,19 @@ function modelFor(name: string): InterfaceModel {
           },
         ],
       };
+    // RV-07: la pancarte retournée et un encart proposés par soi, en même temps.
+    case 'envoyees': {
+      const tel = modelFor('telephone-messages');
+      const opening = modelFor('ouverture');
+      return {
+        ...opening,
+        proposals: [...opening.proposals, ...tel.proposals].map((p, i) => ({
+          ...p,
+          id: `p${String(4 + i)}`,
+          from: 0,
+        })),
+      };
+    }
     case 'reprendre':
       return {
         ...base,
@@ -836,6 +851,20 @@ function modelFor(name: string): InterfaceModel {
           letter: null,
         },
       };
+    // RV-03: une action de 45 € proposée par Sacha le matin, et « On ouvre ? » en même temps.
+    case 'matin-proposition':
+    case 'bilan-proposition': {
+      const scene = modelFor(state === 'matin-proposition' ? 'matin' : 'bilan-4');
+      const tel = modelFor('telephone-messages');
+      const open = modelFor('ouverture').proposals;
+      return {
+        ...scene,
+        discounts: remises().discounts,
+        marketing: remises().marketing,
+        house: tel.house,
+        proposals: state === 'matin-proposition' ? [...tel.proposals, ...open] : tel.proposals,
+      };
+    }
     case 'lettre':
     case 'matin-lettre':
       return {

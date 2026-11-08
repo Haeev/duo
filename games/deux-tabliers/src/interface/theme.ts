@@ -165,8 +165,11 @@ export const CSS = `
   position: fixed; z-index: 25; left: 54%; bottom: 0.75rem;
   font-family: var(--dt-ui); color: var(--dt-creme); line-height: 1.35;
   font-size: max(calc(1rem * var(--dt-scale)), min(calc(100vh / 54), calc(1.25rem * var(--dt-scale))));
-  /* Jamais sous « En main » (coin bas droit du HUD, 15 em du HUD avec sa marge), même à 150 %. */
-  width: min(23em, 46vw, calc(2 * (46vw - 15.5 * min(calc(1rem * var(--dt-scale)), calc(100vh / 30)))));
+  /* Jamais sous « En main » (coin bas droit du HUD, 15 em du HUD avec sa marge), même à 150 %.
+     Fenêtre réduite (RV-06): jamais moins de 17,5 em (le contenu tient), ni plus large que la vue;
+     les colonnes du HUD qu'il couvre alors se cachent tant qu'il est sorti (index.ts, fitPhone). */
+  width: max(min(17.5em, calc(100vw - 1.5rem)), min(23em, 46vw, calc(2 * (46vw - 15.5 * min(calc(1rem * var(--dt-scale)), calc(100vh / 30))))));
+  max-width: calc(100vw - 1.5rem);
   height: min(46em, calc(100vh - 5.4 * min(calc(1rem * var(--dt-scale)), calc(100vh / 30)) - 0.75rem));
   transform: translateX(-50%);
 }
@@ -290,10 +293,12 @@ export const CSS = `
 .dt-banniere span:not(.dt-app-dot) { grid-column: 2; font-size: 0.875em; }
 .dt-banniere .dt-app-dot { grid-column: 1; grid-row: 1 / span 2; }
 .dt-tel-aide { position: absolute; right: calc(100% + 1.6rem); bottom: 0; width: 15.5em; font-size: calc(0.875rem * var(--dt-scale)); display: grid; gap: 0.35em; }
+.dt-sans-aide .dt-tel-aide, .dt-hud .dt-sous-tel { display: none !important; }
 .dt-tel-aide p { display: flex; gap: 0.3em; align-items: center; flex-wrap: wrap; }
 /* Notification du téléphone rangé: deux petites secousses, aucune avec « Réduire les animations ». */
 .dt-phone-alert { align-items: center; }
 .dt-phone-alert .dt-icon { color: var(--dt-or); }
+.dt-screen-proposal { width: 100%; margin: 0 0 0.8em; text-align: left; font: inherit; color: var(--dt-creme); border: 2px solid var(--dt-or); cursor: pointer; }
 .dt-buzz { animation: dt-buzz 0.18s steps(2) 4; }
 @keyframes dt-buzz { 0% { transform: rotate(-1.2deg); } 100% { transform: rotate(1.2deg); } }
 .dt-reduced .dt-buzz { animation: none; }

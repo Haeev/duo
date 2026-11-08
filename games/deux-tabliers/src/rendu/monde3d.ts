@@ -37,6 +37,7 @@ import {
   type SitCalibration,
 } from './assis';
 import type { ModelLibrary } from './modeles';
+import { memberDrink } from '../clientele/gestes';
 
 interface FurnitureNode {
   readonly node: Group;
@@ -61,6 +62,36 @@ export function createWorldNodes(
   scene.add(root);
   const furniture = new Map<string, FurnitureNode>();
   const objects = new Map<number, { node: Group; type: string }>();
+  /** Tasses et verres servis que tient le client assis (`clientele/rendu3d.ts`): pas en double. */
+  const inHands = new Set<number>();
+  const HELD_VESSELS: ReadonlySet<string> = new Set([
+    'ware_cup_espresso',
+    'ware_cup_cappuccino',
+    'ware_glass',
+  ]);
+
+  /**
+   * RV-04: une tasse par boisson servie. Le geste du client (sur la table, puis dans sa main)
+   * dessine sa boisson; la tasse posée par le passe sur la table du groupe ne se montre donc pas
+   * tant qu'il est assis. Elle reparaît, sale, quand il s'en va.
+   */
+  const markHeldCups = (view: GameView): void => {
+    inHands.clear();
+    const world = view.world();
+    for (const g of world.clientele.groups) {
+      if (g.stage !== 'seated' || g.servedAt === null || g.table === null) continue;
+      let drinks = 0;
+      for (let k = 0; k < g.size; k++)
+        if (memberDrink(view.content.clientele, g, k) !== null) drinks++;
+      for (const o of world.objects) {
+        if (drinks <= 0) break;
+        if (o.at.kind !== 'slot' || o.at.furniture !== g.table) continue;
+        if (!HELD_VESSELS.has(OBJECT_MODEL[o.type] ?? '')) continue;
+        inHands.add(o.id);
+        drinks--;
+      }
+    }
+  };
 
   // Avatars: une capsule à la couleur du joueur et un repère du regard.
   const body = new CapsuleGeometry(0.25, 1.1, 4, 12);
@@ -183,6 +214,7 @@ export function createWorldNodes(
 
   const syncObjects = (view: GameView, look: { yawDeg: number; pitchDeg: number }): void => {
     const world = view.world();
+    markHeldCups(view);
     for (const o of world.objects) {
       let entry = objects.get(o.id);
       if (entry !== undefined && entry.type !== o.type) {
@@ -228,11 +260,13 @@ export function createWorldNodes(
         }
         entry.node.position.set(x, y, z);
         entry.node.rotation.y = yaw;
+        entry.node.visible = true;
         continue;
       }
       const pos = objectPosition(view.content, world, o);
       if (pos !== null) entry.node.position.set(pos.x, pos.y, pos.z);
       entry.node.rotation.y = 0;
+      entry.node.visible = !inHands.has(o.id);
     }
     if (objects.size > world.objects.length) {
       const ids = new Set(world.objects.map((o) => o.id));

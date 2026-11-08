@@ -77,6 +77,7 @@ import {
 } from './clients';
 import {
   answerProposal,
+  coverShortfall,
   emergencyCents,
   reconcileLots,
   requestPurchase,
@@ -266,6 +267,7 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
     // Dépannage par Mireille (P0-2): le carton entier, payé 30 % plus cher, sans port.
     const price = emergencyCents(cc, ing);
     s.cash -= price;
+    coverShortfall(s);
     s.today.emergency += price;
     const k =
       s.pace === 'peaceful' ? cc.days.peacefulSecondsPerGameMinute : cc.days.secondsPerGameMinute;

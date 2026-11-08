@@ -270,6 +270,8 @@ export interface OrdersView {
   readonly overMonday: boolean;
   /** À payer à la livraison, port compris, et mis de côté dans la caisse (centimes). */
   readonly totalCents: number;
+  /** Ce que la caisse peut payer aujourd'hui: caisse moins « à régler » et propositions. */
+  readonly payableCents: number;
   readonly suppliers: readonly SupplierView[];
   readonly sent: boolean;
   /** Dépannage dans l'heure (+30 %), seulement pendant le service. */
@@ -425,6 +427,8 @@ export interface HouseView {
   readonly place: string;
   readonly cashCents: number;
   readonly reservedCents: number;
+  /** « À régler » (EC-06): ce que la caisse n'a pas couvert, repris sur les recettes du soir. */
+  readonly dueCents: number;
   /** Demi-tasses de réputation. */
   readonly halfCups: number;
 }

@@ -111,6 +111,8 @@ export interface PhoneBanner {
 export function phoneLayer(
   ctx: UiContext,
   options: PhoneLayerOptions,
+  /** Sorti par-dessus l'écran du matin ou le bilan: Retour arrière le range dès la première appli. */
+  overScreen = false,
 ): LayerSpec & { changed(): void } {
   const phone = ctx.phone;
   let handle: LayerHandle | null = null;
@@ -215,6 +217,7 @@ export function phoneLayer(
         nav.closeConfirm();
         return true;
       }
+      if (overScreen && phone.stack.length <= 1) return false;
       if (!popScreen(phone)) return false;
       changed();
       return true;
@@ -297,6 +300,13 @@ function statusBar(model: InterfaceModel): HTMLElement {
         { class: 'dt-etat-caisse' },
         icon('cash'),
         fill(P.cash, { amount: euros(model.house.cashCents, true) }),
+        model.house.dueCents > 0
+          ? h(
+              'span',
+              { class: 'dt-second' },
+              `· ${fill(P.due, { amount: euros(model.house.dueCents, true) })}`,
+            )
+          : null,
       ),
     );
   return bar;

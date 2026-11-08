@@ -35,6 +35,13 @@ export interface LayerSpec {
   back?(): boolean;
   /** A et E. */
   section?(delta: -1 | 1): void;
+  /**
+   * Entrée, avant d'activer l'élément focalisé: `true` si le calque l'a traité (écran du matin
+   * ou bilan qui laisse passer une proposition de l'autre, RV-03).
+   */
+  enter?(): boolean;
+  /** Tab (sans Maj, sans répétition) sur un calque qui ne le prend pas: `true` si traité. */
+  tab?(): boolean;
   /** Origine (`Home`): raccourci de confort vers l'accueil du téléphone. */
   home?(): void;
   /** Flèches gauche et droite tournent aussi les pages (bilan). */
@@ -257,6 +264,11 @@ export function createLayers(
         remove(entry);
         return;
       }
+      // Le téléphone sort par-dessus l'écran du matin et le bilan (RV-03).
+      if (!event.shiftKey && entry.spec.tab !== undefined) {
+        if (!repeat) entry.spec.tab();
+        return;
+      }
       const list = focusables(entry.root);
       if (list.length === 0) return;
       const i = active instanceof HTMLElement ? list.indexOf(active) : -1;
@@ -274,6 +286,7 @@ export function createLayers(
       if (typing && event.code === 'Space') return;
       event.preventDefault();
       if (guarded || repeat) return;
+      if (event.code !== 'Space' && !typing && entry.spec.enter?.() === true) return;
       if (typing) {
         // Entrée valide le champ: il garde sa valeur, le focus passe au voisin du dessous.
         active.dispatchEvent(new Event('change', { bubbles: true }));
@@ -381,6 +394,11 @@ export function createLayers(
       // Le dernier ouvert passe au-dessus, écran de choix compris (lettre lue depuis le matin).
       // Le téléphone reste sous les fenêtres qu'il ouvre (proposition, ardoise).
       if (!phone) backdrop.style.zIndex = String(30 + stack.length);
+      else if (stack.length > 0) {
+        // Sorti par-dessus un écran (matin, bilan): la vue assombrie et le téléphone le couvrent.
+        backdrop.style.zIndex = String(30 + stack.length);
+        root.style.zIndex = String(31 + stack.length);
+      }
       stack.push(entry);
       host.append(backdrop);
       if (phone) host.append(root);

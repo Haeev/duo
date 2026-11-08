@@ -129,13 +129,13 @@ function sliceFor(id: string, m: InterfaceModel): unknown {
     case 'ardoise':
       return m.slate;
     case 'bilan':
-      return [m.evening, m.house];
+      return [m.evening, m.house, phoneProposals(m)];
     case 'proposition':
       return [m.proposals, m.house];
     case 'nuit':
       return m.night;
     case 'matin':
-      return m.morning;
+      return [m.morning, phoneProposals(m)];
     case 'premiere-fois':
       return m.houseSetup;
     case 'fin-demo':
@@ -143,6 +143,13 @@ function sliceFor(id: string, m: InterfaceModel): unknown {
     default:
       return null;
   }
+}
+
+/** Achats et actions proposés par l'autre: ils se répondent dans le téléphone (Messages). */
+function phoneProposals(m: InterfaceModel): readonly string[] {
+  return m.proposals
+    .filter((p) => p.from !== m.local && (p.kind === 'purchase' || p.kind === 'move'))
+    .map((p) => p.id);
 }
 
 export function createInterface(options: InterfaceOptions): GameInterface {
@@ -210,7 +217,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         phoneSpec?.changed();
         return;
       }
-      phoneSpec = phoneLayer(ctx, notices);
+      phoneSpec = phoneLayer(ctx, notices, layers.any());
       const announceClose = phoneSpec.onClose?.bind(phoneSpec);
       phoneSpec.onClose = () => {
         announceClose?.();
@@ -414,6 +421,56 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     applySettings();
   });
   applySettings();
+  /**
+   * RV-06: dans une fenêtre réduite, le téléphone garde une largeur lisible et peut couvrir les
+   * colonnes du HUD; celles qu'il couvre se cachent tant qu'il est sorti, et l'aide des touches
+   * se range si elle n'a pas la place à côté de lui. Mesuré quatre fois par seconde au plus.
+   */
+  const covered = new Set<HTMLElement>();
+  let fitAt = -Infinity;
+  const fitPhone = (now: number): void => {
+    const tel = options.root.querySelector<HTMLElement>('.dt-tel:not(.out)');
+    if (tel === null) {
+      for (const el of covered) el.classList.remove('dt-sous-tel');
+      covered.clear();
+      return;
+    }
+    if (now - fitAt < 250) return;
+    fitAt = now;
+    const t = tel.getBoundingClientRect();
+    const hit = (r: DOMRect): boolean =>
+      r.width > 0 &&
+      r.height > 0 &&
+      r.right > t.left &&
+      r.left < t.right &&
+      r.bottom > t.top &&
+      r.top < t.bottom;
+    const columns = hudLayer.querySelectorAll<HTMLElement>('.dt-tl, .dt-tr, .dt-br');
+    for (const el of columns) {
+      if (covered.has(el) || !hit(el.getBoundingClientRect())) continue;
+      el.classList.add('dt-sous-tel');
+      covered.add(el);
+    }
+    const help = tel.querySelector<HTMLElement>('.dt-tel-aide');
+    if (help === null || tel.classList.contains('dt-sans-aide')) return;
+    const a = help.getBoundingClientRect();
+    const crowded =
+      a.left < 0 ||
+      [...hudLayer.querySelectorAll<HTMLElement>('.dt-tl, .dt-tr, .dt-br, .dt-bubble')].some(
+        (el) => {
+          const r = el.getBoundingClientRect();
+          return (
+            r.width > 0 &&
+            r.height > 0 &&
+            r.right > a.left &&
+            r.left < a.right &&
+            r.bottom > a.top &&
+            r.top < a.bottom
+          );
+        },
+      );
+    if (crowded) tel.classList.add('dt-sans-aide');
+  };
   let lastBearing: number | null = null;
   /** Réplique simple affichée et depuis quand (elle passe seule une fois lue). */
   let shown: { id: string; at: number } | null = null;
@@ -423,7 +480,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     settings,
     layers,
     step(keys) {
-      if (layers.any()) return { swallowAct: true, swallowConfirm: true };
+      if (layers.any()) {
+        // Les Tab lus par les calques (sortir, ranger) ne reviennent pas après leur fermeture.
+        closedSinceStep = false;
+        phoneWaiting = false;
+        return { swallowAct: true, swallowConfirm: true };
+      }
       const swallowAct = false;
       let swallowConfirm = false;
       if (keys.tablet && !closedSinceStep) phoneWaiting = true;
@@ -438,7 +500,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const d = model.dialogue;
       if (keys.confirm) {
         const scene = model.scene;
-        const received = model.proposals.find((p) => p.from !== model.local);
+        // Une seule invite sur Entrée: la proposition du téléphone passe avant « On ouvre ? ».
+        const received =
+          model.proposals.find(
+            (p) => p.from !== model.local && (p.kind === 'purchase' || p.kind === 'move'),
+          ) ?? model.proposals.find((p) => p.from !== model.local);
         if (scene?.outcome !== null && scene !== null) {
           options.send({ type: 'scene-dismiss', id: scene.id });
           swallowConfirm = true;
@@ -476,6 +542,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         read(now, bearing, true);
       }
       hud.update(centre);
+      fitPhone(now);
       if (settings.get().showFps) {
         if (fpsSince < 0) fpsSince = now;
         fpsFrames++;
