@@ -35,6 +35,9 @@ while i < len(argv):
     if argv[i] == "--avant":
         avant = argv[i + 1]
         i += 2
+    elif argv[i] == "--dossier":  # GLB et fiches .doigts.json pris dans un autre dossier (versions à comparer)
+        ASSETS = PERSOS = argv[i + 1]
+        i += 2
     elif argv[i] == "--rendu":
         rendu = True
         i += 1
@@ -96,7 +99,7 @@ def deformed(meshes):
 def hand_world_gltf(ident, side="Right"):
     """Matrice monde de l'os de la main en pose de liaison (inverse de sa matrice de liaison inverse), sans échelle,
     repère glTF. C'est ce repère que suit la peau: la pose de repos des nœuds peut en différer de quelques millimètres."""
-    sys.path.insert(0, PERSOS)
+    sys.path.insert(0, os.path.normpath(os.path.join(ICI, "..", "personnages")))
     from glb import Glb, mat4
     g = Glb(os.path.join(ASSETS, ident + ".glb"))
     sk = g.g["skins"][0]
