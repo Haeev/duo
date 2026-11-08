@@ -350,6 +350,15 @@ export const CSS = `
 .dt-avatars { display: flex; gap: 0.5em; flex-wrap: wrap; }
 .dt-avatar { width: 3.4em; height: 3.4em; }
 .dt-reduced .fade { animation: none; }
+
+/* Carnet de séance (Ctrl+N, SDK 1.1): la note et l'avis du SDK, habillés en panneau du café. Le SDK pose ses styles en ligne, d'où les !important. */
+[data-testid="carnet-note"] { background: var(--dt-expresso) !important; color: var(--dt-creme) !important; border: 1px solid var(--dt-filet) !important; border-radius: 1.1em !important; box-shadow: 0 0.6em 2em rgba(0,0,0,0.45) !important; font: 500 calc(1rem * var(--dt-scale))/1.4 var(--dt-ui) !important; padding: 0.8em 1em !important; width: min(36em, calc(100vw - 2em)) !important; bottom: 1.5em !important; }
+[data-testid="carnet-note"] > div:first-child { font: 600 1.15em/1.2 var(--dt-titre) !important; margin-bottom: 0.45em !important; }
+[data-testid="carnet-note"] > div:last-child { opacity: 1 !important; color: var(--dt-creme-2) !important; font-size: 0.875em !important; margin-top: 0.45em !important; }
+[data-testid="carnet-texte"] { font: 1em/1.35 var(--dt-ui) !important; color: var(--dt-creme) !important; background: var(--dt-expresso-2) !important; border: 2px solid var(--dt-creme-2) !important; border-radius: 0.5em !important; padding: 0.45em 0.6em !important; caret-color: var(--dt-or); }
+[data-testid="carnet-texte"]:focus { border-color: var(--dt-or) !important; }
+[data-testid="carnet-texte"]::placeholder { color: var(--dt-creme-2); opacity: 1; }
+[data-testid="carnet-avis"] { background: var(--dt-expresso) !important; color: var(--dt-creme) !important; border: 1px solid var(--dt-filet) !important; border-radius: 0.7em !important; font: 500 calc(1rem * var(--dt-scale))/1.4 var(--dt-ui) !important; }
 `;
 
 /** Installe la feuille de style une fois; renvoie de quoi la retirer. */

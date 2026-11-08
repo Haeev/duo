@@ -29,6 +29,7 @@ import { planLabel } from './simulation/interactions';
 import { aim, type Aim } from './simulation/visee';
 import { eyeHeightOf } from './simulation/assise';
 import { placeAnchor } from './etat/assises';
+import { attachNotebook, createNotebookSource, notebookTyping } from './plateforme/carnet';
 
 const canvas = document.getElementById('scene');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas #scene absent');
@@ -67,7 +68,8 @@ const look = createLookControl(canvas, duo.input, {
   degPerPixel: content.settings.mouse.degPerPixel,
   pitchLimitDeg: content.settings.player.pitchLimitDeg,
   start: { yawDeg: startPose.yawDeg, pitchDeg: startPose.pitchDeg },
-  active: () => duo.state === 'running',
+  // Pendant une note du carnet, un clic sur la scène ne reprend pas la souris.
+  active: () => duo.state === 'running' && !notebookTyping(),
 });
 bootHud.dispose();
 const wired = wireInterface(view);
@@ -120,13 +122,24 @@ view.onEvent((event) => {
   sounds.onEvent(event);
 });
 
-duo.notebook.attach({
-  canvas: () => canvas,
-  caption: () => {
-    const p = view.pose(view.local);
-    return `${content.plan.title}, x ${p.x.toFixed(1)} z ${p.z.toFixed(1)}`;
+// Carnet de séance (Ctrl+N, macOS): inerte quand la plateforme ne l'offre pas.
+const notebook = attachNotebook({
+  notebook: duo.notebook,
+  source: createNotebookSource({
+    view,
+    canvas,
+    role: duo.role,
+    look: () => look.look,
+    clock: (world) => wired.sources.clock?.(world, content) ?? null,
+  }),
+  onEvent: (listener) => view.onEvent(listener),
+  locked: () => look.locked(),
+  release: () => {
+    look.release();
   },
-  snapshot: () => session.hostWorld(),
+  regrab: () => {
+    if (duo.state === 'running' && !look.panelOpen()) look.grab();
+  },
 });
 
 // La coque et les avatars se chargent pendant l'écran de chargement (délai de 30 s), pas en
@@ -170,6 +183,7 @@ let lastSeat: string | null = null;
 duo.loop.start({
   step: ({ dt }) => {
     seq++;
+    notebook.step();
     const playing = look.locked() && !look.panelOpen();
     const intents: Intent[] = [];
     const resumeClick = look.consumeResumeClick();
@@ -265,7 +279,8 @@ duo.loop.start({
                 refused: currentAim.plan.kind === 'refuse',
               }),
         hold: use === null || seconds <= 0 ? null : Math.min(1, use.elapsed / seconds),
-        capsule: duo.state === 'running' && !look.locked() && !look.panelOpen(),
+        capsule:
+          duo.state === 'running' && !look.locked() && !look.panelOpen() && !notebookTyping(),
       },
       currentAim?.target ?? null,
     );
@@ -277,6 +292,7 @@ duo.loop.start({
 });
 
 duo.on('stop', () => {
+  notebook.dispose();
   look.dispose();
   sounds.dispose();
   arrange.dispose();

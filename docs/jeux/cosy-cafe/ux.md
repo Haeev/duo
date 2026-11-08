@@ -347,6 +347,7 @@ Demande du manager, d'après la découverte de l'architecte (technique, 2.2): ta
 | Ouverture d'une interface posée | le jeu rend le pointeur (`exitPointerLock`) | curseur visible, la vue ne bouge pas | à la fermeture, le jeu reprend le pointeur sans geste (Chromium l'accepte quand c'est la page qui l'a rendu) |
 | Début de journée (CC05) | le pointeur n'est pas encore verrouillé | écran du matin, curseur visible | le clic ou l'Entrée de « Commencer la journée » sert de geste |
 | Reprise d'une sauvegarde en plein service | pointeur libre au départ | section 1.3 | un clic chacun, puis « Le service reprend dans 3 » |
+| Ctrl+N, carnet de séance (Mac seulement, Duo 1.1) | le jeu rend le pointeur juste avant que la note s'ouvre (jamais pris pour un Échap); le café continue | la note pour le studio en bas au centre, aux couleurs du café; aucune capsule pendant la saisie | Entrée enregistre, Échap annule (cet Échap-là ne fait pas la pause); le jeu reprend le pointeur sans geste s'il l'avait avant |
 
 Règles pour dev-plateforme et le dev du jeu (à vérifier par la mesure M4 de la technique): jamais de `pauseRequest` hors de `running`; le premier clic ou la première touche de reprise sont consommés; Entrée reprend aussi la souris (geste clavier accepté par Chromium, « clic ou touche » selon la technique); l'ordre de `blur` et `pointerlockchange` se décide après une image (`document.hasFocus()`); aucun texte du système (« Appuie sur Échap… ») n'apparaît dans Electron, d'où l'indice « Échap : pause » de Duo au début de chaque partie.
 
@@ -500,6 +501,7 @@ Même modèle que La Petite Ligne (`games/la-petite-ligne/ui-maquettes/README.md
 | Retour arrière | fermer la fenêtre du dessus, sinon l'interface; dans un champ de texte, effacer |
 | Échap | pause de Duo; l'interface reste ouverte dessous, le focus revient où il était |
 | souris | clic; clic à côté de l'interface: la fermer; molette: faire défiler |
+| Ctrl+N (Mac) | note du carnet de séance par-dessus tout, interface comprise: elle garde le clavier jusqu'à Entrée (enregistrer) ou Échap (annuler); Maj+Entrée va à la ligne; Ctrl+Maj+N active ou coupe le carnet |
 
 Règles:
 
