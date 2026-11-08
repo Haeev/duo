@@ -4,6 +4,7 @@
  */
 import { v, type DuoContext, type SaveSnapshot } from '@duo/sdk';
 import type { GameAction } from './actions';
+import { purgeOrphanTickets } from './branchement';
 import type { Content } from './donnees/charger';
 import { WORLD_FORMAT, WorldSchema, type World } from './etat/monde';
 import { createGuest, type Guest } from './reseau/invite';
@@ -11,6 +12,22 @@ import { createHost, type Host } from './reseau/hote';
 import type { GameView } from './reseau/vue';
 import type { Intent, StepInput } from './simulation/entrees';
 import { createWorld } from './simulation/monde';
+import { WEEKDAYS } from './interface/textes';
+
+/** Libellé de l'emplacement: « Jour 9 (mardi), Le café d'Ormeval », 40 caractères au plus. */
+export function saveLabel(content: Content, world: World): string {
+  const s = world.clientele;
+  if (s.day === 0) return content.plan.title.slice(0, 40);
+  const weekday = WEEKDAYS[(s.day - 1) % 7] ?? '';
+  const address = s.houseName ?? 'Ormeval';
+  return `Jour ${String(s.day)} (${weekday}), ${address}`.slice(0, 40);
+}
+
+/** Progression de la démo: jour atteint sur le nombre de journées prévues. */
+export function saveProgress(content: Content, world: World): number {
+  const days = content.clientele.days.days.length;
+  return days === 0 ? 0 : Math.min(1, world.clientele.day / days);
+}
 
 export interface SessionOptions {
   readonly duo: DuoContext<GameAction>;
@@ -50,6 +67,9 @@ export function restoreWorld(
   world.players[1].memberId = memberIds[1];
   world.players[0].use = null;
   world.players[1].use = null;
+  // Sauvegardes d'avant RN-02: les tickets des groupes partis gonflaient le domaine du service
+  // au-delà des 64 Kio d'un message, et la partie s'arrêtait à chaque reprise.
+  purgeOrphanTickets(world, null);
   return world;
 }
 
@@ -64,16 +84,31 @@ export function createSession({ duo, content, now }: SessionOptions): Session {
     const world = restored ?? createWorld(content, memberIds);
     const host: Host = createHost(duo.net, content, world, duo.random('simulation'));
     const snapshot = (): SaveSnapshot => ({
-      label: content.plan.title.slice(0, 40),
+      label: saveLabel(content, world),
       dataSchema: WORLD_FORMAT,
       data: world,
-      progress: 0,
+      progress: saveProgress(content, world),
     });
     duo.saves.provide(snapshot);
+    // Fin de journée (manifeste, moment `level-end`): écrite après le pas, sur un état complet.
+    let dayEnded = false;
+    const unsubscribe = host.view.onEvent((event) => {
+      if (event.type === 'clientele-evening') dayEnded = true;
+    });
     return {
       view: host.view,
       step: (input, intents, dt) => {
         host.step(input, intents, dt);
+        if (!dayEnded) return;
+        dayEnded = false;
+        duo.saves.write('level-end', snapshot()).then(
+          (status) => {
+            if (status !== 'ok') duo.log.warn('sauvegarde du soir non écrite', { status });
+          },
+          (error: unknown) => {
+            duo.log.warn('sauvegarde du soir non écrite', { error: String(error) });
+          },
+        );
       },
       beforeFrame: (alpha) => {
         host.beforeFrame(alpha);
@@ -82,6 +117,7 @@ export function createSession({ duo, content, now }: SessionOptions): Session {
       hostWorld: () => world,
       snapshot,
       dispose: () => {
+        unsubscribe();
         host.dispose();
       },
     };

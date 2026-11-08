@@ -30,6 +30,8 @@ const STEPS_PER_MESSAGE = 2;
 const CORRECTION_WALK_SHARE = 0.3;
 const SNAP_DISTANCE = 2;
 const MOVES_KEPT = 16;
+/** Rattrapage de l'horloge au plus (secondes): au-delà, c'est un hôte relancé, pas un retard. */
+const MAX_CLOCK_CATCH_UP_SEC = 5;
 
 export interface Guest {
   readonly view: GameView;
@@ -56,6 +58,8 @@ export function createGuest(net: Net, content: Content, world: World, now: () =>
   let haveCore = false;
   let haveMoves = false;
   let lastDt = 1 / 60;
+  /** Dernier pas de l'hôte connu par les positions (canal des mouvements). */
+  let hostTick = 0;
 
   const pending: StepInput[] = [];
   let outInputs: StepInput[] = [];
@@ -67,6 +71,7 @@ export function createGuest(net: Net, content: Content, world: World, now: () =>
 
   const onMoves = (m: Moves): void => {
     haveMoves = true;
+    hostTick = m.tick;
     const host = unpackPlayer(m.players[0]);
     hostTrack.push({ atMs: now(), pose: host });
     if (hostTrack.length > MOVES_KEPT) hostTrack.shift();
@@ -114,6 +119,13 @@ export function createGuest(net: Net, content: Content, world: World, now: () =>
         }>
       ).onMessage((m) => {
         Object.assign(world, { [d.key]: m.state });
+        // Horloge du café (RN-10): le domaine « clientele », gros, arrive après les positions,
+        // petites et fréquentes. On avance la seconde de service du retard pris sur l'hôte.
+        const s = world.clientele;
+        if (d.key === 'clientele' && (s.phase === 'service' || s.phase === 'closing')) {
+          const late = Math.floor((hostTick - m.tick) * lastDt);
+          if (late > 0 && late <= MAX_CLOCK_CATCH_UP_SEC) s.serviceSec += late;
+        }
       }),
     ),
   ];

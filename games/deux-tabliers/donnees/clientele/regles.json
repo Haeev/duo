@@ -84,6 +84,7 @@
     "disappointed": 45,
     "disappointedChance": 0.1,
     "regularChance": 0.35,
+    "regularGapDays": 3,
     "kept": 24,
     "reportMissedBelow": 60
   },

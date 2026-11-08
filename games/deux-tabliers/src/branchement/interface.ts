@@ -110,6 +110,12 @@ function weatherOf(cc: ClienteleContent, id: string): WeatherView {
   };
 }
 
+/** Deux lignes qui disent la même chose, à la casse et aux espaces près. */
+function sameLine(a: string, b: string): boolean {
+  const norm = (t: string): string => t.toLowerCase().replace(/\s+/g, ' ').trim();
+  return norm(a) === norm(b);
+}
+
 function weekdayOf(day: number): number {
   return (((day - 1) % 7) + 7) % 7;
 }
@@ -539,7 +545,12 @@ function eveningView(content: Content, world: World, player: PlayerIndex): Eveni
       regular: null,
     },
     partner:
-      s.votes['next-day']?.[other] === 1 ? { kind: 'good-night' } : { kind: 'reading', page: 1 },
+      s.votes['next-day']?.[other] === 1
+        ? { kind: 'good-night' }
+        : {
+            kind: 'reading',
+            page: s.eveningPages[other][0] === r.day ? s.eveningPages[other][1] : 1,
+          },
   };
 }
 
@@ -573,7 +584,27 @@ export function wireInterface(view: GameView): WiredInterface {
   let counter = 0;
   const world = (): World => view.world();
   const local = view.local;
-  const spoken = (): Spoken => ({ dialogue: queue[0] ?? null, scene });
+  /** Scène du jour déjà montée (`jour:événement`): par l'événement, ou d'après l'état. */
+  let sceneShown = '';
+  const sceneOf = (event: string, name?: string): EventSceneView => ({
+    id: `scene-${event}`,
+    title: name ?? cc.events.get(event)?.name ?? '',
+    lines: [cc.events.get(event)?.goal ?? ''].filter((x) => x !== ''),
+    privateHint: null,
+    outcome: null,
+    rewards: [],
+  });
+  const spoken = (): Spoken => {
+    // Reprise d'une sauvegarde, invité qui rejoint: la scène en cours n'a pas d'événement de
+    // début chez nous (RN-03), on la remonte depuis l'état, une fois par scène.
+    const s = world().clientele;
+    const key = s.event === null ? '' : `${String(s.day)}:${s.event.id}`;
+    if (key !== '' && key !== sceneShown) {
+      sceneShown = key;
+      if (scene === null && s.event !== null) scene = sceneOf(s.event.id);
+    }
+    return { dialogue: queue[0] ?? null, scene };
+  };
 
   const vote = (
     topic: 'open' | 'close' | 'next-day' | 'merelles' | 'name',
@@ -685,7 +716,10 @@ export function wireInterface(view: GameView): WiredInterface {
                 `La livraison est arrivée : ${String(cartons)} carton${cartons > 1 ? 's' : ''} sur la palette de la cour.`,
               ]
             : [],
-        today: [plan?.title ?? '', event?.name ?? ''].filter((x) => x !== ''),
+        // Le titre du jour est souvent le nom de l'événement (« Le car de 8 h 12 »): une fois.
+        today: [plan?.title ?? '', event?.name ?? ''].filter(
+          (x, i, all) => x !== '' && all.findIndex((y) => sameLine(y, x)) === i,
+        ),
         projects: [],
         letter:
           s.letterDay !== 0 && s.letterDay === s.day && letterLines.length > 0
@@ -836,6 +870,10 @@ export function wireInterface(view: GameView): WiredInterface {
       type: 'clientele-ui-place',
       place: a.place === null ? null : a.place.slice(0, 60),
     }),
+    'evening-page': (a) => ({
+      type: 'clientele-evening-page',
+      page: Math.max(1, Math.min(8, Math.round(a.page))),
+    }),
     'evening-choice': (a) => (a.goodNight ? vote('next-day', true) : null),
     'night-choice': (a) => (a.choice === 'none' ? null : vote('merelles', a.choice === 'continue')),
     'demo-end': (a) => (a.stay ? vote('next-day', true) : null),
@@ -928,14 +966,8 @@ export function wireInterface(view: GameView): WiredInterface {
           rewards: [],
         };
       } else if (event.type === 'clientele-event-start') {
-        scene = {
-          id: `scene-${event.event}`,
-          title: event.name,
-          lines: [cc.events.get(event.event)?.goal ?? ''].filter((x) => x !== ''),
-          privateHint: null,
-          outcome: null,
-          rewards: [],
-        };
+        sceneShown = `${String(world().clientele.day)}:${event.event}`;
+        scene = sceneOf(event.event, event.name);
       } else if (event.type === 'clientele-evening' || event.type === 'clientele-dawn') {
         scene = null;
       }

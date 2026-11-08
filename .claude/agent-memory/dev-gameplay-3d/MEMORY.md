@@ -547,3 +547,9 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Simulation chiffrée du game designer: importer ses constantes en chargeant le module Python (`importlib`) plutôt que de les recopier (`outils/importer-clientele.py`); les notes entre parenthèses en fin de ses textes d'issue ne se lisent pas en jeu (retirées à l'import).
 - Une journée de 600 s de service tourne en moins de 0,2 s dans Vitest (`stepWorld` complet, robot à la caisse, `fallbackPrepSeconds` à la place du service): un test par jour d'événement reste court.
 - Worktree isolé: l'outil Bash refuse les heredocs Python qui citent des chemins; écrire le correctif dans un script du scratchpad (Write), puis `python3 script.py .`. Le port 8765 peut être pris par un autre membre (scratchpad partagé): en choisir un autre, `--bind 127.0.0.1`.
+## Deux Tabliers, recette de nuit (vérifié le 2026-11-08)
+
+- Deux catalogues pour un même achat: l'aménagement écrit `village-terrasse` (tiret, `world.arrangement.extensions` et `works`), la clientèle `village_terrasse` (souligné, `clientele.purchases`). Tout achat fait d'un côté doit être recopié de l'autre (`stepExtensions` de `branchement/index.ts`); un test qui ne lit qu'un côté passe à tort.
+- `donnees/clientele/*.json` est régénéré depuis `docs/jeux/cosy-cafe/demo/donnees/` par `outils/importer-clientele.py`: un texte ou une règle changé dans le jeu se change aussi dans la source du game designer et dans l'importeur, sinon le prochain import l’efface.
+- Ce qui naît d'un événement (carte de scène, réplique) disparaît à la reprise et chez un invité qui rejoint: le remonter aussi depuis l'état du monde, une fois par scène (clé jour et événement).
+- `fill` de `interface/typo.ts` élide « de » et « que » devant une valeur à voyelle: écrire les gabarits avec « de {partner} », jamais « d'{partner} ».

@@ -137,7 +137,7 @@ def regles(cc: object) -> dict:
                  "delightedThreshold": cc.POURBOIRE["seuilRavi"], "probability": cc.POURBOIRE["probabilite"]},
         "guestbook": {"delighted": cc.LIVRE_DOR["ravi"], "delightedChance": cc.LIVRE_DOR["pRavi"],
                       "disappointed": cc.LIVRE_DOR["decu"], "disappointedChance": cc.LIVRE_DOR["pDecu"],
-                      "regularChance": cc.LIVRE_DOR["habitue"], "kept": 24},
+                      "regularChance": cc.LIVRE_DOR["habitue"], "regularGapDays": 3, "kept": 24},
         "seatFallbacks": {PLACES[k]: [PLACES[x] for x in v] for k, v in cc.REPLIS.items()},
         "counterSeatMaxGroup": 2,
         "weather": {
@@ -352,7 +352,7 @@ def evenements() -> dict:
 def textes() -> dict:
     src = lire("textes.json")
     gb = src["guestbook"]
-    return {"dialogues": src["dialogues"], "guestbook": {"positive": gb["positive"], "negative": gb["negative"], "regulars": gb["regulars"]},
+    return {"dialogues": src["dialogues"], "guestbook": {"positive": gb["positive"], "negative": gb["negative"], "regulars": gb["regulars"], "requires": gb.get("requires", {})},
             "ui": {"evening": src["ui"]["evening"], "demoEnd": src["ui"]["demoEnd"], "events": src["ui"]["events"], "sign": src["ui"]["sign"]}}
 
 

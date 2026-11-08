@@ -110,6 +110,8 @@ const RulesSchema = v.object({
     disappointed: N,
     disappointedChance: N,
     regularChance: N,
+    /** Un habitué n'écrit pas deux fois en moins de ce nombre de jours (RN-06). */
+    regularGapDays: v.optional(Nat, 3),
     kept: Nat,
     /** Bilan du soir: un client à cette satisfaction ou moins compte dans « Ce qui a manqué ». */
     reportMissedBelow: N,
@@ -423,6 +425,8 @@ const TextsSchema = v.object({
     positive: v.record(Str, v.array(Str)),
     negative: v.record(Str, v.array(Str)),
     regulars: Lines,
+    /** Mot qui parle d'un meuble: type de meuble (préfixe) ou équipement qu'il faut au café. */
+    requires: v.optional(v.record(Str, Str), {}),
   }),
   ui: v.record(Str, v.unknown()),
 });
