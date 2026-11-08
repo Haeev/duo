@@ -11,6 +11,6 @@
   },
   "aim": { "coneDeg": 3, "targetRadius": 0.07 },
   "mouse": { "degPerPixel": 0.12 },
-  "seating": { "tableReach": 1.0 },
+  "seating": { "tableReach": 1.0, "eyeAboveSeat": 0.75, "seatedPitchDeg": -20 },
   "net": { "movesEvery": 3, "domainsEvery": 6, "interpolationMs": 110 }
 }

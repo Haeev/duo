@@ -16,6 +16,7 @@ import {
   MeshStandardMaterial,
   SRGBColorSpace,
   type Material,
+  type Object3D,
   type Scene,
 } from 'three';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
@@ -24,6 +25,15 @@ import type { GameView } from '../reseau/vue';
 import { objectPosition } from '../simulation/monde';
 import { AVATAR_MODEL, FURNITURE_MODEL, MODEL_TURN_DEG, OBJECT_MODEL } from './correspondances';
 import { createClipBlend, type ClipBlend } from './melange';
+import { seatAnchor } from '../etat/assises';
+import {
+  bendThighs,
+  seatPlacement,
+  sitCalibration,
+  thighsOf,
+  type SeatPlacement,
+  type SitCalibration,
+} from './assis';
 import type { ModelLibrary } from './modeles';
 
 interface FurnitureNode {
@@ -66,7 +76,14 @@ export function createWorldNodes(
   // Avatars livrés (`char_avatar_*`): marche et attente, badge teinté à la couleur du joueur.
   // `still`: secondes sans bouger; on ne repasse à l'attente qu'après un court délai, car la pose
   // de l'autre n'avance qu'à l'arrivée des états (une image sur deux ou trois sans déplacement).
-  const rigs: ({ blend: ClipBlend; still: number } | null)[] = [null, null];
+  const rigs: ({
+    blend: ClipBlend;
+    still: number;
+    sit: SitCalibration | null;
+    thighs: readonly Object3D[];
+    node: Object3D;
+  } | null)[] = [null, null];
+  const placed: SeatPlacement = { x: 0, y: 0, z: 0, thigh: 0 };
   const owned: Material[] = [];
   const white = new DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
   white.colorSpace = SRGBColorSpace;
@@ -98,11 +115,17 @@ export function createWorldNodes(
         owned.push(tinted);
         child.material = tinted;
       });
+      // Pose assise mesurée avant de poser le personnage (à l'origine, sans rotation).
+      const sit = sitCalibration(
+        `${AVATAR_MODEL[i]}:sit`,
+        node,
+        src.clips.find((c) => c.name === 'sit'),
+      );
       holder.clear();
       holder.add(node);
       const blend = createClipBlend(new AnimationMixer(node), src.clips, 0.2);
       blend.update(0);
-      rigs[i] = { blend, still: 0 };
+      rigs[i] = { blend, still: 0, sit, thighs: thighsOf(node), node };
     });
   }
   const last = [
@@ -223,6 +246,7 @@ export function createWorldNodes(
 
   return {
     update(view, look) {
+      const world = view.world();
       syncFurniture(view);
       syncObjects(view, look);
       const now = performance.now();
@@ -234,15 +258,31 @@ export function createWorldNodes(
         if (avatar === undefined || prev === undefined) continue;
         avatar.visible = i !== view.local;
         const pose = view.pose(i);
-        avatar.position.set(pose.x, 0, pose.z);
-        // L'avant du modèle est +Z, le cap 0 regarde -Z: demi-tour.
-        avatar.rotation.y = (pose.yawDeg * Math.PI) / 180 + (rigs[i] === null ? 0 : Math.PI);
         const rig = rigs[i];
+        // Assis: sur l'assise déclarée, tourné comme elle (face à sa table), clip `sit`.
+        const seatId = world.players[i].seat ?? null;
+        const seatFurniture =
+          seatId === null ? undefined : world.furniture.find((f) => f.id === seatId);
+        const anchor =
+          seatFurniture === undefined
+            ? null
+            : seatAnchor(view.content, world.furniture, seatFurniture);
+        const yaw = anchor === null ? pose.yawDeg : anchor.yawDeg;
+        // L'avant du modèle est +Z, le cap 0 regarde -Z: demi-tour.
+        avatar.rotation.y = (yaw * Math.PI) / 180 + (rig === null ? 0 : Math.PI);
+        const sitting = anchor !== null && rig !== null && rig !== undefined && rig.sit !== null;
+        if (anchor !== null && rig !== null && rig !== undefined && rig.sit !== null) {
+          seatPlacement(rig.sit, anchor.x, anchor.y, anchor.z, avatar.rotation.y, placed);
+          avatar.position.set(placed.x, placed.y, placed.z);
+        } else avatar.position.set(pose.x, 0, pose.z);
         if (rig !== null && rig !== undefined) {
           const moving = dt > 0 && Math.hypot(pose.x - prev.x, pose.z - prev.z) / dt > 0.3;
           rig.still = moving ? 0 : rig.still + dt;
-          rig.blend.set(rig.still < 0.15 ? 'walk' : 'idle');
-          if (avatar.visible) rig.blend.update(dt);
+          rig.blend.set(sitting ? 'sit' : rig.still < 0.15 ? 'walk' : 'idle');
+          if (avatar.visible) {
+            rig.blend.update(dt);
+            if (sitting) bendThighs(rig.node, rig.thighs, placed.thigh);
+          }
         }
         prev.x = pose.x;
         prev.z = pose.z;

@@ -43,6 +43,8 @@ export const CoreSchema = v.strictObject({
   nextObjectId: Tick,
   furniture: v.array(PlacedFurnitureSchema),
   uses: v.tuple([v.nullable(StationUseSchema), v.nullable(StationUseSchema)]),
+  /** Assises des deux avatars (meuble posé, ou `null` debout). */
+  seats: v.optional(v.tuple([v.nullable(v.string()), v.nullable(v.string())]), [null, null]),
 });
 export type Core = v.InferOutput<typeof CoreSchema>;
 

@@ -27,6 +27,8 @@ import { createSession } from './session';
 import type { Intent, StepInput } from './simulation/entrees';
 import { planLabel } from './simulation/interactions';
 import { aim, type Aim } from './simulation/visee';
+import { eyeHeightOf } from './simulation/assise';
+import { seatAnchor } from './etat/assises';
 
 const canvas = document.getElementById('scene');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas #scene absent');
@@ -152,12 +154,15 @@ const localAim = (): Aim | null => {
   const pose = view.pose(view.local);
   return aim(content, view.world(), view.local, {
     x: pose.x,
-    y: content.settings.player.eyeHeight,
+    y: eyeHeightOf(content, view.world(), view.local),
     z: pose.z,
     yawDeg: look.look.yawDeg,
     pitchDeg: look.look.pitchDeg,
   });
 };
+
+/** Assise du joueur local à l'image d'avant, et regard posé sur la table en s'asseyant. */
+let lastSeat: string | null = null;
 
 duo.loop.start({
   step: ({ dt }) => {
@@ -203,7 +208,17 @@ duo.loop.start({
   render: ({ alpha, dt }) => {
     session.beforeFrame(alpha, dt);
     const pose = view.pose(view.local);
-    stage.camera.position.set(pose.x, content.settings.player.eyeHeight, pose.z);
+    // Assis à l'instant: le regard se tourne vers la table, comme le corps (sens de l'assise).
+    const seatId = view.world().players[view.local].seat ?? null;
+    if (seatId !== lastSeat) {
+      lastSeat = seatId;
+      const f = seatId === null ? undefined : view.world().furniture.find((x) => x.id === seatId);
+      if (f !== undefined) {
+        look.look.yawDeg = seatAnchor(content, view.world().furniture, f).yawDeg;
+        look.look.pitchDeg = content.settings.seating.seatedPitchDeg;
+      }
+    }
+    stage.camera.position.set(pose.x, eyeHeightOf(content, view.world(), view.local), pose.z);
     stage.camera.rotation.set(
       (look.look.pitchDeg * Math.PI) / 180,
       (look.look.yawDeg * Math.PI) / 180,
@@ -252,6 +267,7 @@ duo.loop.start({
       currentAim?.target ?? null,
     );
     panels.update();
+    sounds.listen(pose.x, pose.z, look.look.yawDeg);
     sounds.update(view.world(), view.local);
     stage.render();
   },

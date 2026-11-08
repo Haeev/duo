@@ -13,6 +13,7 @@ import type { SimContext } from '../simulation/systemes';
 import type { ClienteleContent, SeatKind } from './donnees';
 import type { ClienteleState } from './etat';
 import { extensionReady } from './economie';
+import { approachCandidates, seatAnchor, type SeatAnchor } from '../etat/assises';
 
 export interface Seat {
   readonly id: string;
@@ -152,8 +153,9 @@ export function seatList(
         table = t.id;
       }
     }
-    // Avant d'un meuble à 0° = sud (+z), à 90° = est; le cap des joueurs: 0 nord, 90 ouest.
-    out.push({ id: f.id, kind, x: f.x, z: f.z, yawDeg: (180 + f.rotDeg) % 360, table });
+    // Assise déclarée du modèle et sens de la personne assise (`etat/assises.ts`).
+    const a = seatAnchor(content, world.furniture, f);
+    out.push({ id: f.id, kind, x: a.x, z: a.z, yawDeg: a.yawDeg, table });
   }
   return out;
 }
@@ -221,6 +223,20 @@ export function navGrid(sim: SimContext, cc: ClienteleContent, s: ClienteleState
   const grid: NavGrid = { key, ox: fx, oz: fz, cell, w, h, free };
   gridCache.set(content, grid);
   return grid;
+}
+
+/**
+ * Point d'où l'on rejoint une assise et où l'on se relève: le premier point libre de la grille
+ * devant, sur le côté ou derrière l'assise (jamais à travers sa table).
+ */
+export function seatApproach(g: NavGrid, a: SeatAnchor): Vec2 {
+  for (const [x, z] of approachCandidates(a, 0.1)) {
+    const [i, j] = cellOf(g, x, z);
+    if (i >= 0 && j >= 0 && i < g.w && j < g.h && g.free[j * g.w + i] === 1) return { x, z };
+  }
+  const n = nearestFree(g, a.x, a.z);
+  if (n === null) return { x: a.x, z: a.z };
+  return { x: g.ox + ((n % g.w) + 0.5) * g.cell, z: g.oz + (Math.floor(n / g.w) + 0.5) * g.cell };
 }
 
 function cellOf(g: NavGrid, x: number, z: number): [number, number] {

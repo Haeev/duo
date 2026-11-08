@@ -107,6 +107,8 @@ export function createGuest(net: Net, content: Content, world: World, now: () =>
       world.furniture = c.furniture;
       world.players[0].use = c.uses[0];
       world.players[1].use = c.uses[1];
+      world.players[0].seat = c.seats[0];
+      world.players[1].seat = c.seats[1];
     }),
     events.onMessage((e) => {
       for (const event of e.events) hub.emit(event);

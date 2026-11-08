@@ -544,6 +544,7 @@ function eveningView(content: Content, world: World, player: PlayerIndex): Eveni
       project: null,
       regular: null,
     },
+    ownPage: s.eveningPages[player][0] === r.day ? s.eveningPages[player][1] : 1,
     partner:
       s.votes['next-day']?.[other] === 1
         ? { kind: 'good-night' }

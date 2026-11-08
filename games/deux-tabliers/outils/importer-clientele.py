@@ -297,7 +297,7 @@ def habitues() -> dict:
 # Mise en scène chiffrée des événements (choix du studio, d'après les textes `goal` du game designer):
 # qui entre, ce qu'il commande, les fenêtres de temps et les aides.
 SCENES = {
-    "le_car_de_8h12": {"lines": {"clue": ["", "Le chauffeur du car attend devant la vitrine: tu peux lui demander trente secondes de plus."], "choice": ["", "Demander au chauffeur"], "driver": ["Le chauffeur du car", "Bon, trente secondes. Pas une de plus !"]}, "profile": "presses", "groups": [1], "orders": [["creme", "croissant"]], "extension": 30,
+    "le_car_de_8h12": {"lines": {"clue": ["", "Le chauffeur du car attend devant la vitrine: tu peux lui demander de patienter encore un peu."], "choice": ["", "Demander au chauffeur"], "driver": ["Le chauffeur du car", "Bon, je patiente encore un peu. Pas plus !"]}, "profile": "presses", "groups": [1], "orders": [["creme", "croissant"]], "extension": 30,
                        "helpAfter": 135, "itemDelayDays": 4, "seat": "takeaway"},
     "la_vieille_dame_tousse": {"lines": {"help": ["Gaby", "Montre-moi ça. Un joint neuf, et elle repart comme en 87."], "hold": ["", "Tu tiens le levier: il faut que l'autre change le joint en même temps."]}, "pairWindow": 3, "reach": 1.8, "formidableBefore": 540, "station": "machine-espresso"},
     "les_godillots": {"lines": {"list": ["", "Colette te lit la liste: {list}. Dicte-la à l'autre !"]}, "profile": "promeneurs", "groups": [9], "seat": "outside", "helpAfter": 420,

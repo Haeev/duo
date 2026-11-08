@@ -9,6 +9,7 @@ import type { StepInput } from './entrees';
 import { furnitureObstacles, shellObstacles } from './collisions';
 import { pushOut, type Vec2 } from './geometrie';
 import { isCarrying } from '../amenagement/port';
+import { standUp } from './assise';
 
 const scratch: Vec2 = { x: 0, z: 0 };
 
@@ -26,6 +27,11 @@ export function walk(
   dt: number,
 ): void {
   applyLook(player, input, content);
+  // Assis: on regarde autour de soi; un pas relève l'avatar à côté de son assise.
+  if ((player.seat ?? null) !== null) {
+    if (input.moveX !== 0 || input.moveZ !== 0) standUp(content, world, player);
+    return;
+  }
   // Port à deux: la charge mène les deux porteurs (chez l'hôte), rien à prédire (technique 5.7).
   if (isCarrying(world, player)) return;
   const len = Math.hypot(input.moveX, input.moveZ);

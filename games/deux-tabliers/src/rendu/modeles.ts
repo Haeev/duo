@@ -53,6 +53,11 @@ const FRONT_TURN: Readonly<Record<'+z' | '-z' | '+x' | '-x', number>> = {
   '-x': Math.PI / 2,
 };
 
+/** URL construite d'une texture livrée (`assets/modeles/textures/<fichier>`), ou `undefined`. */
+export function textureUrl(file: string): string | undefined {
+  return TEXTURE_BY_NAME.get(file);
+}
+
 function urlOf(name: string): string | undefined {
   return MODEL_URLS[`../../assets/modeles/${name}.glb`];
 }

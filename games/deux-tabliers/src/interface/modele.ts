@@ -322,6 +322,8 @@ export interface EveningView {
     readonly project: string | null;
     readonly regular: string | null;
   };
+  /** Page que ce joueur lisait (1 à 4): le bilan rouvert y reprend, l'autre le sait. */
+  readonly ownPage?: number;
   /** Où en est l'autre: page lue, ou son choix. */
   readonly partner:
     | { readonly kind: 'reading'; readonly page: number }

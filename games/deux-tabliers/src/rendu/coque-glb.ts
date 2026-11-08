@@ -7,12 +7,15 @@
  * surexposé). Une fois la coque là, une capture de la salle sert d'environnement aux métaux.
  */
 import {
+  Color,
   DoubleSide,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
   PMREMGenerator,
+  RepeatWrapping,
   SRGBColorSpace,
+  TextureLoader,
   type Material,
   type Object3D,
   type Scene,
@@ -21,7 +24,36 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { GameView } from '../reseau/vue';
-import type { ModelLibrary } from './modeles';
+import { textureUrl, type ModelLibrary } from './modeles';
+
+/**
+ * Revêtements de la coque cuite (`variantes_coque` de `modeles.json`): une peinture garde
+ * l'enduit et prend sa teinte (sRGB, divisée par 0,70 en linéaire comme à l'export); un papier
+ * peint remplace la texture du mur, en blanc; un sol remplace la texture du sol (mêmes UV,
+ * 1 m par tuile). Le modèle de l'article du catalogue est le nom de la variante.
+ */
+const WALL_VARIANTS: Readonly<Record<string, { readonly file: string; readonly tint: string }>> = {
+  peinture_chaux: { file: 'mur_enduit.jpg', tint: '#D5C4A5' },
+  peinture_lin: { file: 'mur_enduit.jpg', tint: '#D4C7AE' },
+  peinture_vert_eau: { file: 'mur_enduit.jpg', tint: '#A9BDB1' },
+  peinture_lie_de_vin: { file: 'mur_enduit.jpg', tint: '#6E3A40' },
+  papier_fleurs_champs: { file: 'papier_fleurs_champs.jpg', tint: '#FFFFFF' },
+  papier_feuillage: { file: 'papier_feuillage.jpg', tint: '#FFFFFF' },
+  papier_rayures_creme: { file: 'papier_rayures_creme.jpg', tint: '#FFFFFF' },
+};
+const FLOOR_VARIANTS: Readonly<Record<string, string>> = {
+  sol_plancher: 'sol_plancher.jpg',
+  sol_tomettes: 'sol_tomettes.jpg',
+  sol_carreaux_ciment: 'sol_carreaux_ciment.jpg',
+  sol_damier: 'sol_damier.jpg',
+};
+/** Matériaux de la coque par pièce: murs, sol (la pièce du fond a son sol de tomettes). */
+const ROOM_MATERIALS: Readonly<Record<string, { readonly wall: string; readonly floor: string }>> =
+  {
+    salle: { wall: 'shell_wall_paint', floor: 'shell_floor' },
+    fond: { wall: 'shell_wall_paint', floor: 'shell_floor_fond' },
+  };
+const PAINT_EXPORT_FACTOR = 0.7;
 
 export interface BakedShell {
   /** Vrai si la coque cuite n'a pas pu se charger: la coque en blocs prend le relais. */
@@ -125,20 +157,66 @@ export function createBakedShell(
     capture();
   });
 
-  let paint = '';
+  // Textures des revêtements, chargées à la première pose (une fois chacune).
+  const loader = new TextureLoader();
+  const textures = new Map<string, Texture>();
+  const texture = (file: string): Texture | null => {
+    const known = textures.get(file);
+    if (known !== undefined) return known;
+    const url = textureUrl(file);
+    if (url === undefined) return null;
+    const t = loader.load(url);
+    // Comme les textures du GLB: pas de retournement, répétée (1 m par tuile), sRGB.
+    t.flipY = false;
+    t.wrapS = RepeatWrapping;
+    t.wrapT = RepeatWrapping;
+    t.colorSpace = SRGBColorSpace;
+    t.anisotropy = 4;
+    textures.set(file, t);
+    owned.push(t);
+    return t;
+  };
+  const tint = new Color();
+  /** Applique murs et sol d'une pièce sur une partie de la coque (salle: la coque, fond: l'extension). */
+  const cover = (root: Object3D, room: string): void => {
+    const names = ROOM_MATERIALS[room];
+    if (names === undefined) return;
+    const a = view.world().arrangement;
+    const wallModel = view.content.arrangement.items.get(a.walls[room] ?? '')?.model;
+    const floorModel = view.content.arrangement.items.get(a.floors[room] ?? '')?.model;
+    const wall = wallModel === undefined ? undefined : WALL_VARIANTS[wallModel];
+    const floor = floorModel === undefined ? undefined : FLOOR_VARIANTS[floorModel];
+    root.traverse((o) => {
+      if (!(o instanceof Mesh) || !(o.material instanceof MeshBasicMaterial)) return;
+      const m = o.material;
+      const ud = m.userData as { origMap?: Texture | null; origColor?: Color };
+      if (m.name !== names.wall && m.name !== names.floor) return;
+      if (!('origMap' in ud)) {
+        ud.origMap = m.map;
+        ud.origColor = m.color.clone();
+      }
+      const variant = m.name === names.wall ? wall : undefined;
+      const file = m.name === names.wall ? variant?.file : floor;
+      const map = file === undefined ? null : texture(file);
+      m.map = map ?? ud.origMap ?? null;
+      if (variant !== undefined && map !== null) {
+        tint.set(variant.tint).multiplyScalar(1 / PAINT_EXPORT_FACTOR);
+        m.color.copy(tint);
+      } else if (m.name === names.floor && map !== null) m.color.set('#ffffff');
+      else if (ud.origColor !== undefined) m.color.copy(ud.origColor);
+      m.needsUpdate = true;
+    });
+  };
+
+  let covers = '';
   const sync = (): void => {
-    const wall = view.world().arrangement.walls.salle ?? '';
-    if (wall !== paint && base !== null) {
-      paint = wall;
-      const color = view.content.arrangement.items.get(wall)?.color;
-      base.traverse((o) => {
-        if (
-          o instanceof Mesh &&
-          o.material instanceof MeshBasicMaterial &&
-          o.material.name === 'shell_wall_paint'
-        )
-          o.material.color.set(color ?? '#ffffff');
-      });
+    const a = view.world().arrangement;
+    const nextCovers = `${JSON.stringify(a.walls)}|${JSON.stringify(a.floors)}|${String(parts.size)}`;
+    if (nextCovers !== covers && base !== null) {
+      covers = nextCovers;
+      cover(base, 'salle');
+      const fond = parts.get('village-fond');
+      if (fond !== undefined && fond !== base) cover(fond, 'fond');
     }
     const open = view.world().arrangement.extensions;
     const next = open.join(',');
@@ -154,6 +232,8 @@ export function createBakedShell(
         bake(src.scene, scale, owned);
         parts.set(ext.id, src.scene);
         scene.add(src.scene);
+        // La pièce du fond arrive avec ses revêtements (le prochain `sync` les pose).
+        covers = '';
       });
     }
   };

@@ -10,7 +10,10 @@
  * - ambiance: la pièce, la place le matin ou le soir, la pluie (`plan.ambienceByTime`);
  * - radio du village pendant le service: deux stations (`plan.radio.stations`), la douce le
  *   matin, l'entraînante l'après-midi, musique en flux, souffle de la radio entre deux morceaux.
- * Pas de son placé dans l'espace pour la démo: tout part en stéréo, au volume du plan.
+ * Sons placés dans l'espace (champ `spatial` du plan, `espace.ts`): les postes, la caisse, la
+ * porte et les gestes de l'autre s'entendent d'où ils viennent, atténués avec la distance et
+ * placés à gauche ou à droite selon le regard (`listen`); la buse aussi. Ambiances, radio et
+ * interface restent partout.
  */
 import { v, type Audio, type AudioBus, type Logger, type PlayingSound } from '@duo/sdk';
 import type { Content } from '../donnees/charger';
@@ -19,6 +22,7 @@ import type { PlayerIndex, World } from '../etat/monde';
 import { serviceGauge } from '../service';
 import type { GameEvent } from '../simulation/evenements';
 import { clockMinutes } from '../clientele';
+import { eventPoint, placeSound, type Listener, type Placed, type Spatial } from './espace';
 
 const SOUND_URLS = import.meta.glob<string>('../../assets/son/**/*.ogg', {
   query: '?url',
@@ -42,6 +46,18 @@ const PlanSchema = v.looseObject({
       files: v.array(v.string()),
       volumeDb: v.optional(v.number(), 0),
       pitchVariation: v.optional(v.number(), 0),
+      spatial: v.optional(
+        v.nullable(
+          v.looseObject({
+            distanceModel: v.optional(v.string()),
+            refDistance: v.number(),
+            rolloffFactor: v.number(),
+            maxDistance: v.number(),
+            cullBeyondM: v.optional(v.number()),
+          }),
+        ),
+        null,
+      ),
     }),
   ),
   music: v.record(
@@ -84,8 +100,17 @@ export function soundIndex(
   return index;
 }
 
+export interface PlayAt {
+  volume?: number;
+  bus?: AudioBus;
+  /** Point du son (x, z): atténué et placé si le son est déclaré dans l'espace. */
+  at?: readonly [number, number] | null;
+}
+
 export interface Sounds {
-  play(id: string, options?: { volume?: number; bus?: AudioBus }): void;
+  play(id: string, options?: PlayAt): void;
+  /** Où est et où regarde qui écoute (le joueur local, à chaque image). */
+  listen(x: number, z: number, yawDeg: number): void;
   /** Son d'un événement de la simulation, s'il en a un. */
   onEvent(event: GameEvent): void;
   /** Boucles et radio d'après le monde (à chaque image). */
@@ -102,6 +127,7 @@ function busOf(name: string): AudioBus {
 interface LoopVoice {
   readonly gain: GainNode;
   readonly source: AudioBufferSourceNode;
+  readonly panner: StereoPannerNode;
 }
 
 const STEAM_LOOPS = ['steam-aerate-loop', 'steam-roll-loop', 'steam-sing-loop', 'steam-hot-loop'];
@@ -146,7 +172,9 @@ export function createSounds(
   };
 
   /** Un fichier de l'identifiant (tiré au hasard) et ses réglages, ou rien. */
-  const pick = (id: string): { url: string; gain: number; rate: number; bus: AudioBus } | null => {
+  const pick = (
+    id: string,
+  ): { url: string; gain: number; rate: number; bus: AudioBus; spatial: Spatial | null } | null => {
     const entry = plan?.sounds[id];
     if (entry !== undefined && entry.files.length > 0) {
       const file = entry.files[Math.floor(Math.random() * entry.files.length)] ?? '';
@@ -158,16 +186,48 @@ export function createSounds(
         gain: dbToGain(entry.volumeDb),
         rate: 1 + (Math.random() * 2 - 1) * spread,
         bus: busOf(entry.bus),
+        spatial: entry.spatial,
       };
     }
     const url = index.get(id);
-    return url === undefined ? null : { url, gain: 1, rate: 1, bus: 'effects' };
+    return url === undefined ? null : { url, gain: 1, rate: 1, bus: 'effects', spatial: null };
   };
-
-  const play = (id: string, options: { volume?: number; bus?: AudioBus } = {}): void => {
+  const listener: Listener = { x: 0, z: 0, yawDeg: 0 };
+  const placed: Placed = { gain: 1, pan: 0 };
+  const play = (id: string, options: PlayAt = {}): void => {
     const p = pick(id);
     if (p === null) {
       warn(id);
+      return;
+    }
+    const at = options.at ?? null;
+    if (at !== null && p.spatial !== null) {
+      placeSound(p.spatial, listener, at[0], at[1], placed);
+      if (placed.gain <= 0.001) return;
+      const gain = (options.volume ?? 1) * p.gain * placed.gain;
+      const pan = placed.pan;
+      void loadUrl(p.url).then((buffer) => {
+        if (buffer === null || disposed) return;
+        // Voix placée: source, gain, panoramique, puis le bus du SDK (volumes du joueur).
+        const ctx = audio.context;
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.playbackRate.value = p.rate;
+        const g = ctx.createGain();
+        g.gain.value = gain;
+        const panner = ctx.createStereoPanner();
+        panner.pan.value = pan;
+        source
+          .connect(g)
+          .connect(panner)
+          .connect(audio.bus(options.bus ?? p.bus));
+        source.onended = () => {
+          source.disconnect();
+          g.disconnect();
+          panner.disconnect();
+        };
+        source.start();
+      });
       return;
     }
     void loadUrl(p.url).then((buffer) => {
@@ -184,7 +244,17 @@ export function createSounds(
   const loops = new Map<string, LoopVoice | 'loading'>();
   const want = new Map<string, number>();
   let disposed = false;
-  const setLoop = (id: string, gain: number, rate = 1): void => {
+  const setLoop = (
+    id: string,
+    wanted: number,
+    rate = 1,
+    at: readonly [number, number] | null = null,
+  ): void => {
+    // Boucle placée (la buse): atténuée et placée comme un son ponctuel.
+    const spatial = at === null ? null : (plan?.sounds[id]?.spatial ?? null);
+    if (spatial !== null && at !== null) placeSound(spatial, listener, at[0], at[1], placed);
+    const gain = spatial === null ? wanted : wanted * placed.gain;
+    const pan = spatial === null ? 0 : placed.pan;
     want.set(id, gain);
     const voice = loops.get(id);
     if (voice === 'loading') return;
@@ -192,6 +262,7 @@ export function createSounds(
       const t = audio.context.currentTime;
       voice.gain.gain.setTargetAtTime(gain, t, 0.15);
       voice.source.playbackRate.setTargetAtTime(rate, t, 0.1);
+      voice.panner.pan.setTargetAtTime(pan, t, 0.1);
       return;
     }
     if (gain <= 0.001) return;
@@ -212,10 +283,11 @@ export function createSounds(
       source.loop = true;
       const node = ctx.createGain();
       node.gain.value = 0;
-      source.connect(node).connect(audio.bus(p.bus));
+      const panner = ctx.createStereoPanner();
+      source.connect(node).connect(panner).connect(audio.bus(p.bus));
       source.start();
       node.gain.setTargetAtTime((want.get(id) ?? 0) * p.gain, ctx.currentTime, 0.3);
-      loops.set(id, { gain: node, source });
+      loops.set(id, { gain: node, source, panner });
     });
   };
 
@@ -270,6 +342,7 @@ export function createSounds(
 
   let lastUpdate = -Infinity;
   const update = (world: World, local: PlayerIndex): void => {
+    lastWorld = world;
     const now = performance.now();
     if (now - lastUpdate < 100 || plan === null) return;
     lastUpdate = now;
@@ -288,7 +361,9 @@ export function createSounds(
         rate = band.rate[0] + (band.rate[1] - band.rate[0]) * k;
       }
     }
-    for (const [id, g] of mix) setLoop(id, g, rate);
+    const wand = world.furniture.find((f) => f.type === 'buse-vapeur');
+    const wandAt: [number, number] | null = wand === undefined ? null : [wand.x, wand.z];
+    for (const [id, g] of mix) setLoop(id, g, rate, wandAt);
     // Rumeur de la salle: la nappe qui va avec le nombre de clients.
     const c = world.clientele;
     const people = c.groups.reduce((sum, g) => sum + (g.stage === 'leaving' ? 0 : g.size), 0);
@@ -314,14 +389,21 @@ export function createSounds(
     tuneRadio(open ? (minutes < 13 * 60 ? 'douce' : 'entrainante') : null);
   };
 
+  let lastWorld: World | null = null;
   return {
     play,
+    listen(x, z, yawDeg) {
+      listener.x = x;
+      listener.z = z;
+      listener.yawDeg = yawDeg;
+    },
     onEvent(event) {
+      const at = lastWorld === null ? null : eventPoint(content, lastWorld, event);
       // Le pourboire tombe dans le bocal quand le client s'en va (il n'a pas d'événement à lui).
       if (event.type === 'clientele-left' && event.tip > 0)
-        play(event.tip >= 100 ? 'tip-big' : 'tip-jar-2');
+        play(event.tip >= 100 ? 'tip-big' : 'tip-jar-2', { at });
       const id = byEvent[event.type];
-      if (id !== undefined) play(id);
+      if (id !== undefined) play(id, { at });
     },
     update,
     dispose() {
@@ -332,6 +414,7 @@ export function createSounds(
         voice.source.stop();
         voice.source.disconnect();
         voice.gain.disconnect();
+        voice.panner.disconnect();
       }
       loops.clear();
     },

@@ -26,7 +26,13 @@ export const SettingsSchema = v.strictObject({
     targetRadius: Positive,
   }),
   mouse: v.strictObject({ degPerPixel: Positive }),
-  seating: v.strictObject({ tableReach: Positive }),
+  seating: v.strictObject({
+    tableReach: Positive,
+    /** Hauteur des yeux d'un avatar assis, au-dessus de l'assise (m). */
+    eyeAboveSeat: Positive,
+    /** Inclinaison du regard en s'asseyant (vers la table), en degrés. */
+    seatedPitchDeg: v.pipe(v.number(), v.minValue(-60), v.maxValue(0)),
+  }),
   net: v.strictObject({
     movesEvery: v.pipe(v.number(), v.integer(), v.minValue(1)),
     domainsEvery: v.pipe(v.number(), v.integer(), v.minValue(1)),

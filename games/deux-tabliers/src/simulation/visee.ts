@@ -8,6 +8,8 @@ import type { Content } from '../donnees/charger';
 import type { PlayerIndex, World } from '../etat/monde';
 import type { Target } from './entrees';
 import { planAct, type ActPlan } from './interactions';
+import { seatAnchor } from '../etat/assises';
+import { eyeHeightOf } from './assise';
 import { furnitureType, heldObject, objectOnSlot, objectPosition, slotPosition } from './monde';
 
 export interface Aim {
@@ -31,7 +33,7 @@ export function eyeOf(content: Content, world: World, player: PlayerIndex): Eye 
   const p = world.players[player];
   return {
     x: p.x,
-    y: content.settings.player.eyeHeight,
+    y: eyeHeightOf(content, world, player),
     z: p.z,
     yawDeg: p.yawDeg,
     pitchDeg: p.pitchDeg,
@@ -85,8 +87,15 @@ export function aim(content: Content, world: World, player: PlayerIndex, eye: Ey
       Math.max(radius, type.size[0] / 2),
     );
   }
+  // Les assises passent après tout geste possible: s'asseoir ne vole jamais « Agir » à une tasse
+  // ou un poste visés à côté (même règle que les bancs de La Petite Ligne).
+  const seats: [string, number, number, number][] = [];
   for (const f of world.furniture) {
     const type = furnitureType(content, f);
+    if (type.kind === 'seat' && !holding) {
+      const a = seatAnchor(content, world.furniture, f);
+      seats.push([f.id, a.x, a.y, a.z]);
+    }
     if (holding) {
       for (const slot of type.slots) {
         if (objectOnSlot(world, f.id, slot.id) !== undefined) continue;
@@ -107,5 +116,12 @@ export function aim(content: Content, world: World, player: PlayerIndex, eye: Ey
     const close = Math.hypot(q.x - eye.x, q.z - eye.z) <= content.settings.player.giveReach;
     if (close) consider({ kind: 'player', player: otherIndex }, q.x, 1.2, q.z, 0.3);
   }
-  return best;
+  // Lu par une fonction: les affectations faites dans `consider` échappent à l'analyse de flux.
+  const state = (): [Aim | null, boolean] => [best, bestActionable];
+  const [before, actionable] = state();
+  if (actionable) return before;
+  for (const [id, x, y, z] of seats) consider({ kind: 'seat', furniture: id }, x, y, z, 0.2);
+  const [after, seatActionable] = state();
+  // Une assise refusée ne remplace pas une cible déjà trouvée (l'invite garde sa raison).
+  return before !== null && !seatActionable ? before : after;
 }

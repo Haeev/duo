@@ -7,6 +7,7 @@
 import type { Content } from '../donnees/charger';
 import type { ObjectState, PlayerIndex, World } from '../etat/monde';
 import type { Target } from './entrees';
+import { seatTaken } from './assise';
 import {
   furnitureById,
   furnitureType,
@@ -40,6 +41,7 @@ export type ActPlan =
     }
   | { readonly kind: 'give'; readonly object: number; readonly to: PlayerIndex }
   | { readonly kind: 'use'; readonly furniture: string; readonly station: string }
+  | { readonly kind: 'sit'; readonly furniture: string }
   | { readonly kind: 'refuse'; readonly reason: string };
 
 export const other = (p: PlayerIndex): PlayerIndex => (p === 0 ? 1 : 0);
@@ -140,6 +142,17 @@ export function planAct(
       }
       return { kind: 'use', furniture: target.furniture, station };
     }
+    case 'seat': {
+      const placed = furnitureById(world, target.furniture);
+      if (placed === undefined || furnitureType(content, placed).kind !== 'seat')
+        return { kind: 'refuse', reason: 'Rien à faire ici' };
+      if (seatTaken(world, target.furniture, player))
+        return { kind: 'refuse', reason: 'Place prise' };
+      if (held !== undefined) return { kind: 'refuse', reason: 'Tes mains sont prises' };
+      if (world.players[player].seat === target.furniture)
+        return { kind: 'refuse', reason: 'Tu y es assis' };
+      return { kind: 'sit', furniture: target.furniture };
+    }
     case 'player': {
       if (target.player === player) return { kind: 'refuse', reason: 'Rien à faire' };
       if (held === undefined) return { kind: 'refuse', reason: 'Rien à donner' };
@@ -178,6 +191,8 @@ export function planLabel(content: Content, world: World, plan: ActPlan): string
       return `Donner : ${name(plan.object)}`;
     case 'use':
       return content.stations.get(plan.station)?.verb ?? 'Utiliser';
+    case 'sit':
+      return "S'asseoir";
     case 'refuse':
       return plan.reason;
   }

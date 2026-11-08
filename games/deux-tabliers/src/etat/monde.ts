@@ -48,6 +48,8 @@ export const PlayerStateSchema = v.strictObject({
   yawDeg: v.number(),
   pitchDeg: v.number(),
   use: v.nullable(StationUseSchema),
+  /** Assise occupée (identifiant du meuble posé): l'avatar est assis. Absent des anciennes sauvegardes. */
+  seat: v.optional(v.nullable(v.string()), null),
 });
 export type PlayerState = v.InferOutput<typeof PlayerStateSchema>;
 

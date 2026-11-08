@@ -63,10 +63,10 @@
         "lines": {
           "clue": [
             "",
-            "Le chauffeur du car attend devant la vitrine: tu peux lui demander trente secondes de plus."
+            "Le chauffeur du car attend devant la vitrine: tu peux lui demander de patienter encore un peu."
           ],
           "choice": ["", "Demander au chauffeur"],
-          "driver": ["Le chauffeur du car", "Bon, trente secondes. Pas une de plus !"]
+          "driver": ["Le chauffeur du car", "Bon, je patiente encore un peu. Pas plus !"]
         },
         "profile": "presses",
         "groups": [1],
@@ -208,7 +208,7 @@
         },
         {
           "who": "colette_godillots",
-          "text": "Et nos gourdes, vous pourriez les remplir ? On repart dans vingt minutes."
+          "text": "Et nos gourdes, vous pourriez les remplir ? On repart en milieu d'après-midi."
         }
       ],
       "goal": "Servir les neuf randonneurs et remplir leurs neuf gourdes avant leur départ.",
