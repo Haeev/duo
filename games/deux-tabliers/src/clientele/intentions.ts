@@ -5,6 +5,7 @@ import { v } from '@duo/sdk';
 
 const Nat = v.pipe(v.number(), v.integer(), v.minValue(0));
 const Short = v.pipe(v.string(), v.maxLength(40));
+const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
 export const CLIENTELE_INTENTS = [
   /** Répondre à une question posée aux deux (« On ouvre ? », « À demain », mariage, Mérelles...). */
@@ -51,6 +52,34 @@ export const CLIENTELE_INTENTS = [
     action: v.picklist(['driver', 'repair', 'signal', 'advice', 'surprise']),
     choice: v.pipe(Nat, v.maxValue(20)),
   }),
+  /** Réglage des remises (onglet « Remises »), pris à l'ouverture suivante (remises v0.2). */
+  v.strictObject({
+    type: v.literal('clientele-discounts'),
+    settings: v.strictObject({
+      happyHour: v.strictObject({
+        on: v.boolean(),
+        start: v.pipe(Nat, v.maxValue(24)),
+        length: v.pipe(Nat, v.maxValue(12)),
+        rate: v.pipe(v.number(), v.minValue(0), v.maxValue(0.9)),
+        days: v.pipe(v.array(v.picklist(WEEKDAYS)), v.maxLength(7)),
+      }),
+      loyalty: v.boolean(),
+      profiles: v.pipe(
+        v.record(
+          Short,
+          v.strictObject({
+            on: v.boolean(),
+            rate: v.pipe(v.number(), v.minValue(0), v.maxValue(0.9)),
+            days: v.pipe(v.array(v.picklist(WEEKDAYS)), v.maxLength(7)),
+          }),
+        ),
+        v.check((r) => Object.keys(r).length <= 8, 'Trop de tarifs'),
+      ),
+      dailyOffer: v.nullable(v.tuple([Short, v.pipe(v.number(), v.minValue(0), v.maxValue(0.9))])),
+    }),
+  }),
+  /** Lancer une action pour faire connaître le café (au-delà du seuil: proposée à l'autre). */
+  v.strictObject({ type: v.literal('clientele-campaign'), action: Short }),
   /** Rythme du duo: normal (1 s par minute de jeu) ou paisible (1,25 s). */
   v.strictObject({ type: v.literal('clientele-pace'), peaceful: v.boolean() }),
   /** Page du bilan du soir que lit ce joueur (la puce de l'autre la montre). */

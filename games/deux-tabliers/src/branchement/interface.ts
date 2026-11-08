@@ -16,6 +16,7 @@ import {
   availableCents,
   bigPurchaseCents,
   cartonCents,
+  emergencyCents,
   linePrice,
   nextOpenDay,
   nextPassage,
@@ -46,6 +47,13 @@ import type {
   WeatherView,
 } from '../interface/modele';
 import { standingPose, type CustomerPose } from '../clientele/reseau';
+import {
+  discountsView,
+  eveningExtras,
+  marketingView,
+  receiptLines,
+  slateDiscounts,
+} from './remises';
 import type { GameView } from '../reseau/vue';
 import { articleLabel, QUALITY_LABEL, serviceGauge } from '../service';
 import { recipeOf } from '../service/regles';
@@ -54,6 +62,14 @@ import type { Intent } from '../simulation/entrees';
 import type { GameEvent } from '../simulation/evenements';
 
 const DT = 1 / 60;
+
+const WEEKDAY_IDS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+type WeekdayId = (typeof WEEKDAY_IDS)[number];
+
+/** Jours renvoyés par l'interface, gardés s'ils sont connus (l'intention les revérifie). */
+function daysOf(days: readonly string[]): WeekdayId[] {
+  return WEEKDAY_IDS.filter((d) => days.includes(d));
+}
 
 /** Geste de scène de chaque genre d'événement (`clientele-scene`). */
 const SCENE_ACTION: Readonly<
@@ -199,6 +215,7 @@ function ticketView(
       };
     }),
     takenBy: t.taker,
+    receipt: g === undefined ? [] : receiptLines(content.clientele, g),
   };
 }
 
@@ -284,7 +301,10 @@ function slateView(content: Content, world: World): SlateView {
       unavailable: !known ? 'Pas encore apprise' : !stations ? 'Il manque le poste' : null,
     };
   });
+  const remises = slateDiscounts(cc, s);
   return {
+    discountLines: remises.lines,
+    happyHourNow: remises.now,
     maxLines: cc.rules.slateLines,
     maxStars: 0,
     lines: s.slate.map(([id]) => ({
@@ -295,6 +315,7 @@ function slateView(content: Content, world: World): SlateView {
       priceNote: '',
       soldOut: null,
       lockedBy: null,
+      discountedCents: remises.discounted(id),
     })),
     word: '',
     recipes,
@@ -363,6 +384,14 @@ function ordersView(content: Content, world: World): OrdersView {
               unit: 'carton',
               unitCents: cartonCents(i),
               lockedBy: null,
+              // Rupture: moins que la plus petite portion d'une recette de l'ardoise qui l'utilise.
+              outOfStock: s.slate.some(([id]) =>
+                (cc.recipes.get(id)?.ingredients ?? []).some(
+                  ([ing, qty]) => ing === i.id && (s.stock[i.id] ?? 0) + 1e-9 < qty,
+                ),
+              ),
+              emergencyCents: emergencyCents(cc, i),
+              emergencyOnTheWay: s.emergencies.some(([ing]) => ing === i.id),
             };
           }),
       };
@@ -488,7 +517,11 @@ function proposalsOf(content: Content, world: World): ProposalView[] {
 function offerName(content: Content, id: string): string {
   const cc = content.clientele;
   return (
-    cc.purchases.get(id)?.name ?? cc.extensions.get(id)?.name ?? cc.catalogue.get(id)?.name ?? id
+    cc.purchases.get(id)?.name ??
+    cc.extensions.get(id)?.name ??
+    cc.catalogue.get(id)?.name ??
+    cc.actions.get(id)?.name ??
+    id
   );
 }
 
@@ -600,6 +633,7 @@ function eveningView(content: Content, world: World, player: PlayerIndex): Eveni
       lostItems: r.lostItems.map((id) => cc.ingredients.get(id)?.name ?? id),
       basketCents: r.basketValue,
       basketPieces: r.open && r.day === s.day ? s.today.basket : 0,
+      ...eveningExtras(cc, r),
     },
     halfCups: Math.round(s.cups * 2),
     reputationHint: r.open
@@ -807,6 +841,9 @@ export function wireInterface(view: GameView): WiredInterface {
     },
     slate: (w) => (w.clientele.day === 0 ? null : slateView(content, w)),
     orders: (w) => (w.clientele.day === 0 ? null : ordersView(content, w)),
+    discounts: (w) => (w.clientele.day === 0 ? null : discountsView(cc, w.clientele)),
+    marketing: (w, _c, player) =>
+      w.clientele.day === 0 ? null : marketingView(cc, w.clientele, player),
     catalogue(w) {
       if (w.clientele.day === 0) return null;
       const items = catalogueItems(content, w);
@@ -937,6 +974,22 @@ export function wireInterface(view: GameView): WiredInterface {
     'order-send': () => supply(currentOrder()),
     buy: (a) => buy(a.item),
     'propose-buy': (a) => buy(a.item),
+    emergency: (a) => ({ type: 'clientele-emergency', ingredient: a.product }),
+    'discounts-set': (a) => ({
+      type: 'clientele-discounts',
+      settings: {
+        happyHour: { ...a.settings.happyHour, days: daysOf(a.settings.happyHour.days) },
+        loyalty: a.settings.loyalty,
+        profiles: Object.fromEntries(
+          Object.entries(a.settings.profiles).map(([id, p]) => [
+            id,
+            { on: p.on, rate: p.rate, days: daysOf(p.days) },
+          ]),
+        ),
+        dailyOffer: a.settings.dailyOffer === null ? null : [...a.settings.dailyOffer],
+      },
+    }),
+    'campaign-launch': (a) => ({ type: 'clientele-campaign', action: a.action }),
     'duo-setting': (a) =>
       a.key === 'pace' ? { type: 'clientele-pace', peaceful: a.value === 'calm' } : null,
     'ui-place': (a) => ({

@@ -7,6 +7,7 @@ import type { PlayerIndex } from '../etat/monde';
 import { cupsFromPoints, addPoints, extensionReady, type Ctx } from './economie';
 import type { EventDef } from './donnees';
 import type { Group } from './etat';
+import { marketingFactor } from './remises';
 import {
   addGuestbook,
   clockMinutes,
@@ -152,7 +153,8 @@ export function dayAffluence(ctx: Ctx, profile: string): number {
     plan?.dayEvent === null || plan?.dayEvent === undefined ? undefined : def(ctx, plan.dayEvent);
   f *= dayEvent?.effects?.profiles[profile] ?? 1;
   if (s.day === cc.economy.challenge.day) f *= cc.economy.challenge.affluence;
-  return f;
+  // Actions pour faire connaître le café (marketing v0.2), plafonnées ensemble.
+  return f * marketingFactor(cc, s, profile);
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -62,7 +62,18 @@ function accounts(f: EveningView['figures']): HTMLElement {
         ),
       ),
     );
+  row(T.evening.marketing, f.marketingCents ?? 0, -1);
   row(T.evening.result, f.resultCents, 1, true);
+  // Remises consenties: pour mémoire, sous le résultat (la recette en est déjà nette).
+  if ((f.discountsCents ?? 0) > 0)
+    tbody.append(
+      h(
+        'tr',
+        { class: 'dt-second', style: 'font-size: 0.85em' },
+        h('td', null, `${T.evening.discounts} (${T.evening.discountsMemo})`),
+        h('td', { class: 'dt-num' }, euros(f.discountsCents ?? 0)),
+      ),
+    );
   table.append(tbody);
   const notes: string[] = [];
   if (f.open) notes.push(fill(T.evening.costOfSales, { amount: euros(f.costOfSalesCents) }));
@@ -91,8 +102,15 @@ function accounts(f: EveningView['figures']): HTMLElement {
   if (f.lostItems.length > 0)
     more.push(fill(T.evening.lostHelp, { items: capital(f.lostItems.join(', ')) }));
   if (f.basketPieces > 0) more.push(fill(T.evening.basketHelp, { n: f.basketPieces }));
+  if (f.discountsHelp !== undefined && f.discountsHelp !== null) more.push(f.discountsHelp);
   more.push(T.evening.vat);
   wrap.append(h('p', { class: 'dt-second', style: 'font-size: 0.85em' }, more.join(' ')));
+  const came = f.cameThanks ?? [];
+  if (came.length > 0)
+    wrap.append(
+      h('h4', { style: 'margin: 0.6em 0 0.2em' }, T.evening.cameThanks),
+      ...came.map((line) => h('p', { style: 'margin: 0.1em 0' }, line)),
+    );
   return wrap;
 }
 

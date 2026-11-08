@@ -25,6 +25,8 @@ DEPOT = JEU.parent.parent
 DEMO = DEPOT / "docs" / "jeux" / "cosy-cafe" / "demo" / "donnees"
 SIM = DEPOT / "docs" / "jeux" / "cosy-cafe" / "simulations" / "cosy_cafe.py"
 SORTIE = JEU / "donnees" / "clientele"
+# Remises et marketing (v0.2): tables JSON de la section 7 du document du game designer.
+REMISES_DOC = DEPOT / "docs" / "jeux" / "cosy-cafe" / "demo" / "remises-marketing-v0-2.md"
 
 SAISON = 0  # printemps: la démo ne connaît que lui
 JOURS_SEMAINE = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
@@ -259,7 +261,7 @@ def economie() -> dict:
         "stationsAtStart": {k: v for k, v in eqp["stationsAtStart"].items() if k not in ("sink", "registers", "dishes")},
         "dishesAtStart": eqp["stationsAtStart"]["dishes"],
         "purchases": [{"id": p["id"], "name": p["name"], "price": p["price"], "tier": p["tier"], "effects": p["effect"].split(";")} for p in eqp["purchases"]]
-        + renov,
+        + renov + [CARTES_FIDELITE],
         "extensions": [{"id": e["id"], "name": e["name"], "price": e["price"], "tier": e["tier"], "nights": e["nightsOfWork"],
                         "seats": [e["seats"]["counter"], e["seats"]["table"], e["seats"]["comfort"], e["seats"]["terrace"]], "text": e["text"]} for e in eqp["extensions"]],
         "catalogue": [{"id": x["id"], "name": x["name"], "category": x["category"], "style": x["style"], "price": x["price"], "charm": x["charm"],
@@ -267,6 +269,59 @@ def economie() -> dict:
                        "comfort": x.get("seats", {}).get("type") == "comfort"} for x in cat["items"]],
         "startDecor": [{"id": f["id"], "count": f["count"], "worn": f["worn"]} for f in cat["startFurniture"]],
     }
+
+
+# Achat de la carte de fidélité (remises v0.2, section 7), absent des données de la démo v0.1.
+CARTES_FIDELITE = {"id": "cartes_fidelite", "name": "Cartes de fidélité (200)", "price": 15, "tier": "t0", "effects": ["remise:fidelite"]}
+
+# Textes des actions et des remises (section 5 du document), ajoutés aux tables de la section 7.
+MARKETING_TEXTES = {
+    "affiche_boulangerie": ("Une affiche chez Lucas, le boulanger", "Les gens du village la voient en prenant leur pain.",
+                            ["J'ai vu votre affiche chez Lucas en prenant ma baguette. Bonne idée !", "L'affiche disait vrai : le crème est bon."]),
+    "affiche_mairie": ("Une affiche au panneau de la mairie-école", "Les parents à la sortie de l'école, les randonneurs qui cherchent un sentier.",
+                       ["Vu l'affiche à la sortie de l'école. Les enfants ont adoré le chocolat.", "Le panneau de la mairie m'a donné l'idée, je reviendrai."]),
+    "prospectus_marche": ("Des prospectus au marché du samedi", "Mireille les glisse dans les cabas. Fort, mais bref.",
+                          ["Le prospectus était dans mon cabas, entre les poireaux.", "Merci Mireille pour le prospectus, et merci à vous pour la tarte."]),
+    "encart_echo": ("Un encart dans L'Écho de l'Arvelle", "Toute la vallée le lit le jeudi.",
+                    ["Vu dans L'Écho ! Et le crème est à la hauteur.", "On a traversé la vallée, grâce à L'Écho."]),
+    "ardoise_trottoir": ("L'ardoise de trottoir", "Écrite chaque matin. La pluie l'efface, sauf sous le store.", []),
+    "degustation": ("Une dégustation sur la place", "Un plateau de petits cafés, pendant que l'autre tient le comptoir.", []),
+    "partenariat_godillots": ("Sur la carte des sentiers des Godillots", "Le club recommande ta maison pour la pause des randonnées.", []),
+    "gouter_ecole": ("Le goûter de l'école", "Dix chocolats pour la classe, chaque mercredi.", []),
+    "vitrine_arvelle": ("Une page sur La Vitrine de l'Arvelle", "Le site des commerces de la vallée. Une jolie salle fait une jolie photo.", []),
+    "babillard": ("Un mot sur le Babillard d'Ormeval", "La page d'entraide du village. Gratuit, une fois par jour.", []),
+}
+REMISES_TEXTES = {
+    "names": {"happyHour": "heure douce", "dailyOffer": "offre du jour", "randonneurs": "tarif randonneur", "etudiants": "tarif étudiant"},
+    "profileLabels": {"randonneurs": "Tarif randonneur, sur présentation de ta carte des sentiers", "etudiants": "Tarif étudiant"},
+    "absent": {"etudiants": "Pas d'étudiants au village : le car du lycée ne s'arrête qu'à Mérelles."},
+    "guestbook": {
+        "heure_douce": ["L'heure douce, c'est le meilleur moment de l'après-midi."],
+        "fidelite": ["C'était mon café offert, merci !"],
+        "tarif_randonneur": ["Un café juste avant la montée, et à prix de randonneur."],
+    },
+}
+
+
+def bloc_doc(nom: str) -> dict:
+    """Le bloc JSON qui suit `<!-- donnees:<nom> -->` dans le document des remises."""
+    texte = REMISES_DOC.read_text(encoding="utf-8")
+    m = re.search(r"<!-- donnees:" + nom + r" -->\s*```json\n(.*?)\n```", texte, re.S)
+    if m is None:
+        raise SystemExit(f"bloc {nom} introuvable dans {REMISES_DOC.name}")
+    return json.loads(m.group(1))
+
+
+def remises() -> dict:
+    return {**bloc_doc("remises"), "texts": REMISES_TEXTES}
+
+
+def marketing() -> dict:
+    src = bloc_doc("marketing")
+    for a in src["actions"]:
+        name, blurb, lines = MARKETING_TEXTES[a["id"]]
+        a.update({"name": name, "blurb": blurb, "guestbook": lines})
+    return src
 
 
 def journees() -> dict:
@@ -376,6 +431,8 @@ def main() -> int:
     ecrire("habitues.json", habitues())
     ecrire("evenements.json", evenements())
     ecrire("textes.json", textes())
+    ecrire("remises.json", remises())
+    ecrire("marketing.json", marketing())
     return 0
 
 

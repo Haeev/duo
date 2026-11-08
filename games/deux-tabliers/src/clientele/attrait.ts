@@ -16,6 +16,8 @@ export interface Attraction {
   readonly cups: number;
   readonly satYesterday: number;
   readonly affluence: number;
+  /** Indice de prix imposé (remises v0.2: créneau de l’heure douce, tarif d'un profil). */
+  readonly index?: number;
 }
 
 export function familiesOf(
@@ -98,7 +100,7 @@ export function attraction(cc: ClienteleContent, p: Profile, a: Attraction): num
   const fam = familiesOf(cc, a.slate);
   return (
     slateFactor(cc, slatePoints(cc, p, fam)) *
-    priceFactor(cc, p, priceIndex(cc, p, a.slate)) *
+    priceFactor(cc, p, a.index ?? priceIndex(cc, p, a.slate)) *
     placeFactor(cc, p, a) *
     cupsFactor(cc, a.cups) *
     moodFactor(cc, a.satYesterday) *
@@ -165,13 +167,17 @@ function chooseFamily(
   p: Profile,
   available: ReadonlyMap<string, readonly Recipe[]>,
   among: readonly string[],
+  featuredFamily: string | null,
 ): string | null {
   const w = cc.rules.cravingWeights;
+  // Offre du jour (remises v0.2): sa famille compte un peu plus (+1, `familyWeightBonus`).
+  const bonus = (f: string): number =>
+    f === featuredFamily ? cc.discounts.dailyOffer.familyWeightBonus : 0;
   const choices: [string, number][] = [];
   for (const f of among) {
     if ((available.get(f)?.length ?? 0) === 0) continue;
-    if (f === p.mainCraving) choices.push([f, w.main]);
-    else if (p.secondaryCravings.includes(f)) choices.push([f, w.secondary]);
+    if (f === p.mainCraving) choices.push([f, w.main + bonus(f)]);
+    else if (p.secondaryCravings.includes(f)) choices.push([f, w.secondary + bonus(f)]);
   }
   if (choices.length === 0) return null;
   let u = random.next() * choices.reduce((s, [, x]) => s + x, 0);
@@ -189,6 +195,7 @@ export function groupOrder(
   p: Profile,
   size: number,
   available: readonly Recipe[],
+  featured: string | null = null,
 ): string[] {
   const byFamily = new Map<string, Recipe[]>();
   for (const r of available) {
@@ -196,21 +203,35 @@ export function groupOrder(
     list.push(r);
     byFamily.set(r.family, list);
   }
+  const star = available.find((r) => r.id === featured) ?? null;
+  const fam = star?.family ?? null;
+  // La recette de l'offre compte double dans le tirage de sa famille (`pickWeight`); sans offre,
+  // le tirage reste celui d'avant (même suite de hasard).
+  const pickIn = (list: readonly Recipe[]): Recipe => {
+    if (star === null || !list.includes(star)) return random.pick(list);
+    const k = cc.discounts.dailyOffer.pickWeight;
+    let u = random.next() * (list.length - 1 + k);
+    for (const r of list) {
+      u -= r === star ? k : 1;
+      if (u <= 0) return r;
+    }
+    return star;
+  };
   const items: string[] = [];
   for (let i = 0; i < size; i++) {
-    let f = chooseFamily(cc, random, p, byFamily, cc.rules.drinks);
+    let f = chooseFamily(cc, random, p, byFamily, cc.rules.drinks, fam);
     if (f === null) {
       const others = cc.rules.drinks.filter((x) => (byFamily.get(x)?.length ?? 0) > 0);
       f = others.length > 0 ? random.pick(others) : null;
     }
     if (f !== null) {
       const list = byFamily.get(f);
-      if (list !== undefined && list.length > 0) items.push(random.pick(list).id);
+      if (list !== undefined && list.length > 0) items.push(pickIn(list).id);
     }
     if (random.next() < p.eatsShare) {
-      const g = chooseFamily(cc, random, p, byFamily, cc.rules.foods);
+      const g = chooseFamily(cc, random, p, byFamily, cc.rules.foods, fam);
       const list = g === null ? undefined : byFamily.get(g);
-      if (list !== undefined && list.length > 0) items.push(random.pick(list).id);
+      if (list !== undefined && list.length > 0) items.push(pickIn(list).id);
     }
   }
   return items;

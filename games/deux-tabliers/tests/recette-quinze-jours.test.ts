@@ -42,8 +42,69 @@ interface DayLog {
   maxQueue: number;
 }
 
+/**
+ * Les leviers de la démo v0.2 (remises et marketing, RM-20): remises par défaut allumées dès le
+ * soir du jour 2 (heure douce, tarif randonneur, carte de fidélité achetée), les quatre actions P0
+ * lancées dès que possible (l'encart proposé par l'un, accepté par l'autre).
+ */
+function levers(world: World, day: number, step: (intents?: QueuedIntent[]) => void): void {
+  const s = world.clientele;
+  if (day === 2) {
+    step([{ player: 0, intent: { type: 'clientele-buy', item: 'cartes_fidelite' } }]);
+    step([
+      {
+        player: 1,
+        intent: {
+          type: 'clientele-discounts',
+          settings: {
+            happyHour: {
+              on: true,
+              start: 15,
+              length: 2,
+              rate: 0.2,
+              days: ['tue', 'wed', 'thu', 'fri'],
+            },
+            loyalty: true,
+            profiles: {
+              randonneurs: { on: true, rate: 0.1, days: ['tue', 'wed', 'thu', 'fri'] },
+              etudiants: { on: false, rate: 0.15, days: [] },
+            },
+            dailyOffer: null,
+          },
+        },
+      },
+    ]);
+  }
+  for (const action of [
+    'affiche_boulangerie',
+    'affiche_mairie',
+    'prospectus_marche',
+    'encart_echo',
+  ])
+    step([{ player: 0, intent: { type: 'clientele-campaign', action } }]);
+  if (s.proposals.some((p) => p.by === 0))
+    step([{ player: 1, intent: { type: 'clientele-answer', by: 0, accept: true } }]);
+}
+
+/** Caisse au soir de chaque jour de la démo v0.2 sans levier (graine 2026), avant les remises. */
+const CASH_V02 = [
+  0, 19665, 16406, 14798, 11631, 9548, 28670, 0, 22174, 22170, 20304, 34469, 31491, 30856, 0,
+];
+
 describe('Deux Tabliers, recette des quinze jours', () => {
-  it('du jour 1 à la fin de la démo, avec achats, reprise et rôles inversés', () => {
+  it('RM-01: sans remise ni action, la caisse de chaque soir est celle de la v0.2', () => {
+    const logs = playDemo(false);
+    expect(logs.map((l) => l.cashEvening)).toEqual(CASH_V02);
+  }, 240_000);
+
+  it('RM-20: avec toutes les actions P0 et les remises par défaut, la démo va au bout', () => {
+    const logs = playDemo(true);
+    expect(logs.length).toBe(15);
+  }, 240_000);
+});
+
+function playDemo(withLevers: boolean): DayLog[] {
+  {
     let content = fastContent();
     let world: World = createWorld(content, ['membre-a', 'membre-b']);
     const random = createRandom(2026);
@@ -179,8 +240,10 @@ describe('Deux Tabliers, recette des quinze jours', () => {
             r.shipping -
             r.emergency -
             r.rent -
-            r.charges,
+            r.charges -
+            r.marketing,
         );
+      if (withLevers) levers(world, day, step);
       expect(world.clientele.cash, `caisse du soir ${String(day)}`).toBeGreaterThanOrEqual(0);
       // Le soir: achats proposés par l'un, acceptés par l'autre.
       if (day >= 7 && terraceBoughtDay === 0) {
@@ -246,5 +309,18 @@ describe('Deux Tabliers, recette des quinze jours', () => {
     expect(refusals.length, JSON.stringify(refusals.slice(0, 5))).toBeLessThan(5_000);
     if (process.env.RECETTE_JOURNAL !== undefined)
       process.stdout.write(`${JSON.stringify({ ...report, refusals: refusals.slice(0, 40) })}\n`);
-  }, 240_000);
-});
+    if (withLevers) {
+      // RM-20 et RM-10: les actions se sont payées, leur coût est au bilan de leur soir.
+      const launched = s.campaigns.map((c) => c.id);
+      for (const id of [
+        'affiche_boulangerie',
+        'affiche_mairie',
+        'prospectus_marche',
+        'encart_echo',
+      ])
+        expect(launched, id).toContain(id);
+      expect(s.loyaltyDays).toBeGreaterThan(5);
+    }
+    return logs;
+  }
+}

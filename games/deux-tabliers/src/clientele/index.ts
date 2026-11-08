@@ -84,6 +84,7 @@ import {
 } from './economie';
 import type { ClienteleState } from './etat';
 import { talk } from './habitues';
+import { applyDiscountSettings, launchCampaign, startCampaign } from './remises';
 import { dawn, startHouse, stepDay, vote } from './journee';
 import { onTalk, sceneAct } from './scenes';
 
@@ -233,6 +234,14 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
     return;
   }
   if (intent.type === 'clientele-answer') {
+    // Une action de marketing au-delà du seuil (marketing v0.2) se répond comme un achat.
+    const i = s.proposals.findIndex((p) => p.by === intent.by);
+    const item = s.proposals[i]?.item;
+    if (item !== undefined && cc.actions.has(item) && intent.by !== player) {
+      s.proposals.splice(i, 1);
+      if (intent.accept) refuse(sim, player, startCampaign(ctx, item, intent.by));
+      return;
+    }
     refuse(sim, player, answerProposal(ctx, player, intent.by, intent.accept));
     return;
   }
@@ -265,6 +274,14 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   }
   if (intent.type === 'clientele-scene') {
     refuse(sim, player, sceneAct(ctx, player, intent.action, intent.choice));
+    return;
+  }
+  if (intent.type === 'clientele-discounts') {
+    refuse(sim, player, applyDiscountSettings(ctx, intent.settings));
+    return;
+  }
+  if (intent.type === 'clientele-campaign') {
+    refuse(sim, player, launchCampaign(ctx, player, intent.action));
     return;
   }
   if (intent.type === 'clientele-pace') {

@@ -70,6 +70,8 @@ export interface TicketView {
   readonly lines: readonly TicketLineView[];
   /** Joueur qui l'a pris, `null` s'il est libre. */
   readonly takenBy: PlayerIndex | null;
+  /** Remises du ticket, déjà rédigées (« Heure douce : -0,50 € », « Tampons : 4 sur 8 »). */
+  readonly receipt?: readonly string[];
 }
 
 /** Ce que tient un joueur (coin bas droit, carte de l'autre). */
@@ -194,9 +196,15 @@ export interface SlateLineView {
   readonly soldOut: string | null;
   /** Ligne tenue par l'autre. */
   readonly lockedBy: PlayerIndex | null;
+  /** Prix remisé en ce moment (heure douce en cours, offre du jour): le prix est barré. */
+  readonly discountedCents?: number | null;
 }
 
 export interface SlateView {
+  /** Remises annoncées en tête de l'ardoise, à la craie (« Heure douce 15 h-17 h : boissons -20 % »). */
+  readonly discountLines?: readonly string[];
+  /** « C'est l'heure douce ! », souligné pendant le créneau. */
+  readonly happyHourNow?: string | null;
   readonly maxLines: number;
   readonly maxStars: number;
   readonly lines: readonly SlateLineView[];
@@ -227,6 +235,12 @@ export interface OrderProductView {
   readonly unit: string;
   readonly unitCents: number;
   readonly lockedBy: PlayerIndex | null;
+  /** En rupture (moins d'une portion de la plus petite recette): le dépannage est proposé. */
+  readonly outOfStock?: boolean;
+  /** Prix d'un carton de dépannage par Mireille (+30 %), centimes. */
+  readonly emergencyCents?: number;
+  /** Un dépannage de ce produit est déjà en route. */
+  readonly emergencyOnTheWay?: boolean;
 }
 
 export interface SupplierView {
@@ -344,6 +358,13 @@ export interface EveningFigures {
   readonly lostItems: readonly string[];
   readonly basketCents: number;
   readonly basketPieces: number;
+  /** Publicité payée ce jour-là: une ligne du résultat (remises et marketing v0.2). */
+  readonly marketingCents?: number;
+  /** Remises consenties, pour mémoire (la recette en est déjà nette), et leur détail rédigé. */
+  readonly discountsCents?: number;
+  readonly discountsHelp?: string | null;
+  /** « Venus grâce à l'affiche chez Lucas : environ 3 clients », bouche-à-oreille compris. */
+  readonly cameThanks?: readonly string[];
 }
 
 export interface EveningView {
@@ -414,6 +435,103 @@ export interface DuoSettingsView {
   readonly radio: 'both' | 'host';
 }
 
+/** Réglage des remises tel que l'interface le renvoie (`discounts-set`). */
+export interface DiscountSettingsView {
+  readonly happyHour: {
+    readonly on: boolean;
+    readonly start: number;
+    readonly length: number;
+    readonly rate: number;
+    /** Jours (`tue`... de `journees.json`). */
+    readonly days: readonly string[];
+  };
+  readonly loyalty: boolean;
+  readonly profiles: Readonly<
+    Record<
+      string,
+      { readonly on: boolean; readonly rate: number; readonly days: readonly string[] }
+    >
+  >;
+  readonly dailyOffer: readonly [string, number] | null;
+}
+
+/** Onglet « Remises » (remises v0.2): réglage de demain, effets, suggestion. */
+export interface DiscountsView {
+  readonly settings: DiscountSettingsView;
+  /** Jours réglables, dans l'ordre (`tue`... `sun`), et leur nom (« mardi »). */
+  readonly days: readonly (readonly [string, string])[];
+  readonly happyHour: {
+    readonly starts: readonly number[];
+    readonly lengths: readonly number[];
+    /** Heure de fermeture: l’heure douce finit avant. */
+    readonly closeHour: number;
+    readonly rates: readonly number[];
+    /** « De 15 h à 17 h, boissons -20 % ». */
+    readonly line: string;
+  };
+  readonly loyalty: {
+    readonly owned: boolean;
+    /** « Achète d'abord les cartes au catalogue (15 €). », `null` une fois achetées. */
+    readonly need: string | null;
+    readonly holders: string | null;
+  };
+  readonly profileRates: readonly {
+    readonly id: string;
+    readonly label: string;
+    readonly rates: readonly number[];
+    /** Raison de la ligne grisée (« Pas d'étudiants au village... »), `null` si réglable. */
+    readonly absent: string | null;
+  }[];
+  readonly dailyOffer: {
+    readonly rates: readonly number[];
+    readonly recipes: readonly {
+      readonly id: string;
+      readonly name: string;
+      readonly baseCents: number;
+      readonly offerCents: number;
+      readonly floored: boolean;
+    }[];
+    readonly defaultRate: number;
+  };
+  /** « Il reste 6 parts de tarte à finir demain... », et la recette à proposer. */
+  readonly suggestion: { readonly text: string; readonly recipe: string } | null;
+  /** « Dimanche : la salle sera sans doute pleine... », `null` sinon. */
+  readonly fullDay: string | null;
+  /** « Hier, les remises t'ont coûté 3,20 €. », `null` sans remise. */
+  readonly costYesterday: string | null;
+  /** Le réglage vaut pour la prochaine ouverture (« Pour demain, mardi »). */
+  readonly forDay: string;
+}
+
+export type CampaignStateView =
+  | { readonly kind: 'launch'; readonly propose: boolean; readonly tired: boolean }
+  | { readonly kind: 'running' | 'pending' | 'fading'; readonly text: string }
+  | { readonly kind: 'missing'; readonly missingCents: number }
+  | { readonly kind: 'pending-mine' }
+  | { readonly kind: 'pending-theirs' }
+  | { readonly kind: 'closed'; readonly reason: string };
+
+/** Onglet « Faire connaître » (marketing v0.2). */
+export interface MarketingView {
+  readonly actions: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly blurb: string;
+    readonly costCents: number;
+    /** « +8 % au plus, 7 jours ». */
+    readonly effect: string;
+    /** « voisins, pressés, flâneurs, familles ». */
+    readonly audience: string;
+    /** « Paraît jeudi 4 (bouclage mardi soir). », « Mireille les distribue samedi matin au marché. ». */
+    readonly when: string;
+    readonly state: CampaignStateView;
+  }[];
+  /** Le bouche-à-oreille, toujours actif: aide et clients venus hier. */
+  readonly word: { readonly name: string; readonly help: string };
+  readonly saturation: string | null;
+  readonly thresholdCents: number;
+}
+
 /** Alerte douce (ux 3.3), déjà rédigée. */
 export interface AlertView {
   readonly id: string;
@@ -443,6 +561,8 @@ export interface InterfaceModel {
   readonly morning: MorningView | null;
   readonly slate: SlateView | null;
   readonly orders: OrdersView | null;
+  readonly discounts?: DiscountsView | null;
+  readonly marketing?: MarketingView | null;
   readonly catalogue: CatalogueView | null;
   readonly projects: ProjectsView | null;
   readonly evening: EveningView | null;
