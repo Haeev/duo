@@ -5,7 +5,14 @@ import { AnimationClip, QuaternionKeyframeTrack } from 'three';
 import { describe, expect, it } from 'vitest';
 import { ctxOf } from '../src/clientele';
 import { spawnGroup } from '../src/clientele/clients';
-import { memberDrink, sipTime } from '../src/clientele/gestes';
+import {
+  fillBefore,
+  memberDrink,
+  sipCount,
+  sipDuration,
+  sipPose,
+  sipTime,
+} from '../src/clientele/gestes';
 import { seatList } from '../src/clientele/places';
 import { loadContent } from '../src/donnees/charger';
 import { DATA_FILES } from '../src/donnees/fichiers';
@@ -112,6 +119,30 @@ describe('Deux Tabliers, places des meubles', () => {
 });
 
 describe('Deux Tabliers, gestes des clients assis', () => {
+  it('gorgée: montée à plat, inclinaison de 30 à 55° selon le contenu, contenu qui baisse', () => {
+    const s = content.settings.seating.sip;
+    const out = { hand: 0, lift: 0, tiltDeg: 0, headDeg: 0, fill: 1 };
+    const top = s.reachSec + s.liftSec + s.tiltSec + s.holdSec / 4;
+    // Pleine: 30°, presque vide: 55°; jamais inclinée tant qu'elle n'est pas aux lèvres.
+    expect(sipPose(s, top, 1, out).tiltDeg).toBeCloseTo(30, 5);
+    expect(out.lift).toBe(1);
+    expect(out.headDeg).toBeGreaterThan(0);
+    expect(sipPose(s, top, s.emptyFill, out).tiltDeg).toBeCloseTo(55, 5);
+    for (let t = 0; t < sipDuration(s); t += 0.05) {
+      sipPose(s, t, 0.6, out);
+      if (out.lift < 1) expect(out.tiltDeg).toBe(0);
+      expect(out.tiltDeg).toBeLessThanOrEqual(55);
+    }
+    // Reposée à plat et lâchée à la fin; le contenu a baissé d'une gorgée.
+    sipPose(s, sipDuration(s), 0.6, out);
+    expect(out.hand).toBe(0);
+    expect(out.lift).toBe(0);
+    expect(out.fill).toBeCloseTo(0.6 - s.sipShare, 5);
+    expect(fillBefore(s, 0)).toBe(1);
+    expect(fillBefore(s, 100)).toBe(s.emptyFill);
+    expect(sipCount(content.settings.seating, 3, 0, 0, 600, sipDuration(s))).toBeGreaterThan(20);
+  });
+
   it('on ne boit que sa boisson servie; qui a commandé à manger attend sans tasse', () => {
     const world = worldWithBench();
     const ctx = ctxOf(simOf(world));

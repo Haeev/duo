@@ -33,21 +33,42 @@ import type { GameView } from '../reseau/vue';
 import { createClipBlend, type ClipBlend } from '../rendu/melange';
 import {
   bendThighs,
+  orientInWorld,
   pinHips,
-  reachTo,
+  reachWithPole,
   restClip,
   seatPlacement,
   SIT_REST,
   sitCalibration,
   thighsOf,
+  tiltHead,
   turnHead,
   type SeatPlacement,
   type SitCalibration,
 } from '../rendu/assis';
 import { DRINK_VESSEL } from '../rendu/correspondances';
+import {
+  cupFromHand,
+  handFrame,
+  handQuaternion,
+  setLiquid,
+  vesselShape,
+  wristFor,
+  type HandFrame,
+  type VesselShape,
+} from '../rendu/tenue';
 import { placeAnchor, placeFurniture, seatTable, type SeatAnchor } from '../etat/assises';
 import { memberLook, type Anim } from './clients';
-import { glanceWeight, memberDrink, sipTime } from './gestes';
+import {
+  fillBefore,
+  glanceWeight,
+  memberDrink,
+  sipCount,
+  sipDuration,
+  sipPose,
+  sipTime,
+  type SipPose,
+} from './gestes';
 import { queueLine } from './places';
 import type { ClienteleContent } from './donnees';
 import type { Group as CustomerGroup } from './etat';
@@ -84,33 +105,22 @@ interface Figure {
   readonly rightForeArm: Object3D | undefined;
   readonly head: Object3D | undefined;
   readonly face: Object3D | undefined;
-  /** Durée du clip `sit_drink` (s), 0 sans lui. */
-  readonly drinkSec: number;
+  /** Main droite mesurée (creux de la main, doigts, paume), à la première gorgée. */
+  grip: HandFrame | null | undefined;
+  /** Boisson suivie et instant où on l'a vue (s): la tasse se vide de gorgée en gorgée. */
+  drinkOf: string | null;
+  drinkSince: number;
   /** Tasse ou verre de sa boisson (clone du modèle), créé à son premier service. */
-  cup: { readonly model: string; readonly node: Object3D } | null;
+  cup: {
+    readonly model: string;
+    readonly node: Object3D;
+    readonly shape: VesselShape;
+    readonly liquid: Object3D | undefined;
+  } | null;
 }
 
 const SIT_CLIPS = [SIT_REST, 'sit_drink'] as const;
-/**
- * Gorgée tirée de `sit_drink` (11,2 s livrées): de 12 % (main droite devant, à hauteur de
- * poitrine) à 72 % (revenue au même point). Avant et après, le clip va chercher et reposer la
- * tasse loin sur le côté, hors de toute table: on n'en joue que le milieu.
- */
-const SIP_FROM = 0.12;
-const SIP_TO = 0.72;
-/** Passage de la tasse de la table à la main (et retour), en secondes. */
-const CUP_MOVE = 0.35;
-/** Prise de la tasse dans la main: sous le poignet, un peu en avant (m). */
-const GRIP_DOWN = 0.09;
-const GRIP_AHEAD = 0.06;
-/**
- * Bouche: au-dessus de `headfront` (devant le visage, à la hauteur de l'os `Head`, sous le
- * menton) dans le repère de la tête. Tasse à la gorgée: son bord près des lèvres, donc sa base
- * un peu devant et en dessous (m).
- */
-const MOUTH_UP = 0.045;
-const SIP_CUP_AHEAD = 0.05;
-const SIP_CUP_BELOW = 0.07;
+const DEG = Math.PI / 180;
 
 export interface CustomerNodes {
   update(view: GameView, nowMs: number, frameDt: number): void;
@@ -345,7 +355,9 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
         rightForeArm: node.getObjectByName('RightForeArm'),
         head: node.getObjectByName('Head'),
         face: node.getObjectByName('headfront'),
-        drinkSec: src.clips.find((c) => c.name === 'sit_drink')?.duration ?? 0,
+        grip: undefined,
+        drinkOf: null,
+        drinkSince: 0,
         cup: null,
       });
     });
@@ -357,60 +369,149 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   };
 
   const placedRest: SeatPlacement = { x: 0, y: 0, z: 0, thigh: 0 };
-  const handAt = new Vector3();
-  const mouthAt = new Vector3();
-  const headQ = new Quaternion();
-  const restAt = new Vector3();
   const cupPending = new Set<string>();
+  const restAt = new Vector3();
+  const heldAt = new Vector3();
+  const sipNow: SipPose = { hand: 0, lift: 0, tiltDeg: 0, headDeg: 0, fill: 1 };
+  const fwd = new Vector3();
+  const right = new Vector3();
+  const axis = new Vector3();
+  const lips = new Vector3();
+  const headAt = new Vector3();
+  const faceFwd = new Vector3();
+  const headUp = new Vector3();
+  const lipLocal = new Vector3();
+  const mouthCup = new Vector3();
+  const wrist = new Vector3();
+  const pole = new Vector3();
+  const yawQ = new Quaternion();
+  const cupQ = new Quaternion();
+  const handQ = new Quaternion();
+  const headQ = new Quaternion();
+  const inverseQ = new Quaternion();
 
-  /** Tasse de `drink`: sur la table (`table`), dans la main (`hand`), ou entre les deux (`h`). */
-  const placeCup = (
-    view: GameView,
-    fig: Figure,
-    drink: string | null,
-    hand: Object3D | undefined,
-    table: Vector3 | null,
-    h: number,
-    rotY: number,
-  ): void => {
+  /** Tasse ou verre de `drink` (clone chargé une fois), `null` le temps du chargement. */
+  const cupOf = (view: GameView, fig: Figure, drink: string | null): Figure['cup'] => {
     const family = drink === null ? undefined : view.content.clientele.recipes.get(drink)?.family;
     const vessel = family === undefined ? undefined : DRINK_VESSEL[family];
     if (vessel === undefined) {
       if (fig.cup !== null) fig.cup.node.visible = false;
-      return;
+      return null;
     }
-    if (fig.cup?.model !== vessel) {
-      if (fig.cup !== null) fig.cup.node.visible = false;
-      if (cupPending.has(vessel + fig.node.uuid)) return;
-      cupPending.add(vessel + fig.node.uuid);
-      void load(vessel).then((src) => {
-        cupPending.delete(vessel + fig.node.uuid);
-        if (src === null || disposed || fig.cup?.model === vessel) return;
-        if (fig.cup !== null) root.remove(fig.cup.node);
-        const node = src.scene.clone();
-        node.visible = false;
-        root.add(node);
-        fig.cup = { model: vessel, node };
+    if (fig.cup?.model === vessel) return fig.cup;
+    if (fig.cup !== null) fig.cup.node.visible = false;
+    if (cupPending.has(vessel + fig.node.uuid)) return null;
+    cupPending.add(vessel + fig.node.uuid);
+    const sip = view.content.settings.seating.sip;
+    void load(vessel).then((src) => {
+      cupPending.delete(vessel + fig.node.uuid);
+      if (src === null || disposed || fig.cup?.model === vessel) return;
+      const node = src.scene.clone();
+      const shape = vesselShape(node, sip);
+      if (shape === null) return;
+      if (fig.cup !== null) root.remove(fig.cup.node);
+      node.visible = false;
+      root.add(node);
+      let liquid: Object3D | undefined;
+      node.traverse((o) => {
+        if (o.name.endsWith('_liquid')) liquid ??= o;
       });
+      fig.cup = { model: vessel, node, shape, liquid };
+    });
+    return null;
+  };
+
+  /** Contenu de la tasse avant la gorgée en cours (ou la prochaine), suivi par figure. */
+  const fillOf = (
+    view: GameView,
+    fig: Figure,
+    drink: string | null,
+    g: CustomerGroup,
+    k: number,
+    nowSec: number,
+    sipping: boolean,
+  ): number => {
+    const seating = view.content.settings.seating;
+    if (drink !== fig.drinkOf) {
+      fig.drinkOf = drink;
+      fig.drinkSince = nowSec;
+    }
+    const n = sipCount(seating, g.id, k, fig.drinkSince, nowSec, sipDuration(seating.sip));
+    return fillBefore(seating.sip, sipping ? Math.max(0, n - 1) : n);
+  };
+
+  /**
+   * Geste de boire (`sipNow` déjà calculé): tête un peu en arrière, tasse tenue par l'anse
+   * (anse vers la main droite), montée bord aux lèvres, inclinée vers la bouche autour de la
+   * lèvre, puis reposée à plat en `rest` (sur la table, ou devant soi si `rest` est `null`:
+   * debout au zinc, assis par terre, la main la garde entre deux gorgées).
+   */
+  const drinkGesture = (
+    view: GameView,
+    fig: Figure,
+    drink: string | null,
+    rest: Vector3 | null,
+    rotY: number,
+  ): void => {
+    const s = view.content.settings.seating.sip;
+    fwd.set(Math.sin(rotY), 0, Math.cos(rotY));
+    right.set(-Math.cos(rotY), 0, Math.sin(rotY));
+    // Tête penchée en arrière: le menton monte (avant vers le haut).
+    axis.crossVectors(fwd, up).normalize();
+    tiltHead(fig.head, axis, sipNow.headDeg * DEG);
+    const cup = cupOf(view, fig, drink);
+    fig.grip ??=
+      fig.rightHand === undefined ? null : handFrame(fig.node, fig.rightHand, s.gripAlongHand);
+    if (cup === null || fig.grip === null || fig.face === undefined || fig.head === undefined) {
+      reachWithPole(fig.rightArm, fig.rightForeArm, fig.rightHand, wrist, pole, 0);
+      orientInWorld(fig.rightHand, handQ, 0);
+      if (cup !== null) cup.node.visible = false;
       return;
     }
-    const cup = fig.cup.node;
-    if (hand !== undefined && h > 0) {
-      hand.getWorldPosition(handAt);
-      handAt.y -= GRIP_DOWN;
-      handAt.x += Math.sin(rotY) * GRIP_AHEAD;
-      handAt.z += Math.cos(rotY) * GRIP_AHEAD;
+    if (rest === null) {
+      // Tenue devant soi, à hauteur du ventre, un peu à droite.
+      (fig.hips ?? fig.node).getWorldPosition(heldAt);
+      heldAt.y += s.heldAboveHips;
+      heldAt.addScaledVector(fwd, s.heldAhead).addScaledVector(right, s.heldRight);
+    } else heldAt.copy(rest);
+    // Anse vers la droite, tournée un peu vers l'avant; inclinaison autour de l'axe des épaules.
+    const a = s.handleForwardDeg * DEG;
+    const hx = right.x * Math.cos(a) + fwd.x * Math.sin(a);
+    const hz = right.z * Math.cos(a) + fwd.z * Math.sin(a);
+    yawQ.setFromAxisAngle(up, Math.atan2(-hz, hx));
+    cupQ.setFromAxisAngle(right, sipNow.tiltDeg * DEG).multiply(yawQ);
+    // Lèvres: au-dessus de `headfront` et devant le visage, dans le repère de la tête.
+    fig.face.getWorldPosition(lips);
+    fig.head.getWorldPosition(headAt);
+    fig.head.getWorldQuaternion(headQ);
+    faceFwd.copy(lips).sub(headAt).normalize();
+    headUp.set(0, 1, 0).applyQuaternion(headQ);
+    lips.addScaledVector(headUp, s.mouthUp).addScaledVector(faceFwd, s.mouthAhead);
+    // Point du bord posé sur la lèvre: côté visage, dans le repère de la tasse (avant penchée).
+    lipLocal.copy(fwd).negate().applyQuaternion(inverseQ.copy(yawQ).invert());
+    lipLocal.y = 0;
+    lipLocal.normalize().multiplyScalar(cup.shape.rimRadius);
+    lipLocal.y = cup.shape.rimY;
+    mouthCup.copy(lipLocal).applyQuaternion(cupQ).negate().add(lips);
+    const node = cup.node;
+    node.position.copy(heldAt).lerp(mouthCup, sipNow.lift);
+    node.quaternion.copy(cupQ);
+    // La main droite va à l'anse: poignet placé pour que l'anse soit au creux de la main.
+    handQuaternion(fig.grip, cupQ, handQ);
+    wristFor(fig.grip, cup.shape, node.position, cupQ, handQ, wrist);
+    fig.rightArm?.getWorldPosition(pole);
+    pole.addScaledVector(right, 0.35).addScaledVector(fwd, -0.15);
+    pole.y -= 0.6;
+    reachWithPole(fig.rightArm, fig.rightForeArm, fig.rightHand, wrist, pole, sipNow.hand);
+    orientInWorld(fig.rightHand, handQ, sipNow.hand);
+    // Tasse en main: elle suit la main réelle (bras trop court, coude retenu), sans écart.
+    if (sipNow.hand >= 0.999 && (sipNow.lift > 0 || rest === null) && fig.rightHand !== undefined) {
+      fig.rightHand.getWorldPosition(wrist);
+      fig.rightHand.getWorldQuaternion(handQ);
+      cupFromHand(fig.grip, cup.shape, wrist, handQ, cupQ, node.position);
     }
-    if (table === null || (hand !== undefined && h >= 1)) {
-      if (hand === undefined) {
-        cup.visible = false;
-        return;
-      }
-      cup.position.copy(handAt);
-    } else if (hand === undefined || h <= 0) cup.position.copy(table);
-    else cup.position.copy(table).lerp(handAt, h);
-    cup.rotation.set(0, rotY, 0);
-    cup.visible = true;
+    setLiquid(cup.liquid, cup.shape, sipNow.fill, sipNow.tiltDeg < s.liquidHideDeg);
+    node.visible = true;
   };
 
   /** Client sur la place d'un meuble: pose calme ou gorgée, tête, tasse. */
@@ -426,11 +527,11 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   ): void => {
     const seating = view.content.settings.seating;
     const drink = memberDrink(view.content.clientele, g, k);
-    const sipSec = fig.drinkSec * (SIP_TO - SIP_FROM);
     const sip =
-      drink === null || sipSec <= 0 ? null : sipTime(seating, g.id, k, nowMs / 1000, sipSec);
-    fig.blend.set(sip === null ? SIT_REST : 'sit_drink');
-    if (sip !== null) fig.blend.seek('sit_drink', fig.drinkSec * SIP_FROM + sip);
+      drink === null ? null : sipTime(seating, g.id, k, nowMs / 1000, sipDuration(seating.sip));
+    // Le corps reste dans la pose calme: seul le bras droit et la tête boivent (le clip
+    // `sit_drink` va chercher la tasse loin sur le côté et la monte au front).
+    fig.blend.set(SIT_REST);
     // Les deux poses n'ont pas le bassin au même endroit: on mêle les placements comme le
     // mélangeur mêle les clips, et les fesses restent sur l'assise pendant le fondu.
     const wd = fig.blend.weight('sit_drink');
@@ -460,7 +561,15 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
         hr.hipZ + (hd.hipZ - hr.hipZ) * t,
       );
     // En attendant (ou entre deux gorgées), un regard vers le voisin, sinon vers le comptoir.
-    const w = glanceWeight(seating, g.id, k, nowMs / 1000) * (1 - wd);
+    const fill = fillOf(view, fig, drink, g, k, nowMs / 1000, sip !== null);
+    if (sip === null) {
+      sipNow.hand = 0;
+      sipNow.lift = 0;
+      sipNow.tiltDeg = 0;
+      sipNow.headDeg = 0;
+      sipNow.fill = fill;
+    } else sipPose(seating.sip, sip, fill, sipNow);
+    const w = glanceWeight(seating, g.id, k, nowMs / 1000) * (1 - Math.max(wd, sipNow.hand));
     if (w <= 0.01) turnHead(fig.neck, 0);
     else {
       const other = k % 2 === 0 ? k + 1 : k - 1;
@@ -473,26 +582,8 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       const max = (seating.glanceMaxDeg * Math.PI) / 180;
       turnHead(fig.neck, Math.max(-max, Math.min(max, angle)) * w);
     }
-    // Tasse sur la table devant lui, dans sa main pendant la gorgée (montée et descente douces).
-    const table = cupSpot(view, g.seats[k], a);
-    let h = 0;
-    if (sip !== null) {
-      const edge = Math.min(1, Math.min(sip, sipSec - sip) / CUP_MOVE);
-      h = edge * edge * (3 - 2 * edge);
-    }
-    // La main porte la tasse à la bouche (le clip la monte au front chez certains modèles).
-    if (sip !== null && fig.face !== undefined && fig.head !== undefined) {
-      fig.head.getWorldQuaternion(headQ);
-      fig.face.getWorldPosition(mouthAt);
-      handAt.set(0, MOUTH_UP, 0).applyQuaternion(headQ);
-      mouthAt.add(handAt);
-      // Main voulue: la base de la tasse devant et sous les lèvres, plus la prise (voir placeCup).
-      mouthAt.x += Math.sin(rotY) * (SIP_CUP_AHEAD - GRIP_AHEAD);
-      mouthAt.z += Math.cos(rotY) * (SIP_CUP_AHEAD - GRIP_AHEAD);
-      mouthAt.y += GRIP_DOWN - SIP_CUP_BELOW;
-      reachTo(fig.rightArm, fig.rightForeArm, fig.rightHand, mouthAt, h);
-    } else reachTo(fig.rightArm, fig.rightForeArm, fig.rightHand, mouthAt, 0);
-    placeCup(view, fig, drink, fig.rightHand, table, table === null ? 1 : h, rotY);
+    // Tasse sur la table devant lui, dans sa main pendant la gorgée.
+    drinkGesture(view, fig, drink, cupSpot(view, g.seats[k], a), rotY);
   };
 
   /**
@@ -555,18 +646,28 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
             }
             // Au zinc ou à la fontaine: le geste de boire seulement avec sa boisson en main.
             const drink = seatAt.kind === 'walk' ? null : memberDrink(view.content.clientele, g, k);
+            // Le corps garde sa pose (debout, ou assis par terre); la main droite tient la tasse
+            // devant soi et la porte aux lèvres à chaque gorgée.
             const anim: Anim =
-              seatAt.kind === 'walk' || drink !== null
-                ? pose.anim
-                : seatAt.kind === 'ground'
-                  ? 'sit'
-                  : 'idle';
+              seatAt.kind === 'walk' ? pose.anim : seatAt.kind === 'ground' ? 'sit' : 'idle';
             if (anim === 'sit') fig.blend.set(SIT_REST);
             else play(fig, anim);
             fig.node.position.set(pose.x, 0, pose.z);
             fig.blend.update(frameDt);
-            const hand = seatAt.kind === 'zinc' ? fig.leftHand : fig.rightHand;
-            placeCup(view, fig, drink, hand, null, 1, rotY);
+            const seating = view.content.settings.seating;
+            const sip =
+              drink === null
+                ? null
+                : sipTime(seating, g.id, k, nowMs / 1000, sipDuration(seating.sip));
+            const fill = fillOf(view, fig, drink, g, k, nowMs / 1000, sip !== null);
+            if (sip === null) {
+              sipNow.lift = 0;
+              sipNow.tiltDeg = 0;
+              sipNow.headDeg = 0;
+              sipNow.fill = fill;
+            } else sipPose(seating.sip, sip, fill, sipNow);
+            sipNow.hand = drink === null ? 0 : 1;
+            drinkGesture(view, fig, drink, null, rotY);
             continue;
           }
           // Modèle en cours de chargement: rien plutôt qu'un substitut d'un instant.
