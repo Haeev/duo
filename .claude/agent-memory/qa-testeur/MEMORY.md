@@ -79,3 +79,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Sans verrouillage du pointeur, les `pointermove` synthétiques ne tournent pas la caméra: il faut d'abord un vrai clic sur la toile.
 - Deux navigateurs à deux vues WebGL logicielles en parallèle peuvent réveiller le chien de garde (« Le jeu ne répond plus »): une partie à la fois.
 - Le faux hôte ne reprend pas une partie en cours après la déconnexion de l'invité: arrêt chez l'hôte, relance depuis la sauvegarde.
+
+## Recette v0.2 de Deux Tabliers (vérifié le 2026-11-08)
+
+- Vraie sauvegarde d'une version passée: `git archive <commit> games/<jeu> | tar -x -C <tmp>`, lien `node_modules` vers celui du jeu, robot en Vitest dans la copie; les sauvegardes produites se versent dans `tests/donnees/`.
+- Journée accélérée (`secondsPerGameMinute` 0,05): `serviceSec` ne dépasse pas une soixantaine de secondes; un seuil « après 60 s de service » n'est jamais atteint.
+- Deux Tabliers: le stock peut différer de la somme des lots pendant un pas (tickets rendus après `reconcileLots`); contrôler un écart qui dure deux pas. La caisse peut être négative en journée, le report « à régler » (EC-06) ne se fait qu'au soir.
+- Faux hôte: une vue qui garde le verrouillage du pointeur reçoit aussi les clics faits sur l'autre vue (et donc les touches); `document.exitPointerLock()` dans les deux cadres avant de cliquer une vue. Filtrer les cadres du jeu par `url().startsWith('http://localhost:<port du jeu>')`: l'adresse de `deux-vues.html` contient aussi celle du jeu (`?jeu=`).
+- Écran du matin et bilan du soir de Deux Tabliers: modaux, Tab n'y ouvre pas le téléphone; une action marketing ne se lance qu'après « Commencer la journée » d'un seul joueur.
+- Sonde WebGL par `addInitScript` de contexte (programmes vivants, appels et triangles par image via `requestAnimationFrame`): s'applique aux cadres du jeu. En 1600x640, deux vues logicielles réveillent le chien de garde; 1280x520 passe.
+- Avant de publier un jeu: comparer `version` de `duo-game.json` aux étiquettes `jeu-<id>-v*` de `git ls-remote --tags origin`.
