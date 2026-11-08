@@ -58,8 +58,9 @@ Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta,
 - Demande du client: un café à ouvrir à deux, en vue à la première personne, d'une petite cellule de village jusqu'à Paris, avec des employés.
 - Fait: cadrage (`docs/jeux/cosy-cafe/cadrage.md`); cahier des charges 0.2 consolidé (`docs/jeux/cosy-cafe/cahier-des-charges.md`) avec sa simulation (34 h pour un duo médian, cinq adresses), plans des cinq adresses, bible artistique, direction sonore, parcours et maquettes de l'interface, technique et plafonds C1 à C26.
 - Fait: Meshy branché (serveur MCP, clé sur l'environnement cloud « duo »), fiche du studio `docs/production/meshy.md`, essai réel de bout en bout (62 crédits).
-- En cours: essai de style 3D du café du village, deux variantes (stylisé chaleureux, semi-réaliste), pour la question Q17.
-- Ensuite: décisions du client (Q1 à Q19), critères testables (qa-testeur), ADR de la vue subjective, puis prototype au café d'Ormeval.
+- Fait: titre « Deux Tabliers » et rendu semi-réaliste choisis par le client (Q1, Q17).
+- Fait (nuit du 2026-11-07 au 08): démo jouable v0.1.0 publiée dans le catalogue de Duo: 15 jours au café d'Ormeval (environ 4 h), service et gestes, clientèle et économie, aménagement et décoration, 11 événements, sons et radio. Recette de nuit: `docs/jeux/cosy-cafe/recette/2026-11-08-nuit.md`.
+- Ensuite: retours de la séance du client sur la démo, décisions restantes (Q2 à Q19), critères testables (qa-testeur), ADR de la vue subjective, puis prototype au café d'Ormeval.
 
 ## En attente du client
 
