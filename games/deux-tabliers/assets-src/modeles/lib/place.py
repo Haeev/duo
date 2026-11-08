@@ -41,6 +41,9 @@ ENDUITS = ["#D9C7A4", "#E0CDB0", "#D7B994", "#E3D3B8", "#CFB79A"]
 VOLETS = [SHUTTER, "#8DA08A", "#7F979B", "#9C6B5E", "#A3ADA8"]
 PORTES = ["#5E7A71", "#6B4B35", "#7F979B", "#4F5D6B", "#8E3A34"]
 
+# couronnes des arbres de la place, posées par `tilleul` et `arbre_simple`, construites par `feuillage` (objet à part)
+COURONNES = []
+
 
 def k(fam, tint="#FFFFFF"):
     return f"{fam}|{tint}"
@@ -441,7 +444,8 @@ def mairie_ecole(g, rng):
     porte(f, uc, 1.4, 2.8, "#4F5D6B", marches=0)
     for i in range(3):
         f.box(uc - 1.2 + i * 0.12, uc + 1.2 - i * 0.12, 0.3, 0.3 + 0.9 - i * 0.3, -0.3 + i * 0.16, -0.14 + i * 0.16, k("pierre", STONE_SHADE))
-    f.panel(uc - 1.2, uc + 1.2, 3.0, 3.32, 0.31, k("img:mairie@0,0.5,1,1"))
+    # « MAIRIE » gravé dans la frise de l'avant-corps, sous la corniche (lettres de 45 cm: lisibles de la terrasse)
+    f.panel(uc - 1.45, uc + 1.45, 6.4, 7.12, 0.31, k("img:mairie@0,0.7539,1,0.9922"))
     fenetre(f, uc, 4.1, 1.1, 2.0, rng, volet=None, cadre="#E6D8B8")
     f.box(uc - 0.8, uc + 0.8, 0.3, 0.75, 3.95, 4.05, k("pierre", STONE_LIGHT))
     for i in range(9):
@@ -463,8 +467,8 @@ def mairie_ecole(g, rng):
     for uu in (0.9, 2.4, f.length - 2.4, f.length - 0.9):
         fenetre(f, uu, 0.95, 1.0, 1.9, rng, volet=None, cadre="#E6D8B8", rideau=False)
         fenetre(f, uu, 4.2, 1.0, 1.7, rng, volet=None, cadre="#E6D8B8", rideau=True)
-    # inscription « ÉCOLE PUBLIQUE » sur l'aile sud, au-dessus des fenêtres
-    f.panel(f.length - 2.9, f.length - 0.4, 2.95, 3.32, 0.012, k("img:mairie@0,0,1,0.5"))
+    # « ÉCOLE PUBLIQUE » en cartouche sur deux lignes, entre les fenêtres de l'étage de l'aile sud et la corniche
+    f.panel(f.length - 3.15, f.length - 0.15, 6.0, 7.2, 0.012, k("img:mairie@0,0.3281,1,0.7266"))
     # plaque de la place (émaillée bleue), au coin nord
     f.panel(0.3, 0.95, 2.5, 2.8, 0.03, k("img:ecole@0,0,1,0.5"))
     # toit en croupe (simplifié: deux pans et deux croupes)
@@ -500,13 +504,17 @@ def mairie_ecole(g, rng):
 
 
 def arbre_simple(g, x, y, z, h, r, tint, rng, segs=10):
+    """Arbre de cour: tronc, trois charpentières, couronne de bouquets découpés (objet `feuillage`)."""
     g.cyl(x, y, z, z + h * 0.55, 0.16, 6, k("img:ecorce", "#8A7A68"), r_top=0.11)
-    for i in range(4):
-        a = rng.uniform(0, 2 * math.pi)
-        d = rng.uniform(0.2, 0.7) * r
-        g.sphere(x + math.cos(a) * d, y + math.sin(a) * d, z + h * 0.62 + rng.uniform(0, 0.25) * h, r * rng.uniform(0.55, 0.75),
-                 r * rng.uniform(0.55, 0.75), r * 0.6, k("img:feuillage", tint), segs=segs, rings=6)
-    g.sphere(x, y, z + h * 0.7, r, r, r * 0.8, k("img:feuillage", tint), segs=segs, rings=7)
+    tips = []
+    for i in range(3):
+        a = 2 * math.pi * i / 3 + rng.uniform(-0.3, 0.3)
+        tip = (x + math.cos(a) * r * 0.55, y + math.sin(a) * r * 0.55, z + h * 0.85)
+        g.rod((x, y, z + h * 0.5), tip, 0.08, 5, k("img:ecorce", "#8A7A68"), cap=False)
+        tips.append(tip)
+    COURONNES.append({"centre": (x, y, z + h * 0.78), "rx": r, "rys": r, "ryn": r, "rz": r * 0.75, "zmin": z + h * 0.5,
+                      "ymin": -1e9, "tips": tips + [(x, y, z + h * 0.78 + r * 0.6)], "n": 70, "r": (0.4, 0.7), "tint": tint,
+                      "seed": 37})
 
 
 def eglise(g, rng):
@@ -553,8 +561,25 @@ def eglise(g, rng):
                normal_hint=(0, -1, 0))
     for i in range(3):
         f.box(uc - 2.4 + 0.3 * i, uc + 2.4 - 0.3 * i, 0.0, 1.2 - 0.4 * i, -0.3 + 0.16 * i, -0.14 + 0.16 * i, k("pierre", STONE_SHADE))
-    # rosace
-    f.panel(uc - 1.1, uc + 1.1, 5.6, 7.8, 0.02, k("img:rosace@0,0.5,1,1"))
+    # rosace: disque à 24 pans pris dans le cercle de la case (pas de fond carré), entouré d'une moulure de pierre
+    zr, rr, rf = 6.7, 1.1, 1.26
+    ring = [(math.cos(2 * math.pi * i / 24), math.sin(2 * math.pi * i / 24)) for i in range(24)]
+    disc = []
+    for (c_, s_) in ring:
+        x, y = f.pt(uc + rr * c_, 0.02)
+        disc.append((x, y, zr + rr * s_))
+    g.quad(disc, k("img:rosace@0.2617,0.5117,0.7383,0.9883"), normal_hint=(0, -1, 0))
+    for i in range(24):
+        (c0, s0), (c1, s1) = ring[i], ring[(i + 1) % 24]
+        pts = []
+        for (r_, c_, s_) in ((rr - 0.02, c0, s0), (rf, c0, s0), (rf, c1, s1), (rr - 0.02, c1, s1)):
+            x, y = f.pt(uc + r_ * c_, 0.07)
+            pts.append((x, y, zr + r_ * s_))
+        g.quad(pts, k("pierre", STONE_LIGHT), normal_hint=(0, -1, 0))
+        pa, pb = f.pt(uc + rf * c0, 0.07), f.pt(uc + rf * c1, 0.07)
+        qa, qb = f.pt(uc + rf * c0, 0.0), f.pt(uc + rf * c1, 0.0)
+        g.quad([(qa[0], qa[1], zr + rf * s0), (qb[0], qb[1], zr + rf * s1), (pb[0], pb[1], zr + rf * s1), (pa[0], pa[1], zr + rf * s0)],
+               k("pierre", STONE_LIGHT), normal_hint=(-(c0 + c1) * 0.5, 0, (s0 + s1) * 0.5))
     g.cyl(*f.pt(uc, 0.0), 5.5, 5.62, 0.1, 4, k("pierre", STONE_LIGHT))
     # baies de la nef sur le côté est (vues depuis la place, en biais)
     for yy in (37.0, 41.0, 45.0):
@@ -646,42 +671,134 @@ def tilleul(g, rng):
         g.rod(b1, b3, 0.07, 5, k("img:ecorce", "#857B6E"), cap=False)
         branches += [b1, b2, b3]
     g.rod((tx, ty, z0 + 3.0), (tx + 0.1, ty + 0.2, z0 + 8.6), 0.2, 6, k("img:ecorce", "#857B6E"), cap=False)
-    # houppier: bouquets autour d'un ellipsoïde (centre décalé au sud), denses en surface, déformés par un bruit
-    cx, cy, cz = tx, ty + 0.5, z0 + 7.2
-    rx, rys, ryn, rz = 4.4, 4.6, 3.3, 3.3
-    pts = []
-    for i in range(84):
-        while True:
-            d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1)))
-            if 0.35 < d.length <= 1.0:
-                break
-        d = d / d.length * (0.78 + 0.22 * rng.random() ** 0.5)
-        ry = rys if d.y > 0 else ryn
-        p = (cx + d.x * rx, cy + d.y * ry, cz + d.z * rz)
-        if p[2] < z0 + 4.4:
-            p = (p[0], p[1], z0 + 4.4 + rng.uniform(0, 0.6))
-        pts.append((p, d))
+    # houppier: bouquets de feuillage découpé (objet à part, voir `feuillage`), groupés au bout des rameaux
+    COURONNES.append({"centre": (tx, ty + 0.5, z0 + 7.2), "rx": 4.4, "rys": 4.6, "ryn": 3.3, "rz": 3.3, "zmin": z0 + 4.3,
+                      "ymin": 14.1, "tips": branches + [(tx + 0.1, ty + 0.2, z0 + 8.6)], "n": 205, "r": (0.42, 0.78),
+                      "tint": TREE, "seed": 31})
+
+
+FEUILLAGE_TILE = 1.3  # mètres par tuile de la texture de feuillage découpé (feuilles de 7 à 9 cm)
+
+
+def _srgb(c):
+    return "#%02X%02X%02X" % tuple(max(0, min(255, int(round(v * 255)))) for v in c)
+
+
+def feuillage(sun_dir):
+    """Feuillage des arbres de la place, en un Geo sans lumière cuite: pour chaque couronne, des bouquets (icosphères
+    déformées par un bruit) groupés autour des bouts de rameaux, ce qui laisse des trouées de ciel entre les groupes; le
+    bord de chaque bouquet est découpé par la texture de feuillage (alpha). Lumière calculée ici, par sommet, en couleurs
+    de coin (`g.loop_cols`, sRGB): soleil (avec l'ombre portée des autres bouquets, par lancer de rayons), ciel, et
+    assombrissement vers le cœur de la couronne. UV en projection sur le plan dominant de chaque face (`g.loop_uvs`)."""
+    from mathutils.bvhtree import BVHTree
+    g = Geo("shell_village_place_foliage")
     bm = g.bm
-    for (p, d) in pts:
-        r = rng.uniform(0.85, 1.25) * (1.12 if d.z > 0.2 else 1.0)
-        res = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=r)
-        vs = res["verts"]
-        c = P(*p)
-        seed = Vector((rng.uniform(0, 100), rng.uniform(0, 100), rng.uniform(0, 100)))
+    sun = P(*sun_dir).normalized()
+    blobs = []
+    for cr in COURONNES:
+        rng = random.Random(cr["seed"])
+        cx, cy, cz = cr["centre"]
+        rx, rz = cr["rx"], cr["rz"]
+
+        def env(d, cr=cr):
+            return Vector((d.x * cr["rx"], d.y * (cr["rys"] if d.y > 0 else cr["ryn"]), d.z * cr["rz"]))
+
+        # groupes: bouts de rameaux ramenés vers l'enveloppe, plus quelques groupes au sommet et sur les flancs
+        groups = []
+        for t in cr["tips"]:
+            d = Vector((t[0] - cx, t[1] - cy, t[2] - cz))
+            if d.length < 1e-3:
+                d = Vector((0, 0, 1))
+            d.normalize()
+            groups.append(d)
+        while len(groups) < max(10, len(cr["tips"]) + 8):
+            d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-0.3, 1)))
+            if d.length > 0.2:
+                groups.append(d.normalized())
+        n_per = cr["n"] / len(groups)
+        for gi, gd in enumerate(groups):
+            m = int(n_per + (1 if rng.random() < n_per % 1 else 0))
+            for _ in range(m):
+                d = (gd + Vector((rng.gauss(0, 0.24), rng.gauss(0, 0.24), rng.gauss(0, 0.2)))).normalized()
+                e = 0.66 + 0.3 * rng.random() ** 0.6
+                o = env(d) * e
+                p = (cx + o.x, cy + o.y, cz + o.z)
+                if p[2] < cr["zmin"]:
+                    # dessous de la couronne: remonté par paliers irréguliers (pas de plafond plat)
+                    p = (p[0], p[1], cr["zmin"] + rng.uniform(0, 1.2))
+                if p[1] < cr["ymin"]:
+                    p = (p[0], cr["ymin"] + rng.uniform(0, 0.3), p[2])
+                r = rng.uniform(*cr["r"]) * (1.15 if d.z > 0.3 else 1.0)
+                blobs.append((P(*p), r, cr, Vector((rng.uniform(0, 100), rng.uniform(0, 100), rng.uniform(0, 100))), rng.random()))
+    # géométrie
+    spans = []
+    for (c, r, cr, seed, jit) in blobs:
+        # 80 faces (subdivisions=1 donne l'icosaèdre de 20 faces dans Blender 5); construite à part puis recopiée: dans le
+        # maillage commun, l'opérateur invalide des sommets déjà posés
+        tmp = bmesh.new()
+        bmesh.ops.create_icosphere(tmp, subdivisions=2, radius=r)
+        tmp.verts.index_update()
+        vs = [bm.verts.new(v.co) for v in tmp.verts]
+        for tf in tmp.faces:
+            bm.faces.new([vs[v.index] for v in tf.verts])
+        tmp.free()
         for v in vs:
             n = v.co.normalized()
-            disp = 0.3 * noise.noise(n * 2.2 + seed) + 0.12 * noise.noise(n * 5.0 + seed)
-            v.co = c + Vector((n.x * r * (1 + disp), n.y * r * (1 + disp), n.z * r * 0.82 * (1 + disp)))
-        faces = list({f for v in vs for f in v.link_faces})
-        for f in faces:
-            f.normal_update()
-            f.smooth = True
-            up = f.normal.z
-            out = (f.calc_center_median() - P(cx, cy, cz)).normalized().dot(f.normal)
-            lum = 1.0 + 0.25 * max(0.0, up) + 0.1 * out - (0.08 if p[2] < cz - 1.0 else 0) + rng.uniform(-0.06, 0.06)
-            hexs = _scale_hex(TREE, lum, warm=0.05 * max(0.0, up))
-            f.material_index = g.mi(k("img:feuillage", hexs))
-        bmesh.ops.recalc_face_normals(bm, faces=faces)
+            disp = 0.28 * noise.noise(n * 2.2 + seed) + 0.12 * noise.noise(n * 5.0 + seed)
+            v.co = c + Vector((n.x * r * (1 + disp), n.y * r * (1 + disp), n.z * r * 0.85 * (1 + disp)))
+        spans.append((vs, c, cr, jit))
+    bm.faces.ensure_lookup_table()
+    for f in bm.faces:
+        f.material_index = g.mi(k("feuillage", "#FFFFFF"))
+        f.smooth = True
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.normal_update()
+    tree = BVHTree.FromBMesh(bm)
+    # lumière par sommet
+    shade = {}
+    for (vs, c, cr, jit) in spans:
+        cc = P(*cr["centre"])
+        base = Vector([int(cr["tint"][i:i + 2], 16) / 255 for i in (1, 3, 5)])
+        for v in vs:
+            n = (v.co - c).normalized()
+            lam = max(0.0, n.dot(sun))
+            vis = 0.0
+            if lam > 0:
+                for off in ((0, 0, 0), (0.15, 0.1, 0.0), (-0.1, -0.15, 0.1)):
+                    o = v.co + n * 0.06 + Vector(off)
+                    hit = tree.ray_cast(o, sun, 12.0)
+                    if hit[0] is None:
+                        vis += 1 / 3
+                    elif hit[3] > 2.5:
+                        vis += 0.12  # ombre légère d'un bouquet lointain (le feuillage laisse passer le jour)
+            q = v.co - cc
+            dz = cr["rz"]
+            ell = math.sqrt((q.x / cr["rx"]) ** 2 + (q.y / max(cr["rys"], cr["ryn"])) ** 2 + (q.z / dz) ** 2)
+            ao = max(0.35, min(1.0, 0.25 + 0.85 * ell)) * (0.85 + 0.15 * max(0.0, n.z))
+            sky = 0.55 + 0.25 * n.z
+            light = ao * (0.42 * sky + 0.95 * lam * vis)
+            warm = 0.07 * lam * vis
+            col = (min(1, base.x * (0.55 + 1.1 * light) + warm), min(1, base.y * (0.52 + 1.05 * light) + warm * 0.7),
+                   min(1, base.z * (0.5 + light) * 0.92))
+            col = tuple(cc_ * (0.94 + 0.12 * jit) for cc_ in col)
+            shade[v] = _srgb(col)
+    # UV (projection sur le plan dominant, continue d'une face à l'autre, décalage par bouquet) et couleurs de coin
+    blob_of = {}
+    for bi, (vs, c, cr, jit) in enumerate(spans):
+        for v in vs:
+            blob_of[v] = (bi, jit)
+    g.loop_uvs, g.loop_cols = [], []
+    for f in bm.faces:
+        nrm = f.normal
+        ax = max(range(3), key=lambda i: abs(nrm[i]))
+        bi, jit = blob_of[f.verts[0]]
+        ou, ov = (bi * 0.618) % 1.0, (bi * 0.382 + jit) % 1.0
+        for lp in f.loops:
+            co = lp.vert.co
+            a, b = [(co.y, co.z), (co.x, co.z), (co.x, co.y)][ax]
+            g.loop_uvs.append((a / FEUILLAGE_TILE + ou, b / FEUILLAGE_TILE + ov))
+            g.loop_cols.append(shade[lp.vert])
+    return g
 
 
 def _scale_hex(h, s, warm=0.0):
@@ -761,6 +878,7 @@ def place(rng=None):
     """Toute la place cuite, en un Geo (un objet, un matériau par famille)."""
     rng = rng or random.Random(11)
     g = Geo("shell_village_place")
+    COURONNES.clear()
     sol(g)
     maison_du_cafe(g, rng)
     ruelle(g, rng)
@@ -793,7 +911,7 @@ def place(rng=None):
 def _shade(hexs, nrm, sun, haze, fog="#B7B3B4"):
     """Couleur d'une face du lointain: lambert doux vers le soleil, voile de l'air vers la couleur de l'horizon."""
     r, gg, b = (int(hexs[i:i + 2], 16) / 255 for i in (1, 3, 5))
-    lam = 0.62 + 0.45 * max(0.0, nrm.dot(sun))
+    lam = 0.5 + 0.42 * max(0.0, nrm.dot(sun))
     fr, fg, fb = (int(fog[i:i + 2], 16) / 255 for i in (1, 3, 5))
     r, gg, b = r * lam, gg * lam, b * lam
     r, gg, b = r * (1 - haze) + fr * haze, gg * (1 - haze) + fg * haze, b * (1 - haze) + fb * haze
@@ -816,6 +934,9 @@ def lointain(sun_dir, rng=None):
         w, dd, h = rng.uniform(6, 10), rng.uniform(6, 9), rng.uniform(5.5, 8.5)
         base = rng.choice(ENDUITS + [STONE, STONE])
         haze = min(0.4, (d - 30) / 50)
+        # la route départementale continue vers l'ouest et l'est: aucune maison en travers (couloir y 17,5 à 26,5)
+        if (x < -18 or x > 33) and y + dd / 2 > 17.5 and y - dd / 2 < 26.5:
+            continue
         before = len(g.bm.faces)
         g.box(x - w / 2, x + w / 2, y - dd / 2, y + dd / 2, -0.5, h, k("lointain", base), bevel=0, drop=("bottom",))
         axis = "x" if rng.random() < 0.5 else "y"
@@ -834,6 +955,7 @@ def lointain(sun_dir, rng=None):
                        k("lointain", ROOF), normal_hint=(sg, 0, 1))
             for yy, sg in ((y - dd / 2, -1), (y + dd / 2, 1)):
                 g.quad([(x - w / 2, yy, h), (x + w / 2, yy, h), (x, yy, hr)], k("lointain", base), normal_hint=(0, sg, 0))
+        _fenetres_lointain(g, x, y, w, dd, h, centre)
         _haze_faces(g, before, sun, haze)
         # quelques arbres de jardin entre les toits
         if i % 3 == 0:
@@ -841,6 +963,26 @@ def lointain(sun_dir, rng=None):
             tx, ty = centre[0] + math.cos(a + 0.06) * (d - 6), centre[1] + math.sin(a + 0.06) * (d - 6)
             g.sphere(tx, ty, 5.0, 3.0, 3.0, 3.2, k("lointain", "#5F7F4A"), segs=8, rings=5, smooth=False)
             _haze_faces(g, before, sun, haze)
+    # la route au-delà de la place (ouest et est), ses accotements, et les maisons qui la bordent, pignon ou façade sur rue
+    for (xa, xb) in ((-52.0, -29.5), (39.5, 60.0)):
+        before = len(g.bm.faces)
+        g.quad([(xa, 19.36, -0.29), (xb, 19.36, -0.29), (xb, 24.4, -0.29), (xa, 24.4, -0.29)], k("lointain", "#7C766C"), normal_hint=(0, 0, 1))
+        for (ya, yb) in ((17.0, 19.36), (24.4, 27.0)):
+            g.quad([(xa, ya, -0.22), (xb, ya, -0.22), (xb, yb, -0.22), (xa, yb, -0.22)], k("lointain", "#8E8A6E"), normal_hint=(0, 0, 1))
+        _haze_faces(g, before, sun, 0.2)
+    for (x, y, w, dd, h, side, base) in ((-35.0, 13.2, 7.0, 6.5, 6.6, "s", "#C9B48E"), (-42.0, 14.0, 6.0, 7.0, 7.2, "s", STONE),
+                                         (-38.5, 30.2, 8.0, 6.5, 6.2, "n", "#CDB89A"), (46.0, 14.2, 7.0, 6.0, 6.8, "s", "#CFB79A"),
+                                         (52.0, 30.0, 7.0, 6.5, 6.4, "n", STONE)):
+        before = len(g.bm.faces)
+        g.box(x - w / 2, x + w / 2, y - dd / 2, y + dd / 2, -0.5, h, k("lointain", base), bevel=0, drop=("bottom",))
+        hr = h + dd / 2 * math.tan(math.radians(33))
+        for (ya, sg) in ((y - dd / 2 - 0.3, -1), (y + dd / 2 + 0.3, 1)):
+            g.quad([(x - w / 2 - 0.2, ya, h - 0.2), (x + w / 2 + 0.2, ya, h - 0.2), (x + w / 2 + 0.2, y, hr), (x - w / 2 - 0.2, y, hr)],
+                   k("lointain", ROOF), normal_hint=(0, sg, 1))
+        for xx, sg in ((x - w / 2, -1), (x + w / 2, 1)):
+            g.quad([(xx, y - dd / 2, h), (xx, y + dd / 2, h), (xx, y, hr)], k("lointain", base), normal_hint=(sg, 0, 0))
+        _fenetres_lointain(g, x, y, w, dd, h, (x, 21.9))
+        _haze_faces(g, before, sun, min(0.4, (abs(x - 7.5) - 30) / 50))
     # collines: deux anneaux de crêtes (coteau boisé proche, collines bleutées loin), bas sous le sol
     for (rad, hmin, hmax, col, haze, n) in ((54.0, 7.0, 16.0, "#5E7448", 0.35, 48), (64.0, 10.0, 22.0, "#71837A", 0.6, 40)):
         before = len(g.bm.faces)
@@ -858,6 +1000,29 @@ def lointain(sun_dir, rng=None):
             g.quad([ia, ib, b, a], k("lointain", col), normal_hint=(-mx, -my, 0.3))
         _haze_faces(g, before, sun, haze)
     return g
+
+
+def _fenetres_lointain(g, x, y, w, dd, h, centre):
+    """Fenêtres et volets des maisons du lointain, sur les murs tournés vers la place (ou la route): sans elles, un mur
+    d'enduit clair au soleil se lit comme une boîte blanche."""
+    for (nx, ny, line, a, b) in ((1, 0, x + w / 2, y - dd / 2, y + dd / 2), (-1, 0, x - w / 2, y - dd / 2, y + dd / 2),
+                                 (0, 1, y + dd / 2, x - w / 2, x + w / 2), (0, -1, y - dd / 2, x - w / 2, x + w / 2)):
+        if nx * (centre[0] - x) + ny * (centre[1] - y) <= 0:
+            continue
+        bays = max(2, int((b - a) / 2.6))
+        for fl in range(2 if h > 5.8 else 1):
+            z0 = 1.0 + fl * 2.8
+            for i in range(bays):
+                u = a + (b - a) * (i + 0.5) / bays
+                for (du, col) in ((0.0, "#3E4044"), (-0.78, "#6F8588"), (0.78, "#6F8588")):
+                    hw = 0.42 if du == 0 else 0.34
+                    u0, u1 = u + du - hw, u + du + hw
+                    off = 0.03 if du == 0 else 0.04
+                    if nx:
+                        pts = [(line + nx * off, u0, z0), (line + nx * off, u1, z0), (line + nx * off, u1, z0 + 1.35), (line + nx * off, u0, z0 + 1.35)]
+                    else:
+                        pts = [(u0, line + ny * off, z0), (u1, line + ny * off, z0), (u1, line + ny * off, z0 + 1.35), (u0, line + ny * off, z0 + 1.35)]
+                    g.quad(pts, k("lointain", col), normal_hint=(nx, ny, 0))
 
 
 def _haze_faces(g, start, sun, haze):

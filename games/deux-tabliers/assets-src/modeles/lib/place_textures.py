@@ -281,15 +281,33 @@ def enseigne_boulangerie():
     return im
 
 
+def _fit(d, txt, box, sans=False):
+    """Police la plus grande qui tient dans la boîte (largeur, hauteur) en pixels."""
+    size = 8
+    while True:
+        f = _font(size + 2, sans)
+        bb = d.textbbox((0, 0), txt, font=f)
+        if bb[2] - bb[0] > box[0] or bb[3] - bb[1] > box[1]:
+            return _font(size, sans)
+        size += 2
+
+
+def _grave(d, cx, cy, txt, font):
+    """Lettres gravées: ombre claire décalée vers le bas, lettre sombre."""
+    _text_center(d, cx + 2, cy + 3, txt, font, (250, 244, 230))
+    _text_center(d, cx, cy, txt, font, (78, 66, 52))
+
+
 def mairie():
-    """Inscription gravée MAIRIE (haut) et ÉCOLE PUBLIQUE (bas) sur pierre claire."""
+    """Inscriptions gravées sur pierre claire, aux proportions des panneaux de la façade (lettres pleine hauteur):
+    lignes 4 à 126 « MAIRIE » (panneau de 2,90 x 0,72 m), lignes 140 à 344 « ÉCOLE / PUBLIQUE » (3,00 x 1,20 m)."""
     im, d = _canvas("#E6DCC6")
-    d.rectangle([8, 8, N - 8, 248], outline=(196, 182, 156), width=6)
-    _text_center(d, N / 2 + 2, 130, "MAIRIE", _font(96), (250, 244, 230))
-    _text_center(d, N / 2, 128, "MAIRIE", _font(96), (90, 78, 62))
-    d.rectangle([8, 264, N - 8, N - 8], outline=(196, 182, 156), width=6)
-    _text_center(d, N / 2, 352, "ÉCOLE", _font(84), (90, 78, 62))
-    _text_center(d, N / 2, 448, "PUBLIQUE", _font(50), (90, 78, 62))
+    d.rectangle([4, 4, N - 5, 126], outline=(190, 176, 150), width=5)
+    _grave(d, N / 2, 66, "MAIRIE", _fit(d, "MAIRIE", (N - 60, 84)))
+    d.rectangle([4, 140, N - 5, 344], outline=(190, 176, 150), width=5)
+    f = _fit(d, "PUBLIQUE", (N - 50, 78))
+    _grave(d, N / 2, 196, "ÉCOLE", f)
+    _grave(d, N / 2, 292, "PUBLIQUE", f)
     return im
 
 
@@ -347,6 +365,48 @@ def feuillage(seed=117):
         d.polygon(pts, fill=c)
         d.line([(x, y), (x + s * 0.8 * math.cos(a + math.pi), y + s * 0.8 * math.sin(a + math.pi) * 0.8)], fill=(int(190 * lum), int(210 * lum), int(150 * lum)), width=2)
     return im.filter(ImageFilter.GaussianBlur(0.6))
+
+
+def feuillage_decoupe(seed=131, n=512):
+    """Feuillage découpé des arbres (RGBA, tuile de 1,3 m, répétée): feuilles de tilleul en cœur de 7 à 9 cm, en
+    rameaux serrés; alpha 1 sur les feuilles (environ 70 % de la surface, de sorte que les mipmaps restent pleines à
+    distance), trous entre les rameaux. Clair et peu saturé: la couleur et la lumière viennent des sommets."""
+    rng = np.random.default_rng(seed)
+    big = 2 * n
+    im = Image.new("RGBA", (big, big), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+
+    def leaf(x, y, s, a, lum):
+        c = (int(214 * lum), int(236 * lum), int(178 * lum), 255)
+        pts = []
+        for kk in range(16):
+            t = kk / 16 * 2 * math.pi
+            r = s * (0.55 + 0.45 * abs(math.sin(t / 2)) ** 0.5) * (1 - 0.25 * max(0, math.cos(t)))
+            pts.append((x + r * math.cos(t + a), y + r * math.sin(t + a) * 0.8))
+        for (ox, oy) in ((0, 0), (-big, 0), (big, 0), (0, -big), (0, big)):
+            d.polygon([(px + ox, py + oy) for px, py in pts], fill=c)
+            d.line([(x + ox, y + oy), (x + ox + s * 0.8 * math.cos(a + math.pi), y + oy + s * 0.8 * math.sin(a + math.pi) * 0.8)],
+                   fill=(int(170 * lum), int(192 * lum), int(140 * lum), 255), width=3)
+
+    # rameaux: chaque grappe de feuilles part d'un point et s'étale dans une direction
+    for _ in range(130):
+        x0, y0 = rng.uniform(0, big), rng.uniform(0, big)
+        a0 = rng.uniform(0, 2 * math.pi)
+        for j in range(int(rng.integers(9, 15))):
+            t = j * rng.uniform(14, 20)
+            x = x0 + math.cos(a0) * t + rng.normal(0, 14)
+            y = y0 + math.sin(a0) * t + rng.normal(0, 14)
+            leaf(x % big, y % big, rng.uniform(26, 36), a0 + rng.normal(0, 0.9), rng.uniform(0.7, 1.0))
+    im = im.resize((n, n), Image.LANCZOS)
+    a = np.array(im).astype(np.float64)
+    alpha = a[..., 3]
+    # alpha net (découpe) et couleur prolongée sous les trous (pas de liseré sombre au filtrage)
+    mask = alpha > 110
+    rgb_ = a[..., :3] / np.maximum(alpha[..., None], 1) * 255
+    fill = np.array([150, 170, 126], dtype=np.float64)
+    rgb_ = np.where(mask[..., None], np.clip(rgb_, 0, 255), fill)
+    out = np.dstack([rgb_, np.where(mask, 255, 0)]).astype(np.uint8)
+    return Image.fromarray(out, "RGBA"), float(mask.mean())
 
 
 def ecorce(seed=119):
@@ -527,6 +587,11 @@ def construire(dossier, sun_az_deg, sun_el_deg):
     p = os.path.join(dossier, "place_atlas.jpg")
     construire_atlas(p)
     out["place_atlas"] = p
+    p = os.path.join(dossier, "place_feuillage.png")
+    im, couverture = feuillage_decoupe()
+    im.quantize(colors=64, method=Image.Quantize.FASTOCTREE).save(p, optimize=True)
+    out["place_feuillage"] = p
+    out["place_feuillage_couverture"] = couverture
     p = os.path.join(dossier, "place_ciel.jpg")
     _save(ciel(sun_az_deg, sun_el_deg), p, quality=90)
     out["place_ciel"] = p

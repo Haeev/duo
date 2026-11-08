@@ -596,7 +596,7 @@ def ao_blanc(objs):
 URIS = {"meubles_atlas": "textures/meubles_atlas.jpg", "meubles_orm": "textures/meubles_orm.png"}
 
 
-def exporter_glb(objs, chemin, extras=None, externes=True):
+def exporter_glb(objs, chemin, extras=None, externes=True, patch=None):
     bpy.ops.object.select_all(action="DESELECT")
     for o in objs:
         o.select_set(True)
@@ -621,7 +621,7 @@ def exporter_glb(objs, chemin, extras=None, externes=True):
         ext_file = next((f for f in sorted(os.listdir(TEXDIR)) if os.path.splitext(f)[0] == base), None) if os.path.isdir(TEXDIR) else None
         if externes and ext_file:
             im["uri"] = "textures/" + ext_file
-            im["mimeType"] = "image/jpeg" if ext_file.endswith(".jpg") else "image/png"
+            im["mimeType"] = "image/jpeg" if ext_file.endswith((".jpg", ".jpeg")) else "image/png"
         else:
             # image propre au modèle: on l'embarque
             with open(os.path.join(tmp, im["uri"]), "rb") as fh:
@@ -634,6 +634,8 @@ def exporter_glb(objs, chemin, extras=None, externes=True):
             im["mimeType"] = "image/png" if im["uri"].endswith(".png") else "image/jpeg"
             im.pop("uri")
     g["buffers"][0]["byteLength"] = len(data)
+    if patch is not None:
+        patch(g)
     js = json.dumps(g, separators=(",", ":")).encode()
     while len(js) % 4:
         js += b" "

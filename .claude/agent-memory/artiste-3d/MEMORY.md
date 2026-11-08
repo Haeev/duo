@@ -248,3 +248,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - UV des cases d'atlas: base (t = up x n, b = n x t) par face; texte lisible de dehors sans cas particulier. Feuillage et écorce: fenêtre de la case à l'échelle (1,4 m par case), sinon feuilles de 2 cm.
 - Houppier: une trentaine de grosses icosphères (subdiv 2) se lit en brocoli sombre (auto-ombrage cuit). Mieux: 80 à 90 bouquets plus petits (subdiv 1, déplacés par `mathutils.noise`), près de la surface, teintes claires.
 - Visionneuse `verifier/vue/`: charge aussi la place (paramètre `far` du plan lointain, 80 m comme le jeu).
+
+## Deux Tabliers, finitions de la place (vérifié le 2026-11-08)
+
+- Blender 5: `bmesh.ops.create_icosphere(subdivisions=1)` donne l'icosaèdre de 20 faces (2 = 80 faces). Dans un bmesh déjà garni, subdivisions=2 invalide des sommets posés avant (ReferenceError): construire la sphère dans un bmesh à part puis recopier.
+- Feuillage découpé: objet à part non cuit (`dt_feuillage`, lumière par sommet calculée par script avec lancer de rayons BVHTree vers le soleil), alpha de la texture branché sur Alpha pour des ombres tachetées dans la cuisson; alphaMode MASK posé par un `patch` de `commun.exporter_glb` (l'exporteur écrirait BLEND). Couverture de la texture vers 80 %: les mipmaps restent pleines au loin.
+- Panneau d'atlas (inscription, rosace): garder les proportions du panneau égales à celles de la zone de texture, sinon lettres écrasées illisibles; rosace en disque à 24 pans pris dans le cercle de la case (plus de carré de fond).
+- Compression avec textures externes partagées: `assets-src/modeles/quantifier.cjs` (gltf-transform 4 par API, GLB réassemblé à la main pour garder `uri: textures/...`). `dedup({propertyTypes:['ACCESSOR']})` est refusé en 4.5: `dedup()` seul. Les UV répétées hors [0,1] ne sont pas quantifiées (message « Skipping TEXCOORD_0 »), sans gravité.
+- `coque.py` complet: 4 min 30 (cuisson 48 échantillons, 2048 px).

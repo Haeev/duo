@@ -3,7 +3,7 @@
  * (x et z du plan), éclairée par sa carte de lumière (occlusion sur TEXCOORD_1 dans le GLB,
  * rebranchée en `lightMap`, intensité `lightmap_scale` × π, × 0,42 pour la rue et la cour). La place du
  * Tilleul (`shell_village_place.glb`) a sa propre carte et son propre `lightmap_scale`; son ciel et son
- * lointain (`dt_ciel`) sont sans lumière.
+ * lointain (`dt_ciel`) et le feuillage découpé des arbres (`dt_feuillage`) sont sans lumière.
  * Les matériaux de la coque passent en `MeshBasicMaterial`: la lumière est déjà cuite, les
  * lumières de la scène n'éclairent que meubles et personnages (moins de programmes, rien de
  * surexposé). Une fois la coque là, une capture de la salle sert d'environnement aux métaux.
@@ -100,6 +100,19 @@ function bake(root: Object3D, scale: number, owned: { dispose(): void }[]): void
       owned.push(sky);
       o.material = sky;
       o.frustumCulled = false;
+      return;
+    }
+    if (m.name === 'dt_feuillage' && m instanceof MeshStandardMaterial) {
+      // Feuillage découpé des arbres de la place: lumière dans les couleurs de sommets, alpha en
+      // découpe (alphaMode MASK du GLB), sans tri ni transparence.
+      const leaves = new MeshBasicMaterial({
+        name: m.name,
+        map: m.map,
+        vertexColors: true,
+        alphaTest: m.alphaTest > 0 ? m.alphaTest : 0.5,
+      });
+      owned.push(leaves);
+      o.material = leaves;
       return;
     }
     if (!(m instanceof MeshStandardMaterial) || m.aoMap === null) return;

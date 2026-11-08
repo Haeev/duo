@@ -578,6 +578,62 @@ def finir_place(g, nom, far=None):
     return ob
 
 
+def finir_feuillage(g):
+    """Objet du feuillage découpé (lib/place.py `feuillage`): UV et couleurs de coin calculées par le script, matériau
+    `dt_feuillage` (texture RGBA, alpha en découpe: alphaMode MASK posé à l'export), sans carte de lumière. Il porte
+    ses ombres (tachetées par l'alpha) dans la cuisson de la place."""
+    me = bpy.data.meshes.new(g.name)
+    g.bm.to_mesh(me)
+    g.bm.free()
+    uv = me.uv_layers.new(name="UVMap")
+    flat = [c for t in g.loop_uvs for c in t]
+    uv.data.foreach_set("uv", flat)
+    att = me.color_attributes.new("ao", "BYTE_COLOR", "CORNER")
+    cache = {}
+    cols = []
+    for h in g.loop_cols:
+        if h not in cache:
+            cache[h] = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)] + [1.0]
+        cols.extend(cache[h])
+    att.data.foreach_set("color_srgb", cols)
+    me.color_attributes.active_color = att
+    me.color_attributes.render_color_index = 0
+    m = bpy.data.materials.new("dt_feuillage")
+    m.use_backface_culling = True
+    nt = m.node_tree
+    b = nt.nodes["Principled BSDF"]
+    t = nt.nodes.new("ShaderNodeTexImage")
+    t.image = bpy.data.images.load(os.path.join(K.TEXDIR, "place_feuillage.png"), check_existing=True)
+    t.interpolation = "Linear"
+    ca = nt.nodes.new("ShaderNodeVertexColor")
+    ca.layer_name = "ao"
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    mix["teinte_sommets"] = 1
+    nt.links.new(t.outputs["Color"], mix.inputs["A"])
+    nt.links.new(ca.outputs["Color"], mix.inputs["B"])
+    nt.links.new(mix.outputs["Result"], b.inputs["Base Color"])
+    nt.links.new(t.outputs["Alpha"], b.inputs["Alpha"])
+    b.inputs["Roughness"].default_value = 0.8
+    me.materials.append(m)
+    for poly in me.polygons:
+        poly.use_smooth = True
+    ob = bpy.data.objects.new(g.name, me)
+    bpy.context.scene.collection.objects.link(ob)
+    return ob
+
+
+def _patch_feuillage(gltf):
+    """Découpe du feuillage: alphaMode MASK (l'exporteur écrirait BLEND, trié et sans écriture de profondeur)."""
+    for mat in gltf.get("materials", []):
+        if mat.get("name") == "dt_feuillage":
+            mat["alphaMode"] = "MASK"
+            mat["alphaCutoff"] = 0.5
+            mat.pop("doubleSided", None)
+
+
 def remap_keys(g):
     g.keys = [KEYMAP.get(k, k) for k in g.keys]
 
@@ -620,6 +676,7 @@ def main():
     sun_plan = (math.sin(az) * math.cos(el), -math.cos(az) * math.cos(el), math.sin(el))
     place = finir_place(PL.place(), "shell_village_place")
     sky = finir_place(PL.ciel(), "shell_village_sky", far=PL.lointain(sun_plan))
+    fol = finir_feuillage(PL.feuillage(sun_plan))
     print(f"géométrie: {time.time() - t0:.0f} s")
     baked = [o for n, o in objs.items() if n not in ("vitrages", "glow")]
     # seconde UV (carte de lumière) sur tout ce qui est cuit
@@ -732,13 +789,18 @@ def main():
         Kc = float(np.percentile(used, 99.7)) if used.size else 1.0
         enc = K.l2s(np.clip(a / Kc, 0, 1))
         from PIL import Image
-        Image.fromarray((np.flipud(enc) * 255 + 0.5).astype(np.uint8)).save(png, optimize=True)
+        im8 = Image.fromarray((np.flipud(enc) * 255 + 0.5).astype(np.uint8))
+        if png.endswith(".jpg"):
+            im8.save(png, quality=95, subsampling=0, optimize=True)
+        else:
+            im8.save(png, optimize=True)
         return Kc
 
     lm_name = "shell_village_lightmap"
     lm_png = os.path.join(K.TEXDIR, lm_name + ".png")
     place_lm_name = "shell_village_place_lightmap"
-    place_lm_png = os.path.join(K.TEXDIR, place_lm_name + ".png")
+    # carte de la place en JPEG (qualité 95, chrominance pleine): trois fois plus légère que le PNG, sans artefact visible
+    place_lm_png = os.path.join(K.TEXDIR, place_lm_name + ".jpg")
     meta_p = os.path.join(args.travail, "lightmap.json")
     if not args.sans_cuisson:
         sc.render.engine = "CYCLES"
@@ -778,6 +840,12 @@ def main():
     else:
         meta = json.load(open(meta_p))
     sky.hide_render = False
+    # feuillage: texture seule en couleur de base à l'export (ses couleurs de sommets partent en COLOR_0)
+    fnt = fol.material_slots[0].material.node_tree
+    fmix = next(n for n in fnt.nodes if n.get("teinte_sommets"))
+    ftex = next(n for n in fnt.nodes if n.type == "TEX_IMAGE")
+    fnt.links.new(ftex.outputs["Color"], fnt.nodes["Principled BSDF"].inputs["Base Color"])
+    fnt.nodes.remove(fmix)
 
     # branchement de la carte de lumière: occlusion glTF sur la seconde UV
     lm_img = bpy.data.images.load(lm_png, check_existing=True)
@@ -828,19 +896,21 @@ def main():
     glow = objs["glow"]
     ferme = objs["fond_ferme"]
     fond = joindre([objs["fond"], objs["cour"]], "shell_village_ext_fond")
-    for o in (shell, glass, glow, ferme, fond, place, sky):
+    for o in (shell, glass, glow, ferme, fond, place, sky, fol):
         o.data.uv_layers.active_index = 0
     K.ao_blanc([shell, glass, glow, ferme, fond])
     for o in (shell, ferme, fond):
         o["lightmap_scale"] = meta["lightmap_scale"]
-    for o in (place, sky):
+    for o in (place, sky, fol):
         o["lightmap_scale"] = meta["place_lightmap_scale"]
     fiches = {}
     for nom, objs_, lmk, lmn in (("shell_village", [shell, glass, glow, ferme], "lightmap_scale", lm_name),
                                  ("shell_village_ext_fond", [fond], "lightmap_scale", lm_name),
-                                 ("shell_village_place", [place, sky], "place_lightmap_scale", place_lm_name)):
+                                 ("shell_village_place", [place, sky, fol], "place_lightmap_scale", place_lm_name)):
         path = os.path.join(K.ASSETS, nom + ".glb")
-        size = K.exporter_glb(objs_, path, extras={"lightmap_scale": meta[lmk], "lightmap": f"textures/{lmn}.png"})
+        lmf = os.path.basename(place_lm_png) if lmn == place_lm_name else lmn + ".png"
+        size = K.exporter_glb(objs_, path, extras={"lightmap_scale": meta[lmk], "lightmap": f"textures/{lmf}"},
+                              patch=_patch_feuillage)
         fiches[nom] = {"id": nom, "fichier": nom + ".glb", "poids_octets": size,
                        "triangles": {o.name: K.tris(o) for o in objs_},
                        "materiaux": sorted({s.material.name for o in objs_ for s in o.material_slots})}

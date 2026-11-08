@@ -36,6 +36,8 @@ function lumiereCuite(racine) {
     } else if (m.name === 'dt_ciel') {
       o.material = new THREE.MeshBasicMaterial({ map: m.map, vertexColors: true, fog: false });
       o.frustumCulled = false;
+    } else if (m.name === 'dt_feuillage') {
+      o.material = new THREE.MeshBasicMaterial({ map: m.map, vertexColors: true, alphaTest: m.alphaTest || 0.5 });
     } else if (m.name === 'dt_lampe') {
       o.material = new THREE.MeshBasicMaterial({ color: new THREE.Color('#FFE6BE') });
     } else if (m.aoMap) {
