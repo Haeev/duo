@@ -54,3 +54,9 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Calque au-dessus du HUD mais fond sous le HUD: un enfant ne sort pas du contexte d'empilement de son parent `position: fixed`; le téléphone est ajouté à côté de son fond, pas dedans.
 - `.x button:not(.a, .b)` pèse (0,2,1) et écrase `.puce[aria-pressed]`: mettre les remises à zéro des boutons sous `:where(...)`.
 - Page d'aperçu sans SDK: Tab et Entrée relayés vers `ui.step` en capture, avec `stopImmediatePropagation` et un `setTimeout(0)` (le jeu lit ces touches au pas suivant), plus un `step` vide par image.
+
+## Entrées de l'invité (vérifié le 2026-11-08, Deux Tabliers)
+
+- Un bug « marche sur le Mac, pas sur le PC » peut tenir au rôle (hôte ou invité) plutôt qu'au système: le Mac du client héberge en général. Reproduire d'abord à deux avec `startLocalDuo` (latence 5 ms) avant de chercher du côté de Windows.
+- Une intention de l'invité doit être jouée par l'hôte au pas de l'entrée où elle est née: appliquée au pas d'une entrée plus ancienne, un geste à maintien lit « Agir relâché » et s'annule aussitôt.
+- `createInputState.keyDown(code, repeat)`: une répétition ne vaut jamais un appui; un appui non répété d'une touche déjà tenue (keyup perdu) vaut un nouvel appui.
