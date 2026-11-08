@@ -69,3 +69,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - L'interface du jeu écrit l'apostrophe typographique (’): les attentes de texte des tests de bout en bout doivent l'employer.
 - Contrôle I-08 (variables non remplies): les astuces gardent les jetons de touches et de `contentVars` (`{bigPurchase}`...), les répliques `{partner}`, `{henColorN}`, `{secret}`, remplis par l'interface; lettres, titres de quête et écrans arrivent déjà remplis.
 - Robot glouton: sac plein, il rachète un matelas chaque fois que le précédent tombe au sol (il ne compte que sac et coffre): ne pas lire sa taille d'état comme celle d'un vrai duo.
+
+## Deux Tabliers dans le faux hôte (vérifié le 2026-11-08, recette de nuit)
+
+- `pnpm --filter <jeu> typecheck lint test build` passe `lint test build` en arguments à `tsc` (TS5112): lancer les scripts un par un.
+- `deux-vues.html` reprend l'emplacement 1 de `localStorage['duo-sdk-dev:deux-tabliers:sauvegarde:1']` (champs de `StoredSaveSchema`, `data` = `JSON.stringify(world)`, membres `membre-hote` et `membre-invite`): poser la sauvegarde par `addInitScript` dans le seul cadre du haut (`window === window.top`). Les cadres du jeu sont ceux dont l'adresse contient `/jeu/`.
+- Sauvegardes de robot faites avec `fallbackPrepSeconds`: la préparation d'office laisse les tickets sur le rail; au-delà de 64 Kio de domaine `service`, la partie s'arrête au chargement. Filtrer `service.tickets` sur les groupes présents avant de charger, sauf pour prouver le défaut.
+- Caisse par le vrai poste: Agir maintenu 2,5 s plus 0,4 s par article au-delà du premier (neuf articles: 5,7 s); un robot qui relâche avant laisse le groupe à la caisse et la journée ne finit pas.
+- Sans verrouillage du pointeur, les `pointermove` synthétiques ne tournent pas la caméra: il faut d'abord un vrai clic sur la toile.
+- Deux navigateurs à deux vues WebGL logicielles en parallèle peuvent réveiller le chien de garde (« Le jeu ne répond plus »): une partie à la fois.
+- Le faux hôte ne reprend pas une partie en cours après la déconnexion de l'invité: arrêt chez l'hôte, relance depuis la sauvegarde.
