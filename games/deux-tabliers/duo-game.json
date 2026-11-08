@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "deux-tabliers",
   "name": "Deux Tabliers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "sdk": "1.1",
   "view": "3d",
   "engine": "three",
@@ -13,26 +13,77 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, en vue à la première personne, vous reprenez le petit café d'Ormeval et vous le tenez ensemble.",
-  "whatsNew": "Bienvenue à Ormeval ! Le café ouvre ses portes: prenez les commandes, faites les cafés à deux, servez les clients et lisez votre bilan du soir, quinze jours durant.",
+  "whatsNew": "Gestion plus vraie: marchandise payée à la livraison, fournisseurs à leurs jours, produits frais qui se périment, bilan détaillé. Nouveau: remises et « Faire connaître ». Tous les menus passent dans ton téléphone (Tab). Les clients s'assoient face à leur table, tu peux t'asseoir aussi, et la place du Tilleul est belle depuis les vitrines.",
   "actions": [
-    { "id": "forward", "label": "Avancer", "keys": ["KeyW", "ArrowUp"] },
-    { "id": "back", "label": "Reculer", "keys": ["KeyS", "ArrowDown"] },
-    { "id": "left", "label": "Aller à gauche", "keys": ["KeyA", "ArrowLeft"] },
-    { "id": "right", "label": "Aller à droite", "keys": ["KeyD", "ArrowRight"] },
-    { "id": "fast", "label": "Marcher vite", "keys": ["ShiftLeft", "ShiftRight"] },
-    { "id": "act", "label": "Agir", "keys": ["KeyE", "Space"], "mouse": ["left"] },
-    { "id": "drop", "label": "Reposer, ranger, lâcher", "keys": ["KeyR"], "mouse": ["right"] },
+    {
+      "id": "forward",
+      "label": "Avancer",
+      "keys": ["KeyW", "ArrowUp"]
+    },
+    {
+      "id": "back",
+      "label": "Reculer",
+      "keys": ["KeyS", "ArrowDown"]
+    },
+    {
+      "id": "left",
+      "label": "Aller à gauche",
+      "keys": ["KeyA", "ArrowLeft"]
+    },
+    {
+      "id": "right",
+      "label": "Aller à droite",
+      "keys": ["KeyD", "ArrowRight"]
+    },
+    {
+      "id": "fast",
+      "label": "Marcher vite",
+      "keys": ["ShiftLeft", "ShiftRight"]
+    },
+    {
+      "id": "act",
+      "label": "Agir",
+      "keys": ["KeyE", "Space"],
+      "mouse": ["left"]
+    },
+    {
+      "id": "drop",
+      "label": "Reposer, ranger, lâcher",
+      "keys": ["KeyR"],
+      "mouse": ["right"]
+    },
     {
       "id": "rotate",
       "label": "Tourner le meuble ou la charge",
       "keys": ["KeyQ"],
       "mouse": ["wheel-up", "wheel-down"]
     },
-    { "id": "wave", "label": "Faire signe à l'autre", "keys": ["KeyG"], "mouse": ["middle"] },
-    { "id": "tablet", "label": "Téléphone", "keys": ["Tab"] },
-    { "id": "arrange", "label": "Aménager", "keys": ["KeyB"] },
-    { "id": "close", "label": "Fermer, annuler", "keys": ["Backspace"] },
-    { "id": "confirm", "label": "Valider, reprendre la souris", "keys": ["Enter", "NumpadEnter"] }
+    {
+      "id": "wave",
+      "label": "Faire signe à l'autre",
+      "keys": ["KeyG"],
+      "mouse": ["middle"]
+    },
+    {
+      "id": "tablet",
+      "label": "Téléphone",
+      "keys": ["Tab"]
+    },
+    {
+      "id": "arrange",
+      "label": "Aménager",
+      "keys": ["KeyB"]
+    },
+    {
+      "id": "close",
+      "label": "Fermer, annuler",
+      "keys": ["Backspace"]
+    },
+    {
+      "id": "confirm",
+      "label": "Valider, reprendre la souris",
+      "keys": ["Enter", "NumpadEnter"]
+    }
   ],
   "saves": {
     "slots": 3,
