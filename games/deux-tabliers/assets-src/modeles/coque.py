@@ -34,6 +34,8 @@ import geo as G  # noqa: E402
 from geo import Geo  # noqa: E402
 import scene_coque as S  # noqa: E402
 import textures as TX  # noqa: E402
+import place as PL  # noqa: E402
+import place_textures as PT  # noqa: E402
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 ap = argparse.ArgumentParser()
@@ -420,9 +422,6 @@ def construire():
     bulbs = [S.suspension(lamps, emit, x, y, "enamel") for (x, y) in ((9.15, 8.72), (10.6, 8.85))]
     geos["lampes"] = lamps
     geos["glow"] = emit
-    street, tree = S.place()
-    geos["rue"] = street
-    geos["tilleul"] = tree
     geos["fond_ferme"] = fond_ferme()
     geos["fond"] = piece_du_fond()
     geos["cour"] = cour()
@@ -437,9 +436,17 @@ def main():
     objs = {}
     for name, g in geos.items():
         remap_keys(g)
-        rue = name in ("rue", "tilleul", "cour")
+        rue = name in ("cour",)
         ob = K.finir(g, seed=7, tiled=TILED, matfn=(lambda k, r=rue: mat_for(k, r)))
         objs[name] = ob
+    # la place du Tilleul (GLB à part, sa propre carte de lumière) et le lointain (sans lumière)
+    SUN_AZ, SUN_EL = 205.0, float(K.PAL["moments"]["afternoon"]["sunElevation"])
+    PT.construire(K.TEXDIR, SUN_AZ, SUN_EL)
+    az, el = math.radians(SUN_AZ), math.radians(SUN_EL)
+    sun_plan = (math.sin(az) * math.cos(el), -math.cos(az) * math.cos(el), math.sin(el))
+    place = finir_place(PL.place(), "shell_village_place")
+    far = Geo("shell_village_sky")
+    sky = finir_place(PL.ciel(), "shell_village_sky", far=PL.lointain(sun_plan))
     print(f"géométrie: {time.time() - t0:.0f} s")
     baked = [o for n, o in objs.items() if n not in ("vitrages", "glow")]
     # seconde UV (carte de lumière) sur tout ce qui est cuit
@@ -455,7 +462,7 @@ def main():
     bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.0, scale_to_bounds=False)
     bpy.ops.uv.average_islands_scale()
     bpy.ops.object.mode_set(mode="OBJECT")
-    for n in ("rue", "tilleul", "cour"):
+    for n in ("cour",):
         uv = objs[n].data.uv_layers["lightmap"]
         for d in uv.data:
             d.uv = d.uv * 0.3
@@ -464,13 +471,25 @@ def main():
     bpy.ops.uv.select_all(action="SELECT")
     bpy.ops.uv.pack_islands(margin=0.0025, rotate=True, scale=True)
     bpy.ops.object.mode_set(mode="OBJECT")
-    for ob in baked:
+    # carte de lumière de la place: même méthode, image à part
+    place.data.uv_layers.new(name="lightmap")
+    place.data.uv_layers.active = place.data.uv_layers["lightmap"]
+    bpy.ops.object.select_all(action="DESELECT")
+    place.select_set(True)
+    bpy.context.view_layer.objects.active = place
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.0, scale_to_bounds=False)
+    bpy.ops.uv.average_islands_scale()
+    bpy.ops.uv.select_all(action="SELECT")
+    bpy.ops.uv.pack_islands(margin=0.002, rotate=True, scale=True)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for ob in baked + [place]:
         ob.data.uv_layers.active = ob.data.uv_layers["UVMap"]
         ob.data.uv_layers["UVMap"].active_render = True
 
     sc = bpy.context.scene
     mom = K.PAL["moments"]["afternoon"]
-    SUN_AZ, SUN_EL = 205.0, float(mom["sunElevation"])
     world = bpy.data.worlds.new("ciel")
     sc.world = world
     world.node_tree.nodes["Background"].inputs["Color"].default_value = K.lin4("#D8CFCF")
@@ -500,39 +519,11 @@ def main():
         lo.location = K.P(*p)
         sc.collection.objects.link(lo)
 
-    lm_name = "shell_village_lightmap"
-    lm_png = os.path.join(K.TEXDIR, lm_name + ".png")
-    meta_p = os.path.join(args.travail, "lightmap.json")
-    if not args.sans_cuisson:
-        sc.render.engine = "CYCLES"
-        sc.cycles.device = "CPU"
-        sc.cycles.samples = args.spp
-        sc.cycles.max_bounces = 6
-        sc.cycles.diffuse_bounces = 4
-        sc.render.bake.margin = 6
-        img = bpy.data.images.new("lightmap_raw", args.res, args.res, float_buffer=True)
-        tmp_nodes = []
-        for m in {s.material for o in baked for s in o.material_slots}:
-            n = m.node_tree.nodes.new("ShaderNodeTexImage")
-            n.image = img
-            m.node_tree.nodes.active = n
-            tmp_nodes.append((m, n))
-        for n in ("vitrages", "glow"):
-            objs[n].hide_render = True
-        bpy.ops.object.select_all(action="DESELECT")
-        for ob in baked:
-            ob.select_set(True)
-        bpy.context.view_layer.objects.active = baked[0]
-        t = time.time()
-        bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, uv_layer="lightmap")
-        print(f"cuisson: {time.time() - t:.0f} s")
-        for n in ("vitrages", "glow"):
-            objs[n].hide_render = False
-        for m, n in tmp_nodes:
-            m.node_tree.nodes.remove(n)
+
+    def debruiter_encoder(img, png, tag):
+        """Débruitage OpenImageDenoise par le compositeur (méthode de l'essai), encodage sRGB après division par K."""
         raw = np.array(img.pixels[:], dtype=np.float32).reshape(args.res, args.res, 4)[..., :3]
-        # débruitage OpenImageDenoise par le compositeur (méthode de l'essai)
-        raw_exr = os.path.join(args.travail, "lm_brut.exr")
+        raw_exr = os.path.join(args.travail, f"{tag}_brut.exr")
         img.filepath_raw = raw_exr
         img.file_format = "OPEN_EXR"
         img.save()
@@ -545,11 +536,12 @@ def main():
         ng.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
         ng.links.new(ni.outputs["Image"], nd.inputs["Image"])
         ng.links.new(nd.outputs["Image"], go.inputs[0])
+        engine = sc.render.engine
         sc.render.engine = "BLENDER_WORKBENCH"
         sc.render.resolution_x = sc.render.resolution_y = args.res
         sc.render.resolution_percentage = 100
         sc.render.image_settings.file_format = "OPEN_EXR"
-        den_exr = os.path.join(args.travail, "lm_debruite.exr")
+        den_exr = os.path.join(args.travail, f"{tag}_debruite.exr")
         sc.render.filepath = den_exr
         hidden = [o for o in sc.objects if not o.hide_render]
         for o in hidden:
@@ -558,6 +550,7 @@ def main():
         for o in hidden:
             o.hide_render = False
         sc.compositing_node_group = None
+        sc.render.engine = engine
         den = bpy.data.images.load(den_exr)
         a = np.array(den.pixels[:], dtype=np.float32).reshape(args.res, args.res, 4)[..., :3]
         a = np.where(a.sum(-1, keepdims=True) > 1e-5, a, raw)
@@ -566,11 +559,52 @@ def main():
         Kc = float(np.percentile(used, 99.7)) if used.size else 1.0
         enc = K.l2s(np.clip(a / Kc, 0, 1))
         from PIL import Image
-        Image.fromarray((np.flipud(enc) * 255 + 0.5).astype(np.uint8)).save(lm_png, optimize=True)
-        meta = {"lightmap_scale": Kc, "bake_spp": args.spp, "bake_res": args.res}
+        Image.fromarray((np.flipud(enc) * 255 + 0.5).astype(np.uint8)).save(png, optimize=True)
+        return Kc
+
+    lm_name = "shell_village_lightmap"
+    lm_png = os.path.join(K.TEXDIR, lm_name + ".png")
+    place_lm_name = "shell_village_place_lightmap"
+    place_lm_png = os.path.join(K.TEXDIR, place_lm_name + ".png")
+    meta_p = os.path.join(args.travail, "lightmap.json")
+    if not args.sans_cuisson:
+        sc.render.engine = "CYCLES"
+        sc.cycles.device = "CPU"
+        sc.cycles.samples = args.spp
+        sc.cycles.max_bounces = 6
+        sc.cycles.diffuse_bounces = 4
+        sc.render.bake.margin = 6
+        img = bpy.data.images.new("lightmap_raw", args.res, args.res, float_buffer=True)
+        img_place = bpy.data.images.new("lightmap_place_raw", args.res, args.res, float_buffer=True)
+        tmp_nodes = []
+        for (objs_, im_) in ((baked, img), ([place], img_place)):
+            for m in {s.material for o in objs_ for s in o.material_slots}:
+                n = m.node_tree.nodes.new("ShaderNodeTexImage")
+                n.image = im_
+                m.node_tree.nodes.active = n
+                tmp_nodes.append((m, n))
+        for n in ("vitrages", "glow"):
+            objs[n].hide_render = True
+        # le ciel et le lointain ne portent pas d'ombre (le dôme cacherait le ciel de la cuisson)
+        sky.hide_render = True
+        bpy.ops.object.select_all(action="DESELECT")
+        for ob in baked + [place]:
+            ob.select_set(True)
+        bpy.context.view_layer.objects.active = baked[0]
+        t = time.time()
+        bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, uv_layer="lightmap")
+        print(f"cuisson: {time.time() - t:.0f} s")
+        for n in ("vitrages", "glow"):
+            objs[n].hide_render = False
+        for m, n in tmp_nodes:
+            m.node_tree.nodes.remove(n)
+        meta = {"bake_spp": args.spp, "bake_res": args.res}
+        meta["lightmap_scale"] = debruiter_encoder(img, lm_png, "lm")
+        meta["place_lightmap_scale"] = debruiter_encoder(img_place, place_lm_png, "lmp")
         json.dump(meta, open(meta_p, "w"))
     else:
         meta = json.load(open(meta_p))
+    sky.hide_render = False
 
     # branchement de la carte de lumière: occlusion glTF sur la seconde UV
     lm_img = bpy.data.images.load(lm_png, check_existing=True)
