@@ -553,6 +553,20 @@ function modelFor(name: string): InterfaceModel {
         clock: base.clock === null ? null : { ...base.clock, stop: { kind: 'resume' } },
         partner: { place: 'À la caisse', doing: 'Pas encore la main' },
       };
+    case 'dialogue-reprendre':
+      // Pire cas du HUD (recette du 2026-11-08): longue réplique, capsule, astuce et carte de l'autre.
+      return {
+        ...base,
+        hint: 'passe derrière le comptoir, puis prends une tasse sur la machine et pose-la sous le groupe.',
+        partner: { place: 'Derrière le comptoir', doing: 'Utilise : machine à espresso' },
+        dialogue: {
+          id: 'd2',
+          speaker: 'Simone',
+          text: "Vous voilà chez vous. Faites de ce café l'endroit où l'on aime s'arrêter : écrivez votre carte, servez vos clients, et la maison grandira. Demain, on retourne la pancarte à 8 heures.",
+          answers: [],
+          privateHint: null,
+        },
+      };
     case 'dialogue':
       return {
         ...base,
@@ -772,9 +786,13 @@ const centre = {
           ? { key: 'E', text: 'Maintiens E : retourner la pancarte', refused: false }
           : null,
   hold: state === 'ouverture' ? 0.45 : null,
-  capsule: state === 'reprendre',
+  capsule: state === 'reprendre' || state === 'dialogue-reprendre',
 };
-const bearing = ['service', 'rail', 'reprendre', 'preparation'].includes(state) ? 160 : null;
+const bearing = ['service', 'rail', 'reprendre', 'preparation', 'dialogue-reprendre'].includes(
+  state,
+)
+  ? 160
+  : null;
 if (params.has('fps')) ui.settings.set('showFps', true);
 
 const loop = (now: number): void => {

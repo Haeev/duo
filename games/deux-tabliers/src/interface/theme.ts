@@ -50,7 +50,8 @@ export const CSS = `
 .dt-second { color: var(--dt-creme-2); }
 .dt-region { position: absolute; display: flex; flex-direction: column; gap: 0.45em; }
 .dt-tl { left: 1em; top: 1em; width: 15em; }
-.dt-tc { left: 50%; top: 1em; width: 19em; transform: translateX(-50%); align-items: stretch; }
+/* Le haut au centre tient entre la colonne de gauche (15em) et celle de droite (14,5em): l'astuce passe à la ligne au lieu de glisser sous la carte de l'autre. */
+.dt-tc { left: 50%; top: 1em; width: max(9em, min(19em, calc(100% - 2 * (15em + 2em)))); transform: translateX(-50%); align-items: stretch; overflow-wrap: anywhere; }
 .dt-tr { right: 1em; top: 1em; width: 14.5em; }
 .dt-br { right: 1em; bottom: 3.5em; width: 14em; }
 .dt-clock-time { display: flex; align-items: center; gap: 0.4em; font: 600 1.45em/1.1 var(--dt-titre); }
@@ -90,7 +91,17 @@ export const CSS = `
 .dt-flash { position: absolute; left: 50%; top: 38%; transform: translateX(-50%); border: 2px dashed var(--dt-creme-2); border-radius: 2em; display: flex; gap: 0.4em; align-items: center; }
 .dt-fail { position: absolute; inset: 10%; padding: 20px; background: var(--dt-expresso); border: 1px solid var(--dt-filet); white-space: pre-wrap; overflow: auto; pointer-events: auto; }
 .dt-fps { position: absolute; left: 0.5em; bottom: 0.5em; font: 600 0.85em/1.3 var(--dt-ui); padding: 0.1em 0.5em; border-radius: 0.4em; }
-.dt-bubble { position: absolute; left: 50%; bottom: 7.5em; transform: translateX(-50%); width: min(34em, 80vw); pointer-events: auto; }
+.dt-bubble { position: absolute; left: 50%; bottom: 7.5em; transform: translateX(-50%); width: max(16em, min(34em, calc(100% - 2 * (14em + 2em)))); pointer-events: auto; }
+/* Réplique affichée: la capsule « Clique pour reprendre la souris » monte au-dessus d'elle. */
+.dt-hud:has(.dt-bubble:not([hidden])) .dt-capsule { top: 30%; }
+/* Fenêtre étroite (deux vues côte à côte, petit écran): la carte de l'autre descend au-dessus de
+   « En main », l'astuce prend la place libre en haut à droite, la réplique se cale à gauche. */
+.dt-hud { container: dt-hud / size; }
+@container dt-hud (max-width: 52em) {
+  .dt-tr { top: auto; bottom: 9.5em; }
+  .dt-tc { left: 17em; right: 1em; width: auto; transform: none; }
+  .dt-bubble { left: 1em; transform: none; width: calc(100% - 18.5em); }
+}
 .dt-bubble-who { font: 700 0.95em/1.3 var(--dt-titre); color: var(--dt-or); }
 .dt-bubble-text { font-size: 1.1em; margin: 0.2em 0 0.4em; }
 .dt-bubble ol { margin: 0.2em 0 0.3em; padding-left: 1.4em; }
