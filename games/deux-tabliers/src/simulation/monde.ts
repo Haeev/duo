@@ -23,6 +23,7 @@ export function createWorld(content: Content, memberIds: readonly [string, strin
     yawDeg: 180,
     pitchDeg: -10,
     use: null,
+    seat: null,
   }));
   const [host, guest] = players;
   if (host === undefined || guest === undefined) throw new Error('deux joueurs attendus');

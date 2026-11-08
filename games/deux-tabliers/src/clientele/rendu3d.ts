@@ -28,6 +28,15 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { World } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
 import { createClipBlend, type ClipBlend } from '../rendu/melange';
+import {
+  bendThighs,
+  seatPlacement,
+  sitCalibration,
+  thighsOf,
+  type SeatPlacement,
+  type SitCalibration,
+} from '../rendu/assis';
+import { seatAnchor } from '../etat/assises';
 import { memberLook, type Anim } from './clients';
 import type { ClienteleContent } from './donnees';
 import type { Group as CustomerGroup } from './etat';
@@ -52,7 +61,12 @@ interface Figure {
   readonly node: Object3D;
   readonly blend: ClipBlend;
   readonly clips: ReadonlySet<string>;
+  /** Pose assise mesurée par clip (`sit`, `sit_drink`), et les cuisses à baisser. */
+  readonly sit: ReadonlyMap<string, SitCalibration | null>;
+  readonly thighs: readonly Object3D[];
 }
+
+const SIT_CLIPS = ['sit', 'sit_drink'] as const;
 
 export interface CustomerNodes {
   update(view: GameView, nowMs: number, frameDt: number): void;
@@ -84,12 +98,36 @@ const PROFILE_MODEL: Readonly<Record<string, string>> = {
   connaisseurs: 'char_client_connaisseur',
 };
 
+/**
+ * Figurants des scènes, pris parmi les modèles livrés (aucun n'a le sien): le chauffeur en col
+ * roulé, trois dames de la place, et les randonneurs des Godillots (neuf personnes) variés
+ * membre par membre, Colette en tête (trench et sacoche).
+ */
+const EXTRA_MODEL = {
+  driver: 'char_client_connaisseur',
+  ladies: ['char_client_voisine', 'char_client_brunch', 'char_client_pressee'],
+} as const;
+const SCENE_CROWD: Readonly<Record<string, readonly string[]>> = {
+  colette_godillots: [
+    'char_client_pressee',
+    'char_client_flaneur',
+    'char_client_etudiante',
+    'char_client_gourmand',
+    'char_client_teletravail',
+    'char_client_voisine',
+    'char_client_connaisseur',
+    'char_client_brunch',
+  ],
+};
+
 /** Modèle du membre `k`: l'allure tirée par la simulation (variée), sinon celle du profil. */
 function modelName(cc: ClienteleContent, g: CustomerGroup, k: number): string | null {
+  const crowd = g.role === null ? undefined : SCENE_CROWD[g.role];
   const names = [
     g.regular === null ? null : `habitue-${g.regular}`,
     g.regular === null ? null : (REGULAR_MODEL[g.regular] ?? null),
     g.role === null ? null : `scene-${g.role}`,
+    crowd === undefined || crowd.length === 0 ? null : (crowd[k % crowd.length] ?? null),
     g.look === '' ? null : memberLook(cc, g.profile, g.look, k),
     `client-${g.profile}`,
     PROFILE_MODEL[g.profile] ?? 'char_client_flaneur',
@@ -97,6 +135,9 @@ function modelName(cc: ClienteleContent, g: CustomerGroup, k: number): string | 
   for (const n of names) if (n !== null && urlOf(n) !== undefined) return n;
   return null;
 }
+
+/** Hauteur de l'assise occupée (m), `null` hors d'un meuble (zinc, fontaine, debout). */
+const seatAt = { y: null as number | null };
 
 /** Position et cap du membre `k` d'un groupe; `seated` vrai s'il est assis. */
 function memberPose(
@@ -107,6 +148,7 @@ function memberPose(
   nowMs: number,
   out: CustomerPose,
 ): boolean | null {
+  seatAt.y = null;
   const rules = view.content.clientele.rules;
   if (g.stage === 'seated') {
     const id = g.seats[k] ?? g.seats[0];
@@ -124,9 +166,12 @@ function memberPose(
     }
     const f = world.furniture.find((x) => x.id === id);
     if (f === undefined) return null;
-    out.x = f.x;
-    out.z = f.z;
-    out.yawDeg = (180 + f.rotDeg) % 360;
+    // Sur l'assise déclarée du meuble, tourné comme elle (face à sa table).
+    const a = seatAnchor(view.content, world.furniture, f);
+    out.x = a.x;
+    out.z = a.z;
+    out.yawDeg = a.yawDeg;
+    seatAt.y = a.y;
     out.anim = 'sit_drink';
     return true;
   }
@@ -174,6 +219,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   const scale = new Vector3(1, 1, 1);
   const up = new Vector3(0, 1, 0);
   const pose: CustomerPose = { x: 0, z: 0, yawDeg: 0, anim: 'idle' };
+  const placed: SeatPlacement = { x: 0, y: 0, z: 0, thigh: 0 };
 
   const loader = new GLTFLoader();
   const loaded = new Map<string, Promise<Loaded | null>>();
@@ -218,10 +264,26 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       const node = cloneSkinned(src.scene);
       // Ajouté à la scène au premier `update` qui le place: jamais vu à l'origine ni sans clip.
       node.visible = false;
+      const sit = new Map<string, SitCalibration | null>();
+      for (const c of SIT_CLIPS)
+        sit.set(
+          c,
+          sitCalibration(
+            `${name}:${c}`,
+            node,
+            src.clips.find((x) => x.name === c),
+          ),
+        );
       const blend = createClipBlend(new AnimationMixer(node), src.clips, FADE);
       blend.update(0);
       root.add(node);
-      figures.set(key, { node, blend, clips: new Set(src.clips.map((c) => c.name)) });
+      figures.set(key, {
+        node,
+        blend,
+        clips: new Set(src.clips.map((c) => c.name)),
+        sit,
+        thighs: thighsOf(node),
+      });
     });
     return null;
   };
@@ -250,11 +312,17 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
           const fig = name === null ? null : figureFor(key, name);
           if (fig !== null) {
             seen.add(key);
-            fig.node.position.set(pose.x, 0, pose.z);
-            fig.node.rotation.y = (pose.yawDeg * Math.PI) / 180 + Math.PI;
-            fig.node.visible = true;
+            const rotY = (pose.yawDeg * Math.PI) / 180 + Math.PI;
             play(fig, pose.anim);
+            const cal = seatAt.y === null ? null : (fig.sit.get(fig.blend.target()) ?? null);
+            if (cal !== null && seatAt.y !== null) {
+              seatPlacement(cal, pose.x, seatAt.y, pose.z, rotY, placed);
+              fig.node.position.set(placed.x, placed.y, placed.z);
+            } else fig.node.position.set(pose.x, 0, pose.z);
+            fig.node.rotation.y = rotY;
+            fig.node.visible = true;
             fig.blend.update(frameDt);
+            if (cal !== null) bendThighs(fig.node, fig.thighs, placed.thigh);
             continue;
           }
           // Modèle en cours de chargement: rien plutôt qu'un substitut d'un instant.
@@ -273,28 +341,56 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
           n++;
         }
       }
-      // Figurants des scènes, vus de la vitrine: le chauffeur du car, les dames de la place.
+      // Figurants des scènes, vus de la vitrine: le chauffeur du car devant son car, face au
+      // café; les trois dames qui traversent la place (l'une est Mamie Odile), d'ouest en est.
       const ev = world.clientele.event;
-      const extras: [number, number, Color][] = [];
-      if (ev?.id === 'le_car_de_8h12') extras.push([7.2, 14.4, driverColor]);
-      if (ev?.id === 'jules_a_perdu_sa_mamie') {
-        const [[ax, az], [bx, bz]] = view.content.clientele.rules.placeWalk;
-        for (let i = 0; i < 3; i++) {
-          const t = (nowMs / 24000 + i / 3) % 1;
-          extras.push([ax + (bx - ax) * t, az + (bz - az) * t, ladyColors[i] ?? driverColor]);
+      const extra = (
+        key: string,
+        model: string,
+        x: number,
+        z: number,
+        yawDeg: number,
+        anim: Anim,
+        color: Color,
+      ): void => {
+        const fig = figureFor(key, model);
+        if (fig !== null) {
+          seen.add(key);
+          fig.node.position.set(x, 0, z);
+          fig.node.rotation.y = (yawDeg * Math.PI) / 180 + Math.PI;
+          fig.node.visible = true;
+          play(fig, anim);
+          fig.blend.update(frameDt);
+          return;
         }
-      }
-      for (const [x, z, c] of extras) {
-        if (n >= MAX) break;
-        q.setFromAxisAngle(up, -Math.PI / 2);
+        if (!missing.has(model) || n >= MAX) return;
+        q.setFromAxisAngle(up, (yawDeg * Math.PI) / 180);
         pos.set(x, 0, z);
         scale.set(1, 1, 1);
         m4.compose(pos, q, scale);
         bodies.setMatrixAt(n, m4);
         heads.setMatrixAt(n, m4);
-        bodies.setColorAt(n, c);
+        bodies.setColorAt(n, color);
         heads.setColorAt(n, skin);
         n++;
+      };
+      if (ev?.id === 'le_car_de_8h12')
+        extra('extra:chauffeur', EXTRA_MODEL.driver, 7.2, 14.4, 0, 'idle', driverColor);
+      if (ev?.id === 'jules_a_perdu_sa_mamie') {
+        const [[ax, az], [bx, bz]] = view.content.clientele.rules.placeWalk;
+        const yaw = (Math.atan2(-(bx - ax), -(bz - az)) * 180) / Math.PI;
+        for (let i = 0; i < 3; i++) {
+          const t = (nowMs / 24000 + i / 3) % 1;
+          extra(
+            `extra:dame-${String(i)}`,
+            EXTRA_MODEL.ladies[i] ?? EXTRA_MODEL.driver,
+            ax + (bx - ax) * t,
+            az + (bz - az) * t,
+            yaw,
+            'walk',
+            ladyColors[i] ?? driverColor,
+          );
+        }
       }
       bodies.count = n;
       bodies.visible = n > 0;

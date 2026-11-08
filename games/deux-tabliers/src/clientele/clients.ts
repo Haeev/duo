@@ -11,7 +11,17 @@ import type { ClienteleContent, Profile, Recipe } from './donnees';
 import { addPoints, consume, inStock, linePrice, type Ctx } from './economie';
 import type { Group, PlaceKind, Quality } from './etat';
 import { onRegularServed, regularOrder } from './habitues';
-import { findPath, groupRows, navGrid, planPoint, queueSpot, seatList, type Seat } from './places';
+import {
+  findPath,
+  groupRows,
+  navGrid,
+  planPoint,
+  queueSpot,
+  seatApproach,
+  seatList,
+  type Seat,
+} from './places';
+import { seatAnchor, type SeatAnchor } from '../etat/assises';
 import { sceneHooks } from './scenes';
 
 // ---------------------------------------------------------------------------------------------
@@ -37,6 +47,8 @@ interface Runtime {
   readonly aside: Map<number, number>;
   /** Allures des dernières personnes entrées (la plus récente à la fin). */
   readonly recentLooks: string[];
+  /** Groupes qui se lèvent: point où ils se relèvent, à côté de l'assise, avant de repartir. */
+  readonly stepOff: Map<number, Vec2>;
 }
 
 const runtimes = new WeakMap<World, Runtime>();
@@ -44,7 +56,7 @@ const runtimes = new WeakMap<World, Runtime>();
 export function runtimeOf(world: World): Runtime {
   let r = runtimes.get(world);
   if (r === undefined) {
-    r = { walkers: new Map(), aside: new Map(), recentLooks: [] };
+    r = { walkers: new Map(), aside: new Map(), recentLooks: [], stepOff: new Map() };
     runtimes.set(world, r);
   }
   return r;
@@ -82,7 +94,34 @@ function goTo(ctx: Ctx, g: Group, to: Vec2, key: string): Walker {
   if (w.key !== key) {
     w.key = key;
     const grid = navGrid(ctx.sim, ctx.cc, ctx.s);
-    w.path = findPath(grid, w, to, ctx.cc.rules.walk.searchNodes);
+    const off = runtimeOf(ctx.sim.world).stepOff.get(g.id);
+    runtimeOf(ctx.sim.world).stepOff.delete(g.id);
+    // Qui se lève fait d'abord un pas de côté (jamais à travers sa table), puis repart.
+    w.path =
+      off === undefined
+        ? findPath(grid, w, to, ctx.cc.rules.walk.searchNodes)
+        : [off, ...findPath(grid, off, to, ctx.cc.rules.walk.searchNodes)];
+  }
+  return w;
+}
+
+/** Assise du premier membre d'un groupe installé sur un meuble, ou `null` (zinc, fontaine). */
+function firstSeatAnchor(ctx: Ctx, g: Group): SeatAnchor | null {
+  const first = g.seats[0];
+  if (first === undefined || first.startsWith('standing-') || first.startsWith('picnic-'))
+    return null;
+  const f = ctx.sim.world.furniture.find((x) => x.id === first);
+  return f === undefined ? null : seatAnchor(ctx.sim.content, ctx.sim.world.furniture, f);
+}
+
+/** Vers l'assise: par le point d'approche libre, puis le dernier pas jusqu'à l'assise. */
+function goToSeat(ctx: Ctx, g: Group, a: SeatAnchor, key: string): Walker {
+  const w = walkerOf(ctx, g);
+  if (w.key !== key) {
+    w.key = key;
+    const grid = navGrid(ctx.sim, ctx.cc, ctx.s);
+    const near = seatApproach(grid, a);
+    w.path = [...findPath(grid, w, near, ctx.cc.rules.walk.searchNodes), { x: a.x, z: a.z }];
   }
   return w;
 }
@@ -414,6 +453,8 @@ export function seatNow(ctx: Ctx, g: Group): void {
 function occupied(ctx: Ctx): Set<string> {
   const out = new Set<string>();
   for (const g of ctx.s.groups) for (const id of g.seats) out.add(id);
+  // Un avatar assis garde sa place: aucun client ne s'assoit sur lui.
+  for (const p of ctx.sim.world.players) if ((p.seat ?? null) !== null) out.add(p.seat ?? '');
   return out;
 }
 
@@ -529,7 +570,9 @@ export function placePoint(
     return p === undefined ? null : { x: p[0], z: p[1] };
   }
   const f = ctx.sim.world.furniture.find((x) => x.id === first);
-  return f === undefined ? null : { x: f.x, z: f.z };
+  if (f === undefined) return null;
+  const a = seatAnchor(ctx.sim.content, ctx.sim.world.furniture, f);
+  return { x: a.x, z: a.z };
 }
 
 export function satisfaction(ctx: Ctx, g: Group): number {
@@ -711,6 +754,9 @@ function depart(ctx: Ctx, g: Group): void {
 }
 
 function leave(ctx: Ctx, g: Group): void {
+  const a = g.stage === 'seated' ? firstSeatAnchor(ctx, g) : null;
+  if (a !== null)
+    runtimeOf(ctx.sim.world).stepOff.set(g.id, seatApproach(navGrid(ctx.sim, ctx.cc, ctx.s), a));
   g.stage = 'leaving';
   g.since = ctx.s.serviceSec;
   g.seats = [];
@@ -851,8 +897,11 @@ export function stepCustomers(ctx: Ctx, arrivalsOpen: boolean): void {
         break;
       }
       case 'toSeat': {
+        const key = `s${g.seats.join(',')}`;
+        const a = firstSeatAnchor(ctx, g);
         const at = placePoint(ctx, g);
-        const w = goTo(ctx, g, at ?? { x: 6.4, z: 11 }, `s${g.seats.join(',')}`);
+        const w =
+          a === null ? goTo(ctx, g, at ?? { x: 6.4, z: 11 }, key) : goToSeat(ctx, g, a, key);
         if (arrived(w)) {
           g.stage = 'seated';
           g.since = now;

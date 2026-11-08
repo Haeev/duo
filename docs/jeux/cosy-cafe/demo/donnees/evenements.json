@@ -101,7 +101,7 @@
       ],
       "scene": [
         { "who": "colette_godillots", "text": "Neuf Godillots assoiffés ! Je vous lis la liste: on a voté dans le car." },
-        { "who": "colette_godillots", "text": "Et nos gourdes, vous pourriez les remplir ? On repart dans vingt minutes." }
+        { "who": "colette_godillots", "text": "Et nos gourdes, vous pourriez les remplir ? On repart en milieu d'après-midi." }
       ],
       "goal": {
         "text": "Servir les neuf randonneurs et remplir leurs neuf gourdes avant leur départ.",

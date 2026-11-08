@@ -22,7 +22,10 @@ const TONE_ICON: Readonly<Record<GuestbookEntryView['tone'], IconName>> = {
 };
 
 export function eveningLayer(ctx: UiContext): LayerSpec {
-  let page = 0;
+  // Rouvert (« Pas encore », puis le bilan à nouveau): on reprend à la page qu'on lisait, et
+  // l'autre est prévenu de la page affichée (sinon il lirait « page 3 » pour une page 1).
+  let page = Math.max(0, Math.min(PAGES.length - 1, (ctx.model().evening?.ownPage ?? 1) - 1));
+  ctx.send({ type: 'evening-page', page: page + 1 });
   const goTo = (next: number): void => {
     const clamped = Math.max(0, Math.min(PAGES.length - 1, next));
     if (clamped === page) return;

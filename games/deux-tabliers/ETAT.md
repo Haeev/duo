@@ -21,7 +21,9 @@ Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre cha
 - Coque cuite `shell_village.glb` et ses extensions (carte de lumière en `lightMap`, `lightmap_scale` × π, × 0,42 pour la rue), matériaux de la coque en `MeshBasicMaterial`; la coque en blocs ne sert plus que si le GLB manque. Environnement des métaux: `RoomEnvironment` calculé une fois.
 - Meubles, objets, personnages: correspondances dans `src/rendu/correspondances.ts` et `clientele/rendu3d.ts` (`char_*`). Allure des clients de passage tirée par la simulation parmi les modèles de leur profil, sans répétition proche (`looks`, `lookWindow` de `regles.json`). Avatars animés (marche, attente), badge à la couleur du joueur. Clips mélangés par `rendu/melange.ts` (somme des poids à 1: jamais la pose de liaison).
 - Programmes WebGL (budget 12): verre à deux faces en une passe, badge sur le programme des personnages, substituts des clients cachés tant qu'aucun modèle ne manque. Relevé du 2026-11-08 au premier écran: 4 chez l'hôte, 7 chez l'invité.
-- Sons: `assets/son/sons.json` (fichiers tirés, bus, volume), boucles de la buse selon la température, nappe de rumeur selon le nombre de clients, ambiance de la place, radio du village à deux stations pendant le service.
+- Sons: `assets/son/sons.json` (fichiers tirés, bus, volume), boucles de la buse selon la température, nappe de rumeur selon le nombre de clients, ambiance de la place, radio du village à deux stations pendant le service. Sons placés dans l'espace (`src/audio/espace.ts`, champ `spatial`): postes, caisse, porte et gestes de l'autre atténués avec la distance et placés à gauche ou à droite selon le regard; ambiances, radio et interface partout.
+- Assises (`src/etat/assises.ts`, pur): point d'assise déclaré dans `modeles.json` (`assises`), tourné comme le meuble; banc et tabourets sans dossier tournés vers leur table; une place par meuble (celle de la banquette la plus proche de la table). Clients: approche et départ par un point libre devant, à côté ou derrière l'assise, jamais à travers la table. Pose (`src/rendu/assis.ts`): fesses sur l'assise et bassin au-dessus du point d'assise, mesurés par modèle et par clip (`sit`, `sit_drink`), cuisses baissées pour poser les pieds (dans une limite). Avatars: E sur une assise libre (mains vides) pour s'asseoir, un pas pour se relever; assise transmise à l'invité dans le canal du cœur (`seats`).
+- Revêtements: papiers peints et sols du catalogue texturés sur la coque cuite (`variantes_coque` de `modeles.json`), peinture en teinte sur l'enduit.
 
 ## Preuves
 
@@ -30,8 +32,9 @@ Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre cha
 
 ## Limites connues et suites
 
-- Sons non placés dans l'espace; pas de pas, ni de rumeur par table, ni d'événements de la place tirés au hasard.
-- Les revêtements achetés teignent la peinture de la salle; papiers peints et sols ne changent pas encore la texture de la coque cuite.
-- Les avatars ne s'assoient pas et ne portent rien visiblement; les clients au comptoir boivent sans tasse posée devant eux.
+- Pas de pas, ni de rumeur par table, ni d'événements de la place tirés au hasard.
+- Les avatars ne portent rien visiblement; les clients au comptoir boivent sans tasse posée devant eux.
+- Une seule place par meuble (banquette de trois, banc de deux): plusieurs places par meuble changeraient le comptage des places de la clientèle.
+- Clients au pique-nique de la fontaine: assis au sol (hauteur du rebord non déclarée).
 - Lot JavaScript de 1,37 Mo (364 Ko compressé): Three.js entier, à découper plus tard.
 - Prise d'objet non prédite chez l'invité (un aller-retour), comme au squelette.

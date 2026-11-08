@@ -6,6 +6,7 @@ import type { RandomSource } from '@duo/sdk';
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex, World } from '../etat/monde';
 import { CHANTIERS, stationHandler } from './chantiers';
+import { sitDown } from './assise';
 import { walk } from './deplacement';
 import type { Intent, StepInput, Target } from './entrees';
 import type { GameEvent } from './evenements';
@@ -110,6 +111,9 @@ function execute(sim: SimContext, player: PlayerIndex, plan: ActPlan): void {
       sim.emit({ type: 'given', from: player, to: plan.to, object: o.id });
       return;
     }
+    case 'sit':
+      sitDown(sim.content, world, player, plan.furniture);
+      return;
     case 'use': {
       const refusal = stationHandler(plan.station)?.refuse?.(sim, player, plan.furniture) ?? null;
       if (refusal !== null) {

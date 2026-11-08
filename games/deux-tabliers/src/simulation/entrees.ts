@@ -42,6 +42,7 @@ export const TargetSchema = v.variant('kind', [
   v.strictObject({ kind: v.literal('station'), furniture: v.string() }),
   v.strictObject({ kind: v.literal('source'), furniture: v.string() }),
   v.strictObject({ kind: v.literal('player'), player: PlayerIndexSchema }),
+  v.strictObject({ kind: v.literal('seat'), furniture: v.string() }),
 ]);
 export type Target = v.InferOutput<typeof TargetSchema>;
 

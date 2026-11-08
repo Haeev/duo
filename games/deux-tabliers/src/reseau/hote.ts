@@ -132,8 +132,14 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
       nextObjectId: world.nextObjectId,
       furniture: world.furniture,
       uses: [world.players[0].use, world.players[1].use],
+      seats: [world.players[0].seat ?? null, world.players[1].seat ?? null],
     };
-    const coreJson = JSON.stringify([coreMessage.objects, coreMessage.furniture, coreMessage.uses]);
+    const coreJson = JSON.stringify([
+      coreMessage.objects,
+      coreMessage.furniture,
+      coreMessage.uses,
+      coreMessage.seats,
+    ]);
     if (force || coreJson !== lastCore) {
       core.send(coreMessage);
       lastCore = coreJson;
