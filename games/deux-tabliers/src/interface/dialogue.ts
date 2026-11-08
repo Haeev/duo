@@ -1,7 +1,9 @@
 /**
  * Répliques des habitués et scènes d'événements (ux 4.8, demo 5).
  * - Réplique: bulle en bas au centre, au-dessus des mains, texte à la taille de l'interface.
- *   Réplique simple: le pointeur reste verrouillé, E ou clic pour la suite. Réponses à choisir:
+ *   Réplique simple: le pointeur reste verrouillé, Entrée pour la suite (E, Espace et le clic
+ *   agissent toujours dans le café, demande du client du 2026-11-08), et elle passe seule une fois
+ *   lue (`dialogueReadMs`). Réponses à choisir:
  *   l'interface rend le curseur (calque « réponses »), flèches et Entrée, Retour arrière
  *   « Au revoir ».
  * - Scène: carte au centre haut, sous les alertes, jamais de focus volé. L'indice privé
@@ -16,6 +18,11 @@ import { T } from './textes';
 export interface DialogueOverlay {
   update(dialogue: DialogueView | null, scene: EventSceneView | null, actKey: string): void;
   dispose(): void;
+}
+
+/** Temps de lecture d'une réplique simple avant qu'elle passe seule: 4 s, plus 60 ms par signe. */
+export function dialogueReadMs(text: string): number {
+  return Math.min(12_000, 4_000 + 60 * text.length);
 }
 
 export function createDialogueOverlay(root: HTMLElement): DialogueOverlay {
@@ -48,7 +55,7 @@ export function createDialogueOverlay(root: HTMLElement): DialogueOverlay {
             h(
               'div',
               { class: 'dt-second' },
-              d.answers.length === 0 ? keycap(actKey) : keycap('Entrée'),
+              keycap('Entrée'),
               d.answers.length === 0 ? ` ${T.dialogue.next}` : ' répondre',
             ),
           );

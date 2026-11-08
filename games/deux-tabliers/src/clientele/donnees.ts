@@ -45,6 +45,18 @@ const RulesSchema = v.object({
   presentMax: Nat,
   standingAtCounter: Nat,
   queuePlaces: Nat,
+  /**
+   * File à la caisse: écart entre deux personnes (m); secondes à la caisse sans être servi avant
+   * de laisser passer les suivants (s'il y en a); secondes à l'écart avant de revenir juste
+   * derrière le client en tête.
+   */
+  queue: v.object({
+    spacing: Pos,
+    stepAsideSeconds: Pos,
+    asideReturnSeconds: Pos,
+    /** Ce que dit un habitué qui laisse passer les suivants. */
+    asideLine: Str,
+  }),
   estimatedSecondsPerGroup: Pos,
   softClosingGameMinutes: Pos,
   servedAfterSoftCloseGameMinutes: Pos,
@@ -99,6 +111,8 @@ const RulesSchema = v.object({
     disappointedChance: N,
     regularChance: N,
     kept: Nat,
+    /** Bilan du soir: un client à cette satisfaction ou moins compte dans « Ce qui a manqué ». */
+    reportMissedBelow: N,
   }),
   seatFallbacks: v.record(Str, v.array(SeatKind)),
   counterSeatMaxGroup: Nat,
@@ -119,6 +133,10 @@ const RulesSchema = v.object({
     blockedZones: v.array(Str),
     terraceZoneLabel: Str,
   }),
+  /** Allures des clients de passage: modèle et profils qu'il peut représenter. */
+  looks: v.array(v.object({ model: Str, profiles: v.array(Str) })),
+  /** Pas deux fois la même allure parmi les `lookWindow` dernières entrées. */
+  lookWindow: Nat,
   standingSpots: v.array(Point),
   seatKinds: v.record(Str, SeatKind),
   waitingSpots: v.array(Point),

@@ -80,6 +80,11 @@ export const GroupSchema = v.strictObject({
   chat: v.boolean(),
   asUsual: v.boolean(),
   dirtySeat: v.boolean(),
+  /**
+   * Allure d'un client de passage (modèle de `regles.json`, `looks`), tirée à l'entrée sans
+   * répéter les dernières; vide pour un habitué, un invité de scène ou une ancienne sauvegarde.
+   */
+  look: v.optional(Str, ''),
 });
 export type Group = v.InferOutput<typeof GroupSchema>;
 
@@ -105,6 +110,11 @@ const DayStats = v.strictObject({
   euros: Nat,
   /** Achats du jour (équipements, meubles, décoration, travaux), en centimes. */
   spent: v.optional(Nat, 0),
+  /** Habitués servis: identifiant, minute de jeu, commande (pour le bilan, « Nos habitués »). */
+  visits: v.optional(v.array(v.tuple([Str, N, v.array(Str)])), () => []),
+  /** Ce qui a plu (`latteArt`, `quality`...) et ce qui a manqué (`noSeat`, `full`...): nombre. */
+  liked: v.optional(v.record(Str, Nat), () => ({})),
+  missed: v.optional(v.record(Str, Nat), () => ({})),
 });
 export type DayStatsState = v.InferOutput<typeof DayStats>;
 
@@ -264,6 +274,9 @@ export function emptyDayStats(): DayStatsState {
     basket: 0,
     euros: 0,
     spent: 0,
+    visits: [],
+    liked: {},
+    missed: {},
   };
 }
 

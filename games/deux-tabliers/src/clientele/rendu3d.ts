@@ -19,7 +19,6 @@ import {
   Quaternion,
   SphereGeometry,
   Vector3,
-  type AnimationAction,
   type AnimationClip,
   type Object3D,
   type Scene,
@@ -28,7 +27,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { World } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
-import type { Anim } from './clients';
+import { createClipBlend, type ClipBlend } from '../rendu/melange';
+import { memberLook, type Anim } from './clients';
+import type { ClienteleContent } from './donnees';
 import type { Group as CustomerGroup } from './etat';
 import { standingPose, type CustomerPose } from './reseau';
 
@@ -49,9 +50,8 @@ interface Loaded {
 
 interface Figure {
   readonly node: Object3D;
-  readonly mixer: AnimationMixer;
-  readonly actions: Map<string, AnimationAction>;
-  current: string;
+  readonly blend: ClipBlend;
+  readonly clips: ReadonlySet<string>;
 }
 
 export interface CustomerNodes {
@@ -84,11 +84,13 @@ const PROFILE_MODEL: Readonly<Record<string, string>> = {
   connaisseurs: 'char_client_connaisseur',
 };
 
-function modelName(g: CustomerGroup): string | null {
+/** Modèle du membre `k`: l'allure tirée par la simulation (variée), sinon celle du profil. */
+function modelName(cc: ClienteleContent, g: CustomerGroup, k: number): string | null {
   const names = [
     g.regular === null ? null : `habitue-${g.regular}`,
     g.regular === null ? null : (REGULAR_MODEL[g.regular] ?? null),
     g.role === null ? null : `scene-${g.role}`,
+    g.look === '' ? null : memberLook(cc, g.profile, g.look, k),
     `client-${g.profile}`,
     PROFILE_MODEL[g.profile] ?? 'char_client_flaneur',
   ];
@@ -130,9 +132,9 @@ function memberPose(
   }
   if (!standingPose(world, g.id, nowMs, out)) return null;
   if (k > 0) {
-    // Les autres membres suivent, un peu en arrière et de côté.
+    // Les autres membres suivent deux par deux, un rang derrière (`groupRows` de la file).
     const a = (out.yawDeg * Math.PI) / 180;
-    const back = 0.55 * Math.ceil(k / 2);
+    const back = rules.queue.spacing * Math.ceil(k / 2);
     const side = k % 2 === 1 ? 0.3 : -0.3;
     out.x += Math.sin(a) * back + Math.cos(a) * side;
     out.z += Math.cos(a) * back - Math.sin(a) * side;
@@ -198,29 +200,18 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       pending.delete(key);
       if (src === null || disposed) return;
       const node = cloneSkinned(src.scene);
-      const mixer = new AnimationMixer(node);
-      const actions = new Map<string, AnimationAction>();
-      for (const clip of src.clips) actions.set(clip.name, mixer.clipAction(clip));
+      // Ajouté à la scène au premier `update` qui le place: jamais vu à l'origine ni sans clip.
+      node.visible = false;
+      const blend = createClipBlend(new AnimationMixer(node), src.clips, FADE);
+      blend.update(0);
       root.add(node);
-      figures.set(key, { node, mixer, actions, current: '' });
+      figures.set(key, { node, blend, clips: new Set(src.clips.map((c) => c.name)) });
     });
     return null;
   };
 
   const play = (f: Figure, anim: Anim): void => {
-    const want = f.actions.has(anim)
-      ? anim
-      : anim === 'sit_drink' && f.actions.has('sit')
-        ? 'sit'
-        : 'idle';
-    if (f.current === want) return;
-    const next = f.actions.get(want);
-    const prev = f.actions.get(f.current);
-    if (next !== undefined) {
-      next.reset().fadeIn(FADE).play();
-      prev?.fadeOut(FADE);
-    }
-    f.current = want;
+    f.blend.set(f.clips.has(anim) ? anim : anim === 'sit_drink' ? 'sit' : 'idle');
   };
 
   const seen = new Set<string>();
@@ -230,7 +221,6 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       let n = 0;
       seen.clear();
       for (const g of world.clientele.groups) {
-        const name = modelName(g);
         let color = colors.get(g.profile);
         if (color === undefined) {
           color = new Color(view.content.clientele.profiles.get(g.profile)?.color ?? '#888888');
@@ -240,13 +230,15 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
           const seated = memberPose(world, view, g, k, nowMs, pose);
           if (seated === null) continue;
           const key = `${String(g.id)}:${String(k)}`;
+          const name = modelName(view.content.clientele, g, k);
           const fig = name === null ? null : figureFor(key, name);
           if (fig !== null) {
             seen.add(key);
             fig.node.position.set(pose.x, 0, pose.z);
             fig.node.rotation.y = (pose.yawDeg * Math.PI) / 180 + Math.PI;
+            fig.node.visible = true;
             play(fig, pose.anim);
-            fig.mixer.update(frameDt);
+            fig.blend.update(frameDt);
             continue;
           }
           if (n >= MAX) continue;
@@ -295,7 +287,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       for (const [key, f] of figures) {
         if (seen.has(key)) continue;
         root.remove(f.node);
-        f.mixer.stopAllAction();
+        f.blend.stop();
         figures.delete(key);
       }
     },
@@ -307,7 +299,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
       material.dispose();
       bodies.dispose();
       heads.dispose();
-      for (const f of figures.values()) f.mixer.stopAllAction();
+      for (const f of figures.values()) f.blend.stop();
       figures.clear();
       for (const p of loaded.values()) {
         void p.then((src) => {

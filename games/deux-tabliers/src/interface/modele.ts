@@ -134,7 +134,7 @@ export interface DialogueView {
   /** « Simone ». */
   readonly speaker: string;
   readonly text: string;
-  /** Deux ou trois réponses au plus; vide: E ou clic pour la suite. */
+  /** Deux ou trois réponses au plus; vide: Entrée pour la suite (ou seule, une fois lue). */
   readonly answers: readonly string[];
   /** Indice visible de ce joueur seulement (événements à indices, D-08). */
   readonly privateHint: string | null;

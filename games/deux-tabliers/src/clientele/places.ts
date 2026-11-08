@@ -99,13 +99,24 @@ export function queueLine(content: Content): QueueLine {
   };
 }
 
-/** Place `k` de la file (0: devant la caisse), à 45 cm d'écart, prolongée au-delà de la ligne. */
-export function queueSpot(content: Content, k: number): Vec2 {
+/**
+ * Rang `row` de la file (0: devant la caisse), à `spacing` mètres l'un de l'autre, le long du mur
+ * est comme au plan (de la caisse vers la porte), prolongé au-delà de la ligne si besoin.
+ */
+export function queueSpot(content: Content, row: number, spacing: number): Vec2 {
   const q = queueLine(content);
   const dx = q.tail.x - q.head.x;
   const dz = q.tail.z - q.head.z;
   const len = Math.hypot(dx, dz) || 1;
-  return { x: q.head.x + (dx / len) * 0.45 * k, z: q.head.z + (dz / len) * 0.45 * k };
+  return { x: q.head.x + (dx / len) * spacing * row, z: q.head.z + (dz / len) * spacing * row };
+}
+
+/**
+ * Rangs qu'occupe un groupe debout: le premier devant, les autres deux par deux derrière lui
+ * (même placement que le rendu, `memberPose`).
+ */
+export function groupRows(size: number): number {
+  return 1 + Math.ceil(Math.max(0, size - 1) / 2);
 }
 
 function terraceZone(content: Content, cc: ClienteleContent): Zone | undefined {

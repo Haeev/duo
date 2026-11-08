@@ -6,7 +6,7 @@
 import type { PlayerIndex } from '../etat/monde';
 import { inStock, type Ctx } from './economie';
 import type { Group } from './etat';
-import { spawnGroup, spm } from './clients';
+import { clockMinutes, spawnGroup, spm } from './clients';
 
 function regularState(
   ctx: Ctx,
@@ -148,6 +148,7 @@ export function onRegularServed(ctx: Ctx, g: Group): void {
   const gains = ctx.cc.regulars.bondGains;
   const st = regularState(ctx, r.id);
   st.visits++;
+  ctx.s.today.visits.push([r.id, clockMinutes(ctx.cc, ctx.s), [...g.items]]);
   const fav = r.favorite.length > 0 && r.favorite.every((x) => g.items.includes(x));
   let pts = gains.visitServed;
   if (fav) pts += gains.favoriteServed;
