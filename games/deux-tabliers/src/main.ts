@@ -58,7 +58,7 @@ const models = createModelLibrary((message, data) => {
 const baked = createBakedShell(stage.scene, stage.renderer, models, view);
 const nodes = createWorldNodes(stage.scene, models, [duo.host.colorHex, duo.guest.colorHex]);
 const customers = createCustomerNodes(stage.scene);
-const sounds = createSounds(duo.audio, duo.log, DATA_FILES);
+const sounds = createSounds(duo.audio, duo.log, DATA_FILES, content);
 const startPose = view.world().players[view.local];
 const look = createLookControl(canvas, duo.input, {
   degPerPixel: content.settings.mouse.degPerPixel,
@@ -204,7 +204,7 @@ duo.loop.start({
     customers.update(view, now(), dt);
     shell.update();
     baked.update();
-    shell.setBaseVisible(!baked.ready());
+    shell.setBaseVisible(baked.failed());
     arrange.render();
     currentAim = session.ready() && !arrange.active() ? localAim() : null;
     const use = view.world().players[view.local].use;
@@ -243,12 +243,14 @@ duo.loop.start({
       currentAim?.target ?? null,
     );
     panels.update();
+    sounds.update(view.world(), view.local);
     stage.render();
   },
 });
 
 duo.on('stop', () => {
   look.dispose();
+  sounds.dispose();
   arrange.dispose();
   panels.dispose();
   nodes.dispose();

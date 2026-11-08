@@ -7,26 +7,25 @@
  * surexposé). Une fois la coque là, une capture de la salle sert d'environnement aux métaux.
  */
 import {
-  CubeCamera,
   DoubleSide,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
   PMREMGenerator,
   SRGBColorSpace,
-  WebGLCubeRenderTarget,
   type Material,
   type Object3D,
   type Scene,
   type Texture,
   type WebGLRenderer,
 } from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import type { GameView } from '../reseau/vue';
 import type { ModelLibrary } from './modeles';
 
 export interface BakedShell {
-  /** Vrai dès que la coque cuite est posée (la coque en blocs peut se cacher). */
-  ready(): boolean;
+  /** Vrai si la coque cuite n'a pas pu se charger: la coque en blocs prend le relais. */
+  failed(): boolean;
   update(): void;
   dispose(): void;
 }
@@ -96,23 +95,25 @@ export function createBakedShell(
   let base: Object3D | null = null;
   let scale = 1;
   let disposed = false;
+  let failed = false;
   let key = '';
 
+  // Environnement des métaux: une pièce neutre calculée une fois au chargement, comme l'essai
+  // de style (une capture de la salle par six vues compilerait une variante de chaque
+  // programme pour la cible cubique: le budget de 12 programmes ne le permet pas).
   const capture = (): void => {
-    const target = new WebGLCubeRenderTarget(128);
-    const camera = new CubeCamera(0.05, 40, target);
-    camera.position.set(7, 1.5, 10);
-    camera.update(renderer, scene);
+    const room = new RoomEnvironment();
     const pmrem = new PMREMGenerator(renderer);
-    const env = pmrem.fromCubemap(target.texture);
+    const env = pmrem.fromScene(room, 0.04);
     pmrem.dispose();
-    target.dispose();
+    room.dispose();
     owned.push(env);
     scene.environment = env.texture;
     scene.environmentIntensity = 0.45;
   };
 
   void models.gltf('shell_village').then((src) => {
+    if (src === null) failed = true;
     if (src === null || disposed) return;
     scale = lightmapScale(src.scene);
     bake(src.scene, scale, owned);
@@ -156,7 +157,7 @@ export function createBakedShell(
   };
 
   return {
-    ready: () => base !== null,
+    failed: () => failed,
     update: sync,
     dispose() {
       disposed = true;

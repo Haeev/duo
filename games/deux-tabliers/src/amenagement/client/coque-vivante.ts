@@ -22,10 +22,13 @@ const LAYER = 0.006;
 export function createLiveShell(scene: Scene, content: Content, view: GameView): LiveShell {
   let plan = currentPlan(content, view.world());
   let shell = buildShell(plan);
-  let baseVisible = true;
+  // Cachée d'emblée: la coque cuite la remplace, sauf si elle ne se charge pas.
+  let baseVisible = false;
+  shell.group.visible = false;
   scene.add(shell.group);
   const extras = new Group();
   extras.name = 'revetements';
+  extras.visible = false;
   scene.add(extras);
   const owned: { dispose(): void }[] = [];
   let key = '';

@@ -24,10 +24,20 @@
     "service-dishwasher-start": "dishwasher-close",
     "service-dishwasher-done": "dishwasher-done",
     "service-dishwasher-emptied": "dishwasher-open",
-    "service-carton-delivered": "delivery-knock",
     "service-carton-stored": "shelf-place",
     "service-recipe-unlocked": "ui-notify",
     "service-equipment": "ui-notify",
-    "service-tip": "tip-jar-2"
+    "service-tip": "tip-jar-2",
+    "clientele-delivery": "delivery-knock",
+    "clientele-arrived": "door-bell-village",
+    "clientele-opened": "service-open",
+    "clientele-closing": "service-close",
+    "clientele-guestbook": "guestbook-page",
+    "clientele-cups": "ui-notify",
+    "clientele-event-start": "event-fanfare",
+    "clientele-proposal": "ui-notify",
+    "clientele-ask": "ui-notify",
+    "clientele-purchased": "coins-drawer",
+    "amenagement-achat": "coins-drawer"
   }
 }
