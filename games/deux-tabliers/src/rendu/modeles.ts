@@ -10,6 +10,7 @@
  */
 import {
   BoxGeometry,
+  DoubleSide,
   Group,
   Mesh,
   MeshLambertMaterial,
@@ -65,6 +66,19 @@ function frontTurn(name: string): number {
   return FRONT_TURN[avant];
 }
 
+/**
+ * Verre transparent à deux faces (`dt_verre`): une seule passe. Sinon Three.js le dessine en deux
+ * passes (faces arrière puis avant), avec un programme de plus pour les faces arrière; à 14 %
+ * d'opacité, l'ordre des faces ne se voit pas (budget de 12 programmes).
+ */
+export function singlePassGlass(root: Object3D): void {
+  root.traverse((o) => {
+    if (!(o instanceof Mesh)) return;
+    const mats = Array.isArray(o.material) ? (o.material as Material[]) : [o.material as Material];
+    for (const m of mats) if (m.transparent && m.side === DoubleSide) m.forceSinglePass = true;
+  });
+}
+
 export interface SubstituteHint {
   readonly width: number;
   readonly depth: number;
@@ -116,7 +130,10 @@ export function createModelLibrary(
       url === undefined
         ? Promise.resolve(null)
         : loader.loadAsync(url).then(
-            (g) => ({ scene: g.scene, clips: g.animations }),
+            (g) => {
+              singlePassGlass(g.scene);
+              return { scene: g.scene, clips: g.animations };
+            },
             (error: unknown) => {
               onError('modèle illisible, substitut affiché', { name, error: String(error) });
               return null;

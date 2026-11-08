@@ -154,7 +154,12 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   const bodies = new InstancedMesh(body, material, MAX);
   const heads = new InstancedMesh(head, material, MAX);
   for (const m of [bodies, heads]) {
+    // Couleurs d'instance créées tout de suite et maillages cachés tant qu'aucun substitut ne
+    // sert: un seul programme, et seulement si un modèle manque (budget de 12 programmes; un
+    // `InstancedMesh` visible se compile même à zéro instance).
+    m.setColorAt(0, new Color('#ffffff'));
     m.count = 0;
+    m.visible = false;
     m.frustumCulled = false;
     root.add(m);
   }
@@ -187,8 +192,19 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
             () => null,
           );
     loaded.set(name, p);
+    void p.then((src) => {
+      if (src === null) missing.add(name);
+    });
     return p;
   };
+  /** Modèles illisibles: leurs personnages prennent le substitut. */
+  const missing = new Set<string>();
+  // Les personnages se chargent dès maintenant (écran de chargement), pas à l'entrée du premier
+  // client: pas d'à-coup en service, pas de substitut le temps du chargement.
+  for (const url of Object.keys(MODEL_URLS)) {
+    const name = /\/(char_(?!avatar)[\w-]+)\.glb$/.exec(url)?.[1];
+    if (name !== undefined) void load(name);
+  }
 
   const pending = new Set<string>();
   const figureFor = (key: string, name: string): Figure | null => {
@@ -241,6 +257,8 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
             fig.blend.update(frameDt);
             continue;
           }
+          // Modèle en cours de chargement: rien plutôt qu'un substitut d'un instant.
+          if (name !== null && !missing.has(name)) continue;
           if (n >= MAX) continue;
           // Substitut: assis, le corps descend sur l'assise et se tasse.
           q.setFromAxisAngle(up, (pose.yawDeg * Math.PI) / 180);
@@ -279,6 +297,8 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
         n++;
       }
       bodies.count = n;
+      bodies.visible = n > 0;
+      heads.visible = n > 0;
       heads.count = n;
       bodies.instanceMatrix.needsUpdate = true;
       heads.instanceMatrix.needsUpdate = true;

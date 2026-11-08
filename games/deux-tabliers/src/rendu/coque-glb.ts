@@ -46,6 +46,8 @@ function bake(root: Object3D, scale: number, owned: { dispose(): void }[]): void
         opacity: 0.14,
         depthWrite: false,
         side: DoubleSide,
+        // Une passe, un programme (voir `singlePassGlass`).
+        forceSinglePass: true,
       });
       owned.push(glass);
       o.material = glass;

@@ -9,10 +9,12 @@ import {
   BoxGeometry,
   CapsuleGeometry,
   Color,
+  DataTexture,
   Group,
   Mesh,
   MeshLambertMaterial,
   MeshStandardMaterial,
+  SRGBColorSpace,
   type Material,
   type Scene,
 } from 'three';
@@ -66,23 +68,35 @@ export function createWorldNodes(
   // de l'autre n'avance qu'à l'arrivée des états (une image sur deux ou trois sans déplacement).
   const rigs: ({ blend: ClipBlend; still: number } | null)[] = [null, null];
   const owned: Material[] = [];
+  const white = new DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+  white.colorSpace = SRGBColorSpace;
+  white.needsUpdate = true;
   let disposed = false;
   for (const i of [0, 1] as const) {
     void models.gltf(AVATAR_MODEL[i]).then((src) => {
       const holder = avatars[i];
       if (src === null || disposed || holder === undefined) return;
       const node = cloneSkinned(src.scene);
+      // Badge teinté: copie du matériau du corps (texture blanche), pour garder le programme des
+      // personnages au lieu d'en compiler un de plus (budget de 12 programmes).
+      let bodyMaterial: MeshStandardMaterial | null = null;
+      node.traverse((child) => {
+        const m = child instanceof Mesh ? (child.material as Material) : null;
+        if (m instanceof MeshStandardMaterial && m.map !== null) bodyMaterial ??= m;
+      });
       node.traverse((child) => {
         if (!(child instanceof Mesh)) return;
         const m = child.material as Material;
-        if (m.name === 'dt_badge_joueur') {
-          const tinted = new MeshStandardMaterial({
-            color: new Color(colors[i]),
-            roughness: 0.4,
-          });
-          owned.push(tinted);
-          child.material = tinted;
-        }
+        if (m.name !== 'dt_badge_joueur') return;
+        const base: MeshStandardMaterial | null = bodyMaterial;
+        const tinted = base === null ? new MeshStandardMaterial() : base.clone();
+        tinted.name = m.name;
+        tinted.map = base === null ? null : white;
+        tinted.color = new Color(colors[i]);
+        tinted.roughness = 0.4;
+        tinted.metalness = 0;
+        owned.push(tinted);
+        child.material = tinted;
       });
       holder.clear();
       holder.add(node);
@@ -237,6 +251,7 @@ export function createWorldNodes(
     dispose() {
       disposed = true;
       for (const m of owned) m.dispose();
+      white.dispose();
       for (const r of rigs) r?.blend.stop();
       scene.remove(root);
       body.dispose();
