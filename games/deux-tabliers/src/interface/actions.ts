@@ -23,7 +23,7 @@ export type UiAction =
   | { readonly type: 'slate-star'; readonly recipe: string; readonly star: boolean }
   | { readonly type: 'slate-word'; readonly text: string }
   | { readonly type: 'slate-hold'; readonly recipe: string | null }
-  // Tablette
+  // Téléphone
   | {
       readonly type: 'order-quantity';
       readonly supplier: string;
@@ -46,7 +46,7 @@ export type UiAction =
       readonly key: 'pace' | 'crowd' | 'radio';
       readonly value: string;
     }
-  /** Où est ce joueur dans l'interface, pour la carte de l'autre (« Sur la tablette : catalogue »). */
+  /** Où est ce joueur dans l'interface, pour la carte de l'autre (« Sur son téléphone : Catalogue »). */
   | { readonly type: 'ui-place'; readonly place: string | null }
   // Bilan, nuit, fin
   | { readonly type: 'evening-page'; readonly page: number }

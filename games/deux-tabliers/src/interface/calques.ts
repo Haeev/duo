@@ -5,7 +5,7 @@
  *   (C20). Fondu de 150 ms, aucun avec « Réduire les animations ».
  * - Clavier, comme La Petite Ligne: flèches ou Z Q S D (positions) pour l'élément voisin
  *   (navigation spatiale), A et E (positions `KeyQ`, `KeyE`) pour la section ou la page, Entrée
- *   ou Espace pour activer, Tab et Maj+Tab pour boucler (ou fermer la tablette, sa touche),
+ *   ou Espace pour activer, Tab et Maj+Tab pour boucler (Tab range le téléphone, sa touche),
  *   Retour arrière pour fermer la fenêtre du dessus. Échap n'est jamais lu ici (C19).
  * - Anti-double-appui: Entrée, Espace et E ignorés 300 ms après l'ouverture; une touche
  *   maintenue n'active jamais deux fois.
@@ -20,7 +20,14 @@ export interface LayerSpec {
   /** Écran de choix (matin, nuit, première fois): plein écran, pas de fermeture par clic à côté. */
   readonly modal?: boolean;
   readonly narrow?: boolean;
-  /** Touche (code) qui ferme ce calque, en plus de Retour arrière (« Tab » pour la tablette). */
+  /**
+   * Téléphone tenu en main (ux-telephone 10.1): la vue s'assombrit sous le HUD, le téléphone
+   * passe au-dessus; un clic à côté le range d'un coup, Maj+Tab ne fait rien.
+   */
+  readonly phone?: boolean;
+  /** Nom accessible du calque quand il n'a pas de titre `h2` (« Ton téléphone »). */
+  readonly label?: string;
+  /** Touche (code) qui ferme ce calque, en plus de Retour arrière (« Tab » pour le téléphone). */
   readonly closeKey?: string;
   /** Construit le contenu dans `root` (appelé à l'ouverture et à chaque `refresh`). */
   render(root: HTMLElement, layer: LayerHandle): void;
@@ -28,6 +35,8 @@ export interface LayerSpec {
   back?(): boolean;
   /** A et E. */
   section?(delta: -1 | 1): void;
+  /** Origine (`Home`): raccourci de confort vers l'accueil du téléphone. */
+  home?(): void;
   /** Flèches gauche et droite tournent aussi les pages (bilan). */
   readonly arrowPages?: boolean;
   /** Focus par défaut, cherché après chaque rendu d'ouverture. */
@@ -65,6 +74,8 @@ interface Entry {
 const FOCUSABLE =
   'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea, [tabindex="0"]';
 const ACTIVATION_GUARD_MS = 300;
+/** Durée du rangement du téléphone (ux-telephone 2.1). */
+const PHONE_OUT_MS = 150;
 
 const DIRECTIONS: Readonly<Record<string, readonly [number, number]>> = {
   ArrowUp: [0, -1],
@@ -192,7 +203,18 @@ export function createLayers(
     const index = stack.indexOf(entry);
     if (index < 0) return;
     stack.splice(index, 1);
-    entry.backdrop.remove();
+    if (entry.spec.phone === true && !options.reducedMotion()) {
+      // Le téléphone redescend (150 ms) avant de quitter la page; il ne reçoit plus rien.
+      entry.root.classList.add('out');
+      entry.backdrop.classList.add('out');
+      setTimeout(() => {
+        entry.root.remove();
+        entry.backdrop.remove();
+      }, PHONE_OUT_MS);
+    } else {
+      entry.backdrop.remove();
+      entry.root.remove();
+    }
     entry.spec.onClose?.();
     const next = topEntry();
     if (next === undefined) {
@@ -229,6 +251,8 @@ export function createLayers(
     if (event.code === 'Tab') {
       event.preventDefault();
       if (repeat && entry.spec.closeKey === 'Tab') return;
+      // Maj+Tab ne range pas le téléphone (évite de le ranger par erreur).
+      if (entry.spec.phone === true && event.shiftKey) return;
       if (entry.spec.closeKey === 'Tab') {
         remove(entry);
         return;
@@ -257,6 +281,11 @@ export function createLayers(
         return;
       }
       if (active instanceof HTMLElement && entry.root.contains(active)) active.click();
+      return;
+    }
+    if (event.code === 'Home' && entry.spec.home !== undefined && !typing) {
+      event.preventDefault();
+      if (!repeat) entry.spec.home();
       return;
     }
     if ((event.code === 'KeyQ' || event.code === 'KeyE') && !typing) {
@@ -308,19 +337,29 @@ export function createLayers(
         render(existing);
         return existing.handle;
       }
+      const phone = spec.phone === true;
+      const moving = !options.reducedMotion();
       const backdrop = document.createElement('div');
-      backdrop.className = `${spec.modal === true ? 'dt-screen' : 'dt-backdrop'}${options.reducedMotion() ? '' : ' fade'}`;
+      backdrop.className = phone
+        ? `dt-phone-dim${moving ? ' in' : ''}`
+        : `${spec.modal === true ? 'dt-screen' : 'dt-backdrop'}${moving ? ' fade' : ''}`;
       backdrop.dataset.layer = spec.id;
       const root = document.createElement('div');
-      root.className = `dt-panel${spec.narrow === true ? ' narrow' : ''}`;
+      root.className = phone
+        ? `dt-tel${moving ? ' in' : ''}`
+        : `dt-panel${spec.narrow === true ? ' narrow' : ''}`;
       root.setAttribute('role', 'dialog');
-      root.setAttribute('aria-modal', 'true');
-      backdrop.append(root);
+      root.setAttribute('aria-modal', phone ? 'false' : 'true');
+      if (spec.label !== undefined) root.setAttribute('aria-label', spec.label);
+      if (phone) root.dataset.layer = spec.id;
+      else backdrop.append(root);
       backdrop.addEventListener('pointerdown', (event) => {
-        // Clic à côté: fermer (pas pour un écran de choix).
+        // Clic à côté: fermer (pas pour un écran de choix); le téléphone se range d'un coup.
         if (event.target !== backdrop || spec.modal === true) return;
         const entry = stack.find((e) => e.spec.id === spec.id);
-        if (entry !== undefined && entry === topEntry()) back(entry);
+        if (entry === undefined || entry !== topEntry()) return;
+        if (phone) remove(entry);
+        else back(entry);
       });
       const entry: Entry = {
         spec,
@@ -340,9 +379,11 @@ export function createLayers(
       };
       const wasEmpty = stack.length === 0;
       // Le dernier ouvert passe au-dessus, écran de choix compris (lettre lue depuis le matin).
-      backdrop.style.zIndex = String(30 + stack.length);
+      // Le téléphone reste sous les fenêtres qu'il ouvre (proposition, ardoise).
+      if (!phone) backdrop.style.zIndex = String(30 + stack.length);
       stack.push(entry);
       host.append(backdrop);
+      if (phone) host.append(root);
       spec.render(root, entry.handle);
       const title = root.querySelector('h2');
       if (title !== null) {
@@ -367,7 +408,10 @@ export function createLayers(
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
-      for (const e of [...stack]) e.backdrop.remove();
+      for (const e of [...stack]) {
+        e.backdrop.remove();
+        e.root.remove();
+      }
       stack.length = 0;
     },
   };

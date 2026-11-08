@@ -5,7 +5,7 @@
  * restent affichées jusqu'à ce que le joueur passe à la suite.
  *
  * Votes: « Commencer la journée » (écran du matin) retourne la pancarte (vote `open`), l'autre
- * répond par la proposition « On ouvre ? »; « Bonne nuit » au bilan (ou sur la tablette) vote
+ * répond par la proposition « On ouvre ? »; « Bonne nuit » au bilan (ou dans le téléphone) vote
  * `next-day`; le lundi, jour fermé, le bilan du jour de repos mène au lendemain de la même façon.
  * Le dernier lundi (jour 15), l'écran de nuit pose « Partir pour Mérelles ? ».
  */

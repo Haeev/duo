@@ -87,7 +87,7 @@ export const CLIENTELE_INTENTS = [
     type: v.literal('clientele-evening-page'),
     page: v.pipe(Nat, v.minValue(1), v.maxValue(8)),
   }),
-  /** Où est ce joueur dans l'interface (« Sur la tablette : catalogue »), pour la carte de l'autre. */
+  /** Où est ce joueur dans l'interface (« Sur son téléphone : Catalogue »), pour la carte de l'autre. */
   v.strictObject({
     type: v.literal('clientele-ui-place'),
     place: v.nullable(v.pipe(v.string(), v.maxLength(60))),

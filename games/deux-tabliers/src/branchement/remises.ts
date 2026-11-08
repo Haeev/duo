@@ -55,7 +55,7 @@ export function discountsView(cc: ClienteleContent, s: ClienteleState): Discount
   const fullDay =
     day === cc.economy.challenge.day ||
     (d.happyHour.on && d.happyHour.days.includes('sun') && weekdayId(cc, day) === 'sun')
-      ? fill(T.tablet.discounts.fullDay, { weekday: capitalize(weekdayName(day)) })
+      ? fill(T.apps.discounts.fullDay, { weekday: capitalize(weekdayName(day)) })
       : null;
   return {
     settings: d,
@@ -65,7 +65,7 @@ export function discountsView(cc: ClienteleContent, s: ClienteleState): Discount
       lengths: cc.discounts.happyHour.lengths,
       closeHour: cc.days.close / 60,
       rates: cc.discounts.happyHour.rates,
-      line: fill(T.tablet.discounts.happyHourLine, {
+      line: fill(T.apps.discounts.happyHourLine, {
         start: hourText(d.happyHour.start),
         end: hourText(d.happyHour.start + d.happyHour.length),
         pct: pct(d.happyHour.rate),
@@ -75,10 +75,10 @@ export function discountsView(cc: ClienteleContent, s: ClienteleState): Discount
       owned,
       need: owned
         ? null
-        : fill(T.tablet.discounts.loyaltyNeedCards, { amount: euros(cents(card.price), true) }),
+        : fill(T.apps.discounts.loyaltyNeedCards, { amount: euros(cents(card.price), true) }),
       holders:
         owned && d.loyalty
-          ? fill(T.tablet.discounts.holders, { pct: pct(holderShare(cc, s)) })
+          ? fill(T.apps.discounts.holders, { pct: pct(holderShare(cc, s)) })
           : null,
     },
     profileRates: cc.discounts.profileRates
@@ -108,7 +108,7 @@ export function discountsView(cc: ClienteleContent, s: ClienteleState): Discount
         ? null
         : {
             recipe: suggestion.recipe,
-            text: fill(T.tablet.discounts.dailyOfferSuggest, {
+            text: fill(T.apps.discounts.dailyOfferSuggest, {
               n: suggestion.left,
               item: `portions de ${recipeName(suggestion.recipe).toLowerCase()}`,
               usual: String(suggestion.usual).replace('.', ','),
@@ -117,9 +117,9 @@ export function discountsView(cc: ClienteleContent, s: ClienteleState): Discount
     fullDay,
     costYesterday:
       yesterday !== null && yesterday.discounts > 0
-        ? fill(T.tablet.discounts.costYesterday, { amount: euros(yesterday.discounts) })
+        ? fill(T.apps.discounts.costYesterday, { amount: euros(yesterday.discounts) })
         : null,
-    forDay: fill(T.tablet.discounts.forDay, { weekday: weekdayName(day), day }),
+    forDay: fill(T.apps.discounts.forDay, { weekday: weekdayName(day), day }),
   };
 }
 
@@ -135,7 +135,7 @@ export function marketingView(
   s: ClienteleState,
   player: PlayerIndex,
 ): MarketingView {
-  const M = T.tablet.marketing;
+  const M = T.apps.marketing;
   const closed = s.phase === 'service' || s.phase === 'closing';
   const available = availableCents(cc, s);
   const threshold = cents(cc.marketing.bigProposalEuros);

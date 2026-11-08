@@ -335,7 +335,7 @@ export const ClienteleStateSchema = v.strictObject({
   soldHistory: v.optional(v.array(v.record(Str, Nat)), () => []),
   /** Actions de marketing lancées (marketing v0.2), les plus anciennes d'abord. */
   campaigns: v.optional(v.array(CampaignSchema), () => []),
-  /** Où est chaque joueur dans l'interface (« Sur la tablette : catalogue »), `null`: en jeu. */
+  /** Où est chaque joueur dans l'interface (« Sur son téléphone : Catalogue »), `null`: en jeu. */
   uiPlaces: v.optional(v.tuple([v.nullable(Str), v.nullable(Str)]), () => [null, null]),
   /** Page du bilan que lit chaque joueur: jour du bilan, page (à partir de 1). */
   eveningPages: v.optional(v.tuple([v.tuple([Nat, Nat]), v.tuple([Nat, Nat])]), () => [

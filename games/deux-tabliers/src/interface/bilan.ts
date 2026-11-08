@@ -9,7 +9,7 @@ import { footer } from './calques';
 import type { UiContext } from './contexte';
 import { button, h, icon, token, type IconName } from './dom';
 import type { EveningView, GuestbookEntryView } from './modele';
-import { cupsRow, cupsText } from './tablette';
+import { cupsRow, cupsText } from './telephone-applis';
 import { T, WEEKDAYS } from './textes';
 import { capital, euros, fill } from './typo';
 
@@ -314,7 +314,7 @@ function pageContent(body: HTMLElement, ctx: UiContext, evening: EveningView, pa
                   null,
                   ' ',
                   button(m.link, () => {
-                    ctx.openTablet('catalogue');
+                    ctx.openPhone('catalogue');
                   }),
                 ),
           ),
@@ -379,7 +379,7 @@ function pageContent(body: HTMLElement, ctx: UiContext, evening: EveningView, pa
         body.append(
           h('p', null, T.evening.orderPending),
           button(T.evening.prepareOrder, () => {
-            ctx.openTablet('orders');
+            ctx.openPhone('orders');
           }),
         );
       if (t.project !== null) body.append(h('p', { class: 'dt-row' }, icon('heart'), t.project));

@@ -79,9 +79,12 @@ const ui = attachInterface({
   camera: stage.camera,
   sources: wired.sources,
   intents: wired.intents,
+  sound: (id) => {
+    sounds.play(id);
+  },
 });
 // Le panneau provisoire de l'aménagement (Tab en mode aménagement, B pour y entrer) garde son
-// propre calque: la boutique de la tablette passe par `catalogView` pour le reste.
+// propre calque: la boutique du téléphone passe par `catalogView` pour le reste.
 const panels = createPanels(document.body, view, (open) => {
   look.setPanelOpen(open);
 });

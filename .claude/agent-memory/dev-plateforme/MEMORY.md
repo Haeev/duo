@@ -47,3 +47,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Un champ de texte focalisé par programme a son curseur au début: `setSelectionRange(fin, fin)` pour l'avoir à la fin.
 - Panneau reconstruit à chaque changement du modèle: retrouver le focus par une clé (balise, nom, rang) et garder tel quel le champ en cours de saisie (`data-keep`), sinon la frappe se perd.
 - Le faux hôte (`servir.ts`) sert `dist/` du jeu: reconstruire le jeu avant d'essayer; ports 8080 à 8100 souvent pris par d'autres sessions, prendre un port plus haut.
+
+## Téléphone de Deux Tabliers (vérifié le 2026-11-08)
+
+- Une touche lue à la fois par les calques (keydown) et par le SDK (`wasPressed`, vidé seulement à `endStep`): le Tab qui range le téléphone arrive aussi au pas suivant et le ressortirait. Parade: drapeau « rangé depuis le dernier pas » posé dans `onClose`, lu puis remis à zéro par `step`.
+- Calque au-dessus du HUD mais fond sous le HUD: un enfant ne sort pas du contexte d'empilement de son parent `position: fixed`; le téléphone est ajouté à côté de son fond, pas dedans.
+- `.x button:not(.a, .b)` pèse (0,2,1) et écrase `.puce[aria-pressed]`: mettre les remises à zéro des boutons sous `:where(...)`.
+- Page d'aperçu sans SDK: Tab et Entrée relayés vers `ui.step` en capture, avec `stopImmediatePropagation` et un `setTimeout(0)` (le jeu lit ces touches au pas suivant), plus un `step` vide par image.

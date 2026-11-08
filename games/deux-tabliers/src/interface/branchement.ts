@@ -4,7 +4,7 @@
  *   const ui = attachInterface({ duo, view, look, canvas, camera: stage.camera, sources: {}, intents: {} });
  *   // step: const keys = ui.step(); ... if (!keys.swallowAct) { act/drop comme avant }
  *   //       intents.push(...ui.drainIntents());
- *   //       ne plus appeler panels.toggle('tablette') ni panels.close() (les calques lisent Tab et Retour arrière),
+ *   //       ne plus appeler panels.toggle ni panels.close() (les calques lisent Tab et Retour arrière),
  *   //       et ne reprendre la souris sur Entrée que si !keys.swallowConfirm.
  *   // render: ui.frame(hudState, currentAim?.target ?? null) à la place de hud.update(hudState) et panels.update()
  *   // view.onEvent: ui.onEvent(event) (remplace hud.flash pour les refus)
@@ -40,6 +40,8 @@ export interface AttachOptions {
   readonly camera: PerspectiveCamera;
   readonly sources?: InterfaceSources;
   readonly intents?: IntentFor;
+  /** Son d'interface (sortie du téléphone, notification), par identifiant de `sons.json`. */
+  readonly sound?: (id: string) => void;
 }
 
 export interface AttachedInterface {
@@ -93,6 +95,9 @@ export function attachInterface(options: AttachOptions): AttachedInterface {
     },
     aspect,
     actLabel: () => duo.input.actionLabel('act'),
+    sound: (id) => {
+      options.sound?.(id);
+    },
   });
 
   const applyView = (): void => {

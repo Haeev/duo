@@ -70,3 +70,8 @@ export function fill(template: string, values: Readonly<Record<string, string | 
 export function capital(text: string): string {
   return text.length === 0 ? text : text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+/** Première lettre en minuscule, le reste intact (« un encart dans L'Écho »). */
+export function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}

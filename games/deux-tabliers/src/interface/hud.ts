@@ -13,7 +13,7 @@ import { h, icon, keycap, token, type IconName } from './dom';
 import type { AlertView, GaugeView, InterfaceModel, TicketView } from './modele';
 import type { PlayerSettings } from './reglages';
 import { T, WEEKDAYS } from './textes';
-import { capital, euros, fill, fr, heure } from './typo';
+import { capital, euros, fill, fr, heure, lowerFirst } from './typo';
 
 export interface HudState {
   /** Une cible est visée: anneau au lieu du point. */
@@ -49,8 +49,13 @@ export interface Hud {
   setModel(model: InterfaceModel, people: HudPeople): void;
   /** Refus ou message bref, au centre, deux secondes. */
   flash(text: string): void;
-  /** Alerte douce (ux 3.3): 6 s, 3 au plus, jamais de focus. */
-  alert(alert: AlertView): void;
+  /**
+   * Alerte douce (ux 3.3): 6 s, 3 au plus, jamais de focus. `buzz`: notification du téléphone
+   * rangé, deux petites secousses (aucune avec « Réduire les animations »).
+   */
+  alert(alert: AlertView, options?: { readonly buzz?: boolean; readonly ms?: number }): void;
+  /** Téléphone sorti: les propositions passent dans sa bannière, plus au centre du HUD. */
+  setPhoneOpen(open: boolean): void;
   /** Mot de qualité d'un geste, chez ce joueur seulement, 1,5 s (ux 5.1). */
   quality(word: string): void;
   setSettings(settings: PlayerSettings): void;
@@ -215,6 +220,10 @@ export function createHud(root: HTMLElement): Hud {
   let settings: PlayerSettings | null = null;
   let gaugeActive = false;
   let lastFps = -1;
+  let phoneOpen = false;
+  /** Propositions déjà annoncées par une secousse (une seule fois chacune). */
+  const buzzed = new Set<string>();
+  let lastModel: { model: InterfaceModel; people: HudPeople } | null = null;
 
   /** Remplace le contenu d'une région seulement si sa clé a changé. */
   const paint = (
@@ -270,6 +279,7 @@ export function createHud(root: HTMLElement): Hud {
     },
 
     setModel(model, people) {
+      lastModel = { model, people };
       const clock = model.clock;
       const showClock =
         clock !== null &&
@@ -357,8 +367,37 @@ export function createHud(root: HTMLElement): Hud {
 
       const countdown = clock?.stop?.kind === 'countdown' ? clock.stop.seconds : null;
       const hint = settings?.tips === false ? null : model.hint;
-      paint('tc', JSON.stringify([hint, countdown]), tcFixed, () => {
+      // Proposition de l'autre, téléphone rangé: alerte au centre tant qu'elle attend (ux-telephone 5).
+      const phoneProposals = phoneOpen
+        ? []
+        : model.proposals.filter(
+            (p) => p.from !== model.local && (p.kind === 'purchase' || p.kind === 'move'),
+          );
+      paint('tc', JSON.stringify([hint, countdown, phoneProposals]), tcFixed, () => {
         const out: Node[] = [];
+        for (const p of phoneProposals) {
+          const card = h(
+            'div',
+            { class: 'dt-card dt-alert dt-phone-alert', role: 'status', 'data-proposal': p.id },
+            icon('phone'),
+            h(
+              'span',
+              null,
+              fill(T.notif.hudProposal, {
+                player: people.partnerName,
+                name: lowerFirst(p.item ?? ''),
+                amount: euroText(p.amountCents ?? 0),
+              }),
+              keycap(T.notif.hudProposalKey),
+              T.notif.hudProposalTail,
+            ),
+          );
+          if (!buzzed.has(p.id)) {
+            buzzed.add(p.id);
+            card.classList.add('dt-buzz');
+          }
+          out.push(card);
+        }
         if (countdown !== null)
           out.push(
             h(
@@ -391,6 +430,7 @@ export function createHud(root: HTMLElement): Hud {
           model.held[1 - model.local],
           model.proposals,
           people.partnerName,
+          phoneOpen,
         ]),
         tr,
         () => {
@@ -423,7 +463,11 @@ export function createHud(root: HTMLElement): Hud {
               ),
             );
           }
-          for (const p of model.proposals) out.push(proposalCard(p, model.local, people));
+          for (const p of model.proposals) {
+            // Les achats proposés par l'autre passent par le téléphone (alerte au centre, Messages).
+            if (p.from !== model.local && (p.kind === 'purchase' || p.kind === 'move')) continue;
+            out.push(proposalCard(p, model.local, people));
+          }
           return out;
         },
       );
@@ -514,11 +558,11 @@ export function createHud(root: HTMLElement): Hud {
       }, 2000);
     },
 
-    alert(a) {
+    alert(a, options = {}) {
       const card = h(
         'div',
-        { class: 'dt-card dt-alert', role: 'status' },
-        icon(ALERT_ICONS[a.icon]),
+        { class: `dt-card dt-alert${options.buzz === true ? ' dt-buzz' : ''}`, role: 'status' },
+        icon(options.buzz === true ? 'phone' : ALERT_ICONS[a.icon]),
         a.text,
       );
       alerts.append(card);
@@ -527,8 +571,14 @@ export function createHud(root: HTMLElement): Hud {
       const timer = setTimeout(() => {
         alertTimers.delete(timer);
         card.remove();
-      }, 6000);
+      }, options.ms ?? 6000);
       alertTimers.add(timer);
+    },
+
+    setPhoneOpen(open) {
+      if (open === phoneOpen) return;
+      phoneOpen = open;
+      if (lastModel !== null) this.setModel(lastModel.model, lastModel.people);
     },
 
     quality(word) {

@@ -149,17 +149,154 @@ export const CSS = `
 .dt-error { color: var(--dt-erreur); display: flex; gap: 0.35em; align-items: center; }
 .dt-ok { color: var(--dt-succes); display: flex; gap: 0.35em; align-items: center; }
 
-/* Tablette */
-.dt-tablet { display: grid; grid-template-columns: 12em 1fr; min-height: 0; flex: 1; }
-.dt-tablet nav { border-right: 1px solid var(--dt-filet); padding: 0.8em 0.6em; display: flex; flex-direction: column; gap: 0.25em; overflow: auto; }
-.dt-tab { display: flex; align-items: center; gap: 0.55em; text-align: left; font: 500 1em/1.2 var(--dt-ui); color: var(--dt-creme); background: transparent; border: 2px solid transparent; border-radius: 0.55em; padding: 0.45em 0.6em; cursor: pointer; }
-.dt-tab[aria-selected="true"] { border-color: var(--dt-creme-2); background: var(--dt-expresso-2); font-weight: 700; }
-.dt-tab .dt-count { margin-left: auto; min-width: 1.4em; border: 1.5px solid currentColor; border-radius: 1em; font-size: 0.8em; text-align: center; }
-.dt-tablet section { overflow: auto; padding: 0.9em 1.3em; min-height: 0; }
+/* Réglages des écrans de choix (première fois) */
 .dt-setting { display: grid; grid-template-columns: 1fr auto; gap: 0.2em 1em; align-items: center; padding: 0.55em 0; border-bottom: 1px solid var(--dt-filet); }
 .dt-setting .dt-second { grid-column: 1 / -1; font-size: 0.875em; }
 .dt-seg { display: inline-flex; gap: 0.3em; flex-wrap: wrap; }
-.dt-switch { min-width: 4.2em; }
+
+/* Téléphone tenu en main (ux-telephone 2 et 3): vue assombrie à 28 % sous le HUD, téléphone au-dessus */
+.dt-phone-dim { position: fixed; inset: 0; z-index: 5; background: rgba(18, 12, 8, 0.28); }
+.dt-phone-dim.in { animation: dt-dim-in 180ms ease-out; }
+.dt-phone-dim.out { animation: dt-dim-out 150ms ease-in forwards; pointer-events: none; }
+@keyframes dt-dim-in { from { background: rgba(18, 12, 8, 0); } }
+@keyframes dt-dim-out { to { background: rgba(18, 12, 8, 0); } }
+.dt-tel {
+  --noyer: #4B2F1F; --noyer-clair: #6E4A31; --laiton: #B8924F;
+  position: fixed; z-index: 25; left: 54%; bottom: 0.75rem;
+  font-family: var(--dt-ui); color: var(--dt-creme); line-height: 1.35;
+  font-size: max(calc(1rem * var(--dt-scale)), min(calc(100vh / 54), calc(1.25rem * var(--dt-scale))));
+  /* Jamais sous « En main » (coin bas droit du HUD, 15 em du HUD avec sa marge), même à 150 %. */
+  width: min(23em, 46vw, calc(2 * (46vw - 15.5 * min(calc(1rem * var(--dt-scale)), calc(100vh / 30)))));
+  height: min(46em, calc(100vh - 5.4 * min(calc(1rem * var(--dt-scale)), calc(100vh / 30)) - 0.75rem));
+  transform: translateX(-50%);
+}
+.dt-tel.in { animation: dt-tel-in 180ms cubic-bezier(.2, .8, .3, 1); }
+.dt-tel.out { animation: dt-tel-out 150ms ease-in forwards; pointer-events: none; }
+@keyframes dt-tel-in { from { transform: translate(-50%, 70%) rotate(6deg); opacity: 0; } }
+@keyframes dt-tel-out { to { transform: translate(-50%, 70%) rotate(6deg); opacity: 0; } }
+.dt-reduced .dt-tel, .dt-reduced .dt-phone-dim { animation: none; }
+.dt-tel [hidden] { display: none !important; }
+.dt-tel h2, .dt-tel h3, .dt-tel p { margin: 0; }
+.dt-tel-coque { position: absolute; inset: 0; border-radius: 2.1em; padding: 0.6em; background: linear-gradient(100deg, var(--noyer-clair), var(--noyer) 40%, #3a2417); box-shadow: 0 0 0 0.16em var(--laiton), 0 0 0 0.22em #3b2a17, 0 1.2em 2.4em rgba(0,0,0,0.55); }
+.dt-tel-ecran { position: relative; height: 100%; border-radius: 1.55em; overflow: hidden; background: var(--dt-expresso); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-shadow: inset 0 0 0 1px #120c08; }
+/* Main provisoire: l'image rendue depuis le modèle des mains la remplacera (H4). */
+.dt-tel-doigts { position: absolute; left: -1.25em; top: 54%; width: 2.2em; height: 40%; z-index: -1; pointer-events: none; }
+.dt-tel-pouce { position: absolute; right: -1.15em; bottom: 16%; width: 2em; height: 5.2em; pointer-events: none; }
+.dt-etat { display: flex; align-items: center; gap: 0.5em; padding: 0.55em 1.1em 0.4em; font-size: 0.875em; font-weight: 600; background: #221a15; border-bottom: 1px solid var(--dt-filet); }
+.dt-etat .dt-second { font-weight: 500; }
+.dt-etat-heure { font-variant-numeric: tabular-nums; }
+.dt-etat-caisse { margin-left: auto; display: flex; gap: 0.35em; align-items: center; }
+.dt-etat-caisse .dt-icon { color: var(--dt-or); }
+.dt-corps { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--dt-filet) transparent; padding: 0.9em 1em 1em; position: relative; }
+.dt-appli-tete { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3em 0.5em; position: sticky; top: -0.9em; z-index: 2; margin: -0.9em -1em 0.6em; padding: 0.9em 1em 0.5em; background: var(--dt-expresso); box-shadow: 0 1px 0 var(--dt-filet); }
+.dt-appli-tete h2 { font: 600 1.35em/1.15 var(--dt-titre); }
+.dt-appli-tete .dt-token { width: 1.8em; height: 1.8em; }
+.dt-meme { flex-basis: 100%; display: flex; gap: 0.35em; align-items: center; font-size: 0.875em; }
+.dt-intro { color: var(--dt-creme-2); font-size: 0.9375em; margin-bottom: 0.8em !important; }
+.dt-petit { font-size: 0.875em; }
+.dt-fort { font-weight: 600; margin-top: 0.4em !important; }
+.dt-tel .dt-rubrique { font: 700 0.875em/1.3 var(--dt-ui); letter-spacing: 0.07em; text-transform: uppercase; color: var(--dt-creme-2); margin: 1em 0 0.45em; }
+.dt-tel-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4em; padding: 0.45em 0.7em 0.6em; background: #221a15; border-top: 1px solid var(--dt-filet); }
+.dt-tel-nav button { display: flex; align-items: center; justify-content: center; gap: 0.4em; min-height: 2.4em; border-radius: 0.7em; background: transparent; border: 1.5px solid var(--dt-filet); color: var(--dt-creme); font: 600 0.9375em/1.2 var(--dt-ui); cursor: pointer; }
+.dt-tel-nav button:hover { border-color: var(--dt-creme-2); }
+:where(.dt-tel button) { font-family: var(--dt-ui); font-size: 1em; color: inherit; }
+.dt-tel :focus { outline: none; }
+.dt-tel :focus-visible { outline: 3px solid var(--dt-or); outline-offset: 2px; box-shadow: 0 0 0 5px var(--dt-expresso); }
+.dt-tel .dt-btn { min-height: 2.4em; border-radius: 0.6em; }
+.dt-tel .dt-btn-lien { background: transparent; border-color: transparent; text-decoration: underline; text-underline-offset: 0.2em; }
+.dt-plein { width: 100%; }
+.dt-rond { width: 2.2em; height: 2.2em; min-height: 0 !important; padding: 0 !important; border-radius: 50% !important; }
+.dt-carte { background: var(--dt-expresso-2); border: 1px solid var(--dt-filet); border-radius: 0.9em; padding: 0.75em 0.85em; display: grid; gap: 0.3em; }
+.dt-carte + .dt-carte, .dt-carte + article, .dt-tache + .dt-tache, .dt-conv + .dt-conv { margin-top: 0.65em; }
+.dt-carte h3 { font: 600 1.05em/1.2 var(--dt-titre); }
+.dt-carte.attente { border: 2px dashed var(--dt-creme-2); }
+.dt-carte.lue { background: transparent; }
+.dt-carte-tete { display: flex; justify-content: space-between; align-items: center; gap: 0.5em; }
+.dt-carte-action { margin-top: 0.2em; }
+.dt-accueil-tete { display: flex; align-items: center; gap: 0.6em; margin-bottom: 0.8em; }
+.dt-accueil-tete h2 { font: 600 1.25em/1.1 var(--dt-titre); }
+.dt-embleme { width: 2.6em; height: 2.6em; border-radius: 50%; background: #2F4E7A; border: 2px solid var(--dt-creme); display: grid; place-items: center; flex: none; }
+.dt-embleme .dt-icon { width: 1.4em; height: 1.4em; }
+.dt-afaire { display: grid; gap: 0.4em; margin-top: 0.2em; }
+.dt-tache, .dt-conv { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.55em; align-items: center; text-align: left; padding: 0.5em 0.55em; border-radius: 0.7em; border: 1.5px solid var(--dt-filet); background: var(--dt-expresso); cursor: pointer; font-size: 0.9375em; }
+.dt-tache:hover, .dt-conv:hover { border-color: var(--dt-creme-2); }
+.dt-tache b { display: block; color: var(--dt-or); font-size: 0.95em; margin-top: 0.1em; }
+.dt-conv b { display: block; }
+.dt-conv span span { display: block; font-size: 0.875em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dt-conv-heure { font-size: 0.875em; color: var(--dt-creme-2); display: grid; justify-items: end; gap: 0.2em; }
+.dt-nonlu { width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--dt-or); border: 2px solid var(--dt-expresso); }
+.dt-grille { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.7em 0.2em; margin-top: 0.9em; }
+.dt-app { display: grid; justify-items: center; align-content: start; gap: 0.3em; padding: 0.3em 0; border-radius: 0.8em; border: 0; background: transparent; cursor: pointer; text-align: center; font: 600 0.875em/1.2 var(--dt-ui); position: relative; }
+.dt-app:hover .dt-app-dot { box-shadow: 0 0 0 2px var(--dt-creme-2), inset 0 -0.2em 0 rgba(0,0,0,0.25); }
+.dt-app-dot { width: 3.3em; height: 3.3em; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--dt-expresso); box-shadow: inset 0 -0.2em 0 rgba(0,0,0,0.25), inset 0 0.15em 0 rgba(255,255,255,0.35); border: 2px solid #1a120d; }
+.dt-app-dot .dt-icon { width: 1.55em; height: 1.55em; }
+.dt-app-dot.small { width: 2em; height: 2em; }
+.dt-app-dot.small .dt-icon { width: 1.15em; height: 1.15em; }
+.dt-badge { position: absolute; top: 0; right: calc(50% - 2.2em); min-width: 1.6em; height: 1.6em; padding: 0 0.3em; border-radius: 1em; background: var(--dt-creme); color: var(--dt-expresso); border: 2px solid var(--dt-expresso); font-size: 1em; font-weight: 800; display: grid; place-items: center; z-index: 1; }
+/* Teintes d'émail des pastilles (à valider par directeur-artistique, H7); le nom est toujours écrit. */
+.c-commandes { background: #E9C98A; } .c-reserve { background: #C9D7B0; } .c-catalogue { background: #E6C2A6; }
+.c-carte { background: #F1EDE3; } .c-remises { background: #F2B8A0; } .c-connaitre { background: #B9D3E4; }
+.c-bilans { background: #D9CDE8; } .c-projets { background: #F3D9A4; } .c-messages { background: #A8DCC4; } .c-reglages { background: #D5CEC6; }
+.dt-ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.2em 0.6em; padding: 0.6em 0; border-top: 1px solid var(--dt-filet); align-items: center; }
+.dt-carte > h3 + .dt-ligne, .dt-fournisseur + .dt-ligne, .dt-rubrique + .dt-ligne { border-top: 0; }
+.dt-ligne.carte-prix { grid-template-columns: minmax(0, 1fr) auto; }
+.dt-ligne-nom { font-weight: 600; }
+.dt-ligne-info, .dt-ligne-action, .dt-verrou { grid-column: 1 / -1; }
+.dt-ligne-info { color: var(--dt-creme-2); font-size: 0.875em; }
+.dt-verrou { display: flex; gap: 0.4em; align-items: center; font-size: 0.875em; }
+.dt-ligne.tenue { box-shadow: inset 3px 0 0 var(--dt-creme-2); padding-left: 0.6em; }
+.dt-pas { display: inline-flex; align-items: center; gap: 0.35em; }
+.dt-pas output { min-width: 3.6em; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.dt-pas-ligne { display: flex; justify-content: space-between; align-items: center; gap: 0.5em; }
+.dt-prix { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dt-ambre { color: #F2B94B; }
+.dt-douce { display: flex; gap: 0.45em; align-items: flex-start; background: #3d3020; border: 1px solid #7a5e2c; border-radius: 0.7em; padding: 0.55em 0.7em; font-size: 0.9375em; margin: 0.6em 0 !important; }
+.dt-douce .dt-icon { color: var(--dt-or); margin-top: 0.05em; }
+.dt-douce.ok .dt-icon, .dt-tel .ok { color: var(--dt-succes); }
+.dt-fournisseur { display: flex; gap: 0.6em; align-items: center; }
+.dt-portrait { width: 2.4em; height: 2.4em; border-radius: 50%; flex: none; display: grid; place-items: center; font: 600 1em var(--dt-titre); color: var(--dt-expresso); background: #E9C98A; border: 2px solid var(--dt-creme-2); }
+.dt-port { font-size: 0.875em; margin-top: 0.3em !important; display: flex; gap: 0.35em; align-items: center; }
+.dt-collant { position: sticky; bottom: -1em; margin: 0.9em -1em -1em; padding: 0.7em 1em 0.9em; background: var(--dt-expresso); box-shadow: 0 -1px 0 var(--dt-filet); display: grid; gap: 0.35em; z-index: 2; }
+.dt-total { display: flex; justify-content: space-between; font-weight: 700; }
+.dt-puces { display: flex; gap: 0.35em; overflow-x: auto; padding: 0.15em 0.1em 0.3em; margin-top: 0.2em; scrollbar-width: thin; }
+.dt-puce { flex: none; min-height: 2.2em; min-width: 2.6em; padding: 0.2em 0.6em; border-radius: 1.1em; border: 1.5px solid var(--dt-creme-2); background: transparent; cursor: pointer; font: 600 0.9em/1.2 var(--dt-ui); }
+.dt-puce[aria-pressed="true"], .dt-puce[aria-checked="true"] { background: var(--dt-creme); color: var(--dt-expresso); border-color: var(--dt-creme); }
+.dt-puce:disabled { border-style: dashed; cursor: default; }
+.dt-inter { display: inline-flex; align-items: center; gap: 0.45em; cursor: pointer; background: transparent; border: 0; padding: 0.2em; font: 600 0.9375em/1.2 var(--dt-ui); flex: none; }
+.dt-inter:disabled { cursor: default; color: var(--dt-creme-2); }
+.dt-inter-piste { width: 2.6em; height: 1.45em; border-radius: 1em; border: 2px solid var(--dt-creme-2); position: relative; flex: none; }
+.dt-inter-piste::after { content: ''; position: absolute; top: 0.15em; left: 0.17em; width: 0.95em; height: 0.95em; border-radius: 50%; background: var(--dt-creme-2); }
+.dt-inter:disabled .dt-inter-piste { border-style: dashed; }
+.dt-inter[aria-checked="true"] .dt-inter-piste { background: var(--dt-succes); border-color: var(--dt-succes); }
+.dt-inter[aria-checked="true"] .dt-inter-piste::after { left: 1.3em; background: var(--dt-expresso); }
+.dt-reglage { display: grid; gap: 0.3em; padding: 0.6em 0; border-bottom: 1px solid var(--dt-filet); }
+.dt-reglage > .dt-inter { justify-self: start; }
+.dt-curseur { display: flex; align-items: center; gap: 0.6em; }
+.dt-curseur input { accent-color: var(--dt-or); flex: 1; min-width: 0; }
+.dt-curseur output { min-width: 3em; text-align: right; font-weight: 700; }
+.dt-confirmer { position: absolute; inset: 0; z-index: 4; display: grid; align-items: center; padding: 1em; background: rgba(18, 12, 8, 0.6); }
+.dt-confirmer .dt-carte { border: 2px solid var(--dt-creme-2); background: var(--dt-expresso); }
+.dt-actions { display: grid; gap: 0.45em; margin-top: 0.6em; }
+.dt-fil { display: grid; gap: 0.6em; }
+.dt-bulle { max-width: 88%; padding: 0.55em 0.75em; border-radius: 0.9em; font-size: 0.9375em; }
+.dt-bulle.nouvelle { justify-self: center; max-width: 100%; text-align: center; color: var(--dt-creme-2); font-size: 0.875em; padding: 0.2em 0.4em; }
+.dt-bulle.elle { background: #4A3A30; border-bottom-left-radius: 0.25em; }
+.dt-qui { display: flex; gap: 0.4em; align-items: center; font-weight: 700; font-size: 0.875em; }
+.dt-proposition { border: 2px solid var(--dt-or); background: var(--dt-expresso-2); border-radius: 0.9em; padding: 0.8em 0.85em; display: grid; gap: 0.3em; }
+.dt-proposition h3 { font: 600 1.1em/1.2 var(--dt-titre); }
+.dt-montant { font-size: 1.05em; font-weight: 700; }
+.dt-banniere { position: absolute; left: 0.6em; right: 0.6em; top: 2.6em; z-index: 3; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.1em 0.6em; align-items: center; padding: 0.6em 0.75em; border-radius: 0.9em; background: var(--dt-creme); color: var(--dt-expresso) !important; border: 2px solid var(--dt-expresso); box-shadow: 0 0.5em 1em rgba(0,0,0,0.45); cursor: pointer; text-align: left; }
+.dt-banniere b { grid-column: 2; font-size: 0.95em; }
+.dt-banniere span:not(.dt-app-dot) { grid-column: 2; font-size: 0.875em; }
+.dt-banniere .dt-app-dot { grid-column: 1; grid-row: 1 / span 2; }
+.dt-tel-aide { position: absolute; right: calc(100% + 1.6rem); bottom: 0; width: 15.5em; font-size: calc(0.875rem * var(--dt-scale)); display: grid; gap: 0.35em; }
+.dt-tel-aide p { display: flex; gap: 0.3em; align-items: center; flex-wrap: wrap; }
+/* Notification du téléphone rangé: deux petites secousses, aucune avec « Réduire les animations ». */
+.dt-phone-alert { align-items: center; }
+.dt-phone-alert .dt-icon { color: var(--dt-or); }
+.dt-buzz { animation: dt-buzz 0.18s steps(2) 4; }
+@keyframes dt-buzz { 0% { transform: rotate(-1.2deg); } 100% { transform: rotate(1.2deg); } }
+.dt-reduced .dt-buzz { animation: none; }
 
 /* Ardoise */
 .dt-slate { display: grid; grid-template-columns: 1fr 1.25fr; gap: 1em; min-height: 0; }
