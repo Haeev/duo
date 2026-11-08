@@ -1,6 +1,6 @@
 {
   "format": "deux-tabliers.ingredients",
-  "version": "demo-0.1",
+  "version": "demo-0.2",
   "ingredients": [
     {
       "id": "grains_maison",
@@ -11,18 +11,20 @@
       "storage": "reserve",
       "shelfDays": 30,
       "cartonUnits": 1000,
-      "cartonHeavy": true
+      "cartonHeavy": true,
+      "pack": "sac d'1 kg"
     },
     {
       "id": "lait_entier",
-      "name": "Lait entier",
+      "name": "Lait entier de la ferme",
       "unit": "ml",
       "unitCost": 0.0013,
       "supplier": "armelle",
       "storage": "frigo",
       "shelfDays": 7,
       "cartonUnits": 6000,
-      "cartonHeavy": true
+      "cartonHeavy": true,
+      "pack": "caisse de 6 bouteilles d'1 L"
     },
     {
       "id": "lait_avoine",
@@ -31,31 +33,34 @@
       "unitCost": 0.0028,
       "supplier": "armelle",
       "storage": "frigo",
-      "shelfDays": 10,
+      "shelfDays": 30,
       "cartonUnits": 3000,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "3 briques d'1 L"
     },
     {
       "id": "beurre",
-      "name": "Beurre",
+      "name": "Beurre doux",
       "unit": "g",
       "unitCost": 0.008,
       "supplier": "armelle",
       "storage": "frigo",
-      "shelfDays": 14,
+      "shelfDays": 30,
       "cartonUnits": 500,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "2 plaquettes de 250 g"
     },
     {
       "id": "oeufs",
-      "name": "Œufs",
+      "name": "Œufs de la ferme",
       "unit": "piece",
       "unitCost": 0.25,
       "supplier": "armelle",
       "storage": "frigo",
-      "shelfDays": 14,
+      "shelfDays": 28,
       "cartonUnits": 12,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "boîte de 12"
     },
     {
       "id": "cacao",
@@ -64,42 +69,46 @@
       "unitCost": 0.012,
       "supplier": "joseph",
       "storage": "reserve",
-      "shelfDays": 60,
+      "shelfDays": 180,
       "cartonUnits": 1000,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "boîte d'1 kg"
     },
     {
       "id": "the_noir",
-      "name": "Thé noir en vrac (une dose)",
+      "name": "Thé noir en vrac",
       "unit": "dose",
       "unitCost": 0.18,
       "supplier": "joseph",
       "storage": "reserve",
-      "shelfDays": 90,
+      "shelfDays": 365,
       "cartonUnits": 50,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "boîte de 50 doses"
     },
     {
       "id": "the_vert",
-      "name": "Thé vert en vrac (une dose)",
+      "name": "Thé vert en vrac",
       "unit": "dose",
       "unitCost": 0.22,
       "supplier": "joseph",
       "storage": "reserve",
-      "shelfDays": 90,
+      "shelfDays": 365,
       "cartonUnits": 50,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "boîte de 50 doses"
     },
     {
       "id": "plantes_simone",
-      "name": "Plantes du jardin de Simone (un bouquet)",
+      "name": "Plantes du jardin de Simone",
       "unit": "dose",
       "unitCost": 0.1,
       "supplier": "simone_jardin",
       "storage": "reserve",
       "shelfDays": 7,
       "cartonUnits": 20,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "20 bouquets"
     },
     {
       "id": "menthe",
@@ -110,7 +119,8 @@
       "storage": "frigo",
       "shelfDays": 4,
       "cartonUnits": 20,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "botte de 20 brins"
     },
     {
       "id": "oranges",
@@ -119,9 +129,10 @@
       "unitCost": 0.3,
       "supplier": "mireille",
       "storage": "reserve",
-      "shelfDays": 10,
+      "shelfDays": 14,
       "cartonUnits": 30,
-      "cartonHeavy": true
+      "cartonHeavy": true,
+      "pack": "cagette de 30"
     },
     {
       "id": "citrons",
@@ -130,31 +141,34 @@
       "unitCost": 0.25,
       "supplier": "mireille",
       "storage": "reserve",
-      "shelfDays": 14,
+      "shelfDays": 21,
       "cartonUnits": 20,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "filet de 20"
     },
     {
       "id": "sucre",
-      "name": "Sucre",
+      "name": "Sucre en poudre",
       "unit": "g",
       "unitCost": 0.002,
       "supplier": "mireille",
       "storage": "reserve",
       "shelfDays": 365,
       "cartonUnits": 2000,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "2 paquets d'1 kg"
     },
     {
       "id": "farine",
-      "name": "Farine",
+      "name": "Farine de blé",
       "unit": "g",
       "unitCost": 0.0012,
       "supplier": "mireille",
       "storage": "reserve",
       "shelfDays": 120,
       "cartonUnits": 5000,
-      "cartonHeavy": true
+      "cartonHeavy": true,
+      "pack": "sac de 5 kg"
     },
     {
       "id": "confiture",
@@ -165,73 +179,80 @@
       "storage": "reserve",
       "shelfDays": 60,
       "cartonUnits": 1000,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "2 pots de 500 g"
     },
     {
       "id": "limonade_bouteille",
-      "name": "Limonade de la vallée (bouteille)",
+      "name": "Limonade de la vallée",
       "unit": "piece",
       "unitCost": 1.1,
       "supplier": "mireille",
       "storage": "frigo",
       "shelfDays": 180,
       "cartonUnits": 12,
-      "cartonHeavy": true
+      "cartonHeavy": true,
+      "pack": "casier de 12 bouteilles"
     },
     {
       "id": "accompagnement",
-      "name": "Sucre et carré de chocolat servis avec la boisson",
+      "name": "Sucres et carrés de chocolat pour le café",
       "unit": "piece",
       "unitCost": 0.06,
       "supplier": "mireille",
       "storage": "reserve",
       "shelfDays": 365,
       "cartonUnits": 200,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "carton de 200"
     },
     {
       "id": "pain_campagne",
-      "name": "Pain de campagne (une tranche)",
+      "name": "Pain de campagne",
       "unit": "piece",
       "unitCost": 0.12,
       "supplier": "lucas",
       "storage": "reserve",
-      "shelfDays": 1,
+      "shelfDays": 2,
       "cartonUnits": 20,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "1 pain d'1 kg (20 tranches)"
     },
     {
       "id": "croissant_boulanger",
-      "name": "Croissant du boulanger",
+      "name": "Croissants du boulanger",
       "unit": "piece",
       "unitCost": 0.7,
       "supplier": "lucas",
       "storage": "vitrine",
       "shelfDays": 1,
       "cartonUnits": 10,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "par 10"
     },
     {
       "id": "pain_chocolat_boulanger",
-      "name": "Pain au chocolat du boulanger",
+      "name": "Pains au chocolat du boulanger",
       "unit": "piece",
       "unitCost": 0.75,
       "supplier": "lucas",
       "storage": "vitrine",
       "shelfDays": 1,
       "cartonUnits": 10,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "par 10"
     },
     {
       "id": "tarte_boulanger",
-      "name": "Tarte aux fruits du boulanger (une part)",
+      "name": "Tarte aux fruits du boulanger",
       "unit": "piece",
       "unitCost": 1.6,
       "supplier": "lucas",
       "storage": "vitrine",
-      "shelfDays": 1,
+      "shelfDays": 2,
       "cartonUnits": 8,
-      "cartonHeavy": false
+      "cartonHeavy": false,
+      "pack": "tarte de 8 parts"
     }
   ],
   "suppliers": [
@@ -246,7 +267,15 @@
         "oeufs"
       ],
       "deliveryTime": "7:15",
-      "line": "Le lait de ce matin, il était encore dans le pré hier soir."
+      "line": "Le lait de ce matin, il était encore dans le pré hier soir.",
+      "days": [
+        "tue",
+        "thu",
+        "sat"
+      ],
+      "franco": 15,
+      "shipping": 3,
+      "emergency": true
     },
     {
       "id": "lucas",
@@ -259,7 +288,18 @@
         "pain_campagne"
       ],
       "deliveryTime": "7:00",
-      "line": "Tout chaud, je traverse juste la ruelle."
+      "line": "Tout chaud, je traverse juste la ruelle.",
+      "days": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "franco": 0,
+      "shipping": 0,
+      "emergency": true
     },
     {
       "id": "joseph",
@@ -272,7 +312,14 @@
         "cacao"
       ],
       "deliveryTime": "7:30",
-      "line": "Torréfié avant-hier: il est à point."
+      "line": "Torréfié avant-hier: il est à point.",
+      "days": [
+        "tue",
+        "fri"
+      ],
+      "franco": 30,
+      "shipping": 5,
+      "emergency": true
     },
     {
       "id": "mireille",
@@ -290,7 +337,17 @@
       ],
       "deliveryTime": "7:30",
       "line": "Si tu manques de quelque chose, je suis à deux pas.",
-      "emergency": true
+      "emergency": true,
+      "days": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "franco": 0,
+      "shipping": 0
     },
     {
       "id": "simone_jardin",
@@ -301,7 +358,18 @@
         "menthe"
       ],
       "deliveryTime": "8:30",
-      "line": "Cueilli ce matin, ne me remercie pas."
+      "line": "Cueilli ce matin, ne me remercie pas.",
+      "days": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "franco": 0,
+      "shipping": 0,
+      "emergency": true
     }
   ],
   "ordering": {
@@ -312,6 +380,9 @@
     "emergencySurcharge": 0.3,
     "unsoldFreshGoTo": "evening_basket",
     "eveningBasketReputationPerItem": 1,
-    "eveningBasketMaxPerDay": 20
+    "eveningBasketMaxPerDay": 6,
+    "margin": 1.2,
+    "freshMargin": 1.1,
+    "payment": "on_delivery"
   }
 }

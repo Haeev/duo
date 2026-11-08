@@ -75,7 +75,13 @@ import {
   takeOrder,
   type ServeResult,
 } from './clients';
-import { answerProposal, requestPurchase, type Ctx } from './economie';
+import {
+  answerProposal,
+  emergencyCents,
+  reconcileLots,
+  requestPurchase,
+  type Ctx,
+} from './economie';
 import type { ClienteleState } from './etat';
 import { talk } from './habitues';
 import { dawn, startHouse, stepDay, vote } from './journee';
@@ -89,6 +95,17 @@ export {
   availableCents,
   reserveCents,
   bigPurchaseCents,
+  chargesCents,
+  orderCost,
+  orderReservedCents,
+  nextOpenDay,
+  nextPassage,
+  supplierPasses,
+  weekdayId,
+  cartonCents,
+  lastGoodDay,
+  emergencyCents,
+  reconcileLots,
 } from './economie';
 export { proposeSlate } from './attrait';
 export { hostWalkers };
@@ -237,7 +254,10 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
       return;
     }
     const o = cc.supplies.ordering;
-    s.cash -= Math.round(ing.cartonUnits * ing.unitCost * o.emergencySurcharge * 100);
+    // Dépannage par Mireille (P0-2): le carton entier, payé 30 % plus cher, sans port.
+    const price = emergencyCents(cc, ing);
+    s.cash -= price;
+    s.today.emergency += price;
     const k =
       s.pace === 'peaceful' ? cc.days.peacefulSecondsPerGameMinute : cc.days.secondsPerGameMinute;
     s.emergencies.push([ing.id, 1, s.serviceSec + o.emergencyGameMinutes * k]);
@@ -269,6 +289,7 @@ export const clienteleChantier: Chantier = {
     step(sim) {
       const ctx = ctxOf(sim);
       if (ctx.s.day === 0) startHouse(ctx);
+      reconcileLots(ctx.cc, ctx.s);
       stepDay(ctx);
     },
     intent: onIntent,

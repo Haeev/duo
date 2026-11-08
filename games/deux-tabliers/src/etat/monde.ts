@@ -69,4 +69,9 @@ export type World = v.InferOutput<typeof WorldSchema>;
 /** Version du format de `World` dans les sauvegardes (`dataSchema`). */
 // 2: domaines service, clientèle et aménagement complets (démo du 2026-11-08). Une sauvegarde du
 // squelette (format 1) ne se relit pas: la maison repart du jour 1.
-export const WORLD_FORMAT = 2;
+// 3: réalisme v0.2 (lots datés, marchandise payée à la livraison, bilan détaillé). Une partie au
+// format 2 se relit sans perte: les champs nouveaux ont une valeur par défaut, et les lots naissent
+// du stock au premier pas (`reconcileLots`).
+export const WORLD_FORMAT = 3;
+/** Formats encore relus (voir `restoreWorld`). */
+export const WORLD_FORMATS_READ: readonly number[] = [2, 3];

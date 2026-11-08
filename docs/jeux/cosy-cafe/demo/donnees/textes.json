@@ -92,9 +92,12 @@
   "dialogues": {
     "prologue": [
       { "who": "simone", "text": "Vous voilà chez vous. Faites de ce café l'endroit où l'on aime s'arrêter: écrivez votre carte, servez vos clients, et la maison grandira." },
+      { "who": "simone", "text": "Je vous laisse la réserve : du café, du thé, du sucre. Le frais, c'est à vous de le commander." },
       { "who": "simone", "text": "Demain, on retourne la pancarte à 8 heures." },
       { "who": "simone", "text": "Avant ça, il lui faut un nom, à cette maison. À vous deux de choisir." }
     ],
+    "simone_fete_order": [{ "who": "simone", "text": "Armelle passe demain, et c'est la fête dimanche. Prenez large en lait." }],
+    "simone_first_loss": [{ "who": "simone", "text": "Le lait ne se garde pas : la tablette te dit ce qui est à finir." }],
     "rene_letter": [
       { "who": "rene", "text": "J'ai été pâtissier quarante ans, place de la Halle, à Mérelles. Mon four est froid depuis trois hivers." },
       { "who": "rene", "text": "Je vous ai regardé faire, à la fête. Je cherche quelqu'un pour le rallumer. Vous, par exemple." },

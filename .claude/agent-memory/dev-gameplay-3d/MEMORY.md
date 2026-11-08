@@ -518,7 +518,6 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Page de rendu avec la vraie simulation des habitants: `rendu.html?vie13=1&jour=&heure=&avance=` (`demo/vie13-exemple.ts`); `x`, `y` posent le joueur 1 (les bulles ne se montrent qu'à moins de 8 m de lui). Le port 6431 est pris par une autre séance: 6587.
 - Le son de la 0.13 joue les événements du village par leur nom (`AUDIO_SETTINGS.village.events`, champs `villager`, `by`, `at`) dans le `default` de `declencheurs.ts`; un type ajouté à `WorldEvent` doit avoir son `case` qui appelle `villageEventSound`, sinon il n'est plus joué.
 
-<<<<<<< HEAD
 ## Scènes de vie et chat de la 0.13 (La Petite Ligne, vérifié le 2026-11-04)
 
 - Vitesse des habitants 1,6 m/s pour 0,7 s par minute de jeu: 1,1 m par minute. Une scène dont un membre vient de loin (80 m) le voit arriver une heure après: chiffrer les distances (planning à la minute d'avant) avant de fixer `from`, ou ajouter une scène d'approche (`mado_to_quay`).
@@ -553,6 +552,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `donnees/clientele/*.json` est régénéré depuis `docs/jeux/cosy-cafe/demo/donnees/` par `outils/importer-clientele.py`: un texte ou une règle changé dans le jeu se change aussi dans la source du game designer et dans l'importeur, sinon le prochain import l’efface.
 - Ce qui naît d'un événement (carte de scène, réplique) disparaît à la reprise et chez un invité qui rejoint: le remonter aussi depuis l'état du monde, une fois par scène (clé jour et événement).
 - `fill` de `interface/typo.ts` élide « de » et « que » devant une valeur à voyelle: écrire les gabarits avec « de {partner} », jamais « d'{partner} ».
+<<<<<<< HEAD
 
 ## Assises et personnages assis (Deux Tabliers, vérifié le 2026-11-08)
 
@@ -562,3 +562,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le regard local (`look.look`) est à part du monde: s'asseoir doit aussi tourner la caméra locale vers la table, sinon le corps regarde la table et la vue la fenêtre.
 - Captures de près sans jouer: sauvegarde fabriquée dans Node (test Vitest jetable qui écrit le `StoredSave`, `data` = `JSON.stringify(world)`), posée dans `localStorage` sous `duo-sdk-dev:<jeu>:sauvegarde:1`, page rechargée; serveur `pnpm --filter @duo/sdk-dev servir <jeu> --construire --port <p>`, puis `pnpm build` du jeu pour reprendre un changement. 30 s par capture, sans erreur.
 - Un texte des scènes se change à trois endroits: `donnees/clientele/evenements.json`, la source du game designer (`docs/jeux/cosy-cafe/demo/donnees/evenements.json`) et la mise en scène écrite dans `outils/importer-clientele.py` (répliques du chauffeur). Horloge du café: 1 s réelle par minute de jeu; une durée dite par un personnage se compte en minutes de l'horloge.
+
+- Deux Tabliers, importeurs (vérifié le 2026-11-08): `importer-clientele.py` réécrit aussi `regles.json`, et `service-donnees.mjs` réécrit `meubles.json` et `service/recettes.json`, avec des écarts anciens (retouches faites à la main dans le jeu). Après un import, ne garder que les fichiers visés (`git checkout` des autres) et le signaler.
+- Deux Tabliers, faux hôte jusqu'à la tablette au jour 1 (Playwright, deux cadres `/jeu/`): « Continuer » des deux, nom de la maison (`input`), « C’est notre maison » chez l'hôte puis « C’est notre maison ! » exact chez l'invité (le texte non exact attrape l'étiquette d'état), Retour arrière des deux (le bilan du lundi couvre l'écran du prénom), prénom, « C’est parti » deux fois chez chacun (prénom puis « Ton confort »), Tab chez l'hôte. Le bilan d'un jour ouvert se regarde sur la page d'aperçu (`apercu/index.html#bilan-3`, deux clics « Page suivante »).
+- Worktree isolé: un script Python en heredoc passe, mais pas une commande qui mêle `git show` et une boucle ou une redirection: mettre ces commandes dans un script du scratchpad.

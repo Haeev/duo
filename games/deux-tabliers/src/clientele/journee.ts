@@ -16,11 +16,19 @@ import {
 } from './attrait';
 import { abandon, closeSec, deliverOrder, spm, stepCustomers } from './clients';
 import {
+  addLot,
   ambiance,
   cents,
+  chargesCents,
   deliver,
+  eveningBasket,
+  lastGoodDay,
+  nextOpenDay,
+  receiveMorningOrder,
+  reconcileLots,
   rentCents,
   suggestedOrder,
+  throwExpired,
   updateTiers,
   type Ctx,
 } from './economie';
@@ -56,6 +64,12 @@ export function startHouse(ctx: Ctx): void {
   s.dishes = e.dishesAtStart;
   s.tomorrowWeather = forcedWeather(ctx, 1) ?? drawWeather(cc, ctx.sim.random);
   s.slate = proposeSlate(cc, possibleRecipes(ctx)).map((id) => [id, 0]);
+  // La réserve de Simone (P0-1): offerte, datée du premier jour ouvert. Le frais reste à commander.
+  const first = nextOpenDay(cc, 1);
+  for (const [id, n] of e.startStock) {
+    const ing = cc.ingredients.get(id);
+    if (ing !== undefined) addLot(s, id, n * ing.cartonUnits, lastGoodDay(ing, first));
+  }
   dawn(ctx, 1);
 }
 
@@ -80,10 +94,20 @@ export function dawn(ctx: Ctx, day: number): void {
   s.event = null;
   s.conditions = [];
   const open = plan(ctx)?.open ?? weekday(ctx) !== 'mon';
-  // Livraison du matin: la commande du soir, sinon la commande habituelle (jamais bloqué).
-  if (open) deliver(ctx, s.order ?? suggestedOrder(cc, s), false);
-  else if (s.order !== null) deliver(ctx, s.order, false);
-  s.order = null;
+  // Le périmé part avant la livraison, lundi compris (P0-3).
+  reconcileLots(cc, s);
+  throwExpired(ctx);
+  if (s.today.lost > 0 && !s.flags.includes('first-loss')) {
+    s.flags.push('first-loss');
+    for (const line of cc.texts.dialogues.simone_first_loss ?? [])
+      ctx.sim.emit({ type: 'clientele-say', who: 'Simone', text: line.text, player: null });
+  }
+  // Livraison du matin, payée à la livraison: la commande du soir, sinon l'habituelle (jamais
+  // bloqué). Un jour fermé, personne ne passe: la commande attend le prochain jour ouvert.
+  if (open) {
+    receiveMorningOrder(ctx, s.order ?? suggestedOrder(cc, s, day));
+    s.order = null;
+  }
   if (s.letterDay === 0 && s.renown >= cc.economy.offer.renown) {
     s.letterDay = day;
     ctx.sim.emit({ type: 'clientele-letter', how: 'mail' });
@@ -141,6 +165,12 @@ function mondayReport(ctx: Ctx): Report {
     charges: 0,
     purchases: s.today.spent,
     eventEuros: 0,
+    goods: 0,
+    shipping: 0,
+    emergency: 0,
+    lost: s.today.lost,
+    lostItems: [...s.today.lostItems],
+    basketValue: 0,
     result: -rent,
     served: 0,
     left: 0,
@@ -225,19 +255,15 @@ function evening(ctx: Ctx): void {
     s.history.length > 0
       ? (s.history[s.history.length - 1]?.[4] ?? s.cups)
       : cc.economy.reputation.startCups;
-  const charges = cents(cc.economy.chargesPerOpenDay);
+  const charges = chargesCents(cc);
   s.cash += t.tips - charges;
-  // Panier du soir (ST-06): ce qui ne se garde pas est donné, +1 point par article, 20 au plus.
+  // Panier du soir (ST-06, P0-3): les pièces du boulanger qui finissent ce soir, déjà payées,
+  // sont données; +1 point par pièce, `basketMaxPerDay` au plus.
   const o = cc.supplies.ordering;
-  let basket = 0;
-  for (const ing of cc.supplies.ingredients) {
-    if (ing.shelfDays > 1) continue;
-    const left = s.stock[ing.id] ?? 0;
-    if (ing.unit === 'piece') basket += Math.floor(left);
-    s.stock[ing.id] = 0;
-  }
-  basket = Math.min(o.basketMaxPerDay, basket);
-  t.basket = basket;
+  reconcileLots(cc, s);
+  const pieces = eveningBasket(ctx);
+  const basket = Math.min(o.basketMaxPerDay, pieces);
+  t.basket = pieces;
   s.points += basket * o.basketReputationPerItem;
   s.renown += basket * o.basketReputationPerItem;
   s.usage.push({ ...s.todayUse });
@@ -277,7 +303,13 @@ function evening(ctx: Ctx): void {
     charges,
     purchases: t.spent,
     eventEuros: t.euros,
-    result: t.revenue + t.tips + t.euros - t.materials - rent - charges,
+    goods: t.goods,
+    shipping: t.shipping,
+    emergency: t.emergency,
+    lost: t.lost,
+    lostItems: [...t.lostItems],
+    basketValue: t.basketValue,
+    result: t.revenue + t.tips + t.euros - t.goods - t.shipping - t.emergency - rent - charges,
     served: t.served,
     left: t.left,
     satisfaction: Math.round(sat * 10) / 10,
@@ -293,6 +325,10 @@ function evening(ctx: Ctx): void {
   s.history.push([s.day, t.revenue, t.served, Math.round(sat * 10) / 10, s.cups]);
   s.phase = 'evening';
   ctx.sim.emit({ type: 'clientele-evening', day: s.day });
+  // Conseil de Simone l'avant-veille de la fête: la laitière passe demain (P0-2).
+  if (s.day === cc.economy.challenge.day - 2)
+    for (const line of cc.texts.dialogues.simone_fete_order ?? [])
+      ctx.sim.emit({ type: 'clientele-say', who: 'Simone', text: line.text, player: null });
 }
 
 /** Tables débarrassées: plus aucun objet sur leurs emplacements (le service les vide). */

@@ -13,7 +13,7 @@
     },
     {
       "id": "lait-entier",
-      "label": "Lait entier",
+      "label": "Lait entier de la ferme",
       "unit": "ml",
       "unitCost": 0.0013,
       "supplier": "armelle",
@@ -29,29 +29,29 @@
       "unitCost": 0.0028,
       "supplier": "armelle",
       "storage": "frigo",
-      "shelfDays": 10,
+      "shelfDays": 30,
       "cartonUnits": 3000,
       "heavy": false
     },
     {
       "id": "beurre",
-      "label": "Beurre",
+      "label": "Beurre doux",
       "unit": "g",
       "unitCost": 0.008,
       "supplier": "armelle",
       "storage": "frigo",
-      "shelfDays": 14,
+      "shelfDays": 30,
       "cartonUnits": 500,
       "heavy": false
     },
     {
       "id": "oeufs",
-      "label": "Œufs",
+      "label": "Œufs de la ferme",
       "unit": "piece",
       "unitCost": 0.25,
       "supplier": "armelle",
       "storage": "frigo",
-      "shelfDays": 14,
+      "shelfDays": 28,
       "cartonUnits": 12,
       "heavy": false
     },
@@ -62,35 +62,35 @@
       "unitCost": 0.012,
       "supplier": "joseph",
       "storage": "reserve",
-      "shelfDays": 60,
+      "shelfDays": 180,
       "cartonUnits": 1000,
       "heavy": false
     },
     {
       "id": "the-noir",
-      "label": "Thé noir en vrac (une dose)",
+      "label": "Thé noir en vrac",
       "unit": "dose",
       "unitCost": 0.18,
       "supplier": "joseph",
       "storage": "reserve",
-      "shelfDays": 90,
+      "shelfDays": 365,
       "cartonUnits": 50,
       "heavy": false
     },
     {
       "id": "the-vert",
-      "label": "Thé vert en vrac (une dose)",
+      "label": "Thé vert en vrac",
       "unit": "dose",
       "unitCost": 0.22,
       "supplier": "joseph",
       "storage": "reserve",
-      "shelfDays": 90,
+      "shelfDays": 365,
       "cartonUnits": 50,
       "heavy": false
     },
     {
       "id": "plantes-simone",
-      "label": "Plantes du jardin de Simone (un bouquet)",
+      "label": "Plantes du jardin de Simone",
       "unit": "dose",
       "unitCost": 0.1,
       "supplier": "simone-jardin",
@@ -117,7 +117,7 @@
       "unitCost": 0.3,
       "supplier": "mireille",
       "storage": "reserve",
-      "shelfDays": 10,
+      "shelfDays": 14,
       "cartonUnits": 30,
       "heavy": true
     },
@@ -128,13 +128,13 @@
       "unitCost": 0.25,
       "supplier": "mireille",
       "storage": "reserve",
-      "shelfDays": 14,
+      "shelfDays": 21,
       "cartonUnits": 20,
       "heavy": false
     },
     {
       "id": "sucre",
-      "label": "Sucre",
+      "label": "Sucre en poudre",
       "unit": "g",
       "unitCost": 0.002,
       "supplier": "mireille",
@@ -145,7 +145,7 @@
     },
     {
       "id": "farine",
-      "label": "Farine",
+      "label": "Farine de blé",
       "unit": "g",
       "unitCost": 0.0012,
       "supplier": "mireille",
@@ -167,7 +167,7 @@
     },
     {
       "id": "limonade-bouteille",
-      "label": "Limonade de la vallée (bouteille)",
+      "label": "Limonade de la vallée",
       "unit": "piece",
       "unitCost": 1.1,
       "supplier": "mireille",
@@ -178,7 +178,7 @@
     },
     {
       "id": "accompagnement",
-      "label": "Sucre et carré de chocolat servis avec la boisson",
+      "label": "Sucres et carrés de chocolat pour le café",
       "unit": "piece",
       "unitCost": 0.06,
       "supplier": "mireille",
@@ -189,18 +189,18 @@
     },
     {
       "id": "pain-campagne",
-      "label": "Pain de campagne (une tranche)",
+      "label": "Pain de campagne",
       "unit": "piece",
       "unitCost": 0.12,
       "supplier": "lucas",
       "storage": "reserve",
-      "shelfDays": 1,
+      "shelfDays": 2,
       "cartonUnits": 20,
       "heavy": false
     },
     {
       "id": "croissant-boulanger",
-      "label": "Croissant du boulanger",
+      "label": "Croissants du boulanger",
       "unit": "piece",
       "unitCost": 0.7,
       "supplier": "lucas",
@@ -211,7 +211,7 @@
     },
     {
       "id": "pain-chocolat-boulanger",
-      "label": "Pain au chocolat du boulanger",
+      "label": "Pains au chocolat du boulanger",
       "unit": "piece",
       "unitCost": 0.75,
       "supplier": "lucas",
@@ -222,12 +222,12 @@
     },
     {
       "id": "tarte-boulanger",
-      "label": "Tarte aux fruits du boulanger (une part)",
+      "label": "Tarte aux fruits du boulanger",
       "unit": "piece",
       "unitCost": 1.6,
       "supplier": "lucas",
       "storage": "vitrine",
-      "shelfDays": 1,
+      "shelfDays": 2,
       "cartonUnits": 8,
       "heavy": false
     }

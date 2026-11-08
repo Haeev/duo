@@ -123,10 +123,13 @@ describe('Deux Tabliers, une journée branchée', () => {
     steps(2);
     expect(world.service.tickets).toHaveLength(1);
     expect(group.paid).toBe(140);
+    // R2-02: la marchandise est payée à la livraison, la vente rapporte son prix exact; le coût
+    // des matières reste compté pour la marge.
     const materials = Math.round(
       (content.clientele.recipes.get('espresso')?.costMaterials ?? 0) * 100,
     );
-    expect(c.cash).toBe(cashBefore + 140 - materials);
+    expect(c.cash).toBe(cashBefore + 140);
+    expect(c.today.materials).toBe(materials);
     expect(events.some((e) => e.type === 'service-order-taken' && e.player === 0)).toBe(true);
 
     // L'invité: une tasse sous le groupe, une dose au moulin, l'extraction arrêtée à 12,8 s
