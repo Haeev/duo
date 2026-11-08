@@ -62,5 +62,16 @@ export const OBJECT_MODEL: Readonly<Record<string, string>> = {
   'carton-lourd': 'crate_box_m',
 };
 
+/**
+ * Demi-tour propre au modèle (`modeles.json`): ces postes ont leur avant (+Z) côté barista, au
+ * nord, alors que le meuble posé à 0° a son avant au sud.
+ */
+export const MODEL_TURN_DEG: Readonly<Record<string, number>> = {
+  station_espresso_2g: 180,
+  station_grinder: 180,
+  station_caisse: 180,
+  station_ticket_rail: 180,
+};
+
 /** Avatars des joueurs: l'hôte, puis l'invité. */
 export const AVATAR_MODEL = ['char_avatar_1', 'char_avatar_2'] as const;

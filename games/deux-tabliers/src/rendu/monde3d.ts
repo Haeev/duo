@@ -21,7 +21,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { PlacedFurniture, PlayerIndex } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
 import { objectPosition } from '../simulation/monde';
-import { AVATAR_MODEL, FURNITURE_MODEL, OBJECT_MODEL } from './correspondances';
+import { AVATAR_MODEL, FURNITURE_MODEL, MODEL_TURN_DEG, OBJECT_MODEL } from './correspondances';
 import type { ModelLibrary } from './modeles';
 
 interface FurnitureNode {
@@ -125,12 +125,16 @@ export function createWorldNodes(
         const node =
           mapped === null
             ? new Group()
-            : models.instance(model, {
-                width: type.footprint[0],
-                depth: type.footprint[1],
-                height: type.height,
-                color: type.color,
-              });
+            : models.instance(
+                model,
+                {
+                  width: type.footprint[0],
+                  depth: type.footprint[1],
+                  height: type.height,
+                  color: type.color,
+                },
+                model === undefined ? 0 : (MODEL_TURN_DEG[model] ?? 0),
+              );
         node.name = f.id;
         root.add(node);
         entry = { node, key };

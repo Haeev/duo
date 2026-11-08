@@ -62,6 +62,33 @@ const FAMILY: Readonly<Record<string, string>> = {
   cake: 'Pâtisseries',
 };
 
+const STYLE: Readonly<Record<string, string>> = {
+  campagne: 'Campagne',
+  jardin: 'Jardin',
+  nordique: 'Nordique',
+  retro: 'Rétro',
+  bistrot: 'Bistrot',
+  atelier: 'Atelier',
+  neutre: 'Simple',
+};
+
+const CATEGORY: Readonly<Record<string, string>> = {
+  counter_object: 'Sur le comptoir',
+  floor: 'Sols',
+  frame: 'Cadres',
+  light: 'Lumières',
+  paint: 'Peintures',
+  plant: 'Plantes',
+  rug: 'Tapis',
+  seat: 'Assises',
+  shelf: 'Étagères',
+  sign: 'Enseignes',
+  table: 'Tables',
+  terrace: 'Terrasse',
+  wallpaper: 'Papiers peints',
+  extension: 'Agrandir le café',
+};
+
 function weatherOf(cc: ClienteleContent, id: string): WeatherView {
   const label = cc.rules.weather.names[id] ?? id;
   return {
@@ -287,7 +314,7 @@ function catalogueItems(content: Content, world: World): CatalogueItemView[] {
       id: p.id,
       name: p.name,
       family: 'Équipement',
-      style: 'neutre',
+      style: STYLE.neutre ?? 'Simple',
       brings: '',
       needs: null,
       priceCents: price,
@@ -308,8 +335,8 @@ function catalogueItems(content: Content, world: World): CatalogueItemView[] {
     out.push({
       id: e.id,
       name: e.label,
-      family: e.category === 'extension' ? 'Agrandir le café' : e.category,
-      style: e.style,
+      family: CATEGORY[e.category] ?? e.category,
+      style: STYLE[e.style] ?? e.style,
       brings: e.text,
       needs: null,
       priceCents: price,

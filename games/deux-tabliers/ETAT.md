@@ -24,7 +24,7 @@ Démo branchée du 2026-11-08 (version 0.1.0, format du monde 2): les quatre cha
 
 ## Preuves
 
-- `pnpm --filter deux-tabliers test`: 16 tests en quelques secondes, dont `journee.test.ts` (une journée accélérée à deux joueurs: commande à la caisse, ticket, geste « Parfait », service, encaissement, bilan, lendemain).
+- `pnpm --filter deux-tabliers test`: 15 tests en quelques secondes, dont `journee.test.ts` (une journée accélérée à deux joueurs: commande à la caisse, ticket, geste « Parfait », service, encaissement, bilan, lendemain).
 - Faux hôte (`deux-vues.html`): parcours à deux par l'interface jusqu'au service, geste au moulin et à la machine, tablette, bilan (captures du 2026-11-08).
 
 ## Limites connues et suites

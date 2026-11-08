@@ -49,24 +49,24 @@
       "id": "station-4",
       "type": "machine-espresso",
       "x": 9.15,
-      "z": 9.125,
-      "y": 1.1,
+      "z": 9.005,
+      "y": 0.95,
       "rotDeg": 0
     },
     {
       "id": "station-5",
       "type": "moulin",
       "x": 9.775,
-      "z": 9.105,
-      "y": 1.1,
+      "z": 9.04,
+      "y": 0.95,
       "rotDeg": 0
     },
     {
       "id": "station-6",
       "type": "caisse",
       "x": 10.6,
-      "z": 9.125,
-      "y": 1.1,
+      "z": 9.01,
+      "y": 0.95,
       "rotDeg": 0
     },
     {

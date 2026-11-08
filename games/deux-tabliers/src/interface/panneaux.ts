@@ -25,9 +25,9 @@ export interface Panels {
 }
 
 const CSS = `
-.dt-panel { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 320px; max-width: 80vw; max-height: 80vh; overflow: auto; padding: 20px 24px; border-radius: 14px; background: #f6efe3; color: #2b2420; font-family: system-ui, sans-serif; box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
-.dt-panel h2 { margin: 0 0 8px; font-size: 20px; }
-.dt-panel .dt-close { margin-top: 14px; }
+.dt-old-panel { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 320px; max-width: 80vw; max-height: 80vh; overflow: auto; padding: 20px 24px; border-radius: 14px; background: #f6efe3; color: #2b2420; font-family: system-ui, sans-serif; box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+.dt-old-panel h2 { margin: 0 0 8px; font-size: 20px; }
+.dt-old-panel .dt-close { margin-top: 14px; }
 `;
 
 export function createPanels(
@@ -62,7 +62,7 @@ export function createPanels(
       const panel = registry.get(id);
       if (panel === undefined) return;
       const root = document.createElement('div');
-      root.className = 'dt-panel';
+      root.className = 'dt-old-panel';
       root.dataset.panel = id;
       host.append(root);
       panel.open(root, view);

@@ -74,7 +74,7 @@ export interface SubstituteHint {
 
 export interface ModelLibrary {
   /** Un exemplaire du modèle (substitut tout de suite, remplacé par le GLB dès qu'il est chargé). */
-  instance(name: string | undefined, hint: SubstituteHint): Group;
+  instance(name: string | undefined, hint: SubstituteHint, turnDeg?: number): Group;
   /** Le GLB complet (scène et clips), chargé une fois, `null` s'il manque ou se lit mal. */
   gltf(name: string): Promise<{ scene: Object3D; clips: AnimationClip[] } | null>;
   dispose(): void;
@@ -135,7 +135,7 @@ export function createModelLibrary(
 
   return {
     gltf,
-    instance(name, hint) {
+    instance(name, hint, turnDeg = 0) {
       const group = new Group();
       const substitute = new Mesh(box, material(hint.color));
       substitute.scale.set(hint.width, hint.height, hint.depth);
@@ -144,7 +144,7 @@ export function createModelLibrary(
         void load(name).then((source) => {
           if (source === null) return;
           const copy = source.clone(true);
-          copy.rotation.y = frontTurn(name);
+          copy.rotation.y = frontTurn(name) + (turnDeg * Math.PI) / 180;
           group.remove(substitute);
           group.add(copy);
         });
