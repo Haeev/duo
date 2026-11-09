@@ -26,7 +26,6 @@ import {
   type Object3D,
   type Scene,
 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { World } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
@@ -47,6 +46,7 @@ import {
   type SitCalibration,
 } from '../rendu/assis';
 import { DRINK_VESSEL } from '../rendu/correspondances';
+import { loadCharacterGltf } from '../rendu/personnages';
 import {
   adaptHold,
   cupFromHand,
@@ -78,6 +78,7 @@ import {
   type SipPose,
 } from './gestes';
 import { queueLine } from './places';
+import { followerSpot } from './suiveurs';
 import type { ClienteleContent } from './donnees';
 import type { Group as CustomerGroup } from './etat';
 import { standingPose, type CustomerPose } from './reseau';
@@ -140,7 +141,7 @@ export interface CustomerNodes {
   dispose(): void;
 }
 
-function urlOf(name: string): string | undefined {
+export function urlOf(name: string): string | undefined {
   return MODEL_URLS[`../../assets/modeles/${name}.glb`];
 }
 
@@ -188,7 +189,11 @@ const SCENE_CROWD: Readonly<Record<string, readonly string[]>> = {
 };
 
 /** Modèle du membre `k`: l'allure tirée par la simulation (variée), sinon celle du profil. */
-function modelName(cc: ClienteleContent, g: CustomerGroup, k: number): string | null {
+export function modelName(
+  cc: ClienteleContent,
+  g: Pick<CustomerGroup, 'role' | 'regular' | 'look' | 'profile'>,
+  k: number,
+): string | null {
   const crowd = g.role === null ? undefined : SCENE_CROWD[g.role];
   const names = [
     g.regular === null ? null : `habitue-${g.regular}`,
@@ -252,12 +257,9 @@ function memberPose(
   }
   if (!standingPose(world, g.id, nowMs, out)) return null;
   if (k > 0) {
-    // Les autres membres suivent deux par deux, un rang derrière (`groupRows` de la file).
-    const a = (out.yawDeg * Math.PI) / 180;
-    const back = rules.queue.spacing * Math.ceil(k / 2);
-    const side = k % 2 === 1 ? 0.3 : -0.3;
-    out.x += Math.sin(a) * back + Math.cos(a) * side;
-    out.z += Math.cos(a) * back - Math.sin(a) * side;
+    // Les autres membres suivent deux par deux, un rang derrière (`groupRows` de la file),
+    // jamais dans un mur ni dans un meuble (`suiveurs.ts`).
+    followerSpot(view.content, world, out, k, rules.queue.spacing, out);
   }
   return false;
 }
@@ -296,7 +298,6 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
   const pose: CustomerPose = { x: 0, z: 0, yawDeg: 0, anim: 'idle' };
   const placed: SeatPlacement = { x: 0, y: 0, z: 0, thigh: 0 };
 
-  const loader = new GLTFLoader();
   const loaded = new Map<string, Promise<Loaded | null>>();
   const figures = new Map<string, Figure>();
   let disposed = false;
@@ -306,13 +307,7 @@ export function createCustomerNodes(scene: Scene): CustomerNodes {
     let p = loaded.get(name);
     if (p !== undefined) return p;
     const url = urlOf(name);
-    p =
-      url === undefined
-        ? Promise.resolve(null)
-        : loader.loadAsync(url).then(
-            (gltf) => ({ scene: gltf.scene, clips: gltf.animations }),
-            () => null,
-          );
+    p = url === undefined ? Promise.resolve(null) : loadCharacterGltf(url);
     loaded.set(name, p);
     void p.then((src) => {
       if (src === null) missing.add(name);

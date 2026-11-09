@@ -89,6 +89,12 @@ export interface ClosedCafeOptions {
   readonly light?: boolean;
   /** Taches à dessiner (par défaut `DUST_SPOTS`). */
   readonly spots?: readonly DustSpot[];
+  /**
+   * Vrai quand la lumière du jour (`lumiere-jour.ts`) règle elle-même les intensités: ce module
+   * n'écrit plus rien dans les lumières ni dans la coque, il donne ses facteurs (`roomLight`,
+   * `sceneLight`) qu'elle multiplie à sa variation horaire.
+   */
+  readonly externalLight?: boolean;
 }
 
 export interface ClosedCafe {
@@ -106,6 +112,8 @@ export interface ClosedCafe {
   syncInstallation(look: InstallationLook | null | undefined): void;
   /** Lumière de la salle affichée (D15): de 0,6 (vitrines blanches) à 1. */
   roomLight(): number;
+  /** Facteur des lumières de la scène (meubles, personnages): `roomLight` dans la salle, 1 dehors. */
+  sceneLight(): number;
   /** Chaque image, après la caméra: fondus, grains, lumière de la salle. */
   update(dt: number, camera: PerspectiveCamera): void;
   dispose(): void;
@@ -768,6 +776,7 @@ export function createClosedCafe(
       });
     },
     roomLight: () => room,
+    sceneLight: () => 1 + (room - 1) * (shownInside < 0 ? 1 : shownInside),
     update(dt, camera) {
       const step = Math.min(0.1, Math.max(0, dt));
       for (const f of panes.values()) if (approach(f, step, WIPE_SECONDS)) panesDirty = true;
@@ -780,8 +789,11 @@ export function createClosedCafe(
       let white = 0;
       for (const f of panes.values()) white += f.shown;
       room = roomLightFor(white);
-      collectInterior();
-      collectLights();
+      const external = options.externalLight === true;
+      if (!external) {
+        collectInterior();
+        collectLights();
+      }
       const inside = 1 - smooth(FACADE_INSIDE_Z, FACADE_OUTSIDE_Z, camera.position.z);
       if (room !== shownRoom || dustDirty) {
         dustDirty = false;
@@ -796,7 +808,7 @@ export function createClosedCafe(
         for (const l of lights) l.light.intensity = l.base * k;
         shownInside = inside;
       }
-      if (interior !== null) shownRoom = room;
+      if (interior !== null || external) shownRoom = room;
       let amount = 0;
       for (const f of panes.values()) amount += f.shown;
       for (const d of dust) amount += d.fade.shown;

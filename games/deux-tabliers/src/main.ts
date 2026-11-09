@@ -19,6 +19,11 @@ import { serviceStationPrompt } from './service';
 import { createArrangementClient } from './amenagement/client/mode';
 import { createLiveShell } from './amenagement/client/coque-vivante';
 import { createBakedShell } from './rendu/coque-glb';
+import { createDecorClock } from './decor/horloge';
+import { EVENING_CAP_MINUTE } from './decor/reglages';
+import { createDaylightRig } from './rendu/lumiere-jour';
+import { createPassersNodes } from './rendu/passants3d';
+import { createPlaceTouchUps } from './rendu/place-retouches';
 import { AVATAR_MODEL } from './rendu/correspondances';
 import { createModelLibrary } from './rendu/modeles';
 import { createWorldNodes } from './rendu/monde3d';
@@ -74,6 +79,17 @@ const spots = dustSpots(content);
 const closedCafe = createClosedCafe(stage.scene, models, spots.length > 0 ? { spots } : {});
 const nodes = createWorldNodes(stage.scene, models, [duo.host.colorHex, duo.guest.colorHex]);
 const customers = createCustomerNodes(stage.scene);
+// Décor vivant (retours du 2026-11-09): heure du décor, lumière du jour, passants de la place.
+// Simulés chez chaque joueur avec la graine commune, sans réseau.
+const decorClock = createDecorClock({
+  openMinute: content.clientele.days.open,
+  secondsPerGameMinute: content.clientele.days.secondsPerGameMinute,
+  peacefulSecondsPerGameMinute: content.clientele.days.peacefulSecondsPerGameMinute,
+  eveningCapMinute: EVENING_CAP_MINUTE,
+});
+const daylight = createDaylightRig(stage.scene);
+const touchUps = createPlaceTouchUps(stage.scene);
+const passers = createPassersNodes(stage.scene, duo.seed, decorClock);
 const sounds = createSounds(duo.audio, duo.log, DATA_FILES, content);
 const startPose = view.world().players[view.local];
 const look = createLookControl(canvas, duo.input, {
@@ -261,6 +277,9 @@ duo.loop.start({
     closedCafe.syncInstallation(closedCafeLook(content, view.world()));
     nodes.update(view, look.look);
     customers.update(view, now(), dt);
+    decorClock.update(view.world(), dt);
+    passers.update(view, stage.camera, dt, now());
+    daylight.update(decorClock.minute(), view.world().clientele.weather);
     shell.update();
     baked.update();
     shell.setBaseVisible(baked.failed());
@@ -367,6 +386,9 @@ duo.on('stop', () => {
   panels.dispose();
   nodes.dispose();
   customers.dispose();
+  passers.dispose();
+  daylight.dispose();
+  touchUps.dispose();
   models.dispose();
   shell.dispose();
   baked.dispose();
