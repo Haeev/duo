@@ -815,6 +815,29 @@ Dossier: `base/interface/`. Famille « papier, crayon et porcelaine », distinct
 
 Pas de son pour: le survol à la souris, la caméra qui tourne, le focus placé par le programme, la saisie au clavier hors de l'ardoise, Échap (réservé à la pause de Duo), un geste réussi « bien » (seul le geste sonne), un geste fait avec l'aide (il sonne comme le même geste sans aide), un client déçu, une baisse de réputation, une journée calme. Accueillir un client n'a pas de son: les joueurs se parlent.
 
+### 8.5.22 Le nouveau départ: le café fermé qu'on installe à deux
+
+Source: `docs/jeux/cosy-cafe/demo/depart-cellule-vide-v0-3.md` (sections 3.4, 5, 9, ligne S1 de 14). Dossier: `installation/`, décodé à l'arrivée sur la place (jour 1, puis le jour 2 avant la première ouverture), libéré à l'ouverture (`plan.installation` de `sons.json`). Aucun son de réussite ni d'échec: la soupape dit « chaude » comme la vraie machine, le rideau qui retombe dit « trop lourd » par son poids. Les gestes faits dans la salle portent une queue de salle vide (0,85 s au lieu de 0,4): ils ne servent que tant qu'elle est vide.
+
+| Événement | Son | Fichiers | Niveau | Prio. | Variations | Écoute |
+|---|---|---|---|---|---|---|
+| Lever le rideau de fer de la porte à deux: la serrure, le grincement grave de la coulisse, les lames qui s'enroulent de plus en plus vite, la butée sourde à 1,6 s | `shutter-up` | 2 × 2 s | -23 | 1 | ±3 %, ±1 dB | porte |
+| Le rideau d'une vitrine monte au moteur (après la clé de Simone), un par vitrine, 0,4 s d'écart | `shutter-motor` | 2 × 2 s | -27 | 3 | ±4 %, ±1 dB | vitrine |
+| Le rideau retombe (soulevé seul de 20 cm, ou baissé le soir): les lames en cascade, la lame du bas sur le seuil, amortie | `shutter-down` | 2 × 0,6 s | -24 | 2 | ±4 %, ±1 dB | porte |
+| Chauffe de la vieille dame (20 s): pompe, gargouillis qui montent, soupape à 17,6 s (sifflement sous 1,6 kHz), puis le repos | `machine-heat` | 1 × 20 s | -25 (la soupape; gargouillis de -39 à -26) | 2 | | machine |
+| Raccorder la machine: quatre quarts de tour de clé sur l'écrou de laiton, la fiche dans la prise à 1,7 s, l'eau qui arrive | `machine-connect` | 2 × 2,6 s | -25 | 2 | ±2 %, ±1 dB | machine |
+| Ouvrir un carton de l'installation: le ruban décollé (déchirure grave et fibreuse, sous 3,5 kHz), les deux rabats, le papier de calage | `carton-tear` | 3 × 1,7 s | -25 | 2 | ±5 %, ±1 dB | geste |
+| La porte qui colle: elle force (craquement grave), cède d'un coup sourd, s'ouvre; à la place de `door-open-village` la première fois | `door-stick` | 2 × 1,6 s | -23 | 2 | ±3 %, ±1 dB | porte |
+| Retirer un drap: le tissu glisse et bat, la poussière s'envole, le drap tombe en tas | `sheet-pull` | 2 × 1,6 s | -26 | 2 | ±5 %, ±1 dB | geste |
+| Un coup de balai de paille sur les tomettes (feuilles mortes une fois sur deux), relancé toutes les 0,5 s pendant le maintien | `broom-sweep` | 3 × 0,9 s | -28 | 2 | ±6 %, ±1 dB | geste |
+| L'éponge mouillée sur la vitrine, un arc, relancé toutes les 0,75 s pendant le maintien; aucun couinement | `sponge-glass` | 2 × 1,2 s | -29 | 2 | ±5 %, ±1 dB | vitrine |
+| La camionnette de Gaby s'arrête devant la vitrine: moteur qui ralentit, freins doux, contact coupé, frein à main, portière | `van-stop` | 2 × 3,8 s | -27 | 2 | ±2 % | rue |
+| La pièce vide: souffle plus creux (modes de la pièce nue), une poutre qui travaille, un tic de vitre, dans une réverbération de 1,2 s | `room-village-empty` | boucle 6 s | -46 int. | 4 | départ tiré | non placé, en fondu avec `room-village` selon l'équipement (3 s) |
+
+Écarts: les identifiants suivent la convention du jeu (`shutter-up` et non `shutter_up`); `van-stop` passe de -30 et priorité 3 (8.5.10, livraison lointaine) à -27 et priorité 2, parce qu'ici il annonce la livraison du jour; `carton-tear` déchire le ruban, que `carton-open` évite: la déchirure reste grave, sous 3,5 kHz, sans sifflement; `shutter-motor` ajouté pour les « moteurs des vitrines » du tableau 9.
+
+Mémoire: 5,95 Mo décodés à 24 kHz, 11,9 Mo à 48 kHz (décodage actuel du SDK). Le contrôle compte deux phases qui ne se recouvrent pas: l'installation, sans les airs ni le marché (59,7 Mo à 48 kHz, sur un plafond de 60), et le service, sans l'installation (54,5 Mo). Cela suppose que le jeu libère les tampons du dossier `installation/` à la première ouverture, avant le premier air.
+
 ## 8.6 Le son comme information, et la même pièce
 
 ### 8.6.1 Ce qu'on entend sans le voir
@@ -1070,3 +1093,4 @@ Je ne peux pas écouter: chaque son se prouve par la mesure, avant que le client
 |---|---|---|---|
 | 2026-11-07 | 0.1 | Première version: intention et piliers, palette et tonalité, ambiances des cinq adresses et des moments, rumeur, musique diégétique (appareils, six listes, 24 morceaux, écrans), événements sonores, information et même pièce, mixage, mémoire et poids, plan de production | sound-designer |
 | 2026-11-08 | 0.2 | Production de la démo d'Ormeval (Deux Tabliers): section 8.9.4 | sound-designer |
+| 2026-11-09 | 0.3 | Sons du nouveau départ (café fermé qu'on installe à deux): section 8.5.22 | sound-designer |

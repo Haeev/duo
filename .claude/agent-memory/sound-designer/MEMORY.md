@@ -139,3 +139,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `partition.frottements` d'origine est quadratique; version triée par début (arrêt dès qu'une note commence trop tard) dans la copie de Deux Tabliers. Programme de batterie (Brush 40) envoyé sur le canal 10 si `programme > 0`.
 - Coups de bois (porte, meubles, coups à la porte): sous 200 Hz de fondamentale, 70 à 80 % de l'énergie tombe sous 300 Hz; fondamentale 240 à 290 Hz et `passe_haut` 200 à 240 ramènent un signal (coups de livraison) vers 40 à 50 %.
 - `Son(...)` modifié par script avec recherche de `"),\\n"`: la fin d'une lambda sur la même ligne trompe la recherche (paramètre ajouté dans l'appel de la fonction). Éditer ces appels à la main.
+
+## Deux Tabliers: sons de l'installation (vérifié le 2026-11-09)
+
+- Le plafond mémoire de `controler.py` (60 Mo à 48 kHz, décodage actuel du SDK) était à 54,5 Mo avant l'installation: un nouveau dossier de sons ne tient que si l'on compte des phases qui ne se recouvrent pas (`PAS_PENDANT_INSTALLATION`). Toute phase ajoutée doit être vraie dans le code (le jeu charge à la demande et ne libère rien: `buffers` de `src/audio/sons.ts`), donc le dire au dev.
+- Les sons de longue durée pilotés par un réglage de gameplay (`install.heatSec`) : un seul fichier calé sur la valeur par défaut, avec l'instant clé dans `extra` (`valveAtSeconds`) et la règle de décalage (offset de `start`) dans la note, plutôt que boucle plus fin: une ligne de branchement pour le dev.
+- Une chaudière qui « monte » réglée à l'intuition sortait à -55 LUFS ffmpeg au début de la chauffe (inaudible): mesurer le profil de sonie momentanée seconde par seconde (`ebur128`, une ligne sur dix) avant de livrer un son long.
+- Moteur de véhicule (fondamentale 25 à 45 Hz): 77 % de l'énergie sous 300 Hz même avec passe-haut à 100 Hz; un passe-haut à 180 Hz et une cloche de +9 dB à 650 Hz (capot, échappement) ramènent à 46 %.
+- Dans un worktree isolé, un heredoc Python qui édite un fichier du dépôt est parfois refusé (« too complex »): passer par Edit, ou un script dans le dossier de brouillon.

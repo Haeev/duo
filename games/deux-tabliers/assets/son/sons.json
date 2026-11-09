@@ -4236,6 +4236,404 @@
    ],
    "momentaryMaxLufs": -28,
    "note": "Ormeval n'a pas de marché (cahier, TE-09): à jouer pour une tournée de marchand ambulant ou à Mérelles"
+  },
+  "shutter-up": {
+   "event": "Lever le rideau de fer de la porte à deux: la serrure, le grincement de la coulisse, les lames qui s'enroulent, la butée en haut (1,5 s de montée)",
+   "bus": "effects",
+   "priority": 1,
+   "files": [
+    "installation/shutter-up-1.ogg",
+    "installation/shutter-up-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 1000,
+   "maxVoices": 1,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 15.0,
+    "cullBeyondM": 15.0
+   },
+   "looping": false,
+   "durationMs": [
+    1988,
+    1963
+   ],
+   "momentaryMaxLufs": -23,
+   "note": "la butée tombe à 1,6 s du début; si l'animation du rideau dure autrement, la caler sur la butée"
+  },
+  "shutter-motor": {
+   "event": "Le rideau d'une vitrine monte au moteur (Simone a tourné la clé du boîtier)",
+   "bus": "effects",
+   "priority": 3,
+   "files": [
+    "installation/shutter-motor-1.ogg",
+    "installation/shutter-motor-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 3,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 20.0,
+    "cullBeyondM": 20.0
+   },
+   "looping": false,
+   "durationMs": [
+    1979,
+    1991
+   ],
+   "momentaryMaxLufs": -27,
+   "note": "un par vitrine, placé à la vitrine, lancés à 0,4 s d'écart (section 5.1, point 3); la fin de course tombe à 1,6 s"
+  },
+  "shutter-down": {
+   "event": "Le rideau retombe: soulevé seul de 20 cm, ou baissé le soir",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/shutter-down-1.ogg",
+    "installation/shutter-down-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.04,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 15.0,
+    "cullBeyondM": 15.0
+   },
+   "looping": false,
+   "durationMs": [
+    569,
+    622
+   ],
+   "momentaryMaxLufs": -24,
+   "note": "la lame du bas touche le seuil à 0,32 ou 0,38 s du début"
+  },
+  "machine-heat": {
+   "event": "La vieille dame chauffe: la pompe remplit, la chaudière gargouille de plus en plus, puis la soupape souffle",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/machine-heat.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 2,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 8.0,
+    "cullBeyondM": 8.0
+   },
+   "looping": false,
+   "durationMs": [
+    19945
+   ],
+   "momentaryMaxLufs": -25,
+   "note": "lancé au début de la chauffe; la soupape s'ouvre à 17.6 s, soit 2,4 s avant la fin des 20 s (install.heatSec). Si heatSec change: plus court, démarrer le fichier en avance de (20 - heatSec) s (offset de start); plus long, le lancer (heatSec - 20) s après le début",
+   "valveAtSeconds": 17.6,
+   "designedForHeatSec": 20.0
+  },
+  "carton-tear": {
+   "event": "Ouvrir un carton de l'installation: le ruban décollé, les rabats, le papier de calage",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/carton-tear-1.ogg",
+    "installation/carton-tear-2.ogg",
+    "installation/carton-tear-3.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    1651,
+    1702,
+    1684
+   ],
+   "momentaryMaxLufs": -25
+  },
+  "door-stick": {
+   "event": "La porte d'entrée colle un peu: elle force, cède d'un coup, s'ouvre",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/door-stick-1.ogg",
+    "installation/door-stick-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.03,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 15.0,
+    "cullBeyondM": 15.0
+   },
+   "looping": false,
+   "durationMs": [
+    1568,
+    1578
+   ],
+   "momentaryMaxLufs": -23,
+   "note": "à la place de door-open-village la première fois qu'on entre, jour 1 et jour 2"
+  },
+  "sheet-pull": {
+   "event": "Retirer un drap: le tissu glisse, la poussière s'envole, le drap tombe en tas",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/sheet-pull-1.ogg",
+    "installation/sheet-pull-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    1456,
+    1591
+   ],
+   "momentaryMaxLufs": -26
+  },
+  "broom-sweep": {
+   "event": "Un coup de balai sur les tomettes (relancé tant qu'on balaie)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/broom-sweep-1.ogg",
+    "installation/broom-sweep-2.ogg",
+    "installation/broom-sweep-3.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.06,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 350,
+   "maxVoices": 2,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 12.0,
+    "cullBeyondM": 12.0
+   },
+   "looping": false,
+   "durationMs": [
+    918,
+    903,
+    918
+   ],
+   "momentaryMaxLufs": -28,
+   "note": "relancé toutes les 0,5 s tant que E est maintenu sur une tache (4 coups pour sweepHoldSec 2)"
+  },
+  "sponge-glass": {
+   "event": "L'éponge mouillée sur la vitrine, un arc (relancé tant qu'on lave)",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/sponge-glass-1.ogg",
+    "installation/sponge-glass-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.05,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 500,
+   "maxVoices": 2,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 2.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 20.0,
+    "cullBeyondM": 20.0
+   },
+   "looping": false,
+   "durationMs": [
+    1198,
+    1132
+   ],
+   "momentaryMaxLufs": -29,
+   "note": "relancé toutes les 0,75 s tant que E est maintenu sur une vitre (4 arcs pour wipeHoldSec 3)"
+  },
+  "machine-connect": {
+   "event": "Raccorder la machine: la clé sur l'écrou du flexible, la fiche dans la prise, l'eau qui arrive",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/machine-connect-1.ogg",
+    "installation/machine-connect-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 1.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 1,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 1.0,
+    "rolloffFactor": 1.0,
+    "maxDistance": 8.0,
+    "cullBeyondM": 8.0
+   },
+   "looping": false,
+   "durationMs": [
+    2549,
+    2577
+   ],
+   "momentaryMaxLufs": -25,
+   "note": "lancé au début du maintien (connectHoldSec 2): le clic de la prise tombe à 1,7 s; si le maintien est lâché, arrêter le son (fondu de 50 ms)"
+  },
+  "van-stop": {
+   "event": "La camionnette de Gaby s'arrête devant la vitrine, le moteur se coupe, la portière",
+   "bus": "effects",
+   "priority": 2,
+   "files": [
+    "installation/van-stop-1.ogg",
+    "installation/van-stop-2.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "shuffle-no-repeat",
+   "pitchVariation": 0.02,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": {
+    "distanceModel": "inverse",
+    "refDistance": 6.0,
+    "rolloffFactor": 0.8,
+    "maxDistance": 80.0,
+    "cullBeyondM": 100000.0
+   },
+   "looping": false,
+   "durationMs": [
+    3753,
+    3758
+   ],
+   "momentaryMaxLufs": -27,
+   "note": "placé dans la rue devant la vitrine ouest; dedans, passe par la porte et les vitrines (plan.doorFilter); la portière se referme vers 3,6 s, juste avant la bannière de Gaby"
+  },
+  "room-village-empty": {
+   "event": "La pièce vide: le café fermé depuis trois ans, plus creux et plus réverbérant",
+   "bus": "ambience",
+   "priority": 4,
+   "files": [
+    "installation/room-village-empty.ogg"
+   ],
+   "group": "installation",
+   "decodeSampleRate": 24000,
+   "pick": "single",
+   "pitchVariation": 0.0,
+   "gainVariationDb": 0.0,
+   "volumeDb": 0.0,
+   "minIntervalMs": 60,
+   "maxVoices": 4,
+   "duckMusicDb": 0.0,
+   "channels": 1,
+   "spatial": null,
+   "looping": true,
+   "durationMs": [
+    6000
+   ],
+   "loop": {
+    "startSeconds": 0.5,
+    "endSeconds": 6.5,
+    "startSample": 12000,
+    "endSample": 156000,
+    "sampleRate": 24000
+   },
+   "playFromSeconds": 0.5,
+   "integratedLufs": -46,
+   "note": "en fondu avec room-village selon l'équipement de la salle (plan.installation)"
   }
  },
  "music": {
@@ -4581,6 +4979,36 @@
    "openRampMs": 250,
    "closeDelayMs": 400,
    "description": "Dedans, le dehors sort de la porte et des vitrines (son.md, 8.3.2 et 8.3.4)."
+  },
+  "installation": {
+   "description": "Le nouveau départ (depart-cellule-vide-v0-3.md): les sons du dossier installation/ ne servent que tant que world.installation existe et n'est pas 'opened'; les décoder à l'arrivée sur la place (jour 1, et le jour 2 avant la première ouverture), les libérer à l'ouverture. La pièce vide remplace la pièce meublée en fondu: gain de room-village-empty = 1 - k et de room-village = k, k = part de la salle équipée (draps retirés, chaises descendues, appareils posés, chacun compté pour une part égale), fondu de 3 s à chaque changement. Les gestes du dossier portent déjà une queue de salle vide (0,85 s): aucune réverbération à ajouter.",
+   "decodeWhen": "installation",
+   "emptyRoom": {
+    "empty": "room-village-empty",
+    "furnished": "room-village",
+    "crossfadeMs": 3000,
+    "countedSteps": [
+     "sheets",
+     "seats",
+     "appliances"
+    ]
+   },
+   "shutter": {
+    "door": "shutter-up",
+    "windows": "shutter-motor",
+    "windowsStaggerMs": 400,
+    "alone": "shutter-down",
+    "doorFirstEntry": "door-stick"
+   },
+   "heat": {
+    "sound": "machine-heat",
+    "designedForHeatSec": 20,
+    "valveAtSeconds": 17.6
+   },
+   "repeatWhileHeld": {
+    "broom-sweep": 500,
+    "sponge-glass": 750
+   }
   },
   "peer": {
    "description": "Les sons de l'autre joueur sont les mêmes fichiers, placés à sa position, 3 dB plus bas et un cran de priorité en dessous (son.md, 8.5.0).",

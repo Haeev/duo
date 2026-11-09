@@ -33,6 +33,8 @@ PLAFOND_DBTP = -1.0
 POIDS_MAX_MO = 32.0  # plafond proposé pour tout le son du jeu (son.md, 8.8.2)
 MEMOIRE_MAX_MO = 60.0  # plafond du moteur (son.md, 8.8.1), sur 64 Mo au budget
 CIBLE_MUSIQUE = -16.0
+# Groupes jamais décodés pendant l'installation: les airs ne jouent qu'en service, le marché n'a pas lieu.
+PAS_PENDANT_INSTALLATION = ("airs", "moments/marche")
 
 
 def mesurer_ebur128(fichier: Path) -> dict:
@@ -180,6 +182,17 @@ def main() -> int:
     total = [sum(v[0] for v in memoire.values()), sum(v[1] for v in memoire.values())]
     print(f"  tout décodé à la fois: {total[0] / mo:.2f} / {total[1] / mo:.2f} Mo, plus environ 1 Mo par flux "
           f"de musique")
+    # Groupes qui ne vivent jamais ensemble (plan.installation de sons.json): l'installation est
+    # libérée à la première ouverture, avant le premier air du service; pas de marché les jours
+    # d'installation. Le plafond porte sur la pire des deux phases, pas sur leur somme.
+    phases = {"installation (jours 1 et 2 avant l'ouverture)": set(PAS_PENDANT_INSTALLATION),
+              "service": {"installation"}}
+    pic = [0.0, 0.0]
+    for nom, absents in phases.items():
+        p = [sum(v[k] for g, v in memoire.items() if g not in absents) for k in (0, 1)]
+        print(f"  phase {nom}: {p[0] / mo:.2f} / {p[1] / mo:.2f} Mo")
+        pic = [max(pic[0], p[0]), max(pic[1], p[1])]
+    total = pic
     for l in lignes:
         if l["fichier"].startswith("musique/"):
             print(f"  {l['fichier']}: {l['codec']}, {l['duree_s']} s, intégrée {l['sonie_integree_lufs']} LUFS, "

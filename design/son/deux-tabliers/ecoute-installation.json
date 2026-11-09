@@ -1,0 +1,62 @@
+[
+ {
+  "id": "shutter-up",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "shutter-motor",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "shutter-down",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "machine-heat",
+  "variants": 1,
+  "loop": false
+ },
+ {
+  "id": "carton-tear",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "door-stick",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "sheet-pull",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "broom-sweep",
+  "variants": 3,
+  "loop": false
+ },
+ {
+  "id": "sponge-glass",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "machine-connect",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "van-stop",
+  "variants": 2,
+  "loop": false
+ },
+ {
+  "id": "room-village-empty",
+  "variants": 1,
+  "loop": true
+ }
+]

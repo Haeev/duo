@@ -40,6 +40,7 @@ sys.dont_write_bytecode = True  # pas de __pycache__ dans le dossier versionné
 import airs  # noqa: E402
 import ambiances  # noqa: E402
 import dsp  # noqa: E402
+import installation  # noqa: E402
 import musiques  # noqa: E402
 import partition  # noqa: E402
 import postes  # noqa: E402
@@ -228,7 +229,7 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> dict:
 
 
 def tous_les_sons() -> list[Son]:
-    return postes.sons() + salle.sons() + ambiances.sons() + airs.sons()
+    return postes.sons() + salle.sons() + ambiances.sons() + airs.sons() + installation.sons()
 
 
 PLAN = {
@@ -290,7 +291,24 @@ PLAN = {
     },
     "doorFilter": {"closedDb": -10.0, "closedLowpassHz": 1200, "openRampMs": 250, "closeDelayMs": 400,
                    "description": "Dedans, le dehors sort de la porte et des vitrines (son.md, 8.3.2 et 8.3.4)."},
-    "peer": {"description": "Les sons de l'autre joueur sont les mêmes fichiers, placés à sa position, 3 dB plus bas "
+    "installation": {
+        "description": "Le nouveau départ (depart-cellule-vide-v0-3.md): les sons du dossier installation/ ne "
+                       "servent que tant que world.installation existe et n'est pas 'opened'; les décoder à "
+                       "l'arrivée sur la place (jour 1, et le jour 2 avant la première ouverture), les libérer à "
+                       "l'ouverture. La pièce vide remplace la pièce meublée en fondu: gain de "
+                       "room-village-empty = 1 - k et de room-village = k, k = part de la salle équipée "
+                       "(draps retirés, chaises descendues, appareils posés, chacun compté pour une part égale), "
+                       "fondu de 3 s à chaque changement. Les gestes du dossier portent déjà une queue de salle "
+                       "vide (0,85 s): aucune réverbération à ajouter.",
+        "decodeWhen": "installation",
+        "emptyRoom": {"empty": "room-village-empty", "furnished": "room-village", "crossfadeMs": 3000,
+                      "countedSteps": ["sheets", "seats", "appliances"]},
+        "shutter": {"door": "shutter-up", "windows": "shutter-motor", "windowsStaggerMs": 400,
+                    "alone": "shutter-down", "doorFirstEntry": "door-stick"},
+        "heat": {"sound": "machine-heat", "designedForHeatSec": 20, "valveAtSeconds": installation.SOUPAPE},
+        "repeatWhileHeld": {"broom-sweep": 500, "sponge-glass": 750},
+    },
+    "peer": {"description":"Les sons de l'autre joueur sont les mêmes fichiers, placés à sa position, 3 dB plus bas "
                             "et un cran de priorité en dessous (son.md, 8.5.0).", "peerWorldSoundsDb": -3.0,
              "peerPriorityOffset": 1},
 }
@@ -306,7 +324,8 @@ MIX = {
 }
 
 
-def planche(apercus: dict[str, np.ndarray], tous: list[Son], tmp: Path) -> None:
+def planche(apercus: dict[str, np.ndarray], tous: list[Son], tmp: Path, nom: str = "ecoute",
+            titre: str = "planche d'écoute des sons") -> None:
     """Planche d'écoute pour le client: chaque son et ses variantes, 0,5 s de silence entre deux,
     1,5 s entre deux sons; les boucles jouées deux fois (le raccord s'entend)."""
     morceaux = []
@@ -318,11 +337,11 @@ def planche(apercus: dict[str, np.ndarray], tous: list[Son], tmp: Path) -> None:
             morceaux += [x, np.zeros((dsp.n_ech(0.5), 2))]
         morceaux.append(np.zeros((dsp.n_ech(1.0), 2)))
     y = np.concatenate(morceaux)
-    wav = tmp / "planche.wav"
+    wav = tmp / f"{nom}.wav"
     dsp.ecrire_wav(wav, y)
-    dsp.encoder_m4a(wav, DESIGN / "ecoute.m4a", "96k", "Deux Tabliers: planche d'écoute des sons")
+    dsp.encoder_m4a(wav, DESIGN / f"{nom}.m4a", "96k", f"Deux Tabliers: {titre}")
     ordre = [{"id": s.id, "variants": s.variantes, "loop": s.boucle} for s in tous]
-    (DESIGN / "ecoute.json").write_text(json.dumps(ordre, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (DESIGN / f"{nom}.json").write_text(json.dumps(ordre, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
 def main() -> int:
@@ -344,6 +363,8 @@ def main() -> int:
             sons_defs, apercus = produire_sons(tous, tmp)
             if "planche" in quoi:
                 planche(apercus, tous, tmp)
+                planche(apercus, installation.sons(), tmp, "ecoute-installation",
+                        "sons du nouveau départ (installation)")
         if "musiques" in quoi:
             print("Musiques:")
             nouvelles = produire_musiques(tmp, args.musiques)
