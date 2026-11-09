@@ -117,11 +117,13 @@
     "shell_village_sky": "ciel de fin d'après-midi et lointain (toits du village, coteau, collines), sans lumière"
    },
    "triangles": {
-    "shell_village_place": 24023,
-    "shell_village_sky": 2160
+    "shell_village_place": 22356,
+    "shell_village_sky": 3888,
+    "shell_village_place_foliage": 22000
    },
    "materiaux": [
     "dt_ciel",
+    "dt_feuillage",
     "street_place_atlas",
     "street_place_dalles",
     "street_place_enduit",
@@ -129,7 +131,7 @@
     "street_place_pierre",
     "street_place_tuiles"
    ],
-   "poids_octets": 2777768
+   "poids_octets": 2185120
   },
   {
    "id": "shell_village_ext_fond",
@@ -165,10 +167,10 @@
   }
  ],
  "cuisson": {
-  "bake_spp": 48,
+  "bake_spp": 64,
   "bake_res": 2048,
-  "lightmap_scale": 3.0941176414489746,
-  "place_lightmap_scale": 2.780296802520752,
+  "lightmap_scale": 3.0691049098968506,
+  "place_lightmap_scale": 2.7789223194122314,
   "soleil": {
    "azimut_deg": 205.0,
    "hauteur_deg": 16.0
@@ -244,6 +246,121 @@
   },
   "frigo": "dans la coque (façade inox sous l'arrière-comptoir, x 8,00 à 8,75)",
   "ardoise_murale": "dans la coque: x 8,83 à 9,85, y 1,27 à 2,17 m, plan z = 7,145 (zone d'écriture, Caveat)"
+ },
+ "installation_v03": {
+  "source": "assets-src/modeles/installation.py (départ dans une cellule vide, docs/jeux/cosy-cafe/demo/depart-cellule-vide-v0-3.md, A1 à A7)",
+  "poses": {
+   "bucket_sponge": {
+    "position": [
+     8.9,
+     0,
+     11.8
+    ],
+    "rotation_deg": 0,
+    "pourquoi": "le plan dit (8,6 ; 12,2): le seau y touche le drap et les chaises de table-3 (x 8,00); à (8,9 ; 11,8) il reste près de la porte, 12 cm du drap"
+   },
+   "chairs_upturned": {
+    "position": "celle du guéridon (table-1 à table-3)",
+    "rotation_deg": 0
+   },
+   "chairs_upturned_square": {
+    "position": "celle de la table carrée (table-4)",
+    "rotation_deg": 0
+   },
+   "espresso_revised": {
+    "position": [
+     9.15,
+     0.95,
+     9.005
+    ],
+    "rotation_deg": 180
+   },
+   "mail_bundle": {
+    "position": [
+     9.4,
+     0,
+     12.2
+    ],
+    "rotation_deg": 0
+   },
+   "price_tag": {
+    "position": "point d'accroche sur l'objet de Simone (dossier de chaise, poignée de la machine, coin du drap)",
+    "rotation_deg": "face au joueur"
+   },
+   "sheet_counter": {
+    "position": [
+     9.45,
+     0,
+     9.16
+    ],
+    "rotation_deg": 0
+   },
+   "sheet_pile": {
+    "position": "au sol, au pied de la table ou du comptoir découverts",
+    "rotation_deg": "au choix"
+   },
+   "sheet_table": {
+    "position": "celle du guéridon (table-1 à table-3)",
+    "rotation_deg": 0
+   },
+   "sheet_table_square": {
+    "position": "celle de la table carrée (table-4)",
+    "rotation_deg": 0
+   },
+   "shutter_bay_door": {
+    "position": [
+     9.4,
+     0.0,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "shutter_bay_east": {
+    "position": [
+     7.5,
+     0.45,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "shutter_bay_small": {
+    "position": [
+     10.5,
+     0.9,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "shutter_bay_west": {
+    "position": [
+     5.4,
+     0.45,
+     13.0
+    ],
+    "rotation_deg": 0
+   }
+  },
+  "balai": "event_balai.glb (déjà livré, debout, 1,40 m): l'appuyer contre la cloison des toilettes en (5,9 ; 9,3), incliné d'une dizaine de degrés, brosse au sol",
+  "a_montrer_ensemble": {
+   "drap sur une table": [
+    "gueridon_marbre ou table_bistrot_quatre",
+    "chairs_upturned ou chairs_upturned_square",
+    "sheet_table ou sheet_table_square"
+   ],
+   "drap retiré": [
+    "la table",
+    "les chaises retournées",
+    "sheet_pile au pied de la table"
+   ],
+   "chaises descendues": [
+    "la table",
+    "deux chaise_paillee aux places seat-*"
+   ],
+   "drap du comptoir": [
+    "sheet_counter",
+    "station_espresso_2g dessous"
+   ]
+  }
  },
  "dispositions": [
   "dispositions/village_arrivee.json",
@@ -1019,6 +1136,57 @@
    "source": "Blender scripté (meubles.py ou objets.py)"
   },
   {
+   "id": "bucket_sponge",
+   "nom": "Seau d'eau et éponge",
+   "fichier": "bucket_sponge.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "objet",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.32,
+    "y": 0.276,
+    "z": 0.306
+   },
+   "triangles": 546,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "bucket_sponge",
+    "bucket_sponge_sponge"
+   ],
+   "poids_octets": 42540,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     8.9,
+     0,
+     11.8
+    ],
+    "rotation_deg": 0,
+    "pourquoi": "le plan dit (8,6 ; 12,2): le seau y touche le drap et les chaises de table-3 (x 8,00); à (8,9 ; 11,8) il reste près de la porte, 12 cm du drap"
+   },
+   "note": "pivot au centre du fond, au sol; l'éponge (nœud bucket_sponge_sponge) se cache quand un joueur la prend",
+   "douilles": {
+    "socket_sponge": {
+     "position": [
+      -0.02,
+      0.15,
+      -0.03
+     ],
+     "parent": "bucket_sponge_sponge"
+    }
+   }
+  },
+  {
    "id": "caisse_ancienne",
    "nom": "Caisse enregistreuse ancienne",
    "fichier": "caisse_ancienne.glb",
@@ -1099,6 +1267,108 @@
     "h": 0.0
    },
    "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "chairs_upturned",
+   "nom": "Deux chaises paillées retournées sur le guéridon",
+   "fichier": "chairs_upturned.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "chaises",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.929,
+    "y": 0.901,
+    "z": 0.457
+   },
+   "triangles": 1188,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "chairs_upturned"
+   ],
+   "poids_octets": 115884,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": "celle du guéridon (table-1 à table-3)",
+    "rotation_deg": 0
+   },
+   "controle": {
+    "traversees_chaise1_table": 0,
+    "traversees_chaise2_table": 0,
+    "traversees_chaise1_chaise2": 0,
+    "ecart_min_mm": {
+     "chaise1_table": 1.5,
+     "chaise2_table": 1.5,
+     "chaise1_chaise2": 22.8
+    },
+    "centre_sur_plateau": [
+     true,
+     true
+    ],
+    "hauteur_max_m": 1.198,
+    "bas_du_dossier_m": 0.297
+   },
+   "note": "les deux chaises seules (le guéridon reste gueridon_marbre); pivot au centre du guéridon, au sol; dossiers vers l'ouest et l'est, pendants hors du plateau"
+  },
+  {
+   "id": "chairs_upturned_square",
+   "nom": "Deux chaises paillées retournées sur la table carrée",
+   "fichier": "chairs_upturned_square.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "chaises",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.462,
+    "y": 0.901,
+    "z": 1.104
+   },
+   "triangles": 1188,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "chairs_upturned_square"
+   ],
+   "poids_octets": 116908,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": "celle de la table carrée (table-4)",
+    "rotation_deg": 0
+   },
+   "controle": {
+    "traversees_chaise1_table": 0,
+    "traversees_chaise2_table": 0,
+    "traversees_chaise1_chaise2": 0,
+    "ecart_min_mm": {
+     "chaise1_table": 2.8,
+     "chaise2_table": 3.3,
+     "chaise1_chaise2": 186.1
+    },
+    "centre_sur_plateau": [
+     true,
+     true
+    ],
+    "hauteur_max_m": 1.233,
+    "bas_du_dossier_m": 0.333
+   },
+   "note": "les deux chaises seules (la table reste table_bistrot_quatre); pivot au centre de la table, au sol; dossiers vers le nord et le sud"
   },
   {
    "id": "chaise_cintree",
@@ -1906,6 +2176,104 @@
     "h": 0.0
    },
    "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "espresso_revised",
+   "nom": "La machine révisée de Joseph (deux groupes, deux buses)",
+   "fichier": "espresso_revised.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "surface",
+   "dimensions_m": {
+    "x": 0.763,
+    "y": 0.504,
+    "z": 0.539
+   },
+   "triangles": 3898,
+   "budget_triangles": 4000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "espresso_revised"
+   ],
+   "poids_octets": 262560,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     9.15,
+     0.95,
+     9.005
+    ],
+    "rotation_deg": 180
+   },
+   "note": "même origine et même pose que station_espresso_2g (centre x 9,15, z 9,005, plan de travail à 0,95 m, tournée de 180°)",
+   "usage": "barista face à la façade de la machine (avant du modèle)",
+   "douilles": {
+    "socket_cup_0": {
+     "position": [
+      0.19,
+      0.066,
+      0.09
+     ],
+     "parent": "espresso_revised"
+    },
+    "socket_group_0": {
+     "position": [
+      0.19,
+      0.205,
+      0.09
+     ],
+     "parent": "espresso_revised"
+    },
+    "socket_cup_1": {
+     "position": [
+      -0.19,
+      0.066,
+      0.09
+     ],
+     "parent": "espresso_revised"
+    },
+    "socket_group_1": {
+     "position": [
+      -0.19,
+      0.205,
+      0.09
+     ],
+     "parent": "espresso_revised"
+    },
+    "socket_steam_wand": {
+     "position": [
+      0.325,
+      0.09,
+      0.125
+     ],
+     "parent": "espresso_revised"
+    },
+    "socket_steam_wand_1": {
+     "position": [
+      -0.325,
+      0.09,
+      0.125
+     ],
+     "parent": "espresso_revised"
+    },
+    "socket_cup_warmer": {
+     "position": [
+      0.0,
+      0.443,
+      0.0
+     ],
+     "parent": "espresso_revised"
+    }
+   }
   },
   {
    "id": "etagere_livres_equip",
@@ -3117,6 +3485,45 @@
    "source": "Blender scripté (meubles.py ou objets.py)"
   },
   {
+   "id": "mail_bundle",
+   "nom": "Trois ans de courrier glissé sous la porte",
+   "fichier": "mail_bundle.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "objet",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.979,
+    "y": 0.043,
+    "z": 0.535
+   },
+   "triangles": 400,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "mail_bundle"
+   ],
+   "poids_octets": 30412,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     9.4,
+     0,
+     12.2
+    ],
+    "rotation_deg": 0
+   },
+   "note": "pivot au centre du tas, au sol; l'avant (+Z) regarde la porte: posé à (9,4 ; 12,2), tourné de 0°, il part du seuil"
+  },
+  {
    "id": "mange_debout_zinc",
    "nom": "Mange-debout de zinc (hors catalogue)",
    "fichier": "mange_debout_zinc.glb",
@@ -3660,6 +4067,48 @@
    "source": "Blender scripté (meubles.py ou objets.py)"
   },
   {
+   "id": "price_tag",
+   "nom": "Étiquette de prix en carton de Simone",
+   "fichier": "price_tag.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "objet",
+   "accroche": "plafond",
+   "dimensions_m": {
+    "x": 0.08,
+    "y": 0.17,
+    "z": 0.003
+   },
+   "triangles": 98,
+   "budget_triangles": 150,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_price_tag_text"
+   ],
+   "noeuds": [
+    "price_tag",
+    "price_tag_text"
+   ],
+   "poids_octets": 10508,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": "point d'accroche sur l'objet de Simone (dossier de chaise, poignée de la machine, coin du drap)",
+    "rotation_deg": "face au joueur"
+   },
+   "note": "pivot au point d'accroche, l'étiquette pend vers -Y (12 cm de carton sous 5 cm de ficelle); face écrite vers +Z",
+   "texte": {
+    "noeud": "price_tag_text",
+    "uv": "0..1 sur la zone d'écriture (6,8 x 8,6 cm)",
+    "materiau": "dt_price_tag_text (kraft uni): y poser une CanvasTexture (Caveat, encre #2B2622)"
+   }
+  },
+  {
    "id": "range_velos",
    "nom": "Range-vélos",
    "fichier": "range_velos.glb",
@@ -3701,6 +4150,150 @@
    "source": "Blender scripté (meubles.py ou objets.py)"
   },
   {
+   "id": "sheet_counter",
+   "nom": "Drap sur le comptoir et la vieille dame",
+   "fichier": "sheet_counter.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "drap",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 3.067,
+    "y": 1.302,
+    "z": 1.048
+   },
+   "triangles": 1861,
+   "budget_triangles": 2000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "sheet_counter"
+   ],
+   "poids_octets": 107476,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py), simulation de tissu Cloth",
+   "pose": {
+    "position": [
+     9.45,
+     0,
+     9.16
+    ],
+    "rotation_deg": 0
+   },
+   "note": "simulé sur le comptoir de la coque et station_espresso_2g à sa place; pivot au sol sous le milieu du comptoir (plan x 9,45, y 9,16)"
+  },
+  {
+   "id": "sheet_pile",
+   "nom": "Drap tombé en tas au sol",
+   "fichier": "sheet_pile.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "drap",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.398,
+    "y": 0.185,
+    "z": 1.176
+   },
+   "triangles": 568,
+   "budget_triangles": 600,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "sheet_pile"
+   ],
+   "poids_octets": 40420,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py), simulation de tissu Cloth",
+   "pose": {
+    "position": "au sol, au pied de la table ou du comptoir découverts",
+    "rotation_deg": "au choix"
+   },
+   "note": "pivot au centre de l'emprise, au sol; une seule forme pour les cinq draps (tournée au hasard)"
+  },
+  {
+   "id": "sheet_table",
+   "nom": "Drap sur un guéridon et ses deux chaises retournées",
+   "fichier": "sheet_table.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "drap",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.249,
+    "y": 1.216,
+    "z": 0.763
+   },
+   "triangles": 1126,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "sheet_table"
+   ],
+   "poids_octets": 75736,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py), simulation de tissu Cloth",
+   "pose": {
+    "position": "celle du guéridon (table-1 à table-3)",
+    "rotation_deg": 0
+   },
+   "note": "simulé sur gueridon_marbre et chairs_upturned; pivot au centre du guéridon, au sol; à montrer avec eux"
+  },
+  {
+   "id": "sheet_table_square",
+   "nom": "Drap sur la table carrée et ses deux chaises retournées",
+   "fichier": "sheet_table_square.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "drap",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.884,
+    "y": 1.243,
+    "z": 1.432
+   },
+   "triangles": 1127,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "sheet_table_square"
+   ],
+   "poids_octets": 72364,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py), simulation de tissu Cloth",
+   "pose": {
+    "position": "celle de la table carrée (table-4)",
+    "rotation_deg": 0
+   },
+   "note": "simulé sur table_bistrot_quatre et chairs_upturned_square; pivot au centre de la table, au sol"
+  },
+  {
    "id": "shell_village_ext_terrasse",
    "nom": "Terrasse sous le store (extension)",
    "fichier": "shell_village_ext_terrasse.glb",
@@ -3730,6 +4323,246 @@
    ],
    "note": "coordonnées du plan, à poser sans transformation; bord du lambrequin à 1,99 m (au-dessus des têtes: 2,05 m au plus bas des bras)",
    "source": "Blender scripté (meubles.py ou objets.py)"
+  },
+  {
+   "id": "shutter_bay_door",
+   "nom": "Rideau métallique de la porte",
+   "fichier": "shutter_bay_door.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "facade",
+   "accroche": "facade",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 2.2,
+    "z": 0.098
+   },
+   "triangles": 812,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles",
+    "dt_mot_simone"
+   ],
+   "noeuds": [
+    "shutter_bay_door",
+    "shutter_bay_door_curtain",
+    "shutter_bay_door_note"
+   ],
+   "poids_octets": 72868,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     9.4,
+     0.0,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "animation": {
+    "noeud": "shutter_bay_door_curtain",
+    "lever": {
+     "translation_y_m": 2.16,
+     "duree_s": 1.5
+    },
+    "explication": "translation du tablier vers +Y: il passe derrière le recouvrement et disparaît dans le linteau (mur plein); le cacher une fois levé"
+   },
+   "baie": {
+    "largeur_m": 1.2,
+    "hauteur_m": 2.1,
+    "x_plan": [
+     8.8,
+     10.0
+    ],
+    "bas_m": 0.0
+   },
+   "note": "pivot au milieu du bas de la baie, sur le nu de la façade (plan y = 13,00); tout le modèle est dans l'épaisseur du mur (z glTF de -0,075 à 0); la poignée dépasse de 1,2 cm du nu",
+   "douilles": {
+    "socket_handle": {
+     "position": [
+      0.0,
+      0.024,
+      0.012
+     ],
+     "parent": "shutter_bay_door_curtain"
+    }
+   }
+  },
+  {
+   "id": "shutter_bay_east",
+   "nom": "Rideau métallique de la vitrine est",
+   "fichier": "shutter_bay_east.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "facade",
+   "accroche": "facade",
+   "dimensions_m": {
+    "x": 2.0,
+    "y": 2.04,
+    "z": 0.073
+   },
+   "triangles": 662,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "shutter_bay_east",
+    "shutter_bay_east_curtain"
+   ],
+   "poids_octets": 46340,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     7.5,
+     0.45,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "animation": {
+    "noeud": "shutter_bay_east_curtain",
+    "lever": {
+     "translation_y_m": 2.01,
+     "duree_s": 1.5
+    },
+    "explication": "translation du tablier vers +Y: il passe derrière le recouvrement et disparaît dans le linteau (mur plein); le cacher une fois levé"
+   },
+   "baie": {
+    "largeur_m": 2.0,
+    "hauteur_m": 1.95,
+    "x_plan": [
+     6.5,
+     8.5
+    ],
+    "bas_m": 0.45
+   },
+   "note": "pivot au milieu du bas de la baie, sur le nu de la façade (plan y = 13,00); tout le modèle est dans l'épaisseur du mur (z glTF de -0,075 à 0)"
+  },
+  {
+   "id": "shutter_bay_small",
+   "nom": "Rideau métallique de la petite fenêtre",
+   "fichier": "shutter_bay_small.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "facade",
+   "accroche": "facade",
+   "dimensions_m": {
+    "x": 0.6,
+    "y": 1.56,
+    "z": 0.073
+   },
+   "triangles": 590,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "shutter_bay_small",
+    "shutter_bay_small_curtain"
+   ],
+   "poids_octets": 42616,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     10.5,
+     0.9,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "animation": {
+    "noeud": "shutter_bay_small_curtain",
+    "lever": {
+     "translation_y_m": 1.56,
+     "duree_s": 1.5
+    },
+    "explication": "translation du tablier vers +Y: il passe derrière le recouvrement et disparaît dans le linteau (mur plein); le cacher une fois levé"
+   },
+   "baie": {
+    "largeur_m": 0.6,
+    "hauteur_m": 1.5,
+    "x_plan": [
+     10.2,
+     10.8
+    ],
+    "bas_m": 0.9
+   },
+   "note": "pivot au milieu du bas de la baie, sur le nu de la façade (plan y = 13,00); tout le modèle est dans l'épaisseur du mur (z glTF de -0,075 à 0)"
+  },
+  {
+   "id": "shutter_bay_west",
+   "nom": "Rideau métallique de la vitrine ouest",
+   "fichier": "shutter_bay_west.glb",
+   "famille": "installation",
+   "style": "neutre",
+   "categorie": "facade",
+   "accroche": "facade",
+   "dimensions_m": {
+    "x": 2.0,
+    "y": 2.04,
+    "z": 0.073
+   },
+   "triangles": 662,
+   "budget_triangles": 1200,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "shutter_bay_west",
+    "shutter_bay_west_curtain"
+   ],
+   "poids_octets": 47180,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "source": "Blender scripté (installation.py)",
+   "pose": {
+    "position": [
+     5.4,
+     0.45,
+     13.0
+    ],
+    "rotation_deg": 0
+   },
+   "animation": {
+    "noeud": "shutter_bay_west_curtain",
+    "lever": {
+     "translation_y_m": 2.01,
+     "duree_s": 1.5
+    },
+    "explication": "translation du tablier vers +Y: il passe derrière le recouvrement et disparaît dans le linteau (mur plein); le cacher une fois levé"
+   },
+   "baie": {
+    "largeur_m": 2.0,
+    "hauteur_m": 1.95,
+    "x_plan": [
+     4.4,
+     6.4
+    ],
+    "bas_m": 0.45
+   },
+   "note": "pivot au milieu du bas de la baie, sur le nu de la façade (plan y = 13,00); tout le modèle est dans l'épaisseur du mur (z glTF de -0,075 à 0)"
   },
   {
    "id": "station_bouilloire",
@@ -5580,6 +6413,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -6145,6 +6979,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -6755,6 +7590,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -7365,6 +8201,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -7975,6 +8812,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -8530,6 +9368,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -9250,6 +10089,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -9805,6 +10645,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   },
@@ -10360,6 +11201,7 @@
       }
      }
     },
+    "etirement_max": null,
     "repere_des_prises": "repère métrique de l'os RightHand (origine de l'os, axes de l'os, sans l'échelle 0,01 du squelette): récipient = main · (position_m, quaternion_xyzw)"
    }
   }

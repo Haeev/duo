@@ -269,3 +269,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Repère de la main: analyse en composantes principales des sommets de la main (la direction « bas » de la liaison n'est pas la normale de la paume). Pouce: côté où la moitié basse déborde le plus. Palmure introuvable sur ces maillages (doigts qui se touchent): jointures à 56 % de la longueur.
 - Doigts: ne pondérer que les sommets surtout portés par la main (sinon la manche suit le pouce), rayon de capture 6 cm (sinon le bout de l'auriculaire reste à la main: pointe étirée). Contrôle de traversée sur toute la main et l'avant-bras: des triangles de palmure relient pouce et index.
 - Le pouce de ces maillages est court: prise en clé (index replié à fond) et non en pince à demi pliée. Récipient gonflé de 0,5 mm pendant la recherche (sinon le moteur en float32 voit des contacts comme traversées).
+
+## Draps, rideaux, chaises retournées (installation.py, vérifié le 2026-11-09)
+
+- Simulation Cloth de Blender 5.2 sans interface: modificateur CLOTH, `scene.frame_set(f)` image par image, puis `bpy.data.meshes.new_from_object(obj.evaluated_get(depsgraph))`; SMOOTH (0,5 x 3) et DECIMATE (COLLAPSE) empilés derrière le tissu donnent directement le maillage au budget. 80 x 60 mailles, qualité 10: 10 à 20 s.
+- Drap sur un objet haut (machine sur un comptoir): le tissu glisse vers l'objet et se ramasse (frottement trop faible par défaut). `collision.cloth_friction = 80`, `collision.damping = 1`, raideurs 60 à 80, `air_damping = 3`, arrêt vers 35 à 70 images.
+- Pieds de chaise (3 cm): le tissu passe entre eux et retombe sur l'assise, les pieds percent le drap. Colliders = enveloppes convexes (`bmesh.ops.convex_hull`) des chaises.
+- Tas de drap: lâcher une grille réduite avec `settings.shrink_min` négatif (le tissu regrandit en tombant).
+- Placer un objet retourné sur un plateau: recherche du recul minimal (dossier pendant hors du chant + marge), appui sur la seule zone de l'assise (sinon la chaise se pose sur le haut du dossier), puis test `BVHTree.overlap` dans la boucle: une arête entre un sommet sur le plateau et un sommet dehors peut couper le chant.
+- Surfaces de révolution ouvertes (seau à paroi intérieure): `recalc_face_normals` les oriente mal par morceaux; orienter chaque bande par la normale (dz, -dr) du profil. Contrôle: triangles classés par leurs sommets (pas par leur centre, ambigu sur une paroi de 5 mm).
+- Dans un `Geo`, échanger deux axes sans changer de signe (`P(x, z, y)`) est une symétrie: les faces se retournent. Toujours échanger avec un signe (`P(x, -z, y)`).
+- Coque d'Ormeval: aucun support d'enseigne au-dessus de la porte (ni dans `shell_village.glb` ni dans la place); la baie de la porte va de x 8,80 à 10,00, linteau à 2,10, nu de la façade au plan y = 13,00, châssis à 12,84-12,92 (8 cm libres pour un rideau).

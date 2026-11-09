@@ -10,6 +10,7 @@ Modèles du café d'Ormeval en rendu semi-réaliste (variante B de l'essai de st
 | Meubles et décorations du catalogue (`catalogue.json` de la démo) | `meubles.py` | un GLB par identifiant du catalogue |
 | Postes, équipements, vaisselle, nourriture, cartons, terrasse (store), objets uniques et d'événements | `objets.py` | un GLB par identifiant |
 | Personnages Meshy (15) | `personnages/conformer.py` (appelle `docs/production/essais-meshy/scripts/conformite_personnage.py`) | `char_*.glb`, fiches `personnages/<id>.meshy.json` et rapports |
+| Départ dans une cellule vide (v0.3): rideaux métalliques, draps (simulation de tissu Cloth), chaises retournées (contrôle de traversée BVH), courrier, seau, étiquette, machine révisée | `installation.py` (rendus dans la coque: `verifier/scene_installation.py`) | `shutter_bay_*`, `sheet_*`, `chairs_upturned*`, `mail_bundle`, `bucket_sponge`, `price_tag`, `espresso_revised`; fiche `fiches/installation.json` |
 | Mises en place par défaut et contrôle des assises | `dispositions.py` | `assets/modeles/dispositions/*.json` |
 | Fiche commune | `modeles_json.py` | `assets/modeles/modeles.json` |
 
@@ -28,6 +29,7 @@ Bibliothèque: `lib/commun.py` (atlas des meubles, matériaux, UV, occlusion cui
 duo-python games/deux-tabliers/assets-src/modeles/coque.py            # 3 min environ (cuisson 2048 px, 64 échantillons)
 duo-python games/deux-tabliers/assets-src/modeles/meubles.py          # 10 s
 duo-python games/deux-tabliers/assets-src/modeles/objets.py           # 10 s (lancer après meubles.py: il importe ses fonctions)
+duo-python games/deux-tabliers/assets-src/modeles/installation.py     # 2 min (quatre simulations de tissu); n'écrit pas l'atlas
 python3 games/deux-tabliers/assets-src/modeles/personnages/conformer.py   # 15 x 20 s; sorties brutes de Meshy requises (hors dépôt)
 duo-python games/deux-tabliers/assets-src/modeles/personnages/doigts.py    # 4 min; os des doigts et poses de main, après conformer.py
 python3 games/deux-tabliers/assets-src/modeles/dispositions.py        # contrôle des assises, code 1 en cas d'erreur

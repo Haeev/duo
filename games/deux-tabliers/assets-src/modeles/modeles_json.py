@@ -14,7 +14,7 @@ ASSETS = os.path.join(DEPOT, "games", "deux-tabliers", "assets", "modeles")
 DONNEES = os.path.join(DEPOT, "docs", "jeux", "cosy-cafe", "demo", "donnees")
 
 fiches = {}
-for f in ("meubles.json", "objets.json"):
+for f in ("meubles.json", "objets.json", "installation.json"):
     fiches.update(json.load(open(os.path.join(ICI, "fiches", f))))
 coque = json.load(open(os.path.join(ICI, "fiches", "coque.json")))
 cat = json.load(open(os.path.join(DONNEES, "catalogue.json")))
@@ -35,7 +35,7 @@ for ident, f in sorted(fiches.items()):
         d = f["dimensions_m"]
         f["catalogue_size"] = s
         f["ecart_catalogue_m"] = {"w": round(d["x"] - s["w"], 3), "d": round(d["z"] - s["d"], 3), "h": round(d["y"] - s["h"], 3)}
-    f["source"] = "Meshy (essai de style) puis conformité" if f.get("meshy") else "Blender scripté (meubles.py ou objets.py)"
+    f["source"] = f.get("source") or ("Meshy (essai de style) puis conformité" if f.get("meshy") else "Blender scripté (meubles.py ou objets.py)")
     objets.append(f)
 
 persos = []
@@ -131,6 +131,17 @@ out = {
         "lave_verres": {"modele": "station_dishwasher", "position": [7.555, 0.0, 7.7], "rotation_deg": 0},
         "frigo": "dans la coque (façade inox sous l'arrière-comptoir, x 8,00 à 8,75)",
         "ardoise_murale": "dans la coque: x 8,83 à 9,85, y 1,27 à 2,17 m, plan z = 7,145 (zone d'écriture, Caveat)",
+    },
+    "installation_v03": {
+        "source": "assets-src/modeles/installation.py (départ dans une cellule vide, docs/jeux/cosy-cafe/demo/depart-cellule-vide-v0-3.md, A1 à A7)",
+        "poses": {o["id"]: o["pose"] for o in objets if o.get("famille") == "installation" and "pose" in o},
+        "balai": "event_balai.glb (déjà livré, debout, 1,40 m): l'appuyer contre la cloison des toilettes en (5,9 ; 9,3), incliné d'une dizaine de degrés, brosse au sol",
+        "a_montrer_ensemble": {
+            "drap sur une table": ["gueridon_marbre ou table_bistrot_quatre", "chairs_upturned ou chairs_upturned_square", "sheet_table ou sheet_table_square"],
+            "drap retiré": ["la table", "les chaises retournées", "sheet_pile au pied de la table"],
+            "chaises descendues": ["la table", "deux chaise_paillee aux places seat-*"],
+            "drap du comptoir": ["sheet_counter", "station_espresso_2g dessous"],
+        },
     },
     "dispositions": ["dispositions/village_arrivee.json", "dispositions/village_terrasse.json", "dispositions/village_fond.json"],
     "objets": objets,
