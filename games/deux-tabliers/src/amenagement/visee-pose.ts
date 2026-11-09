@@ -8,6 +8,7 @@ import type { FurnitureType } from '../donnees/schemas';
 import type { PlacedFurniture, World } from '../etat/monde';
 import type { Eye } from '../simulation/visee';
 import type { PlacementRequest } from './intentions';
+import { arrangementHooks } from './crochets';
 import {
   mountOf,
   norm,
@@ -152,6 +153,15 @@ export function proposePlacement(
   if (ft === undefined) return null;
   const rules = content.arrangement.rules;
   const ray = rayOf(eye);
+  // Appareil à place unique (installation): l'aperçu s'aimante à sa place quand on la vise.
+  const spot = arrangementHooks().spot?.(content, world, type) ?? null;
+  if (spot !== null) {
+    const hit = planeY(ray, spot.y, rules.reach + 1) ?? planeY(ray, 0, rules.reach);
+    if (hit === null) return null;
+    if (Math.hypot(hit.x - spot.x, hit.z - spot.z) <= spot.snap)
+      return { x: spot.x, z: spot.z, y: spot.y, rotDeg: spot.rotDeg, support: null };
+    return { x: round(hit.x), z: round(hit.z), y: 0, rotDeg: norm(rotDeg), support: null };
+  }
   const reach = rules.reach;
   const placement = placementOf(content, type);
   const mount = mountOf(placement);

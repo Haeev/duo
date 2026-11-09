@@ -172,14 +172,22 @@ export function placeFurniture(world: World, p: Placement): PlacedFurniture | nu
 export function installService(content: Content, world: World): void {
   const s = world.service;
   const settings = content.service.settings;
+  // Démo v0.3, cellule vide: la machine, la bouilloire et la cloche arrivent avec leurs appareils
+  // (installation); ni vaisselle ni réserve au départ.
+  const cell = (world.installation ?? null) === null ? null : content.installation?.cell;
+  const deferred = new Set(cell?.serviceDeferred ?? []);
   for (const p of settings.installation) {
-    if (furnitureById(world, p.id) !== undefined) continue;
+    if (furnitureById(world, p.id) !== undefined || deferred.has(p.id)) continue;
     const placed = placeFurniture(world, p);
     if (placed !== null) world.furniture.push(placed);
   }
-  s.clean = { ...settings.cleanAtStart };
-  for (const i of content.service.ingredients.values())
-    s.stock[i.id] = (s.stock[i.id] ?? 0) + i.cartonUnits * settings.startCartons;
+  s.clean =
+    cell === undefined || cell === null
+      ? { ...settings.cleanAtStart }
+      : { tasse: 0, verre: 0, assiette: 0 };
+  if (cell === undefined || cell === null)
+    for (const i of content.service.ingredients.values())
+      s.stock[i.id] = (s.stock[i.id] ?? 0) + i.cartonUnits * settings.startCartons;
   s.installed = true;
 }
 
@@ -347,13 +355,25 @@ function finishStep(
 
 // ---------------------------------------------------------------- jugements
 
-export function judgeExtraction(content: Content, elapsed: number, ready: number): Quality {
+export function judgeExtraction(
+  content: Content,
+  elapsed: number,
+  ready: number,
+  bonus = 0,
+): Quality {
   const g = content.service.settings.gestures.extraction;
   if (elapsed < g.underSeconds) return 'correct';
   if (elapsed < ready) return 'bien';
-  if (elapsed <= ready + g.perfectSeconds) return 'parfait';
+  if (elapsed <= ready + g.perfectSeconds + bonus) return 'parfait';
   if (elapsed <= ready + g.goodSeconds) return 'bien';
   return 'correct';
+}
+
+/** Fenêtre « Parfait » en plus (machine révisée de la démo v0.3, `machine-perfect-bonus`). */
+export function perfectBonus(content: Content, world: World): number {
+  return world.service.equipment.includes('machine-perfect-bonus')
+    ? (content.installation?.rules.perfectBonusSec ?? 0)
+    : 0;
 }
 
 export function judgeSteam(content: Content, temperatureC: number): Quality {
@@ -510,7 +530,9 @@ function stopProcess(sim: SimContext, object: number, forced: Quality | null): v
   if (item === undefined) return;
   const elapsed = secondsSince(sim.world, p.startTick, sim.dt);
   if (p.kind === 'extraction') {
-    const q = forced ?? judgeExtraction(sim.content, elapsed, p.readySeconds);
+    const q =
+      forced ??
+      judgeExtraction(sim.content, elapsed, p.readySeconds, perfectBonus(sim.content, sim.world));
     finishStep(sim, p.player, item, q);
     sim.emit({
       type: 'service-extraction-stop',

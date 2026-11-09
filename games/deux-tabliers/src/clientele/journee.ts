@@ -38,6 +38,13 @@ import { planRegulars, stepRegulars, storySteps } from './habitues';
 import { closeDiscounts, hourlyAttraction, openDiscounts } from './remises';
 import { calmArrivals, calmEndSec, warmupAffluence } from './prise-en-main';
 import { closeDayEvents, dayAffluence, planEvents, stepEvents } from './scenes';
+import { openingCheck } from '../installation/regles';
+
+/** Vitrines encore blanchies (démo v0.3): de la place, on ne voit pas qu'un café est ouvert. */
+function whitewash(ctx: Ctx): number {
+  const panes = ctx.sim.world.installation?.panes.length ?? 0;
+  return panes > 0 ? (ctx.sim.content.installation?.rules.whitewashPassers ?? 1) : 1;
+}
 
 export function weekday(ctx: Ctx, day = ctx.s.day): string {
   return ctx.cc.days.weekdays[(day - 1) % 7] ?? 'mon';
@@ -143,7 +150,8 @@ export function dawn(ctx: Ctx, day: number): void {
           player: null,
         });
     }
-    if (day === 1)
+    // Une maison partie d'une cellule vide a son propre prologue (installation, devant le rideau).
+    if (day === 1 && (ctx.sim.world.installation ?? null) === null)
       for (const line of cc.texts.dialogues.prologue ?? [])
         ctx.sim.emit({ type: 'clientele-say', who: 'Simone', text: line.text, player: null });
   }
@@ -222,7 +230,13 @@ function generateArrivals(ctx: Ctx): void {
   const ramp = warmupAffluence(cc, s.day);
   const out = calmArrivals(cc, s.day, spm(ctx), ctx.sim.random);
   for (const p of cc.profileList) {
-    const perHour = passersPerHour(cc, p, wdi, s.weather, dayAffluence(ctx, p.id) * ramp);
+    const perHour = passersPerHour(
+      cc,
+      p,
+      wdi,
+      s.weather,
+      dayAffluence(ctx, p.id) * ramp * whitewash(ctx),
+    );
     // Remises v0.2: attrait heure par heure (heure douce, tarif, carte); sans remise, le même.
     const k = hourlyAttraction(cc, s, p, att, attraction, perHour.length);
     perHour.forEach((lam, i) => {
@@ -445,6 +459,12 @@ export function vote(ctx: Ctx, player: PlayerIndex, topic: string, yes: boolean)
     name: ['monday', 'prep', 'evening'],
   };
   if (!(allowed[topic] ?? []).includes(s.phase)) return 'Pas maintenant';
+  // Démo v0.3: une maison qui s'installe n'ouvre qu'avec une caisse, de la vaisselle et une ligne
+  // servable, le rideau levé (section 7.1).
+  if (topic === 'open' && yes) {
+    const block = openingCheck(ctx.sim.content, ctx.sim.world).blocks[0];
+    if (block !== undefined) return block.text;
+  }
   if (topic === 'next-day' && plan(ctx)?.endOfDemo === true && !s.demoEnded)
     return 'René attend votre réponse';
   if (topic === 'next-day' && s.day >= cc.economy.demoMaxDay) return 'La démo s’arrête au jour 28';

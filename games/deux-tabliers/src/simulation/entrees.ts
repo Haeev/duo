@@ -6,6 +6,7 @@ import { v } from '@duo/sdk';
 import { ARRANGEMENT_INTENTS } from '../amenagement/intentions';
 import { CLIENTELE_INTENTS } from '../clientele/intentions';
 import { SERVICE_INTENTS } from '../service/intentions';
+import { INSTALLATION_INTENTS } from '../installation/intentions';
 import { PlayerIndexSchema } from '../etat/monde';
 
 const Axis = v.picklist([-1, 0, 1]);
@@ -58,5 +59,6 @@ export const IntentSchema = v.variant('type', [
   ...SERVICE_INTENTS,
   ...CLIENTELE_INTENTS,
   ...ARRANGEMENT_INTENTS,
+  ...INSTALLATION_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

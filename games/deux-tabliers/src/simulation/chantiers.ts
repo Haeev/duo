@@ -3,6 +3,7 @@ import { amenagementChantier } from '../amenagement';
 import { branchementChantier } from '../branchement';
 import { clienteleChantier } from '../clientele';
 import { serviceChantier } from '../service';
+import { installationChantier } from '../installation';
 import type { Chantier, StationHandler } from './systemes';
 
 export const CHANTIERS: readonly Chantier[] = [
@@ -10,6 +11,7 @@ export const CHANTIERS: readonly Chantier[] = [
   clienteleChantier,
   branchementChantier,
   amenagementChantier,
+  installationChantier,
 ];
 
 export function stationHandler(station: string): StationHandler | undefined {

@@ -88,6 +88,7 @@ import { talk } from './habitues';
 import { applyDiscountSettings, launchCampaign, startCampaign } from './remises';
 import { dawn, startHouse, stepDay, vote } from './journee';
 import { onTalk, sceneAct } from './scenes';
+import { appliances } from '../installation/regles';
 
 export { clockMinutes, deliverOrder, prepareOrder, type ServeResult };
 export { ctxOf };
@@ -252,8 +253,21 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
       return;
     }
     const order: Record<string, number> = {};
-    for (const [id, n] of intent.cartons) if (cc.ingredients.has(id) && n > 0) order[id] = n;
+    // Démo v0.3: sans réfrigérateur posé, le frais ne se garde pas (il n'est pas commandé).
+    const noFridge =
+      (sim.world.installation ?? null) !== null && !appliances(sim.content, sim.world).fridge;
+    let refusedFresh = false;
+    for (const [id, n] of intent.cartons) {
+      const ing = cc.ingredients.get(id);
+      if (ing === undefined || n <= 0) continue;
+      if (noFridge && ing.storage === 'frigo') {
+        refusedFresh = true;
+        continue;
+      }
+      order[id] = n;
+    }
     s.order = order;
+    if (refusedFresh) refuse(sim, player, sim.content.installation?.texts.catalog.noFridge ?? null);
     return;
   }
   if (intent.type === 'clientele-emergency') {

@@ -60,6 +60,7 @@ import { recipeOf } from '../service/regles';
 import { placeFurniture } from '../etat/assises';
 import type { Intent } from '../simulation/entrees';
 import type { GameEvent } from '../simulation/evenements';
+import { needBought, openingCheck } from '../installation/regles';
 
 const DT = 1 / 60;
 
@@ -420,22 +421,45 @@ function ordersView(content: Content, world: World): OrdersView {
   };
 }
 
+/** Lignes de l'écran du matin: ce qui bloque l'ouverture, puis ce qui se dit avant (démo v0.3). */
+function openingLines(content: Content, world: World): string[] {
+  const check = openingCheck(content, world);
+  return [...check.blocks.map((b) => b.text), ...check.warnings.map((x) => x.text)];
+}
+
+/** Bandeau du catalogue pendant l'installation: les besoins pour ouvrir, cochés. */
+function openingBanner(content: Content, world: World): string | null {
+  const ic = content.installation;
+  const i = world.installation ?? null;
+  if (ic === null || i === null || i.stage === 'opened') return null;
+  const marks = ic.needs
+    .filter((n) => n.id !== 'places')
+    .map((n) => `${needBought(content, world, n.id) ? '✓' : '·'} ${n.label}`);
+  return `${ic.texts.catalog.family ?? 'Pour ouvrir'} : ${marks.join('  ')}`;
+}
+
 function catalogueItems(content: Content, world: World): CatalogueItemView[] {
   const cc = content.clientele;
   const s = world.clientele;
   const threshold = bigPurchaseCents(cc, s);
   const available = availableCents(cc, s);
   const out: CatalogueItemView[] = [];
+  const install = content.installation;
+  const installing = (world.installation ?? null) !== null;
   for (const p of cc.purchases.values()) {
+    const opening = install?.purchases.get(p.id);
+    // « Pour ouvrir » (démo v0.3): seulement pour une maison partie d'une cellule vide.
+    if (opening !== undefined && !installing) continue;
     const offer = offerOf(cc, s, p.id);
     const bought = s.purchases.some(([id]) => id === p.id);
     const price = Math.round(p.price * 100);
     out.push({
       id: p.id,
       name: p.name,
-      family: 'Équipement',
+      family:
+        opening !== undefined ? (install?.texts.catalog.family ?? 'Pour ouvrir') : 'Équipement',
       style: STYLE.neutre ?? 'Simple',
-      brings: '',
+      brings: opening?.text ?? '',
       needs: null,
       priceCents: price,
       state: bought
@@ -770,7 +794,10 @@ export function wireInterface(view: GameView): WiredInterface {
           : s.phase === 'prep'
             ? c.clientele.days.open
             : c.clientele.days.close;
-      const phase = phaseOf(c.clientele, s);
+      // Démo v0.3: le lundi de l'installation se joue dans le café; le bilan du lundi s'ouvre
+      // depuis le téléphone (Bilans), pas de lui-même.
+      const base = phaseOf(c.clientele, s);
+      const phase = base === 'evening' && w.installation?.stage === 'setup' ? 'preparation' : base;
       return {
         minutes: Math.floor(minutes),
         day: s.day,
@@ -837,12 +864,18 @@ export function wireInterface(view: GameView): WiredInterface {
       return {
         title: `${WEEKDAYS[weekdayOf(s.day)] ?? ''} ${String(s.day)} · printemps`,
         weather: weatherOf(c.clientele, s.weather),
-        thisMorning:
-          cartons > 0
+        thisMorning: [
+          ...(cartons > 0
             ? [
                 `La livraison est arrivée : ${String(cartons)} carton${cartons > 1 ? 's' : ''} sur la palette de la cour.`,
               ]
-            : [],
+            : []),
+          // Le grand jour (démo v0.3): le rideau, puis ce qui bloque ou ce qui manque encore.
+          ...(w.installation?.stage === 'bigday' && c.installation !== null
+            ? [c.installation.texts.bigDay]
+            : []),
+          ...openingLines(c, w),
+        ],
         // Le titre du jour est souvent le nom de l'événement (« Le car de 8 h 12 »): une fois.
         today: [plan?.title ?? '', event?.name ?? ''].filter(
           (x, i, all) => x !== '' && all.findIndex((y) => sameLine(y, x)) === i,
@@ -875,7 +908,7 @@ export function wireInterface(view: GameView): WiredInterface {
         banner:
           w.clientele.phase === 'monday' && w.clientele.day > 1
             ? 'Lundi : la brocante est sur la place.'
-            : null,
+            : openingBanner(content, w),
       };
     },
     evening: (w, player) => eveningView(content, w, player),
@@ -918,6 +951,14 @@ export function wireInterface(view: GameView): WiredInterface {
     alert(event) {
       counter++;
       const id = `${event.type}-${String(counter)}`;
+      if (event.type === 'installation-message')
+        return { id, icon: 'info', text: `${event.from} : ${event.text}` };
+      if (event.type === 'installation-delivery')
+        return {
+          id,
+          icon: 'delivery',
+          text: content.installation?.texts.messages.delivery ?? 'Gaby a livré.',
+        };
       if (event.type === 'clientele-delivery')
         return { id, icon: 'delivery', text: 'La livraison est arrivée dans la cour.' };
       if (event.type === 'service-ticket-ready')

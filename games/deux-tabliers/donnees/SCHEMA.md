@@ -200,6 +200,40 @@ Converti de `docs/jeux/cosy-cafe/demo/donnees/` par `python3 games/deux-tabliers
 | `startPieces` | objets posés à l'arrivée (horloge, applique, bocal), avec leur raison (`why`) |
 | `extensionWorks` | par extension: éléments du plan retirés, ajoutés ou restylés (arche, store), meubles de Simone retirés, meubles posés à l'ouverture, raison |
 
+## Départ dans une cellule vide (démo v0.3): `installation.json` et `departs/<adresse>-cellule.json`
+
+Lus par `src/installation/donnees.ts` (conception: `docs/jeux/cosy-cafe/demo/depart-cellule-vide-v0-3.md`). Une nouvelle partie du jeu part de la cellule (`createSession({ start: 'cellule' })` dans `main.ts`); les tests et les robots gardent le départ équipé (`departs/<adresse>.json`, valeur par défaut). Écrits à la main: aucun importeur ne les régénère.
+
+`departs/<adresse>-cellule.json` a les clés d'un départ (`address`, `spawns`, `furniture`, `objects`), plus `spawnYawDeg` (cap des deux joueurs à l'arrivée, 0: vers le nord) et le bloc `installation`, propre au local:
+
+| Clé | Sens |
+|---|---|
+| `economy` | `startCash` (€, remplace la caisse de `economie.json`), `simoneGift` (`[ingrédient, unités]`, donné quand la machine est chaude, lot daté du premier jour ouvert), `startDecor` (`[article, nombre, usé]`, décor de départ de la maison), `keepPieces` (pièces de départ de l'aménagement gardées: ce qui est scellé au mur) |
+| `simone` | porte du logement et bout du comptoir (`[x, z]`), raison |
+| `shutters` | rideaux métalliques (meubles posés), `door`: celui de la porte, à lever à deux |
+| `shutterHandle` | poignée basse du rideau de la porte (`x`, `y`, `z`) et portée au sol (`reach`, m) |
+| `sheets` | draps (meubles posés), meubles qu'ils couvrent, point visé |
+| `mail`, `tools` | courrier, balai (`broom`) et seau à éponge (`sponge`): meuble posé et point visé |
+| `dust` | taches de poussière (meubles `poussiere`), dans l'ordre que lit `rendu/cafe-ferme.ts` |
+| `panes` | vitres blanchies (meubles `vitre-*`, identifiants des éléments du plan: `window-2`...), point visé, `sign` (« À LOUER ») |
+| `lots` | lots de Simone: table, chaises retournées (meuble), drap, chaises une fois descendues (`seats`), décor qu'ils apportent |
+| `oldMachine` | machine de Simone déjà en place (meuble posé) |
+| `appliances` | place unique de chaque appareil (DE-04): type, identifiant du meuble posé, pose, clé de la phrase de refus (`texts.spots`) |
+| `machineParts` | pièces de `service/reglages.json` (`installation`) posées quand la machine est chaude |
+| `serviceDeferred` | pièces de `service/reglages.json` que le service ne pose pas d'office (arrivent avec leur appareil) |
+| `deliveryArea`, `deliveryWhy` | zone du trottoir où Gaby pose les cartons `[x, z, largeur, profondeur]`, et pourquoi là |
+| `nightCartonSpot`, `nightCartonWhy` | où Gaby rentre un carton oublié dehors le soir |
+
+`installation.json` (commun à toutes les adresses):
+
+| Clé | Sens |
+|---|---|
+| `rules` | durées et réglages de la section 11: `deliveryFirstSec`, `deliveryNextSec`, `deliveryJoinSec`, `heatSec`, `connectHoldSec`, `shutterHoldSec`, `sweepHoldSec`, `wipeHoldSec`, `buyHoldSec`, `returnHoldSec`, `chairsDownSec` (s); `soloLift` (m: le rideau soulevé seul); `dustCleanliness` (propreté de l'ambiance tant qu'il reste de la poussière); `whitewashPassers` (facteur des passants tant qu'une vitre est blanchie); `seatsAdvised`; `sweepRadius`, `spotReach`, `snapRadius` (m); `lookLineAfterSec`, `lookLineReach` (répliques de Simone); `budgetLineAbove` (€); `perfectBonusSec` (fenêtre « Parfait » en plus de la machine révisée) |
+| `purchases` | achats « Pour ouvrir »: `id`, `name`, `price` (€), `need`, `seller`, `delivery` (`en-place`, `simone`, `gaby`), `furniture` (type que devient le carton), `heavy` (gros carton à deux), `dishes` (pièces de vaisselle), `lot`, `exclusive` (une seule machine), `text`. Ajoutés au catalogue de la clientèle au chargement (proposition à l'autre, caisse, réserve), sans effet propre: l'installation les livre et les pose |
+| `needs`, `required` | besoins pour ouvrir (libellés du téléphone), et ceux qui sont obligatoires |
+| `credit` | achat nécessaire, et qui fait crédit quand la caisse ne suffit plus (EC-06) |
+| `texts` | répliques de Simone, courrier, invites, phrases de refus des places, pancarte, catalogue, guide d'installation (`guide`), libellé de sauvegarde |
+
 ## Régénérer le départ
 
 ## Clientèle (`clientele/`, chantier b)

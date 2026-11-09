@@ -30,6 +30,14 @@ import { aim, type Aim } from './simulation/visee';
 import { eyeHeightOf } from './simulation/assise';
 import { placeAnchor } from './etat/assises';
 import { attachNotebook, createNotebookSource, notebookTyping } from './plateforme/carnet';
+import {
+  closedCafeLook,
+  dustSpots,
+  installAim,
+  spotFor,
+  type InstallAim,
+} from './installation/regles';
+import { createClosedCafe } from './rendu/cafe-ferme';
 
 const canvas = document.getElementById('scene');
 if (!(canvas instanceof HTMLCanvasElement)) throw new Error('canvas #scene absent');
@@ -51,7 +59,8 @@ duo.reportLoading(0.3);
 
 const t0 = performance.now();
 const now = (): number => performance.now() - t0;
-const session = createSession({ duo, content, now });
+// Une nouvelle maison part d'une cellule vide (démo v0.3); une sauvegarde reprend telle quelle.
+const session = createSession({ duo, content, now, start: 'cellule' });
 const view = session.view;
 const stage = createStage(canvas, content.settings);
 // Coque du plan en vigueur (extensions ouvertes, revêtements), chantier aménagement.
@@ -60,6 +69,9 @@ const models = createModelLibrary((message, data) => {
   duo.log.warn(message, data);
 });
 const baked = createBakedShell(stage.scene, stage.renderer, models, view);
+// Café fermé (démo v0.3): vitres au blanc de Meudon, poussière, lumière de la salle.
+const spots = dustSpots(content);
+const closedCafe = createClosedCafe(stage.scene, models, spots.length > 0 ? { spots } : {});
 const nodes = createWorldNodes(stage.scene, models, [duo.host.colorHex, duo.guest.colorHex]);
 const customers = createCustomerNodes(stage.scene);
 const sounds = createSounds(duo.audio, duo.log, DATA_FILES, content);
@@ -160,6 +172,9 @@ duo.on('resume', () => {
 
 let seq = 0;
 let currentAim: Aim | null = null;
+/** Point de l'installation visé (démo v0.3), quand il passe avant la cible du cœur. */
+let currentInstall: InstallAim | null = null;
+const partnerName = (text: string): string => text.replaceAll('{partner}', duo.remotePlayer.name);
 const axis = (plus: GameAction, minus: GameAction): -1 | 0 | 1 => {
   const v = (duo.input.isDown(plus) ? 1 : 0) - (duo.input.isDown(minus) ? 1 : 0);
   return v > 0 ? 1 : v < 0 ? -1 : 0;
@@ -202,7 +217,9 @@ duo.loop.start({
     intents.push(...arrange.step(playing && !resumeClick));
     if (playing && !resumeClick && !arranging && !keys.swallowAct) {
       const target = currentAim?.target;
-      if (duo.input.wasPressed('act') && target !== undefined)
+      if (duo.input.wasPressed('act') && currentInstall !== null)
+        intents.push({ type: 'installation-act', spot: currentInstall.spot.id });
+      else if (duo.input.wasPressed('act') && target !== undefined)
         intents.push({ type: 'act', target });
       if (duo.input.wasPressed('drop') && target !== undefined)
         intents.push({ type: 'drop', target });
@@ -241,6 +258,7 @@ duo.loop.start({
       (look.look.yawDeg * Math.PI) / 180,
       0,
     );
+    closedCafe.syncInstallation(closedCafeLook(content, view.world()));
     nodes.update(view, look.look);
     customers.update(view, now(), dt);
     shell.update();
@@ -248,6 +266,45 @@ duo.loop.start({
     shell.setBaseVisible(baked.failed());
     arrange.render();
     currentAim = session.ready() && !arrange.active() ? localAim() : null;
+    currentInstall = null;
+    if (session.ready() && !arrange.active()) {
+      const eyePose = view.pose(view.local);
+      const eyeY = eyeHeightOf(content, view.world(), view.local);
+      const found = installAim(content, view.world(), view.local, {
+        x: eyePose.x,
+        y: eyeY,
+        z: eyePose.z,
+        yawDeg: look.look.yawDeg,
+        pitchDeg: look.look.pitchDeg,
+      });
+      const core = currentAim;
+      const coreDistance =
+        core === null
+          ? Infinity
+          : Math.hypot(core.x - eyePose.x, core.y - eyeY, core.z - eyePose.z);
+      const coreRefused = core?.plan.kind === 'refuse';
+      // Le point de l'installation l'emporte s'il est plus près, ou si la cible du cœur ne fait rien.
+      if (
+        found !== null &&
+        (core === null ||
+          (coreRefused && found.spot.refused === null) ||
+          found.distance <= coreDistance + 0.05)
+      )
+        currentInstall = found;
+    }
+    const installHold = view.world().installation?.holds[view.local] ?? null;
+    const installSpot =
+      installHold === null ? null : spotFor(content, view.world(), view.local, installHold.spot);
+    const installProgress =
+      installHold === null || installSpot === null
+        ? null
+        : installHold.spot === 'shutter'
+          ? Math.min(1, (view.world().installation?.together ?? 0) / installSpot.hold)
+          : Math.min(1, installHold.elapsed / Math.max(0.01, installSpot.hold));
+    // L'éponge efface le blanc pendant le maintien (après la synchronisation de l'état).
+    if (installHold?.spot.startsWith('pane:') === true && installProgress !== null)
+      closedCafe.setPaneWhitewash(installHold.spot.slice(5), 1 - installProgress);
+    closedCafe.update(dt, stage.camera);
     const use = view.world().players[view.local].use;
     const station =
       use === null
@@ -265,20 +322,31 @@ duo.loop.start({
         : null;
     ui.frame(
       {
-        aiming: arrange.active() || (currentAim !== null && currentAim.plan.kind !== 'refuse'),
+        aiming:
+          arrange.active() ||
+          (currentInstall !== null && currentInstall.spot.refused === null) ||
+          (currentAim !== null && currentAim.plan.kind !== 'refuse'),
         prompt:
           arrangePrompt ??
-          (currentAim === null
-            ? null
-            : {
+          (currentInstall !== null
+            ? {
                 key: duo.input.actionLabel('act'),
-                text:
-                  currentAim.plan.kind === 'refuse'
-                    ? planLabel(content, view.world(), currentAim.plan)
-                    : (servicePrompt ?? planLabel(content, view.world(), currentAim.plan)),
-                refused: currentAim.plan.kind === 'refuse',
-              }),
-        hold: use === null || seconds <= 0 ? null : Math.min(1, use.elapsed / seconds),
+                text: partnerName(currentInstall.spot.refused ?? currentInstall.spot.label),
+                refused: currentInstall.spot.refused !== null,
+              }
+            : currentAim === null
+              ? null
+              : {
+                  key: duo.input.actionLabel('act'),
+                  text:
+                    currentAim.plan.kind === 'refuse'
+                      ? planLabel(content, view.world(), currentAim.plan)
+                      : (servicePrompt ?? planLabel(content, view.world(), currentAim.plan)),
+                  refused: currentAim.plan.kind === 'refuse',
+                }),
+        hold:
+          installProgress ??
+          (use === null || seconds <= 0 ? null : Math.min(1, use.elapsed / seconds)),
         capsule:
           duo.state === 'running' && !look.locked() && !look.panelOpen() && !notebookTyping(),
       },
@@ -302,6 +370,7 @@ duo.on('stop', () => {
   models.dispose();
   shell.dispose();
   baked.dispose();
+  closedCafe.dispose();
   stage.dispose();
   ui.dispose();
   session.dispose();

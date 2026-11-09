@@ -15,6 +15,7 @@ import type { CatalogItem, Placement } from './donnees';
 import { CARTON_HEAVY, CARTON_SMALL } from './donnees';
 import { currentPlan, roomOpen } from './extensions';
 import type { PlacementRequest } from './intentions';
+import { arrangementHooks, type SpotRule } from './crochets';
 
 export type Verdict =
   | {
@@ -23,6 +24,8 @@ export type Verdict =
       readonly rotDeg: number;
       /** Assises voisines à retourner vers la table qu'on pose. */
       readonly reorient: readonly { id: string; rotDeg: number }[];
+      /** Appareil à place unique: la place retenue (installation, démo v0.3). */
+      readonly spot?: SpotRule;
     }
   | { readonly ok: false; readonly reason: string; readonly detail: string };
 
@@ -561,6 +564,8 @@ export function checkPlacement(
 ): Verdict {
   const type = content.furniture.get(cand.type);
   if (type === undefined) return refuse('Ça ne se pose pas ici.');
+  const spot = arrangementHooks().spot?.(content, world, cand.type) ?? null;
+  if (spot !== null) return checkSpot(content, world, cand, spot, ignore);
   const rules = content.arrangement.rules;
   const placement = placementOf(content, cand.type);
   const mount = mountOf(placement);
@@ -603,6 +608,28 @@ export function checkPlacement(
     case 'vitrine':
       return checkWindow(content, world, cand, type, ignore, mount);
   }
+}
+
+/**
+ * Appareil à place unique (DE-04): seulement à sa place, à `snap` près; une place déjà prise
+ * refuse, sauf pour une pièce qui s'y range (vaisselle) ou ce que la pose remplace.
+ */
+function checkSpot(
+  content: Content,
+  world: World,
+  cand: Candidate,
+  spot: SpotRule,
+  ignore: ReadonlySet<string>,
+): Verdict {
+  if (Math.hypot(cand.x - spot.x, cand.z - spot.z) > spot.snap) return refuse(spot.reason);
+  const there = world.furniture.find(
+    (f) => f.id === spot.id && !ignore.has(f.id) && !spot.replaces.includes(f.id),
+  );
+  if (there !== undefined && !(spot.merge && there.type === cand.type)) {
+    const what = content.furniture.get(there.type)?.label.toLowerCase() ?? there.type;
+    return refuse(`La place est prise : ${what} y est encore.`);
+  }
+  return { ok: true, rotDeg: spot.rotDeg, reorient: [], spot };
 }
 
 function roomsFor(

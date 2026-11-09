@@ -192,6 +192,10 @@ export type Plan = v.InferOutput<typeof PlanSchema>;
 export const StartSchema = v.strictObject({
   address: Id,
   spawns: v.tuple([Point, Point]),
+  /** Cap des deux joueurs à l'arrivée (0: vers le nord). Absent: face à la salle (sud). */
+  spawnYawDeg: v.optional(v.number()),
+  /** Départ en cellule vide: bloc lu par `installation/donnees.ts` (`CellSchema`). */
+  installation: v.optional(v.unknown()),
   furniture: v.array(
     v.strictObject({
       id: v.string(),

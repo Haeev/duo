@@ -9,6 +9,7 @@ import type { Intent } from '../simulation/entrees';
 import type { SimContext } from '../simulation/systemes';
 import { orientSeat } from './assises';
 import { CARTON_HEAVY, CARTON_SMALL, isCovering } from './donnees';
+import { arrangementHooks } from './crochets';
 import { economy } from './economie';
 import type { Held, Piece, Pose3 } from './etat';
 import { roomOpen } from './extensions';
@@ -306,7 +307,11 @@ function initialize(sim: SimContext): void {
     const info = content.arrangement.pieces.get(f.type);
     if (info?.worn === true && !a.worn.includes(f.id)) a.worn.push(f.id);
   }
+  // Démo v0.3, cellule vide: seul ce qui est scellé au mur reste (l'applique).
+  const keep =
+    (world.installation ?? null) === null ? null : content.installation?.cell.economy.keepPieces;
   for (const p of content.arrangement.startPieces) {
+    if (keep !== null && keep !== undefined && !keep.includes(p.item)) continue;
     const type = content.furniture.get(p.item);
     if (type === undefined) continue;
     const id = newId(world, 'piece');
@@ -354,6 +359,8 @@ export function takeRefusal(
   f: PlacedFurniture,
 ): string | null {
   const type = content.furniture.get(f.type);
+  const locked = arrangementHooks().locked?.(content, world, f.id) ?? null;
+  if (locked !== null) return locked;
   if (type === undefined || type.fixed || type.carry === 'none')
     return 'Ce meuble ne se déplace pas.';
   if (world.arrangement.held[player] !== null) return 'Tu tiens déjà quelque chose.';
@@ -417,6 +424,7 @@ function take(sim: SimContext, player: PlayerIndex, furnitureId: string): void {
       piece: carton.piece,
       from: { kind: 'carton', carton: f.id, pose: poseOf(f) },
     };
+    arrangementHooks().unpacked?.(sim, player, f.id, carton.piece);
     sim.emit({
       type: 'amenagement-geste',
       player,
@@ -461,6 +469,21 @@ function place(
     const f = world.furniture.find((x) => x.id === r.id);
     if (f !== undefined) f.rotDeg = r.rotDeg;
   }
+  const spot = verdict.spot;
+  if (spot !== undefined) {
+    // Appareil à place unique (installation): posé à sa place, sous son identifiant de poste.
+    const merged = spot.merge && world.furniture.some((f) => f.id === spot.id);
+    if (!merged) world.furniture.push({ id: spot.id, type: piece.type, ...spotPose(spot) });
+    arrangementHooks().placed?.(sim, player, piece, merged);
+    sim.emit({
+      type: 'amenagement-geste',
+      player,
+      gesture: 'pose',
+      furniture: spot.id,
+      item: piece.type,
+    });
+    return true;
+  }
   world.furniture.push({
     id: piece.id,
     type: piece.type,
@@ -482,6 +505,10 @@ function place(
   return true;
 }
 
+function spotPose(spot: { x: number; z: number; y: number; rotDeg: number }): Pose3 {
+  return { x: spot.x, z: spot.z, y: spot.y, rotDeg: spot.rotDeg };
+}
+
 /** Pose de la charge portée à deux, là où elle est (un gros carton se déballe en son meuble). */
 function placeCarry(sim: SimContext, player: PlayerIndex): void {
   const { content, world } = sim;
@@ -497,6 +524,36 @@ function placeCarry(sim: SimContext, player: PlayerIndex): void {
     new Set([f.id]),
     carton?.piece.id ?? f.id,
   );
+  const hooks = arrangementHooks();
+  if (carton !== undefined && (hooks.spot?.(content, world, type) ?? null) !== null) {
+    // Gros carton d'un appareil (installation): déballé seulement à la place de l'appareil;
+    // ailleurs, il se pose fermé, comme un carton.
+    if (verdict.ok && verdict.spot !== undefined) {
+      const spot = verdict.spot;
+      world.furniture = world.furniture.filter((x) => x.id !== f.id);
+      a.cartons = a.cartons.filter((c) => c !== carton);
+      a.carry = null;
+      hooks.unpacked?.(sim, player, f.id, carton.piece);
+      world.furniture.push({ id: spot.id, type, ...spotPose(spot) });
+      hooks.placed?.(sim, player, carton.piece, false);
+      sim.emit({ type: 'amenagement-port', player, state: 'pose', furniture: spot.id });
+      return;
+    }
+    const closed = checkPlacement(
+      content,
+      world,
+      { type: f.type, x: f.x, z: f.z, y: 0, rotDeg: f.rotDeg, support: null },
+      new Set([f.id]),
+      f.id,
+    );
+    if (!closed.ok) {
+      refuse(sim, player, verdict.ok ? closed.reason : verdict.reason);
+      return;
+    }
+    a.carry = null;
+    sim.emit({ type: 'amenagement-port', player, state: 'pose', furniture: f.id });
+    return;
+  }
   if (!verdict.ok) {
     refuse(sim, player, verdict.reason);
     return;
@@ -556,6 +613,11 @@ function stash(sim: SimContext, player: PlayerIndex, furnitureId: string | null)
     return;
   }
   const type = content.furniture.get(f.type);
+  const locked = arrangementHooks().locked?.(content, world, f.id) ?? null;
+  if (locked !== null) {
+    refuse(sim, player, locked);
+    return;
+  }
   if (type === undefined || type.fixed || type.carry === 'none') {
     refuse(sim, player, 'Ce meuble ne se range pas.');
     return;

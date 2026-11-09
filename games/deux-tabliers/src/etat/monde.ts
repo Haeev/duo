@@ -7,6 +7,7 @@
 import { v } from '@duo/sdk';
 import { ArrangementStateSchema } from '../amenagement/etat';
 import { ClienteleStateSchema } from '../clientele/etat';
+import { InstallationStateSchema } from '../installation/etat';
 import { ServiceStateSchema } from '../service/etat';
 
 /** 0: l'hôte, 1: l'invité (ordre de `duo.players`). */
@@ -63,6 +64,8 @@ export const WorldSchema = v.strictObject({
   service: ServiceStateSchema,
   clientele: ClienteleStateSchema,
   arrangement: ArrangementStateSchema,
+  /** Départ dans une cellule vide (démo v0.3); `null`: maison déjà ouverte (IN-15). */
+  installation: v.optional(v.nullable(InstallationStateSchema), null),
 });
 export type World = v.InferOutput<typeof WorldSchema>;
 
@@ -72,6 +75,8 @@ export type World = v.InferOutput<typeof WorldSchema>;
 // 3: réalisme v0.2 (lots datés, marchandise payée à la livraison, bilan détaillé). Une partie au
 // format 2 se relit sans perte: les champs nouveaux ont une valeur par défaut, et les lots naissent
 // du stock au premier pas (`reconcileLots`).
-export const WORLD_FORMAT = 3;
+// 4: départ dans une cellule vide (démo v0.3, domaine `installation`). Une partie au format 3 se
+// relit telle quelle, sans installation: la maison est déjà ouverte (IN-15).
+export const WORLD_FORMAT = 4;
 /** Formats encore relus (voir `restoreWorld`). */
-export const WORLD_FORMATS_READ: readonly number[] = [2, 3];
+export const WORLD_FORMATS_READ: readonly number[] = [2, 3, 4];

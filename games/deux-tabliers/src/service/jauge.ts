@@ -8,7 +8,13 @@ import type { PlayerIndex, World } from '../etat/monde';
 import { furnitureById } from '../simulation/monde';
 import type { Quality } from './etat';
 import type { LATTE_SHAPES } from './intentions';
-import { kettleTemperature, recipeOf, secondsSince, steamTemperature } from './regles';
+import {
+  kettleTemperature,
+  perfectBonus,
+  recipeOf,
+  secondsSince,
+  steamTemperature,
+} from './regles';
 
 export type ServiceGauge =
   /** Maintien d'Agir: avancement de 0 à 1. */
@@ -78,7 +84,7 @@ export function serviceGauge(
       furniture: p.furniture,
       seconds,
       readySeconds: p.readySeconds,
-      perfectSeconds: ex.perfectSeconds,
+      perfectSeconds: ex.perfectSeconds + perfectBonus(content, world),
       autoStopSeconds: ex.autoStopSeconds,
     };
   }

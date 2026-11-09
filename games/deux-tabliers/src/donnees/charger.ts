@@ -9,6 +9,12 @@ import { loadClienteleContent, type ClienteleContent } from '../clientele/donnee
 import { loadServiceContent, type ServiceContent } from '../service/donnees';
 import { seatFacingIssues } from '../amenagement/assises';
 import {
+  CellSchema,
+  loadInstallationContent,
+  type InstallationContent,
+} from '../installation/donnees';
+import type { Purchase } from '../clientele/donnees';
+import {
   FurnitureFileSchema,
   ObjectsFileSchema,
   PlanSchema,
@@ -36,6 +42,10 @@ export interface Content {
   readonly service: ServiceContent;
   readonly clientele: ClienteleContent;
   readonly arrangement: ArrangementContent;
+  /** Départ dans une cellule vide (`departs/<adresse>-cellule.json`), `null` si l'adresse n'en a pas. */
+  readonly cellStart: Start | null;
+  /** Règles et données de l'installation (démo v0.3), `null` sans départ en cellule. */
+  readonly installation: InstallationContent | null;
 }
 
 export class ContentError extends Error {
@@ -86,8 +96,31 @@ export function loadContent(files: DataFiles, address = 'village'): Content {
   const stationsFile = readFile(files, 'postes.json', StationsFileSchema, issues);
   const plan = readFile(files, `adresses/${address}.json`, PlanSchema, issues);
   const start = readFile(files, `departs/${address}.json`, StartSchema, issues);
+  const cellPath = `departs/${address}-cellule.json`;
+  const cellStart = cellPath in files ? readFile(files, cellPath, StartSchema, issues) : null;
+  const cell =
+    cellStart === null
+      ? null
+      : readFile({ [cellPath]: cellStart.installation }, cellPath, CellSchema, issues);
+  const installation = loadInstallationContent(files, cell, issues);
   const service = loadServiceContent(files, issues);
-  const clientele = loadClienteleContent(files, issues);
+  const loadedClientele = loadClienteleContent(files, issues);
+  // Achats « Pour ouvrir » (installation.json): achetés comme les équipements, par la caisse de
+  // la clientèle (proposition à l'autre, réserve de deux jours), sans effet propre: l'installation
+  // les livre et les pose (`installation/regles.ts`).
+  const clientele: ClienteleContent =
+    installation === null
+      ? loadedClientele
+      : {
+          ...loadedClientele,
+          purchases: new Map([
+            ...installation.purchaseList.map((p): [string, Purchase] => [
+              p.id,
+              { id: p.id, name: p.name, price: p.price, tier: 't0', effects: [] },
+            ]),
+            ...loadedClientele.purchases,
+          ]),
+        };
   const arrangement = loadArrangementContent(files, issues);
   if (
     settings === null ||
@@ -144,7 +177,43 @@ export function loadContent(files: DataFiles, address = 'village'): Content {
   // Cohérence du monde (demande du client, 2026-11-07): aucune assise dos à sa table.
   for (const issue of seatFacingIssues(start.furniture, furniture, settings.seating.tableReach))
     issues.push(`departs/${address}.json: ${issue}`);
+  if (cellStart !== null) {
+    for (const p of cellStart.furniture)
+      if (!furniture.has(p.type))
+        issues.push(`${cellPath} (${p.id}): meuble inconnu « ${p.type} »`);
+    const placedIds = new Set(cellStart.furniture.map((f) => f.id));
+    const cited = [
+      ...(cell?.shutters.map((x) => x.id) ?? []),
+      ...(cell?.sheets.map((x) => x.id) ?? []),
+      ...(cell?.dust ?? []),
+      ...(cell?.panes.map((x) => x.id) ?? []),
+      ...(cell?.tools.map((x) => x.id) ?? []),
+      ...(cell?.lots.flatMap((l) => [l.table, l.chairs, l.sheet]) ?? []),
+    ];
+    for (const id of cited)
+      if (!placedIds.has(id)) issues.push(`${cellPath}: meuble posé inconnu « ${id} »`);
+    for (const a of cell?.appliances ?? [])
+      if (!furniture.has(a.type)) issues.push(`${cellPath}: appareil inconnu « ${a.type} »`);
+    for (const p of installation?.purchaseList ?? []) {
+      if (p.furniture !== null && !furniture.has(p.furniture))
+        issues.push(`installation.json (${p.id}): meuble inconnu « ${p.furniture} »`);
+      if (p.lot !== null && !(cell?.lots.some((l) => l.id === p.lot) ?? false))
+        issues.push(`installation.json (${p.id}): lot inconnu « ${p.lot} »`);
+    }
+  }
 
   if (issues.length > 0) throw new ContentError(issues);
-  return { settings, objects, furniture, stations, plan, start, service, clientele, arrangement };
+  return {
+    settings,
+    objects,
+    furniture,
+    stations,
+    plan,
+    start,
+    service,
+    clientele,
+    arrangement,
+    cellStart,
+    installation,
+  };
 }

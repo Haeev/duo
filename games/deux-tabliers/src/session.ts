@@ -11,13 +11,15 @@ import { createGuest, type Guest } from './reseau/invite';
 import { createHost, type Host } from './reseau/hote';
 import type { GameView } from './reseau/vue';
 import type { Intent, StepInput } from './simulation/entrees';
-import { createWorld } from './simulation/monde';
+import { createWorld, type StartKind } from './simulation/monde';
 import { WEEKDAYS } from './interface/textes';
 
 /** Libellé de l'emplacement: « Jour 9 (mardi), Le café d'Ormeval », 40 caractères au plus. */
 export function saveLabel(content: Content, world: World): string {
   const s = world.clientele;
   if (s.day === 0) return content.plan.title.slice(0, 40);
+  if (s.day === 1 && world.installation?.stage === 'setup' && content.installation !== null)
+    return content.installation.texts.saveLabel.slice(0, 40);
   const weekday = WEEKDAYS[(s.day - 1) % 7] ?? '';
   const address = s.houseName ?? 'Ormeval';
   return `Jour ${String(s.day)} (${weekday}), ${address}`.slice(0, 40);
@@ -34,6 +36,11 @@ export interface SessionOptions {
   readonly content: Content;
   /** Horloge locale en millisecondes (interpolation chez l'invité). */
   readonly now: () => number;
+  /**
+   * Départ d'une nouvelle maison (sans sauvegarde): `cellule` pour le jeu (démo v0.3), `equipe`
+   * par défaut (tests, robots). Une sauvegarde reprend toujours telle quelle.
+   */
+  readonly start?: StartKind;
 }
 
 export interface Session {
@@ -73,7 +80,7 @@ export function restoreWorld(
   return world;
 }
 
-export function createSession({ duo, content, now }: SessionOptions): Session {
+export function createSession({ duo, content, now, start }: SessionOptions): Session {
   const memberIds = [duo.host.id, duo.guest.id] as const;
   if (duo.role === 'host') {
     const loaded = duo.saves.loaded;
@@ -81,7 +88,7 @@ export function createSession({ duo, content, now }: SessionOptions): Session {
       loaded === null ? null : restoreWorld(loaded.data, loaded.dataSchema, memberIds);
     if (loaded !== null && restored === null)
       duo.log.warn('sauvegarde illisible, nouvelle partie', { slot: loaded.slot });
-    const world = restored ?? createWorld(content, memberIds);
+    const world = restored ?? createWorld(content, memberIds, start ?? 'equipe');
     const host: Host = createHost(duo.net, content, world, duo.random('simulation'));
     const snapshot = (): SaveSnapshot => ({
       label: saveLabel(content, world),

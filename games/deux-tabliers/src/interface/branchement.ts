@@ -154,7 +154,8 @@ export function attachInterface(options: AttachOptions): AttachedInterface {
       paintGuide();
     },
     onEvent(event) {
-      if (event.type === 'refused' && event.player === view.local) ui.flash(event.reason);
+      if (event.type === 'refused' && event.player === view.local)
+        ui.flash(event.reason.replaceAll('{partner}', duo.remotePlayer.name));
       const alert = sources.alert?.(event, view.local) ?? null;
       if (alert !== null) ui.alert(alert);
       const word = sources.quality?.(event, view.local) ?? null;

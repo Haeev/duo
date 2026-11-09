@@ -2,6 +2,7 @@
 import { v } from '@duo/sdk';
 import { ArrangementStateSchema } from '../amenagement/etat';
 import { ClienteleStateSchema } from '../clientele/etat';
+import { InstallationStateSchema } from '../installation/etat';
 import { ServiceStateSchema } from '../service/etat';
 import { ObjectStateSchema, PlacedFurnitureSchema, StationUseSchema } from '../etat/monde';
 import { IntentSchema, StepInputSchema } from '../simulation/entrees';
@@ -15,6 +16,8 @@ export const CHANNEL = {
   clientele: 4,
   arrangement: 5,
   events: 6,
+  /** 7: positions des clients debout (chantier clientèle). */
+  installation: 8,
 } as const;
 
 const Tick = v.pipe(v.number(), v.integer(), v.minValue(0));
@@ -63,6 +66,11 @@ export const DOMAINS = [
     key: 'arrangement',
     channel: CHANNEL.arrangement,
     schema: v.strictObject({ tick: Tick, state: ArrangementStateSchema }),
+  },
+  {
+    key: 'installation',
+    channel: CHANNEL.installation,
+    schema: v.strictObject({ tick: Tick, state: v.nullable(InstallationStateSchema) }),
   },
 ] as const;
 
