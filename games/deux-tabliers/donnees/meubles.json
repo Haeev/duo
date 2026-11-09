@@ -31,8 +31,8 @@
       "station": null,
       "source": null,
       "slots": [
-        { "id": "a", "x": 0.5, "y": 0.9, "z": 0 },
-        { "id": "b", "x": 0.8, "y": 0.9, "z": 0 }
+        { "id": "a", "x": 0.33, "y": 0.9, "z": 0.17 },
+        { "id": "b", "x": 0.75, "y": 0.9, "z": 0.17 }
       ]
     },
     {
@@ -49,7 +49,7 @@
       "price": 0,
       "station": "plonge",
       "source": null,
-      "slots": [{ "id": "bac", "x": 0, "y": 0.8, "z": 0 }]
+      "slots": [{ "id": "bac", "x": -0.11, "y": 0.745, "z": 0 }]
     },
     {
       "id": "frigo-sous-plan",
@@ -65,7 +65,7 @@
       "price": 0,
       "station": "frigo",
       "source": null,
-      "slots": [{ "id": "plan", "x": 0.05, "y": 0.91, "z": 0 }]
+      "slots": [{ "id": "plan", "x": 0.05, "y": 0.913, "z": 0 }]
     },
     {
       "id": "passe",
@@ -291,7 +291,7 @@
       "label": "Vaisselle propre",
       "model": "pile-tasses",
       "color": "#f2ece0",
-      "footprint": [0.2, 0.2],
+      "footprint": [0.34, 0.28],
       "height": 0.25,
       "kind": "other",
       "blocks": false,
@@ -372,9 +372,9 @@
       "id": "vitrine",
       "label": "Cloche à viennoiseries",
       "color": "#e8e2d0",
-      "footprint": [0.28, 0.28],
-      "height": 0.32,
-      "slots": [{ "id": "assiette", "x": 0, "y": 0, "z": 0.2 }],
+      "footprint": [0.5, 0.3],
+      "height": 0.3,
+      "slots": [{ "id": "assiette", "x": 0, "y": 0, "z": 0.28 }],
       "station": "vitrine"
     },
     {
@@ -447,9 +447,9 @@
       "id": "rail-tickets",
       "label": "Rail à tickets",
       "color": "#8a8f94",
-      "footprint": [0.6, 0.03],
-      "height": 0.05,
-      "slots": [{ "id": "pince", "x": 0, "y": 0.05, "z": 0 }],
+      "footprint": [0.6, 0.04],
+      "height": 0.46,
+      "slots": [{ "id": "pince", "x": 0, "y": 0.42, "z": 0 }],
       "station": "rail"
     },
     {

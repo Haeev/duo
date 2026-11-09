@@ -9,6 +9,7 @@ Modèles du café d'Ormeval en rendu semi-réaliste (variante B de l'essai de st
 | Coque d'Ormeval, pièce du fond, rue, lumière cuite | `coque.py` (reprend `lib/scene_coque.py`, copie adaptée de l'essai) | `shell_village.glb`, `shell_village_ext_fond.glb`, `textures/shell_village_lightmap.png`, textures des murs et sols |
 | Meubles et décorations du catalogue (`catalogue.json` de la démo) | `meubles.py` | un GLB par identifiant du catalogue |
 | Postes, équipements, vaisselle, nourriture, cartons, terrasse (store), objets uniques et d'événements | `objets.py` | un GLB par identifiant |
+| Postes de l'arrière-comptoir (rail à tickets, vitrine, range-vaisselle, plonge, réfrigérateur sous le plan, lave-vaisselle), réserve (armoire froide, deux étagères garnies), palette de la cour et cartons étiquetés par ingrédient (refaits après la séance du 2026-11-09) | `postes_arriere.py` | un GLB par identifiant, fiche `fiches/postes_arriere.json` |
 | Personnages Meshy (15) | `personnages/conformer.py` (appelle `docs/production/essais-meshy/scripts/conformite_personnage.py`) | `char_*.glb`, fiches `personnages/<id>.meshy.json` et rapports |
 | Mises en place par défaut et contrôle des assises | `dispositions.py` | `assets/modeles/dispositions/*.json` |
 | Fiche commune | `modeles_json.py` | `assets/modeles/modeles.json` |
@@ -28,12 +29,14 @@ Bibliothèque: `lib/commun.py` (atlas des meubles, matériaux, UV, occlusion cui
 duo-python games/deux-tabliers/assets-src/modeles/coque.py            # 3 min environ (cuisson 2048 px, 64 échantillons)
 duo-python games/deux-tabliers/assets-src/modeles/meubles.py          # 10 s
 duo-python games/deux-tabliers/assets-src/modeles/objets.py           # 10 s (lancer après meubles.py: il importe ses fonctions)
+duo-python games/deux-tabliers/assets-src/modeles/postes_arriere.py   # 5 s (police Patrick Hand des node_modules: pnpm install d'abord)
 python3 games/deux-tabliers/assets-src/modeles/personnages/conformer.py   # 15 x 20 s; sorties brutes de Meshy requises (hors dépôt)
 duo-python games/deux-tabliers/assets-src/modeles/personnages/doigts.py    # 4 min; os des doigts et poses de main, après conformer.py
 python3 games/deux-tabliers/assets-src/modeles/dispositions.py        # contrôle des assises, code 1 en cas d'erreur
 python3 games/deux-tabliers/assets-src/modeles/modeles_json.py
 ```
 
-Contrôles: `verifier/valider.cjs` (gltf-validator, images externes comprises), `verifier/inspecter_glb.py`, `verifier/mains.py` (clips intacts, prises sans traversée, gros plans des mains), `verifier/planche.py` (planche Cycles avec mannequin de 1,80 m), `verifier/vue/` (visionneuse Three.js 0.187 et `capturer.mjs` sous Chromium: coque cuite, dispositions, personnages, vue de dessus).
+Contrôles: `verifier/valider.cjs` (gltf-validator, images externes comprises), `verifier/inspecter_glb.py`,
+`verifier/controle_faces.py` (faces vues de dos, îlots fermés retournés, boîte de chaque nœud), `verifier/mains.py` (clips intacts, prises sans traversée, gros plans des mains), `verifier/planche.py` (planche Cycles avec mannequin de 1,80 m), `verifier/vue/` (visionneuse Three.js 0.187 et `capturer.mjs` sous Chromium: coque cuite, dispositions, personnages, vue de dessus).
 
 Les sorties brutes de Meshy (références, modèles, rigs) ne sont pas versionnées; leurs tâches, crédits et réglages sont dans les fiches `personnages/*.meshy.json`. Les liens de Meshy expirent trois jours après la génération (le 2026-11-10).

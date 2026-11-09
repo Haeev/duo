@@ -61,7 +61,8 @@ def sk(name, x, y, z):
 
 
 # ------------------------------------------------------------------------------------------------
-# Postes de la coque d'Ormeval (repris de l'essai, version fine)
+# Postes de la coque d'Ormeval (repris de l'essai, version fine). Rail à tickets, vitrine, plonge, lave-vaisselle et
+# range-vaisselle: postes_arriere.py (refaits après la séance du 2026-11-09).
 
 @objet("station_espresso_2g", "neutre", "poste", 4000, nom="La vieille machine de Simone (deux groupes)")
 def o_espresso(g):
@@ -154,29 +155,6 @@ def o_bouilloire_t(g):
     return {"sockets": [sk("spout", 0.0, 0.18, 0.24)], "note": "col de cygne pour verser lentement"}
 
 
-@objet("station_vitrine", "neutre", "poste", 1000, nom="Vitrine réfrigérée du comptoir")
-def o_vitrine(g):
-    """Vitrine à gâteaux (0,90 x 0,45 x 0,32 m): sur l'arrière-comptoir d'Ormeval elle tient sous l'ardoise murale (1,22 m): socle de noyer, deux étagères, vitre bombée côté clients."""
-    w, d, h = 0.9, 0.45, 0.32
-    g.box(-w / 2, w / 2, -d / 2, d / 2, 0, 0.08, "t:walnut", bevel=0.008)
-    g.box(-w / 2 + 0.02, w / 2 - 0.02, -d / 2 + 0.02, d / 2 - 0.02, 0.08, 0.085, "steel", bevel=0)
-    g.box(-w / 2 + 0.03, w / 2 - 0.03, -d / 2 + 0.05, d / 2 - 0.08, 0.19, 0.2, "glass", bevel=0)
-    for s in (-1, 1):
-        g.box(s * w / 2 - (0.02 if s > 0 else 0), s * w / 2 + (0 if s > 0 else 0.02), -d / 2, d / 2, 0.08, h, "brass", bevel=0.004)
-    g.box(-w / 2, w / 2, -d / 2, d / 2, h - 0.02, h, "brass", bevel=0.004)
-    # vitre bombée devant les clients (nord du modèle = arrière: côté clients); portes coulissantes côté barista (sud)
-    n = 6
-    for i in range(n):
-        a0, a1 = math.pi / 2 * i / n, math.pi / 2 * (i + 1) / n
-        y0, z0 = -d / 2 + 0.17 * (1 - math.cos(a0)), 0.085 + 0.215 * math.sin(a0)
-        y1, z1 = -d / 2 + 0.17 * (1 - math.cos(a1)), 0.085 + 0.215 * math.sin(a1)
-        g.quad([(-w / 2 + 0.02, y0 - 0.0, z0), (w / 2 - 0.02, y0, z0), (w / 2 - 0.02, y1, z1), (-w / 2 + 0.02, y1, z1)], "glass", normal_hint=(0, -1, 0))
-    g.quad([(-w / 2 + 0.02, -d / 2 + 0.17, h - 0.02), (w / 2 - 0.02, -d / 2 + 0.17, h - 0.02), (w / 2 - 0.02, d / 2, h - 0.02), (-w / 2 + 0.02, d / 2, h - 0.02)], "glass", normal_hint=(0, 0, 1))
-    g.quad([(-w / 2 + 0.02, d / 2, 0.085), (w / 2 - 0.02, d / 2, 0.085), (w / 2 - 0.02, d / 2, h - 0.02), (-w / 2 + 0.02, d / 2, h - 0.02)], "glass", normal_hint=(0, 1, 0))
-    socks = [sk(f"shelf_low_{i}", -0.3 + i * 0.2, 0.0, 0.085) for i in range(4)] + [sk(f"shelf_high_{i}", -0.3 + i * 0.2, 0.05, 0.2) for i in range(4)]
-    return {"sockets": socks, "note": "avant (sud du modèle) = côté barista, portes; vitre bombée vers les clients"}
-
-
 @objet("station_caisse", "neutre", "poste", 600, nom="Caisse du comptoir")
 def o_caisse(g):
     tmp = S.caisse_et_livre()
@@ -186,65 +164,6 @@ def o_caisse(g):
         Geo.registry.remove(tmp[1])
     recentrer(g, rot180=True, centre=(10.6, 9.01), z0=S.WORK)
     return {"note": "touches vers le barista; afficheur vers les clients. Dans la coque: x 10,6, z 9,01, tourné vers le nord"}
-
-
-@objet("station_ticket_rail", "neutre", "poste", 600, accroche="plafond", nom="Rail à tickets")
-def o_rail(g):
-    """Rail inox de 0,80 m pendu à une solive (origine au point d'accroche, sous la solive); six pinces mobiles."""
-    zr = -0.77
-    g.rod((-0.4, 0, zr), (0.4, 0, zr), 0.01, 8, "steel")
-    for x in (-0.37, 0.37):
-        g.rod((x, 0, zr), (x, 0, 0), 0.006, 6, "steel")
-        g.cyl(x, 0, -0.01, 0.0, 0.02, 8, "steel")
-    socks = []
-    for i in range(6):
-        x = -0.33 + i * 0.132
-        g.box(x - 0.02, x + 0.02, -0.022, 0.01, zr - 0.012, zr + 0.025, "steel", bevel=0.004)
-        socks.append(sk(f"ticket_{i}", x, -0.024, zr - 0.02))
-    return {"sockets": socks, "note": "tickets face au nord (barista) dans la coque: poser tourné de 180°; rail à 1,88 m (solive à 2,65 m)"}
-
-
-@objet("station_sink", "neutre", "poste", 600, nom="Évier de la plonge")
-def o_sink(g):
-    """Bac inox encastré et robinet col de cygne en laiton (posé sur le plan de 0,90 m, x 7,15 à 7,95 dans la coque)."""
-    g.box(-0.35, 0.35, -0.19, 0.19, 0.0, 0.006, "steel", bevel=0.003)
-    g.box(-0.29, 0.29, -0.13, 0.15, 0.003, 0.0065, "steel_dark", bevel=0)
-    g.cyl(0.0, -0.215, 0.0, 0.25, 0.015, 8, "brass")
-    g.rod((0, -0.215, 0.25), (0, -0.02, 0.22), 0.013, 8, "brass")
-    g.rod((0, -0.02, 0.22), (0, -0.01, 0.14), 0.011, 8, "brass")
-    for s in (-1, 1):
-        g.cyl(s * 0.06, -0.215, 0.12, 0.15, 0.018, 8, "brass")
-    return {"sockets": [sk("tap", 0.0, -0.01, 0.14), sk("basin", 0.0, 0.01, 0.006)],
-            "note": "robinet au nord (contre le refend), avant du modèle = côté du plongeur; ne pas tourner dans la coque"}
-
-
-@objet("station_dishwasher", "neutre", "poste", 600, nom="Lave-verres sous le plan")
-def o_dishwasher(g):
-    """Façade du lave-verres sous l'évier (0,76 x 0,04 x 0,72 m): elle se pose devant le placard de la plonge (x 7,18 à 7,93,
-    y 7,70) et le recouvre."""
-    g.box(-0.38, 0.38, 0, 0.035, 0.1, 0.84, "steel", bevel=0.006)
-    g.box(-0.36, 0.36, 0.035, 0.04, 0.7, 0.8, "steel_dark", bevel=0)
-    g.rod((-0.25, 0.07, 0.66), (0.25, 0.07, 0.66), 0.01, 8, "steel")
-    for x in (-0.25, 0.25):
-        g.rod((x, 0.035, 0.66), (x, 0.07, 0.66), 0.008, 6, "steel")
-    for i in range(3):
-        g.cyl(0.18 + i * 0.05, 0.04, 0.75, 0.765, 0.012, 8, ["ink", "alert", "leaf"][i])
-    return {"note": "origine au dos de la façade, en bas; dans la coque: x 7,555, z 7,70"}
-
-
-@objet("station_cup_shelf", "neutre", "poste", 1000, nom="Étagère à tasses")
-def o_cup_shelf(g):
-    """Étagère à deux niveaux pour l'arrière-comptoir (0,60 x 0,25 x 0,40 m), tasses retournées (le jeu les compte)."""
-    for x in (-0.29, 0.29):
-        for y in (-0.11, 0.11):
-            g.rod((x, y, 0), (x, y, 0.4), 0.008, 6, "steel")
-    socks = []
-    for zi, z in enumerate((0.02, 0.22)):
-        g.box(-0.3, 0.3, -0.125, 0.125, z, z + 0.012, "steel", bevel=0.003)
-        for i in range(4):
-            for j in range(2):
-                socks.append(sk(f"cup_{zi}_{i}_{j}", -0.21 + i * 0.14, -0.06 + j * 0.12, z + 0.012))
-    return {"sockets": socks, "note": "16 places de tasse (douilles cup_niveau_colonne_rangée)"}
 
 
 # ------------------------------------------------------------------------------------------------

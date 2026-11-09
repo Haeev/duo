@@ -2,9 +2,9 @@
  "shell_village": {
   "id": "shell_village",
   "fichier": "shell_village.glb",
-  "poids_octets": 448844,
+  "poids_octets": 460940,
   "triangles": {
-   "shell_village": 4634,
+   "shell_village": 4778,
    "shell_village_glass": 10,
    "shell_village_glow": 424,
    "shell_village_fond_ferme": 304
@@ -63,7 +63,7 @@
  "cuisson": {
   "bake_spp": 64,
   "bake_res": 2048,
-  "lightmap_scale": 3.0691049098968506,
+  "lightmap_scale": 3.0453929901123047,
   "place_lightmap_scale": 2.7789223194122314,
   "soleil": {
    "azimut_deg": 205.0,

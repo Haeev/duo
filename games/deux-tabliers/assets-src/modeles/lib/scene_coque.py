@@ -186,17 +186,29 @@ def comptoir():
 def arriere_comptoir():
     g = Geo("backbar")
     x0, x1, y0, y1 = 7.1, 9.9, Y0, 7.7
-    g.box(x0, x1, y0, y1 - 0.03, 0, 0.08, "walnut", bevel=0.004, drop=("bottom", "n"))
-    g.box(x0, x1, y0, y1, 0.08, 0.87, "counter_paint", bevel=None, edges="vertical", drop=("n",))
-    g.box(x0 - 0.01, x1 + 0.02, y0, y1 + 0.03, 0.87, 0.9, "walnut", bevel=0.01, drop=("n",))
-    # portes de placard sous la plonge, façade inox du réfrigérateur sous le plan
+    # niche du réfrigérateur sous le plan (x 8,00 à 8,75, poste station-2): ouverte jusqu'au sol, le modèle
+    # station_fridge_under la remplit (sans réfrigérateur, la place vide se voit: départ de la v0.3)
+    fx0, fx1 = 8.0, 8.75
+    for a, b in ((x0, fx0), (fx1, x1)):
+        g.box(a, b, y0, y1 - 0.03, 0, 0.08, "walnut", bevel=0.004, drop=("bottom", "n"))
+    # caisson de la plonge: creux sous le bac (le bac inox du poste station_sink descend à 0,74 m), bandeau avant
+    # et joue contre la niche jusqu'au plan
+    g.box(x0, fx0, y0, y1, 0.08, 0.70, "counter_paint", bevel=None, edges="vertical", drop=("n",))
+    g.box(x0, fx0, y1 - 0.02, y1, 0.70, 0.87, "counter_paint", bevel=0, drop=("n", "top"))
+    g.box(fx0 - 0.02, fx0, y0, y1 - 0.02, 0.70, 0.87, "counter_paint", bevel=0, drop=("n", "top", "s"))
+    g.box(fx1, x1, y0, y1, 0.08, 0.87, "counter_paint", bevel=None, edges="vertical", drop=("n",))
+    # plan de noyer percé pour le bac de la plonge (le plateau inox du poste recouvre les bords de la découpe)
+    hx0, hx1, hy0, hy1 = 7.21, 7.67, 7.17, 7.63
+    g.box(x0 - 0.01, hx0, y0, y1 + 0.03, 0.87, 0.9, "walnut", bevel=0.01, drop=("n",))
+    g.box(hx1, x1 + 0.02, y0, y1 + 0.03, 0.87, 0.9, "walnut", bevel=0.01, drop=("n",))
+    g.box(hx0, hx1, y0, hy0, 0.87, 0.9, "walnut", bevel=0.01, drop=("n",))
+    g.box(hx0, hx1, hy1, y1 + 0.03, 0.87, 0.9, "walnut", bevel=0.01)
+    # portes de placard sous la plonge et à l'est de la niche
     g.box(7.18, 7.93, y1, y1 + 0.015, 0.14, 0.82, "counter_paint", bevel=0.008)
-    g.box(8.0, 8.75, y1, y1 + 0.02, 0.1, 0.84, "steel", bevel=0.008)
-    g.rod((8.1, y1 + 0.05, 0.78), (8.65, y1 + 0.05, 0.78), 0.01, 6, "steel_dark")
     g.box(8.82, 9.84, y1, y1 + 0.015, 0.14, 0.82, "counter_paint", bevel=0.008)
     for x in (7.86, 9.77):
         g.cyl(x, y1 + 0.025, 0.48, 0.5, 0.018, 8, "brass")
-    # l'évier et son robinet sont le poste station_sink, posé sur ce plan (x 7,15 à 7,95)
+    # l'évier, son robinet et l'égouttoir sont le poste station_sink, posé sur ce plan (x 7,15 à 7,95)
     # faïence vert sombre derrière: fond sombre pour la vaisselle rangée (bible, règle 2)
     g.box(7.1, 9.9, Y0, Y0 + 0.012, 0.9, 2.0, "tiles_dark", bevel=0, drop=("n",))
     # étagères de chêne ciré sur consoles

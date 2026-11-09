@@ -25,6 +25,11 @@ def _socket(name, loc_plan, extras):
     return e
 
 
+def _nom_douille(s):
+    """Nom du nœud d'une douille: `socket_<nom>`, ou le nom tel quel (`brut`) quand le code le cherche ainsi (`slot_0`)."""
+    return s["name"] if s.get("brut") else f"socket_{s['name']}"
+
+
 def to_gltf(x, y, z):
     """Point du plan (repère du modèle) -> repère glTF du modèle."""
     return [round(x, 4), round(z, 4), round(y, 4)]
@@ -86,7 +91,7 @@ def produire(catalogue, ids, fiche_path, ao=True):
         if "top" in info:
             extras["top_height"] = info["top"]["z"]
         for j, s in enumerate(info.get("sockets", [])):
-            sockets.append(_socket(f"socket_{s['name']}", (s["x"], s["y"], s["z"]), {}))
+            sockets.append(_socket(_nom_douille(s), (s["x"], s["y"], s["z"]), {}))
         objs = parts + sockets
         for sk in sockets:
             sk.parent = main
@@ -125,7 +130,7 @@ def produire(catalogue, ids, fiche_path, ao=True):
             if k in info:
                 f[k] = info[k]
         if info.get("sockets"):
-            f["douilles"] = {f"socket_{s['name']}": to_gltf(s["x"], s["y"], s["z"]) for s in info["sockets"]}
+            f["douilles"] = {_nom_douille(s): to_gltf(s["x"], s["y"], s["z"]) for s in info["sockets"]}
         fiches[ident] = f
         for o in parts:
             o.location = off

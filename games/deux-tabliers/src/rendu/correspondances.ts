@@ -1,13 +1,14 @@
 /**
  * Modèle livré (`assets/modeles/<nom>.glb`) de chaque meuble et objet des données du cœur.
  * `null`: l'élément fait partie de la coque cuite (`shell_village.glb`: comptoir, arrière-comptoir,
- * frigo sous le plan) ou d'un autre modèle (groupes et buse de la machine): rien à poser, il reste
- * visable par les règles. Absent de la table: le modèle des données, sinon un substitut.
+ * passe) ou d'un autre modèle (groupes et buse de la machine): rien à poser, il reste visable par
+ * les règles. Absent de la table: le modèle des données, sinon un substitut.
  */
 export const FURNITURE_MODEL: Readonly<Record<string, string | null>> = {
   comptoir: null,
   'arriere-comptoir': null,
-  'frigo-sous-plan': null,
+  // Dans la niche de l'arrière-comptoir, avec la planche du poste de préparation sur le plan.
+  'frigo-sous-plan': 'station_fridge_under',
   passe: null,
   'groupe-espresso': null,
   'buse-vapeur': null,
@@ -24,6 +25,10 @@ export const FURNITURE_MODEL: Readonly<Record<string, string | null>> = {
   'bouilloire-temperature': 'bouilloire_temperature',
   crepiere: 'creperie',
   'caisses-patronne': 'crate_box_m',
+  'frigo-armoire': 'reserve_frigo_armoire',
+  etagere: 'reserve_etagere',
+  'etagere-longue': 'reserve_etagere_longue',
+  'palette-livraison': 'reserve_palette',
   gueridon: 'gueridon_marbre',
   'table-carree': 'table_bistrot_quatre',
   chaise: 'chaise_paillee',
@@ -63,15 +68,49 @@ export const OBJECT_MODEL: Readonly<Record<string, string>> = {
 };
 
 /**
+ * Carton livré d'un ingrédient (`service.cartons`, ingrédient de `service/ingredients.json`): son
+ * contenu est écrit dessus. Absent: le carton générique de `OBJECT_MODEL`.
+ */
+export const CARTON_MODEL: Readonly<Record<string, string>> = {
+  'grains-maison': 'carton_grains_maison',
+  'lait-entier': 'carton_lait_entier',
+  'lait-avoine': 'carton_lait_avoine',
+  beurre: 'carton_beurre',
+  oeufs: 'carton_oeufs',
+  cacao: 'carton_cacao',
+  'the-noir': 'carton_the_noir',
+  'the-vert': 'carton_the_vert',
+  'plantes-simone': 'carton_plantes_simone',
+  menthe: 'carton_menthe',
+  oranges: 'carton_oranges',
+  citrons: 'carton_citrons',
+  sucre: 'carton_sucre',
+  farine: 'carton_farine',
+  confiture: 'carton_confiture',
+  'limonade-bouteille': 'carton_limonade_bouteille',
+  accompagnement: 'carton_accompagnement',
+  'pain-campagne': 'carton_pain_campagne',
+  'croissant-boulanger': 'carton_croissant_boulanger',
+  'pain-chocolat-boulanger': 'carton_pain_chocolat_boulanger',
+  'tarte-boulanger': 'carton_tarte_boulanger',
+};
+
+/**
  * Demi-tour propre au modèle (`modeles.json`): ces postes ont leur avant (+Z) côté barista, au
- * nord, alors que le meuble posé à 0° a son avant au sud.
+ * nord, alors que le meuble posé à 0° a son avant au sud. Armoire froide et étagère longue de la
+ * réserve: leur place de service (`pied` des données) est derrière l'avant du meuble posé.
  */
 export const MODEL_TURN_DEG: Readonly<Record<string, number>> = {
   station_espresso_2g: 180,
   station_grinder: 180,
   station_caisse: 180,
   station_ticket_rail: 180,
+  reserve_frigo_armoire: 180,
+  reserve_etagere_longue: 180,
 };
+
+/** Tickets vierges du rail (`ticket_0` à `ticket_5`): on en montre autant que de commandes en cours. */
+export const RAIL_TICKETS = 6;
 
 /** Avatars des joueurs: l'hôte, puis l'invité. */
 export const AVATAR_MODEL = ['char_avatar_1', 'char_avatar_2'] as const;
