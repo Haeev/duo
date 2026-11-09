@@ -332,3 +332,12 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le mardi calme suit le rythme du duo (`holdCalmArrival`): un duo qui bloque sur un poste reçoit moins de groupes; une règle d'économie du premier jour doit tenir pour un duo lent (simuler « sert 60 % »).
 - Script court réutilisable: `docs/jeux/cosy-cafe/demo/simulations/premiers_jours_v0_3.py` (lit les JSON du jeu, 5 s; variantes en dictionnaires).
 - Le grep complet du dépôt pour les tirets dépasse 2 minutes: le lancer sur les fichiers touchés.
+
+## Deux Tabliers: analyse d'écart avec le genre (2026-11-09)
+
+- Avant de proposer un retour visuel ou une bulle, chercher si l'événement existe déjà: beaucoup sont émis par la simulation et lus par le seul audio (`clientele-order`, `service-paid`, `service-tip`, `clientele-passed-by`). Le brancher à l'interface est un « vite fait ».
+- Seuls les personnages (`char_*`) viennent de Meshy; postes, vaisselle et nourriture sont en Blender scripté. Les « c'est quoi ? » d'une séance visent presque toujours ces formes simples ou une entrée sans modèle de `FURNITURE_MODEL` (bloc de substitution).
+- « Carte de fidélité » est déjà une remise du jeu (`remises-marketing-v0-2.md`): ne pas réemployer ce nom pour une progression.
+- La table 6.4 de `demo-v0-1.md` date d'avant la montée en charge de la 0.2.3: tout seuil calculé dessus se recale avec `demo/simulations/demo_v0_1.py`.
+- Les scripts de simulation de la démo sont dans `docs/jeux/cosy-cafe/demo/simulations/`, pas dans `docs/jeux/cosy-cafe/simulations/`.
+- Un document long s'écrit en plusieurs ajouts (un par section), jamais en un seul appel.
