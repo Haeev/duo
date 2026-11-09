@@ -11,6 +11,8 @@ export const FURNITURE_MODEL: Readonly<Record<string, string | null>> = {
   passe: null,
   'groupe-espresso': null,
   'buse-vapeur': null,
+  // Taches de poussière de l'installation (v0.3): décalques de `cafe-ferme.ts`, pas de modèle.
+  poussiere: null,
   'machine-espresso': 'station_espresso_2g',
   moulin: 'station_grinder',
   'moulin-dose': 'moulin_dose',
