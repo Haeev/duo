@@ -76,7 +76,10 @@ const models = createModelLibrary((message, data) => {
 const baked = createBakedShell(stage.scene, stage.renderer, models, view);
 // Café fermé (démo v0.3): vitres au blanc de Meudon, poussière, lumière de la salle.
 const spots = dustSpots(content);
-const closedCafe = createClosedCafe(stage.scene, models, spots.length > 0 ? { spots } : {});
+const closedCafe = createClosedCafe(stage.scene, models, {
+  ...(spots.length > 0 ? { spots } : {}),
+  externalLight: true,
+});
 const nodes = createWorldNodes(stage.scene, models, [duo.host.colorHex, duo.guest.colorHex]);
 const customers = createCustomerNodes(stage.scene);
 // Décor vivant (retours du 2026-11-09): heure du décor, lumière du jour, passants de la place.
@@ -88,6 +91,8 @@ const decorClock = createDecorClock({
   eveningCapMinute: EVENING_CAP_MINUTE,
 });
 const daylight = createDaylightRig(stage.scene);
+// Une seule main sur les lumières: le café fermé donne ses facteurs, la lumière du jour les applique.
+daylight.setFactors(closedCafe);
 const touchUps = createPlaceTouchUps(stage.scene);
 const passers = createPassersNodes(stage.scene, duo.seed, decorClock);
 const sounds = createSounds(duo.audio, duo.log, DATA_FILES, content);
