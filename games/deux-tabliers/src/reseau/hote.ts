@@ -65,21 +65,15 @@ export function createHost(net: Net, content: Content, world: World, random: Ran
       },
     };
   };
-  const [serviceDomain, clienteleDomain, arrangementDomain] = DOMAINS;
-  const domains = [
+  const domains = DOMAINS.map((d) =>
     domainSender(
-      net.channel(serviceDomain.channel, { mode: 'latest', schema: serviceDomain.schema }),
-      () => world.service,
+      net.channel(d.channel, { mode: 'latest', schema: d.schema }) as NetChannel<{
+        tick: number;
+        state: World[typeof d.key];
+      }>,
+      () => world[d.key],
     ),
-    domainSender(
-      net.channel(clienteleDomain.channel, { mode: 'latest', schema: clienteleDomain.schema }),
-      () => world.clientele,
-    ),
-    domainSender(
-      net.channel(arrangementDomain.channel, { mode: 'latest', schema: arrangementDomain.schema }),
-      () => world.arrangement,
-    ),
-  ];
+  );
   const hub = createEventHub();
   // Canal 7: positions des clients debout (chantier clientèle).
   const customers = createClienteleHostNet(net, world, content.settings.net.movesEvery);

@@ -123,7 +123,12 @@ export function planEvents(ctx: Ctx): void {
     } else if (e.id === 'le_cafe_d_honneur') {
       if (s.flags.includes('wedding-accepted')) add(e.id, e.time ?? 930);
     } else if (e.id === 'le_coeur_de_lait') add(e.id, e.staging.from ?? 600);
-    else add(e.id, e.time ?? cc.days.open);
+    else if (
+      e.id !== 'la_vieille_dame_tousse' ||
+      ctx.sim.world.installation?.machine.model !== 'machine-revisee'
+    )
+      // Machine révisée par Joseph (démo v0.3): pas de panne le jour 6 (IN-14).
+      add(e.id, e.time ?? cc.days.open);
   }
   // L'averse: une fois entre les jours 9 et 13, un jour couvert où la terrasse est ouverte.
   const rain = def(ctx, 'l_averse_de_trois_heures');

@@ -11,6 +11,7 @@ import { gameStation, itemOf, recipeOf } from '../service/regles';
 import type { Recipe } from '../service/donnees';
 import type { Ticket } from '../service/etat';
 import { furnitureType, heldObject, objectOnSlot } from '../simulation/monde';
+import { installGuideOf } from '../installation/guide';
 
 /** Ce que le guide surligne: un meuble (poste) ou un objet posé. */
 export type GuideFocus =
@@ -19,9 +20,16 @@ export type GuideFocus =
 
 export interface GuideStep {
   readonly label: string;
+  /** Guide d'installation: cochée d'après le monde (sinon, celles d'avant l'étape en cours). */
+  readonly done?: boolean;
+  readonly optional?: boolean;
+  /** Chapitre (« Ouvrir le local »): la carte replie les chapitres finis. */
+  readonly chapter?: string;
 }
 
 export interface GuideView {
+  /** Titre de la carte (« Simone te guide · l'installation »), sinon celui du premier service. */
+  readonly title?: string;
   /** Recette suivie (« Café crème »), `null` sans commande en cours. */
   readonly recipe: string | null;
   readonly steps: readonly GuideStep[];
@@ -135,6 +143,11 @@ export function guideOf(
   player: PlayerIndex,
   always = false,
 ): GuideView | null {
+  // Démo v0.3: une maison qui s'installe suit d'abord le guide de l'installation.
+  if (!always) {
+    const install = installGuideOf(content, world, player);
+    if (install !== null) return install;
+  }
   if (!always && !guideActive(world)) return null;
   const sv = world.service;
   const held = heldObject(world, player);

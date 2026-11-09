@@ -324,6 +324,12 @@ export const ClienteleStateSchema = v.strictObject({
   /** Ambiance du jour: valeur (0 à 95), style dominant, cohérence (0 à 1). */
   ambiance: v.tuple([N, Str, N]),
   /**
+   * Décor de départ de cette maison (article, nombre, usé), à la place de `startDecor` de
+   * `economie.json`: une maison partie d'une cellule vide n'a que l'applique, puis les lots de
+   * Simone descendus. `null`: le décor du fichier (café équipé, sauvegardes v0.2).
+   */
+  startDecor: v.optional(v.nullable(v.array(v.tuple([Str, Nat, v.boolean()]))), null),
+  /**
    * Remises v0.2: réglage de l'onglet (`null`: jamais touché, les valeurs par défaut de
    * `remises.json`), copie prise à l'ouverture (`null` hors service), tampons des habitués, jours
    * ouverts avec la carte de fidélité, portions vendues des trois derniers jours.
@@ -455,6 +461,7 @@ export function createClienteleState(): ClienteleState {
     servedTotal: 0,
     conditions: [],
     ambiance: [0, 'campagne', 0],
+    startDecor: null,
     discounts: null,
     activeDiscounts: null,
     stamps: {},

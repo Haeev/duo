@@ -6,6 +6,7 @@ import { v } from '@duo/sdk';
 import { ARRANGEMENT_EVENTS } from '../amenagement/evenements';
 import { CLIENTELE_EVENTS } from '../clientele/evenements';
 import { SERVICE_EVENTS } from '../service/evenements';
+import { INSTALLATION_EVENTS } from '../installation/evenements';
 import { PlayerIndexSchema } from '../etat/monde';
 
 const ObjectId = v.pipe(v.number(), v.integer(), v.minValue(0));
@@ -48,5 +49,6 @@ export const GameEventSchema = v.variant('type', [
   ...SERVICE_EVENTS,
   ...CLIENTELE_EVENTS,
   ...ARRANGEMENT_EVENTS,
+  ...INSTALLATION_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

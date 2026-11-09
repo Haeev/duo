@@ -16,12 +16,57 @@ const STYLE = `
 .dt-guide li { color: var(--dt-creme-2); }
 .dt-guide li.done { text-decoration: line-through; opacity: 0.7; }
 .dt-guide li.now { color: var(--dt-creme); font-weight: 600; }
+.dt-guide li.dt-guide-chapter { color: var(--dt-or); font-weight: 600; margin-top: 0.15em; }
+.dt-guide .dt-guide-opt { font-size: 0.85em; opacity: 0.75; font-weight: 400; }
 @container dt-hud (max-height: 34em) { .dt-guide ol { display: none; } }
 `;
 
 export interface GuideCard {
   update(guide: GuideView | null, full: boolean): void;
   dispose(): void;
+}
+
+function plainSteps(guide: GuideView): HTMLElement[] {
+  return guide.steps.map((s, i) =>
+    h(
+      'li',
+      { class: i < guide.current ? 'done' : i === guide.current ? 'now' : null },
+      `${i < guide.current ? '✓' : i === guide.current ? '▸' : '·'} ${s.label}`,
+    ),
+  );
+}
+
+/**
+ * Guide d'installation (démo v0.3): un chapitre fini se replie en une ligne cochée; le chapitre
+ * en cours montre ses étapes, chacune cochée d'après le monde; les suivants, leur titre.
+ */
+function chapterSteps(guide: GuideView): HTMLElement[] {
+  const current = guide.steps[guide.current]?.chapter ?? null;
+  const out: HTMLElement[] = [];
+  const chapters = [...new Set(guide.steps.map((s) => s.chapter ?? ''))];
+  for (const chapter of chapters) {
+    const steps = guide.steps.filter((s) => (s.chapter ?? '') === chapter);
+    // Fini: toutes ses étapes obligatoires cochées; un chapitre tout facultatif, toutes cochées.
+    const required = steps.filter((s) => s.optional !== true);
+    const done = (required.length > 0 ? required : steps).every((s) => s.done === true);
+    if (chapter !== current) {
+      out.push(h('li', { class: done ? 'done' : null }, `${done ? '✓' : '·'} ${chapter}`));
+      continue;
+    }
+    out.push(h('li', { class: 'dt-guide-chapter' }, chapter));
+    for (const s of steps) {
+      const now = guide.steps[guide.current] === s;
+      out.push(
+        h(
+          'li',
+          { class: s.done === true ? 'done' : now ? 'now' : null },
+          `  ${s.done === true ? '✓' : now ? '▸' : '·'} ${s.label}`,
+          s.optional === true ? h('span', { class: 'dt-guide-opt' }, ' · facultatif') : '',
+        ),
+      );
+    }
+  }
+  return out;
 }
 
 export function createGuideCard(root: HTMLElement): GuideCard {
@@ -35,21 +80,24 @@ export function createGuideCard(root: HTMLElement): GuideCard {
   return {
     update(guide, full) {
       const key =
-        guide === null ? '' : JSON.stringify([full, guide.say, guide.current, guide.recipe]);
+        guide === null
+          ? ''
+          : JSON.stringify([
+              full,
+              guide.say,
+              guide.current,
+              guide.recipe,
+              guide.title,
+              guide.steps.map((s) => [s.label, s.done]),
+            ]);
       if (key === painted) return;
       painted = key;
       card.hidden = guide === null;
       if (guide === null) return;
       const title = full
-        ? 'Simone te guide · premier service'
+        ? (guide.title ?? 'Simone te guide · premier service')
         : `Recette : ${guide.recipe ?? 'en cours'}`;
-      const steps = guide.steps.map((s, i) =>
-        h(
-          'li',
-          { class: i < guide.current ? 'done' : i === guide.current ? 'now' : null },
-          `${i < guide.current ? '✓' : i === guide.current ? '▸' : '·'} ${s.label}`,
-        ),
-      );
+      const steps = guide.title === undefined ? plainSteps(guide) : chapterSteps(guide);
       const parts: HTMLElement[] = [h('h3', null, title)];
       if (guide.say !== '') parts.push(h('p', { class: 'dt-guide-say' }, `« ${guide.say} »`));
       if (full && guide.recipe !== null)

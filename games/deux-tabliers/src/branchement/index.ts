@@ -339,7 +339,10 @@ export function purgeOrphanTickets(world: World, content: SimContext['content'] 
 /** Panne du jour 6: un groupe de la machine sur deux; l'inspection relève la pile de tasses. */
 function stepConditions(sim: SimContext): void {
   const { world } = sim;
-  const degraded = world.clientele.conditions.includes('machine-degraded');
+  // La machine révisée par Joseph ne tousse pas (démo v0.3, IN-14).
+  const degraded =
+    world.clientele.conditions.includes('machine-degraded') &&
+    world.installation?.machine.model !== 'machine-revisee';
   const out = world.service.groupsOut.includes('groupe-2');
   if (degraded !== out) setGroupOut(sim, 'groupe-2', degraded);
   if (world.clientele.event?.id === 'l_inspection' && world.service.clean.tasse === 0)

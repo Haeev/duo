@@ -37,6 +37,44 @@ const PREFIX = '../../assets/son/';
 
 const SoundsFileSchema = v.strictObject({ events: v.record(v.string(), v.string()) });
 
+/** Adresses des fichiers du dossier `installation/` (démo v0.3), libérés à la première ouverture. */
+export const INSTALLATION_URLS: ReadonlySet<string> = new Set(
+  Object.entries(SOUND_URLS)
+    .filter(([path]) => path.startsWith(`${PREFIX}installation/`))
+    .map(([, url]) => url),
+);
+
+/**
+ * Les sons de l'installation ne servent plus: maison déjà ouverte (ou jamais partie de rien).
+ * Plafond mémoire du son (`assets/son/sons.json`, `plan.installation.decodeWhen`).
+ */
+export function installationSoundsDone(world: World): boolean {
+  const i = world.installation ?? null;
+  return i === null || i.stage === 'opened';
+}
+
+/** Retire des tampons décodés ceux de l'installation; rend le nombre de tampons libérés. */
+export function releaseInstallationBuffers(
+  buffers: Map<string, unknown>,
+  urls: ReadonlySet<string> = INSTALLATION_URLS,
+): number {
+  let n = 0;
+  for (const url of [...buffers.keys()])
+    if (urls.has(url)) {
+      buffers.delete(url);
+      n++;
+    }
+  return n;
+}
+
+/** Son d'un geste de l'installation (`installation-gesture`), par geste. */
+const GESTURE_SOUND: Readonly<Record<string, string>> = {
+  sheet: 'sheet-pull',
+  sweep: 'broom-sweep',
+  wipe: 'sponge-glass',
+  connect: 'machine-connect',
+};
+
 const Range = v.tuple([v.number(), v.number()]);
 const PlanSchema = v.looseObject({
   sounds: v.record(
@@ -156,7 +194,10 @@ export function createSounds(
     log.warn('son absent', { id });
   };
 
+  /** Vrai une fois les sons de l'installation libérés: ils ne se rechargent plus. */
+  let installationReleased = false;
   const loadUrl = (url: string): Promise<AudioBuffer | null> => {
+    if (installationReleased && INSTALLATION_URLS.has(url)) return Promise.resolve(null);
     let p = buffers.get(url);
     if (p === undefined) {
       p = audio.load(url).then(
@@ -343,6 +384,10 @@ export function createSounds(
   let lastUpdate = -Infinity;
   const update = (world: World, local: PlayerIndex): void => {
     lastWorld = world;
+    if (!installationReleased && installationSoundsDone(world)) {
+      installationReleased = true;
+      releaseInstallationBuffers(buffers);
+    }
     const now = performance.now();
     if (now - lastUpdate < 100 || plan === null) return;
     lastUpdate = now;
@@ -402,7 +447,8 @@ export function createSounds(
       // Le pourboire tombe dans le bocal quand le client s'en va (il n'a pas d'événement à lui).
       if (event.type === 'clientele-left' && event.tip > 0)
         play(event.tip >= 100 ? 'tip-big' : 'tip-jar-2', { at });
-      const id = byEvent[event.type];
+      const id =
+        event.type === 'installation-gesture' ? GESTURE_SOUND[event.gesture] : byEvent[event.type];
       if (id !== undefined) play(id, { at });
     },
     update,

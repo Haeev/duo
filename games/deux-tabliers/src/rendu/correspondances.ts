@@ -31,6 +31,23 @@ export const FURNITURE_MODEL: Readonly<Record<string, string | null>> = {
   chaise: 'chaise_paillee',
   banc: 'banc_ferme',
   'ardoise-trottoir': 'ardoise_trottoir',
+  // Démo v0.3, cellule vide: modèles commandés à l'artiste 3D (substituts aux dimensions des
+  // données tant que le GLB n'est pas livré). Le rideau sert aux trois largeurs de baie.
+  'machine-espresso-revisee': 'espresso_revised',
+  // Vitres blanchies: dessinées par `cafe-ferme.ts` (blanc de Meudon sur le verre de la coque).
+  'vitre-vitrine': null,
+  'vitre-porte': null,
+  'vitre-fenetre': null,
+  'drap-comptoir': 'sheet_counter',
+  'drap-table': 'sheet_table',
+  'drap-table-carree': 'sheet_table',
+  'chaises-retournees': 'chairs_upturned',
+  courrier: 'mail_bundle',
+  balai: 'broom',
+  'seau-eponge': 'bucket_sponge',
+  'rideau-vitrine': 'shutter_bay',
+  'rideau-porte': 'shutter_bay',
+  'rideau-fenetre': 'shutter_bay',
 };
 
 export const OBJECT_MODEL: Readonly<Record<string, string>> = {

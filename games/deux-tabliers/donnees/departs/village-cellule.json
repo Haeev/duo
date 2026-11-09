@@ -1,0 +1,680 @@
+{
+  "address": "village",
+  "spawns": [
+    [9.0, 14.6],
+    [9.9, 14.6]
+  ],
+  "spawnYawDeg": 0,
+  "furniture": [
+    {
+      "id": "backbar-1",
+      "type": "arriere-comptoir",
+      "x": 8.5,
+      "z": 7.4,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-1",
+      "type": "plonge",
+      "x": 7.55,
+      "z": 7.395,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "counter-1",
+      "type": "comptoir",
+      "x": 9.5,
+      "z": 9.15,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-3",
+      "type": "passe",
+      "x": 8.35,
+      "z": 9.125,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-4",
+      "type": "machine-espresso",
+      "x": 9.15,
+      "z": 9.005,
+      "y": 0.95,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-1",
+      "type": "etagere",
+      "x": 8.575,
+      "z": 3.775,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-2",
+      "type": "etagere-longue",
+      "x": 10.725,
+      "z": 5.0,
+      "y": 0,
+      "rotDeg": 90
+    },
+    {
+      "id": "station-7",
+      "type": "frigo-armoire",
+      "x": 8.5,
+      "z": 6.275,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-3",
+      "type": "caisses-patronne",
+      "x": 5.0,
+      "z": 5.85,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "table-1",
+      "type": "gueridon",
+      "x": 4.8,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "table-2",
+      "type": "gueridon",
+      "x": 6.4,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "table-3",
+      "type": "gueridon",
+      "x": 8.0,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "table-4",
+      "type": "table-carree",
+      "x": 4.43,
+      "z": 10.1,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-9",
+      "type": "banc",
+      "x": 5.3,
+      "z": 13.275,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-10",
+      "type": "banc",
+      "x": 5.9,
+      "z": 13.275,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-4",
+      "type": "ardoise-trottoir",
+      "x": 8.5,
+      "z": 13.25,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "chaises-1",
+      "type": "chaises-retournees",
+      "x": 4.8,
+      "z": 12.2,
+      "y": 0.75,
+      "rotDeg": 0
+    },
+    {
+      "id": "chaises-2",
+      "type": "chaises-retournees",
+      "x": 6.4,
+      "z": 12.2,
+      "y": 0.75,
+      "rotDeg": 0
+    },
+    {
+      "id": "chaises-3",
+      "type": "chaises-retournees",
+      "x": 8.0,
+      "z": 12.2,
+      "y": 0.75,
+      "rotDeg": 0
+    },
+    {
+      "id": "chaises-4",
+      "type": "chaises-retournees",
+      "x": 4.43,
+      "z": 10.1,
+      "y": 0.75,
+      "rotDeg": 0
+    },
+    {
+      "id": "drap-comptoir",
+      "type": "drap-comptoir",
+      "x": 9.5,
+      "z": 9.15,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "drap-1",
+      "type": "drap-table",
+      "x": 4.8,
+      "z": 12.2,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "drap-2",
+      "type": "drap-table",
+      "x": 6.4,
+      "z": 12.2,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "drap-3",
+      "type": "drap-table",
+      "x": 8.0,
+      "z": 12.2,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "drap-4",
+      "type": "drap-table-carree",
+      "x": 4.43,
+      "z": 10.1,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "rideau-ouest",
+      "type": "rideau-vitrine",
+      "x": 5.4,
+      "z": 13.02,
+      "y": 0.45,
+      "rotDeg": 0
+    },
+    {
+      "id": "rideau-centre",
+      "type": "rideau-vitrine",
+      "x": 7.5,
+      "z": 13.02,
+      "y": 0.45,
+      "rotDeg": 0
+    },
+    {
+      "id": "rideau-porte",
+      "type": "rideau-porte",
+      "x": 9.4,
+      "z": 13.02,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "rideau-fenetre",
+      "type": "rideau-fenetre",
+      "x": 10.5,
+      "z": 13.02,
+      "y": 0.9,
+      "rotDeg": 0
+    },
+    {
+      "id": "window-2",
+      "type": "vitre-vitrine",
+      "x": 5.4,
+      "z": 12.874,
+      "y": 0.51,
+      "rotDeg": 0
+    },
+    {
+      "id": "window-3",
+      "type": "vitre-vitrine",
+      "x": 7.5,
+      "z": 12.874,
+      "y": 0.51,
+      "rotDeg": 0
+    },
+    {
+      "id": "porte-entree",
+      "type": "vitre-porte",
+      "x": 9.4,
+      "z": 12.874,
+      "y": 0.85,
+      "rotDeg": 0
+    },
+    {
+      "id": "window-4",
+      "type": "vitre-fenetre",
+      "x": 10.5,
+      "z": 12.874,
+      "y": 0.96,
+      "rotDeg": 0
+    },
+    {
+      "id": "courrier",
+      "type": "courrier",
+      "x": 9.4,
+      "z": 12.2,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "balai",
+      "type": "balai",
+      "x": 5.86,
+      "z": 8.95,
+      "y": 0.0,
+      "rotDeg": 90
+    },
+    {
+      "id": "seau",
+      "type": "seau-eponge",
+      "x": 10.15,
+      "z": 12.3,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-1",
+      "type": "poussiere",
+      "x": 5.0,
+      "z": 11.4,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-2",
+      "type": "poussiere",
+      "x": 6.6,
+      "z": 10.4,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-3",
+      "type": "poussiere",
+      "x": 8.2,
+      "z": 11.6,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-4",
+      "type": "poussiere",
+      "x": 9.6,
+      "z": 10.8,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-5",
+      "type": "poussiere",
+      "x": 9.4,
+      "z": 11.8,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-6",
+      "type": "poussiere",
+      "x": 8.6,
+      "z": 8.2,
+      "y": 0.0,
+      "rotDeg": 0
+    },
+    {
+      "id": "poussiere-7",
+      "type": "poussiere",
+      "x": 6.4,
+      "z": 8.6,
+      "y": 0.0,
+      "rotDeg": 0
+    }
+  ],
+  "objects": [],
+  "installation": {
+    "economy": {
+      "startCash": 1800,
+      "simoneGift": [
+        ["grains_maison", 1000],
+        ["lait_entier", 1000]
+      ],
+      "startDecor": [["applique_laiton", 1, true]],
+      "keepPieces": ["applique-laiton"]
+    },
+    "simone": {
+      "door": [2.95, 13.2],
+      "counter": [10.6, 9.75],
+      "why": "Simone sort de la porte de son logement, juste à l'ouest de la vitrine, puis attend au bout du comptoir, côté clients, là où l'on vient payer."
+    },
+    "shutters": [
+      {
+        "id": "rideau-porte",
+        "door": true
+      },
+      {
+        "id": "rideau-ouest",
+        "door": false
+      },
+      {
+        "id": "rideau-centre",
+        "door": false
+      },
+      {
+        "id": "rideau-fenetre",
+        "door": false
+      }
+    ],
+    "shutterHandle": {
+      "x": 9.4,
+      "y": 0.25,
+      "z": 13.1,
+      "reach": 1.5
+    },
+    "sheets": [
+      {
+        "id": "drap-comptoir",
+        "covers": ["counter-1", "station-4"],
+        "x": 9.5,
+        "y": 1.3,
+        "z": 9.15
+      },
+      {
+        "id": "drap-1",
+        "covers": ["table-1", "chaises-1"],
+        "x": 4.8,
+        "y": 1.0,
+        "z": 12.2
+      },
+      {
+        "id": "drap-2",
+        "covers": ["table-2", "chaises-2"],
+        "x": 6.4,
+        "y": 1.0,
+        "z": 12.2
+      },
+      {
+        "id": "drap-3",
+        "covers": ["table-3", "chaises-3"],
+        "x": 8.0,
+        "y": 1.0,
+        "z": 12.2
+      },
+      {
+        "id": "drap-4",
+        "covers": ["table-4", "chaises-4"],
+        "x": 4.43,
+        "y": 1.0,
+        "z": 10.1
+      }
+    ],
+    "mail": {
+      "id": "courrier",
+      "x": 9.4,
+      "y": 0.05,
+      "z": 12.2
+    },
+    "tools": [
+      {
+        "id": "balai",
+        "tool": "broom",
+        "x": 5.86,
+        "y": 0.9,
+        "z": 8.95
+      },
+      {
+        "id": "seau",
+        "tool": "sponge",
+        "x": 10.15,
+        "y": 0.3,
+        "z": 12.3
+      }
+    ],
+    "dust": [
+      "poussiere-1",
+      "poussiere-2",
+      "poussiere-3",
+      "poussiere-4",
+      "poussiere-5",
+      "poussiere-6",
+      "poussiere-7"
+    ],
+    "panes": [
+      {
+        "id": "window-2",
+        "x": 5.4,
+        "y": 1.4,
+        "z": 12.874,
+        "sign": true
+      },
+      {
+        "id": "window-3",
+        "x": 7.5,
+        "y": 1.4,
+        "z": 12.874,
+        "sign": false
+      },
+      {
+        "id": "porte-entree",
+        "x": 9.4,
+        "y": 1.4,
+        "z": 12.874,
+        "sign": false
+      },
+      {
+        "id": "window-4",
+        "x": 10.5,
+        "y": 1.6,
+        "z": 12.874,
+        "sign": false
+      }
+    ],
+    "lots": [
+      {
+        "id": "lot-simone-a",
+        "table": "table-1",
+        "chairs": "chaises-1",
+        "sheet": "drap-1",
+        "seats": [
+          {
+            "id": "seat-1",
+            "type": "chaise",
+            "x": 4.225,
+            "z": 12.2,
+            "rotDeg": 90
+          },
+          {
+            "id": "seat-2",
+            "type": "chaise",
+            "x": 5.375,
+            "z": 12.2,
+            "rotDeg": 270
+          }
+        ],
+        "decor": [
+          ["gueridon_marbre", 1],
+          ["chaise_paillee", 2]
+        ]
+      },
+      {
+        "id": "lot-simone-b",
+        "table": "table-2",
+        "chairs": "chaises-2",
+        "sheet": "drap-2",
+        "seats": [
+          {
+            "id": "seat-3",
+            "type": "chaise",
+            "x": 5.825,
+            "z": 12.2,
+            "rotDeg": 90
+          },
+          {
+            "id": "seat-4",
+            "type": "chaise",
+            "x": 6.975,
+            "z": 12.2,
+            "rotDeg": 270
+          }
+        ],
+        "decor": [
+          ["gueridon_marbre", 1],
+          ["chaise_paillee", 2]
+        ]
+      },
+      {
+        "id": "lot-simone-c",
+        "table": "table-3",
+        "chairs": "chaises-3",
+        "sheet": "drap-3",
+        "seats": [
+          {
+            "id": "seat-5",
+            "type": "chaise",
+            "x": 7.425,
+            "z": 12.2,
+            "rotDeg": 90
+          },
+          {
+            "id": "seat-6",
+            "type": "chaise",
+            "x": 8.575,
+            "z": 12.2,
+            "rotDeg": 270
+          }
+        ],
+        "decor": [
+          ["gueridon_marbre", 1],
+          ["chaise_paillee", 2]
+        ]
+      },
+      {
+        "id": "lot-simone-d",
+        "table": "table-4",
+        "chairs": "chaises-4",
+        "sheet": "drap-4",
+        "seats": [
+          {
+            "id": "seat-7",
+            "type": "chaise",
+            "x": 4.43,
+            "z": 9.475,
+            "rotDeg": 0
+          },
+          {
+            "id": "seat-8",
+            "type": "chaise",
+            "x": 4.43,
+            "z": 10.725,
+            "rotDeg": 180
+          }
+        ],
+        "decor": [
+          ["table_ferme", 1],
+          ["chaise_paillee", 2]
+        ]
+      }
+    ],
+    "oldMachine": "station-4",
+    "appliances": [
+      {
+        "type": "machine-espresso",
+        "id": "station-4",
+        "x": 9.15,
+        "z": 9.005,
+        "y": 0.95,
+        "rotDeg": 0,
+        "reason": "machine"
+      },
+      {
+        "type": "machine-espresso-revisee",
+        "id": "station-4",
+        "x": 9.15,
+        "z": 9.005,
+        "y": 0.95,
+        "rotDeg": 0,
+        "reason": "machine"
+      },
+      {
+        "type": "moulin",
+        "id": "station-5",
+        "x": 9.775,
+        "z": 9.04,
+        "y": 0.95,
+        "rotDeg": 0,
+        "reason": "grinder"
+      },
+      {
+        "type": "caisse",
+        "id": "station-6",
+        "x": 10.6,
+        "z": 9.01,
+        "y": 0.95,
+        "rotDeg": 0,
+        "reason": "register"
+      },
+      {
+        "type": "frigo-sous-plan",
+        "id": "station-2",
+        "x": 8.375,
+        "z": 7.395,
+        "y": 0,
+        "rotDeg": 0,
+        "reason": "fridge"
+      },
+      {
+        "type": "bouilloire",
+        "id": "bouilloire-1",
+        "x": 8.1,
+        "z": 7.4,
+        "y": 0.91,
+        "rotDeg": 0,
+        "reason": "kettle"
+      },
+      {
+        "type": "vitrine",
+        "id": "vitrine-1",
+        "x": 8.63,
+        "z": 7.4,
+        "y": 0.91,
+        "rotDeg": 0,
+        "reason": "vitrine"
+      },
+      {
+        "type": "pile-tasses",
+        "id": "pile-tasses-1",
+        "x": 9.7,
+        "z": 7.4,
+        "y": 0.9,
+        "rotDeg": 0,
+        "reason": "dishes"
+      }
+    ],
+    "machineParts": ["groupe-1", "groupe-2", "buse-1"],
+    "serviceDeferred": ["groupe-1", "groupe-2", "buse-1", "bouilloire-1", "vitrine-1"],
+    "deliveryArea": [4.2, 13.7, 4.2, 1.2],
+    "deliveryWhy": "Gaby pose tout sur le trottoir devant la vitrine ouest: la camionnette s'arrête sur la place, et une machine de 60 kg passe par la grande porte de 1,20 m, pas par la cour. La zone laisse libres le banc de Simone, l'ardoise et le passage devant la porte.",
+    "nightCartonSpot": [4.6, 10.9],
+    "nightCartonWhy": "Un carton oublié dehors est rentré par Gaby le soir, contre le mur ouest de la salle, entre les deux tables, hors du passage."
+  }
+}

@@ -4,6 +4,7 @@ import type { FurnitureType, Slot } from '../donnees/schemas';
 import { createArrangementState } from '../amenagement/etat';
 import { createClienteleState } from '../clientele/etat';
 import { createServiceState } from '../service/etat';
+import { createInstallationState } from '../installation/etat';
 import type { ObjectState, PlacedFurniture, PlayerIndex, World } from '../etat/monde';
 import { localToWorld } from './geometrie';
 
@@ -13,14 +14,23 @@ export interface Vec3 {
   z: number;
 }
 
-export function createWorld(content: Content, memberIds: readonly [string, string]): World {
-  const { start } = content;
+/** Départ d'une nouvelle maison: café équipé (tests, robots) ou cellule vide (démo v0.3). */
+export type StartKind = 'equipe' | 'cellule';
+
+export function createWorld(
+  content: Content,
+  memberIds: readonly [string, string],
+  kind: StartKind = 'equipe',
+): World {
+  const cell = kind === 'cellule' ? (content.installation?.cell ?? null) : null;
+  const start = cell !== null && content.cellStart !== null ? content.cellStart : content.start;
   const players = ([0, 1] as const).map((i) => ({
     memberId: memberIds[i],
     x: start.spawns[i][0],
     z: start.spawns[i][1],
-    // Les deux commencent derrière le comptoir, face à la salle (sud).
-    yawDeg: 180,
+    // Café équipé: les deux commencent derrière le comptoir, face à la salle (sud). Cellule vide:
+    // sur la place, face au rideau baissé (cap du fichier de départ).
+    yawDeg: start.spawnYawDeg ?? 180,
     pitchDeg: -10,
     use: null,
     seat: null,
@@ -42,6 +52,15 @@ export function createWorld(content: Content, memberIds: readonly [string, strin
     service: createServiceState(),
     clientele: createClienteleState(),
     arrangement: createArrangementState(),
+    installation:
+      cell === null
+        ? null
+        : createInstallationState(
+            cell.sheets.map((x) => x.id),
+            cell.dust,
+            cell.panes.map((x) => x.id),
+            cell.lots.map((l) => l.id),
+          ),
   };
 }
 

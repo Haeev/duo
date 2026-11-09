@@ -113,7 +113,9 @@ function decorList(cc: ClienteleContent, s: ClienteleState): Decor[] {
       light: item.category === 'light',
     });
   };
-  for (const d of cc.economy.startDecor)
+  const start =
+    s.startDecor?.map(([id, count, worn]) => ({ id, count, worn })) ?? cc.economy.startDecor;
+  for (const d of start)
     for (let i = 0; i < d.count; i++)
       push(cc.catalogue.get(d.id), d.worn && !owns(s, `renover_${d.id}`) ? a.wornCharmFactor : 1);
   for (const [id] of s.purchases) push(cc.catalogue.get(id), 1);
@@ -172,9 +174,14 @@ export function ambiance(ctx: Ctx): AmbianceInfo {
   );
   const light = Math.min(a.lightMax, (a.lightMax * lights) / (surface / a.lightPerM2));
   const music = style === a.radioStyle ? a.musicMatching : a.musicOther;
+  // Démo v0.3: tant qu'il reste de la poussière de l'installation, la propreté compte moins.
+  const dusty = (ctx.sim.world.installation?.dust.length ?? 0) > 0;
+  const cleanliness = dusty
+    ? (ctx.sim.content.installation?.rules.dustCleanliness ?? a.cleanliness)
+    : a.cleanliness;
   const value = Math.min(
     a.max,
-    deco + a.coherenceMax * coh + comfort + light + music + a.cleanliness,
+    deco + a.coherenceMax * coh + comfort + light + music + cleanliness,
   );
   return { value, style, coherence: coh };
 }
@@ -266,9 +273,26 @@ export function completePurchase(ctx: Ctx, offer: Offer, by: PlayerIndex | null)
   ctx.sim.emit({ type: 'clientele-purchased', item: offer.id, by, price: offer.price });
 }
 
+/**
+ * Garde d'un autre chantier sur les achats (installation, démo v0.3): `undefined` laisse faire,
+ * une phrase refuse, `null` dit que l'achat est déjà fait (crédit).
+ */
+export type PurchaseGuard = (
+  ctx: Ctx,
+  player: PlayerIndex,
+  item: string,
+) => string | null | undefined;
+let purchaseGuard: PurchaseGuard | null = null;
+
+export function connectPurchaseGuard(guard: PurchaseGuard): void {
+  purchaseGuard = guard;
+}
+
 /** Un achat demandé par un joueur: refusé, fait tout de suite, ou proposé à l'autre. */
 export function requestPurchase(ctx: Ctx, player: PlayerIndex, item: string): string | null {
   const { s, cc } = ctx;
+  const guarded = purchaseGuard?.(ctx, player, item);
+  if (guarded !== undefined) return guarded;
   if (s.debt > 0) return 'Il reste une somme à régler: les achats attendent';
   const offer = offerOf(cc, s, item);
   if (typeof offer === 'string') return offer;
