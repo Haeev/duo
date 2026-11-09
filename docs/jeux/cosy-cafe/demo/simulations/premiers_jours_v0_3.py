@@ -20,7 +20,7 @@ Ce qu'il simplifie (hypothèses écrites dans le document): ardoise fixe de huit
 séance), aucun achat d'équipement, pas de recommande en cours de séjour, pas d'événement, météo
 neutre, attrait 0,75 la première semaine et 0,9 la seconde, pourboires à leur espérance.
 
-Consigne du client (2026-11-04): simulation courte. 400 parties par cas, 2 s en tout.
+Consigne du client (2026-11-04): simulation courte. 200 parties par cas, 5 s en tout.
 Lancement depuis la racine du dépôt:
   python3 -I -B docs/jeux/cosy-cafe/demo/simulations/premiers_jours_v0_3.py
   python3 -I -B docs/jeux/cosy-cafe/demo/simulations/premiers_jours_v0_3.py servis=0.85
@@ -36,7 +36,7 @@ from pathlib import Path
 
 RACINE = Path(__file__).resolve().parents[5]
 DONNEES = RACINE / "games" / "deux-tabliers" / "donnees" / "clientele"
-PARTIES = 400
+PARTIES = 200
 JOURS = 15
 
 ARDOISE = ["espresso", "allonge", "creme", "the_noir", "chocolat", "pain_chocolat", "tartine", "tarte_fruits"]
@@ -94,18 +94,20 @@ ACTUELLE = {
     "charges_prise_en_main": {},
     "annonce": {d: w["announced"] for d, w in WARMUP.items()},
     "historique_normalise": False,
-    "frais_seuil_carton": 0.0,  # 0: un carton dès qu'il manque une unité (arrondi au-dessus)
+    "frais_seuil_carton": 0.0,  # 0: un carton dès qu'il manque une unité; sinon, seulement les jours de prise en main
     "cartons": {},
+    "port_offert_le_jour": 0,
 }
 
 PROPOSEE = {
     "nom": "proposition",
     "loyer_offert_jusqu_au": 7,
     "charges_prise_en_main": {2: 0.5, 3: 0.75},
-    "annonce": {2: 0.25, 3: 0.5, 4: 0.7, 5: 0.85},
+    "annonce": {d: w["announced"] for d, w in WARMUP.items()},  # inchangé (0,3; 0,5; 0,7; 0,85)
     "historique_normalise": True,
     "frais_seuil_carton": 0.5,
     "cartons": {"croissant_boulanger": 5, "pain_chocolat_boulanger": 5, "tarte_boulanger": 6},
+    "port_offert_le_jour": 2,
 }
 
 
@@ -300,8 +302,11 @@ def commande_habituelle(v: dict, lots: dict, usage: list, d: int) -> dict:
             continue
         u = unites(v, ing)
         n = voulu / u
-        if frais and v["frais_seuil_carton"] > 0:
+        if frais and v["frais_seuil_carton"] > 0 and annonce(v, d) < 1:
             n = math.floor(n) + (1 if n - math.floor(n) >= v["frais_seuil_carton"] else 0)
+            # Une ligne de l'ardoise sans rien de bon en réserve reçoit au moins un carton.
+            if n == 0 and bon_le(lots, ing, d) <= 1e-9:
+                n = 1
         else:
             n = math.ceil(n)
         if n > 0:
@@ -340,7 +345,7 @@ def partie(v: dict, depart: dict, servis: float, graine: int) -> list:
                 ajouter_lot(lots, ing, n * unites(v, ing), dernier_jour(ing, d))
             for sup, g in par_fourn.items():
                 r["marchandise"] += g
-                if g < SUPP[sup]["franco"]:
+                if g < SUPP[sup]["franco"] and d != v["port_offert_le_jour"]:
                     r["port"] += SUPP[sup]["shipping"]
             caisse -= r["marchandise"] + r["port"]
             stock = {ing: total(lots, ing) for ing in INGR}

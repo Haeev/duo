@@ -4,8 +4,8 @@
 |---|---|
 | Identifiant | `cosy-cafe` (provisoire; l'architecte rappelle qu'il peut rester même si le titre change, section 1.1) |
 | Statut | brouillon |
-| Version du document | 0.2.4 |
-| Dernière mise à jour | 2026-11-08 |
+| Version du document | 0.2.5 |
+| Dernière mise à jour | 2026-11-09 |
 | Rédaction | game-designer: sections 1 à 6, 11, 13, 14 et proposition de la section 12; manager: consolidation, résumés des sections 7 à 10, questions Q11 à Q19, section 16 |
 | Documents liés | cadrage: `docs/jeux/cosy-cafe/cadrage.md`; plans et adresses: `docs/jeux/cosy-cafe/plans/`, `docs/jeux/cosy-cafe/adresses.md`; bible: `docs/jeux/cosy-cafe/bible-artistique.md`; son: `docs/jeux/cosy-cafe/son.md`; interface: `docs/jeux/cosy-cafe/ux.md`; technique: `docs/jeux/cosy-cafe/technique.md`; simulation: `docs/jeux/cosy-cafe/simulations/cosy_cafe.py` et `resultats.md`; plateforme: `docs/plateforme/cahier-des-charges.md` (F05 à F09) |
 
@@ -1452,6 +1452,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
+| 2026-11-09 | 0.2.5 | Retour du client sur la 0.2.4 (mardi 2, premier jour ouvert: « on a servi tous les clients avec des marges de +90 % et on finit la journée à -14 euros »; le code affichait en fait -50,47 €). Proposition, à valider (EP-Q1 à EP-Q3), qui vaut pour les deux départs (café équipé et cellule vide): le résultat du soir compte la marge des ventes, les frais et les invendus, la marchandise encore en réserve est montrée à part (elle n'est plus une perte le jour de la livraison); Simone laisse le loyer des jours 1 à 7 (exception à EC-03 pour la démo); charges x 0,5 le jour 2 et x 0,75 le jour 3; port offert à la première livraison; viennoiseries par 5 et tartes de 6 parts; commande proposée arrondie au plus proche pour le frais pendant la montée en charge et historique ramené à l'affluence normale. Effet simulé: mardi parfait de -8 € à +21 € (bilan par la marge), duo débutant de -20 € à +10 €; +158 à +170 € de caisse au jour 15. Détail, valeurs des clés et textes: `demo/economie-premiers-jours-v0-3.md`; simulation `demo/simulations/premiers_jours_v0_3.py` | client |
 | 2026-11-08 | 0.2.4 | Retour du client sur la démo: « le jeu devait commencer sur une cellule vide et le café fermé, un budget pour démarrer et acheter meubles, et stock pour commencer ». Ormeval devient une boutique fermée depuis trois ans: arrivée sur la place, rideau levé à deux, installation le jour 1 (13 à 24 minutes), 1 800 € d'épargne au lieu de l'équipement fourni et des 300 € de caisse, aucune réserve offerte, Simone propriétaire des murs qui vend sa vieille machine et ses tables, garde-fous d'ouverture, guide de l'installation. Conception et simulation: `demo/depart-cellule-vide-v0-3.md`, `demo/simulations/depart_v0_3.py`. Mis à jour: En bref, 1.3, 2.5, 3, TE-08, EC-08, notes sous les tables `adresses`, `depart` et `divers`, 6.5 (Simone), 6.9 (scènes 1 et 2), Q19 à Q26. Les tables marquées de la simulation longue ne changent pas (contrôle `--croise`), à recaler à la prochaine relance | client |
 | 2026-11-08 | 0.2.3 | Décision du client: direction de rendu B, semi-réaliste (Q17) | client |
 | 2026-11-08 | 0.2.2 | Retours du client sur l'essai 3D: personnages (clients et avatars) au niveau de détail du décor (visages, mains, vêtements, coiffures variées); couleurs des joueurs retirées des tenues (Q14). La bible (section 4) est à reprendre en ce sens par le directeur artistique | client |

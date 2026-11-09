@@ -323,3 +323,12 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le facteur de prix du jeu (`priceFactor` linéaire, pente = sensibilité, borné 0,4 à 1,25) rend une remise rentable seulement si sensibilité x part remisée de l'indice > part remisée du ticket / taux de marge: avec l'indice moyenné sur toutes les envies, aucune remise ne paie jamais. Lire l'indice d'une heure douce sur les seules lignes remisées (ce qu'annonce l'ardoise).
 - Valoriser un groupe en plus au ticket de son profil, pas au ticket moyen du jour: un pressé vaut 2,5 €, une famille 14 €; l'erreur inversait le verdict (heure douce du matin « rentable »).
 - Au village, le week-end et la fête sont presque pleins (capacité douce 42 puis 46 groupes par jour): un levier ne paie qu'en semaine; c'est ce qui crée le choix du moment. Simulation: `docs/jeux/cosy-cafe/demo/simulations/remises_marketing_v0_2.py` (lit les JSON dans le document).
+
+## Deux Tabliers: lire un bilan et une séance (vérifié le 2026-11-09)
+
+- Le `result` du bilan 0.2.4 retire la marchandise reçue en entier le jour de la livraison: tout jour de livraison (surtout le premier, qui achète le sec) paraît en perte. Juger une économie de jour par la marge (ventes - coût des ventes - frais - invendus), le stock à part.
+- Reconstituer une journée de séance: suivre la caisse des états du carnet (`etatEnvoi.caisse`, tickets payés) et recalculer `suggestedOrder` à part; la livraison du matin se retrouve au centime (aube = caisse veille - loyer - livraison).
+- Une montée en charge (`warmup.announced`) appliquée à la commande ET à un historique déjà réduit compte deux fois: ranger l'historique divisé par l'affluence annoncée du jour.
+- Le mardi calme suit le rythme du duo (`holdCalmArrival`): un duo qui bloque sur un poste reçoit moins de groupes; une règle d'économie du premier jour doit tenir pour un duo lent (simuler « sert 60 % »).
+- Script court réutilisable: `docs/jeux/cosy-cafe/demo/simulations/premiers_jours_v0_3.py` (lit les JSON du jeu, 5 s; variantes en dictionnaires).
+- Le grep complet du dépôt pour les tirets dépasse 2 minutes: le lancer sur les fichiers touchés.
