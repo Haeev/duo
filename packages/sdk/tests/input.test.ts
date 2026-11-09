@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { unlockMeansEscape } from '../src/input';
 import { createInputState } from '../src/input-state';
 import { keyLabel } from '../src/keys';
 
@@ -40,7 +41,7 @@ describe('état des actions', () => {
     s.endStep();
     expect(s.isDown('up')).toBe(true);
     expect(s.wasPressed('up')).toBe(false);
-    s.keyDown('KeyW');
+    s.keyDown('KeyW', true);
     expect(s.wasPressed('up')).toBe(false);
     s.keyUp('KeyW');
     expect(s.isDown('up')).toBe(false);
@@ -83,5 +84,46 @@ describe('état des actions', () => {
     expect(s.isDown('up') || s.isDown('act')).toBe(false);
     expect(s.wasReleased('up') && s.wasReleased('act')).toBe(true);
     expect(s.frame()).toEqual({ down: [], pressed: [], released: ['up', 'act'] });
+  });
+
+  it('tient la touche pendant la répétition automatique, sans nouvel appui', () => {
+    const s = createInputState(actions, {});
+    s.keyDown('Space');
+    s.endStep();
+    for (let i = 0; i < 5; i++) s.keyDown('Space', true);
+    expect(s.isDown('act')).toBe(true);
+    expect(s.wasPressed('act')).toBe(false);
+  });
+
+  it('agit encore quand le relâchement d’une touche s’est perdu', () => {
+    const s = createInputState(actions, {});
+    s.keyDown('Space');
+    s.endStep();
+    // Pas de keyup, puis un nouvel appui (sans répétition): c'est un vrai appui.
+    s.keyDown('Space', false);
+    expect(s.wasPressed('act')).toBe(true);
+    expect(s.isDown('act')).toBe(true);
+    s.keyUp('Space');
+    expect(s.isDown('act')).toBe(false);
+  });
+
+  it('reprend le maintien d’une touche tenue après la perte du focus, sans appui', () => {
+    const s = createInputState(actions, {});
+    s.keyDown('Space');
+    s.endStep();
+    s.releaseAll();
+    s.endStep();
+    s.keyDown('Space', true);
+    expect(s.isDown('act')).toBe(true);
+    expect(s.wasPressed('act')).toBe(false);
+  });
+});
+
+describe('pointeur rendu sans demande du jeu', () => {
+  it('vaut Échap fenêtre active, pas après Alt+Tab ni quand le jeu l’a rendu', () => {
+    expect(unlockMeansEscape({ requested: false, visible: true, focused: true })).toBe(true);
+    expect(unlockMeansEscape({ requested: false, visible: true, focused: false })).toBe(false);
+    expect(unlockMeansEscape({ requested: false, visible: false, focused: true })).toBe(false);
+    expect(unlockMeansEscape({ requested: true, visible: true, focused: true })).toBe(false);
   });
 });

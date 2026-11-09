@@ -87,3 +87,23 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - Les fichiers du jeu existants ne sont pas au format Prettier (lignes longues): ne passer `prettier --write` que sur les fichiers neufs.
 - `UI_SETTINGS` est `as const`: une boucle `m < v.dayTo` déclenche `no-unnecessary-condition`; typer une locale `const end: number`.
 - Hauteur à 125 % sur 1366x768: `min(4rem, 9.6vh)` pour la taille des vignettes garde 100 % intact et fait tenir la page.
+
+## Vue subjective (Cosy Café, 2026-11)
+
+- Pointeur verrouillé: Chromium avale le premier Échap (gestionnaire d'accès exclusif d'Electron avant `before-input-event`); parade du SDK: déverrouillage involontaire, fenêtre active, partie `running` = `pauseRequest`. Après un Échap, re-verrouiller exige un geste (clic ou touche) et Chromium refuse 1,25 s; sans geste seulement si la page a rendu le pointeur elle-même (`exitPointerLock`). D'où la capsule « Clique pour reprendre la souris », premier clic consommé (`docs/jeux/cosy-cafe/technique.md`, 2.2).
+- La caméra ne bouge jamais sans le joueur (C22): une interface posée s'ouvre en surimpression 2D, jamais par un cadrage; une aide à viser choisit la cible, ne tourne pas la vue.
+- Bas de l'écran réservé aux mains et au plan de travail: HUD en haut (horloge et tickets à gauche, alertes au centre, l'autre à droite), seul « En main » au coin bas droit, au-dessus de l'indicateur de sauvegarde de Duo. Taille du HUD plafonnée: `font-size: min(1rem, 100vh / 30)`, tailles en `em`; tient de 911x512 (1366x768 à 150 % Windows) à 1920x1080 à 150 %.
+- Repères des sons sur un anneau autour du point de visée (9 em sur les côtés, 10 em derrière), icône seule nommée pour les lecteurs d'écran: évite les chevauchements avec les coins. Le vérificateur doit comparer aussi les éléments du centre entre eux.
+- Seuil des lettres écrites dans le monde fixé à 18 px à 1366x768 au champ de vision par défaut (2,7 cm à 1 m, 6,8 cm à 2,5 m), plancher 14 px; le reste se lit dans une carte du HUD ou une interface.
+- Avant d'inventer des noms ou des prix d'exemple, lire la simulation du game designer (`docs/jeux/<jeu>/simulations/*.py`): noms, horaires, prix conseillés, jour de fermeture. Vérifier la cohérence du calendrier (une saison commence un lundi: « mardi 9 », pas « mardi 12 »).
+
+## Maquettes en HTML (pièges vérifiés, suite)
+
+- L'événement `close` d'un `<dialog>` ne remonte pas: l'écouter en capture. Bloquer `cancel` pour qu'Échap ne ferme pas une fenêtre du jeu; la pause simulée de Duo est elle-même un `<dialog>` modal (sinon inerte sous un autre modal).
+- `focus({ preventScroll: true })` laisse le focus par défaut hors de la vue dans un conteneur qui défile: enchaîner `scrollIntoView({ block: 'nearest' })`. Barre d'action collante (`position: sticky; bottom: 0`) avec `box-shadow` de la couleur du fond pour masquer ce qui passe dessous.
+- Piège de largeur minimale: une grille à colonne implicite grandit jusqu'au contenu le plus large (`grid-template-columns: minmax(0, 1fr)`), et `minmax(7rem, 1fr)` plus des boutons déborde à 150 %: `minmax(0, 1fr)` et laisser le nom passer à la ligne.
+- Remplacer un texte dans un HTML déjà typographié: remettre d'abord U+00A0 et U+202F à plat, remplacer, puis relancer le typographe (sinon la recherche échoue).
+- Test d'effort (police large, pseudos longs) injecté après le chargement: rappeler le focus par défaut avant d'analyser, sinon faux « focus hors de la vue ».
+- Scènes provisoires en SVG dans un fichier `.js` (chaînes) injecté dans la page: les groupes `[data-si]` se montrent par état, et un même SVG sert à plusieurs vues par `transform` (point visé ramené au centre; vérifier qu'aucun bord de la scène n'apparaît).
+- Jeton de joueur sur fond clair: disque de nuit `#1A1F3D` cerclé d'encre, symbole dans la couleur du profil; distinct en niveaux de gris et sous les trois daltonismes (forme et clarté).
+- Navigation spatiale fiable: distance de bord à bord dans l'axe, plus deux fois l'écart de centre en travers; flèches haut et bas sortent d'un champ d'une ligne.

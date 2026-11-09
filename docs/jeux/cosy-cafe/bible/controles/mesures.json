@@ -1,0 +1,6439 @@
+{
+  "generated": "node source/mesurer.cjs",
+  "thresholds": {
+    "decorMaxL": 82,
+    "decorMaxC": 45,
+    "workSurfaceL": [
+      20,
+      58
+    ],
+    "porcelainGap": 35,
+    "clothesL": [
+      28,
+      76
+    ],
+    "lightTopMinL": 87,
+    "darkTopMaxL": 26,
+    "houseL": [
+      25,
+      55
+    ],
+    "playerDeltaE": 15
+  },
+  "porcelainL": 94.9,
+  "colors": [
+    {
+      "family": "commune",
+      "id": "porcelain",
+      "hex": "#F5F0E6",
+      "fr": "porcelaine",
+      "bande": "jeu",
+      "L": 94.9,
+      "C": 5.4,
+      "h": 90,
+      "gray": 94.3,
+      "nearestPlayer": {
+        "d": 23.3,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 18.5,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 14,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 14.2,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "paper",
+      "hex": "#FBF6EA",
+      "fr": "papier",
+      "bande": "jeu",
+      "L": 97,
+      "C": 6.4,
+      "h": 93,
+      "gray": 96.5,
+      "nearestPlayer": {
+        "d": 22.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 19.8,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 14.8,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 14.1,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "milk",
+      "hex": "#FAF4EA",
+      "fr": "lait et mousse",
+      "bande": "jeu",
+      "L": 96.4,
+      "C": 5.5,
+      "h": 87,
+      "gray": 95.9,
+      "nearestPlayer": {
+        "d": 23.6,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 19.2,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 14.3,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 14.8,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "ink",
+      "hex": "#2B2622",
+      "fr": "encre",
+      "bande": "jeu",
+      "L": 15.6,
+      "C": 3.8,
+      "h": 67,
+      "gray": 15.2,
+      "nearestPlayer": {
+        "d": 46.2,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 40.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 36.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 39.7,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "espresso",
+      "hex": "#3B2318",
+      "fr": "café",
+      "bande": "jeu",
+      "L": 16.5,
+      "C": 15.7,
+      "h": 50,
+      "gray": 15.4,
+      "nearestPlayer": {
+        "d": 44.4,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 39.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 34.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 40.1,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "crema",
+      "hex": "#B57844",
+      "fr": "crème du café",
+      "bande": "jeu",
+      "L": 55.8,
+      "C": 42.2,
+      "h": 64,
+      "gray": 50.7,
+      "nearestPlayer": {
+        "d": 17.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 9.2,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 2.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 10.8,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "chocolate",
+      "hex": "#5A3426",
+      "fr": "chocolat",
+      "bande": "jeu",
+      "L": 26.1,
+      "C": 22.3,
+      "h": 46,
+      "gray": 23.2,
+      "nearestPlayer": {
+        "d": 37.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 32.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 28.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 32.8,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "tea",
+      "hex": "#A65A2C",
+      "fr": "thé infusé",
+      "bande": "jeu",
+      "L": 46.4,
+      "C": 47.9,
+      "h": 55,
+      "gray": 40.3,
+      "nearestPlayer": {
+        "d": 18.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 16.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 11.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.9,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "crust",
+      "hex": "#C68845",
+      "fr": "croûte dorée",
+      "bande": "jeu",
+      "L": 61.7,
+      "C": 47.9,
+      "h": 69,
+      "gray": 56.6,
+      "nearestPlayer": {
+        "d": 18.9,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 3.7,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 4.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 8.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "crumb",
+      "hex": "#EBD5A2",
+      "fr": "mie et pâte",
+      "bande": "jeu",
+      "L": 85.9,
+      "C": 28,
+      "h": 90,
+      "gray": 83.9,
+      "nearestPlayer": {
+        "d": 17.2,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.9,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 11.7,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 19.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "berry",
+      "hex": "#9E3647",
+      "fr": "fruits rouges",
+      "bande": "touche",
+      "L": 38.5,
+      "C": 46.4,
+      "h": 17,
+      "gray": 30.3,
+      "nearestPlayer": {
+        "d": 29,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 20.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 26.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 20,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "citrus",
+      "hex": "#E5AE38",
+      "fr": "agrumes",
+      "bande": "touche",
+      "L": 74.3,
+      "C": 65.2,
+      "h": 82,
+      "gray": 69.5,
+      "nearestPlayer": {
+        "d": 25.4,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.7,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 13.7,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 9,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "kraft",
+      "hex": "#B48C5E",
+      "fr": "kraft",
+      "bande": "jeu",
+      "L": 61,
+      "C": 31.7,
+      "h": 73,
+      "gray": 56.9,
+      "nearestPlayer": {
+        "d": 21.4,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.9,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 6.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 10.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "walnut",
+      "hex": "#5E4130",
+      "fr": "noyer",
+      "bande": "travail",
+      "L": 30.3,
+      "C": 18.5,
+      "h": 56,
+      "gray": 27.4,
+      "nearestPlayer": {
+        "d": 36.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 29.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 31.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "oak_dark",
+      "hex": "#7A5A3E",
+      "fr": "chêne foncé",
+      "bande": "travail",
+      "L": 40.9,
+      "C": 23.2,
+      "h": 66,
+      "gray": 37.2,
+      "nearestPlayer": {
+        "d": 29,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 20.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 16.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 24.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "slate",
+      "hex": "#343938",
+      "fr": "ardoise",
+      "bande": "travail",
+      "L": 23.5,
+      "C": 2.4,
+      "h": 183,
+      "gray": 21.9,
+      "nearestPlayer": {
+        "d": 39.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 36.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 33.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 32.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "zinc",
+      "hex": "#858C91",
+      "fr": "zinc",
+      "bande": "travail",
+      "L": 57.8,
+      "C": 3.9,
+      "h": 247,
+      "gray": 54.5,
+      "nearestPlayer": {
+        "d": 17.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.6,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 9.1,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 12,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "marble_dark",
+      "hex": "#4F5A55",
+      "fr": "marbre vert-gris",
+      "bande": "travail",
+      "L": 37.2,
+      "C": 5.6,
+      "h": 165,
+      "gray": 34.2,
+      "nearestPlayer": {
+        "d": 33.8,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 26.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 23.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "tray",
+      "hex": "#4A3A31",
+      "fr": "plateau",
+      "bande": "travail",
+      "L": 25.9,
+      "C": 9.9,
+      "h": 56,
+      "gray": 23.8,
+      "nearestPlayer": {
+        "d": 40.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 33.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 29.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 36.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "oak_honey",
+      "hex": "#B3834F",
+      "fr": "chêne miel",
+      "bande": "decor",
+      "L": 58.4,
+      "C": 37.3,
+      "h": 70,
+      "gray": 53.9,
+      "nearestPlayer": {
+        "d": 20.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.4,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 11.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "plaster",
+      "hex": "#D5C4A5",
+      "fr": "enduit crème",
+      "bande": "decor",
+      "L": 79.8,
+      "C": 17.8,
+      "h": 87,
+      "gray": 77.4,
+      "nearestPlayer": {
+        "d": 21,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 18.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "linen",
+      "hex": "#CBBEA6",
+      "fr": "lin",
+      "bande": "decor",
+      "L": 77.4,
+      "C": 13.8,
+      "h": 87,
+      "gray": 74.9,
+      "nearestPlayer": {
+        "d": 22.4,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "leaf",
+      "hex": "#5D7D47",
+      "fr": "feuillage",
+      "bande": "decor",
+      "L": 48.8,
+      "C": 33.8,
+      "h": 130,
+      "gray": 44.8,
+      "nearestPlayer": {
+        "d": 19.4,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 19.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "leaf_light",
+      "hex": "#8A9C5E",
+      "fr": "feuillage clair",
+      "bande": "decor",
+      "L": 61.6,
+      "C": 34.8,
+      "h": 119,
+      "gray": 57.9,
+      "nearestPlayer": {
+        "d": 17.2,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 18.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "pot",
+      "hex": "#A5603F",
+      "fr": "terre cuite",
+      "bande": "decor",
+      "L": 47.9,
+      "C": 39.5,
+      "h": 51,
+      "gray": 42.5,
+      "nearestPlayer": {
+        "d": 17.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 11,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "copper",
+      "hex": "#A2643D",
+      "fr": "cuivre",
+      "bande": "decor",
+      "L": 48.4,
+      "C": 38.6,
+      "h": 57,
+      "gray": 43.3,
+      "nearestPlayer": {
+        "d": 18.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 14.2,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "brass",
+      "hex": "#C2A05A",
+      "fr": "laiton",
+      "bande": "decor",
+      "L": 67.5,
+      "C": 41,
+      "h": 85,
+      "gray": 63.6,
+      "nearestPlayer": {
+        "d": 25,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 7.8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 10.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "steel",
+      "hex": "#A3A8AC",
+      "fr": "inox",
+      "bande": "decor",
+      "L": 68.6,
+      "C": 2.9,
+      "h": 250,
+      "gray": 65.6,
+      "nearestPlayer": {
+        "d": 22.1,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 1.4,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 9,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 16,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "steel_dark",
+      "hex": "#4C5156",
+      "fr": "acier sombre",
+      "bande": "decor",
+      "L": 34.2,
+      "C": 3.7,
+      "h": 257,
+      "gray": 31.5,
+      "nearestPlayer": {
+        "d": 27.7,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 30.4,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 25,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "glass",
+      "hex": "#C9D6D3",
+      "fr": "verre",
+      "bande": "jeu",
+      "L": 84.6,
+      "C": 4.9,
+      "h": 180,
+      "gray": 82.8,
+      "nearestPlayer": {
+        "d": 18.5,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.3,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 7.8,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 7.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "glass_tint",
+      "hex": "#DCE6E4",
+      "fr": "voile des vitres",
+      "bande": "jeu",
+      "L": 90.5,
+      "C": 3.7,
+      "h": 183,
+      "gray": 89.3,
+      "nearestPlayer": {
+        "d": 20.1,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.7,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 8.4,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 7,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "shadow_contact",
+      "hex": "#2A1E18",
+      "fr": "ombre de contact",
+      "bande": "decor",
+      "L": 12.5,
+      "C": 8,
+      "h": 53,
+      "gray": 12.6,
+      "nearestPlayer": {
+        "d": 48.2,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 41.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 38,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 43.9,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "lamp_warm",
+      "hex": "#FFC27A",
+      "fr": "lampe chaude",
+      "bande": "lumiere",
+      "L": 82.5,
+      "C": 46.5,
+      "h": 73,
+      "gray": 79.1,
+      "nearestPlayer": {
+        "d": 26.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.8,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 9.3,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 12.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "lamp_shade",
+      "hex": "#FFE0B0",
+      "fr": "abat-jour allumé",
+      "bande": "lumiere",
+      "L": 90.6,
+      "C": 27.7,
+      "h": 82,
+      "gray": 89.1,
+      "nearestPlayer": {
+        "d": 20.1,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.4,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 11.4,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 20.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "sun_patch",
+      "hex": "#FFD9A0",
+      "fr": "tache de soleil",
+      "bande": "lumiere",
+      "L": 88.6,
+      "C": 33.5,
+      "h": 80,
+      "gray": 86.7,
+      "nearestPlayer": {
+        "d": 20.9,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 6.1,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 9.6,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 18.4,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "alert",
+      "hex": "#E0A030",
+      "fr": "ambre",
+      "bande": "ui",
+      "L": 70.3,
+      "C": 65.1,
+      "h": 77,
+      "gray": 64.9,
+      "nearestPlayer": {
+        "d": 26.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.9,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 13.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 7.4,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "commune",
+      "id": "alert_ink",
+      "hex": "#5A3A10",
+      "fr": "ambre foncé",
+      "bande": "ui",
+      "L": 27.4,
+      "C": 32,
+      "h": 72,
+      "gray": 24.2,
+      "nearestPlayer": {
+        "d": 38.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 33.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 32.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "saisons",
+      "id": "season_autumn_leaf",
+      "hex": "#A86F3E",
+      "fr": "feuillage d'automne",
+      "bande": "dehors",
+      "L": 51.9,
+      "C": 40.1,
+      "h": 64,
+      "gray": 46.9,
+      "nearestPlayer": {
+        "d": 18.9,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 5.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "saisons",
+      "id": "season_autumn_ochre",
+      "hex": "#C08A4A",
+      "fr": "feuillage ocre",
+      "bande": "dehors",
+      "L": 61.5,
+      "C": 44,
+      "h": 72,
+      "gray": 56.8,
+      "nearestPlayer": {
+        "d": 20.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 4.3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 8.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "saisons",
+      "id": "season_snow",
+      "hex": "#EEF1F3",
+      "fr": "neige",
+      "bande": "dehors",
+      "L": 95,
+      "C": 1.5,
+      "h": 244,
+      "gray": 94.3,
+      "nearestPlayer": {
+        "d": 23.5,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.5,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 8.4,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 8.7,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_bg",
+      "hex": "#2B211C",
+      "fr": "expresso",
+      "bande": "ui",
+      "L": 13.7,
+      "C": 6.5,
+      "h": 54,
+      "gray": 13.6,
+      "nearestPlayer": {
+        "d": 47.2,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 41.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 37.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 42.7,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_line",
+      "hex": "#5C4A3E",
+      "fr": "filet",
+      "bande": "ui",
+      "L": 33,
+      "C": 11.5,
+      "h": 61,
+      "gray": 30.2,
+      "nearestPlayer": {
+        "d": 36.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 28.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 32.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_text",
+      "hex": "#F6EEDF",
+      "fr": "crème",
+      "bande": "ui",
+      "L": 94.3,
+      "C": 8.2,
+      "h": 89,
+      "gray": 93.6,
+      "nearestPlayer": {
+        "d": 22.2,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 18.3,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 16,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 16.4,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_text_muted",
+      "hex": "#CDBBA6",
+      "fr": "crème second",
+      "bande": "ui",
+      "L": 76.8,
+      "C": 13.3,
+      "h": 77,
+      "gray": 74.2,
+      "nearestPlayer": {
+        "d": 24.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_accent",
+      "hex": "#FFC857",
+      "fr": "or de Duo",
+      "bande": "ui",
+      "L": 83.6,
+      "C": 62.7,
+      "h": 83,
+      "gray": 79.8,
+      "nearestPlayer": {
+        "d": 22.5,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.7,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 7,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 13.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_success",
+      "hex": "#6BD69A",
+      "fr": "vert d'eau de Duo",
+      "bande": "ui",
+      "L": 78.2,
+      "C": 48.9,
+      "h": 155,
+      "gray": 73.3,
+      "nearestPlayer": {
+        "d": 11.2,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 10.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 5.8,
+          "id": "orb"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "hud_error",
+      "hex": "#FF6B81",
+      "fr": "rouge rosé de Duo",
+      "bande": "ui",
+      "L": 64.5,
+      "C": 60.5,
+      "h": 16,
+      "gray": 54.9,
+      "nearestPlayer": {
+        "d": 12.5,
+        "id": "planet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 13.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 4.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "chalk",
+      "hex": "#F1EDE3",
+      "fr": "craie",
+      "bande": "ui",
+      "L": 93.8,
+      "C": 5.3,
+      "h": 94,
+      "gray": 93,
+      "nearestPlayer": {
+        "d": 23,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 17.9,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 13.2,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 13.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "chalk_color",
+      "hex": "#E9C98A",
+      "fr": "craie jaune",
+      "bande": "ui",
+      "L": 82.3,
+      "C": 35.7,
+      "h": 85,
+      "gray": 79.7,
+      "nearestPlayer": {
+        "d": 19.1,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.3,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 10.4,
+          "id": "star"
+        },
+        "tritanopie": {
+          "d": 15.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "slate_board",
+      "hex": "#2F3634",
+      "fr": "ardoise",
+      "bande": "ui",
+      "L": 21.9,
+      "C": 3.5,
+      "h": 176,
+      "gray": 20.5,
+      "nearestPlayer": {
+        "d": 41.2,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 37.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 34.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 33.5,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "guestbook_page",
+      "hex": "#F2E8D2",
+      "fr": "papier du livre d'or",
+      "bande": "ui",
+      "L": 92.2,
+      "C": 11.9,
+      "h": 91,
+      "gray": 91.2,
+      "nearestPlayer": {
+        "d": 20.5,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 16.4,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 17.7,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 18.1,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "interface",
+      "id": "ticket_rail",
+      "hex": "#8E9499",
+      "fr": "rail à tickets",
+      "bande": "ui",
+      "L": 61,
+      "C": 3.6,
+      "h": 251,
+      "gray": 57.7,
+      "nearestPlayer": {
+        "d": 18.8,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.5,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 7.9,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 12.5,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_light_cream",
+      "hex": "#EEE6D6",
+      "fr": "crème",
+      "bande": "clair",
+      "L": 91.5,
+      "C": 8.7,
+      "h": 90,
+      "gray": 90.4,
+      "nearestPlayer": {
+        "d": 21.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 17.9,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 15.4,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 16.4,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_light_sky",
+      "hex": "#DDE6EC",
+      "fr": "ciel pâle",
+      "bande": "clair",
+      "L": 90.8,
+      "C": 4.4,
+      "h": 245,
+      "gray": 89.6,
+      "nearestPlayer": {
+        "d": 21.1,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.1,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 5.5,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 7.4,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_light_rose",
+      "hex": "#EEDCD6",
+      "fr": "rose pâle",
+      "bande": "clair",
+      "L": 89,
+      "C": 7.3,
+      "h": 45,
+      "gray": 87.6,
+      "nearestPlayer": {
+        "d": 25.9,
+        "id": "planet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.5,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 11.8,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 20.8,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_light_sage",
+      "hex": "#DDE6D4",
+      "fr": "sauge pâle",
+      "bande": "clair",
+      "L": 90.2,
+      "C": 9.9,
+      "h": 129,
+      "gray": 88.9,
+      "nearestPlayer": {
+        "d": 19.9,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 16.5,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 15.3,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 6.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_dark_indigo",
+      "hex": "#2B2F45",
+      "fr": "indigo",
+      "bande": "sombre",
+      "L": 19.9,
+      "C": 15,
+      "h": 288,
+      "gray": 18.7,
+      "nearestPlayer": {
+        "d": 35.8,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 35.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 36.4,
+          "id": "crescent"
+        },
+        "tritanopie": {
+          "d": 33.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_dark_wine",
+      "hex": "#43262D",
+      "fr": "lie-de-vin",
+      "bande": "sombre",
+      "L": 19.1,
+      "C": 14.8,
+      "h": 5,
+      "gray": 17.5,
+      "nearestPlayer": {
+        "d": 41.7,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 38.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 38.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 38.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_dark_bottle",
+      "hex": "#23372E",
+      "fr": "vert bouteille",
+      "bande": "sombre",
+      "L": 21.2,
+      "C": 10.9,
+      "h": 163,
+      "gray": 19.6,
+      "nearestPlayer": {
+        "d": 42.7,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 37.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 32.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 34.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "joueurs",
+      "id": "top_dark_coffee",
+      "hex": "#3A2C25",
+      "fr": "brun expresso",
+      "bande": "sombre",
+      "L": 19.4,
+      "C": 8.7,
+      "h": 53,
+      "gray": 18.2,
+      "nearestPlayer": {
+        "d": 44.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 37.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 34.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 40.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_bordeaux",
+      "hex": "#6E2E35",
+      "fr": "bordeaux",
+      "bande": "maison",
+      "L": 28.2,
+      "C": 30.7,
+      "h": 18,
+      "gray": 23.6,
+      "nearestPlayer": {
+        "d": 36.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 31.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_bottle",
+      "hex": "#2F4F3E",
+      "fr": "vert bouteille",
+      "bande": "maison",
+      "L": 30.7,
+      "C": 17.4,
+      "h": 159,
+      "gray": 27.8,
+      "nearestPlayer": {
+        "d": 35.3,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 31.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_duck",
+      "hex": "#2F5560",
+      "fr": "bleu canard",
+      "bande": "maison",
+      "L": 33.9,
+      "C": 14.7,
+      "h": 226,
+      "gray": 30.5,
+      "nearestPlayer": {
+        "d": 26.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 28.2,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 28.8,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 27.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_navy",
+      "hex": "#313D5B",
+      "fr": "bleu nuit",
+      "bande": "maison",
+      "L": 26,
+      "C": 19.9,
+      "h": 282,
+      "gray": 23.8,
+      "nearestPlayer": {
+        "d": 30.7,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.3,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 31.2,
+          "id": "crescent"
+        },
+        "tritanopie": {
+          "d": 29.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_terracotta",
+      "hex": "#934B33",
+      "fr": "terre de Sienne",
+      "bande": "maison",
+      "L": 40.4,
+      "C": 39.5,
+      "h": 45,
+      "gray": 34.7,
+      "nearestPlayer": {
+        "d": 23.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 21.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 18.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 19.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_mustard",
+      "hex": "#94742A",
+      "fr": "moutarde",
+      "bande": "maison",
+      "L": 50.6,
+      "C": 44.2,
+      "h": 84,
+      "gray": 46.1,
+      "nearestPlayer": {
+        "d": 29.9,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.7,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 5.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 17.8,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_plum",
+      "hex": "#5A3450",
+      "fr": "prune",
+      "bande": "maison",
+      "L": 27.3,
+      "C": 23.9,
+      "h": 336,
+      "gray": 24.4,
+      "nearestPlayer": {
+        "d": 33.9,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 31.9,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 33.6,
+          "id": "crescent"
+        },
+        "tritanopie": {
+          "d": 33.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "maison",
+      "id": "house_olive",
+      "hex": "#5E6234",
+      "fr": "olive",
+      "bande": "maison",
+      "L": 40.2,
+      "C": 27.2,
+      "h": 110,
+      "gray": 36.8,
+      "nearestPlayer": {
+        "d": 31,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 22.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 14.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 25.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "employés",
+      "id": "staff_chambray",
+      "hex": "#93A3B5",
+      "fr": "chambray",
+      "bande": "tenue",
+      "L": 66.3,
+      "C": 11.3,
+      "h": 261,
+      "gray": 63.1,
+      "nearestPlayer": {
+        "d": 16.5,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.1,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 3.1,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 14.2,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "employés",
+      "id": "staff_linen",
+      "hex": "#C2B39A",
+      "fr": "lin naturel",
+      "bande": "tenue",
+      "L": 73.6,
+      "C": 14.8,
+      "h": 85,
+      "gray": 70.7,
+      "nearestPlayer": {
+        "d": 23.9,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 9.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "employés",
+      "id": "staff_stone",
+      "hex": "#9C978C",
+      "fr": "gris pierre",
+      "bande": "tenue",
+      "L": 62.6,
+      "C": 6.4,
+      "h": 91,
+      "gray": 59.3,
+      "nearestPlayer": {
+        "d": 24.6,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 10.1,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "employés",
+      "id": "staff_pastry",
+      "hex": "#C6B9A0",
+      "fr": "veste de pâtisserie lin",
+      "bande": "tenue",
+      "L": 75.6,
+      "C": 14.4,
+      "h": 88,
+      "gray": 72.9,
+      "nearestPlayer": {
+        "d": 22.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 7.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 18.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil presses",
+      "id": "presses_coat",
+      "hex": "#A6927A",
+      "fr": "manteau mastic",
+      "bande": "tenue",
+      "L": 61.7,
+      "C": 15.9,
+      "h": 77,
+      "gray": 58.2,
+      "nearestPlayer": {
+        "d": 24.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 2.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.7,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil presses",
+      "id": "presses_charcoal",
+      "hex": "#4E5258",
+      "fr": "anthracite",
+      "bande": "tenue",
+      "L": 34.7,
+      "C": 4.1,
+      "h": 267,
+      "gray": 32,
+      "nearestPlayer": {
+        "d": 28.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.8,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 29.8,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 24.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil presses",
+      "id": "presses_navy",
+      "hex": "#3E4A66",
+      "fr": "marine",
+      "bande": "tenue",
+      "L": 31.5,
+      "C": 18.1,
+      "h": 280,
+      "gray": 28.8,
+      "nearestPlayer": {
+        "d": 27.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 27.3,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 28.6,
+          "id": "crescent"
+        },
+        "tritanopie": {
+          "d": 26.1,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil presses",
+      "id": "presses_bag",
+      "hex": "#8A5A38",
+      "fr": "sacoche cognac",
+      "bande": "tenue",
+      "L": 42.8,
+      "C": 31.8,
+      "h": 60,
+      "gray": 38.3,
+      "nearestPlayer": {
+        "d": 24.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 19.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 14.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 20.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil flaneurs",
+      "id": "flaneurs_scarf",
+      "hex": "#B39656",
+      "fr": "écharpe moutarde douce",
+      "bande": "tenue",
+      "L": 63.4,
+      "C": 37.6,
+      "h": 86,
+      "gray": 59.4,
+      "nearestPlayer": {
+        "d": 26.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.8,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil flaneurs",
+      "id": "flaneurs_cord",
+      "hex": "#7A5A44",
+      "fr": "velours brun",
+      "bande": "tenue",
+      "L": 41,
+      "C": 20.5,
+      "h": 61,
+      "gray": 37.3,
+      "nearestPlayer": {
+        "d": 28.4,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 20.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 17.5,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 24.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil flaneurs",
+      "id": "flaneurs_knit",
+      "hex": "#707A86",
+      "fr": "pull gris bleuté",
+      "bande": "tenue",
+      "L": 50.8,
+      "C": 7.9,
+      "h": 262,
+      "gray": 47.3,
+      "nearestPlayer": {
+        "d": 16.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 17.9,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 12.1,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 13.1,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil flaneurs",
+      "id": "flaneurs_paper",
+      "hex": "#D9D0BE",
+      "fr": "journal",
+      "bande": "tenue",
+      "L": 83.7,
+      "C": 10,
+      "h": 90,
+      "gray": 81.8,
+      "nearestPlayer": {
+        "d": 21.9,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 14.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "profil familles",
+      "id": "familles_raincoat",
+      "hex": "#BE9F55",
+      "fr": "ciré moutarde",
+      "bande": "tenue",
+      "L": 66.8,
+      "C": 42.5,
+      "h": 87,
+      "gray": 62.8,
+      "nearestPlayer": {
+        "d": 24.5,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.1,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 8.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 11.3,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil familles",
+      "id": "familles_tomato",
+      "hex": "#B0574D",
+      "fr": "rouge tomate doux",
+      "bande": "tenue",
+      "L": 47.7,
+      "C": 42,
+      "h": 33,
+      "gray": 41.3,
+      "nearestPlayer": {
+        "d": 17.3,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 15.3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil familles",
+      "id": "familles_sky",
+      "hex": "#7E9CC0",
+      "fr": "bleu ciel moyen",
+      "bande": "tenue",
+      "L": 63.4,
+      "C": 22,
+      "h": 266,
+      "gray": 59.7,
+      "nearestPlayer": {
+        "d": 15.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.2,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 4.5,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 11.3,
+          "id": "comet"
+        }
+      }
+    },
+    {
+      "family": "profil familles",
+      "id": "familles_apple",
+      "hex": "#97A866",
+      "fr": "vert pomme doux",
+      "bande": "tenue",
+      "L": 66.2,
+      "C": 36.3,
+      "h": 118,
+      "gray": 62.6,
+      "nearestPlayer": {
+        "d": 17.7,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.2,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 5.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.8,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "profil gourmands",
+      "id": "gourmands_raspberry",
+      "hex": "#9E4E63",
+      "fr": "framboise douce",
+      "bande": "tenue",
+      "L": 43.7,
+      "C": 35.7,
+      "h": 5,
+      "gray": 37.9,
+      "nearestPlayer": {
+        "d": 23.2,
+        "id": "planet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 24.8,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 17,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil gourmands",
+      "id": "gourmands_caramel",
+      "hex": "#AF7A4D",
+      "fr": "caramel",
+      "bande": "tenue",
+      "L": 55.7,
+      "C": 36.2,
+      "h": 64,
+      "gray": 51,
+      "nearestPlayer": {
+        "d": 18,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.5,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 3.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12.5,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil gourmands",
+      "id": "gourmands_cream",
+      "hex": "#C9B897",
+      "fr": "crème pâtissière",
+      "bande": "tenue",
+      "L": 75.4,
+      "C": 19,
+      "h": 87,
+      "gray": 72.6,
+      "nearestPlayer": {
+        "d": 21.9,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.3,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 16.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil gourmands",
+      "id": "gourmands_box",
+      "hex": "#C9A8A0",
+      "fr": "boîte à gâteaux",
+      "bande": "tenue",
+      "L": 71.5,
+      "C": 13.8,
+      "h": 39,
+      "gray": 68.4,
+      "nearestPlayer": {
+        "d": 18.9,
+        "id": "planet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 12.3,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil promeneurs",
+      "id": "promeneurs_forest",
+      "hex": "#3F5E4A",
+      "fr": "vert forêt",
+      "bande": "tenue",
+      "L": 37,
+      "C": 18,
+      "h": 154,
+      "gray": 33.7,
+      "nearestPlayer": {
+        "d": 30.1,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 25.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 20.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 25.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil promeneurs",
+      "id": "promeneurs_rust",
+      "hex": "#A15A3B",
+      "fr": "sac rouille",
+      "bande": "tenue",
+      "L": 45.9,
+      "C": 40.1,
+      "h": 49,
+      "gray": 40.3,
+      "nearestPlayer": {
+        "d": 18.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 16.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 13.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 14.9,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil promeneurs",
+      "id": "promeneurs_beige",
+      "hex": "#C9B794",
+      "fr": "casquette beige",
+      "bande": "tenue",
+      "L": 75.1,
+      "C": 20.2,
+      "h": 87,
+      "gray": 72.3,
+      "nearestPlayer": {
+        "d": 21.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 5.9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 16.5,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil promeneurs",
+      "id": "promeneurs_khaki",
+      "hex": "#8A8463",
+      "fr": "kaki",
+      "bande": "tenue",
+      "L": 54.9,
+      "C": 19,
+      "h": 100,
+      "gray": 51.3,
+      "nearestPlayer": {
+        "d": 24.3,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 22.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil etudiants",
+      "id": "etudiants_burgundy",
+      "hex": "#6E3238",
+      "fr": "sweat bordeaux",
+      "bande": "tenue",
+      "L": 29.1,
+      "C": 28.7,
+      "h": 18,
+      "gray": 24.8,
+      "nearestPlayer": {
+        "d": 36.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 30.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil etudiants",
+      "id": "etudiants_denim",
+      "hex": "#4D5F7D",
+      "fr": "jean",
+      "bande": "tenue",
+      "L": 40,
+      "C": 19.1,
+      "h": 274,
+      "gray": 36.6,
+      "nearestPlayer": {
+        "d": 21.2,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 21.8,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 22.3,
+          "id": "crescent"
+        },
+        "tritanopie": {
+          "d": 20.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil etudiants",
+      "id": "etudiants_canvas",
+      "hex": "#B3A887",
+      "fr": "toile kaki clair",
+      "bande": "tenue",
+      "L": 69,
+      "C": 18.6,
+      "h": 94,
+      "gray": 65.9,
+      "nearestPlayer": {
+        "d": 23.4,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 2.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 18,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil etudiants",
+      "id": "etudiants_headset",
+      "hex": "#2E2E33",
+      "fr": "casque audio",
+      "bande": "tenue",
+      "L": 19.1,
+      "C": 3.4,
+      "h": 291,
+      "gray": 18.2,
+      "nearestPlayer": {
+        "d": 40.5,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 39.5,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 38.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 35,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil teletravail",
+      "id": "teletravail_grey",
+      "hex": "#8E8B86",
+      "fr": "gris chiné",
+      "bande": "tenue",
+      "L": 58,
+      "C": 3.1,
+      "h": 87,
+      "gray": 54.6,
+      "nearestPlayer": {
+        "d": 25.6,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 14.5,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 17.2,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil teletravail",
+      "id": "teletravail_shirt",
+      "hex": "#A6B6C8",
+      "fr": "chemise bleu pâle",
+      "bande": "tenue",
+      "L": 73.4,
+      "C": 11.1,
+      "h": 261,
+      "gray": 70.5,
+      "nearestPlayer": {
+        "d": 20,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 6.3,
+          "id": "orb"
+        },
+        "protanopie": {
+          "d": 8.2,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 15.1,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "profil teletravail",
+      "id": "teletravail_laptop",
+      "hex": "#6F7379",
+      "fr": "ordinateur",
+      "bande": "tenue",
+      "L": 48.3,
+      "C": 3.8,
+      "h": 267,
+      "gray": 44.9,
+      "nearestPlayer": {
+        "d": 22,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 19.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 16,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 15.1,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil teletravail",
+      "id": "teletravail_bag",
+      "hex": "#34343A",
+      "fr": "sacoche noire",
+      "bande": "tenue",
+      "L": 21.9,
+      "C": 4,
+      "h": 291,
+      "gray": 20.6,
+      "nearestPlayer": {
+        "d": 38.8,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 38.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 37,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 33.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil brunch",
+      "id": "brunch_linen",
+      "hex": "#CF9A80",
+      "fr": "lin terracotta clair",
+      "bande": "tenue",
+      "L": 68,
+      "C": 27,
+      "h": 53,
+      "gray": 64.1,
+      "nearestPlayer": {
+        "d": 16.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 2.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 6.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "profil brunch",
+      "id": "brunch_sage",
+      "hex": "#8E9F7B",
+      "fr": "robe sauge",
+      "bande": "tenue",
+      "L": 63.3,
+      "C": 21.1,
+      "h": 127,
+      "gray": 59.9,
+      "nearestPlayer": {
+        "d": 16,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 2.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 3.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.1,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil brunch",
+      "id": "brunch_denim",
+      "hex": "#5B6E86",
+      "fr": "veste en jean",
+      "bande": "tenue",
+      "L": 45.8,
+      "C": 15.5,
+      "h": 266,
+      "gray": 42.2,
+      "nearestPlayer": {
+        "d": 16.9,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 20.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 16.2,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 16.5,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil brunch",
+      "id": "brunch_shades",
+      "hex": "#2A2A2E",
+      "fr": "lunettes de soleil",
+      "bande": "tenue",
+      "L": 17.2,
+      "C": 2.8,
+      "h": 291,
+      "gray": 16.6,
+      "nearestPlayer": {
+        "d": 41.7,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 40.5,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 39.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 36.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil connaisseurs",
+      "id": "connaisseurs_roll",
+      "hex": "#414449",
+      "fr": "col roulé anthracite",
+      "bande": "tenue",
+      "L": 28.7,
+      "C": 3.4,
+      "h": 269,
+      "gray": 26.6,
+      "nearestPlayer": {
+        "d": 32.7,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 34.7,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 33.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 28.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil connaisseurs",
+      "id": "connaisseurs_cord",
+      "hex": "#6E6A45",
+      "fr": "velours olive",
+      "bande": "tenue",
+      "L": 44.3,
+      "C": 21.9,
+      "h": 102,
+      "gray": 40.9,
+      "nearestPlayer": {
+        "d": 29.3,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 17.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 12.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 25.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "profil connaisseurs",
+      "id": "connaisseurs_notebook",
+      "hex": "#6B4430",
+      "fr": "carnet de cuir",
+      "bande": "tenue",
+      "L": 32.9,
+      "C": 23.8,
+      "h": 53,
+      "gray": 29.4,
+      "nearestPlayer": {
+        "d": 33.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 27.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 23.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 28.5,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "profil connaisseurs",
+      "id": "connaisseurs_tote",
+      "hex": "#B48F60",
+      "fr": "sac kraft",
+      "bande": "tenue",
+      "L": 61.8,
+      "C": 31.3,
+      "h": 75,
+      "gray": 57.8,
+      "nearestPlayer": {
+        "d": 22.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.7,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 6.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 11.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_lime",
+      "hex": "#D5C4A5",
+      "fr": "chaux crème",
+      "bande": "decor",
+      "L": 79.8,
+      "C": 17.8,
+      "h": 87,
+      "gray": 77.4,
+      "nearestPlayer": {
+        "d": 21,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 18.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_beam",
+      "hex": "#6B4B35",
+      "fr": "poutres de chêne",
+      "bande": "haut",
+      "L": 34.8,
+      "C": 21.3,
+      "h": 60,
+      "gray": 31.5,
+      "nearestPlayer": {
+        "d": 33,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 26.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 21.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 28.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_ceiling",
+      "hex": "#C7B597",
+      "fr": "plafond entre solives",
+      "bande": "haut",
+      "L": 74.5,
+      "C": 17.7,
+      "h": 85,
+      "gray": 71.6,
+      "nearestPlayer": {
+        "d": 23.1,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 16.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_tomette",
+      "hex": "#A65A3E",
+      "fr": "tomettes",
+      "bande": "decor",
+      "L": 46.7,
+      "C": 41.2,
+      "h": 46,
+      "gray": 40.8,
+      "nearestPlayer": {
+        "d": 17.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 12.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.9,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_tomette_joint",
+      "hex": "#C8B393",
+      "fr": "joints",
+      "bande": "decor",
+      "L": 73.9,
+      "C": 19.3,
+      "h": 82,
+      "gray": 71,
+      "nearestPlayer": {
+        "d": 23.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 5.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.4,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_counter",
+      "hex": "#7E937B",
+      "fr": "bois peint sauge",
+      "bande": "decor",
+      "L": 58.7,
+      "C": 16,
+      "h": 140,
+      "gray": 55.2,
+      "nearestPlayer": {
+        "d": 16.1,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 8.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_shelf",
+      "hex": "#8B6544",
+      "fr": "chêne ciré",
+      "bande": "decor",
+      "L": 45.9,
+      "C": 27,
+      "h": 66,
+      "gray": 41.8,
+      "nearestPlayer": {
+        "d": 24.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 12.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 19.8,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_backbar",
+      "hex": "#4A5249",
+      "fr": "carreaux vert sombre",
+      "bande": "travail",
+      "L": 33.9,
+      "C": 6.7,
+      "h": 141,
+      "gray": 31.2,
+      "nearestPlayer": {
+        "d": 36.3,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 28.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 26.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_stone",
+      "hex": "#CDB892",
+      "fr": "pierre blonde",
+      "bande": "dehors",
+      "L": 75.7,
+      "C": 22.1,
+      "h": 86,
+      "gray": 72.8,
+      "nearestPlayer": {
+        "d": 21.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.4,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_stone_shade",
+      "hex": "#A8946F",
+      "fr": "pierre à l'ombre",
+      "bande": "dehors",
+      "L": 62.2,
+      "C": 22.4,
+      "h": 85,
+      "gray": 58.7,
+      "nearestPlayer": {
+        "d": 26.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 4.8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_shutter",
+      "hex": "#7F979B",
+      "fr": "volets gris-bleu",
+      "bande": "dehors",
+      "L": 60.8,
+      "C": 9,
+      "h": 213,
+      "gray": 57.3,
+      "nearestPlayer": {
+        "d": 20.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.6,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 7.4,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 14,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_roof",
+      "hex": "#A9674A",
+      "fr": "tuiles",
+      "bande": "dehors",
+      "L": 50.3,
+      "C": 36.1,
+      "h": 49,
+      "gray": 45.1,
+      "nearestPlayer": {
+        "d": 16.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 10,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_tree",
+      "hex": "#6E8A4C",
+      "fr": "tilleul",
+      "bande": "dehors",
+      "L": 54,
+      "C": 36.7,
+      "h": 125,
+      "gray": 50,
+      "nearestPlayer": {
+        "d": 17.4,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 2.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 18,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_bark",
+      "hex": "#9E9580",
+      "fr": "écorce du tilleul",
+      "bande": "dehors",
+      "L": 61.9,
+      "C": 12.3,
+      "h": 91,
+      "gray": 58.6,
+      "nearestPlayer": {
+        "d": 24.8,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 0.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 7.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_paving",
+      "hex": "#A49B8A",
+      "fr": "pavés de la place",
+      "bande": "dehors",
+      "L": 64.3,
+      "C": 10.1,
+      "h": 88,
+      "gray": 61.1,
+      "nearestPlayer": {
+        "d": 25.3,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 2.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 7.8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.5,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse village",
+      "id": "village_water",
+      "hex": "#7FA0A6",
+      "fr": "eau de la fontaine",
+      "bande": "dehors",
+      "L": 63.7,
+      "C": 12.1,
+      "h": 215,
+      "gray": 60.2,
+      "nearestPlayer": {
+        "d": 19.5,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.5,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 5.8,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 11.4,
+          "id": "comet"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_parquet",
+      "hex": "#97683F",
+      "fr": "parquet de chêne",
+      "bande": "decor",
+      "L": 48.1,
+      "C": 33.6,
+      "h": 65,
+      "gray": 43.5,
+      "nearestPlayer": {
+        "d": 22.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 16.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_wall",
+      "hex": "#D2BC97",
+      "fr": "enduit ocre pâle",
+      "bande": "decor",
+      "L": 77.2,
+      "C": 21.7,
+      "h": 84,
+      "gray": 74.5,
+      "nearestPlayer": {
+        "d": 21.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 7.3,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.7,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_panelling",
+      "hex": "#5B6B62",
+      "fr": "lambris vert-de-gris",
+      "bande": "decor",
+      "L": 43.7,
+      "C": 8.5,
+      "h": 159,
+      "gray": 40.4,
+      "nearestPlayer": {
+        "d": 27,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 19.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 20.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 19.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_moulding",
+      "hex": "#E3D6BF",
+      "fr": "moulures",
+      "bande": "haut",
+      "L": 86.1,
+      "C": 13,
+      "h": 87,
+      "gray": 84.4,
+      "nearestPlayer": {
+        "d": 21.1,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.9,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 14.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.8,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_kitchen_tile",
+      "hex": "#A9BDB1",
+      "fr": "faïence vert d'eau",
+      "bande": "decor",
+      "L": 74.8,
+      "C": 9.9,
+      "h": 158,
+      "gray": 72.1,
+      "nearestPlayer": {
+        "d": 18.3,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.9,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 12.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 12.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_oven",
+      "hex": "#3F3A36",
+      "fr": "fonte du four",
+      "bande": "travail",
+      "L": 24.8,
+      "C": 3.5,
+      "h": 68,
+      "gray": 23,
+      "nearestPlayer": {
+        "d": 42,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 35,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 31.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 34.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_shopfront",
+      "hex": "#2F4F55",
+      "fr": "devanture bleu-vert",
+      "bande": "dehors",
+      "L": 31.5,
+      "C": 12.3,
+      "h": 216,
+      "gray": 28.5,
+      "nearestPlayer": {
+        "d": 29.9,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 31.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 31.5,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 28.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_render_ochre",
+      "hex": "#D5AE78",
+      "fr": "enduit ocre",
+      "bande": "dehors",
+      "L": 73.4,
+      "C": 33.8,
+      "h": 78,
+      "gray": 70,
+      "nearestPlayer": {
+        "d": 25.2,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 9.2,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 5.8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 10.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_render_rose",
+      "hex": "#D6A794",
+      "fr": "enduit rose",
+      "bande": "dehors",
+      "L": 72.3,
+      "C": 22,
+      "h": 48,
+      "gray": 68.9,
+      "nearestPlayer": {
+        "d": 18.7,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 9.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 5.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 8.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_cobble",
+      "hex": "#8E877B",
+      "fr": "pavés",
+      "bande": "dehors",
+      "L": 56.6,
+      "C": 7.4,
+      "h": 87,
+      "gray": 53.2,
+      "nearestPlayer": {
+        "d": 26.1,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 12.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_hall_timber",
+      "hex": "#7A5538",
+      "fr": "charpente de la halle",
+      "bande": "dehors",
+      "L": 39.4,
+      "C": 25.8,
+      "h": 63,
+      "gray": 35.6,
+      "nearestPlayer": {
+        "d": 29.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 22.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 17.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 24.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_hall_roof",
+      "hex": "#9C5E45",
+      "fr": "tuiles de la halle",
+      "bande": "dehors",
+      "L": 46.3,
+      "C": 33.7,
+      "h": 48,
+      "gray": 41.3,
+      "nearestPlayer": {
+        "d": 19.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 13.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 15.9,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse bourg",
+      "id": "bourg_awning",
+      "hex": "#B7A27E",
+      "fr": "toile des étals",
+      "bande": "dehors",
+      "L": 67.6,
+      "C": 21.7,
+      "h": 84,
+      "gray": 64.3,
+      "nearestPlayer": {
+        "d": 25.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 0.9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 14.3,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_brick",
+      "hex": "#985842",
+      "fr": "brique",
+      "bande": "decor",
+      "L": 44.3,
+      "C": 34,
+      "h": 45,
+      "gray": 39.2,
+      "nearestPlayer": {
+        "d": 21,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 16.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 15.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 17.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_mortar",
+      "hex": "#C4B49C",
+      "fr": "joints de brique",
+      "bande": "decor",
+      "L": 74,
+      "C": 14.4,
+      "h": 83,
+      "gray": 71.2,
+      "nearestPlayer": {
+        "d": 24.2,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_steel",
+      "hex": "#3D4346",
+      "fr": "acier noirci",
+      "bande": "decor",
+      "L": 28,
+      "C": 3.2,
+      "h": 237,
+      "gray": 25.9,
+      "nearestPlayer": {
+        "d": 30.9,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 34.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 33.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_concrete",
+      "hex": "#A29D94",
+      "fr": "béton ciré",
+      "bande": "decor",
+      "L": 64.9,
+      "C": 5.3,
+      "h": 88,
+      "gray": 61.7,
+      "nearestPlayer": {
+        "d": 25,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 10.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.1,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_wood",
+      "hex": "#A6825E",
+      "fr": "bois brut",
+      "bande": "decor",
+      "L": 57,
+      "C": 26.3,
+      "h": 70,
+      "gray": 53,
+      "nearestPlayer": {
+        "d": 21.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.7,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_paint",
+      "hex": "#CFC9BD",
+      "fr": "blanc d'atelier",
+      "bande": "haut",
+      "L": 81.1,
+      "C": 6.7,
+      "h": 90,
+      "gray": 79,
+      "nearestPlayer": {
+        "d": 23.5,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.8,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 14.1,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_facade_brick",
+      "hex": "#A5684F",
+      "fr": "brique des façades",
+      "bande": "dehors",
+      "L": 50.1,
+      "C": 32.5,
+      "h": 48,
+      "gray": 45.2,
+      "nearestPlayer": {
+        "d": 17,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 11,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_facade_render",
+      "hex": "#CEC4B2",
+      "fr": "enduit clair",
+      "bande": "dehors",
+      "L": 79.5,
+      "C": 10.3,
+      "h": 87,
+      "gray": 77.2,
+      "nearestPlayer": {
+        "d": 22.9,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.3,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 11.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_tram",
+      "hex": "#3E6B7A",
+      "fr": "tramway",
+      "bande": "dehors",
+      "L": 42.7,
+      "C": 17.2,
+      "h": 230,
+      "gray": 38.6,
+      "nearestPlayer": {
+        "d": 21.3,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 22.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 18.8,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 21.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_asphalt",
+      "hex": "#5D5E60",
+      "fr": "chaussée",
+      "bande": "dehors",
+      "L": 39.9,
+      "C": 1.3,
+      "h": 272,
+      "gray": 36.8,
+      "nearestPlayer": {
+        "d": 29.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 24.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.5,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 21.7,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_sidewalk",
+      "hex": "#A8A39A",
+      "fr": "trottoir",
+      "bande": "dehors",
+      "L": 67.2,
+      "C": 5.3,
+      "h": 88,
+      "gray": 64.1,
+      "nearestPlayer": {
+        "d": 25.1,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 6.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 10.3,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.7,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse ville",
+      "id": "ville_tree",
+      "hex": "#5F7F4A",
+      "fr": "tilleuls",
+      "bande": "dehors",
+      "L": 49.6,
+      "C": 33.3,
+      "h": 131,
+      "gray": 45.6,
+      "nearestPlayer": {
+        "d": 18.7,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 13.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 5.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 19,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_mosaic",
+      "hex": "#CDBDA0",
+      "fr": "mosaïque crème",
+      "bande": "decor",
+      "L": 77.2,
+      "C": 16.8,
+      "h": 86,
+      "gray": 74.6,
+      "nearestPlayer": {
+        "d": 22,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_mosaic_motif",
+      "hex": "#7A4034",
+      "fr": "mosaïque brique",
+      "bande": "decor",
+      "L": 34.1,
+      "C": 30.2,
+      "h": 38,
+      "gray": 29.6,
+      "nearestPlayer": {
+        "d": 30.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 26.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 24,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 25.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_woodwork",
+      "hex": "#4E3A2D",
+      "fr": "boiseries sombres",
+      "bande": "travail",
+      "L": 26.3,
+      "C": 13.3,
+      "h": 59,
+      "gray": 24,
+      "nearestPlayer": {
+        "d": 39.9,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 32.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 28.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 35.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_ceiling",
+      "hex": "#E2D5BB",
+      "fr": "plafond mouluré",
+      "bande": "haut",
+      "L": 85.7,
+      "C": 14.5,
+      "h": 89,
+      "gray": 83.9,
+      "nearestPlayer": {
+        "d": 20.3,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.1,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 13.9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_mirror",
+      "hex": "#8E9A9C",
+      "fr": "miroir peint",
+      "bande": "decor",
+      "L": 62.7,
+      "C": 4.6,
+      "h": 213,
+      "gray": 59.4,
+      "nearestPlayer": {
+        "d": 19.5,
+        "id": "planet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 6.2,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 8.6,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 13.2,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_banquette",
+      "hex": "#6E2E35",
+      "fr": "moleskine",
+      "bande": "decor",
+      "L": 28.2,
+      "C": 30.7,
+      "h": 18,
+      "gray": 23.6,
+      "nearestPlayer": {
+        "d": 36.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 31.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_stone",
+      "hex": "#DBCBAE",
+      "fr": "pierre de taille",
+      "bande": "dehors",
+      "L": 82.3,
+      "C": 16.5,
+      "h": 87,
+      "gray": 80.1,
+      "nearestPlayer": {
+        "d": 20.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.8,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 11.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.6,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_stone_shade",
+      "hex": "#B9A688",
+      "fr": "pierre à l'ombre",
+      "bande": "dehors",
+      "L": 69,
+      "C": 18.2,
+      "h": 83,
+      "gray": 65.8,
+      "nearestPlayer": {
+        "d": 25.6,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 2.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 15.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_roof",
+      "hex": "#8A949B",
+      "fr": "toits de zinc",
+      "bande": "dehors",
+      "L": 60.7,
+      "C": 5.4,
+      "h": 247,
+      "gray": 57.4,
+      "nearestPlayer": {
+        "d": 16,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.1,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 7,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 12.7,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_ironwork",
+      "hex": "#2B3230",
+      "fr": "fer forgé",
+      "bande": "dehors",
+      "L": 20.1,
+      "C": 3.5,
+      "h": 176,
+      "gray": 19,
+      "nearestPlayer": {
+        "d": 42.1,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 38.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 35.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 34.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_asphalt",
+      "hex": "#545659",
+      "fr": "chaussée",
+      "bande": "dehors",
+      "L": 36.5,
+      "C": 2,
+      "h": 266,
+      "gray": 33.6,
+      "nearestPlayer": {
+        "d": 29.6,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 28.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 28.7,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 24,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_sidewalk",
+      "hex": "#A8A297",
+      "fr": "trottoir",
+      "bande": "dehors",
+      "L": 66.8,
+      "C": 6.5,
+      "h": 88,
+      "gray": 63.7,
+      "nearestPlayer": {
+        "d": 25.1,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 21,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_plane",
+      "hex": "#708D50",
+      "fr": "platanes",
+      "bande": "dehors",
+      "L": 55.1,
+      "C": 36.2,
+      "h": 126,
+      "gray": 51.1,
+      "nearestPlayer": {
+        "d": 16.6,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 17.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-quartier",
+      "id": "pq_kiosk",
+      "hex": "#3E5B4A",
+      "fr": "kiosque",
+      "bande": "dehors",
+      "L": 36,
+      "C": 16.2,
+      "h": 157,
+      "gray": 32.8,
+      "nearestPlayer": {
+        "d": 31.4,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 27.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 22.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 26,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_iron",
+      "hex": "#5E7A71",
+      "fr": "fer peint vert-de-gris",
+      "bande": "decor",
+      "L": 48.9,
+      "C": 12.2,
+      "h": 172,
+      "gray": 45.3,
+      "nearestPlayer": {
+        "d": 21.7,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 18.8,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 17.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_parquet",
+      "hex": "#8A5A38",
+      "fr": "parquet en point de Hongrie",
+      "bande": "decor",
+      "L": 42.8,
+      "C": 31.8,
+      "h": 60,
+      "gray": 38.3,
+      "nearestPlayer": {
+        "d": 24.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 19.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 14.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 20.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_wall",
+      "hex": "#D3C2A3",
+      "fr": "stuc clair",
+      "bande": "decor",
+      "L": 79.1,
+      "C": 17.8,
+      "h": 86,
+      "gray": 76.6,
+      "nearestPlayer": {
+        "d": 21.2,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 17.9,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_roaster",
+      "hex": "#2F3E3A",
+      "fr": "émail vert sombre",
+      "bande": "travail",
+      "L": 24.8,
+      "C": 7.1,
+      "h": 176,
+      "gray": 22.9,
+      "nearestPlayer": {
+        "d": 40.9,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 36,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 32.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 31.7,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_lab_tile",
+      "hex": "#C1CAC2",
+      "fr": "faïence du laboratoire",
+      "bande": "decor",
+      "L": 80.4,
+      "C": 5.4,
+      "h": 147,
+      "gray": 78.2,
+      "nearestPlayer": {
+        "d": 20.2,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.9,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 11.2,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 9.3,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_stair",
+      "hex": "#6F4A33",
+      "fr": "noyer des marches",
+      "bande": "decor",
+      "L": 35,
+      "C": 23.8,
+      "h": 57,
+      "gray": 31.5,
+      "nearestPlayer": {
+        "d": 32.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 26.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 21.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 27.4,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_sky_glass",
+      "hex": "#BCCBD0",
+      "fr": "ciel à travers la verrière",
+      "bande": "dehors",
+      "L": 80.7,
+      "C": 5.9,
+      "h": 226,
+      "gray": 78.5,
+      "nearestPlayer": {
+        "d": 18.4,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.8,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 5.3,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 10,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_gallery_wood",
+      "hex": "#5A3F2E",
+      "fr": "devantures de la galerie",
+      "bande": "dehors",
+      "L": 29.2,
+      "C": 17.8,
+      "h": 58,
+      "gray": 26.5,
+      "nearestPlayer": {
+        "d": 37.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 30.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 26.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 32.5,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_gallery_stone",
+      "hex": "#D9CCB2",
+      "fr": "pierre de la galerie",
+      "bande": "dehors",
+      "L": 82.5,
+      "C": 14.6,
+      "h": 89,
+      "gray": 80.3,
+      "nearestPlayer": {
+        "d": 20.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.6,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 11.9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.3,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "adresse paris-maison",
+      "id": "pm_gallery_floor",
+      "hex": "#B8AA90",
+      "fr": "dallage de la galerie",
+      "bande": "dehors",
+      "L": 70.1,
+      "C": 15.3,
+      "h": 87,
+      "gray": 67.1,
+      "nearestPlayer": {
+        "d": 24.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 4.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 16.9,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style campagne",
+      "id": "campagne_oak",
+      "hex": "#B3834F",
+      "fr": "chêne miel",
+      "bande": "decor",
+      "L": 58.4,
+      "C": 37.3,
+      "h": 70,
+      "gray": 53.9,
+      "nearestPlayer": {
+        "d": 20.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.4,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 11.2,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style campagne",
+      "id": "campagne_linen",
+      "hex": "#D4C7AE",
+      "fr": "lin écru",
+      "bande": "decor",
+      "L": 80.7,
+      "C": 14.2,
+      "h": 88,
+      "gray": 78.4,
+      "nearestPlayer": {
+        "d": 21.3,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.6,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 11,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.7,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style campagne",
+      "id": "campagne_clay",
+      "hex": "#A65A3D",
+      "fr": "terre cuite",
+      "bande": "decor",
+      "L": 46.7,
+      "C": 41.6,
+      "h": 47,
+      "gray": 40.8,
+      "nearestPlayer": {
+        "d": 17.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 12.9,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.9,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style campagne",
+      "id": "campagne_sage",
+      "hex": "#8C9F84",
+      "fr": "sauge",
+      "bande": "decor",
+      "L": 63.4,
+      "C": 16.8,
+      "h": 135,
+      "gray": 60,
+      "nearestPlayer": {
+        "d": 15.8,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 1.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 5.2,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 16.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style campagne",
+      "id": "campagne_faience",
+      "hex": "#93A9BC",
+      "fr": "bleu faïence",
+      "bande": "decor",
+      "L": 68.2,
+      "C": 12.8,
+      "h": 254,
+      "gray": 65,
+      "nearestPlayer": {
+        "d": 16.1,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.6,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 4.5,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 14,
+          "id": "comet"
+        }
+      }
+    },
+    {
+      "family": "style campagne",
+      "id": "campagne_straw",
+      "hex": "#C9AE76",
+      "fr": "paille",
+      "bande": "decor",
+      "L": 72.2,
+      "C": 32.4,
+      "h": 86,
+      "gray": 68.9,
+      "nearestPlayer": {
+        "d": 22.1,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 9,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 5.5,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 12.9,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_moleskine",
+      "hex": "#6B2E33",
+      "fr": "moleskine bordeaux",
+      "bande": "decor",
+      "L": 27.6,
+      "C": 29.5,
+      "h": 20,
+      "gray": 23.3,
+      "nearestPlayer": {
+        "d": 37,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 31,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 31.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29.9,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_wood",
+      "hex": "#4F3426",
+      "fr": "bois foncé",
+      "bande": "travail",
+      "L": 24.5,
+      "C": 17.1,
+      "h": 53,
+      "gray": 22.2,
+      "nearestPlayer": {
+        "d": 39.8,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 34.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 29.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 35.1,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_brass",
+      "hex": "#C2A05A",
+      "fr": "laiton",
+      "bande": "decor",
+      "L": 67.5,
+      "C": 41,
+      "h": 85,
+      "gray": 63.6,
+      "nearestPlayer": {
+        "d": 25,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 4.6,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 7.8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 10.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_zinc",
+      "hex": "#858C91",
+      "fr": "zinc",
+      "bande": "travail",
+      "L": 57.8,
+      "C": 3.9,
+      "h": 247,
+      "gray": 54.5,
+      "nearestPlayer": {
+        "d": 17.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.6,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 9.1,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 12,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_tile_dark",
+      "hex": "#2E2C2B",
+      "fr": "carreau noir",
+      "bande": "decor",
+      "L": 18.2,
+      "C": 1.2,
+      "h": 55,
+      "gray": 17.4,
+      "nearestPlayer": {
+        "d": 43.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 39.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 36.3,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 36.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_tile_light",
+      "hex": "#D3C7B0",
+      "fr": "carreau crème",
+      "bande": "decor",
+      "L": 80.6,
+      "C": 13,
+      "h": 88,
+      "gray": 78.4,
+      "nearestPlayer": {
+        "d": 21.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 11.3,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.1,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "style bistrot",
+      "id": "bistrot_marble",
+      "hex": "#4F5A55",
+      "fr": "marbre vert-gris",
+      "bande": "travail",
+      "L": 37.2,
+      "C": 5.6,
+      "h": 165,
+      "gray": 34.2,
+      "nearestPlayer": {
+        "d": 33.8,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 26.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 25.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 23.8,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style nordique",
+      "id": "nordique_ash",
+      "hex": "#C4A77E",
+      "fr": "frêne miel",
+      "bande": "decor",
+      "L": 70.1,
+      "C": 25.6,
+      "h": 79,
+      "gray": 66.7,
+      "nearestPlayer": {
+        "d": 25.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 10.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 1.8,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 12.1,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style nordique",
+      "id": "nordique_white",
+      "hex": "#DDD6C9",
+      "fr": "blanc cassé",
+      "bande": "haut",
+      "L": 85.8,
+      "C": 7.3,
+      "h": 89,
+      "gray": 84.1,
+      "nearestPlayer": {
+        "d": 22.8,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.3,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 14.3,
+          "id": "orb"
+        },
+        "tritanopie": {
+          "d": 15.4,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "style nordique",
+      "id": "nordique_wool",
+      "hex": "#A7A39C",
+      "fr": "laine grise",
+      "bande": "decor",
+      "L": 67.1,
+      "C": 4.1,
+      "h": 88,
+      "gray": 64.1,
+      "nearestPlayer": {
+        "d": 25.1,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 6.7,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 11.7,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 19.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style nordique",
+      "id": "nordique_blue",
+      "hex": "#97A9B5",
+      "fr": "bleu gris",
+      "bande": "decor",
+      "L": 68.2,
+      "C": 9.1,
+      "h": 246,
+      "gray": 65.1,
+      "nearestPlayer": {
+        "d": 16.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.7,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 5.5,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 15.5,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style nordique",
+      "id": "nordique_rose",
+      "hex": "#C9AAA0",
+      "fr": "rose poudré",
+      "bande": "decor",
+      "L": 72,
+      "C": 13.5,
+      "h": 44,
+      "gray": 69,
+      "nearestPlayer": {
+        "d": 20.2,
+        "id": "planet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 8.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 9.3,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 12.9,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style nordique",
+      "id": "nordique_fir",
+      "hex": "#4E6656",
+      "fr": "vert sapin",
+      "bande": "decor",
+      "L": 40.9,
+      "C": 14,
+      "h": 154,
+      "gray": 37.5,
+      "nearestPlayer": {
+        "d": 27.5,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 22.3,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 19.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 22.2,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style jardin",
+      "id": "jardin_rattan",
+      "hex": "#C9A26C",
+      "fr": "rotin",
+      "bande": "decor",
+      "L": 69,
+      "C": 34.3,
+      "h": 77,
+      "gray": 65.3,
+      "nearestPlayer": {
+        "d": 24.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.4,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 4.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 9.7,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style jardin",
+      "id": "jardin_leaf",
+      "hex": "#5D7D47",
+      "fr": "vert feuille",
+      "bande": "decor",
+      "L": 48.8,
+      "C": 33.8,
+      "h": 130,
+      "gray": 44.8,
+      "nearestPlayer": {
+        "d": 19.4,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 19.3,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style jardin",
+      "id": "jardin_water",
+      "hex": "#A9BDB1",
+      "fr": "vert d'eau",
+      "bande": "decor",
+      "L": 74.8,
+      "C": 9.9,
+      "h": 158,
+      "gray": 72.1,
+      "nearestPlayer": {
+        "d": 18.3,
+        "id": "orb"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.9,
+          "id": "planet"
+        },
+        "protanopie": {
+          "d": 12.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 12.6,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "style jardin",
+      "id": "jardin_pot",
+      "hex": "#A5603F",
+      "fr": "terre cuite",
+      "bande": "decor",
+      "L": 47.9,
+      "C": 39.5,
+      "h": 51,
+      "gray": 42.5,
+      "nearestPlayer": {
+        "d": 17.5,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 15,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 11,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style jardin",
+      "id": "jardin_iron",
+      "hex": "#3E5A4C",
+      "fr": "fer peint vert",
+      "bande": "travail",
+      "L": 35.7,
+      "C": 14.6,
+      "h": 161,
+      "gray": 32.6,
+      "nearestPlayer": {
+        "d": 32,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 27.4,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 23.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 25.9,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style jardin",
+      "id": "jardin_tile",
+      "hex": "#C9B79A",
+      "fr": "carreau de ciment",
+      "bande": "decor",
+      "L": 75.2,
+      "C": 17.2,
+      "h": 84,
+      "gray": 72.4,
+      "nearestPlayer": {
+        "d": 23.1,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 11.2,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.6,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 16.8,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style atelier",
+      "id": "atelier_steel",
+      "hex": "#3D4346",
+      "fr": "acier",
+      "bande": "decor",
+      "L": 28,
+      "C": 3.2,
+      "h": 237,
+      "gray": 25.9,
+      "nearestPlayer": {
+        "d": 30.9,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 34.1,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 33.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 29.4,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style atelier",
+      "id": "atelier_brick",
+      "hex": "#985842",
+      "fr": "brique",
+      "bande": "decor",
+      "L": 44.3,
+      "C": 34,
+      "h": 45,
+      "gray": 39.2,
+      "nearestPlayer": {
+        "d": 21,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 16.8,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 15.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 17.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style atelier",
+      "id": "atelier_wood",
+      "hex": "#A6825E",
+      "fr": "bois brut",
+      "bande": "decor",
+      "L": 57,
+      "C": 26.3,
+      "h": 70,
+      "gray": 53,
+      "nearestPlayer": {
+        "d": 21.2,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 7.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 6.8,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 13.7,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style atelier",
+      "id": "atelier_concrete",
+      "hex": "#A29D94",
+      "fr": "béton",
+      "bande": "decor",
+      "L": 64.9,
+      "C": 5.3,
+      "h": 88,
+      "gray": 61.7,
+      "nearestPlayer": {
+        "d": 25,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 5.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 10.4,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.1,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style atelier",
+      "id": "atelier_leather",
+      "hex": "#7A4E33",
+      "fr": "cuir",
+      "bande": "decor",
+      "L": 37.5,
+      "C": 28.1,
+      "h": 57,
+      "gray": 33.5,
+      "nearestPlayer": {
+        "d": 29.3,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 24,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 19.4,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 24.8,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style atelier",
+      "id": "atelier_workblue",
+      "hex": "#4F6A8A",
+      "fr": "bleu de travail",
+      "bande": "decor",
+      "L": 44,
+      "C": 20.8,
+      "h": 267,
+      "gray": 40.2,
+      "nearestPlayer": {
+        "d": 18,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 18.9,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 18.1,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 18.6,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_teak",
+      "hex": "#93603A",
+      "fr": "teck",
+      "bande": "decor",
+      "L": 45.5,
+      "C": 34.3,
+      "h": 61,
+      "gray": 40.8,
+      "nearestPlayer": {
+        "d": 22.6,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 17.1,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 12.2,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 17.7,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_mustard",
+      "hex": "#BC9E52",
+      "fr": "formica moutarde",
+      "bande": "decor",
+      "L": 66.3,
+      "C": 43.3,
+      "h": 88,
+      "gray": 62.3,
+      "nearestPlayer": {
+        "d": 24.4,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 3.7,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 8.9,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 11.5,
+          "id": "planet"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_orange",
+      "hex": "#A8693A",
+      "fr": "orange brûlé",
+      "bande": "decor",
+      "L": 50.4,
+      "C": 41.9,
+      "h": 60,
+      "gray": 45.1,
+      "nearestPlayer": {
+        "d": 18.1,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14,
+          "id": "sun"
+        },
+        "protanopie": {
+          "d": 7.6,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 12.6,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_brown",
+      "hex": "#5B3B2A",
+      "fr": "brun chocolat",
+      "bande": "travail",
+      "L": 28.2,
+      "C": 20.2,
+      "h": 54,
+      "gray": 25.3,
+      "nearestPlayer": {
+        "d": 37,
+        "id": "sun"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 31.5,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 27.1,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 32.3,
+          "id": "sun"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_cream",
+      "hex": "#E3D6BA",
+      "fr": "crème",
+      "bande": "haut",
+      "L": 86,
+      "C": 15.4,
+      "h": 90,
+      "gray": 84.2,
+      "nearestPlayer": {
+        "d": 19.7,
+        "id": "star"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 14.6,
+          "id": "star"
+        },
+        "protanopie": {
+          "d": 14,
+          "id": "comet"
+        },
+        "tritanopie": {
+          "d": 20.2,
+          "id": "star"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_olive",
+      "hex": "#7D7F45",
+      "fr": "vert olive",
+      "bande": "decor",
+      "L": 51.8,
+      "C": 32.7,
+      "h": 108,
+      "gray": 48,
+      "nearestPlayer": {
+        "d": 23.9,
+        "id": "comet"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 12.9,
+          "id": "comet"
+        },
+        "protanopie": {
+          "d": 3.7,
+          "id": "sun"
+        },
+        "tritanopie": {
+          "d": 21.2,
+          "id": "crescent"
+        }
+      }
+    },
+    {
+      "family": "style retro",
+      "id": "retro_petrol",
+      "hex": "#3F6670",
+      "fr": "bleu pétrole",
+      "bande": "decor",
+      "L": 40.8,
+      "C": 14.8,
+      "h": 222,
+      "gray": 37,
+      "nearestPlayer": {
+        "d": 23.4,
+        "id": "crescent"
+      },
+      "nearestPlayerSimulated": {
+        "deuteranopie": {
+          "d": 24.3,
+          "id": "crescent"
+        },
+        "protanopie": {
+          "d": 21.3,
+          "id": "planet"
+        },
+        "tritanopie": {
+          "d": 22.8,
+          "id": "crescent"
+        }
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "pair": "orb/crescent",
+      "darkTop": "orb",
+      "lightTop": "crescent",
+      "topGap": 71.6,
+      "strapOnDarkTop": 62.9,
+      "strapOnLightTop": 35.8
+    },
+    {
+      "pair": "orb/star",
+      "darkTop": "star",
+      "lightTop": "orb",
+      "topGap": 71.6,
+      "strapOnDarkTop": 71.3,
+      "strapOnLightTop": 8.7
+    },
+    {
+      "pair": "orb/sun",
+      "darkTop": "orb",
+      "lightTop": "sun",
+      "topGap": 71.6,
+      "strapOnDarkTop": 62.9,
+      "strapOnLightTop": 29.4
+    },
+    {
+      "pair": "orb/planet",
+      "darkTop": "orb",
+      "lightTop": "planet",
+      "topGap": 71.6,
+      "strapOnDarkTop": 62.9,
+      "strapOnLightTop": 23.9
+    },
+    {
+      "pair": "orb/comet",
+      "darkTop": "orb",
+      "lightTop": "comet",
+      "topGap": 71.6,
+      "strapOnDarkTop": 62.9,
+      "strapOnLightTop": 27.4
+    },
+    {
+      "pair": "crescent/star",
+      "darkTop": "star",
+      "lightTop": "crescent",
+      "topGap": 71.6,
+      "strapOnDarkTop": 71.3,
+      "strapOnLightTop": 35.8
+    },
+    {
+      "pair": "crescent/sun",
+      "darkTop": "sun",
+      "lightTop": "crescent",
+      "topGap": 71.6,
+      "strapOnDarkTop": 42.2,
+      "strapOnLightTop": 35.8
+    },
+    {
+      "pair": "crescent/planet",
+      "darkTop": "planet",
+      "lightTop": "crescent",
+      "topGap": 71.6,
+      "strapOnDarkTop": 47.7,
+      "strapOnLightTop": 35.8
+    },
+    {
+      "pair": "crescent/comet",
+      "darkTop": "comet",
+      "lightTop": "crescent",
+      "topGap": 71.6,
+      "strapOnDarkTop": 44.2,
+      "strapOnLightTop": 35.8
+    },
+    {
+      "pair": "star/sun",
+      "darkTop": "star",
+      "lightTop": "sun",
+      "topGap": 71.6,
+      "strapOnDarkTop": 71.3,
+      "strapOnLightTop": 29.4
+    },
+    {
+      "pair": "star/planet",
+      "darkTop": "star",
+      "lightTop": "planet",
+      "topGap": 71.6,
+      "strapOnDarkTop": 71.3,
+      "strapOnLightTop": 23.9
+    },
+    {
+      "pair": "star/comet",
+      "darkTop": "star",
+      "lightTop": "comet",
+      "topGap": 71.6,
+      "strapOnDarkTop": 71.3,
+      "strapOnLightTop": 27.4
+    },
+    {
+      "pair": "sun/planet",
+      "darkTop": "planet",
+      "lightTop": "sun",
+      "topGap": 71.6,
+      "strapOnDarkTop": 47.7,
+      "strapOnLightTop": 29.4
+    },
+    {
+      "pair": "sun/comet",
+      "darkTop": "comet",
+      "lightTop": "sun",
+      "topGap": 71.6,
+      "strapOnDarkTop": 44.2,
+      "strapOnLightTop": 29.4
+    },
+    {
+      "pair": "planet/comet",
+      "darkTop": "planet",
+      "lightTop": "comet",
+      "topGap": 71.6,
+      "strapOnDarkTop": 47.7,
+      "strapOnLightTop": 27.4
+    }
+  ],
+  "minTopGap": 67.8,
+  "contrasts": [
+    {
+      "name": "hud_text sur hud_bg",
+      "fg": "#F6EEDF",
+      "bg": "#2B211C",
+      "ratio": 13.62,
+      "min": 7
+    },
+    {
+      "name": "hud_text_muted sur hud_bg",
+      "fg": "#CDBBA6",
+      "bg": "#2B211C",
+      "ratio": 8.42,
+      "min": 4.5
+    },
+    {
+      "name": "hud_accent sur hud_bg",
+      "fg": "#FFC857",
+      "bg": "#2B211C",
+      "ratio": 10.21,
+      "min": 4.5
+    },
+    {
+      "name": "hud_success sur hud_bg",
+      "fg": "#6BD69A",
+      "bg": "#2B211C",
+      "ratio": 8.76,
+      "min": 4.5
+    },
+    {
+      "name": "hud_error sur hud_bg",
+      "fg": "#FF6B81",
+      "bg": "#2B211C",
+      "ratio": 5.74,
+      "min": 4.5
+    },
+    {
+      "name": "hud_line sur hud_bg (décor)",
+      "fg": "#5C4A3E",
+      "bg": "#2B211C",
+      "ratio": 1.87,
+      "min": 1.5
+    },
+    {
+      "name": "craie sur ardoise",
+      "fg": "#F1EDE3",
+      "bg": "#2F3634",
+      "ratio": 10.58,
+      "min": 7
+    },
+    {
+      "name": "craie jaune sur ardoise",
+      "fg": "#E9C98A",
+      "bg": "#2F3634",
+      "ratio": 7.77,
+      "min": 4.5
+    },
+    {
+      "name": "encre sur papier",
+      "fg": "#2B2622",
+      "bg": "#FBF6EA",
+      "ratio": 13.88,
+      "min": 7
+    },
+    {
+      "name": "encre sur page du livre d'or",
+      "fg": "#2B2622",
+      "bg": "#F2E8D2",
+      "ratio": 12.29,
+      "min": 7
+    },
+    {
+      "name": "ambre foncé sur ambre",
+      "fg": "#5A3A10",
+      "bg": "#E0A030",
+      "ratio": 4.51,
+      "min": 4.5
+    },
+    {
+      "name": "symbole --player-on sur mauve (pire couleur)",
+      "fg": "#0E1126",
+      "bg": "#8D6CFF",
+      "ratio": 5.08,
+      "min": 4.5
+    },
+    {
+      "name": "liseré sombre sur haut clair",
+      "fg": "#1C1A26",
+      "bg": "#EEE6D6",
+      "ratio": 13.82,
+      "min": 7
+    }
+  ],
+  "surfaces": [
+    {
+      "surface": "walnut #5E4130",
+      "L": 30.3,
+      "gapWithPorcelain": 64.6
+    },
+    {
+      "surface": "oak_dark #7A5A3E",
+      "L": 40.9,
+      "gapWithPorcelain": 54
+    },
+    {
+      "surface": "slate #343938",
+      "L": 23.5,
+      "gapWithPorcelain": 71.4
+    },
+    {
+      "surface": "zinc #858C91",
+      "L": 57.8,
+      "gapWithPorcelain": 37.1
+    },
+    {
+      "surface": "marble_dark #4F5A55",
+      "L": 37.2,
+      "gapWithPorcelain": 57.7
+    },
+    {
+      "surface": "tray #4A3A31",
+      "L": 25.9,
+      "gapWithPorcelain": 69
+    },
+    {
+      "surface": "village_backbar #4A5249",
+      "L": 33.9,
+      "gapWithPorcelain": 61
+    },
+    {
+      "surface": "bourg_oven #3F3A36",
+      "L": 24.8,
+      "gapWithPorcelain": 70.1
+    },
+    {
+      "surface": "pq_woodwork #4E3A2D",
+      "L": 26.3,
+      "gapWithPorcelain": 68.6
+    },
+    {
+      "surface": "pm_roaster #2F3E3A",
+      "L": 24.8,
+      "gapWithPorcelain": 70.1
+    },
+    {
+      "surface": "bistrot_wood #4F3426",
+      "L": 24.5,
+      "gapWithPorcelain": 70.4
+    },
+    {
+      "surface": "bistrot_zinc #858C91",
+      "L": 57.8,
+      "gapWithPorcelain": 37.1
+    },
+    {
+      "surface": "bistrot_marble #4F5A55",
+      "L": 37.2,
+      "gapWithPorcelain": 57.7
+    },
+    {
+      "surface": "jardin_iron #3E5A4C",
+      "L": 35.7,
+      "gapWithPorcelain": 59.2
+    },
+    {
+      "surface": "retro_brown #5B3B2A",
+      "L": 28.2,
+      "gapWithPorcelain": 66.7
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,204 @@
+{
+  "generated": "node source/planches.cjs",
+  "planches": [
+    {
+      "svg": "palette.svg",
+      "png": "palette.png",
+      "width": 1920,
+      "height": 1830,
+      "montage": "controles/palette-controles.png",
+      "montageLabel": "Palette et rôles: vision normale, niveaux de gris, deutéranopie, protanopie",
+      "montageWidth": 1400
+    },
+    {
+      "svg": "adresse-village.svg",
+      "png": "adresse-village.png",
+      "width": 1920,
+      "height": 1430,
+      "crops": [
+        {
+          "x": 40,
+          "y": 140,
+          "w": 1366,
+          "h": 768,
+          "png": "controles/village-vue.png",
+          "gray": "controles/village-vue-gris.png",
+          "temporary": true,
+          "montage": "controles/village-vue-controles.png",
+          "montageLabel": "Village, derrière le comptoir: vision normale, niveaux de gris, deutéranopie, protanopie"
+        }
+      ]
+    },
+    {
+      "svg": "adresse-bourg.svg",
+      "png": "adresse-bourg.png",
+      "width": 1920,
+      "height": 1430,
+      "crops": [
+        {
+          "x": 40,
+          "y": 140,
+          "w": 1366,
+          "h": 768,
+          "png": "controles/bourg-vue.png",
+          "gray": "controles/bourg-vue-gris.png",
+          "temporary": true
+        }
+      ]
+    },
+    {
+      "svg": "adresse-ville.svg",
+      "png": "adresse-ville.png",
+      "width": 1920,
+      "height": 1430,
+      "crops": [
+        {
+          "x": 40,
+          "y": 140,
+          "w": 1366,
+          "h": 768,
+          "png": "controles/ville-vue.png",
+          "gray": "controles/ville-vue-gris.png",
+          "temporary": true
+        }
+      ]
+    },
+    {
+      "svg": "adresse-paris-quartier.svg",
+      "png": "adresse-paris-quartier.png",
+      "width": 1920,
+      "height": 1430,
+      "crops": [
+        {
+          "x": 40,
+          "y": 140,
+          "w": 1366,
+          "h": 768,
+          "png": "controles/paris-quartier-vue.png",
+          "gray": "controles/paris-quartier-vue-gris.png",
+          "temporary": true
+        }
+      ]
+    },
+    {
+      "svg": "adresse-paris-maison.svg",
+      "png": "adresse-paris-maison.png",
+      "width": 1920,
+      "height": 1430,
+      "crops": [
+        {
+          "x": 40,
+          "y": 140,
+          "w": 1366,
+          "h": 768,
+          "png": "controles/paris-maison-vue.png",
+          "gray": "controles/paris-maison-vue-gris.png",
+          "temporary": true
+        }
+      ]
+    },
+    {
+      "svg": "moments.svg",
+      "png": "moments.png",
+      "width": 1920,
+      "height": 1250,
+      "montage": "controles/moments-controles.png",
+      "montageLabel": "Les six moments: vision normale, niveaux de gris, deutéranopie, protanopie",
+      "montageWidth": 1400
+    },
+    {
+      "svg": "styles.svg",
+      "png": "styles.png",
+      "width": 1920,
+      "height": 1620,
+      "montage": "controles/styles-controles.png",
+      "montageLabel": "Les six styles: vision normale, niveaux de gris, deutéranopie, protanopie",
+      "montageWidth": 1400
+    },
+    {
+      "svg": "silhouettes.svg",
+      "png": "silhouettes.png",
+      "width": 1920,
+      "height": 1990,
+      "montage": "controles/silhouettes-controles.png",
+      "montageLabel": "Silhouettes et paires de joueurs: vision normale, niveaux de gris, deutéranopie, protanopie",
+      "montageWidth": 1400
+    },
+    {
+      "svg": "camera-echelle.svg",
+      "png": "camera-echelle.png",
+      "width": 1920,
+      "height": 1180
+    },
+    {
+      "svg": "references/chaise-paillee-campagne.svg",
+      "png": "references/chaise-paillee-campagne.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/gueridon-bistrot.svg",
+      "png": "references/gueridon-bistrot.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/tasse-cappuccino.svg",
+      "png": "references/tasse-cappuccino.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/machine-expresso.svg",
+      "png": "references/machine-expresso.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/suspension-emaillee.svg",
+      "png": "references/suspension-emaillee.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/plante-en-pot.svg",
+      "png": "references/plante-en-pot.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/avatar-face.svg",
+      "png": "references/avatar-face.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/avatar-dos.svg",
+      "png": "references/avatar-dos.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/client-presse-face.svg",
+      "png": "references/client-presse-face.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    },
+    {
+      "svg": "references/client-presse-dos.svg",
+      "png": "references/client-presse-dos.png",
+      "width": 1024,
+      "height": 1024,
+      "bg": "#EEE8DE"
+    }
+  ]
+}

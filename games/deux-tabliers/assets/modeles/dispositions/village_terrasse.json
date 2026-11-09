@@ -1,0 +1,64 @@
+{
+ "format": "deux-tabliers.disposition",
+ "version": "demo-0.1",
+ "nom": "village_terrasse",
+ "extensions": [
+  "terrasse"
+ ],
+ "repere": "x = x du plan, z = y du plan (sud), y = hauteur; rotation_deg autour de +Y, 0 = avant au sud",
+ "objets": [
+  {
+   "id": "gueridon_marbre",
+   "x": 5.5,
+   "y": 0.0,
+   "z": 14.75,
+   "rotation_deg": 0,
+   "pourquoi": "sous le store (plan village-maximum, table-6 et 7)"
+  },
+  {
+   "id": "chaise_fer_peint",
+   "x": 4.93,
+   "y": 0.0,
+   "z": 14.75,
+   "rotation_deg": 90
+  },
+  {
+   "id": "chaise_fer_peint",
+   "x": 6.07,
+   "y": 0.0,
+   "z": 14.75,
+   "rotation_deg": -90
+  },
+  {
+   "id": "gueridon_marbre",
+   "x": 7.4,
+   "y": 0.0,
+   "z": 14.75,
+   "rotation_deg": 0,
+   "pourquoi": "sous le store (plan village-maximum, table-6 et 7)"
+  },
+  {
+   "id": "chaise_fer_peint",
+   "x": 6.83,
+   "y": 0.0,
+   "z": 14.75,
+   "rotation_deg": 90
+  },
+  {
+   "id": "chaise_fer_peint",
+   "x": 7.97,
+   "y": 0.0,
+   "z": 14.75,
+   "rotation_deg": -90
+  },
+  {
+   "id": "jardinieres_terrasse",
+   "x": 4.35,
+   "y": 0.0,
+   "z": 15.25,
+   "rotation_deg": 0,
+   "pourquoi": "jardinière du plan (furniture-6), bord ouest de la terrasse"
+  }
+ ],
+ "modeles_manquants": []
+}

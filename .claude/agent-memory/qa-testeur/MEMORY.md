@@ -69,3 +69,23 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - L'interface du jeu écrit l'apostrophe typographique (’): les attentes de texte des tests de bout en bout doivent l'employer.
 - Contrôle I-08 (variables non remplies): les astuces gardent les jetons de touches et de `contentVars` (`{bigPurchase}`...), les répliques `{partner}`, `{henColorN}`, `{secret}`, remplis par l'interface; lettres, titres de quête et écrans arrivent déjà remplis.
 - Robot glouton: sac plein, il rachète un matelas chaque fois que le précédent tombe au sol (il ne compte que sac et coffre): ne pas lire sa taille d'état comme celle d'un vrai duo.
+
+## Deux Tabliers dans le faux hôte (vérifié le 2026-11-08, recette de nuit)
+
+- `pnpm --filter <jeu> typecheck lint test build` passe `lint test build` en arguments à `tsc` (TS5112): lancer les scripts un par un.
+- `deux-vues.html` reprend l'emplacement 1 de `localStorage['duo-sdk-dev:deux-tabliers:sauvegarde:1']` (champs de `StoredSaveSchema`, `data` = `JSON.stringify(world)`, membres `membre-hote` et `membre-invite`): poser la sauvegarde par `addInitScript` dans le seul cadre du haut (`window === window.top`). Les cadres du jeu sont ceux dont l'adresse contient `/jeu/`.
+- Sauvegardes de robot faites avec `fallbackPrepSeconds`: la préparation d'office laisse les tickets sur le rail; au-delà de 64 Kio de domaine `service`, la partie s'arrête au chargement. Filtrer `service.tickets` sur les groupes présents avant de charger, sauf pour prouver le défaut.
+- Caisse par le vrai poste: Agir maintenu 2,5 s plus 0,4 s par article au-delà du premier (neuf articles: 5,7 s); un robot qui relâche avant laisse le groupe à la caisse et la journée ne finit pas.
+- Sans verrouillage du pointeur, les `pointermove` synthétiques ne tournent pas la caméra: il faut d'abord un vrai clic sur la toile.
+- Deux navigateurs à deux vues WebGL logicielles en parallèle peuvent réveiller le chien de garde (« Le jeu ne répond plus »): une partie à la fois.
+- Le faux hôte ne reprend pas une partie en cours après la déconnexion de l'invité: arrêt chez l'hôte, relance depuis la sauvegarde.
+
+## Recette v0.2 de Deux Tabliers (vérifié le 2026-11-08)
+
+- Vraie sauvegarde d'une version passée: `git archive <commit> games/<jeu> | tar -x -C <tmp>`, lien `node_modules` vers celui du jeu, robot en Vitest dans la copie; les sauvegardes produites se versent dans `tests/donnees/`.
+- Journée accélérée (`secondsPerGameMinute` 0,05): `serviceSec` ne dépasse pas une soixantaine de secondes; un seuil « après 60 s de service » n'est jamais atteint.
+- Deux Tabliers: le stock peut différer de la somme des lots pendant un pas (tickets rendus après `reconcileLots`); contrôler un écart qui dure deux pas. La caisse peut être négative en journée, le report « à régler » (EC-06) ne se fait qu'au soir.
+- Faux hôte: une vue qui garde le verrouillage du pointeur reçoit aussi les clics faits sur l'autre vue (et donc les touches); `document.exitPointerLock()` dans les deux cadres avant de cliquer une vue. Filtrer les cadres du jeu par `url().startsWith('http://localhost:<port du jeu>')`: l'adresse de `deux-vues.html` contient aussi celle du jeu (`?jeu=`).
+- Écran du matin et bilan du soir de Deux Tabliers: modaux, Tab n'y ouvre pas le téléphone; une action marketing ne se lance qu'après « Commencer la journée » d'un seul joueur.
+- Sonde WebGL par `addInitScript` de contexte (programmes vivants, appels et triangles par image via `requestAnimationFrame`): s'applique aux cadres du jeu. En 1600x640, deux vues logicielles réveillent le chien de garde; 1280x520 passe.
+- Avant de publier un jeu: comparer `version` de `duo-game.json` aux étiquettes `jeu-<id>-v*` de `git ls-remote --tags origin`.

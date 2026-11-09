@@ -289,3 +289,55 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Une scène partagée ne vérifie pas que son habitant est là (sauf annonces): caler le `when` sur son emploi du temps, sinon il parle sans être à l'écran.
 - Les six habitants de la démo ont des compléments dans `habitants-0-13.json`: y insérer les répliques en cherchant `"id": "<habitant>"` touche les deux fichiers et double les identifiants. Choisir un seul fichier par habitant.
 - Robot à l'abri: faire partir la première quête d'une suite d'une rencontre (`dialogue_done <habitant>_meet`) d'un habitant que le robot ne va pas voir.
+
+## Cosy Café: simulation client par client (vérifié le 2026-11-07, `docs/jeux/cosy-cafe/simulations/cosy_cafe.py`)
+
+- Temps compressé (une minute de jeu = 1 s): le rapport séjour / travail d'un client tombe à 1 ou 2 (15 à 20 dans un vrai café). On ne remplit pas une grande salle en servant plus vite: on allonge les séjours (en minutes de jeu) et l'on dimensionne les places par la simulation, sous le plafond C2 de l'architecte.
+- Renoncement à l'entrée: sans lui, les commandes s'accumulent et le service finit 7 min après la fermeture; avec une file seule, rien ne renonce au comptoir. Règle qui marche: attente estimée = groupes qui attendent x 25 s / personnes qui servent, comparée à la patience du profil.
+- Piège: un départ calculé par `min(maintenant + séjour, fermeture)` peut tomber dans le passé; l'horloge recule et recompte du temps (usages de postes à 700 %). Garder `assert t >= self.t` dans la boucle d'événements.
+- Vitesse: ranger la file de préparation par poste et sauter la répartition quand personne n'est libre (97 vers 51 ms par journée à 300 groupes); une partie de 120 jours se joue en 1,3 s, 120 parties en 160 s: assez pour garder la simulation fine dans le Monte-Carlo, sans modèle approché à caler.
+- Salaires réalistes (95 à 130 € par jour) face à une journée de 13 minutes: un employé sert 15 groupes et coûte 40 % des recettes. Rendre les employés plus rapides que les joueurs (des professionnels) plutôt que d'afficher des salaires irréalistes; prix parisiens à x1,8 et x2 (plausibles).
+- Déménagement le lundi, défi le dimanche: les durées sautent par semaines. Une épargne finie deux jours après le défi coûte une semaine: faire commencer l'épargne une fois le lieu du défi payé, et caler l'installation sur ce qui s'épargne entre cet achat et le défi. Toujours mesurer la condition bloquante de chaque départ (réputation, extension, épargne, offre).
+- Moins de décoration ralentit le duo médian (réputation plus lente): l'ambiance pèse vraiment; ne pas la traiter comme un luxe dans les politiques d'achat.
+- `python3 -I` ignore `PYTHONDONTWRITEBYTECODE`: lancer avec `-I -B`, sinon un `__pycache__` apparaît dans `simulations/`.
+- Contrôle croisé rapide: marqueurs `<!-- table:id -->` et `<!-- val:clé -->` dans le cahier; `resultats.md` porte l'empreinte des tables de paramètres; `--croise` relit les résultats sans relancer le Monte-Carlo. Un script de remplissage dans le scratchpad recopie les tables (jamais à la main).
+- Documents des autres membres à lire tôt: `plans/plans.json` (noms, places par pièce, extensions: Ormeval, place du Tilleul; Mérelles, ancienne pâtisserie, marché du jeudi), bible (roue des styles, fournisseurs, signes des profils), `son.md` (aucun son de qualité ni de client déçu), `technique.md` section 11 (C1 à C26).
+- Titres vérifiés le 2026-11-07, sans résultat sous le nom exact: « Deux Tabliers », « L'Ardoise du jour », « Comptoir à deux », « Petit noir, grand crème », « Les Deux Tasses », « Guide de la Tasse », « Tasse d'or ». « Cosy Café »: pris (Tailside: Cozy Cafe Sim, Steam 2026; itch.io).
+
+## Démo de Deux Tabliers (vérifié le 2026-11-07, `docs/jeux/cosy-cafe/demo/simulations/demo_v0_1.py`)
+
+- Une extension construite « le lundi suivant » ne sert jamais à un défi tenu six jours plus tard: dans une démo courte, mesurer le jour d'achat contre le jour où elle doit servir (terrasse posée dans la nuit, pièce du fond en deux nuits).
+- Compter la surface de la terrasse dans le décor dilue la salle: ouvrir la terrasse faisait perdre 12 points d'ambiance. La terrasse ne compte pas dans la surface du décor.
+- Paliers « réputation ou jour fixe, le premier des deux » et défi à date fixe: la démo ne bloque jamais, l'argent reste la seule limite.
+- Le script de démo importe `cosy_cafe.py` par `importlib` (enregistrer le module dans `sys.modules` avant `exec_module`, sinon les dataclasses plantent) et relit les JSON générés: c'est le contrôle croisé.
+- Consigne du client (nuit du 2026-11-07): simulations courtes, 8 parties par duo et par ordre suffisent (3 s en tout).
+
+## Deux Tabliers: économie et stock (vérifié le 2026-11-08)
+
+- Dans la v0.1, `deliver` ne débite rien: les matières sont payées à la vente (`clients.ts`), et le panier du soir donne de la réputation pour des invendus gratuits. Toujours vérifier qui paie quoi et quand avant de régler une économie de stock.
+- Simuler une variante d'économie sans copier `demo_v0_1.py`: remplacer `cc.Service.encaisser` (noter les recettes vendues) et `cc.Service.bilan` (rendre un autre `cout`), puis appeler `d1.jouer` (script `demo/simulations/demo_v0_2.py`, 5 s pour 96 parties).
+- Une commande habituelle par moyenne des trois derniers jours rate les recettes nouvelles (aucun historique): reprendre la base de l'ardoise ingrédient par ingrédient, sinon les ruptures doublent. Monter la marge n'y change presque rien.
+
+## Remises et marketing (Deux Tabliers, 2026-11-08)
+
+- Le facteur de prix du jeu (`priceFactor` linéaire, pente = sensibilité, borné 0,4 à 1,25) rend une remise rentable seulement si sensibilité x part remisée de l'indice > part remisée du ticket / taux de marge: avec l'indice moyenné sur toutes les envies, aucune remise ne paie jamais. Lire l'indice d'une heure douce sur les seules lignes remisées (ce qu'annonce l'ardoise).
+- Valoriser un groupe en plus au ticket de son profil, pas au ticket moyen du jour: un pressé vaut 2,5 €, une famille 14 €; l'erreur inversait le verdict (heure douce du matin « rentable »).
+- Au village, le week-end et la fête sont presque pleins (capacité douce 42 puis 46 groupes par jour): un levier ne paie qu'en semaine; c'est ce qui crée le choix du moment. Simulation: `docs/jeux/cosy-cafe/demo/simulations/remises_marketing_v0_2.py` (lit les JSON dans le document).
+
+## Deux Tabliers: lire un bilan et une séance (vérifié le 2026-11-09)
+
+- Le `result` du bilan 0.2.4 retire la marchandise reçue en entier le jour de la livraison: tout jour de livraison (surtout le premier, qui achète le sec) paraît en perte. Juger une économie de jour par la marge (ventes - coût des ventes - frais - invendus), le stock à part.
+- Reconstituer une journée de séance: suivre la caisse des états du carnet (`etatEnvoi.caisse`, tickets payés) et recalculer `suggestedOrder` à part; la livraison du matin se retrouve au centime (aube = caisse veille - loyer - livraison).
+- Une montée en charge (`warmup.announced`) appliquée à la commande ET à un historique déjà réduit compte deux fois: ranger l'historique divisé par l'affluence annoncée du jour.
+- Le mardi calme suit le rythme du duo (`holdCalmArrival`): un duo qui bloque sur un poste reçoit moins de groupes; une règle d'économie du premier jour doit tenir pour un duo lent (simuler « sert 60 % »).
+- Script court réutilisable: `docs/jeux/cosy-cafe/demo/simulations/premiers_jours_v0_3.py` (lit les JSON du jeu, 5 s; variantes en dictionnaires).
+- Le grep complet du dépôt pour les tirets dépasse 2 minutes: le lancer sur les fichiers touchés.
+
+## Deux Tabliers: analyse d'écart avec le genre (2026-11-09)
+
+- Avant de proposer un retour visuel ou une bulle, chercher si l'événement existe déjà: beaucoup sont émis par la simulation et lus par le seul audio (`clientele-order`, `service-paid`, `service-tip`, `clientele-passed-by`). Le brancher à l'interface est un « vite fait ».
+- Seuls les personnages (`char_*`) viennent de Meshy; postes, vaisselle et nourriture sont en Blender scripté. Les « c'est quoi ? » d'une séance visent presque toujours ces formes simples ou une entrée sans modèle de `FURNITURE_MODEL` (bloc de substitution).
+- « Carte de fidélité » est déjà une remise du jeu (`remises-marketing-v0-2.md`): ne pas réemployer ce nom pour une progression.
+- La table 6.4 de `demo-v0-1.md` date d'avant la montée en charge de la 0.2.3: tout seuil calculé dessus se recale avec `demo/simulations/demo_v0_1.py`.
+- Les scripts de simulation de la démo sont dans `docs/jeux/cosy-cafe/demo/simulations/`, pas dans `docs/jeux/cosy-cafe/simulations/`.
+- Un document long s'écrit en plusieurs ajouts (un par section), jamais en un seul appel.

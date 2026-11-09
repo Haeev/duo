@@ -1,0 +1,497 @@
+{
+ "asset": "char_client_brunch",
+ "os": {
+  "RightHandThumb1": {
+   "parent": "RightHand",
+   "longueur_m": 0.0279
+  },
+  "RightHandThumb2": {
+   "parent": "RightHandThumb1",
+   "longueur_m": 0.0279
+  },
+  "RightHandIndex1": {
+   "parent": "RightHand",
+   "longueur_m": 0.0361
+  },
+  "RightHandIndex2": {
+   "parent": "RightHandIndex1",
+   "longueur_m": 0.0403
+  },
+  "RightHandFingers1": {
+   "parent": "RightHand",
+   "longueur_m": 0.0349
+  },
+  "RightHandFingers2": {
+   "parent": "RightHandFingers1",
+   "longueur_m": 0.0359
+  },
+  "LeftHandThumb1": {
+   "parent": "LeftHand",
+   "longueur_m": 0.0236
+  },
+  "LeftHandThumb2": {
+   "parent": "LeftHandThumb1",
+   "longueur_m": 0.0236
+  },
+  "LeftHandIndex1": {
+   "parent": "LeftHand",
+   "longueur_m": 0.0371
+  },
+  "LeftHandIndex2": {
+   "parent": "LeftHandIndex1",
+   "longueur_m": 0.0414
+  },
+  "LeftHandFingers1": {
+   "parent": "LeftHand",
+   "longueur_m": 0.0404
+  },
+  "LeftHandFingers2": {
+   "parent": "LeftHandFingers1",
+   "longueur_m": 0.0427
+  }
+ },
+ "poses": {
+  "relaxed": {
+   "RightHandThumb1": {
+    "flexion_x_deg": 8,
+    "rotation_z_deg": 6.0,
+    "quaternion_local_xyzw": [
+     0.317969,
+     -0.419153,
+     0.05234,
+     0.848803
+    ]
+   },
+   "RightHandThumb2": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": 0.0,
+    "quaternion_local_xyzw": [
+     0.104528,
+     0.0,
+     0.0,
+     0.994522
+    ]
+   },
+   "RightHandIndex1": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": 0.0,
+    "quaternion_local_xyzw": [
+     0.140533,
+     -0.361868,
+     0.25893,
+     0.884453
+    ]
+   },
+   "RightHandIndex2": {
+    "flexion_x_deg": 22,
+    "rotation_z_deg": 0.0,
+    "quaternion_local_xyzw": [
+     0.205813,
+     -0.028709,
+     -0.075501,
+     0.975252
+    ]
+   },
+   "RightHandFingers1": {
+    "flexion_x_deg": 18,
+    "rotation_z_deg": 0.0,
+    "quaternion_local_xyzw": [
+     0.235633,
+     -0.39529,
+     0.043371,
+     0.886759
+    ]
+   },
+   "RightHandFingers2": {
+    "flexion_x_deg": 30,
+    "rotation_z_deg": 0.0,
+    "quaternion_local_xyzw": [
+     0.328786,
+     0.075626,
+     0.18557,
+     0.9229
+    ]
+   },
+   "LeftHandThumb1": {
+    "flexion_x_deg": 8,
+    "rotation_z_deg": -6.0,
+    "quaternion_local_xyzw": [
+     0.317286,
+     0.431052,
+     -0.033625,
+     0.844034
+    ]
+   },
+   "LeftHandThumb2": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.104528,
+     -0.0,
+     -0.0,
+     0.994522
+    ]
+   },
+   "LeftHandIndex1": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.103326,
+     0.414652,
+     -0.103972,
+     0.898097
+    ]
+   },
+   "LeftHandIndex2": {
+    "flexion_x_deg": 22,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.293864,
+     -0.001472,
+     -0.007184,
+     0.955819
+    ]
+   },
+   "LeftHandFingers1": {
+    "flexion_x_deg": 18,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.267123,
+     0.41169,
+     0.019851,
+     0.87107
+    ]
+   },
+   "LeftHandFingers2": {
+    "flexion_x_deg": 30,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.250116,
+     -0.024946,
+     -0.09588,
+     0.963134
+    ]
+   }
+  },
+  "grip_handle": {
+   "RightHandThumb1": {
+    "flexion_x_deg": 58,
+    "rotation_z_deg": -4.0,
+    "quaternion_local_xyzw": [
+     0.679242,
+     -0.337464,
+     0.154978,
+     0.633033
+    ]
+   },
+   "RightHandThumb2": {
+    "flexion_x_deg": 10,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.087156,
+     0.0,
+     0.0,
+     0.996195
+    ]
+   },
+   "RightHandIndex1": {
+    "flexion_x_deg": 70,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.551705,
+     -0.190966,
+     0.401902,
+     0.705428
+    ]
+   },
+   "RightHandIndex2": {
+    "flexion_x_deg": 71,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.591712,
+     -0.057434,
+     -0.056797,
+     0.802092
+    ]
+   },
+   "RightHandFingers1": {
+    "flexion_x_deg": 95,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.736429,
+     -0.282358,
+     0.280016,
+     0.5473
+    ]
+   },
+   "RightHandFingers2": {
+    "flexion_x_deg": 100,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.798679,
+     0.168388,
+     0.108632,
+     0.567412
+    ]
+   },
+   "LeftHandThumb1": {
+    "flexion_x_deg": 8,
+    "rotation_z_deg": -6.0,
+    "quaternion_local_xyzw": [
+     0.317286,
+     0.431052,
+     -0.033625,
+     0.844034
+    ]
+   },
+   "LeftHandThumb2": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.104528,
+     -0.0,
+     -0.0,
+     0.994522
+    ]
+   },
+   "LeftHandIndex1": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.103326,
+     0.414652,
+     -0.103972,
+     0.898097
+    ]
+   },
+   "LeftHandIndex2": {
+    "flexion_x_deg": 22,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.293864,
+     -0.001472,
+     -0.007184,
+     0.955819
+    ]
+   },
+   "LeftHandFingers1": {
+    "flexion_x_deg": 18,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.267123,
+     0.41169,
+     0.019851,
+     0.87107
+    ]
+   },
+   "LeftHandFingers2": {
+    "flexion_x_deg": 30,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.250116,
+     -0.024946,
+     -0.09588,
+     0.963134
+    ]
+   }
+  },
+  "grip_glass": {
+   "RightHandThumb1": {
+    "flexion_x_deg": 70,
+    "rotation_z_deg": -10.0,
+    "quaternion_local_xyzw": [
+     0.755862,
+     -0.275658,
+     0.164634,
+     0.570597
+    ]
+   },
+   "RightHandThumb2": {
+    "flexion_x_deg": 15,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.130526,
+     0.0,
+     0.0,
+     0.991445
+    ]
+   },
+   "RightHandIndex1": {
+    "flexion_x_deg": 64,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.514029,
+     -0.211738,
+     0.391357,
+     0.733335
+    ]
+   },
+   "RightHandIndex2": {
+    "flexion_x_deg": 1,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.024641,
+     -0.014469,
+     -0.079468,
+     0.996428
+    ]
+   },
+   "RightHandFingers1": {
+    "flexion_x_deg": 69,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.594438,
+     -0.338111,
+     0.209323,
+     0.698933
+    ]
+   },
+   "RightHandFingers2": {
+    "flexion_x_deg": 3,
+    "rotation_z_deg": 0,
+    "quaternion_local_xyzw": [
+     0.104255,
+     0.030216,
+     0.198097,
+     0.974154
+    ]
+   },
+   "LeftHandThumb1": {
+    "flexion_x_deg": 8,
+    "rotation_z_deg": -6.0,
+    "quaternion_local_xyzw": [
+     0.317286,
+     0.431052,
+     -0.033625,
+     0.844034
+    ]
+   },
+   "LeftHandThumb2": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.104528,
+     -0.0,
+     -0.0,
+     0.994522
+    ]
+   },
+   "LeftHandIndex1": {
+    "flexion_x_deg": 12,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.103326,
+     0.414652,
+     -0.103972,
+     0.898097
+    ]
+   },
+   "LeftHandIndex2": {
+    "flexion_x_deg": 22,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.293864,
+     -0.001472,
+     -0.007184,
+     0.955819
+    ]
+   },
+   "LeftHandFingers1": {
+    "flexion_x_deg": 18,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.267123,
+     0.41169,
+     0.019851,
+     0.87107
+    ]
+   },
+   "LeftHandFingers2": {
+    "flexion_x_deg": 30,
+    "rotation_z_deg": -0.0,
+    "quaternion_local_xyzw": [
+     0.250116,
+     -0.024946,
+     -0.09588,
+     0.963134
+    ]
+   }
+  }
+ },
+ "prises": {
+  "grip_handle": {
+   "position_m": [
+    -0.0629,
+    0.0107,
+    0.0373
+   ],
+   "quaternion_xyzw": [
+    0.440962,
+    0.367215,
+    0.272967,
+    0.772137
+   ],
+   "modele": "ware_cup_cappuccino",
+   "traversees": 0,
+   "ecart_pince_initial_mm": 0.0,
+   "ecart_pouce_mm": 0.1,
+   "ecart_index_mm": 0.3,
+   "point_de_prise_anse_m": [
+    -0.021,
+    0.0868,
+    0.0451
+   ],
+   "point_de_prise_dans_la_tasse_m": [
+    0.0785,
+    0.038,
+    0.0
+   ],
+   "axe_de_pince_dans_la_main": [
+    0.8078,
+    -0.4805,
+    0.3414
+   ]
+  },
+  "grip_glass": {
+   "position_m": [
+    -0.0977,
+    0.06,
+    0.001
+   ],
+   "quaternion_xyzw": [
+    0.570434,
+    0.323477,
+    -0.174682,
+    0.734475
+   ],
+   "modele": "ware_glass",
+   "traversees": 0,
+   "ecart_pouce_mm": 3.1,
+   "contacts": {
+    "index": true,
+    "majeur_annulaire_auriculaire": true,
+    "pouce": true
+   }
+  }
+ },
+ "reperes": {
+  "Right": {
+   "amax": 0.1891,
+   "web": 0.1179,
+   "knuckle": 0.1059,
+   "spacing": 0.0173,
+   "thumb_verts": 31.0,
+   "signe_pouce": -1.0
+  },
+  "Left": {
+   "amax": 0.2041,
+   "web": 0.1263,
+   "knuckle": 0.1143,
+   "spacing": 0.0191,
+   "thumb_verts": 27.0,
+   "signe_pouce": 1.0
+  }
+ },
+ "file_bytes": 676024,
+ "os_total": 36
+}

@@ -1,0 +1,107 @@
+{
+  "asset": "char_essai_flaneur",
+  "triangles": 2434,
+  "triangle_budget": 5000,
+  "within_budget": true,
+  "bones": 18,
+  "bone_names": [
+    "root",
+    "hips",
+    "spine",
+    "chest",
+    "neck",
+    "head",
+    "upper_arm_l",
+    "forearm_l",
+    "hand_l",
+    "upper_arm_r",
+    "forearm_r",
+    "hand_r",
+    "thigh_l",
+    "shin_l",
+    "foot_l",
+    "thigh_r",
+    "shin_r",
+    "foot_r"
+  ],
+  "root_bone": "hips",
+  "height_before_m": 1.765,
+  "scale_applied": 0.9632,
+  "clips": {
+    "walk": {
+      "seconds": 0.5,
+      "frames": [
+        0.0,
+        12.0
+      ],
+      "root_move_m": [
+        0.0,
+        -0.656,
+        0.025
+      ],
+      "root_move_after_m": [
+        -0.0,
+        0.0,
+        0.025
+      ]
+    },
+    "idle": {
+      "seconds": 6.0,
+      "frames": [
+        0.0,
+        144.0
+      ],
+      "root_move_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "sit": {
+      "seconds": 2.667,
+      "frames": [
+        0.0,
+        64.0
+      ],
+      "root_move_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "drink": {
+      "seconds": 1.583,
+      "frames": [
+        0.0,
+        38.0
+      ],
+      "root_move_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "clip_bones_missing_on_character": {},
+  "palette": [
+    {
+      "mesh": "villager_odette",
+      "parts": 1451,
+      "cells": [
+        "flaneurs_cord",
+        "flaneurs_paper",
+        "hair_2",
+        "hair_6",
+        "ink",
+        "porcelain",
+        "skin_2",
+        "skin_3",
+        "skin_5",
+        "skin_6"
+      ],
+      "mixed_parts": [],
+      "area_where_final_differs_from_face_nearest": 0.0
+    }
+  ],
+  "file_bytes": 508020
+}

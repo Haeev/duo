@@ -1,0 +1,204 @@
+{
+  "objects": [
+    {
+      "id": "tasse",
+      "label": "Tasse",
+      "model": "tasse",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#f2ece0",
+      "tray": null
+    },
+    {
+      "id": "tasse-espresso",
+      "label": "Espresso",
+      "model": "tasse-espresso",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#6b3e1f",
+      "tray": null
+    },
+    {
+      "id": "tasse-sale",
+      "label": "Tasse sale",
+      "model": "tasse-sale",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#a89a80",
+      "tray": null
+    },
+    {
+      "id": "plateau",
+      "label": "Plateau",
+      "model": "plateau",
+      "size": [0.4, 0.3, 0.02],
+      "color": "#8c6b4a",
+      "tray": { "places": 4 }
+    },
+    {
+      "id": "verre",
+      "label": "Verre",
+      "size": [0.07, 0.07, 0.12],
+      "color": "#d8e8ec",
+      "tray": null
+    },
+    {
+      "id": "verre-sale",
+      "label": "Verre sale",
+      "size": [0.07, 0.07, 0.12],
+      "color": "#a9b4a8",
+      "tray": null
+    },
+    {
+      "id": "assiette",
+      "label": "Assiette",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#f4efe6",
+      "tray": null
+    },
+    {
+      "id": "assiette-sale",
+      "label": "Assiette sale",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#b5a68a",
+      "tray": null
+    },
+    {
+      "id": "tasse-cafe",
+      "label": "Tasse de café",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#6b3e1f",
+      "tray": null
+    },
+    {
+      "id": "carton",
+      "label": "Carton",
+      "size": [0.4, 0.3, 0.25],
+      "color": "#b88a55",
+      "tray": null
+    },
+    {
+      "id": "carton-lourd",
+      "label": "Gros carton",
+      "size": [0.5, 0.35, 0.35],
+      "color": "#9c7040",
+      "tray": null
+    },
+    {
+      "id": "espresso",
+      "label": "Espresso (petit noir)",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#4a2a14",
+      "tray": null
+    },
+    {
+      "id": "allonge",
+      "label": "Café allongé",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#4a2a14",
+      "tray": null
+    },
+    {
+      "id": "creme",
+      "label": "Café crème",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#c89a64",
+      "tray": null
+    },
+    {
+      "id": "the-noir",
+      "label": "Thé noir",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#b5651d",
+      "tray": null
+    },
+    {
+      "id": "chocolat",
+      "label": "Chocolat chaud",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#5a3320",
+      "tray": null
+    },
+    {
+      "id": "croissant",
+      "label": "Croissant",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#d9a441",
+      "tray": null
+    },
+    {
+      "id": "pain-chocolat",
+      "label": "Pain au chocolat",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#d9a441",
+      "tray": null
+    },
+    {
+      "id": "tartine",
+      "label": "Tartine beurre-confiture",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#d9a441",
+      "tray": null
+    },
+    {
+      "id": "tarte-fruits",
+      "label": "Tarte aux fruits de saison",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#c0504d",
+      "tray": null
+    },
+    {
+      "id": "noisette",
+      "label": "Noisette",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#4a2a14",
+      "tray": null
+    },
+    {
+      "id": "cappuccino",
+      "label": "Cappuccino",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#c89a64",
+      "tray": null
+    },
+    {
+      "id": "the-vert",
+      "label": "Thé vert",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#b5651d",
+      "tray": null
+    },
+    {
+      "id": "infusion",
+      "label": "Infusion du jardin de Simone",
+      "size": [0.09, 0.09, 0.07],
+      "color": "#b5651d",
+      "tray": null
+    },
+    {
+      "id": "citronnade",
+      "label": "Citronnade maison",
+      "size": [0.07, 0.07, 0.12],
+      "color": "#f3d36b",
+      "tray": null
+    },
+    {
+      "id": "jus-orange",
+      "label": "Jus d'orange pressé",
+      "size": [0.07, 0.07, 0.12],
+      "color": "#f3d36b",
+      "tray": null
+    },
+    {
+      "id": "limonade",
+      "label": "Limonade artisanale",
+      "size": [0.07, 0.07, 0.12],
+      "color": "#f3d36b",
+      "tray": null
+    },
+    {
+      "id": "crepe",
+      "label": "Crêpe",
+      "size": [0.18, 0.18, 0.03],
+      "color": "#c0504d",
+      "tray": null
+    }
+  ]
+}

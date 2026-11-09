@@ -1,0 +1,153 @@
+{
+  "format": "duo-meshy-sheet/1",
+  "asset": "station_espresso_2g",
+  "game": "cosy-cafe",
+  "family": "postes et machines (bible, 13.2: mixte, esquisse par Meshy puis reprise dans Blender aux cotes, avec douilles)",
+  "purpose": "essai de la chaîne Meshy du studio: machine à expresso à deux groupes du café du village, cuivre (objet vedette, plafond de 4 000 triangles, C8 de technique.md)",
+  "status": "téléchargé et mis en conformité le 2026-11-07 (route image retenue): modeles/station_espresso_2g.glb; variante texte: modeles/station_espresso_texte_essai.glb",
+  "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
+  "author": "tech-artist",
+  "date": "2026-11-07",
+  "client": {
+    "server": "@meshy-ai/meshy-mcp-server@0.6.9",
+    "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+    "api": "https://api.meshy.ai"
+  },
+  "credits_budget": 100,
+  "inputs": [
+    {
+      "file": "docs/jeux/cosy-cafe/bible/references/machine-expresso.png",
+      "sha256": "15fe7c953756bc0a5b24855a810dfe287a1973f989b74624713faef934d9ef8f",
+      "author": "directeur-artistique",
+      "note": "trois quarts, fond uni, trois tasses posées sur le dessus (Meshy les fond dans la machine: à séparer ou retirer à la mise en conformité)"
+    }
+  ],
+  "tasks": [
+    {
+      "step": "apercu texte",
+      "tool": "meshy_text_to_3d",
+      "endpoint": "POST /openapi/v2/text-to-3d (mode preview)",
+      "task_id": "01a1b79c-afc3-7589-b419-f472bb49b307",
+      "params": {
+        "prompt": "A two-group commercial espresso machine for a cozy French village cafe, stylized low-poly game asset with clean flat shapes. Polished copper body shaped like a slightly rounded box, brushed stainless-steel top tray, two group heads with black portafilter handles at the front, one steam wand on the right side, one round pressure gauge on the front panel, metal drip tray at the bottom. Sits flat on a counter. About 76 cm wide, 50 cm deep, 48 cm tall. Simple readable silhouette, no cups, no text, no logo.",
+        "ai_model": "meshy-t2.5",
+        "model_type": "smart-topology",
+        "target_polycount": 4000,
+        "topology": "triangle",
+        "target_formats": [
+          "glb"
+        ],
+        "auto_size": true,
+        "origin_at": "bottom"
+      },
+      "seed": 3215524405,
+      "credits": 5,
+      "created": "2026-11-07T20:04:24.195Z",
+      "finished": "2026-11-07T20:04:49.080Z",
+      "duration_s": 24.9,
+      "files_expire": "2026-11-10T20:04:49.080Z",
+      "outputs": [
+        "GLB sans texture (un aperçu de texte vers 3D n'est jamais texturé)",
+        "vignette"
+      ],
+      "downloaded": true,
+      "measured": {
+        "triangles": 3945,
+        "materials": 0,
+        "textures": 0,
+        "open_edges": 239,
+        "auto_size_m": [
+          0.249,
+          0.32,
+          0.268
+        ],
+        "note": "machine domestique à un seul groupe (consigne demandait deux), formes arrondies propres; auto_size très sous-estimé (0,25 m de large au lieu de 0,76)"
+      }
+    },
+    {
+      "step": "image vers 3D (route retenue par la bible)",
+      "tool": "meshy_image_to_3d",
+      "endpoint": "POST /openapi/v1/image-to-3d",
+      "task_id": "01a1b7b3-5172-7405-b35e-33b10ff359a6",
+      "params": {
+        "file_path": "docs/jeux/cosy-cafe/bible/references/machine-expresso.png",
+        "ai_model": "meshy-t2.5",
+        "model_type": "smart-topology",
+        "target_polycount": 4000,
+        "texture_model": "meshy-n1",
+        "target_formats": [
+          "glb"
+        ],
+        "auto_size": true,
+        "origin_at": "bottom"
+      },
+      "credits": 15,
+      "created": "2026-11-07T20:29:05.047Z",
+      "finished": "2026-11-07T20:29:34.261Z",
+      "duration_s": 29.2,
+      "files_expire": "2026-11-10T20:29:34.261Z",
+      "outputs": [
+        "model.glb",
+        "texture_0.png (couleur de base seule, Meshy N1)",
+        "preview.png"
+      ],
+      "downloaded": true,
+      "measured": {
+        "triangles": 2399,
+        "target": 4000,
+        "texture": "PNG 2048 x 2048 (1,02 Mo), couleur de base",
+        "open_edges": 317,
+        "auto_size_m": [
+          1.178,
+          0.9,
+          1.067
+        ],
+        "parts": 12,
+        "note": "fidèle à la référence (deux groupes, cuivre, trois tasses fondues dessus); auto_size surestimé; la texture n'a peint que la face vue: dos et côté droit gris"
+      }
+    }
+  ],
+  "credits_total": 20,
+  "next_steps": [
+    "reprise dans Blender par l'artiste 3D (bible 13.2): plateau du dessus (pans sans épaisseur, triangle sombre), dos et côté droit à recolorer en cuivre, douilles des porte-filtres et de la buse",
+    "ou nouvelle référence dessinée sous trois quarts et de dos, en image à plusieurs vues"
+  ],
+  "conformity": {
+    "node_name": "station_espresso_2g",
+    "front_yaw_deg": 0,
+    "target_size_m": {
+      "axis": "width",
+      "value": 0.76
+    },
+    "size_source": "maquette de la bible (docs/jeux/cosy-cafe/bible/source/mobilier.cjs, espressoMachine: 0,76 m de large, 0,48 m de haut, corps de 0,42 m de profondeur)",
+    "max_triangles": 4000,
+    "palette_allowed": [
+      "copper",
+      "brass",
+      "steel",
+      "steel_dark",
+      "ink",
+      "porcelain"
+    ],
+    "palette_default": "steel",
+    "palette_overrides": {},
+    "lightness_weight": 2.0,
+    "smooth_angle_deg": 20,
+    "remove_bottom_faces": true,
+    "bake_ao": true,
+    "ao_floor": 0.75,
+    "remove_parts": [
+      0,
+      1,
+      4,
+      10
+    ],
+    "per_face_parts": [
+      5
+    ],
+    "fill_holes_max_sides": 12,
+    "notes": [
+      "dos et côté droit gris: la texture meshy-n1 ne connaît que la vue de face"
+    ]
+  }
+}

@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosy Café · maquette basse fidélité · HUD à la première personne</title>
+<link rel="stylesheet" href="support/commun.css">
+<style>
+  body[data-etat='rail'] .scene__vue { --px: 60.2; --py: 20; --s: 1.6; }
+  body[data-etat='caisse'] .scene__vue { --px: 33.9; --py: 55.1; --s: 1.5; }
+  body[data-etat='preparation'] .scene__vue, body[data-etat='fermeture'] .scene__vue { --px: 83.9; --py: 28.8; --s: 2.2; }
+  body[data-etat='tasses'] .scene__vue { --px: 50; --py: 7.4; --s: 1.6; }
+  body[data-etat='amenagement'] .scene__vue { --px: 56.3; --py: 64.8; --s: 1.45; }
+  body[data-etat='amenagement-ok'] .scene__vue { --px: 50; --py: 66.7; --s: 1.5; }
+  body[data-etat='amenagement-eau'] .scene__vue { --px: 50.5; --py: 59.3; --s: 1.3; }
+  .autre__direction svg { transform: rotate(var(--angle, 0deg)); }
+  .bulle-client { position: absolute; left: 50%; top: 7vh; transform: translateX(-50%); }
+  .etiquette-sacha { position: absolute; left: 81%; top: 39vh; transform: translateX(-50%); }
+  .anneau-maintien { position: absolute; left: -1.9em; top: -1.9em; width: 3.8em; height: 3.8em; }
+  .fenetre-jeu { width: min(34rem, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); overflow-y: auto; background: var(--papier); border: 3px solid var(--encre); border-radius: 1rem; padding: 1.3rem 1.5rem; gap: 0.7rem; }
+  .fenetre-jeu h2 { font-size: 1.375rem; line-height: 1.25; }
+  .fenetre-jeu .rangee { margin-top: 0.4rem; }
+  .voile-jeu { position: fixed; inset: 0; background: var(--voile); z-index: 2; }
+  .minuterie__anneau circle { fill: none; stroke-width: 4; }
+</style>
+</head>
+<body data-etats="service rail caisse preparation ouverture ouverture-ouverte fermeture vide tasses geste geste-simplifie proposition proposition-ouverte envoyee reprendre absence amenagement amenagement-ok amenagement-eau porter"
+      data-scenes="salleVersComptoir:service proposition proposition-ouverte envoyee reprendre absence vide ouverture ouverture-ouverte;comptoir:rail caisse preparation fermeture;machine:geste geste-simplifie tasses;salle:amenagement amenagement-ok amenagement-eau porter">
+
+<div class="scene" aria-hidden="true"><div class="scene__vue" data-scene="salleVersComptoir"></div></div>
+<p class="etiquette-maquette" aria-hidden="true">Maquette basse fidélité · scène provisoire en gris · Camille (toi, astre aqua) et Sacha (croissant mauve)</p>
+
+<div class="hud" role="region" aria-label="Interface en jeu">
+
+  <!-- Haut gauche: le temps et ton travail (horloge, minuteries, tes tickets) -->
+  <div class="hud-haut-gauche">
+    <div class="horloge carte-hud" data-si="service rail caisse tasses geste geste-simplifie proposition proposition-ouverte envoyee">
+      <p class="horloge__heure"><span class="icone" data-icone="horloge"></span><span class="chiffre">11 h 20</span><span class="icone" data-icone="soleil" role="img" aria-label="soleil"></span></p>
+      <p class="horloge__moment">Mardi · fermeture à 19 h</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="reprendre">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">11 h 20</span></p>
+      <p class="horloge__moment">L’horloge repart quand vous avez repris la souris</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="absence">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">11 h 20</span></p>
+      <p class="horloge__moment">L’horloge attend Sacha</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="preparation ouverture ouverture-ouverte">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">7 h 30</span><span class="icone" data-icone="soleil" role="img" aria-label="soleil"></span></p>
+      <p class="horloge__moment">Mardi · préparation</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="vide">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">8 h 00</span><span class="icone" data-icone="soleil" role="img" aria-label="soleil"></span></p>
+      <p class="horloge__moment">Mardi · préparation</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="amenagement amenagement-ok amenagement-eau porter">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">7 h 30</span></p>
+      <p class="horloge__moment">Mardi · préparation, aménagement</p>
+    </div>
+    <div class="horloge horloge--arretee carte-hud" data-si="fermeture">
+      <p class="horloge__heure"><span class="icone" data-icone="pause"></span><span class="chiffre">18 h 10</span></p>
+      <p class="horloge__moment">Fermé · plus de clients ce soir</p>
+    </div>
+
+    <p class="minuterie capsule" data-si="service proposition proposition-ouverte envoyee reprendre absence">
+      <svg class="minuterie__anneau" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="#bbb"/><circle cx="12" cy="12" r="9" stroke="#111" stroke-dasharray="37 57" transform="rotate(-90 12 12)"/></svg>
+      Lave-vaisselle · encore 2 min
+    </p>
+    <p class="minuterie capsule" data-si="tasses"><span class="icone" data-icone="coche"></span>Lave-vaisselle : propre</p>
+
+    <div class="tickets" data-si="service proposition proposition-ouverte envoyee reprendre absence">
+      <p class="tickets__titre">Tes tickets</p>
+      <div class="ticket-hud carte-hud">
+        <p class="ticket-hud__tete"><span class="jeton jeton--petit" data-joueur="orb"></span>12 · Table 3<span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>6 min</span></p>
+        <p class="ticket-hud__ligne"><span class="icone" data-icone="caseCochee"></span>Cappuccino</p>
+        <p class="ticket-hud__ligne"><span class="icone" data-icone="caseCochee"></span>Tarte aux fruits</p>
+        <p class="ticket-hud__etat">Prêt à servir</p>
+      </div>
+      <p class="ticket-hud ticket-hud--replie carte-hud"><span class="ticket-hud__tete"><span class="jeton jeton--petit" data-joueur="orb"></span>14 · Comptoir · à faire</span></p>
+    </div>
+    <div class="tickets" data-si="rail caisse">
+      <p class="tickets__titre">Tes tickets</p>
+      <div class="ticket-hud carte-hud">
+        <p class="ticket-hud__tete"><span class="jeton jeton--petit" data-joueur="orb"></span>12 · Table 3<span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>5 min</span></p>
+        <p class="ticket-hud__ligne"><span class="icone" data-icone="caseCochee"></span>Cappuccino, au passe</p>
+        <p class="ticket-hud__ligne"><span class="icone" data-icone="case"></span>Tarte aux fruits</p>
+        <p class="ticket-hud__etat">1 sur 2 prêt</p>
+      </div>
+      <p class="ticket-hud ticket-hud--replie carte-hud"><span class="ticket-hud__tete"><span class="jeton jeton--petit" data-joueur="orb"></span>14 · Comptoir · à faire</span></p>
+    </div>
+    <div class="tickets" data-si="tasses geste geste-simplifie">
+      <p class="tickets__titre">Tes tickets</p>
+      <div class="ticket-hud carte-hud">
+        <p class="ticket-hud__tete"><span class="jeton jeton--petit" data-joueur="orb"></span>14 · Comptoir<span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>3 min</span></p>
+        <p class="ticket-hud__ligne"><span class="icone" data-icone="case"></span>Chocolat chaud</p>
+        <p class="ticket-hud__etat">En cours</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Haut centre: alertes douces, astuces, barres d'un mode -->
+  <div class="hud-haut-centre">
+    <ul class="alertes" aria-live="polite">
+      <li class="alerte carte-hud" data-si="service"><span class="icone" data-icone="carton"></span><span class="alerte__texte">Livraison : le Fournil Morel a déposé 2 cartons à la porte de service.</span></li>
+      <li class="alerte carte-hud" data-si="vide"><span class="icone" data-icone="carton"></span><span class="alerte__texte">Livraison du matin : 4 cartons à ranger dans la réserve.</span></li>
+      <li class="alerte carte-hud" data-si="tasses"><span class="icone" data-icone="tasse"></span><span class="alerte__texte">Plus de tasses propres sur la machine.</span></li>
+      <li class="alerte carte-hud" data-si="geste geste-simplifie"><span class="icone" data-icone="cloche"></span><span class="alerte__texte">Lucette arrive : un café crème, comme d’habitude.</span></li>
+      <li class="alerte carte-hud" data-si="fermeture"><span class="icone" data-icone="carton"></span><span class="alerte__texte">Commande de demain pas encore passée. <kbd>Tab</kbd> tablette, Commandes.</span></li>
+    </ul>
+    <p class="astuce capsule" data-si="vide"><span class="icone" data-icone="info"></span>Astuce : passe derrière le comptoir, puis prends une tasse sur la machine.</p>
+    <div class="barre-amenagement carte-hud" data-si="amenagement amenagement-ok amenagement-eau">
+      <p class="fort">Aménager</p>
+      <p class="barre-amenagement__touches">
+        <span><kbd>E</kbd><span data-souris="gauche"></span>poser</span>
+        <span><kbd>A</kbd><span data-souris="molette"></span>tourner</span>
+        <span><kbd>R</kbd><span data-souris="droit"></span>ranger dans la réserve</span>
+        <span><kbd>Retour arrière</kbd>annuler</span>
+        <span><kbd>B</kbd>terminer</span>
+      </p>
+    </div>
+    <div class="barre-amenagement carte-hud" data-si="porter">
+      <p class="fort">Porter à deux</p>
+      <p class="barre-amenagement__touches">
+        <span><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd>avancer ensemble</span>
+        <span><kbd>A</kbd><span data-souris="molette"></span>tourner</span>
+        <span><kbd>E</kbd><span data-souris="gauche"></span>poser</span>
+        <span><kbd>R</kbd><span data-souris="droit"></span>lâcher ton côté</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Haut droite: l'autre joueur quand il est hors de vue, propositions -->
+  <div class="hud-haut-droite">
+    <div class="autre carte-hud" data-si="service proposition-ouverte reprendre">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi, à droite"><span class="icone" data-icone="fleche" style="--angle: 45deg"></span></span>
+      <p class="autre__ou">À la plonge</p><p class="autre__tient">Tient 3 assiettes sales</p>
+    </div>
+    <div class="autre carte-hud" data-si="rail caisse">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
+      <p class="autre__ou">À la machine</p><p class="autre__tient">Tient un pichet de lait</p>
+    </div>
+    <div class="autre carte-hud" data-si="preparation">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
+      <p class="autre__ou">À l’ardoise</p><p class="autre__tient">Écrit la carte du jour</p>
+    </div>
+    <div class="autre carte-hud" data-si="ouverture ouverture-ouverte">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
+      <p class="autre__ou">À la porte</p><p class="autre__tient">Tient la pancarte</p>
+    </div>
+    <div class="autre carte-hud" data-si="fermeture">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
+      <p class="autre__ou">Au livre d’or</p><p class="autre__tient">Lit les mots du jour</p>
+    </div>
+    <div class="autre carte-hud" data-si="vide proposition envoyee">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="devant toi, à droite"><span class="icone" data-icone="fleche" style="--angle: -45deg"></span></span>
+      <p class="autre__ou">Dans la réserve</p>
+      <p class="autre__tient" data-si="vide">Tient un carton de lait</p>
+      <p class="autre__tient" data-si="proposition envoyee">Sur la tablette : catalogue</p>
+    </div>
+    <div class="autre carte-hud" data-si="tasses geste geste-simplifie">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="derrière toi"><span class="icone" data-icone="fleche" style="--angle: 90deg"></span></span>
+      <p class="autre__ou">En salle</p><p class="autre__tient">Tient 2 tasses sales</p>
+    </div>
+    <div class="autre carte-hud" data-si="absence">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="à ta gauche"><span class="icone" data-icone="fleche" style="--angle: 180deg"></span></span>
+      <p class="autre__ou">À la caisse</p><p class="autre__tient">Fait une pause depuis 1 min</p>
+    </div>
+    <div class="autre carte-hud" data-si="amenagement amenagement-ok amenagement-eau">
+      <span class="jeton" data-joueur="crescent"></span><p class="autre__nom">Sacha</p>
+      <span class="autre__direction" role="img" aria-label="à ta gauche"><span class="icone" data-icone="fleche" style="--angle: 180deg"></span></span>
+      <p class="autre__ou">Aménage aussi</p><p class="autre__tient">Déplace une chaise</p>
+    </div>
+
+    <section class="proposition carte-hud interactif" data-si="proposition" aria-label="Proposition de Sacha">
+      <p class="proposition__titre"><span class="icone" data-icone="bulle"></span>Proposition de Sacha</p>
+      <p class="proposition__objet">Machine à espresso deux groupes · 980 €</p>
+      <p class="proposition__aide"><kbd>Entrée</kbd> voir et répondre</p>
+    </section>
+    <section class="proposition carte-hud interactif" data-si="ouverture" aria-label="Proposition de Sacha">
+      <p class="proposition__titre"><span class="icone" data-icone="bulle"></span>On ouvre ?</p>
+      <p class="proposition__objet">Sacha a retourné la pancarte.</p>
+      <p class="proposition__aide"><kbd>Entrée</kbd> répondre</p>
+    </section>
+    <section class="proposition proposition--envoyee carte-hud" data-si="envoyee" aria-label="Ta proposition">
+      <p class="proposition__titre"><span class="icone" data-icone="sablier"></span>Ta proposition</p>
+      <p class="proposition__objet">Banquette en velours · 340 €</p>
+      <p class="proposition__aide">En attente de Sacha…</p>
+    </section>
+  </div>
+
+  <!-- Dans le monde: bulle d'un client, étiquette de l'autre quand il est en vue -->
+  <p class="bulle bulle-client" data-si="caisse">« Un cappuccino et un croissant, s’il vous plaît. »</p>
+  <p class="capsule etiquette-monde etiquette-sacha" data-si="porter"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha</p>
+
+  <!-- Centre: point de visée, geste, invite, repères des sons -->
+  <div class="hud-centre">
+    <span class="viseur viseur--cible" data-si="service rail caisse preparation fermeture tasses proposition envoyee absence amenagement amenagement-ok amenagement-eau porter"></span>
+    <span class="viseur" data-si="vide ouverture geste geste-simplifie"></span>
+
+    <svg class="anneau-maintien" data-si="fermeture" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#111" stroke-width="7"/><circle cx="20" cy="20" r="17" fill="none" stroke="#fff" stroke-width="4"/><circle cx="20" cy="20" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="64 107" transform="rotate(-90 20 20)"/></svg>
+
+    <div class="arc-geste" data-si="geste geste-simplifie" aria-hidden="true">
+      <svg viewBox="-50 -50 100 100">
+        <path d="M -29.7 29.7 A 42 42 0 1 1 29.7 29.7" fill="none" stroke="#111" stroke-width="12" stroke-linecap="round"/>
+        <path d="M -29.7 29.7 A 42 42 0 1 1 29.7 29.7" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+        <path d="M -29.7 29.7 A 42 42 0 1 1 32.5 -26.7" fill="none" stroke="#555" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 36.7 -20.5 A 42 42 0 0 1 41.8 -4.1" fill="none" stroke="#111" stroke-width="14"/>
+        <line x1="34" y1="-19.1" x2="44.5" y2="-24.9" stroke="#111" stroke-width="3"/>
+        <line x1="38.8" y1="-3.8" x2="50.8" y2="-5" stroke="#111" stroke-width="3"/>
+        <circle cx="32.5" cy="-26.7" r="6" fill="#111" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+      <p class="arc-geste__libelle capsule" data-si="geste"><span class="icone" data-icone="thermometre"></span>Mousser le lait · 55 °C</p>
+      <p class="arc-geste__libelle capsule" data-si="geste-simplifie"><span class="icone" data-icone="thermometre"></span>Mousser le lait · tout seul</p>
+    </div>
+
+
+    <div class="invite">
+      <div class="lecture-ticket carte-hud" data-si="rail">
+        <p class="lecture-ticket__tete">Ticket 15 · Table 5 <span class="ticket-hud__attente"><span class="icone" data-icone="sablier"></span>2 min</span></p>
+        <p>2 chocolats chauds, dont 1 au lait d’avoine</p><p>1 pain au chocolat</p>
+        <p class="aide">Libre : personne ne le prépare</p>
+      </div>
+      <p class="invite__ligne capsule" data-si="service proposition envoyee"><kbd>E</kbd><span data-souris="gauche"></span>Servir la table 3</p>
+      <p class="invite__detail" data-si="service proposition envoyee">Cappuccino, tarte aux fruits · ticket 12</p>
+      <p class="invite__ligne capsule" data-si="rail"><kbd>E</kbd><span data-souris="gauche"></span>Prendre le ticket 15</p>
+      <p class="invite__ligne capsule" data-si="caisse"><kbd>E</kbd><span data-souris="gauche"></span>Prendre la commande</p>
+      <p class="invite__detail" data-si="caisse">Cappuccino, croissant · 4,20 € · le ticket part au rail</p>
+      <p class="invite__ligne capsule" data-si="preparation">Maintiens <kbd>E</kbd><span data-souris="gauche"></span>Retourner la pancarte : ouvrir</p>
+      <p class="invite__detail" data-si="preparation">Côté rue : fermé · Sacha verra « On ouvre ? »</p>
+      <p class="invite__ligne capsule" data-si="fermeture">Maintiens <kbd>E</kbd><span data-souris="gauche"></span>À demain</p>
+      <p class="invite__detail" data-si="fermeture">La journée finit quand vous avez dit « À demain » tous les deux.</p>
+      <p class="invite__ligne capsule invite__refus" data-si="tasses"><span class="icone" data-icone="info"></span>Plus de tasse propre ici</p>
+      <p class="invite__detail" data-si="tasses">Il y en a dans le lave-vaisselle, à la plonge.</p>
+      <p class="invite__ligne capsule" data-si="geste">Relâche <kbd>E</kbd> dans la zone : 58 à 65 °C</p>
+      <p class="invite__detail" data-si="geste">Presque…</p>
+      <p class="invite__ligne capsule" data-si="geste-simplifie">Le geste se fait tout seul</p>
+      <p class="invite__detail" data-si="geste-simplifie">Gestes simplifiés : résultat « bien » assuré</p>
+      <p class="invite__ligne capsule" data-si="absence"><kbd>E</kbd><span data-souris="gauche"></span>Débarrasser la table 3</p>
+      <p class="invite__detail" data-si="absence">Les clients attendent aussi : rien ne presse.</p>
+      <p class="invite__ligne capsule statut-pose statut-pose--non" data-si="amenagement"><span class="icone" data-icone="croix"></span>Ça ne passe pas : passage de 60 cm</p>
+      <p class="invite__detail" data-si="amenagement">Il faut 90 cm pour que les clients rejoignent leur place.</p>
+      <p class="invite__ligne capsule statut-pose" data-si="amenagement-ok"><span class="icone" data-icone="coche"></span>Peut se poser ici</p>
+      <p class="invite__detail" data-si="amenagement-ok">Style bistrot : va bien avec la salle.</p>
+      <p class="invite__ligne capsule statut-pose statut-pose--non" data-si="amenagement-eau"><span class="icone" data-icone="croix"></span>Ça ne passe pas : trop loin de l’eau</p>
+      <p class="invite__detail" data-si="amenagement-eau">Un lave-vaisselle se pose à moins de 2 m d’un point d’eau (entouré au sol).</p>
+      <p class="invite__ligne capsule" data-si="porter"><kbd>E</kbd><span data-souris="gauche"></span>Poser le comptoir</p>
+      <p class="invite__detail" data-si="porter">Sacha tient l’autre côté · avancez dans le même sens</p>
+    </div>
+
+    <p class="repere repere--derriere capsule" data-si="geste geste-simplifie" role="img" aria-label="Clochette de la porte, derrière toi"><span class="icone" data-icone="cloche"></span><span class="icone" data-icone="fleche" style="transform: rotate(90deg)"></span></p>
+
+    <div class="capsule-souris" data-si="reprendre" role="status">
+      <p class="capsule"><span data-souris="gauche" aria-hidden="true"></span>Clique pour reprendre la souris</p>
+      <p class="invite__detail">ou appuie sur <kbd>Entrée</kbd>. Ce clic n’agit pas dans le café.</p>
+    </div>
+  </div>
+
+  <!-- Bas droite: ce que tu tiens (le reste du bas de l'écran reste aux mains et au plan de travail) -->
+  <div class="hud-bas-droite">
+    <div class="en-main carte-hud" data-si="service proposition proposition-ouverte envoyee reprendre absence">
+      <p class="en-main__titre">En main</p>
+      <p class="en-main__objet">Plateau : cappuccino, tarte aux fruits</p>
+      <p class="en-main__ligne">Ticket 12 · 2 sur 4 places</p>
+    </div>
+    <div class="en-main carte-hud" data-si="geste geste-simplifie">
+      <p class="en-main__titre">En main</p>
+      <p class="en-main__objet">Pichet de lait · 55 °C</p>
+    </div>
+    <div class="en-main carte-hud" data-si="amenagement amenagement-ok amenagement-eau">
+      <p class="en-main__titre">En main</p>
+      <p class="en-main__objet" data-si="amenagement amenagement-ok">Table ronde bistrot</p>
+      <p class="en-main__objet" data-si="amenagement-eau">Lave-vaisselle</p>
+      <p class="en-main__ligne">Prise dans la réserve</p>
+    </div>
+    <div class="en-main carte-hud" data-si="porter">
+      <p class="en-main__titre">Vous portez</p>
+      <p class="en-main__objet">Comptoir en chêne</p>
+      <p class="en-main__ligne">Trop lourd pour une seule personne</p>
+    </div>
+  </div>
+</div>
+
+<!-- Pointeur du système, visible quand le jeu l'a relâché -->
+<svg class="curseur-systeme" data-si="reprendre proposition-ouverte ouverture-ouverte" viewBox="0 0 22 32" aria-hidden="true"><path d="M2 2 L2 26 L8 20 L12 30 L16 28 L12 18 L20 18 Z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/></svg>
+
+<!-- Détail d'une proposition (interface posée: le jeu relâche le pointeur, la vue ne bouge pas) -->
+<div class="voile-jeu" data-si="proposition-ouverte ouverture-ouverte"></div>
+<section class="interface fenetre-jeu" data-si="proposition-ouverte" data-panneau-jeu data-piege data-nav role="dialog" aria-modal="true" aria-labelledby="titre-proposition">
+  <p class="surtitre">Proposition de Sacha</p>
+  <h2 id="titre-proposition">Sacha propose d’acheter une machine à espresso deux groupes</h2>
+  <p class="fort">980 € · il resterait 502 € dans la caisse</p>
+  <p>Deux cafés à la fois : le service va plus vite aux heures de pointe.</p>
+  <p>Livrée demain à 7 h, installée à la place de la machine actuelle.</p>
+  <div class="rangee">
+    <button class="bouton bouton--principal" data-focus data-action="accepter"><span class="icone" data-icone="coche"></span>D’accord</button>
+    <button class="bouton" data-action="refuser">Pas maintenant</button>
+    <button class="bouton bouton--discret" data-aller="tablette.html#catalogue-attente">Voir dans le catalogue</button>
+  </div>
+  <p class="aide"><kbd>Retour arrière</kbd> répondre plus tard. La somme reste réservée jusqu’à ta réponse, ou jusqu’à la fin de la journée.</p>
+</section>
+<section class="interface fenetre-jeu" data-si="ouverture-ouverte" data-panneau-jeu data-piege data-nav role="dialog" aria-modal="true" aria-labelledby="titre-ouverture">
+  <p class="surtitre">Proposition de Sacha</p>
+  <h2 id="titre-ouverture">On ouvre ?</h2>
+  <p>Sacha a retourné la pancarte. L’horloge démarre et les premiers clients arrivent dès que vous l’avez retournée tous les deux.</p>
+  <div class="rangee">
+    <button class="bouton bouton--principal" data-focus data-action="ouvrir"><span class="icone" data-icone="coche"></span>Oui, on ouvre</button>
+    <button class="bouton" data-action="attendre">Pas encore</button>
+  </div>
+  <p class="aide"><kbd>Retour arrière</kbd> répondre plus tard.</p>
+</section>
+
+<script src="support/symboles.js"></script>
+<script src="support/scenes.js"></script>
+<script src="support/commun.js"></script>
+<script>
+  'use strict';
+  const MONDE = ['service', 'rail', 'caisse', 'preparation', 'ouverture', 'fermeture', 'vide', 'tasses', 'geste', 'geste-simplifie', 'proposition', 'envoyee', 'absence', 'amenagement', 'amenagement-ok', 'amenagement-eau', 'porter'];
+  const PREPARATION = ['preparation', 'ouverture', 'vide'];
+  let avantSouris = 'service';
+
+  function etat() { return document.body.dataset.etat; }
+
+  Maquette.surTouche = function (e) {
+    const ici = etat();
+    if (ici === 'reprendre' && (e.key === 'Enter' || e.key === ' ')) {
+      Maquette.aller(avantSouris);
+      Maquette.note('Souris reprise : la vue suit de nouveau la souris. Ce clic n’a rien fait dans le café.');
+      return true;
+    }
+    if (!MONDE.includes(ici)) return false;
+    if (e.key === 'Tab') {
+      location.href = 'tablette.html#accueil';
+      return true;
+    }
+    if (e.key === 'Enter' && ici === 'proposition') { Maquette.aller('proposition-ouverte'); return true; }
+    if (e.key === 'Enter' && ici === 'ouverture') { Maquette.aller('ouverture-ouverte'); return true; }
+    if (e.code === 'KeyB' && PREPARATION.includes(ici)) { Maquette.aller('amenagement'); return true; }
+    if (e.code === 'KeyB' && ici.startsWith('amenagement')) { Maquette.aller('preparation'); return true; }
+    if (e.code === 'KeyG') { Maquette.note('G : tu fais signe à l’endroit visé. Sacha voit ton repère et l’entend sonner.'); return true; }
+    return false;
+  };
+
+  Maquette.surRetour = function () {
+    const ici = etat();
+    if (ici === 'proposition-ouverte') { Maquette.aller('proposition'); return true; }
+    if (ici === 'ouverture-ouverte') { Maquette.aller('ouverture'); return true; }
+    if (ici.startsWith('amenagement')) { Maquette.note('Déplacement annulé : la table revient à sa place.'); return true; }
+    return false;
+  };
+  Maquette.fermer = function () { return Maquette.surRetour(); };
+
+  // Après la pause de Duo, le pointeur a été relâché: la capsule apparaît (sauf dans une interface posée).
+  Maquette.apresPause = function () {
+    const ici = etat();
+    if (!MONDE.includes(ici)) return false;
+    avantSouris = ici;
+    Maquette.aller('reprendre');
+    return true;
+  };
+
+  document.addEventListener('click', (e) => {
+    const action = e.target.closest('[data-action]');
+    if (action) {
+      const a = action.dataset.action;
+      if (a === 'accepter') { Maquette.aller('service'); Maquette.note('D’accord ! Machine à espresso deux groupes achetée : livrée demain à 7 h.'); }
+      if (a === 'refuser') { Maquette.aller('service'); Maquette.note('Chez Sacha : « Camille préfère attendre : rien n’a été dépensé. »'); }
+      if (a === 'ouvrir') { Maquette.aller('service'); Maquette.note('La pancarte se retourne : ouvert. L’horloge tourne.'); }
+      if (a === 'attendre') { Maquette.aller('ouverture'); Maquette.note('Chez Sacha : « Camille dit : pas encore. »'); }
+      return;
+    }
+    if (etat() === 'reprendre') {
+      Maquette.aller(avantSouris);
+      Maquette.note('Souris reprise : ce premier clic ne fait rien dans le café.');
+    }
+  });
+</script>
+</body>
+</html>

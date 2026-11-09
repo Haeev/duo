@@ -1,0 +1,249 @@
+{
+  "slateLines": 8,
+  "presentMax": 24,
+  "standingAtCounter": 3,
+  "queuePlaces": 5,
+  "queue": {
+    "spacing": 0.6,
+    "stepAsideSeconds": 20,
+    "asideReturnSeconds": 30,
+    "asideLine": "Servez donc les suivants, je patiente au zinc."
+  },
+  "estimatedSecondsPerGroup": 25,
+  "softClosingGameMinutes": 15,
+  "servedAfterSoftCloseGameMinutes": 5,
+  "standingStayFactor": 0.5,
+  "drinks": ["black_coffee", "milk_coffee", "tea", "chocolate", "cold_drink", "specialty"],
+  "foods": ["pastry_bread", "cake", "savory"],
+  "cravingWeights": {
+    "main": 3,
+    "secondary": 1
+  },
+  "slatePoints": {
+    "main": 3,
+    "secondary": 1,
+    "variety": 1,
+    "varietyCount": 3
+  },
+  "slateFactors": [0.0, 0.35, 0.55, 0.75, 0.9, 1.0, 1.1, 1.2],
+  "priceBounds": [0.4, 1.25],
+  "place": {
+    "base": 0.75,
+    "ambiance": 0.25,
+    "style50": 0.1,
+    "style75": 0.15,
+    "equipment": 0.08,
+    "equipmentMax": 2
+  },
+  "cupFactors": [
+    [1.0, 0.7],
+    [1.5, 0.775],
+    [2.0, 0.85],
+    [2.5, 0.925],
+    [3.0, 1.0],
+    [3.5, 1.075],
+    [4.0, 1.15],
+    [4.5, 1.225],
+    [5.0, 1.3]
+  ],
+  "mood": {
+    "pivot": 70,
+    "slope": 0.01,
+    "bound": 0.1
+  },
+  "satisfaction": {
+    "base": 70,
+    "perSecond": -0.5,
+    "waitMax": -30,
+    "perfect": 10,
+    "good": 4,
+    "fine": -4,
+    "connoisseurQualityWeight": 2.0,
+    "latteArt": 4,
+    "homemade": 3,
+    "priceSlope": 40,
+    "priceBound": 12,
+    "wantedSeat": 5,
+    "standing": -10,
+    "dirtyTable": -6,
+    "ambianceDivisor": 5,
+    "chat": 12,
+    "asUsual": 10,
+    "forgottenOption": -8
+  },
+  "tips": {
+    "threshold": 75,
+    "rate": 0.05,
+    "delightedRate": 0.1,
+    "delightedThreshold": 88,
+    "probability": 0.5
+  },
+  "guestbook": {
+    "delighted": 85,
+    "delightedChance": 0.12,
+    "disappointed": 45,
+    "disappointedChance": 0.1,
+    "regularChance": 0.35,
+    "regularGapDays": 3,
+    "kept": 24,
+    "reportMissedBelow": 60
+  },
+  "seatFallbacks": {
+    "counter": ["counter", "table", "comfort", "terrace"],
+    "table": ["table", "comfort", "terrace", "counter"],
+    "comfort": ["comfort", "table", "terrace", "counter"],
+    "terrace": ["terrace", "table", "comfort", "counter"]
+  },
+  "counterSeatMaxGroup": 2,
+  "weather": {
+    "kinds": ["soleil", "couvert", "pluie", "chaleur", "froid", "neige"],
+    "chances": {
+      "soleil": 0.4,
+      "couvert": 0.35,
+      "pluie": 0.25,
+      "chaleur": 0.0,
+      "froid": 0.0,
+      "neige": 0.0
+    },
+    "terraceOpen": {
+      "soleil": true,
+      "couvert": true,
+      "pluie": false,
+      "chaleur": true,
+      "froid": false,
+      "neige": false
+    },
+    "names": {
+      "soleil": "soleil",
+      "couvert": "temps couvert",
+      "pluie": "pluie",
+      "chaleur": "chaleur",
+      "froid": "froid",
+      "neige": "neige"
+    },
+    "forced": [
+      [2, "soleil"],
+      [4, "couvert"],
+      [14, "soleil"]
+    ]
+  },
+  "talkReach": 2.5,
+  "maxRegularsPerDay": 8,
+  "walk": {
+    "cell": 0.25,
+    "speed": 1.1,
+    "radius": 0.2,
+    "searchNodes": 4000,
+    "blockedZones": ["work", "private", "extension"],
+    "terraceZoneLabel": "E1"
+  },
+  "looks": [
+    { "model": "char_client_pressee", "profiles": ["presses", "connaisseurs"] },
+    { "model": "char_client_voisine", "profiles": ["voisins", "familles", "flaneurs"] },
+    { "model": "char_client_flaneur", "profiles": ["flaneurs", "promeneurs", "voisins"] },
+    { "model": "char_client_gourmand", "profiles": ["gourmands", "familles", "brunch"] },
+    { "model": "char_client_etudiante", "profiles": ["etudiants", "promeneurs", "teletravail"] },
+    { "model": "char_client_teletravail", "profiles": ["teletravail", "presses", "etudiants"] },
+    { "model": "char_client_brunch", "profiles": ["brunch", "gourmands", "flaneurs"] },
+    { "model": "char_client_connaisseur", "profiles": ["connaisseurs", "voisins", "presses"] }
+  ],
+  "lookWindow": 3,
+  "standingSpots": [
+    [8.75, 10.0],
+    [9.25, 10.0],
+    [9.75, 10.0]
+  ],
+  "seatKinds": {
+    "banc": "terrace",
+    "chaise": "table",
+    "fauteuil": "comfort",
+    "tabouret": "counter"
+  },
+  "waitingSpots": [
+    [8.3, 10.55],
+    [8.85, 10.65],
+    [7.75, 10.75],
+    [8.4, 11.15],
+    [9.0, 11.25],
+    [7.8, 11.35]
+  ],
+  "picnicSpots": [
+    [13.4, 18.83],
+    [13.03, 18.71],
+    [12.72, 18.48],
+    [12.49, 18.17],
+    [12.37, 17.8],
+    [12.37, 17.4],
+    [12.49, 17.03],
+    [12.72, 16.72],
+    [13.03, 16.49],
+    [13.4, 16.37],
+    [13.8, 16.37],
+    [14.17, 16.49],
+    [14.48, 16.72],
+    [14.71, 17.03]
+  ],
+  "placeWalk": [
+    [2.0, 14.6],
+    [15.0, 14.6]
+  ],
+  "windowWatch": {
+    "z": 12.5,
+    "reach": 2.5
+  },
+  "fallbackPrepSeconds": null,
+  "closingGraceGameMinutes": 30,
+  "extensionZones": {
+    "E2": "village_fond"
+  },
+  "warmup": [
+    {
+      "day": 2,
+      "calmUntil": 1080,
+      "calmGroups": 7,
+      "calmProfiles": ["voisins", "flaneurs", "gourmands"],
+      "maxGroupSize": 2,
+      "firstSeconds": 15,
+      "gapSeconds": 12,
+      "affluence": 0,
+      "patience": 4,
+      "announced": 0.3
+    },
+    {
+      "day": 3,
+      "calmUntil": 660,
+      "calmGroups": 3,
+      "calmProfiles": ["voisins", "flaneurs", "gourmands"],
+      "maxGroupSize": 2,
+      "firstSeconds": 15,
+      "gapSeconds": 10,
+      "affluence": 0.5,
+      "patience": 2,
+      "announced": 0.5
+    },
+    {
+      "day": 4,
+      "calmUntil": 480,
+      "calmGroups": 0,
+      "calmProfiles": [],
+      "maxGroupSize": 4,
+      "firstSeconds": 0,
+      "gapSeconds": 0,
+      "affluence": 0.7,
+      "patience": 1.5,
+      "announced": 0.7
+    },
+    {
+      "day": 5,
+      "calmUntil": 480,
+      "calmGroups": 0,
+      "calmProfiles": [],
+      "maxGroupSize": 4,
+      "firstSeconds": 0,
+      "gapSeconds": 0,
+      "affluence": 0.85,
+      "patience": 1.2,
+      "announced": 0.85
+    }
+  ]
+}

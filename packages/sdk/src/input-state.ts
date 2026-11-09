@@ -3,8 +3,11 @@ import type { ManifestAction } from '@duo/protocol';
 import type { InputFrame, MouseInput } from './api';
 
 export interface InputState {
-  /** Code de touche enfoncé; renvoie `true` si la touche appartient à une action. */
-  keyDown(code: string): boolean;
+  /**
+   * Code de touche enfoncé (`repeat`: répétition automatique du système); renvoie `true` si la
+   * touche appartient à une action.
+   */
+  keyDown(code: string, repeat?: boolean): boolean;
   keyUp(code: string): void;
   mouseDown(button: MouseInput): void;
   mouseUp(button: MouseInput): void;
@@ -65,10 +68,10 @@ export function createInputState(
     }
   };
 
-  const hold = (action: string): void => {
+  const hold = (action: string, announce = true): void => {
     const count = holders.get(action) ?? 0;
     holders.set(action, count + 1);
-    if (count === 0) pressed.add(action);
+    if (count === 0 && announce) pressed.add(action);
   };
   const unhold = (action: string): void => {
     const count = holders.get(action) ?? 0;
@@ -91,12 +94,21 @@ export function createInputState(
   applyBindings(initialBindings);
 
   return {
-    keyDown(code) {
+    keyDown(code, repeat = false) {
       const bound = actionsByKey.get(code);
       if (bound === undefined) return false;
-      if (heldKeys.has(code)) return true;
+      if (heldKeys.has(code)) {
+        if (repeat) return true;
+        // Nouvel appui d'une touche jamais relâchée: son keyup s'est perdu (vue qui change de
+        // focus, raccourci du système). Sans cela, la touche resterait tenue et n'agirait plus.
+        for (const action of bound) unhold(action);
+        for (const action of bound) hold(action);
+        return true;
+      }
       heldKeys.add(code);
-      for (const action of bound) hold(action);
+      // Répétition d'une touche tenue avant le dernier « tout relâcher » (focus revenu): elle
+      // reprend son maintien sans valoir un nouvel appui.
+      for (const action of bound) hold(action, !repeat);
       return true;
     },
     keyUp(code) {

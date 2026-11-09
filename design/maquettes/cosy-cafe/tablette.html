@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosy Café · maquette basse fidélité · tablette de la maison</title>
+<link rel="stylesheet" href="support/commun.css">
+<style>
+  .tablette {
+    width: min(72rem, calc(100vw - 2rem));
+    height: min(44rem, calc(100vh - 2rem));
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0.6rem 1rem;
+    background: var(--papier);
+    border: 3px solid var(--encre);
+    border-radius: 1.4rem;
+    padding: 0.9rem 1rem 0.7rem;
+    box-shadow: 0 0 0 0.6rem #3a3a3a;
+  }
+  .tablette__tete { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1.4rem; border-bottom: 2px solid var(--papier-3); padding-bottom: 0.5rem; }
+  .tablette__maison { font-weight: 700; font-size: 1.0625rem; display: inline-flex; gap: 0.4rem; align-items: center; }
+  .tablette__tete p { display: inline-flex; gap: 0.4rem; align-items: center; }
+  .tablette__autre { margin-left: auto; font-size: 0.9375rem; }
+  .tablette__sections { display: grid; align-content: start; gap: 0.25rem; overflow-y: auto; padding: 0.3rem; }
+  .onglet {
+    font-size: 1rem;
+    display: flex; align-items: center; gap: 0.55rem;
+    min-height: 2.6rem; padding: 0.35rem 0.7rem;
+    border: 2px solid transparent; border-radius: 0.6rem;
+    background: none; cursor: pointer; text-align: left;
+  }
+  .onglet:hover { background: var(--papier-2); }
+  .onglet[aria-selected='true'] { border-color: var(--encre); background: var(--papier-3); font-weight: 700; }
+  .onglet__badge { margin-left: auto; font-size: 0.8125rem; font-weight: 700; border: 2px solid var(--encre); border-radius: 999px; padding: 0 0.45rem; }
+  .tablette__contenu { overflow-y: auto; padding: 0.4rem 0.5rem 0; display: grid; align-content: start; gap: 0.9rem; }
+  .tablette__contenu h2 { font-size: 1.5rem; line-height: 1.2; }
+  .tablette__pied { grid-column: 1 / -1; border-top: 2px solid var(--papier-3); padding-top: 0.5rem; color: var(--encre-2); }
+  .cartes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr)); gap: 0.8rem; }
+  .carte { border: 2px solid var(--trait); border-radius: 0.8rem; padding: 0.8rem 0.9rem; display: grid; gap: 0.35rem; align-content: start; min-width: 0; }
+  .carte h3 { font-size: 1.0625rem; display: flex; align-items: center; gap: 0.4rem; }
+  .carte--accent { border: 3px solid var(--encre); }
+  .liste-a-faire { display: grid; gap: 0.5rem; }
+  .liste-a-faire li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; justify-content: space-between; }
+  .tasses-note { display: inline-flex; gap: 0.15rem; }
+  .fournisseur { display: grid; gap: 0.4rem; }
+  .fournisseur__tete { display: flex; align-items: center; gap: 0.6rem; }
+  .portrait { width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 2px solid var(--trait); background: repeating-linear-gradient(45deg, #e5e5e5 0 6px, #d2d2d2 6px 12px); flex: none; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1.5px solid var(--papier-3); font-size: 0.9375rem; vertical-align: middle; }
+  th { font-size: 0.8125rem; color: var(--encre-2); border-bottom: 2px solid var(--encre); }
+  td.nombre, th.nombre { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pas { display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+  .pas output { min-width: 3.6rem; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .verrou { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.875rem; font-weight: 600; border: 2px dashed var(--encre); border-radius: 999px; padding: 0.05rem 0.55rem; white-space: nowrap; }
+  .total { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; border-top: 3px solid var(--encre); padding: 0.6rem 0.2rem 0.3rem; position: sticky; bottom: 0; background: var(--papier); box-shadow: 0 -0.5rem 0 var(--papier); }
+  .carte .bouton { white-space: normal; }
+  .total p { font-size: 1.125rem; font-weight: 700; }
+  .filtres { display: grid; gap: 0.4rem; }
+  .filtres p { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+  .filtres .bouton { min-height: 2.1rem; padding: 0.15rem 0.7rem; font-size: 0.9375rem; }
+  .filtres .bouton[aria-pressed='true'] { background: var(--encre); color: #fff; }
+  .vignette { aspect-ratio: 16 / 9; border: 2px solid var(--trait); border-radius: 0.5rem; background: linear-gradient(to top right, transparent calc(50% - 1px), #aaa calc(50% - 1px), #aaa calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(to bottom right, transparent calc(50% - 1px), #aaa calc(50% - 1px), #aaa calc(50% + 1px), transparent calc(50% + 1px)), #ececec; }
+  .article__prix { font-weight: 700; font-size: 1.0625rem; }
+  .article__etat { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; font-size: 0.9375rem; }
+  .bandeau { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; justify-content: space-between; border: 3px solid var(--encre); border-radius: 0.8rem; padding: 0.6rem 0.9rem; }
+  .vide { border: 2px dashed var(--trait); border-radius: 0.8rem; padding: 1rem 1.1rem; display: grid; gap: 0.4rem; }
+  .vide__titre { font-weight: 700; font-size: 1.0625rem; }
+  .reglage { display: grid; grid-template-columns: minmax(10rem, 15rem) minmax(0, 1fr); gap: 0.3rem 1rem; align-items: center; padding: 0.45rem 0; border-bottom: 1.5px solid var(--papier-3); }
+  .reglage__aide { grid-column: 2; font-size: 0.875rem; color: var(--encre-3); }
+  .reglage label, .reglage__nom { font-weight: 600; }
+  .curseur { display: flex; align-items: center; gap: 0.7rem; }
+  .curseur input { flex: 1; accent-color: #111; min-width: 6rem; }
+  .curseur output { min-width: 3.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .segments { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .segments .bouton { min-height: 2.25rem; padding: 0.2rem 0.75rem; font-size: 0.9375rem; white-space: normal; }
+  .segments .bouton[aria-pressed='true'] { background: var(--encre); color: #fff; }
+  .interrupteur { justify-self: start; display: inline-flex; align-items: center; gap: 0.6rem; min-height: 2.25rem; padding: 0.2rem 0.75rem; border: 2px solid var(--encre); border-radius: 999px; background: var(--papier); cursor: pointer; font-size: 0.9375rem; font-weight: 600; }
+  .interrupteur__pastille { width: 2.4rem; height: 1.3rem; border-radius: 999px; border: 2px solid var(--encre); position: relative; flex: none; }
+  .interrupteur__pastille::after { content: ''; position: absolute; top: 0.1rem; left: 0.12rem; width: 0.85rem; height: 0.85rem; border-radius: 50%; background: var(--encre); }
+  .interrupteur[aria-checked='true'] .interrupteur__pastille { background: var(--encre); }
+  .interrupteur[aria-checked='true'] .interrupteur__pastille::after { left: auto; right: 0.12rem; background: #fff; }
+  .interrupteur .oui, .interrupteur[aria-checked='true'] .non { display: none; }
+  .interrupteur[aria-checked='true'] .oui { display: inline; }
+  .groupe-reglages h3 { font-size: 1.0625rem; margin-top: 0.4rem; }
+  .ligne-bilan { width: 100%; justify-content: space-between; white-space: normal; text-align: left; flex-wrap: wrap; }
+  .projet { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.2rem 0.8rem; align-items: center; border: 2px solid var(--trait); border-radius: 0.8rem; padding: 0.7rem 0.9rem; }
+  .projet__titre { font-weight: 700; }
+  .projet--ferme { border-style: dashed; }
+  .barre-progression { height: 0.6rem; border: 2px solid var(--encre); border-radius: 999px; overflow: hidden; }
+  .barre-progression span { display: block; height: 100%; background: var(--encre); }
+</style>
+</head>
+<body data-etats="accueil commandes commandes-envoyee catalogue catalogue-proposer catalogue-attente carte equipe cafes bilans projets reglages"
+      data-retour="hud.html#service" data-touche-fermer="Tab">
+
+<div class="scene scene--sombre" aria-hidden="true"><div class="scene__vue" data-scene="salleVersComptoir"></div></div>
+<p class="etiquette-maquette" aria-hidden="true">Maquette basse fidélité · la tablette s’ouvre par-dessus le café, qui continue derrière</p>
+
+<section class="interface tablette" data-panneau-jeu data-nav aria-label="Tablette de la maison">
+  <header class="tablette__tete">
+    <p class="tablette__maison"><span class="icone" data-icone="tablette"></span>La Tasse Bleue · place du Tilleul</p>
+    <p>Mardi 9 · printemps · <span class="chiffre">11 h 20</span></p>
+    <p class="fort">Caisse : 1 482 €<span data-si="catalogue-proposer accueil">&nbsp;· dont 980 € réservés</span><span data-si="catalogue-attente">&nbsp;· dont 1 320 € réservés</span></p>
+    <p class="tablette__autre" data-si="catalogue catalogue-proposer catalogue-attente"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha regarde aussi : Catalogue</p>
+    <p class="tablette__autre" data-si="commandes commandes-envoyee"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha regarde aussi : Commandes</p>
+  </header>
+
+  <nav class="tablette__sections" data-sections role="tablist" aria-orientation="vertical" aria-label="Sections de la tablette">
+    <button class="onglet" role="tab" data-section-etats="accueil" data-aller="#accueil"><span class="icone" data-icone="tablette"></span>Accueil<span class="onglet__badge" aria-label="2 choses à faire">2</span></button>
+    <button class="onglet" role="tab" data-section-etats="commandes commandes-envoyee" data-aller="#commandes"><span class="icone" data-icone="carton"></span>Commandes</button>
+    <button class="onglet" role="tab" data-section-etats="catalogue catalogue-proposer catalogue-attente" data-aller="#catalogue"><span class="icone" data-icone="etoile"></span>Catalogue</button>
+    <button class="onglet" role="tab" data-section-etats="carte" data-aller="#carte"><span class="icone" data-icone="bulle"></span>Carte et prix</button>
+    <button class="onglet" role="tab" data-section-etats="equipe" data-aller="#equipe"><span class="icone" data-icone="main"></span>Équipe</button>
+    <button class="onglet" role="tab" data-section-etats="cafes" data-aller="#cafes"><span class="icone" data-icone="tasse"></span>Nos cafés</button>
+    <button class="onglet" role="tab" data-section-etats="bilans" data-aller="#bilans"><span class="icone" data-icone="livre"></span>Bilans</button>
+    <button class="onglet" role="tab" data-section-etats="projets" data-aller="#projets"><span class="icone" data-icone="coeur"></span>Nos projets</button>
+    <button class="onglet" role="tab" data-section-etats="reglages" data-aller="#reglages"><span class="icone" data-icone="reglages"></span>Réglages</button>
+  </nav>
+
+  <div class="tablette__contenu">
+
+    <!-- Accueil -->
+    <div class="pile" data-si="accueil" role="tabpanel" aria-label="Accueil">
+      <h2>Aujourd’hui</h2>
+      <div class="cartes">
+        <div class="carte carte--accent">
+          <h3><span class="icone" data-icone="alerte"></span>À faire</h3>
+          <ul class="liste-a-faire">
+            <li><span>Sacha propose : machine à espresso deux groupes, 980 €</span><button class="bouton bouton--principal bouton--petit" data-focus data-aller="hud.html#proposition-ouverte">Répondre</button></li>
+            <li><span>Commande de demain : pas encore passée</span><button class="bouton bouton--petit" data-aller="#commandes">Préparer la commande</button></li>
+          </ul>
+        </div>
+        <div class="carte">
+          <h3><span class="icone" data-icone="horloge"></span>Service en cours</h3>
+          <p>Fermeture à 18 h · 31 clients servis</p>
+          <p class="aide">2 cartons attendent à la porte de service.</p>
+        </div>
+        <div class="carte">
+          <h3><span class="icone" data-icone="soleil"></span>Soleil, 18 °C</h3>
+          <p>Le banc et les deux tables dehors vont plaire.</p>
+          <p class="aide">Demain : pluie, 12 °C. Sortie de l’école à 16 h 30.</p>
+        </div>
+        <div class="carte">
+          <h3><span class="icone" data-icone="tasse"></span>Réputation : 3 tasses sur 5</h3>
+          <p class="tasses-note" aria-hidden="true"><span class="icone" data-icone="tassePleine"></span><span class="icone" data-icone="tassePleine"></span><span class="icone" data-icone="tassePleine"></span><span class="icone" data-icone="tasse"></span><span class="icone" data-icone="tasse"></span></p>
+          <p class="aide">Encore quelques belles journées pour la quatrième.</p>
+        </div>
+        <div class="carte">
+          <h3><span class="icone" data-icone="coeur"></span>Projet épinglé</h3>
+          <p>Une vraie terrasse : 2 sur 3</p>
+          <p class="aide">Il manque : un store.</p>
+          <button class="bouton bouton--petit" data-aller="#projets">Voir nos projets</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Commandes -->
+    <div class="pile" data-si="commandes commandes-envoyee" role="tabpanel" aria-label="Commandes">
+      <h2>Commandes pour demain</h2>
+      <p class="aide">Livrées demain à 7 h, à la porte de service. « Habituelle » : d’après vos trois dernières journées et l’ardoise prévue.</p>
+      <p class="bandeau" data-si="commandes-envoyee" role="status"><span class="fort"><span class="icone" data-icone="coche"></span> Commande envoyée : livrée demain à 7 h.</span><span class="aide">Tu peux la modifier jusqu’à la fermeture à clé.</span></p>
+      <div class="rangee"><button class="bouton bouton--petit" data-action="hier">Revenir à la commande habituelle</button></div>
+
+      <div class="fournisseur">
+        <p class="fournisseur__tete"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Joëlle, laitière</span><br><span class="aide">Ferme des Prés, à 3 km</span></span></p>
+        <table>
+          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Habituelle</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
+          <tbody>
+            <tr><td>Lait entier</td><td class="nombre">3 L</td><td class="nombre">12 L</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de lait entier" data-pas="-1" data-cible="q-lait"><span class="icone" data-icone="moins"></span></button><output id="q-lait" data-valeur="12" data-min="0" data-max="40" data-format="litre" data-prix="0.9">12 L</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de lait entier" data-pas="1" data-cible="q-lait"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-lait">10,80 €</td></tr>
+            <tr><td>Crème</td><td class="nombre">0,5 L</td><td class="nombre">1 L</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de crème" data-pas="-0.5" data-cible="q-creme"><span class="icone" data-icone="moins"></span></button><output id="q-creme" data-valeur="1" data-min="0" data-max="5" data-format="litre" data-prix="2.4">1 L</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de crème" data-pas="0.5" data-cible="q-creme"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-creme">2,40 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fournisseur">
+        <p class="fournisseur__tete"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Fournil Morel, boulangerie</span><br><span class="aide">Sur la place</span></span></p>
+        <table>
+          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Habituelle</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
+          <tbody>
+            <tr><td>Croissants</td><td class="nombre">4</td><td class="nombre">30</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de croissants" data-pas="-5" data-cible="q-croissants"><span class="icone" data-icone="moins"></span></button><output id="q-croissants" data-valeur="30" data-min="0" data-max="80" data-prix="0.7">30</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de croissants" data-pas="5" data-cible="q-croissants"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-croissants">21,00 €</td></tr>
+            <tr><td>Pains au chocolat</td><td class="nombre">2</td><td class="nombre">20</td><td><span class="pas"><button class="bouton bouton--icone bouton--petit" aria-label="Moins de pains au chocolat" data-pas="-5" data-cible="q-pains"><span class="icone" data-icone="moins"></span></button><output id="q-pains" data-valeur="20" data-min="0" data-max="80" data-prix="0.8">20</output><button class="bouton bouton--icone bouton--petit" aria-label="Plus de pains au chocolat" data-pas="5" data-cible="q-pains"><span class="icone" data-icone="plus"></span></button></span></td><td class="nombre" data-sous-total="q-pains">16,00 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fournisseur">
+        <p class="fournisseur__tete"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Torréfaction Lamy</span><br><span class="aide">Livre le mardi et le vendredi</span></span></p>
+        <table>
+          <thead><tr><th>Produit</th><th class="nombre">En réserve</th><th class="nombre">Habituelle</th><th>Quantité</th><th class="nombre">Prix</th></tr></thead>
+          <tbody>
+            <tr><td>Café en grains, mélange du Tilleul</td><td class="nombre">0,8 kg</td><td class="nombre">1 kg</td><td><span class="verrou"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha modifie cette ligne</span></td><td class="nombre">18,00 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="total">
+        <p>Total : <span id="total-commande" class="chiffre">68,20 €</span></p>
+        <button class="bouton bouton--principal" data-focus data-si="commandes" data-aller="#commandes-envoyee"><span class="icone" data-icone="carton"></span>Commander pour demain</button>
+        <button class="bouton" data-focus data-si="commandes-envoyee" data-aller="#commandes">Modifier la commande</button>
+      </div>
+    </div>
+
+    <!-- Catalogue -->
+    <div class="pile" data-si="catalogue catalogue-proposer catalogue-attente" role="tabpanel" aria-label="Catalogue">
+      <h2>Catalogue</h2>
+      <div class="filtres">
+        <p><span class="reglage__nom">Familles</span>
+          <button class="bouton" data-groupe-choix="famille" aria-pressed="true">Tout</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Fonctionnel</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Assises</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Tables</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Luminaires</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Décoration</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Revêtements</button><button class="bouton" data-groupe-choix="famille" aria-pressed="false">Extérieur</button></p>
+        <p><span class="reglage__nom">Style</span>
+          <button class="bouton" data-groupe-choix="style" aria-pressed="true">Tous</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Campagne</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Bistrot</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Nordique</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Jardin</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Atelier</button><button class="bouton" data-groupe-choix="style" aria-pressed="false">Rétro</button></p>
+      </div>
+      <p class="aide">À partir de 300 €, un achat attend l’accord de Sacha. Tout achat arrive demain matin, avec les livraisons.</p>
+      <div class="cartes">
+        <article class="carte" aria-label="Machine à espresso deux groupes">
+          <div class="vignette" aria-hidden="true"></div>
+          <h3>Machine à espresso deux groupes</h3>
+          <p class="aide">Fonctionnel · deux cafés à la fois</p>
+          <p class="aide">Il faut : un point d’eau, une prise</p>
+          <p class="article__prix">980 €</p>
+          <button class="bouton bouton--petit" data-si="catalogue" data-ouvrir-proposition="Machine à espresso deux groupes|980">Proposer à Sacha</button>
+          <p class="article__etat" data-si="catalogue-attente catalogue-proposer"><span class="jeton jeton--petit" data-joueur="crescent"></span>Proposée par Sacha · 980 € réservés</p>
+          <button class="bouton bouton--principal bouton--petit" data-si="catalogue-attente catalogue-proposer" data-aller="hud.html#proposition-ouverte">Répondre à Sacha</button>
+        </article>
+        <article class="carte" aria-label="Banquette en velours">
+          <div class="vignette" aria-hidden="true"></div>
+          <h3>Banquette en velours</h3>
+          <p class="aide">Assises · rétro · 3 places, très confortable</p>
+          <p class="article__prix">340 €</p>
+          <button class="bouton bouton--petit" data-focus data-si="catalogue catalogue-proposer" data-ouvrir-proposition="Banquette en velours|340">Proposer à Sacha</button>
+          <p class="article__etat" data-si="catalogue-attente"><span class="icone" data-icone="sablier"></span>Ta proposition · en attente de Sacha</p>
+          <button class="bouton bouton--petit" data-focus data-si="catalogue-attente" data-aller="#catalogue">Retirer ma proposition</button>
+        </article>
+        <article class="carte" aria-label="Chaise bistrot cannée">
+          <div class="vignette" aria-hidden="true"></div>
+          <h3>Chaise bistrot cannée</h3>
+          <p class="aide">Assises · bistrot · confortable</p>
+          <p class="article__prix">45 €</p>
+          <button class="bouton bouton--petit" data-action="acheter">Acheter</button>
+        </article>
+        <article class="carte" aria-label="Suspension en laiton">
+          <div class="vignette" aria-hidden="true"></div>
+          <h3>Suspension en laiton</h3>
+          <p class="aide">Luminaires · bistrot · lumière chaude</p>
+          <p class="article__prix">80 €</p>
+          <button class="bouton bouton--petit" data-action="acheter">Acheter</button>
+        </article>
+        <article class="carte" aria-label="Fougère en pot">
+          <div class="vignette" aria-hidden="true"></div>
+          <h3>Fougère en pot</h3>
+          <p class="aide">Décoration · jardin · déjà 1 dans la réserve</p>
+          <p class="article__prix">18 €</p>
+          <button class="bouton bouton--petit" data-action="acheter">Acheter</button>
+        </article>
+        <article class="carte" aria-label="Comptoir en zinc">
+          <div class="vignette" aria-hidden="true"></div>
+          <h3>Comptoir en zinc</h3>
+          <p class="aide">Fonctionnel · bistrot · se porte à deux</p>
+          <p class="article__prix">2 400 €</p>
+          <button class="bouton bouton--petit" aria-disabled="true">Il manque 918 €</button>
+        </article>
+      </div>
+    </div>
+
+    <!-- Carte et prix -->
+    <div class="pile" data-si="carte" role="tabpanel" aria-label="Carte et prix">
+      <h2>Carte et prix</h2>
+      <p class="aide">La même carte que l’ardoise : ce que tu changes ici s’écrit à la craie.</p>
+      <table>
+        <thead><tr><th>Sur l’ardoise (6 lignes sur 8)</th><th class="nombre">Prix</th><th>Vedette</th></tr></thead>
+        <tbody>
+          <tr><td>Café crème</td><td class="nombre">2,40 €</td><td></td></tr>
+          <tr><td>Cappuccino</td><td class="nombre">3,00 €</td><td><span class="icone" data-icone="etoilePleine" role="img" aria-label="vedette"></span></td></tr>
+          <tr><td>Chocolat chaud</td><td class="nombre">3,20 €</td><td><span class="icone" data-icone="etoilePleine" role="img" aria-label="vedette"></span></td></tr>
+          <tr><td>Thé vert</td><td class="nombre">2,60 €</td><td></td></tr>
+          <tr><td>Croissant</td><td class="nombre">1,20 €</td><td></td></tr>
+          <tr><td>Tarte aux fruits de saison</td><td class="nombre">3,20 €</td><td><span class="icone" data-icone="etoilePleine" role="img" aria-label="vedette"></span></td></tr>
+        </tbody>
+      </table>
+      <div class="rangee"><button class="bouton bouton--principal" data-focus data-aller="ardoise.html#composer">Modifier la carte</button></div>
+    </div>
+
+    <!-- Équipe (vide au village) -->
+    <div class="pile" data-si="equipe" role="tabpanel" aria-label="Équipe">
+      <h2>Équipe</h2>
+      <div class="vide">
+        <p class="vide__titre">Pas encore d’équipe : à deux, vous suffisez au café du village.</p>
+        <p class="aide">Quand le café grandira, vous pourrez embaucher et confier des postes : service en salle, barista, commis, pâtisserie, plonge.</p>
+      </div>
+    </div>
+
+    <!-- Nos cafés (un seul) -->
+    <div class="pile" data-si="cafes" role="tabpanel" aria-label="Nos cafés">
+      <h2>Nos cafés</h2>
+      <div class="cartes">
+        <div class="carte carte--accent">
+          <h3><span class="icone" data-icone="tasse"></span>La Tasse Bleue · place du Tilleul, Ormeval</h3>
+          <p>Ouverte depuis le 1er jour du printemps · 3 tasses sur 5</p>
+          <p class="aide">Vous y êtes aujourd’hui.</p>
+        </div>
+        <div class="carte">
+          <h3>Notre maison</h3>
+          <p>La Tasse Bleue · emblème : théière · bleu et crème</p>
+          <button class="bouton bouton--petit" data-focus data-action="renommer">Modifier, avec l’accord de Sacha</button>
+        </div>
+      </div>
+      <div class="vide">
+        <p class="vide__titre">Un seul café pour l’instant.</p>
+        <p class="aide">Quand vous partirez pour une plus grande adresse, celui-ci restera ouvert : vous le retrouverez ici, avec son résultat de chaque jour.</p>
+      </div>
+    </div>
+
+    <!-- Bilans -->
+    <div class="pile" data-si="bilans" role="tabpanel" aria-label="Bilans">
+      <h2>Bilans</h2>
+      <p class="aide">Le bilan de ce soir s’écrira à la fermeture.</p>
+      <div class="pile serree">
+        <button class="bouton ligne-bilan" data-focus data-aller="bilan.html#livre"><span class="fort">Lundi 8</span><span>Jour de fermeture · la nouvelle nappe posée</span></button>
+        <button class="bouton ligne-bilan" data-aller="bilan.html#livre"><span class="fort">Dimanche 7</span><span>52 clients · 402,10 € de recette · 5 mots au livre d’or</span></button>
+        <button class="bouton ligne-bilan" data-aller="bilan.html#livre"><span class="fort">Samedi 6</span><span>47 clients · 361,80 € de recette · 3 mots au livre d’or</span></button>
+        <button class="bouton ligne-bilan" data-aller="bilan.html#livre"><span class="fort">Vendredi 5</span><span>38 clients · 296,40 € de recette · 2 mots au livre d’or</span></button>
+      </div>
+    </div>
+
+    <!-- Nos projets -->
+    <div class="pile" data-si="projets" role="tabpanel" aria-label="Nos projets">
+      <h2>Nos projets</h2>
+      <p class="aide">Le carnet de vos envies pour la maison. Ceux que vous épinglez vous attendent chaque matin.</p>
+      <div class="projet">
+        <p class="projet__titre">Une vraie terrasse</p>
+        <button class="bouton bouton--petit" data-focus data-bascule aria-pressed="true"><span class="icone" data-icone="signe"></span>Épinglé</button>
+        <p class="aide">2 sur 3 · il manque : un store</p>
+        <div class="barre-progression" aria-hidden="true" style="grid-column: 1 / -1"><span style="width: 66%"></span></div>
+      </div>
+      <div class="projet">
+        <p class="projet__titre">Les habitués à la carte</p>
+        <button class="bouton bouton--petit" data-bascule aria-pressed="false"><span class="icone" data-icone="signe"></span>Épingler</button>
+        <p class="aide">1 sur 3 · la commande fétiche de Lucette, de Bastien et de Simone sur l’ardoise</p>
+      </div>
+      <div class="projet projet--ferme">
+        <p class="projet__titre">Notre propre mélange</p>
+        <p class="aide"><span class="icone" data-icone="cadenas"></span> Plus tard</p>
+        <p class="aide" style="grid-column: 1 / -1">Il faudra un torréfacteur, dans une plus grande adresse.</p>
+      </div>
+      <div class="projet projet--ferme">
+        <p class="projet__titre">Ouvrir à Paris</p>
+        <p class="aide"><span class="icone" data-icone="cadenas"></span> Un jour…</p>
+      </div>
+      <h3>Réalisés</h3>
+      <p class="aide">Le premier café servi · jour 1</p>
+    </div>
+
+    <!-- Réglages pour toi -->
+    <div class="pile" data-si="reglages" role="tabpanel" aria-label="Réglages">
+      <h2>Réglages pour toi</h2>
+      <p class="aide">Sacha ne les voit pas et garde les siens. Son, affichage et touches : Échap, puis Réglages de Duo.</p>
+      <div class="groupe-reglages">
+        <h3>Vue</h3>
+        <div class="reglage"><label for="r-champ">Champ de vision</label><span class="curseur"><input id="r-champ" type="range" min="50" max="75" step="5" value="60" data-focus aria-valuetext="92 degrés à l’horizontale"><output for="r-champ">92°</output></span><p class="reglage__aide">Angle à l’horizontale sur ton écran. Plus large, on voit davantage autour de soi.</p></div>
+        <div class="reglage"><span class="reglage__nom">Balancement de la tête en marchant</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Balancement de la tête en marchant"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Coupé</span><span class="oui">Léger</span></button></div>
+        <div class="reglage"><span class="reglage__nom">Point de visée</span><span class="segments" role="group" aria-label="Taille du point de visée"><button class="bouton" data-groupe-choix="viseur" aria-pressed="false">Petit</button><button class="bouton" data-groupe-choix="viseur" aria-pressed="true">Moyen</button><button class="bouton" data-groupe-choix="viseur" aria-pressed="false">Grand</button></span></div>
+        <div class="reglage"><span class="reglage__nom">Aide à viser</span><span class="segments" role="group" aria-label="Aide à viser"><button class="bouton" data-groupe-choix="aimant" aria-pressed="false">Sans</button><button class="bouton" data-groupe-choix="aimant" aria-pressed="true">Légère</button><button class="bouton" data-groupe-choix="aimant" aria-pressed="false">Forte</button></span><p class="reglage__aide">Le point de visée s’accroche à l’objet le plus proche.</p></div>
+      </div>
+      <div class="groupe-reglages">
+        <h3>Souris</h3>
+        <div class="reglage"><label for="r-sensibilite">Sensibilité</label><span class="curseur"><input id="r-sensibilite" type="range" min="0.2" max="3" step="0.1" value="1"><output for="r-sensibilite">1,0</output></span></div>
+        <div class="reglage"><span class="reglage__nom">Mouvement vertical</span><span class="segments" role="group" aria-label="Mouvement vertical"><button class="bouton" data-groupe-choix="inversion" aria-pressed="true">Normal</button><button class="bouton" data-groupe-choix="inversion" aria-pressed="false">Inversé</button></span></div>
+      </div>
+      <div class="groupe-reglages">
+        <h3>Gestes</h3>
+        <div class="reglage"><span class="reglage__nom">Gestes simplifiés</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Gestes simplifiés"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Un clic par geste : il se fait tout seul, avec un résultat « bien » assuré. Sacha ne le voit pas.</p></div>
+        <div class="reglage"><span class="reglage__nom">Rappel des options</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Rappel des options"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Le lait d’avoine ou le moulin à déca s’éclairent quand le ticket les demande.</p></div>
+        <div class="reglage"><span class="reglage__nom">Guide du poste</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="Guide du poste"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Le prochain objet à prendre brille doucement.</p></div>
+        <div class="reglage"><span class="reglage__nom">Gestes à maintenir</span><span class="segments" role="group" aria-label="Gestes à maintenir"><button class="bouton" data-groupe-choix="maintien" aria-pressed="true">Garder appuyé</button><button class="bouton" data-groupe-choix="maintien" aria-pressed="false">Un appui pour commencer, un pour finir</button></span></div>
+        <div class="reglage"><span class="reglage__nom">Marcher vite</span><span class="segments" role="group" aria-label="Marcher vite"><button class="bouton" data-groupe-choix="vite" aria-pressed="true">Garder Maj appuyée</button><button class="bouton" data-groupe-choix="vite" aria-pressed="false">Un appui pour basculer</button></span></div>
+      </div>
+      <div class="groupe-reglages">
+        <h3>Son</h3>
+        <div class="reglage"><label for="r-ambiance">Ambiance</label><span class="curseur"><input id="r-ambiance" type="range" min="0" max="100" step="5" value="80"><output for="r-ambiance">80 %</output></span><p class="reglage__aide">La rumeur de la salle et la rue. Les autres volumes : Échap, puis Réglages de Duo.</p></div>
+        <div class="reglage"><span class="reglage__nom">J’écoute au casque</span><button class="interrupteur" role="switch" aria-checked="false" data-bascule aria-label="J’écoute au casque"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Les sons se placent mieux autour de toi.</p></div>
+      </div>
+      <div class="groupe-reglages">
+        <h3>Lecture</h3>
+        <div class="reglage"><span class="reglage__nom">Écritures à la main</span><span class="segments" role="group" aria-label="Écritures à la main"><button class="bouton" data-groupe-choix="ecriture" aria-pressed="true">Manuscrites</button><button class="bouton" data-groupe-choix="ecriture" aria-pressed="false">Plus lisibles</button></span><p class="reglage__aide">Livre d’or, ardoise et tickets.</p></div>
+        <div class="reglage"><span class="reglage__nom">Montrer les sons importants</span><button class="interrupteur" role="switch" aria-checked="true" data-bascule aria-label="Montrer les sons importants"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button><p class="reglage__aide">Clochette de la porte, client qui appelle, machine prête, signe de Sacha.</p></div>
+        <div class="reglage"><span class="reglage__nom">Heure à l’écran</span><span class="segments" role="group" aria-label="Heure à l’écran"><button class="bouton" data-groupe-choix="heure" aria-pressed="true">Toujours</button><button class="bouton" data-groupe-choix="heure" aria-pressed="false">En service</button><button class="bouton" data-groupe-choix="heure" aria-pressed="false">Jamais</button></span></div>
+        <div class="reglage"><span class="reglage__nom">Astuces</span><button class="interrupteur" role="switch" aria-checked="true" data-bascule aria-label="Astuces"><span class="interrupteur__pastille" aria-hidden="true"></span><span class="non">Non</span><span class="oui">Oui</span></button></div>
+      </div>
+      <div class="groupe-reglages">
+        <h3>Pour vous deux</h3>
+        <p class="aide">Ces réglages valent pour vous deux : Sacha voit tout de suite tes changements.</p>
+        <div class="reglage"><span class="reglage__nom">Rythme du service</span><span class="segments" role="group" aria-label="Rythme du service"><button class="bouton" data-groupe-choix="rythme" aria-pressed="true">Normal</button><button class="bouton" data-groupe-choix="rythme" aria-pressed="false">Paisible</button></span><p class="reglage__aide">Paisible : les heures du service durent un quart de plus, avec les mêmes clients.</p></div>
+        <div class="reglage"><span class="reglage__nom">Musique de la radio</span><span class="segments" role="group" aria-label="Musique de la radio"><button class="bouton" data-groupe-choix="musique" aria-pressed="true">Sur les deux ordinateurs</button><button class="bouton" data-groupe-choix="musique" aria-pressed="false">Seulement chez Camille</button></span><p class="reglage__aide">Si vous entendez un écho dans la pièce.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="tablette__pied pied-touches">
+    <span><kbd>A</kbd><kbd>E</kbd> sections</span>
+    <span>flèches ou <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> choisir</span>
+    <span><kbd>Entrée</kbd> valider</span>
+    <span><kbd>Tab</kbd> ou <kbd>Retour arrière</kbd> fermer</span>
+    <span>Le café continue pendant que tu regardes.</span>
+  </footer>
+</section>
+
+<dialog class="fenetre" id="fenetre-proposer" aria-labelledby="fp-titre">
+  <h2 id="fp-titre">Proposer l’achat à Sacha ?</h2>
+  <p class="fort" id="fp-objet">Banquette en velours · 340 €</p>
+  <p id="fp-texte">La somme est réservée en attendant la réponse de Sacha. Il resterait 162 € dans la caisse.</p>
+  <div class="rangee rangee--fin">
+    <button class="bouton" data-fermer-fenetre="annuler">Annuler</button>
+    <button class="bouton bouton--principal" data-focus data-action="proposer">Proposer à Sacha</button>
+  </div>
+</dialog>
+
+<script src="support/symboles.js"></script>
+<script src="support/scenes.js"></script>
+<script src="support/commun.js"></script>
+<script>
+  'use strict';
+  const euro = (v) => `${v.toFixed(2).replace('.', ',')} €`;
+  function recalculer() {
+    let total = 18; // ligne du café, tenue par Sacha
+    document.querySelectorAll('output[data-prix]').forEach((o) => {
+      const st = Number(o.dataset.valeur) * Number(o.dataset.prix);
+      total += st;
+      const cellule = document.querySelector(`[data-sous-total="${o.id}"]`);
+      if (cellule) cellule.textContent = euro(st);
+    });
+    document.getElementById('total-commande').textContent = euro(total);
+  }
+  document.addEventListener('valeur', recalculer);
+
+  Maquette.surEtat = function (etat) {
+    const f = document.getElementById('fenetre-proposer');
+    if (etat === 'catalogue-proposer' && !f.open) {
+      f._ouvreur = document.querySelector('[data-ouvrir-proposition^="Banquette"]');
+      f.showModal();
+      f.querySelector('[data-focus]').focus();
+    }
+    if (etat !== 'catalogue-proposer' && f.open) f.close();
+  };
+
+  // L'événement close ne remonte pas: écoute en capture.
+  document.addEventListener('close', (e) => {
+    if (e.target.id === 'fenetre-proposer' && document.body.dataset.etat === 'catalogue-proposer' && e.target.returnValue !== 'propose') Maquette.aller('catalogue');
+  }, true);
+
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'r-champ') {
+      // Le jeu règle l'angle vertical (50 à 75°); on affiche l'angle horizontal, celui que les joueurs connaissent.
+      const v = (Number(e.target.value) * Math.PI) / 180;
+      const h = Math.round((2 * Math.atan(Math.tan(v / 2) * (innerWidth / innerHeight)) * 180) / Math.PI);
+      e.target.nextElementSibling.textContent = `${h}°`;
+      e.target.setAttribute('aria-valuetext', `${h} degrés à l’horizontale`);
+    }
+    if (e.target.id === 'r-ambiance') e.target.nextElementSibling.textContent = `${e.target.value}\u202f%`;
+    if (e.target.id === 'r-sensibilite') e.target.nextElementSibling.textContent = Number(e.target.value).toFixed(1).replace('.', ',');
+  });
+
+  document.addEventListener('click', (e) => {
+    const proposer = e.target.closest('[data-ouvrir-proposition]');
+    if (proposer) {
+      const [nom, prix] = proposer.dataset.ouvrirProposition.split('|');
+      document.getElementById('fp-objet').textContent = `${nom} · ${prix} €`;
+      Maquette.aller('catalogue-proposer');
+      return;
+    }
+    const action = e.target.closest('[data-action]');
+    if (!action) return;
+    const a = action.dataset.action;
+    if (a === 'proposer') {
+      const f = document.getElementById('fenetre-proposer');
+      f.close('propose');
+      Maquette.aller('catalogue-attente');
+      Maquette.note('Proposition envoyée : Sacha la voit en haut à droite, avec « Entrée : voir et répondre ».');
+    }
+    if (a === 'acheter') Maquette.note('Achat fait : livré demain matin, avec les livraisons.');
+    if (a === 'hier') Maquette.note('Commande habituelle remise. Tu peux encore l’ajuster.');
+    if (a === 'renommer') Maquette.note('Renommer la maison ouvre « Notre maison » et demande l’accord de Sacha.');
+  });
+</script>
+</body>
+</html>

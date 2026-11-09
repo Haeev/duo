@@ -1,0 +1,413 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "essai-style-village",
+ "game": "cosy-cafe",
+ "author": "artiste-3d",
+ "date": "2026-11-07",
+ "purpose": "essai de style 3D du café du village: chaise paillée (variante B), plante en pot, croissant (écarté), cinq personnages riggés (trois clients, deux avatars en tenue de travail de la maison)",
+ "license": "offre payante du client: licence privée, les modèles appartiennent au client (docs/production/meshy.md, section 7)",
+ "client": {
+  "server": "@meshy-ai/meshy-mcp-server@0.6.9",
+  "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+  "api": "https://api.meshy.ai"
+ },
+ "credits_budget": 300,
+ "credits_total": 130,
+ "solde": {
+  "debut": 3013,
+  "fin": 2871,
+  "note": "écart de 142 pour 130 crédits de cette mission: le reste vient d'autres tâches du compte pendant la mission (animations du tech-artist, 12 crédits)"
+ },
+ "inputs": [
+  {
+   "file": "docs/jeux/cosy-cafe/essai-style/meshy/references/char_lecteur.jpg",
+   "note": "image générée par Meshy (texte vers image, nano-banana), réduite à 512 px pour le dépôt",
+   "sha256": "49578d5741737dce378b2220bbfca084c3e63ffe2b99b50aac3fb194805f67b9"
+  },
+  {
+   "file": "docs/jeux/cosy-cafe/essai-style/meshy/references/char_attente.jpg",
+   "note": "image générée par Meshy (texte vers image, nano-banana), réduite à 512 px pour le dépôt",
+   "sha256": "78d699d5e989d8c80ae8dd1df41012dca79c873275f7008e2c9a8dbcb11e84af"
+  },
+  {
+   "file": "docs/jeux/cosy-cafe/essai-style/meshy/references/char_barista1.jpg",
+   "note": "image générée par Meshy (texte vers image, nano-banana), réduite à 512 px pour le dépôt",
+   "sha256": "663620cbbf32d07577953761dcde5bc85ab9fb7334759ae7c02511031f00ac49"
+  },
+  {
+   "file": "docs/jeux/cosy-cafe/essai-style/meshy/references/char_barista2.jpg",
+   "note": "image générée par Meshy (texte vers image, nano-banana), réduite à 512 px pour le dépôt",
+   "sha256": "a2a7582ff9675b39635ad1b8aebab4946e679af8dc57b4a7d8a3fb757dc6fd83"
+  },
+  {
+   "file": "docs/jeux/cosy-cafe/essai-style/meshy/references/char_caisse.jpg",
+   "note": "image générée par Meshy (texte vers image, nano-banana), réduite à 512 px pour le dépôt",
+   "sha256": "724c0b76a4fc51344cf4cbf5693ca4c9629bfc233f3e5cd0c5211afd7c58239b"
+  }
+ ],
+ "tasks": [
+  {
+   "asset": "food_croissant",
+   "etape": "texte vers 3D, aperçu",
+   "task_id": "01a1b7c5-0e0e-71a3-a419-2e00bf7eb860",
+   "endpoint": "POST /openapi/v2/text-to-3d (preview)",
+   "prompt": "A single French butter croissant, realistic proportions, golden flaky layered crust with curved crescent shape and tapered ends, game asset, sits flat, about 14 cm long. No plate, no text.",
+   "seed": 2904174959,
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "parametres": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom",
+    "target_polycount": 600
+   },
+   "expire_ms": null,
+   "telecharge": true
+  },
+  {
+   "asset": "deco_plant_pot",
+   "etape": "texte vers 3D, aperçu",
+   "task_id": "01a1b7c5-0dbe-70e4-981f-361d277850b8",
+   "endpoint": "POST /openapi/v2/text-to-3d (preview)",
+   "prompt": "A leafy indoor potted plant for a cozy French village cafe: a small olive tree style shrub with many small leaves in clusters, in a round terracotta clay pot with a rim, about 60 cm tall, game asset, simple readable silhouette. No text, no logo.",
+   "seed": 2509953411,
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "parametres": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom",
+    "target_polycount": 2000
+   },
+   "expire_ms": null,
+   "telecharge": true
+  },
+  {
+   "asset": "furn_chair_campagne",
+   "etape": "texte vers 3D, aperçu",
+   "task_id": "01a1b7c5-0d20-7475-93dd-5a36ff5456fe",
+   "endpoint": "POST /openapi/v2/text-to-3d (preview)",
+   "prompt": "A traditional French country rush-seat chair (chaise paillee): turned honey oak wooden frame, four legs with stretchers, ladder back with three curved horizontal slats, woven straw seat, realistic proportions, seat height 45 cm, total height 90 cm, game asset. No cushion, no text.",
+   "seed": 3549383395,
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "parametres": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom",
+    "target_polycount": 1500
+   },
+   "expire_ms": null,
+   "telecharge": true
+  },
+  {
+   "asset": "char_lecteur",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b7d7-5949-7158-9a0a-57086e4aa4cf",
+   "endpoint": "POST /openapi/v1/text-to-image",
+   "prompt": "A man in his sixties, short grey hair and short grey beard, grey-blue knit sweater, brown corduroy trousers, a long soft mustard-yellow wool scarf, brown leather shoes. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   },
+   "credits": 3,
+   "statut": "SUCCEEDED",
+   "telecharge": true
+  },
+  {
+   "asset": "char_lecteur",
+   "etape": "image vers 3D",
+   "task_id": "01a1b7d7-cb82-7752-bff8-f9bbf5ad9fc7",
+   "parent_task_id": "01a1b7d7-5949-7158-9a0a-57086e4aa4cf",
+   "endpoint": "POST /openapi/v1/image-to-3d",
+   "parametres": {
+    "input_task_id": "01a1b7d7-5949-7158-9a0a-57086e4aa4cf",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 5000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   },
+   "credits": 15,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794344981989,
+   "telecharge": false
+  },
+  {
+   "asset": "char_lecteur",
+   "etape": "rig",
+   "task_id": "01a1b7d9-2189-751d-86ae-c631a39cc270",
+   "parent_task_id": "01a1b7d7-cb82-7752-bff8-f9bbf5ad9fc7",
+   "endpoint": "POST /openapi/v1/rigging",
+   "parametres": {
+    "input_task_id": "01a1b7d7-cb82-7752-bff8-f9bbf5ad9fc7",
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345035328,
+   "telecharge": true
+  },
+  {
+   "asset": "char_attente",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b7d7-5a33-7701-a836-f43450efc161",
+   "endpoint": "POST /openapi/v1/text-to-image",
+   "prompt": "A woman in her seventies, grey hair in a bun, raspberry-pink knitted cardigan over a cream blouse, dark blue jeans, flat brown shoes. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   },
+   "credits": 3,
+   "statut": "SUCCEEDED",
+   "telecharge": true
+  },
+  {
+   "asset": "char_attente",
+   "etape": "image vers 3D",
+   "task_id": "01a1b7d7-ce2a-7260-accd-7f2e88acb4b3",
+   "parent_task_id": "01a1b7d7-5a33-7701-a836-f43450efc161",
+   "endpoint": "POST /openapi/v1/image-to-3d",
+   "parametres": {
+    "input_task_id": "01a1b7d7-5a33-7701-a836-f43450efc161",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 5000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   },
+   "credits": 15,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345031330,
+   "telecharge": false
+  },
+  {
+   "asset": "char_attente",
+   "etape": "rig",
+   "task_id": "01a1b7d9-5897-76f0-8f1e-777f30b59e21",
+   "parent_task_id": "01a1b7d7-ce2a-7260-accd-7f2e88acb4b3",
+   "endpoint": "POST /openapi/v1/rigging",
+   "parametres": {
+    "input_task_id": "01a1b7d7-ce2a-7260-accd-7f2e88acb4b3",
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345046863,
+   "telecharge": true
+  },
+  {
+   "asset": "char_barista1",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b7d7-5946-72ae-9b66-21e9f0fe75dd",
+   "endpoint": "POST /openapi/v1/text-to-image",
+   "prompt": "A young adult barista with short dark brown hair and warm brown skin, dark indigo long-sleeve work shirt with sleeves rolled up, a plain dark bottle-green cotton bib apron with waist ties, charcoal trousers, dark shoes. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   },
+   "credits": 3,
+   "statut": "SUCCEEDED",
+   "telecharge": true
+  },
+  {
+   "asset": "char_barista1",
+   "etape": "image vers 3D",
+   "task_id": "01a1b7d7-cb8b-75ca-85e9-221f759be80e",
+   "parent_task_id": "01a1b7d7-5946-72ae-9b66-21e9f0fe75dd",
+   "endpoint": "POST /openapi/v1/image-to-3d",
+   "parametres": {
+    "input_task_id": "01a1b7d7-5946-72ae-9b66-21e9f0fe75dd",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 5000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   },
+   "credits": 15,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345005069,
+   "telecharge": false
+  },
+  {
+   "asset": "char_barista1",
+   "etape": "rig",
+   "task_id": "01a1b7d9-3358-7735-8279-ea20c5644951",
+   "parent_task_id": "01a1b7d7-cb8b-75ca-85e9-221f759be80e",
+   "endpoint": "POST /openapi/v1/rigging",
+   "parametres": {
+    "input_task_id": "01a1b7d7-cb8b-75ca-85e9-221f759be80e",
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345038616,
+   "telecharge": true
+  },
+  {
+   "asset": "char_barista2",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b7d7-5a44-757f-ac91-d416fd84f56d",
+   "endpoint": "POST /openapi/v1/text-to-image",
+   "prompt": "A young adult woman barista with curly auburn hair tied back, light skin, cream long-sleeve work shirt, a plain dark bottle-green cotton bib apron with waist ties, dark blue jeans, brown shoes. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   },
+   "credits": 3,
+   "statut": "SUCCEEDED",
+   "telecharge": true
+  },
+  {
+   "asset": "char_barista2",
+   "etape": "image vers 3D",
+   "task_id": "01a1b7d7-cd3a-776a-8ec3-be485176197a",
+   "parent_task_id": "01a1b7d7-5a44-757f-ac91-d416fd84f56d",
+   "endpoint": "POST /openapi/v1/image-to-3d",
+   "parametres": {
+    "input_task_id": "01a1b7d7-5a44-757f-ac91-d416fd84f56d",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 5000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   },
+   "credits": 15,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345002362,
+   "telecharge": false
+  },
+  {
+   "asset": "char_barista2",
+   "etape": "rig",
+   "task_id": "01a1b7d9-46e6-7663-ac56-f422a20100ec",
+   "parent_task_id": "01a1b7d7-cd3a-776a-8ec3-be485176197a",
+   "endpoint": "POST /openapi/v1/rigging",
+   "parametres": {
+    "input_task_id": "01a1b7d7-cd3a-776a-8ec3-be485176197a",
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345042288,
+   "telecharge": true
+  },
+  {
+   "asset": "char_caisse",
+   "etape": "texte vers image (référence)",
+   "task_id": "01a1b7e3-2931-77b5-b245-4088624e1bed",
+   "endpoint": "POST /openapi/v1/text-to-image",
+   "prompt": "A woman in her thirties in a hurry, dark brown hair in a low ponytail, warm medium skin, a long beige trench coat over a navy sweater, navy trousers, a cognac leather messenger bag worn across the body, brown ankle boots. Full body 3D game character, stylized semi-realistic with natural adult proportions (about 7 heads tall), friendly face with clear eyes, eyebrows, nose and mouth, formed hands with fingers, clothes with soft folds and volume, real shoes. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing the camera, neutral expression. Plain light beige background, soft even lighting, no shadow, no text, no logo.",
+   "parametres": {
+    "ai_model": "nano-banana",
+    "pose_mode": "t-pose",
+    "aspect_ratio": "1:1"
+   },
+   "credits": 3,
+   "statut": "SUCCEEDED",
+   "telecharge": true
+  },
+  {
+   "asset": "char_caisse",
+   "etape": "image vers 3D",
+   "task_id": "01a1b7e3-83e7-7014-ab1e-c8dc2e4bf17d",
+   "parent_task_id": "01a1b7e3-2931-77b5-b245-4088624e1bed",
+   "endpoint": "POST /openapi/v1/image-to-3d",
+   "parametres": {
+    "input_task_id": "01a1b7e3-2931-77b5-b245-4088624e1bed",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 5000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "auto_size": true,
+    "origin_at": "bottom"
+   },
+   "credits": 15,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345775053,
+   "telecharge": false
+  },
+  {
+   "asset": "char_caisse",
+   "etape": "rig",
+   "task_id": "01a1b7e4-ab76-7131-adfa-a070f4b27a49",
+   "parent_task_id": "01a1b7e3-83e7-7014-ab1e-c8dc2e4bf17d",
+   "endpoint": "POST /openapi/v1/rigging",
+   "parametres": {
+    "input_task_id": "01a1b7e3-83e7-7014-ab1e-c8dc2e4bf17d",
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "statut": "SUCCEEDED",
+   "expire_ms": 1794345788935,
+   "telecharge": true
+  }
+ ],
+ "reused": [
+  {
+   "file": "docs/production/essais-meshy/modeles/char_essai_presse.glb",
+   "from": "tech-artist",
+   "use": "clips idle, sit, drink (24 os, mêmes noms que nos rigs): aucun clip racheté; le client pressé lui-même sert de repli si char_caisse manque"
+  }
+ ],
+ "conformity": {
+  "scripts": [
+   "docs/jeux/cosy-cafe/essai-style/blender/conformer_meshy.py (chaise, plante, croissant)",
+   "docs/jeux/cosy-cafe/essai-style/blender/personnages_meshy.py (personnages posés)"
+  ],
+  "outputs": [
+   "docs/jeux/cosy-cafe/essai-style/meshy/furn_chair_campagne_B.json",
+   "docs/jeux/cosy-cafe/essai-style/meshy/deco_plant_pot_A.json",
+   "docs/jeux/cosy-cafe/essai-style/meshy/deco_plant_pot_B.json"
+  ],
+  "notes": [
+   "aperçus sans texture: couleurs choisies par la géométrie (assise paillée, pot, terre, tige, feuillage)",
+   "personnages: pose figée d'un clip, A en cases de palette (texture de Meshy lue sous chaque face), B avec la texture de Meshy réduite à 512 px",
+   "sorties brutes (GLB riggés, 3 Mo chacun, et aperçus) gardées hors du dépôt dans essai-style/meshy_output/ (ignoré par git); les liens de Meshy expirent 72 h après chaque tâche"
+  ]
+ },
+ "status": "téléchargé et intégré le 2026-11-07, sauf croissant écarté (forme droite et trop haute, remplacé par la forme scriptée)"
+}

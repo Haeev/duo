@@ -184,8 +184,8 @@ const mountUi = (): GameInterface =>
     sound: (id) => {
       log.sounds.push(id);
     },
-    outfitPreview: (options) => renderer?.createOutfitPreview?.(options) ?? null,
-    villagerPortrait: (id) => renderer?.villagerPortrait?.(id) ?? null,
+    outfitPreview: (options) => renderer?.createOutfitPreview(options) ?? null,
+    villagerPortrait: (id) => renderer?.villagerPortrait(id) ?? null,
   });
 let ui = mountUi();
 
@@ -310,8 +310,8 @@ async function start(): Promise<void> {
     graphics: () => (renderer === null ? null : { options: renderer.graphicsOptions(), ...renderer.graphicsState() }),
     log,
     portraits: () => ({
-      urls: Object.fromEntries(content.villagers.map((v) => [v.id, renderer?.villagerPortrait?.(v.id) ?? null])),
-      stats: renderer?.portraitStats?.() ?? null,
+      urls: Object.fromEntries(content.villagers.map((v) => [v.id, renderer?.villagerPortrait(v.id) ?? null])),
+      stats: renderer?.portraitStats() ?? null,
     }),
     remount: (n) => {
       for (let i = 0; i < n; i++) {

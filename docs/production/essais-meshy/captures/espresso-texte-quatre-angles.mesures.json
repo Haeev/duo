@@ -1,0 +1,44 @@
+{
+  "frame": {
+    "triangles": 4513,
+    "calls": 21,
+    "programs": 2,
+    "textures": 2,
+    "geometries": 21
+  },
+  "decor": {
+    "triangles": 592,
+    "calls": 21
+  },
+  "models": [
+    {
+      "file": "t1.glb",
+      "fileBytes": 289740,
+      "url": "/modele-0.glb",
+      "triangles": 3953,
+      "drawCalls": 1,
+      "bones": 0,
+      "clips": [],
+      "playing": null,
+      "sizeM": [
+        0.76,
+        0.976,
+        0.816
+      ],
+      "textures": [
+        {
+          "slot": "map",
+          "w": 64,
+          "h": 64
+        }
+      ],
+      "textureBytesWithMips": 21845
+    }
+  ],
+  "viewport": [
+    1366,
+    768
+  ],
+  "fovVertical": 60,
+  "pageErrors": []
+}

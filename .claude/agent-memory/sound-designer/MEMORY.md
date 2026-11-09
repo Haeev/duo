@@ -119,3 +119,31 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - La géométrie du train du son (`slideDistanceM` 70) ne suit pas le rendu depuis R06 (`trainSlides` de `rendu/voie.ts`: entrée depuis le bord est de la carte): ce qui dépend de la position visible (sifflet aux passages à niveau) se calcule à part.
 - Prettier n'est pas appliqué aux fichiers de `src/audio` (27 fichiers hors format avant toute retouche): ne pas reformater, seuls `tsc` et `eslint` comptent.
 - Commande refusée dans un worktree isolé: `git show HEAD:...` suivi d'une redirection; `magick` absent (ImageMagick 6: `convert`).
+
+## Budgets et Chromium (vérifié le 2026-11-07, direction sonore de Cosy Café)
+
+- Mémoire décodée: `new OfflineAudioContext(1, 1, 24000).decodeAudioData()` rend un tampon à 24 kHz (deux fois moins de mémoire qu'à 48 kHz) qui se joue juste dans un contexte à 48 ou 44,1 kHz (sinus de 1 kHz, durée exacte). Le `load` du SDK décode dans le contexte principal: il faut une option de fréquence.
+- Ogg Opus dans Chromium: `canPlayType` « probably », décodage à la longueur exacte à 48 et 44,1 kHz, lecture en flux par `createMediaElementSource`, `preservesPitch` présent; une vitesse de 1,01 donne 1,0096 mesuré sur 6 s (sur 2 s, la mesure n'est pas fiable).
+- libopus en débit variable libre dépasse sa consigne sur un rendu FluidR3 court (48k demandés, 56,8 kbit/s réels); `-vbr constrained` reste juste dessous (40k: 37,7; 48k: 45,0). Énergie par octave à 0,12 dB de la source jusqu'à 12 kHz dès 32 à 40 kbit/s (ne mesure pas tous les défauts: faire comparer à l'oreille).
+- Poids des sons courts en Vorbis: environ 3,6 Ko d'en-têtes par fichier mono (qualité 3) plus 6,5 Ko/s; stéréo qualité 4 environ 4 Ko plus 12 Ko/s (bruit décroissant, majorant).
+- Un budget se calcule à partir des tableaux du document sonore (colonne Fichiers « n × d s », « boucle d s », « st. », « 32 kHz », « par adresse »), par un script qui lit le Markdown: une première version à 48 kHz, trois ou quatre variantes et longues queues donnait 150 Mo de pic; leviers: musiques finies lues en flux (pas de raccord), décodage à 24 ou 32 kHz, groupes décodés par moment, variantes et queues resserrées.
+- Inventaire de FluidR3_GM (lecture du bloc `phdr`, script de 30 lignes): batteries Brush 128:40 à 42 et Jazz 128:32 à 36; Italian Accordion 8:21, Mandolin 16:25, Ukulele 8:24, Slow Violin 8:40, Fiddle 0:110, Rhodes EP 0:4, Honky Tonk 0:3, Calliope Lead 0:82, Reed Organ 0:20, Bandoneon 0:23, Kalimba 0:108; pas de clarinette basse.
+- SDK audio (`packages/sdk/src/audio.ts`): trois bus (`music`, `effects`, `interface`), aucun limiteur, `playMusic` démarre tout de suite un `HTMLAudioElement` sans position ni départ programmé.
+
+## Deux Tabliers (Cosy Café): démo d'Ormeval (vérifié le 2026-11-08)
+
+- Chaîne de La Petite Ligne copiée dans `games/deux-tabliers/assets-src/son/` (`dsp.py`, `instruments.py`, `partition.py`) plus `timbres.py` (porcelaine, laiton sur ressort, bol de bois, craie sans crissement, moteurs plafonnés sous 2 kHz). Sons encodés en Vorbis à leur fréquence de décodage (24 ou 32 kHz, `aresample=soxr`), musiques en Ogg Opus 40k contraint, extension `.ogg`.
+- Dans une boucle, tout filtre IIR (même un `tb.doux`) doit passer par `dsp.circ` (trois copies, celle du milieu); sinon le raccord casse. Le raccord se mesure sur le fichier décodé à sa fréquence propre (indices de boucle à cette fréquence).
+- Les fonds lisses (rumeur filtrée sous 1,5 kHz, réfrigérateur, bouilloire, roulement de vapeur) ressortent avec une seconde différence au centile 100 au raccord, même à 24 kHz: `souffle_de_raccord` de `generer.py` ajoute un souffle 2,5 à 10 kHz 22 dB sous le fond quand moins de 2 % de l'énergie est au-dessus de 2,5 kHz.
+- Copie M4A d'une musique à -1,5 dBTP: l'AAC monte à -0,4 dBTP; copies d'écoute encodées 2 dB plus bas (à -1 dB, encore -0,7 dBTP).
+- `partition.frottements` d'origine est quadratique; version triée par début (arrêt dès qu'une note commence trop tard) dans la copie de Deux Tabliers. Programme de batterie (Brush 40) envoyé sur le canal 10 si `programme > 0`.
+- Coups de bois (porte, meubles, coups à la porte): sous 200 Hz de fondamentale, 70 à 80 % de l'énergie tombe sous 300 Hz; fondamentale 240 à 290 Hz et `passe_haut` 200 à 240 ramènent un signal (coups de livraison) vers 40 à 50 %.
+- `Son(...)` modifié par script avec recherche de `"),\\n"`: la fin d'une lambda sur la même ligne trompe la recherche (paramètre ajouté dans l'appel de la fonction). Éditer ces appels à la main.
+
+## Deux Tabliers: sons de l'installation (vérifié le 2026-11-09)
+
+- Le plafond mémoire de `controler.py` (60 Mo à 48 kHz, décodage actuel du SDK) était à 54,5 Mo avant l'installation: un nouveau dossier de sons ne tient que si l'on compte des phases qui ne se recouvrent pas (`PAS_PENDANT_INSTALLATION`). Toute phase ajoutée doit être vraie dans le code (le jeu charge à la demande et ne libère rien: `buffers` de `src/audio/sons.ts`), donc le dire au dev.
+- Les sons de longue durée pilotés par un réglage de gameplay (`install.heatSec`) : un seul fichier calé sur la valeur par défaut, avec l'instant clé dans `extra` (`valveAtSeconds`) et la règle de décalage (offset de `start`) dans la note, plutôt que boucle plus fin: une ligne de branchement pour le dev.
+- Une chaudière qui « monte » réglée à l'intuition sortait à -55 LUFS ffmpeg au début de la chauffe (inaudible): mesurer le profil de sonie momentanée seconde par seconde (`ebur128`, une ligne sur dix) avant de livrer un son long.
+- Moteur de véhicule (fondamentale 25 à 45 Hz): 77 % de l'énergie sous 300 Hz même avec passe-haut à 100 Hz; un passe-haut à 180 Hz et une cloche de +9 dB à 650 Hz (capot, échappement) ramènent à 46 %.
+- Dans un worktree isolé, un heredoc Python qui édite un fichier du dépôt est parfois refusé (« too complex »): passer par Edit, ou un script dans le dossier de brouillon.

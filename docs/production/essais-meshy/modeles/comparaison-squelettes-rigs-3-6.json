@@ -1,0 +1,100 @@
+{
+  "a": {
+    "file": "Animation_Walking_withSkin.glb",
+    "skin": 0,
+    "joints": 24
+  },
+  "b": {
+    "file": "Character_output.glb",
+    "skin": 0,
+    "joints": 24
+  },
+  "same_bone_names": true,
+  "only_in_a": [],
+  "only_in_b": [],
+  "hierarchy_differences": [],
+  "same_skeleton": true,
+  "largest_bone_length_differences": [
+    {
+      "bone": "RightShoulder",
+      "a_m": 0.0328,
+      "b_m": 0.0712,
+      "relative": 1.169
+    },
+    {
+      "bone": "LeftShoulder",
+      "a_m": 0.0322,
+      "b_m": 0.0683,
+      "relative": 1.122
+    },
+    {
+      "bone": "headfront",
+      "a_m": 0.1826,
+      "b_m": 0.0865,
+      "relative": -0.526
+    },
+    {
+      "bone": "neck",
+      "a_m": 0.0533,
+      "b_m": 0.0706,
+      "relative": 0.325
+    },
+    {
+      "bone": "LeftForeArm",
+      "a_m": 0.1663,
+      "b_m": 0.2169,
+      "relative": 0.304
+    },
+    {
+      "bone": "head_end",
+      "a_m": 0.3597,
+      "b_m": 0.2565,
+      "relative": -0.287
+    },
+    {
+      "bone": "LeftArm",
+      "a_m": 0.1065,
+      "b_m": 0.135,
+      "relative": 0.267
+    },
+    {
+      "bone": "RightLeg",
+      "a_m": 0.3243,
+      "b_m": 0.4105,
+      "relative": 0.266
+    }
+  ],
+  "clips_of_a_on_b": [
+    {
+      "clip": "Armature|walking_man|baselayer",
+      "tracks_targets": 22,
+      "missing_in_b": []
+    }
+  ],
+  "bone_names_a": [
+    "Head",
+    "Hips",
+    "LeftArm",
+    "LeftFoot",
+    "LeftForeArm",
+    "LeftHand",
+    "LeftLeg",
+    "LeftShoulder",
+    "LeftToeBase",
+    "LeftUpLeg",
+    "RightArm",
+    "RightFoot",
+    "RightForeArm",
+    "RightHand",
+    "RightLeg",
+    "RightShoulder",
+    "RightToeBase",
+    "RightUpLeg",
+    "Spine",
+    "Spine01",
+    "Spine02",
+    "head_end",
+    "headfront",
+    "neck"
+  ]
+}

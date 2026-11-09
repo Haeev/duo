@@ -1,0 +1,157 @@
+{
+ "outil": "banc jetable (coque cuite, meubles du départ village, cafe-ferme.ts), Chromium SwiftShader, 1366x768, 2026-11-09",
+ "vues": {
+  "00-place-sans-module": {
+   "appels": 65,
+   "triangles": 81819,
+   "programmes": 9,
+   "cles_des_programmes": [
+    "char_avatar_2_mat 8388624,8521762",
+    "street_place_paves 8395776,8519682",
+    "dt_feuillage 8392192,8519682",
+    "dt_ciel 8391680,8519680",
+    " 8388608,8519682",
+    " 8388624,8519682",
+    " 8388608,8390658",
+    "dt_meubles 8391696,8519682",
+    "dt_verre 8391696,8390658"
+   ]
+  },
+  "00-salle-sans-module": {
+   "appels": 31,
+   "triangles": 61614,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "shell_floor 8395776,8519682",
+    "dt_arriere_pierre 8391680,8519680",
+    "dt_feuillage 8392192,8519682",
+    " 8388624,8519682",
+    " 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "01-salle-vitrines-blanchies": {
+   "appels": 37,
+   "triangles": 64638,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "shell_floor 8395776,8519682",
+    "dt_arriere_pierre 8391680,8519680",
+    "dt_feuillage 8392192,8519682",
+    " 8388624,8519682",
+    "dt_poussiere 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "02-salle-vitrines-propres": {
+   "appels": 31,
+   "triangles": 61614,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "shell_floor 8395776,8519682",
+    "dt_arriere_pierre 8391680,8519680",
+    "dt_feuillage 8392192,8519682",
+    " 8388624,8519682",
+    " 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "03-place-vitrines-blanchies": {
+   "appels": 75,
+   "triangles": 88563,
+   "programmes": 9,
+   "cles_des_programmes": [
+    "char_avatar_2_mat 8388624,8521762",
+    "street_place_paves 8395776,8519682",
+    "dt_feuillage 8392192,8519682",
+    "dt_ciel 8391680,8519680",
+    " 8388608,8519682",
+    " 8388624,8519682",
+    "dt_poussiere 8388608,8390658",
+    "dt_meubles 8391696,8519682",
+    "dt_verre 8391696,8390658"
+   ]
+  },
+  "04-vitre-moitie-interieur": {
+   "appels": 29,
+   "triangles": 56992,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "shell_floor 8395776,8519682",
+    "dt_feuillage 8392192,8519682",
+    "dt_ciel 8391680,8519680",
+    " 8388624,8519682",
+    " 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "05-vitre-moitie-place": {
+   "appels": 75,
+   "triangles": 88563,
+   "programmes": 9,
+   "cles_des_programmes": [
+    "dt_feuilles_mortes 8392192,8519682",
+    "char_avatar_2_mat 8388624,8521762",
+    "shell_floor 8395776,8519682",
+    " 8388608,8519682",
+    "dt_arriere_carreaux 8391680,8519680",
+    " 8388624,8519682",
+    "dt_poussiere 8388608,8390658",
+    "dt_meubles 8391696,8519682",
+    "dt_verre 8391696,8390658"
+   ]
+  },
+  "06-sol-poussiere-feuilles": {
+   "appels": 31,
+   "triangles": 59858,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "street_place_paves 8395776,8519682",
+    "dt_feuillage 8392192,8519682",
+    "dt_ciel 8391680,8519680",
+    " 8388624,8519682",
+    "dt_poussiere 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "07-sol-a-moitie-balaye": {
+   "appels": 31,
+   "triangles": 59858,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "dt_feuilles_mortes 8392192,8519682",
+    "shell_floor 8395776,8519682",
+    "dt_ciel 8391680,8519680",
+    " 8388624,8519682",
+    "dt_poussiere 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "08-sol-poussiere-salle": {
+   "appels": 41,
+   "triangles": 70076,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "shell_floor 8395776,8519682",
+    "dt_arriere_pierre 8391680,8519680",
+    "dt_feuillage 8392192,8519682",
+    " 8388624,8519682",
+    "dt_poussiere 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  },
+  "09-variante-legere": {
+   "appels": 29,
+   "triangles": 56872,
+   "programmes": 6,
+   "cles_des_programmes": [
+    "shell_floor 8395776,8519682",
+    "dt_feuillage 8392192,8519682",
+    "dt_ciel 8391680,8519680",
+    " 8388624,8519682",
+    " 8388608,8390658",
+    "dt_meubles 8391696,8519682"
+   ]
+  }
+ }
+}

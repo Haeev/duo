@@ -160,6 +160,11 @@ export interface Input<TAction extends string = string> {
   /** Élément dont on suit le pointeur (le canvas du jeu); `document.body` par défaut. */
   attach(element: HTMLElement): void;
   lockPointer(): void;
+  /**
+   * Rend le pointeur. Passer par ici (et non par `document.exitPointerLock`): un déverrouillage
+   * que le jeu n'a pas demandé, fenêtre active et partie en cours, est pris pour Échap et
+   * demande la pause de Duo.
+   */
   unlockPointer(): void;
   /**
    * Libellé d'une touche selon la disposition réelle du clavier (`KeyW` donne « Z » en AZERTY).

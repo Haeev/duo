@@ -182,6 +182,10 @@ function createContext<TAction extends string>(
       send({ type: 'pauseRequest' });
     },
     escapeTaken: () => notebook?.typing === true,
+    // Jamais hors de `running`: pendant une pause, un second `pauseRequest` vaudrait « reprendre ».
+    onPointerEscape: () => {
+      if (state === 'running') send({ type: 'pauseRequest' });
+    },
   });
   disposers.push(() => {
     input.dispose();

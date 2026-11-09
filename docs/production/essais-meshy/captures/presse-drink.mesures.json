@@ -1,0 +1,70 @@
+{
+  "frame": {
+    "triangles": 4552,
+    "calls": 22,
+    "programs": 2,
+    "textures": 3,
+    "geometries": 22
+  },
+  "decor": {
+    "triangles": 592,
+    "calls": 21
+  },
+  "models": [
+    {
+      "file": "char_essai_presse.glb",
+      "fileBytes": 624456,
+      "url": "/modele-0.glb",
+      "triangles": 3960,
+      "drawCalls": 1,
+      "bones": 24,
+      "clips": [
+        {
+          "name": "walk",
+          "duration": 1,
+          "tracks": 72
+        },
+        {
+          "name": "idle",
+          "duration": 4,
+          "tracks": 72
+        },
+        {
+          "name": "sit",
+          "duration": 10.667,
+          "tracks": 72
+        },
+        {
+          "name": "drink",
+          "duration": 8.833,
+          "tracks": 72
+        },
+        {
+          "name": "sit_drink",
+          "duration": 11.167,
+          "tracks": 72
+        }
+      ],
+      "playing": "drink",
+      "sizeM": [
+        1.514,
+        1.7,
+        0.309
+      ],
+      "textures": [
+        {
+          "slot": "map",
+          "w": 64,
+          "h": 64
+        }
+      ],
+      "textureBytesWithMips": 21845
+    }
+  ],
+  "viewport": [
+    1366,
+    768
+  ],
+  "fovVertical": 60,
+  "pageErrors": []
+}

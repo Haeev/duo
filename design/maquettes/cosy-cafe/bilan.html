@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosy Café · maquette basse fidélité · bilan du soir</title>
+<link rel="stylesheet" href="support/commun.css">
+<style>
+  .bilan {
+    width: min(58rem, calc(100vw - 2rem));
+    height: min(44rem, calc(100vh - 2rem));
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    background: var(--papier);
+    border: 3px solid var(--encre);
+    border-radius: 1.2rem;
+    padding: 0.9rem 1.2rem 0.7rem;
+  }
+  .bilan__tete { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 1.2rem; border-bottom: 2px solid var(--papier-3); padding-bottom: 0.5rem; }
+  .bilan__tete h1 { font-size: 1.625rem; }
+  .bilan__tete .partenaire { margin-left: auto; }
+  .partenaire { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9375rem; border: 2px solid var(--encre); border-radius: 999px; padding: 0.1rem 0.7rem 0.1rem 0.25rem; }
+  .bilan__page { overflow-y: auto; padding: 0.3rem 0.4rem 0.6rem; display: grid; gap: 0.8rem; align-content: start; }
+  .bilan__page h2 { font-size: 1.5rem; }
+  .mots { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr)); gap: 0.8rem; }
+  .mot { border: 2px solid var(--trait); border-radius: 0.3rem 1rem 0.3rem 1rem; padding: 0.8rem 0.9rem; display: grid; gap: 0.4rem; background: #fbfbf8; }
+  .mot--habitue { border: 3px solid var(--encre); }
+  .mot__texte { font-family: Georgia, 'Times New Roman', serif; font-size: 1.1875rem; line-height: 1.35; }
+  .mot__signature { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .etiquette { font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; border: 2px solid var(--encre); border-radius: 999px; padding: 0 0.5rem; }
+  .mot__sujet { display: inline-flex; gap: 0.35rem; align-items: center; font-size: 0.875rem; color: var(--encre-2); }
+  .bloc-bilan { display: grid; gap: 0.45rem; }
+  .bloc-bilan h3 { font-size: 1.125rem; display: flex; gap: 0.4rem; align-items: center; }
+  .bloc-bilan li { display: flex; gap: 0.6rem; align-items: start; }
+  .habitue { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; }
+  .portrait { width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 2px solid var(--trait); background: repeating-linear-gradient(45deg, #e5e5e5 0 6px, #d2d2d2 6px 12px); }
+  table { border-collapse: collapse; width: 100%; max-width: 36rem; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1.5px solid var(--papier-3); font-size: 1rem; }
+  td.nombre { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  td.note { color: var(--encre-3); font-size: 0.875rem; }
+  tr.resultat td { border-top: 3px solid var(--encre); font-size: 1.125rem; }
+  .barre-progression { height: 0.7rem; border: 2px solid var(--encre); border-radius: 999px; overflow: hidden; max-width: 24rem; }
+  .barre-progression span { display: block; height: 100%; background: var(--encre); }
+  .vide { border: 2px dashed var(--trait); border-radius: 0.8rem; padding: 1rem 1.1rem; display: grid; gap: 0.4rem; }
+  .bilan__pied { display: grid; gap: 0.4rem; border-top: 2px solid var(--papier-3); padding-top: 0.5rem; }
+  .bilan__nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .points { display: flex; gap: 0.35rem; align-items: center; }
+  .point { width: 1.6rem; height: 1.6rem; border-radius: 50%; border: 2px solid var(--encre); background: var(--papier); cursor: pointer; padding: 0; font-size: 0.75rem; font-weight: 700; }
+  .point[aria-selected='true'] { background: var(--encre); color: #fff; }
+  .page-sur { font-weight: 700; }
+</style>
+</head>
+<body data-etats="livre livre-vide premier appris chiffres plusieurs demain" data-retour="hud.html#fermeture">
+
+<div class="scene scene--sombre" aria-hidden="true"><div class="scene__vue" data-scene="comptoir"></div></div>
+<p class="etiquette-maquette" aria-hidden="true">Maquette basse fidélité · le bilan s’ouvre quand le dernier client est parti</p>
+
+<section class="interface bilan" data-panneau-jeu data-piege aria-labelledby="titre-bilan">
+  <header class="bilan__tete">
+    <h1 id="titre-bilan">Bilan du soir</h1>
+    <p class="aide" data-si="livre livre-vide premier appris chiffres demain">Mardi 9 · printemps · La Tasse Bleue, place du Tilleul</p>
+    <p class="aide" data-si="plusieurs">Mardi 2 · été · La Tasse Bleue, place de la Halle, Mérelles</p>
+    <p class="partenaire" data-si="livre livre-vide premier"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha lit la page 2</p>
+    <p class="partenaire" data-si="appris chiffres plusieurs"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha lit la page 1</p>
+    <p class="partenaire" data-si="demain"><span class="jeton jeton--petit" data-joueur="crescent"></span>Sacha a dit « À demain »</p>
+  </header>
+
+  <div class="bilan__page">
+    <!-- Page 1: le livre d'or, avant tout chiffre -->
+    <div class="pile" data-si="livre">
+      <h2>Le livre d’or</h2>
+      <p class="aide">4 mots aujourd’hui, de la main de vos clients. Les habitués d’abord.</p>
+      <div class="mots">
+        <article class="mot mot--habitue">
+          <p class="mot__texte">Mon café crème était parfait, comme toujours. Et cette nappe à carreaux, quelle bonne idée !</p>
+          <p class="mot__signature">Lucette <span class="etiquette">habituée</span></p>
+          <p class="mot__sujet"><span class="icone" data-icone="coeur"></span>A aimé : le café crème, la nappe</p>
+        </article>
+        <article class="mot">
+          <p class="mot__texte">Pas trouvé de place pour m’asseoir vers midi, dommage. On reviendra plus tôt.</p>
+          <p class="mot__signature">Deux randonneurs de passage</p>
+          <p class="mot__sujet"><span class="icone" data-icone="info"></span>A manqué : une place assise</p>
+        </article>
+        <article class="mot">
+          <p class="mot__texte">La tarte aux fruits ! J’en rêve encore.</p>
+          <p class="mot__signature">Une famille du village</p>
+          <p class="mot__sujet"><span class="icone" data-icone="coeur"></span>A aimé : la tarte aux fruits</p>
+        </article>
+        <article class="mot">
+          <p class="mot__texte">Un peu cher, le chocolat chaud, mais si bon.</p>
+          <p class="mot__signature">Une étudiante</p>
+          <p class="mot__sujet"><span class="icone" data-icone="info"></span>A trouvé cher : le chocolat chaud</p>
+        </article>
+      </div>
+    </div>
+
+    <div class="pile" data-si="livre-vide">
+      <h2>Le livre d’or</h2>
+      <div class="vide">
+        <p class="fort">Personne n’a écrit dans le livre d’or aujourd’hui.</p>
+        <p>Les clients écrivent quand quelque chose les a marqués : une recette, un geste, un manque. Demain, peut-être !</p>
+      </div>
+    </div>
+
+    <div class="pile" data-si="premier">
+      <h2>Le livre d’or</h2>
+      <p class="aide">Les premiers mots de votre livre d’or.</p>
+      <div class="mots">
+        <article class="mot mot--habitue">
+          <p class="mot__texte">Bienvenue chez vous. Le café est entre de bonnes mains, je le sens. À demain, pour mon café !</p>
+          <p class="mot__signature">Simone <span class="etiquette">ancienne patronne</span></p>
+        </article>
+        <article class="mot">
+          <p class="mot__texte">Contente que le café rouvre. Le croissant était tout chaud.</p>
+          <p class="mot__signature">La voisine du dessus</p>
+          <p class="mot__sujet"><span class="icone" data-icone="coeur"></span>A aimé : le croissant</p>
+        </article>
+      </div>
+    </div>
+
+    <!-- Page 2: ce qu'on retient -->
+    <div class="pile" data-si="appris">
+      <h2>Ce qu’on retient</h2>
+      <div class="bloc-bilan">
+        <h3>Nos habitués</h3>
+        <p class="habitue"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Lucette</span> est passée à 10 h pour son café crème. Elle vous a parlé du mariage de sa petite-fille, samedi.</span></p>
+        <p class="habitue"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Bastien</span> est passé à vélo avec deux amis. Il a demandé si vous feriez de la citronnade cet été.</span></p>
+        <p class="habitue"><span class="portrait" aria-hidden="true"></span><span><span class="fort">Nora</span> n’est pas venue : le mardi, elle travaille à la ville.</span></p>
+      </div>
+      <div class="bloc-bilan">
+        <h3><span class="icone" data-icone="coeur"></span>Ce qui a plu</h3>
+        <ul><li>La tarte aux fruits : 9 parts vendues, toutes avant 15 h.</li><li>La nouvelle nappe à carreaux.</li></ul>
+      </div>
+      <div class="bloc-bilan">
+        <h3><span class="icone" data-icone="info"></span>Ce qui a manqué</h3>
+        <ul><li>3 clients n’ont pas trouvé de place assise vers midi.</li><li>2 clients ont trouvé l’attente longue à la caisse, vers 12 h 30.</li></ul>
+        <div class="rangee"><button class="bouton bouton--petit" data-aller="tablette.html#catalogue">Voir des tables dans le catalogue</button></div>
+      </div>
+    </div>
+
+    <!-- Page 3: les chiffres -->
+    <div class="pile" data-si="chiffres">
+      <h2>La journée en chiffres</h2>
+      <table>
+        <tbody>
+          <tr><td>Clients servis</td><td class="nombre">46</td><td class="note">dimanche : 52</td></tr>
+          <tr><td>Recette</td><td class="nombre">352,40 €</td><td class="note"></td></tr>
+          <tr><td>Pourboires</td><td class="nombre">18,60 €</td><td class="note"></td></tr>
+          <tr><td>Achats du jour</td><td class="nombre">96,00 €</td><td class="note">fournisseurs, une fougère</td></tr>
+          <tr class="resultat"><td class="fort">Résultat du jour</td><td class="nombre">+ 275,00 €</td><td class="note"></td></tr>
+          <tr><td>Caisse ce soir</td><td class="nombre">1 757 €</td><td class="note"></td></tr>
+        </tbody>
+      </table>
+      <div class="bloc-bilan">
+        <h3><span class="icone" data-icone="tasse"></span>Réputation : 3 tasses sur 5</h3>
+        <div class="barre-progression" aria-hidden="true"><span style="width: 70%"></span></div>
+        <p class="aide">Vers la quatrième tasse : les clients ravis et les mots du livre d’or la font monter.</p>
+      </div>
+    </div>
+
+    <!-- Page des autres cafés (dès qu'il y en a plusieurs) -->
+    <div class="pile" data-si="plusieurs">
+      <h2>Nos autres cafés</h2>
+      <div class="bloc-bilan">
+        <h3><span class="icone" data-icone="tasse"></span>La Tasse Bleue, place du Tilleul · tenue par Simone</h3>
+        <p>38 clients · + 212 € · 4 tasses sur 5</p>
+        <p class="aide">Tout va bien. Simone aimerait mettre la citronnade à la carte pour l’été.</p>
+        <div class="rangee"><button class="bouton bouton--petit" data-aller="tablette.html#cafes">Régler à distance</button></div>
+      </div>
+    </div>
+
+    <!-- Page 4: demain -->
+    <div class="pile" data-si="demain">
+      <h2>Demain</h2>
+      <ul class="bloc-bilan">
+        <li><span class="icone" data-icone="pluie"></span><span>Mercredi 10 · pluie, 12 °C : les boissons chaudes vont plaire.</span></li>
+        <li><span class="icone" data-icone="cloche"></span><span>Sortie de l’école à 16 h 30 : des familles au goûter.</span></li>
+        <li><span class="icone" data-icone="carton"></span><span>Livraison à 7 h : commande pas encore passée.</span></li>
+        <li><span class="icone" data-icone="signe"></span><span>Projet épinglé : une vraie terrasse, 2 sur 3.</span></li>
+        <li><span class="icone" data-icone="coeur"></span><span>Lucette a promis de passer avec sa petite-fille.</span></li>
+      </ul>
+      <div class="rangee"><button class="bouton" data-aller="tablette.html#commandes">Préparer la commande</button></div>
+      <p class="aide">« Encore un instant » te ramène dans le café ; tu retrouveras ce bilan sur la tablette, section Bilans. La journée finit quand vous avez dit « À demain » tous les deux.</p>
+    </div>
+  </div>
+
+  <footer class="bilan__pied">
+    <div class="bilan__nav">
+      <button class="bouton" data-page="precedente" data-si="appris chiffres plusieurs demain"><span class="icone" data-icone="fleche" style="transform: rotate(180deg)"></span>Page précédente</button>
+      <span data-si="livre livre-vide premier" aria-hidden="true"></span>
+      <div class="points" data-sections data-sans-boucle role="tablist" aria-label="Pages du bilan">
+        <button class="point" role="tab" data-section-etats="livre livre-vide premier" data-aller="#livre" aria-label="Page 1 : le livre d’or">1</button>
+        <button class="point" role="tab" data-section-etats="appris" data-aller="#appris" aria-label="Page 2 : ce qu’on retient">2</button>
+        <button class="point" role="tab" data-section-etats="chiffres" data-aller="#chiffres" aria-label="Page 3 : la journée en chiffres">3</button>
+        <button class="point" role="tab" data-section-etats="plusieurs" data-si="plusieurs" data-aller="#plusieurs" aria-label="Page 4 : nos autres cafés">4</button>
+        <button class="point" role="tab" data-section-etats="demain" data-aller="#demain" aria-label="Dernière page : demain"><span data-si="livre livre-vide premier appris chiffres demain">4</span><span data-si="plusieurs">5</span></button>
+      </div>
+      <button class="bouton bouton--principal" data-page="suivante" data-focus data-si="livre livre-vide premier appris chiffres plusieurs">Page suivante<span class="icone" data-icone="fleche"></span></button>
+      <span class="rangee" data-si="demain"><button class="bouton" data-fermer-interface>Encore un instant</button><button class="bouton bouton--principal" data-focus data-action="demain">À demain</button></span>
+    </div>
+    <p class="pied-touches"><span><kbd>←</kbd><kbd>→</kbd> ou <kbd>A</kbd><kbd>E</kbd> tourner les pages</span><span><kbd>Entrée</kbd> valider</span><span><kbd>Retour arrière</kbd> encore un instant</span><span>Le café est fermé : rien ne presse.</span></p>
+  </footer>
+</section>
+
+<script src="support/symboles.js"></script>
+<script src="support/scenes.js"></script>
+<script src="support/commun.js"></script>
+<script>
+  'use strict';
+  const ORDRE = ['livre', 'appris', 'chiffres', 'demain'];
+  function voisine(sens) {
+    const ici = document.body.dataset.etat;
+    const base = ['livre-vide', 'premier'].includes(ici) ? 'livre' : ici;
+    if (base === 'plusieurs') return sens > 0 ? 'demain' : 'chiffres';
+    const i = ORDRE.indexOf(base);
+    const j = i + sens;
+    if (j < 0 || j >= ORDRE.length) return null;
+    return ORDRE[j];
+  }
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-page]');
+    if (!b) return;
+    const cible = voisine(b.dataset.page === 'suivante' ? 1 : -1);
+    if (cible) Maquette.aller(cible);
+  });
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-action="demain"]')) Maquette.note('Vous avez dit « À demain » tous les deux : la nuit tombe sur le café.');
+  });
+  Maquette.surTouche = function (e) {
+    if (e.key === 'ArrowRight' || e.code === 'KeyD') { const c = voisine(1); if (c) Maquette.aller(c); return true; }
+    if (e.key === 'ArrowLeft' || e.code === 'KeyA') { const c = voisine(-1); if (c) Maquette.aller(c); return true; }
+    return false;
+  };
+</script>
+</body>
+</html>

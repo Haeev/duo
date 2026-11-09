@@ -14,3 +14,6 @@ Thumbs.db
 .claude/agent-memory-local/
 __pycache__/
 .claude/worktrees/
+
+# Sorties brutes du serveur MCP Meshy (seuls les assets mis en conformité se versionnent)
+meshy_output/

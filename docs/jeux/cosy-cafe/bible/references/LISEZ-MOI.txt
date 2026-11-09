@@ -1,0 +1,13 @@
+Images de référence de style pour Meshy (image vers 3D, retexture guidée par image).
+Générées par source/planches.cjs; règles d'usage: bible-artistique.md, section 13.3.
+
+chaise-paillee-campagne.png: Chaise paillée, style campagne (600 triangles au plus)
+gueridon-bistrot.png: Guéridon de bistrot, marbre vert-gris (600 au plus)
+tasse-cappuccino.png: Tasse de cappuccino sur soucoupe, liseré de la maison (250 au plus)
+machine-expresso.png: Machine à expresso à deux groupes, cuivre (4 000 au plus)
+suspension-emaillee.png: Suspension émaillée (600 au plus)
+plante-en-pot.png: Plante en pot, terre cuite (1 200 au plus)
+avatar-face.png: Avatar de joueur, de face (5 000 triangles au plus de près)
+avatar-dos.png: Avatar de joueur, de dos
+client-presse-face.png: Client pressé, de face
+client-presse-dos.png: Client pressé, de dos

@@ -1,0 +1,1510 @@
+{
+  "id": "village-arrivee",
+  "address": "village",
+  "state": "arrivee",
+  "number": 1,
+  "title": "Ormeval, le Café de la place",
+  "state_label": "À l'arrivée",
+  "north_deg": 0,
+  "capacity": {
+    "inside": 8,
+    "outside": 2
+  },
+  "staff": {
+    "players": 2,
+    "employees": 0
+  },
+  "summary": "Boutique de 38 m² (7,00 x 5,40 m) sur la place du Tilleul, vitrine au sud. La pièce du fond est fermée; dehors, seul le banc de la patronne.",
+  "scale_px": 50,
+  "levels": [
+    {
+      "id": "rdc",
+      "name": "Rez-de-chaussée",
+      "frame": [0.0, 0.0, 16.0, 19.5],
+      "draw_offset": [0.0, 0.0],
+      "elements": [
+        {
+          "id": "ground-1",
+          "kind": "ground",
+          "shape": {
+            "rect": [2.1, 0.0, 9.4, 3.0]
+          },
+          "style": "courtyard",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "ground-2",
+          "kind": "ground",
+          "shape": {
+            "rect": [0.0, 0.0, 2.1, 3.0]
+          },
+          "style": "grass",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "ground-3",
+          "kind": "ground",
+          "shape": {
+            "rect": [11.7, 0.0, 4.3, 3.0]
+          },
+          "style": "grass",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "ground-4",
+          "kind": "ground",
+          "shape": {
+            "rect": [11.5, 0.0, 2.0, 13.0]
+          },
+          "style": "pavement",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "ground-5",
+          "kind": "ground",
+          "shape": {
+            "rect": [0.0, 13.0, 16.0, 6.5]
+          },
+          "style": "pavement",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "ground-6",
+          "kind": "ground",
+          "shape": {
+            "rect": [0.0, 3.0, 1.9, 10.0]
+          },
+          "style": "neighbour",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "ground-7",
+          "kind": "ground",
+          "shape": {
+            "rect": [13.5, 3.0, 2.5, 10.0]
+          },
+          "style": "neighbour",
+          "label": null,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "tree-1",
+          "kind": "tree",
+          "shape": {
+            "circle": [2.6, 17.4, 0.25]
+          },
+          "crown": 1.9,
+          "label": "tilleul",
+          "height": 6.0,
+          "opaque": false,
+          "blocks": true
+        },
+        {
+          "id": "fixture-1",
+          "kind": "fixture",
+          "shape": {
+            "circle": [13.6, 17.6, 0.8]
+          },
+          "style": "fountain",
+          "label": "fontaine",
+          "height": 0.8,
+          "reason": null,
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "tree-2",
+          "kind": "tree",
+          "shape": {
+            "circle": [3.2, 1.2, 0.15]
+          },
+          "crown": 1.1,
+          "label": "figuier",
+          "height": 6.0,
+          "opaque": false,
+          "blocks": true
+        },
+        {
+          "id": "fixture-2",
+          "kind": "fixture",
+          "shape": {
+            "rect": [6.4, 0.3, 1.8, 0.7]
+          },
+          "style": "bins",
+          "label": "poubelles",
+          "height": 1.1,
+          "reason": null,
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "partition-1",
+          "kind": "partition",
+          "shape": {
+            "rect": [1.9, 0.0, 0.2, 3.0]
+          },
+          "height": 2.6,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "partition-2",
+          "kind": "partition",
+          "shape": {
+            "rect": [11.5, 0.0, 0.2, 0.6]
+          },
+          "height": 2.6,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "door-1",
+          "kind": "door",
+          "shape": {
+            "rect": [11.5, 0.6, 0.2, 1.6]
+          },
+          "access": "closed",
+          "delivery": true,
+          "swing": {
+            "leaves": 2,
+            "hinge": "start",
+            "side": "-"
+          },
+          "label": "portail",
+          "orient": "v",
+          "width": 1.6,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": true
+        },
+        {
+          "id": "partition-3",
+          "kind": "partition",
+          "shape": {
+            "rect": [11.5, 2.2, 0.2, 0.8]
+          },
+          "height": 2.6,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "wall-1",
+          "kind": "wall",
+          "shape": {
+            "rect": [1.9, 3.0, 4.7, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "window-1",
+          "kind": "window",
+          "shape": {
+            "rect": [6.6, 3.0, 1.1, 0.5]
+          },
+          "sill": 0.9,
+          "orient": "h",
+          "width": 1.1,
+          "height": 2.4,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "wall-2",
+          "kind": "wall",
+          "shape": {
+            "rect": [7.7, 3.0, 1.6, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "door-2",
+          "kind": "door",
+          "shape": {
+            "rect": [9.3, 3.0, 1.2, 0.5]
+          },
+          "access": "staff",
+          "delivery": true,
+          "label": "porte de la cour",
+          "swing": {
+            "leaves": 2,
+            "hinge": "start",
+            "side": "+"
+          },
+          "orient": "h",
+          "width": 1.2,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": true
+        },
+        {
+          "id": "partition-9",
+          "kind": "partition",
+          "shape": {
+            "rect": [9.3, 3.5, 0.04, 0.6]
+          },
+          "label": "vantail ouvert",
+          "height": 2.1,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "partition-10",
+          "kind": "partition",
+          "shape": {
+            "rect": [10.46, 3.5, 0.04, 0.6]
+          },
+          "label": "vantail ouvert",
+          "height": 2.1,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "wall-3",
+          "kind": "wall",
+          "shape": {
+            "rect": [10.5, 3.0, 1.0, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "wall-4",
+          "kind": "wall",
+          "shape": {
+            "rect": [1.9, 3.0, 0.5, 10.0]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "wall-5",
+          "kind": "wall",
+          "shape": {
+            "rect": [3.6, 3.5, 0.4, 9.0]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "wall-6",
+          "kind": "wall",
+          "shape": {
+            "rect": [11.0, 3.0, 0.5, 10.0]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "floor-1",
+          "kind": "floor",
+          "shape": {
+            "rect": [2.4, 3.5, 1.2, 9.0]
+          },
+          "style": "neighbour",
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "fixture-3",
+          "kind": "fixture",
+          "shape": {
+            "rect": [2.45, 4.0, 1.1, 4.2]
+          },
+          "style": "stairs",
+          "label": "escalier du logement",
+          "height": 0.0,
+          "reason": null,
+          "fixed": true,
+          "steps": 15,
+          "up": "N",
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "wall-7",
+          "kind": "wall",
+          "shape": {
+            "rect": [1.9, 12.5, 0.6, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "door-3",
+          "kind": "door",
+          "shape": {
+            "rect": [2.5, 12.5, 0.9, 0.5]
+          },
+          "access": "closed",
+          "label": "logement",
+          "swing": {
+            "leaves": 1,
+            "hinge": "start",
+            "side": "-"
+          },
+          "orient": "h",
+          "width": 0.9,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": true
+        },
+        {
+          "id": "wall-8",
+          "kind": "wall",
+          "shape": {
+            "rect": [3.4, 12.5, 1.0, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "window-2",
+          "kind": "window",
+          "shape": {
+            "rect": [4.4, 12.5, 2.0, 0.5]
+          },
+          "sill": 0.45,
+          "orient": "h",
+          "width": 2.0,
+          "height": 2.4,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "wall-9",
+          "kind": "wall",
+          "shape": {
+            "rect": [6.4, 12.5, 0.1, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "window-3",
+          "kind": "window",
+          "shape": {
+            "rect": [6.5, 12.5, 2.0, 0.5]
+          },
+          "sill": 0.45,
+          "orient": "h",
+          "width": 2.0,
+          "height": 2.4,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "wall-10",
+          "kind": "wall",
+          "shape": {
+            "rect": [8.5, 12.5, 0.3, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "porte-entree",
+          "kind": "door",
+          "shape": {
+            "rect": [8.8, 12.5, 1.2, 0.5]
+          },
+          "access": "public",
+          "glazed": true,
+          "label": "entrée",
+          "entrance": true,
+          "swing": {
+            "leaves": 2,
+            "hinge": "start",
+            "side": "+"
+          },
+          "orient": "h",
+          "width": 1.2,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "wall-11",
+          "kind": "wall",
+          "shape": {
+            "rect": [10.0, 12.5, 0.2, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "window-4",
+          "kind": "window",
+          "shape": {
+            "rect": [10.2, 12.5, 0.6, 0.5]
+          },
+          "sill": 0.9,
+          "orient": "h",
+          "width": 0.6,
+          "height": 2.4,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "wall-12",
+          "kind": "wall",
+          "shape": {
+            "rect": [10.8, 12.5, 0.7, 0.5]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "wall-13",
+          "kind": "wall",
+          "shape": {
+            "rect": [4.0, 6.7, 1.95, 0.4]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "door-4",
+          "kind": "door",
+          "shape": {
+            "rect": [5.95, 6.7, 0.9, 0.4]
+          },
+          "access": "closed",
+          "swing": {
+            "leaves": 1,
+            "hinge": "start",
+            "side": "-"
+          },
+          "label": "pièce du fond",
+          "orient": "h",
+          "width": 0.9,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": true
+        },
+        {
+          "id": "wall-14",
+          "kind": "wall",
+          "shape": {
+            "rect": [6.85, 6.7, 3.15, 0.4]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "door-5",
+          "kind": "door",
+          "shape": {
+            "rect": [10.0, 6.7, 0.9, 0.4]
+          },
+          "access": "staff",
+          "swing": {
+            "leaves": 1,
+            "hinge": "end",
+            "side": "-"
+          },
+          "orient": "h",
+          "width": 0.9,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": true
+        },
+        {
+          "id": "wall-15",
+          "kind": "wall",
+          "shape": {
+            "rect": [10.9, 6.7, 0.1, 0.4]
+          },
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "partition-4",
+          "kind": "partition",
+          "shape": {
+            "rect": [8.0, 3.5, 0.1, 3.2]
+          },
+          "height": 2.7,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "floor-2",
+          "kind": "floor",
+          "shape": {
+            "rect": [4.0, 7.1, 7.0, 5.4]
+          },
+          "style": "wood",
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "floor-3",
+          "kind": "floor",
+          "shape": {
+            "rect": [4.0, 3.5, 4.0, 3.2]
+          },
+          "style": "closed",
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "floor-4",
+          "kind": "floor",
+          "shape": {
+            "rect": [8.1, 3.5, 2.9, 3.2]
+          },
+          "style": "tiles",
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "floor-5",
+          "kind": "floor",
+          "shape": {
+            "rect": [4.0, 7.1, 1.7, 2.0]
+          },
+          "style": "tiles",
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "partition-5",
+          "kind": "partition",
+          "shape": {
+            "rect": [5.7, 7.1, 0.1, 0.5]
+          },
+          "height": 2.7,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "door-6",
+          "kind": "door",
+          "shape": {
+            "rect": [5.7, 7.6, 0.1, 0.9]
+          },
+          "access": "public",
+          "swing": {
+            "leaves": 1,
+            "hinge": "start",
+            "side": "+"
+          },
+          "label": "WC",
+          "orient": "v",
+          "width": 0.9,
+          "height": 2.1,
+          "blocks": false,
+          "opaque": true
+        },
+        {
+          "id": "partition-6",
+          "kind": "partition",
+          "shape": {
+            "rect": [5.7, 8.5, 0.1, 0.7]
+          },
+          "height": 2.7,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "partition-7",
+          "kind": "partition",
+          "shape": {
+            "rect": [4.0, 9.1, 1.7, 0.1]
+          },
+          "height": 2.7,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "fixture-4",
+          "kind": "fixture",
+          "shape": {
+            "rect": [4.1, 7.15, 0.4, 0.65]
+          },
+          "style": "wc",
+          "label": "WC",
+          "height": 0.45,
+          "reason": null,
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "fixture-5",
+          "kind": "fixture",
+          "shape": {
+            "rect": [5.1, 7.15, 0.5, 0.35]
+          },
+          "style": "basin",
+          "label": "lave-mains",
+          "height": 0.85,
+          "reason": null,
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "marker-1",
+          "kind": "marker",
+          "shape": {
+            "circle": [4.3, 8.0, 0.12]
+          },
+          "style": "drain",
+          "label": null,
+          "reason": null,
+          "fixed": true,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "partition-8",
+          "kind": "partition",
+          "shape": {
+            "rect": [7.0, 7.1, 0.1, 2.4]
+          },
+          "height": 1.1,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "backbar-1",
+          "kind": "backbar",
+          "shape": {
+            "rect": [7.1, 7.1, 2.8, 0.6]
+          },
+          "label": "arrière-comptoir",
+          "height": 0.9,
+          "reason": "Contre le refend: l'eau et l'évacuation de l'ancienne cuisine arrivent derrière ce mur.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "station-1",
+          "kind": "station",
+          "shape": {
+            "rect": [7.15, 7.12, 0.8, 0.55]
+          },
+          "label": "plonge",
+          "style": "sink",
+          "height": 0.9,
+          "post": "plonge",
+          "reason": "Évier et lave-verres sous le plan, sur l'arrivée d'eau du refend.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "station-2",
+          "kind": "station",
+          "shape": {
+            "rect": [8.0, 7.12, 0.75, 0.55]
+          },
+          "label": "frigo",
+          "style": "fridge",
+          "height": 0.9,
+          "post": "frigo",
+          "reason": "Réfrigérateur sous le plan, à un pas de la machine: le lait est à portée de main.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "marker-2",
+          "kind": "marker",
+          "shape": {
+            "circle": [7.4, 6.95, 0.12]
+          },
+          "style": "water",
+          "label": null,
+          "reason": null,
+          "fixed": true,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "marker-3",
+          "kind": "marker",
+          "shape": {
+            "circle": [7.7, 6.95, 0.12]
+          },
+          "style": "drain",
+          "label": null,
+          "reason": null,
+          "fixed": true,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "counter-1",
+          "kind": "counter",
+          "shape": {
+            "rect": [8.0, 8.8, 3.0, 0.7]
+          },
+          "label": "comptoir",
+          "height": 1.1,
+          "reason": "Parallèle à la façade: derrière lui, on fait face à la porte.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "station-3",
+          "kind": "station",
+          "shape": {
+            "rect": [8.05, 8.85, 0.6, 0.55]
+          },
+          "label": "passe",
+          "style": "pass",
+          "height": 1.1,
+          "post": "passe",
+          "reason": null,
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "station-4",
+          "kind": "station",
+          "shape": {
+            "rect": [8.75, 8.85, 0.8, 0.55]
+          },
+          "label": "machine",
+          "style": "machine",
+          "height": 1.4,
+          "post": "machine",
+          "reason": "Sur le comptoir, face à la salle: seul point du comptoir où arrivent l'eau, l'évacuation et la prise de 32 A, passées sous le plancher de l'allée.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "station-5",
+          "kind": "station",
+          "shape": {
+            "rect": [9.6, 8.88, 0.35, 0.45]
+          },
+          "label": "moulin",
+          "style": "grinder",
+          "height": 1.45,
+          "post": "moulin",
+          "reason": null,
+          "fixed": true,
+          "label_at": [9.78, 9.72],
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "station-6",
+          "kind": "station",
+          "shape": {
+            "rect": [10.25, 8.85, 0.7, 0.55]
+          },
+          "label": "caisse",
+          "style": "register",
+          "height": 1.25,
+          "post": "caisse",
+          "reason": "Au bout du comptoir, côté porte: la file y arrive tout droit, le long du mur est.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "marker-4",
+          "kind": "marker",
+          "shape": {
+            "circle": [9.15, 8.65, 0.12]
+          },
+          "style": "power",
+          "label": null,
+          "reason": null,
+          "fixed": true,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "door-7",
+          "kind": "door",
+          "shape": {
+            "rect": [7.1, 8.8, 0.9, 0.7]
+          },
+          "access": "staff",
+          "swing": {
+            "leaves": 1,
+            "hinge": "start",
+            "side": "+"
+          },
+          "label": "portillon",
+          "orient": "h",
+          "width": 0.9,
+          "height": 1.1,
+          "opaque": false,
+          "blocks": false
+        },
+        {
+          "id": "furniture-1",
+          "kind": "furniture",
+          "shape": {
+            "rect": [8.15, 3.55, 0.85, 0.45]
+          },
+          "style": "shelf",
+          "label": "étagères",
+          "height": 2.0,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "furniture-2",
+          "kind": "furniture",
+          "shape": {
+            "rect": [10.5, 4.4, 0.45, 1.2]
+          },
+          "style": "shelf",
+          "label": "étagères",
+          "height": 2.0,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "station-7",
+          "kind": "station",
+          "shape": {
+            "rect": [8.15, 5.9, 0.7, 0.75]
+          },
+          "label": "frigo",
+          "style": "fridge",
+          "height": 1.85,
+          "post": "frigo de la réserve",
+          "reason": null,
+          "fixed": true,
+          "blocks": true,
+          "opaque": true
+        },
+        {
+          "id": "marker-5",
+          "kind": "marker",
+          "shape": {
+            "circle": [10.8, 3.8, 0.12]
+          },
+          "style": "panel",
+          "label": "tableau",
+          "reason": null,
+          "fixed": true,
+          "blocks": false,
+          "opaque": false
+        },
+        {
+          "id": "fixture-6",
+          "kind": "fixture",
+          "shape": {
+            "rect": [4.5, 3.5, 1.5, 0.55]
+          },
+          "style": "fireplace",
+          "label": "cheminée",
+          "height": 1.2,
+          "reason": "Le conduit monte dans le mur du fond, côté cour, comme dans les anciennes cuisines du village.",
+          "fixed": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "furniture-3",
+          "kind": "furniture",
+          "shape": {
+            "rect": [4.2, 5.3, 1.6, 1.1]
+          },
+          "style": "crates",
+          "label": "affaires de la patronne",
+          "height": 1.2,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "table-1",
+          "kind": "table",
+          "shape": {
+            "circle": [4.8, 12.2, 0.3]
+          },
+          "height": 0.75,
+          "round": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-1",
+          "kind": "seat",
+          "shape": {
+            "rect": [4.0, 11.975, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "W",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-2",
+          "kind": "seat",
+          "shape": {
+            "rect": [5.15, 11.975, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "E",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "table-2",
+          "kind": "table",
+          "shape": {
+            "circle": [6.4, 12.2, 0.3]
+          },
+          "height": 0.75,
+          "round": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-3",
+          "kind": "seat",
+          "shape": {
+            "rect": [5.6, 11.975, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "W",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-4",
+          "kind": "seat",
+          "shape": {
+            "rect": [6.75, 11.975, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "E",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "table-3",
+          "kind": "table",
+          "shape": {
+            "circle": [8.0, 12.2, 0.3]
+          },
+          "height": 0.75,
+          "round": true,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-5",
+          "kind": "seat",
+          "shape": {
+            "rect": [7.2, 11.975, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "W",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-6",
+          "kind": "seat",
+          "shape": {
+            "rect": [8.35, 11.975, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "E",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "table-4",
+          "kind": "table",
+          "shape": {
+            "rect": [4.0, 9.75, 0.7, 0.7]
+          },
+          "height": 0.75,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-7",
+          "kind": "seat",
+          "shape": {
+            "rect": [4.125, 9.25, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "N",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-8",
+          "kind": "seat",
+          "shape": {
+            "rect": [4.125, 10.5, 0.45, 0.45]
+          },
+          "seat": {
+            "area": "inside",
+            "room": "salle"
+          },
+          "style": "chair",
+          "back": "S",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-9",
+          "kind": "seat",
+          "shape": {
+            "rect": [5.0, 13.05, 0.6, 0.45]
+          },
+          "seat": {
+            "area": "outside",
+            "room": "terrasse"
+          },
+          "style": "bench",
+          "back": "N",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "seat-10",
+          "kind": "seat",
+          "shape": {
+            "rect": [5.6, 13.05, 0.6, 0.45]
+          },
+          "seat": {
+            "area": "outside",
+            "room": "terrasse"
+          },
+          "style": "bench",
+          "back": "N",
+          "height": 0.9,
+          "blocks": true,
+          "opaque": false
+        },
+        {
+          "id": "furniture-4",
+          "kind": "furniture",
+          "shape": {
+            "rect": [8.3, 13.1, 0.4, 0.3]
+          },
+          "style": "slate",
+          "label": "ardoise",
+          "height": 1.2,
+          "blocks": true,
+          "opaque": false
+        }
+      ],
+      "zones": [
+        {
+          "id": "zone-backdrop-1",
+          "kind": "backdrop",
+          "shape": {
+            "rect": [0.0, 0.0, 1.9, 13.0]
+          },
+          "label": "décor"
+        },
+        {
+          "id": "zone-backdrop-2",
+          "kind": "backdrop",
+          "shape": {
+            "rect": [11.7, 0.0, 4.3, 13.0]
+          },
+          "label": "décor"
+        },
+        {
+          "id": "zone-backdrop-3",
+          "kind": "backdrop",
+          "shape": {
+            "rect": [0.0, 16.5, 16.0, 3.0]
+          },
+          "label": "décor"
+        },
+        {
+          "id": "zone-work-1",
+          "kind": "work",
+          "shape": {
+            "rect": [7.1, 7.1, 3.9, 2.4]
+          },
+          "label": "zone de travail"
+        },
+        {
+          "id": "zone-private-1",
+          "kind": "private",
+          "shape": {
+            "rect": [8.1, 3.5, 2.9, 3.2]
+          },
+          "label": "réserve"
+        },
+        {
+          "id": "zone-extension-1",
+          "kind": "extension",
+          "shape": {
+            "rect": [4.0, 3.5, 4.0, 3.2]
+          },
+          "label": "E2: la pièce du fond, fermée"
+        },
+        {
+          "id": "zone-extension-2",
+          "kind": "extension",
+          "shape": {
+            "rect": [4.0, 13.0, 4.8, 2.5]
+          },
+          "label": "E1: terrasse sous le store"
+        },
+        {
+          "id": "zone-free-1",
+          "kind": "free",
+          "shape": {
+            "rect": [4.0, 9.2, 4.8, 3.3]
+          },
+          "label": "salle"
+        },
+        {
+          "id": "zone-keep_clear-1",
+          "kind": "keep_clear",
+          "shape": {
+            "rect": [5.8, 7.1, 1.2, 2.4]
+          },
+          "label": "dégagement"
+        },
+        {
+          "id": "zone-keep_clear-2",
+          "kind": "keep_clear",
+          "shape": {
+            "rect": [7.1, 9.5, 2.9, 1.2]
+          },
+          "label": "passe"
+        },
+        {
+          "id": "zone-keep_clear-3",
+          "kind": "keep_clear",
+          "shape": {
+            "rect": [10.0, 9.5, 1.0, 3.0]
+          },
+          "label": "file"
+        },
+        {
+          "id": "zone-keep_clear-4",
+          "kind": "keep_clear",
+          "shape": {
+            "rect": [8.8, 10.7, 1.2, 1.8]
+          },
+          "label": "porte"
+        },
+        {
+          "id": "zone-keep_clear-5",
+          "kind": "keep_clear",
+          "shape": {
+            "rect": [8.8, 13.0, 1.2, 3.5]
+          },
+          "label": "porte"
+        },
+        {
+          "id": "zone-space-1",
+          "kind": "space",
+          "shape": {
+            "rect": [4.0, 7.1, 7.0, 5.4]
+          },
+          "label": "salle et comptoir",
+          "extras": 2
+        },
+        {
+          "id": "zone-space-2",
+          "kind": "space",
+          "shape": {
+            "rect": [4.0, 3.5, 4.0, 3.2]
+          },
+          "label": "pièce du fond",
+          "extras": 1
+        },
+        {
+          "id": "zone-space-3",
+          "kind": "space",
+          "shape": {
+            "rect": [0.0, 13.0, 16.0, 6.5]
+          },
+          "label": "place",
+          "extras": 4
+        }
+      ],
+      "points": {
+        "wc": [[4.85, 8.4]],
+        "stock": [9.3, 5.0],
+        "delivery": [10.6, 1.6],
+        "entrance": [[9.4, 16.0]],
+        "exits": [[9.4, 16.0]],
+        "staff_start": [[8.7, 8.25]]
+      },
+      "queues": [
+        {
+          "id": "comptoir",
+          "points": [
+            [10.5, 12.05],
+            [10.5, 9.95]
+          ],
+          "width": 1.0,
+          "places": 4,
+          "register": [10.55, 9.95],
+          "pickup": [8.35, 9.95],
+          "doors": ["porte-entree"]
+        }
+      ],
+      "views": [
+        {
+          "id": "caisse",
+          "label": "caisse",
+          "pos": [10.6, 8.25],
+          "facing_deg": 180,
+          "checks": ["queue:comptoir"]
+        },
+        {
+          "id": "machine",
+          "label": "machine",
+          "pos": [9.15, 8.25],
+          "facing_deg": 180,
+          "checks": ["door:porte-entree"]
+        },
+        {
+          "id": "entree",
+          "label": "entrée",
+          "pos": [9.4, 12.1],
+          "facing_deg": 0,
+          "checks": []
+        }
+      ],
+      "routes": [
+        {
+          "kind": "clients",
+          "points": [
+            [9.4, 15.8],
+            [9.4, 13.4],
+            [9.6, 12.3],
+            [10.5, 11.9],
+            [10.5, 10.2]
+          ],
+          "label": null
+        },
+        {
+          "kind": "clients",
+          "points": [
+            [10.2, 9.95],
+            [8.6, 9.95]
+          ],
+          "label": null
+        },
+        {
+          "kind": "clients",
+          "points": [
+            [8.2, 10.3],
+            [7.5, 11.1],
+            [5.8, 11.3]
+          ],
+          "label": null
+        },
+        {
+          "kind": "clients",
+          "points": [
+            [6.4, 10.2],
+            [6.4, 8.45],
+            [6.0, 8.05]
+          ],
+          "label": null
+        },
+        {
+          "kind": "staff",
+          "points": [
+            [8.3, 8.25],
+            [7.55, 8.25],
+            [7.55, 10.1],
+            [6.8, 10.9]
+          ],
+          "label": null
+        },
+        {
+          "kind": "staff",
+          "points": [
+            [10.45, 7.9],
+            [10.45, 5.9]
+          ],
+          "label": null
+        },
+        {
+          "kind": "delivery",
+          "points": [
+            [12.6, 12.5],
+            [12.6, 1.4],
+            [9.9, 1.4],
+            [9.9, 4.6]
+          ],
+          "label": null
+        }
+      ],
+      "texts": [
+        {
+          "pos": [0.95, 8.0],
+          "text": "maison voisine",
+          "style": "street",
+          "rotate": -90,
+          "anchor": "middle"
+        },
+        {
+          "pos": [14.75, 8.0],
+          "text": "boulangerie",
+          "style": "street",
+          "rotate": -90,
+          "anchor": "middle"
+        },
+        {
+          "pos": [12.6, 6.4],
+          "text": "ruelle du Lavoir",
+          "style": "street",
+          "rotate": -90,
+          "anchor": "middle"
+        },
+        {
+          "pos": [4.6, 1.85],
+          "text": "cour: poubelles, caisses vides, figuier",
+          "style": "street",
+          "rotate": 0,
+          "anchor": "start"
+        },
+        {
+          "pos": [8.0, 16.2],
+          "text": "trottoir de la place (on y joue jusqu'ici)",
+          "style": "note",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [8.0, 19.05],
+          "text": "place du Tilleul: arrêt du car, mairie-école à l'est, église au sud",
+          "style": "street",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [9.3, 7.4],
+          "text": "ardoise",
+          "style": "note",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [6.0, 5.1],
+          "text": "pièce du fond",
+          "style": "room",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [9.5, 4.6],
+          "text": "réserve",
+          "style": "room",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [6.3, 10.95],
+          "text": "salle",
+          "style": "room",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [6.4, 15.75],
+          "text": "terrasse",
+          "style": "room",
+          "rotate": 0,
+          "anchor": "middle"
+        },
+        {
+          "pos": [3.0, 9.6],
+          "text": "logement",
+          "style": "street",
+          "rotate": -90,
+          "anchor": "middle"
+        }
+      ],
+      "dims": [
+        {
+          "from": [4.0, 3.0],
+          "to": [11.0, 3.0],
+          "text": "7,00 m",
+          "offset": -0.3
+        },
+        {
+          "from": [11.0, 7.1],
+          "to": [11.0, 12.5],
+          "text": "5,40 m",
+          "offset": 0.95
+        },
+        {
+          "from": [11.0, 3.5],
+          "to": [11.0, 6.7],
+          "text": "3,20 m",
+          "offset": 0.95
+        }
+      ]
+    }
+  ],
+  "links": []
+}

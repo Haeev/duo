@@ -1,0 +1,139 @@
+{
+  "format": "deux-tabliers.economy",
+  "version": "demo-0.2",
+  "startCash": 300,
+  "rentPerMonth": 520,
+  "rentDaysPerMonth": 28,
+  "chargesPerOpenDay": 8,
+  "reserveDaysOfCharges": 2,
+  "emergencySurcharge": 0.3,
+  "priceAdjust": {
+    "min": -0.3,
+    "max": 0.5,
+    "step": 0.1
+  },
+  "bigPurchaseThreshold": {
+    "minimum": 150,
+    "shareOfDailyRevenue": 1.0
+  },
+  "reputation": {
+    "startCups": 1.5,
+    "stepPoints": 150,
+    "pivotSatisfaction": 50,
+    "divisor": 10,
+    "catchUp": {
+      "afterOpenDays": 12,
+      "perDay": 0.05,
+      "max": 2.0
+    }
+  },
+  "offer": {
+    "to": "bourg",
+    "renown": 850,
+    "fallback": "la_fete_du_tilleul"
+  },
+  "challenge": {
+    "id": "la_fete_du_tilleul",
+    "day": 14,
+    "affluence": 1.6,
+    "renown": 150,
+    "goals": {
+      "groups": 45,
+      "terrace": true,
+      "cups": 3.0
+    }
+  },
+  "ambiance": {
+    "publicSurfaceM2": {
+      "salle": 26.0,
+      "village_terrasse": 0.0,
+      "village_fond": 12.8
+    },
+    "terraceNote": "la terrasse ne dilue pas le décor de la salle: ses objets ajoutent leur charme sans agrandir la surface comptée",
+    "decorMax": 40,
+    "charmPerM2ForMax": 1.2,
+    "coherenceMax": 20,
+    "comfortFactor": 30,
+    "comfortMax": 15,
+    "lightPerM2": 8,
+    "lightMax": 10,
+    "music": {
+      "matching": 5,
+      "other": 2,
+      "silence": 0
+    },
+    "cleanlinessMax": 10,
+    "cleanlinessAssumedInSim": 8,
+    "wornCharmFactor": 0.5
+  },
+  "brocante": {
+    "piecesPerMonday": 6,
+    "discount": 0.3,
+    "charmFactor": 1.5
+  },
+  "flowerMarket": {
+    "day": 6,
+    "plantDiscount": 0.2,
+    "untilDay": 12
+  },
+  "objectLimit": 60,
+  "demoEndDay": 15,
+  "demoMaxDay": 28,
+  "startStock": [
+    [
+      "grains_maison",
+      2
+    ],
+    [
+      "cacao",
+      1
+    ],
+    [
+      "the_noir",
+      1
+    ],
+    [
+      "sucre",
+      1
+    ],
+    [
+      "confiture",
+      1
+    ],
+    [
+      "accompagnement",
+      1
+    ],
+    [
+      "beurre",
+      1
+    ]
+  ],
+  "charges": [
+    {
+      "id": "electricite",
+      "name": "Électricité (machine, frigo, lumière)",
+      "perOpenDay": 4.6
+    },
+    {
+      "id": "eau",
+      "name": "Eau",
+      "perOpenDay": 1.1
+    },
+    {
+      "id": "assurance",
+      "name": "Assurance du café",
+      "perOpenDay": 1.8
+    },
+    {
+      "id": "banque",
+      "name": "Banque et terminal de carte",
+      "perOpenDay": 1.0
+    },
+    {
+      "id": "radio",
+      "name": "Droits de la radio (Sacem)",
+      "perOpenDay": 0.5
+    }
+  ]
+}

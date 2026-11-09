@@ -1,0 +1,19 @@
+{
+  "format": "duo-meshy-sheet/1",
+  "asset": "char_essai_flaneur",
+  "note": "fiche des doublures (scripts/doublure_personnage.py, tirées des personnages de La Petite Ligne), pas de sorties de Meshy: elle éprouve conformite_personnage.py tant que assets.meshy.ai est refusé par le proxy",
+  "conformity": {
+    "node_name": "char_essai_flaneur",
+    "target_height_m": 1.70,
+    "max_triangles": 5000,
+    "clips": [
+      { "file": "Animation_Walking_withSkin.glb", "index": 0, "name": "walk", "in_place": true },
+      { "file": "Animation_Actions_withSkin.glb", "index": 0, "name": "idle" },
+      { "file": "Animation_Actions_withSkin.glb", "index": 1, "name": "sit" },
+      { "file": "Animation_Actions_withSkin.glb", "index": 2, "name": "drink" }
+    ],
+    "palette_allowed": ["skin_1", "skin_2", "skin_3", "skin_4", "skin_5", "skin_6", "hair_1", "hair_2", "hair_3", "hair_4", "hair_5", "hair_6", "hair_7", "flaneurs_scarf", "flaneurs_cord", "flaneurs_knit", "flaneurs_paper", "ink", "porcelain"],
+    "per_face_all": true,
+    "face_smoothing": 2
+  }
+}

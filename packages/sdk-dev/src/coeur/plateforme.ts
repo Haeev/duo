@@ -428,6 +428,11 @@ export function createFakePlatform(options: FakePlatformOptions): FakePlatform {
       case 'log':
         log(message.level, `[jeu] ${message.message}`, message.data);
         return;
+      // Le carnet de séance n'existe que dans Duo: le banc de développement l'ignore.
+      case 'notebookEnable':
+      case 'notebookTyping':
+      case 'notebookWrite':
+        return;
     }
   };
 

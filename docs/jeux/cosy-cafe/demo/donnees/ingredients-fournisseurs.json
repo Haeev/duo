@@ -1,0 +1,388 @@
+{
+  "format": "deux-tabliers.ingredients",
+  "version": "demo-0.2",
+  "ingredients": [
+    {
+      "id": "grains_maison",
+      "name": "Grains, mélange de la vallée",
+      "unit": "g",
+      "unitCost": 0.02,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 30,
+      "cartonUnits": 1000,
+      "cartonHeavy": true,
+      "pack": "sac d'1 kg"
+    },
+    {
+      "id": "lait_entier",
+      "name": "Lait entier de la ferme",
+      "unit": "ml",
+      "unitCost": 0.0013,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 7,
+      "cartonUnits": 6000,
+      "cartonHeavy": true,
+      "pack": "caisse de 6 bouteilles d'1 L"
+    },
+    {
+      "id": "lait_avoine",
+      "name": "Lait d'avoine",
+      "unit": "ml",
+      "unitCost": 0.0028,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 30,
+      "cartonUnits": 3000,
+      "cartonHeavy": false,
+      "pack": "3 briques d'1 L"
+    },
+    {
+      "id": "beurre",
+      "name": "Beurre doux",
+      "unit": "g",
+      "unitCost": 0.008,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 30,
+      "cartonUnits": 500,
+      "cartonHeavy": false,
+      "pack": "2 plaquettes de 250 g"
+    },
+    {
+      "id": "oeufs",
+      "name": "Œufs de la ferme",
+      "unit": "piece",
+      "unitCost": 0.25,
+      "supplier": "armelle",
+      "storage": "frigo",
+      "shelfDays": 28,
+      "cartonUnits": 12,
+      "cartonHeavy": false,
+      "pack": "boîte de 12"
+    },
+    {
+      "id": "cacao",
+      "name": "Chocolat en poudre",
+      "unit": "g",
+      "unitCost": 0.012,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 180,
+      "cartonUnits": 1000,
+      "cartonHeavy": false,
+      "pack": "boîte d'1 kg"
+    },
+    {
+      "id": "the_noir",
+      "name": "Thé noir en vrac",
+      "unit": "dose",
+      "unitCost": 0.18,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 365,
+      "cartonUnits": 50,
+      "cartonHeavy": false,
+      "pack": "boîte de 50 doses"
+    },
+    {
+      "id": "the_vert",
+      "name": "Thé vert en vrac",
+      "unit": "dose",
+      "unitCost": 0.22,
+      "supplier": "joseph",
+      "storage": "reserve",
+      "shelfDays": 365,
+      "cartonUnits": 50,
+      "cartonHeavy": false,
+      "pack": "boîte de 50 doses"
+    },
+    {
+      "id": "plantes_simone",
+      "name": "Plantes du jardin de Simone",
+      "unit": "dose",
+      "unitCost": 0.1,
+      "supplier": "simone_jardin",
+      "storage": "reserve",
+      "shelfDays": 7,
+      "cartonUnits": 20,
+      "cartonHeavy": false,
+      "pack": "20 bouquets"
+    },
+    {
+      "id": "menthe",
+      "name": "Menthe du jardin",
+      "unit": "brin",
+      "unitCost": 0.05,
+      "supplier": "simone_jardin",
+      "storage": "frigo",
+      "shelfDays": 4,
+      "cartonUnits": 20,
+      "cartonHeavy": false,
+      "pack": "botte de 20 brins"
+    },
+    {
+      "id": "oranges",
+      "name": "Oranges à presser",
+      "unit": "piece",
+      "unitCost": 0.3,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 14,
+      "cartonUnits": 30,
+      "cartonHeavy": true,
+      "pack": "cagette de 30"
+    },
+    {
+      "id": "citrons",
+      "name": "Citrons",
+      "unit": "piece",
+      "unitCost": 0.25,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 21,
+      "cartonUnits": 20,
+      "cartonHeavy": false,
+      "pack": "filet de 20"
+    },
+    {
+      "id": "sucre",
+      "name": "Sucre en poudre",
+      "unit": "g",
+      "unitCost": 0.002,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 365,
+      "cartonUnits": 2000,
+      "cartonHeavy": false,
+      "pack": "2 paquets d'1 kg"
+    },
+    {
+      "id": "farine",
+      "name": "Farine de blé",
+      "unit": "g",
+      "unitCost": 0.0012,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 120,
+      "cartonUnits": 5000,
+      "cartonHeavy": true,
+      "pack": "sac de 5 kg"
+    },
+    {
+      "id": "confiture",
+      "name": "Confiture d'abricot",
+      "unit": "g",
+      "unitCost": 0.004,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 60,
+      "cartonUnits": 1000,
+      "cartonHeavy": false,
+      "pack": "2 pots de 500 g"
+    },
+    {
+      "id": "limonade_bouteille",
+      "name": "Limonade de la vallée",
+      "unit": "piece",
+      "unitCost": 1.1,
+      "supplier": "mireille",
+      "storage": "frigo",
+      "shelfDays": 180,
+      "cartonUnits": 12,
+      "cartonHeavy": true,
+      "pack": "casier de 12 bouteilles"
+    },
+    {
+      "id": "accompagnement",
+      "name": "Sucres et carrés de chocolat pour le café",
+      "unit": "piece",
+      "unitCost": 0.06,
+      "supplier": "mireille",
+      "storage": "reserve",
+      "shelfDays": 365,
+      "cartonUnits": 200,
+      "cartonHeavy": false,
+      "pack": "carton de 200"
+    },
+    {
+      "id": "pain_campagne",
+      "name": "Pain de campagne",
+      "unit": "piece",
+      "unitCost": 0.12,
+      "supplier": "lucas",
+      "storage": "reserve",
+      "shelfDays": 2,
+      "cartonUnits": 20,
+      "cartonHeavy": false,
+      "pack": "1 pain d'1 kg (20 tranches)"
+    },
+    {
+      "id": "croissant_boulanger",
+      "name": "Croissants du boulanger",
+      "unit": "piece",
+      "unitCost": 0.7,
+      "supplier": "lucas",
+      "storage": "vitrine",
+      "shelfDays": 1,
+      "cartonUnits": 10,
+      "cartonHeavy": false,
+      "pack": "par 10"
+    },
+    {
+      "id": "pain_chocolat_boulanger",
+      "name": "Pains au chocolat du boulanger",
+      "unit": "piece",
+      "unitCost": 0.75,
+      "supplier": "lucas",
+      "storage": "vitrine",
+      "shelfDays": 1,
+      "cartonUnits": 10,
+      "cartonHeavy": false,
+      "pack": "par 10"
+    },
+    {
+      "id": "tarte_boulanger",
+      "name": "Tarte aux fruits du boulanger",
+      "unit": "piece",
+      "unitCost": 1.6,
+      "supplier": "lucas",
+      "storage": "vitrine",
+      "shelfDays": 2,
+      "cartonUnits": 8,
+      "cartonHeavy": false,
+      "pack": "tarte de 8 parts"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "armelle",
+      "name": "Armelle, la laitière",
+      "vehicle": "triporteur",
+      "delivers": [
+        "lait_entier",
+        "lait_avoine",
+        "beurre",
+        "oeufs"
+      ],
+      "deliveryTime": "7:15",
+      "line": "Le lait de ce matin, il était encore dans le pré hier soir.",
+      "days": [
+        "tue",
+        "thu",
+        "sat"
+      ],
+      "franco": 15,
+      "shipping": 3,
+      "emergency": true
+    },
+    {
+      "id": "lucas",
+      "name": "Lucas, le boulanger de la place",
+      "vehicle": "panière",
+      "delivers": [
+        "croissant_boulanger",
+        "pain_chocolat_boulanger",
+        "tarte_boulanger",
+        "pain_campagne"
+      ],
+      "deliveryTime": "7:00",
+      "line": "Tout chaud, je traverse juste la ruelle.",
+      "days": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "franco": 0,
+      "shipping": 0,
+      "emergency": true
+    },
+    {
+      "id": "joseph",
+      "name": "Joseph, le petit torréfacteur de la vallée",
+      "vehicle": "fourgonnette",
+      "delivers": [
+        "grains_maison",
+        "the_noir",
+        "the_vert",
+        "cacao"
+      ],
+      "deliveryTime": "7:30",
+      "line": "Torréfié avant-hier: il est à point.",
+      "days": [
+        "tue",
+        "fri"
+      ],
+      "franco": 30,
+      "shipping": 5,
+      "emergency": true
+    },
+    {
+      "id": "mireille",
+      "name": "Mireille, l'épicerie d'Ormeval",
+      "vehicle": "à pied, un cabas",
+      "delivers": [
+        "oranges",
+        "citrons",
+        "sucre",
+        "farine",
+        "confiture",
+        "limonade_bouteille",
+        "gobelets_lot",
+        "accompagnement"
+      ],
+      "deliveryTime": "7:30",
+      "line": "Si tu manques de quelque chose, je suis à deux pas.",
+      "emergency": true,
+      "days": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "franco": 0,
+      "shipping": 0
+    },
+    {
+      "id": "simone_jardin",
+      "name": "Le jardin de Simone",
+      "vehicle": "panier d'osier",
+      "delivers": [
+        "plantes_simone",
+        "menthe"
+      ],
+      "deliveryTime": "8:30",
+      "line": "Cueilli ce matin, ne me remercie pas.",
+      "days": [
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "franco": 0,
+      "shipping": 0,
+      "emergency": true
+    }
+  ],
+  "ordering": {
+    "when": "closing",
+    "deliveredBefore": "preparation",
+    "suggestion": "average_of_last_3_days_plus_planned_menu",
+    "emergencyDeliveryGameMinutes": 60,
+    "emergencySurcharge": 0.3,
+    "unsoldFreshGoTo": "evening_basket",
+    "eveningBasketReputationPerItem": 1,
+    "eveningBasketMaxPerDay": 6,
+    "margin": 1.2,
+    "freshMargin": 1.1,
+    "payment": "on_delivery"
+  }
+}

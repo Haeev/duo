@@ -1,0 +1,58 @@
+{
+ "format": "deux-tabliers.disposition",
+ "version": "demo-0.1",
+ "nom": "village_fond",
+ "extensions": [
+  "fond"
+ ],
+ "repere": "x = x du plan, z = y du plan (sud), y = hauteur; rotation_deg autour de +Y, 0 = avant au sud",
+ "objets": [
+  {
+   "id": "table_basse_malle",
+   "x": 5.25,
+   "y": 0.0,
+   "z": 4.7,
+   "rotation_deg": 0,
+   "pourquoi": "entre les deux fauteuils, devant la cheminée"
+  },
+  {
+   "id": "fauteuil_crapaud",
+   "x": 4.475,
+   "y": 0.0,
+   "z": 4.7,
+   "rotation_deg": 90,
+   "pourquoi": "plan village-maximum, seat-1: tourné vers la table basse et le feu"
+  },
+  {
+   "id": "fauteuil_crapaud",
+   "x": 6.025,
+   "y": 0.0,
+   "z": 4.7,
+   "rotation_deg": -90,
+   "pourquoi": "plan village-maximum, seat-2"
+  },
+  {
+   "id": "gueridon_marbre",
+   "x": 7.62,
+   "y": 0.0,
+   "z": 4.95,
+   "rotation_deg": 0,
+   "pourquoi": "table pour deux (plan: table-1 de la pièce du fond)"
+  },
+  {
+   "id": "chaise_paillee",
+   "x": 7.62,
+   "y": 0.0,
+   "z": 4.38,
+   "rotation_deg": 0
+  },
+  {
+   "id": "chaise_paillee",
+   "x": 7.62,
+   "y": 0.0,
+   "z": 5.52,
+   "rotation_deg": 180
+  }
+ ],
+ "modeles_manquants": []
+}

@@ -1,0 +1,298 @@
+{
+  "recipes": [
+    {
+      "id": "espresso",
+      "name": "Espresso (petit noir)",
+      "family": "black_coffee",
+      "basePrice": 1.4,
+      "costMaterials": 0.2,
+      "ingredientCost": 0.2,
+      "ingredients": [
+        ["grains_maison", 7],
+        ["accompagnement", 1]
+      ],
+      "stations": ["espresso"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "allonge",
+      "name": "Café allongé",
+      "family": "black_coffee",
+      "basePrice": 1.6,
+      "costMaterials": 0.22,
+      "ingredientCost": 0.22,
+      "ingredients": [
+        ["grains_maison", 8],
+        ["accompagnement", 1]
+      ],
+      "stations": ["espresso"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "creme",
+      "name": "Café crème",
+      "family": "milk_coffee",
+      "basePrice": 2.4,
+      "costMaterials": 0.4,
+      "ingredientCost": 0.395,
+      "ingredients": [
+        ["grains_maison", 7],
+        ["lait_entier", 150],
+        ["accompagnement", 1]
+      ],
+      "stations": ["espresso", "vapeur"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "the_noir",
+      "name": "Thé noir",
+      "family": "tea",
+      "basePrice": 2.5,
+      "costMaterials": 0.24,
+      "ingredientCost": 0.24,
+      "ingredients": [
+        ["the_noir", 1],
+        ["accompagnement", 1]
+      ],
+      "stations": ["bouilloire"],
+      "dishes": 2,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "chocolat",
+      "name": "Chocolat chaud",
+      "family": "chocolate",
+      "basePrice": 2.8,
+      "costMaterials": 0.44,
+      "ingredientCost": 0.44,
+      "ingredients": [
+        ["lait_entier", 200],
+        ["cacao", 15]
+      ],
+      "stations": ["vapeur"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "croissant",
+      "name": "Croissant",
+      "family": "pastry_bread",
+      "basePrice": 1.2,
+      "costMaterials": 0.7,
+      "ingredientCost": 0.7,
+      "ingredients": [["croissant_boulanger", 1]],
+      "stations": ["vitrine"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "pain_chocolat",
+      "name": "Pain au chocolat",
+      "family": "pastry_bread",
+      "basePrice": 1.3,
+      "costMaterials": 0.75,
+      "ingredientCost": 0.75,
+      "ingredients": [["pain_chocolat_boulanger", 1]],
+      "stations": ["vitrine"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "tartine",
+      "name": "Tartine beurre-confiture",
+      "family": "pastry_bread",
+      "basePrice": 2.2,
+      "costMaterials": 0.4,
+      "ingredientCost": 0.4,
+      "ingredients": [
+        ["pain_campagne", 2],
+        ["beurre", 10],
+        ["confiture", 20]
+      ],
+      "stations": ["plan"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "tarte_fruits",
+      "name": "Tarte aux fruits de saison",
+      "family": "cake",
+      "basePrice": 3.2,
+      "costMaterials": 1.6,
+      "ingredientCost": 1.6,
+      "ingredients": [["tarte_boulanger", 1]],
+      "stations": ["vitrine"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "start"
+      }
+    },
+    {
+      "id": "noisette",
+      "name": "Noisette",
+      "family": "black_coffee",
+      "basePrice": 1.7,
+      "costMaterials": 0.23,
+      "ingredientCost": 0.226,
+      "ingredients": [
+        ["grains_maison", 7],
+        ["lait_entier", 20],
+        ["accompagnement", 1]
+      ],
+      "stations": ["espresso", "vapeur"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "regular",
+        "regular": "simone",
+        "level": 0
+      }
+    },
+    {
+      "id": "cappuccino",
+      "name": "Cappuccino",
+      "family": "milk_coffee",
+      "basePrice": 2.9,
+      "costMaterials": 0.37,
+      "ingredientCost": 0.368,
+      "ingredients": [
+        ["grains_maison", 7],
+        ["lait_entier", 120],
+        ["cacao", 1],
+        ["accompagnement", 1]
+      ],
+      "stations": ["espresso", "vapeur"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "purchase",
+        "item": "fiche_cappuccino"
+      }
+    },
+    {
+      "id": "the_vert",
+      "name": "Thé vert",
+      "family": "tea",
+      "basePrice": 2.6,
+      "costMaterials": 0.28,
+      "ingredientCost": 0.28,
+      "ingredients": [
+        ["the_vert", 1],
+        ["accompagnement", 1]
+      ],
+      "stations": ["bouilloire"],
+      "dishes": 2,
+      "unlock": {
+        "kind": "purchase",
+        "item": "fiche_the_vert"
+      }
+    },
+    {
+      "id": "infusion",
+      "name": "Infusion du jardin de Simone",
+      "family": "tea",
+      "basePrice": 2.4,
+      "costMaterials": 0.16,
+      "ingredientCost": 0.16,
+      "ingredients": [
+        ["plantes_simone", 1],
+        ["accompagnement", 1]
+      ],
+      "stations": ["bouilloire"],
+      "dishes": 2,
+      "unlock": {
+        "kind": "regular",
+        "regular": "simone",
+        "level": 1
+      }
+    },
+    {
+      "id": "citronnade",
+      "name": "Citronnade maison",
+      "family": "cold_drink",
+      "basePrice": 3.0,
+      "costMaterials": 0.33,
+      "ingredientCost": 0.33,
+      "ingredients": [
+        ["citrons", 1],
+        ["sucre", 15],
+        ["menthe", 1]
+      ],
+      "stations": ["frigo"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "regular",
+        "regular": "bastien",
+        "level": 1
+      }
+    },
+    {
+      "id": "jus_orange",
+      "name": "Jus d'orange pressé",
+      "family": "cold_drink",
+      "basePrice": 3.5,
+      "costMaterials": 0.9,
+      "ingredientCost": 0.9,
+      "ingredients": [["oranges", 3]],
+      "stations": ["agrumes"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "purchase",
+        "item": "presse_levier"
+      }
+    },
+    {
+      "id": "limonade",
+      "name": "Limonade artisanale",
+      "family": "cold_drink",
+      "basePrice": 3.2,
+      "costMaterials": 1.1,
+      "ingredientCost": 1.1,
+      "ingredients": [["limonade_bouteille", 1]],
+      "stations": ["frigo"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "purchase",
+        "item": "frigo_vitre"
+      }
+    },
+    {
+      "id": "crepe",
+      "name": "Crêpe",
+      "family": "cake",
+      "basePrice": 2.5,
+      "costMaterials": 0.3,
+      "ingredientCost": 0.299,
+      "ingredients": [
+        ["farine", 30],
+        ["lait_entier", 60],
+        ["oeufs", 0.5],
+        ["sucre", 10],
+        ["beurre", 5]
+      ],
+      "stations": ["creperie"],
+      "dishes": 1,
+      "unlock": {
+        "kind": "purchase",
+        "item": "creperie"
+      }
+    }
+  ]
+}

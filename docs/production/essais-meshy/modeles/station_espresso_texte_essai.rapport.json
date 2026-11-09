@@ -1,0 +1,326 @@
+{
+  "asset": "station_espresso_texte_essai",
+  "raw": "model.glb",
+  "raw_triangles": 3945,
+  "decimated_from": null,
+  "triangles": 3954,
+  "triangle_budget": 4000,
+  "within_budget": true,
+  "welded_vertices": 8920,
+  "flipped_faces_fixed": 2,
+  "open_edges_before_after_fill": [
+    239,
+    174
+  ],
+  "bottom_faces_removed": 44,
+  "symmetrized": null,
+  "bevel_m": null,
+  "parts": 24,
+  "removed_parts": [],
+  "removed_triangles": 0,
+  "dimensions_m": {
+    "width_x": 0.76,
+    "depth_y_blender": 0.816,
+    "height": 0.976
+  },
+  "scale_applied": 3.05112,
+  "front_yaw_deg": 0,
+  "source_textures": [],
+  "palette_rule": "CIEDE2000, poids de clarté 2.0, cases permises ['copper', 'brass', 'steel', 'steel_dark', 'ink', 'porcelain']",
+  "palette_cells_used": [
+    "steel"
+  ],
+  "mixed_parts": [],
+  "color_stats": {
+    "area_where_final_differs_from_face_nearest": null
+  },
+  "parts_under_1cm": [
+    {
+      "center_m": [
+        -0.0,
+        -0.344,
+        0.655
+      ],
+      "smallest_size_m": 0.006,
+      "triangles": 71
+    },
+    {
+      "center_m": [
+        -0.002,
+        -0.35,
+        0.653
+      ],
+      "smallest_size_m": 0.004,
+      "triangles": 50
+    }
+  ],
+  "floating_parts": [],
+  "ambient_occlusion": "cuite (Cycles, 64 échantillons), ramenée à [0.75, 1]",
+  "file_bytes": 289760,
+  "part_details": [
+    {
+      "part": 0,
+      "triangles": 716,
+      "center_raw": [
+        -0.0014,
+        -0.0272,
+        0.1345
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 1,
+      "triangles": 190,
+      "center_raw": [
+        0.0762,
+        -0.0729,
+        0.167
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 2,
+      "triangles": 196,
+      "center_raw": [
+        -0.0723,
+        -0.1167,
+        0.2136
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 3,
+      "triangles": 464,
+      "center_raw": [
+        -0.0004,
+        -0.0712,
+        0.1475
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 4,
+      "triangles": 186,
+      "center_raw": [
+        0.0619,
+        0.109,
+        0.2615
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 5,
+      "triangles": 206,
+      "center_raw": [
+        0.0936,
+        -0.1106,
+        0.1433
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 6,
+      "triangles": 211,
+      "center_raw": [
+        -0.0467,
+        -0.1093,
+        0.1252
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 7,
+      "triangles": 202,
+      "center_raw": [
+        0.0628,
+        -0.0619,
+        0.2595
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 8,
+      "triangles": 260,
+      "center_raw": [
+        -0.0467,
+        0.0823,
+        0.2789
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 9,
+      "triangles": 192,
+      "center_raw": [
+        0.0708,
+        -0.1167,
+        0.2134
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 10,
+      "triangles": 200,
+      "center_raw": [
+        -0.0665,
+        -0.0614,
+        0.2594
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 11,
+      "triangles": 112,
+      "center_raw": [
+        -0.0736,
+        -0.072,
+        0.1768
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 12,
+      "triangles": 71,
+      "center_raw": [
+        -0.0005,
+        -0.1129,
+        0.2144
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 13,
+      "triangles": 90,
+      "center_raw": [
+        0.1224,
+        -0.0725,
+        0.2147
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 14,
+      "triangles": 224,
+      "center_raw": [
+        -0.0599,
+        0.1102,
+        0.2617
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 15,
+      "triangles": 44,
+      "center_raw": [
+        -0.0928,
+        -0.0914,
+        0.0065
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 16,
+      "triangles": 110,
+      "center_raw": [
+        0.0722,
+        -0.0717,
+        0.1769
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 17,
+      "triangles": 46,
+      "center_raw": [
+        0.0876,
+        0.1068,
+        0.0064
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 18,
+      "triangles": 52,
+      "center_raw": [
+        -0.0004,
+        -0.1172,
+        0.2132
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 19,
+      "triangles": 46,
+      "center_raw": [
+        -0.0928,
+        0.1068,
+        0.0063
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 20,
+      "triangles": 50,
+      "center_raw": [
+        -0.0024,
+        -0.0877,
+        0.1378
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 21,
+      "triangles": 38,
+      "center_raw": [
+        -0.0734,
+        -0.0716,
+        0.1646
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 22,
+      "triangles": 42,
+      "center_raw": [
+        0.0881,
+        -0.0912,
+        0.0064
+      ],
+      "votes": null,
+      "cell": "steel"
+    },
+    {
+      "part": 23,
+      "triangles": 50,
+      "center_raw": [
+        -0.0004,
+        -0.1149,
+        0.2142
+      ],
+      "votes": null,
+      "cell": "steel"
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "stations": [
+    {
+      "id": "plonge",
+      "label": "Plonge",
+      "verb": "Laver (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "bac",
+      "transforms": []
+    },
+    {
+      "id": "groupe",
+      "label": "Groupe de la machine",
+      "verb": "Lancer ou arrêter l’extraction",
+      "use": "click",
+      "seconds": 600,
+      "slot": "bec",
+      "transforms": [
+        { "from": "tasse", "to": "tasse" }
+      ]
+    },
+    {
+      "id": "vapeur",
+      "label": "Buse vapeur",
+      "verb": "Mousser le lait (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "bec",
+      "transforms": [
+        { "from": "tasse", "to": "tasse" },
+        { "from": "tasse-cafe", "to": "tasse-cafe" }
+      ]
+    },
+    {
+      "id": "moulin",
+      "label": "Moulin",
+      "verb": "Moudre une dose (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "bac",
+      "transforms": []
+    },
+    {
+      "id": "moulin-dose",
+      "label": "Moulin à dose",
+      "verb": "Tirer deux doses",
+      "use": "click",
+      "seconds": 600,
+      "slot": "bac",
+      "transforms": []
+    },
+    {
+      "id": "caisse",
+      "label": "Caisse",
+      "verb": "Prendre la commande (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "terminal",
+      "transforms": []
+    },
+    {
+      "id": "frigo",
+      "label": "Réfrigérateur et plan",
+      "verb": "Préparer (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "plan",
+      "transforms": [
+        { "from": "verre", "to": "verre" },
+        { "from": "assiette", "to": "assiette" }
+      ]
+    },
+    {
+      "id": "vaisselle",
+      "label": "Vaisselle propre",
+      "verb": "Prendre de la vaisselle",
+      "use": "click",
+      "seconds": 600,
+      "slot": "dessus",
+      "transforms": []
+    },
+    {
+      "id": "bouilloire",
+      "label": "Bouilloire",
+      "verb": "Chauffer l’eau, puis verser",
+      "use": "click",
+      "seconds": 600,
+      "slot": "tasse",
+      "transforms": [
+        { "from": "tasse", "to": "tasse" }
+      ]
+    },
+    {
+      "id": "vitrine",
+      "label": "Cloche à viennoiseries",
+      "verb": "Servir une part (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "assiette",
+      "transforms": [
+        { "from": "assiette", "to": "assiette" },
+        { "from": "carton", "to": "carton" }
+      ]
+    },
+    {
+      "id": "presse-agrumes",
+      "label": "Presse-agrumes",
+      "verb": "Presser (maintenir)",
+      "use": "click",
+      "seconds": 600,
+      "slot": "verre",
+      "transforms": [
+        { "from": "verre", "to": "verre" }
+      ]
+    },
+    {
+      "id": "crepiere",
+      "label": "Crêpière",
+      "verb": "Verser la pâte (maintenir), puis sortir",
+      "use": "click",
+      "seconds": 600,
+      "slot": "assiette",
+      "transforms": [
+        { "from": "assiette", "to": "assiette" }
+      ]
+    },
+    {
+      "id": "lave-vaisselle",
+      "label": "Lave-vaisselle",
+      "verb": "Charger, lancer ou vider",
+      "use": "click",
+      "seconds": 600,
+      "slot": "panier",
+      "transforms": []
+    },
+    {
+      "id": "rail",
+      "label": "Rail à tickets",
+      "verb": "Prendre un ticket",
+      "use": "click",
+      "seconds": 600,
+      "slot": "pince",
+      "transforms": []
+    },
+    {
+      "id": "rangement",
+      "label": "Rangement",
+      "verb": "Ranger le carton",
+      "use": "click",
+      "seconds": 600,
+      "slot": "pied",
+      "transforms": [
+        { "from": "carton", "to": "carton" },
+        { "from": "carton-lourd", "to": "carton-lourd" }
+      ]
+    }
+  ]
+}

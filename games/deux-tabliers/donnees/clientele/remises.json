@@ -1,0 +1,102 @@
+{
+  "floorAtCost": true,
+  "satisfactionWeight": 0.5,
+  "happyHour": {
+    "tier": "P0",
+    "starts": [8, 9, 10, 11, 12, 13, 14, 15, 16],
+    "lengths": [1, 2, 3],
+    "rates": [0.1, 0.2, 0.3],
+    "default": {
+      "start": 15,
+      "length": 2,
+      "rate": 0.2,
+      "days": ["tue", "wed", "thu", "fri"]
+    },
+    "families": ["black_coffee", "milk_coffee", "tea", "chocolate", "cold_drink", "specialty"]
+  },
+  "dailyOffer": {
+    "tier": "P0",
+    "rates": [0.2, 0.3, 0.5],
+    "default": 0.3,
+    "familyWeightBonus": 1,
+    "pickWeight": 2,
+    "maxRecipes": 1,
+    "suggestWhenLeftOverUsual": 1.0
+  },
+  "profileRates": [
+    {
+      "id": "randonneurs",
+      "tier": "P0",
+      "profile": "promeneurs",
+      "rates": [0.1, 0.15, 0.2],
+      "default": 0.1,
+      "defaultDays": ["tue", "wed", "thu", "fri"]
+    },
+    {
+      "id": "etudiants",
+      "tier": "P0",
+      "profile": "etudiants",
+      "rates": [0.1, 0.15, 0.2],
+      "default": 0.15,
+      "defaultDays": ["tue", "wed", "thu", "fri"]
+    }
+  ],
+  "loyaltyCard": {
+    "tier": "P0",
+    "price": 15,
+    "purchase": "cartes_fidelite",
+    "stamps": 8,
+    "families": ["black_coffee", "milk_coffee"],
+    "profiles": ["voisins", "presses", "teletravail", "connaisseurs"],
+    "holderShareStart": 0.1,
+    "holderSharePerDay": 0.1,
+    "holderShareMax": 0.6,
+    "attractionBonusMax": 0.1,
+    "freeSatisfaction": 6,
+    "guestbookChance": 0.5
+  },
+  "formulas": [
+    {
+      "id": "petit_dejeuner",
+      "tier": "P1",
+      "drinks": ["black_coffee", "milk_coffee"],
+      "foods": ["pastry_bread"],
+      "hours": [8, 11],
+      "rate": 0.1,
+      "eatsShareFactor": 1.5,
+      "eatsShareMax": 0.9,
+      "attractionBonus": 0.04
+    },
+    {
+      "id": "gouter",
+      "tier": "P1",
+      "drinks": ["chocolate", "cold_drink"],
+      "foods": ["cake"],
+      "hours": [15, 18],
+      "rate": 0.1,
+      "eatsShareFactor": 1.5,
+      "eatsShareMax": 0.9,
+      "attractionBonus": 0.04
+    }
+  ],
+  "texts": {
+    "names": {
+      "happyHour": "heure douce",
+      "dailyOffer": "offre du jour",
+      "randonneurs": "tarif randonneur",
+      "etudiants": "tarif étudiant"
+    },
+    "profileLabels": {
+      "randonneurs": "Tarif randonneur, sur présentation de ta carte des sentiers",
+      "etudiants": "Tarif étudiant"
+    },
+    "absent": {
+      "etudiants": "Pas d'étudiants au village : le car du lycée ne s'arrête qu'à Mérelles."
+    },
+    "guestbook": {
+      "heure_douce": ["L'heure douce, c'est le meilleur moment de l'après-midi."],
+      "fidelite": ["C'était mon café offert, merci !"],
+      "tarif_randonneur": ["Un café juste avant la montée, et à prix de randonneur."]
+    }
+  }
+}

@@ -1,0 +1,354 @@
+{
+  "format": "deux-tabliers.events",
+  "version": "demo-0.1",
+  "rules": {
+    "announcedTheDayBefore": true,
+    "neverInterruptAGesture": true,
+    "noFailure": "chaque événement finit toujours bien; seule la récompense varie entre « Réussi » et « Formidable »",
+    "maxSpecialEventsPerDay": 1,
+    "realSecondsAreAffectedByPeacefulPace": true
+  },
+  "events": [
+    {
+      "id": "le_car_de_8h12",
+      "name": "Le car de 8 h 12",
+      "kind": "client_presse",
+      "trigger": { "day": 4, "time": "8:05", "fallbackDay": 5 },
+      "announce": "Demain, le car du matin passe avec un remplaçant au volant. Il ne s'arrête qu'un instant.",
+      "cast": [
+        { "id": "octave_brissac", "name": "Octave Brissac", "look": "imperméable mastic, valise à roulettes, tasse de voyage cabossée à la main" },
+        { "id": "chauffeur_car", "name": "Le chauffeur du car", "look": "chemisette bleue, casquette, klaxon poli" }
+      ],
+      "scene": [
+        { "who": "octave_brissac", "text": "Bonjour ! Un double crème au lait d'avoine, mousse épaisse, dans ma tasse, pas trop chaud, avec un sucre à côté, et un croissant coupé en deux. Le car repart tout de suite." },
+        { "who": "octave_brissac", "text": "Et si vous pouvez écrire « Courage » sur le couvercle, c'est un grand jour pour moi." },
+        { "who": "chauffeur_car", "text": "Je ne peux pas attendre, j'ai un horaire !" }
+      ],
+      "goal": {
+        "text": "Servir la commande complète avant que le car reparte.",
+        "timeLimitRealSeconds": 75,
+        "steps": ["double crème avec l'option lait d'avoine", "croissant coupé (plan de travail, 1 s)", "écrire « Courage » sur le couvercle (tracé de 2 s, comme le dessin sur le lait)"],
+        "duoTwist": "Un joueur peut aller parler au chauffeur (porte, 2 répliques): il accorde 30 secondes de plus, une seule fois. Le chauffeur n'est visible que depuis la vitrine: celui qui est au bar doit l'apprendre de l'autre."
+      },
+      "outcomes": {
+        "formidable": { "when": "servi avant le klaxon, sans la rallonge du chauffeur", "text": "Le car repart, Octave lève sa tasse derrière la vitre." },
+        "reussi": { "when": "servi avec la rallonge, ou servi en retard: le chauffeur attend en soupirant, Octave court", "text": "« Vous m'avez sauvé la matinée ! »" }
+      },
+      "rewards": {
+        "reussi": { "euros": 6, "reputationPoints": 8 },
+        "formidable": { "euros": 10, "reputationPoints": 12 },
+        "items": ["carte_postale_brissac"],
+        "itemArrives": "courrier du lundi suivant"
+      },
+      "guestbook": "Arrivé à l'heure à mon entretien, et embauché. Le café m'a porté chance. O. B.",
+      "sim": { "day": 4, "euros": 8, "points": 10 }
+    },
+    {
+      "id": "la_vieille_dame_tousse",
+      "name": "La vieille dame tousse",
+      "kind": "panne",
+      "trigger": { "day": 6, "time": "opening", "note": "le samedi du marché aux fleurs, quand la place est la plus pleine" },
+      "announce": "Demain, marché aux fleurs sur la place du Tilleul: du monde dès l'ouverture.",
+      "cast": [
+        { "id": "simone", "name": "Simone" },
+        { "id": "gaby", "name": "Gaby, plombier du village", "look": "salopette bleu de travail, caisse à outils rouge, crayon sur l'oreille" }
+      ],
+      "scene": [
+        { "who": "system", "text": "La machine siffle, crachote, et le groupe de droite ne donne plus qu'un filet d'eau." },
+        { "who": "simone", "text": "Elle fait ça tous les printemps, la vieille dame. C'est le joint du groupe. Il y en a un neuf dans la boîte à outils, à la réserve." },
+        { "who": "simone", "text": "Il faut être deux: l'un tient le levier en bas, l'autre change le joint. Et ne vous brûlez pas." }
+      ],
+      "goal": {
+        "text": "Réparer le groupe de droite à deux pendant que la place se remplit.",
+        "during": "un seul groupe d'extraction sur deux tant que ce n'est pas réparé",
+        "steps": ["prendre le joint neuf dans la boîte à outils de la réserve", "un joueur maintient le levier (maintien de 3 s)", "pendant ce temps, l'autre retire l'ancien joint puis pose le neuf (deux appuis dans le rythme indiqué)"],
+        "duoTwist": "Le geste ne se fait qu'à deux, côte à côte; pendant ce temps le comptoir est vide, il faut choisir le bon moment (entre deux clients).",
+        "helpAfterRealSeconds": 180,
+        "help": "Si la réparation n'est pas faite après 3 minutes réelles, Gaby passe acheter ses fleurs et la fait en deux répliques."
+      },
+      "outcomes": {
+        "formidable": { "when": "réparé à deux avant 9 h (heure de jeu)", "text": "Simone: « Elle vous a adoptés. »" },
+        "reussi": { "when": "réparé plus tard, ou par Gaby", "text": "Gaby: « Un joint de 1987 ! Gardez-le, c'est une relique. »" }
+      },
+      "rewards": {
+        "reussi": { "reputationPoints": 5 },
+        "formidable": { "reputationPoints": 10, "unlock": "geste « purge du groupe » (le premier café du matin sort « Bien » au moins)" },
+        "items": ["joint_encadre"]
+      },
+      "sim": { "day": 6, "affluence": 0.97, "points": 5, "note": "marché aux fleurs (+10 % de flâneurs) et une heure sur un seul groupe, compensés à peu près" }
+    },
+    {
+      "id": "le_marche_aux_fleurs",
+      "name": "Le marché aux fleurs",
+      "kind": "jour_du_village",
+      "trigger": { "day": 6 },
+      "announce": "Demain, marché aux fleurs sur la place du Tilleul: du monde dès l'ouverture.",
+      "effects": { "profiles": { "flaneurs": 1.2, "promeneurs": 1.1 }, "catalogPlantDiscount": 0.2, "discountUntilDay": 12 },
+      "scene": [
+        { "who": "system", "text": "Les étals de plants couvrent la place. Tout le catalogue des plantes est à -20 % jusqu'à vendredi." }
+      ],
+      "rewards": {}
+    },
+    {
+      "id": "les_godillots",
+      "name": "Les Godillots de l'Arvelle",
+      "kind": "commande_de_groupe",
+      "trigger": { "day": 7, "time": "11:40", "note": "Bastien amène son club de randonnée après sa première visite du matin" },
+      "announce": "Bastien a prévenu: dimanche, son club de randonnée descend des crêtes vers midi. Ils seront neuf.",
+      "cast": [
+        { "id": "bastien", "name": "Bastien" },
+        { "id": "colette_godillots", "name": "Colette, présidente des Godillots", "look": "chapeau de toile, sifflet autour du cou, carnet de marche" }
+      ],
+      "scene": [
+        { "who": "colette_godillots", "text": "Neuf Godillots assoiffés ! Je vous lis la liste: on a voté dans le car." },
+        { "who": "colette_godillots", "text": "Et nos gourdes, vous pourriez les remplir ? On repart en milieu d'après-midi." }
+      ],
+      "goal": {
+        "text": "Servir les neuf randonneurs et remplir leurs neuf gourdes avant leur départ.",
+        "order": "un grand ticket double: 4 boissons fraîches de la carte (citronnade ou jus si connus, sinon thé), 3 cafés crème, 2 chocolats, 9 tartines ou viennoiseries; 9 gourdes à remplir d'eau fraîche à l'évier (1 s chacune)",
+        "timeLimitRealSeconds": 240,
+        "seating": "le club occupe la terrasse ou le banc et deux tables; s'il n'y a pas la place, ils pique-niquent sur les marches de la fontaine (aucune perte)",
+        "duoTwist": "Seule Colette lit la liste: celui qui prend la commande la dicte à l'autre, ticket par ticket; les gourdes s'empilent au bout du comptoir et se remplissent pendant que la machine coule."
+      },
+      "outcomes": {
+        "formidable": { "when": "tout servi et les gourdes pleines en moins de 4 minutes réelles", "text": "Colette siffle trois fois: le salut des Godillots." },
+        "reussi": { "when": "servi plus tard: ils repartent un peu après l'heure, ravis", "text": "« On a pris du retard, mais quel déjeuner ! »" }
+      },
+      "rewards": {
+        "reussi": { "euros": 20, "reputationPoints": 20 },
+        "formidable": { "euros": 30, "reputationPoints": 30 },
+        "items": ["fanion_godillots"],
+        "note": "la commande elle-même est payée au prix de l'ardoise; les euros sont la cagnotte du club"
+      },
+      "guestbook": "Neuf Godillots repus, neuf gourdes pleines. On repassera à l'automne. Le club.",
+      "sim": { "day": 7, "euros": 75, "points": 20, "note": "commande payée (environ 55 €, matières déduites) et cagnotte" }
+    },
+    {
+      "id": "le_carnet_vert",
+      "name": "Le carnet vert",
+      "kind": "critique_deguisee",
+      "trigger": { "fromDay": 9, "condition": "réputation de 2 tasses au moins", "fallbackDay": 10, "time": "10:30" },
+      "announce": null,
+      "announceNote": "pas d'annonce: c'est une surprise. La radio du café en parle la veille, en passant: « On dit qu'une plume de L'Écho de l'Arvelle fait le tour des cafés de la vallée. »",
+      "cast": [
+        { "id": "plume_echo", "name": "Une cliente au carnet vert", "look": "chapeau de pluie, carnet vert à élastique, stylo-plume; signe distinctif: elle ne regarde que les tasses", "realName": "Hortense Vidal, de « L'Écho de l'Arvelle »" }
+      ],
+      "scene": [
+        { "who": "plume_echo", "text": "Un cappuccino, s'il vous plaît. Et que me conseillez-vous avec ?" },
+        { "who": "system", "text": "Elle ouvre un carnet vert et note quelque chose en regardant la machine." }
+      ],
+      "goal": {
+        "text": "Repérer la cliente au carnet et la soigner sans en faire trop.",
+        "clues": {
+          "atCounter": "le joueur qui prend sa commande voit la question « que me conseillez-vous ? »: il choisit le conseil parmi trois réponses (une pâtisserie de l'ardoise, la tartine, « rien, le café se suffit »); les deux premières comptent",
+          "atBar": "le joueur au bar, seul, voit le carnet vert et l'élastique quand elle s'assoit: il doit le dire à l'autre"
+        },
+        "criteria": ["qualité du cappuccino « Bien » ou « Parfait »", "dessin sur le lait", "table propre au moment où elle s'assoit", "deux mots échangés (parler à la table)", "le conseil de la caisse"],
+        "fallbackIfCappuccinoUnknown": "elle commande un café crème"
+      },
+      "outcomes": {
+        "formidable": { "when": "4 critères sur 5 ou plus", "text": "L'article titre: « À Ormeval, le café de la place a retrouvé son âme »." },
+        "reussi": { "when": "moins de 4 critères", "text": "L'article titre: « Le café de la place rouvre, et c'est une bonne nouvelle »." }
+      },
+      "rewards": {
+        "reussi": { "reputationPoints": 25, "affluenceBonus": { "factor": 1.08, "days": 3 } },
+        "formidable": { "reputationPoints": 40, "affluenceBonus": { "factor": 1.15, "days": 3 } },
+        "items": ["coupure_echo"],
+        "itemArrives": "le lendemain, avec le journal; Lise l'encadre si elle est déjà venue"
+      },
+      "guestbook": null,
+      "sim": { "day": 9, "points": 30, "bonus": [3, 1.1] }
+    },
+    {
+      "id": "jules_a_perdu_sa_mamie",
+      "name": "Jules a perdu sa mamie",
+      "kind": "enfant_perdu",
+      "trigger": { "day": 10, "time": "15:10", "note": "un mercredi après-midi, quand la place est pleine d'enfants" },
+      "announce": null,
+      "cast": [
+        { "id": "jules", "name": "Jules, cinq ans", "look": "ciré jaune trop grand, une petite voiture rouge à la main" },
+        { "id": "mamie_odile", "name": "Mamie Odile", "look": "parapluie lilas, cabas à carreaux, cheveux blancs courts" }
+      ],
+      "scene": [
+        { "who": "jules", "text": "J'ai perdu ma mamie. Elle a un parapluie... je sais plus de quelle couleur." },
+        { "who": "jules", "text": "Elle achète toujours du pain. Et elle dit « mon lapin »." }
+      ],
+      "goal": {
+        "text": "Rassurer Jules et retrouver sa mamie, à deux.",
+        "split": {
+          "withJules": "le joueur qui parle à Jules l'installe (coin des enfants si acheté, sinon le banc) et lui sert un chocolat ou un sirop; chaque réplique de plus donne un indice (« lilas, comme les fleurs de la maîtresse », « un cabas à carreaux »), visible de ce seul joueur",
+          "atTheWindow": "l'autre joueur regarde la place par la vitrine ou la porte: trois mamies passent (parapluie lilas, parapluie vert et cabas à carreaux, parapluie lilas et cabas à carreaux); faire signe vers la bonne la fait entrer"
+        },
+        "duoTwist": "Les indices sont d'un côté, la place de l'autre: il faut se parler. Un mauvais signe ne coûte rien: la mamie salue et passe son chemin.",
+        "helpAfterRealSeconds": 150,
+        "help": "Après 2 minutes et demie réelles, Lucas le boulanger traverse la ruelle avec Mamie Odile: « Elle cherche un petit lapin en ciré jaune ! »"
+      },
+      "outcomes": {
+        "formidable": { "when": "retrouvée par le duo en moins de 90 secondes réelles", "text": "Mamie Odile: « Mon lapin ! » Jules rend sa petite voiture... puis la reprend." },
+        "reussi": { "when": "retrouvée plus tard ou avec Lucas", "text": "Mamie Odile: « Je ne l'ai quitté des yeux qu'une seconde, chez le boulanger. »" }
+      },
+      "rewards": {
+        "reussi": { "reputationPoints": 15 },
+        "formidable": { "reputationPoints": 25 },
+        "items": ["moulin_mamie_odile"],
+        "regularUnlocked": "Mamie Odile et Jules viennent ensuite le mercredi à 15 h (petit habitué de la démo, sans histoire)"
+      },
+      "guestbook": "Merci d'avoir gardé mon lapin. Le chocolat était meilleur que le mien, il me l'a dit. Odile.",
+      "sim": { "day": 10, "points": 20 }
+    },
+    {
+      "id": "l_inspection",
+      "name": "L'inspection",
+      "kind": "inspection",
+      "trigger": { "day": 11, "time": "random between 9:00 and 16:00", "note": "annoncée la veille par une lettre de la préfecture, sans l'heure" },
+      "announce": "Lettre de la préfecture: « Contrôle d'hygiène de votre établissement demain, dans la journée. »",
+      "cast": [
+        { "id": "mme_ferrand", "name": "Madame Ferrand, inspectrice", "look": "blouse blanche sous un trench, tablette à pince, thermomètre-sonde dans la poche" }
+      ],
+      "scene": [
+        { "who": "mme_ferrand", "text": "Bonjour, contrôle sanitaire. Ne vous arrêtez pas pour moi, faites comme d'habitude." },
+        { "who": "mme_ferrand", "text": "Je regarde, je note, je ne touche à rien." }
+      ],
+      "goal": {
+        "text": "Tenir le café propre pendant qu'elle observe (6 minutes réelles).",
+        "criteria": ["aucune table sale depuis plus de 30 s", "une pile de tasses propres jamais vide", "la livraison du matin rangée (aucun carton à la porte de service)", "le sol balayé dans la journée", "le frigo du bar fermé (il se ferme seul après 5 s, sauf si on le laisse ouvert en le tenant)"],
+        "duoTwist": "Chaque critère s'affiche discrètement chez les deux; la répartition se décide à voix haute: l'un tient le service, l'autre la plonge et le balai."
+      },
+      "outcomes": {
+        "formidable": { "when": "5 critères tenus", "text": "« Très satisfaisant. C'est rare, un comptoir aussi bien tenu. »" },
+        "reussi": { "when": "moins de 5", "text": "« Satisfaisant. Je vous laisse deux petits conseils. » (les critères manqués, en conseils sur la tablette)" }
+      },
+      "rewards": {
+        "reussi": { "reputationPoints": 10 },
+        "formidable": { "reputationPoints": 20 },
+        "items": ["plaque_hygiene"]
+      },
+      "sim": { "day": 11, "points": 15 }
+    },
+    {
+      "id": "le_cafe_d_honneur",
+      "name": "Le café d'honneur",
+      "kind": "mariage",
+      "trigger": { "day": 12, "time": "15:30", "note": "le mariage a lieu à la mairie, de l'autre côté de la place, à 15 h" },
+      "announce": "Nadia et Paul se marient demain à la mairie et vous demandent le café d'honneur pour quatorze personnes, à 15 h 30. Lucas livre la pièce montée. Pensez au lait.",
+      "acceptance": "la demande arrive à la fermeture du jour 11 (proposition à deux, toujours acceptable; la refuser fait passer la noce chez Lucas, sans regret)",
+      "cast": [
+        { "id": "nadia", "name": "Nadia", "look": "robe courte ivoire, couronne de pâquerettes" },
+        { "id": "paul", "name": "Paul", "look": "costume de lin bleu, nœud papillon à fleurs" },
+        { "id": "lucas", "name": "Lucas, le boulanger" }
+      ],
+      "scene": [
+        { "who": "lucas", "text": "La pièce montée ! Elle est lourde, on la porte à deux, doucement, et droit." },
+        { "who": "nadia", "text": "Tout le village est là ! Et Paul veut un café. Paul veut toujours un café." },
+        { "who": "paul", "text": "Un noisette. Et pour la table d'honneur, la surprise de la maison." }
+      ],
+      "goal": {
+        "text": "Porter la pièce montée à deux, servir quatorze invités sur la terrasse ou dans la salle, puis la « surprise de la maison ».",
+        "steps": ["porter la pièce montée de la boulangerie à la table d'honneur (port à deux, 1,2 m/s au plus)", "servir 14 boissons de la carte (deux tickets de 7)", "la surprise: le duo choisit une recette de la carte et lui donne un dessin sur le lait, ou deux crêpes en cœur si la crêpière est là"],
+        "prepTip": "la commande de la veille propose deux litres de lait de plus",
+        "duoTwist": "Le port à deux de la pièce montée demande de se parler pour tourner à la porte; aucun échec: posée de travers, elle reste belle."
+      },
+      "outcomes": {
+        "formidable": { "when": "les 14 servis en moins de 5 minutes réelles après l'arrivée de la noce, et la surprise faite", "text": "Les mariés lèvent leur tasse: « Au café de la place ! »" },
+        "reussi": { "when": "sinon", "text": "« Le plus beau café d'honneur du canton. »" }
+      },
+      "rewards": {
+        "reussi": { "euros": 160, "reputationPoints": 20 },
+        "formidable": { "euros": 200, "reputationPoints": 30 },
+        "items": ["photo_maries"],
+        "note": "forfait de 160 € payé par les mariés à la place des additions, matières (environ 25 €) à la charge du café"
+      },
+      "guestbook": "Merci d'avoir fait de notre café d'honneur un vrai moment. On reviendra pour notre premier anniversaire. Nadia et Paul",
+      "sim": { "day": 12, "euros": 140, "points": 25 }
+    },
+    {
+      "id": "le_coeur_de_lait",
+      "name": "Le concours du cœur de lait",
+      "kind": "concours",
+      "trigger": { "day": 13, "time": "10:00 to 12:00", "note": "Simone l'organise pour faire parler du café avant la fête; annoncé par une affiche dans la vitrine" },
+      "announce": "Demain matin, Simone organise le premier concours du cœur de lait. Le jury: Noé, Lise et Simone.",
+      "cast": [
+        { "id": "simone", "name": "Simone" },
+        { "id": "lise", "name": "Lise" },
+        { "id": "noe", "name": "Noé" }
+      ],
+      "scene": [
+        { "who": "simone", "text": "Entre 10 h et midi, chaque boisson au lait de la salle passe au jury. Cœur, feuille ou tulipe: c'est vous qui voyez." },
+        { "who": "noe", "text": "Moi je veux un chat." },
+        { "who": "simone", "text": "Un chat, ce sera pour le prochain concours, mon grand." }
+      ],
+      "goal": {
+        "text": "Réussir 10 dessins sur le lait à deux entre 10 h et midi (heure de jeu).",
+        "scoring": "chaque dessin « Bien » vaut 1 point, « Parfait » 2; le duo vise 10 points ensemble; le jury commente chaque tasse (jamais le joueur qui l'a faite)",
+        "duoTwist": "Le dessin se fait après le moussage: l'un mousse, l'autre dessine, ou chaque joueur fait les deux. Les gestes simplifiés donnent « Bien » à chaque dessin: personne n'est laissé de côté.",
+        "noComparison": true
+      },
+      "outcomes": {
+        "formidable": { "when": "20 points ou plus", "text": "Lise: « Je mets la tulipe dans le bulletin du village. »" },
+        "reussi": { "when": "moins de 20 points", "text": "Noé: « C'était pas un chat, mais c'était bien. »" }
+      },
+      "rewards": {
+        "reussi": { "reputationPoints": 15 },
+        "formidable": { "reputationPoints": 25 },
+        "items": ["pichet_argent"]
+      },
+      "sim": { "day": 13, "points": 20 }
+    },
+    {
+      "id": "l_averse_de_trois_heures",
+      "name": "L'averse de trois heures",
+      "kind": "meteo",
+      "trigger": { "fromDay": 9, "condition": "terrasse ouverte, temps « couvert », une fois dans la démo", "time": "15:00" },
+      "announce": "La radio: « Couvert demain, avec une averse possible dans l'après-midi. »",
+      "scene": [
+        { "who": "system", "text": "Les premières gouttes tombent sur le store. Les clients de la terrasse prennent leur tasse et cherchent une place dedans." }
+      ],
+      "goal": {
+        "text": "Rentrer la terrasse: accueillir dedans les clients du dehors (ils gardent leur commande) et rentrer les coussins.",
+        "duoTwist": "L'un fait de la place dedans (débarrasser, rapprocher deux tables), l'autre rentre les tasses de la terrasse sur un plateau.",
+        "after": "l'averse dure une heure de jeu; ensuite le soleil revient et les promeneurs ressortent"
+      },
+      "outcomes": {
+        "formidable": { "when": "aucun client de la terrasse debout plus de 20 s", "text": "« On est mieux dedans, finalement. »" },
+        "reussi": { "when": "sinon", "text": "« Un peu mouillés, mais au chaud. »" }
+      },
+      "rewards": { "reussi": { "reputationPoints": 5 }, "formidable": { "reputationPoints": 10 } }
+    },
+    {
+      "id": "la_fete_du_tilleul",
+      "name": "La fête du Tilleul",
+      "kind": "defi_local",
+      "trigger": { "day": 14, "note": "date fixe: la fête du village est le deuxième dimanche du printemps, pour tout le monde" },
+      "announce": "Demain, c'est la fête du Tilleul. Tout le village sera sur la place, et René viendra de Mérelles.",
+      "cast": [
+        { "id": "simone", "name": "Simone" },
+        { "id": "rene", "name": "René" },
+        { "id": "maire", "name": "Madame la maire, Josette Arnoux", "look": "écharpe tricolore par-dessus un gilet de laine" }
+      ],
+      "scene": [
+        { "who": "maire", "text": "Comme chaque année, le café de la place régale la fête. Cette année, c'est vous !" },
+        { "who": "simone", "text": "Trente ans que je la fais. Ce soir, c'est la vôtre." }
+      ],
+      "goal": {
+        "text": "Tenir le coup de feu de la fête: affluence x1,6 toute la journée.",
+        "goals": [
+          { "id": "groupes", "text": "Servir 45 groupes", "value": 45 },
+          { "id": "terrasse", "text": "Ouvrir la terrasse sous le store", "fallback": "sans terrasse, la mairie prête deux tables à tréteaux sur la place: 4 places dehors pour la journée" },
+          { "id": "trois_tasses", "text": "Arriver à la fête avec trois tasses de réputation" }
+        ],
+        "alwaysSucceeds": true
+      },
+      "outcomes": {
+        "formidable": { "when": "les 3 objectifs", "text": "Toute la place applaudit quand le store s'allume." },
+        "reussi": { "when": "moins de 3 objectifs", "text": "La place chante jusqu'à la nuit." }
+      },
+      "rewards": {
+        "reussi": { "renown": 150 },
+        "formidable": { "renown": 150, "euros": 50, "note": "la mairie double la cagnotte des musiciens" },
+        "items": ["lanterne_tilleul"]
+      },
+      "after": "Le soir, René attend au bout du comptoir: c'est lui qui apporte la lettre de Mérelles si elle n'est pas encore arrivée.",
+      "sim": { "day": 14, "points": 0 }
+    }
+  ]
+}

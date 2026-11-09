@@ -1,0 +1,227 @@
+/*
+  Deux Tabliers · maquette du téléphone tenu en main (vue subjective).
+  Jetons de la bible (section 10) et de `src/interface/theme.ts`: expresso, filet, crème, or de Duo.
+  Polices DM Sans et Jost (OFL, copiées dans polices/), aucune ressource réseau.
+  Tailles en em du téléphone: 1em = 16 px x taille du texte de Duo (--ui).
+*/
+@font-face { font-family: 'DM Sans'; src: url('polices/dm-sans-latin-wght-normal.woff2') format('woff2'); font-weight: 100 1000; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'DM Sans'; src: url('polices/dm-sans-latin-ext-wght-normal.woff2') format('woff2'); font-weight: 100 1000; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Jost'; src: url('polices/jost-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+
+:root {
+  --expresso: #2B211C;
+  --expresso-2: #3A2D26;
+  --expresso-3: #4A3A30;
+  --filet: #5C4A3E;
+  --creme: #F6EEDF;
+  --creme-2: #CDBBA6;
+  --or: #FFC857;
+  --succes: #6BD69A;
+  --erreur: #FF6B81;
+  --ambre: #E0A030;
+  --noyer: #4B2F1F;
+  --noyer-clair: #6E4A31;
+  --laiton: #B8924F;
+  --laiton-clair: #E2C487;
+  --nuit: #1A1F3D;
+  --camille: #5CE1E6;
+  --sacha: #8D6CFF;
+  --ui: 1;
+  --duree: 180ms;
+  font-size: calc(16px * var(--ui));
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--creme); background: #1b1410; line-height: 1.35; }
+h1, h2, h3, h4, p, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; }
+.reduit { --duree: 0ms; }
+
+/* ---------- Le café, derrière (rendu de l'essai de style B, semi-réaliste) ---------- */
+.cafe { position: fixed; inset: 0; background: #2a2018 url('../../../../docs/jeux/cosy-cafe/essai-style/captures/B-vue1-1920x1080.png') center / cover no-repeat; }
+.cafe::after { content: ''; position: absolute; inset: 0; background: rgba(18, 12, 8, 0); transition: background var(--duree) ease-out; }
+.tel-sorti .cafe::after { background: rgba(18, 12, 8, 0.28); }
+
+/* ---------- HUD du jeu (repris de hud.html, version haute fidélité): plafonné par la hauteur ---------- */
+.hud { position: fixed; inset: 0; pointer-events: none; font-size: min(calc(1rem), calc(100vh / 30)); z-index: 5; }
+.capsule { background: var(--expresso); border: 1px solid var(--filet); border-radius: 0.7em; padding: 0.5em 0.8em; color: var(--creme); }
+.hud__horloge { position: absolute; left: 0.75em; top: 0.75em; width: 14.5em; }
+.hud__heure { font: 600 1.45em/1.1 'Jost', sans-serif; display: flex; gap: 0.35em; align-items: center; }
+.hud__sous { font-size: 0.9em; color: var(--creme-2); margin-top: 0.15em; }
+.hud__ticket { position: absolute; left: 0.75em; top: 5.2em; width: 14.5em; }
+.hud__ticket b { display: block; }
+.hud__ticket span { color: var(--creme-2); font-size: 0.92em; }
+.hud__alerte { position: absolute; left: 50%; top: 0.75em; transform: translateX(-50%); display: flex; gap: 0.55em; align-items: center; white-space: nowrap; }
+.hud__alerte .ico { color: var(--or); }
+.hud__alerte .touche { margin-left: 0.4em; }
+.hud__autre { position: absolute; right: 0.75em; top: 0.75em; width: 16.5em; }
+.hud__autre-tete { display: flex; gap: 0.45em; align-items: center; font-weight: 700; }
+.hud__autre p { color: var(--creme-2); font-size: 0.92em; margin-top: 0.15em; }
+.hud__main { position: absolute; right: 0.75em; bottom: 0.75em; }
+.hud__main small { display: block; font: 700 0.875em/1.4 'DM Sans', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: var(--creme-2); }
+.vibre { animation: vibre 0.36s steps(2) 2; }
+@keyframes vibre { 0% { transform: translateX(-50%) rotate(-1.2deg); } 100% { transform: translateX(-50%) rotate(1.2deg); } }
+.reduit .vibre { animation: none; }
+
+.touche { display: inline-block; min-width: 1.6em; padding: 0 0.35em; border: 1.5px solid currentColor; border-radius: 0.3em; font: 600 0.85em/1.45 'DM Sans', sans-serif; text-align: center; }
+.jeton { display: inline-grid; place-items: center; width: 1.45em; height: 1.45em; border-radius: 50%; background: var(--nuit); box-shadow: 0 0 0 2px #0b0b0b; flex: none; }
+.jeton svg { width: 1.1em; height: 1.1em; }
+.ico { width: 1.25em; height: 1.25em; flex: none; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Le téléphone ---------- */
+.tel {
+  position: fixed; z-index: 10;
+  left: 54%; bottom: 0.75rem;
+  font-size: max(1rem, min(calc(100vh / 54), 1.25rem));
+  width: min(23em, 46vw);
+  height: min(46em, calc(100vh - 5.4rem - 0.75rem));
+  transform: translate(-50%, 0);
+  transition: transform var(--duree) cubic-bezier(.2,.8,.3,1), opacity var(--duree) ease-out;
+}
+.tel[data-range] { transform: translate(-50%, 70%) rotate(6deg); opacity: 0; pointer-events: none; }
+.reduit .tel { transition: none; }
+.tel__coque {
+  position: absolute; inset: 0; border-radius: 2.1em; padding: 0.6em;
+  background: linear-gradient(100deg, var(--noyer-clair), var(--noyer) 40%, #3a2417);
+  box-shadow: 0 0 0 0.16em var(--laiton), 0 0 0 0.22em #3b2a17, 0 1.2em 2.4em rgba(0,0,0,0.55);
+}
+.tel__ecran {
+  position: relative; height: 100%; border-radius: 1.55em; overflow: hidden;
+  background: var(--expresso); display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  box-shadow: inset 0 0 0 1px #120c08;
+}
+/* Main droite qui tient le téléphone: provisoire, l'image viendra du modèle des mains (artiste-3d). */
+.tel__main { position: absolute; left: -1.25em; top: 54%; width: 2.2em; height: 40%; pointer-events: none; z-index: -1; }
+.tel__pouce { position: absolute; right: -1.15em; bottom: 16%; width: 2em; height: 5.2em; pointer-events: none; }
+
+/* Barre d'état */
+.etat { display: flex; align-items: center; gap: 0.5em; padding: 0.55em 1.1em 0.4em; font-size: 0.875em; font-weight: 600; background: #221a15; border-bottom: 1px solid var(--filet); }
+.etat__heure { font-variant-numeric: tabular-nums; }
+.etat__jour { color: var(--creme-2); font-weight: 500; }
+.etat__caisse { margin-left: auto; display: flex; gap: 0.35em; align-items: center; }
+.etat__caisse .ico { width: 1.1em; height: 1.1em; color: var(--or); }
+
+/* Corps et défilement */
+.corps { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--filet) transparent; padding: 0.9em 1em 1em; position: relative; }
+.appli-tete { display: flex; align-items: center; gap: 0.5em; position: sticky; top: -0.9em; z-index: 2; margin: -0.9em -1em 0.6em; padding: 0.9em 1em 0.5em; background: var(--expresso); box-shadow: 0 1px 0 var(--filet); }
+.appli-tete h1 { font: 600 1.35em/1.15 'Jost', sans-serif; }
+.appli-tete .pastille-app { width: 2em; height: 2em; }
+.intro { color: var(--creme-2); font-size: 0.9375em; margin-bottom: 0.8em; }
+.second { color: var(--creme-2); }
+.petit { font-size: 0.875em; }
+h2.rubrique { font: 700 0.875em/1.3 'DM Sans', sans-serif; letter-spacing: 0.07em; text-transform: uppercase; color: var(--creme-2); margin: 1em 0 0.45em; }
+
+/* Barre du bas: retour et accueil */
+.nav { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4em; padding: 0.45em 0.7em 0.6em; background: #221a15; border-top: 1px solid var(--filet); }
+.nav button { display: flex; align-items: center; justify-content: center; gap: 0.4em; min-height: 2.4em; border-radius: 0.7em; background: transparent; border: 1.5px solid var(--filet); color: var(--creme); font-weight: 600; font-size: 0.9375em; cursor: pointer; }
+.nav button:hover { border-color: var(--creme-2); }
+
+/* Boutons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4em; font: 600 0.95em/1.2 'DM Sans', sans-serif; color: var(--creme); background: var(--expresso-2); border: 2px solid var(--creme-2); border-radius: 0.6em; padding: 0.45em 0.85em; min-height: 2.4em; cursor: pointer; }
+.btn:hover { background: var(--expresso-3); }
+.btn--or { background: var(--or); color: var(--expresso); border-color: var(--or); }
+.btn--or:hover { background: #ffd57c; }
+.btn--plein { width: 100%; }
+.btn--lien { background: transparent; border-color: transparent; text-decoration: underline; text-underline-offset: 0.2em; padding-inline: 0.2em; }
+.btn:disabled { border-style: dashed; background: transparent; color: var(--creme-2); cursor: default; }
+.rond { width: 2.3em; height: 2.3em; min-height: 0; padding: 0; border-radius: 50%; font-size: 1em; }
+
+/* Focus: anneau or doublé d'expresso, toujours visible (13:1 sur l'écran) */
+:focus { outline: none; }
+:focus-visible { outline: 3px solid var(--or); outline-offset: 2px; box-shadow: 0 0 0 5px var(--expresso); }
+
+/* Cartes */
+.carte { background: var(--expresso-2); border: 1px solid var(--filet); border-radius: 0.9em; padding: 0.75em 0.85em; }
+.carte + .carte { margin-top: 0.65em; }
+.carte h3 { font: 600 1.05em/1.2 'Jost', sans-serif; }
+.carte--attente { border: 2px dashed var(--creme-2); }
+.carte--lue { background: transparent; }
+
+/* Accueil */
+.accueil-tete { display: flex; align-items: center; gap: 0.6em; margin-bottom: 0.8em; }
+.emblème { width: 2.6em; height: 2.6em; border-radius: 50%; background: #2F4E7A; border: 2px solid var(--creme); display: grid; place-items: center; flex: none; }
+.emblème .ico { color: var(--creme); }
+.accueil-tete h1 { font: 600 1.25em/1.1 'Jost', sans-serif; }
+.afaire { display: grid; gap: 0.4em; margin-top: 0.45em; }
+.tache { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.55em; align-items: center; text-align: left; padding: 0.5em 0.55em; border-radius: 0.7em; border: 1.5px solid var(--filet); background: var(--expresso); cursor: pointer; font-size: 0.9375em; }
+.tache:hover { border-color: var(--creme-2); }
+.tache b { display: block; color: var(--or); font-size: 0.95em; margin-top: 0.1em; }
+.grille { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.7em 0.2em; margin-top: 0.9em; }
+.app { display: grid; justify-items: center; align-content: start; gap: 0.3em; padding: 0.3em 0; border-radius: 0.8em; border: 0; background: transparent; cursor: pointer; text-align: center; font-size: 0.875em; hyphens: manual; font-weight: 600; line-height: 1.2; position: relative; }
+.app:hover .pastille-app { box-shadow: 0 0 0 2px var(--creme-2), inset 0 -0.2em 0 rgba(0,0,0,0.25); }
+.pastille-app { width: 3.3em; height: 3.3em; border-radius: 50%; display: grid; place-items: center; color: var(--expresso); box-shadow: inset 0 -0.2em 0 rgba(0,0,0,0.25), inset 0 0.15em 0 rgba(255,255,255,0.35); border: 2px solid #1a120d; }
+.pastille-app .ico { width: 1.55em; height: 1.55em; stroke-width: 1.9; }
+.badge { position: absolute; top: 0; right: calc(50% - 2.2em); min-width: 1.6em; height: 1.6em; padding: 0 0.3em; border-radius: 1em; background: var(--creme); color: var(--expresso); border: 2px solid var(--expresso); font-size: 1em; font-weight: 800; display: grid; place-items: center; z-index: 1; }
+
+/* Couleurs des pastilles: émail clair, icône expresso (contraste porté par l'icône sombre, toujours avec le nom) */
+.c-commandes { background: #E9C98A; }
+.c-reserve { background: #C9D7B0; }
+.c-catalogue { background: #E6C2A6; }
+.c-carte { background: #F1EDE3; }
+.c-remises { background: #F2B8A0; }
+.c-connaitre { background: #B9D3E4; }
+.c-bilans { background: #D9CDE8; }
+.c-projets { background: #F3D9A4; }
+.c-messages { background: #A8DCC4; }
+.c-reglages { background: #D5CEC6; }
+
+/* Listes de lignes (commandes, carte) */
+.ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.2em 0.6em; padding: 0.6em 0; border-top: 1px solid var(--filet); align-items: center; }
+.ligne:first-of-type { border-top: 0; }
+.ligne__nom { font-weight: 600; }
+.ligne__info { grid-column: 1 / -1; color: var(--creme-2); font-size: 0.875em; display: flex; flex-wrap: wrap; gap: 0.1em 0.8em; }
+.pas { display: inline-flex; align-items: center; gap: 0.35em; }
+.pas output { min-width: 3.6em; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pas .rond { width: 2.1em; height: 2.1em; }
+.prix { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ambre { color: #F2B94B; }
+.ok { color: var(--succes); }
+.alerte-douce { display: flex; gap: 0.45em; align-items: flex-start; background: #3d3020; border: 1px solid #7a5e2c; border-radius: 0.7em; padding: 0.55em 0.7em; font-size: 0.9375em; margin: 0.6em 0; }
+.alerte-douce .ico { color: var(--or); margin-top: 0.05em; }
+.verrou { display: flex; gap: 0.4em; align-items: center; font-size: 0.875em; color: var(--creme); grid-column: 1 / -1; }
+.ligne--tenue { box-shadow: inset 3px 0 0 var(--sacha); padding-left: 0.6em; }
+
+.fournisseur-tete { display: flex; gap: 0.6em; align-items: center; }
+.portrait { width: 2.4em; height: 2.4em; border-radius: 50%; flex: none; display: grid; place-items: center; font: 600 1em 'Jost', sans-serif; color: var(--expresso); border: 2px solid var(--creme-2); }
+.fournisseur-tete p { font-size: 0.875em; color: var(--creme-2); }
+.port { font-size: 0.875em; margin-top: 0.4em; display: flex; gap: 0.35em; align-items: center; }
+
+.collant { position: sticky; bottom: -1em; margin: 0.9em -1em -1em; padding: 0.7em 1em 0.9em; background: var(--expresso); box-shadow: 0 -1px 0 var(--filet); }
+.collant p { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.45em; }
+
+/* Interrupteur */
+.inter { display: inline-flex; align-items: center; gap: 0.45em; cursor: pointer; background: transparent; border: 0; padding: 0.2em; font-weight: 600; font-size: 0.9375em; }
+.inter__piste { width: 2.6em; height: 1.45em; border-radius: 1em; background: transparent; border: 2px solid var(--creme-2); position: relative; flex: none; }
+.inter__piste::after { content: ''; position: absolute; top: 0.15em; left: 0.17em; width: 0.95em; height: 0.95em; border-radius: 50%; background: var(--creme-2); transition: left var(--duree); }
+.inter[aria-checked="true"] .inter__piste { background: var(--succes); border-color: var(--succes); }
+.inter[aria-checked="true"] .inter__piste::after { left: 1.3em; background: var(--expresso); }
+.remise-tete { display: flex; justify-content: space-between; align-items: center; gap: 0.5em; }
+.choix { display: flex; flex-wrap: wrap; gap: 0.35em; margin-top: 0.45em; }
+.puce { min-height: 2.2em; min-width: 2.6em; padding: 0.2em 0.6em; border-radius: 1.1em; border: 1.5px solid var(--creme-2); background: transparent; cursor: pointer; font-weight: 600; font-size: 0.9em; }
+.puce[aria-pressed="true"] { background: var(--creme); color: var(--expresso); border-color: var(--creme); }
+
+/* Messages */
+.fil { display: grid; gap: 0.6em; }
+.bulle { max-width: 88%; padding: 0.55em 0.75em; border-radius: 0.9em; font-size: 0.9375em; }
+.bulle--nouvelle { justify-self: center; max-width: 100%; text-align: center; background: transparent; color: var(--creme-2); font-size: 0.875em; padding: 0.2em 0.4em; }
+.bulle--elle { background: var(--expresso-3); border-bottom-left-radius: 0.25em; }
+.bulle--moi { justify-self: end; background: #23413F; border-bottom-right-radius: 0.25em; }
+.qui { display: flex; gap: 0.4em; align-items: center; font-weight: 700; font-size: 0.875em; margin-bottom: 0.2em; }
+.proposition { border: 2px solid var(--or); background: var(--expresso-2); border-radius: 0.9em; padding: 0.8em 0.85em; }
+.proposition h3 { font: 600 1.1em/1.2 'Jost', sans-serif; margin: 0.2em 0 0.35em; }
+.proposition .montant { font-size: 1.05em; font-weight: 700; }
+.proposition .actions { display: grid; gap: 0.45em; margin-top: 0.7em; }
+
+/* Bannière de notification dans le téléphone */
+.banniere { position: absolute; left: 0.6em; right: 0.6em; top: 2.6em; z-index: 3; display: grid; grid-template-columns: auto minmax(0,1fr); gap: 0.1em 0.6em; align-items: center; padding: 0.6em 0.75em; border-radius: 0.9em; background: var(--creme); color: var(--expresso); border: 2px solid var(--expresso); box-shadow: 0 0.5em 1em rgba(0,0,0,0.45); cursor: pointer; text-align: left; transition: transform var(--duree); }
+.banniere b { grid-column: 2; font-size: 0.95em; }
+.banniere span { grid-column: 2; font-size: 0.875em; }
+.banniere .pastille-app { width: 2.2em; height: 2.2em; grid-column: 1; grid-row: 1 / span 2; }
+
+/* Aide clavier, à gauche du téléphone */
+.aide { position: fixed; z-index: 9; left: calc(54% - min(23 * max(1rem, min(100vh / 54, 1.25rem)), 46vw) / 2 - 1.6rem); bottom: 0.75rem; transform: translateX(-100%); width: 15.5em; font-size: 0.875rem; display: grid; gap: 0.35em; }
+.aide p { display: flex; gap: 0.4em; align-items: center; flex-wrap: wrap; }
+.etiquette-maquette { position: fixed; right: 0.5rem; bottom: 0.3rem; z-index: 20; font-size: 0.75rem; background: #111; color: #fff; padding: 0.1rem 0.5rem; border-radius: 0.3rem; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

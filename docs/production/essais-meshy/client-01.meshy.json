@@ -1,0 +1,125 @@
+{
+  "format": "duo-meshy-sheet/1",
+  "asset": "char_essai_flaneur",
+  "game": "cosy-cafe",
+  "family": "personnages (essai: personnage entier par Meshy; la bible, 13.2, réserve Meshy aux coiffures et accessoires)",
+  "purpose": "essai de la chaîne Meshy du studio: un client par texte vers 3D (profil flâneur), riggé par Meshy",
+  "status": "téléchargé le 2026-11-07; non mis en conformité (aperçu sans texture: couleurs à poser à la main); sert à la comparaison des squelettes",
+  "license": "offre payante du client: licence privée, le modèle appartient au client (docs/production/meshy.md, section 7)",
+  "author": "tech-artist",
+  "date": "2026-11-07",
+  "client": {
+    "server": "@meshy-ai/meshy-mcp-server@0.6.9",
+    "script": "docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+    "api": "https://api.meshy.ai"
+  },
+  "credits_budget": 100,
+  "tasks": [
+    {
+      "step": "apercu texte",
+      "tool": "meshy_text_to_3d",
+      "endpoint": "POST /openapi/v2/text-to-3d (mode preview)",
+      "task_id": "01a1b79d-f767-750f-a2bc-46f8a0899654",
+      "params": {
+        "prompt": "Full-body stylized low-poly game character: a friendly adult cafe customer, about 1.70 m tall, casual clothes: loose knit sweater, corduroy trousers, simple leather shoes, short tidy hair. Standing in a T-pose, arms straight out to the sides, legs slightly apart, facing forward, neutral calm expression. Clean simple shapes, soft cozy cartoon proportions (not chibi), clearly separated arms, hands and legs. No bag, no hat, no scarf, no accessories, no text.",
+        "ai_model": "meshy-t2.5",
+        "model_type": "smart-topology",
+        "target_polycount": 5000,
+        "topology": "triangle",
+        "pose_mode": "t-pose",
+        "target_formats": [
+          "glb"
+        ],
+        "auto_size": true,
+        "origin_at": "bottom"
+      },
+      "seed": 3539810118,
+      "credits": 5,
+      "created": "2026-11-07T20:05:47.283Z",
+      "finished": "2026-11-07T20:06:28.201Z",
+      "duration_s": 40.9,
+      "files_expire": "2026-11-10T20:06:28.201Z",
+      "outputs": [
+        "GLB sans texture",
+        "vignette"
+      ],
+      "downloaded": true,
+      "measured": {
+        "triangles": 5099,
+        "target": 5000,
+        "textures": 0,
+        "auto_size_height_m": 1.3
+      }
+    },
+    {
+      "step": "rig",
+      "tool": "meshy_rig",
+      "endpoint": "POST /openapi/v1/rigging",
+      "task_id": "01a1b79e-ca78-70c9-80ef-3726b55f0dd0",
+      "parent_task_id": "01a1b79d-f767-750f-a2bc-46f8a0899654",
+      "params": {
+        "input_task_id": "01a1b79d-f767-750f-a2bc-46f8a0899654",
+        "height_meters": 1.7
+      },
+      "credits": 5,
+      "created": "2026-11-07T20:06:42.168Z",
+      "finished": "2026-11-07T20:06:48.625Z",
+      "duration_s": 6.5,
+      "files_expire": "2026-11-10T20:06:48.625Z",
+      "outputs": [
+        "Character_output.glb, Character_output.fbx (personnage riggé)",
+        "Animation_Walking_withSkin.glb, .fbx, Animation_Walking_withSkin_armature.glb (marche offerte)",
+        "Animation_Running_withSkin.glb, .fbx, Animation_Running_withSkin_armature.glb (course offerte)"
+      ],
+      "downloaded": true,
+      "note": "rig accepté et réussi sur un aperçu sans texture, alors que la documentation demande un humanoïde texturé: qualité des poids et des articulations à vérifier au téléchargement",
+      "measured": {
+        "triangles": 5099,
+        "bones": 24,
+        "height_m": 1.7,
+        "walk_clip": "Armature|walking_man|baselayer, 1,067 s, 30 i/s, sur place",
+        "armature_node_scale": 0.01
+      }
+    }
+  ],
+  "credits_total": 10,
+  "next_steps": [
+    "si l'on garde ce personnage: couleurs par pièce (palette_overrides) puis conformite_personnage.py"
+  ],
+  "conformity": {
+    "node_name": "char_essai_flaneur",
+    "target_height_m": 1.7,
+    "max_triangles": 4000,
+    "clips": [
+      {
+        "file": "Animation_Walking_withSkin.glb",
+        "index": 0,
+        "name": "walk",
+        "in_place": true
+      }
+    ],
+    "palette_allowed": [
+      "skin_1",
+      "skin_2",
+      "skin_3",
+      "skin_4",
+      "skin_5",
+      "skin_6",
+      "hair_1",
+      "hair_2",
+      "hair_3",
+      "hair_4",
+      "hair_5",
+      "hair_6",
+      "hair_7",
+      "flaneurs_scarf",
+      "flaneurs_cord",
+      "flaneurs_knit",
+      "flaneurs_paper",
+      "ink",
+      "porcelain"
+    ],
+    "per_face_all": true,
+    "face_smoothing": 2
+  }
+}

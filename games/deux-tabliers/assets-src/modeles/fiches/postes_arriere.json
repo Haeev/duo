@@ -1,0 +1,1122 @@
+{
+ "station_ticket_rail": {
+  "id": "station_ticket_rail",
+  "nom": "Rail à tickets de la passe",
+  "fichier": "station_ticket_rail.glb",
+  "famille": "station",
+  "style": "neutre",
+  "categorie": "poste",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.608,
+   "y": 0.458,
+   "z": 0.042
+  },
+  "triangles": 544,
+  "budget_triangles": 600,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "station_ticket_rail",
+   "ticket_0",
+   "ticket_1",
+   "ticket_2",
+   "ticket_3",
+   "ticket_4",
+   "ticket_5"
+  ],
+  "poids_octets": 46824,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "pied sur la tablette de la passe (1,105 m), barre à 0,42-0,456 m; avant = barista (poser tourné de 180°); nœuds ticket_0 à ticket_5 à montrer selon les commandes en cours",
+  "douilles": {
+   "socket_ticket_0": [
+    -0.25,
+    0.422,
+    0.02
+   ],
+   "socket_ticket_1": [
+    -0.15,
+    0.422,
+    0.02
+   ],
+   "socket_ticket_2": [
+    -0.05,
+    0.422,
+    0.02
+   ],
+   "socket_ticket_3": [
+    0.05,
+    0.422,
+    0.02
+   ],
+   "socket_ticket_4": [
+    0.15,
+    0.422,
+    0.02
+   ],
+   "socket_ticket_5": [
+    0.25,
+    0.422,
+    0.02
+   ]
+  }
+ },
+ "station_vitrine": {
+  "id": "station_vitrine",
+  "nom": "Vitrine réfrigérée à viennoiseries",
+  "fichier": "station_vitrine.glb",
+  "famille": "station",
+  "style": "neutre",
+  "categorie": "vitrine",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.51,
+   "y": 0.3,
+   "z": 0.31
+  },
+  "triangles": 713,
+  "budget_triangles": 1000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles",
+   "dt_verre"
+  ],
+  "noeuds": [
+   "station_vitrine",
+   "station_vitrine_glass"
+  ],
+  "poids_octets": 66516,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "vitre et inscription vers le barista et la salle (+Z); slot_0..5 plateau bas (z 0,064), slot_6..11 plateau haut (z 0,169), rang du fond puis rang de devant, colonnes ouest, centre, est",
+  "douilles": {
+   "slot_0": [
+    -0.15,
+    0.064,
+    -0.06
+   ],
+   "slot_1": [
+    0.0,
+    0.064,
+    -0.06
+   ],
+   "slot_2": [
+    0.15,
+    0.064,
+    -0.06
+   ],
+   "slot_3": [
+    -0.15,
+    0.064,
+    0.06
+   ],
+   "slot_4": [
+    0.0,
+    0.064,
+    0.06
+   ],
+   "slot_5": [
+    0.15,
+    0.064,
+    0.06
+   ],
+   "slot_6": [
+    -0.15,
+    0.169,
+    -0.06
+   ],
+   "slot_7": [
+    0.0,
+    0.169,
+    -0.06
+   ],
+   "slot_8": [
+    0.15,
+    0.169,
+    -0.06
+   ],
+   "slot_9": [
+    -0.15,
+    0.169,
+    0.06
+   ],
+   "slot_10": [
+    0.0,
+    0.169,
+    0.06
+   ],
+   "slot_11": [
+    0.15,
+    0.169,
+    0.06
+   ]
+  }
+ },
+ "station_cup_shelf": {
+  "id": "station_cup_shelf",
+  "nom": "Range-vaisselle propre",
+  "fichier": "station_cup_shelf.glb",
+  "famille": "station",
+  "style": "neutre",
+  "categorie": "etagere",
+  "accroche": "surface",
+  "dimensions_m": {
+   "x": 0.34,
+   "y": 0.308,
+   "z": 0.28
+  },
+  "triangles": 866,
+  "budget_triangles": 1000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles",
+   "dt_verre"
+  ],
+  "noeuds": [
+   "station_cup_shelf",
+   "station_cup_shelf_glass"
+  ],
+  "poids_octets": 63364,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "vaisselle propre lisible (assiettes, verres, tasses); dessus libre au centre",
+  "douilles": {
+   "socket_dessus": [
+    0.0,
+    0.25,
+    0.0
+   ]
+  }
+ },
+ "station_sink": {
+  "id": "station_sink",
+  "nom": "Plonge: bac inox, robinet col de cygne et égouttoir",
+  "fichier": "station_sink.glb",
+  "famille": "station",
+  "style": "neutre",
+  "categorie": "poste",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.8,
+   "y": 0.465,
+   "z": 0.625
+  },
+  "triangles": 890,
+  "budget_triangles": 1500,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "station_sink"
+  ],
+  "poids_octets": 64016,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "pivot au sol (données y 0); bac dans la découpe du plan de la coque; emplacement bac des données au fond (0,745 m, x -0,11)",
+  "douilles": {
+   "socket_basin": [
+    -0.11,
+    0.749,
+    0.005
+   ],
+   "socket_tap": [
+    -0.11,
+    1.08,
+    -0.105
+   ],
+   "socket_rack": [
+    0.26,
+    0.918,
+    0.02
+   ]
+  }
+ },
+ "station_dishwasher": {
+  "id": "station_dishwasher",
+  "nom": "Lave-vaisselle sous le plan",
+  "fichier": "station_dishwasher.glb",
+  "famille": "station",
+  "style": "neutre",
+  "categorie": "poste",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.6,
+   "y": 0.842,
+   "z": 0.076
+  },
+  "triangles": 332,
+  "budget_triangles": 2000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "station_dishwasher"
+  ],
+  "poids_octets": 27100,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "pivot au sol (données y 0); façade devant le placard de la coque",
+  "douilles": {
+   "socket_panier": [
+    0.0,
+    0.45,
+    0.4
+   ]
+  }
+ },
+ "station_fridge_under": {
+  "id": "station_fridge_under",
+  "nom": "Réfrigérateur sous le plan et plan de préparation",
+  "fichier": "station_fridge_under.glb",
+  "famille": "station",
+  "style": "neutre",
+  "categorie": "poste",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.742,
+   "y": 1.21,
+   "z": 0.656
+  },
+  "triangles": 1049,
+  "budget_triangles": 2000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "station_fridge_under"
+  ],
+  "poids_octets": 73960,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "pivot au sol (données y 0); porte à 0,30-0,335 m devant le centre (z 7,695 à 7,73), sous le plan de la coque; planche du poste de préparation au-dessus (0,912 m)",
+  "douilles": {
+   "socket_plan": [
+    0.05,
+    0.912,
+    0.0
+   ],
+   "socket_door": [
+    0.0,
+    0.45,
+    0.335
+   ]
+  }
+ },
+ "reserve_frigo_armoire": {
+  "id": "reserve_frigo_armoire",
+  "nom": "Armoire froide de la réserve",
+  "fichier": "reserve_frigo_armoire.glb",
+  "famille": "reserve",
+  "style": "neutre",
+  "categorie": "poste",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.704,
+   "y": 1.85,
+   "z": 0.793
+  },
+  "triangles": 1391,
+  "budget_triangles": 2000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "reserve_frigo_armoire"
+  ],
+  "poids_octets": 93380,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "avant (+Z) = porte: poser tourné de 180° (porte vers le nord dans la réserve); charnières côté +X du modèle",
+  "douilles": {
+   "socket_pied": [
+    0.0,
+    0.0,
+    0.6
+   ]
+  }
+ },
+ "reserve_etagere": {
+  "id": "reserve_etagere",
+  "nom": "Étagère de la réserve (0,85 m)",
+  "fichier": "reserve_etagere.glb",
+  "famille": "reserve",
+  "style": "neutre",
+  "categorie": "etagere",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.85,
+   "y": 2.0,
+   "z": 0.45
+  },
+  "triangles": 968,
+  "budget_triangles": 1000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "reserve_etagere"
+  ],
+  "poids_octets": 78664,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "avant au sud (+Z), comme les données",
+  "douilles": {
+   "socket_pied": [
+    0.0,
+    0.0,
+    0.4
+   ]
+  }
+ },
+ "reserve_etagere_longue": {
+  "id": "reserve_etagere_longue",
+  "nom": "Étagère longue de la réserve (1,20 m)",
+  "fichier": "reserve_etagere_longue.glb",
+  "famille": "reserve",
+  "style": "neutre",
+  "categorie": "etagere",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 1.2,
+   "y": 2.0,
+   "z": 0.45
+  },
+  "triangles": 924,
+  "budget_triangles": 1000,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "reserve_etagere_longue"
+  ],
+  "poids_octets": 74100,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "avant (+Z) = allée: poser tourné de 180° (avant vers l'ouest une fois posé à 90° contre le mur est)",
+  "douilles": {
+   "socket_pied": [
+    0.0,
+    0.0,
+    0.4
+   ]
+  }
+ },
+ "reserve_palette": {
+  "id": "reserve_palette",
+  "nom": "Demi-palette des livraisons",
+  "fichier": "reserve_palette.glb",
+  "famille": "reserve",
+  "style": "neutre",
+  "categorie": "livraison",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.8,
+   "y": 0.15,
+   "z": 0.6
+  },
+  "triangles": 182,
+  "budget_triangles": 300,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "reserve_palette"
+  ],
+  "poids_octets": 17772,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "dessus à 0,15 m (emplacements s1 à s4 des données)",
+  "douilles": {
+   "socket_s1": [
+    -0.2,
+    0.15,
+    -0.15
+   ],
+   "socket_s2": [
+    0.2,
+    0.15,
+    -0.15
+   ],
+   "socket_s3": [
+    -0.2,
+    0.15,
+    0.15
+   ],
+   "socket_s4": [
+    0.2,
+    0.15,
+    0.15
+   ]
+  }
+ },
+ "carton_grains_maison": {
+  "id": "carton_grains_maison",
+  "nom": "Carton « Café »",
+  "fichier": "carton_grains_maison.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.382,
+   "y": 0.302,
+   "z": 0.28
+  },
+  "triangles": 116,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_grains_maison"
+  ],
+  "poids_octets": 8012,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Grains, mélange de la vallée (lourd); mot lu depuis l'avant (+Z)"
+ },
+ "carton_lait_entier": {
+  "id": "carton_lait_entier",
+  "nom": "Carton « Lait »",
+  "fichier": "carton_lait_entier.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.382,
+   "y": 0.302,
+   "z": 0.28
+  },
+  "triangles": 96,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_lait_entier"
+  ],
+  "poids_octets": 7164,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Lait entier de la ferme (lourd); mot lu depuis l'avant (+Z)"
+ },
+ "carton_lait_avoine": {
+  "id": "carton_lait_avoine",
+  "nom": "Carton « Lait d’avoine »",
+  "fichier": "carton_lait_avoine.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 242,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_lait_avoine"
+  ],
+  "poids_octets": 14284,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Lait d'avoine (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_beurre": {
+  "id": "carton_beurre",
+  "nom": "Carton « Beurre »",
+  "fichier": "carton_beurre.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 159,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_beurre"
+  ],
+  "poids_octets": 9892,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Beurre doux (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_oeufs": {
+  "id": "carton_oeufs",
+  "nom": "Carton « Œufs »",
+  "fichier": "carton_oeufs.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 137,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_oeufs"
+  ],
+  "poids_octets": 8956,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Œufs de la ferme (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_cacao": {
+  "id": "carton_cacao",
+  "nom": "Carton « Chocolat »",
+  "fichier": "carton_cacao.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 173,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_cacao"
+  ],
+  "poids_octets": 10772,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Chocolat en poudre (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_the_noir": {
+  "id": "carton_the_noir",
+  "nom": "Carton « Thé noir »",
+  "fichier": "carton_the_noir.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 154,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_the_noir"
+  ],
+  "poids_octets": 10064,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Thé noir en vrac (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_the_vert": {
+  "id": "carton_the_vert",
+  "nom": "Carton « Thé vert »",
+  "fichier": "carton_the_vert.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 167,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_the_vert"
+  ],
+  "poids_octets": 10584,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Thé vert en vrac (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_plantes_simone": {
+  "id": "carton_plantes_simone",
+  "nom": "Carton « Tisanes »",
+  "fichier": "carton_plantes_simone.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 166,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_plantes_simone"
+  ],
+  "poids_octets": 10556,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Plantes du jardin de Simone (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_menthe": {
+  "id": "carton_menthe",
+  "nom": "Carton « Menthe »",
+  "fichier": "carton_menthe.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 155,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_menthe"
+  ],
+  "poids_octets": 9868,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Menthe du jardin (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_oranges": {
+  "id": "carton_oranges",
+  "nom": "Carton « Oranges »",
+  "fichier": "carton_oranges.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.382,
+   "y": 0.302,
+   "z": 0.28
+  },
+  "triangles": 173,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_oranges"
+  ],
+  "poids_octets": 10616,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Oranges à presser (lourd); mot lu depuis l'avant (+Z)"
+ },
+ "carton_citrons": {
+  "id": "carton_citrons",
+  "nom": "Carton « Citrons »",
+  "fichier": "carton_citrons.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 149,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_citrons"
+  ],
+  "poids_octets": 9832,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Citrons (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_sucre": {
+  "id": "carton_sucre",
+  "nom": "Carton « Sucre »",
+  "fichier": "carton_sucre.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 129,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_sucre"
+  ],
+  "poids_octets": 8668,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Sucre en poudre (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_farine": {
+  "id": "carton_farine",
+  "nom": "Carton « Farine »",
+  "fichier": "carton_farine.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.382,
+   "y": 0.302,
+   "z": 0.28
+  },
+  "triangles": 140,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_farine"
+  ],
+  "poids_octets": 9252,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Farine de blé (lourd); mot lu depuis l'avant (+Z)"
+ },
+ "carton_confiture": {
+  "id": "carton_confiture",
+  "nom": "Carton « Confiture »",
+  "fichier": "carton_confiture.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 196,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_confiture"
+  ],
+  "poids_octets": 12080,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Confiture d'abricot (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_limonade_bouteille": {
+  "id": "carton_limonade_bouteille",
+  "nom": "Carton « Limonade »",
+  "fichier": "carton_limonade_bouteille.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.382,
+   "y": 0.302,
+   "z": 0.28
+  },
+  "triangles": 184,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_limonade_bouteille"
+  ],
+  "poids_octets": 11316,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Limonade de la vallée (lourd); mot lu depuis l'avant (+Z)"
+ },
+ "carton_accompagnement": {
+  "id": "carton_accompagnement",
+  "nom": "Carton « Sucres »",
+  "fichier": "carton_accompagnement.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 155,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_accompagnement"
+  ],
+  "poids_octets": 9972,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Sucres et carrés de chocolat pour le café (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_pain_campagne": {
+  "id": "carton_pain_campagne",
+  "nom": "Carton « Pain »",
+  "fichier": "carton_pain_campagne.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 108,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_pain_campagne"
+  ],
+  "poids_octets": 7644,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Pain de campagne (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_croissant_boulanger": {
+  "id": "carton_croissant_boulanger",
+  "nom": "Carton « Croissants »",
+  "fichier": "carton_croissant_boulanger.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 225,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_croissant_boulanger"
+  ],
+  "poids_octets": 13528,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Croissants du boulanger (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_pain_chocolat_boulanger": {
+  "id": "carton_pain_chocolat_boulanger",
+  "nom": "Carton « Pains choc. »",
+  "fichier": "carton_pain_chocolat_boulanger.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 219,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_pain_chocolat_boulanger"
+  ],
+  "poids_octets": 13184,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Pains au chocolat du boulanger (léger); mot lu depuis l'avant (+Z)"
+ },
+ "carton_tarte_boulanger": {
+  "id": "carton_tarte_boulanger",
+  "nom": "Carton « Tartes »",
+  "fichier": "carton_tarte_boulanger.glb",
+  "famille": "carton",
+  "style": "neutre",
+  "categorie": "carton",
+  "accroche": "sol",
+  "dimensions_m": {
+   "x": 0.362,
+   "y": 0.222,
+   "z": 0.26
+  },
+  "triangles": 145,
+  "budget_triangles": 250,
+  "dans_budget": true,
+  "materiaux": [
+   "dt_meubles"
+  ],
+  "noeuds": [
+   "carton_tarte_boulanger"
+  ],
+  "poids_octets": 9432,
+  "avant": [
+   0,
+   0,
+   1
+  ],
+  "note": "Tarte aux fruits du boulanger (léger); mot lu depuis l'avant (+Z)"
+ }
+}

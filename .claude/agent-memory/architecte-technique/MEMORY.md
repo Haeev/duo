@@ -73,3 +73,30 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Le garde de la copie isolée refuse toute commande où apparaît `--exclude-dir=.git` ou une variable en position d'argument: le contrôle des tirets passe par l'outil Grep (classe de caractères des deux tirets interdits, U+2014 et U+2013), qui saute les dossiers cachés: compléter par `grep -rnI` nommant `.claude` et `docs` explicitement.
 - La Petite Ligne: `triangleSplit().meshes` nomme les morceaux du décor par une empreinte qui change avec la carte; comparer par groupe (`parent/` avant la barre), pas par nom.
 - Three.js 0.187: le nombre de lumières ponctuelles entre dans la clé des programmes; une lampe d'intensité nulle compte encore, la retirer ou en ajouter une recompile les matériaux éclairés.
+
+## Vue subjective, pointeur et foule (Cosy Café, vérifié le 2026-11-07)
+
+- Electron 45.2.0, `WebContents::PreHandleKeyboardEvent`: `exclusive_access_manager_.HandleUserKeyEvent` passe avant `before-input-event`. Pointeur verrouillé, Échap le déverrouille (`PointerLockController::HandleUserPressedEscape`, Chromium 156.0.8078.49) et n'est émise ni à `before-input-event` ni à la page: pas de pause de Duo. La plateforme honore déjà `pauseRequest` du jeu (`game-host.ts`): parade côté SDK.
+- Re-verrouiller exige un geste du joueur, sauf si la page a rendu le pointeur elle-même (`exitPointerLock`); refus pendant 1,25 s après un Échap (`kEffectiveUserEscapeDuration`). Electron n'affiche aucune bulle d'accès exclusif (`UpdateExclusiveAccessBubble` vide dans `electron_api_web_contents.h`).
+- Code de Chromium lisible sur `raw.githubusercontent.com/chromium/chromium/<version>/...`; la version est `chromium_version` dans le `DEPS` d'Electron au tag.
+- SDK 1.1: `pointer.movementX` se remet à zéro à chaque pas de simulation, pas à chaque image; `GameSettings` n'a ni sensibilité ni inversion de la souris; la plateforme ignore les messages `perf` (aucun affichage des performances au 2026-11-07); `deriveSeed(graine, étiquette)` prend une seule étiquette.
+- Three.js 0.187: `Skeleton.update` marque `boneTexture.needsUpdate` à chaque image (un envoi par personnage); `BatchedMesh` offre `addGeometry`, `addInstance`, `setMatrixAt`, `setColorAt`, `perObjectFrustumCulled` (vrai par défaut) et le multi-draw; un même matériau sur un `Mesh` et un `BatchedMesh` donne deux programmes.
+- Mesurer l'animation sans rendu: `GLTFLoader.parse` marche dans Node une fois retirés du JSON du GLB `images`, `textures`, `samplers` et les références de textures (GLB reconstruit: en-tête, JSON complété d'espaces jusqu'à un multiple de 4, BIN inchangé); three installé par `npm install` dans le scratchpad, importé par URL de fichier. Repère: 6 à 13 µs par personnage et par image (18 os) sur le Xeon cloud (famille 6, modèle 207, 2,1 GHz, KVM); script `docs/jeux/cosy-cafe/essais/foule-animation-cpu.mjs`.
+- Le level designer de Cosy Café a son validateur des plans (`docs/jeux/cosy-cafe/plans/valider_plans.py`): foule au pire dans un champ de 100°, normes de passage. S'y aligner plutôt que de fixer des seuils concurrents.
+
+## Squelette de Deux Tabliers (vérifié le 2026-11-07)
+
+- Copie isolée: le garde refuse les heredocs (`cat <<EOF`) et les commandes composées complexes; écrire les scripts par l'outil Write (scratchpad) et les lancer seuls.
+- Playwright, pointeur verrouillé dans une iframe (`deux-vues.html`): chaque `mouse.move` arrive en paire de sauts opposés (+1073/+425 puis -1073/-425); un test du regard passe par un robot, pas par la souris. Le jeu ignore tout saut de plus de 300 px en un événement.
+- Plans du level designer: une `door` peut être un portillon de comptoir (hauteur 1,1) ou un portail de clôture: pas de linteau sauf si un `wall` la jouxte dans le même alignement.
+- La CI des jeux filtre par chemin (`pnpm --filter "./games/$ID"`): le nom npm du paquet est libre (`deux-tabliers` sans portée marche aussi avec `--filter deux-tabliers`).
+- Valibot: un tableau vide `[] as const` s'étale dans `v.variant` (intentions et événements extensibles par chantier sans toucher au fichier commun).
+
+## Branchement de Deux Tabliers (vérifié le 2026-11-08)
+
+- SDK: `requestPointerLock()` rend une promesse; son rejet (Échap récent, autre document qui tient le pointeur) remontait en erreur fatale et arrêtait la partie des deux côtés. `lockPointer` l'avale désormais (`packages/sdk/src/input.ts`). Dans `deux-vues.html`, les deux iframes se disputent le verrou: c'est là que ça se voit.
+- Compter les programmes WebGL vivants sans toucher au jeu: `page.addInitScript` qui enveloppe `createProgram` et `deleteProgram` de `WebGL2RenderingContext.prototype` (s'applique aussi aux iframes), lu par `frame.evaluate`.
+- Three.js 0.187: une capture par `CubeCamera` compile une variante de chaque programme pour la cible cubique (19 programmes au lieu de 8); `PMREMGenerator.fromScene(new RoomEnvironment())` puis `dispose` ne laisse rien.
+- Coque cuite: matériaux passés en `MeshBasicMaterial` avec `map` et `lightMap` (canal 1): la lumière de la scène n'y touche plus, un seul programme pour toute la coque.
+- Piloter le regard dans le faux hôte: un vrai clic Playwright (coordonnées de page, hors des bulles du HUD qui interceptent) verrouille le pointeur, puis des `PointerEvent('pointermove', { movementX, movementY })` synthétiques sur `window` de l'iframe (moins de 300 px chacun) tournent la tête; les touches par `KeyboardEvent` synthétiques (`code`) sur `window`.
+- Ne pas modifier `src/` pendant une capture longue: le serveur de Vite recharge les deux vues et la partie repart à zéro.

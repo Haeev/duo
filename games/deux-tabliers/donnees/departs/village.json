@@ -1,0 +1,255 @@
+{
+  "address": "village",
+  "spawns": [
+    [8.3, 8.25],
+    [9.5, 8.25]
+  ],
+  "furniture": [
+    {
+      "id": "backbar-1",
+      "type": "arriere-comptoir",
+      "x": 8.5,
+      "z": 7.4,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-1",
+      "type": "plonge",
+      "x": 7.55,
+      "z": 7.395,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-2",
+      "type": "frigo-sous-plan",
+      "x": 8.375,
+      "z": 7.395,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "counter-1",
+      "type": "comptoir",
+      "x": 9.5,
+      "z": 9.15,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-3",
+      "type": "passe",
+      "x": 8.35,
+      "z": 9.125,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-4",
+      "type": "machine-espresso",
+      "x": 9.15,
+      "z": 9.005,
+      "y": 0.95,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-5",
+      "type": "moulin",
+      "x": 9.775,
+      "z": 9.04,
+      "y": 0.95,
+      "rotDeg": 0
+    },
+    {
+      "id": "station-6",
+      "type": "caisse",
+      "x": 10.6,
+      "z": 9.01,
+      "y": 0.95,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-1",
+      "type": "etagere",
+      "x": 8.575,
+      "z": 3.775,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-2",
+      "type": "etagere-longue",
+      "x": 10.725,
+      "z": 5.0,
+      "y": 0,
+      "rotDeg": 90
+    },
+    {
+      "id": "station-7",
+      "type": "frigo-armoire",
+      "x": 8.5,
+      "z": 6.275,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-3",
+      "type": "caisses-patronne",
+      "x": 5.0,
+      "z": 5.85,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "table-1",
+      "type": "gueridon",
+      "x": 4.8,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-1",
+      "type": "chaise",
+      "x": 4.225,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 90
+    },
+    {
+      "id": "seat-2",
+      "type": "chaise",
+      "x": 5.375,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 270
+    },
+    {
+      "id": "table-2",
+      "type": "gueridon",
+      "x": 6.4,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-3",
+      "type": "chaise",
+      "x": 5.825,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 90
+    },
+    {
+      "id": "seat-4",
+      "type": "chaise",
+      "x": 6.975,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 270
+    },
+    {
+      "id": "table-3",
+      "type": "gueridon",
+      "x": 8.0,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-5",
+      "type": "chaise",
+      "x": 7.425,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 90
+    },
+    {
+      "id": "seat-6",
+      "type": "chaise",
+      "x": 8.575,
+      "z": 12.2,
+      "y": 0,
+      "rotDeg": 270
+    },
+    {
+      "id": "table-4",
+      "type": "table-carree",
+      "x": 4.35,
+      "z": 10.1,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-7",
+      "type": "chaise",
+      "x": 4.35,
+      "z": 9.475,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-8",
+      "type": "chaise",
+      "x": 4.35,
+      "z": 10.725,
+      "y": 0,
+      "rotDeg": 180
+    },
+    {
+      "id": "seat-9",
+      "type": "banc",
+      "x": 5.3,
+      "z": 13.275,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "seat-10",
+      "type": "banc",
+      "x": 5.9,
+      "z": 13.275,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "furniture-4",
+      "type": "ardoise-trottoir",
+      "x": 8.5,
+      "z": 13.25,
+      "y": 0,
+      "rotDeg": 0
+    },
+    {
+      "id": "pile-tasses-1",
+      "type": "pile-tasses",
+      "x": 9.7,
+      "z": 7.4,
+      "y": 0.9,
+      "rotDeg": 0
+    }
+  ],
+  "objects": [
+    {
+      "type": "plateau",
+      "furniture": "counter-1",
+      "slot": "libre"
+    },
+    {
+      "type": "tasse",
+      "furniture": "backbar-1",
+      "slot": "a"
+    },
+    {
+      "type": "tasse",
+      "furniture": "backbar-1",
+      "slot": "b"
+    },
+    {
+      "type": "tasse-sale",
+      "furniture": "table-1",
+      "slot": "a"
+    }
+  ]
+}

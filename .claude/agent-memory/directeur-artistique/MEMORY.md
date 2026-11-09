@@ -95,3 +95,22 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Charge de 20 sur 4 cœurs: une capture de `rendu.html` en mode continu a dépassé 480 s sur `page.screenshot`. Le mode `manuel=1` (attendre `lplRendu.ready`, `advance(1/30)` 40 fois, puis capturer) passe en 3 à 8 min par image en 1600 x 900: le préférer dès que la machine est chargée.
 - Zooms de la page de rendu: `zoom=0` est le plus proche, `zoom=2` le plus large. En 1600 x 900, un personnage adulte fait environ 160, 100 et 65 pixels de haut aux zooms 0, 1 et 2, son œil 2 à 3 pixels au zoom 0. À la distance de jeu, on lit d'abord la lumière sur le personnage, son bord, sa silhouette et le dessus de sa tête (caméra à 35 degrés): juger un visage dans les aperçus 3D et au zoom 0, pas au zoom 1.
 - Valeurs: une planche de personnages alignés sur la grève (L* 2,6 % sous 30) ne représente pas le bourg (17,6 % sous 30 à 15 h avec toits et forêt). Mesurer L* sur une capture du bourg avant de conclure à un étalonnage voilé.
+
+## Planches en vue subjective et polices (Cosy Café, 2026-11-07)
+
+- `rsvg-convert` lit les polices par fontconfig: `fc-list` voit les WOFF2 des paquets @fontsource, mais le rendu sort des carrés vides. Rendre les SVG par Chromium (SVG en ligne dans une page HTML qui charge les CSS @fontsource, servie par `page.route`); un SVG en `<img>` ne voit pas les polices de la page.
+- Polices manuscrites OFL vérifiées par fontkit (fichiers latin et latin-ext): Caveat (variable), Kalam, Patrick Hand couvrent tout le français (accents, œ, « », ’, …, €); U+202F absente de toutes.
+- Petit moteur de perspective réutilisable pour dessiner une vue à la vraie caméra du jeu: `docs/jeux/cosy-cafe/bible/source/scene3d.cjs` (+ `mobilier.cjs`, `figures.cjs`, `adresses.cjs`). Pièges rencontrés: un point près du plan de la caméra fait exploser une projection (découper ou ignorer sous 0,3 m); l'ordre des pièces d'un objet l'emporte sur la profondeur, donc une pièce « posée devant » se dessine même vue de dos (mettre groupes et façade au même ordre); une source de lumière placée sur une face donne une distance nulle et une couleur NaN (noir); un texte projeté par transformation affine sur un panneau vu de l'autre côté sort en miroir (coin haut gauche du côté des x croissants vu depuis +z); une personne assise dessinée à plat se pose au bord avant de l'assise et se dessine après le siège.
+- Liseré de silhouette en SVG: épaisseur à convertir en pixels d'écran selon la profondeur (sinon un liseré de 2 cm devient un contour d'autocollant au premier plan).
+
+## Couleurs de jeu face aux couleurs de joueur de Duo (2026-11-07)
+
+- Les gris bleutés moyens (L* 50 à 60, C* 10 à 15, teinte 240 à 265) tombent à moins de 15 (CIEDE2000) du mauve de Duo: les pousser vers le bleu-vert (teinte 210 à 230), plus clair (L* 66 et plus) ou plus sombre (L* 50 et moins). Terre cuite et cuivre clairs frôlent le corail: assombrir (L* 48 à 50).
+- Sous deutéranopie et protanopie, cuivre, laiton, ocre et sauge rejoignent le corail ou le jade (écart jusqu'à 0,3): inévitable dans une palette chaude; un joueur ne doit jamais se reconnaître à sa teinte seule.
+- Distinguer deux joueurs quelle que soit la paire de Duo (15 paires): le plus clair des deux porte un haut sombre (L* 26 et moins), l'autre un haut clair (87 et plus); les bandes à la couleur du joueur bordées d'un liseré sombre (aqua sur crème ne fait que 9 de L*). Vérifié sur les 15 paires en gris et sous simulations (`docs/jeux/cosy-cafe/bible/controles/silhouettes-controles.png`).
+- En silhouette noire, des profils debout sans accessoire saillant se confondent: grossir l'accessoire signature d'un quart et donner une posture propre.
+
+## Travail en parallèle
+
+- Le manager fait des commits de sauvegarde du travail en cours de l'équipe (« non relu »): mes fichiers peuvent apparaître suivis par git pendant la mission. Les plans du level designer bougent aussi pendant ce temps: relire `plans.json` juste avant de figer une vue calée sur un plan.
+- `docs/jeux/cosy-cafe/plans/plans.json`: x vers la droite, y vers le bas (rue en bas du dessin); pour une vue face à la rue, x de la vue = abscisse du mur de droite du plan moins x du plan, z = y du plan moins y du mur du fond.

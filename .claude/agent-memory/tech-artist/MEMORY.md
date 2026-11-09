@@ -76,3 +76,35 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Vue de la messe (zoom 2, 11 h): 319 000 triangles et 174 appels avant contour, dont 60 000 pour les personnages et autant dans l'ombre: le contour de tout le monde (+60 000) dépasserait 350 000, d'où le plafond en triangles de coque.
 
 - `simplifyPath` (simulation) rend des points de passage espacés: pour vérifier qu'un trajet suit une ligne, l'échantillonner tous les 10 cm le long des segments.
+
+## Meshy (vérifié le 2026-11-07, fiche `docs/production/meshy.md`)
+
+- Les membres n'ont pas les outils `mcp__meshy__*` (fiche: `disallowedTools: mcp__*`): passer par `docs/production/essais-meshy/scripts/meshy-mcp.mjs` (serveur 0.6.9 par stdio, `MESHY_API_KEY=proxy-injected`, journal JSONL des appels). Dossier de travail hors du dépôt: le serveur y écrit `meshy_output/` et y charge un `.env` s'il en trouve un.
+- Réseau: `api.meshy.ai` ouvert, clé injectée par le proxy; `assets.meshy.ai` (tous les fichiers produits), `cdn.meshy.ai`, `docs.meshy.ai`, `help.meshy.ai` refusés (403 au CONNECT). Vérifier l'hôte des fichiers sur une tâche existante (lecture gratuite) avant de dépenser des crédits.
+- Fichiers effacés 72 h après la fin d'une tâche (`expires_at`). L'état d'une tâche en topologie intelligente ne donne ni faces ni dimensions: mesurer sur le fichier. Aperçu de texte vers 3D: jamais de texture. Image vers 3D avec `meshy-n1`: `texture_0.png`, couleur de base seule.
+- Le rig accepte un aperçu sans texture (6,5 s, 5 crédits) et rend marche et course en GLB, FBX et squelette seul (`_armature.glb`). `meshy_list_usage` refusé (offre ni Studio ni Enterprise): suivre les crédits par le solde et `consumed_credits`.
+- Couleur de palette tirée d'une texture générée: choisir face par face suit l'éclairage peint (groupes zébrés, 14,5 % de la surface de la doublure); vote à l'aire par pièce, CIEDE2000 avec `kL` = 2 (`meshy_commun.py`, vérifié sur six paires de Sharma 2005).
+- Sorties réelles (vérifié le 2026-11-07 au soir): un nœud `geometry_0`, maillage ouvert (29 à 317 arêtes de bord: boucher les petits trous), `auto_size` faux (x 0,3 à x 1,5), faces à 2 % de la demande sauf référence simple (60 %). `meshy-n1` ne peint que la face vue (dos gris). Rigs: 24 os sans doigts (`Hips`, `Spine02`... `RightToeBase`), nœud `Armature` à l'échelle 0,01, mêmes noms et hiérarchie d'un personnage à l'autre, longueurs différentes: ne rejouer dans Three.js que la translation des hanches. Clips à 30 i/s, nommés comme la bibliothèque (`Idle`, `Chair_Sit_Idle_M`...), marche déjà sur place.
+- `docs.meshy.ai` se lit par `curl` (WebFetch ne passe pas par le proxy); ajouter `.md` à l'adresse d'une page. Le solde est commun au studio: compter ses tâches, pas l'écart du solde.
+- Palette à cases: la bible insère des couleurs au milieu de ses listes; garder les cases fixes (`exporter-palette.mjs`: ajout en fin, couleur retirée marquée), sinon tous les UV pointent la mauvaise case.
+
+## Blender 5.2 et glTF (vérifié le 2026-11-07)
+
+- bmesh: après `delete` ou `triangulate`, les `f.index` sont faux tant qu'on n'appelle pas `bm.faces.index_update()` (`ensure_lookup_table` ne suffit pas). Un dictionnaire indexé par `f.index` se corrompt sans bruit.
+- `Image.pixels` d'une image 8 bits: valeurs telles qu'enregistrées (sRGB, de 0 à 1), rangées de bas en haut, cohérentes avec les UV de Blender (`data[int(v*h), int(u*w)]`).
+- L'import glTF d'un personnage ajoute un objet `Icosphere` (forme des os) dans la scène: filtrer les maillages qui ont un modificateur Armature.
+- Export glTF: `export_all_vertex_colors` vaut vrai par défaut et sort chaque attribut de couleur (COLOR_0, COLOR_1...): le mettre à faux et retirer les anciens attributs avant d'en cuire un.
+- Faces retournées d'une sortie générée: `bmesh.ops.recalc_face_normals`, et compter les retournées par le signe du produit scalaire avant et après.
+- Pièces qui flottent: `BVHTree.overlap` entre pièces (une pièce enfoncée dans une autre ne flotte pas), puis distance au plus proche; seuil de 2 mm.
+- Capture Three.js d'un personnage: `renderer.info.memory.textures` compte aussi la texture des os et celle des cibles de morphose.
+
+## Deux Tabliers: effets sans programme de plus (vérifié le 2026-11-09)
+
+- Inventaire de la coque cuite (salle, 6 programmes): carte de lumière (`shell_floor`), couleurs de sommets RGBA (`dt_ciel`, `dt_arriere_*`), découpe du feuillage (`dt_feuillage`: texture, couleurs RGBA, `alphaTest`, une face, normales), verre (`MeshBasicMaterial` transparent sans texture, deux faces, `forceSinglePass`), lampe, meubles. Un effet qui reprend exactement les réglages et les attributs (normales comprises) de l'un d'eux ne compile rien: comparer les deux masques en fin de `renderer.info.programs[i].cacheKey`.
+- Effacement progressif dans un programme à découpe sans uniforme: l'alpha de la texture code l'ordre d'effacement, l'alpha du sommet vaut `0,5 / seuil` (attribut flottant, pas borné à 1): un texel reste si `ordre ≥ seuil`. Un seul maillage pour plusieurs vitres, chacune son seuil.
+- Deux faces au rendu différent sans `gl_FrontFacing`: deux couches à une face (normales opposées, 4 mm d'écart) qui lisent deux moitiés d'un même atlas.
+- Alpha codé en ordre et mipmaps: de loin, les traits fins (alpha 0) se remplissent. Donner aux traits la couleur de ce qu'on voit au travers pour qu'ils restent lisibles.
+- Bruit d'un pixel sur un ordre d'effacement: le front se défait en grains qui scintillent; bruit de 1 à 3 cm seulement.
+- Tache translucide d'une couleur sur le programme du verre: un voile d'un seul tenant montre son contour; des amas de toutes tailles qui se recouvrent font la densité et effilochent le bord.
+- Vite en service: un fichier ajouté à un dossier lu par `import.meta.glob` après le démarrage n'est pas vu (module déjà transformé): relancer le serveur.
+- Cotes de `shell_village_glass`: vitrine ouest x 4,46 à 6,34, centre 6,56 à 8,44 (y 0,51 à 2,34), porte deux battants 8,95 à 9,32 et 9,48 à 9,85 (y 0,85 à 1,95), petite fenêtre 10,26 à 10,74 (y 0,96 à 2,34), plan z 12,88. Sol de la salle à y 0 partout.

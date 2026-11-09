@@ -1,0 +1,44 @@
+{
+  "frame": {
+    "triangles": 1418,
+    "calls": 6,
+    "programs": 2,
+    "textures": 2,
+    "geometries": 6
+  },
+  "decor": {
+    "triangles": 616,
+    "calls": 23
+  },
+  "models": [
+    {
+      "file": "station_espresso_2g.glb",
+      "fileBytes": 134564,
+      "url": "/modele-0.glb",
+      "triangles": 1358,
+      "drawCalls": 1,
+      "bones": 0,
+      "clips": [],
+      "playing": null,
+      "sizeM": [
+        0.76,
+        0.519,
+        0.689
+      ],
+      "textures": [
+        {
+          "slot": "map",
+          "w": 64,
+          "h": 64
+        }
+      ],
+      "textureBytesWithMips": 21845
+    }
+  ],
+  "viewport": [
+    1366,
+    768
+  ],
+  "fovVertical": 60,
+  "pageErrors": []
+}

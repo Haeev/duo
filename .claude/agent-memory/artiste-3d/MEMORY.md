@@ -216,3 +216,79 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Poses de repos par descente sur les angles (`verifier/poses_repos.py`, poignet, coude et bout de la main visés), plusieurs départs; l'avant-bras ne plie qu'en positif (sinon solution en hyperextension). Firmin mains dans le dos: upper_arm (39, 124, 32), forearm 59.
 - Une épaule en boule large sur un torse étroit se lit comme une épaulette au zoom 1: élargir le haut du torse, boule plus petite et plus basse.
 - Garde-fou: les heredocs qui écrivent dans un fichier du dépôt (`cat >> fichier`) et les patchs python avec `cd` puis git sont refusés; Edit ou un script dans le scratchpad. Une variable d'environnement devant `node` passe.
+
+## Cosy Café, essai de style 3D (vérifié le 2026-11-07)
+
+- Carte de lumière cuite par script: `bake(type="DIFFUSE", pass_filter={"DIRECT","INDIRECT"})` sur une seconde UV (smart_project, average_islands_scale, pack_islands sur tous les objets en édition multiple); 2048 px à 96 échantillons: 2 min 20 pour le café entier. Débruitage OpenImageDenoise par le compositeur: Blender 5 `scene.compositing_node_group = node_groups.new(..., "CompositorNodeTree")`, nœuds Image, Denoise, `NodeGroupOutput` (plus de nœud Composite), rendu Workbench d'une scène vide: 4 s.
+- Exporter la carte de lumière dans le GLB: groupe de nœuds nommé « glTF Material Output » avec une entrée « Occlusion », image sur l'UV « lightmap »: l'export écrit `occlusionTexture` avec `texCoord: 1`. Côté Three.js 0.187: `lightMap = aoMap`, `colorSpace = SRGB`, `lightMapIntensity = K * PI` (Basic et Standard divisent par PI). Encoder la carte en sRGB après division par K (centile 99,7).
+- Ne pas mélanger la cuisson et les lumières dynamiques: deux scènes Three.js (cuite sans lumière, personnages avec 4 lumières), `autoClear = false`, même tampon de profondeur. En Standard, un envMap ajoute aussi de l'éclairement diffus: le retirer par `onBeforeCompile` (ligne `iblIrradiance += getIBLIrradiance`).
+- Pixels d'une image 8 bits importée dans Blender: valeurs encodées sRGB, ne pas les « reconvertir » (couleurs de palette fausses sinon).
+- Import glTF d'un rig Meshy: une icosphère de 2 m est créée pour dessiner les os; ne garder que les maillages qui ont un modificateur Armature. Rigs Meshy: 24 os aux mêmes noms d'un personnage à l'autre, les clips achetés sur l'un (idle, sit, drink) se posent sur tous. `use_nla = False` avant de poser une action sur un rig importé.
+- Soleil rasant (16 degrés) et place bâtie: vérifier par calcul que la maison d'en face ne met pas toute la salle à l'ombre (à 235 degrés c'était le cas).
+- `renderer.info.programs` compte aussi les programmes de la capture d'environnement (PMREM) faite au chargement. Compter la mémoire des textures par `texture.source` (GLTFLoader crée une Texture par matériau pour une même image).
+
+## Deux Tabliers, démo v0.1 (vérifié le 2026-11-07)
+
+- Orientation des assises: l'avant de tout modèle est +Z glTF (sud du plan); contrôler par la géométrie (sommets au-dessus de l'assise + 0,15 m derrière, z moyen négatif) et par une capture de dessus. Piège de l'essai: `poser()` attend le cap du regard, on lui passait le côté du dossier (chaises dos aux tables).
+- GLB à textures externes partagées: export `GLTF_SEPARATE` dans un dossier temporaire, puis réassemblage en GLB en gardant `uri: "textures/<fichier>"` pour les images présentes dans `textures/` (`commun.exporter_glb`). gltf-validator les lit par `externalResourceFunction`.
+- Atlas partagé entre plusieurs scripts: les cases de palette doivent être fixes (`CASES_FIXES`, gelé ensuite), sinon l'ordre de construction déplace les cases et casse les UV des GLB faits par l'autre script. Graine d'UV par `zlib.crc32` (le `hash()` de Python change à chaque lancement).
+- `conformite_personnage.py`: appliquer l'échelle d'un rig Meshy (objet à 0,01) demande de multiplier les translations des clips par facteur x 0,01, sinon le personnage s'envole (hanches à 100 fois leur hauteur) dès que la taille visée diffère de celle du rig. Corrigé; options `decimate_to`, `texture_mode: "meshy"`, `badge` ajoutées.
+- Three.js: cuivre, laiton, inox (metalness 1) sortent noirs sans environnement; la visionneuse de contrôle prend `RoomEnvironment` par PMREM (intensité 0,45).
+- Planche Cycles: un objet de façade ou de plafond pend sous son origine; un sol à z = 0 le cache (le disque de l'enseigne à potence semblait absent).
+- Rue de l'essai: trottoir à -0,02 et bordure à 14,60 ne collaient pas aux plans (terrasse à 14,75): dessus du trottoir à 0 et bordure à 15,80. Toujours confronter le décor de l'essai au plan des extensions.
+- Pan qui se cache (porte fermée devant une arche): le faire mince, côté salle, sinon les tableaux de l'arche sont cuits noirs derrière lui.
+- Budgets C8: avec les pans x 2 de l'essai B, presque tout dépassait; pans de la bible (x 1) et lissage suffisent. Tiges en chaîne `rod(..., cap=False)`, pas de boules aux coudes; capitons en losanges plats.
+
+## Deux Tabliers, place du Tilleul (vérifié le 2026-11-08)
+
+- Décor extérieur cuit dans un GLB à part (`shell_village_place.glb`), avec sa propre carte de lumière: une seule cuisson Cycles suffit pour deux images (chaque matériau a son nœud image actif; intérieur et place n'ont aucun matériau commun). `lightmap_scale` propre au GLB, relu par `lightmapScale(root)`.
+- Le dôme du ciel cache le ciel de la cuisson: `hide_render` sur le ciel et le lointain pendant `bake`, puis le remettre.
+- Teintes par face sans multiplier les matériaux: attribut de coin « ao » en BYTE_COLOR rempli par `foreach_set("color_srgb", ...)`, multiplié à la texture pour la cuisson (rebonds teintés), puis le nœud Mix retiré avant l'export (texture seule en couleur de base, COLOR_0 à part). Côté Three.js: `vertexColors: m.vertexColors` sur le MeshBasicMaterial de la coque (les coques ont déjà un COLOR_0 blanc: aucun programme de plus).
+- Panneaux d'une façade (fenêtre, porte, enseigne): toujours devant le mur (décalage de 6 mm), jamais en retrait dans une boîte pleine (invisibles). Le relief vient des encadrements et appuis saillants.
+- UV des cases d'atlas: base (t = up x n, b = n x t) par face; texte lisible de dehors sans cas particulier. Feuillage et écorce: fenêtre de la case à l'échelle (1,4 m par case), sinon feuilles de 2 cm.
+- Houppier: une trentaine de grosses icosphères (subdiv 2) se lit en brocoli sombre (auto-ombrage cuit). Mieux: 80 à 90 bouquets plus petits (subdiv 1, déplacés par `mathutils.noise`), près de la surface, teintes claires.
+- Visionneuse `verifier/vue/`: charge aussi la place (paramètre `far` du plan lointain, 80 m comme le jeu).
+
+## Deux Tabliers, finitions de la place (vérifié le 2026-11-08)
+
+- Blender 5: `bmesh.ops.create_icosphere(subdivisions=1)` donne l'icosaèdre de 20 faces (2 = 80 faces). Dans un bmesh déjà garni, subdivisions=2 invalide des sommets posés avant (ReferenceError): construire la sphère dans un bmesh à part puis recopier.
+- Feuillage découpé: objet à part non cuit (`dt_feuillage`, lumière par sommet calculée par script avec lancer de rayons BVHTree vers le soleil), alpha de la texture branché sur Alpha pour des ombres tachetées dans la cuisson; alphaMode MASK posé par un `patch` de `commun.exporter_glb` (l'exporteur écrirait BLEND). Couverture de la texture vers 80 %: les mipmaps restent pleines au loin.
+- Panneau d'atlas (inscription, rosace): garder les proportions du panneau égales à celles de la zone de texture, sinon lettres écrasées illisibles; rosace en disque à 24 pans pris dans le cercle de la case (plus de carré de fond).
+- Compression avec textures externes partagées: `assets-src/modeles/quantifier.cjs` (gltf-transform 4 par API, GLB réassemblé à la main pour garder `uri: textures/...`). `dedup({propertyTypes:['ACCESSOR']})` est refusé en 4.5: `dedup()` seul. Les UV répétées hors [0,1] ne sont pas quantifiées (message « Skipping TEXCOORD_0 »), sans gravité.
+- `coque.py` complet: 4 min 30 (cuisson 48 échantillons, 2048 px).
+
+## Deux Tabliers, place du Tilleul (vérifié le 2026-11-08)
+
+- `coque.py --sans-cuisson` après une modification de géométrie de la place (même de couleurs de sommets seules, relancé derrière une cuisson complète): carte de lumière décalée, façades noires et inscriptions effacées. Toujours une cuisson complète (5 min), puis restaurer `shell_village.glb`, `shell_village_ext_fond.glb` et `textures/shell_village_lightmap.png` si seule la place est en jeu, puis `quantifier.cjs` et corriger `fiches/coque.json` (poids quantifié, ligne `compression`).
+- Visionneuse `verifier/vue/capturer.mjs` (paramètre `cam=px,hauteur,pz;cible`): 5 vues en 20 s. Terrasse vers l'est: `cam=8,1.55,14.6;22,4.5,26`.
+
+## Postes de l'arrière-comptoir et réserve (Deux Tabliers, vérifié le 2026-11-09)
+
+- Où le jeu pose un poste: `departs/village.json` (meubles de départ) et `service/reglages.json` (`installation`, ancrée à un meuble: x, z relatifs, y ajouté). Les sauvegardes gardent les positions d'installation (aucune migration): une place corrigée dans les données ne vaut que pour une nouvelle partie.
+- Pivot = la hauteur que les données donnent: plonge et frigo sous plan posés à y 0 (pivot au sol, plan à 0,90), vitrine et range-vaisselle à y 0,90 (dessous). Un modèle « posé sur le plan » placé à y 0 disparaît dans le caisson (c'était l'évier invisible); un modèle « au plafond » posé sur la passe s'enfonce dans le comptoir (l'ancien rail).
+- Une assiette « invisible » = un emplacement de données dans un autre modèle (plan du frigo dans l'ancienne vitrine, bac de la plonge sous le plan): confronter chaque emplacement (`slots` de meubles.json) aux boîtes des modèles voisins.
+- Arrière-comptoir (x 7,10 à 9,90): plonge 7,15-7,95, bouilloire 8,00-8,20, planche du frigo 8,24-8,64, pot 8,62-8,72, vitrine 8,78-9,28 (sous l'ardoise à 1,22 m), presse 9,28-9,52 (achat), range-vaisselle 9,53-9,87; emplacements a et b devant la vitrine (z 7,57). Étagères murales x 7,22-8,68, consoles à 1,14 m (x 7,32 et 8,58).
+- Style B: `bevel` est multiplié par 0,18; pour 1,8 cm de chanfrein, passer 0,1. `finir` met une arête vive au-delà de 40 degrés: cylindre de 8 pans facetté, 10 pans lisse.
+- Texte en géométrie: Patrick Hand (woff du paquet @fontsource) à `resolution_u` 1, environ 20 triangles par lettre; Jost (woff2 variable) se charge aussi. Un carton étiqueté tient dans 250 triangles avec un seul mot sur le dessus.
+- Disque plein vu ici: `exporter_glb` laisse un `dt_export_*` par modèle dans /tmp. Lancer `env TMPDIR=<scratchpad>/tmp duo-python ...` puis vider ce dossier. Chromium: `--disk-cache-dir` et TMPDIR dans /dev/shm. Le garde-fou refuse de balayer le /tmp partagé.
+- Captures en jeu: `node --experimental-strip-types packages/sdk-dev/src/serveur/servir.ts deux-tabliers --port N` (jeu construit par `npx vite build`, pages par `npx vite build` dans sdk-dev), page `deux-vues.html`, sauvegarde dans localStorage `duo-sdk-dev:deux-tabliers:sauvegarde:1` (enveloppe slot, dataSchema, data en chaîne JSON); fenêtre 2750 x 854 = cadre de l'hôte 1366 x 768. Sous SwiftShader le faux hôte coupe à 8 s sans battement: construire son dist avec `RUNNING_HEARTBEAT_TIMEOUT_MS` relevé puis remettre la source (git checkout). 90 s d'attente avant capture; cacher « Clique pour reprendre la souris ».
+- `coque.py` complet: 14 min machine chargée. Restaurer `shell_village_place.glb`, sa carte et `place_lightmap_scale` de coque.json si la place n'a pas bougé. `quantifier.cjs` sur shell_village et ext_fond (coque-glb.ts lit les positions par matrixWorld: compatible).
+
+## Doigts des personnages Meshy (Deux Tabliers, vérifié le 2026-11-08)
+
+- Ajouter des os à un GLB sans aller-retour Blender: `personnages/glb.py` (lecture et réécriture numpy, identique à l'octet près sans modification). Les clips restent intacts (écart 0,001 mm, `verifier/mains.py --avant`).
+- Import glTF dans Blender: le premier clip est actif et les os sans courbe gardent la pose précédente; remettre toutes les pose bones à zéro avant d'appliquer un clip partiel (doigts seuls).
+- Repère de la main: analyse en composantes principales des sommets de la main (la direction « bas » de la liaison n'est pas la normale de la paume). Pouce: côté où la moitié basse déborde le plus. Palmure introuvable sur ces maillages (doigts qui se touchent): jointures à 56 % de la longueur.
+- Doigts: ne pondérer que les sommets surtout portés par la main (sinon la manche suit le pouce), rayon de capture 6 cm (sinon le bout de l'auriculaire reste à la main: pointe étirée). Contrôle de traversée sur toute la main et l'avant-bras: des triangles de palmure relient pouce et index.
+- Le pouce de ces maillages est court: prise en clé (index replié à fond) et non en pince à demi pliée. Récipient gonflé de 0,5 mm pendant la recherche (sinon le moteur en float32 voit des contacts comme traversées).
+
+## Draps, rideaux, chaises retournées (installation.py, vérifié le 2026-11-09)
+
+- Simulation Cloth de Blender 5.2 sans interface: modificateur CLOTH, `scene.frame_set(f)` image par image, puis `bpy.data.meshes.new_from_object(obj.evaluated_get(depsgraph))`; SMOOTH (0,5 x 3) et DECIMATE (COLLAPSE) empilés derrière le tissu donnent directement le maillage au budget. 80 x 60 mailles, qualité 10: 10 à 20 s.
+- Drap sur un objet haut (machine sur un comptoir): le tissu glisse vers l'objet et se ramasse (frottement trop faible par défaut). `collision.cloth_friction = 80`, `collision.damping = 1`, raideurs 60 à 80, `air_damping = 3`, arrêt vers 35 à 70 images.
+- Pieds de chaise (3 cm): le tissu passe entre eux et retombe sur l'assise, les pieds percent le drap. Colliders = enveloppes convexes (`bmesh.ops.convex_hull`) des chaises.
+- Tas de drap: lâcher une grille réduite avec `settings.shrink_min` négatif (le tissu regrandit en tombant).
+- Placer un objet retourné sur un plateau: recherche du recul minimal (dossier pendant hors du chant + marge), appui sur la seule zone de l'assise (sinon la chaise se pose sur le haut du dossier), puis test `BVHTree.overlap` dans la boucle: une arête entre un sommet sur le plateau et un sommet dehors peut couper le chant.
+- Surfaces de révolution ouvertes (seau à paroi intérieure): `recalc_face_normals` les oriente mal par morceaux; orienter chaque bande par la normale (dz, -dr) du profil. Contrôle: triangles classés par leurs sommets (pas par leur centre, ambigu sur une paroi de 5 mm).
+- Dans un `Geo`, échanger deux axes sans changer de signe (`P(x, z, y)`) est une symétrie: les faces se retournent. Toujours échanger avec un signe (`P(x, -z, y)`).
+- Coque d'Ormeval: aucun support d'enseigne au-dessus de la porte (ni dans `shell_village.glb` ni dans la place); la baie de la porte va de x 8,80 à 10,00, linteau à 2,10, nu de la façade au plan y = 13,00, châssis à 12,84-12,92 (8 cm libres pour un rideau).
