@@ -601,6 +601,8 @@ P0 minimal, environ 7 h: D1, D2, D3 (sans achats dans le monde: tout par le tél
 
 ## 16. Questions pour le client
 
+**Décisions du client (2026-11-09):** V3-1 oui; V3-2 aucun prêt dans la démo; V3-3 oui, 1 800 €; V3-4 oui, meubles et machine de Simone sous les draps, à racheter; V3-5 oui, livraisons le jour même; V3-6 les adresses suivantes sont **complètement vides** (chaque adresse s'équipe de zéro); V3-7 facultatif mais visible, recommandation retenue par défaut.
+
 | # | Question | Recommandation |
 |---|---|---|
 | V3-1 | Simone devient l'ancienne patronne qui a fermé il y a trois ans, propriétaire des murs, qui habite au-dessus et vous loue la boutique vide. Ça te va ? | oui: elle garde son rôle (première cliente, voix des premiers jours, gérante plus tard) et c'est elle qui rend le départ chaleureux |
