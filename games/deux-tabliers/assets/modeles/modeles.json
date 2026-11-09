@@ -90,7 +90,7 @@
     "shell_village_fond_ferme": "pan qui ferme l'arche avec la porte de la pièce du fond: le cacher quand village_fond est acheté"
    },
    "triangles": {
-    "shell_village": 4634,
+    "shell_village": 4778,
     "shell_village_glass": 10,
     "shell_village_glow": 424,
     "shell_village_fond_ferme": 304
@@ -107,7 +107,7 @@
     "shell_walnut",
     "street_stone"
    ],
-   "poids_octets": 448844
+   "poids_octets": 268268
   },
   {
    "id": "shell_village_place",
@@ -153,7 +153,7 @@
     "street_paving",
     "street_stone"
    ],
-   "poids_octets": 99656
+   "poids_octets": 61848
   },
   {
    "id": "shell_village_ext_terrasse",
@@ -169,7 +169,7 @@
  "cuisson": {
   "bake_spp": 64,
   "bake_res": 2048,
-  "lightmap_scale": 3.0691049098968506,
+  "lightmap_scale": 3.0453929901123047,
   "place_lightmap_scale": 2.7789223194122314,
   "soleil": {
    "azimut_deg": 205.0,
@@ -230,21 +230,32 @@
    "modele": "station_sink",
    "position": [
     7.55,
-    0.9,
-    7.4
+    0.0,
+    7.395
    ],
-   "rotation_deg": 0
+   "rotation_deg": 0,
+   "note": "pivot au sol; le plan de la coque est percé pour son bac (x 7,21 à 7,67, z 7,17 à 7,63)"
   },
-  "lave_verres": {
+  "lave_vaisselle": {
    "modele": "station_dishwasher",
    "position": [
-    7.555,
+    9.15,
     0.0,
-    7.7
+    7.4
    ],
-   "rotation_deg": 0
+   "rotation_deg": 0,
+   "note": "achat: façade devant le placard de l'arrière-comptoir"
   },
-  "frigo": "dans la coque (façade inox sous l'arrière-comptoir, x 8,00 à 8,75)",
+  "frigo": {
+   "modele": "station_fridge_under",
+   "position": [
+    8.375,
+    0.0,
+    7.395
+   ],
+   "rotation_deg": 0,
+   "note": "dans la niche de la coque (x 8,00 à 8,75, ouverte jusqu'au sol); planche de préparation sur le plan"
+  },
   "ardoise_murale": "dans la coque: x 8,83 à 9,85, y 1,27 à 2,17 m, plan z = 7,145 (zone d'écriture, Caveat)"
  },
  "installation_v03": {
@@ -407,7 +418,7 @@
     "d": 0.003,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "applique_laiton",
@@ -455,7 +466,7 @@
     "d": 0.01,
     "h": -0.08
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "aquarelle_simone",
@@ -496,7 +507,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ardoise_trottoir",
@@ -527,7 +538,7 @@
     1
    ],
    "note": "zones d'écriture: ardoises de 0,34 x 0,62 m sur chaque face (texte du jeu, Caveat)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "assiettes_faience",
@@ -567,7 +578,7 @@
     "d": -0.024,
     "h": -0.08
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "banc_ferme",
@@ -634,7 +645,7 @@
     "d": -0.03,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "banquette_moleskine",
@@ -713,7 +724,7 @@
     "d": 0.01,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "bocal_biscuits",
@@ -755,7 +766,7 @@
     "d": -0.025,
     "h": 0.005
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "bouilloire_temperature",
@@ -803,7 +814,7 @@
     "d": 0.143,
     "h": -0.025
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "bouquet_champetre",
@@ -843,7 +854,7 @@
     "d": -0.05,
     "h": -0.001
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "brocante_banc_nordique",
@@ -909,7 +920,7 @@
     "d": 0.0,
     "h": 0.052
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "brocante_chaises_coques",
@@ -964,7 +975,7 @@
     "d": -0.059,
     "h": 0.001
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "brocante_horloge_comtoise",
@@ -1005,7 +1016,7 @@
     "d": 0.023,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "brocante_lampe_champignon",
@@ -1052,7 +1063,7 @@
     "d": -0.008,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "brocante_moulin_cafe",
@@ -1092,7 +1103,7 @@
     "d": -0.035,
     "h": -0.02
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "brocante_plaque_emaillee",
@@ -1133,7 +1144,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "bucket_sponge",
@@ -1225,7 +1236,7 @@
     "d": -0.037,
     "h": -0.02
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "carte_postale_brissac",
@@ -1266,7 +1277,658 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_accompagnement",
+   "nom": "Carton « Sucres »",
+   "fichier": "carton_accompagnement.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 155,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_accompagnement"
+   ],
+   "poids_octets": 9972,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Sucres et carrés de chocolat pour le café (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_beurre",
+   "nom": "Carton « Beurre »",
+   "fichier": "carton_beurre.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 159,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_beurre"
+   ],
+   "poids_octets": 9892,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Beurre doux (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_cacao",
+   "nom": "Carton « Chocolat »",
+   "fichier": "carton_cacao.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 173,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_cacao"
+   ],
+   "poids_octets": 10772,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Chocolat en poudre (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_citrons",
+   "nom": "Carton « Citrons »",
+   "fichier": "carton_citrons.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 149,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_citrons"
+   ],
+   "poids_octets": 9832,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Citrons (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_confiture",
+   "nom": "Carton « Confiture »",
+   "fichier": "carton_confiture.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 196,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_confiture"
+   ],
+   "poids_octets": 12080,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Confiture d'abricot (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_croissant_boulanger",
+   "nom": "Carton « Croissants »",
+   "fichier": "carton_croissant_boulanger.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 225,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_croissant_boulanger"
+   ],
+   "poids_octets": 13528,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Croissants du boulanger (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_farine",
+   "nom": "Carton « Farine »",
+   "fichier": "carton_farine.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.382,
+    "y": 0.302,
+    "z": 0.28
+   },
+   "triangles": 140,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_farine"
+   ],
+   "poids_octets": 9252,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Farine de blé (lourd); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_grains_maison",
+   "nom": "Carton « Café »",
+   "fichier": "carton_grains_maison.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.382,
+    "y": 0.302,
+    "z": 0.28
+   },
+   "triangles": 116,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_grains_maison"
+   ],
+   "poids_octets": 8012,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Grains, mélange de la vallée (lourd); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_lait_avoine",
+   "nom": "Carton « Lait d’avoine »",
+   "fichier": "carton_lait_avoine.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 242,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_lait_avoine"
+   ],
+   "poids_octets": 14284,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Lait d'avoine (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_lait_entier",
+   "nom": "Carton « Lait »",
+   "fichier": "carton_lait_entier.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.382,
+    "y": 0.302,
+    "z": 0.28
+   },
+   "triangles": 96,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_lait_entier"
+   ],
+   "poids_octets": 7164,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Lait entier de la ferme (lourd); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_limonade_bouteille",
+   "nom": "Carton « Limonade »",
+   "fichier": "carton_limonade_bouteille.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.382,
+    "y": 0.302,
+    "z": 0.28
+   },
+   "triangles": 184,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_limonade_bouteille"
+   ],
+   "poids_octets": 11316,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Limonade de la vallée (lourd); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_menthe",
+   "nom": "Carton « Menthe »",
+   "fichier": "carton_menthe.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 155,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_menthe"
+   ],
+   "poids_octets": 9868,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Menthe du jardin (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_oeufs",
+   "nom": "Carton « Œufs »",
+   "fichier": "carton_oeufs.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 137,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_oeufs"
+   ],
+   "poids_octets": 8956,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Œufs de la ferme (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_oranges",
+   "nom": "Carton « Oranges »",
+   "fichier": "carton_oranges.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.382,
+    "y": 0.302,
+    "z": 0.28
+   },
+   "triangles": 173,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_oranges"
+   ],
+   "poids_octets": 10616,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Oranges à presser (lourd); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_pain_campagne",
+   "nom": "Carton « Pain »",
+   "fichier": "carton_pain_campagne.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 108,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_pain_campagne"
+   ],
+   "poids_octets": 7644,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Pain de campagne (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_pain_chocolat_boulanger",
+   "nom": "Carton « Pains choc. »",
+   "fichier": "carton_pain_chocolat_boulanger.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 219,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_pain_chocolat_boulanger"
+   ],
+   "poids_octets": 13184,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Pains au chocolat du boulanger (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_plantes_simone",
+   "nom": "Carton « Tisanes »",
+   "fichier": "carton_plantes_simone.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 166,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_plantes_simone"
+   ],
+   "poids_octets": 10556,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Plantes du jardin de Simone (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_sucre",
+   "nom": "Carton « Sucre »",
+   "fichier": "carton_sucre.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 129,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_sucre"
+   ],
+   "poids_octets": 8668,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Sucre en poudre (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_tarte_boulanger",
+   "nom": "Carton « Tartes »",
+   "fichier": "carton_tarte_boulanger.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 145,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_tarte_boulanger"
+   ],
+   "poids_octets": 9432,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Tarte aux fruits du boulanger (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_the_noir",
+   "nom": "Carton « Thé noir »",
+   "fichier": "carton_the_noir.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 154,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_the_noir"
+   ],
+   "poids_octets": 10064,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Thé noir en vrac (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "carton_the_vert",
+   "nom": "Carton « Thé vert »",
+   "fichier": "carton_the_vert.glb",
+   "famille": "carton",
+   "style": "neutre",
+   "categorie": "carton",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.362,
+    "y": 0.222,
+    "z": 0.26
+   },
+   "triangles": 167,
+   "budget_triangles": 250,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "carton_the_vert"
+   ],
+   "poids_octets": 10584,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "Thé vert en vrac (léger); mot lu depuis l'avant (+Z)",
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "chairs_upturned",
@@ -1422,7 +2084,7 @@
     "d": -0.017,
     "h": 0.012
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "chaise_fer_peint",
@@ -1476,7 +2138,7 @@
     "d": -0.007,
     "h": 0.021
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "chaise_paillee",
@@ -1572,7 +2234,7 @@
     "d": 0.067,
     "h": -0.04
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "cloche_gateaux",
@@ -1627,7 +2289,7 @@
     "d": 0.0,
     "h": -0.03
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "cloche_verre",
@@ -1677,7 +2339,7 @@
     "d": -0.019,
     "h": 0.2
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "coin_enfants",
@@ -1732,7 +2394,7 @@
     "d": 0.0,
     "h": 0.282
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "coupure_echo",
@@ -1773,7 +2435,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "crate_box_l",
@@ -1803,7 +2465,7 @@
     0,
     1
    ],
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "crate_box_m",
@@ -1833,7 +2495,7 @@
     0,
     1
    ],
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "crate_box_s",
@@ -1863,7 +2525,7 @@
     0,
     1
    ],
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "creperie",
@@ -1910,7 +2572,7 @@
     "d": 0.008,
     "h": -0.05
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "desserte_zinc",
@@ -1971,7 +2633,7 @@
     "d": 0.006,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "dessins_noe",
@@ -2012,7 +2674,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ecuelle_gribouille",
@@ -2052,7 +2714,7 @@
     "d": -0.016,
     "h": -0.01
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "enseigne_bois_peint",
@@ -2093,7 +2755,7 @@
     "d": 0.01,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "enseigne_fer_forge",
@@ -2134,7 +2796,7 @@
     "d": 0.0,
     "h": 0.685
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "enseigne_lettres_dorees",
@@ -2175,7 +2837,7 @@
     "d": -0.006,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "espresso_revised",
@@ -2314,7 +2976,7 @@
     "d": 0.0,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "etagere_pots",
@@ -2374,7 +3036,7 @@
     "d": -0.01,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_balai",
@@ -2405,7 +3067,7 @@
     1
    ],
    "note": "rangé debout dans la réserve; tenu à deux mains pour « sol balayé » (l_inspection)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_boite_outils",
@@ -2436,7 +3098,7 @@
     1
    ],
    "note": "le joint neuf est dedans (événement la_vieille_dame_tousse)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_carnet_vert",
@@ -2466,7 +3128,7 @@
     0,
     1
    ],
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_gourde",
@@ -2504,7 +3166,7 @@
      0.0
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_piece_montee",
@@ -2535,7 +3197,7 @@
     1
    ],
    "note": "se porte à deux (événement le_cafe_d_honneur)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_table_treteaux",
@@ -2573,7 +3235,7 @@
    },
    "places": 4,
    "note": "fête du Tilleul sans terrasse (4 places dehors)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "event_valise_octave",
@@ -2603,7 +3265,7 @@
     0,
     1
    ],
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "fanion_godillots",
@@ -2644,7 +3306,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "fauteuil_club",
@@ -2698,7 +3360,7 @@
     "d": 0.0,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "fauteuil_crapaud",
@@ -2752,7 +3414,7 @@
     "d": 0.004,
     "h": 0.03
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "fauteuil_rotin",
@@ -2806,7 +3468,7 @@
     "d": -0.087,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "food_crepe",
@@ -2837,7 +3499,7 @@
     1
    ],
    "note": "pliée en quatre",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "food_croissant",
@@ -2868,7 +3530,7 @@
     1
    ],
    "note": "16 cm à 120 %",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "food_pain_chocolat",
@@ -2899,7 +3561,7 @@
     1
    ],
    "note": "14 x 9 cm (120 %), barres de chocolat visibles aux deux bouts",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "food_tarte_fruits",
@@ -2930,7 +3592,7 @@
     1
    ],
    "note": "pointe vers l'ouest dans le modèle; recentrée sur son emprise",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "food_tartine",
@@ -2960,7 +3622,7 @@
     0,
     1
    ],
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "fougere_suspendue",
@@ -3001,7 +3663,7 @@
     "d": 0.248,
     "h": 0.073
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "frigo_vitre",
@@ -3044,7 +3706,7 @@
     "d": 0.029,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "geraniums_vitrine",
@@ -3085,7 +3747,7 @@
     "d": -0.02,
     "h": 0.015
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "globe_opalin",
@@ -3133,7 +3795,7 @@
     "d": -0.015,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "gueridon_marbre",
@@ -3180,7 +3842,7 @@
     "d": 0.01,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "guirlande_guinguette",
@@ -3223,7 +3885,7 @@
     "d": -0.048,
     "h": 0.198
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "herbier_encadre",
@@ -3263,7 +3925,7 @@
     "d": 0.004,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "horloge_ecole",
@@ -3304,7 +3966,7 @@
     "d": 0.006,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "jardinieres_terrasse",
@@ -3344,7 +4006,7 @@
     "d": 0.0,
     "h": 0.216
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "joint_encadre",
@@ -3385,7 +4047,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "lampe_lin",
@@ -3433,7 +4095,7 @@
     "d": -0.008,
     "h": -0.01
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "lanterne_tilleul",
@@ -3482,7 +4144,7 @@
     "d": -0.015,
     "h": 0.02
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "mail_bundle",
@@ -3559,7 +4221,7 @@
    },
    "places": 2,
    "note": "debout: repose-pieds de laiton à 0,30 m",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "miroir_peint",
@@ -3600,7 +4262,7 @@
     "d": 0.008,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "moulin_dose",
@@ -3650,7 +4312,7 @@
     "d": -0.02,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "moulin_mamie_odile",
@@ -3690,7 +4352,7 @@
     "d": -0.019,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "olivier_pot",
@@ -3731,7 +4393,7 @@
     "d": -0.076,
     "h": -0.04
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "parasol_toile",
@@ -3772,7 +4434,7 @@
     "d": 0.0,
     "h": 0.07
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "photo_maries",
@@ -3813,7 +4475,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "pichet_argent",
@@ -3853,7 +4515,7 @@
     "d": -0.01,
     "h": -0.01
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "pichet_thermometre",
@@ -3894,7 +4556,7 @@
     "d": 0.004,
     "h": 0.02
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "plaque_hygiene",
@@ -3935,7 +4597,7 @@
     "d": 0.002,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "pot_pourboires_gres",
@@ -3975,7 +4637,7 @@
     "d": -0.01,
     "h": -0.005
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "pothos_etagere",
@@ -4016,7 +4678,7 @@
     "d": -0.021,
     "h": -0.06
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "presse_levier",
@@ -4064,7 +4726,7 @@
     "d": 0.069,
     "h": -0.01
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "price_tag",
@@ -4147,7 +4809,174 @@
     "d": -0.1,
     "h": -0.042
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "reserve_etagere",
+   "nom": "Étagère de la réserve (0,85 m)",
+   "fichier": "reserve_etagere.glb",
+   "famille": "reserve",
+   "style": "neutre",
+   "categorie": "etagere",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.85,
+    "y": 2.0,
+    "z": 0.45
+   },
+   "triangles": 968,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "reserve_etagere"
+   ],
+   "poids_octets": 78664,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "avant au sud (+Z), comme les données",
+   "douilles": {
+    "socket_pied": [
+     0.0,
+     0.0,
+     0.4
+    ]
+   },
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "reserve_etagere_longue",
+   "nom": "Étagère longue de la réserve (1,20 m)",
+   "fichier": "reserve_etagere_longue.glb",
+   "famille": "reserve",
+   "style": "neutre",
+   "categorie": "etagere",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 1.2,
+    "y": 2.0,
+    "z": 0.45
+   },
+   "triangles": 924,
+   "budget_triangles": 1000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "reserve_etagere_longue"
+   ],
+   "poids_octets": 74100,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "avant (+Z) = allée: poser tourné de 180° (avant vers l'ouest une fois posé à 90° contre le mur est)",
+   "douilles": {
+    "socket_pied": [
+     0.0,
+     0.0,
+     0.4
+    ]
+   },
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "reserve_frigo_armoire",
+   "nom": "Armoire froide de la réserve",
+   "fichier": "reserve_frigo_armoire.glb",
+   "famille": "reserve",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.704,
+    "y": 1.85,
+    "z": 0.793
+   },
+   "triangles": 1391,
+   "budget_triangles": 2000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "reserve_frigo_armoire"
+   ],
+   "poids_octets": 93380,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "avant (+Z) = porte: poser tourné de 180° (porte vers le nord dans la réserve); charnières côté +X du modèle",
+   "douilles": {
+    "socket_pied": [
+     0.0,
+     0.0,
+     0.6
+    ]
+   },
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "reserve_palette",
+   "nom": "Demi-palette des livraisons",
+   "fichier": "reserve_palette.glb",
+   "famille": "reserve",
+   "style": "neutre",
+   "categorie": "livraison",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.8,
+    "y": 0.15,
+    "z": 0.6
+   },
+   "triangles": 182,
+   "budget_triangles": 300,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "reserve_palette"
+   ],
+   "poids_octets": 17772,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "dessus à 0,15 m (emplacements s1 à s4 des données)",
+   "douilles": {
+    "socket_s1": [
+     -0.2,
+     0.15,
+     -0.15
+    ],
+    "socket_s2": [
+     0.2,
+     0.15,
+     -0.15
+    ],
+    "socket_s3": [
+     -0.2,
+     0.15,
+     0.15
+    ],
+    "socket_s4": [
+     0.2,
+     0.15,
+     0.15
+    ]
+   },
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "sheet_counter",
@@ -4322,7 +5151,7 @@
     1
    ],
    "note": "coordonnées du plan, à poser sans transformation; bord du lambrequin à 1,99 m (au-dessus des têtes: 2,05 m au plus bas des bras)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "shutter_bay_door",
@@ -4600,7 +5429,7 @@
      0.15
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_caisse",
@@ -4631,136 +5460,63 @@
     1
    ],
    "note": "touches vers le barista; afficheur vers les clients. Dans la coque: x 10,6, z 9,01, tourné vers le nord",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_cup_shelf",
-   "nom": "Étagère à tasses",
+   "nom": "Range-vaisselle propre",
    "fichier": "station_cup_shelf.glb",
    "famille": "station",
    "style": "neutre",
-   "categorie": "poste",
+   "categorie": "etagere",
    "accroche": "surface",
    "dimensions_m": {
-    "x": 0.6,
-    "y": 0.4,
-    "z": 0.25
+    "x": 0.34,
+    "y": 0.308,
+    "z": 0.28
    },
-   "triangles": 168,
+   "triangles": 866,
    "budget_triangles": 1000,
    "dans_budget": true,
    "materiaux": [
-    "dt_meubles"
+    "dt_meubles",
+    "dt_verre"
    ],
    "noeuds": [
-    "station_cup_shelf"
+    "station_cup_shelf",
+    "station_cup_shelf_glass"
    ],
-   "poids_octets": 16144,
+   "poids_octets": 63364,
    "avant": [
     0,
     0,
     1
    ],
-   "note": "16 places de tasse (douilles cup_niveau_colonne_rangée)",
+   "note": "vaisselle propre lisible (assiettes, verres, tasses); dessus libre au centre",
    "douilles": {
-    "socket_cup_0_0_0": [
-     -0.21,
-     0.032,
-     -0.06
-    ],
-    "socket_cup_0_0_1": [
-     -0.21,
-     0.032,
-     0.06
-    ],
-    "socket_cup_0_1_0": [
-     -0.07,
-     0.032,
-     -0.06
-    ],
-    "socket_cup_0_1_1": [
-     -0.07,
-     0.032,
-     0.06
-    ],
-    "socket_cup_0_2_0": [
-     0.07,
-     0.032,
-     -0.06
-    ],
-    "socket_cup_0_2_1": [
-     0.07,
-     0.032,
-     0.06
-    ],
-    "socket_cup_0_3_0": [
-     0.21,
-     0.032,
-     -0.06
-    ],
-    "socket_cup_0_3_1": [
-     0.21,
-     0.032,
-     0.06
-    ],
-    "socket_cup_1_0_0": [
-     -0.21,
-     0.232,
-     -0.06
-    ],
-    "socket_cup_1_0_1": [
-     -0.21,
-     0.232,
-     0.06
-    ],
-    "socket_cup_1_1_0": [
-     -0.07,
-     0.232,
-     -0.06
-    ],
-    "socket_cup_1_1_1": [
-     -0.07,
-     0.232,
-     0.06
-    ],
-    "socket_cup_1_2_0": [
-     0.07,
-     0.232,
-     -0.06
-    ],
-    "socket_cup_1_2_1": [
-     0.07,
-     0.232,
-     0.06
-    ],
-    "socket_cup_1_3_0": [
-     0.21,
-     0.232,
-     -0.06
-    ],
-    "socket_cup_1_3_1": [
-     0.21,
-     0.232,
-     0.06
+    "socket_dessus": [
+     0.0,
+     0.25,
+     0.0
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_dishwasher",
-   "nom": "Lave-verres sous le plan",
+   "nom": "Lave-vaisselle sous le plan",
    "fichier": "station_dishwasher.glb",
    "famille": "station",
    "style": "neutre",
    "categorie": "poste",
-   "accroche": "surface",
+   "accroche": "sol",
    "dimensions_m": {
-    "x": 0.76,
-    "y": 0.74,
-    "z": 0.08
+    "x": 0.6,
+    "y": 0.842,
+    "z": 0.076
    },
-   "triangles": 208,
-   "budget_triangles": 600,
+   "triangles": 332,
+   "budget_triangles": 2000,
    "dans_budget": true,
    "materiaux": [
     "dt_meubles"
@@ -4768,14 +5524,21 @@
    "noeuds": [
     "station_dishwasher"
    ],
-   "poids_octets": 17000,
+   "poids_octets": 27100,
    "avant": [
     0,
     0,
     1
    ],
-   "note": "origine au dos de la façade, en bas; dans la coque: x 7,555, z 7,70",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "note": "pivot au sol (données y 0); façade devant le placard de la coque",
+   "douilles": {
+    "socket_panier": [
+     0.0,
+     0.45,
+     0.4
+    ]
+   },
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_espresso_2g",
@@ -4839,7 +5602,50 @@
      0.0
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
+  },
+  {
+   "id": "station_fridge_under",
+   "nom": "Réfrigérateur sous le plan et plan de préparation",
+   "fichier": "station_fridge_under.glb",
+   "famille": "station",
+   "style": "neutre",
+   "categorie": "poste",
+   "accroche": "sol",
+   "dimensions_m": {
+    "x": 0.742,
+    "y": 1.21,
+    "z": 0.656
+   },
+   "triangles": 1049,
+   "budget_triangles": 2000,
+   "dans_budget": true,
+   "materiaux": [
+    "dt_meubles"
+   ],
+   "noeuds": [
+    "station_fridge_under"
+   ],
+   "poids_octets": 73960,
+   "avant": [
+    0,
+    0,
+    1
+   ],
+   "note": "pivot au sol (données y 0); porte à 0,30-0,335 m devant le centre (z 7,695 à 7,73), sous le plan de la coque; planche du poste de préparation au-dessus (0,912 m)",
+   "douilles": {
+    "socket_plan": [
+     0.05,
+     0.912,
+     0.0
+    ],
+    "socket_door": [
+     0.0,
+     0.45,
+     0.335
+    ]
+   },
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_grinder",
@@ -4879,23 +5685,23 @@
      0.13
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_sink",
-   "nom": "Évier de la plonge",
+   "nom": "Plonge: bac inox, robinet col de cygne et égouttoir",
    "fichier": "station_sink.glb",
    "famille": "station",
    "style": "neutre",
    "categorie": "poste",
-   "accroche": "surface",
+   "accroche": "sol",
    "dimensions_m": {
-    "x": 0.7,
-    "y": 0.263,
-    "z": 0.423
+    "x": 0.8,
+    "y": 0.465,
+    "z": 0.625
    },
-   "triangles": 196,
-   "budget_triangles": 600,
+   "triangles": 890,
+   "budget_triangles": 1500,
    "dans_budget": true,
    "materiaux": [
     "dt_meubles"
@@ -4903,104 +5709,115 @@
    "noeuds": [
     "station_sink"
    ],
-   "poids_octets": 17212,
+   "poids_octets": 64016,
    "avant": [
     0,
     0,
     1
    ],
-   "note": "robinet au nord (contre le refend), avant du modèle = côté du plongeur; ne pas tourner dans la coque",
+   "note": "pivot au sol (données y 0); bac dans la découpe du plan de la coque; emplacement bac des données au fond (0,745 m, x -0,11)",
    "douilles": {
-    "socket_tap": [
-     0.0,
-     0.14,
-     -0.01
-    ],
     "socket_basin": [
-     0.0,
-     0.006,
-     0.01
+     -0.11,
+     0.749,
+     0.005
+    ],
+    "socket_tap": [
+     -0.11,
+     1.08,
+     -0.105
+    ],
+    "socket_rack": [
+     0.26,
+     0.918,
+     0.02
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_ticket_rail",
-   "nom": "Rail à tickets",
+   "nom": "Rail à tickets de la passe",
    "fichier": "station_ticket_rail.glb",
    "famille": "station",
    "style": "neutre",
    "categorie": "poste",
-   "accroche": "plafond",
+   "accroche": "surface",
    "dimensions_m": {
-    "x": 0.8,
-    "y": 0.782,
+    "x": 0.608,
+    "y": 0.458,
     "z": 0.042
    },
-   "triangles": 388,
+   "triangles": 544,
    "budget_triangles": 600,
    "dans_budget": true,
    "materiaux": [
     "dt_meubles"
    ],
    "noeuds": [
-    "station_ticket_rail"
+    "station_ticket_rail",
+    "ticket_0",
+    "ticket_1",
+    "ticket_2",
+    "ticket_3",
+    "ticket_4",
+    "ticket_5"
    ],
-   "poids_octets": 30024,
+   "poids_octets": 46824,
    "avant": [
     0,
     0,
     1
    ],
-   "note": "tickets face au nord (barista) dans la coque: poser tourné de 180°; rail à 1,88 m (solive à 2,65 m)",
+   "note": "pied sur la tablette de la passe (1,105 m), barre à 0,42-0,456 m; avant = barista (poser tourné de 180°); nœuds ticket_0 à ticket_5 à montrer selon les commandes en cours",
    "douilles": {
     "socket_ticket_0": [
-     -0.33,
-     -0.79,
-     -0.024
+     -0.25,
+     0.422,
+     0.02
     ],
     "socket_ticket_1": [
-     -0.198,
-     -0.79,
-     -0.024
+     -0.15,
+     0.422,
+     0.02
     ],
     "socket_ticket_2": [
-     -0.066,
-     -0.79,
-     -0.024
+     -0.05,
+     0.422,
+     0.02
     ],
     "socket_ticket_3": [
-     0.066,
-     -0.79,
-     -0.024
+     0.05,
+     0.422,
+     0.02
     ],
     "socket_ticket_4": [
-     0.198,
-     -0.79,
-     -0.024
+     0.15,
+     0.422,
+     0.02
     ],
     "socket_ticket_5": [
-     0.33,
-     -0.79,
-     -0.024
+     0.25,
+     0.422,
+     0.02
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "station_vitrine",
-   "nom": "Vitrine réfrigérée du comptoir",
+   "nom": "Vitrine réfrigérée à viennoiseries",
    "fichier": "station_vitrine.glb",
    "famille": "station",
    "style": "neutre",
-   "categorie": "poste",
+   "categorie": "vitrine",
    "accroche": "surface",
    "dimensions_m": {
-    "x": 0.9,
-    "y": 0.32,
-    "z": 0.45
+    "x": 0.51,
+    "y": 0.3,
+    "z": 0.31
    },
-   "triangles": 208,
+   "triangles": 713,
    "budget_triangles": 1000,
    "dans_budget": true,
    "materiaux": [
@@ -5011,56 +5828,76 @@
     "station_vitrine",
     "station_vitrine_glass"
    ],
-   "poids_octets": 20460,
+   "poids_octets": 66516,
    "avant": [
     0,
     0,
     1
    ],
-   "note": "avant (sud du modèle) = côté barista, portes; vitre bombée vers les clients",
+   "note": "vitre et inscription vers le barista et la salle (+Z); slot_0..5 plateau bas (z 0,064), slot_6..11 plateau haut (z 0,169), rang du fond puis rang de devant, colonnes ouest, centre, est",
    "douilles": {
-    "socket_shelf_low_0": [
-     -0.3,
-     0.085,
-     0.0
+    "slot_0": [
+     -0.15,
+     0.064,
+     -0.06
     ],
-    "socket_shelf_low_1": [
-     -0.1,
-     0.085,
-     0.0
+    "slot_1": [
+     0.0,
+     0.064,
+     -0.06
     ],
-    "socket_shelf_low_2": [
-     0.1,
-     0.085,
-     0.0
+    "slot_2": [
+     0.15,
+     0.064,
+     -0.06
     ],
-    "socket_shelf_low_3": [
-     0.3,
-     0.085,
-     0.0
+    "slot_3": [
+     -0.15,
+     0.064,
+     0.06
     ],
-    "socket_shelf_high_0": [
-     -0.3,
-     0.2,
-     0.05
+    "slot_4": [
+     0.0,
+     0.064,
+     0.06
     ],
-    "socket_shelf_high_1": [
-     -0.1,
-     0.2,
-     0.05
+    "slot_5": [
+     0.15,
+     0.064,
+     0.06
     ],
-    "socket_shelf_high_2": [
-     0.1,
-     0.2,
-     0.05
+    "slot_6": [
+     -0.15,
+     0.169,
+     -0.06
     ],
-    "socket_shelf_high_3": [
-     0.3,
-     0.2,
-     0.05
+    "slot_7": [
+     0.0,
+     0.169,
+     -0.06
+    ],
+    "slot_8": [
+     0.15,
+     0.169,
+     -0.06
+    ],
+    "slot_9": [
+     -0.15,
+     0.169,
+     0.06
+    ],
+    "slot_10": [
+     0.0,
+     0.169,
+     0.06
+    ],
+    "slot_11": [
+     0.15,
+     0.169,
+     0.06
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "suspension_osier",
@@ -5108,7 +5945,7 @@
     "d": -0.011,
     "h": 0.35
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "table_basse_malle",
@@ -5156,7 +5993,7 @@
     "d": 0.024,
     "h": 0.004
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "table_bistrot_quatre",
@@ -5203,7 +6040,7 @@
     "d": 0.008,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "table_fer_mosaique",
@@ -5250,7 +6087,7 @@
     "d": 0.01,
     "h": 0.008
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "table_ferme",
@@ -5297,7 +6134,7 @@
     "d": 0.0,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "tabouret_bois",
@@ -5352,7 +6189,7 @@
     "d": -0.022,
     "h": 0.002
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "tabourets_zinc",
@@ -5407,7 +6244,7 @@
     "d": -0.04,
     "h": 0.006
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "tapis_jonc",
@@ -5448,7 +6285,7 @@
     "d": 0.0,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "tapis_lirette",
@@ -5489,7 +6326,7 @@
     "d": 0.0,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "vaisselier_sauge",
@@ -5550,7 +6387,7 @@
     "d": 0.057,
     "h": 0.0
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_cup_cappuccino",
@@ -5582,7 +6419,7 @@
     1
    ],
    "note": "sert aussi au café crème, au chocolat et au noisette (teinter ou remplacer le contenu, nœud _liquid)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_cup_espresso",
@@ -5614,7 +6451,7 @@
     1
    ],
    "note": "7 cm à 120 %; anse vers l'est (+X); contenu: nœud ware_cup_espresso_liquid (crème d'espresso)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_glass",
@@ -5647,7 +6484,7 @@
     1
    ],
    "note": "13 cm; contenu opaque sous le bord (bible 6), nœud _liquid",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_plate",
@@ -5685,7 +6522,7 @@
      0.0
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_saucer",
@@ -5722,7 +6559,7 @@
      0.0
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_takeaway_cup",
@@ -5753,7 +6590,7 @@
     1
    ],
    "note": "couvercle crème: le jeu peut y écrire (événement du car de 8 h 12)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_teapot",
@@ -5784,7 +6621,7 @@
     1
    ],
    "note": "le thé compte deux pièces de vaisselle (tasse et théière)",
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   },
   {
    "id": "ware_tray",
@@ -5847,7 +6684,7 @@
      0.06
     ]
    },
-   "source": "Blender scripté (meubles.py ou objets.py)"
+   "source": "Blender scripté (meubles.py, objets.py ou postes_arriere.py)"
   }
  ],
  "personnages": [

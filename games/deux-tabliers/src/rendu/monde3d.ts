@@ -23,7 +23,14 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import type { PlacedFurniture, PlayerIndex } from '../etat/monde';
 import type { GameView } from '../reseau/vue';
 import { objectPosition } from '../simulation/monde';
-import { AVATAR_MODEL, FURNITURE_MODEL, MODEL_TURN_DEG, OBJECT_MODEL } from './correspondances';
+import {
+  AVATAR_MODEL,
+  CARTON_MODEL,
+  FURNITURE_MODEL,
+  MODEL_TURN_DEG,
+  OBJECT_MODEL,
+  RAIL_TICKETS,
+} from './correspondances';
 import { createClipBlend, type ClipBlend } from './melange';
 import { placeAnchor } from '../etat/assises';
 import {
@@ -205,6 +212,13 @@ export function createWorldNodes(
       }
       entry.node.position.set(f.x, f.y, f.z);
       entry.node.rotation.y = (f.rotDeg * Math.PI) / 180;
+      if (view.content.furniture.get(f.type)?.station === 'rail') {
+        const shown = Math.min(RAIL_TICKETS, world.service.tickets.length);
+        for (let i = 0; i < RAIL_TICKETS; i++) {
+          const ticket = entry.node.getObjectByName(`ticket_${i}`);
+          if (ticket !== undefined) ticket.visible = i < shown;
+        }
+      }
     }
     for (const [id, entry] of furniture) {
       if (!seen.has(id)) {
@@ -226,7 +240,10 @@ export function createWorldNodes(
       if (entry === undefined) {
         const type = view.content.objects.get(o.type);
         if (type === undefined) continue;
-        const node = models.instance(OBJECT_MODEL[o.type] ?? type.model, {
+        // Carton livré: celui de son ingrédient, contenu écrit dessus.
+        const ingredient = world.service.cartons.find((c) => c.object === o.id)?.ingredient;
+        const carton = ingredient === undefined ? undefined : CARTON_MODEL[ingredient];
+        const node = models.instance(carton ?? OBJECT_MODEL[o.type] ?? type.model, {
           width: type.size[0],
           depth: type.size[1],
           height: type.size[2],

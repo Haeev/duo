@@ -14,7 +14,7 @@ ASSETS = os.path.join(DEPOT, "games", "deux-tabliers", "assets", "modeles")
 DONNEES = os.path.join(DEPOT, "docs", "jeux", "cosy-cafe", "demo", "donnees")
 
 fiches = {}
-for f in ("meubles.json", "objets.json", "installation.json"):
+for f in ("meubles.json", "objets.json", "installation.json", "postes_arriere.json"):
     fiches.update(json.load(open(os.path.join(ICI, "fiches", f))))
 coque = json.load(open(os.path.join(ICI, "fiches", "coque.json")))
 cat = json.load(open(os.path.join(DONNEES, "catalogue.json")))
@@ -35,7 +35,7 @@ for ident, f in sorted(fiches.items()):
         d = f["dimensions_m"]
         f["catalogue_size"] = s
         f["ecart_catalogue_m"] = {"w": round(d["x"] - s["w"], 3), "d": round(d["z"] - s["d"], 3), "h": round(d["y"] - s["h"], 3)}
-    f["source"] = f.get("source") or ("Meshy (essai de style) puis conformité" if f.get("meshy") else "Blender scripté (meubles.py ou objets.py)")
+    f["source"] = f.get("source") or ("Meshy (essai de style) puis conformité" if f.get("meshy") else "Blender scripté (meubles.py, objets.py ou postes_arriere.py)")
     objets.append(f)
 
 persos = []
@@ -127,9 +127,12 @@ out = {
         "machine": {"modele": "station_espresso_2g", "position": [9.15, 0.95, 9.005], "rotation_deg": 180},
         "moulin": {"modele": "station_grinder", "position": [9.78, 0.95, 9.04], "rotation_deg": 180},
         "caisse": {"modele": "station_caisse", "position": [10.6, 0.95, 9.01], "rotation_deg": 180},
-        "plonge": {"modele": "station_sink", "position": [7.55, 0.9, 7.4], "rotation_deg": 0},
-        "lave_verres": {"modele": "station_dishwasher", "position": [7.555, 0.0, 7.7], "rotation_deg": 0},
-        "frigo": "dans la coque (façade inox sous l'arrière-comptoir, x 8,00 à 8,75)",
+        "plonge": {"modele": "station_sink", "position": [7.55, 0.0, 7.395], "rotation_deg": 0,
+                   "note": "pivot au sol; le plan de la coque est percé pour son bac (x 7,21 à 7,67, z 7,17 à 7,63)"},
+        "lave_vaisselle": {"modele": "station_dishwasher", "position": [9.15, 0.0, 7.4], "rotation_deg": 0,
+                           "note": "achat: façade devant le placard de l'arrière-comptoir"},
+        "frigo": {"modele": "station_fridge_under", "position": [8.375, 0.0, 7.395], "rotation_deg": 0,
+                  "note": "dans la niche de la coque (x 8,00 à 8,75, ouverte jusqu'au sol); planche de préparation sur le plan"},
         "ardoise_murale": "dans la coque: x 8,83 à 9,85, y 1,27 à 2,17 m, plan z = 7,145 (zone d'écriture, Caveat)",
     },
     "installation_v03": {

@@ -47,16 +47,16 @@
       "anchor": "backbar-1",
       "x": -0.4,
       "z": 0,
-      "y": 0.91,
+      "y": 0.9,
       "rotDeg": 0
     },
     {
       "id": "vitrine-1",
       "type": "vitrine",
       "anchor": "backbar-1",
-      "x": 0.13,
-      "z": 0,
-      "y": 0.91,
+      "x": 0.53,
+      "z": -0.12,
+      "y": 0.9,
       "rotDeg": 0
     },
     {
@@ -84,7 +84,7 @@
     "presse-agrumes": {
       "id": "presse-1",
       "anchor": "backbar-1",
-      "x": 0.97,
+      "x": 0.9,
       "z": 0,
       "y": 0.9,
       "rotDeg": 0
