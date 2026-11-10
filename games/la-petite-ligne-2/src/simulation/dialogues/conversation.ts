@@ -15,6 +15,7 @@ import { evaluateAll, type RuleContext } from '../regles/conditions';
 import { applyEffects } from '../regles/effets';
 import { recall, remember } from '../regles/memoire';
 import { RULES } from '../regles/reglages';
+import { agreeFor } from './accords';
 import { greet } from './amitie';
 
 /** Au-delà, un parcours sans texte est une faute de données: on s'arrête plutôt que boucler. */
@@ -36,13 +37,13 @@ export function onceKey(place: string, dialogue: DialogueDef, player: PlayerInde
 
 /** Le dialogue à jouer: le plus prioritaire dont les conditions sont vraies et qui n'est pas épuisé. */
 export function pickDialogue(
-  sim: SimContext,
+  sim: { readonly world: ReadonlyWorld; readonly content: Content },
   player: PlayerIndex,
   villager: string,
 ): DialogueDef | null {
   const place = placeContent(sim.content, sim.world);
   if (place === null) return null;
-  const ctx = ruleContext(sim, player);
+  const ctx: RuleContext = { world: sim.world, content: sim.content, actor: player };
   let best: DialogueDef | null = null;
   for (const dialogue of place.dialogues) {
     if (dialogue.villager !== villager) continue;
@@ -194,7 +195,7 @@ export function talkChoose(sim: SimContext, player: PlayerIndex, optionId: strin
 export interface TalkView {
   readonly villager: string;
   readonly node: string;
-  /** Identifiant de l'habitant, ou `player`. Texte brut: les accords se résolvent à l'affichage. */
+  /** Identifiant de l'habitant, ou `player`. Texte déjà accordé au genre des joueurs (cahier 1.5). */
   readonly speaker: string;
   readonly text: string | null;
   readonly emote: string | null;
@@ -217,7 +218,7 @@ export function talkView(
       villager: talk.villager,
       node: talk.node,
       speaker: node.speaker,
-      text: node.text,
+      text: agreeFor(world, player, node.text),
       emote: node.emote,
       options: [],
     };
@@ -227,7 +228,7 @@ export function talkView(
     .filter((o) => evaluateAll(ctx, o.when))
     .map((o) => ({
       id: o.id,
-      text: o.text,
+      text: agreeFor(world, player, o.text),
       fails: failsForHygiene(world, player, o.effects) ? ('hygiene' as const) : null,
     }));
   return {

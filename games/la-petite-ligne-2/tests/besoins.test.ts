@@ -7,6 +7,7 @@ import { hasPerk } from '../src/simulation/besoins/repas';
 import { idleInput } from '../src/simulation/noyau/entrees';
 import { RULES } from '../src/simulation/regles/reglages';
 import { act, contentWith, contextOf, wait, withTestProps } from './aides-l3';
+import { NORTH, put } from './aides-noyau';
 import { gameContent, newSim } from './aides';
 
 const content = gameContent();
@@ -20,8 +21,8 @@ describe('besoins', () => {
     expect(a.needs.sleep).toBeCloseTo(70 - 1.6, 1);
     expect(a.needs.hygiene).toBeCloseTo(70 - 1, 1);
     const running = newSim(content);
-    running.world.players[0].body.speed = 5;
-    const run = { ...idleInput(0), run: true };
+    // Course vers l'est, sur le quai dégagé.
+    const run = { ...idleInput(0), moveX: 1, run: true };
     wait(running, 60, [run, idleInput(0)]);
     expect(running.world.players[0].needs.hunger).toBeCloseTo(70 - 3, 1);
     expect(running.world.players[1].needs.hunger).toBeCloseTo(70 - 2, 1);
@@ -144,5 +145,56 @@ describe('besoins', () => {
     wait(sim, 0.1);
     expect(mealPerkOf(sim.world, 0)).toBeNull();
     expect(mealPerkOf(sim.world, 1)).toBe('no_tool_wear');
+  });
+
+  it('se laver à la pompe par la touche d’action: geste long, gain jusqu’au plafond, sans refus à la fin', () => {
+    const sim = newSim(content);
+    put(sim, 0, 28.5, 23.6, NORTH);
+    sim.world.players[0].needs.hygiene = 15;
+    expect(act(sim, 0, { type: 'act' })).toContainEqual({
+      type: 'gesture_started',
+      player: 0,
+      clip: 'wash',
+      target: 'pompe',
+    });
+    expect(sim.world.players[0].gesture?.long).toBe(true);
+    const events = wait(sim, 4.5);
+    expect(sim.world.players[0].needs.hygiene).toBeCloseTo(55, 0);
+    expect(events.filter((e) => e.type === 'refused')).toEqual([]);
+    expect(sim.world.players[0].gesture).toBeNull();
+  });
+
+  it('un repas spécial ajouté par un seul fichier se sert à deux à table et donne son bonus', () => {
+    const custom = contentWith((files) => {
+      withTestProps(files);
+      files['commun/objets/tourte-essai.json'] = {
+        schema: 1,
+        id: 'tourte-essai',
+        name: 'Tourte',
+        family: 'food',
+        stack: 1,
+        food: { hunger: 60 },
+        tool: null,
+        meal: { perk: 'better_prices' },
+      };
+    });
+    const sim = newSim(custom);
+    sim.world.players[0].toolbar[0] = { item: 'tourte-essai', count: 1 };
+    const serve = {
+      type: 'serve_meal',
+      from: { area: 'toolbar', index: 0 },
+      target: 'banc',
+    } as const;
+    expect(act(sim, 0, serve)).toContainEqual({
+      type: 'refused',
+      player: 0,
+      reason: 'not-together',
+      target: 'banc',
+    });
+    const seats = sim.world.places['essai-gare']?.objects.banc?.sit;
+    if (seats !== undefined) seats.splice(0, 2, 0, 1);
+    act(sim, 0, serve);
+    expect(sim.world.players[0].toolbar[0]).toBeNull();
+    expect(modifiersOf(custom, sim.world, 1).sellPrice).toBe(RULES.needs.betterPrices);
   });
 });

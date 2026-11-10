@@ -128,9 +128,9 @@ describe('sac et barre', () => {
     act(sim, 0, { type: 'store_take', target: 'coffre', index: 1 });
     expect(countItem(a, 'buche')).toBe(3);
     a.body.x += 5;
-    expect(act(sim, 0, { type: 'store_take', target: 'coffre', index: 0 })[0]).toMatchObject({
-      reason: 'too-far',
-    });
+    // Hors de portée, rien ne bouge (l'interface a déjà fermé le rangement).
+    act(sim, 0, { type: 'store_take', target: 'coffre', index: 0 });
+    expect(countItem(a, 'buche')).toBe(3);
   });
 
   it('un objet ajouté par un seul fichier suit sa propre limite de pile, sans code', () => {

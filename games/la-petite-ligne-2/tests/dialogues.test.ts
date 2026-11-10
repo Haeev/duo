@@ -6,13 +6,16 @@ import { talkView } from '../src/simulation/dialogues/conversation';
 import { agreementTagShare, validateDialogueTexts } from '../src/simulation/dialogues/valider';
 import type { Sim } from '../src/simulation/noyau/pas';
 import { act, contentWith } from './aides-l3';
+import { NORTH, put } from './aides-noyau';
+import { bondKey } from '../src/etat/progression';
 import { gameContent, newSim } from './aides';
 
 const content = gameContent();
 const VILLAGER = 'cheffe-de-gare';
 
+/** Devant le guichet, face à l'habitant: la touche d'action ouvre la conversation (brique `talk`). */
 function openTalk(sim: Sim, player: 0 | 1): Sim['events'] {
-  sim.world.players[player].aim = VILLAGER;
+  put(sim, player, 20, 16, NORTH);
   return act(sim, player, { type: 'act' });
 }
 
@@ -80,15 +83,15 @@ describe('dialogues', () => {
     const sim = newSim(content);
     openTalk(sim, 0);
     // Hygiène de départ en bonus (Soigné): 5 points multipliés par 1,2.
-    expect(sim.world.progress.bonds[VILLAGER]).toBe(6);
+    expect(sim.world.progress.bonds[bondKey(VILLAGER, 0)]).toBe(6);
     act(sim, 0, { type: 'talk_close' });
     openTalk(sim, 0);
-    expect(sim.world.progress.bonds[VILLAGER]).toBe(6);
+    expect(sim.world.progress.bonds[bondKey(VILLAGER, 0)]).toBe(6);
     act(sim, 0, { type: 'talk_close' });
     sim.world.players[1].tiers.hygiene = 'low';
     sim.world.players[1].needs.hygiene = 15;
     openTalk(sim, 1);
-    expect(sim.world.progress.bonds[VILLAGER]).toBe(6);
+    expect(sim.world.progress.bonds[bondKey(VILLAGER, 1)]).toBeUndefined();
   });
 
   it('un dialogue ajouté par un seul fichier, conditionné à l’amitié, joué une fois par joueur', () => {
@@ -98,7 +101,7 @@ describe('dialogues', () => {
         id: 'confidence',
         villager: VILLAGER,
         priority: 10,
-        when: [{ type: 'remembered', key: heartKey(VILLAGER, 1) }],
+        when: [{ type: 'bond_at_least', villager: VILLAGER, points: 100 }],
         once: 'player',
         start: 'aveu',
         nodes: {
@@ -114,7 +117,7 @@ describe('dialogues', () => {
     });
     expect(validateDialogueTexts(custom)).toEqual([]);
     const sim = newSim(custom);
-    sim.world.progress.bonds[VILLAGER] = 90;
+    sim.world.progress.bonds[bondKey(VILLAGER, 0)] = 90;
     openTalk(sim, 0);
     expect(sim.world.players[0].talk?.dialogue).toBe('accueil');
     act(sim, 0, { type: 'talk_close' });
@@ -122,12 +125,15 @@ describe('dialogues', () => {
     openTalk(sim, 0);
     expect(sim.world.players[0].talk?.dialogue).toBe('accueil');
     // Le premier cœur vient d'être atteint au bonjour du jour 2: la confidence passe au suivant.
-    expect(sim.world.progress.memory[heartKey(VILLAGER, 1)]?.v).toBe(true);
+    expect(sim.world.progress.memory[heartKey(VILLAGER, 1, 0)]?.v).toBe(true);
     act(sim, 0, { type: 'talk_close' });
     openTalk(sim, 0);
     const view = talkView(custom, sim.world, 0);
     expect(view?.node).toBe('aveu');
-    expect(resolveAgreement(view?.text ?? '', 'f', ['f', 'm'])).toBe(
+    // Le texte arrive déjà accordé au genre choisi dans l'éditeur.
+    expect(view?.text).toBe('Te voilà revenu. Je peux te dire un secret ?');
+    sim.world.players[0].gender = 'f';
+    expect(talkView(custom, sim.world, 0)?.text).toBe(
       'Te voilà revenue. Je peux te dire un secret ?',
     );
     act(sim, 0, { type: 'talk_next' });
@@ -151,6 +157,22 @@ describe('accords de genre', () => {
     expect(checkAgreementTags('Te voilà [[|prêt]] !')).toHaveLength(1);
     expect(checkAgreementTags('Tu es arrivé bien tard.')[0]).toMatch(/hors balise/);
     expect(checkAgreementTags('Tu es là ? Quelle mine !')).toEqual([]);
+  });
+
+  it('le chargement refuse une balise incomplète et une condition d’amitié sur un habitant inconnu', () => {
+    expect(() =>
+      contentWith((files) => {
+        const accueil = files['lieux/essai-gare/dialogues/accueil.json'] as {
+          nodes: Record<string, { text?: string }>;
+          when: unknown[];
+        };
+        const bonjour = accueil.nodes.bonjour;
+        if (bonjour !== undefined) bonjour.text = 'Te voilà [[prête !';
+        accueil.when.push({ type: 'bond_at_least', villager: 'personne', points: 100 });
+      }),
+    ).toThrow(
+      /balise d’accord incomplète[^]*habitant inconnu « personne »|habitant inconnu « personne »[^]*balise d’accord incomplète/,
+    );
   });
 
   it('les dialogues du jeu passent le validateur, avec moins d’une réplique sur dix balisée', () => {

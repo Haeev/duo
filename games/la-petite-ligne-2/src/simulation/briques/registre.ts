@@ -7,6 +7,8 @@
  * `asseoir.ts` sans geste, `ramasser.ts` avec geste, `ranger.ts` avec intentions), une ligne ici,
  * un test dans `tests/`. Contrat: `types.ts`.
  */
+import { NEEDS_BRICKS } from '../besoins/briques';
+import { BAG_BRICKS } from '../sac/briques';
 import { sitBehaviour } from './asseoir';
 import { sleepBehaviour } from './dormir';
 import { talkBehaviour } from './parler';
@@ -34,6 +36,8 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   sit: sitBehaviour,
   sleep: sleepBehaviour,
   store: storeBehaviour,
+  ...NEEDS_BRICKS,
+  ...BAG_BRICKS,
 };
 
 /** Actions sur ce qui n'est pas un meuble: un objet au sol (`pickup`), un habitant (`talk`). */

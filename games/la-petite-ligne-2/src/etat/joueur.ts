@@ -4,7 +4,7 @@
  */
 import * as v from 'valibot';
 import {
-  CountSchema,
+  CentsSchema,
   FiniteSchema,
   GaugeSchema,
   IdSchema,
@@ -71,8 +71,8 @@ const slow = {
    * `null` tant que le personnage n'est pas créé.
    */
   gender: v.nullable(GenderSchema),
-  /** Bourse du joueur, en euros entiers (réponse 10: chacun la sienne). */
-  money: CountSchema,
+  /** Bourse du joueur, en centimes d'euro (réponse 10: chacun la sienne). */
+  money: CentsSchema,
   /** La barre: toujours là, même sans sac. */
   toolbar: SlotsSchema,
   /** Sac possédé (`sacs.json`) et ses cases; `null`: pas encore de sac. */

@@ -17,4 +17,6 @@
   // Outil: { "kind": "axe", "durability": 0, "gestureSeconds": 1, "bluntGestureSeconds": 1 }
   // (durability 0 = outil de base, inusable), avec "family": "tool" et "stack": 1. Sinon: null.
   "tool": null,
+  // Repas spécial à deux (pile de 1, servi à table): ajouter "meal": { "perk": "no_tool_wear" }
+  // (extra_catch, no_tool_wear, better_prices, night_rare_glow). Plat ordinaire: ne rien mettre.
 }

@@ -11,7 +11,6 @@ import { findProp, footprintOf, type PropInstance } from '../noyau/obstacles';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { sleepThroughNight } from './dormir';
 import { gestureOf, gestureTicks } from './geste';
-import { endTalk } from './parler';
 import { postureOf } from './postures';
 import { storePut, storeTake } from './ranger';
 import { BRICK_BEHAVIOURS, ENTITY_BEHAVIOURS } from './registre';
@@ -83,7 +82,10 @@ function perform(
     const behaviour =
       found === null ? undefined : behaviourOf(BRICK_BEHAVIOURS, found.target.params.brick);
     if (found !== null && behaviour !== undefined) {
-      refusal = behaviour.refuse(sim, player, found.target);
+      refusal =
+        clip !== null && behaviour.recheckAtEnd === false
+          ? null
+          : behaviour.refuse(sim, player, found.target);
       const place = sim.world.places[sim.world.common.place];
       // L'état des briques du meuble, modifiable: créé s'il manquait (meuble sans mémoire).
       const states = place === undefined ? {} : (place.objects[id] ??= {});
@@ -128,7 +130,7 @@ function begin(
     return;
   }
   const until = sim.world.tick + gestureTicks(sim.content, spec);
-  actor.gesture = { clip: spec.clip, target: id, until, long: false };
+  actor.gesture = { clip: spec.clip, target: id, until, long: spec.long === true };
   pendingOf(sim.world)[player] = { kind, id, action, clip: spec.clip };
   sim.touch('players');
   sim.emit({ type: 'gesture_started', player, clip: spec.clip, target: id });
@@ -172,25 +174,6 @@ function finishGestures(sim: SimContext): void {
   }
 }
 
-/** Assis, le sommeil remonte doucement (sieste). */
-function restSeated(sim: SimContext): void {
-  const { world, content } = sim;
-  const placeContent = content.places[world.common.place];
-  const place = world.places[world.common.place];
-  if (placeContent === undefined || place === undefined) return;
-  for (const player of PLAYERS) {
-    const posture = postureOf(place, player);
-    if (posture?.kind !== 'sit') continue;
-    const prop = findProp(placeContent, place, posture.object);
-    const bricks = prop === null ? undefined : content.props[prop.type]?.bricks;
-    for (const brick of bricks ?? []) {
-      if (brick.brick !== 'sit') continue;
-      const needs = world.players[player].needs;
-      needs.sleep = Math.min(100, needs.sleep + (brick.restPerMinute * sim.dt) / 60);
-    }
-  }
-}
-
 /** Écrit la cible de chaque joueur dans l'état, quand elle change. */
 function updateAims(sim: SimContext): void {
   for (const player of PLAYERS) {
@@ -228,15 +211,10 @@ export const brickSystem: GameSystem = {
     } else if (intent.type === 'store_take') {
       const slots = storeInReach(sim, player, intent.target);
       if (slots !== null) storeTake(sim, player, intent.target, slots, intent.index);
-    } else if (intent.type === 'talk_close') {
-      // En attendant le système de dialogues du lot L3, qui reprendra la fermeture à son compte
-      // (`endTalk` est sans effet si le dialogue est déjà fermé).
-      endTalk(sim, player);
     }
   },
   step(sim) {
     finishGestures(sim);
-    restSeated(sim);
     sleepThroughNight(sim);
     updateAims(sim);
   },

@@ -3,7 +3,7 @@
   "start": {
     "place": "essai-gare",
     "minute": 600,
-    "money": 20,
+    "money": 2000,
     "shapes": {
       "f": "adult-f-medium",
       "m": "adult-m-medium"

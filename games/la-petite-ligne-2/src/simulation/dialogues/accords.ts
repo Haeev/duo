@@ -10,7 +10,24 @@
  * incomplète et signale un accord au joueur écrit hors balise.
  */
 
-export type Gender = 'f' | 'm';
+import type { Gender } from '../../donnees/schemas/personnage';
+import type { PlayerIndex } from '../../donnees/schemas/communs';
+import type { ReadonlyWorld } from '../../etat/monde';
+
+export type { Gender };
+
+/**
+ * Genre d'un joueur pour les accords. Avant l'éditeur de personnage (`gender` nul), le masculin
+ * grammatical sert de forme par défaut; l'éditeur impose le choix avant la première réplique.
+ */
+export function genderOf(world: ReadonlyWorld, player: PlayerIndex): Gender {
+  return world.players[player].gender ?? 'm';
+}
+
+/** Texte d'une réplique accordé pour ce joueur, d'après les genres choisis dans l'éditeur. */
+export function agreeFor(world: ReadonlyWorld, player: PlayerIndex, text: string): string {
+  return resolveAgreement(text, genderOf(world, player), [genderOf(world, 0), genderOf(world, 1)]);
+}
 
 const TAG = /\[\[(duo:)?([^[\]|]*)\|([^[\]|]*)\]\]/g;
 
