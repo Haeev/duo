@@ -23,7 +23,15 @@ import { fill, TEXTS } from './textes';
 const NEED_ICONS = { hunger: 'bol', sleep: 'lune', hygiene: 'goutte' } as const;
 
 /** Projection d'un point du monde (m) vers l'écran (px CSS), `null` hors champ. */
-export type ProjectToScreen = (x: number, y: number) => { x: number; y: number } | null;
+/** Hauteurs (m) où s'accrochent la bulle d'action et le jeton de l'autre joueur. */
+const PROMPT_HEIGHT = 1.1;
+const TOKEN_HEIGHT = 2.2;
+
+export type ProjectToScreen = (
+  x: number,
+  y: number,
+  height?: number,
+) => { x: number; y: number } | null;
 
 export interface HudFrame {
   readonly now: number;
@@ -76,7 +84,11 @@ export function createHud(
   });
 
   // Barre d'outils.
-  const toolbar = el('div', { class: 'toolbar', role: 'toolbar', 'aria-label': TEXTS.toolbar.label });
+  const toolbar = el('div', {
+    class: 'toolbar',
+    role: 'toolbar',
+    'aria-label': TEXTS.toolbar.label,
+  });
   let toolbarDrawn = '';
 
   // Bulle d'action, sous elle la raison d'un refus.
@@ -89,7 +101,10 @@ export function createHud(
   // Avis (haut droite, un seul à la fois) et coup d'œil.
   const noticeText = el('span');
   const noticeIcon = el('span', { class: 'notice__ic' });
-  const notice = el('div', { class: 'notice', role: 'status', 'aria-live': 'polite' }, [noticeIcon, noticeText]);
+  const notice = el('div', { class: 'notice', role: 'status', 'aria-live': 'polite' }, [
+    noticeIcon,
+    noticeText,
+  ]);
   notice.hidden = true;
   const otherToken = el('div', { class: 'glance-other' }, [
     el('span', { class: 'token token--other' }),
@@ -124,9 +139,12 @@ export function createHud(
       slot.append(el('span', { class: 'slot__key', text: keyLabel(`Digit${index + 1}`) }));
       if (model !== null) {
         slot.insertAdjacentHTML('beforeend', itemThumb(model.item, model.name));
-        if (model.limit > 1) slot.append(el('span', { class: 'slot__n pastille', text: String(model.count) }));
+        if (model.limit > 1)
+          slot.append(el('span', { class: 'slot__n pastille', text: String(model.count) }));
         if (model.wear !== null) {
-          const arc = el('span', { class: `wear${model.wear < 0.25 ? ' wear--low' : ''}` }, [el('i')]);
+          const arc = el('span', { class: `wear${model.wear < 0.25 ? ' wear--low' : ''}` }, [
+            el('i'),
+          ]);
           const bar = arc.firstElementChild;
           if (bar instanceof HTMLElement) bar.style.width = `${Math.round(model.wear * 100)}%`;
           slot.append(arc);
@@ -146,7 +164,11 @@ export function createHud(
       toggle(clock, 'hud-clock--night', c.night);
       show(bed, c.canSleep);
       sun.style.transform = `rotate(${Math.round(-70 + 140 * c.arc)}deg)`;
-      setAttr(clock, 'aria-label', fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money }));
+      setAttr(
+        clock,
+        'aria-label',
+        fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money }),
+      );
       show(gain, now < gainUntil);
 
       const glancing = glance.active(now);
@@ -179,11 +201,16 @@ export function createHud(
         setText(promptKey, model?.key ?? keyLabel('Space'));
         setText(promptVerb, model?.verb ?? '');
         show(promptVerb, model !== null);
-        const why = refusing ? refusalText : (model?.refusal ?? (model?.kind === 'board' ? model.waiting : null));
+        const why = refusing
+          ? refusalText
+          : (model?.refusal ?? (model?.kind === 'board' ? model.waiting : null));
         setText(promptWhy, why ?? '');
         show(promptWhy, why !== null && why !== '');
         toggle(prompt, 'prompt--no', model?.refusal !== null && model?.refusal !== undefined);
-        const at = model?.kind === 'act' && project !== undefined ? project(model.x, model.y) : null;
+        const at =
+          model?.kind === 'act' && project !== undefined
+            ? project(model.x, model.y, PROMPT_HEIGHT)
+            : null;
         toggle(prompt, 'prompt--anchored', at !== null);
         if (at !== null) {
           prompt.style.left = `${Math.round(at.x)}px`;
@@ -200,10 +227,13 @@ export function createHud(
       if (glancing) {
         const other = world.players[local === 0 ? 1 : 0];
         const dir = otherDirection(me.body, other.body, yaw);
-        const projected = project?.(other.body.x, other.body.y) ?? null;
+        const projected = project?.(other.body.x, other.body.y, TOKEN_HEIGHT) ?? null;
         const label = otherToken.lastElementChild;
         if (label !== null)
-          setText(label, fill(TEXTS.glance.other, { nom: other.name, n: Math.round(dir.distance) }));
+          setText(
+            label,
+            fill(TEXTS.glance.other, { nom: other.name, n: Math.round(dir.distance) }),
+          );
         if (projected !== null) {
           otherToken.style.left = `${Math.round(projected.x)}px`;
           otherToken.style.top = `${Math.round(projected.y)}px`;
@@ -215,7 +245,8 @@ export function createHud(
           otherToken.style.top = `${Math.round(h / 2 - Math.cos(dir.angle) * (h / 2 - 70))}px`;
         }
         const bar = timer.firstElementChild;
-        if (bar instanceof HTMLElement) bar.style.transform = `scaleX(${glance.left(now).toFixed(3)})`;
+        if (bar instanceof HTMLElement)
+          bar.style.transform = `scaleX(${glance.left(now).toFixed(3)})`;
       }
     },
     glance(now) {

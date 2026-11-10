@@ -17,6 +17,7 @@ import {
   SRGBColorSpace,
   Scene,
   type ToneMapping,
+  Vector3,
   WebGLRenderer,
 } from 'three';
 import type { GameView } from '../session';
@@ -106,6 +107,12 @@ export interface GameRenderer {
    * résultat se donne tel quel à `StepInput.moveX` et `moveY`.
    */
   moveToWorld(right: number, up: number): { x: number; y: number };
+  /**
+   * Position du monde (x vers l'est, y vers le sud, `height` en mètres au-dessus du sol) vers les
+   * pixels CSS de la fenêtre, pour accrocher l'interface à un objet. `null` hors du champ. Valable
+   * après `frame`. Le résultat est réutilisé d'un appel à l'autre: à lire tout de suite.
+   */
+  projectToScreen(x: number, y: number, height?: number): { x: number; y: number } | null;
   /** Cadrage imposé (démonstration, captures): lacet en degrés, largeur de vue en mètres. */
   setCamera(yawDeg: number, width: number): void;
   graphics(): GraphicsOptions;
@@ -175,6 +182,8 @@ class Engine implements GameRenderer {
   /** Objets réutilisés d'une image à l'autre: aucune allocation dans `frame`. */
   private readonly input: Mutable<CameraInput> = { turn: 0, zoom: 0, dragPixels: 0, wheel: 0 };
   private readonly target = { x: 0, y: 0, speed: 0, facing: 0 };
+  private readonly projected = new Vector3();
+  private readonly screenPoint = { x: 0, y: 0 };
   private readonly resolveAim = (id: string): Aimable | null =>
     this.place?.aimable(id) ?? this.characters.aimable(id);
   private frameMs = 0;
@@ -417,6 +426,18 @@ class Engine implements GameRenderer {
 
   cameraYaw(): number {
     return this.rig.yawAngle();
+  }
+
+  projectToScreen(x: number, y: number, height = 0): { x: number; y: number } | null {
+    const point = this.projected.set(x, height, y);
+    this.camera.updateMatrixWorld();
+    point.project(this.camera);
+    if (Math.abs(point.x) > 1 || Math.abs(point.y) > 1 || point.z > 1) return null;
+    const canvas = this.options.canvas;
+    const rect = canvas.getBoundingClientRect();
+    this.screenPoint.x = rect.left + ((point.x + 1) / 2) * rect.width;
+    this.screenPoint.y = rect.top + ((1 - point.y) / 2) * rect.height;
+    return this.screenPoint;
   }
 
   moveToWorld(right: number, up: number): { x: number; y: number } {
