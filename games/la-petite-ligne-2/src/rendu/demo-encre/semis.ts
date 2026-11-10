@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import { lean, TONE } from './decor';
 import { at, GLOW, hex, LAYER, Sculpt } from './formes';
 import { outside, pathDistance, type HeightAt, type Rect } from './terrain';
-import type { GroundPlan } from './textures';
+import type { GroundPlan } from '../encre/textures';
 
 /**
  * Natures de sol: herbe du pré, terre du chemin, bord du chemin, ballast, fond du fossé, et

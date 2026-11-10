@@ -9,7 +9,7 @@
  */
 import * as THREE from 'three';
 
-import type { GroundPlan } from './textures';
+import type { GroundPlan } from '../encre/textures';
 
 export interface Rect {
   readonly x0: number;

@@ -131,3 +131,66 @@ Versions économes prêtes ou à une ligne, si la mesure sur le PC déçoit:
 4. **Trait de machine**: épaisseur variable mais ni pleins ni déliés selon la courbure.
 5. **Aube**: la brume demande des nappes en volume (cartes posées au sol) plutôt qu'un voile dans le nuanceur.
 6. **Clip de repos**: une seule pose dans les fichiers actuels; la vie vient des gestes posés par code.
+
+## Portage dans le vrai jeu (tranche 1, 2026-11-10, ADR 0023)
+
+Module `games/la-petite-ligne-2/src/rendu/encre/` (README sur place). Le style encré est le rendu par défaut du jeu; `?rendu=aplats` rend l'ancien. Captures du vrai jeu au banc à deux vues, 1366 x 768, sans retouche: `captures/jeu-encre-*.png`; montages côte à côte avec les références de l'essai: `captures/jeu-encre-compare-*.png`.
+
+### Ce qui est porté
+
+| De la liste « à porter » | État |
+| --- | --- |
+| 1. Deux sorties et passe d'encrage | fait (`contour.ts`), trait de l'essai (1,55 point, épaissi au zoom serré) |
+| 2. Numéros et classes de taille | fait à la fabrication des tuiles (`GeometryBuilder`) et par conversion automatique des modèles (`conversion.ts`); pas dans les GLB eux-mêmes |
+| 3. Nuanceur de volumes unique | fait (`InkMaterial`): sol, décor, semis, modèles, personnages actuels; variante atlas prête, non branchée |
+| 4. Terrain en données | non fait: le sol du jeu est plat (voir plus bas) |
+| 5. Ambiances en données, interpolées | fait (`ambiances.json`): aube, midi clair, fin d'après-midi dense, crépuscule, nuit; dedans; météo; lieu clos |
+| 6. Ombres | fait: soleil cadré sur la vue, lampe la plus proche du joueur local, contact |
+| 7. Gabarits de contenu | ambiances, lampes par famille de modèle, matériaux de bâtiment par nom, semis par surface: en données; essences et bâtiments de l'essai non repris |
+| 8. Caméra | fait: 50 degrés à 18 m et plus, 35 degrés à 6 m, zoom de jeu 18 m |
+| 9. Mesure sur l'UHD 620 | non faite (rendu logiciel ici) |
+| 10. Gestes par-dessus les clips | appliqué à la pose assise (`personnages/assise.ts`) |
+
+En plus: sol sans grille (carte du sol lue en un point qui ondule, bords droits pour les sols posés par l'homme), plancher et murs coupés des pièces, bâtiments livrés d'Aubrune posés à leur place avec leurs fenêtres éclairées, semis de cailloux et de touffes en volumes, sols déclarés des petits lieux, ambiance du wagon lue dans `lieu.json`, pose assise par cinématique inverse.
+
+### Mesures (zoom de jeu, toutes passes)
+
+| Vue | Appels | Triangles | Programmes |
+| --- | --- | --- | --- |
+| Quai d'Aubrune, 17 h, hôte | 111 | 227 324 | 11 |
+| Quai d'Aubrune, 17 h, invité | 113 | 228 268 | 12 |
+| Quai d'Aubrune, 22 h, hôte | 105 | 220 046 | 11 |
+| Quai d'Aubrune, 22 h, invité | 104 | 220 336 | 12 |
+| La halte, 17 h | 115 | 247 369 | 11 |
+| Gare d'essai | 44 | 60 723 | 9 |
+| Wagon du train de nuit | 93 | 59 233 | 10 |
+| Trajet en train | 21 | 53 869 | 10 |
+
+Budgets (350 000 triangles, 200 appels, 14 programmes): tenus partout. Mémoire ajoutée par l'encre: 46 Mo (budget 64). Aller et retour gare, halte, gare, deux fois: textures 17, 15, 17, 17 et programmes 10, 10, 10 (reviennent à l'identique); géométries 38, 34, 34, 36 (elles comptent aussi les personnages présents selon l'heure: pas de croissance, mais pas une preuve nette).
+
+### Notes franches, vue par vue (contre les références validées)
+
+| Capture | Note | Écarts avec l'essai, un par un |
+| --- | --- | --- |
+| `jeu-encre-halte-nuit` | 7,5 | fenêtres éclairées et croisillons au sol, ombres de lune, lucioles: le langage de l'étalon y est; manquent la lanterne et sa flaque sur la façade, les masses de feuillage, la clôture, le chemin de terre caillouteux en relief; personnages de l'ancien catalogue |
+| `jeu-encre-halte-jour` | 7,5 | pierre à pierre, volets, vitres, toits de tuile, ombres prune hachurées; sol dallé dessiné à plat (l'essai posait ses dalles en volume), aucun relief de terrain, pas d'arbres en festons |
+| `jeu-encre-quai-jour-hote`, `-invite` | 6,5 | trait, tons, ombres, ballast en cailloux; quai nu: dalles à plat, pas de bordure en marche travaillée, pas de mobilier de quai ni de végétation |
+| `jeu-encre-quai-nuit-hote`, `-invite` | 6 | nuit lisible, brume, lucioles; aucune lampe sur le quai dans les données: pas de foyer de lumière |
+| `jeu-encre-place-bourg`, `-nuit` | 6,5 | pompe, banc, chemin au bord sinueux, semis; un bâtiment entre la caméra et le joueur s'efface en entier et ne laisse que son ombre |
+| `jeu-encre-interieur` | 6,5 | plancher lame par lame, murs coupés avec épaisseur et soubassement, meubles encrés; pas de fenêtres ni de soleil qui entre, pas de jardin autour (les pièces sont hors de la carte), peu d'objets posés |
+| `jeu-encre-wagon` | 7 | lampes chaudes, plancher et tapis encrés, parois coupées; les deux joueurs ne sont pas assis sur la capture (« place prise » dans cette sauvegarde) |
+| `jeu-encre-trajet` | 6,5 | train et diorama encrés, ombres hachurées; herbe des collines étirée, formes provisoires |
+| `jeu-encre-gare-essai` | 6 | lieu d'essai en formes provisoires: le style s'applique, le contenu reste un prototype |
+| `jeu-encre-assis` | 8 | bassin sur l'assise, cuisses à l'horizontale, genoux au bord, pieds à plat, dos au dossier, entre les accoudoirs; deux gabarits seulement (ceux du catalogue actuel) |
+
+Seuil de 9 non atteint. Ce qui sépare encore le vrai jeu de l'essai n'est plus le nuanceur mais la géométrie et les personnages.
+
+### Ce qui reste, par ordre d'effet à l'écran
+
+1. **Relief du terrain et dalles en volume** (règle « éviter le plat absolu »): le sol du jeu est un plan; chemin creusé, talus, fossé, dalles désaffleurées demandent une hauteur de terrain partagée avec la simulation (point 4 de la liste) et les générateurs de l'essai (`terrain.ts`, `decor.ts`) branchés sur le plan.
+2. **Végétation en festons**: les arbres du jeu sont des modèles et des boules; reprendre `vegetation.ts` (essences en données) pour les arbres semés par tuile.
+3. **Personnages de l'essai 4**: corps riggés, tenues en fiches, atlas de traits; la variante `ATLAS` du matériau les attend. Les personnages actuels sont encrés (aplats, ombre relevée, hachures de près, contour) mais restent d'un modelé lisse d'un autre style.
+4. **Lampes et mobilier du quai, clôtures, cailloux de chemin modelés**: contenu à poser dans les données du lieu.
+5. **Effacement des bâtiments livrés**: aujourd'hui le bâtiment entier s'efface; il faut couper le toit et garder les murs (deux plages d'index par bâtiment).
+6. **Fenêtres et soleil dans les pièces**, jardin visible autour: les pièces vivent hors de la carte.
+7. **Mesure sur l'UHD 620**: images par seconde et temps de compilation des programmes à l'arrivée dans un lieu.

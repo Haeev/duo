@@ -19,6 +19,8 @@ import {
   SphereGeometry,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { inkTag } from '../encre/conversion';
+import { LAYER } from '../encre/couches';
 import { TRIP_SETTINGS, type TripSettings } from './reglages';
 import { doorX, type TripFrame } from './sequence';
 
@@ -289,15 +291,22 @@ export class TripScene {
   constructor(
     material: Material,
     private readonly settings: TripSettings = TRIP_SETTINGS,
+    /** Rendu encré (ADR 0023): les géométries reçoivent leurs morceaux et leurs couches de traits. */
+    inked = false,
   ) {
     this.root.name = 'trajet';
-    this.world = new Mesh(sceneryGeometry(settings), material);
+    const tag = (geometry: BufferGeometry, layer?: number): BufferGeometry =>
+      inked ? inkTag(geometry, layer === undefined ? {} : { layer }) : geometry;
+    this.world = new Mesh(tag(sceneryGeometry(settings)), material);
     this.world.castShadow = true;
     this.world.receiveShadow = true;
-    this.train = new Mesh(trainGeometry(settings), material);
+    this.train = new Mesh(tag(trainGeometry(settings)), material);
     this.train.castShadow = true;
     this.train.receiveShadow = true;
-    this.puffGeometry = paint(new SphereGeometry(1, 10, 8), settings.colors.smoke);
+    this.puffGeometry = tag(
+      paint(new SphereGeometry(1, 10, 8), settings.colors.smoke),
+      LAYER.plain,
+    );
     for (let i = 0; i < settings.smoke.puffs; i += 1) {
       const puff = new Mesh(this.puffGeometry, material);
       puff.visible = false;

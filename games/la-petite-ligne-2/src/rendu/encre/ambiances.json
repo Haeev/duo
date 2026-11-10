@@ -1,0 +1,296 @@
+{
+  "format": "duo-ambiances/1",
+  "stops": [
+    {
+      "minute": 0,
+      "key": "nuit"
+    },
+    {
+      "minute": 300,
+      "key": "nuit"
+    },
+    {
+      "minute": 390,
+      "key": "aube"
+    },
+    {
+      "minute": 660,
+      "key": "midi"
+    },
+    {
+      "minute": 840,
+      "key": "midi"
+    },
+    {
+      "minute": 1020,
+      "key": "apres-midi"
+    },
+    {
+      "minute": 1150,
+      "key": "crepuscule"
+    },
+    {
+      "minute": 1260,
+      "key": "nuit"
+    }
+  ],
+  "sheets": {
+    "defaut": {
+      "pourquoi": "Fiche de tous les lieux sans fiche propre. Décision du client (2026-11-10): jour clair au milieu de la journée, jour dense (ombres prune, noirs pleins) en fin d'après-midi, passage continu de l'un à l'autre; nuit bleue aux lampes chaudes.",
+      "dehors": {
+        "midi": {
+          "lit": [1.03, 1.0, 0.94],
+          "half": [0.86, 0.82, 0.8],
+          "shade": [0.6, 0.57, 0.66],
+          "ink": "#231A17",
+          "hatchOwn": 0.85,
+          "hatchCast": 0.3,
+          "blackFill": 0.0,
+          "relief": 1.3,
+          "grime": 0.85,
+          "characterLift": 0.8,
+          "characterRim": 0.9,
+          "lamps": 0,
+          "lampColor": [0, 0, 0],
+          "windowGlow": "#3F5A59",
+          "windowAmount": 0,
+          "spill": 0,
+          "glint": "#CFE0DC",
+          "glintAmount": 0.8,
+          "mist": 0,
+          "mistTop": 1.2,
+          "mistColor": "#C9D2D6",
+          "wind": 1,
+          "windAzimuth": 80,
+          "particles": "poussiere",
+          "vignetteColor": "#4A3A2E",
+          "vignette": 0.3,
+          "vignetteStart": 0.5,
+          "tint": [1.0, 0.985, 0.95],
+          "saturation": 1,
+          "contrast": 1,
+          "background": "#231A17",
+          "sunShadow": 1
+        },
+        "apres-midi": {
+          "lit": [0.97, 0.9, 0.77],
+          "half": [0.65, 0.57, 0.56],
+          "shade": [0.45, 0.35, 0.56],
+          "hatchOwn": 1,
+          "hatchCast": 0.45,
+          "blackFill": 0.62,
+          "grime": 1,
+          "vignetteColor": "#16110F",
+          "vignette": 0.86,
+          "vignetteStart": 0.3,
+          "tint": [1, 0.95, 0.86],
+          "saturation": 0.86,
+          "contrast": 1.1
+        },
+        "crepuscule": {
+          "lit": [1.06, 0.84, 0.6],
+          "half": [0.82, 0.6, 0.56],
+          "shade": [0.5, 0.38, 0.52],
+          "ink": "#1F1620",
+          "hatchCast": 0.28,
+          "blackFill": 0.35,
+          "lamps": 0.7,
+          "lampColor": [0.5, 0.36, 0.1],
+          "windowGlow": "#FFC46B",
+          "windowAmount": 1,
+          "spill": 0.8,
+          "glintAmount": 0,
+          "mist": 0.45,
+          "mistTop": 0.9,
+          "mistColor": "#8E6F86",
+          "wind": 0.7,
+          "particles": "lucioles",
+          "vignetteColor": "#1E1426",
+          "vignette": 0.72,
+          "vignetteStart": 0.34,
+          "tint": [1, 0.95, 0.93],
+          "saturation": 1,
+          "contrast": 1
+        },
+        "nuit": {
+          "lit": [0.4, 0.49, 0.72],
+          "half": [0.3, 0.37, 0.6],
+          "shade": [0.17, 0.21, 0.4],
+          "ink": "#0E1220",
+          "hatchCast": 0.6,
+          "blackFill": 0.6,
+          "lamps": 1,
+          "lampColor": [0.72, 0.5, 0.16],
+          "windowGlow": "#FFC46B",
+          "windowAmount": 1,
+          "spill": 1,
+          "glintAmount": 0,
+          "mist": 0.8,
+          "mistTop": 1.1,
+          "mistColor": "#3B4A78",
+          "wind": 0.5,
+          "particles": "lucioles",
+          "vignetteColor": "#070A14",
+          "vignette": 0.9,
+          "vignetteStart": 0.28,
+          "tint": [0.96, 0.98, 1.04],
+          "saturation": 1,
+          "contrast": 1,
+          "background": "#0E1220"
+        },
+        "aube": {
+          "lit": [1, 0.88, 0.8],
+          "half": [0.74, 0.7, 0.76],
+          "shade": [0.46, 0.46, 0.62],
+          "ink": "#1A1A26",
+          "hatchCast": 0.5,
+          "blackFill": 0.3,
+          "lamps": 0.45,
+          "lampColor": [0.42, 0.3, 0.1],
+          "windowGlow": "#FFC46B",
+          "windowAmount": 1,
+          "spill": 0.5,
+          "glintAmount": 0,
+          "mist": 0.5,
+          "mistTop": 1.5,
+          "mistColor": "#C4C2CE",
+          "wind": 0.4,
+          "particles": "aucune",
+          "vignetteColor": "#1B1B2A",
+          "vignette": 0.7,
+          "vignetteStart": 0.34,
+          "tint": [0.98, 0.96, 1],
+          "saturation": 0.9,
+          "contrast": 1
+        }
+      },
+      "dedans": {
+        "midi": {
+          "sun": [205, 31],
+          "sunShadow": 0,
+          "lit": [1.14, 1.08, 0.94],
+          "half": [0.99, 0.93, 0.85],
+          "shade": [0.9, 0.83, 0.78],
+          "hatchOwn": 0.8,
+          "hatchCast": 0,
+          "lamps": 0.3,
+          "lampColor": [0.3, 0.22, 0.08],
+          "windowGlow": "#E4F0EC",
+          "windowAmount": 1,
+          "glintAmount": 0,
+          "mist": 0,
+          "wind": 0,
+          "particles": "poussiere",
+          "blackFill": 0.2,
+          "vignette": 0.78,
+          "vignetteStart": 0.36,
+          "tint": [1.0, 0.97, 0.92]
+        },
+        "apres-midi": {
+          "sun": [205, 31],
+          "sunShadow": 0,
+          "lit": [1.07, 0.97, 0.77],
+          "half": [0.75, 0.65, 0.6],
+          "shade": [0.52, 0.44, 0.5],
+          "hatchOwn": 1,
+          "hatchCast": 0,
+          "lamps": 0.6,
+          "lampColor": [0.42, 0.3, 0.1],
+          "windowGlow": "#E4F0EC",
+          "windowAmount": 1,
+          "glintAmount": 0,
+          "mist": 0,
+          "wind": 0,
+          "particles": "poussiere"
+        },
+        "crepuscule": {
+          "sun": [205, 34],
+          "sunShadow": 0,
+          "hatchCast": 0,
+          "lamps": 0.9,
+          "lampColor": [0.62, 0.44, 0.15],
+          "windowGlow": "#C98A6B",
+          "spill": 0,
+          "mist": 0,
+          "wind": 0,
+          "particles": "aucune"
+        },
+        "nuit": {
+          "sun": [205, 38],
+          "sunShadow": 0,
+          "lit": [0.42, 0.5, 0.74],
+          "half": [0.34, 0.36, 0.56],
+          "shade": [0.27, 0.25, 0.42],
+          "hatchCast": 0,
+          "blackFill": 0.7,
+          "lampColor": [0.78, 0.56, 0.2],
+          "windowGlow": "#2E3A5C",
+          "windowAmount": 0,
+          "glint": "#8E7A52",
+          "glintAmount": 0.55,
+          "spill": 0,
+          "mist": 0,
+          "wind": 0,
+          "particles": "aucune",
+          "vignette": 0.92,
+          "vignetteStart": 0.3,
+          "tint": [1, 0.97, 0.94]
+        },
+        "aube": {
+          "sun": [205, 31],
+          "sunShadow": 0,
+          "hatchCast": 0,
+          "lamps": 0.7,
+          "spill": 0,
+          "mist": 0,
+          "wind": 0
+        }
+      }
+    }
+  },
+  "weather": {
+    "overcast": {
+      "scale": {
+        "saturation": 0.86,
+        "hatchCast": 0.4,
+        "glintAmount": 0.4,
+        "sunShadow": 0.6
+      }
+    },
+    "rain": {
+      "scale": {
+        "saturation": 0.8,
+        "hatchCast": 0.3,
+        "glintAmount": 0,
+        "wind": 1.4,
+        "sunShadow": 0.4
+      }
+    },
+    "storm": {
+      "scale": {
+        "saturation": 0.74,
+        "hatchCast": 0.2,
+        "glintAmount": 0,
+        "wind": 2,
+        "sunShadow": 0.3
+      }
+    },
+    "mist": {
+      "scale": {
+        "saturation": 0.88,
+        "hatchCast": 0.4,
+        "sunShadow": 0.6
+      },
+      "atLeast": {
+        "mist": 0.7,
+        "mistTop": 1.6
+      }
+    },
+    "snow": {
+      "scale": {
+        "saturation": 0.86,
+        "hatchCast": 0.6
+      }
+    }
+  }
+}

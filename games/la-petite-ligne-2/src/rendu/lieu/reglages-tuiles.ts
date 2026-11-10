@@ -90,8 +90,11 @@ export const TILE_SETTINGS = {
     shoreCells: 1,
   },
   rail: {
-    /** Classes d'arêtes du graphe qui suivent une voie ferrée. */
-    kinds: ['voie', 'interieur'],
+    /**
+     * Classes d'arêtes du graphe qui suivent une voie ferrée, pour une carte sans `rails` (les
+     * arêtes `interieur` sont les trajets des habitants dans les pièces: jamais des rails).
+     */
+    kinds: ['voie'],
     halfGauge: 0.72,
     railWidth: 0.08,
     railHeight: 0.14,
@@ -145,6 +148,47 @@ export const TILE_SETTINGS = {
     /** Plateforme sans mur (le quai): dalle basse. */
     platformHeight: 0.12,
     platformEdgeColor: '#ece6d6',
+  },
+  /**
+   * Semis de petits volumes (rendu encré, ADR 0023): cailloux du ballast et des chemins, touffes
+   * du pré. Densités par case de 1 m selon la surface, tailles en mètres, teintes (une par
+   * tirage). Tout est instancié: un appel par tuile et par forme.
+   */
+  semis: {
+    pebbles: { gravier: 1.3, terre: 0.16, herbe: 0.02, sable: 0.3 } as Readonly<
+      Partial<Record<SurfaceKind, number>>
+    >,
+    tufts: { herbe: 0.5 } as Readonly<Partial<Record<SurfaceKind, number>>>,
+    pebbleSize: [0.05, 0.15] as const,
+    pebbleColors: {
+      gravier: ['#cfc6b4', '#b6a890', '#a49882'],
+      terre: ['#d9c79f', '#bfa67c'],
+      herbe: ['#c9c2ae', '#a9a08c'],
+      sable: ['#e2d5b0', '#c9b98f'],
+    } as Readonly<Partial<Record<SurfaceKind, readonly string[]>>>,
+    tuftHeight: [0.16, 0.38] as const,
+    tuftWidth: 0.11,
+    tuftColors: ['#74863f', '#8fa44e', '#6f8f4e'] as const,
+    /** Les touffes s'espacent loin de tout aménagement (cases), pour tenir le budget. */
+    wildThin: 14,
+    maxPerTile: 1200,
+  },
+  /**
+   * Pièces (rendu encré, ADR 0023): murs coupés à hauteur d'appui pour voir dedans sous tous les
+   * angles, soubassement de pierre, plancher. Une porte laisse un vide de `doorWidth` dans le mur
+   * le plus proche de son point d'arrivée.
+   */
+  interior: {
+    wallHeight: 1.05,
+    wallThickness: 0.3,
+    wallColor: '#e6d9bf',
+    plinthHeight: 0.24,
+    plinthOut: 0.05,
+    plinthColor: '#8f8474',
+    floorColor: '#b98f5e',
+    doorWidth: 1.3,
+    /** Un point d'arrivée de porte compte s'il est à moins de cette distance du mur (m). */
+    doorReach: 1.6,
   },
   landmark: {
     /** Repère dans un lieu sauvage (loin des chemins): un grand arbre; sinon une tour. */

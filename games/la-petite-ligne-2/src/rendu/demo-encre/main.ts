@@ -40,7 +40,7 @@ import {
   type View,
 } from './scenes';
 import { createGroundMap, terrainGeometry, type HeightAt } from './terrain';
-import { createInkLayers, createNoise } from './textures';
+import { createInkLayers, createNoise } from '../encre/textures';
 
 type ContourMode = 'complet' | 'post' | 'aucun';
 type ViewName = 'large' | 'jeu' | 'proche';

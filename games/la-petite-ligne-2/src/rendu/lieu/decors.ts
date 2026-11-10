@@ -7,6 +7,7 @@
  */
 import type { Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { gamePlaceBuildings } from './batiments';
 import type { ModelSource } from './lieu';
 import { DECOR_MANIFEST, type DecorManifest, decorFiles } from './decors-manifeste';
 
@@ -37,6 +38,8 @@ export class DecorModels implements ModelSource {
   constructor(
     manifest: DecorManifest = DECOR_MANIFEST,
     load: (file: string) => Promise<GLTF> = loadFromAssets,
+    /** Autre chargement à attendre avec les décors (bâtiments des lieux). */
+    also: Promise<void> = Promise.resolve(),
   ) {
     this.ready = Promise.all(
       decorFiles(manifest).map(async (file) => {
@@ -44,11 +47,13 @@ export class DecorModels implements ModelSource {
         for (const node of gltf.scene.children)
           if (manifest.models[node.name] !== undefined) this.prototypes.set(node.name, node);
       }),
-    ).then(
-      () => undefined,
-      // Un fichier manquant ou abîmé: ses modèles restent en formes provisoires, la partie continue.
-      () => undefined,
-    );
+    )
+      .then(
+        () => undefined,
+        // Un fichier manquant ou abîmé: ses modèles restent en formes provisoires, la partie continue.
+        () => undefined,
+      )
+      .then(() => also);
   }
 
   instantiate(model: string): Object3D | null {
@@ -65,6 +70,8 @@ let shared: DecorModels | null = null;
 
 /** La source du jeu, créée au premier appel et partagée par tous les lieux. */
 export function gameDecorModels(): DecorModels {
-  shared ??= new DecorModels();
+  // Le jeu attend `ready` avant d'entrer dans le premier lieu: les bâtiments livrés des lieux
+  // (rendu encré) se chargent dans la même attente, sinon ils resteraient en volumes provisoires.
+  shared ??= new DecorModels(DECOR_MANIFEST, loadFromAssets, gamePlaceBuildings().ready);
   return shared;
 }

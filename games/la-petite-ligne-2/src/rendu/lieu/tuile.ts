@@ -18,6 +18,8 @@ import {
   Vector3,
 } from 'three';
 import type { MapDef } from '../../donnees/schemas/lieu';
+import { KIND, LAYER, SWAP } from '../encre/couches';
+import { Fadable } from '../fondu';
 import type { OccluderBox } from '../occultation';
 import { ResourceTracker } from '../ressources';
 import { FadingMesh, GeometryBuilder } from './geometrie';
@@ -30,6 +32,7 @@ import {
   hash01,
   railPieces,
   tileDecor,
+  tileSemis,
   type TreeItem,
 } from './terrain-rendu';
 import { tileRect } from './tuiles';
@@ -46,6 +49,9 @@ export interface TileShapes {
   readonly box: BufferGeometry;
   readonly trunk: BufferGeometry;
   readonly blob: BufferGeometry;
+  /** Rendu encré: caillou cabossé et touffe dressée du semis (absents de l'ancien rendu). */
+  readonly pebble?: BufferGeometry;
+  readonly tuft?: BufferGeometry;
 }
 
 /** Ce que toutes les tuiles d'un lieu partagent (créé et libéré par le lieu). */
@@ -54,6 +60,8 @@ export interface TileKit {
   readonly field: GroundField;
   readonly settings: TileSettings;
   readonly buildings: ReadonlyMap<number, readonly BuildingShape[]>;
+  /** Bâtiments livrés (rendu encré), par tuile: ils remplacent les volumes provisoires. */
+  readonly models?: ReadonlyMap<number, readonly ModeledBuilding[]>;
   readonly materials: TileMaterials;
   readonly shapes: TileShapes;
 }
@@ -66,11 +74,23 @@ const up = new Vector3(0, 1, 0);
 const color = new Color();
 const corner = [new Color(), new Color(), new Color(), new Color()];
 
+/** Un bâtiment livré posé dans une tuile: sa géométrie reste à la source des bâtiments. */
+export interface ModeledBuilding {
+  readonly id: string;
+  readonly geometry: BufferGeometry;
+  readonly height: number;
+  readonly rect: { x: number; y: number; w: number; h: number };
+}
+
+const modelGlow = new Color(0, 0, 0);
+
 export class TileView {
   readonly group = new Group();
   readonly tracker = new ResourceTracker();
   readonly instanced: InstancedMesh[] = [];
   readonly fading: FadingMesh[] = [];
+  /** Bâtiments livrés de la tuile, effaçables d'un bloc (par l'identifiant de leurs murs). */
+  readonly models = new Map<string, Fadable>();
   readonly occluders: OccluderBox[] = [];
   /** Boîtes des houppiers (même index que `trees`). */
   readonly crownBoxes: OccluderBox[] = [];
@@ -95,7 +115,10 @@ export class TileView {
   /** Ombres portées par cette tuile ou non (tuiles proches seulement). */
   setShadows(cast: boolean): void {
     this.group.traverse((object) => {
-      if ((object as Partial<Mesh>).isMesh === true) object.castShadow = cast;
+      // Le semis (cailloux, touffes) ne porte pas d'ombre: elle ne se verrait pas, et la passe
+      // d'ombre redessinerait des milliers de petits volumes.
+      if ((object as Partial<Mesh>).isMesh === true)
+        object.castShadow = cast && object.userData.semis !== true;
     });
   }
 
@@ -103,11 +126,14 @@ export class TileView {
   fadedCount(): number {
     let count = 0;
     for (const mesh of this.fading) count += mesh.fadedCount;
+    for (const model of this.models.values()) count += model.copies;
     return count;
   }
 
   dispose(): void {
     for (const mesh of this.fading) mesh.dispose();
+    for (const model of this.models.values()) model.dispose();
+    this.models.clear();
     // Libère les tampons d'instances; les géométries unité restent au lieu.
     for (const mesh of this.instanced) mesh.dispose();
     this.group.removeFromParent();
@@ -126,6 +152,8 @@ function groundOf(kit: TileKit, tile: number): BufferGeometry | null {
   const shade = (target: Color, base: Color, x: number, y: number): Color =>
     target.copy(base).multiplyScalar(1 + (hash01(x, y, 21) - 0.5) * 2 * g.noise);
   const base = new Color();
+  // Encre: la teinte et la matière du sol se lisent dans la carte du sol du lieu.
+  builder.setInk(LAYER.grass, KIND.ground);
   const at = (x: number, y: number): number =>
     x < 0 || y < 0 || x >= width || y >= height ? -1 : (cells[y * width + x] ?? 0);
   for (let y = y0; y < y1; y++)
@@ -135,6 +163,7 @@ function groundOf(kit: TileKit, tile: number): BufferGeometry | null {
       if (look === undefined || look.hidden === true) continue;
       if (look.water === true) {
         // Berges: une paroi de terre là où l'eau touche la terre ferme.
+        builder.setInk(LAYER.dirt);
         const top = 0;
         const low = g.waterLevel - 0.04;
         const sides: [number, number, [number, number, number][], [number, number, number]][] = [
@@ -188,6 +217,7 @@ function groundOf(kit: TileKit, tile: number): BufferGeometry | null {
           if (other === undefined || other.water === true || other.hidden === true) continue;
           builder.quad(quad, normal, [bank]);
         }
+        builder.setInk(LAYER.grass, KIND.ground);
         continue;
       }
       base.set(look.color);
@@ -215,6 +245,7 @@ function groundOf(kit: TileKit, tile: number): BufferGeometry | null {
         ],
       );
     }
+  builder.setInk(LAYER.grain);
   for (const piece of railPieces(map, tile, settings)) builder.box(piece);
   return builder.build();
 }
@@ -225,6 +256,7 @@ function waterOf(kit: TileKit, tile: number): BufferGeometry | null {
   const { x0, y0, x1, y1 } = tileRect(map, tile);
   const builder = new GeometryBuilder();
   const white = [color.set('#ffffff')];
+  builder.setInk(LAYER.plain, KIND.water);
   const level = settings.ground.waterLevel;
   for (let y = y0; y < y1; y++) {
     let x = x0;
@@ -371,11 +403,66 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   }
   yield;
 
+  if (shapes.pebble !== undefined && shapes.tuft !== undefined) {
+    // Semis de petits volumes: ce qui ponctue le sol est un volume, pas un dessin à plat.
+    const semis = tileSemis(kit.field, kit.map, tile, kit.settings);
+    const stones = instances(
+      view,
+      shapes.pebble,
+      materials.instanced,
+      semis.pebbles.length,
+      'cailloux',
+      (mesh, i) => {
+        const item = semis.pebbles[i];
+        if (item === undefined) return;
+        putBlob(mesh, i, item);
+        // Chaque caillou tourne sur lui-même: quatre facettes ne font pas deux fois la même pierre.
+        rotation.setFromAxisAngle(up, hash01(i, tile, 81) * Math.PI * 2);
+        matrix.compose(
+          position.set(item.x, item.y, item.z),
+          rotation,
+          scale.set(item.rx, item.ry, item.rz),
+        );
+        mesh.setMatrixAt(i, matrix);
+      },
+    );
+    const blades = instances(
+      view,
+      shapes.tuft,
+      materials.instanced,
+      semis.tufts.length,
+      'touffes',
+      (mesh, i) => {
+        const item = semis.tufts[i];
+        if (item !== undefined) putBox(mesh, i, item);
+      },
+    );
+    for (const mesh of [stones, blades]) if (mesh !== null) mesh.userData.semis = true;
+    yield;
+  }
+
+  for (const b of kit.models?.get(tile) ?? []) {
+    // Posé au milieu de son emprise, rotation 0 (convention du manifeste des bâtiments).
+    const mesh = new Mesh(b.geometry, materials.ground);
+    mesh.name = b.id;
+    mesh.position.set(b.rect.x + b.rect.w / 2, 0, b.rect.y + b.rect.h / 2);
+    mesh.receiveShadow = true;
+    view.add(mesh);
+    const wallId = `${b.id}-murs`;
+    view.models.set(wallId, new Fadable(mesh, modelGlow));
+    view.occluders.push({
+      id: wallId,
+      min: { x: b.rect.x, y: 0, z: b.rect.y },
+      max: { x: b.rect.x + b.rect.w, y: b.height, z: b.rect.y + b.rect.h },
+    });
+  }
+
   const buildings = kit.buildings.get(tile) ?? [];
   if (buildings.length > 0) {
     const walls = new GeometryBuilder();
     const glass = new GeometryBuilder();
     const roofs = new GeometryBuilder();
+    walls.setInk(LAYER.wall);
     for (const b of buildings) {
       const wallId = `${b.id}-murs`;
       const roofId = `${b.id}-toit`;
@@ -387,6 +474,8 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
       glass.end();
       if (b.roof !== null) {
         roofs.begin(roofId);
+        // Les rangs de tuiles courent le long du faîtage.
+        roofs.setInk(LAYER.roof, b.roof.alongX ? 0 : SWAP);
         roofs.gable(b.roof);
         roofs.end();
         const o = kit.settings.building.overhang;

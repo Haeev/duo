@@ -56,8 +56,20 @@ export const CHARACTER_SETTINGS = {
       front: 0.5 - RENDER_SETTINGS.standIn.inset,
     },
     clipSeat: 0.5,
-    /** Enfoncement maximal de la figure quand l'assise est plus basse que celle du clip (m). */
-    maxSink: 0.08,
+    /**
+     * Jambes posées par cinématique inverse (`assise.ts`): os de chaque jambe (squelette
+     * `duo-24`), et marge gardée avant la jambe tendue (m).
+     */
+    legs: [
+      ['LeftUpLeg', 'LeftLeg', 'LeftFoot'],
+      ['RightUpLeg', 'RightLeg', 'RightFoot'],
+    ] as const,
+    legSlack: 0.012,
+    /**
+     * Par famille de meuble à accoudoirs: ce qu'il faut entre le milieu du corps et le bout du
+     * meuble (accoudoir et demi-largeur du corps, coudes compris) pour ne rien traverser (m).
+     */
+    sideClear: { banc: 0.47 } as Readonly<Record<string, number>>,
     /** Avancée des genoux devant le bassin dans le clip `sit` (m, gabarit adulte), et marge au bord. */
     clipKnee: 0.35,
     kneeMargin: 0.05,

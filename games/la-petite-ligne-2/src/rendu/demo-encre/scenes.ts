@@ -64,7 +64,7 @@ import {
 import type { Lamp, WindowLight } from './matiere';
 import { scatter, type ScatterBatch } from './semis';
 import { heightFunction, type HeightAt, type Rect, type TerrainSpec } from './terrain';
-import type { GroundPlan } from './textures';
+import type { GroundPlan } from '../encre/textures';
 import { plant, type PlantBatch, type PlantSpot } from './vegetation';
 
 export interface ScenePiece {
