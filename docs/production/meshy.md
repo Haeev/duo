@@ -416,3 +416,4 @@ Ces modèles utilisent la palette de l'essai (`palette-essai.json`, 66 cases), p
 |---|---|---|---|
 | 2026-11-07 | 0.1 | Inventaire, chaîne, familles, règles de crédits, fiche de génération, estimation, essai (50 crédits, téléchargement bloqué), scripts éprouvés sur doublures, alignement sur la bible | tech-artist |
 | 2026-11-07 | 0.2 | Hôtes ouverts: sorties réelles téléchargées et mesurées (section 4), squelette commun vérifié, animations, machine et client conformés et capturés (section 14), documentation de Meshy lue (débit, conservation, rig, licence), chemins stables des modèles (15.2) | tech-artist |
+| 2026-11-10 | 0.2 | Renvoi: essai « personnage modulaire » (`essais-meshy/personnage-modulaire/README.md`, 71 crédits): pièces séparées sur le squelette de 24 os, proportions imposées par le squelette, vêtements générés seuls par texte non livrables | tech-artist |

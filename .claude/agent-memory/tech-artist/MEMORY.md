@@ -97,3 +97,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Faces retournées d'une sortie générée: `bmesh.ops.recalc_face_normals`, et compter les retournées par le signe du produit scalaire avant et après.
 - Pièces qui flottent: `BVHTree.overlap` entre pièces (une pièce enfoncée dans une autre ne flotte pas), puis distance au plus proche; seuil de 2 mm.
 - Capture Three.js d'un personnage: `renderer.info.memory.textures` compte aussi la texture des os et celle des cibles de morphose.
+
+## Personnage modulaire avec Meshy (essai du 2026-11-10, `docs/production/essais-meshy/personnage-modulaire/`)
+
+- Texte seul: Meshy ignore « seul », « sans tête », « cinq têtes de haut » environ une fois sur deux (veste sur buste, jupe en robe sur mannequin, perruque livrée avec tête et socle, corps réaliste de 7,5 têtes). `pose_mode` ne vaut que pour un personnage: un vêtement seul sort manches à 45 ou 75 degrés.
+- Imposer des proportions à un rig de Meshy: `inherit_scale = "NONE"` sur tous les os, échelle par os en pose, appliquer le modificateur Armature au maillage, `pose.armature_apply`, remettre `FULL` et le modificateur. Mettre à l'échelle les clés de translation des hanches selon la nouvelle hauteur du bassin.
+- Ramener un personnage riggé par Meshy sur un autre squelette de Meshy: `pose_bone.matrix = repos_cible @ Diagonal(largeur, longueur_cible / longueur, largeur)` os par os, parents d'abord, `view_layer.update()` entre chaque; tête et bouts de tête en échelle uniforme (os très courts: rapport aberrant, tête aplatie en disque).
+- Vêtement conformé dans une autre pose que le repos: poser le corps, transférer les poids, puis ramener chaque sommet par l'inverse de la somme pondérée des matrices de peau.
+- Transfert de poids par face la plus proche: exclure les os du côté opposé, sinon une toile se tend entre les jambes du pantalon en marche. Recentrer d'abord chaque jambe sur l'axe des os.
+- `import bmesh` avant `import bpy` échoue sous duo-python (module introuvable). Le rig de Meshy rend des sommets séparés par face: `remove_doubles` avant de lisser.
+- Three.js: lier une pièce au squelette d'un autre fichier par `new Skeleton(os du corps retrouvés par nom, boneInverses de la pièce)` puis `bind(skeleton, bindMatrix)`; une matière par zone du corps donne un maillage par zone, que l'on cache sous un vêtement.
+- Dossiers de `meshy_output/`: le suffixe ne porte que 8 caractères de l'identifiant, commun à des tâches lancées la même minute; lire le chemin rendu par `meshy_download_model`.
