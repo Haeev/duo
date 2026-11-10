@@ -20,7 +20,13 @@ function kept(w: ProbeWorld): string {
   });
 }
 
-async function travel(duo: Duo, from: string, to: string, label: string): Promise<number> {
+async function travel(
+  duo: Duo,
+  from: string,
+  to: string,
+  label: string,
+  skip = false,
+): Promise<number> {
   const { host, guest } = duo;
   const [hi, gi] = [await host.local(), await guest.local()];
   const poteau = POTEAU[from] ?? { x: 17.5, y: 4.5 };
@@ -40,6 +46,11 @@ async function travel(duo: Duo, from: string, to: string, label: string): Promis
   await host.page.waitForTimeout(500);
   await host.shot(`${label}-2-wagon`);
   await guest.shot(`${label}-2-wagon`);
+  // Le trajet (10 s) se passe à deux: chacun vote à la touche d'action.
+  if (skip) {
+    await host.press('Space');
+    await guest.press('Space');
+  }
   try {
     await duo.until(
       host,
@@ -86,7 +97,9 @@ test('voyage aller et retour à deux', async ({ browser }) => {
   const start = await duo.host.world();
   if (start === null) throw new Error('monde absent');
   const aller = await travel(duo, 'essai-gare', 'essai-halte', 'aller');
-  const retour = await travel(duo, 'essai-halte', 'essai-gare', 'retour');
+  // Le retour se passe à deux (vote): il arrive avant la fin des 10 s du trajet.
+  const retour = await travel(duo, 'essai-halte', 'essai-gare', 'retour', true);
+  expect(retour, 'trajet passé à deux plus court qu’à l’aller').toBeLessThan(aller);
   const back = await duo.host.world();
   if (back === null) throw new Error('monde absent');
   expect(kept(back), 'CA-02: sacs, bourses, coffre identiques').toBe(kept(start));

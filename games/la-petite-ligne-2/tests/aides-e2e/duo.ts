@@ -183,7 +183,8 @@ export async function startDuo(
   onGuestPage?.(guestPage);
   await hostPage.goto('/');
   await hostPage.getByLabel('Ton pseudo').fill('Loïc');
-  await hostPage.getByRole('button', { name: 'Héberger', exact: true }).click();
+  // Chaque parcours part d'une partie neuve, même si un parcours précédent a enregistré la sienne.
+  await hostPage.getByRole('button', { name: /^Héberger( une nouvelle partie)?$/ }).click();
   await guestPage.goto('/');
   await guestPage.getByLabel('Ton pseudo').fill('Zoé');
   await guestPage.getByRole('button', { name: 'Rejoindre' }).click();
