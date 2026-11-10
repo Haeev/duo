@@ -34,10 +34,12 @@ import {
   turnQuestPage,
 } from '../src/interface/carnet/quetes';
 import { CARNET_TEXTS } from '../src/interface/carnet/textes';
+import { swallowedAtOpening } from '../src/interface/carnet/onglet';
 import { outfitsModel } from '../src/interface/carnet/tenues';
 import { DEFAULT_GRAPHICS_OPTIONS } from '../src/rendu/options';
 import { bondKey } from '../src/etat/progression';
 import { createWorld } from '../src/simulation/noyau/monde';
+import { UI_TUNING } from '../src/interface/reglages';
 import { gameContent, MEMBERS, SEED } from './aides';
 
 const PLAN_PATH = fileURLToPath(new URL('../donnees/lieux/aubrune/plan.json', import.meta.url));
@@ -348,5 +350,32 @@ describe('carnet: textes', () => {
       expect(name.split(/\s+/).length).toBeLessThanOrEqual(4);
     for (const name of Object.values(CARNET_TEXTS.settings.presets))
       expect(name.split(/\s+/).length).toBeLessThanOrEqual(4);
+  });
+});
+
+describe('carnet: onglet à l’ouverture', () => {
+  const guard = UI_TUNING.openGuardMs;
+
+  it('C puis E tapés vite: le changement d’onglet n’est jamais avalé, quel que soit le délai', () => {
+    for (const since of [0, 1, guard / 2, guard - 1, guard, guard + 200])
+      for (const code of ['KeyQ', 'KeyE'])
+        expect(swallowedAtOpening('notebook', code, since, guard, true)).toBe(false);
+  });
+
+  it('juste après C, flèches et actions passent; un second C immédiat est avalé', () => {
+    for (const code of ['KeyD', 'ArrowRight', 'Space', 'Enter', 'KeyP', 'KeyT'])
+      expect(swallowedAtOpening('notebook', code, 0, guard, true)).toBe(false);
+    for (const code of ['KeyC', 'Backspace'])
+      expect(swallowedAtOpening('notebook', code, guard - 1, guard, true)).toBe(true);
+    expect(swallowedAtOpening('notebook', 'KeyC', guard, guard, true)).toBe(false);
+  });
+
+  it('C, P puis C tapés vite: le second C ferme, ce n’est plus un double appui', () => {
+    expect(swallowedAtOpening('notebook', 'KeyC', 1, guard, false)).toBe(false);
+  });
+
+  it('rangement ouvert par Espace: toute touche est avalée pendant la garde', () => {
+    expect(swallowedAtOpening('store', 'Space', guard - 1, guard, false)).toBe(true);
+    expect(swallowedAtOpening('store', 'Space', guard, guard, true)).toBe(false);
   });
 });

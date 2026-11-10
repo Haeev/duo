@@ -10,8 +10,12 @@ test('carnet: l’histoire d’Aubrune regroupée par actes', async ({ browser }
   await host.press('KeyC');
   const book = host.game().locator('.lpl-ui .carnet');
   await expect(book).toBeVisible();
-  // Q et E changent d'onglet: Sac, puis Quêtes.
+  // Règle (interface.md, 5.3): C ouvre sur le dernier onglet vu, le Sac la première fois; E, même
+  // tapé aussitôt (garde d'ouverture), passe à l'onglet Quêtes. Aucune attente entre les deux.
+  const selected = book.locator('.signet[aria-selected="true"]');
+  await expect(selected).toHaveAttribute('aria-label', 'Sac');
   await host.press('KeyE');
+  await expect(selected).toHaveAttribute('aria-label', 'Quêtes');
   const saga = book.locator('.saga');
   await expect(saga, 'une seule carte pour toute l’histoire').toHaveCount(1);
   await expect(saga.locator('.quete__titre').first()).toHaveText('Aubrune');
@@ -24,11 +28,19 @@ test('carnet: l’histoire d’Aubrune regroupée par actes', async ({ browser }
   await expect(acts.nth(1).locator('.acte__etape')).not.toBeEmpty();
   await host.page.waitForTimeout(500);
   await host.shot('1-quetes-actes');
+  // Refermé puis rouvert, le carnet revient sur l'onglet Quêtes, le dernier vu.
+  await host.press('KeyC');
+  await expect(book).toBeHidden();
+  await host.press('KeyC');
+  await expect(selected).toHaveAttribute('aria-label', 'Quêtes');
+  await expect(book.locator('.saga')).toHaveCount(1);
   // Le carnet de l'invité est le sien: il l'ouvre aussi, sur la même histoire.
   await guest.press('KeyC');
   await expect(guest.game().locator('.lpl-ui .carnet')).toBeVisible();
-  await guest.page.waitForTimeout(800);
   await guest.press('KeyE');
+  await expect(
+    guest.game().locator('.lpl-ui .carnet .signet[aria-selected="true"]'),
+  ).toHaveAttribute('aria-label', 'Quêtes');
   await expect(guest.game().locator('.lpl-ui .carnet .saga .acte')).toHaveCount(2);
   await guest.shot('1-quetes-actes');
   expect(duo.errors).toEqual([]);
