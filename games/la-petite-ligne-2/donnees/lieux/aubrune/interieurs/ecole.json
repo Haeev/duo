@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "ecole",
+  "name": "L'école-mairie",
+  "width": 6,
+  "height": 5,
+  "at": {
+    "x": 115,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "armand-tableau": {
+      "x": 3.5,
+      "y": 1.5
+    }
+  },
+  "objects": [
+    {
+      "id": "ecole-archives",
+      "type": "armoire",
+      "x": 5.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "ecole-banc-1",
+      "type": "banc",
+      "x": 1,
+      "y": 2.5,
+      "rotation": 2
+    },
+    {
+      "id": "ecole-banc-2",
+      "type": "banc",
+      "x": 5,
+      "y": 2.5,
+      "rotation": 2
+    },
+    {
+      "id": "ecole-table-mairie",
+      "type": "table-a-manger",
+      "x": 1,
+      "y": 3.5,
+      "rotation": 0
+    }
+  ],
+  "doors": {
+    "ecole-porte": {
+      "x": 3.5,
+      "y": 4.5,
+      "facing": 2,
+      "to": "porte-ecole"
+    }
+  },
+  "pourquoi": "une seule salle: l'instituteur est aussi secrétaire de mairie (armoire des archives, table du registre); les bancs regardent le tableau, au nord"
+}

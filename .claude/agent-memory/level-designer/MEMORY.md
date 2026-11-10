@@ -120,3 +120,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Le chargeur refuse un point sur une case pleine (banc, lit, eau): poser le point sur la case libre la plus proche (le siège devant le banc, le pêcheur sur la berge). `comptoir-buvette` exige son commerce: ne pas l'employer comme simple comptoir.
 - Ajouter un troisième lieu (`aubrune`) casse `tests/donnees.test.ts` et `tests/aides-sauvegarde.ts`, qui supposent deux lieux d'essai, le premier par ordre alphabétique étant le départ.
 - Garde-fou: les commandes git qui lisent une autre branche passent seules (`git show <branche>:<chemin>`), sans redirection ni enchaînement; les longs scripts de retouche vont dans un fichier du dossier temporaire, à mon nom (`ld-v2/`), car ce dossier est partagé (un `os.py` d'un autre membre y traîne: toujours `python3 -I`).
+
+## Raccorder un plan à l'histoire écrite (Aubrune version 3, vérifié le 2026-11-10)
+
+- Avant de croire une mesure rapportée par un autre membre, la rejouer sur la carte de SA branche (`git show <commit>:.../carte.json`): les « verrous contournables » de l'auteur venaient d'une carte version 1 restée dans sa branche.
+- Un verrou testé seul (les autres de son acte ouverts) ne suffit pas: rejouer chaque état que les fiches permettent (`requires`, chapitres, `after`, effets `remember ...verrou.*` et `unlock_zone` des étapes et des scènes qu'elles jouent), et comparer nœud par nœud grille et graphe. C'est ce qui a montré un nœud (`k1`) posé dans le carré d'un verrou voisin, et un second carré de V4 posé par l'outil sur un autre chemin (une arête verrouillée qui traverse une troisième zone reçoit un carré à chaque passage d'acte).
+- Le jeu ouvre une zone quand on en rejoint la moitié des cases (`PLACES.zoneOpenShare`): un verrou interne (V2b) doit laisser plus de la moitié de la zone avant lui si l'histoire ouvre la zone au verrou d'entrée. Un couloir de verrou interne de 7 m pile est mesuré 7,25 par le contrôle: viser 6,5 m.
+- Le rendu des grands lieux et sa page de démonstration lisent la sortie de `plan-vers-lieu.ts`, pas `carte.json`: ce qu'on veut voir rendu passe par l'outil (natures de parcelles, `rails`, `kind` des repères), l'assembleur ne doit pas l'écraser.
+- `pnpm format:verifier` passe sur `donnees/`: l'assembleur lance prettier sur les fichiers du lieu qu'il écrit.
+- Meubles contre un mur sud: rotation 2 (façade au nord, vers la pièce). La porte intérieure se place au droit de la porte du plan: x local = x porte - x emprise - 0,5.
+- Images: dessiner tous les tracés, puis les étiquettes de verrou, puis les pastilles (écartées avec un trait si elles gênent), sinon le tracé suivant recouvre les numéros.

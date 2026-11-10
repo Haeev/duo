@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Contrôle du plan d'Aubrune: lit plan.json (et le tableau des distances de plan.md), ne dépend pas du constructeur.
+Puis rejoue l'ordre réel de l'histoire (fiches de quêtes et de scènes du lieu) sur la grille de carte.json.
 
 Usage: python3 -I controler_plan.py            contrôle le plan, code de sortie 1 s'il y a une erreur
-       python3 -I controler_plan.py --eprouver casse une copie du plan de douze façons et vérifie que chaque casse est vue
+       python3 -I controler_plan.py --eprouver casse une copie du plan (et de la carte) de 21 façons et vérifie que chaque casse est vue
 """
 import copy
 import heapq
@@ -455,14 +456,280 @@ def controler(d, md=None):
     return err, info
 
 
+# ================================================================ ordre réel de l'histoire, sur la grille du lieu
+LIEU = os.path.normpath(os.path.join(ICI, '..', '..', '..', '..', '..', 'games', 'la-petite-ligne-2', 'donnees', 'lieux', 'aubrune'))
+PART_OUVERTE = 0.5   # `PLACES.zoneOpenShare` du jeu: une zone est ouverte quand on en rejoint la moitié des cases libres
+
+
+def gid(s):
+    return s.replace('_', '-').lower()
+
+
+def lire_fiches(lieu=LIEU):
+    """Suites, chapitres et étapes du lieu, dans l'ordre de leurs `requires`; scènes par identifiant."""
+    suites = {}
+    for f in sorted(os.listdir(os.path.join(lieu, 'quetes'))):
+        if f.endswith('.json'):
+            q = json.load(open(os.path.join(lieu, 'quetes', f), encoding='utf-8'))
+            suites[q['id']] = q
+    scenes = {}
+    for f in sorted(os.listdir(os.path.join(lieu, 'scenes'))):
+        if f.endswith('.json'):
+            s = json.load(open(os.path.join(lieu, 'scenes', f), encoding='utf-8'))
+            scenes[s['id']] = s
+    return suites, scenes
+
+
+def effets_de(o, out):
+    """Verrous (fait `<lieu>.verrou.<id>` retenu à vrai) et zones (`unlock_zone`) posés n'importe où dans o."""
+    if isinstance(o, dict):
+        if o.get('type') == 'remember' and isinstance(o.get('key'), str) and '.verrou.' in o['key'] and o.get('value') is True:
+            out['verrous'].add(o['key'].split('.verrou.')[1])
+        if o.get('type') == 'unlock_zone':
+            out['zones'].add(o['zone'])
+        for v in o.values():
+            effets_de(v, out)
+    elif isinstance(o, list):
+        for v in o:
+            effets_de(v, out)
+    return out
+
+
+def etapes_ordonnees(suites, scenes):
+    """Chaque étape: ses ancêtres (règles de `quetes/moteur.ts`: `after`, sinon l'étape d'avant; chapitres et
+    suites l'un après l'autre), ses effets (fiche et scènes qu'elle joue ou attend), ses cibles (points)."""
+    ordre, vus = [], set()
+    while len(ordre) < len(suites):
+        for qid, q in suites.items():
+            req = [r['quest'] for r in q.get('requires', []) if r.get('type') == 'quest_step' and r.get('quest') in suites]
+            if qid not in vus and all(r in vus for r in req):
+                ordre.append(qid); vus.add(qid)
+                break
+        else:
+            raise ValueError('suites en cercle: %s' % sorted(set(suites) - vus))
+    etapes, avant_tout = {}, set()
+    for qid in ordre:
+        q = suites[qid]
+        for ch in q['chapters']:
+            ids = ['%s/%s' % (qid, s['id']) for s in ch['steps']]
+            for i, s in enumerate(ch['steps']):
+                if 'after' in s:
+                    pre = ['%s/%s' % (qid, a) for a in s['after']]
+                else:
+                    pre = [ids[i - 1]] if i > 0 else []
+                eff = effets_de(s.get('onDone', []), dict(verrous=set(), zones=set()))
+                for c in s.get('done', []) + s.get('onStart', []):
+                    sc = c.get('scene')
+                    if sc in scenes and c.get('type') in ('scene_seen', 'play_scene'):
+                        effets_de(scenes[sc], eff)
+                cibles = set()
+                if isinstance(s.get('target'), dict) and s['target'].get('point'):
+                    cibles.add(s['target']['point'])
+                cibles |= {c['point'] for c in s.get('done', []) if c.get('type') == 'reach' and c.get('point')}
+                etapes[ids[i]] = dict(pre=set(pre), base=set(avant_tout), eff=eff, cibles=cibles)
+            avant_tout |= set(ids)
+    # ancêtres transitifs
+    memo = {}
+
+    def anc(k):
+        if k not in memo:
+            memo[k] = set()
+            for p in etapes[k]['pre'] | etapes[k]['base']:
+                memo[k] |= {p} | anc(p)
+        return memo[k]
+    for k in etapes:
+        etapes[k]['anc'] = anc(k)
+    return ordre, etapes
+
+
+class Grille:
+    """La grille du lieu telle que le jeu la lit: murs (`blocked`), verrous fermés, zones (la première l'emporte)."""
+    def __init__(self, carte):
+        from collections import deque
+        self.deque = deque
+        self.c = carte
+        self.W, self.H = carte['width'], carte['height']
+        W, H = self.W, self.H
+        self.base = bytearray(W * H)
+        for r in carte['blocked']:
+            x0, x1 = max(0, r['x']), min(W, r['x'] + r['w'])
+            for y in range(max(0, r['y']), min(H, r['y'] + r['h'])):
+                self.base[y * W + x0: y * W + x1] = b'\x01' * (x1 - x0)
+        self.ids = list(carte.get('zones', {}))
+        self.zone_of = bytearray(W * H)
+        for k, zid in enumerate(self.ids):
+            poly = carte['zones'][zid]['polygon']
+            x0, x1 = max(0, int(min(p[0] for p in poly))), min(W, int(max(p[0] for p in poly)) + 1)
+            y0, y1 = max(0, int(min(p[1] for p in poly))), min(H, int(max(p[1] for p in poly)) + 1)
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    if self.zone_of[y * W + x] == 0 and dans(poly, x + 0.5, y + 0.5):
+                        self.zone_of[y * W + x] = k + 1
+        self.cache = {}
+
+    def atteint(self, ouverts):
+        cle = frozenset(ouverts)
+        if cle in self.cache:
+            return self.cache[cle]
+        W, H = self.W, self.H
+        mur = bytearray(self.base)
+        for lk, l in self.c['locks'].items():
+            if lk in ouverts:
+                continue
+            for r in l['rects']:
+                for y in range(max(0, r['y']), min(H, r['y'] + r['h'])):
+                    for x in range(max(0, r['x']), min(W, r['x'] + r['w'])):
+                        mur[y * W + x] = 1
+        a = self.c['points']['quai']
+        s = int(a['y']) * W + int(a['x'])
+        vu = bytearray(W * H); vu[s] = 1
+        file = self.deque([s])
+        while file:
+            i = file.popleft(); x = i % W
+            for j in ((i + 1) if x < W - 1 else -1, (i - 1) if x > 0 else -1, i + W, i - W):
+                if 0 <= j < W * H and not vu[j] and not mur[j]:
+                    vu[j] = 1; file.append(j)
+        part = {}
+        cells = [0] * len(self.ids); got = [0] * len(self.ids)
+        for i in range(W * H):
+            z = self.zone_of[i]
+            if z == 0 or self.base[i]:
+                continue
+            cells[z - 1] += 1
+            if vu[i] and not mur[i]:
+                got[z - 1] += 1
+        for k, zid in enumerate(self.ids):
+            part[zid] = got[k] / cells[k] if cells[k] else 0.0
+        self.cache[cle] = (vu, part)
+        return vu, part
+
+    def touche(self, vu, x, y):
+        return bool(vu[int(y) * self.W + int(x)])
+
+
+def controler_histoire(d, carte, fiches):
+    """Pour chaque état de l'histoire (ensemble d'étapes à verrous franchies, dans tous les ordres que les fiches
+    permettent): chaque zone que l'histoire a ouverte l'est sur la grille (la moitié de ses cases au moins), aucune
+    autre ne l'est, rien d'une zone fermée n'est atteint hors de son antichambre déclarée, la grille et le graphe du
+    plan disent la même chose nœud par nœud, et la cible de chaque étape est atteignable quand elle s'ouvre."""
+    err, info = [], []
+    suites, scenes = fiches
+    _, etapes = etapes_ordonnees(suites, scenes)
+    G = Grille(carte)
+    N = d['noeuds']
+    zone_jeu = {gid(k): k for k in d['zones']}
+    verrou_jeu = {gid(k): k for k in d['verrous']}
+    noeud_jeu = {gid(k): k for k in N}
+    # 1. ordre annoncé par le plan = ordre lu dans les fiches
+    lus = {k: e for k, e in etapes.items() if e['eff']['verrous'] or e['eff']['zones']}
+    annonce = {o['etape']: o for o in d.get('ordre_histoire', [])}
+    for k, e in lus.items():
+        o = annonce.get(k)
+        vs = sorted(verrou_jeu.get(v, v) for v in e['eff']['verrous'])
+        zs = sorted(zone_jeu.get(z, z) for z in e['eff']['zones'])
+        if o is None:
+            err.append("ordre de l'histoire: l'étape %s lève %s et ouvre %s, absente du plan" % (k, vs, zs))
+        elif sorted(o['verrous']) != vs or sorted(o['zones']) != zs:
+            err.append("ordre de l'histoire: %s lève %s et ouvre %s dans les fiches, le plan annonce %s et %s" % (k, vs, zs, sorted(o['verrous']), sorted(o['zones'])))
+    for k in annonce:
+        if k not in lus:
+            err.append("ordre de l'histoire: le plan annonce %s, qui ne lève rien dans les fiches" % k)
+    for v in d['verrous']:
+        if not any(gid(v) in e['eff']['verrous'] for e in lus.values()):
+            err.append("ordre de l'histoire: aucune étape ne lève %s" % v)
+    # 2. états: ensembles d'étapes à verrous fermés vers le bas (si une étape est franchie, ses ancêtres aussi)
+    cles = sorted(lus)
+    etats = set()
+
+    def etendre(courant, reste):
+        etats.add(frozenset(courant))
+        for k in reste:
+            if lus[k]['anc'] & set(cles) <= courant:
+                etendre(courant | {k}, [r for r in reste if r != k])
+    etendre(frozenset(), cles)
+    actes = {gid(k): z['acte'] for k, z in d['zones'].items()}
+    anti = {gid(k): set(v['noeuds']) for k, v in d.get('antichambres', {}).items()}
+
+    def graphe_atteint(ouverts):
+        adj = {k: [] for k in N}
+        for a in d['aretes']:
+            if a.get('verrou') and gid(a['verrou']) not in ouverts:
+                continue
+            adj[a['a']].append(a['b']); adj[a['b']].append(a['a'])
+        vus, pile = {'quai'}, ['quai']
+        while pile:
+            u = pile.pop()
+            for w in adj[u]:
+                if w not in vus:
+                    vus.add(w); pile.append(w)
+        return vus
+    for etat in sorted(etats, key=lambda s: (len(s), sorted(s))):
+        ouverts = set().union(*[lus[k]['eff']['verrous'] for k in etat]) if etat else set()
+        zones = set().union(*[lus[k]['eff']['zones'] for k in etat]) if etat else set()
+        vu, part = G.atteint(ouverts)
+        gr = graphe_atteint(ouverts)
+        nom = '+'.join(k.split('/')[1] for k in sorted(etat, key=lambda s: len(lus[s]['anc']))) or 'début'
+        for z, p in part.items():
+            ouverte_histoire = actes.get(z, 1) == 1 or z in zones
+            if ouverte_histoire and p < PART_OUVERTE:
+                err.append("état %s: l'histoire a ouvert la zone %s, on n'en rejoint que %.0f %%" % (nom, z, 100 * p))
+            if not ouverte_histoire and p >= PART_OUVERTE:
+                err.append("état %s: la zone %s est ouverte (%.0f %%) avant l'étape qui l'ouvre" % (nom, z, 100 * p))
+        for k, nn in N.items():
+            g_ = G.touche(vu, nn['x'], nn['y'])
+            if g_ and k not in gr:
+                err.append("état %s: le nœud %s (zone %s) est atteint à pied, le graphe le dit fermé: un verrou se contourne" % (nom, k, nn['zone']))
+            elif k in gr and not g_:
+                err.append("état %s: le nœud %s est ouvert dans le graphe mais pas sur la grille" % (nom, k))
+            z = gid(nn['zone'])
+            if g_ and actes.get(z, 1) > 1 and z not in zones and k not in anti.get(z, set()):
+                err.append("état %s: le nœud %s de la zone %s est atteint avant l'étape qui l'ouvre (hors antichambre)" % (nom, k, z))
+        info.append("histoire, état %s: verrous %s; zones %s" % (nom, ','.join(sorted(ouverts)) or '-', ' '.join('%s %.0f%%' % (z, 100 * p) for z, p in part.items())))
+    # 3. la cible de chaque étape, quand elle s'ouvre (ses ancêtres franchis, pas plus)
+    nb = 0
+    for k, e in etapes.items():
+        ouverts = set().union(*[etapes[a]['eff']['verrous'] for a in e['anc']]) if e['anc'] else set()
+        vu, _ = G.atteint(ouverts)
+        for c in e['cibles']:
+            if c in noeud_jeu:
+                nn = N[noeud_jeu[c]]
+            elif c in carte['points']:
+                nn = carte['points'][c]
+                if nn['y'] >= d['taille']['hauteur']:
+                    continue  # point d'un intérieur: atteint par sa porte
+            else:
+                err.append("étape %s: point %s inconnu de la carte" % (k, c)); continue
+            nb += 1
+            if not G.touche(vu, nn['x'], nn['y']):
+                err.append("étape %s: sa cible %s n'est pas atteignable quand l'étape s'ouvre (verrous ouverts: %s)" % (k, c, ','.join(sorted(ouverts)) or '-'))
+    info.append("histoire: %d étapes lues, %d lèvent un verrou ou ouvrent une zone, %d états contrôlés, %d cibles atteignables à leur ouverture" % (
+        len(etapes), len(lus), len(etats), nb))
+    return err, info
+
+
 def eprouver(d):
     def casse(nom, f, attendu):
         c = copy.deepcopy(d)
         f(c)
-        err, _ = controler(c)
+        if f in (ordre_faux, frenes_trop_courts, belvedere_non_declare):
+            carte = json.load(open(os.path.join(LIEU, 'carte.json'), encoding='utf-8'))
+            if f is frenes_trop_courts:
+                carte['locks']['v2b']['rects'] = [dict(x=48, y=94, w=7, h=3)]
+            err, _ = controler_histoire(c, carte, lire_fiches())
+        else:
+            err, _ = controler(c)
         ok = any(attendu in e for e in err)
         print("  %s %s: %s" % ('vu ' if ok else 'RATÉ', nom, next((e for e in err if attendu in e), '(aucune erreur de ce type)')))
         return ok
+
+    def ordre_faux(c):
+        c['ordre_histoire'][0]['verrous'] = ['V2b']
+
+    def frenes_trop_courts(c):
+        pass
+
+    def belvedere_non_declare(c):
+        c['antichambres'] = {}
     bat = lambda c, i: next(b for b in c['batiments'] if b['id'] == i)
     eau = lambda c, i: next(w for w in c['eaux'] if w['id'] == i)
 
@@ -512,8 +779,8 @@ def eprouver(d):
 
     def couloir_large(c):
         p_ = c['zones']['V']['poly']
-        p_[p_.index([100, 94.5])] = [100, 80]
-        p_[p_.index([164, 94.5])] = [164, 80]
+        p_[p_.index([47, 94])] = [47, 88]
+        p_[p_.index([55, 94])] = [55, 88]
 
     def banc_de_dos(c):
         next(m for m in c['mobilier'] if m['id'] == 'banc-ponton')['rotation'] = 2
@@ -531,8 +798,10 @@ def eprouver(d):
               ("forge posée sur la rue", maison_sur_le_chemin, "traverse le bâtiment"), ("porte du moulin sans chemin", porte_loin, "du chemin"),
               ("bief sans prise d'eau", bief_sans_prise, "source"), ("quête hors de son acte", quete_coupee, "inatteignable"),
               ("verrou sans objet", verrou_sans_objet, "aucun objet visible"), ("lisière en mur nu", lisiere_nue, "lisière nue"),
-              ("tranchée sans talus autour de V2b", couloir_large, "on le contourne"), ("banc dos à la rivière", banc_de_dos, "tourne le dos"),
-              ("vanne posée sur l'eau (version 1)", vanne_dans_l_eau, "dans l'eau"), ("porte du gabarit sur la mauvaise façade", porte_mal_gabaritee, "façade")]
+              ("étranglement du poste sans talus autour de V2b", couloir_large, "on le contourne"), ("banc dos à la rivière", banc_de_dos, "tourne le dos"),
+              ("vanne posée sur l'eau (version 1)", vanne_dans_l_eau, "dans l'eau"), ("porte du gabarit sur la mauvaise façade", porte_mal_gabaritee, "façade"),
+              ("ordre des verrous annoncé faux", ordre_faux, "dans les fiches"), ("frênes qui ne barrent que la moitié de l'étranglement", frenes_trop_courts, "se contourne"),
+              ("belvédère atteint sans antichambre déclarée", belvedere_non_declare, "hors antichambre")]
     res = [casse(*e) for e in essais]
     print("banc d'épreuve: %d casses vues sur %d" % (sum(res), len(res)))
     return all(res)
@@ -546,6 +815,12 @@ if __name__ == '__main__':
     chemin_md = os.path.join(ICI, 'plan.md')
     md = open(chemin_md, encoding='utf-8').read() if os.path.exists(chemin_md) else None
     erreurs, infos = controler(plan, md)
+    chemin_carte = os.path.join(LIEU, 'carte.json')
+    if os.path.exists(chemin_carte):
+        e2, i2 = controler_histoire(plan, json.load(open(chemin_carte, encoding='utf-8')), lire_fiches())
+        erreurs += e2; infos += i2
+    else:
+        erreurs.append("carte du lieu absente (%s): lancer plan-vers-lieu.ts puis assembler_lieu.py" % chemin_carte)
     for i in infos:
         print("info:", i)
     for e_ in erreurs:

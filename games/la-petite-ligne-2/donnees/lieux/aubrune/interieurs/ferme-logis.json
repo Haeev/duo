@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "ferme-logis",
+  "name": "Le logis de la ferme Delmas",
+  "width": 8,
+  "height": 5,
+  "at": {
+    "x": 191,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "margot-cuisine": {
+      "x": 1.5,
+      "y": 1.5
+    },
+    "paulin-table": {
+      "x": 5.5,
+      "y": 2.5
+    }
+  },
+  "objects": [
+    {
+      "id": "logis-cuisiniere",
+      "type": "cuisiniere",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "logis-plan",
+      "type": "plan-de-travail",
+      "x": 2,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "logis-table",
+      "type": "table-a-manger",
+      "x": 4,
+      "y": 2.5,
+      "rotation": 0
+    },
+    {
+      "id": "logis-chaise-1",
+      "type": "chaise",
+      "x": 3.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "logis-chaise-2",
+      "type": "chaise",
+      "x": 4.5,
+      "y": 3.5,
+      "rotation": 2
+    },
+    {
+      "id": "logis-armoire",
+      "type": "armoire",
+      "x": 7.5,
+      "y": 0.5,
+      "rotation": 0
+    }
+  ],
+  "doors": {
+    "ferme-logis-porte": {
+      "x": 4.5,
+      "y": 4.5,
+      "facing": 2,
+      "to": "porte-ferme-logis"
+    }
+  },
+  "pourquoi": "une salle commune: la cuisine au nord, la grande table au milieu, la porte au midi sur la cour"
+}

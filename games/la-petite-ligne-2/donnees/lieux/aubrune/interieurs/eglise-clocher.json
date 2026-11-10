@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "eglise-clocher",
+  "name": "La chambre des cloches",
+  "width": 5,
+  "height": 5,
+  "at": {
+    "x": 147,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "clocher-vue": {
+      "x": 2.5,
+      "y": 4.5
+    }
+  },
+  "objects": [],
+  "doors": {
+    "eglise-clocher-esc-eglise": {
+      "x": 0.5,
+      "y": 0.5,
+      "facing": 0,
+      "to": "eglise-esc-eglise-clocher"
+    }
+  },
+  "pourquoi": "en haut de l'échelle du sonneur: la cloche au milieu, les abat-son ouverts sur le bourg (la vue de « La robe et la cloche »); le niveau intermédiaire attend l'écriture de la suite"
+}

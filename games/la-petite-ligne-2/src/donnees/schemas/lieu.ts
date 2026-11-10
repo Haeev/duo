@@ -187,6 +187,16 @@ export const LandmarkSchema = v.strictObject({
   y: FiniteSchema,
   /** Hauteur (m). */
   height: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(80)),
+  /** Ce qu'il est (`clocher`, `arbre`, `signal`...), pour sa silhouette; absent: le rendu le déduit. */
+  kind: v.optional(IdSchema),
+});
+
+/** Tracé d'une voie ferrée du plan (ligne, voie de garage, tunnel): le rendu y pose les rails. */
+export const RailTrackSchema = v.strictObject({
+  id: IdSchema,
+  points: v.pipe(v.array(v.tuple([FiniteSchema, FiniteSchema])), v.minLength(2), v.maxLength(256)),
+  /** Sous terre (le tunnel): rails sans ciel au-dessus. */
+  tunnel: v.optional(v.boolean()),
 });
 
 /** Point d'intérêt du plan (pêche, fouille, banc, service), rattaché à son nœud de chemin. */
@@ -257,6 +267,8 @@ export const MapSchema = v.strictObject({
   /** Graphe des chemins tiré du plan: les habitants marchent dessus (absent: A* sur la grille). */
   graph: v.optional(PathGraphSchema),
   landmarks: v.optional(v.record(IdSchema, LandmarkSchema)),
+  /** Voies ferrées tracées par le plan (absent: le rendu suit les arêtes `voie` du graphe). */
+  rails: v.optional(v.pipe(v.array(RailTrackSchema), v.maxLength(32))),
   interests: v.optional(v.record(IdSchema, InterestSchema)),
   buildings: v.optional(v.record(IdSchema, BuildingSchema)),
 });

@@ -9,5 +9,155 @@
   },
   "links": ["train-de-nuit"],
   "activities": [],
-  "music": null
+  "music": null,
+  "fishing": [
+    {
+      "id": "ponton",
+      "area": {
+        "x": 200,
+        "y": 131,
+        "w": 8,
+        "h": 5
+      },
+      "shadows": 3,
+      "table": [
+        {
+          "catch": "goujon",
+          "weight": 4
+        },
+        {
+          "catch": "ablette",
+          "weight": 4
+        },
+        {
+          "catch": "perche",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "id": "aval",
+      "area": {
+        "x": 291,
+        "y": 135,
+        "w": 8,
+        "h": 5
+      },
+      "shadows": 3,
+      "table": [
+        {
+          "catch": "truite",
+          "weight": 3
+        },
+        {
+          "catch": "goujon",
+          "weight": 2
+        },
+        {
+          "catch": "ablette",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "id": "fosse",
+      "area": {
+        "x": 132,
+        "y": 126,
+        "w": 8,
+        "h": 3
+      },
+      "shadows": 4,
+      "table": [
+        {
+          "catch": "goujon",
+          "weight": 3
+        },
+        {
+          "catch": "perche",
+          "weight": 3
+        },
+        {
+          "catch": "tanche",
+          "weight": 2
+        },
+        {
+          "catch": "brochet",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "saule-ile",
+      "area": {
+        "x": 77,
+        "y": 135,
+        "w": 8,
+        "h": 3
+      },
+      "shadows": 3,
+      "table": [
+        {
+          "catch": "goujon",
+          "weight": 3
+        },
+        {
+          "catch": "perche",
+          "weight": 2
+        },
+        {
+          "catch": "tanche",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "id": "vanne",
+      "area": {
+        "x": 19,
+        "y": 148,
+        "w": 6,
+        "h": 5
+      },
+      "shadows": 3,
+      "table": [
+        {
+          "catch": "brochet",
+          "weight": 2
+        },
+        {
+          "catch": "truite",
+          "weight": 2
+        },
+        {
+          "catch": "ablette",
+          "weight": 2
+        }
+      ]
+    },
+    {
+      "id": "etang",
+      "area": {
+        "x": 228,
+        "y": 36,
+        "w": 8,
+        "h": 5
+      },
+      "shadows": 4,
+      "table": [
+        {
+          "catch": "tanche",
+          "weight": 3
+        },
+        {
+          "catch": "perche",
+          "weight": 2
+        },
+        {
+          "catch": "goujon",
+          "weight": 2
+        }
+      ]
+    }
+  ]
 }

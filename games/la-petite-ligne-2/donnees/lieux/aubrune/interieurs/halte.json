@@ -1,71 +1,72 @@
 {
- "schema": 1,
- "id": "halte",
- "name": "La halte",
- "width": 9,
- "height": 5,
- "at": {
-  "x": 2,
-  "y": 210
- },
- "blocked": [
-  {
-   "x": 6,
-   "y": 3,
-   "w": 2,
-   "h": 1
-  }
- ],
- "points": {
-  "halte-p-guichet": {
-   "x": 6.5,
-   "y": 2.5
+  "schema": 1,
+  "id": "halte",
+  "name": "La halte",
+  "width": 9,
+  "height": 5,
+  "at": {
+    "x": 2,
+    "y": 210
   },
-  "halte-p-bureau": {
-   "x": 7.5,
-   "y": 2.5
+  "blocked": [
+    {
+      "x": 6,
+      "y": 3,
+      "w": 2,
+      "h": 1
+    }
+  ],
+  "points": {
+    "halte-p-guichet": {
+      "x": 6.5,
+      "y": 2.5
+    },
+    "halte-p-bureau": {
+      "x": 7.5,
+      "y": 2.5
+    },
+    "halte-p-banc": {
+      "x": 1.5,
+      "y": 1
+    }
   },
-  "halte-p-banc": {
-   "x": 1.5,
-   "y": 1
-  }
- },
- "objects": [
-  {
-   "id": "halte-banc",
-   "type": "banc",
-   "x": 1.5,
-   "y": 0.5,
-   "rotation": 0
+  "objects": [
+    {
+      "id": "halte-banc",
+      "type": "banc",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-bureau",
+      "type": "table-a-manger",
+      "x": 7.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-chaise",
+      "type": "chaise",
+      "x": 7.5,
+      "y": 1.5,
+      "rotation": 2
+    },
+    {
+      "id": "halte-consigne",
+      "type": "coffre",
+      "x": 8.5,
+      "y": 4.5,
+      "rotation": 3
+    }
+  ],
+  "doors": {
+    "halte-porte": {
+      "x": 2.5,
+      "y": 4.5,
+      "facing": 2,
+      "to": "porte-halte"
+    }
   },
-  {
-   "id": "halte-bureau",
-   "type": "table-a-manger",
-   "x": 7.5,
-   "y": 0.5,
-   "rotation": 0
-  },
-  {
-   "id": "halte-chaise",
-   "type": "chaise",
-   "x": 7.5,
-   "y": 1.5,
-   "rotation": 2
-  },
-  {
-   "id": "halte-consigne",
-   "type": "coffre",
-   "x": 8.5,
-   "y": 4.5,
-   "rotation": 3
-  }
- ],
- "doors": {
-  "halte-porte": {
-   "x": 2.5,
-   "y": 4.5,
-   "facing": 2,
-   "to": "porte-halte"
-  }
- }
+  "pourquoi": "le guichet sépare la salle du bureau; la consigne est le coffre commun des deux joueurs"
 }

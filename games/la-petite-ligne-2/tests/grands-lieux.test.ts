@@ -46,7 +46,8 @@ describe('plan vers lieu (Aubrune)', () => {
     expect(report.firstActCut).toEqual([]);
     expect(report.blockedNodes).toEqual([]);
     expect(Object.keys(map.locks ?? {})).toHaveLength(12);
-    expect(Object.keys(map.graph?.nodes ?? {})).toHaveLength(117);
+    // Plan version 3: portillon de la berge du moulin (`mp`) et allée du poulailler (`jo`).
+    expect(Object.keys(map.graph?.nodes ?? {})).toHaveLength(119);
     expect(Object.keys(map.interests ?? {})).toHaveLength(68);
     expect(Object.keys(map.buildings ?? {})).toHaveLength(28);
     expect(map.terrain && terrainProblem(map.terrain, map.width, map.height)).toBeNull();

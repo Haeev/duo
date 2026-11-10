@@ -1,27 +1,28 @@
 {
- "schema": 1,
- "id": "maison-etage",
- "name": "La maison du garde, étage",
- "width": 10,
- "height": 7,
- "at": {
-  "x": 27,
-  "y": 210
- },
- "blocked": [],
- "points": {
-  "maison-etage-milieu": {
-   "x": 5,
-   "y": 3.5
-  }
- },
- "objects": [],
- "doors": {
-  "maison-etage-esc-maison-rdc": {
-   "x": 5.5,
-   "y": 4.5,
-   "facing": 2,
-   "to": "maison-rdc-esc-maison-etage"
-  }
- }
+  "schema": 1,
+  "id": "maison-etage",
+  "name": "La maison du garde, étage",
+  "width": 10,
+  "height": 7,
+  "at": {
+    "x": 27,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "maison-etage-milieu": {
+      "x": 5,
+      "y": 3.5
+    }
+  },
+  "objects": [],
+  "doors": {
+    "maison-etage-esc-maison-rdc": {
+      "x": 5.5,
+      "y": 4.5,
+      "facing": 2,
+      "to": "maison-rdc-esc-maison-etage"
+    }
+  },
+  "pourquoi": "sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier)"
 }
