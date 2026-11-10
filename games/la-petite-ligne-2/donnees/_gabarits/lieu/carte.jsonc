@@ -1,5 +1,9 @@
-// GABARIT: la carte d'un lieu, en cases de 1 m (x vers l'est, y vers le sud), 128 x 128 au plus.
-// Schéma: src/donnees/schemas/lieu.ts
+// GABARIT: la carte d'un petit lieu, écrite à la main, en cases de 1 m (x vers l'est, y vers le sud).
+// Schéma: src/donnees/schemas/lieu.ts (512 x 512 au plus).
+// Un grand lieu ne s'écrit pas à la main: son plan vu du dessus est la source, et
+// `node outils/plan-vers-lieu.ts <plan.json> <carte.json>` produit cette carte avec, en plus,
+// le terrain, les zones, les verrous d'histoire, le graphe des chemins, les repères, les points
+// d'intérêt, les bâtiments et le dehors (`outdoor`) au-dessus de l'annexe des intérieurs (ADR 0022).
 {
   "schema": 1,
   "width": 24,

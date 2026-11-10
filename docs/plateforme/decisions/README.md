@@ -34,6 +34,7 @@ Chaque décision structurante de la plateforme a son ADR: contexte, au moins deu
 | 0019 | État en tranches sur le réseau (La Petite Ligne) | proposée | architecte-technique (avec dev-reseau, dev-gameplay-3d, qa-testeur) | [0019-etat-en-tranches-petite-ligne.md](0019-etat-en-tranches-petite-ligne.md) |
 | 0020 | Ressenti: prédiction du geste chez l'invité, mini-jeux locaux, gestes bornés | proposée | architecte-technique (avec dev-reseau, dev-gameplay-3d, ux-ui-designer, sound-designer, qa-testeur) | [0020-ressenti-prediction-du-geste-petite-ligne.md](0020-ressenti-prediction-du-geste-petite-ligne.md) |
 | 0021 | Personnages modulaires de La Petite Ligne, squelette commun de 24 os | proposée | architecte-technique (avec tech-artist, artiste-3d, dev-gameplay-3d, directeur-artistique, dev-reseau) | [0021-personnages-modulaires-squelette-commun.md](0021-personnages-modulaires-squelette-commun.md) |
+| 0022 | Grands lieux de La Petite Ligne: une grille, des tuiles de rendu, le plan comme source | proposée | architecte-technique (avec level-designer, dev-gameplay-3d, dev-reseau, tech-artist, qa-testeur) | [0022-grands-lieux-tuiles-plan-source-petite-ligne.md](0022-grands-lieux-tuiles-plan-source-petite-ligne.md) |
 
 « Avec » désigne les membres qui doivent relire l'ADR; ils ne l'ont pas encore fait au 2026-10-30. Les ADR 0007 et 0008 étaient en cours de rédaction par dev-reseau à la date de cet index: leur ligne est à compléter (statut, lien) à leur intégration.
 

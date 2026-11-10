@@ -1,0 +1,28 @@
+// GABARIT: un intérieur (pièce, boutique, étage) d'un lieu, sur la même grille que le dehors (ADR 0022).
+// Créer: pnpm nouveau interieur <id> <lieu>   -> donnees/lieux/<lieu>/interieurs/<id>.json
+// Schéma: src/donnees/schemas/lieu.ts (InteriorSchema)
+// Il se pose hors du dehors (`outdoor` de carte.json), dans l'annexe sous la carte, à une case au
+// moins de tout autre intérieur: le chargement l'entoure d'un mur. Coordonnées locales: (0, 0) est
+// le coin nord-ouest de la pièce. Les identifiants des points, meubles et portes sont uniques dans
+// tout le lieu: préfixe-les du nom de la pièce.
+{
+  "schema": 1,
+  "id": "exemple-interieur",
+  "name": "Nouvelle pièce",
+  // Taille en cases de 1 m, 64 au plus par côté.
+  "width": 8,
+  "height": 6,
+  // Coin nord-ouest sur la grille du lieu: sous le dehors (y >= hauteur du dehors + 1).
+  "at": { "x": 2, "y": 130 },
+  // Murs intérieurs, cloisons, comptoirs fixes.
+  "blocked": [],
+  "points": {
+    "piece-milieu": { "x": 4, "y": 3 },
+  },
+  "objects": [],
+  // Chaque porte mène à une autre (« to »), qui ramène ici: écrire la porte du dehors dans
+  // carte.json, au pied de la porte du bâtiment, avec "to" = l'identifiant de celle-ci.
+  "doors": {
+    "piece-porte": { "x": 4, "y": 5, "facing": 2, "to": "piece-porte-dehors" },
+  },
+}
