@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:longues": "vitest run --config vitest.longues.config.ts",
-    "nouveau": "node outils/nouveau.ts"
+    "nouveau": "node outils/nouveau.ts",
+    "vignette": "node assets-src/vignette/generer.mjs"
   },
   "dependencies": {
     "@duo/sdk": "workspace:*",
