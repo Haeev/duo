@@ -8,13 +8,16 @@
  * L'histoire peut aussi faire partir les deux joueurs (effet `travel_to`, `takeDeparture`).
  */
 import type { PlayerIndex } from '../../donnees/schemas/communs';
+import type { TripArrival } from '../../donnees/schemas/trajet';
+import { wakeUp } from '../besoins/soins';
 import { endTalk } from '../briques/parler';
 import { postureOf, standUp } from '../briques/postures';
 import type { Look } from '../briques/types';
 import { SIM_HZ } from '../noyau/constantes';
 import { freePlayer } from '../noyau/deblocage';
 import { stopPlayer } from '../noyau/deplacement';
-import { addMinutes } from '../noyau/horloge';
+import { addMinutes, skipToMorning } from '../noyau/horloge';
+import { MINUTES_PER_DAY } from '../noyau/constantes';
 import { createPlaceState, placeAtArrival } from '../noyau/monde';
 import { CORE_TUNING } from '../noyau/reglages-noyau';
 import type { GameSystem, SimContext } from '../noyau/systemes';
@@ -75,7 +78,7 @@ function unboard(sim: SimContext, player: PlayerIndex): void {
 }
 
 /** Les deux sont à bord: le lieu quitté est figé, le lieu d'arrivée devient le lieu courant. */
-function depart(sim: SimContext, to: string): void {
+function depart(sim: SimContext, to: string, arrival?: TripArrival): void {
   const { world, content } = sim;
   const from = world.common.place;
   const destination = content.places[to];
@@ -100,7 +103,13 @@ function depart(sim: SimContext, to: string): void {
     freePlayer(content, world, player);
   }
   world.common.phase = 'travel';
-  world.common.travel = { to, boarded: [true, true], loaded: [false, false], since: world.tick };
+  world.common.travel = {
+    to,
+    boarded: [true, true],
+    loaded: [false, false],
+    since: world.tick,
+    ...(arrival === undefined ? {} : { arrival }),
+  };
   sim.touch('common');
   sim.touch('players');
   sim.touch('place');
@@ -130,7 +139,7 @@ function takeDeparture(sim: SimContext): void {
   heldUntil.delete(world);
   sim.touch('common');
   if (sim.content.places[departure.to] !== undefined) {
-    depart(sim, departure.to);
+    depart(sim, departure.to, departure.arrival);
     return;
   }
   if (departure.ending === null) return;
@@ -138,11 +147,40 @@ function takeDeparture(sim: SimContext): void {
   sim.emit({ type: 'chapter_ended', place: world.common.place, ending: departure.ending });
 }
 
-function arrive(sim: SimContext, place: string): void {
+/** Minutes de `from` jusqu'à la prochaine `to` (0 si l'on y est). */
+function minutesUntil(from: number, to: number): number {
+  return (((to - from) % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;
+}
+
+/**
+ * L'horloge au bout du trajet, selon la règle qu'il déclare (`donnees/schemas/trajet.ts`). Le
+ * trajet coûte ses heures d'un coup (cahier 4.1); l'horloge est la même dans tous les lieux.
+ */
+export function advanceTripClock(sim: SimContext, arrival: TripArrival | undefined): void {
   const { world, content } = sim;
-  // Le trajet coûte ses heures d'un coup (cahier 4.1); l'horloge est la même dans tous les lieux.
+  const rule = arrival ?? { kind: 'hours', hours: content.settings.travel.clockHours };
+  if (rule.kind === 'hours') {
+    addMinutes(sim, rule.hours * 60);
+    return;
+  }
+  if (rule.kind === 'at') {
+    addMinutes(sim, minutesUntil(world.minutes, rule.minute));
+    return;
+  }
+  const { dayStart } = content.settings.clock;
+  const slept = minutesUntil(dayStart, world.minutes) < minutesUntil(dayStart, rule.minute);
+  if (!slept) {
+    // La nuit se passe à bord, comme dans un lit: réveil doux, puis le matin jusqu'à l'heure dite.
+    for (const player of PLAYERS) wakeUp(sim, player, rule.wakeAt);
+    skipToMorning(sim);
+  }
+  addMinutes(sim, minutesUntil(world.minutes, rule.minute));
+}
+
+function arrive(sim: SimContext, place: string): void {
+  const { world } = sim;
   world.common.phase = 'arrival';
-  addMinutes(sim, content.settings.travel.clockHours * 60);
+  advanceTripClock(sim, world.common.travel?.arrival);
   world.common.travel = {
     to: place,
     boarded: [true, true],

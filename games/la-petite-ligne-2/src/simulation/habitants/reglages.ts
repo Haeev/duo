@@ -76,7 +76,7 @@ export const VILLAGERS: VillagerSettings = {
   reactRadius: 4,
   reactCooldown: 20,
   emoteSeconds: 2,
-  runSpeed: 3.5,
+  runSpeed: 2.2,
   dirtyTiers: ['blocked', 'low'],
   giftReach: 1.8,
   gift: {

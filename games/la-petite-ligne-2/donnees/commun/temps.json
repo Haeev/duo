@@ -57,7 +57,7 @@
     "spawnChance": 0.5,
     "netReach": 1.5,
     "netHalfAngleDeg": 60,
-    "runThreshold": 3.5
+    "runThreshold": 2.2
   },
   "photo": {
     "range": 20,

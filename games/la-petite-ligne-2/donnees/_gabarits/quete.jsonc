@@ -54,6 +54,12 @@
           //   { "type": "villager_arrives", "villager": "..." }
           //   { "type": "open_quest", "quest": "..." }   { "type": "play_scene", "scene": "..." }
           //   { "type": "travel_to", "place": "...", "ending": {...} }   (voir le gabarit de scène)
+          //   Heure d'arrivée du trajet, facultative (sans elle: `travel.clockHours` de reglages.json):
+          //   "arrival": { "kind": "hours", "hours": 3 }                  le trajet prend 3 h de jeu
+          //   "arrival": { "kind": "at", "minute": 600 }                  arrivée à la prochaine 10 h
+          //   "arrival": { "kind": "night", "minute": 480, "wakeAt": 85 } train de nuit: arrivée le
+          //     lendemain à 8 h (heure après l'aube); la nuit se passe à bord comme dans un lit
+          //     (sommeil remonté à wakeAt, faim et hygiène d'une nuit), sauf si on a déjà dormi.
           // Et aussi: take_money, change_bond, et "to": "duo" (voir le gabarit de dialogue).
           "onStart": [],
           "onDone": [

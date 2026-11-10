@@ -16,6 +16,7 @@ import {
   TextSchema,
 } from './communs';
 import { ConditionSchema, EffectSchema, type Condition } from './regles';
+import { TripArrivalSchema } from './trajet';
 
 const Radius = v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(40));
 
@@ -86,6 +87,8 @@ export const StoryEffectSchema = v.variant('type', [
     type: v.literal('travel_to'),
     place: IdSchema,
     ending: v.exactOptional(ChapterEndSchema),
+    /** Heure d'arrivée (`trajet.ts`); absente: `travel.clockHours` de `reglages.json`. */
+    arrival: v.exactOptional(TripArrivalSchema),
   }),
 ]);
 export type StoryEffect = v.InferOutput<typeof StoryEffectSchema>;

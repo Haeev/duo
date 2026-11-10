@@ -163,6 +163,8 @@ export const TEXTS = {
     otherLeftTrain: '{nom} est descendu·e',
     given: '{nom} te donne {objet}',
     toolBlunt: 'Outil émoussé',
+    /** Rappel de la course, une fois (`astuce-course.ts`); `{touche}` selon le clavier réel. */
+    runHint: 'Maintiens {touche} pour courir (ça creuse un peu l’appétit)',
   },
   glance: {
     other: '{nom}, à {n} m',

@@ -58,6 +58,7 @@ export function applyStepEffects(
           to: effect.place,
           since: sim.world.tick,
           ending: effect.ending?.id ?? null,
+          ...(effect.arrival === undefined ? {} : { arrival: effect.arrival }),
         };
         sim.touch('common');
         break;

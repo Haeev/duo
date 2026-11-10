@@ -122,7 +122,12 @@
             },
             {
               "type": "travel_to",
-              "place": "aubrune"
+              "place": "aubrune",
+              "arrival": {
+                "kind": "night",
+                "minute": 480,
+                "wakeAt": 85
+              }
             }
           ]
         }
