@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "etal-de-haches",
+  "name": "Râtelier de haches",
+  "model": "ratelier",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "gather",
+      "verb": "Prendre",
+      "clip": "pickup",
+      "seconds": 0.5,
+      "gives": {
+        "item": "hache",
+        "count": 1
+      },
+      "stock": null,
+      "tool": null
+    }
+  ]
+}

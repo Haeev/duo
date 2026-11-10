@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "armoire",
+  "name": "Armoire",
+  "model": "armoire",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "repos",
+  "bricks": [
+    {
+      "brick": "store",
+      "slots": 20
+    }
+  ]
+}

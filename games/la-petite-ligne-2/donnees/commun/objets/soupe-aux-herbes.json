@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "soupe-aux-herbes",
+  "name": "Soupe aux herbes",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 35
+  },
+  "tool": null
+}

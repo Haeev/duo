@@ -92,6 +92,7 @@ describe('gabarits', () => {
     expect(content.places['essai-gare']?.villagers.map((villager) => villager.id)).toEqual([
       'cheffe-de-gare',
       'facteur',
+      'odilon',
     ]);
     const world = createWorld(content, SEED, MEMBERS);
     expect(world.places['essai-gare']?.villagers.facteur?.body).toMatchObject({ x: 20, y: 15 });
@@ -99,7 +100,7 @@ describe('gabarits', () => {
       met: [false, false],
       talkingWith: null,
     });
-    expect(fastMessage(world, content, -1).villagers).toHaveLength(2);
+    expect(fastMessage(world, content, -1).villagers).toHaveLength(3);
   });
 
   it('dialogue: un dialogue ajouté par un seul fichier est rattaché à son habitant et passe le validateur', () => {

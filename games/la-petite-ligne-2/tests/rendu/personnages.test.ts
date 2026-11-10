@@ -224,7 +224,7 @@ describe('couche des personnages', () => {
     const figure = root.getObjectByName('personnage-player-0');
     const s = CHARACTER_SETTINGS.seat;
     expect(figure?.position.y ?? 0).toBeCloseTo(s.standIn.height - s.clipSeat, 1);
-    expect(layer.stats().figures).toBe(2);
+    expect(layer.stats().figures).toBe(2 + Object.keys(bench.villagers).length);
     layer.dispose();
     expect(layer.stats().figures).toBe(0);
     expect(root.children.length).toBe(0);

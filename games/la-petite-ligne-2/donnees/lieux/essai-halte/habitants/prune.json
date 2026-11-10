@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "prune",
+  "name": "Prune, la jardinière",
+  "temper": "cheerful",
+  "look": {
+    "shape": "adult-f-round",
+    "skin": 1,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [4, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bun",
+        "colors": [2]
+      },
+      {
+        "slot": "dress",
+        "id": "dress-simple",
+        "colors": [16]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [0, 0]
+      },
+      {
+        "slot": "hat",
+        "id": "hat-beanie-pompom",
+        "colors": [3]
+      }
+    ]
+  },
+  "stands": "potager",
+  "voice": "high"
+}

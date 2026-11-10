@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "tourte-du-quai",
+  "name": "Tourte du quai",
+  "family": "food",
+  "stack": 1,
+  "food": {
+    "hunger": 60
+  },
+  "tool": null,
+  "meal": {
+    "perk": "no_tool_wear"
+  }
+}
