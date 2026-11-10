@@ -57,6 +57,9 @@ const ui =
         keyLabel: (code) => duo.input.keyLabel(code),
         reducedMotion: duo.ui.reducedMotion,
       });
+// Sonde des parcours de recette, seulement sur demande de l'adresse (`?sonde=1`).
+if (new URLSearchParams(location.search).get('sonde') === '1')
+  void import('./plateforme/sonde-essai').then((m) => m.installTestProbe({ session, renderer }));
 const controls = createControls({
   input: duo.input,
   view: session.view,

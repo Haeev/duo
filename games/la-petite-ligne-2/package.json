@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:longues": "vitest run --config vitest.longues.config.ts",
     "nouveau": "node outils/nouveau.ts",
-    "vignette": "node assets-src/vignette/generer.mjs"
+    "vignette": "node assets-src/vignette/generer.mjs",
+    "test:e2e": "vite build && playwright test"
   },
   "dependencies": {
     "@duo/sdk": "workspace:*",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@duo/config": "workspace:*",
     "@duo/sdk-dev": "workspace:*",
+    "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@types/three": "0.187.0",
     "eslint": "catalog:",

@@ -89,3 +89,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Écran du matin et bilan du soir de Deux Tabliers: modaux, Tab n'y ouvre pas le téléphone; une action marketing ne se lance qu'après « Commencer la journée » d'un seul joueur.
 - Sonde WebGL par `addInitScript` de contexte (programmes vivants, appels et triangles par image via `requestAnimationFrame`): s'applique aux cadres du jeu. En 1600x640, deux vues logicielles réveillent le chien de garde; 1280x520 passe.
 - Avant de publier un jeu: comparer `version` de `duo-game.json` aux étiquettes `jeu-<id>-v*` de `git ls-remote --tags origin`.
+
+## La Petite Ligne 2 à deux dans `servir` (vérifié le 2026-11-10, recette J1)
+
+- Sonde d'essai `?sonde=1` (`src/plateforme/sonde-essai.ts`, `window.__lplSonde`): le cadre `/jeu/` reçoit le paramètre par redirection 302 de `context.route`; téléporter, régler jauge, heure et bourse chez l'hôte seulement. Aides: `tests/aides-e2e/duo.ts`.
+- `@playwright/test` n'était pas une dépendance du paquet: ajout en `catalog:` puis `pnpm install --offline`. Vitest ramasse aussi les `*.spec.ts`: exclure `tests/e2e/**` dans `vitest.config.ts`.
+- `servir` exige `pnpm --filter @duo/sdk-dev build` une fois (pages du faux hôte).
+- Portée d'action 1,2 m au point le plus proche de l'emprise, cône de 50 degrés: placer le joueur à moins d'un mètre, face à l'objet, et vérifier `aim(i)` avant d'appuyer (un meuble voisin, armoire ou coffre, peut prendre la cible).
+- Voyage: la phase `travel` dure au moins 20 s et jusqu'à 47 s en rendu logiciel (chargement du lieu): délai d'arrivée d'au moins 60 s.
+- L'horloge système de l'environnement fait foi pour le temps de mission (`date`), pas l'estimation au jugé.
