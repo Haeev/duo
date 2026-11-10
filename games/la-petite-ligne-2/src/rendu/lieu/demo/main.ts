@@ -10,7 +10,7 @@
  * Paramètres d'URL: `x`, `y` (m), `lacet` (degrés), `largeur` (m), `minute`, `haute` (largeur de
  * la vue haute, m), `qualite`, `panneau=0`.
  */
-import plan from '../../../../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json';
+import plan from '../../../../donnees/lieux/aubrune/plan.json';
 import { planToMap } from '../../../../outils/plan-vers-lieu';
 import { loadContent } from '../../../donnees/charger';
 import { DATA_FILES } from '../../../donnees/fichiers';

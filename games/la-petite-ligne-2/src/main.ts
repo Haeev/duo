@@ -22,7 +22,7 @@ import { DEFAULT_UI_SETTINGS } from './interface/carnet/lectures';
 import { memorySettings } from './interface/carnet/options';
 import { parsePlan } from './interface/carnet/plan';
 import { DEFAULT_GRAPHICS_OPTIONS } from './rendu/options';
-import planAubrune from '../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json';
+import planAubrune from '../donnees/lieux/aubrune/plan.json';
 import { SIM_HZ } from './simulation/noyau/constantes';
 
 /** Attente du premier état chez l'invité avant de se déclarer prêt (ms), et pas de l'attente. */

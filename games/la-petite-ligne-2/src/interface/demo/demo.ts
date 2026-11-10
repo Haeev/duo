@@ -20,7 +20,7 @@ import { memoryFollow } from '../carnet/quetes';
 import { worldSources } from '../carnet/lectures';
 import { createInterface } from '../index';
 import { histoireFiles, setupHistoire } from './histoire';
-import planAubrune from '../../../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json';
+import planAubrune from '../../../donnees/lieux/aubrune/plan.json';
 
 const content = loadContent({ ...DATA_FILES, ...histoireFiles() });
 const world: WorldState = createWorld(content, 7, [
