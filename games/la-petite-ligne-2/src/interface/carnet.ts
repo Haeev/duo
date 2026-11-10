@@ -18,6 +18,7 @@ import {
   type SlotModel,
   type SlotRefModel,
 } from './modeles';
+import { createCarnetTabs, type CarnetTabsOptions, type TabId } from './carnet/index';
 import { itemThumb } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, TEXTS } from './textes';
@@ -38,9 +39,18 @@ type Mode =
   | { readonly kind: 'notebook' }
   | { readonly kind: 'store'; readonly target: string };
 
+/** Ce que le jeu branche aux onglets autres que le Sac (sources de lecture, réglages, éditeur). */
+export type NotebookExtras = Pick<
+  CarnetTabsOptions,
+  'sources' | 'sourcesExtras' | 'settings' | 'openEditor' | 'follow'
+>;
+
 export interface Notebook {
   isOpen(): boolean;
-  open(now: number): void;
+  /** Ouvre le carnet; `tab` choisit l'onglet (identifiant), sinon le dernier ouvert. */
+  open(now: number, tab?: string): void;
+  /** Réglages de la machine et suite suivie, tenus par les onglets. */
+  readonly tabs: Pick<ReturnType<typeof createCarnetTabs>, 'follow' | 'settings'>;
   openStore(target: string, now: number): void;
   close(): void;
   frame(world: ReadonlyWorld, local: PlayerIndex): void;
@@ -65,6 +75,7 @@ export function createNotebook(
   send: (intent: Intent) => void,
   keyLabel: (code: string) => string,
   openGuardMs: number,
+  extras: NotebookExtras = {},
 ): Notebook {
   const layer = el('div', { class: 'carnet-layer' });
   layer.hidden = true;
@@ -77,18 +88,47 @@ export function createNotebook(
   let focus = 0;
   let held: SlotRefModel | null = null;
   let openedAt = 0;
+  /** L'ouverture (le carnet qui monte) ne se joue qu'une fois, pas à chaque redessin. */
+  let entering = false;
   let drawn = '';
   let last: { world: ReadonlyWorld; local: PlayerIndex } | null = null;
 
+  const tabs = createCarnetTabs({
+    ...extras,
+    content,
+    keyLabel,
+    invalidate: () => {
+      redraw();
+    },
+    goto(target) {
+      const at = TABS.findIndex(([id]) => id === target);
+      if (at >= 0) tab = at;
+      redraw();
+    },
+  });
+  const tabId = (): TabId | null => {
+    const id = TABS[tab]?.[0];
+    return id === undefined || id === 'bag' ? null : id;
+  };
+
   const keys = (codes: readonly string[], label: string): HTMLElement =>
-    el('span', {}, [...codes.map((c) => el('span', { class: 'key', text: keyLabel(c) })), ` ${label}`]);
+    el('span', {}, [
+      ...codes.map((c) => el('span', { class: 'key', text: keyLabel(c) })),
+      ` ${label}`,
+    ]);
 
   function storeSlots(world: ReadonlyWorld, target: string): readonly (SlotModel | null)[] {
     const slots = world.places[world.common.place]?.objects[target]?.store ?? [];
     return slots.map((s) => slotModel(content, s));
   }
 
-  function tile(model: SlotModel | null, focused: boolean, isHeld: boolean, onClick: () => void, onHover: () => void): HTMLButtonElement {
+  function tile(
+    model: SlotModel | null,
+    focused: boolean,
+    isHeld: boolean,
+    onClick: () => void,
+    onHover: () => void,
+  ): HTMLButtonElement {
     const label =
       model === null
         ? TEXTS.toolbar.empty
@@ -109,7 +149,9 @@ export function createNotebook(
           }),
         );
       if (model.wear !== null) {
-        const arc = el('span', { class: `wear${model.wear < 0.25 ? ' wear--low' : ''}` }, [el('i')]);
+        const arc = el('span', { class: `wear${model.wear < 0.25 ? ' wear--low' : ''}` }, [
+          el('i'),
+        ]);
         const bar = arc.firstElementChild;
         if (bar instanceof HTMLElement) bar.style.width = `${Math.round(model.wear * 100)}%`;
         node.append(arc);
@@ -165,14 +207,20 @@ export function createNotebook(
       grid.setAttribute('aria-label', fill(TEXTS.notebook.bagLabel, { n: me.bag.slots.length }));
       const used = me.bag.slots.filter((s) => s !== null).length;
       wrap.append(
-        el('div', { class: 'bag-head' }, [icon('sac'), el('span', { class: 'pastille', text: `${used}/${me.bag.slots.length}` })]),
+        el('div', { class: 'bag-head' }, [
+          icon('sac'),
+          el('span', { class: 'pastille', text: `${used}/${me.bag.slots.length}` }),
+        ]),
         grid,
       );
     }
     return wrap;
   }
 
-  function focusedModel(world: ReadonlyWorld, local: PlayerIndex): { ref: SlotRefModel; model: SlotModel } | null {
+  function focusedModel(
+    world: ReadonlyWorld,
+    local: PlayerIndex,
+  ): { ref: SlotRefModel; model: SlotModel } | null {
     const ref = slotAt(world, local, focus);
     if (ref === null) return null;
     const me = world.players[local];
@@ -184,7 +232,8 @@ export function createNotebook(
   function detailPage(world: ReadonlyWorld, local: PlayerIndex): HTMLElement {
     const page = el('div', { class: 'detail' });
     const chosen = focusedModel(world, local);
-    if (chosen === null) page.append(el('p', { class: 'detail__none', text: TEXTS.notebook.nothing }));
+    if (chosen === null)
+      page.append(el('p', { class: 'detail__none', text: TEXTS.notebook.nothing }));
     else {
       const { model } = chosen;
       const big = el('div', { class: 'v3d' });
@@ -201,15 +250,29 @@ export function createNotebook(
       );
       const row = el('div', { class: 'row' });
       if (model.edible) row.append(button('Enter', TEXTS.notebook.eat, true));
-      row.append(button('KeyP', TEXTS.notebook.drop, false), button('KeyT', TEXTS.notebook.give, false));
+      row.append(
+        button('KeyP', TEXTS.notebook.drop, false),
+        button('KeyT', TEXTS.notebook.give, false),
+      );
       page.append(row);
     }
     const money = chestModel(world, local);
     page.append(
       el('div', { class: 'chest' }, [
-        el('div', { class: 'chest__row' }, [icon('coffre'), el('b', { text: TEXTS.notebook.chest }), el('span', { class: 'chest__n', text: money.chest })]),
-        el('div', { class: 'chest__row' }, [el('span', { class: 'coin coin--sm' }), el('span', { text: TEXTS.notebook.purse }), el('span', { class: 'chest__n', text: money.purse })]),
-        el('div', { class: 'row' }, [button('KeyV', TEXTS.notebook.deposit, false), button('KeyR', TEXTS.notebook.withdraw, false)]),
+        el('div', { class: 'chest__row' }, [
+          icon('coffre'),
+          el('b', { text: TEXTS.notebook.chest }),
+          el('span', { class: 'chest__n', text: money.chest }),
+        ]),
+        el('div', { class: 'chest__row' }, [
+          el('span', { class: 'coin coin--sm' }),
+          el('span', { text: TEXTS.notebook.purse }),
+          el('span', { class: 'chest__n', text: money.purse }),
+        ]),
+        el('div', { class: 'row' }, [
+          button('KeyV', TEXTS.notebook.deposit, false),
+          button('KeyR', TEXTS.notebook.withdraw, false),
+        ]),
       ]),
     );
     return page;
@@ -231,48 +294,73 @@ export function createNotebook(
     if (mode.kind === 'store') {
       const target = mode.target;
       const store = storeSlots(world, target);
-      const furniture = el('div', { class: 'grid', role: 'grid', 'aria-label': TEXTS.store.furniture });
+      const furniture = el('div', {
+        class: 'grid',
+        role: 'grid',
+        'aria-label': TEXTS.store.furniture,
+      });
       store.forEach((model, i) => {
         furniture.append(
-          tile(model, side === 'store' && focus === i, false, () => {
-            side = 'store';
-            focus = i;
-            activate();
-          }, () => {
-            side = 'store';
-            focus = i;
-            redraw();
-          }),
+          tile(
+            model,
+            side === 'store' && focus === i,
+            false,
+            () => {
+              side = 'store';
+              focus = i;
+              activate();
+            },
+            () => {
+              side = 'store';
+              focus = i;
+              redraw();
+            },
+          ),
         );
       });
       layer.replaceChildren(
-        el('section', { class: 'carnet carnet--store', 'aria-label': TEXTS.store.label }, [
-          el('div', { class: 'book' }, [
-            el('section', { class: 'page page--g' }, [
-              el('h2', { class: 'page__title', text: TEXTS.store.mine }),
-              mineGrid(world, local, true),
-              el('div', { class: 'foot' }, [keys(['Space'], TEXTS.store.put), keys(['Backspace'], TEXTS.notebook.close)]),
+        el(
+          'section',
+          {
+            class: `carnet carnet--store${entering ? ' carnet--entre' : ''}`,
+            'aria-label': TEXTS.store.label,
+          },
+          [
+            el('div', { class: 'book' }, [
+              el('section', { class: 'page page--g' }, [
+                el('h2', { class: 'page__title', text: TEXTS.store.mine }),
+                mineGrid(world, local, true),
+                el('div', { class: 'foot' }, [
+                  keys(['Space'], TEXTS.store.put),
+                  keys(['Backspace'], TEXTS.notebook.close),
+                ]),
+              ]),
+              el('section', { class: 'page page--d' }, [
+                el('h2', { class: 'page__title', text: TEXTS.store.furniture }),
+                furniture,
+                el('div', { class: 'foot' }, [keys(['Space'], TEXTS.store.take)]),
+              ]),
             ]),
-            el('section', { class: 'page page--d' }, [
-              el('h2', { class: 'page__title', text: TEXTS.store.furniture }),
-              furniture,
-              el('div', { class: 'foot' }, [keys(['Space'], TEXTS.store.take)]),
-            ]),
-          ]),
-        ]),
+          ],
+        ),
       );
+      entering = false;
       return;
     }
-    const signets = el('div', { class: 'signets', role: 'tablist', 'aria-label': TEXTS.notebook.label });
+    const signets = el('div', {
+      class: 'signets',
+      role: 'tablist',
+      'aria-label': TEXTS.notebook.label,
+    });
     TABS.forEach(([id, ic], i) => {
-      const soon = i > 0;
       const node = el(
         'button',
         {
-          class: `signet${soon ? ' signet--soon' : ''}`,
+          class: 'signet',
           role: 'tab',
           'aria-selected': i === tab ? 'true' : 'false',
-          'aria-label': soon ? `${TEXTS.notebook.tabs[id]}, ${TEXTS.notebook.soon}` : TEXTS.notebook.tabs[id],
+          'aria-label': TEXTS.notebook.tabs[id],
+          title: TEXTS.notebook.tabs[id],
           tabindex: '-1',
         },
         [icon(ic), el('span', { text: TEXTS.notebook.tabs[id] })],
@@ -291,36 +379,53 @@ export function createNotebook(
         { class: 'needs needs--inline' },
         NEEDS.map((need) => {
           const low = me.needs[need] < UI_TUNING.lowNeed;
-          const node = el('div', {
-            class: `need${low ? ' need--low' : ''}${me.tiers[need] === 'bonus' ? ' need--bonus' : ''}`,
-            role: 'img',
-            'aria-label': `${TEXTS.needs[need]} : ${TEXTS.needs.state[me.tiers[need]]}`,
-          }, [icon(NEED_ICONS[need])]);
+          const node = el(
+            'div',
+            {
+              class: `need${low ? ' need--low' : ''}${me.tiers[need] === 'bonus' ? ' need--bonus' : ''}`,
+              role: 'img',
+              'aria-label': `${TEXTS.needs[need]} : ${TEXTS.needs.state[me.tiers[need]]}`,
+            },
+            [icon(NEED_ICONS[need])],
+          );
           node.style.setProperty('--val', String(Math.round(me.needs[need])));
           return node;
         }),
       ),
     ]);
+    const id = tabId();
+    const pages = id === null ? null : tabs.render(id, world, local);
+    const hints = id === null ? [] : tabs.hints(id);
+    const foot = el('div', { class: 'foot' }, [
+      keys(['KeyQ', 'KeyE'], TEXTS.notebook.tabsKeys),
+      ...(id === null
+        ? [keys(['Space'], TEXTS.notebook.move)]
+        : hints.map((h) => keys(h.codes, h.label))),
+      keys(['Backspace'], TEXTS.notebook.close),
+    ]);
     const left =
-      tab === 0
+      pages === null
         ? [who, mineGrid(world, local, true)]
-        : [who, el('div', { class: 'soon' }, [icon(TABS[tab]?.[1] ?? 'info', 'ic soon__ic'), el('h2', { text: TEXTS.notebook.soon }), el('p', { text: TEXTS.notebook.soonLine })])];
-    layer.replaceChildren(
-      el('section', { class: 'carnet', 'aria-label': TEXTS.notebook.label }, [
-        el('div', { class: 'book' }, [
-          el('section', { class: 'page page--g' }, [
-            ...left,
-            el('div', { class: 'foot' }, [
-              keys(['KeyQ', 'KeyE'], TEXTS.notebook.tabsKeys),
-              keys(['Space'], TEXTS.notebook.move),
-              keys(['Backspace'], TEXTS.notebook.close),
+        : [...(pages.full ? [] : [who]), ...pages.left];
+    const book =
+      pages?.full === true
+        ? el('div', { class: 'book' }, [
+            el('section', { class: 'page page--g page--pleine' }, [...left, foot]),
+          ])
+        : el('div', { class: 'book' }, [
+            el('section', { class: 'page page--g' }, [...left, foot]),
+            el('section', { class: 'page page--d', 'aria-live': 'polite' }, [
+              ...(pages === null ? [detailPage(world, local)] : (pages.right ?? [])),
             ]),
-          ]),
-          el('section', { class: 'page page--d', 'aria-live': 'polite' }, [tab === 0 ? detailPage(world, local) : null]),
-        ]),
-        signets,
-      ]),
+          ]);
+    layer.replaceChildren(
+      el(
+        'section',
+        { class: `carnet${entering ? ' carnet--entre' : ''}`, 'aria-label': TEXTS.notebook.label },
+        [book, signets],
+      ),
     );
+    entering = false;
   }
 
   function redraw(): void {
@@ -345,7 +450,8 @@ export function createNotebook(
     if (held === null) {
       if (focusedModel(world, local) !== null) held = ref;
     } else {
-      if (held.area !== ref.area || held.index !== ref.index) send({ type: 'move_stack', from: held, to: ref });
+      if (held.area !== ref.area || held.index !== ref.index)
+        send({ type: 'move_stack', from: held, to: ref });
       held = null;
     }
     redraw();
@@ -355,7 +461,11 @@ export function createNotebook(
     isOpen() {
       return mode.kind !== 'closed';
     },
-    open(now) {
+    tabs,
+    open(now, target) {
+      const wanted = TABS.findIndex(([id]) => id === target);
+      if (wanted >= 0) tab = wanted;
+      entering = true;
       mode = { kind: 'notebook' };
       side = 'mine';
       held = null;
@@ -364,6 +474,7 @@ export function createNotebook(
       redraw();
     },
     openStore(target, now) {
+      entering = true;
       mode = { kind: 'store', target };
       side = 'store';
       focus = 0;
@@ -373,6 +484,7 @@ export function createNotebook(
       redraw();
     },
     close() {
+      if (last !== null && mode.kind === 'notebook') tabs.closed(last.world, last.local);
       mode = { kind: 'closed' };
       held = null;
       layer.hidden = true;
@@ -383,8 +495,28 @@ export function createNotebook(
       last = { world, local };
       if (mode.kind === 'closed') return;
       const me = world.players[local];
-      const store = mode.kind === 'store' ? (world.places[world.common.place]?.objects[mode.target]?.store ?? []) : [];
-      const signature = JSON.stringify([mode, tab, side, focus, held, me.toolbar, me.bag, me.selected, me.money, me.tiers, world.common.chest, store]);
+      const store =
+        mode.kind === 'store'
+          ? (world.places[world.common.place]?.objects[mode.target]?.store ?? [])
+          : [];
+      const shown = tabId();
+      const tabSignature =
+        shown === null || mode.kind !== 'notebook' ? '' : tabs.signature(shown, world, local);
+      const signature = JSON.stringify([
+        mode,
+        tab,
+        side,
+        focus,
+        held,
+        me.toolbar,
+        me.bag,
+        me.selected,
+        me.money,
+        me.tiers,
+        world.common.chest,
+        store,
+        tabSignature,
+      ]);
       if (signature === drawn) return;
       drawn = signature;
       draw(world, local);
@@ -393,13 +525,25 @@ export function createNotebook(
       if (mode.kind === 'closed' || last === null) return false;
       if (now - openedAt < openGuardMs) return true;
       const { world, local } = last;
+      const current = tabId();
+      if (
+        current !== null &&
+        mode.kind === 'notebook' &&
+        tabs.key(current, code, shift, world, local)
+      )
+        return true;
       const dir = DIRS[code];
       if (dir !== undefined) {
         const columns = UI_TUNING.gridColumns;
         if (side === 'mine') {
           const next = gridMove(focus, slotCount(world, local), columns, dir);
           // Au bord droit de ses affaires, on passe au meuble.
-          if (mode.kind === 'store' && dir === 'right' && next === focus && focus % columns === columns - 1) {
+          if (
+            mode.kind === 'store' &&
+            dir === 'right' &&
+            next === focus &&
+            focus % columns === columns - 1
+          ) {
             side = 'store';
             focus = Math.floor(focus / columns) * columns;
           } else focus = next;
