@@ -69,6 +69,7 @@ describe('pas de simulation vide', () => {
   it('branche un système par lot, chacun sous son nom de dossier', () => {
     expect(SYSTEMS.map((s) => s.id)).toEqual([
       'voyage',
+      'lieux',
       'briques',
       'sac',
       'commerces',

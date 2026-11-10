@@ -22,6 +22,7 @@ import { remember } from '../regles/memoire';
 import { bodyCollides } from '../noyau/grille';
 import { placeBlockers } from '../noyau/obstacles';
 import { findRoute, type Route } from './chemins';
+import { closedLockSet } from '../lieux/chemins';
 import { currentEntry, goalOf, type Goal } from './planning';
 import { attend, giveGift, showEmote } from './presence';
 import { VILLAGERS } from './reglages';
@@ -142,7 +143,7 @@ function spread(
     return false;
   };
   if (!taken(goal.x, goal.y)) return;
-  const blockers = placeBlockers(sim.content, content, place);
+  const blockers = placeBlockers(sim.content, content, place, sim.world);
   for (let k = 0; k < SPREAD_COUNT; k++) {
     const a = (2 * Math.PI * k) / SPREAD_COUNT + Math.PI / 2;
     const x = goal.x + Math.cos(a) * SPREAD_RADIUS;
@@ -185,7 +186,16 @@ function head(
     settle(sim, place, id, life, villager, state, rt);
     return;
   }
-  rt.route = findRoute(sim.content, content, place, body.x, body.y, rt.goal.x, rt.goal.y);
+  rt.route = findRoute(
+    sim.content,
+    content,
+    place,
+    body.x,
+    body.y,
+    rt.goal.x,
+    rt.goal.y,
+    closedLockSet(sim),
+  );
   state.pose = 'walk';
 }
 
@@ -244,7 +254,16 @@ function updatePresence(
     rt.route =
       platform === undefined
         ? null
-        : findRoute(sim.content, content, place, body.x, body.y, platform.x, platform.y);
+        : findRoute(
+            sim.content,
+            content,
+            place,
+            body.x,
+            body.y,
+            platform.x,
+            platform.y,
+            closedLockSet(sim),
+          );
     rt.next = 0;
     sim.touch('place');
   }

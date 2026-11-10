@@ -13,6 +13,7 @@ import { dialogueSystem } from '../dialogues/index';
 import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
 import { villagerSystem } from '../habitants/index';
+import { placeSystem } from '../lieux/index';
 import { bagSystem } from '../sac/index';
 import { travelSystem } from '../voyage/index';
 import type { Intent, StepInput } from './entrees';
@@ -47,6 +48,7 @@ export interface GameSystem {
 /** Ordre d'exécution à chaque pas. */
 export const SYSTEMS: readonly GameSystem[] = [
   travelSystem,
+  placeSystem,
   brickSystem,
   bagSystem,
   shopSystem,

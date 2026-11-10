@@ -22,6 +22,12 @@
   "objects": [],
   // Chaque porte mène à une autre (« to »), qui ramène ici: écrire la porte du dehors dans
   // carte.json, au pied de la porte du bâtiment, avec "to" = l'identifiant de celle-ci.
+  // « facing »: sens où l'on regarde en arrivant par cette porte (0 sud, 1 est, 2 nord, 3 ouest),
+  // vers l'intérieur de la pièce. Champs facultatifs, qui ne règlent que ce sens-ci (on ressort
+  // toujours): "enter": "act" (touche d'action sur "object", un meuble à brique passage; défaut
+  // "walk", en marchant dessus), "opens": [conditions] (fermée à clé tant qu'elles sont fausses),
+  // "shop": "<commerce du lieu>" (fermée hors de ses heures), "says": "phrase quand c'est fermé".
+  // Les verrous d'histoire de carte.json ont aussi leur "says" (« pas encore »).
   "doors": {
     "piece-porte": { "x": 4, "y": 5, "facing": 2, "to": "piece-porte-dehors" },
   },

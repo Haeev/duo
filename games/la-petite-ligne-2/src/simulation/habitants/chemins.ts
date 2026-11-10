@@ -7,6 +7,9 @@
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { ReadPlace } from '../noyau/obstacles';
 import { footprintOf } from '../noyau/obstacles';
+import { edgePassable } from '../lieux/chemins';
+
+const NONE: ReadonlySet<string> = new Set();
 
 /** Un trajet: suite de points (m), et les portes franchies avec l'index du point qui les passe. */
 export interface Route {
@@ -35,9 +38,18 @@ function placedSignature(state: ReadPlace): number {
 
 const EDGE = 1e-6;
 
-/** Grille des habitants: la carte, plus les meubles solides; les portes restent franchissables. */
-function gridOf(content: Content, place: PlaceContent, state: ReadPlace): Grid {
-  const signature = placedSignature(state);
+/** Grille des habitants: la carte, plus les meubles solides et les verrous fermés; les portes restent franchissables. */
+function gridOf(
+  content: Content,
+  place: PlaceContent,
+  state: ReadPlace,
+  closed: ReadonlySet<string>,
+): Grid {
+  let signature = placedSignature(state);
+  for (const id of closed)
+    for (let k = 0; k < id.length; k++)
+      signature = (Math.imul(signature, 31) + id.charCodeAt(k)) | 0;
+  signature = (signature + closed.size) | 0;
   const cached = grids.get(place);
   if (cached?.signature === signature) return cached.grid;
   const { width, height } = place.map;
@@ -47,6 +59,11 @@ function gridOf(content: Content, place: PlaceContent, state: ReadPlace): Grid {
     for (let cy = Math.max(0, r.y); cy < Math.min(height, r.y + r.h); cy++)
       for (let cx = Math.max(0, r.x); cx < Math.min(width, r.x + r.w); cx++)
         blocked[cy * width + cx] = 1;
+  for (const id of closed)
+    for (const r of place.map.locks?.[id]?.rects ?? [])
+      for (let cy = Math.max(0, r.y); cy < Math.min(height, r.y + r.h); cy++)
+        for (let cx = Math.max(0, r.x); cx < Math.min(width, r.x + r.w); cx++)
+          blocked[cy * width + cx] = 1;
   for (const prop of [...place.map.objects, ...state.placed]) {
     const def = content.props[prop.type];
     if (!def?.solid) continue;
@@ -215,6 +232,7 @@ function graphRoute(
   fy: number,
   tx: number,
   ty: number,
+  closed: ReadonlySet<string>,
 ): Route | null {
   const paths = place.map.graph;
   if (paths === undefined) return null;
@@ -248,6 +266,7 @@ function graphRoute(
     const p = paths.nodes[cur];
     if (p === undefined) continue;
     for (const edge of paths.edges) {
+      if (!edgePassable(edge, closed)) continue;
       const other = edge.a === cur ? edge.b : edge.b === cur ? edge.a : null;
       const q = other === null ? undefined : paths.nodes[other];
       if (other === null || q === undefined || done.has(other)) continue;
@@ -270,7 +289,10 @@ function graphRoute(
   return { points, doors: [] };
 }
 
-/** Trajet de (fx, fy) à (tx, ty) dans le lieu: graphe d'abord, grille à défaut; ligne droite en dernier recours. */
+/**
+ * Trajet de (fx, fy) à (tx, ty) dans le lieu: graphe d'abord, grille à défaut; ligne droite en
+ * dernier recours. `closed`: verrous d'histoire fermés (`lieux/`), ni arête ni case n'y passent.
+ */
 export function findRoute(
   content: Content,
   place: PlaceContent,
@@ -279,10 +301,11 @@ export function findRoute(
   fy: number,
   tx: number,
   ty: number,
+  closed: ReadonlySet<string> = NONE,
 ): Route {
   return (
-    graphRoute(place, fx, fy, tx, ty) ??
-    gridRoute(gridOf(content, place, state), fx, fy, tx, ty) ?? {
+    graphRoute(place, fx, fy, tx, ty, closed) ??
+    gridRoute(gridOf(content, place, state, closed), fx, fy, tx, ty) ?? {
       points: [{ x: tx, y: ty }],
       doors: [],
     }

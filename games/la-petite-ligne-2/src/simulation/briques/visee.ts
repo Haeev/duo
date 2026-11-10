@@ -75,6 +75,7 @@ export function chooseBrick(
   for (const brick of def.bricks) {
     const behaviour = behaviourOf(registry, brick.brick);
     if (behaviour === undefined) continue;
+    if (behaviour.inert?.(look, player, brickView(place, prop, brick)) === true) continue;
     const refusal = behaviour.refuse(look, player, brickView(place, prop, brick));
     const withTool = wantsTool(brick, tool);
     const found = { brick, behaviour, refusal, tool: withTool };

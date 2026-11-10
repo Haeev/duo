@@ -18,6 +18,7 @@ import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
+import { validatePassages } from '../simulation/lieux/valider';
 
 function checkCondition(content: Content, c: Condition, at: string, problems: string[]): void {
   switch (c.type) {
@@ -326,6 +327,7 @@ function checkLargePlace(content: Content, place: PlaceContent, problems: string
     if (target === undefined) problems.push(`${where}: porte d'arrivée inconnue « ${door.to} »`);
     else if (target.to !== id) problems.push(`${where}: « ${door.to} » ne ramène pas ici`);
     if (!within({ x: door.x, y: door.y, w: 0, h: 0 })) problems.push(`${where}: hors de la carte`);
+    for (const c of door.opens ?? []) checkCondition(content, c, where, problems);
   }
   const objectIds = new Set(map.objects.map((o) => o.id));
   const withBricks = map.objects.filter((o) => (content.props[o.type]?.bricks.length ?? 0) > 0);
@@ -463,5 +465,6 @@ export function validateContent(content: Content): string[] {
   problems.push(...validateDialogueTexts(content));
   problems.push(...validateHarvestContent(content));
   problems.push(...validateVillagerLives(content));
+  problems.push(...validatePassages(content));
   return problems;
 }
