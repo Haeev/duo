@@ -43,6 +43,11 @@ export interface QuestLineRead {
   readonly together: boolean;
   /** Où mène l'étape courante, en mètres du lieu courant; `null`: nulle part ou autre lieu. */
   readonly target: { readonly x: number; readonly y: number } | null;
+  /**
+   * Histoire dont cette suite est un acte (`saga` des données, comme `journal`): le carnet réunit
+   * les suites d'une même histoire en une carte. Absent: suite seule.
+   */
+  readonly saga?: { readonly id: string; readonly title: string; readonly act: number };
 }
 
 // ---------- Habitants ----------
@@ -274,6 +279,7 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
           step: entry.steps.map((st) => st.objective).join(' ; '),
           together: entry.steps.some((st) => st.together),
           target,
+          ...(entry.saga === undefined ? {} : { saga: entry.saga }),
         };
       });
     },

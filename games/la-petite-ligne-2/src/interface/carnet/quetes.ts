@@ -32,8 +32,27 @@ export function memoryFollow(initial: string | null = null): FollowStore {
   };
 }
 
-export interface QuestCardModel {
+/** Un acte d'une histoire (suite d'une `saga`): l'acte en cours est déplié, les autres tiennent sur une ligne. */
+export interface SagaActModel {
   readonly id: string;
+  readonly act: number;
+  readonly title: string;
+  readonly state: QuestLineRead['chapters'][number]['state'];
+  /** Déplié: l'acte en cours (pas fini, et le premier à ne pas l'être). */
+  readonly open: boolean;
+  readonly step: string;
+  readonly pearls: readonly QuestLineRead['chapters'][number]['state'][];
+  readonly followed: boolean;
+  readonly together: boolean;
+}
+
+export interface QuestCardModel {
+  /** Une suite seule: son identifiant. Une histoire: celui de l'acte en cours (ou du dernier acte si tout est fini). */
+  readonly id: string;
+  /** Identifiants de toutes les suites de la carte (un seul pour une suite seule). */
+  readonly ids: readonly string[];
+  /** Les actes de l'histoire, dans l'ordre; `null`: suite seule. */
+  readonly acts: readonly SagaActModel[] | null;
   readonly kind: QuestLineRead['kind'];
   readonly title: string;
   readonly pearls: readonly QuestLineRead['chapters'][number]['state'][];
@@ -53,6 +72,8 @@ export interface QuestDetailModel {
   readonly followed: boolean;
   readonly canFollow: boolean;
   readonly hasTarget: boolean;
+  /** L'histoire dont c'est un acte (titre et numéro), `null`: suite seule. */
+  readonly saga: { readonly title: string; readonly act: number } | null;
 }
 
 export interface QuestsModel {
@@ -67,27 +88,98 @@ export interface QuestsModel {
   readonly detail: QuestDetailModel | null;
 }
 
-function card(line: QuestLineRead, followed: string | null): QuestCardModel {
+/** Les suites d'une même histoire (ou une suite seule), actes par ordre croissant. */
+interface QuestGroup {
+  readonly lines: readonly QuestLineRead[];
+  /** L'acte en cours: le premier qui n'est pas fini, sinon le dernier. */
+  readonly lead: QuestLineRead;
+  readonly finished: boolean;
+}
+
+function groupQuests(lines: readonly QuestLineRead[]): QuestGroup[] {
+  const groups: QuestLineRead[][] = [];
+  const bySaga = new Map<string, QuestLineRead[]>();
+  for (const line of lines) {
+    const saga = line.saga;
+    if (saga === undefined) {
+      groups.push([line]);
+      continue;
+    }
+    const known = bySaga.get(saga.id);
+    if (known === undefined) {
+      const fresh = [line];
+      bySaga.set(saga.id, fresh);
+      groups.push(fresh);
+    } else known.push(line);
+  }
+  return groups.flatMap((members) => {
+    const sorted = [...members].sort((a, b) => (a.saga?.act ?? 0) - (b.saga?.act ?? 0));
+    const lead = sorted.find((l) => !l.finished) ?? sorted.at(-1);
+    return lead === undefined
+      ? []
+      : [{ lines: sorted, lead, finished: sorted.every((l) => l.finished) }];
+  });
+}
+
+function card(group: QuestGroup, followed: string | null): QuestCardModel {
+  const { lead } = group;
+  const saga = lead.saga;
+  const isFollowed = group.lines.some((l) => l.id === followed && !l.finished);
+  if (saga === undefined || group.lines.length === 0)
+    return {
+      id: lead.id,
+      ids: [lead.id],
+      acts: null,
+      kind: lead.kind,
+      title: lead.title,
+      pearls: lead.chapters.map((c) => c.state),
+      finished: lead.finished,
+      followed: isFollowed,
+      together: lead.together,
+      giver: lead.giver?.name ?? null,
+    };
+  const acts: SagaActModel[] = group.lines.map((l) => ({
+    id: l.id,
+    act: l.saga?.act ?? 0,
+    title: l.title,
+    state: l.finished ? 'done' : l === lead ? 'current' : 'todo',
+    open: l === lead && !l.finished,
+    step: l.step,
+    pearls: l.chapters.map((c) => c.state),
+    followed: l.id === followed && !l.finished,
+    together: l.together && !l.finished,
+  }));
   return {
-    id: line.id,
-    kind: line.kind,
-    title: line.title,
-    pearls: line.chapters.map((c) => c.state),
-    finished: line.finished,
-    followed: line.id === followed && !line.finished,
-    together: line.together,
-    giver: line.giver?.name ?? null,
+    id: lead.id,
+    ids: group.lines.map((l) => l.id),
+    acts,
+    kind: lead.kind,
+    title: saga.title,
+    pearls: acts.map((a) => a.state),
+    finished: group.finished,
+    followed: isFollowed,
+    together: lead.together && !lead.finished,
+    giver: lead.giver?.name ?? null,
   };
 }
 
-/** Les suites dans l'ordre d'affichage: la principale, puis les autres (en cours avant finies). */
-export function orderQuests(lines: readonly QuestLineRead[]): readonly QuestLineRead[] {
-  const mains = lines.filter((l) => l.kind === 'main');
-  const main = mains.find((l) => !l.finished) ?? mains[0];
-  const rest = lines.filter((l) => l !== main);
-  const active = rest.filter((l) => !l.finished);
-  const done = rest.filter((l) => l.finished);
+/**
+ * Les cartes dans l'ordre d'affichage: la principale (une histoire réunit ses actes en une carte),
+ * puis les autres, en cours avant finies.
+ */
+function orderGroups(lines: readonly QuestLineRead[]): QuestGroup[] {
+  const groups = groupQuests(lines);
+  const mains = groups.filter((g) => g.lead.kind === 'main');
+  const main = mains.find((g) => !g.finished) ?? mains[0];
+  const rest = groups.filter((g) => g !== main);
+  const active = rest.filter((g) => !g.finished);
+  const done = rest.filter((g) => g.finished);
   return main === undefined ? [...active, ...done] : [main, ...active, ...done];
+}
+
+/** Les suites à plat, dans l'ordre d'affichage (les actes d'une histoire se suivent, du premier au dernier). */
+export function orderQuests(lines: readonly QuestLineRead[]): readonly QuestLineRead[] {
+  return orderGroups(lines).flatMap((g) => g.lines);
 }
 
 /** Choix initial: la suite suivie, sinon la première en cours, sinon la première. */
@@ -110,8 +202,8 @@ export function questsModel(
   selection: string | null,
   perPage: number = CARNET_TUNING.secondaryPerPage,
 ): QuestsModel {
-  const ordered = orderQuests(lines);
-  if (ordered.length === 0)
+  const groups = orderGroups(lines);
+  if (groups.length === 0)
     return {
       empty: true,
       main: null,
@@ -121,18 +213,19 @@ export function questsModel(
       selected: null,
       detail: null,
     };
+  const ordered = orderQuests(lines);
   const selected = ordered.find((l) => l.id === selection)?.id ?? defaultQuest(lines, followed);
-  const first = ordered[0];
-  const hasMain = first?.kind === 'main';
-  const rest = hasMain ? ordered.slice(1) : ordered;
+  const first = groups[0];
+  const hasMain = first?.lead.kind === 'main';
+  const rest = hasMain ? groups.slice(1) : groups;
   const pageCount = Math.max(1, Math.ceil(rest.length / perPage));
-  const at = rest.findIndex((l) => l.id === selected);
+  const at = rest.findIndex((g) => g.lines.some((l) => l.id === selected));
   const page = at < 0 ? 0 : Math.floor(at / perPage);
   const line = ordered.find((l) => l.id === selected);
   return {
     empty: false,
     main: hasMain ? card(first, followed) : null,
-    others: rest.slice(page * perPage, (page + 1) * perPage).map((l) => card(l, followed)),
+    others: rest.slice(page * perPage, (page + 1) * perPage).map((g) => card(g, followed)),
     page,
     pageCount,
     selected: selected ?? null,
@@ -148,6 +241,7 @@ export function questsModel(
             followed: line.id === followed && !line.finished,
             canFollow: !line.finished,
             hasTarget: line.target !== null,
+            saga: line.saga === undefined ? null : { title: line.saga.title, act: line.saga.act },
           },
   };
 }
@@ -171,14 +265,14 @@ export function turnQuestPage(
   delta: -1 | 1,
   perPage: number = CARNET_TUNING.secondaryPerPage,
 ): string | null {
-  const ordered = orderQuests(lines);
-  const hasMain = ordered[0]?.kind === 'main';
-  const rest = hasMain ? ordered.slice(1) : ordered;
-  const at = rest.findIndex((l) => l.id === selected);
+  const groups = orderGroups(lines);
+  const hasMain = groups[0]?.lead.kind === 'main';
+  const rest = hasMain ? groups.slice(1) : groups;
+  const at = rest.findIndex((g) => g.lines.some((l) => l.id === selected));
   const page = at < 0 ? 0 : Math.floor(at / perPage);
   const next = page + delta;
   if (next < 0 || next * perPage >= rest.length) return null;
-  return rest[next * perPage]?.id ?? null;
+  return rest[next * perPage]?.lead.id ?? null;
 }
 
 /** Une seule suite suivie: suivre la suivie la lâche, une autre prend la place, une finie ne se suit pas. */
@@ -194,18 +288,97 @@ export function toggleFollow(
 
 // ---------- Affichage ----------
 
-function pearls(model: QuestCardModel): HTMLElement {
+function pearls(
+  states: readonly QuestLineRead['chapters'][number]['state'][],
+  template: string = T.chapter,
+): HTMLElement {
   const wrap = el('div', { class: 'perles', role: 'img' });
   wrap.setAttribute(
     'aria-label',
-    model.pearls
+    states
       .map((state, i) =>
-        fill(T.chapter, { n: i + 1, max: model.pearls.length, etat: T.chapterState[state] }),
+        fill(template, { n: i + 1, max: states.length, etat: T.chapterState[state] }),
       )
       .join(' ; '),
   );
-  for (const state of model.pearls) wrap.append(el('i', { class: `perle perle--${state}` }));
+  for (const state of states) wrap.append(el('i', { class: `perle perle--${state}` }));
   return wrap;
+}
+
+/**
+ * Une histoire en plusieurs actes, réunis en une carte: l'en-tête (titre, un perle par acte), puis
+ * une ligne par acte. L'acte en cours est déplié (titre, chapitres, étape en une phrase), les
+ * autres tiennent sur une ligne. Chaque acte se choisit (le détail suit à droite).
+ */
+function sagaNode(
+  model: QuestCardModel,
+  selected: string | null,
+  big: boolean,
+  onPick: (id: string) => void,
+): HTMLElement {
+  const acts = model.acts ?? [];
+  const art = el('div', { class: 'saga__art' });
+  // Vignette stable: tirée du premier acte, elle ne change pas quand l'histoire avance.
+  art.insertAdjacentHTML('beforeend', itemThumb(model.ids[0] ?? model.id, model.title));
+  const head = el('div', { class: 'saga__tete' }, [
+    art,
+    el('div', { class: 'quete__corps' }, [
+      el('b', { class: 'quete__titre', text: model.title }),
+      pearls(model.pearls, T.act),
+    ]),
+  ]);
+  if (model.followed)
+    head.append(el('span', { class: 'ruban', title: T.followed }, [icon('losange')]));
+  if (model.finished) head.append(el('span', { class: 'tampon', text: T.done }));
+  const list = el('div', { class: 'saga__actes' });
+  for (const act of acts) {
+    const row = el(
+      'button',
+      {
+        class: `acte acte--${act.open ? 'ouvert' : act.state}${act.id === selected ? ' focus' : ''}`,
+        tabindex: '-1',
+        'aria-pressed': act.id === selected ? 'true' : 'false',
+        'aria-expanded': act.open ? 'true' : 'false',
+        'aria-label': `${fill(T.actNumber, { n: act.act })}, ${act.title}, ${T.chapterState[act.state]}`,
+      },
+      [
+        el('span', { class: 'acte__ligne' }, [
+          el('span', { class: 'acte__num', text: fill(T.actNumber, { n: act.act }) }),
+          el('b', { class: 'acte__titre', text: act.title }),
+          act.state === 'done' ? el('span', { class: 'acte__fait', text: T.actDone }) : null,
+          act.followed
+            ? el('span', { class: 'ruban ruban--acte', title: T.followed }, [icon('losange')])
+            : null,
+        ]),
+        act.open
+          ? el('span', { class: 'acte__corps' }, [
+              pearls(act.pearls),
+              el('span', { class: 'acte__etape', text: act.step }),
+              act.together
+                ? el('span', { class: 'deux-ligne' }, [
+                    el('i', { class: 'token' }),
+                    el('i', { class: 'token token--other' }),
+                    T.together,
+                  ])
+                : null,
+            ])
+          : null,
+      ],
+    );
+    row.addEventListener('click', () => {
+      onPick(act.id);
+    });
+    list.append(row);
+  }
+  return el(
+    'div',
+    {
+      class: `saga${big ? ' saga--grande' : ''}${model.finished ? ' saga--finie' : ''}`,
+      role: 'group',
+      'aria-label': fill(T.sagaLabel, { titre: model.title }),
+    },
+    [head, list],
+  );
 }
 
 function cardNode(
@@ -230,7 +403,7 @@ function cardNode(
     art,
     el('div', { class: 'quete__corps' }, [
       el('b', { class: 'quete__titre', text: model.title }),
-      pearls(model),
+      pearls(model.pearls),
     ]),
   );
   if (model.followed)
@@ -273,13 +446,15 @@ export function createQuestsTab(
         selected = id;
         deps.invalidate();
       };
-      if (model.main !== null)
-        left.push(
-          cardNode(model.main, model.selected === model.main.id, true, pick(model.main.id)),
-        );
+      const draw = (c: QuestCardModel, big: boolean): HTMLElement =>
+        c.acts === null
+          ? cardNode(c, model.selected === c.id, big, pick(c.id))
+          : sagaNode(c, model.selected, big, (id) => {
+              pick(id)();
+            });
+      if (model.main !== null) left.push(draw(model.main, true));
       const others = el('div', { class: 'quetes' });
-      for (const c of model.others)
-        others.append(cardNode(c, model.selected === c.id, false, pick(c.id)));
+      for (const c of model.others) others.append(draw(c, false));
       left.push(others);
       if (model.pageCount > 1)
         left.push(
@@ -310,6 +485,12 @@ export function createQuestsTab(
           el('div', { class: 'detail detail--quete' }, [
             art,
             el('h2', { text: d.title }),
+            d.saga === null
+              ? null
+              : el('p', {
+                  class: 'detail__saga',
+                  text: fill(T.sagaAct, { titre: d.saga.title, n: d.saga.act }),
+                }),
             el('p', { class: 'etape', text: d.step }),
             d.together && !d.finished
               ? el('p', { class: 'deux-ligne' }, [

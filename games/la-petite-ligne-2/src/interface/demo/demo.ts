@@ -17,10 +17,12 @@ import { createWorld } from '../../simulation/noyau/monde';
 import { dummySources, stressSources } from '../carnet/fictif';
 import { parsePlan } from '../carnet/plan';
 import { memoryFollow } from '../carnet/quetes';
+import { worldSources } from '../carnet/lectures';
 import { createInterface } from '../index';
+import { histoireFiles, setupHistoire } from './histoire';
 import planAubrune from '../../../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json';
 
-const content = loadContent(DATA_FILES);
+const content = loadContent({ ...DATA_FILES, ...histoireFiles() });
 const world: WorldState = createWorld(content, 7, [
   { id: 'a', name: 'Camille' },
   { id: 'b', name: 'Sacha' },
@@ -42,7 +44,13 @@ other.body.y = 4;
 const TABS_DEMO = ['quetes', 'habitants', 'collections', 'carte', 'tenues', 'reglages'] as const;
 // Suffixe `-long`: contenu très long pour vérifier le défilement (banc des petites fenêtres).
 const longContent = state.endsWith('-long');
-const tabName = longContent ? state.slice(0, -'-long'.length) : state;
+// `#carnet-quetes-histoire`: les vraies suites d'Aubrune (deux actes, `-3`: trois), lues dans l'état.
+const sagaDemo = /^carnet-quetes-histoire(-3)?$/.exec(state);
+const tabName = longContent
+  ? state.slice(0, -'-long'.length)
+  : sagaDemo === null
+    ? state
+    : 'carnet-quetes';
 const tabStep = TABS_DEMO.findIndex((t) => tabName === `carnet-${t}`) + 1;
 if (tabStep > 0) {
   // Les joueurs au quai d'Aubrune, en mètres du plan.
@@ -75,6 +83,53 @@ if (state === 'bulle') {
     x: 0,
     y: 0,
   };
+}
+const histoire = setupHistoire(state, world);
+if (histoire.noAim) aim = null;
+if (sagaDemo !== null) {
+  const all = (ids: readonly string[]): string[] => [...ids];
+  world.progress.quests['le-train-de-5h12'] = {
+    chapter: 'logement-fourni',
+    step: 'reponse',
+    done: true,
+    passed: all([
+      'quai',
+      'lettre',
+      'maison',
+      'pension',
+      'pompe',
+      'souper',
+      'nuit-pension',
+      'outils',
+      'debroussailler',
+      'abattre',
+      'besaces',
+      'toit',
+      'graines',
+      'potager',
+      'poules',
+      'vente-odette',
+      'vente-achille',
+      'premiere-nuit',
+      'reponse',
+    ]),
+  };
+  const third = sagaDemo[1] !== undefined;
+  world.progress.quests['la-minute-d-ecart'] = third
+    ? { chapter: 'le-premier-train', step: 'farce', done: true, passed: [] }
+    : {
+        chapter: 'la-halte-en-service',
+        step: 'tranchee',
+        done: false,
+        passed: ['occupation', 'cuisine', 'article-7'],
+      };
+  if (third)
+    world.progress.quests['ceux-qui-partent'] = {
+      chapter: 'la-lueur',
+      step: 'lucie',
+      done: false,
+      passed: ['chambre', 'coupe', 'trappe', 'registre'],
+    };
 }
 if (state === 'coup-d-oeil') {
   me.needs.sleep = 82;
@@ -173,14 +228,21 @@ const ui = createInterface({
   },
   cameraYaw: () => 0,
   notebook: {
-    sources: (longContent ? stressSources : dummySources)(parsePlan(planAubrune), [
-      'M',
-      'F',
-      'T',
-      'C',
-    ]),
-    follow: memoryFollow('histoire'),
+    sources:
+      sagaDemo === null
+        ? (longContent ? stressSources : dummySources)(parsePlan(planAubrune), ['M', 'F', 'T', 'C'])
+        : worldSources(content),
+    follow: memoryFollow(sagaDemo === null ? 'histoire' : 'la-minute-d-ecart'),
   },
+  ...(histoire.project
+    ? {
+        // Projection de la démonstration: le monde à 30 px par mètre autour du joueur.
+        projectToScreen: (x: number, y: number) => ({
+          x: window.innerWidth / 2 + (x - me.body.x) * 30,
+          y: window.innerHeight * 0.5 + (y - me.body.y) * 30,
+        }),
+      }
+    : {}),
   editorAtStart: false,
 });
 
@@ -206,6 +268,7 @@ setTimeout(() => {
     me.selected = 2;
     emit({ type: 'money_changed', who: 0, delta: 120 });
   }
+  if (histoire.event !== null) emit(histoire.event);
   if (state === 'coup-d-oeil') press('KeyG');
   if (state === 'carnet-sans-sac' || state === 'carnet-sac' || bagState !== undefined)
     press('KeyC');

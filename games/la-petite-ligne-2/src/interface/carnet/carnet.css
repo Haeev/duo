@@ -213,6 +213,134 @@
   height: 0.875rem;
   margin-left: -0.125rem;
 }
+.lpl-ui .saga {
+  position: relative;
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-1);
+}
+.lpl-ui .saga--grande {
+  border-color: var(--ink);
+  background: linear-gradient(100deg, var(--paper-raised) 70%, var(--paper-sunken));
+}
+.lpl-ui .saga--finie {
+  background: var(--paper-sunken);
+}
+.lpl-ui .saga__tete {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+}
+.lpl-ui .saga__art {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+}
+.lpl-ui .saga--grande .saga__art {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+.lpl-ui .saga__art .obj {
+  width: 100%;
+  height: 100%;
+}
+.lpl-ui .saga--grande .quete__titre {
+  font-size: 1.375rem;
+}
+.lpl-ui .saga__actes {
+  display: grid;
+  gap: 0.25rem;
+}
+.lpl-ui .acte {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.3125rem 0.625rem;
+  text-align: left;
+  color: var(--ink);
+  background: var(--paper);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.5rem;
+}
+.lpl-ui .acte--done,
+.lpl-ui .acte--todo {
+  color: var(--ink-muted);
+  background: transparent;
+}
+.lpl-ui .acte--todo {
+  border-style: dashed;
+}
+.lpl-ui .acte--ouvert {
+  background: var(--paper-raised);
+  border-color: var(--ink);
+  box-shadow: var(--shadow-1);
+}
+.lpl-ui .acte__ligne {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.lpl-ui .acte__num {
+  flex: none;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.lpl-ui .acte__titre {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 650;
+}
+.lpl-ui .acte--ouvert .acte__titre {
+  white-space: normal;
+  font-size: 1.0625rem;
+}
+.lpl-ui .acte__fait {
+  flex: none;
+  margin-left: auto;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.lpl-ui .acte__fait::before {
+  content: '✓ ';
+}
+.lpl-ui .acte__corps {
+  display: grid;
+  gap: 0.375rem;
+}
+.lpl-ui .acte__etape {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.lpl-ui .ruban--acte {
+  position: static;
+  flex: none;
+  margin-left: auto;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.lpl-ui .detail__saga {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
 .lpl-ui .pages {
   margin-top: 0.75rem;
   font-size: 0.8125rem;
