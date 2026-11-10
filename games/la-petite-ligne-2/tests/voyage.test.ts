@@ -95,7 +95,7 @@ describe('voyage en train', () => {
     expect(sim.world.common).toMatchObject({ phase: 'travel', place: 'essai-halte' });
     expect(gare.leftOn).toBe(1);
     expect(sim.world.places['essai-halte']?.objects.banc).toEqual({ sit: [null, null] });
-    expect(sim.world.players.map((p) => p.body.x)).toEqual([15.2, 16.8]);
+    expect(sim.world.players.map((p) => p.body.x)).toEqual([15.4, 16.6]);
     expect(sim.world.players[0].body.y).toBe(5);
 
     // Tant que les deux machines n'ont pas chargé, on reste dans le wagon, sans bouger.
@@ -127,7 +127,7 @@ describe('voyage en train', () => {
     expect(gare.leftOn).toBeNull();
     expect(gare.ground).toHaveLength(1);
     expect(sim.world.places['essai-halte']?.leftOn).toBe(1);
-    expect(sim.world.players.map((p) => p.body.x)).toEqual([19.2, 20.8]);
+    expect(sim.world.players.map((p) => p.body.x)).toEqual([19.4, 20.6]);
     expect(v.safeParse(WorldSchema, sim.world).success).toBe(true);
   });
 

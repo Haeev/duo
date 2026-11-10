@@ -7,6 +7,8 @@
  */
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { BeatDef, GestureDef, SceneDef, SceneRun } from '../../donnees/schemas/scene';
+import { bodyCollides } from '../noyau/grille';
+import { placeBlockers } from '../noyau/obstacles';
 import type { SimContext } from '../noyau/systemes';
 import type { RuleContext } from '../regles/conditions';
 import { remember } from '../regles/memoire';
@@ -14,6 +16,8 @@ import { evaluateStepAll, playersTogether } from '../quetes/conditions';
 import { applyStepEffects, type StoryHooks } from '../quetes/effets';
 import { sceneKey, sceneSeenOn, storyOf } from '../quetes/faits';
 import { STORY } from '../quetes/reglages';
+import type { Spot } from '../voyage/arrivee';
+import { SCENE_STAGING } from './reglages';
 
 /** Au-delà, une suite de temps instantanés est une faute de données: on reprend au pas suivant. */
 const MAX_INSTANT_BEATS = 64;
@@ -103,11 +107,106 @@ function nextBeat(sim: SimContext, run: SceneRun): void {
   sim.emit({ type: 'scene_beat', scene: run.id, beat: run.beat });
 }
 
-/** Avance l'habitant d'un pas vers le point; `true`: arrivé. */
+/**
+ * Où s'arrête un acteur envoyé vers `point`: au point même s'il est loin des joueurs; sinon en
+ * face d'eux, à distance de conversation de leur milieu, sur une place libre (ni mur, ni meuble,
+ * ni joueur à moins de `playerClearance`). La règle vaut pour tout point et toute scène: un acteur
+ * ne se pose jamais sur les joueurs.
+ */
+export function stageSpot(
+  sim: SimContext,
+  run: SceneRun,
+  point: Spot,
+): Spot & { facing: number | null } {
+  const [a, b] = sim.world.players.map((p) => p.body);
+  if (a === undefined || b === undefined) return { ...point, facing: null };
+  const { talkDistance, playerClearance, bodyRadius, steps } = SCENE_STAGING;
+  const near = (x: number, y: number, d: number): boolean =>
+    Math.hypot(a.x - x, a.y - y) < d || Math.hypot(b.x - x, b.y - y) < d;
+  if (!near(point.x, point.y, talkDistance)) return { ...point, facing: null };
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  // En face: dans le sens où regardent les joueurs; à défaut, du côté d'où vient le point.
+  const fx = Math.cos(a.facing) + Math.cos(b.facing);
+  const fy = Math.sin(a.facing) + Math.sin(b.facing);
+  const first =
+    Math.hypot(fx, fy) > 0.5 ? Math.atan2(fy, fx) : Math.atan2(point.y - my, point.x - mx);
+  const content = sim.content.places[run.place];
+  const state = sim.world.places[run.place];
+  const blockers =
+    content === undefined || state === undefined
+      ? null
+      : placeBlockers(sim.content, content, state, sim.world);
+  for (let k = 0; k < steps; k++) {
+    // 0, +1, -1, +2, -2...: au plus près d'en face.
+    const turn = (k % 2 === 1 ? 1 : -1) * Math.ceil(k / 2);
+    const angle = first + (2 * Math.PI * turn) / steps;
+    const x = mx + Math.cos(angle) * talkDistance;
+    const y = my + Math.sin(angle) * talkDistance;
+    if (near(x, y, playerClearance)) continue;
+    if (blockers !== null && bodyCollides(blockers, x, y, bodyRadius)) continue;
+    return { x, y, facing: Math.atan2(my - y, mx - x) };
+  }
+  return { ...point, facing: null };
+}
+
+/** Distance d'un point au segment [from, to]. */
+function toSegment(p: Spot, from: Spot, to: Spot): number {
+  const sx = to.x - from.x;
+  const sy = to.y - from.y;
+  const len2 = sx * sx + sy * sy;
+  const t =
+    len2 < 1e-9 ? 0 : Math.max(0, Math.min(1, ((p.x - from.x) * sx + (p.y - from.y) * sy) / len2));
+  return Math.hypot(from.x + sx * t - p.x, from.y + sy * t - p.y);
+}
+
+/**
+ * Un acteur ne traverse pas les joueurs: si la ligne droite passe sur l'un d'eux, il contourne
+ * la paire par le bout le plus proche de lui. `null`: la voie est libre.
+ */
+function aroundPlayers(sim: SimContext, from: Spot, to: Spot): Spot | null {
+  const [a, b] = sim.world.players.map((p) => p.body);
+  if (a === undefined || b === undefined) return null;
+  const { playerClearance } = SCENE_STAGING;
+  const pass = playerClearance / 2;
+  if (toSegment(a, from, to) >= pass && toSegment(b, from, to) >= pass) return null;
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const span = Math.hypot(b.x - a.x, b.y - a.y);
+  const ux = span > 1e-3 ? (b.x - a.x) / span : 1;
+  const uy = span > 1e-3 ? (b.y - a.y) / span : 0;
+  const side = (from.x - mx) * ux + (from.y - my) * uy >= 0 ? 1 : -1;
+  const reach = span / 2 + playerClearance;
+  return { x: mx + side * ux * reach, y: my + side * uy * reach };
+}
+
+function stepToward(
+  sim: SimContext,
+  body: { x: number; y: number; facing: number; speed: number },
+  to: Spot,
+): void {
+  const dx = to.x - body.x;
+  const dy = to.y - body.y;
+  const left = Math.hypot(dx, dy);
+  const stride = Math.min(left, STORY.villagerWalkSpeed * sim.dt);
+  if (left < 1e-6) return;
+  body.x += (dx / left) * stride;
+  body.y += (dy / left) * stride;
+  body.facing = Math.atan2(dy, dx);
+  body.speed = STORY.villagerWalkSpeed;
+}
+
+/** Avance l'habitant d'un pas vers le point (placé par `stageSpot`); `true`: arrivé. */
 function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: number): boolean {
   const villager = sim.world.places[run.place]?.villagers[who];
-  const point = sim.content.places[run.place]?.map.points[to];
-  if (villager === undefined || point === undefined) return true;
+  const target = sim.content.places[run.place]?.map.points[to];
+  if (villager === undefined || target === undefined) return true;
+  const point = stageSpot(sim, run, target);
+  const via = aroundPlayers(sim, villager.body, point);
+  if (via !== null && elapsed < STORY.maxWalkSeconds) {
+    stepToward(sim, villager.body, via);
+    return false;
+  }
   const dx = point.x - villager.body.x;
   const dy = point.y - villager.body.y;
   const left = Math.hypot(dx, dy);
@@ -116,6 +215,7 @@ function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: 
     villager.body.x = point.x;
     villager.body.y = point.y;
     villager.body.speed = 0;
+    if (point.facing !== null) villager.body.facing = point.facing;
     return true;
   }
   villager.body.x += (dx / left) * stride;

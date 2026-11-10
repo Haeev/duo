@@ -50,7 +50,7 @@
     "slowLoadSeconds": 11,
     "from": 360,
     "to": 1200,
-    "arrivalSpread": 0.8,
+    "arrivalSpread": 0.6,
     "arrivalSeconds": 1
   },
   "dialogue": {

@@ -217,7 +217,12 @@ describe('quêtes et scènes', () => {
     const started = wait(sim, 0.3);
     expect(started).toContainEqual({ type: 'scene_started', scene: 'aube', roleA: 0 });
     wait(sim, 30);
-    expect(sim.world.places[PLACE]?.villagers['cheffe-de-gare']?.body.y).toBe(4);
+    // Envoyée sur le quai où sont les joueurs, elle s'arrête à distance de conversation.
+    const cheffe = sim.world.places[PLACE]?.villagers['cheffe-de-gare']?.body;
+    for (const p of sim.world.players)
+      expect(Math.hypot((cheffe?.x ?? 0) - p.body.x, (cheffe?.y ?? 0) - p.body.y)).toBeGreaterThan(
+        1.1,
+      );
     expect(passed(sim, 'factice')).toEqual(['aube']);
     expect(isZoneOpen(sim.world, PLACE, 'remise')).toBe(true);
     // Pas deux fois le même jour; de nouveau le lendemain.
