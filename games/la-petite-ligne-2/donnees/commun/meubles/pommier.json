@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "pommier",
   "name": "Pommier",
-  "model": "tree-apple",
+  "model": "apple-tree",
   "size": {
     "w": 1,
     "h": 1

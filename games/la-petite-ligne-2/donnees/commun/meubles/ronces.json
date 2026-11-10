@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "ronces",
   "name": "Ronces à mûres",
-  "model": "buisson",
+  "model": "bramble",
   "size": {
     "w": 1,
     "h": 1

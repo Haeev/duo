@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "point-de-fouille",
   "name": "Sol qui scintille",
-  "model": "scintillement",
+  "model": "dig-spot",
   "size": {
     "w": 1,
     "h": 1

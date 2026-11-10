@@ -110,6 +110,11 @@ export const CropSchema = v.strictObject({
   schema: FileVersionSchema,
   id: IdSchema,
   name: LabelSchema,
+  /**
+   * Modèle 3D de la culture (facultatif): clé de `crops` dans le manifeste des décors, qui donne
+   * un modèle par stade et les mêmes « à arroser » (`cropModel` de `rendu/lieu/decors-manifeste`).
+   */
+  model: v.exactOptional(IdSchema),
   /** Graine qui la sème (objet de famille `seed`). */
   seed: IdSchema,
   /** Saisons où elle se sème et pousse; hors saison, elle attend sans mourir. Vide: toutes. */

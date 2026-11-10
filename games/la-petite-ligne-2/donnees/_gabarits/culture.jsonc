@@ -5,6 +5,10 @@
   "schema": 1,
   "id": "exemple-culture",
   "name": "Culture d'essai",
+  // Modèle 3D (facultatif): l'entrée `id` de la culture dans
+  // assets-src/decors/recoltables-aubrune/recoltables.toml, qui engendre un modèle par stade
+  // (levée, pousse, mûr) et les mêmes « à arroser ». Sans lui, la culture pousse sans se voir.
+  "model": "crop-radis",
   // Objet de famille « seed » qui la sème (une graine ne sème qu'une culture).
   "seed": "pomme",
   // Saisons où elle se sème et pousse (spring, summer, autumn, winter). [] = toutes.

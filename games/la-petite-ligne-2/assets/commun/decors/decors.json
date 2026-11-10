@@ -1,6 +1,410 @@
 {
+ "crops": {
+  "crop-radis": {
+   "crop": "radis",
+   "stages": [
+    "crop-radis-0",
+    "crop-radis-1",
+    "crop-radis-2"
+   ],
+   "thirsty": [
+    "crop-radis-0-thirsty",
+    "crop-radis-1-thirsty"
+   ]
+  },
+  "crop-tomate": {
+   "crop": "tomate",
+   "stages": [
+    "crop-tomate-0",
+    "crop-tomate-1",
+    "crop-tomate-2",
+    "crop-tomate-3"
+   ],
+   "thirsty": [
+    "crop-tomate-0-thirsty",
+    "crop-tomate-1-thirsty",
+    "crop-tomate-2-thirsty"
+   ]
+  }
+ },
  "format": "duo-decors/1",
+ "materials": {
+  "bois": {
+   "layer": "grain"
+  },
+  "ecorce": {
+   "kind": "stem",
+   "layer": "bark"
+  },
+  "feuillage": {
+   "kind": "leaf",
+   "layer": "leaf"
+  },
+  "fleur": {
+   "kind": "stem",
+   "layer": "plain"
+  },
+  "fruit": {
+   "kind": "stem",
+   "layer": "plain"
+  },
+  "mousse": {
+   "layer": "leaf"
+  },
+  "pierre": {
+   "layer": "face"
+  },
+  "terre": {
+   "layer": "dirt"
+  },
+  "tige": {
+   "kind": "stem",
+   "layer": "plain"
+  }
+ },
  "models": {
+  "apple-tree": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.22,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre du verger: bas, tordu, penché par le vent d'ouest, pommes à portée de main",
+   "size": {
+    "d": 4.131,
+    "h": 3.069,
+    "w": 4.564
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "bare": "apple-tree-bare",
+    "stump": "apple-tree-stump",
+    "winter": "apple-tree-winter"
+   },
+   "triangles": 1001,
+   "trianglesParMateriau": {
+    "ecorce": 188,
+    "feuillage": 701,
+    "fruit": 112
+   },
+   "variants": [
+    "apple-tree-b"
+   ]
+  },
+  "apple-tree-b": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.207,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre du verger: bas, tordu, penché par le vent d'ouest, pommes à portée de main",
+   "size": {
+    "d": 3.868,
+    "h": 2.893,
+    "w": 3.939
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "bare": "apple-tree-b-bare",
+    "stump": "apple-tree-stump",
+    "winter": "apple-tree-b-winter"
+   },
+   "triangles": 992,
+   "trianglesParMateriau": {
+    "ecorce": 188,
+    "feuillage": 692,
+    "fruit": 112
+   },
+   "variants": [
+    "apple-tree"
+   ]
+  },
+  "apple-tree-b-bare": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.207,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.868,
+    "h": 2.893,
+    "w": 3.939
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "apple-tree-b",
+    "state": "bare"
+   },
+   "triangles": 880,
+   "trianglesParMateriau": {
+    "ecorce": 188,
+    "feuillage": 692
+   }
+  },
+  "apple-tree-b-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.207,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.616,
+    "h": 3.147,
+    "w": 2.635
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "apple-tree-b",
+    "state": "winter"
+   },
+   "triangles": 278,
+   "trianglesParMateriau": {
+    "ecorce": 278
+   }
+  },
+  "apple-tree-bare": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.22,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 4.131,
+    "h": 3.069,
+    "w": 4.564
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "apple-tree",
+    "state": "bare"
+   },
+   "triangles": 889,
+   "trianglesParMateriau": {
+    "ecorce": 188,
+    "feuillage": 701
+   }
+  },
+  "apple-tree-stump": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.22,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 0.928,
+    "h": 0.42,
+    "w": 0.922
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "apple-tree",
+    "state": "stump"
+   },
+   "triangles": 165,
+   "trianglesParMateriau": {
+    "bois": 165
+   }
+  },
+  "apple-tree-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.22,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.948,
+    "h": 3.323,
+    "w": 3.039
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "apple-tree",
+    "state": "winter"
+   },
+   "triangles": 278,
+   "trianglesParMateriau": {
+    "ecorce": 278
+   }
+  },
+  "ash-tree": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.21,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre des haies et des bords de ruisseau: fût droit et gris, houppier haut et étroit, vert plus frais",
+   "size": {
+    "d": 3.804,
+    "h": 6.297,
+    "w": 3.92
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "ash-tree-stump",
+    "winter": "ash-tree-winter"
+   },
+   "triangles": 915,
+   "trianglesParMateriau": {
+    "ecorce": 204,
+    "feuillage": 711
+   },
+   "variants": [
+    "ash-tree-b"
+   ]
+  },
+  "ash-tree-b": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.193,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre des haies et des bords de ruisseau: fût droit et gris, houppier haut et étroit, vert plus frais",
+   "size": {
+    "d": 3.378,
+    "h": 5.777,
+    "w": 3.269
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "ash-tree-stump",
+    "winter": "ash-tree-b-winter"
+   },
+   "triangles": 919,
+   "trianglesParMateriau": {
+    "ecorce": 204,
+    "feuillage": 715
+   },
+   "variants": [
+    "ash-tree"
+   ]
+  },
+  "ash-tree-b-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.193,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.197,
+    "h": 5.749,
+    "w": 1.955
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree-b",
+    "state": "winter"
+   },
+   "triangles": 312,
+   "trianglesParMateriau": {
+    "ecorce": 312
+   }
+  },
+  "ash-tree-stump": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.21,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 0.894,
+    "h": 0.415,
+    "w": 0.836
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree",
+    "state": "stump"
+   },
+   "triangles": 165,
+   "trianglesParMateriau": {
+    "bois": 165
+   }
+  },
+  "ash-tree-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.21,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.299,
+    "h": 6.116,
+    "w": 2.286
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree",
+    "state": "winter"
+   },
+   "triangles": 312,
+   "trianglesParMateriau": {
+    "ecorce": 312
+   }
+  },
   "barrel": {
    "bottom": 0.0,
    "budget": 1200,
@@ -147,6 +551,401 @@
     "w": 1.7
    },
    "triangles": 1372
+  },
+  "berry-bush": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "buisson",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.92,
+     1.08
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 1.141,
+    "h": 0.795,
+    "w": 1.005
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "bare": "berry-bush-bare"
+   },
+   "triangles": 253,
+   "trianglesParMateriau": {
+    "feuillage": 149,
+    "fruit": 80,
+    "tige": 24
+   }
+  },
+  "berry-bush-bare": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "buisson",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 1.141,
+    "h": 0.775,
+    "w": 1.005
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "berry-bush",
+    "state": "bare"
+   },
+   "triangles": 173,
+   "trianglesParMateriau": {
+    "feuillage": 149,
+    "tige": 24
+   }
+  },
+  "birch-tree": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.15,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre des lisières humides: fût blanc marqué de noir, mince et penché, petites touffes claires étagées",
+   "size": {
+    "d": 3.348,
+    "h": 5.91,
+    "w": 3.722
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "birch-tree-stump",
+    "winter": "birch-tree-winter"
+   },
+   "triangles": 830,
+   "trianglesParMateriau": {
+    "ecorce": 244,
+    "feuillage": 586
+   },
+   "variants": [
+    "birch-tree-b"
+   ]
+  },
+  "birch-tree-b": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.135,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre des lisières humides: fût blanc marqué de noir, mince et penché, petites touffes claires étagées",
+   "size": {
+    "d": 3.214,
+    "h": 5.43,
+    "w": 3.081
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "birch-tree-stump",
+    "winter": "birch-tree-b-winter"
+   },
+   "triangles": 824,
+   "trianglesParMateriau": {
+    "ecorce": 244,
+    "feuillage": 580
+   },
+   "variants": [
+    "birch-tree"
+   ]
+  },
+  "birch-tree-b-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.135,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 1.991,
+    "h": 5.477,
+    "w": 1.904
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree-b",
+    "state": "winter"
+   },
+   "triangles": 352,
+   "trianglesParMateriau": {
+    "ecorce": 352
+   }
+  },
+  "birch-tree-stump": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.15,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 0.759,
+    "h": 0.385,
+    "w": 0.7
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree",
+    "state": "stump"
+   },
+   "triangles": 165,
+   "trianglesParMateriau": {
+    "bois": 165
+   }
+  },
+  "birch-tree-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.15,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.062,
+    "h": 6.074,
+    "w": 2.178
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree",
+    "state": "winter"
+   },
+   "triangles": 352,
+   "trianglesParMateriau": {
+    "ecorce": 352
+   }
+  },
+  "boulder": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 1.421,
+    "h": 0.956,
+    "w": 1.421
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "chipped": "boulder-chipped"
+   },
+   "triangles": 98,
+   "trianglesParMateriau": {
+    "pierre": 74,
+    "tige": 24
+   }
+  },
+  "boulder-chipped": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 1.489,
+    "h": 0.956,
+    "w": 1.421
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "boulder",
+    "state": "chipped"
+   },
+   "triangles": 144,
+   "trianglesParMateriau": {
+    "pierre": 120,
+    "tige": 24
+   }
+  },
+  "boulder-mossy": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 1.427,
+    "h": 1.028,
+    "w": 1.448
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "chipped": "boulder-mossy-chipped"
+   },
+   "triangles": 205,
+   "trianglesParMateriau": {
+    "mousse": 106,
+    "pierre": 75,
+    "tige": 24
+   }
+  },
+  "boulder-mossy-chipped": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 1.427,
+    "h": 1.028,
+    "w": 1.448
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "boulder-mossy",
+    "state": "chipped"
+   },
+   "triangles": 250,
+   "trianglesParMateriau": {
+    "mousse": 106,
+    "pierre": 120,
+    "tige": 24
+   }
+  },
+  "bramble": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "buisson",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.92,
+     1.08
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 1.306,
+    "h": 0.901,
+    "w": 1.436
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "bare": "bramble-bare"
+   },
+   "triangles": 279,
+   "trianglesParMateriau": {
+    "feuillage": 187,
+    "fruit": 56,
+    "tige": 36
+   },
+   "variants": [
+    "bramble-b"
+   ]
+  },
+  "bramble-b": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "buisson",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.92,
+     1.08
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 1.367,
+    "h": 0.829,
+    "w": 1.302
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "bare": "bramble-b-bare"
+   },
+   "triangles": 278,
+   "trianglesParMateriau": {
+    "feuillage": 186,
+    "fruit": 56,
+    "tige": 36
+   },
+   "variants": [
+    "bramble"
+   ]
+  },
+  "bramble-b-bare": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "buisson",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 1.367,
+    "h": 0.829,
+    "w": 1.302
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "bramble-b",
+    "state": "bare"
+   },
+   "triangles": 222,
+   "trianglesParMateriau": {
+    "feuillage": 186,
+    "tige": 36
+   }
+  },
+  "bramble-bare": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "buisson",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 1.306,
+    "h": 0.901,
+    "w": 1.436
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "bramble",
+    "state": "bare"
+   },
+   "triangles": 223,
+   "trianglesParMateriau": {
+    "feuillage": 187,
+    "tige": 36
+   }
   },
   "bush-flowering": {
    "bottom": 0.002,
@@ -308,6 +1107,360 @@
    "top": 0.6,
    "triangles": 684
   },
+  "crop-radis-0": {
+   "bottom": 0.1556,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 6,
+   "size": {
+    "d": 0.667,
+    "h": 0.168,
+    "w": 0.661
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-radis",
+    "state": "growing"
+   },
+   "triangles": 96,
+   "trianglesParMateriau": {
+    "tige": 96
+   }
+  },
+  "crop-radis-0-thirsty": {
+   "bottom": 0.1556,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 6,
+   "size": {
+    "d": 0.667,
+    "h": 0.168,
+    "w": 0.661
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-radis",
+    "state": "thirsty"
+   },
+   "triangles": 96,
+   "trianglesParMateriau": {
+    "tige": 96
+   }
+  },
+  "crop-radis-1": {
+   "bottom": 0.1436,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 6,
+   "size": {
+    "d": 0.809,
+    "h": 0.231,
+    "w": 0.788
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-radis",
+    "state": "growing"
+   },
+   "triangles": 192,
+   "trianglesParMateriau": {
+    "tige": 192
+   }
+  },
+  "crop-radis-1-thirsty": {
+   "bottom": 0.1436,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 6,
+   "size": {
+    "d": 0.851,
+    "h": 0.198,
+    "w": 0.84
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-radis",
+    "state": "thirsty"
+   },
+   "triangles": 192,
+   "trianglesParMateriau": {
+    "tige": 192
+   }
+  },
+  "crop-radis-2": {
+   "bottom": 0.1286,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 6,
+   "size": {
+    "d": 0.909,
+    "h": 0.311,
+    "w": 0.89
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-radis",
+    "state": "ripe"
+   },
+   "triangles": 336,
+   "trianglesParMateriau": {
+    "fruit": 48,
+    "tige": 288
+   }
+  },
+  "crop-tomate-0": {
+   "bottom": 0.1436,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 0.718,
+    "h": 0.19,
+    "w": 0.479
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "growing"
+   },
+   "triangles": 44,
+   "trianglesParMateriau": {
+    "tige": 44
+   }
+  },
+  "crop-tomate-0-thirsty": {
+   "bottom": 0.1436,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 0.718,
+    "h": 0.19,
+    "w": 0.479
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "thirsty"
+   },
+   "triangles": 44,
+   "trianglesParMateriau": {
+    "tige": 44
+   }
+  },
+  "crop-tomate-1": {
+   "bottom": 0.0,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 0.963,
+    "h": 1.124,
+    "w": 0.734
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "growing"
+   },
+   "triangles": 149,
+   "trianglesParMateriau": {
+    "bois": 20,
+    "feuillage": 105,
+    "tige": 24
+   }
+  },
+  "crop-tomate-1-thirsty": {
+   "bottom": 0.0,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 1.051,
+    "h": 1.124,
+    "w": 0.785
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "thirsty"
+   },
+   "triangles": 149,
+   "trianglesParMateriau": {
+    "bois": 20,
+    "feuillage": 105,
+    "tige": 24
+   }
+  },
+  "crop-tomate-2": {
+   "bottom": 0.0,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 0.995,
+    "h": 1.124,
+    "w": 0.767
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "growing"
+   },
+   "triangles": 213,
+   "trianglesParMateriau": {
+    "bois": 20,
+    "feuillage": 105,
+    "fleur": 64,
+    "tige": 24
+   }
+  },
+  "crop-tomate-2-thirsty": {
+   "bottom": 0.0,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 1.092,
+    "h": 1.124,
+    "w": 0.824
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "thirsty"
+   },
+   "triangles": 213,
+   "trianglesParMateriau": {
+    "bois": 20,
+    "feuillage": 105,
+    "fleur": 64,
+    "tige": 24
+   }
+  },
+  "crop-tomate-3": {
+   "bottom": 0.0,
+   "budget": 150,
+   "cell": true,
+   "family": "culture",
+   "file": "aubrune-potager.glb",
+   "plants": 2,
+   "size": {
+    "d": 1.026,
+    "h": 1.124,
+    "w": 0.807
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "crop-tomate",
+    "state": "ripe"
+   },
+   "triangles": 297,
+   "trianglesParMateriau": {
+    "bois": 20,
+    "feuillage": 157,
+    "fruit": 96,
+    "tige": 24
+   }
+  },
+  "dead-branches": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "bois",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.9,
+     1.1
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.947,
+    "h": 0.257,
+    "w": 0.892
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 108,
+   "trianglesParMateriau": {
+    "bois": 108
+   },
+   "variants": [
+    "dead-branches-b"
+   ]
+  },
+  "dead-branches-b": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "bois",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.9,
+     1.1
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.809,
+    "h": 0.259,
+    "w": 0.906
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 108,
+   "trianglesParMateriau": {
+    "bois": 108
+   },
+   "variants": [
+    "dead-branches"
+   ]
+  },
+  "dig-spot": {
+   "bottom": 0.0,
+   "budget": 200,
+   "family": "repere",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.95,
+     1.05
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.731,
+    "h": 0.255,
+    "w": 0.708
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 72,
+   "trianglesParMateriau": {
+    "pierre": 16,
+    "terre": 56
+   }
+  },
   "fence": {
    "bottom": 0.0,
    "budget": 800,
@@ -328,6 +1481,24 @@
     "w": 2.02
    },
    "triangles": 464
+  },
+  "fishing-spot": {
+   "bottom": 0.0,
+   "budget": 200,
+   "family": "repere",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 0.722,
+    "h": 1.192,
+    "w": 0.889
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 148,
+   "trianglesParMateriau": {
+    "bois": 10,
+    "fleur": 64,
+    "tige": 74
+   }
   },
   "flowers-poppy": {
    "bottom": 0.0,
@@ -350,6 +1521,70 @@
    },
    "triangles": 772
   },
+  "garden-bed": {
+   "bottom": 0.0,
+   "budget": 800,
+   "family": "parcelle",
+   "file": "aubrune-potager.glb",
+   "size": {
+    "d": 3.984,
+    "h": 0.283,
+    "w": 5.99
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "tilled": "garden-bed-tilled",
+    "watered": "garden-bed-watered"
+   },
+   "triangles": 756,
+   "trianglesParMateriau": {
+    "pierre": 272,
+    "terre": 192,
+    "tige": 292
+   }
+  },
+  "garden-bed-tilled": {
+   "bottom": 0.0,
+   "budget": 220,
+   "cell": true,
+   "family": "parcelle",
+   "file": "aubrune-potager.glb",
+   "size": {
+    "d": 0.97,
+    "h": 0.173,
+    "w": 0.992
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "garden-bed",
+    "state": "tilled"
+   },
+   "triangles": 198,
+   "trianglesParMateriau": {
+    "terre": 198
+   }
+  },
+  "garden-bed-watered": {
+   "bottom": 0.0,
+   "budget": 220,
+   "cell": true,
+   "family": "parcelle",
+   "file": "aubrune-potager.glb",
+   "size": {
+    "d": 0.97,
+    "h": 0.168,
+    "w": 0.989
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "garden-bed",
+    "state": "watered"
+   },
+   "triangles": 202,
+   "trianglesParMateriau": {
+    "terre": 202
+   }
+  },
   "grass-tuft": {
    "bottom": 0.0012,
    "budget": 300,
@@ -370,6 +1605,87 @@
     "w": 0.228
    },
    "triangles": 144
+  },
+  "great-oak-tree": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.52,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "le vieux chêne isolé, repère du pré: deux cases de tronc, il demande une hache forgée",
+   "size": {
+    "d": 6.539,
+    "h": 6.684,
+    "w": 6.501
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "great-oak-tree-stump",
+    "winter": "great-oak-tree-winter"
+   },
+   "triangles": 1182,
+   "trianglesParMateriau": {
+    "ecorce": 246,
+    "feuillage": 936
+   }
+  },
+  "great-oak-tree-stump": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.52,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 1.443,
+    "h": 0.75,
+    "w": 1.296
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "great-oak-tree",
+    "state": "stump"
+   },
+   "triangles": 186,
+   "trianglesParMateriau": {
+    "bois": 186
+   }
+  },
+  "great-oak-tree-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.52,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 4.264,
+    "h": 6.726,
+    "w": 4.536
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "great-oak-tree",
+    "state": "winter"
+   },
+   "triangles": 372,
+   "trianglesParMateriau": {
+    "ecorce": 372
+   }
   },
   "house-town": {
    "bottom": 0.0,
@@ -402,6 +1718,30 @@
     "w": 7.52
    },
    "triangles": 7004
+  },
+  "insect-spot": {
+   "bottom": 0.0,
+   "budget": 200,
+   "family": "repere",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.92,
+     1.08
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.588,
+    "h": 0.791,
+    "w": 0.555
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 86,
+   "trianglesParMateriau": {
+    "fleur": 48,
+    "tige": 38
+   }
   },
   "lamp-floor": {
    "bottom": 0.0,
@@ -466,6 +1806,150 @@
    },
    "triangles": 468
   },
+  "oak-tree": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.3,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre d'ombre du bocage: tronc trapu et noueux, houppier large en festons",
+   "size": {
+    "d": 4.242,
+    "h": 5.147,
+    "w": 4.199
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "oak-tree-stump",
+    "winter": "oak-tree-winter"
+   },
+   "triangles": 1018,
+   "trianglesParMateriau": {
+    "ecorce": 204,
+    "feuillage": 814
+   },
+   "variants": [
+    "oak-tree-b"
+   ]
+  },
+  "oak-tree-b": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.27,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "jitter": {
+    "scale": [
+     0.94,
+     1.06
+    ],
+    "yaw": true
+   },
+   "pourquoi": "l'arbre d'ombre du bocage: tronc trapu et noueux, houppier large en festons",
+   "size": {
+    "d": 3.718,
+    "h": 4.559,
+    "w": 4.057
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "stump": "oak-tree-stump",
+    "winter": "oak-tree-b-winter"
+   },
+   "triangles": 1026,
+   "trianglesParMateriau": {
+    "ecorce": 204,
+    "feuillage": 822
+   },
+   "variants": [
+    "oak-tree"
+   ]
+  },
+  "oak-tree-b-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.27,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.421,
+    "h": 4.555,
+    "w": 2.545
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree-b",
+    "state": "winter"
+   },
+   "triangles": 312,
+   "trianglesParMateriau": {
+    "ecorce": 312
+   }
+  },
+  "oak-tree-stump": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.3,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 1.039,
+    "h": 0.515,
+    "w": 1.02
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree",
+    "state": "stump"
+   },
+   "triangles": 165,
+   "trianglesParMateriau": {
+    "bois": 165
+   }
+  },
+  "oak-tree-winter": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "r": 0.3,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.946,
+    "h": 5.103,
+    "w": 2.913
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree",
+    "state": "winter"
+   },
+   "triangles": 312,
+   "trianglesParMateriau": {
+    "ecorce": 312
+   }
+  },
   "platform-sign": {
    "bottom": 0.0,
    "budget": 800,
@@ -486,6 +1970,158 @@
     "w": 1.1
    },
    "triangles": 504
+  },
+  "poppies": {
+   "bottom": 0.0,
+   "budget": 200,
+   "family": "fleur",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.9,
+     1.1
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.683,
+    "h": 0.54,
+    "w": 0.586
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 182,
+   "trianglesParMateriau": {
+    "fleur": 98,
+    "tige": 84
+   },
+   "variants": [
+    "poppies-b"
+   ]
+  },
+  "poppies-b": {
+   "bottom": 0.0,
+   "budget": 200,
+   "family": "fleur",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.9,
+     1.1
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.597,
+    "h": 0.526,
+    "w": 0.575
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 182,
+   "trianglesParMateriau": {
+    "fleur": 98,
+    "tige": 84
+   },
+   "variants": [
+    "poppies"
+   ]
+  },
+  "rock": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.704,
+    "h": 0.484,
+    "w": 0.934
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "chipped": "rock-chipped"
+   },
+   "triangles": 63,
+   "trianglesParMateriau": {
+    "pierre": 45,
+    "tige": 18
+   }
+  },
+  "rock-chipped": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 0.772,
+    "h": 0.484,
+    "w": 1.026
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "rock",
+    "state": "chipped"
+   },
+   "triangles": 111,
+   "trianglesParMateriau": {
+    "pierre": 93,
+    "tige": 18
+   }
+  },
+  "rock-mossy": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.88,
+    "h": 0.558,
+    "w": 0.961
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "chipped": "rock-mossy-chipped"
+   },
+   "triangles": 140,
+   "trianglesParMateriau": {
+    "mousse": 80,
+    "pierre": 42,
+    "tige": 18
+   }
+  },
+  "rock-mossy-chipped": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 0.885,
+    "h": 0.558,
+    "w": 0.965
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "rock-mossy",
+    "state": "chipped"
+   },
+   "triangles": 191,
+   "trianglesParMateriau": {
+    "mousse": 80,
+    "pierre": 93,
+    "tige": 18
+   }
   },
   "rug-oval": {
    "bottom": 0.0,
@@ -643,6 +2279,87 @@
    },
    "top": 0.85,
    "triangles": 664
+  },
+  "stone": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.7,
+    "h": 0.188,
+    "w": 0.731
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 64,
+   "trianglesParMateriau": {
+    "pierre": 64
+   },
+   "variants": [
+    "stone-b",
+    "stone-c"
+   ]
+  },
+  "stone-b": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.639,
+    "h": 0.222,
+    "w": 0.734
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 62,
+   "trianglesParMateriau": {
+    "pierre": 62
+   },
+   "variants": [
+    "stone",
+    "stone-c"
+   ]
+  },
+  "stone-c": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "rocher",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.88,
+     1.12
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.571,
+    "h": 0.235,
+    "w": 0.525
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 63,
+   "trianglesParMateriau": {
+    "pierre": 63
+   },
+   "variants": [
+    "stone",
+    "stone-b"
+   ]
   },
   "stool": {
    "bottom": 0.0007,
@@ -1162,6 +2879,69 @@
     "w": 2.104
    },
    "triangles": 1108
+  },
+  "wild-herbs": {
+   "bottom": 0.0,
+   "budget": 200,
+   "family": "fleur",
+   "file": "aubrune-recoltes.glb",
+   "jitter": {
+    "scale": [
+     0.9,
+     1.1
+    ],
+    "yaw": true
+   },
+   "size": {
+    "d": 0.696,
+    "h": 0.368,
+    "w": 0.734
+   },
+   "source": "recoltables-aubrune",
+   "triangles": 184,
+   "trianglesParMateriau": {
+    "fleur": 40,
+    "tige": 144
+   }
+  },
+  "woodpile": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "bois",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 0.503,
+    "h": 0.786,
+    "w": 0.877
+   },
+   "source": "recoltables-aubrune",
+   "states": {
+    "bare": "woodpile-bare"
+   },
+   "triangles": 300,
+   "trianglesParMateriau": {
+    "bois": 300
+   }
+  },
+  "woodpile-bare": {
+   "bottom": 0.0,
+   "budget": 300,
+   "family": "bois",
+   "file": "aubrune-recoltes.glb",
+   "size": {
+    "d": 0.468,
+    "h": 0.786,
+    "w": 0.877
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "woodpile",
+    "state": "bare"
+   },
+   "triangles": 110,
+   "trianglesParMateriau": {
+    "bois": 110
+   }
   }
  }
 }

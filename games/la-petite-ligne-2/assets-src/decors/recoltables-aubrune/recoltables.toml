@@ -1,0 +1,341 @@
+# Récoltables d'Aubrune: tout ce qu'on récolte et tout ce qui pousse dehors (style encré, campagne).
+#
+# Ajouter un modèle = copier une entrée [[modeles]] de la même famille, changer `id` et les champs
+# voulus, puis lancer
+#   bash games/la-petite-ligne-2/assets-src/decors/recoltables-aubrune/construire.sh
+# Aucun code à écrire. Recette complète: README.md de ce dossier.
+#
+# Unités: mètres. Origine au pied du modèle, au centre de son emprise. Identifiants en anglais,
+# minuscules et traits d'union. Un modèle engendre ses variantes (`<id>-b`) et ses états
+# (`<id>-stump`, `<id>-bare`, `<id>-winter`...), inscrits au manifeste sous `variants` et `states`.
+
+lieu = "aubrune"
+
+# ---------------------------------------------------------------- fichiers et budgets par famille
+[fichiers]
+arbre = "aubrune-arbres"
+buisson = "aubrune-recoltes"
+rocher = "aubrune-recoltes"
+fleur = "aubrune-recoltes"
+bois = "aubrune-recoltes"
+repere = "aubrune-recoltes"
+culture = "aubrune-potager"
+parcelle = "aubrune-potager"
+
+# Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
+[budgets]
+arbre = 1200
+buisson = 300
+rocher = 300
+fleur = 200
+bois = 300
+repere = 200
+culture = 150
+parcelle = 220
+potager = 800
+
+# ---------------------------------------------------------------- matériaux (noms stables)
+# Le rendu encré tire du NOM la couche de traits et la prise au vent (`nature`: leaf = feuillage
+# qui plie et frémit, stem = tige qui plie). Recopié tel quel dans le manifeste (`materials`).
+[materiaux]
+feuillage = { couche = "leaf", nature = "leaf" }
+ecorce = { couche = "bark", nature = "stem" }  # tronc vivant: il plie avec son houppier
+bois = { couche = "grain" }                    # bois mort ou coupé: souche, bûche, piquet
+pierre = { couche = "face" }
+mousse = { couche = "leaf" }
+terre = { couche = "dirt" }
+tige = { couche = "plain", nature = "stem" }
+fruit = { couche = "plain", nature = "stem" }  # il suit la branche qui le porte
+fleur = { couche = "plain", nature = "stem" }
+
+# ---------------------------------------------------------------- nuancier d'Aubrune (teintes d'écran)
+# Accordé à la scène d'essai validée (`src/rendu/demo-encre/`): herbe tendre, terre blonde, bois miel.
+[teintes]
+feuille_chene = ["#8FAE52", "#7C9C48", "#A3BD5E"]
+feuille_frene = ["#86B062", "#74A05A", "#9CC074"]
+feuille_bouleau = ["#B4C66A", "#A1B75B", "#C4D07A"]
+feuille_pommier = ["#7FA049", "#6F9145", "#93AF55"]
+feuille_ronce = ["#7A9C4C", "#6C8D45", "#8DAD56"]
+feuille_baies = ["#88A64E", "#76964A", "#9DB65A"]
+feuille_potager = ["#86B054", "#76A04C", "#9BC062"]
+feuille_soif = ["#B3B866", "#A5AA5C", "#C2C678"]
+ecorce_chene = ["#8C6F4E", "#80654A", "#977A58"]
+ecorce_frene = ["#A39683", "#978A78", "#AEA290"]
+ecorce_bouleau = ["#E9E3D2", "#DFD8C6", "#F0EBDD"]
+ecorce_pommier = ["#7A6248", "#6F5942", "#866C50"]
+marque = ["#3A302B"]
+bois_coupe = ["#D7A86A", "#CC9C60", "#DDB277"]
+bois_mort = ["#A38B6C", "#978062", "#AE9777"]
+piquet = ["#B4854F", "#A87A46"]
+pierre = ["#D2C6AC", "#C9BDA6", "#DAD0B8"]
+pierre_dessus = ["#E8E0CC"]
+pierre_fraiche = ["#F3ECDD"]
+quartz = ["#F7F2E4", "#EFE6CE"]
+mousse = ["#7E9A4E", "#6C8A45", "#8FA858"]
+terre_friche = ["#C9B48C", "#C0AA82", "#D1BD97"]
+terre_billon = ["#B08D62", "#A5835B", "#BA986C"]
+terre_billon_dessus = ["#C29F73"]
+terre_mouillee = ["#77593F", "#6C5039", "#826347"]
+terre_mouillee_dessus = ["#8A694B"]
+flaque = ["#7C9AA6"]
+tige = ["#6F8F45", "#628240"]
+herbe = ["#9DBB5B", "#8BAA52"]
+roseau = ["#B9C478", "#A9B56A"]
+massette = ["#7A5238"]
+coquelicot = ["#C5443D", "#D2523F"]
+coeur = ["#3A302B"]
+ombelle = ["#F3EDE0", "#E9E0C8"]
+bouton_or = ["#D4A33E"]
+mure = ["#3F2A4A", "#C0304A", "#4A2F4F"]
+groseille = ["#C5443D", "#B5383A"]
+pomme = ["#C5443D", "#D4A33E", "#CF5540"]
+radis = ["#D8527A", "#CC4A6E"]
+tomate = ["#D2452F", "#C73C2C"]
+tomate_verte = ["#A9BE5C"]
+fleur_tomate = ["#E3C24A"]
+
+# ---------------------------------------------------------------- essences d'arbres
+# `fut`: hauteur du tronc jusqu'à la fourche, rayon au pied, pans. `houppier`: forme (rond, ovale,
+# etage, plat), rayon, hauteur, nombre de masses. Le bas du houppier est à la hauteur du fût: on
+# passe dessous et la caméra voit le personnage au pied du tronc.
+[essences.chene]
+feuillage = "feuille_chene"
+ecorce = "ecorce_chene"
+fut = { hauteur = 2.9, rayon = 0.30, pans = 6, sinuosite = 0.14 }
+houppier = { forme = "rond", rayon = 1.7, hauteur = 2.6, masses = 6, festons = 3, segments = 9, dome = 0.72, dents = 0.34 }
+pourquoi = "l'arbre d'ombre du bocage: tronc trapu et noueux, houppier large en festons"
+
+[essences.gros_chene]
+feuillage = "feuille_chene"
+ecorce = "ecorce_chene"
+fut = { hauteur = 3.5, rayon = 0.52, pans = 7, sinuosite = 0.2 }
+houppier = { forme = "rond", rayon = 2.6, hauteur = 3.4, masses = 7, festons = 3, segments = 9, dome = 0.74, dents = 0.32 }
+pourquoi = "le vieux chêne isolé, repère du pré: deux cases de tronc, il demande une hache forgée"
+
+[essences.frene]
+feuillage = "feuille_frene"
+ecorce = "ecorce_frene"
+fut = { hauteur = 3.2, rayon = 0.21, pans = 6, sinuosite = 0.07 }
+houppier = { forme = "ovale", rayon = 1.5, hauteur = 3.6, masses = 6, festons = 3, segments = 8, dome = 0.95, dents = 0.42 }
+pourquoi = "l'arbre des haies et des bords de ruisseau: fût droit et gris, houppier haut et étroit, vert plus frais"
+
+[essences.bouleau]
+feuillage = "feuille_bouleau"
+ecorce = "ecorce_bouleau"
+marques = 5
+fut = { hauteur = 2.9, rayon = 0.15, pans = 6, sinuosite = 0.1, penche = 0.35 }
+houppier = { forme = "etage", rayon = 1.3, hauteur = 3.4, masses = 6, festons = 2, segments = 8, dome = 0.9, dents = 0.5 }
+pourquoi = "l'arbre des lisières humides: fût blanc marqué de noir, mince et penché, petites touffes claires étagées"
+
+[essences.pommier]
+feuillage = "feuille_pommier"
+ecorce = "ecorce_pommier"
+fruits = { teinte = "pomme", nombre = 14, rayon = 0.12 }
+fut = { hauteur = 1.75, rayon = 0.22, pans = 6, sinuosite = 0.2, penche = 0.3 }
+houppier = { forme = "plat", rayon = 1.55, hauteur = 1.5, masses = 5, festons = 3, segments = 9, dome = 0.6, dents = 0.3 }
+pourquoi = "l'arbre du verger: bas, tordu, penché par le vent d'ouest, pommes à portée de main"
+
+# ================================================================ modèles
+# ---------------------------------------------------------------- arbres
+# `etats`: stump (abattu: souche et bûches), winter (sans feuilles), bare (sans fruits).
+# `variantes`: autres formes de la même essence (graine et taille), tirées au hasard à la pose.
+[[modeles]]
+id = "oak-tree"
+famille = "arbre"
+essence = "chene"
+graine = 11
+variantes = [{ suffixe = "b", graine = 27, taille = 0.9 }]
+etats = ["stump", "winter"]
+
+[[modeles]]
+id = "great-oak-tree"
+famille = "arbre"
+essence = "gros_chene"
+graine = 5
+etats = ["stump", "winter"]
+
+[[modeles]]
+id = "ash-tree"
+famille = "arbre"
+essence = "frene"
+graine = 41
+variantes = [{ suffixe = "b", graine = 57, taille = 0.92 }]
+etats = ["stump", "winter"]
+
+[[modeles]]
+id = "birch-tree"
+famille = "arbre"
+essence = "bouleau"
+graine = 71
+variantes = [{ suffixe = "b", graine = 83, taille = 0.9 }]
+etats = ["stump", "winter"]
+
+[[modeles]]
+id = "apple-tree"
+famille = "arbre"
+essence = "pommier"
+graine = 101
+variantes = [{ suffixe = "b", graine = 113, taille = 0.94 }]
+etats = ["bare", "stump", "winter"]
+
+# ---------------------------------------------------------------- buissons et ronces
+# `forme`: "fourre" (ronce: fourré bas et arceaux qui retombent dessus) ou "boule" (buisson à baies).
+[[modeles]]
+id = "bramble"
+famille = "buisson"
+forme = "fourre"
+feuillage = "feuille_ronce"
+fruits = { teinte = "mure", nombre = 7, rayon = 0.09 }
+rayon = 0.52
+hauteur = 0.66
+graine = 131
+variantes = [{ suffixe = "b", graine = 149, taille = 0.92 }]
+etats = ["bare"]
+
+[[modeles]]
+id = "berry-bush"
+famille = "buisson"
+forme = "boule"
+feuillage = "feuille_baies"
+fruits = { teinte = "groseille", nombre = 10, rayon = 0.075 }
+rayon = 0.48
+hauteur = 0.95
+graine = 163
+etats = ["bare"]
+
+# ---------------------------------------------------------------- rochers et cailloux
+# `taille`: petit (caillou à ramasser), moyen, grand. `mousse`: plaques de mousse sur le dessus.
+# État `chipped`: rocher entamé (cassure claire, éclats au pied).
+[[modeles]]
+id = "stone"
+famille = "rocher"
+taille = "petit"
+graine = 181
+variantes = [{ suffixe = "b", graine = 191 }, { suffixe = "c", graine = 199 }]
+
+[[modeles]]
+id = "rock"
+famille = "rocher"
+taille = "moyen"
+graine = 211
+etats = ["chipped"]
+
+[[modeles]]
+id = "rock-mossy"
+famille = "rocher"
+taille = "moyen"
+mousse = true
+graine = 223
+etats = ["chipped"]
+
+[[modeles]]
+id = "boulder"
+famille = "rocher"
+taille = "grand"
+graine = 229
+etats = ["chipped"]
+
+[[modeles]]
+id = "boulder-mossy"
+famille = "rocher"
+taille = "grand"
+mousse = true
+graine = 239
+etats = ["chipped"]
+
+# ---------------------------------------------------------------- fleurs et herbes à cueillir
+# `sorte`: "pavot" (corolle en coupe sur une tige), "ombelle" (plateau de petites fleurs), "herbe".
+[[modeles]]
+id = "poppies"
+famille = "fleur"
+sorte = "pavot"
+corolle = "coquelicot"
+tiges = 6
+hauteur = 0.44
+graine = 251
+variantes = [{ suffixe = "b", graine = 263 }]
+
+[[modeles]]
+id = "wild-herbs"
+famille = "fleur"
+sorte = "herbe"
+corolle = "bouton_or"
+tiges = 5
+hauteur = 0.3
+graine = 271
+
+# ---------------------------------------------------------------- bois à ramasser
+[[modeles]]
+id = "dead-branches"
+famille = "bois"
+sorte = "branches"
+graine = 281
+variantes = [{ suffixe = "b", graine = 293 }]
+
+[[modeles]]
+id = "woodpile"
+famille = "bois"
+sorte = "tas"
+graine = 307
+etats = ["bare"]
+
+# ---------------------------------------------------------------- repères discrets
+# Fouille: terre remuée et éclats clairs. Pêche: touffe de roseaux et piquet au bord de l'eau.
+# Insectes: grandes ombelles où les papillons se posent.
+[[modeles]]
+id = "dig-spot"
+famille = "repere"
+sorte = "fouille"
+graine = 311
+
+[[modeles]]
+id = "fishing-spot"
+famille = "repere"
+sorte = "peche"
+graine = 331
+
+[[modeles]]
+id = "insect-spot"
+famille = "repere"
+sorte = "insectes"
+graine = 347
+
+# ---------------------------------------------------------------- potager: sol travaillé
+# Le potager en friche (emprise de la fiche du meuble), puis une case de 1 m par parcelle bêchée:
+# trois billons en relief, secs (`tilled`) ou arrosés (`watered`).
+[[modeles]]
+id = "garden-bed"
+famille = "parcelle"
+sorte = "friche"
+largeur = 6
+profondeur = 4
+graine = 353
+etats = ["tilled", "watered"]
+
+# ---------------------------------------------------------------- cultures
+# Une entrée par culture de `donnees/commun/cultures/`: `culture` est l'identifiant de sa fiche,
+# dont on lit le nombre de stades. Modèles engendrés: `<id>-<stade>` (le dernier est mûr) et
+# `<id>-<stade>-thirsty` (à arroser), inscrits au manifeste sous `crops.<id>`.
+# `port`: "rosette" (racine: feuilles en couronne, collet coloré à maturité) ou "tuteur" (pied
+# attaché à un piquet, fruits à maturité).
+[[modeles]]
+id = "crop-radis"
+famille = "culture"
+culture = "radis"
+port = "rosette"
+plants = 6
+hauteur = 0.22
+fruit = "radis"
+graine = 367
+
+[[modeles]]
+id = "crop-tomate"
+famille = "culture"
+culture = "tomate"
+port = "tuteur"
+plants = 2
+hauteur = 0.95
+fruit = "tomate"
+fruit_vert = "tomate_verte"
+fleur = "fleur_tomate"
+graine = 379

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "frene",
+  "name": "Frêne",
+  "model": "ash-tree",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "chene"
+    }
+  ]
+}
