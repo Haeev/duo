@@ -31,6 +31,8 @@ import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
 import './interface.css';
 import './carnet/carnet.css';
+import './encre/cadres.css';
+import './encre/encre.css';
 
 export type { BabbleInfo } from './dialogue';
 export type { ProjectToScreen } from './hud';
