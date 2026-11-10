@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "id": "jeanne-wagon",
+  "villager": "jeanne",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.wagon-vu"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu es [[entrée|entré]] dans mon wagon ! C'est ma cabane. Tu as compté les bâtons ?",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Quarante et un. Un par nuit où j'ai entendu la sonnerie. Toujours 5 h 12. Tu trouves que le vent est ponctuel, toi ?",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-vent-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Alors le jour devrait sonner aussi. Je parie deux caramels.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3-cabane-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je sais. Sinon je dis à Solange qui a mangé un caramel.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "vent",
+          "text": "Firmin dit que le vent se lève avec le jour.",
+          "when": [],
+          "effects": [],
+          "next": "n3-vent-1"
+        },
+        {
+          "id": "cabane",
+          "text": "Je ne dirai rien pour la cabane.",
+          "when": [],
+          "effects": [],
+          "next": "n3-cabane-1"
+        }
+      ]
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu peux venir. Mais on frappe: trois coups, puis deux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

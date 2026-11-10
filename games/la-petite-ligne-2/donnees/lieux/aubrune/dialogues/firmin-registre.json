@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "firmin-registre",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.registre",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "... Vous avez trouvé la trappe.",
+      "emote": "sad",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Les six semaines, c'est moi. J'avais trente-quatre ans. Je me disais: s'il revient, il faut que le registre soit à jour.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-vu-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "J'écrivais. Je ne regardais pas. On ne sait jamais ce qu'on verrait. Ou ce qu'on ne verrait pas.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3-savais-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je savais qu'il valait mieux un toit, un potager et des poules avant une cave. J'ai fait dans l'ordre.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "vu",
+          "text": "Tu écrivais « passé ». Tu l'as vu passer ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-vu-1"
+        },
+        {
+          "id": "savais",
+          "text": "Tu savais, pour la cave.",
+          "when": [],
+          "effects": [],
+          "next": "n3-savais-1"
+        }
+      ]
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Au bout de six semaines, j'ai reposé la lame. Sans la clouer. Au cas où.",
+      "emote": null,
+      "next": "n5"
+    },
+    "n5": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Émile, c'est mon oncle. Chef de ligne. Voilà, c'est dit. Ça ne change rien.",
+      "emote": "sad",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La lanterne, laisse-la où elle est. Sans son verre, c'est un chandelier. Et ne va pas me réveiller le bourg avec ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

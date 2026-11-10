@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-cuisine",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison.cuisine"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cuisine. Droite. Le buffet boite. Normal: plus de cale.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

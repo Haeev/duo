@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-marraine",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.le-train-d-honorine",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Honorine t'a raconté sa marraine ? Elle avait sept ans et de la fièvre. À sept ans, avec la rougeole, j'ai vu des éléphants.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "id": "la-veillee-du-premier-train",
+  "title": "La Veillée du premier train",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "walk",
+      "who": "odette",
+      "to": "quai"
+    },
+    {
+      "do": "walk",
+      "who": "jeanne",
+      "to": "quai"
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le soir venu, tout Aubrune est sur le quai. Vingt âmes, des lampions, une soupe d'Odette et une tarte de Colette.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Un camion de laitier, je te dis ! Un laitier très poli, très en avance, et sur des rails. Reprends de la soupe.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "J'ai gagné mon pari. Firmin m'a donné un caramel. Il datait de 1987. Je le garde: c'est une preuve.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ambroise et Firmin sont assis sur le même banc. Face à face, cette fois. Ils se disputent l'heure exacte. Ils ont l'air heureux.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sur le tableau des horaires, quelqu'un a ajouté une ligne à la craie: « 5 h 12. Hautefonte. S'il est à l'heure. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "À ceux qui partent ! Et à ceux qui reviennent, tant qu'à faire. On a de la place.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.decor.veillee",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.decor.horaire-5h12",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte3.fini",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

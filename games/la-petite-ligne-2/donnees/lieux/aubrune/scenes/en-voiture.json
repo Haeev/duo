@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "id": "en-voiture",
+  "title": "En voiture",
+  "together": true,
+  "roles": {
+    "a": "Côté fenêtre",
+    "b": "Côté couloir"
+  },
+  "trigger": {
+    "at": 312,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.depart",
+        "equals": "ouvert"
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "5 h 12. Trois coups au clocher. À la barrière, un lumignon: Marthe l'a posé elle-même.",
+      "emote": null,
+      "sound": "Dong ! Dong ! Dong !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.autorail.en-gare",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "L'autorail crème s'arrête à ta hauteur, à l'heure. La porte s'ouvre toute seule: elle a l'habitude.",
+      "emote": null,
+      "sound": "Pschhh...",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "walk",
+      "who": "firmin",
+      "to": "quai-e"
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Je passais. Par hasard. À 5 h 12.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Firmin est en souliers. Cirés. Il tient une lanterne à bout de bras, comme on a dû le lui apprendre, petit.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Dites-lui que le registre est à jour. Et rentrez pour les radis: je ne les arroserai pas. ... Si. Je les arroserai.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "anatole",
+      "text": "Hautefonte ! En voiture. Les valises sous la banquette, les pieds pas sur la banquette. Article 12.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu montes. Par la fenêtre, Aubrune rétrécit: une pendule à l'heure, un signal incliné, une lumière au bout du quai.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu montes. Dans le couloir, le Contrôleur compte deux voyageurs, recompte, et note: « Complet. »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "fade",
+      "to": "black",
+      "seconds": 2
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Prochain arrêt: Hautefonte. Le bureau 512 n'existe pas. Vous y avez rendez-vous.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.depart.fait",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.autorail.en-gare",
+          "value": false,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "id": "paulin",
+  "name": "Paulin Delmas",
+  "temper": "grumpy",
+  "look": {
+    "shape": "adult-m-round",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [6, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [2]
+      },
+      {
+        "slot": "top",
+        "id": "top-tee",
+        "colors": [9]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [11]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [12]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [3, 1]
+      }
+    ]
+  },
+  "stands": "fc",
+  "voice": "grumpy",
+  "life": {
+    "home": "fc",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1260,
+        "when": [
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.verrou.v3"
+            }
+          }
+        ],
+        "at": {
+          "point": "gu-n"
+        },
+        "activity": "attendre-au-gue",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "when": [
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.verrou.v3"
+            }
+          }
+        ],
+        "at": {
+          "point": "gu-n"
+        },
+        "activity": "attendre-au-gue",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 1200,
+        "at": {
+          "point": "fe1"
+        },
+        "activity": "travailler-aux-champs",
+        "gesture": null
+      },
+      {
+        "from": 1200,
+        "to": 420,
+        "at": {
+          "point": "fc"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "question",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["pomme-de-terre"],
+      "liked": ["pain", "buche"],
+      "disliked": ["coquelicot"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.train2"
+      }
+    ],
+    "leaves": null
+  }
+}

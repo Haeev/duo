@@ -1,0 +1,182 @@
+{
+  "schema": 1,
+  "id": "les-leviers",
+  "title": "Les leviers",
+  "together": true,
+  "roles": {
+    "a": "Dans la cabine",
+    "b": "Au pied du signal"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Monte dans la cabine du poste d'aiguillage.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "po",
+              "who": "one",
+              "radius": 3
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Va au pied du sémaphore, à l'ouest du poste.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "pg0",
+              "who": "one",
+              "radius": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Trois leviers. Les étiquettes ont déteint: « S.MA....E », « AIG...LE », « NE PAS T..... ».",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "D'ici, tu vois le bras du signal, l'aiguille à tes pieds, et un nid de mésanges sur le contrepoids.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu tires le premier levier. Demande à ta moitié ce qui bouge, dehors.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "L'aiguille claque à tes pieds. Le signal, lui, ne bronche pas. Dis-le vite !",
+      "emote": null,
+      "sound": "Clac !",
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le deuxième, alors. Il résiste. Tu tires des deux mains.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le bras frémit, monte d'un cran, puis retombe. Le contrepoids est coincé par le nid. Préviens ta moitié.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Tiens le levier, sans forcer.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "po",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Porte le nid à l'abri, sur le rebord du poste.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "po",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Clac. Le bras s'incline, net. « Voie libre », annonce le signal, après trente ans de silence.",
+      "emote": null,
+      "sound": "Clac !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Reste le troisième levier. « NE PAS T..... ». Tu ne le touches pas. Tu es très [[fière|fier]] de toi.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Les mésanges inspectent leur nouveau rebord. Elles n'ont pas l'air de vouloir porter plainte.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.halte.signal",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.verrou.v11",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "unlock_zone",
+          "zone": "r"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Derrière le poste, un portillon s'ouvre du dedans: un sentier descend vers la vanne et la rivière.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

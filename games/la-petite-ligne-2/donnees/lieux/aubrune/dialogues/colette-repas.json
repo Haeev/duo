@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "colette-repas",
+  "villager": "colette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.repas",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "pot-au-feu",
+              "count": 1
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Firmin et Ambroise à ma table ? J'ai servi des noces qui finissaient plus mal.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Apporte la marmite: légumes des Delmas, bœuf d'Odette. Je m'occupe du plan de table.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ça, c'est une marmite ! Donne. Je les ai fait venir pour midi. L'un croit que l'autre ne vient pas. L'autre aussi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

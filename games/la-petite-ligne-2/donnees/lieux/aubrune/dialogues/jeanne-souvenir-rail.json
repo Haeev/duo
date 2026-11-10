@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-rail",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lanterne.verre"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu as vu ? Le rail brillait. Armand dit: l'humidité. Je lui ai demandé pourquoi un seul rail. Il a dit: « Très bonne question. »",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

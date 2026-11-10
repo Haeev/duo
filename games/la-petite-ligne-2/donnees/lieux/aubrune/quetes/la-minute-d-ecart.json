@@ -1,0 +1,1119 @@
+{
+  "schema": 1,
+  "id": "la-minute-d-ecart",
+  "kind": "main",
+  "title": "La minute d'écart",
+  "giver": "firmin",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "le-train-de-5h12"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "le-reglement",
+      "title": "Le règlement",
+      "steps": [
+        {
+          "id": "occupation",
+          "objective": "Firmin a une idée pour t'occuper. Loin de la voie, de préférence.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-occupation",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.occupation",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.occupation",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "cuisine",
+          "objective": "Porte six bûches à Basile, à la maison: il refait la cuisine, où dort le règlement.",
+          "target": {
+            "villager": "basile"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 6,
+              "villager": "basile"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.cuisine",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.cuisine",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "le-reglement-retrouve"
+            }
+          ]
+        },
+        {
+          "id": "article-7",
+          "objective": "Porte le règlement à Firmin, sur le quai.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-reglement",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.article-7",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.article-7",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v2",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "unlock_zone",
+              "zone": "v"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-halte-en-service",
+      "title": "Quatre conditions",
+      "steps": [
+        {
+          "id": "tranchee",
+          "objective": "Dégage la voie vers l'ouest: suis les rails dans la tranchée, après la barrière.",
+          "target": {
+            "point": "tw2"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "reach",
+              "point": "tw2",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.tranchee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.tranchee",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "wagon",
+          "objective": "Un wagon dort sur la voie de garage. Va voir.",
+          "target": {
+            "point": "tw3"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "tw3",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.wagon",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.wagon",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "le-wagon-oublie"
+            }
+          ]
+        },
+        {
+          "id": "frenes",
+          "objective": "Trois frênes barrent la voie, trop gros pour ta hache. Mado, à la forge, saura quoi faire.",
+          "target": {
+            "villager": "mado"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "mado-hache",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.frenes",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.frenes",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "hache-forgee",
+          "objective": "Porte à Mado trois pierres des grèves et deux bûches: elle reforge ta hache.",
+          "target": {
+            "villager": "mado"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "pierre",
+              "count": 3,
+              "villager": "mado"
+            },
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 2,
+              "villager": "mado"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.hache-forgee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.hache-forgee",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "take_item",
+              "item": "hache",
+              "count": 1
+            },
+            {
+              "type": "give_item",
+              "item": "hache-forgee",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "id": "degager",
+          "objective": "Hache forgée en main, retourne aux frênes et ouvre la voie.",
+          "target": {
+            "point": "tw3"
+          },
+          "done": [
+            {
+              "type": "item_in_bag",
+              "item": "hache-forgee",
+              "count": 1
+            },
+            {
+              "type": "reach",
+              "point": "tw3",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.degager",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.degager",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v2b",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "buche",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "id": "semaphore",
+          "objective": "Au bout de la voie: le poste d'aiguillage et son signal.",
+          "target": {
+            "point": "po"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "po",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.semaphore",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.semaphore",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "le-semaphore-manchot"
+            }
+          ]
+        },
+        {
+          "id": "bras",
+          "objective": "Porte le bras du sémaphore à Mado, avec quatre bûches de frêne pour sa forge.",
+          "target": {
+            "villager": "mado"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 4,
+              "villager": "mado"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.bras",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.bras",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "leviers",
+          "objective": "À deux au poste d'aiguillage: une personne aux leviers, l'autre au pied du signal.",
+          "target": {
+            "point": "po"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "les-leviers"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.leviers",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "les-leviers"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.leviers",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "pendule",
+          "objective": "La pendule du quai est arrêtée. Demande à Firmin depuis quand.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-pendule",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.pendule",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.pendule",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "version-ambroise",
+          "objective": "Ambroise, l'ancien régleur, vit au bout de la Grand-Route. Écoute sa version de « la minute ».",
+          "target": {
+            "villager": "ambroise"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "ambroise-minute",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.version-ambroise",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.version-ambroise",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "version-firmin",
+          "objective": "Retourne voir Firmin: il a sa version, lui aussi.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-minute",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.version-firmin",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.version-firmin",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "odette-sait",
+          "objective": "Deux têtes de mule, deux versions. Odette sait tout: demande-lui.",
+          "target": {
+            "villager": "odette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-minute",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.odette-sait",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.odette-sait",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "oeuf",
+          "objective": "Cuis un œuf au plat sur le réchaud de la maison, jaune entier, et montre-le à Honorine.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-oeuf",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.oeuf",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.oeuf",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "marthe-oeuf",
+          "objective": "Porte l'œuf au plat à Marthe, « de la part d'Honorine ». Et regarde bien sa tête.",
+          "target": {
+            "villager": "marthe"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "oeuf-au-plat",
+              "count": 1,
+              "villager": "marthe"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.marthe-oeuf",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.marthe-oeuf",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "confidence",
+          "objective": "Raconte à Honorine la tête de Marthe: elle te doit une minute.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-confidence",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.confidence",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.confidence",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "aveu-ambroise",
+          "objective": "Dis à Ambroise ce que tu sais de l'ordre de la Compagnie.",
+          "target": {
+            "villager": "ambroise"
+          },
+          "after": ["confidence"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "ambroise-aveu",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.aveu-ambroise",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.aveu-ambroise",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "aveu-firmin",
+          "objective": "Dis à Firmin que la minute venait d'un ordre.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": ["confidence"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-aveu",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.aveu-firmin",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.aveu-firmin",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "lecon",
+          "objective": "La commande veut du poisson. Achille pêche à ses heures: demande-lui une leçon, au fournil.",
+          "target": {
+            "villager": "achille"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "achille-lecon",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.lecon",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.lecon",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v1",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "unlock_zone",
+              "zone": "r"
+            }
+          ]
+        },
+        {
+          "id": "saule",
+          "objective": "Suis la berge vers l'ouest: le saule est débité, le chemin de l'Île est ouvert.",
+          "target": {
+            "point": "bw2"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "bw2",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.saule",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.saule",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "fosse",
+          "objective": "Passe les planches jusqu'à la fosse du bief, sur l'Île, et sors deux goujons pour Achille.",
+          "target": {
+            "villager": "achille"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "goujon",
+              "count": 2,
+              "villager": "achille"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.fosse",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.fosse",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "commande-jardin",
+          "objective": "Pour la commande: six radis du potager et quatre œufs, à porter à Firmin sur le quai.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "radis",
+              "count": 6,
+              "villager": "firmin"
+            },
+            {
+              "type": "deliver",
+              "item": "oeuf",
+              "count": 4,
+              "villager": "firmin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.commande-jardin",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.commande-jardin",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "commande-riviere",
+          "objective": "Pour la commande: trois goujons, à porter à Firmin sur le quai.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": ["fosse"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "goujon",
+              "count": 3,
+              "villager": "firmin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.commande-riviere",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.commande-riviere",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "commande-bois",
+          "objective": "Pour la commande: cinq bûches bien fendues, à porter à Firmin sur le quai.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": ["degager"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 5,
+              "villager": "firmin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.commande-bois",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.commande-bois",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "le-premier-train",
+      "title": "Le premier train",
+      "steps": [
+        {
+          "id": "telegraphe",
+          "objective": "Quatre conditions sur quatre, ou presque: va le dire à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-telegraphe",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.telegraphe",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.telegraphe",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "veille-du-train",
+          "objective": "Le train est annoncé pour demain: une bonne nuit, et une toilette à la pompe.",
+          "target": {
+            "point": "hd"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "sleep",
+              "value": 95
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.veille-du-train",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.veille-du-train",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "le-train",
+          "objective": "Le grand jour: en matinée, sur le quai, à deux, au pied de la pendule.",
+          "target": {
+            "point": "quai-e"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-pendule-repart"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.le-train",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.le-train",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "rosalie",
+          "objective": "La mécanicienne te fait signe depuis le quai: elle a quelque chose pour toi.",
+          "target": {
+            "villager": "rosalie"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "rosalie-lettre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.rosalie",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.rosalie",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_money",
+              "amount": 2400
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-deuxieme-lettre"
+            }
+          ]
+        },
+        {
+          "id": "farce",
+          "objective": "Une lettre d'É. Lacombe, postée avant-hier. Montre-la à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-farce",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.farce",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.farce",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte2.fini",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.train.en-gare",
+              "value": false,
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.decor.cafe-ouvert",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.decor.ecole-ouverte",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-autorail",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Un autorail crème dans la brume, et je dormais ! La plus belle entrée en scène du siècle, et j'étais en bigoudis.",
+      "emote": "sad",
+      "next": null
+    }
+  }
+}

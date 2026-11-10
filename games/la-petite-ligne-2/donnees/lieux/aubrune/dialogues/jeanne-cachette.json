@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "jeanne-cachette",
+  "villager": "jeanne",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.jeanne",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La cachette d'Émile ? Qui t'a dit que je la connaissais ? ... Bon. Je la connais.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "C'est au fond du tunnel. Tout au fond, là où ça souffle tiède. Il y a une boîte en fer. J'ai rien pris. J'ai regardé. Tous les jeudis.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-emmene-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je passe par mon trou, sous la grille. Toi, tu es trop [[grande|grand]]: prends la clé de Firmin.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-peur-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Il y a une lampe par niche. Et je parie toujours que j'ai pas peur. Comme ça, je suis obligée.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "emmene",
+          "text": "Tu nous y emmènes ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-emmene-1"
+        },
+        {
+          "id": "peur",
+          "text": "Tu n'as pas peur, dans le tunnel ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-peur-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Rendez-vous au fond. Quand tu ouvres la grille, je pars. Je parie que j'arrive avant. Suis les rails: y en a que deux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "jeanne-pari",
+  "villager": "jeanne",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.pari",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Le nouveau ? Celui qui a « conduit un train » ? Il ne sait pas lire l'heure ? Ha !",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2-parie-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Parier quoi ?",
+      "emote": null,
+      "next": "n3"
+    },
+    "n2-defi-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "En un jour ? En une heure ! Enfin, il faut d'abord qu'il sache lire une heure.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "parie",
+          "text": "Ne te moque pas. Parie plutôt.",
+          "when": [],
+          "effects": [],
+          "next": "n2-parie-1"
+        },
+        {
+          "id": "defi",
+          "text": "Je parie que tu ne lui apprends pas en un jour.",
+          "when": [],
+          "effects": [],
+          "next": "n2-defi-1"
+        }
+      ]
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "D'accord. Je parie qu'à midi, il lit la pendule du quai. S'il y arrive, il me doit son lance-pierre. S'il rate, je lui dois mes caramels.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ne le dis pas aux grands. On dira qu'il savait déjà. Entre nous, on a notre règlement aussi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

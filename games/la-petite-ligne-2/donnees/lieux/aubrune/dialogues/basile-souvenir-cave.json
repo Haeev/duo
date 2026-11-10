@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-cave",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison.cave"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cave. Pas sur le plan. J'ai refait le plan.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

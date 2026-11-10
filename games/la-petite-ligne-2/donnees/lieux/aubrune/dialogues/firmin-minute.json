@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-minute",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.version-firmin",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Des excuses ? Sa pendule avançait d'une minute. Je l'ai vu de mes yeux, montre en main.",
+      "emote": "anger",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "À cause de cette minute, le dernier train est parti sans... sans quelqu'un. Voilà.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-qui-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Sans quelqu'un qui était toujours à l'heure. Ça suffit comme ça.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-peu-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Sur une ligne, une minute, c'est un train. Demande à n'importe quel lapin.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "qui",
+          "text": "Sans qui ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-qui-1"
+        },
+        {
+          "id": "peu",
+          "text": "Une minute, ce n'est pas grand-chose.",
+          "when": [],
+          "effects": [],
+          "next": "n3-peu-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Qu'il avoue, et il la règle. Sinon elle restera à 5 h 12, et le règlement avec.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

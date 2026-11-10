@@ -346,3 +346,16 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Ajouter un lieu aux données casse les tests qui listent les lieux (`donnees.test.ts`, `aides-sauvegarde.ts`, override de `grands-lieux.test.ts`, liens obligatoires dans les deux sens).
 - Le trajet en train coûte `travel.clockHours` et n'est permis qu'entre `travel.from` et `travel.to` (6 h à 20 h): un prologue de nuit doit passer par une vraie nuit (lit) avant de descendre.
 - L'outil d'écriture de fichiers transforme l'échappement unicode du cadratin en vrai tiret: dans un test, écrire `String.fromCharCode(0x2013, 0x2014)`.
+
+## Écrire la suite d'une histoire en données (actes 2 et 3 d'Aubrune, vérifié le 2026-11-10)
+
+- Départ: `git merge --ff-only origin/claude/stoic-lamport-lueey2` (branche de session) avant toute autre fusion; fusionner à la main la branche d'un autre membre donne des conflits dans le moteur.
+- Volume: un petit générateur Python dans le scratchpad (répliques en listes, choix, étapes, scènes) écrit les JSON, puis `prettier --write`; il refuse lui-même plus de 150 caractères, les tirets longs, « chacun » et « tous les deux ». 480 répliques en une passe, validateur vert du premier coup.
+- `once` d'un dialogue s'inscrit au début de la conversation: un cadeau par joueur se donne par un nœud d'effets sans échappatoire, dans un dialogue `once: player`, priorité 65, condition « le fait de l'étape existe » (sans `equals`), pour que l'autre joueur le reçoive après le passage de l'étape. À priorité égale, c'est l'ordre des noms de fichiers qui tranche.
+- Remise d'objets: un dialogue à aiguillage (`item_in_bag` vers les remerciements, sinon la demande); l'étape passe et retire les objets dès que la conversation s'ouvre.
+- Piège du moteur: un habitant dont la ligne de planning change pendant qu'on lui parle reste sur place avec la nouvelle activité. Faire basculer son planning par une étape `reach` (le joueur atteint un point), jamais par la fin de son propre dialogue.
+- Une étape franchie par une scène à deux rôles ne doit pas être `together`: la scène sépare les joueurs et l'étape attendrait qu'ils se rejoignent.
+- Un personnage de passage (mécanicienne, contrôleur): `arrives` sur l'existence d'un fait, `leaves` sur ce fait à `false`; le remettre à `true` le fait redescendre du train.
+- Carte d'Aubrune à cette date: plusieurs verrous se contournent (V2 seul ouvre 97 % de la zone de la voie et 76 % de la rivière); mesurer avec `zoneViews` avant d'écrire qu'une étape « ouvre » une zone. Aucune ressource, aucun coin de pêche, aucun poste de cuisine sur la carte: le test donne les objets par `giveItem`.
+- Compter avant d'écrire un nombre du cahier dans une réplique: « douze foyers » ne tombait pas juste (13 dès l'acte 2); « vingt âmes » oui (10 + 2 + 3 + 5).
+- Accords de « vous » (les deux joueurs): balise `[[duo:f|m]]`, acceptée dans les dialogues, les options et les scènes.

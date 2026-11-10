@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-reglement",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.article-7",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le règlement ! Donne. Article 7... « Est dite en service toute halte pourvue... » Voilà.",
+      "emote": "idea",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Un: une pendule à l'heure. Deux: un signal qui marche. Trois: une voie dégagée. Quatre: une commande prête sur le quai.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Zéro sur quatre. Pas mal, pour trente ans de travail.",
+      "emote": "sad",
+      "next": "n4"
+    },
+    "n4-sonnerie-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Aucun. Le vent n'a pas d'article. Au travail.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "allons",
+          "text": "On s'y met.",
+          "when": [],
+          "effects": [],
+          "next": "fin"
+        },
+        {
+          "id": "sonnerie",
+          "text": "Et la sonnerie de 5 h 12, c'est quel article ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-sonnerie-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La voie d'abord: vers l'ouest, après la barrière. Des ronces jusqu'au poste d'aiguillage. Tu en as pour des jours. Parfait.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

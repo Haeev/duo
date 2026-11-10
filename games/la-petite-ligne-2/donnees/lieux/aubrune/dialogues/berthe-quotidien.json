@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "id": "berthe-quotidien",
+  "villager": "berthe",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.berthe",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.berthe",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.berthe",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Bonjour. Parle fort: la meule est jalouse, elle couvre les voix qu'elle ne connaît pas.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.berthe",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ah, toi. J'ai dit à ma meule que tu avais ouvert la vanne. Elle t'aime bien. Elle ne le montre pas, elle est en pierre.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.berthe",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Bonjour. De la farine disparaît, la nuit. Je ne dis rien. Je compte. Quand j'aurai fini de compter, je dirai.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.berthe",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Te voilà. Un moulin qui tourne, ça s'entend jusqu'à la halte. Firmin règle sa journée dessus. Je ne lui ai pas dit que je m'arrête à midi.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.berthe",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    }
+  }
+}

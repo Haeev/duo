@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "id": "leon",
+  "name": "Léon Delmas",
+  "temper": "cheerful",
+  "look": {
+    "shape": "child-medium",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [1, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [4]
+      },
+      {
+        "slot": "top",
+        "id": "top-tee",
+        "colors": [14]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-shorts",
+        "colors": [10]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [0, 0]
+      }
+    ]
+  },
+  "stands": "fc2",
+  "voice": "high",
+  "life": {
+    "home": "fc2",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1260,
+        "when": [
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.verrou.v3"
+            }
+          }
+        ],
+        "at": {
+          "point": "bg"
+        },
+        "activity": "attendre-au-gue",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "when": [
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.verrou.v3"
+            }
+          }
+        ],
+        "at": {
+          "point": "bg"
+        },
+        "activity": "attendre-au-gue",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 840,
+        "at": {
+          "point": "fs3"
+        },
+        "activity": "sauter-dans-le-foin",
+        "gesture": null
+      },
+      {
+        "from": 840,
+        "to": 1140,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "jouer-sur-la-place",
+        "gesture": null
+      },
+      {
+        "from": 1140,
+        "to": 420,
+        "at": {
+          "point": "fc2"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["mures"],
+      "liked": ["pomme", "vieille-piece"],
+      "disliked": ["poireau"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.train2"
+      }
+    ],
+    "leaves": null
+  }
+}

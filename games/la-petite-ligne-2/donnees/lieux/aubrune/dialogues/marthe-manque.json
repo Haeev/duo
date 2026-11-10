@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "marthe-manque",
+  "villager": "marthe",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.marthe-manque",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Il manque Émile. Bien. Tu sais compter. On ne grave pas les gens qui sont partis à pied: on les attend.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Firmin fleurit la dalle tous les jeudis, à 17 h 40. Il croit que personne ne le sait. Je sonne un peu plus doucement, ce jour-là.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Pour le reste de la coutume, vois ma sœur. Elle prétend avoir vu le train. Elle prétend aussi avoir dansé avec un préfet.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-train",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "J'ai sonné pour le train. Onze coups. Il était dix heures, mais il en méritait un de plus.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

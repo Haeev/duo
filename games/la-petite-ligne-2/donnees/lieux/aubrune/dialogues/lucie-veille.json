@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "lucie-veille",
+  "villager": "lucie",
+  "priority": 65,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.lucie"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Une lueur sur la voie à 5 h 12 ? Ha ! Ha ! ... Attends. 5 h 12 pile ? Toutes les nuits ?",
+      "emote": "question",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "J'ai onze minutes entre deux tournées. Tu m'en as déjà pris deux. Mais ça, je veux le voir.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "appareil-photo",
+          "count": 1
+        }
+      ],
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Prends mon vieux boîtier. Moi, je monte le gros sur pied, à la barrière. Pose longue: douze secondes sans respirer.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Cette nuit, 5 h 12, à la barrière. Venez à deux: une personne qui déclenche, une qui compte. Moi, je ris quand j'ai peur: je ne peux pas compter.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

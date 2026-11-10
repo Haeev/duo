@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "marthe-heure",
+  "villager": "marthe",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.marthe-sonne",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Quatre minutes ? Depuis 1962 ? ... Ça explique bien des soupes brûlées.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Cinquante-cinq ans que le bourg dîne en retard par ma faute et que personne ne me dit rien. C'est donc ça, être respectée.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-sonner-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Je sonnerai à 5 h 12. La vraie. Trois coups: deux, c'est pour les passages à niveau.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-mal-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Je le prends à l'heure. C'est nouveau, laisse-moi m'habituer.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "sonner",
+          "text": "Tu sonneras à 5 h 12 ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-sonner-1"
+        },
+        {
+          "id": "mal",
+          "text": "Ne le prends pas mal.",
+          "when": [],
+          "effects": [],
+          "next": "n3-mal-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Et je poserai le lumignon moi-même, à la barrière. Ma mère le faisait. Il était temps que je retarde un peu moins.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

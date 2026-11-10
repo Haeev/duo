@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "id": "la-repetition",
+  "title": "La répétition",
+  "together": true,
+  "roles": {
+    "a": "À la barrière",
+    "b": "À la lanterne"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Répétition. Article 41: « La manœuvre de nuit se fait à deux, sans cri, sans course et sans commentaire. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Va à la manivelle de la barrière.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "pn-s",
+              "who": "one",
+              "radius": 3
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Va au bout du quai, lanterne en main.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "quai",
+              "who": "one",
+              "radius": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu tournes la manivelle. La barrière descend sans un bruit: le saindoux d'Odette fait des merveilles.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu lèves la lanterne à bout de bras. D'ici, tu vois ta moitié à la barrière, pas plus grande que ton pouce.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu ne vois pas le quai, seulement une lumière qui se lève. C'est ton signal: barrière baissée, tu annonces « Voie gardée ! ».",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Quand tu entends « Voie gardée ! », réponds « Lanterne haute ! ». C'est tout. C'est dans le règlement, donc c'est beau.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Bien. Maintenant, je fais le train. Tchou. Voilà, je suis passé. À l'heure, moi.",
+      "emote": "joy",
+      "sound": "Tchou.",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Cette nuit, pour de vrai. 5 h 12. Je ne viendrai pas: un chef de halte dort, la nuit. C'est ce que je dirai.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.halte.de-nuit",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

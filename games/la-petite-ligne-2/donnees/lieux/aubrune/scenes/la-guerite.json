@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "la-guerite",
+  "title": "La guérite du cantonnier",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Une guérite de cantonnier. Sur l'étagère, une gamelle, un sifflet, un calendrier de 1987 ouvert à la bonne page.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Au mur, la consigne du tunnel: « Une lampe par niche. Ne pas courir. Saluer en sortant. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Saluer qui, ce n'est pas précisé.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

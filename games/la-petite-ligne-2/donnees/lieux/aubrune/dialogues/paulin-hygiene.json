@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "paulin-hygiene",
+  "villager": "paulin",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Non. Là, non. Même mes bêtes reculeraient. Va te laver, on causera après.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

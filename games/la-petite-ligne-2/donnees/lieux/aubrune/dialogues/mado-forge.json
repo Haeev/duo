@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "id": "mado-forge",
+  "villager": "mado",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.hache-forgee",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "pierre",
+              "count": 3
+            },
+            {
+              "type": "item_in_bag",
+              "item": "buche",
+              "count": 2
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Trois pierres, deux bûches. Je garde le feu chaud, mais pas éternellement.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Cling ! Cling ! Regarde-moi ce fil. Elle fendrait un regret en deux.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Une pour deux, pour l'instant. Que ta moitié m'apporte les mêmes pierres, les mêmes bûches et sa hache: je lui fais la sienne.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
