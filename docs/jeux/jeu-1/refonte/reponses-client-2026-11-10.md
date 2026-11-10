@@ -460,3 +460,13 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Carte d'Aubrune: reprise et retouchée.
 - Parties d'essai remises à zéro à chaque étape tant que le jeu n'est pas complet: oui.
 - Modèles 3D: le client autorise à abandonner Meshy là où les créations du studio (scripts Blender) donnent un meilleur résultat. Le choix se fait pièce par pièce, sur preuve.
+
+## Décisions du client sur les questions ouvertes (10 novembre, soir)
+
+- Surnaturel: oui, mais très doux dès Aubrune.
+- Monnaie: l'euro.
+- Habitants de la 0.13: gardés, avec une refonte (apparence et écriture).
+- Les deux joueurs sont des adultes.
+- Oui à toutes les autres recommandations du manager: jauges de besoins visibles seulement au changement de palier, sous 20 % ou sur une touche (avec un réglage « toujours visibles »); il faut être deux au lit pour passer au lendemain, sieste libre pour un seul; passants composés depuis le catalogue en métropole et 20 habitants écrits par lieu; plancher de 30 images par seconde sur le PC; saison de 14 jours; fil directeur « maquette de train miniature »; visages à pièces de rechange; aucun choix de genre, toutes les pièces vont à tous; barre d'outils repliée après 3 secondes; touche G pour le coup d'œil (quête, besoins, autre joueur); mémoire des prix par commerçant.
+- Personnages: corps, visages et vêtements fabriqués par les scripts du studio (essai 2 du 10 novembre); Meshy réservé aux chapeaux, sacs, accessoires et coiffures élaborées, puis aux meubles, bâtiments et paysage, sur preuve.
+- Rythme: sobriété (trois membres en parallèle au plus), travail en continu, modèle choisi par tâche.
