@@ -15,6 +15,7 @@ export const ITEM_FAMILIES = [
   'tool',
   'furniture',
   'clothing',
+  'bag',
 ] as const;
 
 /** Un outil: celui de base ne s'use pas et travaille lentement (réponse 19). */
@@ -53,5 +54,11 @@ export const ItemSchema = v.strictObject({
   tool: v.nullable(ToolSchema),
   /** Repas spécial (pile de 1): servi à table aux deux joueurs assis, il donne ce bonus. Absent: plat ordinaire. */
   meal: v.exactOptional(v.strictObject({ perk: MealPerkSchema })),
+  /**
+   * Sac (pile de 1, famille `bag`): l'équiper (intention `equip_bag`) donne le sac de `sacs.json`
+   * de cet identifiant et rend le précédent. Il s'achète, se trouve au sol ou se reçoit comme
+   * n'importe quel objet; l'effet `give_bag` des dialogues reste valable.
+   */
+  bag: v.exactOptional(IdSchema),
 });
 export type ItemDef = v.InferOutput<typeof ItemSchema>;

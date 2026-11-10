@@ -2,6 +2,8 @@
 // Créer: pnpm nouveau meuble <id>         -> donnees/commun/meubles/<id>.json
 // Schéma: src/donnees/schemas/meuble.ts; briques: src/donnees/schemas/briques.ts
 // Ce que fait le meuble tient dans ses briques: aucun code à écrire.
+// Un ensemble (une table et ses chaises pour le repas à deux) ne se déclare pas ici: c'est le champ
+// "group" des meubles posés dans la carte du lieu (voir lieu/carte.jsonc).
 {
   "schema": 1,
   "id": "exemple-meuble",

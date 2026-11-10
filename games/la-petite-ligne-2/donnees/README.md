@@ -8,7 +8,7 @@ commun/        reglages.json, besoins.json, sacs.json, temps.json, collections.j
                cultures/<id>.json   ressources/<id>.json
                carnet/<id>.json   insectes/<id>.json   photos/<id>.json
                personnages/catalogue.json (écrit par le générateur de pièces, lot L5)
-lieux/<lieu>/  lieu.json, carte.json, climat.json et nature.json (facultatifs)
+lieux/<lieu>/  lieu.json, carte.json (meubles, objets au sol, notes `pourquoi`), climat.json et nature.json (facultatifs)
                evenements/<id>.json
                habitants/<id>.json   dialogues/<id>.json   commerces/<id>.json   quetes/<id>.json
                interieurs/<id>.json (pièces posées sur la grille du lieu, sous le dehors)
@@ -48,6 +48,17 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Lieu                 | `pnpm nouveau lieu hautefonte`                                                                                       | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier.                                                                                                                                                                                                                                            |
 | Grand lieu           | `pnpm nouveau lieu hautefonte`, puis `node outils/plan-vers-lieu.ts <plan.json> donnees/lieux/hautefonte/carte.json` | le plan vu du dessus du level designer est la source de `carte.json` (ADR 0022): ne pas retoucher la carte produite, corriger le plan et relancer. Les meubles s'ajoutent dans `objects` (400 meubles à briques au plus par lieu).                                                                                                                                             |
 | Intérieur            | `pnpm nouveau interieur salle-du-cafe aubrune`                                                                       | taille, `at` dans l'annexe sous le dehors (`outdoor` de la carte), murs, points, meubles, portes; la porte du dehors s'écrit dans `doors` de `carte.json` et les deux portes se nomment l'une l'autre.                                                                                                                                                                         |
+
+## Objets au sol, ensembles, sacs et notes de placement
+
+Quatre ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/lieu/carte.jsonc`, `_gabarits/objet.jsonc`).
+
+| Besoin                       | Recette                                                                                                                                                                                                                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Objet posé au sol            | Dans `carte.json` (ou un intérieur), `groundItems`: `{ "id", "item", "count", "x", "y" }`. Il est au sol dès la première visite et se ramasse comme tout objet. `"respawnDaily": true` le remet chaque matin s'il a été ramassé; sans lui il ne revient pas. 40 au plus par carte. |
+| Ensemble de meubles          | Donne le même `"group"` aux meubles de la carte qui forment un tout (une table et ses chaises). Le repas spécial à deux est servi quand les deux joueurs sont assis sur deux meubles du groupe. Deux meubles au moins, un à brique `sit`, à 6 m au plus l'un de l'autre.           |
+| Sac comme objet              | Un objet `"family": "bag"`, `"stack": 1`, `"bag": "<id de sacs.json>"`. Il s'achète (commerce), se trouve (`groundItems`) ou se reçoit (`give_item`), puis s'équipe (intention `equip_bag`): le sac porté revient dans les poches. `give_bag` des dialogues reste valable.         |
+| Note de placement `pourquoi` | Texte facultatif sur le lieu (`lieu.json`), chaque meuble, chaque objet au sol et chaque intérieur: pourquoi il est là, dans ce sens, à cette taille. Le moteur l'ignore. `pnpm pourquoi [lieu]` liste ce qui n'en a pas, sans rien bloquer.                                       |
 
 ## Briques (ce qu'un meuble sait faire)
 

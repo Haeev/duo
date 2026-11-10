@@ -24,4 +24,7 @@
   //               "table": [{ "catch": "goujon", "weight": 1 }] }]
   // "area": cases d'eau (à mettre aussi dans "blocked" de la carte); "shadows": ombres visibles
   // au plus (1 à 8); "table": poissons (commun/prises/, avec un bloc "fish") et poids de tirage.
+  // Note de placement (facultative, ignorée du moteur): pourquoi ce lieu existe et est fait ainsi.
+  // `pnpm pourquoi` liste ce qui n'en a pas (règle « cohérence du monde » de CLAUDE.md).
+  "pourquoi": "Lieu d'exemple: sert de modèle.",
 }

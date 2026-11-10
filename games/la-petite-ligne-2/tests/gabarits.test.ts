@@ -7,9 +7,12 @@ import { describe, expect, it } from 'vitest';
 import { loadContent, type Content } from '../src/donnees/charger';
 import { SLICE_SCHEMAS } from '../src/reseau/canaux';
 import { fastMessage, sliceMessage } from '../src/reseau/tranches';
-import { createWorld } from '../src/simulation/noyau/monde';
+import { seatedTogether } from '../src/simulation/besoins/repas';
+import { createPlaceState, createWorld } from '../src/simulation/noyau/monde';
+import { contextOf } from './aides-l3';
+import { send } from './aides-noyau';
 import { plan, stripComments, TEMPLATES } from '../outils/nouveau';
-import { dataFiles, MEMBERS, SEED } from './aides';
+import { dataFiles, MEMBERS, newSim, SEED } from './aides';
 
 const TEMPLATE_DIR = fileURLToPath(new URL('../donnees/_gabarits/', import.meta.url));
 
@@ -155,6 +158,43 @@ describe('gabarits', () => {
     const map = content.places['essai-gare']?.map;
     expect(map?.points['piece-milieu']).toEqual({ x: 6, y: 45 });
     expect(map?.doors?.['piece-porte']?.to).toBe('piece-porte-dehors');
+  });
+
+  it('objet sac: un sac ajouté par un seul fichier s’achète, se trouve ou se reçoit, puis s’équipe', () => {
+    const content = withNew('objet', 'sac-de-mer', null, (value) => {
+      Object.assign(value, { family: 'bag', stack: 1, food: null, bag: 'sac-de-toile' });
+    });
+    expect(content.items['sac-de-mer']).toMatchObject({ family: 'bag', bag: 'sac-de-toile' });
+    const sim = newSim(content);
+    sim.world.players[0].toolbar[0] = { item: 'sac-de-mer', count: 1 };
+    send(sim, 0, { type: 'equip_bag', from: { area: 'toolbar', index: 0 } });
+    expect(sim.world.players[0].bag?.id).toBe('sac-de-toile');
+  });
+
+  it('carte: les champs facultatifs du gabarit (objet au sol, pourquoi) se chargent et paraissent en jeu', () => {
+    const content = withNew('lieu', 'bout-de-ligne', null);
+    const place = content.places['bout-de-ligne'];
+    expect(place?.map.groundItems?.[0]).toMatchObject({ item: 'pomme', respawnDaily: true });
+    expect(place?.def.pourquoi).toMatch(/modèle/);
+    expect(place?.map.objects[0]?.pourquoi).toMatch(/quai/);
+    if (place === undefined) throw new Error('bout-de-ligne');
+    expect(createPlaceState(content, place).ground[0]?.stack).toEqual({ item: 'pomme', count: 1 });
+  });
+
+  it('ensemble de meubles: le groupe du gabarit de carte (table et chaises) fait un repas à deux', () => {
+    const content = withNew('meuble', 'tabouret', null, (_value, files) => {
+      const objects = files['lieux/essai-gare/carte.json']?.objects as Json[];
+      for (const [id, y] of [
+        ['tabouret-a', 24],
+        ['tabouret-b', 25],
+      ] as const)
+        objects.push({ id, type: 'tabouret', x: 22.5, y, rotation: 0, group: 'gouter' });
+    });
+    const sim = newSim(content);
+    const seats = sim.world.places['essai-gare']?.objects;
+    if (seats?.['tabouret-a']?.sit) seats['tabouret-a'].sit[0] = 0;
+    if (seats?.['tabouret-b']?.sit) seats['tabouret-b'].sit[0] = 1;
+    expect(seatedTogether(contextOf(sim), 'tabouret-a')).toBe(true);
   });
 
   it('refuse un type inconnu, un identifiant mal formé et un lieu manquant', () => {

@@ -7,6 +7,7 @@ import { initialBrickStates } from '../../etat/briques';
 import type { PlayerState } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../../etat/monde';
+import { layMapGround } from '../sac/sol';
 import { CORE_TUNING } from './reglages-noyau';
 
 /** Un joueur du duo, tel que la plateforme le donne. */
@@ -49,6 +50,7 @@ export function createPlaceState(content: Content, place: PlaceContent): PlaceSt
       body: { x: at.x, y: at.y, facing: Math.PI / 2, speed: 0 },
     };
   }
+  layMapGround(place.map, state, false);
   return state;
 }
 

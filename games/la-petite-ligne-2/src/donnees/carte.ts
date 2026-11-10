@@ -120,6 +120,7 @@ export function withInteriors(map: MapDef, interiors: readonly InteriorDef[]): M
   const points = { ...map.points };
   const objects = [...map.objects];
   const doors = { ...map.doors };
+  const groundItems = [...(map.groundItems ?? [])];
   for (const room of interiors) {
     const { x: ox, y: oy } = room.at;
     const { width: w, height: h } = room;
@@ -132,8 +133,11 @@ export function withInteriors(map: MapDef, interiors: readonly InteriorDef[]): M
     for (const r of room.blocked) blocked.push({ ...r, x: r.x + ox, y: r.y + oy });
     for (const [id, p] of Object.entries(room.points)) points[id] = { x: p.x + ox, y: p.y + oy };
     for (const o of room.objects) objects.push({ ...o, x: o.x + ox, y: o.y + oy });
+    for (const g of room.groundItems ?? []) groundItems.push({ ...g, x: g.x + ox, y: g.y + oy });
     for (const [id, d] of Object.entries(room.doors ?? {}))
       doors[id] = { ...d, x: d.x + ox, y: d.y + oy };
   }
-  return { ...map, blocked, points, objects, doors };
+  return groundItems.length === 0
+    ? { ...map, blocked, points, objects, doors }
+    : { ...map, blocked, points, objects, doors, groundItems };
 }
