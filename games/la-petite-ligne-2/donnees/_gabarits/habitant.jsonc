@@ -1,6 +1,6 @@
 // GABARIT: un habitant écrit d'un lieu.
 // Créer: pnpm nouveau habitant <id> <lieu>   -> donnees/lieux/<lieu>/habitants/<id>.json
-// Schéma: src/donnees/schemas/habitant.ts
+// Schéma: src/donnees/schemas/habitant.ts et vie-habitant.ts (sa vie: planning, goûts, réactions).
 {
   "schema": 1,
   "id": "exemple-habitant",
@@ -11,8 +11,80 @@
   //   { "shape": "adult-medium", "skin": 0, "pieces": [{ "slot": "top", "id": "<pièce>", "colors": [0] }] }
   // null tant que les pièces ne sont pas livrées: le rendu montre un mannequin.
   "look": null,
-  // Point de la carte du lieu où il se tient.
+  // Point de la carte où il paraît à la création de la partie (avant que sa vie ne le reprenne).
   "stands": "guichet",
   // Timbre du babil: low, medium, high (ou un timbre du sound designer).
   "voice": "medium",
+  // Sa vie. Retirer ce bloc: il reste planté à `stands`.
+  "life": {
+    // Point de la carte chez lui (dans sa maison): il doit y être à 3 h (contrôlé).
+    "home": "guichet",
+    // Planning: la PREMIÈRE ligne qui convient l'emporte. Heures en minutes depuis minuit
+    // (420 = 7 h), `to` exclu; une plage peut passer minuit. Filtres facultatifs:
+    //   "days": ["mon", ..., "sun"]   "weathers": ["clear", "overcast", "rain", "mist", "snow"]
+    //   "seasons": ["spring", "summer", "autumn", "winter"]   "when": [conditions d'histoire]
+    // Les lignes SANS filtre doivent couvrir les 24 heures (contrôlé): les lignes à filtres
+    // passent avant, elles.
+    // Où (jamais dans le vide):
+    //   { "point": "<point>" }                        un point de la carte
+    //   { "seat": "<meuble>" }                        une vraie place assise (meuble à brique sit)
+    //   { "object": "<meuble>", "side": "front" }     devant un meuble (la pompe, l'établi)
+    //   { "object": "<meuble>", "side": "behind" }    derrière (le comptoir), tourné vers les clients
+    // "activity": nom lu par le rendu; "gesture": clip joué sur place (balayer), ou null.
+    // "with": "<habitant>" pour discuter à deux (l'autre doit avoir une ligne qui le nomme).
+    // "shop": "<commerce>" ouvre son commerce pendant cette ligne (il doit en être le keeper).
+    "schedule": [
+      {
+        "from": 1230,
+        "to": 420,
+        "at": { "point": "guichet" },
+        "activity": "dormir",
+        "gesture": null,
+      },
+      {
+        "from": 720,
+        "to": 840,
+        "days": ["sat"],
+        "at": { "point": "quai" },
+        "activity": "attendre-le-train",
+        "gesture": null,
+      },
+      {
+        "from": 420,
+        "to": 720,
+        "at": { "point": "guichet" },
+        "activity": "travailler",
+        "gesture": null,
+      },
+      {
+        "from": 720,
+        "to": 840,
+        "at": { "point": "depart-joueur-1" },
+        "activity": "flaner",
+        "gesture": null,
+      },
+      {
+        "from": 840,
+        "to": 1230,
+        "at": { "point": "guichet" },
+        "activity": "travailler",
+        "gesture": null,
+      },
+    ],
+    // Onomatopée du premier bonjour du jour à chaque joueur.
+    "greeting": "joy",
+    // Réactions à des actes simples, de près: runs (le joueur court), dirty (hygiène basse),
+    // gesture (le joueur fait le geste "clip"). Six au plus.
+    "reactions": [
+      { "act": "runs", "emote": "surprise" },
+      { "act": "dirty", "emote": "smell" },
+    ],
+    // Goûts (identifiants d'objets): un cadeau par jour et par joueur; adoré 30 points, aimé 15.
+    "gifts": { "loved": ["pomme"], "liked": ["pain"], "disliked": ["buche"] },
+    // Absent jusqu'à ce que ces conditions soient vraies, puis il descend du train; null: là dès le début.
+    //   ex.: [{ "type": "remembered", "key": "aubrune.acte-2.fini" }]
+    "arrives": null,
+    // Il reprend le train quand ces conditions deviennent vraies; null: il reste.
+    "leaves": null,
+  },
 }

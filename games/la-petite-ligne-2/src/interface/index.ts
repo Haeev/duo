@@ -171,6 +171,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'plot_changed':
       case 'crop_reaped':
       case 'tool_upgraded':
+      case 'villager_arrived':
+      case 'villager_door':
+      case 'villager_gift':
+      case 'villager_greeted':
+      case 'villager_left':
+      case 'villager_reacted':
         break;
     }
   }

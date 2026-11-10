@@ -11,6 +11,7 @@ import {
   PlayerIndexSchema,
 } from '../donnees/schemas/communs';
 import { BrickStatesSchema } from './briques';
+import { VillagerLifeStateSchema } from './habitants';
 import { BodySchema, StackSchema } from './joueur';
 
 const villagerSlow = {
@@ -18,6 +19,8 @@ const villagerSlow = {
   met: v.tuple([v.boolean(), v.boolean()]),
   /** Joueur à qui il parle. */
   talkingWith: v.nullable(PlayerIndexSchema),
+  /** Vie au fil du planning (`etat/habitants.ts`), pour les habitants qui en ont un. */
+  life: v.exactOptional(VillagerLifeStateSchema),
 } as const;
 
 export const VillagerSlowSchema = v.strictObject(villagerSlow);
@@ -87,7 +90,10 @@ export type PlaceState = v.InferOutput<typeof PlaceStateSchema>;
 export function slowOfPlace(place: PlaceState): PlaceSlow {
   const villagers: PlaceSlow['villagers'] = {};
   for (const [id, villager] of Object.entries(place.villagers))
-    villagers[id] = { met: villager.met, talkingWith: villager.talkingWith };
+    villagers[id] =
+      villager.life === undefined
+        ? { met: villager.met, talkingWith: villager.talkingWith }
+        : { met: villager.met, talkingWith: villager.talkingWith, life: villager.life };
   const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops } = place;
   const slow: PlaceSlow = {
     leftOn,

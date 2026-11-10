@@ -203,6 +203,7 @@ export const MapSchema = v.strictObject({
   terrain: v.optional(TerrainSchema),
   zones: v.optional(v.record(IdSchema, ZoneSchema)),
   locks: v.optional(v.record(IdSchema, LockSchema)),
+  /** Graphe des chemins tiré du plan: les habitants marchent dessus (absent: A* sur la grille). */
   graph: v.optional(PathGraphSchema),
   landmarks: v.optional(v.record(IdSchema, LandmarkSchema)),
   interests: v.optional(v.record(IdSchema, InterestSchema)),

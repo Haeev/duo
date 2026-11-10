@@ -12,6 +12,7 @@ import { shopSystem } from '../commerces/index';
 import { dialogueSystem } from '../dialogues/index';
 import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
+import { villagerSystem } from '../habitants/index';
 import { bagSystem } from '../sac/index';
 import { travelSystem } from '../voyage/index';
 import type { Intent, StepInput } from './entrees';
@@ -53,4 +54,5 @@ export const SYSTEMS: readonly GameSystem[] = [
   dialogueSystem,
   toolSystem,
   cropSystem,
+  villagerSystem,
 ];

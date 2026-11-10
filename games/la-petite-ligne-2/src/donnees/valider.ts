@@ -17,6 +17,7 @@ import { validateHarvestContent } from './schemas/recolte';
 import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
+import { validateVillagerLives } from '../simulation/habitants/valider';
 
 function checkCondition(content: Content, c: Condition, at: string, problems: string[]): void {
   switch (c.type) {
@@ -461,5 +462,6 @@ export function validateContent(content: Content): string[] {
   // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
   problems.push(...validateDialogueTexts(content));
   problems.push(...validateHarvestContent(content));
+  problems.push(...validateVillagerLives(content));
   return problems;
 }
