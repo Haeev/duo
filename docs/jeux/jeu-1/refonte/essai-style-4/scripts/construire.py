@@ -20,7 +20,7 @@ TRAVAIL = ESSAI / ".travail"  # .blend intermédiaires, planches de repères, at
 # Croisements de la planche: tenue x corps, avec la coiffure et les couleurs du personnage du corps.
 CROIX_TENUES = ("carreaux-jean", "mariniere-short", "pull-toile")
 CROIX_CORPS = ("femme", "costaud", "enfant")
-ETIQUETTES = ("CONFORME", "REPERES", "COIFFURE", "COL", "ATLAS", "TRAITS", "PLIS", "EXPORT")
+ETIQUETTES = ("CONFORME", "SONDE", "REPERES", "COIFFURE", "COL", "ATLAS", "TRAITS", "PLIS", "EXPORT")
 
 
 def run(*args):
@@ -48,6 +48,8 @@ def main():
         src = pathlib.Path(sys.argv[sys.argv.index("--corps") + 1])
         lot([(ICI / "conformer_corps.py", src / g / "marche.glb", TRAVAIL / f"{g}.blend", ESSAI / "modeles" / f"{g}.npz",
               GAB / "corps" / f"{g}.toml") for g in corps])
+        # Pieds au sol dans chaque clip (bassin recalé à la verticale), vitesse d'appui de la marche.
+        lot([(ICI / "sonde_pieds.py", "--poser", TRAVAIL / f"{g}.blend") for g in corps])
         lot([(ICI / "reperes.py", TRAVAIL / f"{g}.blend", ESSAI / "modeles" / f"{g}.npz", TRAVAIL / f"reperes-{g}.png")
              for g in corps])
     # Coiffures: une coque par couple (corps, coiffure) réellement porté.

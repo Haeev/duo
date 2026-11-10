@@ -80,6 +80,8 @@ const ENCRE_GLSL = /* glsl */`
   uniform vec3 uInk, uLit, uShadeMul, uShadeAdd, uRim, uLampPos, uLampCol;
   uniform float uVig, uDetail, uHatchPx, uLampR, uLampOn, uHatch;
   uniform vec4 uView;
+  // Masque du visage (attribut _VISAGE des corps, 0 ailleurs): ombre à deux tons seulement, pas de troisième ton.
+  float gVisage = 0.0;
   vec3 encre(vec3 albedo, vec3 N, vec3 V, vec3 L, float sh, vec3 vpos, vec2 anchor, float ground) {
     float ndl = dot(N, L);
     float lit = smoothstep(0.10, 0.13, ndl) * sh;
@@ -91,7 +93,7 @@ const ENCRE_GLSL = /* glsl */`
     if (ground < 0.5) {
       // Troisième ton: le creux de l'ombre, plus dense.
       float deep = smoothstep(-0.50, -0.54, ndl);
-      c = mix(c, cs * 0.66, deep * (1.0 - lit));
+      c = mix(c, cs * 0.66, deep * (1.0 - lit) * (1.0 - gVisage));
       // Hachures: ancrées à l'objet (elles le suivent sans glisser), pas constant à l'écran.
       float h1 = fract((q.x + q.y * 0.85) / uHatchPx);
       float pen = 1.0 - smoothstep(0.13, 0.27, ndl);
@@ -130,12 +132,12 @@ function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, 
     sh.uniforms.uHatch = { value: variante === 'tete' ? 0 : 1 };   // pas de hachures sur les visages: ils restent nets
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', `#include <common>
-        attribute float aOutline; attribute vec2 traitsUv; attribute vec3 aHullN;
-        varying float vOutline; varying vec2 vTraits; flat varying vec2 vAnchor;
+        attribute float aOutline; attribute vec2 traitsUv; attribute vec3 aHullN; attribute float _visage;
+        varying float vOutline; varying vec2 vTraits; flat varying vec2 vAnchor; varying float vVisage;
         uniform vec2 uRes; uniform float uPx; uniform float uPush; uniform vec4 uView;
         ${relief ? 'uniform sampler2D map;' : ''}`)
       .replace('#include <uv_vertex>', `#include <uv_vertex>
-        vOutline = aOutline; vTraits = traitsUv;`)
+        vOutline = aOutline; vTraits = traitsUv; vVisage = _visage;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
         ${relief ? 'transformed += normalize(objectNormal) * (textureLod(map, uv, 0.0).a - 0.44) * uPush;' : ''}`)
       .replace('#include <project_vertex>', `#include <project_vertex>
@@ -154,11 +156,14 @@ function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, 
           vec2 n2 = normalize((projectionMatrix * vec4(hn, 0.0)).xy + 1e-5);
           // Trait un peu irrégulier (80 à 120 %), lié au corps: il ne grouille pas.
           float k = 0.8 + 0.4 * (0.5 + 0.5 * sin(position.x * 0.31 + position.y * 0.17) * sin(position.z * 0.23 - position.y * 0.11 + 1.7));
+          // Pas de coque dans le masque du visage (aucun cerne intérieur: orbites, nez); la silhouette garde
+          // son trait, car le masque s'efface avant le tour du visage.
+          k *= 1.0 - smoothstep(0.35, 0.85, _visage);
           gl_Position.xy += n2 * uPx * k * 2.0 / uRes * gl_Position.w;
         }` : ''}`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-        varying float vOutline; varying vec2 vTraits; flat varying vec2 vAnchor;
+        varying float vOutline; varying vec2 vTraits; flat varying vec2 vAnchor; varying float vVisage;
         uniform sampler2D traitsMap; uniform float uCell; uniform float uBias;
         ${ENCRE_GLSL}`)
       .replace('#include <shadowmap_pars_fragment>', '#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>')
@@ -171,8 +176,11 @@ function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, 
         #endif
         ${traits ? `if (vTraits.x > 0.0 && vTraits.x < 1.0 && vTraits.y > 0.0 && vTraits.y < 1.0) {
           // Atlas des traits en grille (traits.json): colonne et rangée de l'expression.
-          vec4 t = texture2D(traitsMap, vec2((vTraits.x + mod(uCell, ${TJ.colonnes.toFixed(1)})) / ${TJ.colonnes.toFixed(1)}, (vTraits.y + floor(uCell / ${TJ.colonnes.toFixed(1)})) / ${TJ.rangees.toFixed(1)}));
-          diffuseColor.rgb = mix(diffuseColor.rgb, t.rgb, t.a * uDetail);
+          vec2 tUv = vec2((vTraits.x + mod(uCell, ${TJ.colonnes.toFixed(1)})) / ${TJ.colonnes.toFixed(1)}, (vTraits.y + floor(uCell / ${TJ.colonnes.toFixed(1)})) / ${TJ.rangees.toFixed(1)});
+          // Lisibilité à mi-distance: les traits fins s'éteignaient dans les niveaux de mip (visage vide sans le
+          // modelé des orbites). Niveaux de mip « à l'encre » (mipsEncre), lecture un peu plus nette et couverture renforcée.
+          vec4 t = texture2D(traitsMap, tUv, -0.5);
+          diffuseColor.rgb = mix(diffuseColor.rgb, t.rgb, clamp(t.a * 1.5, 0.0, 1.0) * uDetail);
         }` : ''}`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         ${relief ? `{
@@ -181,7 +189,7 @@ function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, 
           vec3 r1 = cross(sy, normal), r2 = cross(normal, sx);
           float det = dot(sx, r1);
           vec3 grad = sign(det) * (dFdx(hRelief) * r1 + dFdy(hRelief) * r2);
-          normal = normalize(abs(det) * normal - 0.036 * grad);
+          normal = normalize(abs(det) * normal - 0.036 * (1.0 - vVisage) * grad);
         }` : ''}`)
       .replace('#include <opaque_fragment>', `
         #if NUM_DIR_LIGHTS > 0
@@ -189,7 +197,12 @@ function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, 
         #else
           vec3 sunDir = vec3(0.0, 1.0, 0.0);
         #endif
-        outgoingLight = encre(diffuseColor.rgb, normal, normalize(vViewPosition), sunDir, smoothstep(0.40, 0.60, getShadowMask()), -vViewPosition, vAnchor, ${variante === 'sol' ? '1.0' : '0.0'});
+        gVisage = vVisage;
+        float ombrePortee = smoothstep(0.40, 0.60, getShadowMask());
+        ${perso ? `// Personnages: près de la limite d'ombre, les facettes s'ombrent elles-mêmes dans la carte d'ombre
+        // (taches à côté de la courbe que donnent les normales lissées). On y laisse la rampe seule décider.
+        ombrePortee = mix(ombrePortee, 1.0, 1.0 - smoothstep(0.13, 0.42, dot(normal, sunDir)));` : ''}
+        outgoingLight = encre(diffuseColor.rgb, normal, normalize(vViewPosition), sunDir, ombrePortee, -vViewPosition, vAnchor, ${variante === 'sol' ? '1.0' : '0.0'});
         if (vOutline > 0.5) outgoingLight = uInk;
         #include <opaque_fragment>`);
   };
@@ -250,7 +263,45 @@ async function glb(url) { cache[url] ??= loader.loadAsync(url); return cache[url
 const TJ = await (await fetch(ESSAI + 'atlas/traits.json')).json();
 const EXPRESSION = Object.fromEntries(TJ.expressions.map((n, i) => [n, i]));
 const traitsCache = {};
-const traitsTexture = (url) => (traitsCache[url] ??= new Promise((ok) => new THREE.TextureLoader().load(ESSAI + url, (t) => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; ok(t); })));
+// Niveaux de mip des traits « à l'encre »: chaque bloc de 2 x 2 garde la couverture la plus forte et la couleur
+// la plus sombre. Paupières, iris et sourcils restent des marques sombres à mi-distance au lieu de s'éteindre
+// dans la peau (le visage lissé n'a plus d'orbites creuses pour les porter).
+function mipsEncre(img) {
+  const c0 = document.createElement('canvas'); c0.width = img.width; c0.height = img.height;
+  c0.getContext('2d').drawImage(img, 0, 0);
+  const levels = [c0];
+  let src = c0.getContext('2d').getImageData(0, 0, c0.width, c0.height);
+  while (src.width > 1 || src.height > 1) {
+    const w = Math.max(1, src.width >> 1), h = Math.max(1, src.height >> 1);
+    const dst = new ImageData(w, h);
+    for (let y = 0; y < h; y += 1) for (let x = 0; x < w; x += 1) {
+      let best = -1, bl = 9, amax = 0;
+      for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+        const sx = Math.min(src.width - 1, 2 * x + dx), sy = Math.min(src.height - 1, 2 * y + dy);
+        const i = (sy * src.width + sx) * 4, a = src.data[i + 3];
+        amax = Math.max(amax, a);
+        const l = (src.data[i] * 0.3 + src.data[i + 1] * 0.59 + src.data[i + 2] * 0.11) / 255 + (a < 80 ? 2 : 0);
+        if (l < bl) { bl = l; best = i; }
+      }
+      const o = (y * w + x) * 4;
+      for (let k = 0; k < 3; k += 1) dst.data[o + k] = src.data[best + k];
+      dst.data[o + 3] = amax;
+    }
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    cv.getContext('2d').putImageData(dst, 0, 0);
+    levels.push(cv);
+    src = dst;
+  }
+  return levels;
+}
+const traitsTexture = (url) => (traitsCache[url] ??= new Promise((ok) => new THREE.ImageLoader().load(ESSAI + url, (img) => {
+  const levels = mipsEncre(img);
+  const t = new THREE.Texture(levels[0]);
+  t.mipmaps = levels; t.generateMipmaps = false;
+  t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
+  t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; t.needsUpdate = true;
+  ok(t);
+})));
 
 // ---------------------------------------------------------------- personnages
 const contactGeo = (() => {
@@ -294,7 +345,8 @@ async function personnage({ corps, atlas, coiffure, col = false, expression = 0,
   if (coiffure) {
     const h = await glb(ESSAI + `modeles/${corps}-${coiffure}.glb`);
     const hair = h.scene.clone(true);
-    hair.traverse((o) => { if (o.isMesh) { o.geometry = bakeOutline(o.geometry); o.material = matCheveux; o.castShadow = true; o.receiveShadow = true; tris += o.geometry.index.count / 3; } });
+    // Les mèches ne portent pas d'ombre: découpées, elles posaient des taches en dents de scie sur le visage.
+    hair.traverse((o) => { if (o.isMesh) { o.geometry = bakeOutline(o.geometry); o.material = matCheveux; o.castShadow = false; o.receiveShadow = true; tris += o.geometry.index.count / 3; } });
     headBone.attach(hair);
   }
   if (col) {
@@ -590,8 +642,8 @@ try {
   const r4 = 280, ew = 300;
   const EXPR = [['maelle', 'neutre'], ['gaston', 'joie'], ['lou', 'surprise'], ['odette', 'sommeil']].map(([k, n]) => [k, EXPRESSION[n], n]);
   // `zoom`: champ en degrés (8,2: buste; 4,6: le visage remplit la case).
-  const visage = (rect, key, cellule, zoom = 8.2) => {
-    const c = P[key]; only(c); c.at(STUDIO.x, STUDIO.z, 0.0, 'repos'); c.cell.value = cellule;
+  const visage = (rect, key, cellule, zoom = 8.2, ry = 0.0) => {
+    const c = P[key]; only(c); c.at(STUDIO.x, STUDIO.z, ry, 'repos'); c.cell.value = cellule;
     const h = c.head(); h.y += zoom < 6 ? 0.1 : 0.07;
     shot(rect, new THREE.Vector3(h.x + 0.25, h.y + 0.08, h.z + 3.2), h, zoom, 3.0);
     c.cell.value = 0;
@@ -651,6 +703,23 @@ try {
       ['face', 'dos', 'marche', 'repos'].forEach((kind, k) => portrait(P[key], { x: k * W / 4, y: 0, w: W / 4, h: H }, kind));
     }
     if (vue === 'croix') X.forEach((x, k) => { only(x.p); x.p.at(STUDIO.x, STUDIO.z, 0.45, 'repos'); shot({ x: (k % 5) * W / 5, y: Math.floor(k / 5) * H / 2, w: W / 5, h: H / 2 }, new THREE.Vector3(STUDIO.x + 1.4, 3.4, STUDIO.z + 8.6), new THREE.Vector3(STUDIO.x, 0.9, STUDIO.z), 13.5); });
+    if (vue === 'tetes') {
+      // Les cinq visages, neutres: de face (rangée du haut) et de trois quarts (tournés de 35 degrés).
+      order.forEach((key, k) => [0, 0.61].forEach((ry, r) => {
+        visage({ x: k * W / 5, y: r * H / 2, w: W / 5, h: H / 2 }, key, 0, Number(params.get('zoom') ?? 5.2), ry);
+        labels.push([`${key}${r ? ', trois quarts' : ', face'}`, k * W / 5 + 5, r * H / 2 + 4, 12]);
+      }));
+    }
+    if (vue === 'poses') {
+      // Repos (3 instants du clip) et marche (3 instants), un corps par rangée, vus de trois quarts.
+      const instants = [['repos', 0], ['repos', 1.2], ['repos', 2.4], ['marche', 0], ['marche', 0.17], ['marche', 0.34]];
+      order.forEach((key, r) => instants.forEach(([clip, t], k) => {
+        const c = P[key]; only(c); c.at(STUDIO.x, STUDIO.z, clip === 'marche' ? Math.PI / 2 + 0.3 : 0.45, clip, t);
+        const rect = { x: k * W / 6, y: r * H / 5, w: W / 6, h: H / 5 };
+        shot(rect, new THREE.Vector3(STUDIO.x + 1.2, 3.0, STUDIO.z + 8.6), new THREE.Vector3(STUDIO.x, 0.85, STUDIO.z), 12.5);
+        labels.push([`${key}: ${clip} ${t} s`, rect.x + 5, rect.y + 4, 12]);
+      }));
+    }
     if (vue === 'visages') EXPR.forEach(([key, cellule], k) => visage({ x: k * W / 4, y: 0, w: W / 4, h: H }, key, cellule));
   }
   const sheet = document.createElement('canvas');

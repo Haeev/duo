@@ -51,8 +51,34 @@ Planche: `comparaison-plume.png` (avant | après). Sources dessinées, encrées 
 - `gabarits/plis/plis.svg` et `plis.toml`: coude, genou, aine, taille, aisselle, ourlet, couture, poches,
   bouton, côtes, torsades, carreaux, rayures, pois, en calques encre, ombre, clair et zones; `scripts/plis.py`
   en tire les calques et la hauteur (canal alpha de l'atlas); planche de contrôle `.travail/plis/planche.png`.
-- Repère du nez: `[visage] nez` de la fiche du corps (fraction des yeux à la bouche, 0,62 par défaut); le point
-  « nez » du conformateur est souvent la lèvre.
+- Repère du nez: `[visage] nez` de la fiche du corps (fraction des yeux à la bouche), mesuré par le
+  conformateur depuis la refonte des têtes.
+
+## Têtes et mains refaites (artiste 3D, 2026-11-10)
+
+Planche: `comparaison-tetes.png` (avant | après; `scripts/planche_tetes.py`). Module `scripts/tete_mains.py`,
+appelé par `conformer_corps.py`:
+
+- **Repères mesurés** (`mesurer`): profil médian de la tête (bout du nez, racine du nez sous la corde front-nez,
+  dessous du menton), yeux tirés des pièces de paupières de Meshy ou du creux des orbites, bouche au tiers entre
+  la base du nez et le menton. Ils sont réécrits dans le bloc `[visage]` de la fiche du corps à chaque
+  conformation (ne plus les régler à la main). `reperes.py` rend désormais la planche en pose de repos (les
+  pistes de clips inclinaient la tête et décalaient les lignes).
+- **Visage lissé**: masque front-joues-menton subdivisé, détendu, puis posé sur une surface lisse ajustée hors
+  du nez, des lèvres et des orbites; nez simple (arête et bout), orbites à peine creusées, aucune lèvre. Crâne,
+  mâchoire et oreilles inchangés. Tête réduite à part (`triangles_tete`, 560 visés).
+- **Ombre à deux tons**: normales imposées sur toute la tête (analytiques au coeur du visage, lissées ailleurs).
+  Attribut `_VISAGE` (0 à 1) dans le GLB (`_visage` pour GLTFLoader): le nuanceur de `scene.html` y coupe la
+  coque d'encre et le troisième ton. Ajouts du nuanceur, tous commentés: coque nulle dans le masque, pas
+  d'ombre portée près de la limite d'ombre des personnages, mèches sans ombre portée, niveaux de mip des traits
+  « à l'encre » (`mipsEncre`: les traits restent sombres à mi-distance).
+- **Moufles** (`mitaines`, bloc `[mains]` de la fiche): paume, quatre doigts en bloc plié aux jointures, pouce
+  séparé, poignet engagé dans l'avant-bras bouché; 118 triangles par main, os `LeftHand`/`RightHand` seuls.
+- **Repos animé** (`respiration`): 3,5 s en boucle (respiration, balancement du buste, coup d'oeil), bassin et
+  jambes fixes. `scripts/sonde_pieds.py --poser` recale le bassin à la verticale pour que les pieds touchent
+  le sol dans chaque clip, et mesure la vitesse d'appui de la marche (vitesse à donner au jeu pour qu'aucun
+  pied ne glisse: femme 1,30 m/s, homme 1,34, costaud 1,24, âgée 1,16, enfant 0,93; lecture du clip à
+  vitesse du jeu / vitesse d'appui).
 
 ## Ajouter du contenu
 
@@ -76,5 +102,6 @@ Planche: `comparaison-plume.png` (avant | après). Sources dessinées, encrées 
 - Un coloris: un bloc `[coloris]` dans la fiche du personnage.
 - Une coiffure: copier `gabarits/coiffures/carre.toml` (calotte, groupes de mèches, boules).
 - Un personnage: copier `gabarits/personnages/maelle.toml` (corps, tenue, coiffure, peau, cheveux).
-- Un corps: copier `gabarits/corps/femme.toml`, déposer le rig dans `<dossier>/<id>/marche.glb`, lancer
-  `construire.py --corps <dossier>`, régler les repères du visage sur la planche de réglage.
+- Un corps: copier `gabarits/corps/femme.toml`, déposer le rig dans `<dossier>/<id>/marche.glb`, régler
+  `[mains]` (longueur environ 0,105 x taille), lancer `construire.py --corps <dossier>`: les repères du visage
+  sont mesurés et écrits dans `[visage]`; vérifier la planche `.travail/reperes-<id>.png`.

@@ -285,3 +285,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - GLTFLoader sous Node (vitest) échoue sur toute texture (`self is not defined`): dans les tests, lire la partie JSON du GLB à la main.
 - Meshy: un aperçu `meshy-t2.5` s'affine (texture) sans `ai_model` (hérité), 10 crédits. Texturé, il gagne nettement sur nourriture et objets à motifs (vichy, étiquette, écailles); sans texture, à 800 triangles, il perd contre les gabarits.
 - Garde-fou: les patchs Python en heredoc sur un fichier du dépôt sont refusés; écrire le patch dans le scratchpad (Write) puis `python3 patch.py <fichier>`. Les fichiers .mjs sous `src/` cassent eslint (hors projet TS): les mettre dans `assets-src/`.
+
+## Têtes encrées de l'essai 4 (vérifié le 2026-11-10)
+
+- Rampe à deux tons sur une tête Meshy réduite: les taches venaient des normales (bosses du maillage), pas des ombres portées ni du relief. Diagnostic: sortir dans le nuanceur N.L > 0, N.L > seuil et masque d'ombre en trois canaux. Remède: normales imposées sur toute la tête (analytiques au coeur du visage, diffusion de proche en proche ailleurs, coeur fixe); le polynôme du visage ne vaut rien au bord du masque.
+- Lisser un visage Meshy en projetant y sur une surface: d'abord détendre x, z (replis des paupières et narines), et supprimer les îlots séparés (paupières de Meshy, bon repère des yeux).
+- Repères du visage: profil médian (segments des faces coupées par x = 0); bout du nez = bas du palier le plus avancé; racine = plus grand retrait sous la corde front-nez; menton = recul franc vers le cou (la lèvre avance parfois plus que le menton).
+- Planche de repères rendue avec des pistes NLA actives = pose du clip: `arm.data.pose_position = "REST"`. Les anciens réglages à l'oeil de l'essai 4 étaient faussés ainsi (menton 3 cm trop haut).
+- `bpy.ops.mesh.decimate` en mode édition agit sur la sélection, mais poser `polygon.select` ne suffit pas (sommets restés sélectionnés = tout le maillage): sélectionner par `bmesh.from_edit_mesh` puis `select_flush_mode`.
+- Attribut glTF perso: nom `_MAJ` et `export_attributes=True`; GLTFLoader le met en minuscules (`attribute float _visage;`).
+- Sans modelé d'orbites, les traits fins s'éteignent dans les mips: mips « à l'encre » (couverture max, couleur la plus sombre par bloc 2 x 2) faits en JS au chargement.
+- Clip sur place: pieds recalés au sol par translation verticale du bassin (clés de `Hips` en repère de l'os, `sonde_pieds.py --poser`); vitesse d'appui de la marche Meshy 0,9 à 1,35 m/s selon le corps.
+- Un script nommé `inspect.py` dans le dossier courant masque le module standard (Blender plante au chargement). Heredoc suivi d'une autre commande: refusé par le garde-fou.

@@ -31,8 +31,13 @@ import tomllib  # noqa: E402
 
 FICHE = tomllib.load(open(args[3], "rb"))
 target_tris = int(FICHE.get("triangles", 2300))
-# Échelles autour de l'articulation (1 = tel que généré): mains, pieds, tête.
-ECH = {"main": float(FICHE.get("mains", 1.0)), "pied": float(FICHE.get("pieds", 1.0)), "tete": float(FICHE.get("tete", 1.0))}
+tete_tris = int(FICHE.get("triangles_tete", 560))
+# Échelles autour de l'articulation (1 = tel que généré): pieds, tête. Les mains sont refaites (tete_mains.py).
+ECH = {"pied": float(FICHE.get("pieds", 1.0)), "tete": float(FICHE.get("tete", 1.0))}
+import os  # noqa: E402
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import tete_mains as TM  # noqa: E402
 
 TETE = {"Head", "head_end", "headfront", "neck"}
 BAS = {"Hips", "LeftUpLeg", "LeftLeg", "LeftFoot", "LeftToeBase", "RightUpLeg", "RightLeg", "RightFoot",
@@ -64,11 +69,10 @@ bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)  # unités locales: cent
 bm.to_mesh(mesh)
 bm.free()
 
-# Mains et pieds agrandis autour de leur articulation (poignet, cheville), selon le poids de l'os.
+# Pieds et tête mis à l'échelle autour de leur articulation (cheville, base du crâne), selon le poids de l'os.
 inv = me.matrix_world.inverted()
 gidx = {g.name: g.index for g in me.vertex_groups}
-for bones, piv, quoi in ((("LeftHand",), "LeftHand", "main"), (("RightHand",), "RightHand", "main"),
-                         (("LeftFoot", "LeftToeBase"), "LeftFoot", "pied"), (("RightFoot", "RightToeBase"), "RightFoot", "pied"),
+for bones, piv, quoi in ((("LeftFoot", "LeftToeBase"), "LeftFoot", "pied"), (("RightFoot", "RightToeBase"), "RightFoot", "pied"),
                          (("Head", "head_end", "headfront"), "Head", "tete")):
     pivot = inv @ (arm.matrix_world @ arm.data.bones[piv].head_local)
     ids = {gidx[b] for b in bones if b in gidx}
@@ -77,17 +81,62 @@ for bones, piv, quoi in ((("LeftHand",), "LeftHand", "main"), (("RightHand",), "
         if w > 0:
             v.co = pivot + (v.co - pivot) * (1 + (ECH[quoi] - 1) * min(w, 1.0))
 
-# Réduction: effondrement d'arêtes, qui garde les groupes de sommets (poids de peau).
+# Tête et mains refaites (tete_mains.py): repères mesurés, masque du visage lissé, nez simple, moufles.
+mw = me.matrix_world
+names = [g.name for g in me.vertex_groups]
+bone_w = {b.name: arm.matrix_world @ b.head_local for b in arm.data.bones}
+bm = bmesh.new()
+bm.from_mesh(mesh)
+deform = bm.verts.layers.deform.verify()
+REP = TM.mesurer(bm, mw, deform, names, bone_w["Head"].z)
+VIS, n_fit = TM.lisser_visage(bm, mw, REP)
+hauteur = max((mw @ v.co).z for v in bm.verts)
+mit_tris, main_L = TM.mitaines(bm, mw, deform, names, bone_w, FICHE.get("mains", {}), hauteur)
+bm.to_mesh(mesh)
+bm.free()
+
+# Réduction par effondrement d'arêtes (garde les poids de peau), en deux lots: la tête à son budget
+# (bible 2.2: 400 à 600), le reste du corps; les moufles, déjà légères, ne sont pas touchées.
 for o in bpy.context.scene.objects:
     o.select_set(o == me)
 bpy.context.view_layer.objects.active = me
-tris0 = sum(len(p.vertices) - 2 for p in mesh.polygons)
-dec = me.modifiers.new("reduire", "DECIMATE")
-dec.ratio = min(1.0, target_tris / tris0)
-dec.use_symmetry = True
-dec.symmetry_axis = "X"
-bpy.ops.object.modifier_move_to_index(modifier="reduire", index=0)
-bpy.ops.object.modifier_apply(modifier="reduire")
+mit_att = np.zeros(len(mesh.vertices), dtype=np.int32)
+mesh.attributes["mitaine"].data.foreach_get("value", mit_att)
+
+
+def dominant(v):
+    return names[max(v.groups, key=lambda g: g.weight).group] if len(v.groups) else ""
+
+
+def decimer(sel_pred, cible):
+    vt = [dominant(v) for v in mesh.vertices]
+    sel = [sel_pred(p, vt) for p in mesh.polygons]
+    n = sum(len(p.vertices) - 2 for p, s in zip(mesh.polygons, sel) if s)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_mode(type="FACE")
+    bme = bmesh.from_edit_mesh(mesh)
+    bme.faces.ensure_lookup_table()
+    for v in bme.verts:
+        v.select = False
+    for e in bme.edges:
+        e.select = False
+    for f, s in zip(bme.faces, sel):
+        f.select = s
+    bme.select_flush_mode()
+    bmesh.update_edit_mesh(mesh)
+    bpy.ops.mesh.decimate(ratio=min(1.0, cible / max(n, 1)), use_symmetry=True, symmetry_axis="X")
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def est_tete(p, vt):
+    return sum(vt[i] in TM.TETE for i in p.vertices) >= 2 and not any(mit[i] for i in p.vertices)
+
+
+mit = mit_att
+decimer(est_tete, tete_tris)
+mit = np.zeros(len(mesh.vertices), dtype=np.int32)
+mesh.attributes["mitaine"].data.foreach_get("value", mit)
+decimer(lambda p, vt: not est_tete(p, vt) and not any(mit[i] for i in p.vertices), target_tris - tete_tris - mit_tris)
 bm = bmesh.new()
 bm.from_mesh(mesh)
 bmesh.ops.triangulate(bm, faces=bm.faces)
@@ -95,6 +144,8 @@ bm.to_mesh(mesh)
 bm.free()
 for p in mesh.polygons:
     p.use_smooth = True
+    p.select = False
+w_visage = TM.poser_attribut_et_normales(me, VIS)
 for uv in list(mesh.uv_layers):
     mesh.uv_layers.remove(uv)
 
@@ -150,9 +201,12 @@ bm.from_mesh(mesh)
 bm.verts.ensure_lookup_table()
 bm.edges.ensure_lookup_table()
 bm.faces.ensure_lookup_table()
+lay_couture = bm.edges.layers.int.get("couture")
+lay_mit = bm.verts.layers.int.get("mitaine")
 for e in bm.edges:
     fs = {piece_f[f.index] for f in e.link_faces}
-    e.seam = len(fs) > 1 or len(e.link_faces) < 2
+    e.seam = len(fs) > 1 or len(e.link_faces) < 2 or bool(lay_couture and e[lay_couture])
+MITAINE = {v.index for v in bm.verts if lay_mit and v[lay_mit]}
 
 
 def bone_pt(name, tail=False):
@@ -162,7 +216,7 @@ def bone_pt(name, tail=False):
 
 def cut(piece, a, b, desired, start_hi):
     """Coupe la pièce le long de la direction voulue, d'un bord (début) au bout le plus lointain (fin)."""
-    verts = {v.index for f in bm.faces if piece_f[f.index] == piece for v in f.verts}
+    verts = {v.index for f in bm.faces if piece_f[f.index] == piece for v in f.verts} - MITAINE
     ab = b - a
     L2 = ab.length_squared
 
@@ -210,7 +264,7 @@ def cut(piece, a, b, desired, start_hi):
 down = Vector((0, 0, -1))
 cut("tete", bone_pt("neck"), bone_pt("head_end"), lambda i: Vector((0, 1, 0)), None)
 for side, sx in (("Left", 1), ("Right", -1)):
-    tip = bone_pt(side + "Hand", True)
+    tip = bone_pt(side + "Hand")
     cut("brasG" if sx > 0 else "brasD", bone_pt(side + "Arm"), tip,
         lambda i: (down - down.project(tip - bone_pt(side + "Arm"))).normalized(), None)
     cut("jambeG" if sx > 0 else "jambeD", bone_pt(side + "UpLeg"), bone_pt(side + "Foot"),
@@ -303,27 +357,28 @@ for r, items in by_region.items():
                 u, v = v, size[0] - u
             uvd[li].uv = (rect[0] + px + MARGE / 2 + u * scale, rect[1] + py + MARGE / 2 + v * scale)
 
-# Repères du visage (bible 2.4: fractions de la hauteur de tête depuis le sommet), en mètres.
+# Repères du visage: mesurés sur le modelé (tete_mains.mesurer), le visage lissé et le nez simple sont
+# construits dessus. Ils sont réécrits dans le bloc [visage] de la fiche du corps (plus de réglage à l'oeil).
 mw = me.matrix_world
 head_v = [mw @ mesh.vertices[i].co for p in mesh.polygons if region[p.index] == 0 for i in p.vertices]
-top = max(v.z for v in head_v)
-front = [v for v in head_v if abs(v.x) < 0.015 and v.y < 0]
-nose = min((v for v in front if v.z > top - 0.25), key=lambda v: v.y)
-# Menton: le point le plus avancé sous le nez (le cou, plus bas, est en retrait).
-chin = min((v for v in front if nose.z - 0.11 < v.z < nose.z - 0.035), key=lambda v: v.y).z - 0.008
-hh = top - chin
-# Yeux et bouche calés sur le nez mesuré (le visage stylisé de Meshy ne suit pas les fractions de la bible).
-# Repères du visage: estimés d'après le nez, puis corrigés par la fiche du corps ([visage], en fractions de
-# la hauteur de tête depuis le sommet du crâne; écart = demi-distance entre les yeux, en mètres).
-V = FICHE.get("visage", {})
-if "menton" in V:
-    chin = top - V["menton"] * ECH["tete"]
-    hh = top - chin
-yeux = top - V["yeux"] * hh if "yeux" in V else nose.z + 0.26 * hh
-bouche = top - V["bouche"] * hh if "bouche" in V else nose.z - 0.13 * hh
-ecart = float(V.get("ecart", 0.145)) * hh
+top, chin, hh = REP["top"], REP["chin"], REP["hh"]
+yeux, bouche, ecart = REP["yeux"], REP["bouche"], REP["ecart"]
+nose = Vector((0.0, float(VIS.Y(np.array([0.0]), np.array([REP["tip"]]))[0]), REP["tip"]))
 face = {"top": top, "chin": chin, "hauteur": hh, "yeux": yeux, "bouche": bouche,
         "nez": (nose.x, nose.y, nose.z), "centre_y": float(np.mean([v.y for v in head_v]))}
+k_nez = (yeux - REP["base"]) / (yeux - bouche)
+bloc = ("[visage]              # MESURÉ par conformer_corps.py (tete_mains.mesurer): ne pas régler à la main\n"
+        f"menton = {hh / ECH['tete']:.3f}        # du sommet du crâne au menton, en mètres, tête à l'échelle 1\n"
+        f"yeux = {(top - yeux) / hh:.3f}          # centre des yeux, fraction de la hauteur de tête depuis le sommet\n"
+        f"bouche = {(top - bouche) / hh:.3f}        # trait de la bouche, même unité\n"
+        f"ecart = {ecart / hh:.3f}         # demi-distance entre les yeux, fraction de la hauteur de tête\n"
+        f"nez = {k_nez:.3f}           # base du nez, fraction du chemin des yeux à la bouche (traits.py)\n"
+        f"saillie_nez = {VIS.nez_h:.4f}  # saillie du nez simple au-dessus du visage lissé, en mètres\n")
+texte = open(args[3], encoding="utf-8").read()
+debut = texte.find("[visage]")
+fin = texte.find("\n[", debut + 1) if debut >= 0 else -1
+texte = (texte[:debut] if debut >= 0 else texte.rstrip("\n") + "\n\n") + bloc + (texte[fin + 1:] if fin >= 0 else "")
+open(args[3], "w", encoding="utf-8").write(texte)
 # Cellule des traits: yeux à v 0,80 et bouche à v 0,20, demi-écart des yeux à 0,235 de la largeur.
 cell = (yeux - bouche) / 0.6
 cell_w = ecart / 0.235
@@ -431,9 +486,20 @@ aim(pb["RightForeArm"], Vector((-0.05, -0.55, -0.85)))   # coude plié d'un tier
 aim(pb["RightHand"], Vector((-0.02, -0.45, -0.9)))
 aim(pb["LeftUpLeg"], Vector((0.10, -0.06, -1)))          # jambe libre, genou un peu avancé
 aim(pb["LeftLeg"], Vector((0.04, 0.10, -1)))
-for b in pb:
-    b.keyframe_insert("rotation_quaternion", frame=0)
-    b.keyframe_insert("location", frame=0)
+# Repos vivant: la pose ci-dessus, plus respiration, balancement du buste et coup d'oeil (tete_mains.respiration),
+# 3,5 s en boucle exacte. Bassin et jambes immobiles: les pieds restent posés.
+base = {b.name: b.matrix_basis.copy() for b in pb}
+N_REPOS = 105
+for fr in range(0, N_REPOS + 1, 5):
+    for b in pb:
+        b.matrix_basis = base[b.name]
+    bpy.context.view_layer.update()
+    ordre = [b.name for b in pb]
+    for nom, axe, deg in sorted(TM.respiration(fr, N_REPOS), key=lambda d: ordre.index(d[0])):
+        turn(pb[nom], axe, deg)
+    for b in pb:
+        b.keyframe_insert("rotation_quaternion", frame=fr)
+        b.keyframe_insert("location", frame=fr)
 bpy.ops.object.mode_set(mode="OBJECT")
 arm.animation_data.action = None
 for b in pb:
@@ -455,4 +521,5 @@ tris = sum(len(p.vertices) - 2 for p in mesh.polygons)
 print("CONFORME", src, "ilots", len(islands), "uv_nuls", uv_nuls, "triangles", tris, "par region", np.bincount(region).tolist(), "echelles UV", {k: round(v, 3) for k, v in scales.items()},
       "texels par metre", round(scale * 512, 1), "tete", round(hh, 3), "tetes", round(top / hh, 2),
       "hauteur", round(top, 3), "yeux", round((top - yeux) / hh, 3), "bouche", round((top - bouche) / hh, 3),
-      "nez", round((top - nose.z) / hh, 3), "ecart", round(ecart, 4))
+      "nez", round((top - nose.z) / hh, 3), "ecart", round(ecart, 4), "moufles", mit_tris, "main", round(main_L, 3),
+      "points_ajustes", n_fit, "saillie_nez", round(VIS.nez_h, 4), "tete_tris", sum(1 for p in mesh.polygons if region[p.index] == 0))
