@@ -29,8 +29,13 @@ import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
+import { passageSays } from '../simulation/lieux/index';
+
 import './interface.css';
 import './carnet/carnet.css';
+
+/** Refus d'un passage fermé: la phrase `says` du verrou ou de la porte remplace le texte générique. */
+const PASSAGE_REASONS: ReadonlySet<string> = new Set(['not-yet', 'door-locked', 'shop-closed']);
 
 export type { BabbleInfo } from './dialogue';
 export type { ProjectToScreen } from './hud';
@@ -177,6 +182,16 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     return view.world()?.players[player].name ?? '';
   }
 
+  /** Texte d'un refus; devant un verrou ou une porte fermée, la phrase des données d'abord. */
+  function refusalLine(reason: string, target: string | null): string {
+    const world = view.world();
+    if (target !== null && world !== null && PASSAGE_REASONS.has(reason)) {
+      const says = passageSays({ content: view.content, world }, target);
+      if (says !== null) return says;
+    }
+    return shopRefusalText(reason) ?? refusalText(reason);
+  }
+
   function onEvent(event: GameEvent): void {
     kitchen.onEvent(event);
     coop.onEvent(event);
@@ -188,7 +203,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     switch (event.type) {
       case 'refused':
         if (event.player === me && !shop.isOpen() && !workshop.isOpen())
-          hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
+          hud.refusal(now, refusalLine(event.reason, event.target));
         break;
       case 'pockets_full':
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
