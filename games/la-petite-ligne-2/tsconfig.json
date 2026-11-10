@@ -1,5 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@duo/config/tsconfig.browser.json",
+  "compilerOptions": {
+    // vite/client: import.meta.glob; node: les tests lisent les fichiers de données.
+    "types": ["vite/client", "node"]
+  },
   "include": ["src", "tests", "*.ts"]
 }
