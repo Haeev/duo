@@ -16,9 +16,9 @@
       "h": 1
     },
     {
-      "x": 4,
+      "x": 5,
       "y": 5,
-      "w": 3,
+      "w": 2,
       "h": 1
     }
   ],
@@ -29,7 +29,7 @@
     },
     "odette-cuisine": {
       "x": 1.5,
-      "y": 7.5
+      "y": 8.5
     }
   },
   "objects": [
@@ -50,8 +50,8 @@
     {
       "id": "epicerie-table",
       "type": "table-a-manger",
-      "x": 4,
-      "y": 7,
+      "x": 2,
+      "y": 7.5,
       "rotation": 0
     }
   ],

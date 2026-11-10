@@ -19,7 +19,7 @@
   "doors": {
     "eglise-clocher-esc-eglise": {
       "x": 0.5,
-      "y": 0.5,
+      "y": 2.5,
       "facing": 0,
       "to": "eglise-esc-eglise-clocher"
     }

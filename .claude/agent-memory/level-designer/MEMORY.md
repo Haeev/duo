@@ -130,3 +130,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `pnpm format:verifier` passe sur `donnees/`: l'assembleur lance prettier sur les fichiers du lieu qu'il écrit.
 - Meubles contre un mur sud: rotation 2 (façade au nord, vers la pièce). La porte intérieure se place au droit de la porte du plan: x local = x porte - x emprise - 0,5.
 - Images: dessiner tous les tracés, puis les étiquettes de verrou, puis les pastilles (écartées avec un trait si elles gênent), sinon le tracé suivant recouvre les numéros.
+
+## Règle d'accès des intérieurs (Aubrune, vérifié le 2026-11-10)
+
+- Un meuble se pose sur ses cases: centre demi-entier pour une taille impaire, entier pour une taille paire (chaise en (7; 1) = 4 cases bloquées, table 2 x 1 en y 7 = deux rangées). Les deux signalements (épicerie, maison du garde) venaient de là; `controler_plan.py` refuse maintenant un meuble « à cheval » dans un intérieur. Dehors, 49 objets le sont encore (signalé, pas corrigé).
+- Le `regard` d'un escalier fixe la case d'arrivée (1 m devant): un escalier dans un coin qui regarde le mur fait arriver hors de la salle, dans le vide de l'annexe (moulin). Vérifier l'arrivée de chaque porte, pas seulement que la porte se touche.
+- La case d'une porte ne se traverse pas (y entrer, c'est la passer): un point de quête posé sur le seuil (`po`) s'atteint par les voisines; une porte au milieu d'un mur sud coupe la rangée en deux poches.
+- « Attendu dans cet état » = le nœud du graphe le plus proche (même salle, ou dehors) est atteint par le graphe: aucune fausse alerte derrière les verrous. Python (`controler_acces`) et TS (`unreachableStoryElements`) donnent la même liste: les comparer sur les fichiers d'avant (`git archive` dans le dossier temporaire, puis un test vitest jetable `--dir`).
+- 2 m pour deux joueurs: blocs 2 x 2 libres, pas diagonal permis (1,41 m entre deux coins). Le seuil d'arrivée d'une porte de façade n'est jamais dans un bloc s'il touche un meuble: laisser libres les deux cases de part et d'autre de l'arrivée.
+- Le rendu des intérieurs ne dessine pas les cloisons (`blocked` des intérieurs), seulement le mur d'entourage: une cloison est un mur invisible en jeu (vu sur captures, 2026-11-10).
+- Captures en jeu d'un intérieur: spec Playwright temporaire dans `tests/e2e/` (sauvegarde `aubrune`, `duo.teleport`, `host.shot`, `LPL2_CAPTURES=<dossier>`), après `npx vite build` et `pnpm --filter @duo/sdk-dev build`; la supprimer ensuite.

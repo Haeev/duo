@@ -16,7 +16,7 @@
     },
     "paulin-table": {
       "x": 5.5,
-      "y": 2.5
+      "y": 3.5
     }
   },
   "objects": [
@@ -37,21 +37,21 @@
     {
       "id": "logis-table",
       "type": "table-a-manger",
-      "x": 4,
+      "x": 6,
       "y": 2.5,
       "rotation": 0
     },
     {
       "id": "logis-chaise-1",
       "type": "chaise",
-      "x": 3.5,
+      "x": 5.5,
       "y": 1.5,
       "rotation": 0
     },
     {
       "id": "logis-chaise-2",
       "type": "chaise",
-      "x": 4.5,
+      "x": 6.5,
       "y": 3.5,
       "rotation": 2
     },
@@ -71,5 +71,5 @@
       "to": "porte-ferme-logis"
     }
   },
-  "pourquoi": "une salle commune: la cuisine au nord, la grande table au milieu, la porte au midi sur la cour"
+  "pourquoi": "une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour"
 }

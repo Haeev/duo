@@ -35,7 +35,7 @@
     "moulin-etage-esc-moulin": {
       "x": 0.5,
       "y": 6.5,
-      "facing": 0,
+      "facing": 2,
       "to": "moulin-esc-moulin-etage"
     }
   },
