@@ -1,0 +1,37 @@
+// GABARIT: une espèce de la basse-cour (cahier 4.7, réponse 31): une seule nourriture, un produit.
+// Créer: pnpm nouveau espece <id>        -> donnees/commun/especes/<id>.json
+// Schéma: src/donnees/schemas/elevage.ts. Nourriture et produits sont des fichiers de commun/objets/.
+// Elle vit dans tout meuble à brique « shelter » qui la nomme (gabarit « abri »).
+{
+  "schema": 1,
+  "id": "exemple-espece",
+  "name": "Bête d'essai",
+  // Nœud du modèle 3D (forme simple tant qu'il n'est pas livré).
+  "model": "exemple-espece",
+  // Prix d'achat, en centimes.
+  "price": 800,
+  // La seule nourriture: un exemplaire vaut une ration.
+  "food": "pomme",
+  // Rations mangées chaque matin par bête.
+  "ration": 1,
+  "product": {
+    // Tous les combien de jours elle donne, nourrie.
+    "every": 1,
+    // Qualités, de la plus simple à la meilleure, atteintes à partir de « hearts » cœurs.
+    "qualities": [{ "hearts": 0, "item": "pomme" }],
+    // Caressée la veille: chance que le produit monte d'une qualité.
+    "pettedChance": 0.1,
+  },
+  // Une caresse par jour et par joueur rapporte « perPet » points; « perHeart » points font un cœur.
+  "affection": { "perPet": 1, "perHeart": 3, "hearts": 5 },
+  // Sans nourriture: « fewer » jours à donner un jour sur deux, puis plus rien. Jamais de mort ni de fuite.
+  "hunger": { "fewer": 2 },
+  // Onomatopées au-dessus de la bête (12 caractères au plus).
+  "sounds": { "happy": "Hop !", "hungry": "??", "petted": "Hop hop !" },
+  // Robes (couleur de la forme simple et de la vignette).
+  "robes": [{ "id": "claire", "name": "Claire", "color": "#fbf1dc" }],
+  // Noms proposés à l'arrivée; les joueurs peuvent renommer.
+  "names": ["Pompon"],
+  // Dehors de « out » à « in » (minutes depuis minuit), un but de promenade toutes les « every » minutes.
+  "roam": { "out": 450, "in": 1170, "every": 40 },
+}

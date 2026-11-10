@@ -39,8 +39,10 @@ describe('gabarits', () => {
   it('existent pour chaque type de contenu et se lisent une fois les commentaires retirés', () => {
     expect(Object.keys(TEMPLATES).sort()).toEqual(
       [
+        'abri',
         'commerce',
         'culture',
+        'espece',
         'dialogue',
         'entree-de-collection',
         'evenement',

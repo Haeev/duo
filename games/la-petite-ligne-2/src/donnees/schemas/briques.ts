@@ -13,6 +13,7 @@
 import * as v from 'valibot';
 import { CountSchema, FiniteSchema, IdSchema, IntSchema, NeedIdSchema } from './communs';
 import { HARVEST_BRICK_SCHEMAS } from './recolte-briques';
+import { SHELTER_BRICK_SCHEMAS } from './elevage';
 
 export const TOOL_KINDS = ['axe', 'spade', 'can', 'rod', 'net', 'hammer', 'camera'] as const;
 export const ToolKindSchema = v.picklist(TOOL_KINDS);
@@ -91,6 +92,8 @@ export const BRICK_SCHEMAS = [
   v.strictObject({ brick: v.literal('travel') }),
   /** Points de récolte du monde et terre cultivable (`recolte-briques.ts`). */
   ...HARVEST_BRICK_SCHEMAS,
+  /** Abri de la basse-cour (`elevage.ts`). */
+  ...SHELTER_BRICK_SCHEMAS,
   /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */
   v.strictObject({ brick: v.literal('mirror') }),
 ] as const;

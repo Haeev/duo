@@ -1,0 +1,32 @@
+// GABARIT: un abri de la basse-cour (poulailler, clapier, bergerie): un meuble à brique « shelter ».
+// Créer: pnpm nouveau abri <id>        -> donnees/commun/meubles/<id>.json
+// Schéma: src/donnees/schemas/elevage.ts (brique) et meuble.ts. La touche d'action ouvre son écran.
+{
+  "schema": 1,
+  "id": "exemple-abri",
+  "name": "Abri d'essai",
+  "model": "exemple-abri",
+  // Emprise en cases de 1 m, façade au sud.
+  "size": { "w": 3, "h": 2 },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "shelter",
+      // L'espèce qui y vit (commun/especes/<id>.json).
+      "species": "poule",
+      // Places: la plus grande valeur dont le fait est retenu (agrandissement); null = dès le départ.
+      "places": [{ "count": 4, "fact": null }],
+      // Mangeoire, en rations (« 20 »: 5 jours pour 4 bêtes).
+      "feeder": 20,
+      // Pondoirs visibles et plafond de produits gardés au nid.
+      "nests": 3,
+      "nestCapacity": 12,
+      // Enclos du jour, en m depuis le centre du meuble (façade au sud: y positif devant).
+      "pen": { "x": -3, "y": 1.2, "w": 6, "h": 4 },
+      // Bêtes présentes dès le départ (nom, robe de l'espèce); [] le plus souvent.
+      "starters": [],
+    },
+  ],
+}

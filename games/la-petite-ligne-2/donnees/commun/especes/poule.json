@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "poule",
+  "name": "Poule",
+  "model": "poule",
+  "price": 800,
+  "food": "grain",
+  "ration": 1,
+  "product": {
+    "every": 1,
+    "qualities": [
+      { "hearts": 0, "item": "oeuf" },
+      { "hearts": 4, "item": "oeuf-roux" }
+    ],
+    "pettedChance": 0.1
+  },
+  "affection": { "perPet": 1, "perHeart": 3, "hearts": 5 },
+  "hunger": { "fewer": 2 },
+  "sounds": { "happy": "Cot cot !", "hungry": "??", "petted": "Cotte !" },
+  "robes": [
+    { "id": "blanche", "name": "Blanche", "color": "#fbf1dc" },
+    { "id": "rousse", "name": "Rousse", "color": "#c98a55" },
+    { "id": "noire", "name": "Noire", "color": "#5b4d40" },
+    { "id": "blonde", "name": "Blonde", "color": "#e2b06a" }
+  ],
+  "names": [
+    "Bichette",
+    "Noisette",
+    "Plume",
+    "Griotte",
+    "Cannelle",
+    "Pâquerette",
+    "Caramel",
+    "Brindille"
+  ],
+  "roam": { "out": 450, "in": 1170, "every": 40 }
+}

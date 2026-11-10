@@ -18,6 +18,7 @@ import { WORLD_EVENTS } from '../monde/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
 import { SCENE_EVENTS } from '../scenes/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
+import { FARM_EVENTS } from '../elevage/evenements';
 
 export const CORE_EVENTS = [
   /**
@@ -69,5 +70,6 @@ export const GameEventSchema = v.variant('type', [
   ...COOK_EVENTS,
   ...WORLD_EVENTS,
   ...COLLECTION_EVENTS,
+  ...FARM_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

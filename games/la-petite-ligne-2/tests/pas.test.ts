@@ -83,6 +83,7 @@ describe('pas de simulation vide', () => {
       'cuisine',
       'monde',
       'collections',
+      'elevage',
     ]);
   });
 });

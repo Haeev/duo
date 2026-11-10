@@ -14,6 +14,7 @@ import { shopRefusalText } from './boutique/textes';
 import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
 import { createKitchen } from './cuisine/index';
+import { createCoopScreen } from './basse-cour/ecran';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import type { UiSettings } from './carnet/lectures';
 import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
@@ -120,7 +121,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     UI_TUNING.openGuardMs,
     options.notebook,
   );
-  const shop = createShopScreen(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, reduced);
+  const shop = createShopScreen(
+    layer,
+    view.content,
+    send,
+    keyLabel,
+    UI_TUNING.openGuardMs,
+    reduced,
+  );
   layer.dataset.motion = reduced() ? 'reduced' : 'full';
   const playerColors = options.playerColors ?? EDITOR_SETTINGS.fallbackAccents;
   const editor = createCharacterEditor(layer, {
@@ -151,13 +159,15 @@ export function createInterface(options: InterfaceOptions): GameInterface {
 
   function onEvent(event: GameEvent): void {
     kitchen.onEvent(event);
+    coop.onEvent(event);
     const me = local();
     if (me === null) return;
     const other: PlayerIndex = me === 0 ? 1 : 0;
     shop.onEvent(event, me, now);
     switch (event.type) {
       case 'refused':
-        if (event.player === me && !shop.isOpen()) hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
+        if (event.player === me && !shop.isOpen())
+          hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
         break;
       case 'pockets_full':
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
@@ -273,15 +283,28 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'photo_taken':
       case 'rain_watered':
       case 'weather_changed':
+      case 'shelter_opened':
+      case 'shelter_filled':
+      case 'shelter_collected':
+      case 'animal_petted':
+      case 'animal_arrived':
         break;
     }
   }
   const kitchen = createKitchen(layer, view, send, keyLabel, options.keyTarget ?? window);
+  const coop = createCoopScreen(
+    layer,
+    view,
+    send,
+    keyLabel,
+    options.keyTarget ?? window,
+    UI_TUNING.openGuardMs,
+  );
   const offEvents = view.onEvent(onEvent);
 
   const keyTarget = options.keyTarget ?? window;
   const onKey = (raw: Event): void => {
-    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen()) return;
+    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen() || coop.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (editor.isOpen()) used = editor.key(raw);
@@ -319,6 +342,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       notebook.frame(world, me);
       shop.frame(world, me, now);
       kitchen.frame(dtMs);
+      coop.frame(dtMs);
       const shopOpen = shop.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       const prompt = menu
@@ -344,7 +368,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         dialogue.isOpen() ||
         notebook.isOpen() ||
         shop.isOpen() ||
-        kitchen.isOpen()
+        kitchen.isOpen() ||
+        coop.isOpen()
       );
     },
     dispose() {
@@ -356,6 +381,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       shop.dispose();
       editor.dispose();
       kitchen.dispose();
+      coop.dispose();
       layer.remove();
     },
   };
