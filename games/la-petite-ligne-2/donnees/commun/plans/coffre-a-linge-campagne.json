@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "coffre-a-linge-campagne",
+  "name": "Coffre à linge",
+  "makes": {
+    "kind": "furniture",
+    "variants": [
+      {
+        "color": "#c8955a",
+        "item": "coffre-a-linge-miel"
+      },
+      {
+        "color": "#8fa27c",
+        "item": "coffre-a-linge-sauge"
+      }
+    ]
+  },
+  "station": "workbench",
+  "materials": [
+    {
+      "item": "planche",
+      "count": 5
+    },
+    {
+      "item": "buche",
+      "count": 1
+    }
+  ],
+  "work": 60,
+  "source": "shop",
+  "series": "campagne"
+}

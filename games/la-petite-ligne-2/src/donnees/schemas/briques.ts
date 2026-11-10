@@ -13,6 +13,7 @@
 import * as v from 'valibot';
 import { CountSchema, FiniteSchema, IdSchema, IntSchema, NeedIdSchema } from './communs';
 import { HARVEST_BRICK_SCHEMAS } from './recolte-briques';
+import { CRAFT_SERVICES, CRAFT_STATIONS } from './plan';
 
 export const TOOL_KINDS = ['axe', 'spade', 'can', 'rod', 'net', 'hammer', 'camera'] as const;
 export const ToolKindSchema = v.picklist(TOOL_KINDS);
@@ -91,6 +92,12 @@ export const BRICK_SCHEMAS = [
   v.strictObject({ brick: v.literal('travel') }),
   /** Points de récolte du monde et terre cultivable (`recolte-briques.ts`). */
   ...HARVEST_BRICK_SCHEMAS,
+  /** Atelier: fabriquer sur plans, améliorer, réparer ou affûter un outil (`simulation/fabrication/`). */
+  v.strictObject({
+    brick: v.literal('craft'),
+    station: v.picklist(CRAFT_STATIONS),
+    services: v.pipe(v.array(v.picklist(CRAFT_SERVICES)), v.minLength(1), v.maxLength(4)),
+  }),
   /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */
   v.strictObject({ brick: v.literal('mirror') }),
 ] as const;

@@ -12,6 +12,7 @@ import { shopBehaviour } from '../commerces/brique';
 import { BAG_BRICKS } from '../sac/briques';
 import { HARVEST_BRICKS } from '../outils/briques';
 import { COOK_BRICKS } from '../cuisine/briques';
+import { CRAFT_BRICKS } from '../fabrication/briques';
 import { sitBehaviour } from './asseoir';
 import { sleepBehaviour } from './dormir';
 import { talkBehaviour } from './parler';
@@ -48,6 +49,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   shop: shopBehaviour,
   ...HARVEST_BRICKS,
   mirror: mirrorBehaviour,
+  ...CRAFT_BRICKS,
 };
 
 /** Actions sur ce qui n'est pas un meuble: un objet au sol (`pickup`), un habitant (`talk`). */

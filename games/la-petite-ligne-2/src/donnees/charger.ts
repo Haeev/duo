@@ -30,6 +30,7 @@ import {
 } from './schemas/personnage';
 import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
+import { PlanSchema, type PlanDef } from './schemas/plan';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
 import { CropSchema, ResourceSchema, type CropDef, type ResourceDef } from './schemas/recolte';
 import { SceneSchema, type SceneDef } from './schemas/scene';
@@ -73,6 +74,8 @@ export interface Content {
   /** Meubles et éléments interactifs du décor. */
   readonly props: ById<PropDef>;
   readonly recipes: ById<RecipeDef>;
+  /** Plans de fabrication (`simulation/fabrication/`). */
+  readonly plans: ById<PlanDef>;
   readonly catches: ById<CatchDef>;
   /** Cultures du potager et ressources du monde (`schemas/recolte.ts`). */
   readonly crops: ById<CropDef>;
@@ -155,6 +158,7 @@ export function loadContent(files: Files): Content {
   const items = parseFolder(ItemSchema, files, 'commun/objets', problems);
   const props = parseFolder(PropSchema, files, 'commun/meubles', problems);
   const recipes = parseFolder(RecipeSchema, files, 'commun/recettes', problems);
+  const plans = parseFolder(PlanSchema, files, 'commun/plans', problems);
   const catches = parseFolder(CatchSchema, files, 'commun/prises', problems);
   const crops = parseFolder(CropSchema, files, 'commun/cultures', problems);
   const resources = parseFolder(ResourceSchema, files, 'commun/ressources', problems);
@@ -229,6 +233,7 @@ export function loadContent(files: Files): Content {
     items,
     props,
     recipes,
+    plans,
     catches,
     crops,
     resources,

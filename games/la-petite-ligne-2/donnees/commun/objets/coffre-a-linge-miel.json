@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "coffre-a-linge-miel",
+  "name": "Coffre à linge miel",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

@@ -6,6 +6,7 @@ import { COLLECTION_INTENTS } from '../collections/intentions';
 import { BRICK_INTENTS } from '../briques/intentions';
 import { SHOP_INTENTS } from '../commerces/intentions';
 import { COOK_INTENTS } from '../cuisine/intentions';
+import { CRAFT_INTENTS } from '../fabrication/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { TOOL_INTENTS } from '../outils/intentions';
 import { VILLAGER_INTENTS } from '../habitants/intentions';
@@ -50,6 +51,7 @@ export const IntentSchema = v.variant('type', [
   ...QUEST_INTENTS,
   ...SCENE_INTENTS,
   ...COOK_INTENTS,
+  ...CRAFT_INTENTS,
   ...COLLECTION_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

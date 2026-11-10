@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "etagere-campagne",
+  "name": "Étagère",
+  "makes": {
+    "kind": "furniture",
+    "variants": [
+      {
+        "color": "#c8955a",
+        "item": "etagere-miel"
+      },
+      {
+        "color": "#8fa27c",
+        "item": "etagere-sauge"
+      }
+    ]
+  },
+  "station": "workbench",
+  "materials": [
+    {
+      "item": "planche",
+      "count": 4
+    },
+    {
+      "item": "pierre",
+      "count": 1
+    }
+  ],
+  "work": 48,
+  "source": "villager",
+  "series": "campagne"
+}

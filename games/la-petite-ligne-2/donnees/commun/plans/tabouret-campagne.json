@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "tabouret-campagne",
+  "name": "Tabouret",
+  "makes": {
+    "kind": "furniture",
+    "variants": [
+      {
+        "color": "#c8955a",
+        "item": "tabouret-miel"
+      },
+      {
+        "color": "#8fa27c",
+        "item": "tabouret-sauge"
+      }
+    ]
+  },
+  "station": "workbench",
+  "materials": [
+    {
+      "item": "planche",
+      "count": 2
+    }
+  ],
+  "work": 24,
+  "source": "start",
+  "series": "campagne"
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "etagere-sauge",
+  "name": "Étagère sauge",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}
