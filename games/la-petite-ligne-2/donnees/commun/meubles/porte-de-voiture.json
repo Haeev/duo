@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "porte-de-voiture",
+  "name": "Porte de voiture",
+  "model": "train-door",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": []
+}

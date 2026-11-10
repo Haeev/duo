@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "banquette-de-train",
+  "name": "Banquette de train",
+  "model": "train-seat",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": [
+    {
+      "brick": "sit",
+      "seats": 2,
+      "restPerMinute": 6
+    }
+  ]
+}

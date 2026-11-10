@@ -50,6 +50,9 @@ pomme = "#C5443D"
 tige = "#5E8048"
 herbe_haute = "#86A657"
 fleur_rose = "#E58FA6"
+vitre_nuit = "#1C2638"     # vitre d'un wagon la nuit: le noir du dehors, un peu bleu
+reflet = "#8197B2"         # reflet clair sur une vitre de nuit
+ambre_clair = "#FFE2A6"    # verre d'une lampe allumée
 
 # ---------------------------------------------------------------- fichiers et budgets par famille
 # Un fichier GLB par grande famille (le rendu les charge tous et cherche les nœuds par nom).
@@ -83,6 +86,14 @@ touffe = "plants"
 fleurs = "plants"
 souche = "plants"
 maison = "houses"
+paroi-voiture = "train"
+angle-caisse = "train"
+porte-voiture = "train"
+banquette-train = "train"
+couchette-train = "train"
+tablette = "train"
+porte-bagages = "train"
+applique = "train"
 
 # Plafonds de triangles (bible 7.4: 300 à 1 500 par meuble, 2 500 pour les grandes pièces).
 [budgets]
@@ -115,6 +126,14 @@ touffe = 300
 fleurs = 800
 souche = 800
 maison = 9000
+paroi-voiture = 600
+angle-caisse = 60
+porte-voiture = 600
+banquette-train = 2500
+couchette-train = 2500
+tablette = 800
+porte-bagages = 2500
+applique = 600
 
 # Couleurs par défaut des emplacements (une entrée peut les remplacer par `couleurs = { ... }`).
 [defauts.couleurs]
@@ -388,3 +407,66 @@ volets = false
 portes = [{ facade = "ouest", position = 0.5 }]
 fenetres = { sud = 1 }
 couleurs = { murs = "bois_gris", toit = "lauze", menuiseries = "bois_sombre", porte = "bois_brut", soubassement = "pierre" }
+
+# ---------------------------------------------------------------- voiture de train de nuit (intérieur)
+# Une voiture se monte avec des pans de 1 m (paroi à fenêtre, paroi pleine, porte) posés au bord
+# avant de leur case, des angles aux quatre coins, puis le mobilier (banquettes face à face par
+# travée, tablette entre elles, filets à bagages, appliques). Couleurs: bois = boiseries, peinture =
+# haut des parois, tissu = velours et lambrequins, metal = laiton; `caisse` = peinture du dehors.
+[[modeles]]
+id = "train-wall-window"       # pan de 1 m: allège boisée, fenêtre (la nuit et deux reflets), lambrequin
+famille = "paroi-voiture"
+couleurs = { bois = "noisette", peinture = "creme", tissu = "brique" }
+
+[[modeles]]
+id = "train-wall"              # pan plein (bout de voiture)
+famille = "paroi-voiture"
+fenetre = false
+couleurs = { bois = "noisette", peinture = "creme" }
+
+[[modeles]]
+id = "train-wall-map"          # pan plein avec le plan de la ligne encadré (bout du couloir)
+famille = "paroi-voiture"
+fenetre = false
+cadre = true
+couleurs = { bois = "noisette", peinture = "creme" }
+
+[[modeles]]
+id = "train-wall-corner"       # montant d'angle de caisse
+famille = "angle-caisse"
+
+[[modeles]]
+id = "train-door"              # porte de voiture: vantail boisé à hublot, poignée de laiton, seuil
+famille = "porte-voiture"
+couleurs = { bois = "noisette", peinture = "creme", metal = "laiton" }
+
+[[modeles]]
+id = "train-seat"              # banquette de deux places, velours brique, têtières blanches
+famille = "banquette-train"
+couleurs = { bois = "noisette", tissu = "brique" }
+
+[[modeles]]
+id = "train-berth"             # deux banquettes tirées en couchette: oreiller, couverture moutarde
+famille = "couchette-train"
+couleurs = { bois = "noisette", tissu = "brique" }
+
+[[modeles]]
+id = "train-table"             # tablette fixée sous la fenêtre, pied central
+famille = "tablette"
+couleurs = { bois = "miel", metal = "laiton" }
+
+[[modeles]]
+id = "train-luggage-rack"      # filet à bagages de 2,6 m et les deux valises des voyageurs
+famille = "porte-bagages"
+couleurs = { bois = "miel", metal = "laiton" }
+valises = [[-0.55, 0.62, 0.28, 0.20, "rouille"], [0.25, 0.54, 0.26, 0.18, "canard"]]
+
+[[modeles]]
+id = "train-luggage-rack-empty" # même filet, vide
+famille = "porte-bagages"
+couleurs = { bois = "miel", metal = "laiton" }
+
+[[modeles]]
+id = "train-wall-lamp"         # applique: platine de laiton, tulipe ambrée
+famille = "applique"
+couleurs = { metal = "laiton" }

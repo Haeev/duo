@@ -172,6 +172,8 @@ describe('scène d’un lieu', () => {
     if (place === undefined || type === undefined) throw new Error('données d’essai absentes');
     const scene = new PlaceScene(describePlace(content, place), materials(), null);
     const fixed = scene.counts().volumes;
+    // Les grands meubles livrés de la carte (plus de 1,10 m) cachent déjà: ils restent.
+    const occluders = scene.occlusion.size;
     const state = createPlaceState(content, place);
     state.placed.push({ id: 'pose-0', type, x: 6, y: 7, rotation: 0 });
     const children = scene.root.children.length;
@@ -181,7 +183,7 @@ describe('scène d’un lieu', () => {
     expect(scene.aimable('pose-0')).not.toBeNull();
     scene.setDynamic([]);
     expect(scene.root.children).toHaveLength(children);
-    expect(scene.occlusion.size).toBe(0);
+    expect(scene.occlusion.size).toBe(occluders);
     scene.dispose();
   });
 });

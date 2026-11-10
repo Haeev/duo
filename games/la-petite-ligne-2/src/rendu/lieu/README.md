@@ -2,6 +2,12 @@
 
 Tout ce qui appartient au lieu affiché: `description.ts` traduit les données et l'état du lieu en volumes (logique pure), `formes.ts` fabrique les formes provisoires quand le modèle manque, `lieu.ts` construit la scène du lieu et la libère en entier au départ (un `ResourceTracker` par lieu, ADR 0018). Les modèles livrés arrivent par `ModelSource` (`lieu.ts`): le moteur ne connaît aucun nom de modèle.
 
+## Sol des petits lieux
+
+Un petit lieu (sans `terrain`) peut déclarer son sol dans sa carte (`floor`: une nature de base, puis des rectangles); `sol.ts` le dessine aux couleurs de `GROUND_LOOKS` (lames d'un plancher, cases `vide` non dessinées, tranche au bord). Sans `floor`: la plaque d'essai en damier.
+
+Ajouter une nature de sol (le plancher d'une maison, un carrelage): une ligne dans `GROUND_LOOKS` de `reglages-tuiles.ts` (couleur, surface entendue sous les pas, `planks` pour des lames, `hidden` pour ne rien dessiner), puis la citer dans `floor` d'une carte. `tests/train-de-nuit.test.ts` vérifie que chaque nature citée par une carte est connue.
+
 ## Grands lieux par tuiles (ADR 0022)
 
 Une carte qui a un `terrain` (produite par `outils/plan-vers-lieu.ts`) est rendue par tuiles de 32 m; les meubles et objets posés passent toujours par `lieu.ts`.

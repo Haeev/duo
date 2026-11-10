@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "porte-bagages",
+  "name": "Porte-bagages",
+  "model": "train-luggage-rack",
+  "size": {
+    "w": 3,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": []
+}

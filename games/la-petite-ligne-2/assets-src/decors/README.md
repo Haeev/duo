@@ -27,6 +27,7 @@ Preuve: `chair-farm-sage` (coloris sauge de la chaise de ferme) tient en 3 ligne
 - Bords arrondis (biseau à 2 segments, arêtes posées au sol laissées vives) et normales pondérées par l'aire: grandes faces planes, arrondis doux, aucun coin vif.
 - Maisons: deux enfants, `<id>_walls` (murs, soubassement, portes, fenêtres, devanture) et `<id>_roof` (toit, faîtière, cheminée), pour effacer le toit seul. Panneaux posés devant le mur (6 mm), jamais en retrait.
 - Accroches au manifeste (repère du jeu: x est, y sud): `seat` (dessus de l'assise, bord avant), `top` (plateau), `bed` (couchage), `doors` (milieu du seuil dehors, hauteur), `collision` (boîte ou cylindre de tronc).
+- Voiture de train (fichier `train`): les parois, portes et angles (`paroi-voiture`, `porte-voiture`, `angle-caisse`) se posent au bord avant de leur case de 1 m, face intérieure sur la limite de la case; tout le reste est centré, et le mobilier mural (tablette, filet, applique) se cale contre la paroi par sa position dans la carte. Montage complet: `donnees/lieux/train-de-nuit/carte.json`.
 - Cotes contrôlées par `verifier_decors.py`: assise 0,43 à 0,47 m, plateau de table 0,73 à 0,77 m, couchage 0,45 à 0,55 m, porte de 2,0 à 2,2 m, budget de triangles par famille (`[budgets]`), emprise d'un meuble dans les cases de sa fiche.
 
 ## Fichiers

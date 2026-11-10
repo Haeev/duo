@@ -439,7 +439,170 @@ def souche(m, p, c):
     return {"plateau": {"hauteur": 0.40}}
 
 
+# ---------------------------------------------------------------- voiture de train (intérieur)
+# Cotes d'une voiture de grande ligne ancienne: caisse de 3 m entre parois (grille de 1 m), plafond bas
+# (parois de 2,15 m), banquettes de 1 m de large et 0,45 m d'assise, dossier haut. Les parois et les
+# angles se posent au BORD AVANT de leur case de 1 m (la face intérieure tombe pile sur la limite de
+# la case, la case du mur est bloquée par la fiche); le mobilier est centré sur son emprise et se
+# cale contre la paroi par la position de la carte (centre à 3,0 + profondeur / 2, par exemple).
+
+
+def _pan(m, c, caisse, x, largeur, z, hauteur, y0, e, slot):
+    """Morceau de paroi: face intérieure de couleur `slot`, peau extérieure peinte `caisse`."""
+    m.boite((largeur, e - 0.03, hauteur), (x, y0 + (e - 0.03) / 2, z), *c(slot), arrondi=0.008, seg=1)
+    m.boite((largeur, 0.03, hauteur), (x, y0 + e - 0.015, z), caisse, "fixe", arrondi=0.008, seg=1)
+
+
+def _reflet(m, x, y, z, haut, large=0.05):
+    """Reflet de la vitre: un trait clair incliné, collé devant le verre (côté intérieur)."""
+    m.boite((large, 0.004, haut), (x, y, z), "reflet", "fixe", arrondi=0.0, rot=(0, 35, 0))
+
+
+def paroi_voiture(m, p, c):
+    L, e, H = p.get("longueur", 1.0), p.get("epaisseur", 0.14), p.get("hauteur", 2.15)
+    y0 = -p.get("case", 1.0) / 2
+    caisse = p.get("caisse", "vert_sombre")
+    allege, linteau = p.get("allege", 0.85), p.get("linteau", 1.70)
+    if not p.get("fenetre", True):
+        _pan(m, c, caisse, 0, L, 0, allege, y0, e, "bois")
+        _pan(m, c, caisse, 0, L, allege, H - allege, y0, e, "peinture")
+        if p.get("cadre", False):
+            # Plan de la ligne encadré, au-dessus des dossiers (1,15 m) pour ne rien toucher.
+            m.boite((0.52, 0.015, 0.36), (0, y0 - 0.0075, 1.30), *c("bois"), arrondi=0.004, seg=1)
+            m.boite((0.44, 0.006, 0.28), (0, y0 - 0.018, 1.34), "craie", "fixe", arrondi=0.0)
+            m.boite((0.34, 0.004, 0.012), (0, y0 - 0.022, 1.47), "rouge_cheminot", "fixe", arrondi=0.0, rot=(0, -8, 0))
+        return {}
+    pied = p.get("trumeau", 0.10)
+    wf = L - 2 * pied
+    _pan(m, c, caisse, 0, L, 0, allege, y0, e, "bois")
+    for sx in (-1, 1):
+        _pan(m, c, caisse, sx * (L / 2 - pied / 2), pied, allege, linteau - allege, y0, e, "peinture")
+    _pan(m, c, caisse, 0, L, linteau, H - linteau, y0, e, "peinture")
+    # Vitre en retrait de 6 cm: la nuit derrière, deux reflets devant.
+    yv = y0 + 0.06
+    m.boite((wf, 0.012, linteau - allege), (0, yv, allege), "vitre_nuit", "fixe", arrondi=0.0)
+    _reflet(m, -0.25 * wf / 0.8, yv - 0.008, allege + 0.13, 0.55)
+    _reflet(m, 0.0, yv - 0.008, allege + 0.30, 0.30, large=0.025)
+    # Lambrequin sous le linteau (rien sous 1,58 m: les dossiers de 1,15 m passent devant).
+    m.boite((wf + 0.04, 0.025, 0.12), (0, y0 - 0.0125, linteau - 0.12), *c("tissu"), arrondi=0.008, seg=1)
+    return {}
+
+
+def angle_caisse(m, p, c):
+    # Montant d'angle: bouche le coin de e x e où deux parois se rejoignent (coin avant droit de la case).
+    e, H = p.get("epaisseur", 0.14), p.get("hauteur", 2.15)
+    demi = p.get("case", 1.0) / 2
+    m.boite((e, e, H), (demi - e / 2, -demi + e / 2, 0), p.get("caisse", "vert_sombre"), "fixe", arrondi=0.008, seg=1)
+    return {}
+
+
+def porte_voiture(m, p, c):
+    L, e, H = p.get("longueur", 1.0), p.get("epaisseur", 0.14), p.get("hauteur", 2.15)
+    y0 = -p.get("case", 1.0) / 2
+    caisse = p.get("caisse", "vert_sombre")
+    pied, hp, lp = 0.10, p.get("hauteur_porte", 2.0), L - 0.20
+    for sx in (-1, 1):
+        _pan(m, c, caisse, sx * (L / 2 - pied / 2), pied, 0, hp, y0, e, "peinture")
+    _pan(m, c, caisse, 0, L, hp, H - hp, y0, e, "peinture")
+    # Vantail en retrait de 3 cm, peint comme la caisse dehors; hublot et reflet; poignée de laiton.
+    m.boite((lp, e - 0.042, hp - 0.02), (0, y0 + 0.03 + (e - 0.042) / 2, 0.02), *c("bois"), arrondi=0.01, seg=1)
+    m.boite((lp, 0.012, hp - 0.02), (0, y0 + e - 0.006, 0.02), caisse, "fixe", arrondi=0.0)
+    m.boite((0.46, 0.008, 0.58), (0, y0 + 0.026, 1.20), "vitre_nuit", "fixe", arrondi=0.0)
+    m.boite((0.46, 0.008, 0.58), (0, y0 + e + 0.002, 1.20), "vitre_nuit", "fixe", arrondi=0.0)
+    _reflet(m, -0.14, y0 + 0.020, 1.30, 0.38, large=0.035)
+    m.boite((0.12, 0.03, 0.025), (lp / 2 - 0.12, y0 + 0.015, 1.00), *c("metal"), arrondi=0.008, seg=1)
+    m.boite((lp, e, 0.02), (0, y0 + e / 2, 0), *c("metal"), arrondi=0.004, seg=1)
+    return {}
+
+
+def banquette_train(m, p, c):
+    # Banquette de deux places, dossier haut, avant au sud; accoudoirs aux deux bouts.
+    L, d, h = p.get("largeur", 1.0), p.get("profondeur", 0.65), p.get("assise", 0.45)
+    haut = p.get("dossier", 1.15)
+    m.boite((L - 0.04, d - 0.14, 0.30), (0, 0.04, 0), *c("bois"), arrondi=0.015)
+    # Panneau arrière de bois, de fond en haut du dossier: deux banquettes dos à dos se touchent.
+    m.boite((L, 0.05, haut), (0, d / 2 - 0.025, 0), *c("bois"), arrondi=0.015)
+    m.boite((L - 0.12, d - 0.17, 0.15), (0, -d / 2 + (d - 0.17) / 2 + 0.005, 0.30), *c("tissu"), arrondi=0.035, seg=2)
+    # Coussin du dossier incliné de 6 degrés: son haut reste devant le panneau arrière.
+    m.boite((L - 0.12, 0.12, haut - h - 0.05), (0, d / 2 - 0.14, h + 0.01), *c("tissu"), arrondi=0.035, seg=2, rot=(-6, 0, 0))
+    for sx in (-1, 1):
+        m.boite((0.06, d - 0.06, h + 0.20), (sx * (L / 2 - 0.03), 0.03, 0), *c("bois"), arrondi=0.02)
+        # Têtière blanche sur le dossier, une par place (le tissu se salit, on change la têtière).
+        zt = haut - 0.24
+        m.boite((0.32, 0.01, 0.17), (sx * 0.22, d / 2 - 0.20 + (zt - h - 0.01) * 0.105 - 0.004, zt), "craie", "fixe",
+                arrondi=0.004, seg=1, rot=(-6, 0, 0))
+    return {"assise": {"hauteur": h, "avant": d / 2}}
+
+
+def couchette_train(m, p, c):
+    # Deux banquettes tirées l'une vers l'autre: couchette plate de 1,74 m entre deux dossiers hauts,
+    # oreiller au dos (+Y), couverture sur les pieds (avant, -Y).
+    L, Lg, haut = p.get("largeur", 1.0), p.get("longueur", 2.0), p.get("couchage", 0.48)
+    dos = p.get("dossier", 1.15)
+    m.boite((L - 0.04, Lg - 0.12, 0.30), (0, 0, 0), *c("bois"), arrondi=0.015)
+    m.boite((L - 0.12, Lg - 0.26, haut - 0.30), (0, 0, 0.30), *c("tissu"), arrondi=0.035, seg=2)
+    for sy in (-1, 1):
+        m.boite((L, 0.05, dos), (0, sy * (Lg / 2 - 0.025), 0), *c("bois"), arrondi=0.015)
+        m.boite((L - 0.12, 0.08, dos - haut - 0.05), (0, sy * (Lg / 2 - 0.05 - 0.04), haut), *c("tissu"), arrondi=0.03, seg=2)
+    for sx in (-1, 1):
+        m.boite((0.06, Lg - 0.06, haut + 0.12), (sx * (L / 2 - 0.03), 0, 0), *c("bois"), arrondi=0.02)
+    m.boite((0.58, 0.30, 0.11), (0, Lg / 2 - 0.15 - 0.15, haut), "craie", "fixe", arrondi=0.045, seg=2)
+    m.boite((L - 0.14, 0.95, 0.045), (0, -Lg / 2 + 0.13 + 0.475, haut), p.get("couverture", "moutarde"), "fixe",
+            arrondi=0.02, seg=2)
+    m.boite((L - 0.13, 0.12, 0.05), (0, -Lg / 2 + 0.13 + 0.95, haut), "craie", "fixe", arrondi=0.02, seg=2)
+    return {"couchage": {"hauteur": haut, "places": 1}}
+
+
+def tablette(m, p, c):
+    # Tablette fixée à la paroi (dos au nord, +Y), un pied central: on y pose un gobelet.
+    w, d, h = p.get("largeur", 0.45), p.get("profondeur", 0.55), p.get("plateau", 0.75)
+    m.boite((w, d, 0.035), (0, 0, h - 0.035), *c("bois"), arrondi=0.015)
+    m.boite((w - 0.10, 0.03, 0.22), (0, d / 2 - 0.015, h - 0.25), *c("metal"), arrondi=0.008, seg=1)
+    m.boite((0.05, d - 0.12, 0.05), (0, 0.03, h - 0.085), *c("metal"), arrondi=0.01, seg=1)
+    m.cylindre(0.025, h - 0.085, (0, -d / 2 + 0.16, 0), *c("metal"), pans=10)
+    m.cylindre(0.09, 0.02, (0, -d / 2 + 0.16, 0), *c("metal"), pans=14, arrondi=0.006)
+    return {"plateau": {"hauteur": h}}
+
+
+def porte_bagages(m, p, c):
+    # Filet à bagages fixé à la paroi (dos +Y) à 1,80 m: consoles, deux tringles, fond à lattes, valises.
+    # Rien sous 1,71 m contre la paroi: les lambrequins des fenêtres montent à 1,70 m.
+    L, d, z = p.get("longueur", 2.6), p.get("profondeur", 0.40), p.get("hauteur", 1.80)
+    n = max(2, round(L / 1.2) + 1)
+    for k in range(n):
+        x = -L / 2 + 0.05 + k * (L - 0.10) / (n - 1)
+        m.boite((0.03, 0.04, 0.26), (x, d / 2 - 0.02, z - 0.08), *c("metal"), arrondi=0.008, seg=1)
+        m.boite((0.03, d - 0.02, 0.03), (x, 0.01, z), *c("metal"), arrondi=0.008, seg=1)
+        # Jambe de force: du bas de la console, contre la paroi, jusque sous le bras.
+        m.boite((0.025, 0.025, 0.15), (x, d / 2 - 0.03, z - 0.075), *c("metal"), arrondi=0.006, seg=1, rot=(61, 0, 0))
+    for y in (-d / 2 + 0.02, d / 2 - 0.03):
+        m.cylindre(0.012, L, (-L / 2, y, z + 0.045), *c("metal"), pans=8, rot=(0, 90, 0))
+    m.boite((L - 0.04, d - 0.08, 0.012), (0, 0.0, z + 0.03), *c("bois"), arrondi=0.004, seg=1)
+    # Valises couchées entre les deux tringles: [x, largeur, profondeur (0,28 au plus), épaisseur, couleur].
+    for (x, larg, prof, ep, couleur) in p.get("valises", []):
+        m.boite((larg, prof, ep), (x, 0.0, z + 0.042), couleur, "fixe", arrondi=0.025, seg=2)
+        m.boite((0.14, 0.025, 0.035), (x, -prof / 2 - 0.01, z + 0.042 + ep / 2 - 0.02), "chocolat", "fixe",
+                arrondi=0.01, seg=1)
+        for sx in (-1, 1):
+            m.boite((0.04, prof + 0.006, ep + 0.004), (x + sx * larg * 0.3, 0.0, z + 0.04), "ficelle", "fixe",
+                    arrondi=0.008, seg=1)
+    return {}
+
+
+def applique(m, p, c):
+    # Applique murale (dos +Y): platine, bras, tulipe ambrée ouverte vers le haut, lumière chaude.
+    d, z = p.get("profondeur", 0.18), p.get("hauteur", 1.45)
+    m.boite((0.10, 0.02, 0.20), (0, d / 2 - 0.01, z), *c("metal"), arrondi=0.008, seg=1)
+    m.cylindre(0.012, 0.11, (0, d / 2 - 0.02, z + 0.10), *c("metal"), pans=8, rot=(90, 0, 0))
+    m.cylindre(0.035, 0.13, (0, -d / 2 + 0.075, z + 0.09), "ambre_clair", "fixe", pans=14, rayon_haut=0.075, arrondi=0.008)
+    m.boule(0.032, (0, -d / 2 + 0.075, z + 0.20), "ambre", "fixe", pans=10, anneaux=6)
+    return {}
+
+
 FAMILLES = {
+    "paroi-voiture": paroi_voiture, "angle-caisse": angle_caisse, "porte-voiture": porte_voiture,
+    "banquette-train": banquette_train, "couchette-train": couchette_train, "tablette": tablette,
+    "porte-bagages": porte_bagages, "applique": applique,
     "chaise": chaise, "tabouret": tabouret, "banc": banc, "table": table, "lit": lit, "armoire": armoire,
     "coffre": coffre, "etagere": etagere, "rechaud": rechaud, "evier": evier, "pompe": pompe,
     "baignoire": baignoire, "lampe": lampe, "tapis": tapis, "reverbere": reverbere, "poteau-quai": poteau_quai,

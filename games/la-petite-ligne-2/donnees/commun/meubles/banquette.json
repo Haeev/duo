@@ -1,20 +1,21 @@
 {
   "schema": 1,
   "id": "banquette",
-  "name": "Banquette de compartiment",
-  "model": "banc",
+  "name": "Couchette",
+  "model": "train-berth",
   "size": {
-    "w": 2,
-    "h": 1
+    "w": 1,
+    "h": 2
   },
   "solid": true,
   "placeable": false,
-  "series": null,
+  "series": "voiture-de-nuit",
   "bricks": [
     {
       "brick": "sleep",
       "places": 1,
-      "wakeAt": 85
+      "wakeAt": 85,
+      "lie": { "height": 0.48, "pillow": 0.7, "spacing": 0.9 }
     }
   ]
 }

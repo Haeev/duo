@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "applique",
+  "name": "Applique",
+  "model": "train-wall-lamp",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": []
+}

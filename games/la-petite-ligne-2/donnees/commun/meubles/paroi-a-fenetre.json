@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "paroi-a-fenetre",
+  "name": "Paroi à fenêtre",
+  "model": "train-wall-window",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": []
+}

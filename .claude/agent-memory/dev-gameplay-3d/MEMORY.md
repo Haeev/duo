@@ -642,3 +642,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 
 - Chromium rejoue `mouseover`/`mouseenter` quand le contenu passe sous un pointeur immobile (carnet qui monte du bas). Le pointeur des parcours e2e reste où Playwright a cliqué (« Héberger et continuer »): `mouseenter` mettait le focus du carnet sur la case 5. Le survol passe par `onPointerHover` (`src/interface/dom.ts`, `mousemove` avec `movementX/Y` non nuls); test garde-fou `tests/survol.test.ts`.
 - Dans le carnet, les chiffres 1 à 5 ne font rien: viser une case par D (ou les flèches) depuis la case 1.
+
+## Intérieur clos d'un petit lieu: le wagon du train de nuit (La Petite Ligne 2, vérifié le 2026-11-10)
+
+- Collisions à la case de 1 m (rayon du corps 0,3): deux banquettes de 1 m et un couloir libre imposent 3 cases, donc 3 m entre parois, pas 2,8. Un meuble solide hors des cases (centre à 3,6) prend deux cases et bouche le couloir.
+- Murs d'un intérieur sans dalles: parois en meubles solides 1 x 1 dont la géométrie est au bord avant de la case (face intérieure sur la limite), angles en montants e x e; `blocked` vide. Les dalles de `blocked` (0,12 m, gris violet) se voient sinon dehors.
+- La touche d'action prend la première brique utilisable: `sit` puis `sleep` sur un même meuble rend le sommeil inaccessible. Un meuble par geste (banquette assise, couchette couchée).
+- Places assises: la place 0 est à droite de qui s'assoit; deux banquettes face à face donnent des places en diagonale.
+- Occultation: un meuble de carte s'efface s'il dépasse `occlusion.minHeight` (1,1 m); sa hauteur vient du manifeste des décors (`description.ts`), sinon 0,9 m. Une paroi de 2,15 m à 0,9 m ne s'effaçait jamais.
+- Parcours e2e en rendu logiciel: le geste « s'asseoir » met plusieurs secondes réelles; attendre l'état (`objects[id].sit` contient l'index) avant la capture. `acte-1.spec.ts` D1 échoue déjà sur la base (Aubrune, délai), P18b est instable.
+- Régénérer les décors réécrit tous les GLB (octets différents, même contenu): remettre par `git checkout` ceux dont le manifeste ne change pas.

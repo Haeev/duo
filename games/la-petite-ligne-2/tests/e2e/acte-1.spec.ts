@@ -39,10 +39,10 @@ test('P18 départ: la fin du prologue mène les deux sur le quai d’Aubrune', a
   const duo = await startDuo(browser, 'depart', { save: 'train-de-nuit-porte' });
   const { host, guest } = duo;
   await duo.until(host, 'dans le train', (w) => w.common.place === 'train-de-nuit');
-  // Les deux se retrouvent devant la porte du wagon (13,5; 9,2): l'étape « descendre » finit le
-  // prologue, dont l'effet fait partir le train vers Aubrune.
-  await duo.teleport(0, 13.1, 9.2, Math.PI / 2);
-  await duo.teleport(1, 13.9, 9.2, Math.PI / 2);
+  // Les deux se retrouvent devant la porte du wagon (point `porte`, 8,35; 5,35): l'étape
+  // « descendre » finit le prologue, dont l'effet fait partir le train vers Aubrune.
+  await duo.teleport(0, 8.05, 5.35, Math.PI / 2);
+  await duo.teleport(1, 8.65, 5.35, Math.PI / 2);
   await duo.until(host, 'en route', (w) => w.common.phase === 'travel');
   for (const side of [host, guest])
     await duo.until(

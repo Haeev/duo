@@ -64,6 +64,17 @@ export const PlaceSchema = v.strictObject({
   fishing: v.exactOptional(v.pipe(v.array(FishingSpotSchema), v.maxLength(12))),
   /** Note de placement: pourquoi ce lieu est là et fait ce qu'il fait. Ignorée du moteur (`donnees/pourquoi.ts`). */
   pourquoi: v.exactOptional(TextSchema),
+  /**
+   * Ambiance lumineuse d'un lieu clos (facultative): lumière des lampes du lieu la nuit et teinte
+   * du dehors. Donnée seulement pour l'instant: le rendu ne la lit pas encore.
+   */
+  ambience: v.exactOptional(
+    v.strictObject({
+      indoor: v.boolean(),
+      lamps: v.pipe(v.string(), v.regex(/^#[0-9a-f]{6}$/)),
+      outside: v.pipe(v.string(), v.regex(/^#[0-9a-f]{6}$/)),
+    }),
+  ),
 });
 export type PlaceDef = v.InferOutput<typeof PlaceSchema>;
 
@@ -245,6 +256,20 @@ export const DoorSchema = v.strictObject({
 });
 export type DoorDef = v.InferOutput<typeof DoorSchema>;
 
+/**
+ * Sol dessiné d'un petit lieu (sans `terrain`): la nature de toutes les cases, puis des rectangles
+ * d'autres natures, peints dans l'ordre. Les natures sont celles du rendu (`GROUND_LOOKS` de
+ * `rendu/lieu/reglages-tuiles.ts`: `plancher`, `tapis-de-couloir`, `vide` pour ne rien dessiner).
+ * Il ne bloque rien. Absent: la plaque d'essai.
+ */
+export const FloorSchema = v.strictObject({
+  nature: IdSchema,
+  areas: v.exactOptional(
+    v.pipe(v.array(v.strictObject({ ...RectSchema.entries, nature: IdSchema })), v.maxLength(64)),
+  ),
+});
+export type FloorDef = v.InferOutput<typeof FloorSchema>;
+
 const mapCore = {
   schema: FileVersionSchema,
   /** Zones où l'on ne marche pas (murs, eau, bâtiments). */
@@ -267,6 +292,7 @@ export const MapSchema = v.strictObject({
    */
   outdoor: v.optional(RectSchema),
   terrain: v.optional(TerrainSchema),
+  floor: v.optional(FloorSchema),
   zones: v.optional(v.record(IdSchema, ZoneSchema)),
   locks: v.optional(v.record(IdSchema, LockSchema)),
   /** Graphe des chemins tiré du plan: les habitants marchent dessus (absent: A* sur la grille). */

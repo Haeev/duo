@@ -10,6 +10,11 @@
   "height": 24,
   // Zones où l'on ne marche pas (murs, eau, voie).
   "blocked": [{ "x": 0, "y": 0, "w": 24, "h": 2 }],
+  // Facultatif, petit lieu seulement: le sol dessiné, une nature pour tout puis des rectangles peints
+  // dans l'ordre (natures de `src/rendu/lieu/reglages-tuiles.ts`: "plancher", "tapis-de-couloir",
+  // "vide" pour ne rien dessiner, "herbe"...). Absent: la plaque d'essai. Exemple d'intérieur clos:
+  // lieux/train-de-nuit/carte.json (murs posés comme meubles solides, rien dans "blocked").
+  // "floor": { "nature": "vide", "areas": [{ "x": 2, "y": 3, "w": 7, "h": 3, "nature": "plancher" }] },
   // Points nommés: la gare, les postes des habitants, les repères de quête.
   "points": {
     "descente": { "x": 12, "y": 5 },

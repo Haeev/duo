@@ -27,4 +27,7 @@
   // Note de placement (facultative, ignorée du moteur): pourquoi ce lieu existe et est fait ainsi.
   // `pnpm pourquoi` liste ce qui n'en a pas (règle « cohérence du monde » de CLAUDE.md).
   "pourquoi": "Lieu d'exemple: sert de modèle.",
+  // Facultatif, lieu clos: lumière des lampes la nuit et teinte du dehors (donnée seulement: le
+  // rendu ne la lit pas encore). Exemple: lieux/train-de-nuit/lieu.json.
+  // "ambience": { "indoor": true, "lamps": "#ffc27a", "outside": "#05070d" },
 }
