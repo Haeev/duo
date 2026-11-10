@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "table-de-chevet-campagne",
+  "name": "Table de chevet",
+  "makes": {
+    "kind": "furniture",
+    "variants": [
+      {
+        "color": "#c8955a",
+        "item": "table-de-chevet-miel"
+      },
+      {
+        "color": "#8fa27c",
+        "item": "table-de-chevet-sauge"
+      }
+    ]
+  },
+  "station": "workbench",
+  "materials": [
+    {
+      "item": "planche",
+      "count": 3
+    }
+  ],
+  "work": 36,
+  "source": "start",
+  "series": "campagne"
+}

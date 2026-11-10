@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "pierre-a-aiguiser",
+  "name": "Pierre à aiguiser",
+  "family": "supply",
+  "stack": 5,
+  "food": null,
+  "tool": null
+}

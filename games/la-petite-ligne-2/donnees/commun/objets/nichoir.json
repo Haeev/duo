@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "nichoir",
+  "name": "Nichoir",
+  "family": "material",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

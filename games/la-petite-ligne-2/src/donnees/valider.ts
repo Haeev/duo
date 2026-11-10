@@ -22,6 +22,7 @@ import { validateStory } from '../simulation/quetes/valider';
 import { checkRecipes } from '../simulation/cuisine/valider';
 import { validateHousings } from '../simulation/logement/valider';
 import { validatePassages } from '../simulation/lieux/valider';
+import { checkPlans } from '../simulation/fabrication/valider';
 
 export function checkCondition(
   content: Content,
@@ -484,6 +485,7 @@ export function validateContent(content: Content): string[] {
   }
   for (const prop of Object.values(content.props)) checkBricks(content, prop, problems);
   problems.push(...checkRecipes(content));
+  problems.push(...checkPlans(content));
   for (const recipe of Object.values(content.recipes)) {
     for (const portion of [...recipe.inputs, recipe.output]) {
       if (!(portion.item in content.items))

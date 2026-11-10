@@ -57,6 +57,7 @@ describe('gabarits', () => {
         'meuble',
         'objet',
         'piece-de-personnage',
+        'plan',
         'prise',
         'quete',
         'recette',

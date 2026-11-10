@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "tabouret-miel",
+  "name": "Tabouret miel",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

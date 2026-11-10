@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "coffre-a-linge-sauge",
+  "name": "Coffre à linge sauge",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

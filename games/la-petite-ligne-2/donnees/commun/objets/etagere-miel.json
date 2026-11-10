@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "etagere-miel",
+  "name": "Étagère miel",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

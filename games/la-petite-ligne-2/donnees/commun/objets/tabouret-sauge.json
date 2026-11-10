@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "tabouret-sauge",
+  "name": "Tabouret sauge",
+  "family": "furniture",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

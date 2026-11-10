@@ -11,6 +11,7 @@ import { fishingSystem } from '../peche/index';
 import { brickSystem } from '../briques/index';
 import { shopSystem } from '../commerces/index';
 import { cookingSystem } from '../cuisine/index';
+import { craftSystem } from '../fabrication/index';
 import { dialogueSystem } from '../dialogues/index';
 import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
@@ -70,6 +71,7 @@ export const SYSTEMS: readonly GameSystem[] = [
   questSystem,
   sceneSystem,
   cookingSystem,
+  craftSystem,
   worldTimeSystem,
   collectionSystem,
   housingSystem,

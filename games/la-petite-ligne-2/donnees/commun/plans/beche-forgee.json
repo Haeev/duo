@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "beche-forgee",
+  "name": "Bêche forgée",
+  "makes": {
+    "kind": "upgrade",
+    "from": "beche"
+  },
+  "station": "forge",
+  "materials": [],
+  "work": 1,
+  "source": "start",
+  "series": null,
+  "delay": "next-day"
+}
