@@ -700,3 +700,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Captures d'un passage de 0,4 s en rendu logiciel: une rafale de `page.screenshot` pendant la marche (une image du jeu vaut 0,1 s au plus dans le rendu) attrape le noir. Cadrer par `__lplSonde.setCamera(lacet, largeur)`: une porte sur le mur est d'un bâtiment est cachée au lacet de départ (45 degrés), visible à 225.
 - Le fond uni d'un lieu clos passe par `InkFrame.backdrop`; `InkFrame.place` forcerait aussi les lampes.
 
+
+## Sol en relief des grands lieux (La Petite Ligne 2, vérifié le 2026-11-10)
+
+- Le nuanceur encré forçait la normale du sol vers le haut et la passe de contour ne cerne jamais le sol (morceau 0): un relief de sol ne se lit que par le ton. La pente vraie entre dans le choix des trois tons (`INK_SETTINGS.ground.slopeTone`); une pente de 5 % suffit.
+- Dalles en volume: un dessus et quatre flancs par dalle, toutes morceaux (`part`) d'une même pièce au code fixe (`piece(inkCode(0, 99))`): trait fin aux joints, trait fort au bord du dallage, aucun trait au raccord de deux tuiles. Donner à tous les morceaux la même classe de taille, sinon les hachures d'ombre paraissent sur une dalle et pas sur sa voisine (`inkGain` dépend de la classe).
+- Hauteur continue entre cases: chaque terme doit être une fonction continue du point seul (distance au plus proche des cases d'une nature, poids nuls à 1 m). Un terme qui dépend de la case d'où l'on calcule, ou de l'ordre de parcours des voisins, ouvre une fente.
+- La table du moteur (à 1,2 cm sous le sol) cachait l'eau des tuiles (à 16 cm sous le sol) en rendu encré: le ruisseau d'Aubrune ne se voyait pas. Dehors, la table descend sous le relief (`RELIEF_SETTINGS.tableDrop`); dans une pièce elle reste le plancher.
+- Le biais de l'ombre du soleil vaut 14 cm (0,0009 sur 160 m de profondeur): rien de plus bas ne porte d'ombre. Le sol en relief sort donc de la passe d'ombre (moins d'appels qu'avant), les rails passent dans les boîtes instanciées.
+- Sol par morceaux de 16 m plutôt que par tuile de 32 m: Three.js écarte par sphère englobante, quatre tuiles entières passaient pour une vue de 18 m. Le surcoût à l'écran a été divisé par deux pour trois appels de plus par tuile.
+- Banc de rendu: `packages/sdk-dev/dist` doit exister (`pnpm --filter @duo/sdk-dev build`), sinon « le faux hôte s'est arrêté (code 1) ». Pour capturer l'invité en `?rendu=aplats`: `onGuestPage` pose une route après celle de la sonde (la dernière posée gagne).

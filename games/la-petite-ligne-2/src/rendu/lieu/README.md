@@ -38,3 +38,28 @@ Les pièces sont rangées côte à côte sur la grille du lieu, hors du dehors, 
 Portes (`doorVolumes` de `description.ts`, formes dans `formes.ts`): l'objet visible d'une porte est dessiné sur son seuil (`donnees/seuils.ts`) tant qu'aucun modèle n'est livré pour son meuble. Dans une pièce: encadrement et vantail à taille humaine (la cible de la touche d'action, qui s'efface devant la caméra comme tout volume haut) et paillasson, lisible au sol même quand le mur est coupé. Dehors: le paillasson seul, le bâtiment portant déjà sa porte. Porte au sol: cadre bas et marches. Réglages: `interior.door`, `mat`, `hatch`.
 
 Passage (`../passage.ts`): quand le joueur local est déplacé d'un coup (porte, replacement), l'image d'avant reste et s'éteint (`passage.outSeconds`), la caméra et les personnages se posent au noir, puis l'image revient (`inSeconds`). L'autre joueur disparaît à la porte sans glisser.
+
+## Sol en relief (rendu encré, règle « éviter le plat absolu »)
+
+Le sol d'un grand lieu n'est plus un plan. La hauteur est une affaire d'affichage: la simulation reste en 2D et ne lit rien d'ici (ni collisions, ni cases franchissables, ni vitesses). L'ancien rendu (`?rendu=aplats`) garde son sol plan.
+
+| Fichier              | Rôle                                                                                                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `reglages-relief.ts` | un profil par nature de sol (niveau, bosses, raccord, bourrelet ou fossé, dalles, bordures), emprises à niveau (portes, voies), maillage                                              |
+| `relief.ts`          | `Relief`: `heightAt(x, y)` pure et déterministe, tirée de la carte du lieu (natures, bâtiments, portes, voies); dalles et pierres de bordure en données (logique pure, sans Three.js) |
+| `relief-sol.ts`      | le maillage: sol souple en nappe lissée, serrée seulement là où le relief change; marches; dalles et bordures en petits volumes (une pièce de contour, un morceau par pierre)         |
+
+Niveaux: les sols posés par l'homme (rue, route, seuils, voie) restent à y = 0, l'herbe est 5 cm plus bas, les chemins de terre encore 7 cm (creusés, talus d'herbe sur leurs bords), le quai 12 cm plus haut, le fond de l'eau à 42 cm. Un sol `rigide` est plan et finit par une marche ou une bordure; un sol `souple` se raccorde en pente douce à ses voisins. Le sol est plan sous l'emprise de chaque bâtiment, de plain-pied devant chaque porte et sous chaque voie. Ce qui suit la hauteur: le maillage des tuiles, le décor et le semis (`tuile.ts`), les meubles et objets posés (`lieu.ts`), les pieds et l'ombre de contact des personnages (`CharacterFrame.ground`), les repères d'interface (`projectToScreen`).
+
+### Ajouter une nature de sol en relief (aucun code)
+
+1. La nature existe dans la légende de la carte (`terrain.legend`) et, pour sa teinte, dans `GROUND_LOOKS` de `reglages-tuiles.ts`.
+2. Dans `reglages-relief.ts`, ajoute une entrée à `profiles`, du nom de la nature. Sans entrée, elle prend le profil de sa surface (`bySurface`).
+3. `pourquoi`: la raison d'être de ce relief, en une phrase.
+4. `level`: hauteur en mètres par rapport au plan de la simulation (négatif: creusé).
+5. `edge`: `souple` (terre, herbe, eau) ou `rigide` (sol posé par l'homme).
+6. Souple: `bumps` (bosses), `spread` (largeur du raccord, 1 m au plus), `rim` (bourrelet ou fossé posé sur les voisins), `joins` (natures rigides rejointes de plain-pied).
+7. Rigide: `apron` (la terre remonte contre lui), `paving` (dalles en volume), `kerb` (bordure de pierre).
+8. Copie le profil le plus proche (`chemin` pour un sol creusé, `rue` pour un dallage) et ne change que ce qui diffère.
+9. `pnpm exec vitest run tests/rendu/relief.test.ts`: le test ajoute une nature factice et vérifie qu'elle paraît dans la hauteur et le maillage; un profil hors bornes est refusé avec son nom.
+10. Regarde le résultat: `pnpm exec vite build`, puis `pnpm exec playwright test --config tests/rendu-encre/playwright.config.ts relief` (captures et compteurs, avec le contrôle de `?rendu=aplats`).

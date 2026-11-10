@@ -44,6 +44,39 @@ export class GeometryBuilder {
     this.kind = kind;
   }
 
+  /**
+   * Rendu encré: pièce imposée à ce qui suit (0: aucune, le sol). Le même code d'une tuile à
+   * l'autre ne laisse aucun trait à leur raccord (un dallage qui continue).
+   */
+  piece(code: number): void {
+    this.pieceCode = code;
+  }
+
+  /** Rendu encré: morceau suivant (son trait intérieur), classé d'après `diagonal` (m); `null`: aucun. */
+  part(diagonal: number | null): void {
+    this.partCode = diagonal === null ? 0 : inkCode(this.parts++, diagonal);
+  }
+
+  /**
+   * Nappe à sommets partagés et normales lissées (sol en relief): positions et normales à plat
+   * (x, y, z par sommet), triangles par index dans la nappe.
+   */
+  sheet(
+    positions: readonly number[],
+    normals: readonly number[],
+    indices: readonly number[],
+    color: Color,
+  ): void {
+    const start = this.positions.length / 3;
+    for (let i = 0; i < positions.length; i += 3) {
+      this.positions.push(positions[i] ?? 0, positions[i + 1] ?? 0, positions[i + 2] ?? 0);
+      this.normals.push(normals[i] ?? 0, normals[i + 1] ?? 1, normals[i + 2] ?? 0);
+      this.colors.push(color.r, color.g, color.b);
+      this.inks.push(this.layer, this.pieceCode, this.kind, this.partCode);
+    }
+    for (const index of indices) this.indices.push(start + index);
+  }
+
   begin(id: string): void {
     this.open = { id, start: this.indices.length, vertex: this.positions.length / 3 };
   }

@@ -67,6 +67,7 @@ import type { BuildingSource } from './lieu/batiments';
 import { Spaces } from './lieu/espaces';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
+import { RELIEF_SETTINGS } from './lieu/reglages-relief';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
 import { Daylight, nightShare } from './lumiere';
 import { DEFAULT_GRAPHICS_OPTIONS, type GraphicsOptions } from './options';
@@ -278,6 +279,8 @@ class Engine implements GameRenderer {
   private readonly target = { x: 0, y: 0, speed: 0, facing: 0 };
   private readonly projected = new Vector3();
   private readonly screenPoint = { x: 0, y: 0 };
+  /** Hauteur du sol affiché sous un point de la carte (relief d'un grand lieu), 0 ailleurs. */
+  private readonly groundAt = (x: number, y: number): number => this.tiled?.heightAt(x, y) ?? 0;
   private readonly resolveAim = (id: string): Aimable | null =>
     this.place?.aimable(id) ?? this.characters.aimable(id);
   private frameMs = 0;
@@ -609,18 +612,7 @@ class Engine implements GameRenderer {
       undefined,
       !tiled,
     );
-    this.place = new PlaceScene(
-      description,
-      {
-        ground: this.groundMaterial,
-        standIn: this.standInMaterial,
-        ink: this.ink?.volume ?? null,
-        outside: place.def.ambience?.outside ?? null,
-      },
-      this.options.models ?? null,
-      !tiled,
-    );
-    this.scene.add(this.place.root);
+    // Le grand lieu d'abord: son relief donne la hauteur du sol à ce qui se pose dessus.
     if (tiled) {
       const buildings = this.options.buildings;
       this.tiled = new TiledPlace(
@@ -632,6 +624,20 @@ class Engine implements GameRenderer {
       );
       this.scene.add(this.tiled.root);
     }
+    this.place = new PlaceScene(
+      description,
+      {
+        ground: this.groundMaterial,
+        standIn: this.standInMaterial,
+        ink: this.ink?.volume ?? null,
+        outside: place.def.ambience?.outside ?? null,
+      },
+      this.options.models ?? null,
+      !tiled,
+      // Meubles et objets se posent sur le sol tel qu'il est affiché (relief d'un grand lieu).
+      (this.tiled?.relief ?? null) === null ? null : this.groundAt,
+    );
+    this.scene.add(this.place.root);
     this.ink?.setGround(
       this.tiled?.groundMap ?? this.place.groundMap,
       place.map.width,
@@ -740,6 +746,7 @@ class Engine implements GameRenderer {
       cameraYaw: this.rig.yawAngle(),
       visibleAt: this.visibleAt,
       hidden: this.hidden,
+      ground: (this.tiled?.relief ?? null) === null ? null : this.groundAt,
     });
 
     const shown = this.characters.playerPosition(local) ?? body;
@@ -797,6 +804,14 @@ class Engine implements GameRenderer {
         shown.y < outdoor.y ||
         shown.x > outdoor.x + outdoor.w ||
         shown.y > outdoor.y + outdoor.h);
+
+    // Sur un sol en relief, la table (le sol hors des tuiles) passe sous les creux: chemins,
+    // berges, fond de l'eau. Dans une pièce elle est cachée.
+    if (this.ink !== null)
+      this.table.position.y =
+        (this.tiled?.relief ?? null) === null
+          ? -INK_SETTINGS.ground.tableDrop
+          : -RELIEF_SETTINGS.tableDrop;
 
     this.draw(dt, world, pose.x, pose.y, radius, this.lights);
     this.measure(dt);
@@ -917,7 +932,7 @@ class Engine implements GameRenderer {
       this.screenPoint.y = OFF_SCREEN;
       return this.screenPoint;
     }
-    const point = this.projected.set(x, height, y);
+    const point = this.projected.set(x, height + this.groundAt(x, y), y);
     this.camera.updateMatrixWorld();
     point.project(this.camera);
     if (Math.abs(point.x) > 1 || Math.abs(point.y) > 1 || point.z > 1) return null;

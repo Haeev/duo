@@ -171,6 +171,8 @@ export interface TreeItem {
   crownRadius: number;
   crownHeight: number;
   color: string;
+  /** Hauteur du sol sous le tronc (sol en relief), posée à la construction de la tuile; absente: 0. */
+  ground?: number;
 }
 /** Boule (houppier, buisson): centre et demi-tailles. */
 export interface BlobItem {
