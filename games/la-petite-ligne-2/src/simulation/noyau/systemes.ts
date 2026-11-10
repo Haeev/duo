@@ -9,6 +9,7 @@ import type { Slice, WorldState } from '../../etat/monde';
 import { needsSystem } from '../besoins/index';
 import { brickSystem } from '../briques/index';
 import { dialogueSystem } from '../dialogues/index';
+import { housingSystem } from '../logement/index';
 import { bagSystem } from '../sac/index';
 import { travelSystem } from '../voyage/index';
 import type { Intent, StepInput } from './entrees';
@@ -47,4 +48,5 @@ export const SYSTEMS: readonly GameSystem[] = [
   bagSystem,
   needsSystem,
   dialogueSystem,
+  housingSystem,
 ];

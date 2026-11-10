@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "baquet-essai",
+  "name": "Baquet",
+  "model": "baquet-essai",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "campagne-essai",
+  "bricks": [
+    {
+      "brick": "relieve",
+      "verb": "Se laver",
+      "clip": "wash",
+      "seconds": 4,
+      "need": "hygiene",
+      "amount": 50,
+      "cap": 90
+    }
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}

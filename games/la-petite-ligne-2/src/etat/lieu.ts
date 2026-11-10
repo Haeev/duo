@@ -6,6 +6,7 @@ import * as v from 'valibot';
 import { FiniteSchema, IdSchema, IntSchema, PlayerIndexSchema } from '../donnees/schemas/communs';
 import { BrickStatesSchema } from './briques';
 import { BodySchema, StackSchema } from './joueur';
+import { HousingStateSchema } from './logement';
 
 const villagerSlow = {
   /** Déjà rencontré par chaque joueur. */
@@ -47,6 +48,8 @@ const placeSlow = {
   /** 80 au plus: au-delà, le rangement retire les plus anciens (budget de la tranche, `reseau/canaux.ts`). */
   ground: v.pipe(v.array(GroundItemSchema), v.maxLength(80)),
   nextGroundId: v.pipe(IntSchema, v.minValue(0)),
+  /** Logements du lieu (`simulation/logement/`), créés à la première visite. */
+  housing: v.exactOptional(v.record(IdSchema, HousingStateSchema)),
 } as const;
 
 /** Ce qui part dans la tranche « lieu »: tout, sauf les positions des habitants (canal rapide). */
@@ -67,5 +70,6 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
   for (const [id, villager] of Object.entries(place.villagers))
     villagers[id] = { met: villager.met, talkingWith: villager.talkingWith };
   const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId } = place;
-  return { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, villagers };
+  const slow = { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, villagers };
+  return place.housing === undefined ? slow : { ...slow, housing: place.housing };
 }

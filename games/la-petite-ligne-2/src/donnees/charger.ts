@@ -11,6 +11,7 @@ import { ShopSchema, type ShopDef } from './schemas/commerce';
 import { DialogueSchema, type DialogueDef } from './schemas/dialogue';
 import { VillagerSchema, type VillagerDef } from './schemas/habitant';
 import { MapSchema, PlaceSchema, type MapDef, type PlaceDef } from './schemas/lieu';
+import { HousingSchema, type HousingDef } from './schemas/logement';
 import { PropSchema, type PropDef } from './schemas/meuble';
 import { ItemSchema, type ItemDef } from './schemas/objets';
 import {
@@ -38,6 +39,8 @@ export interface PlaceContent {
   readonly dialogues: readonly DialogueDef[];
   readonly shops: ById<ShopDef>;
   readonly quests: ById<QuestLineDef>;
+  /** Logements du lieu (`logements/<id>.json`). */
+  readonly housings: ById<HousingDef>;
 }
 
 /** Tout le contenu du jeu, lu et contrôlé. Il ne change jamais pendant une partie. */
@@ -145,12 +148,13 @@ export function loadContent(files: Files): Content {
     );
     const shops = parseFolder(ShopSchema, files, `${base}/commerces`, problems);
     const quests = parseFolder(QuestLineSchema, files, `${base}/quetes`, problems);
+    const housings = parseFolder(HousingSchema, files, `${base}/logements`, problems);
     if (def === null || map === null) continue;
     if (def.id !== folder)
       problems.push(
         `${path}: l'identifiant « ${def.id} » doit être le nom du dossier « ${folder} »`,
       );
-    places[def.id] = { def, map, villagers, dialogues, shops, quests };
+    places[def.id] = { def, map, villagers, dialogues, shops, quests, housings };
   }
 
   if (

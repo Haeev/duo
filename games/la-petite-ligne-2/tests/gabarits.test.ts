@@ -43,6 +43,7 @@ describe('gabarits', () => {
         'dialogue',
         'habitant',
         'lieu',
+        'logement',
         'meuble',
         'objet',
         'piece-de-personnage',

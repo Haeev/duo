@@ -14,6 +14,7 @@ import type { QuestLineDef } from './schemas/quete';
 import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
+import { validateHousings } from '../simulation/logement/valider';
 
 function checkCondition(content: Content, c: Condition, at: string, problems: string[]): void {
   switch (c.type) {
@@ -382,5 +383,6 @@ export function validateContent(content: Content): string[] {
   for (const place of Object.values(content.places)) checkPlace(content, place, problems);
   // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
   problems.push(...validateDialogueTexts(content));
+  problems.push(...validateHousings(content));
   return problems;
 }

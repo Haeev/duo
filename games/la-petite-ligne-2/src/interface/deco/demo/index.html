@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne (refonte): démonstration du mode déco</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #2a2522;
+      }
+      main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        height: 100%;
+      }
+      .vue {
+        position: relative;
+        overflow: hidden;
+      }
+      .vue > p {
+        position: absolute;
+        right: 0.5rem;
+        top: 0.25rem;
+        z-index: 2;
+        margin: 0;
+        padding: 0.125rem 0.5rem;
+        background: #fbf6e9;
+        font:
+          700 0.8125rem system-ui,
+          sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="vue" id="vue-0"><p>Écran de Camille</p></section>
+      <section class="vue" id="vue-1"><p>Écran de Sacha</p></section>
+    </main>
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

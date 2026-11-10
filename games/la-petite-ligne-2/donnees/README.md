@@ -30,6 +30,7 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
 | Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
 | Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | chapitres, étapes, conditions de fin, effets. |
+| Logement | `pnpm nouveau logement maison aubrune` | pièces (sol sur la carte, état de départ, étapes: matériaux, prix, travail, conditions d'histoire), portes, jardin, meubles possédés. Murs et trous de porte: `blocked` de la carte. Section `deco` d'un meuble posable: couche (`floor`, `rug`, `top`, `wall`), surface, dedans ou dehors, confort. |
 | Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |
 
 ## Briques (ce qu'un meuble sait faire)
