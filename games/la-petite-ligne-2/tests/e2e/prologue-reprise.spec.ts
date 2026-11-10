@@ -2,14 +2,30 @@
 // P19b: une vraie partie neuve SANS la sonde de recette (comme chez un joueur): l'éditeur de
 // personnage s'ouvre-t-il au démarrage, et que voit-on avec la première scène derrière ?
 // P20 (CA-34): quitter au milieu du prologue puis reprendre rend l'état de la dernière sauvegarde,
-// sans objet ni euro dupliqué.
+// sans objet ni euro dupliqué, chacun là où il était (D11). Les joueurs y marchent au clavier:
+// aucune téléportation.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { startDuo, type ProbeWorld } from '../aides-e2e/duo';
-import { Journal, me, playUi, seats, snapshot, type UiContext } from '../aides-e2e/prologue';
+import {
+  actOn,
+  calibrateYaw,
+  Journal,
+  loadMap,
+  me,
+  playUi,
+  seats,
+  shareSpots,
+  snapshot,
+  standSpots,
+  walkBoth,
+  windowSize,
+  type UiContext,
+} from '../aides-e2e/prologue';
 
 const QUEST = 'terminus';
+const PLACE = 'train-de-nuit';
 
 const newContext = (journal: Journal): UiContext => ({
   journal,
@@ -75,22 +91,37 @@ test('P20 quitter et reprendre au milieu du prologue (CA-34)', async ({ browser 
       if (!did.some(Boolean)) await d.host.page.waitForTimeout(250);
     }
   };
-  // La scène d'ouverture lue, puis les papiers de chacun (téléportés devant le Contrôleur: ce
-  // parcours teste la sauvegarde, pas la marche, déjà jouée par P19).
+  // La scène d'ouverture lue, puis chacun marche jusqu'au Contrôleur (cases libres à côté de lui,
+  // lues sur la carte) et lui montre ses papiers.
   await readAll(first, (w) => (w.common.story?.scene ?? null) === null, 90_000);
   const w0 = await first.host.world();
-  const ctrl = w0?.places['train-de-nuit']?.villagers?.controleur;
+  const ctrl = w0?.places[PLACE]?.villagers?.controleur;
   if (ctrl === undefined) throw new Error('Contrôleur absent');
+  const map = loadMap(PLACE);
+  await windowSize(first, true);
+  await calibrateYaw(first, journal);
+  const spots = await shareSpots(first, map, standSpots(map, ctrl.body, 2, [ctrl.body]), [
+    ctrl.body,
+  ]);
+  const walk = await walkBoth(first, spots, {
+    map,
+    journal,
+    label: 'P20: aller au Contrôleur',
+    avoid: [ctrl.body],
+  });
+  await windowSize(first, false);
+  expect(walk.state, 'les deux arrivent à pied près du Contrôleur').toEqual(['arrivé', 'arrivé']);
   for (const seat of [seatH, seatG]) {
-    await first.teleport(seat.index, ctrl.body.x - 1.1, ctrl.body.y + 0.2 * seat.index, 0);
-    await expect
-      .poll(async () => (await seat.side.aim(seat.index))?.id ?? '', { timeout: 20_000 })
-      .toContain('controleur');
-    // Un appui perdu entre deux images (2 images par seconde ici): on recommence.
-    for (let i = 0; i < 4 && (await snapshot(seat.side)).dialogue === null; i++) {
-      await seat.side.press('Space', 400);
-      await seat.side.page.waitForTimeout(2500);
-    }
+    // On n'appuie que si la bulle vise le Contrôleur (une couchette voisine peut prendre la visée).
+    const aimed = async (): Promise<boolean> => {
+      const aim = await seat.side.aim(seat.index);
+      return (aim?.id ?? '').includes('controleur') && (aim?.refusal ?? null) === null;
+    };
+    const talking = async (): Promise<boolean> => (await snapshot(seat.side)).dialogue !== null;
+    expect(
+      await actOn(first, seat, ctrl.body, aimed, talking, journal),
+      `${seat.side.who}: le dialogue du Contrôleur s’ouvre`,
+    ).toBe(true);
     await readAll(
       first,
       (w) => w.players[seat.index]?.toolbar.some((s) => s?.item === 'billet-poinconne') === true,
@@ -156,7 +187,7 @@ test('P20 quitter et reprendre au milieu du prologue (CA-34)', async ({ browser 
     second.host.shot('p20-3-reprise-hote'),
     second.guest.shot('p20-3-reprise-invite'),
   ]);
-  expect(after.common.place).toBe('train-de-nuit');
+  expect(after.common.place).toBe(PLACE);
   expect(quest(after)).toEqual(quest(before));
   expect(after.players.map((p) => p.money)).toEqual(before.players.map((p) => p.money));
   for (const i of [0, 1]) {
@@ -167,8 +198,19 @@ test('P20 quitter et reprendre au milieu du prologue (CA-34)', async ({ browser 
     const b = before.players[i];
     if (a === undefined || b === undefined) throw new Error('joueur absent');
     journal.log(
-      `P20 joueur ${String(i)}: position avant ${b.body.x.toFixed(1)}; ${b.body.y.toFixed(1)}, après ${a.body.x.toFixed(1)}; ${a.body.y.toFixed(1)}`,
+      `P20 joueur ${String(i)}: position avant ${b.body.x.toFixed(2)}; ${b.body.y.toFixed(2)}, après ${a.body.x.toFixed(2)}; ${a.body.y.toFixed(2)}`,
     );
+    // D11: chacun reparaît là où il était (30 cm de marge: le Contrôleur écarte qui le serre).
+    const saved = savedWorld?.players?.[i]?.body;
+    expect(saved, `position du joueur ${String(i)} dans le fichier`).toBeDefined();
+    expect(
+      Math.hypot(a.body.x - (saved?.x ?? 0), a.body.y - (saved?.y ?? 0)),
+      `joueur ${String(i)}: reparaît où la sauvegarde le place`,
+    ).toBeLessThan(0.3);
+    expect(
+      Math.hypot(a.body.x - b.body.x, a.body.y - b.body.y),
+      `joueur ${String(i)}: reparaît où il était en quittant`,
+    ).toBeLessThan(0.3);
   }
   expect(me(after, seatH).name.length).toBeGreaterThan(0);
   expect(second.errors).toEqual([]);

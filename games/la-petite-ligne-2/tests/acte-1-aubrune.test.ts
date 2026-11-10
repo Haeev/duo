@@ -10,6 +10,7 @@ import type { Sim } from '../src/simulation/noyau/pas';
 import { giveItem } from '../src/simulation/sac/actions';
 import { sceneView } from '../src/simulation/scenes/lecture';
 import { act, contentWith, contextOf, wait } from './aides-l3';
+import { lieDown, propsWithBrick } from './aides-prologue';
 import { newSim } from './aides';
 
 type Json = Record<string, unknown>;
@@ -204,10 +205,15 @@ describe('écriture du prologue et de l’acte 1', () => {
     sim.world.players[0].needs.hunger = Math.max(sim.world.players[0].needs.hunger, 90);
     wait(sim, 0.5);
     expect(passed(sim, 'terminus')).toContain('manger');
-    // Le tunnel, la nuit sur les banquettes (le saut de nuit est le lot des besoins: simulé ici).
+    // Le tunnel, puis la nuit: l'étape ne passe que les deux couchés (lits lus dans les données).
     playScene(sim);
-    setNeed(sim, 'sleep', 85);
-    wait(sim, 0.5);
+    const beds = propsWithBrick(sim.content, PROLOGUE, 'sleep');
+    const eveningDay = sim.world.common.day;
+    lieDown(sim, 0, beds[0] ?? '');
+    wait(sim, 1);
+    expect(passed(sim, 'terminus'), 'un seul couché: pas encore').not.toContain('dormir');
+    lieDown(sim, 1, beds[1] ?? '');
+    wait(sim, 1);
     expect(passed(sim, 'terminus')).toContain('dormir');
     playScene(sim);
     // Les deux devant la porte: l'étape finit le prologue, dont l'effet `travel_to` fait partir
@@ -215,7 +221,6 @@ describe('écriture du prologue et de l’acte 1', () => {
     if (sim.world.common.place === PROLOGUE) both(sim, 'porte');
     wait(sim, 0.5);
     expect(sim.world.progress.quests.terminus?.done).toBe(true);
-    const nightDay = sim.world.common.day;
     for (
       let i = 0;
       i < 40 && (sim.world.common.place !== AUBRUNE || sim.world.common.phase !== 'day');
@@ -227,7 +232,8 @@ describe('écriture du prologue et de l’acte 1', () => {
     // Train de nuit: on arrive toujours le lendemain à 8 h (« Il est 8 h », dit Firmin).
     expect(sim.world.minutes).toBeGreaterThanOrEqual(8 * 60);
     expect(sim.world.minutes).toBeLessThan(8 * 60 + 2);
-    expect(sim.world.common.day).toBe(nightDay + 1);
+    // La nuit dormie sur les couchettes n'est pas comptée deux fois par le trajet.
+    expect(sim.world.common.day).toBe(eveningDay + 1);
     expect(sim.world.common.place).toBe(AUBRUNE);
     wait(sim, 0.5);
 

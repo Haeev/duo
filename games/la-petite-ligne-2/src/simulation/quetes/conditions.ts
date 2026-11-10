@@ -5,6 +5,7 @@
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { StepCondition, StoryCondition } from '../../donnees/schemas/quete';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { postureOf } from '../briques/postures';
 import { onceKey } from '../dialogues/conversation';
 import { countHeld, evaluate, type RuleContext } from '../regles/conditions';
 import { sceneSeenOn } from './faits';
@@ -15,6 +16,7 @@ const STORY_TYPES: ReadonlySet<string> = new Set([
   'reach',
   'talked',
   'together',
+  'posture',
   'scene_seen',
   'quest_step',
 ]);
@@ -84,6 +86,12 @@ function evaluateStory(ctx: RuleContext, c: StoryCondition): boolean {
     }
     case 'together':
       return playersTogether(world, c.radius);
+    case 'posture': {
+      const state = world.places[placeId];
+      if (state === undefined) return false;
+      const holds = (p: PlayerIndex): boolean => postureOf(state, p)?.kind === c.posture;
+      return c.who === 'both' ? holds(0) && holds(1) : forActor(ctx, holds);
+    }
     case 'scene_seen':
       return sceneSeenOn(world, placeId, c.scene) !== null;
     case 'quest_step':

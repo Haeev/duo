@@ -42,6 +42,7 @@
           //   { "type": "reach", "point": "quai", "who": "one" }   (ou "both"; "radius" en m)
           //   { "type": "talked", "dialogue": "accueil", "node": "fin" }   (node facultatif)
           //   { "type": "together" }   { "type": "scene_seen", "scene": "..." }
+          //   { "type": "posture", "posture": "sleep", "who": "both" }   (assis: "sit"; "one" ou "both")
           //   { "type": "quest_step", "quest": "...", "step": "..." }
           "done": [
             { "type": "deliver", "item": "pomme", "count": 3, "villager": "cheffe-de-gare" },

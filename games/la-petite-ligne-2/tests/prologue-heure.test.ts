@@ -1,8 +1,7 @@
 // Recette du prologue (qa-testeur): l'heure à l'arrivée à Aubrune. Firmin dit « Il est 8 h et des
-// poussières »: c'est vrai quand les deux joueurs dorment ensemble (saut de nuit jusqu'à 6 h, puis
-// le trajet), faux quand un seul se couche (une sieste suffit à l'étape « dormir »: le train
-// arrive en pleine nuit). Le second cas est un défaut connu (`it.fails`): il devient rouge à la
-// correction, il faudra alors retirer `.fails`.
+// poussières »: l'étape « dormir » ne passe que les deux joueurs couchés (saut de nuit jusqu'à
+// 6 h, puis le trajet). Une sieste d'un seul ne la franchit plus (défaut D7: le train arrivait en
+// pleine nuit). Les lits se lisent dans les données (brique `sleep`), pas par leur identifiant.
 import { describe, expect, it } from 'vitest';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
@@ -10,6 +9,7 @@ import type { Sim } from '../src/simulation/noyau/pas';
 import { sceneView } from '../src/simulation/scenes/lecture';
 import { newSim } from './aides';
 import { act, contentWith, contextOf, wait } from './aides-l3';
+import { isLying, lieDown, propsWithBrick } from './aides-prologue';
 
 type Json = Record<string, unknown>;
 
@@ -58,22 +58,11 @@ function talk(sim: Sim, player: PlayerIndex, villager: string, option?: string):
   wait(sim, 0.3);
 }
 
-/** Se couche sur la banquette dont le point `bed` est le centre, comme un joueur face au lit. */
-function lieDown(sim: Sim, player: PlayerIndex, bed: string): void {
-  const prop = sim.content.places[PROLOGUE]?.map.objects.find((o) => o.id === bed);
-  if (prop === undefined) throw new Error(`banquette ${bed}`);
-  const body = sim.world.players[player].body;
-  body.x = prop.x;
-  body.y = prop.y + 1.6;
-  body.facing = -Math.PI / 2;
-  body.speed = 0;
-  wait(sim, 0.3);
-  act(sim, player, { type: 'act' });
-  wait(sim, 0.3);
-}
+const passedSleep = (sim: Sim): boolean =>
+  (sim.world.progress.quests.terminus?.passed ?? []).includes('dormir');
 
-/** Joue le prologue jusqu'à la descente; renvoie la minute du monde à l'arrivée à Aubrune. */
-function playPrologue(sleepers: readonly PlayerIndex[]): { day: number; minutes: number } {
+/** Joue le prologue jusqu'à l'étape « dormir », scène du tunnel lue; renvoie la partie et ses lits. */
+function untilBedtime(): { sim: Sim; beds: readonly string[] } {
   const sim = newGame();
   playScene(sim);
   talk(sim, 0, 'controleur');
@@ -84,19 +73,13 @@ function playPrologue(sleepers: readonly PlayerIndex[]): { day: number; minutes:
   wait(sim, 0.5);
   expect(sim.world.progress.quests.terminus?.step).toBe('dormir');
   playScene(sim);
-  // Le sommeil part de 78 (au lieu de 65) pour que la sieste d'un seul joueur reste courte.
-  for (const p of [0, 1] as const) sim.world.players[p].needs.sleep = 78;
-  const beds = ['banquette-ouest', 'banquette-est'] as const;
-  sleepers.forEach((p) => {
-    lieDown(sim, p, beds[p]);
-  });
-  for (
-    let i = 0;
-    i < 120 && !(sim.world.progress.quests.terminus?.passed ?? []).includes('dormir');
-    i++
-  )
-    wait(sim, 1);
-  expect(sim.world.progress.quests.terminus?.passed).toContain('dormir');
+  const beds = propsWithBrick(sim.content, PROLOGUE, 'sleep');
+  expect(beds.length, 'un lit par joueur dans le wagon').toBeGreaterThanOrEqual(2);
+  return { sim, beds };
+}
+
+/** Les deux devant la porte, puis le trajet; renvoie le jour et la minute à l'arrivée à Aubrune. */
+function getOff(sim: Sim): { day: number; minutes: number } {
   playScene(sim);
   const door = point(sim, 'porte');
   for (const p of [0, 1] as const) {
@@ -118,14 +101,32 @@ function playPrologue(sleepers: readonly PlayerIndex[]): { day: number; minutes:
 
 describe('prologue: l’heure à l’arrivée à Aubrune', () => {
   it('les deux dorment: réveil à 6 h, arrivée vers 8 h comme le dit Firmin', () => {
-    const arrival = playPrologue([0, 1]);
+    const { sim, beds } = untilBedtime();
+    for (const p of [0, 1] as const) lieDown(sim, p, beds[p] ?? '');
+    for (let i = 0; i < 10 && !passedSleep(sim); i++) wait(sim, 1);
+    expect(passedSleep(sim)).toBe(true);
+    expect(sim.world.common.day).toBe(2);
+    const arrival = getOff(sim);
     expect(arrival.minutes).toBeGreaterThanOrEqual(8 * 60);
     expect(arrival.minutes).toBeLessThan(8 * 60 + 30);
   });
 
-  // Défaut: une sieste d'un seul joueur franchit « dormir » sans saut de nuit; arrivée vers 0 h 45.
-  it.fails('un seul se couche: l’arrivée ne tombe pas en pleine nuit (Firmin dit 8 h)', () => {
-    const arrival = playPrologue([0]);
-    expect(arrival.minutes).toBeGreaterThanOrEqual(6 * 60);
+  it('un seul se couche: l’étape attend l’autre, et l’arrivée ne tombe pas en pleine nuit (D7)', () => {
+    const { sim, beds } = untilBedtime();
+    // Sommeil déjà haut: avant la correction, cette sieste franchissait l'étape en moins de 30 s.
+    for (const p of [0, 1] as const) sim.world.players[p].needs.sleep = 78;
+    lieDown(sim, 0, beds[0] ?? '');
+    expect(isLying(sim, 0)).toBe(true);
+    wait(sim, 60);
+    expect(sim.world.players[0].needs.sleep).toBeGreaterThanOrEqual(80);
+    expect(passedSleep(sim), 'une sieste seule ne franchit pas « dormir »').toBe(false);
+    expect(sim.world.common.day).toBe(1);
+    lieDown(sim, 1, beds[1] ?? '');
+    for (let i = 0; i < 10 && !passedSleep(sim); i++) wait(sim, 1);
+    expect(passedSleep(sim)).toBe(true);
+    const arrival = getOff(sim);
+    expect(arrival.day).toBe(2);
+    expect(arrival.minutes).toBeGreaterThanOrEqual(8 * 60);
+    expect(arrival.minutes).toBeLessThan(8 * 60 + 30);
   });
 });

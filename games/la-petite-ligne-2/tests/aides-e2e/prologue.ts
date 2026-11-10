@@ -1,28 +1,127 @@
 // Aides du parcours P19 (partie neuve, prologue entier): deux joueurs qui marchent au clavier
 // (planification sur la carte du lieu, lue dans ses données, jamais de position en dur), lisent
 // les répliques, passent par l'éditeur de personnage, et un journal de tout ce qui cloche.
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { Duo, ProbePlayer, ProbeWorld, Side } from './duo';
 import { CAPTURES } from './duo';
 
 const PLACES = join(import.meta.dirname, '../../donnees/lieux');
+const PROPS = join(import.meta.dirname, '../../donnees/commun/meubles');
 
 export interface Point {
   readonly x: number;
   readonly y: number;
 }
 
+/** Un meuble de la carte, avec les briques de sa fiche (ce qu'on peut y faire). */
+export interface MapObject extends Point {
+  readonly id: string;
+  readonly type: string;
+  readonly rotation: number;
+  readonly bricks: readonly string[];
+}
+
 export interface PlaceMap {
   readonly width: number;
   readonly height: number;
+  /** Cases bloquées: les murs de la carte et l'emprise des meubles solides. */
   readonly blocked: readonly { x: number; y: number; w: number; h: number }[];
   readonly points: Readonly<Record<string, Point>>;
+  readonly objects: readonly MapObject[];
 }
 
-/** La carte d'un lieu, lue dans ses données (les points ont des identifiants stables). */
+interface PropFile {
+  readonly id: string;
+  readonly size: { readonly w: number; readonly h: number };
+  readonly solid: boolean;
+  readonly bricks: readonly { readonly brick: string }[];
+}
+
+function loadProps(): Map<string, PropFile> {
+  const props = new Map<string, PropFile>();
+  for (const name of readdirSync(PROPS)) {
+    if (!name.endsWith('.json')) continue;
+    const prop = JSON.parse(readFileSync(join(PROPS, name), 'utf8')) as PropFile;
+    props.set(prop.id, prop);
+  }
+  return props;
+}
+
+/**
+ * La carte d'un lieu, lue dans ses données (les points ont des identifiants stables). Les meubles
+ * solides comptent parmi les cases bloquées, par la même règle que le jeu (`noyau/obstacles.ts`:
+ * toute case que leur emprise touche): un wagon dont les parois sont des meubles se planifie ainsi.
+ */
 export function loadMap(place: string): PlaceMap {
-  return JSON.parse(readFileSync(join(PLACES, place, 'carte.json'), 'utf8')) as PlaceMap;
+  const raw = JSON.parse(readFileSync(join(PLACES, place, 'carte.json'), 'utf8')) as Omit<
+    PlaceMap,
+    'objects'
+  > & { readonly objects?: readonly Omit<MapObject, 'bricks'>[] };
+  const props = loadProps();
+  const blocked = [...raw.blocked];
+  const objects: MapObject[] = [];
+  const edge = 1e-6;
+  for (const o of raw.objects ?? []) {
+    const def = props.get(o.type);
+    objects.push({ ...o, bricks: def?.bricks.map((b) => b.brick) ?? [] });
+    if (def?.solid !== true) continue;
+    const w = o.rotation % 2 === 0 ? def.size.w : def.size.h;
+    const h = o.rotation % 2 === 0 ? def.size.h : def.size.w;
+    const x0 = Math.floor(o.x - w / 2 + edge);
+    const y0 = Math.floor(o.y - h / 2 + edge);
+    blocked.push({
+      x: x0,
+      y: y0,
+      w: Math.floor(o.x + w / 2 - edge) - x0 + 1,
+      h: Math.floor(o.y + h / 2 - edge) - y0 + 1,
+    });
+  }
+  return { ...raw, blocked, objects };
+}
+
+/** Une étape de quête telle qu'écrite: sa phrase et sa cible (point de la carte ou habitant). */
+export interface QuestStep {
+  readonly id: string;
+  readonly objective: string;
+  readonly target: { readonly point?: string; readonly villager?: string } | null;
+}
+
+/** Les étapes d'une suite d'un lieu, lues dans ses données. */
+export function loadSteps(place: string, quest: string): readonly QuestStep[] {
+  const line = JSON.parse(readFileSync(join(PLACES, place, 'quetes', `${quest}.json`), 'utf8')) as {
+    readonly chapters: readonly { readonly steps: readonly QuestStep[] }[];
+  };
+  return line.chapters.flatMap((c) => c.steps);
+}
+
+function isFree(map: PlaceMap, cx: number, cy: number): boolean {
+  if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return false;
+  return !map.blocked.some((b) => cx >= b.x && cx < b.x + b.w && cy >= b.y && cy < b.y + b.h);
+}
+
+/**
+ * Où se tenir près d'un endroit (habitant, meuble): les centres des `count` cases libres les plus
+ * proches, hors des cases où quelqu'un se tient déjà (`taken`). Vide si rien n'est libre à 3 m.
+ */
+export function standSpots(
+  map: PlaceMap,
+  at: Point,
+  count: number,
+  taken: readonly Point[] = [],
+): Point[] {
+  const spots: { p: Point; d: number }[] = [];
+  for (let cy = Math.floor(at.y) - 3; cy <= Math.floor(at.y) + 3; cy++)
+    for (let cx = Math.floor(at.x) - 3; cx <= Math.floor(at.x) + 3; cx++) {
+      if (!isFree(map, cx, cy)) continue;
+      const p = { x: cx + 0.5, y: cy + 0.5 };
+      if (taken.some((t) => Math.floor(t.x) === cx && Math.floor(t.y) === cy)) continue;
+      spots.push({ p, d: Math.hypot(p.x - at.x, p.y - at.y) });
+    }
+  return spots
+    .sort((a, b) => a.d - b.d)
+    .slice(0, count)
+    .map((s) => s.p);
 }
 
 export function point(map: PlaceMap, id: string): Point {
@@ -52,7 +151,7 @@ export function planPath(
       )
     )
       return false;
-    return !map.blocked.some((b) => cx >= b.x && cx < b.x + b.w && cy >= b.y && cy < b.y + b.h);
+    return isFree(map, cx, cy);
   };
   const key = (cx: number, cy: number): number => cy * map.width + cx;
   const start = { x: Math.floor(from.x), y: Math.floor(from.y) };
@@ -379,6 +478,28 @@ export async function playUi(side: Side, ctx: UiContext): Promise<boolean> {
   return false;
 }
 
+/**
+ * Deux places pour deux joueurs: chacun prend celle qui évite de se croiser dans un couloir d'un
+ * mètre (la répartition dont le plus long des deux trajets est le plus court).
+ */
+export async function shareSpots(
+  duo: Duo,
+  map: PlaceMap,
+  spots: readonly Point[],
+  avoid: readonly Point[] = [],
+): Promise<readonly [Point, Point]> {
+  const [a, b] = spots;
+  if (a === undefined || b === undefined) throw new Error('il faut deux places libres');
+  const w = await duo.host.world();
+  if (w === null) throw new Error('monde absent');
+  const [first, second] = await seats(duo);
+  const cost = (seat: Seat, to: Point): number =>
+    planPath(map, me(w, seat).body, to, avoid)?.length ?? Number.POSITIVE_INFINITY;
+  const straight = Math.max(cost(first, a), cost(second, b));
+  const crossed = Math.max(cost(first, b), cost(second, a));
+  return straight <= crossed ? [a, b] : [b, a];
+}
+
 export interface WalkResult {
   /** Par joueur: arrivé, ou bloqué (aucun chemin sur la carte, ou aucun progrès pendant 3 s). */
   readonly state: readonly [WalkState, WalkState];
@@ -386,6 +507,9 @@ export interface WalkResult {
 export type WalkState = 'arrivé' | 'bloqué' | 'sans cible' | 'trop long';
 
 const STUCK_MS = 5000;
+/** Distance au but sous laquelle on avance par petits pas, et durée d'un appui (ms). */
+const NEAR_M = 1.2;
+const PULSE_MS = 160;
 /** Dernier lacet de caméra déduit, par machine: il survit d'une marche à l'autre. */
 const YAW = new WeakMap<Side, number>();
 
@@ -406,6 +530,8 @@ export async function walkBoth(
     readonly straight?: boolean;
     /** Points à contourner (habitants). */
     readonly avoid?: readonly Point[];
+    /** La marche n'a plus lieu d'être (étape franchie, lieu quitté): on s'arrête, arrivés. */
+    readonly stop?: (w: ProbeWorld) => boolean;
   },
 ): Promise<WalkResult> {
   const { map, journal } = options;
@@ -460,6 +586,10 @@ export async function walkBoth(
     for (;;) {
       // Positions lues chez l'hôte (autorité): la vue de l'invité sur son propre corps est en retard.
       const w = await duo.host.world();
+      if (w !== null && options.stop?.(w) === true) {
+        for (const [i, st] of state.entries()) if (st !== 'sans cible') state[i] = 'arrivé';
+        break;
+      }
       for (const [i, seat] of duoSeats.entries()) {
         const target = targets[i];
         if (state[i] !== 'trop long' || target === null || target === undefined || w === null)
@@ -491,6 +621,12 @@ export async function walkBoth(
         if (s < -0.38) want.add('a');
         if (remaining > 4) want.add('Shift');
         await setKeys(i, want);
+        // Près du but, de petits pas: en rendu logiciel une image dure jusqu'à un quart de seconde
+        // de jeu, une touche tenue ferait dépasser la cible de près d'un mètre.
+        if (remaining < NEAR_M) {
+          await seat.side.page.waitForTimeout(PULSE_MS);
+          await setKeys(i, new Set());
+        }
         const moved = before === null || Math.hypot(here.x - before.x, here.y - before.y) > 0.02;
         stuckSince[i] = moved ? 0 : stuckSince[i] === 0 ? Date.now() : (stuckSince[i] ?? 0);
         if (stuckSince[i] !== 0 && Date.now() - (stuckSince[i] ?? 0) > STUCK_MS) {
@@ -530,24 +666,50 @@ export async function calibrateYaw(duo: Duo, journal: Journal): Promise<void> {
       }),
     ),
   );
-  await Promise.all(duoSeats.map((seat) => seat.side.page.keyboard.down('s')));
-  await duo.host.page.waitForTimeout(1500);
-  await Promise.all(duoSeats.map((seat) => seat.side.page.keyboard.up('s')));
-  await duo.host.page.waitForTimeout(2500);
-  const after = await duo.host.world();
-  if (after === null) throw new Error('monde absent');
+  // Dans un couloir d'un mètre, un pas de biais glisse le long des parois: une seule touche ne
+  // dit pas le lacet. Deux touches (arrière, puis droite) départagent les huit lacets possibles
+  // (la caméra repose sur des multiples de 45 degrés): on garde celui qui explique le mieux les
+  // deux déplacements, glissement compris.
+  const moves: { key: string; from: ProbeWorld; to: ProbeWorld }[] = [];
+  let from = before;
+  for (const key of ['s', 'd']) {
+    await Promise.all(duoSeats.map((seat) => seat.side.page.keyboard.down(key)));
+    await duo.host.page.waitForTimeout(1000);
+    await Promise.all(duoSeats.map((seat) => seat.side.page.keyboard.up(key)));
+    await duo.host.page.waitForTimeout(2500);
+    const to = await duo.host.world();
+    if (to === null) throw new Error('monde absent');
+    moves.push({ key, from, to });
+    from = to;
+  }
   for (const seat of duoSeats) {
-    const a = me(before, seat).body;
-    const b = me(after, seat).body;
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const raw = Math.hypot(dx, dy) > 0.2 ? Math.atan2(dy, dx) - Math.PI / 2 : 0;
-    // La caméra repose sur des quarts d'angle de 45 degrés; un glissement contre un mur fausse la mesure.
-    const snapped = Math.round(raw / (Math.PI / 4)) * (Math.PI / 4);
-    const yaw = Math.abs(snapped - raw) < 0.25 ? snapped : raw;
-    YAW.set(seat.side, yaw);
+    let best = 0;
+    let bestScore = Number.NEGATIVE_INFINITY;
+    const seen: string[] = [];
+    for (let k = 0; k < 8; k++) {
+      const yaw = (k * Math.PI) / 4;
+      let score = 0;
+      for (const move of moves) {
+        const a = me(move.from, seat).body;
+        const b = me(move.to, seat).body;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const d = Math.hypot(dx, dy);
+        if (k === 0) seen.push(`${move.key}: ${dx.toFixed(2)}; ${dy.toFixed(2)}`);
+        if (d < 0.15) continue;
+        // Arrière: (-sin, cos). Droite: (cos, sin) (`entrees/commandes.ts`).
+        const vx = move.key === 's' ? -Math.sin(yaw) : Math.cos(yaw);
+        const vy = move.key === 's' ? Math.cos(yaw) : Math.sin(yaw);
+        score += (dx * vx + dy * vy) / d;
+      }
+      if (score > bestScore + 1e-6) {
+        bestScore = score;
+        best = yaw;
+      }
+    }
+    YAW.set(seat.side, best);
     journal.log(
-      `lacet de caméra ${seat.side.who}: ${yaw.toFixed(2)} rad (déplacement ${dx.toFixed(2)}; ${dy.toFixed(2)})`,
+      `lacet de caméra ${seat.side.who}: ${best.toFixed(2)} rad (déplacements ${seen.join(' | ')})`,
     );
   }
 }
@@ -589,6 +751,33 @@ export async function tapToward(
     for (const k of keys) await seat.side.page.keyboard.up(k);
     await seat.side.page.waitForTimeout(1000);
   }
+}
+
+/**
+ * Agir sur une cible comme un joueur qui lit la bulle: tant que la touche d'action ne vise pas ce
+ * qu'on veut (`aimed`), se tourner vers lui par petits pas; quand elle le vise, appuyer. S'arrête
+ * dès que `done` est vrai. Un appui tombé entre deux images se perd: on recommence.
+ */
+export async function actOn(
+  duo: Duo,
+  seat: Seat,
+  at: Point,
+  aimed: () => Promise<boolean>,
+  done: () => Promise<boolean>,
+  journal: Journal,
+  tries = 8,
+): Promise<boolean> {
+  for (let n = 0; n < tries && !(await done()); n++) {
+    if (!(await aimed())) {
+      await windowSize(duo, true);
+      await tapToward(duo, seat, at, aimed, journal, 3);
+      await windowSize(duo, false);
+      continue;
+    }
+    await seat.side.press('Space', 400);
+    await seat.side.page.waitForTimeout(2500);
+  }
+  return await done();
 }
 
 const FULL = { width: 960, height: 540 } as const;

@@ -69,7 +69,7 @@ describe('le wagon du train de nuit', () => {
     const cited = new Set<string>();
     for (const [path, json] of Object.entries(files))
       if (path.startsWith(`lieux/${PLACE}/`)) citedPoints(json, cited);
-    expect([...cited].sort()).toEqual(['chariot', 'compartiment', 'couloir', 'porte']);
+    expect([...cited].sort()).toEqual(['compartiment', 'couchettes', 'couloir', 'porte']);
     // Parcours en largeur des cases libres depuis l'arrivée.
     const start = map.points.compartiment ?? { x: -1, y: -1 };
     const seen = new Set<number>([Math.floor(start.y) * map.width + Math.floor(start.x)]);

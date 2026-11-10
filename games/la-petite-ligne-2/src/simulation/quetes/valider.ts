@@ -125,6 +125,17 @@ function checkCondition(env: Env, c: StepCondition, at: string, scope: StepScope
     }
     case 'together':
       return;
+    case 'posture': {
+      // Sans meuble qui porte la brique dans le lieu, personne ne peut prendre la posture.
+      const offered = place.map.objects.some(
+        (o) => env.content.props[o.type]?.bricks.some((b) => b.brick === c.posture) === true,
+      );
+      if (!offered)
+        problems.push(
+          `${at}: condition impossible, aucun meuble du lieu n'a la brique « ${c.posture} »`,
+        );
+      return;
+    }
     case 'scene_seen': {
       const scene = place.scenes[c.scene];
       if (scene === undefined) problems.push(`${at}: scène inconnue « ${c.scene} »`);
