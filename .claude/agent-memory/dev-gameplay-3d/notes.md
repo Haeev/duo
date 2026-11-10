@@ -64,3 +64,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Construire une page de démonstration hors du serveur partagé: `npx vite build <dossier-de-la-page> --base ./ --emptyOutDir --outDir <scratchpad>/<sous-dossier>/site` depuis le paquet. Une config Vite posée dans le scratchpad ne trouve pas `vite` (ERR_MODULE_NOT_FOUND).
 - Le scratchpad est partagé: un autre membre a réécrit mon `donnees.py` entre deux appels. Toujours un sous-dossier à soi, et ne jamais relancer un script du scratchpad sans le relire.
 - `prettier --write` sur un fichier commun pas encore formaté (ex. `src/interface/index.ts`) réécrit les lignes des autres: n'y appliquer que des modifications à la main.
+
+## Grands lieux par tuiles (vérifié le 2026-11-10, Three.js 0.187)
+
+- Effacer une partie d'un maillage fusionné sans le refaire: maillage principal à tableau de matériaux `[m]` et groupes d'index (tout sauf la partie), plus une copie transparente qui partage la géométrie et règle `setDrawRange` dans `onBeforeRender`/`onAfterRender` (et `onBeforeShadow`/`onAfterShadow`). Un maillage à tableau de matériaux sans groupe ne dessine rien: toujours au moins un groupe. Même méthode pour le sol lointain (groupes = tuiles non construites).
+- Houppier instancié à effacer: matrice d'échelle nulle sur l'instance, copie `Mesh` transparente. Donner aux géométries unité un attribut `color` blanc et un matériau `vertexColors`: la copie prend alors un clone du matériau du sol (même programme que les autres fondus).
+- `InstancedMesh.dispose()` libère les tampons d'instances (pas la géométrie partagée): l'appeler au déchargement d'une tuile.
+- `renderer.info.memory.geometries` ne compte que ce qui a été dessiné au moins une fois: pour un contrôle de fuite, comparer deux états obtenus par le même chemin (l'hystérésis rend l'anneau dépendant du trajet), pas un départ frais et un retour.
+- Page de démonstration qui importe un outil Node (`outils/plan-vers-lieu.ts`): config Vite à soi dans le dossier de la page (`resolve.alias` de `node:fs` et `node:url` vers un module vide, `define: { 'process.argv': '[]' }`), lancée par `pnpm exec vite --config <page>/vite.config.ts` depuis le paquet. Un `prettier --write` pendant une capture recharge la page (HMR) et casse `page.evaluate`.
+- Boucle `for` d'un parcours en largeur sur un tableau qui grandit: `for (const i of queue)` suit la longueur (règle `prefer-for-of`).

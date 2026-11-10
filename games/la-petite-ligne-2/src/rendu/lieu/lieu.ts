@@ -65,15 +65,19 @@ export class PlaceScene {
     readonly description: PlaceDescription,
     private readonly materials: PlaceMaterials,
     private readonly models: ModelSource | null,
+    /** Faux pour un grand lieu: son sol est dessiné tuile par tuile (`grand-lieu.ts`). */
+    withGround = true,
   ) {
     this.root.name = 'lieu';
-    const ground = new Mesh(
-      this.tracker.track(groundGeometry(description.width, description.height)),
-      materials.ground,
-    );
-    ground.receiveShadow = true;
-    ground.name = 'sol';
-    this.root.add(ground);
+    if (withGround) {
+      const ground = new Mesh(
+        this.tracker.track(groundGeometry(description.width, description.height)),
+        materials.ground,
+      );
+      ground.receiveShadow = true;
+      ground.name = 'sol';
+      this.root.add(ground);
+    }
     for (const volume of description.volumes) this.fixed.set(volume.id, this.build(volume));
   }
 
