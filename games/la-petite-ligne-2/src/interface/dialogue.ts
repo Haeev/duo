@@ -37,13 +37,20 @@ export function createDialogue(
   openGuardMs: number,
 ): DialogueWindow {
   const bust = el('div', { class: 'dlg__bust' });
-  const provisional = el('span', { class: 'provisoire provisoire--bust', text: TEXTS.dialogue.provisional });
+  const provisional = el('span', {
+    class: 'provisoire provisoire--bust',
+    text: TEXTS.dialogue.provisional,
+  });
   const name = el('div', { class: 'dlg__plate' });
   const text = el('p', { class: 'dlg__text', 'aria-live': 'polite' });
   const nextKey = el('span', { class: 'key' });
   const next = el('div', { class: 'dlg__next' }, [nextKey, el('i')]);
   const band = el('section', { class: 'dlg' }, [bust, provisional, name, text, next]);
-  const choices = el('div', { class: 'choices', role: 'listbox', 'aria-label': TEXTS.dialogue.choices });
+  const choices = el('div', {
+    class: 'choices',
+    role: 'listbox',
+    'aria-label': TEXTS.dialogue.choices,
+  });
   const layer = el('div', { class: 'dialogue' }, [choices, band]);
   layer.hidden = true;
   root.append(layer);
@@ -78,7 +85,10 @@ export function createDialogue(
           title: option.fails !== null ? TEXTS.dialogue.fails : null,
           tabindex: '-1',
         },
-        [option.fails !== null ? el('span', { class: 'barre' }, [icon('goutte')]) : null, option.text],
+        [
+          option.fails !== null ? el('span', { class: 'barre' }, [icon('goutte')]) : null,
+          option.text,
+        ],
       );
       button.addEventListener('click', () => {
         api.choose(i);
@@ -101,7 +111,8 @@ export function createDialogue(
         }
         return;
       }
-      if (current !== null && current.node === view.node && current.villager === view.villager) return;
+      if (current !== null && current.node === view.node && current.villager === view.villager)
+        return;
       const opening = current === null;
       current = view;
       pending = false;
@@ -156,7 +167,8 @@ export function createDialogue(
         return true;
       }
       if (options.length > 0 && writer.done) {
-        if (code === 'ArrowUp' || code === 'KeyW') focus = (focus + options.length - 1) % options.length;
+        if (code === 'ArrowUp' || code === 'KeyW')
+          focus = (focus + options.length - 1) % options.length;
         else if (code === 'ArrowDown' || code === 'KeyS') focus = (focus + 1) % options.length;
         else if (code === 'Enter') api.choose(focus);
         drawChoices();

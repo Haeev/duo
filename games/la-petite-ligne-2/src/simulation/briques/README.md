@@ -2,16 +2,16 @@
 
 Le moteur ne connaît aucun meuble. La touche d'action vise un objet visible (un meuble et ses briques de `donnees/commun/meubles/`, un objet au sol, un habitant) et appelle le comportement inscrit dans `registre.ts`.
 
-| Fichier | Rôle |
-|---|---|
-| `types.ts` | contrat: `BrickBehaviour` (`verb`, `gesture?`, `refuse`, `use`), `EntityBehaviour`, `Aim`, `Look` |
-| `registre.ts` | `BRICK_BEHAVIOURS` (par brique) et `ENTITY_BEHAVIOURS` (`pickup`, `talk`) |
-| `visee.ts` | `aimOf(look, player)`: la cible, son verbe et son refus éventuel, fonction pure de l'état transmis |
-| `geste.ts` | geste d'une action, lu sans rien modifier (lancement chez l'hôte, prédiction chez l'invité) |
-| `index.ts` | le système: intentions `act`, `use_brick`, `store_put`, `store_take`; fin des gestes; `player.aim` |
-| `asseoir.ts`, `dormir.ts`, `ranger.ts` | briques `sit`, `sleep`, `store` |
-| `ramasser.ts`, `parler.ts` | actions `pickup` (objet au sol, avec geste) et `talk` (habitant) |
-| `postures.ts`, `piles.ts` | places assises ou couchées; piles dans des cases |
+| Fichier                                | Rôle                                                                                               |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `types.ts`                             | contrat: `BrickBehaviour` (`verb`, `gesture?`, `refuse`, `use`), `EntityBehaviour`, `Aim`, `Look`  |
+| `registre.ts`                          | `BRICK_BEHAVIOURS` (par brique) et `ENTITY_BEHAVIOURS` (`pickup`, `talk`)                          |
+| `visee.ts`                             | `aimOf(look, player)`: la cible, son verbe et son refus éventuel, fonction pure de l'état transmis |
+| `geste.ts`                             | geste d'une action, lu sans rien modifier (lancement chez l'hôte, prédiction chez l'invité)        |
+| `index.ts`                             | le système: intentions `act`, `use_brick`, `store_put`, `store_take`; fin des gestes; `player.aim` |
+| `asseoir.ts`, `dormir.ts`, `ranger.ts` | briques `sit`, `sleep`, `store`                                                                    |
+| `ramasser.ts`, `parler.ts`             | actions `pickup` (objet au sol, avec geste) et `talk` (habitant)                                   |
+| `postures.ts`, `piles.ts`              | places assises ou couchées; piles dans des cases                                                   |
 
 ## Ajouter une brique
 

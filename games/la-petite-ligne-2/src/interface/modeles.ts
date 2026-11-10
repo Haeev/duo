@@ -87,7 +87,8 @@ export class NeedsWatcher {
     return NEEDS.map((need) => {
       const state = tiers[need];
       const before = this.last.get(need);
-      if (before !== undefined && before !== state) this.until.set(need, nowMs + this.tuning.tierShowMs);
+      if (before !== undefined && before !== state)
+        this.until.set(need, nowMs + this.tuning.tierShowMs);
       this.last.set(need, state);
       const value = needs[need];
       const low = value < this.tuning.lowNeed || state === 'low' || state === 'blocked';
@@ -179,8 +180,21 @@ export function toolbarSignature(world: ReadonlyWorld, local: PlayerIndex): stri
 // ---------- Bulle d'action ----------
 
 export type PromptModel =
-  | { readonly kind: 'act'; readonly key: string; readonly verb: string; readonly refusal: string | null; readonly x: number; readonly y: number }
-  | { readonly kind: 'board'; readonly key: string; readonly verb: string; readonly refusal: string | null; readonly waiting: string | null };
+  | {
+      readonly kind: 'act';
+      readonly key: string;
+      readonly verb: string;
+      readonly refusal: string | null;
+      readonly x: number;
+      readonly y: number;
+    }
+  | {
+      readonly kind: 'board';
+      readonly key: string;
+      readonly verb: string;
+      readonly refusal: string | null;
+      readonly waiting: string | null;
+    };
 
 /**
  * Ce que dit la bulle: la cible de la touche d'action, sinon, à bord, l'invite pour redescendre
@@ -346,7 +360,11 @@ export interface SlotRefModel {
   readonly index: number;
 }
 
-export function slotAt(world: ReadonlyWorld, local: PlayerIndex, linear: number): SlotRefModel | null {
+export function slotAt(
+  world: ReadonlyWorld,
+  local: PlayerIndex,
+  linear: number,
+): SlotRefModel | null {
   const me = world.players[local];
   if (linear < me.toolbar.length) return { area: 'toolbar', index: linear };
   const bagIndex = linear - me.toolbar.length;
@@ -375,6 +393,9 @@ export function gridMove(
   return next >= 0 && next < count ? next : index;
 }
 
-export function chestModel(world: ReadonlyWorld, local: PlayerIndex): { chest: string; purse: string } {
+export function chestModel(
+  world: ReadonlyWorld,
+  local: PlayerIndex,
+): { chest: string; purse: string } {
   return { chest: formatEuros(world.common.chest), purse: formatEuros(world.players[local].money) };
 }
