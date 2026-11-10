@@ -34,14 +34,14 @@
     {
       "id": "halte-banc",
       "type": "banc",
-      "x": 1.5,
+      "x": 1,
       "y": 0.5,
       "rotation": 0
     },
     {
       "id": "halte-bureau",
       "type": "table-a-manger",
-      "x": 7.5,
+      "x": 8,
       "y": 0.5,
       "rotation": 0
     },

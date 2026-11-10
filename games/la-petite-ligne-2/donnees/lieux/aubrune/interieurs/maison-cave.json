@@ -27,10 +27,10 @@
   "doors": {
     "maison-cave-esc-maison-rdc": {
       "x": 0.5,
-      "y": 0.5,
-      "facing": 0,
+      "y": 3.5,
+      "facing": 2,
       "to": "maison-rdc-esc-maison-cave"
     }
   },
-  "pourquoi": "la lanterne sans verre (acte 3) y attend"
+  "pourquoi": "la lanterne sans verre (acte 3) y attend; l'escalier descend à l'aplomb de celui de la chambre"
 }

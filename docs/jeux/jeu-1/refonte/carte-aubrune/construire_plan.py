@@ -15,7 +15,12 @@ import subprocess
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 L, H = 320, 208
-MARCHE, COURSE, DRAISINE = 3.0, 5.0, 8.0
+# Vitesses du jeu (m/s): marche 1,5 et course 3,2 (décision du client, 2026-11-10; avant: 3 et 5).
+MARCHE, COURSE, DRAISINE = 1.5, 3.2, 8.0
+
+
+def vit(v):
+    return ('%g' % v).replace('.', ',')
 
 # ---------------------------------------------------------------- zones
 ZONES = {
@@ -764,6 +769,21 @@ POINTS_NOMMES = [
 # meubles: (id, type du jeu ou None, modèle, x, y, rotation); points: (id, x, y, rôle, qui).
 # porte: (x, y, regard en arrivant) côté intérieur; escaliers: liens vers un autre niveau.
 INT = []
+# Tailles des types de meubles du jeu (`donnees/commun/meubles`): le plan dessine et contrôle l'emprise réelle.
+_DOSSIER_MEUBLES = os.path.join(ICI, '..', '..', '..', '..', '..', 'games', 'la-petite-ligne-2', 'donnees', 'commun', 'meubles')
+TAILLES = {f[:-5]: json.load(open(os.path.join(_DOSSIER_MEUBLES, f), encoding='utf-8'))['size']
+           for f in sorted(os.listdir(_DOSSIER_MEUBLES)) if f.endswith('.json')}
+
+
+def emprise(m):
+    """Cases (x, y) que le jeu bloque pour ce meuble: centre, taille du type, rotation; un modèle à créer: sa case."""
+    t = TAILLES.get(m['type'])
+    if t is None:
+        return [(int(m['x']), int(m['y']))]
+    w, h = (t['w'], t['h']) if m['rotation'] % 2 == 0 else (t['h'], t['w'])
+    x0, x1 = math.floor(m['x'] - w / 2 + 1e-6), math.floor(m['x'] + w / 2 - 1e-6)
+    y0, y1 = math.floor(m['y'] - h / 2 + 1e-6), math.floor(m['y'] + h / 2 - 1e-6)
+    return [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
 
 
 def interieur(i, bat, nom, l, h, pieces, cloisons, meubles, points, porte=None, escaliers=(), niveau=0, note=''):
@@ -775,38 +795,47 @@ def interieur(i, bat, nom, l, h, pieces, cloisons, meubles, points, porte=None, 
 interieur('halte', 'halte', 'la halte', 9, 5,
           [('salle des pas perdus', [0, 0, 5, 5]), ('guichet', [5, 0, 1, 5]), ('bureau de Firmin', [6, 0, 3, 3]), ('consigne', [6, 3, 3, 2])],
           [[6, 3, 2, 1]],
-          [('halte-banc', 'banc', 'bench-platform', 1.5, 0.5, 0), ('halte-guichet', None, 'comptoir', 5.5, 2, 1),
-           ('halte-bureau', 'table-a-manger', 'table-farm', 7.5, 0.5, 0), ('halte-chaise', 'chaise', 'chair-farm', 7.5, 1.5, 2),
+          [('halte-banc', 'banc', 'bench-platform', 1, 0.5, 0), ('halte-guichet', None, 'comptoir', 5.5, 2, 1),
+           ('halte-bureau', 'table-a-manger', 'table-farm', 8, 0.5, 0), ('halte-chaise', 'chaise', 'chair-farm', 7.5, 1.5, 2),
            ('halte-consigne', 'coffre', 'chest', 8.5, 4.5, 3)],
           [('halte-p-guichet', 6.5, 2.5, 'comptoir', 'Firmin'), ('halte-p-bureau', 7.5, 1.6, 'siege', 'Firmin'), ('halte-p-banc', 1.5, 1, 'siege', None)],
           porte=(2.5, 4.5, 2), note="le guichet sépare la salle du bureau; la consigne est le coffre commun des deux joueurs")
 interieur('maison-rdc', 'maison', 'la maison du garde, rez-de-chaussée', 10, 7,
-          [('salle', [5, 0, 5, 4]), ('cuisine', [5, 4, 5, 3]), ('chambre', [0, 0, 5, 4]), ('troisième pièce', [0, 4, 5, 3])],
-          [[5, 0, 1, 1], [5, 3, 1, 2], [5, 6, 1, 1], [6, 4, 2, 1]],
+          [('salle commune et cuisine', [5, 0, 5, 7]), ('chambre', [0, 0, 5, 4]), ('troisième pièce', [0, 4, 5, 3])],
+          # La salle et la cuisine ne font qu'une pièce (la salle commune d'une maison de garde): la cloison qui les
+          # séparait, avec la table et les chaises posées à cheval sur deux rangées, isolait la porte d'entrée de tout
+          # le reste. La table contre le mur nord, près de la porte (une chaise au bout, une devant); le lit double
+          # contre le mur est, tête au mur, entre la table et les feux; au milieu, 2 m libres de la porte au refend
+          # (ouvert en y 2-3 vers la chambre et l'escalier de la cave), à l'escalier de l'étage et aux feux.
+          [[5, 0, 1, 2], [5, 4, 1, 1], [5, 6, 1, 1]],
           [('maison-cuisiniere', 'cuisiniere', 'stove', 9.5, 6.5, 0), ('maison-plan', 'plan-de-travail', 'plan-de-travail', 8, 6.5, 0),
-           ('maison-table', 'table-a-manger', 'table-farm', 7, 2, 0), ('maison-chaise-1', 'chaise', 'chair-farm', 7, 1, 0),
-           ('maison-chaise-2', 'chaise', 'chair-farm', 7, 3, 2), ('lit-de-la-maison', 'lit-double', 'bed-double', 9, 3, 0), ('maison-armoire', 'armoire', 'wardrobe', 4.5, 0.5, 0)],
-          [('maison-lit-g', 8.6, 3.5, 'lit', None), ('maison-lit-d', 9.4, 3.5, 'lit', None), ('maison-cuisine', 8, 5.5, 'poste', None)],
-          porte=(9.5, 1.5, 3), escaliers=[dict(x=5.5, y=4.5, vers='maison-etage', regard=0), dict(x=0.5, y=3.5, vers='maison-cave', regard=0)],
-          note="au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de la cave part de la chambre")
+           ('maison-table', 'table-a-manger', 'table-farm', 7, 0.5, 0), ('maison-chaise-1', 'chaise', 'chair-farm', 8.5, 0.5, 3),
+           ('maison-chaise-2', 'chaise', 'chair-farm', 6.5, 1.5, 2), ('lit-de-la-maison', 'lit-double', 'bed-double', 9, 4, 3), ('maison-armoire', 'armoire', 'wardrobe', 4.5, 0.5, 0)],
+          [('maison-lit-g', 8.5, 2.5, 'lit', None), ('maison-lit-d', 8.5, 5.5, 'lit', None), ('maison-cuisine', 7.5, 5.5, 'poste', None)],
+          porte=(9.5, 1.5, 3), escaliers=[dict(x=5.5, y=4.5, vers='maison-etage', regard=1), dict(x=0.5, y=3.5, vers='maison-cave', regard=2)],
+          note="au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre")
 interieur('maison-etage', 'maison', "la maison du garde, étage", 10, 7,
           [('grenier aménageable', [0, 0, 10, 7])], [], [], [('maison-etage-milieu', 5, 3.5, 'poste', None)],
           escaliers=[dict(x=5.5, y=4.5, vers='maison-rdc', regard=2)], niveau=1, note="sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier)")
 interieur('maison-cave', 'maison', 'la cave de la maison', 5, 4, [('cave voûtée', [0, 0, 5, 4])], [],
           [('cave-coffre', 'coffre', 'chest', 4.5, 3.5, 3)], [('cave-lanterne', 2.5, 1.5, 'poste', None)],
-          escaliers=[dict(x=0.5, y=0.5, vers='maison-rdc', regard=0)], niveau=-1, note="la lanterne sans verre (acte 3) y attend")
+          escaliers=[dict(x=0.5, y=3.5, vers='maison-rdc', regard=2)], niveau=-1, note="la lanterne sans verre (acte 3) y attend; l'escalier descend à l'aplomb de celui de la chambre")
 interieur('epicerie-rdc', 'epicerie', "l'épicerie Ferrand", 7, 9,
-          [('boutique', [0, 0, 7, 5]), ('cuisine', [0, 5, 7, 4])], [[0, 5, 3, 1], [4, 5, 3, 1]],
+          # Les pensionnaires traversent la cuisine pour monter: baie de 2 m (x 3-4), la table à l'ouest, près du
+          # fourneau, hors du passage de la baie à l'escalier (coin sud-est).
+          [('boutique', [0, 0, 7, 5]), ('cuisine', [0, 5, 7, 4])], [[0, 5, 3, 1], [5, 5, 2, 1]],
           [('epicerie-comptoir', None, 'comptoir', 2, 2.5, 1), ('epicerie-etal', 'etal-de-tourte', 'etal', 5.5, 0.5, 0),
-           ('epicerie-cuisiniere', 'cuisiniere', 'stove', 0.5, 8.5, 0), ('epicerie-table', 'table-a-manger', 'table-farm', 4, 7, 0)],
-          [('odette-comptoir', 1, 2.5, 'comptoir', 'Odette'), ('odette-cuisine', 1.5, 7.5, 'poste', 'Odette')],
+           ('epicerie-cuisiniere', 'cuisiniere', 'stove', 0.5, 8.5, 0), ('epicerie-table', 'table-a-manger', 'table-farm', 2, 7.5, 0)],
+          [('odette-comptoir', 1, 2.5, 'comptoir', 'Odette'), ('odette-cuisine', 1.5, 8.5, 'poste', 'Odette')],
           porte=(6.5, 2.5, 3), escaliers=[dict(x=6.5, y=8.5, vers='epicerie-etage', regard=2)], note="la boutique donne sur la place (porte à l'est), la cuisine derrière")
 interieur('epicerie-etage', 'epicerie', 'la pension Ferrand, étage', 7, 9,
-          [('chambre de la pension', [0, 0, 7, 5]), ('chambre d’Odette', [0, 5, 7, 4])], [[0, 5, 6, 1]],
+          # L'escalier arrive sur un palier de 2 m (x 5-6) qui mène tout droit à la pension: les pensionnaires ne
+          # traversent plus la chambre d'Odette, qui ouvre sur le palier (porte en x 4, y 6).
+          [('chambre de la pension', [0, 0, 7, 5]), ('chambre d’Odette', [0, 6, 4, 3]), ('palier', [5, 5, 2, 4])], [[0, 5, 5, 1], [4, 7, 1, 2]],
           [('lit-pension-1', 'lit-simple', 'bed-single', 0.5, 1, 0), ('lit-pension-2', 'lit-simple', 'bed-single', 2.5, 1, 0),
            ('odette-lit', 'lit-simple', 'bed-single', 0.5, 7, 0)],
-          [('pension-lit-a', 0.5, 1, 'lit', None), ('pension-lit-b', 2.5, 1, 'lit', None), ('odette-lit-p', 0.5, 7, 'lit', 'Odette')],
-          escaliers=[dict(x=6.5, y=8.5, vers='epicerie-rdc', regard=2)], niveau=1, note="la chambre du premier soir, deux lits simples")
+          [('pension-lit-a', 1.5, 1.5, 'lit', None), ('pension-lit-b', 3.5, 1.5, 'lit', None), ('odette-lit-p', 1.5, 7.5, 'lit', 'Odette')],
+          escaliers=[dict(x=6.5, y=8.5, vers='epicerie-rdc', regard=2)], niveau=1, note="la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté")
 interieur('fournil', 'fournil', "le fournil d'Achille", 6, 5,
           [('boutique', [0, 2, 6, 3]), ('fournil', [0, 0, 6, 2])], [[0, 2, 2, 1]],
           [('fournil-four', 'four', 'four', 5.5, 0.5, 0), ('fournil-petrin', 'plan-de-travail', 'plan-de-travail', 2, 0.5, 0),
@@ -977,14 +1006,17 @@ MANQUES = [
 
 # 4. Les six intérieurs qui manquaient. Porte intérieure au droit de la porte du plan (x local = x porte - x emprise - 0,5).
 interieur('cafe', 'cafe', 'le café de la Halte', 6, 5,
-          [('cuisine et comptoir', [0, 0, 6, 2]), ('salle', [0, 2, 6, 3])], [[0, 1, 3, 1]],
+          # Le coin cuisine n'a plus de cloison (elle enfermait le fourneau derrière le plan de travail): il s'ouvre
+          # derrière le comptoir. Les deux tables, contre les murs est et ouest, laissent l'allée de 2 m (x 2-3) de la
+          # porte au comptoir; les chaises regardent leur table.
+          [('cuisine et comptoir', [0, 0, 6, 2]), ('salle', [0, 2, 6, 3])], [],
           [('cafe-cuisiniere', 'cuisiniere', 'stove', 0.5, 0.5, 0), ('cafe-plan', 'plan-de-travail', 'plan-de-travail', 2, 0.5, 0),
-           ('cafe-comptoir', None, 'comptoir', 4, 1.5, 0), ('cafe-table-1', 'table-a-manger', 'table-farm', 1, 3.5, 0),
-           ('cafe-chaise-1', 'chaise', 'chair-farm', 0.5, 2.5, 0), ('cafe-chaise-2', 'chaise', 'chair-farm', 1.5, 4.5, 2),
-           ('cafe-table-2', 'table-a-manger', 'table-farm', 5, 3.5, 0), ('cafe-chaise-3', 'chaise', 'chair-farm', 4.5, 2.5, 0),
-           ('cafe-chaise-4', 'chaise', 'chair-farm', 5.5, 4.5, 2)],
+           ('cafe-comptoir', None, 'comptoir', 4, 1.5, 0), ('cafe-table-1', 'table-a-manger', 'table-farm', 0.5, 3, 1),
+           ('cafe-chaise-1', 'chaise', 'chair-farm', 1.5, 2.5, 3), ('cafe-chaise-2', 'chaise', 'chair-farm', 1.5, 3.5, 3),
+           ('cafe-table-2', 'table-a-manger', 'table-farm', 5.5, 3, 1), ('cafe-chaise-3', 'chaise', 'chair-farm', 4.5, 2.5, 1),
+           ('cafe-chaise-4', 'chaise', 'chair-farm', 4.5, 3.5, 1)],
           [('colette-comptoir', 4.5, 0.5, 'comptoir', 'Colette')],
-          porte=(3.5, 4.5, 2), note="salle sur la rue (porte au sud, côté terrasse), comptoir et petite cuisine au nord; passage derrière le comptoir à l'est")
+          porte=(3.5, 4.5, 2), note="salle sur la rue (porte au sud, côté terrasse), comptoir et coin cuisine au nord; allée de 2 m de la porte au comptoir, passage derrière le comptoir à l'est")
 interieur('ecole', 'ecole', "l'école-mairie", 6, 5,
           [('classe et secrétariat de mairie', [0, 0, 6, 5])], [],
           [('ecole-tableau', None, 'blackboard', 3, 0.5, 0), ('ecole-archives', 'armoire', 'wardrobe', 5.5, 0.5, 0),
@@ -994,7 +1026,8 @@ interieur('ecole', 'ecole', "l'école-mairie", 6, 5,
           porte=(3.5, 4.5, 2), note="une seule salle: l'instituteur est aussi secrétaire de mairie (armoire des archives, table du registre); les bancs regardent le tableau, au nord")
 interieur('eglise', 'eglise', "l'église Saint-Aubin", 20, 11,
           [('base du clocher', [0, 3, 5, 5]), ('nef', [6, 0, 12, 11]), ('chœur', [18, 0, 2, 11])],
-          [[0, 0, 5, 3], [0, 8, 5, 3], [5, 0, 1, 5], [5, 6, 1, 5]],
+          # L'arc entre la nef et la base du clocher fait 2 m (y 5-6): on y monte à deux, vers la chambre des cloches.
+          [[0, 0, 5, 3], [0, 8, 5, 3], [5, 0, 1, 5], [5, 7, 1, 4]],
           [('eglise-autel', None, 'altar', 18.5, 5.5, 3), ('eglise-banc-1', 'banc', 'bench-platform', 8.5, 2, 1),
            ('eglise-banc-2', 'banc', 'bench-platform', 12.5, 2, 1), ('eglise-banc-3', 'banc', 'bench-platform', 14.5, 2, 1),
            ('eglise-banc-4', 'banc', 'bench-platform', 8.5, 8, 1), ('eglise-banc-5', 'banc', 'bench-platform', 12.5, 8, 1),
@@ -1004,7 +1037,7 @@ interieur('eglise', 'eglise', "l'église Saint-Aubin", 20, 11,
           note="portail latéral au sud, chœur à l'est, clocher à l'ouest: on entre face à l'allée, la corde de la cloche pend dans la base du clocher")
 interieur('eglise-clocher', 'eglise', 'la chambre des cloches', 5, 5, [('chambre des cloches', [0, 0, 5, 5])], [],
           [('clocher-cloche', None, 'bell', 2.5, 2.5, 0)], [('clocher-vue', 2.5, 4.5, 'poste', None)],
-          escaliers=[dict(x=0.5, y=0.5, vers='eglise', regard=0)], niveau=1,
+          escaliers=[dict(x=0.5, y=2.5, vers='eglise', regard=0)], niveau=1,
           note="en haut de l'échelle du sonneur: la cloche au milieu, les abat-son ouverts sur le bourg (la vue de « La robe et la cloche »); le niveau intermédiaire attend l'écriture de la suite")
 interieur('poste', 'poste', "le poste d'aiguillage, rez-de-chaussée", 5, 3, [('salle des transmissions', [0, 0, 5, 3])], [],
           [('poste-coffre', 'coffre', 'chest', 0.5, 2.5, 1)], [('poste-bas', 2.5, 1.5, 'poste', None)],
@@ -1018,18 +1051,21 @@ interieur('poste-cabine', 'poste', 'la cabine des leviers', 5, 3, [('cabine vitr
 interieur('moulin', 'moulin', 'le moulin de la Vanne, salle des meules', 7, 7, [('salle des meules', [0, 0, 7, 7])], [],
           [('moulin-meules', None, 'millstones', 3, 4, 0), ('moulin-sacs', 'coffre', 'chest', 6.5, 6.5, 3)],
           [('berthe-meules', 4.5, 3.5, 'poste', 'Berthe')],
-          porte=(3.5, 0.5, 0), escaliers=[dict(x=0.5, y=6.5, vers='moulin-etage', regard=0)],
+          # L'escalier est dans le coin sud-ouest: on en sort vers le nord, dans la salle (vers le sud, c'était le mur).
+          porte=(3.5, 0.5, 0), escaliers=[dict(x=0.5, y=6.5, vers='moulin-etage', regard=2)],
           note="porte au nord sur la cour; les meules au milieu, l'arbre de la roue entre par le pignon sud")
 interieur('moulin-etage', 'moulin', 'le grenier du moulin', 7, 7, [('grenier à grain', [0, 0, 7, 7])], [],
           [('moulin-grain-1', 'coffre', 'chest', 6.5, 0.5, 3), ('moulin-grain-2', 'coffre', 'chest', 6.5, 1.5, 3)],
           [('moulin-grenier', 3.5, 3.5, 'poste', None)],
-          escaliers=[dict(x=0.5, y=6.5, vers='moulin', regard=0)], niveau=1, note="le grain monté en sacs, la trémie au-dessus des meules")
+          escaliers=[dict(x=0.5, y=6.5, vers='moulin', regard=2)], niveau=1, note="le grain monté en sacs, la trémie au-dessus des meules")
 interieur('ferme-logis', 'ferme_logis', 'le logis de la ferme Delmas', 8, 5, [('salle commune', [0, 0, 8, 5])], [],
           [('logis-cuisiniere', 'cuisiniere', 'stove', 0.5, 0.5, 0), ('logis-plan', 'plan-de-travail', 'plan-de-travail', 2, 0.5, 0),
-           ('logis-table', 'table-a-manger', 'table-farm', 4, 2.5, 0), ('logis-chaise-1', 'chaise', 'chair-farm', 3.5, 1.5, 0),
-           ('logis-chaise-2', 'chaise', 'chair-farm', 4.5, 3.5, 2), ('logis-armoire', 'armoire', 'wardrobe', 7.5, 0.5, 0)],
-          [('margot-cuisine', 1.5, 1.5, 'poste', 'Margot'), ('paulin-table', 5.5, 2.5, 'poste', 'Paulin')],
-          porte=(4.5, 4.5, 2), note="une salle commune: la cuisine au nord, la grande table au milieu, la porte au midi sur la cour")
+           # La table et ses chaises à l'est de l'allée de la porte (x 3-4): elles fermaient la salle en diagonale,
+           # l'armoire et la moitié est n'étaient plus atteignables, et une chaise barrait l'entrée.
+           ('logis-table', 'table-a-manger', 'table-farm', 6, 2.5, 0), ('logis-chaise-1', 'chaise', 'chair-farm', 5.5, 1.5, 0),
+           ('logis-chaise-2', 'chaise', 'chair-farm', 6.5, 3.5, 2), ('logis-armoire', 'armoire', 'wardrobe', 7.5, 0.5, 0)],
+          [('margot-cuisine', 1.5, 1.5, 'poste', 'Margot'), ('paulin-table', 5.5, 3.5, 'poste', 'Paulin')],
+          porte=(4.5, 4.5, 2), note="une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour")
 
 
 # ================================================================ calculs
@@ -1223,7 +1259,7 @@ def tableaux(dist_t, dens):
     z.append('| **Total jouable** | | **%d m²** sur %d m² de carte (%d x %d m) | %d | %d |' % (
         sum(round(aire(zz['poly'])) for zz in ZONES.values()), L * H, L, H, len(B), len(P)))
     t['zones'] = z
-    d = ['| De | À | Distance | Marche (3 m/s) | Course (5 m/s) |', '|---|---|---|---|---|']
+    d = ['| De | À | Distance | Marche (%s m/s) | Course (%s m/s) |' % (vit(MARCHE), vit(COURSE)), '|---|---|---|---|---|']
     for r in dist_t:
         d.append('| %s | %s | %d m | %s | %s |' % (r['de_nom'], r['a_nom'], r['m'], temps(r['m'], MARCHE), temps(r['m'], COURSE)))
     t['distances'] = d
@@ -1278,8 +1314,11 @@ def tableaux(dist_t, dens):
             for yy in range(c[1], c[1] + c[3]):
                 for xx in range(c[0], c[0] + c[2]):
                     grille[yy][xx] = '#'
+        # Toute l'emprise du meuble, telle que le jeu la bloque (centre, taille du type, rotation).
         for m in i['meubles']:
-            grille[int(m['y'])][int(m['x'])] = (m['type'] or m['modele'])[0].upper()
+            for xx, yy in emprise(m):
+                if 0 <= yy < i['hauteur'] and 0 <= xx < i['largeur']:
+                    grille[yy][xx] = (m['type'] or m['modele'])[0].upper()
         for q in i['points']:
             grille[int(q['y'])][int(q['x'])] = '*'
         if i['porte']:
@@ -1466,7 +1505,7 @@ def nord_echelle(x, y, k):
     s.append(texte(2, 5, 'N', 2.8, halo=False, gras=True))
     s.append('<rect x="8" y="-2" width="25" height="1.6" fill="#2E2A26"/><rect x="33" y="-2" width="25" height="1.6" fill="#FFFDF5" stroke="#2E2A26" stroke-width="0.3"/>')
     s.append(texte(8, -4, '0', 2.6, halo=False)); s.append(texte(33, -4, '25 m', 2.6, halo=False)); s.append(texte(56, -4, '50 m', 2.6, halo=False))
-    s.append(texte(33, 4, '1 case = 1 m; course 5 m/s: 50 m = 10 s', 2.2, halo=False))
+    s.append(texte(33, 4, '1 case = 1 m; course %s m/s: 50 m = %d s' % (vit(COURSE), round(50 / COURSE)), 2.2, halo=False))
     s.append('</g>')
     return s
 

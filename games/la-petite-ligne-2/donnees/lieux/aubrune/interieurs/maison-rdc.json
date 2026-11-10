@@ -13,38 +13,32 @@
       "x": 5,
       "y": 0,
       "w": 1,
-      "h": 1
+      "h": 2
     },
     {
       "x": 5,
-      "y": 3,
+      "y": 4,
       "w": 1,
-      "h": 2
+      "h": 1
     },
     {
       "x": 5,
       "y": 6,
       "w": 1,
       "h": 1
-    },
-    {
-      "x": 6,
-      "y": 4,
-      "w": 2,
-      "h": 1
     }
   ],
   "points": {
     "maison-lit-g": {
       "x": 8.5,
-      "y": 4.5
+      "y": 2.5
     },
     "maison-lit-d": {
-      "x": 9.5,
-      "y": 4.5
+      "x": 8.5,
+      "y": 5.5
     },
     "maison-cuisine": {
-      "x": 8,
+      "x": 7.5,
       "y": 5.5
     }
   },
@@ -67,29 +61,29 @@
       "id": "maison-table",
       "type": "table-a-manger",
       "x": 7,
-      "y": 2,
+      "y": 0.5,
       "rotation": 0
     },
     {
       "id": "maison-chaise-1",
       "type": "chaise",
-      "x": 7,
-      "y": 1,
-      "rotation": 0
+      "x": 8.5,
+      "y": 0.5,
+      "rotation": 3
     },
     {
       "id": "maison-chaise-2",
       "type": "chaise",
-      "x": 7,
-      "y": 3,
+      "x": 6.5,
+      "y": 1.5,
       "rotation": 2
     },
     {
       "id": "lit-de-la-maison",
       "type": "lit-double",
       "x": 9,
-      "y": 3,
-      "rotation": 0
+      "y": 4,
+      "rotation": 3
     },
     {
       "id": "maison-armoire",
@@ -116,15 +110,15 @@
     "maison-rdc-esc-maison-etage": {
       "x": 5.5,
       "y": 4.5,
-      "facing": 0,
+      "facing": 1,
       "to": "maison-etage-esc-maison-rdc"
     },
     "maison-rdc-esc-maison-cave": {
       "x": 0.5,
       "y": 3.5,
-      "facing": 0,
+      "facing": 2,
       "to": "maison-cave-esc-maison-rdc"
     }
   },
-  "pourquoi": "au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de la cave part de la chambre"
+  "pourquoi": "au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre"
 }

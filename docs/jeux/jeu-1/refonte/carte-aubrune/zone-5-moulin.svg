@@ -2,7 +2,7 @@
 <rect width="100%" height="100%" fill="#FFFDF5"/>
 <text x="12" y="23" font-family="DejaVu Sans" font-size="17" font-weight="bold" fill="#2E2A26">Zone 5: le moulin (acte 3)</text>
 <rect x="1491.25" y="20" width="234.375" height="5" fill="#2E2A26"/><rect x="1725.62" y="20" width="234.375" height="5" fill="#FFFDF5" stroke="#2E2A26" stroke-width="1"/>
-<text x="1968" y="15" font-family="DejaVu Sans" font-size="11" fill="#2E2A26" text-anchor="end">échelle: 20 m (7 s de marche, 4 s de course)</text>
+<text x="1968" y="15" font-family="DejaVu Sans" font-size="11" fill="#2E2A26" text-anchor="end">échelle: 20 m (13 s de marche, 6 s de course)</text>
 <path d="M1461.25,30 L1461.25,8 M1461.25,4 L1456.25,13 L1466.25,13 Z" stroke="#2E2A26" stroke-width="2" fill="#2E2A26"/><text x="1469.25" y="24" font-family="DejaVu Sans" font-size="12" font-weight="bold" fill="#2E2A26">N</text>
 <svg x="0" y="34" width="1500" height="1031.25" viewBox="100 96 64 44">
 <rect x="0" y="0" width="384" height="208" fill="#B7CC8E"/>

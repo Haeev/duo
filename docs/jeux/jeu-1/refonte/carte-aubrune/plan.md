@@ -5,7 +5,7 @@
 | Statut | version 3: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12), raccordé à l'histoire écrite des actes 1 à 3 (section 13) |
 | Date | 2026-11-10 |
 | Source unique | `construire_plan.py` (composition en code), qui écrit `plan.json`, les SVG, les PNG et les tableaux marqués « généré » de ce document |
-| Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (21 casses vues sur 21), `assembler_lieu.py` (aucun verrou contournable sur la grille) |
+| Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (26 casses vues sur 26), `assembler_lieu.py` (aucun verrou contournable sur la grille); règle d'accès des intérieurs et du dehors (section 14), aussi tenue par `tests/points-de-quete.test.ts` du jeu |
 | Règle suivie | « le plan avant le volume » (CLAUDE.md): la carte 3D sera générée à partir de `plan.json`, jamais l'inverse |
 
 Images: `plan-ensemble.png`, `zone-1-bourg.png` à `zone-7-tunnel.png`, `quetes-acte-1.png` à `quetes-acte-3.png` (SVG de même nom à côté).
@@ -36,7 +36,7 @@ Le récit, comme un habitant le raconterait. L'Aubrune coule d'ouest en est au p
 - 1 case = 1 m. x vers l'est, y vers le sud, origine au coin nord-ouest: plus d'origine négative.
 - Carte: 320 x 208 m. Les marges sud-ouest et est (prés lointains, bois) sont du décor non jouable.
 - Reprise de l'ancien bourg: ancien (x, y) de `halte.json` = nouveau (x - 100, y - 84), à 1 ou 2 m près pour le coeur (quai, halte, place, rue Haute, église).
-- Métriques du cahier (4.12): marche 3 m/s, course 5 m/s, vue large de 28 m au plus. Traverser toute la carte en courant d'ouest en est prend 64 s; la vue ne montre qu'un onzième de la largeur: d'où les repères hauts.
+- Métriques: marche 1,5 m/s et course 3,2 m/s (décision du client du 2026-11-10; le cahier 4.12 disait 3 et 5), vue large de 28 m au plus. Traverser toute la carte de la version 2 (384 m) d'ouest en est prend 2 min en courant, 4 min 16 en marchant; la vue ne montre qu'un quatorzième de la largeur: d'où les repères hauts.
 
 <!-- genere:zones:debut -->
 | Zone | Ouverte à | Surface | Bâtiments | Points d’intérêt |
@@ -200,58 +200,58 @@ Eau: quatre règles tenues par le contrôle. Toute eau courante part du bord de 
 
 ## 6. Distances et densité d'intérêt
 
-Dijkstra sur le graphe des chemins, tous verrous ouverts. Temps: distance divisée par 3 m/s (marche) et 5 m/s (course).
+Dijkstra sur le graphe des chemins, tous verrous ouverts. Temps: distance divisée par 1,5 m/s (marche) et 3,2 m/s (course), les vitesses décidées par le client le 2026-11-10 (avant: 3 et 5 m/s; les temps ont presque doublé, les distances n'ont pas bougé).
 
 <!-- genere:distances:debut -->
-| De | À | Distance | Marche (3 m/s) | Course (5 m/s) |
+| De | À | Distance | Marche (1,5 m/s) | Course (3,2 m/s) |
 |---|---|---|---|---|
-| le quai | la maison | 34 m | 11 s | 7 s |
-| le quai | la place (pompe) | 14 m | 5 s | 3 s |
-| le quai | l'épicerie | 20 m | 7 s | 4 s |
-| le quai | l'atelier de Basile | 36 m | 12 s | 7 s |
-| le quai | le fournil et la mercerie | 36 m | 12 s | 7 s |
-| le quai | le carrefour de l'Église (café, forge) | 61 m | 20 s | 12 s |
-| le quai | l'église | 75 m | 25 s | 15 s |
-| le quai | le lavoir | 28 m | 9 s | 6 s |
-| le quai | le ponton | 27 m | 9 s | 5 s |
-| le quai | le gué (rive nord) | 45 m | 15 s | 9 s |
-| le quai | l'arrêt du car | 116 m | 39 s | 23 s |
-| le quai | la fosse du bief | 97 m | 32 s | 19 s |
-| le quai | la vanne | 207 m | 1 min 09 | 41 s |
-| le quai | le poste d'aiguillage | 170 m | 57 s | 34 s |
-| le quai | le moulin | 73 m | 24 s | 15 s |
-| le quai | la ferme | 86 m | 29 s | 17 s |
-| le quai | le Gros Noyer | 112 m | 37 s | 22 s |
-| le quai | la clairière du Vieux Chêne | 74 m | 25 s | 15 s |
-| le quai | l'étang | 73 m | 24 s | 15 s |
-| le quai | la source | 103 m | 34 s | 21 s |
-| le quai | le belvédère | 191 m | 1 min 04 | 38 s |
-| le quai | le portail du tunnel | 184 m | 1 min 01 | 37 s |
-| le quai | la cachette d'Émile | 218 m | 1 min 13 | 44 s |
-| la maison | l'épicerie | 44 m | 15 s | 9 s |
-| la maison | le fournil et la mercerie | 58 m | 19 s | 12 s |
-| la maison | le carrefour de l'Église (café, forge) | 84 m | 28 s | 17 s |
-| la maison | le poste d'aiguillage | 162 m | 54 s | 32 s |
-| la maison | le moulin | 53 m | 18 s | 11 s |
-| la maison | la ferme | 53 m | 18 s | 11 s |
-| la maison | l'étang | 105 m | 35 s | 21 s |
-| la maison | la cachette d'Émile | 252 m | 1 min 24 | 50 s |
-| le poste d'aiguillage | le moulin | 188 m | 1 min 03 | 38 s |
-| le moulin | la ferme | 97 m | 32 s | 19 s |
-| la ferme | l'arrêt du car | 162 m | 54 s | 32 s |
-| le belvédère | l'église | 116 m | 39 s | 23 s |
-| l'étang | l'église | 108 m | 36 s | 22 s |
-| la clairière du Vieux Chêne | l'atelier de Basile | 38 m | 13 s | 8 s |
-| le passage à niveau | le poste d'aiguillage | 144 m | 48 s | 29 s |
-| le passage des Hameaux | la cachette d'Émile | 127 m | 42 s | 25 s |
+| le quai | la maison | 34 m | 23 s | 11 s |
+| le quai | la place (pompe) | 14 m | 9 s | 4 s |
+| le quai | l'épicerie | 20 m | 13 s | 6 s |
+| le quai | l'atelier de Basile | 36 m | 24 s | 11 s |
+| le quai | le fournil et la mercerie | 36 m | 24 s | 11 s |
+| le quai | le carrefour de l'Église (café, forge) | 61 m | 41 s | 19 s |
+| le quai | l'église | 75 m | 50 s | 23 s |
+| le quai | le lavoir | 28 m | 19 s | 9 s |
+| le quai | le ponton | 27 m | 18 s | 8 s |
+| le quai | le gué (rive nord) | 45 m | 30 s | 14 s |
+| le quai | l'arrêt du car | 116 m | 1 min 17 | 36 s |
+| le quai | la fosse du bief | 97 m | 1 min 05 | 30 s |
+| le quai | la vanne | 207 m | 2 min 18 | 1 min 05 |
+| le quai | le poste d'aiguillage | 170 m | 1 min 53 | 53 s |
+| le quai | le moulin | 73 m | 49 s | 23 s |
+| le quai | la ferme | 86 m | 57 s | 27 s |
+| le quai | le Gros Noyer | 112 m | 1 min 15 | 35 s |
+| le quai | la clairière du Vieux Chêne | 74 m | 49 s | 23 s |
+| le quai | l'étang | 73 m | 49 s | 23 s |
+| le quai | la source | 103 m | 1 min 09 | 32 s |
+| le quai | le belvédère | 191 m | 2 min 07 | 1 min 00 |
+| le quai | le portail du tunnel | 184 m | 2 min 03 | 58 s |
+| le quai | la cachette d'Émile | 218 m | 2 min 25 | 1 min 08 |
+| la maison | l'épicerie | 44 m | 29 s | 14 s |
+| la maison | le fournil et la mercerie | 58 m | 39 s | 18 s |
+| la maison | le carrefour de l'Église (café, forge) | 84 m | 56 s | 26 s |
+| la maison | le poste d'aiguillage | 162 m | 1 min 48 | 51 s |
+| la maison | le moulin | 53 m | 35 s | 17 s |
+| la maison | la ferme | 53 m | 35 s | 17 s |
+| la maison | l'étang | 105 m | 1 min 10 | 33 s |
+| la maison | la cachette d'Émile | 252 m | 2 min 48 | 1 min 19 |
+| le poste d'aiguillage | le moulin | 188 m | 2 min 05 | 59 s |
+| le moulin | la ferme | 97 m | 1 min 05 | 30 s |
+| la ferme | l'arrêt du car | 162 m | 1 min 48 | 51 s |
+| le belvédère | l'église | 116 m | 1 min 17 | 36 s |
+| l'étang | l'église | 108 m | 1 min 12 | 34 s |
+| la clairière du Vieux Chêne | l'atelier de Basile | 38 m | 25 s | 12 s |
+| le passage à niveau | le poste d'aiguillage | 144 m | 1 min 36 | 45 s |
+| le passage des Hameaux | la cachette d'Émile | 127 m | 1 min 25 | 40 s |
 <!-- genere:distances:fin -->
 
-Densité d'intérêt (plafond visé: jamais plus de 25 s de marche, soit 75 m, sans rien à faire):
+Densité d'intérêt (plafond visé: jamais plus de 25 s de marche sans rien à faire, soit 37,5 m à 1,5 m/s; c'était 75 m à 3 m/s, et le contrôle tire maintenant le plafond de la vitesse du plan):
 
 <!-- genere:densite:debut -->
 - Réseau de chemins: 2141 m; 96 points d’intérêt et bâtiments, soit un tous les 22,3 m de chemin en moyenne.
-- Distance moyenne, depuis un point quelconque du réseau, au point d’intérêt le plus proche: 6,9 m (2 s à la marche).
-- Pire cas: 28,0 m (9 s à la marche, 6 s à la course), sur le tronçon trav - pne.
+- Distance moyenne, depuis un point quelconque du réseau, au point d’intérêt le plus proche: 6,9 m (5 s à la marche).
+- Pire cas: 28,0 m (19 s à la marche, 9 s à la course), sur le tronçon trav - pne.
 <!-- genere:densite:fin -->
 
 ## 7. Les sentiers de quête
@@ -259,12 +259,12 @@ Densité d'intérêt (plafond visé: jamais plus de 25 s de marche, soit 75 m, s
 <!-- genere:quetes:debut -->
 | Sentier | Forme | Aller | Retour | Total à la marche | Total à la course |
 |---|---|---|---|---|---|
-| Acte 1, « Logement fourni »: le tour du propriétaire | étoile autour de la place | 336 m | sur place | 1 min 52 | 1 min 07 |
-| Acte 2, « La minute d’écart »: la voie jusqu’au signal | sentier linéaire, retour en boucle | 191 m | 212 m | 2 min 14 | 1 min 21 |
-| Acte 2: la pendule et la leçon de pêche | deux allers courts depuis le centre | 270 m | sur place | 1 min 30 | 54 s |
-| Acte 3, « Ceux qui partent »: le verre de la lanterne | sentier linéaire, retour par le haut | 253 m | 252 m | 2 min 49 | 1 min 41 |
-| Suite « Le fantôme du moulin »: les pas blancs | piste de traces, linéaire | 220 m | sur place | 1 min 13 | 44 s |
-| Suite « Les lettres en retard »: la ligne de la draisine | raccourci sur rail | 340 m | sur place | 1 min 53 | 1 min 08 |
+| Acte 1, « Logement fourni »: le tour du propriétaire | étoile autour de la place | 336 m | sur place | 3 min 44 | 1 min 45 |
+| Acte 2, « La minute d’écart »: la voie jusqu’au signal | sentier linéaire, retour en boucle | 191 m | 212 m | 4 min 29 | 2 min 06 |
+| Acte 2: la pendule et la leçon de pêche | deux allers courts depuis le centre | 270 m | sur place | 3 min 00 | 1 min 25 |
+| Acte 3, « Ceux qui partent »: le verre de la lanterne | sentier linéaire, retour par le haut | 253 m | 252 m | 5 min 37 | 2 min 38 |
+| Suite « Le fantôme du moulin »: les pas blancs | piste de traces, linéaire | 220 m | sur place | 2 min 26 | 1 min 09 |
+| Suite « Les lettres en retard »: la ligne de la draisine | raccourci sur rail | 340 m | sur place | 3 min 47 | 1 min 46 |
 <!-- genere:quetes:fin -->
 
 Ces durées sont du déplacement pur; les obstacles, scènes et activités s'y ajoutent.
@@ -592,7 +592,7 @@ Posés dans l'annexe sous le dehors (y 210), reliés au dehors par une paire de 
 **la halte** (`interieurs/halte.json`, 9 x 5 m, 45 m², niveau 0): le guichet sépare la salle du bureau; la consigne est le coffre commun des deux joueurs.
 
 ```text
-. B . . . . . T .
+B B . . . . . T T
 . * . . . . . * .
 . . . . . C * . .
 . . . . . . # # .
@@ -601,19 +601,19 @@ Posés dans l'annexe sous le dehors (y 210), reliés au dehors par une paire de 
 
 Pièces: salle des pas perdus (5 x 5); guichet (1 x 5); bureau de Firmin (3 x 3); consigne (3 x 2). Meubles: halte-banc (banc), halte-guichet (comptoir, à créer), halte-bureau (table-a-manger), halte-chaise (chaise), halte-consigne (coffre). Points: halte-p-guichet (comptoir, Firmin), halte-p-bureau (siege, Firmin), halte-p-banc (siege).
 
-**la maison du garde, rez-de-chaussée** (`interieurs/maison-rdc.json`, 10 x 7 m, 70 m², niveau 0): au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de la cave part de la chambre.
+**la maison du garde, rez-de-chaussée** (`interieurs/maison-rdc.json`, 10 x 7 m, 70 m², niveau 0): au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre.
 
 ```text
-. . . . A # . . . .
-. . . . . . . C . P
-. . . . . . . T . .
-E . . . . # . C * *
-. . . . . E # # . .
+. . . . A # T T C .
+. . . . . # C . . P
 . . . . . . . . * .
-. . . . . # R . P C
+E . . . . . . . L L
+. . . . . E . . L L
+. . . . . . . * * .
+. . . . . # R P P C
 ```
 
-Pièces: salle (5 x 4); cuisine (5 x 3); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
+Pièces: salle commune et cuisine (5 x 7); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire), maison-rechaud (rechaud). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
 
 **la maison du garde, étage** (`interieurs/maison-etage.json`, 10 x 7 m, 70 m², niveau 1): sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier).
 
@@ -629,13 +629,13 @@ Pièces: salle (5 x 4); cuisine (5 x 3); chambre (5 x 4); troisième pièce (5 x
 
 Pièces: grenier aménageable (10 x 7). Meubles: aucun. Points: maison-etage-milieu (poste).
 
-**la cave de la maison** (`interieurs/maison-cave.json`, 5 x 4 m, 20 m², niveau -1): la lanterne sans verre (acte 3) y attend.
+**la cave de la maison** (`interieurs/maison-cave.json`, 5 x 4 m, 20 m², niveau -1): la lanterne sans verre (acte 3) y attend; l'escalier descend à l'aplomb de celui de la chambre.
 
 ```text
-E . . . .
+. . . . .
 . . * . .
 . . . . .
-. . . . C
+E . . . C
 ```
 
 Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre). Points: cave-lanterne (poste).
@@ -648,34 +648,34 @@ Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre). Points: cave-lant
 . * C . . . P
 . . . . . . .
 . . . . . . .
-# # # . # # #
+# # # . . # #
 . . . . . . .
-. * . . T . .
-C . . . . . E
+. T T . . . .
+C * . . . . E
 ```
 
 Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir, à créer), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
 
-**la pension Ferrand, étage** (`interieurs/epicerie-etage.json`, 7 x 9 m, 63 m², niveau 1): la chambre du premier soir, deux lits simples.
+**la pension Ferrand, étage** (`interieurs/epicerie-etage.json`, 7 x 9 m, 63 m², niveau 1): la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté.
 
 ```text
+L . L . . . .
+L * L * . . .
 . . . . . . .
-* . * . . . .
 . . . . . . .
 . . . . . . .
-. . . . . . .
-# # # # # # .
-. . . . . . .
-* . . . . . .
-. . . . . . E
+# # # # # . .
+L . . . . . .
+L * . . # . .
+. . . . # . E
 ```
 
-Pièces: chambre de la pension (7 x 5); chambre d’Odette (7 x 4). Meubles: lit-pension-1 (lit-simple), lit-pension-2 (lit-simple), odette-lit (lit-simple). Points: pension-lit-a (lit), pension-lit-b (lit), odette-lit-p (lit, Odette).
+Pièces: chambre de la pension (7 x 5); chambre d’Odette (4 x 3); palier (2 x 4). Meubles: lit-pension-1 (lit-simple), lit-pension-2 (lit-simple), odette-lit (lit-simple). Points: pension-lit-a (lit), pension-lit-b (lit), odette-lit-p (lit, Odette).
 
 **le fournil d'Achille** (`interieurs/fournil.json`, 6 x 5 m, 30 m², niveau 0): le four contre le pignon est, côté ru; la boutique sur la rue.
 
 ```text
-. . P . . F
+. P P . . F
 . . . . * .
 # # . * . .
 . . . C . .
@@ -712,7 +712,7 @@ Pièces: forge (5 x 5). Meubles: forge-foyer (four), forge-haches (etal-de-hache
 **l'atelier de Basile** (`interieurs/atelier-basile.json`, 9 x 7 m, 63 m², niveau 0): atelier d'une pièce, porte à l'est vers l'auvent.
 
 ```text
-. . . . P . . . E
+. . . P P . . . E
 . . . . * . . . .
 . . . . . . . . .
 . . . . . . . . P
@@ -723,14 +723,14 @@ T . . . . . . . .
 
 Pièces: atelier (9 x 7). Meubles: basile-etabli (plan-de-travail), basile-bois (tas-de-bois), basile-haches (etal-de-haches). Points: basile-p-etabli (poste, Basile).
 
-**le café de la Halte** (`interieurs/cafe.json`, 6 x 5 m, 30 m², niveau 0): salle sur la rue (porte au sud, côté terrasse), comptoir et petite cuisine au nord; passage derrière le comptoir à l'est.
+**le café de la Halte** (`interieurs/cafe.json`, 6 x 5 m, 30 m², niveau 0): salle sur la rue (porte au sud, côté terrasse), comptoir et coin cuisine au nord; allée de 2 m de la porte au comptoir, passage derrière le comptoir à l'est.
 
 ```text
-C . P . * .
-# # # . C .
-C . . . C .
-. T . . . T
-. C . P . C
+C P P . * .
+. . . . C .
+T C . . C T
+T C . . C T
+. . . P . .
 ```
 
 Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (cuisiniere), cafe-plan (plan-de-travail), cafe-comptoir (comptoir, à créer), cafe-table-1 (table-a-manger), cafe-chaise-1 (chaise), cafe-chaise-2 (chaise), cafe-table-2 (table-a-manger), cafe-chaise-3 (chaise), cafe-chaise-4 (chaise). Points: colette-comptoir (comptoir, Colette).
@@ -740,8 +740,8 @@ Pièces: cuisine et comptoir (6 x 2); salle (6 x 3). Meubles: cafe-cuisiniere (c
 ```text
 . . . B . A
 . . . * . .
-. B . . . B
-. T . . . .
+B B . . B B
+T T . . . .
 . . . P . .
 ```
 
@@ -751,13 +751,13 @@ Pièces: classe et secrétariat de mairie (6 x 5). Meubles: ecole-tableau (black
 
 ```text
 # # # # # # . . . . . . . . . . . . . .
-# # # # # # . . . . . . . . . . . . . .
+# # # # # # . . B . . . B . B . . . . .
 # # # # # # . . B . . . B . B . . . . .
 . . . . . # . . . . . . . . . . . . . .
 . . * . . # . . . . . . . . . . . . . .
 E . . . . . . . . . . . . . . . . * A .
-. . . . . # . . . . . . . . . . . . . .
-. . . . . # . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . .
+. . . . . # . . B . . . B . B . . . . .
 # # # # # # . . B . . . B . B . . . . .
 # # # # # # . . . . . . . . . . . . . .
 # # # # # # . . . . P . . . . . . . . .
@@ -768,9 +768,9 @@ Pièces: base du clocher (5 x 5); nef (12 x 11); chœur (2 x 11). Meubles: eglis
 **la chambre des cloches** (`interieurs/eglise-clocher.json`, 5 x 5 m, 25 m², niveau 1): en haut de l'échelle du sonneur: la cloche au milieu, les abat-son ouverts sur le bourg (la vue de « La robe et la cloche »); le niveau intermédiaire attend l'écriture de la suite.
 
 ```text
-E . . . .
 . . . . .
-. . B . .
+. . . . .
+E . B . .
 . . . . .
 . . * . .
 ```
@@ -825,13 +825,13 @@ E . . . . . .
 
 Pièces: grenier à grain (7 x 7). Meubles: moulin-grain-1 (coffre), moulin-grain-2 (coffre). Points: moulin-grenier (poste).
 
-**le logis de la ferme Delmas** (`interieurs/ferme-logis.json`, 8 x 5 m, 40 m², niveau 0): une salle commune: la cuisine au nord, la grande table au milieu, la porte au midi sur la cour.
+**le logis de la ferme Delmas** (`interieurs/ferme-logis.json`, 8 x 5 m, 40 m², niveau 0): une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour.
 
 ```text
-C . P . . . . A
-. * . C . . . .
-. . . . T * . .
-. . . . C . . .
+C P P . . . . A
+. * . . . C . .
+. . . . . T T .
+. . . . . * C .
 . . . . P . . .
 ```
 
@@ -929,3 +929,45 @@ Ce qui manque pour que la carte porte tout (rien n'est inventé):
 ### Lisibilité des images
 
 Étiquettes de verrou jamais plus petites qu'à 0,6 de l'échelle du plan d'ensemble (zone 5); pastilles des trajets de quête posées après tous les tracés, écartées de leur nœud avec un trait quand elles en chevauchent une autre ou une étiquette de verrou (acte 2); noms des repères placés au-dessus, au-dessous ou à côté, là où ils ne couvrent ni numéro ni pastille (le clocher et le numéro 20); « l'éperon (rocher) » descendu sous le portail du tunnel; flèche du nord à gauche de l'échelle dans le bandeau.
+
+## 14. Règle d'accès: tout ce que l'histoire utilise s'atteint à pied
+
+### La règle
+
+Pour le dehors et les 19 fichiers d'intérieurs (13 bâtiments, leurs étages, la cave et la cabine), dans chacun des 16 états d'ouverture que l'histoire permet (les 15 ordres des verrous relus dans les fiches, plus « tous levés »): toute porte, tout escalier, tout meuble à brique (lit, siège, coffre, comptoir, réchaud, établi, poulailler...), tout point nommé par une quête, une scène, un planning d'habitant ou la fiche du lieu, et tout point d'un intérieur s'atteint à pied depuis le quai. Un élément n'est attendu dans un état que si le graphe des chemins y atteint son nœud le plus proche (dans la même salle, ou dehors): ce qui est derrière un verrou fermé attend son ouverture.
+
+La marche suit le jeu: quatre voisins, murs, cloisons et meubles solides bloquent (emprise réelle du meuble: centre, taille du type, rotation); passer une porte ou un escalier fait arriver 1 m devant sa jumelle, ou sur la case libre la plus proche (`passDoor`); la case d'une porte ne se traverse pas (y entrer, c'est la passer). Trois règles de gabarit s'y ajoutent dans les intérieurs: chaque porte et chaque escalier font arriver dans la salle qu'ils desservent; aucun meuble n'est posé à cheval sur des cases (un meuble de 1 x 1 posé sur un coin de case en bloque quatre); de l'arrivée de chaque salle à chaque escalier et à chaque lit des joueurs, un passage de 2 cases (deux corps de 0,6 m s'y croisent; 1,41 m en diagonale entre deux coins de meubles suffit). Les lits des habitants (celui d'Odette) en sont dispensés.
+
+Deux contrôles disent la même chose: `controler_plan.py` (section « accès », liste de ce qui manque avec sa position, et cinq casses de plus dans `--eprouver`, dont les deux signalements) et `tests/points-de-quete.test.ts` du jeu (`unreachableStoryElements` de `tests/aides-acces.ts`, pour tout lieu, avec les mêmes casses rejouées sur une copie des fiches).
+
+### Avant: 33 éléments inaccessibles, dans 6 intérieurs
+
+| Intérieur | Inaccessible | Cause |
+|---|---|---|
+| épicerie, rez-de-chaussée | l'escalier, la cuisinière, le point `odette-cuisine` | la table (2 x 1) posée en y 7 bloquait deux rangées, juste sous la baie de 1 m: la cuisine était coupée de la boutique (signalement 1) |
+| pension, étage | l'escalier, les trois lits, les points `pension-lit-a`, `-b`, `odette-lit-p` | rien n'y menait (l'escalier du bas inaccessible); de plus on traversait la chambre d'Odette pour aller à la pension |
+| maison, rez-de-chaussée | les deux escaliers, la cuisinière, le plan de travail, le réchaud, une chaise, l'armoire, les points `maison-lit-g`, `-d`, `maison-cuisine` | la table et les deux chaises posées sur des coins de case faisaient un mur de 2 x 4 m du nord à la cloison de la cuisine: la porte d'entrée ne menait qu'à 4 cases et au lit (signalement 2: escaliers non reliés, ce n'était pas voulu) |
+| maison, étage et cave | l'escalier de chacun, le coffre et le point `cave-lanterne` de la cave, le point `maison-etage-milieu` | par le rez-de-chaussée; la cave sert pourtant à la fin de l'acte 2 et à l'acte 3 (la lanterne) |
+| moulin, grenier | l'escalier, les deux coffres de grain, le point `moulin-grenier` | les deux escaliers faisaient arriver « vers le sud », dans le mur: on se retrouvait hors du moulin, sous l'annexe |
+| café | la cuisinière, une chaise | la cuisinière enfermée derrière le plan de travail et sa cloison; une chaise dans un coin que seule la case de la porte desservait |
+| logis de la ferme | l'armoire, le point `paulin-table` | chaise, table, chaise et porte en diagonale coupaient la salle en deux, une chaise devant l'entrée |
+
+À quoi s'ajoutaient (52 erreurs du contrôle en tout): 6 meubles à cheval (la table et les deux chaises de la maison, la table de l'épicerie, causes des deux signalements; le banc et le bureau de la halte, qui bloquaient 3 cases au lieu de 2), 2 escaliers qui faisaient arriver hors de leur salle (moulin) et 11 passages de moins de 2 m vers un escalier ou un lit (baie de l'épicerie, palier de la pension, arc du clocher de l'église, salle de la maison, et le moulin par son arrivée dans le mur). L'ancienne règle du test ne voyait rien: elle ne suivait que les cibles des étapes, dont `pl-o` (devant l'épicerie) pour la nuit à la pension.
+
+### Après: 0
+
+| Intérieur | Correction | Pourquoi là |
+|---|---|---|
+| épicerie, rez-de-chaussée | baie de 2 m (x 3-4); table en (2; 7,5), à l'ouest de la cuisine; `odette-cuisine` en (1,5; 8,5) | les pensionnaires traversent la cuisine pour monter: la table près du fourneau, hors du trajet de la baie à l'escalier |
+| pension, étage | palier de 2 m (x 5-6) de l'escalier à la pension; chambre d'Odette (4 x 3) ouverte sur le palier; points de lit au chevet de chaque lit | on ne traverse plus la chambre de la logeuse |
+| maison, rez-de-chaussée | salle et cuisine en une salle commune; table contre le mur nord près de la porte, une chaise au bout et une devant; lit double contre le mur est, tête au mur; refend ouvert en y 2-3; escalier de l'étage qui fait arriver face à la salle, celui de la cave face à la chambre | 2 m libres de la porte au refend, aux escaliers et aux feux; on dort toujours dans la salle (la seule pièce couverte au début) |
+| maison, cave | escalier en (0,5; 3,5), à l'aplomb de celui de la chambre | un escalier descend sur place |
+| moulin et grenier | escaliers qui font arriver vers le nord, dans la salle | le coin sud-ouest est contre deux murs |
+| café | plus de cloison: le coin cuisine s'ouvre derrière le comptoir; tables contre les murs est et ouest, chaises tournées vers elles; allée de 2 m de la porte au comptoir | un café de village cuisine derrière son comptoir; on entre face au comptoir |
+| logis de la ferme | table et chaises à l'est de l'allée de la porte | l'entrée et la cuisine restent dégagées, la table reste au cœur de la salle commune |
+| halte | banc en x 1, bureau en x 8 (centres entiers pour les meubles de 2 m) | chaque meuble bloque ses deux cases, pas trois |
+| église et chambre des cloches | arc du clocher de 2 m (y 5-6); échelle du sonneur en (0,5; 2,5), à l'aplomb du pied de l'échelle | on y monte à deux |
+
+Aucune porte de bâtiment n'a bougé: toutes les portes d'entrée restent au droit de la porte du plan (et des fiches de bâtiments). Seuls les escaliers intérieurs ont changé de sens d'arrivée ou de place.
+
+Défaut vu hors de la règle, pas corrigé ici: 49 objets du dehors sont posés à cheval (chênes, cailloux, bancs, pompe, tas de bois, poulailler, potager), centres entiers pour un meuble de 1 m ou demi-entiers pour un meuble de 2 m; aucun ne coupe un passage (la règle d'accès passe), mais chacun bloque 2 à 6 cases de plus que son emprise. Proposition: arrondir les centres dans l'assembleur, après vérification des tests qui citent ces positions.

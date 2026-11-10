@@ -9,12 +9,13 @@ L'outil du paquet écrit la grille (collisions, terrain, zones, verrous, graphe)
 version 2 décrit et que l'outil ne lit pas encore: sols détaillés (codes ajoutés au bout de la légende, les premiers
 ne bougent pas), meubles et décor dont le type existe déjà (`donnees/commun/meubles`), points nommés, coins de pêche,
 portes et intérieurs (annexe sous le dehors), nœuds de portes et d'intérieurs dans le graphe. Il écrit `carte.json`,
-`lieu.json`, `climat.json` et `interieurs/*.json` du lieu, puis prouve qu'aucun verrou ne se contourne: pour chaque
+`lieu.json`, `climat.json`, `interieurs/*.json` et la copie de `plan.json` du lieu, puis prouve qu'aucun verrou ne se contourne: pour chaque
 verrou fermé (avec ceux des actes suivants et les raccourcis), aucun nœud que le graphe dit fermé n'est atteint en
 marchant sur la grille. Rien de tout cela ne se retouche à la main: on corrige le plan et on relance les deux étapes.
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -276,12 +277,16 @@ def main(brute):
         json.dump(climat, f, ensure_ascii=False, indent=2)
         f.write('\n')
 
+    # Le jeu lit sa copie du plan (la publication ne récupère pas `docs/`); `tests/plan-copie.test.ts` la garde égale
+    # à la source: la copie est mise en forme avec les autres, puis recopiée sur la source (docs/ n'est pas formaté).
+    shutil.copyfile(os.path.join(ICI, 'plan.json'), os.path.join(LIEU, 'plan.json'))
     # Mise en forme du dépôt (`pnpm format:verifier`): les fichiers du lieu se relisent ligne à ligne dans les diffs.
-    sorties = [os.path.join(LIEU, 'carte.json'), os.path.join(LIEU, 'climat.json')] + [
+    sorties = [os.path.join(LIEU, 'carte.json'), os.path.join(LIEU, 'climat.json'), os.path.join(LIEU, 'plan.json')] + [
         os.path.join(LIEU, 'interieurs', f) for f in sorted(os.listdir(os.path.join(LIEU, 'interieurs')))]
     r = subprocess.run(['npx', 'prettier', '--write', '--log-level', 'warn'] + sorties, cwd=PAQUET)
     if r.returncode != 0:
         print('prettier a échoué: fichiers du lieu laissés tels quels')
+    shutil.copyfile(os.path.join(LIEU, 'plan.json'), os.path.join(ICI, 'plan.json'))
     erreurs = eprouver_verrous(plan, carte)
     print('carte.json: %d objets, %d points, %d portes, %d noeuds, %d arêtes; %d intérieurs; légende de %d sols' % (
         len(objets), len(pts), len(portes), len(noeuds), len(aretes), len(plan['interieurs']), len(legende)))
