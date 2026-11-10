@@ -48,6 +48,8 @@ await duo.ready();
 duo.input.attach(canvas);
 
 const colors = [duo.host.colorHex, duo.guest.colorHex] as const;
+/** Parcours de recette (`?sonde=1`): sonde installée, pas d'éditeur de personnage au départ. */
+const probed = new URLSearchParams(location.search).get('sonde') === '1';
 // Rendu 3D; sans WebGL2, repli sur le plan 2D du socle et ses repères d'essai.
 // Décors chargés avant le premier lieu: sinon il garderait ses formes provisoires.
 await gameDecorModels().ready;
@@ -114,6 +116,7 @@ const ui =
         },
         notebook: { settings, sourcesExtras: { plans } },
         objectViewer,
+        editorAtStart: !probed,
       });
 // Reprise de partie: ce que la sauvegarde a donné à dire (partie neuve, invité remplacé).
 if (session.notice !== null) ui?.notice(session.notice.message);
@@ -122,7 +125,7 @@ duo.on('pause', () => {
   void session.saveNow();
 });
 // Sonde des parcours de recette, seulement sur demande de l'adresse (`?sonde=1`).
-if (new URLSearchParams(location.search).get('sonde') === '1')
+if (probed)
   void import('./plateforme/sonde-essai').then((m) => m.installTestProbe({ session, renderer }));
 const controls = createControls({
   input: duo.input,
