@@ -83,6 +83,8 @@ export interface Duo {
   readonly guest: Side;
   readonly contexts: readonly [BrowserContext, BrowserContext];
   readonly errors: string[];
+  /** Le faux hôte de ce démarrage (pour une reprise). */
+  readonly server: Serveur;
   /** Hôte seulement: place un joueur (index du monde). */
   teleport(player: number, x: number, y: number, facing?: number): Promise<void>;
   setNeed(player: number, need: Need, value: number): Promise<void>;
@@ -188,6 +190,15 @@ export interface StartOptions {
   readonly save?: string | null;
   /** Appelé avant la première navigation de l'invité (écoute de la WebSocket). */
   readonly onGuestPage?: (page: Page) => void;
+  /**
+   * Reprise (quitter puis reprendre): faux hôte et dossier de données d'un démarrage précédent.
+   * L'accueil propose alors « Héberger et continuer ». Le faux hôte n'est pas arrêté par `close`
+   * (`keepServer`), c'est à l'appelant de le faire.
+   */
+  readonly server?: Serveur;
+  readonly keepServer?: boolean;
+  /** Faux: le jeu est lancé sans la sonde, comme chez un vrai joueur (aucune lecture du monde). */
+  readonly probe?: boolean;
 }
 
 /** Profils fixes: ceux d'une sauvegarde de départ (les joueurs sont reconnus par leur identifiant). */
@@ -202,10 +213,11 @@ export async function startDuo(
   options: StartOptions = {},
 ): Promise<Duo> {
   const { onGuestPage } = options;
+  const resumed = options.server !== undefined;
   const save = options.save === undefined ? 'essai-gare' : (options.save ?? undefined);
   // Un faux hôte à soi (port et dossier de données propres): chaque parcours part d'une partie
   // connue, quoi qu'aient laissé les parcours précédents.
-  const server: Serveur = await startServer(save);
+  const server: Serveur = options.server ?? (await startServer(save));
   const baseURL = server.url;
   const contexts = [
     await browser.newContext({ baseURL }),
@@ -217,7 +229,7 @@ export async function startDuo(
         localStorage.setItem('duo-sdk-dev:profil', JSON.stringify(profile));
     }, PROFILES[i] ?? PROFILES[0]);
   // Le faux hôte ouvre `/jeu/` sans paramètre: une redirection y ajoute la sonde.
-  for (const ctx of contexts)
+  for (const ctx of options.probe === false ? [] : contexts)
     await ctx.route(
       (url) => url.pathname === '/jeu/' && url.search === '',
       (route) => route.fulfill({ status: 302, headers: { location: '/jeu/?sonde=1' } }),
@@ -238,7 +250,7 @@ export async function startDuo(
   await hostPage.getByLabel('Ton pseudo').fill('Loïc');
   await hostPage
     .getByRole('button', {
-      name: save === undefined ? 'Héberger' : 'Héberger et continuer',
+      name: save === undefined && !resumed ? 'Héberger' : 'Héberger et continuer',
       exact: true,
     })
     .click();
@@ -288,12 +300,15 @@ export async function startDuo(
     },
     async close() {
       for (const ctx of contexts) await ctx.close();
-      await server.close();
+      if (options.keepServer !== true) await server.close();
     },
+    server,
   };
   // La sonde se charge par un import différé: attendre qu'elle réponde des deux côtés.
-  await duo.until(host, 'sonde de l’hôte', () => true);
-  await duo.until(guest, 'sonde de l’invité', () => true);
+  if (options.probe !== false) {
+    await duo.until(host, 'sonde de l’hôte', () => true);
+    await duo.until(guest, 'sonde de l’invité', () => true);
+  }
   return duo;
 }
 

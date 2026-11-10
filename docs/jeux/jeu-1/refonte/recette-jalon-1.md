@@ -1,6 +1,6 @@
 # Recette automatisée à deux joueurs, jalon 1 (socle) de `la-petite-ligne-2`
 
-Date: 2026-11-10. Auteur: qa-testeur. Code mesuré: branche `claude/stoic-lamport-lueey2` au commit `f7d4d7d`, arbre de travail de la mission (tests seuls modifiés). Deuxième passage de la recette (le premier est de la mission L11).
+Date: 2026-11-10. Auteur: qa-testeur. Code mesuré: branche `claude/stoic-lamport-lueey2` au commit `f7d4d7d`, arbre de travail de la mission (tests seuls modifiés). Deuxième passage de la recette (le premier est de la mission L11). **Passage « prologue »** (sections 9 à 12, en fin de document): une partie neuve jouée de bout en bout par l'automate, du train de nuit au quai d'Aubrune, sur le code de la branche à `ee6e6f3`.
 
 ## 1. Comment lancer
 
@@ -36,12 +36,13 @@ Les échecs en série n'étaient pas ceux du jeu. Avec une sauvegarde dans le do
 | CA-20 coffre commun depuis la gare | P09 | `interface.spec.ts` | partielle: verser et retirer depuis le carnet à la gare |
 | CA-26 dialogue dans le bandeau bas, portrait | P01 | `dialogue.spec.ts` | partielle: bandeau, portrait, nom, choix; lettre par lettre et babil non mesurés |
 | CA-33 coup d'œil 3 s puis plus rien | P07 | `interface.spec.ts` | complète (durée lue dans la page, bornée entre 2 et 4,5 s) |
-| CA-34 quitter et reprendre | (aucun) | | non fait; les sauvegardes de départ sont reprises sans erreur par les parcours P17, P18a et P18b, ce qui prouve la reprise d'une sauvegarde fabriquée, pas le cycle quitter et reprendre |
+| CA-34 quitter et reprendre | P20 | `prologue-reprise.spec.ts` | partielle: au milieu du prologue (étape « chariot »), Échap puis « Quitter la partie » écrit la sauvegarde; la reprise rend l'étape, la bourse (20,00 € chacun) et la barre (un billet poinçonné chacun, rien de dupliqué). **Positions non restituées** (D11). Pas jouée: quitter au milieu d'une journée à Aubrune, ni le plantage sans sortie propre |
 | CA-35 déconnexion: horloge figée, reprise au retour | P11 | `reseau.spec.ts` | partielle: horloge figée constatée; reprise impossible dans le banc |
 | Socle J1: poussée entre joueurs | P10 | `interface.spec.ts` | complète (écart au moins 0,55 m pour deux rayons de 0,3 m) |
 | Socle J1: donner un objet | P15 | `bloques.spec.ts` | complète sur un cas (pomme donnée, retirée du donneur, vue chez l'autre) |
 | Socle J1: se laver | P06 | `besoins.spec.ts` | complète (geste, jauge au-dessus de 40, palier quitté) |
 | Carnet: quêtes, histoire regroupée par actes | P17 | `carnet-histoire.spec.ts` | complète sur Aubrune (une carte, acte 1 fait replié, acte 2 déplié, chez les deux joueurs) |
+| Prologue du train de nuit, d'une partie neuve à l'arrivée à Aubrune | P19, P19b, `prologue-heure.test.ts` | `prologue.spec.ts`, `prologue-reprise.spec.ts` | complète sur les étapes (papiers, chariot, manger, dormir, descendre), partielle sur la marche (D5) |
 | Acte 1 d'Aubrune: arrivée, premier habitant, première étape | P18a, P18b | `acte-1.spec.ts` | partielle: partie posée à Aubrune par sauvegarde (voir 5, D4); scène lancée chez les deux, lettre à Firmin, étape franchie, avancée vue par l'invité |
 
 ## 3. Résultats
@@ -118,6 +119,7 @@ Stabilité: avant ce passage final, un passage complet avait déjà donné 12 r�
 - Gravité: **majeur** (limite d'intégration, pas un bogue de code).
 - Constat: `reglages.json` démarre à `essai-gare`; la gare d'essai ne mène qu'à `essai-halte`; Aubrune n'est desservie que depuis `train-de-nuit`, qui n'est branché à rien (« branchement prévu », test `acte-1-aubrune.test.ts`). `train-de-nuit` n'a aucun poteau de quai (brique `travel`): la descente vers Aubrune ne se joue qu'avec l'intention `board` dans le test de simulation. Le parcours P18 part donc d'une sauvegarde posée à Aubrune.
 - Piste: brancher le départ sur `train-de-nuit` et y poser un poteau (ou une scène qui embarque), puis rejouer P18 depuis le départ.
+- **Mise à jour (passage prologue)**: le départ est branché (`a2c1b65`): le jeu démarre dans le train de nuit à 21 h 30 et la descente mène à Aubrune sans poteau (effet `travel_to`). P19 rejoue le tout depuis une partie neuve, D4 est levé. Restent les défauts D5 à D12 (section 9.3).
 
 ### B3: le carnet déborde de l'écran en 960 x 540 (mineur, inchangé)
 
@@ -183,3 +185,144 @@ Running 17 tests using 1 worker
 - Couper le Wi-Fi de l'invité en pleine partie dans Duo: l'horloge s'arrête chez l'hôte, puis la partie reprend au retour (B4).
 - Images par seconde au point de départ sur le PC (40 appels de dessin ici) et au quai d'Aubrune avec ses habitants.
 - Le son: aucune vérification possible ici.
+
+## 9. Passage « prologue »: une partie neuve de bout en bout (P19, P19b, P20)
+
+Demande: faire jouer le prologue entier par l'automate à deux joueurs, depuis une partie neuve jusqu'au quai d'Aubrune. Les parcours s'écrivent sur les identifiants (quête `terminus`, scènes, étapes, points de la carte lue dans `donnees/lieux/train-de-nuit/carte.json`), jamais sur des positions: ils survivent à un nouveau décor du wagon.
+
+Lancer: `pnpm --filter @duo/la-petite-ligne-2 exec playwright test tests/e2e/prologue.spec.ts --trace off` (P19: **389 s de jeu, 6,6 min** avec le démarrage; le parcours a son propre délai de 15 min) et `tests/e2e/prologue-reprise.spec.ts` (P19b 56 s, P20 4,2 min). `LPL2_STRICT=1`: un contournement par téléportation fait échouer P19 (utile à la correction de D5). Journal de chaque passage: `$LPL2_CAPTURES/p19-releves.txt` (étapes, durées, défauts, toutes les répliques lues).
+
+### 9.1 Ce que fait P19
+
+| Étape | Ce que les deux joueurs font | Durée (rendu logiciel) | Résultat |
+|---|---|---|---|
+| départ | partie neuve (hôte « Loïc », invité « Zoé »), 21 h 30, jour 1; scène du compartiment lue à deux (Espace chez chacun, « lu » vu par l'autre) | 56 s | vert |
+| papiers | marche (D5: impossible, contournée), se tourner vers le Contrôleur, Espace, quatre répliques, billet poinçonné, chez l'hôte puis chez l'invité | 107 s | vert, éditeur absent (D8) |
+| chariot | suivre la cible de la quête (D6: personne), parler au Contrôleur, choisir « Un sandwich » | 65 s | vert |
+| manger | carnet (C), case du sandwich, Entrée: faim de 65 à 94 (D10) | 16 s | vert |
+| dormir | retour au compartiment (D5), scène du tunnel, les deux se couchent sur une banquette (Espace sur « Se coucher »), saut de nuit, réveil à 6 h, scène de l'arrêt | 54 s | vert |
+| descendre | les deux devant la porte (D5), l'étape finit le prologue, trajet | 18 s, puis 16 s | vert, arrivée à 8 h 14 (jour 2) |
+| accueil | scène « Firmin en pantoufles » lue en entier chez les deux (réplique par réplique, dont 2 « rien que pour toi ») | 57 s | vert (D9) |
+
+Le rendu logiciel tourne à environ 2 images par seconde à 960 x 540 (le temps du jeu passe alors au ralenti, et un appui bref peut tomber entre deux images, d'où parfois deux appuis pour parler): pendant la marche le parcours rapetisse les deux fenêtres à 320 x 180, puis les remet en taille réelle pour lire et capturer. Ce n'est pas un défaut du jeu.
+
+Ce que l'automate vérifie pendant qu'il joue (journal): texte qui déborde de l'écran ou est coupé (retenu seulement s'il dure trois relevés d'affilée), balises d'accord `[[f|m]]` ou valeurs brutes (`undefined`, `NaN`) dans l'interface visible, cible d'action au bon endroit avant chaque Espace, heure dite par Firmin contre l'horloge. Rien relevé pour les accords: **le prologue et la scène d'accueil ne contiennent aucune balise `[[f|m]]`** (recherche dans les données), donc rien à accorder ici; avant l'éditeur, le genre par défaut est le masculin (`accords.ts`).
+
+Lecture des répliques: avec un joueur qui lit (délai proportionnel au texte, puis Espace), la réplique suivante arrive aussitôt que les deux ont lu; une réplique non lue avance seule au bout de 10 s (plafond des réglages, constaté à l'exploration): assez lent pour lire, rien ne file. Aucune réplique trop rapide relevée. Les durées par réplique du journal sont en temps du banc (ralenti), non comparables au PC.
+
+### 9.2 L'heure à l'arrivée (question d'un membre)
+
+Test de simulation `tests/prologue-heure.test.ts` (1,6 s), qui joue le prologue deux fois:
+
+| Cas | Réveil | Arrivée à Aubrune | Verdict |
+|---|---|---|---|
+| les deux se couchent | 6 h 01, jour 2 | **8 h 03** (8 h 14 dans P19, avec la marche) | cohérent avec « Il est 8 h et des poussières » |
+| un seul se couche | pas de saut de nuit | **0 h 45** | incohérent (D7) |
+
+Le jeu fait donc ceci: l'étape « dormir » se franchit dès qu'**un** joueur atteint 80 de sommeil, et une sieste solitaire suffit (la banquette fait monter le sommeil, de 65 à 80 en 103 s de jeu, mesuré en simulation). Le saut de nuit n'a lieu que si les deux sont couchés. Si seul l'un dort, le train part de nuit (le membre parlait de 23 h 30; selon l'heure du coucher on obtient ici 22 h 24 au départ, plus 2 h de trajet, soit 0 h 45) et Firmin annonce « 8 h » à un quai éclairé par la nuit. Le cas à deux, le plus naturel (l'étape dit « retrouve ta moitié »), est cohérent.
+
+### 9.3 Défauts relevés par le passage prologue
+
+Tous reproduits sur le code `ee6e6f3`. **D5 a un autre membre au travail** (décor du wagon): à re-vérifier après sa livraison en relançant P19 avec `LPL2_STRICT=1`.
+
+#### D5: le compartiment est fermé, les joueurs n'en sortent pas (bloquant)
+
+- Étapes: partie neuve, lire la scène d'ouverture, marcher vers le couloir (le Contrôleur est à (12; 8)).
+- Attendu: la porte du compartiment (point `porte-compartiment`, (9,5; 6,5)) laisse passer vers le couloir.
+- Obtenu: les deux joueurs butent contre le mur à (8,7; 5,7) et n'en sortent pas. Cause lue dans `carte.json`: le compartiment occupe x 1 à 8, y 2 à 5; le mur de droite (`x 9, y 2, h 4`) et la rangée du bas (`y 6, x 1 à 8`) ne laissent la case de la porte (9; 6) que par un coin: ses deux voisines orthogonales sont bloquées, un corps de 0,3 m ne passe pas. Aucun chemin n'existe sur la carte (le parcours le calcule d'abord, puis essaie droit devant 8 s, puis contourne). La même impasse barre le retour au compartiment (étape « dormir »), l'étape « descendre » et la reprise d'une sauvegarde (D11).
+- Preuve: `captures/recette-prologue-compartiment-ferme.png` (le joueur contre le mur, le Contrôleur de l'autre côté); journal de P19 (« aucun chemin sur la carte », « BLOQUANT marche impossible »).
+- Contournement du parcours: téléportation à la cible, comptée comme défaut (six marches contournées: aller au Contrôleur, retour au compartiment, devant la porte, pour chacun des deux joueurs).
+- Piste: ouvrir la rangée du bas à la case 8 (porte en (8; 6)), ou prolonger le compartiment d'une case; garder le test de chemin de P19.
+
+#### D6: l'étape « chariot » désigne un point où il n'y a personne (majeur)
+
+- Étapes: finir les papiers, suivre le repère de la quête (point `chariot`, (22; 8)).
+- Attendu: le chariot et celui qui vend les sandwichs au bout du couloir (« Le chariot passe au bout du couloir: demande un sandwich »).
+- Obtenu: rien à (22; 8) (aucune cible, aucune bulle). Le Contrôleur, qui fait aussi le chariot, est resté à (12; 8) au milieu du couloir; il faut le trouver soi-même pour avoir le dialogue du chariot. Un joueur qui suit le repère arrive devant un mur vide.
+- Preuve: `captures/recette-prologue-chariot-vide.png` (les deux au point `chariot`, personne; le Contrôleur est loin, en bas à gauche). Journal: « chariot: personne au point que la quête désigne ».
+- Piste: faire venir le Contrôleur au point `chariot` pendant l'étape, ou viser le Contrôleur dans l'étape (`target.villager`).
+
+#### D7: une sieste d'un seul joueur fait arriver le train en pleine nuit (majeur)
+
+- Étapes: partie neuve, papiers, sandwich, **un seul** joueur se couche sur une banquette jusqu'à 80 de sommeil (environ 100 s de jeu), l'autre reste debout; les deux vont à la porte.
+- Attendu: arrivée de jour, comme dit Firmin (« Il est 8 h et des poussières »).
+- Obtenu: étape « dormir » franchie sans saut de nuit, arrivée à Aubrune à 0 h 45, scène d'accueil à cette heure avec la réplique de 8 h.
+- Preuve: `tests/prologue-heure.test.ts` (cas `it.fails`: il devient rouge à la correction, retirer alors `.fails`). Cas à deux: 8 h 03.
+- Piste: exiger les deux couchés pour franchir « dormir » (ou un saut de nuit déclenché par le départ), ou faire dire l'heure réelle à Firmin.
+
+#### D8: la « photo d'identité » du Contrôleur n'ouvre pas l'éditeur (mineur)
+
+- Constat: le Contrôleur dit « On la refait. Regarde l'objectif » puis « Clic. Ressemblant », mais aucun éditeur ne s'ouvre à ce moment (l'attache prévue par l'écriture, section 4, n'est pas branchée). En revanche **chez un vrai joueur l'éditeur s'ouvre dès le démarrage**, avant la première scène (P19b: les deux le voient, le partenaire affiche « Zoé : Pas encore »; la scène du compartiment ne démarre qu'après). Les deux conceptions se superposent: la photo est faite avant le contrôle de la photo. Avec la sonde de recette l'éditeur est désactivé (`editorAtStart: !probed`): P19 joue donc sans apparence, P19b la joue.
+- Preuve: `captures/recette-prologue-editeur-demarrage.png` (éditeur au démarrage, hôte); journal de P19 (« l'éditeur de personnage ne s'ouvre pas à la photo d'identité »).
+- Piste (décision à prendre): soit ouvrir l'éditeur au nœud `photo` et le retirer du démarrage, soit garder le démarrage et réécrire les répliques du Contrôleur (« Ta photo est ressemblante »).
+
+#### D9: Firmin parle d'un car et d'un banc, on arrive en train (mineur)
+
+- Obtenu (scène d'accueil, 2e réplique): « Vous êtes venus par le car, vous avez dormi sur le banc. Voilà tout. » Les joueurs viennent d'un train de nuit où ils ont dormi sur des banquettes de compartiment. La réplique suivante (« Dans ta poche, pourtant, un billet poinçonné ») ne garde son sel que si la première est une fausse piste de Firmin; à trancher par le game designer (reste d'une version sans prologue ?).
+- Preuve: journal de P19 (la réplique), `captures/recette-prologue-quai-accueil.png` (scène à son premier temps).
+
+#### D10: l'étape « manger » ne dit pas comment manger (mineur, à valider par le client)
+
+- Constat: l'objectif est « Mange ton sandwich avant qu'il refroidisse encore », sans cible ni touche. La barre (touche 2 puis Espace) ne le mange pas (vérifié en simulation: faim inchangée, sandwich gardé). Le seul chemin est le carnet (C, case du sandwich, Entrée), que rien n'indique dans l'étape. La barre montre aussi une pastille « 1/3 » sur le sandwich provisoire (portions ?).
+- Preuve: `captures/recette-prologue-manger-par-le-carnet.png` (carnet ouvert sur le sandwich; le haut du livre est coupé, voir B3).
+- Piste: une phrase dans l'objectif (« ouvre ton carnet (C) »), ou l'action « manger » sur la case tenue.
+
+#### D11: quitter puis reprendre ramène les joueurs dans le compartiment (majeur)
+
+- Étapes: partie neuve, papiers faits, les deux dans le couloir devant le Contrôleur; Échap, « Quitter la partie »; relancer, « Héberger et continuer ».
+- Attendu: l'état de la dernière sauvegarde (CA-34), joueurs où ils étaient.
+- Obtenu: étape, bourses et barres identiques (CA-34 tenu pour les objets et l'argent: ni billet ni euro en double). Mais le fichier contient bien les positions (10,9; 7,8 et 10,9; 8,4) et les joueurs reparaissent à (8,7; 5,5) et (8,1; 5,5), dans le compartiment fermé (D5): le prologue repris est impossible à finir tant que D5 existe.
+- Preuve: `captures/recette-prologue-reprise-dans-le-compartiment.png`; journal de P20 (positions avant, dans le fichier, après).
+- Piste: restituer les positions sauvegardées, ou placer les joueurs au point d'arrivée du lieu du côté libre.
+
+#### D12: boutons de l'éditeur sur deux lignes en 960 x 540 (cosmétique)
+
+- « Au hasard » et « C'est parti ! » passent à la ligne dans leurs boutons (`captures/recette-prologue-editeur-demarrage.png`), et la rangée « Silhouette » est tronquée à droite (défilement voulu). À revoir en 1366 x 768 sur le PC.
+
+### 9.4 Ce que l'automate n'a pas pu jouer
+
+- Le son (babil des répliques, ambiances du train): invérifiable ici.
+- Les performances sur le PC (2 images par seconde en rendu logiciel ici, sans valeur).
+- Une marche sans contournement: elle dépend de D5. Le parcours est écrit pour: dès que la carte donne un passage, la planification suit les cases libres et contourne les habitants, sans modification.
+- Le jeu sans la sonde pendant toute la partie (elle n'est absente que dans P19b, pour le démarrage): l'éditeur n'est donc joué qu'en P19b.
+- Plantage sans sortie propre (CA-34, « dernier point de sauvegarde »): non joué.
+
+## 10. Résultats du passage prologue
+
+```text
+Running 1 test using 1 worker
+  ✓  1 prologue.spec.ts:38 P19 partie neuve: du train de nuit au quai d'Aubrune (6.6m)
+  1 passed (7.9m)
+
+Running 2 tests using 1 worker
+  ✓  1 prologue-reprise.spec.ts:23 P19b partie neuve sans sonde: l'éditeur de personnage au démarrage (56.1s)
+  ✓  2 prologue-reprise.spec.ts:58 P20 quitter et reprendre au milieu du prologue (CA-34) (4.2m)
+
+ Test Files  1 passed (1)   (prologue-heure.test.ts)
+      Tests  1 passed | 1 expected fail (2)
+```
+
+Les parcours sont **verts avec contournements** (D5): ils ne s'arrêtent que sur un blocage inattendu, pas sur un défaut déjà décrit; `LPL2_STRICT=1` rend P19 rouge pour D5 seul. Captures de recette regardées: départ, compartiment fermé, chariot vide, carnet, réveil sur les banquettes, quai d'accueil, éditeur au démarrage, reprise.
+
+## 11. Tests ajoutés
+
+| Fichier | Rôle |
+|---|---|
+| `tests/e2e/prologue.spec.ts` | P19: la partie neuve jouée de bout en bout, journal des défauts |
+| `tests/e2e/prologue-reprise.spec.ts` | P19b (éditeur au démarrage, sans sonde) et P20 (quitter et reprendre, CA-34) |
+| `tests/aides-e2e/prologue.ts` | marche au clavier (planification sur la carte, lacet de caméra étalonné, habitants contournés), lecture des répliques, éditeur, journal |
+| `tests/aides-e2e/duo.ts` | options `probe`, `server`, `keepServer` (jeu sans sonde, reprise sur le même dossier de données) |
+| `tests/prologue-heure.test.ts` | l'heure d'arrivée; un cas `it.fails` pour D7 |
+
+Non-régression à la correction: D5 par P19 en mode strict, D7 par le cas `it.fails` (le retirer), D11 par P20 (ajouter l'assertion sur les positions).
+
+## 12. À tester chez le client (prologue)
+
+- Lancer une partie neuve à deux: l'éditeur de personnage s'ouvre-t-il chez les deux au démarrage, puis la scène du train ?
+- Sortir du compartiment et aller voir le Contrôleur: le passage existe-t-il (D5) ?
+- Suivre l'objectif « demande un sandwich »: trouve-t-on quelqu'un (D6) ? Comprend-on comment manger (D10) ?
+- Dormir **à deux** sur les banquettes: réveil à 6 h, arrivée à Aubrune vers 8 h. Essayer aussi de ne dormir qu'à un: à quelle heure arrive-t-on (D7) ?
+- Quitter la partie au milieu du prologue (Échap) puis la reprendre: où se retrouve-t-on (D11) ?
+- Les textes à l'écran sur le PC (1366 x 768 possible): éditeur, bandeau des répliques, carnet, rien de coupé (D12, B3).
+- Le son du train, des voix (babil) et des « Clac ! » des répliques.
+- La fluidité de la marche dans le wagon étroit et de la scène d'accueil sur le PC (ici 2 images par seconde, sans valeur).
