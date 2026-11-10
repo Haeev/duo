@@ -1,0 +1,261 @@
+{
+  "plannedPlaces": ["aubrune"],
+  "timing": {
+    "decodeRate": 24000,
+    "preroll": 1,
+    "crossfadeSeconds": 6,
+    "fadeSeconds": 4,
+    "arrivalHoldSeconds": 5,
+    "jingleCooldownSeconds": 2,
+    "otherPlayerDb": -3,
+    "residentTracks": 1,
+    "tickSeconds": 0.5
+  },
+  "bands": {
+    "cinq-douze": [4.75, 5.5],
+    "aube": [5, 8],
+    "matin": [8, 12.5],
+    "apres-midi": [12.5, 18],
+    "soir": [18, 21],
+    "nuit": [21, 5]
+  },
+  "tracks": {
+    "bourg-aube": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/bourg-aube-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/bourg-aube-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "bourg-matin": {
+      "seconds": 80,
+      "stems": {
+        "fond": { "file": "musique/bourg-matin-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/bourg-matin-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "bourg-apres-midi": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/bourg-apres-midi-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/bourg-apres-midi-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "bourg-soir": {
+      "seconds": 72,
+      "stems": {
+        "fond": { "file": "musique/bourg-soir-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/bourg-soir-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "bourg-nuit": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/bourg-nuit-fond.ogg", "pan": -0.15, "volumeDb": 0 },
+        "air": { "file": "musique/bourg-nuit-air.ogg", "pan": 0.15, "volumeDb": 0 }
+      }
+    },
+    "bourg-pluie": {
+      "seconds": 72,
+      "stems": {
+        "fond": { "file": "musique/bourg-pluie-fond.ogg", "pan": -0.15, "volumeDb": 0 },
+        "air": { "file": "musique/bourg-pluie-air.ogg", "pan": 0.15, "volumeDb": 0 }
+      }
+    },
+    "riviere": {
+      "seconds": 70,
+      "stems": {
+        "fond": { "file": "musique/riviere-fond.ogg", "pan": -0.25, "volumeDb": 0 },
+        "air": { "file": "musique/riviere-air.ogg", "pan": 0.25, "volumeDb": 0 }
+      }
+    },
+    "train": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/train-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/train-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "mystere": {
+      "seconds": 60,
+      "stems": {
+        "fond": { "file": "musique/mystere-fond.ogg", "pan": -0.1, "volumeDb": 0 },
+        "air": { "file": "musique/mystere-air.ogg", "pan": 0.1, "volumeDb": 0 }
+      }
+    },
+    "fete": {
+      "seconds": 80,
+      "stems": {
+        "fond": { "file": "musique/fete-fond.ogg", "pan": -0.25, "volumeDb": 0 },
+        "air": { "file": "musique/fete-air.ogg", "pan": 0.25, "volumeDb": 0 }
+      }
+    }
+  },
+  "jingles": {
+    "prise-nouvelle": {
+      "file": "musique/jingle-prise-nouvelle.ogg",
+      "volumeDb": -3,
+      "duckDb": -7,
+      "seconds": 2.73
+    },
+    "etape-quete": {
+      "file": "musique/jingle-etape-quete.ogg",
+      "volumeDb": -4,
+      "duckDb": -5,
+      "seconds": 2.03
+    },
+    "quete-terminee": {
+      "file": "musique/jingle-quete-terminee.ogg",
+      "volumeDb": -3,
+      "duckDb": -8,
+      "seconds": 4.2
+    },
+    "reveil": {
+      "file": "musique/jingle-reveil.ogg",
+      "volumeDb": -4,
+      "duckDb": -6,
+      "seconds": 4.03
+    },
+    "repas-partage": {
+      "file": "musique/jingle-repas-partage.ogg",
+      "volumeDb": -4,
+      "duckDb": -6,
+      "seconds": 3.81
+    },
+    "collection-complete": {
+      "file": "musique/jingle-collection-complete.ogg",
+      "volumeDb": -3,
+      "duckDb": -8,
+      "seconds": 3.59
+    },
+    "arrivee-aubrune": {
+      "file": "musique/theme-arrivee-aubrune.ogg",
+      "volumeDb": -3,
+      "duckDb": -10,
+      "seconds": 5.83
+    }
+  },
+  "pacings": {
+    "steady": null,
+    "normal": { "playSeconds": [150, 240], "quietSeconds": [50, 100] },
+    "rare": { "playSeconds": [90, 150], "quietSeconds": [90, 170] },
+    "long": { "playSeconds": [240, 360], "quietSeconds": [40, 70] }
+  },
+  "rules": [
+    {
+      "id": "sonnerie-mystere",
+      "when": { "scenes": ["sonnerie"] },
+      "play": "mystere",
+      "pacing": "steady"
+    },
+    {
+      "id": "voyage",
+      "when": { "phases": ["boarding", "travel"] },
+      "play": "train",
+      "pacing": "steady"
+    },
+    { "id": "fete", "when": { "events": ["fete-d-essai"] }, "play": "fete", "pacing": "long" },
+    {
+      "id": "train-du-samedi",
+      "when": { "events": ["visiteur-du-samedi"] },
+      "play": "train",
+      "pacing": "normal"
+    },
+    {
+      "id": "cinq-heures-douze",
+      "when": { "places": ["aubrune", "essai-gare", "essai-halte"], "bands": ["cinq-douze"] },
+      "play": "mystere",
+      "pacing": "rare"
+    },
+    {
+      "id": "riviere-la-nuit",
+      "when": { "places": ["aubrune"], "zones": ["riviere"], "bands": ["nuit"] },
+      "play": "riviere",
+      "pacing": "rare"
+    },
+    {
+      "id": "riviere",
+      "when": { "places": ["aubrune"], "zones": ["riviere"] },
+      "play": "riviere",
+      "pacing": "normal"
+    },
+    {
+      "id": "pluie",
+      "when": {
+        "places": ["aubrune", "essai-gare", "essai-halte"],
+        "weathers": ["rain", "storm", "snow"],
+        "bands": ["aube", "matin", "apres-midi", "soir"]
+      },
+      "play": "bourg-pluie",
+      "pacing": "normal"
+    },
+    {
+      "id": "bourg-aube",
+      "when": { "places": ["aubrune", "essai-gare", "essai-halte"], "bands": ["aube"] },
+      "play": "bourg-aube",
+      "pacing": "normal"
+    },
+    {
+      "id": "bourg-matin",
+      "when": { "places": ["aubrune", "essai-gare", "essai-halte"], "bands": ["matin"] },
+      "play": "bourg-matin",
+      "pacing": "normal"
+    },
+    {
+      "id": "bourg-apres-midi",
+      "when": { "places": ["aubrune", "essai-gare", "essai-halte"], "bands": ["apres-midi"] },
+      "play": "bourg-apres-midi",
+      "pacing": "normal"
+    },
+    {
+      "id": "bourg-soir",
+      "when": { "places": ["aubrune", "essai-gare", "essai-halte"], "bands": ["soir"] },
+      "play": "bourg-soir",
+      "pacing": "normal"
+    },
+    {
+      "id": "bourg-nuit",
+      "when": { "places": ["aubrune", "essai-gare", "essai-halte"], "bands": ["nuit"] },
+      "play": "bourg-nuit",
+      "pacing": "rare"
+    }
+  ],
+  "modifiers": [
+    {
+      "id": "temps-couvert",
+      "when": { "weathers": ["rain", "storm", "snow", "mist"] },
+      "stemsDb": { "air": -3 },
+      "gainDb": -1.5,
+      "lowpassHz": 4200
+    },
+    { "id": "orage", "when": { "weathers": ["storm"] }, "gainDb": -2, "lowpassHz": 3000 },
+    {
+      "id": "nuit-depouillee",
+      "when": { "bands": ["nuit"] },
+      "stemsDb": { "air": -6 },
+      "gainDb": -1.5,
+      "lowpassHz": 5500
+    },
+    { "id": "hiver", "when": { "seasons": ["winter"] }, "gainDb": -1, "lowpassHz": 7000 }
+  ],
+  "jingleRules": [
+    {
+      "on": "collection_found",
+      "where": { "first": true },
+      "jingle": "prise-nouvelle",
+      "audience": "both"
+    },
+    { "on": "quest_step_done", "jingle": "etape-quete", "actor": "by", "audience": "both" },
+    { "on": "quest_done", "jingle": "quete-terminee", "audience": "both" },
+    { "on": "day_started", "where": { "slept": true }, "jingle": "reveil", "audience": "both" },
+    { "on": "meal_shared", "jingle": "repas-partage", "audience": "own" },
+    { "on": "collection_completed", "jingle": "collection-complete", "audience": "both" }
+  ],
+  "arrivals": {
+    "aubrune": "arrivee-aubrune",
+    "essai-gare": "arrivee-aubrune",
+    "essai-halte": "arrivee-aubrune"
+  },
+  "defaults": { "music": 0.8, "levelDb": -6 },
+  "storageKey": "la-petite-ligne-2.musique"
+}
