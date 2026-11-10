@@ -1,0 +1,1969 @@
+<title>Suivi de La Petite Ligne</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Grandstander:wght@500;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap"
+/>
+<style>
+  /* Mise en page: un bandeau de titre, une rangée d'onglets, puis une seule colonne de panneaux
+     sombres; un seul accent vif (bouton d'or), repris de l'interface du jeu. */
+  :root {
+    color-scheme: dark;
+    --fond: #171413;
+    --panneau: #221d1b;
+    --panneau-haut: #2c2623;
+    --creux: #100d0c;
+    --texte: #f0e4c8;
+    --texte-doux: #b9aa8d;
+    --filet: #44392f;
+    --filet-fort: #9c8a6c;
+    --accent: #ffc83d;
+    --sur-accent: #1d1a17;
+    --accent-texte: #ffc83d;
+    --bord-accent: #ffc83d;
+    --ok: #7fc49a;
+    --alerte: #ff8a6e;
+    --ombre: rgb(0 0 0 / 0.5);
+    --voile: rgb(8 6 5 / 0.72);
+    --epingle-bord: #1d1a17;
+    --police-titre: 'Grandstander', ui-rounded, 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+    --police-texte: 'Nunito Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --rayon: 0.75rem;
+    --rayon-petit: 0.4rem;
+    --duree: 140ms;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) {
+      color-scheme: light;
+      --fond: #f3ebd4;
+      --panneau: #fbf6e9;
+      --panneau-haut: #fffdf6;
+      --creux: #e6dabd;
+      --texte: #2a2522;
+      --texte-doux: #5b4d40;
+      --filet: #d3c5a2;
+      --filet-fort: #8a6a43;
+      --accent: #ffc83d;
+      --sur-accent: #1d1a17;
+      --accent-texte: #7a5200;
+      --bord-accent: #2a2522;
+      --ok: #2c6647;
+      --alerte: #a33f34;
+      --ombre: rgb(60 40 20 / 0.28);
+      --voile: rgb(42 37 34 / 0.6);
+      --epingle-bord: #1d1a17;
+    }
+  }
+  :root[data-theme='light'] {
+    color-scheme: light;
+    --fond: #f3ebd4;
+    --panneau: #fbf6e9;
+    --panneau-haut: #fffdf6;
+    --creux: #e6dabd;
+    --texte: #2a2522;
+    --texte-doux: #5b4d40;
+    --filet: #d3c5a2;
+    --filet-fort: #8a6a43;
+    --accent: #ffc83d;
+    --sur-accent: #1d1a17;
+    --accent-texte: #7a5200;
+    --bord-accent: #2a2522;
+    --ok: #2c6647;
+    --alerte: #a33f34;
+    --ombre: rgb(60 40 20 / 0.28);
+    --voile: rgb(42 37 34 / 0.6);
+    --epingle-bord: #1d1a17;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--fond);
+    color: var(--texte);
+    font-family: var(--police-texte);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--fond);
+  }
+  h1,
+  h2,
+  h3,
+  p,
+  ul,
+  ol,
+  dl,
+  dd,
+  figure {
+    margin: 0;
+  }
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 0.1875rem solid var(--accent-texte);
+    outline-offset: 0.125rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+    }
+  }
+
+  .tdb-page {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 1.25rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .tdb-tete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+  .tdb-tete h1 {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+  .tdb-tete__sous {
+    color: var(--texte-doux);
+    font-size: 0.95rem;
+  }
+  /* Trait de pinceau sous le titre, comme dans les menus du jeu. */
+  .tdb-tete h1::after {
+    content: '';
+    display: block;
+    height: 0.4rem;
+    width: 9.5rem;
+    max-width: 100%;
+    margin-top: 0.15rem;
+    background: var(--accent-texte);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6.5C30 3 62 2.6 104 4.2c34 1.2 62 .4 94-1.4l-.6 3.4C160 8.4 128 8.8 96 7.6 60 6.4 30 7.4 3 9.4z'/%3E%3C/svg%3E")
+      center / 100% 100% no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6.5C30 3 62 2.6 104 4.2c34 1.2 62 .4 94-1.4l-.6 3.4C160 8.4 128 8.8 96 7.6 60 6.4 30 7.4 3 9.4z'/%3E%3C/svg%3E")
+      center / 100% 100% no-repeat;
+  }
+
+  /* Composants communs */
+  .tdb-titre {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .tdb-surtitre {
+    color: var(--texte-doux);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tdb-doux {
+    color: var(--texte-doux);
+  }
+  .tdb-carte {
+    background: var(--panneau);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    padding: 1rem 1.125rem;
+    min-width: 0;
+  }
+  .tdb-pile {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+  }
+  .tdb-rang {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    min-width: 0;
+  }
+  .tdb-texte {
+    max-width: 65ch;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+  .tdb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.5rem;
+    padding: 0.4rem 0.9rem;
+    background: var(--panneau-haut);
+    color: var(--texte);
+    border: 0.125rem solid var(--filet-fort);
+    border-radius: var(--rayon-petit);
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+    transition:
+      transform var(--duree),
+      background-color var(--duree);
+  }
+  .tdb-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .tdb-btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .tdb-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .tdb-btn--accent {
+    background: var(--accent);
+    color: var(--sur-accent);
+    border-color: var(--bord-accent);
+    box-shadow: 0.1875rem 0.1875rem 0 0 var(--ombre);
+  }
+  .tdb-btn--discret {
+    background: transparent;
+    border-color: transparent;
+    color: var(--texte-doux);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    min-height: 2rem;
+    padding-inline: 0.4rem;
+  }
+  .tdb-btn[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--sur-accent);
+    border-color: var(--bord-accent);
+  }
+  .tdb-pastille {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.1rem 0.6rem;
+    border-radius: 99rem;
+    border: 0.125rem solid var(--filet-fort);
+    color: var(--texte);
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .tdb-pastille--ok {
+    border-color: var(--ok);
+    color: var(--ok);
+  }
+  .tdb-pastille--alerte {
+    border-color: var(--alerte);
+    color: var(--alerte);
+  }
+  .tdb-pastille--accent {
+    background: var(--accent);
+    border-color: var(--bord-accent);
+    color: var(--sur-accent);
+  }
+  .tdb-vide {
+    border: 0.125rem dashed var(--filet-fort);
+    border-radius: var(--rayon);
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .tdb-vide__titre {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .tdb-vide p {
+    color: var(--texte-doux);
+    max-width: 60ch;
+  }
+  .tdb-champ {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.7rem;
+    background: var(--creux);
+    color: var(--texte);
+    border: 0.125rem solid var(--filet-fort);
+    border-radius: var(--rayon-petit);
+  }
+  textarea.tdb-champ {
+    min-height: 4.5rem;
+    resize: vertical;
+  }
+  .tdb-champ::placeholder {
+    color: var(--texte-doux);
+    opacity: 1;
+  }
+  .tdb-etiquette {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .tdb-note-ed {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .tdb-note-ed__aide {
+    color: var(--texte-doux);
+    font-size: 0.8rem;
+  }
+
+  /* État de la connexion */
+  .tdb-lien {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--texte-doux);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .tdb-lien::before {
+    content: '';
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    border: 0.125rem solid var(--texte-doux);
+  }
+  .tdb-lien[data-etat='direct'] {
+    color: var(--ok);
+  }
+  .tdb-lien[data-etat='direct']::before {
+    background: var(--ok);
+    border-color: var(--ok);
+  }
+  .tdb-lien[data-etat='horsligne'],
+  .tdb-lien[data-etat='lecture'] {
+    color: var(--alerte);
+  }
+  .tdb-lien[data-etat='horsligne']::before {
+    border-radius: 0.1rem;
+    border-color: var(--alerte);
+  }
+  .tdb-lien[data-etat='lecture']::before {
+    border-radius: 0.1rem;
+    border-color: var(--alerte);
+    background: var(--alerte);
+  }
+  .tdb-bandeau {
+    border: 0.125rem solid var(--alerte);
+    border-radius: var(--rayon);
+    padding: 0.75rem 1rem;
+    background: var(--panneau);
+  }
+  .tdb-bandeau strong {
+    color: var(--alerte);
+  }
+
+  /* Onglets */
+  .tdb-onglets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding-block: 0.5rem;
+    background: var(--fond);
+    border-bottom: 1px solid var(--filet);
+  }
+  .tdb-onglet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.5rem;
+    padding: 0.35rem 0.9rem;
+    background: transparent;
+    color: var(--texte-doux);
+    border: 0.125rem solid transparent;
+    border-radius: 99rem;
+    font-family: var(--police-titre);
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .tdb-onglet:hover {
+    color: var(--texte);
+    border-color: var(--filet-fort);
+  }
+  .tdb-onglet[aria-selected='true'] {
+    background: var(--accent);
+    color: var(--sur-accent);
+    border-color: var(--bord-accent);
+    font-weight: 700;
+  }
+  .tdb-onglet__compte {
+    min-width: 1.5rem;
+    padding: 0 0.35rem;
+    border-radius: 99rem;
+    background: var(--texte);
+    color: var(--fond);
+    font-family: var(--police-texte);
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    text-align: center;
+  }
+  .tdb-onglet[aria-selected='true'] .tdb-onglet__compte {
+    background: var(--sur-accent);
+    color: var(--accent);
+  }
+  @media (min-width: 44rem) {
+    .tdb-onglets {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 5;
+    }
+  }
+  @media (max-width: 34rem) {
+    .tdb-onglets {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .tdb-onglet {
+      padding-inline: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .tdb-tete h1 {
+      font-size: 1.5rem;
+    }
+  }
+  .tdb-panneau {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+  .tdb-panneau:focus-visible {
+    outline-offset: 0.5rem;
+  }
+
+  /* Dialogue de confirmation et message bref */
+  .tdb-dialogue {
+    width: min(28rem, calc(100% - 2rem));
+    padding: 1.25rem;
+    background: var(--panneau-haut);
+    color: var(--texte);
+    border: 0.125rem solid var(--filet-fort);
+    border-radius: var(--rayon);
+    box-shadow: 0.3rem 0.3rem 0 0 var(--ombre);
+  }
+  .tdb-dialogue::backdrop {
+    background: var(--voile);
+  }
+  .tdb-dialogue p {
+    margin-bottom: 1rem;
+    overflow-wrap: anywhere;
+  }
+  .tdb-dialogue .tdb-rang {
+    justify-content: flex-end;
+  }
+  .tdb-toast {
+    position: fixed;
+    inset: auto 0 calc(1rem + env(safe-area-inset-bottom, 0px)) 0;
+    width: fit-content;
+    max-width: calc(100% - 2rem);
+    margin: 0 auto;
+    padding: 0.6rem 1rem;
+    background: var(--texte);
+    color: var(--fond);
+    border: 0;
+    border-radius: var(--rayon-petit);
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0.1875rem 0.1875rem 0 0 var(--ombre);
+    z-index: 30;
+  }
+
+  /* Avancement */
+  .av-rappel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-color: var(--accent-texte);
+    border-width: 0.125rem;
+  }
+  .av-tete {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+  }
+  .av-nombre {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: clamp(3.5rem, 14vw, 6rem);
+    line-height: 0.95;
+    color: var(--accent-texte);
+    font-variant-numeric: tabular-nums;
+  }
+  .av-nombre small {
+    font-size: 0.45em;
+  }
+  @media (max-width: 34rem) {
+    .av-tete {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* La ligne: un tronçon par étape, large comme son poids, rempli selon son avancement. */
+  .av-ligne {
+    display: flex;
+    gap: 0.2rem;
+    height: 1.1rem;
+    margin-top: 0.25rem;
+  }
+  .av-troncon {
+    min-width: 0.4rem;
+    background: var(--creux);
+    border: 1px solid var(--filet-fort);
+    border-radius: 0.2rem;
+    overflow: hidden;
+  }
+  .av-troncon:first-child {
+    border-radius: 99rem 0.2rem 0.2rem 99rem;
+  }
+  .av-troncon:last-child {
+    border-radius: 0.2rem 99rem 99rem 0.2rem;
+  }
+  .av-troncon > span,
+  .av-barre > span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+  }
+  .av-etapes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.9rem;
+  }
+  .av-etape {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 1rem;
+    align-items: baseline;
+  }
+  .av-etape__nom {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .av-etape__val {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+  .av-barre {
+    grid-column: 1 / -1;
+    height: 0.7rem;
+    background: var(--creux);
+    border: 1px solid var(--filet-fort);
+    border-radius: 99rem;
+    overflow: hidden;
+  }
+  .av-etape--finie .av-etape__val {
+    color: var(--ok);
+  }
+  .av-deux {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1rem;
+  }
+  .av-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+  .av-liste li {
+    display: grid;
+    grid-template-columns: 1rem minmax(0, 1fr);
+    gap: 0.5rem;
+    overflow-wrap: anywhere;
+  }
+  .av-liste li::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: 0.45rem;
+    border-radius: 50%;
+    background: var(--ok);
+  }
+  .av-liste--bloque li::before {
+    border-radius: 0.1rem;
+    background: var(--alerte);
+    transform: rotate(45deg);
+  }
+  .av-journal {
+    display: flex;
+    flex-direction: column;
+  }
+  .av-journal li {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 0.25rem 1rem;
+    padding-block: 0.8rem;
+    border-top: 1px solid var(--filet);
+  }
+  .av-journal li:first-child {
+    border-top: 0;
+    padding-top: 0.25rem;
+  }
+  .av-journal__quand {
+    color: var(--texte-doux);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 34rem) {
+    .av-journal li {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Questions */
+  .q-carte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .q-carte--ouverte {
+    border-color: var(--filet-fort);
+  }
+  .q-texte {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .q-reco {
+    border-left: 0.3rem solid var(--accent-texte);
+    background: var(--creux);
+    border-radius: 0 var(--rayon-petit) var(--rayon-petit) 0;
+    padding: 0.6rem 0.9rem;
+  }
+  .q-reco .tdb-surtitre {
+    color: var(--accent-texte);
+  }
+  .q-options {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .q-options legend {
+    padding: 0;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+  }
+  .q-option {
+    position: relative;
+    display: inline-flex;
+    min-width: 0;
+  }
+  .q-option input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .q-option span {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.4rem 1rem;
+    background: var(--panneau-haut);
+    border: 0.125rem solid var(--filet-fort);
+    border-radius: var(--rayon-petit);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .q-option small {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-texte);
+  }
+  .q-option--reco span {
+    border-color: var(--accent-texte);
+    border-width: 0.1875rem;
+  }
+  .q-option input:checked + span {
+    background: var(--accent);
+    color: var(--sur-accent);
+    border-color: var(--bord-accent);
+    box-shadow: 0.1875rem 0.1875rem 0 0 var(--ombre);
+  }
+  .q-option input:checked + span small {
+    color: var(--sur-accent);
+  }
+  .q-option input:checked + span::before {
+    content: 'Ton choix';
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .q-option input:focus-visible + span {
+    outline: 0.1875rem solid var(--accent-texte);
+    outline-offset: 0.125rem;
+  }
+  .q-option input:disabled + span {
+    opacity: 0.6;
+  }
+  .q-envoyee {
+    border: 0.125rem solid var(--ok);
+    border-radius: var(--rayon-petit);
+    padding: 0.6rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .q-envoyee .tdb-surtitre {
+    color: var(--ok);
+  }
+  .q-repondues {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .q-repondues details {
+    background: var(--panneau);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+  }
+  .q-repondues summary {
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    font-weight: 700;
+    border-radius: var(--rayon);
+  }
+  .q-repondues summary > span:first-child {
+    flex: 1 1 12rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .q-repondues details > div {
+    padding: 0 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  /* Images: galerie */
+  .img-grille {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+  .img-vignette {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    text-align: left;
+    cursor: pointer;
+    background: var(--panneau);
+    color: var(--texte);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    min-width: 0;
+  }
+  .img-vignette:hover {
+    border-color: var(--filet-fort);
+  }
+  .img-vignette__cadre {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    max-width: 100%;
+    background: var(--creux);
+    border-radius: var(--rayon-petit);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    color: var(--texte-doux);
+    font-size: 0.9rem;
+  }
+  .img-vignette__cadre img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .img-vignette__cadre .tdb-pastille {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.4rem;
+  }
+  .img-vignette__titre {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .img-vignette__just {
+    color: var(--texte-doux);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .img-note {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-texte);
+  }
+
+  /* Images: visionneuse */
+  .vis {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+      env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    background: var(--fond);
+    color: var(--texte);
+  }
+  .vis:not([open]) {
+    display: none;
+  }
+  .vis__grille {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 23rem;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
+  }
+  .vis__tete {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--filet);
+  }
+  .vis__tete h2 {
+    flex: 1 1 10rem;
+    min-width: 0;
+    font-family: var(--police-titre);
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+  }
+  .vis__scene {
+    position: relative;
+    overflow: hidden;
+    overflow: clip;
+    background: var(--creux);
+    touch-action: none;
+    cursor: crosshair;
+    min-height: 0;
+  }
+  .vis__scene[data-mode='trait'] {
+    cursor: cell;
+  }
+  .vis__scene.est-deplacee {
+    cursor: grabbing;
+  }
+  .vis__scene:focus-visible {
+    outline-offset: -0.25rem;
+  }
+  .vis__img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  .vis__traits {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .vis__traits .dessous {
+    fill: none;
+    stroke: var(--epingle-bord);
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .vis__traits .dessus {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .vis__traits .traitee .dessus {
+    stroke-dasharray: 2 7;
+  }
+  .vis__epingle {
+    position: absolute;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin: -0.95rem 0 0 -0.95rem;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: var(--sur-accent);
+    border: 0.1875rem solid var(--epingle-bord);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    box-shadow: 0 0 0 0.125rem var(--accent);
+  }
+  .vis__epingle--trait {
+    border-radius: 0.3rem;
+  }
+  .vis__epingle--traitee {
+    background: var(--epingle-bord);
+    color: var(--accent);
+  }
+  .vis__epingle--brouillon {
+    border-style: dashed;
+    pointer-events: none;
+  }
+  .vis__epingle.est-choisie {
+    transform: scale(1.25);
+    z-index: 2;
+  }
+  .vis__epingle:focus-visible {
+    outline: 0.1875rem solid var(--texte);
+    outline-offset: 0.2rem;
+  }
+  .vis__viseur {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin: -0.8rem 0 0 -0.8rem;
+    pointer-events: none;
+    border: 0.125rem solid var(--accent);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 0.125rem var(--epingle-bord),
+      inset 0 0 0 0.125rem var(--epingle-bord);
+    display: none;
+  }
+  .vis__scene:focus-visible .vis__viseur {
+    display: block;
+  }
+  .vis__outils {
+    position: absolute;
+    left: 0.5rem;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    pointer-events: none;
+  }
+  .vis__outils > * {
+    pointer-events: auto;
+  }
+  .vis__outils .tdb-btn {
+    min-height: 2.25rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.9rem;
+    box-shadow: 0.125rem 0.125rem 0 0 var(--ombre);
+  }
+  .vis__manque {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    text-align: center;
+    color: var(--texte-doux);
+  }
+  .vis__cote {
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    border-left: 1px solid var(--filet);
+    background: var(--panneau);
+    min-width: 0;
+  }
+  .vis__cote section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .vis__notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .vis__notes button {
+    width: 2.1rem;
+    min-height: 2.1rem;
+    padding: 0;
+  }
+  .vis__remarques {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .vis__remarque {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.3rem 0.6rem;
+    padding: 0.6rem;
+    background: var(--panneau-haut);
+    border: 0.125rem solid var(--filet);
+    border-radius: var(--rayon-petit);
+  }
+  .vis__remarque.est-choisie {
+    border-color: var(--accent-texte);
+  }
+  .vis__remarque > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+  .vis__remarque .vis__epingle {
+    position: static;
+    margin: 0;
+    box-shadow: none;
+  }
+  .vis__remarque > .tdb-pastille {
+    align-self: start;
+  }
+  .vis__reponse {
+    border-left: 0.2rem solid var(--ok);
+    padding-left: 0.6rem;
+  }
+  .vis__reponse .tdb-surtitre {
+    color: var(--ok);
+  }
+  @media (max-width: 47rem) {
+    .vis__grille {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto 46% minmax(0, 1fr);
+    }
+    .vis__cote {
+      border-left: 0;
+      border-top: 1px solid var(--filet);
+    }
+    .vis__tete h2 {
+      flex-basis: 100%;
+    }
+    .vis__tete .tdb-btn {
+      flex: 1 1 auto;
+      min-height: 2.25rem;
+      padding-inline: 0.5rem;
+    }
+  }
+
+  /* Règles */
+  .rg-recherche {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: 30rem;
+  }
+  .rg-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .rg-regle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+</style>
+
+<div class="tdb-page">
+  <header class="tdb-tete">
+    <div>
+      <h1>La Petite Ligne</h1>
+      <p class="tdb-tete__sous">Suivi de la refonte, en direct</p>
+    </div>
+    <p class="tdb-lien" id="tdb-lien" data-etat="connexion" role="status">Connexion…</p>
+  </header>
+  <p class="tdb-bandeau" id="tdb-bandeau" hidden></p>
+  <div
+    class="tdb-onglets"
+    id="tdb-onglets"
+    role="tablist"
+    aria-label="Sections du tableau de bord"
+  ></div>
+  <main id="tdb-panneaux"></main>
+</div>
+
+<dialog class="tdb-dialogue" id="tdb-confirmer" aria-labelledby="tdb-confirmer-texte">
+  <p id="tdb-confirmer-texte"></p>
+  <div class="tdb-rang">
+    <button type="button" class="tdb-btn" id="tdb-confirmer-non">Annuler</button>
+    <button type="button" class="tdb-btn tdb-btn--accent" id="tdb-confirmer-oui">Confirmer</button>
+  </div>
+</dialog>
+<div class="tdb-toast" id="tdb-toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+  (function () {
+    'use strict';
+
+    var DELAI_CHARGEMENT = 10000;
+    var DUREE_TOAST = 4500;
+    var IDS_RESERVES = /^(settings|sidebar|customize|upgrade|downloads|comment-.*)$/;
+    var TYPES_CIBLE = ['image', 'carte', 'modele'];
+
+    /* ---------- Fabrique d'éléments: tout texte passe par textContent ---------- */
+    function h(balise, attributs) {
+      var el = document.createElement(balise);
+      var a = attributs || {};
+      Object.keys(a).forEach(function (cle) {
+        var v = a[cle];
+        if (v === null || v === undefined || v === false) return;
+        if (cle === 'class') el.className = v;
+        else if (cle === 'text') el.textContent = String(v);
+        else if (cle.slice(0, 2) === 'on' && typeof v === 'function')
+          el.addEventListener(cle.slice(2), v);
+        else if (v === true) el.setAttribute(cle, '');
+        else el.setAttribute(cle, String(v));
+      });
+      for (var i = 2; i < arguments.length; i++) ajouter(el, arguments[i]);
+      return el;
+    }
+    function ajouter(el, enfant) {
+      if (enfant === null || enfant === undefined || enfant === false) return;
+      if (Array.isArray(enfant))
+        enfant.forEach(function (e) {
+          ajouter(el, e);
+        });
+      else if (enfant instanceof Node) el.appendChild(enfant);
+      else el.appendChild(document.createTextNode(String(enfant)));
+    }
+    function vide(titre, texte) {
+      return h(
+        'div',
+        { class: 'tdb-vide' },
+        h('p', { class: 'tdb-vide__titre', text: titre }),
+        texte ? h('p', { text: texte }) : null,
+      );
+    }
+
+    /* ---------- Dates en français, à l'heure de Paris ---------- */
+    var fmtJour = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    var fmtHeure = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    function date(valeur) {
+      if (typeof valeur !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(valeur))
+        return valeur === null || valeur === undefined ? '' : String(valeur);
+      var jourSeul = valeur.length === 10;
+      var d = new Date(jourSeul ? valeur + 'T12:00:00Z' : valeur);
+      if (isNaN(d.getTime())) return valeur;
+      var jour = fmtJour.format(d).replace(/^1 /, '1er ');
+      if (jourSeul) return jour;
+      return jour + ' à ' + fmtHeure.format(d).replace(':', ' h ');
+    }
+
+    /* ---------- Message bref et confirmation ---------- */
+    var elToast = document.getElementById('tdb-toast');
+    var minuterieToast = 0;
+    var toastEnCouche = typeof elToast.showPopover === 'function';
+    if (toastEnCouche) elToast.setAttribute('popover', 'manual');
+    function toast(texte) {
+      clearTimeout(minuterieToast);
+      elToast.textContent = String(texte);
+      elToast.hidden = false;
+      if (toastEnCouche) {
+        // Rouvert à chaque fois pour passer au-dessus d'un dialogue ouvert entre-temps.
+        try {
+          if (elToast.matches(':popover-open')) elToast.hidePopover();
+          elToast.showPopover();
+        } catch (e) {
+          /* affichage simple */
+        }
+      }
+      minuterieToast = setTimeout(function () {
+        try {
+          if (toastEnCouche && elToast.matches(':popover-open')) elToast.hidePopover();
+        } catch (e) {
+          /* rien */
+        }
+        elToast.hidden = true;
+      }, DUREE_TOAST);
+    }
+
+    var elConfirmer = document.getElementById('tdb-confirmer');
+    var elOui = document.getElementById('tdb-confirmer-oui');
+    var elNon = document.getElementById('tdb-confirmer-non');
+    var repondre = null;
+    function fermerConfirmation(valeur) {
+      var r = repondre;
+      repondre = null;
+      if (elConfirmer.open) elConfirmer.close();
+      if (r) r(valeur);
+    }
+    elOui.addEventListener('click', function () {
+      fermerConfirmation(true);
+    });
+    elNon.addEventListener('click', function () {
+      fermerConfirmation(false);
+    });
+    elConfirmer.addEventListener('close', function () {
+      fermerConfirmation(false);
+    });
+    function confirmer(texte, libelles) {
+      if (repondre) fermerConfirmation(false);
+      var l = libelles || {};
+      document.getElementById('tdb-confirmer-texte').textContent = String(texte);
+      elOui.textContent = l.ok || 'Confirmer';
+      elNon.textContent = l.annuler || 'Annuler';
+      return new Promise(function (resoudre) {
+        repondre = resoudre;
+        if (typeof elConfirmer.showModal === 'function') elConfirmer.showModal();
+        else elConfirmer.setAttribute('open', '');
+        elNon.focus();
+      });
+    }
+
+    /* ---------- Champ de remarque réutilisable ---------- */
+    var compteurChamps = 0;
+    function noteEditor(el, options) {
+      var o = options || {};
+      var id = 'tdb-remarque-' + (o.id || ++compteurChamps);
+      var zone = h('textarea', {
+        class: 'tdb-champ',
+        id: id,
+        rows: '3',
+        placeholder: o.placeholder || 'Écris ta remarque ici',
+      });
+      zone.value = o.valeur || '';
+      var envoyer = h('button', {
+        type: 'submit',
+        class: 'tdb-btn tdb-btn--accent',
+        text: o.bouton || 'Enregistrer la remarque',
+      });
+      var annuler = o.onCancel
+        ? h('button', {
+            type: 'button',
+            class: 'tdb-btn',
+            text: 'Annuler',
+            onclick: function () {
+              o.onCancel();
+            },
+          })
+        : null;
+      var boite = h(
+        'form',
+        { class: 'tdb-note-ed', novalidate: true },
+        h('label', { class: 'tdb-etiquette', for: id, text: o.label || 'Ta remarque' }),
+        zone,
+        h(
+          'div',
+          { class: 'tdb-rang' },
+          envoyer,
+          annuler,
+          h('span', { class: 'tdb-note-ed__aide', text: 'Ctrl+Entrée pour envoyer' }),
+        ),
+      );
+      var occupe = false;
+      function soumettre() {
+        var texte = zone.value.trim();
+        if (occupe) return;
+        if (!texte) {
+          zone.focus();
+          toast('Écris d’abord quelques mots.');
+          return;
+        }
+        if (typeof o.onSubmit !== 'function') return;
+        occupe = true;
+        envoyer.disabled = true;
+        Promise.resolve()
+          .then(function () {
+            return o.onSubmit(texte);
+          })
+          .then(
+            function (resultat) {
+              if (resultat !== false) zone.value = '';
+            },
+            function () {
+              toast('L’envoi n’a pas marché. Réessaie dans un instant.');
+            },
+          )
+          .then(function () {
+            occupe = false;
+            envoyer.disabled = false;
+          });
+      }
+      boite.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        soumettre();
+      });
+      zone.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+          ev.preventDefault();
+          soumettre();
+        } else if (ev.key === 'Escape' && o.onCancel) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          o.onCancel();
+        }
+      });
+      el.appendChild(boite);
+      return {
+        el: boite,
+        focus: function () {
+          zone.focus();
+        },
+        clear: function () {
+          zone.value = '';
+        },
+        destroy: function () {
+          boite.remove();
+        },
+      };
+    }
+
+    /* ---------- Données: un seul abonnement par chemin ---------- */
+    var ctx = { db: null, ready: null, me: null, canWrite: false, data: {}, notes: {}, ui: {} };
+    var baseConnue = false;
+    var vues = new Map();
+    var elLien = document.getElementById('tdb-lien');
+    var elBandeau = document.getElementById('tdb-bandeau');
+
+    function photo(v) {
+      return { etat: v.etat, docs: v.docs, data: v.data, retard: v.retard };
+    }
+    function diffuser(v) {
+      var p = photo(v);
+      v.ecoutes.forEach(function (fn) {
+        try {
+          fn(p);
+        } catch (e) {
+          setTimeout(function () {
+            throw e;
+          });
+        }
+      });
+      majLien();
+    }
+    function brancher(v) {
+      if (v.branchee) return;
+      v.branchee = true;
+      if (!ctx.db) {
+        v.etat = 'horsligne';
+        diffuser(v);
+        return;
+      }
+      var suite = function (snap) {
+        if (v.estDoc) v.data = snap.exists ? Object.assign({}, snap.data()) : null;
+        else
+          v.docs = snap.docs.map(function (d) {
+            return Object.assign({ id: d.id }, d.data());
+          });
+        v.etat = 'pret';
+        if (!(snap.metadata && snap.metadata.fromCache)) {
+          v.confirmee = true;
+          v.retard = false;
+        }
+        diffuser(v);
+      };
+      var echec = function () {
+        // Écoute terminée par la base: on garde ce qui est affiché, sans erreur brute.
+        if (v.etat !== 'pret') v.etat = 'horsligne';
+        v.retard = v.etat === 'pret';
+        v.coupee = true;
+        diffuser(v);
+      };
+      try {
+        var ref = v.estDoc ? ctx.db.doc(v.chemin) : ctx.db.collection(v.chemin);
+        ref.onSnapshot(suite, echec);
+      } catch (e) {
+        echec();
+      }
+    }
+    function watch(chemin, fn) {
+      var v = vues.get(chemin);
+      if (!v) {
+        v = {
+          chemin: chemin,
+          estDoc: chemin.split('/').length % 2 === 0,
+          etat: 'chargement',
+          docs: [],
+          data: null,
+          retard: false,
+          confirmee: false,
+          coupee: false,
+          branchee: false,
+          ecoutes: new Set(),
+        };
+        vues.set(chemin, v);
+        setTimeout(function () {
+          if (!v.confirmee && v.etat !== 'horsligne') {
+            v.retard = true;
+            diffuser(v);
+          }
+        }, DELAI_CHARGEMENT);
+        if (baseConnue) brancher(v);
+      }
+      v.ecoutes.add(fn);
+      try {
+        fn(photo(v));
+      } catch (e) {
+        setTimeout(function () {
+          throw e;
+        });
+      }
+      return function () {
+        v.ecoutes.delete(fn);
+      };
+    }
+
+    function majLien() {
+      var etat = 'connexion';
+      var texte = 'Connexion…';
+      var message = '';
+      var confirmee = false;
+      var coupee = false;
+      var retard = false;
+      vues.forEach(function (v) {
+        confirmee = confirmee || v.confirmee;
+        coupee = coupee || v.coupee;
+        retard = retard || v.retard;
+      });
+      if (baseConnue && !ctx.db) {
+        etat = 'horsligne';
+        texte = 'Hors ligne';
+        message =
+          'La page ne peut pas joindre ses données pour le moment: rien ne peut être lu ni envoyé. Ouvre-la depuis claude.ai, avec ton compte, puis reviens ici.';
+      } else if (coupee) {
+        etat = 'horsligne';
+        texte = 'Connexion perdue';
+        message =
+          'La connexion aux données s’est arrêtée. Ce qui est affiché peut dater. Recharge la page pour reprendre le direct.';
+      } else if (retard) {
+        texte = 'La base tarde à répondre';
+      } else if (baseConnue && !ctx.canWrite) {
+        etat = 'lecture';
+        texte = 'Lecture seule';
+        message =
+          'Tu peux tout lire, mais ce compte ne peut ni répondre ni annoter. Demande au manager de t’ouvrir la page en tant que contributeur.';
+      } else if (confirmee) {
+        etat = 'direct';
+        texte = 'En direct';
+      }
+      if (elLien.dataset.etat !== etat || elLien.textContent !== texte) {
+        elLien.dataset.etat = etat;
+        elLien.textContent = texte;
+      }
+      elBandeau.hidden = !message;
+      if (message && elBandeau.dataset.message !== message) {
+        elBandeau.dataset.message = message;
+        elBandeau.textContent = '';
+        elBandeau.appendChild(h('strong', { text: texte + ' : ' }));
+        elBandeau.appendChild(document.createTextNode(message));
+      }
+    }
+
+    /* ---------- Écritures: une à la fois par document, erreurs dites en clair ---------- */
+    var files = new Map();
+    function ecrire(chemin, action, creation) {
+      if (!ctx.db || !ctx.canWrite) {
+        toast(
+          ctx.db
+            ? 'Lecture seule : ce compte ne peut pas écrire ici.'
+            : 'Hors ligne : rien n’a été envoyé.',
+        );
+        return Promise.resolve(false);
+      }
+      var avant = files.get(chemin) || Promise.resolve();
+      var apres = avant
+        .then(function () {
+          return action(ctx.db);
+        })
+        .then(
+          function () {
+            return true;
+          },
+          function (e) {
+            var code = e && e.code;
+            if (code === 'quota_exceeded')
+              toast('La base est pleine : préviens le manager, rien n’a été enregistré.');
+            else if (code === 'invalid_argument' && !creation)
+              toast(
+                'Cet élément n\u2019existe plus ou ne peut pas être modifié\u00a0: rien n\u2019a été enregistré.',
+              );
+            else if (code === 'invalid_argument' || code === 'revoked' || code === 'not_granted') {
+              ctx.canWrite = false;
+              majLien();
+              document.dispatchEvent(new CustomEvent('tdb:droits'));
+              toast('Ce compte ne peut pas écrire ici : rien n’a été enregistré.');
+            } else toast('L’envoi n’a pas marché. Vérifie ta connexion et réessaie.');
+            return false;
+          },
+        );
+      files.set(chemin, apres);
+      return apres;
+    }
+
+    /* ---------- Remarques ---------- */
+    var remarques = [];
+    var ecoutesRemarques = new Set();
+    var remarquesBranchees = false;
+    function brancherRemarques() {
+      if (remarquesBranchees) return;
+      remarquesBranchees = true;
+      watch('remarques', function (vue) {
+        remarques = vue.docs
+          .filter(function (r) {
+            return r && r.cible && r.forme;
+          })
+          .sort(function (a, b) {
+            var ca = String(a.creeLe || ''),
+              cb = String(b.creeLe || '');
+            return ca < cb ? -1 : ca > cb ? 1 : a.id < b.id ? -1 : 1;
+          });
+        ecoutesRemarques.forEach(function (e) {
+          e();
+        });
+      });
+    }
+    function listeRemarques(type, id) {
+      brancherRemarques();
+      var liste = remarques.filter(function (r) {
+        return r.cible.type === type && r.cible.id === id && r.forme.sorte !== 'note';
+      });
+      // Permet aussi `await ctx.notes.list(...)` et `.then(...)`.
+      Object.defineProperty(liste, 'then', {
+        enumerable: false,
+        configurable: true,
+        value: function (ok) {
+          return Promise.resolve(liste.slice()).then(ok);
+        },
+      });
+      return liste;
+    }
+    function nombre(n) {
+      return typeof n === 'number' && isFinite(n);
+    }
+    function arrondi(n) {
+      return Math.round(n * 10000) / 10000;
+    }
+    function formeValide(f) {
+      if (!f || typeof f !== 'object') return null;
+      if (f.sorte === 'globale') return { sorte: 'globale' };
+      if (f.sorte === 'point' && nombre(f.x) && nombre(f.y))
+        return { sorte: 'point', x: arrondi(f.x), y: arrondi(f.y) };
+      if (
+        f.sorte === 'trait' &&
+        Array.isArray(f.points) &&
+        f.points.length >= 2 &&
+        f.points.every(function (p) {
+          return Array.isArray(p) && nombre(p[0]) && nombre(p[1]);
+        })
+      ) {
+        return {
+          sorte: 'trait',
+          points: f.points.map(function (p) {
+            return [arrondi(p[0]), arrondi(p[1])];
+          }),
+        };
+      }
+      var triplet = function (t) {
+        return Array.isArray(t) && t.length === 3 && t.every(nombre);
+      };
+      if (f.sorte === 'point3d' && triplet(f.position) && triplet(f.normale))
+        return {
+          sorte: 'point3d',
+          position: f.position.map(arrondi),
+          normale: f.normale.map(arrondi),
+        };
+      return null;
+    }
+    function cibleValide(c) {
+      return c && TYPES_CIBLE.indexOf(c.type) !== -1 && typeof c.id === 'string' && c.id !== ''
+        ? { type: c.type, id: c.id }
+        : null;
+    }
+    ctx.notes = {
+      list: listeRemarques,
+      watch: function (type, id, fn) {
+        var ecoute = function () {
+          fn(listeRemarques(type, id));
+        };
+        ecoutesRemarques.add(ecoute);
+        brancherRemarques();
+        ecoute();
+        return function () {
+          ecoutesRemarques.delete(ecoute);
+        };
+      },
+      add: function (remarque) {
+        var r = remarque || {};
+        var cible = cibleValide(r.cible);
+        var forme = formeValide(r.forme);
+        var texte = typeof r.texte === 'string' ? r.texte.trim() : '';
+        if (!cible || !forme || !texte) return Promise.resolve(null);
+        var ref = null;
+        return ecrire(
+          'remarques/+',
+          function (db) {
+            ref = db.collection('remarques').doc();
+            return ref.set({
+              cible: cible,
+              forme: forme,
+              texte: texte,
+              auteur: ctx.me,
+              creeLe: new Date().toISOString(),
+              statut: 'ouverte',
+              reponseManager: '',
+            });
+          },
+          true,
+        ).then(function (ok) {
+          return ok && ref ? ref.id : null;
+        });
+      },
+      resolve: function (id) {
+        return ecrire('remarques/' + id, function (db) {
+          return db.doc('remarques/' + id).update({ statut: 'traitee' });
+        });
+      },
+      remove: function (id) {
+        return ecrire('remarques/' + id, function (db) {
+          return db.doc('remarques/' + id).delete();
+        });
+      },
+      rating: function (type, id) {
+        brancherRemarques();
+        var doc = remarques.find(function (r) {
+          return r.id === 'note-' + type + '-' + id;
+        });
+        return doc && doc.forme.sorte === 'note' && nombre(doc.forme.valeur)
+          ? doc.forme.valeur
+          : null;
+      },
+      setRating: function (cible, note) {
+        var c = cibleValide(cible);
+        if (!c || !nombre(note)) return Promise.resolve(false);
+        var chemin = 'remarques/note-' + c.type + '-' + c.id;
+        var valeur = Math.max(0, Math.min(10, Math.round(note)));
+        return ecrire(
+          chemin,
+          function (db) {
+            return db.doc(chemin).set({
+              cible: c,
+              forme: { sorte: 'note', valeur: valeur },
+              texte: '',
+              auteur: ctx.me,
+              creeLe: new Date().toISOString(),
+              statut: 'ouverte',
+              reponseManager: '',
+            });
+          },
+          true,
+        );
+      },
+    };
+    ctx.data = { watch: watch, write: ecrire };
+    ctx.ui = {
+      toast: toast,
+      confirm: confirmer,
+      noteEditor: noteEditor,
+      h: h,
+      vide: vide,
+      date: date,
+    };
+
+    /* ---------- Connexion à la base (jamais pendant le premier affichage) ---------- */
+    function sansEchec(promesse, repli) {
+      return Promise.resolve(promesse).then(
+        function (v) {
+          return v;
+        },
+        function () {
+          return repli;
+        },
+      );
+    }
+    ctx.ready = (function () {
+      var c = window.claude;
+      if (!c || typeof c.use !== 'function') return Promise.resolve(null);
+      var appel = function (nom) {
+        try {
+          return sansEchec(c.use(nom), null);
+        } catch (e) {
+          return Promise.resolve(null);
+        }
+      };
+      return Promise.all([appel('db'), appel('user')]).then(function (r) {
+        var db = r[0],
+          user = r[1];
+        if (!db) return null;
+        if (!user) {
+          ctx.canWrite = true;
+          return db;
+        }
+        return Promise.all([
+          sansEchec(user.id(), null),
+          sansEchec(user.can('data.write'), null),
+        ]).then(function (u) {
+          ctx.me = typeof u[0] === 'string' ? u[0] : null;
+          ctx.canWrite = u[1] !== false;
+          return db;
+        });
+      });
+    })().then(function (db) {
+      ctx.db = db || null;
+      if (!ctx.db) ctx.canWrite = false;
+      baseConnue = true;
+      vues.forEach(brancher);
+      majLien();
+      document.dispatchEvent(new CustomEvent('tdb:droits'));
+      return ctx.db;
+    });
+
+    /* ---------- Onglets, routés sur location.hash ---------- */
+    var onglets = [];
+    var actif = null;
+    var demarre = false;
+    var elAucun = null;
+    var elOnglets = document.getElementById('tdb-onglets');
+    var elPanneaux = document.getElementById('tdb-panneaux');
+
+    function registerTab(def) {
+      if (
+        !def ||
+        typeof def.id !== 'string' ||
+        !/^[A-Za-z][A-Za-z-]*$/.test(def.id) ||
+        IDS_RESERVES.test(def.id)
+      )
+        return false;
+      if (
+        typeof def.mount !== 'function' ||
+        onglets.some(function (o) {
+          return o.id === def.id;
+        })
+      )
+        return false;
+      var o = {
+        id: def.id,
+        title: String(def.title || def.id),
+        order: nombre(def.order) ? def.order : 100,
+        mount: def.mount,
+        monte: false,
+        badge: 0,
+      };
+      o.bouton = h('button', {
+        type: 'button',
+        class: 'tdb-onglet',
+        role: 'tab',
+        id: 'onglet-' + o.id,
+        'aria-controls': 'panneau-' + o.id,
+        'aria-selected': 'false',
+        tabindex: '-1',
+        onclick: function () {
+          go(o.id);
+        },
+      });
+      o.panneau = h('section', {
+        class: 'tdb-panneau',
+        role: 'tabpanel',
+        id: 'panneau-' + o.id,
+        'aria-labelledby': 'onglet-' + o.id,
+        tabindex: '0',
+        hidden: true,
+      });
+      if (elAucun) {
+        elAucun.remove();
+        elAucun = null;
+      }
+      elPanneaux.appendChild(o.panneau);
+      onglets.push(o);
+      onglets.sort(function (a, b) {
+        return a.order - b.order;
+      });
+      onglets.forEach(function (x) {
+        elOnglets.appendChild(x.bouton);
+      });
+      libeller(o);
+      if (demarre) router();
+      return true;
+    }
+    function libeller(o) {
+      o.bouton.textContent = '';
+      o.bouton.appendChild(h('span', { text: o.title }));
+      if (o.badge > 0) {
+        o.bouton.appendChild(
+          h('span', { class: 'tdb-onglet__compte', 'aria-hidden': 'true', text: o.badge }),
+        );
+        o.bouton.setAttribute('aria-label', o.title + ', ' + o.badge + ' en attente');
+      } else o.bouton.removeAttribute('aria-label');
+    }
+    function setBadge(id, n) {
+      var o = onglets.find(function (x) {
+        return x.id === id;
+      });
+      var v = nombre(n) && n > 0 ? Math.floor(n) : 0;
+      if (!o || o.badge === v) return;
+      o.badge = v;
+      libeller(o);
+    }
+    function activer(o) {
+      if (actif === o) return;
+      actif = o;
+      onglets.forEach(function (x) {
+        var choisi = x === o;
+        x.bouton.setAttribute('aria-selected', choisi ? 'true' : 'false');
+        x.bouton.tabIndex = choisi ? 0 : -1;
+        x.panneau.hidden = !choisi;
+      });
+      if (!o.monte) {
+        o.monte = true;
+        var panne = function () {
+          o.panneau.textContent = '';
+          o.panneau.appendChild(
+            vide(
+              'Cette section n’a pas pu s’afficher',
+              'Les autres sections marchent toujours. Recharge la page ; si le souci revient, préviens le manager.',
+            ),
+          );
+        };
+        try {
+          Promise.resolve(o.mount(o.panneau, ctx)).catch(panne);
+        } catch (e) {
+          panne();
+        }
+      }
+    }
+    function router() {
+      if (!onglets.length) return;
+      var id = decodeURIComponent((location.hash || '').slice(1));
+      activer(
+        onglets.find(function (x) {
+          return x.id === id;
+        }) ||
+          (actif && !id ? onglets[0] : actif) ||
+          onglets[0],
+      );
+    }
+    function go(id) {
+      var o = onglets.find(function (x) {
+        return x.id === id;
+      });
+      if (!o) return;
+      activer(o);
+      try {
+        if (location.hash !== '#' + id) location.hash = id;
+      } catch (e) {
+        /* adresse figée: l'onglet est ouvert quand même */
+      }
+    }
+    elOnglets.addEventListener('keydown', function (ev) {
+      var i = onglets.findIndex(function (x) {
+        return x.bouton === document.activeElement;
+      });
+      if (i === -1) return;
+      var j =
+        ev.key === 'ArrowRight'
+          ? i + 1
+          : ev.key === 'ArrowLeft'
+            ? i - 1
+            : ev.key === 'Home'
+              ? 0
+              : ev.key === 'End'
+                ? onglets.length - 1
+                : null;
+      if (j === null) return;
+      ev.preventDefault();
+      var o = onglets[(j + onglets.length) % onglets.length];
+      go(o.id);
+      o.bouton.focus();
+    });
+    window.addEventListener('hashchange', router);
+
+    window.TDB = { registerTab: registerTab, setBadge: setBadge, go: go, ctx: ctx };
+
+    function demarrer() {
+      if (demarre) return;
+      demarre = true;
+      if (!onglets.length)
+        elPanneaux.appendChild(
+          (elAucun = vide(
+            'Aucune section à afficher',
+            'Les scripts de la page n’ont pas pu se charger. Recharge la page ; si le souci revient, préviens le manager.',
+          )),
+        );
+      router();
+      majLien();
+    }
+    // Les scripts d'onglets (defer) s'exécutent avant DOMContentLoaded; un onglet inscrit plus tard est pris aussi.
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer);
+    else setTimeout(demarrer, 0);
+  })();
+</script>
+<script src="avancement.js" defer></script>
+<script src="questions.js" defer></script>
+<script src="images.js" defer></script>
+<script src="regles.js" defer></script>
+<script src="carte.js" defer></script>
+<script src="modeles.js" defer></script>
