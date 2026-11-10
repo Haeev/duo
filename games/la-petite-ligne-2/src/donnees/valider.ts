@@ -486,6 +486,14 @@ export function validateContent(content: Content): string[] {
   for (const prop of Object.values(content.props)) checkBricks(content, prop, problems);
   problems.push(...checkRecipes(content));
   problems.push(...checkPlans(content));
+  // Coins de pêche: chaque poisson de la table est une prise connue avec son bloc `fish`.
+  for (const place of Object.values(content.places))
+    for (const spot of place.def.fishing ?? [])
+      for (const row of spot.table)
+        if (content.catches[row.catch]?.fish === undefined)
+          problems.push(
+            `lieu ${place.def.id}, coin de pêche ${spot.id}: « ${row.catch} » n'est pas une prise avec un bloc fish`,
+          );
   for (const recipe of Object.values(content.recipes)) {
     for (const portion of [...recipe.inputs, recipe.output]) {
       if (!(portion.item in content.items))
