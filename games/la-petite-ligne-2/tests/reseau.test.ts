@@ -35,9 +35,11 @@ describe('séance à deux', () => {
       expect(seen.progress).toEqual(sim.world.progress);
       expect(seen.players[1].toolbar).toEqual(sim.world.players[1].toolbar);
       expect(seen.players[0].body).toEqual(sim.world.players[0].body);
-      expect(seen.places['essai-gare']?.villagers['cheffe-de-gare']?.body).toEqual(
-        sim.world.places['essai-gare']?.villagers['cheffe-de-gare']?.body,
-      );
+      // Habitants au centième près (canal rapide arrondi, `reseau/tranches.ts`).
+      const shown = seen.places['essai-gare']?.villagers['cheffe-de-gare']?.body;
+      const truth = sim.world.places['essai-gare']?.villagers['cheffe-de-gare']?.body;
+      for (const key of ['x', 'y', 'facing', 'speed'] as const)
+        expect(shown?.[key]).toBeCloseTo(truth?.[key] ?? Number.NaN, 2);
       expect(seen.tick).toBeGreaterThan(0);
       expect(host.view.localIndex()).toBe(0);
       expect(guest.view.localIndex()).toBe(1);

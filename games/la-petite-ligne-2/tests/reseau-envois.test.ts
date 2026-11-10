@@ -223,8 +223,16 @@ describe('bascule de lieu', () => {
     // Le lieu change d'une image à l'autre: jamais d'image avec le nouveau lieu incomplet.
     expect([...seen].filter((s) => s.startsWith('essai-halte'))).toEqual(['essai-halte:settled']);
     expect(seen.has('essai-gare:settled')).toBe(true);
-    const villagers = duo.guest.world()?.places['essai-halte']?.villagers;
-    expect(villagers).toEqual(sim.world.places['essai-halte']?.villagers);
+    const villagers = duo.guest.world()?.places['essai-halte']?.villagers ?? {};
+    const expected = sim.world.places['essai-halte']?.villagers ?? {};
+    expect(Object.keys(villagers)).toEqual(Object.keys(expected));
+    // Les habitants arrivent au centième près (canal rapide arrondi, `tranches.ts`).
+    for (const [id, villager] of Object.entries(expected)) {
+      const { body, ...slow } = villager;
+      expect(villagers[id]).toMatchObject(slow);
+      for (const key of ['x', 'y', 'facing', 'speed'] as const)
+        expect(villagers[id]?.body[key]).toBeCloseTo(body[key], 2);
+    }
   });
 });
 

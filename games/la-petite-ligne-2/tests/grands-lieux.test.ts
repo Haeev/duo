@@ -19,6 +19,9 @@ import {
   PLACE_OBJECTS_STATE_BYTES,
   SLICE_SCHEMAS,
 } from '../src/reseau/canaux';
+import { PLACE_PART_BUDGET_BYTES } from '../src/reseau/etat-lieu';
+import { keyedParts } from '../src/reseau/par-cles';
+import { NET_SETTINGS } from '../src/reseau/reglages';
 import { byteLength, currentPlace, fastMessage, sliceMessage } from '../src/reseau/tranches';
 import { planToMap } from '../outils/plan-vers-lieu';
 import { dataFiles, gameContent, newSim } from './aides';
@@ -179,8 +182,11 @@ describe('réseau d’un grand lieu', () => {
       fast: byteLength(fast),
     };
     process.stdout.write(`grand lieu au pire (octets): ${JSON.stringify(sizes)}\n`);
-    // La tranche entière déborderait (ADR 0022): les meubles partent à part, par morceaux.
+    // La tranche entière déborderait (ADR 0022): l'état du lieu part par morceaux (mission M3).
     expect(sizes.tranche).toBeGreaterThan(BUDGET_BYTES.place);
+    const head = { target: 'aubrune', rev: 0, baseRev: -1, tick: 1 };
+    const { parts } = keyedParts(null, message.place, head, NET_SETTINGS.place.partBytes);
+    for (const part of parts) expect(byteLength(part)).toBeLessThanOrEqual(PLACE_PART_BUDGET_BYTES);
     expect(sizes.horsMeubles).toBeLessThanOrEqual(BUDGET_BYTES.place);
     expect(sizes.meubles).toBeLessThanOrEqual(PLACE_OBJECTS_STATE_BYTES);
     expect(sizes.fast).toBeLessThanOrEqual(BUDGET_BYTES.fast);

@@ -65,6 +65,9 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Commande devinée par l'hôte: chaque devinée « marche » à la place d'un arrêt fait glisser l'invité d'un pas (5 cm à 1,5 m/s) après l'arrêt, jamais de recul. Six devinées (0.13) donnaient 30 cm au banc avec 5 % de pertes; deux, 10 cm. Le reste se supprimerait par un retour arrière du seul corps de l'invité chez l'hôte (non fait).
 - Banc à 60 images et 30 pas: commencer la marche sur une image paire, sinon la réponse et l'écart à l'idéal sont décalés d'une image.
 - Geste prédit: l'abandon « sans réponse » se décide quand l'accusé du canal rapide atteint la commande qui portait l'intention (les événements du même pas partent avant le rapide, sur la même connexion). Une confirmation tardive après abandon se rejoue comme un événement normal.
+- Valibot: `v.tuple([..., v.unknown()])` accepte un tableau plus court (l'élément manquant devient `undefined`, et la sortie a la longueur du schéma). Pour distinguer « écriture » et « retrait » par la longueur d'un tuple, `v.strictTuple`, le plus court en premier dans l'union.
+- État lent par clés (`par-cles.ts`, M3): la forme de chaque champ se lit à l'exécution (dictionnaire, tableau à `id`, valeur); un tableau à `id` réordonné force une révision complète. Coût d'une minute chargée au pire d'Aubrune: 5,3 Ko/s; le gros du débit d'un grand lieu est le canal rapide (32 habitants: 30 Ko/s même arrondis au cm).
+- Outil Bash de la copie isolée: `--exclude-dir=.git` dans un `grep` compte comme une commande git trop complexe; passer par l'outil Grep.
 
 ## Systèmes (faits lus, à confirmer sur les machines du client)
 

@@ -30,6 +30,7 @@ import {
   type PredictedGesture,
   type Predictor,
 } from './prediction';
+import { createPlaceAssembler, PLACE_PART_CHANNEL, PlacePartSchema } from './etat-lieu';
 import { createProgressAssembler, PROGRESS_PART_CHANNEL, ProgressPartSchema } from './progression';
 import { NET_SETTINGS, type NetSettings } from './reglages';
 
@@ -139,6 +140,7 @@ export function createGuest(
   const intents: Intent[] = [];
   const snapshots = createSnapshotBuffer(settings.interpolation);
   const progress = createProgressAssembler();
+  const placeParts = createPlaceAssembler();
   let common: SliceMessage<'common'> | null = null;
   let players: SliceMessage<'players'> | null = null;
   let place: SliceMessage<'place'> | null = null;
@@ -236,9 +238,11 @@ export function createGuest(
         if (progress.receive(message) !== null) stale = true;
       }),
     net
-      .channel(CHANNEL.place, { mode: 'latest', schema: SLICE_SCHEMAS.place })
+      .channel(PLACE_PART_CHANNEL, { mode: 'reliable', schema: PlacePartSchema })
       .onMessage((message) => {
-        place = message;
+        const done = placeParts.receive(message);
+        if (done === null) return;
+        place = { tick: done.tick, id: done.target, place: done.state };
         stale = true;
       }),
     net.channel(CHANNEL.events, { mode: 'reliable', schema: EventsSchema }).onMessage(onEvents),
@@ -403,6 +407,7 @@ export function createGuest(
       snapshots.clear();
       walk.reset();
       progress.reset();
+      placeParts.reset();
       gesture = null;
       lastRender = null;
     },

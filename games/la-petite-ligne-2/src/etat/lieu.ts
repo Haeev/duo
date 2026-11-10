@@ -98,24 +98,13 @@ export type PlaceState = v.InferOutput<typeof PlaceStateSchema>;
 
 export function slowOfPlace(place: PlaceState): PlaceSlow {
   const villagers: PlaceSlow['villagers'] = {};
+  // Tout sauf la position, qui part par le canal rapide.
   for (const [id, villager] of Object.entries(place.villagers))
     villagers[id] =
       villager.life === undefined
         ? { met: villager.met, talkingWith: villager.talkingWith }
         : { met: villager.met, talkingWith: villager.talkingWith, life: villager.life };
-  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops, fishing } = place;
-  const slow: PlaceSlow = {
-    leftOn,
-    placed,
-    nextPlacedId,
-    objects,
-    ground,
-    nextGroundId,
-    villagers,
-  };
-  if (shops !== undefined) slow.shops = shops;
-  if (place.insects !== undefined) slow.insects = place.insects;
-  if (place.housing !== undefined) slow.housing = place.housing;
-  if (fishing !== undefined) slow.fishing = fishing;
-  return slow;
+  // Tout le reste part tel quel: un champ ajouté au lieu par un système est transmis sans code
+  // de plus (`reseau/par-cles.ts`, mission M3).
+  return { ...place, villagers };
 }
