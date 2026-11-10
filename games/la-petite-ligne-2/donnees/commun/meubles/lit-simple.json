@@ -14,7 +14,8 @@
     {
       "brick": "sleep",
       "places": 1,
-      "wakeAt": 100
+      "wakeAt": 100,
+      "lie": { "height": 0.52, "pillow": 0.7, "spacing": 0 }
     }
   ]
 }

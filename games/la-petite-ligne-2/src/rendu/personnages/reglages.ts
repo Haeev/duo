@@ -63,6 +63,19 @@ export const CHARACTER_SETTINGS = {
     kneeMargin: 0.05,
   },
 
+  /**
+   * Couché (brique `sleep`): le personnage debout basculé sur le dos. `back`: épaisseur du dos
+   * sous l'axe des pieds (m), `headBelowTop`: du sommet du crâne au milieu de la tête (m), au
+   * gabarit adulte. Mesures du couchage: fiche du meuble (`lie`), sinon le dessus de la forme
+   * provisoire. Yeux fermés pendant le sommeil.
+   */
+  lie: {
+    back: 0.12,
+    headBelowTop: 0.12,
+    expression: 'blink',
+    fallback: { height: RENDER_SETTINGS.standIn.propHeight, pillowInset: 0.35 },
+  },
+
   /** Clignement: intervalle tiré entre `minGap` et `maxGap` (s), durée d'un battement (s). */
   blink: { minGap: 2.4, maxGap: 5.5, seconds: 0.16 },
   /** Bouche du babil: durée d'une page (s) et fréquence d'ouverture (Hz). */

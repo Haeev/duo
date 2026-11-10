@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { WorldSchema } from '../src/etat/monde';
 import { aimOf } from '../src/simulation/briques/visee';
 import { canSkipNight, isNight } from '../src/simulation/noyau/horloge';
-import { boardingChoices } from '../src/simulation/voyage/index';
+import { boardingChoices, tripSeconds } from '../src/simulation/voyage/index';
 import { gameContent, newSim } from './aides';
 import { contentWith, put, run, send, SOUTH } from './aides-noyau';
 
@@ -129,6 +129,37 @@ describe('voyage en train', () => {
     expect(sim.world.places['essai-halte']?.leftOn).toBe(1);
     expect(sim.world.players.map((p) => p.body.x)).toEqual([19.2, 20.8]);
     expect(v.safeParse(WorldSchema, sim.world).success).toBe(true);
+  });
+
+  it('dure 12 s au plus, et se passe plus tôt quand les deux appuient sur la touche d’action', () => {
+    expect(travel.minSeconds).toBeLessThanOrEqual(12);
+    const sim = newSim(content);
+    send(sim, 0, { type: 'board', to: 'essai-halte' });
+    send(sim, 1, { type: 'board', to: 'essai-halte' });
+    send(sim, 0, { type: 'place_loaded', place: 'essai-halte' });
+    send(sim, 1, { type: 'place_loaded', place: 'essai-halte' });
+    run(sim, 2);
+    expect(tripSeconds(sim)).toBeCloseTo(2 + 2 / 30, 1);
+    // Une seule voix ne suffit pas: on reste dans le train.
+    send(sim, 0, { type: 'act' });
+    send(sim, 0, { type: 'act' });
+    run(sim, 1);
+    expect(sim.world.common.phase).toBe('travel');
+    expect(sim.world.common.travel?.skip).toEqual([true, false]);
+    expect(send(sim, 1, { type: 'act' })).toContainEqual({
+      type: 'train_arrived',
+      place: 'essai-halte',
+    });
+    expect(tripSeconds(sim)).toBe(0);
+
+    // Sans personne pour passer: l'arrivée tombe à la durée réglée, pas plus tard.
+    const slow = newSim(content);
+    send(slow, 0, { type: 'board', to: 'essai-halte' });
+    send(slow, 1, { type: 'board', to: 'essai-halte' });
+    send(slow, 0, { type: 'place_loaded', place: 'essai-halte' });
+    send(slow, 1, { type: 'place_loaded', place: 'essai-halte' });
+    const events = run(slow, travel.minSeconds + 0.1);
+    expect(events).toContainEqual({ type: 'train_arrived', place: 'essai-halte' });
   });
 
   it('prévient quand le chargement de l’autre machine dure', () => {

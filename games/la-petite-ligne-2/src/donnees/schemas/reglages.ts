@@ -75,8 +75,11 @@ export const SettingsSchema = v.strictObject({
   travel: v.strictObject({
     /** Heures de jeu ajoutées à l'horloge par un trajet. */
     clockHours: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(12)),
-    /** Durée minimale de la scène de wagon, et attente avant le message « l'autre charge encore ». */
-    minSeconds: Seconds,
+    /**
+     * Durée de la scène du trajet (quai, montée, train qui roule, arrivée), 12 s au plus; les deux
+     * joueurs peuvent la passer plus tôt. Puis attente avant le message « l'autre charge encore ».
+     */
+    minSeconds: v.pipe(FiniteSchema, v.minValue(2), v.maxValue(12)),
     slowLoadSeconds: Seconds,
     /** Écart entre les deux joueurs à la descente du train (m), et durée de la descente (s). */
     arrivalSpread: Seconds,

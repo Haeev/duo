@@ -42,6 +42,7 @@ import { approach } from '../camera';
 import type { Aimable } from '../cible';
 import { Fadable } from '../fondu';
 import { RENDER_SETTINGS } from '../reglages';
+import { type LyingPose, lyingPose } from './allonge';
 import { Face, blendWeights, type Posture, strideRate, targetWeights } from './animation';
 import { composeLook, defaultPlayerLook, hashString, lookKey, resolveLook } from './apparence';
 import {
@@ -69,6 +70,8 @@ interface Figure extends Aimable {
   readonly height: number;
   readonly legScale: number;
   readonly root: Object3D;
+  /** Entre le personnage et son squelette: bascule le corps sur le dos quand il est couché. */
+  readonly tilt: Group;
   readonly skinned: SkinnedMesh;
   readonly body: SkinnedMesh;
   readonly head: SkinnedMesh | null;
@@ -94,9 +97,13 @@ interface Figure extends Aimable {
 }
 
 const target = new Map<string, number>();
+/** Taille du gabarit adulte (m), à laquelle sont mesurées les longueurs des réglages. */
+const ADULT_HEIGHT = 1.7;
+const STILL: Posture = { kind: 'stand', speed: 0 };
 const size = new Vector2();
 const cameraPoint = new Vector3();
 const blobPoint = new Vector3();
+const lying: LyingPose = { x: 0, y: 0, facing: 0, height: 0 };
 
 /** Pastille dégradée de l'ombre de contact (texture calculée, sans canevas). */
 function contactTexture(opacity: number): DataTexture {
@@ -288,7 +295,9 @@ export class AssembledCharacters implements CharacterLayer {
     whole.visible = false;
     const object = new Group();
     object.name = `personnage-${id}`;
-    object.add(root);
+    const tilt = new Group();
+    tilt.add(root);
+    object.add(tilt);
     const fadable = new Fadable(root, this.glowColor);
     // Liseré ajouté après le relevé du fondu: il garde son matériau propre.
     const rim = new SkinnedMesh(shared.geometry.whole, this.rimMaterial);
@@ -317,6 +326,7 @@ export class AssembledCharacters implements CharacterLayer {
       height: library.height(shape),
       legScale: (lengths?.legs ?? 1) * (lengths?.scale ?? 1),
       root,
+      tilt,
       skinned: skeletonOf,
       body,
       head,
@@ -500,8 +510,35 @@ export class AssembledCharacters implements CharacterLayer {
     figure.object.position.set(figure.x, figure.lift, figure.y);
     // Cap de l'état: 0 vers l'est, PI/2 vers le sud. Le personnage regarde vers +Z au repos.
     figure.object.rotation.y = Math.PI / 2 - figure.facing;
+    figure.tilt.rotation.x = 0;
+    figure.blob.visible = true;
     figure.blob.position.y = this.settings.contact.lift - figure.lift;
     this.animate(figure, posture, dt);
+  }
+
+  /** Taille affichée du personnage (m): celle de l'éditeur, sinon celle de sa silhouette. */
+  private tallness(figure: Figure): number {
+    return figure.chosenHeight === undefined ? figure.height : figure.chosenHeight / 100;
+  }
+
+  /**
+   * Couché sur le dos: pieds vers la façade du lit, tête sur l'oreiller, dos sur le couchage. Le
+   * corps garde sa pose de repos (bras le long du corps); il se pose d'un coup, comme la simulation.
+   */
+  private lie(figure: Figure, pose: LyingPose, dt: number): void {
+    const scale = this.tallness(figure) / ADULT_HEIGHT;
+    figure.x = pose.x;
+    figure.y = pose.y;
+    figure.facing = pose.facing;
+    figure.lift = pose.height + this.settings.lie.back * scale;
+    figure.placed = true;
+    figure.object.position.set(figure.x, figure.lift, figure.y);
+    figure.object.rotation.y = Math.PI / 2 - figure.facing;
+    // Rotation de -90 degrés autour de l'axe gauche-droite: la tête part vers -Z (le dos du lit),
+    // le visage vers le haut.
+    figure.tilt.rotation.x = -Math.PI / 2;
+    figure.blob.visible = false;
+    this.animate(figure, STILL, dt);
   }
 
   private animate(figure: Figure, posture: Posture, dt: number): void {
@@ -606,8 +643,21 @@ export class AssembledCharacters implements CharacterLayer {
           tier === undefined ? undefined : this.settings.needExpressions[need]?.[tier];
         if (expression !== undefined) held = expression;
       }
-      figure.face.hold(held);
-      this.follow(figure, player.body, this.playerPosture(player, seat !== null), seat, frame.dt);
+      const headHeight =
+        this.tallness(figure) * (1 - this.settings.lie.headBelowTop / ADULT_HEIGHT);
+      const lies = lyingPose(
+        this.view.content,
+        frame.world,
+        frame.place,
+        index,
+        headHeight,
+        this.settings.lie.fallback,
+        lying,
+      );
+      figure.face.hold(lies === null ? held : this.settings.lie.expression);
+      if (lies !== null) this.lie(figure, lies, frame.dt);
+      else
+        this.follow(figure, player.body, this.playerPosture(player, seat !== null), seat, frame.dt);
     }
     const placeId = frame.world.common.place;
     for (const id in frame.place.villagers) {

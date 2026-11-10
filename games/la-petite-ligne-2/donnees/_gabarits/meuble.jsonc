@@ -21,6 +21,8 @@
   // Briques, dans l'ordre de priorité de la touche d'action (une de chaque sorte au plus):
   //   { "brick": "sit", "seats": 1, "restPerMinute": 6 }                       s'asseoir
   //   { "brick": "sleep", "places": 2, "wakeAt": 100 }                         dormir
+  //     pose couchée facultative (m): "lie": { "height": 0.52, "pillow": 0.7, "spacing": 0.72 }
+  //     (dessus du couchage, milieu du meuble au milieu de l'oreiller, écart entre deux places)
   //   { "brick": "store", "slots": 20 }                                        ranger
   //   { "brick": "gather", "verb": "Cueillir", "clip": "reach-up", "seconds": 0.5,
   //     "gives": { "item": "pomme", "count": 1 },

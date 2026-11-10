@@ -220,10 +220,23 @@ export function promptModel(
       y: aim.y,
     };
   const look = { content, world };
-  if (!onPlatform(look, local)) return null;
   const other: PlayerIndex = local === 0 ? 1 : 0;
   const travel = world.common.travel;
   const otherName = world.players[other].name;
+  // Dans le train: la touche d'action passe la scène quand les deux l'ont demandé.
+  if (world.common.phase === 'arrival') return null;
+  if (world.common.phase === 'travel') {
+    const skip = travel?.skip;
+    const waiting = skip?.[local] === true && !skip[other];
+    return {
+      kind: 'board',
+      key: keys.act,
+      verb: TEXTS.prompt.skipTrip,
+      refusal: null,
+      waiting: waiting ? fill(TEXTS.prompt.waitOther, { nom: otherName }) : null,
+    };
+  }
+  if (!onPlatform(look, local)) return null;
   if (travel?.boarded[local] === true)
     return {
       kind: 'board',

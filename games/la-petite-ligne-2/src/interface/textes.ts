@@ -35,6 +35,7 @@ export const TEXTS = {
     board: 'Monter',
     boardTo: 'Monter vers {lieu}',
     unboard: 'Descendre',
+    skipTrip: 'Passer le trajet',
     waitOther: 'On attend {nom}',
   },
   /** Raison d'un refus (clé de la simulation): 4 mots au plus. */
