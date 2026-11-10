@@ -1,0 +1,134 @@
+/* Planche des composants: mise en page de la démonstration seulement (rien ne sert en jeu). */
+.lpl-ui.planche {
+  --tile: 4.25rem;
+  overflow: auto;
+  pointer-events: auto;
+  padding: 1rem 1.5rem;
+  background: var(--paper);
+}
+.planche .pl-tete {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.planche h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 850;
+  line-height: 1.1;
+}
+.planche .pl-tete p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-weight: 700;
+}
+.planche .pl-grille {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 3rem;
+}
+.planche .pl-groupe--large,
+.planche .pl-groupe:nth-child(3) {
+  flex: 0 0 100%;
+}
+/* Touches, étapes et couleurs: la dernière rangée. */
+.planche .pl-groupe:nth-child(4),
+.planche .pl-groupe:nth-child(7) {
+  order: 1;
+}
+/* Les couleurs: en haut à droite, à côté du titre. */
+.planche .pl-groupe:nth-child(8) {
+  position: absolute;
+  right: 1.5rem;
+  top: 0.625rem;
+}
+.planche .pl-groupe:nth-child(8) h2 {
+  display: none;
+}
+.planche .pl-groupe:nth-child(8) .pl-rang {
+  gap: 0.5rem;
+}
+.planche h2 {
+  margin: 0 0 0.375rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+.planche .pl-rang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.125rem 1.5rem;
+}
+.planche .pl-etat {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+.planche figcaption {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.planche .pl-pile {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.planche .pl-touches {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.planche .pl-cadre {
+  display: grid;
+  place-items: center;
+  width: 7.5rem;
+  height: 3.5rem;
+  border: 0.1875rem solid transparent;
+  font-weight: 800;
+}
+.planche .pl-cadre--clair {
+  color: var(--paper-raised);
+}
+.planche .pl-teinte {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  margin: 0;
+}
+.planche .pl-teinte i {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0.1875rem solid var(--ink);
+}
+/* Composants que le jeu ancre à l'écran: remis dans le flux pour la planche. */
+.planche .prompt,
+.planche .dlg__plate {
+  position: relative;
+  left: auto;
+  top: auto;
+  bottom: auto;
+  transform: none;
+}
+.planche .signet {
+  width: auto;
+}
+.planche .signet span {
+  display: inline;
+}
+.planche .shop-bigtab {
+  width: 9rem;
+  height: 3rem;
+}
+.planche .shop-btn {
+  width: 12rem;
+}
+.planche .shop-tile__no {
+  width: 1.25rem;
+  height: 1.25rem;
+}

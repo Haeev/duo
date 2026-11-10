@@ -7,6 +7,14 @@ export const TEXTS = {
     day: 'Jour {n}',
     sleep: 'Tu peux dormir',
     label: 'Jour {n}, {heure}. Bourse : {montant}.',
+    weather: {
+      clear: 'Beau temps',
+      overcast: 'Ciel couvert',
+      rain: 'Pluie',
+      mist: 'Brume',
+      snow: 'Neige',
+      storm: 'Orage',
+    },
   },
   needs: {
     hunger: 'Faim',

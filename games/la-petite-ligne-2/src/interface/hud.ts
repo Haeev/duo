@@ -21,6 +21,15 @@ import { UI_TUNING } from './reglages';
 import { fill, TEXTS } from './textes';
 
 const NEED_ICONS = { hunger: 'bol', sleep: 'lune', hygiene: 'goutte' } as const;
+/** Picto du temps qu'il fait, à côté du jour (par beau temps: soleil le jour, lune la nuit). */
+const WEATHER_ICONS = {
+  clear: 'soleil',
+  overcast: 'nuage',
+  rain: 'pluie',
+  mist: 'brume',
+  snow: 'neige',
+  storm: 'orage',
+} as const;
 
 /** Projection d'un point du monde (m) vers l'écran (px CSS), `null` hors champ. */
 /** Hauteurs (m) où s'accrochent la bulle d'action et le jeton de l'autre joueur. */
@@ -66,7 +75,9 @@ export function createHud(
   const sun = el('div', { class: 'dial__sun' });
   const bed = el('span', { class: 'dial__bed', title: TEXTS.clock.sleep }, [icon('lit')]);
   const dial = el('div', { class: 'dial' }, [sun, bed]);
-  const day = el('div', { class: 'hud-clock__day' }, [icon('soleil'), el('span')]);
+  const weatherIcon = icon('soleil');
+  const weatherUse = weatherIcon.firstElementChild;
+  const day = el('div', { class: 'hud-clock__day' }, [weatherIcon, el('span')]);
   const time = el('div', { class: 'hud-clock__time' });
   const amount = el('span', { class: 'purse__n' });
   const purse = el('div', { class: 'purse' }, [el('span', { class: 'coin' }), amount]);
@@ -169,10 +180,14 @@ export function createHud(
       toggle(clock, 'hud-clock--night', c.night);
       show(bed, c.canSleep);
       sun.style.transform = `rotate(${Math.round(-70 + 140 * c.arc)}deg)`;
+      const weather = world.common.weather;
+      const weatherId = weather === 'clear' && c.night ? 'lune' : WEATHER_ICONS[weather];
+      if (weatherUse !== null) setAttr(weatherUse, 'href', `#lpl-i-${weatherId}`);
+      setAttr(day, 'title', TEXTS.clock.weather[weather]);
       setAttr(
         clock,
         'aria-label',
-        fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money }),
+        `${fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money })} ${TEXTS.clock.weather[weather]}.`,
       );
       show(gain, now < gainUntil);
 

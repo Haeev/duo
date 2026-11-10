@@ -35,6 +35,8 @@ import { glanceTarget } from '../simulation/quetes/lecture';
 
 import './interface.css';
 import './carnet/carnet.css';
+import './encre/cadres.css';
+import './encre/encre.css';
 
 /** Refus d'un passage fermé: la phrase `says` du verrou ou de la porte remplace le texte générique. */
 const PASSAGE_REASONS: ReadonlySet<string> = new Set(['not-yet', 'door-locked', 'shop-closed']);

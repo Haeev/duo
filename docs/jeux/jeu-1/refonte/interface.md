@@ -443,3 +443,49 @@ Limites de ces maquettes: ce sont des images de référence pour valider la dire
 ## 14. Passation
 
 Pour le dev du jeu, quand le client aura validé: les maquettes donnent les mesures et les textes exacts des cinq écrans clés; `maquettes/refonte.css` porte les jetons nouveaux (durées, courbes) et les composants de la section 7. À faire ensuite par ux-ui-designer: maquettes de l'éditeur de personnage, de la carte, de la cuisine et du mode déco; contrôle à 1280x720, 1920x1080, facteur 2, tailles 125 et 150 %; script de parcours au clavier.
+
+## 15. Style encré (2026-11-10)
+
+Habillage voulu par le client: une bande dessinée encrée, tendre et drôle. Papier chaud, encre presque noire, couleurs douces, un seul accent vif (bouton d'or). Il remplace l'habillage « bois et laiton » des sections 3 à 7 sans toucher aux écrans, aux touches ni aux parcours. Code: `games/la-petite-ligne-2/src/interface/encre/` (README pour ajouter un composant).
+
+### Règles
+
+- **Cases**: tout ce qui porte du texte est une case tracée à la plume: trait épais qui s'affine vers un coin, traits qui dépassent aux angles, bords un peu de travers, aucun coin arrondi. Trois tailles de trait: petit (3 px: vignettes, boutons, pastilles), moyen (3,6 px: bulles, cartouches, réponses), grand (4,6 px: bandeau de dialogue, carnet, boutique).
+- **Ombres**: des hachures en bas à droite, jamais de flou ni de dégradé. Les touches ont une ombre pleine de 2 px, pour ne pas les confondre avec des boutons.
+- **Aplats**: deux ou trois tons par case; l'ombre intérieure est une hachure (pli du carnet, coin des panneaux) ou une trame de points (vitrines).
+- **Couleur = sens**: accent pour ce qui est choisi, tenu, ou l'action principale; papier creux pour ce qui ne l'est pas; tirets pour le vide, l'indisponible et le refusé; rouge de tampon pour la raison d'un refus, toujours écrite.
+- **Focus**: fond d'accent et second trait de plume autour de la case. Il se lit en niveaux de gris (double trait), pas seulement par la teinte.
+- **De travers**: cartouches, onglets, réponses et cases de la barre penchent de 0,5 à 2,5 degrés, en alternance. Le survol penche l'élément, l'appui l'enfonce vers son ombre.
+- **Peu à l'écran**: l'heure, le jour, le temps qu'il fait et l'argent dans un seul cartouche; besoins, barre d'objets et bulle d'action seulement quand ils servent (inchangé, section 3).
+- **Animations** (remplacent les durées de la section 6 sous ce thème): 200 ms au plus, par crans (`steps`), sans rebond. Apparition « posée à la main » (fondu et un degré et demi de rotation), tremblement d'encre de 160 ms à la prise de focus, trait qui se dessine sous le titre d'une fiche (180 ms). Seuls transform, rotate et opacity bougent. Restent en boucle: la bouche qui parle, le triangle « suite », le médaillon d'un besoin bas. Tout tombe à 1 ms avec le mouvement réduit.
+- **Textes**: titres en Fraunces grasse (850), courant en Nunito Sans (650 à 800). Contraste du texte courant: 4,8 pour 1 au moins (tableau ci-dessous).
+
+### Variables (`encre.css`, sur `.lpl-ui`)
+
+| Variable | Valeur | Emploi | Contraste de l'encre dessus |
+|---|---|---|---|
+| `--paper-raised` | `#fdf6e3` | cases, bulles | 16,1 |
+| `--paper` | `#f6ecd2` | pages du carnet | 14,7 |
+| `--paper-sunken` | `#ead9b4` | creux, vide, onglets au repos | 12,4 |
+| `--ink` | `#1d1a17` | traits, texte | |
+| `--ink-muted` | `#54483a` | texte secondaire (6,4 sur le creux, 8,2 sur le papier) | |
+| `--accent` | `#ffc83d` | choisi, tenu, action principale, étape suivante | 11,2 |
+| `--stamp` | `#a8321f` | refus et sa raison (4,8 sur le creux, 6,2 sur le papier) | |
+| `--primary` | `#2f6b4f` | jauge d'un besoin qui va bien | |
+| `--soft-green`, `--soft-sky`, `--soft-ochre`, `--soft-rose` | `#a9c58f`, `#b9d6de`, `#dba565`, `#efb3a2` | couverture du carnet, vitrines, comptoir; le rose est en réserve | 9,1 / 11,3 / 7,9 |
+| `--night` | `#2b3a5c` | cartouche de l'heure la nuit (texte papier: 10,5) | |
+| `--d-fast`, `--d-base`, `--d-slow`, `--d-scene` | 100, 140, 180, 200 ms | durées | |
+| `--lpl-ic-stroke`, `--lpl-ic-cap`, `--lpl-ic-join` | 2,5, `square`, `bevel` | trait des pictos | |
+| `--cadre-<taille>-<fond>[-ombre]`, `--bi-<taille>[-ombre]` | générées | cadres encrés (`cadres.css`) | |
+
+### Étapes d'une quête
+
+Faites: pastilles d'encre pleine. La suivante: plus grande, en accent, avec une ombre, et sa phrase passée au surligneur dans la fiche. À venir: cercles en tirets.
+
+### Images de référence
+
+`captures/ui-encre-hud.png`, `ui-encre-dialogue.png` (et `-dialogue-suite`), `ui-encre-carnet.png`, `ui-encre-boutique.png` (et `-boutique-achat`), `ui-encre-planche.png`: la vraie interface du jeu à 1366x768, refaites par `assets-src/interface-encre/capturer.cjs`. Tant que les captures du moteur (`captures/encre-*.png`) manquent, le fond est provisoire et marqué comme tel.
+
+### Reste à faire pour ce style
+
+Vignettes d'objets et portraits définitifs (aujourd'hui des substituts générés), pictos redessinés à la plume, écrans non encore habillés (cuisine, pêche, déco, éditeur, basse-cour, atelier: ils héritent déjà des couleurs), et le choix d'une police de titrage plus « lettrage de BD ».

@@ -210,7 +210,6 @@ describe('couche des personnages', () => {
     for (const id of Object.keys(place.villagers)) expect(layer.aimable(id)).not.toBeNull();
     // La vie de l'habitant (`villagerView`): absent du lieu, il n'est pas dessiné.
     const extra = place.villagers['figurant-essai'];
-    if (extra === undefined) throw new Error('figurant');
     extra.life = {
       presence: 'away',
       entry: 0,
