@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "pompe",
   "name": "Pompe à eau",
-  "model": "pompe-a-eau",
+  "model": "water-pump",
   "size": {
     "w": 1,
     "h": 1

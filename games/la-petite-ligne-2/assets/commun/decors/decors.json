@@ -1,0 +1,927 @@
+{
+ "format": "duo-decors/1",
+ "models": {
+  "barrel": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "d": 0.623,
+    "h": 0.86,
+    "shape": "box",
+    "w": 0.623
+   },
+   "family": "tonneau",
+   "file": "street.glb",
+   "nodes": [
+    "barrel_mesh"
+   ],
+   "size": {
+    "d": 0.623,
+    "h": 0.86,
+    "w": 0.623
+   },
+   "top": 0.85,
+   "triangles": 540
+  },
+  "bed-double": {
+   "bed": {
+    "height": 0.5,
+    "places": 2
+   },
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 2.0,
+    "h": 0.95,
+    "shape": "box",
+    "w": 1.51
+   },
+   "family": "lit",
+   "file": "furniture.glb",
+   "nodes": [
+    "bed-double_mesh"
+   ],
+   "size": {
+    "d": 2.0,
+    "h": 0.95,
+    "w": 1.51
+   },
+   "triangles": 1188
+  },
+  "bed-single": {
+   "bed": {
+    "height": 0.5,
+    "places": 1
+   },
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 2.0,
+    "h": 0.95,
+    "shape": "box",
+    "w": 1.01
+   },
+   "family": "lit",
+   "file": "furniture.glb",
+   "nodes": [
+    "bed-single_mesh"
+   ],
+   "size": {
+    "d": 2.0,
+    "h": 0.95,
+    "w": 1.01
+   },
+   "triangles": 1064
+  },
+  "bench-farm": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 0.388,
+    "h": 0.45,
+    "shape": "box",
+    "w": 1.4
+   },
+   "family": "banc",
+   "file": "furniture.glb",
+   "nodes": [
+    "bench-farm_mesh"
+   ],
+   "seat": {
+    "front": 0.21,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.388,
+    "h": 0.45,
+    "w": 1.4
+   },
+   "triangles": 380
+  },
+  "bench-park": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 0.501,
+    "h": 0.869,
+    "shape": "box",
+    "w": 1.8
+   },
+   "family": "banc",
+   "file": "furniture.glb",
+   "nodes": [
+    "bench-park_mesh"
+   ],
+   "seat": {
+    "front": 0.21,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.501,
+    "h": 0.869,
+    "w": 1.8
+   },
+   "triangles": 1372
+  },
+  "bench-platform": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 0.501,
+    "h": 0.869,
+    "shape": "box",
+    "w": 1.7
+   },
+   "family": "banc",
+   "file": "furniture.glb",
+   "nodes": [
+    "bench-platform_mesh"
+   ],
+   "seat": {
+    "front": 0.21,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.501,
+    "h": 0.869,
+    "w": 1.7
+   },
+   "triangles": 1372
+  },
+  "bush-flowering": {
+   "bottom": 0.002,
+   "budget": 1500,
+   "collision": {
+    "d": 0.967,
+    "h": 0.767,
+    "shape": "box",
+    "w": 1.134
+   },
+   "family": "buisson",
+   "file": "plants.glb",
+   "nodes": [
+    "bush-flowering_mesh"
+   ],
+   "size": {
+    "d": 0.967,
+    "h": 0.767,
+    "w": 1.134
+   },
+   "triangles": 1120
+  },
+  "bush-round": {
+   "bottom": 0.002,
+   "budget": 1500,
+   "collision": {
+    "d": 1.182,
+    "h": 0.937,
+    "shape": "box",
+    "w": 1.386
+   },
+   "family": "buisson",
+   "file": "plants.glb",
+   "nodes": [
+    "bush-round_mesh"
+   ],
+   "size": {
+    "d": 1.182,
+    "h": 0.937,
+    "w": 1.386
+   },
+   "triangles": 672
+  },
+  "chair-bedroom": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.452,
+    "h": 0.918,
+    "shape": "box",
+    "w": 0.44
+   },
+   "family": "chaise",
+   "file": "furniture.glb",
+   "nodes": [
+    "chair-bedroom_mesh"
+   ],
+   "seat": {
+    "front": 0.21,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.452,
+    "h": 0.918,
+    "w": 0.44
+   },
+   "triangles": 768
+  },
+  "chair-farm": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.452,
+    "h": 0.918,
+    "shape": "box",
+    "w": 0.44
+   },
+   "family": "chaise",
+   "file": "furniture.glb",
+   "nodes": [
+    "chair-farm_mesh"
+   ],
+   "seat": {
+    "front": 0.21,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.452,
+    "h": 0.918,
+    "w": 0.44
+   },
+   "triangles": 844
+  },
+  "chair-farm-sage": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.452,
+    "h": 0.918,
+    "shape": "box",
+    "w": 0.44
+   },
+   "family": "chaise",
+   "file": "furniture.glb",
+   "nodes": [
+    "chair-farm-sage_mesh"
+   ],
+   "seat": {
+    "front": 0.21,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.452,
+    "h": 0.918,
+    "w": 0.44
+   },
+   "triangles": 844
+  },
+  "chest": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "d": 0.485,
+    "h": 0.655,
+    "shape": "box",
+    "w": 0.82
+   },
+   "family": "coffre",
+   "file": "furniture.glb",
+   "nodes": [
+    "chest_mesh"
+   ],
+   "size": {
+    "d": 0.485,
+    "h": 0.655,
+    "w": 0.82
+   },
+   "triangles": 492
+  },
+  "crate": {
+   "bottom": 0.0,
+   "budget": 1200,
+   "collision": {
+    "d": 0.61,
+    "h": 0.6,
+    "shape": "box",
+    "w": 0.6
+   },
+   "family": "caisse",
+   "file": "street.glb",
+   "nodes": [
+    "crate_mesh"
+   ],
+   "size": {
+    "d": 0.61,
+    "h": 0.6,
+    "w": 0.6
+   },
+   "top": 0.6,
+   "triangles": 684
+  },
+  "fence": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.155,
+    "h": 1.116,
+    "shape": "box",
+    "w": 2.02
+   },
+   "family": "barriere",
+   "file": "street.glb",
+   "nodes": [
+    "fence_mesh"
+   ],
+   "size": {
+    "d": 0.155,
+    "h": 1.116,
+    "w": 2.02
+   },
+   "triangles": 464
+  },
+  "flowers-poppy": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.324,
+    "h": 0.461,
+    "shape": "box",
+    "w": 0.387
+   },
+   "family": "fleurs",
+   "file": "plants.glb",
+   "nodes": [
+    "flowers-poppy_mesh"
+   ],
+   "size": {
+    "d": 0.324,
+    "h": 0.461,
+    "w": 0.387
+   },
+   "triangles": 772
+  },
+  "grass-tuft": {
+   "bottom": 0.0012,
+   "budget": 300,
+   "collision": {
+    "d": 0.262,
+    "h": 0.346,
+    "shape": "box",
+    "w": 0.228
+   },
+   "family": "touffe",
+   "file": "plants.glb",
+   "nodes": [
+    "grass-tuft_mesh"
+   ],
+   "size": {
+    "d": 0.262,
+    "h": 0.346,
+    "w": 0.228
+   },
+   "triangles": 144
+  },
+  "house-town": {
+   "bottom": 0.0,
+   "budget": 9000,
+   "collision": {
+    "d": 6.0,
+    "h": 5.6,
+    "shape": "box",
+    "w": 7.0
+   },
+   "doors": [
+    {
+     "height": 2.05,
+     "side": "sud",
+     "width": 1.0,
+     "x": 0.0,
+     "y": 3.5
+    }
+   ],
+   "eaves": 5.6,
+   "family": "maison",
+   "file": "houses.glb",
+   "nodes": [
+    "house-town_walls",
+    "house-town_roof"
+   ],
+   "size": {
+    "d": 6.99,
+    "h": 8.617,
+    "w": 7.52
+   },
+   "triangles": 7004
+  },
+  "lamp-floor": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.432,
+    "h": 1.51,
+    "shape": "box",
+    "w": 0.432
+   },
+   "family": "lampe",
+   "file": "furniture.glb",
+   "nodes": [
+    "lamp-floor_mesh"
+   ],
+   "size": {
+    "d": 0.432,
+    "h": 1.51,
+    "w": 0.432
+   },
+   "triangles": 504
+  },
+  "log-pile": {
+   "bottom": 0.0101,
+   "budget": 2000,
+   "collision": {
+    "d": 0.87,
+    "h": 0.58,
+    "shape": "box",
+    "w": 0.91
+   },
+   "family": "buches",
+   "file": "street.glb",
+   "nodes": [
+    "log-pile_mesh"
+   ],
+   "size": {
+    "d": 0.87,
+    "h": 0.58,
+    "w": 0.91
+   },
+   "triangles": 1368
+  },
+  "mailbox": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.435,
+    "h": 1.37,
+    "shape": "box",
+    "w": 0.32
+   },
+   "family": "boite-aux-lettres",
+   "file": "street.glb",
+   "nodes": [
+    "mailbox_mesh"
+   ],
+   "size": {
+    "d": 0.435,
+    "h": 1.37,
+    "w": 0.32
+   },
+   "triangles": 468
+  },
+  "platform-sign": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.221,
+    "h": 2.77,
+    "shape": "box",
+    "w": 1.1
+   },
+   "family": "poteau-quai",
+   "file": "street.glb",
+   "nodes": [
+    "platform-sign_mesh"
+   ],
+   "size": {
+    "d": 0.221,
+    "h": 2.77,
+    "w": 1.1
+   },
+   "triangles": 504
+  },
+  "rug-oval": {
+   "bottom": 0.0,
+   "budget": 400,
+   "collision": {
+    "d": 1.0,
+    "h": 0.016,
+    "shape": "box",
+    "w": 1.6
+   },
+   "family": "tapis",
+   "file": "furniture.glb",
+   "nodes": [
+    "rug-oval_mesh"
+   ],
+   "size": {
+    "d": 1.0,
+    "h": 0.016,
+    "w": 1.6
+   },
+   "triangles": 184
+  },
+  "shed": {
+   "bottom": 0.0,
+   "budget": 9000,
+   "collision": {
+    "d": 5.0,
+    "h": 3.0,
+    "shape": "box",
+    "w": 6.0
+   },
+   "doors": [
+    {
+     "height": 2.05,
+     "side": "ouest",
+     "width": 1.0,
+     "x": -3.5,
+     "y": -0.0
+    }
+   ],
+   "eaves": 3.0,
+   "family": "maison",
+   "file": "houses.glb",
+   "nodes": [
+    "shed_walls",
+    "shed_roof"
+   ],
+   "size": {
+    "d": 5.55,
+    "h": 4.452,
+    "w": 6.64
+   },
+   "triangles": 900
+  },
+  "shelf": {
+   "bottom": 0.0,
+   "budget": 2000,
+   "collision": {
+    "d": 0.32,
+    "h": 1.6,
+    "shape": "box",
+    "w": 0.9
+   },
+   "family": "etagere",
+   "file": "furniture.glb",
+   "nodes": [
+    "shelf_mesh"
+   ],
+   "size": {
+    "d": 0.32,
+    "h": 1.6,
+    "w": 0.9
+   },
+   "top": 0.587,
+   "triangles": 1092
+  },
+  "shop-front": {
+   "bottom": 0.0,
+   "budget": 9000,
+   "collision": {
+    "d": 10.0,
+    "h": 5.6,
+    "shape": "box",
+    "w": 8.0
+   },
+   "doors": [
+    {
+     "height": 2.05,
+     "side": "nord",
+     "width": 1.0,
+     "x": 1.6,
+     "y": -5.5
+    },
+    {
+     "height": 2.05,
+     "side": "sud",
+     "width": 1.0,
+     "x": 0.0,
+     "y": 5.5
+    }
+   ],
+   "eaves": 5.6,
+   "family": "maison",
+   "file": "houses.glb",
+   "nodes": [
+    "shop-front_walls",
+    "shop-front_roof"
+   ],
+   "size": {
+    "d": 11.35,
+    "h": 8.901,
+    "w": 8.8
+   },
+   "triangles": 7860
+  },
+  "signpost": {
+   "bottom": 0.0,
+   "budget": 1000,
+   "collision": {
+    "d": 0.49,
+    "h": 2.236,
+    "shape": "box",
+    "w": 1.62
+   },
+   "family": "panneau",
+   "file": "street.glb",
+   "nodes": [
+    "signpost_mesh"
+   ],
+   "size": {
+    "d": 0.49,
+    "h": 2.236,
+    "w": 1.62
+   },
+   "triangles": 624
+  },
+  "sink-stone": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.558,
+    "h": 1.178,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "evier",
+   "file": "furniture.glb",
+   "nodes": [
+    "sink-stone_mesh"
+   ],
+   "size": {
+    "d": 0.558,
+    "h": 1.178,
+    "w": 1.0
+   },
+   "top": 0.85,
+   "triangles": 664
+  },
+  "stool": {
+   "bottom": 0.0007,
+   "budget": 800,
+   "collision": {
+    "d": 0.341,
+    "h": 0.45,
+    "shape": "box",
+    "w": 0.34
+   },
+   "family": "tabouret",
+   "file": "furniture.glb",
+   "nodes": [
+    "stool_mesh"
+   ],
+   "seat": {
+    "front": 0.17,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.341,
+    "h": 0.45,
+    "w": 0.34
+   },
+   "triangles": 320
+  },
+  "stove": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.678,
+    "h": 2.2,
+    "shape": "box",
+    "w": 0.84
+   },
+   "family": "rechaud",
+   "file": "furniture.glb",
+   "nodes": [
+    "stove_mesh"
+   ],
+   "size": {
+    "d": 0.678,
+    "h": 2.2,
+    "w": 0.84
+   },
+   "top": 0.85,
+   "triangles": 1264
+  },
+  "street-lamp": {
+   "bottom": 0.0,
+   "budget": 1000,
+   "collision": {
+    "d": 0.378,
+    "h": 3.295,
+    "shape": "box",
+    "w": 0.378
+   },
+   "family": "reverbere",
+   "file": "street.glb",
+   "nodes": [
+    "street-lamp_mesh"
+   ],
+   "size": {
+    "d": 0.378,
+    "h": 3.295,
+    "w": 0.378
+   },
+   "triangles": 488
+  },
+  "stump": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.869,
+    "h": 0.4,
+    "shape": "box",
+    "w": 0.869
+   },
+   "family": "souche",
+   "file": "plants.glb",
+   "nodes": [
+    "stump_mesh"
+   ],
+   "size": {
+    "d": 0.869,
+    "h": 0.4,
+    "w": 0.869
+   },
+   "top": 0.4,
+   "triangles": 504
+  },
+  "table-farm": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.8,
+    "h": 0.75,
+    "shape": "box",
+    "w": 1.4
+   },
+   "family": "table",
+   "file": "furniture.glb",
+   "nodes": [
+    "table-farm_mesh"
+   ],
+   "size": {
+    "d": 0.8,
+    "h": 0.75,
+    "w": 1.4
+   },
+   "top": 0.75,
+   "triangles": 616
+  },
+  "table-round": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.9,
+    "h": 0.75,
+    "shape": "box",
+    "w": 0.9
+   },
+   "family": "table",
+   "file": "furniture.glb",
+   "nodes": [
+    "table-round_mesh"
+   ],
+   "size": {
+    "d": 0.9,
+    "h": 0.75,
+    "w": 0.9
+   },
+   "top": 0.75,
+   "triangles": 532
+  },
+  "tree-apple": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "h": 3.875,
+    "radius": 0.2,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "plants.glb",
+   "nodes": [
+    "tree-apple_mesh"
+   ],
+   "size": {
+    "d": 3.013,
+    "h": 3.875,
+    "w": 3.219
+   },
+   "triangles": 1672
+  },
+  "tree-fir": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "h": 6.192,
+    "radius": 0.3,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "plants.glb",
+   "nodes": [
+    "tree-fir_mesh"
+   ],
+   "size": {
+    "d": 2.8,
+    "h": 6.192,
+    "w": 2.73
+   },
+   "triangles": 1032
+  },
+  "tree-round": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "h": 5.315,
+    "radius": 0.275,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "plants.glb",
+   "nodes": [
+    "tree-round_mesh"
+   ],
+   "size": {
+    "d": 4.46,
+    "h": 5.315,
+    "w": 4.764
+   },
+   "triangles": 1272
+  },
+  "tub": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.72,
+    "h": 0.58,
+    "shape": "box",
+    "w": 1.5
+   },
+   "family": "baignoire",
+   "file": "furniture.glb",
+   "nodes": [
+    "tub_mesh"
+   ],
+   "size": {
+    "d": 0.72,
+    "h": 0.58,
+    "w": 1.5
+   },
+   "triangles": 712
+  },
+  "wardrobe": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.627,
+    "h": 1.95,
+    "shape": "box",
+    "w": 1.06
+   },
+   "family": "armoire",
+   "file": "furniture.glb",
+   "nodes": [
+    "wardrobe_mesh"
+   ],
+   "size": {
+    "d": 0.627,
+    "h": 1.95,
+    "w": 1.06
+   },
+   "triangles": 540
+  },
+  "water-pump": {
+   "bottom": 0.0,
+   "budget": 1500,
+   "collision": {
+    "d": 0.947,
+    "h": 1.35,
+    "shape": "box",
+    "w": 0.8
+   },
+   "family": "pompe",
+   "file": "street.glb",
+   "nodes": [
+    "water-pump_mesh"
+   ],
+   "size": {
+    "d": 0.947,
+    "h": 1.35,
+    "w": 0.8
+   },
+   "top": 0.28,
+   "triangles": 908
+  },
+  "well": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 1.8,
+    "h": 2.612,
+    "shape": "box",
+    "w": 2.104
+   },
+   "family": "puits",
+   "file": "street.glb",
+   "nodes": [
+    "well_mesh"
+   ],
+   "size": {
+    "d": 1.8,
+    "h": 2.612,
+    "w": 2.104
+   },
+   "triangles": 1108
+  }
+ }
+}

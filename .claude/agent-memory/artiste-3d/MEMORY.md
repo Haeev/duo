@@ -269,3 +269,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Repère de la main: analyse en composantes principales des sommets de la main (la direction « bas » de la liaison n'est pas la normale de la paume). Pouce: côté où la moitié basse déborde le plus. Palmure introuvable sur ces maillages (doigts qui se touchent): jointures à 56 % de la longueur.
 - Doigts: ne pondérer que les sommets surtout portés par la main (sinon la manche suit le pouce), rayon de capture 6 cm (sinon le bout de l'auriculaire reste à la main: pointe étirée). Contrôle de traversée sur toute la main et l'avant-bras: des triangles de palmure relient pouce et index.
 - Le pouce de ces maillages est court: prise en clé (index replié à fond) et non en pince à demi pliée. Récipient gonflé de 0,5 mm pendant la recherche (sinon le moteur en float32 voit des contacts comme traversées).
+
+## La Petite Ligne 2: chaîne des décors (vérifié le 2026-11-10)
+
+- `assets-src/decors/`: `gabarits.toml` + `construire.sh` (10 s). Pièces en bmesh, `bm.to_mesh` par pièce puis `bpy.ops.object.join` et modificateur WEIGHTED_NORMAL (FACE_AREA, keep_sharp) appliqué: grandes faces planes, biseaux doux. `bpy.ops.object.select_all(action="DESELECT")`: itérer `view_layer.objects` après des suppressions rend des None.
+- Enveloppe convexe (`bmesh.ops.convex_hull`) pour pans de toit, croupes, stores: plus simple que des boîtes tournées; supprimer `geom_interior` et `geom_unused`.
+- Le rendu du jeu pose un modèle au CENTRE de son emprise (`object.position = volume.x, base, volume.y`); un meuble doit tenir dans ses cases (contrôlé par `verifier_decors.py`).
+- Conflit à suivre: `clipSeat` du clip `sit` vaut 0,50 m, la bible veut des assises à 0,45: le bassin flotte de 5 cm (couche.ts borne à 0).
+- Playwright global: `NODE_PATH=/opt/node22/lib/node_modules`. Le port 5173 et d'autres sont pris par d'autres sessions: `npx vite --port <libre> --strictPort`.

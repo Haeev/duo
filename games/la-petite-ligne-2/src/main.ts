@@ -12,7 +12,7 @@ import { createControls } from './entrees/commandes';
 import { drawTestMarkers } from './entrees/repere-essai';
 import { drawBaseScreen } from './plateforme/ecran-socle';
 import { createInterface } from './interface/index';
-import { createRenderer } from './rendu/index';
+import { createRenderer, gameDecorModels } from './rendu/index';
 import { createSession } from './session';
 import { SIM_HZ } from './simulation/noyau/constantes';
 
@@ -40,6 +40,8 @@ duo.input.attach(canvas);
 
 const colors = [duo.host.colorHex, duo.guest.colorHex] as const;
 // Rendu 3D; sans WebGL2, repli sur le plan 2D du socle et ses repères d'essai.
+// Décors chargés avant le premier lieu: sinon il garderait ses formes provisoires.
+await gameDecorModels().ready;
 const renderer = createRenderer({ canvas, view: session.view, playerColors: colors });
 if (renderer === null) duo.log.warn('WebGL2 indisponible: plan 2D de repli');
 // L'interface HTML se pose sur le canevas; le repli sans WebGL2 n'en a pas besoin (plan d'essai).
