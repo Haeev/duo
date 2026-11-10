@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "mures",
   "name": "Mûres",
+  "model": "mures",
   "family": "food",
   "stack": 10,
   "food": {

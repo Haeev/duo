@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "tartine",
   "name": "Tartine grillée",
+  "model": "tartine",
   "family": "food",
   "stack": 3,
   "food": {

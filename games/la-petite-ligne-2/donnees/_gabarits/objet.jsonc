@@ -7,6 +7,10 @@
   "id": "exemple-objet",
   // Nom affiché, 40 caractères au plus.
   "name": "Objet d'exemple",
+  // Modèle 3D: un `id` de `assets-src/objets/gabarits.toml` (ajouter l'entrée, puis lancer
+  // `bash assets-src/objets/construire.sh`). Sans ce champ, le sac et la boutique montrent une
+  // vignette générique marquée provisoire.
+  "model": "pomme",
   // Famille: food, material, crop, catch, treasure, seed, supply, tool, furniture, clothing, bag.
   // Les commerçants rachètent par famille.
   "family": "food",

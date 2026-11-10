@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "pierre",
   "name": "Pierre",
+  "model": "pierre",
   "family": "material",
   "stack": 5,
   "food": null,

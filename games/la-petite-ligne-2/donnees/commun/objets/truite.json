@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "truite",
   "name": "Truite fario",
+  "model": "truite",
   "family": "catch",
   "stack": 3,
   "food": null,

@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "pomme-de-terre",
   "name": "Pomme de terre",
+  "model": "pomme-de-terre",
   "family": "crop",
   "stack": 10,
   "food": null,

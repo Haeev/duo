@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "hache",
   "name": "Hache",
+  "model": "hache",
   "family": "tool",
   "stack": 1,
   "food": null,

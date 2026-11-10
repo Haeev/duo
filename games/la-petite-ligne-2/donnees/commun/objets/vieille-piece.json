@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "vieille-piece",
   "name": "Vieille pièce",
+  "model": "vieille-piece",
   "family": "treasure",
   "stack": 1,
   "food": null,

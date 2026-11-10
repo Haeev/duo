@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "tomate",
   "name": "Tomate",
+  "model": "tomate",
   "family": "crop",
   "stack": 10,
   "food": {

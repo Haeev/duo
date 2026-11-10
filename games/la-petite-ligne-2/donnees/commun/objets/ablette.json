@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "ablette",
   "name": "Ablette",
+  "model": "ablette",
   "family": "catch",
   "stack": 3,
   "food": null,

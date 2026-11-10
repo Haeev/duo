@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "oeuf",
   "name": "Œuf",
+  "model": "oeuf",
   "family": "food",
   "stack": 6,
   "food": {

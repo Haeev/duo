@@ -44,6 +44,8 @@ export const ItemSchema = v.strictObject({
   schema: FileVersionSchema,
   id: IdSchema,
   name: LabelSchema,
+  /** Modèle 3D (`assets-src/objets/gabarits.toml`); absent: vignette générique provisoire. */
+  model: v.exactOptional(IdSchema),
   family: v.picklist(ITEM_FAMILIES),
   /** Pile maximale dans une case (1: ne s'empile pas). */
   stack: v.pipe(IntSchema, v.minValue(1), v.maxValue(99)),

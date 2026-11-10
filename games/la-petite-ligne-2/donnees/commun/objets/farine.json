@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "farine",
   "name": "Farine",
+  "model": "farine",
   "family": "supply",
   "stack": 5,
   "food": null,

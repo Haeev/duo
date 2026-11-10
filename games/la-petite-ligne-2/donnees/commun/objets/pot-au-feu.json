@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "pot-au-feu",
   "name": "Pot-au-feu du dimanche",
+  "model": "pot-au-feu",
   "family": "food",
   "stack": 1,
   "food": {

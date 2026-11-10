@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "radis-croquant",
   "name": "Radis croquant",
+  "model": "radis-croquant",
   "family": "crop",
   "stack": 10,
   "food": {

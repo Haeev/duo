@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "brochet",
   "name": "Brochet",
+  "model": "brochet",
   "family": "catch",
   "stack": 3,
   "food": null,

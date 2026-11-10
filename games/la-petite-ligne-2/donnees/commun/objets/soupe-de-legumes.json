@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "soupe-de-legumes",
   "name": "Soupe de légumes",
+  "model": "soupe-de-legumes",
   "family": "food",
   "stack": 3,
   "food": {

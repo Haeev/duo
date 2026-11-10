@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "canne",
   "name": "Canne à pêche",
+  "model": "canne",
   "family": "tool",
   "stack": 1,
   "food": null,

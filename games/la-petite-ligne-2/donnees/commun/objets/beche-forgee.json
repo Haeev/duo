@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "beche-forgee",
   "name": "Bêche forgée",
+  "model": "beche-forgee",
   "family": "tool",
   "stack": 1,
   "food": null,
