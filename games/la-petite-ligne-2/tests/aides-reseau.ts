@@ -10,7 +10,7 @@ import type { ReadonlyWorld } from '../src/etat/monde';
 import type { Predictor } from '../src/reseau/prediction';
 import { SIM_DT } from '../src/simulation/noyau/constantes';
 import type { StepInput } from '../src/simulation/noyau/entrees';
-import { step, type AuthoredIntent, type Sim } from '../src/simulation/noyau/pas';
+import type { AuthoredIntent, Sim } from '../src/simulation/noyau/pas';
 
 export interface Conditions {
   readonly latencyMs: number;
@@ -61,7 +61,11 @@ export function createVirtualLink(
     return {
       role,
       sessionTimeMs: now,
-      quality: () => ({ rttMs: conditions.latencyMs * 2, jitterMs: conditions.jitterMs, state: 'good' }),
+      quality: () => ({
+        rttMs: conditions.latencyMs * 2,
+        jitterMs: conditions.jitterMs,
+        state: 'good',
+      }),
       channel<TSchema extends v.GenericSchema>(
         id: number,
         options: { mode: 'reliable' | 'latest'; schema: TSchema },
@@ -148,14 +152,17 @@ export const FAKE_PREDICTOR: Predictor = {
   },
 };
 
-/** Pas factice de l'hôte: le noyau, puis la marche et le geste du prédicteur factice. */
+/** Pas factice de l'hôte: la marche et le geste du prédicteur factice, sans le noyau. */
 export function fakeAdvance(
   sim: Sim,
   inputs: readonly [StepInput, StepInput],
   intents: readonly AuthoredIntent[],
 ): void {
-  step(sim, inputs, intents);
+  // Le pas factice remplace tout le noyau (L2: le vrai noyau marche et vise lui-même, il fausserait
+  // la marche et la cible factices de ce banc): seuls le compteur de pas et les événements avancent.
   const { world } = sim;
+  world.tick += 1;
+  sim.events.length = 0;
   for (const { player, intent } of intents) {
     if (intent.type !== 'act') continue;
     const p = world.players[player];

@@ -4,7 +4,7 @@
  * monde naît d'un événement ou de l'état, jamais d'une entrée locale.
  */
 import * as v from 'valibot';
-import { IdSchema, PlayerIndexSchema } from '../../donnees/schemas/communs';
+import { IdSchema, IntSchema, PlayerIndexSchema } from '../../donnees/schemas/communs';
 import { NEEDS_EVENTS } from '../besoins/evenements';
 import { BRICK_EVENTS } from '../briques/evenements';
 import { DIALOGUE_EVENTS } from '../dialogues/evenements';
@@ -36,6 +36,14 @@ export const CORE_EVENTS = [
     reason: IdSchema,
     target: v.nullable(IdSchema),
   }),
+  /** Un nouveau jour commence à l'aube; `slept`: les deux joueurs dormaient (fondu, réveil). */
+  v.strictObject({
+    type: v.literal('day_started'),
+    day: v.pipe(IntSchema, v.minValue(1)),
+    slept: v.boolean(),
+  }),
+  /** Le personnage était coincé: il vient d'être replacé (le rendu ne lisse pas ce saut). */
+  v.strictObject({ type: v.literal('unstuck'), player: PlayerIndexSchema }),
 ] as const;
 
 export const GameEventSchema = v.variant('type', [

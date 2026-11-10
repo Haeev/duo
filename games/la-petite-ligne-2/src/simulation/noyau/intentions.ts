@@ -17,4 +17,6 @@ export const CORE_INTENTS = [
   }),
   /** Validation de l'éditeur de personnage. */
   v.strictObject({ type: v.literal('set_look'), name: LabelSchema, look: LookSchema }),
+  /** « Débloquer mon personnage » (menu): replacé sur la case libre la plus proche reliée au quai. */
+  v.strictObject({ type: v.literal('unstick') }),
 ] as const;
