@@ -29,7 +29,7 @@ import {
   heightFunction,
   terrainGeometry,
 } from '../../../../src/rendu/demo-encre/terrain';
-import { createInkLayers, createNoise } from '../../../../src/rendu/demo-encre/textures';
+import { createInkLayers, createNoise } from '../../../../src/rendu/encre/textures';
 
 /** Couche de traits et nature de chaque matériau des bâtiments: la table que le moteur doit lire. */
 export const MATERIAUX = {

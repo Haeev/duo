@@ -12,7 +12,7 @@
   "finition": "pierre",
   "couleurs": {
     "murs": "pierre_claire",
-    "toit": "lauze",
+    "toit": "tuile",
     "volets": "rouge_cheminot",
     "porte": "rouge_cheminot",
     "enseigne": "rouge_cheminot"
@@ -40,7 +40,8 @@
       "rdc": [
         {
           "type": "fenetre-nue",
-          "position": 0.3
+          "position": 0.3,
+          "raison": "la pendule de la Compagnie occupe la moitié nord du mur, côté quai: la fenêtre du bureau se range dans l'autre moitié"
         }
       ]
     }
@@ -57,7 +58,7 @@
       "piece": "pendule",
       "facade": "est",
       "position": 0.72,
-      "hauteur": 2.5
+      "hauteur": 2.35
     },
     {
       "piece": "enseigne",

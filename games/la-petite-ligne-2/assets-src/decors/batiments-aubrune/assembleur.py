@@ -42,7 +42,7 @@ OUVERTURES = {
     "baie": dict(l=2.4, h=2.7, enc=3.1),
 }
 NIVEAUX_CLES = ("rdc", "etage", "etage2", "pignon")
-PIECES_OPTIONS = ("cheminee", "lucarne", "enseigne", "auvent", "pendule", "drapeau", "roue", "bassin", "croix", "escalier", "contrefort")
+PIECES_OPTIONS = ("cheminee", "lucarne", "enseigne", "auvent", "pendule", "drapeau", "roue", "bassin", "croix", "escalier", "contrefort", "bucher")
 
 
 class FicheInvalide(ValueError):
@@ -73,47 +73,172 @@ def _element(item):
     return e
 
 
-def disposer(elements, longueur, ou):
+PILIERS = {"contrefort": 0.8, "four": 1.56}
+"""Largeur au mur des pièces maçonnées depuis le sol (contrefort, cheminée de four): elles
+bornent les travées, et une ouverture ne les chevauche jamais."""
+JEU_PILIER = 0.12
+"""Trumeau minimal entre un pilier et une ouverture."""
+CENTRAGE = 0.12
+"""Écart toléré entre les trumeaux gauche et droit d'une ouverture: au-delà, elle est décentrée."""
+PORTES = ("porte", "porte-service")
+
+
+def _rang(e) -> bool:
+    """Une ouverture qui donne sa hauteur (`bas`) est hors rang: une baie de clocher au-dessus
+    d'une fenêtre ne lui prend pas sa place sur le mur."""
+    return "bas" not in e
+
+
+def _travees(a, b, piliers):
+    """Les travées de [a, b] entre les piliers (x, demi-largeur)."""
+    baies, debut = [], a
+    for p, d in sorted(piliers):
+        if p + d <= debut or p - d >= b:
+            continue
+        if p - d > debut + 1e-6:
+            baies.append((debut, p - d))
+        debut = max(debut, p + d)
+    if b > debut + 1e-6:
+        baies.append((debut, b))
+    return baies
+
+
+def _jeu(a, b, encs) -> float:
+    """Trumeau commun quand des ouvertures se partagent [a, b] à trumeaux égaux."""
+    return (b - a - sum(encs)) / (len(encs) + 1)
+
+
+def _repartir(groupe, baies, elements, ou):
+    """Répartit les ouvertures d'un groupe (dans l'ordre de la fiche) entre les travées, de
+    gauche à droite: la répartition qui garde le plus grand trumeau minimal, puis le moins de
+    travées vides. Rend [(a, b, membres)]."""
+    k, n = len(groupe), len(baies)
+    meilleur, choix_ = None, None
+
+    def compositions(reste, cases):
+        if cases == 1:
+            yield (reste,)
+            return
+        for c in range(reste + 1):
+            for suite in compositions(reste - c, cases - 1):
+                yield (c,) + suite
+
+    for comp in compositions(k, n):
+        debut, jeux, vides = 0, [], 0
+        for (a, b), c in zip(baies, comp):
+            membres = groupe[debut:debut + c]
+            debut += c
+            if not membres:
+                vides += 1 if b - a > 1.2 else 0
+                continue
+            jeux.append(_jeu(a, b, [elements[j]["enc"] for j in membres]))
+        score = (min(jeux) >= -0.02, round(min(jeux), 3), -vides)
+        if meilleur is None or score > meilleur:
+            meilleur, choix_ = score, comp
+    if meilleur is None or not meilleur[0]:
+        total = sum(elements[j]["enc"] for j in groupe)
+        libre = sum(b - a for a, b in baies)
+        if total <= libre:
+            raise FicheInvalide(f"{ou}: {k} ouvertures ne tiennent pas dans les {n} travées entre les piliers (une travée de {max(b - a for a, b in baies):.2f} m au plus); déplace un contrefort ou retire une ouverture")
+        raise FicheInvalide(f"{ou}: {total:.2f} m d'ouvertures pour {libre:.2f} m de mur libre entre les angles, les portes et les piliers; retire une ouverture ou prends une fenêtre étroite")
+    sortie, debut = [], 0
+    for (a, b), c in zip(baies, choix_):
+        sortie.append((a, b, groupe[debut:debut + c]))
+        debut += c
+    return sortie
+
+
+def disposer(elements, longueur, ou, piliers=()):
     """Place des ouvertures le long d'une façade (x depuis son milieu): celles qui ont une
     `position` (0 à 1 depuis la gauche vue de dehors) y sont; les autres se répartissent, dans
-    l'ordre, dans les intervalles libres, de façon à garder les plus grands trumeaux."""
+    l'ordre, entre les angles, les ouvertures placées et les piliers (contreforts, cheminée
+    adossée): chacune au milieu de sa travée, à trumeaux égaux avec ses voisines."""
     fixes = [(i, (e["position"] - 0.5) * longueur) for i, e in enumerate(elements) if "position" in e]
     libres = [i for i, e in enumerate(elements) if "position" not in e]
     x = [0.0] * len(elements)
     for i, v in fixes:
         x[i] = v
-    # Une ouverture qui donne sa hauteur (`bas`) est hors rang: une baie de clocher au-dessus
-    # d'une fenêtre ne lui prend pas sa place sur le mur.
-    fixes = [(i, v) for i, v in fixes if "bas" not in elements[i]]
-    bornes = sorted((x[i] - elements[i]["enc"] / 2, x[i] + elements[i]["enc"] / 2, i) for i, _ in fixes)
+    fixes = [(i, v) for i, v in fixes if _rang(elements[i])]
+    bornes = sorted([(x[i] - elements[i]["enc"] / 2, x[i] + elements[i]["enc"] / 2, elements[i]["type"]) for i, _ in fixes] + [(p - d, p + d, "pilier") for p, d in piliers])
     for k in range(len(bornes) - 1):
         if bornes[k][1] > bornes[k + 1][0] + 1e-6:
-            raise FicheInvalide(f"{ou}: deux ouvertures placées se chevauchent")
-    for a, b, i in bornes:
+            raise FicheInvalide(f"{ou}: « {bornes[k][2]} » et « {bornes[k + 1][2]} » se chevauchent")
+    for i, _v in fixes:
+        a, b = x[i] - elements[i]["enc"] / 2, x[i] + elements[i]["enc"] / 2
         if a < -longueur / 2 + MARGE - 0.06 or b > longueur / 2 - MARGE + 0.06:
             raise FicheInvalide(f"{ou}: « {elements[i]['type']} » trop près de l'angle (il faut {MARGE} m)")
     # Intervalles libres entre les angles et les ouvertures placées. Une ouverture libre écrite
     # avant une ouverture placée reste à sa gauche: l'ordre de la fiche est l'ordre sur le mur.
-    travees, debut, avant = [], -longueur / 2 + MARGE, 0
-    ordre_fixes = sorted(fixes, key=lambda f: f[1])
-    for i, v in ordre_fixes:
-        travees.append((debut, v - elements[i]["enc"] / 2, [j for j in libres if avant <= j < i]))
+    piliers_jeu = [(p, d + JEU_PILIER) for p, d in piliers]
+    groupes, debut, avant = [], -longueur / 2 + MARGE, 0
+    for i, v in sorted(fixes, key=lambda f: f[1]):
+        groupes.append((debut, v - elements[i]["enc"] / 2, [j for j in libres if avant <= j < i]))
         debut, avant = v + elements[i]["enc"] / 2, i + 1
-    travees.append((debut, longueur / 2 - MARGE, [j for j in libres if j >= avant]))
-    for a, b, groupe in travees:
+    groupes.append((debut, longueur / 2 - MARGE, [j for j in libres if j >= avant]))
+    for a, b, groupe in groupes:
         if not groupe:
             continue
-        total = sum(elements[j]["enc"] for j in groupe)
-        jeu = (b - a - total) / (len(groupe) + 1)
-        if jeu < -0.02:
-            raise FicheInvalide(f"{ou}: {total:.2f} m d'ouvertures pour {b - a:.2f} m de mur libre; retire une ouverture ou prends une fenêtre étroite")
-        jeu = max(jeu, 0.0)
-        c = a
-        for j in groupe:
-            c += jeu
-            x[j] = c + elements[j]["enc"] / 2
-            c += elements[j]["enc"]
+        for ba, bb, membres in _repartir(groupe, _travees(a, b, piliers_jeu), elements, ou):
+            if not membres:
+                continue
+            jeu = max(_jeu(ba, bb, [elements[j]["enc"] for j in membres]), 0.0)
+            c = ba
+            for j in membres:
+                c += jeu
+                x[j] = c + elements[j]["enc"] / 2
+                c += elements[j]["enc"]
     return x
+
+
+def controler_centrage(elements, xs, longueur, ou, piliers=(), exemptes=()):
+    """Refuse une ouverture décentrée sans raison: ses trumeaux gauche et droit (jusqu'à la
+    voisine, au pilier ou à l'angle) diffèrent de plus de `CENTRAGE`. Sont exemptées la porte
+    d'entrée (sa place vient du plan), les ouvertures hors rang et celles qui donnent une
+    `raison`."""
+    spans = sorted([(x - e["enc"] / 2, x + e["enc"] / 2, k) for k, (e, x) in enumerate(zip(elements, xs)) if _rang(e)] + [(p - d - JEU_PILIER, p + d + JEU_PILIER, None) for p, d in piliers])
+    gauche, droite = -longueur / 2 + MARGE, longueur / 2 - MARGE
+    for n, (a, b, k) in enumerate(spans):
+        if k is None or k in exemptes or "raison" in elements[k]:
+            continue
+        g = a - (spans[n - 1][1] if n > 0 else gauche)
+        d = (spans[n + 1][0] if n + 1 < len(spans) else droite) - b
+        if abs(g - d) > CENTRAGE:
+            raise FicheInvalide(f"{ou}: « {elements[k]['type']} » décentrée dans sa travée (trumeaux de {g:.2f} et {d:.2f} m); laisse-la se placer seule, ou écris sa « raison »")
+
+
+def aligner_etage(etage, rdc, xs_rdc, longueur, piliers=()):
+    """Les axes d'un étage pris parmi ceux du rez-de-chaussée: le sous-ensemble qui tient (sans
+    chevauchement, loin des angles et des piliers), symétrique si le rez-de-chaussée l'est,
+    de préférence au-dessus des fenêtres plutôt que des portes, le plus étalé. None si aucun."""
+    from itertools import combinations
+
+    axes = sorted((x, e["type"]) for e, x in zip(rdc, xs_rdc) if _rang(e))
+    m = len(etage)
+    if m == 0 or m > len(axes):
+        return None
+    sym_rdc = _symetrique([x for x, _t in axes])
+    gauche, droite = -longueur / 2 + MARGE - 0.06, longueur / 2 - MARGE + 0.06
+    meilleur, retenu = None, None
+    for combo in combinations(axes, m):
+        xs = [x for x, _t in combo]
+        if any(x - e["enc"] / 2 < gauche or x + e["enc"] / 2 > droite for e, x in zip(etage, xs)):
+            continue
+        if any(xs[k + 1] - xs[k] < (etage[k]["enc"] + etage[k + 1]["enc"]) / 2 - 0.05 for k in range(m - 1)):
+            continue
+        if any(abs(x - p) < d + JEU_PILIER + e["enc"] / 2 - 0.02 for e, x in zip(etage, xs) for p, d in piliers):
+            continue
+        ecart = sum(abs(xs[k] + xs[m - 1 - k]) for k in range(m)) if sym_rdc else 0.0
+        portes = sum(1 for _x, t in combo if t in PORTES)
+        etale = min((xs[k + 1] - xs[k] for k in range(m - 1)), default=0.0)
+        score = (-round(ecart, 2), -portes, round(etale, 2))
+        if meilleur is None or score > meilleur:
+            meilleur, retenu = score, xs
+    return retenu
+
+
+def _symetrique(xs, tol=0.12) -> bool:
+    xs = sorted(xs)
+    return all(abs(xs[k] + xs[len(xs) - 1 - k]) <= tol for k in range(len(xs)))
 
 
 def _libre(x0, x1, y0, y1, interdits):
@@ -156,6 +281,43 @@ class Corps:
         self.sans_mur = donnees.get("sansMur", [])
         self.options = donnees.get("options", [])
         self.principal = principal
+        self.portes_hautes = []  # (façade, x, seuil) des portes d'étage, que dessert un escalier
+        self.ouvertures = {}  # façade -> rectangles (x0, x1, y0, y1) des ouvertures
+
+    def _sur(self, cote, longueur):
+        """Les options posées sur une façade, avec leur x depuis le milieu du mur."""
+        for o in self.options:
+            if o.get("facade", "sud") == cote and o.get("piece") in ("contrefort", "cheminee", "pendule", "escalier", "enseigne", "bucher"):
+                yield o, (o.get("position", 0.5) - 0.5) * longueur
+
+    def piliers(self, cote, longueur):
+        """Les pièces maçonnées depuis le sol sur cette façade: (x, demi-largeur)."""
+        out = []
+        for o, x in self._sur(cote, longueur):
+            cle = "four" if o["piece"] == "cheminee" and o.get("forme") == "four" else o["piece"]
+            if cle in PILIERS:
+                out.append((x, PILIERS[cle] / 2))
+        return out
+
+    def encombrements(self, cote, longueur):
+        """Les rectangles du mur couverts par une pièce posée dessus (x0, x1, y0, y1)."""
+        out = [(x - d - 0.1, x + d + 0.1, 0.0, 99.0) for x, d in self.piliers(cote, longueur)]
+        for o, x in self._sur(cote, longueur):
+            if o["piece"] == "pendule" and o.get("forme") != "fronton":
+                ext = o.get("diametre", 0.8) / 2 + 0.3
+                y = o.get("hauteur", 3.0)
+                out.append((x - ext, x + ext, y - ext - 0.1, y + ext))
+            elif o["piece"] == "escalier":
+                monte = o.get("monte", 2.47)
+                out.append((x + P.PALIER[0] - P.volee(monte) - 0.1, x + P.PALIER[1] + 0.1, 0.0, monte + 1.0))
+            elif o["piece"] == "bucher":
+                demi = o.get("longueur", 2.2) / 2 + 0.15
+                out.append((x - demi, x + demi, 0.0, o.get("hauteur", 1.5) + 0.6))
+            elif o["piece"] == "enseigne" and o.get("forme") == "bandeau":
+                demi = o.get("largeur", 2.2) / 2 + 0.1
+                y = o.get("hauteur", 2.75)
+                out.append((x - demi, x + demi, y - 0.1, y + 0.65))
+        return out
 
     def cote_du_toit(self, cote):
         """Côté du repère du toit (+z, +x, -z, -x) auquel correspond une façade du monde."""
@@ -187,6 +349,7 @@ def assembler(fiche: dict, nuancier: dict, economie: int = 0):
     emprise = fiche["emprise"]
     graine = sum(ord(c) * (i + 1) for i, c in enumerate(fiche["id"])) % 997
     s = Atelier(graine)
+    s.signalements = []
     corps = [Corps(fiche, emprise, {}, nuancier, True)]
     for annexe in fiche.get("annexes", []):
         corps.append(Corps(annexe, emprise, fiche.get("couleurs", {}), nuancier, False))
@@ -244,6 +407,8 @@ def _corps(s: Atelier, c: Corps, graine, economie, porte, porte_position, notice
 
     for k, option in enumerate(c.options):
         _option(s, c, option, graine + 300 + k * 7, ident)
+    for cote, x, _seuil in c.portes_hautes:
+        raise FicheInvalide(f"{ident}: la porte d'étage de la façade {cote} (x = {x:.2f} m) ne mène nulle part; ajoute son « escalier » à la même position")
 
 
 def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte_position, notice, matrice, ident):
@@ -272,20 +437,32 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
             entrees[0].update(type=porte["modele"], largeur=large, enc=OUVERTURES[porte["modele"]]["enc"] + large - OUVERTURES[porte["modele"]]["l"])
             if "hauteur" in porte:
                 entrees[0]["hauteur"] = porte["hauteur"]
-    xs = disposer(rdc, longueur, ou + " (rdc)")
-    centres_rdc = sorted(xs)
+    piliers = c.piliers(cote, longueur)
+    xs = disposer(rdc, longueur, ou + " (rdc)", piliers)
+    controler_centrage(rdc, xs, longueur, ou + " (rdc)", piliers, exemptes=[k for k, e in enumerate(rdc) if porte is not None and e is entrees[0]])
     for e, x in zip(rdc, xs):
         places.append((e, x, 0.0))
     for k, cle in enumerate(("etage", "etage2")):
         etage = [_element(i) for i in niveaux.get(cle, [])]
         if not etage:
             continue
+        for e in etage:
+            if e["type"] == "fenetre" and e["largeur"] == OUVERTURES["fenetre"]["l"]:
+                # À l'étage, la fenêtre fait 0,80 m: ses volets ouverts prennent 30 cm de moins.
+                e["enc"] -= 0.3
         if k + 2 > c.niveaux:
             raise FicheInvalide(f"{ou}: des ouvertures à « {cle} » mais {c.niveaux} niveau(x)")
-        if len(etage) == len(centres_rdc) and all("position" not in e for e in etage):
-            xe = centres_rdc
-        else:
-            xe = disposer(etage, longueur, ou + f" ({cle})")
+        # Les étages se posent sur les axes du rez-de-chaussée; sinon ils se répartissent seuls,
+        # et une façade qui n'est alors ni alignée ni symétrique est signalée.
+        xe = None
+        if all("position" not in e for e in etage):
+            xe = aligner_etage(etage, rdc, xs, longueur, piliers)
+        if xe is None:
+            xe = disposer(etage, longueur, ou + f" ({cle})", piliers)
+            controler_centrage(etage, xe, longueur, ou + f" ({cle})", piliers)
+            axes_rdc = [x for e, x in zip(rdc, xs) if _rang(e)]
+            if axes_rdc and not (_symetrique(xe) and _symetrique(axes_rdc)) and not all(any(abs(x - a) < 0.05 for a in axes_rdc) for e, x in zip(etage, xe) if "raison" not in e):
+                s.signalements.append(f"{ou} ({cle}): ouvertures ni alignées sur le rez-de-chaussée ni symétriques")
         for e, x in zip(etage, xe):
             places.append((e, x, 2.3 * (k + 1)))
     pignon = [_element(i) for i in niveaux.get("pignon", [])]
@@ -300,10 +477,15 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
     for e, x, niveau in places:
         t = e["type"]
         o = OUVERTURES[t]
-        if t in ("porte", "porte-service"):
-            trous.append(P.trou_porte(T, x, e.get("modele", "pleine")))
-            interdits.append((x - 0.95, x + 0.95, 0, 2.75))
-            seuils.append((x - 0.82, x + 0.82))
+        if t in PORTES:
+            if niveau > 0 and t == "porte":
+                raise FicheInvalide(f"{ou}: la porte d'entrée est au rez-de-chaussée; à l'étage, écris « porte-service » et son « escalier »")
+            trous.append(P.trou_porte(T, x, e.get("modele", "pleine"), niveau))
+            interdits.append((x - 0.95, x + 0.95, niveau, niveau + 2.75))
+            if niveau > 0:
+                c.portes_hautes.append((cote, x, niveau + P.SEUIL))
+            else:
+                seuils.append((x - 0.82, x + 0.82))
         elif t == "vitrine":
             trous.append(P.trou_vitrine(T, x, e["largeur"]))
             interdits.append((x - e["largeur"] / 2 - 0.4, x + e["largeur"] / 2 + 0.4, 0, 3.0))
@@ -331,10 +513,14 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
             interdits.append((x - demi, x + demi, bas - 0.3, bas + h + 0.45))
 
     P.peau_de_mur(s, T, longueur, c.haut, trous, c.profil(cote), graine)
-    P.moellons_bas(s, T, -longueur / 2, longueur / 2, graine, seuils)
+    # Sous l'enduit, le soubassement monte d'une assise de plus: le pied du mur se lit mieux.
+    P.moellons_bas(s, T, -longueur / 2, longueur / 2, graine, seuils, rangs=3 if c.finition == "crepi" and economie <= 1 else 2)
     droite = c.haut_a(cote, longueur / 2, longueur)
     P.chaine_angle(s, T, longueur / 2, 0.58, droite - 0.12, graine)
     ouvertures_interdites = list(interdits)
+    c.ouvertures[cote] = list(interdits)
+    # Les pièces posées sur le mur (horloge, escalier, contrefort) n'ont pas de pierre dessous.
+    interdits.extend(c.encombrements(cote, longueur))
     interdits.append((-longueur / 2 - 1, -longueur / 2 + 0.62, 0, 99))
     interdits.append((longueur / 2 - 0.62, longueur / 2 + 1, 0, 99))
 
@@ -359,9 +545,24 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
         for k in range(3 if economie == 0 else 2):
             g = graine + k * 41
             x = -longueur / 2 + 0.8 + tirage(g) * (longueur - 2.2)
-            y = 0.8 + tirage(g + 1) * 0.5 + (c.haut - 2.0 if k == 2 else 0)
+            y = 0.95 + tirage(g + 1) * 0.5 + (c.haut - 2.0 if k == 2 else 0)
             if _libre(x - 0.25, x + 0.95, y - 0.15, y + 0.5, interdits):
                 P.pierres_nues(s, T, x, y, g)
+                interdits.append((x - 0.25, x + 0.95, y - 0.15, y + 0.5))
+        # Reprises d'enduit: des pans refaits, en léger relief, qui cassent le grand plan calme.
+        for k in range(3 if economie == 0 else 1):
+            g = graine + 500 + k * 29
+            w, h = 0.9 + tirage(g) * 1.1, 0.6 + tirage(g + 1) * 0.9
+            x = -longueur / 2 + 0.7 + w / 2 + tirage(g + 2) * max(0.0, longueur - 1.4 - w)
+            y = 0.95 + h / 2 + tirage(g + 3) * max(0.0, c.haut - 1.4 - h)
+            if y + h / 2 < c.haut - 0.2 and _libre(x - w / 2, x + w / 2, y - h / 2, y + h / 2, interdits):
+                P.reprise_d_enduit(s, T, x, y, w, h, g)
+        # Une lézarde part de l'angle haut d'une ouverture: c'est là que le mur travaille.
+        coins = [(x1 + 0.08, y1 + 0.05, 1) for x0, x1, y0, y1 in ouvertures_interdites if y1 + 1.0 < c.haut_a(cote, x1, longueur) and x1 + 0.9 < longueur / 2 - 0.6]
+        coins += [(x0 - 0.08, y1 + 0.05, -1) for x0, x1, y0, y1 in ouvertures_interdites if y1 + 1.0 < c.haut_a(cote, x0, longueur) and x0 - 0.9 > -longueur / 2 + 0.6]
+        if coins and tirage(graine + 77) < 0.7:
+            x, y, sens = coins[int(tirage(graine + 78) * len(coins)) % len(coins)]
+            P.lezarde(s, T, x, y, graine, 0.55 + tirage(graine + 79) * 0.4, sens)
     else:
         # Bardage: des couvre-joints en saillie sur les planches, du soubassement au toit.
         pas = 0.5 * (1 + 0.5 * economie)
@@ -379,9 +580,10 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
     for e, x, niveau in places:
         t = e["type"]
         g = int(graine + x * 10 + niveau * 3) % 1000
-        if t in ("porte", "porte-service"):
-            with s.groupe(at(x, 0, 0)):
-                P.porte(s, T, e.get("modele", "pleine"), e.get("linteau", "bois" if c.finition != "pierre" else "pierre"), g)
+        if t in PORTES:
+            # Une porte d'étage n'a pas de marche: son palier est celui de l'escalier.
+            with s.groupe(at(x, niveau, 0)):
+                P.porte(s, T, e.get("modele", "pleine"), e.get("linteau", "bois" if c.finition != "pierre" else "pierre"), g, marches=0 if niveau > 0 else 1)
         elif t == "vitrine":
             with s.groupe(at(x, 0, 0)):
                 P.vitrine(s, T, e["largeur"], g)
@@ -482,9 +684,17 @@ def _option(s: Atelier, c: Corps, o: dict, graine, ident):
         with s.groupe(m):
             auvent(s, T, o.get("largeur", 3.0), o.get("profondeur", 1.6), o.get("accroche", min(3.1, c.haut - 0.25)), graine)
     elif piece == "pendule":
-        m, _c, _l = mur(3.0)
-        with s.groupe(m):
-            P.pendule(s, T, o.get("diametre", 0.9), graine)
+        if o.get("forme") == "fronton":
+            # L'horloge de mairie: dans un fronton qui monte au-dessus de l'égout.
+            m, cote, _l = mur()
+            if c.profil(cote) is not None or c.forme == "appentis":
+                raise FicheInvalide(f"{ident}: un fronton d'horloge se pose côté égout, pas sur le pignon {cote}")
+            with s.groupe(m):
+                R.fronton_horloge(s, T, c.haut, c.pente, graine, o.get("diametre", 0.7))
+        else:
+            m, _c, _l = mur(3.0)
+            with s.groupe(m):
+                P.horloge(s, T, o.get("diametre", 0.8), graine)
     elif piece == "drapeau":
         m, _c, _l = mur(2.9)
         with s.groupe(m):
@@ -500,9 +710,35 @@ def _option(s: Atelier, c: Corps, o: dict, graine, ident):
         with s.groupe(at(c.cx, c.faite + 0.05, c.cz)):
             P.croix(s, T, o.get("hauteur", 1.6))
     elif piece == "escalier":
+        # Un escalier dessert une porte d'étage: son palier est devant elle, à son seuil.
+        cote = o.get("facade", "sud")
+        _m, longueur = _repere(c.cx, c.cz, c.largeur, c.profondeur, cote)
+        x = (o.get("position", 0.5) - 0.5) * longueur
+        porte = next((p for p in c.portes_hautes if p[0] == cote and abs(p[1] - x) < 0.06), None)
+        if porte is None:
+            raise FicheInvalide(f"{ident}: l'escalier de la façade {cote} ne mène à aucune porte d'étage (mets une « porte-service » à l'étage, à la même position)")
+        monte = o.get("monte", porte[2])
+        x0, x1 = x + P.PALIER[0] - P.volee(monte), x + P.PALIER[1]
+        for a, b, y0, _y1 in c.ouvertures.get(cote, []):
+            if y0 < 2.0 and a < x1 and b > x0:
+                raise FicheInvalide(f"{ident}: l'escalier de la façade {cote} barre une ouverture du rez-de-chaussée")
+        c.portes_hautes.remove(porte)
         m, _c, _l = mur()
         with s.groupe(m):
-            P.escalier(s, T, o.get("monte", 2.5), o.get("largeur", 1.0), graine)
+            P.escalier(s, T, monte, o.get("largeur", 1.0), graine)
+    elif piece == "bucher":
+        cote = o.get("facade", "sud")
+        _m, longueur = _repere(c.cx, c.cz, c.largeur, c.profondeur, cote)
+        x = (o.get("position", 0.5) - 0.5) * longueur
+        demi = o.get("longueur", 2.2) / 2
+        if x - demi < -longueur / 2 + 0.1 or x + demi > longueur / 2 - 0.1:
+            raise FicheInvalide(f"{ident}: le bûcher de la façade {cote} dépasse du mur")
+        for a, b, y0, _y1 in c.ouvertures.get(cote, []):
+            if y0 < o.get("hauteur", 1.5) + 0.4 and a < x + demi and b > x - demi:
+                raise FicheInvalide(f"{ident}: le bûcher de la façade {cote} barre une ouverture")
+        m, _c, _l = mur()
+        with s.groupe(m):
+            P.bucher(s, T, o.get("longueur", 2.2), o.get("profondeur", 0.7), o.get("hauteur", 1.5), graine)
     elif piece == "contrefort":
         m, _c, _l = mur()
         with s.groupe(m):

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "cheminot-o",
   "nom": "la maison de cheminot (ouest)",
-  "detail": "logement type de la Compagnie, jumeau du voisin: pierre claire, volets rouge cheminot, linteaux de pierre",
+  "detail": "logement type de la Compagnie, jumeau du voisin: pierre claire, volets rouge cheminot, linteaux de pierre; bûcher contre le pignon ouest, côté jardin (son jumeau a le sien à l'est)",
   "emprise": {
     "largeur": 6,
     "profondeur": 6
@@ -27,7 +27,7 @@
   "facades": {
     "nord": {
       "rdc": ["porte", "fenetre-etroite"],
-      "etage": ["fenetre", "fenetre"]
+      "etage": ["fenetre-etroite", "fenetre-etroite"]
     },
     "sud": {
       "rdc": ["fenetre", "fenetre"],
@@ -45,6 +45,12 @@
       "piece": "cheminee",
       "forme": "souche",
       "position": 0.82
+    },
+    {
+      "piece": "bucher",
+      "facade": "ouest",
+      "position": 0.825,
+      "longueur": 1.8
     }
   ]
 }

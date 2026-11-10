@@ -16,13 +16,13 @@
   "abat-sons": {
    "boite": [
     [
-     -0.933,
+     -0.948,
      -0.151,
-     -0.168
+     -0.164
     ],
     [
-     0.941,
-     2.899,
+     0.948,
+     2.906,
      0.217
     ]
    ],
@@ -80,14 +80,14 @@
   "appui": {
    "boite": [
     [
-     -0.738,
-     -0.011,
-     -0.061
+     -0.739,
+     -0.002,
+     -0.052
     ],
     [
-     0.727,
-     0.143,
-     0.264
+     0.736,
+     0.141,
+     0.262
     ]
    ],
    "description": "appui de fenêtre débordant",
@@ -102,13 +102,13 @@
    "boite": [
     [
      -1.505,
-     -0.012,
-     -0.04
+     -0.011,
+     -0.045
     ],
     [
      1.505,
      2.878,
-     1.796
+     1.794
     ]
    ],
    "description": "auvent de 3 x 1,6 m sur poteaux et dés de pierre",
@@ -125,13 +125,13 @@
    "boite": [
     [
      -0.954,
-     1.525,
+     1.524,
      -0.042
     ],
     [
      0.956,
-     2.885,
-     1.09
+     2.881,
+     1.084
     ]
    ],
    "description": "petit auvent de 1,9 x 0,9 m sur consoles",
@@ -146,13 +146,13 @@
   "bassin": {
    "boite": [
     [
-     -1.607,
-     -0.038,
-     -0.942
+     -1.614,
+     -0.016,
+     -0.939
     ],
     [
-     1.609,
-     0.54,
+     1.61,
+     0.564,
      0.94
     ]
    ],
@@ -165,28 +165,73 @@
    "teinte": null,
    "triangles": 102
   },
+  "bucher": {
+   "boite": [
+    [
+     -1.298,
+     -0.011,
+     -0.01
+    ],
+    [
+     1.298,
+     2.005,
+     0.962
+    ]
+   ],
+   "description": "bûcher de 2,2 m adossé au mur: bûches sur traverses, poteaux, appentis de planches",
+   "finition": null,
+   "materiaux": [
+    "bardage",
+    "bois",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 1476
+  },
+  "chapeau-de-cheminee": {
+   "boite": [
+    [
+     -0.445,
+     -0.002,
+     -0.441
+    ],
+    [
+     0.446,
+     0.57,
+     0.442
+    ]
+   ],
+   "description": "chapeau de tôle à deux pans sur quatre pieds, pour un conduit de 60 x 60 cm (origine: dessus du conduit)",
+   "finition": null,
+   "materiaux": [
+    "metal"
+   ],
+   "teinte": null,
+   "triangles": 86
+  },
   "cheminee-four": {
    "boite": [
     [
      -0.776,
      -0.027,
-     -0.092
+     -0.142
     ],
     [
      0.783,
-     6.566,
-     0.682
+     6.748,
+     0.701
     ]
    ],
-   "description": "cheminée de four ou de forge adossée au mur, 6 m",
+   "description": "cheminée de four ou de forge adossée au mur, 6 m, coiffée de son chapeau de tôle",
    "finition": null,
    "materiaux": [
+    "metal",
     "moellon",
     "pierre",
     "tuile"
    ],
    "teinte": null,
-   "triangles": 140
+   "triangles": 202
   },
   "cheminee-souche": {
    "boite": [
@@ -197,31 +242,31 @@
     ],
     [
      0.457,
-     2.378,
+     2.621,
      0.466
     ]
    ],
-   "description": "souche de cheminée: couronne de pierres, dalle, mitre (origine: 1,90 m sous le sommet)",
+   "description": "souche de cheminée: couronne de pierres, dalle, chapeau de tôle sur quatre pieds (origine: 1,90 m sous le sommet)",
    "finition": null,
    "materiaux": [
     "crepi",
-    "pierre",
-    "tuile"
+    "metal",
+    "pierre"
    ],
    "teinte": null,
-   "triangles": 78
+   "triangles": 144
   },
   "contrefort": {
    "boite": [
     [
      -0.415,
-     -0.01,
-     -0.027
+     -0.009,
+     -0.025
     ],
     [
      0.415,
-     5.61,
-     0.775
+     5.611,
+     0.784
     ]
    ],
    "description": "contrefort d'église de 5 m",
@@ -236,11 +281,11 @@
    "boite": [
     [
      -0.353,
-     -0.052,
-     -0.177
+     -0.054,
+     -0.175
     ],
     [
-     0.354,
+     0.351,
      1.604,
      0.177
     ]
@@ -256,14 +301,14 @@
   "descente": {
    "boite": [
     [
-     -0.285,
-     -0.009,
+     -0.297,
+     -0.016,
      0.007
     ],
     [
      0.291,
      2.712,
-     0.72
+     0.723
     ]
    ],
    "description": "descente d'eau de 2,70 m: coude, colliers, dauphin et pierre d'éclaboussure",
@@ -278,14 +323,14 @@
   "drapeau": {
    "boite": [
     [
-     -0.026,
-     -0.035,
-     -0.023
+     -0.022,
+     -0.033,
+     -0.025
     ],
     [
-     0.867,
-     1.232,
-     0.903
+     0.872,
+     1.228,
+     0.91
     ]
    ],
    "description": "hampe et drapeau",
@@ -300,14 +345,14 @@
   "enseigne-bandeau": {
    "boite": [
     [
-     -1.102,
-     -0.013,
-     -0.003
+     -1.108,
+     -0.016,
+     -0.007
     ],
     [
      1.108,
      0.557,
-     0.081
+     0.083
     ]
    ],
    "description": "enseigne vierge en planche encadrée, à plat sur le mur",
@@ -322,14 +367,14 @@
   "enseigne-potence": {
    "boite": [
     [
-     -0.049,
-     -0.685,
-     0.0
+     -0.046,
+     -0.684,
+     -0.002
     ],
     [
-     0.048,
+     0.047,
      0.029,
-     0.954
+     0.952
     ]
    ],
    "description": "enseigne vierge pendue à sa potence de fer",
@@ -344,24 +389,25 @@
   "escalier": {
    "boite": [
     [
-     -0.02,
-     -0.008,
+     -3.635,
+     -0.007,
      -0.008
     ],
     [
-     5.303,
-     3.475,
-     1.008
+     0.792,
+     3.422,
+     1.057
     ]
    ],
-   "description": "escalier extérieur de pierre, 2,50 m de montée, marches de 17 x 28 cm",
+   "description": "escalier extérieur de pierre vers une porte d'étage: palier, volée de 13 marches de 19 x 25 cm, garde-corps (origine: axe de la porte, au sol)",
    "finition": null,
    "materiaux": [
     "metal",
+    "moellon",
     "pierre"
    ],
    "teinte": null,
-   "triangles": 176
+   "triangles": 199
   },
   "faitage": {
    "boite": [
@@ -387,14 +433,14 @@
   "fenetre": {
    "boite": [
     [
-     -0.77,
-     -0.017,
+     -0.769,
+     -0.024,
      -0.144
     ],
     [
-     0.765,
-     1.576,
-     0.255
+     0.76,
+     1.573,
+     0.253
     ]
    ],
    "description": "fenêtre à croisillons, sans volets",
@@ -409,58 +455,6 @@
    "triangles": 58
   },
   "fenetre-volets-fermes": {
-   "boite": [
-    [
-     -0.754,
-     -0.012,
-     -0.144
-    ],
-    [
-     0.76,
-     1.591,
-     0.255
-    ]
-   ],
-   "description": "fenêtre, volets clos",
-   "finition": null,
-   "materiaux": [
-    "bois",
-    "crepi",
-    "metal",
-    "pierre",
-    "vitre",
-    "volet"
-   ],
-   "teinte": null,
-   "triangles": 108
-  },
-  "fenetre-volets-fermes--rouge": {
-   "boite": [
-    [
-     -0.769,
-     -0.022,
-     -0.144
-    ],
-    [
-     0.76,
-     1.589,
-     0.265
-    ]
-   ],
-   "description": "fenêtre, volets clos",
-   "finition": null,
-   "materiaux": [
-    "bois",
-    "crepi",
-    "metal",
-    "pierre",
-    "vitre",
-    "volet"
-   ],
-   "teinte": "rouge",
-   "triangles": 108
-  },
-  "fenetre-volets-fermes--sauge": {
    "boite": [
     [
      -0.762,
@@ -483,49 +477,23 @@
     "vitre",
     "volet"
    ],
-   "teinte": "sauge",
+   "teinte": null,
    "triangles": 108
   },
-  "fenetre-volets-ouverts": {
+  "fenetre-volets-fermes--rouge": {
    "boite": [
     [
-     -1.124,
-     -0.024,
-     -0.144
-    ],
-    [
-     1.123,
-     1.573,
-     0.253
-    ]
-   ],
-   "description": "fenêtre, volets de planches rabattus",
-   "finition": null,
-   "materiaux": [
-    "bois",
-    "crepi",
-    "metal",
-    "pierre",
-    "vitre",
-    "volet"
-   ],
-   "teinte": null,
-   "triangles": 122
-  },
-  "fenetre-volets-ouverts--rouge": {
-   "boite": [
-    [
-     -1.116,
+     -0.761,
      -0.022,
      -0.144
     ],
     [
-     1.123,
-     1.587,
-     0.262
+     0.769,
+     1.594,
+     0.265
     ]
    ],
-   "description": "fenêtre, volets de planches rabattus",
+   "description": "fenêtre, volets clos",
    "finition": null,
    "materiaux": [
     "bois",
@@ -536,9 +504,35 @@
     "volet"
    ],
    "teinte": "rouge",
-   "triangles": 122
+   "triangles": 108
   },
-  "fenetre-volets-ouverts--sauge": {
+  "fenetre-volets-fermes--sauge": {
+   "boite": [
+    [
+     -0.769,
+     -0.022,
+     -0.144
+    ],
+    [
+     0.76,
+     1.589,
+     0.265
+    ]
+   ],
+   "description": "fenêtre, volets clos",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 108
+  },
+  "fenetre-volets-ouverts": {
    "boite": [
     [
      -1.12,
@@ -561,20 +555,96 @@
     "vitre",
     "volet"
    ],
+   "teinte": null,
+   "triangles": 122
+  },
+  "fenetre-volets-ouverts--rouge": {
+   "boite": [
+    [
+     -1.123,
+     -0.012,
+     -0.144
+    ],
+    [
+     1.119,
+     1.591,
+     0.255
+    ]
+   ],
+   "description": "fenêtre, volets de planches rabattus",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 122
+  },
+  "fenetre-volets-ouverts--sauge": {
+   "boite": [
+    [
+     -1.116,
+     -0.022,
+     -0.144
+    ],
+    [
+     1.123,
+     1.587,
+     0.262
+    ]
+   ],
+   "description": "fenêtre, volets de planches rabattus",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
    "teinte": "sauge",
    "triangles": 122
+  },
+  "fronton-horloge": {
+   "boite": [
+    [
+     -1.092,
+     0.0,
+     -3.38
+    ],
+    [
+     1.094,
+     2.814,
+     0.351
+    ]
+   ],
+   "description": "fronton d'horloge au-dessus de l'égout, toit à 35 degrés, horloge de 70 cm (origine: au mur, à l'arase)",
+   "finition": null,
+   "materiaux": [
+    "crepi",
+    "metal",
+    "pierre",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 839
   },
   "gouttiere": {
    "boite": [
     [
-     -1.005,
+     -1.006,
      -0.104,
-     -0.006
+     -0.005
     ],
     [
-     1.003,
-     0.002,
-     0.142
+     0.999,
+     0.005,
+     0.145
     ]
    ],
    "description": "2 m de gouttière de zinc",
@@ -585,17 +655,39 @@
    "teinte": null,
    "triangles": 10
   },
+  "horloge": {
+   "boite": [
+    [
+     -0.598,
+     -0.689,
+     -0.025
+    ],
+    [
+     0.598,
+     0.65,
+     0.224
+    ]
+   ],
+   "description": "horloge de façade: cadran émaillé de 80 cm, lunette de laiton, douze repères, deux aiguilles, œil-de-bœuf de pierre (origine: centre du cadran, au mur)",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 628
+  },
   "linteau-bois": {
    "boite": [
     [
-     -0.76,
-     0.006,
-     -0.064
+     -0.756,
+     -0.013,
+     -0.076
     ],
     [
-     0.765,
+     0.761,
      0.215,
-     0.196
+     0.185
     ]
    ],
    "description": "linteau de chêne",
@@ -609,14 +701,14 @@
   "linteau-pierre": {
    "boite": [
     [
-     -0.737,
-     -0.002,
-     -0.065
+     -0.735,
+     -0.007,
+     -0.072
     ],
     [
-     0.734,
-     0.254,
-     0.168
+     0.732,
+     0.245,
+     0.161
     ]
    ],
    "description": "linteau de pierre",
@@ -655,13 +747,13 @@
   "marche": {
    "boite": [
     [
-     -0.82,
-     -0.021,
-     -0.0
+     -0.818,
+     -0.01,
+     0.01
     ],
     [
-     0.809,
-     0.185,
+     0.818,
+     0.186,
      0.637
     ]
    ],
@@ -676,14 +768,14 @@
   "marches": {
    "boite": [
     [
-     -0.959,
-     -0.018,
+     -0.967,
+     -0.015,
      0.003
     ],
     [
-     0.968,
-     0.345,
-     0.959
+     0.969,
+     0.356,
+     0.95
     ]
    ],
    "description": "deux marches de seuil (2 x 17 cm, giron de 32 cm)",
@@ -1663,28 +1755,6 @@
    "teinte": "sauge",
    "triangles": 162
   },
-  "pendule": {
-   "boite": [
-    [
-     -0.53,
-     -0.507,
-     -0.005
-    ],
-    [
-     0.529,
-     0.506,
-     0.207
-    ]
-   ],
-   "description": "pendule de façade",
-   "finition": null,
-   "materiaux": [
-    "metal",
-    "volet"
-   ],
-   "teinte": null,
-   "triangles": 92
-  },
   "pignon-bardage": {
    "boite": [
     [
@@ -1760,14 +1830,14 @@
   "porte-cochere": {
    "boite": [
     [
-     -1.655,
+     -1.644,
      -0.008,
-     -0.13
+     -0.132
     ],
     [
-     1.65,
-     3.331,
-     0.455
+     1.654,
+     3.335,
+     0.461
     ]
    ],
    "description": "porte cochère sous un arc de pierre",
@@ -1783,14 +1853,14 @@
   "porte-de-grange": {
    "boite": [
     [
-     -1.717,
-     -0.012,
-     -0.126
+     -1.723,
+     -0.01,
+     -0.12
     ],
     [
-     1.701,
-     3.051,
-     0.451
+     1.708,
+     3.054,
+     0.45
     ]
    ],
    "description": "porte de grange à deux vantaux et écharpes, linteau de chêne",
@@ -1805,54 +1875,6 @@
    "triangles": 180
   },
   "porte-pleine": {
-   "boite": [
-    [
-     -0.959,
-     -0.022,
-     -0.118
-    ],
-    [
-     0.97,
-     2.52,
-     0.64
-    ]
-   ],
-   "description": "porte en planches à pentures, piédroits, linteau, marche",
-   "finition": null,
-   "materiaux": [
-    "bois",
-    "metal",
-    "pierre",
-    "volet"
-   ],
-   "teinte": null,
-   "triangles": 116
-  },
-  "porte-pleine--rouge": {
-   "boite": [
-    [
-     -0.965,
-     -0.017,
-     -0.121
-    ],
-    [
-     0.966,
-     2.52,
-     0.632
-    ]
-   ],
-   "description": "porte en planches à pentures, piédroits, linteau, marche",
-   "finition": null,
-   "materiaux": [
-    "bois",
-    "metal",
-    "pierre",
-    "volet"
-   ],
-   "teinte": "rouge",
-   "triangles": 116
-  },
-  "porte-pleine--sauge": {
    "boite": [
     [
      -0.971,
@@ -1873,10 +1895,10 @@
     "pierre",
     "volet"
    ],
-   "teinte": "sauge",
+   "teinte": null,
    "triangles": 116
   },
-  "porte-vitree": {
+  "porte-pleine--rouge": {
    "boite": [
     [
      -0.968,
@@ -1889,31 +1911,7 @@
      0.631
     ]
    ],
-   "description": "porte à carreaux en partie haute",
-   "finition": null,
-   "materiaux": [
-    "bois",
-    "metal",
-    "pierre",
-    "volet"
-   ],
-   "teinte": null,
-   "triangles": 126
-  },
-  "porte-vitree--rouge": {
-   "boite": [
-    [
-     -0.963,
-     -0.008,
-     -0.12
-    ],
-    [
-     0.968,
-     2.52,
-     0.635
-    ]
-   ],
-   "description": "porte à carreaux en partie haute",
+   "description": "porte en planches à pentures, piédroits, linteau, marche",
    "finition": null,
    "materiaux": [
     "bois",
@@ -1922,9 +1920,33 @@
     "volet"
    ],
    "teinte": "rouge",
-   "triangles": 126
+   "triangles": 116
   },
-  "porte-vitree--sauge": {
+  "porte-pleine--sauge": {
+   "boite": [
+    [
+     -0.965,
+     -0.017,
+     -0.121
+    ],
+    [
+     0.966,
+     2.52,
+     0.632
+    ]
+   ],
+   "description": "porte en planches à pentures, piédroits, linteau, marche",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 116
+  },
+  "porte-vitree": {
    "boite": [
     [
      -0.967,
@@ -1945,20 +1967,68 @@
     "pierre",
     "volet"
    ],
+   "teinte": null,
+   "triangles": 126
+  },
+  "porte-vitree--rouge": {
+   "boite": [
+    [
+     -0.955,
+     -0.021,
+     -0.118
+    ],
+    [
+     0.965,
+     2.516,
+     0.637
+    ]
+   ],
+   "description": "porte à carreaux en partie haute",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 126
+  },
+  "porte-vitree--sauge": {
+   "boite": [
+    [
+     -0.963,
+     -0.008,
+     -0.12
+    ],
+    [
+     0.968,
+     2.52,
+     0.635
+    ]
+   ],
+   "description": "porte à carreaux en partie haute",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
    "teinte": "sauge",
    "triangles": 126
   },
   "roue-de-moulin": {
    "boite": [
     [
+     -2.74,
      -2.737,
-     -2.739,
-     -0.1
+     -0.11
     ],
     [
-     2.741,
-     2.744,
-     1.459
+     2.729,
+     2.731,
+     1.457
     ]
    ],
    "description": "roue à aubes de 5 m",
@@ -2041,14 +2111,14 @@
   "vitrail": {
    "boite": [
     [
-     -0.774,
-     -0.15,
+     -0.778,
+     -0.152,
      -0.138
     ],
     [
-     0.78,
-     3.277,
-     0.222
+     0.774,
+     3.285,
+     0.217
     ]
    ],
    "description": "baie haute d'église sous son arc",

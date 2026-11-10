@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "hameau-c",
   "nom": "la maison du bout",
-  "detail": "maison basse d'un seul niveau en pierre, lucarne côté rue, volets rouge cheminot",
+  "detail": "maison basse d'un seul niveau en pierre, lucarne côté rue, volets rouge cheminot; bûcher contre le pignon est: la dernière maison, au bord des prés",
   "emprise": {
     "largeur": 6,
     "profondeur": 6
@@ -11,7 +11,7 @@
   "finition": "pierre",
   "couleurs": {
     "murs": "pierre",
-    "toit": "lauze",
+    "toit": "tuile",
     "volets": "rouge_cheminot",
     "porte": "rouge_cheminot"
   },
@@ -49,6 +49,12 @@
       "piece": "cheminee",
       "forme": "souche",
       "position": 0.15
+    },
+    {
+      "piece": "bucher",
+      "facade": "est",
+      "position": 0.14,
+      "longueur": 1.4
     }
   ]
 }

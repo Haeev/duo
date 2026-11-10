@@ -13,7 +13,7 @@ import math
 import numpy as np
 
 from atelier import Atelier, at, choix, penche, tirage
-from pieces import fenetre, peau_de_mur, trou_fenetre
+from pieces import fenetre, horloge, peau_de_mur, trou_fenetre
 
 PAS_RANG = 0.34
 VOLIGE = 0.07
@@ -26,6 +26,7 @@ def pan(s: Atelier, T, polygone, u_de, s_max, graine, flancs, large=1.0, chevron
     montant depuis l'égout; `u_de(s)`: l'intervalle de u couvert à la hauteur s; `flancs`:
     côtés du polygone dont le chant se voit (égout, rives)."""
     s.prisme(polygone, VOLIGE, at(0, -VOLIGE / 2, 0, 0, -math.pi / 2, 0), "bois", T.bois[1], tremble=0.0, sans="z-", flancs=flancs)
+    lauze = getattr(T, "lauze", False)
     rangs = max(1, math.ceil((s_max - 0.12) / PAS_RANG))
     for r in range(rangs):
         sc = min(s_max - 0.2, 0.2 + r * PAS_RANG + penche(graine + r, 0.015))
@@ -36,11 +37,18 @@ def pan(s: Atelier, T, polygone, u_de, s_max, graine, flancs, large=1.0, chevron
         k = 0
         while u < u1 - 0.02:
             g = graine + r * 31 + k * 7
-            w = min((0.5 + tirage(g) * 0.75) * large, u1 - u)
+            if lauze:
+                # Lauze: pierres plates de tailles inégales, plus épaisses, posées un peu de biais.
+                w = min((0.32 + tirage(g) * 1.0) * large, u1 - u)
+            else:
+                w = min((0.5 + tirage(g) * 0.75) * large, u1 - u)
             if u1 - (u + w) < 0.3 * large:
                 w = u1 - u
             sans = "y-z-" + ("" if k == 0 else "x-") + ("" if u + w >= u1 - 1e-6 else "x+")
-            s.box(w - 0.012, 0.075, 0.44, at(u + w / 2, 0.06 + tirage(g + 2) * 0.02, -sc, 0, -0.13, 0), "tuile", choix(T.tuile, g + 3), grain="x", tremble=0.012, sans=sans)
+            if lauze:
+                s.box(w - 0.02, 0.1, 0.46, at(u + w / 2, 0.07 + tirage(g + 2) * 0.03, -sc, penche(g + 5, 0.035), -0.16, 0), "tuile", choix(T.tuile, g + 3), grain="x", tremble=0.02, sans=sans)
+            else:
+                s.box(w - 0.012, 0.075, 0.44, at(u + w / 2, 0.06 + tirage(g + 2) * 0.02, -sc, 0, -0.13, 0), "tuile", choix(T.tuile, g + 3), grain="x", tremble=0.012, sans=sans)
             u += w
             k += 1
     if chevrons is not None:
@@ -186,3 +194,46 @@ def lucarne(s: Atelier, T, haut, pente_deg, graine=0, largeur=1.3, hauteur=1.3):
                 y = hauteur + d * math.sin(q) + 0.06 + r * 0.015
                 s.box(bande + 0.06, 0.07, prof + 0.3, at(x, y, -prof / 2 + 0.15, 0, 0, -c * (q - 0.1)), "tuile", choix(T.tuile, graine + r + c), grain="z", tremble=0.01, sans="y-")
         faitieres(s, T, (0, hauteur + fleche + 0.08, 0.32), (0, hauteur + fleche + 0.08, -prof + 0.1), graine, rayon=0.13, bout_bas=True)
+
+
+def fronton_horloge(s: Atelier, T, haut, pente_deg, graine=0, diametre=0.7, heure=None):
+    """Fronton d'horloge à l'aplomb du mur, côté égout (mairie, école): un pan de mur qui monte
+    au-dessus de l'égout, tenu par deux chaînes de pierre, coiffé d'un larmier et d'un petit
+    toit à deux pans comme une lucarne; l'horloge au milieu. Repère du mur, x au milieu du
+    fronton (sur l'axe de la porte)."""
+    p = math.radians(pente_deg)
+    r = diametre / 2
+    oeil = r + 0.04 + max(0.14, r * 0.38) + 0.06
+    largeur = 2 * oeil + 0.56
+    hauteur = 2 * oeil + 0.54
+    base = haut - 0.1
+    prof = (hauteur + 0.5) / math.tan(p) + 0.2
+    mat = T.mur_mat if T.mur_mat != "bardage" else "crepi"
+    with s.groupe(at(0, base, 0)):
+        peau_de_mur(s, T, largeur, hauteur, [], None, graine)
+        # Chaînes de pierre aux deux rives, longues et courtes en alternance.
+        n = max(3, round(hauteur / 0.36))
+        hp = hauteur / n
+        for c in (-1, 1):
+            for i in range(n):
+                long = 0.3 if (i + (c > 0)) % 2 == 0 else 0.2
+                s.box(long, hp - 0.015, 0.16, at(c * (largeur / 2 - long / 2 + 0.03), hp / 2 + i * hp, 0.05), "pierre", T.pierre[(i + c + graine) % len(T.pierre)], tremble=0.008, sans="z-y-")
+        with s.groupe(at(0, 0.48 + oeil - 0.06, 0)):
+            horloge(s, T, diametre, graine, heure)
+        for c in (-1, 1):
+            s.box(0.12, hauteur, prof, at(c * (largeur / 2 - 0.06), hauteur / 2, -prof / 2), mat, T.mur[0], tremble=0.0, sans="y-y+z-z+" + ("x-" if c > 0 else "x+"))
+        # Larmier: la corniche de pierre qui rejette l'eau, sous le triangle du fronton.
+        s.box(largeur + 0.16, 0.13, 0.26, at(0, hauteur + 0.04, 0.06), "pierre", T.pierre[2], tremble=0.008, sans="z-y-")
+        q = math.radians(36)
+        a = largeur / 2 + 0.16
+        fleche = a * math.tan(q)
+        dessus = hauteur + 0.1
+        s.prisme([(-a + 0.1, dessus), (a - 0.1, dessus), (0, dessus + (a - 0.1) * math.tan(q))], 0.1, at(0, 0, -0.05), mat, T.mur[0], tremble=0.0, sans="z-", flancs=())
+        bande = a / math.cos(q) / 2
+        for c in (-1, 1):
+            for rg in range(2):
+                d = (rg + 0.5) * bande
+                x = c * (a - d * math.cos(q))
+                y = dessus + d * math.sin(q) + 0.06 + rg * 0.015
+                s.box(bande + 0.06, 0.07, prof + 0.3, at(x, y, -prof / 2 + 0.15, 0, 0, -c * (q - 0.1)), "tuile", choix(T.tuile, graine + rg + c), grain="z", tremble=0.01, sans="y-")
+        faitieres(s, T, (0, dessus + fleche + 0.08, 0.32), (0, dessus + fleche + 0.08, -prof + 0.1), graine, rayon=0.13, bout_bas=True)

@@ -45,6 +45,8 @@ const Opening = v.union([
     /** Hauteur du bas du tableau: l'ouverture sort alors du rang (baie de clocher). */
     bas: v.exactOptional(Metres),
     linteau: v.exactOptional(v.picklist(['bois', 'pierre'])),
+    /** Pourquoi une ouverture placée n'est pas au milieu de sa travée (sinon l'assembleur refuse). */
+    raison: v.exactOptional(v.pipe(v.string(), v.minLength(10), v.maxLength(200))),
   }),
 ]);
 const Openings = v.pipe(v.array(Opening), v.maxLength(8));
@@ -89,12 +91,14 @@ export const BUILDING_OPTIONS = [
   'croix',
   'escalier',
   'contrefort',
+  'bucher',
 ] as const;
 
 /** Une option: la pièce, puis où elle se pose et ses cotes (voir le gabarit commenté). */
 const Option = v.strictObject({
   piece: v.picklist(BUILDING_OPTIONS),
-  forme: v.exactOptional(v.picklist(['souche', 'four', 'potence', 'bandeau'])),
+  /** `fronton`: l'horloge (`pendule`) monte dans un fronton au-dessus de l'égout. */
+  forme: v.exactOptional(v.picklist(['souche', 'four', 'potence', 'bandeau', 'fronton'])),
   facade: v.exactOptional(Side),
   position: v.exactOptional(Fraction),
   hauteur: v.exactOptional(Metres),

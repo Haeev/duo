@@ -180,6 +180,8 @@ def main():
             **notice,
         }
         etat = "ok" if s.triangles <= notice["budget"] else "HORS BUDGET"
+        for signal in s.signalements:
+            print(f"BATIMENT {ident}: SIGNAL {signal}")
         print(f"BATIMENT {ident}: {s.triangles} triangles (budget {notice['budget']}, économie {notice['economie']}), {os.path.getsize(chemin) // 1024} Ko, {etat}")
         if s.triangles > notice["budget"]:
             erreurs += 1

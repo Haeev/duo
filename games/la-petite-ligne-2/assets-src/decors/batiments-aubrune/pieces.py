@@ -44,6 +44,7 @@ def teintes(nuancier: dict, finition: str, couleurs: dict) -> SimpleNamespace:
         finition=finition,
         pierre=[hexa(c) for c in fixes["pierre_de_taille"]],
         tuile=[hexa(c) for c in nuancier["toit"][toit]],
+        lauze=toit == "lauze",
         bois=[hexa(c) for c in fixes["bois"]],
         bois_clair=[hexa(c) for c in fixes["bois_clair"]],
         volet=p("volets", "bleu_vert"),
@@ -139,11 +140,11 @@ def peau_de_mur(s: Atelier, T, longueur, hauteur, trous, profil=None, graine=0):
 
 
 # ---------------------------------------------------------------------------- pierres
-def moellons_bas(s: Atelier, T, x0, x1, graine, trous=()):
-    """Soubassement: deux assises de moellons qui dépassent du mur de 5 à 11 cm, un à un.
-    `trous`: intervalles (a, b) laissés libres (portes, baies)."""
-    for rang in (0, 1):
-        x = x0 - 0.06 - (0.24 if rang == 1 else 0)
+def moellons_bas(s: Atelier, T, x0, x1, graine, trous=(), rangs=2):
+    """Soubassement: deux (ou trois) assises de moellons qui dépassent du mur de 5 à 11 cm, un
+    à un. `trous`: intervalles (a, b) laissés libres (portes, baies)."""
+    for rang in range(rangs):
+        x = x0 - 0.06 - (0.24 if rang % 2 == 1 else 0)
         k = 0
         while x < x1 + 0.04:
             g = rang * 97 + k * 13 + graine
@@ -155,7 +156,7 @@ def moellons_bas(s: Atelier, T, x0, x1, graine, trous=()):
             suivant = min((t[0] for t in trous if t[0] > x), default=None)
             if suivant is not None:
                 long = min(long, suivant - x)
-            sort = 0.05 + tirage(g + 1) * 0.06
+            sort = 0.05 + tirage(g + 1) * 0.06 - 0.02 * max(0, rang - 1)
             if long > 0.1:
                 s.box(long - 0.02, 0.27, 0.2, at(x + long / 2, 0.14 + rang * 0.28, sort - 0.1), "pierre", choix(T.pierre, g + 2), tremble=0.016, sans="z-y-")
             x += max(long, 0.05)
@@ -192,6 +193,31 @@ def pierres_nues(s: Atelier, T, x, y, graine):
     for i in range(4):
         rang = i >> 1
         moellon(s, T, x + (i % 2) * 0.44 + rang * 0.18, y + rang * 0.23, 0.3 + tirage(graine + i) * 0.14, 0.2, graine + i * 3)
+
+
+def reprise_d_enduit(s: Atelier, T, x, y, largeur, hauteur, graine):
+    """Une reprise d'enduit: un pan refait plus tard, d'un ton voisin, en léger relief (8 mm),
+    aux bords irréguliers (deux ou trois plaques qui se chevauchent)."""
+    for k in range(3):
+        g = graine + k * 5
+        w = largeur * (0.55 + tirage(g) * 0.45)
+        h = hauteur * (0.5 + tirage(g + 1) * 0.5)
+        dx = (tirage(g + 2) - 0.5) * (largeur - w)
+        dy = (tirage(g + 3) - 0.5) * (hauteur - h)
+        s.box(w, h, 0.016, at(x + dx, y + dy, 0.004 + k * 0.003, 0, 0, penche(g + 4, 0.03)), T.mur_mat, choix(T.mur, g + 1 + k), tremble=0.004, sans="z-")
+
+
+def lezarde(s: Atelier, T, x, y, graine, long=0.9, sens=1):
+    """Une lézarde: un trait sombre en zigzag qui part d'un angle d'ouverture (là où le mur
+    travaille) et monte en biais. Origine: son départ, sur le nu du mur."""
+    n = 4
+    pas = long / n
+    for k in range(n):
+        a = math.radians(62 + (22 if k % 2 else -14) + penche(graine + k, 6))
+        dx, dy = sens * math.cos(a) * pas, math.sin(a) * pas
+        s.box(pas + 0.015, 0.024 - k * 0.004, 0.01, at(x + dx / 2, y + dy / 2, 0.006, 0, 0, math.atan2(dy, dx)), T.mur_mat, fonce(T.mur[0], 0.5), tremble=0.0, sans="z-")
+        x += dx
+        y += dy
 
 
 # ---------------------------------------------------------------------------- fenêtres
@@ -317,8 +343,8 @@ def porte(s: Atelier, T, modele="pleine", linteau="bois", graine=0, marches=1):
     s.box(0.09, 0.22, 0.07, at(demi - 0.14, SEUIL + 1.0, z + 0.06), "metal", T.laiton, tremble=0.004, sans="z-y-")
 
 
-def trou_porte(T, x, modele="pleine"):
-    y0, y1 = SEUIL, SEUIL + PORTE_HAUT
+def trou_porte(T, x, modele="pleine", niveau=0.0):
+    y0, y1 = niveau + SEUIL, niveau + SEUIL + PORTE_HAUT
     fond = [(y0, y1, "bois", T.fond)]
     if modele == "vitree":
         fond = [(y0, y0 + 0.95, "bois", T.fond), (y0 + 0.95, y1, "vitre", T.vitre)]
@@ -430,21 +456,50 @@ def descente(s: Atelier, T, haut, graine=0):
 
 
 # ---------------------------------------------------------------------------- cheminées
+CHAPEAU_PIEDS = 0.24
+"""Hauteur des pieds du chapeau: le jour entre le conduit et la tôle, par où sort la fumée."""
+CHAPEAU_PENTE = math.radians(32)
+
+
+def chapeau_de_cheminee(s: Atelier, T, largeur, profondeur, graine=0, debord=0.13):
+    """Chapeau de tôle à deux pans posé sur quatre pieds de fer au-dessus du conduit: le petit
+    toit qui arrête la pluie sans gêner le tirage. Faîtage le long de x; pans de zinc qui
+    débordent du conduit de `debord`, ourlet sombre à l'égout et couvre-joint au faîte, pour que
+    les deux pans se lisent de haut. Origine: milieu du dessus du conduit; `largeur` x
+    `profondeur`: l'écartement des pieds."""
+    pied = CHAPEAU_PIEDS + debord * math.tan(CHAPEAU_PENTE) + 0.01
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            s.box(0.05, pied, 0.05, at(sx * largeur / 2, pied / 2, sz * profondeur / 2), "metal", T.fer, tremble=0.002, sans="y-y+")
+    demi = profondeur / 2 + debord
+    long = largeur + 2 * debord
+    rampant = demi / math.cos(CHAPEAU_PENTE)
+    fleche = demi * math.tan(CHAPEAU_PENTE)
+    base = CHAPEAU_PIEDS
+    for cote in (-1, 1):
+        # Le pan: une tôle de 3 cm, du faîte (z = 0) à l'égout (z = cote * demi).
+        s.box(long, 0.03, rampant, at(0, base + fleche / 2 + 0.015, cote * demi / 2, 0, cote * CHAPEAU_PENTE), "metal", T.zinc if cote > 0 else fonce(T.zinc, 0.9), tremble=0.003)
+        s.box(long + 0.01, 0.04, 0.04, at(0, base + 0.01, cote * (demi - 0.01)), "metal", T.fer, tremble=0.002, sans="y-")
+    s.box(long + 0.03, 0.05, 0.07, at(0, base + fleche + 0.035, 0), "metal", fonce(T.zinc, 0.8), tremble=0.002, sans="y-")
+
+
 def cheminee_souche(s: Atelier, T, hauteur=1.9, graine=0):
-    """Souche de cheminée maçonnée: couronne de pierres, dalle de couverture, mitre de terre
-    cuite. Origine: axe de la souche, `hauteur` sous son sommet (elle part de sous le toit)."""
+    """Souche de cheminée maçonnée: couronne de pierres, dalle de couverture, chapeau de tôle
+    sur ses quatre pieds. Origine: axe de la souche, `hauteur` sous son sommet (elle part de
+    sous le toit)."""
     s.box(0.66, hauteur, 0.66, at(0, hauteur / 2, 0), T.mur_mat if T.mur_mat != "bardage" else "moellon", T.mur[0] if T.mur_mat != "bardage" else T.pierre[1], tremble=0.03, sans="y-y+")
     for i in range(4):
         a = i * math.pi / 2
         s.box(0.5, 0.2, 0.2, at(math.sin(a) * 0.27, hauteur - 0.05, math.cos(a) * 0.27, a), "pierre", T.pierre[i], tremble=0.015, sans="y-")
     s.box(0.86, 0.1, 0.86, at(0, hauteur + 0.1, 0, 0.05), "pierre", T.pierre[2], tremble=0.02, sans="y-")
-    s.cyl(0.13, 0.16, 0.34, 6, at(0, hauteur + 0.3, 0), "tuile", T.tuile[-1], tremble=0.01)
+    with s.groupe(at(0, hauteur + 0.15, 0)):
+        chapeau_de_cheminee(s, T, 0.6, 0.6, graine)
 
 
 def cheminee_de_four(s: Atelier, T, hauteur=6.0, graine=0, epaule=2.3):
     """Cheminée de four ou de forge, adossée au mur depuis le sol: massif du foyer, épaule en
-    glacis, conduit de pierre, couronne de briques et mitre de deux tuiles. Origine: pied, sur
-    le nu du mur."""
+    glacis, conduit de pierre, couronne de briques et chapeau de tôle sur quatre pieds.
+    Origine: pied, sur le nu du mur."""
     s.box(1.5, epaule, 0.62, at(0, epaule / 2, 0.29), "moellon", T.pierre[1], tremble=0.03, sans="z-y-y+")
     for rang in range(2):
         x = -0.78
@@ -462,18 +517,58 @@ def cheminee_de_four(s: Atelier, T, hauteur=6.0, graine=0, epaule=2.3):
         s.box(0.34, 0.3, 0.64, at(cote * 0.3, epaule + 1.0 + i * 0.9, 0.28), "pierre", T.pierre[(i + graine) % 4], tremble=0.014, sans="y-")
     haut = epaule + 0.55 + conduit
     s.box(1.02, 0.24, 0.72, at(0, haut + 0.02, 0.28), "tuile", T.brique, tremble=0.016, sans="y-")
-    for cote in (-1, 1):
-        s.box(0.5, 0.05, 0.6, at(cote * 0.2, haut + 0.32, 0.28, 0, 0, cote * 0.75), "tuile", T.tuile[(cote + 1) // 2], tremble=0.01)
+    with s.groupe(at(0, haut + 0.14, 0.28)):
+        chapeau_de_cheminee(s, T, 0.84, 0.56, graine)
 
 
 # ---------------------------------------------------------------------------- détails propres
-def pendule(s: Atelier, T, diametre=0.9, graine=0):
-    """Pendule de façade: boîte de bois, cadran clair, deux aiguilles. Origine: centre, au mur."""
+CADRAN = "#F3EDE0"
+
+
+def heure_de(graine) -> tuple[int, int]:
+    """Une heure de jour plausible (8 h à 17 h 55), propre à chaque horloge."""
+    return 8 + int(tirage(graine + 0.3) * 10), 5 * int(tirage(graine + 0.7) * 12)
+
+
+def horloge(s: Atelier, T, diametre=0.8, graine=0, heure=None):
+    """Horloge de façade: cadran rond de tôle émaillée dans un œil-de-bœuf de claveaux de
+    pierre (clé en haut, appui mouluré en bas), lunette de laiton en saillie, douze repères
+    d'heures (ceux de 12, 3, 6 et 9 plus forts), aiguille des heures courte et large, aiguille
+    des minutes longue et fine, sur une heure plausible. Trois plans de relief: la pierre
+    avance de 16 cm, le cadran est 6 cm en retrait d'elle, la lunette et les aiguilles en
+    ressortent. Origine: centre du cadran, au nu du mur."""
     r = diametre / 2
-    s.cyl(r + 0.08, r + 0.08, 0.16, 10, at(0, 0, 0.08, 0, math.pi / 2, 0), "volet", T.enseigne, tremble=0.006)
-    s.cyl(r, r, 0.03, 10, at(0, 0, 0.17, 0, math.pi / 2, 0), "volet", hexa("#F3EDE0"), tremble=0.003)
-    s.box(0.045, r * 0.62, 0.02, at(0.0, r * 0.28, 0.195, 0, 0, -0.5), "metal", T.fer, tremble=0.002, sans="z-")
-    s.box(0.04, r * 0.85, 0.02, at(-0.03, r * 0.3, 0.195, 0, 0, 1.2), "metal", T.fer, tremble=0.002, sans="z-")
+    z_cadran = 0.1
+    # L'œil-de-bœuf: douze claveaux rayonnants, la clé plus haute; ils portent le cadran.
+    n = 12
+    epais = max(0.14, r * 0.38)
+    for i in range(n):
+        a = i * 2 * math.pi / n
+        cle = i == 0
+        rayon = r + 0.04 + epais / 2
+        long = 2 * math.pi * (r + 0.04 + epais) / n - 0.02
+        s.box(long, epais + (0.05 if cle else 0.0), 0.16, at(math.sin(a) * (rayon + (0.025 if cle else 0)), math.cos(a) * (rayon + (0.025 if cle else 0)), 0.08, 0, 0, -a), "pierre", T.pierre[(i + graine) % len(T.pierre)], tremble=0.008, sans="z-")
+    s.box(r * 2 + 0.3, 0.1, 0.24, at(0, -(r + 0.04 + epais) - 0.04, 0.1), "pierre", T.pierre[2], tremble=0.008, sans="z-y-")
+    # Le fond du cadran et la lunette.
+    s.cyl(r + 0.05, r + 0.05, 0.04, 24, at(0, 0, z_cadran - 0.02, 0, math.pi / 2, 0), "metal", hexa(CADRAN), grain=None, tremble=0.0)
+    m = 24
+    for i in range(m):
+        a = i * 2 * math.pi / m
+        s.box(2 * math.pi * (r + 0.03) / m + 0.006, 0.05, 0.05, at(math.sin(a) * (r + 0.03), math.cos(a) * (r + 0.03), z_cadran + 0.025, 0, 0, -a), "metal", T.laiton, tremble=0.0, sans="z-")
+    # Les douze repères: des bâtons sombres, plus longs et plus larges aux quarts.
+    for h in range(12):
+        a = h * math.pi / 6
+        fort = h % 3 == 0
+        long = r * (0.24 if fort else 0.15)
+        rayon = r * 0.86 - long / 2
+        s.box(r * (0.075 if fort else 0.045), long, 0.012, at(math.sin(a) * rayon, math.cos(a) * rayon, z_cadran + 0.006, 0, 0, -a), "metal", T.fer, tremble=0.0, sans="z-")
+    # Les aiguilles: chaque boîte part du centre (avec une courte queue) vers son angle.
+    hh, mm = heure if heure is not None else heure_de(graine)
+    for angle, long, large, dz in (((hh % 12 + mm / 60) * math.pi / 6, r * 0.52, r * 0.1, 0.02), (mm * math.pi / 30, r * 0.8, r * 0.055, 0.034)):
+        queue = r * 0.14
+        milieu = (long - queue) / 2
+        s.box(large, long + queue, 0.012, at(math.sin(angle) * milieu, math.cos(angle) * milieu, z_cadran + dz, 0, 0, -angle), "metal", T.fer, tremble=0.0, sans="z-")
+    s.cyl(r * 0.07, r * 0.07, 0.03, 8, at(0, 0, z_cadran + 0.045, 0, math.pi / 2, 0), "metal", T.laiton, grain=None, tremble=0.0)
 
 
 def drapeau(s: Atelier, T, graine=0):
@@ -510,7 +605,8 @@ def bassin(s: Atelier, T, longueur=3.2, largeur=1.8, graine=0):
         n = max(2, round(longueur / 0.9))
         for i in range(n):
             lw = longueur / n
-            s.box(lw - 0.02, h, 0.4, at(-longueur / 2 + (i + 0.5) * lw, h / 2, cote * (largeur / 2 - 0.2), 0, cote * -0.12, 0), "pierre", T.pierre[(i + cote + graine) % 4], tremble=0.018, sans="y-")
+            # Inclinée vers l'eau, la margelle est relevée de 3 cm: son arête basse ne s'enfonce pas.
+            s.box(lw - 0.02, h, 0.4, at(-longueur / 2 + (i + 0.5) * lw, h / 2 + 0.03, cote * (largeur / 2 - 0.2), 0, cote * -0.12, 0), "pierre", T.pierre[(i + cote + graine) % 4], tremble=0.012, sans="y-")
     for cote in (-1, 1):
         s.box(0.36, h, largeur - 0.8, at(cote * (longueur / 2 - 0.18), h / 2, 0), "pierre", T.pierre[(cote + 2 + graine) % 4], tremble=0.018, sans="y-")
     s.box(longueur - 0.7, 0.04, largeur - 0.78, at(0, h - 0.16, 0), "vitre", T.eau, tremble=0.0, sans="y-x-x+z-z+")
@@ -534,6 +630,38 @@ def abat_sons(s: Atelier, T, largeur=1.1, hauteur=2.2, graine=0):
         s.box(largeur, 0.04, 0.3, at(0, (i + 0.5) * hauteur / n, -0.03, 0, 0.7, 0), "bois", choix(T.bois, i + graine), grain="x", tremble=0.008, sans="x-x+")
 
 
+def bucher(s: Atelier, T, longueur=2.2, profondeur=0.7, hauteur=1.5, graine=0):
+    """Bûcher adossé au mur: bûches empilées sur deux traverses (le bois ne touche pas la
+    terre), tenues par deux poteaux, sous un appentis de planches qui les garde au sec; de haut,
+    un petit toit de plus contre la maison. Origine: pied du mur, au milieu du bûcher."""
+    demi = longueur / 2
+    for z in (0.12, profondeur - 0.1):
+        s.box(longueur, 0.09, 0.09, at(0, 0.045, z), "bois", T.bois[1], grain="x", tremble=0.008, sans="y-")
+    # La pile: un massif de bois sombre, puis les bouts des bûches en quinconce sur le devant.
+    s.box(longueur - 0.08, hauteur - 0.1, profondeur - 0.12, at(0, 0.09 + (hauteur - 0.1) / 2, (profondeur - 0.12) / 2), "bois", fonce(T.bois[0], 0.7), grain="x", tremble=0.01, sans="y-z-")
+    r = 0.095
+    pas_y = 2 * r * 0.9
+    rangs = int((hauteur - 0.12) / pas_y)
+    for rg in range(rangs):
+        decale = r if rg % 2 else 0.0
+        n = int((longueur - 0.12 - decale) / (2 * r))
+        for k in range(n):
+            g = graine + rg * 17 + k
+            rr = r * (0.78 + 0.22 * tirage(g))
+            x = -demi + 0.06 + r + decale + k * 2 * r
+            y = 0.09 + r + rg * pas_y
+            s.cyl(rr, rr, 0.05, 5, at(x, y, profondeur - 0.1 + tirage(g + 1) * 0.04, tirage(g + 2) * 1.2, math.pi / 2, 0), "bois", choix(T.bois_clair, g + 3), grain=None, tremble=0.006)
+    haut_mur, haut_bord = hauteur + 0.45, hauteur + 0.18
+    for c in (-1, 1):
+        poteau(s, T, haut_bord, c * (demi + 0.04), profondeur + 0.04, graine + c, section=0.1)
+    pente = math.atan2(haut_mur - haut_bord, profondeur + 0.25)
+    long = (profondeur + 0.25) / math.cos(pente)
+    n = max(3, round((longueur + 0.4) / 0.24))
+    for k in range(n):
+        x = -demi - 0.2 + (k + 0.5) * (longueur + 0.4) / n
+        s.box((longueur + 0.4) / n - 0.015, 0.035, long, at(x, (haut_mur + haut_bord) / 2 + 0.03, (profondeur + 0.25) / 2, 0, pente, penche(graine + k, 0.02)), "bardage", choix(T.bois, graine + k), grain="z", tremble=0.006)
+
+
 def contrefort(s: Atelier, T, hauteur=5.0, graine=0):
     """Contrefort d'église: un massif de pierres qui épaule le mur là où pousse la charpente,
     en deux ressauts coiffés d'un glacis qui rejette la pluie. Origine: pied, sur le nu du mur."""
@@ -554,20 +682,52 @@ def trou_haut(T, x, y, largeur, hauteur):
     return dict(x0=x - largeur / 2, x1=x + largeur / 2, y0=y, y1=y + hauteur, creux=CREUX_FENETRE + 0.06, fond=[(y, y + hauteur, "bois", T.fond)])
 
 
-def escalier(s: Atelier, T, hauteur=2.5, largeur=1.0, graine=0):
-    """Escalier extérieur de pierre le long du mur, montant vers la droite: marches de 17 cm
-    de haut et 28 cm de giron, palier en haut, garde-corps de fer. Origine: pied de la première
-    marche, sur le nu du mur."""
-    n = round(hauteur / SEUIL)
-    h = hauteur / n
-    giron = 0.28
-    for i in range(n):
-        s.box(giron + 0.03, h * (i + 1), largeur, at((i + 0.5) * giron, h * (i + 1) / 2, largeur / 2), "pierre", T.pierre[(i + graine) % 4], tremble=0.008, sans="z-y-x+")
-    s.box(1.1, hauteur, largeur, at(n * giron + 0.55, hauteur / 2, largeur / 2), "pierre", T.pierre[1], tremble=0.01, sans="z-y-x-")
-    long = math.hypot(n * giron, hauteur)
-    pente = math.atan2(hauteur, n * giron)
-    s.box(long, 0.05, 0.05, at(n * giron / 2, hauteur / 2 + 0.95, largeur - 0.04, 0, 0, pente), "metal", T.fer, tremble=0.004)
-    s.box(1.1, 0.05, 0.05, at(n * giron + 0.55, hauteur + 0.95, largeur - 0.04), "metal", T.fer, tremble=0.004)
-    for i in range(0, n + 1, 3):
-        s.box(0.04, 0.95, 0.04, at(min(i, n) * giron + 0.1, h * min(i + 1, n) + 0.47, largeur - 0.04), "metal", T.fer, tremble=0.003, sans="y-y+")
-    s.box(0.04, 0.95, 0.04, at(n * giron + 1.05, hauteur + 0.47, largeur - 0.04), "metal", T.fer, tremble=0.003, sans="y-y+")
+ESCALIER_CONTREMARCHE = 0.19
+"""Contremarche la plus haute admise: un escalier de service, raide mais à taille humaine."""
+ESCALIER_GIRON = 0.25
+"""Giron: 2 x 19 + 25 = 63 cm, dans la règle du pas (60 à 64 cm)."""
+PALIER = (-0.6, 0.75)
+"""Le palier, depuis l'axe de la porte servie: il passe devant toute la baie et son jambage droit."""
+
+
+def marches_d_escalier(hauteur: float) -> tuple[int, float]:
+    """Nombre de contremarches et leur hauteur pour monter à `hauteur`."""
+    n = max(2, math.ceil(hauteur / ESCALIER_CONTREMARCHE - 1e-6))
+    return n, hauteur / n
+
+
+def volee(hauteur: float) -> float:
+    """Longueur de la volée, du nez de la première marche au palier."""
+    n, _h = marches_d_escalier(hauteur)
+    return (n - 1) * ESCALIER_GIRON
+
+
+def escalier(s: Atelier, T, hauteur=2.47, largeur=1.0, graine=0):
+    """Escalier extérieur de pierre le long d'un mur, qui dessert une porte d'étage: palier
+    devant la porte, volée qui descend vers la gauche (vu de dehors), massif de moellons
+    dessous, marches de pierre une à une (19 cm au plus, giron de 25 cm), garde-corps de fer
+    (main courante, lisse basse, poteaux) le long du vide et au bout du palier.
+    Origine: axe de la porte servie, au pied du mur; `hauteur`: dessus du palier (seuil)."""
+    n, h = marches_d_escalier(hauteur)
+    x_pal, x_fin = PALIER
+    x_pied = x_pal - (n - 1) * ESCALIER_GIRON
+    # Massifs: le palier sur son mur de moellons, la volée sur son triangle de maçonnerie.
+    s.box(x_fin - x_pal, hauteur - 0.12, largeur, at((x_pal + x_fin) / 2, (hauteur - 0.12) / 2, largeur / 2), "moellon", T.pierre[1], tremble=0.01, sans="z-y-x-")
+    s.box(x_fin - x_pal + 0.04, 0.12, largeur + 0.05, at((x_pal + x_fin) / 2 + 0.02, hauteur - 0.06, largeur / 2 + 0.025), "pierre", T.pierre[2], tremble=0.008, sans="z-y-")
+    s.prisme([(x_pied, 0), (x_pal, 0), (x_pal, hauteur - h - 0.04)], largeur, at(0, 0, largeur / 2), "moellon", T.pierre[3], tremble=0.0, sans="z-", flancs=())
+    for i in range(n - 1):
+        haut = (i + 1) * h
+        epais = min(h + 0.1, haut)
+        s.box(ESCALIER_GIRON + 0.03, epais, largeur + 0.04, at(x_pied + (i + 0.5) * ESCALIER_GIRON - 0.015, haut - epais / 2, largeur / 2 + 0.02), "pierre", T.pierre[(i + graine) % len(T.pierre)], tremble=0.008, sans="z-y-x+")
+    # Garde-corps: le long du vide (bord extérieur), puis au bout du palier, jusqu'au mur.
+    zr = largeur - 0.03
+    pente = math.atan2(hauteur - h, x_pal - x_pied)
+    long = math.hypot(x_pal - x_pied, hauteur - h)
+    for dessus, epais in ((0.92, 0.055), (0.45, 0.04)):
+        s.box(long, epais, epais, at((x_pied + x_pal) / 2, (h + hauteur) / 2 + dessus, zr, 0, 0, pente), "metal", T.fer, tremble=0.003)
+        s.box(x_fin - x_pal + 0.05, epais, epais, at((x_pal + x_fin) / 2, hauteur + dessus, zr), "metal", T.fer, tremble=0.003)
+        s.box(epais, epais, zr - 0.03, at(x_fin - 0.03, hauteur + dessus, (zr + 0.03) / 2), "metal", T.fer, tremble=0.003)
+    poteaux = [x_pied + 0.06 + k * (x_pal - x_pied - 0.06) / 3 for k in range(4)] + [x_fin - 0.03]
+    for x in poteaux:
+        sol = h + (x - x_pied) * math.tan(pente) if x < x_pal - 1e-6 else hauteur
+        s.box(0.045, 0.95, 0.045, at(x, sol + 0.475, zr), "metal", T.fer, tremble=0.002, sans="y-y+")

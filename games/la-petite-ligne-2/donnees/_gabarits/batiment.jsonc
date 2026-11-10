@@ -36,7 +36,12 @@
   // fenetre-nue (sans volets), petite-fenetre, vitrine, porte-service, grange, cochere, baie,
   // vitrail, abat-sons. Pour imposer une place ou une cote:
   //   { "type": "vitrine", "largeur": 1.7, "position": 0.25 }
-  // Un étage qui a autant d'ouvertures que le rez-de-chaussée s'aligne sur lui.
+  // Règle des travées: chaque ouverture se met au milieu de sa travée (entre ses voisines, les
+  // angles, les contreforts et la cheminée adossée), et les étages se posent sur les axes du
+  // rez-de-chaussée (au-dessus des fenêtres plutôt que des portes, symétriques si le bas l'est).
+  // Une ouverture placée hors du milieu de sa travée est refusée, sauf avec sa "raison":
+  //   { "type": "fenetre-nue", "position": 0.3, "raison": "la pendule occupe l'autre moitié du mur" }
+  // Une porte d'étage ("porte-service" à "etage") demande son "escalier" à la même position.
   "facades": {
     "sud": { "rdc": ["fenetre", "porte", "fenetre"], "etage": ["fenetre", "fenetre", "fenetre"] },
     "nord": { "rdc": ["fenetre-etroite"], "etage": ["fenetre", "fenetre"] },
@@ -49,10 +54,14 @@
   //   { "piece": "lucarne", "facade": "sud", "position": 0.5 }       côté égout seulement
   //   { "piece": "enseigne", "forme": "potence", "facade": "sud", "position": 0.5, "hauteur": 3.9 }   ou "bandeau"
   //   { "piece": "auvent", "facade": "est", "position": 0.5, "largeur": 3, "profondeur": 1.6, "accroche": 2.9 }
-  //   { "piece": "pendule" | "drapeau", "facade": "sud", "position": 0.5, "hauteur": 3.9 }
+  //   { "piece": "pendule" | "drapeau", "facade": "sud", "position": 0.5, "hauteur": 3.9 }   horloge murale
+  //   { "piece": "pendule", "forme": "fronton", "facade": "sud", "position": 0.5, "diametre": 0.7 }   dans un fronton, côté égout
+  //   { "piece": "bucher", "facade": "est", "position": 0.5, "longueur": 2.2, "hauteur": 1.5 }   contre un mur aveugle
   //   { "piece": "roue", "facade": "sud", "position": 0.5, "diametre": 5 }     roue de moulin
   //   { "piece": "bassin", "x": 0, "y": 0, "longueur": 3.2, "largeur": 1.8, "rotation": 90 }
-  //   { "piece": "contrefort" | "escalier", "facade": "nord", "position": 0.3, "monte": 4.7 }
+  //   { "piece": "contrefort", "facade": "nord", "position": 0.3, "monte": 4.7 }   borne une travée
+  //   { "piece": "escalier", "facade": "ouest", "position": 0.67 }   palier devant la porte d'étage
+  //     placée là, volée qui descend vers la gauche (vue de dehors), garde-corps
   //   { "piece": "croix" }                                            au sommet du toit
   // Un second corps (clocher, aile): "annexes": [{ "nom": "...", "place": { "x", "y", "largeur",
   // "profondeur" } dans l'emprise, puis les mêmes champs que ci-dessus }]; le corps principal

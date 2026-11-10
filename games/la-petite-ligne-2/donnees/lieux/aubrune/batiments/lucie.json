@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "lucie",
   "nom": "la maison de Lucie",
-  "detail": "petite maison crépie aux volets bleus, porte au nord sur la rue, lucarne au midi",
+  "detail": "petite maison crépie aux volets miel, porte au nord sur la rue, lucarne au midi",
   "emprise": {
     "largeur": 6,
     "profondeur": 6
@@ -12,8 +12,8 @@
   "couleurs": {
     "murs": "enduit",
     "toit": "tuile",
-    "volets": "bleu",
-    "porte": "bleu"
+    "volets": "miel",
+    "porte": "miel"
   },
   "toit": {
     "forme": "deux-pans",
@@ -27,7 +27,7 @@
   "facades": {
     "nord": {
       "rdc": ["porte", "fenetre-etroite"],
-      "etage": ["fenetre", "fenetre"]
+      "etage": ["fenetre-etroite", "fenetre-etroite"]
     },
     "sud": {
       "rdc": ["fenetre", "fenetre"],
