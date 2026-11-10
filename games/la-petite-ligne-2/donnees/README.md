@@ -9,11 +9,8 @@ commun/        reglages.json, besoins.json, sacs.json
                personnages/catalogue.json (écrit par le générateur de pièces, lot L5)
 lieux/<lieu>/  lieu.json, carte.json
                habitants/<id>.json   dialogues/<id>.json   commerces/<id>.json   quetes/<id>.json
-<<<<<<< HEAD
                interieurs/<id>.json (pièces posées sur la grille du lieu, sous le dehors)
-=======
                scenes/<id>.json
->>>>>>> worktree-agent-a5d24b99248e3b99b
 _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le jeu)
 ```
 
@@ -25,7 +22,6 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 
 ## Recettes par type
 
-<<<<<<< HEAD
 | Type                | Commande                                                                                                             | Ensuite                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Objet               | `pnpm nouveau objet poire`                                                                                           | famille, pile, `food` s'il se mange. Il est connu du sac, des commerces et des effets.                                                                                                                                                                                                                                                                                         |
@@ -38,25 +34,11 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Culture             | `pnpm nouveau culture carotte`                                                                                       | graine (objet `seed`), saisons, stades en points de pousse (jour sec 1, arrosé 2), récolte unique ou qui repousse, qualités. Elle pousse sur tout meuble à brique `field`.                                                                                                                                                                                                     |
 | Ressource           | `pnpm nouveau ressource noisetier`                                                                                   | geste, outil et niveau minimal, travail, repousse en jours, table de butin (heures, météos, saisons, rare). Pour la poser: un meuble avec la brique `{ "brick": "harvest", "resource": "noisetier" }`, puis une ligne dans la carte.                                                                                                                                           |
 | Commerce            | `pnpm nouveau commerce epicerie aubrune`                                                                             | tenancier, horaires, ventes (stock, réassort, déblocage, paiement), rachats à son prix (objet, coefficient, famille), plafond du jour, besoin du jour, amitié. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte, ou l'effet `open_shop` dans un dialogue du commerçant. Identifiant unique dans tout le jeu. Moteur: `src/simulation/commerces/README.md`. |
-| Quête               | `pnpm nouveau quete le-train-de-5h12 aubrune`                                                                        | chapitres, étapes, conditions de fin, effets.                                                                                                                                                                                                                                                                                                                                  |
+| Quête               | `pnpm nouveau quete le-train-de-5h12 aubrune`                                                                        | actes, étapes (ordonnées ou en parallèle par `after`), conditions de fin, effets, ligne du carnet, repère du coup d'œil. Le validateur refuse une suite qui peut se bloquer. Moteur: `src/simulation/quetes/README.md`.                                                                                                                                                        |
+| Scène               | `pnpm nouveau scene la-sonnerie aubrune`                                                                             | temps (répliques, marches, caméra, fondu, attente d'une action, effets), rôles pour une scène à deux asymétrique. Se lance par l'effet `play_scene` d'une étape ou par son `trigger` (heure, histoire, présence des deux). Exemple jouable: `lieux/essai-gare/quetes/sonnerie-essai.json`.                                                                                     |
 | Lieu                | `pnpm nouveau lieu hautefonte`                                                                                       | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier.                                                                                                                                                                                                                                            |
 | Grand lieu          | `pnpm nouveau lieu hautefonte`, puis `node outils/plan-vers-lieu.ts <plan.json> donnees/lieux/hautefonte/carte.json` | le plan vu du dessus du level designer est la source de `carte.json` (ADR 0022): ne pas retoucher la carte produite, corriger le plan et relancer. Les meubles s'ajoutent dans `objects` (400 meubles à briques au plus par lieu).                                                                                                                                             |
 | Intérieur           | `pnpm nouveau interieur salle-du-cafe aubrune`                                                                       | taille, `at` dans l'annexe sous le dehors (`outdoor` de la carte), murs, points, meubles, portes; la porte du dehors s'écrit dans `doors` de `carte.json` et les deux portes se nomment l'une l'autre.                                                                                                                                                                         |
-=======
-| Type | Commande | Ensuite |
-|---|---|---|
-| Objet | `pnpm nouveau objet poire` | famille, pile, `food` s'il se mange. Il est connu du sac, des commerces et des effets. |
-| Meuble | `pnpm nouveau meuble chaise` | taille, briques. Pour le voir: une ligne dans `objects` de la carte d'un lieu, ou `placeable: true` pour le mode déco. Modèle: nœud `model` à livrer par l'artiste; en attendant, une forme simple. |
-| Pièce de personnage | générateur du lot L5 (écrit `catalogue.json` et le GLB) | `pnpm nouveau piece-de-personnage <id>` ajoute une entrée d'essai à la main. |
-| Habitant | `pnpm nouveau habitant facteur aubrune` | nom, caractère, point de la carte où il se tient, apparence. |
-| Dialogue | `pnpm nouveau dialogue bonjour-facteur aubrune` | `villager`, conditions, nœuds. 150 caractères par réplique, 3 options au plus, toujours une fin. |
-| Recette | `pnpm nouveau recette compote` | poste, ingrédients, résultat (des objets existants). |
-| Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
-| Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
-| Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | actes, étapes (ordonnées ou en parallèle par `after`), conditions de fin, effets, ligne du carnet, repère du coup d'œil. Le validateur refuse une suite qui peut se bloquer. Moteur: `src/simulation/quetes/README.md`. |
-| Scène | `pnpm nouveau scene la-sonnerie aubrune` | temps (répliques, marches, caméra, fondu, attente d'une action, effets), rôles pour une scène à deux asymétrique. Se lance par l'effet `play_scene` d'une étape ou par son `trigger` (heure, histoire, présence des deux). Exemple jouable: `lieux/essai-gare/quetes/sonnerie-essai.json`. |
-| Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |
->>>>>>> worktree-agent-a5d24b99248e3b99b
 
 ## Briques (ce qu'un meuble sait faire)
 

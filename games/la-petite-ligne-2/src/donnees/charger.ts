@@ -31,11 +31,8 @@ import {
 import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
-<<<<<<< HEAD
 import { CropSchema, ResourceSchema, type CropDef, type ResourceDef } from './schemas/recolte';
-=======
 import { SceneSchema, type SceneDef } from './schemas/scene';
->>>>>>> worktree-agent-a5d24b99248e3b99b
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
 import { validateContent } from './valider';
@@ -167,13 +164,10 @@ export function loadContent(files: Files): Content {
     );
     const shops = parseFolder(ShopSchema, files, `${base}/commerces`, problems);
     const quests = parseFolder(QuestLineSchema, files, `${base}/quetes`, problems);
-<<<<<<< HEAD
     const interiors = Object.values(
       parseFolder(InteriorSchema, files, `${base}/interieurs`, problems),
     );
-=======
     const scenes = parseFolder(SceneSchema, files, `${base}/scenes`, problems);
->>>>>>> worktree-agent-a5d24b99248e3b99b
     if (def === null || map === null) continue;
     // Un point ou une porte d'intérieur qui porterait le nom d'un autre l'écraserait à la fusion.
     const seen = new Set([...Object.keys(map.points), ...Object.keys(map.doors ?? {})]);
@@ -188,7 +182,6 @@ export function loadContent(files: Files): Content {
       problems.push(
         `${path}: l'identifiant « ${def.id} » doit être le nom du dossier « ${folder} »`,
       );
-<<<<<<< HEAD
     places[def.id] = {
       def,
       map: withInteriors(map, interiors),
@@ -197,10 +190,8 @@ export function loadContent(files: Files): Content {
       dialogues,
       shops,
       quests,
+      scenes,
     };
-=======
-    places[def.id] = { def, map, villagers, dialogues, shops, quests, scenes };
->>>>>>> worktree-agent-a5d24b99248e3b99b
   }
 
   if (

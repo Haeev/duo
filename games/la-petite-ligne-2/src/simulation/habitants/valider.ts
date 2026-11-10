@@ -5,6 +5,7 @@
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { VillagerDef } from '../../donnees/schemas/habitant';
+import type { Condition } from '../../donnees/schemas/regles';
 import type { Spot } from '../../donnees/schemas/vie-habitant';
 import { findObject, inRange, isUnconditional } from './planning';
 import { VILLAGERS } from './reglages';
@@ -29,15 +30,33 @@ function clock(minute: number): string {
   return `${String(Math.floor(minute / 60))} h ${String(minute % 60).padStart(2, '0')}`;
 }
 
+/** Contrôle d'une condition d'histoire, fourni par `donnees/valider.ts` (pas d'import circulaire). */
+export type ConditionCheck = (
+  content: Content,
+  c: Condition,
+  at: string,
+  problems: string[],
+) => void;
+
 function checkVillager(
   content: Content,
   place: PlaceContent,
   villager: VillagerDef,
   problems: string[],
+  condition: ConditionCheck | undefined,
 ): void {
   const life = villager.life;
   if (life === undefined) return;
   const file = `lieux/${place.def.id}/habitants/${villager.id}.json, life`;
+  if (condition !== undefined) {
+    life.schedule.forEach((entry, i) =>
+      entry.when?.forEach((c) =>
+        condition(content, c, `${file}, schedule ${String(i)}, when`, problems),
+      ),
+    );
+    life.arrives?.forEach((c) => condition(content, c, `${file}, arrives`, problems));
+    life.leaves?.forEach((c) => condition(content, c, `${file}, leaves`, problems));
+  }
   if (!(life.home in place.map.points))
     problems.push(`${file}: point « ${life.home} » (chez lui) absent de la carte`);
   const covered = new Uint8Array(DAY);
@@ -87,9 +106,10 @@ function checkVillager(
       problems.push(`${file}: aucune ligne ne le met au comptoir de « ${shop.id} »`);
 }
 
-export function validateVillagerLives(content: Content): string[] {
+export function validateVillagerLives(content: Content, condition?: ConditionCheck): string[] {
   const problems: string[] = [];
   for (const place of Object.values(content.places))
-    for (const villager of place.villagers) checkVillager(content, place, villager, problems);
+    for (const villager of place.villagers)
+      checkVillager(content, place, villager, problems, condition);
   return problems;
 }

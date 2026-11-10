@@ -269,7 +269,8 @@ describe('habitants', () => {
               id: 'voir',
               objective: 'Va voir le facteur.',
               target: { villager: 'facteur' },
-              done: [{ type: 'remembered', key: 'essai-gare.lettre' }],
+              // Fin atteignable (le validateur de quêtes refuse un fait que rien n'écrit).
+              done: [{ type: 'item_in_bag', item: 'pierre', count: 1 }],
               together: false,
               onStart: [],
               onDone: [],
@@ -380,6 +381,9 @@ describe('habitants', () => {
       gesture: null,
     };
     expect(() => loadContent(night)).toThrow(/à 3 h 00, il doit être chez lui/);
+    const story = filesWithVillager('facteur');
+    lifeOf(story, 'facteur').arrives = [{ type: 'item_in_bag', item: 'objet-fantome', count: 1 }];
+    expect(() => loadContent(story)).toThrow(/arrives: objet inconnu « objet-fantome »/);
   });
 
   it('état compact: vingt habitants au pire tiennent la tranche « lieu » sous son budget', () => {

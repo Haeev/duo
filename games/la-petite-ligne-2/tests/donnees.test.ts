@@ -47,14 +47,9 @@ describe('données du jeu', () => {
     expect(Object.keys(content.places).sort()).toEqual(['essai-gare', 'essai-halte']);
     expect(content.items.pomme?.stack).toBe(10);
     expect(content.bags.toolbarSlots).toBe(5);
-<<<<<<< HEAD
-    expect(content.places['essai-gare']?.dialogues.map((d) => d.id).sort()).toEqual([
-      'accueil',
-      'pose-de-signal',
-    ]);
-=======
-    expect(content.places['essai-gare']?.dialogues.map((d) => d.id)).toContain('accueil');
->>>>>>> worktree-agent-a5d24b99248e3b99b
+    const dialogueIds = content.places['essai-gare']?.dialogues.map((d) => d.id) ?? [];
+    expect(dialogueIds).toContain('accueil');
+    expect(dialogueIds).toContain('pose-de-signal');
     expect(Object.keys(content.props)).toEqual(
       expect.arrayContaining(['banc', 'chaise', 'pommier', 'pompe', 'tas-de-bois']),
     );
