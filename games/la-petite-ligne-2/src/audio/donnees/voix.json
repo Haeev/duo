@@ -1,0 +1,116 @@
+{
+  "timbres": {
+    "flute": { "file": "babil/flute.ogg", "rootMidi": 72 },
+    "clarinette": { "file": "babil/clarinette.ogg", "rootMidi": 67 },
+    "marimba": { "file": "babil/marimba.ogg", "rootMidi": 72 },
+    "basson": { "file": "babil/basson.ogg", "rootMidi": 55 },
+    "boite-a-musique": { "file": "babil/boite-a-musique.ogg", "rootMidi": 84 },
+    "ocarina": { "file": "babil/ocarina.ogg", "rootMidi": 72 }
+  },
+  "fallback": "medium",
+  "vowels": "aeiouyàâäéèêëîïôöùûüœ",
+  "punctuation": {
+    ".": { "semitones": -3, "length": 1.6, "gainDb": -2 },
+    ",": { "semitones": 2, "length": 1.2, "gainDb": -1 },
+    "?": { "semitones": 5, "length": 1.8, "gainDb": 0 },
+    "!": { "semitones": 3, "length": 1.4, "gainDb": 2 }
+  },
+  "voices": {
+    "medium": {
+      "timbre": "clarinette",
+      "tonicMidi": 64,
+      "scale": [0, 2, 4, 7, 9],
+      "span": 6,
+      "noteMs": 110,
+      "minGapMs": 70,
+      "vowelLength": 1.3,
+      "consonantLength": 0.7,
+      "wobble": 0.3,
+      "volumeDb": -2
+    },
+    "low": {
+      "timbre": "basson",
+      "tonicMidi": 50,
+      "scale": [0, 2, 3, 7, 8],
+      "span": 5,
+      "noteMs": 150,
+      "minGapMs": 95,
+      "vowelLength": 1.4,
+      "consonantLength": 0.8,
+      "wobble": 0.15,
+      "volumeDb": 0
+    },
+    "high": {
+      "timbre": "flute",
+      "tonicMidi": 72,
+      "scale": [0, 2, 4, 7, 9],
+      "span": 5,
+      "noteMs": 90,
+      "minGapMs": 60,
+      "vowelLength": 1.3,
+      "consonantLength": 0.6,
+      "wobble": 0.4,
+      "volumeDb": -2
+    },
+    "bright": {
+      "timbre": "boite-a-musique",
+      "tonicMidi": 79,
+      "scale": [0, 2, 4, 7, 9],
+      "span": 6,
+      "noteMs": 100,
+      "minGapMs": 65,
+      "vowelLength": 1.2,
+      "consonantLength": 0.8,
+      "wobble": 0.2,
+      "volumeDb": -1
+    },
+    "soft": {
+      "timbre": "ocarina",
+      "tonicMidi": 69,
+      "scale": [0, 3, 5, 7, 10],
+      "span": 5,
+      "noteMs": 130,
+      "minGapMs": 85,
+      "vowelLength": 1.5,
+      "consonantLength": 0.7,
+      "wobble": 0.2,
+      "volumeDb": -1
+    },
+    "bouncy": {
+      "timbre": "marimba",
+      "tonicMidi": 67,
+      "scale": [0, 2, 4, 5, 7, 9],
+      "span": 8,
+      "noteMs": 80,
+      "minGapMs": 55,
+      "vowelLength": 1.1,
+      "consonantLength": 0.9,
+      "wobble": 0.5,
+      "volumeDb": -1
+    },
+    "grumpy": {
+      "timbre": "basson",
+      "tonicMidi": 47,
+      "scale": [0, 1, 5, 7, 8],
+      "span": 4,
+      "noteMs": 170,
+      "minGapMs": 110,
+      "vowelLength": 1.3,
+      "consonantLength": 0.9,
+      "wobble": 0.1,
+      "volumeDb": 0
+    },
+    "shy": {
+      "timbre": "flute",
+      "tonicMidi": 76,
+      "scale": [0, 2, 5, 7, 9],
+      "span": 4,
+      "noteMs": 120,
+      "minGapMs": 100,
+      "vowelLength": 1.2,
+      "consonantLength": 0.6,
+      "wobble": 0.15,
+      "volumeDb": -4
+    }
+  }
+}

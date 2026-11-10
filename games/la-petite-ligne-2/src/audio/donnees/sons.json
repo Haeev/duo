@@ -1,0 +1,232 @@
+{
+  "pas-herbe": {
+    "files": ["effets/pas-herbe-1.ogg", "effets/pas-herbe-2.ogg", "effets/pas-herbe-3.ogg"],
+    "category": "effects",
+    "volumeDb": -14,
+    "pitchVariation": 0.06,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
+  },
+  "pas-terre": {
+    "files": ["effets/pas-terre-1.ogg", "effets/pas-terre-2.ogg", "effets/pas-terre-3.ogg"],
+    "category": "effects",
+    "volumeDb": -13,
+    "pitchVariation": 0.06,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
+  },
+  "pas-pave": {
+    "files": ["effets/pas-pave-1.ogg", "effets/pas-pave-2.ogg", "effets/pas-pave-3.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1.5,
+    "priority": 3,
+    "maxVoices": 3,
+    "minIntervalMs": 120
+  },
+  "cible": {
+    "files": ["effets/cible.ogg"],
+    "category": "interface",
+    "volumeDb": -10,
+    "pitchVariation": 0.02,
+    "gainVariationDb": 0.5,
+    "priority": 3,
+    "maxVoices": 1,
+    "minIntervalMs": 80
+  },
+  "reussite": {
+    "files": ["effets/reussite.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 3,
+    "minIntervalMs": 60
+  },
+  "refus": {
+    "files": ["effets/refus.ogg"],
+    "category": "interface",
+    "volumeDb": -8,
+    "pitchVariation": 0.03,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 150
+  },
+  "asseoir": {
+    "files": ["effets/asseoir.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 200
+  },
+  "ramasser": {
+    "files": ["effets/ramasser.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 2,
+    "maxVoices": 3,
+    "minIntervalMs": 60
+  },
+  "poser": {
+    "files": ["effets/poser.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0.05,
+    "gainVariationDb": 1,
+    "priority": 2,
+    "maxVoices": 3,
+    "minIntervalMs": 60
+  },
+  "rangement-ouvre": {
+    "files": ["effets/rangement-ouvre.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 100
+  },
+  "rangement-ferme": {
+    "files": ["effets/rangement-ferme.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0.04,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 100
+  },
+  "sac-plein": {
+    "files": ["effets/sac-plein.ogg"],
+    "category": "interface",
+    "volumeDb": -8,
+    "pitchVariation": 0.02,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 300
+  },
+  "monnaie": {
+    "files": ["effets/monnaie.ogg"],
+    "category": "interface",
+    "volumeDb": -11,
+    "pitchVariation": 0,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 2,
+    "minIntervalMs": 80
+  },
+  "carnet-ouvre": {
+    "files": ["effets/carnet-ouvre.ogg"],
+    "category": "interface",
+    "volumeDb": -9,
+    "pitchVariation": 0.03,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 100
+  },
+  "carnet-ferme": {
+    "files": ["effets/carnet-ferme.ogg"],
+    "category": "interface",
+    "volumeDb": -9,
+    "pitchVariation": 0.03,
+    "gainVariationDb": 0.5,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 100
+  },
+  "page": {
+    "files": ["effets/page.ogg"],
+    "category": "interface",
+    "volumeDb": -10,
+    "pitchVariation": 0.06,
+    "gainVariationDb": 1,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 60
+  },
+  "choix": {
+    "files": ["effets/choix.ogg"],
+    "category": "interface",
+    "volumeDb": -6,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 40
+  },
+  "palier-bas": {
+    "files": ["effets/palier-bas.ogg"],
+    "category": "interface",
+    "volumeDb": -11,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 500
+  },
+  "palier-bonus": {
+    "files": ["effets/palier-bonus.ogg"],
+    "category": "interface",
+    "volumeDb": -11,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 2,
+    "maxVoices": 1,
+    "minIntervalMs": 500
+  },
+  "eau-pompe": {
+    "files": ["effets/eau-pompe.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0.03,
+    "gainVariationDb": 0.5,
+    "priority": 3,
+    "maxVoices": 2,
+    "minIntervalMs": 300
+  },
+  "reveil": {
+    "files": ["effets/reveil.ogg"],
+    "category": "effects",
+    "volumeDb": -10,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 2000
+  },
+  "train-arrive": {
+    "files": ["effets/train-arrive.ogg"],
+    "category": "effects",
+    "volumeDb": -8,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 1,
+    "minIntervalMs": 2000
+  },
+  "embarquement": {
+    "files": ["effets/embarquement.ogg"],
+    "category": "effects",
+    "volumeDb": -9,
+    "pitchVariation": 0,
+    "gainVariationDb": 0,
+    "priority": 1,
+    "maxVoices": 2,
+    "minIntervalMs": 300
+  }
+}
