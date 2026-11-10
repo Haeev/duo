@@ -53,7 +53,8 @@ export function hueOf(id: string): number {
 
 /**
  * Vignette provisoire d'un objet: une pastille de couleur et ses deux premières lettres. Elle
- * tient la place de l'image rendue depuis le modèle (interface.md, section 8).
+ * tient la place de l'image rendue depuis le modèle (interface.md, section 8); `data-obj-item`
+ * la fait remplacer par la vignette 3D quand le jeu en fournit une (`hydrateThumbnails`).
  */
 export function itemThumb(item: string, name: string): string {
   const hue = hueOf(item);
@@ -62,5 +63,5 @@ export function itemThumb(item: string, name: string): string {
     .slice(0, 2)
     .map((w) => w.charAt(0).toUpperCase())
     .join('');
-  return `<svg class="obj" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="12" fill="hsl(${hue} 45% 70%)" stroke="#2a2522" stroke-width="2.5"/><text x="24" y="31" text-anchor="middle" font-size="18" font-weight="800" fill="#2a2522" font-family="Nunito Sans Variable, system-ui, sans-serif">${letters}</text></svg>`;
+  return `<svg class="obj" data-obj-item="${item}" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="5" width="38" height="38" rx="12" fill="hsl(${hue} 45% 70%)" stroke="#2a2522" stroke-width="2.5"/><text x="24" y="31" text-anchor="middle" font-size="18" font-weight="800" fill="#2a2522" font-family="Nunito Sans Variable, system-ui, sans-serif">${letters}</text></svg>`;
 }

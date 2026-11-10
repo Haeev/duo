@@ -14,6 +14,7 @@ import { drawBaseScreen } from './plateforme/ecran-socle';
 import { createInterface } from './interface/index';
 import { createRenderer, gameDecorModels } from './rendu/index';
 import { createCharacterPreview } from './rendu/personnages/apercu';
+import { createGameObjectViewer } from './rendu/objets/index';
 import { createSession } from './session';
 import { createGameAudio } from './audio/index';
 import { createGameMusic } from './audio/musique/index';
@@ -72,6 +73,8 @@ const music = createGameMusic({
 });
 // Réglages du carnet: volume par le son, qualité par le rendu. Le plan n'existe que pour Aubrune
 // (les lieux d'essai n'en ont pas: l'onglet Carte le dit).
+// Vignettes 3D des objets dans les menus (sac, barre, boutique).
+const objectViewer = createGameObjectViewer(content.items, { reducedMotion: duo.ui.reducedMotion });
 const aubrunePlan = parsePlan(planAubrune);
 if (aubrunePlan === null) duo.log.warn('plan d’Aubrune illisible: onglet Carte vide');
 const plans = aubrunePlan === null ? {} : { aubrune: aubrunePlan };
@@ -110,6 +113,7 @@ const ui =
           sound.cue(cue);
         },
         notebook: { settings, sourcesExtras: { plans } },
+        objectViewer,
       });
 // Reprise de partie: ce que la sauvegarde a donné à dire (partie neuve, invité remplacé).
 if (session.notice !== null) ui?.notice(session.notice.message);
@@ -173,6 +177,7 @@ duo.on('stop', () => {
   ui?.dispose();
   music.dispose();
   sound.dispose();
+  objectViewer.dispose();
   renderer?.dispose();
   session.dispose();
   duo.dispose();

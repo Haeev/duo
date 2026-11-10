@@ -31,6 +31,7 @@ import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
 import { passageSays } from '../simulation/lieux/index';
+import { hydrateThumbnails, type ObjectViewer } from '../rendu/objets/index';
 import { glanceTarget } from '../simulation/quetes/lecture';
 
 import './interface.css';
@@ -75,6 +76,11 @@ export interface InterfaceOptions {
    * ouvrir et fermer le carnet, une marque de la cuisine, un plat posé.
    */
   readonly onCue?: (cue: string) => void;
+  /**
+   * Visionneuse des objets 3D (`rendu/objets`): les vignettes provisoires du sac, de la barre et
+   * de la boutique sont remplacées par l'image rendue du modèle. Absente: vignettes provisoires.
+   */
+  readonly objectViewer?: ObjectViewer;
 }
 
 export interface GameInterface {
@@ -122,6 +128,15 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   layer.className = 'lpl-ui';
   layer.innerHTML = spriteMarkup();
   root.append(layer);
+  // Vignettes 3D: chaque grille redessinée (sac, barre, boutique) est complétée dès qu'elle paraît.
+  const viewer = options.objectViewer;
+  const thumbs =
+    viewer === undefined || typeof MutationObserver === 'undefined'
+      ? null
+      : new MutationObserver(() => {
+          hydrateThumbnails(layer, viewer);
+        });
+  thumbs?.observe(layer, { childList: true, subtree: true });
 
   let now = 0;
   const hud = createHud(layer, view.content, keyLabel, options.projectToScreen);
@@ -510,6 +525,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       );
     },
     dispose() {
+      thumbs?.disconnect();
       offEvents();
       fishing.dispose();
       keyTarget.removeEventListener('keydown', onKey);
