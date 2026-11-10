@@ -19,6 +19,7 @@ Un habitant vit si sa fiche a un bloc `life` (schéma `src/donnees/schemas/vie-h
 - **Commerces**: une ligne `shop` ouvre le commerce quand le commerçant est arrivé à son poste (`isShopOpen`). Un commerçant sans `life` suit les heures du commerce.
 - **Mémoire** (faits datés, lisibles par la condition `remembered`): `habitants.<id>.salut.j<n>` (bonjour du jour), `habitants.<id>.cadeau.j<n>` (dernier cadeau, valeur: l'objet), `habitants.<id>.cadeaux.j<n>` (compteur), `habitants.<id>.adore.j<n>`, `habitants.<id>.arrive`, `habitants.<id>.parti`. L'amitié passe par `dialogues/amitie.ts` (`addBond`).
 - **Train**: `arrives` faux, il attend hors de la carte (`offstage`, ni visible ni visable); vrai, il descend au point d'arrivée de la gare et marche jusqu'à son poste. `leaves`: il marche jusqu'au quai et disparaît.
+- **Conversation**: on lui parle, il s'arrête et écoute; si sa ligne de planning change pendant ce temps, il reprend son trajet à la fin de la conversation (debout, `stand`, en attendant).
 - **Économe**: à plus de `nearRadius` des deux joueurs, un pas sur `farEveryTicks`; le planning se relit tous les `planEveryTicks`. Chemins et minuteries ne sont pas dans l'état: à la reprise d'une sauvegarde ou au retour dans le lieu, chacun est posé à son poste du moment.
 
 ## Pour le rendu (lecture seule, chez l'hôte et l'invité)

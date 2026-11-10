@@ -63,8 +63,8 @@ describe('dialogues', () => {
     act(sim, 0, { type: 'talk_next' });
     act(sim, 0, { type: 'talk_next' });
     expect(talkView(content, sim.world, 0)?.options).toEqual([
-      { id: 'oui', text: "Oui, je n'ai que mes poches.", fails: 'hygiene' },
-      { id: 'non', text: 'Ça ira, merci.', fails: null },
+      { id: 'oui', text: "Oui, je n'ai que mes poches.", fails: 'hygiene', blocked: null },
+      { id: 'non', text: 'Ça ira, merci.', fails: null, blocked: null },
     ]);
     expect(act(sim, 0, { type: 'talk_choose', option: 'oui' })).toContainEqual({
       type: 'refused',

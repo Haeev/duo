@@ -463,9 +463,14 @@ function liveOne(
     }
     showEmote(sim, state, 'surprise');
   }
-  // En conversation, il s'arrête et écoute.
+  // En conversation, il s'arrête et écoute; le trajet en cours (planning changé pendant qu'on
+  // lui parle) attend la fin de la conversation au lieu d'être tenu pour fini.
   const busy = villager.talkingWith !== null;
-  const arrived = busy || walk(sim, place, def.id, villager, rt, dt, near);
+  if (rt.route !== null && state.pose !== (busy ? 'stand' : 'walk')) {
+    state.pose = busy ? 'stand' : 'walk';
+    sim.touch('place');
+  }
+  const arrived = !busy && walk(sim, place, def.id, villager, rt, dt, near);
   if (arrived && rt.route !== null) {
     rt.route = null;
     if (state.presence === 'leaving') {

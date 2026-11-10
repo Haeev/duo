@@ -36,6 +36,30 @@ const FocusSchema = v.union([
 ]);
 export type Focus = v.InferOutput<typeof FocusSchema>;
 
+/**
+ * Geste d'une partie d'attente (scène à deux rôles), lu sur la touche d'action tenue (`act` des
+ * commandes) ou la position du joueur, chez l'hôte: `hold`, tenir la touche `seconds`; `press`,
+ * l'appuyer une fois; `stand`, rester `seconds` à moins de `radius` m du point.
+ */
+export const GestureSchema = v.variant('type', [
+  v.strictObject({ type: v.literal('hold'), seconds: v.pipe(Seconds, v.minValue(0.2)) }),
+  v.strictObject({ type: v.literal('press') }),
+  v.strictObject({
+    type: v.literal('stand'),
+    point: IdSchema,
+    radius: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(10))),
+    seconds: Seconds,
+  }),
+]);
+export type GestureDef = v.InferOutput<typeof GestureSchema>;
+
+/** Avancement d'un geste en cours: touche tenue, et pas où le maintien, l'appui ou la station a commencé. */
+export const GestureRunSchema = v.strictObject({
+  down: v.boolean(),
+  since: v.nullable(TickSchema),
+});
+export type GestureRun = v.InferOutput<typeof GestureRunSchema>;
+
 export const BeatSchema = v.variant('do', [
   /**
    * Une réplique. Elle passe quand chaque joueur concerné l'a lue (`scene_next`), ou au bout de
@@ -77,12 +101,21 @@ export const BeatSchema = v.variant('do', [
         v.strictObject({
           role: v.picklist(['a', 'b', 'any']),
           hint: TextSchema,
-          done: v.pipe(v.array(StepConditionSchema), v.minLength(1)),
+          /** Conditions (toutes vraies); vide permis si la partie a un geste. */
+          done: v.array(StepConditionSchema),
+          /** Geste demandé au joueur du rôle (`a` ou `b`), en plus des conditions. */
+          gesture: v.exactOptional(GestureSchema),
         }),
       ),
       v.minLength(1),
       v.maxLength(2),
     ),
+    /**
+     * Gestes ensemble: les parties à geste doivent être réussies en même temps, à `together`
+     * secondes près (un appui compte pendant ce délai; tenir et se tenir comptent tant qu'ils
+     * durent). Absent: chaque partie est acquise une fois réussie.
+     */
+    together: v.exactOptional(Seconds),
   }),
   v.strictObject({ do: v.literal('effects'), effects: v.array(StepEffectSchema) }),
 ]);
@@ -132,6 +165,8 @@ export const SceneRunSchema = v.strictObject({
   parts: v.tuple([v.boolean(), v.boolean()]),
   camera: v.nullable(v.strictObject({ focus: FocusSchema, until: TickSchema })),
   fade: v.picklist(['black', 'clear']),
+  /** Gestes de l'attente en cours, par partie; absent hors d'une attente à geste. */
+  gestures: v.exactOptional(v.tuple([GestureRunSchema, GestureRunSchema])),
 });
 export type SceneRun = v.InferOutput<typeof SceneRunSchema>;
 
@@ -140,5 +175,13 @@ export const StoryStateSchema = v.strictObject({
   tracked: v.tuple([v.nullable(IdSchema), v.nullable(IdSchema)]),
   scene: v.nullable(SceneRunSchema),
   queue: v.pipe(v.array(IdSchema), v.maxLength(4)),
+  /** Départ demandé par l'effet `travel_to`, pris quand la scène en cours est finie. */
+  departure: v.exactOptional(
+    v.strictObject({ to: IdSchema, since: TickSchema, ending: v.nullable(IdSchema) }),
+  ),
+  /** Écran de fin de chapitre montré (`ending` d'un `travel_to` du lieu); `closed`: fermé par chacun. */
+  ending: v.exactOptional(
+    v.strictObject({ place: IdSchema, id: IdSchema, closed: v.tuple([v.boolean(), v.boolean()]) }),
+  ),
 });
 export type StoryState = v.InferOutput<typeof StoryStateSchema>;

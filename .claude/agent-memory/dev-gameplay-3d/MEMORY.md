@@ -615,3 +615,8 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un événement ajouté à `GameEventSchema` casse le `switch` exhaustif de `src/interface/index.ts` (lint): l'ajouter aux cas ignorés.
 - Un champ ajouté à `progress` ne part pas chez l'invité (`reseau/progression.ts` n'envoie que `memory`, `bonds`, `quests`, `collections`, `opened`): un champ facultatif dans un objet déjà envoyé (`QuestSchema`, `CommonSchema`) part sans toucher au réseau.
 - Un dialogue de quête de priorité haute masque l'accueil d'un habitant (tests de dialogue cassés): ouvrir la suite d'essai par un fait de l'accueil (`requires`).
+- Un événement ajouté casse aussi le `switch` exhaustif de `src/interface/cuisine/index.ts`, pas seulement `interface/index.ts`.
+- Un effet qui change de lieu (`travel_to`) ne doit pas partir pendant la scène: `runBeats` abandonne une scène dont le lieu a changé (non comptée vue). Le départ attend la fin de la scène plus un délai (les quêtes ne sont vérifiées que tous les 6 pas et seulement dans le lieu courant).
+- Champ facultatif d'état sans défaut à écrire partout: `v.exactOptional` et `delete` pour l'effacer (pas `v.optional(x, défaut)`, qui oblige chaque littéral à l'écrire).
+- `tests/dialogues.test.ts` compare `talkView(...).options` par `toEqual`: un champ ajouté aux options demande de mettre à jour ce test.
+- Outil Bash isolé: `python3 - <<'EOF'` passe s'il est seul dans la commande après `cd`; suivi d'un `&&` ou d'un autre appel, toute la commande est refusée (rien ne s'exécute). Vérifier par `git diff --stat` après coup.

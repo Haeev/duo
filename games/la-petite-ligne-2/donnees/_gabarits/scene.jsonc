@@ -52,8 +52,38 @@
         },
       ],
     },
+    // Gestes (scène à deux rôles, une partie par rôle "a" ou "b", jamais "any"): "gesture" en plus
+    // des conditions "done" (qui peuvent alors être vides). Lus chez l'hôte:
+    //   { "type": "hold", "seconds": 2 }    tenir la touche d'action 2 s
+    //   { "type": "press" }                 appuyer une fois
+    //   { "type": "stand", "point": "quai", "radius": 1.5, "seconds": 1 }   rester 1 s au point
+    // "together": 0.5 (facultatif): les gestes doivent réussir en même temps, à 0,5 s près (un
+    // appui vaut 0,5 s; tenir et se tenir valent tant qu'ils durent). Sans lui: chacun à son tour.
+    // L'interface lit l'avancement dans sceneView (hints[].gesture) et l'événement scene_gesture.
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Tiens le levier pendant que l'autre fait signe.",
+          "done": [],
+          "gesture": { "type": "hold", "seconds": 2 },
+        },
+        {
+          "role": "b",
+          "hint": "Reste au bout du quai.",
+          "done": [],
+          "gesture": { "type": "stand", "point": "quai", "seconds": 1 },
+        },
+      ],
+      "together": 0.5,
+    },
     { "do": "fade", "to": "black", "seconds": 1 },
-    // Effets: ceux des étapes de quête.
+    // Effets: ceux des étapes de quête. Départ en train à la fin de la scène:
+    //   { "type": "travel_to", "place": "<lieu>" }
+    // Vers un lieu qui n'existe pas encore, un écran de fin de chapitre est obligatoire:
+    //   { "type": "travel_to", "place": "<lieu à venir>",
+    //     "ending": { "id": "a-suivre", "title": "À suivre", "lines": ["La suite arrive bientôt."] } }
     { "do": "effects", "effects": [] },
     { "do": "wait", "seconds": 1 },
     { "do": "fade", "to": "clear", "seconds": 1 },

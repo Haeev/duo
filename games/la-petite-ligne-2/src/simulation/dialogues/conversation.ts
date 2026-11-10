@@ -17,6 +17,7 @@ import { recall, remember } from '../regles/memoire';
 import { RULES } from '../regles/reglages';
 import { agreeFor } from './accords';
 import { greet } from './amitie';
+import { exchangeRefusal, type ExchangeRefusal } from './echanges';
 
 /** Au-delà, un parcours sans texte est une faute de données: on s'arrête plutôt que boucler. */
 const MAX_SILENT_NODES = 32;
@@ -107,10 +108,19 @@ function enter(
       case 'branch':
         id = node.cases.find((c) => evaluateAll(ctx, c.when))?.next ?? node.otherwise;
         continue;
-      case 'effects':
+      case 'effects': {
+        const refused =
+          node.otherwise === undefined ? null : exchangeRefusal(sim, player, node.effects);
+        if (refused !== null) {
+          const villager = sim.world.players[player].talk?.villager ?? null;
+          sim.emit({ type: 'refused', player, reason: refused, target: villager });
+          id = node.otherwise ?? null;
+          continue;
+        }
         applyEffects(sim, player, node.effects);
         id = node.next;
         continue;
+      }
       case 'line':
       case 'choice': {
         const talk = sim.world.players[player].talk;
@@ -174,7 +184,10 @@ export function talkNext(sim: SimContext, player: PlayerIndex): void {
   enter(sim, player, dialogue, node.next);
 }
 
-/** Choix d'une option visible; un échange que l'hygiène fait échouer est refusé et le choix reste. */
+/**
+ * Choix d'une option visible; un échange que l'hygiène fait échouer, ou impossible (poches
+ * pleines, argent insuffisant, objet manquant), est refusé avec sa raison et le choix reste.
+ */
 export function talkChoose(sim: SimContext, player: PlayerIndex, optionId: string): void {
   const talk = sim.world.players[player].talk;
   const dialogue = currentDialogue(sim, player);
@@ -185,6 +198,11 @@ export function talkChoose(sim: SimContext, player: PlayerIndex, optionId: strin
   if (option === undefined || !evaluateAll(ruleContext(sim, player), option.when)) return;
   if (failsForHygiene(sim.world, player, option.effects)) {
     sim.emit({ type: 'refused', player, reason: 'too-dirty', target: talk.villager });
+    return;
+  }
+  const refused = exchangeRefusal(sim, player, option.effects);
+  if (refused !== null) {
+    sim.emit({ type: 'refused', player, reason: refused, target: talk.villager });
     return;
   }
   applyEffects(sim, player, option.effects);
@@ -199,8 +217,16 @@ export interface TalkView {
   readonly speaker: string;
   readonly text: string | null;
   readonly emote: string | null;
-  /** Options visibles; `fails`: l'échange échouera (goutte barrée), on sait pourquoi avant de choisir. */
-  readonly options: readonly { id: string; text: string; fails: 'hygiene' | null }[];
+  /**
+   * Options visibles; `fails`: l'échange échouera (goutte barrée), on sait pourquoi avant de
+   * choisir; `blocked`: l'échange est impossible pour l'instant (raison de refus, texte `refusals`).
+   */
+  readonly options: readonly {
+    id: string;
+    text: string;
+    fails: 'hygiene' | null;
+    blocked: ExchangeRefusal | null;
+  }[];
 }
 
 export function talkView(
@@ -230,6 +256,7 @@ export function talkView(
       id: o.id,
       text: agreeFor(world, player, o.text),
       fails: failsForHygiene(world, player, o.effects) ? ('hygiene' as const) : null,
+      blocked: exchangeRefusal({ world, content }, player, o.effects),
     }));
   return {
     villager: talk.villager,

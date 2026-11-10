@@ -27,6 +27,10 @@ const KEYS = [
   'fish-none',
   'deco-overlap',
   'room-not-paid',
+  'missing-item',
+  'other-missing-item',
+  'other-not-enough-money',
+  'story-item',
 ];
 
 describe('textes des refus', () => {

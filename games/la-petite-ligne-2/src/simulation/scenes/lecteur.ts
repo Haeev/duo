@@ -6,7 +6,7 @@
  * quittée (changement de lieu) est abandonnée sans être comptée vue: son déclencheur la rejouera.
  */
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { BeatDef, SceneDef, SceneRun } from '../../donnees/schemas/scene';
+import type { BeatDef, GestureDef, SceneDef, SceneRun } from '../../donnees/schemas/scene';
 import type { SimContext } from '../noyau/systemes';
 import type { RuleContext } from '../regles/conditions';
 import { remember } from '../regles/memoire';
@@ -97,6 +97,7 @@ function nextBeat(sim: SimContext, run: SceneRun): void {
   run.since = sim.world.tick;
   run.read = [false, false];
   run.parts = [false, false];
+  delete run.gestures;
   sim.touch('common');
   sim.emit({ type: 'scene_beat', scene: run.id, beat: run.beat });
 }
@@ -121,6 +122,56 @@ function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: 
   villager.body.facing = Math.atan2(dy, dx);
   villager.body.speed = STORY.villagerWalkSpeed;
   return false;
+}
+
+/**
+ * Suit le geste d'une partie (touche d'action tenue, position du joueur) et dit s'il est réussi
+ * maintenant. Chaque début, arrêt ou expiration part en événement `scene_gesture`.
+ */
+function followGesture(
+  sim: SimContext,
+  run: SceneRun,
+  part: number,
+  gesture: GestureDef,
+  player: PlayerIndex,
+  window: number | undefined,
+): boolean {
+  run.gestures ??= [
+    { down: false, since: null },
+    { down: false, since: null },
+  ];
+  const g = run.gestures[part === 0 ? 0 : 1];
+  const tick = sim.world.tick;
+  const emit = (state: 'start' | 'stop' | 'expired'): void => {
+    sim.touch('common');
+    sim.emit({ type: 'scene_gesture', scene: run.id, part, player, state });
+  };
+  let down: boolean;
+  if (gesture.type === 'stand') {
+    const at = sim.content.places[run.place]?.map.points[gesture.point];
+    const body = sim.world.players[player].body;
+    down =
+      at !== undefined &&
+      Math.hypot(body.x - at.x, body.y - at.y) <= (gesture.radius ?? STORY.reachRadius);
+  } else down = sim.inputs[player].act;
+  if (down !== g.down) {
+    g.down = down;
+    // Un appui reste valable après qu'on a lâché la touche; tenir et se tenir s'arrêtent.
+    if (gesture.type === 'press' && !down) sim.touch('common');
+    else {
+      g.since = down ? tick : null;
+      emit(down ? 'start' : 'stop');
+    }
+  }
+  if (g.since === null) return false;
+  const elapsed = (tick - g.since) * sim.dt;
+  if (gesture.type !== 'press') return elapsed >= gesture.seconds;
+  if (window !== undefined && elapsed > window) {
+    g.since = null;
+    emit('expired');
+    return false;
+  }
+  return true;
 }
 
 /** Le temps en cours est-il fini ? Applique au passage ce qu'il fait. */
@@ -154,17 +205,28 @@ function beatDone(sim: SimContext, run: SceneRun, beat: BeatDef, hooks: StoryHoo
     case 'wait':
       return elapsed >= beat.seconds;
     case 'await': {
+      const window = beat.together;
       beat.parts.forEach((part, i) => {
-        if (run.parts[i] === true) return;
-        const ctx: RuleContext = {
-          world: sim.world,
-          content: sim.content,
-          actor: playerOfRole(run, part.role),
-        };
-        if (evaluateStepAll(ctx, part.done)) {
-          run.parts[i] = true;
-          sim.touch('common');
-        }
+        const player = playerOfRole(run, part.role);
+        const ctx: RuleContext = { world: sim.world, content: sim.content, actor: player };
+        // Sans geste, ou acquise hors d'un geste ensemble: la partie ne change plus.
+        if (run.parts[i] === true && (part.gesture === undefined || window === undefined)) return;
+        const ok =
+          (part.gesture === undefined ||
+            player === null ||
+            followGesture(sim, run, i, part.gesture, player, window)) &&
+          evaluateStepAll(ctx, part.done);
+        if (ok === run.parts[i]) return;
+        run.parts[i] = ok;
+        sim.touch('common');
+        if (part.gesture !== undefined && player !== null)
+          sim.emit({
+            type: 'scene_gesture',
+            scene: run.id,
+            part: i,
+            player,
+            state: ok ? 'done' : 'lost',
+          });
       });
       return beat.parts.every((_, i) => run.parts[i] === true);
     }

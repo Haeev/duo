@@ -10,6 +10,9 @@
   // main: suite principale du lieu; side: secondaire; errand: petite demande (rare).
   "kind": "side",
   "title": "Une quête d'exemple",
+  // Facultatif: cette suite est l'acte "act" d'une histoire plus longue, regroupée au carnet
+  // (même "id" et même "title" pour toutes ses suites). Exemple:
+  //   "saga": { "id": "aubrune", "title": "Aubrune", "act": 2 },
   // L'habitant qui la donne, ou null.
   "giver": "cheffe-de-gare",
   // Ce qui l'ouvre (toutes vraies). [] : ouverte dès l'arrivée dans le lieu.
@@ -50,6 +53,8 @@
           //   { "type": "unlock_zone", "zone": "riviere" }
           //   { "type": "villager_arrives", "villager": "..." }
           //   { "type": "open_quest", "quest": "..." }   { "type": "play_scene", "scene": "..." }
+          //   { "type": "travel_to", "place": "...", "ending": {...} }   (voir le gabarit de scène)
+          // Et aussi: take_money, change_bond, et "to": "duo" (voir le gabarit de dialogue).
           "onStart": [],
           "onDone": [
             {

@@ -9,7 +9,9 @@ import { relieveNeed } from '../besoins/soins';
 import { openShop } from '../commerces/index';
 import type { SimContext } from '../noyau/systemes';
 import { equipBag, giveItem } from '../sac/actions';
-import { earn } from '../sac/argent';
+import { changeBond } from '../dialogues/amitie';
+import { effectTargets } from '../dialogues/echanges';
+import { earn, pay } from '../sac/argent';
 import { removeItem } from '../sac/inventaire';
 import { remember } from './memoire';
 
@@ -19,13 +21,24 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
       remember(sim, effect.key, effect.value, effect.by === 'duo' ? 'duo' : actor);
       return;
     case 'give_item':
-      giveItem(sim, actor, effect.item, effect.count);
+      for (const p of effectTargets(actor, effect.to)) giveItem(sim, p, effect.item, effect.count);
       return;
     case 'take_item':
-      if (removeItem(sim.world.players[actor], effect.item, effect.count)) sim.touch('players');
+      for (const p of effectTargets(actor, effect.to))
+        if (removeItem(sim.world.players[p], effect.item, effect.count)) sim.touch('players');
       return;
     case 'give_money':
-      earn(sim, actor, effect.amount);
+      for (const p of effectTargets(actor, effect.to)) earn(sim, p, effect.amount);
+      return;
+    case 'take_money':
+      // Sans contrôle préalable (`exchangeRefusal`), une bourse trop maigre refuse sans payer.
+      for (const p of effectTargets(actor, effect.to))
+        if (pay(sim, p, effect.amount) !== null)
+          sim.emit({ type: 'refused', player: p, reason: 'not-enough-money', target: null });
+      return;
+    case 'change_bond':
+      for (const p of effectTargets(actor, effect.to))
+        changeBond(sim, p, effect.villager, effect.points);
       return;
     case 'change_need':
       relieveNeed(sim, actor, effect.need, effect.amount, effect.cap);

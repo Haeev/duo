@@ -50,8 +50,16 @@
         "when": [
           {
             "type": "remembered",
-            "key": "aubrune.acte2.fosse",
-            "equals": "ouvert"
+            "key": "aubrune.acte2.lecon",
+            "equals": "fait"
+          },
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.acte2.fosse",
+              "equals": "fait"
+            }
           }
         ],
         "at": {

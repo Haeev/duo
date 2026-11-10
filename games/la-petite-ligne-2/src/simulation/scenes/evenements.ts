@@ -12,6 +12,18 @@ export const SCENE_EVENTS = [
     scene: IdSchema,
     beat: v.pipe(IntSchema, v.minValue(0)),
   }),
+  /**
+   * Geste d'une partie d'attente (`part`: son indice) par le joueur de son rôle: `start` (touche
+   * enfoncée, joueur arrivé au point), `stop` (lâché, parti), `expired` (appui trop tôt pour un
+   * geste ensemble), `done` (réussi), `lost` (geste ensemble défait avant l'autre).
+   */
+  v.strictObject({
+    type: v.literal('scene_gesture'),
+    scene: IdSchema,
+    part: v.pipe(IntSchema, v.minValue(0), v.maxValue(1)),
+    player: PlayerIndexSchema,
+    state: v.picklist(['start', 'stop', 'expired', 'done', 'lost']),
+  }),
   /** `completed`: jouée jusqu'au bout (sinon abandonnée, elle reviendra). */
   v.strictObject({ type: v.literal('scene_ended'), scene: IdSchema, completed: v.boolean() }),
 ] as const;

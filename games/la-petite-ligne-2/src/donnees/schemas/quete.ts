@@ -11,6 +11,7 @@ import {
   FileVersionSchema,
   FiniteSchema,
   IdSchema,
+  IntSchema,
   LabelSchema,
   TextSchema,
 } from './communs';
@@ -56,6 +57,17 @@ export type StoryCondition = v.InferOutput<typeof StoryConditionSchema>;
 export const StepConditionSchema = v.union([ConditionSchema, StoryConditionSchema]);
 export type StepCondition = Condition | StoryCondition;
 
+/**
+ * Écran de fin de chapitre (effet `travel_to` vers un lieu à venir): un titre et quelques lignes,
+ * lus par l'interface. `id`: unique dans le lieu, c'est lui que retient l'état.
+ */
+export const ChapterEndSchema = v.strictObject({
+  id: IdSchema,
+  title: LabelSchema,
+  lines: v.pipe(v.array(TextSchema), v.minLength(1), v.maxLength(6)),
+});
+export type ChapterEndDef = v.InferOutput<typeof ChapterEndSchema>;
+
 /** Effets propres à l'histoire (appliqués par `simulation/quetes/effets.ts`). */
 export const StoryEffectSchema = v.variant('type', [
   /** Ouvre une zone du lieu (fait `zones.<lieu>.<zone>`, lu par le déplacement et le rendu). */
@@ -66,6 +78,15 @@ export const StoryEffectSchema = v.variant('type', [
   v.strictObject({ type: v.literal('open_quest'), quest: IdSchema }),
   /** Lance une scène du lieu (elle attend son tour si une autre se joue). */
   v.strictObject({ type: v.literal('play_scene'), scene: IdSchema }),
+  /**
+   * Départ en train vers `place` (les deux joueurs), une fois la scène en cours finie. Si ce lieu
+   * n'existe pas encore dans le jeu, `ending` est montré aux deux à la place (obligatoire alors).
+   */
+  v.strictObject({
+    type: v.literal('travel_to'),
+    place: IdSchema,
+    ending: v.exactOptional(ChapterEndSchema),
+  }),
 ]);
 export type StoryEffect = v.InferOutput<typeof StoryEffectSchema>;
 
@@ -100,6 +121,17 @@ export const QuestLineSchema = v.strictObject({
   /** `main`: la suite principale du lieu; `side`: secondaire; `errand`: petite demande (rare, réponse 40). */
   kind: v.picklist(['main', 'side', 'errand']),
   title: LabelSchema,
+  /**
+   * Regroupement au carnet: cette suite est l'acte `act` d'une histoire plus longue (`id`, `title`
+   * communs à toutes ses suites). Absent: suite seule.
+   */
+  saga: v.exactOptional(
+    v.strictObject({
+      id: IdSchema,
+      title: LabelSchema,
+      act: v.pipe(IntSchema, v.minValue(1), v.maxValue(20)),
+    }),
+  ),
   giver: v.nullable(IdSchema),
   /** Ce qui l'ouvre (toutes vraies). */
   requires: v.array(StepConditionSchema),

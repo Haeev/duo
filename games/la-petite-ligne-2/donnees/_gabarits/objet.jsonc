@@ -34,4 +34,6 @@
   // "food": null, "tool": null et "bag": "<id d'un sac de commun/sacs.json>". L'équiper (intention
   // equip_bag) remplace le sac porté, qui revient dans les poches. L'effet give_bag des dialogues
   // équipe un sac directement, sans objet.
+  // Objet d'histoire (règlement, lettre, lanterne): ajouter "story": true. Il ne se vend pas et
+  // ne se jette pas; les dialogues et les étapes le donnent et le reprennent (give_item, take_item).
 }

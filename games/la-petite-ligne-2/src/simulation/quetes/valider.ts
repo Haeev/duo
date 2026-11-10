@@ -28,6 +28,8 @@ interface Env {
   readonly facts: ReadonlyMap<string, ReadonlySet<FactValue>>;
   /** Scènes lancées par un effet `play_scene` du lieu. */
   readonly played: ReadonlySet<string>;
+  /** Écrans de fin de chapitre du lieu déjà vus, et où. */
+  readonly endings: Map<string, string>;
   readonly problems: string[];
 }
 
@@ -190,10 +192,27 @@ function checkEffects(env: Env, effects: readonly StepEffect[], at: string): voi
       case 'play_scene':
         if (!(e.scene in place.scenes)) problems.push(`${at}: scène inconnue « ${e.scene} »`);
         break;
+      case 'travel_to':
+        if (e.place === place.def.id) problems.push(`${at}: départ vers le lieu même`);
+        if (!(e.place in env.content.places) && e.ending === undefined)
+          problems.push(
+            `${at}: lieu « ${e.place} » absent du jeu et pas d'écran de fin (\`ending\`)`,
+          );
+        if (e.ending !== undefined) {
+          for (const problem of e.ending.lines.flatMap((line) => checkAgreementTags(line)))
+            problems.push(`${at}: ${problem}`);
+          const first = env.endings.get(e.ending.id);
+          if (first !== undefined && first !== at)
+            problems.push(`${at}: écran de fin « ${e.ending.id} » déjà décrit à ${first}`);
+          env.endings.set(e.ending.id, at);
+        }
+        break;
       case 'remember':
       case 'give_item':
       case 'take_item':
       case 'give_money':
+      case 'take_money':
+      case 'change_bond':
       case 'change_need':
       case 'give_bag':
       case 'open_shop':
@@ -297,7 +316,17 @@ function checkScene(env: Env, scene: SceneDef): void {
           if (part.role !== 'any' && !roles)
             problems.push(`${where}: rôle « ${part.role} » dans une scène sans \`roles\``);
           checkConditions(env, part.done, where, null);
+          const gesture = part.gesture;
+          if (gesture === undefined) {
+            if (part.done.length === 0) problems.push(`${where}: partie sans condition ni geste`);
+            continue;
+          }
+          if (part.role === 'any') problems.push(`${where}: un geste se confie à un rôle (a ou b)`);
+          if (gesture.type === 'stand' && !(gesture.point in place.map.points))
+            problems.push(`${where}: point inconnu « ${gesture.point} »`);
         }
+        if (beat.together !== undefined && !beat.parts.some((p) => p.gesture !== undefined))
+          problems.push(`${where}: \`together\` sans geste`);
         return;
       case 'effects':
         checkEffects(env, beat.effects, where);
@@ -309,12 +338,39 @@ function checkScene(env: Env, scene: SceneDef): void {
   });
 }
 
+/** Les suites d'une même histoire (`saga`) ont le même titre et chacune son numéro d'acte. */
+function checkSagas(content: Content, problems: string[]): void {
+  const sagas = new Map<string, { title: string; acts: Map<number, string> }>();
+  for (const place of Object.values(content.places))
+    for (const line of Object.values(place.quests)) {
+      const saga = line.saga;
+      if (saga === undefined) continue;
+      const at = `lieu ${place.def.id}, quête ${line.id}`;
+      const known = sagas.get(saga.id) ?? { title: saga.title, acts: new Map<number, string>() };
+      sagas.set(saga.id, known);
+      if (known.title !== saga.title)
+        problems.push(`${at}: histoire « ${saga.id} » déjà titrée « ${known.title} »`);
+      const other = known.acts.get(saga.act);
+      if (other !== undefined)
+        problems.push(`${at}: acte ${String(saga.act)} de « ${saga.id} » déjà tenu par ${other}`);
+      known.acts.set(saga.act, line.id);
+    }
+}
+
 export function validateStory(content: Content, base: BaseCheckers): string[] {
   const problems: string[] = [];
   const facts = collectFacts(content);
   const owner = new Map<string, string>();
   for (const place of Object.values(content.places)) {
-    const env: Env = { content, place, base, facts, played: collectPlayed(place), problems };
+    const env: Env = {
+      content,
+      place,
+      base,
+      facts,
+      played: collectPlayed(place),
+      endings: new Map(),
+      problems,
+    };
     for (const line of Object.values(place.quests)) {
       const first = owner.get(line.id);
       if (first !== undefined)
@@ -324,5 +380,6 @@ export function validateStory(content: Content, base: BaseCheckers): string[] {
     }
     for (const scene of Object.values(place.scenes)) checkScene(env, scene);
   }
+  checkSagas(content, problems);
   return problems;
 }

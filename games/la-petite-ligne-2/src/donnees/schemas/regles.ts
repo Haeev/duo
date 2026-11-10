@@ -102,6 +102,9 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
   ]),
 );
 
+/** À qui s'applique un effet d'échange: celui qui agit, ou chacun des deux joueurs. */
+export const EffectTargetSchema = v.picklist(['actor', 'duo']);
+
 export const EffectSchema = v.variant('type', [
   /** Écrit un fait dans la mémoire, au nom du joueur qui agit (`by: 'duo'`: au nom des deux). */
   v.strictObject({
@@ -110,18 +113,44 @@ export const EffectSchema = v.variant('type', [
     value: FactValueSchema,
     by: v.picklist(['actor', 'duo']),
   }),
+  /** `to`: à celui qui agit (défaut) ou à chacun des deux (`duo`); refusé si les poches sont pleines. */
   v.strictObject({
     type: v.literal('give_item'),
     item: IdSchema,
     count: v.pipe(CountSchema, v.minValue(1)),
+    to: v.exactOptional(EffectTargetSchema),
   }),
+  /** Reprend des objets (à chacun avec `to: 'duo'`); refusé s'il en manque. */
   v.strictObject({
     type: v.literal('take_item'),
     item: IdSchema,
     count: v.pipe(CountSchema, v.minValue(1)),
+    to: v.exactOptional(EffectTargetSchema),
   }),
   /** Montant en centimes. */
-  v.strictObject({ type: v.literal('give_money'), amount: v.pipe(CentsSchema, v.minValue(1)) }),
+  v.strictObject({
+    type: v.literal('give_money'),
+    amount: v.pipe(CentsSchema, v.minValue(1)),
+    to: v.exactOptional(EffectTargetSchema),
+  }),
+  /** Paiement de la bourse, en centimes (tout ou rien); refusé si elle n'y suffit pas. */
+  v.strictObject({
+    type: v.literal('take_money'),
+    amount: v.pipe(CentsSchema, v.minValue(1)),
+    to: v.exactOptional(EffectTargetSchema),
+  }),
+  /** Points d'amitié avec un habitant, gagnés (positif) ou perdus (négatif, jamais sous zéro). */
+  v.strictObject({
+    type: v.literal('change_bond'),
+    villager: IdSchema,
+    points: v.pipe(
+      IntSchema,
+      v.minValue(-500),
+      v.maxValue(500),
+      v.check((n) => n !== 0, 'points non nuls'),
+    ),
+    to: v.exactOptional(EffectTargetSchema),
+  }),
   /** Ajoute `amount` (négatif permis) à un besoin de celui qui agit, sans dépasser `cap`. */
   v.strictObject({
     type: v.literal('change_need'),

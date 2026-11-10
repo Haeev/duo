@@ -71,6 +71,6 @@ export const RULES: RulesSettings = {
   bonds: { firstTalkOfDay: 5, perHeart: 100, hearts: 5, noGainHygiene: ['blocked', 'low'] },
   dialogue: {
     failHygiene: ['blocked', 'low'],
-    exchangeEffects: ['give_item', 'take_item', 'give_money', 'give_bag', 'remember'],
+    exchangeEffects: ['give_item', 'take_item', 'give_money', 'take_money', 'give_bag', 'remember'],
   },
 };

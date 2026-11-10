@@ -68,10 +68,15 @@ export function checkEffect(content: Content, e: Effect, at: string, problems: s
       if (!content.bags.bags.some((b) => b.id === e.bag))
         problems.push(`${at}: sac inconnu « ${e.bag} »`);
       return;
+    case 'change_bond':
+      if (!Object.values(content.places).some((p) => p.villagers.some((v) => v.id === e.villager)))
+        problems.push(`${at}: habitant inconnu « ${e.villager} »`);
+      return;
     case 'open_shop':
       return;
     case 'remember':
     case 'give_money':
+    case 'take_money':
     case 'change_need':
       return;
   }
@@ -98,8 +103,9 @@ function checkDialogue(
     if (node === undefined) return [];
     switch (node.kind) {
       case 'line':
-      case 'effects':
         return [node.next];
+      case 'effects':
+        return [node.next, node.otherwise ?? null];
       case 'choice':
         return node.options.map((o) => o.next);
       case 'branch':
