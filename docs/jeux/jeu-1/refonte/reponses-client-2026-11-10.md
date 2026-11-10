@@ -535,3 +535,10 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Le studio continue jusqu'à ce que tout Aubrune soit fini. On ne passe pas au lieu suivant tant que ce chapitre n'est pas terminé et revu par le client.
 - Rythme de nuit: deux membres en parallèle au plus, pour garder du quota; une dizaine d'heures de travail tranquille.
 - Tests décalés: pas de batterie de tests en continu pendant la nuit; on sort du contenu, et on vérifie tout d'un coup le 11 novembre à 8 h (recette complète à deux joueurs comprise). Aucune publication avant cette vérification.
+
+## Réponses du tableau de bord, 22 h 17 (q19 à q22)
+
+- **q19, relief du sol**: oui. Chemins creusés, talus, dalles en volume, simulation comprise.
+- **q20, toits des commerces**: épicerie, forge et atelier de Basile en tuile; la maison forestière reste en tuile.
+- **q21, Firmin nie le train**: on garde (« venus par le car »), le billet poinçonné le contredit ensuite.
+- **q22, coût de la course**: non à la simple faim accélérée. Le client veut une jauge d'endurance en plus de la perte de faim, avec l'idée de renforcer la jauge par des plats (« booster la jauge avec des boost de nourriture ? »). À concevoir par le game-designer avant de coder.
