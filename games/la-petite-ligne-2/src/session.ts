@@ -155,6 +155,11 @@ export function createSession(options: SessionOptions): Session {
   };
 
   // Reprise après une pause ou une coupure: commandes en attente, instantanés et prédiction oubliés.
+  // Départ commun des deux machines: l'invité écoute enfin; tout repart complet (le lieu compris,
+  // dont la première complète, envoyée avant que l'invité ne soit prêt, s'est perdue).
+  const offStart = duo.on('start', () => {
+    host?.resume();
+  });
   const offResume = duo.on('resume', () => {
     host?.resume();
     guest?.resume();
@@ -181,6 +186,7 @@ export function createSession(options: SessionOptions): Session {
     },
     dispose() {
       offResume();
+      offStart();
       saves?.dispose();
       host?.dispose();
       guest?.dispose();
