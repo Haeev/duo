@@ -1,0 +1,49 @@
+{
+ "schema": 1,
+ "id": "atelier-basile",
+ "name": "L'atelier de Basile",
+ "width": 9,
+ "height": 7,
+ "at": {
+  "x": 94,
+  "y": 210
+ },
+ "blocked": [],
+ "points": {
+  "basile-p-etabli": {
+   "x": 4,
+   "y": 1.6
+  }
+ },
+ "objects": [
+  {
+   "id": "basile-etabli",
+   "type": "plan-de-travail",
+   "x": 4,
+   "y": 0.5,
+   "rotation": 0
+  },
+  {
+   "id": "basile-bois",
+   "type": "tas-de-bois",
+   "x": 0.5,
+   "y": 6.5,
+   "rotation": 0
+  },
+  {
+   "id": "basile-haches",
+   "type": "etal-de-haches",
+   "x": 8.5,
+   "y": 0.5,
+   "rotation": 0
+  }
+ ],
+ "doors": {
+  "atelier-basile-porte": {
+   "x": 8.5,
+   "y": 3.5,
+   "facing": 3,
+   "to": "porte-scierie-atelier-basile"
+  }
+ }
+}

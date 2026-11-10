@@ -275,7 +275,7 @@ def controler(d, md=None):
             err.append("noeud %s: inatteignable depuis le quai" % i)
         hors_eau = not ouvrage_pres((nn['x'], nn['y']))
         for w in d['eaux']:
-            if hors_eau and dist_poly((nn['x'], nn['y']), w['pts']) < w['largeur'] / 2 - 0.3:
+            if hors_eau and dist_poly((nn['x'], nn['y']), w['pts']) < w['largeur'] / 2 + 0.8:
                 err.append("noeud %s: dans l'eau (%s)" % (i, w['id']))
         classes = {a['classe'] for a in d['aretes'] if i in (a['a'], a['b'])}
         if classes - {'voie', 'interieur'}:
@@ -321,6 +321,66 @@ def controler(d, md=None):
     for k, v in d['verrous'].items():
         if not any(a.get('verrou') == k for a in d['aretes']):
             err.append("verrou %s: posé sur aucun chemin" % k)
+
+    # ---- 4 bis. version 2: verrous visibles, lisières habillées, couloirs des verrous internes, gabarits, bancs
+    if d.get('revision', 1) >= 2:
+        for k, v in d['verrous'].items():
+            if not v.get('objet') or not v.get('modele'):
+                err.append("verrou %s: aucun objet visible" % k)
+            if 'Pas encore' not in v.get('pas_encore', ''):
+                err.append("verrou %s: pas de phrase « pas encore »" % k)
+        hab = set(d['habillages'])
+        for zk, z in d['zones'].items():
+            morceaux = d['bordures'].get(zk, [])
+            per = sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(z['poly'], z['poly'][1:] + z['poly'][:1]))
+            couvert = sum(math.hypot(m['a'][0] - m['de'][0], m['a'][1] - m['de'][1]) for m in morceaux)
+            if abs(per - couvert) > 1.0:
+                err.append("zone %s: lisière habillée sur %.0f m sur %.0f m de contour" % (zk, couvert, per))
+            for m in morceaux:
+                if m['habillage'] not in hab:
+                    err.append("zone %s: lisière nue (%s) vers %s en (%.0f, %.0f)" % (zk, m['habillage'], m['voisin'], m['de'][0], m['de'][1]))
+        # verrou posé à l'intérieur d'une zone: le couloir doit être plus étroit que l'obstacle (7 m)
+        for k, v in d['verrous'].items():
+            ar = [a for a in d['aretes'] if a.get('verrou') == k]
+            if not ar or N[ar[0]['a']]['zone'] != N[ar[0]['b']]['zone']:
+                continue
+            z = d['zones'][N[ar[0]['a']]['zone']]['poly']
+            pa, pb = P.pos(ar[0]['a']), P.pos(ar[0]['b'])
+            ln = math.hypot(pb[0] - pa[0], pb[1] - pa[1])
+            nx, ny = -(pb[1] - pa[1]) / ln, (pb[0] - pa[0]) / ln
+            larg = 0.0
+            for sg in (1, -1):
+                t = 0.0
+                while t < 60 and dans(z, v['x'] + sg * nx * t, v['y'] + sg * ny * t):
+                    t += 0.25
+                larg += t
+            if larg > 7.0:
+                err.append("verrou %s: posé dans un passage de %.1f m, plus large que l'obstacle (7 m): on le contourne" % (k, larg))
+        for b in bats:
+            g = b.get('gabarit') or {}
+            if g.get('largeur') != b['rect'][2] or g.get('profondeur') != b['rect'][3]:
+                err.append("bâtiment %s: gabarit d'une autre taille que l'emprise" % b['id'])
+            if b['porte'] is not None:
+                x, y, l, h = b['rect']
+                px, py = b['porte']
+                fac = 'ouest' if abs(px - x) < 1e-6 else 'est' if abs(px - x - l) < 1e-6 else 'nord' if abs(py - y) < 1e-6 else 'sud'
+                if g.get('facade_porte') != fac or not g.get('portes'):
+                    err.append("bâtiment %s: la porte du gabarit n'est pas sur la façade %s du plan" % (b['id'], fac))
+        for m in d['mobilier']:
+            for b in bats:
+                x, y, l, h = b['rect']
+                if b['porte'] is not None and x < m['x'] < x + l and y < m['y'] < y + h:
+                    err.append("objet %s: posé dans le bâtiment %s" % (m['id'], b['id']))
+            if m.get('regarde'):
+                vx, vy = m['regarde'][0] - m['x'], m['regarde'][1] - m['y']
+                fx, fy = [(0, 1), (1, 0), (0, -1), (-1, 0)][m['rotation']]
+                if (vx * fx + vy * fy) / max(1e-9, math.hypot(vx, vy)) < 0.5:
+                    err.append("objet %s: tourne le dos (ou le flanc) à ce qu'il regarde" % m['id'])
+        for it in d['interieurs']:
+            if not it['porte'] and not it['escaliers']:
+                err.append("intérieur %s: ni porte ni escalier" % it['id'])
+        info.append("version 2: %d lisières habillées, %d objets de lieu, %d intérieurs, %d ressources" % (
+            sum(len(v) for v in d['bordures'].values()), len(d['mobilier']), len(d['interieurs']), len(d['ressources'])))
 
     # ---- 5. densité d'intérêt
     src = sorted({q['noeud'] for q in d['points_interet'] if q['noeud'] in N} | {b['noeud'] for b in bats if b['noeud'] in N})
@@ -444,12 +504,35 @@ def eprouver(d):
     def quete_coupee(c):
         next(q for q in c['quetes'] if q['id'] == 'A2')['acte'] = 1
 
+    def verrou_sans_objet(c):
+        c['verrous']['V5'].pop('objet', None)
+
+    def lisiere_nue(c):
+        c['bordures']['M'][0]['habillage'] = 'mur'
+
+    def couloir_large(c):
+        p_ = c['zones']['V']['poly']
+        p_[p_.index([100, 94.5])] = [100, 80]
+        p_[p_.index([164, 94.5])] = [164, 80]
+
+    def banc_de_dos(c):
+        next(m for m in c['mobilier'] if m['id'] == 'banc-ponton')['rotation'] = 2
+
+    def vanne_dans_l_eau(c):
+        c['noeuds']['vn'].update(x=24, y=145.3)
+
+    def porte_mal_gabaritee(c):
+        bat(c, 'forge')['gabarit']['facade_porte'] = 'nord'
+
     essais = [("porte du lavoir côté ru", lavoir_cote_riviere, "tourne le dos"), ("carré d'eau au milieu de rien", carre_d_eau, "isolé"),
               ("ru qui n'arrive nulle part", ru_coupe, "exutoire"), ("chemin en impasse", impasse, "impasse sans raison"),
               ("pont retiré", sans_pont, "dans l'eau"), ("passage à niveau retiré", sans_pn, "sans passage à niveau"),
               ("distance fausse", distance_fausse, "annoncée"), ("verrou du gué oublié", verrou_oublie, "un verrou manque"),
               ("forge posée sur la rue", maison_sur_le_chemin, "traverse le bâtiment"), ("porte du moulin sans chemin", porte_loin, "du chemin"),
-              ("bief sans prise d'eau", bief_sans_prise, "source"), ("quête hors de son acte", quete_coupee, "inatteignable")]
+              ("bief sans prise d'eau", bief_sans_prise, "source"), ("quête hors de son acte", quete_coupee, "inatteignable"),
+              ("verrou sans objet", verrou_sans_objet, "aucun objet visible"), ("lisière en mur nu", lisiere_nue, "lisière nue"),
+              ("tranchée sans talus autour de V2b", couloir_large, "on le contourne"), ("banc dos à la rivière", banc_de_dos, "tourne le dos"),
+              ("vanne posée sur l'eau (version 1)", vanne_dans_l_eau, "dans l'eau"), ("porte du gabarit sur la mauvaise façade", porte_mal_gabaritee, "façade")]
     res = [casse(*e) for e in essais]
     print("banc d'épreuve: %d casses vues sur %d" % (sum(res), len(res)))
     return all(res)

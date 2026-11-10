@@ -22,6 +22,10 @@ function aubrune(): ReturnType<typeof newSim> {
   const { map } = planToMap(plan, { place: 'aubrune', annex: 48 });
   const files = dataFiles() as Record<string, Record<string, unknown>>;
   files['lieux/aubrune/carte.json'] = v.parse(MapSchema, JSON.parse(JSON.stringify(map)));
+  // La grille seule, telle que l'outil la produit: les intérieurs livrés (portes vers la carte
+  // assemblée) n'ont pas leur porte d'arrivée ici. `assembler_lieu.py` prouve le reste.
+  for (const path of Object.keys(files))
+    if (path.startsWith('lieux/aubrune/interieurs/')) Reflect.deleteProperty(files, path);
   files['lieux/aubrune/lieu.json'] = {
     schema: 1,
     id: 'aubrune',
@@ -76,7 +80,7 @@ describe('verrous d’Aubrune (carte générée)', () => {
     );
     // Seul le ponton du premier acte, qui avance sur la rivière (zone « r »), mord sur une zone
     // suivante: ses cases appartiennent au premier acte à la génération. Rien d'autre.
-    expect(leaks).toEqual({ r: 17 });
+    expect(leaks).toEqual({ r: 11 });
   });
 
   it('verrous ouverts (faits « aubrune.verrou.<id> »): toutes les zones et tous les nœuds sont atteints', () => {
@@ -91,8 +95,8 @@ describe('verrous d’Aubrune (carte générée)', () => {
     const cut = Object.entries(place.map.graph?.nodes ?? {})
       .filter(([, p]) => !cells.has(Math.floor(p.y) * width + Math.floor(p.x)))
       .map(([id]) => id);
-    // La vanne tombe sur l'eau (à reprendre dans le plan, ADR 0022): le nœud est retiré du graphe.
-    expect(cut).toEqual(['vn']);
+    // Plan version 2: la vanne n'est plus sur l'eau, tous les nœuds sont atteints.
+    expect(cut).toEqual([]);
     const mask = reachMask(sim);
     expect(mask?.[Math.floor(arrival.y) * width + Math.floor(arrival.x)]).toBe(1);
   });

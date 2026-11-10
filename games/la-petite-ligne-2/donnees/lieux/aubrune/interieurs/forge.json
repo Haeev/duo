@@ -1,0 +1,53 @@
+{
+ "schema": 1,
+ "id": "forge",
+ "name": "La forge",
+ "width": 5,
+ "height": 5,
+ "at": {
+  "x": 86,
+  "y": 210
+ },
+ "blocked": [],
+ "points": {
+  "mado-foyer": {
+   "x": 2.5,
+   "y": 1.6
+  },
+  "mado-etabli": {
+   "x": 3.5,
+   "y": 2.5
+  }
+ },
+ "objects": [
+  {
+   "id": "forge-foyer",
+   "type": "four",
+   "x": 2.5,
+   "y": 0.5,
+   "rotation": 0
+  },
+  {
+   "id": "forge-haches",
+   "type": "etal-de-haches-forgees",
+   "x": 4.5,
+   "y": 2.5,
+   "rotation": 3
+  },
+  {
+   "id": "forge-coffre",
+   "type": "coffre",
+   "x": 0.5,
+   "y": 2.5,
+   "rotation": 1
+  }
+ ],
+ "doors": {
+  "forge-porte": {
+   "x": 2.5,
+   "y": 4.5,
+   "facing": 2,
+   "to": "porte-forge"
+  }
+ }
+}

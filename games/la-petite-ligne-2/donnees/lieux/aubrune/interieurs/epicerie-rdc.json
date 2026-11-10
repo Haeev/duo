@@ -1,0 +1,72 @@
+{
+ "schema": 1,
+ "id": "epicerie-rdc",
+ "name": "L'épicerie Ferrand",
+ "width": 7,
+ "height": 9,
+ "at": {
+  "x": 48,
+  "y": 210
+ },
+ "blocked": [
+  {
+   "x": 0,
+   "y": 5,
+   "w": 3,
+   "h": 1
+  },
+  {
+   "x": 4,
+   "y": 5,
+   "w": 3,
+   "h": 1
+  }
+ ],
+ "points": {
+  "odette-comptoir": {
+   "x": 1,
+   "y": 2.5
+  },
+  "odette-cuisine": {
+   "x": 1.5,
+   "y": 7.5
+  }
+ },
+ "objects": [
+  {
+   "id": "epicerie-etal",
+   "type": "etal-de-tourte",
+   "x": 5.5,
+   "y": 0.5,
+   "rotation": 0
+  },
+  {
+   "id": "epicerie-cuisiniere",
+   "type": "cuisiniere",
+   "x": 0.5,
+   "y": 8.5,
+   "rotation": 0
+  },
+  {
+   "id": "epicerie-table",
+   "type": "table-a-manger",
+   "x": 4,
+   "y": 7,
+   "rotation": 0
+  }
+ ],
+ "doors": {
+  "epicerie-rdc-porte": {
+   "x": 6.5,
+   "y": 2.5,
+   "facing": 3,
+   "to": "porte-epicerie-epicerie-rdc"
+  },
+  "epicerie-rdc-esc-epicerie-etage": {
+   "x": 6.5,
+   "y": 8.5,
+   "facing": 2,
+   "to": "epicerie-etage-esc-epicerie-rdc"
+  }
+ }
+}
