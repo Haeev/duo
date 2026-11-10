@@ -120,4 +120,10 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Corpulences par cibles de morphose (même générateur relancé avec d'autres cotes: topologie identique), cuites à la fusion. Âges par translations de repos des os: des membres en gélules coaxiales coulissent l'un dans l'autre sans cisaillement; jamais d'échelle non uniforme sur un os animé.
 - Expressions: reconstruire tout le visage par expression avec la même topologie, chaque version devient une clé de forme; une pièce cachée (arc d'œil fermé, joue) se range dans la tête plutôt que de disparaître.
 - Blender 5.2: régler `scene.render.fps` avant d'importer un glTF animé (sinon 24 i/s et des durées fausses); `export_vertex_color="ACTIVE"` avec un attribut `FLOAT_COLOR` de coin sort COLOR_0; `tomllib` est disponible sous duo-python.
+- Axe V: l'export glTF de Blender écrit `v' = 1 - v`. Le catalogue v1 écrit `1 - (section + 0,5) / 16` dans Blender (`section_v`) pour que le jeu lise `floor(v * 16)` directement.
+- Une clé de forme bloque `modifier_apply` (Solidify, Decimate) et `join` mélange mal des objets avec et sans clés: construire sans clés, joindre, épaissir, puis ajouter les cibles (`add_stoop`).
+- Une cible qui ne dépend que de la position (dos voûté `stoop_delta`) s'ajoute à toutes les pièces sans rien décoller, y compris tête, chapeau et lunettes.
+- Barbes et lunettes « qui vont à toutes les têtes »: lancer des rayons sur le crâne de chaque tête du catalogue et garder la surface la plus avancée.
+- Budget 6 000 triangles par personnage: la tête (visage complet) pèse 1 250, les boutons (n=8) 64 chacun; un bonnet Meshy se réduit par `DECIMATE` au champ `triangles`.
+- Copie isolée: une commande qui contient `source` ou `git show` dans une boucle est refusée; passer par un script Python (subprocess) écrit avec l'outil d'écriture.
 - Three.js: `SkeletonUtils.clone` par personnage, puis fusion manuelle (positions plus deltas de morphose, indices d'os refaits par nom); une vue de profil d'une rangée de personnages demande 14 m d'écart, sinon la caméra entre dans le voisin.

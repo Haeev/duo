@@ -1,0 +1,31 @@
+{
+ "outil": "Meshy (serveur MCP officiel 0.6.9, par docs/production/essais-meshy/scripts/meshy-mcp.mjs)",
+ "date": "2026-11-10",
+ "usage": "essai de style 2, voie B: personnages entiers de référence, non livrés dans le jeu",
+ "sorties_brutes": "non versionnées (liens signés, effacés 3 jours après la tâche)",
+ "solde": { "avant": 2122, "apres": 2052, "depense": 70, "budget": 200 },
+ "parametres_communs": { "ai_model": "meshy-6", "pose_mode": "a-pose", "should_remesh": true, "target_polycount": 8000, "topology": "triangle", "affinage": { "enable_pbr": false }, "rig": "meshy_rig, marche incluse" },
+ "suffixe_de_consigne": "low-poly early-2000s life simulation game character, realistic slender proportions about seven heads tall, painted hand-made textures, clothes with folds and seams painted in the texture, face painted, full body, A-pose, standing, plain background",
+ "assets": [
+  {
+   "id": "femme",
+   "consigne": "woman in her thirties, shoulder-length brown hair, mustard knit sweater, dark blue jeans, brown ankle boots, + suffixe",
+   "taches": [
+    { "type": "text-to-3d (aperçu)", "id": "01a1c584-8208-73e0-8167-6cba4bbd7f69", "credits": 20 },
+    { "type": "text-to-3d (affinage, texture)", "id": "01a1c585-7c0c-75ed-9232-d17aa1fb9c33", "credits": 10 },
+    { "type": "rigging (marche)", "id": "01a1c586-a702-77b8-bf69-7e76ea31391f", "credits": 5 }
+   ],
+   "mesure": { "triangles": 8325, "texture": "2048 x 2048 JPEG", "glb_marche_octets": 4631184 }
+  },
+  {
+   "id": "homme",
+   "consigne": "older man in his sixties, short grey hair and grey moustache, white shirt with rolled sleeves, olive work vest, brown corduroy trousers, black leather shoes, + suffixe",
+   "taches": [
+    { "type": "text-to-3d (aperçu)", "id": "01a1c584-92d1-7104-96c0-b600f0abd3a9", "credits": 20 },
+    { "type": "text-to-3d (affinage, texture)", "id": "01a1c587-0906-727a-85cc-6e3d771b39d1", "credits": 10 },
+    { "type": "rigging (marche)", "id": "01a1c588-3a5a-7000-9453-1a26f0870107", "credits": 5 }
+   ],
+   "mesure": { "triangles": 8271, "texture": "2048 x 2048 JPEG", "glb_marche_octets": 4258028 }
+  }
+ ]
+}

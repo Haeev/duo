@@ -1,0 +1,30 @@
+{
+ "A": [
+  {
+   "triangles": 3872,
+   "textures": [
+    "512x512"
+   ]
+  },
+  {
+   "triangles": 4008,
+   "textures": [
+    "512x512"
+   ]
+  }
+ ],
+ "B": [
+  {
+   "triangles": 8325,
+   "textures": [
+    "2048x2048"
+   ]
+  },
+  {
+   "triangles": 8271,
+   "textures": [
+    "2048x2048"
+   ]
+  }
+ ]
+}

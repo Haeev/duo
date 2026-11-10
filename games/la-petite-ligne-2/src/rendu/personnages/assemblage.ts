@@ -181,12 +181,11 @@ interface Part {
 const color = new Color();
 
 /**
- * Section du corps d'un sommet. Le générateur écrit `(section + 0,5) / 16` en V dans Blender;
- * l'export glTF retourne l'axe V (v' = 1 - v): on relit donc depuis le haut. Vérifié sur
- * `body.glb`: sans ce retournement, une jupe retirait les mollets et les mains.
+ * Section du corps d'un sommet: le fichier glTF porte `(section + 0,5) / 16` en V (le générateur
+ * compense le retournement de l'axe V à l'export depuis le catalogue v1), lu directement.
  */
 export function sectionOf(v: number): number {
-  return 15 - Math.min(15, Math.max(0, Math.floor(v * 16)));
+  return Math.min(15, Math.max(0, Math.floor(v * 16)));
 }
 
 function readPart(

@@ -4,7 +4,9 @@ Conventions d'export (lues par l'assemblage du jeu):
 - un seul matériau `figurine` pour toutes les pièces; la couleur par défaut est en couleurs de sommets (COLOR_0);
 - TEXCOORD_0.x = (zone + 0,5) / 8: zones 0 à 2 teintables (ordre de `zones` dans le catalogue), 6 couleur fixe
   (on garde COLOR_0), 7 peau (teinte `skin` de l'apparence);
-- TEXCOORD_0.y = (section + 0,5) / 16: section du corps (ordre de REGIONS), pour retirer ce qu'un vêtement couvre;
+- TEXCOORD_0.y = (section + 0,5) / 16 dans le fichier glTF, lu directement (`floor(v * 16)`): section du corps
+  (ordre de REGIONS), pour retirer ce qu'un vêtement couvre. L'export glTF retourne l'axe V de Blender (v' = 1 - v):
+  on écrit donc `1 - (section + 0,5) / 16` dans Blender (fonction `section_v`);
 - cibles de morphose: corpulences et silhouettes sur les pièces du corps et les vêtements, expressions sur les têtes.
 """
 import math
@@ -21,6 +23,11 @@ ZONE_FIXED, ZONE_SKIN = 6, 7
 def srgb(hexa):
     c = [int(hexa[i:i + 2], 16) / 255 for i in (1, 3, 5)]
     return [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+
+
+def section_v(region):
+    """V à écrire dans Blender pour que le fichier glTF porte (section + 0,5) / 16 (export: v' = 1 - v)."""
+    return 1.0 - (region + 0.5) / 16
 
 
 def smooth(a, b, t):
@@ -119,7 +126,7 @@ class Builder:
             p.use_smooth = True
             rgb = cache.setdefault(color, srgb(color))
             for li in p.loop_indices:
-                uv.data[li].uv = ((zone + 0.5) / 8, (region + 0.5) / 16)
+                uv.data[li].uv = ((zone + 0.5) / 8, section_v(region))
                 col.data[li].color = (*rgb, 1.0)
         me.color_attributes.active_color = col
         me.set_sharp_from_angle(angle=math.radians(sharp))
