@@ -10,6 +10,7 @@ import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { TOOL_INTENTS } from '../outils/intentions';
 import { VILLAGER_INTENTS } from '../habitants/intentions';
 import { QUEST_INTENTS } from '../quetes/intentions';
+import { HOUSING_INTENTS } from '../logement/intentions';
 import { BAG_INTENTS } from '../sac/intentions';
 import { SCENE_INTENTS } from '../scenes/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
@@ -51,5 +52,6 @@ export const IntentSchema = v.variant('type', [
   ...SCENE_INTENTS,
   ...COOK_INTENTS,
   ...COLLECTION_INTENTS,
+  ...HOUSING_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

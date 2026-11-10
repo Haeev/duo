@@ -19,6 +19,7 @@ import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
 import { validateStory } from '../simulation/quetes/valider';
 import { checkRecipes } from '../simulation/cuisine/valider';
+import { validateHousings } from '../simulation/logement/valider';
 
 export function checkCondition(
   content: Content,
@@ -443,5 +444,6 @@ export function validateContent(content: Content): string[] {
   problems.push(...validateVillagerLives(content, checkCondition));
   // Suites de quêtes et scènes: références, et aucune suite qui puisse se bloquer.
   problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));
+  problems.push(...validateHousings(content));
   return problems;
 }

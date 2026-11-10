@@ -6,6 +6,7 @@
 import * as v from 'valibot';
 import { FileVersionSchema, IdSchema, IntSchema, LabelSchema } from './communs';
 import { BrickSchema } from './briques';
+import { DecoSchema } from './logement';
 
 const Cells = v.pipe(IntSchema, v.minValue(1), v.maxValue(8));
 
@@ -25,5 +26,7 @@ export const PropSchema = v.strictObject({
   series: v.nullable(IdSchema),
   /** Ce qu'il sait faire, dans l'ordre de priorité de la touche d'action; une brique de chaque sorte au plus. */
   bricks: v.pipe(v.array(BrickSchema), v.maxLength(4)),
+  /** Mode déco: couche, surface, dedans ou dehors, confort (`logement.ts`); absent: au sol, dedans, confort 1. */
+  deco: v.exactOptional(DecoSchema),
 });
 export type PropDef = v.InferOutput<typeof PropSchema>;

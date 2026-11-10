@@ -14,6 +14,7 @@ import { shopRefusalText } from './boutique/textes';
 import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
 import { createKitchen } from './cuisine/index';
+import { createDecoMode, decoHousingFor } from './deco/deco';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import type { UiSettings } from './carnet/lectures';
 import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
@@ -140,6 +141,15 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     defaultGender: (player) => CHARACTER_SETTINGS.defaultGenders[player],
   });
   let editorShown = options.editorAtStart === false;
+  // Mode déco (touche B dans le logement): plan dessiné par l'interface tant que le rendu n'a pas de vue du dessus.
+  const deco = createDecoMode({
+    layer,
+    content: view.content,
+    world: view.world,
+    localIndex: view.localIndex,
+    send,
+    keyLabel,
+  });
 
   function local(): PlayerIndex | null {
     return view.localIndex();
@@ -273,6 +283,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'photo_taken':
       case 'rain_watered':
       case 'weather_changed':
+      case 'room_progress':
+      case 'room_supplied':
+      case 'deco_changed':
+      case 'comfort_changed':
         break;
     }
   }
@@ -285,12 +299,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (editor.isOpen()) used = editor.key(raw);
+    else if (deco.isOpen()) used = deco.key(raw.code);
     else if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
     else if (shop.isOpen()) used = shop.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (raw.code === 'KeyG' && !raw.repeat) {
       hud.glance(now);
       used = true;
+    } else if (raw.code === 'KeyB' && !raw.repeat) {
+      const home = decoHousingFor(view.content, view.world(), local());
+      if (home !== null) deco.open(home);
+      used = home !== null;
     } else if (raw.code === 'KeyC' && !raw.repeat) {
       notebook.open(now);
       used = true;
@@ -319,6 +338,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       notebook.frame(world, me);
       shop.frame(world, me, now);
       kitchen.frame(dtMs);
+      deco.frame();
       const shopOpen = shop.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       const prompt = menu
@@ -344,7 +364,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         dialogue.isOpen() ||
         notebook.isOpen() ||
         shop.isOpen() ||
-        kitchen.isOpen()
+        kitchen.isOpen() ||
+        deco.isOpen()
       );
     },
     dispose() {
@@ -356,6 +377,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       shop.dispose();
       editor.dispose();
       kitchen.dispose();
+      deco.dispose();
       layer.remove();
     },
   };

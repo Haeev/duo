@@ -19,6 +19,7 @@ import {
   type MapDef,
   type PlaceDef,
 } from './schemas/lieu';
+import { HousingSchema, type HousingDef } from './schemas/logement';
 import { PropSchema, type PropDef } from './schemas/meuble';
 import { ItemSchema, type ItemDef } from './schemas/objets';
 import {
@@ -58,6 +59,8 @@ export interface PlaceContent {
   readonly shops: ById<ShopDef>;
   readonly quests: ById<QuestLineDef>;
   readonly scenes: ById<SceneDef>;
+  /** Logements du lieu (`logements/<id>.json`). */
+  readonly housings: ById<HousingDef>;
 }
 
 /** Tout le contenu du jeu, lu et contrôlé. Il ne change jamais pendant une partie. */
@@ -178,6 +181,7 @@ export function loadContent(files: Files): Content {
       parseFolder(InteriorSchema, files, `${base}/interieurs`, problems),
     );
     const scenes = parseFolder(SceneSchema, files, `${base}/scenes`, problems);
+    const housings = parseFolder(HousingSchema, files, `${base}/logements`, problems);
     if (def === null || map === null) continue;
     // Un point ou une porte d'intérieur qui porterait le nom d'un autre l'écraserait à la fusion.
     const seen = new Set([...Object.keys(map.points), ...Object.keys(map.doors ?? {})]);
@@ -201,6 +205,7 @@ export function loadContent(files: Files): Content {
       shops,
       quests,
       scenes,
+      housings,
     };
   }
 

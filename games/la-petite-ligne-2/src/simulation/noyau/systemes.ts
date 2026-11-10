@@ -17,6 +17,7 @@ import { villagerSystem } from '../habitants/index';
 import { questSystem } from '../quetes/index';
 import { collectionSystem } from '../collections/index';
 import { worldTimeSystem } from '../monde/index';
+import { housingSystem } from '../logement/index';
 import { bagSystem } from '../sac/index';
 import { sceneSystem } from '../scenes/index';
 import { travelSystem } from '../voyage/index';
@@ -67,4 +68,5 @@ export const SYSTEMS: readonly GameSystem[] = [
   cookingSystem,
   worldTimeSystem,
   collectionSystem,
+  housingSystem,
 ];

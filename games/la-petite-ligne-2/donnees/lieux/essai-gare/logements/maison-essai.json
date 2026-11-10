@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "id": "maison-essai",
+  "name": "Maison d'essai",
+  "kind": "house",
+  "entrance": {
+    "x": 29.5,
+    "y": 13.5
+  },
+  "doors": [
+    {
+      "x": 32.5,
+      "y": 8.5
+    }
+  ],
+  "rooms": [
+    {
+      "id": "salle",
+      "name": "Salle",
+      "area": {
+        "x": 27,
+        "y": 5,
+        "w": 5,
+        "h": 8
+      },
+      "floor": 0,
+      "start": "ruin",
+      "requires": [],
+      "stages": [
+        {
+          "name": "Débroussailler",
+          "materials": [],
+          "cost": 0,
+          "work": 6,
+          "when": []
+        },
+        {
+          "name": "Poser le toit",
+          "materials": [
+            {
+              "item": "planche",
+              "count": 4
+            }
+          ],
+          "cost": 500,
+          "work": 10,
+          "when": []
+        }
+      ],
+      "unlocks": ["sleep", "store"],
+      "clue": "Sous les gravats, une casquette de chef de ligne, pliée avec soin."
+    },
+    {
+      "id": "chambre",
+      "name": "Chambre",
+      "area": {
+        "x": 33,
+        "y": 5,
+        "w": 5,
+        "h": 8
+      },
+      "floor": 0,
+      "start": "ruin",
+      "requires": ["salle"],
+      "stages": [
+        {
+          "name": "Refaire le plancher",
+          "materials": [
+            {
+              "item": "planche",
+              "count": 2
+            },
+            {
+              "item": "buche",
+              "count": 2
+            }
+          ],
+          "cost": 1500,
+          "work": 8,
+          "when": [
+            {
+              "type": "remembered",
+              "key": "essai-gare.maison-essai.salle"
+            }
+          ]
+        }
+      ],
+      "unlocks": ["sleep", "store", "wash"],
+      "clue": null
+    }
+  ],
+  "garden": {
+    "x": 24,
+    "y": 2,
+    "w": 16,
+    "h": 15
+  },
+  "stock": {
+    "lit-double-essai": 1,
+    "table-essai": 1,
+    "chaise-essai": 2,
+    "tapis-essai": 1,
+    "lampe-essai": 1,
+    "cadre-essai": 1,
+    "coffre-deco-essai": 1,
+    "baquet-essai": 1,
+    "buffet-essai": 1,
+    "pot-de-fleurs-essai": 2
+  }
+}

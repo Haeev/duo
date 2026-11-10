@@ -1,0 +1,49 @@
+// GABARIT: le logement d'un lieu (maison à restaurer, appartement, wagon), fait de pièces.
+// Créer: pnpm nouveau logement <id> <lieu>   -> donnees/lieux/<lieu>/logements/<id>.json
+// Schéma: src/donnees/schemas/logement.ts; système: src/simulation/logement/
+// Les murs et les portes se dessinent dans la carte du lieu (zones "blocked" avec un trou de 1 m).
+// Coordonnées en mètres de la carte (x vers l'est, y vers le sud). Prix en centimes.
+{
+  "schema": 1,
+  "id": "exemple-logement",
+  "name": "Logement d'exemple",
+  // "house" (à restaurer et agrandir), "apartment" (pièces fixes, tout à décorer), "wagon".
+  "kind": "house",
+  // Le trou de la porte d'entrée dans le mur: toujours libre, départ du chemin vers les lits.
+  "entrance": { "x": 12.5, "y": 20.5 },
+  // Les autres portes (entre pièces, vers le jardin): on ne pose rien devant.
+  "doors": [],
+  "rooms": [
+    {
+      "id": "piece",
+      "name": "Pièce",
+      // Sol de la pièce, murs exclus. Un étage a son propre rectangle et "floor": 1.
+      "area": { "x": 10, "y": 14, "w": 6, "h": 6 },
+      "floor": 0,
+      // "ruin" (à restaurer), "absent" (agrandissement à construire), "restored" (déjà prête, sans étape).
+      "start": "ruin",
+      // Pièces à restaurer avant celle-ci.
+      "requires": [],
+      // Étapes, dans l'ordre. Chacune: matériaux (objets du sac, apportables en plusieurs fois et
+      // à deux), prix (coffre commun puis bourse de qui paie), secondes de travail d'un joueur
+      // seul (plus vite à deux), conditions d'histoire (vocabulaire des quêtes) pour commencer.
+      "stages": [
+        {
+          "name": "Déblayer",
+          "materials": [{ "item": "planche", "count": 2 }],
+          "cost": 1000,
+          "work": 20,
+          "when": [],
+        },
+      ],
+      // Ce que la pièce restaurée permet d'installer: "sleep", "cook", "wash", "store".
+      "unlocks": ["sleep", "store"],
+      // Indice de l'histoire trouvé à la fin (cahier 4.2), ou null.
+      "clue": null,
+    },
+  ],
+  // Le dehors décorable autour du logement (réponse 53), ou null (appartement sans balcon).
+  "garden": { "x": 8, "y": 12, "w": 10, "h": 11 },
+  // Meubles déjà possédés à l'arrivée (inventaire de la maison): type de meuble -> nombre.
+  "stock": { "chaise": 1 },
+}

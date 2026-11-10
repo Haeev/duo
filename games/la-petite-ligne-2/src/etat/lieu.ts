@@ -14,6 +14,7 @@ import {
 import { BrickStatesSchema } from './briques';
 import { VillagerLifeStateSchema } from './habitants';
 import { BodySchema, StackSchema } from './joueur';
+import { HousingStateSchema } from './logement';
 
 const villagerSlow = {
   /** Déjà rencontré par chaque joueur. */
@@ -75,6 +76,8 @@ const placeSlow = {
   shops: v.exactOptional(v.record(IdSchema, ShopDaySchema)),
   /** Insectes posés (`simulation/collections/insectes.ts`). */
   insects: v.exactOptional(InsectsStateSchema),
+  /** Logements du lieu (`simulation/logement/`), créés à la première visite. */
+  housing: v.exactOptional(v.record(IdSchema, HousingStateSchema)),
 } as const;
 
 /** Ce qui part dans la tranche « lieu »: tout, sauf les positions des habitants (canal rapide). */
@@ -109,5 +112,6 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
   };
   if (shops !== undefined) slow.shops = shops;
   if (place.insects !== undefined) slow.insects = place.insects;
+  if (place.housing !== undefined) slow.housing = place.housing;
   return slow;
 }

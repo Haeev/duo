@@ -48,6 +48,7 @@ describe('gabarits', () => {
         'interieur',
         'insecte',
         'lieu',
+        'logement',
         'meuble',
         'objet',
         'piece-de-personnage',

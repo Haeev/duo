@@ -4,7 +4,7 @@ import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
 import { loadContent, type Content } from '../src/donnees/charger';
 import { bondKey } from '../src/etat/progression';
-import { BUDGET_BYTES, SLICE_SCHEMAS } from '../src/reseau/canaux';
+import { BUDGET_BYTES, PLACE_OBJECTS_STATE_BYTES, SLICE_SCHEMAS } from '../src/reseau/canaux';
 import { byteLength, currentPlace, sliceMessage } from '../src/reseau/tranches';
 import { findRoute } from '../src/simulation/habitants/chemins';
 import { hasSomethingFor, isShopOpen, villagerView } from '../src/simulation/habitants/lecture';
@@ -425,7 +425,11 @@ describe('habitants', () => {
       `tranche lieu au pire: ${String(size)} octets, un habitant: ${String(perVillager)}\n`,
     );
     expect(perVillager).toBeLessThan(400);
-    expect(size).toBeLessThan(BUDGET_BYTES.place);
+    // ADR 0022: les meubles partent à part, par morceaux; le budget du lieu vaut hors meubles.
+    const { objects, ...rest } = message.place;
+    expect(size).toBeGreaterThan(0);
+    expect(byteLength({ ...message, place: rest })).toBeLessThan(BUDGET_BYTES.place);
+    expect(byteLength(objects)).toBeLessThanOrEqual(PLACE_OBJECTS_STATE_BYTES);
     expect(seasonOf(15, 14)).toBe('summer');
   });
 });
