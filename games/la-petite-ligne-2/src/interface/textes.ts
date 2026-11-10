@@ -183,6 +183,13 @@ export const TEXTS = {
     eat: 'Manger',
     drop: 'Poser',
     give: 'Donner',
+    equip: 'Équiper',
+    equipDone: '{sac} équipé : {n} cases.',
+    equipDoneUnknown: 'Sac équipé.',
+    equipSame: 'Tu portes déjà ce sac.',
+    equipSmaller:
+      'Ton sac a déjà {n} cases, celui-ci n’en a que {m}. Garde le tien ou donne celui-ci à l’autre.',
+    scrollKeys: 'défiler',
     move: 'déplacer',
     tabsKeys: 'onglets',
     close: 'fermer',

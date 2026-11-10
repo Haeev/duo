@@ -38,6 +38,12 @@ export interface UiTuning {
   readonly gridColumns: number;
   /** Nom d'un objet dans les menus: 4 mots au plus. */
   readonly nameWords: number;
+  /**
+   * Encombrement du carnet ouvert à l'échelle 1 (px): livre de 1064 x 608 plus signet ouvert et
+   * marges. Sert à ne pas agrandir l'interface au point que le carnet sorte de la fenêtre.
+   */
+  readonly notebookWidthPx: number;
+  readonly notebookHeightPx: number;
 }
 
 export const UI_TUNING: UiTuning = {
@@ -61,4 +67,6 @@ export const UI_TUNING: UiTuning = {
   sleepFrom: 15 * 60,
   gridColumns: 5,
   nameWords: 4,
+  notebookWidthPx: 1260,
+  notebookHeightPx: 640,
 };
