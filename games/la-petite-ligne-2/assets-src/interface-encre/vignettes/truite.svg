@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Truite: corps dodu, dos vert sombre, ventre clair, points, oeil rond. -->
+  <g transform="translate(0 2) rotate(-14 48 48)">
+    <path d="M70 46 L90 30 Q86 48 92 64 L70 52 Z" fill="#3F6453"/>
+    <path d="M38 32 Q44 22 54 30 Z" fill="#3F6453"/>
+    <path id="corps" d="M6 48 Q20 28 48 30 Q66 32 76 48 Q66 64 46 66 Q20 66 6 48 Z" fill="#96A98C"/>
+    <path data-clip="corps" data-w="0" d="M0 20 L90 20 L90 46 Q50 36 0 44 Z" fill="#3F6453"/>
+    <path data-clip="corps" data-w="0" d="M0 54 Q40 52 80 50 L80 80 L0 80 Z" fill="#F3EDE0"/>
+    <path data-clip="corps" data-w="0" d="M10 50 Q40 46 76 49 L76 54 Q40 50 10 54 Z" fill="#CC9C96"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M22 38 Q28 48 22 58"/>
+    <path d="M30 60 Q36 66 32 72 Q26 66 30 60 Z" fill="#3F6453" data-w="0.6"/>
+    <circle cx="15" cy="45" r="4.4" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="16" cy="45" r="2" fill="#231A17" data-w="0"/>
+    <g data-w="0"><circle cx="40" cy="38" r="1.8" fill="#231A17"/><circle cx="50" cy="42" r="1.8" fill="#231A17"/><circle cx="58" cy="37" r="1.6" fill="#231A17"/><circle cx="62" cy="45" r="1.5" fill="#231A17"/><circle cx="44" cy="46" r="1.4" fill="#C5443D"/></g>
+  </g>
+</svg>

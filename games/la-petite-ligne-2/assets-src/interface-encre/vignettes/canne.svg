@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Canne à pêche: gaule de bambou, moulinet de laiton, fil et bouchon rouge et blanc. -->
+  <g transform="translate(6 -2) scale(0.9)">
+  <path data-w="0.32" fill="none" stroke="#000" d="M86 9 Q90 40 76 58"/>
+  <path d="M8 88 L16 82 L84 8 L88 11 L22 88 L14 92 Z" fill="#D7A86A"/>
+  <path data-w="0" d="M14 90 L20 86 L86 10 L88 11 L22 88 Z" fill="#A87A46"/>
+  <g data-w="0.5" fill="none" stroke="#000"><path d="M36 63 l5 4 M56 41 l4 4 M71 25 l3 3"/></g>
+  <path d="M6 87 L18 75 L25 82 L13 94 Z" fill="#8C5A35"/>
+  <circle id="moulinet" cx="30" cy="72" r="9" fill="#C8A150"/>
+  <circle data-clip="moulinet" data-w="0" cx="34" cy="76" r="9" fill="#8E6A26"/>
+  <circle cx="30" cy="72" r="3.2" fill="#F2C55C" data-w="0.5"/>
+  <path d="M37 78 L44 86 L40 89 L33 81 Z" fill="#4A4D52" data-w="0.6"/>
+  <path id="bouchon" d="M76 56 Q84 62 76 76 Q68 62 76 56 Z" fill="#C5443D"/>
+  <path data-clip="bouchon" data-w="0" d="M66 66 L86 66 L86 80 L66 80 Z" fill="#F3EDE0"/>
+  <path data-w="0.5" fill="none" stroke="#000" d="M76 76 L76 82"/>
+  </g>
+</svg>

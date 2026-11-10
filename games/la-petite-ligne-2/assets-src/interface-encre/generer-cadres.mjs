@@ -1,7 +1,8 @@
 /**
- * Génère `cadres.css`: les cadres du style « encré », comme des cases de bande dessinée tracées à
- * la règle et à la plume (traits épais qui s'affinent, coins qui dépassent, bords un peu de
- * travers, ombre en hachures).
+ * Génère `cadres.css`: les cadres du style « encré », thème sombre (retour du client du
+ * 2026-11-10: « plus sombre, moins encré »). Panneaux presque noirs, liseré fin et clair, bords un
+ * peu irréguliers et anguleux mais nets; ombre en aplat sombre, sans hachures ni second trait.
+ * Le trait vivant reste aux vignettes, pictos et portraits.
  *
  * Lancer depuis le paquet: `node assets-src/interface-encre/generer-cadres.mjs`, puis
  * `prettier --write src/interface/encre/cadres.css`. Le tirage est fixe (graine par cadre): deux
@@ -17,17 +18,20 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 /** Couleurs: les mêmes que les variables de `encre.css` (une image ne lit pas les variables). */
-const INK = '#1d1a17';
+const INK = '#9c8a6c';
+const SHADOW = '#0b0908';
 const FILLS = {
-  papier: '#fdf6e3',
-  page: '#f6ecd2',
-  creux: '#ead9b4',
+  papier: '#2a2421',
+  page: '#221d1b',
+  creux: '#171413',
   accent: '#ffc83d',
-  encre: '#1d1a17',
-  nuit: '#2b3a5c',
-  tilleul: '#a9c58f',
-  ciel: '#b9d6de',
+  encre: '#f0e4c8',
+  nuit: '#1b2238',
+  tilleul: '#26302a',
+  ciel: '#1e2a33',
 };
+/** Liseré par fond: clair sur le sombre, plus chaud sur l'accent, éteint sur les tirets. */
+const LINES = { accent: '#ffe7a3', creux: '#6e604f' };
 
 /**
  * Tailles (px): `ink` épaisseur du trait, `out` débord du cadre hors de la boîte, `shadow`
@@ -35,9 +39,9 @@ const FILLS = {
  * nombre de cassures d'un grand bord.
  */
 const SIZES = {
-  grand: { ink: 4.6, out: 6, shadow: 9, skew: 2.2, over: 5, bends: 2 },
-  moyen: { ink: 3.6, out: 5, shadow: 6, skew: 1.6, over: 3.5, bends: 1 },
-  petit: { ink: 3, out: 4, shadow: 5, skew: 1.1, over: 2.5, bends: 0 },
+  grand: { ink: 2.2, out: 6, shadow: 9, skew: 1.4, over: 0, bends: 2 },
+  moyen: { ink: 1.9, out: 5, shadow: 6, skew: 1.1, over: 0, bends: 1 },
+  petit: { ink: 1.6, out: 4, shadow: 5, skew: 0.8, over: 0, bends: 0 },
 };
 
 /** Écart (px) entre la case et le second trait de plume des cadres de focus. */
@@ -121,7 +125,7 @@ function edge(rnd, s, horizontal, anchorFar, near, far, depth, dashed) {
       lines.push(`<line ${coords} stroke-width='${r1(width)}'/>`);
     };
     draw(da, db, s.ink);
-    if (!dashed) {
+    if (!dashed && s.double === true) {
       // Second passage de plume, vers l'intérieur: le trait s'épaissit vers un coin (jamais à
       // une cassure, où les deux segments doivent se rejoindre).
       const swell = s.ink * (0.3 + rnd() * 0.3);
@@ -146,22 +150,21 @@ function frameSvg(name, sizeName, fillName, shadow, dashed, halo = false) {
   const size = `width:calc(100% - ${r1(lead + trail)}px);height:calc(100% - ${r1(lead + trail)}px)`;
   const parts = [];
   if (shadow) {
-    const step = Math.round(s.ink * 2.1);
-    const weight = r1(s.ink * 0.55);
+    // Ombre portée en aplat sombre, décalée de moitié: elle pose la case sans la doubler.
+    const d = r1(s.shadow * 0.5);
     parts.push(
-      `<pattern id='h' width='${step * 9}' height='${step * 2}' patternUnits='userSpaceOnUse' patternTransform='rotate(-48)'><path d='M0 ${r1(step * 0.5)}H${step * 9}M${step} ${r1(step * 1.5)}H${step * 5}M${r1(step * 5.8)} ${r1(step * 1.45)}H${step * 9}' stroke='${INK}' stroke-width='${weight}' stroke-linecap='round'/></pattern>`,
-      `<rect x='${r1(lead + s.shadow)}' y='${r1(lead + s.shadow)}' style='${size}' fill='url(%23h)'/>`,
+      `<rect x='${r1(lead + d)}' y='${r1(lead + d)}' style='${size}' fill='${SHADOW}' fill-opacity='0.55'/>`,
     );
   }
   parts.push(`<rect x='${r1(lead)}' y='${r1(lead)}' style='${size}' fill='${FILLS[fillName]}'/>`);
   if (fillName === 'ciel') {
     // Vitrine: une trame de points dans le tiers bas, comme une ombre imprimée sous l'objet.
     parts.push(
-      `<pattern id='p' width='7' height='7' patternUnits='userSpaceOnUse'><circle cx='2' cy='2' r='1.3' fill='${INK}' fill-opacity='0.3'/><circle cx='5.5' cy='5.5' r='1.3' fill='${INK}' fill-opacity='0.3'/></pattern>`,
+      `<pattern id='p' width='7' height='7' patternUnits='userSpaceOnUse'><circle cx='2' cy='2' r='1.1' fill='%23000' fill-opacity='0.35'/><circle cx='5.5' cy='5.5' r='1.1' fill='%23000' fill-opacity='0.35'/></pattern>`,
       `<rect x='${r1(lead)}' y='68%' style='width:calc(100% - ${r1(lead + trail)}px);height:calc(32% - ${r1(trail)}px)' fill='url(%23p)'/>`,
     );
   }
-  if (sizeName === 'grand') {
+  if (sizeName === 'grand' && s.double === true) {
     // Quelques hachures dans le coin bas droit de la case, comme une ombre portée du bord.
     const strokes = [];
     for (let i = 1; i <= 7; i += 1) {
@@ -174,8 +177,9 @@ function frameSvg(name, sizeName, fillName, shadow, dashed, halo = false) {
     );
   }
   const dash = dashed ? ` stroke-dasharray='${r1(s.ink * 2.4)} ${r1(s.ink * 2.2)}'` : '';
+  const line = LINES[fillName] ?? INK;
   parts.push(
-    `<g stroke='${INK}' stroke-linecap='${dashed ? 'butt' : 'square'}'${dash}>`,
+    `<g stroke='${line}' stroke-linecap='${dashed ? 'butt' : 'square'}'${dash}>`,
     edge(rnd, s, true, false, lead, trail, lead, dashed),
     edge(rnd, s, false, true, lead, trail, trail, dashed),
     edge(rnd, s, true, true, lead, trail, trail, dashed),
@@ -183,15 +187,15 @@ function frameSvg(name, sizeName, fillName, shadow, dashed, halo = false) {
     '</g>',
   );
   if (halo) {
-    // Second trait, plus fin et plus libre, autour de la case: le focus se lit sans la couleur.
-    const pen = { ink: 2, skew: 1.2, over: 3, bends: s.bends };
+    // Second trait fin, d'accent, autour de la case: le focus se lit aussi sans la couleur.
+    const pen = { ink: 1.6, skew: 0.8, over: 0, bends: s.bends };
     const [near, far] = [2.6, trail - lead + 2.6];
     parts.push(
-      `<g stroke='${INK}' stroke-linecap='square'>`,
-      edge(rnd, pen, true, false, near, far, near, true),
-      edge(rnd, pen, false, true, near, far, far, true),
-      edge(rnd, pen, true, true, near, far, far, true),
-      edge(rnd, pen, false, false, near, far, near, true),
+      `<g stroke='${FILLS.accent}' stroke-linecap='square'>`,
+      edge(rnd, pen, true, false, near, far, near, false),
+      edge(rnd, pen, false, true, near, far, far, false),
+      edge(rnd, pen, true, true, near, far, far, false),
+      edge(rnd, pen, false, false, near, far, near, false),
       '</g>',
     );
   }

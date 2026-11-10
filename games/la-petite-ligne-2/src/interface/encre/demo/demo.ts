@@ -61,7 +61,10 @@ const capture = Object.entries(captures).find(([path]) => path.endsWith(`encre-$
 fond.dataset.fond = backdrop;
 if (capture !== undefined) fond.style.backgroundImage = `url("${capture[1]}")`;
 else {
-  fond.innerHTML = provisionalBackdrop(backdrop === 'interieur-jour' ? 'interieur' : 'exterieur');
+  fond.innerHTML = provisionalBackdrop(
+    backdrop === 'interieur-jour' ? 'interieur' : 'exterieur',
+    backdrop === 'exterieur-nuit' ? 'nuit' : 'crepuscule',
+  );
   document.getElementById('monde')?.removeAttribute('hidden');
 }
 if (params.get('style') !== 'ancien') root.dataset.lplStyle = 'encre';
@@ -98,7 +101,8 @@ if (screen === 'planche') {
   ]);
   const me = world.players[0];
   const night = backdrop === 'exterieur-nuit';
-  world.minutes = night ? 21 * 60 + 20 : 10 * 60 + 40;
+  // Fond provisoire au crépuscule (thème sombre): l'horloge dit la même heure que le ciel.
+  world.minutes = night ? 21 * 60 + 20 : 18 * 60 + 40;
   world.common.day = 3;
   world.common.weather = night ? 'clear' : 'overcast';
   world.common.chest = 5000;

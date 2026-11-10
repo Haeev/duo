@@ -1,0 +1,32 @@
+/*
+ * Images à la plume (`pictos.ts`, `portrait.ts`). Expressions des portraits dessinés: un seul
+ * calque visible. Neutre par défaut;
+ * content ou soucieux selon `data-expr` (sur le portrait ou un ancêtre) ou l'humeur du marchand.
+ */
+.lpl-por .expr--content,
+.lpl-por .expr--soucieux {
+  display: none;
+}
+.lpl-por:is([data-expr='content'], [data-expr='soucieux']) .expr--neutre,
+:is([data-expr='content'], [data-expr='soucieux'], .shop-bust--joy, .shop-bust--yes, .shop-bust--no)
+  .lpl-por:not([data-expr])
+  .expr--neutre {
+  display: none;
+}
+.lpl-por[data-expr='content'] .expr--content,
+:is([data-expr='content'], .shop-bust--joy, .shop-bust--yes)
+  .lpl-por:not([data-expr])
+  .expr--content {
+  display: inline;
+}
+.lpl-por[data-expr='soucieux'] .expr--soucieux,
+:is([data-expr='soucieux'], .shop-bust--no) .lpl-por:not([data-expr]) .expr--soucieux {
+  display: inline;
+}
+
+/* Un portrait dessiné n'est plus un substitut: l'étiquette « provisoire » s'efface. */
+.lpl-ui .dlg:has(.dlg__bust .lpl-por) .provisoire--bust,
+.lpl-ui .shop-keeper:has(.lpl-por) .shop-keeper__tag,
+.lpl-ui :is(.v3d, .shop-v3d):has(.obj--plume) .provisoire {
+  display: none;
+}

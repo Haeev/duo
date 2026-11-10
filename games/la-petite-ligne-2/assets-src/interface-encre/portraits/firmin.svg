@@ -1,0 +1,76 @@
+<!--
+  Firmin Lacombe, 64 ans, chef de halte sans trains: bourru, ponctuel jusqu'à la manie.
+  Bonnet à pompon et pull chocolat, gilet perle (sa fiche), grosse moustache blanche, nez en
+  patate, sourcils broussailleux qui portent l'humeur, sifflet de laiton au cou (le métier).
+  Peau miel (fiche: peau 2), ombre dorée. Calques d'expression: neutre, content, soucieux.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
+  <!-- Buste -->
+  <path id="pull" d="M8 232 L20 188 Q36 166 72 160 L118 160 Q154 166 170 188 L182 232 Z" fill="#5E4233"/>
+  <path data-clip="pull" data-w="0" d="M120 150 Q170 170 160 232 L190 232 L190 150 Z" fill="#4F3626"/>
+  <path id="gilg" d="M26 232 L36 186 Q52 170 78 166 L86 232 Z" fill="#B9B7B0"/>
+  <path id="gild" d="M104 232 L112 166 Q138 170 154 186 L164 232 Z" fill="#B9B7B0"/>
+  <path data-clip="gild" data-w="0" d="M130 160 Q150 200 120 232 L170 232 L170 160 Z" fill="#8C8E91"/>
+  <g data-w="0.55" fill="#C8A150"><circle cx="80" cy="196" r="3.2"/><circle cx="81" cy="214" r="3.2"/></g>
+  <path data-w="0.4" fill="none" stroke="#000" d="M92 168 Q98 190 112 204"/>
+  <path d="M108 200 L126 196 L128 206 L110 210 Z" fill="#C8A150" data-w="0.7"/>
+  <circle cx="113" cy="205" r="2" fill="#8E6A26" data-w="0"/>
+  <!-- Cou et oreilles -->
+  <path id="cou" d="M76 136 L114 136 L116 164 Q95 176 74 164 Z" fill="#E0AE86"/>
+  <path data-clip="cou" data-w="0" d="M70 130 L120 130 L120 152 Q95 160 70 150 Z" fill="#C99368"/>
+  <path d="M74 160 Q95 172 116 160 L118 170 Q95 182 72 170 Z" fill="#5E4233" data-w="0.8"/>
+  <ellipse cx="44" cy="104" rx="10" ry="14" fill="#E0AE86"/>
+  <ellipse cx="146" cy="104" rx="10" ry="14" fill="#C99368"/>
+  <!-- Tête carrée -->
+  <path id="tete" d="M46 74 Q48 46 95 44 Q142 46 144 74 L146 118 Q142 148 112 152 L78 152 Q48 148 44 118 Z" fill="#E0AE86"/>
+  <path data-clip="tete" data-w="0" d="M124 40 Q154 104 108 160 L170 160 L170 40 Z" fill="#C99368"/>
+  <!-- Tempes blanches sous le bonnet -->
+  <path d="M44 76 Q38 92 46 108 L54 100 L52 82 Z" fill="#E9E5DC" data-w="0.7"/>
+  <path d="M146 76 Q152 92 144 108 L136 100 L138 82 Z" fill="#9A948C" data-w="0.7"/>
+  <!-- Nez en patate: aplat d'ombre et trait -->
+  <path data-w="0" d="M100 106 Q112 114 108 126 Q100 132 92 126 Q100 122 100 106 Z" fill="#C99368"/>
+  <path data-w="0.6" fill="none" stroke="#000" d="M94 96 Q84 116 90 125 Q100 132 108 124"/>
+  <!-- Rides de patience -->
+  <g data-w="0.35" fill="none" stroke="#000"><path d="M54 112 l6 2 M136 112 l-6 2 M60 132 Q66 140 70 140"/></g>
+  <!-- Moustache -->
+  <path id="moustache" d="M66 136 Q80 122 95 130 Q110 122 124 136 Q116 146 95 138 Q74 146 66 136 Z" fill="#E9E5DC"/>
+  <path data-clip="moustache" data-w="0" d="M95 136 L130 130 L130 150 L95 150 Z" fill="#9A948C"/>
+  <path data-w="0.35" fill="none" stroke="#000" d="M80 132 l-4 6 M110 132 l4 6"/>
+  <!-- Bonnet à pompon -->
+  <circle id="pompon" cx="95" cy="22" r="15" fill="#D9CAAE"/>
+  <circle data-clip="pompon" data-w="0" cx="101" cy="28" r="15" fill="#B8A17E"/>
+  <path id="bonnet" d="M38 80 Q38 30 95 28 Q152 30 152 80 Q95 70 38 80 Z" fill="#5E4233"/>
+  <path data-clip="bonnet" data-w="0" d="M118 20 Q152 50 140 80 L160 80 L160 20 Z" fill="#4F3626"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M70 36 Q66 52 66 64 M95 32 L95 60 M120 36 Q124 52 124 64"/></g>
+  <path d="M34 72 Q95 58 156 72 L156 90 Q95 78 34 90 Z" fill="#5E4233"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M54 70 l0 14 M74 66 l0 14 M95 64 l0 14 M116 66 l0 14 M136 70 l0 14"/></g>
+
+  <!-- Neutre: paupières lourdes, sourcils bas, bouche plate -->
+  <g data-expr="neutre">
+    <ellipse cx="72" cy="104" rx="9" ry="5.5" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="118" cy="104" rx="9" ry="5.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="73" cy="105" r="4" fill="#6E4B33"/><circle cx="117" cy="105" r="4" fill="#6E4B33"/><circle cx="71.5" cy="103.5" r="1.4" fill="#F7F3EA"/><circle cx="115.5" cy="103.5" r="1.4" fill="#F7F3EA"/></g>
+    <path data-w="0.75" fill="none" stroke="#000" d="M61 101 Q72 96 83 101 M107 101 Q118 96 129 101"/>
+    <path d="M52 94 Q56 80 70 82 Q84 80 90 92 Q74 89 54 100 Z" fill="#9A948C" data-w="0.55"/>
+    <path d="M138 94 Q134 80 120 82 Q106 80 100 92 Q116 89 136 100 Z" fill="#9A948C" data-w="0.55"/>
+    <g class="bouche"><path d="M84 142 Q95 140 106 143 L105 146 Q95 144 85 145 Z" fill="#A2473F" data-w="0.5"/></g>
+  </g>
+  <!-- Content: yeux plissés, sourcils remontés, sourire sous la moustache -->
+  <g data-expr="content">
+    <path data-w="0.75" fill="none" stroke="#000" d="M63 106 Q72 97 81 106 M109 106 Q118 97 127 106"/>
+    <path d="M52 86 Q58 72 72 74 Q86 74 90 84 Q74 83 54 92 Z" fill="#9A948C" data-w="0.55"/>
+    <path d="M138 86 Q132 72 118 74 Q104 74 100 84 Q116 83 136 92 Z" fill="#9A948C" data-w="0.55"/>
+    <g data-w="0"><ellipse cx="62" cy="120" rx="8" ry="5" fill="#E58E84"/><ellipse cx="128" cy="120" rx="8" ry="5" fill="#E58E84"/></g>
+    <g class="bouche"><path d="M80 141 Q95 139 110 141 Q104 154 95 154 Q86 154 80 141 Z" fill="#A2473F" data-w="0.6"/></g>
+  </g>
+  <!-- Soucieux: sourcils relevés au milieu, regard de côté, bouche qui ondule, goutte de sueur -->
+  <g data-expr="soucieux">
+    <ellipse cx="72" cy="103" rx="9" ry="6.5" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="118" cy="103" rx="9" ry="6.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="77" cy="104" r="3.6" fill="#6E4B33"/><circle cx="123" cy="104" r="3.6" fill="#6E4B33"/><circle cx="76" cy="102.6" r="1.2" fill="#F7F3EA"/><circle cx="122" cy="102.6" r="1.2" fill="#F7F3EA"/></g>
+    <path d="M52 94 Q70 92 86 76 Q92 84 82 90 Q70 96 54 100 Z" fill="#9A948C" data-w="0.55"/>
+    <path d="M138 94 Q120 92 104 76 Q98 84 108 90 Q120 96 136 100 Z" fill="#9A948C" data-w="0.55"/>
+    <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M84 145 Q89 140 95 145 Q101 150 106 144"/></g>
+    <path d="M138 92 Q144 102 140 106 Q134 104 138 92 Z" fill="#A9C7D9" data-w="0.5"/>
+  </g>
+</svg>

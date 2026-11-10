@@ -1,6 +1,6 @@
 # Style « encré » (thème de l'interface)
 
-Une couche de thème posée sur l'interface existante: cases de bande dessinée à l'encre, papier chaud, un accent bouton d'or. Règles et variables: `docs/jeux/jeu-1/refonte/interface.md`, section 15.
+Une couche de thème posée sur l'interface existante. Depuis le retour du client du 2026-11-10 (« plus sombre, moins encré »): panneaux presque noirs à liseré fin, texte clair et chaud, un accent bouton d'or, titres en Grandstander; le trait vivant reste aux vignettes, pictos et portraits (`assets-src/interface-encre/README.md`). Les noms des variables n'ont pas changé: `--paper*` sont les fonds sombres, `--ink` le texte clair, `--on-accent` le texte des fonds clairs. Règles et variables: `docs/jeux/jeu-1/refonte/interface.md`, section 15.
 
 ## Activer
 

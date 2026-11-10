@@ -33,12 +33,15 @@ function contrast(a, b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-/** Paires texte sur fond réellement employées par `encre.css` (noms des variables). */
+/**
+ * Paires texte sur fond réellement employées par `encre.css` (noms des variables). Thème sombre:
+ * `--ink` est le texte clair, `--on-accent` le texte sombre des fonds clairs (accent, plein).
+ */
 const PAIRS = [
   ['--ink', '--paper-raised'],
   ['--ink', '--paper'],
   ['--ink', '--paper-sunken'],
-  ['--ink', '--accent'],
+  ['--on-accent', '--accent'],
   ['--ink', '--soft-green'],
   ['--ink', '--soft-sky'],
   ['--ink', '--soft-ochre'],
@@ -48,8 +51,8 @@ const PAIRS = [
   ['--stamp', '--paper-raised'],
   ['--stamp', '--paper'],
   ['--stamp', '--paper-sunken'],
-  ['--paper-raised', '--night'],
-  ['--paper-raised', '--ink'],
+  ['--ink', '--night'],
+  ['--on-accent', '--ink'],
 ];
 
 async function open(page, query) {
