@@ -239,13 +239,236 @@ Lecture des tableaux:
 - **Consigne**: la forme seule, en anglais (langue de l'outil). Elle sert à produire l'image de référence et, sur la route texte, se complète du préfixe et des exclusions de la section 5.2. Pour les pièces scriptées, c'est une description en français.
 - **Pour**: T, J ou H (3.4). **Couleurs**: emplacements de couleur. **Route**: A = maillage seul (5 crédits), B = avec texture de répartition (15 crédits), S = script Blender (0 crédit). **Vague**: 1, 2 ou 3.
 
-@@CATALOGUE@@
+### Corps (`body`), 8 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `body_adult_medium` | Adulte moyen | neutral adult toy mannequin, 5 heads tall, barrel torso, rounded shoulders, mitten hands with separate thumb, pebble feet, A-pose | T | peau | A | 1 |
+| `body_adult_slim` | Adulte mince | dérivé par script du mannequin adulte (carrure 38 cm, taille 26 cm) | T | peau | S | 1 |
+| `body_adult_round` | Adulte rond | dérivé par script du mannequin adulte (carrure 46 cm, taille 43 cm, ventre et hanches pleins) | T | peau | S | 1 |
+| `body_child_slim` | Enfant menu | child toy mannequin, 4 heads tall, short legs, small rounded torso, mitten hands, A-pose | H | peau | A | 1 |
+| `body_child_round` | Enfant rond | dérivé par script du mannequin enfant (taille 28 cm, joues du corps pleines) | H | peau | S | 2 |
+| `body_elder_medium` | Âgé moyen | elderly toy mannequin, slightly stooped rounded back, sloping shoulders, short neck, A-pose | H | peau | A | 1 |
+| `body_elder_slim` | Âgé menu | dérivé par script du mannequin âgé (carrure 35 cm, épaules tombantes) | H | peau | S | 1 |
+| `body_elder_round` | Âgé rond | dérivé par script du mannequin âgé (taille 44 cm, ventre en avant) | H | peau | S | 1 |
+
+### Têtes (`head`), 15 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `head_round` | Ronde | bald toy head, round full cheeks, small soft chin, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 1 |
+| `head_oval` | Ovale | bald toy head, smooth oval face, gentle cheekbones, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 1 |
+| `head_square` | Carrée | bald toy head, wide square jaw, flat cheeks, strong chin, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 1 |
+| `head_heart` | En cœur | bald toy head, wide forehead, pointed small chin, high cheeks, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 1 |
+| `head_long` | Longue | bald toy head, long narrow face, long chin, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 2 |
+| `head_soft` | Pleine | bald toy head, very full cheeks, soft double chin, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 2 |
+| `head_angular` | Anguleuse | bald toy head, high sharp cheekbones softened, narrow jaw, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 3 |
+| `head_pear` | En poire | bald toy head, narrow forehead area below hat line, heavy low cheeks, wide jaw, simple ears, empty eye sockets, no nose, no mouth | T | peau | A | 3 |
+| `head_child_round` | Enfant ronde | bald toy child head, very round, big cheeks, tiny chin, small ears, empty eye sockets, no nose, no mouth | H | peau | A | 1 |
+| `head_child_oval` | Enfant ovale | bald toy child head, soft oval, small chin, ears sticking out a little, empty eye sockets, no nose, no mouth | H | peau | A | 2 |
+| `head_child_chubby` | Enfant joufflue | bald toy child head, chubby low cheeks, tiny chin, small ears, empty eye sockets, no nose, no mouth | H | peau | A | 3 |
+| `head_elder_jowly` | Âgée à bajoues | bald toy elderly head, soft jowls, two smooth forehead wrinkles in relief, large ears, empty eye sockets, no nose, no mouth | H | peau | A | 1 |
+| `head_elder_gaunt` | Âgée creusée | bald toy elderly head, hollow cheeks, long chin, smooth crow's feet in relief, large ears, empty eye sockets, no nose, no mouth | H | peau | A | 1 |
+| `head_elder_round` | Âgée ronde | bald toy elderly head, round apple cheeks, smile lines in relief, large ears, empty eye sockets, no nose, no mouth | H | peau | A | 2 |
+| `head_elder_long` | Âgée longue | bald toy elderly head, long face, drooping cheeks, heavy brow ridge, large ears, empty eye sockets, no nose, no mouth | H | peau | A | 3 |
+
+### Pièces du visage (`nose`, `eyes`, `brows`, `mouth`), 25 pièces, scriptées dans Blender
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `nose_button` | Nez bouton | petite demi-sphère de 2,5 cm | T | peau | S | 1 |
+| `nose_round` | Nez rond | boule de 3,5 cm, narines suggérées par deux creux | T | peau | S | 1 |
+| `nose_long` | Nez long | goutte allongée de 5 cm, arête douce | T | peau | S | 1 |
+| `nose_snub` | Nez retroussé | petit coin relevé de 3 cm | T | peau | S | 2 |
+| `nose_wide` | Nez large | galet large de 4,5 cm, ailes pleines | T | peau | S | 2 |
+| `nose_hook` | Nez aquilin | arête bombée de 5 cm, pointe tombante | T | peau | S | 3 |
+| `eyes_bead` | Yeux en perles | perle sombre brillante de 2,6 cm dans l'orbite, reflet en relief | T | iris (6 teintes) | S | 1 |
+| `eyes_oval` | Yeux ovales | ovale dressé, blanc visible autour, paupière du haut | T | iris | S | 1 |
+| `eyes_almond` | Yeux en amande | amande horizontale, paupière marquée | T | iris | S | 1 |
+| `eyes_wide` | Grands yeux | grand rond, blanc large, pour les enfants et les étonnés | T | iris | S | 2 |
+| `eyes_droopy` | Yeux tombants | coin externe bas, paupière lourde | T | iris | S | 2 |
+| `eyes_small` | Petits yeux | point de 1,8 cm, rapprochés, pour les bougons | T | iris | S | 3 |
+| `brows_soft` | Sourcils doux | boudin court de 4 cm, bouts ronds | T | cheveux | S | 1 |
+| `brows_thick` | Sourcils épais | boudin de 5 cm, 1,2 cm d'épaisseur | T | cheveux | S | 1 |
+| `brows_thin` | Sourcils fins | arc fin de 4,5 cm | T | cheveux | S | 1 |
+| `brows_arched` | Sourcils arqués | arc haut, pointe externe | T | cheveux | S | 2 |
+| `brows_bushy` | Sourcils broussailleux | touffe à trois lobes, pour les âgés | H | cheveux | S | 2 |
+| `mouth_set` | Jeu de 8 bouches | neutre, sourire, grand sourire ouvert, rond de surprise, moue de côté, vague de gêne, arc de peine, dents serrées; lèvres en relief de 4 mm | T | bouche, dents | S | 1 |
+
+### Cheveux (`hair`), 16 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `hair_crop` | Court | short cropped toy hair cap, three soft lobes on top, clean nape | T | cheveux | A | 1 |
+| `hair_side_part` | Raie de côté | short toy hair with a side part, one big smooth wave over the forehead | T | cheveux | A | 1 |
+| `hair_curls_short` | Boucles courtes | short curly toy hair made of large rounded blobs | T | cheveux | A | 1 |
+| `hair_bob` | Carré | chin-length bob toy hair, thick rounded ends, short fringe | T | cheveux | A | 1 |
+| `hair_ponytail` | Queue de cheval | toy hair pulled back, thick high ponytail in one chunky teardrop | T | cheveux, lien | A | 1 |
+| `hair_bun_high` | Chignon haut | toy hair pulled up, big round bun on top of the head | T | cheveux | A | 1 |
+| `hair_bun_low` | Chignon bas | toy hair smoothed back, small round bun at the nape | T | cheveux | A | 1 |
+| `hair_pigtails` | Couettes | toy hair with center part, two short chunky pigtails over the ears | H | cheveux, liens | A | 1 |
+| `hair_quiff` | Houppe | short toy hair with a tall rounded quiff swept up at the front | T | cheveux | A | 2 |
+| `hair_cloud` | Nuage | big round afro toy hair, one soft sphere with gentle bumps | T | cheveux | A | 2 |
+| `hair_wavy` | Ondulé aux épaules | shoulder-length wavy toy hair, four thick waves, open forehead | T | cheveux | A | 2 |
+| `hair_long` | Long | long straight toy hair to mid-back, one thick smooth mass, fringe | T | cheveux | A | 2 |
+| `hair_braid` | Tresse | toy hair with one thick braid over the shoulder, braid as big rounded beads | T | cheveux, lien | A | 2 |
+| `hair_buzz` | Ras | very short buzz cut toy hair, thin cap following the skull, clear hairline | T | cheveux | A | 3 |
+| `hair_bald_crown` | Couronne dégarnie | bald top with a rounded ring of hair around the sides and back | T | cheveux | A | 3 |
+| `hair_undercut` | Mèche longue rasée dessous | toy hair shaved sides, long chunky top swept to one side | J | cheveux | A | 3 |
+
+### Pilosité (`facial_hair`), 6 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `beard_full` | Barbe fournie | full rounded toy beard covering jaw and chin, one smooth mass with three lobes, mustache attached | T | cheveux | A | 1 |
+| `mustache_handlebar` | Moustache en guidon | thick toy handlebar mustache, curled rounded tips | H | cheveux | A | 1 |
+| `beard_short` | Barbe courte | short toy beard, thin shell along the jaw | T | cheveux | A | 2 |
+| `mustache_brush` | Moustache en brosse | short thick toy mustache, rounded bar | T | cheveux | A | 2 |
+| `goatee` | Bouc | small rounded toy goatee on the chin | T | cheveux | A | 3 |
+| `beard_long` | Longue barbe | long toy beard to the chest, one thick teardrop mass | H | cheveux | A | 3 |
+
+### Hauts (`top`, et `outer` pour les vestes), 20 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `top_tee_crew` | T-shirt col rond | toy t-shirt, short sleeves with thick rolled hems, round neck band | T | principale, liseré | B | 1 |
+| `top_shirt_work` | Chemise de travail | toy work shirt, sleeves rolled above the elbow, soft collar, chest pocket, big round buttons | T | principale, boutons | B | 1 |
+| `top_shirt_collar` | Chemise à col | toy long-sleeved shirt, neat collar, button placket, thick cuffs | T | principale, boutons | B | 1 |
+| `top_sweater_crew` | Pull col rond | chunky toy knit sweater, thick ribbed neck, cuffs and hem as rounded rolls | T | principale, bords | B | 1 |
+| `top_blouse_puff` | Blouse à manches ballon | toy blouse with short puffed sleeves, round flat collar | T | principale, col | B | 1 |
+| `outer_jacket_work` | Veste de travail | toy chore jacket, open front, big patch pockets, wide collar, thick hems | T | principale, boutons | B | 1 |
+| `outer_cardigan` | Gilet ouvert | toy open knit cardigan, thick rolled front band, hip length | T | principale, bande | B | 1 |
+| `outer_jacket_station` | Veste de chef de halte | toy railway uniform jacket, double row of round buttons, stand collar, piped cuffs | H | principale, galon, boutons | B | 1 |
+| `top_tee_stripes` | Marinière | toy long-sleeved boat-neck top, four wide raised stripes around the torso | T | principale, rayures | B | 2 |
+| `top_tank` | Débardeur | toy tank top, wide straps, thick hems | T | principale | A | 2 |
+| `top_shirt_short` | Chemisette | toy short-sleeved shirt, open camp collar, straight hem worn over | T | principale, boutons | B | 2 |
+| `top_sweater_turtle` | Col roulé | toy turtleneck sweater, thick folded neck roll, fitted sleeves | T | principale | A | 2 |
+| `outer_jacket_rain` | Ciré | toy raincoat to mid-thigh, hood down on the back, big toggles, glossy | T | principale, attaches | B | 2 |
+| `outer_vest_padded` | Gilet matelassé | toy sleeveless padded vest, four horizontal puffy bands, stand collar | T | principale, doublure | B | 2 |
+| `top_polo` | Polo | toy polo shirt, short sleeves, ribbed collar, two buttons | T | principale, col | B | 3 |
+| `top_sweater_vneck` | Pull en V sur col | toy V-neck sweater with a shirt collar showing at the neck | T | principale, col | B | 3 |
+| `top_hoodie` | Sweat à capuche | toy hoodie, hood down, front pouch pocket, thick drawstrings | J | principale, cordons | B | 3 |
+| `outer_bomber` | Blouson court | toy short bomber jacket, ribbed collar, cuffs and waistband, closed zip | T | principale, bords | B | 3 |
+| `outer_blazer` | Veste de ville | toy city blazer, notched lapels softened, two buttons, hip length | T | principale, boutons | B | 3 |
+| `outer_coat_mid` | Manteau mi-cuisse | toy overcoat to mid-thigh, big collar, belt, flared so legs move freely | T | principale, ceinture | B | 3 |
+
+### Bas (`bottom`), 14 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `bottom_pants_straight` | Pantalon droit | toy straight trousers, waistband, thick turned-up hems at the ankle | T | principale | A | 1 |
+| `bottom_pants_work` | Pantalon de toile | toy work trousers, big thigh pockets, reinforced knee patches, belt | T | principale, renforts, ceinture | B | 1 |
+| `bottom_shorts_bermuda` | Bermuda | toy knee-length shorts, thick cuffs, waistband | T | principale | A | 1 |
+| `bottom_skirt_aline` | Jupe trapèze | toy A-line skirt to the knee, smooth bell shape, thick hem, waistband | T | principale, ceinture | A | 1 |
+| `bottom_skirt_long` | Jupe longue | toy long skirt to mid-calf, wide bell, three soft folds, thick hem | T | principale | A | 1 |
+| `bottom_pants_wide` | Pantalon large | toy wide-leg trousers, high waist, hems covering the shoe tops | T | principale | A | 2 |
+| `bottom_pants_rolled` | Pantalon retroussé | toy trousers rolled above the ankle, big cuffs, rope belt | T | principale, revers | B | 2 |
+| `bottom_pants_braces` | Pantalon à bretelles | toy high-waisted trousers with wide braces over the shoulders, round buttons | H | principale, bretelles | B | 2 |
+| `bottom_shorts_short` | Short | toy short shorts, rounded leg openings, elastic waist | T | principale | A | 2 |
+| `bottom_skirt_pleated` | Jupe plissée | toy short pleated skirt, eight deep rounded pleats | T | principale | A | 2 |
+| `bottom_pants_slim` | Pantalon étroit | toy slim trousers ending at the ankle, thin waistband | T | principale | A | 3 |
+| `bottom_shorts_cuffed` | Culotte courte | toy child knee breeches with buttoned cuffs under the knee | H | principale, boutons | B | 3 |
+| `bottom_skirt_straight` | Jupe droite | toy straight knee-length skirt, back slit, wide waistband | T | principale | A | 3 |
+| `bottom_pants_jogger` | Pantalon resserré | toy jogger trousers, ribbed ankle cuffs, drawstring | J | principale, bords | B | 3 |
+
+### Robes et salopettes (`bottom` qui couvre `top`), 12 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `onepiece_overalls` | Salopette | toy bib overalls, big front pocket, wide straps with round buttons, rolled ankles | T | principale, boutons | B | 1 |
+| `onepiece_dress_shirt` | Robe chemise | toy shirt dress to the knee, collar, button front, wide belt, short sleeves | T | principale, ceinture, boutons | B | 1 |
+| `onepiece_dress_granny` | Robe boutonnée | toy mid-calf dress, round flat collar, long sleeves, row of buttons, gathered waist | H | principale, col, boutons | B | 1 |
+| `onepiece_dress_tee` | Robe t-shirt | toy t-shirt dress to mid-thigh, short sleeves, straight cut | T | principale | A | 2 |
+| `onepiece_dress_sun` | Robe à bretelles | toy sundress, wide straps, flared skirt to the knee | T | principale | A | 2 |
+| `onepiece_overalls_short` | Salopette short | toy short overalls ending above the knee, bib and straps | T | principale, boutons | B | 2 |
+| `onepiece_coverall` | Bleu de travail | toy one-piece work coverall, zip front, collar, chest pockets, belt loops | T | principale, fermeture | B | 2 |
+| `onepiece_dress_pinafore` | Robe chasuble | toy sleeveless pinafore dress worn over a top, square neckline, flared | T | principale | A | 2 |
+| `onepiece_dress_smock` | Blouse ample | toy loose smock dress, yoke, three-quarter sleeves, two patch pockets | T | principale, empiècement | B | 3 |
+| `onepiece_overalls_skirt` | Salopette jupe | toy overall skirt, bib and straps, A-line skirt | T | principale, boutons | B | 3 |
+| `onepiece_dress_child` | Robe à col | toy child dress, big round collar, puff sleeves, bell skirt above the knee | H | principale, col | B | 3 |
+| `onepiece_jumpsuit` | Combinaison de ville | toy city jumpsuit, short sleeves, belted waist, tapered legs | J | principale, ceinture | B | 3 |
+
+### Chaussures (`shoes`), 14 paires
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `shoes_boots_ankle` | Bottines lacées | pair of toy lace-up ankle boots, round toe, thick sole, chunky laces | T | principale, semelle | B | 1 |
+| `shoes_boots_rain` | Bottes de pluie | pair of toy rubber rain boots to mid-calf, wide round shaft, thick sole, glossy | T | principale, semelle | B | 1 |
+| `shoes_sneakers_canvas` | Baskets de toile | pair of toy canvas sneakers, rubber toe cap, flat thick sole | T | principale, caoutchouc | B | 1 |
+| `shoes_clogs` | Sabots | pair of toy wooden clogs, very round toe, open heel | T | principale | A | 1 |
+| `shoes_mary_janes` | Souliers à bride | pair of toy mary jane shoes, round toe, one strap with a round button | T | principale, bouton | B | 1 |
+| `shoes_boots_work` | Brodequins | pair of toy heavy work boots, bulbous toe, deep sole, folded sock on top | T | principale, semelle, chaussette | B | 2 |
+| `shoes_loafers` | Mocassins | pair of toy loafers, low cut, strap across the top | T | principale | A | 2 |
+| `shoes_sandals` | Sandales | pair of toy sandals, two wide straps, thick sole, toes shown as one rounded block | T | principale, semelle | B | 2 |
+| `shoes_espadrilles` | Espadrilles | pair of toy espadrilles, braided rope sole in rounded rings | T | principale, corde | B | 2 |
+| `shoes_slippers` | Charentaises | pair of toy felt slippers, plush round shape, folded collar | H | principale, revers | B | 2 |
+| `shoes_derbies` | Souliers de ville | pair of toy derby shoes, rounded toe cap, thin laces, small heel | T | principale | A | 3 |
+| `shoes_boots_tall` | Bottes hautes | pair of toy tall leather boots to the knee, straight shaft, pull tab | T | principale | A | 3 |
+| `shoes_flats` | Ballerines | pair of toy ballet flats, low cut, tiny bow | T | principale | A | 3 |
+| `shoes_sneakers_chunky` | Baskets épaisses | pair of toy chunky sneakers, oversized layered sole, big tongue | J | principale, semelle, empiècement | B | 3 |
+
+### Chapeaux et coiffes (`hat`), 15 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `hat_cap_flat` | Casquette plate | toy flat cap, soft rounded crown, short visor | T | principale | A | 1 |
+| `hat_straw_wide` | Chapeau de paille | toy wide-brim straw hat, round crown, ribbon band, slightly wavy brim | T | principale, ruban | B | 1 |
+| `hat_cap_station` | Casquette de chef de halte | toy railway station master cap, stiff flat top, shiny visor, band and round badge | H | principale, bandeau, insigne | B | 1 |
+| `hat_beanie_fisher` | Bonnet court | toy short beanie with a thick rolled brim, worn high | T | principale | A | 1 |
+| `hat_baker_cap` | Calot de boulanger | toy baker's cap, low soft pleated crown with a flat band | H | principale | A | 1 |
+| `hat_beret` | Béret | toy beret, soft flat disc tilted to one side, small stalk | T | principale | A | 2 |
+| `hat_beanie_pompom` | Bonnet à pompon | toy knit beanie, ribbed brim, big round pompom | T | principale, pompon | B | 2 |
+| `hat_bucket` | Bob | toy bucket hat, short sloping brim, stitched bands as soft ridges | T | principale | A | 2 |
+| `hat_headscarf` | Fichu noué | toy headscarf tied under the chin, smooth over the head, small knot | T | principale | A | 2 |
+| `hat_kepi_postal` | Képi de la poste | toy postal kepi, short cylinder, flat top, small visor, braid band | H | principale, galon | B | 2 |
+| `hat_boater` | Canotier | toy boater hat, flat top, flat stiff brim, wide ribbon | T | principale, ruban | B | 3 |
+| `hat_fedora` | Feutre | toy felt hat, pinched crown softened, medium brim, band | T | principale, ruban | B | 3 |
+| `hat_cap_visor` | Casquette à visière | toy six-panel cap, curved visor, button on top | J | principale, visière | B | 3 |
+| `hat_headband` | Bandeau | toy wide headband with a knotted bow on top, worn over the hair | T | principale | A | 3 |
+| `hat_souwester` | Suroît | toy rain hat, long back brim, short front brim, chin strap, glossy | T | principale | A | 3 |
+
+### Lunettes (`glasses`), 10 pièces, scriptées dans Blender
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `glasses_round` | Rondes fines | monture ronde, fil de 8 mm d'épaisseur | T | monture | S | 1 |
+| `glasses_round_thick` | Rondes épaisses | monture ronde, jonc de 14 mm | T | monture | S | 1 |
+| `glasses_half` | Demi-lunes | demi-cercles bas, posées au bout du nez | H | monture | S | 1 |
+| `glasses_square` | Carrées | monture carrée aux coins ronds | T | monture | S | 2 |
+| `glasses_oval` | Ovales | petits ovales horizontaux | T | monture | S | 2 |
+| `glasses_cat` | Papillon | coins externes relevés | T | monture | S | 2 |
+| `glasses_sun_round` | Soleil rondes | rondes, verres pleins sombres | J | monture, verres | S | 2 |
+| `glasses_sun_square` | Soleil carrées | carrées larges, verres pleins sombres | J | monture, verres | S | 3 |
+| `glasses_goggles` | Lunettes d'atelier | deux coques rondes et sangle, portées sur le front | T | coques, sangle | S | 3 |
+| `glasses_monocle` | Monocle | un verre cerclé et sa chaînette | H | laiton | S | 3 |
+
+### Sacs et accessoires (`neck`, `back`, `side`, `waist`, `hand`), 16 pièces
+
+| Identifiant | Nom | Consigne (forme seule) | Pour | Couleurs | Route | Vague |
+|---|---|---|---|---|---|---|
+| `side_satchel_postal` | Sacoche de la poste | toy leather postal satchel, big flap, two buckles, letters peeking out as one block | H | principale, boucles | B | 1 |
+| `back_school` | Cartable | toy child school satchel worn on the back, rounded flap, two clasps | H | principale, fermoirs | B | 1 |
+| `waist_apron_bib` | Tablier à bavette | toy bib apron, neck loop, big front pocket, ties in a bow at the back | T | principale, poche | B | 1 |
+| `neck_shawl` | Châle | toy knitted shawl over the shoulders, crossed and pinned at the chest, scalloped edge | H | principale, broche | B | 1 |
+| `neck_kerchief` | Foulard noué | toy neckerchief tied at the front, small rounded knot, two short tips | T | principale | A | 1 |
+| `hand_cane` | Canne | toy wooden walking cane, curved handle, rubber tip | H | principale | A | 1 |
+| `back_canvas` | Sac à dos de toile | toy canvas backpack, drawstring top, flap with one strap, side pocket | T | principale, sangles | B | 2 |
+| `side_messenger` | Besace | toy messenger bag, soft rounded body, wide flap | T | principale, rabat | B | 2 |
+| `waist_apron_half` | Tablier de taille | toy half apron from waist to knee, two pockets | T | principale | A | 2 |
+| `neck_scarf_knit` | Écharpe tricotée | toy chunky knit scarf wrapped once, one end hanging at the front, fringe as rounded lobes | T | principale, rayures | B | 2 |
+| `neck_bowtie` | Noeud papillon | toy bow tie, two puffy wings and a round knot | T | principale | A | 2 |
+| `back_basket` | Hotte d'osier | toy wicker pannier basket worn on the back, weave as wide rounded bands, leather straps | H | principale, sangles | B | 3 |
+| `side_tote` | Cabas | toy tote bag on the shoulder, two long handles, plain open top | T | principale, anses | B | 3 |
+| `waist_tool_belt` | Ceinture à outils | toy tool belt, two pouches, hammer loop, big buckle | T | principale, boucle | B | 3 |
+| `waist_belt_bag` | Banane | toy belt bag worn in front, rounded pouch, zip | J | principale, fermeture | B | 3 |
+| `neck_tie` | Cravate | toy necktie, wide blade, big knot | T | principale | A | 3 |
+
 ### 4.1 Ordre de production
 
 | Vague | But | Pièces Meshy | Pièces scriptées |
 |---|---|---|---|
 | Étalonnage | 6 pièces témoins pour figer la route et le rendu avant toute série: mannequin adulte, `head_round`, `hair_bob`, `top_sweater_crew`, `bottom_pants_straight`, `shoes_boots_ankle` (elles comptent dans la vague 1 si elles sont bonnes) | 6 | visage de base |
-| 1 | habiller les deux joueurs avec du choix (4 têtes adultes, 7 coiffures, 5 hauts, 3 vestes, 5 bas, 3 robes ou salopettes, 5 chaussures) et 6 habitants d'Aubrune très différents | 52 | 17 |
+| 1 | habiller les deux joueurs avec du choix (4 têtes adultes, 7 coiffures, 5 hauts, 2 vestes, 5 bas, 2 robes ou salopettes, 5 chaussures, 3 chapeaux) et 6 habitants d'Aubrune très différents | 52 | 17 |
 | 2 | élargir l'éditeur et la boutique d'Aubrune, deuxième série d'habitants | 42 | 11 |
 | 3 | pièces de ville (métropole) et compléments, pièces J de récompense | 37 | 5 |
 
@@ -253,7 +476,7 @@ Les 6 habitants témoins de la vague 1 sont des archétypes de contrôle, choisi
 
 | Archétype | Corps | Tête, visage | Coiffure, coiffe | Tenue | Signature |
 |---|---|---|---|---|---|
-| Chef de halte | `body_elder_round` | `head_elder_jowly`, nez rond, `mustache_handlebar` | `hair_bun_low` remplacé par crâne nu sous `hat_cap_station` | `outer_jacket_station` marine, `top_shirt_collar` craie, `bottom_pants_straight` anthracite, `shoes_boots_ankle` | casquette et veste d'uniforme |
+| Chef de halte | `body_elder_round` | `head_elder_jowly`, nez rond, `mustache_handlebar` | `hair_crop` gris sous `hat_cap_station` | `outer_jacket_station` marine, `top_shirt_collar` craie, `bottom_pants_straight` anthracite, `shoes_boots_ankle` | casquette et veste d'uniforme |
 | Boulangère | `body_adult_round` | `head_round`, nez bouton | `hair_bun_high` roux, `hat_baker_cap` | `top_blouse_puff` craie, `bottom_skirt_long` rose ancien, `waist_apron_bib` lin, `shoes_clogs` | calot et tablier |
 | Gamine du bourg | `body_child_slim` | `head_child_round`, yeux ovales | `hair_pigtails` châtain | `top_tee_crew` moutarde, `onepiece_overalls` bleu de travail, `shoes_sneakers_canvas` coquelicot, `back_school` | couettes et cartable |
 | Factrice | `body_adult_slim` | `head_heart`, nez long, `glasses_round` | `hair_ponytail` noir, `hat_cap_flat` | `top_shirt_work` ciel, `bottom_shorts_bermuda` marine, `shoes_boots_ankle`, `side_satchel_postal` | sacoche débordante |

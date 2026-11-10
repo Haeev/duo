@@ -114,3 +114,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 
 - Le manager fait des commits de sauvegarde du travail en cours de l'équipe (« non relu »): mes fichiers peuvent apparaître suivis par git pendant la mission. Les plans du level designer bougent aussi pendant ce temps: relire `plans.json` juste avant de figer une vue calée sur un plan.
 - `docs/jeux/cosy-cafe/plans/plans.json`: x vers la droite, y vers le bas (rue en bas du dessin); pour une vue face à la rue, x de la vue = abscisse du mur de droite du plan moins x du plan, z = y du plan moins y du mur du fond.
+
+## Planches et catalogue de personnages (La Petite Ligne, refonte, 2026-11-10)
+
+- `rsvg-convert` rend bien les textes en « DejaVu Sans » (police du système): suffisant pour une planche de cotes, sans passer par Chromium. Les signes ♪ et ♥ y sont présents.
+- Un libellé ancré à droite (`text-anchor="end"`) près du bord gauche sort de la planche sans erreur: toujours regarder le PNG.
+- Visage en traits d'encre sur peau sombre (L* sous 35): illisible. Prévoir le blanc de l'œil visible et des lèvres claires; règle d'au moins 25 points de L* entre peau et sourcils ou bouche.
+- CIEDE2000 pardonne beaucoup la saturation: un rouge coquelicot, un rose ancien et un gris-bleu moyen tombent à moins de 15 du corail, du rose et du mauve de Duo. Contrôle: `docs/jeux/jeu-1/refonte/planches/source/controle_nuancier.py`.
+- Liste de catalogue longue: la tenir en données (une ligne par pièce) et générer les tableaux, puis vérifier par script les totaux par vague et que les exemples n'emploient que des pièces de la vague annoncée.
