@@ -1,18 +1,26 @@
 <!--
   Gabarit d'une vignette d'objet « à la plume ». Copier ce fichier sous le nom exact de l'objet
-  (`vignettes/<id de donnees/commun/objets>.svg`), dessiner, puis lancer
+  (`vignettes/<id de donnees/commun/objets>.svg`, ou d'un meuble posable de
+  `donnees/commun/meubles/`), dessiner, puis lancer
   `NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/generer-images.mjs vignettes <id>`.
 
   Règles (bible 0.2, sections 1.2 et 3.5):
   - grille 96, sujet entre 8 et 88, un peu de travers (transform rotate de 3 à 12 degrés);
   - formes trapues, quincaillerie exagérée; 2 ou 3 tons par matière, tirés du nuancier
-    (`docs/jeux/jeu-1/refonte/planches/source/nuancier-v02.json`): ton de base, ombre en aplat à
+    (`assets-src/interface-encre/nuancier-v02.json`): ton de base, ombre en aplat à
     bord net en bas à droite (`data-w="0"` et `data-clip` vers la forme), un éclat clair en haut à
     gauche; quelques hachures (3 à 5 traits, 45 degrés) dans l'ombre seulement;
   - pas de trait (`stroke`) à régler: le contour est calculé (plein, délié, tremblé). Un trait de
     détail s'écrit `fill="none" stroke="#000"`, `data-w` en règle l'épaisseur (0.3 à 0.6);
+  - détail intérieur (veines du bois, stries, reflets): trait fin coloré, `data-teinte="#..."` (le
+    ton d'ombre ou le ton clair de la matière) avec `data-w` 0.26 à 0.35; il enrichit à 96 px sans
+    noircir à 48 px. L'encre noire reste au contour, au pli principal et aux hachures d'ombre;
+  - familles: les graines dans leur sachet, les poissons de profil tête à gauche, les plats dans
+    leur contenant (assiette, bol, moule), les outils en diagonale tête en haut à droite, les
+    meubles de trois quarts (dessus clair, côté droit dans l'ombre);
   - ordre du document = ordre de peinture: chaque forme cerne celles d'avant.
-  Le test `tests/interface-vignettes.test.ts` contrôle les couleurs et la taille.
+  Le test `tests/interface-plume.test.ts` contrôle les couleurs, la taille et la couverture
+  (chaque objet et chaque meuble posable a sa vignette).
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
   <g transform="rotate(-6 48 48)">

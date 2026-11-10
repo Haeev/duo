@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tabouret miel (famille des meubles: trois quarts, dessus clair, côté droit dans l'ombre): assise ronde, trois pieds écartés, bois couleur miel. -->
+  <g>
+    <path d="M58 38 L64 38 L68 80 L62 80 Z" fill="#8E6A26"/>
+    <path d="M24 44 L31 44 L24 86 L17 86 Z" fill="#D4A33E"/>
+    <path d="M64 44 L71 44 L78 86 L71 86 Z" fill="#D4A33E"/>
+    <path d="M44 48 L51 48 L50 92 L43 92 Z" fill="#D4A33E"/>
+    <path data-w="0" d="M48 48 L51 48 L50 92 L47 92 Z" fill="#8E6A26"/>
+    <path d="M22 70 L74 70 L74 75 L22 75 Z" fill="#8E6A26" data-w="0.6"/>
+    <path id="assise" d="M14 34 Q14 22 48 20 Q82 22 82 34 L82 42 Q82 52 48 54 Q14 52 14 42 Z" fill="#D4A33E"/>
+    <path data-clip="assise" data-w="0" d="M50 30 Q80 30 84 44 L84 60 L40 60 Q66 50 50 30 Z" fill="#8E6A26"/>
+    <ellipse cx="48" cy="33" rx="34" ry="12" fill="#F2C55C"/>
+    <g data-teinte="#D4A33E" data-w="0.3" fill="none" stroke="#000">
+    <path d="M26 32 Q40 26 56 28 M34 38 Q50 36 66 34"/>
+    </g>
+    <path data-w="0" d="M20 30 Q26 24 38 23 Q28 28 24 34 Z" fill="#F7F3EA"/>
+  </g>
+</svg>

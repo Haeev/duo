@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Coquelicot: grande fleur rouge aux pétales froissés, cœur noir étoilé, tige velue et un bouton penché. -->
+  <path data-w="0.75" fill="none" stroke="#000" d="M46 52 Q40 70 30 92"/>
+  <path data-w="0.6" fill="none" stroke="#000" d="M38 72 Q24 62 18 46"/>
+  <path d="M20 46 Q12 40 14 30 Q22 30 24 40 Q24 46 20 46 Z" fill="#6E9241"/>
+  <path data-w="0" d="M15 32 Q12 26 17 22 Q20 28 19 34 Z" fill="#C5443D"/>
+  <path d="M40 74 Q50 70 56 76 Q48 80 40 74 Z" fill="#6E9241" data-w="0.55"/>
+  <path d="M24 46 Q14 22 32 14 Q42 10 46 22 Q50 8 66 12 Q86 18 80 38 Q90 52 76 62 Q62 72 48 62 Q32 70 24 56 Q16 52 24 46 Z" fill="#C5443D"/>
+  <path data-w="0" d="M60 24 Q78 24 78 40 Q86 54 74 60 Q64 66 52 58 Q66 50 60 24 Z" fill="#8F3B34"/>
+  <path data-w="0" d="M28 26 Q32 16 40 16 Q34 22 32 32 Z" fill="#E0675A"/>
+  <g data-teinte="#8F3B34" data-w="0.32" fill="none" stroke="#000"><path d="M34 30 Q40 36 44 40 M60 20 Q56 30 54 36 M30 52 Q38 48 44 46 M70 50 Q62 46 56 44"/></g>
+  <circle cx="50" cy="40" r="8" fill="#3F6453" data-w="0.6"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M50 32 L50 48 M42 40 L58 40 M44 34 L56 46 M56 34 L44 46"/></g>
+  <g data-w="0" fill="#231A17"><circle cx="40" cy="32" r="1.4"/><circle cx="60" cy="32" r="1.4"/><circle cx="40" cy="48" r="1.4"/><circle cx="60" cy="48" r="1.4"/><circle cx="50" cy="29" r="1.3"/><circle cx="50" cy="51" r="1.3"/></g>
+</svg>

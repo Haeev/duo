@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Miroir sur pied: psyché ovale montée sur pivots, glace bleutée à reflets, pieds écartés. -->
+  <g>
+    <path d="M14 90 L30 70 L34 72 L20 92 Z" fill="#A87A46"/>
+    <path d="M82 90 L66 70 L62 72 L76 92 Z" fill="#6E4B30"/>
+    <path d="M44 66 L52 66 L52 80 L44 80 Z" fill="#A87A46" data-w="0.6"/>
+    <path d="M22 16 L26 16 L26 72 L22 72 Z" fill="#A87A46"/>
+    <path d="M70 16 L74 16 L74 72 L70 72 Z" fill="#6E4B30"/>
+    <path d="M20 74 L76 74 L76 70 L20 70 Z" fill="#A87A46" data-w="0.6"/>
+    <ellipse cx="48" cy="40" rx="24" ry="32" fill="#A87A46"/>
+    <ellipse id="glace" cx="48" cy="40" rx="18.5" ry="26" fill="#A9C7D9"/>
+    <path data-clip="glace" data-w="0" d="M56 6 Q72 40 40 72 L80 80 L80 6 Z" fill="#587F8E"/>
+    <path data-clip="glace" data-w="0" d="M30 30 L44 16 L48 18 L32 36 Z" fill="#F7F3EA"/>
+    <path data-clip="glace" data-w="0" d="M32 42 L50 22 L52 24 L34 46 Z" fill="#F7F3EA"/>
+    <circle cx="24" cy="40" r="2.6" fill="#C8A150" data-w="0.45"/>
+    <circle cx="72" cy="40" r="2.6" fill="#C8A150" data-w="0.45"/>
+    <g data-teinte="#D7A86A" data-w="0.3" fill="none" stroke="#000">
+    <path d="M28 18 Q36 10 46 9"/>
+    </g>
+  </g>
+</svg>

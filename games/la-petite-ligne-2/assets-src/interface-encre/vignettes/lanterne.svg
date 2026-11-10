@@ -9,7 +9,10 @@
     <path data-clip="verre" data-w="0" d="M43 40 Q48 32 53 40 Q56 52 48 58 Q40 52 43 40 Z" fill="#FFE6B0"/>
     <path d="M46 46 Q48 40 50 46 Q51 52 48 53 Q45 52 46 46 Z" fill="#F7F3EA" data-w="0.4"/>
     <g data-w="0.6" fill="none" stroke="#000"><path d="M48 30 L48 72 M31 51 L65 51"/></g>
+    <path data-w="0" d="M30 25 L46 15 L48 16 L34 27 Z" fill="#5E8A72"/>
+    <g data-clip="verre" data-teinte="#FFE6B0" data-w="0.3" fill="none" stroke="#000"><path d="M35 34 L35 46 M60 56 L59 68"/></g>
     <path d="M26 72 L70 72 L72 84 L24 84 Z" fill="#3F6453"/>
+    <path data-w="0" d="M27 73 L46 73 L46 75 L27 75 Z" fill="#5E8A72"/>
     <path data-w="0" d="M50 72 L70 72 L72 84 L46 84 Z" fill="#25392F"/>
     <g data-w="0.5"><circle cx="30" cy="78" r="2" fill="#C8A150"/><circle cx="66" cy="78" r="2" fill="#C8A150"/></g>
   </g>

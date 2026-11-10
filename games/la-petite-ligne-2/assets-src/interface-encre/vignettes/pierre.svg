@@ -5,5 +5,8 @@
   <path data-clip="pierre" data-w="0" d="M20 38 L42 22 L66 26 L52 36 L26 46 Z" fill="#DED3BC"/>
   <g data-w="0.5" fill="none" stroke="#000"><path d="M26 46 L52 36 L58 56 M52 36 L66 26 M58 56 L40 84"/></g>
   <path data-w="0.42" fill="none" stroke="#000" d="M34 58 L40 64 L37 72"/>
+  <g data-clip="pierre" data-w="0" fill="#7C705F"><circle cx="24" cy="62" r="1.2"/><circle cx="46" cy="70" r="1"/><circle cx="30" cy="50" r="0.9"/></g>
+  <g data-clip="pierre" data-w="0" fill="#DED3BC"><circle cx="70" cy="56" r="1"/><circle cx="62" cy="74" r="0.9"/></g>
+  <g data-clip="pierre" data-teinte="#7C705F" data-w="0.3" fill="none" stroke="#000"><path d="M18 66 Q24 70 30 70"/></g>
   <g data-w="0.35" fill="none" stroke="#000"><path d="M66 64 l6 -6 M62 72 l8 -8 M58 78 l6 -6"/></g>
 </svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tomate: grosse, aplatie et côtelée, collerette verte en étoile, reflet brillant. -->
+  <g transform="rotate(-6 48 52)">
+    <path id="tomate" d="M48 28 Q60 22 74 28 Q90 38 88 58 Q84 82 60 86 Q48 88 36 86 Q12 82 8 58 Q6 38 22 28 Q36 22 48 28 Z" fill="#C5443D"/>
+    <path data-clip="tomate" data-w="0" d="M70 22 Q86 70 30 94 L96 96 L96 22 Z" fill="#8F3B34"/>
+    <g data-clip="tomate" data-teinte="#8F3B34" data-w="0.4" fill="none" stroke="#000"><path d="M30 32 Q20 56 30 82 M64 32 Q76 56 66 82 M48 34 L48 86"/></g>
+    <path data-clip="tomate" data-w="0" d="M16 44 Q22 32 34 31 Q24 42 22 56 Z" fill="#E0675A"/>
+    <path data-w="0" d="M20 40 Q24 34 30 33 Q24 38 22 44 Z" fill="#F7F3EA"/>
+    <path d="M48 32 L36 26 L44 24 L40 16 L50 22 L58 14 L56 24 L66 24 L54 30 Z" fill="#6E9241" data-w="0.7"/>
+    <path data-w="0" d="M50 28 L56 24 L66 24 L54 30 Z" fill="#40592D"/>
+    <path d="M47 24 Q46 16 50 10 L53 11 Q50 17 51 24 Z" fill="#6E9241" data-w="0.6"/>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M70 70 l6 -6 M64 76 l8 -8 M60 80 l6 -6"/></g>
+  </g>
+</svg>

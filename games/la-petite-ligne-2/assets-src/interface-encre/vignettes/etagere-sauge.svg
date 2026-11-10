@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Étagère sauge: la même, peinte vert sauge. -->
+  <g>
+    <path d="M20 16 L28 16 L28 90 L20 90 Z" fill="#96A98C"/>
+    <path d="M66 16 L74 16 L74 90 L66 90 Z" fill="#96A98C"/>
+    <path d="M74 16 L82 10 L82 84 L74 90 Z" fill="#727B6E"/>
+    <path d="M28 18 L66 18 L66 88 L28 88 Z" fill="#231A17" data-w="0"/>
+    <path d="M31 26 L36 26 L36 40 L31 40 Z" fill="#C5443D" data-w="0.45"/>
+    <path d="M36 28 L41 28 L41 40 L36 40 Z" fill="#2F6E73" data-w="0.45"/>
+    <path d="M41 25 L45 25 L45 40 L41 40 Z" fill="#D4A33E" data-w="0.45"/>
+    <path d="M52 28 Q52 24 58 24 Q64 24 64 28 L64 40 L52 40 Z" fill="#F3EDE0" data-w="0.5"/>
+    <path d="M52 27 L64 27 L64 30 L52 30 Z" fill="#C5443D" data-w="0.35"/>
+    <path d="M32 54 Q30 64 40 64 Q50 64 48 54 Z" fill="#A35A44" data-w="0.5"/>
+    <path d="M36 54 Q34 44 40 44 Q46 44 44 54 Z" fill="#6E9241" data-w="0.5"/>
+    <path d="M54 50 L62 50 L62 64 L54 64 Z" fill="#8C99A3" data-w="0.45"/>
+    <path d="M31 80 L60 80 L60 74 L31 74 Z" fill="#D9CAAE" data-w="0.45"/>
+    <path d="M33 74 L58 74 L58 70 L33 70 Z" fill="#F3EDE0" data-w="0.4"/>
+    <path d="M24 40 L70 40 L78 34 L32 34 Z" fill="#D2DCD8" data-w="0.6"/>
+    <path d="M24 40 L70 40 L70 44 L24 44 Z" fill="#96A98C" data-w="0.6"/>
+    <path d="M24 64 L70 64 L78 58 L32 58 Z" fill="#D2DCD8" data-w="0.6"/>
+    <path d="M24 64 L70 64 L70 68 L24 68 Z" fill="#96A98C" data-w="0.6"/>
+    <path d="M24 84 L70 84 L78 78 L32 78 Z" fill="#D2DCD8" data-w="0.6"/>
+    <path d="M24 84 L70 84 L70 88 L24 88 Z" fill="#96A98C" data-w="0.6"/>
+    <path d="M20 16 L28 16 L36 10 L28 10 Z" fill="#D2DCD8" data-w="0.6"/>
+    <path d="M66 16 L74 16 L82 10 L74 10 Z" fill="#D2DCD8" data-w="0.6"/>
+  </g>
+</svg>

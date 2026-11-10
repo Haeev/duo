@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Brochet (de profil): long corps en torpille, museau en bec de canard, mâchoire dentée, flanc olive semé de taches pâles, nageoires dorsale et anale tout à l'arrière. -->
+  <g transform="translate(1 4) rotate(-16 48 48)">
+    <path d="M74 46 L94 32 Q90 47 94 62 L74 52 Z" fill="#C0803A"/>
+    <path data-w="0" d="M84 52 L94 62 L74 52 Z" fill="#8E6A26"/>
+    <path d="M60 38 Q70 28 76 44 Z" fill="#C0803A" data-w="0.6"/>
+    <path d="M60 58 Q70 66 76 52 Z" fill="#C0803A" data-w="0.6"/>
+    <path id="corps" d="M2 46 L16 41 Q30 36 52 37 Q70 38 80 48 Q70 58 52 59 Q30 60 16 54 L2 52 Z" fill="#7A7B45"/>
+    <path data-clip="corps" data-w="0" d="M0 20 L96 20 L96 45 Q50 38 0 46 Z" fill="#3F6453"/>
+    <path data-clip="corps" data-w="0" d="M0 53 Q40 55 90 51 L90 80 L0 80 Z" fill="#D9CAAE"/>
+    <g data-clip="corps" data-w="0" fill="#E2C582"><ellipse cx="34" cy="44" rx="2.6" ry="1.4"/><ellipse cx="42" cy="49" rx="2.6" ry="1.4"/><ellipse cx="50" cy="43" rx="2.6" ry="1.4"/><ellipse cx="56" cy="49" rx="2.4" ry="1.3"/><ellipse cx="64" cy="45" rx="2.2" ry="1.2"/><ellipse cx="70" cy="50" rx="2" ry="1.1"/><ellipse cx="38" cy="53" rx="2" ry="1.1"/></g>
+    <path data-clip="corps" data-w="0" d="M8 44 Q16 40 26 39 L25 41 Q16 42 10 46 Z" fill="#B9C76A"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M26 40 Q31 47 26 55"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M2 49 L18 50"/>
+    <g data-teinte="#F7F3EA" data-w="0.3" fill="none" stroke="#000"><path d="M5 50 l1 1.6 M9 50.2 l1 1.6 M13 50.4 l1 1.6"/></g>
+    <path d="M36 56 Q42 60 38 66 Q32 62 36 56 Z" fill="#C0803A" data-w="0.6"/>
+    <circle cx="19" cy="44" r="3.6" fill="#E2C582" data-w="0.6"/>
+    <circle cx="19.6" cy="44" r="1.7" fill="#231A17" data-w="0"/>
+  </g>
+</svg>

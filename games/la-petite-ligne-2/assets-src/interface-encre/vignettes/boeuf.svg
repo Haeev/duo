@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Morceau de bœuf: rôti ficelé chez le boucher, chair rouge persillée, barde de gras, posé sur son papier. -->
+  <g transform="rotate(-8 48 54)">
+    <path d="M6 70 L82 58 L92 76 L14 90 Z" fill="#D9CAAE"/>
+    <path data-w="0" d="M10 82 L90 70 L92 76 L14 90 Z" fill="#B8A17E"/>
+    <path id="roti" d="M12 50 Q12 30 34 28 L66 26 Q86 26 86 46 Q86 68 64 70 L32 72 Q12 72 12 50 Z" fill="#C5443D"/>
+    <path data-clip="roti" data-w="0" d="M60 20 Q84 66 24 80 L96 96 L96 20 Z" fill="#8F3B34"/>
+    <path data-clip="roti" data-w="0" d="M10 24 L90 22 L90 34 Q50 38 10 40 Z" fill="#F3EDE0"/>
+    <path data-clip="roti" data-w="0" d="M10 34 Q50 34 90 30 L90 36 Q50 40 10 40 Z" fill="#D9CAAE"/>
+    <g data-clip="roti" data-teinte="#F3EDE0" data-w="0.32" fill="none" stroke="#000"><path d="M22 50 Q28 46 34 52 M44 46 Q50 50 54 46 M62 54 Q68 50 74 56 M30 60 Q36 58 40 62"/></g>
+    <path data-clip="roti" data-w="0" d="M18 44 Q20 40 26 40 L22 54 Q18 52 18 44 Z" fill="#E58E84"/>
+    <g fill="none" stroke="#000" data-w="0.75"><path d="M28 28 Q24 50 30 72 M48 27 Q44 50 50 71 M66 26 Q62 48 68 70"/></g>
+    <g data-teinte="#B8A17E" data-w="0.5" fill="none" stroke="#000"><path d="M28 29 Q24 50 30 71 M48 28 Q44 50 50 70 M66 27 Q62 48 68 69"/></g>
+    <path d="M66 26 Q72 18 78 20 Q74 24 68 27 Z" fill="#B8A17E" data-w="0.5"/>
+  </g>
+</svg>

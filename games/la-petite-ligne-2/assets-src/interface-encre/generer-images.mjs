@@ -3,7 +3,7 @@
  *
  * Lancer depuis le paquet (Chromium de Playwright, rsvg-convert de la boîte à outils):
  *   NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/generer-images.mjs \
- *     [vignettes|pictos|portraits] [identifiant]
+ *     [vignettes|pictos|portraits] [identifiant[,identifiant...]]
  *
  * - `vignettes/<objet>.svg` (grille 96) -> `assets/commun/interface/vignettes/<objet>.svg`,
  *   `<objet>-96.png` et `<objet>-48.png`. L'interface prend le SVG dès qu'il existe.
@@ -32,7 +32,7 @@ const sources = (family) =>
   readdirSync(path.join(here, family))
     .filter((f) => f.endsWith('.svg') && !f.startsWith('_'))
     .map((f) => ({ id: f.slice(0, -4), text: readFileSync(path.join(here, family, f), 'utf8') }))
-    .filter((s) => onlyId === undefined || s.id === onlyId);
+    .filter((s) => onlyId === undefined || onlyId.split(',').includes(s.id));
 
 const png = (svgFile, size, out, height = size) =>
   execFileSync('rsvg-convert', ['-w', String(size), '-h', String(height), svgFile, '-o', out]);

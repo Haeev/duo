@@ -4,6 +4,8 @@
     <path id="billet" fill-rule="evenodd" d="M8 28 L88 26 L90 70 L10 72 Z M70 44 A5 5 0 1 0 70.1 44 Z" fill="#F2C55C"/>
     <path data-clip="billet" data-w="0" d="M8 60 L92 56 L92 76 L8 76 Z" fill="#D4A33E"/>
     <path data-clip="billet" data-w="0" d="M8 28 L28 28 L28 74 L8 74 Z" fill="#44618A"/>
+    <g data-clip="billet" data-teinte="#8E6A26" data-w="0.3" fill="none" stroke="#000"><path d="M36 62 L50 61.5 M54 62 L62 61.5"/></g>
+    <path data-clip="billet" data-w="0" d="M30 30 L86 28 L86 31 L30 33 Z" fill="#FFE6B0"/>
     <path data-w="0.5" fill="none" stroke="#000" d="M28 28 L29 72"/>
     <g data-w="0.5" fill="none" stroke="#000"><path d="M36 36 L60 35 M36 44 L54 43.5 M36 52 L58 51"/></g>
     <g data-w="0.75" fill="none" stroke="#000"><path d="M14 44 Q18 38 22 44 Q16 52 14 58 L23 58"/></g>

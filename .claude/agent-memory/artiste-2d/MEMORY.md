@@ -33,3 +33,12 @@
 - Réduire un atlas RGBA en alpha prémultiplié, puis étendre les couleurs sous les texels vides, sinon franges sombres au filtrage.
 - Juger les visages à `?vue=expressions&zoom=5`: le modelé à facettes et la coque d'encre autour des orbites dominent les traits; c'est la limite de la note, pas le dessin.
 - Bash refuse les commandes jugées complexes (heredoc, `git` dans une boucle): écrire les scripts avec Write dans le scratchpad, une commande git par appel.
+
+## La Petite Ligne 2: série des vignettes d'objets (2026-11-10)
+
+- Détail intérieur sans noircir à 48 px: `data-teinte="#ton"` (moteur `encrer.mjs`) peint le trait de plume dans un ton du nuancier (ombre de la matière pour les veines, ton clair pour les reflets), `data-w` 0,26 à 0,35. L'encre noire reste au contour, au pli principal et aux hachures.
+- Lots: `generer-images.mjs vignettes id,id,...`; `planche-serie.cjs <dossier> <famille|id,id> [--grand]` (familles tirées des données: outils, poissons, potager, cuisine, provisions, meubles). Les meubles sont générés par `generer-meubles.py` (projection commune, séries miel et sauge par trio de tons): modifier le script, pas les SVG.
+- Pièges de lecture vus à la planche: un œuf trop brun et moucheté se lit pomme de terre (garder un ton clair, points minuscules); un tas de grain lisse se lit miche de pain (grains détachés, en relief, plus une plume); une tranche de pain dessinée de face « debout » paraît étrange (la coucher en trois quarts sur sa planchette); un paquet qui couvre la moitié d'un sandwich le cache.
+- Familles qui tiennent à 48 px: outils dessinés tête en haut puis tournés de 38 degrés (ombre peinte à droite avant rotation); poissons de profil tête à gauche, tournés de -10 à -16; plats dans l'assiette crème à liseré de couleur, le bol de trois quarts, le moule à bord festonné.
+- Bash refuse toute commande qui mêle `git` à un `cd` calculé ou à un sous-shell: lancer `git status` seul, depuis la racine du worktree.
+

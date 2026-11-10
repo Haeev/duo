@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Cuisinière: fonte noire, barre de laiton, foyer qui rougeoie, bouilloire de cuivre, tuyau. -->
+  <g>
+    <path d="M66 4 L74 4 L74 30 L66 30 Z" fill="#4A4D52"/>
+    <path data-w="0" d="M70 4 L74 4 L74 30 L70 30 Z" fill="#26282E"/>
+    <path d="M72 38 L86 28 L86 76 L72 86 Z" fill="#26282E"/>
+    <path d="M8 38 L72 38 L86 28 L22 28 Z" fill="#8C8E91"/>
+    <path id="caisse" d="M8 38 L72 38 L72 86 L8 86 Z" fill="#4A4D52"/>
+    <path d="M6 38 L72 38 L72 42 L6 42 Z" fill="#C8A150" data-w="0.5"/>
+    <ellipse cx="28" cy="33" rx="10" ry="3.4" fill="#26282E" data-w="0.5"/>
+    <ellipse cx="56" cy="33" rx="9" ry="3" fill="#26282E" data-w="0.5"/>
+    <ellipse cx="28" cy="33" rx="5" ry="1.6" fill="none" stroke="#000" data-w="0.35"/>
+    <path d="M48 32 Q46 18 56 16 Q66 18 64 32 Z" fill="#A85837" data-w="0.6"/>
+    <path d="M64 26 L72 20 L73 23 L65 29 Z" fill="#A85837" data-w="0.5"/>
+    <path d="M50 18 Q56 10 62 18" fill="none" stroke="#000" data-w="0.5"/>
+    <path data-w="0" d="M50 28 Q50 20 54 18 L54 30 Z" fill="#D98C62"/>
+    <path d="M14 48 L42 48 L42 76 L14 76 Z" fill="#8C8E91" data-w="0.5"/>
+    <path d="M16 50 L40 50 L40 54 L16 54 Z" fill="#B9B7B0" data-w="0"/>
+    <path d="M18 58 L38 58 L38 62 L18 62 Z" fill="#C8A150" data-w="0.45"/>
+    <path d="M48 54 L66 54 L66 66 L48 66 Z" fill="#26282E" data-w="0.5"/>
+    <path d="M50 56 L64 56 L64 64 L50 64 Z" fill="#D9822E" data-w="0"/>
+    <path d="M52 58 L62 58 L62 63 L52 63 Z" fill="#FFC264" data-w="0"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M50 60 L64 60 M54 56 L54 64 M58 56 L58 64"/>
+    </g>
+    <path d="M10 86 L16 86 L16 92 L10 92 Z" fill="#26282E" data-w="0.5"/>
+    <path d="M64 86 L70 86 L70 92 L64 92 Z" fill="#26282E" data-w="0.5"/>
+  </g>
+</svg>

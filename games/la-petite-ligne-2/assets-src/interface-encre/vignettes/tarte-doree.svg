@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tarte bien dorée: la tarte aux pommes réussie; moule rouille, pâte et pommes caramélisées et luisantes, éclats de brillance. -->
+  <g transform="rotate(5 48 56)">
+    <path id="moule" d="M4 52 L10 70 Q48 86 86 70 L92 52 Z" fill="#A85837"/>
+    <path data-clip="moule" data-w="0" d="M62 44 Q74 80 18 90 L96 96 L96 44 Z" fill="#743D2B"/>
+    <g data-clip="moule" data-teinte="#743D2B" data-w="0.35" fill="none" stroke="#000"><path d="M14 58 L18 72 M26 62 L28 77 M40 64 L41 80 M56 64 L55 80 M70 62 L68 77 M82 58 L78 72"/></g>
+    <ellipse cx="48" cy="52" rx="44" ry="20" fill="#C0803A" data-w="0.8"/>
+    <g data-w="0.45" fill="#8E6A26"><circle cx="8" cy="52" r="3"/><circle cx="14" cy="62" r="3"/><circle cx="26" cy="68" r="3"/><circle cx="40" cy="71" r="3"/><circle cx="56" cy="71" r="3"/><circle cx="70" cy="68" r="3"/><circle cx="82" cy="62" r="3"/><circle cx="88" cy="52" r="3"/></g>
+    <ellipse id="garniture" cx="48" cy="52" rx="35" ry="14" fill="#C0803A"/>
+    <g data-w="0.42" fill="#D4A33E">
+      <path d="M48 52 Q30 38 22 50 Q32 54 48 52 Z"/>
+      <path d="M48 52 Q40 36 52 38 Q56 46 48 52 Z"/>
+      <path d="M48 52 Q62 36 74 46 Q64 54 48 52 Z"/>
+      <path d="M48 52 Q74 52 72 62 Q58 62 48 52 Z"/>
+      <path d="M48 52 Q46 66 32 64 Q34 56 48 52 Z"/>
+      <path d="M48 52 Q24 56 22 50 Q22 58 32 64 Z"/>
+    </g>
+    <g data-teinte="#8E6A26" data-w="0.35" fill="none" stroke="#000"><path d="M28 48 Q38 50 46 51 M52 40 Q51 46 49 51 M70 46 Q60 50 50 52 M68 60 Q58 56 50 53 M36 62 Q42 58 48 53"/></g>
+    <g data-teinte="#FFE6B0" data-w="0.4" fill="none" stroke="#000"><path d="M30 46 Q36 44 40 46 M58 42 Q62 41 66 43"/></g>
+    <circle cx="48" cy="52" r="3" fill="#8E6A26" data-w="0.4"/>
+  </g>
+  <g data-w="0.45" fill="#FFE6B0"><path d="M20 22 L22 28 L28 30 L22 32 L20 38 L18 32 L12 30 L18 28 Z"/><path d="M76 16 L77.5 20 L82 21.5 L77.5 23 L76 27 L74.5 23 L70 21.5 L74.5 20 Z"/></g>
+</svg>

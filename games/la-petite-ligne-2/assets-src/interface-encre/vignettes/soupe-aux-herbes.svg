@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Soupe aux herbes: bol de faïence crème à filet bleu (la famille des soupes: le bol vu de trois quarts), velouté vert, feuilles flottantes, vapeur. -->
+  <g data-w="0.5" fill="none" stroke="#000"><path d="M34 22 Q28 14 34 8 Q38 4 34 0 M50 20 Q56 12 50 6 M64 22 Q58 14 64 8"/></g>
+  <g transform="rotate(-4 48 58)">
+    <path d="M30 80 Q48 86 66 80 L64 88 Q48 92 32 88 Z" fill="#D9CAAE" data-w="0.7"/>
+    <path id="bol" d="M6 46 Q8 82 48 86 Q88 82 90 46 Z" fill="#F3EDE0"/>
+    <path data-clip="bol" data-w="0" d="M62 40 Q72 80 18 90 L96 96 L96 40 Z" fill="#D9CAAE"/>
+    <path data-clip="bol" data-w="0" d="M12 50 L22 50 Q22 66 28 76 Q16 70 12 50 Z" fill="#F7F3EA"/>
+    <path data-clip="bol" data-w="0" d="M8 58 Q48 72 90 58 L90 63 Q48 77 8 63 Z" fill="#44618A"/>
+    <ellipse cx="48" cy="46" rx="42" ry="12" fill="#F3EDE0" data-w="0.8"/>
+    <ellipse id="soupe" cx="48" cy="47" rx="36" ry="8.5" fill="#96A98C"/>
+    <ellipse data-clip="soupe" data-w="0" cx="56" cy="51" rx="36" ry="8" fill="#6E9241"/>
+    <path data-clip="soupe" data-w="0" d="M18 46 Q28 41 42 41 Q30 43 22 48 Z" fill="#B9C76A"/>
+    <g data-w="0.45"><path d="M32 46 Q36 40 42 42 Q38 48 32 46 Z" fill="#40592D"/><path d="M56 44 Q62 40 66 44 Q60 48 56 44 Z" fill="#40592D"/><path d="M46 50 Q50 46 54 49 Q50 53 46 50 Z" fill="#6E9241"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M66 74 l6 -6 M60 79 l7 -7 M54 82 l5 -5"/></g>
+  </g>
+</svg>

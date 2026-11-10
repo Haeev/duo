@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Table à manger: nappe à carreaux rouges, bol et pichet: la table où l'on mange. -->
+  <g>
+    <path d="M64 52 L69 52 L70 82 L65 82 Z" fill="#6E4B30"/>
+    <path d="M14 58 L20 58 L19 92 L13 92 Z" fill="#A87A46"/>
+    <path d="M60 60 L66 60 L67 92 L61 92 Z" fill="#A87A46"/>
+    <path id="nappe" d="M6 46 L64 46 L82 32 L24 32 Z" fill="#F3EDE0"/>
+    <path id="pan" d="M6 46 L64 46 L64 66 Q48 70 34 64 Q20 70 8 64 Z" fill="#F3EDE0"/>
+    <path d="M64 46 L82 32 L82 50 Q74 58 64 66 Z" fill="#D9CAAE"/>
+    <g data-clip="pan" data-w="0" fill="#C5443D">
+    <path d="M6 46 L16 46 L16 72 L6 72 Z"/>
+    <path d="M26 46 L36 46 L36 72 L26 72 Z"/>
+    <path d="M46 46 L56 46 L56 72 L46 72 Z"/>
+    <path d="M0 54 L70 54 L70 59 L0 59 Z" fill-opacity="0.6"/>
+    </g>
+    <g data-clip="nappe" data-w="0" fill="#E58E84">
+    <path d="M12 46 L22 46 L38 32 L28 32 Z"/>
+    <path d="M32 46 L42 46 L58 32 L48 32 Z"/>
+    <path d="M52 46 L62 46 L78 32 L68 32 Z"/>
+    </g>
+    <path d="M28 38 Q30 46 38 46 Q46 46 48 38 Z" fill="#44618A" data-w="0.5"/>
+    <ellipse cx="38" cy="38" rx="10" ry="3" fill="#A9C7D9" data-w="0.45"/>
+    <path d="M56 22 L66 22 Q70 30 68 40 L56 40 Q54 30 56 22 Z" fill="#F3EDE0" data-w="0.55"/>
+    <path d="M68 26 Q74 28 70 34" fill="none" stroke="#000" data-w="0.5"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M66 82 l4 -4 M71 82 l4 -4"/>
+    </g>
+  </g>
+</svg>

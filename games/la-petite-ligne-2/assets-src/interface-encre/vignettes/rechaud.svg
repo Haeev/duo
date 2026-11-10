@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Réchaud: petit poêle de fonte sur trois pieds, flammes bleues, casserole de cuivre qui fume. -->
+  <g>
+    <path d="M26 70 L18 92 M70 70 L78 92 M48 72 L48 90" fill="none" stroke="#000" data-w="0.9"/>
+    <path id="corps" d="M20 52 L76 52 L72 74 Q48 80 24 74 Z" fill="#4A4D52"/>
+    <path data-clip="corps" data-w="0" d="M56 48 Q66 72 30 80 L80 80 L80 48 Z" fill="#26282E"/>
+    <path data-clip="corps" data-w="0" d="M24 56 L30 56 L30 72 L26 70 Z" fill="#8C8E91"/>
+    <path d="M40 60 L56 60 L56 70 L40 70 Z" fill="#26282E" data-w="0.4"/>
+    <path d="M42 66 Q46 60 48 64 Q50 60 54 66 L54 70 L42 70 Z" fill="#FFC264" data-w="0"/>
+    <ellipse cx="48" cy="52" rx="29" ry="7" fill="#C8A150" data-w="0.6"/>
+    <g data-w="0.4">
+    <path d="M34 50 Q36 42 40 48 Z" fill="#A9C7D9"/>
+    <path d="M44 50 Q48 40 52 50 Z" fill="#A9C7D9"/>
+    <path d="M56 50 Q60 42 62 50 Z" fill="#A9C7D9"/>
+    </g>
+    <path d="M32 44 L32 30 Q48 26 64 30 L64 44 Q48 48 32 44 Z" fill="#A85837" data-w="0.6"/>
+    <path data-w="0" d="M34 32 L38 31 L38 42 L34 42 Z" fill="#D98C62"/>
+    <path d="M64 33 L86 28 L87 32 L65 37 Z" fill="#4F3626" data-w="0.55"/>
+    <ellipse cx="48" cy="30" rx="16" ry="3.4" fill="#743D2B" data-w="0.45"/>
+    <g data-w="0.5" fill="none" stroke="#000">
+    <path d="M42 22 Q38 16 42 10 M54 22 Q58 16 54 10"/>
+    </g>
+  </g>
+</svg>

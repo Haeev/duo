@@ -12,5 +12,8 @@
   <path data-clip="pot" data-w="0" d="M16 48 Q20 44 26 45 Q20 56 20 68 Q14 60 16 48 Z" fill="#D98C62"/>
   <path d="M8 38 Q48 28 88 38 Q88 44 86 46 Q48 38 10 46 Q8 42 8 38 Z" fill="#D98C62"/>
   <path data-w="0.45" fill="none" stroke="#000" d="M14 60 Q48 66 82 60"/>
+  <g data-clip="pot" data-teinte="#743D2B" data-w="0.3" fill="none" stroke="#000"><path d="M24 68 Q30 74 38 76 M44 70 Q50 74 58 74"/></g>
+  <ellipse cx="48" cy="40" rx="30" ry="4" fill="#8E6A26" data-w="0.35"/>
+  <g data-w="0" fill="#FFC264"><ellipse cx="36" cy="40" rx="3" ry="1.4"/><ellipse cx="58" cy="40" rx="2.6" ry="1.2"/></g>
   <g data-w="0.35" fill="none" stroke="#000"><path d="M64 74 l6 -6 M58 80 l7 -7 M52 83 l6 -6"/></g>
 </svg>

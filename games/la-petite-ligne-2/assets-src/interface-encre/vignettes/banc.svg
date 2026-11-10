@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Banc de quai: lattes de bois, pieds et accoudoirs de fonte verte. -->
+  <g transform="rotate(-3 48 52)">
+    <path d="M14 22 L76 16 L77 23 L15 29 Z" fill="#A87A46"/>
+    <g data-teinte="#6E4B30" data-w="0.28" fill="none" stroke="#000">
+    <path d="M22 25 Q40 22 60 21"/>
+    </g>
+    <path d="M14 31 L76 25 L77 32 L15 38 Z" fill="#A87A46"/>
+    <g data-teinte="#6E4B30" data-w="0.28" fill="none" stroke="#000">
+    <path d="M22 34 Q40 31 60 30"/>
+    </g>
+    <path d="M8 56 L70 50 L86 56 L24 63 Z" fill="#D7A86A"/>
+    <path id="assise" d="M8 56 L24 63 L24 69 L8 62 Z" fill="#6E4B30"/>
+    <path d="M24 63 L86 56 L86 62 L24 69 Z" fill="#A87A46"/>
+    <g data-teinte="#A87A46" data-w="0.3" fill="none" stroke="#000">
+    <path d="M16 58 L76 52 M20 61 L82 55"/>
+    </g>
+    <path d="M16 18 L21 17 L22 60 L17 61 Z" fill="#3F6453" data-w="0.8"/>
+    <path d="M20 60 L25 59 L23 84 L27 88 L17 88 L19 84 Z" fill="#3F6453" data-w="0.8"/>
+    <path d="M14 42 Q24 38 26 50 L23 53 Q24 44 15 46 Z" fill="#5E8A72" data-w="0.7"/>
+    <path d="M70 18 L75 17 L76 60 L71 61 Z" fill="#3F6453" data-w="0.8"/>
+    <path d="M80 60 L85 59 L83 84 L87 88 L77 88 L79 84 Z" fill="#3F6453" data-w="0.8"/>
+    <path d="M68 42 Q78 38 86 50 L83 53 Q78 44 69 46 Z" fill="#5E8A72" data-w="0.7"/>
+  </g>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Pommes sautées: assiette crème à liseré vert bouteille, tas de dés de pommes de terre bien dorés, persil. -->
+  <g transform="rotate(-5 48 56)">
+    <ellipse id="assiette" cx="48" cy="62" rx="44" ry="24" fill="#F3EDE0"/>
+    <path data-clip="assiette" data-w="0" d="M66 36 Q84 86 18 92 L96 96 L96 36 Z" fill="#D9CAAE"/>
+    <g data-teinte="#3F6453" data-w="0.4" fill="none" stroke="#000"><ellipse cx="48" cy="62" rx="38.5" ry="19.5"/></g>
+    <ellipse cx="48" cy="61" rx="31" ry="14" fill="#D9CAAE" data-w="0.3"/>
+    <g fill="#D4A33E" data-w="0.6">
+      <path d="M20 58 L32 54 L36 64 L24 68 Z"/>
+      <path d="M58 60 L72 58 L74 70 L60 72 Z"/>
+      <path d="M36 62 L50 60 L52 72 L38 74 Z"/>
+      <path d="M28 44 L42 42 L44 54 L30 56 Z"/>
+      <path d="M48 44 L62 46 L60 58 L46 56 Z"/>
+      <path d="M62 44 L74 46 L74 56 L62 56 Z"/>
+      <path d="M38 32 L52 32 L52 44 L38 44 Z"/>
+    </g>
+    <g data-w="0" fill="#F2C55C"><path d="M29 45 L40 43.5 L39 47 L30 48 Z"/><path d="M39 33 L50 33 L49 36 L40 36 Z"/><path d="M49 45 L60 47 L59 50 L49 48 Z"/><path d="M37 63 L48 61 L48 64 L38 65 Z"/></g>
+    <g data-w="0" fill="#C0803A"><path d="M42 50 L44 54 L30 56 L30 52 Z"/><path d="M50 40 L52 44 L38 44 L38 40 Z"/><path d="M71 64 L74 70 L60 72 L60 68 Z"/><path d="M58 52 L60 58 L46 56 L48 52 Z"/></g>
+    <g fill="#6E9241" data-w="0.4"><circle cx="46" cy="38" r="2.4"/><circle cx="34" cy="58" r="2"/><circle cx="66" cy="52" r="2"/><circle cx="54" cy="66" r="1.8"/></g>
+  </g>
+</svg>

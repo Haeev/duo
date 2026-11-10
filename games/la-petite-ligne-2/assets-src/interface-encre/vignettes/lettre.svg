@@ -6,9 +6,11 @@
     <path data-w="0.55" fill="none" stroke="#000" d="M10 77 L44 50 M89 75 L56 50"/>
     <path d="M8 26 L88 24 L50 56 Z" fill="#F5E6C6"/>
     <path data-w="0" d="M60 40 L86 26 L52 54 Z" fill="#DDC59C"/>
+    <g data-clip="env" data-teinte="#A88C6C" data-w="0.3" fill="none" stroke="#000"><path d="M16 66 L30 66 M16 70 L26 70 M70 34 L80 33"/></g>
     <path d="M42 50 Q50 40 58 50 Q60 60 50 62 Q40 60 42 50 Z" fill="#C5443D"/>
     <path data-w="0" d="M50 52 Q58 52 56 58 Q52 62 46 60 Z" fill="#8F3B34"/>
     <path data-w="0.45" fill="none" stroke="#000" d="M47 49 Q50 54 53 49"/>
+    <path data-w="0" d="M44 50 Q46 46 49 45 Q46 49 46 52 Z" fill="#E58E84"/>
     <g data-w="0.35" fill="none" stroke="#000"><path d="M66 70 l5 -5 M72 70 l5 -5 M78 70 l5 -5"/></g>
   </g>
 </svg>
