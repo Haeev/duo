@@ -2,12 +2,12 @@
 
 | Champ | Valeur |
 |---|---|
-| Identifiant | `la-petite-ligne` (paquet `games/la-petite-ligne`, version actuelle 0.13.0) |
-| Statut | brouillon, à faire valider par le client |
-| Version du document | 0.1 |
+| Identifiant | nouveau paquet de jeu à côté de l'ancien, identifiant proposé `petite-ligne` (à fixer par ADR, `technique.md` 2.3); l'ancien `la-petite-ligne` 0.13.0 reste jouable jusqu'à l'Alpha du premier lieu, puis il est retiré |
+| Statut | validé sur le fond par le client le 2026-11-10; questions restantes en section 14 |
+| Version du document | 0.2 |
 | Dernière mise à jour | 2026-11-10 |
-| Rédaction | game-designer (sections 1 à 6, 11, propositions des sections 12 à 14); sections 7 à 10 à compléter par leurs responsables |
-| Sources | réponses du client aux 75 questions: `docs/jeux/jeu-1/refonte/reponses-client-2026-11-10.md` (fait foi; les renvois « R23 » désignent ses réponses); ressenti visé: `docs/jeux/jeu-1/refonte/references-de-ressenti.md`; simulation: `docs/jeux/jeu-1/simulations/refonte_besoins_economie.py` |
+| Rédaction | game-designer (sections 1 à 6, 11, propositions des sections 12 à 14); sections 7 à 10 résumées ici, leurs documents de référence font foi |
+| Sources | réponses du client aux 75 questions: `docs/jeux/jeu-1/refonte/reponses-client-2026-11-10.md` (fait foi; les renvois « R23 » désignent ses réponses); ressenti visé: `docs/jeux/jeu-1/refonte/references-de-ressenti.md`; direction artistique: `bible-artistique.md`; interface: `interface.md`; technique: `technique.md` (même dossier); simulation: `docs/jeux/jeu-1/simulations/refonte_besoins_economie.py` |
 | Remplace | pour tout le contenu: `docs/jeux/jeu-1/cahier-des-charges.md` et les documents de conception 0.12 et 0.13, qui deviennent des archives |
 
 > Ce document tranche et chiffre. Chaque valeur est une valeur de départ, réglable, rangée dans un fichier de configuration. Ce que le client doit encore décider est en section 14, avec une recommandation à chaque fois.
@@ -15,11 +15,12 @@
 ## En bref
 
 - **Le jeu**: une vie tranquille à deux (potager, pêche, collections, déco, voisins attachants) portée par une vraie histoire, tendre, drôle et mystérieuse, qui vous mène en train de lieu en lieu.
+- **Surnaturel très doux à Aubrune**: jusqu'au dénouement, tout peut passer pour une coïncidence ou une légende; aucun fantôme au premier lieu.
 - **Trois lieux écrits**: Aubrune (le bourg où l'on apprend tout), Hautefonte (la métropole), Combe-Veilleuse (le village abandonné et hanté). D'autres lieux viendront par mises à jour. Chaque lieu: une grande suite de quêtes, des suites secondaires mémorables, son logement, ses activités, ses fêtes. Objectif: 15 heures de jeu au moins par lieu.
 - **Le fil rouge**: vous avez été embauchés comme gardes de la Petite Ligne par une lettre signée d'un homme disparu depuis trente ans, et le train qui vous a déposés ne figure sur aucun horaire.
 - **Trois besoins qui comptent** (faim, sommeil, hygiène), simples: gêne sous 20 %, blocage à 0 %, petit bonus au-dessus de 50 %.
 - **Prise en main refaite**: clavier seul pour marcher, une seule touche d'action, caméra proche qui tourne librement, pas de sac au début.
-- **Page blanche pour le contenu**: les 78 quêtes, l'étal du marché, les métiers, la monnaie « aubrun » et les sauvegardes de la 0.13 disparaissent. Les habitants d'Aubrune qui servent la nouvelle histoire sont repris et réécrits.
+- **Page blanche pour le contenu**: les 78 quêtes, l'étal du marché, les métiers, la monnaie « aubrun » (remplacée par l'euro) et les sauvegardes de la 0.13 disparaissent. Les habitants d'Aubrune sont gardés et refondus: nouvelle apparence, nouvelle écriture, quêtes neuves.
 
 ## 1. Résumé (game-designer)
 
@@ -58,12 +59,12 @@ Un couple, dans la même pièce, de niveaux de jeu différents. Séance type de 
 | Action | barre d'outils et gestes multiples | une touche contextuelle | R18 |
 | Sac | 10 cases | aucun sac au début, puis 4, 6, 10, 15, 20; piles limitées | R20 |
 | Outils | inusables | de base inusables et lents; améliorés qui s'usent et se réparent | R19 |
-| Argent | « aubruns », bourse commune | « sous », une bourse par joueur, un coffre commun | R10, R13 |
+| Argent | « aubruns », bourse commune | l'euro, une bourse par joueur, un coffre commun | R10, R13, décision du 10 novembre |
 | Vente | étal du marché | uniquement aux commerçants, selon leur métier, à des prix différents | R34 |
 | Dialogues | bulles | bandeau bas avec portrait, lettre par lettre, babil | R37, R38, R63 |
 | Amitié | lanternes | cœurs visibles | R39 |
 | Maison | maisonnette | ruine à restaurer et agrandir, mode déco vu du dessus | R11, R52, R54 |
-| Personnages | modèles fixes | catalogue de pièces à assembler, vrai éditeur | R47 à R51 |
+| Personnages | modèles fixes | catalogue de pièces à assembler, vrai éditeur; deux joueurs adultes, femme ou homme au choix | R47 à R51, décisions du 10 novembre |
 
 ### 1.3 Ce qui est abandonné
 
@@ -71,7 +72,14 @@ L'étal du marché, les cinq métiers et le « regard du métier », la bourse e
 
 ### 1.4 Création originale
 
-Le client cite deux références de genre: un jeu de vie paisible très connu (pour le quotidien) et les versions portables d'un jeu de simulation de vie (pour l'histoire guidée et le ton). On garde le genre et l'intention. Ce qui nous distingue: une ligne de train qu'on remonte, des habitants humains, un couple de joueurs embauchés (ni héritage, ni panne, ni dette envers un commerçant), une monnaie et des noms à nous, pas de musée, pas de voisins animaux. Points de vigilance signalés au manager en section 14 (babil, confidences, logement du troisième lieu).
+Le client cite deux références de genre: un jeu de vie paisible très connu (pour le quotidien) et les versions portables d'un jeu de simulation de vie (pour l'histoire guidée et le ton). On garde le genre et l'intention. Ce qui nous distingue: une ligne de train qu'on remonte, des habitants humains, un couple de joueurs embauchés (ni héritage, ni panne, ni dette envers un commerçant), des noms à nous, une monnaie banale (l'euro), pas de musée, pas de voisins animaux. Points de vigilance signalés au manager en section 14 (babil, confidences, logement du troisième lieu).
+
+### 1.5 Les deux personnages jouables
+
+- **Deux adultes** (décision du 10 novembre). Les corps d'enfant et de personne âgée du catalogue servent aux habitants.
+- **Genre au choix dans l'éditeur: femme ou homme** (correction du client, 10 novembre). Ce choix fait deux choses seulement: il règle les accords des textes qui parlent du joueur, et il propose une silhouette et des pièces de départ. Il ne ferme rien: toutes les pièces du catalogue (coiffures, vêtements, accessoires, corpulences) restent portables par tous, et le choix se change à tout moment chez Solange, sans coût.
+- **Règle d'écriture des accords**: d'abord la tournure qui évite l'accord (« Te voilà enfin ! » plutôt que « Tu es arrivé »; « Quelle mine ! » plutôt que « Tu es fatigué »). Quand l'accord est le plus naturel, la réplique porte une variante accordée, rangée dans les données sous une balise à deux formes (féminin, masculin); l'outil de validation refuse une balise incomplète et signale tout participe ou adjectif accordé au joueur hors balise. Cible: moins d'une réplique sur dix avec balise. Une réplique adressée aux deux joueurs dit « vous » et s'accorde au pluriel selon les deux choix (féminin pluriel pour deux femmes, masculin pluriel sinon), par la même balise. « Ta moitié » désigne l'autre joueur sans accord.
+- Les habitants parlent des joueurs par leur prénom. Aucune romance avec les habitants, aucun texte qui suppose la nature du lien entre les deux joueurs au-delà de « vous deux ».
 
 ## 2. Expérience à deux (game-designer)
 
@@ -94,7 +102,7 @@ Le client cite deux références de genre: un jeu de vie paisible très connu (p
 
 ### 2.3 Ce qu'on a intérêt à se dire
 
-« Achille paie les œufs 10, pas 6 », « j'ai trouvé une clé dans la cave », « viens, il pleut, la truite sort », « attends-moi pour dîner ». Les scènes asymétriques obligent à se décrire ce qu'on voit. Rien à l'écran ne remplace la parole (R14).
+« Achille paie les œufs 1 €, pas 60 centimes », « j'ai trouvé une clé dans la cave », « viens, il pleut, la truite sort », « attends-moi pour dîner ». Les scènes asymétriques obligent à se décrire ce qu'on voit. Rien à l'écran ne remplace la parole (R14).
 
 ### 2.4 Niveaux de jeu différents
 
@@ -121,7 +129,7 @@ Le client cite deux références de genre: un jeu de vie paisible très connu (p
 | Durée | 2 heures de jeu ajoutées à l'horloge; à l'écran, une scène de wagon de 20 à 40 secondes (le temps de charger le lieu) où l'on peut parler au contrôleur | le trajet a un coût léger et un charme |
 | Prix | gratuit avec la carte de ligne reçue à la fin d'Aubrune | l'argent sert à la maison, pas au billet (R33) |
 | Retour | toujours possible vers tout lieu déjà rouvert | R6 |
-| Train du samedi | à Aubrune, chaque samedi à 10 h: la commande de la semaine (3 à 5 lignes d'objets, payée en sous, ce qui manque est reporté sans pénalité), le courrier, parfois un nouvel habitant | décision du premier tour |
+| Train du samedi | à Aubrune, chaque samedi à 10 h: la commande de la semaine (3 à 5 lignes d'objets, payée en euros, ce qui manque est reporté sans pénalité), le courrier, parfois un nouvel habitant | décision du premier tour |
 | Une seule horloge | l'heure, le jour, la saison et la météo sont les mêmes dans tous les lieux; seul le lieu où se trouvent les joueurs est simulé en détail | simple à comprendre et à sauvegarder |
 | Pendant l'absence | le potager pousse sans faner, le poulailler garde ses œufs jusqu'à la limite du pondoir, les habitants avancent leur calendrier | rien ne punit le voyage |
 
@@ -147,21 +155,21 @@ Ce qui persiste d'un lieu à l'autre: les deux personnages (apparence, tenues, b
 | Une heure de jeu | 125 secondes réelles | 100 à 150 | donne exactement les durées demandées (R3) |
 | Jour | de 6 h à 20 h 30: 30 minutes réelles | | |
 | Nuit jouable | de 20 h 30 à 6 h: 20 minutes réelles | | R3, R4 |
-| Dormir pour passer au lendemain | à partir de 15 h, quand les deux personnages sont au lit: fondu, réveil à 6 h | 15 h fixe | R3 |
+| Dormir pour passer au lendemain | à partir de 15 h, quand les deux personnages sont au lit: fondu, réveil à 6 h. Un petit lit apparaît dans le cadran de l'horloge dès 15 h | 15 h fixe | R3, validé le 10 novembre |
 | Sieste | à toute heure, seul, sur un lit ou un banc: le temps ne saute pas, le sommeil remonte (4.4) | | permet à l'un de dormir pendant que l'autre veille |
 | Sans dormir | la nuit passe, 6 h sonne, le jour suivant commence où que l'on soit (R4) | | |
 | Semaine | 7 jours, du lundi au dimanche; le samedi est le jour du train | | |
-| Saison | 14 jours de jeu, soit 2 semaines | 14 à 21 | R5; une année de 56 jours dure environ 33 heures réelles si l'on dort presque chaque nuit |
+| Saison | 14 jours de jeu, soit 2 semaines (validé le 10 novembre) | fixe | R5; une année de 56 jours dure environ 33 heures réelles si l'on dort presque chaque nuit |
 | Météo | tirée chaque matin par saison: beau, couvert, pluie, brume, neige (hiver) | | sert la rareté (R58) |
 | Pause | Échap (pause de Duo): l'horloge s'arrête pour les deux | | |
-| Dialogue ordinaire | l'horloge continue; les besoins du joueur qui lit sont figés | | on ne perd rien à lire |
+| Dialogue ordinaire, carnet, boutique | l'horloge continue (le monde ne se met jamais en pause dans un menu); les besoins du joueur qui lit un dialogue sont figés | | on ne perd rien à lire |
 | Scène d'histoire à deux | horloge et besoins figés | | |
 
 Rareté (R58): chaque entrée de collection porte une plage d'heures, une ou plusieurs météos, une ou plusieurs saisons et un lieu. Le carnet affiche ces conditions dès qu'un habitant en a parlé ou après la première prise. Coup de pouce: une entrée jamais prise a un poids multiplié par 4 quand ses conditions sont réunies (apprentissage du carnet du game-designer: sans cela, les derniers 10 % d'une collection prennent 2 à 4 fois plus de temps que le reste).
 
 ### 4.4 Les besoins (R23 à R26)
 
-Trois jauges de 0 à 100 par joueur. Elles n'apparaissent à l'écran que lorsqu'elles changent de palier, quand on maintient la touche Alt, et en permanence sous 20 (R60 et note de ressenti).
+Trois jauges de 0 à 100 par joueur. Elles n'apparaissent à l'écran que lorsqu'elles changent de palier (4 secondes, seul le médaillon concerné), pendant qu'on mange, dort ou se lave, au coup d'œil de la touche G (3 secondes), dans l'en-tête du carnet, et en permanence sous 20. Un réglage « besoins toujours visibles » existe par joueur (validé le 10 novembre). Le reste du temps, c'est le personnage qui parle: main sur le ventre, bâillement, petit nuage.
 
 | Palier | Faim | Sommeil | Hygiène |
 |---|---|---|---|
@@ -185,9 +193,9 @@ Les cinq bonus cochés par le client (R24) y sont tous, chacun attaché à une j
 | Plat simple (réchaud) | faim plus 35 | | 2 à 3 par jour tiennent la faim au-dessus de 50 |
 | Plat cuisiné (vraie cuisine) | faim plus 50 à plus 70, selon la réussite du mini-jeu | | |
 | Repas spécial à deux | faim à 100 pour les deux, plus un bonus exclusif (ci-dessous) | | R26 |
-| Se débarbouiller (pompe, rivière, fontaine) | hygiène plus 40, plafonnée à 60, geste de 4 secondes | | disponible dès le premier jour |
-| Baquet (maison d'Aubrune) | hygiène à 100, 10 secondes | | |
-| Douche ou bain (salle d'eau, bains publics de Hautefonte, source chaude de Combe-Veilleuse) | hygiène à 100, 6 secondes; avec un savon parfumé: bonus Soigné porté à 1,3 jusqu'à ce que la jauge repasse sous 50 | | un petit puits d'argent agréable |
+| Se débarbouiller (pompe, rivière, fontaine) | hygiène plus 40, plafonnée à 60, geste de 1,5 seconde | | disponible dès le premier jour |
+| Baquet (maison d'Aubrune) | hygiène à 100, 4 secondes derrière un paravent, l'anneau se remplit sous les yeux; on peut sortir avant la fin et garder ce qui est gagné | | un moment choisi, jamais subi |
+| Douche ou bain (salle d'eau, bains publics de Hautefonte, source chaude de Combe-Veilleuse) | hygiène à 100, 3 secondes; avec un savon parfumé: bonus Soigné porté à 1,3 jusqu'à ce que la jauge repasse sous 50 | | un petit puits d'argent agréable |
 
 **Repas spéciaux à deux** (R26): de gros repas en 4 étapes, cuisinés dans une vraie cuisine sur deux postes en même temps (l'un coupe pendant que l'autre remue; seul, on enchaîne les deux postes, deux fois plus longtemps), puis servis à table. Les deux s'assoient: une animation de repas de 15 secondes (on trinque, on se sert, vapeur et petits bruits de couverts). Le bonus exclusif vaut pour les deux tant que la faim de chacun reste au-dessus de 50.
 
@@ -210,14 +218,14 @@ Lecture: qui s'occupe de soi (2,5 plats simples et 1,3 toilette par journée) ga
 
 ### 4.5 Sac, barre d'outils, piles, outils
 
-**Barre d'outils**: 5 emplacements dès le début, pour les outils comme pour les objets. Il n'y a pas de sac au départ (R20): les poches sont la barre. Un objet ramassé sans place reste au sol, brille, et une bulle dit « Poches pleines ».
+**Barre d'outils**: 5 emplacements dès le début, pour les outils comme pour les objets. Elle se replie 3 secondes après le dernier changement (l'outil se voit dans la main du personnage) et revient au changement d'outil, à un objet ramassé ou perdu, au coup d'œil et dans le carnet; un réglage la garde toujours visible. Il n'y a pas de sac au départ (R20): les poches sont la barre. Un objet ramassé sans place reste au sol, brille, et une bulle dit « Poches pleines ».
 
 | Sac | Cases en plus de la barre | Où | Prix |
 |---|---|---|---|
 | Besace | 4 | Aubrune, offerte par Solange à l'acte 1 | quête |
-| Sac de toile | 6 | Aubrune, mercerie de Solange | 350 sous |
-| Sac à dos | 10 | Aubrune, mercerie, après l'acte 2 | 900 sous |
-| Sac de voyage | 15 | Hautefonte, grand magasin | 2 500 sous |
+| Sac de toile | 6 | Aubrune, mercerie de Solange | 35 € |
+| Sac à dos | 10 | Aubrune, mercerie, après l'acte 2 | 90 € |
+| Sac de voyage | 15 | Hautefonte, grand magasin | 250 € |
 | Malle à bretelles | 20 | Combe-Veilleuse, plan trouvé, fabriquée à l'établi | matériaux |
 
 Un sac remplace le précédent (repris à moitié prix). Les lieux suivants pourront monter à 25 et 30. À la maison: coffres de rangement de 20 cases (plan de Basile), mêmes piles.
@@ -244,82 +252,75 @@ Un sac remplace le précédent (repris à moitié prix). Les lieux suivants pour
 
 | Outil | De base (inusable) | Amélioré | Fin (Hautefonte) | Usure de l'amélioré | Émoussé | Réparation |
 |---|---|---|---|---|---|---|
-| Hache | arbre en 6 coups | 4 coups | 2 coups | 120 coups | 9 coups | meule de la forge: geste de 5 secondes, gratuit chez Mado, ou pierre à aiguiser (20 sous) n'importe où |
-| Bêche (potager, fouilles) | 1 case par geste, 2 s | 3 cases en ligne | 9 cases | 150 gestes | 1 case, 3 s | meule, comme la hache |
-| Arrosoir | 3 cases par plein | 9 cases | 18 cases | 200 arrosages | fuit: 1 case par plein | rustine d'étain (15 sous chez Mado), posée à l'établi |
-| Canne à pêche | zone de tension étroite | zone 30 % plus large | 60 % plus large | 60 prises | zone plus étroite que la canne de base | bobine de fil neuf (25 sous, épicerie) |
-| Filet à insectes | portée 1 m | 1,5 m | 2 m | 80 coups | troué: une prise sur deux s'échappe | ficelle (10 sous), raccommodé à la maison ou chez Solange |
-| Marteau (restauration, établi) | fabrication en 8 s | 5 s | 3 s | 100 fabrications | 12 s | manche neuf: 1 planche, à l'établi |
-| Appareil photo | 6 poses par pellicule | 12 poses, zoom | 24 poses | ne s'use pas | | pellicule (30 sous) |
+| Hache | arbre en 6 coups | 4 coups | 2 coups | 120 coups | 9 coups | meule de la forge: 4 tours de meule d'une seconde, gratuit chez Mado, ou pierre à aiguiser (2 €) n'importe où |
+| Bêche (potager, fouilles) | 1 case en 2 coups d'une seconde | 3 cases en ligne par coup | 9 cases par coup | 150 coups | 1 case en 3 coups | meule, comme la hache |
+| Arrosoir | 3 cases par plein | 9 cases | 18 cases | 200 arrosages | fuit: 1 case par plein | rustine d'étain (1,50 € chez Mado), posée à l'établi |
+| Canne à pêche | zone de tension étroite | zone 30 % plus large | 60 % plus large | 60 prises | zone plus étroite que la canne de base | bobine de fil neuf (2,50 €, épicerie) |
+| Filet à insectes | portée 1 m | 1,5 m | 2 m | 80 coups | troué: une prise sur deux s'échappe | ficelle (1 €), raccommodé à la maison ou chez Solange |
+| Marteau (restauration, établi) | fabrication en 6 coups d'une seconde | 4 coups | 2 coups | 100 fabrications | 9 coups | manche neuf: 1 planche, à l'établi |
+| Appareil photo | 6 poses par pellicule | 12 poses, zoom | 24 poses | ne s'use pas | | pellicule (3 €) |
 | Instrument | 3 airs | 6 airs | tous les airs | ne s'use pas, se désaccorde après 20 airs (fausses notes comiques) | | accordé par Armand, gratuit, ou soi-même avec un diapason (plan) |
 
-Prix: amélioré 300 sous et des matériaux, à la forge de Mado ou chez l'artisan concerné; fin 1 200 sous à Hautefonte. L'usure restante se lit sur l'icône de l'outil (un liseré qui se vide), jamais par un chiffre.
+Prix: amélioré 30 € et des matériaux, à la forge de Mado ou chez l'artisan concerné; fin 120 € à Hautefonte. L'usure restante se lit sur l'icône de l'outil (un petit arc qui se vide, hachuré quand il est usé), jamais par un chiffre. Aucun geste d'outil ne bloque plus de 1,5 seconde: la lenteur d'un outil de base ou émoussé, ce sont des coups en plus, chacun avec sa réponse, et l'on peut s'arrêter entre deux coups.
 
 ### 4.6 Économie
 
-**Nom de la monnaie** (R13): trois propositions.
+**Monnaie: l'euro** (décision du client, 10 novembre). Elle vaut dans tous les lieux et ne demande aucune explication. Tous les prix sont des multiples de 0,10 € et s'affichent « 1,20 € ». À l'écran, la bourse montre une pièce et un nombre. Les prix sont ceux d'un petit monde de maquette: justes pour un œuf ou un pain, volontairement modestes pour une pièce de maison (on paie les matériaux, pas un chantier).
 
-| Nom | Pour | Contre |
-|---|---|---|
-| **le sou** (recommandé) | compris en une seconde, vaut partout (bourg, métropole, village des fantômes), riche en expressions pour les dialogues (« sans le sou », « sou à sou », « pas un sou de bon sens ») | mot courant, peu distinctif |
-| le poinçon | propre à l'univers du train (le trou du contrôleur dans le billet), original | demande une explication, moins naturel dans une épicerie |
-| le rond | familier et drôle (« il n'a plus un rond ») | registre trop argotique pour les personnages âgés ou guindés |
-
-Nom écarté: tout ce qui évoque une clochette ou un grelot, trop proche de la monnaie du jeu de référence. La suite du document compte en sous.
-
-- **Bourse** par joueur; **coffre commun** au logement et aux guichets de consigne des gares (R10). Chacun y verse et en retire librement. Le coffre commun paie seul les achats du foyer (pièces de la maison, cuisine, salle d'eau, établi); ces achats peuvent se compléter par les bourses. Tout le reste se paie de sa bourse.
-- **Vente** (R34): uniquement aux commerçants, dans le thème de leur métier. Chacun affiche à son ardoise ce qu'il achète. Ce qu'il n'achète pas, il le dit avec son caractère (« Du goujon ? Ça sent la vase. »). Chaque matin, chaque commerçant a un **besoin du jour** écrit à la craie devant sa boutique: cet objet est payé 50 % de plus.
+- **Bourse** par joueur; **coffre commun** au logement et aux guichets de consigne des gares (R10). Les deux y versent et en retirent librement. Le coffre commun paie seul les achats du foyer (pièces de la maison, cuisine, salle d'eau, établi); ces achats peuvent se compléter par les bourses. Tout le reste se paie de sa bourse.
+- **Vente** (R34): uniquement aux commerçants, dans le thème de leur métier. Chaque commerçant affiche à son ardoise ce qu'il achète. Ce qu'il n'achète pas, il le dit avec son caractère (« Du goujon ? Ça sent la vase. »). Chaque matin, chaque commerçant a un **besoin du jour** écrit à la craie devant sa boutique: cet objet est payé 50 % de plus.
+- **Mémoire des prix** (validée le 10 novembre): le carnet retient, pour chaque objet, le prix vu chez chaque commerçant déjà visité, par l'un ou l'autre des joueurs. Dans le sac, la fiche d'un objet montre qui l'achète et à combien; un prix jamais vu reste un point d'interrogation.
 - **Boutiques** (R64): un menu en images, deux onglets (Acheter, Vendre), les objets vendables du sac déjà triés, le prix de ce commerçant sous chaque objet, un bouton « Tout vendre de cette sorte ».
 
-Prix d'achat par les commerçants d'Aubrune (en sous, « non » = n'achète pas):
+Prix d'achat par les commerçants d'Aubrune (en euros, « non » = n'achète pas):
 
 | Objet | Odette, épicerie | Achille, fournil | Colette, café | Basile, menuiserie | Mado, forge | Solange, mercerie | Armand, école |
 |---|---|---|---|---|---|---|---|
-| Œuf | 6 | 10 | 7 | non | non | non | non |
-| Radis | 5 | non | 7 | non | non | non | non |
-| Carotte | 8 | non | 11 | non | non | non | non |
-| Pomme | 6 | 9 | 6 | non | non | non | non |
-| Goujon | non | non | 12 | non | non | non | non |
-| Truite | 20 | non | 30 | non | non | non | non |
-| Girolle | 10 | non | 16 | non | non | non | non |
-| Bûche | non | 5 | non | 6 | 4 | non | non |
-| Planche | non | non | non | 14 | non | non | non |
-| Ferraille | non | non | non | non | 15 | non | non |
-| Plume | non | non | non | non | non | 8 | 4 |
-| Fleur des champs | 4 | non | 5 | non | non | 6 | non |
-| Coquille de rivière | non | non | non | non | non | 12 | 6 |
-| Insecte commun | non | non | non | non | non | non | 10 |
-| Insecte rare | non | non | non | non | non | non | 40 |
-| Fossile en double | non | non | non | non | non | non | 60 |
-| Soupe de légumes (plat) | 20 | non | 35 | non | non | non | non |
+| Œuf | 0,60 | 1,00 | 0,70 | non | non | non | non |
+| Radis | 0,50 | non | 0,70 | non | non | non | non |
+| Carotte | 0,80 | non | 1,10 | non | non | non | non |
+| Pomme | 0,60 | 0,90 | 0,60 | non | non | non | non |
+| Goujon | non | non | 1,20 | non | non | non | non |
+| Truite | 2,00 | non | 3,00 | non | non | non | non |
+| Girolle | 1,00 | non | 1,60 | non | non | non | non |
+| Bûche | non | 0,50 | non | 0,60 | 0,40 | non | non |
+| Planche | non | non | non | 1,40 | non | non | non |
+| Ferraille | non | non | non | non | 1,50 | non | non |
+| Plume | non | non | non | non | non | 0,80 | 0,40 |
+| Fleur des champs | 0,40 | non | 0,50 | non | non | 0,60 | non |
+| Coquille de rivière | non | non | non | non | non | 1,20 | 0,60 |
+| Insecte commun | non | non | non | non | non | non | 1,00 |
+| Insecte rare | non | non | non | non | non | non | 4,00 |
+| Fossile en double | non | non | non | non | non | non | 6,00 |
+| Soupe de légumes (plat) | 2,00 | non | 3,50 | non | non | non | non |
 
-Lecture: l'épicerie prend presque tout ce qui se mange, au prix le plus bas; l'artisan qui en a vraiment besoin paie 40 à 70 % de plus. C'est l'exemple du client (l'œuf), généralisé. Une pile vendue au bon endroit vaut 50 sous en moyenne.
+Lecture: l'épicerie prend presque tout ce qui se mange, au prix le plus bas; l'artisan qui en a vraiment besoin paie 40 à 70 % de plus. C'est l'exemple du client (l'œuf), généralisé. Une pile vendue au bon endroit vaut 5 € en moyenne.
 
 Puits d'argent (R33): le logement, les meubles et la décoration, les vêtements, les outils, les sacs, les consommables. Embellir un lieu et rouvrir la ligne ne s'achètent jamais: ce sont des récompenses de quêtes.
 
-| Dépense | Prix | Payé par |
+| Dépense | Prix en euros | Payé par |
 |---|---|---|
-| Pain (faim plus 25) | 12 | bourse |
-| Plat du jour au café (faim plus 50) | 30 | bourse |
-| Sachet de 5 graines | 10 à 40 | bourse |
-| Savon parfumé | 15 | bourse |
-| Vêtement | 60 à 400 | bourse |
-| Meuble | 40 à 600 | bourse ou coffre |
-| Outil amélioré | 300 | bourse |
-| Maison d'Aubrune: cuisine | 1 500 | coffre commun |
-| Maison d'Aubrune: chambre | 3 000 | coffre commun |
-| Maison d'Aubrune: troisième pièce | 4 500 | coffre commun |
-| Maison d'Aubrune: étage | 8 000 | coffre commun |
-| Salle d'eau (baquet remplacé par une douche) | 1 200 | coffre commun |
+| Pain (faim plus 25) | 1,20 | bourse |
+| Plat du jour au café (faim plus 50) | 3,00 | bourse |
+| Sachet de 5 graines | 1,00 à 4,00 | bourse |
+| Savon parfumé | 1,50 | bourse |
+| Vêtement | 6 à 40 | bourse |
+| Meuble | 4 à 60 | bourse ou coffre |
+| Outil amélioré | 30 | bourse |
+| Maison d'Aubrune: cuisine | 150 | coffre commun |
+| Maison d'Aubrune: chambre | 300 | coffre commun |
+| Maison d'Aubrune: troisième pièce | 450 | coffre commun |
+| Maison d'Aubrune: étage | 800 | coffre commun |
+| Salle d'eau (baquet remplacé par une douche) | 120 | coffre commun |
 
-Résultats de la simulation (deux joueurs, la moitié des gains versée au coffre, 10 % du coffre en meubles):
+Résultats de la simulation relancée en euros (deux joueurs, la moitié des gains versée au coffre, 10 % du coffre en meubles):
 
-| Revenu d'un joueur | Sous par journée (40 % du temps à récolter et vendre) |
+| Revenu d'un joueur | Euros par journée (40 % du temps à récolter et vendre) |
 |---|---|
-| sans sac, outils de base | 218 |
-| besace de 4 | 267 |
-| sac de 6, outils améliorés | 395 |
-| sac de 10, outils améliorés | 411 |
+| sans sac, outils de base | 21,80 |
+| besace de 4 | 26,70 |
+| sac de 6, outils améliorés | 39,50 |
+| sac de 10, outils améliorés | 41,10 |
 
 | Palier atteint au jour de jeu | Duo tranquille (25 % du temps) | Duo médian (40 %) | Duo appliqué (55 %) |
 |---|---|---|---|
@@ -331,7 +332,7 @@ Résultats de la simulation (deux joueurs, la moitié des gains versée au coffr
 | Troisième pièce | 47 | 28 | 21 |
 | Étage | 83 | 51 | 37 |
 
-Lecture: le sac agrandit surtout le confort (moins d'allers-retours), ce sont les outils qui augmentent le revenu. Le duo médian a sa cuisine quand l'histoire lui apprend les repas à deux (acte 2), et son étage vers la fin de la première année de jeu: la maison reste un but au long cours, y compris quand on revient à Aubrune depuis un autre lieu. Le modèle est grossier (revenu moyen par pile, pas de fêtes ni de commandes du samedi): à recaler au prototype.
+Lecture: le sac agrandit surtout le confort (moins d'allers-retours), ce sont les outils qui augmentent le revenu. Le duo médian a sa cuisine quand l'histoire lui apprend les repas à deux (acte 2), et son étage vers la fin de la première année de jeu: la maison reste un but au long cours, y compris quand on revient à Aubrune depuis un autre lieu. Le passage à l'euro divise tous les montants par dix sans changer les rapports: les jours du tableau sont les mêmes qu'en version 0.1. Le modèle est grossier (revenu moyen par pile, pas de fêtes ni de commandes du samedi): à recaler au jalon J2.
 
 ### 4.7 Activités
 
@@ -354,7 +355,7 @@ Chaque activité existe dans une forme adaptée au lieu (R28). Règles communes:
 
 | Lieu | Activités |
 |---|---|
-| Aubrune | quilles au café (20 à 60 sous); course de draisine sur la voie, à deux en pompant en alternance, ou seul contre le chrono; ricochets au bief; ramassage des balles de foin chez les Delmas |
+| Aubrune | quilles au café (2 à 6 €); course de draisine sur la voie, à deux en pompant en alternance, ou seul contre le chrono; ricochets au bief; ramassage des balles de foin chez les Delmas |
 | Hautefonte | service du midi à la brasserie (prendre et porter les commandes, pourboires); tir à la ficelle de la fête foraine; course de triporteurs; lâcher de journaux à vélo |
 | Combe-Veilleuse | cache-cache avec les enfants fantômes; partie de cartes contre un revenant mauvais perdant; allumer les veilleuses de la grand-rue avant minuit |
 
@@ -385,8 +386,9 @@ Une collection complète dans un lieu donne un meuble trophée unique. Les meubl
 
 ### 4.9 Habitants
 
+- **Habitants de la 0.13 gardés et refondus** (décision du 10 novembre): mêmes prénoms et mêmes métiers quand ils servent l'histoire, apparence recomposée depuis le nouveau catalogue, caractère resserré, tous les textes et toutes les quêtes réécrits.
 - **Humains** (R43), **personnalités marquées** (R44): chaque habitant a un registre de langue, un tic, un sujet favori, une mauvaise foi bien à lui. Aucun habitant ne ressemble à un autre, y compris physiquement (R50); les habitants secondaires ont la même qualité de modèle et d'écriture que ceux des quêtes, avec moins de texte (R36).
-- **Dialogue** (R37, R63): bandeau bas avec portrait, lettre par lettre (40 caractères par seconde), trois lignes au plus par page; Espace affiche tout, puis passe. **Babil** (R38): chaque habitant a un instrument pour voix (Firmin un basson, Jeanne un pipeau, Honorine une boîte à musique), dont les notes suivent les syllabes et la ponctuation. Émotions en onomatopées stylisées au-dessus de la tête (R51).
+- **Dialogue** (R37, R63): bandeau bas avec portrait, lettre par lettre (40 caractères par seconde), trois lignes au plus par page; Espace affiche tout, puis passe. **Babil** (R38): chaque habitant a un instrument pour voix (Firmin un basson, Jeanne un pipeau, Honorine une boîte à musique), dont les notes suivent les syllabes et la ponctuation. Émotions en onomatopées stylisées au-dessus de la tête (R51); avant de parler à un joueur à l'hygiène basse, l'habitant affiche « Pouah », et le choix de dialogue qui échouerait porte une goutte barrée: on sait pourquoi avant de choisir.
 - **Amitié** (R39): 5 cœurs de 100 points par habitant et par joueur. Jamais de perte.
 
 | Geste | Points | Limite |
@@ -402,13 +404,13 @@ Une collection complète dans un lieu donne un meuble trophée unique. Les meubl
 - **Confidences**: à 2 et à 4 cœurs, l'habitant confie quelque chose (un souvenir, un soupçon, un aveu), qui s'écrit à sa page du carnet. Certaines confidences sont des indices: elles ouvrent une étape d'une suite secondaire ou une piste de l'histoire principale. On les obtient par ce qu'on a fait pour lui, jamais en les achetant ni en les échangeant.
 - **Mémoire** (R41): le jeu tient un registre de souvenirs (étapes franchies et choix, premières prises, cadeaux, tenue portée, fois où l'on est venu sale, nuits blanches, fêtes). Chaque habitant a au moins 12 répliques conditionnées par un souvenir, dont 4 sur ce qu'a fait l'autre joueur (« Ta moitié m'a vendu douze œufs hier. Douze ! »). Une réplique de souvenir ne se dit qu'une fois.
 - **Petites demandes** (R40): au plus une par jour de jeu dans le lieu, portée par un seul habitant, signalée par une bulle (R69), jamais obligatoire, jamais requise par une suite. Moins de 10 % des répliques écrites.
-- **Repeuplement** (R42): Aubrune compte 10 habitants à l'arrivée et 20 à la fin; les nouveaux descendent du train du samedi après chaque acte, emménagent dans une maison rouverte, et le bourg change (volets ouverts, vitrine rallumée, fumée). À Hautefonte, c'est la clientèle du commerce aidé qui grossit; à Combe-Veilleuse, les vivants reviennent à mesure que les fantômes partent. Le jeu compose aussi des passants depuis le catalogue de pièces, pour les quais et les rues.
+- **Repeuplement** (R42): Aubrune compte 10 habitants à l'arrivée et 20 à la fin; les nouveaux descendent du train du samedi après chaque acte, emménagent dans une maison rouverte, et le bourg change (volets ouverts, vitrine rallumée, fumée). À Hautefonte, c'est la clientèle du commerce aidé qui grossit; à Combe-Veilleuse, les vivants reviennent à mesure que les fantômes partent. Le jeu compose aussi des passants depuis le catalogue de pièces, pour les quais et les rues: à Hautefonte, une foule de passants composés (une réplique chacun, jamais deux pareils à l'écran) autour de 20 habitants écrits; règle validée le 10 novembre: 20 habitants écrits par lieu.
 
 ### 4.10 Quêtes et suivi
 
 - Une suite principale et 6 suites secondaires par lieu. Une suite se joue en étapes longues; chaque étape passe par une activité (pêcher, photographier, cuisiner, fouiller, veiller la nuit), par un déplacement dans une zone nouvelle ou par une conversation où l'on doit avoir compris quelque chose. Aucune étape ne se réduit à « rapporte N objets », sauf dans l'acte 1 d'Aubrune, qui apprend les gestes (R27).
 - Histoire très guidée (R70): la page « Histoire » du carnet dit toujours quoi faire ensuite, en une phrase. Les suites secondaires s'ouvrent par les actes et par les cœurs.
-- **Repère à la demande** (R68): la touche G montre pendant 3 secondes une flèche au sol vers l'objectif de la suite choisie au carnet, puis disparaît. Rien d'autre à l'écran.
+- **Coup d'œil à la demande** (R68, validé le 10 novembre): la touche G montre pendant 3 secondes une flèche au sol vers l'objectif de la suite choisie au carnet (un losange sur l'objectif s'il est à l'écran), les trois besoins, la barre d'outils et un repère vers l'autre joueur au bord de l'écran. Puis tout disparaît.
 - **Zones qui s'ouvrent**: chaque acte ouvre une partie du lieu (5.2).
 - Deux joueurs, une histoire: une étape franchie par l'un l'est pour les deux; l'autre reçoit une ligne au bas de l'écran (« Étape franchie: la cave du garde-barrière ») et retrouve la scène au carnet, à relire.
 - **Décisions à deux**: à la fin de certaines suites, un choix que les deux doivent valider du même côté. Aucune option n'est mauvaise; le lieu en garde la trace.
@@ -421,13 +423,13 @@ Une collection complète dans un lieu donne un meuble trophée unique. Les meubl
 | Deux joueurs parlent au même habitant | chacun sa conversation, l'habitant se tourne vers le dernier arrivé entre deux pages |
 | L'un dort, l'autre veille | le dormeur fait une sieste (pas de saut); une ligne dit au veilleur « Ta moitié dort. Va te coucher pour passer au lendemain. » |
 | 6 h arrive pendant un mini-jeu ou un dialogue | le jour change à la fin du geste, sans coupure |
-| Faim à 0 sans rien à manger ni un sou | Odette (ou l'équivalent du lieu) offre une soupe par jour: « Ça me fait mal de vous voir comme ça. » |
+| Faim à 0 sans rien à manger ni un euro | Odette (ou l'équivalent du lieu) offre une soupe par jour: « Ça me fait mal de vous voir comme ça. » |
 | Sommeil à 0 loin d'un lit | on s'allonge dans l'herbe ou sur un banc (sieste à demi-vitesse) |
 | Hygiène à 0 et étape de quête | l'étape attend; le carnet dit « Un brin de toilette d'abord » |
 | Sac plein pendant une récompense de quête | la récompense attend chez l'habitant, sans limite de temps |
 | L'un veut prendre le train, pas l'autre | rien ne part; on peut redescendre du marchepied |
 | Déconnexion d'un joueur | le jeu se met en pause pour l'autre (horloge, besoins, monde figés) jusqu'au retour, ou jusqu'à « Retour au salon », qui sauvegarde |
-| Sauvegarde | automatique à chaque coucher, à chaque aube, à chaque étape de quête, à chaque voyage en train, à la sortie. Trois emplacements de partie. Contenu: horloge, lieux (logement, potager, bêtes, coffres, état des suites, habitants présents), joueurs rattachés à leur identifiant stable (apparence, sac, bourse, besoins, cœurs), carnet, registre de souvenirs |
+| Sauvegarde | automatique à chaque coucher, à chaque aube, à chaque étape de quête, à chaque voyage en train, à la sortie. Un emplacement (`technique.md` 2.3). Jusqu'à l'Alpha du premier lieu (J3), la partie d'essai repart de zéro à chaque jalon, avec un message clair en jeu (décision du 10 novembre); ensuite les parties sont toujours conservées. Contenu: horloge, lieux (logement, potager, bêtes, coffres, état des suites, habitants présents), joueurs rattachés à leur identifiant stable (apparence, sac, bourse, besoins, cœurs), carnet, registre de souvenirs |
 | Résultat d'une séance pour Duo | `progress`: jours de jeu vécus, étapes d'histoire franchies, entrées de collection ajoutées pendant la séance. Une séance quittée par « Retour au salon » est une fin normale, pas une partie interrompue (à voir avec l'architecte-technique) |
 | Pas de mode solo (R15) | la partie ne se lance qu'à deux |
 
@@ -438,39 +440,41 @@ Une collection complète dans un lieu donne un meuble trophée unique. Les meubl
 | Marche, course | 3,0 m/s, 5,0 m/s | course sans jauge d'endurance: c'est la faim qui la paie |
 | Accélération, freinage | 0,15 s, 0,10 s | doux, sans glisser |
 | Portée de la touche d'action | 1,2 m devant le personnage, cône de 100 degrés; une seule cible à la fois, la plus proche de l'axe | la cible se montre toujours avant l'appui |
-| Réponse à une action | visible et audible en moins de 0,1 s; aucune action courante ne bloque plus de 1,5 s | note de ressenti |
-| Caméra | distance de 6 à 18 m, 11 m par défaut; inclinaison de 35 à 60 degrés liée au zoom; rotation de 120 degrés par seconde | proche, lisible |
-| Aubrune | 260 m sur 200 m en fin d'histoire (traversée en 50 s de course), contre 64 m sur 48 m pour la démo | « des cartes plus grandes » (R27) |
-| Hautefonte | 4 quartiers d'environ 150 m sur 150 m, reliés par le tramway | |
-| Combe-Veilleuse | 220 m sur 220 m, en étages sur la pente | |
+| Réponse à une action | visible et audible en moins de 0,1 s; aucune action courante ne bloque plus de 1,5 s (toilette au baquet, repas spécial et mini-jeux sont des moments choisis, que l'on peut quitter) | note de ressenti |
+| Caméra | proche du personnage, vue large de 28 m au plus (36 m en 0.13), rotation continue de 120 degrés par seconde, suivi avec un léger retard; murs et toits s'effacent en fondu, sans à-coup. Vue à plat ou en perspective: montrée en images au J1 (`technique.md`, question Q2) | proche, lisible |
+| Allure | le personnage se penche dans les virages | note de ressenti |
+| Aubrune | la carte de la 0.13 reprise et retouchée (décision du 10 novembre), zones ouvertes acte par acte; budget technique de 128 m sur 128 m par lieu chargé (`technique.md` 3.10), contre 64 m sur 48 m pour la démo | « des cartes plus grandes » (R27); l'étendue exacte se cale avec l'architecte et le level-designer |
+| Hautefonte | 4 quartiers reliés par le tramway, chacun dans le budget d'un lieu chargé | |
+| Combe-Veilleuse | un lieu chargé, en étages sur la pente | |
 
 ## 5. Contrôles (game-designer, ux-ui-designer)
 
-Touches lues par position (`KeyboardEvent.code`), libellés selon le clavier réel.
+Accordé avec `interface.md` (section 4, qui fait foi pour le détail des menus). Touches lues par position (`KeyboardEvent.code`), libellés selon le clavier réel. Tout se fait au clavier, sauf le mode déco; la souris reste un complément partout.
 
 | Action | Touche (clavier AZERTY) | Souris |
 |---|---|---|
 | Se déplacer (relatif à la caméra) | Z, Q, S, D | non (R16) |
 | Courir | Maj gauche maintenue | |
-| Action contextuelle (R18) | Espace | |
-| Tourner la caméra | A et E | clic droit maintenu et glisser |
-| Zoom | | molette |
-| Choisir un emplacement de la barre | Tab (suivant), Maj+Tab (précédent), ou les cinq premières touches de la rangée du haut, sans Maj | |
+| Action contextuelle (R18); avec un plat en main et sans cible: manger | Espace | |
+| Tourner la caméra, en continu sur 360 degrés | A et E, ou flèches gauche et droite | clic droit maintenu et glisser |
+| Zoom | flèches haut et bas | molette |
+| Choisir un emplacement de la barre | Tab (suivant), Maj+Tab (précédent), ou les cinq premières touches de la rangée du haut, sans Maj (jamais obligatoires) | |
 | Ranger l'outil (mains libres) | X | |
-| Carnet (histoire, sac, collections, voisins, carte) | C | navigation à la souris |
-| Repère de quête, 3 secondes | G | |
-| Voir ses besoins | Alt maintenue | |
-| Mode déco (dans le logement) | B | glisser, molette pour tourner |
+| Carnet (s'ouvre à son dernier onglet) | C | clic sur un signet |
+| Coup d'œil de 3 secondes: flèche de la quête, besoins, barre d'outils, autre joueur | G | |
+| Mode déco (dans le logement) | B | saisir, glisser, poser; molette pour tourner |
 | Dialogue: tout afficher, continuer | Espace | clic gauche |
-| Fermer un menu | Retour arrière, ou C | bouton de fermeture |
-| Pause (Duo) | Échap | |
+| Dans un menu: se déplacer, valider, changer d'onglet | Z, Q, S, D ou flèches; Entrée; A et E | clic |
+| Fermer un menu | Retour arrière (C pour le carnet) | bouton de fermeture |
+| Pause (Duo), pour les deux | Échap (ne ferme aucun menu du jeu) | |
 | Mini-jeux | Q, S, D, F et Espace | |
 
-- Reconfiguration des touches: oui.
-- **Touche d'action**: le jeu choisit l'action selon la cible et l'outil en main. La cible réagit dès qu'elle est à portée (léger rebond, brillance) et une petite bulle dit le verbe (« Arroser », « Parler », « Ramasser ») (R21). Pas de nom au survol dans le monde, seulement dans les menus, en 4 mots au plus (R65). Aucune zone d'action sans objet visible.
+- Reconfiguration des touches: oui. Il n'y a plus de touche Alt (sous Windows, Alt et Espace ouvrent le menu de la fenêtre).
+- **Touche d'action**: le jeu choisit l'action selon la cible et l'outil en main. La cible réagit dès qu'elle est à portée (un rebond, puis un liseré clair) et une petite bulle montre la touche et un seul verbe (« Arroser », « Parler », « Ramasser ») (R21). Une seule cible à la fois. Si l'action est impossible, la bulle montre ce qui manque en image et Espace joue un petit « non » de la tête. Pas de nom au survol dans le monde, seulement dans les menus, en 4 mots au plus (R65). Aucune zone d'action sans objet visible.
 - **Ressenti** (R22): chaque geste a un son court, l'objet touché bouge (l'arbre tremble, la terre saute, l'eau éclabousse), des particules (feuilles, gouttes, étoiles d'une prise rare) et, sur les gros coups seulement (arbre qui tombe, poutre posée, gros poisson sorti), une vibration d'écran de 0,15 s réglable et désactivable.
-- **À l'écran en permanence** (R60): l'heure avec la météo, la bourse, la barre d'outils. Tout le reste vient quand il sert.
-- **Carnet** (R61): un seul carnet animé à onglets en images. Sac: objets en 3D qui tournent au survol (R62). Carte: dessinée, plein écran, avec les habitants déjà rencontrés et l'autre joueur (R66).
+- **À l'écran en permanence** (R60): l'horloge (avec la météo) et la bourse. C'est tout. La barre d'outils se replie après 3 secondes; les besoins suivent la règle de 4.4. Réglages par joueur: « barre d'outils toujours visible », « besoins toujours visibles ».
+- **Carnet** (R61): un seul carnet animé, sept onglets en signets d'images, dans l'ordre du client: Sac, Quêtes (la page « Histoire » et les suites secondaires), Habitants, Collections, Carte, Tenues, Réglages. Sac: objets en 3D qui tournent au survol (R62). Carte: dessinée, plein écran, avec les habitants déjà rencontrés et l'autre joueur (R66). Quêtes, habitants rencontrés, carte et collections sont communs; sac, tenues, cœurs et réglages sont propres à chaque joueur.
+- La molette quitte le choix d'outil (usage de la 0.13) pour le zoom: le prologue du train le dit.
 
 ## 6. Contenu (game-designer, level-designer)
 
@@ -478,24 +482,25 @@ Touches lues par position (`KeyboardEvent.code`), libellés selon le clavier ré
 
 **Ce que tout le monde croit.** La Compagnie a fermé la Petite Ligne il y a trente ans, en une nuit, parce qu'elle ne rapportait plus. Les gares se sont vidées l'une après l'autre.
 
-**Ce que vous découvrez, lieu après lieu.**
+**Ce que vous découvrez, lieu après lieu.** Le mystère monte d'un cran par lieu; il reste très doux à Aubrune (décision du 10 novembre).
 
-- Vous avez répondu, chacun de votre côté, à la même petite annonce: « La Compagnie de la Petite Ligne recrute deux gardes de ligne. Logement fourni. Sens de l'heure exigé. » Votre lettre d'embauche est signée « É. Lacombe, chef de ligne ». Émile Lacombe a disparu la nuit de la fermeture.
-- Un train sans fumée ni bruit passe encore chaque nuit à 5 h 12. Il n'est sur aucun horaire. C'est lui qui vous a déposés. Les habitants ne voient qu'une lueur sur les rails; une photographie, elle, montre le train.
-- Le 5 h 12 était le train de ceux qui partent pour de bon: de tout temps, les morts de la vallée y montaient avant l'aube, et deux gardes vivants lui ouvraient la voie (une barrière, une lanterne). Un comptable de la Compagnie a supprimé ce train parce que ses voyageurs ne payaient pas leur billet. Depuis, ceux qui devaient partir attendent au terminus, Combe-Veilleuse, que les vivants ont fini par quitter.
-- Émile n'est pas mort. Il tient seul, depuis trente ans, les lanternes du terminus. Il a envoyé plus de quatre cents lettres d'embauche.
+| Lieu | Ce que l'on apprend | Dose de surnaturel |
+|---|---|---|
+| Aubrune | Vous avez répondu, de votre côté, à la même petite annonce: « La Compagnie de la Petite Ligne recrute deux gardes de ligne. Logement fourni. Sens de l'heure exigé. » Votre lettre d'embauche est signée « É. Lacombe, chef de ligne »; Émile Lacombe a disparu la nuit de la fermeture. On raconte qu'un train passe encore à 5 h 12. Les anciens laissaient un lumignon à la barrière « pour ceux qui partent » | très douce: une sonnerie, une lueur, une vieille coutume. Jusqu'au dénouement, tout s'explique aussi par le vent, le sommeil, une farce ou une légende. Aucun fantôme, aucune apparition |
+| Hautefonte | Le 5 h 12 a bel et bien existé: un train de nuit hors horaire, supprimé par un comptable parce que ses voyageurs ne payaient pas de billet. Quelqu'un écrit encore au nom d'Émile | douce: une enquête dans des archives, un bureau qui ne devrait pas exister |
+| Combe-Veilleuse | « Ceux qui partent », c'étaient ceux qui partent pour de bon. Depuis la fermeture, ils attendent au terminus, que les vivants ont fini par quitter. Émile n'est pas mort: il tient seul, depuis trente ans, les lanternes du terminus, et il a envoyé plus de quatre cents lettres d'embauche | assumée, tendre et taquine: les esprits se montrent, la nuit |
 
 **Pourquoi le train.** Parce que chaque gare rouverte le laisse aller une gare plus loin: le 5 h 12 ne s'arrête que dans une halte « en service » (une pendule à l'heure, un signal, une barrière, des gens). Rouvrir un lieu est donc le but de chaque suite principale, et le voyage en est la récompense.
 
 **Pourquoi nous.** Réponse tendre et drôle, donnée au troisième lieu: vous êtes les seuls à avoir répondu. En trente ans. Et il fallait deux personnes qui tiennent l'une à l'autre: la barrière et la lanterne ne se manœuvrent pas par des gens qui ne s'attendent pas.
 
-**Ton.** Du surnaturel traité avec douceur et humour: le contrôleur du 5 h 12 est tatillon et vexé par ses trente ans de retard, les fantômes sont de mauvaise foi, personne ne fait peur. Jamais sombre: on ne montre aucune mort, on parle de départs.
+**Ton.** Du surnaturel traité avec douceur et humour, dosé par lieu: à Aubrune, on hausse un sourcil et l'on sourit; le contrôleur du 5 h 12 est un petit homme tatillon, vexé par son retard; les esprits du troisième lieu sont de mauvaise foi, personne ne fait peur. Jamais sombre: on ne montre aucune mort, on parle de départs.
 
 **Personnages de la ligne**: le Contrôleur (Anatole, casquette trop grande, on ne voit jamais ses yeux, connaît le règlement par cœur et l'applique à tout); Rosalie Vasseur, mécanicienne du train du samedi (bien vivante, rieuse, ne croit à rien de tout cela).
 
 ### 6.2 Aubrune: distribution
 
-Bourg de campagne au bout de la partie vivante de la ligne. Lieu d'apprentissage. Habitants repris de la 0.13 quand ils servent l'histoire, réécrits pour le nouveau ton.
+Bourg de campagne au bout de la partie vivante de la ligne. Lieu d'apprentissage. Habitants de la 0.13 gardés et refondus (décision du 10 novembre): apparence recomposée depuis le nouveau catalogue (`bible-artistique.md`), écriture neuve pour le nouveau ton. Aubrune en compte 20 écrits à la fin de l'histoire.
 
 | Habitant | Caractère, façon de parler | Rôle | Présence |
 |---|---|---|---|
@@ -521,15 +526,15 @@ Bourg de campagne au bout de la partie vivante de la ligne. Lieu d'apprentissage
 
 Durée visée: 9 à 10 heures, soit 16 à 18 journées de jeu pour un duo médian.
 
-**Prologue jouable: « Terminus » (10 minutes).** Un compartiment, la nuit. Les deux personnages sont assis face à face. Le Contrôleur demande vos papiers: la photo d'identité est l'éditeur de personnage (R47), chacun sur son écran. On apprend en faisant (R71): marcher dans le couloir, tourner la caméra, la touche d'action (ouvrir une porte, prendre sa valise), le dialogue, et la faim (le chariot passe, on mange un sandwich, la jauge apparaît puis s'efface). Un tunnel. Le train s'arrête à Aubrune au petit matin. Vous descendez. Vous vous retournez: plus de train, des rails rouillés, des herbes entre les traverses. Firmin accourt en pantoufles: « Personne n'est descendu ici depuis trente ans. Et il n'y a pas de train. »
+**Prologue jouable: « Terminus » (10 minutes).** Un compartiment, la nuit. Les deux personnages sont assis face à face. Le Contrôleur demande vos papiers: la photo d'identité est l'éditeur de personnage (R47), sur chaque écran: deux adultes, femme ou homme au choix (1.5), toutes les pièces ouvertes à tous. On apprend en faisant (R71): marcher dans le couloir, tourner la caméra, la touche d'action (ouvrir une porte, prendre sa valise), le dialogue, et la faim (le chariot passe, on mange un sandwich, la jauge apparaît puis s'efface). Un tunnel, le ronron des roues: vous vous assoupissez (fondu). Vous vous réveillez à l'aube sur le banc du quai d'Aubrune, vos valises aux pieds. Pas de train en vue, des herbes entre les traverses. Firmin accourt en pantoufles: « Personne n'est descendu ici depuis trente ans. Vous êtes venus par le car, vous avez dormi, voilà tout. » Vous avez pourtant chacun un billet poinçonné en poche. « Ça se garde longtemps, un billet. »
 
 **Acte 1: « Logement fourni » (jours 1 à 4, 2 heures). Zone ouverte: le bourg et le passage à niveau.**
 
 - Firmin lit votre lettre, blêmit en voyant la signature, la met dans sa poche et change de sujet. Le « logement fourni » est la maison du garde-barrière: un toit crevé, des ronces, une porte qui tient par habitude. C'était la maison d'Émile.
 - Première nuit à la pension d'Odette (dormir), toilette à la pompe (« Vous sentez le wagon. », hygiène), souper (faim).
 - Basile prête les outils de base. On débroussaille, on abat deux arbres, on porte les planches (à deux ou seul), on pose le toit de la première pièce (marteau). Solange offre les besaces. On bêche le premier carré de potager, on reçoit deux poules d'Odette.
-- Première vente: Odette prend les œufs à 6 sous, et lâche qu'Achille « les paie n'importe quoi ». Il les paie 10. La leçon des commerçants tient en une scène.
-- **Rebondissement**: première nuit dans la maison. À 5 h 12, la sonnerie du passage à niveau retentit toute seule et une lueur dorée file sur les rails. Qu'on dorme ou qu'on veille, la scène a lieu (réveil en sursaut ou vue en direct). Au matin, Firmin: « Les barrières ne sonnent plus. Vous avez rêvé. Tous les deux. Le même rêve. Ça arrive. »
+- Première vente: Odette prend les œufs à 0,60 €, et lâche qu'Achille « les paie n'importe quoi ». Il les paie 1 €. La leçon des commerçants tient en une scène.
+- **Rebondissement**: première nuit dans la maison. À 5 h 12, la sonnerie du passage à niveau tinte, deux coups, et une lueur passe du côté de la voie, dans la brume. Qu'on dorme ou qu'on veille, la scène a lieu (réveil en sursaut ou vue en direct), et elle est brève: on n'est sûr de rien. Au matin, Firmin: « Le vent dans le fil de la sonnerie. Et le soleil se lève de ce côté-là. » Jeanne, elle, a noté l'heure.
 
 **Acte 2: « La minute d'écart » (jours 5 à 10, 3 heures). Zones ouvertes: la rivière et le bief, la voie jusqu'au poste d'aiguillage.**
 
@@ -538,16 +543,17 @@ Durée visée: 9 à 10 heures, soit 16 à 18 journées de jeu pour un duo média
 - **Le signal**: Mado refait le bras, il faut d'abord améliorer la hache pour dégager le poste d'aiguillage (outils améliorés, usure, meule). Scène asymétrique: dans la cabine, l'un voit des leviers aux étiquettes à demi effacées; dehors, l'autre voit le signal et les aiguilles bouger. Il faut se parler pour trouver la bonne combinaison. Seul, on fait les allers-retours (c'est plus long, pas bloquant).
 - **La commande**: légumes du potager, œufs, poissons (la pêche s'apprend avec Achille), planches. Sans échec: ce qui manque part la semaine suivante.
 - **Dénouement de l'acte**: le samedi, la pendule repart, Firmin et Ambroise se serrent la main sans se regarder, le train de Rosalie entre en gare dans un vacarme joyeux. Lucie, Colette et Armand en descendent; le café et l'école rouvrent.
-- **Rebondissement**: Rosalie vous tend une lettre arrivée au dépôt. Expéditeur: É. Lacombe, postée à Hautefonte avant-hier. Et elle rit quand vous parlez de votre arrivée: « Mardi ? Aucun train n'a roulé sur cette ligne mardi. Ni depuis trente ans. C'est moi la première. » La lettre dit seulement: « Bien arrivés ? Il reste la cave. »
+- **Rebondissement**: Rosalie vous tend une lettre arrivée au dépôt. Expéditeur: É. Lacombe, postée à Hautefonte avant-hier. Et elle rit quand vous parlez de votre arrivée: « Mardi ? Pas de mon dépôt, en tout cas. Un train de travaux, peut-être. » La lettre dit seulement: « Bien arrivés ? Il reste la cave. » Firmin parle d'une mauvaise farce, d'un homonyme. Il garde la lettre.
 
 **Acte 3: « Ceux qui partent » (jours 11 à 17, 4 heures). Zones ouvertes: la Côte, le moulin, la ferme, le tunnel.**
 
+- Règle de ton de l'acte: chaque indice a son explication raisonnable, dite par un habitant; les joueurs choisissent ce qu'ils croient.
 - **La cave**: elle n'existe sur aucun plan. On la trouve en restaurant la chambre (trappe sous le plancher). Dedans: le registre de nuit d'Émile, une colonne par jour, une seule ligne à chaque fois, « 5 h 12, passé », et une lanterne sans verre.
-- **La photo**: Lucie, à qui vous avez appris l'heure, veille avec vous et photographie la lueur (activité photo, nuit jouable). Au développement, la photo montre un train entier, fenêtres éclairées, et un contrôleur à la portière. Firmin cède enfin et sort la lettre de sa poche: il a reconnu l'écriture dès le premier jour.
-- **La coutume**: Honorine (4 cœurs) et Marthe racontent ce que les anciens savaient sans le dire: on laissait un lumignon à la barrière « pour ceux qui partent », et le garde levait sa lanterne au passage du 5 h 12. Personne ne demandait qui était dans le train.
+- **La photo**: Lucie, à qui vous avez appris l'heure, veille avec vous et photographie la lueur (activité photo, nuit jouable). Au développement, la pose longue montre une traînée claire au ras des rails, ponctuée de carrés réguliers. « Des fenêtres », dit Jeanne. « Des gouttes sur l'objectif », dit Lucie, pas très sûre. Firmin regarde longtemps, puis sort enfin la lettre de sa poche: il a reconnu l'écriture dès le premier jour.
+- **La coutume**: Honorine (4 cœurs) et Marthe racontent ce que les anciens savaient sans le dire: on laissait un lumignon à la barrière « pour ceux qui partent », et le garde levait sa lanterne à 5 h 12. On disait que cela portait bonheur aux voyageurs. Honorine jure avoir vu le train, petite; Marthe rappelle qu'Honorine jure aussi avoir dansé avec un préfet.
 - **Préparer la halte de nuit**: retrouver le verre de la lanterne (fouilles le long de la voie avec Jeanne, qui connaît la cachette d'Émile), le faire sertir par Mado, graisser la barrière, obtenir de Marthe qu'elle sonne à l'heure juste, remplir le registre de la halte (les Delmas, Berthe et Barnabé arrivent par le train du samedi: la halte a ses « douze foyers »).
-- **Dénouement (scène à deux obligatoire)**: nuit du dernier jour, 5 h 12. L'un baisse la barrière, l'autre lève la lanterne. Le train s'arrête pour la première fois en trente ans, dans un soupir. Le Contrôleur descend, regarde sa montre: « Trente ans de retard. On va encore dire que c'est ma faute. » Il poinçonne vos lettres d'embauche, vous remet deux cartes de ligne et un ordre de mission: le siège de la Compagnie, à Hautefonte, bureau 512. « Monsieur Lacombe vous y attend. Enfin, il attend. » Il remonte, le train repart, sans personne dedans: à Aubrune, personne n'attendait.
-- **Fin**: au matin, les habitants trouvent la barrière baissée et la lanterne chaude. Firmin remonte la montre d'Émile. Fête sur le quai (première Veillée du premier train).
+- **Dénouement (scène à deux obligatoire)**: nuit du dernier jour, 5 h 12. L'un baisse la barrière, l'autre lève la lanterne. De la brume sort un vieil autorail crème, tout ce qu'il y a de plus réel, qui s'arrête dans un soupir de freins. Le Contrôleur du prologue descend, regarde sa montre: « Du retard. On va encore dire que c'est ma faute. » Il poinçonne vos lettres d'embauche, vous remet deux cartes de ligne et un ordre de mission: le siège de la Compagnie, à Hautefonte, bureau 512. « Monsieur Lacombe vous y attend. Enfin, il attend. » Il remonte, l'autorail repart dans la brume. C'est le seul moment d'Aubrune où le mystère se montre, et il a l'air d'un train en retard.
+- **Fin**: au matin, les habitants trouvent la barrière baissée et la lanterne chaude; personne d'autre n'a rien vu, et Rosalie assure qu'aucun autorail crème ne dort à son dépôt. Chacun garde son explication. Firmin remonte la montre d'Émile. Fête sur le quai (première Veillée du premier train).
 
 **Ce que la suite débloque**: la ligne vers Hautefonte et les cartes de ligne; 10 habitants de plus; le café, l'école, le moulin, la ferme; le sac à dos de 10; la cuisine, la chambre et la cave de la maison; les quatre fêtes; les suites secondaires restantes.
 
@@ -561,9 +567,9 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 |---|---|---|---|---|
 | **La Baronne** | Achille, Colette, Jeanne | Trois générations de boulangers ont raté la même perche énorme du bief. Achille s'endort toujours avant la touche. On apprend ses heures, ses appâts, ses météos | La Baronne, enfin sortie, porte une alliance prise dans la lèvre: celle de la grand-mère d'Achille, jetée à l'eau un jour de colère. Décision à deux: la relâcher ou l'offrir au café | canne améliorée, poissons rares, recette de la friture |
 | **La guerre de la soupe** | Odette, Colette, Honorine | Chacune jure faire la meilleure soupe du bourg et vous prend comme commis et comme espion. Quelqu'un sale les marmites la nuit | La coupable est Honorine, 89 ans, prise la main dans le sel: elle veut que les deux cuisinent ensemble, comme leurs mères. Fin: une soupe à quatre mains et le premier Concours de la soupe | vraie cuisine (plan), 6 recettes, fête d'automne |
-| **Le fantôme du moulin** | Berthe, Barnabé, Léon, Jeanne | De la farine disparaît, des pas blancs traversent la cour, les enfants jurent avoir vu un géant pâle. Deux nuits de guet | Le géant est Barnabé, qui pétrit des brioches en cachette parce qu'« un bûcheron, ça ne fait pas de la brioche ». Fin: il entre en apprentissage chez Achille, la tête haute | brioches, plan du pétrin, amitié de Berthe |
+| **Le « fantôme » du moulin** (une fausse piste: à Aubrune, tout fantôme a une explication) | Berthe, Barnabé, Léon, Jeanne | De la farine disparaît, des pas blancs traversent la cour, les enfants jurent avoir vu un géant pâle. Deux nuits de guet | Le géant est Barnabé, qui pétrit des brioches en cachette parce qu'« un bûcheron, ça ne fait pas de la brioche ». Fin: il entre en apprentissage chez Achille, la tête haute | brioches, plan du pétrin, amitié de Berthe |
 | **La fanfare de la halte** | Armand, Solange, Barnabé, Martial | Un train qui arrive mérite une fanfare. Il faut retrouver les instruments (grenier, forge, fond du bief), les remettre en état, répéter | Le jour du concert, Armand a disparu. On le retrouve au lavoir, dirigeant les grenouilles: il a le trac. Fin: il dirige de dos, face au train | instruments des joueurs, collection des musiques |
-| **Les lettres en retard** | Lucie, Firmin, Basile, Marthe | Un sac postal oublié à la consigne depuis la fermeture: six lettres de trente ans. Chacune ouvre une petite histoire (une demande en mariage jamais reçue, une dette de trois sous, une recette) | La sixième est adressée « aux deux nouveaux gardes de la halte », datée d'il y a trente ans. Dedans: la clé de la draisine et « Merci d'avance. É. L. » | cartes postales, draisine (course et raccourci sur la voie) |
+| **Les lettres en retard** | Lucie, Firmin, Basile, Marthe | Un sac postal oublié à la consigne depuis la fermeture: six lettres de trente ans. Chacune ouvre une petite histoire (une demande en mariage jamais reçue, une dette de quatre euros vingt, une recette) | La sixième est adressée « aux deux nouveaux gardes de la halte », datée d'il y a trente ans. Dedans: la clé de la draisine et « Merci d'avance. É. L. » | cartes postales, draisine (course et raccourci sur la voie) |
 | **La robe et la cloche** | Marthe, Honorine, Mado | Les deux sœurs ne se parlent plus depuis quarante ans, pour une robe de noces. La petite cloche fêlée sonne toute seule certaines nuits | Ce sont Jeanne et Léon qui sonnent, pour forcer les deux vieilles à sortir en même temps. La robe était dans le clocher. Fin: la cloche est refondue, les sœurs se disputent à nouveau, mais ensemble | tenues anciennes, la cloche qui s'entend dans tout le bourg, fête d'été |
 
 ### 6.5 Hautefonte, la métropole (deuxième lieu)
@@ -674,9 +680,9 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 
 **Économie**
 
-- CA-19: un commerçant ne propose à la vente que les objets de son thème; le même œuf rapporte 6 sous chez Odette et 10 chez Achille.
+- CA-19: un commerçant ne propose à la vente que les objets de son thème; le même œuf rapporte 0,60 € chez Odette et 1,00 € chez Achille; tout prix affiché est un multiple de 0,10 €.
 - CA-20: le coffre commun ne paie que les achats du foyer; chaque joueur peut y verser et en retirer depuis le logement et depuis chaque gare.
-- CA-21: aucun embellissement de lieu ni réouverture de ligne n'a de prix en sous.
+- CA-21: aucun embellissement de lieu ni réouverture de ligne n'a de prix en euros.
 
 **Activités et collections**
 
@@ -701,7 +707,7 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 
 **Sauvegarde et réseau**
 
-- CA-34: quitter au milieu d'une journée puis reprendre rend l'état du dernier point de sauvegarde, sans objet ni sou dupliqué.
+- CA-34: quitter au milieu d'une journée puis reprendre rend l'état du dernier point de sauvegarde, sans objet ni euro dupliqué.
 - CA-35: quand un joueur se déconnecte, l'horloge et les besoins de l'autre se figent; ils reprennent au retour.
 
 ## 13. Jalons (proposition, dates à fixer par le manager)
