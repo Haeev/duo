@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "perche",
+  "name": "Perche",
+  "family": "catch",
+  "stack": 3,
+  "food": null,
+  "tool": null
+}

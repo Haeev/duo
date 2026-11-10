@@ -18,4 +18,21 @@
   "rarity": "uncommon",
   // Difficulté du mini-jeu, de 1 à 5.
   "difficulty": 2,
+  // Poisson seulement (sinon retirer ce bloc): son caractère au combat (src/simulation/peche/).
+  // Pour qu'on le pêche, l'ajouter à la "table" d'un coin de pêche (champ "fishing" de lieu.json).
+  "fish": {
+    // Poids de ses élans (0 à 1); changements de côté et frétillement (0 à 1).
+    "force": 0.4,
+    "nervousness": 0.5,
+    // Durée moyenne d'un élan et d'un souffle, en secondes (0,5 à 6).
+    "rhythm": { "pull": 1.4, "rest": 1.2 },
+    // Secondes à le tenir dans la bonne tension pour l'épuiser (2 à 30).
+    "stamina": 6,
+    // Creux du bouchon avant le vrai plongeon, au plus (0 à 4).
+    "feints": 2,
+    // Longueur tirée à la prise, en cm.
+    "sizeCm": { "min": 12, "max": 30 },
+    // Taille de son ombre dans l'eau: small, medium, large, huge.
+    "shadow": "medium",
+  },
 }

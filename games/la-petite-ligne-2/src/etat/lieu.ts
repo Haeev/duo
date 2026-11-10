@@ -15,6 +15,7 @@ import { BrickStatesSchema } from './briques';
 import { VillagerLifeStateSchema } from './habitants';
 import { BodySchema, StackSchema } from './joueur';
 import { HousingStateSchema } from './logement';
+import { FishingPlaceStateSchema } from './peche';
 
 const villagerSlow = {
   /** Déjà rencontré par chaque joueur. */
@@ -78,6 +79,8 @@ const placeSlow = {
   insects: v.exactOptional(InsectsStateSchema),
   /** Logements du lieu (`simulation/logement/`), créés à la première visite. */
   housing: v.exactOptional(v.record(IdSchema, HousingStateSchema)),
+  /** Pêche (`etat/peche.ts`), absente tant que personne n'a pêché ici. */
+  fishing: v.exactOptional(FishingPlaceStateSchema),
 } as const;
 
 /** Ce qui part dans la tranche « lieu »: tout, sauf les positions des habitants (canal rapide). */
@@ -100,7 +103,7 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
       villager.life === undefined
         ? { met: villager.met, talkingWith: villager.talkingWith }
         : { met: villager.met, talkingWith: villager.talkingWith, life: villager.life };
-  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops } = place;
+  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops, fishing } = place;
   const slow: PlaceSlow = {
     leftOn,
     placed,
@@ -113,5 +116,6 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
   if (shops !== undefined) slow.shops = shops;
   if (place.insects !== undefined) slow.insects = place.insects;
   if (place.housing !== undefined) slow.housing = place.housing;
+  if (fishing !== undefined) slow.fishing = fishing;
   return slow;
 }

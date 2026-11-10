@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "goujon",
+  "kind": "fish",
+  "item": "goujon",
+  "places": ["essai-gare"],
+  "hours": {
+    "from": 360,
+    "to": 1440
+  },
+  "weathers": [],
+  "seasons": [],
+  "rarity": "common",
+  "difficulty": 1,
+  "fish": {
+    "force": 0.25,
+    "nervousness": 0.85,
+    "rhythm": {
+      "pull": 0.8,
+      "rest": 1.2
+    },
+    "stamina": 4,
+    "feints": 1,
+    "sizeCm": {
+      "min": 8,
+      "max": 15
+    },
+    "shadow": "small"
+  }
+}

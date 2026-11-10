@@ -7,6 +7,7 @@ import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Slice, WorldState } from '../../etat/monde';
 import { needsSystem } from '../besoins/index';
+import { fishingSystem } from '../peche/index';
 import { brickSystem } from '../briques/index';
 import { shopSystem } from '../commerces/index';
 import { cookingSystem } from '../cuisine/index';
@@ -69,4 +70,5 @@ export const SYSTEMS: readonly GameSystem[] = [
   worldTimeSystem,
   collectionSystem,
   housingSystem,
+  fishingSystem,
 ];

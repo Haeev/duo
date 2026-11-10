@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "ablette",
+  "kind": "fish",
+  "item": "ablette",
+  "places": ["essai-gare"],
+  "hours": {
+    "from": 360,
+    "to": 1440
+  },
+  "weathers": [],
+  "seasons": [],
+  "rarity": "common",
+  "difficulty": 1.5,
+  "fish": {
+    "force": 0.4,
+    "nervousness": 0.4,
+    "rhythm": {
+      "pull": 1.4,
+      "rest": 1.4
+    },
+    "stamina": 6,
+    "feints": 2,
+    "sizeCm": {
+      "min": 12,
+      "max": 30
+    },
+    "shadow": "medium"
+  }
+}

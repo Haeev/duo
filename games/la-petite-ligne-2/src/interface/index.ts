@@ -23,6 +23,7 @@ import { defaultPlayerLook } from '../rendu/personnages/apparence';
 import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
 import { createHud, type ProjectToScreen } from './hud';
 import { promptModel } from './modeles';
+import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
@@ -121,7 +122,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     UI_TUNING.openGuardMs,
     options.notebook,
   );
-  const shop = createShopScreen(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, reduced);
+  const shop = createShopScreen(
+    layer,
+    view.content,
+    send,
+    keyLabel,
+    UI_TUNING.openGuardMs,
+    reduced,
+  );
   layer.dataset.motion = reduced() ? 'reduced' : 'full';
   const playerColors = options.playerColors ?? EDITOR_SETTINGS.fallbackAccents;
   const editor = createCharacterEditor(layer, {
@@ -167,7 +175,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     shop.onEvent(event, me, now);
     switch (event.type) {
       case 'refused':
-        if (event.player === me && !shop.isOpen()) hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
+        if (event.player === me && !shop.isOpen())
+          hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
         break;
       case 'pockets_full':
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
@@ -229,6 +238,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       }
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
+      // La pêche a son médaillon (`peche/`), qui lit ses événements lui-même.
+      case 'fish_cast':
+      case 'fish_caught':
+      case 'fish_hooked':
+      case 'fish_lost':
       case 'ate':
       case 'cook_cancelled':
       case 'cook_part_done':
@@ -290,10 +304,26 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         break;
     }
   }
-  const kitchen = createKitchen(layer, view, send, keyLabel, options.keyTarget ?? window);
-  const offEvents = view.onEvent(onEvent);
-
   const keyTarget = options.keyTarget ?? window;
+  const kitchen = createKitchen(layer, view, send, keyLabel, keyTarget);
+  const fishing = createFishingOverlay({
+    ...{
+      layer,
+      content: view.content,
+      world: view.world,
+      local,
+      aim: view.aim,
+      send,
+      keyLabel,
+      keyTarget,
+    },
+    ...(options.projectToScreen === undefined ? {} : { projectToScreen: options.projectToScreen }),
+  });
+  const offEvents = view.onEvent((event) => {
+    fishing.onEvent(event);
+    onEvent(event);
+  });
+
   const onKey = (raw: Event): void => {
     if (!(raw instanceof KeyboardEvent) || kitchen.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
@@ -333,6 +363,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         editor.open('create', world, me);
       }
       editor.frame(dt, world, me);
+      fishing.frame(dtMs / 1000);
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
@@ -365,11 +396,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         notebook.isOpen() ||
         shop.isOpen() ||
         kitchen.isOpen() ||
-        deco.isOpen()
+        deco.isOpen() ||
+        fishing.capturing()
       );
     },
     dispose() {
       offEvents();
+      fishing.dispose();
       keyTarget.removeEventListener('keydown', onKey);
       hud.dispose();
       dialogue.dispose();

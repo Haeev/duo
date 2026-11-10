@@ -9,5 +9,43 @@
   },
   "links": ["essai-halte"],
   "activities": [],
-  "music": null
+  "music": null,
+  "fishing": [
+    {
+      "id": "etang",
+      "area": {
+        "x": 3,
+        "y": 29,
+        "w": 8,
+        "h": 5
+      },
+      "shadows": 5,
+      "table": [
+        {
+          "catch": "goujon",
+          "weight": 4
+        },
+        {
+          "catch": "ablette",
+          "weight": 4
+        },
+        {
+          "catch": "perche",
+          "weight": 3
+        },
+        {
+          "catch": "tanche",
+          "weight": 3
+        },
+        {
+          "catch": "truite",
+          "weight": 2
+        },
+        {
+          "catch": "brochet",
+          "weight": 2
+        }
+      ]
+    }
+  ]
 }

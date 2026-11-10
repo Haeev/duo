@@ -31,6 +31,7 @@ export const INTERIOR_MAX_SIDE = 64;
  * dans la tranche « lieu », dont ce plafond tient le budget (`tests/grands-lieux.test.ts`).
  */
 export const PLACE_BRICK_OBJECTS_MAX = 400;
+import { FishingSpotSchema } from './peche';
 
 export const PlaceSchema = v.strictObject({
   schema: FileVersionSchema,
@@ -50,6 +51,8 @@ export const PlaceSchema = v.strictObject({
   activities: v.array(IdSchema),
   /** Musiques du lieu, de jour et de nuit (`assets/lieux/<id>/son/`), `null` tant qu'elles ne sont pas livrées. */
   music: v.nullable(v.strictObject({ day: IdSchema, night: IdSchema })),
+  /** Coins de pêche du lieu (`schemas/peche.ts`). */
+  fishing: v.exactOptional(v.pipe(v.array(FishingSpotSchema), v.maxLength(12))),
 });
 export type PlaceDef = v.InferOutput<typeof PlaceSchema>;
 

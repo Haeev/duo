@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "tanche",
+  "kind": "fish",
+  "item": "tanche",
+  "places": ["essai-gare"],
+  "hours": {
+    "from": 1080,
+    "to": 360
+  },
+  "weathers": ["clear", "overcast"],
+  "seasons": ["summer", "autumn"],
+  "rarity": "uncommon",
+  "difficulty": 3,
+  "fish": {
+    "force": 0.8,
+    "nervousness": 0.15,
+    "rhythm": {
+      "pull": 3,
+      "rest": 1.8
+    },
+    "stamina": 10,
+    "feints": 0,
+    "sizeCm": {
+      "min": 20,
+      "max": 45
+    },
+    "shadow": "medium"
+  }
+}
