@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Banc d'essai 2: figurines</title>
+<style>
+ body { margin: 0; background: #efe9dd; font: 14px system-ui, sans-serif; }
+ canvas { display: block; }
+ #aide { position: fixed; left: 10px; top: 8px; color: #554; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="aide"></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+// Adresse: ?perso=<identifiant de essai2.json>&planche=1 (cinq vues figées) ; sans planche: marche en boucle, flèches pour tourner.
+const params = new URLSearchParams(location.search);
+const data = await (await fetch('essai2.json')).json();
+const spec = data.personnages[params.get('perso') ?? Object.keys(data.personnages)[0]];
+const loader = new GLTFLoader();
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.info.autoReset = false;
+document.body.appendChild(renderer.domElement);
+
+// Éclairage de présentation: principale chaude avec ombre, contre-jour froid, ciel doux, sol clair, ombre de contact.
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xefe9dd);
+scene.add(new THREE.HemisphereLight(0xfff8ee, 0xcfc3b0, 1.5));
+const key = new THREE.DirectionalLight(0xffe9cc, 2.4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 2.2, bottom: -0.4, near: 0.5, far: 12 });
+// Biais réglé sur capture: sans biais de normale, des rayures d'acné couvrent les manches.
+key.shadow.bias = -0.0004;
+key.shadow.normalBias = 0.012;
+key.shadow.radius = 5;
+const rim = new THREE.DirectionalLight(0xbfd8ff, 1.6);
+const lights = new THREE.Group();
+lights.add(key, key.target, rim, rim.target);
+scene.add(lights);
+const ground = new THREE.Mesh(new THREE.CircleGeometry(6, 64), new THREE.ShadowMaterial({ opacity: 0.16 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+const blobCanvas = document.createElement('canvas');
+blobCanvas.width = blobCanvas.height = 128;
+const g = blobCanvas.getContext('2d');
+const grad = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+grad.addColorStop(0, 'rgba(60,45,35,0.42)');
+grad.addColorStop(1, 'rgba(60,45,35,0)');
+g.fillStyle = grad;
+g.fillRect(0, 0, 128, 128);
+const blob = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(blobCanvas), transparent: true, depthWrite: false }));
+blob.rotation.x = -Math.PI / 2;
+blob.position.y = 0.004;
+scene.add(blob);
+
+const bodyGltf = await loader.loadAsync(spec.corps);
+scene.add(bodyGltf.scene);
+const bones = new Map();
+const zones = new Map();
+bodyGltf.scene.traverse((o) => {
+  if (o.isBone) bones.set(o.name, o);
+  if (o.isSkinnedMesh) {
+    o.frustumCulled = false;
+    o.castShadow = true;
+    zones.set(o.material.name.replace('corps_', ''), o);
+  }
+});
+if (spec.peau) for (const [zone, mesh] of zones) if (!['bassin', 'torse'].includes(zone)) mesh.material.color.set(spec.peau);
+let triangles = 0;
+let bytes = 0;
+for (const entry of spec.pieces) {
+  const file = typeof entry === 'string' ? entry : entry.fichier;
+  const colors = typeof entry === 'string' ? {} : entry.couleurs ?? {};
+  const response = await fetch(file);
+  const buffer = await response.arrayBuffer();
+  bytes += buffer.byteLength;
+  const gltf = await loader.parseAsync(buffer, '');
+  const meshes = [];
+  let meta = {};
+  gltf.scene.traverse((o) => { if (o.isSkinnedMesh) meshes.push(o); if (o.userData.masque) meta = o.userData; });
+  for (const mesh of meshes) {
+    // Liaison au squelette du corps par les noms d'os.
+    const skinned = new THREE.SkinnedMesh(mesh.geometry, mesh.material.clone());
+    skinned.bind(new THREE.Skeleton(mesh.skeleton.bones.map((b) => bones.get(b.name)), mesh.skeleton.boneInverses), mesh.bindMatrix);
+    skinned.frustumCulled = false;
+    skinned.castShadow = true;
+    skinned.receiveShadow = true;
+    const slot = mesh.material.name.split('__')[1];
+    if (colors[slot]) skinned.material.color.set(colors[slot]);
+    scene.add(skinned);
+    triangles += mesh.geometry.index.count / 3;
+  }
+  for (const zone of meta.masque ?? []) if (zones.has(zone)) zones.get(zone).visible = false;
+}
+for (const mesh of zones.values()) if (mesh.visible) triangles += mesh.geometry.index.count / 3;
+
+const mixer = new THREE.AnimationMixer(bodyGltf.scene);
+const actions = new Map(bodyGltf.animations.map((clip) => [clip.name, mixer.clipAction(clip)]));
+function play(name) {
+  for (const action of actions.values()) action.stop();
+  actions.get(name)?.play();
+}
+const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 50);
+function view(azimuthDeg, x, w) {
+  const a = THREE.MathUtils.degToRad(azimuthDeg);
+  camera.aspect = w / innerHeight;
+  camera.position.set(Math.sin(a) * 5.2, 1.2, Math.cos(a) * 5.2);
+  camera.lookAt(0, 0.86, 0);
+  camera.updateProjectionMatrix();
+  // Les lumières suivent la caméra: chaque vue garde la même lecture des volumes.
+  lights.rotation.y = a;
+  key.position.set(2.2, 4.2, 3.4);
+  rim.position.set(-2.5, 2.6, -3.5);
+  blob.rotation.z = 0;
+  renderer.setViewport(x, 0, w, innerHeight);
+  renderer.setScissor(x, 0, w, innerHeight);
+  renderer.setScissorTest(true);
+  renderer.render(scene, camera);
+}
+window.banc = { pret: false };
+if (params.get('planche')) {
+  const shots = [['idle', 0.5, 0], ['idle', 0.5, 35], ['idle', 0.5, 90], ['walk', 0.26, 35], ['walk', 0.78, 90]];
+  const w = innerWidth / shots.length;
+  renderer.info.reset();
+  shots.forEach(([clip, time, azimuth], i) => {
+    play(clip);
+    mixer.setTime(time);
+    if (i === 1) renderer.info.reset();
+    view(azimuth, i * w, w);
+    if (i === 1) window.banc.mesures = { triangles_image: renderer.info.render.triangles, appels: renderer.info.render.calls, programmes: renderer.info.programs.length, triangles_personnage: triangles, octets_pieces: bytes };
+  });
+  window.banc.pret = true;
+} else {
+  const clock = new THREE.Clock();
+  let angle = 30;
+  play(params.get('anim') ?? 'walk');
+  document.getElementById('aide').textContent = `${spec.titre}: flèches gauche et droite pour tourner`;
+  addEventListener('keydown', (e) => { if (e.code === 'ArrowLeft') angle -= 15; if (e.code === 'ArrowRight') angle += 15; });
+  renderer.setAnimationLoop(() => { mixer.update(clock.getDelta()); view(angle, 0, innerWidth); window.banc.pret = true; });
+}
+</script>
+</body>
+</html>

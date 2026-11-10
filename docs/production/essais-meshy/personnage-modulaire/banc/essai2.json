@@ -1,0 +1,8 @@
+{
+ "personnages": {
+  "d1": {"titre": "Voie D, adulte moyen: pull, pantalon", "voie": "D", "corps": "../pieces-d/moyen_corps.glb",
+         "pieces": ["../pieces-d/moyen_tete_ronde.glb", "../pieces-d/moyen_cheveux_court.glb", "../pieces-d/moyen_haut_pull.glb", "../pieces-d/moyen_bas_pantalon.glb", "../pieces-d/moyen_chaussures_galet.glb"]},
+  "d2": {"titre": "Voie D, adulte moyen: t-shirt, veste ouverte, jupe", "voie": "D", "corps": "../pieces-d/moyen_corps.glb", "peau": "#A9744D",
+         "pieces": [{"fichier": "../pieces-d/moyen_tete_ronde.glb", "couleurs": {"peau": "#A9744D", "sourcils": "#2B2523"}}, "../pieces-d/moyen_cheveux_carre.glb", "../pieces-d/moyen_haut_tshirt.glb", "../pieces-d/moyen_veste_ouverte.glb", "../pieces-d/moyen_bas_jupe.glb", {"fichier": "../pieces-d/moyen_chaussures_galet.glb", "couleurs": {"cuir": "#8F3B34"}}]}
+ }
+}

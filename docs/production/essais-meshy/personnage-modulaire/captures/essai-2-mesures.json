@@ -1,0 +1,18 @@
+{
+ "d1": {
+  "titre": "Voie D, adulte moyen: pull, pantalon",
+  "triangles_image": 36914,
+  "appels": 34,
+  "programmes": 4,
+  "triangles_personnage": 18424,
+  "octets_pieces": 450444
+ },
+ "d2": {
+  "titre": "Voie D, adulte moyen: t-shirt, veste ouverte, jupe",
+  "triangles_image": 44842,
+  "appels": 38,
+  "programmes": 4,
+  "triangles_personnage": 22388,
+  "octets_pieces": 549072
+ }
+}
