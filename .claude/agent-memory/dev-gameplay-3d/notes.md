@@ -58,3 +58,9 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Prises de l'artiste (`doigts.prises`): main = récipient · prise⁻¹, poignet = récipient − main · position. Les prises varient beaucoup d'un personnage à l'autre (poignet au-dessus, à côté ou devant l'anse): orienter le récipient par la direction du poignet (`wristDirection`), pas par l'anse. Poignet tourné vers soi: il descend quand la tasse s'incline vers la bouche, la main reste sous l'œil.
 - Banc de captures de la gorgée: page Vite temporaire qui monte `createCustomerNodes` sur un faux `GameView` (monde de `createWorld`, groupe `spawnGroup` passé à `seated`, `servedAt` posé), et cherche l'instant où `sipTime` vaut le temps voulu. Viser `headfront` plus 4 cm devant pour la vue de profil: centrée sur la tête, la main sort du cadre.
 - Lint: une variable `let` relue après un `await` est jugée « toujours fausse » (`no-unnecessary-condition`, rétrécissement d'avant l'attente): la relire par une petite fonction.
+
+## Pages de démonstration (vérifié le 2026-11-10)
+
+- Construire une page de démonstration hors du serveur partagé: `npx vite build <dossier-de-la-page> --base ./ --emptyOutDir --outDir <scratchpad>/<sous-dossier>/site` depuis le paquet. Une config Vite posée dans le scratchpad ne trouve pas `vite` (ERR_MODULE_NOT_FOUND).
+- Le scratchpad est partagé: un autre membre a réécrit mon `donnees.py` entre deux appels. Toujours un sous-dossier à soi, et ne jamais relancer un script du scratchpad sans le relire.
+- `prettier --write` sur un fichier commun pas encore formaté (ex. `src/interface/index.ts`) réécrit les lignes des autres: n'y appliquer que des modifications à la main.

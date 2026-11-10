@@ -59,6 +59,13 @@
       "x": 12.5,
       "y": 30.5,
       "rotation": 1
+    },
+    {
+      "id": "comptoir-buvette",
+      "type": "comptoir-buvette",
+      "x": 23,
+      "y": 15,
+      "rotation": 1
     }
   ]
 }

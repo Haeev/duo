@@ -6,6 +6,7 @@
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Effect } from '../../donnees/schemas/regles';
 import { relieveNeed } from '../besoins/soins';
+import { openShop } from '../commerces/index';
 import type { SimContext } from '../noyau/systemes';
 import { equipBag, giveItem } from '../sac/actions';
 import { earn } from '../sac/argent';
@@ -31,6 +32,9 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
       return;
     case 'give_bag':
       equipBag(sim, actor, effect.bag);
+      return;
+    case 'open_shop':
+      openShop(sim, actor, effect.shop);
       return;
   }
 }

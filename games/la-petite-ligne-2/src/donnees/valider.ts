@@ -5,6 +5,7 @@
  */
 import type { Content, PlaceContent } from './charger';
 import type { ShopDef } from './schemas/commerce';
+import { shopProblems } from '../simulation/commerces/validation';
 import { NEED_IDS } from './schemas/communs';
 import type { DialogueDef } from './schemas/dialogue';
 import type { MapObject } from './schemas/lieu';
@@ -50,6 +51,8 @@ function checkEffect(content: Content, e: Effect, at: string, problems: string[]
     case 'give_bag':
       if (!content.bags.bags.some((b) => b.id === e.bag))
         problems.push(`${at}: sac inconnu « ${e.bag} »`);
+      return;
+    case 'open_shop':
       return;
     case 'remember':
     case 'give_money':
@@ -213,10 +216,7 @@ function checkShop(content: Content, place: PlaceContent, shop: ShopDef, problem
   const at = `lieu ${place.def.id}, commerce ${shop.id}`;
   if (!place.villagers.some((v) => v.id === shop.keeper))
     problems.push(`${at}: habitant inconnu « ${shop.keeper} »`);
-  for (const line of [...shop.sells, ...shop.buys]) {
-    if ('item' in line && !(line.item in content.items))
-      problems.push(`${at}: objet inconnu « ${line.item} »`);
-  }
+  for (const problem of shopProblems(content, shop)) problems.push(`${at}: ${problem}`);
 }
 
 function checkPlace(content: Content, place: PlaceContent, problems: string[]): void {

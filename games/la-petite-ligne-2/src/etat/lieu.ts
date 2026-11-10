@@ -3,7 +3,13 @@
  * sauvegarde; seul le lieu courant est simulé et transmis (ADR 0018).
  */
 import * as v from 'valibot';
-import { FiniteSchema, IdSchema, IntSchema, PlayerIndexSchema } from '../donnees/schemas/communs';
+import {
+  CentsSchema,
+  FiniteSchema,
+  IdSchema,
+  IntSchema,
+  PlayerIndexSchema,
+} from '../donnees/schemas/communs';
 import { BrickStatesSchema } from './briques';
 import { BodySchema, StackSchema } from './joueur';
 
@@ -36,6 +42,20 @@ export const GroundItemSchema = v.strictObject({
   y: FiniteSchema,
 });
 
+/**
+ * Journée d'un commerce: jour et centimes dépensés en rachats ce jour-là; par article vendu, le
+ * premier jour de sa période de réassort et les exemplaires vendus depuis.
+ */
+export const ShopDaySchema = v.strictObject({
+  day: v.pipe(IntSchema, v.minValue(1)),
+  spent: CentsSchema,
+  sold: v.record(
+    IdSchema,
+    v.tuple([v.pipe(IntSchema, v.minValue(1)), v.pipe(IntSchema, v.minValue(0))]),
+  ),
+});
+export type ShopDay = v.InferOutput<typeof ShopDaySchema>;
+
 const placeSlow = {
   /** Jour du départ des joueurs, pour le rattrapage au retour; `null`: ils y sont. */
   leftOn: v.nullable(v.pipe(IntSchema, v.minValue(1))),
@@ -47,6 +67,8 @@ const placeSlow = {
   /** 80 au plus: au-delà, le rangement retire les plus anciens (budget de la tranche, `reseau/canaux.ts`). */
   ground: v.pipe(v.array(GroundItemSchema), v.maxLength(80)),
   nextGroundId: v.pipe(IntSchema, v.minValue(0)),
+  /** Journée de chaque commerce du lieu (stock vendu, rachats du jour): `simulation/commerces/`. */
+  shops: v.exactOptional(v.record(IdSchema, ShopDaySchema)),
 } as const;
 
 /** Ce qui part dans la tranche « lieu »: tout, sauf les positions des habitants (canal rapide). */
@@ -66,6 +88,16 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
   const villagers: PlaceSlow['villagers'] = {};
   for (const [id, villager] of Object.entries(place.villagers))
     villagers[id] = { met: villager.met, talkingWith: villager.talkingWith };
-  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId } = place;
-  return { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, villagers };
+  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops } = place;
+  const slow: PlaceSlow = {
+    leftOn,
+    placed,
+    nextPlacedId,
+    objects,
+    ground,
+    nextGroundId,
+    villagers,
+  };
+  if (shops !== undefined) slow.shops = shops;
+  return slow;
 }

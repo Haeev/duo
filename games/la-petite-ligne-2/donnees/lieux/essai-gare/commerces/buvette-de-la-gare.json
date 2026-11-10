@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "buvette-de-la-gare",
+  "name": "Buvette de la gare",
+  "keeper": "cheffe-de-gare",
+  "icon": "train",
+  "hours": { "from": 360, "to": 1260 },
+  "sells": [
+    { "item": "pain", "price": 120, "dailyStock": 6 },
+    { "item": "pomme", "price": 90, "dailyStock": null },
+    {
+      "item": "hache-forgee",
+      "price": 3000,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": { "type": "bond_at_least", "villager": "cheffe-de-gare", "points": 100 }
+    }
+  ],
+  "buys": [
+    { "item": "pomme", "price": 60 },
+    { "item": "buche", "price": 40 }
+  ],
+  "dailyBuyCap": 2000,
+  "dailyNeeds": ["pomme", "buche"],
+  "friendship": [{ "hearts": 2, "factor": 1.1 }],
+  "refusal": "Je tiens une gare, pas une brocante. Garde ça pour qui en a l'usage."
+}

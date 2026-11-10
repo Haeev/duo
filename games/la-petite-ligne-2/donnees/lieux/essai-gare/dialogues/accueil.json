@@ -86,7 +86,37 @@
       "speaker": "cheffe-de-gare",
       "text": "Alors, cette besace ? Elle te va bien.",
       "emote": "joy",
-      "next": null
+      "next": "buvette"
+    },
+    "buvette": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "acheter",
+          "text": "Je regarde ta buvette.",
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 1260
+            }
+          ],
+          "effects": [
+            {
+              "type": "open_shop",
+              "shop": "buvette-de-la-gare"
+            }
+          ],
+          "next": null
+        },
+        {
+          "id": "bonjour",
+          "text": "Je passais dire bonjour.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
     }
   }
 }

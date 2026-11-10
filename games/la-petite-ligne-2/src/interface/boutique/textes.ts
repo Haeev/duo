@@ -1,0 +1,62 @@
+/**
+ * Textes de l'écran de boutique, en français, qui tutoient. `{nom}`, `{objet}`, `{n}`, `{prix}`,
+ * `{montant}`: valeurs remplies à l'affichage (`fill` de `../textes`).
+ */
+export const SHOP_TEXTS = {
+  label: '{boutique}, tenue par {nom}',
+  provisional: 'Portrait provisoire',
+  buy: 'Acheter',
+  sell: 'Vendre',
+  buyGrid: 'Ce que vend {nom}',
+  sellGrid: 'Ce que {nom} te rachète',
+  refusedGrid: 'Ce que {nom} ne rachète pas',
+  notWanted: '{nom} n’en veut pas',
+  unitPrice: '{objet}, {prix} l’unité',
+  unitOwned: '{objet}, tu en as {n}, {nom} en donne {prix} l’unité',
+  tooExpensive: ', il te manque {montant}',
+  outOfStock: ', plus en rayon aujourd’hui',
+  stock: 'En rayon : {n}',
+  owned: 'Dans ton sac : {n}',
+  hunger: 'Faim : plus {n}',
+  need: 'Besoin du jour : payé plus cher',
+  quantity: 'Quantité',
+  less: 'Moins',
+  more: 'Plus',
+  totalBuy: 'Total : {montant}',
+  totalSell: 'Tu reçois : {montant}',
+  knownPrices: 'Prix déjà vus',
+  knownNone: 'Aucun autre prix connu',
+  unknownBuyer: 'Personne ne te l’a encore pris',
+  withChest: 'Avec le coffre commun',
+  chestPays: 'Le coffre paie {montant}',
+  household: 'Payé par le coffre commun',
+  nothingToSell: 'Rien à vendre ici',
+  nothingToBuy: 'Rien en rayon pour toi',
+  keysTabs: 'acheter, vendre',
+  keysQty: 'quantité',
+  keysChest: 'coffre',
+  keysClose: 'sortir',
+  bought: 'Merci !',
+  sold: 'Marché conclu.',
+  /** Raisons de refus des commerces (clés de la simulation, `simulation/commerces/index.ts`). */
+  refusals: {
+    'shop-closed': 'C’est fermé',
+    'not-sold': 'Pas en rayon',
+    locked: 'Pas encore pour toi',
+    'out-of-stock': 'Plus en rayon',
+    'pockets-full': 'Poches pleines',
+    'not-enough-money': 'Pas assez d’argent',
+    'chest-not-allowed': 'Ça se paie de ta bourse',
+    'not-wanted': 'Pas dans ce métier',
+    'not-enough-items': 'Tu n’en as pas assez',
+    'shop-cap-reached': 'Plus de sous pour aujourd’hui',
+    'purse-full': 'Bourse pleine',
+    'too-far': 'Trop loin',
+    gone: 'Plus là',
+  } as Readonly<Record<string, string>>,
+} as const;
+
+/** Texte d'un refus de commerce, ou `null` si la raison n'en est pas une. */
+export function shopRefusalText(reason: string): string | null {
+  return SHOP_TEXTS.refusals[reason] ?? null;
+}

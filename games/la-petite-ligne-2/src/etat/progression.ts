@@ -1,6 +1,6 @@
 /** Tranche « progression »: ce que le duo a accompli, tous lieux confondus. Elle change rarement. */
 import * as v from 'valibot';
-import { IdSchema, IntSchema } from '../donnees/schemas/communs';
+import { CentsSchema, IdSchema, IntSchema } from '../donnees/schemas/communs';
 import { FactValueSchema } from '../donnees/schemas/regles';
 
 /** Un fait retenu (réponse 41: les habitants se souviennent): sa valeur, qui l'a fait, quel jour. */
@@ -31,6 +31,11 @@ export const ProgressSchema = v.strictObject({
   collections: v.record(IdSchema, v.array(IdSchema)),
   /** Lieux rouverts par l'histoire: le train y mène. */
   opened: v.array(IdSchema),
+  /**
+   * Mémoire des prix (cahier 4.6, CA-38): par objet, le prix de rachat vu chez chaque commerce
+   * (centimes, prix de base sans bonus du jour). Lot commerces, `simulation/commerces/memoire.ts`.
+   */
+  prices: v.record(IdSchema, v.record(IdSchema, CentsSchema)),
 });
 export type ProgressState = v.InferOutput<typeof ProgressSchema>;
 

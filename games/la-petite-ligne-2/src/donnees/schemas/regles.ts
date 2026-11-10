@@ -102,5 +102,7 @@ export const EffectSchema = v.variant('type', [
   }),
   /** Remplace le sac de celui qui agit (identifiant de `sacs.json`). */
   v.strictObject({ type: v.literal('give_bag'), bag: IdSchema }),
+  /** Ouvre la boutique de ce commerce du lieu pour celui qui agit (dialogue du commerçant). */
+  v.strictObject({ type: v.literal('open_shop'), shop: IdSchema }),
 ]);
 export type Effect = v.InferOutput<typeof EffectSchema>;

@@ -113,7 +113,14 @@ export function createWorld(
     minutes: start.minute,
     common: { phase: 'day', place: start.place, day: 1, weather: 'clear', chest: 0, travel: null },
     players: [createPlayer(content, members[0], 0, 0), createPlayer(content, members[1], 0, 0)],
-    progress: { memory: {}, bonds: {}, quests: {}, collections: {}, opened: [start.place] },
+    progress: {
+      memory: {},
+      bonds: {},
+      quests: {},
+      collections: {},
+      opened: [start.place],
+      prices: {},
+    },
     places: { [start.place]: createPlaceState(content, place) },
   };
   placeAtArrival(content, world);
