@@ -442,7 +442,8 @@ def peindre_atlas(fiche_path, sortie):
         sous_nez = tete & devant & (np.abs(z - (nz - 0.03 * hh)) < 0.016 * hh * (1 - (P[..., 0] / (0.06 * hh)) ** 2)) & (np.abs(P[..., 0]) < 0.06 * hh)
         ink = np.maximum(ink, sous_nez * 1.0)
     # Dessous du menton et de la mâchoire, creux de l'oreille: aplats d'ombre francs.
-    img[tete & (N[..., 2] < -0.35)] = ombre(peau)
+    # Pas sur l'avant du visage (lissé, ses pentes douces vers le bas ne sont pas des dessous).
+    img[tete & (N[..., 2] < -0.35) & ~(devant & (z > f["chin"] + 0.012))] = ombre(peau)
     if fiche.get("rides"):
         # Rides d'expression: trois traits au front, pattes d'oie aux tempes.
         for k in range(3):

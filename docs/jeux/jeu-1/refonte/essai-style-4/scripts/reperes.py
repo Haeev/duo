@@ -12,6 +12,10 @@ from mathutils import Vector
 args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
 blend, npz, out = args[:3]
 bpy.ops.wm.open_mainfile(filepath=blend)
+# Pose de repos du squelette: les pistes des clips (repos, marche) inclinent la tête et décaleraient les repères.
+for o in bpy.data.objects:
+    if o.type == "ARMATURE":
+        o.data.pose_position = "REST"
 f = np.load(npz)["face"]
 top, chin, hh, yeux, bouche = (float(x) for x in f[:5])
 ecart = float(f[12])

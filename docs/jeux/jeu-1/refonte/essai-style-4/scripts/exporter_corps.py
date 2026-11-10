@@ -29,5 +29,5 @@ for o in bpy.context.scene.objects:
     o.select_set(o.type in ("ARMATURE", "MESH"))
 bpy.ops.export_scene.gltf(filepath=out, use_selection=True, export_format="GLB", export_animations=True,
                           export_animation_mode="NLA_TRACKS", export_skins=True, export_texcoords=True,
-                          export_normals=True, export_vertex_color="NONE", export_image_format="NONE")
+                          export_normals=True, export_attributes=True, export_vertex_color="NONE", export_image_format="NONE")
 print("EXPORT", out)

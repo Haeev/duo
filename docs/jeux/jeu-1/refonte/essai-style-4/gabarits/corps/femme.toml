@@ -3,12 +3,20 @@
 # `python3 scripts/construire.py --corps <dossier>` et régler les valeurs sur la planche `.travail/reperes-femme.png`.
 id = "femme"
 triangles = 2300      # triangles visibles (la coque d'encre double le compte)
-mains = 0.92          # échelle des mains autour du poignet (1 = tel que généré)
 pieds = 1.0           # échelle des pieds autour de la cheville
+triangles_tete = 560   # dont la tête (bible 2.2: 400 à 600)
 tete = 0.92           # échelle de la tête autour de la base du crâne (viser 7 têtes; enfant 5,5)
 
-[visage]              # repères relevés sur le modelé de ce corps: le visage dessiné tombe sur le visage sculpté
-menton = 0.265        # du sommet du crâne au menton, en mètres, tête à l'échelle 1
-yeux = 0.39          # centre des yeux, fraction de la hauteur de tête depuis le sommet
-bouche = 0.73        # trait de la bouche, même unité
-ecart = 0.155         # demi-distance entre les yeux, fraction de la hauteur de tête
+[mains]               # moufle refaite (tete_mains.mitaines): main fine
+longueur = 0.172      # du poignet au bout des doigts, en mètres (environ 0,105 x taille)
+largeur = 0.46        # largeur de la paume, fraction de la longueur
+epaisseur = 0.23      # épaisseur de la paume, fraction de la longueur
+jointures = [16, 22]  # pli des doigts aux jointures puis au milieu, en degrés (repos détendu)
+
+[visage]              # MESURÉ par conformer_corps.py (tete_mains.mesurer): ne pas régler à la main
+menton = 0.298        # du sommet du crâne au menton, en mètres, tête à l'échelle 1
+yeux = 0.348          # centre des yeux, fraction de la hauteur de tête depuis le sommet
+bouche = 0.789        # trait de la bouche, même unité
+ecart = 0.167         # demi-distance entre les yeux, fraction de la hauteur de tête
+nez = 0.764           # base du nez, fraction du chemin des yeux à la bouche (traits.py)
+saillie_nez = 0.0164  # saillie du nez simple au-dessus du visage lissé, en mètres
