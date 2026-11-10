@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "pomme-cuite",
+  "name": "Pomme cuite",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 35
+  },
+  "tool": null
+}

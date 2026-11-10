@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "four",
+  "name": "Four",
+  "model": "four",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "cook",
+      "station": "oven"
+    }
+  ]
+}

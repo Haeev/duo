@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "cuisiniere",
+  "name": "Cuisinière",
+  "model": "cuisiniere",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "cook",
+      "station": "kitchen"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import * as v from 'valibot';
 import { FiniteSchema, IntSchema } from '../../donnees/schemas/communs';
 import { NEEDS_INTENTS } from '../besoins/intentions';
 import { BRICK_INTENTS } from '../briques/intentions';
+import { COOK_INTENTS } from '../cuisine/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { BAG_INTENTS } from '../sac/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
@@ -37,5 +38,6 @@ export const IntentSchema = v.variant('type', [
   ...NEEDS_INTENTS,
   ...BAG_INTENTS,
   ...DIALOGUE_INTENTS,
+  ...COOK_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

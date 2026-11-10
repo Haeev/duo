@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "id": "pot-au-feu-du-dimanche",
+  "name": "Pot-au-feu du dimanche",
+  "station": "counter",
+  "inputs": [
+    {
+      "item": "carotte",
+      "count": 2
+    },
+    {
+      "item": "poireau",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "pot-au-feu",
+    "count": 1
+  },
+  "seconds": 36,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 10
+    },
+    {
+      "kind": "season",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ],
+  "second": {
+    "station": "kitchen",
+    "inputs": [
+      {
+        "item": "boeuf",
+        "count": 1
+      },
+      {
+        "item": "pomme-de-terre",
+        "count": 2
+      }
+    ],
+    "steps": [
+      {
+        "kind": "heat",
+        "count": 3,
+        "after": 0
+      },
+      {
+        "kind": "stir",
+        "count": 10
+      },
+      {
+        "kind": "heat",
+        "count": 2,
+        "after": 1
+      }
+    ]
+  }
+}

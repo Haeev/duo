@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "carotte",
+  "name": "Carotte",
+  "family": "crop",
+  "stack": 10,
+  "food": {
+    "hunger": 6
+  },
+  "tool": null
+}

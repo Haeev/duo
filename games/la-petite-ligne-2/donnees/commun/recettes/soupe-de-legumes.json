@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "soupe-de-legumes",
+  "name": "Soupe de légumes",
+  "station": "kitchen",
+  "inputs": [
+    {
+      "item": "carotte",
+      "count": 1
+    },
+    {
+      "item": "poireau",
+      "count": 1
+    },
+    {
+      "item": "pomme-de-terre",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "soupe-de-legumes",
+    "count": 1
+  },
+  "seconds": 18,
+  "known": "start",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 8
+    },
+    {
+      "kind": "stir",
+      "count": 8
+    },
+    {
+      "kind": "season",
+      "count": 3
+    }
+  ],
+  "quality": {
+    "perfect": {
+      "item": "soupe-de-legumes",
+      "count": 2
+    }
+  }
+}

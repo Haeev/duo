@@ -10,6 +10,7 @@ import type { Intent } from '../simulation/noyau/entrees';
 import type { GameEvent } from '../simulation/noyau/evenements';
 import { formatEuros } from '../simulation/sac/argent';
 import { createNotebook } from './carnet';
+import { createKitchen } from './cuisine/index';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import { createHud, type ProjectToScreen } from './hud';
 import { promptModel } from './modeles';
@@ -71,7 +72,8 @@ export function azertyLabel(code: string): string {
 export function createInterface(options: InterfaceOptions): GameInterface {
   const { root, view, send } = options;
   const keyLabel = options.keyLabel ?? azertyLabel;
-  const media = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const media =
+    typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   const reduced = (): boolean => options.reducedMotion === true || media?.matches === true;
 
   const layer = document.createElement('div');
@@ -102,6 +104,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   }
 
   function onEvent(event: GameEvent): void {
+    kitchen.onEvent(event);
     const me = local();
     if (me === null) return;
     const other: PlayerIndex = me === 0 ? 1 : 0;
@@ -113,27 +116,48 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
         break;
       case 'money_changed':
-        if (event.who === me) hud.money(now, `${event.delta > 0 ? '+' : ''}${formatEuros(event.delta)}`);
+        if (event.who === me)
+          hud.money(now, `${event.delta > 0 ? '+' : ''}${formatEuros(event.delta)}`);
         else if (event.who === 'chest')
-          hud.notice(now, 'coffre', fill(TEXTS.notices.chestIn, { montant: formatEuros(view.world()?.common.chest ?? 0) }));
+          hud.notice(
+            now,
+            'coffre',
+            fill(TEXTS.notices.chestIn, { montant: formatEuros(view.world()?.common.chest ?? 0) }),
+          );
         break;
       case 'train_waiting':
-        if (!event.loaded[other]) hud.notice(now, 'train', fill(TEXTS.notices.otherLoading, { nom: nameOf(other) }));
+        if (!event.loaded[other])
+          hud.notice(now, 'train', fill(TEXTS.notices.otherLoading, { nom: nameOf(other) }));
         break;
       case 'train_boarded':
         if (event.player === other)
-          hud.notice(now, 'train', fill(event.to === null ? TEXTS.notices.otherLeftTrain : TEXTS.notices.otherAtTrain, { nom: nameOf(other) }));
+          hud.notice(
+            now,
+            'train',
+            fill(event.to === null ? TEXTS.notices.otherLeftTrain : TEXTS.notices.otherAtTrain, {
+              nom: nameOf(other),
+            }),
+          );
         break;
       case 'sleep_waiting':
         hud.notice(
           now,
           'lit',
-          fill(event.player === me ? TEXTS.notices.youSleepWait : TEXTS.notices.otherSleeping, { nom: nameOf(other) }),
+          fill(event.player === me ? TEXTS.notices.youSleepWait : TEXTS.notices.otherSleeping, {
+            nom: nameOf(other),
+          }),
         );
         break;
       case 'item_given':
         if (event.to === me)
-          hud.notice(now, 'sac', fill(TEXTS.notices.given, { nom: nameOf(event.from), objet: view.content.items[event.item]?.name ?? event.item }));
+          hud.notice(
+            now,
+            'sac',
+            fill(TEXTS.notices.given, {
+              nom: nameOf(event.from),
+              objet: view.content.items[event.item]?.name ?? event.item,
+            }),
+          );
         break;
       case 'tool_blunt':
         if (event.player === me) hud.notice(now, 'info', TEXTS.notices.toolBlunt);
@@ -144,6 +168,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
       case 'ate':
+      case 'cook_cancelled':
+      case 'cook_part_done':
+      case 'cook_started':
+      case 'cook_step_done':
+      case 'dish_cooked':
+      case 'kitchen_opened':
+      case 'recipe_learned':
       case 'bag_changed':
       case 'brick_used':
       case 'day_started':
@@ -162,11 +193,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         break;
     }
   }
+  const kitchen = createKitchen(layer, view, send, keyLabel, options.keyTarget ?? window);
   const offEvents = view.onEvent(onEvent);
 
   const keyTarget = options.keyTarget ?? window;
   const onKey = (raw: Event): void => {
-    if (!(raw instanceof KeyboardEvent)) return;
+    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
@@ -194,15 +226,26 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
+      kitchen.frame(dtMs);
       const menu = notebook.isOpen() || dialogue.isOpen();
       const prompt = menu
         ? null
-        : promptModel(view.content, world, me, view.aim(me), { act: keyLabel('Space'), board: keyLabel('Enter') });
-      hud.frame({ now, world, local: me, prompt, menu: notebook.isOpen(), yaw: options.cameraYaw() });
+        : promptModel(view.content, world, me, view.aim(me), {
+            act: keyLabel('Space'),
+            board: keyLabel('Enter'),
+          });
+      hud.frame({
+        now,
+        world,
+        local: me,
+        prompt,
+        menu: notebook.isOpen(),
+        yaw: options.cameraYaw(),
+      });
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen());
     },
     capturing() {
-      return dialogue.isOpen() || notebook.isOpen();
+      return dialogue.isOpen() || notebook.isOpen() || kitchen.isOpen();
     },
     dispose() {
       offEvents();
@@ -210,6 +253,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       hud.dispose();
       dialogue.dispose();
       notebook.dispose();
+      kitchen.dispose();
       layer.remove();
     },
   };

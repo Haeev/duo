@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "pot-au-feu",
+  "name": "Pot-au-feu du dimanche",
+  "family": "food",
+  "stack": 1,
+  "food": {
+    "hunger": 70
+  },
+  "tool": null,
+  "meal": {
+    "perk": "extra_catch"
+  }
+}
