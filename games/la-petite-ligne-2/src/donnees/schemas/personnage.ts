@@ -54,6 +54,8 @@ const HexColor = v.pipe(v.string(), v.regex(/^#[0-9a-f]{6}$/));
 /** Une pièce de personnage (vêtement, coiffure, tête, accessoire): une entrée de `pieces` du catalogue. */
 export const PieceSchema = v.strictObject({
   id: IdSchema,
+  /** Nom français court affiché dans l'éditeur et les boutiques (« Pull col roulé »). */
+  name: v.optional(v.pipe(v.string(), v.minLength(1), v.maxLength(40))),
   slot: SlotSchema,
   /** Fichier GLB de l'emplacement (relatif à `assets/commun/personnages/`) et nœud dans ce fichier. */
   file: v.pipe(v.string(), v.regex(/^[a-z0-9-]+\.glb$/)),

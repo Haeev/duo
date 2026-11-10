@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Planches du catalogue des personnages</title>
+<style>
+ body { margin: 0; background: #efe9dd; }
+ canvas { display: block; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+// Banc des planches du catalogue (lot L5). Même fusion que l'assemblage du jeu: pièces fusionnées en un maillage à
+// peau, tête à part pour ses expressions (2 appels de dessin), sections du corps lues directement (floor(v * 16)).
+// Adresse: ?planche=pieces&slot=<emplacement> | personnages | expressions | distance | silhouettes | detail&ids=a,b
+//          &donnees=<dossier des données>&modeles=<dossier des GLB> (pour les captures « avant »)
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+const params = new URLSearchParams(location.search);
+const ASSETS = params.get('modeles') ?? '/games/la-petite-ligne-2/assets/commun/personnages/';
+const DATA = params.get('donnees') ?? '/games/la-petite-ligne-2/donnees/commun/personnages/';
+const catalogue = await (await fetch(DATA + 'catalogue.json')).json();
+const details = await (await fetch(DATA + 'morphologies.json')).json();
+const bench = await (await fetch('personnages.json')).json();
+const nuancier = await (await fetch('../nuancier.json')).json();
+const named = new Map();
+for (const list of Object.values(nuancier)) for (const [n, hex] of list) if (!named.has(n)) named.set(n, hex.toLowerCase());
+const pieceById = new Map(catalogue.pieces.map((p) => [p.id, p]));
+const loader = new GLTFLoader();
+const files = new Map();
+async function file(name) {
+  if (!files.has(name)) files.set(name, await loader.loadAsync(ASSETS + name));
+  return files.get(name);
+}
+function node(gltf, name) {
+  let found = null;
+  gltf.scene.traverse((o) => { if (o.isSkinnedMesh && (o.name === name || o.parent?.name === name)) found = found ?? o; });
+  if (!found) throw new Error(`nœud ${name} introuvable`);
+  return found;
+}
+// Pièces du banc: [emplacement, id, [noms de couleurs]] ou objets du jeu ({ slot, id, colors }).
+function entryOf(e) {
+  if (!Array.isArray(e)) return e;
+  const [slot, id, names = []] = e;
+  const piece = pieceById.get(id);
+  if (!piece) return null;
+  const colors = piece.zones.map((z, i) => {
+    const hex = named.get(names[i]);
+    const k = hex ? z.colors.indexOf(hex) : -1;
+    return k >= 0 ? k : details.defaults[id]?.[i] ?? 0;
+  });
+  return { slot, id, colors };
+}
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.info.autoReset = false;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xefe9dd);
+scene.add(new THREE.HemisphereLight(0xfff8ee, 0xcfc3b0, 1.5));
+const key = new THREE.DirectionalLight(0xffe9cc, 2.4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 2.4, bottom: -0.6, near: 0.5, far: 14 });
+// Biais vérifié sur capture: sans biais de normale, des rayures d'acné couvrent les manches.
+key.shadow.bias = -0.0004;
+key.shadow.normalBias = 0.012;
+key.shadow.radius = 5;
+const rim = new THREE.DirectionalLight(0xbfd8ff, 1.6);
+scene.add(key, key.target, rim, rim.target);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.16 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0 });
+const bodyFile = await file('body.glb');
+const LENGTHS = { legs: ['LeftLeg', 'RightLeg', 'LeftFoot', 'RightFoot'], arms: ['LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand'], torso: ['Spine02', 'Spine01', 'Spine', 'neck', 'Head'] };
+
+async function createCharacter(look) {
+  const shape = details.shapes[look.shape] ?? details.shapes[catalogue.shapes[0].id];
+  const root = SkeletonUtils.clone(bodyFile.scene);
+  const bones = new Map();
+  let bodyMesh = null;
+  root.traverse((o) => { if (o.isBone) bones.set(o.name, o); if (o.isSkinnedMesh && !bodyMesh) bodyMesh = o; });
+  root.traverse((o) => { if (o.isSkinnedMesh) o.visible = false; });
+  const skeleton = bodyMesh.skeleton;
+  const boneIndex = new Map(skeleton.bones.map((b, i) => [b.name, i]));
+  const skin = new THREE.Color(catalogue.skins[look.skin]);
+  const bodyId = catalogue.pieces.find((p) => p.slot === 'body').id;
+  const pieces = [{ slot: 'body', id: bodyId, colors: [] }, ...look.pieces.map(entryOf).filter(Boolean)];
+  const covered = new Set();
+  let hairMode = 'free';
+  for (const entry of pieces) {
+    const piece = pieceById.get(entry.id);
+    for (const region of piece.covers) covered.add(details.regions.indexOf(region));
+    if (piece.hair === 'hidden') hairMode = 'hidden';
+    else if (piece.hair === 'flat' && hairMode === 'free') hairMode = 'flat';
+  }
+  const merged = { position: [], normal: [], color: [], skinIndex: [], skinWeight: [], index: [] };
+  let head = null;
+  let triangles = 0;
+  const vflip = params.get('vflip') === '1';
+  for (const entry of pieces) {
+    const piece = pieceById.get(entry.id);
+    if (piece.slot === 'hair' && hairMode === 'hidden') continue;
+    const name = piece.slot === 'hair' && hairMode === 'flat' ? piece.node + details.flat_suffix : piece.node;
+    const source = node(await file(piece.file), name);
+    const geo = source.geometry;
+    const pos = geo.attributes.position, nor = geo.attributes.normal, uv = geo.attributes.uv, col = geo.attributes.color;
+    const si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+    const remap = source.skeleton.bones.map((b) => boneIndex.get(b.name));
+    const zoneColors = piece.zones.map((z, i) => new THREE.Color(z.colors[entry.colors[i] ?? 0] ?? z.colors[0]));
+    const count = pos.count;
+    const out = { position: new Float32Array(count * 3), color: new Float32Array(count * 3), skinIndex: new Uint16Array(count * 4) };
+    const dict = source.morphTargetDictionary ?? {};
+    const deltas = shape.morphs.filter((m) => m in dict).map((m) => geo.morphAttributes.position[dict[m]]);
+    for (let i = 0; i < count; i += 1) {
+      let x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+      for (const d of deltas) { x += d.getX(i); y += d.getY(i); z += d.getZ(i); }
+      out.position.set([x, y, z], i * 3);
+      const zone = Math.floor(uv.getX(i) * 8);
+      const fixed = new THREE.Color(col.getX(i), col.getY(i), col.getZ(i));
+      const c = zone === details.zones.peau ? skin : zone === details.zones.fixe ? fixed : zoneColors[zone] ?? fixed;
+      out.color.set([c.r, c.g, c.b], i * 3);
+      for (let k = 0; k < 4; k += 1) out.skinIndex[i * 4 + k] = remap[si.getComponent(i, k)];
+    }
+    const index = geo.index.array;
+    if (piece.slot === 'head') {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(out.position, 3));
+      g.setAttribute('normal', nor.clone());
+      g.setAttribute('color', new THREE.BufferAttribute(out.color, 3));
+      g.setAttribute('skinIndex', new THREE.BufferAttribute(out.skinIndex, 4));
+      g.setAttribute('skinWeight', sw.clone());
+      g.setIndex(new THREE.BufferAttribute(index.slice(), 1));
+      g.morphAttributes.position = geo.morphAttributes.position;
+      g.morphTargetsRelative = true;
+      head = new THREE.SkinnedMesh(g, material);
+      head.morphTargetDictionary = { ...source.morphTargetDictionary };
+      head.morphTargetInfluences = new Array(geo.morphAttributes.position.length).fill(0);
+      triangles += index.length / 3;
+      continue;
+    }
+    const base = merged.position.length / 3;
+    for (let i = 0; i < count; i += 1) {
+      merged.position.push(out.position[i * 3], out.position[i * 3 + 1], out.position[i * 3 + 2]);
+      merged.normal.push(nor.getX(i), nor.getY(i), nor.getZ(i));
+      merged.color.push(out.color[i * 3], out.color[i * 3 + 1], out.color[i * 3 + 2]);
+      merged.skinIndex.push(out.skinIndex[i * 4], out.skinIndex[i * 4 + 1], out.skinIndex[i * 4 + 2], out.skinIndex[i * 4 + 3]);
+      merged.skinWeight.push(sw.getX(i), sw.getY(i), sw.getZ(i), sw.getW(i));
+    }
+    for (let t = 0; t < index.length; t += 3) {
+      const v = uv.getY(index[t]);
+      const section = vflip ? 15 - Math.floor(v * 16) : Math.floor(v * 16);
+      if (piece.slot === 'body' && covered.has(section)) continue;
+      merged.index.push(base + index[t], base + index[t + 1], base + index[t + 2]);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(merged.position, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(merged.normal, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(merged.color, 3));
+  g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(merged.skinIndex, 4));
+  g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(merged.skinWeight, 4));
+  g.setIndex(merged.index);
+  triangles += merged.index.length / 3;
+  const body = new THREE.SkinnedMesh(g, material);
+  for (const mesh of [body, head]) {
+    mesh.bind(skeleton, bodyMesh.bindMatrix);
+    mesh.frustumCulled = false;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    bodyMesh.parent.add(mesh);
+  }
+  for (const [part, names] of Object.entries(LENGTHS)) for (const n of names) bones.get(n).position.multiplyScalar(shape[part]);
+  const hipsScale = (0.10 + 0.80 * shape.legs) / 0.90;
+  bones.get('Hips').position.multiplyScalar(hipsScale);
+  bones.get('Head').scale.setScalar(shape.head);
+  const holder = new THREE.Group();
+  holder.add(root);
+  holder.scale.setScalar(shape.scale);
+  scene.add(holder);
+  const mixer = new THREE.AnimationMixer(root);
+  const actions = new Map();
+  for (const clip of bodyFile.animations) {
+    const tracks = [];
+    for (const track of clip.tracks) {
+      if (track.name.endsWith('.quaternion')) tracks.push(track);
+      else if (track.name === 'Hips.position') {
+        const copy = track.clone();
+        for (let i = 0; i < copy.values.length; i += 1) copy.values[i] *= hipsScale;
+        tracks.push(copy);
+      }
+    }
+    actions.set(clip.name, mixer.clipAction(new THREE.AnimationClip(clip.name, clip.duration, tracks)));
+  }
+  const character = {
+    holder, head, triangles, look,
+    play(name, time) { for (const a of actions.values()) a.stop(); (actions.get(name) ?? actions.get('idle')).play(); mixer.setTime(time); },
+    express(name) { head.morphTargetInfluences.fill(0); if (name && name !== 'neutral') head.morphTargetInfluences[head.morphTargetDictionary[name]] = 1; },
+  };
+  character.express(look.expression);
+  return character;
+}
+
+const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 80);
+function view(target, azimuthDeg, rect, options = {}) {
+  const a = THREE.MathUtils.degToRad(azimuthDeg);
+  const distance = options.distance ?? 5.2;
+  const elevation = THREE.MathUtils.degToRad(options.elevation ?? 4);
+  const look = new THREE.Vector3(target.x, options.lookY ?? 0.86, target.z);
+  camera.fov = options.fov ?? 26;
+  camera.aspect = rect.w / rect.h;
+  camera.position.set(look.x + Math.sin(a) * Math.cos(elevation) * distance, look.y + Math.sin(elevation) * distance, look.z + Math.cos(a) * Math.cos(elevation) * distance);
+  camera.lookAt(look);
+  camera.updateProjectionMatrix();
+  const right = new THREE.Vector3(Math.cos(a), 0, -Math.sin(a));
+  const back = new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
+  key.target.position.copy(look).setY(0.8);
+  key.position.copy(key.target.position).addScaledVector(right, 2.2).addScaledVector(back, 3.4).add(new THREE.Vector3(0, 3.4, 0));
+  rim.target.position.copy(key.target.position);
+  rim.position.copy(key.target.position).addScaledVector(right, -2.5).addScaledVector(back, -3.5).add(new THREE.Vector3(0, 1.8, 0));
+  renderer.setViewport(rect.x, rect.y, rect.w, rect.h);
+  renderer.setScissor(rect.x, rect.y, rect.w, rect.h);
+  renderer.setScissorTest(true);
+  renderer.render(scene, camera);
+}
+
+const labels = [];
+function label(text, x, yTop, size = 15) { labels.push({ text, x, y: yTop, size }); }
+window.banc = { pret: false, mesures: {} };
+const mode = params.get('planche') ?? 'personnages';
+const W = innerWidth, Hh = innerHeight;
+async function row(looks, spacing = 14) {
+  const list = [];
+  for (const [i, look] of looks.entries()) {
+    const c = await createCharacter(look);
+    c.holder.position.x = i * spacing;
+    list.push(c);
+  }
+  return list;
+}
+function measure(c) {
+  // Appels de dessin et triangles du personnage seul (hors sol et ombre portée), par renderer.info.
+  const hidden = [];
+  scene.traverse((o) => { if (o.isMesh && o.visible && !c.holder.getObjectById(o.id)) { hidden.push([o, true]); o.visible = false; } });
+  key.castShadow = false;
+  renderer.info.reset();
+  view(c.holder.position, 20, { x: 0, y: 0, w: 64, h: 64 });
+  const m = { triangles: renderer.info.render.triangles, appels: renderer.info.render.calls };
+  key.castShadow = true;
+  for (const [o, v] of hidden) o.visible = v;
+  return m;
+}
+const mannequin = bench.mannequin;
+function withPiece(entry) {
+  const slot = entry[0];
+  const replaced = new Set([slot]);
+  if (slot === 'dress') replaced.add('top').add('bottom');
+  const pieces = mannequin.pieces.filter((p) => !replaced.has(p[0]));
+  if (slot === 'outer' || slot === 'waist' || slot === 'neck' || slot === 'accessory') pieces.forEach((p, i) => { if (p[0] === 'top') pieces[i] = ['top', pieceById.has('top-sweater-crew') ? 'top-sweater-crew' : 'top-sweater', ['craie']]; });
+  return { ...mannequin, pieces: [...pieces, entry] };
+}
+
+if (mode === 'pieces') {
+  // Toutes les pièces d'un ou plusieurs emplacements, portées par le mannequin, de face puis de trois quarts.
+  const slots = (params.get('slot') ?? 'top').split(',');
+  const list = catalogue.pieces.filter((p) => slots.includes(p.slot));
+  const looks = list.map((p) => withPiece([p.slot, p.id]));
+  const chars = await row(looks);
+  const head = slots.includes('head') || slots.includes('hair') || slots.includes('hat') || slots.includes('glasses') || slots.includes('facial_hair');
+  const w = W / list.length;
+  chars.forEach((c, i) => {
+    c.play(params.get('clip') ?? 'idle', 0.4);
+    if (head) {
+      view(c.holder.position, 0, { x: i * w, y: Hh / 2, w, h: Hh / 2 - 26 }, { distance: 1.7, lookY: 1.5, fov: 24 });
+      view(c.holder.position, 50, { x: i * w, y: 0, w, h: Hh / 2 }, { distance: 1.7, lookY: 1.5, fov: 24 });
+    } else {
+      view(c.holder.position, 0, { x: i * w, y: Hh / 2, w, h: Hh / 2 - 26 });
+      view(c.holder.position, 40, { x: i * w, y: 0, w, h: Hh / 2 });
+    }
+    label(list[i].name ?? list[i].id, i * w + 8, 4);
+    label(`${list[i].triangles} tri.`, i * w + 8, 22, 12);
+    window.banc.mesures[list[i].id] = list[i].triangles;
+  });
+} else if (mode === 'personnages') {
+  const looks = bench.personnages;
+  const list = await row(looks);
+  const clip = params.get('clip') ?? 'present';
+  list.forEach((c, i) => { c.play(clip, 0.5); window.banc.mesures[looks[i].nom] = measure(c); });
+  const w = W / list.length;
+  list.forEach((c, i) => {
+    view(c.holder.position, 0, { x: i * w, y: Hh / 2, w, h: Hh / 2 - 40 }, { distance: 5.0 });
+    view(c.holder.position, 38, { x: i * w, y: 0, w, h: Hh / 2 }, { distance: 5.0 });
+    const m = window.banc.mesures[looks[i].nom];
+    label(looks[i].nom, i * w + 6, 4);
+    label(`${m.triangles} tri., ${m.appels} appels`, i * w + 6, 22, 12);
+  });
+} else if (mode === 'expressions') {
+  const names = ['neutral', ...details.expressions.filter((e) => !['blink', 'talk'].includes(e))];
+  const fr = { neutral: 'neutre', joy: 'joie', surprise: 'surprise', thinking: 'réflexion', embarrassed: 'gêne', sad: 'peine', angry: 'colère', sleepy: 'sommeil' };
+  const sel = [[0, 'head-round', 'hair-bob', 'chatain'], [4, 'head-heart', 'hair-ponytail', 'noir'], [7, 'head-square', 'hair-short', 'noir']];
+  const looks = sel.map(([skin, h, hair, c]) => ({ ...mannequin, skin, pieces: [['head', h, [c, skin > 5 ? 'dent' : 'bouche']], ['hair', hair, [c]], ['top', 'top-tee', ['ardoise']], ['bottom', 'bottom-trousers'], ['shoes', 'shoes-pebble']] }));
+  const list = await row(looks);
+  const w = W / names.length, h = Hh / list.length;
+  list.forEach((c, r) => {
+    c.play('idle', 0.4);
+    names.forEach((name, i) => {
+      c.express(name);
+      view(c.holder.position, 8, { x: i * w, y: Hh - (r + 1) * h, w, h }, { distance: 1.25, lookY: 1.53, fov: 22 });
+      if (r === 0) label(fr[name], i * w + 8, 4);
+    });
+  });
+} else if (mode === 'distance') {
+  const looks = bench.personnages;
+  const list = await row(looks, 1.3);
+  list.forEach((c, i) => { c.play(i % 3 === 1 ? 'walk' : 'idle', 0.3 + i * 0.1); c.holder.rotation.y = ((i % 3) - 1) * 0.5; c.holder.position.z = (i % 2) * 1.2; });
+  const mid = new THREE.Vector3((list.length - 1) * 0.65, 0, 0.6);
+  Object.assign(key.shadow.camera, { left: -10, right: 10, top: 8, bottom: -4 });
+  key.shadow.camera.updateProjectionMatrix();
+  view(mid, 0, { x: 0, y: 0, w: W, h: Hh }, { distance: 22, elevation: 35, lookY: 0.8, fov: 30 });
+} else if (mode === 'silhouettes') {
+  // Vignettes de l'éditeur: pose de présentation contre pose en T (défaut f).
+  const looks = bench.personnages.slice(0, 6);
+  const list = await row(looks);
+  const w = W / list.length;
+  // Ligne du haut: pose de liaison (en T), ligne du bas: pose de présentation.
+  list.forEach((c, i) => view(c.holder.position, 25, { x: i * w, y: Hh / 2, w, h: Hh / 2 - 22 }, { distance: 5.6 }));
+  list.forEach((c, i) => { c.play('present', 0.5); view(c.holder.position, 25, { x: i * w, y: 0, w, h: Hh / 2 }, { distance: 5.6 }); });
+  label('pose en T (avant)', 8, 4);
+  label('pose de présentation « present » (après)', 8, Hh / 2 + 4);
+} else if (mode === 'detail') {
+  // Gros plan sur des pièces (défauts avant et après): ids séparés par des virgules, angle, cadrage.
+  const ids = (params.get('ids') ?? '').split(',').filter(Boolean);
+  const looks = ids.map((id) => {
+    const base = bench.personnages.find((p) => p.nom === id);
+    const look = base ?? withPiece([pieceById.get(id)?.slot ?? 'top', id]);
+    return params.get('skin') ? { ...look, skin: Number(params.get('skin')) } : look;
+  });
+  const list = await row(looks);
+  const w = W / list.length;
+  const az = Number(params.get('az') ?? 0), lookY = Number(params.get('y') ?? 1.2), dist = Number(params.get('d') ?? 2.6);
+  list.forEach((c, i) => {
+    c.play(params.get('clip') ?? 'idle', 0.4);
+    if (params.get('expr')) c.express(params.get('expr'));
+    view(c.holder.position, az, { x: i * w, y: 0, w, h: Hh - 24 }, { distance: dist, lookY, fov: 24 });
+    label(pieceById.get(ids[i])?.name ?? ids[i], i * w + 8, Hh - 22);
+  });
+}
+// Étiquettes: le canevas WebGL recopié dans un canevas 2D, textes par-dessus.
+const sheet = document.createElement('canvas');
+sheet.width = W;
+sheet.height = Hh;
+const ctx = sheet.getContext('2d');
+ctx.fillStyle = '#efe9dd';
+ctx.fillRect(0, 0, W, Hh);
+ctx.drawImage(renderer.domElement, 0, 0);
+ctx.fillStyle = '#2b2523';
+ctx.textBaseline = 'top';
+for (const l of labels) { ctx.font = `bold ${l.size}px sans-serif`; ctx.fillText(l.text, l.x, l.y); }
+window.banc.image = sheet.toDataURL('image/png');
+window.banc.pret = true;
+</script>
+</body>
+</html>

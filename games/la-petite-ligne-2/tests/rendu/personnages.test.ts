@@ -74,7 +74,7 @@ describe('apparences', () => {
 });
 
 describe('assemblage', () => {
-  it('lit les sections du corps dans le sens du générateur (V retourné par glTF)', () => {
+  it('lit les sections du corps directement dans V (le générateur compense le retournement glTF)', () => {
     const body = content.catalogue.pieces.find((p) => p.slot === 'body');
     const mesh = body === undefined ? null : library.node(body.file, body.node);
     if (mesh === null) throw new Error('corps');
