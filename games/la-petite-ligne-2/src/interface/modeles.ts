@@ -11,7 +11,7 @@ import type { Aim } from '../simulation/briques/types';
 import { stackLimit } from '../simulation/sac/inventaire';
 import { toolWearRatio } from '../simulation/sac/outils';
 import { formatEuros } from '../simulation/sac/argent';
-import { boardingChoices, boardRefusal, onPlatform } from '../simulation/voyage/index';
+import { onPlatform } from '../simulation/voyage/index';
 import { UI_TUNING, type UiTuning } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
 
@@ -168,8 +168,9 @@ export type PromptModel =
   | { readonly kind: 'board'; readonly key: string; readonly verb: string; readonly refusal: string | null; readonly waiting: string | null };
 
 /**
- * Ce que dit la bulle: la cible de la touche d'action, sinon l'invite du quai. `actKey` et
- * `boardKey`: libellés des touches selon le clavier réel.
+ * Ce que dit la bulle: la cible de la touche d'action, sinon, à bord, l'invite pour redescendre
+ * (et qui l'on attend). `keys`: libellés des touches selon le clavier réel; on monte et descend
+ * par la touche d'action sur le poteau du quai.
  */
 export function promptModel(
   content: Content,
@@ -202,29 +203,8 @@ export function promptModel(
       refusal: null,
       waiting: travel.boarded[other] ? null : fill(TEXTS.prompt.waitOther, { nom: otherName }),
     };
-  const choices = boardingChoices(look, local);
-  const first = choices[0];
-  if (first !== undefined) {
-    const place = content.places[first]?.def.name ?? first;
-    return {
-      kind: 'board',
-      key: keys.board,
-      verb: fill(TEXTS.prompt.boardTo, { lieu: place }),
-      refusal: null,
-      waiting: null,
-    };
-  }
-  // Sur le quai sans train possible: la raison du premier lieu desservi.
-  const link = content.places[world.common.place]?.def.links[0];
-  if (link === undefined) return null;
-  const reason = boardRefusal(look, local, link);
-  return {
-    kind: 'board',
-    key: keys.board,
-    verb: TEXTS.prompt.board,
-    refusal: reason === null ? null : refusalText(reason),
-    waiting: null,
-  };
+  // Pas encore à bord: c'est le poteau du quai (brique `travel`) qui porte l'invite, en le visant.
+  return null;
 }
 
 // ---------- Dialogue ----------

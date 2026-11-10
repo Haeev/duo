@@ -4,8 +4,13 @@ import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { CAPTURES, startDuo, type Duo, type ProbeWorld } from '../aides-e2e/duo';
 
-const QUAI = { x: 20, y: 4 };
-const NORTH = -Math.PI / 2;
+/** Poteau de quai de chaque lieu d'essai (brique `travel`): on monte en le visant, touche d'action. */
+const POTEAU: Readonly<Record<string, { x: number; y: number }>> = {
+  'essai-gare': { x: 17.5, y: 4.5 },
+  'essai-halte': { x: 18.5, y: 4.5 },
+};
+const EAST = 0;
+const WEST = Math.PI;
 
 /** Ce qui doit survivre au voyage (CA-02), par joueur. */
 function kept(w: ProbeWorld): string {
@@ -18,18 +23,18 @@ function kept(w: ProbeWorld): string {
 async function travel(duo: Duo, from: string, to: string, label: string): Promise<number> {
   const { host, guest } = duo;
   const [hi, gi] = [await host.local(), await guest.local()];
-  const quai = from === 'essai-gare' ? QUAI : { x: 16, y: 4 };
-  await duo.teleport(hi, quai.x - 0.8, quai.y + 0.5, NORTH);
-  await duo.teleport(gi, quai.x + 0.8, quai.y + 0.5, NORTH);
+  const poteau = POTEAU[from] ?? { x: 17.5, y: 4.5 };
+  await duo.teleport(hi, poteau.x - 0.9, poteau.y, EAST);
+  await duo.teleport(gi, poteau.x + 0.9, poteau.y, WEST);
   await host.page.waitForTimeout(800);
   // CA-01: un seul joueur monte, le train ne part pas.
-  await host.press('Enter');
+  await host.press('Space');
   await host.page.waitForTimeout(3000);
   const alone = await host.world();
   expect(alone?.common.place, `${label}: un seul joueur monté, on reste`).toBe(from);
   expect(alone?.common.phase, `${label}: pas de voyage à un seul`).not.toBe('travel');
   await host.shot(`${label}-1-un-seul-monte`);
-  await guest.press('Enter');
+  await guest.press('Space');
   const start = Date.now();
   await duo.until(host, `${label}: départ`, (w) => w.common.phase === 'travel', 15_000);
   await host.page.waitForTimeout(500);

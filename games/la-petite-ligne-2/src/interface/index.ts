@@ -462,7 +462,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         ? null
         : promptModel(view.content, world, me, view.aim(me), {
             act: keyLabel('Space'),
-            board: keyLabel('Enter'),
+            board: keyLabel('Space'),
           });
       hud.frame({
         now,

@@ -113,8 +113,9 @@ export function aimOf(
   const { phase, travel } = world.common;
   if (phase !== 'day' && phase !== 'boarding') return null;
   const actor = world.players[player];
-  if (actor.gesture !== null || actor.talk !== null || travel?.boarded[player] === true)
-    return null;
+  if (actor.gesture !== null || actor.talk !== null) return null;
+  // À bord, seul ce qui fait voyager reste une cible: le poteau du quai, pour redescendre.
+  const boarded = travel?.boarded[player] === true;
   const placeContent = content.places[world.common.place];
   const place = world.places[world.common.place];
   const blockers = currentBlockers(content, world);
@@ -158,6 +159,7 @@ export function aimOf(
       const chosen = chooseBrick(look, player, place, prop, def, registry);
       if (chosen === null) return null;
       const { brick, behaviour, refusal, tool } = chosen;
+      if (boarded && brick.brick !== 'travel') return null;
       const verb =
         behaviour.verbOf?.(look, player, brickView(place, prop, brick)) ??
         ('verb' in brick ? brick.verb : behaviour.verb);
@@ -167,6 +169,7 @@ export function aimOf(
   for (const object of placeContent.map.objects) considerProp(object);
   for (const placed of place.placed) considerProp(placed);
 
+  if (boarded) return best;
   const { pickup, talk } = ENTITY_BEHAVIOURS;
   for (const item of place.ground) {
     const id = groundAimId(item.id);
