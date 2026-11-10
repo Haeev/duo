@@ -72,6 +72,11 @@ export interface InkFrame {
     readonly lamps: string;
     readonly outside: string;
   } | null;
+  /**
+   * Fond uni imposé (`#rrggbb`): la pièce où est le joueur est un monde clos, rien autour.
+   * Absent ou `null`: le fond de l'ambiance.
+   */
+  readonly backdrop?: string | null;
   /** Point de sol visé (m, repère Three.js) et rayon du cercle vu. */
   readonly focusX: number;
   readonly focusZ: number;
@@ -333,6 +338,8 @@ export class InkKit {
       ambiance.lamps = Math.max(ambiance.lamps, s.placeLamps.minimum);
       ambiance.background = hex(frame.place.outside);
     }
+    if (frame.backdrop !== undefined && frame.backdrop !== null)
+      ambiance.background = hex(frame.backdrop);
     this.current = ambiance;
     const lights = frame.lights ?? NO_LIGHTS;
     nearest(lights.lamps, frame.focusX, frame.focusZ, MAX_LAMPS, s.lights.reach, this.lamps);

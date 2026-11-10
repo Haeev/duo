@@ -2,6 +2,7 @@
 // données seulement fonctionnent sans toucher au moteur.
 import { describe, expect, it } from 'vitest';
 import { loadContent } from '../src/donnees/charger';
+import { sillObjectId } from '../src/donnees/seuils';
 import { aimOf } from '../src/simulation/briques/visee';
 import { findRoute } from '../src/simulation/habitants/chemins';
 import { isShopOpen } from '../src/simulation/habitants/lecture';
@@ -156,6 +157,20 @@ describe('portes et intérieur d’essai', () => {
     expect(sim.world.players[0].body.y).toBeGreaterThan(30);
   });
 
+  it('la direction tenue en entrant ne fait pas ressortir: il faut la relâcher', () => {
+    const sim = trial();
+    put(sim, 0, 26.5, 26.5, SOUTH);
+    // Vers le sud sans relâcher: la porte de la salle est justement au sud du point d'arrivée.
+    const held = run(sim, 2.5, { moveY: 1 });
+    expect(held.filter((e) => e.type === 'door_passed')).toHaveLength(1);
+    expect(playerInterior(sim, 0)).toBe('salle-d-essai');
+    // Relâchée puis reprise: on ressort.
+    run(sim, 0.2);
+    expect(walkSouthToDoor(sim).find((e) => e.type === 'door_passed')).toMatchObject({
+      interior: null,
+    });
+  });
+
   it('à la touche d’action, fermée à clé par une condition', () => {
     const sim = trial();
     put(sim, 0, 34.5, 29.9, NORTH);
@@ -182,7 +197,7 @@ describe('portes et intérieur d’essai', () => {
     const events = run(sim, 2, { moveY: 1 });
     const refusals = events.filter((e) => e.type === 'refused');
     expect(refusals).toEqual([
-      { type: 'refused', player: 0, reason: 'shop-closed', target: 'porte-buvette' },
+      { type: 'refused', player: 0, reason: 'shop-closed', target: sillObjectId('porte-buvette') },
     ]);
     expect(playerInterior(sim, 0)).toBeNull();
   });

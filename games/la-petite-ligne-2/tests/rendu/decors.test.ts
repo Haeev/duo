@@ -42,6 +42,7 @@ const PROPS_WITHOUT_MODEL = [
   'meule',
   'miroir',
   'plan-de-travail',
+  'porte',
   'pot-de-fleurs-essai',
   'poulailler',
   'poulailler-d-essai',

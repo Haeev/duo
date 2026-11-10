@@ -223,13 +223,31 @@ export function sceneWalkSpeed(remaining: number, elapsed: number): number {
   return Math.min(hurrySpeed, Math.max(STORY.villagerWalkSpeed, remaining / timeLeft));
 }
 
+/**
+ * Pas du dernier déplacement de chaque marche de scène. Au pas où la scène démarre, ses temps sont
+ * lus deux fois (au lancement, puis par le système des scènes): l'habitant n'avance qu'une fois,
+ * sinon sa première foulée serait double.
+ */
+const walkedAt = new WeakMap<SceneRun, number>();
+
 /** Avance l'habitant d'un pas vers le point (placé par `stageSpot`); `true`: arrivé. */
 function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: number): boolean {
   const villager = sim.world.places[run.place]?.villagers[who];
   const target = sim.content.places[run.place]?.map.points[to];
   if (villager === undefined || target === undefined) return true;
+  if (walkedAt.get(run) === sim.world.tick) return false;
+  walkedAt.set(run, sim.world.tick);
   const point = stageSpot(sim, run, target);
   const body = villager.body;
+  // Il quitte ce qu'il faisait (balayer, être assis): le rendu le fait marcher, pas glisser dans
+  // la pose de son activité. Le planning lui rend son poste et son geste après la scène.
+  const life = villager.life;
+  if (life !== undefined && (life.gesture !== null || life.seat !== null || life.pose !== 'walk')) {
+    life.gesture = null;
+    life.seat = null;
+    life.pose = 'walk';
+    sim.touch('place');
+  }
   const [a, b] = sim.world.players.map((p) => p.body);
   const via = a === undefined || b === undefined ? null : detourAround(a, b, body, point);
   const next = via ?? point;
@@ -243,6 +261,10 @@ function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: 
     body.y = point.y;
     body.speed = 0;
     if (point.facing !== null) body.facing = point.facing;
+    if (life !== undefined) {
+      life.pose = 'stand';
+      sim.touch('place');
+    }
     return true;
   }
   if (left > 1e-6) {

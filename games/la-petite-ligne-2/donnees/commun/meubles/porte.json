@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "porte",
+  "name": "Porte",
+  "model": "porte",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "passage"
+    }
+  ]
+}

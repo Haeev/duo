@@ -15,6 +15,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RENDER_SETTINGS } from '../reglages';
 import type { SceneVolume } from './description';
+import { TILE_SETTINGS } from './reglages-tuiles';
 
 type StandInSettings = typeof RENDER_SETTINGS.standIn;
 
@@ -37,6 +38,78 @@ function box(w: number, h: number, d: number, y: number, z: number, color: Color
   return paint(new BoxGeometry(w, h, d).translate(0, y + h / 2, z), color);
 }
 
+function boxAt(
+  w: number,
+  h: number,
+  d: number,
+  x: number,
+  y: number,
+  z: number,
+  color: string,
+): BufferGeometry {
+  return paint(new BoxGeometry(w, h, d).translate(x, y + h / 2, z), new Color(color));
+}
+
+type DoorLook = typeof TILE_SETTINGS.interior;
+
+/**
+ * Porte d'une pièce: deux montants, un linteau, une barre de seuil, et le vantail fermé avec ses
+ * deux panneaux et sa poignée du côté de la pièce (+Z). `w`: largeur hors tout, `h`: profondeur
+ * de l'encadrement, à cheval sur le mur.
+ */
+function doorParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
+  const { w, h: depth, height } = volume;
+  const d = look.door;
+  const jamb = look.doorJamb;
+  const head = jamb;
+  const clear = w - jamb * 2;
+  const leafZ = depth / 2 - d.leafDepth / 2 - 0.02;
+  const face = leafZ + d.leafDepth / 2;
+  return [
+    boxAt(jamb, height, depth, -(w - jamb) / 2, 0, 0, d.frameColor),
+    boxAt(jamb, height, depth, (w - jamb) / 2, 0, 0, d.frameColor),
+    boxAt(w, head, depth, 0, height - head, 0, d.frameColor),
+    boxAt(clear, 0.04, depth, 0, 0, 0, d.frameColor),
+    boxAt(clear, height - head - 0.04, d.leafDepth, 0, 0.04, leafZ, d.leafColor),
+    boxAt(clear * 0.64, height * 0.3, 0.02, 0, height * 0.14, face + 0.01, d.panelColor),
+    boxAt(clear * 0.64, height * 0.34, 0.02, 0, height * 0.52, face + 0.01, d.panelColor),
+    boxAt(0.07, 0.07, 0.06, clear / 2 - 0.13, height * 0.47, face + 0.03, d.knobColor),
+  ];
+}
+
+/** Paillasson: une natte bordée, à plat devant la porte. */
+function matParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
+  const { w, h: depth, height } = volume;
+  const m = look.mat;
+  const edge = Math.min(0.07, w / 6, depth / 6);
+  return [
+    boxAt(w, height, depth, 0, 0, 0, m.edgeColor),
+    boxAt(w - edge * 2, height + 0.008, depth - edge * 2, 0, 0, 0, m.color),
+  ];
+}
+
+/** Porte au sol: un cadre bas autour d'un puits sombre, et trois marches qui y descendent. */
+function hatchParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
+  const { w: size, height } = volume;
+  const t = look.hatch;
+  const half = size / 2 - t.curb / 2;
+  const inner = size - t.curb * 2;
+  const parts = [
+    boxAt(size, height, t.curb, 0, 0, -half, t.curbColor),
+    boxAt(t.curb, height, inner, -half, 0, 0, t.curbColor),
+    boxAt(t.curb, height, inner, half, 0, 0, t.curbColor),
+    boxAt(inner, 0.02, inner, 0, 0, 0, t.wellColor),
+  ];
+  // Les marches partent du côté d'où l'on arrive (+Z) et s'enfoncent vers le fond.
+  const tread = inner / 3;
+  [0.1, 0.065, 0.03].forEach((top, i) => {
+    parts.push(
+      boxAt(inner, top, tread - 0.02, 0, 0, inner / 2 - tread * (i + 0.5), look.door.leafColor),
+    );
+  });
+  return parts;
+}
+
 /**
  * Géométrie d'une forme provisoire, dans le repère local du volume: origine au centre de l'emprise,
  * au niveau du bas du volume, façade vers +Z (le sud à la rotation 0). L'appelant la libère.
@@ -44,6 +117,7 @@ function box(w: number, h: number, d: number, y: number, z: number, color: Color
 export function standInGeometry(
   volume: SceneVolume,
   settings: StandInSettings = RENDER_SETTINGS.standIn,
+  doors: DoorLook = TILE_SETTINGS.interior,
 ): BufferGeometry {
   const body =
     volume.color !== undefined
@@ -55,6 +129,15 @@ export function standInGeometry(
         );
   const parts: BufferGeometry[] = [];
   switch (volume.shape) {
+    case 'door':
+      parts.push(...doorParts(volume, doors));
+      break;
+    case 'mat':
+      parts.push(...matParts(volume, doors));
+      break;
+    case 'hatch':
+      parts.push(...hatchParts(volume, doors));
+      break;
     case 'slab': {
       parts.push(
         box(

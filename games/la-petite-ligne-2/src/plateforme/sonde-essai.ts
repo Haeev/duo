@@ -31,6 +31,8 @@ export interface TestProbe {
   setMinutes(minutes: number): boolean;
   /** Hôte seulement: fixe la bourse d'un joueur (centimes). */
   setMoney(player: number, cents: number): boolean;
+  /** Cadre la vue de cette machine: lacet (degrés) et largeur (m). Faux sans rendu. */
+  setCamera(yawDeg: number, width: number): boolean;
 }
 
 export interface ProbeOptions {
@@ -87,6 +89,11 @@ export function installTestProbe(options: ProbeOptions): TestProbe {
       if (target === null || s === null) return false;
       target.money = cents;
       s.revisions.players += 1;
+      return true;
+    },
+    setCamera(yawDeg, width) {
+      if (renderer === null) return false;
+      renderer.setCamera(yawDeg, width);
       return true;
     },
   };

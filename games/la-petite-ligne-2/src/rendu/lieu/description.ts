@@ -8,12 +8,17 @@ import type { Content, PlaceContent } from '../../donnees/charger';
 import type { DeepReadonly } from '../../etat/monde';
 import type { PlaceState } from '../../etat/lieu';
 import type { FloorDef } from '../../donnees/schemas/lieu';
+import { DOORS, doorSills, type Sill } from '../../donnees/seuils';
 import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { DECOR_MANIFEST } from './decors-manifeste';
+import { TILE_SETTINGS } from './reglages-tuiles';
 
-/** Forme simple d'un volume sans modèle. */
-export type StandInShape = 'box' | 'ball' | 'post' | 'slab';
+/**
+ * Forme simple d'un volume sans modèle. Les trois dernières sont celles d'une porte (`formes.ts`):
+ * `door` encadrement et vantail, `mat` paillasson, `hatch` porte au sol (escalier, trappe).
+ */
+export type StandInShape = 'box' | 'ball' | 'post' | 'slab' | 'door' | 'mat' | 'hatch';
 
 export interface SceneVolume {
   /** Identifiant d'instance: celui de la carte, d'un meuble posé (`pose-<n>`), ou fabriqué. */
@@ -75,6 +80,70 @@ export function boxOf(volume: SceneVolume): OccluderBox {
   };
 }
 
+type DoorLook = typeof TILE_SETTINGS.interior;
+
+/**
+ * Volumes de l'objet visible d'une porte, posés sur son seuil (`donnees/seuils.ts`) et tournés
+ * vers la pièce où l'on arrive. Dans une pièce: l'encadrement et son vantail (la cible), plus un
+ * paillasson qui marque le seuil au sol même quand la porte s'efface devant la caméra. Dehors: le
+ * paillasson seul (le bâtiment porte déjà sa porte). Au sol: le cadre de l'escalier.
+ */
+export function doorVolumes(
+  id: string,
+  sill: Sill,
+  indoor: boolean,
+  look: DoorLook = TILE_SETTINGS.interior,
+): SceneVolume[] {
+  const rotation = sill.ny > 0.5 ? 0 : sill.nx > 0.5 ? 1 : sill.ny < -0.5 ? 2 : 3;
+  const plain = { model: null, rotation, base: 0 } as const;
+  if (sill.kind === 'floor')
+    return [
+      {
+        ...plain,
+        id,
+        x: sill.x,
+        y: sill.y,
+        w: look.hatch.size,
+        h: look.hatch.size,
+        height: look.hatch.height,
+        shape: 'hatch',
+        occludes: false,
+        aimable: true,
+      },
+    ];
+  const width = sill.halfWidth * 2;
+  const out = look.mat.gap + look.mat.depth / 2;
+  const mat: SceneVolume = {
+    ...plain,
+    id: indoor ? `${id}-tapis` : id,
+    x: sill.x + sill.nx * out,
+    y: sill.y + sill.ny * out,
+    w: width * 0.9,
+    h: look.mat.depth,
+    height: look.mat.height,
+    shape: 'mat',
+    occludes: false,
+    aimable: !indoor,
+  };
+  if (!indoor) return [mat];
+  const back = look.door.depth / 2;
+  return [
+    {
+      ...plain,
+      id,
+      x: sill.x - sill.nx * back,
+      y: sill.y - sill.ny * back,
+      w: width + look.doorJamb * 2,
+      h: look.door.depth,
+      height: look.door.height,
+      shape: 'door',
+      occludes: true,
+      aimable: true,
+    },
+    mat,
+  ];
+}
+
 /**
  * Volumes fixes d'un lieu: ses zones bloquées et les meubles de sa carte. `extras`: volumes
  * ajoutés par l'appelant (page de démonstration, futur format des murs et des toits).
@@ -84,9 +153,22 @@ export function describePlace(
   place: PlaceContent,
   extras: readonly SceneVolume[] = [],
   settings: StandInSettings = RENDER_SETTINGS.standIn,
+  /** Faux pour un grand lieu: haies, berges et murs montrent déjà ses zones pleines. */
+  slabs = true,
 ): PlaceDescription {
   const volumes: SceneVolume[] = [];
-  place.map.blocked.forEach((rect, index) => {
+  // Objets visibles des portes: dessinés sur leur seuil, en porte, tant qu'aucun modèle n'est livré.
+  const sills = doorSills(place.map, DOORS.width);
+  const doorOf = new Map<string, Sill>();
+  for (const [id, door] of Object.entries(place.map.doors ?? {})) {
+    const sill = sills[id];
+    if (door.object !== undefined && sill !== undefined) doorOf.set(door.object, sill);
+  }
+  const inRoom = (x: number, y: number): boolean =>
+    place.interiors.some(
+      (r) => x >= r.at.x && y >= r.at.y && x < r.at.x + r.width && y < r.at.y + r.height,
+    );
+  (slabs ? place.map.blocked : []).forEach((rect, index) => {
     volumes.push({
       id: `zone-${String(index)}`,
       model: null,
@@ -106,6 +188,12 @@ export function describePlace(
     const prop = content.props[object.type];
     // Les données sont contrôlées au chargement: un type inconnu n'arrive pas jusqu'ici.
     if (prop === undefined) continue;
+    const sill = doorOf.get(object.id);
+    if (sill !== undefined && DECOR_MANIFEST.models[prop.model] === undefined) {
+      const indoor = inRoom(sill.x + sill.nx * 0.3, sill.y + sill.ny * 0.3);
+      volumes.push(...doorVolumes(object.id, sill, indoor));
+      continue;
+    }
     volumes.push({
       id: object.id,
       model: prop.model,

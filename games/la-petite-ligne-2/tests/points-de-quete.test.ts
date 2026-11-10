@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadContent } from '../src/donnees/charger';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
-import { interiorAt } from '../src/simulation/lieux/portes';
+import { interiorAt, sillsOf } from '../src/simulation/lieux/portes';
 import { SIM_DT } from '../src/simulation/noyau/constantes';
 import { idleInput, type StepInput } from '../src/simulation/noyau/entrees';
 import { isBlockedCell } from '../src/simulation/noyau/grille';
@@ -295,9 +295,15 @@ describe('Aubrune: les deux signalements, joués à pied', () => {
     const body = sim.world.players[0].body;
     Object.assign(body, { x: Math.floor(d.x) + 1.5, y: Math.floor(d.y) + 0.5 });
     for (const [id, room] of legs) {
-      const at = place.map.doors?.[id];
-      if (at === undefined) throw new Error(`porte ${id} absente`);
+      const sill = sillsOf(place)[id];
+      if (sill === undefined) throw new Error(`porte ${id} absente`);
+      // On franchit le seuil en poussant vers la porte: le but est juste derrière lui, dans le mur.
+      const at =
+        sill.kind === 'floor' ? sill : { x: sill.x - sill.nx * 0.3, y: sill.y - sill.ny * 0.3 };
       const inside = (): boolean => interiorAt(place, body.x, body.y) === room;
+      // D'abord devant la porte, de son côté (une porte de cloison ne se passe que de face).
+      if (sill.kind === 'wall')
+        walkTo(sim, 0, { x: sill.x + sill.nx * 0.5, y: sill.y + sill.ny * 0.5 }, 15, inside);
       walkTo(sim, 0, at, 15, inside);
       expect(interiorAt(place, body.x, body.y), `après ${id}`).toBe(room);
     }

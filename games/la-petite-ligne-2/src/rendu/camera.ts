@@ -35,7 +35,11 @@ export interface CameraTarget {
   readonly facing: number;
 }
 
+/** Rectangle où la vue reste: la carte, le dehors d'un lieu, ou la pièce où est le joueur. */
 export interface MapBounds {
+  /** Coin nord-ouest (m); absent: l'origine de la carte. */
+  readonly x?: number;
+  readonly y?: number;
   readonly width: number;
   readonly height: number;
 }
@@ -168,17 +172,19 @@ export class CameraRig {
   private goal(target: CameraTarget, bounds: MapBounds): { x: number; y: number } {
     const s = this.settings;
     const ahead = Math.min(s.lookAheadMax, target.speed * s.lookAheadSeconds);
+    const x0 = bounds.x ?? 0;
+    const y0 = bounds.y ?? 0;
     return {
       x: softClamp(
         target.x + Math.cos(target.facing) * ahead,
-        s.edgeMargin,
-        bounds.width - s.edgeMargin,
+        x0 + s.edgeMargin,
+        x0 + bounds.width - s.edgeMargin,
         s.edgeSoftness,
       ),
       y: softClamp(
         target.y + Math.sin(target.facing) * ahead,
-        s.edgeMargin,
-        bounds.height - s.edgeMargin,
+        y0 + s.edgeMargin,
+        y0 + bounds.height - s.edgeMargin,
         s.edgeSoftness,
       ),
     };

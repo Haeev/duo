@@ -320,7 +320,7 @@ describe('pièces et rails', () => {
   it('murs coupés tout autour, un vide à la porte', () => {
     const room = { id: 'piece', at: { x: 10, y: 20 }, width: 6, height: 4 };
     const closed = interiorWalls(room, []);
-    const open = interiorWalls(room, [{ x: 13, y: 23.5 }]);
+    const open = interiorWalls(room, [{ kind: 'wall', x: 13, y: 24, halfWidth: 0.5 }]);
     // Deux boîtes par mur plein (soubassement et mur); la porte coupe le mur sud en deux.
     expect(closed).toHaveLength(8);
     expect(open).toHaveLength(10);
