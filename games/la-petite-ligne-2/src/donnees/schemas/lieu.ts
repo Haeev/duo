@@ -62,5 +62,15 @@ export const MapSchema = v.strictObject({
   blocked: v.array(RectSchema),
   points: v.record(IdSchema, PointSchema),
   objects: v.array(MapObjectSchema),
+  /**
+   * Graphe des chemins tiré du plan du lieu (`noeuds` et `aretes` de `plan.json`): les habitants
+   * marchent dessus. Absent: ils cherchent leur chemin sur la grille.
+   */
+  paths: v.exactOptional(
+    v.strictObject({
+      nodes: v.record(IdSchema, PointSchema),
+      edges: v.array(v.strictObject({ a: IdSchema, b: IdSchema })),
+    }),
+  ),
 });
 export type MapDef = v.InferOutput<typeof MapSchema>;

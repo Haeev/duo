@@ -2,6 +2,7 @@
 import * as v from 'valibot';
 import { FileVersionSchema, IdSchema, LabelSchema } from './communs';
 import { LookSchema } from './personnage';
+import { VillagerLifeSchema } from './vie-habitant';
 
 export const VillagerSchema = v.strictObject({
   schema: FileVersionSchema,
@@ -15,5 +16,7 @@ export const VillagerSchema = v.strictObject({
   stands: IdSchema,
   /** Babil: identifiant du timbre de voix. */
   voice: IdSchema,
+  /** Sa vie au fil des heures (`vie-habitant.ts`); absent: il reste à `stands`. */
+  life: v.exactOptional(VillagerLifeSchema),
 });
 export type VillagerDef = v.InferOutput<typeof VillagerSchema>;

@@ -24,7 +24,7 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Objet | `pnpm nouveau objet poire` | famille, pile, `food` s'il se mange. Il est connu du sac, des commerces et des effets. |
 | Meuble | `pnpm nouveau meuble chaise` | taille, briques. Pour le voir: une ligne dans `objects` de la carte d'un lieu, ou `placeable: true` pour le mode déco. Modèle: nœud `model` à livrer par l'artiste; en attendant, une forme simple. |
 | Pièce de personnage | générateur du lot L5 (écrit `catalogue.json` et le GLB) | `pnpm nouveau piece-de-personnage <id>` ajoute une entrée d'essai à la main. |
-| Habitant | `pnpm nouveau habitant facteur aubrune` | nom, caractère, point de la carte où il se tient, apparence. |
+| Habitant | `pnpm nouveau habitant facteur aubrune` | nom, caractère, apparence, et sa vie (`life`): chez lui, planning sans trou sur des points, sièges ou meubles de la carte, bonjour, réactions, goûts, arrivée par le train (`src/simulation/habitants/README.md`). |
 | Dialogue | `pnpm nouveau dialogue bonjour-facteur aubrune` | `villager`, conditions, nœuds. 150 caractères par réplique, 3 options au plus, toujours une fin. |
 | Recette | `pnpm nouveau recette compote` | poste, ingrédients, résultat (des objets existants). |
 | Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |

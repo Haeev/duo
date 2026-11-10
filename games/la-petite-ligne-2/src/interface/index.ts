@@ -159,6 +159,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'train_arrived':
       case 'train_departed':
       case 'unstuck':
+      case 'villager_arrived':
+      case 'villager_door':
+      case 'villager_gift':
+      case 'villager_greeted':
+      case 'villager_left':
+      case 'villager_reacted':
         break;
     }
   }
