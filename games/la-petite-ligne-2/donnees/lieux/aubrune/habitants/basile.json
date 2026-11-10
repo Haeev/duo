@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "basile",
+  "name": "Basile Cornu",
+  "temper": "shy",
+  "look": {
+    "shape": "elder-medium",
+    "skin": 4,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [7, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [0]
+      },
+      {
+        "slot": "top",
+        "id": "top-tee",
+        "colors": [11]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [9]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [10]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [3, 1]
+      }
+    ]
+  },
+  "stands": "cf0",
+  "voice": "grumpy",
+  "life": {
+    "home": "cf0",
+    "schedule": [
+      {
+        "from": 480,
+        "to": 1140,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.acte1.toit",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "hd"
+        },
+        "activity": "poser-le-toit",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 1200,
+        "at": {
+          "point": "cf0"
+        },
+        "activity": "raboter",
+        "gesture": "raboter"
+      },
+      {
+        "from": 1200,
+        "to": 1260,
+        "at": {
+          "point": "cf0"
+        },
+        "activity": "fumer-la-pipe",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "cf0"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["planche"],
+      "liked": ["buche", "pain"],
+      "disliked": ["coquelicot"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

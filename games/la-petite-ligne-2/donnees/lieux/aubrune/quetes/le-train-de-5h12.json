@@ -1,0 +1,598 @@
+{
+  "schema": 1,
+  "id": "le-train-de-5h12",
+  "kind": "main",
+  "title": "Le train de 5 h 12",
+  "giver": "firmin",
+  "requires": [],
+  "chapters": [
+    {
+      "id": "logement-fourni",
+      "title": "Logement fourni",
+      "steps": [
+        {
+          "id": "quai",
+          "objective": "Réveille-toi sur le quai: quelqu'un arrive en courant.",
+          "target": {
+            "point": "quai"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "firmin-en-pantoufles"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "play_scene",
+              "scene": "firmin-en-pantoufles"
+            }
+          ],
+          "onDone": []
+        },
+        {
+          "id": "lettre",
+          "objective": "Montre ta lettre d'embauche à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-lettre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.lettre",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.lettre",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "maison",
+          "objective": "Va voir le « logement fourni », la maison du garde-barrière.",
+          "target": {
+            "point": "hd"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "hd",
+              "who": "one",
+              "radius": 6
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.maison",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-maison-en-ruine"
+            }
+          ]
+        },
+        {
+          "id": "pension",
+          "objective": "Odette vous loge ce soir: passe à l'épicerie-pension.",
+          "target": {
+            "villager": "odette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-pension",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.pension",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.pension",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "pompe",
+          "objective": "Débarbouille-toi à la pompe de la place.",
+          "target": {
+            "point": "pl"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "hygiene",
+              "value": 59
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.pompe",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "souper",
+          "objective": "Va souper chez Odette, sous la tonnelle.",
+          "target": {
+            "villager": "odette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-souper",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.souper",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.souper",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "nuit-pension",
+          "objective": "Dors à la pension: deux lits sont faits, à côté de l'épicerie.",
+          "target": {
+            "point": "pl-o"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "sleep",
+              "value": 95
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.nuit-pension",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "outils",
+          "objective": "Basile prête des outils: passe à son atelier, de l'autre côté de la voie.",
+          "target": {
+            "villager": "basile"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "basile-outils",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.outils",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.outils",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "debroussailler",
+          "objective": "Arrache les ronces devant la maison.",
+          "target": {
+            "point": "hd"
+          },
+          "after": ["outils"],
+          "done": [
+            {
+              "type": "item_in_bag",
+              "item": "mures",
+              "count": 2
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.debroussailler",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "abattre",
+          "objective": "Besace au dos, abats les deux chênes de la lisière et porte six bûches à Basile.",
+          "target": {
+            "point": "lis"
+          },
+          "after": ["besaces"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 6,
+              "villager": "basile"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.abattre",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.abattre",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "planche",
+              "count": 8
+            }
+          ]
+        },
+        {
+          "id": "besaces",
+          "objective": "Solange a quelque chose pour vous, à la mercerie.",
+          "target": {
+            "villager": "solange"
+          },
+          "after": ["outils"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "solange-besaces",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.besaces",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.besaces",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "toit",
+          "objective": "Rejoins Basile à la maison avec les huit planches: le toit, à deux.",
+          "target": {
+            "villager": "basile"
+          },
+          "after": ["abattre", "debroussailler"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "planche",
+              "count": 8,
+              "villager": "basile"
+            }
+          ],
+          "together": true,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.toit",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.toit",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "le-toit"
+            }
+          ]
+        },
+        {
+          "id": "graines",
+          "objective": "Demande des graines à Odette pour le potager.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": ["debroussailler"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-graines",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.graines",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.graines",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "potager",
+          "objective": "Bêche le premier carré du potager, derrière la maison, et sème les radis.",
+          "target": {
+            "point": "jd"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "jd",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.potager",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.potager",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "poules",
+          "objective": "Odette a deux poules de trop. Va les chercher.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": ["potager"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-poules",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.poules",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.poules",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "vente-odette",
+          "objective": "Vends trois œufs à Odette.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": ["poules"],
+          "done": [
+            {
+              "type": "remembered",
+              "key": "aubrune.acte1.vendu-odette",
+              "equals": true
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.vente-odette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.vente-odette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "vente-achille",
+          "objective": "Va voir si Achille paie vraiment « n'importe quoi ».",
+          "target": {
+            "villager": "achille"
+          },
+          "after": ["vente-odette"],
+          "done": [
+            {
+              "type": "remembered",
+              "key": "aubrune.acte1.vendu-achille",
+              "equals": true
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.vente-achille",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.vente-achille",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "premiere-nuit",
+          "objective": "Première nuit dans la maison: couchez-vous dans la pièce au toit neuf.",
+          "target": {
+            "point": "hd"
+          },
+          "after": ["toit", "besaces", "vente-achille"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-sonnerie-de-5h12"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.premiere-nuit",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.premiere-nuit",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "reponse",
+          "objective": "Raconte la nuit à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-matin",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.reponse",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.reponse",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

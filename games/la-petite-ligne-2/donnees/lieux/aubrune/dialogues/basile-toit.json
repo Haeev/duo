@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "basile-toit",
+  "villager": "basile",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.toit",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Planches ? Huit. Ensemble.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

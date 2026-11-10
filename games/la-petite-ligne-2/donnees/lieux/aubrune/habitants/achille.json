@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "id": "achille",
+  "name": "Achille Pradel",
+  "temper": "dreamy",
+  "look": {
+    "shape": "adult-m-slim",
+    "skin": 0,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [1, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [3]
+      },
+      {
+        "slot": "top",
+        "id": "top-tee",
+        "colors": [0]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [2]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [0, 0]
+      }
+    ]
+  },
+  "stands": "gr4",
+  "voice": "soft",
+  "life": {
+    "home": "gr4",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1080,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "vendre-le-pain",
+        "gesture": null
+      },
+      {
+        "from": 1080,
+        "to": 1260,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "rever-sur-la-place",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["oeuf"],
+      "liked": ["mures", "pomme"],
+      "disliked": ["fossile-coquille"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

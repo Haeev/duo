@@ -85,6 +85,11 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     folder: 'lieux/<lieu>/interieurs',
     inPlace: true,
   },
+  scene: {
+    files: [{ from: 'scene.jsonc', to: '<id>.json' }],
+    folder: 'lieux/<lieu>/scenes',
+    inPlace: true,
+  },
   lieu: {
     files: [
       { from: 'lieu/lieu.jsonc', to: 'lieu.json' },

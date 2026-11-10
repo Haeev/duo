@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "id": "la-sonnerie-de-5h12",
+  "title": "La sonnerie de 5 h 12",
+  "together": false,
+  "roles": {
+    "a": "Côté fenêtre",
+    "b": "Côté porte"
+  },
+  "trigger": {
+    "at": 312,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte1.premiere-nuit",
+        "equals": "ouvert"
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ding. Ding. Deux coups, du côté du passage à niveau.",
+      "emote": null,
+      "sound": "Ding ! Ding !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "camera",
+      "focus": {
+        "point": "pn-s"
+      },
+      "seconds": 4
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans la brume, une lueur glisse au ras de la voie. Puis plus rien.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "emote",
+      "who": "a",
+      "emote": "surprise",
+      "sound": null
+    },
+    {
+      "do": "emote",
+      "who": "b",
+      "emote": "question",
+      "sound": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La barrière n'a pas bougé. Seul le fil de la sonnerie tremble encore.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

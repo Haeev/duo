@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "sonnerie-debut",
+  "villager": "cheffe-de-gare",
+  "priority": 10,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "essai-gare.sonnerie",
+      "equals": "parler"
+    }
+  ],
+  "once": null,
+  "start": "bruit",
+  "nodes": {
+    "bruit": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Cette nuit, j'ai entendu sonner au passage à niveau. Deux coups, comme pour un train.",
+      "emote": "question",
+      "next": "doute"
+    },
+    "doute": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Il ne passe plus de train ici depuis des années. Le vent, sans doute.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Rapporte-moi une bûche du tas de bois, veux-tu ? On veillera au chaud ce soir.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "l-arret",
+  "title": "L'arrêt",
+  "together": true,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le train s'est arrêté. Le couloir est vide. La porte du wagon bâille sur le jour.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dehors, un quai couvert d'herbes et un panneau écaillé: Aubrune.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

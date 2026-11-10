@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-hache",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.outils",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "C'est la hache de Basile ? Elle est vieille. Reviens me voir quand elle sera fatiguée.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

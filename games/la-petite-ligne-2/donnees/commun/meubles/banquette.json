@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "banquette",
+  "name": "Banquette de compartiment",
+  "model": "banc",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "sleep",
+      "places": 1,
+      "wakeAt": 85
+    }
+  ]
+}

@@ -77,6 +77,8 @@ describe('pas de simulation vide', () => {
       'outils',
       'cultures',
       'habitants',
+      'quetes',
+      'scenes',
     ]);
   });
 });

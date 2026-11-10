@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "firmin-matin",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.reponse",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Une sonnerie ? À 5 h 12 ? Le vent dans le fil de la sonnerie. Ça arrive. Souvent. Parfois.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "lueur",
+          "text": "Et la lueur, sur la voie ?",
+          "when": [],
+          "effects": [],
+          "next": "soleil"
+        },
+        {
+          "id": "pale",
+          "text": "Tu es tout pâle, Firmin.",
+          "when": [],
+          "effects": [],
+          "next": "couleurs"
+        }
+      ]
+    },
+    "soleil": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le soleil se lève de ce côté-là. Un peu en avance, voilà tout.",
+      "emote": null,
+      "next": "fin"
+    },
+    "couleurs": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je suis toujours pâle à 7 h. Je reprends des couleurs vers 9 h 30.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Au travail. Et pas un mot à Honorine: elle en ferait un roman en trois tomes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

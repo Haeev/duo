@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-sonnerie",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "scenes.aubrune.la-sonnerie-de-5h12"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Le train de 5 h 12 ? Je l'ai pris trois fois. Une fois, il m'a ramenée. Les deux autres, je mens.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "ambroise-hygiene",
+  "villager": "ambroise",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Hm. Ton odeur a dix minutes d'avance sur toi. Va te régler à la pompe.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

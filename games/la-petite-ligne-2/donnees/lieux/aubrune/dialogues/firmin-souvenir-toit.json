@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-toit",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.toit",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Un toit posé. Basile dit que c'est droit. Basile ne dit jamais rien, alors c'est vrai.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

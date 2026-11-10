@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "id": "jeanne",
+  "name": "Jeanne Ribot",
+  "temper": "cheerful",
+  "look": {
+    "shape": "child-medium",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [0, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bob",
+        "colors": [6]
+      },
+      {
+        "slot": "top",
+        "id": "top-tee",
+        "colors": [4]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-shorts",
+        "colors": [7]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [1, 0]
+      }
+    ]
+  },
+  "stands": "gr4",
+  "voice": "high",
+  "life": {
+    "home": "gr4",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 720,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "jouer-sur-la-place",
+        "gesture": null
+      },
+      {
+        "from": 720,
+        "to": 840,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "dejeuner",
+        "gesture": null
+      },
+      {
+        "from": 840,
+        "to": 1170,
+        "at": {
+          "point": "pn-s"
+        },
+        "activity": "guetter-la-voie",
+        "gesture": null
+      },
+      {
+        "from": 1170,
+        "to": 1260,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "rentrer",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["fossile-coquille", "vieille-piece"],
+      "liked": ["mures", "pomme"],
+      "disliked": ["radis"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

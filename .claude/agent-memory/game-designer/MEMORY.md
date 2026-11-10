@@ -335,3 +335,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Surnaturel « très doux » au premier lieu: chaque indice reçoit une explication raisonnable dite par un habitant; aucune apparition avant le dénouement; les esprits sont réservés au troisième lieu.
 - Règle de ressenti « aucune action courante ne bloque plus de 1,5 s »: exprimer la lenteur d'un outil en nombre de coups d'une seconde, jamais en un geste long.
 - Quand interface, bible et technique existent, le cahier résume et renvoie; vérifier les budgets techniques (128 m sur 128 m par lieu chargé) avant de chiffrer une carte.
+
+## Écrire en données pour La Petite Ligne 2 (vérifié le 2026-11-10, acte 1 d'Aubrune)
+
+- Le moteur de dialogues joue le plus prioritaire, sans tirage: pour varier les bonjours, une tournante par fait (`aubrune.tour.<habitant>` lu par un aiguillage, avancé par un nœud d'effets). Pas de condition de météo ni de jour de semaine dans les dialogues.
+- Le validateur refuse un choix qui revient sur lui-même par un aparté (« le graphe boucle »): l'aparté mène à un second choix.
+- `talked` sans `once` n'est vrai que pendant l'affichage: ne pas le combiner avec une autre condition (`reach`); couper en deux étapes.
+- Une condition de quête est vraie si un des deux joueurs la remplit: `not item_in_bag` passe toujours chez celui qui n'a rien. Préférer une jauge (`need_at_least`) ou un fait.
+- Sans besace, la barre fait 5 cases: une étape « porte 6 bûches » doit venir après le sac.
+- Ajouter un lieu aux données casse les tests qui listent les lieux (`donnees.test.ts`, `aides-sauvegarde.ts`, override de `grands-lieux.test.ts`, liens obligatoires dans les deux sens).
+- Le trajet en train coûte `travel.clockHours` et n'est permis qu'entre `travel.from` et `travel.to` (6 h à 20 h): un prologue de nuit doit passer par une vraie nuit (lit) avant de descendre.
+- L'outil d'écriture de fichiers transforme l'échappement unicode du cadratin en vrai tiret: dans un test, écrire `String.fromCharCode(0x2013, 0x2014)`.

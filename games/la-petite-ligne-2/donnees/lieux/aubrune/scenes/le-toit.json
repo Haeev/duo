@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "id": "le-toit",
+  "title": "Le toit de la première pièce",
+  "together": true,
+  "roles": {
+    "a": "Sur l'échelle",
+    "b": "En bas"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Toi, échelle. Toi, planches.",
+      "emote": "idea",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Monte sur l'échelle, contre le mur de la maison.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "hd",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Reste en bas et passe les planches.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "hd",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Tac. Tac. Tac.",
+      "emote": null,
+      "sound": "Tac ! Tac !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La première pièce a un toit. La pluie, désormais, tombera dehors.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.maison.premiere-piece",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "id": "solange",
+  "name": "Solange Mérigot",
+  "temper": "cheerful",
+  "look": {
+    "shape": "adult-f-slim",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [6, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bob",
+        "colors": [5]
+      },
+      {
+        "slot": "top",
+        "id": "top-tank",
+        "colors": [16]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-skirt",
+        "colors": [14]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [2, 0]
+      }
+    ]
+  },
+  "stands": "gr4",
+  "voice": "bouncy",
+  "life": {
+    "home": "gr4",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1170,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "coudre",
+        "gesture": null
+      },
+      {
+        "from": 1170,
+        "to": 1260,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "prendre-l-air",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "gr4"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["coquelicot"],
+      "liked": ["vieille-piece", "tomate"],
+      "disliked": ["buche"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

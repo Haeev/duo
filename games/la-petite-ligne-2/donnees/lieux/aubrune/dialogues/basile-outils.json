@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "basile-outils",
+  "villager": "basile",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.outils",
+      "equals": "ouvert"
+    }
+  ],
+  "once": "player",
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Les gardes. Firmin prévenu.",
+      "emote": null,
+      "next": "pret"
+    },
+    "pret": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Hache. Bêche. Prêtées.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "merci",
+          "text": "Merci, Basile !",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "hache",
+              "count": 1
+            },
+            {
+              "type": "give_item",
+              "item": "beche",
+              "count": 1
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "mots",
+          "text": "Tu parles toujours si peu ?",
+          "when": [],
+          "effects": [],
+          "next": "oui"
+        }
+      ]
+    },
+    "oui": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Oui.",
+      "emote": null,
+      "next": "choix2"
+    },
+    "choix2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "merci",
+          "text": "Merci, Basile !",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "hache",
+              "count": 1
+            },
+            {
+              "type": "give_item",
+              "item": "beche",
+              "count": 1
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Je repasserai.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ronces. Chênes. Ensuite, toit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

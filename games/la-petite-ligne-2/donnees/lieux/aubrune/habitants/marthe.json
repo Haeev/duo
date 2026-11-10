@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "id": "marthe",
+  "name": "Marthe Bousquet",
+  "temper": "grumpy",
+  "look": {
+    "shape": "elder-medium",
+    "skin": 2,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [5, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bun",
+        "colors": [3]
+      },
+      {
+        "slot": "dress",
+        "id": "dress-simple",
+        "colors": [22]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [23]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [2, 0]
+      }
+    ]
+  },
+  "stands": "re1",
+  "voice": "medium",
+  "life": {
+    "home": "re1",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1140,
+        "at": {
+          "point": "pv"
+        },
+        "activity": "garder-la-cloche",
+        "gesture": null
+      },
+      {
+        "from": 1140,
+        "to": 1260,
+        "at": {
+          "point": "re1"
+        },
+        "activity": "fermer-les-volets",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "re1"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["soupe-aux-herbes"],
+      "liked": ["pain"],
+      "disliked": ["coquelicot"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

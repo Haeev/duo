@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "id": "ambroise",
+  "name": "Ambroise Pélissier",
+  "temper": "grumpy",
+  "look": {
+    "shape": "elder-medium",
+    "skin": 1,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [9, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-side-part",
+        "colors": [7]
+      },
+      {
+        "slot": "top",
+        "id": "top-sweater",
+        "colors": [3]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [19]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [3]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [2, 1]
+      }
+    ]
+  },
+  "stands": "gr7",
+  "voice": "shy",
+  "life": {
+    "home": "gr7",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1140,
+        "at": {
+          "point": "gr7"
+        },
+        "activity": "regler-les-horloges",
+        "gesture": null
+      },
+      {
+        "from": 1140,
+        "to": 1260,
+        "at": {
+          "point": "gr7"
+        },
+        "activity": "ecouter-les-tic-tac",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "gr7"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["vieille-piece"],
+      "liked": ["fossile-coquille"],
+      "disliked": ["oeuf"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

@@ -269,7 +269,7 @@ describe('habitants', () => {
               id: 'voir',
               objective: 'Va voir le facteur.',
               target: { villager: 'facteur' },
-              done: [{ type: 'remembered', key: 'essai-gare.lettre' }],
+              done: [{ type: 'time_is', from: 0, to: 1 }],
               together: false,
               onStart: [],
               onDone: [],

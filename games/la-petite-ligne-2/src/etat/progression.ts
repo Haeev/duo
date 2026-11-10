@@ -16,6 +16,8 @@ export const QuestSchema = v.strictObject({
   chapter: IdSchema,
   step: IdSchema,
   done: v.boolean(),
+  /** Étapes franchies (les étapes d'un acte peuvent se faire en parallèle); absent: aucune. */
+  passed: v.exactOptional(v.array(IdSchema)),
 });
 
 export const ProgressSchema = v.strictObject({

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "firmin-lettre",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.lettre",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Des gardes de ligne ? La ligne est fermée depuis trente ans. Montre voir ta lettre.",
+      "emote": "question",
+      "next": "lit"
+    },
+    "lit": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "« Logement fourni. Sens de l'heure exigé. » Signé... É. Lacombe.",
+      "emote": "surprise",
+      "next": "poche"
+    },
+    "poche": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "C'est... une vieille signature. Je la garde, pour les archives. Bon !",
+      "emote": "sad",
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "rends",
+          "text": "Rends-moi ma lettre !",
+          "when": [],
+          "effects": [],
+          "next": "bouton"
+        },
+        {
+          "id": "qui",
+          "text": "Qui est É. Lacombe ?",
+          "when": [],
+          "effects": [],
+          "next": "lacombe"
+        }
+      ]
+    },
+    "bouton": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Elle est en sûreté. Ma poche ferme à bouton depuis 1987.",
+      "emote": null,
+      "next": "fin"
+    },
+    "lacombe": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Un Lacombe. Il y en a eu plusieurs. Ils sont tous partis. Voilà.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le logement fourni, c'est la maison du garde-barrière, après la barrière. Fournie en courants d'air.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

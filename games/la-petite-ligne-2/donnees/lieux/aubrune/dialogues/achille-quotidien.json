@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "id": "achille-quotidien",
+  "villager": "achille",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.achille",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.achille",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.achille",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.achille",
+              "equals": 4
+            }
+          ],
+          "next": "b4"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.achille",
+              "equals": 5
+            }
+          ],
+          "next": "b5"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh... bonjour. La pâte lève. Moi, presque.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.achille",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Bonjour... J'ai rêvé d'un croissant grand comme la gare. Il avait du retard, lui aussi.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.achille",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ah, c'est toi... Le levain m'a parlé, cette nuit. Il disait « encore cinq minutes ».",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.achille",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Bonjour. Une miche, c'est un nuage qui a accepté de rester.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.achille",
+          "value": 4,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b4": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh ? Bonjour. Je ne dors pas. Je laisse reposer mes yeux, comme la pâte.",
+      "emote": null,
+      "next": "t4"
+    },
+    "t4": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.achille",
+          "value": 5,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b5": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Bonjour... Le four chante quand il est content. Écoute. Non ? Moi non plus.",
+      "emote": null,
+      "next": "t5"
+    },
+    "t5": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.achille",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1080
+            }
+          ],
+          "next": "midi"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1290
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Je me lève à 3 h pour le pain. Le reste du jour, je me rattrape.",
+      "emote": null,
+      "next": null
+    },
+    "midi": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "À midi, la croûte craque. C'est l'heure où je suis le plus réveillé.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Le soir, je pêche. Enfin, je tiens une canne et je ferme les yeux.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Chut... À cette heure, la farine dort. Moi presque. Le four, jamais.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

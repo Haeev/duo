@@ -12,14 +12,19 @@ import type { DialogueDef } from './schemas/dialogue';
 import { PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schemas/lieu';
 import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
-import type { QuestLineDef } from './schemas/quete';
 import { validateHarvestContent } from './schemas/recolte';
 import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
+import { validateStory } from '../simulation/quetes/valider';
 
-function checkCondition(content: Content, c: Condition, at: string, problems: string[]): void {
+export function checkCondition(
+  content: Content,
+  c: Condition,
+  at: string,
+  problems: string[],
+): void {
   switch (c.type) {
     case 'all':
     case 'any':
@@ -45,7 +50,7 @@ function checkCondition(content: Content, c: Condition, at: string, problems: st
   }
 }
 
-function checkEffect(content: Content, e: Effect, at: string, problems: string[]): void {
+export function checkEffect(content: Content, e: Effect, at: string, problems: string[]): void {
   switch (e.type) {
     case 'give_item':
     case 'take_item':
@@ -184,37 +189,6 @@ function checkBricks(content: Content, prop: PropDef, problems: string[]): void 
   }
 }
 
-function checkQuest(
-  content: Content,
-  place: PlaceContent,
-  quest: QuestLineDef,
-  problems: string[],
-): void {
-  const at = `lieu ${place.def.id}, quête ${quest.id}`;
-  const villagers = new Set(place.villagers.map((v) => v.id));
-  if (quest.giver !== null && !villagers.has(quest.giver))
-    problems.push(`${at}: habitant inconnu « ${quest.giver} »`);
-  for (const c of quest.requires) checkCondition(content, c, at, problems);
-  const steps = new Set<string>();
-  for (const chapter of quest.chapters) {
-    for (const step of chapter.steps) {
-      const where = `${at}, étape ${step.id}`;
-      if (steps.has(step.id)) problems.push(`${where}: identifiant en double`);
-      steps.add(step.id);
-      if (
-        step.target !== null &&
-        'point' in step.target &&
-        !(step.target.point in place.map.points)
-      )
-        problems.push(`${where}: point inconnu « ${step.target.point} »`);
-      if (step.target !== null && 'villager' in step.target && !villagers.has(step.target.villager))
-        problems.push(`${where}: habitant inconnu « ${step.target.villager} »`);
-      for (const c of step.done) checkCondition(content, c, where, problems);
-      for (const e of [...step.onStart, ...step.onDone]) checkEffect(content, e, where, problems);
-    }
-  }
-}
-
 function checkShop(content: Content, place: PlaceContent, shop: ShopDef, problems: string[]): void {
   const at = `lieu ${place.def.id}, commerce ${shop.id}`;
   if (!place.villagers.some((v) => v.id === shop.keeper))
@@ -281,7 +255,6 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
   checkLargePlace(content, place, problems);
   for (const d of place.dialogues) checkDialogue(content, place, d, problems);
   for (const shop of Object.values(place.shops)) checkShop(content, place, shop, problems);
-  for (const quest of Object.values(place.quests)) checkQuest(content, place, quest, problems);
 }
 
 interface Box {
@@ -463,5 +436,7 @@ export function validateContent(content: Content): string[] {
   problems.push(...validateDialogueTexts(content));
   problems.push(...validateHarvestContent(content));
   problems.push(...validateVillagerLives(content));
+  // Suites de quêtes et scènes: références, et aucune suite qui puisse se bloquer.
+  problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));
   return problems;
 }

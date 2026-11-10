@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "solange-hygiene",
+  "villager": "solange",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Halte ! Mon nez joue la tragédie. File à la pompe, et reviens en scène.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

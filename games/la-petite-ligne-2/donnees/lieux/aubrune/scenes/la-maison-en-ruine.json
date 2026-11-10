@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "la-maison-en-ruine",
+  "title": "La maison du garde-barrière",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "point": "hd"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un toit crevé. Des ronces jusqu'aux fenêtres. Une porte qui tient debout par habitude.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sur le linteau, deux lettres gravées au couteau: É. L.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

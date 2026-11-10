@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "id": "odette-vente",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.vente-odette",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Des œufs ? Je te les prends à soixante centimes pièce. Trois, ça fait un euro quatre-vingts.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "vendre",
+          "text": "Marché conclu.",
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "oeuf",
+              "count": 3
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "oeuf",
+              "count": 3
+            },
+            {
+              "type": "give_money",
+              "amount": 180
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.vendu-odette",
+              "value": true,
+              "by": "duo"
+            }
+          ],
+          "next": "achille"
+        },
+        {
+          "id": "non",
+          "text": "Je réfléchis.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "achille": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Tiens. Remarque, Achille les paie n'importe quoi. Mais je ne t'ai rien dit.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

@@ -1,16 +1,22 @@
-// GABARIT: une suite de quêtes d'un lieu (chapitres et étapes).
+// GABARIT: une suite de quêtes d'un lieu, en actes (chapters) et en étapes.
 // Créer: pnpm nouveau quete <id> <lieu>   -> donnees/lieux/<lieu>/quetes/<id>.json
-// Schéma: src/donnees/schemas/quete.ts; conditions et effets: src/donnees/schemas/regles.ts
+// Schéma: src/donnees/schemas/quete.ts; conditions et effets communs: src/donnees/schemas/regles.ts
+// Moteur et vocabulaire complet: src/simulation/quetes/README.md
+// Progression commune: une étape franchie par l'un l'est pour les deux.
 {
   "schema": 1,
+  // Identifiant unique dans tout le jeu (c'est aussi le nom du fichier).
   "id": "exemple-quete",
   // main: suite principale du lieu; side: secondaire; errand: petite demande (rare).
   "kind": "side",
   "title": "Une quête d'exemple",
   // L'habitant qui la donne, ou null.
   "giver": "cheffe-de-gare",
-  // Conditions qui l'ouvrent (toutes vraies).
+  // Ce qui l'ouvre (toutes vraies). [] : ouverte dès l'arrivée dans le lieu.
+  // Une suite peut aussi s'ouvrir par l'effet { "type": "open_quest", "quest": "..." } d'une autre.
+  // Exemple: [{ "type": "quest_step", "quest": "le-train-de-5h12", "step": "premiere-nuit" }]
   "requires": [],
+  // Les actes se jouent l'un après l'autre.
   "chapters": [
     {
       "id": "chapitre-1",
@@ -18,13 +24,32 @@
       "steps": [
         {
           "id": "cueillir",
-          "objective": "Cueillir trois pommes pour la cheffe de gare.",
-          // Repère montré 3 secondes à la demande: { "point": "..." }, { "villager": "..." } ou null.
+          // Ligne du carnet: quoi faire, en une phrase, au tutoiement. Accords: [[féminin|masculin]].
+          "objective": "Cueille trois pommes pour la cheffe de gare.",
+          // Repère du coup d'œil (touche G, 3 s): { "point": "<point de la carte>" },
+          // { "villager": "<habitant>" } ou null.
           "target": { "villager": "cheffe-de-gare" },
-          // Ce qui franchit l'étape (toutes vraies).
-          "done": [{ "type": "item_in_bag", "item": "pomme", "count": 3 }],
-          // true: il faut être deux.
+          // Absent: l'étape suit la précédente de l'acte. []: ouverte dès le début de l'acte
+          // (en parallèle). ["a", "b"]: après ces étapes de l'acte.
+          "after": [],
+          // Ce qui franchit l'étape (toutes vraies). Communes: remembered, item_in_bag, place_is,
+          // time_is, bond_at_least, need_at_least, all, any, not. De l'histoire:
+          //   { "type": "deliver", "item": "pomme", "count": 3, "villager": "cheffe-de-gare" }
+          //       (on lui parle en les tenant: elles lui sont remises)
+          //   { "type": "reach", "point": "quai", "who": "one" }   (ou "both"; "radius" en m)
+          //   { "type": "talked", "dialogue": "accueil", "node": "fin" }   (node facultatif)
+          //   { "type": "together" }   { "type": "scene_seen", "scene": "..." }
+          //   { "type": "quest_step", "quest": "...", "step": "..." }
+          "done": [
+            { "type": "deliver", "item": "pomme", "count": 3, "villager": "cheffe-de-gare" },
+          ],
+          // true: il faut être deux, réunis (sinon faisable seul).
           "together": false,
+          // Effets à l'ouverture de l'étape, puis quand elle est franchie. Communs: remember,
+          // give_item, take_item, give_money, change_need, give_bag. De l'histoire:
+          //   { "type": "unlock_zone", "zone": "riviere" }
+          //   { "type": "villager_arrives", "villager": "..." }
+          //   { "type": "open_quest", "quest": "..." }   { "type": "play_scene", "scene": "..." }
           "onStart": [],
           "onDone": [
             {
@@ -34,6 +59,15 @@
               "by": "duo",
             },
           ],
+        },
+        {
+          "id": "au-quai",
+          "objective": "Retrouve l'autre sur le quai.",
+          "target": { "point": "quai" },
+          "done": [{ "type": "reach", "point": "quai", "who": "both" }],
+          "together": true,
+          "onStart": [],
+          "onDone": [],
         },
       ],
     },

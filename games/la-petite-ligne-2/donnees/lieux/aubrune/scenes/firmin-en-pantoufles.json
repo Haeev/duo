@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "id": "firmin-en-pantoufles",
+  "title": "Firmin en pantoufles",
+  "together": true,
+  "roles": {
+    "a": "Sur le banc",
+    "b": "Sur le banc"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "villager": "firmin"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "walk",
+      "who": "firmin",
+      "to": "quai"
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Ho ! Ho là ! Personne n'est descendu ici depuis trente ans !",
+      "emote": "surprise",
+      "sound": "Flap flap flap",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Vous êtes venus par le car, vous avez dormi sur le banc. Voilà tout.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans ta poche, pourtant, un billet poinçonné. Terminus: Aubrune.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans ta poche, pourtant, un billet poinçonné. Terminus: Aubrune.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Ça se garde longtemps, un billet. Bon. Il est 8 h et des poussières. Je n'aime pas les poussières. Qu'est-ce que vous voulez ?",
+      "emote": "question",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

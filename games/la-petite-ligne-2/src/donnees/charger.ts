@@ -32,6 +32,7 @@ import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
 import { CropSchema, ResourceSchema, type CropDef, type ResourceDef } from './schemas/recolte';
+import { SceneSchema, type SceneDef } from './schemas/scene';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
 import { validateContent } from './valider';
@@ -50,6 +51,7 @@ export interface PlaceContent {
   readonly dialogues: readonly DialogueDef[];
   readonly shops: ById<ShopDef>;
   readonly quests: ById<QuestLineDef>;
+  readonly scenes: ById<SceneDef>;
 }
 
 /** Tout le contenu du jeu, lu et contrôlé. Il ne change jamais pendant une partie. */
@@ -165,6 +167,7 @@ export function loadContent(files: Files): Content {
     const interiors = Object.values(
       parseFolder(InteriorSchema, files, `${base}/interieurs`, problems),
     );
+    const scenes = parseFolder(SceneSchema, files, `${base}/scenes`, problems);
     if (def === null || map === null) continue;
     // Un point ou une porte d'intérieur qui porterait le nom d'un autre l'écraserait à la fusion.
     const seen = new Set([...Object.keys(map.points), ...Object.keys(map.doors ?? {})]);
@@ -187,6 +190,7 @@ export function loadContent(files: Files): Content {
       dialogues,
       shops,
       quests,
+      scenes,
     };
   }
 

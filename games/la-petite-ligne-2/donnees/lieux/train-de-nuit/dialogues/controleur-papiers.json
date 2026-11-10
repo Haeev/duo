@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "controleur-papiers",
+  "villager": "controleur",
+  "priority": 60,
+  "when": [],
+  "once": "player",
+  "start": "controle",
+  "nodes": {
+    "controle": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Contrôle ! Billet et papiers. Règlement, article 4: on ne voyage pas sans visage.",
+      "emote": "question",
+      "next": "photo"
+    },
+    "photo": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Ta photo d'identité est floue. Ou absente. On la refait. Regarde l'objectif, et ne bouge plus.",
+      "emote": null,
+      "next": "clic"
+    },
+    "clic": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Clic. Ressemblant. Plus ou moins: le règlement ne dit pas combien.",
+      "emote": "joy",
+      "next": "poincon"
+    },
+    "poincon": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "billet-poinconne",
+          "count": 1
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Billet poinçonné. Terminus: Aubrune. Garde-le bien, ça se garde longtemps.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

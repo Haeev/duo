@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "jeanne-hygiene",
+  "villager": "jeanne",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Pouah ! Je parie que même les poules se pincent le bec. Va à la pompe !",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

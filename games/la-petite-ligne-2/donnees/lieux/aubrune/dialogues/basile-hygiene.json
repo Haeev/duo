@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "basile-hygiene",
+  "villager": "basile",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Hm. Odeur. Pompe.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

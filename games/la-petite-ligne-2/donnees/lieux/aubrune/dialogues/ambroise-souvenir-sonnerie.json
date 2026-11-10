@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-sonnerie",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "scenes.aubrune.la-sonnerie-de-5h12"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Une sonnerie à 5 h 12, dis-tu ? Les fils chantent au vent. Évidemment. Évidemment.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

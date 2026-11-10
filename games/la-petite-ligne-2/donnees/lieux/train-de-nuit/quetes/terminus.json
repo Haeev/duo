@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "id": "terminus",
+  "kind": "main",
+  "title": "Terminus",
+  "giver": "controleur",
+  "requires": [],
+  "chapters": [
+    {
+      "id": "prologue",
+      "title": "Le train de nuit",
+      "steps": [
+        {
+          "id": "papiers",
+          "objective": "Montre tes papiers au Contrôleur, dans le couloir.",
+          "target": {
+            "villager": "controleur"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "controleur-papiers",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "play_scene",
+              "scene": "le-compartiment"
+            }
+          ],
+          "onDone": []
+        },
+        {
+          "id": "chariot",
+          "objective": "Le chariot passe au bout du couloir: demande un sandwich.",
+          "target": {
+            "point": "chariot"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "controleur-chariot",
+              "node": "servi"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "train-de-nuit.prologue.chariot",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": []
+        },
+        {
+          "id": "manger",
+          "objective": "Mange ton sandwich avant qu'il refroidisse encore.",
+          "target": null,
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "hunger",
+              "value": 85
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": []
+        },
+        {
+          "id": "dormir",
+          "objective": "Retourne au compartiment et allonge-toi sur une banquette.",
+          "target": {
+            "point": "compartiment"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "sleep",
+              "value": 80
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "play_scene",
+              "scene": "le-tunnel"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "play_scene",
+              "scene": "l-arret"
+            }
+          ]
+        },
+        {
+          "id": "descendre",
+          "objective": "Retrouve ta moitié devant la porte du wagon, et descendez.",
+          "target": {
+            "point": "porte"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "porte",
+              "who": "both"
+            }
+          ],
+          "together": true,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "train-de-nuit.prologue.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

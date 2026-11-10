@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "id": "solange-quotidien",
+  "villager": "solange",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.solange",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.solange",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.solange",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.solange",
+              "equals": 4
+            }
+          ],
+          "next": "b4"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.solange",
+              "equals": 5
+            }
+          ],
+          "next": "b5"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Bonjour, bonjour ! Entrée côté cour. Très réussie.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.solange",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Te voilà ! Ce col... Non, je plaisante. Enfin, à moitié.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.solange",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Bonjour ! J'ai joué « La Dame aux camélias » quarante fois. Je tousse encore, par habitude.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.solange",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ah, mon public ! Approche, la lumière est meilleure de ce côté.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.solange",
+          "value": 4,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b4": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Bonjour ! Jeanne a encore parié sur quelque chose. Elle a gagné. Comme toujours.",
+      "emote": null,
+      "next": "t4"
+    },
+    "t4": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.solange",
+          "value": 5,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b5": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Te voilà ! Une coiffure, c'est un costume qu'on n'enlève pas le soir. Choisis bien.",
+      "emote": null,
+      "next": "t5"
+    },
+    "t5": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.solange",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1080
+            }
+          ],
+          "next": "midi"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1290
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Le matin, je coiffe ces dames. À dix heures, je sais tout. C'est mon vrai métier.",
+      "emote": null,
+      "next": null
+    },
+    "midi": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Midi: entracte. Je mange debout, comme en coulisses.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Le soir, je recouds. Le bourg use ses ourlets plus vite que ses souliers.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Tu rôdes ? Très bien. Les plus belles entrées se font la nuit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

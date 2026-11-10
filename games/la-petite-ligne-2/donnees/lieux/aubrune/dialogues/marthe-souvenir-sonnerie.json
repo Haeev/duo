@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-sonnerie",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "scenes.aubrune.la-sonnerie-de-5h12"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta sonnerie de 5 h 12, c'était le vent. Ou ma sœur. Ma sœur est capable de tout.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

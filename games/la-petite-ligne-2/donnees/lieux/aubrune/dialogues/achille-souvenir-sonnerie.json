@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-sonnerie",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "scenes.aubrune.la-sonnerie-de-5h12"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Une sonnerie à 5 h 12 ? À 5 h 12, moi, j'enfourne. Je n'entends que le four.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

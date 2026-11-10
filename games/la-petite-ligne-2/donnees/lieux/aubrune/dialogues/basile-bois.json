@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "basile-bois",
+  "villager": "basile",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.abattre",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Deux chênes. Lisière. Six bûches.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
