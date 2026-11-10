@@ -45,4 +45,23 @@ export const HISTOIRE_TEXTS = {
     gauge: 'Avancement de {nom}',
     pin: 'Point à atteindre',
   },
+  /** Répliques des scènes (bandeau bas, même habillage que le dialogue). */
+  line: {
+    label: 'Réplique de la scène',
+    sceneEyebrow: 'Scène',
+    you: 'Toi',
+    narrator: 'Récit',
+    /** Réplique adressée à ce seul joueur (scène à deux rôles). */
+    onlyYou: 'Rien que pour toi',
+    meRead: 'lu',
+    meReading: 'tu lis',
+    otherRead: 'a lu',
+    otherReading: 'lit encore',
+    /** Tu as lu, l'autre pas encore: la suite attend. */
+    waiting: 'On attend {nom}',
+    /** La réplique ne s'adresse qu'à l'autre joueur. */
+    otherOnly: '{nom} lit sa réplique',
+    otherOnlyHint: 'La scène reprend dès que {nom} a lu.',
+    next: 'Suite',
+  },
 } as const;

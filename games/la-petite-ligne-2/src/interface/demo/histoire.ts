@@ -3,6 +3,10 @@
  * `#fin-de-chapitre`, `-attente` (tu as continué), `-autre` (l'autre a fini);
  * `#geste-tenir`, `#geste-point`, `#geste-ensemble`, `#geste-appuyer`, `#geste-rate`;
  * `#dialogue-bloque` (argent et objet), `#dialogue-bloque-autre` (poches de l'autre);
+ * répliques de scène: `#scene-replique` (en écriture), `-finie`, `#scene-deux` (un joueur répond,
+ * l'autre a lu), `#scene-attente` (tu as lu), `#scene-pour-toi`, `#scene-autre` (pour l'autre
+ * seul), `#scene-fondu` (noir), `-replique` (réplique sur le noir), `#scene-pages` (page 2),
+ * `#scene-gestes` (réplique sous la carte « Ensemble »);
  * `#carnet-quetes-histoire` (deux actes, vraies suites d'Aubrune), `-histoire-3` (trois actes).
  * Les fiches d'essai (scènes, dialogue) sont ajoutées au contenu par `histoireFiles`, sans toucher
  * aux données du jeu.
@@ -139,7 +143,77 @@ export function histoireFiles(): Record<string, Json> {
       },
     },
   };
+  // Répliques: un habitant, un joueur qui lui répond, le récit pour un seul rôle, un fondu, une
+  // réplique longue (deux pages) avec un accord au lecteur.
+  const say = (who: string, to: string, text: string, extra: Json = {}): Json => ({
+    do: 'say',
+    who,
+    text,
+    emote: null,
+    sound: null,
+    to,
+    seconds: null,
+    ...extra,
+  });
+  const repliques = {
+    schema: 1,
+    id: 'demo-repliques',
+    title: 'Firmin en pantoufles',
+    together: false,
+    roles: { a: 'Sur le banc', b: 'Sur le banc' },
+    trigger: null,
+    beats: [
+      say(
+        'firmin',
+        'both',
+        'Ho\u202f! Ho là\u202f! Personne n’est descendu ici depuis trente ans\u202f!',
+        {
+          emote: 'surprise',
+          sound: 'Flap flap flap',
+        },
+      ),
+      say('a', 'both', 'On a dormi sur le banc\u202f? Je ne me souviens de rien du tout.', {
+        emote: 'question',
+      }),
+      say('narrator', 'a', 'Dans ta poche, pourtant, un billet poinçonné. Terminus, Aubrune.'),
+      say('narrator', 'b', 'Dans ta poche, pourtant, un billet poinçonné. Terminus, Aubrune.'),
+      { do: 'fade', to: 'black', seconds: 1.5 },
+      say(
+        'firmin',
+        'both',
+        'Te voilà [[réveillée|réveillé]], c’est déjà ça. Ça se garde longtemps, un billet. Bon. Il est 8 h et des poussières, et je n’aime pas les poussières. La pension est en haut de la rue, la pompe derrière la halle. Qu’est-ce que vous voulez\u202f?',
+        { emote: 'joy' },
+      ),
+    ],
+  };
+  const levierSuite = scene(
+    'demo-levier-suite',
+    'Le levier',
+    [
+      {
+        role: 'a',
+        hint: 'Tiens le levier pendant que l’autre se met au bout du quai.',
+        done: [],
+        gesture: { type: 'hold', seconds: 2 },
+      },
+      {
+        role: 'b',
+        hint: 'Reste au bout du quai, le temps que le levier tienne.',
+        done: [],
+        gesture: { type: 'stand', point: 'quai', radius: 2, seconds: 1.5 },
+      },
+    ],
+    0.5,
+  );
+  (levierSuite.beats as Json[]).push(
+    say('cheffe-de-gare', 'both', 'Il a bougé\u202f! Trente ans que ce levier n’avait pas bougé.', {
+      emote: 'surprise',
+    }),
+  );
   return {
+    // Firmin est un habitant d'Aubrune: la scène y est rangée (le validateur le demande).
+    [`lieux/aubrune/scenes/demo-repliques.json`]: repliques,
+    [`lieux/${PLACE}/scenes/demo-levier-suite.json`]: levierSuite,
     [`lieux/${PLACE}/scenes/demo-levier.json`]: levier,
     [`lieux/${PLACE}/scenes/demo-appuis.json`]: appuis,
     [`lieux/${PLACE}/scenes/demo-fin.json`]: fin,
@@ -154,6 +228,10 @@ export interface HistoireSetup {
   readonly event: GameEvent | null;
   /** Aucune bulle d'action: la scène a la main. */
   readonly noAim: boolean;
+  /** Touches à jouer après la pose (ms depuis la pose). */
+  readonly keys?: readonly { readonly at: number; readonly code: string }[];
+  /** Changement d'état plus tard (ms depuis la pose), avec les événements à émettre. */
+  readonly later?: { readonly at: number; readonly apply: () => readonly GameEvent[] };
 }
 
 /** Pose l'état de l'ancre; renvoie ce qu'il faut de plus (projection, événement). */
@@ -186,6 +264,67 @@ export function setupHistoire(state: string, world: WorldState): HistoireSetup {
     fade: 'clear',
   });
   const quai = { x: 20, y: 4 };
+
+  // Répliques de scène (`demo-repliques`): temps choisi, lectures, fondu.
+  const lines: Readonly<Record<string, { beat: number; read: [boolean, boolean]; black?: true }>> =
+    {
+      'scene-replique': { beat: 0, read: [false, false] },
+      'scene-replique-finie': { beat: 0, read: [false, false] },
+      'scene-deux': { beat: 1, read: [false, true] },
+      'scene-attente': { beat: 0, read: [true, false] },
+      'scene-pour-toi': { beat: 2, read: [false, false] },
+      'scene-autre': { beat: 3, read: [false, false] },
+      'scene-fondu': { beat: 4, read: [false, false], black: true },
+      'scene-fondu-replique': { beat: 5, read: [false, false], black: true },
+      'scene-pages': { beat: 5, read: [false, false] },
+    };
+  const line = lines[state];
+  if (line !== undefined) {
+    const r = { ...run('demo-repliques', 0), place: 'aubrune' };
+    r.beat = line.beat;
+    r.read = line.read;
+    if (line.black === true) r.fade = 'black';
+    story.scene = r;
+    // Fin de l'écriture (Espace), et pour les pages: la page suivante, écrite d'un coup.
+    const finished = state !== 'scene-replique' && state !== 'scene-fondu';
+    const keys = finished ? [{ at: 700, code: 'Space' }] : [];
+    if (state === 'scene-pages')
+      keys.push({ at: 1100, code: 'Space' }, { at: 1400, code: 'Space' });
+    return { project: false, event: null, noAim: true, keys };
+  }
+  if (state === 'scene-gestes') {
+    // Les deux tiennent: le geste réussit, la réplique suivante arrive sous la carte « Ensemble ».
+    const r = run('demo-levier-suite', 0);
+    r.gestures = [
+      { down: true, since: seconds(1.9) },
+      { down: true, since: seconds(1.4) },
+    ];
+    story.scene = r;
+    other.body.x = quai.x;
+    other.body.y = quai.y;
+    return {
+      project: false,
+      event: null,
+      noAim: true,
+      keys: [{ at: 900, code: 'Space' }],
+      later: {
+        at: 250,
+        apply: () => {
+          r.parts = [true, true];
+          r.beat = 1;
+          r.read = [false, false];
+          delete r.gestures;
+          return [0, 1].map((player) => ({
+            type: 'scene_gesture' as const,
+            scene: 'demo-levier-suite',
+            part: player,
+            player: player === 0 ? (0 as const) : (1 as const),
+            state: 'done' as const,
+          }));
+        },
+      },
+    };
+  }
 
   if (state === 'geste-tenir') {
     // Toi au levier: tu tiens la touche depuis 0,9 s sur 2 s; l'autre n'est pas encore au quai.

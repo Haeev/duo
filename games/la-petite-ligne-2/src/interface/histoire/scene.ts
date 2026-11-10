@@ -4,7 +4,7 @@
  * moment « ensemble ». La touche répond tout de suite chez le joueur (écho local), sans attendre
  * l'état de l'hôte, qui arrive une image plus tard chez l'invité.
  *
- * Les répliques des scènes (`say`) ne sont pas dessinées ici: cet écran ne montre que les attentes.
+ * Les répliques des scènes (`say`), le fondu et le titre sont dans `replique.ts`: ici, les attentes.
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';

@@ -26,6 +26,7 @@ import { defaultPlayerLook } from '../rendu/personnages/apparence';
 import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
 import { createChapterEnd } from './histoire/fin-chapitre';
 import { createSceneOverlay } from './histoire/scene';
+import { createSceneLine } from './histoire/replique';
 import { createHud, type ProjectToScreen } from './hud';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
@@ -441,6 +442,26 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       chapterEnd.isOpen(),
     ...(options.projectToScreen === undefined ? {} : { projectToScreen: options.projectToScreen }),
   });
+  // Répliques des scènes: le bandeau du dialogue, qui attend qu'aucun autre écran n'ait la main.
+  const sceneLine = createSceneLine({
+    root: layer,
+    content: view.content,
+    send,
+    keyLabel,
+    reduced,
+    onBabble: options.onBabble ?? (() => undefined),
+    openGuardMs: UI_TUNING.openGuardMs,
+    busy: () =>
+      editor.isOpen() ||
+      deco.isOpen() ||
+      dialogue.isOpen() ||
+      shop.isOpen() ||
+      workshop.isOpen() ||
+      notebook.isOpen() ||
+      kitchen.isOpen() ||
+      coop.isOpen() ||
+      chapterEnd.isOpen(),
+  });
   const fishing = createFishingOverlay({
     ...{
       layer,
@@ -475,6 +496,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     else if (shop.isOpen()) used = shop.key(raw.code, now);
     else if (workshop.isOpen()) used = workshop.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
+    else if (sceneLine.key(raw.code, now)) used = true;
     else if (raw.code === 'KeyG' && !raw.repeat) {
       hud.glance(now);
       used = true;
@@ -531,11 +553,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       coop.frame(dtMs);
       chapterEnd.frame(world, me, now);
       sceneOverlay.frame(world, me, now);
+      sceneLine.frame(world, me, now, dtMs);
       const shopOpen = shop.isOpen() || workshop.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
-      // Pendant un geste de scène, la touche d'action sert à la scène: pas de bulle d'action.
+      // Pendant une scène (hors attente) ou un geste de scène, la touche d'action sert à la
+      // scène: pas de bulle d'action.
       const prompt =
-        menu || sceneOverlay.active()
+        menu || sceneOverlay.active() || sceneLine.hidesPrompt()
           ? null
           : promptModel(view.content, world, me, view.aim(me), {
               act: keyLabel('Space'),
@@ -552,6 +576,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         questTarget: questMarker(world, me),
       });
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
+      layer.classList.toggle('lpl-ui--scene', sceneLine.inScene());
     },
     capturing() {
       return (
@@ -564,7 +589,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         deco.isOpen() ||
         fishing.capturing() ||
         coop.isOpen() ||
-        chapterEnd.isOpen()
+        chapterEnd.isOpen() ||
+        sceneLine.capturing()
       );
     },
     dispose() {
@@ -583,6 +609,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       coop.dispose();
       chapterEnd.dispose();
       sceneOverlay.dispose();
+      sceneLine.dispose();
       layer.remove();
     },
   };

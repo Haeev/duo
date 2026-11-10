@@ -10,6 +10,10 @@ export interface HistoireSettings {
   readonly togetherHoldMs: number;
   /** Message d'un geste raté (ms). */
   readonly gestureMessageMs: number;
+  /** Titre de la scène montré à son début (ms). */
+  readonly sceneTitleMs: number;
+  /** Fondu au noir ou retour quand la durée n'est pas lue dans la scène (ms). */
+  readonly fadeFallbackMs: number;
 }
 
 export const HISTOIRE_SETTINGS: HistoireSettings = {
@@ -18,4 +22,6 @@ export const HISTOIRE_SETTINGS: HistoireSettings = {
   pressEchoMs: 400,
   togetherHoldMs: 1400,
   gestureMessageMs: 2200,
+  sceneTitleMs: 3500,
+  fadeFallbackMs: 600,
 };

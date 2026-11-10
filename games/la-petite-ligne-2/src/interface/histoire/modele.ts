@@ -4,7 +4,7 @@
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { GestureDef } from '../../donnees/schemas/scene';
+import type { BeatDef, GestureDef } from '../../donnees/schemas/scene';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { chapterEndView } from '../../simulation/quetes/lecture';
 import { STORY } from '../../simulation/quetes/reglages';
@@ -208,6 +208,129 @@ export function shownProgress(row: SceneRowModel, heldMs: number | null): number
     );
   if (gesture.type === 'press' && heldMs <= HISTOIRE_SETTINGS.pressEchoMs) return 1;
   return gesture.progress;
+}
+
+// ---------- Répliques des scènes ----------
+
+/** Qui parle: un habitant (portrait et nom), le personnage d'un joueur, ou la voix du récit. */
+export type SceneSpeakerModel =
+  | { readonly kind: 'villager'; readonly id: string; readonly name: string }
+  | {
+      readonly kind: 'player';
+      readonly player: PlayerIndex;
+      readonly name: string;
+      /** C'est le personnage de ce joueur. */
+      readonly me: boolean;
+    }
+  | { readonly kind: 'narrator' };
+
+/** Pour qui est la réplique, vu de ce joueur: les deux, lui seul, ou l'autre seul. */
+export type SceneAudience = 'both' | 'me' | 'other';
+
+export interface SceneLineModel {
+  readonly speaker: SceneSpeakerModel;
+  /** Texte accordé au joueur qui lit (vide quand la réplique ne s'adresse qu'à l'autre). */
+  readonly text: string;
+  /** Expression du portrait, d'après l'émotion de la réplique. */
+  readonly mood: 'neutre' | 'content' | 'soucieux';
+  /** Signe au-dessus du portrait (surprise, question), `null`: aucun. */
+  readonly mark: '!' | '?' | null;
+  /** Onomatopée affichée en bulle, `null`: aucune. */
+  readonly sound: string | null;
+  readonly audience: SceneAudience;
+  readonly readByMe: boolean;
+  readonly readByOther: boolean;
+}
+
+export interface SceneScreenModel {
+  readonly scene: string;
+  readonly title: string;
+  /** Indice du temps en cours: une nouvelle réplique repart de zéro (écriture, garde, envoi). */
+  readonly beat: number;
+  readonly kind: 'say' | 'await' | 'other';
+  readonly line: SceneLineModel | null;
+  readonly otherName: string;
+  readonly fade: 'black' | 'clear';
+  /** Durée du fondu en cours (s), `null`: le temps en cours n'est pas un fondu. */
+  readonly fadeSeconds: number | null;
+}
+
+type Emote = Extract<BeatDef, { do: 'say' }>['emote'];
+
+function moodOf(emote: Emote): SceneLineModel['mood'] {
+  if (emote === 'joy') return 'content';
+  if (emote === 'anger' || emote === 'sad') return 'soucieux';
+  return 'neutre';
+}
+
+function markOf(emote: Emote): SceneLineModel['mark'] {
+  if (emote === 'question') return '?';
+  if (emote === 'surprise' || emote === 'idea' || emote === 'anger') return '!';
+  return null;
+}
+
+/** Nom affiché d'un habitant: sa fiche, dans n'importe quel lieu (comme le dialogue). */
+export function villagerName(content: Content, id: string): string {
+  for (const place of Object.values(content.places)) {
+    const def = place.villagers.find((v) => v.id === id);
+    if (def !== undefined) return def.name;
+  }
+  return id;
+}
+
+/**
+ * Ce qu'une scène en cours montre à ce joueur: la réplique (qui parle, pour qui, qui l'a lue),
+ * le fondu et le titre. `null`: pas de scène. Lit `sceneView` pour les deux joueurs: la réplique
+ * est accordée au lecteur, et l'on sait si elle s'adresse aussi à l'autre.
+ */
+export function sceneScreenModel(
+  world: ReadonlyWorld,
+  content: Content,
+  me: PlayerIndex,
+): SceneScreenModel | null {
+  const view = sceneView(world, content, me);
+  const run = world.common.story?.scene ?? null;
+  if (view === null || run === null) return null;
+  const other = otherOf(me);
+  const theirs = sceneView(world, content, other);
+  const def = content.places[run.place]?.scenes[run.id]?.beats[run.beat];
+  let line: SceneLineModel | null = null;
+  if (view.beat.kind === 'say') {
+    const beat = view.beat;
+    const otherToo = theirs?.beat.kind === 'say' && theirs.beat.mine;
+    const audience: SceneAudience = beat.mine ? (otherToo ? 'both' : 'me') : 'other';
+    let speaker: SceneSpeakerModel;
+    if (beat.speaker === 'narrator') speaker = { kind: 'narrator' };
+    else if (beat.speakerPlayer !== null)
+      speaker = {
+        kind: 'player',
+        player: beat.speakerPlayer,
+        name: world.players[beat.speakerPlayer].name,
+        me: beat.speakerPlayer === me,
+      };
+    else
+      speaker = { kind: 'villager', id: beat.speaker, name: villagerName(content, beat.speaker) };
+    line = {
+      speaker,
+      text: beat.mine ? beat.text : '',
+      mood: moodOf(beat.emote),
+      mark: markOf(beat.emote),
+      sound: beat.sound,
+      audience,
+      readByMe: run.read[me],
+      readByOther: run.read[other],
+    };
+  }
+  return {
+    scene: view.scene,
+    title: view.title,
+    beat: run.beat,
+    kind: view.beat.kind,
+    line,
+    otherName: world.players[other].name,
+    fade: view.fade,
+    fadeSeconds: def?.do === 'fade' ? def.seconds : null,
+  };
 }
 
 /** État montré d'une consigne, avec l'écho de la touche tenue. */

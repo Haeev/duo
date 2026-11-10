@@ -97,6 +97,7 @@ function nextBeat(sim: SimContext, run: SceneRun): void {
   run.since = sim.world.tick;
   run.read = [false, false];
   run.parts = [false, false];
+  delete run.readAt;
   delete run.gestures;
   sim.touch('common');
   sim.emit({ type: 'scene_beat', scene: run.id, beat: run.beat });
@@ -182,7 +183,9 @@ function beatDone(sim: SimContext, run: SceneRun, beat: BeatDef, hooks: StoryHoo
       const audience = audienceOf(run, beat.to);
       if (audience.every((p) => run.read[p])) return true;
       if (beat.seconds !== null && elapsed >= beat.seconds) return true;
-      if (audience.some((p) => run.read[p]) && elapsed >= STORY.soloReadSeconds) return true;
+      // Le délai d'un lecteur seul part de sa lecture: l'autre a toujours ce temps pour finir.
+      const readFor = (sim.world.tick - (run.readAt ?? run.since)) * sim.dt;
+      if (audience.some((p) => run.read[p]) && readFor >= STORY.soloReadSeconds) return true;
       return elapsed >= STORY.maxLineSeconds;
     }
     case 'walk':
@@ -303,6 +306,7 @@ export function sceneNext(sim: SimContext, player: PlayerIndex, hooks: StoryHook
   if (run === null || run.read[player]) return;
   const beat = sceneDef(sim, run)?.beats[run.beat];
   if (beat?.do !== 'say' || !audienceOf(run, beat.to).includes(player)) return;
+  if (!run.read.some(Boolean)) run.readAt = sim.world.tick;
   run.read[player] = true;
   sim.touch('common');
   runBeats(sim, hooks);
