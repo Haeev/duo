@@ -1,0 +1,18 @@
+// GABARIT: un sujet de photo; photographié avec l'appareil en main, il devient une carte postale du carnet.
+// Créer: pnpm nouveau sujet-photo vue-du-pont   -> donnees/commun/photos/<id>.json
+// Il faut aussi son entrée du carnet (source { "type": "photo" }). Schéma: src/donnees/schemas/collections.ts.
+{
+  "schema": 1,
+  "id": "exemple-sujet",
+  // Entrée du carnet (source « photo »).
+  "entry": "carte-du-quai",
+  // Ce qu'il faut cadrer:
+  //   { "type": "point", "place": "<lieu>", "point": "<point de carte.json>" }   un repère, un point de vue;
+  //   { "type": "object", "place": "<lieu>", "object": "<objet de carte.json>" };
+  //   { "type": "villager", "villager": "<habitant>" };
+  //   { "type": "insect", "insect": "<espèce>" }   un animal;
+  //   { "type": "event", "event": "<événement>" }  pendant un événement rare, n'importe où dans le lieu.
+  "target": { "type": "point", "place": "essai-gare", "point": "quai" },
+  // Conditions (heure, météo, saison, histoire); [] = toujours.
+  "conditions": [],
+}

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "categories": [
+    {
+      "id": "poissons",
+      "name": "Poissons",
+      "record": {
+        "label": "Taille",
+        "unit": "cm"
+      }
+    },
+    {
+      "id": "insectes",
+      "name": "Insectes",
+      "record": null
+    },
+    {
+      "id": "tresors",
+      "name": "Fossiles et trésors",
+      "record": null
+    },
+    {
+      "id": "fleurs",
+      "name": "Fleurs",
+      "record": null
+    },
+    {
+      "id": "tenues",
+      "name": "Tenues",
+      "record": null
+    },
+    {
+      "id": "recettes",
+      "name": "Recettes",
+      "record": null
+    },
+    {
+      "id": "cartes-postales",
+      "name": "Cartes postales et photos",
+      "record": null
+    },
+    {
+      "id": "musiques",
+      "name": "Musiques",
+      "record": null
+    }
+  ]
+}

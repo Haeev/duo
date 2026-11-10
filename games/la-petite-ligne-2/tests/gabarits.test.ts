@@ -42,8 +42,11 @@ describe('gabarits', () => {
         'commerce',
         'culture',
         'dialogue',
+        'entree-de-collection',
+        'evenement',
         'habitant',
         'interieur',
+        'insecte',
         'lieu',
         'meuble',
         'objet',
@@ -53,6 +56,7 @@ describe('gabarits', () => {
         'recette',
         'ressource',
         'scene',
+        'sujet-photo',
       ].sort(),
     );
     for (const template of Object.values(TEMPLATES)) {

@@ -46,7 +46,8 @@ describe('pas de simulation vide', () => {
     const revision = sim.revisions.common;
     run(sim, SIM_HZ);
     expect(sim.world.common.day).toBe(2);
-    expect(sim.revisions.common).toBe(revision + 1);
+    // Le temps du monde (météo, lendemain) marque aussi la tranche au premier pas et à l'aube.
+    expect(sim.revisions.common).toBeGreaterThan(revision);
   });
 
   it('passe minuit sans sortir de la journée', () => {
@@ -80,6 +81,8 @@ describe('pas de simulation vide', () => {
       'quetes',
       'scenes',
       'cuisine',
+      'monde',
+      'collections',
     ]);
   });
 });

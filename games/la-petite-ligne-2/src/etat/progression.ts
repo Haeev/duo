@@ -1,6 +1,7 @@
 /** Tranche « progression »: ce que le duo a accompli, tous lieux confondus. Elle change rarement. */
 import * as v from 'valibot';
 import { CentsSchema, IdSchema, IntSchema } from '../donnees/schemas/communs';
+import { AlbumSchema } from '../donnees/schemas/collections';
 import { FactValueSchema } from '../donnees/schemas/regles';
 
 /** Un fait retenu (réponse 41: les habitants se souviennent): sa valeur, qui l'a fait, quel jour. */
@@ -31,6 +32,8 @@ export const ProgressSchema = v.strictObject({
   quests: v.record(IdSchema, QuestSchema),
   /** Entrées trouvées, par collection. */
   collections: v.record(IdSchema, v.array(IdSchema)),
+  /** Carnet des collections: qui a trouvé quoi, quand et par quel temps (`simulation/collections/`). */
+  album: v.exactOptional(AlbumSchema),
   /** Lieux rouverts par l'histoire: le train y mène. */
   opened: v.array(IdSchema),
   /**

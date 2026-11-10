@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "visiteur-du-samedi",
+  "name": "Visiteur du train",
+  "kind": "visitor",
+  "when": {
+    "type": "weekly",
+    "weekday": "saturday",
+    "seasons": []
+  },
+  "days": 1,
+  "hours": {
+    "from": 540,
+    "to": 1080
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "essai-gare.fete.vue"
+    }
+  ],
+  "announce": true,
+  "activates": {
+    "facts": [],
+    "villagers": ["cheffe-de-gare"],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  }
+}

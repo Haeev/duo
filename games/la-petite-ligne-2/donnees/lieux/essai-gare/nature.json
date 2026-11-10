@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "zones": [
+    {
+      "id": "pre-ouest",
+      "terrain": "pre",
+      "area": {
+        "x": 3,
+        "y": 22,
+        "w": 8,
+        "h": 8
+      },
+      "max": 3
+    }
+  ]
+}

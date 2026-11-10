@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "fete-d-essai",
+  "name": "Fête d'essai",
+  "kind": "festival",
+  "when": {
+    "type": "date",
+    "season": "spring",
+    "day": 3
+  },
+  "days": 1,
+  "hours": {
+    "from": 600,
+    "to": 1320
+  },
+  "conditions": [],
+  "announce": true,
+  "activates": {
+    "facts": [
+      {
+        "key": "essai-gare.fete.vue",
+        "value": true
+      }
+    ],
+    "villagers": ["cheffe-de-gare"],
+    "shop": null,
+    "scene": null,
+    "tune": "air-de-la-fete"
+  }
+}

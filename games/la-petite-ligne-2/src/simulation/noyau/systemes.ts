@@ -15,6 +15,8 @@ import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
 import { villagerSystem } from '../habitants/index';
 import { questSystem } from '../quetes/index';
+import { collectionSystem } from '../collections/index';
+import { worldTimeSystem } from '../monde/index';
 import { bagSystem } from '../sac/index';
 import { sceneSystem } from '../scenes/index';
 import { travelSystem } from '../voyage/index';
@@ -32,6 +34,8 @@ export interface SimContext {
   /** Commandes du pas de chaque joueur. */
   readonly inputs: readonly [StepInput, StepInput];
   emit(event: GameEvent): void;
+  /** Événements déjà émis pendant ce pas (un système placé après les autres peut y réagir). */
+  readonly events?: readonly GameEvent[];
   /**
    * À appeler après toute écriture dans une tranche lente: elle repart alors vers l'invité.
    * Les champs du canal rapide (`body`, `needs`, `minutes`) n'en ont pas besoin.
@@ -61,4 +65,6 @@ export const SYSTEMS: readonly GameSystem[] = [
   questSystem,
   sceneSystem,
   cookingSystem,
+  worldTimeSystem,
+  collectionSystem,
 ];

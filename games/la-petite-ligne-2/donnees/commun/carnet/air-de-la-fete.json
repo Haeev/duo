@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-de-la-fete",
+  "category": "musiques",
+  "name": "Air de la fête d'essai",
+  "place": "essai-gare",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "Tu fredonnes l'air de la fête."
+}

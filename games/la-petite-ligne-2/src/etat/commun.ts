@@ -10,7 +10,7 @@ import { StoryStateSchema } from '../donnees/schemas/scene';
 export const PHASES = ['day', 'boarding', 'travel', 'arrival'] as const;
 export type Phase = (typeof PHASES)[number];
 
-export const WEATHERS = ['clear', 'overcast', 'rain', 'mist', 'snow'] as const;
+export const WEATHERS = ['clear', 'overcast', 'rain', 'mist', 'snow', 'storm'] as const;
 
 const Pair = v.tuple([v.boolean(), v.boolean()]);
 
@@ -32,6 +32,13 @@ export const CommonSchema = v.strictObject({
   /** Jour de jeu, à partir de 1. L'heure (`minutes`) vit à la racine du monde: elle part sur le canal rapide. */
   day: v.pipe(IntSchema, v.minValue(1)),
   weather: v.picklist(WEATHERS),
+  /** Lendemain au lieu courant: météo du matin et événements annoncés (`simulation/monde/`). */
+  outlook: v.exactOptional(
+    v.strictObject({
+      weather: v.picklist(WEATHERS),
+      events: v.pipe(v.array(IdSchema), v.maxLength(8)),
+    }),
+  ),
   /** Coffre commun, pour les gros achats (réponse 10). */
   chest: CentsSchema,
   travel: v.nullable(TravelSchema),

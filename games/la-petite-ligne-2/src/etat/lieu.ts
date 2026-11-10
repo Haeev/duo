@@ -3,6 +3,7 @@
  * sauvegarde; seul le lieu courant est simulé et transmis (ADR 0018).
  */
 import * as v from 'valibot';
+import { InsectsStateSchema } from '../donnees/schemas/collections';
 import {
   CentsSchema,
   FiniteSchema,
@@ -72,6 +73,8 @@ const placeSlow = {
   nextGroundId: v.pipe(IntSchema, v.minValue(0)),
   /** Journée de chaque commerce du lieu (stock vendu, rachats du jour): `simulation/commerces/`. */
   shops: v.exactOptional(v.record(IdSchema, ShopDaySchema)),
+  /** Insectes posés (`simulation/collections/insectes.ts`). */
+  insects: v.exactOptional(InsectsStateSchema),
 } as const;
 
 /** Ce qui part dans la tranche « lieu »: tout, sauf les positions des habitants (canal rapide). */
@@ -105,5 +108,6 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
     villagers,
   };
   if (shops !== undefined) slow.shops = shops;
+  if (place.insects !== undefined) slow.insects = place.insects;
   return slow;
 }

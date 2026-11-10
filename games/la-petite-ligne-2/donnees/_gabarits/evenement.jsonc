@@ -1,0 +1,33 @@
+// GABARIT: un événement du calendrier d'un lieu (fête de saison, visiteur du train, concours, anniversaire).
+// Créer: pnpm nouveau evenement fete-des-barrieres aubrune   -> donnees/lieux/<lieu>/evenements/<id>.json
+// Schéma: src/donnees/schemas/temps.ts. Moteur: src/simulation/monde/ (rien à y toucher).
+{
+  "schema": 1,
+  "id": "exemple-evenement",
+  "name": "Fête d'exemple",
+  // festival, visitor, contest, birthday, market, other.
+  "kind": "festival",
+  // Date de l'année: { "type": "date", "season": "spring", "day": 3 } (jour de la saison, à partir de 1),
+  // ou règle: { "type": "weekly", "weekday": "saturday", "seasons": [] } (seasons vide: toute l'année).
+  "when": { "type": "date", "season": "summer", "day": 7 },
+  // Nombre de jours, à partir de la date.
+  "days": 1,
+  // Heures de chaque jour, en minutes depuis minuit (cahier 4.7: 10 h à 22 h pour une fête).
+  "hours": { "from": 600, "to": 1320 },
+  // Conditions d'histoire (mêmes conditions que les dialogues); [] = toujours.
+  "conditions": [],
+  // Annoncé la veille (l'interface le montre avec la météo du lendemain).
+  "announce": true,
+  "activates": {
+    // Faits écrits au début, au nom du duo (clé lieu.sujet.detail).
+    "facts": [],
+    // Habitants présents (de ce lieu, ou visiteurs venus par le train).
+    "villagers": [],
+    // Commerce spécial ouvert (commerces/<id>.json du lieu), ou null.
+    "shop": null,
+    // Scène jouée au début, ou null.
+    "scene": null,
+    // Air joué: entrée du carnet de source « tune » que les deux joueurs inscrivent, ou null.
+    "tune": null,
+  },
+}

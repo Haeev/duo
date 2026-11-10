@@ -262,6 +262,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'villager_greeted':
       case 'villager_left':
       case 'villager_reacted':
+      case 'calendar_ended':
+      case 'calendar_started':
+      case 'collection_completed':
+      case 'collection_found':
+      case 'collection_record':
+      case 'insect_fled':
+      case 'net_swung':
+      case 'outlook_ready':
+      case 'photo_taken':
+      case 'rain_watered':
+      case 'weather_changed':
         break;
     }
   }

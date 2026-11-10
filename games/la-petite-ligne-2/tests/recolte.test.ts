@@ -260,10 +260,20 @@ describe('potager', () => {
       expect.objectContaining({ type: 'crop_reaped', item: 'radis', count: 1, quality: 0 }),
     );
 
-    hold(sim, 'graines-radis');
-    sim.world.common.weather = 'rain';
-    stroke(sim);
-    expect(fieldView(sim, 'potager')?.[0]).toMatchObject({ watered: true });
+    // La météo vient du climat du lieu (lot du temps du monde): un printemps toujours pluvieux.
+    const files = dataFiles() as Record<string, { seasons: Record<string, { weights: object }> }>;
+    const climate = files['lieux/essai-gare/climat.json'];
+    if (climate?.seasons.spring === undefined) throw new Error('climat absent');
+    climate.seasons.spring.weights = { rain: 1 };
+    const rainy = newSim(loadContent(files));
+    atField(rainy);
+    hold(rainy, 'beche');
+    stroke(rainy);
+    stroke(rainy);
+    hold(rainy, 'graines-radis');
+    stroke(rainy);
+    expect(rainy.world.common.weather).toBe('rain');
+    expect(fieldView(rainy, 'potager')?.[0]).toMatchObject({ watered: true });
 
     // Semé le 13e jour, l'été arrive le 15e: la pousse s'arrête, la plante reste.
     const late = newSim(content);
