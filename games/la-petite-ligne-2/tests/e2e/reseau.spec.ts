@@ -9,20 +9,22 @@ test('une minute de jeu: octets reçus par l’invité et appels de dessin', asy
   // L'écoute de la WebSocket doit précéder son ouverture: on la pose sur le contexte de l'invité.
   const bytes = { total: 0, frames: 0, byChannel: new Map<number, number>() };
   let counting = false;
-  const duo = await startDuo(browser, 'm1-reseau', (page) => {
-    page.on('websocket', (ws) => {
-      ws.on('framereceived', (f) => {
-        if (typeof f.payload !== 'string' || !counting) return;
-        bytes.total += Buffer.byteLength(f.payload);
-        bytes.frames += 1;
-        const channel = /"channel":(\d+)/.exec(f.payload)?.[1];
-        if (channel !== undefined)
-          bytes.byChannel.set(
-            Number(channel),
-            (bytes.byChannel.get(Number(channel)) ?? 0) + Buffer.byteLength(f.payload),
-          );
+  const duo = await startDuo(browser, 'm1-reseau', {
+    onGuestPage: (page) => {
+      page.on('websocket', (ws) => {
+        ws.on('framereceived', (f) => {
+          if (typeof f.payload !== 'string' || !counting) return;
+          bytes.total += Buffer.byteLength(f.payload);
+          bytes.frames += 1;
+          const channel = /"channel":(\d+)/.exec(f.payload)?.[1];
+          if (channel !== undefined)
+            bytes.byChannel.set(
+              Number(channel),
+              (bytes.byChannel.get(Number(channel)) ?? 0) + Buffer.byteLength(f.payload),
+            );
+        });
       });
-    });
+    },
   });
   const { host, guest } = duo;
   const stats = (await host
