@@ -1,3 +1,3 @@
-# Rendu du lieu courant (lot L4)
+# Lieu courant (lot L4)
 
-Terrain, meubles et objets de la carte, lumière. Tout y est libéré au départ du lieu: après dix allers-retours, géométries, textures et programmes reviennent à leur compte de départ.
+Tout ce qui appartient au lieu affiché: `description.ts` traduit les données et l'état du lieu en volumes (logique pure), `formes.ts` fabrique les formes provisoires quand le modèle manque, `lieu.ts` construit la scène du lieu et la libère en entier au départ (un `ResourceTracker` par lieu, ADR 0018). Les modèles livrés arrivent par `ModelSource` (`lieu.ts`): le moteur ne connaît aucun nom de modèle.
