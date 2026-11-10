@@ -1,0 +1,29 @@
+# Tenue « pull et pantalon de toile ».
+id = "pull-toile"
+nom = "Pull côtelé et pantalon de toile"
+
+[haut]
+modele = "pull"
+manches = 0.99
+ourlet = 0.045
+col_haut = 0.012
+encolure_v = 0.0
+rentre = false
+motif = "cotes"
+bord_cotes = true
+couleurs = ["moutarde", "rouille", "craie"]
+
+[bas]
+modele = "pantalon"
+longueur = 0.97
+taille = 0.07
+couleurs = ["lin"]
+coutures = true
+surpiqure = "ficelle"
+pli = true
+
+[chaussures]
+modele = "basses"
+tige = 0.03
+lacets = true
+couleurs = ["cuir_sombre", "semelle"]

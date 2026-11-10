@@ -1,0 +1,32 @@
+# Tenue « marinière à manches courtes, short et chaussettes »: éprouve les manches courtes sur la peau.
+id = "mariniere-short"
+nom = "Marinière, short et chaussettes"
+
+[haut]
+modele = "tshirt"
+manches = 0.42
+ourlet = 0.03
+col_haut = 0.0
+encolure_v = 0.0
+rentre = true
+motif = "rayures"
+couleurs = ["craie", "marine"]
+
+[bas]
+modele = "short"
+longueur = 0.36
+taille = 0.075
+couleurs = ["canard"]
+coutures = true
+surpiqure = "ficelle"
+revers = 0.03
+
+[chaussettes]
+hauteur = 0.17
+couleurs = ["moutarde"]
+
+[chaussures]
+modele = "basses"
+tige = 0.03
+lacets = true
+couleurs = ["craie", "semelle"]

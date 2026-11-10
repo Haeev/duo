@@ -1,0 +1,10 @@
+# Personnage d'essai: un corps commun, une tenue, une coiffure, des couleurs. Rien d'autre.
+id = "maelle"
+tenue = "carreaux-jean"
+coiffure = "carre"
+peau = "peaux.miel"
+cheveux = "cheveux.auburn"
+
+[corps]
+gabarit = "femme"
+donnees = "modeles/femme.npz"
