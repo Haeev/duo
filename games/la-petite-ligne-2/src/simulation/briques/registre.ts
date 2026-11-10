@@ -13,6 +13,7 @@ import { BAG_BRICKS } from '../sac/briques';
 import { HARVEST_BRICKS } from '../outils/briques';
 import { COOK_BRICKS } from '../cuisine/briques';
 import { sitBehaviour } from './asseoir';
+import { gatherBehaviour } from './cueillir';
 import { sleepBehaviour } from './dormir';
 import { talkBehaviour } from './parler';
 import { mirrorBehaviour } from './miroir';
@@ -35,10 +36,10 @@ export type {
 
 /**
  * Comportements livrés. Une brique déclarée sans comportement est inerte: son meuble n'est pas
- * une cible. Restent à inscrire: `gather` et `open` (L2, tour suivant), `relieve` (L3); `shop`,
- * `cook` et `repair` arrivent au jalon 2.
+ * une cible.
  */
 export const BRICK_BEHAVIOURS: BrickRegistry = {
+  gather: gatherBehaviour,
   sit: sitBehaviour,
   sleep: sleepBehaviour,
   store: storeBehaviour,

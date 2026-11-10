@@ -11,7 +11,7 @@ import { FieldStateSchema, HarvestStateSchema } from '../donnees/schemas/recolte
 const Seat = v.nullable(PlayerIndexSchema);
 
 export const BrickStatesSchema = v.strictObject({
-  /** Stock restant et pas de son retour (`null`: plein). */
+  /** Stock restant et minute absolue du jeu de son retour (`null`: pas épuisé). */
   gather: v.exactOptional(
     v.strictObject({ left: v.pipe(IntSchema, v.minValue(0)), refillAt: v.nullable(TickSchema) }),
   ),
