@@ -13,7 +13,7 @@ import { Occlusion } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { boxOf, type PlaceDescription, type SceneVolume } from './description';
-import { groundGeometry, standInGeometry } from './formes';
+import { DOOR_CUT_COUNT, groundGeometry, standInGeometry } from './formes';
 import { floorGeometry } from './sol';
 
 /**
@@ -40,6 +40,8 @@ export interface PlaceMaterials {
 
 class VolumeView implements Aimable {
   readonly fadable: Fadable;
+  /** Porte coupée avec son mur (`cutDoors`): elle ne cache plus personne. */
+  cut = false;
   private opacity = 1;
   private glow = 0;
 
@@ -163,6 +165,33 @@ export class PlaceScene {
     this.shown = test;
     for (const map of [this.fixed, this.dynamic])
       for (const view of map.values()) view.object.visible = test?.(view.volume) ?? true;
+  }
+
+  /**
+   * Portes des pièces selon la caméra: une porte dont le mur est entre la caméra et la pièce se
+   * coupe avec lui (on n'en dessine que le bas, tranche à l'encre); les autres restent entières.
+   * `toCamera`: du sol vers la caméra; `threshold`: le seuil des murs (`ROOM_SETTINGS.frontDot`).
+   */
+  cutDoors(toCamera: { readonly x: number; readonly z: number }, threshold: number): void {
+    const flat = Math.hypot(toCamera.x, toCamera.z) || 1;
+    for (const view of this.fixed.values()) {
+      const { volume, object } = view;
+      if (volume.shape !== 'door' || view.modelled || !isMesh(object)) continue;
+      const count: unknown = object.geometry.userData[DOOR_CUT_COUNT];
+      if (typeof count !== 'number') continue;
+      // La porte regarde la pièce (+Z local): son mur est devant quand elle tourne le dos à la caméra.
+      const angle = (volume.rotation * Math.PI) / 2;
+      const facing = (Math.sin(angle) * toCamera.x + Math.cos(angle) * toCamera.z) / flat;
+      const cut = facing < -threshold;
+      if (cut === view.cut) continue;
+      view.cut = cut;
+      object.geometry.setDrawRange(0, cut ? count : Infinity);
+      // Coupée, elle est plus basse qu'un genou: elle sort de l'occultation et redevient pleine.
+      if (cut) {
+        this.occlusion.remove(volume.id);
+        view.setOpacity(1);
+      } else if (volume.occludes) this.occlusion.add(boxOf(volume));
+    }
   }
 
   /** Tous les volumes affichés, fixes puis dynamiques (lampes du rendu encré). */

@@ -30,8 +30,13 @@ export const LAYER = {
   grain: 11,
   /** Une seule pierre ou dalle: éclats, fissures, piqûres, sans appareil. */
   face: 12,
+  /**
+   * Un carreau ou une dalle d'intérieur posés en volume: quelques piqûres, une fêlure rare,
+   * aucune tache (le damier, les joints et les teintes sont dans la géométrie).
+   */
+  tile: 13,
 } as const;
-export const LAYER_COUNT = 13;
+export const LAYER_COUNT = 14;
 export type LayerName = keyof typeof LAYER;
 
 /** Côté d'un carreau de texture, en mètres: 512 points pour 4 m, un trait de 3 points fait 2,3 cm. */

@@ -779,6 +779,29 @@ void main() {
 }
 `;
 
+/**
+ * Nappe du fond d'une pièce: la teinte d'écran de ses sommets, assombrie avec l'heure comme le
+ * reste (ton d'ombre de l'ambiance), sans lumière, sans trait ni contour (ni pièce ni morceau).
+ */
+const BACKDROP_VERTEX = /* glsl */ `
+out vec3 vColor;
+void main() {
+  vColor = color;
+  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+}
+`;
+
+const BACKDROP_FRAGMENT = /* glsl */ `
+layout(location = 0) out highp vec4 gColor;
+layout(location = 1) out highp vec4 gAux;
+in vec3 vColor;
+uniform vec3 uShade;
+void main() {
+  gColor = vec4(vColor * mix(vec3(1.0), uShade, 0.8), 1.0);
+  gAux = vec4(0.5, 1.0, 0.0, 0.0);
+}
+`;
+
 /** Aplat sans lumière (liseré de l'objet visé): une couleur d'écran, sa propre pièce de contour. */
 const FLAT_FRAGMENT = /* glsl */ `
 layout(location = 0) out highp vec4 gColor;
@@ -957,6 +980,17 @@ export function createContactMaterial(uniforms: InkUniforms): ShaderMaterial {
     polygonOffset: true,
     polygonOffsetFactor: -2,
     polygonOffsetUnits: -2,
+  });
+}
+
+/** Matériau de la nappe du fond d'une pièce (couleurs de sommets en teintes d'écran). */
+export function createBackdropMaterial(uniforms: InkUniforms): ShaderMaterial {
+  return new ShaderMaterial({
+    uniforms,
+    glslVersion: GLSL3,
+    vertexShader: BACKDROP_VERTEX,
+    fragmentShader: BACKDROP_FRAGMENT,
+    vertexColors: true,
   });
 }
 

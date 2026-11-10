@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "poste",
   "name": "Le poste d'aiguillage, rez-de-chaussée",
+  "style": "commerce",
   "width": 5,
   "height": 3,
   "at": {

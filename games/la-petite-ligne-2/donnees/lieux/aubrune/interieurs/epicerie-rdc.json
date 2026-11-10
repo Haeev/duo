@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "epicerie-rdc",
   "name": "L'épicerie Ferrand",
+  "style": "commerce",
   "width": 7,
   "height": 9,
   "at": {

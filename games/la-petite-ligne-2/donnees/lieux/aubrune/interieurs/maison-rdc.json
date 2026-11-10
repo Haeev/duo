@@ -120,5 +120,13 @@
       "to": "maison-cave-esc-maison-rdc"
     }
   },
-  "pourquoi": "au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre"
+  "pourquoi": "au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de l'étage part de la cuisine, celui de la cave de la chambre",
+  "rugs": [
+    {
+      "x": 6.9,
+      "y": 3.3,
+      "w": 1.1,
+      "h": 1.4
+    }
+  ]
 }

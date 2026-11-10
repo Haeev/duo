@@ -61,12 +61,14 @@ import {
   describeDynamic,
   describePlace,
   dynamicSignature,
+  footprint,
   type SceneVolume,
 } from './lieu/description';
 import type { BuildingSource } from './lieu/batiments';
 import { Spaces } from './lieu/espaces';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
+import { ROOM_SETTINGS } from './lieu/reglages-pieces';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
 import { Daylight, nightShare } from './lumiere';
@@ -305,6 +307,8 @@ class Engine implements GameRenderer {
     width: 1,
     height: 1,
     backdrop: null,
+    room: false,
+    blind: false,
   };
   /** Temps restant du fondu de sommeil (s), 0: aucun. */
   private sleepFade = 0;
@@ -527,6 +531,18 @@ class Engine implements GameRenderer {
     this.bounds = this.spaces?.bounds(room) ?? place.description;
     place.showWhere(this.spaces === null ? null : this.volumeShown);
     this.tiled?.showRoom(room);
+    this.refreshLights(place);
+  }
+
+  /**
+   * Lampes de l'espace affiché (rendu encré): celles de ses meubles et, dans une pièce, ses
+   * appliques. Rien n'éclaire à travers un mur, ni du dehors ni d'une pièce voisine.
+   */
+  private refreshLights(place: PlaceScene): void {
+    if (this.ink === null) return;
+    const volumes =
+      this.spaces === null ? place.volumes() : [...place.volumes()].filter(this.volumeShown);
+    this.lights = placeLights(volumes, this.tiled?.lights(this.room ?? null) ?? null);
   }
 
   /**
@@ -621,6 +637,18 @@ class Engine implements GameRenderer {
         this.ink,
         place.interiors,
         buildings === undefined ? null : { place: id, source: buildings },
+        description.volumes
+          .filter((volume) => volume.shape === 'box' && volume.model !== null)
+          .map((volume) => {
+            const size = footprint(volume);
+            return {
+              x0: volume.x - size.w / 2,
+              z0: volume.y - size.h / 2,
+              x1: volume.x + size.w / 2,
+              z1: volume.y + size.h / 2,
+              height: volume.base + volume.height,
+            };
+          }),
       );
       this.scene.add(this.tiled.root);
     }
@@ -714,8 +742,7 @@ class Engine implements GameRenderer {
       this.signature = signature;
       this.highlight.release();
       place.setDynamic(describeDynamic(view.content, state));
-      if (this.ink !== null)
-        this.lights = placeLights(place.volumes(), this.tiled?.lights() ?? null);
+      this.refreshLights(place);
     }
 
     const local = view.localIndex() ?? 0;
@@ -778,7 +805,10 @@ class Engine implements GameRenderer {
     this.held.radius = radius;
     this.held.valid = true;
     // Dans une pièce, le dehors n'est pas dessiné: ses tuiles restent telles quelles.
-    if (room === null)
+    if (room !== null) {
+      this.tiled?.viewRoom(this.toCamera);
+      if (this.tiled !== null) place.cutDoors(this.toCamera, ROOM_SETTINGS.frontDot);
+    } else
       this.tiled?.update(
         dt,
         shown.x,
@@ -845,7 +875,9 @@ class Engine implements GameRenderer {
     frame.viewRadius = radius;
     frame.lights = lights;
     frame.exposure = this.fade;
-    frame.backdrop = typeof this.room === 'string' ? TILE_SETTINGS.interior.backdrop : null;
+    frame.room = typeof this.room === 'string' && this.tiled !== null;
+    frame.blind = frame.room && this.tiled?.roomIsBlind() === true;
+    frame.backdrop = frame.room ? ROOM_SETTINGS.backdrop.color : null;
     frame.width = this.bufferWidth;
     frame.height = this.bufferHeight;
     ink.frame(this.renderer, this.scene, this.camera, frame);

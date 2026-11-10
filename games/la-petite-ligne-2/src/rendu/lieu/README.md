@@ -29,13 +29,35 @@ Page de démonstration: `pnpm exec vite --config src/rendu/lieu/demo/vite.config
 
 ## Rendu encré (ADR 0023)
 
-En style encré, `grand-lieu.ts` prend ses matériaux dans `../encre/` et ajoute: la carte du sol du lieu (`../encre/sol.ts`), le semis de cailloux et de touffes (`tileSemis`, réglages `semis`), les murs coupés et le plancher des pièces (`interiorWalls`, réglages `interior`), et les bâtiments livrés (`batiments.ts`: manifeste `assets/lieux/<lieu>/batiments/batiments.json`, un modèle par identifiant de `buildings`; sans modèle, les volumes provisoires). Les voies suivent `rails` de la carte quand il existe.
+En style encré, `grand-lieu.ts` prend ses matériaux dans `../encre/` et ajoute: la carte du sol du lieu (`../encre/sol.ts`), le semis de cailloux et de touffes (`tileSemis`, réglages `semis`), les pièces (voir plus bas), et les bâtiments livrés (`batiments.ts`: manifeste `assets/lieux/<lieu>/batiments/batiments.json`, un modèle par identifiant de `buildings`; sans modèle, les volumes provisoires). Les voies suivent `rails` de la carte quand il existe.
 
 ## Pièces: un monde clos à l'écran
 
-Les pièces sont rangées côte à côte sur la grille du lieu, hors du dehors, mais on n'en dessine qu'une: celle du joueur local (`espaces.ts`: `Spaces.at`, `shows`, `bounds`). Dedans: son plancher, ses murs coupés, ses cloisons (`blocked` de la pièce, `interiorWalls`), ses meubles et les personnages qui s'y trouvent, sur le fond uni `interior.backdrop`; ni le dehors, ni les tuiles, ni les pièces voisines, et la vue reste dans ses bornes. Dehors: aucune pièce. Le moteur bascule par `TiledPlace.showRoom` et `PlaceScene.showWhere`.
+Les pièces sont rangées côte à côte sur la grille du lieu, hors du dehors, mais on n'en dessine qu'une: celle du joueur local (`espaces.ts`: `Spaces.at`, `shows`, `bounds`). Dedans: son sol, ses murs, ses cloisons, ses meubles et les personnages qui s'y trouvent, sur une nappe sombre et chaude (`ROOM_SETTINGS.backdrop`); ni le dehors, ni les tuiles, ni les pièces voisines, et la vue reste dans ses bornes. Dehors: aucune pièce. Le moteur bascule par `TiledPlace.showRoom` et `PlaceScene.showWhere`.
 
-Portes (`doorVolumes` de `description.ts`, formes dans `formes.ts`): l'objet visible d'une porte est dessiné sur son seuil (`donnees/seuils.ts`) tant qu'aucun modèle n'est livré pour son meuble. Dans une pièce: encadrement et vantail à taille humaine (la cible de la touche d'action, qui s'efface devant la caméra comme tout volume haut) et paillasson, lisible au sol même quand le mur est coupé. Dehors: le paillasson seul, le bâtiment portant déjà sa porte. Porte au sol: cadre bas et marches. Réglages: `interior.door`, `mat`, `hatch`.
+Une pièce se construit à sa première visite, en deux temps:
+
+| Fichier              | Rôle                                                                                                                                                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pieces.ts`          | le plan (logique pure): portes aux seuils, fenêtres déclarées par la pièce ou déduites des façades de son bâtiment (`roomFacades`, manifeste des bâtiments; sinon une par travée), jamais derrière un meuble haut ni contre une cloison; appliques; tapis |
+| `piece-geometrie.ts` | les maillages: sol posé lame par lame ou carreau par carreau, chaque mur en deux formes (entier: enduit, plinthe, lambris, pan de bois, embrasures, menuiseries, rideaux, appliques; coupé: soubassement bas à tranche d'encre), coque d'ombre, nappe     |
+| `reglages-pieces.ts` | les styles (`ROOM_STYLES`) et les réglages communs (`ROOM_SETTINGS`)                                                                                                                                                                                      |
+
+- Murs: les deux murs qui tournent le dos à la caméra sont entiers, les deux autres coupés à `cut` (`TiledPlace.viewRoom`, à chaque image); une porte se coupe avec son mur (`PlaceScene.cutDoors`), elle reste la cible de la touche d'action.
+- Lumière: la coque d'ombre (plafond et murs pleins, jamais dessinés, `SHADOW_ONLY`) ne laisse entrer le soleil que par les fenêtres, croisillon compris; la nappe de lumière suit l'heure (ambiances `piece`, `INK_SETTINGS.roomSun`). Le soir, les appliques. Une pièce sans fenêtre (cave) garde l'ambiance de la nuit à toute heure. Dans une pièce, seules ses lampes éclairent.
+- Budget (maison de 10 x 7 m, toutes passes): 40 appels, 25 000 triangles; une pièce seule: 7 appels, 3 000 à 8 000 triangles.
+
+### Ajouter un style de pièce, ou en changer (aucun code)
+
+1. Choisir un style: dans `donnees/lieux/<lieu>/interieurs/<id>.json`, ajouter `"style": "commerce"` (styles livrés: `aubrune` par défaut, `commerce`, `atelier`, `cave`, `eglise`).
+2. Créer un style: copier une entrée de `ROOM_STYLES` (`reglages-pieces.ts`) sous un nouveau nom; elle part de `base`, n'écrire que ce qui change.
+3. Murs: `height` (murs du fond), `cut` (murs du devant), `wall` (teinte et couche de traits de l'enduit), `wainscot` (lambris ou `null`), `plinth`, `timber` (pan de bois ou `null`).
+4. Sol: `floor.kind` (`lames`, `carreaux`, `dalles`), ses teintes, sa taille, son joint.
+5. Fenêtres: `windows.rule` (`facades` ou `aucune`), cotes par défaut, menuiserie, rideaux. Pour imposer les fenêtres d'une pièce: `"windows": [{ "side": "nord", "at": 2.5 }]` dans son fichier.
+6. Lampes: `lamps` (espacement, hauteur, rayon) ou `null`. Tapis: `"rugs": [{ "x": 2, "y": 3, "w": 1.5, "h": 1.2 }]` dans le fichier de la pièce.
+7. Noter l'intention dans `pourquoi`, puis `pnpm exec vitest run tests/rendu/pieces.test.ts` (une pièce factice au style factice y est construite; chaque style cité par un intérieur doit exister).
+
+Portes (`doorVolumes` de `description.ts`, formes dans `formes.ts`): l'objet visible d'une porte est dessiné sur son seuil (`donnees/seuils.ts`) tant qu'aucun modèle n'est livré pour son meuble. Dans une pièce: encadrement et vantail à taille humaine (la cible de la touche d'action), dans le vide de son mur quand il est entier, coupés avec lui quand il est devant la caméra, et paillasson, lisible au sol dans les deux cas. Dehors: le paillasson seul, le bâtiment portant déjà sa porte. Porte au sol: cadre bas et marches. Réglages: `interior.door`, `mat`, `hatch`.
 
 Passage (`../passage.ts`): quand le joueur local est déplacé d'un coup (porte, replacement), l'image d'avant reste et s'éteint (`passage.outSeconds`), la caméra et les personnages se posent au noir, puis l'image revient (`inSeconds`). L'autre joueur disparaît à la porte sans glisser.
 

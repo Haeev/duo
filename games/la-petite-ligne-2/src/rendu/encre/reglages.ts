@@ -80,6 +80,12 @@ export const INK_SETTINGS = {
     maxRadius: 34,
   },
 
+  /**
+   * Pièce à fenêtres (ambiances `piece`): le soleil y suit l'heure, mais jamais plus haut que
+   * `maxElevationDeg`, pour que la nappe de lumière d'une fenêtre entre dans la pièce même à midi.
+   */
+  roomSun: { maxElevationDeg: 40 },
+
   /** Ombre de la lampe la plus proche du joueur local: une seule carte en cône. */
   lampShadow: { size: 512, fovDeg: 130, near: 0.28 },
 

@@ -25,6 +25,7 @@ import { hex } from './couches';
 import { InkScale, scaleFromAddress } from './echelle';
 import {
   applyAmbiance,
+  createBackdropMaterial,
   createContactMaterial,
   createDepthMaterial,
   createFlatMaterial,
@@ -63,6 +64,10 @@ export interface InkFrame {
   readonly weather: string | null;
   /** Le joueur local est dans une pièce. */
   readonly indoor: boolean;
+  /** Cette pièce a sa coque d'ombre (pièce d'un grand lieu): ambiances `piece`, soleil par les fenêtres. */
+  readonly room?: boolean;
+  /** Pièce sans fenêtre (cave): l'ambiance de la nuit à toute heure, lampes allumées. */
+  readonly blind?: boolean;
   /**
    * Ambiance déclarée par le lieu (`ambience` de `lieu.json`): lieu clos, teinte de ses lampes
    * et du dehors (`#rrggbb`); `null`: rien de plus que la fiche du climat.
@@ -133,6 +138,8 @@ export class InkKit {
   readonly volume: InkMaterial;
   /** Ombre de contact sous les personnages. */
   readonly contact: ShaderMaterial;
+  /** Nappe du fond d'une pièce (teintes d'écran, sans lumière ni trait). */
+  readonly backdrop: ShaderMaterial;
   private readonly depth: ShaderMaterial;
   private readonly layers: DataArrayTexture;
   private readonly noise: DataTexture;
@@ -183,6 +190,7 @@ export class InkKit {
     this.volume = new InkMaterial(this.uniforms);
     this.volume.name = 'encre';
     this.contact = createContactMaterial(this.uniforms);
+    this.backdrop = createBackdropMaterial(this.uniforms);
     this.depth = createDepthMaterial(this.uniforms);
     this.pass = new InkPass(4, 4, this.noise);
     this.motes = createMotes(this.uniforms, INK_SETTINGS.motes);
@@ -302,7 +310,7 @@ export class InkKit {
     return Math.round(layers + 128 * 128 * 4 + shadows + inner);
   }
 
-  private sunDirection(minutes: number, ambiance: Readonly<Ambiance>): void {
+  private sunDirection(minutes: number, ambiance: Readonly<Ambiance>, room: boolean): void {
     const out = this.uniforms.uSunDir.value;
     if (ambiance.sun !== null) {
       lightDirection(ambiance.sun[0], ambiance.sun[1], out);
@@ -313,6 +321,13 @@ export class InkKit {
     lightDirection(from.azimuthDeg, from.elevationDeg, this.dirA);
     lightDirection(to.azimuthDeg, to.elevationDeg, this.dirB);
     out.copy(this.dirA).lerp(this.dirB, t).normalize();
+    if (!room) return;
+    // Dans une pièce, le soleil garde son azimut mais ne monte pas plus haut que le réglage.
+    const top = Math.sin((INK_SETTINGS.roomSun.maxElevationDeg * Math.PI) / 180);
+    if (out.y <= top) return;
+    const flat = Math.hypot(out.x, out.z) || 1;
+    const reach = Math.sqrt(1 - top * top) / flat;
+    out.set(out.x * reach, top, out.z * reach);
   }
 
   /** Une image entière, du calcul de l'ambiance au contour sur le canevas. */
@@ -326,9 +341,11 @@ export class InkKit {
       : Math.max(0, this.indoorShare - step);
     const ambiance = ambianceAt(this.book, {
       sheet: frame.sheet,
-      minutes: frame.minutes,
+      // Minuit: la première heure repère, toujours la nuit.
+      minutes: frame.blind === true ? 0 : frame.minutes,
       indoor: this.indoorShare,
       weather: frame.weather,
+      room: frame.room === true,
     });
     if (frame.place !== null) {
       // Le lieu donne la teinte de ses lampes et celle du dehors (vitres, vide autour).
@@ -345,7 +362,7 @@ export class InkKit {
     nearest(lights.lamps, frame.focusX, frame.focusZ, MAX_LAMPS, s.lights.reach, this.lamps);
     nearest(lights.windows, frame.focusX, frame.focusZ, MAX_WINDOWS, s.lights.reach, this.windows);
     applyAmbiance(u, ambiance, this.lamps, this.windows);
-    this.sunDirection(frame.minutes, ambiance);
+    this.sunDirection(frame.minutes, ambiance, frame.room === true);
     u.uTime.value += frame.dt;
     if (this.renderer !== renderer) {
       this.renderer = renderer;
@@ -477,6 +494,7 @@ export class InkKit {
   dispose(): void {
     this.volume.dispose();
     this.contact.dispose();
+    this.backdrop.dispose();
     this.depth.dispose();
     this.motes.dispose();
     this.pass.dispose();
