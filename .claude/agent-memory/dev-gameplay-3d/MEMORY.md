@@ -608,3 +608,6 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - La raison d'un événement `refused` est un `IdSchema` (minuscules et traits d'union): `too-far`, jamais `too_far`.
 - Les joueurs naissent au point `descente` (près du quai), pas aux points `depart-joueur-*`: un test de portée place les corps lui-même.
 - Tests d'un système hors du pas: construire un `SimContext` à la main (copie de `step`) qui note les tranches touchées; retoucher le contenu en modifiant `dataFiles()` avant `loadContent` (exemplaire factice sans code).
+- Un événement ajouté à `GameEventSchema` casse le `switch` exhaustif de `src/interface/index.ts` (lint): l'ajouter aux cas ignorés.
+- Un champ ajouté à `progress` ne part pas chez l'invité (`reseau/progression.ts` n'envoie que `memory`, `bonds`, `quests`, `collections`, `opened`): un champ facultatif dans un objet déjà envoyé (`QuestSchema`, `CommonSchema`) part sans toucher au réseau.
+- Un dialogue de quête de priorité haute masque l'accueil d'un habitant (tests de dialogue cassés): ouvrir la suite d'essai par un fait de l'accueil (`requires`).

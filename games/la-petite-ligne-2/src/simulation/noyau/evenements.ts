@@ -8,7 +8,9 @@ import { IdSchema, IntSchema, PlayerIndexSchema } from '../../donnees/schemas/co
 import { NEEDS_EVENTS } from '../besoins/evenements';
 import { BRICK_EVENTS } from '../briques/evenements';
 import { DIALOGUE_EVENTS } from '../dialogues/evenements';
+import { QUEST_EVENTS } from '../quetes/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
+import { SCENE_EVENTS } from '../scenes/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
 
 export const CORE_EVENTS = [
@@ -53,5 +55,7 @@ export const GameEventSchema = v.variant('type', [
   ...NEEDS_EVENTS,
   ...BAG_EVENTS,
   ...DIALOGUE_EVENTS,
+  ...QUEST_EVENTS,
+  ...SCENE_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

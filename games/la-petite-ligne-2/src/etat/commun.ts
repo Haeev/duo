@@ -1,6 +1,7 @@
 /** Tranche « commun »: ce que les deux joueurs partagent et qui change rarement. */
 import * as v from 'valibot';
 import { CentsSchema, IdSchema, IntSchema, TickSchema } from '../donnees/schemas/communs';
+import { StoryStateSchema } from '../donnees/schemas/scene';
 
 /**
  * Phases du jeu (ADR 0018). `day` couvre le jour et la nuit jouable; les trois autres sont le
@@ -34,5 +35,7 @@ export const CommonSchema = v.strictObject({
   /** Coffre commun, pour les gros achats (réponse 10). */
   chest: CentsSchema,
   travel: v.nullable(TravelSchema),
+  /** Suivi des quêtes et scène en cours (`simulation/quetes/`, `scenes/`); absent: rien encore. */
+  story: v.exactOptional(StoryStateSchema),
 });
 export type CommonState = v.InferOutput<typeof CommonSchema>;

@@ -8,6 +8,7 @@ commun/        reglages.json, besoins.json, sacs.json
                personnages/catalogue.json (écrit par le générateur de pièces, lot L5)
 lieux/<lieu>/  lieu.json, carte.json
                habitants/<id>.json   dialogues/<id>.json   commerces/<id>.json   quetes/<id>.json
+               scenes/<id>.json
 _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le jeu)
 ```
 
@@ -29,7 +30,8 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Recette | `pnpm nouveau recette compote` | poste, ingrédients, résultat (des objets existants). |
 | Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
 | Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
-| Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | chapitres, étapes, conditions de fin, effets. |
+| Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | actes, étapes (ordonnées ou en parallèle par `after`), conditions de fin, effets, ligne du carnet, repère du coup d'œil. Le validateur refuse une suite qui peut se bloquer. Moteur: `src/simulation/quetes/README.md`. |
+| Scène | `pnpm nouveau scene la-sonnerie aubrune` | temps (répliques, marches, caméra, fondu, attente d'une action, effets), rôles pour une scène à deux asymétrique. Se lance par l'effet `play_scene` d'une étape ou par son `trigger` (heure, histoire, présence des deux). Exemple jouable: `lieux/essai-gare/quetes/sonnerie-essai.json`. |
 | Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |
 
 ## Briques (ce qu'un meuble sait faire)

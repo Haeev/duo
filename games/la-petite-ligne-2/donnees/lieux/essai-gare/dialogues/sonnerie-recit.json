@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "sonnerie-recit",
+  "villager": "cheffe-de-gare",
+  "priority": 10,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "essai-gare.sonnerie",
+      "equals": "vue"
+    }
+  ],
+  "once": null,
+  "start": "recit",
+  "nodes": {
+    "recit": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Une pendule arrêtée et une lueur sur les rails ? Alors la vieille voie du nord se souvient.",
+      "emote": "surprise",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Je t'ouvre la barrière du nord. Allez voir le quai, tous les deux.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

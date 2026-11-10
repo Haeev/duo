@@ -4,7 +4,9 @@ import { FiniteSchema, IntSchema } from '../../donnees/schemas/communs';
 import { NEEDS_INTENTS } from '../besoins/intentions';
 import { BRICK_INTENTS } from '../briques/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
+import { QUEST_INTENTS } from '../quetes/intentions';
 import { BAG_INTENTS } from '../sac/intentions';
+import { SCENE_INTENTS } from '../scenes/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
 import { CORE_INTENTS } from './intentions';
 
@@ -37,5 +39,7 @@ export const IntentSchema = v.variant('type', [
   ...NEEDS_INTENTS,
   ...BAG_INTENTS,
   ...DIALOGUE_INTENTS,
+  ...QUEST_INTENTS,
+  ...SCENE_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

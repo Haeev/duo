@@ -23,6 +23,7 @@ import {
 import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
+import { SceneSchema, type SceneDef } from './schemas/scene';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
 import { validateContent } from './valider';
@@ -38,6 +39,7 @@ export interface PlaceContent {
   readonly dialogues: readonly DialogueDef[];
   readonly shops: ById<ShopDef>;
   readonly quests: ById<QuestLineDef>;
+  readonly scenes: ById<SceneDef>;
 }
 
 /** Tout le contenu du jeu, lu et contrôlé. Il ne change jamais pendant une partie. */
@@ -145,12 +147,13 @@ export function loadContent(files: Files): Content {
     );
     const shops = parseFolder(ShopSchema, files, `${base}/commerces`, problems);
     const quests = parseFolder(QuestLineSchema, files, `${base}/quetes`, problems);
+    const scenes = parseFolder(SceneSchema, files, `${base}/scenes`, problems);
     if (def === null || map === null) continue;
     if (def.id !== folder)
       problems.push(
         `${path}: l'identifiant « ${def.id} » doit être le nom du dossier « ${folder} »`,
       );
-    places[def.id] = { def, map, villagers, dialogues, shops, quests };
+    places[def.id] = { def, map, villagers, dialogues, shops, quests, scenes };
   }
 
   if (

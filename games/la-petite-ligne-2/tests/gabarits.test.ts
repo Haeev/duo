@@ -49,6 +49,7 @@ describe('gabarits', () => {
         'prise',
         'quete',
         'recette',
+        'scene',
       ].sort(),
     );
     for (const template of Object.values(TEMPLATES)) {
