@@ -1,10 +1,10 @@
 // P18 début de l'acte 1 à Aubrune. Départ: parties posées à Aubrune (le départ réglé du jeu est
 // la gare d'essai; voir `fabrique-sauvegardes.prep.ts`), le voyage lui-même étant joué par P04 et
 // P16. P18a: les deux sont sur le quai, la scène d'accueil démarre chez les deux avec l'étape
-// « quai ». P18b: après la scène, Firmin reçoit la lettre et l'étape avance. D1: les répliques de
-// la scène devraient s'afficher (défaut connu, voir le rapport).
+// « quai ». P18b: après la scène, Firmin reçoit la lettre et l'étape avance. D1 (corrigé): les
+// répliques de la scène s'affichent chez les deux et avancent quand les deux ont lu.
 import { expect, test } from '@playwright/test';
-import { startDuo } from '../aides-e2e/duo';
+import { startDuo, type Side } from '../aides-e2e/duo';
 
 const QUEST = 'le-train-de-5h12';
 
@@ -82,19 +82,57 @@ test('P18b acte 1: la lettre à Firmin fait avancer la première étape', async 
   await duo.close();
 });
 
-test('D1 les répliques de la scène d’accueil s’affichent (défaut connu)', async ({ browser }) => {
-  // Attendu en échec tant que rien ne dessine les répliques `say` des scènes (rapport, défaut D1):
-  // le test échoue, donc passe en « échec attendu »; dès la correction il faudra retirer `fail`.
-  test.fail(true, 'D1: les répliques de scène ne sont dessinées par aucune couche de l’interface');
-  const duo = await startDuo(browser, 'd1-scene-muette', { save: 'aubrune' });
-  const { host } = duo;
-  try {
-    // La première réplique de Firmin arrive après sa marche: on laisse 25 s.
-    await expect(host.game().getByText(/Personne n.est descendu ici/)).toBeVisible({
+test('D1 les répliques de la scène d’accueil s’affichent et avancent quand les deux ont lu', async ({
+  browser,
+}) => {
+  const duo = await startDuo(browser, 'd1-scene-repliques', { save: 'aubrune' });
+  const { host, guest } = duo;
+  const line = (side: Side) => side.game().locator('.lpl-ui .scene-line');
+  // La première réplique de Firmin arrive après sa marche: on laisse 25 s.
+  for (const side of [host, guest]) {
+    await expect(line(side).getByText(/Personne n.est descendu ici/)).toBeVisible({
       timeout: 25_000,
     });
-  } finally {
-    await host.shot('1-scene-sans-texte');
-    await duo.close();
+    await expect(line(side).locator('.dlg__plate')).toContainText('Firmin');
+    await expect(line(side).locator('.dlg__bust svg')).toBeVisible();
   }
+  await host.shot('1-replique');
+  // L'hôte lit (Espace: tout afficher, puis « lu »): il attend l'invité, qui voit qu'il a lu.
+  const waiting = line(host).locator('.scene-line__wait');
+  for (let i = 0; i < 4 && !(await waiting.isVisible()); i++) {
+    await host.press('Space');
+    await host.page.waitForTimeout(400);
+  }
+  await expect(waiting).toContainText('On attend');
+  await expect(line(guest).locator('.scene-line__read--done')).toContainText('a lu');
+  await expect(line(guest).getByText(/Personne n.est descendu ici/)).toBeVisible();
+  await host.shot('2-attente-de-l-invite');
+  await guest.shot('2-l-hote-a-lu');
+  // L'invité lit à son tour: la réplique suivante arrive chez les deux, sans attendre le délai.
+  const next = /par le car/;
+  for (let i = 0; i < 4 && !(await line(guest).getByText(next).isVisible()); i++) {
+    await guest.press('Space');
+    await guest.page.waitForTimeout(400);
+  }
+  for (const side of [host, guest])
+    await expect(line(side).getByText(next)).toBeVisible({ timeout: 3_000 });
+  await guest.shot('3-replique-suivante');
+  // Réplique du récit pour un seul rôle: l'un la lit, l'autre voit qu'on la lit.
+  for (const side of [host, guest])
+    for (let i = 0; i < 4 && (await line(side).getByText(next).isVisible()); i++) {
+      await side.press('Space');
+      await side.page.waitForTimeout(400);
+    }
+  const only = (side: Side) => side.game().locator('.lpl-ui .scene-other');
+  await expect
+    .poll(async () => (await only(host).isVisible()) || (await only(guest).isVisible()), {
+      timeout: 10_000,
+    })
+    .toBe(true);
+  const reader = (await only(host).isVisible()) ? guest : host;
+  await expect(line(reader).getByText(/billet poinçonné/)).toBeVisible();
+  await expect(line(reader).locator('.scene-line__only')).toBeVisible();
+  await reader.shot('4-rien-que-pour-toi');
+  expect(duo.errors).toEqual([]);
+  await duo.close();
 });

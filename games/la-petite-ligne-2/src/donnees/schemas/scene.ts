@@ -161,6 +161,8 @@ export const SceneRunSchema = v.strictObject({
   roleA: PlayerIndexSchema,
   /** Chaque joueur a lu la réplique en cours. */
   read: v.tuple([v.boolean(), v.boolean()]),
+  /** Pas où le premier joueur a lu la réplique en cours (le délai d'un lecteur seul part de là). */
+  readAt: v.exactOptional(TickSchema),
   /** Parties de l'attente déjà faites. */
   parts: v.tuple([v.boolean(), v.boolean()]),
   camera: v.nullable(v.strictObject({ focus: FocusSchema, until: TickSchema })),

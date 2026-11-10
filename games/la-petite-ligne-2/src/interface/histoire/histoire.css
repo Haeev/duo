@@ -419,3 +419,222 @@
 .lpl-ui .choice.focus .barre::after {
   background: var(--brass);
 }
+
+/* ---------- Répliques des scènes (bandeau du dialogue, `.dlg`) ---------- */
+.lpl-ui .scene-say {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+/* Fondu au noir: sous le carnet (45) et le bandeau, au-dessus du monde et du HUD. */
+.lpl-ui .scene-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 44;
+  background: #0b0907;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 600ms var(--ease);
+}
+.lpl-ui .scene-fade--black {
+  opacity: 1;
+}
+.lpl-ui .scene-line {
+  cursor: pointer;
+}
+.lpl-ui .scene-line .dlg__plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.lpl-ui .scene-line .dlg__plate .token {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-color: var(--on-wood);
+}
+/* Voix du récit: pas de portrait, le texte prend la place, en italique. */
+.lpl-ui .scene-line[data-speaker='narrator'] .dlg__plate {
+  left: 1.5rem;
+}
+.lpl-ui .scene-line[data-speaker='narrator'] :is(.dlg__text, .scene-line__reads) {
+  left: 2rem;
+}
+.lpl-ui .scene-line[data-speaker='narrator'] .dlg__text {
+  font-style: italic;
+}
+.lpl-ui .scene-line__mark {
+  position: absolute;
+  left: 11rem;
+  top: -4.75rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.1875rem solid var(--ink);
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1;
+  animation: scene-signe var(--d-slow) var(--ease-bounce) 160ms both;
+}
+@keyframes scene-signe {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.lpl-ui :is(.scene-line__only, .scene-line__sound) {
+  position: absolute;
+  right: 1.5rem;
+  top: -1.125rem;
+  z-index: 2;
+  padding: 0.125rem 0.625rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+.lpl-ui .scene-line__sound {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  transform: rotate(2deg);
+}
+.lpl-ui .scene-line:has(.scene-line__only:not([hidden])) .scene-line__sound {
+  right: 12rem;
+}
+.lpl-ui .scene-line__reads {
+  position: absolute;
+  left: 15rem;
+  bottom: 0.625rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+.lpl-ui .scene-line__read {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.lpl-ui .scene-line__read .token {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.125rem;
+}
+.lpl-ui .scene-line__read--done {
+  color: var(--ink);
+}
+.lpl-ui .scene-line__read--done span::before {
+  content: '✓ ';
+}
+.lpl-ui .scene-line__wait {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 0.625rem;
+  margin: 0;
+  font-weight: 800;
+}
+/* Réplique pour l'autre seul: une carte courte, sans texte. */
+.lpl-ui .scene-other {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(34rem, calc(100% - 2rem));
+  padding: 0.625rem 1rem;
+  transform: translateX(-50%);
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.1875rem solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-3);
+  animation: scene-monte var(--d-base) var(--ease-bounce) both;
+}
+.lpl-ui .scene-other__text {
+  display: grid;
+}
+.lpl-ui .scene-other__text b {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 650;
+}
+.lpl-ui .scene-other__text span {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+/* Titre de la scène, en haut au centre, entre l'horloge et les avis. */
+.lpl-ui .scene-title {
+  position: absolute;
+  left: 50%;
+  top: 0.75rem;
+  display: grid;
+  justify-items: center;
+  max-width: min(24rem, calc(100% - 28rem));
+  padding: 0.375rem 1.25rem 0.5rem;
+  transform: translateX(-50%);
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.1875rem solid var(--ink);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-2);
+  text-align: center;
+  animation: scene-titre var(--d-scene) var(--ease) both;
+}
+@keyframes scene-titre {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -0.75rem);
+  }
+}
+.lpl-ui .scene-title__eyebrow {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.lpl-ui .scene-title b {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+/* Pendant une scène: HUD discret; la carte des gestes passe au-dessus du bandeau. */
+.lpl-ui--scene :is(.hud-clock, .needs, .toolbar, .glance-quest) {
+  opacity: 0.45;
+  transition: opacity var(--d-slow) var(--ease);
+}
+.lpl-ui:has(.scene-line:not([hidden])) .scene-card {
+  bottom: 13.5rem;
+}
+/* Style encré: l'encre y est claire; sur le laiton de « Ensemble ! », le texte repasse au sombre. */
+[data-lpl-style='encre'] .lpl-ui .scene-card[data-state='ensemble'],
+[data-lpl-style='encre']
+  .lpl-ui
+  .scene-card[data-state='ensemble']
+  :is(.scene-card__hint, .scene-row__who, .scene-row__what, .scene-together) {
+  color: var(--on-accent);
+}
+[data-lpl-style='encre'] .lpl-ui :is(.scene-other, .scene-title) {
+  background: none;
+  border-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  border-image: var(--cadre-moyen-papier-ombre) var(--bi-moyen-ombre);
+  animation-timing-function: steps(3, end);
+}

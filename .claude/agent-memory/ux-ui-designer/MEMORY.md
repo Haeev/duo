@@ -132,7 +132,12 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 
 ## Histoire à l'écran de La Petite Ligne (fin de chapitre, gestes, options impossibles, sagas)
 
-- Avant ce lot, rien n'affichait `sceneView`: les répliques (`say`) des scènes n'ont toujours pas d'écran, `histoire/scene.ts` ne montre que les attentes (`await`). Chercher `sceneView` hors de `simulation/` avant de supposer qu'un écran existe.
+- Répliques des scènes: `histoire/replique.ts` (bandeau `.dlg` du dialogue réutilisé, jetons « lu », fondu, titre), `histoire/scene.ts` pour les attentes (`await`). Chercher `sceneView` hors de `simulation/` avant de supposer qu'un écran existe.
+- Ne jamais réutiliser la classe `.dialogue` pour un autre bandeau: les parcours e2e visent `.lpl-ui .dialogue` et un second élément casse le mode strict de Playwright. Envelopper `.dlg` dans sa propre couche.
+- `paginate` découpait sur `\s`: une espace fine insécable devenait une coupure possible (« ! » seul en tête de ligne). Découper sur `[ \t\r\n]`.
+- `capturing()` coupe à la fois marche et action (`entrees/commandes.ts`): on ne peut pas avaler Espace seul. Capturer seulement pendant une réplique à lire ou l'écran noir, jamais pendant une attente (les gestes lisent `act`).
+- Parcours e2e (`tests/e2e`): il faut `pnpm --filter @duo/sdk-dev build` (pages du faux hôte) puis `vite build` du jeu, sinon « le faux hôte s'est arrêté (code 1) ». Captures: `LPL2_CAPTURES=<dossier>`.
+- Style encré: `--ink` y est clair; un fond laiton (« Ensemble ! ») demande `color: var(--on-accent)` sur ses textes. Redéfinir `--ink` localement casse les pastilles et touches (encre sur encre).
 - L'état de l'autre joueur se lit avec le même modèle pur appelé pour l'autre index (`sceneView(world, content, other)`). Le point et la durée d'un geste ne sont pas dans `sceneView`: relus dans la définition de la scène (`content.places[run.place].scenes[run.id].beats[run.beat]`, parties filtrées par rôle comme `sceneView`).
 - Réponse « sous 0,1 s » chez l'invité: écho local de la touche (keydown et keyup sur `keyTarget`, `performance.now`) qui avance la jauge sans dépasser 98 % et n'affiche jamais « fait » avant l'hôte; la mise à jour du DOM se fait dans l'événement, pas à l'image suivante.
 - Le Write convertit les échappements Unicode écrits dans le texte en vrais caractères: un U+00A0 dans un gabarit de chaîne ou un commentaire fait échouer ESLint (`no-irregular-whitespace`), et un U+2013 écrit dans un test devient un tiret interdit. Construire ces caractères par `String.fromCharCode`, puis relancer le contrôle des tirets.

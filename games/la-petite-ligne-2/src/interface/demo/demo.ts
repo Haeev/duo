@@ -269,6 +269,15 @@ setTimeout(() => {
     emit({ type: 'money_changed', who: 0, delta: 120 });
   }
   if (histoire.event !== null) emit(histoire.event);
+  for (const { at, code } of histoire.keys ?? [])
+    setTimeout(() => {
+      press(code);
+    }, at);
+  const later = histoire.later;
+  if (later !== undefined)
+    setTimeout(() => {
+      for (const event of later.apply()) emit(event);
+    }, later.at);
   if (state === 'coup-d-oeil') press('KeyG');
   if (state === 'carnet-sans-sac' || state === 'carnet-sac' || bagState !== undefined)
     press('KeyC');

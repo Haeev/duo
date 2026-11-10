@@ -14,7 +14,10 @@ export interface StorySettings {
   readonly glanceSeconds: number;
   /** Retard permis d'un déclencheur à heure fixe (minutes de jeu): au-delà, il attend le lendemain. */
   readonly triggerLateMinutes: number;
-  /** Une réplique lue par un seul joueur passe d'elle-même au bout de ce délai (s). */
+  /**
+   * Une réplique lue par un seul joueur passe d'elle-même ce délai (s) après sa lecture: filet de
+   * sécurité si l'autre s'est absenté, assez long pour qu'il finisse de lire à son rythme.
+   */
   readonly soloReadSeconds: number;
   /** Plafond d'une réplique, lue ou non (s): un joueur parti ne bloque jamais l'autre. */
   readonly maxLineSeconds: number;
@@ -35,7 +38,7 @@ export const STORY: StorySettings = {
   reachRadius: 2.5,
   glanceSeconds: 3,
   triggerLateMinutes: 60,
-  soloReadSeconds: 4,
+  soloReadSeconds: 8,
   maxLineSeconds: 20,
   villagerWalkSpeed: 1.4,
   maxWalkSeconds: 20,

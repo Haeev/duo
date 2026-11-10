@@ -259,7 +259,8 @@ export function paginate(
 ): string[] {
   const rows: string[] = [];
   let row = '';
-  for (const word of text.split(/\s+/).filter(Boolean)) {
+  // Pas `\s`: les espaces insécables (avant « ! ? : ; ») tiennent le signe à son mot.
+  for (const word of text.split(/[ \t\r\n]+/).filter(Boolean)) {
     if (row === '') row = word;
     else if (row.length + 1 + word.length <= width) row += ` ${word}`;
     else {
