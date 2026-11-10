@@ -1,0 +1,12 @@
+# Personnage d'essai: un corps commun, une tenue, une coiffure, des couleurs. Rien d'autre.
+# Facultatif: `rides = true`, `racine = 0.2` (hauteur de la racine des cheveux), et un bloc [coloris]
+# (`haut = ["!canard", "bouteille", "craie"]`) qui change les couleurs de la tenue sans nouvelle fiche.
+id = "gaston"
+tenue = "salopette"
+coiffure = "brosse"
+peau = "peaux.dore"
+cheveux = "cheveux.poivre_et_sel"
+
+[corps]
+gabarit = "costaud"
+donnees = "modeles/costaud.npz"

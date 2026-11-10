@@ -1,0 +1,39 @@
+# Tenue « blouse à pois et gilet »: blouse boutonnée, gilet de laine ouvert à manches longues, pantalon droit.
+id = "blouse-gilet"
+nom = "Blouse à pois et gilet"
+
+[haut]
+modele = "blouse"
+manches = 0.9
+ourlet = 0.06
+encolure_v = 0.03
+col = "chemise"
+boutons = true
+rentre = false
+motif = "pois"
+couleurs = ["lin", "prune"]
+
+[gilet]
+manches = 0.98
+ourlet = 0.1
+ouverture = 0.035         # écart des pans devant, en haut (m)
+evase = 0.1               # les pans s'écartent vers le bas
+bord_cotes = true
+motif = "cotes"
+couleurs = ["!lilas", "prune"]
+
+[bas]
+modele = "pantalon"
+longueur = 0.9
+taille = 0.08
+pli = true
+couleurs = ["chocolat"]
+
+[chaussettes]
+hauteur = 0.12
+couleurs = ["perle"]
+
+[chaussures]
+modele = "charentaises"
+tige = 0.035
+couleurs = ["brique", "semelle"]

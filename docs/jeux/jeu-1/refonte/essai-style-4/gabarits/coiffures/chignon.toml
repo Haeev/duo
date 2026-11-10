@@ -1,0 +1,40 @@
+# Coiffure « chignon »: cheveux tirés, chignon haut à facettes, deux mèches échappées aux tempes.
+id = "chignon"
+graine = 2
+
+[calotte]
+volume = 0.06
+front_deg = 40
+cotes_deg = 84
+nuque_deg = 104
+dents_deg = 4
+aretes = 0.08
+
+[[boules]]
+theta_deg = 180       # derrière
+phi_deg = 38          # haut du crâne
+rayon = 0.2
+distance = 0.02
+aplati = 0.85
+long = 0.9
+
+[[meches]]            # mèches échappées
+de_deg = 34
+a_deg = 56
+nombre = 1
+miroir = true
+racine_deg = 36
+longueur = 0.4
+largeur = 0.14
+chute = 0.7
+ecart = 0.05
+
+[[meches]]            # petites mèches de la nuque
+de_deg = 140
+a_deg = 220
+nombre = 4
+racine_deg = 96
+longueur = 0.13
+largeur = 0.16
+chute = 0.5
+ecart = 0.05

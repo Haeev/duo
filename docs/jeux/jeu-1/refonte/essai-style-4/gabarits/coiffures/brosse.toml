@@ -1,0 +1,44 @@
+# Coiffure « brosse à toupet »: cheveux courts, toupet dressé devant, épis sur le dessus, pattes aux tempes.
+id = "brosse"
+graine = 5
+
+[calotte]
+volume = 0.05
+front_deg = 44
+cotes_deg = 74
+nuque_deg = 98
+dents_deg = 5
+aretes = 0.1
+
+[[meches]]            # toupet dressé
+de_deg = -34
+a_deg = 34
+nombre = 4
+racine_deg = 30
+longueur = 0.2
+largeur = 0.2
+epaisseur = 0.06
+leve = 1.1            # la mèche se dresse (0 couchée)
+vrille_deg = 10
+alea = 0.3
+
+[[meches]]            # épis du dessus
+de_deg = 60
+a_deg = 300
+nombre = 6
+racine_deg = 34
+longueur = 0.15
+largeur = 0.17
+epaisseur = 0.05
+leve = 0.8
+alea = 0.3
+
+[[meches]]            # pattes
+de_deg = 72
+a_deg = 96
+nombre = 1
+miroir = true
+racine_deg = 66
+longueur = 0.2
+largeur = 0.16
+chute = 0.8
