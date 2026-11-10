@@ -1,0 +1,442 @@
+# Gabarits des textures répétables de La Petite Ligne (refonte): sols, murs, toits, eau.
+#
+# Ajouter une texture = copier une entrée [[textures]] de même motif, changer `id`, `nom`,
+# `matiere` et les paramètres voulus, puis lancer
+#   bash games/la-petite-ligne-2/assets-src/textures/construire.sh
+# Aucun code à écrire. Recette complète et note d'intégration: README.md de ce dossier.
+#
+# Style (vision définitive du client, 2026-11-10): « bande dessinée encrée ». Aplats peints à 2 ou
+# 3 tons par matière (`tons`: clair, moyen, sombre), contours et joints à l'encre épais et
+# irréguliers, éléments un peu de travers, ombres en taches plates et en hachures, herbe en touffes
+# de traits sombres. Aucun bruit photographique, aucun relief réaliste, aucune brillance.
+# Toutes les images sont calculées par nos scripts: aucune image existante n'est reprise.
+#
+# Unités: mètres. Une texture couvre la `taille` de sa famille; les éléments sont arrondis au
+# nombre entier qui tient dedans (raccord sans couture). Les tailles obtenues sont écrites dans
+# textures.json (`mesures_m`) et contrôlées (verifier_textures.py).
+# Couleurs: noms de [couleurs] ou "#RRGGBB". Identifiants: anglais, minuscules et traits d'union.
+# `palettes`: lieux pour lesquels décliner la texture (la première garde l'identifiant, les
+# suivantes reçoivent le suffixe de [palettes.<lieu>]); par défaut, la palette de [reglages].
+
+[reglages]
+palette = "aubrune"
+passe = 0.0           # aucun gris mêlé: les tons du gabarit sont déjà ceux de la bible
+grain_peint = 0.0     # aucun bruit fin (style encré)
+ombre_cuite = 0.0     # aucun relief cuit: les ombres sont dessinées en aplats et hachures
+relief = 0.0
+qualite = 88          # WebP de couleur (traits nets: pas en dessous de 85)
+qualite_relief = 80
+
+# ---------------------------------------------------------------- palettes par lieu
+# Appliquées après le dessin: même motif, autre ambiance. `encre`: couleur des traits; `teinte` et
+# `desature`: part de la couleur remplacée par sa clarté teintée; `clarte`: facteur final.
+[palettes.aubrune]
+nom = "Aubrune"
+suffixe = "aubrune"
+encre = "#2E2620"     # brun très sombre, plus doux qu'un noir pur sur des aplats clairs
+clarte = 1.0
+
+[palettes.hautefonte]
+nom = "Hautefonte"
+suffixe = "hautefonte"
+encre = "#24252B"
+teinte = "#CDD0D6"
+desature = 0.3
+clarte = 0.9
+
+[palettes.combe-veilleuse]
+nom = "Combe-Veilleuse"
+suffixe = "combe"
+encre = "#1C201F"
+teinte = "#9DB2A9"
+desature = 0.5
+clarte = 0.7
+
+# ---------------------------------------------------------------- familles (un atlas par famille)
+# pixels: largeur x hauteur d'une couche; taille: mètres couverts (pixels carrés).
+[familles.sols_exterieurs]
+nom = "Sols extérieurs"
+pixels = [512, 512]
+taille = [4.0, 4.0]
+relief = false
+
+[familles.sols_interieurs]
+nom = "Sols intérieurs"
+pixels = [256, 256]
+taille = [1.6, 1.6]
+relief = false
+
+[familles.murs_exterieurs]
+nom = "Murs extérieurs"
+pixels = [256, 256]
+taille = [2.0, 2.0]
+relief = false
+
+[familles.toitures]
+nom = "Toitures"
+pixels = [256, 256]
+taille = [2.0, 2.0]
+relief = false
+
+# ---------------------------------------------------------------- contrôles (verifier_textures.py)
+[controles]
+poids_max_mo = 6.0
+raccord_max = 1.25        # écart au bord / plus grand écart entre colonnes voisines intérieures
+derive_max = 1.5          # même mesure sur des bandes de 5 cm glissantes (dérive lente de clarté)
+# contraste: le style encré est contrasté par nature (traits sombres sur aplats clairs). On borne
+# l'écart-type de L* pour que la matière reste un fond derrière les personnages, et la clarté
+# moyenne pour un jour tendre et clair à Aubrune (les autres lieux sont plus sombres)
+ecart_type_l_max = 24.0
+detail_l_max = 22.0
+l_moyenne = [45.0, 88.0]
+l_moyenne_lieu = { hautefonte = [38.0, 85.0], combe-veilleuse = [25.0, 70.0] }
+# chaque matière prioritaire: au moins 2 variantes à Aubrune
+matieres = ["herbe", "terre", "paves", "dalles", "plancher", "crepi", "pierre", "tuiles", "bardage", "eau"]
+variantes_min = 2
+[controles.echelles]
+lame = [0.08, 0.14]
+lame_large = [0.12, 0.30]   # fiches marquées `large = true`: plancher large, bardage
+pave = [0.09, 0.16]
+dalle = [0.30, 0.80]
+tuile = [0.18, 0.30]
+brique = [0.20, 0.26]
+
+[couleurs]
+trait_herbe = "#46602F"
+trait_herbe_sec = "#6A6236"
+trait_eau = "#3D6676"
+mousse = "#8EA562"
+
+# ================================================================= sols extérieurs
+
+[[textures]]
+id = "grass-meadow"
+nom = "Herbe de pré"
+matiere = "herbe"
+famille = "sols_exterieurs"
+motif = "herbe"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+tons = ["#A9C46A", "#93B45E", "#82A653"]
+trait_herbe = "trait_herbe"
+densite = 7
+brin = 0.17
+
+[[textures]]
+id = "grass-short"
+nom = "Herbe rase"
+matiere = "herbe"
+famille = "sols_exterieurs"
+motif = "herbe"
+tons = ["#9FBE62", "#8DAF59"]
+trait_herbe = "trait_herbe"
+densite = 4
+brin = 0.12
+taches = 0.25
+
+[[textures]]
+id = "grass-flowers"
+nom = "Herbe fleurie"
+matiere = "herbe"
+famille = "sols_exterieurs"
+motif = "herbe"
+tons = ["#ADC76E", "#97B862", "#86A955"]
+trait_herbe = "trait_herbe"
+densite = 7
+brin = 0.15
+fleurs = ["#F4EEDC", "#EBCF6A", "#E6A5B0"]
+densite_fleurs = 2
+
+[[textures]]
+id = "earth-packed"
+nom = "Terre battue"
+matiere = "terre"
+famille = "sols_exterieurs"
+motif = "terre"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+tons = ["#DCC59A", "#CFB489", "#BCA078"]
+tons_cailloux = ["#E6DCC6", "#CBC0AA"]
+cailloux = 6
+taille_cailloux = 0.035
+tirets = 10
+
+[[textures]]
+id = "earth-path-grassy"
+nom = "Chemin de terre aux bords herbus"
+matiere = "terre"
+famille = "sols_exterieurs"
+motif = "terre"
+tons = ["#D8C093", "#CAAE83", "#B49870"]
+tons_cailloux = ["#E3D8C1"]
+cailloux = 3
+taille_cailloux = 0.03
+tirets = 6
+touffes = 2
+trait_herbe = "trait_herbe_sec"
+
+[[textures]]
+id = "earth-dark-damp"
+nom = "Terre humide du potager"
+matiere = "terre"
+famille = "sols_exterieurs"
+motif = "terre"
+tons = ["#B69772", "#A58763", "#8F7455"]
+tons_cailloux = ["#CDBFA6"]
+cailloux = 2
+tirets = 16
+
+[[textures]]
+id = "cobbles-square"
+nom = "Pavés de place"
+matiere = "paves"
+famille = "sols_exterieurs"
+motif = "paves"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+pave = 0.14
+tons = ["#D2C8B6", "#C2B7A3", "#AC9F8A"]
+trait = 0.014
+hachures = 0.25
+
+[[textures]]
+id = "cobbles-long"
+nom = "Pavés allongés de rue"
+matiere = "paves"
+famille = "sols_exterieurs"
+motif = "paves"
+pave = 0.12
+allonge = 1.6
+tons = ["#CDC4B4", "#BCB2A0", "#A89C88"]
+trait = 0.013
+hachures = 0.15
+
+[[textures]]
+id = "platform-slabs"
+nom = "Dalles de quai"
+matiere = "dalles"
+famille = "sols_exterieurs"
+motif = "dalles"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+dalle = 0.5
+quinconce = true
+tons = ["#D9D2C3", "#CBC3B2", "#B4AB98"]
+trait = 0.016
+fissures = 0.6
+hachures = 0.2
+
+[[textures]]
+id = "flagstones-large"
+nom = "Grandes dalles de pierre"
+matiere = "dalles"
+famille = "sols_exterieurs"
+motif = "dalles"
+dalle = 0.8
+dalle_h = 0.4
+quinconce = true
+tons = ["#D6CDBB", "#C7BCA8", "#B0A48F"]
+trait = 0.017
+fissures = 0.4
+ombre = 0.18
+
+[[textures]]
+id = "water-river"
+nom = "Eau de rivière"
+matiere = "eau"
+famille = "sols_exterieurs"
+motif = "eau"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+tons = ["#9CC7CB", "#86B3BD", "#6E9DAB"]
+trait_eau = "trait_eau"
+rides = 8
+
+[[textures]]
+id = "water-pond"
+nom = "Eau calme de mare"
+matiere = "eau"
+famille = "sols_exterieurs"
+motif = "eau"
+tons = ["#9BC0B4", "#86AEA3", "#719A90"]
+trait_eau = "#3B6158"
+rides = 3
+
+# ================================================================= sols intérieurs
+
+[[textures]]
+id = "floorboards-honey"
+nom = "Plancher miel"
+matiere = "plancher"
+famille = "sols_interieurs"
+motif = "planches"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+lame = 0.13
+longueur = 1.2
+tons = ["#D2A468", "#C3955B", "#A97E4A"]
+trait = 0.009
+veines = 10
+noeuds = 2
+clous = true
+
+[[textures]]
+id = "floorboards-wide-old"
+nom = "Vieux plancher large"
+matiere = "plancher"
+famille = "sols_interieurs"
+motif = "planches"
+large = true
+lame = 0.2
+longueur = 0
+tons = ["#BF9767", "#AE875A", "#93714A"]
+trait = 0.01
+veines = 12
+noeuds = 3
+hachures = 0.3
+
+[[textures]]
+id = "floorboards-painted-sage"
+nom = "Plancher peint sauge"
+matiere = "plancher"
+famille = "sols_interieurs"
+motif = "planches"
+lame = 0.12
+longueur = 0.9
+tons = ["#A3B597", "#93A688", "#7C9073"]
+trait = 0.009
+veines = 4
+
+# ================================================================= murs extérieurs
+
+[[textures]]
+id = "render-cream"
+nom = "Crépi crème"
+matiere = "crepi"
+famille = "murs_exterieurs"
+motif = "crepi"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+tons = ["#F0E4C9", "#E6D7B7", "#D3C09B"]
+taches_encre = 14
+fissures = 0.3
+
+[[textures]]
+id = "render-pink-flaking"
+nom = "Crépi rose écaillé"
+matiere = "crepi"
+famille = "murs_exterieurs"
+motif = "crepi"
+tons = ["#EDCDB8", "#E0BCA5", "#CBA18A"]
+ecaille = 0.4
+dessous = "#C9B9A0"
+taches_encre = 10
+
+[[textures]]
+id = "render-ochre"
+nom = "Crépi ocre"
+matiere = "crepi"
+famille = "murs_exterieurs"
+motif = "crepi"
+tons = ["#E8CD95", "#DBBD83", "#C6A56C"]
+taches_encre = 12
+fissures = 0.5
+
+[[textures]]
+id = "rubble-stone"
+nom = "Moellons de pierre"
+matiere = "pierre"
+famille = "murs_exterieurs"
+motif = "pierre"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+assise = 0.2
+longueur = 0.32
+tons = ["#D3C9B5", "#C3B7A2", "#AB9E89"]
+trait = 0.016
+hachures = 0.3
+
+[[textures]]
+id = "rubble-stone-mossy"
+nom = "Pierre moussue"
+matiere = "pierre"
+famille = "murs_exterieurs"
+motif = "pierre"
+assise = 0.24
+longueur = 0.4
+tons = ["#C6C1AE", "#B4AE9A", "#9C9583"]
+trait = 0.017
+mousse = 0.6
+ton_mousse = "mousse"
+hachures = 0.3
+
+[[textures]]
+id = "clapboard-sage"
+nom = "Bardage de bois peint sauge"
+matiere = "bardage"
+famille = "murs_exterieurs"
+motif = "bardage"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+large = true
+lame = 0.17
+tons = ["#A1B998", "#93AD8A", "#6F8A69"]
+trait = 0.011
+ecaille = 0.25
+dessous = "#B99B78"
+hachures = 0.5
+
+[[textures]]
+id = "clapboard-raw-wood"
+nom = "Bardage de bois brut"
+matiere = "bardage"
+famille = "murs_exterieurs"
+motif = "bardage"
+large = true
+lame = 0.2
+tons = ["#BE9466", "#AE8558", "#88663F"]
+trait = 0.011
+
+[[textures]]
+id = "brick-red"
+nom = "Brique de ville"
+matiere = "brique"
+famille = "murs_exterieurs"
+motif = "brique"
+palettes = ["hautefonte", "aubrune"]
+brique = 0.22
+tons = ["#C47A5E", "#B36B52", "#9A5743"]
+mortier = "#E1D5BF"
+trait = 0.006
+ombre = 0.15
+
+# ================================================================= toitures
+
+[[textures]]
+id = "roof-tiles"
+nom = "Tuiles"
+matiere = "tuiles"
+famille = "toitures"
+motif = "tuiles"
+palettes = ["aubrune", "hautefonte", "combe-veilleuse"]
+tuile = 0.22
+pureau = 0.15
+tons = ["#D2876A", "#C27758", "#93503D"]
+trait = 0.012
+hachures = 1
+
+[[textures]]
+id = "roof-tiles-mossy"
+nom = "Tuiles moussues"
+matiere = "tuiles"
+famille = "toitures"
+motif = "tuiles"
+tuile = 0.22
+pureau = 0.15
+tons = ["#C8836A", "#B67659", "#8A4F3E"]
+trait = 0.012
+mousse = 0.5
+ton_mousse = "mousse"
+
+[[textures]]
+id = "roof-slates"
+nom = "Ardoises"
+matiere = "tuiles"
+famille = "toitures"
+motif = "tuiles"
+palettes = ["hautefonte", "combe-veilleuse"]
+tuile = 0.24
+pureau = 0.11
+tons = ["#8A93A0", "#7A8491", "#545C68"]
+trait = 0.011
