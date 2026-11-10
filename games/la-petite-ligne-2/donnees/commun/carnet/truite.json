@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "truite",
+  "category": "poissons",
+  "name": "Truite",
+  "place": "essai-gare",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "Une truite mouchetée, fraîche comme la source."
+}

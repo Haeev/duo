@@ -3,6 +3,7 @@
  * la graine des ombres, accepte les lancers (l'ombre qui viendra, la graine de la touche et du
  * combat), puis valide le résultat joué chez le pêcheur en rejouant son journal de touches.
  */
+import { recordFind } from '../collections/registre';
 import { deriveSeed, createRandom } from '@duo/sdk/sim';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { FishingSpot } from '../../donnees/schemas/peche';
@@ -187,9 +188,9 @@ function land(
   );
 
   const progress = sim.world.progress;
-  const seen = (progress.collections[FISHING.collection] ??= []);
-  const isNew = !seen.includes(def.id);
-  if (isNew) seen.push(def.id);
+  // Une seule source des espèces vues: l'album des collections (taille en cm pour son record).
+  const isNew = progress.album?.f[def.id] === undefined;
+  recordFind(sim, player, def.id, sizeMm / 10);
   const key = recordKey(player, def.id);
   const previous = progress.memory[key]?.v;
   const record = typeof previous !== 'number' || sizeMm > previous;

@@ -199,18 +199,15 @@ describe('carnet: collections', () => {
     expect(moveEntry(16, 5, 'right')).toBe(5);
   });
 
-  it('lit les entrées trouvées dans la progression', () => {
+  it('sans entrée dans les données, une famille garde le catalogue d’essai', () => {
+    // L'album (`collectionBook`) fait foi pour les familles qui ont des entrées (poissons: voir
+    // `carnet-collections-moteur.test.ts`); `progress.collections` n'est plus lu.
     const content = gameContent();
     const world = createWorld(content, SEED, MEMBERS);
-    world.progress.collections.fish = ['fish-2'];
-    const sources = worldSources(content, {
-      catalogue: fakeCollections().map((c) => ({
-        ...c,
-        entries: c.entries.map((e) => ({ ...e, found: false })),
-      })),
-    });
-    const fish = sources.collections(world, 0).find((c) => c.family === 'fish');
-    expect(fish?.entries.filter((e) => e.found).map((e) => e.id)).toEqual(['fish-2']);
+    const sources = worldSources(content, { catalogue: fakeCollections() });
+    const recipes = sources.collections(world, 0).find((c) => c.family === 'recipes');
+    const fake = fakeCollections().find((c) => c.family === 'recipes');
+    expect(recipes?.entries.map((e) => e.id)).toEqual(fake?.entries.map((e) => e.id));
   });
 });
 

@@ -210,7 +210,8 @@ describe('pêche: partie jouée chez le pêcheur, validée par l hôte', () => {
     });
     if (caught?.type !== 'fish_caught') return;
     expect(countItem(sim.world.players[0], caught.catch)).toBe(caught.count);
-    expect(sim.world.progress.collections[FISHING.collection]).toContain(caught.catch);
+    // Le carnet des collections (album) fait foi pour les espèces vues.
+    expect(sim.world.progress.album?.f[caught.catch]).toBeDefined();
     expect(sim.world.progress.memory[recordKey(0, caught.catch)]?.v).toBe(caught.sizeMm);
     const entry = fishCollectionView(sim.content, sim.world).find((f) => f.catch === caught.catch);
     expect(entry).toMatchObject({ seen: true, records: [caught.sizeMm, 0] });

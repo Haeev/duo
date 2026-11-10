@@ -13,6 +13,7 @@ import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { bondKey } from '../../etat/progression';
 import { glanceTarget, journal } from '../../simulation/quetes/lecture';
+import { collectionBook } from '../../simulation/collections/registre';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { GraphicsOptions } from '../../rendu/options';
 import { UI_TUNING } from '../reglages';
@@ -181,6 +182,38 @@ export interface WorldSourcesExtras {
   readonly closed?: (placeId: string, world: ReadonlyWorld) => readonly string[];
 }
 
+/** Catégorie des données (`commun/collections.json`) vers la famille d'onglet du carnet. */
+const FAMILY_OF_CATEGORY: Readonly<Record<string, CollectionFamily>> = {
+  poissons: 'fish',
+  insectes: 'insects',
+  tresors: 'fossils',
+  fleurs: 'flowers',
+  tenues: 'outfits',
+  recettes: 'recipes',
+  'cartes-postales': 'postcards',
+  musiques: 'music',
+};
+
+/** Moments du jour couverts par une plage d'heures (minutes); `from = to`: toute la journée. */
+const MOMENTS: readonly { readonly id: string; readonly from: number; readonly to: number }[] = [
+  { id: 'morning', from: 360, to: 720 },
+  { id: 'day', from: 720, to: 1080 },
+  { id: 'evening', from: 1080, to: 1320 },
+  { id: 'night', from: 1320, to: 1800 },
+];
+
+function momentsOf(hours: { readonly from: number; readonly to: number }): string[] {
+  if (hours.from === hours.to) return MOMENTS.map((m) => m.id);
+  const to = hours.to > hours.from ? hours.to : hours.to + 1440;
+  const overlaps = (a: number, b: number): boolean => a < to && b > hours.from;
+  return MOMENTS.filter(
+    (m) =>
+      overlaps(m.from, m.to) ||
+      overlaps(m.from - 1440, m.to - 1440) ||
+      overlaps(m.from + 1440, m.to + 1440),
+  ).map((m) => m.id);
+}
+
 const HALF_HEART_POINTS = 50;
 const MAX_HALVES = 10;
 
@@ -277,13 +310,34 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
       });
     },
     collections(world) {
+      // Le carnet des collections fait foi (`collectionBook`); le catalogue d'essai ne sert plus
+      // qu'aux familles qui n'ont encore aucune entrée dans les données.
+      const book = collectionBook(world, content);
       const catalogue = extras.catalogue ?? [];
       return COLLECTION_FAMILIES.map((family) => {
-        const found = new Set(world.progress.collections[family] ?? []);
-        const entries = catalogue.find((c) => c.family === family)?.entries ?? [];
+        const category = book.find((c) => FAMILY_OF_CATEGORY[c.id] === family);
+        if (category === undefined || category.entries.length === 0)
+          return { family, entries: catalogue.find((c) => c.family === family)?.entries ?? [] };
         return {
           family,
-          entries: entries.map((e) => ({ ...e, found: found.has(e.id) || e.found })),
+          entries: category.entries.map((e) => {
+            const found = e.by[0] || e.by[1];
+            return {
+              id: e.id,
+              name: e.name,
+              rarity: 1,
+              found,
+              firstBy: e.firstBy,
+              clues: {
+                moments: e.rarity === null ? null : momentsOf(e.rarity.hours),
+                weathers:
+                  e.rarity === null || e.rarity.weathers.length === 0 ? null : e.rarity.weathers,
+                seasons:
+                  e.rarity === null || e.rarity.seasons.length === 0 ? null : e.rarity.seasons,
+                where: found ? (content.places[e.place]?.def.name ?? null) : null,
+              },
+            };
+          }),
         };
       });
     },

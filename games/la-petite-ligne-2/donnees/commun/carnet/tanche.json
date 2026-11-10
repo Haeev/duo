@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "tanche",
+  "category": "poissons",
+  "name": "Tanche",
+  "place": "essai-gare",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "Une tanche toute verte et glissante."
+}
