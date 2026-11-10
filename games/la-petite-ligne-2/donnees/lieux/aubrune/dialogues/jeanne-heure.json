@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "jeanne-heure",
+  "villager": "jeanne",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.reponse",
+      "equals": "ouvert"
+    }
+  ],
+  "once": "player",
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu l'as entendue, toi aussi ? Deux coups. J'ai noté l'heure: 5 h 12.",
+      "emote": "surprise",
+      "next": "pari"
+    },
+    "pari": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Firmin dit que c'est le vent. Je parie un caramel que non.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tenu",
+          "text": "Pari tenu.",
+          "when": [],
+          "effects": [
+            {
+              "type": "remember",
+              "key": "aubrune.jeanne.pari",
+              "value": true,
+              "by": "actor"
+            }
+          ],
+          "next": "caramel"
+        },
+        {
+          "id": "vent",
+          "text": "C'était sûrement le vent.",
+          "when": [],
+          "effects": [],
+          "next": "menteur"
+        }
+      ]
+    },
+    "caramel": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je garde le caramel en attendant. Il est dans ma poche. Il fond un peu.",
+      "emote": "joy",
+      "next": null
+    },
+    "menteur": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Le vent ne sait pas l'heure. Moi si.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "id": "odette-poules",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.poules",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "J'ai deux poules de trop: Pimprenelle et Capucine. Elles s'ennuient, chez moi.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "oui",
+          "text": "On les prend !",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "oeuf",
+              "count": 6
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.poules.nombre",
+              "value": 2,
+              "by": "duo"
+            }
+          ],
+          "next": "pondu"
+        },
+        {
+          "id": "sures",
+          "text": "Elles sont gentilles ?",
+          "when": [],
+          "effects": [],
+          "next": "gentilles"
+        }
+      ]
+    },
+    "gentilles": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Pimprenelle, oui. Capucine a un caractère. Comme moi. Alors ?",
+      "emote": null,
+      "next": "choix2"
+    },
+    "choix2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "oui",
+          "text": "On les prend !",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "oeuf",
+              "count": 6
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.poules.nombre",
+              "value": 2,
+              "by": "duo"
+            }
+          ],
+          "next": "pondu"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Je réfléchis.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "pondu": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Elles ont pondu dans le panier, de saisissement. Six œufs. Tiens !",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Elles dormiront dans ton jardin. Basile leur fera un poulailler, s'il trouve trois mots pour dire oui.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

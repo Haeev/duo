@@ -44,7 +44,12 @@ function bricksOf(files: Record<string, Json>, prop: string): Json[] {
 describe('données du jeu', () => {
   it('se chargent sans problème', () => {
     const content = gameContent();
-    expect(Object.keys(content.places).sort()).toEqual(['essai-gare', 'essai-halte']);
+    expect(Object.keys(content.places).sort()).toEqual([
+      'aubrune',
+      'essai-gare',
+      'essai-halte',
+      'train-de-nuit',
+    ]);
     expect(content.items.pomme?.stack).toBe(10);
     expect(content.bags.toolbarSlots).toBe(5);
     const dialogueIds = content.places['essai-gare']?.dialogues.map((d) => d.id) ?? [];

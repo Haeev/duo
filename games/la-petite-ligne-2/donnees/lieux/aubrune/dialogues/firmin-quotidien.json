@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "id": "firmin-quotidien",
+  "villager": "firmin",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.firmin",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.firmin",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.firmin",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.firmin",
+              "equals": 4
+            }
+          ],
+          "next": "b4"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.firmin",
+              "equals": 5
+            }
+          ],
+          "next": "b5"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Bonjour. Il est l'heure qu'il est, et c'est déjà ça.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.firmin",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ah, te voilà. Deux minutes de retard sur personne. Je note quand même.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.firmin",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Bonjour. Le train de 8 h 40 ne passera pas. Comme hier. C'est fiable, au moins.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.firmin",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Tiens. Tu tombes entre deux trains qui ne viennent pas. C'est le meilleur moment.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.firmin",
+          "value": 4,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b4": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Bonjour. J'ai remonté la pendule du bureau. Elle avance de quatre secondes. Je la surveille.",
+      "emote": null,
+      "next": "t4"
+    },
+    "t4": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.firmin",
+          "value": 5,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b5": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Salut, garde. Rien à signaler. À part toi.",
+      "emote": null,
+      "next": "t5"
+    },
+    "t5": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.firmin",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1080
+            }
+          ],
+          "next": "midi"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1290
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le matin, je balaie le quai. Pour personne. Mais un quai, ça doit être prêt.",
+      "emote": null,
+      "next": null
+    },
+    "midi": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je mange à 12 h 15. Le quart d'heure d'avant, c'est pour regarder la voie.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le dernier train partait à 19 h 47. Je reste jusqu'à 19 h 48. Par politesse.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Tu ne dors pas ? Moi non plus. Ça fait une équipe de nuit, ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

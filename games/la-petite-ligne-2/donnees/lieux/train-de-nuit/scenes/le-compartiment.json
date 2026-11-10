@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "le-compartiment",
+  "title": "Le compartiment",
+  "together": true,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La nuit défile derrière la vitre. Le train ronronne. Face à face, deux voyageurs et deux valises.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "camera",
+      "focus": {
+        "villager": "controleur"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "say",
+      "who": "controleur",
+      "text": "Contrôle ! Approchez, un à la fois. J'ai deux mains, mais un seul poinçon.",
+      "emote": "question",
+      "sound": "Clac !",
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

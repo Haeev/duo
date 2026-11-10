@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-vente",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.vendu-achille",
+      "equals": true
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Tu as porté des œufs chez Achille. Je le sais, je sais tout. Je ne t'en veux pas. Un peu.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "id": "mado",
+  "name": "Mado Cazals",
+  "temper": "cheerful",
+  "look": {
+    "shape": "adult-f-round",
+    "skin": 5,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [2, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [1]
+      },
+      {
+        "slot": "top",
+        "id": "top-tank",
+        "colors": [8]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [12]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [10]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [0, 1]
+      }
+    ]
+  },
+  "stands": "gr6",
+  "voice": "medium",
+  "life": {
+    "home": "gr6",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1200,
+        "at": {
+          "point": "gr6"
+        },
+        "activity": "forger",
+        "gesture": "marteler"
+      },
+      {
+        "from": 1200,
+        "to": 1260,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "prendre-l-air",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "gr6"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["pierre"],
+      "liked": ["pain", "buche"],
+      "disliked": ["coquelicot"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

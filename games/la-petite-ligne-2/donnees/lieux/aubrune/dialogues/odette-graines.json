@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "odette-graines",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.graines",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Un potager ! Il te faut des radis. Ça pousse vite et ça ne discute pas.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "prendre",
+          "text": "Je prends les graines.",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "graines-radis",
+              "count": 6
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Plus tard.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Bêche d'abord, sème ensuite, arrose toujours. Et parle-leur, ça les vexe moins.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

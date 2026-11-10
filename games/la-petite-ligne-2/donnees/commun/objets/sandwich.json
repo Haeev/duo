@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "sandwich",
+  "name": "Sandwich du chariot",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 30
+  },
+  "tool": null
+}

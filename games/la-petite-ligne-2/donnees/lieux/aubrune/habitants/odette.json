@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "id": "odette",
+  "name": "Odette Ferrand",
+  "temper": "chatty",
+  "look": {
+    "shape": "adult-f-round",
+    "skin": 1,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [4, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bun",
+        "colors": [9]
+      },
+      {
+        "slot": "dress",
+        "id": "dress-simple",
+        "colors": [5]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [1, 0]
+      }
+    ]
+  },
+  "stands": "pl-o",
+  "voice": "bouncy",
+  "life": {
+    "home": "pl-o",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1260,
+        "at": {
+          "point": "pl-o"
+        },
+        "activity": "tenir-l-epicerie",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "pl-o"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["tourte-du-quai"],
+      "liked": ["oeuf", "tomate", "radis"],
+      "disliked": ["pierre"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

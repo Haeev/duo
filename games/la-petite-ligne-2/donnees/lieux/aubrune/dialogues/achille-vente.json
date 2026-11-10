@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "id": "achille-vente",
+  "villager": "achille",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.vente-achille",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Des œufs ? Un euro pièce. Un œuf, c'est une aube qu'on casse.",
+      "emote": "joy",
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "vendre",
+          "text": "Va pour trois !",
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "oeuf",
+              "count": 3
+            }
+          ],
+          "effects": [
+            {
+              "type": "take_item",
+              "item": "oeuf",
+              "count": 3
+            },
+            {
+              "type": "give_money",
+              "amount": 300
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte1.vendu-achille",
+              "value": true,
+              "by": "duo"
+            }
+          ],
+          "next": "quoi"
+        },
+        {
+          "id": "non",
+          "text": "Je repasserai.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "quoi": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Odette dit que je paie n'importe quoi ? Elle a raison. Je paie ce que ça vaut.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

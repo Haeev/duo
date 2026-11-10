@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "id": "marthe-quotidien",
+  "villager": "marthe",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.marthe",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.marthe",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.marthe",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.marthe",
+              "equals": 4
+            }
+          ],
+          "next": "b4"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.marthe",
+              "equals": 5
+            }
+          ],
+          "next": "b5"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Bonjour. C'est dit.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.marthe",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Bonjour. Si Honorine t'a dit quelque chose, c'est faux. Même la date.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.marthe",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Bonjour. Ici, la cloche sonne midi à midi. Au moins, c'est simple.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.marthe",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Bonjour. Tu marches trop vite. Ou pas assez. Je n'ai pas décidé.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.marthe",
+          "value": 4,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b4": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Bonjour. J'ai mis mon chapeau. Ce n'est pas pour toi, c'est pour le vent.",
+      "emote": null,
+      "next": "t4"
+    },
+    "t4": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.marthe",
+          "value": 5,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b5": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Bonjour. Encore toi. Bon. Ce n'est pas un reproche. Pas encore.",
+      "emote": null,
+      "next": "t5"
+    },
+    "t5": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.marthe",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1080
+            }
+          ],
+          "next": "midi"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1290
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Le matin, je sonne l'angélus. Le bourg se lève. Sauf Achille.",
+      "emote": null,
+      "next": null
+    },
+    "midi": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Midi. Douze coups. Pas onze, pas treize. Je compte.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Le soir, je ferme l'église. Les pigeons restent. Ils ont leurs habitudes.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "La nuit, on ne sonne pas. Sauf les imbéciles. Et le vent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

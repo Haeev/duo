@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "marthe-hygiene",
+  "villager": "marthe",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Non. Pas comme ça. Lave-toi, puis reviens. Je t'écouterai si j'ai le temps.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

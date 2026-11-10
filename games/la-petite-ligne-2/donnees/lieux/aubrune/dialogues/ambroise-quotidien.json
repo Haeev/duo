@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "id": "ambroise-quotidien",
+  "villager": "ambroise",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.ambroise",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.ambroise",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.ambroise",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.ambroise",
+              "equals": 4
+            }
+          ],
+          "next": "b4"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.ambroise",
+              "equals": 5
+            }
+          ],
+          "next": "b5"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Bonjour. Tu es à l'heure. Laquelle, c'est un autre sujet.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.ambroise",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Hm. Bonjour. Ma montre dit 12 secondes de plus que la tienne. La tienne ment.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.ambroise",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Bonjour. Ne touche à rien, tout est réglé. Même la poussière.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.ambroise",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ah. Bonjour. J'ai réglé trois pendules ce matin. Elles me remercient en tic-tac.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.ambroise",
+          "value": 4,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b4": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Bonjour. Si tu vois Firmin, ne lui dis pas bonjour de ma part. Merci.",
+      "emote": null,
+      "next": "t4"
+    },
+    "t4": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.ambroise",
+          "value": 5,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "b5": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Hm. Bonjour. Une minute, c'est long. Plus qu'on ne croit.",
+      "emote": null,
+      "next": "t5"
+    },
+    "t5": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.ambroise",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "heure"
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1080
+            }
+          ],
+          "next": "midi"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1080,
+              "to": 1290
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Le matin, je remonte les horloges. Toutes. Sauf une, et ça ne te regarde pas.",
+      "emote": null,
+      "next": null
+    },
+    "midi": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Midi. Les cloches, les pendules et moi: tous d'accord. C'est rare.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Le soir, j'écoute les tic-tac. On les croit tous pareils. Ils ne le sont pas.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "La nuit, une horloge s'entend mieux. Les regrets aussi. Bonne nuit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

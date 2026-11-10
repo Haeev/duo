@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "id": "odette-souper",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.souper",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "À table ! Soupe aux herbes. Recette de ma mère, améliorée par moi.",
+      "emote": "joy",
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "merci",
+          "text": "Merci, Odette !",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "soupe-aux-herbes",
+              "count": 2
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "herbes",
+          "text": "Quelles herbes ?",
+          "when": [],
+          "effects": [],
+          "next": "secret"
+        }
+      ]
+    },
+    "secret": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ça, c'est un secret. Le seul que je garde. Tiens, sers-toi.",
+      "emote": null,
+      "next": "choix2"
+    },
+    "choix2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "merci",
+          "text": "Merci, Odette !",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "soupe-aux-herbes",
+              "count": 2
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Tout à l'heure.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Une pour toi, une pour ta moitié. Mangez chaud, et au lit: les lits sont faits.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

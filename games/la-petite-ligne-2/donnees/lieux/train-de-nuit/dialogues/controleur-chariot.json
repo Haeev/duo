@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "controleur-chariot",
+  "villager": "controleur",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "train-de-nuit.prologue.chariot",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "chariot",
+  "nodes": {
+    "chariot": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Chariot ! Sandwichs, eau plate, règlement de poche. Je fais aussi le chariot: article 12, polyvalence.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "sandwich",
+          "text": "Un sandwich, s'il te plaît.",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "sandwich",
+              "count": 1
+            }
+          ],
+          "next": "servi"
+        },
+        {
+          "id": "reglement",
+          "text": "Le règlement de poche ?",
+          "when": [],
+          "effects": [],
+          "next": "epuise"
+        }
+      ]
+    },
+    "servi": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Jambon-beurre. Il est froid. C'est un sandwich: c'est son état normal.",
+      "emote": "joy",
+      "next": null
+    },
+    "epuise": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Épuisé. Je l'ai trop lu.",
+      "emote": "sad",
+      "next": null
+    }
+  }
+}

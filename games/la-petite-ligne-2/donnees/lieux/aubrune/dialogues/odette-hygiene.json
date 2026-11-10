@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "odette-hygiene",
+  "villager": "odette",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ma foi... Tu as dormi dans un sac de pommes de terre ? La pompe est à dix pas. Je ne bouge pas.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

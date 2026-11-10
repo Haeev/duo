@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-ronces",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.debroussailler",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ronces parties. Émile aurait ri.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

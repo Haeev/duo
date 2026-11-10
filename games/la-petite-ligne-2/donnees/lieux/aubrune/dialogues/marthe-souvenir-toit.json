@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-toit",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.toit",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ton toit est droit. Je l'ai vu du clocher. Tout se voit, du clocher.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "id": "solange-besaces",
+  "villager": "solange",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.besaces",
+      "equals": "ouvert"
+    }
+  ],
+  "once": "player",
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Deux gardes sans sac ? On ne monte pas sur scène sans accessoires !",
+      "emote": "surprise",
+      "next": "tiens"
+    },
+    "tiens": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Tiens: une besace. Quatre poches, du cuir qui a vécu.",
+      "emote": null,
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "merci",
+          "text": "Elle est parfaite.",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_bag",
+              "bag": "besace"
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "couleur",
+          "text": "Tu l'as en bleu ?",
+          "when": [],
+          "effects": [],
+          "next": "bleu"
+        }
+      ]
+    },
+    "bleu": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "En bleu, en rouge, en jaune: en cuir. Choisis le cuir.",
+      "emote": null,
+      "next": "choix2"
+    },
+    "choix2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "merci",
+          "text": "Va pour le cuir.",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_bag",
+              "bag": "besace"
+            }
+          ],
+          "next": "fin"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Je repasserai.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié aura la sienne: qu'elle passe. Et reviens me raconter. Avec des détails.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

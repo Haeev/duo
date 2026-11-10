@@ -19,8 +19,10 @@ export function referenceSave(version: number): { dataSchema: number; data: unkn
  */
 export function livedWorld(content: Content): WorldState {
   const world = createWorld(content, 7, MEMBERS);
-  const [first, second] = Object.keys(content.places);
-  if (first === undefined || second === undefined) throw new Error('il faut deux lieux d’essai');
+  // Le lieu de départ et le premier lieu qu'il dessert (d'autres lieux peuvent s'ajouter aux données).
+  const first = content.settings.start.place;
+  const second = content.places[first]?.def.links[0];
+  if (second === undefined) throw new Error('il faut deux lieux d’essai');
   world.tick = 5400;
   world.minutes = 14 * 60 + 5;
   world.common.day = 3;

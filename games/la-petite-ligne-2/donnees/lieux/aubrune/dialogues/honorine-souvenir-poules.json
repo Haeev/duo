@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-poules",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.poules",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Odette t'a donné Capucine ? Cette poule m'a volé un bouton en 1987. Méfie-toi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

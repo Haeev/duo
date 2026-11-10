@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "width": 26,
+  "height": 12,
+  "blocked": [
+    {
+      "x": 0,
+      "y": 0,
+      "w": 26,
+      "h": 2
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "w": 26,
+      "h": 2
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "w": 1,
+      "h": 8
+    },
+    {
+      "x": 25,
+      "y": 2,
+      "w": 1,
+      "h": 8
+    },
+    {
+      "x": 9,
+      "y": 2,
+      "w": 1,
+      "h": 4
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "w": 8,
+      "h": 1
+    },
+    {
+      "x": 10,
+      "y": 6,
+      "w": 3,
+      "h": 1
+    },
+    {
+      "x": 14,
+      "y": 6,
+      "w": 11,
+      "h": 1
+    }
+  ],
+  "points": {
+    "compartiment": {
+      "x": 5,
+      "y": 4
+    },
+    "porte-compartiment": {
+      "x": 9.5,
+      "y": 6.5
+    },
+    "couloir": {
+      "x": 12,
+      "y": 8
+    },
+    "chariot": {
+      "x": 22,
+      "y": 8
+    },
+    "porte": {
+      "x": 13.5,
+      "y": 9.2
+    }
+  },
+  "objects": [
+    {
+      "id": "banquette-ouest",
+      "type": "banquette",
+      "x": 3,
+      "y": 3,
+      "rotation": 0
+    },
+    {
+      "id": "banquette-est",
+      "type": "banquette",
+      "x": 7,
+      "y": 3,
+      "rotation": 0
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "train-de-nuit",
+  "name": "Le train de nuit",
+  "station": {
+    "arrival": "compartiment",
+    "platform": "porte",
+    "platformRadius": 2
+  },
+  "links": ["aubrune"],
+  "activities": [],
+  "music": null
+}

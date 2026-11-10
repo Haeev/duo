@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-besace",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.besaces",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu as une besace ! Je parie qu'il y a une poche secrète. Il y en a toujours une.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

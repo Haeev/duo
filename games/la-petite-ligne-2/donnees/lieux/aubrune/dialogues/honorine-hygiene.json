@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "honorine-hygiene",
+  "villager": "honorine",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Oh, oh ! Tu sens comme mon troisième mari. Celui que je n'ai pas eu. File te laver.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

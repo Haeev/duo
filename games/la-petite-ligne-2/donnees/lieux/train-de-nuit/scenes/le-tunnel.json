@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "le-tunnel",
+  "title": "Le tunnel",
+  "together": true,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un tunnel. Le ronron des roues devient une berceuse.",
+      "emote": null,
+      "sound": "Tatoum... tatoum...",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "controleur",
+      "text": "Extinction des feux. Article 31: on rêve en silence. Allongez-vous.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

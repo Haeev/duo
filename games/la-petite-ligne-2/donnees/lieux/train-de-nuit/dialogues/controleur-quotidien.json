@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "id": "controleur-quotidien",
+  "villager": "controleur",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "train-de-nuit.tour.controleur",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "train-de-nuit.tour.controleur",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Prochain arrêt: terminus. C'est le seul. C'est pratique.",
+      "emote": null,
+      "next": "a1"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Le train a du retard. Ce n'est pas ma faute. Je le note quand même.",
+      "emote": null,
+      "next": "a2"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "controleur",
+      "text": "Ne marche pas dans le couloir en dormant. Article 9. Il a servi.",
+      "emote": null,
+      "next": "a0"
+    },
+    "a0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "train-de-nuit.tour.controleur",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "a1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "train-de-nuit.tour.controleur",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "a2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "train-de-nuit.tour.controleur",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-toit",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.toit",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Un toit sur la maison d'Émile ! J'ai pleuré dans ma soupe. Elle était trop salée, de toute façon.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

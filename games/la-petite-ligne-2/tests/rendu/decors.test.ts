@@ -25,6 +25,7 @@ function parse(file: string): Promise<GLTF> {
 
 const PROPS_WITHOUT_MODEL = [
   'armoire',
+  'banquette',
   'baquet-essai',
   'branches',
   'buffet-essai',

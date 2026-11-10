@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "firmin-hygiene",
+  "villager": "firmin",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Hm. Tu sens le ballast mouillé. Passe à la pompe, et je te parlerai à l'heure.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

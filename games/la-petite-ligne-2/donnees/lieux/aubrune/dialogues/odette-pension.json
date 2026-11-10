@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "odette-pension",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.pension",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ah, les gardes de Firmin ! Je sais tout. Il ne m'a rien dit, j'ai deviné le reste.",
+      "emote": "joy",
+      "next": "lits"
+    },
+    "lits": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ce soir, vous dormez chez moi. Deux lits, des draps à la lavande, et une souris polie.",
+      "emote": null,
+      "next": "wagon"
+    },
+    "wagon": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Mais avant la soupe... Vous sentez le wagon. La pompe est sur la place.",
+      "emote": "anger",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Allez, allez ! La soupe n'attend pas. Enfin si, elle attend. Mais elle boude.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

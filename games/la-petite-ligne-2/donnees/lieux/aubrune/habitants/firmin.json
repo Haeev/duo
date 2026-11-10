@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "id": "firmin",
+  "name": "Firmin Lacombe",
+  "temper": "grumpy",
+  "look": {
+    "shape": "adult-m-round",
+    "skin": 2,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [3, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-side-part",
+        "colors": [8]
+      },
+      {
+        "slot": "hat",
+        "id": "hat-beanie-pompom",
+        "colors": [20]
+      },
+      {
+        "slot": "top",
+        "id": "top-sweater",
+        "colors": [20]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [21]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [20]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [2, 1]
+      }
+    ]
+  },
+  "stands": "n1",
+  "voice": "low",
+  "life": {
+    "home": "n1",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 720,
+        "at": {
+          "point": "quai"
+        },
+        "activity": "surveiller-le-quai",
+        "gesture": "balayer"
+      },
+      {
+        "from": 720,
+        "to": 840,
+        "at": {
+          "point": "gr2"
+        },
+        "activity": "dejeuner",
+        "gesture": null
+      },
+      {
+        "from": 840,
+        "to": 1260,
+        "at": {
+          "point": "quai"
+        },
+        "activity": "surveiller-le-quai",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "n1"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["vieille-piece"],
+      "liked": ["pain", "soupe-aux-herbes"],
+      "disliked": ["mures"]
+    },
+    "arrives": null,
+    "leaves": null
+  }
+}

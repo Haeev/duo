@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-lettre",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte1.lettre",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Firmin a empoché ta lettre ? Il a toujours tout gardé dans sa poche. Même ses excuses.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}
