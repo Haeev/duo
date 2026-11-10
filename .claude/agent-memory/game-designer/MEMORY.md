@@ -331,3 +331,7 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Sans sac au départ, c'est le nombre de cases libres qui borne le revenu d'un aller-retour; agrandir le sac améliore le confort, les outils améliorent le revenu. Le dire au client pour éviter d'attendre des sacs un effet économique.
 - Durées demandées (jour 30 min, nuit 20 min): une heure de jeu uniforme de 125 s donne jour 6 h à 20 h 30 et nuit 20 h 30 à 6 h.
 - Logement d'un lieu hanté: éviter l'hôtel à remettre en état avec des clients de l'intrigue (trop proche d'une référence du client); wagon de service retenu.
+- Décisions du client du 2026-11-10 pour la refonte: monnaie = euro (prix en multiples de 0,10 €, échelle divisée par dix, mêmes rapports); joueurs adultes avec choix femme ou homme dans l'éditeur. L'écriture neutre ci-dessus reste la première solution; quand l'accord est plus naturel, variante accordée par balise à deux formes, validée par l'outil. Toutes les pièces restent portables par tous.
+- Surnaturel « très doux » au premier lieu: chaque indice reçoit une explication raisonnable dite par un habitant; aucune apparition avant le dénouement; les esprits sont réservés au troisième lieu.
+- Règle de ressenti « aucune action courante ne bloque plus de 1,5 s »: exprimer la lenteur d'un outil en nombre de coups d'une seconde, jamais en un geste long.
+- Quand interface, bible et technique existent, le cahier résume et renvoie; vérifier les budgets techniques (128 m sur 128 m par lieu chargé) avant de chiffrer une carte.
