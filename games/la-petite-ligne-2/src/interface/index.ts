@@ -68,11 +68,18 @@ export interface InterfaceOptions {
   readonly editorAtStart?: boolean;
   /** Écoute du clavier (`window` par défaut). */
   readonly keyTarget?: Pick<Window, 'addEventListener' | 'removeEventListener'>;
+  /**
+   * Son d'interface sans événement de la simulation (`cues` de `audio/donnees/evenements.json`):
+   * ouvrir et fermer le carnet, une marque de la cuisine, un plat posé.
+   */
+  readonly onCue?: (cue: string) => void;
 }
 
 export interface GameInterface {
   /** Une image: `dt` en secondes depuis la précédente. */
   frame(dt: number): void;
+  /** Avis en haut à droite (reprise de partie, partie enregistrée). */
+  notice(text: string): void;
   /**
    * Un écran de l'interface prend le clavier (dialogue, carnet, rangement): la boucle ne doit
    * alors envoyer ni déplacement ni touche d'action à la simulation.
@@ -367,7 +374,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     }
   }
   const keyTarget = options.keyTarget ?? window;
-  const kitchen = createKitchen(layer, view, send, keyLabel, keyTarget);
+  const kitchen = createKitchen(layer, view, send, keyLabel, keyTarget, {
+    onCue: (cue) => {
+      if (cue.type === 'mark') options.onCue?.('choix');
+      else if (cue.type === 'dish') options.onCue?.('poser');
+    },
+  });
   const coop = createCoopScreen(layer, view, send, keyLabel, keyTarget, UI_TUNING.openGuardMs);
   const fishing = createFishingOverlay({
     ...{
@@ -412,7 +424,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   };
   keyTarget.addEventListener('keydown', onKey);
 
+  let notebookWasOpen = false;
   return {
+    notice(text) {
+      hud.notice(now, 'info', text);
+    },
     frame(dt) {
       const dtMs = Math.max(0, Math.min(250, dt * 1000));
       now += dtMs;
@@ -431,6 +447,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
+      if (notebook.isOpen() !== notebookWasOpen) {
+        notebookWasOpen = notebook.isOpen();
+        options.onCue?.(notebookWasOpen ? 'carnet-ouvre' : 'carnet-ferme');
+      }
       shop.frame(world, me, now);
       workshop.frame(world, me, now);
       kitchen.frame(dtMs);
