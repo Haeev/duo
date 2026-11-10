@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "lit-simple",
   "name": "Lit simple",
-  "model": "lit-simple",
+  "model": "bed-single",
   "size": {
     "w": 1,
     "h": 2
@@ -14,7 +14,8 @@
     {
       "brick": "sleep",
       "places": 1,
-      "wakeAt": 100
+      "wakeAt": 100,
+      "lie": { "height": 0.52, "pillow": 0.7, "spacing": 0 }
     }
   ]
 }

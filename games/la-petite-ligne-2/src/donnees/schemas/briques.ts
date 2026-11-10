@@ -65,6 +65,18 @@ export const BRICK_SCHEMAS = [
     places: v.pipe(IntSchema, v.minValue(1), v.maxValue(2)),
     /** Sommeil au réveil (100 pour un vrai lit, 80 pour une paillasse). */
     wakeAt: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(100)),
+    /**
+     * Pose du dormeur au rendu, couché sur le dos, tête vers le dos du meuble: dessus du couchage
+     * (m), du milieu du meuble au milieu de l'oreiller (m), écart entre deux places (m). Absente:
+     * couché sur le dessus de la forme provisoire.
+     */
+    lie: v.optional(
+      v.strictObject({
+        height: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(2)),
+        pillow: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(2)),
+        spacing: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(2)),
+      }),
+    ),
   }),
   /** Ranger: des cases comme celles du sac, partagées par les deux joueurs. */
   v.strictObject({

@@ -20,7 +20,12 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
+import type { Body } from '../etat/joueur';
+import type { PlaceState } from '../etat/lieu';
+import type { DeepReadonly, ReadonlyWorld } from '../etat/monde';
 import type { GameView } from '../session';
+import { SIM_HZ } from '../simulation/noyau/constantes';
+import { tripSeconds } from '../simulation/voyage/index';
 import {
   type CharacterLayer,
   type CharacterLayerFactory,
@@ -47,6 +52,9 @@ import { DEFAULT_GRAPHICS_OPTIONS, type GraphicsOptions } from './options';
 import { QualityGovernor, sizeSettingsOf, type RenderProfile } from './options-graphiques';
 import { type DisplaySurface, renderPixelSize, usefulResolutionSteps } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
+import { TRIP_SETTINGS } from './voyage/reglages';
+import { TripScene } from './voyage/scene';
+import { createTripFrame, tripFrame, type TripActor } from './voyage/sequence';
 
 export interface RenderOptions {
   readonly canvas: HTMLCanvasElement;
@@ -147,6 +155,40 @@ export function webglAvailable(): boolean {
 
 type Mutable<T> = { -readonly [K in keyof T]-?: T[K] };
 
+/**
+ * Le monde vu par la couche des personnages pendant le trajet: les deux joueurs aux places de la
+ * scène du train (corps réécrits à chaque image), sans meuble ni habitant autour d'eux.
+ */
+interface TripCast {
+  readonly world: ReadonlyWorld;
+  readonly place: DeepReadonly<PlaceState>;
+  readonly bodies: readonly [Body, Body];
+  /** Où était chacun à l'image précédente: un changement le pose d'un coup (montée, descente). */
+  readonly where: [TripActor['where'] | null, TripActor['where'] | null];
+}
+
+const PLAYER_INDICES = [0, 1] as const;
+
+function tripCast(world: ReadonlyWorld, place: DeepReadonly<PlaceState>): TripCast {
+  const bodies: [Body, Body] = [
+    { x: 0, y: 0, facing: 0, speed: 0 },
+    { x: 0, y: 0, facing: 0, speed: 0 },
+  ];
+  const [a, b] = world.players;
+  return {
+    world: {
+      ...world,
+      players: [
+        { ...a, body: bodies[0], gesture: null, talk: null },
+        { ...b, body: bodies[1], gesture: null, talk: null },
+      ],
+    },
+    place: { ...place, objects: {}, villagers: {} },
+    bodies,
+    where: [null, null],
+  };
+}
+
 class Engine implements GameRenderer {
   private readonly renderer: WebGLRenderer;
   private readonly scene = new Scene();
@@ -192,6 +234,15 @@ class Engine implements GameRenderer {
   private readonly background = new Color();
   /** Temps restant du fondu de sommeil (s), 0: aucun. */
   private sleepFade = 0;
+  /** Scène du trajet, construite à l'entrée dans le train et libérée à l'arrivée. */
+  private trip: TripScene | null = null;
+  private tripCast: TripCast | null = null;
+  /** Temps de la scène affiché (s): suit celui de l'état, sans à-coups chez l'invité. */
+  private tripClock = 0;
+  private readonly tripFrame = createTripFrame();
+  private readonly tripPose: Mutable<CameraPose> = { x: 0, y: 0, yaw: 0, pitch: 0, width: 1 };
+  /** Temps restant du fondu d'entrée ou de sortie de la scène du trajet (s). */
+  private cutFade = 0;
   private readonly offEvent: () => void;
   private disposed = false;
 
@@ -248,6 +299,86 @@ class Engine implements GameRenderer {
     if (progress < ramp) return 1 - progress / ramp;
     if (progress < ramp + holdPart) return 0;
     return (progress - ramp - holdPart) / ramp;
+  }
+
+  /** Exposition du fondu d'entrée et de sortie du train: remonte du noir en `fadeSeconds`. */
+  private cutExposure(dt: number): number {
+    if (this.cutFade <= 0) return 1;
+    this.cutFade = Math.max(0, this.cutFade - dt);
+    return 1 - this.cutFade / TRIP_SETTINGS.fadeSeconds;
+  }
+
+  /**
+   * Une image du trajet: le lieu d'arrivée se construit derrière (il est caché), le train et les
+   * deux personnages se dessinent à sa place. Tout se déduit du temps de la scène (`tripSeconds`):
+   * l'hôte et l'invité voient la même chose.
+   */
+  private drawTrip(dt: number, alpha: number, world: ReadonlyWorld): boolean {
+    const state = world.places[world.common.place];
+    if (this.trip === null) {
+      if (state === undefined) return false;
+      this.trip = new TripScene(this.standInMaterial);
+      this.scene.add(this.trip.root);
+      this.tripCast = tripCast(world, state);
+      this.tripClock = tripSeconds({ world });
+      this.characters.reset();
+      this.highlight.release();
+      this.cutFade = TRIP_SETTINGS.fadeSeconds;
+    }
+    const cast = this.tripCast;
+    if (cast === null) return false;
+    if (this.place !== null) this.place.root.visible = false;
+    this.table.visible = false;
+    this.trip.root.visible = true;
+
+    // Horloge de la scène: elle avance à l'image et se recale doucement sur celle de l'état.
+    const wanted = tripSeconds({ world }) + alpha / SIM_HZ;
+    this.tripClock += dt;
+    const gap = wanted - this.tripClock;
+    if (Math.abs(gap) > 0.3) this.tripClock = wanted;
+    else this.tripClock += gap * 0.1;
+    const frame = tripFrame(
+      this.tripClock,
+      this.options.view.content.settings.travel.minSeconds,
+      this.tripFrame,
+    );
+    this.trip.apply(frame, this.tripClock);
+    for (const index of PLAYER_INDICES) {
+      const actor = frame.players[index];
+      const body = cast.bodies[index];
+      body.x = actor.x;
+      body.y = actor.y;
+      body.facing = actor.facing;
+      body.speed = actor.speed;
+      if (cast.where[index] !== actor.where) this.characters.snap(index);
+      cast.where[index] = actor.where;
+    }
+    const c = TRIP_SETTINGS.camera;
+    const pose = this.tripPose;
+    pose.x = c.x;
+    pose.y = c.y;
+    pose.yaw = (c.yawDeg * Math.PI) / 180;
+    pose.pitch = (c.pitchDeg * Math.PI) / 180;
+    pose.width = frame.cameraWidth;
+    this.characters.update({ dt, world: cast.world, place: cast.place, cameraYaw: pose.yaw });
+    this.poseCamera(pose);
+    this.highlight.update(dt, null, this.resolveAim);
+    this.daylight.update(world.minutes, pose.x, pose.y, viewRadius(pose, this.aspect));
+    this.background.copy(this.daylight.tableColor);
+    this.renderer.render(this.scene, this.camera);
+    this.measure(dt);
+    return true;
+  }
+
+  /** Arrivée: le train disparaît, le lieu revient, les personnages se posent au quai d'arrivée. */
+  private endTrip(): void {
+    if (this.trip === null) return;
+    this.trip.dispose();
+    this.trip = null;
+    this.tripCast = null;
+    if (this.place !== null) this.place.root.visible = true;
+    this.characters.reset();
+    this.cutFade = TRIP_SETTINGS.fadeSeconds;
   }
 
   private applyProfile(profile: RenderProfile): void {
@@ -331,7 +462,8 @@ class Engine implements GameRenderer {
     const view = this.options.view;
     // L'état à dessiner (chez l'invité: les autres interpolés, soi-même prédit), pas l'état logique.
     const world = view.frame(alpha);
-    this.renderer.toneMappingExposure = RENDER_SETTINGS.renderer.exposure * this.fadeExposure(dt);
+    this.renderer.toneMappingExposure =
+      RENDER_SETTINGS.renderer.exposure * this.fadeExposure(dt) * this.cutExposure(dt);
     const placeId = world?.common.place ?? null;
     if (placeId !== (this.place?.description.id ?? null)) {
       if (placeId === null) {
@@ -339,6 +471,11 @@ class Engine implements GameRenderer {
         this.place = null;
       } else this.loadPlace(placeId);
     }
+    // Dans le train: la scène du trajet à la place du lieu (qui se construit derrière).
+    const travelling =
+      world?.common.phase === 'travel' && (world.common.travel?.since ?? null) !== null;
+    if (world !== null && travelling && this.drawTrip(dt, alpha, world)) return;
+    this.endTrip();
     const place = this.place;
     const state = world === null || placeId === null ? undefined : world.places[placeId];
     if (world === null || place === null || state === undefined) {
@@ -481,6 +618,8 @@ class Engine implements GameRenderer {
     this.disposed = true;
     this.offEvent();
     this.highlight.dispose();
+    this.trip?.dispose();
+    this.trip = null;
     this.place?.dispose();
     this.place = null;
     this.characters.dispose();

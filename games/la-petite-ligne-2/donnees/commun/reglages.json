@@ -45,8 +45,8 @@
   },
   "travel": {
     "clockHours": 2,
-    "minSeconds": 20,
-    "slowLoadSeconds": 30,
+    "minSeconds": 10,
+    "slowLoadSeconds": 11,
     "from": 360,
     "to": 1200,
     "arrivalSpread": 0.8,

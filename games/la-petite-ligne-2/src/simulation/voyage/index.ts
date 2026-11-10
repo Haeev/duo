@@ -2,8 +2,9 @@
  * Système « voyage » (lot L2, ADR 0018): un seul lieu simulé, celui où sont les deux joueurs.
  * `day` puis `boarding` (sur le quai, chacun valide « Monter », sans limite d'attente; donner une
  * direction fait redescendre) puis `travel` (le lieu quitté est figé avec `leftOn`, `common.place`
- * change, la tranche du nouveau lieu part; chaque machine charge et envoie `place_loaded`) puis
- * `arrival` (descente sur le quai, l'horloge a pris les heures du trajet) et retour à `day`.
+ * change, la tranche du nouveau lieu part; chaque machine charge et envoie `place_loaded` pendant
+ * la scène du trajet, longue de `travel.minSeconds` ou passée plus tôt quand les deux joueurs
+ * appuient sur la touche d'action) puis `arrival` (descente sur le quai, l'horloge a pris les heures du trajet) et retour à `day`.
  */
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { endTalk } from '../briques/parler';
@@ -124,10 +125,34 @@ function arrive(sim: SimContext, place: string): void {
   sim.emit({ type: 'train_arrived', place });
 }
 
+/** Secondes écoulées dans la scène du trajet (0 hors du trajet). Pur: le rendu s'en sert aussi. */
+export function tripSeconds(look: Pick<Look, 'world'>): number {
+  const { common, tick } = look.world;
+  const since = common.travel?.since ?? null;
+  if (common.phase !== 'travel' || since === null) return 0;
+  return Math.max(0, (tick - since) / SIM_HZ);
+}
+
+/** Les deux joueurs ont demandé à passer la scène du trajet. */
+function bothSkipped(travel: { readonly skip?: readonly [boolean, boolean] }): boolean {
+  return travel.skip !== undefined && travel.skip[0] && travel.skip[1];
+}
+
 export const travelSystem: GameSystem = {
   id: 'voyage',
   intent(sim, player, intent) {
     const { common } = sim.world;
+    if (intent.type === 'act') {
+      // Dans le train, la touche d'action vote pour passer la scène; il faut les deux voix.
+      const travel = common.travel;
+      if (common.phase !== 'travel' || travel === null) return;
+      const skip = travel.skip ?? [false, false];
+      if (skip[player]) return;
+      skip[player] = true;
+      travel.skip = skip;
+      sim.touch('common');
+      return;
+    }
     if (intent.type === 'place_loaded') {
       const travel = common.travel;
       if (common.phase !== 'travel' || travel?.to !== intent.place || travel.loaded[player]) return;
@@ -177,7 +202,8 @@ export const travelSystem: GameSystem = {
     const elapsed = (world.tick - (travel.since ?? world.tick)) / SIM_HZ;
     if (common.phase === 'travel') {
       const ready = travel.loaded[0] && travel.loaded[1];
-      if (ready && elapsed >= content.settings.travel.minSeconds) arrive(sim, travel.to);
+      if (ready && (elapsed >= content.settings.travel.minSeconds || bothSkipped(travel)))
+        arrive(sim, travel.to);
       else if (
         !ready &&
         world.tick - (travel.since ?? world.tick) ===

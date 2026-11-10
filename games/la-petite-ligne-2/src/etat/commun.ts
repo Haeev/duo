@@ -22,6 +22,8 @@ export const TravelSchema = v.strictObject({
   loaded: Pair,
   /** Pas du départ (les deux à bord). */
   since: v.nullable(TickSchema),
+  /** Pendant le trajet, chaque joueur a demandé à passer la scène (touche d'action). */
+  skip: v.exactOptional(Pair),
 });
 export type TravelState = v.InferOutput<typeof TravelSchema>;
 

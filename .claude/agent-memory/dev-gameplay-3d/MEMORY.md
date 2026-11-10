@@ -602,6 +602,14 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Worktree neuf sans `node_modules`: `pnpm install --frozen-lockfile --prefer-offline` (moins d'une seconde). Playwright: le paquet global `/opt/node22/lib/node_modules/playwright` (celui du dépôt réclame un navigateur absent). Page de captures jetable: HTML et TS à la racine du jeu, configuration Vite à côté (`outDir` dans le scratchpad), serveur `python3 -m http.server` en tâche de fond avec un `timeout` long (sinon il s'arrête au bout de 30 min, en plein lot).
 - Paramètres utiles d'une page de captures: `x`, `z`, `yaw`, `pitch`, `y` (vue de dessus), `ext` (extension ouverte), `sans` (cacher son groupe pour comparer, programmes compris). Cap: 0 regarde vers -z (nord, vers la cour depuis la salle), +90 vers -x.
 
+## La Petite Ligne 2: banc à deux vues et scènes hors lieu (vérifié le 2026-11-10)
+
+- Banc `servir --construire` piloté par Playwright: un navigateur par machine (`chromium.launch()` deux fois), pas deux contextes du même navigateur. Avec un seul processus GPU, SwiftShader sert les deux vues l'une après l'autre et l'invité dépasse les 8 s du battement du faux hôte (« Le jeu ne répond plus »).
+- Au départ, l'éditeur « Ta photo d'identité » prend le clavier: cliquer « C'est parti ! » par `frame.evaluate` (le bouton est recréé à chaque image, un `click()` de Playwright le voit détaché). Après une partie, l'accueil propose « Héberger une nouvelle partie »: vider `<donnees>/sauvegardes` entre deux essais. `pnpm --filter @duo/la-petite-ligne-2 build` suffit pour que le serveur déjà lancé serve le nouveau jeu.
+- Une capture coûte environ 7 s de jeu en rendu logiciel: pour une scène de 10 s, une capture par passage (prise sur les deux pages par `Promise.all`), et plusieurs allers-retours.
+- Scène qui n'est pas un lieu (trajet en train): la couche des personnages se nourrit d'un monde de substitution (copie des joueurs avec des corps à soi, lieu sans meuble ni habitant), et l'on appelle `snap` quand un personnage change de place d'un coup. Ce qui roule reste immobile dans la scène et c'est le décor qui défile: le lissage des positions laisserait sinon les passagers derrière le wagon.
+- Personnage couché sans clip: un `Group` entre l'objet et le squelette, tourné de -90 degrés autour de x (tête vers -Z, visage en haut), corps en `idle`; l'ombre de contact se cache.
+
 ## La Petite Ligne 2 (simulation, vérifié le 2026-11-10)
 
 - Un `GameSystem.intent` reçoit toutes les intentions: `switch-exhaustiveness-check` refuse un `default` seul; dérogation `// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- raison`.
