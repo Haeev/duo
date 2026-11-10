@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "horloger",
+  "nom": "l'atelier d'Ambroise",
+  "detail": "la pendule de l'horloger sur la façade, enseigne de laiton en potence, vitrine sombre",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre_claire",
+    "toit": "tuile",
+    "menuiseries": "bois_sombre",
+    "porte": "bois_sombre",
+    "volets": "bois_sombre",
+    "enseigne": "laiton"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 45
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "vitree"
+  },
+  "facades": {
+    "sud": {
+      "rdc": [
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        },
+        "porte",
+        "fenetre"
+      ],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre-etroite"],
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "pendule",
+      "facade": "sud",
+      "position": 0.5,
+      "hauteur": 3.95,
+      "diametre": 0.9
+    },
+    {
+      "piece": "enseigne",
+      "forme": "potence",
+      "facade": "sud",
+      "position": 0.08,
+      "hauteur": 3.1
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.85
+    }
+  ]
+}

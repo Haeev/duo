@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "cheminot-o",
+  "nom": "la maison de cheminot (ouest)",
+  "detail": "logement type de la Compagnie, jumeau du voisin: pierre claire, volets rouge cheminot, linteaux de pierre",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre_claire",
+    "toit": "tuile",
+    "volets": "rouge_cheminot",
+    "porte": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 38
+  },
+  "porte": {
+    "facade": "nord",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "nord": {
+      "rdc": ["porte", "fenetre-etroite"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre-etroite"]
+    },
+    "ouest": {
+      "rdc": ["fenetre-etroite"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.82
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "fournil",
+  "nom": "le fournil d'Achille",
+  "detail": "la grosse cheminée du four adossée au pignon est, côté ru; devanture miel et enseigne en potence",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit",
+    "toit": "tuile",
+    "menuiseries": "miel",
+    "porte": "miel",
+    "volets": "miel",
+    "enseigne": "bois_sombre"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "vitree"
+  },
+  "facades": {
+    "sud": {
+      "rdc": [
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        },
+        "porte",
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        }
+      ],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre-etroite", "porte-service"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "four",
+      "facade": "est",
+      "position": 0.5
+    },
+    {
+      "piece": "enseigne",
+      "forme": "potence",
+      "facade": "sud",
+      "position": 0.5,
+      "hauteur": 3.9
+    }
+  ]
+}

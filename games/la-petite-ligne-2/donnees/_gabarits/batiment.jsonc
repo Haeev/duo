@@ -1,0 +1,61 @@
+// GABARIT: un bâtiment d'un lieu (maison, commerce, grange, lavoir), assemblé à partir du jeu de pièces du lieu.
+// Créer: pnpm nouveau batiment <id> <lieu>   -> donnees/lieux/<lieu>/batiments/<id>.json
+// Construire: bash assets-src/decors/batiments-aubrune/construire.sh <id>
+//             -> assets/lieux/<lieu>/batiments/<id>.glb et son entrée dans batiments.json
+// Schéma: src/donnees/schemas/batiment.ts. Aucun code à écrire: une maison de plus = cette fiche.
+// `id` est l'identifiant du bâtiment dans `buildings` de la carte (celui du plan, « _ » devenu « - »).
+// Les façades se nomment dans le repère du monde: le modèle se pose au centre de l'emprise, en rotation 0.
+{
+  "schema": 1,
+  "id": "exemple-batiment",
+  "nom": "la maison d'exemple",
+  // Le détail propre qui le fait reconnaître de haut, et sa raison d'être.
+  "detail": "volets sauge et souche de cheminée près du pignon ouest, côté cuisine",
+  // Emprise du plan, en cases de 1 m: largeur d'ouest en est, profondeur du nord au sud.
+  "emprise": { "largeur": 7, "profondeur": 6 },
+  // 1 à 3 niveaux. Hauteur des murs: 0,4 + 2,3 m par niveau, ou "hauteurMurs" pour l'imposer.
+  "niveaux": 2,
+  // "crepi" (enduit sur soubassement de pierre), "pierre" (pierre apparente) ou "bardage" (planches).
+  "finition": "crepi",
+  // Teintes du nuancier du lieu (assets-src/decors/batiments-aubrune/teintes.json):
+  //   murs: enduit, enduit_ocre, enduit_rose (crépi); pierre, pierre_claire; bois_brut, bois_gris (bardage)
+  //   toit: tuile, lauze
+  //   volets, porte, menuiseries, enseigne: bleu_vert, sauge, bleu, rouge_cheminot, vert_sombre,
+  //     bois_gris, bois_sombre, bois_brut, miel, creme, fleur_rose, laiton
+  "couleurs": { "murs": "enduit", "toit": "tuile", "volets": "sauge", "porte": "sauge" },
+  // forme: "deux-pans" (faitage "est-ouest" ou "nord-sud", par défaut le long du grand côté),
+  //   "croupe" (quatre pans), "appentis" ("basVers": le côté bas). pente en degrés, debord en mètres.
+  "toit": { "forme": "deux-pans", "pente": 40 },
+  // La porte d'entrée, donnée sur l'emprise comme dans le plan: façade, place de 0 à 1 depuis la
+  // gauche vue de dehors. modele: "pleine", "vitree", "grange" ou "cochere" (charretières, avec
+  // "largeur" et "hauteur"), "baie" (ouverte, sans vantaux), "ouverte" (côté sans mur d'un lavoir).
+  "porte": { "facade": "sud", "position": 0.5, "modele": "pleine" },
+  // Ouvertures par façade et par niveau ("rdc", "etage", "etage2", "pignon"), de gauche à droite
+  // vues de dehors. Elles se répartissent seules; "porte" marque la place de la porte d'entrée
+  // dans l'ordre. Noms: fenetre (volets ouverts), fenetre-etroite, fenetre-close (volets fermés),
+  // fenetre-nue (sans volets), petite-fenetre, vitrine, porte-service, grange, cochere, baie,
+  // vitrail, abat-sons. Pour imposer une place ou une cote:
+  //   { "type": "vitrine", "largeur": 1.7, "position": 0.25 }
+  // Un étage qui a autant d'ouvertures que le rez-de-chaussée s'aligne sur lui.
+  "facades": {
+    "sud": { "rdc": ["fenetre", "porte", "fenetre"], "etage": ["fenetre", "fenetre", "fenetre"] },
+    "nord": { "rdc": ["fenetre-etroite"], "etage": ["fenetre", "fenetre"] },
+    "est": { "rdc": ["fenetre"], "etage": ["fenetre"] },
+    "ouest": { "rdc": ["fenetre"], "pignon": ["petite-fenetre"] },
+  },
+  // Options (toutes facultatives). "facade" et "position" comme pour la porte, "hauteur" en mètres:
+  //   { "piece": "cheminee", "forme": "souche", "position": 0.15 }   le long du faîtage, au-dessus d'un foyer
+  //   { "piece": "cheminee", "forme": "four", "facade": "est", "position": 0.5 }   adossée à un pignon, depuis le sol
+  //   { "piece": "lucarne", "facade": "sud", "position": 0.5 }       côté égout seulement
+  //   { "piece": "enseigne", "forme": "potence", "facade": "sud", "position": 0.5, "hauteur": 3.9 }   ou "bandeau"
+  //   { "piece": "auvent", "facade": "est", "position": 0.5, "largeur": 3, "profondeur": 1.6, "accroche": 2.9 }
+  //   { "piece": "pendule" | "drapeau", "facade": "sud", "position": 0.5, "hauteur": 3.9 }
+  //   { "piece": "roue", "facade": "sud", "position": 0.5, "diametre": 5 }     roue de moulin
+  //   { "piece": "bassin", "x": 0, "y": 0, "longueur": 3.2, "largeur": 1.8, "rotation": 90 }
+  //   { "piece": "contrefort" | "escalier", "facade": "nord", "position": 0.3, "monte": 4.7 }
+  //   { "piece": "croix" }                                            au sommet du toit
+  // Un second corps (clocher, aile): "annexes": [{ "nom": "...", "place": { "x", "y", "largeur",
+  // "profondeur" } dans l'emprise, puis les mêmes champs que ci-dessus }]; le corps principal
+  // reçoit alors lui aussi sa "place". "murs": "poteaux" fait un corps ouvert (lavoir, halle).
+  "options": [{ "piece": "cheminee", "forme": "souche", "position": 0.15 }],
+}

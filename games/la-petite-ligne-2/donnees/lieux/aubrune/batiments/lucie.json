@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "lucie",
+  "nom": "la maison de Lucie",
+  "detail": "petite maison crépie aux volets bleus, porte au nord sur la rue, lucarne au midi",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit",
+    "toit": "tuile",
+    "volets": "bleu",
+    "porte": "bleu"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 42
+  },
+  "porte": {
+    "facade": "nord",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "nord": {
+      "rdc": ["porte", "fenetre-etroite"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.2
+    },
+    {
+      "piece": "lucarne",
+      "facade": "sud",
+      "position": 0.5
+    }
+  ]
+}

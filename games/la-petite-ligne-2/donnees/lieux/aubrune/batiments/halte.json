@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "id": "halte",
+  "nom": "la halte",
+  "detail": "bâtiment voyageurs de la Compagnie: un seul niveau haut, toit à croupes, auvent sur poteaux côté quai, pendule sur le mur est, plaque de gare vierge au-dessus de la porte",
+  "emprise": {
+    "largeur": 10,
+    "profondeur": 6
+  },
+  "niveaux": 1,
+  "hauteurMurs": 3.4,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre_claire",
+    "toit": "lauze",
+    "volets": "rouge_cheminot",
+    "porte": "rouge_cheminot",
+    "enseigne": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "croupe",
+    "pente": 30
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "vitree"
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["fenetre", "porte", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre", "fenetre", "fenetre"]
+    },
+    "ouest": {
+      "rdc": ["porte-service"]
+    },
+    "est": {
+      "rdc": [
+        {
+          "type": "fenetre-nue",
+          "position": 0.3
+        }
+      ]
+    }
+  },
+  "options": [
+    {
+      "piece": "auvent",
+      "facade": "ouest",
+      "position": 0.5,
+      "largeur": 5.2,
+      "profondeur": 2.2
+    },
+    {
+      "piece": "pendule",
+      "facade": "est",
+      "position": 0.72,
+      "hauteur": 2.5
+    },
+    {
+      "piece": "enseigne",
+      "forme": "bandeau",
+      "facade": "sud",
+      "position": 0.5,
+      "hauteur": 2.74,
+      "largeur": 2.6
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.8
+    }
+  ]
+}

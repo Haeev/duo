@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "id": "remise",
+  "nom": "la remise de la draisine",
+  "detail": "petite remise en planches grises, porte charretière à l'ouest dans l'axe des rails",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 5
+  },
+  "niveaux": 1,
+  "hauteurMurs": 3.3,
+  "finition": "bardage",
+  "couleurs": {
+    "murs": "bois_gris",
+    "toit": "tuile",
+    "porte": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 32
+  },
+  "porte": {
+    "facade": "ouest",
+    "position": 0.5,
+    "modele": "grange",
+    "largeur": 3.0
+  },
+  "facades": {
+    "ouest": {
+      "rdc": ["porte"]
+    },
+    "sud": {
+      "rdc": ["petite-fenetre"]
+    },
+    "nord": {
+      "rdc": ["petite-fenetre"]
+    }
+  }
+}

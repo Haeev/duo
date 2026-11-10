@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "id": "mercerie",
+  "nom": "la mercerie-coiffure",
+  "detail": "crépi rose et volets roses, deux vitrines crème sur la rue, lucarne côté rue",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 7
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit_rose",
+    "toit": "tuile",
+    "menuiseries": "creme",
+    "volets": "fleur_rose",
+    "porte": "creme",
+    "enseigne": "fleur_rose"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "nord",
+    "position": 0.5,
+    "modele": "vitree"
+  },
+  "facades": {
+    "nord": {
+      "rdc": [
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        },
+        "porte",
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        }
+      ],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "lucarne",
+      "facade": "nord",
+      "position": 0.5
+    },
+    {
+      "piece": "enseigne",
+      "forme": "potence",
+      "facade": "nord",
+      "position": 0.5,
+      "hauteur": 3.9
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.84
+    }
+  ]
+}

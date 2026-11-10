@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "id": "cafe",
+  "nom": "le café de la Halte",
+  "detail": "crépi ocre, devanture et grande enseigne rouges au-dessus de la porte, côté soleil et terrasse",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit_ocre",
+    "toit": "tuile",
+    "menuiseries": "rouge_cheminot",
+    "porte": "rouge_cheminot",
+    "volets": "rouge_cheminot",
+    "enseigne": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "vitree"
+  },
+  "facades": {
+    "sud": {
+      "rdc": [
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        },
+        "porte",
+        {
+          "type": "vitrine",
+          "largeur": 1.7
+        }
+      ],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre-etroite", "porte-service"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "enseigne",
+      "forme": "bandeau",
+      "facade": "sud",
+      "position": 0.5,
+      "hauteur": 3.55,
+      "largeur": 1.9
+    },
+    {
+      "piece": "enseigne",
+      "forme": "potence",
+      "facade": "sud",
+      "position": 0.93,
+      "hauteur": 3.2
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.5
+    },
+    {
+      "piece": "lucarne",
+      "facade": "sud",
+      "position": 0.5
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "id": "ecole",
+  "nom": "l'école-mairie",
+  "detail": "pierre claire, volets bleus, toit à croupes; l'horloge et le drapeau au-dessus de la porte disent la mairie",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre_claire",
+    "toit": "lauze",
+    "volets": "bleu",
+    "porte": "bleu",
+    "enseigne": "bleu"
+  },
+  "toit": {
+    "forme": "croupe",
+    "pente": 35
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["fenetre", "porte", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "pendule",
+      "facade": "sud",
+      "position": 0.5,
+      "hauteur": 3.85,
+      "diametre": 0.8
+    },
+    {
+      "piece": "drapeau",
+      "facade": "sud",
+      "position": 0.5,
+      "hauteur": 2.75
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.5
+    }
+  ]
+}

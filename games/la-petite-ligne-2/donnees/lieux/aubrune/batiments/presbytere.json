@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "presbytere",
+  "nom": "le presbytère",
+  "detail": "maison carrée en pierre sous un toit en pavillon, volets vert sombre, porte à l'est sur le parvis",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 7
+  },
+  "niveaux": 2,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre",
+    "toit": "lauze",
+    "volets": "vert_sombre",
+    "porte": "vert_sombre"
+  },
+  "toit": {
+    "forme": "croupe",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "est",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "est": {
+      "rdc": ["fenetre", "porte", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.5,
+      "ecart": 0.9
+    }
+  ]
+}

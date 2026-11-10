@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "id": "honorine",
+  "nom": "la maison d'Honorine",
+  "detail": "pignon sur la rue, crépi rose et volets sauge, petit auvent sur consoles au-dessus de la porte; sa fenêtre du pignon nord regarde la voie",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit_rose",
+    "toit": "tuile",
+    "volets": "sauge",
+    "porte": "sauge"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 42,
+    "faitage": "nord-sud"
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["fenetre-etroite", "porte"],
+      "etage": ["fenetre", "fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "auvent",
+      "facade": "sud",
+      "position": 0.5,
+      "largeur": 1.9,
+      "profondeur": 0.9,
+      "accroche": 3.05
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.8
+    }
+  ]
+}

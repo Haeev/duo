@@ -1,0 +1,2064 @@
+{
+ "format": "duo-pieces-batiment/1",
+ "lieu": "aubrune",
+ "materiaux": [
+  "pierre",
+  "moellon",
+  "crepi",
+  "tuile",
+  "bois",
+  "bardage",
+  "volet",
+  "vitre",
+  "metal"
+ ],
+ "pieces": {
+  "abat-sons": {
+   "boite": [
+    [
+     -0.933,
+     -0.151,
+     -0.168
+    ],
+    [
+     0.941,
+     2.899,
+     0.217
+    ]
+   ],
+   "description": "baie de clocher à abat-sons",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 170
+  },
+  "angle": {
+   "boite": [
+    [
+     -0.499,
+     0.569,
+     -0.563
+    ],
+    [
+     0.085,
+     2.714,
+     0.084
+    ]
+   ],
+   "description": "chaîne d'angle du rez-de-chaussée: pierres de taille alternées (origine: l'arête du coin, au sol)",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 50
+  },
+  "angle-etage": {
+   "boite": [
+    [
+     -0.5,
+     -0.011,
+     -0.563
+    ],
+    [
+     0.079,
+     2.129,
+     0.084
+    ]
+   ],
+   "description": "chaîne d'angle d'un étage",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 50
+  },
+  "appui": {
+   "boite": [
+    [
+     -0.738,
+     -0.011,
+     -0.061
+    ],
+    [
+     0.727,
+     0.143,
+     0.264
+    ]
+   ],
+   "description": "appui de fenêtre débordant",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 8
+  },
+  "auvent": {
+   "boite": [
+    [
+     -1.505,
+     -0.012,
+     -0.04
+    ],
+    [
+     1.505,
+     2.878,
+     1.796
+    ]
+   ],
+   "description": "auvent de 3 x 1,6 m sur poteaux et dés de pierre",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "pierre",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 190
+  },
+  "auvent-consoles": {
+   "boite": [
+    [
+     -0.954,
+     1.525,
+     -0.042
+    ],
+    [
+     0.956,
+     2.885,
+     1.09
+    ]
+   ],
+   "description": "petit auvent de 1,9 x 0,9 m sur consoles",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 98
+  },
+  "bassin": {
+   "boite": [
+    [
+     -1.607,
+     -0.038,
+     -0.942
+    ],
+    [
+     1.609,
+     0.54,
+     0.94
+    ]
+   ],
+   "description": "bassin de lavoir de 3,2 x 1,8 m",
+   "finition": null,
+   "materiaux": [
+    "pierre",
+    "vitre"
+   ],
+   "teinte": null,
+   "triangles": 102
+  },
+  "cheminee-four": {
+   "boite": [
+    [
+     -0.776,
+     -0.027,
+     -0.092
+    ],
+    [
+     0.783,
+     6.566,
+     0.682
+    ]
+   ],
+   "description": "cheminée de four ou de forge adossée au mur, 6 m",
+   "finition": null,
+   "materiaux": [
+    "moellon",
+    "pierre",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 140
+  },
+  "cheminee-souche": {
+   "boite": [
+    [
+     -0.469,
+     -0.027,
+     -0.469
+    ],
+    [
+     0.457,
+     2.378,
+     0.466
+    ]
+   ],
+   "description": "souche de cheminée: couronne de pierres, dalle, mitre (origine: 1,90 m sous le sommet)",
+   "finition": null,
+   "materiaux": [
+    "crepi",
+    "pierre",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 78
+  },
+  "contrefort": {
+   "boite": [
+    [
+     -0.415,
+     -0.01,
+     -0.027
+    ],
+    [
+     0.415,
+     5.61,
+     0.775
+    ]
+   ],
+   "description": "contrefort d'église de 5 m",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 76
+  },
+  "croix": {
+   "boite": [
+    [
+     -0.353,
+     -0.052,
+     -0.177
+    ],
+    [
+     0.354,
+     1.604,
+     0.177
+    ]
+   ],
+   "description": "croix de fer de clocher",
+   "finition": null,
+   "materiaux": [
+    "metal"
+   ],
+   "teinte": null,
+   "triangles": 42
+  },
+  "descente": {
+   "boite": [
+    [
+     -0.285,
+     -0.009,
+     0.007
+    ],
+    [
+     0.291,
+     2.712,
+     0.72
+    ]
+   ],
+   "description": "descente d'eau de 2,70 m: coude, colliers, dauphin et pierre d'éclaboussure",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 60
+  },
+  "drapeau": {
+   "boite": [
+    [
+     -0.026,
+     -0.035,
+     -0.023
+    ],
+    [
+     0.867,
+     1.232,
+     0.903
+    ]
+   ],
+   "description": "hampe et drapeau",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 48
+  },
+  "enseigne-bandeau": {
+   "boite": [
+    [
+     -1.102,
+     -0.013,
+     -0.003
+    ],
+    [
+     1.108,
+     0.557,
+     0.081
+    ]
+   ],
+   "description": "enseigne vierge en planche encadrée, à plat sur le mur",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 32
+  },
+  "enseigne-potence": {
+   "boite": [
+    [
+     -0.049,
+     -0.685,
+     0.0
+    ],
+    [
+     0.048,
+     0.029,
+     0.954
+    ]
+   ],
+   "description": "enseigne vierge pendue à sa potence de fer",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 66
+  },
+  "escalier": {
+   "boite": [
+    [
+     -0.02,
+     -0.008,
+     -0.008
+    ],
+    [
+     5.303,
+     3.475,
+     1.008
+    ]
+   ],
+   "description": "escalier extérieur de pierre, 2,50 m de montée, marches de 17 x 28 cm",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 176
+  },
+  "faitage": {
+   "boite": [
+    [
+     -1.024,
+     -0.015,
+     -0.237
+    ],
+    [
+     1.032,
+     0.229,
+     0.235
+    ]
+   ],
+   "description": "2 m de tuiles faîtières demi-rondes",
+   "finition": null,
+   "materiaux": [
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 44
+  },
+  "fenetre": {
+   "boite": [
+    [
+     -0.77,
+     -0.017,
+     -0.144
+    ],
+    [
+     0.765,
+     1.576,
+     0.255
+    ]
+   ],
+   "description": "fenêtre à croisillons, sans volets",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "pierre",
+    "vitre"
+   ],
+   "teinte": null,
+   "triangles": 58
+  },
+  "fenetre-volets-fermes": {
+   "boite": [
+    [
+     -0.754,
+     -0.012,
+     -0.144
+    ],
+    [
+     0.76,
+     1.591,
+     0.255
+    ]
+   ],
+   "description": "fenêtre, volets clos",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 108
+  },
+  "fenetre-volets-fermes--rouge": {
+   "boite": [
+    [
+     -0.769,
+     -0.022,
+     -0.144
+    ],
+    [
+     0.76,
+     1.589,
+     0.265
+    ]
+   ],
+   "description": "fenêtre, volets clos",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 108
+  },
+  "fenetre-volets-fermes--sauge": {
+   "boite": [
+    [
+     -0.762,
+     -0.016,
+     -0.144
+    ],
+    [
+     0.758,
+     1.588,
+     0.253
+    ]
+   ],
+   "description": "fenêtre, volets clos",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 108
+  },
+  "fenetre-volets-ouverts": {
+   "boite": [
+    [
+     -1.124,
+     -0.024,
+     -0.144
+    ],
+    [
+     1.123,
+     1.573,
+     0.253
+    ]
+   ],
+   "description": "fenêtre, volets de planches rabattus",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 122
+  },
+  "fenetre-volets-ouverts--rouge": {
+   "boite": [
+    [
+     -1.116,
+     -0.022,
+     -0.144
+    ],
+    [
+     1.123,
+     1.587,
+     0.262
+    ]
+   ],
+   "description": "fenêtre, volets de planches rabattus",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 122
+  },
+  "fenetre-volets-ouverts--sauge": {
+   "boite": [
+    [
+     -1.12,
+     -0.009,
+     -0.144
+    ],
+    [
+     1.121,
+     1.586,
+     0.252
+    ]
+   ],
+   "description": "fenêtre, volets de planches rabattus",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 122
+  },
+  "gouttiere": {
+   "boite": [
+    [
+     -1.005,
+     -0.104,
+     -0.006
+    ],
+    [
+     1.003,
+     0.002,
+     0.142
+    ]
+   ],
+   "description": "2 m de gouttière de zinc",
+   "finition": null,
+   "materiaux": [
+    "metal"
+   ],
+   "teinte": null,
+   "triangles": 10
+  },
+  "linteau-bois": {
+   "boite": [
+    [
+     -0.76,
+     0.006,
+     -0.064
+    ],
+    [
+     0.765,
+     0.215,
+     0.196
+    ]
+   ],
+   "description": "linteau de chêne",
+   "finition": null,
+   "materiaux": [
+    "bois"
+   ],
+   "teinte": null,
+   "triangles": 8
+  },
+  "linteau-pierre": {
+   "boite": [
+    [
+     -0.737,
+     -0.002,
+     -0.065
+    ],
+    [
+     0.734,
+     0.254,
+     0.168
+    ]
+   ],
+   "description": "linteau de pierre",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 8
+  },
+  "lucarne": {
+   "boite": [
+    [
+     -0.87,
+     0.0,
+     -2.354
+    ],
+    [
+     0.867,
+     2.188,
+     0.351
+    ]
+   ],
+   "description": "lucarne à l'aplomb du mur, pour un toit à 40 degrés (origine: au mur, à l'arase)",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "crepi",
+    "pierre",
+    "tuile",
+    "vitre"
+   ],
+   "teinte": null,
+   "triangles": 163
+  },
+  "marche": {
+   "boite": [
+    [
+     -0.82,
+     -0.021,
+     -0.0
+    ],
+    [
+     0.809,
+     0.185,
+     0.637
+    ]
+   ],
+   "description": "marche de seuil de 17 cm",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 8
+  },
+  "marches": {
+   "boite": [
+    [
+     -0.959,
+     -0.018,
+     0.003
+    ],
+    [
+     0.968,
+     0.345,
+     0.959
+    ]
+   ],
+   "description": "deux marches de seuil (2 x 17 cm, giron de 32 cm)",
+   "finition": null,
+   "materiaux": [
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 16
+  },
+  "mur-devanture-bardage": {
+   "boite": [
+    [
+     -1.742,
+     -0.007,
+     -0.148
+    ],
+    [
+     1.56,
+     3.1,
+     0.257
+    ]
+   ],
+   "description": "pan de 3 m avec devanture de commerce et bandeau d'enseigne vierge",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 126
+  },
+  "mur-devanture-crepi": {
+   "boite": [
+    [
+     -1.74,
+     -0.006,
+     -0.153
+    ],
+    [
+     1.555,
+     3.1,
+     0.256
+    ]
+   ],
+   "description": "pan de 3 m avec devanture de commerce et bandeau d'enseigne vierge",
+   "finition": "crepi",
+   "materiaux": [
+    "crepi",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 126
+  },
+  "mur-devanture-pierre": {
+   "boite": [
+    [
+     -1.74,
+     -0.007,
+     -0.151
+    ],
+    [
+     1.557,
+     3.1,
+     0.256
+    ]
+   ],
+   "description": "pan de 3 m avec devanture de commerce et bandeau d'enseigne vierge",
+   "finition": "pierre",
+   "materiaux": [
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 126
+  },
+  "mur-etage-bardage": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.261
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 122
+  },
+  "mur-etage-bardage--rouge": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.265
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 122
+  },
+  "mur-etage-bardage--sauge": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.263
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 122
+  },
+  "mur-etage-crepi": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.261
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 122
+  },
+  "mur-etage-crepi--rouge": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.261
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 122
+  },
+  "mur-etage-crepi--sauge": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.262
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 122
+  },
+  "mur-etage-pierre": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.264
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 122
+  },
+  "mur-etage-pierre--rouge": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.258
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 122
+  },
+  "mur-etage-pierre--sauge": {
+   "boite": [
+    [
+     -1.0,
+     0.0,
+     -0.144
+    ],
+    [
+     1.0,
+     2.3,
+     0.245
+    ]
+   ],
+   "description": "pan d'étage de 2 m (2,30 m de haut) avec fenêtre et volets",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 122
+  },
+  "mur-etage-plein-bardage": {
+   "boite": [
+    [
+     -0.5,
+     0.0,
+     0.0
+    ],
+    [
+     0.5,
+     2.3,
+     0.0
+    ]
+   ],
+   "description": "pan d'étage plein de 1 m",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage"
+   ],
+   "teinte": null,
+   "triangles": 2
+  },
+  "mur-etage-plein-crepi": {
+   "boite": [
+    [
+     -0.5,
+     0.0,
+     0.0
+    ],
+    [
+     0.5,
+     2.3,
+     0.0
+    ]
+   ],
+   "description": "pan d'étage plein de 1 m",
+   "finition": "crepi",
+   "materiaux": [
+    "crepi"
+   ],
+   "teinte": null,
+   "triangles": 2
+  },
+  "mur-etage-plein-pierre": {
+   "boite": [
+    [
+     -0.5,
+     0.0,
+     0.0
+    ],
+    [
+     0.5,
+     2.3,
+     0.0
+    ]
+   ],
+   "description": "pan d'étage plein de 1 m",
+   "finition": "pierre",
+   "materiaux": [
+    "moellon"
+   ],
+   "teinte": null,
+   "triangles": 2
+  },
+  "mur-fenetre-bardage": {
+   "boite": [
+    [
+     -1.236,
+     -0.011,
+     -0.154
+    ],
+    [
+     1.035,
+     2.7,
+     0.255
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 170
+  },
+  "mur-fenetre-bardage--rouge": {
+   "boite": [
+    [
+     -1.241,
+     -0.007,
+     -0.155
+    ],
+    [
+     1.032,
+     2.7,
+     0.265
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 170
+  },
+  "mur-fenetre-bardage--sauge": {
+   "boite": [
+    [
+     -1.233,
+     -0.01,
+     -0.151
+    ],
+    [
+     1.033,
+     2.7,
+     0.257
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 170
+  },
+  "mur-fenetre-crepi": {
+   "boite": [
+    [
+     -1.241,
+     -0.009,
+     -0.153
+    ],
+    [
+     1.03,
+     2.7,
+     0.255
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 170
+  },
+  "mur-fenetre-crepi--rouge": {
+   "boite": [
+    [
+     -1.237,
+     -0.009,
+     -0.149
+    ],
+    [
+     1.031,
+     2.7,
+     0.264
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 170
+  },
+  "mur-fenetre-crepi--sauge": {
+   "boite": [
+    [
+     -1.239,
+     -0.01,
+     -0.152
+    ],
+    [
+     1.032,
+     2.7,
+     0.255
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 170
+  },
+  "mur-fenetre-pierre": {
+   "boite": [
+    [
+     -1.241,
+     -0.009,
+     -0.155
+    ],
+    [
+     1.032,
+     2.7,
+     0.265
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 170
+  },
+  "mur-fenetre-pierre--rouge": {
+   "boite": [
+    [
+     -1.244,
+     -0.008,
+     -0.15
+    ],
+    [
+     1.032,
+     2.7,
+     0.264
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 170
+  },
+  "mur-fenetre-pierre--sauge": {
+   "boite": [
+    [
+     -1.245,
+     -0.005,
+     -0.15
+    ],
+    [
+     1.036,
+     2.7,
+     0.253
+    ]
+   ],
+   "description": "pan de 2 m avec fenêtre à croisillons creusée et volets ouverts",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "vitre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 170
+  },
+  "mur-grange-bardage": {
+   "boite": [
+    [
+     -2.243,
+     -0.008,
+     -0.154
+    ],
+    [
+     2.032,
+     3.4,
+     0.462
+    ]
+   ],
+   "description": "pan de 4 m avec porte de grange à deux vantaux, de plain-pied",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 224
+  },
+  "mur-grange-crepi": {
+   "boite": [
+    [
+     -2.24,
+     -0.01,
+     -0.152
+    ],
+    [
+     2.035,
+     3.4,
+     0.456
+    ]
+   ],
+   "description": "pan de 4 m avec porte de grange à deux vantaux, de plain-pied",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 224
+  },
+  "mur-grange-pierre": {
+   "boite": [
+    [
+     -2.237,
+     -0.012,
+     -0.152
+    ],
+    [
+     2.021,
+     3.4,
+     0.454
+    ]
+   ],
+   "description": "pan de 4 m avec porte de grange à deux vantaux, de plain-pied",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 224
+  },
+  "mur-plein-bardage": {
+   "boite": [
+    [
+     -0.74,
+     -0.008,
+     -0.146
+    ],
+    [
+     0.536,
+     2.7,
+     0.115
+    ]
+   ],
+   "description": "pan de mur plein de 1 m, un niveau (2,70 m), soubassement de moellons",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 34
+  },
+  "mur-plein-crepi": {
+   "boite": [
+    [
+     -0.746,
+     -0.01,
+     -0.147
+    ],
+    [
+     0.534,
+     2.7,
+     0.118
+    ]
+   ],
+   "description": "pan de mur plein de 1 m, un niveau (2,70 m), soubassement de moellons",
+   "finition": "crepi",
+   "materiaux": [
+    "crepi",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 34
+  },
+  "mur-plein-pierre": {
+   "boite": [
+    [
+     -0.74,
+     -0.008,
+     -0.147
+    ],
+    [
+     0.535,
+     2.7,
+     0.111
+    ]
+   ],
+   "description": "pan de mur plein de 1 m, un niveau (2,70 m), soubassement de moellons",
+   "finition": "pierre",
+   "materiaux": [
+    "moellon",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 34
+  },
+  "mur-porte-bardage": {
+   "boite": [
+    [
+     -1.235,
+     -0.006,
+     -0.15
+    ],
+    [
+     1.03,
+     2.7,
+     0.631
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 162
+  },
+  "mur-porte-bardage--rouge": {
+   "boite": [
+    [
+     -1.241,
+     -0.017,
+     -0.15
+    ],
+    [
+     1.032,
+     2.7,
+     0.631
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 162
+  },
+  "mur-porte-bardage--sauge": {
+   "boite": [
+    [
+     -1.225,
+     -0.009,
+     -0.153
+    ],
+    [
+     1.035,
+     2.7,
+     0.637
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 162
+  },
+  "mur-porte-crepi": {
+   "boite": [
+    [
+     -1.246,
+     -0.021,
+     -0.155
+    ],
+    [
+     1.025,
+     2.7,
+     0.637
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 162
+  },
+  "mur-porte-crepi--rouge": {
+   "boite": [
+    [
+     -1.244,
+     -0.01,
+     -0.15
+    ],
+    [
+     1.035,
+     2.7,
+     0.63
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 162
+  },
+  "mur-porte-crepi--sauge": {
+   "boite": [
+    [
+     -1.233,
+     -0.014,
+     -0.154
+    ],
+    [
+     1.034,
+     2.7,
+     0.641
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 162
+  },
+  "mur-porte-pierre": {
+   "boite": [
+    [
+     -1.234,
+     -0.015,
+     -0.154
+    ],
+    [
+     1.033,
+     2.7,
+     0.63
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 162
+  },
+  "mur-porte-pierre--rouge": {
+   "boite": [
+    [
+     -1.235,
+     -0.009,
+     -0.147
+    ],
+    [
+     1.032,
+     2.7,
+     0.634
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 162
+  },
+  "mur-porte-pierre--sauge": {
+   "boite": [
+    [
+     -1.234,
+     -0.008,
+     -0.152
+    ],
+    [
+     1.035,
+     2.7,
+     0.622
+    ]
+   ],
+   "description": "pan de 2 m avec porte pleine de 2,06 m sur sa marche",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "metal",
+    "moellon",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 162
+  },
+  "pendule": {
+   "boite": [
+    [
+     -0.53,
+     -0.507,
+     -0.005
+    ],
+    [
+     0.529,
+     0.506,
+     0.207
+    ]
+   ],
+   "description": "pendule de façade",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 92
+  },
+  "pignon-bardage": {
+   "boite": [
+    [
+     -3.0,
+     0.0,
+     -0.144
+    ],
+    [
+     3.0,
+     2.517,
+     0.254
+    ]
+   ],
+   "description": "pignon de 6 m de portée pour un toit à 40 degrés, petite fenêtre de grenier",
+   "finition": "bardage",
+   "materiaux": [
+    "bardage",
+    "bois",
+    "pierre",
+    "vitre"
+   ],
+   "teinte": null,
+   "triangles": 57
+  },
+  "pignon-crepi": {
+   "boite": [
+    [
+     -3.0,
+     0.0,
+     -0.144
+    ],
+    [
+     3.0,
+     2.517,
+     0.262
+    ]
+   ],
+   "description": "pignon de 6 m de portée pour un toit à 40 degrés, petite fenêtre de grenier",
+   "finition": "crepi",
+   "materiaux": [
+    "bois",
+    "crepi",
+    "pierre",
+    "vitre"
+   ],
+   "teinte": null,
+   "triangles": 57
+  },
+  "pignon-pierre": {
+   "boite": [
+    [
+     -3.0,
+     0.0,
+     -0.144
+    ],
+    [
+     3.0,
+     2.517,
+     0.263
+    ]
+   ],
+   "description": "pignon de 6 m de portée pour un toit à 40 degrés, petite fenêtre de grenier",
+   "finition": "pierre",
+   "materiaux": [
+    "bois",
+    "moellon",
+    "pierre",
+    "vitre"
+   ],
+   "teinte": null,
+   "triangles": 57
+  },
+  "porte-cochere": {
+   "boite": [
+    [
+     -1.655,
+     -0.008,
+     -0.13
+    ],
+    [
+     1.65,
+     3.331,
+     0.455
+    ]
+   ],
+   "description": "porte cochère sous un arc de pierre",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 242
+  },
+  "porte-de-grange": {
+   "boite": [
+    [
+     -1.717,
+     -0.012,
+     -0.126
+    ],
+    [
+     1.701,
+     3.051,
+     0.451
+    ]
+   ],
+   "description": "porte de grange à deux vantaux et écharpes, linteau de chêne",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 180
+  },
+  "porte-pleine": {
+   "boite": [
+    [
+     -0.959,
+     -0.022,
+     -0.118
+    ],
+    [
+     0.97,
+     2.52,
+     0.64
+    ]
+   ],
+   "description": "porte en planches à pentures, piédroits, linteau, marche",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 116
+  },
+  "porte-pleine--rouge": {
+   "boite": [
+    [
+     -0.965,
+     -0.017,
+     -0.121
+    ],
+    [
+     0.966,
+     2.52,
+     0.632
+    ]
+   ],
+   "description": "porte en planches à pentures, piédroits, linteau, marche",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 116
+  },
+  "porte-pleine--sauge": {
+   "boite": [
+    [
+     -0.971,
+     -0.016,
+     -0.118
+    ],
+    [
+     0.968,
+     2.517,
+     0.632
+    ]
+   ],
+   "description": "porte en planches à pentures, piédroits, linteau, marche",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 116
+  },
+  "porte-vitree": {
+   "boite": [
+    [
+     -0.968,
+     -0.006,
+     -0.12
+    ],
+    [
+     0.962,
+     2.497,
+     0.631
+    ]
+   ],
+   "description": "porte à carreaux en partie haute",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": null,
+   "triangles": 126
+  },
+  "porte-vitree--rouge": {
+   "boite": [
+    [
+     -0.963,
+     -0.008,
+     -0.12
+    ],
+    [
+     0.968,
+     2.52,
+     0.635
+    ]
+   ],
+   "description": "porte à carreaux en partie haute",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "rouge",
+   "triangles": 126
+  },
+  "porte-vitree--sauge": {
+   "boite": [
+    [
+     -0.967,
+     -0.017,
+     -0.12
+    ],
+    [
+     0.964,
+     2.494,
+     0.639
+    ]
+   ],
+   "description": "porte à carreaux en partie haute",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "pierre",
+    "volet"
+   ],
+   "teinte": "sauge",
+   "triangles": 126
+  },
+  "roue-de-moulin": {
+   "boite": [
+    [
+     -2.737,
+     -2.739,
+     -0.1
+    ],
+    [
+     2.741,
+     2.744,
+     1.459
+    ]
+   ],
+   "description": "roue à aubes de 5 m",
+   "finition": null,
+   "materiaux": [
+    "bois"
+   ],
+   "teinte": null,
+   "triangles": 700
+  },
+  "toit-appentis": {
+   "boite": [
+    [
+     -2.352,
+     -0.219,
+     -1.775
+    ],
+    [
+     2.349,
+     1.369,
+     2.042
+    ]
+   ],
+   "description": "appentis de 4 x 3 m à 20 degrés, bas vers +z",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 342
+  },
+  "toit-croupe": {
+   "boite": [
+    [
+     -4.635,
+     -0.368,
+     -3.628
+    ],
+    [
+     4.644,
+     2.563,
+     3.637
+    ]
+   ],
+   "description": "toit à croupes de 8 x 6 m à 35 degrés, arêtiers",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 1992
+  },
+  "toit-deux-pans": {
+   "boite": [
+    [
+     -2.421,
+     -0.416,
+     -3.595
+    ],
+    [
+     2.422,
+     2.977,
+     3.596
+    ]
+   ],
+   "description": "tronçon de 4 m de toit à deux pans (portée 6 m, 40 degrés): tuiles en rangs, faîtage, rives, chevrons, gouttières (origine: milieu, à l'arase des murs)",
+   "finition": null,
+   "materiaux": [
+    "bois",
+    "metal",
+    "tuile"
+   ],
+   "teinte": null,
+   "triangles": 896
+  },
+  "vitrail": {
+   "boite": [
+    [
+     -0.774,
+     -0.15,
+     -0.138
+    ],
+    [
+     0.78,
+     3.277,
+     0.222
+    ]
+   ],
+   "description": "baie haute d'église sous son arc",
+   "finition": null,
+   "materiaux": [
+    "metal",
+    "pierre"
+   ],
+   "teinte": null,
+   "triangles": 156
+  }
+ }
+}

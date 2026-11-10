@@ -297,3 +297,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Sans modelé d'orbites, les traits fins s'éteignent dans les mips: mips « à l'encre » (couverture max, couleur la plus sombre par bloc 2 x 2) faits en JS au chargement.
 - Clip sur place: pieds recalés au sol par translation verticale du bassin (clés de `Hips` en repère de l'os, `sonde_pieds.py --poser`); vitesse d'appui de la marche Meshy 0,9 à 1,35 m/s selon le corps.
 - Un script nommé `inspect.py` dans le dossier courant masque le module standard (Blender plante au chargement). Heredoc suivi d'une autre commande: refusé par le garde-fou.
+
+## Bâtiments encrés d'Aubrune (vérifié le 2026-11-10)
+
+- Chaîne: `assets-src/decors/batiments-aubrune/` (géométrie en numpy pur dans `atelier.py`, Blender ne fait qu'écrire le GLB: 27 bâtiments et 86 pièces en 8 s). Fiches dans `donnees/lieux/aubrune/batiments/`, modèles dans `assets/lieux/aubrune/batiments/`.
+- Le style encré se porte tel quel en Blender: boîtes tremblées une à une (pierre, tuile, planche), couleur par coin, un matériau nommé par matière. La page `planche/planche.mjs` importe la matière de `src/rendu/demo-encre/` sans y toucher (fichier .mjs sous `assets-src/`, servi par Vite depuis la racine du paquet) et convertit les GLB: couche de traits par nom de matériau, morceaux par sommets communs.
+- Budget: ne pas faire les dessous ni les faces noyées dans le mur (caméra à 35 degrés au moins), tuile = dessus et chant bas (4 triangles): maison de 7 x 6 à deux niveaux en 4 100 triangles. Condition: profondeur des ombres en double face.
+- Deux morceaux qui partagent un sommet à 1 mm près fusionnent pour le contour: reculer la vitre de 4 mm derrière le tableau.
+- Trou au-dessus de l'arase (fenêtre de pignon): découper la grille du mur par les droites du pignon (Sutherland-Hodgman), sinon des rectangles percent le toit.
+- Faîtières: les poser 10 cm au-dessus du faîte avec 20 cm de rayon; à 5 cm et 17 cm elles disparaissent sous le dernier rang de tuiles.
+- Planche: placer le soleil par rapport à la caméra (lacet + 191 degrés), sinon les portes au nord et à l'est sont dans les noirs pleins et on ne juge rien. Vu du nord à 50 degrés, une lucarne du pan sud dépasse du faîtage: ce n'est pas un défaut.
+- Ports Vite: 5391 et 5477 étaient pris; lire `ss -ltnp` avant de choisir. `npm install` hors dépôt: `--prefix <dossier>` (le cd vers le scratchpad ne tient pas).
+- Garde-fou: une commande qui enchaîne heredoc et autre chose est refusée; un heredoc Python seul après un `cd` passe.

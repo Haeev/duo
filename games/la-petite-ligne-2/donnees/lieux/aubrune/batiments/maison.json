@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "maison",
+  "nom": "la maison du garde-barrière",
+  "detail": "la plus grande maison du passage à niveau: deux souches de cheminée, une lucarne au midi, porte à l'est vers la barrière",
+  "emprise": {
+    "largeur": 11,
+    "profondeur": 8
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit",
+    "toit": "tuile",
+    "volets": "sauge",
+    "porte": "sauge",
+    "menuiseries": "creme"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "est",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "est": {
+      "rdc": ["fenetre", "porte", "fenetre"],
+      "etage": ["fenetre", "fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.86
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.2
+    },
+    {
+      "piece": "lucarne",
+      "facade": "sud",
+      "position": 0.5
+    }
+  ]
+}

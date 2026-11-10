@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "id": "firmin",
+  "nom": "la maison de Firmin",
+  "detail": "volets rouge cheminot, souche de cheminée près du pignon ouest: la maison de la référence encrée",
+  "emprise": {
+    "largeur": 7,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit",
+    "toit": "tuile",
+    "volets": "rouge_cheminot",
+    "porte": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 36
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["fenetre", "porte", "fenetre"],
+      "etage": ["fenetre", "fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre-etroite"],
+      "etage": ["fenetre", "fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.14
+    }
+  ]
+}

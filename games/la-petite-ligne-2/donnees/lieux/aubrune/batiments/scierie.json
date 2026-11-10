@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "scierie",
+  "nom": "l'atelier de Basile",
+  "detail": "atelier en planches sur soubassement de pierre, grande porte à deux vantaux sous un auvent de 3 m où Basile travaille dehors",
+  "emprise": {
+    "largeur": 10,
+    "profondeur": 8
+  },
+  "niveaux": 1,
+  "hauteurMurs": 3.6,
+  "finition": "bardage",
+  "couleurs": {
+    "murs": "bois_brut",
+    "toit": "lauze",
+    "porte": "bois_sombre",
+    "menuiseries": "bois_sombre"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 30
+  },
+  "porte": {
+    "facade": "est",
+    "position": 0.5,
+    "modele": "grange",
+    "largeur": 2.6
+  },
+  "facades": {
+    "est": {
+      "rdc": ["porte"]
+    },
+    "sud": {
+      "rdc": ["fenetre-nue", "fenetre-nue"]
+    },
+    "nord": {
+      "rdc": ["fenetre-nue"]
+    },
+    "ouest": {
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "auvent",
+      "facade": "est",
+      "position": 0.5,
+      "largeur": 5.0,
+      "profondeur": 3.0,
+      "accroche": 3.45
+    }
+  ]
+}
