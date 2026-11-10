@@ -1,0 +1,33 @@
+# Tenue « chemise à carreaux et jean ». Gabarit: copier, changer `id`, les couleurs (noms du nuancier;
+# `!nom` garde la couleur vive: c'est l'accent du personnage, un seul par tenue) et les cotes.
+# Les cotes sont relatives aux repères du corps: la même fiche habille tous les corps.
+id = "carreaux-jean"
+nom = "Chemise à carreaux et jean"
+
+[haut]
+modele = "chemise"
+manches = 0.97            # fraction du bras couverte: 1 = poignet, 0,45 = manche courte
+ourlet = 0.045            # m sous la hanche
+col_haut = 0.0            # m au-dessus de la base du cou
+encolure_v = 0.05         # profondeur du V devant (m)
+col = "chemise"
+boutons = true
+poche = true
+rentre = false
+motif = "carreaux"
+couleurs = ["!coquelicot", "brique", "craie"]   # base, motif, filet
+
+[bas]
+modele = "pantalon"
+longueur = 0.96           # fraction de la jambe: 1 = cheville
+taille = 0.075            # m au-dessus de la hanche
+motif = "jean"
+couleurs = ["marine"]
+surpiqure = "ocre"
+revers = 0.035
+
+[chaussures]
+modele = "bottines"
+tige = 0.085
+lacets = true
+couleurs = ["cuir_sombre", "semelle"]

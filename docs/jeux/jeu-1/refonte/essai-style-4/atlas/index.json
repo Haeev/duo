@@ -1,0 +1,49 @@
+{
+ "basile": {
+  "corps": "homme",
+  "coiffure": "tignasse",
+  "tenue": "pull-toile",
+  "col": false
+ },
+ "gaston": {
+  "corps": "costaud",
+  "coiffure": "brosse",
+  "tenue": "salopette",
+  "col": true
+ },
+ "lou": {
+  "corps": "enfant",
+  "coiffure": "tignasse",
+  "tenue": "mariniere-short",
+  "col": false
+ },
+ "maelle": {
+  "corps": "femme",
+  "coiffure": "carre",
+  "tenue": "carreaux-jean",
+  "col": true
+ },
+ "odette": {
+  "corps": "agee",
+  "coiffure": "chignon",
+  "tenue": "blouse-gilet",
+  "col": true
+ },
+ "_tenues": {
+  "carreaux-jean": {
+   "col": true
+  },
+  "pull-toile": {
+   "col": false
+  },
+  "salopette": {
+   "col": true
+  },
+  "mariniere-short": {
+   "col": false
+  },
+  "blouse-gilet": {
+   "col": true
+  }
+ }
+}

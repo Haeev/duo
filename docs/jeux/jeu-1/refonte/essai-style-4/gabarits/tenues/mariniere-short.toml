@@ -1,0 +1,31 @@
+# Tenue « marinière et short »: manches courtes, short au genou, chaussettes hautes.
+id = "mariniere-short"
+nom = "Marinière et short"
+
+[haut]
+modele = "tee-shirt"
+manches = 0.42
+ourlet = 0.03
+encolure_v = 0.0
+rentre = false
+motif = "rayures"
+couleurs = ["craie", "!moutarde"]
+
+[bas]
+modele = "short"
+longueur = 0.46
+taille = 0.07
+coutures = true
+couleurs = ["canard"]
+surpiqure = "lin"
+revers = 0.03
+
+[chaussettes]
+hauteur = 0.17
+couleurs = ["lin"]
+
+[chaussures]
+modele = "baskets"
+tige = 0.05
+lacets = true
+couleurs = ["brique", "craie"]

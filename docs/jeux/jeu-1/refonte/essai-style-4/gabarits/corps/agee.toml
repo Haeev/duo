@@ -1,0 +1,14 @@
+# Corps commun « agee ». Femme âgée: petite, dos rond, tête en avant.
+# Gabarit: copier ce fichier pour un nouveau corps (rig Meshy dans <dossier>/agee/marche.glb), lancer
+# `python3 scripts/construire.py --corps <dossier>` et régler les valeurs sur la planche `.travail/reperes-agee.png`.
+id = "agee"
+triangles = 2300      # triangles visibles (la coque d'encre double le compte)
+mains = 0.78          # échelle des mains autour du poignet (1 = tel que généré)
+pieds = 1.0           # échelle des pieds autour de la cheville
+tete = 0.9           # échelle de la tête autour de la base du crâne (viser 7 têtes; enfant 5,5)
+
+[visage]              # repères relevés sur le modelé de ce corps: le visage dessiné tombe sur le visage sculpté
+menton = 0.262        # du sommet du crâne au menton, en mètres, tête à l'échelle 1
+yeux = 0.435          # centre des yeux, fraction de la hauteur de tête depuis le sommet
+bouche = 0.74        # trait de la bouche, même unité
+ecart = 0.17         # demi-distance entre les yeux, fraction de la hauteur de tête

@@ -1,0 +1,47 @@
+# Coiffure « tignasse »: frange en bataille, côtés qui rebiquent, deux épis à l'arrière du crâne.
+id = "tignasse"
+graine = 11
+
+[calotte]
+volume = 0.1
+front_deg = 46
+cotes_deg = 84
+nuque_deg = 100
+dents_deg = 9
+aretes = 0.2
+
+[[meches]]            # frange en bataille
+de_deg = -64
+a_deg = 64
+nombre = 6
+racine_deg = 28
+longueur = 0.36
+largeur = 0.24
+epaisseur = 0.06
+vrille_deg = 26
+chute = 0.1
+ecart = 0.05
+alea = 0.3
+alea_deg = 6
+
+[[meches]]            # côtés qui rebiquent
+de_deg = 74
+a_deg = 178
+nombre = 4
+miroir = true
+racine_deg = 60
+longueur = 0.34
+largeur = 0.28
+epaisseur = 0.06
+chute = 0.45
+ecart = 0.13
+alea = 0.3
+
+[[meches]]            # épis
+de_deg = 140
+a_deg = 215
+nombre = 2
+racine_deg = 14
+longueur = 0.24
+largeur = 0.17
+leve = 1.3

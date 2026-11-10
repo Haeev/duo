@@ -1,0 +1,39 @@
+# Tenue « salopette »: chemise claire à manches retroussées, salopette à bavette et bretelles, foulard noué.
+id = "salopette"
+nom = "Salopette et foulard"
+
+[haut]
+modele = "chemise"
+manches = 0.62
+ourlet = 0.0
+encolure_v = 0.04
+col = "chemise"
+boutons = true
+rentre = true
+couleurs = ["lin"]
+
+[bas]
+modele = "pantalon"
+longueur = 0.95
+taille = 0.08
+motif = "jean"
+couleurs = ["!bleu_de_travail"]
+surpiqure = "ocre"
+revers = 0.045
+
+[bavette]
+bavette_haut = 0.0        # m au-dessus du haut de la poitrine
+bavette_large = 0.62      # part de la carrure
+bretelle = 0.024          # demi-largeur (m)
+
+[foulard]
+hauteur = 0.035
+longueur = 0.1
+pointe = "devant"
+couleurs = ["brique"]
+
+[chaussures]
+modele = "godillots"
+tige = 0.1
+lacets = true
+couleurs = ["cuir_sombre", "semelle"]

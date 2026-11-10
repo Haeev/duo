@@ -1,0 +1,38 @@
+# Coiffure « carré à frange »: calotte, frange en cinq mèches, rideau de mèches jusqu'à la mâchoire.
+# Gabarit: copier ce fichier, changer `id` et les cotes. Longueurs en hauteurs de tête, angles en degrés
+# (autour de la tête: 0 devant, 90 côté gauche, 180 nuque; depuis le sommet: 0 en haut, 90 à l'horizontale).
+id = "carre"
+graine = 3
+
+[calotte]
+volume = 0.085        # épaisseur des cheveux sur le crâne
+front_deg = 46        # bas de la calotte devant, sur les côtés, à la nuque (angle depuis le sommet)
+cotes_deg = 80
+nuque_deg = 92
+dents_deg = 7         # bord en dents
+aretes = 0.14         # relief des pans
+
+[[meches]]            # frange
+de_deg = -42
+a_deg = 42
+nombre = 5
+racine_deg = 26       # où la mèche sort de la calotte
+longueur = 0.36
+largeur = 0.2
+epaisseur = 0.05
+vrille_deg = 14       # balayage de côté
+chute = 0.25          # 0 suit le crâne, 1 tombe à la verticale
+alea = 0.2
+
+[[meches]]            # rideau des côtés et de la nuque (en miroir)
+de_deg = 58
+a_deg = 176
+nombre = 5
+miroir = true
+racine_deg = 52
+longueur = 0.82
+largeur = 0.32
+epaisseur = 0.06
+chute = 0.95
+ecart = 0.07          # la pointe s'écarte de la tête
+alea = 0.12

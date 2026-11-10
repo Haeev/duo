@@ -1,0 +1,29 @@
+# Tenue « pull à côtes et pantalon de toile »: pull rentré, bandes sur la poitrine, pli de pantalon.
+id = "pull-toile"
+nom = "Pull à côtes et pantalon de toile"
+
+[haut]
+modele = "pull"
+manches = 1.0
+ourlet = 0.0
+col_haut = 0.025
+encolure_v = 0.0
+rentre = false
+bord_cotes = true
+motif = "cotes"
+couleurs = ["!ocre", "chocolat", "craie"]
+
+[bas]
+modele = "pantalon"
+longueur = 0.99
+taille = 0.08
+pli = true
+coutures = true
+couleurs = ["anthracite"]
+surpiqure = "perle"
+
+[chaussures]
+modele = "derbies"
+tige = 0.045
+lacets = true
+couleurs = ["chocolat", "semelle"]
