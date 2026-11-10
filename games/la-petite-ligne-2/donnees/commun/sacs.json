@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "toolbarSlots": 5,
+  "bags": [
+    { "id": "besace", "name": "Besace", "slots": 4 },
+    { "id": "sac-de-toile", "name": "Sac de toile", "slots": 6 },
+    { "id": "sac-a-dos", "name": "Sac à dos", "slots": 10 },
+    { "id": "sac-de-voyage", "name": "Sac de voyage", "slots": 15 },
+    { "id": "malle-a-bretelles", "name": "Malle à bretelles", "slots": 20 }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "essai-gare",
+  "name": "Gare d'essai",
+  "station": { "arrival": "descente", "platform": "quai", "platformRadius": 3 },
+  "links": ["essai-halte"],
+  "activities": []
+}
