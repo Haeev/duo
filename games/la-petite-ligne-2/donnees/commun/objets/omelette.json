@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "omelette",
+  "name": "Omelette aux herbes",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 55
+  },
+  "tool": null
+}

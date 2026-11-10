@@ -11,6 +11,7 @@ import { NEEDS_BRICKS } from '../besoins/briques';
 import { shopBehaviour } from '../commerces/brique';
 import { BAG_BRICKS } from '../sac/briques';
 import { HARVEST_BRICKS } from '../outils/briques';
+import { COOK_BRICKS } from '../cuisine/briques';
 import { sitBehaviour } from './asseoir';
 import { sleepBehaviour } from './dormir';
 import { talkBehaviour } from './parler';
@@ -42,6 +43,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   store: storeBehaviour,
   ...NEEDS_BRICKS,
   ...BAG_BRICKS,
+  ...COOK_BRICKS,
   travel: travelBehaviour,
   shop: shopBehaviour,
   ...HARVEST_BRICKS,

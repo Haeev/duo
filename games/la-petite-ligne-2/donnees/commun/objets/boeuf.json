@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "boeuf",
+  "name": "Morceau de bœuf",
+  "family": "supply",
+  "stack": 3,
+  "food": null,
+  "tool": null
+}

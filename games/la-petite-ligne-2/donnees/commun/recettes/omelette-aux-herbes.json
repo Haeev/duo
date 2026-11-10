@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "id": "omelette-aux-herbes",
+  "name": "Omelette aux herbes",
+  "station": "kitchen",
+  "inputs": [
+    {
+      "item": "oeuf",
+      "count": 2
+    }
+  ],
+  "output": {
+    "item": "omelette",
+    "count": 1
+  },
+  "seconds": 18,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "stir",
+      "count": 8,
+      "pace": 1.2
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ],
+  "quality": {
+    "perfect": {
+      "item": "omelette",
+      "count": 2
+    }
+  }
+}

@@ -79,6 +79,7 @@ describe('pas de simulation vide', () => {
       'habitants',
       'quetes',
       'scenes',
+      'cuisine',
     ]);
   });
 });

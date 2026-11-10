@@ -8,6 +8,7 @@ import { IdSchema, IntSchema, PlayerIndexSchema } from '../../donnees/schemas/co
 import { NEEDS_EVENTS } from '../besoins/evenements';
 import { BRICK_EVENTS } from '../briques/evenements';
 import { SHOP_EVENTS } from '../commerces/evenements';
+import { COOK_EVENTS } from '../cuisine/evenements';
 import { DIALOGUE_EVENTS } from '../dialogues/evenements';
 import { TOOL_EVENTS } from '../outils/evenements';
 import { VILLAGER_EVENTS } from '../habitants/evenements';
@@ -63,5 +64,6 @@ export const GameEventSchema = v.variant('type', [
   ...VILLAGER_EVENTS,
   ...QUEST_EVENTS,
   ...SCENE_EVENTS,
+  ...COOK_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

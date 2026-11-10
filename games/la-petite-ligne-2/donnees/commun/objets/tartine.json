@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "tartine",
+  "name": "Tartine grillée",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 35
+  },
+  "tool": null
+}

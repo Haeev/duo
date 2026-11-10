@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "tartine-grillee",
+  "name": "Tartine grillée",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "pain",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "tartine",
+    "count": 1
+  },
+  "seconds": 2,
+  "known": "start"
+}

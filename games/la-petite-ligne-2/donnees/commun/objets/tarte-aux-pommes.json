@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "tarte-aux-pommes",
+  "name": "Tarte aux pommes",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 60
+  },
+  "tool": null
+}

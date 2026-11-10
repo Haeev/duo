@@ -9,6 +9,7 @@ import type { Slice, WorldState } from '../../etat/monde';
 import { needsSystem } from '../besoins/index';
 import { brickSystem } from '../briques/index';
 import { shopSystem } from '../commerces/index';
+import { cookingSystem } from '../cuisine/index';
 import { dialogueSystem } from '../dialogues/index';
 import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
@@ -59,4 +60,5 @@ export const SYSTEMS: readonly GameSystem[] = [
   villagerSystem,
   questSystem,
   sceneSystem,
+  cookingSystem,
 ];

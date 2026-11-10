@@ -1,0 +1,360 @@
+/* Cuisine: livre de recettes, mini-jeu, plat fêté, repas à deux (interface.md 5.6). */
+.lpl-cook {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-family: 'Nunito Sans Variable', system-ui, sans-serif;
+  color: #2a2522;
+}
+.lpl-cook-p {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+.lpl-cook-p.big {
+  width: 44px;
+  height: 44px;
+}
+.lpl-cook-book,
+.lpl-cook-result {
+  background: #fbf6e9;
+  border: 2px solid #2a2522;
+  border-radius: 16px;
+  box-shadow: 0 6px 0 rgba(42, 37, 34, 0.35);
+  padding: 16px 20px;
+  max-width: min(92vw, 820px);
+}
+.lpl-cook-book header,
+.lpl-cook-book footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+.lpl-cook-book footer {
+  margin-top: 12px;
+}
+.lpl-cook kbd {
+  display: inline-block;
+  min-width: 28px;
+  padding: 2px 8px;
+  border: 2px solid #2a2522;
+  border-radius: 8px;
+  background: #fff;
+  font:
+    800 14px/1.4 'Nunito Sans Variable',
+    system-ui,
+    sans-serif;
+  text-align: center;
+  box-shadow: 0 3px 0 #2a2522;
+}
+.lpl-cook kbd.on {
+  background: #f2c14e;
+  transform: translateY(-2px);
+}
+.lpl-cook kbd.ok {
+  opacity: 0.4;
+}
+.lpl-cook-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 176px);
+  gap: 12px;
+  margin-top: 12px;
+}
+.lpl-cook-card {
+  border: 2px solid #c9bda4;
+  border-radius: 12px;
+  padding: 8px;
+  background: #fff;
+}
+.lpl-cook-card.sel {
+  border-color: #2a2522;
+  box-shadow: 0 0 0 3px #f2c14e;
+}
+.lpl-cook-card.unknown .lpl-cook-dish .obj {
+  filter: brightness(0) opacity(0.25);
+}
+.lpl-cook-card.elsewhere {
+  opacity: 0.55;
+}
+.lpl-cook-dish {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.lpl-cook-dish .obj {
+  width: 72px;
+  height: 72px;
+}
+.lpl-cook-dish .badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #b3542e;
+}
+.lpl-cook-dish .where {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.lpl-cook-ins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 6px;
+}
+.lpl-cook-in {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+}
+.lpl-cook-in .obj {
+  width: 30px;
+  height: 30px;
+}
+.lpl-cook-in.missing .obj {
+  opacity: 0.35;
+  outline: 2px dashed #b3542e;
+  border-radius: 10px;
+}
+.lpl-cook-in.missing b {
+  color: #b3542e;
+  text-decoration: line-through;
+}
+.lpl-cook-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 14px;
+}
+.lpl-cook-stars {
+  margin-left: auto;
+  display: inline-flex;
+}
+.lpl-cook-star {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #2a2522;
+  stroke-width: 1.5;
+}
+.lpl-cook-star.on {
+  fill: #f2c14e;
+}
+.lpl-cook-stars.big .lpl-cook-star {
+  width: 40px;
+  height: 40px;
+}
+.lpl-cook-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lpl-cook-frieze {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 6px 12px;
+  height: 44px;
+  background: #fbf6e9;
+  border: 2px solid #2a2522;
+  border-radius: 12px;
+}
+.lpl-cook-frieze.other {
+  transform: scale(0.7);
+  opacity: 0.8;
+  margin-bottom: -8px;
+}
+.lpl-cook-step {
+  display: flex;
+  align-items: center;
+  opacity: 0.4;
+}
+.lpl-cook-step.now {
+  opacity: 1;
+  color: #b3542e;
+}
+.lpl-cook-step.done {
+  opacity: 1;
+}
+.lpl-cook-step.g3 {
+  color: #3f8a4a;
+}
+.lpl-cook-step.g2 {
+  color: #6b8a3f;
+}
+.lpl-cook-stage {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lpl-cook-stage .obj {
+  width: 96px;
+  height: 96px;
+}
+.lpl-cook-gauge {
+  position: relative;
+  width: 480px;
+  height: 40px;
+  margin-top: 12px;
+  background: #fbf6e9;
+  border: 2px solid #2a2522;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.lpl-cook-gauge.lead {
+  opacity: 0.6;
+}
+.lpl-cook-gauge i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.lpl-cook-fill {
+  left: 0;
+  background: #9cc2a0;
+}
+.lpl-cook-fill.hot {
+  background: linear-gradient(90deg, #f6d38a, #e0763e);
+  opacity: 0.85;
+}
+.lpl-cook-zone {
+  background: #f2c14e;
+  opacity: 0.55;
+}
+.lpl-cook-sweet {
+  background: #e3a92a;
+}
+.lpl-cook-needle,
+.lpl-cook-beat {
+  width: 6px;
+  margin-left: -3px;
+  background: #2a2522;
+  border-radius: 3px;
+}
+.lpl-cook-target {
+  width: 14px;
+  margin-left: -7px;
+  background: #f2c14e;
+}
+.lpl-cook-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.lpl-cook-dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #2a2522;
+  background: #fff;
+}
+.lpl-cook-dots i.on {
+  background: #2a2522;
+}
+.lpl-cook-keys {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 10px 0 56px;
+  padding: 4px 12px;
+  background: #fbf6e9;
+  border-radius: 12px;
+  font-weight: 700;
+}
+.lpl-cook-mark {
+  position: absolute;
+  bottom: 170px;
+  font:
+    800 28px/1 'Fraunces',
+    serif;
+  color: #fff;
+  -webkit-text-stroke: 1px #2a2522;
+  animation: lpl-cook-pop 0.5s ease-out;
+}
+.lpl-cook-mark.g3 {
+  color: #f2c14e;
+}
+.lpl-cook-result {
+  text-align: center;
+  font-weight: 700;
+}
+.lpl-cook-result .obj {
+  width: 120px;
+  height: 120px;
+}
+.lpl-cook-result.first .dish {
+  animation: lpl-cook-grow 0.6s ease-out;
+}
+.lpl-cook-result .new {
+  font:
+    800 28px/1.2 'Fraunces',
+    serif;
+  color: #b3542e;
+  margin: 0 0 8px;
+}
+.lpl-cook-meal {
+  position: absolute;
+  left: 50%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: #fbf6e9;
+  border: 2px solid #2a2522;
+  border-radius: 16px;
+  font:
+    800 18px/1 'Nunito Sans Variable',
+    system-ui,
+    sans-serif;
+  color: #2a2522;
+  pointer-events: none;
+}
+.lpl-cook-meal .steam {
+  width: 6px;
+  height: 18px;
+  border-radius: 3px;
+  background: #c9bda4;
+  animation: lpl-cook-steam 1.4s ease-in-out infinite;
+}
+.lpl-cook-meal .steam:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.lpl-cook-meal .steam:nth-child(5) {
+  animation-delay: 0.8s;
+}
+@keyframes lpl-cook-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+@keyframes lpl-cook-grow {
+  0% {
+    transform: scale(0.3);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+}
+@keyframes lpl-cook-steam {
+  50% {
+    transform: translateY(-8px);
+    opacity: 0.3;
+  }
+}
+[data-motion='reduced'] .lpl-cook *,
+[data-motion='reduced'] .lpl-cook-meal * {
+  animation: none !important;
+}

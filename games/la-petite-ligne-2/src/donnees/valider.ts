@@ -18,6 +18,7 @@ import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
 import { validateStory } from '../simulation/quetes/valider';
+import { checkRecipes } from '../simulation/cuisine/valider';
 
 export function checkCondition(
   content: Content,
@@ -419,6 +420,7 @@ export function validateContent(content: Content): string[] {
       problems.push(`${at}: famille « tool » et champ \`tool\` vont ensemble`);
   }
   for (const prop of Object.values(content.props)) checkBricks(content, prop, problems);
+  problems.push(...checkRecipes(content));
   for (const recipe of Object.values(content.recipes)) {
     for (const portion of [...recipe.inputs, recipe.output]) {
       if (!(portion.item in content.items))

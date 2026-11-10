@@ -1,17 +1,30 @@
 // GABARIT: une recette de cuisine ou un plan d'établi.
 // Créer: pnpm nouveau recette <id>        -> donnees/commun/recettes/<id>.json
-// Schéma: src/donnees/schemas/recette.ts
+// Schéma: src/donnees/schemas/recette.ts; règles: docs/jeux/jeu-1/refonte/cuisine.md
 {
   "schema": 1,
   "id": "exemple-recette",
   "name": "Compote d'exemple",
-  // Poste: stove (réchaud, recettes simples), kitchen (vraie cuisine, mini-jeu), workbench (établi).
+  // Poste (brique "cook" d'un meuble): stove (réchaud, recettes simples), kitchen (cuisinière),
+  // oven (four), counter (plan de travail), workbench (établi).
   "station": "stove",
-  // Ingrédients (6 lignes au plus) et résultat: des objets de commun/objets/.
+  // Ingrédients (6 lignes au plus) et plat obtenu: des objets de commun/objets/. Ses effets sur
+  // les besoins sont ceux de l'objet (champ "food", ou "meal" pour un repas à deux).
   "inputs": [{ "item": "pomme", "count": 3 }],
   "output": { "item": "pain", "count": 1 },
-  // Durée de la préparation, en secondes.
+  // Durée visée du mini-jeu, en secondes (15 à 40 s); une recette sans "steps" sort aussitôt.
   "seconds": 6,
-  // "start": connue dès le début; "learned": apprise d'un habitant, d'une quête ou d'un essai.
+  // "start": connue dès le début; "learned": apprise d'un habitant (effet de dialogue
+  // { "type": "remember", "key": "cuisine.recette.<id>", "value": 0 }), d'un livre ou par essai.
   "known": "learned",
+  // Facultatif. Étapes du mini-jeu (vraie cuisine), dans l'ordre:
+  // { "kind": "chop" | "stir" | "heat" | "season" | "plate", "count": gestes, "pace": 0.6 à 1.5 }
+  // "steps": [{ "kind": "chop", "count": 8 }, { "kind": "stir", "count": 6 }],
+  // Facultatif. Ce que donne un plat bon ou parfait (sinon le même plat):
+  // "quality": { "perfect": { "item": "pain", "count": 2 } },
+  // Facultatif. "book": l'objet livre qui l'apprend; "trial": se trouve en la cuisinant.
+  // "learn": { "book": "livre-de-cuisine", "trial": true },
+  // Facultatif. Repas à deux: la seconde part, sur un autre poste de la même cuisine. "after" sur
+  // une étape: elle attend l'étape n de la première part (faite trop tôt, un cran de moins).
+  // "second": { "station": "kitchen", "inputs": [...], "steps": [{ "kind": "heat", "count": 2, "after": 0 }] },
 }

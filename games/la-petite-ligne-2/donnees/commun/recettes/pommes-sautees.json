@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "pommes-sautees",
+  "name": "Pommes sautées",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "pomme-de-terre",
+      "count": 2
+    }
+  ],
+  "output": {
+    "item": "pommes-sautees",
+    "count": 1
+  },
+  "seconds": 2,
+  "known": "learned",
+  "learn": {
+    "book": "livre-de-cuisine"
+  }
+}

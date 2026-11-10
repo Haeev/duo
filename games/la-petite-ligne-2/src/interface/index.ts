@@ -13,6 +13,7 @@ import { createShopScreen } from './boutique/ecran';
 import { shopRefusalText } from './boutique/textes';
 import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
+import { createKitchen } from './cuisine/index';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import type { UiSettings } from './carnet/lectures';
 import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
@@ -149,6 +150,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   }
 
   function onEvent(event: GameEvent): void {
+    kitchen.onEvent(event);
     const me = local();
     if (me === null) return;
     const other: PlayerIndex = me === 0 ? 1 : 0;
@@ -218,6 +220,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
       case 'ate':
+      case 'cook_cancelled':
+      case 'cook_part_done':
+      case 'cook_started':
+      case 'cook_step_done':
+      case 'dish_cooked':
+      case 'kitchen_opened':
+      case 'recipe_learned':
       case 'bag_changed':
       case 'brick_used':
       case 'shop_bought':
@@ -256,11 +265,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         break;
     }
   }
+  const kitchen = createKitchen(layer, view, send, keyLabel, options.keyTarget ?? window);
   const offEvents = view.onEvent(onEvent);
 
   const keyTarget = options.keyTarget ?? window;
   const onKey = (raw: Event): void => {
-    if (!(raw instanceof KeyboardEvent)) return;
+    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (editor.isOpen()) used = editor.key(raw);
@@ -297,6 +307,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.frame(dtMs);
       notebook.frame(world, me);
       shop.frame(world, me, now);
+      kitchen.frame(dtMs);
       const shopOpen = shop.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       const prompt = menu
@@ -317,7 +328,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
     },
     capturing() {
-      return editor.isOpen() || dialogue.isOpen() || notebook.isOpen() || shop.isOpen();
+      return (
+        editor.isOpen() ||
+        dialogue.isOpen() ||
+        notebook.isOpen() ||
+        shop.isOpen() ||
+        kitchen.isOpen()
+      );
     },
     dispose() {
       offEvents();
@@ -327,6 +344,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       notebook.dispose();
       shop.dispose();
       editor.dispose();
+      kitchen.dispose();
       layer.remove();
     },
   };

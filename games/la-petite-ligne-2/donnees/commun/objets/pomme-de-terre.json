@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "pomme-de-terre",
+  "name": "Pomme de terre",
+  "family": "crop",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

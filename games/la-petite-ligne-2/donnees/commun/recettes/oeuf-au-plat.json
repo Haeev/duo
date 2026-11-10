@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "oeuf-au-plat",
+  "name": "Œuf au plat",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "oeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "oeuf-au-plat",
+    "count": 1
+  },
+  "seconds": 2,
+  "known": "learned",
+  "learn": {
+    "trial": true
+  }
+}

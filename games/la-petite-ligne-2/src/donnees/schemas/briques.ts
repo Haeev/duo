@@ -17,7 +17,8 @@ import { HARVEST_BRICK_SCHEMAS } from './recolte-briques';
 export const TOOL_KINDS = ['axe', 'spade', 'can', 'rod', 'net', 'hammer'] as const;
 export const ToolKindSchema = v.picklist(TOOL_KINDS);
 
-export const STATIONS = ['stove', 'kitchen', 'workbench'] as const;
+/** Postes: réchaud, cuisinière, établi, puis four et plan de travail (cuisine). */
+export const STATIONS = ['stove', 'kitchen', 'workbench', 'oven', 'counter'] as const;
 
 /** Verbe de la bulle d'action (« Cueillir »), deux mots au plus. */
 const Verb = v.pipe(v.string(), v.minLength(2), v.maxLength(20));

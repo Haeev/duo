@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "tarte-doree",
+  "name": "Tarte bien dorée",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 70
+  },
+  "tool": null
+}

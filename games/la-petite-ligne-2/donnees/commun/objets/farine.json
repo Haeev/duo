@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "farine",
+  "name": "Farine",
+  "family": "supply",
+  "stack": 5,
+  "food": null,
+  "tool": null
+}

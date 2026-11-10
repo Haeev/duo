@@ -4,6 +4,7 @@ import { FiniteSchema, IntSchema } from '../../donnees/schemas/communs';
 import { NEEDS_INTENTS } from '../besoins/intentions';
 import { BRICK_INTENTS } from '../briques/intentions';
 import { SHOP_INTENTS } from '../commerces/intentions';
+import { COOK_INTENTS } from '../cuisine/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { TOOL_INTENTS } from '../outils/intentions';
 import { VILLAGER_INTENTS } from '../habitants/intentions';
@@ -47,5 +48,6 @@ export const IntentSchema = v.variant('type', [
   ...VILLAGER_INTENTS,
   ...QUEST_INTENTS,
   ...SCENE_INTENTS,
+  ...COOK_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "plan-de-travail",
+  "name": "Plan de travail",
+  "model": "plan-de-travail",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "cook",
+      "station": "counter"
+    }
+  ]
+}

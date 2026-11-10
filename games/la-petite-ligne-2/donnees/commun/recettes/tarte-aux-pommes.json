@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "tarte-aux-pommes",
+  "name": "Tarte aux pommes",
+  "station": "oven",
+  "inputs": [
+    {
+      "item": "pomme",
+      "count": 3
+    },
+    {
+      "item": "farine",
+      "count": 1
+    },
+    {
+      "item": "oeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "tarte-aux-pommes",
+    "count": 1
+  },
+  "seconds": 20,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 8,
+      "pace": 0.8
+    },
+    {
+      "kind": "plate",
+      "count": 5
+    },
+    {
+      "kind": "heat",
+      "count": 3,
+      "pace": 0.8
+    }
+  ],
+  "quality": {
+    "good": {
+      "item": "tarte-aux-pommes",
+      "count": 2
+    },
+    "perfect": {
+      "item": "tarte-doree",
+      "count": 2
+    }
+  },
+  "learn": {
+    "book": "livre-de-cuisine"
+  }
+}

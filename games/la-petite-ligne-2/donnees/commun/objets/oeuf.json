@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "oeuf",
+  "name": "Œuf",
+  "family": "food",
+  "stack": 6,
+  "food": {
+    "hunger": 5
+  },
+  "tool": null
+}
