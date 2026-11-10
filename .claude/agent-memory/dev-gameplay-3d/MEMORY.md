@@ -642,3 +642,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 
 - Chromium rejoue `mouseover`/`mouseenter` quand le contenu passe sous un pointeur immobile (carnet qui monte du bas). Le pointeur des parcours e2e reste où Playwright a cliqué (« Héberger et continuer »): `mouseenter` mettait le focus du carnet sur la case 5. Le survol passe par `onPointerHover` (`src/interface/dom.ts`, `mousemove` avec `movementX/Y` non nuls); test garde-fou `tests/survol.test.ts`.
 - Dans le carnet, les chiffres 1 à 5 ne font rien: viser une case par D (ou les flèches) depuis la case 1.
+
+## Page Artifact et Three.js r128 en scripts classiques (vérifié le 2026-11-10, tableau de bord)
+
+- Les CDN (cdnjs, jsDelivr) sont fermés dans l'environnement cloud: `npm pack three@0.128.0`, décompresser, puis `page.route(url, (r) => r.fulfill({ path }))` dans Playwright pour servir les mêmes fichiers.
+- r128: `material.skinning` et `material.morphTargets` sont à poser à la main sur tout matériau de remplacement d'une peau; `outputEncoding = sRGBEncoding` et `texture.encoding` (pas `colorSpace`); `uv2` pour `TEXCOORD_1`.
+- r128 ne lance pas de rayon sur une peau animée, et `Box3.setFromObject` ignore le squelette: figer une copie par `SkinnedMesh.boneTransform(i, v)` à la pose de repos (enfant invisible du maillage) pour le pointage et les cotes. L'échelle réelle d'une peau se lit là (taille figée sur taille brute), pas dans la matrice du noeud.
+- Fuite classique: chaque `Skeleton` garde une `boneTexture`; `skeleton.dispose()` en changeant de modèle (3 textures perdues par personnage sinon). Contrôle: `renderer.info.memory` lu après une image rendue, pas avant.
+- GLTFLoader charge les images embarquées par des adresses `blob:` (soumises à la politique de sécurité de la page hôte): retirer `images`, `textures` et `samplers` du bloc JSON du GLB avant `parse`, décoder soi-même par `createImageBitmap(new Blob([octets]))`, puis reposer `material.map` grâce à `gltf.parser.associations` (matériaux clonés compris).
+- Pièces à squelette venues de plusieurs GLB: `socle.attach(peau)` puis `peau.bind(new Skeleton(os du squelette de référence retrouvés par nom, boneInverses d'origine), peau.bindMatrix)`.
+- Banc d'un onglet publié à côté d'une page: `<base href="../">` pour garder les adresses relatives de la page publiée; les `<option>` ne sont jamais « visibles » pour Playwright (`state: 'attached'`); recalculer la boîte d'un élément après un clic qui fait défiler la page.

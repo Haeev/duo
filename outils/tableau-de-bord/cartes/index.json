@@ -1,0 +1,393 @@
+{
+ "format": "tdb-cartes/1",
+ "calques": [
+  {
+   "id": "batiments",
+   "titre": "Bâtiments et repères"
+  },
+  {
+   "id": "chemins",
+   "titre": "Chemins"
+  },
+  {
+   "id": "verrous",
+   "titre": "Verrous"
+  },
+  {
+   "id": "ressources",
+   "titre": "Ressources"
+  },
+  {
+   "id": "points",
+   "titre": "Points de quête"
+  }
+ ],
+ "lieux": [
+  {
+   "id": "aubrune",
+   "nom": "Aubrune",
+   "largeur": 384,
+   "hauteur": 208,
+   "vitesses": {
+    "marche": 3,
+    "course": 5,
+    "draisine": 8
+   },
+   "donnees": "aubrune/lieu.json"
+  }
+ ],
+ "cartes": [
+  {
+   "id": "aubrune-plan-ensemble",
+   "lieu": "aubrune",
+   "titre": "Ensemble",
+   "fichier": "aubrune/plan-ensemble.svg",
+   "poids": 123807,
+   "largeur": 384,
+   "hauteur": 208,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 846
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 812.5
+   },
+   "vue": {
+    "x": 0,
+    "y": 0,
+    "largeur": 384,
+    "hauteur": 208
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-quetes-acte-1",
+   "lieu": "aubrune",
+   "titre": "Quêtes de l'acte 1",
+   "fichier": "aubrune/quetes-acte-1.svg",
+   "poids": 101492,
+   "largeur": 130,
+   "hauteur": 62,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 749
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 715.385
+   },
+   "vue": {
+    "x": 148,
+    "y": 76,
+    "largeur": 130,
+    "hauteur": 62
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-quetes-acte-2",
+   "lieu": "aubrune",
+   "titre": "Quêtes de l'acte 2",
+   "fichier": "aubrune/quetes-acte-2.svg",
+   "poids": 109236,
+   "largeur": 330,
+   "hauteur": 86,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 424
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 390.909
+   },
+   "vue": {
+    "x": 0,
+    "y": 78,
+    "largeur": 330,
+    "hauteur": 86
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-quetes-acte-3",
+   "lieu": "aubrune",
+   "titre": "Quêtes de l'acte 3",
+   "fichier": "aubrune/quetes-acte-3.svg",
+   "poids": 115134,
+   "largeur": 300,
+   "hauteur": 172,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 894
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 860
+   },
+   "vue": {
+    "x": 84,
+    "y": 0,
+    "largeur": 300,
+    "hauteur": 172
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-1-bourg",
+   "lieu": "aubrune",
+   "titre": "Zone 1: le bourg",
+   "fichier": "aubrune/zone-1-bourg.svg",
+   "poids": 124186,
+   "largeur": 178,
+   "hauteur": 80,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 1140
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 674.157
+   },
+   "vue": {
+    "x": 144,
+    "y": 60,
+    "largeur": 178,
+    "hauteur": 80
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-2-riviere-bief",
+   "lieu": "aubrune",
+   "titre": "Zone 2: la rivière et le bief",
+   "fichier": "aubrune/zone-2-riviere-bief.svg",
+   "poids": 103213,
+   "largeur": 194,
+   "hauteur": 64,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 632
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 494.845
+   },
+   "vue": {
+    "x": 0,
+    "y": 100,
+    "largeur": 194,
+    "hauteur": 64
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-3-voie-poste",
+   "lieu": "aubrune",
+   "titre": "Zone 3: la voie et le poste",
+   "fichier": "aubrune/zone-3-voie-poste.svg",
+   "poids": 106943,
+   "largeur": 190,
+   "hauteur": 64,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 734
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 505.263
+   },
+   "vue": {
+    "x": 0,
+    "y": 80,
+    "largeur": 190,
+    "hauteur": 64
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-4-cote",
+   "lieu": "aubrune",
+   "titre": "Zone 4: la Côte",
+   "fichier": "aubrune/zone-4-cote.svg",
+   "poids": 111098,
+   "largeur": 270,
+   "hauteur": 100,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 792
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 555.556
+   },
+   "vue": {
+    "x": 96,
+    "y": 0,
+    "largeur": 270,
+    "hauteur": 100
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-5-moulin",
+   "lieu": "aubrune",
+   "titre": "Zone 5: le moulin",
+   "fichier": "aubrune/zone-5-moulin.svg",
+   "poids": 94283,
+   "largeur": 64,
+   "hauteur": 44,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 1065
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 1031.25
+   },
+   "vue": {
+    "x": 100,
+    "y": 96,
+    "largeur": 64,
+    "hauteur": 44
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-6-ferme",
+   "lieu": "aubrune",
+   "titre": "Zone 6: la ferme",
+   "fichier": "aubrune/zone-6-ferme.svg",
+   "poids": 103461,
+   "largeur": 212,
+   "hauteur": 84,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 628
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 594.34
+   },
+   "vue": {
+    "x": 126,
+    "y": 122,
+    "largeur": 212,
+    "hauteur": 84
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  },
+  {
+   "id": "aubrune-zone-7-tunnel",
+   "lieu": "aubrune",
+   "titre": "Zone 7: le tunnel",
+   "fichier": "aubrune/zone-7-tunnel.svg",
+   "poids": 97434,
+   "largeur": 114,
+   "hauteur": 112,
+   "image": {
+    "largeur": 1980,
+    "hauteur": 1507
+   },
+   "cadre": {
+    "x": 0,
+    "y": 34,
+    "largeur": 1500,
+    "hauteur": 1473.68
+   },
+   "vue": {
+    "x": 270,
+    "y": 0,
+    "largeur": 114,
+    "hauteur": 112
+   },
+   "calques": [
+    "batiments",
+    "chemins",
+    "verrous",
+    "ressources",
+    "points"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+{
+  "lieux": [
+    {
+      "id": "aubrune",
+      "nom": "Aubrune",
+      "dossier": "docs/jeux/jeu-1/refonte/carte-aubrune",
+      "plan": "plan.json",
+      "cartes": [
+        { "fichier": "plan-ensemble.svg", "titre": "Ensemble" },
+        { "fichier": "quetes-acte-1.svg", "titre": "Quêtes de l'acte 1" },
+        { "fichier": "quetes-acte-2.svg", "titre": "Quêtes de l'acte 2" },
+        { "fichier": "quetes-acte-3.svg", "titre": "Quêtes de l'acte 3" },
+        { "fichier": "zone-1-bourg.svg", "titre": "Zone 1: le bourg" },
+        { "fichier": "zone-2-riviere-bief.svg", "titre": "Zone 2: la rivière et le bief" },
+        { "fichier": "zone-3-voie-poste.svg", "titre": "Zone 3: la voie et le poste" },
+        { "fichier": "zone-4-cote.svg", "titre": "Zone 4: la Côte" },
+        { "fichier": "zone-5-moulin.svg", "titre": "Zone 5: le moulin" },
+        { "fichier": "zone-6-ferme.svg", "titre": "Zone 6: la ferme" },
+        { "fichier": "zone-7-tunnel.svg", "titre": "Zone 7: le tunnel" }
+      ]
+    }
+  ]
+}

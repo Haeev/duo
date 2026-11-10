@@ -10,3 +10,6 @@ pnpm-lock.yaml
 **/dist/
 **/out/
 **/coverage/
+# Fichiers générés du tableau de bord (publier-cartes.mjs, inventaire-modeles.mjs).
+outils/tableau-de-bord/cartes/
+outils/tableau-de-bord/modeles/
