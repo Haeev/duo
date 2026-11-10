@@ -9,6 +9,7 @@ import {
   BoxGeometry,
   type BufferGeometry,
   Color,
+  ConeGeometry,
   CylinderGeometry,
   Float32BufferAttribute,
   Group,
@@ -16,7 +17,9 @@ import {
   type InstancedMesh,
   Matrix4,
   Mesh,
+  type Material,
   MeshStandardMaterial,
+  type Texture,
   Quaternion,
   Vector3,
   type WebGLProgramParametersWithUniforms,
@@ -24,13 +27,30 @@ import {
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { tileGrid } from '../../donnees/carte';
 import type { MapDef } from '../../donnees/schemas/lieu';
+import type { InkKit } from '../encre/index';
+import { inkUnit } from '../encre/conversion';
+import { KIND, LAYER } from '../encre/couches';
+import type { PlaceLights } from '../encre/lumieres';
+import type { WindowLight } from '../encre/matiere';
+import { INK_SETTINGS } from '../encre/reglages';
+import { createGroundMap } from '../encre/sol';
 import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { GeometryBuilder } from './geometrie';
 import { type SurfaceKind, TILE_SETTINGS, type TileSettings } from './reglages-tuiles';
-import { buildingsByTile, type GroundField, groundField, kindAt, surfaceAt } from './terrain-rendu';
-import { buildTile, crownBlob, type TileKit, TileView } from './tuile';
+import {
+  type BuildingShape,
+  buildingsByTile,
+  type GroundField,
+  groundField,
+  type InteriorRect,
+  interiorWalls,
+  kindAt,
+  surfaceAt,
+} from './terrain-rendu';
+import type { BuildingSource } from './batiments';
+import { buildTile, crownBlob, type ModeledBuilding, type TileKit, TileView } from './tuile';
 import { TileRing, tileDistance, tileRect } from './tuiles';
 
 /** Compteurs du rendu par tuiles (construits, pas dessinés: la vue n'en montre qu'une partie). */
@@ -70,11 +90,31 @@ function white(geometry: BufferGeometry): BufferGeometry {
   return geometry;
 }
 
+/** Ce que le fondu d'un houppier règle sur son matériau (standard ou encré). */
+type FadeMaterial = Material & { color: Color; opacity: number };
+
+/** Caillou du semis: un polyèdre à vingt faces cabossé, à facettes franches (un ton par face). */
+function pebbleShape(): BufferGeometry {
+  const geometry = new IcosahedronGeometry(1, 0);
+  const position = geometry.getAttribute('position');
+  for (let i = 0; i < position.count; i++) {
+    // Même décalage pour les sommets confondus: le tirage ne dépend que de la place du sommet.
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
+    const k =
+      0.78 + 0.44 * Math.abs((Math.sin(x * 12.9898 + y * 78.233 + z * 37.719) * 43758.5453) % 1);
+    position.setXYZ(i, x * k, y * k, z * k);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 interface CrownFade {
   readonly view: TileView;
   readonly index: number;
   readonly mesh: Mesh;
-  readonly material: MeshStandardMaterial;
+  readonly material: FadeMaterial;
   opacity: number;
   hidden: boolean;
 }
@@ -99,8 +139,11 @@ export class TiledPlace {
   private readonly shadowed = new Map<number, boolean>();
   private readonly crownFades = new Map<string, CrownFade>();
   private readonly time = { value: 0 };
-  private readonly glass: MeshStandardMaterial;
-  private readonly fadeBase: MeshStandardMaterial;
+  private readonly glass: Material & { emissiveIntensity: number };
+  private readonly fadeBase: FadeMaterial;
+  /** Rendu encré: carte du sol du lieu (`null` dans l'ancien rendu). */
+  readonly groundMap: Texture | null;
+  private readonly built: PlaceLights;
   private readonly probe = { x: 0, y: 0, z: 0 };
   private buildMs = 0;
   private maxStepMs = 0;
@@ -108,50 +151,125 @@ export class TiledPlace {
   constructor(
     readonly map: MapDef,
     private readonly settings: TileSettings = TILE_SETTINGS,
+    /** Rendu encré (ADR 0023): ses matériaux remplacent les matériaux standard. */
+    ink: InkKit | null = null,
+    /** Pièces du lieu (rendu encré: plancher et murs coupés). */
+    private readonly rooms: readonly InteriorRect[] = [],
+    /** Bâtiments livrés du lieu (rendu encré): ils remplacent les volumes provisoires. */
+    delivered: { readonly place: string; readonly source: BuildingSource } | null = null,
   ) {
     this.root.name = 'grand-lieu';
     this.field = groundField(map, settings);
     this.ring = new TileRing(map, settings.ring);
     const t = this.tracker;
-    const ground = t.track(new MeshStandardMaterial({ vertexColors: true, roughness: 0.95 }));
+    const standard = (roughness: number): MeshStandardMaterial =>
+      new MeshStandardMaterial({ vertexColors: true, roughness });
+    const ground = t.track(ink?.material() ?? standard(0.95));
     this.fadeBase = ground;
+    // Encre: la lueur des vitres vient de l'ambiance de l'heure, pas d'un émissif.
     this.glass = t.track(
-      new MeshStandardMaterial({
-        vertexColors: true,
-        roughness: 0.4,
-        emissive: new Color(settings.building.glowColor),
-        emissiveIntensity: 0,
-      }),
+      ink?.material() ??
+        new MeshStandardMaterial({
+          vertexColors: true,
+          roughness: 0.4,
+          emissive: new Color(settings.building.glowColor),
+          emissiveIntensity: 0,
+        }),
     );
-    const water = t.track(
-      new MeshStandardMaterial({
+    let water: Material;
+    if (ink === null) {
+      const plain = new MeshStandardMaterial({
         color: settings.water.color,
         roughness: settings.water.roughness,
         metalness: 0,
-      }),
-    );
-    this.animateWater(water);
+      });
+      this.animateWater(plain);
+      water = t.track(plain);
+    } else {
+      const inked = ink.material();
+      inked.color.set(settings.water.color);
+      water = t.track(inked);
+    }
+    this.groundMap =
+      ink === null
+        ? null
+        : t.track(
+            createGroundMap(
+              this.field,
+              settings.ground.bankColor,
+              rooms,
+              settings.interior.floorColor,
+            ),
+          );
+    const buildings = buildingsByTile(map, settings);
+    const models = new Map<number, ModeledBuilding[]>();
+    const windows: WindowLight[] = [];
+    if (ink !== null && delivered !== null)
+      for (const [tile, list] of buildings) {
+        const kept: BuildingShape[] = [];
+        for (const shape of list) {
+          const model = delivered.source.model(delivered.place, shape.id);
+          if (model === null) {
+            kept.push(shape);
+            continue;
+          }
+          const { rect } = shape;
+          const tileModels = models.get(tile) ?? [];
+          tileModels.push({ id: shape.id, geometry: model.geometry, height: model.height, rect });
+          models.set(tile, tileModels);
+          // Fenêtres du manifeste, du repère du bâtiment à celui du lieu.
+          for (const w of model.windows)
+            windows.push({ ...w, x: w.x + rect.x + rect.w / 2, z: w.z + rect.y + rect.h / 2 });
+        }
+        buildings.set(tile, kept);
+      }
+    const lamp = INK_SETTINGS.lights;
+    this.built = {
+      lamps: [...buildings.values()].flatMap((list) =>
+        list.flatMap((b) => b.lamps.map((l) => ({ ...l, radius: lamp.lampRadius, shadow: true }))),
+      ),
+      windows: [
+        ...windows,
+        ...[...buildings.values()].flatMap((list) => list.flatMap((b) => b.windows)),
+      ],
+    };
     const blob = mergeVertices(new IcosahedronGeometry(1, 1));
     blob.computeVertexNormals();
     this.kit = {
       map,
       field: this.field,
       settings,
-      buildings: buildingsByTile(map, settings),
+      buildings,
+      models,
       materials: {
         ground,
         water,
-        instanced: t.track(new MeshStandardMaterial({ vertexColors: true, roughness: 0.9 })),
+        instanced: t.track(ink?.material() ?? standard(0.9)),
         glass: this.glass,
       },
       shapes: {
-        box: t.track(white(new BoxGeometry(1, 1, 1).translate(0, 0.5, 0))),
-        trunk: t.track(white(new CylinderGeometry(1, 1, 1, 6, 1).translate(0, 0.5, 0))),
-        blob: t.track(white(blob)),
+        box: t.track(inkUnit(white(new BoxGeometry(1, 1, 1).translate(0, 0.5, 0)), LAYER.plain)),
+        trunk: t.track(
+          inkUnit(white(new CylinderGeometry(1, 1, 1, 6, 1).translate(0, 0.5, 0)), LAYER.bark),
+        ),
+        blob: t.track(inkUnit(white(blob), LAYER.leaf, KIND.leaf)),
+        ...(ink === null
+          ? {}
+          : {
+              pebble: t.track(inkUnit(white(pebbleShape()), LAYER.face)),
+              tuft: t.track(
+                inkUnit(
+                  white(new ConeGeometry(1, 1, 5, 1, true).translate(0, 0.5, 0)),
+                  LAYER.plain,
+                  KIND.stem,
+                ),
+              ),
+            }),
       },
     };
     this.far = this.buildFar();
     this.buildLandmarks();
+    if (ink !== null) this.buildRooms();
   }
 
   /** Surface de l'eau: ondulation par la normale, calculée dans le nuanceur (aucun coût au processeur). */
@@ -189,6 +307,7 @@ export class TiledPlace {
     const { field, settings, map } = this;
     const step = settings.far.cell;
     const builder = new GeometryBuilder();
+    builder.setInk(LAYER.grass, KIND.ground);
     const { cols, rows } = tileGrid(map);
     const counts = new Map<number, number>();
     const c = new Color();
@@ -243,6 +362,28 @@ export class TiledPlace {
     mesh.receiveShadow = true;
     this.root.add(mesh);
     return mesh;
+  }
+
+  /** Murs coupés des pièces, en un maillage (une pièce de contour par pièce du lieu). */
+  private buildRooms(): void {
+    if (this.rooms.length === 0) return;
+    const builder = new GeometryBuilder();
+    builder.setInk(LAYER.plain);
+    const doors = Object.values(this.map.doors ?? {})
+      .map((door) => this.map.points[door.to])
+      .filter((point): point is { x: number; y: number } => point !== undefined);
+    for (const room of this.rooms) {
+      builder.begin(room.id);
+      for (const box of interiorWalls(room, doors, this.settings)) builder.box(box);
+      builder.end();
+    }
+    const geometry = builder.build();
+    if (geometry === null) return;
+    const mesh = new Mesh(this.tracker.track(geometry), this.kit.materials.ground);
+    mesh.name = 'pieces';
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    this.root.add(mesh);
   }
 
   /** Repères (`landmarks`), toujours affichés: tour carrée à toit en pointe, ou grand arbre s'il est en pleine nature. */
@@ -360,6 +501,11 @@ export class TiledPlace {
     }
   }
 
+  /** Rendu encré: lampes de porte et fenêtres de tous les bâtiments du lieu. */
+  lights(): PlaceLights {
+    return this.built;
+  }
+
   /** Nature dessinée et surface entendue sous un point (son des pas). */
   surfaceAt(x: number, y: number): SurfaceKind {
     return surfaceAt(this.field, x, y);
@@ -407,6 +553,7 @@ export class TiledPlace {
       const opacity = this.occlusion.opacity(id);
       if (view === undefined) continue;
       for (const mesh of view.fading) mesh.setOpacity(id, opacity);
+      view.models.get(id)?.apply(opacity, 0);
     }
     this.updateCrowns(dt, subjects, toCamera);
   }

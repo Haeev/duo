@@ -4,6 +4,7 @@
  * lisières, cultures, traverses), les rails le long du graphe et les volumes des bâtiments. Tout
  * est déterministe (hachage des coordonnées): les deux machines voient le même bourg.
  */
+import type { LayerName } from '../encre/couches';
 import { TILE_SIZE, decodeTerrain } from '../../donnees/carte';
 import type { MapDef } from '../../donnees/schemas/lieu';
 import {
@@ -156,6 +157,10 @@ export interface BoxItem {
   d: number;
   yaw: number;
   color: string;
+  /** Rendu encré: couche de traits de cette boîte (absente: celle du maillage qui la reçoit). */
+  layer?: LayerName;
+  /** Rendu encré: vitre (lueur, reflet du ciel) ou flamme (lampe allumée la nuit). */
+  glow?: 'window' | 'flame';
 }
 export interface TreeItem {
   x: number;
@@ -185,9 +190,20 @@ export interface TileDecor {
 
 /** Segments de voie ferrée (m), tirés des arêtes du graphe dont la classe suit une voie. */
 export function railSegments(
-  map: Pick<MapDef, 'graph'>,
+  map: Pick<MapDef, 'graph' | 'rails'>,
   settings: TileSettings = TILE_SETTINGS,
 ): [number, number, number, number][] {
+  // Voies tracées par le plan: elles font foi (schéma de la carte); sinon, les arêtes du graphe.
+  if (map.rails !== undefined) {
+    const traced: [number, number, number, number][] = [];
+    for (const track of map.rails)
+      for (let i = 0; i + 1 < track.points.length; i++) {
+        const a = track.points[i];
+        const b = track.points[i + 1];
+        if (a !== undefined && b !== undefined) traced.push([a[0], a[1], b[0], b[1]]);
+      }
+    return traced;
+  }
   const graph = map.graph;
   if (graph === undefined) return [];
   const kinds: readonly string[] = settings.rail.kinds;
@@ -453,6 +469,17 @@ export interface BuildingShape {
   readonly wallHeight: number;
   readonly doorSide: Side | null;
   readonly rect: { x: number; y: number; w: number; h: number };
+  /** Rendu encré: foyer de la lampe de porte, et fenêtres (milieu de l'appui dehors, normale du mur). */
+  readonly lamps: { x: number; y: number; z: number }[];
+  readonly windows: {
+    x: number;
+    sill: number;
+    z: number;
+    width: number;
+    height: number;
+    nx: number;
+    nz: number;
+  }[];
 }
 
 /** Le côté du rectangle le plus proche de la porte. */
@@ -487,6 +514,8 @@ export function buildingShape(
   const { rect } = building;
   const walls: BoxItem[] = [];
   const glass: BoxItem[] = [];
+  const lamps: BuildingShape['lamps'] = [];
+  const windows: BuildingShape['windows'] = [];
   if (building.door === null) {
     walls.push({
       x: rect.x + rect.w / 2,
@@ -497,8 +526,19 @@ export function buildingShape(
       d: rect.h,
       yaw: 0,
       color: b.platformEdgeColor,
+      layer: 'slab',
     });
-    return { id, walls, glass, roof: null, wallHeight: b.platformHeight, doorSide: null, rect };
+    return {
+      id,
+      walls,
+      glass,
+      roof: null,
+      wallHeight: b.platformHeight,
+      doorSide: null,
+      rect,
+      lamps,
+      windows,
+    };
   }
   const salt = Math.floor(hash01(rect.x, rect.y, 11) * 1000);
   const wallColor = pick(b.wallColors, hash01(salt, 1, 12));
@@ -555,8 +595,10 @@ export function buildingShape(
       depth: number,
       color: string,
       list: BoxItem[],
+      ink: Pick<BoxItem, 'layer' | 'glow'> = {},
     ): void => {
       list.push({
+        ...ink,
         x: along ? a : fixedOut + (outward * depth) / 2,
         z: along ? fixedOut + (outward * depth) / 2 : a,
         base,
@@ -593,9 +635,17 @@ export function buildingShape(
         d: along ? 0.1 : b.door.width,
         yaw: 0,
         color: b.door.color,
+        layer: 'wood',
       });
-      put(center, b.door.width + 0.4, 0.12, 0, 0.6, b.door.stepColor, walls);
-      put(center, b.lamp.size, b.lamp.size, b.door.height + 0.3, 0.3, b.lamp.color, glass);
+      put(center, b.door.width + 0.4, 0.12, 0, 0.6, b.door.stepColor, walls, { layer: 'face' });
+      put(center, b.lamp.size, b.lamp.size, b.door.height + 0.3, 0.3, b.lamp.color, glass, {
+        glow: 'flame',
+      });
+      lamps.push({
+        x: along ? center : fixedOut + outward * 0.3,
+        y: b.door.height + 0.3 + b.lamp.size / 2,
+        z: along ? fixedOut + outward * 0.3 : center,
+      });
     } else wall(s, from, to, 0, height);
     // Fenêtres régulières, loin des coins et de la porte.
     const span = to - from;
@@ -608,7 +658,18 @@ export function buildingShape(
         a - b.window.width / 2 < gap[1] + 0.4
       )
         continue;
-      put(a, b.window.width, b.window.height, b.window.sill, 0.06, b.window.color, glass);
+      put(a, b.window.width, b.window.height, b.window.sill, 0.06, b.window.color, glass, {
+        glow: 'window',
+      });
+      windows.push({
+        x: along ? a : fixedOut,
+        sill: b.window.sill,
+        z: along ? fixedOut : a,
+        width: b.window.width,
+        height: b.window.height,
+        nx: along ? 0 : outward,
+        nz: along ? outward : 0,
+      });
     }
   }
   const alongX = rect.w >= rect.h;
@@ -622,7 +683,7 @@ export function buildingShape(
     alongX,
     color: roofColor,
   };
-  return { id, walls, glass, roof, wallHeight: height, doorSide: side, rect };
+  return { id, walls, glass, roof, wallHeight: height, doorSide: side, rect, lamps, windows };
 }
 
 /** Bâtiments rangés par tuile (celle de leur centre). */
@@ -641,4 +702,126 @@ export function buildingsByTile(
     out.set(tile, list);
   }
   return out;
+}
+
+/** Emprise d'une pièce sur la grille du lieu (cases). */
+export interface InteriorRect {
+  readonly id: string;
+  readonly at: { readonly x: number; readonly y: number };
+  readonly width: number;
+  readonly height: number;
+}
+
+/**
+ * Murs coupés d'une pièce: quatre côtés à hauteur d'appui, leur soubassement, et un vide à chaque
+ * porte (le point d'arrivée d'une porte est posé dans la pièce, contre son mur). Logique pure.
+ */
+export function interiorWalls(
+  room: InteriorRect,
+  doorPoints: readonly { readonly x: number; readonly y: number }[],
+  settings: TileSettings = TILE_SETTINGS,
+): BoxItem[] {
+  const s = settings.interior;
+  const out: BoxItem[] = [];
+  const x0 = room.at.x;
+  const y0 = room.at.y;
+  const x1 = x0 + room.width;
+  const y1 = y0 + room.height;
+  const t = s.wallThickness;
+  // Chaque côté: son axe (x ou y), sa position fixe sur l'autre axe, vers le dehors de la pièce.
+  const sides = [
+    { alongX: true, fixed: y0 - t / 2, from: x0 - t, to: x1 + t, edge: y0 },
+    { alongX: true, fixed: y1 + t / 2, from: x0 - t, to: x1 + t, edge: y1 },
+    { alongX: false, fixed: x0 - t / 2, from: y0, to: y1, edge: x0 },
+    { alongX: false, fixed: x1 + t / 2, from: y0, to: y1, edge: x1 },
+  ];
+  for (const side of sides) {
+    const gaps: [number, number][] = [];
+    for (const door of doorPoints) {
+      if (door.x < x0 || door.x > x1 || door.y < y0 || door.y > y1) continue;
+      const away = Math.abs((side.alongX ? door.y : door.x) - side.edge);
+      // La porte appartient au mur le plus proche de son point d'arrivée.
+      const nearest = Math.min(door.y - y0, y1 - door.y, door.x - x0, x1 - door.x);
+      if (away > s.doorReach || away > nearest + 1e-6) continue;
+      const at = side.alongX ? door.x : door.y;
+      gaps.push([at - s.doorWidth / 2, at + s.doorWidth / 2]);
+    }
+    gaps.sort((a, b) => a[0] - b[0]);
+    let cursor = side.from;
+    const spans: [number, number][] = [];
+    for (const [a, b] of gaps) {
+      if (a > cursor) spans.push([cursor, Math.min(a, side.to)]);
+      cursor = Math.max(cursor, b);
+    }
+    if (cursor < side.to) spans.push([cursor, side.to]);
+    for (const [a, b] of spans) {
+      if (b - a < 0.05) continue;
+      const box = (thickness: number, base: number, h: number, color: string): BoxItem => ({
+        x: side.alongX ? (a + b) / 2 : side.fixed,
+        z: side.alongX ? side.fixed : (a + b) / 2,
+        base,
+        w: side.alongX ? b - a : thickness,
+        h,
+        d: side.alongX ? thickness : b - a,
+        yaw: 0,
+        color,
+      });
+      out.push({ ...box(t + s.plinthOut * 2, 0, s.plinthHeight, s.plinthColor), layer: 'wall' });
+      out.push(box(t, s.plinthHeight, s.wallHeight - s.plinthHeight, s.wallColor));
+    }
+  }
+  return out;
+}
+
+/** Semis d'une tuile (rendu encré): cailloux à demi enterrés et touffes dressées, par surface. */
+export function tileSemis(
+  field: GroundField,
+  map: Pick<MapDef, 'width' | 'height'>,
+  tile: number,
+  settings: TileSettings = TILE_SETTINGS,
+): { pebbles: BlobItem[]; tufts: BoxItem[] } {
+  const s = settings.semis;
+  const pebbles: BlobItem[] = [];
+  const tufts: BoxItem[] = [];
+  const { x0, y0, x1, y1 } = tileRect(map, tile);
+  for (let y = y0; y < y1; y++)
+    for (let x = x0; x < x1; x++) {
+      const i = y * field.width + x;
+      const look = field.looks[field.cells[i] ?? 0];
+      if (look === undefined || look.hidden === true || look.water === true) continue;
+      const stones = s.pebbles[look.surface] ?? 0;
+      const colors = s.pebbleColors[look.surface] ?? [];
+      // Partie entière de la densité, plus un tirage pour le reste: 2,4 donne 2 ou 3 cailloux.
+      const count = Math.floor(stones) + (hash01(x, y, 61) < stones % 1 ? 1 : 0);
+      for (let k = 0; k < count && pebbles.length < s.maxPerTile; k++) {
+        const size =
+          s.pebbleSize[0] + hash01(x * 3 + k, y, 62) * (s.pebbleSize[1] - s.pebbleSize[0]);
+        pebbles.push({
+          x: x + hash01(x, y * 5 + k, 63),
+          // À demi enterré: son milieu est un peu sous le sol.
+          y: size * 0.18,
+          z: y + hash01(x * 7 + k, y, 64),
+          rx: size * (0.8 + hash01(x, y + k, 65) * 0.7),
+          ry: size * (0.45 + hash01(x + k, y, 66) * 0.4),
+          rz: size * (0.8 + hash01(x - k, y, 67) * 0.7),
+          color: pick(colors.length > 0 ? colors : ['#b6a890'], hash01(x, y + k * 3, 68)),
+        });
+      }
+      const grass = s.tufts[look.surface] ?? 0;
+      const thin = (field.wild[i] ?? 0) > s.wildThin ? 0.35 : 1;
+      if (grass > 0 && hash01(x, y, 71) < grass * thin && tufts.length < s.maxPerTile) {
+        const h = s.tuftHeight[0] + hash01(x, y, 72) * (s.tuftHeight[1] - s.tuftHeight[0]);
+        tufts.push({
+          x: x + hash01(x, y, 73),
+          z: y + hash01(x, y, 74),
+          base: 0,
+          w: s.tuftWidth * (0.8 + hash01(x, y, 75) * 0.6),
+          h,
+          d: s.tuftWidth * (0.8 + hash01(x, y, 76) * 0.6),
+          yaw: hash01(x, y, 77) * Math.PI,
+          color: pick(s.tuftColors, hash01(x, y, 78)),
+        });
+      }
+    }
+  return { pebbles, tufts };
 }

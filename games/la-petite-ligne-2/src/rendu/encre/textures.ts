@@ -1,7 +1,6 @@
 /**
- * Essai « encre »: les textures de traits, dessinées par script à l'ouverture de la page (aucune
- * image dans le dépôt). Chaque couche est un carreau de 4 m qui se répète sans raccord, avec deux
- * quatre
+ * Rendu encré: les textures de traits, dessinées par script au démarrage du rendu (aucune image
+ * dans le dépôt). Chaque couche est un carreau de 4 m qui se répète sans raccord, avec quatre
  * canaux: R = le trait d'encre (planches cernées une à une, dalles, tuiles, touffes d'herbe,
  * hachures), G = les taches du second ton peint, B et A = la pente du relief (pierres qui
  * dépassent, planches bombées, tuiles en rangs), tirée d'une carte de hauteur dessinée avec le
@@ -11,7 +10,7 @@
  */
 import * as THREE from 'three';
 
-import { LAYER, LAYER_COUNT } from './formes';
+import { LAYER, LAYER_COUNT } from './couches';
 
 const SIZE = 512;
 

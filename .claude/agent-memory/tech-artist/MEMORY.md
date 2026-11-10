@@ -180,3 +180,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Planche en 256 couleurs: les teintes d'accent virent (lilas en gris), bandes dans la vignette. Gagner la place ailleurs: GLB sans image embarquée, npz en float16, PNG réenregistré avec `optimize` (3,3 Mo vers 1,9 Mo).
 - Copie isolée: les heredocs (`python3 - <<EOF`) sont refusés aussi; écrire le script dans le dossier de travail avec l'outil d'écriture.
 
+
+## Rendu encré dans le moteur (portage du 2026-11-10, `games/la-petite-ligne-2/src/rendu/encre/`, ADR 0023)
+
+- Cible à deux sorties: tout matériau qui s'y dessine doit écrire les deux (un matériau standard de Three.js laisse la seconde indéfinie). Fondu d'un volume: mélange alpha normal et seconde sortie à `vec4(0)` (chaque sortie se mélange avec son propre alpha: l'image du contour reste intacte).
+- `ShaderMaterial.clone()` clone les uniformes (vecteurs, couleurs): la copie perd la lumière commune. Sous-classe avec `clone()` qui repart des mêmes objets d'uniformes et garde à part teinte, opacité, lueur; `Material.onBeforeRender()` (0.187) recopie `opacity`, `transparent`, `emissive` dans les uniformes, avec `uniformsNeedUpdate = true`.
+- `renderer.info.autoReset = false` puis `info.reset()` en début d'image: les compteurs somment toutes les passes (ombres, scène, contour).
+- Rendu logiciel (banc, e2e): compiler dix programmes dans la même image gèle le fil principal plus de 8 s et le faux hôte arrête la partie (« le jeu ne répond plus »). Faire entrer les familles de maillages une par image (calque 0 retiré aux autres), et sauter des images quand l'écart entre deux images dépasse 250 ms. `gl.finish()` posé pour mesurer suffit à provoquer la panne.
+- Banc à deux vues en rendu logiciel: garder les deux pages petites (240 x 135) et n'agrandir à 1366 x 768 que la page capturée, le temps de la capture.
+- Attribut absent d'une géométrie: le nuanceur lit (0, 0, 0, 1). S'en servir comme « automatique » (forme unité instanciée: classe de taille lue dans l'échelle de l'instance).
+- Sol sans grille à partir d'une grille: texture d'un point par case en filtrage au plus proche, lue en un point décalé par un bruit; les sols posés par l'homme (drapeau dans l'alpha) se lisent sans décalage, leur bord reste droit.
+- Copie isolée: `git merge --ff-only` refuse si mes fichiers modifiés sont touchés en face; `git diff --output=<fichier> -- <chemins>`, `git checkout -- <chemins>`, fusion, puis `git apply --3way` (une commande à la fois, sans variable ni `&&` avec git).
+- Deux os en cinématique inverse dans le repère du monde: plier le genou autour de `cross(tibia, cuisse)` de l'écart d'angle intérieur, puis balancer la cuisse par `setFromUnitVectors`; garder la pose du clip avant et la rendre avant le mélangeur suivant (os non réécrits).

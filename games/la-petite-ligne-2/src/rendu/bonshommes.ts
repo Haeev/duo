@@ -11,6 +11,7 @@ import {
   Color,
   Float32BufferAttribute,
   Group,
+  type Material,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -24,6 +25,7 @@ import type { DeepReadonly, ReadonlyWorld } from '../etat/monde';
 import type { PlaceState } from '../etat/lieu';
 import { approach } from './camera';
 import type { Aimable } from './cible';
+import type { InkKit } from './encre/index';
 import { Fadable } from './fondu';
 import { RENDER_SETTINGS } from './reglages';
 
@@ -59,6 +61,8 @@ export interface CharacterLayerDeps {
   readonly root: Object3D;
   /** Couleurs des deux joueurs (profils Duo), dans l'ordre des personnages 0 et 1. */
   readonly playerColors: readonly [string, string];
+  /** Rendu encré (ADR 0023): les personnages prennent ses matériaux; absent: ancien rendu. */
+  readonly ink?: InkKit | null;
 }
 
 export type CharacterLayerFactory = (deps: CharacterLayerDeps) => CharacterLayer;
@@ -97,7 +101,7 @@ function figureGeometry(s: FigureSettings): BufferGeometry {
 
 interface Figure extends Aimable {
   readonly object: Group;
-  readonly material: MeshStandardMaterial;
+  readonly material: Material;
   readonly fadable: Fadable;
   placed: boolean;
   x: number;
@@ -108,7 +112,7 @@ interface Figure extends Aimable {
 class StandInCharacters implements CharacterLayer {
   private readonly geometry: BufferGeometry;
   private readonly blobGeometry: BufferGeometry;
-  private readonly blobMaterial: MeshBasicMaterial;
+  private readonly blobMaterial: Material;
   private readonly players: [Figure, Figure];
   private readonly villagers = new Map<string, Figure>();
   private readonly glowColor = new Color(RENDER_SETTINGS.target.rimColor);
@@ -121,17 +125,28 @@ class StandInCharacters implements CharacterLayer {
     this.blobGeometry = new CircleGeometry(RENDER_SETTINGS.shadows.contactRadius, 20).rotateX(
       -Math.PI / 2,
     );
-    this.blobMaterial = new MeshBasicMaterial({
-      color: '#000000',
-      transparent: true,
-      opacity: RENDER_SETTINGS.shadows.contactOpacity,
-      depthWrite: false,
-    });
+    this.blobMaterial =
+      deps.ink?.contact ??
+      new MeshBasicMaterial({
+        color: '#000000',
+        transparent: true,
+        opacity: RENDER_SETTINGS.shadows.contactOpacity,
+        depthWrite: false,
+      });
     this.players = [this.create(deps.playerColors[0]), this.create(deps.playerColors[1])];
   }
 
   private create(color: string): Figure {
-    const material = new MeshStandardMaterial({ color, vertexColors: true, roughness: 0.85 });
+    const ink = this.deps.ink ?? null;
+    let material: Material;
+    if (ink === null)
+      material = new MeshStandardMaterial({ color, vertexColors: true, roughness: 0.85 });
+    else {
+      const inked = ink.characterMaterials();
+      inked.head.dispose();
+      inked.body.color.set(color);
+      material = inked.body;
+    }
     const object = new Group();
     const mesh = new Mesh(this.geometry, material);
     mesh.castShadow = true;
@@ -233,7 +248,8 @@ class StandInCharacters implements CharacterLayer {
     this.villagers.clear();
     this.geometry.dispose();
     this.blobGeometry.dispose();
-    this.blobMaterial.dispose();
+    // L'ombre de contact encrée appartient au rendu encré, qui la libère.
+    if ((this.deps.ink ?? null) === null) this.blobMaterial.dispose();
   }
 }
 

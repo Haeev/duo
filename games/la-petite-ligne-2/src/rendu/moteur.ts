@@ -9,6 +9,7 @@ import {
   AgXToneMapping,
   Color,
   Fog,
+  type Material,
   Mesh,
   MeshStandardMaterial,
   NeutralToneMapping,
@@ -26,6 +27,7 @@ import type { PlaceState } from '../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../etat/monde';
 import type { GameView } from '../session';
 import { SIM_HZ } from '../simulation/noyau/constantes';
+import { seasonOf } from '../simulation/outils/saison';
 import { tripSeconds } from '../simulation/voyage/index';
 import {
   type CharacterLayer,
@@ -35,6 +37,7 @@ import {
 import {
   type CameraInput,
   type CameraPose,
+  type CameraSettings,
   CameraRig,
   screenToWorld,
   towardCamera,
@@ -42,11 +45,23 @@ import {
 } from './camera';
 import { type Aimable, TargetHighlight } from './cible';
 import {
+  INK_SETTINGS,
+  InkKit,
+  type InkFrame,
+  type InkLights,
+  inkTag,
+  KIND,
+  LAYER,
+  type RenderStyle,
+} from './encre/index';
+import { placeLights } from './encre/lumieres';
+import {
   describeDynamic,
   describePlace,
   dynamicSignature,
   type SceneVolume,
 } from './lieu/description';
+import type { BuildingSource } from './lieu/batiments';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
@@ -64,12 +79,19 @@ export interface RenderOptions {
   readonly view: GameView;
   /** Couleurs des deux joueurs (profils Duo), dans l'ordre des personnages 0 et 1. */
   readonly playerColors: readonly [string, string];
+  /**
+   * Style du rendu (ADR 0023): `encre` par défaut; `aplats` garde l'ancien rendu le temps de la
+   * transition.
+   */
+  readonly style?: RenderStyle;
   /** Options graphiques de la machine au départ (Auto par défaut). */
   readonly graphics?: GraphicsOptions;
   /** Animations réduites (réglage de Duo ou de l'ordinateur): ni rebond ni brillance qui passe. */
   readonly reducedMotion?: boolean;
   /** Modèles livrés; sans eux, tout s'affiche en formes provisoires. */
   readonly models?: ModelSource;
+  /** Bâtiments livrés des lieux (rendu encré); sans eux, les volumes provisoires. */
+  readonly buildings?: BuildingSource;
   /** Couche des personnages (lot L6); par défaut, les bonshommes provisoires. */
   readonly characters?: CharacterLayerFactory;
   /** Volumes ajoutés à un lieu par l'appelant (page de démonstration), par identifiant de lieu. */
@@ -81,6 +103,9 @@ export interface RenderOptions {
 /** Compteurs d'une image, pour la mesure et le contrôle de fuite. */
 export interface RenderStats {
   readonly place: string | null;
+  readonly style: RenderStyle;
+  /** Mémoire vidéo ajoutée par le rendu encré (octets): couches, ombres, cibles; 0 en aplats. */
+  readonly inkTextureBytes: number;
   /** Appels de dessin et triangles de la dernière image, passe d'ombre comprise. */
   readonly calls: number;
   readonly triangles: number;
@@ -205,20 +230,20 @@ class Engine implements GameRenderer {
   private readonly renderer: WebGLRenderer;
   private readonly scene = new Scene();
   private readonly camera = new OrthographicCamera();
-  private readonly rig = new CameraRig();
+  private readonly rig: CameraRig;
+  private readonly cameraSettings: CameraSettings;
+  /** Rendu encré (ADR 0023), `null` dans l'ancien rendu en aplats. */
+  private readonly ink: InkKit | null;
+  private lights: InkLights | null = null;
+  private indoor = false;
   private readonly daylight: Daylight;
   private readonly highlight: TargetHighlight;
   private readonly characters: CharacterLayer;
   private readonly governor: QualityGovernor;
-  private readonly groundMaterial = new MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 0.95,
-  });
-  private readonly standInMaterial = new MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 0.9,
-  });
-  private readonly tableMaterial = new MeshStandardMaterial({ roughness: 1 });
+  private readonly groundMaterial: Material;
+  private readonly standInMaterial: Material;
+  private readonly tableMaterial: Material;
+  private readonly tableColor: Color | null;
   private readonly table: Mesh;
   private place: PlaceScene | null = null;
   private tiled: TiledPlace | null = null;
@@ -247,6 +272,24 @@ class Engine implements GameRenderer {
   private readonly subjects: { x: number; y: number; z: number }[] = [{ x: 0, y: 0, z: 0 }];
   private readonly toCamera = { x: 0, y: 1, z: 0 };
   private readonly background = new Color();
+  /** Exposition des fondus au noir (sommeil, train), de 0 à 1. */
+  private fade = 1;
+  private readonly inkFrame: Mutable<InkFrame> = {
+    dt: 0,
+    minutes: 0,
+    sheet: null,
+    weather: null,
+    indoor: false,
+    place: null,
+    focusX: 0,
+    focusZ: 0,
+    viewRadius: 1,
+    toCamera: this.toCamera,
+    lights: null,
+    exposure: 1,
+    width: 1,
+    height: 1,
+  };
   /** Temps restant du fondu de sommeil (s), 0: aucun. */
   private sleepFade = 0;
   /** Scène du trajet, construite à l'entrée dans le train et libérée à l'arrivée. */
@@ -272,24 +315,52 @@ class Engine implements GameRenderer {
     this.renderer.toneMapping = toneMappingOf(settings.toneMapping);
     this.renderer.toneMappingExposure = settings.exposure;
     this.renderer.shadowMap.type = PCFShadowMap;
+    const style = options.style ?? INK_SETTINGS.style;
+    this.ink = style === 'encre' ? new InkKit() : null;
+    this.cameraSettings =
+      this.ink === null
+        ? RENDER_SETTINGS.camera
+        : { ...RENDER_SETTINGS.camera, ...INK_SETTINGS.camera };
+    this.rig = new CameraRig(this.cameraSettings);
+    if (this.ink === null) {
+      this.groundMaterial = new MeshStandardMaterial({ vertexColors: true, roughness: 0.95 });
+      this.standInMaterial = new MeshStandardMaterial({ vertexColors: true, roughness: 0.9 });
+      const table = new MeshStandardMaterial({ roughness: 1 });
+      this.tableMaterial = table;
+      this.tableColor = table.color;
+    } else {
+      // Un seul matériau pour le sol, les formes provisoires et la table: un seul programme.
+      this.groundMaterial = this.ink.volume;
+      this.standInMaterial = this.ink.volume;
+      this.tableMaterial = this.ink.volume;
+      this.tableColor = null;
+      this.scene.add(this.ink.air);
+    }
     this.scene.background = this.background;
     // Brume toujours présente (un seul jeu de programmes), sans effet hors des grands lieux.
     this.scene.fog = this.fog;
 
     const half = RENDER_SETTINGS.ground.tableHalfSize;
-    this.table = new Mesh(
-      new PlaneGeometry(half * 2, half * 2).rotateX(-Math.PI / 2),
-      this.tableMaterial,
-    );
-    this.table.position.y = -RENDER_SETTINGS.ground.thickness;
+    const tableGeometry = new PlaneGeometry(half * 2, half * 2).rotateX(-Math.PI / 2);
+    // En encre, la table prolonge le sol du lieu (même carte du sol, même herbe).
+    if (this.ink !== null) inkTag(tableGeometry, { layer: LAYER.grass, kind: KIND.ground });
+    this.table = new Mesh(tableGeometry, this.tableMaterial);
+    // En encre la table est le sol hors des tuiles (plancher des pièces compris): à fleur du sol.
+    this.table.position.y =
+      this.ink === null ? -RENDER_SETTINGS.ground.thickness : -INK_SETTINGS.ground.tableDrop;
     this.table.receiveShadow = true;
     this.scene.add(this.table);
 
     this.daylight = new Daylight(this.scene);
-    this.highlight = new TargetHighlight(options.reducedMotion ?? false);
+    this.highlight = new TargetHighlight(
+      options.reducedMotion ?? false,
+      RENDER_SETTINGS.target,
+      this.ink,
+    );
     this.characters = (options.characters ?? createStandInCharacters)({
       root: this.scene,
       playerColors: options.playerColors,
+      ink: this.ink,
     });
     this.governor = new QualityGovernor(options.graphics ?? DEFAULT_GRAPHICS_OPTIONS, () =>
       usefulResolutionSteps(
@@ -334,7 +405,7 @@ class Engine implements GameRenderer {
     const state = world.places[world.common.place];
     if (this.trip === null) {
       if (state === undefined) return false;
-      this.trip = new TripScene(this.standInMaterial);
+      this.trip = new TripScene(this.standInMaterial, TRIP_SETTINGS, this.ink !== null);
       this.scene.add(this.trip.root);
       this.tripCast = tripCast(world, state);
       this.tripClock = tripSeconds({ world });
@@ -382,7 +453,8 @@ class Engine implements GameRenderer {
     this.highlight.update(dt, null, this.resolveAim);
     this.daylight.update(world.minutes, pose.x, pose.y, viewRadius(pose, this.aspect));
     this.background.copy(this.daylight.tableColor);
-    this.renderer.render(this.scene, this.camera);
+    this.indoor = false;
+    this.draw(dt, world, pose.x, pose.y, viewRadius(pose, this.aspect), null);
     this.measure(dt);
     return true;
   }
@@ -399,7 +471,8 @@ class Engine implements GameRenderer {
   }
 
   private applyProfile(profile: RenderProfile): void {
-    const shadows = profile.shadows.enabled && !this.adaptiveLight;
+    // En encre, les ombres sont celles du rendu encré (un seul niveau): celles de Three.js dorment.
+    const shadows = this.ink === null && profile.shadows.enabled && !this.adaptiveLight;
     this.renderer.shadowMap.enabled = shadows;
     this.daylight.setShadows(shadows, profile.shadows.mapSize);
     // La taille du tampon est recalculée à la prochaine image.
@@ -437,6 +510,8 @@ class Engine implements GameRenderer {
     this.tiled?.dispose();
     this.tiled = null;
     this.signature = Number.NaN;
+    this.lights = null;
+    this.ink?.setGround(null, 1, 1);
     const content = this.options.view.content;
     const place = content.places[id];
     if (place === undefined) return;
@@ -447,21 +522,38 @@ class Engine implements GameRenderer {
     const description = describePlace(content, source, this.options.extras?.(id) ?? []);
     this.place = new PlaceScene(
       description,
-      { ground: this.groundMaterial, standIn: this.standInMaterial },
+      {
+        ground: this.groundMaterial,
+        standIn: this.standInMaterial,
+        ink: this.ink?.volume ?? null,
+        outside: place.def.ambience?.outside ?? null,
+      },
       this.options.models ?? null,
       !tiled,
     );
     this.scene.add(this.place.root);
     if (tiled) {
-      this.tiled = new TiledPlace(place.map);
+      const buildings = this.options.buildings;
+      this.tiled = new TiledPlace(
+        place.map,
+        TILE_SETTINGS,
+        this.ink,
+        place.interiors,
+        buildings === undefined ? null : { place: id, source: buildings },
+      );
       this.scene.add(this.tiled.root);
     }
+    this.ink?.setGround(
+      this.tiled?.groundMap ?? this.place.groundMap,
+      place.map.width,
+      place.map.height,
+    );
     this.characters.reset();
     this.rig.detach();
   }
 
   private poseCamera(pose: CameraPose): void {
-    const s = RENDER_SETTINGS.camera;
+    const s = this.cameraSettings;
     const dir = towardCamera(pose);
     this.toCamera.x = dir.x;
     this.toCamera.y = dir.y;
@@ -490,8 +582,8 @@ class Engine implements GameRenderer {
     const view = this.options.view;
     // L'état à dessiner (chez l'invité: les autres interpolés, soi-même prédit), pas l'état logique.
     const world = view.frame(alpha);
-    this.renderer.toneMappingExposure =
-      RENDER_SETTINGS.renderer.exposure * this.fadeExposure(dt) * this.cutExposure(dt);
+    this.fade = this.fadeExposure(dt) * this.cutExposure(dt);
+    this.renderer.toneMappingExposure = RENDER_SETTINGS.renderer.exposure * this.fade;
     const placeId = world?.common.place ?? null;
     if (placeId !== (this.place?.description.id ?? null)) {
       if (placeId === null) {
@@ -511,7 +603,13 @@ class Engine implements GameRenderer {
     if (world === null || place === null || state === undefined) {
       this.background.set(RENDER_SETTINGS.lightKeys[0]?.tableColor ?? '#000000');
       this.table.visible = false;
-      this.renderer.render(this.scene, this.camera);
+      if (this.ink === null) this.renderer.render(this.scene, this.camera);
+      else {
+        // Rien à montrer (avant le premier état): le fond, sans la passe encrée.
+        this.renderer.setRenderTarget(null);
+        this.renderer.setClearColor(this.background, 1);
+        this.renderer.clear();
+      }
       return;
     }
     this.table.visible = true;
@@ -521,6 +619,8 @@ class Engine implements GameRenderer {
       this.signature = signature;
       this.highlight.release();
       place.setDynamic(describeDynamic(view.content, state));
+      if (this.ink !== null)
+        this.lights = placeLights(place.volumes(), this.tiled?.lights() ?? null);
     }
 
     this.characters.update({ dt, world, place: state, cameraYaw: this.rig.yawAngle() });
@@ -538,6 +638,11 @@ class Engine implements GameRenderer {
     const pose = this.rig.pose();
     this.poseCamera(pose);
 
+    // En encre la table suit la vue: elle lit le sol dans la carte du lieu, où qu'elle soit.
+    if (this.ink !== null) {
+      this.table.position.x = pose.x;
+      this.table.position.z = pose.y;
+    }
     const subject = this.subjects[0];
     if (subject !== undefined) {
       subject.x = shown.x;
@@ -563,10 +668,50 @@ class Engine implements GameRenderer {
     this.daylight.update(world.minutes, pose.x, pose.y, radius);
     this.background.copy(this.daylight.tableColor);
     this.fog.color.copy(this.daylight.tableColor);
-    this.tableMaterial.color.copy(this.daylight.tableColor);
+    this.tableColor?.copy(this.daylight.tableColor);
+    const outdoor = this.options.view.content.places[placeId ?? '']?.map.outdoor;
+    this.indoor =
+      outdoor !== undefined &&
+      (shown.x < outdoor.x ||
+        shown.y < outdoor.y ||
+        shown.x > outdoor.x + outdoor.w ||
+        shown.y > outdoor.y + outdoor.h);
 
-    this.renderer.render(this.scene, this.camera);
+    this.draw(dt, world, pose.x, pose.y, radius, this.lights);
     this.measure(dt);
+  }
+
+  /** Dessine l'image: rendu encré (ambiance, ombres, scène, contour) ou ancien rendu direct. */
+  private draw(
+    dt: number,
+    world: ReadonlyWorld,
+    focusX: number,
+    focusZ: number,
+    radius: number,
+    lights: InkLights | null,
+  ): void {
+    const ink = this.ink;
+    if (ink === null) {
+      this.renderer.render(this.scene, this.camera);
+      return;
+    }
+    const content = this.options.view.content;
+    const season = seasonOf(content.settings.clock, world.common.day);
+    const frame = this.inkFrame;
+    frame.dt = dt;
+    frame.minutes = world.minutes;
+    frame.sheet = content.time.climates[world.common.place]?.seasons[season].ambience ?? null;
+    frame.weather = world.common.weather;
+    frame.indoor = this.indoor;
+    frame.place = content.places[world.common.place]?.def.ambience ?? null;
+    frame.focusX = focusX;
+    frame.focusZ = focusZ;
+    frame.viewRadius = radius;
+    frame.lights = lights;
+    frame.exposure = this.fade;
+    frame.width = this.bufferWidth;
+    frame.height = this.bufferHeight;
+    ink.frame(this.renderer, this.scene, this.camera, frame);
   }
 
   /**
@@ -592,7 +737,7 @@ class Engine implements GameRenderer {
       this.fog.far = 2e4;
       return;
     }
-    const s = RENDER_SETTINGS.camera;
+    const s = this.cameraSettings;
     const halfHeight = width / 2 / this.aspect;
     // Le sol au bord haut de l'écran est plus loin que le point visé d'environ 1,4 demi-hauteur.
     const reach = halfHeight / Math.tan((s.pitchFarDeg * Math.PI) / 180);
@@ -682,6 +827,8 @@ class Engine implements GameRenderer {
     const counts = this.place?.counts() ?? { volumes: 0, standIns: 0, fading: 0 };
     return {
       place: this.place?.description.id ?? null,
+      style: this.ink === null ? 'aplats' : 'encre',
+      inkTextureBytes: this.ink?.textureBytes(this.bufferWidth, this.bufferHeight) ?? 0,
       calls: info.render.calls,
       triangles: info.render.triangles,
       geometries: info.memory.geometries,
@@ -714,6 +861,7 @@ class Engine implements GameRenderer {
     this.groundMaterial.dispose();
     this.standInMaterial.dispose();
     this.tableMaterial.dispose();
+    this.ink?.dispose();
     this.renderer.dispose();
   }
 }

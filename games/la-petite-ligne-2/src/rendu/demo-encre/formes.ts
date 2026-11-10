@@ -9,36 +9,8 @@
  */
 import * as THREE from 'three';
 
-export type Rgb = readonly [number, number, number];
-
-/** Couleur d'affichage (sRGB, de 0 à 1) telle qu'écrite: l'essai peint directement en valeurs d'écran. */
-export function hex(color: string): Rgb {
-  const value = Number.parseInt(color.slice(1), 16);
-  return [((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255];
-}
-
-/** Couches de la texture de traits (voir `textures.ts`), dans l'ordre du tableau de textures. */
-export const LAYER = {
-  plain: 0,
-  wood: 1,
-  wall: 2,
-  slab: 3,
-  roof: 4,
-  leaf: 5,
-  bark: 6,
-  hatch: 7,
-  grass: 8,
-  dirt: 9,
-  ballast: 10,
-  /** Une seule planche: veines et noeuds, sans joints (les planches sont alors des volumes). */
-  grain: 11,
-  /** Une seule pierre ou dalle: éclats, fissures, piqûres, sans appareil. */
-  face: 12,
-} as const;
-export const LAYER_COUNT = 13;
-
-/** Côté d'un carreau de texture, en mètres: 512 points pour 4 m, un trait de 3 points fait 2,3 cm. */
-export const TILE_METRES = 4;
+export { hex, LAYER, LAYER_COUNT, sizeClass, TILE_METRES, type Rgb } from '../encre/couches';
+import { LAYER, sizeClass, TILE_METRES, type Rgb } from '../encre/couches';
 
 /**
  * Nature d'une face, lue par le nuanceur: vitre (éclairée de l'intérieur ou par le ciel), flamme,
@@ -63,13 +35,6 @@ export interface PartOptions {
    * lieu d'être à plat, et l'ombre dessine une masse au lieu de facettes (feuillages).
    */
   readonly round?: readonly [number, number, number];
-}
-
-/** Classe de taille d'un objet ou d'un morceau, d'après la diagonale de sa boîte (m). */
-export function sizeClass(diagonal: number): number {
-  if (diagonal >= 2.5) return 0;
-  if (diagonal >= 1) return 1;
-  return diagonal >= 0.4 ? 2 : 3;
 }
 
 const AXES = ['x', 'y', 'z'] as const;

@@ -13,6 +13,7 @@ import {
   type Object3D,
   Vector3,
 } from 'three';
+import type { InkKit } from './encre/index';
 import { isMesh } from './fondu';
 import { RENDER_SETTINGS } from './reglages';
 
@@ -64,8 +65,12 @@ export class TargetHighlight {
   constructor(
     private readonly reduced: boolean,
     private readonly settings: TargetSettings = RENDER_SETTINGS.target,
+    /** Rendu encré (ADR 0023): le liseré devient un aplat qui écrit aussi l'image du contour. */
+    ink: InkKit | null = null,
   ) {
-    this.rim = new MeshBasicMaterial({ color: settings.rimColor, side: BackSide });
+    this.rim =
+      ink?.flatMaterial(settings.rimColor, 0, BackSide) ??
+      new MeshBasicMaterial({ color: settings.rimColor, side: BackSide });
   }
 
   /** Identifiant de la cible en cours de réaction. */

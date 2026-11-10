@@ -12,6 +12,7 @@ import {
   DataTexture,
   Group,
   LinearFilter,
+  type Material,
   MeshBasicMaterial,
   MeshStandardMaterial,
   Mesh,
@@ -26,6 +27,8 @@ import {
   Vector3,
   type WebGLRenderer,
 } from 'three';
+import { DECOR_MANIFEST } from '../lieu/decors-manifeste';
+import { clampAlongSeat, type Leg, LegPose, solveLeg } from './assise';
 import type { Look } from '../../donnees/schemas/personnage';
 import type { DeepReadonly } from '../../etat/monde';
 import type { Body, PlayerState } from '../../etat/joueur';
@@ -73,6 +76,11 @@ interface Figure extends Aimable {
   /** Entre le personnage et son squelette: bascule le corps sur le dos quand il est couché. */
   readonly tilt: Group;
   readonly skinned: SkinnedMesh;
+  /** Matériaux propres à ce personnage (rendu encré: son numéro de pièce), libérés avec lui. */
+  readonly owned: readonly Material[];
+  /** Jambes posées au sol quand le personnage est assis, et la pose du clip gardée de côté. */
+  readonly legs: readonly Leg[];
+  readonly legPose: LegPose;
   readonly body: SkinnedMesh;
   readonly head: SkinnedMesh | null;
   readonly whole: SkinnedMesh;
@@ -142,11 +150,25 @@ function pixelsPerMeter(renderer: WebGLRenderer, camera: Camera, at: Vector3): n
   return size.y / (2 * distance * Math.tan(((p.fov || 50) * Math.PI) / 360));
 }
 
+/** Assise tenue: dessus et bord avant, et, pour un meuble à accoudoirs, de quoi rester entre eux. */
+interface Seat {
+  readonly height: number;
+  readonly front: number;
+  readonly side?: {
+    readonly x: number;
+    readonly y: number;
+    readonly halfWidth: number;
+    readonly clear: number;
+  };
+}
+
+const legTarget = new Vector3();
+
 export class AssembledCharacters implements CharacterLayer {
   private readonly material: MeshStandardMaterial;
-  private readonly rimMaterial: MeshBasicMaterial;
+  private readonly rimMaterial: Material;
   private readonly blobGeometry: PlaneGeometry;
-  private readonly blobMaterial: MeshBasicMaterial;
+  private readonly blobMaterial: Material;
   private readonly blobTexture: DataTexture;
   private readonly glowColor = new Color(RENDER_SETTINGS.target.rimColor);
   private readonly geometries = new Map<string, Shared>();
@@ -172,10 +194,12 @@ export class AssembledCharacters implements CharacterLayer {
       metalness: 0,
     });
     this.material.name = 'figurine';
-    this.rimMaterial = new MeshBasicMaterial({ color: settings.rim.color, side: BackSide });
+    const ink = deps.ink ?? null;
     const width = settings.rim.width;
+    const rim = new MeshBasicMaterial({ color: settings.rim.color, side: BackSide });
+    this.rimMaterial = ink === null ? rim : ink.flatMaterial(settings.rim.color, width, BackSide);
     // Liseré: la coque gonfle le long des normales avant le skinning, elle suit donc la pose.
-    this.rimMaterial.onBeforeCompile = (shader) => {
+    rim.onBeforeCompile = (shader) => {
       shader.vertexShader = shader.vertexShader.replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>\ntransformed += normalize( normal ) * ${width.toFixed(4)};`,
@@ -185,11 +209,14 @@ export class AssembledCharacters implements CharacterLayer {
       -Math.PI / 2,
     );
     this.blobTexture = contactTexture(settings.contact.opacity);
-    this.blobMaterial = new MeshBasicMaterial({
-      map: this.blobTexture,
-      transparent: true,
-      depthWrite: false,
-    });
+    this.blobMaterial =
+      ink?.contact ??
+      new MeshBasicMaterial({
+        map: this.blobTexture,
+        transparent: true,
+        depthWrite: false,
+      });
+    if (ink !== null) rim.dispose();
     this.unsubscribe = view.onEvent((event) => {
       this.onEvent(event);
     });
@@ -278,8 +305,11 @@ export class AssembledCharacters implements CharacterLayer {
     const { key, shared, shape } = this.acquire(look, library);
     const { root, skeletonOf } = createRig(library, shape, look.height);
     const parent = skeletonOf.parent ?? root;
-    const bind = (geometry: AssembledGeometry['body']): SkinnedMesh => {
-      const mesh = new SkinnedMesh(geometry, this.material);
+    // Encre: chaque personnage a ses deux matériaux (même programme), donc son numéro de pièce.
+    const inked = this.deps.ink?.characterMaterials() ?? null;
+    const bind = (geometry: AssembledGeometry['body'], face = false): SkinnedMesh => {
+      const material = inked === null ? this.material : face ? inked.head : inked.body;
+      const mesh = new SkinnedMesh(geometry, material);
       mesh.bind(skeletonOf.skeleton, skeletonOf.bindMatrix);
       // Bornes du maillage au repos fausses une fois animé: on dessine toujours (14 personnages au plus).
       mesh.frustumCulled = false;
@@ -289,7 +319,7 @@ export class AssembledCharacters implements CharacterLayer {
       return mesh;
     };
     const body = bind(shared.geometry.body);
-    const head = shared.geometry.head === null ? null : bind(shared.geometry.head);
+    const head = shared.geometry.head === null ? null : bind(shared.geometry.head, true);
     if (head !== null) head.updateMorphTargets();
     const whole = bind(shared.geometry.whole);
     whole.visible = false;
@@ -316,6 +346,14 @@ export class AssembledCharacters implements CharacterLayer {
       action.play();
       actions.set(name, action);
     }
+    const legs: Leg[] = [];
+    for (const [upperName, lowerName, footName] of this.settings.seat.legs) {
+      const upper = root.getObjectByName(upperName);
+      const lower = root.getObjectByName(lowerName);
+      const foot = root.getObjectByName(footName);
+      if (upper !== undefined && lower !== undefined && foot !== undefined)
+        legs.push({ upper, lower, foot });
+    }
     const lengths = library.morphologies.shapes[shape];
     const figure: Figure = {
       id,
@@ -328,6 +366,9 @@ export class AssembledCharacters implements CharacterLayer {
       root,
       tilt,
       skinned: skeletonOf,
+      owned: inked === null ? [] : [inked.body, inked.head],
+      legs,
+      legPose: new LegPose(legs),
       body,
       head,
       whole,
@@ -366,6 +407,7 @@ export class AssembledCharacters implements CharacterLayer {
     figure.mixer.stopAllAction();
     figure.mixer.uncacheRoot(figure.root);
     figure.skinned.skeleton.dispose();
+    for (const material of figure.owned) material.dispose();
     figure.object.removeFromParent();
     this.release(figure.key);
   }
@@ -443,7 +485,7 @@ export class AssembledCharacters implements CharacterLayer {
   }
 
   /** Dessus de l'assise que tient ce joueur dans le lieu, `null` s'il n'est pas assis. */
-  private seatOf(frame: CharacterFrame, index: 0 | 1): { height: number; front: number } | null {
+  private seatOf(frame: CharacterFrame, index: 0 | 1): Seat | null {
     const objects = frame.place.objects;
     for (const object in objects) {
       const seats = objects[object]?.sit;
@@ -454,42 +496,48 @@ export class AssembledCharacters implements CharacterLayer {
   }
 
   /** Assise d'un meuble du lieu (modèle livré, sinon forme provisoire). */
-  private seatOfObject(frame: CharacterFrame, object: string): { height: number; front: number } {
+  private seatOfObject(frame: CharacterFrame, object: string): Seat {
     const placeId = frame.world.common.place;
-    const type =
-      this.view.content.places[placeId]?.map.objects.find((o) => o.id === object)?.type ??
-      frame.place.placed.find((p) => p.id === object)?.type;
-    const model = type === undefined ? undefined : this.view.content.props[type]?.model;
-    return (
+    const placed =
+      this.view.content.places[placeId]?.map.objects.find((o) => o.id === object) ??
+      frame.place.placed.find((p) => p.id === object);
+    const model = placed === undefined ? undefined : this.view.content.props[placed.type]?.model;
+    const seat =
       (model === undefined ? undefined : this.settings.seat.byModel[model]) ??
-      this.settings.seat.standIn
-    );
+      this.settings.seat.standIn;
+    const shape = model === undefined ? undefined : DECOR_MANIFEST.models[model];
+    const clear = shape === undefined ? undefined : this.settings.seat.sideClear[shape.family];
+    if (placed === undefined || shape === undefined || clear === undefined) return seat;
+    return { ...seat, side: { x: placed.x, y: placed.y, halfWidth: shape.size.w / 2, clear } };
   }
 
   private follow(
     figure: Figure,
     body: DeepReadonly<Body>,
     posture: Posture,
-    seat: { height: number; front: number } | null,
+    seat: Seat | null,
     dt: number,
   ): void {
     let x = body.x;
     let y = body.y;
+    if (seat?.side !== undefined) {
+      // Le long de l'assise: jamais dans l'accoudoir, quel que soit le gabarit.
+      const lx = -Math.sin(body.facing);
+      const ly = Math.cos(body.facing);
+      const along = (x - seat.side.x) * lx + (y - seat.side.y) * ly;
+      const kept = clampAlongSeat(along, seat.side.halfWidth, seat.side.clear);
+      x += (kept - along) * lx;
+      y += (kept - along) * ly;
+    }
     if (seat !== null) {
       const s = this.settings.seat;
       const forward = Math.max(0, seat.front - s.clipKnee * figure.legScale + s.kneeMargin);
       x += Math.cos(body.facing) * forward;
       y += Math.sin(body.facing) * forward;
     }
-    // Le bassin pose sur l'assise, même plus basse que celle du clip (0,45 m des modèles livrés
-    // contre 0,50 m): la figure descend un peu, pieds à peine sous le sol, plutôt que de flotter.
-    const lift =
-      seat === null
-        ? 0
-        : Math.max(
-            -this.settings.seat.maxSink,
-            seat.height - this.settings.seat.clipSeat * figure.legScale,
-          );
+    // Le bassin pose sur l'assise à sa vraie hauteur, quelle que soit celle du clip (0,50 m pour
+    // le gabarit adulte): les jambes sont ensuite ramenées au sol une à une (`groundLegs`).
+    const lift = seat === null ? 0 : seat.height - this.settings.seat.clipSeat * figure.legScale;
     if (!figure.placed) {
       figure.x = x;
       figure.y = y;
@@ -514,6 +562,23 @@ export class AssembledCharacters implements CharacterLayer {
     figure.blob.visible = true;
     figure.blob.position.y = this.settings.contact.lift - figure.lift;
     this.animate(figure, posture, dt);
+    if (seat !== null) this.groundLegs(figure);
+  }
+
+  /**
+   * Assis: chaque cheville revient à la hauteur qu'elle a dans le clip au-dessus du sol (le clip
+   * est fait pieds au sol), donc au sol quelle que soit la hauteur de l'assise. Jambe trop
+   * courte: elle garde la pose du clip, le pied pend.
+   */
+  private groundLegs(figure: Figure): void {
+    if (figure.lift === 0 || figure.legs.length === 0) return;
+    figure.object.updateMatrixWorld(true);
+    figure.legPose.keep();
+    for (const leg of figure.legs) {
+      leg.foot.getWorldPosition(legTarget);
+      legTarget.y -= figure.lift;
+      solveLeg(leg, legTarget, this.settings.seat.legSlack);
+    }
   }
 
   /** Taille affichée du personnage (m): celle de l'éditeur, sinon celle de sa silhouette. */
@@ -545,6 +610,8 @@ export class AssembledCharacters implements CharacterLayer {
     const library = this.library;
     if (library === null) return;
     const c = this.settings.clips;
+    // Les jambes posées à l'image passée reviennent à la pose du clip avant le mélange.
+    figure.legPose.restore();
     const names = new Set(figure.actions.keys());
     targetWeights(posture, names, target, this.settings);
     blendWeights(figure.weights, target, dt, this.settings.locomotion.fadeHalfLife);
@@ -734,7 +801,8 @@ export class AssembledCharacters implements CharacterLayer {
     this.material.dispose();
     this.rimMaterial.dispose();
     this.blobGeometry.dispose();
-    this.blobMaterial.dispose();
+    // L'ombre de contact encrée appartient au rendu encré, qui la libère.
+    if ((this.deps.ink ?? null) === null) this.blobMaterial.dispose();
     this.blobTexture.dispose();
     this.library?.dispose();
     this.library = null;

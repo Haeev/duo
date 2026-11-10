@@ -3,8 +3,11 @@
  * sol), ses volumes occultants. Tout ce qu'elle crée passe par son `ResourceTracker`: `dispose()`
  * rend la mémoire vidéo du lieu en entier (ADR 0018), le commun (matériaux, personnages) reste.
  */
-import { Color, Group, type Material, Mesh, type Object3D } from 'three';
+import { Color, Group, type Material, Mesh, type Object3D, type Texture } from 'three';
 import type { Aimable } from '../cible';
+import { inkifyModel, inkTag } from '../encre/conversion';
+import { KIND, LAYER } from '../encre/couches';
+import { createFloorMap } from '../encre/sol';
 import { Fadable, isMesh } from '../fondu';
 import { Occlusion } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
@@ -26,6 +29,13 @@ export interface ModelSource {
 export interface PlaceMaterials {
   readonly ground: Material;
   readonly standIn: Material;
+  /**
+   * Rendu encré (ADR 0023): le matériau que reçoivent les modèles livrés, convertis à leur
+   * arrivée; `null` dans l'ancien rendu (ils gardent leurs matériaux).
+   */
+  readonly ink?: Material | null;
+  /** Rendu encré: teinte du dehors d'un lieu clos (cases `vide` du sol), `null`: l'encre. */
+  readonly outside?: string | null;
 }
 
 class VolumeView implements Aimable {
@@ -61,6 +71,9 @@ export class PlaceScene {
   private readonly fixed = new Map<string, VolumeView>();
   private readonly dynamic = new Map<string, VolumeView>();
   private readonly glowColor = new Color(RENDER_SETTINGS.target.rimColor);
+  private readonly inked: Material | null;
+  /** Rendu encré: carte du sol d'un petit lieu à sol déclaré (`floor`), `null` sinon. */
+  groundMap: Texture | null = null;
 
   constructor(
     readonly description: PlaceDescription,
@@ -69,15 +82,22 @@ export class PlaceScene {
     /** Faux pour un grand lieu: son sol est dessiné tuile par tuile (`grand-lieu.ts`). */
     withGround = true,
   ) {
+    this.inked = materials.ink ?? null;
     this.root.name = 'lieu';
     if (withGround) {
       const { width, height, floor } = description;
-      const ground = new Mesh(
-        this.tracker.track(
-          floor === undefined ? groundGeometry(width, height) : floorGeometry(floor, width, height),
-        ),
-        materials.ground,
+      const geometry = this.tracker.track(
+        floor === undefined ? groundGeometry(width, height) : floorGeometry(floor, width, height),
       );
+      if (this.inked !== null) {
+        // Encre: teinte et matière du sol lues dans la carte du sol (plancher lame par lame, tapis).
+        inkTag(geometry, { layer: LAYER.grass, kind: KIND.ground });
+        if (floor !== undefined)
+          this.groundMap = this.tracker.track(
+            createFloorMap(floor, width, height, materials.outside ?? null),
+          );
+      }
+      const ground = new Mesh(geometry, materials.ground);
       ground.receiveShadow = true;
       ground.name = 'sol';
       this.root.add(ground);
@@ -89,10 +109,11 @@ export class PlaceScene {
     const model = volume.model === null ? null : (this.models?.instantiate(volume.model) ?? null);
     let object: Object3D;
     if (model !== null) {
-      object = model;
+      object = this.inked === null ? model : inkifyModel(model, this.inked);
     } else {
-      const mesh = new Mesh(this.tracker.track(standInGeometry(volume)), this.materials.standIn);
-      object = mesh;
+      const geometry = this.tracker.track(standInGeometry(volume));
+      if (this.inked !== null) inkTag(geometry, { layer: LAYER.plain });
+      object = new Mesh(geometry, this.materials.standIn);
     }
     object.traverse((child) => {
       if (isMesh(child)) {
@@ -125,6 +146,12 @@ export class PlaceScene {
       if (this.fixed.has(volume.id)) continue;
       this.dynamic.set(volume.id, this.build(volume));
     }
+  }
+
+  /** Tous les volumes affichés, fixes puis dynamiques (lampes du rendu encré). */
+  *volumes(): Generator<SceneVolume> {
+    for (const view of this.fixed.values()) yield view.volume;
+    for (const view of this.dynamic.values()) yield view.volume;
   }
 
   /** L'objet de la scène qui porte cet identifiant, s'il peut être visé. */

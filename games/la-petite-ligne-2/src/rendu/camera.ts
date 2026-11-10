@@ -9,7 +9,10 @@
  */
 import { RENDER_SETTINGS } from './reglages';
 
-export type CameraSettings = typeof RENDER_SETTINGS.camera;
+export type CameraSettings = { readonly [K in keyof typeof RENDER_SETTINGS.camera]: number } & {
+  /** Largeur à partir de laquelle la plongée est entière (m); absente: au zoom le plus large. */
+  readonly pitchFullWidth?: number;
+};
 
 /** Commandes de caméra d'une image. Tout est facultatif: une commande absente vaut zéro. */
 export interface CameraInput {
@@ -188,8 +191,9 @@ export class CameraRig {
 
   pose(): CameraPose {
     const s = this.settings;
-    const t = Math.min(1, Math.max(0, (this.width - s.minWidth) / (s.maxWidth - s.minWidth)));
-    // Adouci surtout tout près: l'inclinaison retrouve vite ses 35 degrés en s'éloignant.
+    const full = s.pitchFullWidth ?? s.maxWidth;
+    const t = Math.min(1, Math.max(0, (this.width - s.minWidth) / (full - s.minWidth)));
+    // Adouci surtout tout près: l'inclinaison retrouve vite sa plongée entière en s'éloignant.
     const eased = 1 - (1 - t) * (1 - t);
     return {
       x: this.x,
