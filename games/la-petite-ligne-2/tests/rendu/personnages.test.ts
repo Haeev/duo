@@ -226,7 +226,7 @@ describe('couche des personnages', () => {
     // Assise du modèle livré (manifeste des décors), sinon celle de la forme provisoire.
     const model = content.props.banc?.model ?? '';
     const height = s.byModel[model]?.height ?? s.standIn.height;
-    expect(figure?.position.y ?? 0).toBeCloseTo(Math.max(0, height - s.clipSeat), 1);
+    expect(figure?.position.y ?? 0).toBeCloseTo(Math.max(-s.maxSink, height - s.clipSeat), 2);
     expect(layer.stats().figures).toBe(2 + Object.keys(bench.villagers).length);
     layer.dispose();
     expect(layer.stats().figures).toBe(0);

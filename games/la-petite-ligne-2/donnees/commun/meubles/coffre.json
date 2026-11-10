@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "coffre",
   "name": "Coffre",
-  "model": "coffre",
+  "model": "chest",
   "size": {
     "w": 1,
     "h": 1

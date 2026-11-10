@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "coquelicots",
   "name": "Coquelicots",
-  "model": "fleurs",
+  "model": "flowers-poppy",
   "size": {
     "w": 1,
     "h": 1

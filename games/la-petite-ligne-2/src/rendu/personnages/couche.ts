@@ -465,8 +465,15 @@ export class AssembledCharacters implements CharacterLayer {
       x += Math.cos(body.facing) * forward;
       y += Math.sin(body.facing) * forward;
     }
+    // Le bassin pose sur l'assise, même plus basse que celle du clip (0,45 m des modèles livrés
+    // contre 0,50 m): la figure descend un peu, pieds à peine sous le sol, plutôt que de flotter.
     const lift =
-      seat === null ? 0 : Math.max(0, seat.height - this.settings.seat.clipSeat * figure.legScale);
+      seat === null
+        ? 0
+        : Math.max(
+            -this.settings.seat.maxSink,
+            seat.height - this.settings.seat.clipSeat * figure.legScale,
+          );
     if (!figure.placed) {
       figure.x = x;
       figure.y = y;

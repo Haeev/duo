@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "cuisiniere",
   "name": "Cuisinière",
-  "model": "cuisiniere",
+  "model": "stove",
   "size": {
     "w": 1,
     "h": 1

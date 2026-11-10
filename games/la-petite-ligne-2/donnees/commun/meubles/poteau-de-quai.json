@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "poteau-de-quai",
   "name": "Poteau de quai",
-  "model": "poteau-de-quai",
+  "model": "platform-sign",
   "size": {
     "w": 1,
     "h": 1

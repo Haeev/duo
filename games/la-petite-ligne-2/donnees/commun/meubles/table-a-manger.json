@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "table-a-manger",
   "name": "Table à manger",
-  "model": "table",
+  "model": "table-farm",
   "size": {
     "w": 2,
     "h": 1
