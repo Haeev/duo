@@ -1,0 +1,183 @@
+{
+ "schema": 1,
+ "tick": 5400,
+ "seed": 7,
+ "rng": [
+  588686121,
+  1937383562,
+  4286812467,
+  2372217166
+ ],
+ "minutes": 845,
+ "common": {
+  "phase": "day",
+  "place": "essai-halte",
+  "day": 3,
+  "weather": "overcast",
+  "chest": 1500,
+  "travel": null
+ },
+ "players": [
+  {
+   "member": "membre-a",
+   "name": "Ada",
+   "look": null,
+   "gender": null,
+   "money": 4250,
+   "toolbar": [
+    {
+     "item": "buche",
+     "count": 3
+    },
+    null,
+    null,
+    null,
+    null
+   ],
+   "bag": null,
+   "selected": null,
+   "tiers": {
+    "hunger": "bonus",
+    "sleep": "bonus",
+    "hygiene": "bonus"
+   },
+   "gesture": null,
+   "talk": null,
+   "aim": null,
+   "body": {
+    "x": 19.2,
+    "y": 5,
+    "facing": 1.5707963267948966,
+    "speed": 0
+   },
+   "needs": {
+    "hunger": 40,
+    "sleep": 55.5,
+    "hygiene": 70
+   }
+  },
+  {
+   "member": "membre-b",
+   "name": "Bob",
+   "look": null,
+   "gender": null,
+   "money": 120,
+   "toolbar": [
+    null,
+    {
+     "item": "hache-forgee",
+     "count": 1,
+     "wear": 30
+    },
+    null,
+    null,
+    null
+   ],
+   "bag": null,
+   "selected": null,
+   "tiers": {
+    "hunger": "bonus",
+    "sleep": "bonus",
+    "hygiene": "bonus"
+   },
+   "gesture": null,
+   "talk": null,
+   "aim": null,
+   "body": {
+    "x": 4.5,
+    "y": 6.25,
+    "facing": 1.5,
+    "speed": 0
+   },
+   "needs": {
+    "hunger": 70,
+    "sleep": 70,
+    "hygiene": 70
+   }
+  }
+ ],
+ "progress": {
+  "memory": {
+   "essai-gare.pomme.cueillie": {
+    "v": true,
+    "by": 0,
+    "day": 2
+   }
+  },
+  "bonds": {
+   "j0-cheffe-de-gare": 12,
+   "j1-cheffe-de-gare": 4
+  },
+  "quests": {
+   "arrivee": {
+    "chapter": "prologue",
+    "step": "quai",
+    "done": false
+   }
+  },
+  "collections": {
+   "poissons": [
+    "gardon"
+   ]
+  },
+  "opened": [
+   "essai-gare",
+   "essai-halte"
+  ]
+ },
+ "places": {
+  "essai-gare": {
+   "leftOn": 3,
+   "placed": [],
+   "nextPlacedId": 0,
+   "objects": {
+    "pommier": {
+     "gather": {
+      "left": 3,
+      "refillAt": null
+     }
+    },
+    "pompe": {},
+    "tas-de-bois": {
+     "gather": {
+      "left": 8,
+      "refillAt": null
+     }
+    }
+   },
+   "ground": [],
+   "nextGroundId": 0,
+   "villagers": {
+    "cheffe-de-gare": {
+     "met": [
+      false,
+      false
+     ],
+     "talkingWith": null,
+     "body": {
+      "x": 20,
+      "y": 15,
+      "facing": 1.5707963267948966,
+      "speed": 0
+     }
+    }
+   }
+  },
+  "essai-halte": {
+   "leftOn": null,
+   "placed": [],
+   "nextPlacedId": 0,
+   "objects": {
+    "banc": {
+     "sit": [
+      null,
+      null
+     ]
+    }
+   },
+   "ground": [],
+   "nextGroundId": 0,
+   "villagers": {}
+  }
+ }
+}
