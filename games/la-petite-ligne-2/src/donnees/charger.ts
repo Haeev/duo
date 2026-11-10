@@ -144,13 +144,19 @@ export function loadContent(files: Files): Content {
     places[def.id] = { def, map, villagers, dialogues, shops, quests };
   }
 
-  if (settings === null || needs === null || bags === null || shapes === null)
+  if (settings === null || needs === null || bags === null || catalogue === null)
     throw new ContentError(problems);
+  const pieces: Record<string, PieceDef> = {};
+  for (const piece of catalogue.pieces) {
+    if (piece.id in pieces)
+      problems.push(`commun/personnages/catalogue.json: pièce « ${piece.id} » en double`);
+    pieces[piece.id] = piece;
+  }
   const content: Content = {
     settings,
     needs,
     bags,
-    shapes,
+    catalogue,
     items,
     props,
     recipes,

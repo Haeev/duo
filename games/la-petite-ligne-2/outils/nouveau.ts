@@ -35,8 +35,10 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   },
   'piece-de-personnage': {
     files: [{ from: 'piece-de-personnage.jsonc', to: '<id>.json' }],
-    folder: 'commun/personnages/pieces',
+    folder: 'commun/personnages',
     inPlace: false,
+    // Entrée du catalogue: le générateur de pièces (lot L5) l'écrit d'ordinaire lui-même, avec le maillage.
+    into: { file: 'commun/personnages/catalogue.json', array: 'pieces' },
   },
   recette: {
     files: [{ from: 'recette.jsonc', to: '<id>.json' }],
@@ -99,13 +101,20 @@ export function fromTemplate(text: string, id: string): Record<string, unknown> 
   return value;
 }
 
-/** Chemins (relatifs à `donnees/`) et contenus des fichiers à créer. */
+export interface PlannedFile {
+  /** Fichier à créer, ou fichier existant à compléter quand `array` est donné. */
+  readonly path: string;
+  readonly value: Record<string, unknown>;
+  readonly array: string | null;
+}
+
+/** Chemins (relatifs à `donnees/`) et contenus des fichiers à créer ou à compléter. */
 export function plan(
   templates: string,
   type: string,
   id: string,
   place: string | null,
-): { path: string; value: Record<string, unknown> }[] {
+): PlannedFile[] {
   const template = TEMPLATES[type];
   if (template === undefined)
     throw new Error(`type inconnu « ${type} » (connus: ${Object.keys(TEMPLATES).join(', ')})`);
