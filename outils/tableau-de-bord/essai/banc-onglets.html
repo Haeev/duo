@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Banc d'essai des onglets Carte et Modèles 3D</title>
+    <!-- Les onglets chargent leurs fichiers par adresse relative à la page publiée: ici, le dossier parent. -->
+    <base href="../" />
+    <style>
+      /* Jetons du socle, repris de son README: sombre d'abord, clair sur demande (?theme=clair). */
+      :root {
+        color-scheme: dark;
+        --fond: #15181c;
+        --panneau: #1e2227;
+        --panneau-haut: #262b31;
+        --creux: #101316;
+        --texte: #f1ede4;
+        --texte-doux: #a9a399;
+        --filet: #3a4048;
+        --accent: #f2c14e;
+        --sur-accent: #1c1a14;
+        --accent-texte: #f2c14e;
+        --ok: #5fb878;
+        --alerte: #e5604d;
+        --ombre: rgba(0, 0, 0, 0.4);
+        --rayon: 12px;
+        --rayon-petit: 8px;
+      }
+      :root[data-theme='light'] {
+        color-scheme: light;
+        --fond: #f6f2e9;
+        --panneau: #fffdf7;
+        --panneau-haut: #ffffff;
+        --creux: #ece7db;
+        --texte: #2a2420;
+        --texte-doux: #6b645a;
+        --filet: #cfc8ba;
+        --accent: #f2c14e;
+        --sur-accent: #1c1a14;
+        --accent-texte: #8a5a00;
+        --ok: #2e7d32;
+        --alerte: #b3261e;
+        --ombre: rgba(60, 40, 10, 0.18);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      body {
+        margin: 0;
+        background: var(--fond);
+        color: var(--texte);
+        font:
+          15px/1.45 system-ui,
+          sans-serif;
+      }
+      .banc {
+        padding-block: 12px;
+        padding-left: max(16px, env(safe-area-inset-left, 0px));
+        padding-right: max(16px, env(safe-area-inset-right, 0px));
+      }
+      .banc-onglets {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      .banc-onglets button {
+        font: inherit;
+        color: var(--texte);
+        background: var(--panneau);
+        border: 1px solid var(--filet);
+        border-radius: 999px;
+        padding: 6px 14px;
+        min-height: 38px;
+        cursor: pointer;
+      }
+      .banc-onglets button[aria-selected='true'] {
+        background: var(--accent);
+        color: var(--sur-accent);
+        border-color: var(--accent);
+        font-weight: 700;
+      }
+      .banc-toast {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        background: var(--panneau-haut);
+        border: 1px solid var(--filet);
+        border-radius: 8px;
+        padding: 8px 14px;
+        z-index: 20;
+        max-width: calc(100vw - 32px);
+      }
+      .banc-voile {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 30;
+        padding: 16px;
+      }
+      .banc-dialogue {
+        background: var(--panneau);
+        border: 1px solid var(--filet);
+        border-radius: 12px;
+        padding: 16px;
+        max-width: 360px;
+        display: grid;
+        gap: 12px;
+      }
+      .banc-dialogue div {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .banc-dialogue button,
+      .banc-editeur button {
+        font: inherit;
+        color: var(--texte);
+        background: var(--panneau-haut);
+        border: 1px solid var(--filet);
+        border-radius: 8px;
+        padding: 8px 12px;
+        min-height: 40px;
+        cursor: pointer;
+      }
+      .banc-editeur {
+        display: grid;
+        gap: 6px;
+      }
+      .banc-editeur textarea {
+        font: inherit;
+        color: var(--texte);
+        background: var(--creux);
+        border: 1px solid var(--filet);
+        border-radius: 8px;
+        padding: 8px;
+        min-height: 80px;
+        box-sizing: border-box;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banc">
+      <nav class="banc-onglets" id="banc-onglets" role="tablist" aria-label="Onglets"></nav>
+      <div id="banc-contenus"></div>
+    </div>
+
+    <!-- Premier cas du contrat: ce script s'exécute avant que `window.TDB` existe et attend `tdb:pret`. -->
+    <script src="carte.js" defer></script>
+    <script>
+      // Socle minimal conforme au contrat des onglets (README du tableau de bord): remarques en mémoire, aucun réseau.
+      // Paramètres: ?theme=clair, ?graines=0 (base vide), #carte ou #modeles.
+      document.addEventListener('DOMContentLoaded', function () {
+        var parametres = new URLSearchParams(location.search);
+        if (parametres.get('theme') === 'clair') document.documentElement.dataset.theme = 'light';
+
+        var remarques = [];
+        var ecoutes = [];
+        var suivant = 1;
+        function de(type, id) {
+          return remarques.filter(function (r) {
+            return r.cible.type === type && r.cible.id === id && r.forme.sorte !== 'note';
+          });
+        }
+        function prevenir() {
+          ecoutes.forEach(function (e) {
+            e.fn(de(e.type, e.id));
+          });
+        }
+        function formeValide(f) {
+          var nombres = function (t, n) {
+            return Array.isArray(t) && t.length === n && t.every(Number.isFinite);
+          };
+          if (!f || typeof f !== 'object') return false;
+          if (f.sorte === 'globale') return true;
+          if (f.sorte === 'point') return Number.isFinite(f.x) && Number.isFinite(f.y);
+          if (f.sorte === 'trait')
+            return (
+              Array.isArray(f.points) &&
+              f.points.length >= 2 &&
+              f.points.every(function (p) {
+                return nombres(p, 2);
+              })
+            );
+          if (f.sorte === 'point3d') return nombres(f.position, 3) && nombres(f.normale, 3);
+          return false;
+        }
+        function ajouter(note, plus) {
+          var id = 'r' + suivant++;
+          remarques.push(
+            Object.assign(
+              {
+                id: id,
+                auteur: 'client',
+                creeLe: new Date(Date.UTC(2026, 10, 10, 17, suivant)).toISOString(),
+                statut: 'ouverte',
+                reponseManager: '',
+              },
+              JSON.parse(JSON.stringify(note)),
+              plus || {},
+            ),
+          );
+          return id;
+        }
+        if (parametres.get('graines') !== '0') {
+          ajouter({
+            cible: { type: 'carte', id: 'aubrune' },
+            forme: {
+              sorte: 'point',
+              x: 0.5326,
+              y: 0.6322,
+              metres: [204.5, 131.5],
+              pres: 'Le ponton',
+            },
+            texte: 'Le ponton me paraît trop court pour pêcher à deux.',
+          });
+          ajouter(
+            {
+              cible: { type: 'carte', id: 'aubrune' },
+              forme: {
+                sorte: 'trait',
+                points: [
+                  [0.47, 0.47],
+                  [0.38, 0.47],
+                ],
+                metres: [
+                  [180.5, 97.8],
+                  [146, 97.8],
+                ],
+                fleche: true,
+              },
+              texte: 'Rapprocher le wagon du passage à niveau.',
+            },
+            { statut: 'traitee', reponseManager: 'Fait: le wagon est à 40 m du passage.' },
+          );
+          ajouter({
+            cible: { type: 'carte', id: 'aubrune' },
+            forme: { sorte: 'globale' },
+            texte: 'J’aime bien la place au milieu.',
+          });
+          ajouter(
+            {
+              cible: { type: 'modele', id: 'decors-bench-park' },
+              forme: { sorte: 'globale' },
+              texte: 'Le banc est bien, mais un peu terne.',
+            },
+            { statut: 'traitee', reponseManager: 'Couleur réchauffée dans la prochaine version.' },
+          );
+        }
+
+        var ui = {
+          toast: function (texte) {
+            var t = document.createElement('div');
+            t.className = 'banc-toast';
+            t.setAttribute('role', 'status');
+            t.textContent = texte;
+            document.body.appendChild(t);
+            setTimeout(function () {
+              t.remove();
+            }, 2500);
+          },
+          confirm: function (texte, options) {
+            return new Promise(function (ok) {
+              var voile = document.createElement('div');
+              voile.className = 'banc-voile';
+              var boite = document.createElement('div');
+              boite.className = 'banc-dialogue';
+              boite.setAttribute('role', 'alertdialog');
+              var p = document.createElement('p');
+              p.style.margin = '0';
+              p.textContent = texte;
+              var boutons = document.createElement('div');
+              var fin = function (v) {
+                voile.remove();
+                ok(v);
+              };
+              [
+                [(options && options.annuler) || 'Annuler', false, 'banc-non'],
+                [(options && options.ok) || 'Confirmer', true, 'banc-oui'],
+              ].forEach(function (d) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.id = d[2];
+                b.textContent = d[0];
+                b.addEventListener('click', function () {
+                  fin(d[1]);
+                });
+                boutons.appendChild(b);
+              });
+              boite.appendChild(p);
+              boite.appendChild(boutons);
+              voile.appendChild(boite);
+              document.body.appendChild(voile);
+              boutons.lastChild.focus();
+            });
+          },
+          noteEditor: function (el, o) {
+            var racine = document.createElement('div');
+            racine.className = 'banc-editeur';
+            var champ = document.createElement('textarea');
+            champ.id = 'banc-remarque';
+            champ.placeholder = o.placeholder || '';
+            champ.setAttribute('aria-label', o.label || 'Remarque');
+            champ.value = o.valeur || '';
+            var envoyer = document.createElement('button');
+            envoyer.type = 'button';
+            envoyer.id = 'banc-envoyer';
+            envoyer.textContent = o.bouton || 'Envoyer';
+            var valider = function () {
+              var texte = champ.value.trim();
+              if (!texte) return;
+              Promise.resolve(o.onSubmit(texte)).then(function (r) {
+                if (r !== false) champ.value = '';
+              });
+            };
+            envoyer.addEventListener('click', valider);
+            champ.addEventListener('keydown', function (ev) {
+              if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) valider();
+              if (ev.key === 'Escape' && o.onCancel) o.onCancel();
+            });
+            racine.appendChild(champ);
+            racine.appendChild(envoyer);
+            el.appendChild(racine);
+            return {
+              el: racine,
+              focus: function () {
+                champ.focus();
+              },
+              clear: function () {
+                champ.value = '';
+              },
+              destroy: function () {
+                racine.remove();
+              },
+            };
+          },
+        };
+
+        var ctx = {
+          db: null,
+          me: null,
+          canWrite: true,
+          ready: new Promise(function (ok) {
+            setTimeout(function () {
+              ctx.me = 'client';
+              ok(null);
+            }, 200);
+          }),
+          ui: ui,
+          notes: {
+            list: function (type, id) {
+              return de(type, id);
+            },
+            watch: function (type, id, fn) {
+              var e = { type: type, id: id, fn: fn };
+              ecoutes.push(e);
+              fn(de(type, id));
+              return function () {
+                ecoutes = ecoutes.filter(function (x) {
+                  return x !== e;
+                });
+              };
+            },
+            add: function (note) {
+              if (
+                !note ||
+                !note.cible ||
+                !formeValide(note.forme) ||
+                !String(note.texte || '').trim()
+              )
+                return Promise.resolve(null);
+              var id = ajouter(note);
+              prevenir();
+              return Promise.resolve(id);
+            },
+            resolve: function (id) {
+              remarques.forEach(function (r) {
+                if (r.id === id) r.statut = 'traitee';
+              });
+              prevenir();
+              return Promise.resolve(true);
+            },
+            remove: function (id) {
+              remarques = remarques.filter(function (r) {
+                return r.id !== id;
+              });
+              prevenir();
+              return Promise.resolve(true);
+            },
+          },
+        };
+
+        var onglets = [];
+        var barre = document.getElementById('banc-onglets');
+        var contenus = document.getElementById('banc-contenus');
+        function ouvrir(id) {
+          onglets.forEach(function (o) {
+            var actif = o.id === id;
+            o.bouton.setAttribute('aria-selected', actif ? 'true' : 'false');
+            o.el.hidden = !actif;
+            if (actif && !o.monte) {
+              o.monte = true;
+              o.mount(o.el, ctx);
+            }
+          });
+          if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+        }
+        window.TDB = {
+          registerTab: function (def) {
+            var o = { id: def.id, order: def.order || 0, mount: def.mount, monte: false };
+            o.bouton = document.createElement('button');
+            o.bouton.type = 'button';
+            o.bouton.setAttribute('role', 'tab');
+            o.bouton.id = 'onglet-' + def.id;
+            o.bouton.textContent = def.title;
+            o.bouton.addEventListener('click', function () {
+              ouvrir(def.id);
+            });
+            o.el = document.createElement('section');
+            o.el.id = 'contenu-' + def.id;
+            o.el.hidden = true;
+            onglets.push(o);
+            onglets.sort(function (a, b) {
+              return a.order - b.order;
+            });
+            onglets.forEach(function (x) {
+              barre.appendChild(x.bouton);
+              contenus.appendChild(x.el);
+            });
+            var voulu = location.hash.slice(1) || onglets[0].id;
+            if (voulu === def.id || (onglets.length === 1 && !location.hash)) ouvrir(def.id);
+          },
+          setBadge: function () {},
+          go: ouvrir,
+          // Pour les essais automatisés seulement: lire les remarques en mémoire.
+          essai: {
+            remarques: function () {
+              return remarques;
+            },
+          },
+        };
+        window.dispatchEvent(new Event('tdb:pret'));
+
+        // Second cas du contrat: ce script arrive après `window.TDB` et s'inscrit tout de suite.
+        var script = document.createElement('script');
+        script.src = 'modeles.js';
+        document.body.appendChild(script);
+      });
+    </script>
+  </body>
+</html>

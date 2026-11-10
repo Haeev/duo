@@ -1,0 +1,4145 @@
+{
+ "format": "tdb-modeles/1",
+ "familles": [
+  {
+   "id": "personnages",
+   "titre": "Personnages"
+  },
+  {
+   "id": "meubles",
+   "titre": "Meubles"
+  },
+  {
+   "id": "objets",
+   "titre": "Objets"
+  },
+  {
+   "id": "decors",
+   "titre": "Décors"
+  }
+ ],
+ "lots": [
+  {
+   "id": "essai",
+   "titre": "Personnages encrés (essai de style 4)"
+  },
+  {
+   "id": "figurine",
+   "titre": "Figurine du jeu, pièce par pièce"
+  },
+  {
+   "id": "decors",
+   "titre": "Décors livrés"
+  },
+  {
+   "id": "objets",
+   "titre": "Objets livrés"
+  }
+ ],
+ "modeles": [
+  {
+   "id": "figurine-accessory-vest",
+   "nom": "Accessoire: gilet",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/accessory.glb",
+   "noeud": "accessory-vest",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 539356,
+   "triangles": 372,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.485,
+    "hauteur": 0.432,
+    "profondeur": 0.281
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/accessory.glb",
+   "partage": 1
+  },
+  {
+   "id": "figurine-bottom-skirt",
+   "nom": "Bas: jupe",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/bottom.glb",
+   "noeud": "bottom-skirt",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 636976,
+   "triangles": 384,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.566,
+    "hauteur": 0.513,
+    "profondeur": 0.426
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/bottom.glb",
+   "partage": 3
+  },
+  {
+   "id": "figurine-bottom-trousers",
+   "nom": "Bas: pantalon",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/bottom.glb",
+   "noeud": "bottom-trousers",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 636976,
+   "triangles": 800,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.364,
+    "hauteur": 0.926,
+    "profondeur": 0.226
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/bottom.glb",
+   "partage": 3
+  },
+  {
+   "id": "figurine-bottom-shorts",
+   "nom": "Bas: short",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/bottom.glb",
+   "noeud": "bottom-shorts",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 636976,
+   "triangles": 520,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.364,
+    "hauteur": 0.415,
+    "profondeur": 0.226
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/bottom.glb",
+   "partage": 3
+  },
+  {
+   "id": "essai-basile",
+   "nom": "Basile (essai encré)",
+   "famille": "personnages",
+   "lot": "essai",
+   "fichier": "essai/homme.glb",
+   "noeud": null,
+   "pieces": [
+    {
+     "fichier": "essai/homme-tignasse.glb",
+     "noeud": null,
+     "os": "Head",
+     "role": "piece"
+    }
+   ],
+   "textures": {
+    "atlas": "essai/basile.png",
+    "traits": {
+     "fichier": "essai/traits-basile.png",
+     "colonnes": 4,
+     "rangees": 3
+    }
+   },
+   "poids": 412220,
+   "triangles": 2482,
+   "clips": [
+    {
+     "nom": "marche",
+     "duree": 1.03
+    },
+    {
+     "nom": "repos",
+     "duree": 3.5
+    }
+   ],
+   "cotes": {
+    "largeur": 1.035,
+    "hauteur": 1.76,
+    "profondeur": 0.309
+   },
+   "source": "docs/jeux/jeu-1/refonte/essai-style-4/modeles/homme.glb",
+   "partage": 1
+  },
+  {
+   "id": "figurine-hat-beanie-pompom",
+   "nom": "Bonnet à pompon",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hat.glb",
+   "noeud": "hat-beanie-pompom",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 540176,
+   "triangles": 827,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.385,
+    "hauteur": 0.375,
+    "profondeur": 0.385
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hat.glb",
+   "partage": 1
+  },
+  {
+   "id": "figurine-shoes-boots",
+   "nom": "Chaussures: bottes",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/shoes.glb",
+   "noeud": "shoes-boots",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 594200,
+   "triangles": 568,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.323,
+    "hauteur": 0.24,
+    "profondeur": 0.252
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/shoes.glb",
+   "partage": 2
+  },
+  {
+   "id": "figurine-shoes-pebble",
+   "nom": "Chaussures: galets",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/shoes.glb",
+   "noeud": "shoes-pebble",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 594200,
+   "triangles": 488,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.323,
+    "hauteur": 0.116,
+    "profondeur": 0.252
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/shoes.glb",
+   "partage": 2
+  },
+  {
+   "id": "figurine-hair-bob",
+   "nom": "Coiffure: carré",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-bob",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 1336,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.356,
+    "hauteur": 0.328,
+    "profondeur": 0.329
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-bob--flat",
+   "nom": "Coiffure: carré, version sous chapeau",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-bob--flat",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 336,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.339,
+    "hauteur": 0.284,
+    "profondeur": 0.312
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-short",
+   "nom": "Coiffure: cheveux courts",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-short",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 900,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.339,
+    "hauteur": 0.254,
+    "profondeur": 0.319
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-short--flat",
+   "nom": "Coiffure: cheveux courts, version sous chapeau",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-short--flat",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 300,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.339,
+    "hauteur": 0.245,
+    "profondeur": 0.301
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-bun",
+   "nom": "Coiffure: chignon",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-bun",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 912,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.339,
+    "hauteur": 0.379,
+    "profondeur": 0.308
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-bun--flat",
+   "nom": "Coiffure: chignon, version sous chapeau",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-bun--flat",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 312,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.339,
+    "hauteur": 0.261,
+    "profondeur": 0.299
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-side-part",
+   "nom": "Coiffure: raie sur le côté",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-side-part",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 812,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.34,
+    "hauteur": 0.265,
+    "profondeur": 0.322
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-hair-side-part--flat",
+   "nom": "Coiffure: raie sur le côté, version sous chapeau",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/hair.glb",
+   "noeud": "hair-side-part--flat",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 718812,
+   "triangles": 312,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.339,
+    "hauteur": 0.253,
+    "profondeur": 0.297
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/hair.glb",
+   "partage": 8
+  },
+  {
+   "id": "figurine-body-base",
+   "nom": "Corps de base",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/body.glb",
+   "noeud": "body-base",
+   "pieces": [
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 501380,
+   "triangles": 2240,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 1.385,
+    "hauteur": 1.31,
+    "profondeur": 0.215
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/body.glb",
+   "partage": 1
+  },
+  {
+   "id": "essai-gaston",
+   "nom": "Gaston (essai encré)",
+   "famille": "personnages",
+   "lot": "essai",
+   "fichier": "essai/costaud.glb",
+   "noeud": null,
+   "pieces": [
+    {
+     "fichier": "essai/costaud-brosse.glb",
+     "noeud": null,
+     "os": "Head",
+     "role": "piece"
+    },
+    {
+     "fichier": "essai/costaud-col.glb",
+     "noeud": null,
+     "os": "Spine",
+     "role": "piece"
+    }
+   ],
+   "textures": {
+    "atlas": "essai/gaston.png",
+    "traits": {
+     "fichier": "essai/traits-gaston.png",
+     "colonnes": 4,
+     "rangees": 3
+    }
+   },
+   "poids": 462315,
+   "triangles": 2478,
+   "clips": [
+    {
+     "nom": "marche",
+     "duree": 1.03
+    },
+    {
+     "nom": "repos",
+     "duree": 3.5
+    }
+   ],
+   "cotes": {
+    "largeur": 1.297,
+    "hauteur": 1.79,
+    "profondeur": 0.485
+   },
+   "source": "docs/jeux/jeu-1/refonte/essai-style-4/modeles/costaud.glb",
+   "partage": 1
+  },
+  {
+   "id": "figurine-top-tank",
+   "nom": "Haut: débardeur",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/top.glb",
+   "noeud": "top-tank",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 658404,
+   "triangles": 384,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.451,
+    "hauteur": 0.392,
+    "profondeur": 0.248
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/top.glb",
+   "partage": 3
+  },
+  {
+   "id": "figurine-top-sweater",
+   "nom": "Haut: pull",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/top.glb",
+   "noeud": "top-sweater",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 658404,
+   "triangles": 1008,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 1.155,
+    "hauteur": 0.467,
+    "profondeur": 0.258
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/top.glb",
+   "partage": 3
+  },
+  {
+   "id": "figurine-top-tee",
+   "nom": "Haut: tee-shirt",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/top.glb",
+   "noeud": "top-tee",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 658404,
+   "triangles": 664,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.592,
+    "hauteur": 0.414,
+    "profondeur": 0.252
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/top.glb",
+   "partage": 3
+  },
+  {
+   "id": "essai-lou",
+   "nom": "Lou (essai encré)",
+   "famille": "personnages",
+   "lot": "essai",
+   "fichier": "essai/enfant.glb",
+   "noeud": null,
+   "pieces": [
+    {
+     "fichier": "essai/enfant-tignasse.glb",
+     "noeud": null,
+     "os": "Head",
+     "role": "piece"
+    }
+   ],
+   "textures": {
+    "atlas": "essai/lou.png",
+    "traits": {
+     "fichier": "essai/traits-lou.png",
+     "colonnes": 4,
+     "rangees": 3
+    }
+   },
+   "poids": 466680,
+   "triangles": 2478,
+   "clips": [
+    {
+     "nom": "marche",
+     "duree": 1.03
+    },
+    {
+     "nom": "repos",
+     "duree": 3.5
+    }
+   ],
+   "cotes": {
+    "largeur": 0.891,
+    "hauteur": 1.305,
+    "profondeur": 0.334
+   },
+   "source": "docs/jeux/jeu-1/refonte/essai-style-4/modeles/enfant.glb",
+   "partage": 1
+  },
+  {
+   "id": "essai-maelle",
+   "nom": "Maëlle (essai encré)",
+   "famille": "personnages",
+   "lot": "essai",
+   "fichier": "essai/femme.glb",
+   "noeud": null,
+   "pieces": [
+    {
+     "fichier": "essai/femme-carre.glb",
+     "noeud": null,
+     "os": "Head",
+     "role": "piece"
+    },
+    {
+     "fichier": "essai/femme-col.glb",
+     "noeud": null,
+     "os": "Spine",
+     "role": "piece"
+    }
+   ],
+   "textures": {
+    "atlas": "essai/maelle.png",
+    "traits": {
+     "fichier": "essai/traits-maelle.png",
+     "colonnes": 4,
+     "rangees": 3
+    }
+   },
+   "poids": 487370,
+   "triangles": 2535,
+   "clips": [
+    {
+     "nom": "marche",
+     "duree": 1.03
+    },
+    {
+     "nom": "repos",
+     "duree": 3.5
+    }
+   ],
+   "cotes": {
+    "largeur": 1.072,
+    "hauteur": 1.659,
+    "profondeur": 0.305
+   },
+   "source": "docs/jeux/jeu-1/refonte/essai-style-4/modeles/femme.glb",
+   "partage": 1
+  },
+  {
+   "id": "essai-odette",
+   "nom": "Odette (essai encré)",
+   "famille": "personnages",
+   "lot": "essai",
+   "fichier": "essai/agee.glb",
+   "noeud": null,
+   "pieces": [
+    {
+     "fichier": "essai/agee-chignon.glb",
+     "noeud": null,
+     "os": "Head",
+     "role": "piece"
+    },
+    {
+     "fichier": "essai/agee-col.glb",
+     "noeud": null,
+     "os": "Spine",
+     "role": "piece"
+    }
+   ],
+   "textures": {
+    "atlas": "essai/odette.png",
+    "traits": {
+     "fichier": "essai/traits-odette.png",
+     "colonnes": 4,
+     "rangees": 3
+    }
+   },
+   "poids": 463136,
+   "triangles": 2392,
+   "clips": [
+    {
+     "nom": "marche",
+     "duree": 1.03
+    },
+    {
+     "nom": "repos",
+     "duree": 3.5
+    }
+   ],
+   "cotes": {
+    "largeur": 0.985,
+    "hauteur": 1.555,
+    "profondeur": 0.37
+   },
+   "source": "docs/jeux/jeu-1/refonte/essai-style-4/modeles/agee.glb",
+   "partage": 1
+  },
+  {
+   "id": "figurine-dress-simple",
+   "nom": "Robe simple",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/dress.glb",
+   "noeud": "dress-simple",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    },
+    {
+     "fichier": "figurine/head.glb",
+     "noeud": "head-round",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 577808,
+   "triangles": 952,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.608,
+    "hauteur": 0.857,
+    "profondeur": 0.468
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/dress.glb",
+   "partage": 1
+  },
+  {
+   "id": "figurine-head-square",
+   "nom": "Tête carrée",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/head.glb",
+   "noeud": "head-square",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 501380,
+   "triangles": 1648,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.348,
+    "hauteur": 0.352,
+    "profondeur": 0.325
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/head.glb",
+   "partage": 2
+  },
+  {
+   "id": "figurine-head-round",
+   "nom": "Tête ronde",
+   "famille": "personnages",
+   "lot": "figurine",
+   "fichier": "figurine/head.glb",
+   "noeud": "head-round",
+   "pieces": [
+    {
+     "fichier": "figurine/body.glb",
+     "noeud": "body-base",
+     "os": null,
+     "role": "mannequin"
+    }
+   ],
+   "textures": null,
+   "poids": 501380,
+   "triangles": 1648,
+   "clips": [
+    {
+     "nom": "run",
+     "duree": 0.6
+    },
+    {
+     "nom": "walk",
+     "duree": 1
+    },
+    {
+     "nom": "idle",
+     "duree": 3
+    },
+    {
+     "nom": "sit",
+     "duree": 3
+    },
+    {
+     "nom": "carry",
+     "duree": 2
+    }
+   ],
+   "cotes": {
+    "largeur": 0.341,
+    "hauteur": 0.34,
+    "profondeur": 0.315
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/personnages/head.glb",
+   "partage": 2
+  },
+  {
+   "id": "decors-wardrobe",
+   "nom": "Armoire",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "wardrobe",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 540,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.06,
+    "hauteur": 1.95,
+    "profondeur": 0.627
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-tub",
+   "nom": "Baignoire",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "tub",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 712,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.5,
+    "hauteur": 0.58,
+    "profondeur": 0.72
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bench-farm",
+   "nom": "Banc de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bench-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 380,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.4,
+    "hauteur": 0.45,
+    "profondeur": 0.388
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bench-park",
+   "nom": "Banc de square",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bench-park",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1372,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.8,
+    "hauteur": 0.869,
+    "profondeur": 0.501
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bench-platform",
+   "nom": "Banc du quai",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bench-platform",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1372,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.7,
+    "hauteur": 0.869,
+    "profondeur": 0.501
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-chair-bedroom",
+   "nom": "Chaise de chambre",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chair-bedroom",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 768,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.918,
+    "profondeur": 0.452
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-chair-farm",
+   "nom": "Chaise de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chair-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 844,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.918,
+    "profondeur": 0.452
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-chair-farm-sage",
+   "nom": "Chaise de ferme vert sauge",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chair-farm-sage",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 844,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.44,
+    "hauteur": 0.918,
+    "profondeur": 0.452
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-chest",
+   "nom": "Coffre",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "chest",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 492,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.82,
+    "hauteur": 0.655,
+    "profondeur": 0.485
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-shelf",
+   "nom": "Étagère",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "shelf",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1092,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.9,
+    "hauteur": 1.6,
+    "profondeur": 0.32
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-sink-stone",
+   "nom": "Évier de pierre",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "sink-stone",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 664,
+   "clips": [],
+   "cotes": {
+    "largeur": 1,
+    "hauteur": 1.178,
+    "profondeur": 0.558
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-lamp-floor",
+   "nom": "Lampadaire d'intérieur",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "lamp-floor",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 504,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.432,
+    "hauteur": 1.51,
+    "profondeur": 0.432
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bed-double",
+   "nom": "Lit double",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bed-double",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1188,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.51,
+    "hauteur": 0.95,
+    "profondeur": 2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-bed-single",
+   "nom": "Lit simple",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "bed-single",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1064,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.01,
+    "hauteur": 0.95,
+    "profondeur": 2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-stove",
+   "nom": "Réchaud",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "stove",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 1264,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.84,
+    "hauteur": 2.2,
+    "profondeur": 0.678
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-table-farm",
+   "nom": "Table de ferme",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "table-farm",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 616,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.4,
+    "hauteur": 0.75,
+    "profondeur": 0.8
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-table-round",
+   "nom": "Table ronde",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "table-round",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 532,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.9,
+    "hauteur": 0.75,
+    "profondeur": 0.9
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-stool",
+   "nom": "Tabouret",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "stool",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 320,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.34,
+    "hauteur": 0.449,
+    "profondeur": 0.341
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "decors-rug-oval",
+   "nom": "Tapis ovale",
+   "famille": "meubles",
+   "lot": "decors",
+   "fichier": "decors/furniture.glb",
+   "noeud": "rug-oval",
+   "pieces": [],
+   "textures": null,
+   "poids": 434552,
+   "triangles": 184,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.6,
+    "hauteur": 0.016,
+    "profondeur": 1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/furniture.glb",
+   "partage": 19
+  },
+  {
+   "id": "objets-ablette",
+   "nom": "Ablette",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "ablette",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 472,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.017,
+    "hauteur": 0.049,
+    "profondeur": 0.14
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-appareil-photo",
+   "nom": "Appareil photo",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/provision.glb",
+   "noeud": "appareil-photo",
+   "pieces": [],
+   "textures": null,
+   "poids": 66736,
+   "triangles": 348,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.13,
+    "hauteur": 0.095,
+    "profondeur": 0.095
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/provision.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-arrosoir",
+   "nom": "Arrosoir",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "arrosoir",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 374,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.188,
+    "hauteur": 0.336,
+    "profondeur": 0.42
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-arrosoir-cuivre",
+   "nom": "Arrosoir de cuivre",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "arrosoir-cuivre",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 662,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.212,
+    "hauteur": 0.361,
+    "profondeur": 0.45
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-baguette",
+   "nom": "Baguette",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/pain.glb",
+   "noeud": "baguette",
+   "pieces": [],
+   "textures": null,
+   "poids": 61544,
+   "triangles": 312,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.066,
+    "hauteur": 0.06,
+    "profondeur": 0.6
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/pain.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-beche",
+   "nom": "Bêche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "beche",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 392,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.127,
+    "hauteur": 1,
+    "profondeur": 0.033
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-beche-forgee",
+   "nom": "Bêche forgée",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "beche-forgee",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 456,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.133,
+    "hauteur": 1.05,
+    "profondeur": 0.034
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-besace",
+   "nom": "Besace",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/sac.glb",
+   "noeud": "besace",
+   "pieces": [],
+   "textures": null,
+   "poids": 76700,
+   "triangles": 432,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.272,
+    "hauteur": 0.32,
+    "profondeur": 0.109
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/sac.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-brioche",
+   "nom": "Brioche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/pain.glb",
+   "noeud": "brioche",
+   "pieces": [],
+   "textures": null,
+   "poids": 61544,
+   "triangles": 272,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.12,
+    "hauteur": 0.095,
+    "profondeur": 0.12
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/pain.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-brochet",
+   "nom": "Brochet",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "brochet",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 592,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.066,
+    "hauteur": 0.13,
+    "profondeur": 0.65
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-buche",
+   "nom": "Bûche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bois.glb",
+   "noeud": "buche",
+   "pieces": [],
+   "textures": null,
+   "poids": 20784,
+   "triangles": 244,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.129,
+    "hauteur": 0.133,
+    "profondeur": 0.4
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bois.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-canne",
+   "nom": "Canne à pêche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "canne",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 272,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.082,
+    "hauteur": 1.5,
+    "profondeur": 0.056
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-canne-fine",
+   "nom": "Canne fine",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "canne-fine",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 416,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.089,
+    "hauteur": 1.55,
+    "profondeur": 0.058
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-carotte",
+   "nom": "Carotte",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "carotte",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 480,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.041,
+    "hauteur": 0.2,
+    "profondeur": 0.041
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-carpe",
+   "nom": "Carpe",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "carpe",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 472,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.073,
+    "hauteur": 0.17,
+    "profondeur": 0.45
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-cerises",
+   "nom": "Cerises",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "cerises",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 420,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.057,
+    "hauteur": 0.07,
+    "profondeur": 0.047
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-chou",
+   "nom": "Chou",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "chou",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 696,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.2,
+    "hauteur": 0.16,
+    "profondeur": 0.2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-cle",
+   "nom": "Clé",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/cle.glb",
+   "noeud": "cle",
+   "pieces": [],
+   "textures": null,
+   "poids": 28436,
+   "triangles": 320,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.09,
+    "hauteur": 0.014,
+    "profondeur": 0.036
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/cle.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-cle-rouillee",
+   "nom": "Clé rouillée",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/cle.glb",
+   "noeud": "cle-rouillee",
+   "pieces": [],
+   "textures": null,
+   "poids": 28436,
+   "triangles": 320,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.1,
+    "hauteur": 0.016,
+    "profondeur": 0.04
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/cle.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-colis",
+   "nom": "Colis",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/courrier.glb",
+   "noeud": "colis",
+   "pieces": [],
+   "textures": null,
+   "poids": 27836,
+   "triangles": 320,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.3,
+    "hauteur": 0.15,
+    "profondeur": 0.226
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/courrier.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-confiture",
+   "nom": "Confiture",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bocal.glb",
+   "noeud": "confiture",
+   "pieces": [],
+   "textures": null,
+   "poids": 45816,
+   "triangles": 460,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.092,
+    "hauteur": 0.11,
+    "profondeur": 0.084
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bocal.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-confiture-meshy",
+   "nom": "Confiture (essai Meshy)",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/essai-meshy.glb",
+   "noeud": "confiture-meshy",
+   "pieces": [],
+   "textures": null,
+   "poids": 239720,
+   "triangles": 733,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.084,
+    "hauteur": 0.11,
+    "profondeur": 0.084
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-coquelicot",
+   "nom": "Coquelicot",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fleur.glb",
+   "noeud": "coquelicot",
+   "pieces": [],
+   "textures": null,
+   "poids": 90900,
+   "triangles": 564,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.107,
+    "hauteur": 0.3,
+    "profondeur": 0.063
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fleur.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-fossile-coquille",
+   "nom": "Coquille fossile",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/caillou.glb",
+   "noeud": "fossile-coquille",
+   "pieces": [],
+   "textures": null,
+   "poids": 121416,
+   "triangles": 728,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.1,
+    "hauteur": 0.055,
+    "profondeur": 0.079
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/caillou.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-croissant",
+   "nom": "Croissant",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/pain.glb",
+   "noeud": "croissant",
+   "pieces": [],
+   "textures": null,
+   "poids": 61544,
+   "triangles": 220,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.14,
+    "hauteur": 0.054,
+    "profondeur": 0.088
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/pain.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-farine",
+   "nom": "Farine",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/provision.glb",
+   "noeud": "farine",
+   "pieces": [],
+   "textures": null,
+   "poids": 66736,
+   "triangles": 480,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.155,
+    "hauteur": 0.2,
+    "profondeur": 0.137
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/provision.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-filet",
+   "nom": "Filet à insectes",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "filet",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 388,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.241,
+    "hauteur": 0.9,
+    "profondeur": 0.163
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-filet-forge",
+   "nom": "Filet forgé",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "filet-forge",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 532,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.254,
+    "hauteur": 0.95,
+    "profondeur": 0.177
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-fossile-d-essai",
+   "nom": "Fossile d'essai",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/caillou.glb",
+   "noeud": "fossile-d-essai",
+   "pieces": [],
+   "textures": null,
+   "poids": 121416,
+   "triangles": 728,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.09,
+    "hauteur": 0.05,
+    "profondeur": 0.071
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/caillou.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-framboises",
+   "nom": "Framboises",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "framboises",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 456,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.045,
+    "hauteur": 0.033,
+    "profondeur": 0.041
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-gardon",
+   "nom": "Gardon",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "gardon",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 472,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.027,
+    "hauteur": 0.077,
+    "profondeur": 0.22
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-goujon",
+   "nom": "Goujon",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "goujon",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 592,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.015,
+    "hauteur": 0.031,
+    "profondeur": 0.12
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-graines-carotte",
+   "nom": "Graines de carotte",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/graine.glb",
+   "noeud": "graines-carotte",
+   "pieces": [],
+   "textures": null,
+   "poids": 69864,
+   "triangles": 336,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.088,
+    "hauteur": 0.12,
+    "profondeur": 0.023
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/graine.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-graines-fleurs",
+   "nom": "Graines de fleurs",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/graine.glb",
+   "noeud": "graines-fleurs",
+   "pieces": [],
+   "textures": null,
+   "poids": 69864,
+   "triangles": 456,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.088,
+    "hauteur": 0.12,
+    "profondeur": 0.022
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/graine.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-graines-radis",
+   "nom": "Graines de radis",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/graine.glb",
+   "noeud": "graines-radis",
+   "pieces": [],
+   "textures": null,
+   "poids": 69864,
+   "triangles": 412,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.088,
+    "hauteur": 0.12,
+    "profondeur": 0.022
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/graine.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-graines-tomate",
+   "nom": "Graines de tomate",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/graine.glb",
+   "noeud": "graines-tomate",
+   "pieces": [],
+   "textures": null,
+   "poids": 69864,
+   "triangles": 412,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.088,
+    "hauteur": 0.12,
+    "profondeur": 0.022
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/graine.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-hache",
+   "nom": "Hache",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "hache",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 260,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.049,
+    "hauteur": 0.7,
+    "profondeur": 0.174
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-hache-meshy",
+   "nom": "Hache (essai Meshy)",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/essai-meshy.glb",
+   "noeud": "hache-meshy",
+   "pieces": [],
+   "textures": null,
+   "poids": 239720,
+   "triangles": 779,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.191,
+    "hauteur": 0.7,
+    "profondeur": 0.039
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-hache-forgee",
+   "nom": "Hache forgée",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "hache-forgee",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 404,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.052,
+    "hauteur": 0.75,
+    "profondeur": 0.187
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-jus-de-pomme",
+   "nom": "Jus de pomme",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bouteille.glb",
+   "noeud": "jus-de-pomme",
+   "pieces": [],
+   "textures": null,
+   "poids": 39972,
+   "triangles": 316,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.087,
+    "hauteur": 0.28,
+    "profondeur": 0.09
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bouteille.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-lait",
+   "nom": "Lait",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bouteille.glb",
+   "noeud": "lait",
+   "pieces": [],
+   "textures": null,
+   "poids": 39972,
+   "triangles": 316,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.081,
+    "hauteur": 0.26,
+    "profondeur": 0.083
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bouteille.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-lettre",
+   "nom": "Lettre",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/courrier.glb",
+   "noeud": "lettre",
+   "pieces": [],
+   "textures": null,
+   "poids": 27836,
+   "triangles": 232,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.18,
+    "hauteur": 0.013,
+    "profondeur": 0.12
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/courrier.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-livre-de-cuisine",
+   "nom": "Livre de cuisine",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/provision.glb",
+   "noeud": "livre-de-cuisine",
+   "pieces": [],
+   "textures": null,
+   "poids": 66736,
+   "triangles": 280,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.159,
+    "hauteur": 0.037,
+    "profondeur": 0.2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/provision.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-marguerite",
+   "nom": "Marguerite",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fleur.glb",
+   "noeud": "marguerite",
+   "pieces": [],
+   "textures": null,
+   "poids": 90900,
+   "triangles": 548,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.109,
+    "hauteur": 0.28,
+    "profondeur": 0.069
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fleur.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-miel",
+   "nom": "Miel",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bocal.glb",
+   "noeud": "miel",
+   "pieces": [],
+   "textures": null,
+   "poids": 45816,
+   "triangles": 460,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.09,
+    "hauteur": 0.079,
+    "profondeur": 0.082
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bocal.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-minerai-de-cuivre",
+   "nom": "Minerai de cuivre",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/caillou.glb",
+   "noeud": "minerai-de-cuivre",
+   "pieces": [],
+   "textures": null,
+   "poids": 121416,
+   "triangles": 468,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.12,
+    "hauteur": 0.082,
+    "profondeur": 0.088
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/caillou.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-minerai-de-fer",
+   "nom": "Minerai de fer",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/caillou.glb",
+   "noeud": "minerai-de-fer",
+   "pieces": [],
+   "textures": null,
+   "poids": 121416,
+   "triangles": 468,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.12,
+    "hauteur": 0.082,
+    "profondeur": 0.088
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/caillou.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-boeuf",
+   "nom": "Morceau de bœuf",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/provision.glb",
+   "noeud": "boeuf",
+   "pieces": [],
+   "textures": null,
+   "poids": 66736,
+   "triangles": 356,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.15,
+    "hauteur": 0.079,
+    "profondeur": 0.122
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/provision.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-mures",
+   "nom": "Mûres",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "mures",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 456,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.05,
+    "hauteur": 0.036,
+    "profondeur": 0.046
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-navet",
+   "nom": "Navet",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "navet",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 500,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.063,
+    "hauteur": 0.15,
+    "profondeur": 0.062
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-noisettes",
+   "nom": "Noisettes",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "noisettes",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 300,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.04,
+    "hauteur": 0.022,
+    "profondeur": 0.033
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-oeuf",
+   "nom": "Œuf",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "oeuf",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 240,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.047,
+    "hauteur": 0.055,
+    "profondeur": 0.047
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-oeuf-au-plat",
+   "nom": "Œuf au plat",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "oeuf-au-plat",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 444,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 0.03,
+    "profondeur": 0.24
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-oignon",
+   "nom": "Oignon",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "oignon",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 268,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.078,
+    "hauteur": 0.09,
+    "profondeur": 0.077
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-omelette",
+   "nom": "Omelette aux herbes",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "omelette",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 636,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.22,
+    "hauteur": 0.035,
+    "profondeur": 0.22
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-pain",
+   "nom": "Pain",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/pain.glb",
+   "noeud": "pain",
+   "pieces": [],
+   "textures": null,
+   "poids": 61544,
+   "triangles": 504,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.22,
+    "hauteur": 0.104,
+    "profondeur": 0.2
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/pain.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-pain-meshy",
+   "nom": "Pain (essai Meshy)",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/essai-meshy.glb",
+   "noeud": "pain-meshy",
+   "pieces": [],
+   "textures": null,
+   "poids": 239720,
+   "triangles": 779,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.218,
+    "hauteur": 0.15,
+    "profondeur": 0.22
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-peche",
+   "nom": "Pêche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "peche",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 200,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.075,
+    "hauteur": 0.071,
+    "profondeur": 0.075
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-perche",
+   "nom": "Perche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "perche",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 472,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.034,
+    "hauteur": 0.094,
+    "profondeur": 0.25
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-piece-d-argent",
+   "nom": "Pièce d'argent",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/piece.glb",
+   "noeud": "piece-d-argent",
+   "pieces": [],
+   "textures": null,
+   "poids": 20112,
+   "triangles": 260,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.025,
+    "hauteur": 0.003,
+    "profondeur": 0.025
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/piece.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-pierre",
+   "nom": "Pierre",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/caillou.glb",
+   "noeud": "pierre",
+   "pieces": [],
+   "textures": null,
+   "poids": 121416,
+   "triangles": 324,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.12,
+    "hauteur": 0.077,
+    "profondeur": 0.087
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/caillou.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-pioche",
+   "nom": "Pioche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "pioche",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 292,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.587,
+    "hauteur": 0.8,
+    "profondeur": 0.074
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-pioche-forgee",
+   "nom": "Pioche forgée",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "pioche-forgee",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 436,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.624,
+    "hauteur": 0.85,
+    "profondeur": 0.079
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-planche",
+   "nom": "Planche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bois.glb",
+   "noeud": "planche",
+   "pieces": [],
+   "textures": null,
+   "poids": 20784,
+   "triangles": 280,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.9,
+    "hauteur": 0.025,
+    "profondeur": 0.16
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bois.glb",
+   "partage": 2
+  },
+  {
+   "id": "objets-poire",
+   "nom": "Poire",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "poire",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 300,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.073,
+    "hauteur": 0.11,
+    "profondeur": 0.073
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-poireau",
+   "nom": "Poireau",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "poireau",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 348,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.195,
+    "hauteur": 0.45,
+    "profondeur": 0.237
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-poisson-grille",
+   "nom": "Poisson grillé",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "poisson-grille",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 752,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.26,
+    "hauteur": 0.041,
+    "profondeur": 0.26
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-pomme",
+   "nom": "Pomme",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "pomme",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 300,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.085,
+    "hauteur": 0.078,
+    "profondeur": 0.085
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-pomme-cuite",
+   "nom": "Pomme cuite",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "pomme-cuite",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 532,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 0.091,
+    "profondeur": 0.24
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-pomme-de-terre",
+   "nom": "Pomme de terre",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "pomme-de-terre",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 324,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.08,
+    "hauteur": 0.046,
+    "profondeur": 0.052
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-pomme-verte",
+   "nom": "Pomme verte",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "pomme-verte",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 300,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.08,
+    "hauteur": 0.074,
+    "profondeur": 0.08
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-pommes-sautees",
+   "nom": "Pommes sautées",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "pommes-sautees",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 492,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 0.042,
+    "profondeur": 0.24
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-pot-au-feu",
+   "nom": "Pot-au-feu du dimanche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "pot-au-feu",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 652,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.17,
+    "hauteur": 0.087,
+    "profondeur": 0.17
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-potiron",
+   "nom": "Potiron",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "potiron",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 324,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.3,
+    "hauteur": 0.18,
+    "profondeur": 0.3
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-prune",
+   "nom": "Prune",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fruit.glb",
+   "noeud": "prune",
+   "pieces": [],
+   "textures": null,
+   "poids": 145748,
+   "triangles": 232,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.035,
+    "hauteur": 0.05,
+    "profondeur": 0.03
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fruit.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-radis",
+   "nom": "Radis",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "radis",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 500,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.046,
+    "hauteur": 0.11,
+    "profondeur": 0.045
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-radis-croquant",
+   "nom": "Radis croquant",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "radis-croquant",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 500,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.055,
+    "hauteur": 0.13,
+    "profondeur": 0.054
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-ragout",
+   "nom": "Ragoût",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "ragout",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 652,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.16,
+    "hauteur": 0.082,
+    "profondeur": 0.16
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-sac-a-dos",
+   "nom": "Sac à dos",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/sac.glb",
+   "noeud": "sac-a-dos",
+   "pieces": [],
+   "textures": null,
+   "poids": 76700,
+   "triangles": 612,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.342,
+    "hauteur": 0.5,
+    "profondeur": 0.295
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/sac.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-sacoche",
+   "nom": "Sacoche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/sac.glb",
+   "noeud": "sacoche",
+   "pieces": [],
+   "textures": null,
+   "poids": 76700,
+   "triangles": 672,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.4,
+    "hauteur": 0.395,
+    "profondeur": 0.14
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/sac.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-salade",
+   "nom": "Salade",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "salade",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 728,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.17,
+    "hauteur": 0.094,
+    "profondeur": 0.17
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-serpe",
+   "nom": "Serpe",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/outil.glb",
+   "noeud": "serpe",
+   "pieces": [],
+   "textures": null,
+   "poids": 244500,
+   "triangles": 288,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.082,
+    "hauteur": 0.4,
+    "profondeur": 0.035
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/outil.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-sirop",
+   "nom": "Sirop",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/bouteille.glb",
+   "noeud": "sirop",
+   "pieces": [],
+   "textures": null,
+   "poids": 39972,
+   "triangles": 316,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.071,
+    "hauteur": 0.18,
+    "profondeur": 0.074
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/bouteille.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-soupe-aux-herbes",
+   "nom": "Soupe aux herbes",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "soupe-aux-herbes",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 760,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.15,
+    "hauteur": 0.074,
+    "profondeur": 0.15
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-soupe-de-legumes",
+   "nom": "Soupe de légumes",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "soupe-de-legumes",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 760,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.15,
+    "hauteur": 0.074,
+    "profondeur": 0.15
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-tanche",
+   "nom": "Tanche",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "tanche",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 472,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.056,
+    "hauteur": 0.132,
+    "profondeur": 0.35
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-tarte-aux-pommes",
+   "nom": "Tarte aux pommes",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "tarte-aux-pommes",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 720,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 0.038,
+    "profondeur": 0.24
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-tarte-doree",
+   "nom": "Tarte bien dorée",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "tarte-doree",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 720,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 0.038,
+    "profondeur": 0.24
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-tartine",
+   "nom": "Tartine grillée",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/pain.glb",
+   "noeud": "tartine",
+   "pieces": [],
+   "textures": null,
+   "poids": 61544,
+   "triangles": 232,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.16,
+    "hauteur": 0.022,
+    "profondeur": 0.1
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/pain.glb",
+   "partage": 5
+  },
+  {
+   "id": "objets-tomate",
+   "nom": "Tomate",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/legume.glb",
+   "noeud": "tomate",
+   "pieces": [],
+   "textures": null,
+   "poids": 211224,
+   "triangles": 524,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.075,
+    "hauteur": 0.062,
+    "profondeur": 0.075
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/legume.glb",
+   "partage": 10
+  },
+  {
+   "id": "objets-tournesol",
+   "nom": "Tournesol",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/fleur.glb",
+   "noeud": "tournesol",
+   "pieces": [],
+   "textures": null,
+   "poids": 90900,
+   "triangles": 656,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.171,
+    "hauteur": 0.5,
+    "profondeur": 0.06
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/fleur.glb",
+   "partage": 3
+  },
+  {
+   "id": "objets-tourte-du-quai",
+   "nom": "Tourte du quai",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/plat.glb",
+   "noeud": "tourte-du-quai",
+   "pieces": [],
+   "textures": null,
+   "poids": 379464,
+   "triangles": 672,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.24,
+    "hauteur": 0.064,
+    "profondeur": 0.231
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/plat.glb",
+   "partage": 13
+  },
+  {
+   "id": "objets-truite-meshy",
+   "nom": "Truite (essai Meshy)",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/essai-meshy.glb",
+   "noeud": "truite-meshy",
+   "pieces": [],
+   "textures": null,
+   "poids": 239720,
+   "triangles": 794,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.099,
+    "hauteur": 0.079,
+    "profondeur": 0.32
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/essai-meshy.glb",
+   "partage": 4
+  },
+  {
+   "id": "objets-truite",
+   "nom": "Truite fario",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/poisson.glb",
+   "noeud": "truite",
+   "pieces": [],
+   "textures": null,
+   "poids": 216380,
+   "triangles": 592,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.038,
+    "hauteur": 0.084,
+    "profondeur": 0.32
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/poisson.glb",
+   "partage": 8
+  },
+  {
+   "id": "objets-vieille-piece",
+   "nom": "Vieille pièce",
+   "famille": "objets",
+   "lot": "objets",
+   "fichier": "objets/piece.glb",
+   "noeud": "vieille-piece",
+   "pieces": [],
+   "textures": null,
+   "poids": 20112,
+   "triangles": 260,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.03,
+    "hauteur": 0.004,
+    "profondeur": 0.03
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/objets/piece.glb",
+   "partage": 2
+  },
+  {
+   "id": "decors-tree-round",
+   "nom": "Arbre rond",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "tree-round",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 1272,
+   "clips": [],
+   "cotes": {
+    "largeur": 4.764,
+    "hauteur": 5.315,
+    "profondeur": 4.46
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-fence",
+   "nom": "Barrière",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "fence",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 464,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.02,
+    "hauteur": 1.116,
+    "profondeur": 0.155
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-mailbox",
+   "nom": "Boîte aux lettres",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "mailbox",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 468,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.32,
+    "hauteur": 1.37,
+    "profondeur": 0.435
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-shop-front",
+   "nom": "Boutique",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/houses.glb",
+   "noeud": "shop-front",
+   "pieces": [],
+   "textures": null,
+   "poids": 465996,
+   "triangles": 7860,
+   "clips": [],
+   "cotes": {
+    "largeur": 8.8,
+    "hauteur": 8.901,
+    "profondeur": 11.35
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-bush-flowering",
+   "nom": "Buisson fleuri",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "bush-flowering",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 1120,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.134,
+    "hauteur": 0.765,
+    "profondeur": 0.967
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-bush-round",
+   "nom": "Buisson rond",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "bush-round",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 672,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.386,
+    "hauteur": 0.935,
+    "profondeur": 1.182
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-crate",
+   "nom": "Caisse",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "crate",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 684,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.6,
+    "hauteur": 0.6,
+    "profondeur": 0.61
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-flowers-poppy",
+   "nom": "Coquelicots",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "flowers-poppy",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 772,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.387,
+    "hauteur": 0.461,
+    "profondeur": 0.324
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-house-town",
+   "nom": "Maison de bourg",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/houses.glb",
+   "noeud": "house-town",
+   "pieces": [],
+   "textures": null,
+   "poids": 465996,
+   "triangles": 7004,
+   "clips": [],
+   "cotes": {
+    "largeur": 7.52,
+    "hauteur": 8.617,
+    "profondeur": 6.99
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-signpost",
+   "nom": "Panneau indicateur",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "signpost",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 624,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.62,
+    "hauteur": 2.236,
+    "profondeur": 0.49
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-tree-apple",
+   "nom": "Pommier",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "tree-apple",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 1672,
+   "clips": [],
+   "cotes": {
+    "largeur": 3.219,
+    "hauteur": 3.875,
+    "profondeur": 3.013
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-water-pump",
+   "nom": "Pompe à eau",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "water-pump",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 908,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.8,
+    "hauteur": 1.35,
+    "profondeur": 0.947
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-platform-sign",
+   "nom": "Poteau du quai",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "platform-sign",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 504,
+   "clips": [],
+   "cotes": {
+    "largeur": 1.1,
+    "hauteur": 2.77,
+    "profondeur": 0.221
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-well",
+   "nom": "Puits",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "well",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 1108,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.104,
+    "hauteur": 2.612,
+    "profondeur": 1.8
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-shed",
+   "nom": "Remise",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/houses.glb",
+   "noeud": "shed",
+   "pieces": [],
+   "textures": null,
+   "poids": 465996,
+   "triangles": 900,
+   "clips": [],
+   "cotes": {
+    "largeur": 6.64,
+    "hauteur": 4.452,
+    "profondeur": 5.55
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/houses.glb",
+   "partage": 3
+  },
+  {
+   "id": "decors-street-lamp",
+   "nom": "Réverbère",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "street-lamp",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 488,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.378,
+    "hauteur": 3.295,
+    "profondeur": 0.378
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-tree-fir",
+   "nom": "Sapin",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "tree-fir",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 1032,
+   "clips": [],
+   "cotes": {
+    "largeur": 2.73,
+    "hauteur": 6.192,
+    "profondeur": 2.8
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-stump",
+   "nom": "Souche",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "stump",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 504,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.869,
+    "hauteur": 0.4,
+    "profondeur": 0.869
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  },
+  {
+   "id": "decors-log-pile",
+   "nom": "Tas de bûches",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "log-pile",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 1368,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.91,
+    "hauteur": 0.57,
+    "profondeur": 0.87
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-barrel",
+   "nom": "Tonneau",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/street.glb",
+   "noeud": "barrel",
+   "pieces": [],
+   "textures": null,
+   "poids": 219244,
+   "triangles": 540,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.623,
+    "hauteur": 0.86,
+    "profondeur": 0.623
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/street.glb",
+   "partage": 10
+  },
+  {
+   "id": "decors-grass-tuft",
+   "nom": "Touffe d'herbe",
+   "famille": "decors",
+   "lot": "decors",
+   "fichier": "decors/plants.glb",
+   "noeud": "grass-tuft",
+   "pieces": [],
+   "textures": null,
+   "poids": 253956,
+   "triangles": 144,
+   "clips": [],
+   "cotes": {
+    "largeur": 0.228,
+    "hauteur": 0.345,
+    "profondeur": 0.262
+   },
+   "source": "games/la-petite-ligne-2/assets/commun/decors/plants.glb",
+   "partage": 8
+  }
+ ],
+ "ecartes": []
+}

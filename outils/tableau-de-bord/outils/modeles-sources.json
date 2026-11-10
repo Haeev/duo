@@ -1,0 +1,50 @@
+{
+  "budget": { "totalOctets": 41943040, "fichierOctets": 4194304, "fichiers": 150 },
+  "familles": [
+    { "id": "personnages", "titre": "Personnages" },
+    { "id": "meubles", "titre": "Meubles" },
+    { "id": "objets", "titre": "Objets" },
+    { "id": "decors", "titre": "Décors" }
+  ],
+  "fichesDeNoms": [
+    "games/la-petite-ligne-2/donnees/commun/objets",
+    "games/la-petite-ligne-2/donnees/commun/meubles"
+  ],
+  "lots": [
+    {
+      "id": "essai",
+      "titre": "Personnages encrés (essai de style 4)",
+      "mode": "essai-encre",
+      "famille": "personnages",
+      "dossier": "docs/jeux/jeu-1/refonte/essai-style-4",
+      "index": "atlas/index.json",
+      "traits": "atlas/traits.json"
+    },
+    {
+      "id": "figurine",
+      "titre": "Figurine du jeu, pièce par pièce",
+      "mode": "pieces",
+      "famille": "personnages",
+      "dossier": "games/la-petite-ligne-2/assets/commun/personnages",
+      "mannequin": [
+        { "fichier": "body.glb", "noeud": "body-base" },
+        { "fichier": "head.glb", "noeud": "head-round" }
+      ]
+    },
+    {
+      "id": "decors",
+      "titre": "Décors livrés",
+      "mode": "racines",
+      "famille": "decors",
+      "familleParFichier": { "furniture.glb": "meubles" },
+      "dossier": "games/la-petite-ligne-2/assets/commun/decors"
+    },
+    {
+      "id": "objets",
+      "titre": "Objets livrés",
+      "mode": "racines",
+      "famille": "objets",
+      "dossier": "games/la-petite-ligne-2/assets/commun/objets"
+    }
+  ]
+}
