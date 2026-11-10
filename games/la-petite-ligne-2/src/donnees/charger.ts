@@ -13,12 +13,7 @@ import { VillagerSchema, type VillagerDef } from './schemas/habitant';
 import { MapSchema, PlaceSchema, type MapDef, type PlaceDef } from './schemas/lieu';
 import { PropSchema, type PropDef } from './schemas/meuble';
 import { ItemSchema, type ItemDef } from './schemas/objets';
-import {
-  PieceSchema,
-  ShapesFileSchema,
-  type PieceDef,
-  type ShapesFile,
-} from './schemas/personnage';
+import { CatalogueSchema, type Catalogue, type PieceDef } from './schemas/personnage';
 import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';

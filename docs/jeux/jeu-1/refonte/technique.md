@@ -2,12 +2,33 @@
 
 | | |
 |---|---|
-| Version | 0.1 (2026-11-10) |
+| Version | 0.2 (2026-11-10) |
 | Auteur | architecte-technique |
-| Statut | proposition, à valider par le manager puis à formaliser par ADR (section 7) |
+| Statut | plan suivi; décisions formalisées par les ADR 0017 à 0021 (proposées) |
 | Sources | `reponses-client-2026-11-10.md` (fait foi), `references-de-ressenti.md` section 3 (exigences), `retours/2026-11-04/retours.md`, ADR 0005, 0007, 0009, 0010, 0013, 0016, `docs/production/meshy.md`, code de `games/la-petite-ligne` 0.13.0 |
 
 Les règles de ressenti de `references-de-ressenti.md` (section 3) sont prises ici comme exigences techniques. Elles sont citées « RR » suivies du sujet (RR Réponse, RR Caméra, RR Attente...).
+
+## Décisions prises depuis la version 0.1
+
+Le client a tranché le 2026-11-10 (fin de `reponses-client-2026-11-10.md`); là où le texte ci-dessous dit autre chose, ces lignes priment.
+
+| Sujet | Décision | Où |
+|---|---|---|
+| Paquet | nouveau paquet `games/la-petite-ligne-2`, identifiant `la-petite-ligne-2`, « La Petite Ligne (refonte) », 0.20.0; l'ancien reste publiable puis sera retiré | ADR 0017; remplace la proposition `petite-ligne` de 2.3 |
+| Contenu | un fichier par contenu, gabarits, briques de comportement: ajouter une chaise ne touche pas au moteur | ADR 0017; complète 3.1 et 3.3 |
+| Lieux | un seul lieu actif; Aubrune repart de la carte actuelle, retouchée | ADR 0018 |
+| Réseau | état en tranches; budgets relevés à 32 Kio pour `progress` et `place` après mesure | ADR 0019; remplace les budgets de 3.7 |
+| Ressenti | prédiction du geste chez l'invité, mini-jeux locaux, gestes de 1,5 s au plus | ADR 0020 |
+| Squelette | **24 os** (`duo-24`), et non les 18 os recommandés en 3.4: la chaîne des pièces retenue par le client est bâtie dessus; les clips de la 0.13 utiles sont à reporter | ADR 0021; remplace 3.4 sur ce point |
+| Personnages | corps, visages, vêtements par scripts du studio; Meshy pour chapeaux, sacs, accessoires, coiffures élaborées | ADR 0021 |
+| Caméra | orthographique conservée; comparaison en images au jalon 1 | section 3.5 inchangée |
+| Temps | jour de 6 h à 20 h 30, nuit jusqu'à 6 h, 125 s par heure de jeu; deux au lit pour passer au lendemain | cahier 4.3; remplace les heures de 3.6 |
+| Monnaie | l'euro, en entiers | `donnees/README.md` du paquet |
+| Images par seconde | plancher de 30 sur le PC | section 3.10 inchangée |
+| Sauvegardes | parties d'essai remises à zéro à chaque étape jusqu'à l'Alpha | ADR 0017 |
+
+Le lot L0 est posé: `games/la-petite-ligne-2/README.md` dit ce que le socle contient et qui possède quoi.
 
 ## En bref
 
@@ -539,3 +560,4 @@ Mesure du 2026-11-10 sur l'ancien jeu (`vitest run` dans `games/la-petite-ligne`
 | Version | Date | Changement |
 |---|---|---|
 | 0.1 | 2026-11-10 | Première version: audit, recommandation, architecture cible, jalons, tests, ADR et questions. |
+| 0.2 | 2026-11-10 | Décisions du client reportées en tête (nouveau paquet, gabarits et briques, squelette de 24 os, euro, horaires); renvoi aux ADR 0017 à 0021; socle du lot L0 posé. |

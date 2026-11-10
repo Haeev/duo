@@ -109,3 +109,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Classer un gros module pour un audit: table fichier vers sort dans un script Python jetable qui additionne les lignes et signale les fichiers oubliés ou comptés deux fois.
 - Le scratchpad est partagé entre sessions (des centaines de fichiers): y travailler dans un sous-dossier à soi.
 - Pendant une mission de cadrage, d'autres membres écrivent des essais voisins (`docs/production/essais-meshy/personnage-modulaire/` prenait le squelette de Meshy à 24 os): relire `git status` avant de rendre et signaler toute divergence au lieu de la trancher seul.
+
+## Socle de la refonte de La Petite Ligne (vérifié le 2026-11-10)
+
+- Prettier ajoute des virgules finales aux fichiers `.jsonc` et replie les lignes longues des `.ts`: relancer les tests après `prettier --write`, et ne plus retoucher un fichier mis en forme par remplacement de chaînes exactes (passer par l'outil Edit ou une expression régulière souple).
+- Valibot 1.5: un tableau de schémas `as const` étalé dans `v.variant` donne l'union attendue, tableau vide compris; `schema.entries.<champ>.literal` rend la valeur d'un `v.literal`; un schéma récursif s'écrit `v.lazy` avec un type déclaré à la main (`v.GenericSchema<T>`).
+- `DeepReadonly` qui teste `T extends (infer U)[]` transforme les tuples en tableaux (accès `[1]` possiblement `undefined`): tester `readonly unknown[]` et mapper sur `keyof T` garde les tuples.
+- Le manifeste borne `label` d'une action à 40 caractères et `saves.help` à 120: `parseManifest` le dit, le tester avant de lancer le faux hôte.
+- Un script d'outil en TypeScript lancé par `node fichier.ts` (types effacés) peut être importé par un test Vitest; le garde `fileURLToPath(import.meta.url) === process.argv[1]` sépare l'usage en ligne de commande.
+- Le manager committe en cours de mission (`wip`) et d'autres membres lisent aussitôt les contrats: un schéma changé après coup casse leur livrable (catalogue des personnages). Figer tôt les contrats lus par d'autres, ou prévenir.
+- Un heredoc qui contient du JavaScript avec des accolades peut être refusé par le garde des suppressions: écrire le script par l'outil Write.

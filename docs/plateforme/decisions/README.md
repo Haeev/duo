@@ -29,6 +29,11 @@ Chaque décision structurante de la plateforme a son ADR: contexte, au moins deu
 | 0014 | Moteur 2D par défaut (PixiJS ou Phaser 4) | différée au premier jeu 2D | architecte-technique (avec dev-gameplay-2d) | non rédigé |
 | 0015 | Journal et rapport de diagnostic (F14) | acceptée | architecte-technique (avec dev-plateforme) | [0015-journal-rapport-diagnostic.md](0015-journal-rapport-diagnostic.md) |
 | 0016 | Intérieurs sur la carte et carte élargie (La Petite Ligne, tour 10) | acceptée | architecte-technique (avec dev-gameplay-3d, dev-reseau, level-designer, tech-artist) | [0016-interieurs-et-carte-elargie-petite-ligne.md](0016-interieurs-et-carte-elargie-petite-ligne.md) |
+| 0017 | Refonte de La Petite Ligne dans un nouveau paquet, contenu par gabarits | proposée | architecte-technique (avec ingenieur-build, dev-gameplay-3d, game-designer, level-designer, qa-testeur) | [0017-refonte-petite-ligne-nouveau-paquet.md](0017-refonte-petite-ligne-nouveau-paquet.md) |
+| 0018 | Lieux de La Petite Ligne: un seul lieu actif | proposée | architecte-technique (avec dev-gameplay-3d, dev-reseau, level-designer, game-designer) | [0018-lieux-petite-ligne-un-seul-lieu-actif.md](0018-lieux-petite-ligne-un-seul-lieu-actif.md) |
+| 0019 | État en tranches sur le réseau (La Petite Ligne) | proposée | architecte-technique (avec dev-reseau, dev-gameplay-3d, qa-testeur) | [0019-etat-en-tranches-petite-ligne.md](0019-etat-en-tranches-petite-ligne.md) |
+| 0020 | Ressenti: prédiction du geste chez l'invité, mini-jeux locaux, gestes bornés | proposée | architecte-technique (avec dev-reseau, dev-gameplay-3d, ux-ui-designer, sound-designer, qa-testeur) | [0020-ressenti-prediction-du-geste-petite-ligne.md](0020-ressenti-prediction-du-geste-petite-ligne.md) |
+| 0021 | Personnages modulaires de La Petite Ligne, squelette commun de 24 os | proposée | architecte-technique (avec tech-artist, artiste-3d, dev-gameplay-3d, directeur-artistique, dev-reseau) | [0021-personnages-modulaires-squelette-commun.md](0021-personnages-modulaires-squelette-commun.md) |
 
 « Avec » désigne les membres qui doivent relire l'ADR; ils ne l'ont pas encore fait au 2026-10-30. Les ADR 0007 et 0008 étaient en cours de rédaction par dev-reseau à la date de cet index: leur ligne est à compléter (statut, lien) à leur intégration.
 
