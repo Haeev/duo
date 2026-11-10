@@ -98,9 +98,29 @@ describe('interface: modèles de vue', () => {
   it('bulle: verbe de la cible, raison du refus en texte court', () => {
     const world = createWorld(content, SEED, MEMBERS);
     const keys = { act: 'Espace', board: 'Entrée' };
-    const ok = promptModel(content, world, 0, { kind: 'villager', id: 'x', action: 'talk', verb: 'Parler', refusal: null, x: 0, y: 0 }, keys);
+    const ok = promptModel(
+      content,
+      world,
+      0,
+      { kind: 'villager', id: 'x', action: 'talk', verb: 'Parler', refusal: null, x: 0, y: 0 },
+      keys,
+    );
     expect(ok).toMatchObject({ kind: 'act', key: 'Espace', verb: 'Parler', refusal: null });
-    const no = promptModel(content, world, 0, { kind: 'ground', id: 'sol-1', action: 'pickup', verb: 'Ramasser', refusal: 'pockets-full', x: 0, y: 0 }, keys);
+    const no = promptModel(
+      content,
+      world,
+      0,
+      {
+        kind: 'ground',
+        id: 'sol-1',
+        action: 'pickup',
+        verb: 'Ramasser',
+        refusal: 'pockets-full',
+        x: 0,
+        y: 0,
+      },
+      keys,
+    );
     expect(no?.refusal).toBe('Poches pleines');
   });
 

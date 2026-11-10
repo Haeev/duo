@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "marteau",
+  "name": "Marteau",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "hammer",
+    "durability": 0,
+    "gestureSeconds": 1,
+    "bluntGestureSeconds": 1,
+    "work": {
+      "tier": 0,
+      "power": 6,
+      "bluntPower": 6,
+      "cells": 1,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": null
+    }
+  }
+}

@@ -74,7 +74,7 @@ describe('apparences', () => {
 });
 
 describe('assemblage', () => {
-  it('lit les sections du corps dans le sens du générateur (V retourné par glTF)', () => {
+  it('lit les sections du corps directement dans V (le générateur compense le retournement glTF)', () => {
     const body = content.catalogue.pieces.find((p) => p.slot === 'body');
     const mesh = body === undefined ? null : library.node(body.file, body.node);
     if (mesh === null) throw new Error('corps');
@@ -208,6 +208,24 @@ describe('couche des personnages', () => {
     // Deux maillages visibles par personnage (corps et tête), le gabarit nu caché.
     expect(meshes.length).toBe(2 * (2 + villagers));
     for (const id of Object.keys(place.villagers)) expect(layer.aimable(id)).not.toBeNull();
+    // La vie de l'habitant (`villagerView`): absent du lieu, il n'est pas dessiné.
+    const extra = place.villagers['figurant-essai'];
+    extra.life = {
+      presence: 'away',
+      entry: 0,
+      activity: null,
+      pose: 'stand',
+      gesture: null,
+      seat: null,
+      emote: null,
+      emoteUntil: 0,
+      gaze: null,
+    };
+    layer.update({ dt: 1 / 60, world, place, cameraYaw: 0 });
+    expect(root.getObjectByName('personnage-figurant-essai')?.visible).toBe(false);
+    delete extra.life;
+    layer.update({ dt: 1 / 60, world, place, cameraYaw: 0 });
+    expect(root.getObjectByName('personnage-figurant-essai')?.visible).toBe(true);
     // Assis sur le banc de la halte: le personnage monte sur l'assise, devant le meuble.
     const halte = content.places['essai-halte'];
     if (halte === undefined) throw new Error('halte');
@@ -226,7 +244,7 @@ describe('couche des personnages', () => {
     // Assise du modèle livré (manifeste des décors), sinon celle de la forme provisoire.
     const model = content.props.banc?.model ?? '';
     const height = s.byModel[model]?.height ?? s.standIn.height;
-    expect(figure?.position.y ?? 0).toBeCloseTo(Math.max(0, height - s.clipSeat), 1);
+    expect(figure?.position.y ?? 0).toBeCloseTo(Math.max(-s.maxSink, height - s.clipSeat), 2);
     expect(layer.stats().figures).toBe(2 + Object.keys(bench.villagers).length);
     layer.dispose();
     expect(layer.stats().figures).toBe(0);

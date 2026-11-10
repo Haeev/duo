@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "perche",
+  "category": "poissons",
+  "name": "Perche",
+  "place": "essai-gare",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "Une perche rayée, nageoire dressée."
+}

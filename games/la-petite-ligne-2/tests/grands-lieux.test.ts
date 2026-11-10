@@ -40,21 +40,24 @@ describe('plan vers lieu (Aubrune)', () => {
   const { map, report } = aubrune();
 
   it('produit une carte valide, fermée là où l’histoire la ferme', () => {
-    expect([map.width, map.height]).toEqual([320, 256]);
+    expect([map.width, map.height]).toEqual([384, 256]);
     expect(report.leaks).toEqual({});
     expect(report.unreachableNodes).toEqual([]);
     expect(report.firstActCut).toEqual([]);
-    // La vanne (impasse du plan) tombe sur l'eau: à reprendre dans le plan, signalé au level designer.
-    expect(report.blockedNodes).toEqual(['vn']);
+    expect(report.blockedNodes).toEqual([]);
     expect(Object.keys(map.locks ?? {})).toHaveLength(12);
-    expect(Object.keys(map.graph?.nodes ?? {})).toHaveLength(115);
-    expect(Object.keys(map.interests ?? {})).toHaveLength(66);
+    expect(Object.keys(map.graph?.nodes ?? {})).toHaveLength(117);
+    expect(Object.keys(map.interests ?? {})).toHaveLength(68);
     expect(Object.keys(map.buildings ?? {})).toHaveLength(28);
     expect(map.terrain && terrainProblem(map.terrain, map.width, map.height)).toBeNull();
   });
 
   it('se charge comme un lieu du jeu (contrôles de cohérence compris)', () => {
     const files = dataFiles();
+    // La carte brute de l'outil n'a pas encore les portes que les intérieurs livrés attendent
+    // (ajoutées par `assembler_lieu.py` du plan): on la charge seule ici; le lieu livré est chargé par `gameContent`.
+    for (const key of Object.keys(files))
+      if (key.startsWith('lieux/aubrune/interieurs/')) Reflect.deleteProperty(files, key);
     files['lieux/aubrune/carte.json'] = map;
     files['lieux/aubrune/lieu.json'] = {
       schema: 1,
@@ -70,7 +73,7 @@ describe('plan vers lieu (Aubrune)', () => {
   });
 
   it('se découpe en tuiles: 9 au plus autour d’un joueur, vue de 28 m comprise', () => {
-    expect(tileGrid(map)).toEqual({ cols: 10, rows: 8 });
+    expect(tileGrid(map)).toEqual({ cols: 12, rows: 8 });
     const quai = map.points.quai;
     expect(quai).toBeDefined();
     if (quai === undefined) return;

@@ -115,3 +115,17 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - Un dessin plat en `rotateY` complet disparaît de profil: le faire se balancer (-55° à 55°) et dire que le vrai modèle tournera.
 - Un `a` utilisé comme onglet garde son soulignement: `text-decoration: none`.
 - `typographier.py` de `games/la-petite-ligne/ui-maquettes/outils/` s'applique tel quel aux maquettes de la refonte (saute script et style).
+
+## Style encré de La Petite Ligne (2026-11-10)
+
+- Thème sous `data-lpl-style="encre"`: `games/la-petite-ligne-2/src/interface/encre/` (README), outils dans `assets-src/interface-encre/` (ESLint refuse les `.cjs` et `.mjs` sous `src/`; `assets-src/` est ignoré par ESLint et Prettier).
+- Cadre irrégulier sans couture: une image SVG sans dimensions propres, posée par `border-image: url() 0 fill / 0 / <débord> stretch`; tout y est en pixels comptés depuis les bords grâce à des `<svg x="100%" overflow="visible">` imbriqués et à `style="width:calc(100% - Npx)"` sur les `rect`. Le découpage en neuf d'un cadre dessiné (`round`) laisse des coutures claires et un tremblé qui se répète: abandonné.
+- Le fond d'un cadre `border-image` passe devant le `background` de l'élément: une trame ou une hachure intérieure se met dans l'image, pas en CSS.
+- `border-image` ne se dessine pas sans bordure: `border: ... solid transparent`.
+- Une image en `url(data:)` ne lit pas les variables CSS: couleurs recopiées dans le générateur.
+- Le trait des pictos du sprite ne se règle par variable que via `style="stroke-width:var(--x,2)"` dans le symbole (un attribut de présentation n'accepte pas `var()`, et une règle CSS n'atteint pas l'intérieur d'un `<use>`).
+- `.lpl-ui--menu::before` est un pseudo-élément de la couche: la règle de mouvement réduit `.lpl-ui[data-motion] *::before` ne l'atteint pas.
+- La garde de l'arbre isolé refuse aussi les heredocs (`cat <<EOF`, `python3 - <<EOF`): `python3 -c "..."` passe, ou écrire le script avec Write.
+- Pied du carnet (quêtes): il reste 11 px de marge à 1366x768 avant le passage à la ligne; mesurer avant d'élargir une touche ou un écart.
+- La démo qui joue des touches après l'ouverture d'un écran: 500 ms entre C et E au carnet, 900 ms avant la première touche à la boutique (sinon l'état capturé n'est pas le bon).
+

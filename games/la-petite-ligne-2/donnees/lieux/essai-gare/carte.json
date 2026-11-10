@@ -93,6 +93,27 @@
   },
   "objects": [
     {
+      "id": "etabli-de-gare",
+      "type": "etabli",
+      "x": 14.5,
+      "y": 16.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-d-essai",
+      "type": "enclume",
+      "x": 33.5,
+      "y": 25.5,
+      "rotation": 0
+    },
+    {
+      "id": "meule-d-essai",
+      "type": "meule",
+      "x": 35.5,
+      "y": 25.5,
+      "rotation": 0
+    },
+    {
       "id": "pommier",
       "type": "pommier",
       "x": 10.5,

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "brochet",
+  "category": "poissons",
+  "name": "Brochet",
+  "place": "essai-gare",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "Un brochet aux dents fines: il t’a bien fait lutter."
+}

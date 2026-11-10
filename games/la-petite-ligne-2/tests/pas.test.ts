@@ -82,10 +82,12 @@ describe('pas de simulation vide', () => {
       'quetes',
       'scenes',
       'cuisine',
+      'fabrication',
       'monde',
       'collections',
       'logement',
       'peche',
+      'elevage',
     ]);
   });
 });

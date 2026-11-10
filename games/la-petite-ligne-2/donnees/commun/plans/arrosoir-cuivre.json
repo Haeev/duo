@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "arrosoir-cuivre",
+  "name": "Arrosoir de cuivre",
+  "makes": {
+    "kind": "upgrade",
+    "from": "arrosoir"
+  },
+  "station": "forge",
+  "materials": [],
+  "work": 1,
+  "source": "villager",
+  "series": null
+}

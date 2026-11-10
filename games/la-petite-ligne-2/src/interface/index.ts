@@ -4,16 +4,19 @@
  * libellés selon le clavier réel (`keyLabel`, du SDK).
  */
 import type { PlayerIndex } from '../donnees/schemas/communs';
+import type { ReadonlyWorld } from '../etat/monde';
 import type { GameView } from '../session';
 import { talkView } from '../simulation/dialogues/conversation';
 import type { Intent } from '../simulation/noyau/entrees';
 import type { GameEvent } from '../simulation/noyau/evenements';
 import { formatEuros } from '../simulation/sac/argent';
 import { createShopScreen } from './boutique/ecran';
+import { createWorkshopScreen } from './atelier/ecran';
 import { shopRefusalText } from './boutique/textes';
 import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
 import { createKitchen } from './cuisine/index';
+import { createCoopScreen } from './basse-cour/ecran';
 import { createDecoMode, decoHousingFor } from './deco/deco';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import type { UiSettings } from './carnet/lectures';
@@ -22,13 +25,22 @@ import { EDITOR_SETTINGS } from './editeur/reglages';
 import { defaultPlayerLook } from '../rendu/personnages/apparence';
 import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
 import { createHud, type ProjectToScreen } from './hud';
-import { promptModel } from './modeles';
+import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
+import { passageSays } from '../simulation/lieux/index';
+import { hydrateThumbnails, type ObjectViewer } from '../rendu/objets/index';
+import { glanceTarget } from '../simulation/quetes/lecture';
+
 import './interface.css';
 import './carnet/carnet.css';
+import './encre/cadres.css';
+import './encre/encre.css';
+
+/** Refus d'un passage fermé: la phrase `says` du verrou ou de la porte remplace le texte générique. */
+const PASSAGE_REASONS: ReadonlySet<string> = new Set(['not-yet', 'door-locked', 'shop-closed']);
 
 export type { BabbleInfo } from './dialogue';
 export type { ProjectToScreen } from './hud';
@@ -59,11 +71,23 @@ export interface InterfaceOptions {
   readonly editorAtStart?: boolean;
   /** Écoute du clavier (`window` par défaut). */
   readonly keyTarget?: Pick<Window, 'addEventListener' | 'removeEventListener'>;
+  /**
+   * Son d'interface sans événement de la simulation (`cues` de `audio/donnees/evenements.json`):
+   * ouvrir et fermer le carnet, une marque de la cuisine, un plat posé.
+   */
+  readonly onCue?: (cue: string) => void;
+  /**
+   * Visionneuse des objets 3D (`rendu/objets`): les vignettes provisoires du sac, de la barre et
+   * de la boutique sont remplacées par l'image rendue du modèle. Absente: vignettes provisoires.
+   */
+  readonly objectViewer?: ObjectViewer;
 }
 
 export interface GameInterface {
   /** Une image: `dt` en secondes depuis la précédente. */
   frame(dt: number): void;
+  /** Avis en haut à droite (reprise de partie, partie enregistrée). */
+  notice(text: string): void;
   /**
    * Un écran de l'interface prend le clavier (dialogue, carnet, rangement): la boucle ne doit
    * alors envoyer ni déplacement ni touche d'action à la simulation.
@@ -83,6 +107,8 @@ const AZERTY: Readonly<Record<string, string>> = {
   KeyA: 'Q',
   KeyZ: 'W',
   ShiftLeft: 'Maj',
+  PageUp: 'Page préc.',
+  PageDown: 'Page suiv.',
 };
 
 export function azertyLabel(code: string): string {
@@ -102,6 +128,15 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   layer.className = 'lpl-ui';
   layer.innerHTML = spriteMarkup();
   root.append(layer);
+  // Vignettes 3D: chaque grille redessinée (sac, barre, boutique) est complétée dès qu'elle paraît.
+  const viewer = options.objectViewer;
+  const thumbs =
+    viewer === undefined || typeof MutationObserver === 'undefined'
+      ? null
+      : new MutationObserver(() => {
+          hydrateThumbnails(layer, viewer);
+        });
+  thumbs?.observe(layer, { childList: true, subtree: true });
 
   let now = 0;
   const hud = createHud(layer, view.content, keyLabel, options.projectToScreen);
@@ -114,15 +149,36 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     options.onBabble ?? (() => undefined),
     UI_TUNING.openGuardMs,
   );
-  const notebook = createNotebook(
+  const notebook = createNotebook(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, {
+    // Suite suivie: l'état partagé fait foi, « Suivre » part en intention (le coup d'œil la lit).
+    follow: {
+      get: () => {
+        const me = view.localIndex();
+        return me === null ? null : (view.world()?.common.story?.tracked[me] ?? null);
+      },
+      set: (quest) => {
+        send({ type: 'quest_track', quest });
+      },
+    },
+    // Onglet Tenues: « Changer de tenue » ouvre l'éditeur comme le miroir.
+    openEditor: () => {
+      const world = view.world();
+      const me = view.localIndex();
+      if (world === null || me === null) return;
+      notebook.close();
+      editor.open('mirror', world, me);
+    },
+    ...options.notebook,
+  });
+  const shop = createShopScreen(
     layer,
     view.content,
     send,
     keyLabel,
     UI_TUNING.openGuardMs,
-    options.notebook,
+    reduced,
   );
-  const shop = createShopScreen(
+  const workshop = createWorkshopScreen(
     layer,
     view.content,
     send,
@@ -167,16 +223,40 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     return view.world()?.players[player].name ?? '';
   }
 
+  /** Repère du coup d'œil: l'étape ouverte de la suite suivie, dans le lieu où l'on joue. */
+  function questMarker(
+    world: ReadonlyWorld,
+    me: PlayerIndex,
+  ): { x: number; y: number; label: string } | null {
+    const target = glanceTarget(world, view.content, me);
+    return target === null
+      ? null
+      : { x: target.target.x, y: target.target.y, label: target.objective };
+  }
+
+  /** Texte d'un refus; devant un verrou ou une porte fermée, la phrase des données d'abord. */
+  function refusalLine(reason: string, target: string | null): string {
+    const world = view.world();
+    if (target !== null && world !== null && PASSAGE_REASONS.has(reason)) {
+      const says = passageSays({ content: view.content, world }, target);
+      if (says !== null) return says;
+    }
+    return shopRefusalText(reason) ?? refusalText(reason);
+  }
+
   function onEvent(event: GameEvent): void {
     kitchen.onEvent(event);
+    coop.onEvent(event);
     const me = local();
     if (me === null) return;
     const other: PlayerIndex = me === 0 ? 1 : 0;
     shop.onEvent(event, me, now);
+    workshop.onEvent(event, me, now);
+    const shownInNotebook = notebook.onEvent(event, me);
     switch (event.type) {
       case 'refused':
-        if (event.player === me && !shop.isOpen())
-          hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
+        if (event.player === me && !shop.isOpen() && !workshop.isOpen() && !shownInNotebook)
+          hud.refusal(now, refusalLine(event.reason, event.target));
         break;
       case 'pockets_full':
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
@@ -306,11 +386,31 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'room_supplied':
       case 'deco_changed':
       case 'comfort_changed':
+      case 'shelter_opened':
+      case 'shelter_filled':
+      case 'shelter_collected':
+      case 'animal_petted':
+      case 'animal_arrived':
+      case 'workshop_opened':
+      case 'craft_started':
+      case 'craft_hit':
+      case 'craft_cancelled':
+      case 'crafted':
+      case 'plan_learned':
+      case 'tool_ordered':
+      case 'tool_mended':
+      case 'tool_sharpened':
         break;
     }
   }
   const keyTarget = options.keyTarget ?? window;
-  const kitchen = createKitchen(layer, view, send, keyLabel, keyTarget);
+  const kitchen = createKitchen(layer, view, send, keyLabel, keyTarget, {
+    onCue: (cue) => {
+      if (cue.type === 'mark') options.onCue?.('choix');
+      else if (cue.type === 'dish') options.onCue?.('poser');
+    },
+  });
+  const coop = createCoopScreen(layer, view, send, keyLabel, keyTarget, UI_TUNING.openGuardMs);
   const fishing = createFishingOverlay({
     ...{
       layer,
@@ -330,13 +430,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   });
 
   const onKey = (raw: Event): void => {
-    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen()) return;
+    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen() || coop.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (editor.isOpen()) used = editor.key(raw);
     else if (deco.isOpen()) used = deco.key(raw.code);
     else if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
     else if (shop.isOpen()) used = shop.key(raw.code, now);
+    else if (workshop.isOpen()) used = workshop.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (raw.code === 'KeyG' && !raw.repeat) {
       hud.glance(now);
@@ -353,12 +454,23 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   };
   keyTarget.addEventListener('keydown', onKey);
 
+  let notebookWasOpen = false;
   return {
+    notice(text) {
+      hud.notice(now, 'info', text);
+    },
     frame(dt) {
       const dtMs = Math.max(0, Math.min(250, dt * 1000));
       now += dtMs;
       layer.dataset.motion = reduced() ? 'reduced' : 'full';
-      layer.style.zoom = String(UI_SCALE_FACTOR[settingsUi().scale]);
+      layer.style.zoom = String(
+        fitScale(
+          UI_SCALE_FACTOR[settingsUi().scale],
+          notebook.isOpen(),
+          window.innerWidth,
+          window.innerHeight,
+        ),
+      );
       const world = view.world();
       const me = local();
       layer.hidden = world === null || me === null;
@@ -372,16 +484,22 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
+      if (notebook.isOpen() !== notebookWasOpen) {
+        notebookWasOpen = notebook.isOpen();
+        options.onCue?.(notebookWasOpen ? 'carnet-ouvre' : 'carnet-ferme');
+      }
       shop.frame(world, me, now);
+      workshop.frame(world, me, now);
       kitchen.frame(dtMs);
       deco.frame();
-      const shopOpen = shop.isOpen();
+      coop.frame(dtMs);
+      const shopOpen = shop.isOpen() || workshop.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       const prompt = menu
         ? null
         : promptModel(view.content, world, me, view.aim(me), {
             act: keyLabel('Space'),
-            board: keyLabel('Enter'),
+            board: keyLabel('Space'),
           });
       hud.frame({
         now,
@@ -391,6 +509,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         menu: notebook.isOpen() || shopOpen,
         yaw: options.cameraYaw(),
         needsAlways: settingsUi().needsAlways,
+        questTarget: questMarker(world, me),
       });
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
     },
@@ -400,12 +519,15 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         dialogue.isOpen() ||
         notebook.isOpen() ||
         shop.isOpen() ||
+        workshop.isOpen() ||
         kitchen.isOpen() ||
         deco.isOpen() ||
-        fishing.capturing()
+        fishing.capturing() ||
+        coop.isOpen()
       );
     },
     dispose() {
+      thumbs?.disconnect();
       offEvents();
       fishing.dispose();
       keyTarget.removeEventListener('keydown', onKey);
@@ -413,9 +535,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.dispose();
       notebook.dispose();
       shop.dispose();
+      workshop.dispose();
       editor.dispose();
       kitchen.dispose();
       deco.dispose();
+      coop.dispose();
       layer.remove();
     },
   };

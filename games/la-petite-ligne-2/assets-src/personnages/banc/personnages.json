@@ -1,0 +1,138 @@
+{
+  "mannequin": {
+    "nom": "Mannequin",
+    "shape": "adult-f-medium",
+    "skin": 2,
+    "pieces": [
+      ["head", "head-round", ["chatain"]],
+      ["hair", "hair-short", ["chatain"]],
+      ["top", "top-tee", ["perle"]],
+      ["bottom", "bottom-trousers", ["anthracite"]],
+      ["shoes", "shoes-pebble"]
+    ]
+  },
+  "personnages": [
+    {
+      "nom": "Chef de halte",
+      "shape": "elder-medium",
+      "skin": 1,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-round", ["gris"]],
+        ["hair", "hair-short", ["gris"]],
+        ["bottom", "bottom-trousers", ["anthracite"]],
+        ["shoes", "shoes-pebble", ["cuir_sombre"]]
+      ]
+    },
+    {
+      "nom": "Boulangère",
+      "shape": "adult-f-round",
+      "skin": 3,
+      "expression": "joy",
+      "pieces": [
+        ["head", "head-round", ["auburn"]],
+        ["hair", "hair-bun", ["roux"]],
+        ["top", "top-tee", ["craie"]]
+      ]
+    },
+    {
+      "nom": "Gamine du bourg",
+      "shape": "child-medium",
+      "skin": 5,
+      "expression": "joy",
+      "pieces": [
+        ["head", "head-round", ["chatain"]],
+        ["top", "top-tee", ["moutarde"]]
+      ]
+    },
+    {
+      "nom": "Factrice",
+      "shape": "adult-f-slim",
+      "skin": 7,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-round", ["noir", "dent"]],
+        ["bottom", "bottom-shorts", ["marine"]],
+        ["shoes", "shoes-pebble", ["cuir_sombre"]]
+      ]
+    },
+    {
+      "nom": "Grand-mère",
+      "shape": "elder-medium",
+      "skin": 0,
+      "expression": "neutral",
+      "pieces": [["head", "head-round", ["blanc"]]]
+    },
+    {
+      "nom": "Menuisier",
+      "shape": "adult-m-medium",
+      "skin": 4,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-square", ["brun"]],
+        ["hair", "hair-short", ["brun"]],
+        ["hat", "hat-beanie-pompom", ["rouille"]],
+        ["shoes", "shoes-boots", ["encre"]]
+      ]
+    },
+    {
+      "nom": "Joueuse",
+      "shape": "adult-f-medium",
+      "skin": 2,
+      "expression": "joy",
+      "pieces": [
+        ["head", "head-round", ["chatain"]],
+        ["hair", "hair-bob", ["framboise"]]
+      ]
+    },
+    {
+      "nom": "Joueur",
+      "shape": "adult-m-slim",
+      "skin": 6,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-round", ["noir", "dent"]],
+        ["top", "top-tee", ["craie"]],
+        ["bottom", "bottom-trousers", ["encre"]]
+      ]
+    },
+    {
+      "nom": "Curé",
+      "shape": "adult-m-round",
+      "skin": 1,
+      "expression": "neutral",
+      "pieces": [["head", "head-round", ["gris"]]]
+    },
+    {
+      "nom": "Mécanicienne",
+      "shape": "adult-f-medium",
+      "skin": 5,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-round", ["brun"]],
+        ["shoes", "shoes-boots", ["encre"]]
+      ]
+    },
+    {
+      "nom": "Épicière",
+      "shape": "adult-f-medium",
+      "skin": 3,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-square", ["chatain"]],
+        ["bottom", "bottom-skirt", ["marine"]],
+        ["shoes", "shoes-pebble", ["cuir"]]
+      ]
+    },
+    {
+      "nom": "Jardinier",
+      "shape": "adult-m-slim",
+      "skin": 2,
+      "expression": "neutral",
+      "pieces": [
+        ["head", "head-round", ["poivre_et_sel"]],
+        ["bottom", "bottom-trousers", ["chocolat"]]
+      ]
+    }
+  ]
+}

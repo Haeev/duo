@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "lanterne",
+  "name": "Lanterne",
+  "makes": {
+    "kind": "item",
+    "item": "lanterne",
+    "count": 1
+  },
+  "station": "workbench",
+  "materials": [
+    {
+      "item": "planche",
+      "count": 1
+    },
+    {
+      "item": "pierre",
+      "count": 1
+    }
+  ],
+  "work": 30,
+  "source": "dig",
+  "paper": "plan-de-lanterne",
+  "series": null
+}

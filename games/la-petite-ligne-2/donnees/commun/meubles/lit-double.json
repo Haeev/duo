@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "lit-double",
   "name": "Lit double",
-  "model": "lit-double",
+  "model": "bed-double",
   "size": {
     "w": 2,
     "h": 2

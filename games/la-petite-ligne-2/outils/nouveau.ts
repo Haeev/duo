@@ -45,6 +45,11 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     folder: 'commun/recettes',
     inPlace: false,
   },
+  plan: {
+    files: [{ from: 'plan.jsonc', to: '<id>.json' }],
+    folder: 'commun/plans',
+    inPlace: false,
+  },
   prise: {
     files: [{ from: 'prise.jsonc', to: '<id>.json' }],
     folder: 'commun/prises',
@@ -53,6 +58,16 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   culture: {
     files: [{ from: 'culture.jsonc', to: '<id>.json' }],
     folder: 'commun/cultures',
+    inPlace: false,
+  },
+  espece: {
+    files: [{ from: 'espece.jsonc', to: '<id>.json' }],
+    folder: 'commun/especes',
+    inPlace: false,
+  },
+  abri: {
+    files: [{ from: 'abri.jsonc', to: '<id>.json' }],
+    folder: 'commun/meubles',
     inPlace: false,
   },
   ressource: {

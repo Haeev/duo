@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "goujon",
+  "category": "poissons",
+  "name": "Goujon",
+  "place": "essai-gare",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "Un petit goujon tacheté, sorti du fond de l’étang."
+}

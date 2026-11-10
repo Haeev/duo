@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "miroir",
+  "name": "Miroir sur pied",
+  "model": "miroir",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "mirror"
+    }
+  ]
+}

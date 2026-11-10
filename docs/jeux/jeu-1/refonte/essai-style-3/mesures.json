@@ -1,0 +1,20 @@
+{
+ "date": "2026-11-10",
+ "source": "scripts/scene.html (Three.js 0.187, Chromium SwiftShader), scripts/construire.py, tailles des fichiers",
+ "par_personnage": {
+  "triangles_visibles": { "corps": 2300, "coiffure_carre": 304, "coiffure_court": 240 },
+  "triangles_avec_coque_d_encre": { "maelle (femme, carré)": 5208, "basile (homme, court)": 5080, "gaston (costaud, court)": 5080, "plafond_bible": 6000 },
+  "appels_de_dessin": { "corps": 1, "tete": 1, "coiffure": 1, "coque_d_encre": 0, "ombre_de_contact": 1, "remarque": "la coiffure peut rejoindre le corps à l'assemblage (même matériau): 2 appels" },
+  "textures": { "atlas_personnel": "512 x 512 (1,4 Mo en mémoire avec mipmaps)", "atlas_commun_des_traits": "512 x 128, partagé (0,35 Mo)" },
+  "fichiers": { "corps_glb_avec_clips_et_atlas_webp": "189 à 195 Ko", "coiffure_glb": "7 à 9 Ko", "atlas_png": "137 à 201 Ko" }
+ },
+ "vue_du_jeu_35_degres": { "personnages": 5, "appels": 21, "triangles": 25758 },
+ "essai_2_voie_b_pour_comparer": { "triangles": 8325, "texture": "2 048 x 2 048 (22 Mo en mémoire avec mipmaps)", "glb": "4,6 Mo", "appels": 1, "modulaire": false },
+ "couts": {
+  "un_vetement_de_plus": { "credits": 0, "minutes_machine": "2 s par atlas", "minutes_humaines": "10 à 20 (copier une fiche TOML, régler cotes et couleurs, regarder la planche)" },
+  "un_coloris_de_plus": { "credits": 0, "minutes_humaines": "1 (bloc [coloris] dans la fiche du personnage)" },
+  "une_coiffure_de_plus": { "credits": 0, "minutes_machine": "3 s par corps", "minutes_humaines": "15 à 30" },
+  "un_corps_de_plus": { "credits": "13 (image de concept 3, image vers 3D sans texture 5, rig 5) ou 10 (texte vers 3D 5, rig 5)", "minutes_machine": "1 à 3 (génération) + 20 s (conformation)", "minutes_humaines": "15 (choix sur aperçu, réglage des repères du visage)" }
+ },
+ "credits_meshy": { "avant": 2052, "apres": 1969, "depense": 83, "budget": 120 }
+}

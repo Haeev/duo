@@ -56,6 +56,8 @@ export const CHARACTER_SETTINGS = {
       front: 0.5 - RENDER_SETTINGS.standIn.inset,
     },
     clipSeat: 0.5,
+    /** Enfoncement maximal de la figure quand l'assise est plus basse que celle du clip (m). */
+    maxSink: 0.08,
     /** Avancée des genoux devant le bassin dans le clip `sit` (m, gabarit adulte), et marge au bord. */
     clipKnee: 0.35,
     kneeMargin: 0.05,

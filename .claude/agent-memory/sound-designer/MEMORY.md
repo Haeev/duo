@@ -139,3 +139,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `partition.frottements` d'origine est quadratique; version triée par début (arrêt dès qu'une note commence trop tard) dans la copie de Deux Tabliers. Programme de batterie (Brush 40) envoyé sur le canal 10 si `programme > 0`.
 - Coups de bois (porte, meubles, coups à la porte): sous 200 Hz de fondamentale, 70 à 80 % de l'énergie tombe sous 300 Hz; fondamentale 240 à 290 Hz et `passe_haut` 200 à 240 ramènent un signal (coups de livraison) vers 40 à 50 %.
 - `Son(...)` modifié par script avec recherche de `"),\\n"`: la fin d'une lambda sur la même ligne trompe la recherche (paramètre ajouté dans l'appel de la fonction). Éditer ces appels à la main.
+
+## La Petite Ligne (refonte): musique d'Aubrune (vérifié le 2026-11-10)
+
+- Chaîne dans `games/la-petite-ligne-2/assets-src/son/musique/` (copie de `partition.py` de l'ancien jeu, `dsp.py` du dossier parent): un morceau = deux tiges mono (`fond`, `air`) qui bouclent ensemble; chaque tige mélangée avec la même réverbération et la même égalisation, un seul gain et un seul limiteur pour toutes (`dsp.limiter_circulaire` accepte un tableau à plusieurs colonnes: on lui passe [tige, tige, somme], le gain vient du maximum des colonnes, donc la somme reste fidèle).
+- Sonie visée sur le fichier mono livré, mesurée par ffmpeg: `dsp.sonie_integree` donne un autre chiffre (mono dupliqué: +3,01) et s'écarte de 0,8 dB sur un morceau clairsemé (mystère). Boucle de correction dans le rendu: mesurer avec ffmpeg et recaler (3 passes au plus).
+- Une contrebasse écrite sous mi 2 (MIDI 40) remplit le spectre sous 100 Hz (inaudible sur un portable) et mange la sonie: basses entre ré 2 et ré 3 (38 à 52), passe-haut à 50 Hz.
+- Écrire dans une gamme unique (les sept notes de sol majeur) et décaler le motif de k degrés (`degres`) change le mode (mi, ré) sans note étrangère; une harmonisation par programmation dynamique (accords diatoniques, notes de la mélodie pondérées par durée et temps fort) évite d'écrire les grilles à la main. Le contrôle des frottements a trouvé: une basse tenue qui déborde sur l'accord suivant (couper chaque note à la fin de son accord), un contrechant de clarinette en seconde mineure de la mélodie (le remplacer par une tierce parallèle).
+- Opus mono 36 kbit/s en `.ogg`: 6,4 Mo pour 10 morceaux de deux tiges plus 7 jingles; amorce de 1 s de chaque côté, `loopStart` et `loopEnd` dans la table. Le décodage à 24 kHz (`OfflineAudioContext`) divise la mémoire par deux (96 Ko par seconde et par tige).
+- Un mélange de tiges mono panoramiquées (`StereoPanner` centré à puissance constante) garde la sonie du fichier mono mesuré par ffmpeg.
+- Les copies d'écoute M4A (AAC 56 kbit/s mono, 5 Mo pour 17 fichiers) restent à côté des sources, hors du jeu.
+- Aucun contrôle de Chromium sur le raccord Opus de cette chaîne n'a été fait (seulement le décodage ffmpeg): à faire avec `verifier-chromium.cjs` si un raccord s'entend.
+- L'outil du worktree refuse les heredocs combinés à `cd`: écrire les fichiers avec Write, lancer les scripts en commandes simples.

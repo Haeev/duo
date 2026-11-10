@@ -8,6 +8,7 @@ import {
   ACESFilmicToneMapping,
   AgXToneMapping,
   Color,
+  Fog,
   Mesh,
   MeshStandardMaterial,
   NeutralToneMapping,
@@ -41,8 +42,10 @@ import {
   dynamicSignature,
   type SceneVolume,
 } from './lieu/description';
+import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
-import { Daylight } from './lumiere';
+import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
+import { Daylight, nightShare } from './lumiere';
 import { DEFAULT_GRAPHICS_OPTIONS, type GraphicsOptions } from './options';
 import { QualityGovernor, sizeSettingsOf, type RenderProfile } from './options-graphiques';
 import { type DisplaySurface, renderPixelSize, usefulResolutionSteps } from './qualite';
@@ -85,6 +88,8 @@ export interface RenderStats {
   readonly shadows: boolean;
   /** Moyenne glissante de la durée d'une image (ms). */
   readonly frameMs: number;
+  /** Grand lieu rendu par tuiles (ADR 0022): compteurs par tuile et au total, `null` sinon. */
+  readonly tiles: TileStats | null;
 }
 
 export interface GameRenderer {
@@ -115,6 +120,13 @@ export interface GameRenderer {
   projectToScreen(x: number, y: number, height?: number): { x: number; y: number } | null;
   /** Cadrage imposé (démonstration, captures): lacet en degrés, largeur de vue en mètres. */
   setCamera(yawDeg: number, width: number): void;
+  /**
+   * Vue haute de contrôle (démonstration, mesure): largeur en mètres, vue plongeante; le
+   * chargement des tuiles suit toujours la vue de jeu. `null`: retour à la vue de jeu.
+   */
+  setOverview(width: number | null): void;
+  /** Ce qu'on entend sous ses pas en (x, y) dans un grand lieu (son des pas), `null` sinon. */
+  surfaceAt(x: number, y: number): SurfaceKind | null;
   graphics(): GraphicsOptions;
   setGraphics(options: GraphicsOptions): void;
   stats(): RenderStats;
@@ -167,6 +179,9 @@ class Engine implements GameRenderer {
   private readonly tableMaterial = new MeshStandardMaterial({ roughness: 1 });
   private readonly table: Mesh;
   private place: PlaceScene | null = null;
+  private tiled: TiledPlace | null = null;
+  private readonly fog = new Fog(0x000000, 1e4, 2e4);
+  private overview: number | null = null;
   private signature = Number.NaN;
   private resolutionStep = 0;
   private adaptiveLight = false;
@@ -207,6 +222,8 @@ class Engine implements GameRenderer {
     this.renderer.toneMappingExposure = settings.exposure;
     this.renderer.shadowMap.type = PCFShadowMap;
     this.scene.background = this.background;
+    // Brume toujours présente (un seul jeu de programmes), sans effet hors des grands lieux.
+    this.scene.fog = this.fog;
 
     const half = RENDER_SETTINGS.ground.tableHalfSize;
     this.table = new Mesh(
@@ -286,17 +303,28 @@ class Engine implements GameRenderer {
     this.highlight.release();
     this.place?.dispose();
     this.place = null;
+    this.tiled?.dispose();
+    this.tiled = null;
     this.signature = Number.NaN;
     const content = this.options.view.content;
     const place = content.places[id];
     if (place === undefined) return;
-    const description = describePlace(content, place, this.options.extras?.(id) ?? []);
+    // Grand lieu (carte à terrain): sol, décor et bâtiments par tuiles; ses zones pleines ne
+    // deviennent pas des dalles (haies, berges, murs les montrent déjà).
+    const tiled = place.map.terrain !== undefined;
+    const source = tiled ? { ...place, map: { ...place.map, blocked: [] } } : place;
+    const description = describePlace(content, source, this.options.extras?.(id) ?? []);
     this.place = new PlaceScene(
       description,
       { ground: this.groundMaterial, standIn: this.standInMaterial },
       this.options.models ?? null,
+      !tiled,
     );
     this.scene.add(this.place.root);
+    if (tiled) {
+      this.tiled = new TiledPlace(place.map);
+      this.scene.add(this.tiled.root);
+    }
     this.characters.reset();
     this.rig.detach();
   }
@@ -337,6 +365,8 @@ class Engine implements GameRenderer {
       if (placeId === null) {
         this.place?.dispose();
         this.place = null;
+        this.tiled?.dispose();
+        this.tiled = null;
       } else this.loadPlace(placeId);
     }
     const place = this.place;
@@ -378,15 +408,59 @@ class Engine implements GameRenderer {
       subject.z = shown.y;
     }
     place.applyOcclusion(place.occlusion.update(dt, this.subjects, this.toCamera));
+    const radius = viewRadius(pose, this.aspect);
+    this.tiled?.update(
+      dt,
+      shown.x,
+      shown.y,
+      radius,
+      nightShare(world.minutes, RENDER_SETTINGS.lightKeys),
+      this.subjects,
+      this.toCamera,
+    );
+    this.updateFog(pose.width);
+    if (this.overview !== null) this.poseOverview(pose.x, pose.y, this.overview);
 
     this.highlight.update(dt, view.aim(local)?.id ?? null, this.resolveAim);
 
-    this.daylight.update(world.minutes, pose.x, pose.y, viewRadius(pose, this.aspect));
+    this.daylight.update(world.minutes, pose.x, pose.y, radius);
     this.background.copy(this.daylight.tableColor);
+    this.fog.color.copy(this.daylight.tableColor);
     this.tableMaterial.color.copy(this.daylight.tableColor);
 
     this.renderer.render(this.scene, this.camera);
     this.measure(dt);
+  }
+
+  /**
+   * Brume légère au bord du champ d'un grand lieu: elle commence un peu avant le haut de l'écran
+   * (profondeur comptée le long de l'axe de vue de la caméra orthographique).
+   */
+  private poseOverview(x: number, y: number, width: number): void {
+    const camera = this.camera;
+    const half = width / 2;
+    camera.left = -half;
+    camera.right = half;
+    camera.top = half / this.aspect;
+    camera.bottom = -half / this.aspect;
+    camera.far = 2000;
+    camera.position.set(x, 300, y + 120);
+    camera.lookAt(x, 0, y);
+    camera.updateProjectionMatrix();
+  }
+
+  private updateFog(width: number): void {
+    if (this.tiled === null || this.overview !== null) {
+      this.fog.near = 1e4;
+      this.fog.far = 2e4;
+      return;
+    }
+    const s = RENDER_SETTINGS.camera;
+    const halfHeight = width / 2 / this.aspect;
+    // Le sol au bord haut de l'écran est plus loin que le point visé d'environ 1,4 demi-hauteur.
+    const reach = halfHeight / Math.tan((s.pitchFarDeg * Math.PI) / 180);
+    this.fog.near = s.distance + reach * TILE_SETTINGS.fog.start;
+    this.fog.far = s.distance + reach * TILE_SETTINGS.fog.end;
   }
 
   private measure(dt: number): void {
@@ -448,6 +522,14 @@ class Engine implements GameRenderer {
     this.rig.set(yawDeg, width);
   }
 
+  setOverview(width: number | null): void {
+    this.overview = width;
+  }
+
+  surfaceAt(x: number, y: number): SurfaceKind | null {
+    return this.tiled?.surfaceAt(x, y) ?? null;
+  }
+
   graphics(): GraphicsOptions {
     return this.governor.current();
   }
@@ -473,6 +555,7 @@ class Engine implements GameRenderer {
       height: this.bufferHeight,
       shadows: this.renderer.shadowMap.enabled,
       frameMs: this.frameMs,
+      tiles: this.tiled?.stats() ?? null,
     };
   }
 
@@ -483,6 +566,8 @@ class Engine implements GameRenderer {
     this.highlight.dispose();
     this.place?.dispose();
     this.place = null;
+    this.tiled?.dispose();
+    this.tiled = null;
     this.characters.dispose();
     this.daylight.dispose();
     this.table.geometry.dispose();

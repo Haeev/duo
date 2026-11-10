@@ -53,3 +53,17 @@ for kd, vd in n["duo"]:
             d = de2000(lab(vd), lab(v))
             if d < 15: near.append(f"{kd}/{k} {d:.1f}")
 print("à moins de 15 d'une couleur de profil Duo:", near or "aucun")
+
+# Version 0.2 (rendu encré): échelles de trois tons par matière et par lieu [clair, base, ombre].
+# Règle: base - ombre >= 15 points de L* (11 si la base est sous 40: ambiances sombres), clair - base >= 6.
+if "lieux" in n:
+    bad = []
+    for lieu, mats in n["lieux"].items():
+        for k, c, b, o in mats:
+            lc, lb, lo = lab(c)[0], lab(b)[0], lab(o)[0]
+            print(f"{lieu}/{k}: L* {lc:.0f} {lb:.0f} {lo:.0f}")
+            if lb - lo < (15 if lb >= 40 else 11) or lc - lb < 6:
+                bad.append(f"{lieu}/{k}")
+    print("échelles hors règle:", bad or "aucune")
+    near = [f"{kd}/{lieu}/{k} {de2000(lab(vd), lab(b)):.1f}" for kd, vd in n["duo"] for lieu, mats in n["lieux"].items() for k, c, b, o in mats if de2000(lab(vd), lab(b)) < 15]
+    print("teintes de base des lieux à moins de 15 d'une couleur de profil (information):", near or "aucune")

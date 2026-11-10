@@ -6,8 +6,10 @@
 import type { Content } from '../donnees/charger';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../etat/monde';
+import type { GameEvent } from '../simulation/noyau/evenements';
 import type { Intent } from '../simulation/noyau/entrees';
 import { el, icon } from './dom';
+import { equipModel, equippedText } from './equiper';
 import {
   chestModel,
   gridMove,
@@ -21,7 +23,7 @@ import {
 import { createCarnetTabs, type CarnetTabsOptions, type TabId } from './carnet/index';
 import { itemThumb } from './pictos';
 import { UI_TUNING } from './reglages';
-import { fill, TEXTS } from './textes';
+import { fill, refusalText, TEXTS } from './textes';
 
 const TABS = [
   ['bag', 'sac'],
@@ -52,6 +54,11 @@ export interface Notebook {
   /** Réglages de la machine et suite suivie, tenus par les onglets. */
   readonly tabs: Pick<ReturnType<typeof createCarnetTabs>, 'follow' | 'settings'>;
   openStore(target: string, now: number): void;
+  /**
+   * Événements de la partie: le carnet ouvert sur le Sac y lit la réponse à ses boutons (sac
+   * équipé, refus). Renvoie `true` s'il l'a affichée lui-même (le HUD n'a alors rien à dire).
+   */
+  onEvent(event: GameEvent, local: PlayerIndex): boolean;
   close(): void;
   frame(world: ReadonlyWorld, local: PlayerIndex): void;
   key(code: string, shift: boolean, now: number): boolean;
@@ -91,6 +98,11 @@ export function createNotebook(
   /** L'ouverture (le carnet qui monte) ne se joue qu'une fois, pas à chaque redessin. */
   let entering = false;
   let drawn = '';
+  /** Réponse à la dernière demande « Équiper »; s'efface dès qu'on change de case. */
+  let equipNote: { readonly ok: boolean; readonly text: string } | null = null;
+  /** Défilement des zones, gardé d'un dessin à l'autre pour la même page. */
+  let scrolls: { readonly key: string; readonly tops: readonly number[] } | null = null;
+  let shownKey = '';
   let last: { world: ReadonlyWorld; local: PlayerIndex } | null = null;
 
   const tabs = createCarnetTabs({
@@ -230,8 +242,9 @@ export function createNotebook(
   }
 
   function detailPage(world: ReadonlyWorld, local: PlayerIndex): HTMLElement {
-    const page = el('div', { class: 'detail' });
+    const page = el('div', { class: 'detail detail--sac' });
     const chosen = focusedModel(world, local);
+    let refusedNote: string | null = null;
     if (chosen === null)
       page.append(el('p', { class: 'detail__none', text: TEXTS.notebook.nothing }));
     else {
@@ -249,40 +262,66 @@ export function createNotebook(
         }),
       );
       const row = el('div', { class: 'row' });
+      const equip = equipModel(content, model.item, world.players[local].bag?.id ?? null);
       if (model.edible) row.append(button('Enter', TEXTS.notebook.eat, true));
+      if (equip.kind !== 'none')
+        row.append(button('Enter', TEXTS.notebook.equip, true, equip.kind === 'refused'));
       row.append(
         button('KeyP', TEXTS.notebook.drop, false),
         button('KeyT', TEXTS.notebook.give, false),
       );
       page.append(row);
+      // Un bouton refusé dit toujours pourquoi.
+      if (equip.kind === 'refused') refusedNote = equip.text;
     }
-    const money = chestModel(world, local);
-    page.append(
-      el('div', { class: 'chest' }, [
-        el('div', { class: 'chest__row' }, [
-          icon('coffre'),
-          el('b', { text: TEXTS.notebook.chest }),
-          el('span', { class: 'chest__n', text: money.chest }),
-        ]),
-        el('div', { class: 'chest__row' }, [
-          el('span', { class: 'coin coin--sm' }),
-          el('span', { text: TEXTS.notebook.purse }),
-          el('span', { class: 'chest__n', text: money.purse }),
-        ]),
-        el('div', { class: 'row' }, [
-          button('KeyV', TEXTS.notebook.deposit, false),
-          button('KeyR', TEXTS.notebook.withdraw, false),
-        ]),
-      ]),
-    );
+    // Sinon, la réponse de la partie (le sac équipé a quitté sa case: la fiche est alors vide).
+    const reason = refusedNote === null ? equipNote : { ok: false, text: refusedNote };
+    if (reason !== null)
+      page.append(
+        el(
+          'div',
+          { class: `equip-note equip-note--${reason.ok ? 'ok' : 'refus'}`, role: 'status' },
+          [icon(reason.ok ? 'sac' : 'refus'), el('span', { text: reason.text })],
+        ),
+      );
     return page;
   }
 
-  function button(code: string, label: string, primary: boolean): HTMLButtonElement {
-    const node = el('button', { class: `btn${primary ? ' btn--primary' : ''}`, tabindex: '-1' }, [
-      el('span', { class: 'key', text: keyLabel(code) }),
-      label,
+  function chestBox(world: ReadonlyWorld, local: PlayerIndex): HTMLElement {
+    const money = chestModel(world, local);
+    return el('div', { class: 'chest' }, [
+      el('div', { class: 'chest__row' }, [
+        icon('coffre'),
+        el('b', { text: TEXTS.notebook.chest }),
+        el('span', { class: 'chest__n', text: money.chest }),
+      ]),
+      el('div', { class: 'chest__row' }, [
+        el('span', { class: 'coin coin--sm' }),
+        el('span', { text: TEXTS.notebook.purse }),
+        el('span', { class: 'chest__n', text: money.purse }),
+      ]),
+      el('div', { class: 'row' }, [
+        button('KeyV', TEXTS.notebook.deposit, false),
+        button('KeyR', TEXTS.notebook.withdraw, false),
+      ]),
     ]);
+  }
+
+  function button(
+    code: string,
+    label: string,
+    primary: boolean,
+    refused = false,
+  ): HTMLButtonElement {
+    const node = el(
+      'button',
+      {
+        class: `btn${refused ? ' btn--off' : primary ? ' btn--primary' : ''}`,
+        tabindex: '-1',
+        ...(refused ? { 'aria-disabled': 'true' } : {}),
+      },
+      [el('span', { class: 'key', text: keyLabel(code) }), label],
+    );
     node.addEventListener('click', () => {
       api.key(code, false, Number.POSITIVE_INFINITY);
     });
@@ -290,6 +329,7 @@ export function createNotebook(
   }
 
   function draw(world: ReadonlyWorld, local: PlayerIndex): void {
+    rememberScroll();
     const me = world.players[local];
     if (mode.kind === 'store') {
       const target = mode.target;
@@ -328,16 +368,17 @@ export function createNotebook(
           [
             el('div', { class: 'book' }, [
               el('section', { class: 'page page--g' }, [
-                el('h2', { class: 'page__title', text: TEXTS.store.mine }),
-                mineGrid(world, local, true),
+                zone([
+                  el('h2', { class: 'page__title', text: TEXTS.store.mine }),
+                  mineGrid(world, local, true),
+                ]),
                 el('div', { class: 'foot' }, [
                   keys(['Space'], TEXTS.store.put),
                   keys(['Backspace'], TEXTS.notebook.close),
                 ]),
               ]),
               el('section', { class: 'page page--d' }, [
-                el('h2', { class: 'page__title', text: TEXTS.store.furniture }),
-                furniture,
+                zone([el('h2', { class: 'page__title', text: TEXTS.store.furniture }), furniture]),
                 el('div', { class: 'foot' }, [keys(['Space'], TEXTS.store.take)]),
               ]),
             ]),
@@ -345,6 +386,7 @@ export function createNotebook(
         ),
       );
       entering = false;
+      settleScroll();
       return;
     }
     const signets = el('div', {
@@ -410,12 +452,13 @@ export function createNotebook(
     const book =
       pages?.full === true
         ? el('div', { class: 'book' }, [
-            el('section', { class: 'page page--g page--pleine' }, [...left, foot]),
+            el('section', { class: 'page page--g page--pleine' }, [zone(left), foot]),
           ])
         : el('div', { class: 'book' }, [
-            el('section', { class: 'page page--g' }, [...left, foot]),
+            el('section', { class: 'page page--g' }, [zone(left), foot]),
             el('section', { class: 'page page--d', 'aria-live': 'polite' }, [
-              ...(pages === null ? [detailPage(world, local)] : (pages.right ?? [])),
+              zone(pages === null ? [detailPage(world, local)] : (pages.right ?? [])),
+              ...(pages === null ? [chestBox(world, local)] : []),
             ]),
           ]);
     layer.replaceChildren(
@@ -426,11 +469,73 @@ export function createNotebook(
       ),
     );
     entering = false;
+    settleScroll();
+  }
+
+  /** Zone d'une page: tout ce qui défile, le pied de page restant en dessous. */
+  function zone(children: readonly (HTMLElement | null)[]): HTMLElement {
+    return el('div', { class: 'page__zone' }, children);
+  }
+
+  const zones = (): HTMLElement[] => [...layer.querySelectorAll<HTMLElement>('.page__zone')];
+
+  /** Identifie la page affichée: le défilement ne se garde que pour elle. */
+  const scrollKey = (): string => `${mode.kind}:${tab}`;
+
+  /** Mémorise le défilement avant que le dessin soit refait. */
+  function rememberScroll(): void {
+    scrolls = { key: shownKey, tops: zones().map((z) => z.scrollTop) };
+  }
+
+  /** Remet le défilement, puis fait suivre la case ou la carte au focus (au clavier comme au clic). */
+  function settleScroll(): void {
+    const all = zones();
+    // Un indice de touches n'apparaît que si quelque chose défile vraiment; il s'ajoute d'abord,
+    // car il agrandit le pied et réduit la zone.
+    if (all.some((z) => z.scrollHeight > z.clientHeight + 1))
+      layer
+        .querySelector('.page--g .foot')
+        ?.append(keys(['PageUp', 'PageDown'], TEXTS.notebook.scrollKeys));
+    const saved = scrolls !== null && scrolls.key === scrollKey() ? scrolls.tops : [];
+    all.forEach((z, i) => {
+      z.scrollTop = saved[i] ?? 0;
+      const target = z.querySelector<HTMLElement>('.focus');
+      if (target === null) return;
+      const margin = 8;
+      const zr = z.getBoundingClientRect();
+      const tr = target.getBoundingClientRect();
+      // Le nom sous une case fait partie de ce qui doit rester visible.
+      const tip = target.querySelector<HTMLElement>('.nametag');
+      const bottom = Math.max(tr.bottom, tip?.getBoundingClientRect().bottom ?? 0);
+      if (tr.top < zr.top + margin) z.scrollTop -= zr.top + margin - tr.top;
+      else if (bottom > zr.bottom - margin) z.scrollTop += bottom - (zr.bottom - margin);
+    });
+    shownKey = scrollKey();
   }
 
   function redraw(): void {
     drawn = '';
     if (last !== null) api.frame(last.world, last.local);
+  }
+
+  /** Entrée sur un sac: envoie l'intention, sauf si le refus est déjà connu et expliqué à l'écran. */
+  function equip(
+    ref: SlotRefModel,
+    itemId: string,
+    world: ReadonlyWorld,
+    local: PlayerIndex,
+  ): void {
+    const model = equipModel(content, itemId, world.players[local].bag?.id ?? null);
+    if (model.kind === 'ready') send({ type: 'equip_bag', from: ref });
+  }
+
+  /** PageHaut et PageBas: fait défiler la zone qui déborde (la page de droite d'abord). */
+  function scrollPage(direction: 1 | -1): void {
+    const target = zones()
+      .reverse()
+      .find((z) => z.scrollHeight > z.clientHeight + 1);
+    if (target === undefined) return;
+    target.scrollBy({ top: direction * target.clientHeight * 0.8 });
   }
 
   /** Espace sur la case au focus: prendre puis poser (déplacer), ou ranger et reprendre. */
@@ -469,6 +574,7 @@ export function createNotebook(
       mode = { kind: 'notebook' };
       side = 'mine';
       held = null;
+      equipNote = null;
       openedAt = now;
       layer.hidden = false;
       redraw();
@@ -483,10 +589,22 @@ export function createNotebook(
       layer.hidden = false;
       redraw();
     },
+    onEvent(event, local) {
+      if (mode.kind !== 'notebook' || tab !== 0) return false;
+      if (event.type === 'bag_changed' && event.player === local)
+        equipNote = { ok: true, text: equippedText(content, event.bag) };
+      else if (event.type === 'refused' && event.player === local)
+        equipNote = { ok: false, text: refusalText(event.reason) };
+      else return false;
+      redraw();
+      return true;
+    },
     close() {
       if (last !== null && mode.kind === 'notebook') tabs.closed(last.world, last.local);
       mode = { kind: 'closed' };
       held = null;
+      equipNote = null;
+      shownKey = '';
       layer.hidden = true;
       layer.replaceChildren();
       drawn = '';
@@ -513,6 +631,7 @@ export function createNotebook(
         me.selected,
         me.money,
         me.tiers,
+        equipNote,
         world.common.chest,
         store,
         tabSignature,
@@ -532,8 +651,13 @@ export function createNotebook(
         tabs.key(current, code, shift, world, local)
       )
         return true;
+      if (code === 'PageUp' || code === 'PageDown') {
+        scrollPage(code === 'PageDown' ? 1 : -1);
+        return true;
+      }
       const dir = DIRS[code];
       if (dir !== undefined) {
+        equipNote = null;
         const columns = UI_TUNING.gridColumns;
         if (side === 'mine') {
           const next = gridMove(focus, slotCount(world, local), columns, dir);
@@ -579,6 +703,8 @@ export function createNotebook(
       const chosen = focusedModel(world, local);
       if (chosen !== null) {
         if (code === 'Enter' && chosen.model.edible) send({ type: 'eat', from: chosen.ref });
+        if (code === 'Enter' && !chosen.model.edible)
+          equip(chosen.ref, chosen.model.item, world, local);
         if (code === 'KeyP') send({ type: 'drop', from: chosen.ref });
         if (code === 'KeyT') send({ type: 'give_stack', from: chosen.ref });
       }

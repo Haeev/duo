@@ -1,0 +1,341 @@
+/* Écran de la basse-cour (interface.md 5.5): la scène prend tout l'écran, cartes de 88 px en bas. */
+.lpl-ui .lpl-coop {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  pointer-events: auto;
+  background: #9cba6a;
+}
+/* Scène au rapport 1366 x 768, qui couvre l'écran: pastilles placées en % de la scène. */
+.lpl-coop-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100vw, 177.86vh);
+  height: max(56.22vw, 100vh);
+  transform: translate(-50%, -50%);
+  animation: lpl-coop-in var(--d-scene, 600ms) var(--ease, ease-out) both;
+}
+.lpl-ui[data-motion='reduced'] .lpl-coop-stage,
+.lpl-ui[data-motion='reduced'] .lpl-coop-hen {
+  animation: none;
+}
+@keyframes lpl-coop-in {
+  from {
+    transform: translate(-50%, -50%) scale(0.86) translateY(3%);
+    opacity: 0.4;
+  }
+}
+.lpl-coop-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.lpl-coop-hen {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: lpl-coop-peck 1.6s ease-in-out infinite;
+}
+.lpl-coop-stage.peck .lpl-coop-hen {
+  animation-duration: 0.45s;
+}
+@keyframes lpl-coop-peck {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  75% {
+    transform: rotate(9deg);
+  }
+  88% {
+    transform: rotate(-3deg);
+  }
+}
+.lpl-coop-p {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+.lpl-coop-ring {
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 0.1875rem solid #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.25rem rgb(255 255 255 / 35%),
+    0 0 1.5rem rgb(255 255 255 / 70%);
+  pointer-events: none;
+  transition:
+    left var(--d-fast, 150ms) var(--ease, ease-out),
+    top var(--d-fast, 150ms) var(--ease, ease-out),
+    width var(--d-fast, 150ms) var(--ease, ease-out);
+}
+.lpl-ui .lpl-coop-zone {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.875rem 0.25rem 0.25rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+}
+.lpl-coop-zone small {
+  font-family: var(--font-text);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.lpl-coop-zone.egg {
+  padding-left: 0.625rem;
+}
+.lpl-coop-zone.egg .lpl-coop-p {
+  width: 2rem;
+  height: 2rem;
+}
+.lpl-coop-zone.none {
+  color: var(--ink-muted);
+  border-style: dashed;
+}
+.lpl-coop-zone.alert {
+  border-style: dashed;
+  border-color: var(--stamp);
+}
+.lpl-coop-zone b {
+  color: var(--stamp);
+}
+/* Jauge ronde: la part de grain restante (anneau plein, hachuré quand elle est basse). */
+.lpl-coop-gauge {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(var(--paper-raised) 58%, transparent 60%),
+    conic-gradient(var(--ink) calc(var(--val) * 1%), var(--paper-sunken) 0);
+}
+.lpl-coop-gauge.low {
+  background:
+    radial-gradient(var(--paper-raised) 58%, transparent 60%),
+    repeating-linear-gradient(45deg, var(--ink) 0 3px, transparent 3px 6px);
+}
+.lpl-coop-prompt {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4375rem 1rem 0.4375rem 0.5rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.lpl-coop-prompt.off {
+  color: var(--ink-muted);
+  border-style: dashed;
+}
+.lpl-coop-prompt.shake {
+  animation: lpl-coop-shake 0.3s linear;
+}
+@keyframes lpl-coop-shake {
+  25% {
+    margin-left: -0.375rem;
+  }
+  75% {
+    margin-left: 0.375rem;
+  }
+}
+.lpl-coop-pi {
+  position: relative;
+  display: inline-grid;
+}
+.lpl-coop-pi .lpl-coop-p {
+  grid-area: 1 / 1;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+.lpl-coop-pi .bar {
+  color: var(--stamp);
+}
+.lpl-coop-emote {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 0.125rem 0.5rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--stamp);
+}
+.lpl-coop-heartup {
+  position: absolute;
+  color: var(--stamp);
+  transform: translate(-50%, -50%);
+  animation: lpl-coop-heart 1.2s var(--ease, ease-out) both;
+}
+.lpl-coop-heartup .lpl-coop-p {
+  width: 2rem;
+  height: 2rem;
+}
+@keyframes lpl-coop-heart {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.4);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -140%) scale(1);
+  }
+}
+.lpl-coop-keys {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  display: flex;
+  gap: 0.875rem;
+  padding: 0.375rem 0.75rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+  font-size: 0.8125rem;
+  font-weight: 750;
+}
+.lpl-coop-keys > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+}
+.lpl-coop-keys .lpl-coop-p {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.lpl-coop-cards {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--wood-deep);
+  border: 0.125rem solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-2);
+}
+.lpl-coop-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 0.5rem;
+  width: 10.25rem;
+  height: 4.5rem;
+  padding: 0 0.625rem 0 0.375rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.75rem;
+}
+.lpl-coop-card.sel {
+  outline: 0.25rem solid var(--focus);
+  outline-offset: 0.125rem;
+}
+.lpl-coop-face {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--robe);
+  border: 0.125rem solid var(--ink);
+}
+.lpl-coop-face .lpl-coop-p {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+.lpl-coop-name {
+  align-self: end;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  line-height: 1.1;
+}
+.lpl-coop-hearts {
+  align-self: start;
+  display: flex;
+  gap: 0.0625rem;
+  color: var(--stamp);
+}
+.lpl-coop-h .lpl-coop-p {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-coop-h.off {
+  color: var(--ink-muted);
+  opacity: 0.55;
+}
+.lpl-coop-badge {
+  position: absolute;
+  right: -0.375rem;
+  top: -0.5rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.625rem;
+  height: 1.625rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+.lpl-coop-badge .lpl-coop-p {
+  width: 1rem;
+  height: 1rem;
+}
+.lpl-coop-badge.alert {
+  color: var(--stamp);
+  border-style: dashed;
+  border-color: var(--stamp);
+  padding: 0 0.25rem;
+}
+.lpl-coop-card.free {
+  width: 4.5rem;
+  padding: 0;
+  grid-template-columns: 1fr;
+  place-items: center;
+  background: transparent;
+  border: 0.125rem dashed var(--brass);
+  color: var(--brass);
+}
+.lpl-coop-prov {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+}

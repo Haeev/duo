@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "enclume",
+  "name": "Forge",
+  "model": "enclume",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "craft",
+      "station": "forge",
+      "services": ["upgrade", "repair"]
+    }
+  ]
+}

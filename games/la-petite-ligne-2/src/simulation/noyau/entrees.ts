@@ -7,6 +7,7 @@ import { FISHING_INTENTS } from '../peche/intentions';
 import { BRICK_INTENTS } from '../briques/intentions';
 import { SHOP_INTENTS } from '../commerces/intentions';
 import { COOK_INTENTS } from '../cuisine/intentions';
+import { CRAFT_INTENTS } from '../fabrication/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { TOOL_INTENTS } from '../outils/intentions';
 import { VILLAGER_INTENTS } from '../habitants/intentions';
@@ -15,6 +16,7 @@ import { HOUSING_INTENTS } from '../logement/intentions';
 import { BAG_INTENTS } from '../sac/intentions';
 import { SCENE_INTENTS } from '../scenes/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
+import { FARM_INTENTS } from '../elevage/intentions';
 import { CORE_INTENTS } from './intentions';
 
 const Unit = v.pipe(FiniteSchema, v.minValue(-1), v.maxValue(1));
@@ -52,8 +54,10 @@ export const IntentSchema = v.variant('type', [
   ...QUEST_INTENTS,
   ...SCENE_INTENTS,
   ...COOK_INTENTS,
+  ...CRAFT_INTENTS,
   ...COLLECTION_INTENTS,
   ...HOUSING_INTENTS,
   ...FISHING_INTENTS,
+  ...FARM_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

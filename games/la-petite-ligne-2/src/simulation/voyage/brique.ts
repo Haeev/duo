@@ -21,11 +21,20 @@ function destination(look: Look, player: PlayerIndex): { to: string } | { refusa
 
 export const travelBehaviour: BrickBehaviour<TravelBrick> = {
   verb: 'Monter',
+  verbOf(look, player) {
+    return look.world.common.travel?.boarded[player] === true ? 'Descendre' : 'Monter';
+  },
   refuse(look, player) {
+    // À bord: la même touche sur le même objet fait redescendre, toujours permis.
+    if (look.world.common.travel?.boarded[player] === true) return null;
     const found = destination(look, player);
     return 'refusal' in found ? found.refusal : null;
   },
   use(sim, player) {
+    if (sim.world.common.travel?.boarded[player] === true) {
+      travelSystem.intent?.(sim, player, { type: 'board', to: null });
+      return;
+    }
     const found = destination(sim, player);
     if ('to' in found) travelSystem.intent?.(sim, player, { type: 'board', to: found.to });
   },

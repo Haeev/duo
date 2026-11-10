@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "lit-simple",
   "name": "Lit simple",
-  "model": "lit-simple",
+  "model": "bed-single",
   "size": {
     "w": 1,
     "h": 2

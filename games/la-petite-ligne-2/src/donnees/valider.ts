@@ -13,6 +13,7 @@ import { GROUP_MAX_SPAN, PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schem
 import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
 import { validateHarvestContent } from './schemas/recolte';
+import { validateFarmContent } from '../simulation/elevage/valider';
 import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
@@ -21,6 +22,7 @@ import { validateStory } from '../simulation/quetes/valider';
 import { checkRecipes } from '../simulation/cuisine/valider';
 import { validateHousings } from '../simulation/logement/valider';
 import { validatePassages } from '../simulation/lieux/valider';
+import { checkPlans } from '../simulation/fabrication/valider';
 
 export function checkCondition(
   content: Content,
@@ -489,6 +491,15 @@ export function validateContent(content: Content): string[] {
   }
   for (const prop of Object.values(content.props)) checkBricks(content, prop, problems);
   problems.push(...checkRecipes(content));
+  problems.push(...checkPlans(content));
+  // Coins de pêche: chaque poisson de la table est une prise connue avec son bloc `fish`.
+  for (const place of Object.values(content.places))
+    for (const spot of place.def.fishing ?? [])
+      for (const row of spot.table)
+        if (content.catches[row.catch]?.fish === undefined)
+          problems.push(
+            `lieu ${place.def.id}, coin de pêche ${spot.id}: « ${row.catch} » n'est pas une prise avec un bloc fish`,
+          );
   for (const recipe of Object.values(content.recipes)) {
     for (const portion of [...recipe.inputs, recipe.output]) {
       if (!(portion.item in content.items))
@@ -505,6 +516,7 @@ export function validateContent(content: Content): string[] {
   // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
   problems.push(...validateDialogueTexts(content));
   problems.push(...validateHarvestContent(content));
+  problems.push(...validateFarmContent(content));
   problems.push(...validateVillagerLives(content, checkCondition));
   // Suites de quêtes et scènes: références, et aucune suite qui puisse se bloquer.
   problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));

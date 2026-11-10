@@ -1,0 +1,1427 @@
+{
+ "version": 1,
+ "source": "games/la-petite-ligne-2/assets-src/textures/gabarits.toml",
+ "style": "bande dessinée encrée, lumière en haut à gauche",
+ "familles": {
+  "sols_exterieurs": {
+   "nom": "Sols extérieurs",
+   "fichier": "sols_exterieurs.webp",
+   "relief": null,
+   "pixels": [
+    512,
+    512
+   ],
+   "couches": 22,
+   "repetition": "xy"
+  },
+  "sols_interieurs": {
+   "nom": "Sols intérieurs",
+   "fichier": "sols_interieurs.webp",
+   "relief": null,
+   "pixels": [
+    256,
+    256
+   ],
+   "couches": 5,
+   "repetition": "xy"
+  },
+  "murs_exterieurs": {
+   "nom": "Murs extérieurs",
+   "fichier": "murs_exterieurs.webp",
+   "relief": null,
+   "pixels": [
+    256,
+    256
+   ],
+   "couches": 15,
+   "repetition": "xy"
+  },
+  "toitures": {
+   "nom": "Toitures",
+   "fichier": "toitures.webp",
+   "relief": null,
+   "pixels": [
+    256,
+    256
+   ],
+   "couches": 6,
+   "repetition": "xy"
+  }
+ },
+ "textures": [
+  {
+   "id": "grass-meadow",
+   "nom": "Herbe de pré",
+   "famille": "sols_exterieurs",
+   "couche": 0,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "herbe",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A9C46A",
+     "part": 0.53
+    },
+    {
+     "couleur": "#8FB15C",
+     "part": 0.43
+    },
+    {
+     "couleur": "#546F37",
+     "part": 0.04
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "grass-meadow-hautefonte",
+   "nom": "Herbe de pré (Hautefonte)",
+   "famille": "sols_exterieurs",
+   "couche": 1,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "herbe",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#90A26A",
+     "part": 0.53
+    },
+    {
+     "couleur": "#7C915D",
+     "part": 0.43
+    },
+    {
+     "couleur": "#495A38",
+     "part": 0.04
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "grass-meadow-combe",
+   "nom": "Herbe de pré (Combe-Veilleuse)",
+   "famille": "sols_exterieurs",
+   "couche": 2,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "herbe",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#5C6B4A",
+     "part": 0.86
+    },
+    {
+     "couleur": "#4B5C3D",
+     "part": 0.1
+    },
+    {
+     "couleur": "#303C28",
+     "part": 0.04
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "grass-short",
+   "nom": "Herbe rase",
+   "famille": "sols_exterieurs",
+   "couche": 3,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "herbe",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#9FBE62",
+     "part": 0.71
+    },
+    {
+     "couleur": "#8DAF59",
+     "part": 0.27
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "grass-flowers",
+   "nom": "Herbe fleurie",
+   "famille": "sols_exterieurs",
+   "couche": 4,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "herbe",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A6C26A",
+     "part": 0.88
+    },
+    {
+     "couleur": "#85A654",
+     "part": 0.09
+    },
+    {
+     "couleur": "#506835",
+     "part": 0.04
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "earth-packed",
+   "nom": "Terre battue",
+   "famille": "sols_exterieurs",
+   "couche": 5,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "terre",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#D3B98E",
+     "part": 0.84
+    },
+    {
+     "couleur": "#BA9F77",
+     "part": 0.14
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "earth-packed-hautefonte",
+   "nom": "Terre battue (Hautefonte)",
+   "famille": "sols_exterieurs",
+   "couche": 6,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "terre",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#AD9E84",
+     "part": 0.84
+    },
+    {
+     "couleur": "#998870",
+     "part": 0.14
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "earth-packed-combe",
+   "nom": "Terre battue (Combe-Veilleuse)",
+   "famille": "sols_exterieurs",
+   "couche": 7,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "terre",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#6E6958",
+     "part": 0.72
+    },
+    {
+     "couleur": "#787564",
+     "part": 0.25
+    },
+    {
+     "couleur": "#1D1F1C",
+     "part": 0.02
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "earth-path-grassy",
+   "nom": "Chemin de terre aux bords herbus",
+   "famille": "sols_exterieurs",
+   "couche": 8,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "terre",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#CCB186",
+     "part": 0.71
+    },
+    {
+     "couleur": "#B39770",
+     "part": 0.27
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "earth-dark-damp",
+   "nom": "Terre humide du potager",
+   "famille": "sols_exterieurs",
+   "couche": 9,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "terre",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A98B66",
+     "part": 0.74
+    },
+    {
+     "couleur": "#8F7455",
+     "part": 0.24
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "cobbles-square",
+   "nom": "Pavés de place",
+   "famille": "sols_exterieurs",
+   "couche": 10,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "paves",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#C9BFAC",
+     "part": 0.58
+    },
+    {
+     "couleur": "#A49784",
+     "part": 0.24
+    },
+    {
+     "couleur": "#3E362E",
+     "part": 0.18
+    }
+   ],
+   "mesures_m": {
+    "pave": 0.1379
+   }
+  },
+  {
+   "id": "cobbles-square-hautefonte",
+   "nom": "Pavés de place (Hautefonte)",
+   "famille": "sols_exterieurs",
+   "couche": 11,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "paves",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A8A297",
+     "part": 0.58
+    },
+    {
+     "couleur": "#878176",
+     "part": 0.24
+    },
+    {
+     "couleur": "#2D2D2F",
+     "part": 0.18
+    }
+   ],
+   "mesures_m": {
+    "pave": 0.1379
+   }
+  },
+  {
+   "id": "cobbles-square-combe",
+   "nom": "Pavés de place (Combe-Veilleuse)",
+   "famille": "sols_exterieurs",
+   "couche": 12,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "paves",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#6B6D64",
+     "part": 0.76
+    },
+    {
+     "couleur": "#161917",
+     "part": 0.16
+    },
+    {
+     "couleur": "#41433D",
+     "part": 0.08
+    }
+   ],
+   "mesures_m": {
+    "pave": 0.1379
+   }
+  },
+  {
+   "id": "cobbles-long",
+   "nom": "Pavés allongés de rue",
+   "famille": "sols_exterieurs",
+   "couche": 13,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "paves",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#C4BAA9",
+     "part": 0.59
+    },
+    {
+     "couleur": "#A09583",
+     "part": 0.25
+    },
+    {
+     "couleur": "#3D352E",
+     "part": 0.16
+    }
+   ],
+   "mesures_m": {
+    "pave": 0.1212
+   }
+  },
+  {
+   "id": "platform-slabs",
+   "nom": "Dalles de quai",
+   "famille": "sols_exterieurs",
+   "couche": 14,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "dalles",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#D1CABA",
+     "part": 0.68
+    },
+    {
+     "couleur": "#B1A896",
+     "part": 0.25
+    },
+    {
+     "couleur": "#3C342D",
+     "part": 0.08
+    }
+   ],
+   "mesures_m": {
+    "dalle": 0.5
+   }
+  },
+  {
+   "id": "platform-slabs-hautefonte",
+   "nom": "Dalles de quai (Hautefonte)",
+   "famille": "sols_exterieurs",
+   "couche": 15,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "dalles",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A19D93",
+     "part": 0.61
+    },
+    {
+     "couleur": "#B6B3AA",
+     "part": 0.31
+    },
+    {
+     "couleur": "#2E2F31",
+     "part": 0.08
+    }
+   ],
+   "mesures_m": {
+    "dalle": 0.5
+   }
+  },
+  {
+   "id": "platform-slabs-combe",
+   "nom": "Dalles de quai (Combe-Veilleuse)",
+   "famille": "sols_exterieurs",
+   "couche": 16,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "dalles",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#75786F",
+     "part": 0.68
+    },
+    {
+     "couleur": "#62645B",
+     "part": 0.25
+    },
+    {
+     "couleur": "#191B1A",
+     "part": 0.08
+    }
+   ],
+   "mesures_m": {
+    "dalle": 0.5
+   }
+  },
+  {
+   "id": "flagstones-large",
+   "nom": "Grandes dalles de pierre",
+   "famille": "sols_exterieurs",
+   "couche": 17,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "dalles",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#CEC4B1",
+     "part": 0.71
+    },
+    {
+     "couleur": "#AEA28D",
+     "part": 0.23
+    },
+    {
+     "couleur": "#3E352E",
+     "part": 0.06
+    }
+   ],
+   "mesures_m": {
+    "dalle": 0.8
+   }
+  },
+  {
+   "id": "water-river",
+   "nom": "Eau de rivière",
+   "famille": "sols_exterieurs",
+   "couche": 18,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "eau",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#86B3BD",
+     "part": 0.43
+    },
+    {
+     "couleur": "#9CC7CB",
+     "part": 0.31
+    },
+    {
+     "couleur": "#6D9CAA",
+     "part": 0.27
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "water-river-hautefonte",
+   "nom": "Eau de rivière (Hautefonte)",
+   "famille": "sols_exterieurs",
+   "couche": 19,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "eau",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#79969D",
+     "part": 0.43
+    },
+    {
+     "couleur": "#8BA6AA",
+     "part": 0.31
+    },
+    {
+     "couleur": "#64828C",
+     "part": 0.27
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "water-river-combe",
+   "nom": "Eau de rivière (Combe-Veilleuse)",
+   "famille": "sols_exterieurs",
+   "couche": 20,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "eau",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#536769",
+     "part": 0.43
+    },
+    {
+     "couleur": "#5F7372",
+     "part": 0.31
+    },
+    {
+     "couleur": "#465A5D",
+     "part": 0.27
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "water-pond",
+   "nom": "Eau calme de mare",
+   "famille": "sols_exterieurs",
+   "couche": 21,
+   "taille_m": [
+    4.0,
+    4.0
+   ],
+   "repetition": "xy",
+   "matiere": "eau",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#86AEA3",
+     "part": 0.41
+    },
+    {
+     "couleur": "#9BC0B4",
+     "part": 0.32
+    },
+    {
+     "couleur": "#719A90",
+     "part": 0.27
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "floorboards-honey",
+   "nom": "Plancher miel",
+   "famille": "sols_interieurs",
+   "couche": 0,
+   "taille_m": [
+    1.6,
+    1.6
+   ],
+   "repetition": "xy",
+   "matiere": "plancher",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#C89A60",
+     "part": 0.73
+    },
+    {
+     "couleur": "#A47B49",
+     "part": 0.18
+    },
+    {
+     "couleur": "#423528",
+     "part": 0.09
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1333,
+    "longueur_lame": 1.6
+   }
+  },
+  {
+   "id": "floorboards-honey-hautefonte",
+   "nom": "Plancher miel (Hautefonte)",
+   "famille": "sols_interieurs",
+   "couche": 1,
+   "taille_m": [
+    1.6,
+    1.6
+   ],
+   "repetition": "xy",
+   "matiere": "plancher",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A18460",
+     "part": 0.73
+    },
+    {
+     "couleur": "#836A4C",
+     "part": 0.18
+    },
+    {
+     "couleur": "#302D2B",
+     "part": 0.09
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1333,
+    "longueur_lame": 1.6
+   }
+  },
+  {
+   "id": "floorboards-honey-combe",
+   "nom": "Plancher miel (Combe-Veilleuse)",
+   "famille": "sols_interieurs",
+   "couche": 2,
+   "taille_m": [
+    1.6,
+    1.6
+   ],
+   "repetition": "xy",
+   "matiere": "plancher",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#685D47",
+     "part": 0.73
+    },
+    {
+     "couleur": "#544A37",
+     "part": 0.18
+    },
+    {
+     "couleur": "#1C1D19",
+     "part": 0.09
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1333,
+    "longueur_lame": 1.6
+   }
+  },
+  {
+   "id": "floorboards-wide-old",
+   "nom": "Vieux plancher large",
+   "famille": "sols_interieurs",
+   "couche": 3,
+   "taille_m": [
+    1.6,
+    1.6
+   ],
+   "repetition": "xy",
+   "matiere": "plancher",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#B48D5F",
+     "part": 0.72
+    },
+    {
+     "couleur": "#8F6E49",
+     "part": 0.21
+    },
+    {
+     "couleur": "#3B3026",
+     "part": 0.07
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.2
+   }
+  },
+  {
+   "id": "floorboards-painted-sage",
+   "nom": "Plancher peint sauge",
+   "famille": "sols_interieurs",
+   "couche": 4,
+   "taille_m": [
+    1.6,
+    1.6
+   ],
+   "repetition": "xy",
+   "matiere": "plancher",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#8EA184",
+     "part": 0.85
+    },
+    {
+     "couleur": "#342D26",
+     "part": 0.09
+    },
+    {
+     "couleur": "#616955",
+     "part": 0.06
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1231,
+    "longueur_lame": 0.8
+   }
+  },
+  {
+   "id": "render-cream",
+   "nom": "Crépi crème",
+   "famille": "murs_exterieurs",
+   "couche": 0,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "crepi",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#E7D9BA",
+     "part": 0.74
+    },
+    {
+     "couleur": "#D3C09B",
+     "part": 0.25
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "render-cream-hautefonte",
+   "nom": "Crépi crème (Hautefonte)",
+   "famille": "murs_exterieurs",
+   "couche": 1,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "crepi",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#C1B9A6",
+     "part": 0.74
+    },
+    {
+     "couleur": "#AFA38D",
+     "part": 0.25
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "render-cream-combe",
+   "nom": "Crépi crème (Combe-Veilleuse)",
+   "famille": "murs_exterieurs",
+   "couche": 2,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "crepi",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#808173",
+     "part": 0.74
+    },
+    {
+     "couleur": "#737263",
+     "part": 0.25
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "render-pink-flaking",
+   "nom": "Crépi rose écaillé",
+   "famille": "murs_exterieurs",
+   "couche": 3,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "crepi",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#E1BFA8",
+     "part": 0.8
+    },
+    {
+     "couleur": "#CAA18A",
+     "part": 0.18
+    },
+    {
+     "couleur": "#3D332B",
+     "part": 0.03
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "render-ochre",
+   "nom": "Crépi ocre",
+   "famille": "murs_exterieurs",
+   "couche": 4,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "crepi",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#DBBD83",
+     "part": 0.64
+    },
+    {
+     "couleur": "#E8CD95",
+     "part": 0.2
+    },
+    {
+     "couleur": "#C4A36B",
+     "part": 0.16
+    }
+   ],
+   "mesures_m": {}
+  },
+  {
+   "id": "rubble-stone",
+   "nom": "Moellons de pierre",
+   "famille": "murs_exterieurs",
+   "couche": 5,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "pierre",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#C5B9A5",
+     "part": 0.82
+    },
+    {
+     "couleur": "#352D26",
+     "part": 0.13
+    },
+    {
+     "couleur": "#807567",
+     "part": 0.06
+    }
+   ],
+   "mesures_m": {
+    "pierre": 0.2
+   }
+  },
+  {
+   "id": "rubble-stone-hautefonte",
+   "nom": "Moellons de pierre (Hautefonte)",
+   "famille": "murs_exterieurs",
+   "couche": 6,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "pierre",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#A49E92",
+     "part": 0.82
+    },
+    {
+     "couleur": "#252629",
+     "part": 0.13
+    },
+    {
+     "couleur": "#67645E",
+     "part": 0.06
+    }
+   ],
+   "mesures_m": {
+    "pierre": 0.2
+   }
+  },
+  {
+   "id": "rubble-stone-combe",
+   "nom": "Moellons de pierre (Combe-Veilleuse)",
+   "famille": "murs_exterieurs",
+   "couche": 7,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "pierre",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#6D6E65",
+     "part": 0.82
+    },
+    {
+     "couleur": "#141716",
+     "part": 0.13
+    },
+    {
+     "couleur": "#42443E",
+     "part": 0.06
+    }
+   ],
+   "mesures_m": {
+    "pierre": 0.2
+   }
+  },
+  {
+   "id": "rubble-stone-mossy",
+   "nom": "Pierre moussue",
+   "famille": "murs_exterieurs",
+   "couche": 8,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "pierre",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#BCB6A3",
+     "part": 0.64
+    },
+    {
+     "couleur": "#969778",
+     "part": 0.26
+    },
+    {
+     "couleur": "#3E362E",
+     "part": 0.1
+    }
+   ],
+   "mesures_m": {
+    "pierre": 0.25
+   }
+  },
+  {
+   "id": "clapboard-sage",
+   "nom": "Bardage de bois peint sauge",
+   "famille": "murs_exterieurs",
+   "couche": 9,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "bardage",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#99AF8D",
+     "part": 0.56
+    },
+    {
+     "couleur": "#6E8867",
+     "part": 0.39
+    },
+    {
+     "couleur": "#302922",
+     "part": 0.05
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1667
+   }
+  },
+  {
+   "id": "clapboard-sage-hautefonte",
+   "nom": "Bardage de bois peint sauge (Hautefonte)",
+   "famille": "murs_exterieurs",
+   "couche": 10,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "bardage",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#84927E",
+     "part": 0.56
+    },
+    {
+     "couleur": "#60705D",
+     "part": 0.39
+    },
+    {
+     "couleur": "#212326",
+     "part": 0.05
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1667
+   }
+  },
+  {
+   "id": "clapboard-sage-combe",
+   "nom": "Bardage de bois peint sauge (Combe-Veilleuse)",
+   "famille": "murs_exterieurs",
+   "couche": 11,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "bardage",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#596657",
+     "part": 0.56
+    },
+    {
+     "couleur": "#414E41",
+     "part": 0.39
+    },
+    {
+     "couleur": "#121514",
+     "part": 0.05
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.1667
+   }
+  },
+  {
+   "id": "clapboard-raw-wood",
+   "nom": "Bardage de bois brut",
+   "famille": "murs_exterieurs",
+   "couche": 12,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "bardage",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#BC9264",
+     "part": 0.65
+    },
+    {
+     "couleur": "#88663F",
+     "part": 0.31
+    },
+    {
+     "couleur": "#392E25",
+     "part": 0.04
+    }
+   ],
+   "mesures_m": {
+    "lame": 0.2
+   }
+  },
+  {
+   "id": "brick-red",
+   "nom": "Brique de ville",
+   "famille": "murs_exterieurs",
+   "couche": 13,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "brique",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#936D5F",
+     "part": 0.58
+    },
+    {
+     "couleur": "#705046",
+     "part": 0.28
+    },
+    {
+     "couleur": "#3B3434",
+     "part": 0.13
+    }
+   ],
+   "mesures_m": {
+    "brique": 0.2102
+   }
+  },
+  {
+   "id": "brick-red-aubrune",
+   "nom": "Brique de ville (Aubrune)",
+   "famille": "murs_exterieurs",
+   "couche": 14,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "brique",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#BA7D64",
+     "part": 0.59
+    },
+    {
+     "couleur": "#905A48",
+     "part": 0.28
+    },
+    {
+     "couleur": "#503D33",
+     "part": 0.14
+    }
+   ],
+   "mesures_m": {
+    "brique": 0.2102
+   }
+  },
+  {
+   "id": "roof-tiles",
+   "nom": "Tuiles",
+   "famille": "toitures",
+   "couche": 0,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "tuiles",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#CA8062",
+     "part": 0.6
+    },
+    {
+     "couleur": "#935441",
+     "part": 0.23
+    },
+    {
+     "couleur": "#392C24",
+     "part": 0.16
+    }
+   ],
+   "mesures_m": {
+    "tuile": 0.2222
+   }
+  },
+  {
+   "id": "roof-tiles-hautefonte",
+   "nom": "Tuiles (Hautefonte)",
+   "famille": "toitures",
+   "couche": 1,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "tuiles",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#9F715E",
+     "part": 0.6
+    },
+    {
+     "couleur": "#714B40",
+     "part": 0.23
+    },
+    {
+     "couleur": "#282527",
+     "part": 0.16
+    }
+   ],
+   "mesures_m": {
+    "tuile": 0.2222
+   }
+  },
+  {
+   "id": "roof-tiles-combe",
+   "nom": "Tuiles (Combe-Veilleuse)",
+   "famille": "toitures",
+   "couche": 2,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "tuiles",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#665044",
+     "part": 0.6
+    },
+    {
+     "couleur": "#48362E",
+     "part": 0.23
+    },
+    {
+     "couleur": "#171715",
+     "part": 0.16
+    }
+   ],
+   "mesures_m": {
+    "tuile": 0.2222
+   }
+  },
+  {
+   "id": "roof-tiles-mossy",
+   "nom": "Tuiles moussues",
+   "famille": "toitures",
+   "couche": 3,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "tuiles",
+   "palette": "aubrune",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#BE7C61",
+     "part": 0.56
+    },
+    {
+     "couleur": "#784A3B",
+     "part": 0.35
+    },
+    {
+     "couleur": "#8EA562",
+     "part": 0.09
+    }
+   ],
+   "mesures_m": {
+    "tuile": 0.2222
+   }
+  },
+  {
+   "id": "roof-slates",
+   "nom": "Ardoises",
+   "famille": "toitures",
+   "couche": 4,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "tuiles",
+   "palette": "hautefonte",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#70767F",
+     "part": 0.61
+    },
+    {
+     "couleur": "#4D525A",
+     "part": 0.29
+    },
+    {
+     "couleur": "#27282D",
+     "part": 0.1
+    }
+   ],
+   "mesures_m": {
+    "tuile": 0.25
+   }
+  },
+  {
+   "id": "roof-slates-combe",
+   "nom": "Ardoises (Combe-Veilleuse)",
+   "famille": "toitures",
+   "couche": 5,
+   "taille_m": [
+    2.0,
+    2.0
+   ],
+   "repetition": "xy",
+   "matiere": "tuiles",
+   "palette": "combe-veilleuse",
+   "couleurs_dominantes": [
+    {
+     "couleur": "#4B5255",
+     "part": 0.61
+    },
+    {
+     "couleur": "#34393C",
+     "part": 0.29
+    },
+    {
+     "couleur": "#161919",
+     "part": 0.1
+    }
+   ],
+   "mesures_m": {
+    "tuile": 0.25
+   }
+  }
+ ]
+}

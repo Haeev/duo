@@ -6,6 +6,7 @@
  * hachurées), le rendu et les quêtes (`isZoneOpen`).
  */
 import type { PlaceContent } from '../../donnees/charger';
+import { zoneKey } from '../quetes/faits';
 import { PLACES } from './reglages';
 import { lockCount, markClosedLocks, refreshLockStates, type PlaceLook } from './verrous';
 
@@ -160,10 +161,21 @@ function cacheOf(look: PlaceLook, place: PlaceContent): ZoneCache {
   return cache;
 }
 
-/** Les zones du lieu courant, ouvertes ou fermées, dans l'ordre de la carte. */
+/**
+ * Les zones du lieu courant, ouvertes ou fermées, dans l'ordre de la carte. L'histoire peut
+ * aussi ouvrir une zone (effet `unlock_zone` des quêtes, fait `zones.<lieu>.<zone>`): la zone
+ * compte alors ouverte même si un verrou intérieur en garde encore une grande part.
+ */
 export function zoneViews(look: PlaceLook): readonly ZoneView[] {
-  const place = look.content.places[look.world.common.place];
-  return place === undefined ? [] : cacheOf(look, place).views;
+  const placeId = look.world.common.place;
+  const place = look.content.places[placeId];
+  if (place === undefined) return [];
+  const views = cacheOf(look, place).views;
+  const memory = look.world.progress.memory;
+  if (!views.some((z) => !z.open && memory[zoneKey(placeId, z.id)] !== undefined)) return views;
+  return views.map((z) =>
+    z.open || memory[zoneKey(placeId, z.id)] === undefined ? z : { ...z, open: true },
+  );
 }
 
 /** La zone `id` du lieu courant est-elle ouverte ? Une zone inconnue compte pour fermée. */

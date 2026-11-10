@@ -7,6 +7,7 @@
 # Unités: mètres. Repères de l'adulte: taille (ceinture) 0,983; entrejambe 0,80; genou 0,46; cheville 0,10;
 # col 1,325; menton 1,36; sommet du crâne 1,70. Couleurs: noms du nuancier (nuancier.json, copie de la bible).
 # Identifiants: minuscules, chiffres et traits d'union, emplacement en tête (top-tee).
+# Chaque pièce a un `nom` français court (affiché dans l'éditeur et les boutiques).
 
 # ---------------------------------------------------------------- corpulences (bible 2.1)
 # sh carrure, wa taille, hi bassin, arm et leg épaisseur des membres; d_* profondeurs; belly avancée du ventre.
@@ -126,6 +127,7 @@ torso = 0.97
 # col = hauteur du col (1.337 ras du cou, 1.36 col roulé); bourrelet = bord renflé (vrai ou faux).
 [[pieces]]
 id = "top-tee"
+nom = "T-shirt"
 slot = "top"
 base = "torse"
 couche = 0.019
@@ -139,6 +141,7 @@ tags = ["quotidien"]
 
 [[pieces]]
 id = "top-sweater"
+nom = "Pull col roulé"
 slot = "top"
 base = "torse"
 couche = 0.021
@@ -152,6 +155,7 @@ tags = ["quotidien", "froid"]
 
 [[pieces]]
 id = "top-tank"
+nom = "Débardeur"
 slot = "top"
 base = "torse"
 couche = 0.017
@@ -166,6 +170,7 @@ tags = ["ete"]
 # Pièce ajoutée par une seule entrée de données (preuve du gabarit, 2026-11-10): gilet sans manches porté sur un haut.
 [[pieces]]
 id = "accessory-vest"
+nom = "Gilet sans manches"
 slot = "accessory"
 base = "torse"
 couche = 0.034
@@ -181,6 +186,7 @@ tags = ["travail"]
 # 1.0 jusque sur la chaussure); couche comme ci-dessus (0.008 pour un bas porté sous le haut).
 [[pieces]]
 id = "bottom-trousers"
+nom = "Pantalon droit"
 slot = "bottom"
 base = "jambes"
 couche = 0.008
@@ -190,6 +196,7 @@ tags = ["quotidien"]
 
 [[pieces]]
 id = "bottom-shorts"
+nom = "Short"
 slot = "bottom"
 base = "jambes"
 couche = 0.008
@@ -201,6 +208,7 @@ tags = ["ete"]
 # rigide sous le genou); evasement = élargissement à l'ourlet.
 [[pieces]]
 id = "bottom-skirt"
+nom = "Jupe trapèze"
 slot = "bottom"
 base = "jupe"
 couche = 0.008
@@ -212,6 +220,7 @@ tags = ["quotidien"]
 # --- base "robe": buste (champs de "torse") prolongé en jupe (champs de "jupe"). Occupe haut et bas.
 [[pieces]]
 id = "dress-simple"
+nom = "Robe t-shirt"
 slot = "dress"
 base = "robe"
 couche = 0.019
@@ -226,6 +235,7 @@ tags = ["quotidien"]
 # longueur du pied 0.24 chez l'adulte (bible 2.2). Zones: cuir puis semelle.
 [[pieces]]
 id = "shoes-pebble"
+nom = "Bottines"
 slot = "shoes"
 base = "galet"
 tige = 0.10
@@ -234,6 +244,7 @@ tags = ["quotidien"]
 
 [[pieces]]
 id = "shoes-boots"
+nom = "Bottes"
 slot = "shoes"
 base = "galet"
 tige = 0.24
@@ -246,6 +257,7 @@ tags = ["pluie"]
 # pour les peaux sombres, bible 2.3).
 [[pieces]]
 id = "head-round"
+nom = "Ronde"
 slot = "head"
 base = "tete"
 machoire = 0.0
@@ -257,6 +269,7 @@ tags = ["doux"]
 
 [[pieces]]
 id = "head-square"
+nom = "Carrée"
 slot = "head"
 base = "tete"
 machoire = 0.10
@@ -273,6 +286,7 @@ tags = ["marque"]
 # Sous un chapeau, le jeu prend la variante « à plat » (calotte seule), fabriquée d'office.
 [[pieces]]
 id = "hair-short"
+nom = "Court"
 slot = "hair"
 base = "coiffure"
 front = 1.63
@@ -288,6 +302,7 @@ tags = ["court"]
 
 [[pieces]]
 id = "hair-side-part"
+nom = "Raie de côté"
 slot = "hair"
 base = "coiffure"
 front = 1.64
@@ -305,6 +320,7 @@ tags = ["raie"]
 
 [[pieces]]
 id = "hair-bun"
+nom = "Chignon haut"
 slot = "hair"
 base = "coiffure"
 front = 1.635
@@ -321,6 +337,7 @@ tags = ["chignon"]
 
 [[pieces]]
 id = "hair-bob"
+nom = "Carré"
 slot = "hair"
 base = "coiffure"
 front = 1.60
@@ -341,6 +358,7 @@ tags = ["carre"]
 # cheveux = effet sur la coiffure: "free" (rien), "flat" (variante à plat), "hidden" (coiffure retirée).
 [[pieces]]
 id = "hat-beanie-pompom"
+nom = "Bonnet à pompon"
 slot = "hat"
 base = "meshy-rigide"
 fichier = "meshy/hat-beanie-pompom.source.glb"

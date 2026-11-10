@@ -20,7 +20,7 @@ from mathutils.bvhtree import BVHTree
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from figurine import REGIONS, X, Y, Z, ZONE_FIXED, ZONE_SKIN, Builder, chain, limb_stations, rim, smooth, srgb, tag  # noqa: E402
+from figurine import REGIONS, X, Y, Z, ZONE_FIXED, ZONE_SKIN, Builder, chain, limb_stations, rim, section_v, smooth, srgb, tag  # noqa: E402
 
 OUT_GLB, OUT_DATA = sys.argv[-2:]
 with open(os.path.join(HERE, "gabarits.toml"), "rb") as fh:
@@ -443,7 +443,7 @@ def rigid_from_meshy(spec, rig):
     for p in me.polygons:
         p.use_smooth = True
         for li in p.loop_indices:
-            uv.data[li].uv = (0.5 / 8, 0.5 / 16)
+            uv.data[li].uv = (0.5 / 8, section_v(0))
             col.data[li].color = (*rgb, 1.0)
     me.color_attributes.active_color = col
     me.materials.clear()
@@ -662,7 +662,9 @@ for m in G["morphologies"]:
                                   "legs": m.get("legs", 1.0), "arms": m.get("arms", 1.0), "torso": m.get("torso", 1.0)}
 for pid, (o, spec, flat) in objects.items():
     zones = [{"id": z["id"], "colors": zone_colors(z)} for z in spec["zones"]]
-    catalogue["pieces"].append({"id": pid, "slot": spec["slot"], "file": f"{spec['slot']}.glb", "node": pid, "covers": covers_of(spec),
+    if not spec.get("nom") and pid != "body-base":
+        raise SystemExit(f"{pid}: champ « nom » manquant (nom affiché dans l'éditeur)")
+    catalogue["pieces"].append({"id": pid, "name": spec.get("nom", "Corps"), "slot": spec["slot"], "file": f"{spec['slot']}.glb", "node": pid, "covers": covers_of(spec),
                                 "hair": spec.get("cheveux"), "zones": zones, "tags": spec.get("tags", []), "triangles": triangles(o)})
     details["defaults"][pid] = [zone_colors(z).index(color_of(z).lower()) for z in spec["zones"]]
 with open(os.path.join(OUT_DATA, "catalogue.json"), "w", encoding="utf-8") as fh:

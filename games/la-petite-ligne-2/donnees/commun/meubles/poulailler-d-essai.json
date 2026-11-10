@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "poulailler-d-essai",
+  "name": "Poulailler d'essai",
+  "model": "poulailler",
+  "size": {
+    "w": 3,
+    "h": 2
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "shelter",
+      "species": "poule",
+      "places": [
+        { "count": 4, "fact": null },
+        { "count": 6, "fact": "logement.poulailler.agrandi" },
+        { "count": 8, "fact": "logement.poulailler.grand" }
+      ],
+      "feeder": 20,
+      "nests": 3,
+      "nestCapacity": 12,
+      "pen": { "x": -3, "y": 1.2, "w": 6, "h": 4 },
+      "starters": [
+        { "name": "Bichette", "robe": "blanche" },
+        { "name": "Noisette", "robe": "rousse" },
+        { "name": "Plume", "robe": "noire" }
+      ]
+    }
+  ]
+}

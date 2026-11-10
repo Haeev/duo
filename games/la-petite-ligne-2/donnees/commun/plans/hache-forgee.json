@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "hache-forgee",
+  "name": "Hache forgée",
+  "makes": {
+    "kind": "upgrade",
+    "from": "hache"
+  },
+  "station": "forge",
+  "materials": [],
+  "work": 1,
+  "source": "start",
+  "series": null
+}

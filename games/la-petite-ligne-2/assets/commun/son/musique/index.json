@@ -1,0 +1,100 @@
+{
+  "bourg-apres-midi": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "bourg-aube": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "bourg-matin": {
+    "seconds": 80.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "bourg-nuit": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "bourg-pluie": {
+    "seconds": 72.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "bourg-soir": {
+    "seconds": 72.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "fete": {
+    "seconds": 80.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "jingle-collection-complete": {
+    "seconds": 3.589,
+    "stems": []
+  },
+  "jingle-etape-quete": {
+    "seconds": 2.031,
+    "stems": []
+  },
+  "jingle-prise-nouvelle": {
+    "seconds": 2.729,
+    "stems": []
+  },
+  "jingle-quete-terminee": {
+    "seconds": 4.195,
+    "stems": []
+  },
+  "jingle-repas-partage": {
+    "seconds": 3.795,
+    "stems": []
+  },
+  "jingle-reveil": {
+    "seconds": 4.024,
+    "stems": []
+  },
+  "mystere": {
+    "seconds": 60.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "riviere": {
+    "seconds": 70.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "theme-arrivee-aubrune": {
+    "seconds": 5.834,
+    "stems": []
+  },
+  "train": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  }
+}

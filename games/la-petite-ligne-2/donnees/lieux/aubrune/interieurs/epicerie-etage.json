@@ -1,0 +1,64 @@
+{
+ "schema": 1,
+ "id": "epicerie-etage",
+ "name": "La pension Ferrand, étage",
+ "width": 7,
+ "height": 9,
+ "at": {
+  "x": 58,
+  "y": 210
+ },
+ "blocked": [
+  {
+   "x": 0,
+   "y": 5,
+   "w": 6,
+   "h": 1
+  }
+ ],
+ "points": {
+  "pension-lit-a": {
+   "x": 1.5,
+   "y": 0.5
+  },
+  "pension-lit-b": {
+   "x": 1.5,
+   "y": 0.5
+  },
+  "odette-lit-p": {
+   "x": 1.5,
+   "y": 6.5
+  }
+ },
+ "objects": [
+  {
+   "id": "lit-pension-1",
+   "type": "lit-simple",
+   "x": 0.5,
+   "y": 1,
+   "rotation": 0
+  },
+  {
+   "id": "lit-pension-2",
+   "type": "lit-simple",
+   "x": 2.5,
+   "y": 1,
+   "rotation": 0
+  },
+  {
+   "id": "odette-lit",
+   "type": "lit-simple",
+   "x": 0.5,
+   "y": 7,
+   "rotation": 0
+  }
+ ],
+ "doors": {
+  "epicerie-etage-esc-epicerie-rdc": {
+   "x": 6.5,
+   "y": 8.5,
+   "facing": 2,
+   "to": "epicerie-rdc-esc-epicerie-etage"
+  }
+ }
+}

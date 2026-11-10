@@ -421,6 +421,20 @@ export function createKitchen(
         if (event.player === me) mealTime = 0;
         break;
       // Le reste ne touche pas la cuisine.
+      case 'animal_arrived':
+      case 'animal_petted':
+      case 'craft_cancelled':
+      case 'craft_hit':
+      case 'craft_started':
+      case 'crafted':
+      case 'plan_learned':
+      case 'shelter_collected':
+      case 'shelter_filled':
+      case 'shelter_opened':
+      case 'tool_mended':
+      case 'tool_ordered':
+      case 'tool_sharpened':
+      case 'workshop_opened':
       case 'ate':
       case 'bag_changed':
       case 'brick_used':

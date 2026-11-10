@@ -10,6 +10,7 @@ import { FISHING_EVENTS } from '../peche/evenements';
 import { BRICK_EVENTS } from '../briques/evenements';
 import { SHOP_EVENTS } from '../commerces/evenements';
 import { COOK_EVENTS } from '../cuisine/evenements';
+import { CRAFT_EVENTS } from '../fabrication/evenements';
 import { DIALOGUE_EVENTS } from '../dialogues/evenements';
 import { TOOL_EVENTS } from '../outils/evenements';
 import { VILLAGER_EVENTS } from '../habitants/evenements';
@@ -21,6 +22,7 @@ import { PLACE_EVENTS } from '../lieux/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
 import { SCENE_EVENTS } from '../scenes/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
+import { FARM_EVENTS } from '../elevage/evenements';
 
 export const CORE_EVENTS = [
   /**
@@ -70,10 +72,12 @@ export const GameEventSchema = v.variant('type', [
   ...QUEST_EVENTS,
   ...SCENE_EVENTS,
   ...COOK_EVENTS,
+  ...CRAFT_EVENTS,
   ...WORLD_EVENTS,
   ...COLLECTION_EVENTS,
   ...HOUSING_EVENTS,
   ...FISHING_EVENTS,
   ...PLACE_EVENTS,
+  ...FARM_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

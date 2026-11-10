@@ -1,0 +1,32 @@
+// GABARIT: un plan de fabrication (meuble, objet, outil) ou une amélioration d'outil.
+// Créer: pnpm nouveau plan <id>        -> donnees/commun/plans/<id>.json
+// Schéma: src/donnees/schemas/plan.ts; moteur: src/simulation/fabrication/README.md
+{
+  "schema": 1,
+  "id": "exemple-plan",
+  "name": "Caisse d'exemple",
+  // Ce qu'il fabrique, au choix:
+  // { "kind": "item", "item": "<objet>", "count": 1 }   un objet ou un outil
+  // { "kind": "furniture", "variants": [{ "color": "#c8955a", "item": "<meuble-miel>" }, ...] }
+  //   un meuble (objet de famille "furniture"), une variante par couleur de la série
+  // { "kind": "upgrade", "from": "<outil>" }   l'amélioration de cet outil: outil obtenu, prix et
+  //   matériaux sont ceux de l'outil (tool.work.upgrade); "materials" reste vide
+  "makes": { "kind": "item", "item": "nichoir", "count": 1 },
+  // Poste: workbench (établi), forge (l'artisan), loom (métier à tisser), grindstone (meule).
+  // Il faut un meuble avec la brique { "brick": "craft", "station": ..., "services": [...] }.
+  "station": "workbench",
+  // Matériaux (6 lignes au plus), pris dans les poches puis dans les coffres proches du poste.
+  "materials": [{ "item": "planche", "count": 2 }],
+  // Points de travail: un coup à mains nues en donne 4, un marteau de base 6 (36: six coups).
+  "work": 24,
+  // start: connu dès le début; villager, quest: appris par l'effet de dialogue ou de quête
+  // { "type": "remember", "key": "fabrication.plan.<id>", "value": 0 }; shop, dig: par un
+  // plan papier ("paper") acheté ou trouvé, lu en ouvrant un atelier.
+  "source": "start",
+  // Facultatif. L'objet plan papier qui l'apprend.
+  // "paper": "plan-de-lanterne",
+  // Série de meubles assortis (comme "series" des meubles), null sinon.
+  "series": null,
+  // Facultatif, amélioration seulement: l'artisan rend l'outil le lendemain.
+  // "delay": "next-day",
+}

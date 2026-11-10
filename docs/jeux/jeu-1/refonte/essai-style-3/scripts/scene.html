@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Essai de style 3: corps commun encré, tenues en textures</title>
+<style>body { margin: 0; background: #1d1c1a; } canvas { display: block; }</style>
+<script type="importmap">
+{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+// Planche de l'essai 3 (style « bande dessinée encrée », bible 0.2).
+// Un corps commun par gabarit (GLB conformé), un atlas de 512 px par personnage (tenue + peau + cheveux),
+// une coiffure en coque, l'atlas commun des traits (expressions), la coque d'encre cuite dans la géométrie
+// (triangles retournés poussés en espace écran, épaisseur irrégulière), rampe à 2 tons.
+// Adresse: ?comparer=<glb de l'essai 2, voie B> (facultatif, servi sous /autre/).
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+const ESSAI = '/docs/jeux/jeu-1/refonte/essai-style-3/';
+const params = new URLSearchParams(location.search);
+const W = innerWidth, H = innerHeight;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.autoClear = false;
+renderer.info.autoReset = false;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+
+// Lumière: rampe à 2 tons. Ambiante + directionnelle telles que clair = albédo, ombre = 62 % (jour).
+const amb = new THREE.AmbientLight(0xffffff, 1);
+const sun = new THREE.DirectionalLight(0xffffff, 1);
+scene.add(amb, sun, sun.target);
+const AMBIANCES = {
+  jour: { ciel: 0xd9e6c8, amb: [0xc9c4ff, 0.2], sun: [0xfff2dc, 0.78], dir: [-0.85, 1.0, 0.45], sol: 'jour', encre: 0x231a17 },
+  crepuscule: { ciel: 0x6a4c6e, amb: [0x8e6aa0, 0.26], sun: [0xffb87a, 0.74], dir: [-0.95, 0.72, -0.1], sol: 'crepuscule', encre: 0x1c1420 },
+};
+// Rampe à 3 tons: noir coloré (ambiante seule), ombre, clair. Ambiante 22 %, soleil 78 %.
+const gradient = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255, 128, 128, 128, 255, 255, 255, 255, 255, 255, 255, 255, 255]), 4, 1);
+gradient.minFilter = gradient.magFilter = THREE.NearestFilter;
+gradient.needsUpdate = true;
+
+const uniforms = { uRes: { value: new THREE.Vector2(W, H) }, uPx: { value: 3.0 }, uInk: { value: new THREE.Color(0x231a17) } };
+function setAmbiance(name) {
+  const a = AMBIANCES[name];
+  amb.color.set(a.amb[0]); amb.intensity = a.amb[1] * Math.PI;
+  sun.color.set(a.sun[0]); sun.intensity = a.sun[1] * Math.PI;
+  sun.position.set(...a.dir).multiplyScalar(10);
+  scene.background = new THREE.Color(a.ciel);
+  uniforms.uInk.value.set(a.encre);
+  ground.material.map = groundTex[a.sol];
+}
+
+// Matériau encré: rampe toon, coque d'encre (attribut aOutline), traits du visage (attribut traitsUv).
+function inkMaterial(map, traits) {
+  const m = new THREE.MeshToonMaterial({ map, gradientMap: gradient });
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, uniforms);
+    sh.uniforms.traitsMap = { value: traits?.map ?? null };
+    sh.uniforms.uCell = traits?.cell ?? { value: 0 };
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', `#include <common>
+        attribute float aOutline; attribute vec2 traitsUv; varying float vOutline; varying vec2 vTraits;
+        uniform vec2 uRes; uniform float uPx;`)
+      .replace('#include <uv_vertex>', `#include <uv_vertex>
+        vOutline = aOutline; vTraits = traitsUv;`)
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        if (aOutline > 0.5) {
+          vec2 n2 = (projectionMatrix * vec4(transformedNormal, 0.0)).xy;
+          n2 = normalize(n2 + 1e-5);
+          // Trait irrégulier: 60 à 140 % selon un bruit lié au corps (pas à l'écran: il ne grouille pas).
+          float k = 0.6 + 0.8 * (0.5 + 0.5 * sin(position.x * 0.31 + position.y * 0.17) * sin(position.z * 0.23 - position.y * 0.11 + 1.7));
+          gl_Position.xy += n2 * uPx * k * 2.0 / uRes * gl_Position.w;
+        }`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying float vOutline; varying vec2 vTraits; uniform vec3 uInk; uniform sampler2D traitsMap; uniform float uCell;`)
+      .replace('#include <map_fragment>', `#include <map_fragment>
+        ${traits ? `if (vTraits.x > 0.0 && vTraits.x < 1.0 && vTraits.y > 0.0 && vTraits.y < 1.0) {
+          vec4 t = texture2D(traitsMap, vec2((vTraits.x + uCell) / 4.0, vTraits.y));
+          diffuseColor.rgb = mix(diffuseColor.rgb, t.rgb, t.a);
+        }` : ''}`)
+      .replace('#include <dithering_fragment>', `#include <dithering_fragment>
+        if (vOutline > 0.5) gl_FragColor = vec4(uInk, 1.0);`);
+  };
+  m.customProgramCacheKey = () => (traits ? 'ink-traits' : 'ink');
+  return m;
+}
+
+// Coque cuite: sommets doublés (aOutline = 1), triangles retournés; un seul appel de dessin par groupe.
+function bakeOutline(geo) {
+  const n = geo.attributes.position.count;
+  const out = new THREE.BufferGeometry();
+  for (const [name, attr] of Object.entries(geo.attributes)) {
+    const a = new attr.array.constructor(attr.array.length * 2);
+    a.set(attr.array); a.set(attr.array, attr.array.length);
+    out.setAttribute(name, new THREE.BufferAttribute(a, attr.itemSize, attr.normalized));
+  }
+  const flag = new Float32Array(n * 2); flag.fill(1, n);
+  out.setAttribute('aOutline', new THREE.BufferAttribute(flag, 1));
+  if (!out.attributes.traitsUv) {
+    const t = geo.attributes.uv1 ? geo.attributes.uv1.array : new Float32Array(n * 2).fill(-4);
+    const a = new Float32Array(n * 4); a.set(t); a.fill(-4, n * 2);
+    out.setAttribute('traitsUv', new THREE.BufferAttribute(a, 2));
+  }
+  const idx = geo.index ? geo.index.array : [...Array(n).keys()];
+  const groups = geo.groups.length ? geo.groups : [{ start: 0, count: idx.length, materialIndex: 0 }];
+  const res = [];
+  const newGroups = [];
+  for (const [gi, g] of groups.entries()) {
+    const start = res.length;
+    for (let i = g.start; i < g.start + g.count; i += 1) res.push(idx[i]);
+    for (let i = g.start; i < g.start + g.count; i += 3) res.push(idx[i] + n, idx[i + 2] + n, idx[i + 1] + n);
+    newGroups.push({ start, count: res.length - start, materialIndex: g.materialIndex ?? gi });
+  }
+  out.setIndex(res);
+  for (const g of newGroups) out.addGroup(g.start, g.count, g.materialIndex);
+  out.boundingSphere = geo.boundingSphere?.clone() ?? null;
+  return out;
+}
+
+const loader = new GLTFLoader();
+const texLoader = new THREE.TextureLoader();
+function loadTex(url) {
+  return new Promise((ok) => texLoader.load(url, (t) => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; ok(t); }));
+}
+const cache = {};
+async function glb(url) { cache[url] ??= loader.loadAsync(url); return cache[url]; }
+const traitsTex = await loadTex(ESSAI + 'atlas/traits.png');
+traitsTex.colorSpace = THREE.SRGBColorSpace;
+
+async function personnage({ corps, atlas, coiffure, expression = 0 }) {
+  const g = await glb(ESSAI + `modeles/${corps}.glb`);
+  const root = SkeletonUtils.clone(g.scene);
+  const map = await loadTex(ESSAI + `atlas/${atlas}.png`);
+  const cell = { value: expression };
+  const matCorps = inkMaterial(map, null);
+  const matTete = inkMaterial(map, { map: traitsTex, cell });
+  let tris = 0;
+  let headBone = null;
+  root.traverse((o) => {
+    if (o.isBone && o.name === 'Head') headBone = o;
+    if (o.isSkinnedMesh) {
+      o.geometry = bakeOutline(o.geometry);
+      const pick = (m) => (m.name === 'tete' ? matTete : matCorps);
+      o.material = Array.isArray(o.material) ? o.material.map(pick) : pick(o.material);
+      o.frustumCulled = false;
+      tris += o.geometry.index.count / 3;
+    }
+  });
+  const holder = new THREE.Group();
+  holder.add(root);
+  root.updateMatrixWorld(true);
+  if (coiffure) {
+    const h = await glb(ESSAI + `modeles/${corps}-${coiffure}.glb`);
+    const hair = h.scene.clone(true);
+    hair.traverse((o) => { if (o.isMesh) { o.geometry = bakeOutline(o.geometry); o.material = matCorps; tris += o.geometry.index.count / 3; } });
+    headBone.attach(hair);
+  }
+  // Ombre de contact: aplat sombre à bord net (comme une ombre d'encre), pas d'ombre portée calculée.
+  const blob = new THREE.Mesh(new THREE.CircleGeometry(0.32, 20), new THREE.MeshBasicMaterial({ color: 0x2a1d22, transparent: true, opacity: 0.38, depthWrite: false }));
+  blob.rotation.x = -Math.PI / 2; blob.position.y = 0.005; blob.scale.set(1, 0.75, 1);
+  holder.add(blob);
+  scene.add(holder);
+  const mixer = new THREE.AnimationMixer(root);
+  const clips = Object.fromEntries(g.animations.map((a) => [a.name, a]));
+  return {
+    holder, tris, cell,
+    pose(name, t = 0) {
+      mixer.stopAllAction(); const c = clips[name]; if (c) { mixer.clipAction(c).play(); mixer.setTime(t); } root.updateMatrixWorld(true);
+    },
+  };
+}
+
+// Sol encré: aplat d'herbe à plaques claires, touffes en V à l'encre, chemin de terre fondu par une bande
+// d'ombre, quelques pierres cernées. Peint au canevas (1 024 px pour 6 m).
+function paintGround(pal) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 1024;
+  const g = c.getContext('2d');
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  g.fillStyle = pal.herbe[1]; g.fillRect(0, 0, 1024, 1024);
+  for (let k = 0; k < 26; k += 1) {
+    g.fillStyle = pal.herbe[0]; g.beginPath();
+    const x = rnd() * 1024, y = rnd() * 1024, r = 30 + rnd() * 70;
+    for (let a = 0; a < 7; a += 1) { const rr = r * (0.6 + rnd() * 0.5); g.lineTo(x + Math.cos(a * 0.9) * rr, y + Math.sin(a * 0.9) * rr * 0.7); }
+    g.fill();
+  }
+  // Chemin: bande de terre, bord fondu par une bande d'ombre d'herbe.
+  g.save();
+  g.lineCap = 'round';
+  const pathY = (x) => 690 + 45 * Math.sin((2 * Math.PI * x) / 1024) + 18 * Math.sin((4 * Math.PI * x) / 1024 + 1);
+  const path = () => { g.beginPath(); for (let x = -40; x <= 1064; x += 8) g.lineTo(x, pathY(x)); };
+  g.strokeStyle = pal.herbe[2]; g.lineWidth = 230; path(); g.stroke();
+  g.strokeStyle = pal.terre[1]; g.lineWidth = 190; path(); g.stroke();
+  g.strokeStyle = pal.terre[0]; g.lineWidth = 80; g.globalAlpha = 0.6; path(); g.stroke();
+  g.restore();
+  // Touffes en V, à l'encre, en grappes (jamais sur le chemin).
+  g.strokeStyle = pal.encre; g.lineCap = 'round';
+  for (let k = 0; k < 520; k += 1) {
+    const x = rnd() * 1024, y = rnd() * 1024;
+    const yPath = pathY(x);
+    if (Math.abs(y - yPath) < 120) continue;
+    const s = 4 + rnd() * 5;
+    g.lineWidth = 1.8 + rnd() * 1.6;
+    g.beginPath(); g.moveTo(x - s * 0.7, y - s); g.lineTo(x, y); g.lineTo(x + s * 0.6, y - s * 1.1); g.stroke();
+    if (rnd() > 0.5) { g.beginPath(); g.moveTo(x + 2, y - s * 1.4); g.lineTo(x + 3, y); g.stroke(); }
+  }
+  // Pierres cernées au bord du chemin, ombre portée en aplat.
+  for (let k = 0; k < 14; k += 1) {
+    const x = rnd() * 1024; const y = pathY(x) + (rnd() > 0.5 ? 1 : -1) * (95 + rnd() * 20);
+    const r = 9 + rnd() * 12;
+    g.fillStyle = pal.herbe[2]; g.beginPath(); g.ellipse(x + 4, y + 5, r, r * 0.7, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = pal.pierre[1]; g.strokeStyle = pal.encre; g.lineWidth = 3.5;
+    g.beginPath(); g.ellipse(x, y, r, r * 0.7, rnd(), 0, Math.PI * 2); g.fill(); g.stroke();
+    g.fillStyle = pal.pierre[0]; g.beginPath(); g.ellipse(x - r * 0.25, y - r * 0.2, r * 0.45, r * 0.25, 0, 0, Math.PI * 2); g.fill();
+  }
+  // Hachures dans les creux du chemin (traits à 45 degrés, 3 à 5).
+  g.lineWidth = 2.2;
+  for (let k = 0; k < 18; k += 1) {
+    const x = rnd() * 1024; const y = pathY(x) + (rnd() > 0.5 ? 1 : -1) * 80;
+    for (let j = 0; j < 4; j += 1) { g.beginPath(); g.moveTo(x + j * 7, y); g.lineTo(x + j * 7 + 9 + rnd() * 6, y - 9 - rnd() * 6); g.stroke(); }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(2, 2);
+  t.anisotropy = 8;
+  return t;
+}
+const groundTex = {
+  jour: paintGround({ herbe: ['#B9C76A', '#93A84E', '#5F7340'], terre: ['#E6CF9C', '#C7A877'], pierre: ['#DED3BC', '#B6A890'], encre: '#231A17' }),
+  crepuscule: paintGround({ herbe: ['#B9C76A', '#93A84E', '#5F7340'], terre: ['#E6CF9C', '#C7A877'], pierre: ['#DED3BC', '#B6A890'], encre: '#231A17' }),
+};
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(24, 24), new THREE.MeshToonMaterial({ gradientMap: gradient }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.set(0, 0, 0);
+scene.add(ground);
+
+const cam = new THREE.PerspectiveCamera(30, 1, 0.05, 120);
+function shot(rect, from, to, fov = 28, px = 3.6) {
+  cam.fov = fov; cam.aspect = rect.w / rect.h; cam.position.copy(from); cam.lookAt(to); cam.updateProjectionMatrix();
+  uniforms.uRes.value.set(rect.w, rect.h);
+  uniforms.uPx.value = px;
+  renderer.setViewport(rect.x, H - rect.y - rect.h, rect.w, rect.h);
+  renderer.setScissor(rect.x, H - rect.y - rect.h, rect.w, rect.h);
+  renderer.setScissorTest(true);
+  renderer.clear();
+  renderer.render(scene, cam);
+}
+// Vue du jeu: caméra haute à `deg` degrés, champ réglé pour qu'un personnage de 1,7 m fasse `px` pixels
+// de haut dans une image de 768 px (le cadre est un recadrage à l'échelle 1 de l'écran du jeu).
+function gameShot(rect, target, deg, charPx = 60, dist = 16) {
+  const fovRad = 2 * Math.atan((1.7 * Math.cos(THREE.MathUtils.degToRad(deg)) * 0.5 + 0.0) * (768 / charPx) / dist);
+  const fov = THREE.MathUtils.radToDeg(fovRad) * (rect.h / 768);
+  const d = new THREE.Vector3(0, Math.sin(THREE.MathUtils.degToRad(deg)), Math.cos(THREE.MathUtils.degToRad(deg)));
+  shot(rect, target.clone().addScaledVector(d, dist), target, fov, 3.2);
+}
+
+const labels = [];
+const sheetBg = '#efe9dd';
+const mesures = {};
+try {
+  setAmbiance('jour');
+  const P = {
+    maelle: await personnage({ corps: 'femme', atlas: 'maelle', coiffure: 'carre' }),
+    basile: await personnage({ corps: 'homme', atlas: 'basile', coiffure: 'court' }),
+    lou: await personnage({ corps: 'femme', atlas: 'lou', coiffure: 'court', expression: 1 }),
+    jules: await personnage({ corps: 'homme', atlas: 'jules', coiffure: 'carre', expression: 2 }),
+    gaston: await personnage({ corps: 'costaud', atlas: 'gaston', coiffure: 'court' }),
+  };
+  const all = Object.values(P);
+  const only = (...keep) => { for (const p of all) p.holder.visible = keep.includes(p); if (cmp) cmp.holder.visible = keep.includes(cmp); };
+  let cmp = null;
+  if (params.get('comparer')) {
+    const g = await loader.loadAsync('/autre/' + params.get('comparer'));
+    const root = g.scene;
+    root.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; } });
+    const box = new THREE.Box3().setFromObject(root);
+    root.scale.multiplyScalar(1.68 / (box.max.y - box.min.y));
+    const holder = new THREE.Group(); holder.add(root); scene.add(holder);
+    const mixer = new THREE.AnimationMixer(root);
+    cmp = { holder, pose(t) { mixer.stopAllAction(); mixer.clipAction(g.animations[0]).play(); mixer.setTime(t); } };
+  }
+  mesures.triangles = Object.fromEntries(Object.entries(P).map(([k, p]) => [k, p.tris]));
+
+  // Rangée 1: portraits face, dos, marche (pose de repos naturelle sur les vues fixes).
+  const rowH = 400, cw = W / 6;
+  let y = 30;
+  labels.push(['Essai 3: corps commun Meshy riggé duo-24, tenues = atlas de 512 px peints par fiche, coque d\'encre cuite, rampe à 3 tons', 10, 6, 18]);
+  for (const [i, key] of ['maelle', 'gaston'].entries()) {
+    const c = P[key];
+    only(c);
+    c.holder.position.set(0, 0, 1.5); c.holder.rotation.y = 0;
+    const target = new THREE.Vector3(0, 0.92, 1.5);
+    c.pose('repos');
+    shot({ x: i * 3 * cw, y, w: cw, h: rowH }, new THREE.Vector3(0.0, 1.25, 6.3), target, 21);
+    c.holder.rotation.y = Math.PI;
+    shot({ x: (i * 3 + 1) * cw, y, w: cw, h: rowH }, new THREE.Vector3(0.0, 1.25, 6.3), target, 21);
+    c.holder.rotation.y = Math.PI / 2 + 0.25; c.pose('marche', 0.3);
+    shot({ x: (i * 3 + 2) * cw, y, w: cw, h: rowH }, new THREE.Vector3(0.6, 1.25, 6.3), target, 21);
+    for (const [j, n] of ['face', 'dos', 'marche'].entries()) labels.push([`${key}: ${n}`, (i * 3 + j) * cw + 6, y + 4, 14]);
+  }
+  y += rowH + 4;
+
+  // Rangée 2: trois tenues sur le même corps de femme (vue 3/4 haute), trois expressions (vue proche).
+  const r2 = 300;
+  const tenues = [['maelle', 'carreaux-jean'], ['lou', 'mariniere-short']];
+  for (const [i, [key, nom]] of tenues.entries()) {
+    const c = P[key]; only(c); c.pose('repos');
+    c.holder.position.set(0, 0, 1.5); c.holder.rotation.y = 0.5;
+    shot({ x: i * cw, y, w: cw, h: r2 }, new THREE.Vector3(1.0, 2.6, 5.2), new THREE.Vector3(0, 0.85, 1.5), 22);
+    labels.push([`tenue: ${nom}`, i * cw + 6, y + 4, 13]);
+  }
+  {
+    const c = P.basile; only(c); c.pose('repos'); c.holder.position.set(0, 0, 1.5); c.holder.rotation.y = 0.5;
+    shot({ x: 2 * cw, y, w: cw, h: r2 }, new THREE.Vector3(1.0, 2.7, 5.4), new THREE.Vector3(0, 0.9, 1.5), 22);
+    labels.push(['tenue: pull-toile (homme)', 2 * cw + 6, y + 4, 13]);
+  }
+  {
+    const c = P.maelle; only(c); c.pose('repos'); c.holder.position.set(0, 0, 1.5); c.holder.rotation.y = 0;
+    for (const [k, nom] of ['neutre', 'joie', 'surprise'].entries()) {
+      c.cell.value = k;
+      shot({ x: (3 + k) * cw, y, w: cw, h: r2 }, new THREE.Vector3(0.0, 1.55, 3.0), new THREE.Vector3(0, 1.5, 1.5), 13, 2.5);
+      labels.push([`expression: ${nom}`, (3 + k) * cw + 6, y + 4, 13]);
+    }
+    c.cell.value = 0;
+  }
+  y += r2 + 4;
+
+  // Rangée 3: vues du jeu (recadrage à l'échelle 1: personnage de 60 px), 35 et 55 degrés, jour et crépuscule.
+  for (const p of all) p.holder.visible = true;
+  if (cmp) cmp.holder.visible = false;
+  const place = () => {
+    P.maelle.holder.position.set(-0.7, 0, 0.2); P.maelle.holder.rotation.y = 0.6; P.maelle.pose('marche', 0.2);
+    P.basile.holder.position.set(0.6, 0, -0.3); P.basile.holder.rotation.y = -0.9; P.basile.pose('repos');
+    P.lou.holder.position.set(0.2, 0, 0.9); P.lou.holder.rotation.y = 2.6; P.lou.pose('marche', 0.55);
+    P.jules.holder.position.set(-1.6, 0, -0.9); P.jules.holder.rotation.y = 0.2; P.jules.pose('repos');
+    P.gaston.holder.position.set(1.5, 0, 0.5); P.gaston.holder.rotation.y = -0.4; P.gaston.pose('marche', 0.7);
+  };
+  place();
+  const r3 = 360, w3 = W / 3;
+  const tgt = new THREE.Vector3(-0.3, 0.6, 0.0);
+  renderer.info.reset();
+  gameShot({ x: 0, y, w: w3, h: r3 }, tgt, 35);
+  mesures.vue35 = { appels: renderer.info.render.calls, triangles: renderer.info.render.triangles };
+  gameShot({ x: w3, y, w: w3, h: r3 }, tgt, 55);
+  setAmbiance('crepuscule');
+  gameShot({ x: 2 * w3, y, w: w3, h: r3 }, tgt, 55);
+  setAmbiance('jour');
+  labels.push(['vue du jeu, 35 degrés, jour (échelle 1, personnage de 60 px)', 6, y + 4, 13], ['vue du jeu, 55 degrés, jour', w3 + 6, y + 4, 13], ['vue du jeu, 55 degrés, crépuscule', 2 * w3 + 6, y + 4, 13]);
+  y += r3 + 4;
+
+  // Rangée 4: vue proche, crépuscule à 35 degrés, comparaison avec la voie B de l'essai 2 (même cadre).
+  const r4 = H - y;
+  {
+    const p = P.maelle.holder.position;
+    shot({ x: 0, y, w: w3, h: r4 }, new THREE.Vector3(p.x + 1.6, 2.3, p.z + 2.6), new THREE.Vector3(p.x, 0.9, p.z), 32, 3);
+    labels.push(['vue proche', 6, y + 4, 13]);
+  }
+  setAmbiance('crepuscule');
+  gameShot({ x: w3, y, w: w3, h: r4 }, tgt, 35, 90);
+  labels.push(['35 degrés, crépuscule, zoom le plus proche (90 px)', w3 + 6, y + 4, 13]);
+  setAmbiance('jour');
+  if (cmp) {
+    only(P.maelle, P.basile, P.gaston, cmp);
+    cmp.holder.position.set(-0.7, 0, 0.2); cmp.holder.rotation.y = 0.6; cmp.pose(0.2);
+    P.maelle.holder.position.set(0.9, 0, 0.6);
+    gameShot({ x: 2 * w3, y, w: w3, h: r4 }, tgt, 35, 90);
+    labels.push(['à gauche: essai 2, voie B (Meshy entier, 2 048 px)', 2 * w3 + 6, y + 4, 13]);
+  }
+  mesures.textures = renderer.info.memory.textures;
+  mesures.programmes = renderer.info.programs?.length;
+  const sheet = document.createElement('canvas');
+  sheet.width = W; sheet.height = H;
+  const ctx = sheet.getContext('2d');
+  ctx.fillStyle = sheetBg; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(renderer.domElement, 0, 0);
+  for (const [text, x, yy, size] of labels) { ctx.font = `bold ${size}px sans-serif`; ctx.fillStyle = 'rgba(239,233,221,0.88)'; const w = ctx.measureText(text).width; ctx.fillRect(x - 4, yy - 2, w + 8, size + 6); ctx.fillStyle = '#2b2523'; ctx.textBaseline = 'top'; ctx.fillText(text, x, yy); }
+  window.banc = { pret: true, mesures, image: sheet.toDataURL('image/png') };
+} catch (e) {
+  window.banc = { erreur: String(e.stack ?? e), mesures, image: renderer.domElement.toDataURL('image/png') };
+}
+</script>
+</body>
+</html>

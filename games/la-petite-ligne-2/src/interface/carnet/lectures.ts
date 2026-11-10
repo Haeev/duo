@@ -12,6 +12,8 @@
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { bondKey } from '../../etat/progression';
+import { glanceTarget, journal } from '../../simulation/quetes/lecture';
+import { collectionBook } from '../../simulation/collections/registre';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { GraphicsOptions } from '../../rendu/options';
 import { UI_TUNING } from '../reglages';
@@ -180,6 +182,38 @@ export interface WorldSourcesExtras {
   readonly closed?: (placeId: string, world: ReadonlyWorld) => readonly string[];
 }
 
+/** Catégorie des données (`commun/collections.json`) vers la famille d'onglet du carnet. */
+const FAMILY_OF_CATEGORY: Readonly<Record<string, CollectionFamily>> = {
+  poissons: 'fish',
+  insectes: 'insects',
+  tresors: 'fossils',
+  fleurs: 'flowers',
+  tenues: 'outfits',
+  recettes: 'recipes',
+  'cartes-postales': 'postcards',
+  musiques: 'music',
+};
+
+/** Moments du jour couverts par une plage d'heures (minutes); `from = to`: toute la journée. */
+const MOMENTS: readonly { readonly id: string; readonly from: number; readonly to: number }[] = [
+  { id: 'morning', from: 360, to: 720 },
+  { id: 'day', from: 720, to: 1080 },
+  { id: 'evening', from: 1080, to: 1320 },
+  { id: 'night', from: 1320, to: 1800 },
+];
+
+function momentsOf(hours: { readonly from: number; readonly to: number }): string[] {
+  if (hours.from === hours.to) return MOMENTS.map((m) => m.id);
+  const to = hours.to > hours.from ? hours.to : hours.to + 1440;
+  const overlaps = (a: number, b: number): boolean => a < to && b > hours.from;
+  return MOMENTS.filter(
+    (m) =>
+      overlaps(m.from, m.to) ||
+      overlaps(m.from - 1440, m.to - 1440) ||
+      overlaps(m.from + 1440, m.to + 1440),
+  ).map((m) => m.id);
+}
+
 const HALF_HEART_POINTS = 50;
 const MAX_HALVES = 10;
 
@@ -205,43 +239,43 @@ function targetOf(
 /** Adaptateurs sur l'état réel; ce qui manque est vide (jamais inventé). */
 export function worldSources(content: Content, extras: WorldSourcesExtras = {}): CarnetSources {
   return {
-    quests(world) {
-      const lines: QuestLineRead[] = [];
-      const placeId = world.common.place;
-      for (const place of Object.values(content.places)) {
-        for (const def of Object.values(place.quests)) {
-          const progress = world.progress.quests[def.id];
-          if (progress === undefined) continue;
-          const index = Math.max(
-            0,
-            def.chapters.findIndex((c) => c.id === progress.chapter),
-          );
-          const chapter = def.chapters[index];
-          const step = chapter?.steps.find((s) => s.id === progress.step) ?? chapter?.steps[0];
-          const giver = def.giver === null ? null : place.villagers.find((x) => x.id === def.giver);
-          const target =
-            progress.done || place.def.id !== placeId
+    quests(world, local) {
+      // Le moteur de quêtes fait foi: étapes ouvertes (en parallèle comprises), textes accordés
+      // pour ce joueur, repère du coup d'œil quand la suite est suivie.
+      const glance = glanceTarget(world, content, local);
+      return journal(world, content, local).map((entry) => {
+        const place = content.places[entry.place];
+        const def = place?.quests[entry.quest];
+        const progress = world.progress.quests[entry.quest];
+        const index = Math.max(0, def?.chapters.findIndex((c) => c.id === progress?.chapter) ?? 0);
+        const giver =
+          def?.giver === null || def === undefined
+            ? undefined
+            : place?.villagers.find((x) => x.id === def.giver);
+        const first = entry.steps[0];
+        const firstDef = def?.chapters.flatMap((c) => c.steps).find((st) => st.id === first?.id);
+        const target =
+          glance?.quest === entry.quest
+            ? { x: glance.target.x, y: glance.target.y }
+            : entry.done || place === undefined || entry.place !== world.common.place
               ? null
-              : targetOf(place, step?.target ?? null);
-          lines.push({
-            id: def.id,
-            kind: def.kind,
-            title: def.title,
-            giver:
-              giver === undefined || giver === null ? null : { id: giver.id, name: giver.name },
-            chapters: def.chapters.map((c, i) => ({
-              id: c.id,
-              title: c.title,
-              state: progress.done || i < index ? 'done' : i === index ? 'current' : 'todo',
-            })),
-            finished: progress.done,
-            step: progress.done ? '' : (step?.objective ?? ''),
-            together: progress.done ? false : (step?.together ?? false),
-            target,
-          });
-        }
-      }
-      return lines;
+              : targetOf(place, firstDef?.target ?? null);
+        return {
+          id: entry.quest,
+          kind: entry.kind,
+          title: entry.title,
+          giver: giver === undefined ? null : { id: giver.id, name: giver.name },
+          chapters: (def?.chapters ?? []).map((c, i) => ({
+            id: c.id,
+            title: c.title,
+            state: entry.done || i < index ? 'done' : i === index ? 'current' : 'todo',
+          })),
+          finished: entry.done,
+          step: entry.steps.map((st) => st.objective).join(' ; '),
+          together: entry.steps.some((st) => st.together),
+          target,
+        };
+      });
     },
     villagers(world, local) {
       const other: PlayerIndex = local === 0 ? 1 : 0;
@@ -276,13 +310,34 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
       });
     },
     collections(world) {
+      // Le carnet des collections fait foi (`collectionBook`); le catalogue d'essai ne sert plus
+      // qu'aux familles qui n'ont encore aucune entrée dans les données.
+      const book = collectionBook(world, content);
       const catalogue = extras.catalogue ?? [];
       return COLLECTION_FAMILIES.map((family) => {
-        const found = new Set(world.progress.collections[family] ?? []);
-        const entries = catalogue.find((c) => c.family === family)?.entries ?? [];
+        const category = book.find((c) => FAMILY_OF_CATEGORY[c.id] === family);
+        if (category === undefined || category.entries.length === 0)
+          return { family, entries: catalogue.find((c) => c.family === family)?.entries ?? [] };
         return {
           family,
-          entries: entries.map((e) => ({ ...e, found: found.has(e.id) || e.found })),
+          entries: category.entries.map((e) => {
+            const found = e.by[0] || e.by[1];
+            return {
+              id: e.id,
+              name: e.name,
+              rarity: 1,
+              found,
+              firstBy: e.firstBy,
+              clues: {
+                moments: e.rarity === null ? null : momentsOf(e.rarity.hours),
+                weathers:
+                  e.rarity === null || e.rarity.weathers.length === 0 ? null : e.rarity.weathers,
+                seasons:
+                  e.rarity === null || e.rarity.seasons.length === 0 ? null : e.rarity.seasons,
+                where: found ? (content.places[e.place]?.def.name ?? null) : null,
+              },
+            };
+          }),
         };
       });
     },

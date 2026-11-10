@@ -3,7 +3,6 @@ import type { Settings } from '../../donnees/schemas/reglages';
 import { SEASONS } from '../../donnees/schemas/prise';
 import type { WEATHERS } from '../../etat/commun';
 import type { Look } from '../briques/types';
-import { HARVEST_TUNING } from './reglages';
 
 export type Season = (typeof SEASONS)[number];
 export type Weather = (typeof WEATHERS)[number];
@@ -26,7 +25,10 @@ export function allows<T>(list: readonly T[], value: T): boolean {
   return list.length === 0 || list.includes(value);
 }
 
-/** Il pleut: le potager s'arrose seul aujourd'hui. */
+/**
+ * Il pleut: le potager s'arrose seul aujourd'hui. Une seule source, les météos qui arrosent de
+ * `commun/temps.json` (`wateringWeathers`, celles de l'événement `rain_watered` du temps du monde).
+ */
 export function isRaining(look: Look): boolean {
-  return HARVEST_TUNING.rainWeathers.includes(look.world.common.weather);
+  return look.content.time.file.wateringWeathers.includes(look.world.common.weather);
 }

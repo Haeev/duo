@@ -21,6 +21,15 @@ import { UI_TUNING } from './reglages';
 import { fill, TEXTS } from './textes';
 
 const NEED_ICONS = { hunger: 'bol', sleep: 'lune', hygiene: 'goutte' } as const;
+/** Picto du temps qu'il fait, à côté du jour (par beau temps: soleil le jour, lune la nuit). */
+const WEATHER_ICONS = {
+  clear: 'soleil',
+  overcast: 'nuage',
+  rain: 'pluie',
+  mist: 'brume',
+  snow: 'neige',
+  storm: 'orage',
+} as const;
 
 /** Projection d'un point du monde (m) vers l'écran (px CSS), `null` hors champ. */
 /** Hauteurs (m) où s'accrochent la bulle d'action et le jeton de l'autre joueur. */
@@ -43,6 +52,8 @@ export interface HudFrame {
   readonly yaw: number;
   /** Réglage « besoins toujours visibles » (carnet, onglet Réglages). */
   readonly needsAlways?: boolean;
+  /** Repère de l'étape suivie (`glanceTarget`), montré par le coup d'œil; absent: rien. */
+  readonly questTarget?: { readonly x: number; readonly y: number; readonly label: string } | null;
 }
 
 export interface Hud {
@@ -64,7 +75,9 @@ export function createHud(
   const sun = el('div', { class: 'dial__sun' });
   const bed = el('span', { class: 'dial__bed', title: TEXTS.clock.sleep }, [icon('lit')]);
   const dial = el('div', { class: 'dial' }, [sun, bed]);
-  const day = el('div', { class: 'hud-clock__day' }, [icon('soleil'), el('span')]);
+  const weatherIcon = icon('soleil');
+  const weatherUse = weatherIcon.firstElementChild;
+  const day = el('div', { class: 'hud-clock__day' }, [weatherIcon, el('span')]);
   const time = el('div', { class: 'hud-clock__time' });
   const amount = el('span', { class: 'purse__n' });
   const purse = el('div', { class: 'purse' }, [el('span', { class: 'coin' }), amount]);
@@ -157,7 +170,8 @@ export function createHud(
   }
 
   return {
-    frame({ now, world, local, prompt: model, menu, yaw, needsAlways = false }) {
+    frame(f) {
+      const { now, world, local, prompt: model, menu, yaw, needsAlways = false } = f;
       const c = clockModel(world, local);
       setText(time, c.time);
       const dayLabel = day.lastElementChild;
@@ -166,10 +180,14 @@ export function createHud(
       toggle(clock, 'hud-clock--night', c.night);
       show(bed, c.canSleep);
       sun.style.transform = `rotate(${Math.round(-70 + 140 * c.arc)}deg)`;
+      const weather = world.common.weather;
+      const weatherId = weather === 'clear' && c.night ? 'lune' : WEATHER_ICONS[weather];
+      if (weatherUse !== null) setAttr(weatherUse, 'href', `#lpl-i-${weatherId}`);
+      setAttr(day, 'title', TEXTS.clock.weather[weather]);
       setAttr(
         clock,
         'aria-label',
-        fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money }),
+        `${fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money })} ${TEXTS.clock.weather[weather]}.`,
       );
       show(gain, now < gainUntil);
 
@@ -245,6 +263,23 @@ export function createHud(
           const h = root.clientHeight || window.innerHeight;
           otherToken.style.left = `${Math.round(w / 2 + Math.sin(dir.angle) * (w / 2 - 80))}px`;
           otherToken.style.top = `${Math.round(h / 2 - Math.cos(dir.angle) * (h / 2 - 70))}px`;
+        }
+        const target = f.questTarget ?? null;
+        show(quest, target !== null);
+        if (target !== null) {
+          quest.setAttribute('aria-label', target.label);
+          quest.title = target.label;
+          const qDir = otherDirection(me.body, { x: target.x, y: target.y }, yaw);
+          const onScreen = project?.(target.x, target.y, TOKEN_HEIGHT) ?? null;
+          if (onScreen !== null) {
+            quest.style.left = `${Math.round(onScreen.x)}px`;
+            quest.style.top = `${Math.round(onScreen.y)}px`;
+          } else {
+            const w = root.clientWidth || window.innerWidth;
+            const h = root.clientHeight || window.innerHeight;
+            quest.style.left = `${Math.round(w / 2 + Math.sin(qDir.angle) * (w / 2 - 80))}px`;
+            quest.style.top = `${Math.round(h / 2 - Math.cos(qDir.angle) * (h / 2 - 70))}px`;
+          }
         }
         const bar = timer.firstElementChild;
         if (bar instanceof HTMLElement)

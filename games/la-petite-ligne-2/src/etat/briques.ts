@@ -7,6 +7,7 @@ import { IntSchema, PlayerIndexSchema, TickSchema } from '../donnees/schemas/com
 import type { Brick } from '../donnees/schemas/briques';
 import { StackSchema } from './joueur';
 import { FieldStateSchema, HarvestStateSchema } from '../donnees/schemas/recolte-briques';
+import { ShelterStateSchema } from '../donnees/schemas/elevage';
 
 const Seat = v.nullable(PlayerIndexSchema);
 
@@ -24,6 +25,8 @@ export const BrickStatesSchema = v.strictObject({
   /** Point de récolte et terre cultivable (`donnees/schemas/recolte-briques.ts`). */
   harvest: v.exactOptional(HarvestStateSchema),
   field: v.exactOptional(FieldStateSchema),
+  /** Abri de la basse-cour (`donnees/schemas/elevage.ts`). */
+  shelter: v.exactOptional(ShelterStateSchema),
 });
 export type BrickStates = v.InferOutput<typeof BrickStatesSchema>;
 
@@ -54,12 +57,30 @@ export function initialBrickStates(bricks: readonly Brick[]): BrickStates {
       case 'travel':
       case 'mirror':
       case 'passage':
+      case 'craft':
         break;
       case 'harvest':
         states.harvest = { work: 0, back: null };
         break;
       case 'field':
         states.field = { cells: [], work: null };
+        break;
+      case 'shelter':
+        states.shelter = {
+          feed: brick.feeder,
+          nest: [],
+          animals: brick.starters.map((starter, id) => ({
+            id,
+            ...starter,
+            love: 0,
+            petted: [0, 0],
+            hungry: 0,
+            since: 0,
+            laid: 0,
+          })),
+          nextId: brick.starters.length,
+          day: 0,
+        };
         break;
     }
   }

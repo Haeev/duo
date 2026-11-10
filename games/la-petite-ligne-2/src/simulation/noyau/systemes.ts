@@ -11,6 +11,7 @@ import { fishingSystem } from '../peche/index';
 import { brickSystem } from '../briques/index';
 import { shopSystem } from '../commerces/index';
 import { cookingSystem } from '../cuisine/index';
+import { craftSystem } from '../fabrication/index';
 import { dialogueSystem } from '../dialogues/index';
 import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
@@ -23,6 +24,7 @@ import { placeSystem } from '../lieux/index';
 import { bagSystem } from '../sac/index';
 import { sceneSystem } from '../scenes/index';
 import { travelSystem } from '../voyage/index';
+import { farmSystem } from '../elevage/index';
 import type { Intent, StepInput } from './entrees';
 import type { GameEvent } from './evenements';
 
@@ -69,8 +71,10 @@ export const SYSTEMS: readonly GameSystem[] = [
   questSystem,
   sceneSystem,
   cookingSystem,
+  craftSystem,
   worldTimeSystem,
   collectionSystem,
   housingSystem,
   fishingSystem,
+  farmSystem,
 ];

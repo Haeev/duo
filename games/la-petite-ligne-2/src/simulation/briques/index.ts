@@ -189,7 +189,9 @@ export const brickSystem: GameSystem = {
   id: 'briques',
   intent(sim, player, intent) {
     if (intent.type === 'act') {
-      if (!canAct(sim, player)) return;
+      // À bord, la visée ne garde que le poteau du quai (pour redescendre): `aimOf` filtre.
+      const aboard = sim.world.common.travel?.boarded[player] === true;
+      if (!aboard && !canAct(sim, player)) return;
       const aim = aimOf(sim, player);
       // Sans cible, la touche d'action revient aux autres systèmes (manger un plat en main, L3).
       if (aim === null) return;

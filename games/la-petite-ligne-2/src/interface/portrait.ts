@@ -2,10 +2,13 @@
  * Portrait provisoire d'un habitant, généré depuis son identifiant (teintes de peau, de cheveux et
  * de vêtement stables). Il tient la place du buste 3D (interface.md, section 8) et se marque
  * « provisoire » dans la fenêtre de dialogue. La bouche bouge pendant l'écriture (classe `parle`).
+ * Dessin à l'encre: formes anguleuses, aplats à deux tons (l'ombre est un voile d'encre du côté
+ * droit), quelques hachures sous le menton.
  */
 import { hueOf } from './pictos';
 
 const SKINS = ['#f1c9a5', '#e0ac85', '#c68863', '#9a6646', '#6f4630'] as const;
+const INK = '#2a2522';
 
 export function portraitMarkup(id: string): string {
   const h = hueOf(id);
@@ -13,14 +16,24 @@ export function portraitMarkup(id: string): string {
   const hair = `hsl(${(h * 7) % 360} 35% ${20 + (h % 30)}%)`;
   const cloth = `hsl(${(h * 13) % 360} 40% 50%)`;
   const long = h % 2 === 0;
+  const pen = (width: number): string =>
+    `stroke="${INK}" stroke-width="${String(width)}" stroke-linejoin="bevel" stroke-linecap="round"`;
+  const line = pen(5);
+  const shade = `fill="${INK}" opacity="0.2"`;
   return `<svg viewBox="0 0 190 230" aria-hidden="true">
-  <path d="M20 230c0-52 34-78 75-78s75 26 75 78z" fill="${cloth}" stroke="#2a2522" stroke-width="4"/>
-  <rect x="80" y="128" width="30" height="30" fill="${skin}" stroke="#2a2522" stroke-width="4"/>
-  ${long ? `<path d="M44 96c0-50 22-70 51-70s51 20 51 70v54H44z" fill="${hair}" stroke="#2a2522" stroke-width="4"/>` : ''}
-  <ellipse cx="95" cy="92" rx="44" ry="50" fill="${skin}" stroke="#2a2522" stroke-width="4"/>
-  <path d="M51 80c4-34 24-46 44-46s40 12 44 46c-14-16-30-20-44-20s-30 4-44 20z" fill="${hair}" stroke="#2a2522" stroke-width="4"/>
-  <circle cx="78" cy="94" r="5" fill="#2a2522"/><circle cx="112" cy="94" r="5" fill="#2a2522"/>
-  <circle cx="68" cy="110" r="7" fill="#e58f7c" opacity="0.5"/><circle cx="122" cy="110" r="7" fill="#e58f7c" opacity="0.5"/>
-  <ellipse class="bouche" cx="95" cy="118" rx="10" ry="6" fill="#7a2e2a" stroke="#2a2522" stroke-width="3"/>
+  ${long ? `<path d="M40 156l-6-74 22-48 42-14 42 14 20 52-6 70z" fill="${hair}" ${line}/>` : ''}
+  <path d="M12 232l16-54 46-22h44l44 20 18 56z" fill="${cloth}" ${line}/>
+  <path d="M118 156l44 20 18 56h-46z" ${shade}/>
+  <path d="M74 158l22 24 22-24" fill="none" ${line}/>
+  <path d="M80 128h32l2 32-18 14-18-14z" fill="${skin}" ${line}/>
+  <path d="M80 140l32 6 1 14-17 14z" ${shade}/>
+  <path d="M50 72l16-28 32-9 30 10 13 30-4 38-21 27-24 4-28-10-14-27z" fill="${skin}" ${line}/>
+  <path d="M128 45l13 30-4 38-21 27 4-34 8-33z" ${shade}/>
+  <path d="M44 86l6-38 28-23 34-2 27 17 9 42-17-20-26-9-25 4-20 9z" fill="${hair}" ${line}/>
+  <path d="M112 23l27 17 9 42-17-20z" ${shade}/>
+  <path d="M68 82l16-4M106 78l16 4M96 98l-4 13h8M86 150l8 8M94 148l8 10" fill="none" ${pen(4)}/>
+  <circle cx="78" cy="94" r="5" fill="${INK}"/><circle cx="113" cy="94" r="5" fill="${INK}"/>
+  <path d="M60 106l12-2 2 10-10 3z" fill="#e58f7c" opacity="0.6"/><path d="M118 104l12 2-4 11-10-3z" fill="#e58f7c" opacity="0.6"/>
+  <ellipse class="bouche" cx="96" cy="124" rx="9" ry="5" fill="#7a2e2a" ${pen(3)}/>
 </svg>`;
 }
