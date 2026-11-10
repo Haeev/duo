@@ -19,7 +19,7 @@ ourlet = 0.1
 ouverture = 0.035         # écart des pans devant, en haut (m)
 evase = 0.1               # les pans s'écartent vers le bas
 bord_cotes = true
-motif = "cotes"
+motif = "torsades"         # tricot à torsades (gabarit dessiné, plis.svg)
 couleurs = ["!lilas", "prune"]
 
 [bas]

@@ -7,6 +7,12 @@ coiffure = "carre"
 peau = "peaux.peche"
 cheveux = "cheveux.auburn"
 
+[visage]              # traits dessinés (gabarits/visages): age (jeune, adulte, age), nez (droit, rond, busque),
+age = "adulte"        # iris, marques en plus (taches, moustache, barbe, barbe-machoire, lunettes, sillons...),
+nez = "droit"         # sourcils (couleur, par défaut celle des cheveux)
+iris = "iris.noisette"
+marques = ["taches"]
+
 [corps]
 gabarit = "femme"
 donnees = "modeles/femme.npz"

@@ -25,3 +25,11 @@
 - Portraits inline: identifiants préfixés `__P__`, remplacés à l'affichage par un compteur (deux portraits dans la page). Une `class="bouche"` = un seul groupe par calque (le moteur regroupe les éléments consécutifs).
 - Pictos du sprite: `currentColor`, ombre en `fill-opacity`, aucun `clipPath`; un décimal et `minSeg` 0,32 tiennent le sprite à 85 Ko. Le générateur repasse Prettier sur `pictos-encre.ts`.
 - Outil Bash refusé dans ce worktree pour les heredocs Python avec `>`, les `cat > fichier <<EOF` multiples et les commandes qui contiennent « git » ou « source »: écrire les fichiers avec Write, remplacer par `rep.py` (JSON de paires) dans le scratchpad.
+## La Petite Ligne 2: traits du visage et plis 3D (essai de style 4)
+
+- Moteur de plume de l'interface réutilisé par `essai-style-4/scripts/encrer-lot.mjs` (lot JSON, une page Chromium). Calques séparés par `data-expr`, extraits par regex puis rendus un à un avec rsvg-convert (couverture = alpha). Lancer Node depuis Python avec `env={**os.environ, "NODE_PATH": ...}`: sans HOME, Playwright ne trouve pas son Chromium.
+- Cellule des traits: yeux à y 0,2, bouche à y 0,8, demi-écart 0,235; largeur et hauteur réelles diffèrent selon le corps (enfant et âgée: 1,45): étirer les pièces en hauteur, plafonné pour que les sourcils levés restent dans la cellule. Front, menton et barbe sortent de la cellule: les peindre dans l'atlas du corps.
+- Le point « nez » mesuré par le conformateur est souvent la lèvre (le plus avancé du profil): poser le nez dessiné par une fraction yeux-bouche (0,62).
+- Réduire un atlas RGBA en alpha prémultiplié, puis étendre les couleurs sous les texels vides, sinon franges sombres au filtrage.
+- Juger les visages à `?vue=expressions&zoom=5`: le modelé à facettes et la coque d'encre autour des orbites dominent les traits; c'est la limite de la note, pas le dessin.
+- Bash refuse les commandes jugées complexes (heredoc, `git` dans une boucle): écrire les scripts avec Write dans le scratchpad, une commande git par appel.

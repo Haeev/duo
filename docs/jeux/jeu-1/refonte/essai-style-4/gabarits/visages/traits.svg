@@ -1,0 +1,280 @@
+<!--
+  Atlas des traits du visage, dessiné à la plume: bibliothèque de pièces (bible 0.2, 2.4 et 2.5).
+  Chaque <symbol> est une pièce; `data-cadre` dit sur quel repère elle se pose:
+  - oeil: origine au centre de l'oeil GAUCHE de l'image (coin extérieur vers -x); l'oeil droit est la
+    même pièce en miroir, encrée à part (le tremblé diffère d'un côté à l'autre);
+  - bouche: origine au milieu du trait de la bouche;
+  - nez: origine sous le bout du nez (base), placée à la hauteur du nez du corps;
+  - cellule: repère de la cellule entière (256 x 256, yeux à y 51, bouche à y 205);
+  - etendu: même repère que la cellule, mais peint dans l'atlas du corps (front, menton, mâchoire),
+    hors de la cellule des traits.
+  Unités: 256 = une cellule (128 px dans l'atlas). Trait de plume de 5 unités (2 à 3 px), lumière en
+  haut à gauche: le moteur épaissit le côté de l'ombre (bas droite).
+  Couleurs de remplacement (fixées par personnage dans `traits.py`):
+    #FF00A1 iris, #FF00A2 sourcils et poils, #FF00A3 ombre de la peau, #FF00A4 rougeur des joues,
+    #FF00A5 intérieur de la bouche, #FF00A6 lèvre, #FF00A7 tache de rousseur, #FF00A8 reflet de verre.
+  Toute forme sans `data-w` reçoit un contour d'encre; `data-w="0"` la laisse en aplat; un trait
+  `fill="none"` devient un trait effilé. `data-clip` découpe une forme par une autre (iris dans le blanc).
+-->
+<svg xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ===================================================================== YEUX (oeil gauche) -->
+
+  <!-- Ouvert: blanc en amande, iris mangé par la paupière, paupière haute épaisse qui déborde. -->
+  <symbol id="oeil-ouvert" data-cadre="oeil">
+    <path id="blanc" d="M-29 3 Q-18 -12 0 -13 Q19 -12 29 -1 Q17 10 -1 11 Q-19 11 -29 3 Z" fill="#F7F3EA" data-w="0"/>
+    <g data-clip="blanc" data-w="0">
+      <circle cx="3" cy="0" r="11.5" fill="#FF00A1"/>
+      <path d="M-9 -4 Q3 -12 15 -4 L15 -12 L-9 -12 Z" fill="#231A17" fill-opacity="0.35"/>
+      <circle cx="3" cy="0.5" r="5.6" fill="#231A17"/>
+      <circle cx="-1.5" cy="-4.5" r="2.8" fill="#F7F3EA"/>
+    </g>
+    <path d="M-33 5 Q-25 -10 -4 -14.5 Q18 -16 31 -3 L32 1 Q19 -10 -2 -10 Q-20 -8 -29 4 Z" fill="#231A17" data-w="0.35"/>
+    <path fill="none" d="M-29 3 Q-33 3 -36 1" data-w="0.8"/>
+    <path fill="none" d="M-21 -19 Q-4 -26 17 -19" data-w="0.45"/>
+    <path fill="none" d="M-23 7 Q-12 13 5 12" data-w="0.5"/>
+  </symbol>
+
+  <!-- Mi-clos (colère douce, ennui): paupière basse et plate, iris coupé au ras. -->
+  <symbol id="oeil-mi-clos" data-cadre="oeil">
+    <path id="blancm" d="M-29 3 Q-14 -4 2 -4 Q19 -4 29 0 Q17 10 -1 10 Q-19 10 -29 3 Z" fill="#F7F3EA" data-w="0"/>
+    <g data-clip="blancm" data-w="0">
+      <circle cx="3" cy="1" r="11.5" fill="#FF00A1"/>
+      <circle cx="3" cy="1.5" r="5.6" fill="#231A17"/>
+      <circle cx="-1.5" cy="-1.8" r="2.2" fill="#F7F3EA"/>
+    </g>
+    <path d="M-34 6 Q-20 -8 2 -8 Q22 -8 32 -1 L32 2 Q20 -3 2 -3 Q-16 -3 -29 5 Z" fill="#231A17" data-w="0.35"/>
+    <path fill="none" d="M-29 4 Q-33 4 -36 2" data-w="0.8"/>
+    <path fill="none" d="M-22 -15 Q-2 -20 18 -14" data-w="0.4"/>
+    <path fill="none" d="M-22 7 Q-10 12 6 11" data-w="0.5"/>
+  </symbol>
+
+  <!-- Fermé (sommeil, clignement): paupière en arc vers le bas, trois cils au coin. -->
+  <symbol id="oeil-ferme" data-cadre="oeil">
+    <path fill="none" d="M-31 -1 Q-14 11 4 10 Q19 9 30 -2" data-w="1.25"/>
+    <path fill="none" d="M-28 3 Q-33 6 -36 11" data-w="0.6"/>
+    <path fill="none" d="M-21 7 Q-24 11 -25 16" data-w="0.55"/>
+    <path fill="none" d="M-20 -14 Q-2 -19 17 -13" data-w="0.45"/>
+  </symbol>
+
+  <!-- Rieur: arc en dôme, joue qui pousse la paupière basse, plis au coin. -->
+  <symbol id="oeil-rieur" data-cadre="oeil">
+    <path fill="none" d="M-30 6 Q-20 -12 0 -12 Q19 -11 29 5" data-w="1.3"/>
+    <path fill="none" d="M-22 13 Q-6 8 13 12" data-w="0.55"/>
+    <path fill="none" d="M-33 4 Q-38 6 -41 10" data-w="0.55"/>
+    <path fill="none" d="M-33 -2 Q-38 -4 -41 -8" data-w="0.45"/>
+  </symbol>
+
+  <!-- Étonné: oeil rond grand ouvert, blanc tout autour de l'iris, paupière fine et remontée. -->
+  <symbol id="oeil-etonne" data-cadre="oeil">
+    <path id="blance" d="M-28 1 Q-22 -17 0 -18 Q22 -17 28 1 Q20 15 0 16 Q-20 15 -28 1 Z" fill="#F7F3EA" data-w="0"/>
+    <g data-clip="blance" data-w="0">
+      <circle cx="2" cy="0" r="9" fill="#FF00A1"/>
+      <circle cx="2" cy="0.4" r="4.2" fill="#231A17"/>
+      <circle cx="-1.5" cy="-3.6" r="2.4" fill="#F7F3EA"/>
+    </g>
+    <path d="M-31 1 Q-24 -20 0 -21 Q23 -20 31 -1 L29 2 Q21 -15 0 -16 Q-21 -15 -28 3 Z" fill="#231A17" data-w="0.35"/>
+    <path fill="none" d="M-28 1 Q-32 0 -35 -3" data-w="0.8"/>
+    <path fill="none" d="M-20 -26 Q0 -32 20 -25" data-w="0.4"/>
+    <path fill="none" d="M-22 9 Q-6 19 12 13" data-w="0.5"/>
+  </symbol>
+
+  <!-- Regard de côté, iris vers l'extérieur (coin extérieur, -x). -->
+  <symbol id="oeil-cote-ext" data-cadre="oeil">
+    <path id="blancx" d="M-29 3 Q-18 -12 0 -13 Q19 -12 29 -1 Q17 10 -1 11 Q-19 11 -29 3 Z" fill="#F7F3EA" data-w="0"/>
+    <g data-clip="blancx" data-w="0">
+      <circle cx="-13" cy="1" r="11" fill="#FF00A1"/>
+      <circle cx="-14" cy="1.5" r="5.4" fill="#231A17"/>
+      <circle cx="-17.5" cy="-3.6" r="2.6" fill="#F7F3EA"/>
+    </g>
+    <path d="M-33 5 Q-25 -8 -4 -12 Q18 -14 31 -3 L32 1 Q19 -9 -2 -8 Q-20 -6 -29 4 Z" fill="#231A17" data-w="0.35"/>
+    <path fill="none" d="M-29 3 Q-33 3 -36 1" data-w="0.8"/>
+    <path fill="none" d="M-21 -18 Q-4 -24 17 -18" data-w="0.45"/>
+    <path fill="none" d="M-23 7 Q-12 13 5 12" data-w="0.5"/>
+  </symbol>
+
+  <!-- Regard de côté, iris vers le nez (+x). -->
+  <symbol id="oeil-cote-int" data-cadre="oeil">
+    <path id="blanci" d="M-29 3 Q-18 -12 0 -13 Q19 -12 29 -1 Q17 10 -1 11 Q-19 11 -29 3 Z" fill="#F7F3EA" data-w="0"/>
+    <g data-clip="blanci" data-w="0">
+      <circle cx="15" cy="0" r="11" fill="#FF00A1"/>
+      <circle cx="16" cy="0.5" r="5.4" fill="#231A17"/>
+      <circle cx="11.5" cy="-4.4" r="2.6" fill="#F7F3EA"/>
+    </g>
+    <path d="M-33 5 Q-25 -8 -4 -12 Q18 -14 31 -3 L32 1 Q19 -9 -2 -8 Q-20 -6 -29 4 Z" fill="#231A17" data-w="0.35"/>
+    <path fill="none" d="M-29 3 Q-33 3 -36 1" data-w="0.8"/>
+    <path fill="none" d="M-21 -18 Q-4 -24 17 -18" data-w="0.45"/>
+    <path fill="none" d="M-23 7 Q-12 13 5 12" data-w="0.5"/>
+  </symbol>
+
+  <!-- ===================================================================== SOURCILS (gauche) -->
+  <!-- Une flamme effilée: tête épaisse côté nez (+x), queue fine vers la tempe. -->
+
+  <symbol id="sourcil-neutre" data-cadre="oeil">
+    <path d="M27 -25 Q12 -36 -10 -35 Q-25 -34 -34 -26 Q-23 -30 -10 -30 Q8 -30 25 -20 Z" fill="#FF00A2" data-w="0.5"/>
+  </symbol>
+  <symbol id="sourcil-leve" data-cadre="oeil">
+    <path d="M26 -31 Q10 -45 -10 -44 Q-26 -42 -34 -32 Q-22 -38 -10 -39 Q8 -39 25 -26 Z" fill="#FF00A2" data-w="0.5"/>
+  </symbol>
+  <symbol id="sourcil-fronce" data-cadre="oeil">
+    <path d="M28 -18 Q10 -26 -10 -33 Q-24 -37 -35 -32 Q-23 -32 -10 -28 Q8 -21 25 -13 Z" fill="#FF00A2" data-w="0.5"/>
+    <path fill="none" d="M33 -26 Q35 -20 33 -14" data-w="0.45"/>
+  </symbol>
+  <symbol id="sourcil-inquiet" data-cadre="oeil">
+    <path d="M26 -38 Q14 -40 4 -34 Q-12 -27 -34 -24 Q-14 -24 2 -29 Q14 -33 25 -32 Z" fill="#FF00A2" data-w="0.5"/>
+    <path fill="none" d="M30 -44 Q22 -49 12 -46" data-w="0.4"/>
+  </symbol>
+
+  <!-- ===================================================================== BOUCHES -->
+
+  <symbol id="bouche-neutre" data-cadre="bouche">
+    <path fill="none" d="M-24 -1 Q-10 4 0 2 Q11 0 23 -3"/>
+    <path fill="none" d="M-27 -4 Q-25 -1 -22 0" data-w="0.5"/>
+    <path fill="none" d="M-8 11 Q1 14 9 10" data-w="0.55"/>
+  </symbol>
+  <symbol id="bouche-sourire" data-cadre="bouche">
+    <path fill="none" d="M-27 -7 Q-14 8 1 8 Q16 7 27 -8" data-w="1.1"/>
+    <path fill="none" d="M-30 -10 Q-28 -4 -24 -2" data-w="0.55"/>
+    <path fill="none" d="M30 -11 Q28 -5 25 -3" data-w="0.55"/>
+    <path fill="none" d="M-9 16 Q1 19 10 15" data-w="0.55"/>
+  </symbol>
+  <symbol id="bouche-grand-sourire" data-cadre="bouche">
+    <path id="rire" d="M-29 -7 Q0 -3 29 -8 Q22 20 1 23 Q-20 21 -29 -7 Z" fill="#FF00A5"/>
+    <path data-clip="rire" data-w="0" d="M-30 -10 L30 -10 L28 -1 Q0 3 -28 -1 Z" fill="#F7F3EA"/>
+    <path data-clip="rire" data-w="0" d="M-14 17 Q0 8 15 16 L15 26 L-14 26 Z" fill="#FF00A6"/>
+    <path fill="none" d="M-33 -11 Q-31 -6 -28 -4" data-w="0.55"/>
+    <path fill="none" d="M33 -12 Q31 -7 28 -5" data-w="0.55"/>
+  </symbol>
+  <symbol id="bouche-moue" data-cadre="bouche">
+    <path fill="none" d="M-18 6 Q-8 -3 0 -2 Q8 -3 18 5" data-w="1.05"/>
+    <path fill="none" d="M-7 11 Q0 15 8 11" data-w="0.6"/>
+  </symbol>
+  <symbol id="bouche-pincee" data-cadre="bouche">
+    <path fill="none" d="M-19 1 Q-6 -2 1 0 Q9 -2 19 2" data-w="1.15"/>
+    <path fill="none" d="M-22 -3 Q-21 1 -19 4" data-w="0.5"/>
+    <path fill="none" d="M22 -2 Q21 2 19 5" data-w="0.5"/>
+  </symbol>
+  <symbol id="bouche-surprise" data-cadre="bouche">
+    <path id="oh" d="M0 -10 Q10 -10 10 3 Q10 15 0 15 Q-10 15 -10 3 Q-10 -10 0 -10 Z" fill="#FF00A5"/>
+    <path data-clip="oh" data-w="0" d="M-8 9 Q0 5 8 9 L8 16 L-8 16 Z" fill="#FF00A6"/>
+    <path fill="none" d="M-6 21 Q1 23 7 20" data-w="0.5"/>
+  </symbol>
+  <symbol id="bouche-parole-ouverte" data-cadre="bouche">
+    <path id="par" d="M-20 -3 Q0 -6 20 -3 Q14 13 0 14 Q-14 13 -20 -3 Z" fill="#FF00A5"/>
+    <path data-clip="par" data-w="0" d="M-21 -7 L21 -7 L19 1 Q0 -1 -19 1 Z" fill="#F7F3EA"/>
+    <path data-clip="par" data-w="0" d="M-9 11 Q0 6 9 11 L9 16 L-9 16 Z" fill="#FF00A6"/>
+    <path fill="none" d="M-7 19 Q1 21 8 18" data-w="0.5"/>
+  </symbol>
+  <symbol id="bouche-parole-fermee" data-cadre="bouche">
+    <path fill="none" d="M-21 -1 Q-9 2 0 1 Q10 0 21 -2" data-w="0.95"/>
+    <path d="M-8 1 Q0 5 8 1 Q0 3 -8 1 Z" fill="#FF00A5" data-w="0.4"/>
+    <path fill="none" d="M-8 11 Q1 14 9 10" data-w="0.55"/>
+  </symbol>
+  <symbol id="bouche-coin" data-cadre="bouche">
+    <path fill="none" d="M-22 1 Q-8 5 6 2 Q17 -1 26 -10" data-w="1.05"/>
+    <path fill="none" d="M29 -13 Q28 -7 25 -5" data-w="0.55"/>
+    <path fill="none" d="M-5 11 Q3 14 11 9" data-w="0.55"/>
+  </symbol>
+
+  <!-- ===================================================================== NEZ (ombre côté droit) -->
+
+  <symbol id="nez-droit" data-cadre="nez">
+    <path data-w="0" d="M5 -36 Q9 -18 13 -5 Q8 3 0 3 Q6 -6 5 -36 Z" fill="#FF00A3"/>
+    <path fill="none" d="M6 -38 Q9 -24 11 -12" data-w="0.4"/>
+    <path fill="none" d="M-11 -3 Q-7 4 1 3 Q8 3 12 -3"/>
+    <path fill="none" d="M12 -6 Q15 -2 12 2" data-w="0.45"/>
+  </symbol>
+  <symbol id="nez-rond" data-cadre="nez">
+    <path data-w="0" d="M6 -16 Q17 -8 12 1 Q5 6 -3 4 Q9 0 6 -16 Z" fill="#FF00A3"/>
+    <path fill="none" d="M-9 -9 Q-15 0 -6 4 Q2 7 10 3 Q16 -1 13 -8"/>
+    <path fill="none" d="M-2 -2 Q0 1 3 -1" data-w="0.45"/>
+  </symbol>
+  <symbol id="nez-busque" data-cadre="nez">
+    <path data-w="0" d="M4 -42 Q14 -30 10 -22 Q19 -10 16 -2 Q8 6 -1 4 Q10 -6 4 -42 Z" fill="#FF00A3"/>
+    <path fill="none" d="M4 -44 Q12 -34 9 -24 Q17 -14 15 -5" data-w="0.55"/>
+    <path fill="none" d="M-15 -5 Q-11 4 0 4 Q10 4 15 -3"/>
+    <path fill="none" d="M-15 -8 Q-19 -3 -15 1" data-w="0.45"/>
+  </symbol>
+
+  <!-- ===================================================================== MARQUES DE L'ÂGE ET DU CARACTÈRE -->
+
+  <!-- Jeune: pommettes roses, sous l'oeil vers l'extérieur. -->
+  <symbol id="pommettes" data-cadre="oeil">
+    <ellipse cx="-8" cy="31" rx="17" ry="9" fill="#FF00A4" fill-opacity="0.55" data-w="0"/>
+  </symbol>
+  <!-- Rougeur de joie: plus vive, deux hachures de gêne. -->
+  <symbol id="rougeur" data-cadre="oeil">
+    <g data-w="0" fill="#FF00A4">
+      <path d="M-22 33 L-17 22 L-14 23 L-19 34 Z"/>
+      <path d="M-13 34 L-7 21 L-4 22 L-10 35 Z"/>
+      <path d="M-3 33 L2 22 L5 23 L0 34 Z"/>
+      <path d="M6 31 L10 23 L12 24 L8 32 Z"/>
+    </g>
+  </symbol>
+  <!-- Taches de rousseur: un semis irrégulier sur la pommette et l'arête du nez. -->
+  <symbol id="taches" data-cadre="oeil">
+    <g data-w="0" fill="#FF00A7">
+      <circle cx="-14" cy="22" r="1.9"/><circle cx="-6" cy="25" r="1.5"/><circle cx="-19" cy="28" r="1.6"/>
+      <circle cx="-9" cy="31" r="2"/><circle cx="1" cy="27" r="1.6"/><circle cx="-2" cy="34" r="1.4"/>
+      <circle cx="9" cy="23" r="1.7"/><circle cx="-24" cy="23" r="1.3"/><circle cx="16" cy="26" r="1.4"/>
+      <circle cx="24" cy="21" r="1.5"/><circle cx="-13" cy="37" r="1.2"/><circle cx="6" cy="33" r="1.2"/>
+    </g>
+  </symbol>
+  <!-- Âge: pattes d'oie au coin extérieur, poche sous l'oeil, pli de paupière qui tombe. -->
+  <symbol id="pattes-oie" data-cadre="oeil">
+    <path fill="none" d="M-35 -2 Q-41 -4 -47 -9" data-w="0.5"/>
+    <path fill="none" d="M-36 3 Q-42 3 -49 1" data-w="0.5"/>
+    <path fill="none" d="M-35 8 Q-40 11 -45 15" data-w="0.45"/>
+  </symbol>
+  <symbol id="poches" data-cadre="oeil">
+    <path fill="none" d="M-22 14 Q-6 22 13 15" data-w="0.45"/>
+    <path fill="none" d="M-14 20 Q-2 25 8 21" data-w="0.35"/>
+    <path fill="none" d="M-24 -17 Q-30 -12 -33 -5" data-w="0.45"/>
+  </symbol>
+  <!-- Sillons du nez à la bouche (repère de la bouche, côté gauche). -->
+  <symbol id="sillons" data-cadre="bouche">
+    <path fill="none" d="M-21 -40 Q-33 -22 -32 -2" data-w="0.55"/>
+  </symbol>
+  <!-- Fossette de joie aux coins de la bouche. -->
+  <symbol id="fossettes" data-cadre="bouche">
+    <path fill="none" d="M-34 -14 Q-38 -7 -35 0" data-w="0.45"/>
+  </symbol>
+
+  <!-- Moustache en brosse: deux masses qui tombent sur la lèvre, quelques poils. -->
+  <symbol id="moustache" data-cadre="bouche">
+    <path d="M1 -18 Q-14 -22 -27 -13 Q-34 -6 -33 3 Q-25 -4 -14 -4 Q-5 -4 1 -8 Q7 -4 16 -4 Q27 -4 33 3 Q34 -6 27 -13 Q14 -22 1 -18 Z" fill="#FF00A2" data-w="0.6"/>
+    <path fill="none" d="M-22 -12 Q-24 -7 -26 -2 M-14 -15 Q-15 -10 -16 -6 M13 -15 Q14 -10 15 -6 M22 -12 Q24 -7 26 -2" data-w="0.35"/>
+  </symbol>
+  <!-- Barbe courte, part de la cellule: lèvre du haut et tour de la bouche en ton, poils en traits courts. -->
+  <symbol id="barbe" data-cadre="bouche">
+    <path d="M0 -15 Q-18 -18 -30 -8 Q-38 10 -34 40 L34 40 Q38 10 30 -8 Q18 -18 0 -15 Z M-22 -1 Q0 6 22 -2 Q14 16 0 17 Q-14 16 -22 -1 Z" fill="#FF00A2" fill-opacity="0.42" fill-rule="evenodd" data-w="0"/>
+    <path fill="none" data-w="0.3" d="M-26 -9 l-2 4 M-18 -12 l-1 4 M-8 -13 l0 4 M8 -13 l0 4 M18 -12 l1 4 M26 -9 l2 4 M-31 4 l-2 4 M31 4 l2 4 M-30 18 l-2 4 M30 18 l2 4 M-18 24 l-1 4 M18 24 l1 4 M-6 26 l0 4 M6 26 l0 4"/>
+  </symbol>
+
+  <!-- Lunettes rondes (oeil gauche): verre, reflet, pont vers le milieu du visage (x 60), branche. -->
+  <symbol id="lunettes" data-cadre="oeil">
+    <path fill="none" d="M0 -22 Q22 -22 23 0 Q23 22 0 23 Q-23 22 -23 0 Q-23 -22 0 -22 Z" data-w="0.7"/>
+    <path d="M-16 -9 Q-13 -16 -5 -17 Q-12 -13 -14 -7 Z" fill="#FF00A8" fill-opacity="0.85" data-w="0"/>
+    <path fill="none" d="M23 -4 Q41 -11 60 -7" data-w="0.7"/>
+    <path fill="none" d="M-23 -4 L-44 -8" data-w="0.6"/>
+  </symbol>
+
+  <!-- ===================================================================== FRONT, MENTON, MÂCHOIRE (atlas du corps) -->
+
+  <!-- Rides du front de l'âgée ou de l'âgé: trois traits ondulés, coupés au milieu. -->
+  <symbol id="rides-front" data-cadre="etendu">
+    <path fill="none" d="M38 -14 Q66 -24 100 -16 M150 -17 Q186 -24 216 -13" data-w="0.9"/>
+    <path fill="none" d="M52 -40 Q80 -48 112 -40 M140 -41 Q170 -48 200 -38" data-w="0.8"/>
+    <path fill="none" d="M74 -64 Q100 -70 124 -64 Q146 -70 176 -62" data-w="0.7"/>
+  </symbol>
+  <!-- Pli du menton sous la lèvre: un petit trait, l'ombre du menton fait le reste. -->
+  <symbol id="menton" data-cadre="etendu">
+    <path fill="none" d="M114 232 Q128 238 142 232" data-w="0.8"/>
+  </symbol>
+  <!-- Barbe courte sur la mâchoire et le menton: aplat de ton, bord en dents, poils en traits courts. -->
+  <symbol id="barbe-machoire" data-cadre="etendu">
+    <path d="M10 150 Q8 230 46 290 Q90 340 128 342 Q166 340 210 290 Q248 230 246 150 L232 160 Q228 210 200 240 L190 228 Q160 214 128 216 Q96 214 66 228 L56 240 Q28 210 24 160 Z" fill="#FF00A2" fill-opacity="0.45" data-w="0"/>
+    <path d="M98 199 Q112 186 128 190 Q144 186 158 199 Q144 197 128 198 Q112 197 98 199 Z" fill="#FF00A2" fill-opacity="0.55" data-w="0"/>
+    <path fill="none" data-w="0.55" d="M30 200 l-4 8 M40 236 l-3 8 M62 268 l-2 8 M88 296 l-1 8 M116 312 l0 8 M140 312 l0 8 M168 296 l1 8 M194 268 l2 8 M216 236 l3 8 M226 200 l4 8 M100 262 l-1 7 M128 270 l0 7 M156 262 l1 7"/>
+  </symbol>
+</svg>

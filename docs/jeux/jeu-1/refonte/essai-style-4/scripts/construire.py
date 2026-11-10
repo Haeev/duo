@@ -20,7 +20,7 @@ TRAVAIL = ESSAI / ".travail"  # .blend intermédiaires, planches de repères, at
 # Croisements de la planche: tenue x corps, avec la coiffure et les couleurs du personnage du corps.
 CROIX_TENUES = ("carreaux-jean", "mariniere-short", "pull-toile")
 CROIX_CORPS = ("femme", "costaud", "enfant")
-ETIQUETTES = ("CONFORME", "REPERES", "COIFFURE", "COL", "ATLAS", "TRAITS", "EXPORT")
+ETIQUETTES = ("CONFORME", "REPERES", "COIFFURE", "COL", "ATLAS", "TRAITS", "PLIS", "EXPORT")
 
 
 def run(*args):
@@ -73,10 +73,13 @@ def main():
         for t in CROIX_TENUES:
             fiche = TRAVAIL / "croix" / f"{g}-{t}.toml"
             fiche.write_text(f'id = "{g}-{t}"\ntenue = "{t}"\ncoiffure = "{f["coiffure"]}"\npeau = "{f["peau"]}"\n'
-                             f'cheveux = "{f["cheveux"]}"\ngabarits = "{GAB}"\n[corps]\ngabarit = "{g}"\n'
+                             f'cheveux = "{f["cheveux"]}"\ngabarits = "{GAB}"\nvisage_de = "{nom}"\n[corps]\ngabarit = "{g}"\n'
                              f'donnees = "modeles/{g}.npz"\n')
             taches.append((ICI / "peindre.py", "atlas", fiche, TRAVAIL / "croix" / f"{g}-{t}.png"))
-    taches.append((ICI / "peindre.py", "traits", ESSAI / "atlas" / "traits.png"))
+    # Traits du visage dessinés à la plume (avant les atlas: le front et la barbe y sont repris).
+    if seul in (None, "atlas", "traits"):
+        print(run(ICI / "traits.py"), flush=True)
+        print(run(ICI / "plis.py"), flush=True)
     if seul in (None, "atlas"):
         lot(taches)
     if seul is None:

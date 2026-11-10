@@ -170,7 +170,8 @@ function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, 
           hRelief = sampledDiffuseColor.a;
         #endif
         ${traits ? `if (vTraits.x > 0.0 && vTraits.x < 1.0 && vTraits.y > 0.0 && vTraits.y < 1.0) {
-          vec4 t = texture2D(traitsMap, vec2((vTraits.x + uCell) / 4.0, vTraits.y));
+          // Atlas des traits en grille (traits.json): colonne et rangée de l'expression.
+          vec4 t = texture2D(traitsMap, vec2((vTraits.x + mod(uCell, ${TJ.colonnes.toFixed(1)})) / ${TJ.colonnes.toFixed(1)}, (vTraits.y + floor(uCell / ${TJ.colonnes.toFixed(1)})) / ${TJ.rangees.toFixed(1)}));
           diffuseColor.rgb = mix(diffuseColor.rgb, t.rgb, t.a * uDetail);
         }` : ''}`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
@@ -245,7 +246,11 @@ async function loadAtlas(url, efface) {
 }
 const cache = {};
 async function glb(url) { cache[url] ??= loader.loadAsync(url); return cache[url]; }
-const traitsTex = await new Promise((ok) => new THREE.TextureLoader().load(ESSAI + 'atlas/traits.png', (t) => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; ok(t); }));
+// Atlas des traits dessinés à la plume: un par personnage (traits.py), `traits.png` pour un visage sans fiche.
+const TJ = await (await fetch(ESSAI + 'atlas/traits.json')).json();
+const EXPRESSION = Object.fromEntries(TJ.expressions.map((n, i) => [n, i]));
+const traitsCache = {};
+const traitsTexture = (url) => (traitsCache[url] ??= new Promise((ok) => new THREE.TextureLoader().load(ESSAI + url, (t) => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; ok(t); })));
 
 // ---------------------------------------------------------------- personnages
 const contactGeo = (() => {
@@ -255,10 +260,11 @@ const contactGeo = (() => {
   return new THREE.ShapeGeometry(s);
 })();
 const contactMat = new THREE.MeshBasicMaterial({ color: 0x0d0a0c, transparent: true, opacity: 0.62, depthWrite: false });
-async function personnage({ corps, atlas, coiffure, col = false, expression = 0, efface = true }) {
+async function personnage({ corps, atlas, coiffure, col = false, expression = 0, efface = true, traits = 'atlas/traits.png' }) {
   const g = await glb(ESSAI + `modeles/${corps}.glb`);
   const root = SkeletonUtils.clone(g.scene);
   const map = await loadAtlas(ESSAI + atlas, efface);
+  const traitsTex = await traitsTexture(traits);
   const cell = { value: expression };
   let tris = 0, headBone = null, chestBone = null, height = 0, scaleW = 1;
   root.updateMatrixWorld(true);
@@ -531,13 +537,14 @@ try {
   const INDEX = await (await fetch(ESSAI + 'atlas/index.json')).json();
   const DEF = Object.fromEntries(['maelle', 'basile', 'gaston', 'odette', 'lou'].map((k) => [k, { corps: INDEX[k].corps, coiffure: INDEX[k].coiffure, col: INDEX[k].col }]));
   const P = {};
-  for (const [k, d] of Object.entries(DEF)) P[k] = await personnage({ ...d, atlas: `atlas/${k}.png` });
+  for (const [k, d] of Object.entries(DEF)) P[k] = await personnage({ ...d, atlas: `atlas/${k}.png`, traits: `atlas/traits-${k}.png` });
   const NF = {};   // les mêmes sans effacement (mipmaps ordinaires), pour la comparaison
-  for (const [k, d] of Object.entries(DEF)) NF[k] = await personnage({ ...d, atlas: `atlas/${k}.png`, efface: false });
+  for (const [k, d] of Object.entries(DEF)) NF[k] = await personnage({ ...d, atlas: `atlas/${k}.png`, efface: false, traits: `atlas/traits-${k}.png` });
   const TENUES = ['carreaux-jean', 'mariniere-short', 'pull-toile'];
   const CORPS_X = [['femme', 'carre'], ['costaud', 'brosse'], ['enfant', 'tignasse']];
   const X = [];
-  for (const t of TENUES) for (const [c, coif] of CORPS_X) X.push({ t, c, p: await personnage({ corps: c, coiffure: coif, col: INDEX._tenues[t].col, atlas: `.travail/croix/${c}-${t}.png` }) });
+  const PAR_CORPS = Object.fromEntries(Object.entries(DEF).map(([k, d]) => [d.corps, k]));
+  for (const t of TENUES) for (const [c, coif] of CORPS_X) X.push({ t, c, p: await personnage({ corps: c, coiffure: coif, col: INDEX._tenues[t].col, atlas: `.travail/croix/${c}-${t}.png`, traits: `atlas/traits-${PAR_CORPS[c]}.png` }) });
   const all = [...Object.values(P), ...Object.values(NF), ...X.map((x) => x.p)];
   const only = (...keep) => { for (const p of all) p.holder.visible = keep.includes(p); };
   mesures.triangles = Object.fromEntries(Object.entries(P).map(([k, p]) => [k, p.tris]));
@@ -547,7 +554,7 @@ try {
   const full = { x: 0, y: 0, w: W, h: H };
   const cw = W / 10, rowH = 310;
   let y = 30;
-  labels.push(['Essai 4: cinq corps d\'après concept (Meshy), riggés duo-24; tenues, visages et cheveux peints par fiches; nuanceur encré; un seul niveau de rendu', 10, 6, 17]);
+  if (!vue) labels.push(['Essai 4: cinq corps d\'après concept (Meshy), riggés duo-24; tenues, visages et cheveux peints par fiches; nuanceur encré; un seul niveau de rendu', 10, 6, 17]);
 
   // Rangées 1 et 2: les cinq corps de face, de dos, en marche, au repos (vu de trois quarts, d'un peu plus haut).
   const order = ['maelle', 'basile', 'gaston', 'odette', 'lou'];
@@ -581,11 +588,12 @@ try {
   }
   // Rangée 4: quatre expressions en gros plan (quatre visages: les repères viennent de la fiche de chaque corps).
   const r4 = 280, ew = 300;
-  const EXPR = [['maelle', 0, 'neutre'], ['gaston', 1, 'joie'], ['lou', 2, 'surprise'], ['odette', 3, 'sommeil']];
-  const visage = (rect, key, cellule) => {
+  const EXPR = [['maelle', 'neutre'], ['gaston', 'joie'], ['lou', 'surprise'], ['odette', 'sommeil']].map(([k, n]) => [k, EXPRESSION[n], n]);
+  // `zoom`: champ en degrés (8,2: buste; 4,6: le visage remplit la case).
+  const visage = (rect, key, cellule, zoom = 8.2) => {
     const c = P[key]; only(c); c.at(STUDIO.x, STUDIO.z, 0.0, 'repos'); c.cell.value = cellule;
-    const h = c.head(); h.y += 0.07;
-    shot(rect, new THREE.Vector3(h.x + 0.25, h.y + 0.08, h.z + 3.2), h, 8.2, 3.0);
+    const h = c.head(); h.y += zoom < 6 ? 0.1 : 0.07;
+    shot(rect, new THREE.Vector3(h.x + 0.25, h.y + 0.08, h.z + 3.2), h, zoom, 3.0);
     c.cell.value = 0;
   };
   const place = (S) => {
@@ -631,7 +639,13 @@ try {
     if (vue === 'jeu') { only(...Object.values(P)); place(P); gameShot(full, tgt, 50, Number(params.get('px') ?? 60)); }
     if (vue === 'jeu-sans') { only(...Object.values(NF)); place(NF); noFade = true; gameShot(full, tgt, 50, Number(params.get('px') ?? 60)); }
     if (vue === 'proche') proche(full);
-    if (vue === 'visage') visage(full, params.get('qui') ?? 'maelle', Number(params.get('cellule') ?? 0));
+    const cel = params.get('cellule') ?? '0';
+    if (vue === 'visage') visage(full, params.get('qui') ?? 'maelle', EXPRESSION[cel] ?? Number(cel), Number(params.get('zoom') ?? 8.2));
+    if (vue === 'expressions') {
+      // Les expressions d'un personnage en gros plan, sur une rangée: `liste=neutre,joie,...`.
+      const liste = (params.get('liste') ?? TJ.expressions.join(',')).split(',');
+      liste.forEach((n, k) => { visage({ x: k * W / liste.length, y: 0, w: W / liste.length, h: H }, params.get('qui') ?? 'maelle', EXPRESSION[n], Number(params.get('zoom') ?? 4.6)); labels.push([n, k * W / liste.length + 5, 4, 12]); });
+    }
     if (vue === 'portraits') {
       const key = params.get('qui') ?? 'maelle';
       ['face', 'dos', 'marche', 'repos'].forEach((kind, k) => portrait(P[key], { x: k * W / 4, y: 0, w: W / 4, h: H }, kind));

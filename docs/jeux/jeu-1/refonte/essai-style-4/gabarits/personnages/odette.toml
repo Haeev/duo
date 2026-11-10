@@ -6,7 +6,13 @@ tenue = "blouse-gilet"
 coiffure = "chignon"
 peau = "peaux.porcelaine"
 cheveux = "cheveux.blanc"
-rides = true
+
+[visage]              # traits dessinés (gabarits/visages): age (jeune, adulte, age), nez (droit, rond, busque),
+age = "age"           # iris, marques en plus (taches, moustache, barbe, barbe-machoire, lunettes, sillons...),
+nez = "rond"          # sourcils (couleur, par défaut celle des cheveux)
+iris = "iris.bleu"
+sourcils = "cheveux.gris"
+marques = ["lunettes"]
 
 [corps]
 gabarit = "agee"
