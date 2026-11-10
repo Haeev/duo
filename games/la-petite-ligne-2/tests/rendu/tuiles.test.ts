@@ -17,9 +17,7 @@ import {
 import { TileRing } from '../../src/rendu/lieu/tuiles';
 import { planToMap } from '../../outils/plan-vers-lieu';
 
-const PLAN = fileURLToPath(
-  new URL('../../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json', import.meta.url),
-);
+const PLAN = fileURLToPath(new URL('../../donnees/lieux/aubrune/plan.json', import.meta.url));
 
 function aubrune(): MapDef {
   const plan = JSON.parse(readFileSync(PLAN, 'utf8')) as unknown;

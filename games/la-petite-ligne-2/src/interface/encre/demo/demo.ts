@@ -25,7 +25,7 @@ import { dummySources } from '../../carnet/fictif';
 import { parsePlan } from '../../carnet/plan';
 import { memoryFollow } from '../../carnet/quetes';
 import { createInterface } from '../../index';
-import planAubrune from '../../../../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json';
+import planAubrune from '../../../../donnees/lieux/aubrune/plan.json';
 import { provisionalBackdrop } from './fond';
 import { mountSheet } from './planche';
 

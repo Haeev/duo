@@ -13,9 +13,7 @@ import { closedLocks, reachMask, zoneViews } from '../src/simulation/lieux/index
 import { planToMap } from '../outils/plan-vers-lieu';
 import { dataFiles, newSim } from './aides';
 
-const PLAN = fileURLToPath(
-  new URL('../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json', import.meta.url),
-);
+const PLAN = fileURLToPath(new URL('../donnees/lieux/aubrune/plan.json', import.meta.url));
 
 function aubrune(): ReturnType<typeof newSim> {
   const plan = JSON.parse(readFileSync(PLAN, 'utf8')) as unknown;

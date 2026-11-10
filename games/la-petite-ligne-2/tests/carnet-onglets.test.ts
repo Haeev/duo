@@ -40,9 +40,7 @@ import { bondKey } from '../src/etat/progression';
 import { createWorld } from '../src/simulation/noyau/monde';
 import { gameContent, MEMBERS, SEED } from './aides';
 
-const PLAN_PATH = fileURLToPath(
-  new URL('../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json', import.meta.url),
-);
+const PLAN_PATH = fileURLToPath(new URL('../donnees/lieux/aubrune/plan.json', import.meta.url));
 const plan = parsePlan(JSON.parse(readFileSync(PLAN_PATH, 'utf8')) as unknown);
 
 describe('carnet: quêtes', () => {
