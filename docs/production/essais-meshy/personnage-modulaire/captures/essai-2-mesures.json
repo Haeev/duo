@@ -1,18 +1,34 @@
 {
  "d1": {
   "titre": "Voie D, adulte moyen: pull, pantalon",
-  "triangles_image": 36914,
+  "triangles_image": 21450,
   "appels": 34,
   "programmes": 4,
-  "triangles_personnage": 18424,
-  "octets_pieces": 450444
+  "triangles_personnage": 10692,
+  "octets_pieces": 288536
  },
  "d2": {
   "titre": "Voie D, adulte moyen: t-shirt, veste ouverte, jupe",
-  "triangles_image": 44842,
+  "triangles_image": 25834,
   "appels": 38,
   "programmes": 4,
-  "triangles_personnage": 22388,
-  "octets_pieces": 549072
+  "triangles_personnage": 12884,
+  "octets_pieces": 358288
+ },
+ "c_moyen": {
+  "titre": "Voie C, adulte moyen de la planche",
+  "triangles_image": 12912,
+  "appels": 20,
+  "programmes": 4,
+  "triangles_personnage": 6423,
+  "octets_pieces": 267028
+ },
+ "c_rond": {
+  "titre": "Voie C, adulte rond de la planche",
+  "triangles_image": 13226,
+  "appels": 20,
+  "programmes": 4,
+  "triangles_personnage": 6580,
+  "octets_pieces": 279748
  }
 }
