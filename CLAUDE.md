@@ -97,6 +97,14 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 - La réponse au « pourquoi » s'écrit quand elle n'est pas évidente (carte, bible artistique, compte rendu). Un élément sans raison d'être est déplacé, corrigé ou retiré.
 - Chaque livrable visuel est regardé de près, pas seulement à distance de jeu: rien qui dépasse, flotte ou se traverse.
 
+### Gabarits: ajouter du contenu sans repartir de zéro (demande du client, 2026-11-10)
+
+- Question à se poser pour chaque système conçu: « si demain je veux ajouter une chaise (un habitant, un vêtement, une recette, un poisson, une quête, un lieu), est-ce que je repars de zéro ? ». La réponse doit être non: on duplique un gabarit et on remplit des champs.
+- Un type de contenu = un schéma de données validé, un gabarit commenté à copier, un générateur ou un script pour l'asset quand il y en a un, et une recette d'ajout de dix lignes au plus dans le README du dossier. Aucun ajout de contenu ne demande de toucher au code du moteur; si c'est le cas, le moteur est à corriger, pas le contenu à bricoler.
+- Les comportements se composent à partir de briques nommées et réutilisables (s'asseoir, ranger, vendre, cuisiner, ouvrir), déclarées dans les données: une chaise est « un meuble posable avec la brique s'asseoir », pas un cas particulier.
+- Chaque gabarit a son test court: un exemplaire factice ajouté par le test doit apparaître en jeu sans autre changement.
+- Un lieu entier suit la même règle: un dossier de lieu (carte, habitants, quêtes, commerces, musique) branché sur le socle commun.
+
 ### Ressources et licences
 
 - Sources admises: créations du studio (code, SVG, scripts de génération, modèles Blender scriptés, synthèse sonore), génération par IA avec les outils fournis par le client, ressources externes sous CC0 ou CC-BY, polices sous OFL, code tiers sous licence permissive (MIT, BSD, ISC, Apache-2.0). GPL et licences non commerciales exclues.
