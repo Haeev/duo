@@ -489,3 +489,9 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Son: le client installe Suno pour l'audio; non visible depuis la session cloud à ce jour, licence à vérifier selon son offre avant tout usage en production.
 - Shaders et ombres: le client leur donne un grand rôle dans l'esthétique, à soigner. Les surfaces doivent avoir de la profondeur (relief des murs, des sols et des toits): des aplats sur des volumes plats font « factice ».
 - Écriture des actes 2 et 3 d'Aubrune, oui aux sept propositions de l'auteur: « vingt âmes » au lieu de « douze foyers »; premier train « le lendemain » et non « le samedi »; confidences d'Honorine après un service rendu plutôt qu'à un nombre de cœurs; Firmin a tenu le registre six semaines; scène de la dalle des Lacombe au cimetière gardée; départ pour Hautefonte quand on veut après la Veillée; sac de toile offert en fin d'acte 2 et sac à dos en fin d'acte 3.
+- Règle de rendu: éviter le plat absolu, partout (sols, murs, toits, meubles, vêtements). Ce qui borde ou dépasse du sol est un vrai petit volume (pierres de bordure, touffes, fleurs).
+- Lisibilité avant la quantité d'encre: rien de « gribouillé »; le détail du trait s'efface quand l'objet est petit à l'écran.
+- Interface: thème sombre, moins encré que le monde; police de titrage de bande dessinée (Grandstander, OFL); le thème reste éteint dans le jeu tant qu'aucune image n'atteint 9 sur 10.
+- Ambiances de jour à Aubrune: le rendu « clair » pour le milieu de journée, le rendu « dense » pour la fin de journée; passage continu avec l'heure.
+- Publication: la refonte est publiée dans Duo à côté de l'ancien jeu dès le soir du 10 novembre, comme version d'essai.
+- Suno: annoncé par le client pour l'audio, non visible depuis la session cloud; licence à vérifier avant usage.
