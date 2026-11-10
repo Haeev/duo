@@ -1,8 +1,9 @@
-// P18 début de l'acte 1 à Aubrune. Départ: parties posées à Aubrune (le départ réglé du jeu est
-// la gare d'essai; voir `fabrique-sauvegardes.prep.ts`), le voyage lui-même étant joué par P04 et
-// P16. P18a: les deux sont sur le quai, la scène d'accueil démarre chez les deux avec l'étape
-// « quai ». P18b: après la scène, Firmin reçoit la lettre et l'étape avance. D1 (corrigé): les
-// répliques de la scène s'affichent chez les deux et avancent quand les deux ont lu.
+// P18 début du jeu et de l'acte 1 à Aubrune. P18 départ: une vraie partie neuve commence dans le
+// train de nuit (prologue); la fin du prologue (sauvegarde `train-de-nuit-porte`, fabriquée par la
+// simulation) mène les deux sur le quai d'Aubrune. P18a et P18b partent de parties posées à
+// Aubrune (`fabrique-sauvegardes.prep.ts`). P18a: la scène d'accueil démarre chez les deux avec
+// l'étape « quai ». P18b: après la scène, Firmin reçoit la lettre et l'étape avance. D1 (corrigé):
+// les répliques de la scène s'affichent chez les deux et avancent quand les deux ont lu.
 import { expect, test } from '@playwright/test';
 import { startDuo, type Side } from '../aides-e2e/duo';
 
@@ -10,6 +11,59 @@ const QUEST = 'le-train-de-5h12';
 
 const passed = (w: { progress?: { quests: Record<string, { passed?: readonly string[] }> } }) =>
   w.progress?.quests[QUEST]?.passed ?? [];
+
+test('P18 départ: une partie neuve commence dans le train de nuit', async ({ browser }) => {
+  const duo = await startDuo(browser, 'depart', { save: null });
+  const { host, guest } = duo;
+  for (const side of [host, guest]) {
+    const w = await duo.until(
+      side,
+      `prologue chez ${side.who}`,
+      (x) => x.common.place === 'train-de-nuit',
+    );
+    expect(w.minutes, 'départ à 21 h 30').toBeGreaterThanOrEqual(21 * 60 + 30);
+    expect(w.common.day).toBe(1);
+  }
+  await duo.until(
+    host,
+    'scène du compartiment',
+    (w) => w.common.story?.scene?.id === 'le-compartiment',
+  );
+  await host.page.waitForTimeout(2500);
+  await Promise.all([host.shot('1-train-de-nuit-hote'), guest.shot('1-train-de-nuit-invite')]);
+  expect(duo.errors).toEqual([]);
+  await duo.close();
+});
+
+test('P18 départ: la fin du prologue mène les deux sur le quai d’Aubrune', async ({ browser }) => {
+  const duo = await startDuo(browser, 'depart', { save: 'train-de-nuit-porte' });
+  const { host, guest } = duo;
+  await duo.until(host, 'dans le train', (w) => w.common.place === 'train-de-nuit');
+  // Les deux se retrouvent devant la porte du wagon (13,5; 9,2): l'étape « descendre » finit le
+  // prologue, dont l'effet fait partir le train vers Aubrune.
+  await duo.teleport(0, 13.1, 9.2, Math.PI / 2);
+  await duo.teleport(1, 13.9, 9.2, Math.PI / 2);
+  await duo.until(host, 'en route', (w) => w.common.phase === 'travel');
+  for (const side of [host, guest])
+    await duo.until(
+      side,
+      `quai d’Aubrune chez ${side.who}`,
+      (w) => w.common.place === 'aubrune' && w.common.phase === 'day',
+      40_000,
+    );
+  const arrived = await host.world();
+  for (const p of arrived?.players ?? [])
+    expect(Math.hypot(p.body.x - 204, p.body.y - 102.5), 'sur le quai').toBeLessThan(1.5);
+  await duo.until(
+    host,
+    'scène d’accueil',
+    (w) => w.common.story?.scene?.id === 'firmin-en-pantoufles',
+  );
+  await host.page.waitForTimeout(2500);
+  await Promise.all([host.shot('2-quai-aubrune-hote'), guest.shot('2-quai-aubrune-invite')]);
+  expect(duo.errors).toEqual([]);
+  await duo.close();
+});
 
 test('P18a acte 1: les deux arrivent sur le quai, la scène d’accueil démarre', async ({
   browser,

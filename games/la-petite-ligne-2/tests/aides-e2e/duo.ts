@@ -181,8 +181,11 @@ const KEY_OF: Readonly<Record<string, string>> = {
 
 /** L'un héberge, l'autre rejoint; renvoie quand les deux jeux tournent et que la sonde répond. */
 export interface StartOptions {
-  /** Sauvegarde de départ (`tests/aides-e2e/fabrique-sauvegardes.prep.ts`); sans elle, partie neuve. */
-  readonly save?: string;
+  /**
+   * Sauvegarde de départ (`tests/aides-e2e/fabrique-sauvegardes.prep.ts`). Absente: la gare
+   * d'essai (`essai-gare`, terrain des règles); `null`: vraie partie neuve (le prologue).
+   */
+  readonly save?: string | null;
   /** Appelé avant la première navigation de l'invité (écoute de la WebSocket). */
   readonly onGuestPage?: (page: Page) => void;
 }
@@ -198,7 +201,8 @@ export async function startDuo(
   slug: string,
   options: StartOptions = {},
 ): Promise<Duo> {
-  const { save, onGuestPage } = options;
+  const { onGuestPage } = options;
+  const save = options.save === undefined ? 'essai-gare' : (options.save ?? undefined);
   // Un faux hôte à soi (port et dossier de données propres): chaque parcours part d'une partie
   // connue, quoi qu'aient laissé les parcours précédents.
   const server: Serveur = await startServer(save);

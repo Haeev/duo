@@ -2,8 +2,9 @@
 // Créer: pnpm nouveau commerce <id> <lieu>   -> donnees/lieux/<lieu>/commerces/<id>.json
 // Schéma: src/donnees/schemas/commerce.ts. Moteur: src/simulation/commerces/ (rien à y toucher).
 // Pour l'ouvrir en jeu: un meuble comptoir avec la brique { "brick": "shop", "shop": "<id>" },
-// posé sur la carte du lieu, et/ou un dialogue du commerçant avec l'effet
-// { "type": "open_shop", "shop": "<id>" }. L'identifiant doit être unique dans tout le jeu.
+// posé sur la carte du lieu, et/ou en parlant au commerçant: le champ "talk" (en bas) ajoute le
+// choix à la fin de chacun de ses dialogues; un dialogue peut aussi porter l'effet
+// { "type": "open_shop", "shop": "<id>" } là où il le veut. L'identifiant doit être unique dans tout le jeu.
 {
   "schema": 1,
   "id": "exemple-commerce",
@@ -49,4 +50,8 @@
   "friendship": [{ "hearts": 3, "factor": 1.1 }],
   // Facultatif: ce qu'il dit, avec son caractère, de ce qu'il ne rachète pas.
   "refusal": "Ça ? Je n'en saurais que faire, moi.",
+  // Recommandé: le choix offert à la FIN de toute conversation avec le commerçant, boutique
+  // ouverte (open: ouvre la boutique, leave: clôt). Ainsi un dialogue de quête ne cache jamais
+  // la boutique. Pas de page en plus si le dialogue joué ouvre déjà ce commerce (open_shop).
+  "talk": { "open": "Voyons ce que tu vends.", "leave": "Une autre fois." },
 }

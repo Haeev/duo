@@ -79,7 +79,11 @@ describe('habitants', () => {
     expect(weekdayOf(6)).toBe('sat');
     wait(saturday, 0.1);
     expect(villager(saturday, 'facteur').life?.activity).toBe('attendre-le-train');
-    expect(villager(saturday, 'facteur').body).toMatchObject({ x: 20, y: 4 });
+    // Le point « quai » (20; 4) est à 1 m de la descente des joueurs (20; 5): il s'en écarte
+    // dans le même sens, jusqu'au rayon dégagé (défaut D3).
+    const body = villager(saturday, 'facteur').body;
+    expect(body.x).toBeCloseTo(20, 5);
+    expect(body.y).toBeCloseTo(5 - VILLAGERS.arrivalClearance, 5);
 
     // La nuit, il est chez lui.
     const night = simOf(content, 3 * 60);

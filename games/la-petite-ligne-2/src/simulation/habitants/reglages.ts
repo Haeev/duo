@@ -49,6 +49,15 @@ export interface VillagerSettings {
   readonly offstage: { readonly x: number; readonly y: number };
   /** Heure (minutes) où le validateur exige qu'il soit chez lui. */
   readonly homeCheckMinute: number;
+  /**
+   * Point d'arrivée des joueurs dégagé (défaut D3): aucun poste à moins de ce rayon (m) du point
+   * où descendent les joueurs; un poste trop proche est repoussé sur ce cercle.
+   */
+  readonly arrivalClearance: number;
+  /** Places essayées sur ce cercle (la première libre l'emporte). */
+  readonly arrivalClearanceSteps: number;
+  /** Plus loin que ceci (m) de son poste, sans trajet (mené par une scène, poussé), il y retourne. */
+  readonly returnDistance: number;
 }
 
 export const VILLAGERS: VillagerSettings = {
@@ -79,4 +88,7 @@ export const VILLAGERS: VillagerSettings = {
   bubblePriority: 10,
   offstage: { x: -50, y: -50 },
   homeCheckMinute: 180,
+  arrivalClearance: 2.2,
+  arrivalClearanceSteps: 12,
+  returnDistance: 0.5,
 };

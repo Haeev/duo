@@ -119,6 +119,10 @@
               "key": "train-de-nuit.prologue.fini",
               "value": true,
               "by": "duo"
+            },
+            {
+              "type": "travel_to",
+              "place": "aubrune"
             }
           ]
         }

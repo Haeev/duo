@@ -17,7 +17,9 @@ import { recall, remember } from '../regles/memoire';
 import { RULES } from '../regles/reglages';
 import { agreeFor } from './accords';
 import { greet } from './amitie';
+import { shopOffered, talkingShop } from './commerce';
 import { exchangeRefusal, type ExchangeRefusal } from './echanges';
+import { DIALOGUES } from './reglages';
 
 /** Au-delà, un parcours sans texte est une faute de données: on s'arrête plutôt que boucler. */
 const MAX_SILENT_NODES = 32;
@@ -92,6 +94,22 @@ export function endTalk(sim: SimContext, player: PlayerIndex): void {
   sim.emit({ type: 'talk_ended', player, villager: talk.villager });
 }
 
+/** Montre la page réservée qui propose la boutique du commerçant (`commerce.ts`), si elle s'offre. */
+function offerShop(sim: SimContext, player: PlayerIndex, dialogue: DialogueDef): boolean {
+  const talk = sim.world.players[player].talk;
+  if (talk === null || shopOffered(sim, talk.villager, dialogue) === null) return false;
+  talk.node = DIALOGUES.shopOffer.node;
+  sim.touch('players');
+  sim.emit({
+    type: 'talk_page',
+    player,
+    villager: talk.villager,
+    node: talk.node,
+    speaker: 'player',
+  });
+  return true;
+}
+
 /** Avance jusqu'à la prochaine réplique ou au prochain choix; `null`: fin du dialogue. */
 function enter(
   sim: SimContext,
@@ -138,6 +156,8 @@ function enter(
       }
     }
   }
+  // Fin naturelle (et non faute de données): le commerçant propose encore sa boutique.
+  if (id === null && offerShop(sim, player, dialogue)) return;
   endTalk(sim, player);
 }
 
@@ -192,6 +212,15 @@ export function talkChoose(sim: SimContext, player: PlayerIndex, optionId: strin
   const talk = sim.world.players[player].talk;
   const dialogue = currentDialogue(sim, player);
   if (talk === null || dialogue === null) return;
+  if (talk.node === DIALOGUES.shopOffer.node) {
+    const shop = talkingShop(sim, talk.villager);
+    // L'effet refuse lui-même une boutique fermée entre-temps (`shop-closed`).
+    if (shop !== null && optionId === DIALOGUES.shopOffer.open)
+      applyEffects(sim, player, [{ type: 'open_shop', shop: shop.id }]);
+    else if (optionId !== DIALOGUES.shopOffer.leave) return;
+    endTalk(sim, player);
+    return;
+  }
   const node = dialogue.nodes[talk.node];
   if (node?.kind !== 'choice') return;
   const option = node.options.find((o) => o.id === optionId);
@@ -229,6 +258,29 @@ export interface TalkView {
   }[];
 }
 
+/** La page qui propose la boutique: deux options, textes du commerce, rien d'échangé. */
+function shopOfferView(
+  content: Content,
+  world: ReadonlyWorld,
+  player: PlayerIndex,
+  villager: string,
+): TalkView | null {
+  const shop = talkingShop({ content, world }, villager);
+  if (shop?.talk === undefined) return null;
+  const { node, open, leave } = DIALOGUES.shopOffer;
+  return {
+    villager,
+    node,
+    speaker: 'player',
+    text: null,
+    emote: null,
+    options: [
+      { id: open, text: agreeFor(world, player, shop.talk.open), fails: null, blocked: null },
+      { id: leave, text: agreeFor(world, player, shop.talk.leave), fails: null, blocked: null },
+    ],
+  };
+}
+
 export function talkView(
   content: Content,
   world: ReadonlyWorld,
@@ -236,6 +288,8 @@ export function talkView(
 ): TalkView | null {
   const talk = world.players[player].talk;
   if (talk === null) return null;
+  if (talk.node === DIALOGUES.shopOffer.node)
+    return shopOfferView(content, world, player, talk.villager);
   const dialogue = placeContent(content, world)?.dialogues.find((d) => d.id === talk.dialogue);
   const node = dialogue?.nodes[talk.node];
   if (node === undefined) return null;

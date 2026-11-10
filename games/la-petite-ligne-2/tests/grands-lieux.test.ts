@@ -65,7 +65,7 @@ describe('plan vers lieu (Aubrune)', () => {
       id: 'aubrune',
       name: 'Aubrune',
       station: { arrival: 'quai', platform: 'quai', platformRadius: 3 },
-      links: ['train-de-nuit'],
+      links: [],
       activities: [],
       music: null,
     };

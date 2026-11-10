@@ -23,5 +23,6 @@
   "dailyBuyCap": 2000,
   "dailyNeeds": ["pomme", "buche"],
   "friendship": [{ "hearts": 2, "factor": 1.1 }],
-  "refusal": "Je tiens une gare, pas une brocante. Garde ça pour qui en a l'usage."
+  "refusal": "Je tiens une gare, pas une brocante. Garde ça pour qui en a l'usage.",
+  "talk": { "open": "Je regarde ta buvette.", "leave": "Je passais dire bonjour." }
 }

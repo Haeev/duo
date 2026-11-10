@@ -63,6 +63,11 @@ export const SettingsSchema = v.strictObject({
     aimHalfAngleDeg: v.pipe(FiniteSchema, v.minValue(10), v.maxValue(180)),
     /** Poids de la distance face à l'écart à l'axe dans le choix de la cible (0: l'axe seul). */
     aimDistanceWeight: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1)),
+    /**
+     * Cône du regard (demi-angle, degrés), plus étroit que celui de la visée: ce qui s'y trouve
+     * passe avant ce qui est seulement plus proche, à rang égal (défaut D3). Absent: pas de préférence.
+     */
+    aimLookHalfAngleDeg: v.exactOptional(v.pipe(FiniteSchema, v.minValue(1), v.maxValue(180))),
   }),
   gestures: v.strictObject({
     /** Aucune action courante ne bloque plus longtemps (note de ressenti: 1,5 s). */

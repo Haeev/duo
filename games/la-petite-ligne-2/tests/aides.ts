@@ -17,14 +17,31 @@ function walk(dir: string, out: string[]): string[] {
   return out;
 }
 
-/** Les fichiers de `donnees/`, lus sur le disque: une copie neuve à chaque appel, modifiable par le test. */
-export function dataFiles(): Record<string, unknown> {
+/** Les fichiers de `donnees/` tels quels (le vrai départ du jeu: le prologue du train de nuit). */
+export function gameDataFiles(): Record<string, unknown> {
   const files: Record<string, unknown> = {};
   for (const path of walk(DATA_DIR, [])) {
     files[relative(DATA_DIR, path).split(sep).join('/')] = JSON.parse(
       readFileSync(path, 'utf8'),
     ) as unknown;
   }
+  return files;
+}
+
+/**
+ * Départ des tests: la gare d'essai à 10 h (lieux d'essai, `donnees/lieux/essai-*`), où se jouent
+ * les règles sans l'histoire. Le jeu, lui, part du prologue (`gameDataFiles`).
+ */
+export const TEST_START = { place: 'essai-gare', minute: 600 } as const;
+
+/**
+ * Les fichiers de `donnees/`, lus sur le disque, départ réglé sur `TEST_START`: une copie neuve à
+ * chaque appel, modifiable par le test.
+ */
+export function dataFiles(): Record<string, unknown> {
+  const files = gameDataFiles();
+  const settings = files['commun/reglages.json'] as { start: Record<string, unknown> };
+  settings.start = { ...settings.start, ...TEST_START };
   return files;
 }
 
