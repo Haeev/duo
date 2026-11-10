@@ -93,11 +93,11 @@ n('gr9', 250, 108, 'B')
 n('pl', 140, 116, 'B'); n('pl_o', 133, 116, 'B'); n('lv', 154, 117, 'B')
 n('bp', 140, 126, 'B'); n('bl', 156, 126, 'B'); n('br_o', 161.5, 126, 'B'); n('br_e', 166.5, 126, 'B')
 n('be1', 184, 126, 'B'); n('bj', 195.5, 126.8, 'B'); n('be2', 210, 128, 'B'); n('be3', 230, 130.6, 'B')
-n('be4', 254, 135.2, 'B'); n('cj', 252, 122, 'B')
-n('ponton', 140, 130.2, 'B', "le ponton: on y vient pour pêcher, s'asseoir et regarder la rivière; il ne mène nulle part exprès")
+n('be4', 252, 134.8, 'B'); n('cj', 251, 122, 'B')
+n('ponton', 140, 129.3, 'B', "le ponton: on y vient pour pêcher, s'asseoir et regarder la rivière; il ne mène nulle part exprès")
 n('cm1', 97, 108, 'B'); n('cm2', 89, 108, 'B'); n('mg', 83.5, 108, 'B')
 n('cf0', 118.5, 87, 'B'); n('lis', 131, 92, 'B'); n('n1', 144.5, 92, 'B'); n('n2', 150, 92, 'B'); n('trav', 150, 97.5, 'B')
-n('r0', 151, 84, 'B')
+n('r0', 152, 84, 'B'); n('jd', 116.3, 121.3, 'B', "le jardin de la maison: le potager et le poulailler sont au bout de l'allée, on n'y passe pas pour aller ailleurs")
 n('pne', 195.5, 97.5, 'B'); n('re1', 195.5, 90, 'B'); n('pv', 195.5, 82.5, 'B'); n('pv_o', 186, 82.5, 'B')
 n('cs', 212, 81.5, 'B'); n('ci', 217, 74, 'B'); n('cn', 217, 66.5, 'B'); n('pnh', 227.5, 97.5, 'B')
 # voie ouest
@@ -111,7 +111,7 @@ n('vn', 24, 145.3, 'R', "la vanne et le déversoir: on y règle le niveau du bie
 n('mc', 74, 113, 'M'); n('me', 81, 121, 'M')
 # ferme
 n('gu_n', 118.5, 130, 'B'); n('gu_s', 118.5, 140, 'F'); n('f1', 118.5, 150, 'F'); n('fc', 134, 159, 'F')
-n('fc2', 134, 167, 'F'); n('fe1', 162, 160, 'F'); n('fe2', 200, 158, 'F'); n('fe3', 238, 156, 'F'); n('pj_s', 254, 151, 'F')
+n('fc2', 134, 167, 'F'); n('fe1', 162, 160, 'F'); n('fe2', 200, 158, 'F'); n('fe3', 238, 156, 'F'); n('pj_s', 252, 151, 'F')
 n('fs1', 134, 184, 'F'); n('vr', 118.5, 183, 'F'); n('fs2', 104, 182, 'F'); n('fs3', 100, 160, 'F')
 n('croix', 118.5, 197, 'F', "la croix de chemin, au bord de la carte: la vieille route continue vers un lieu futur, barrée par une barrière de pré; point de vue pour la photo")
 # Côte
@@ -146,7 +146,7 @@ VERROUS = {
                leve="Marthe prête la clé (acte 3, la coutume)"),
     'V8': dict(acte=3, x=234, y=97.5, obstacle='la grille de la Compagnie en travers de la voie (« Ligne fermée »)',
                leve="Firmin sort enfin la clé avec la lettre (acte 3); Jeanne connaît un trou, trop petit pour vous"),
-    'V9': dict(acte=3, x=254, y=143, obstacle='la passerelle des Jardins, sans tablier', sens='raccourci',
+    'V9': dict(acte=3, x=252, y=142.8, obstacle='la passerelle des Jardins, sans tablier', sens='raccourci',
                leve="les planches viennent de la ferme: raccourci ouvert depuis la rive sud (acte 3)"),
     'V10': dict(acte=3, x=292, y=30, obstacle="l'escalier de service du tunnel, verrouillé de l'intérieur", sens='raccourci',
                 leve="on tire le verrou depuis le tunnel: raccourci vers le belvédère (acte 3)"),
@@ -191,7 +191,7 @@ chaine(['f1', 'fc', 'fc2', 'fs1', 'vr', 'fs2', 'fs3', 'f1'], 'chemin', 'tour de 
 chaine(['fc', 'fe1', 'fe2', 'fe3', 'pj_s'], 'chemin', 'chemin des Champs'); e('pj_s', 'be4', 'chemin', 'passerelle des Jardins', 'V9')
 e('cf0', 'cf1', 'chemin', 'chemin forestier', 'V5'); chaine(['cf1', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'cl'], 'chemin', 'chemin forestier')
 chaine(['c1', 'cl', 'e1', 'et'], 'sentier', 'sentier de la Côte')
-e('n1', 'r0', 'sentier', 'sentier du Ru'); e('r0', 'r1', 'sentier', 'sentier du Ru', 'V6'); chaine(['r1', 'r2', 'et'], 'sentier', 'sentier du Ru')
+e('n2', 'r0', 'sentier', 'sentier du Ru'); e('hd', 'jd', 'sentier', 'allée du jardin'); e('r0', 'r1', 'sentier', 'sentier du Ru', 'V6'); chaine(['r1', 'r2', 'et'], 'sentier', 'sentier du Ru')
 chaine(['et', 'en', 'so', 'ee', 'e2'], 'sentier', "tour de l'étang"); chaine(['et', 'dg_o', 'dg_e', 'e2'], 'sentier', 'la digue')
 chaine(['e2', 'e3', 'k1', 'k2', 'k3', 'bv'], 'sentier', 'sentier des Crêtes'); chaine(['so', 'h1', 'k2'], 'sentier', 'sentier du Haut')
 e('pnh', 'te1', 'voie', 'sur la voie', 'V8'); chaine(['te1', 'te2', 'te3', 'te4', 'portail'], 'voie', 'la ligne morte')
@@ -211,7 +211,7 @@ OUVRAGES = [
     dict(id='planches_fuite', nature='planches', x=82, y=131, r=3, raison="deux madriers sur le canal de fuite: le seul accès à pied sec à l'île du Bief"),
     dict(id='passerelle_vanne', nature='passerelle', x=34.5, y=142, r=3, raison="passerelle du meunier pour aller manoeuvrer la vanne"),
     dict(id='bonde', nature='digue', x=167.5, y=49.7, r=3, raison="on passe sur la digue de l'étang, au-dessus de la bonde"),
-    dict(id='passerelle_jardins', nature='passerelle', x=254, y=143.2, r=6, raison="relie les champs de la ferme au bout de la Grand-Route: le raccourci du retour"),
+    dict(id='passerelle_jardins', nature='passerelle', x=252, y=142.8, r=6, raison="relie les champs de la ferme au bout de la Grand-Route: le raccourci du retour"),
     dict(id='deversoir', nature='déversoir', x=20, y=152, r=3, raison="seuil de pierre en travers de l'Aubrune, qui relève l'eau pour le bief (non franchissable)"),
 ]
 
@@ -219,9 +219,9 @@ OUVRAGES = [
 B = []
 
 
-def b(i, nom, x, y, l, h, porte, noeud, qui, raison, acte=1, ancien=None, interieur=None):
+def b(i, nom, x, y, l, h, porte, noeud, qui, raison, acte=1, ancien=None, interieur=None, sur_rail=None):
     B.append(dict(id=i, nom=nom, rect=[x, y, l, h], porte=list(porte) if porte else None, noeud=noeud, qui=qui,
-                  raison=raison, acte=acte, ancien=ancien, interieur=interieur))
+                  raison=raison, acte=acte, ancien=ancien, interieur=interieur, sur_rail=sur_rail))
 
 
 b('quai_b', 'le quai', 121, 99, 30, 4, None, 'quai', 'tous', "le coeur: le train s'arrête là, la caisse de la commande, le tableau, la cloche et la pendule y sont", ancien='platform', interieur=None)
@@ -230,7 +230,7 @@ b('maison', 'la maison du garde-barrière', 104, 111, 11, 8, (115, 115), 'hd', '
 b('epicerie', "l'épicerie-pension Ferrand", 122, 111, 8, 10, (130, 116), 'pl_o', 'Odette', "borde la place à l'ouest, vitrine et porte vers la place: on la voit en descendant du quai", ancien='ferrand_shop', interieur='boutique, cuisine, chambre de la pension: 70 m²')
 b('scierie', "l'atelier de Basile", 102, 84, 10, 8, (112, 88), 'cf0', 'Basile', "contre le bois, au départ du chemin forestier: les grumes descendent et s'arrêtent là; porte et auvent à l'est, vers le chemin", ancien='sawmill', interieur='atelier et établi sous auvent: 60 m²')
 b('firmin', 'la maison de Firmin', 141, 84, 7, 6, (144.5, 90), 'n1', 'Firmin', "en face du quai, de l'autre côté de la voie: il traverse par la traversée de service", ancien='firmin_house')
-b('remise', 'la remise de la draisine', 156, 90, 6, 5, (156, 92.5), 'n2', 'draisine', "sur sa courte voie, porte à l'ouest dans l'axe des rails: la draisine sort droit sur la ligne (déplacée: l'ancienne avait sa porte au sud, sans rail devant)", acte=2, ancien='handcar_shed')
+b('remise', 'la remise de la draisine', 156, 90, 6, 5, (156, 92.5), 'n2', 'draisine', "sur sa courte voie, porte à l'ouest dans l'axe des rails: la draisine sort droit sur la ligne (déplacée: l'ancienne avait sa porte au sud, sans rail devant)", acte=2, ancien='handcar_shed', sur_rail='remise')
 b('fournil', "le fournil d'Achille", 165, 100, 7, 6, (168.5, 106), 'gr4', 'Achille', "sur la Grand-Route juste après le pont du ru: l'eau du pétrin est à sa porte", ancien='bakehouse', interieur='boutique et fournil: 36 m²')
 b('mercerie', 'la mercerie-coiffure', 168, 111, 7, 7, (171.5, 111), 'gr4', 'Solange, Jeanne', "en face du fournil; porte au nord, sur la rue", ancien='salon_shop', interieur='boutique, fauteuil de coiffure, cabine: 42 m²')
 b('ecole', "l'école-mairie", 180, 100, 7, 6, (183.5, 106), 'gr5', 'Armand (acte 2)', "au milieu du bourg, sa cour à l'ouest, entre le fournil et le café", acte=2, ancien='school_house', interieur='classe, archives de la mairie: 36 m²')
@@ -251,7 +251,7 @@ b('poste', "le poste d'aiguillage", 36, 101, 6, 4, (39, 101), 'po', 'personne (s
 b('moulin', 'le moulin de la Vanne', 70, 118, 8, 8, (74, 118), 'mc', 'Berthe (acte 3)', "au bout du bief; la roue est sur le pignon sud, dans le bief; la porte au nord, sur la cour où s'arrêtent les charrettes", acte=3, ancien='mill', interieur='salle des meules et étage: 64 m² par niveau')
 b('ferme_logis', 'le logis de la ferme Delmas', 136, 147, 9, 6, (140.5, 153), 'fc', 'Paulin, Margot, Léon (acte 3)', "sur la rive sud, hors du bourg, façade et porte au midi sur la cour (déplacée: l'ancienne ferme était serrée entre la route et la rivière, sans champs à elle)", acte=3, ancien='farmhouse', interieur='salle commune: 54 m²')
 b('grange', 'la grange', 120, 162, 8, 10, (128, 167), 'fc2', 'les Delmas', "ferme la cour à l'ouest (vents de pluie), porte charretière à l'est sur la cour", acte=3, ancien='barn')
-b('forestiere', 'la maison forestière', 66, 40, 6, 6, (72, 43), 'c3', 'réserve (Inès, après la fin)', "au bout carrossable du chemin forestier, porte à l'est sur le chemin", acte=4, ancien='forester_house')
+b('forestiere', 'la maison forestière', 62, 42, 6, 6, (68, 45), 'c3', 'réserve (Inès, après la fin)', "au bout carrossable du chemin forestier, porte à l'est sur le chemin", acte=4, ancien='forester_house')
 
 # ---------------------------------------------------------------- repères visibles de loin
 REPERES = [
@@ -277,8 +277,8 @@ p('arret', 'arrêt du train, banc du réveil', 'histoire', 'quai', 136, 100.5)
 p('caisse', 'caisse de la commande du samedi', 'service', 'quai', 141, 101.5, 2)
 p('pendule', 'la pendule arrêtée sur 5 h 12', 'histoire', 'quai_e', 148, 100.5)
 p('barriere', 'la barrière et le lumignon', 'histoire', 'pn_s', 120.5, 100.5)
-p('potager', 'le potager (6, 12 puis 24 cases)', 'activite', 'hd', 107, 122.5)
-p('poulailler', 'le poulailler', 'activite', 'hd', 113, 122.5)
+p('potager', 'le potager (6, 12 puis 24 cases)', 'activite', 'jd', 110, 122.5)
+p('poulailler', 'le poulailler', 'activite', 'jd', 115.7, 124.6)
 p('puits', 'la pompe de la place (toilette)', 'service', 'pl', 144, 113.5)
 p('tonnelle', "la tonnelle d'Odette (souper)", 'repos', 'pl_o', 133, 120)
 p('fetes', "l'est de la place, libre pour les fêtes", 'activite', 'pl', 146, 119)
@@ -289,8 +289,8 @@ p('etabli', "l'établi de Basile", 'service', 'cf0', 114.5, 90.5)
 p('quilles', 'le jeu de quilles du café', 'activite', 'gr6', 190, 110.5, 2)
 p('cour_ecole', "la cour de l'école (insectes, fossiles d'Armand)", 'collecte', 'gr5', 177, 103, 2)
 p('boite', 'la boîte aux lettres', 'histoire', 'gr5', 186, 110.5, 2)
-p('enclume', "l'enclume et la meule de Mado", 'service', 'gr6', 206, 104)
-p('jardins', 'les jardins de la Rive', 'collecte', 'bj', 190, 119)
+p('enclume', "l'enclume et la meule de Mado", 'service', 'gr6', 197.4, 103.5)
+p('jardins', 'les jardins de la Rive', 'collecte', 'bj', 192.5, 121.5)
 p('banc_berge', 'banc de la berge', 'repos', 'be1', 184, 124.5)
 p('peche_aval', "coin de pêche de l'aval", 'activite', 'be3', 231, 133, 2)
 p('car', "l'arrêt du car", 'histoire', 'gr9', 251.5, 106)
@@ -347,8 +347,8 @@ PARCELLES = [
     dict(nom='verger', rect=[238, 112, 12, 16], couleur='#B7C98A'), dict(nom='cimetière', rect=[208, 67, 18, 13], couleur='#C9CDB8'),
     dict(nom='place', rect=[131, 110, 18, 12], couleur='#D9CBB4'), dict(nom='parvis', rect=[185, 79, 21, 6], couleur='#D9CBB4'),
     dict(nom="cour de l'école", rect=[174, 100, 6, 6], couleur='#D9CBB4'), dict(nom='cour', rect=[128, 153, 14, 16], couleur='#D9CBB4'),
-    dict(nom='cour du moulin', rect=[66, 108, 14, 10], couleur='#D9CBB4'), dict(nom='potager', rect=[104, 120.5, 6, 4], couleur='#9A7B55'),
-    dict(nom='poulailler', rect=[111.5, 121, 3, 3], couleur='#B58B5A'),
+    dict(nom='cour du moulin', rect=[66, 108, 14, 10], couleur='#D9CBB4'), dict(nom='potager', rect=[106, 120.5, 8, 4], couleur='#9A7B55'),
+    dict(nom='poulailler', rect=[114.4, 123.1, 2.6, 3], couleur='#B58B5A'),
 ]
 
 # ---------------------------------------------------------------- sentiers de quête
@@ -709,7 +709,7 @@ def nord_echelle(x, y, k):
 def page(nom, vue, largeur_px, elements, panneau=None, titre=None):
     x0, y0, w, h = vue
     ech = largeur_px / w
-    pan = 330 if panneau else 0
+    pan = 380 if panneau else 0
     haut = h * ech + (34 if titre else 0)
     if panneau:
         haut = max(haut, 34 + 30 + 14.5 * len(panneau) + 8 * sum(1 for p_ in panneau if p_[0] == 't'))
@@ -786,8 +786,8 @@ def dessiner(dist_t):
     for kz, z in ZONES.items():
         court, x, y = LABELS_ZONES[kz]
         el.append(texte(x, y, court + ' (acte %d)' % z['acte'], 3.4, gras=True, coul='#3A342C'))
-    for r, (dx, dy, anc) in zip(REPERES, [(3.5, -1, 'start'), (1, -3.6, 'middle'), (-4, -1.5, 'end'), (-4, 4.5, 'end'), (4, -2, 'start'), (-5, 1, 'end'), (0, 8, 'middle'), (5, 4, 'start')]):
-        el.append(texte(r['x'] + dx, r['y'] + dy, r['nom'], 2.8, anc=anc, ital=True))
+    for r, (dx, dy, anc) in zip(REPERES, [(-4, 2.5, 'end'), (0.5, -3.4, 'middle'), (-4, -1.5, 'end'), (-4, 4.5, 'end'), (4, -2, 'start'), (-5, 1, 'end'), (0, 8, 'middle'), (5, 4, 'start')]):
+        el.append(texte(r['x'] + dx, r['y'] + dy, r['nom'].replace(' de la halte', ''), 2.8, anc=anc, ital=True))
     for nom_, x, y in (("l'Aubrune", 280, 157.5), ("l'Aubrune", 12, 158), ('le bief', 46, 135), ("l'étang", 172, 41), ('le ru', 168.5, 72), ("l'île du Bief", 58, 143),
                        ('Grand-Route', 240, 106.3), ('chemin de la Berge', 222, 127), ('chemin forestier', 82, 55), ('sentier des Crêtes', 252, 46), ('la tranchée', 76, 100.6),
                        ('la ligne morte', 272, 98), ('vieille route', 127, 176), ('prés lointains (décor)', 292, 124), ('prés lointains (décor)', 30, 184), ('bois (décor)', 20, 40), ('chemin des Champs', 182, 156.5), ('vers Hautefonte', 14, 103), ('vers Combe-Veilleuse', 300, 5)):
@@ -849,7 +849,7 @@ def dessiner(dist_t):
         lg.append(('t', 'Verrous', None))
         for kk, v in VERROUS.items():
             if dedans(v['x'], v['y']):
-                lg.append(('num', v['obstacle'][:47], kk))
+                lg.append(('num', v['obstacle'][:60], kk))
         lg += [('t', 'Signes', None), ('etoile', 'repère visible de loin', None), ('carre', 'point clair: la porte du bâtiment', '#B86B4F'),
                ('carre', 'rouge: verrou; bleu: raccourci', '#B3261E'), ('trait', 'sentier (1 m); plein: chemin, rue, route', ('#B08A56', 2, '4 3'))]
         page(nom, vue, 1500, el, lg, titre)
@@ -871,7 +871,7 @@ def dessiner(dist_t):
             if q['retour_noeuds']:
                 el.append('<polyline points="%s" fill="none" stroke="%s" stroke-width="%g" stroke-dasharray="%g %g" stroke-linejoin="round" opacity="0.9"/>' % (
                     pts([(N[i]['x'] + dec, N[i]['y'] + dec) for i in q['retour_noeuds']]), c, 1.5 * k, 3 * k, 2 * k))
-            lg.append(('trait', q['titre'][:44], (c, 4, None)))
+            lg.append(('trait', q['titre'][:60], (c, 4, None)))
             lg.append(('trait', 'aller %d m, retour %d m' % (q['aller_m'], q['retour_m']), (c, 4, '6 4')))
             vu = {}
             for j, (nid, lib) in enumerate(q['etapes'] + [(a, b_) for a, b_ in q['retour'][1:]]):
@@ -880,7 +880,7 @@ def dessiner(dist_t):
                     vu[nid].append(lettre)
                 else:
                     vu[nid] = [lettre]
-                lg.append(('num', lib[:46], lettre))
+                lg.append(('num', lib[:58], lettre))
             for nid, ls in vu.items():
                 lab = ','.join(ls)
                 w = max(2.6, 1.0 + len(lab) * 1.25) * k

@@ -103,3 +103,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 
 - Le segment `fence` (`fence_wood`) ne porte qu'un poteau, à son x local -0,5: ouest en rotation 0, sud en 1, est en 2, nord en 3. Une file de n segments a n poteaux: le constructeur ajoute le dernier en accroche `fence_post` (sans emprise, `poteaux_de_cloture` dans `valider_carte.py`). Deux files posées au milieu des cases (y + 0,5, x + 0,5) ne se rejoignent jamais en angle: fermer le coin par un buisson ou un autre élément, jamais par un trou.
 - Page `rendu.html`: `zoom=2` éloigne (zoom arrière) et `zoom=0` rapproche; pour un vrai gros plan, `largeur=<m>` (2 à 36). La caméra suit Camille, posée en `x, y` sans collision: la décaler de l'objet regardé, sinon elle se tient dedans.
+
+## Plan vu du dessus avant la 3D (Aubrune, refonte, vérifié le 2026-11-10)
+
+- Chaîne: `docs/jeux/jeu-1/refonte/carte-aubrune/construire_plan.py` (zones en polygones, eaux et rails en polylignes, graphe de chemins noeuds et arêtes, bâtiments avec porte et noeud d'accès, verrous posés sur des arêtes, quêtes en listes de noeuds) écrit `plan.json`, les SVG, les PNG et injecte les tableaux dans `plan.md` entre des marques `<!-- genere:nom:debut -->`. `controler_plan.py` relit le JSON et le tableau du document; `--eprouver` casse une copie de douze façons.
+- Le graphe suffit pour un plan: Dijkstra par acte (arêtes verrouillées retirées) donne à la fois les distances, l'acte d'ouverture de chaque noeud (ni avant ni après celui de sa zone) et la densité d'intérêt (distance de réseau au point le plus proche, échantillonnée tous les 5 m).
+- Piège vu au banc d'épreuve: un croisement « franc » de segments ne voit pas un chemin dont un noeud est posé pile sur l'eau ou sur la voie (pont, passage à niveau): ajouter un contrôle par noeud (noeud dans l'eau ou sur la voie sans ouvrage).
+- Lisibilité: sur un plan dense, numéroter bâtiments et points d'intérêt et mettre les noms dans un panneau à droite; les étiquettes directes se chevauchent dès 20 éléments. Échelle et nord dans le bandeau du titre, jamais sur la carte.
+- Mesurer avant d'écrire: mes longueurs estimées de tête étaient fausses d'un facteur 2 (ligne morte annoncée 160 m, mesurée 93 m). Un sentier linéaire sur une carte de 320 m fait vite moins de 100 m: vérifier la longueur des sentiers de quête dès le premier tracé.
