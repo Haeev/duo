@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Sachet de graines de radis: papier plié, radis dessiné, haut déchiré, graines tombées. -->
+  <g transform="rotate(8 48 48)">
+    <path id="sachet" d="M22 18 L30 14 L38 19 L46 13 L54 18 L62 13 L70 18 L74 84 L20 86 Z" fill="#F5E6C6"/>
+    <path data-clip="sachet" data-w="0" d="M60 10 L80 10 L80 90 L40 90 Q66 60 60 10 Z" fill="#DDC59C"/>
+    <path d="M24 26 L71 24 L72 32 L25 34 Z" fill="#96A98C" data-w="0.6"/>
+    <path id="radis" d="M47 42 Q60 44 60 56 Q58 68 47 74 Q36 68 34 56 Q34 44 47 42 Z" fill="#C5443D"/>
+    <path data-clip="radis" data-w="0" d="M50 40 Q62 60 40 76 L64 76 L64 40 Z" fill="#8F3B34"/>
+    <path data-w="0" d="M39 50 Q42 46 45 46 Q40 52 40 58 Z" fill="#E58E84"/>
+    <path d="M47 42 L42 34 Q46 34 47 38 Q48 32 54 34 Z" fill="#6E9241" data-w="0.6"/>
+    <path data-w="0.5" fill="none" stroke="#000" d="M47 74 L47 80"/>
+    <g data-w="0.4" fill="none" stroke="#000"><path d="M28 80 L44 80"/></g>
+  </g>
+  <g data-w="0.5" fill="#8C5A35"><ellipse cx="78" cy="88" rx="3.4" ry="2.6"/><ellipse cx="86" cy="84" rx="3.2" ry="2.4"/><ellipse cx="84" cy="91" rx="3" ry="2.3"/></g>
+</svg>

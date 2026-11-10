@@ -1,0 +1,76 @@
+<!--
+  Odette Ferrand, 61 ans, épicière et logeuse: gourmande, bavarde, sait tout et le répète.
+  Visage rond (fiche: tête ronde, peau 1 pêche), chignon poivre et sel planté d'un crayon
+  (l'épicière qui note tout), petites lunettes rondes au bout du nez, joues toujours roses,
+  robe rouille à col claudine. Calques d'expression: neutre, content, soucieux.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
+  <!-- Buste: robe rouille, col claudine -->
+  <path id="robe" d="M6 232 Q12 182 56 166 L134 166 Q178 182 184 232 Z" fill="#A85837"/>
+  <path data-clip="robe" data-w="0" d="M128 156 Q176 180 158 232 L190 232 L190 156 Z" fill="#8F3B34"/>
+  <g data-w="0.5" fill="#F3EDE0"><circle cx="95" cy="200" r="3.4"/><circle cx="95" cy="218" r="3.4"/></g>
+  <path id="cou" d="M76 140 L114 140 L114 170 Q95 178 76 170 Z" fill="#EFC7A6"/>
+  <path data-clip="cou" data-w="0" d="M70 136 L120 136 L120 156 Q95 162 70 154 Z" fill="#E0AE86"/>
+  <path d="M95 172 Q80 160 58 166 Q56 186 76 188 Q90 186 95 172 Z" fill="#F3EDE0"/>
+  <path d="M95 172 Q110 160 132 166 Q134 186 114 188 Q100 186 95 172 Z" fill="#D9CAAE"/>
+  <!-- Chignon derrière la tête, crayon planté -->
+  <path d="M120 14 L140 4 L144 10 L124 20 Z" fill="#D4A33E" data-w="0.7"/>
+  <path d="M140 4 L150 1 L144 10 Z" fill="#E6CF9C" data-w="0.5"/>
+  <circle id="chignon" cx="95" cy="30" r="24" fill="#6A6763"/>
+  <path data-clip="chignon" data-w="0" d="M100 4 Q124 30 100 56 L130 56 L130 4 Z" fill="#2B2523"/>
+  <path data-w="0.4" fill="none" stroke="#000" d="M78 24 Q92 14 108 22 M80 36 Q96 28 112 36"/>
+  <!-- Oreilles et boucles -->
+  <ellipse cx="42" cy="104" rx="10" ry="13" fill="#EFC7A6"/>
+  <ellipse cx="148" cy="104" rx="10" ry="13" fill="#E0AE86"/>
+  <circle cx="40" cy="122" r="4.5" fill="#C8A150" data-w="0.55"/>
+  <circle cx="150" cy="122" r="4.5" fill="#C8A150" data-w="0.55"/>
+  <!-- Tête ronde -->
+  <path id="tete" d="M95 46 Q146 48 148 98 Q146 148 95 152 Q44 148 42 98 Q44 48 95 46 Z" fill="#EFC7A6"/>
+  <path data-clip="tete" data-w="0" d="M126 46 Q162 104 104 158 L170 158 L170 46 Z" fill="#E0AE86"/>
+  <!-- Cheveux tirés, deux mèches folles -->
+  <path id="cheveux" d="M42 94 Q38 46 95 42 Q152 46 148 94 Q140 66 112 62 Q102 74 76 70 Q54 74 42 94 Z" fill="#6A6763"/>
+  <path data-clip="cheveux" data-w="0" d="M112 40 Q150 60 148 96 L160 96 L160 40 Z" fill="#2B2523"/>
+  <path data-clip="cheveux" data-w="0" d="M56 64 Q70 50 92 50 Q72 56 62 70 Z" fill="#9A948C"/>
+  <path data-w="0.5" fill="none" stroke="#000" d="M48 86 Q44 98 50 104 M144 86 Q150 96 142 104"/>
+  <!-- Joues roses de la gourmande -->
+  <g data-w="0"><ellipse cx="60" cy="124" rx="11" ry="7" fill="#E58E84"/><ellipse cx="130" cy="124" rx="11" ry="7" fill="#E58E84"/></g>
+  <!-- Petit nez rond -->
+  <path data-w="0" d="M98 108 Q108 114 102 122 Q96 124 92 120 Z" fill="#E0AE86"/>
+  <path data-w="0.55" fill="none" stroke="#000" d="M92 104 Q86 118 94 122 Q100 124 104 119"/>
+
+  <!-- Neutre: oeil vif, sourire en coin -->
+  <g data-expr="neutre">
+    <ellipse cx="72" cy="100" rx="8.5" ry="7" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="118" cy="100" rx="8.5" ry="7" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="73" cy="101" r="4.4" fill="#44618A"/><circle cx="117" cy="101" r="4.4" fill="#44618A"/><circle cx="71.4" cy="99.2" r="1.5" fill="#F7F3EA"/><circle cx="115.4" cy="99.2" r="1.5" fill="#F7F3EA"/></g>
+    <path d="M60 86 Q72 78 84 84 Q72 84 62 90 Z" fill="#6A6763" data-w="0.5"/>
+    <path d="M130 86 Q118 78 106 84 Q118 84 128 90 Z" fill="#6A6763" data-w="0.5"/>
+    <g class="bouche"><path d="M82 134 Q96 140 110 130 Q104 142 94 142 Q86 140 82 134 Z" fill="#A2473F" data-w="0.55"/></g>
+  </g>
+  <!-- Content: rit la bouche grande ouverte (elle a une nouvelle à raconter) -->
+  <g data-expr="content">
+    <path data-w="0.75" fill="none" stroke="#000" d="M63 103 Q72 94 81 103 M109 103 Q118 94 127 103"/>
+    <path d="M60 82 Q72 72 84 80 Q72 80 62 86 Z" fill="#6A6763" data-w="0.5"/>
+    <path d="M130 82 Q118 72 106 80 Q118 80 128 86 Z" fill="#6A6763" data-w="0.5"/>
+    <g class="bouche">
+      <path id="rire" d="M76 130 Q95 126 114 130 Q110 150 95 152 Q80 150 76 130 Z" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="rire" data-w="0" d="M76 128 L114 128 L112 135 Q95 132 78 135 Z" fill="#F7F3EA"/>
+      <path data-clip="rire" data-w="0" d="M84 146 Q95 140 106 146 L106 156 L84 156 Z" fill="#E58E84"/>
+    </g>
+  </g>
+  <!-- Soucieux: sourcils en accent circonflexe, bouche pincée -->
+  <g data-expr="soucieux">
+    <ellipse cx="72" cy="101" rx="8" ry="7.5" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="118" cy="101" rx="8" ry="7.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="72" cy="104" r="4" fill="#44618A"/><circle cx="118" cy="104" r="4" fill="#44618A"/><circle cx="70.6" cy="102.4" r="1.3" fill="#F7F3EA"/><circle cx="116.6" cy="102.4" r="1.3" fill="#F7F3EA"/></g>
+    <path d="M60 90 Q74 88 84 78 Q80 88 62 94 Z" fill="#6A6763" data-w="0.5"/>
+    <path d="M130 90 Q116 88 106 78 Q110 88 128 94 Z" fill="#6A6763" data-w="0.5"/>
+    <g class="bouche"><path d="M88 136 Q95 130 102 136 Q95 140 88 136 Z" fill="#A2473F" data-w="0.55"/></g>
+  </g>
+  <!-- Lunettes rondes, par-dessus les yeux -->
+  <g data-w="0.5" fill="none" stroke="#000">
+    <path d="M72 88 Q86 88 86 101 Q86 114 72 114 Q58 114 58 101 Q58 88 72 88 Z"/>
+    <path d="M118 88 Q132 88 132 101 Q132 114 118 114 Q104 114 104 101 Q104 88 118 88 Z"/>
+    <path d="M86 99 Q95 94 104 99"/>
+  </g>
+</svg>

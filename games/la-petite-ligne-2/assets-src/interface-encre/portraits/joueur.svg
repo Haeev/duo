@@ -1,0 +1,64 @@
+<!--
+  Un des deux joueurs (portrait d'essai, l'apparence réelle viendra de l'éditeur): jeune adulte
+  arrivé par le train, cheveux bleu nuit en épi (teinte réservée aux joueurs), écharpe moutarde
+  de voyage, veste canard, écusson du profil Duo sur la poitrine (rond aqua: l'hôte, bible 2.10).
+  Peau dorée, ombre noisette. Calques d'expression: neutre, content, soucieux.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
+  <!-- Veste et écharpe -->
+  <path id="veste" d="M10 232 L22 184 Q40 166 70 162 L120 162 Q150 166 168 184 L180 232 Z" fill="#2F6E73"/>
+  <path data-clip="veste" data-w="0" d="M124 152 Q172 176 156 232 L190 232 L190 152 Z" fill="#2C3B57"/>
+  <path data-w="0.5" fill="none" stroke="#000" d="M70 168 L84 232 M120 168 L106 232"/>
+  <circle cx="138" cy="200" r="12" fill="#5CE1E6" data-w="0.7"/>
+  <circle cx="138" cy="200" r="5" fill="none" stroke="#000" data-w="0.5"/>
+  <path id="cou" d="M78 136 L112 136 L112 166 Q95 172 78 166 Z" fill="#C99368"/>
+  <path data-clip="cou" data-w="0" d="M70 130 L120 130 L120 152 Q95 158 70 150 Z" fill="#A9744D"/>
+  <path id="echarpe" d="M58 164 Q95 150 132 164 Q134 178 120 182 Q95 172 70 182 Q56 178 58 164 Z" fill="#D4A33E"/>
+  <path data-clip="echarpe" data-w="0" d="M100 160 L140 160 L140 190 L96 190 Q112 176 100 160 Z" fill="#8E6A26"/>
+  <path d="M70 176 L84 178 L80 214 L64 210 Z" fill="#D4A33E"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M66 206 l0 6 M71 207 l0 6 M76 208 l0 6"/></g>
+  <!-- Oreilles et tête -->
+  <ellipse cx="46" cy="104" rx="9" ry="13" fill="#C99368"/>
+  <ellipse cx="144" cy="104" rx="9" ry="13" fill="#A9744D"/>
+  <path id="tete" d="M50 76 Q54 44 95 42 Q136 44 140 76 L140 112 Q136 144 106 150 L84 150 Q54 144 50 112 Z" fill="#C99368"/>
+  <path data-clip="tete" data-w="0" d="M122 40 Q154 104 104 158 L170 158 L170 40 Z" fill="#A9744D"/>
+  <!-- Cheveux en épi, une mèche sur le front -->
+  <path id="cheveux" d="M44 92 Q36 60 52 42 Q50 30 64 28 Q70 14 88 20 Q100 8 114 20 Q132 16 136 32 Q152 40 146 64 Q152 80 144 92 Q138 70 124 64 Q118 74 104 70 Q96 84 82 82 Q86 72 80 66 Q64 70 52 72 Q46 80 44 92 Z" fill="#3E5578"/>
+  <path data-clip="cheveux" data-w="0" d="M110 10 Q150 40 146 96 L170 96 L170 10 Z" fill="#2C3B57"/>
+  <path data-clip="cheveux" data-w="0" d="M62 38 Q76 28 92 30 Q76 36 68 48 Z" fill="#587F8E"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M74 34 Q86 44 92 56 M108 32 Q114 44 112 58"/></g>
+  <!-- Nez: aplat et trait -->
+  <path data-w="0" d="M98 104 Q106 112 102 120 Q96 122 92 118 Z" fill="#A9744D"/>
+  <path data-w="0.55" fill="none" stroke="#000" d="M94 100 Q88 114 94 120 Q100 122 104 118"/>
+  <g data-w="0"><circle cx="64" cy="126" r="1.4" fill="#A9744D"/><circle cx="70" cy="129" r="1.4" fill="#A9744D"/><circle cx="122" cy="128" r="1.4" fill="#A9744D"/></g>
+
+  <!-- Neutre: curieux, petit sourire -->
+  <g data-expr="neutre">
+    <ellipse cx="74" cy="102" rx="8.5" ry="8" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="116" cy="102" rx="8.5" ry="8" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="75" cy="103" r="4.6" fill="#3A2A22"/><circle cx="115" cy="103" r="4.6" fill="#3A2A22"/><circle cx="73.4" cy="101" r="1.6" fill="#F7F3EA"/><circle cx="113.4" cy="101" r="1.6" fill="#F7F3EA"/></g>
+    <path d="M62 88 Q74 80 86 86 Q74 86 64 92 Z" fill="#2C3B57" data-w="0.5"/>
+    <path d="M128 88 Q116 80 104 86 Q116 86 126 92 Z" fill="#2C3B57" data-w="0.5"/>
+    <g class="bouche"><path d="M86 134 Q96 138 106 132 Q104 140 96 140 Q88 140 86 134 Z" fill="#A2473F" data-w="0.5"/></g>
+  </g>
+  <!-- Content: grand sourire, yeux plissés, rougeur -->
+  <g data-expr="content">
+    <path data-w="0.75" fill="none" stroke="#000" d="M65 105 Q74 96 83 105 M107 105 Q116 96 125 105"/>
+    <path d="M62 84 Q74 74 86 82 Q74 82 64 88 Z" fill="#2C3B57" data-w="0.5"/>
+    <path d="M128 84 Q116 74 104 82 Q116 82 126 88 Z" fill="#2C3B57" data-w="0.5"/>
+    <g data-w="0"><ellipse cx="62" cy="120" rx="9" ry="5.5" fill="#E58E84"/><ellipse cx="128" cy="120" rx="9" ry="5.5" fill="#E58E84"/></g>
+    <g class="bouche">
+      <path id="sourire" d="M78 128 Q95 132 112 126 Q108 146 95 146 Q82 146 78 128 Z" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="sourire" data-w="0" d="M76 126 L114 124 L112 134 Q95 136 78 134 Z" fill="#F7F3EA"/>
+    </g>
+  </g>
+  <!-- Soucieux: regard en coin, sourcils relevés, bouche de travers -->
+  <g data-expr="soucieux">
+    <ellipse cx="74" cy="102" rx="8.5" ry="8" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="116" cy="102" rx="8.5" ry="8" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="70" cy="104" r="4.2" fill="#3A2A22"/><circle cx="111" cy="104" r="4.2" fill="#3A2A22"/><circle cx="68.6" cy="102.2" r="1.4" fill="#F7F3EA"/><circle cx="109.6" cy="102.2" r="1.4" fill="#F7F3EA"/></g>
+    <path d="M62 90 Q76 88 86 78 Q82 88 64 94 Z" fill="#2C3B57" data-w="0.5"/>
+    <path d="M128 90 Q114 88 104 78 Q108 88 126 94 Z" fill="#2C3B57" data-w="0.5"/>
+    <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M86 138 Q92 133 98 137 Q103 140 108 134"/></g>
+  </g>
+</svg>

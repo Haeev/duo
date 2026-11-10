@@ -1,0 +1,18 @@
+{
+ "colonnes": 4,
+ "rangees": 3,
+ "expressions": [
+  "neutre",
+  "joie",
+  "rire",
+  "surprise",
+  "souci",
+  "colere",
+  "sommeil",
+  "parole",
+  "parole-fermee",
+  "clin",
+  "bouderie",
+  "reflexion"
+ ]
+}

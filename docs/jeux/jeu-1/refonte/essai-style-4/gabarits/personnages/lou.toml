@@ -7,6 +7,12 @@ coiffure = "tignasse"
 peau = "peaux.noisette"
 cheveux = "cheveux.brun"
 
+[visage]
+age = "jeune"
+nez = "rond"
+iris = "iris.brun"
+marques = []
+
 [corps]
 gabarit = "enfant"
 donnees = "modeles/enfant.npz"

@@ -7,6 +7,12 @@ coiffure = "tignasse"
 peau = "peaux.miel"
 cheveux = "cheveux.noir"
 
+[visage]
+age = "adulte"
+nez = "busque"
+iris = "iris.brun"
+marques = ["barbe-machoire"]
+
 [corps]
 gabarit = "homme"
 donnees = "modeles/homme.npz"

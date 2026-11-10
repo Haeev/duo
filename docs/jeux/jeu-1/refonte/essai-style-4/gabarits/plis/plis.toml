@@ -1,0 +1,87 @@
+# Pose des gabarits de plis et d'encre (dessins: plis.svg) sur les corps, lue par peindre.py.
+# Les mesures sont en mètres; une tenue peut remplacer un tampon par le sien ou l'ôter dans un bloc
+# [plis] de sa fiche (`genou = "genou-large"`, `aine = ""`).
+# Ajouter un motif de pli: dessiner un <symbol> dans plis.svg (copier `coude`), puis un bloc ici (recette: README).
+
+# --- plis aux articulations
+# support: bras | jambe (repère du membre) ou torse; centre: position le long du membre (0 épaule ou hanche,
+# 1 poignet ou cheville); angle: côté du membre au milieu du dessin (0 dessous du bras ou intérieur de la jambe,
+# -90 devant, 90 derrière, 180 dessus ou extérieur); hauteur: ce que couvre le dessin de haut en bas.
+# repere (torse): taille (taille du bas), aisselle (7 cm sous l'épaule); largeur: demi-tour couvert (m).
+[tampons.coude]
+symbole = "coude"
+support = "bras"
+centre = 0.48
+angle = -90
+hauteur = 0.14
+
+[tampons.genou]
+symbole = "genou"
+support = "jambe"
+centre = 0.5
+angle = -90
+hauteur = 0.19
+
+[tampons.aine]
+symbole = "aine"
+support = "jambe"
+centre = 0.07
+angle = -90
+hauteur = 0.19
+
+[tampons.taille]
+symbole = "taille"
+support = "torse"
+repere = "taille"
+hauteur = 0.2
+
+[tampons.aisselle]
+symbole = "aisselle"
+support = "torse"
+repere = "aisselle"
+hauteur = 0.2
+
+# --- bords, coutures, pièces posées, motifs
+[ourlet]
+symbole = "ourlet"
+largeur = 0.03        # profondeur de la bande depuis le bord
+tuiles_membre = 3     # répétitions du dessin sur le tour d'un membre
+tuiles_torse = 7
+
+[couture]
+symbole = "couture"
+largeur = 0.03
+pas = 0.12            # longueur d'une répétition
+
+[poches.poitrine]
+symbole = "poche-poitrine"
+taille = 0.1
+
+[poches.jean]
+symbole = "poche-jean"
+taille = 0.1
+
+[bouton]
+symbole = "bouton"
+largeur = 0.04
+pas = 0.085           # écart entre deux boutons
+
+[motifs.carreaux]
+symbole = "carreaux"
+pas = 0.085
+
+[motifs.rayures]
+symbole = "rayures"
+pas = 0.116
+
+[motifs.cotes]
+symbole = "cotes"
+pas = 0.176
+
+[motifs.torsades]
+symbole = "torsades"
+pas = 0.12
+
+[motifs.pois]
+symbole = "pois"
+pas = 0.124

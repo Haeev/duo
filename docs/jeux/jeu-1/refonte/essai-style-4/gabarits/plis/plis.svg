@@ -1,0 +1,257 @@
+<!--
+  Gabarits de plis et d'encre des vêtements, dessinés à la plume (bible 0.2, 2.8).
+  Chaque <symbol> est un tampon, dessiné à plat dans un repère « déroulé » du corps (voir plis.toml):
+  - bras, jambe: x fait le tour du membre (400 = le tour entier, 200 = le côté `angle` de la fiche,
+    0 et 400 = le côté opposé, raccordés), y descend le long du membre (100 = l'articulation);
+  - torse: x va du milieu devant (0) au milieu du dos (400), le côté à 200; le même dessin sert aux deux
+    côtés (miroir); y descend (100 = le repère: taille, aisselle);
+  - bord: bande d'ourlet, x le long du bord (tuile qui se répète), y du bord (0) vers l'intérieur (3 cm);
+  - couture: bande de 3 cm centrée sur la couture (x 30), y le long (tuile);
+  - plan: pièce posée de face (poche, bouton), au repère et à la taille de la fiche;
+  - tuile: motif qui se répète (x et y), en coordonnées du tissu qui suivent le volume.
+  Calques (`data-expr`): `encre` (traits effilés, noirs pleins, hachures), `ombre` (ombre peinte),
+  `clair` (clair des bosses), `z1`, `z2`, `filet` (zones de couleur d'un motif: masques).
+  La hauteur (canal alpha de l'atlas, relief du nuanceur) en est tirée: l'encre creuse, l'ombre creuse un
+  peu, le clair bombe. Dessin en noir: seule la couverture compte, la couleur vient de la tenue.
+  Lumière en haut à gauche; un pli = 2 à 4 traits effilés, un aplat d'ombre dessous, un noir au creux.
+-->
+<svg xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ============================================================ COUDE (bras, x 200 = devant) -->
+  <symbol id="coude" data-repere="membre" viewBox="0 0 400 200" data-trait="13">
+    <g data-expr="ombre" data-w="0">
+      <path d="M148 100 Q196 122 292 104 L306 146 Q236 164 166 146 Q150 128 148 100 Z"/>
+      <path d="M0 86 Q26 100 14 124 L0 124 Z M400 82 Q372 100 386 126 L400 126 Z"/>
+    </g>
+    <g data-expr="clair" data-w="0">
+      <path d="M150 70 Q198 56 246 68 Q198 72 150 70 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M146 96 Q186 114 230 104 Q262 96 296 108"/>
+      <path fill="none" d="M170 72 Q206 84 242 74" data-w="0.75"/>
+      <path fill="none" d="M182 132 Q218 142 258 128" data-w="0.8"/>
+      <path d="M228 104 L268 100 L246 122 Z" fill="#000"/>
+      <path fill="none" d="M286 124 l12 -16 M300 132 l12 -16 M314 140 l12 -16" data-w="0.55"/>
+      <path fill="none" d="M16 80 Q36 100 22 122" data-w="0.8"/>
+      <path fill="none" d="M384 78 Q364 100 380 124" data-w="0.8"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ GENOU (jambe, x 200 = devant, bords = creux du genou) -->
+  <symbol id="genou" data-repere="membre" viewBox="0 0 400 200" data-trait="14">
+    <g data-expr="ombre" data-w="0">
+      <path d="M0 78 L70 84 Q60 120 74 150 L0 150 Z M400 78 L330 84 Q340 120 326 150 L400 150 Z"/>
+      <path d="M154 122 Q200 140 246 120 L246 134 Q200 150 154 136 Z"/>
+    </g>
+    <g data-expr="clair" data-w="0">
+      <path d="M156 84 Q200 66 244 84 Q200 96 156 84 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M150 80 Q200 62 252 82" data-w="0.7"/>
+      <path fill="none" d="M160 120 Q200 136 242 118"/>
+      <path fill="none" d="M98 56 Q124 98 104 146" data-w="0.8"/>
+      <path fill="none" d="M304 64 Q282 100 300 138" data-w="0.8"/>
+      <path fill="none" d="M0 90 Q22 100 46 88 Q34 104 62 108"/>
+      <path fill="none" d="M400 90 Q378 100 354 88 Q366 104 338 110"/>
+      <path d="M0 96 L40 96 L12 114 Z M400 96 L360 96 L388 116 Z" fill="#000"/>
+      <path fill="none" d="M0 126 Q18 132 34 124 M400 128 Q380 134 364 126" data-w="0.7"/>
+      <path fill="none" d="M114 128 l10 -14 M126 136 l10 -14 M138 144 l10 -14" data-w="0.55"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ AINE (haut de la jambe, x 200 = devant, x 300 = intérieur) -->
+  <symbol id="aine" data-repere="membre" viewBox="0 0 400 200" data-trait="14">
+    <g data-expr="ombre" data-w="0">
+      <path d="M250 40 L350 40 Q330 110 280 140 Q262 96 250 40 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M300 62 Q254 88 208 128"/>
+      <path fill="none" d="M306 82 Q268 112 242 152" data-w="0.8"/>
+      <path fill="none" d="M290 52 Q240 62 194 92" data-w="0.7"/>
+      <path d="M284 46 L322 50 L306 74 Z" fill="#000"/>
+      <path fill="none" d="M318 98 l10 -14 M328 108 l10 -14" data-w="0.55"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ TAILLE (torse, x 0 = devant, 200 = côté; y 100 = taille) -->
+  <symbol id="taille" data-repere="torse" viewBox="0 0 400 200" data-trait="13">
+    <g data-expr="ombre" data-w="0">
+      <path d="M0 100 Q100 104 200 100 Q300 96 400 100 L400 112 Q300 116 200 114 Q100 118 0 112 Z"/>
+      <path d="M176 60 L226 60 L220 98 L182 98 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M108 94 Q118 72 110 50" data-w="0.75"/>
+      <path fill="none" d="M150 96 Q162 76 156 56" data-w="0.8"/>
+      <path fill="none" d="M214 96 Q218 74 230 56"/>
+      <path fill="none" d="M262 94 Q256 76 266 60" data-w="0.75"/>
+      <path d="M190 98 L222 98 L208 78 Z" fill="#000"/>
+      <path fill="none" d="M132 110 Q138 132 132 154" data-w="0.7"/>
+      <path fill="none" d="M268 110 Q262 130 270 150" data-w="0.7"/>
+      <path fill="none" d="M232 70 l12 -12 M240 80 l12 -12 M248 90 l12 -12" data-w="0.5"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ AISSELLE (torse, x 200 = côté; y 100 = 7 cm sous l'épaule) -->
+  <symbol id="aisselle" data-repere="torse" viewBox="0 0 400 200" data-trait="13">
+    <g data-expr="ombre" data-w="0">
+      <path d="M158 52 L244 52 L254 120 Q200 142 148 120 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M198 70 Q174 100 150 142"/>
+      <path fill="none" d="M206 72 Q218 108 240 150" data-w="0.85"/>
+      <path fill="none" d="M194 66 Q160 80 124 92" data-w="0.7"/>
+      <path fill="none" d="M208 66 Q238 82 274 92" data-w="0.7"/>
+      <path d="M180 56 L222 56 L202 84 Z" fill="#000"/>
+      <path fill="none" d="M226 112 l12 -14 M236 122 l12 -14 M246 132 l12 -14" data-w="0.5"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ OURLET (bord: x le long, y 0 = bord, 60 = 3 cm dedans) -->
+  <symbol id="ourlet" data-repere="bord" viewBox="0 0 200 60" data-trait="9">
+    <g data-expr="clair" data-w="0">
+      <path d="M0 9 Q100 12 200 9 L200 22 Q100 25 0 22 Z"/>
+    </g>
+    <g data-expr="ombre" data-w="0">
+      <path d="M0 30 Q100 33 200 30 L200 38 Q100 40 0 38 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M-4 4 Q50 8 100 3 Q150 0 204 4" data-w="1.1"/>
+      <path fill="none" data-w="0.42" d="M6 28 l18 1 M34 29 l18 0 M62 29 l18 -1 M90 28 l18 0 M118 28 l18 1 M146 29 l18 0 M174 29 l18 -1"/>
+      <path fill="none" d="M42 6 Q46 16 41 26" data-w="0.6"/>
+      <path fill="none" d="M138 4 Q134 14 141 22" data-w="0.6"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ COUTURE (bande de 3 cm centrée en x 30, y le long) -->
+  <symbol id="couture" data-repere="couture" viewBox="0 0 60 200" data-trait="8">
+    <g data-expr="ombre" data-w="0">
+      <path d="M30 0 Q34 50 30 100 Q27 150 30 200 L38 200 Q35 150 38 100 Q42 50 38 0 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M30 -4 Q33 50 29 100 Q26 150 30 204" data-w="0.75"/>
+      <path fill="none" data-w="0.4" d="M17 6 l1 16 M17 36 l0 16 M18 66 l-1 16 M17 96 l0 16 M16 126 l1 16 M17 156 l0 16 M18 186 l0 12"/>
+      <path fill="none" data-w="0.4" d="M43 20 l0 16 M43 50 l1 16 M44 80 l-1 16 M43 110 l0 16 M42 140 l1 16 M43 170 l0 16"/>
+      <path fill="none" d="M30 62 q-9 4 -13 12" data-w="0.45"/>
+      <path fill="none" d="M30 142 q9 4 13 12" data-w="0.45"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ POCHE DE POITRINE (plan: 10 x 10 cm, centre de la pièce) -->
+  <symbol id="poche-poitrine" data-repere="plan" viewBox="0 0 200 200" data-trait="10">
+    <g data-expr="clair" data-w="0">
+      <path d="M46 102 L156 98 L158 166 Q100 174 44 168 Z"/>
+    </g>
+    <g data-expr="ombre" data-w="0">
+      <path d="M44 96 Q100 104 158 94 L158 112 Q100 120 44 112 Z"/>
+      <path d="M150 104 L160 104 L162 168 L152 168 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M40 62 L162 58 L160 170 Q100 178 38 172 Z" data-w="0.85"/>
+      <path fill="none" d="M36 58 L166 54 L162 92 Q100 102 40 94 Z"/>
+      <path d="M44 96 Q100 106 158 94 L158 100 Q100 110 44 102 Z" fill="#000"/>
+      <path fill="none" data-w="0.4" d="M52 112 l0 14 M52 136 l0 14 M150 110 l0 14 M150 134 l0 14 M64 160 l14 1 M92 162 l14 0 M120 161 l14 -1"/>
+      <path fill="none" d="M100 76 m-9 0 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0" data-w="0.7"/>
+      <path fill="none" d="M70 128 Q78 142 72 156" data-w="0.5"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ POCHE DE JEAN (plan: 10 x 10 cm, poche gauche; la droite en miroir) -->
+  <symbol id="poche-jean" data-repere="plan" viewBox="0 0 200 200" data-trait="10">
+    <g data-expr="ombre" data-w="0">
+      <path d="M24 40 Q70 52 96 110 L110 112 Q84 48 24 30 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M20 36 Q74 50 100 116"/>
+      <path fill="none" data-w="0.4" d="M24 52 l14 4 M48 62 l12 8 M68 78 l9 11 M82 96 l6 12"/>
+      <path d="M96 108 L112 114 L104 128 Z" fill="#000"/>
+      <path fill="none" d="M120 120 Q132 134 128 152" data-w="0.55"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ BOUTON ET BOUTONNIÈRE (plan: 4 x 8,5 cm, un bouton) -->
+  <symbol id="bouton" data-repere="plan" viewBox="0 0 60 120" data-trait="7">
+    <g data-expr="clair" data-w="0">
+      <circle cx="30" cy="60" r="13"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M30 46 Q44 46 44 60 Q44 74 30 74 Q16 74 16 60 Q16 46 30 46 Z" data-w="0.8"/>
+      <circle cx="25" cy="58" r="2.4" fill="#000"/>
+      <circle cx="35" cy="62" r="2.4" fill="#000"/>
+      <path fill="none" d="M46 58 Q54 54 58 46" data-w="0.5"/>
+      <path fill="none" d="M14 63 Q6 67 2 75" data-w="0.5"/>
+      <path d="M33 74 L36 76 L32 86 L29 84 Z" fill="#000"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ TRICOT: CÔTES (tuile: 8 côtes) -->
+  <symbol id="cotes" data-repere="tuile" viewBox="0 0 200 200" data-trait="6">
+    <g data-expr="ombre" data-w="0">
+      <path d="M8 0 Q11 50 7 100 Q4 150 8 200 L16 200 Q12 150 15 100 Q19 50 16 0 Z"/>
+      <path d="M58 0 Q61 50 57 100 Q54 150 58 200 L66 200 Q62 150 65 100 Q69 50 66 0 Z"/>
+      <path d="M108 0 Q111 50 107 100 Q104 150 108 200 L116 200 Q112 150 115 100 Q119 50 116 0 Z"/>
+      <path d="M158 0 Q161 50 157 100 Q154 150 158 200 L166 200 Q162 150 165 100 Q169 50 166 0 Z"/>
+    </g>
+    <g data-expr="encre" data-w="0.45">
+      <path fill="none" d="M33 6 Q36 40 32 70"/>
+      <path fill="none" d="M84 110 Q87 150 83 190"/>
+      <path fill="none" d="M134 30 Q137 70 133 100"/>
+      <path fill="none" d="M183 120 Q186 150 182 176"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ TRICOT: TORSADES (tuile: une torsade entre deux côtes) -->
+  <symbol id="torsades" data-repere="tuile" viewBox="0 0 200 200" data-trait="7">
+    <g data-expr="ombre" data-w="0">
+      <path d="M40 0 L52 0 L52 200 L40 200 Z M148 0 L160 0 L160 200 L148 200 Z"/>
+      <path d="M100 46 Q118 50 128 60 L128 92 Q112 80 100 76 Z M100 146 Q118 150 128 160 L128 192 Q112 180 100 176 Z"/>
+    </g>
+    <g data-expr="clair" data-w="0">
+      <path d="M72 8 Q100 20 128 46 Q100 40 72 26 Z M72 108 Q100 120 128 146 Q100 140 72 126 Z"/>
+    </g>
+    <g data-expr="encre">
+      <path fill="none" d="M70 2 Q104 18 130 50 Q118 78 72 96" data-w="0.75"/>
+      <path fill="none" d="M130 4 Q112 14 104 24" data-w="0.6"/>
+      <path fill="none" d="M70 102 Q104 118 130 150 Q118 178 72 196" data-w="0.75"/>
+      <path fill="none" d="M130 104 Q112 114 104 124" data-w="0.6"/>
+      <path d="M100 58 L114 64 L102 72 Z M100 158 L114 164 L102 172 Z" fill="#000"/>
+      <path fill="none" d="M46 0 L46 200 M154 0 L154 200" data-w="0.45"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ CARREAUX (tuile: une maille du tartan, bords tracés à la main) -->
+  <symbol id="carreaux" data-repere="tuile" viewBox="0 0 200 200" data-trait="5">
+    <g data-expr="z1" data-w="0">
+      <path d="M0 -2 L82 -2 Q86 50 80 100 Q76 150 84 202 L0 202 Z"/>
+    </g>
+    <g data-expr="z2" data-w="0">
+      <path d="M-2 0 L202 0 L202 82 Q150 86 100 80 Q50 76 -2 84 Z"/>
+    </g>
+    <g data-expr="filet" data-w="0">
+      <path d="M138 -2 Q142 100 139 202 L147 202 Q149 100 146 -2 Z"/>
+      <path d="M-2 140 Q100 136 202 141 L202 148 Q100 144 -2 147 Z"/>
+    </g>
+    <g data-expr="encre" data-w="0.35">
+      <path fill="none" d="M10 20 l10 10 M30 40 l10 10 M50 20 l10 10 M20 60 l10 10 M54 54 l10 10"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ RAYURES (tuile: deux rayures, bords ondulés) -->
+  <symbol id="rayures" data-repere="tuile" viewBox="0 0 200 200" data-trait="5">
+    <g data-expr="z1" data-w="0">
+      <path d="M-2 10 Q60 4 120 12 Q170 16 202 10 L202 52 Q150 58 100 52 Q50 46 -2 52 Z"/>
+      <path d="M-2 110 Q60 104 120 112 Q170 116 202 110 L202 152 Q150 158 100 152 Q50 146 -2 152 Z"/>
+    </g>
+  </symbol>
+
+  <!-- ============================================================ POIS (tuile: deux pois décalés, ronds un peu de travers) -->
+  <symbol id="pois" data-repere="tuile" viewBox="0 0 200 200" data-trait="5">
+    <g data-expr="z1" data-w="0">
+      <path d="M50 30 Q72 30 72 52 Q71 74 50 73 Q28 72 29 51 Q30 30 50 30 Z"/>
+      <path d="M150 128 Q172 129 171 151 Q170 172 149 172 Q128 171 129 150 Q131 128 150 128 Z"/>
+    </g>
+    <g data-expr="encre" data-w="0.4">
+      <path fill="none" d="M68 62 Q62 72 50 74"/>
+      <path fill="none" d="M168 160 Q162 170 150 172"/>
+    </g>
+  </symbol>
+</svg>

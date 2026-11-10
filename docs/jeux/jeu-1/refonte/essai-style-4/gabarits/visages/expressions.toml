@@ -1,0 +1,99 @@
+# Expressions de l'atlas des traits: une entrée = une cellule de 128 px, dans l'ordre (4 par rangée).
+# Chaque expression assemble des pièces de `traits.svg` (sans le préfixe de famille):
+#   yeux      = forme des deux yeux (ouvert, mi-clos, ferme, rieur, etonne, cote-ext, cote-int),
+#               ou `yeux_g` et `yeux_d` pour deux yeux différents (clin d'oeil, regard de côté);
+#   sourcils  = neutre, leve, fronce, inquiet (ou `sourcils_g` et `sourcils_d`);
+#   bouche    = neutre, sourire, grand-sourire, moue, pincee, surprise, parole-ouverte, parole-fermee, coin;
+#   extras    = pièces en plus pour cette expression seulement (rougeur, fossettes...).
+# Les marques du personnage (âge, taches, moustache, lunettes) s'ajoutent à toutes ses expressions.
+# Ajouter une expression: copier un bloc en fin de fichier, changer `nom` et les pièces (recette: README).
+
+[[expression]]
+nom = "neutre"
+yeux = "ouvert"
+sourcils = "neutre"
+bouche = "neutre"
+
+[[expression]]
+nom = "joie"
+yeux = "rieur"
+sourcils = "leve"
+bouche = "sourire"
+extras = ["rougeur", "fossettes"]
+
+[[expression]]
+nom = "rire"
+yeux = "rieur"
+sourcils = "leve"
+bouche = "grand-sourire"
+extras = ["rougeur", "fossettes"]
+
+[[expression]]
+nom = "surprise"
+yeux = "etonne"
+sourcils = "leve"
+bouche = "surprise"
+
+[[expression]]
+nom = "souci"
+yeux = "ouvert"
+sourcils = "inquiet"
+bouche = "moue"
+
+[[expression]]
+nom = "colere"
+yeux = "mi-clos"
+sourcils = "fronce"
+bouche = "pincee"
+
+[[expression]]
+nom = "sommeil"
+yeux = "ferme"
+sourcils = "neutre"
+bouche = "neutre"
+
+[[expression]]
+nom = "parole"
+yeux = "ouvert"
+sourcils = "neutre"
+bouche = "parole-ouverte"
+
+[[expression]]
+nom = "parole-fermee"
+yeux = "ouvert"
+sourcils = "neutre"
+bouche = "parole-fermee"
+
+[[expression]]
+nom = "clin"
+yeux_g = "rieur"
+yeux_d = "ouvert"
+sourcils_g = "neutre"
+sourcils_d = "leve"
+bouche = "coin"
+extras = ["fossettes"]
+
+[[expression]]
+nom = "bouderie"
+yeux_g = "cote-ext"
+yeux_d = "cote-int"
+sourcils = "fronce"
+bouche = "moue"
+
+[[expression]]
+nom = "reflexion"
+yeux_g = "cote-int"
+yeux_d = "cote-ext"
+sourcils_g = "leve"
+sourcils_d = "neutre"
+bouche = "coin"
+
+# Marques de l'âge, ajoutées à toutes les expressions selon `[visage] age` du personnage.
+[ages.jeune]
+marques = ["pommettes"]
+
+[ages.adulte]
+marques = ["menton"]
+
+[ages.age]
+marques = ["pattes-oie", "poches", "sillons", "rides-front", "menton"]

@@ -7,6 +7,12 @@ coiffure = "brosse"
 peau = "peaux.dore"
 cheveux = "cheveux.poivre_et_sel"
 
+[visage]
+age = "adulte"
+nez = "busque"
+iris = "iris.gris"
+marques = ["moustache", "sillons"]
+
 [corps]
 gabarit = "costaud"
 donnees = "modeles/costaud.npz"

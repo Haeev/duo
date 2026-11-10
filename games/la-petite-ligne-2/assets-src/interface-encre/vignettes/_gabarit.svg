@@ -1,0 +1,30 @@
+<!--
+  Gabarit d'une vignette d'objet « à la plume ». Copier ce fichier sous le nom exact de l'objet
+  (`vignettes/<id de donnees/commun/objets>.svg`), dessiner, puis lancer
+  `NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/generer-images.mjs vignettes <id>`.
+
+  Règles (bible 0.2, sections 1.2 et 3.5):
+  - grille 96, sujet entre 8 et 88, un peu de travers (transform rotate de 3 à 12 degrés);
+  - formes trapues, quincaillerie exagérée; 2 ou 3 tons par matière, tirés du nuancier
+    (`docs/jeux/jeu-1/refonte/planches/source/nuancier-v02.json`): ton de base, ombre en aplat à
+    bord net en bas à droite (`data-w="0"` et `data-clip` vers la forme), un éclat clair en haut à
+    gauche; quelques hachures (3 à 5 traits, 45 degrés) dans l'ombre seulement;
+  - pas de trait (`stroke`) à régler: le contour est calculé (plein, délié, tremblé). Un trait de
+    détail s'écrit `fill="none" stroke="#000"`, `data-w` en règle l'épaisseur (0.3 à 0.6);
+  - ordre du document = ordre de peinture: chaque forme cerne celles d'avant.
+  Le test `tests/interface-vignettes.test.ts` contrôle les couleurs et la taille.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <g transform="rotate(-6 48 48)">
+    <!-- Corps: ton de base -->
+    <path id="corps" d="M24 30 L72 28 L74 76 L22 78 Z" fill="#A87A46"/>
+    <!-- Ombre en aplat, découpée par le corps -->
+    <path data-clip="corps" data-w="0" d="M56 20 L90 20 L90 90 L10 90 L10 66 Q48 66 56 20 Z" fill="#6E4B30"/>
+    <!-- Éclat clair -->
+    <path data-w="0" d="M29 35 L44 34 L30 47 Z" fill="#D7A86A"/>
+    <!-- Hachures dans l'ombre -->
+    <g data-w="0.35" fill="none" stroke="#000">
+      <path d="M58 60 l6 -6 M58 66 l8 -8 M60 70 l8 -8"/>
+    </g>
+  </g>
+</svg>

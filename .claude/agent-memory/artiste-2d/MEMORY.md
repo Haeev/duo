@@ -17,3 +17,12 @@
 - Contrôle: `node games/la-petite-ligne/ui-maquettes/outils/planche-vignettes.cjs [sortie.png]` (palette, L* disque et sujet, planche 40/60/190 px en couleur et en gris). Onglet en jeu: `capturer-souvenirs.cjs <url> "" tour-NN vignettes`, serveur Vite du jeu sur un port libre (5197 est souvent pris par une autre copie: `--strictPort` le signale).
 - Lisibilité à 40 px: un oiseau en vol se lit par des ailes larges en M aplati, pas par une croix; un poisson tenu au bec se lit en biais avec queue fourchue et oeil; une échelle se lit par ses barreaux (montants espacés d'au moins 4 unités).
 - Les scénarios de démo `souvenirs-*` ne montrent que héron, oies, échelle, mésanges, renard, vers luisants, poules et mot de Lucie: les autres vignettes ne se vérifient que sur la planche.
+
+## La Petite Ligne 2: traits du visage et plis 3D (essai de style 4)
+
+- Moteur de plume de l'interface réutilisé par `essai-style-4/scripts/encrer-lot.mjs` (lot JSON, une page Chromium). Calques séparés par `data-expr`, extraits par regex puis rendus un à un avec rsvg-convert (couverture = alpha). Lancer Node depuis Python avec `env={**os.environ, "NODE_PATH": ...}`: sans HOME, Playwright ne trouve pas son Chromium.
+- Cellule des traits: yeux à y 0,2, bouche à y 0,8, demi-écart 0,235; largeur et hauteur réelles diffèrent selon le corps (enfant et âgée: 1,45): étirer les pièces en hauteur, plafonné pour que les sourcils levés restent dans la cellule. Front, menton et barbe sortent de la cellule: les peindre dans l'atlas du corps.
+- Le point « nez » mesuré par le conformateur est souvent la lèvre (le plus avancé du profil): poser le nez dessiné par une fraction yeux-bouche (0,62).
+- Réduire un atlas RGBA en alpha prémultiplié, puis étendre les couleurs sous les texels vides, sinon franges sombres au filtrage.
+- Juger les visages à `?vue=expressions&zoom=5`: le modelé à facettes et la coque d'encre autour des orbites dominent les traits; c'est la limite de la note, pas le dessin.
+- Bash refuse les commandes jugées complexes (heredoc, `git` dans une boucle): écrire les scripts avec Write dans le scratchpad, une commande git par appel.

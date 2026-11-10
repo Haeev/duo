@@ -36,7 +36,39 @@ Planche: `comparaison.png`. Mesures et coûts: `mesures.json`. Tâches Meshy et 
 Tout se reconstruit par `python3 scripts/construire.py` (1 min; `--corps <dossier des rigs>` pour reconformer,
 `--seulement atlas` pour ne repeindre que les textures).
 
+## Traits et plis dessinés à la plume (artiste 2D, 2026-11-10)
+
+Planche: `comparaison-plume.png` (avant | après). Sources dessinées, encrées par le moteur de l'interface
+(`games/la-petite-ligne-2/assets-src/interface-encre/encrer.mjs`, via `scripts/encrer-lot.mjs`):
+
+- `gabarits/visages/traits.svg`: pièces du visage (7 yeux, 4 sourcils, 9 bouches, 3 nez, pommettes, rougeur,
+  taches, pattes d'oie, poches, sillons, fossettes, moustache, barbe, lunettes, rides du front, menton).
+  `expressions.toml`: 12 cellules (neutre, joie, rire, surprise, souci, colère, sommeil, parole, parole fermée,
+  clin d'oeil, bouderie, réflexion) et marques de l'âge (jeune, adulte, âgé). Bloc `[visage]` des personnages.
+- `scripts/traits.py`: un atlas par personnage `atlas/traits-<id>.png` (4 x 3 cellules de 128 px, nez et
+  étirement de la cellule propres au corps, couleurs du personnage) et `atlas/traits.json`; front, menton et
+  barbe passent dans l'atlas du corps (`peindre.py`). Coût: 0,7 Mo par personnage proche (512 x 384 et mips).
+- `gabarits/plis/plis.svg` et `plis.toml`: coude, genou, aine, taille, aisselle, ourlet, couture, poches,
+  bouton, côtes, torsades, carreaux, rayures, pois, en calques encre, ombre, clair et zones; `scripts/plis.py`
+  en tire les calques et la hauteur (canal alpha de l'atlas); planche de contrôle `.travail/plis/planche.png`.
+- Repère du nez: `[visage] nez` de la fiche du corps (fraction des yeux à la bouche, 0,62 par défaut); le point
+  « nez » du conformateur est souvent la lèvre.
+
 ## Ajouter du contenu
+
+- Une expression (dix lignes au plus):
+  1. copier un bloc `[[expression]]` à la fin de `gabarits/visages/expressions.toml`, changer `nom`;
+  2. choisir `yeux` (ou `yeux_g`/`yeux_d`), `sourcils`, `bouche`, `extras` parmi les pièces de `traits.svg`;
+  3. s'il faut une forme neuve: copier un `<symbol>` de la même famille dans `traits.svg` (`oeil-*` dans le
+     repère de l'oeil gauche, `bouche-*` centré sur la bouche), garder les couleurs `#FF00A1` à `#FF00A8`;
+  4. `python3 scripts/construire.py --seulement atlas`, puis `?vue=expressions&qui=<id>` pour la voir;
+  5. la scène la trouve par son nom (`EXPRESSION[nom]`), sans autre changement.
+- Un motif de pli ou d'encre (dix lignes au plus):
+  1. copier le `<symbol id="coude">` de `gabarits/plis/plis.svg` sous un nouvel id, garder `data-repere`;
+  2. dessiner dans les calques `encre` (traits `fill="none"`, noirs en `fill="#000"`), `ombre`, `clair`;
+  3. ajouter `[tampons.<id>]` dans `plis.toml` (support, centre, angle, hauteur) ou, pour une seule tenue,
+     `[plis] coude = "<id>"` dans sa fiche (`= ""` ôte un pli);
+  4. `python3 scripts/construire.py --seulement atlas`, regarder `.travail/plis/planche.png` et la scène.
 
 - Une tenue: copier `gabarits/tenues/carreaux-jean.toml`, changer `id`, cotes (relatives au corps) et couleurs
   du nuancier (`!nom` garde la couleur vive: un seul accent par tenue). Blocs facultatifs: `[gilet]`,

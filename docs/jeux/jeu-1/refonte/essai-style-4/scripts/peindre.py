@@ -121,7 +121,7 @@ class Corps:
         self.vg = [str(n) for n in d["vgroups"]]
         f = d["face"]
         self.face = dict(top=f[0], chin=f[1], hh=f[2], yeux=f[3], bouche=f[4], nez=f[5:8], cy=f[8], cell=f[9], cz=f[10],
-                         ecart=f[12])
+                         cw=f[11], ecart=f[12])
         att, mask = rasteriser(d["corners"].astype(np.float32), 8)
         self.mask = mask
         self.P = att[..., 0:3]
@@ -288,12 +288,82 @@ def couche_chaussettes(c, h):
     return np.where(c.tl >= 0, c.bones["LeftFoot"][2] + h.get("hauteur", 0.16) - z, -1)
 
 
+# ---------------------------------------------------------------- gabarits de plis dessinés (plis.py)
+PLIS = tomllib.load(open(ESSAI / "gabarits" / "plis" / "plis.toml", "rb"))
+_TAMPONS = {}
+
+
+def tampon(nom):
+    """Calques d'un tampon dessiné (`.travail/plis/<nom>.npz`), ou None s'il n'est pas construit."""
+    if nom not in _TAMPONS:
+        p = ESSAI / ".travail" / "plis" / f"{nom}.npz"
+        _TAMPONS[nom] = {k: v for k, v in np.load(p).items() if k != "repere"} if p.exists() else None
+    return _TAMPONS[nom]
+
+
+def lire(calque, sx, sy, wrap_x=True, wrap_y=False):
+    """Échantillonne un calque en coordonnées de 0 à 1 (bilinéaire); hors du dessin: 0."""
+    h, w = calque.shape
+    sx = np.mod(sx, 1) if wrap_x else sx
+    sy = np.mod(sy, 1) if wrap_y else sy
+    dedans = (sx >= 0) & (sx <= 1) & (sy >= 0) & (sy <= 1)
+    out = ndimage.map_coordinates(calque, [sy * (h - 1), sx * (w - 1)], order=1, mode="grid-wrap" if wrap_x else "constant")
+    return np.where(dedans, out, 0.0).astype(np.float32)
+
+
+def motif_dessine(kind, base, cols, u, v):
+    """Motif tracé à la main (tuile de plis.svg) dans les coordonnées du tissu; None si absent."""
+    spec = PLIS["motifs"].get(kind)
+    t = tampon(spec["symbole"]) if spec else None
+    if t is None:
+        return None
+    s = spec["pas"]
+    sx, sy = u / s, -v / s
+    z = {k: lire(t[k], sx, sy, True, True)[..., None] for k in ("z1", "z2", "filet", "ombre", "clair") if k in t}
+    c2 = rgb(cols[1]) if len(cols) > 1 else ombre(base[0, 0])
+    if kind == "carreaux":
+        a1, a2 = z["z1"], z["z2"]
+        c3 = rgb(cols[2]) if len(cols) > 2 else clair(rgb(cols[0]))
+        base = base * (1 - a1 * 0.6) + c2 * a1 * 0.6
+        base = base * (1 - a2 * 0.6) + c2 * a2 * 0.6
+        base = base * (1 - a1 * a2 * 0.35)
+        base = base * (1 - z["filet"] * 0.65) + c3 * z["filet"] * 0.65
+    elif kind in ("rayures", "pois"):
+        base = base * (1 - z["z1"]) + c2 * z["z1"]
+    else:   # tricot: côtes et torsades en ombre légère et clair
+        if "ombre" in z:
+            base = base * (1 - z["ombre"] * 0.16)
+        if "clair" in z:
+            base = base * (1 - z["clair"] * 0.5) + clair(base) * z["clair"] * 0.5
+    return base
+
+
+def motif_encre(kind, u, v):
+    """Encre et relief d'un motif dessiné (côtes, torsades, traits du tissage)."""
+    spec = PLIS["motifs"].get(kind)
+    t = tampon(spec["symbole"]) if spec else None
+    if t is None or "encre" not in t:
+        return None, None
+    s = spec["pas"]
+    return lire(t["encre"], u / s, -v / s, True, True), lire(t["relief"], u / s, -v / s, True, True)
+
+
 def motif(c, kind, cols, d, zone):
     """Couleur de base d'un vêtement selon son motif, en coordonnées du corps (continues entre îlots)."""
     P = c.P
     base = np.broadcast_to(rgb(cols[0]), P.shape).copy()
     u = np.where(c.ta >= 0, c.ang * 0.05, np.where(c.tl >= 0, c.ang * 0.08, P[..., 0]))
     v = np.where(c.ta >= 0, c.ta * c.len_bras, np.where(c.tl >= 0, c.tl * c.len_jambe, P[..., 2]))
+    dessin = motif_dessine(kind, base, cols, u, v)
+    if dessin is not None:
+        if kind == "cotes" and (c.ta < 0).any():
+            # Deux bandes de couleur sur la poitrine (pull), comme avant.
+            z = P[..., 2]
+            z0 = c.bones["Spine"][2] - 0.02
+            for k in (0, 1):
+                m = (np.abs(z - (z0 - k * 0.055) - 0.003 * np.sin(P[..., 0] * 70)) < 0.016) & (c.ta < 0) & (c.tl < 0)
+                dessin[m] = rgb(cols[1])
+        return dessin
     if kind == "carreaux":
         # Tartan simple: bandes sombres croisées (40 %), croisement plus sombre, filet clair continu.
         s = 0.085
@@ -362,12 +432,15 @@ def peindre_atlas(fiche_path, sortie):
     nx, ny, nz = f["nez"]
     tete = c.region == 0
     devant = P[..., 1] < f["cy"]
-    # Nez: un aplat d'ombre sur le côté et un trait sous le bout (bible 2.4).
+    # Nez: un aplat d'ombre sur le côté et un trait sous le bout (bible 2.4). Avec un bloc [visage], le nez
+    # est dessiné dans l'atlas des traits (traits.py) et rien n'est peint ici.
     hh = f["hh"]
-    cote_nez = tete & devant & (P[..., 0] > 0.004) & (P[..., 0] < 0.09 * hh) & (z > nz - 0.004) & (z < f["yeux"] - 0.02 * hh) & (P[..., 1] < ny + 0.022)
-    img[cote_nez] = ombre(peau)
-    sous_nez = tete & devant & (np.abs(z - (nz - 0.03 * hh)) < 0.016 * hh * (1 - (P[..., 0] / (0.06 * hh)) ** 2)) & (np.abs(P[..., 0]) < 0.06 * hh)
-    ink = np.maximum(ink, sous_nez * 1.0)
+    dessine = "visage" in fiche or "visage_de" in fiche
+    if not dessine:
+        cote_nez = tete & devant & (P[..., 0] > 0.004) & (P[..., 0] < 0.09 * hh) & (z > nz - 0.004) & (z < f["yeux"] - 0.02 * hh) & (P[..., 1] < ny + 0.022)
+        img[cote_nez] = ombre(peau)
+        sous_nez = tete & devant & (np.abs(z - (nz - 0.03 * hh)) < 0.016 * hh * (1 - (P[..., 0] / (0.06 * hh)) ** 2)) & (np.abs(P[..., 0]) < 0.06 * hh)
+        ink = np.maximum(ink, sous_nez * 1.0)
     # Dessous du menton et de la mâchoire, creux de l'oreille: aplats d'ombre francs.
     img[tete & (N[..., 2] < -0.35)] = ombre(peau)
     if fiche.get("rides"):
@@ -431,12 +504,79 @@ def peindre_atlas(fiche_path, sortie):
     for nom in set(top_layer[c.mask].tolist()) - {""}:
         m = (top_layer == nom) & c.mask
         aplat[m] = img[m].mean(axis=0)
+    # Encre et relief des motifs dessinés (côtes, torsades, pois), dans la couche qui les porte.
+    u_m = np.where(c.ta >= 0, c.ang * 0.05, np.where(c.tl >= 0, c.ang * 0.08, P[..., 0]))
+    v_m = np.where(c.ta >= 0, c.ta * c.len_bras, np.where(c.tl >= 0, c.tl * c.len_jambe, P[..., 2]))
+    for nom, d, h in couches:
+        e, r = motif_encre(h.get("motif", "uni"), u_m, v_m)
+        if e is not None:
+            m = top_layer == nom
+            ink[m] = np.maximum(ink[m], e[m] * 0.85)
+            relief[m] += 0.15 * r[m]
+
+    # --- gabarits dessinés à la plume (plis.svg, posés selon plis.toml): plis, ourlets, coutures, poches, boutons
+    def poser(nom_t, sx, sy, zone, wrap_x=False, fort=1.0):
+        t = tampon(nom_t)
+        if t is None or not zone.any():
+            return False
+        sxz, syz = sx[zone], sy[zone]
+        if "ombre" in t:
+            a = lire(t["ombre"], sxz, syz, wrap_x)[:, None] * fort
+            img[zone] = img[zone] * (1 - a) + shade_col[zone] * a
+        if "clair" in t:
+            a = lire(t["clair"], sxz, syz, wrap_x)[:, None] * 0.7 * fort
+            img[zone] = img[zone] * (1 - a) + clair(img[zone]) * a
+        if "encre" in t:
+            ink[zone] = np.maximum(ink[zone], np.clip(lire(t["encre"], sxz, syz, wrap_x) * 1.15, 0, 1) * fort)
+        relief[zone] += 0.2 * lire(t["relief"], sxz, syz, wrap_x) * fort
+        return True
+
+    habille = (top_layer != "") & (top_layer != "chaussures") & (top_layer != "chaussettes")
+    phi = c.ang * c.cote   # angle autour du membre, même sens des deux côtés: -pi/2 devant, +pi/2 derrière
+    th_tor = np.arctan2(P[..., 0], -(P[..., 1] - c.bones["Spine01"][1]))
+    reglage = {**PLIS["tampons"], **{k: ({**PLIS["tampons"].get(k, {}), "symbole": v} if isinstance(v, str) else v)
+                                     for k, v in tenue.get("plis", {}).items()}}
+    dessines = set()
+    for cle, sp in reglage.items():
+        if not sp.get("symbole"):
+            continue
+        if sp["support"] in ("bras", "jambe"):
+            tm, L = (c.ta, c.len_bras) if sp["support"] == "bras" else (c.tl, c.len_jambe)
+            a0 = math.radians(sp.get("angle", -90))
+            sx = np.angle(np.exp(1j * (phi - a0))) / (2 * math.pi) + 0.5
+            sy = (tm - sp["centre"]) * L / sp["hauteur"] + 0.5
+            zone = habille & (tm >= 0) & (sy > 0) & (sy < 1)
+            ok = poser(sp["symbole"], sx, sy, zone, wrap_x=True)
+        else:
+            zr = (c.bones["Hips"][2] + tenue["bas"].get("taille", 0.07) if sp["repere"] == "taille"
+                  else c.bones["LeftArm"][2] - 0.07)
+            sx = np.abs(th_tor) / math.pi
+            sy = (zr - z) / sp["hauteur"] + 0.5
+            zone = habille & (c.ta < 0) & (c.tl < 0) & (c.region != 0) & (sy > 0) & (sy < 1)
+            ok = poser(sp["symbole"], sx, sy, zone)
+        if ok:
+            dessines.add(cle)
 
     # --- détails des vêtements (dessinés dans leur couche visible)
     haut, bas = tenue["haut"], tenue["bas"]
     vis_h, vis_b = top_layer == "haut", top_layer == "bas"
     xs = P[..., 0]
     devant_t = P[..., 1] < c.bones["Spine01"][1] - 0.01
+    if haut.get("boutons") and tampon(PLIS["bouton"]["symbole"]) is not None:
+        patte = vis_h & devant_t & (np.abs(xs) < 0.016) & (c.ta < 0)
+        img[patte] = clair(img[patte])
+        relief[patte] += 0.06
+        ink = np.maximum(ink, (vis_h & devant_t & (c.ta < 0)) * trait(np.abs(xs) - 0.016 + bord_alea * 0.3, 0.0035) * 0.8)
+        sp = PLIS["bouton"]
+        zone = vis_h & devant_t & (c.ta < 0) & (np.abs(xs) < sp["largeur"] / 2)
+        poser(sp["symbole"], xs / sp["largeur"] + 0.5, np.mod((c.bones["Hips"][2] - z) / sp["pas"] + 0.5, 1), zone)
+        haut = {**haut, "boutons": False}
+    if haut.get("poche") and tampon(PLIS["poches"]["poitrine"]["symbole"]) is not None:
+        sp = PLIS["poches"]["poitrine"]
+        pz, px = c.bones["Spine"][2] - 0.04, 0.07
+        zone = vis_h & devant_t & (np.abs(xs - px) < sp["taille"] / 2) & (np.abs(z - pz) < sp["taille"] / 2)
+        poser(sp["symbole"], (xs - px) / sp["taille"] + 0.5, (pz - z) / sp["taille"] + 0.5, zone)
+        haut = {**haut, "poche": False}
     if haut.get("boutons"):
         patte = vis_h & devant_t & (np.abs(xs) < 0.016) & (c.ta < 0)
         img[patte] = clair(img[patte])
@@ -478,10 +618,26 @@ def peindre_atlas(fiche_path, sortie):
     if bas.get("motif") == "jean" or bas.get("coutures"):
         coul = rgb(bas.get("surpiqure", "ocre"))
         jambe = vis_b & (c.tl >= 0)
-        cote_ext = jambe & (np.abs(np.abs(c.ang) - math.pi) < 0.09)
-        pointille = np.mod(c.tl * c.len_jambe / 0.02, 1) < 0.6
-        img[cote_ext & pointille] = coul
-        ink = np.maximum(ink, jambe & (np.abs(np.abs(c.ang) - math.pi) - 0.11 < 0.0) & (np.abs(np.abs(c.ang) - math.pi) > 0.08))
+        sp = PLIS["couture"]
+        rayon = 0.055   # rayon moyen de la jambe: l'angle devient une distance
+        ecart = np.angle(np.exp(1j * (phi - math.pi))) * rayon
+        zone = jambe & (np.abs(ecart) < sp["largeur"] / 2)
+        if tampon(sp["symbole"]) is not None:
+            # Couture extérieure dessinée: trait, points de surpiqûre (couleur), fronces.
+            t = tampon(sp["symbole"])
+            sxz, syz = ecart[zone] / sp["largeur"] + 0.5, c.tl[zone] * c.len_jambe / sp["pas"]
+            pts = lire(t["encre"], sxz, syz, False, True)
+            fil = (np.abs(ecart[zone]) > 0.004)[:, None] * pts[:, None]
+            img[zone] = img[zone] * (1 - fil) + coul * fil
+            ink[zone] = np.maximum(ink[zone], pts * (np.abs(ecart[zone]) <= 0.004))
+            a = lire(t["ombre"], sxz, syz, False, True)[:, None]
+            img[zone] = img[zone] * (1 - a) + shade_col[zone] * a
+            relief[zone] -= 0.12 * pts
+        else:
+            cote_ext = jambe & (np.abs(np.abs(c.ang) - math.pi) < 0.09)
+            pointille = np.mod(c.tl * c.len_jambe / 0.02, 1) < 0.6
+            img[cote_ext & pointille] = coul
+            ink = np.maximum(ink, jambe & (np.abs(np.abs(c.ang) - math.pi) - 0.11 < 0.0) & (np.abs(np.abs(c.ang) - math.pi) > 0.08))
         zt = c.bones["Hips"][2] + bas.get("taille", 0.07)
         ceinture = vis_b & (z > zt - 0.035)
         img[ceinture] = ombre(img[ceinture]) * 0.3 + img[ceinture] * 0.7
@@ -495,9 +651,17 @@ def peindre_atlas(fiche_path, sortie):
         bout = ceinture & devant_t & (np.hypot(xs, z - (zt - 0.017)) < 0.011)
         img[bout] = rgb("laiton")
         relief[bout] += 0.2
-        # Poches de devant: un arc de la taille vers le côté.
-        arc = vis_b & devant_t & (np.abs(np.hypot(np.abs(xs) - 0.16, z - zt) - 0.085) < 0.0045) & (np.abs(xs) > 0.07)
-        ink = np.maximum(ink, arc * 1.0)
+        # Poches de devant: dessinées (poche-jean, en miroir à droite), sinon un arc de la taille vers le côté.
+        spj = PLIS["poches"]["jean"]
+        if tampon(spj["symbole"]) is not None:
+            px, pz = 0.115, zt - 0.045
+            zone = vis_b & devant_t & (np.abs(np.abs(xs) - px) < spj["taille"] / 2) & (np.abs(z - pz) < spj["taille"] / 2)
+            # x du dessin: du milieu du ventre (0) vers la hanche; même dessin des deux côtés, en miroir.
+            sxj = (np.abs(xs) - px) / spj["taille"] + 0.5
+            poser(spj["symbole"], sxj, (pz - z) / spj["taille"] + 0.5, zone)
+        else:
+            arc = vis_b & devant_t & (np.abs(np.hypot(np.abs(xs) - 0.16, z - zt) - 0.085) < 0.0045) & (np.abs(xs) > 0.07)
+            ink = np.maximum(ink, arc * 1.0)
     if bas.get("pli"):
         jambe = vis_b & (c.tl >= 0) & (c.tl < bas.get("longueur", 1) - 0.03)
         ink = np.maximum(ink, (jambe & (np.abs(c.ang - 1.57 * np.sign(xs) * -1) < 0.05)) * 0.9)
@@ -543,9 +707,12 @@ def peindre_atlas(fiche_path, sortie):
         lac = vis_c & (P[..., 1] < c.bones["LeftFoot"][1] - 0.02) & (np.abs(c.ang) > 2.0) & (np.mod(z / 0.018, 1) < 0.35) & (z > c.bones["LeftToeBase"][2] + 0.01)
         ink = np.maximum(ink, lac * 0.9)
 
-    # --- plis aux articulations: 3 traits effilés côté intérieur (coudes, genoux), un aplat d'ombre dessous
+    # --- plis aux articulations: 3 traits effilés côté intérieur (coudes, genoux), un aplat d'ombre dessous.
+    # Remplacés par les gabarits dessinés (plus haut) quand ils sont construits.
     wob = (bruit(P, 53.0) - 0.5)
-    for t0, tm, L, ang0 in ((0.48, c.ta, c.len_bras, 0.0), (0.5, c.tl, c.len_jambe, math.pi)):
+    proc = [(0.48, c.ta, c.len_bras, 0.0)] if "coude" not in dessines else []
+    proc += [(0.5, c.tl, c.len_jambe, math.pi)] if "genou" not in dessines else []
+    for t0, tm, L, ang0 in proc:
         on = (tm >= 0) & (top_layer != "") & (top_layer != "chaussures")
         a = np.angle(np.exp(1j * (c.ang - ang0)))
         for k, off in enumerate((-0.055, 0.0, 0.06)):
@@ -590,7 +757,7 @@ def peindre_atlas(fiche_path, sortie):
     # fourrure »), et sans miettes: ouverture morphologique.
     neck = c.bones["neck"]
     pres_cou = (np.hypot(P[..., 0] - neck[0], P[..., 1] - neck[1]) < 0.13) & (z > neck[2] - 0.05)
-    noir = (ao + (noise - 0.5) * 0.05 < 0.47) & ~tete & ~pres_cou
+    noir = (ao + (noise - 0.5) * 0.05 < 0.44) & ~tete & ~pres_cou   # les noirs dessinés des gabarits font le reste
     noir = ndimage.binary_opening(noir, iterations=3)
     ink = np.maximum(ink, noir * 1.0)
     sous_h = (N[..., 2] < -0.15) & (N[..., 2] >= -0.5) & ~tete & ~ombre_m
@@ -604,6 +771,16 @@ def peindre_atlas(fiche_path, sortie):
     long_ok = bruit(P, 23.0) > 0.35
     del hach, long_ok, diag   # hachures peintes retirées (essai 4): c'est le nuanceur qui hachure, à pas constant à l'écran
 
+    # --- ourlets dessinés (bande de plis.svg): surpiqûre, fronces, bord tremblé, le long de chaque bord.
+    so = PLIS["ourlet"]
+    if tampon(so["symbole"]) is not None:
+        x_bord = np.where(c.ta >= 0, phi / (2 * math.pi) * so["tuiles_membre"],
+                          np.where(c.tl >= 0, phi / (2 * math.pi) * so["tuiles_membre"], th_tor / (2 * math.pi) * so["tuiles_torse"]))
+        for nom, d, h in couches:
+            if nom in ("chaussures", "chaussettes"):
+                continue
+            zone = (top_layer == nom) & (d >= 0) & (d < so["largeur"]) & (c.region != 0)
+            poser(so["symbole"], x_bord, d / so["largeur"], zone, wrap_x=True, fort=0.9)
     # --- bords des couches (ourlets, encolures, manches): trait épais irrégulier
     for nom, d, h in couches:
         bord = (top_layer == nom) & (d < largeur)
@@ -638,6 +815,9 @@ def peindre_atlas(fiche_path, sortie):
         c.mask |= cellule
 
     col = img * (1 - ink[..., None]) + ENCRE * ink[..., None]
+    # Front, menton, barbe dessinés à la plume (traits.py, repère étendu de la cellule des traits).
+    if dessine:
+        col = poser_etendu(c, col, tete & devant, fiche.get("visage_de", fiche.get("id")))
     col = etendre(col, c.mask)
     # Relief: lissé (chanfreins de 2 à 3 texels), jamais nul (un alpha à 0 perdrait la couleur au chargement).
     relief = ndimage.gaussian_filter(etendre(np.clip(relief, 0.0, 1.0), c.mask), 2.2)
@@ -653,6 +833,25 @@ def peindre_atlas(fiche_path, sortie):
     strip.paste(loin, (256, 0))
     strip.save(str(sortie).replace(".png", ".loin.png"), optimize=True)
     print("ATLAS", sortie)
+
+
+def poser_etendu(c, col, zone, nom):
+    """Calque `<nom>-etendu.png` de traits.py: 512 x 640 px pour x de -128 à 384 et y de -128 à 512 en unités
+    de cellule (256 = une cellule; yeux à y 51, bouche à y 205), projeté de face sur la tête."""
+    chemin = ESSAI / ".travail" / "visages" / f"{nom}-etendu.png"
+    if not chemin.exists():
+        return col
+    lay = np.asarray(Image.open(chemin).convert("RGBA"), dtype=np.float32) / 255
+    f = c.face
+    u = 0.5 + c.P[..., 0] / f["cw"]
+    v = 0.5 + (c.P[..., 2] - f["cz"]) / f["cell"]
+    px, py = u * 256 + 128 - 0.5, (1 - v) * 256 + 128 - 0.5
+    pm = lay[..., :3] * lay[..., 3:4]
+    ech = [ndimage.map_coordinates(pm[..., k], [py[zone], px[zone]], order=1, mode="constant") for k in range(3)]
+    a = ndimage.map_coordinates(lay[..., 3], [py[zone], px[zone]], order=1, mode="constant")
+    out = col.copy()
+    out[zone] = col[zone] * (1 - a[:, None]) + np.stack(ech, -1)
+    return out
 
 
 def peindre_cheveux(c, fiche, coif_id):
