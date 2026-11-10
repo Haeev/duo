@@ -199,3 +199,43 @@ export function dummySources(plan: PlanRead | null, closed: readonly string[] = 
     },
   };
 }
+
+/**
+ * Sources d'essai à contenu long (banc des petites fenêtres): beaucoup d'habitants, de grandes
+ * familles de collection, une quête à la consigne très longue. Sert à vérifier que chaque page
+ * défile au lieu de déborder.
+ */
+export function stressSources(
+  plan: PlanRead | null,
+  closed: readonly string[] = [],
+): CarnetSources {
+  const base = dummySources(plan, closed);
+  const longStep =
+    'Va voir le mécanicien à la halte, il t’attend avec une lettre, trois clés et une lampe. '.repeat(
+      6,
+    );
+  return {
+    ...base,
+    quests: () =>
+      fakeQuests().map((q, i) => ({
+        ...q,
+        title: i === 0 ? 'Le grand chantier du logement fourni de la gare' : q.title,
+        step: q.step === '' ? '' : longStep,
+      })),
+    villagers: () => {
+      const many = fakeVillagers(plan);
+      return Array.from({ length: 28 }, (_, i) => {
+        const v = many[i % many.length];
+        return v === undefined ? null : { ...v, id: `${v.id}-${String(i)}` };
+      }).filter((v): v is VillagerRead => v !== null);
+    },
+    collections: () =>
+      fakeCollections().map((c) => ({
+        ...c,
+        entries: Array.from({ length: 40 }, (_, i) => {
+          const e = c.entries[i % c.entries.length];
+          return e === undefined ? null : { ...e, id: `${e.id}-${String(i)}` };
+        }).filter((e): e is CollectionEntryRead => e !== null),
+      })),
+  };
+}

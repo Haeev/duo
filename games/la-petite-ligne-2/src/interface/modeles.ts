@@ -133,6 +133,21 @@ export interface SlotModel {
   readonly edible: boolean;
 }
 
+/**
+ * Taille d'interface réellement appliquée: celle du réglage, sauf carnet ouvert dans une fenêtre
+ * trop petite pour la contenir (le carnet passe avant la taille, sans jamais descendre sous 1).
+ */
+export function fitScale(
+  factor: number,
+  notebookOpen: boolean,
+  width: number,
+  height: number,
+): number {
+  if (!notebookOpen) return factor;
+  const fit = Math.min(width / UI_TUNING.notebookWidthPx, height / UI_TUNING.notebookHeightPx);
+  return Math.max(1, Math.min(factor, fit));
+}
+
 /** Nom court d'un objet: 4 mots au plus (principe 2). */
 export function shortName(name: string, words: number = UI_TUNING.nameWords): string {
   return name.split(/\s+/).filter(Boolean).slice(0, words).join(' ');

@@ -22,7 +22,7 @@ import { EDITOR_SETTINGS } from './editeur/reglages';
 import { defaultPlayerLook } from '../rendu/personnages/apparence';
 import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
 import { createHud, type ProjectToScreen } from './hud';
-import { promptModel } from './modeles';
+import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
@@ -83,6 +83,8 @@ const AZERTY: Readonly<Record<string, string>> = {
   KeyA: 'Q',
   KeyZ: 'W',
   ShiftLeft: 'Maj',
+  PageUp: 'Page préc.',
+  PageDown: 'Page suiv.',
 };
 
 export function azertyLabel(code: string): string {
@@ -173,9 +175,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     if (me === null) return;
     const other: PlayerIndex = me === 0 ? 1 : 0;
     shop.onEvent(event, me, now);
+    const shownInNotebook = notebook.onEvent(event, me);
     switch (event.type) {
       case 'refused':
-        if (event.player === me && !shop.isOpen())
+        if (event.player === me && !shop.isOpen() && !shownInNotebook)
           hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
         break;
       case 'pockets_full':
@@ -356,7 +359,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const dtMs = Math.max(0, Math.min(250, dt * 1000));
       now += dtMs;
       layer.dataset.motion = reduced() ? 'reduced' : 'full';
-      layer.style.zoom = String(UI_SCALE_FACTOR[settingsUi().scale]);
+      layer.style.zoom = String(
+        fitScale(
+          UI_SCALE_FACTOR[settingsUi().scale],
+          notebook.isOpen(),
+          window.innerWidth,
+          window.innerHeight,
+        ),
+      );
       const world = view.world();
       const me = local();
       layer.hidden = world === null || me === null;
