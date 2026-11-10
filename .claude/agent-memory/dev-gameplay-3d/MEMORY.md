@@ -637,3 +637,8 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un habitant déplacé par une scène (`walk`) ou poussé revient à son poste à la relecture du planning (`backToPost`), jamais pendant une scène. Point d'arrivée des joueurs dégagé: `arrivalClearance` (habitants/reglages.ts).
 - Commerçant: champ `talk` du commerce = page « voir la boutique » ajoutée en fin de toute conversation (nœud réservé `DIALOGUES.shopOffer.node`); les tests qui enchaînent deux dialogues avec la cheffe de gare doivent clore cette page (`talk_close`).
 - Le contrôle `reach` d'une étape a 2,5 m de rayon (`STORY.reachRadius`): une sauvegarde fabriquée doit poser les joueurs loin du point, sinon l'étape (et un `travel_to`) part tout de suite.
+
+## Survol rejoué par Chromium (La Petite Ligne 2, vérifié le 2026-11-10)
+
+- Chromium rejoue `mouseover`/`mouseenter` quand le contenu passe sous un pointeur immobile (carnet qui monte du bas). Le pointeur des parcours e2e reste où Playwright a cliqué (« Héberger et continuer »): `mouseenter` mettait le focus du carnet sur la case 5. Le survol passe par `onPointerHover` (`src/interface/dom.ts`, `mousemove` avec `movementX/Y` non nuls); test garde-fou `tests/survol.test.ts`.
+- Dans le carnet, les chiffres 1 à 5 ne font rien: viser une case par D (ou les flèches) depuis la case 1.

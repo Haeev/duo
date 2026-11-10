@@ -6,7 +6,7 @@
 import type { Content } from '../donnees/charger';
 import type { TalkView } from '../simulation/dialogues/conversation';
 import type { Intent } from '../simulation/noyau/entrees';
-import { el, icon, setText, show, toggle } from './dom';
+import { el, icon, onPointerHover, setText, show, toggle } from './dom';
 import { paginate, Typewriter } from './modeles';
 import { portraitMarkup } from './portrait';
 import { blockedText, TEXTS } from './textes';
@@ -129,7 +129,8 @@ export function createDialogue(
       button.addEventListener('click', () => {
         api.choose(i);
       });
-      button.addEventListener('mouseenter', () => {
+      onPointerHover(button, () => {
+        if (focus === i) return;
         focus = i;
         drawChoices();
       });

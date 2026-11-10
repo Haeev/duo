@@ -8,7 +8,7 @@ import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../etat/monde';
 import type { GameEvent } from '../simulation/noyau/evenements';
 import type { Intent } from '../simulation/noyau/entrees';
-import { el, icon } from './dom';
+import { el, icon, onPointerHover } from './dom';
 import { equipModel, equippedText } from './equiper';
 import {
   chestModel,
@@ -171,7 +171,7 @@ export function createNotebook(
       node.append(el('span', { class: 'nametag', text: model.name }));
     }
     node.addEventListener('click', onClick);
-    node.addEventListener('mouseenter', onHover);
+    onPointerHover(node, onHover);
     return node;
   }
 
@@ -196,6 +196,7 @@ export function createNotebook(
           activate();
         },
         () => {
+          if (side === 'mine' && focus === i) return;
           side = 'mine';
           focus = i;
           redraw();
@@ -351,6 +352,7 @@ export function createNotebook(
               activate();
             },
             () => {
+              if (side === 'store' && focus === i) return;
               side = 'store';
               focus = i;
               redraw();

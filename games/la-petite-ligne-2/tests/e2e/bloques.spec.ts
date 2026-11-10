@@ -25,6 +25,18 @@ async function pickApple(duo: Duo): Promise<number> {
   return hi;
 }
 
+/**
+ * Met le focus du carnet sur la case de la pomme. Les chiffres n'y font rien (interface.md, 4):
+ * le carnet ouvre sur la case 1 et D avance d'une case dans la barre.
+ */
+async function focusApple(duo: Duo, slot: number): Promise<void> {
+  for (let i = 0; i < slot; i += 1) await duo.host.press('KeyD');
+  await expect(duo.host.game().locator('.lpl-ui .carnet .tile.focus')).toHaveAttribute(
+    'aria-label',
+    /^Pomme/,
+  );
+}
+
 test('P13 cueillir une pomme et la manger (CA-09)', async ({ browser }) => {
   const duo = await startDuo(browser, 'p13-manger');
   const { host, guest } = duo;
@@ -39,8 +51,7 @@ test('P13 cueillir une pomme et la manger (CA-09)', async ({ browser }) => {
   await host.shot('2-carnet-pomme');
   const slot = (await host.world())?.players[hi]?.toolbar.findIndex((s) => s?.item === 'pomme');
   expect(slot, 'la pomme est sur la barre').toBeGreaterThanOrEqual(0);
-  // Le carnet ouvre sur la case 1: ranger la pomme en case 1 n'est pas garanti, on la choisit.
-  await host.press(`Digit${String((slot ?? 0) + 1)}`);
+  await focusApple(duo, slot ?? 0);
   await host.press('Enter');
   const ate = await duo.until(
     host,
@@ -71,7 +82,7 @@ test('P15 donner une pomme à l’autre joueur', async ({ browser }) => {
   await host.press('KeyC');
   await expect(host.game().locator('.lpl-ui .carnet')).toBeVisible();
   const slot = (await host.world())?.players[hi]?.toolbar.findIndex((s) => s?.item === 'pomme');
-  await host.press(`Digit${String((slot ?? 0) + 1)}`);
+  await focusApple(duo, slot ?? 0);
   await host.press('KeyT');
   await duo.until(
     host,
@@ -107,7 +118,7 @@ test('P14 poser une pomme au sol puis la ramasser (CA-17)', async ({ browser }) 
   await host.press('KeyC');
   await expect(host.game().locator('.lpl-ui .carnet')).toBeVisible();
   const slot = (await host.world())?.players[hi]?.toolbar.findIndex((s) => s?.item === 'pomme');
-  await host.press(`Digit${String((slot ?? 0) + 1)}`);
+  await focusApple(duo, slot ?? 0);
   await host.press('KeyP');
   const dropped = await duo.until(
     host,
