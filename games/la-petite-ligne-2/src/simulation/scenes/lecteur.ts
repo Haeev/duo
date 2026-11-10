@@ -160,40 +160,67 @@ function toSegment(p: Spot, from: Spot, to: Spot): number {
   return Math.hypot(from.x + sx * t - p.x, from.y + sy * t - p.y);
 }
 
-/**
- * Un acteur ne traverse pas les joueurs: si la ligne droite passe sur l'un d'eux, il contourne
- * la paire par le bout le plus proche de lui. `null`: la voie est libre.
- */
-function aroundPlayers(sim: SimContext, from: Spot, to: Spot): Spot | null {
-  const [a, b] = sim.world.players.map((p) => p.body);
-  if (a === undefined || b === undefined) return null;
-  const { playerClearance } = SCENE_STAGING;
-  const pass = playerClearance / 2;
-  if (toSegment(a, from, to) >= pass && toSegment(b, from, to) >= pass) return null;
-  const mx = (a.x + b.x) / 2;
-  const my = (a.y + b.y) / 2;
-  const span = Math.hypot(b.x - a.x, b.y - a.y);
-  const ux = span > 1e-3 ? (b.x - a.x) / span : 1;
-  const uy = span > 1e-3 ? (b.y - a.y) / span : 0;
-  const side = (from.x - mx) * ux + (from.y - my) * uy >= 0 ? 1 : -1;
-  const reach = span / 2 + playerClearance;
-  return { x: mx + side * ux * reach, y: my + side * uy * reach };
+function gap(p: Spot, q: Spot): number {
+  return Math.hypot(p.x - q.x, p.y - q.y);
 }
 
-function stepToward(
-  sim: SimContext,
-  body: { x: number; y: number; facing: number; speed: number },
-  to: Spot,
-): void {
-  const dx = to.x - body.x;
-  const dy = to.y - body.y;
-  const left = Math.hypot(dx, dy);
-  const stride = Math.min(left, STORY.villagerWalkSpeed * sim.dt);
-  if (left < 1e-6) return;
-  body.x += (dx / left) * stride;
-  body.y += (dy / left) * stride;
-  body.facing = Math.atan2(dy, dx);
-  body.speed = STORY.villagerWalkSpeed;
+/**
+ * Repères de détour autour de la paire, dans son repère: (le long de la paire, de côté), en
+ * demi-écarts de la paire et en `playerClearance`. Ses deux bouts, ses quatre coins, ses deux flancs.
+ */
+const DETOUR_MARKS: readonly (readonly [half: number, clear: number, side: number])[] = [
+  [1, 1, 0],
+  [-1, -1, 0],
+  [1, 0, 1],
+  [1, 0, -1],
+  [-1, 0, 1],
+  [-1, 0, -1],
+  [0, 0, 1],
+  [0, 0, -1],
+];
+
+/**
+ * Un acteur ne traverse pas les joueurs `a` et `b`: si la ligne droite de `from` à `to` passe sur
+ * l'un d'eux, il fait un détour par le plus court des repères de `DETOUR_MARKS` dont les deux
+ * segments sont libres. `null`: la voie est libre, ou aucun détour ne l'est (il va alors au plus
+ * droit plutôt que de rester planté). Sans état: recalculé à chaque pas, le chemin restant ne fait
+ * que raccourcir, et un acteur arrivé à son repère a toujours la voie libre jusqu'au point.
+ */
+export function detourAround(a: Spot, b: Spot, from: Spot, to: Spot): Spot | null {
+  const c = SCENE_STAGING.playerClearance;
+  const pass = c / 2;
+  const clear = (p: Spot, q: Spot): boolean =>
+    toSegment(a, p, q) >= pass && toSegment(b, p, q) >= pass;
+  if (clear(from, to)) return null;
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const span = gap(a, b);
+  const ux = span > 1e-3 ? (b.x - a.x) / span : 1;
+  const uy = span > 1e-3 ? (b.y - a.y) / span : 0;
+  let best: Spot | null = null;
+  let cost = Infinity;
+  for (const [half, along, side] of DETOUR_MARKS) {
+    const u = (half * span) / 2 + along * c;
+    const n = side * c;
+    const via = { x: mx + ux * u - uy * n, y: my + uy * u + ux * n };
+    if (!clear(from, via) || !clear(via, to)) continue;
+    const length = gap(from, via) + gap(via, to);
+    if (length < cost) {
+      cost = length;
+      best = via;
+    }
+  }
+  return best;
+}
+
+/**
+ * Vitesse d'une marche de scène: le pas tranquille, pressé quand le chemin restant ne tiendrait
+ * pas dans `walkBudgetSeconds` (les joueurs n'attendent pas la réplique pendant une longue marche).
+ */
+export function sceneWalkSpeed(remaining: number, elapsed: number): number {
+  const { walkBudgetSeconds, hurrySpeed } = SCENE_STAGING;
+  const timeLeft = Math.max(walkBudgetSeconds - elapsed, 1e-3);
+  return Math.min(hurrySpeed, Math.max(STORY.villagerWalkSpeed, remaining / timeLeft));
 }
 
 /** Avance l'habitant d'un pas vers le point (placé par `stageSpot`); `true`: arrivé. */
@@ -202,26 +229,29 @@ function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: 
   const target = sim.content.places[run.place]?.map.points[to];
   if (villager === undefined || target === undefined) return true;
   const point = stageSpot(sim, run, target);
-  const via = aroundPlayers(sim, villager.body, point);
-  if (via !== null && elapsed < STORY.maxWalkSeconds) {
-    stepToward(sim, villager.body, via);
-    return false;
-  }
-  const dx = point.x - villager.body.x;
-  const dy = point.y - villager.body.y;
+  const body = villager.body;
+  const [a, b] = sim.world.players.map((p) => p.body);
+  const via = a === undefined || b === undefined ? null : detourAround(a, b, body, point);
+  const next = via ?? point;
+  const dx = next.x - body.x;
+  const dy = next.y - body.y;
   const left = Math.hypot(dx, dy);
-  const stride = STORY.villagerWalkSpeed * sim.dt;
-  if (left <= stride || elapsed >= STORY.maxWalkSeconds) {
-    villager.body.x = point.x;
-    villager.body.y = point.y;
-    villager.body.speed = 0;
-    if (point.facing !== null) villager.body.facing = point.facing;
+  const speed = sceneWalkSpeed(left + (via === null ? 0 : gap(via, point)), elapsed);
+  const stride = speed * sim.dt;
+  if ((via === null && left <= stride) || elapsed >= STORY.maxWalkSeconds) {
+    body.x = point.x;
+    body.y = point.y;
+    body.speed = 0;
+    if (point.facing !== null) body.facing = point.facing;
     return true;
   }
-  villager.body.x += (dx / left) * stride;
-  villager.body.y += (dy / left) * stride;
-  villager.body.facing = Math.atan2(dy, dx);
-  villager.body.speed = STORY.villagerWalkSpeed;
+  if (left > 1e-6) {
+    const moved = Math.min(left, stride);
+    body.x += (dx / left) * moved;
+    body.y += (dy / left) * moved;
+    body.facing = Math.atan2(dy, dx);
+  }
+  body.speed = speed;
   return false;
 }
 

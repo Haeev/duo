@@ -3,7 +3,8 @@
 import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import { HOOKS } from '../src/simulation/quetes/crochets';
-import { queueScene } from '../src/simulation/scenes/lecteur';
+import { detourAround, queueScene } from '../src/simulation/scenes/lecteur';
+import { SCENE_STAGING } from '../src/simulation/scenes/reglages';
 import { arrivalFrame } from '../src/simulation/voyage/arrivee';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { newSim } from './aides';
@@ -81,5 +82,56 @@ describe('arrivée dans un lieu', () => {
     // Après la scène, il rejoint son poste en contournant les joueurs (corps de 0,3 m).
     watch(20);
     expect(closest).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it("la première réplique d'accueil arrive en moins de 4,5 s: la marche de Firmin presse le pas", () => {
+    // Avant ce réglage: 9,6 s de marche sans rien à lire (8,3 s sans le contournement).
+    const sim = newSim(startAt('aubrune'));
+    let startedAt: number | null = null;
+    let saidAt: number | null = null;
+    for (let i = 0; i < 300 && saidAt === null; i++) {
+      wait(sim, 0.1);
+      const run = sim.world.common.story?.scene;
+      if (run?.id !== 'firmin-en-pantoufles') continue;
+      startedAt ??= i;
+      const beat = sim.content.places.aubrune?.scenes[run.id]?.beats[run.beat];
+      if (beat?.do === 'say') saidAt = i;
+    }
+    expect(startedAt).not.toBeNull();
+    expect(saidAt).not.toBeNull();
+    expect(((saidAt ?? 0) - (startedAt ?? 0)) / 10).toBeLessThan(
+      SCENE_STAGING.walkBudgetSeconds + 0.5,
+    );
+  });
+
+  it('le détour autour des joueurs arrive toujours, sans jamais les chevaucher', () => {
+    // Paire écartée de 1,2 m, tournée d'un angle quelconque; départs tout autour, arrivées sur
+    // chaque place que `stageSpot` peut donner (à 1,7 m du milieu, à 1,2 m de chacun au moins).
+    const { talkDistance, playerClearance, steps } = SCENE_STAGING;
+    for (const turn of [0, 0.7, Math.PI / 2]) {
+      const a = { x: -0.6 * Math.cos(turn), y: -0.6 * Math.sin(turn) };
+      const b = { x: 0.6 * Math.cos(turn), y: 0.6 * Math.sin(turn) };
+      for (let k = 0; k < steps; k++) {
+        const angle = (2 * Math.PI * k) / steps;
+        const to = { x: Math.cos(angle) * talkDistance, y: Math.sin(angle) * talkDistance };
+        if (gap(to, a) < playerClearance || gap(to, b) < playerClearance) continue;
+        for (let f = 0; f < 24; f++) {
+          const pos = { x: 8 * Math.cos((f * Math.PI) / 12), y: 8 * Math.sin((f * Math.PI) / 12) };
+          let travelled = 0;
+          let closest = Infinity;
+          while (gap(pos, to) > 1e-6 && travelled < 30) {
+            const next = detourAround(a, b, pos, to) ?? to;
+            const step = Math.min(0.05, gap(pos, next));
+            const d = gap(pos, next);
+            pos.x += ((next.x - pos.x) / d) * step;
+            pos.y += ((next.y - pos.y) / d) * step;
+            travelled += step;
+            closest = Math.min(closest, gap(pos, a), gap(pos, b));
+          }
+          expect(travelled, `départ ${f}, place ${k}`).toBeLessThan(14);
+          expect(closest, `départ ${f}, place ${k}`).toBeGreaterThanOrEqual(0.59);
+        }
+      }
+    }
   });
 });

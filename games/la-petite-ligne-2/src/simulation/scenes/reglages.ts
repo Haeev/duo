@@ -8,6 +8,13 @@ export interface SceneStaging {
   readonly bodyRadius: number;
   /** Directions essayées autour des joueurs quand la place en face est prise. */
   readonly steps: number;
+  /**
+   * Durée visée d'une marche de scène (s): au-delà, l'habitant presse le pas (règle de ressenti:
+   * pas de longue attente sans rien à lire; la caméra de la scène le suit pendant ce temps).
+   */
+  readonly walkBudgetSeconds: number;
+  /** Pas pressé le plus vif (m/s), sous la course franche du rendu (`runTo`). */
+  readonly hurrySpeed: number;
 }
 
 export const SCENE_STAGING: SceneStaging = {
@@ -15,4 +22,6 @@ export const SCENE_STAGING: SceneStaging = {
   playerClearance: 1.2,
   bodyRadius: 0.3,
   steps: 12,
+  walkBudgetSeconds: 4,
+  hurrySpeed: 4.5,
 };

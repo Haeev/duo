@@ -9,29 +9,59 @@ test('coup d’œil, carnet immobile, coffre commun, poussée', async ({ browser
   const hi = await host.local();
   const gi = await guest.local();
 
-  // P07: G affiche le coup d'œil, qui disparaît seul en 3 s (marge de 1,5 s en rendu logiciel).
+  // P07: G affiche le coup d'œil, qui disparaît seul en 3 s de temps de l'interface.
   await guest.press('KeyG');
   const glance = guest.game().locator('.lpl-ui .glance');
   await expect(glance).toBeVisible({ timeout: 3_000 });
-  // Durée mesurée dans la page (horloge du cadre), sans capture entre-temps.
+  // Durée mesurée dans la page, en temps de l'interface: son horloge avance à chaque image de
+  // l'écart entre deux images, borné à 250 ms (`frame` de `src/interface/index.ts`, pour qu'un gel
+  // ne fasse pas sauter les minuteries). En rendu logiciel chargé, les images dépassent 250 ms et
+  // l'horloge murale ne dit plus rien des 3 s du coup d'œil: on cumule donc les mêmes écarts bornés.
+  // Le temps déjà passé quand on le voit (souvent plus d'une seconde sous charge) se lit sur la
+  // barre du minuteur (`scaleX`, part restante). Total attendu: 3 s, à une image près.
   const measuring = guest.game().evaluate(async () => {
     const start = performance.now();
+    // Part écoulée lue à notre première image (le jeu, inscrit avant nous, l'a déjà mise à jour).
+    const elapsedMs = (): number => {
+      const bar = document.querySelector<HTMLElement>('.lpl-ui .glance-timer i');
+      return (1 - Number(/scaleX\(([\d.]+)\)/.exec(bar?.style.transform ?? '')?.[1] ?? 1)) * 3000;
+    };
+    let frame = -1;
+    let uiMs = 0;
+    let worstFrame = 0;
+    let watching = true;
+    const onFrame = (t: number): void => {
+      if (frame < 0) uiMs = elapsedMs();
+      else {
+        uiMs += Math.min(250, t - frame);
+        worstFrame = Math.max(worstFrame, t - frame);
+      }
+      frame = t;
+      if (watching) requestAnimationFrame(onFrame);
+    };
+    requestAnimationFrame(onFrame);
     for (;;) {
       const node = document.querySelector('.lpl-ui .glance');
+      const wallMs = performance.now() - start;
       if (
         node === null ||
         (node as HTMLElement).hidden ||
         getComputedStyle(node).display === 'none'
-      )
-        return (performance.now() - start) / 1000;
-      if (performance.now() - start > 10_000) return 99;
+      ) {
+        watching = false;
+        return { ui: uiMs / 1000, wall: wallMs / 1000, worstFrame: worstFrame / 1000 };
+      }
+      if (wallMs > 20_000) return { ui: 99, wall: 99, worstFrame: worstFrame / 1000 };
       await new Promise((r) => setTimeout(r, 50));
     }
   });
   await guest.shot('1-coup-d-oeil');
-  const lasted = await measuring;
-  expect(lasted, 'durée du coup d’œil (s)').toBeGreaterThan(2);
-  expect(lasted).toBeLessThan(4.5);
+  const glanceTime = await measuring;
+  const seen = `interface ${glanceTime.ui.toFixed(2)} s, murale ${glanceTime.wall.toFixed(2)} s, plus longue image ${glanceTime.worstFrame.toFixed(2)} s`;
+  test.info().annotations.push({ type: 'coup d’œil', description: seen });
+  // 3 s, à une image près (250 ms au plus en temps de l'interface), plus une marge.
+  expect(glanceTime.ui, `durée du coup d’œil (${seen})`).toBeGreaterThan(2.5);
+  expect(glanceTime.ui, `durée du coup d’œil (${seen})`).toBeLessThan(3.5);
   await guest.shot('2-apres-coup-d-oeil');
 
   // P08: carnet ouvert, Z maintenu ne déplace pas le personnage.
