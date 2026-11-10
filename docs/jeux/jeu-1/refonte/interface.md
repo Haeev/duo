@@ -150,12 +150,12 @@ Maquette: `maquettes/dialogue.html`.
 Maquette: `maquettes/carnet-sac.html`.
 
 - **But**: un seul objet à ouvrir pour tout retrouver (réponse 61).
-- **Contenu**: un carnet ouvert à plat, deux pages (1120 x 630 px). Sept onglets en signets de tissu sur la tranche droite, en images seulement; le signet ouvert sort davantage et montre son nom. Ordre: Sac, Quêtes, Habitants, Collections, Carte, Tenues, Réglages. En haut de la page de gauche: le jeton du joueur, ses trois besoins (toujours visibles ici), l'heure et la bourse (le HUD reste lisible derrière, ils ne sont donc pas répétés). En pied: les touches utiles en pictos (A, E onglets; Retour arrière fermer).
+- **Contenu**: un carnet ouvert à plat, deux pages (1064 x 608 px, plus les signets). Sept onglets en signets de tissu sur la tranche droite, en images seulement; le signet ouvert sort davantage et montre son nom. Ordre: Sac, Quêtes, Habitants, Collections, Carte, Tenues, Réglages. En haut de la page de gauche: le jeton du joueur, son prénom et ses trois besoins (toujours visibles ici). L'heure et la bourse ne sont pas répétées: le HUD reste visible au-dessus du carnet. En pied: les touches utiles en pictos (A, E onglets; Retour arrière fermer).
 - **États**: fermé; en ouverture; ouvert sur un onglet; onglet avec nouveauté (pastille ronde rouge tampon avec un point, pas de nombre); changement de page.
 - **Animations et 3D**: le carnet monte du bas, la couverture pivote sur la reliure (perspective CSS, 600 ms au total), les signets sortent l'un après l'autre (40 ms d'écart). Changer d'onglet: une page tourne (320 ms). Fermer: 200 ms, plus court que l'ouverture. Le personnage, dans le monde, sort son carnet: l'autre joueur voit qu'on est occupé. Le monde continue (jeu à deux, pas de pause), assombri derrière.
 - **Commun ou propre**: propre à chaque joueur. Quêtes, habitants rencontrés, carte et collections sont communs dans leur contenu; sac, tenues, cœurs d'amitié et réglages sont propres.
 - **Accessibilité**: `role="tablist"`, nom accessible sur chaque signet, étiquette au survol et au focus. Animations réduites: fondu de 120 ms, aucune rotation.
-- **1366x768**: 1120 x 630 px centré, 69 px de marge haute: l'horloge et la bourse restent visibles au-dessus à gauche. À 150 %: le carnet occupe tout l'écran et la page de droite (détail) passe sous la grille en un bandeau de 120 px.
+- **1366x768**: 1064 x 608 px, à 108 px du haut: l'horloge et la bourse restent entières au-dessus à gauche; les signets dépassent de 56 px à droite (96 px pour le signet ouvert). À 150 %: le carnet occupe tout l'écran et la page de droite (détail) passe sous la grille en un bandeau de 120 px.
 
 #### Onglet Sac
 
@@ -199,7 +199,7 @@ Maquette: `maquettes/carnet-sac.html`.
 - **Animations**: les portraits glissent quand les habitants se déplacent (mise à jour toutes les 2 s); le jeton du joueur bat doucement.
 - **Commun** pour le contenu; le curseur est propre.
 - **Accessibilité**: liste des lieux navigable au clavier, chaque lieu lu avec ses occupants.
-- **1366x768**: la carte tient entière (1080 x 560 px utiles), sans défilement ni zoom pour Aubrune; un lieu plus grand ajoute un zoom à deux crans (flèches haut et bas).
+- **1366x768**: la carte tient entière (1030 x 550 px utiles), sans défilement ni zoom pour Aubrune; un lieu plus grand ajoute un zoom à deux crans (flèches haut et bas).
 
 #### Onglet Tenues
 
@@ -216,7 +216,7 @@ Peu d'images possibles: c'est le seul onglet en texte. Volume (musique, sons, ba
 Maquette: `maquettes/boutique.html` (états `#acheter` et `#vendre`).
 
 - **But**: acheter et vendre sans se tromper, et comprendre d'un regard que chaque commerçant a ses goûts et ses prix (réponses 34, 64).
-- **Contenu**: à gauche, le commerçant en buste 3D derrière son comptoir, son nom et son métier en picto; il réagit. Deux grands onglets à images: **Acheter** (une étagère) et **Vendre** (ton sac et une flèche vers le comptoir). Au centre, la grille de vignettes avec le prix en pastille. À droite, le détail: l'objet en 3D qui tourne, son nom, son usage en pastilles, la quantité (Q moins, D plus), le total, un seul bouton. En haut à droite, ta bourse.
+- **Contenu**: à gauche, le commerçant en buste 3D derrière son comptoir, son nom et son métier en picto; il réagit. Deux grands onglets à images: **Acheter** (une étagère) et **Vendre** (ton sac et une flèche vers le comptoir). Au centre, la grille de vignettes avec le prix en pastille. À droite, le détail: l'objet en 3D qui tourne, son nom, son usage en pastilles, la quantité (Q moins, D plus), le total, un seul bouton. La bourse du HUD reste visible au-dessus du panneau: c'est vers elle que volent les pièces.
   - Acheter: ce que tu ne peux pas payer a sa pastille de prix barrée d'un trait et la pièce en pointillé.
   - Vendre: seul ton sac est montré. Ce que ce commerçant rachète est en tête, avec **son** prix. Ce qu'il ne rachète pas est rangé à la fin, grisé, en pointillé, avec le picto « main qui refuse »; au focus, le détail montre le portrait de qui le rachète, si on le sait déjà.
   - Mémoire des prix: au détail d'un objet à vendre, les portraits des commerçants à qui on l'a déjà vendu, avec leur prix; le meilleur porte une petite couronne. On apprend ainsi que le boulanger paie mieux les œufs que l'épicière, sans une phrase.
@@ -224,7 +224,7 @@ Maquette: `maquettes/boutique.html` (états `#acheter` et `#vendre`).
 - **Animations et 3D**: le buste du commerçant hoche la tête à l'achat, fait « non » à un refus; onomatopée « ♪ » pour une belle vente. Les pièces volent une par une (5 au plus, 400 ms). L'objet du détail tourne.
 - **Propre** à chaque joueur (chacun sa bourse, réponse 10); deux joueurs peuvent être dans la même boutique en même temps, chacun dans son menu. Le stock limité d'un article se met à jour chez les deux.
 - **Accessibilité**: prix lus « 2 pièces l'unité »; l'article refusé est annoncé « Odette n'en veut pas »; aucun état porté par la seule couleur (trait, pointillé, picto).
-- **1366x768**: panneau de 1180 x 620 px; commerçant 240 px, grille 5 colonnes de 84 px (15 articles par page, pages par A et E après les deux onglets), détail 320 px.
+- **1366x768**: panneau de 1180 x 608 px à 108 px du haut; commerçant 248 px, grille de 6 colonnes de 84 px (18 articles par page, pages à la molette ou aux flèches de page), détail 328 px.
 
 ### 5.5 Basse-cour
 
@@ -412,6 +412,22 @@ Conséquences:
 - Le monde ne se met jamais en pause dans un menu (jeu à deux); seule la pause de Duo fige la partie pour les deux.
 - Polices et palette actuelles gardées jusqu'à la bible artistique de la refonte (directeur-artistique).
 
-## 13. Passation
+## 13. Les maquettes
+
+Dans `maquettes/`: pages HTML et CSS autonomes (aucun réseau), `refonte.css` (jetons et composants), `commun.js` (pictos, décor figuré, états par ancre), `capturer.cjs` (captures à 1366x768), `verifier.cjs` (touches, débordements, contrastes). Les polices sont celles du dépôt (`games/la-petite-ligne/ui-maquettes/polices/`, OFL), avec repli sur les polices du système.
+
+| Page | États (ancres) | Ce qui bouge | Ce qu'on peut essayer |
+|---|---|---|---|
+| `hud.html` | `#jeu`, `#coup-d-oeil` | soleil du cadran, cible qui rebondit, bulle d'habitant, onomatopée, gain, médaillon qui bat | F: coup d'œil de 3 s |
+| `dialogue.html` | `#parle`, `#choix` | bandeau qui monte, portrait, texte lettre par lettre, bouche, triangle « suite », choix | Espace: tout afficher, puis les choix |
+| `carnet-sac.html` | `#sac`, `#sans-sac` | carnet qui s'ouvre, signets, objet du détail, survol des cases (nom et objet qui bouge) | survol à la souris |
+| `boutique.html` | `#acheter`, `#vendre` | panneau, objet du détail, pièces qui volent vers la bourse (vendre) | A et E: acheter, vendre |
+| `basse-cour.html` | `#normal`, `#vide` | caméra d'entrée, poules qui picorent, cœur, « ?? » | |
+
+Tout ce qui tient lieu de 3D est marqué « 3D figurée » ou « Maquette: décor et objets 3D figurés »: décor, personnages, bustes et objets sont des dessins plats du studio. Un dessin plat ne peut pas faire un tour complet: il se balance; le vrai modèle tournera. `?reduit` avant l'ancre montre la version aux animations réduites.
+
+Limites de ces maquettes: ce sont des images de référence pour valider la direction, pas des prototypes. Seules les touches du tableau répondent; la navigation complète au clavier (flèches dans les grilles, focus) n'y est pas câblée et reste à tester sur la démonstration du jeu.
+
+## 14. Passation
 
 Pour le dev du jeu, quand le client aura validé: les maquettes donnent les mesures et les textes exacts des cinq écrans clés; `maquettes/refonte.css` porte les jetons nouveaux (durées, courbes) et les composants de la section 7. À faire ensuite par ux-ui-designer: maquettes de l'éditeur de personnage, de la carte, de la cuisine et du mode déco; contrôle à 1280x720, 1920x1080, facteur 2, tailles 125 et 150 %; script de parcours au clavier.
