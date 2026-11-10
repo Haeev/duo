@@ -1,0 +1,105 @@
+/**
+ * Réglages des personnages assemblés (lot L6): tout ce qui se règle sans toucher à la logique.
+ * Les pièces, les morphologies et les clips viennent du catalogue (lot L5), jamais d'ici.
+ */
+import { RENDER_SETTINGS } from '../reglages';
+
+export const CHARACTER_SETTINGS = {
+  /** Matériau unique de tous les personnages (couleurs de sommets, rendu « figurine »). */
+  roughness: 0.85,
+
+  /** Temps de demi-rattrapage de la position et du cap affichés (s): orientation lissée. */
+  smoothHalfLife: 0.05,
+  turnHalfLife: 0.08,
+
+  /** Clips du catalogue joués pour chaque posture (noms de `morphologies.json`, `clips`). */
+  clips: {
+    idle: 'idle',
+    walk: 'walk',
+    run: 'run',
+    sit: 'sit',
+    carry: 'carry',
+    /** Geste générique: joué pour un geste dont le clip n'est pas (encore) livré. */
+    gesture: 'carry',
+  },
+
+  /**
+   * Marche et course selon la vitesse au sol (m/s): repos sous `moving`, fondu de la marche à la
+   * course entre `runFrom` et `runTo`. La cadence suit la vitesse réelle (pas de pieds qui
+   * glissent), bornée par `minRate` et `maxRate` autour de la cadence du clip.
+   */
+  locomotion: {
+    moving: 0.25,
+    runFrom: 3.3,
+    runTo: 4.6,
+    minRate: 0.6,
+    maxRate: 1.9,
+    /** Fondu entre deux postures (s, demi-vie). */
+    fadeHalfLife: 0.07,
+  },
+
+  /**
+   * Assise: hauteur du dessus de l'assise (m) par modèle de meuble; sans entrée, le dessus de la
+   * forme provisoire (les modèles de meubles ne sont pas encore livrés). `clipSeat`: hauteur de
+   * l'assise sous le bassin dans le clip `sit`, mesurée sur le corps (hanche à 0,608 m, moins
+   * l'épaisseur des fesses).
+   */
+  seat: {
+    /**
+     * Par modèle: hauteur du dessus de l'assise (m) et distance du milieu du meuble à son bord
+     * avant (m). Le bassin avance pour que les genoux arrivent au bord: les jambes pendent devant.
+     */
+    byModel: {} as Readonly<Record<string, { height: number; front: number }>>,
+    standIn: {
+      height: RENDER_SETTINGS.standIn.propHeight,
+      front: 0.5 - RENDER_SETTINGS.standIn.inset,
+    },
+    clipSeat: 0.5,
+    /** Avancée des genoux devant le bassin dans le clip `sit` (m, gabarit adulte), et marge au bord. */
+    clipKnee: 0.35,
+    kneeMargin: 0.05,
+  },
+
+  /** Clignement: intervalle tiré entre `minGap` et `maxGap` (s), durée d'un battement (s). */
+  blink: { minGap: 2.4, maxGap: 5.5, seconds: 0.16 },
+  /** Bouche du babil: durée d'une page (s) et fréquence d'ouverture (Hz). */
+  talk: { seconds: 1.8, hertz: 6.5 },
+  /** Fondu d'une expression (s, demi-vie) et durée par défaut d'une expression d'événement (s). */
+  expressionHalfLife: 0.08,
+  /**
+   * Expressions déclenchées par un événement: qui la prend (le joueur de l'événement ou
+   * l'habitant), laquelle, combien de temps (s).
+   */
+  eventExpressions: {
+    talk_started: { who: 'villager', expression: 'joy', seconds: 1.6 },
+    refused: { who: 'player', expression: 'embarrassed', seconds: 1.4 },
+    gesture_done: { who: 'player', expression: 'joy', seconds: 0.9 },
+  } as Readonly<
+    Record<string, { who: 'player' | 'villager'; expression: string; seconds: number }>
+  >,
+  /** Expression tenue par l'état: palier d'un besoin. */
+  needExpressions: { sleep: { low: 'sleepy', blocked: 'sleepy' } } as Readonly<
+    Record<string, Readonly<Record<string, string>>>
+  >,
+
+  /**
+   * Niveau de détail: sous cette hauteur à l'écran (pixels CSS), la tête rejoint le corps en un
+   * seul maillage sans morphoses (un appel de dessin, ni visage ni clignement).
+   */
+  lod: { farPixels: 70, hysteresis: 8 },
+
+  /** Ombre de contact: ellipse (m) et opacité au centre. */
+  contact: { width: 0.8, depth: 0.62, opacity: 0.38, lift: 0.012 },
+
+  /** Liseré d'un personnage visé: épaisseur (m) et couleur (celles des objets visés). */
+  rim: { width: 0.022, color: RENDER_SETTINGS.target.rimColor },
+
+  /**
+   * Apparence par défaut, tant que l'éditeur n'existe pas: silhouette selon le genre (ou, sans
+   * genre, celui-ci par joueur) et chances des pièces facultatives d'un habitant composé.
+   */
+  defaultGenders: ['f', 'm'] as const,
+  composed: { dress: 0.3, hat: 0.2, accessory: 0.2 },
+} as const;
+
+export type CharacterSettings = typeof CHARACTER_SETTINGS;

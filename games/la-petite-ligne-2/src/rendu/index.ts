@@ -1,5 +1,13 @@
 /** Rendu 3D (lot L4): ce que les autres lots importent. */
-export { createRenderer, webglAvailable } from './moteur';
+import { createRenderer as createEngine, type GameRenderer, type RenderOptions } from './moteur';
+import { gameCharacters } from './personnages/index';
+
+export { webglAvailable } from './moteur';
+
+/** Le moteur, avec les personnages assemblés (lot L6) sauf si l'appelant donne sa couche. */
+export function createRenderer(options: RenderOptions): GameRenderer | null {
+  return createEngine({ characters: gameCharacters(options.view), ...options });
+}
 export type { GameRenderer, RenderOptions, RenderStats } from './moteur';
 export { screenToWorld } from './camera';
 export type { CameraInput } from './camera';
