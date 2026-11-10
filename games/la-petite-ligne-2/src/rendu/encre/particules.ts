@@ -26,6 +26,7 @@ in vec4 aSeed;
 uniform float uTime;
 uniform vec2 uWind;
 uniform vec2 uScreen;
+uniform float uPixel;
 uniform vec4 uMote;
 uniform vec4 uMoteArea;
 out vec2 vCorner;
@@ -55,7 +56,7 @@ void main() {
   vCorner = position.xy;
   vLife = life;
   vec4 clip = projectionMatrix * viewMatrix * vec4(centre, 1.0);
-  clip.xy += position.xy * size * 2.0 / uScreen * clip.w;
+  clip.xy += position.xy * size * uPixel * 2.0 / uScreen * clip.w;
   gl_Position = life > 0.01 ? clip : vec4(0.0, 0.0, 2.0, 1.0);
 }
 `;

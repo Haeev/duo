@@ -194,3 +194,47 @@ Seuil de 9 non atteint. Ce qui sépare encore le vrai jeu de l'essai n'est plus 
 5. **Effacement des bâtiments livrés**: aujourd'hui le bâtiment entier s'efface; il faut couper le toit et garder les murs (deux plages d'index par bâtiment).
 6. **Fenêtres et soleil dans les pièces**, jardin visible autour: les pièces vivent hors de la carte.
 7. **Mesure sur l'UHD 620**: images par seconde et temps de compilation des programmes à l'arrivée dans un lieu.
+
+## Optimisation et couleurs (2026-11-10, après le premier essai du client sur ses deux machines)
+
+Retour du client: « le style graphique est magnifique », « la version PC rame légèrement », « les couleurs sont plus fades sur la version PC que sur la version Mac ». Décisions et comptages: ADR 0023, points 11 à 14. Ici, ce qui se voit et ce qui se mesure.
+
+### Ce qui change à l'écran: rien, sauf la finesse
+
+- `encre-perf-avant-apres.jpg`: quai de jour, quai de nuit, wagon, avant et après, avec deux détails agrandis deux fois. Regardé de près: même trait, mêmes tons, mêmes ombres, mêmes hachures (les personnages ont bougé entre les deux prises, l'heure du jeu aussi de quelques minutes).
+- `encre-perf-echelles.png`: la même vue à 100, 90, 80 et 70 % d'échelle interne, détails agrandis trois fois. La composition est la même (mêmes traits, mêmes hachures, même épaisseur); à 70 % le trait fin s'adoucit et les joints des dalles perdent du piqué. C'est le pire cas, et il ne sert que si la machine passe sous 30 images par seconde.
+- `encre-perf-ecran-dense.png`: une piste essayée et écartée. Sur un écran dense (fenêtre de 1 440 x 900 points, tampon de 1 821 x 1 138), les seuils de détail se comptent en points du tampon: le Mac trace un rang de trait fin de plus que le PC. Les compter en points d'un écran de référence (colonne de droite) ne rapproche pas les deux images, au contraire: le trait peint des dalles, plus fin sur l'écran dense, pâlit. L'ancien comptage (colonne du milieu) donne l'image la plus proche de celle du PC: il est gardé (`sameOnEveryScreen` à `false`).
+
+### Couleurs d'un écran à l'autre
+
+Cherché côté jeu d'abord, point par point:
+
+| Point | Constat |
+| --- | --- |
+| Espace de couleur du canevas | sRGB déclaré sur les deux machines (`drawingBufferColorSpace`, posé par Three.js avec `outputColorSpace`); pas de P3 implicite sur le Mac |
+| Conversion linéaire vers sRGB | faite une fois, par sommet, dans le matériau encré; ni la cible intermédiaire ni la passe de contour ne reconvertissent |
+| Tampon intermédiaire | 8 bits par canal, en valeurs d'écran: même précision que le canevas, aucune perte de saturation; pas de bandes visibles sur les aplats du style |
+| Mappage tonal | celui de Three.js ne s'applique pas à un `ShaderMaterial` sans son inclusion: aucun |
+| Alpha et prémultiplié | le canevas a un canal alpha (Three.js le demande toujours), écrit à 1 partout: aucun mélange avec la page |
+| Mire de l'outil de mesure | cinq tons connus passés par la chaîne du jeu et relus dans le canevas: écart 0 sur 255 ici; à confirmer sur les deux machines par le relevé |
+| Défaut trouvé | la couleur de fond était convertie en linéaire (plus sombre que la donnée), sur toutes les machines; corrigée, presque jamais visible (le sol la couvre) |
+| Différence d'image venue du jeu | aucune qui se voie: les seuils de détail en points du tampon donnent des images très proches sur un écran dense et sur le PC (voir plus haut) |
+
+À données égales, le jeu envoie donc les mêmes valeurs sRGB aux deux écrans. Ce qui reste leur appartient:
+
+- **L'écran du Mac** couvre plus que sRGB (P3), il est étalonné, lumineux (400 à 500 nits) et contrasté; macOS convertit le sRGB du jeu vers la dalle: les couleurs sortent justes.
+- **Un écran de portable d'entrée de gamme** couvre souvent 60 % de sRGB (dalle dite « 45 % NTSC »), 250 nits, contraste de 700 pour 1: les rouges et les verts vifs n'existent pas sur la dalle, les noirs sont gris. Tout y est plus fade, pas seulement le jeu. Le jeu ne peut pas le compenser sans fausser le Mac: une couleur hors de la gamme de la dalle ne s'obtient pas en poussant les nombres.
+- **Ce qui se règle sur le PC**, à vérifier avant de conclure: HDR de Windows activé (le contenu ordinaire y paraît délavé; le relevé dit « plage dynamique haute »), éclairage nocturne, économiseur de batterie, « économie d'énergie de l'écran » et « amélioration des couleurs » du pilote Intel, profil de couleur de l'écran.
+- **Essai simple pour trancher**: regarder sur les deux écrans, côte à côte, l'accueil de Duo (hors du jeu) et une même photo. S'ils sont plus fades sur le PC eux aussi, c'est l'écran.
+
+### Proposition, non appliquée: un peu plus de saturation et de contraste
+
+`encre-perf-proposition-couleurs.jpg`: les deux références validées et deux vues du jeu, telles quelles et avec saturation x 1,08 et contraste x 1,04 (`INK_SETTINGS.grade`, aujourd'hui à 1 et 1). L'effet est le même sur les deux machines: il rend un peu de tenue à une dalle terne sans déborder sur le Mac, où les tons restent dans la gamme sRGB. Risque: les nuits, déjà denses, se bouchent un peu dans les ombres (contraste), et les ocres du quai chauffent. Avis du technical artist: essayer 1,08 et 1,00 d'abord (saturation seule). Décision au directeur artistique.
+
+### Ce que le client doit relever (outil de mesure, `F9`)
+
+1. Sur le PC puis sur le Mac, dans Duo en plein écran: aller au quai d'Aubrune vers 17 h au jeu, ouvrir l'outil (`F9`, ou `Ctrl` + `Maj` + `M`), marcher une minute le long du quai, puis « Copier le relevé » et le coller.
+2. Au même endroit, bouton « Échelle » une fois (figée à 100 %), une minute de marche, « Copier le relevé ». Remettre ensuite l'échelle en adaptative (bouton jusqu'à « adaptative »).
+3. Au quai de nuit (après 21 h au jeu), une minute, relevé.
+4. Dans un intérieur (une maison, ou le wagon du train de nuit), une minute, relevé.
+5. Sur le PC seulement: la définition de l'écran et l'échelle d'affichage de Windows (Paramètres, Système, Écran), et si « HDR » y est activé.

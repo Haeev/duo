@@ -77,7 +77,10 @@ export interface InkUniforms {
   /** Personnages: x ombre relevée, y liseré clair, z saturation, w gain. */
   uCharacter: IUniform<Vector4>;
   uViewDir: IUniform<Vector3>;
+  /** Taille de la cible de la scène (points): elle suit l'échelle interne. */
   uScreen: IUniform<Vector2>;
+  /** Points de la cible par point de l'écran de référence: tout ce qui se compte en points le suit. */
+  uPixel: IUniform<number>;
   uTime: IUniform<number>;
   /** Vent: direction au sol fois la force (0: air immobile). */
   uWind: IUniform<Vector2>;
@@ -132,6 +135,7 @@ export function createInkUniforms(): InkUniforms {
     },
     uViewDir: { value: new Vector3(0, 1, 0) },
     uScreen: { value: new Vector2(1366, 768) },
+    uPixel: { value: 1 },
     uTime: { value: 0 },
     uWind: { value: new Vector2() },
     uLampPos: { value: four(MAX_LAMPS) },
@@ -291,16 +295,19 @@ uniform mediump sampler2DArray uLayers;
 uniform sampler2D uNoise;
 
 float sunSeen(vec3 wp, vec3 N, vec2 tremble) {
+  // Ambiance sans ombre du soleil (dedans): cinq lectures de moins, la carte n'est pas dessinée.
+  if (uHatch.w <= 0.0) return 1.0;
   // Le bord tremble parce que le point lu se décale de quelques centimètres, pas le seuil.
   vec4 sc = uShadowMatrix * vec4(wp + N * 0.03 + vec3(tremble.x, 0.0, tremble.y), 1.0);
   if (sc.x < 0.0 || sc.x > 1.0 || sc.y < 0.0 || sc.y > 1.0) return 1.0;
   float z = sc.z - 0.0009;
   float t = uShadowTexel * 1.3;
-  float seen = texture(uShadowMap, vec3(sc.xy, z)) * 0.4
-    + texture(uShadowMap, vec3(sc.xy + vec2(t, t * 0.4), z)) * 0.15
-    + texture(uShadowMap, vec3(sc.xy + vec2(-t * 0.4, t), z)) * 0.15
-    + texture(uShadowMap, vec3(sc.xy + vec2(-t, -t * 0.4), z)) * 0.15
-    + texture(uShadowMap, vec3(sc.xy + vec2(t * 0.4, -t), z)) * 0.15;
+  // Lecture au niveau 0 (la carte n'a pas d'autres niveaux): permise dans une branche.
+  float seen = textureLod(uShadowMap, vec3(sc.xy, z), 0.0) * 0.4
+    + textureLod(uShadowMap, vec3(sc.xy + vec2(t, t * 0.4), z), 0.0) * 0.15
+    + textureLod(uShadowMap, vec3(sc.xy + vec2(-t * 0.4, t), z), 0.0) * 0.15
+    + textureLod(uShadowMap, vec3(sc.xy + vec2(-t, -t * 0.4), z), 0.0) * 0.15
+    + textureLod(uShadowMap, vec3(sc.xy + vec2(t * 0.4, -t), z), 0.0) * 0.15;
   return mix(1.0, smoothstep(0.42, 0.58, seen), uHatch.w);
 }
 
@@ -356,8 +363,10 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
   vec3 fine = texture(uNoise, wp.xz * 0.47 + wp.y * 0.39 + 0.2).rgb;
   vec2 tremble = (fine.rg - 0.5) * 0.05 + (nz.rg - 0.5) * 0.07;
   float ndl = dot(N, uSunDir);
-  float seen = sunSeen(wp, flatN, tremble);
   float facing = smoothstep(0.05, 0.09, ndl);
+  // Une face détournée du soleil est à l'ombre quoi que dise la carte (la valeur lue n'y sert à rien:
+  // elle n'est prise que multipliée par facing): ses cinq lectures sont épargnées.
+  float seen = facing > 0.0 ? sunSeen(wp, flatN, tremble) : 1.0;
   float full = smoothstep(0.46, 0.5, ndl);
   float sun = seen * facing;
   vec3 light = mix(uShade, mix(uHalf, uLit, full), sun);
@@ -558,6 +567,7 @@ uniform vec3 uDetail;
 uniform vec4 uCharacter;
 uniform float uOpacity;
 uniform float uFaded;
+uniform float uPixel;
 uniform vec4 uGlow;
 uniform vec4 uOwn;
 #if defined(CHARACTER) || defined(ATLAS)
@@ -591,7 +601,7 @@ vec3 figure(vec3 skin, vec3 N, vec3 lightN, float body) {
   float ndl = dot(lightN, uSunDir);
   color *= mix(1.0, 0.82, smoothstep(-0.42, -0.5, ndl) * body);
   vec2 q = gl_FragCoord.xy - vAnchor;
-  float stripe = fract((q.x - q.y * 0.85) / 5.5);
+  float stripe = fract((q.x - q.y * 0.85) / (5.5 * uPixel));
   float pen = smoothstep(-0.25, -0.8, ndl);
   color = mix(color, uInk, step(stripe, 0.3 * pen) * uDetail.z * body * 0.8);
   float rim = smoothstep(0.56, 0.64, 1.0 - dot(N, uViewDir)) * smoothstep(0.0, 0.12, dot(N, uSunDir));

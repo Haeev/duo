@@ -13,7 +13,6 @@ import {
   type OrthographicCamera,
   type Scene,
   type ShaderMaterial,
-  SRGBColorSpace,
   type Texture,
   Vector3,
   type WebGLRenderer,
@@ -21,8 +20,9 @@ import {
 import { keySpan, lightDirection } from '../lumiere';
 import { RENDER_SETTINGS } from '../reglages';
 import { type Ambiance, ambianceAt, type AmbianceBook, gameAmbiances } from './ambiances';
-import { detailShare, InkPass } from './contour';
+import { COLOR_CHART, detailShare, InkPass } from './contour';
 import { hex } from './couches';
+import { InkScale, scaleFromAddress } from './echelle';
 import {
   applyAmbiance,
   createContactMaterial,
@@ -37,6 +37,8 @@ import {
   MAX_WINDOWS,
   type WindowLight,
 } from './matiere';
+import type { RenderSnapshot } from './mesure';
+import { InkMeter } from './panneau-mesure';
 import { createMotes, type Motes } from './particules';
 import { LampShadow, StageSort, SunShadow } from './ombres';
 import { INK_SETTINGS } from './reglages';
@@ -79,13 +81,19 @@ export interface InkFrame {
   readonly lights: InkLights | null;
   /** 1 hors fondu, 0 au noir (sommeil, montée dans le train). */
   readonly exposure: number;
-  /** Taille du tampon de rendu (points). */
+  /** Taille du tampon du canevas (points); la scène se calcule à l'échelle interne. */
   readonly width: number;
   readonly height: number;
 }
 
 const NO_LIGHTS: InkLights = { lamps: [], windows: [] };
 const MINUTES_PER_DAY = 1440;
+const BYTES_PER_MEGABYTE = 1024 * 1024;
+/** Rendu logiciel (tests, banc): reconnu au nom du processeur graphique. */
+const SOFTWARE = /swiftshader|llvmpipe|software|basic render/i;
+const CHART_EXPECTED: readonly number[] = COLOR_CHART.flat();
+/** Distances de `nearest`, réutilisées d'un appel à l'autre. */
+const distances: number[] = [];
 
 /** Garde dans `out` les `max` éléments de `all` les plus proches de (x, z), du plus proche au plus loin. */
 export function nearest<T extends { readonly x: number; readonly z: number }>(
@@ -97,7 +105,7 @@ export function nearest<T extends { readonly x: number; readonly z: number }>(
   out: T[],
 ): T[] {
   out.length = 0;
-  const distances: number[] = [];
+  distances.length = 0;
   for (const item of all) {
     const d = Math.hypot(item.x - x, item.z - z);
     if (d > reach) continue;
@@ -137,11 +145,28 @@ export class InkKit {
   private readonly stages = new StageSort();
   private indoorShare = 0;
   private lastFrameAt = 0;
+  /** Heure de la dernière image vraiment dessinée (les images sautées ne comptent pas). */
+  private lastDrawnAt = 0;
   private toSkip = 0;
   /** L'image précédente a été sautée: on dessine celle-ci avant de juger à nouveau. */
   private resting = false;
   private current: Ambiance | null = null;
   private nextPiece = 0;
+  /** Résolution interne adaptative et outil de mesure (ADR 0023, points 11 et 12). */
+  private readonly scaler = new InkScale();
+  private readonly meter = new InkMeter();
+  private software: boolean | null = null;
+  private renderer: WebGLRenderer | null = null;
+  private canvasWidth = 1;
+  private canvasHeight = 1;
+  private innerWidth = 1;
+  private innerHeight = 1;
+  private lastMinutes = 0;
+  private lastSheet: string | null = null;
+  private lastIndoor = false;
+  private chartWanted = false;
+  private chartDone = false;
+  private readonly chartRead = new Uint8Array(COLOR_CHART.length * 3);
 
   constructor(book: AmbianceBook = gameAmbiances()) {
     this.book = book;
@@ -156,6 +181,61 @@ export class InkKit {
     this.depth = createDepthMaterial(this.uniforms);
     this.pass = new InkPass(4, 4, this.noise);
     this.motes = createMotes(this.uniforms, INK_SETTINGS.motes);
+    const asked =
+      typeof window === 'undefined' ? undefined : scaleFromAddress(window.location.search);
+    if (asked !== undefined) this.scaler.fix(asked === 'auto' ? null : asked);
+  }
+
+  /** Échelle interne en vigueur (1: pleine finesse) et son mode. */
+  scale(): { readonly scale: number; readonly fixed: boolean } {
+    return { scale: this.scaler.scale(), fixed: this.scaler.fixedScale() !== null };
+  }
+
+  /** Fige l'échelle interne (`null`: adaptative). */
+  setScale(scale: number | null): void {
+    this.scaler.fix(scale);
+  }
+
+  /** Le relevé de l'outil de mesure (`null` tant que son panneau n'a jamais été ouvert). */
+  report(): string | null {
+    return this.meter.report();
+  }
+
+  /** État du rendu à la dernière image, pour l'outil de mesure et le banc. */
+  snapshot(): RenderSnapshot {
+    const renderer = this.renderer;
+    const canvas = renderer?.domElement;
+    return {
+      cssWidth: canvas?.clientWidth ?? 0,
+      cssHeight: canvas?.clientHeight ?? 0,
+      pixelRatio: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
+      canvasWidth: this.canvasWidth,
+      canvasHeight: this.canvasHeight,
+      innerWidth: this.innerWidth,
+      innerHeight: this.innerHeight,
+      scale: this.scaler.scale(),
+      scaleMode: this.scaler.fixedScale() === null ? 'auto' : 'figée',
+      scaleChanges: this.scaler.changeCount(),
+      programs: renderer?.info.programs?.length ?? 0,
+      textures: renderer?.info.memory.textures ?? 0,
+      geometries: renderer?.info.memory.geometries ?? 0,
+      textureMegabytes: this.textureBytes(this.canvasWidth, this.canvasHeight) / BYTES_PER_MEGABYTE,
+      minutes: this.lastMinutes,
+      sheet: this.lastSheet,
+      indoor: this.lastIndoor,
+      chart: this.chartDone ? { expected: CHART_EXPECTED, read: Array.from(this.chartRead) } : null,
+    };
+  }
+
+  /** Bouton « Échelle » du panneau: adaptative, puis chaque palier figé, puis adaptative. */
+  private cycleScale(): string {
+    const steps = INK_SETTINGS.resolution.steps;
+    const fixed = this.scaler.fixedScale();
+    const at = fixed === null ? -1 : steps.indexOf(fixed);
+    const next =
+      fixed !== null && (at < 0 || at === steps.length - 1) ? null : (steps[at + 1] ?? 1);
+    this.scaler.fix(next);
+    return next === null ? 'adaptative' : `figée à ${String(Math.round(next * 100))} %`;
   }
 
   /** Un matériau encré de plus (même programme, état propre): eau teintée, vitres, coupe en fondu. */
@@ -202,13 +282,19 @@ export class InkKit {
     return this.current;
   }
 
-  /** Mémoire vidéo que le rendu encré ajoute, en octets (couches, bruit, ombres, cibles). */
+  /**
+   * Mémoire vidéo que le rendu encré ajoute, en octets (couches, bruit, ombres, cibles), pour un
+   * canevas de `width` x `height` à l'échelle interne en vigueur.
+   */
   textureBytes(width: number, height: number): number {
     const image = this.layers.image as { width: number; height: number; depth: number };
     const layers = image.width * image.height * image.depth * 4 * (4 / 3);
     const s = INK_SETTINGS;
     const shadows = (s.sunShadow.size ** 2 + s.lampShadow.size ** 2) * 4;
-    return Math.round(layers + 128 * 128 * 4 + shadows + width * height * 12);
+    const scale = this.scaler.scale();
+    // Deux sorties et la profondeur (12 octets par point), plus l'image finie avant sa mise à l'échelle.
+    const inner = width * height * scale * scale * (this.pass.scaled ? 16 : 12);
+    return Math.round(layers + 128 * 128 * 4 + shadows + inner);
   }
 
   private sunDirection(minutes: number, ambiance: Readonly<Ambiance>): void {
@@ -254,11 +340,38 @@ export class InkKit {
     applyAmbiance(u, ambiance, this.lamps, this.windows);
     this.sunDirection(frame.minutes, ambiance);
     u.uTime.value += frame.dt;
+    if (this.renderer !== renderer) {
+      this.renderer = renderer;
+      const gl = renderer.getContext();
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      this.software =
+        info !== null && SOFTWARE.test(String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)));
+      this.meter.attach(renderer, {
+        snapshot: () => this.snapshot(),
+        cycleScale: () => this.cycleScale(),
+        requestChart: () => {
+          this.chartWanted = true;
+        },
+        setScale: (scale) => {
+          this.scaler.fix(scale);
+          this.chartWanted = true;
+        },
+      });
+    }
+    this.lastMinutes = frame.minutes;
+    this.lastSheet = frame.sheet;
+    this.lastIndoor = closed;
     // Rendu saturé: on laisse la main au reste du jeu (voir `INK_SETTINGS.breath`).
     const now = performance.now();
-    const gap = now - this.lastFrameAt;
+    const gap = this.lastFrameAt === 0 ? 0 : now - this.lastFrameAt;
     const slow = gap > s.breath.slowMs;
     this.lastFrameAt = now;
+    // Échelle interne: jugée sur l'écart entre deux images, jamais pendant la mise en route d'un
+    // lieu; en rendu logiciel (tests, banc) elle ne bouge pas, les captures restent à pleine finesse.
+    if (this.stages.pending) this.scaler.hold();
+    if (this.software !== true || !s.resolution.softwareFixed) {
+      if (this.scaler.sample(gap)) this.meter.log.noteScale(this.scaler.scale());
+    }
     if (slow && this.toSkip === 0 && !this.resting)
       this.toSkip = Math.min(s.breath.maxSkip, Math.floor(gap / s.breath.slowMs));
     if (this.toSkip > 0) {
@@ -268,19 +381,36 @@ export class InkKit {
     }
     this.resting = false;
     u.uViewDir.value.set(frame.toCamera.x, frame.toCamera.y, frame.toCamera.z);
-    u.uScreen.value.set(frame.width, frame.height);
-    const pixelsPerMetre = frame.height / Math.max(1e-3, camera.top - camera.bottom);
+    const scale = this.scaler.scale();
+    const innerWidth = scale >= 1 ? frame.width : Math.max(1, Math.round(frame.width * scale));
+    const innerHeight = scale >= 1 ? frame.height : Math.max(1, Math.round(frame.height * scale));
+    this.canvasWidth = frame.width;
+    this.canvasHeight = frame.height;
+    this.innerWidth = innerWidth;
+    this.innerHeight = innerHeight;
+    u.uScreen.value.set(innerWidth, innerHeight);
+    // Les seuils de détail se comptent en points du canevas, pas de la cible interne: la
+    // composition de l'image ne dépend pas de l'échelle interne, seule sa finesse varie.
+    const reference = s.resolution.sameOnEveryScreen ? s.resolution.referenceWidth : frame.width;
+    u.uPixel.value = innerWidth / reference;
+    const pixelsPerMetre = reference / Math.max(1e-3, camera.right - camera.left);
     u.uDetail.value.set(
       detailShare(pixelsPerMetre, s.detail.painted),
       detailShare(pixelsPerMetre, s.detail.hatch),
       detailShare(pixelsPerMetre, s.detail.face),
     );
     this.motes.update(ambiance, frame.focusX, frame.focusZ);
-    if (this.pass.target.width !== frame.width || this.pass.target.height !== frame.height)
-      this.pass.setSize(frame.width, frame.height);
+    if (this.pass.target.width !== innerWidth || this.pass.target.height !== innerHeight)
+      this.pass.setSize(innerWidth, innerHeight);
+    if (this.chartWanted) {
+      this.chartWanted = false;
+      this.pass.probe(renderer, frame.width, frame.height, this.chartRead);
+      this.chartDone = true;
+    }
     this.pass.setAmbiance(ambiance);
 
     // Compteurs: le total de toutes les passes de l'image (ombres, scène, contour).
+    const meter = this.meter;
     renderer.info.autoReset = false;
     renderer.info.reset();
     const background = scene.background;
@@ -288,22 +418,53 @@ export class InkKit {
     camera.updateMatrixWorld();
     this.stages.sort(scene);
     this.focus.set(frame.focusX, 0, frame.focusZ);
-    this.sun.update(renderer, scene, this.depth, u, this.focus, frame.viewRadius);
+    if (ambiance.sunShadow > 0) {
+      meter.begin(0);
+      this.sun.update(renderer, scene, this.depth, u, this.focus, frame.viewRadius);
+      meter.end(0, this.sun.size * this.sun.size);
+    } else {
+      this.sun.idle(renderer, u);
+      meter.skip(0);
+    }
     // Ombre locale: la plus proche des lampes retenues qui peut en porter une, lampes allumées.
-    const caster = ambiance.lamps > 0 ? this.lamps.findIndex((lamp) => lamp.shadow) : -1;
+    let caster = -1;
+    if (ambiance.lamps > 0)
+      for (let i = 0; i < this.lamps.length && caster < 0; i += 1)
+        if (this.lamps[i]?.shadow === true) caster = i;
+    if (caster >= 0) meter.begin(1);
     this.lamp.update(renderer, scene, this.depth, u, this.lamps[caster] ?? null, caster);
+    if (caster >= 0) meter.end(1, this.lamp.size * this.lamp.size);
+    else meter.skip(1);
 
+    meter.begin(2);
     renderer.setRenderTarget(this.pass.target);
-    renderer.setClearColor(this.clear.setRGB(...ambiance.background, SRGBColorSpace), 1);
+    // La cible garde des valeurs d'écran (sRGB), comme tout ce que le matériau encré y écrit:
+    // le fond s'y pose tel quel. Avec un espace de couleur, Three.js le convertirait en linéaire
+    // pour une cible (le fond sortait bien plus sombre que la donnée).
+    renderer.setClearColor(this.clear.setRGB(...ambiance.background), 1);
     renderer.clear();
     renderer.render(scene, camera);
+    meter.end(2, innerWidth * innerHeight);
     const o = s.outline;
     const zoom = Math.min(
       o.zoomRange[1],
       Math.max(o.zoomRange[0], o.zoomWidth / Math.max(1e-3, camera.right - camera.left)),
     );
-    this.pass.render(renderer, camera, pixelsPerMetre, frame.exposure, zoom);
+    meter.begin(3);
+    this.pass.render(
+      renderer,
+      camera,
+      pixelsPerMetre,
+      frame.exposure,
+      zoom,
+      frame.width,
+      frame.height,
+    );
+    // Contour à l'échelle interne, plus la mise à l'échelle vers le canevas quand il y en a une.
+    meter.end(3, innerWidth * innerHeight + (scale >= 1 ? 0 : frame.width * frame.height));
     scene.background = background;
+    meter.frame(this.lastDrawnAt === 0 ? 0 : now - this.lastDrawnAt, performance.now() - now, now);
+    this.lastDrawnAt = now;
   }
 
   dispose(): void {
@@ -312,6 +473,7 @@ export class InkKit {
     this.depth.dispose();
     this.motes.dispose();
     this.pass.dispose();
+    this.meter.dispose();
     this.sun.dispose();
     this.lamp.dispose();
     this.layers.dispose();

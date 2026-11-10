@@ -11,9 +11,11 @@
  */
 import {
   BufferGeometry,
+  Color,
   DepthTexture,
   Float32BufferAttribute,
   GLSL3,
+  LinearFilter,
   Mesh,
   NearestFilter,
   OrthographicCamera,
@@ -59,6 +61,42 @@ uniform vec3 uVignette;
 uniform vec2 uGrade;
 uniform float uExposure;
 uniform float uRankWeight[5];
+uniform float uUpscale;
+uniform vec2 uSize;
+
+// Mise à l'échelle de l'image finie vers le canevas quand l'échelle interne est sous 1 (ADR 0023,
+// point 11): bicubique de Catmull-Rom en cinq lectures filtrées (les quatre coins, de poids
+// infime, sont laissés), bornée par les tons lus pour ne poser aucun halo le long des traits
+// d'encre. Elle vit dans ce nuanceur pour ne pas coûter un programme de plus.
+vec3 upscaled() {
+  vec2 at = vUv * uSize;
+  vec2 centre = floor(at - 0.5) + 0.5;
+  vec2 f = at - centre;
+  vec2 f2 = f * f;
+  vec2 f3 = f2 * f;
+  vec2 w0 = -0.5 * f3 + f2 - 0.5 * f;
+  vec2 w1 = 1.5 * f3 - 2.5 * f2 + 1.0;
+  vec2 w2 = -1.5 * f3 + 2.0 * f2 + 0.5 * f;
+  vec2 w3 = 0.5 * f3 - 0.5 * f2;
+  vec2 w12 = w1 + w2;
+  vec2 t0 = (centre - 1.0) / uSize;
+  vec2 t12 = (centre + w2 / w12) / uSize;
+  vec2 t3 = (centre + 2.0) / uSize;
+  vec3 mid = textureLod(tColor, t12, 0.0).rgb;
+  vec3 north = textureLod(tColor, vec2(t12.x, t0.y), 0.0).rgb;
+  vec3 west = textureLod(tColor, vec2(t0.x, t12.y), 0.0).rgb;
+  vec3 east = textureLod(tColor, vec2(t3.x, t12.y), 0.0).rgb;
+  vec3 south = textureLod(tColor, vec2(t12.x, t3.y), 0.0).rgb;
+  float wm = w12.x * w12.y;
+  float wn = w12.x * w0.y;
+  float ww = w0.x * w12.y;
+  float we = w3.x * w12.y;
+  float ws = w12.x * w3.y;
+  vec3 color = (mid * wm + north * wn + west * ww + east * we + south * ws) / (wm + wn + ww + we + ws);
+  vec3 low = min(mid, min(min(north, south), min(west, east)));
+  vec3 high = max(mid, max(max(north, south), max(west, east)));
+  return clamp(color, low, high);
+}
 
 // Pièce et morceau: un octet chacun, numéro sur 6 bits et classe de taille sur 2 bits.
 float pieceOf(vec4 aux) {
@@ -83,6 +121,10 @@ vec3 normalOf(vec4 aux) {
 }
 
 void main() {
+  if (uUpscale > 0.5) {
+    gColor = vec4(upscaled(), 1.0);
+    return;
+  }
   vec3 color = texture(tColor, vUv).rgb;
   if (uRadius > 0.0) {
     vec4 aux0 = texture(tAux, vUv);
@@ -192,6 +234,16 @@ export function detailShare(pixelsPerMetre: number, range: { from: number; to: n
 const right = new Vector3();
 const up = new Vector3();
 const back = new Vector3();
+const patch = new Color();
+
+/** Mire de contrôle des couleurs: valeurs d'écran (sRGB, 0 à 255) qui doivent ressortir telles quelles. */
+export const COLOR_CHART: readonly (readonly [number, number, number])[] = [
+  [163, 182, 89],
+  [200, 85, 61],
+  [42, 48, 72],
+  [128, 128, 128],
+  [250, 240, 220],
+];
 
 export class InkPass {
   readonly target: WebGLRenderTarget;
@@ -200,6 +252,8 @@ export class InkPass {
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly triangle = new BufferGeometry();
   private readonly weights: number[] = [1, 1, 1, 1, 1];
+  /** Image finie à l'échelle interne, avant sa mise à l'échelle: créée à la première échelle sous 1. */
+  private resolved: WebGLRenderTarget | null = null;
 
   constructor(width: number, height: number, noise: Texture) {
     this.target = new WebGLRenderTarget(width, height, {
@@ -237,6 +291,8 @@ export class InkPass {
         uGrade: { value: new Vector2(1, 1) },
         uExposure: { value: 1 },
         uRankWeight: { value: this.weights },
+        uUpscale: { value: 0 },
+        uSize: { value: new Vector2(width, height) },
       },
     });
     this.triangle.setAttribute(
@@ -251,7 +307,78 @@ export class InkPass {
 
   setSize(width: number, height: number): void {
     this.target.setSize(width, height);
+    this.resolved?.setSize(width, height);
     (this.material.uniforms.uTexel?.value as Vector2).set(1 / width, 1 / height);
+    (this.material.uniforms.uSize?.value as Vector2).set(width, height);
+  }
+
+  /** L'image finie intermédiaire existe (une échelle sous 1 a servi): une texture de plus. */
+  get scaled(): boolean {
+    return this.resolved !== null;
+  }
+
+  /** Trace l'image finie: droit vers le canevas à l'échelle 1, sinon par la mise à l'échelle. */
+  private present(renderer: WebGLRenderer, outWidth: number, outHeight: number): void {
+    const { width, height } = this.target;
+    if (width === outWidth && height === outHeight) {
+      renderer.setRenderTarget(null);
+      renderer.render(this.scene, this.camera);
+      return;
+    }
+    if (this.resolved === null) {
+      this.resolved = new WebGLRenderTarget(width, height, { depthBuffer: false });
+      this.resolved.texture.minFilter = LinearFilter;
+      this.resolved.texture.magFilter = LinearFilter;
+      this.resolved.texture.generateMipmaps = false;
+    }
+    const u = this.material.uniforms;
+    renderer.setRenderTarget(this.resolved);
+    renderer.render(this.scene, this.camera);
+    // Seconde passe du même programme: l'image finie, lue filtrée, vers le canevas.
+    if (u.tColor) u.tColor.value = this.resolved.texture;
+    if (u.uUpscale) u.uUpscale.value = 1;
+    renderer.setRenderTarget(null);
+    renderer.render(this.scene, this.camera);
+    if (u.tColor) u.tColor.value = this.target.textures[0] ?? null;
+    if (u.uUpscale) u.uUpscale.value = 0;
+  }
+
+  /**
+   * Mire de contrôle (outil de mesure): chaque ton de `COLOR_CHART` est écrit dans la cible, passe
+   * par la même chaîne que le jeu (contour sans trait ni teinte, mise à l'échelle s'il y en a une)
+   * et est relu dans le canevas. `out` reçoit trois octets par ton. À appeler juste avant une
+   * image normale, qui recouvre la mire: elle n'est jamais montrée.
+   */
+  probe(renderer: WebGLRenderer, outWidth: number, outHeight: number, out: Uint8Array): void {
+    const u = this.material.uniforms;
+    const kept = {
+      radius: Number(u.uRadius?.value ?? 0),
+      exposure: Number(u.uExposure?.value ?? 1),
+      tint: (u.uTint?.value as Vector3).clone(),
+      vignette: (u.uVignette?.value as Vector3).clone(),
+      grade: (u.uGrade?.value as Vector2).clone(),
+    };
+    if (u.uRadius) u.uRadius.value = 0;
+    if (u.uExposure) u.uExposure.value = 1;
+    (u.uTint?.value as Vector3).set(1, 1, 1);
+    (u.uVignette?.value as Vector3).set(0, 2, 1);
+    (u.uGrade?.value as Vector2).set(1, 1);
+    const gl = renderer.getContext();
+    const pixel = new Uint8Array(4);
+    COLOR_CHART.forEach((tone, i) => {
+      renderer.setRenderTarget(this.target);
+      // Sans espace de couleur: les trois nombres sont écrits tels quels dans la cible.
+      renderer.setClearColor(patch.setRGB(tone[0] / 255, tone[1] / 255, tone[2] / 255), 1);
+      renderer.clear();
+      this.present(renderer, outWidth, outHeight);
+      gl.readPixels(outWidth >> 1, outHeight >> 1, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+      out.set(pixel.subarray(0, 3), i * 3);
+    });
+    if (u.uRadius) u.uRadius.value = kept.radius;
+    if (u.uExposure) u.uExposure.value = kept.exposure;
+    (u.uTint?.value as Vector3).copy(kept.tint);
+    (u.uVignette?.value as Vector3).copy(kept.vignette);
+    (u.uGrade?.value as Vector2).copy(kept.grade);
   }
 
   setAmbiance(ambiance: Readonly<Ambiance>): void {
@@ -260,12 +387,17 @@ export class InkPass {
     (u.uTint?.value as Vector3).set(...ambiance.tint);
     (u.uVignetteColor?.value as Vector3).set(...ambiance.vignetteColor);
     (u.uVignette?.value as Vector3).set(ambiance.vignette, ambiance.vignetteStart, 0.42);
-    (u.uGrade?.value as Vector2).set(ambiance.saturation, ambiance.contrast);
+    const grade = INK_SETTINGS.grade;
+    (u.uGrade?.value as Vector2).set(
+      ambiance.saturation * grade.saturation,
+      ambiance.contrast * grade.contrast,
+    );
   }
 
   /**
    * Trace le contour de la cible vers le canevas. `pixelsPerMetre`: zoom de la vue (il choisit
-   * les rangs de trait tracés); `exposure`: 1 hors fondu, 0 au noir; `zoom`: facteur d'épaisseur.
+   * les rangs de trait tracés); `exposure`: 1 hors fondu, 0 au noir; `zoom`: facteur d'épaisseur;
+   * `outWidth` et `outHeight`: taille du canevas (celle de la cible par défaut).
    */
   render(
     renderer: WebGLRenderer,
@@ -273,6 +405,8 @@ export class InkPass {
     pixelsPerMetre: number,
     exposure: number,
     zoom = 1,
+    outWidth: number = this.target.width,
+    outHeight: number = this.target.height,
   ): void {
     const s = INK_SETTINGS.outline;
     const u = this.material.uniforms;
@@ -289,13 +423,13 @@ export class InkPass {
     (u.uCamUp?.value as Vector3).copy(up).multiplyScalar(height);
     (u.uCamForward?.value as Vector3).copy(back).multiplyScalar(-(camera.far - camera.near));
     (u.uCamOrigin?.value as Vector3).copy(camera.position).addScaledVector(back, -camera.near);
-    renderer.setRenderTarget(null);
-    renderer.render(this.scene, this.camera);
+    this.present(renderer, outWidth, outHeight);
   }
 
   dispose(): void {
     this.target.depthTexture?.dispose();
     this.target.dispose();
+    this.resolved?.dispose();
     this.material.dispose();
     this.triangle.dispose();
   }
