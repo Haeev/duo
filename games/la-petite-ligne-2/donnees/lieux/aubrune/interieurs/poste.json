@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "poste",
+  "name": "Le poste d'aiguillage, rez-de-chaussée",
+  "width": 5,
+  "height": 3,
+  "at": {
+    "x": 155,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "poste-bas": {
+      "x": 2.5,
+      "y": 1.5
+    }
+  },
+  "objects": [
+    {
+      "id": "poste-coffre",
+      "type": "coffre",
+      "x": 0.5,
+      "y": 2.5,
+      "rotation": 1
+    }
+  ],
+  "doors": {
+    "poste-porte": {
+      "x": 2.5,
+      "y": 0.5,
+      "facing": 0,
+      "to": "porte-poste"
+    },
+    "poste-esc-poste-cabine": {
+      "x": 4.5,
+      "y": 2.5,
+      "facing": 2,
+      "to": "poste-cabine-esc-poste"
+    }
+  },
+  "pourquoi": "les tringles des leviers descendent vers la voie; l'escalier monte à la cabine"
+}

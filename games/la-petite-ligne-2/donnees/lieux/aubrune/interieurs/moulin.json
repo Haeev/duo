@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "moulin",
+  "name": "Le moulin de la Vanne, salle des meules",
+  "width": 7,
+  "height": 7,
+  "at": {
+    "x": 171,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "berthe-meules": {
+      "x": 4.5,
+      "y": 3.5
+    }
+  },
+  "objects": [
+    {
+      "id": "moulin-sacs",
+      "type": "coffre",
+      "x": 6.5,
+      "y": 6.5,
+      "rotation": 3
+    }
+  ],
+  "doors": {
+    "moulin-porte": {
+      "x": 3.5,
+      "y": 0.5,
+      "facing": 0,
+      "to": "porte-moulin"
+    },
+    "moulin-esc-moulin-etage": {
+      "x": 0.5,
+      "y": 6.5,
+      "facing": 0,
+      "to": "moulin-etage-esc-moulin"
+    }
+  },
+  "pourquoi": "porte au nord sur la cour; les meules au milieu, l'arbre de la roue entre par le pignon sud"
+}

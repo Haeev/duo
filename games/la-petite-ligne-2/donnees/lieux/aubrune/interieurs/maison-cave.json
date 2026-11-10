@@ -1,35 +1,36 @@
 {
- "schema": 1,
- "id": "maison-cave",
- "name": "La cave de la maison",
- "width": 5,
- "height": 4,
- "at": {
-  "x": 40,
-  "y": 210
- },
- "blocked": [],
- "points": {
-  "cave-lanterne": {
-   "x": 2.5,
-   "y": 1.5
-  }
- },
- "objects": [
-  {
-   "id": "cave-coffre",
-   "type": "coffre",
-   "x": 4.5,
-   "y": 3.5,
-   "rotation": 3
-  }
- ],
- "doors": {
-  "maison-cave-esc-maison-rdc": {
-   "x": 0.5,
-   "y": 0.5,
-   "facing": 0,
-   "to": "maison-rdc-esc-maison-cave"
-  }
- }
+  "schema": 1,
+  "id": "maison-cave",
+  "name": "La cave de la maison",
+  "width": 5,
+  "height": 4,
+  "at": {
+    "x": 40,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "cave-lanterne": {
+      "x": 2.5,
+      "y": 1.5
+    }
+  },
+  "objects": [
+    {
+      "id": "cave-coffre",
+      "type": "coffre",
+      "x": 4.5,
+      "y": 3.5,
+      "rotation": 3
+    }
+  ],
+  "doors": {
+    "maison-cave-esc-maison-rdc": {
+      "x": 0.5,
+      "y": 0.5,
+      "facing": 0,
+      "to": "maison-rdc-esc-maison-cave"
+    }
+  },
+  "pourquoi": "la lanterne sans verre (acte 3) y attend"
 }

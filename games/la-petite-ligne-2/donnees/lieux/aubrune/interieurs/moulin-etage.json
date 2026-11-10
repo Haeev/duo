@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "moulin-etage",
+  "name": "Le grenier du moulin",
+  "width": 7,
+  "height": 7,
+  "at": {
+    "x": 181,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "moulin-grenier": {
+      "x": 3.5,
+      "y": 3.5
+    }
+  },
+  "objects": [
+    {
+      "id": "moulin-grain-1",
+      "type": "coffre",
+      "x": 6.5,
+      "y": 0.5,
+      "rotation": 3
+    },
+    {
+      "id": "moulin-grain-2",
+      "type": "coffre",
+      "x": 6.5,
+      "y": 1.5,
+      "rotation": 3
+    }
+  ],
+  "doors": {
+    "moulin-etage-esc-moulin": {
+      "x": 0.5,
+      "y": 6.5,
+      "facing": 0,
+      "to": "moulin-esc-moulin-etage"
+    }
+  },
+  "pourquoi": "le grain monté en sacs, la trémie au-dessus des meules"
+}

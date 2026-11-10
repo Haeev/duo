@@ -30,7 +30,9 @@ const PlanSchema = v.looseObject({
   ),
   eaux: v.array(v.looseObject({ id: v.string(), largeur: Num, pts: v.array(Pt) })),
   plans_eau: v.array(v.looseObject({ id: v.string(), cx: Num, cy: Num, rx: Num, ry: Num })),
-  rails: v.array(v.looseObject({ id: v.string(), pts: v.array(Pt) })),
+  rails: v.array(
+    v.looseObject({ id: v.string(), pts: v.array(Pt), tunnel: v.optional(v.boolean()) }),
+  ),
   noeuds: v.record(v.string(), v.looseObject({ x: Num, y: Num, zone: v.string() })),
   aretes: v.array(
     v.looseObject({ a: v.string(), b: v.string(), classe: v.string(), nom: Name, verrou: Name }),
@@ -50,7 +52,16 @@ const PlanSchema = v.looseObject({
       interieur: Name,
     }),
   ),
-  reperes: v.array(v.looseObject({ id: v.string(), nom: v.string(), x: Num, y: Num, h: Num })),
+  reperes: v.array(
+    v.looseObject({
+      id: v.string(),
+      nom: v.string(),
+      x: Num,
+      y: Num,
+      h: Num,
+      nature: v.optional(v.string()),
+    }),
+  ),
   points_interet: v.array(
     v.looseObject({
       id: v.string(),
@@ -61,7 +72,13 @@ const PlanSchema = v.looseObject({
       y: Num,
     }),
   ),
-  parcelles: v.array(v.looseObject({ nom: v.string(), rect: v.tuple([Num, Num, Num, Num]) })),
+  parcelles: v.array(
+    v.looseObject({
+      nom: v.string(),
+      rect: v.tuple([Num, Num, Num, Num]),
+      nature: v.optional(v.string()),
+    }),
+  ),
 });
 export type Plan = v.InferOutput<typeof PlanSchema>;
 
@@ -324,10 +341,19 @@ export function planToMap(
     const [bx, by, bw, bh] = b.rect;
     grid.stampRect(bx, by, bw, bh, (i) => (building[i] = b.porte === null ? 2 : 1));
   }
+  // Parcelle: sa nature (place, cimetière, labour...) devient un code ajouté au bout de la légende,
+  // les 14 premiers ne bougent pas; une parcelle sans nature reste un `champ`.
+  const legend: string[] = [...LEGEND];
   const field = new Uint8Array(n);
   for (const p of plan.parcelles) {
     const [px, py, pw, ph] = p.rect;
-    grid.stampRect(px, py, pw, ph, (i) => (field[i] = 1));
+    let code: number = CODE.champ;
+    if (p.nature !== undefined) {
+      const name = gameId(p.nature);
+      if (!legend.includes(name)) legend.push(name);
+      code = legend.indexOf(name);
+    }
+    grid.stampRect(px, py, pw, ph, (i) => (field[i] = code));
   }
 
   const ground = new Uint8Array(n);
@@ -343,7 +369,7 @@ export function planToMap(
     else if (water[i] === 1) g = CODE.eau;
     else if (rail[i] === 1) g = CODE.voie;
     else if (building[i] === 2) g = CODE.quai;
-    else if (field[i] === 1) g = CODE.champ;
+    else if ((field[i] ?? 0) !== 0) g = field[i] ?? CODE.champ;
     else g = CODE.herbe;
     ground[i] = g;
   }
@@ -479,7 +505,14 @@ export function planToMap(
       Object.entries(nodes).filter(([id]) => !blockedNodes.map(gameId).includes(id)),
     ),
     objects: [],
-    terrain: { legend: [...LEGEND], runs },
+    terrain: { legend, runs },
+    // Tracés des voies ferrées (ligne, voies de garage, tunnel): le rendu y pose les rails, même
+    // là où aucun chemin du graphe ne les suit.
+    rails: plan.rails.map((r) => ({
+      id: gameId(r.id),
+      points: r.pts.map(([x, y]) => [x, y] as const),
+      ...(r.tunnel === true ? { tunnel: true } : {}),
+    })),
     zones: Object.fromEntries(
       Object.entries(plan.zones).map(([id, z]) => [
         gameId(id),
@@ -497,7 +530,16 @@ export function planToMap(
       })),
     },
     landmarks: Object.fromEntries(
-      plan.reperes.map((r) => [gameId(r.id), { name: r.nom, x: r.x, y: r.y, height: r.h }]),
+      plan.reperes.map((r) => [
+        gameId(r.id),
+        {
+          name: r.nom,
+          x: r.x,
+          y: r.y,
+          height: r.h,
+          ...(r.nature === undefined ? {} : { kind: gameId(r.nature) }),
+        },
+      ]),
     ),
     interests: Object.fromEntries(
       plan.points_interet.map((p) => [

@@ -15,6 +15,7 @@ marchant sur la grille. Rien de tout cela ne se retouche à la main: on corrige 
 """
 import json
 import os
+import subprocess
 import sys
 
 ICI = os.path.dirname(os.path.abspath(__file__))
@@ -63,9 +64,11 @@ def main(brute):
                     if dans(z['poly'], x + 0.5, y + 0.5):
                         codes[i] = code(plan['sols']['par_zone'][zk])
                         break
-    rects = [(p['rect'], plan['sols']['par_parcelle'].get(p['nom'], 'pre')) for p in plan['parcelles']]
-    rects += [(r['rect'], r['sol']) for r in plan['sols']['rects']]
-    modifiables = {herbe, champ} | {legende.index(s) for s in legende[14:]}
+    # Les parcelles gardent la nature que l'outil leur donne (place, cimetière, labour...): le rendu en tire leur
+    # aspect. Seules l'herbe des zones et les surfaces particulières (lande, galets, vase...) reçoivent un sol.
+    natures = {gid(p['nature']) for p in plan['parcelles'] if p.get('nature')}
+    rects = [(r['rect'], r['sol']) for r in plan['sols']['rects']]
+    modifiables = {herbe, champ} | {legende.index(s) for s in legende[14:] if s not in natures}
     for (rx, ry, rw, rh), sol in rects:
         for y in range(max(0, int(ry)), min(H, int(ry + rh + 0.999))):
             for x in range(max(0, int(rx)), min(W, int(rx + rw + 0.999))):
@@ -83,16 +86,44 @@ def main(brute):
     objets = []
     for m in plan['mobilier'] + [dict(a, rotation=0, modele=a['type']) for a in plan['arbres']]:
         if m['type'] in types:
-            objets.append(dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation']))
+            objets.append(dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation'], pourquoi=m['pourquoi'][:400]))
         else:
             manquants.setdefault(m['modele'], []).append(m['id'])
     for r in plan['ressources']:
         t = plan['type_ressource'].get(r['nature'])
         if t and t in types and 'x' in r:
-            objets.append(dict(id=gid(r['id']), type=t, x=r['x'], y=r['y'], rotation=0))
-    for v in plan['verrous'].values():
+            objets.append(dict(id=gid(r['id']), type=t, x=r['x'], y=r['y'], rotation=0, pourquoi=r['pourquoi'][:400]))
+    for k, v in plan['verrous'].items():
         manquants.setdefault(v['modele'], []).append('verrou')
+        # La phrase « pas encore » montrée par la touche d'action tant que le verrou est fermé.
+        carte['locks'][gid(k)]['says'] = v['pas_encore']
     carte['objects'] = objets
+
+    # ---- coins de pêche: le plus grand rectangle d'eau (8 x 5 au plus) près de chaque coin, pour `fishing` de lieu.json
+    eau = legende.index('eau')
+    ress = {r['id']: r for r in plan['ressources']}
+    peche = []
+    for c in plan.get('peche_lieu', []):
+        r = ress[c['ressource']]
+        best = None
+        for w in range(8, 2, -1):
+            for h in range(5, 1, -1):
+                for y0 in range(int(r['y']) - 7, int(r['y']) + 3):
+                    for x0 in range(int(r['x']) - 7, int(r['x']) + 3):
+                        if x0 < 0 or y0 < 0 or x0 + w > W or y0 + h > H:
+                            continue
+                        if any(codes[(y0 + j) * W + x0 + i] != eau for j in range(h) for i in range(w)):
+                            continue
+                        d = abs(x0 + w / 2 - r['x']) + abs(y0 + h / 2 - r['y'])
+                        cle = (-w * h, d)
+                        if best is None or cle < best[0]:
+                            best = (cle, dict(x=x0, y=y0, w=w, h=h))
+        if best is None:
+            raise SystemExit('coin de pêche %s: aucune eau près de (%g, %g)' % (c['id'], r['x'], r['y']))
+        peche.append(dict(id=c['id'], area=best[1], shadows=c['ombres'], table=[dict(catch=k, weight=v) for k, v in c['table'].items()]))
+    with open(os.path.join(ICI, 'peche-lieu.json'), 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(dict(note="proposition du level design pour le champ `fishing` de lieu.json (poissons et poids à équilibrer par le game designer)", fishing=peche), f, ensure_ascii=False, indent=1)
+        f.write('\n')
 
     # ---- points nommés et coins de ressources
     pts = carte['points']
@@ -119,7 +150,7 @@ def main(brute):
         loc = lambda x, y: dict(x=at['x'] + x, y=at['y'] + y)
         room = dict(schema=1, id=iid, name=it['nom'][:1].upper() + it['nom'][1:], width=it['largeur'], height=it['hauteur'], at=at,
                     blocked=[dict(x=c[0], y=c[1], w=c[2], h=c[3]) for c in it['cloisons']],
-                    points={}, objects=[], doors={})
+                    points={}, objects=[], doors={}, pourquoi=it['note'][:400])
         for m in it['meubles']:
             if m['type'] in types:
                 room['objects'].append(dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation']))
@@ -245,6 +276,12 @@ def main(brute):
         json.dump(climat, f, ensure_ascii=False, indent=2)
         f.write('\n')
 
+    # Mise en forme du dépôt (`pnpm format:verifier`): les fichiers du lieu se relisent ligne à ligne dans les diffs.
+    sorties = [os.path.join(LIEU, 'carte.json'), os.path.join(LIEU, 'climat.json')] + [
+        os.path.join(LIEU, 'interieurs', f) for f in sorted(os.listdir(os.path.join(LIEU, 'interieurs')))]
+    r = subprocess.run(['npx', 'prettier', '--write', '--log-level', 'warn'] + sorties, cwd=PAQUET)
+    if r.returncode != 0:
+        print('prettier a échoué: fichiers du lieu laissés tels quels')
     erreurs = eprouver_verrous(plan, carte)
     print('carte.json: %d objets, %d points, %d portes, %d noeuds, %d arêtes; %d intérieurs; légende de %d sols' % (
         len(objets), len(pts), len(portes), len(noeuds), len(aretes), len(plan['interieurs']), len(legende)))

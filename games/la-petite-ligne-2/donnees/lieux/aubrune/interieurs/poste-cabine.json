@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "poste-cabine",
+  "name": "La cabine des leviers",
+  "width": 5,
+  "height": 3,
+  "at": {
+    "x": 163,
+    "y": 210
+  },
+  "blocked": [],
+  "points": {
+    "poste-cabine-leviers": {
+      "x": 2.5,
+      "y": 1.5
+    }
+  },
+  "objects": [
+    {
+      "id": "poste-chaise",
+      "type": "chaise",
+      "x": 0.5,
+      "y": 2.5,
+      "rotation": 1
+    }
+  ],
+  "doors": {
+    "poste-cabine-esc-poste": {
+      "x": 4.5,
+      "y": 2.5,
+      "facing": 2,
+      "to": "poste-esc-poste-cabine"
+    }
+  },
+  "pourquoi": "les leviers face à la voie (nord), la vitre donne sur le sémaphore: celui du dedans lit les étiquettes, celui du dehors voit le bras"
+}

@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "id": "eglise",
+  "name": "L'église Saint-Aubin",
+  "width": 20,
+  "height": 11,
+  "at": {
+    "x": 124,
+    "y": 210
+  },
+  "blocked": [
+    {
+      "x": 0,
+      "y": 0,
+      "w": 5,
+      "h": 3
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "w": 5,
+      "h": 3
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "w": 1,
+      "h": 5
+    },
+    {
+      "x": 5,
+      "y": 6,
+      "w": 1,
+      "h": 5
+    }
+  ],
+  "points": {
+    "marthe-corde": {
+      "x": 2.5,
+      "y": 4.5
+    },
+    "eglise-choeur": {
+      "x": 17,
+      "y": 5.5
+    }
+  },
+  "objects": [
+    {
+      "id": "eglise-banc-1",
+      "type": "banc",
+      "x": 8.5,
+      "y": 2,
+      "rotation": 1
+    },
+    {
+      "id": "eglise-banc-2",
+      "type": "banc",
+      "x": 12.5,
+      "y": 2,
+      "rotation": 1
+    },
+    {
+      "id": "eglise-banc-3",
+      "type": "banc",
+      "x": 14.5,
+      "y": 2,
+      "rotation": 1
+    },
+    {
+      "id": "eglise-banc-4",
+      "type": "banc",
+      "x": 8.5,
+      "y": 8,
+      "rotation": 1
+    },
+    {
+      "id": "eglise-banc-5",
+      "type": "banc",
+      "x": 12.5,
+      "y": 8,
+      "rotation": 1
+    },
+    {
+      "id": "eglise-banc-6",
+      "type": "banc",
+      "x": 14.5,
+      "y": 8,
+      "rotation": 1
+    }
+  ],
+  "doors": {
+    "eglise-porte": {
+      "x": 10.5,
+      "y": 10.5,
+      "facing": 2,
+      "to": "porte-eglise"
+    },
+    "eglise-esc-eglise-clocher": {
+      "x": 0.5,
+      "y": 5.5,
+      "facing": 0,
+      "to": "eglise-clocher-esc-eglise"
+    }
+  },
+  "pourquoi": "portail latéral au sud, chœur à l'est, clocher à l'ouest: on entre face à l'allée, la corde de la cloche pend dans la base du clocher"
+}
