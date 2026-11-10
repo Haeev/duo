@@ -601,3 +601,10 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Deux faces dans le même plan et le même sens (mur maison contre tranche d'un modèle) scintillent: avancer la sienne de 5 mm à 1 cm. Des tranches de 2 cm aux coins d'un modèle voisin se voient en traits sombres: déborder de 2 cm.
 - Worktree neuf sans `node_modules`: `pnpm install --frozen-lockfile --prefer-offline` (moins d'une seconde). Playwright: le paquet global `/opt/node22/lib/node_modules/playwright` (celui du dépôt réclame un navigateur absent). Page de captures jetable: HTML et TS à la racine du jeu, configuration Vite à côté (`outDir` dans le scratchpad), serveur `python3 -m http.server` en tâche de fond avec un `timeout` long (sinon il s'arrête au bout de 30 min, en plein lot).
 - Paramètres utiles d'une page de captures: `x`, `z`, `yaw`, `pitch`, `y` (vue de dessus), `ext` (extension ouverte), `sans` (cacher son groupe pour comparer, programmes compris). Cap: 0 regarde vers -z (nord, vers la cour depuis la salle), +90 vers -x.
+
+## La Petite Ligne 2 (simulation, vérifié le 2026-11-10)
+
+- Un `GameSystem.intent` reçoit toutes les intentions: `switch-exhaustiveness-check` refuse un `default` seul; dérogation `// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- raison`.
+- La raison d'un événement `refused` est un `IdSchema` (minuscules et traits d'union): `too-far`, jamais `too_far`.
+- Les joueurs naissent au point `descente` (près du quai), pas aux points `depart-joueur-*`: un test de portée place les corps lui-même.
+- Tests d'un système hors du pas: construire un `SimContext` à la main (copie de `step`) qui note les tranches touchées; retoucher le contenu en modifiant `dataFiles()` avant `loadContent` (exemplaire factice sans code).
