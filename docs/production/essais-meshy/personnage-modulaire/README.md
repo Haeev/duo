@@ -269,3 +269,20 @@ node banc/capturer2.mjs games/la-petite-ligne/node_modules/three captures [d1 d2
 ```
 
 La voie D se relance sans aucune sortie brute (elle ne lit que `pieces/corps.glb` pour le squelette et les clips). La voie C a besoin des rigs de Meshy, hors dépôt, effacés le 2026-11-13. Les planches réunies (`essai-2-voie-c.png`, `essai-2-voie-d.png`, `essai-2-comparaison.png`) ont été montées avec Pillow à partir des bandes de `capturer2.mjs`.
+
+## 9. Essai 3 (2026-11-10): de l'essai à la chaîne de production (lot L5)
+
+La voie D est retenue par le client. Elle est rangée dans le paquet `games/la-petite-ligne-2` et pilotée par des données: voir `games/la-petite-ligne-2/assets-src/personnages/README.md` (recette d'ajout en dix lignes, conventions pour l'assemblage). Planche: `captures/essai-3-catalogue.png`; mesures: `captures/essai-3-mesures.json`. Crédits Meshy: 0 (solde 2 202 avant et après); le bonnet vient de la tâche n° 20.
+
+| Sujet | Résultat |
+|---|---|
+| Chaîne | `gabarits.toml` (corpulences, silhouettes, morphologies, pièces) puis `construire.sh`: 4 s pour tout régénérer et contrôler |
+| Catalogue v0 | 18 pièces: corps, 2 têtes, 4 coiffures (et leur variante à plat sous un chapeau), 3 hauts, 3 bas, 1 robe, 2 chaussures, 1 bonnet de Meshy, 1 gilet; 8 morphologies; contrat `duo-24` de `personnage.ts` |
+| Poids | paroi intérieure supprimée (bord rentré vers le corps), sections couvertes retirées, fusion: **5 500 à 6 300 triangles et 2 appels de dessin par personnage** (corps fusionné, plus la tête pour ses expressions), 2 programmes; fichiers: 1,25 Mo pour les 9 GLB |
+| Visage | pièces de rechange par cibles de morphose: sourcils mobiles, paupières en coque, arcs d'œil fermé, joues, bouche en relief à 8 formes, plus clignement et babil; yeux agrandis (blanc de 6 cm de haut), bouche claire sur les peaux sombres |
+| Coiffures | calotte et mèches en volumes décrites en données: court, raie de côté, chignon, carré |
+| Gabarits | corpulences et silhouettes F et M par cibles de morphose cuites à la fusion; enfant et âgé par longueurs d'os et échelles uniformes |
+| Clips | `idle`, `sit`, `carry` écrits par le script (poses en degrés); `walk`, `run` de Meshy |
+| Ajout sans code | gilet `accessory-vest`: une entrée de 12 lignes, 2 s de script, visible sur la planche |
+
+Défauts vus sur la planche: le gilet se mêle aux manches d'un pull épais (couche 2 trop proche de la couche du pull: 34 mm contre 21 mm plus la manche); manches courtes un peu « ballon » à l'épaule; le carré garde deux masses latérales raides; arcs des yeux fermés peu lisibles sur les peaux les plus sombres; jambes fines sous une robe. Non fait: lunettes, salopette, dos voûté de l'âgé, quantification des GLB, validation du catalogue par le schéma valibot lui-même (le contrôle Python en reprend les règles), mesure sur le PC.

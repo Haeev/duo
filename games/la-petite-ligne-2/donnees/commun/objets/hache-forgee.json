@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "hache-forgee",
+  "name": "Hache forgée",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "axe",
+    "durability": 120,
+    "gestureSeconds": 0.7,
+    "bluntGestureSeconds": 1.5
+  }
+}

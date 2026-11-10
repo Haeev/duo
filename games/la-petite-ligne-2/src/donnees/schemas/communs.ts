@@ -7,7 +7,10 @@ import * as v from 'valibot';
 /** Identifiant de contenu: minuscules, chiffres, traits d'union (`essai-gare`, `pomme`). */
 export const IdSchema = v.pipe(
   v.string(),
-  v.regex(/^[a-z][a-z0-9-]{0,39}$/, 'identifiant: minuscules, chiffres et traits d’union, 40 caractères au plus'),
+  v.regex(
+    /^[a-z][a-z0-9-]{0,39}$/,
+    'identifiant: minuscules, chiffres et traits d’union, 40 caractères au plus',
+  ),
 );
 export type Id = v.InferOutput<typeof IdSchema>;
 

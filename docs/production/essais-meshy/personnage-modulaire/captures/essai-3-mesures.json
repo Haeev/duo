@@ -1,0 +1,32 @@
+{
+ "Lise": {
+  "triangles": 6320,
+  "appels": 2,
+  "programmes": 2
+ },
+ "Marius": {
+  "triangles": 6060,
+  "appels": 2,
+  "programmes": 2
+ },
+ "Ines": {
+  "triangles": 5760,
+  "appels": 2,
+  "programmes": 2
+ },
+ "Paulin": {
+  "triangles": 5796,
+  "appels": 2,
+  "programmes": 2
+ },
+ "Margot": {
+  "triangles": 6151,
+  "appels": 2,
+  "programmes": 2
+ },
+ "Achille": {
+  "triangles": 5472,
+  "appels": 2,
+  "programmes": 2
+ }
+}

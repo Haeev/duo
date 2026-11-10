@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "id": "accueil",
+  "villager": "cheffe-de-gare",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "essai-gare.besace",
+              "equals": true
+            }
+          ],
+          "next": "revoir"
+        }
+      ],
+      "otherwise": "bonjour"
+    },
+    "bonjour": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Bienvenue à la gare d'essai ! Le train pour la halte part quand vous êtes tous les deux sur le quai.",
+      "emote": "joy",
+      "next": "question"
+    },
+    "question": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Tu voyages les mains dans les poches ?",
+      "emote": "question",
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "oui",
+          "text": "Oui, je n'ai que mes poches.",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_bag",
+              "bag": "besace"
+            },
+            {
+              "type": "remember",
+              "key": "essai-gare.besace",
+              "value": true,
+              "by": "actor"
+            }
+          ],
+          "next": "cadeau"
+        },
+        {
+          "id": "non",
+          "text": "Ça ira, merci.",
+          "when": [],
+          "effects": [],
+          "next": "tant-pis"
+        }
+      ]
+    },
+    "cadeau": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Tiens, une besace oubliée au guichet. Quatre poches de plus, ça change un voyage.",
+      "emote": null,
+      "next": null
+    },
+    "tant-pis": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Comme tu veux. Reviens me voir si tes poches débordent.",
+      "emote": null,
+      "next": null
+    },
+    "revoir": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Alors, cette besace ? Elle te va bien.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

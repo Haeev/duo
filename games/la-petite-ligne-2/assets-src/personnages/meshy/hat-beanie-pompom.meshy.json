@@ -1,0 +1,22 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "hat-beanie-pompom",
+ "game": "la-petite-ligne-2",
+ "family": "personnage: coiffe rigide",
+ "purpose": "bonnet à pompon du catalogue v0, tenu par l'os Head, posé sur la calotte commune",
+ "inputs": [],
+ "tasks": [
+  {"step": "aperçu texte vers 3D", "tool": "meshy_text_to_3d", "task_id": "01a1c4f5-bb87-750d-94f6-60ea3ec36cfe",
+   "params": {"prompt": "smooth vinyl toy figurine style, soft rounded shapes, thick rounded edges, matte flat colors, single object, plain light grey background, a simple knitted beanie hat with a thick rolled brim and a round pompom on top, hat alone, hollow inside, no head, no face, no body, no mannequin, no texture detail, no fabric grain, no pattern, no text, no logo, no photorealism", "ai_model": "meshy-t2.5", "model_type": "smart-topology", "topology": "triangle", "target_polycount": 800, "target_formats": ["glb"]},
+   "credits": 5, "created": "2026-11-10", "files": ["preview.glb"], "downloaded": true}
+ ],
+ "credits_total": 5,
+ "credits_budget": 60,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {"script": "construire_catalogue.py, base meshy-rigide", "source": "hat-beanie-pompom.source.glb (géométrie de l'aperçu, 16 Ko, sans texture)", "largeur_m": 0.385, "bas_m": 1.555, "os": "Head", "lissage": 0.5, "triangles": 827},
+ "status": "catalogue v0",
+ "pending": "le manager tranche: garder cette géométrie d'aperçu de 16 Ko comme source versionnée (sans elle la pièce ne se régénère plus après le 2026-11-13)"
+}

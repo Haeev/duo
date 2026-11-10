@@ -1,0 +1,352 @@
+# Gabarits des personnages de La Petite Ligne (refonte).
+#
+# Ajouter une pièce, une coiffure ou une corpulence = copier une entrée ci-dessous, changer ses champs, puis lancer
+#   bash games/la-petite-ligne-2/assets-src/personnages/construire.sh
+# Aucun code à écrire. Recette en dix lignes: README.md de ce dossier.
+#
+# Unités: mètres. Repères de l'adulte: taille (ceinture) 0,983; entrejambe 0,80; genou 0,46; cheville 0,10;
+# col 1,325; menton 1,36; sommet du crâne 1,70. Couleurs: noms du nuancier (nuancier.json, copie de la bible).
+# Identifiants: minuscules, chiffres et traits d'union, emplacement en tête (top-tee).
+
+# ---------------------------------------------------------------- corpulences (bible 2.1)
+# sh carrure, wa taille, hi bassin, arm et leg épaisseur des membres; d_* profondeurs; belly avancée du ventre.
+[corpulences.medium]
+sh = 0.425
+wa = 0.320
+hi = 0.350
+arm = 0.085
+leg = 0.115
+d_hi = 0.21
+d_wa = 0.20
+d_ch = 0.215
+belly = 0.0
+
+[corpulences.slim]
+sh = 0.385
+wa = 0.265
+hi = 0.305
+arm = 0.072
+leg = 0.098
+d_hi = 0.18
+d_wa = 0.165
+d_ch = 0.185
+belly = 0.0
+
+[corpulences.round]
+sh = 0.455
+wa = 0.430
+hi = 0.440
+arm = 0.100
+leg = 0.138
+d_hi = 0.29
+d_wa = 0.33
+d_ch = 0.27
+belly = 0.035
+
+# Silhouettes de départ: facteurs appliqués à la corpulence (épaules, taille, bassin). Toutes les pièces vont à tous.
+[silhouettes.f]
+sh = 0.93
+wa = 0.90
+hi = 1.07
+
+[silhouettes.m]
+sh = 1.05
+wa = 1.02
+hi = 0.95
+
+# ---------------------------------------------------------------- morphologies
+# build et silhouette: cibles de morphose à appliquer aux pièces. scale: échelle de tout le personnage.
+# head: échelle de la tête; legs, arms, torso: longueurs relatives (1 = adulte).
+[[morphologies]]
+id = "adult-f-slim"
+age = "adult"
+build = "slim"
+silhouette = "f"
+
+[[morphologies]]
+id = "adult-f-medium"
+age = "adult"
+build = "medium"
+silhouette = "f"
+
+[[morphologies]]
+id = "adult-f-round"
+age = "adult"
+build = "round"
+silhouette = "f"
+
+[[morphologies]]
+id = "adult-m-slim"
+age = "adult"
+build = "slim"
+silhouette = "m"
+
+[[morphologies]]
+id = "adult-m-medium"
+age = "adult"
+build = "medium"
+silhouette = "m"
+
+[[morphologies]]
+id = "adult-m-round"
+age = "adult"
+build = "round"
+silhouette = "m"
+
+[[morphologies]]
+id = "child-medium"
+age = "child"
+build = "medium"
+silhouette = "f"
+scale = 0.80
+head = 1.10
+legs = 0.80
+arms = 0.86
+torso = 0.90
+
+[[morphologies]]
+id = "elder-medium"
+age = "elder"
+build = "medium"
+silhouette = "m"
+scale = 0.975
+head = 1.0
+legs = 0.94
+arms = 0.98
+torso = 0.97
+
+# ---------------------------------------------------------------- pièces
+# Champs communs: id, slot (body, head, hair, top, bottom, dress, shoes, hat, glasses, accessory), base (la forme
+# de départ), zones (1 à 3: id, famille du nuancier, couleur par défaut), tags.
+# Les sections du corps masquées (covers) sont déduites des longueurs: rien à remplir.
+
+# --- base "torse": coque autour du buste. couche = décalage depuis la peau (0.019 près du corps, 0.021 pull,
+# 0.034 par-dessus un haut); ourlet = distance sous la taille; manches = part du bras couverte (0 sans manches,
+# 0.3 manche courte, 0.97 manche longue); ouverture = largeur de la fente de devant (0 = fermé);
+# col = hauteur du col (1.337 ras du cou, 1.36 col roulé); bourrelet = bord renflé (vrai ou faux).
+[[pieces]]
+id = "top-tee"
+slot = "top"
+base = "torse"
+couche = 0.019
+ourlet = 0.06
+manches = 0.3
+ouverture = 0.0
+col = 1.337
+bourrelet = false
+zones = [{ id = "principale", famille = "tissus", defaut = "moutarde" }]
+tags = ["quotidien"]
+
+[[pieces]]
+id = "top-sweater"
+slot = "top"
+base = "torse"
+couche = 0.021
+ourlet = 0.09
+manches = 0.97
+ouverture = 0.0
+col = 1.36
+bourrelet = true
+zones = [{ id = "principale", famille = "tissus", defaut = "ardoise" }]
+tags = ["quotidien", "froid"]
+
+[[pieces]]
+id = "top-tank"
+slot = "top"
+base = "torse"
+couche = 0.017
+ourlet = 0.05
+manches = 0.0
+ouverture = 0.0
+col = 1.325
+bourrelet = false
+zones = [{ id = "principale", famille = "tissus", defaut = "craie" }]
+tags = ["ete"]
+
+# Pièce ajoutée par une seule entrée de données (preuve du gabarit, 2026-11-10): gilet sans manches porté sur un haut.
+[[pieces]]
+id = "accessory-vest"
+slot = "accessory"
+base = "torse"
+couche = 0.034
+ourlet = 0.10
+manches = 0.0
+ouverture = 0.09
+col = 1.315
+bourrelet = false
+zones = [{ id = "principale", famille = "tissus", defaut = "bouteille" }]
+tags = ["travail"]
+
+# --- base "jambes": culotte et deux jambes. longueur = part de la jambe couverte (0.3 short, 0.6 pantacourt,
+# 1.0 jusque sur la chaussure); couche comme ci-dessus (0.008 pour un bas porté sous le haut).
+[[pieces]]
+id = "bottom-trousers"
+slot = "bottom"
+base = "jambes"
+couche = 0.008
+longueur = 1.0
+zones = [{ id = "principale", famille = "tissus", defaut = "marine" }]
+tags = ["quotidien"]
+
+[[pieces]]
+id = "bottom-shorts"
+slot = "bottom"
+base = "jambes"
+couche = 0.008
+longueur = 0.3
+zones = [{ id = "principale", famille = "tissus", defaut = "olive" }]
+tags = ["ete"]
+
+# --- base "jupe": cône depuis la taille. bas = hauteur de l'ourlet au-dessus du sol (genou à 0.46: rien de
+# rigide sous le genou); evasement = élargissement à l'ourlet.
+[[pieces]]
+id = "bottom-skirt"
+slot = "bottom"
+base = "jupe"
+couche = 0.008
+bas = 0.50
+evasement = 0.10
+zones = [{ id = "principale", famille = "tissus", defaut = "prune" }]
+tags = ["quotidien"]
+
+# --- base "robe": buste (champs de "torse") prolongé en jupe (champs de "jupe"). Occupe haut et bas.
+[[pieces]]
+id = "dress-simple"
+slot = "dress"
+base = "robe"
+couche = 0.019
+manches = 0.3
+col = 1.337
+bas = 0.48
+evasement = 0.11
+zones = [{ id = "principale", famille = "tissus", defaut = "coquelicot" }]
+tags = ["quotidien"]
+
+# --- base "galet": chaussure en galet. tige = hauteur de la tige (0.10 chaussure basse, 0.24 botte);
+# longueur du pied 0.24 chez l'adulte (bible 2.2). Zones: cuir puis semelle.
+[[pieces]]
+id = "shoes-pebble"
+slot = "shoes"
+base = "galet"
+tige = 0.10
+zones = [{ id = "cuir", famille = "fixes", couleurs = ["cuir", "cuir_sombre", "caoutchouc_clair"], defaut = "cuir_sombre" }, { id = "semelle", famille = "fixes", couleurs = ["semelle", "caoutchouc_clair"], defaut = "semelle" }]
+tags = ["quotidien"]
+
+[[pieces]]
+id = "shoes-boots"
+slot = "shoes"
+base = "galet"
+tige = 0.24
+zones = [{ id = "cuir", famille = "tissus", couleurs = ["bouteille", "moutarde", "encre", "brique"], defaut = "bouteille" }, { id = "semelle", famille = "fixes", couleurs = ["semelle", "caoutchouc_clair"], defaut = "semelle" }]
+tags = ["pluie"]
+
+# --- base "tete": crâne commun au-dessus de la ligne de chapeau, visage à 8 expressions (cibles de morphose).
+# machoire = élargissement du bas du visage (0 rond, 0.1 carré); menton = allongement vers le bas;
+# nez = taille du nez (1 = moyen); oreilles = taille des oreilles. Zones: sourcils, puis bouche (teinte claire
+# pour les peaux sombres, bible 2.3).
+[[pieces]]
+id = "head-round"
+slot = "head"
+base = "tete"
+machoire = 0.0
+menton = 0.0
+nez = 1.0
+oreilles = 1.0
+zones = [{ id = "sourcils", famille = "cheveux", defaut = "chatain" }, { id = "bouche", famille = "fixes", couleurs = ["bouche", "dent"], defaut = "bouche" }]
+tags = ["doux"]
+
+[[pieces]]
+id = "head-square"
+slot = "head"
+base = "tete"
+machoire = 0.10
+menton = 0.012
+nez = 1.35
+oreilles = 1.2
+zones = [{ id = "sourcils", famille = "cheveux", defaut = "noir" }, { id = "bouche", famille = "fixes", couleurs = ["bouche", "dent"], defaut = "bouche" }]
+tags = ["marque"]
+
+# --- base "coiffure": calotte sur le crâne et mèches en volumes.
+# front = hauteur de la ligne des cheveux sur le front; nuque = hauteur de la ligne à l'arrière;
+# meches = liste de volumes [x, y, z, rayon x, rayon y, rayon z, rot x, rot y, rot z] (y négatif = devant,
+# rotations en degrés); miroir = vrai pour copier chaque mèche de l'autre côté (x opposé).
+# Sous un chapeau, le jeu prend la variante « à plat » (calotte seule), fabriquée d'office.
+[[pieces]]
+id = "hair-short"
+slot = "hair"
+base = "coiffure"
+front = 1.63
+nuque = 1.47
+miroir = true
+meches = [
+  [0.035, -0.105, 1.665, 0.060, 0.055, 0.034, 20, 0, 12],
+  [0.095, -0.060, 1.645, 0.055, 0.060, 0.036, 10, 25, 30],
+  [0.050, 0.020, 1.690, 0.075, 0.085, 0.030, 0, 10, 0],
+]
+zones = [{ id = "cheveux", famille = "cheveux", defaut = "chatain" }]
+tags = ["court"]
+
+[[pieces]]
+id = "hair-side-part"
+slot = "hair"
+base = "coiffure"
+front = 1.64
+nuque = 1.46
+miroir = false
+meches = [
+  [0.045, -0.085, 1.672, 0.115, 0.075, 0.040, 18, -8, -14],
+  [-0.085, -0.070, 1.655, 0.060, 0.070, 0.036, 14, -30, 22],
+  [0.118, -0.020, 1.640, 0.050, 0.085, 0.060, 0, 25, 8],
+  [-0.125, 0.010, 1.630, 0.042, 0.090, 0.060, 0, -25, 0],
+  [0.000, 0.060, 1.690, 0.120, 0.090, 0.034, -8, 0, 0],
+]
+zones = [{ id = "cheveux", famille = "cheveux", defaut = "blond_miel" }]
+tags = ["raie"]
+
+[[pieces]]
+id = "hair-bun"
+slot = "hair"
+base = "coiffure"
+front = 1.635
+nuque = 1.45
+miroir = true
+meches = [
+  [0.000, 0.045, 1.765, 0.072, 0.072, 0.066, 0, 0, 0],
+  [0.000, 0.035, 1.712, 0.052, 0.052, 0.022, 0, 0, 0],
+  [0.075, -0.085, 1.652, 0.075, 0.060, 0.034, 22, 28, 25],
+  [0.130, 0.000, 1.615, 0.036, 0.095, 0.055, 0, 20, 0],
+]
+zones = [{ id = "cheveux", famille = "cheveux", defaut = "roux" }]
+tags = ["chignon"]
+
+[[pieces]]
+id = "hair-bob"
+slot = "hair"
+base = "coiffure"
+front = 1.60
+nuque = 1.42
+miroir = true
+meches = [
+  [0.050, -0.128, 1.628, 0.058, 0.034, 0.042, 12, 0, 8],
+  [0.140, -0.035, 1.515, 0.034, 0.070, 0.118, 0, 6, 0],
+  [0.122, 0.070, 1.500, 0.055, 0.070, 0.112, 0, 0, -20],
+  [0.045, 0.122, 1.490, 0.075, 0.048, 0.105, 0, 0, 0],
+  [0.062, 0.010, 1.672, 0.080, 0.110, 0.030, 0, 16, 0],
+]
+zones = [{ id = "cheveux", famille = "cheveux", defaut = "noir" }]
+tags = ["carre"]
+
+# --- base "meshy-rigide": pièce générée par Meshy, déjà mise en place (dossier meshy/), tenue par un os.
+# fichier = GLB conformé; os = os porteur; largeur = largeur finale; bas = hauteur du bord inférieur;
+# cheveux = effet sur la coiffure: "free" (rien), "flat" (variante à plat), "hidden" (coiffure retirée).
+[[pieces]]
+id = "hat-beanie-pompom"
+slot = "hat"
+base = "meshy-rigide"
+fichier = "meshy/hat-beanie-pompom.source.glb"
+os = "Head"
+largeur = 0.385
+bas = 1.555
+cheveux = "flat"
+zones = [{ id = "principale", famille = "tissus", defaut = "coquelicot" }]
+tags = ["froid"]

@@ -29,12 +29,30 @@ const Minutes = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1440));
 
 export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
   v.variant('type', [
-    v.strictObject({ type: v.literal('all'), conditions: v.pipe(v.array(ConditionSchema), v.minLength(1)) }),
-    v.strictObject({ type: v.literal('any'), conditions: v.pipe(v.array(ConditionSchema), v.minLength(1)) }),
+    v.strictObject({
+      type: v.literal('all'),
+      conditions: v.pipe(v.array(ConditionSchema), v.minLength(1)),
+    }),
+    v.strictObject({
+      type: v.literal('any'),
+      conditions: v.pipe(v.array(ConditionSchema), v.minLength(1)),
+    }),
     v.strictObject({ type: v.literal('not'), condition: ConditionSchema }),
-    v.strictObject({ type: v.literal('remembered'), key: FactKeySchema, equals: v.exactOptional(FactValueSchema) }),
-    v.strictObject({ type: v.literal('need_at_least'), need: NeedIdSchema, value: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(100)) }),
-    v.strictObject({ type: v.literal('item_in_bag'), item: IdSchema, count: v.pipe(CountSchema, v.minValue(1)) }),
+    v.strictObject({
+      type: v.literal('remembered'),
+      key: FactKeySchema,
+      equals: v.exactOptional(FactValueSchema),
+    }),
+    v.strictObject({
+      type: v.literal('need_at_least'),
+      need: NeedIdSchema,
+      value: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(100)),
+    }),
+    v.strictObject({
+      type: v.literal('item_in_bag'),
+      item: IdSchema,
+      count: v.pipe(CountSchema, v.minValue(1)),
+    }),
     v.strictObject({ type: v.literal('place_is'), place: IdSchema }),
     v.strictObject({ type: v.literal('time_is'), from: Minutes, to: Minutes }),
   ]),
@@ -42,9 +60,22 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
 
 export const EffectSchema = v.variant('type', [
   /** Écrit un fait dans la mémoire, au nom du joueur qui agit (`by: 'duo'`: au nom des deux). */
-  v.strictObject({ type: v.literal('remember'), key: FactKeySchema, value: FactValueSchema, by: v.picklist(['actor', 'duo']) }),
-  v.strictObject({ type: v.literal('give_item'), item: IdSchema, count: v.pipe(CountSchema, v.minValue(1)) }),
-  v.strictObject({ type: v.literal('take_item'), item: IdSchema, count: v.pipe(CountSchema, v.minValue(1)) }),
+  v.strictObject({
+    type: v.literal('remember'),
+    key: FactKeySchema,
+    value: FactValueSchema,
+    by: v.picklist(['actor', 'duo']),
+  }),
+  v.strictObject({
+    type: v.literal('give_item'),
+    item: IdSchema,
+    count: v.pipe(CountSchema, v.minValue(1)),
+  }),
+  v.strictObject({
+    type: v.literal('take_item'),
+    item: IdSchema,
+    count: v.pipe(CountSchema, v.minValue(1)),
+  }),
   v.strictObject({ type: v.literal('give_money'), amount: v.pipe(CountSchema, v.minValue(1)) }),
   /** Ajoute `amount` (négatif permis) à un besoin de celui qui agit, sans dépasser `cap`. */
   v.strictObject({

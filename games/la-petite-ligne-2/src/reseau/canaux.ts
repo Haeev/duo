@@ -31,12 +31,17 @@ export const BUDGET_BYTES = {
   fast: 3072,
   events: 4096,
   players: 8192,
-  progress: 24_576,
-  place: 24_576,
+  progress: 32_768,
+  place: 32_768,
 } as const;
 
 /** Une tranche lourde part au plus tous les N pas; « joueurs » et « commun » partent au pas même. */
-export const SLICE_EVERY_TICKS: Readonly<Record<Slice, number>> = { common: 1, players: 1, progress: 15, place: 6 };
+export const SLICE_EVERY_TICKS: Readonly<Record<Slice, number>> = {
+  common: 1,
+  players: 1,
+  progress: 15,
+  place: 6,
+};
 /** Sans changement, chaque tranche repart quand même tous les N pas (filet de sécurité). */
 export const SLICE_KEEPALIVE_TICKS = 150;
 
@@ -74,7 +79,10 @@ export type EventsMessage = v.InferOutput<typeof EventsSchema>;
 /** Les tranches lentes, validées champ par champ chez l'invité. */
 export const SLICE_SCHEMAS = {
   common: v.strictObject({ tick: TickSchema, common: CommonSchema }),
-  players: v.strictObject({ tick: TickSchema, players: v.tuple([PlayerSlowSchema, PlayerSlowSchema]) }),
+  players: v.strictObject({
+    tick: TickSchema,
+    players: v.tuple([PlayerSlowSchema, PlayerSlowSchema]),
+  }),
   progress: v.strictObject({ tick: TickSchema, progress: ProgressSchema }),
   place: v.strictObject({ tick: TickSchema, id: IdSchema, place: PlaceSlowSchema }),
 } as const;

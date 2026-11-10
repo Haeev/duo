@@ -112,3 +112,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Le pied d'un rig de Meshy pointe vers le bas au repos: ramené sur un os de pied à plat, la chaussure se dresse. Redresser avant de figer.
 - Vêtement sans traversée par construction: le volume du corps décalé (bas 8 mm, haut 19 mm, veste 38 mm), mêmes poids, Solidify de 8 mm, corps masqué dessous (`scripts/voie_d.py`, `figurine.py`). Replacer les os d'un rig sans casser ses clips: `eb.align_roll(ancien axe z)` après avoir posé tête et queue.
 - Ombre portée d'un `SkinnedMesh` lisse: `bias` -0,0004, `normalBias` 0,012, `PCFSoftShadowMap`, pas d'acné sur les captures.
+
+## Catalogue des personnages de la refonte (lot L5, 2026-11-10, `games/la-petite-ligne-2/assets-src/personnages/`)
+
+- Tout sort de `gabarits.toml` par `construire.sh` (4 s). Ajouter une pièce = une entrée; ne jamais coder une pièce en dur.
+- Le contrat est `src/donnees/schemas/personnage.ts` (squelette `duo-24`, identifiants à traits d'union, objets stricts), plus récent que `technique.md` 3.4 (qui dit encore 18 os): lire le schéma avant d'écrire un catalogue.
+- Corpulences par cibles de morphose (même générateur relancé avec d'autres cotes: topologie identique), cuites à la fusion. Âges par translations de repos des os: des membres en gélules coaxiales coulissent l'un dans l'autre sans cisaillement; jamais d'échelle non uniforme sur un os animé.
+- Expressions: reconstruire tout le visage par expression avec la même topologie, chaque version devient une clé de forme; une pièce cachée (arc d'œil fermé, joue) se range dans la tête plutôt que de disparaître.
+- Blender 5.2: régler `scene.render.fps` avant d'importer un glTF animé (sinon 24 i/s et des durées fausses); `export_vertex_color="ACTIVE"` avec un attribut `FLOAT_COLOR` de coin sort COLOR_0; `tomllib` est disponible sous duo-python.
+- Three.js: `SkeletonUtils.clone` par personnage, puis fusion manuelle (positions plus deltas de morphose, indices d'os refaits par nom); une vue de profil d'une rangée de personnages demande 14 m d'écart, sinon la caméra entre dans le voisin.

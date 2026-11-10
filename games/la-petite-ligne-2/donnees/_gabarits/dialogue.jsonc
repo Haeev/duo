@@ -1,0 +1,55 @@
+// GABARIT: un dialogue d'un habitant (un graphe de nœuds).
+// Créer: pnpm nouveau dialogue <id> <lieu>   -> donnees/lieux/<lieu>/dialogues/<id>.json
+// Schéma: src/donnees/schemas/dialogue.ts; conditions et effets: src/donnees/schemas/regles.ts
+{
+  "schema": 1,
+  "id": "exemple-dialogue",
+  // L'habitant à qui l'on parle (fichier du dossier habitants/ du même lieu).
+  "villager": "cheffe-de-gare",
+  // Parmi les dialogues dont "when" est vrai, le plus prioritaire est joué.
+  "priority": 0,
+  // Conditions, toutes vraies. Exemples:
+  //   { "type": "remembered", "key": "essai-gare.besace", "equals": true }
+  //   { "type": "need_at_least", "need": "hygiene", "value": 21 }
+  //   { "type": "item_in_bag", "item": "pomme", "count": 3 }
+  //   { "type": "time_is", "from": 360, "to": 720 }
+  "when": [],
+  // "duo": une seule fois pour les deux; "player": une fois chacun; null: à volonté.
+  "once": null,
+  "start": "bonjour",
+  "nodes": {
+    // Réplique: 150 caractères au plus (trois lignes du bandeau). "speaker": un habitant ou "player".
+    // "emote": surprise, question, joy, anger, sad, idea, ou null. "next": nœud suivant, null = fin.
+    "bonjour": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Une pomme pour la route ?",
+      "emote": "question",
+      "next": "choix",
+    },
+    // Choix: 2 à 3 options, dont une au moins sans condition. Effets possibles:
+    //   give_item, take_item, give_money, change_need, give_bag, remember
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "oui",
+          "text": "Volontiers !",
+          "when": [],
+          "effects": [{ "type": "give_item", "item": "pomme", "count": 1 }],
+          "next": "merci",
+        },
+        { "id": "non", "text": "Non merci.", "when": [], "effects": [], "next": null },
+      ],
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Bon voyage !",
+      "emote": "joy",
+      "next": null,
+    },
+    // Autres nœuds: { "kind": "branch", "cases": [{ "when": [...], "next": "..." }], "otherwise": "..." }
+    //               { "kind": "effects", "effects": [...], "next": "..." }
+  },
+}

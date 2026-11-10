@@ -115,7 +115,8 @@ export function createHost(sim: Sim, net: Net, log: Logger, local: PlayerIndex):
         lastGuest = next;
         ack = next.seq;
       }
-      const inputs: [StepInput, StepInput] = local === 0 ? [localInput, lastGuest] : [lastGuest, localInput];
+      const inputs: [StepInput, StepInput] =
+        local === 0 ? [localInput, lastGuest] : [lastGuest, localInput];
       step(sim, inputs, pending.splice(0, pending.length));
       const tick = sim.world.tick;
       if (sim.events.length > 0) {
@@ -126,7 +127,8 @@ export function createHost(sim: Sim, net: Net, log: Logger, local: PlayerIndex):
       for (const slice of SLICES) {
         const due = tick - sent[slice].tick;
         const changed = sim.revisions[slice] !== sent[slice].revision;
-        if ((changed && due >= SLICE_EVERY_TICKS[slice]) || due >= SLICE_KEEPALIVE_TICKS) sendSlice(slice);
+        if ((changed && due >= SLICE_EVERY_TICKS[slice]) || due >= SLICE_KEEPALIVE_TICKS)
+          sendSlice(slice);
       }
       return sim.events;
     },

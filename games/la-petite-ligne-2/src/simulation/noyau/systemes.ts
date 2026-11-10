@@ -7,6 +7,7 @@ import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Slice, WorldState } from '../../etat/monde';
 import { needsSystem } from '../besoins/index';
+import { brickSystem } from '../briques/index';
 import { dialogueSystem } from '../dialogues/index';
 import { bagSystem } from '../sac/index';
 import { travelSystem } from '../voyage/index';
@@ -40,4 +41,10 @@ export interface GameSystem {
 }
 
 /** Ordre d'exécution à chaque pas. */
-export const SYSTEMS: readonly GameSystem[] = [travelSystem, bagSystem, needsSystem, dialogueSystem];
+export const SYSTEMS: readonly GameSystem[] = [
+  travelSystem,
+  brickSystem,
+  bagSystem,
+  needsSystem,
+  dialogueSystem,
+];

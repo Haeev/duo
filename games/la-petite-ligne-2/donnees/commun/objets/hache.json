@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "hache",
+  "name": "Hache",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "axe",
+    "durability": 0,
+    "gestureSeconds": 1,
+    "bluntGestureSeconds": 1
+  }
+}

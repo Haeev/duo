@@ -1,0 +1,21 @@
+// GABARIT: une prise de collection (poisson, insecte, coquillage, fossile, trésor).
+// Créer: pnpm nouveau prise <id>          -> donnees/commun/prises/<id>.json
+// Schéma: src/donnees/schemas/prise.ts. L'objet obtenu (nom, pile) est un fichier de commun/objets/.
+{
+  "schema": 1,
+  "id": "exemple-prise",
+  // fish, insect, shell, fossil, treasure.
+  "kind": "fish",
+  "item": "pomme",
+  // Lieux où on la trouve.
+  "places": ["essai-gare"],
+  // Heures de jeu en minutes depuis minuit (la plage peut passer minuit: 1260 à 300).
+  "hours": { "from": 360, "to": 720 },
+  // Météos (clear, overcast, rain, mist, snow) et saisons (spring, summer, autumn, winter). [] = toutes.
+  "weathers": ["rain"],
+  "seasons": [],
+  // common, uncommon, rare.
+  "rarity": "uncommon",
+  // Difficulté du mini-jeu, de 1 à 5.
+  "difficulty": 2,
+}

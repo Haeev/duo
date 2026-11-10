@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Banc d'essai 3: catalogue des personnages</title>
+<style>
+ body { margin: 0; background: #efe9dd; font: 14px system-ui, sans-serif; }
+ canvas { display: block; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+// Adresse: ?planche=catalogue | expressions | distance | gabarits | clips | piece&id=<pièce>   (sans planche: catalogue animé)
+const params = new URLSearchParams(location.search);
+const ASSETS = '/games/la-petite-ligne-2/assets/commun/personnages/';
+const DATA = '/games/la-petite-ligne-2/donnees/commun/personnages/';
+const catalogue = await (await fetch(DATA + 'catalogue.json')).json();
+const details = await (await fetch(DATA + 'morphologies.json')).json();
+const bench = await (await fetch('essai3-looks.json')).json();
+const pieceById = new Map(catalogue.pieces.map((p) => [p.id, p]));
+const loader = new GLTFLoader();
+const files = new Map();
+async function file(name) {
+  if (!files.has(name)) files.set(name, await loader.loadAsync(ASSETS + name));
+  return files.get(name);
+}
+function node(gltf, name) {
+  let found = null;
+  gltf.scene.traverse((o) => { if (o.isSkinnedMesh && (o.name === name || o.parent?.name === name)) found = found ?? o; });
+  if (!found) throw new Error(`nœud ${name} introuvable`);
+  return found;
+}
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.info.autoReset = false;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xefe9dd);
+scene.add(new THREE.HemisphereLight(0xfff8ee, 0xcfc3b0, 1.5));
+const key = new THREE.DirectionalLight(0xffe9cc, 2.4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 2.4, bottom: -0.6, near: 0.5, far: 14 });
+// Biais vérifié sur capture: sans biais de normale, des rayures d'acné couvrent les manches.
+key.shadow.bias = -0.0004;
+key.shadow.normalBias = 0.012;
+key.shadow.radius = 5;
+const rim = new THREE.DirectionalLight(0xbfd8ff, 1.6);
+scene.add(key, key.target, rim, rim.target);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: 0.16 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+const blobCanvas = document.createElement('canvas');
+blobCanvas.width = blobCanvas.height = 128;
+const g2 = blobCanvas.getContext('2d');
+const grad = g2.createRadialGradient(64, 64, 4, 64, 64, 62);
+grad.addColorStop(0, 'rgba(60,45,35,0.42)');
+grad.addColorStop(1, 'rgba(60,45,35,0)');
+g2.fillStyle = grad;
+g2.fillRect(0, 0, 128, 128);
+const blobMaterial = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(blobCanvas), transparent: true, depthWrite: false });
+
+// Un seul matériau pour tous les personnages: la couleur est dans les sommets.
+const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0 });
+const bodyFile = await file('body.glb');
+const LENGTHS = { legs: ['LeftLeg', 'RightLeg', 'LeftFoot', 'RightFoot'], arms: ['LeftForeArm', 'RightForeArm', 'LeftHand', 'RightHand'], torso: ['Spine02', 'Spine01', 'Spine', 'neck', 'Head'] };
+
+function linear(hex) { return new THREE.Color(hex); }
+
+// Fusion: toutes les pièces d'un personnage en une géométrie à peau (la tête reste à part pour ses expressions).
+async function createCharacter(look) {
+  const shape = details.shapes[look.shape];
+  const root = SkeletonUtils.clone(bodyFile.scene);
+  const bones = new Map();
+  let bodyMesh = null;
+  root.traverse((o) => { if (o.isBone) bones.set(o.name, o); if (o.isSkinnedMesh) bodyMesh = o; });
+  const skeleton = bodyMesh.skeleton;
+  const boneIndex = new Map(skeleton.bones.map((b, i) => [b.name, i]));
+  bodyMesh.visible = false;
+  const skin = linear(catalogue.skins[look.skin]);
+  const pieces = [{ slot: 'body', id: 'body-base', colors: [] }, ...look.pieces];
+  const covered = new Set();
+  let hairMode = 'free';
+  for (const entry of pieces) {
+    const piece = pieceById.get(entry.id);
+    for (const region of piece.covers) covered.add(details.regions.indexOf(region));
+    if (piece.hair) hairMode = piece.hair;
+  }
+  const merged = { position: [], normal: [], color: [], skinIndex: [], skinWeight: [], index: [] };
+  let head = null;
+  let triangles = 0;
+  for (const entry of pieces) {
+    const piece = pieceById.get(entry.id);
+    if (piece.slot === 'hair' && hairMode === 'hidden') continue;
+    const name = piece.slot === 'hair' && hairMode === 'flat' ? piece.node + details.flat_suffix : piece.node;
+    const source = node(await file(piece.file), name);
+    const geo = source.geometry;
+    const pos = geo.attributes.position, nor = geo.attributes.normal, uv = geo.attributes.uv, col = geo.attributes.color;
+    const si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+    const remap = source.skeleton.bones.map((b) => boneIndex.get(b.name));
+    const zoneColors = piece.zones.map((z, i) => linear(z.colors[entry.colors[i] ?? 0]));
+    const count = pos.count;
+    const out = { position: new Float32Array(count * 3), color: new Float32Array(count * 3), skinIndex: new Uint16Array(count * 4) };
+    const dict = source.morphTargetDictionary ?? {};
+    const deltas = shape.morphs.filter((m) => m in dict).map((m) => geo.morphAttributes.position[dict[m]]);
+    for (let i = 0; i < count; i += 1) {
+      let x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+      for (const d of deltas) { x += d.getX(i); y += d.getY(i); z += d.getZ(i); }
+      out.position.set([x, y, z], i * 3);
+      const zone = Math.floor(uv.getX(i) * 8);
+      const c = zone === details.zones.peau ? skin : zone === details.zones.fixe ? new THREE.Color(col.getX(i), col.getY(i), col.getZ(i)) : zoneColors[zone] ?? new THREE.Color(col.getX(i), col.getY(i), col.getZ(i));
+      out.color.set([c.r, c.g, c.b], i * 3);
+      for (let k = 0; k < 4; k += 1) out.skinIndex[i * 4 + k] = remap[si.getComponent(i, k)];
+    }
+    const index = geo.index.array;
+    if (piece.slot === 'head') {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(out.position, 3));
+      g.setAttribute('normal', nor.clone());
+      g.setAttribute('color', new THREE.BufferAttribute(out.color, 3));
+      g.setAttribute('skinIndex', new THREE.BufferAttribute(out.skinIndex, 4));
+      g.setAttribute('skinWeight', sw.clone());
+      g.setIndex(new THREE.BufferAttribute(index.slice(), 1));
+      g.morphAttributes.position = geo.morphAttributes.position;
+      g.morphTargetsRelative = true;
+      head = new THREE.SkinnedMesh(g, material);
+      head.morphTargetDictionary = { ...source.morphTargetDictionary };
+      head.morphTargetInfluences = new Array(geo.morphAttributes.position.length).fill(0);
+      triangles += index.length / 3;
+      continue;
+    }
+    const base = merged.position.length / 3;
+    for (let i = 0; i < count; i += 1) {
+      merged.position.push(out.position[i * 3], out.position[i * 3 + 1], out.position[i * 3 + 2]);
+      merged.normal.push(nor.getX(i), nor.getY(i), nor.getZ(i));
+      merged.color.push(out.color[i * 3], out.color[i * 3 + 1], out.color[i * 3 + 2]);
+      merged.skinIndex.push(out.skinIndex[i * 4], out.skinIndex[i * 4 + 1], out.skinIndex[i * 4 + 2], out.skinIndex[i * 4 + 3]);
+      merged.skinWeight.push(sw.getX(i), sw.getY(i), sw.getZ(i), sw.getW(i));
+    }
+    for (let t = 0; t < index.length; t += 3) {
+      // Sections du corps couvertes par un vêtement: retirées (rien ne traverse, moins de triangles).
+      if (piece.slot === 'body' && covered.has(Math.floor(uv.getY(index[t]) * 16))) continue;
+      merged.index.push(base + index[t], base + index[t + 1], base + index[t + 2]);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(merged.position, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(merged.normal, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(merged.color, 3));
+  g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(merged.skinIndex, 4));
+  g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(merged.skinWeight, 4));
+  g.setIndex(merged.index);
+  triangles += merged.index.length / 3;
+  const body = new THREE.SkinnedMesh(g, material);
+  for (const mesh of [body, head]) {
+    mesh.bind(skeleton, bodyMesh.bindMatrix);
+    mesh.frustumCulled = false;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    bodyMesh.parent.add(mesh);
+  }
+  // Âge: longueurs par translation des os (les segments coulissent l'un dans l'autre), tête et taille par échelle uniforme.
+  for (const [part, names] of Object.entries(LENGTHS)) for (const n of names) bones.get(n).position.multiplyScalar(shape[part]);
+  const hipsScale = (0.10 + 0.80 * shape.legs) / 0.90;
+  bones.get('Hips').position.multiplyScalar(hipsScale);
+  bones.get('Head').scale.setScalar(shape.head);
+  const holder = new THREE.Group();
+  holder.add(root);
+  holder.scale.setScalar(shape.scale);
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.7), blobMaterial);
+  blob.rotation.x = -Math.PI / 2;
+  blob.position.y = 0.004;
+  holder.add(blob);
+  scene.add(holder);
+  // Clips partagés: rotations seules, plus la translation des hanches mise à l'échelle des jambes.
+  const mixer = new THREE.AnimationMixer(root);
+  const actions = new Map();
+  for (const clip of bodyFile.animations) {
+    const tracks = [];
+    for (const track of clip.tracks) {
+      if (track.name.endsWith('.quaternion')) tracks.push(track);
+      else if (track.name === 'Hips.position') {
+        const copy = track.clone();
+        for (let i = 0; i < copy.values.length; i += 1) copy.values[i] *= hipsScale;
+        tracks.push(copy);
+      }
+    }
+    actions.set(clip.name, mixer.clipAction(new THREE.AnimationClip(clip.name, clip.duration, tracks)));
+  }
+  const character = {
+    holder, head, mixer, actions, triangles, look,
+    play(name, time) { for (const a of actions.values()) a.stop(); actions.get(name).play(); mixer.setTime(time); },
+    express(name) { head.morphTargetInfluences.fill(0); if (name && name !== 'neutral') head.morphTargetInfluences[head.morphTargetDictionary[name]] = 1; },
+  };
+  character.express(look.expression);
+  return character;
+}
+
+const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 80);
+function view(target, azimuthDeg, rect, options = {}) {
+  const a = THREE.MathUtils.degToRad(azimuthDeg);
+  const distance = options.distance ?? 5.2;
+  const elevation = THREE.MathUtils.degToRad(options.elevation ?? 4);
+  const look = new THREE.Vector3(target.x, options.lookY ?? 0.86, target.z);
+  camera.fov = options.fov ?? 26;
+  camera.aspect = rect.w / rect.h;
+  camera.position.set(look.x + Math.sin(a) * Math.cos(elevation) * distance, look.y + Math.sin(elevation) * distance, look.z + Math.cos(a) * Math.cos(elevation) * distance);
+  camera.lookAt(look);
+  camera.updateProjectionMatrix();
+  // Les lumières suivent la vue: chaque vignette garde la même lecture des volumes.
+  const right = new THREE.Vector3(Math.cos(a), 0, -Math.sin(a));
+  const back = new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
+  key.target.position.copy(look).setY(0.8);
+  key.position.copy(key.target.position).addScaledVector(right, 2.2).addScaledVector(back, 3.4).add(new THREE.Vector3(0, 3.4, 0));
+  rim.target.position.copy(key.target.position);
+  rim.position.copy(key.target.position).addScaledVector(right, -2.5).addScaledVector(back, -3.5).add(new THREE.Vector3(0, 1.8, 0));
+  renderer.setViewport(rect.x, rect.y, rect.w, rect.h);
+  renderer.setScissor(rect.x, rect.y, rect.w, rect.h);
+  renderer.setScissorTest(true);
+  renderer.render(scene, camera);
+}
+
+window.banc = { pret: false, mesures: {} };
+const mode = params.get('planche') ?? 'catalogue';
+const W = innerWidth, Hh = innerHeight;
+async function row(looks, spacing = 4) {
+  const list = [];
+  for (const [i, look] of looks.entries()) {
+    const c = await createCharacter(look);
+    c.holder.position.x = i * spacing;
+    list.push(c);
+  }
+  return list;
+}
+function measure(c) {
+  // Appels de dessin du personnage seul, hors sol et ombre portée.
+  const hidden = [];
+  scene.traverse((o) => { if (o.isMesh && !c.holder.getObjectById(o.id)) { hidden.push([o, o.visible]); o.visible = false; } });
+  c.holder.children.forEach((o) => { if (o.material === blobMaterial) o.visible = false; });
+  key.castShadow = false;
+  renderer.info.reset();
+  view(c.holder.position, 20, { x: 0, y: 0, w: 64, h: 64 });
+  const m = { triangles: c.triangles, appels: renderer.info.render.calls, programmes: renderer.info.programs.length };
+  key.castShadow = true;
+  for (const [o, v] of hidden) o.visible = v;
+  c.holder.children.forEach((o) => { o.visible = true; });
+  return m;
+}
+
+if (mode === 'catalogue') {
+  const list = await row(bench.personnages);
+  list.forEach((c, i) => { c.play('idle', 0.4); window.banc.mesures[bench.personnages[i].nom] = measure(c); });
+  const w = W / list.length;
+  list.forEach((c, i) => {
+    view(c.holder.position, 0, { x: i * w, y: Hh / 2, w, h: Hh / 2 });
+    view(c.holder.position, 38, { x: i * w, y: 0, w, h: Hh / 2 });
+  });
+} else if (mode === 'expressions') {
+  const names = ['neutral', ...details.expressions.filter((e) => !['blink', 'talk'].includes(e))];
+  const list = await row([bench.personnages[0], bench.personnages[1]], 14);
+  const w = W / names.length;
+  list.forEach((c, r) => {
+    c.play('idle', 0.4);
+    names.forEach((name, i) => {
+      c.express(name);
+      view(c.holder.position, r === 0 ? 0 : 24, { x: i * w, y: (1 - r) * Hh / 2, w, h: Hh / 2 }, { distance: 1.45, lookY: 1.545 * details.shapes[c.look.shape].scale, fov: 22 });
+    });
+  });
+} else if (mode === 'distance') {
+  // Vue à distance de jeu: 1366 x 768, caméra plongeante à 35 degrés, personnage d'environ 90 pixels de haut.
+  const list = await row(bench.personnages, 1.5);
+  list.forEach((c, i) => { c.play(i % 2 ? 'walk' : 'idle', 0.3 + i * 0.1); c.holder.rotation.y = (i % 3 - 1) * 0.5; });
+  const mid = new THREE.Vector3((list.length - 1) * 0.75, 0, 0);
+  Object.assign(key.shadow.camera, { left: -6, right: 6, top: 5, bottom: -3 });
+  key.shadow.camera.updateProjectionMatrix();
+  view(mid, 0, { x: 0, y: 0, w: W, h: Hh }, { distance: 17, elevation: 35, lookY: 0.8, fov: 30 });
+} else if (mode === 'gabarits') {
+  const base = bench.personnages[2];
+  const list = await row(catalogue.shapes.map((s) => ({ ...base, shape: s.id })));
+  const w = W / list.length;
+  list.forEach((c, i) => { c.play('idle', 0.4); view(c.holder.position, 18, { x: i * w, y: 0, w, h: Hh }, { distance: 5.6, lookY: 0.84 }); });
+} else if (mode === 'clips') {
+  const shots = [['idle', 0.4, 20], ['idle', 1.5, 90], ['walk', 0.26, 35], ['walk', 0.78, 90], ['run', 0.2, 60], ['sit', 0.5, 40], ['sit', 0.5, 90], ['carry', 0.5, 35]];
+  const list = await row(shots.map((_, i) => bench.personnages[i % bench.personnages.length]), 14);
+  const w = W / shots.length;
+  list.forEach((c, i) => { c.play(shots[i][0], shots[i][1]); view(c.holder.position, shots[i][2], { x: i * w, y: 0, w, h: Hh }); });
+} else if (mode === 'piece') {
+  const list = await row(bench.pieces[params.get('id')]);
+  const w = W / (list.length * 2);
+  list.forEach((c, i) => {
+    c.play('idle', 0.4);
+    view(c.holder.position, 0, { x: 2 * i * w, y: 0, w, h: Hh });
+    view(c.holder.position, 40, { x: (2 * i + 1) * w, y: 0, w, h: Hh });
+  });
+}
+window.banc.pret = true;
+</script>
+</body>
+</html>

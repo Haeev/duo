@@ -1,0 +1,198 @@
+{
+ "regions": [
+  "none",
+  "neck",
+  "torso",
+  "pelvis",
+  "upper-arm-a",
+  "upper-arm-b",
+  "forearm",
+  "hand",
+  "thigh-a",
+  "thigh-b",
+  "shin"
+ ],
+ "zones": {
+  "teintables": [
+   0,
+   1,
+   2
+  ],
+  "fixe": 6,
+  "peau": 7
+ },
+ "expressions": [
+  "joy",
+  "surprise",
+  "thinking",
+  "embarrassed",
+  "sad",
+  "angry",
+  "sleepy",
+  "blink",
+  "talk"
+ ],
+ "clips": {
+  "run": 0.625,
+  "walk": 1.0,
+  "idle": 3.0,
+  "sit": 3.0,
+  "carry": 2.0
+ },
+ "flat_suffix": "--flat",
+ "shapes": {
+  "adult-f-slim": {
+   "morphs": [
+    "slim",
+    "f"
+   ],
+   "scale": 1.0,
+   "head": 1.0,
+   "legs": 1.0,
+   "arms": 1.0,
+   "torso": 1.0
+  },
+  "adult-f-medium": {
+   "morphs": [
+    "f"
+   ],
+   "scale": 1.0,
+   "head": 1.0,
+   "legs": 1.0,
+   "arms": 1.0,
+   "torso": 1.0
+  },
+  "adult-f-round": {
+   "morphs": [
+    "round",
+    "f"
+   ],
+   "scale": 1.0,
+   "head": 1.0,
+   "legs": 1.0,
+   "arms": 1.0,
+   "torso": 1.0
+  },
+  "adult-m-slim": {
+   "morphs": [
+    "slim",
+    "m"
+   ],
+   "scale": 1.0,
+   "head": 1.0,
+   "legs": 1.0,
+   "arms": 1.0,
+   "torso": 1.0
+  },
+  "adult-m-medium": {
+   "morphs": [
+    "m"
+   ],
+   "scale": 1.0,
+   "head": 1.0,
+   "legs": 1.0,
+   "arms": 1.0,
+   "torso": 1.0
+  },
+  "adult-m-round": {
+   "morphs": [
+    "round",
+    "m"
+   ],
+   "scale": 1.0,
+   "head": 1.0,
+   "legs": 1.0,
+   "arms": 1.0,
+   "torso": 1.0
+  },
+  "child-medium": {
+   "morphs": [
+    "f"
+   ],
+   "scale": 0.8,
+   "head": 1.1,
+   "legs": 0.8,
+   "arms": 0.86,
+   "torso": 0.9
+  },
+  "elder-medium": {
+   "morphs": [
+    "m"
+   ],
+   "scale": 0.975,
+   "head": 1.0,
+   "legs": 0.94,
+   "arms": 0.98,
+   "torso": 0.97
+  }
+ },
+ "defaults": {
+  "body-base": [],
+  "top-tee": [
+   3
+  ],
+  "top-sweater": [
+   12
+  ],
+  "top-tank": [
+   0
+  ],
+  "accessory-vest": [
+   17
+  ],
+  "bottom-trousers": [
+   14
+  ],
+  "bottom-shorts": [
+   18
+  ],
+  "bottom-skirt": [
+   9
+  ],
+  "dress-simple": [
+   7
+  ],
+  "shoes-pebble": [
+   1,
+   0
+  ],
+  "shoes-boots": [
+   0,
+   0
+  ],
+  "head-round": [
+   2,
+   0
+  ],
+  "head-square": [
+   0,
+   0
+  ],
+  "hair-short": [
+   2
+  ],
+  "hair-side-part": [
+   5
+  ],
+  "hair-bun": [
+   4
+  ],
+  "hair-bob": [
+   0
+  ],
+  "hat-beanie-pompom": [
+   7
+  ]
+ },
+ "files": {
+  "body": 285328,
+  "top": 157024,
+  "accessory": 37976,
+  "bottom": 135596,
+  "dress": 76428,
+  "shoes": 92820,
+  "head": 216052,
+  "hair": 217432,
+  "hat": 38796
+ }
+}

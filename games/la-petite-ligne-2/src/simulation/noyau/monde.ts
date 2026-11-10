@@ -3,6 +3,7 @@ import { createRandom } from '@duo/sdk/sim';
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { NeedState } from '../../donnees/schemas/besoins';
 import type { NeedId } from '../../donnees/schemas/communs';
+import { initialBrickStates } from '../../etat/briques';
 import type { PlayerState } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../../etat/monde';
@@ -21,17 +22,31 @@ export function tierOf(content: Content, need: NeedId, value: number): NeedState
   return state;
 }
 
-export function createPlaceState(place: PlaceContent): PlaceState {
-  const state: PlaceState = { leftOn: null, objects: {}, ground: [], nextGroundId: 0, villagers: {} };
+export function createPlaceState(content: Content, place: PlaceContent): PlaceState {
+  const state: PlaceState = {
+    leftOn: null,
+    placed: [],
+    nextPlacedId: 0,
+    objects: {},
+    ground: [],
+    nextGroundId: 0,
+    villagers: {},
+  };
   for (const object of place.map.objects) {
-    const stock = object.use?.stock ?? null;
-    if (stock !== null) state.objects[object.id] = { left: stock.count, refillAt: null };
+    const prop = content.props[object.type];
+    if (prop === undefined) throw new Error(`objet ${object.id}: meuble ${object.type} inconnu`);
+    state.objects[object.id] = initialBrickStates(prop.bricks);
   }
   for (const villager of place.villagers) {
     const at = place.map.points[villager.stands];
-    if (at === undefined) throw new Error(`habitant ${villager.id}: point ${villager.stands} absent`);
+    if (at === undefined)
+      throw new Error(`habitant ${villager.id}: point ${villager.stands} absent`);
     // Face au sud, vers qui arrive.
-    state.villagers[villager.id] = { met: [false, false], talkingWith: null, body: { x: at.x, y: at.y, facing: Math.PI / 2, speed: 0 } };
+    state.villagers[villager.id] = {
+      met: [false, false],
+      talkingWith: null,
+      body: { x: at.x, y: at.y, facing: Math.PI / 2, speed: 0 },
+    };
   }
   return state;
 }
@@ -49,7 +64,11 @@ function createPlayer(content: Content, member: Member, x: number, y: number): P
     toolbar: Array.from({ length: content.bags.toolbarSlots }, () => null),
     bag: null,
     selected: null,
-    tiers: { hunger: tierOf(content, 'hunger', start), sleep: tierOf(content, 'sleep', start), hygiene: tierOf(content, 'hygiene', start) },
+    tiers: {
+      hunger: tierOf(content, 'hunger', start),
+      sleep: tierOf(content, 'sleep', start),
+      hygiene: tierOf(content, 'hygiene', start),
+    },
     gesture: null,
     talk: null,
     aim: null,
@@ -59,12 +78,17 @@ function createPlayer(content: Content, member: Member, x: number, y: number): P
 }
 
 /** Partie neuve: les deux joueurs descendent du train au lieu de départ. `members[0]` devient le joueur 0. */
-export function createWorld(content: Content, seed: number, members: readonly [Member, Member]): WorldState {
+export function createWorld(
+  content: Content,
+  seed: number,
+  members: readonly [Member, Member],
+): WorldState {
   const { start } = content.settings;
   const place = content.places[start.place];
   if (place === undefined) throw new Error(`lieu de départ inconnu: ${start.place}`);
   const arrival = place.map.points[place.def.station.arrival];
-  if (arrival === undefined) throw new Error(`point d'arrivée absent: ${place.def.station.arrival}`);
+  if (arrival === undefined)
+    throw new Error(`point d'arrivée absent: ${place.def.station.arrival}`);
   const rng = createRandom(seed).getState();
   return {
     schema: DATA_SCHEMA,
@@ -78,6 +102,6 @@ export function createWorld(content: Content, seed: number, members: readonly [M
       createPlayer(content, members[1], arrival.x + ARRIVAL_SPREAD, arrival.y),
     ],
     progress: { memory: {}, bonds: {}, quests: {}, collections: {}, opened: [start.place] },
-    places: { [start.place]: createPlaceState(place) },
+    places: { [start.place]: createPlaceState(content, place) },
   };
 }

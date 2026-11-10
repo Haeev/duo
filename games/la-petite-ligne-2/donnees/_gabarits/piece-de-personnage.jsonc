@@ -1,0 +1,23 @@
+// GABARIT: une pièce de personnage (vêtement, coiffure, tête, chapeau, lunettes, accessoire).
+// Une pièce est une entrée de "pieces" dans donnees/commun/personnages/catalogue.json, avec son
+// maillage dans un GLB: le générateur de pièces (lot L5) écrit les deux. Ce gabarit dit les champs.
+// À la main (essai): pnpm nouveau piece-de-personnage <id>   -> ajoute l'entrée au catalogue
+// Schéma: src/donnees/schemas/personnage.ts
+{
+  "id": "exemple-piece",
+  // Emplacement: body, head, hair, top, bottom, dress, shoes, hat, glasses, accessory.
+  "slot": "top",
+  // Fichier GLB de l'emplacement (assets/commun/personnages/) et nœud de la pièce dans ce fichier.
+  "file": "top.glb",
+  "node": "haut_pull_exemple",
+  // Régions du corps cachées sous la pièce (liste: "regions" de morphologies.json).
+  "covers": ["torso", "upper-arm-a"],
+  // Pour une coiffe seulement: effet sur les cheveux (free, flat, hidden). Sinon: null.
+  "hair": null,
+  // Zones teintables (3 au plus) et couleurs permises, en #rrggbb du nuancier.
+  "zones": [{ "id": "tissu", "colors": ["#5b6f8a", "#b6553c", "#e9c38a"] }],
+  // Étiquettes: elles servent à composer un habitant (lieu, saison, métier).
+  "tags": ["campagne"],
+  // Triangles du maillage (budget: 6 000 pour un personnage entier).
+  "triangles": 900,
+}

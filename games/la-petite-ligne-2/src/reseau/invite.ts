@@ -11,7 +11,15 @@ import type { PlaceSlow, PlaceState } from '../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../etat/monde';
 import type { Intent, StepInput } from '../simulation/noyau/entrees';
 import type { GameEvent } from '../simulation/noyau/evenements';
-import { CHANNEL, EventsSchema, FastSchema, GuestInputSchema, SLICE_SCHEMAS, type FastMessage, type SliceMessage } from './canaux';
+import {
+  CHANNEL,
+  EventsSchema,
+  FastSchema,
+  GuestInputSchema,
+  SLICE_SCHEMAS,
+  type FastMessage,
+  type SliceMessage,
+} from './canaux';
 
 export interface Guest {
   /** Toutes les tranches et un instantané rapide sont arrivés au moins une fois. */
@@ -34,12 +42,19 @@ function placeFrom(content: Content, id: string, slow: PlaceSlow, fast: FastMess
     const known = slow.villagers[def.id];
     const mover = fast.villagers[index];
     if (known === undefined || mover === undefined) return;
-    villagers[def.id] = { ...known, body: { x: mover[0], y: mover[1], facing: mover[2], speed: mover[3] } };
+    villagers[def.id] = {
+      ...known,
+      body: { x: mover[0], y: mover[1], facing: mover[2], speed: mover[3] },
+    };
   });
-  return { leftOn: slow.leftOn, objects: slow.objects, ground: slow.ground, nextGroundId: slow.nextGroundId, villagers };
+  return { ...slow, villagers };
 }
 
-function playerFrom(slow: PlayerSlow, fast: FastMessage, index: PlayerIndex): WorldState['players'][number] {
+function playerFrom(
+  slow: PlayerSlow,
+  fast: FastMessage,
+  index: PlayerIndex,
+): WorldState['players'][number] {
   const mover = fast.players[index];
   const gauges = fast.needs[index];
   return {
@@ -63,22 +78,30 @@ export function createGuest(content: Content, net: Net, member: string): Guest {
   let stale = true;
 
   const subscriptions = [
-    net.channel(CHANNEL.common, { mode: 'latest', schema: SLICE_SCHEMAS.common }).onMessage((message) => {
-      common = message;
-      stale = true;
-    }),
-    net.channel(CHANNEL.players, { mode: 'latest', schema: SLICE_SCHEMAS.players }).onMessage((message) => {
-      players = message;
-      stale = true;
-    }),
-    net.channel(CHANNEL.progress, { mode: 'latest', schema: SLICE_SCHEMAS.progress }).onMessage((message) => {
-      progress = message;
-      stale = true;
-    }),
-    net.channel(CHANNEL.place, { mode: 'latest', schema: SLICE_SCHEMAS.place }).onMessage((message) => {
-      place = message;
-      stale = true;
-    }),
+    net
+      .channel(CHANNEL.common, { mode: 'latest', schema: SLICE_SCHEMAS.common })
+      .onMessage((message) => {
+        common = message;
+        stale = true;
+      }),
+    net
+      .channel(CHANNEL.players, { mode: 'latest', schema: SLICE_SCHEMAS.players })
+      .onMessage((message) => {
+        players = message;
+        stale = true;
+      }),
+    net
+      .channel(CHANNEL.progress, { mode: 'latest', schema: SLICE_SCHEMAS.progress })
+      .onMessage((message) => {
+        progress = message;
+        stale = true;
+      }),
+    net
+      .channel(CHANNEL.place, { mode: 'latest', schema: SLICE_SCHEMAS.place })
+      .onMessage((message) => {
+        place = message;
+        stale = true;
+      }),
     net.channel(CHANNEL.fast, { mode: 'latest', schema: FastSchema }).onMessage((message) => {
       fast = message;
       stale = true;
@@ -89,7 +112,8 @@ export function createGuest(content: Content, net: Net, member: string): Guest {
   ];
 
   function assemble(): WorldState | null {
-    if (common === null || players === null || progress === null || place === null || fast === null) return null;
+    if (common === null || players === null || progress === null || place === null || fast === null)
+      return null;
     // Pendant un voyage, la tranche du lieu d'arrivée peut suivre de peu celle de « commun ».
     if (place.id !== common.common.place) return assembled;
     return {

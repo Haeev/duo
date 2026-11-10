@@ -1,0 +1,17 @@
+// GABARIT: la carte d'un lieu, en cases de 1 m (x vers l'est, y vers le sud), 128 x 128 au plus.
+// Schéma: src/donnees/schemas/lieu.ts
+{
+  "schema": 1,
+  "width": 24,
+  "height": 24,
+  // Zones où l'on ne marche pas (murs, eau, voie).
+  "blocked": [{ "x": 0, "y": 0, "w": 24, "h": 2 }],
+  // Points nommés: la gare, les postes des habitants, les repères de quête.
+  "points": {
+    "descente": { "x": 12, "y": 5 },
+    "quai": { "x": 12, "y": 4 },
+  },
+  // Meubles et éléments du décor posés ici: "type" = un fichier de commun/meubles/.
+  // "rotation": quarts de tour (0 façade au sud, 1 à l'est, 2 au nord, 3 à l'ouest).
+  "objects": [{ "id": "banc-du-quai", "type": "banc", "x": 12, "y": 8.5, "rotation": 0 }],
+}

@@ -1,0 +1,18 @@
+// GABARIT: un habitant écrit d'un lieu.
+// Créer: pnpm nouveau habitant <id> <lieu>   -> donnees/lieux/<lieu>/habitants/<id>.json
+// Schéma: src/donnees/schemas/habitant.ts
+{
+  "schema": 1,
+  "id": "exemple-habitant",
+  "name": "Habitant d'exemple",
+  // Caractère: grumpy, dreamy, chatty, shy, cheerful. Il choisit sa remarque d'hygiène et son ton.
+  "temper": "cheerful",
+  // Apparence composée depuis le catalogue de pièces:
+  //   { "shape": "adult-medium", "skin": 0, "pieces": [{ "slot": "top", "id": "<pièce>", "colors": [0] }] }
+  // null tant que les pièces ne sont pas livrées: le rendu montre un mannequin.
+  "look": null,
+  // Point de la carte du lieu où il se tient.
+  "stands": "guichet",
+  // Timbre du babil: low, medium, high (ou un timbre du sound designer).
+  "voice": "medium",
+}

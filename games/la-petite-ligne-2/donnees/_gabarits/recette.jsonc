@@ -1,0 +1,17 @@
+// GABARIT: une recette de cuisine ou un plan d'établi.
+// Créer: pnpm nouveau recette <id>        -> donnees/commun/recettes/<id>.json
+// Schéma: src/donnees/schemas/recette.ts
+{
+  "schema": 1,
+  "id": "exemple-recette",
+  "name": "Compote d'exemple",
+  // Poste: stove (réchaud, recettes simples), kitchen (vraie cuisine, mini-jeu), workbench (établi).
+  "station": "stove",
+  // Ingrédients (6 lignes au plus) et résultat: des objets de commun/objets/.
+  "inputs": [{ "item": "pomme", "count": 3 }],
+  "output": { "item": "pain", "count": 1 },
+  // Durée de la préparation, en secondes.
+  "seconds": 6,
+  // "start": connue dès le début; "learned": apprise d'un habitant, d'une quête ou d'un essai.
+  "known": "learned",
+}

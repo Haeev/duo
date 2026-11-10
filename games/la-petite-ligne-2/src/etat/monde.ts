@@ -33,8 +33,8 @@ export const SLICES = ['common', 'players', 'progress', 'place'] as const;
 export type Slice = (typeof SLICES)[number];
 
 /** Lecture seule en profondeur: ce que le rendu, l'interface et le son reçoivent. */
-export type DeepReadonly<T> = T extends (infer U)[]
-  ? readonly DeepReadonly<U>[]
+export type DeepReadonly<T> = T extends readonly unknown[]
+  ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
   : T extends object
     ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
     : T;

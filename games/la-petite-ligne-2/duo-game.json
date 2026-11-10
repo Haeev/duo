@@ -23,7 +23,13 @@
     { "id": "act", "label": "Agir", "keys": ["Space"] },
     { "id": "camera-left", "label": "Tourner la caméra à gauche", "keys": ["KeyQ"] },
     { "id": "camera-right", "label": "Tourner la caméra à droite", "keys": ["KeyE"] },
-    { "id": "camera-drag", "label": "Tourner la caméra (glisser)", "keys": [], "mouse": ["right"], "rebindable": false },
+    {
+      "id": "camera-drag",
+      "label": "Tourner la caméra (glisser)",
+      "keys": [],
+      "mouse": ["right"],
+      "rebindable": false
+    },
     { "id": "zoom-in", "label": "Rapprocher la caméra", "keys": [], "mouse": ["wheel-up"] },
     { "id": "zoom-out", "label": "Éloigner la caméra", "keys": [], "mouse": ["wheel-down"] },
     { "id": "slot-next", "label": "Emplacement suivant de la barre", "keys": ["Tab"] },
@@ -34,18 +40,24 @@
     { "id": "slot-5", "label": "Emplacement 5 de la barre", "keys": ["Digit5"] },
     { "id": "stow", "label": "Ranger l'outil", "keys": ["KeyX"] },
     { "id": "notebook", "label": "Carnet", "keys": ["KeyC"] },
-    { "id": "glance", "label": "Coup d'œil (quête, besoins, autre joueur)", "keys": ["KeyG"] },
+    { "id": "glance", "label": "Coup d'œil (quête, besoins, partenaire)", "keys": ["KeyG"] },
     { "id": "deco", "label": "Mode déco", "keys": ["KeyB"] },
     { "id": "back", "label": "Fermer un menu", "keys": ["Backspace"] },
     { "id": "confirm", "label": "Valider", "keys": ["Enter"] },
-    { "id": "click", "label": "Choisir (menus, mode déco)", "keys": [], "mouse": ["left"], "rebindable": false }
+    {
+      "id": "click",
+      "label": "Choisir (menus, mode déco)",
+      "keys": [],
+      "mouse": ["left"],
+      "rebindable": false
+    }
   ],
   "saves": {
     "slots": 1,
     "maxBytes": 1048576,
     "moments": ["auto", "exit", "manual"],
     "autosaveSeconds": 300,
-    "help": "Le jeu enregistre à l'aube de chaque journée, toutes les 5 minutes et en quittant. Pendant la refonte, une partie d'essai peut repartir de zéro à chaque étape."
+    "help": "Le jeu enregistre à l'aube, toutes les 5 minutes et en quittant. Une partie d'essai peut repartir de zéro."
   },
   "credits": null
 }

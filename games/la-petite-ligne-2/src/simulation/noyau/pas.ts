@@ -48,7 +48,11 @@ function advanceClock(sim: Sim, dt: number): void {
   }
 }
 
-export function step(sim: Sim, inputs: readonly [StepInput, StepInput], intents: readonly AuthoredIntent[]): void {
+export function step(
+  sim: Sim,
+  inputs: readonly [StepInput, StepInput],
+  intents: readonly AuthoredIntent[],
+): void {
   const { world } = sim;
   world.tick += 1;
   sim.events.length = 0;
@@ -65,7 +69,8 @@ export function step(sim: Sim, inputs: readonly [StepInput, StepInput], intents:
       sim.revisions[slice] += 1;
     },
   };
-  for (const { player, intent } of intents) for (const system of SYSTEMS) system.intent?.(context, player, intent);
+  for (const { player, intent } of intents)
+    for (const system of SYSTEMS) system.intent?.(context, player, intent);
   advanceClock(sim, SIM_DT);
   for (const system of SYSTEMS) system.step?.(context);
   const state = sim.random.getState();

@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:longues": "vitest run --config vitest.longues.config.ts"
+    "test:longues": "vitest run --config vitest.longues.config.ts",
+    "nouveau": "node outils/nouveau.ts"
   },
   "dependencies": {
     "@duo/sdk": "workspace:*",

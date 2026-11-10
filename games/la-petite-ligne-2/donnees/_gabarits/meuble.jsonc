@@ -1,0 +1,33 @@
+// GABARIT: un meuble ou un élément interactif du décor (chaise, coffre, pompe, arbre fruitier).
+// Créer: pnpm nouveau meuble <id>         -> donnees/commun/meubles/<id>.json
+// Schéma: src/donnees/schemas/meuble.ts; briques: src/donnees/schemas/briques.ts
+// Ce que fait le meuble tient dans ses briques: aucun code à écrire.
+{
+  "schema": 1,
+  "id": "exemple-meuble",
+  "name": "Chaise d'exemple",
+  // Nœud du modèle 3D. Tant que le modèle n'est pas livré, le rendu montre une forme simple.
+  "model": "chaise",
+  // Emprise au sol en cases de 1 m, façade au sud.
+  "size": { "w": 1, "h": 1 },
+  // true: on ne traverse pas son emprise.
+  "solid": true,
+  // true: les joueurs peuvent le poser chez eux (mode déco).
+  "placeable": true,
+  // Série de meubles assortis ("cuisine-de-campagne", "gare"), ou null.
+  "series": null,
+  // Briques, dans l'ordre de priorité de la touche d'action (une de chaque sorte au plus):
+  //   { "brick": "sit", "seats": 1, "restPerMinute": 6 }                       s'asseoir
+  //   { "brick": "sleep", "places": 2, "wakeAt": 100 }                         dormir
+  //   { "brick": "store", "slots": 20 }                                        ranger
+  //   { "brick": "gather", "verb": "Cueillir", "clip": "reach-up", "seconds": 0.5,
+  //     "gives": { "item": "pomme", "count": 1 },
+  //     "stock": { "count": 3, "refillMinutes": 240 }, "tool": null }          ramasser, cueillir
+  //   { "brick": "relieve", "verb": "Se laver", "clip": "wash", "seconds": 4,
+  //     "need": "hygiene", "amount": 40, "cap": 60 }                           soulager un besoin
+  //   { "brick": "shop", "shop": "<commerce du lieu>" }                        vendre et acheter
+  //   { "brick": "cook", "station": "stove" }                                  cuisiner, fabriquer
+  //   { "brick": "open", "startsOpen": false }                                 ouvrir
+  //   { "brick": "repair", "tools": ["axe", "spade"], "seconds": 1.5 }         réparer
+  "bricks": [{ "brick": "sit", "seats": 1, "restPerMinute": 6 }],
+}

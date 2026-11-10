@@ -2,28 +2,31 @@
   "schema": 1,
   "width": 32,
   "height": 32,
-  "blocked": [{ "x": 0, "y": 0, "w": 32, "h": 2 }],
+  "blocked": [
+    {
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 2
+    }
+  ],
   "points": {
-    "descente": { "x": 16, "y": 5 },
-    "quai": { "x": 16, "y": 4 }
+    "descente": {
+      "x": 16,
+      "y": 5
+    },
+    "quai": {
+      "x": 16,
+      "y": 4
+    }
   },
   "objects": [
     {
       "id": "banc",
-      "model": "banc",
+      "type": "banc",
       "x": 16,
       "y": 12.5,
-      "rotation": 0,
-      "blocks": { "x": 15, "y": 12, "w": 2, "h": 1 },
-      "use": {
-        "verb": "Faire la sieste",
-        "clip": "sit",
-        "seconds": 10,
-        "long": true,
-        "when": [],
-        "effects": [{ "type": "change_need", "need": "sleep", "amount": 1, "cap": 100 }],
-        "stock": null
-      }
+      "rotation": 0
     }
   ]
 }

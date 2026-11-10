@@ -1,0 +1,20 @@
+// GABARIT: un objet (tout ce qui tient dans une case du sac).
+// Créer: pnpm nouveau objet <id>          -> donnees/commun/objets/<id>.json
+// Schéma: src/donnees/schemas/objets.ts
+{
+  "schema": 1,
+  // Identifiant = nom du fichier: minuscules, chiffres, traits d'union.
+  "id": "exemple-objet",
+  // Nom affiché, 40 caractères au plus.
+  "name": "Objet d'exemple",
+  // Famille: food, material, crop, catch, treasure, seed, supply, tool, furniture, clothing.
+  // Les commerçants rachètent par famille.
+  "family": "food",
+  // Pile maximale dans une case (cahier 4.5: poisson 3, bûche 5, planche 10, outil 1).
+  "stack": 5,
+  // Se mange: points de faim rendus. Sinon: null.
+  "food": { "hunger": 10 },
+  // Outil: { "kind": "axe", "durability": 0, "gestureSeconds": 1, "bluntGestureSeconds": 1 }
+  // (durability 0 = outil de base, inusable), avec "family": "tool" et "stack": 1. Sinon: null.
+  "tool": null,
+}

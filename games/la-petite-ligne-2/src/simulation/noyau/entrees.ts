@@ -2,6 +2,7 @@
 import * as v from 'valibot';
 import { FiniteSchema, IntSchema } from '../../donnees/schemas/communs';
 import { NEEDS_INTENTS } from '../besoins/intentions';
+import { BRICK_INTENTS } from '../briques/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { BAG_INTENTS } from '../sac/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
@@ -29,5 +30,12 @@ export function idleInput(seq: number): StepInput {
   return { seq, moveX: 0, moveY: 0, run: false, act: false };
 }
 
-export const IntentSchema = v.variant('type', [...CORE_INTENTS, ...TRAVEL_INTENTS, ...NEEDS_INTENTS, ...BAG_INTENTS, ...DIALOGUE_INTENTS]);
+export const IntentSchema = v.variant('type', [
+  ...CORE_INTENTS,
+  ...BRICK_INTENTS,
+  ...TRAVEL_INTENTS,
+  ...NEEDS_INTENTS,
+  ...BAG_INTENTS,
+  ...DIALOGUE_INTENTS,
+]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

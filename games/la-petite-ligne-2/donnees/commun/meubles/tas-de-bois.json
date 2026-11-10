@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "tas-de-bois",
+  "name": "Tas de bois",
+  "model": "tas-de-buches",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "gather",
+      "verb": "Prendre",
+      "clip": "pickup",
+      "seconds": 0.5,
+      "gives": {
+        "item": "buche",
+        "count": 1
+      },
+      "stock": {
+        "count": 8,
+        "refillMinutes": 720
+      },
+      "tool": null
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "pommier",
+  "name": "Pommier",
+  "model": "arbre-fruitier",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "gather",
+      "verb": "Cueillir",
+      "clip": "reach-up",
+      "seconds": 0.5,
+      "gives": {
+        "item": "pomme",
+        "count": 1
+      },
+      "stock": {
+        "count": 3,
+        "refillMinutes": 240
+      },
+      "tool": null
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "buche",
+  "name": "Bûche",
+  "family": "material",
+  "stack": 5,
+  "food": null,
+  "tool": null
+}

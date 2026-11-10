@@ -18,7 +18,11 @@ function clockText(minutes: number): string {
   return `${hours} h ${String(Math.floor(minutes % 60)).padStart(2, '0')}`;
 }
 
-export function drawBaseScreen(canvas: HTMLCanvasElement, view: GameView, colors: readonly [string, string]): void {
+export function drawBaseScreen(
+  canvas: HTMLCanvasElement,
+  view: GameView,
+  colors: readonly [string, string],
+): void {
   const context = canvas.getContext('2d');
   if (context === null) return;
   const ratio = window.devicePixelRatio;
@@ -35,7 +39,11 @@ export function drawBaseScreen(canvas: HTMLCanvasElement, view: GameView, colors
   context.textBaseline = 'top';
   const world = view.world();
   if (world === null) {
-    context.fillText('La Petite Ligne (refonte): en attente de l’état de l’hôte', 16 * ratio, 16 * ratio);
+    context.fillText(
+      'La Petite Ligne (refonte): en attente de l’état de l’hôte',
+      16 * ratio,
+      16 * ratio,
+    );
     return;
   }
   const place = view.content.places[world.common.place];
@@ -48,22 +56,33 @@ export function drawBaseScreen(canvas: HTMLCanvasElement, view: GameView, colors
     16 * ratio,
   );
   const margin = MARGIN * ratio;
-  const scale = Math.min((width - margin * 2) / place.map.width, (height - margin * 2) / place.map.height);
+  const scale = Math.min(
+    (width - margin * 2) / place.map.width,
+    (height - margin * 2) / place.map.height,
+  );
   const left = (width - place.map.width * scale) / 2;
   const top = (height - place.map.height * scale) / 2 + margin / 4;
   context.fillStyle = GROUND;
   context.fillRect(left, top, place.map.width * scale, place.map.height * scale);
   context.fillStyle = BLOCKED;
-  for (const r of place.map.blocked) context.fillRect(left + r.x * scale, top + r.y * scale, r.w * scale, r.h * scale);
+  for (const r of place.map.blocked)
+    context.fillRect(left + r.x * scale, top + r.y * scale, r.w * scale, r.h * scale);
   context.fillStyle = OBJECT;
-  for (const object of place.map.objects) context.fillRect(left + (object.x - 0.4) * scale, top + (object.y - 0.4) * scale, 0.8 * scale, 0.8 * scale);
+  for (const object of place.map.objects)
+    context.fillRect(
+      left + (object.x - 0.4) * scale,
+      top + (object.y - 0.4) * scale,
+      0.8 * scale,
+      0.8 * scale,
+    );
   const dot = (x: number, y: number, color: string, radius: number): void => {
     context.fillStyle = color;
     context.beginPath();
     context.arc(left + x * scale, top + y * scale, radius * scale, 0, Math.PI * 2);
     context.fill();
   };
-  for (const villager of Object.values(state.villagers)) dot(villager.body.x, villager.body.y, VILLAGER, 0.35);
+  for (const villager of Object.values(state.villagers))
+    dot(villager.body.x, villager.body.y, VILLAGER, 0.35);
   world.players.forEach((player, index) => {
     dot(player.body.x, player.body.y, colors[index] ?? TEXT, 0.45);
   });

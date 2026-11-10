@@ -3,7 +3,15 @@
  * ils changent, au pas même; `body` et `needs` bougent à chaque pas et partent sur le canal rapide.
  */
 import * as v from 'valibot';
-import { CountSchema, FiniteSchema, GaugeSchema, IdSchema, IntSchema, LabelSchema, TickSchema } from '../donnees/schemas/communs';
+import {
+  CountSchema,
+  FiniteSchema,
+  GaugeSchema,
+  IdSchema,
+  IntSchema,
+  LabelSchema,
+  TickSchema,
+} from '../donnees/schemas/communs';
 import { NeedStateSchema } from '../donnees/schemas/besoins';
 import { LookSchema } from '../donnees/schemas/personnage';
 
@@ -27,7 +35,11 @@ export const BodySchema = v.strictObject({
 });
 export type Body = v.InferOutput<typeof BodySchema>;
 
-export const NeedsSchema = v.strictObject({ hunger: GaugeSchema, sleep: GaugeSchema, hygiene: GaugeSchema });
+export const NeedsSchema = v.strictObject({
+  hunger: GaugeSchema,
+  sleep: GaugeSchema,
+  hygiene: GaugeSchema,
+});
 export type Needs = v.InferOutput<typeof NeedsSchema>;
 
 /** Geste en cours: l'animation, ce qu'il vise et le pas où il finit. */
@@ -62,7 +74,11 @@ const slow = {
   /** Case de la barre en main, `null`: mains libres. */
   selected: v.nullable(v.pipe(IntSchema, v.minValue(0), v.maxValue(9))),
   /** Palier de chaque besoin: l'interface ne montre une jauge que quand il change. */
-  tiers: v.strictObject({ hunger: NeedStateSchema, sleep: NeedStateSchema, hygiene: NeedStateSchema }),
+  tiers: v.strictObject({
+    hunger: NeedStateSchema,
+    sleep: NeedStateSchema,
+    hygiene: NeedStateSchema,
+  }),
   gesture: v.nullable(GestureSchema),
   talk: v.nullable(TalkSchema),
   /** Ce que vise la touche d'action (objet de la carte ou habitant), calculé par la simulation. */

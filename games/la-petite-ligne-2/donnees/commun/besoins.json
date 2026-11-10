@@ -11,7 +11,12 @@
       "effortFactor": 1.5,
       "tiers": [
         { "from": 0, "state": "blocked", "modifiers": { "speed": 0.5 }, "onlyRelief": true },
-        { "from": 1, "state": "low", "modifiers": { "speed": 0.8, "toolSpeed": 0.75 }, "onlyRelief": false },
+        {
+          "from": 1,
+          "state": "low",
+          "modifiers": { "speed": 0.8, "toolSpeed": 0.75 },
+          "onlyRelief": false
+        },
         { "from": 21, "state": "neutral", "modifiers": {}, "onlyRelief": false },
         { "from": 51, "state": "bonus", "modifiers": { "toolSpeed": 1.15 }, "onlyRelief": false }
       ]
@@ -22,9 +27,19 @@
       "effortFactor": 1,
       "tiers": [
         { "from": 0, "state": "blocked", "modifiers": { "speed": 0.5 }, "onlyRelief": true },
-        { "from": 1, "state": "low", "modifiers": { "speed": 0.8, "minigame": 0.8 }, "onlyRelief": false },
+        {
+          "from": 1,
+          "state": "low",
+          "modifiers": { "speed": 0.8, "minigame": 0.8 },
+          "onlyRelief": false
+        },
         { "from": 21, "state": "neutral", "modifiers": {}, "onlyRelief": false },
-        { "from": 51, "state": "bonus", "modifiers": { "speed": 1.1, "minigame": 1.15 }, "onlyRelief": false }
+        {
+          "from": 51,
+          "state": "bonus",
+          "modifiers": { "speed": 1.1, "minigame": 1.15 },
+          "onlyRelief": false
+        }
       ]
     },
     {

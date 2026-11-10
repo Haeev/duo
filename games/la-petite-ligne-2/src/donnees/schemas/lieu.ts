@@ -1,12 +1,20 @@
 /**
- * Un lieu: `donnees/lieux/<id>/lieu.json` et `carte.json`. La carte du jalon 1 est une grille
+ * Un lieu est un dossier autonome: `donnees/lieux/<id>/` avec `lieu.json`, `carte.json`, et les
+ * dossiers `habitants/`, `dialogues/`, `commerces/`, `quetes/`. La carte du jalon 1 est une grille
  * de 1 m par case (convention de l'ancien jeu: x vers l'est, y vers le sud, rotation en quarts
  * de tour, 0 façade au sud). Le format complet des cartes d'Aubrune (terrain, pièces, intérieurs)
  * sera repris de l'ancien `GameMap` par les lots L2 et L8.
  */
 import * as v from 'valibot';
-import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema, LabelSchema, PointSchema, RectSchema } from './communs';
-import { ConditionSchema, EffectSchema } from './regles';
+import {
+  FileVersionSchema,
+  FiniteSchema,
+  IdSchema,
+  IntSchema,
+  LabelSchema,
+  PointSchema,
+  RectSchema,
+} from './communs';
 
 export const PlaceSchema = v.strictObject({
   schema: FileVersionSchema,
@@ -24,38 +32,24 @@ export const PlaceSchema = v.strictObject({
   links: v.array(IdSchema),
   /** Activités offertes ici (réponse 28: selon le lieu). */
   activities: v.array(IdSchema),
+  /** Musiques du lieu, de jour et de nuit (`assets/lieux/<id>/son/`), `null` tant qu'elles ne sont pas livrées. */
+  music: v.nullable(v.strictObject({ day: IdSchema, night: IdSchema })),
 });
 export type PlaceDef = v.InferOutput<typeof PlaceSchema>;
 
 /**
- * Ce que fait la touche d'action sur un objet de la carte. Règle de ressenti: toute interaction
- * est attachée à un objet visible, avec un verbe; il n'existe pas de zone d'action sans objet.
+ * Un meuble ou un élément du décor posé sur la carte par le level designer. Ce qu'il fait vient
+ * de son type (`commun/meubles/<type>.json` et ses briques). Règle de ressenti: il n'existe pas
+ * de zone d'action sans objet visible.
  */
-export const UseSchema = v.strictObject({
-  /** Verbe de la bulle (« Ramasser », « Se laver »), 2 mots au plus. */
-  verb: v.pipe(v.string(), v.minLength(2), v.maxLength(20)),
-  /** Clip d'animation du personnage et durée du geste (s). */
-  clip: IdSchema,
-  seconds: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(10)),
-  /** Geste long déclaré (toilette, repas): interruptible, hors de la règle des 1,5 s. */
-  long: v.boolean(),
-  when: v.array(ConditionSchema),
-  effects: v.pipe(v.array(EffectSchema), v.minLength(1)),
-  /** Usages avant épuisement (`null`: sans limite) et retour, en minutes de jeu. */
-  stock: v.nullable(v.strictObject({ count: v.pipe(IntSchema, v.minValue(1)), refillMinutes: v.pipe(IntSchema, v.minValue(1)) })),
-});
-export type UseDef = v.InferOutput<typeof UseSchema>;
-
 export const MapObjectSchema = v.strictObject({
   id: IdSchema,
-  /** Nom du modèle (formes simples au jalon 1). */
-  model: IdSchema,
+  type: IdSchema,
+  /** Centre de l'emprise (m). */
   x: FiniteSchema,
   y: FiniteSchema,
+  /** Quarts de tour: 0 façade au sud, 1 à l'est, 2 au nord, 3 à l'ouest. */
   rotation: v.picklist([0, 1, 2, 3]),
-  /** Emprise qui bloque le passage, en cases, ou `null`. */
-  blocks: v.nullable(RectSchema),
-  use: v.nullable(UseSchema),
 });
 export type MapObject = v.InferOutput<typeof MapObjectSchema>;
 

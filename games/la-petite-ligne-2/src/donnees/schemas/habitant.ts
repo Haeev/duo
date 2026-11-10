@@ -1,9 +1,10 @@
-/** `donnees/lieux/<lieu>/habitants.json`: les habitants écrits d'un lieu. */
+/** `donnees/lieux/<lieu>/habitants/<id>.json`: un habitant écrit d'un lieu. Un fichier par habitant. */
 import * as v from 'valibot';
 import { FileVersionSchema, IdSchema, LabelSchema } from './communs';
 import { LookSchema } from './personnage';
 
 export const VillagerSchema = v.strictObject({
+  schema: FileVersionSchema,
   id: IdSchema,
   name: LabelSchema,
   /** Caractère: il choisit sa remarque d'hygiène et sa façon de parler (réponse 44). */
@@ -16,8 +17,3 @@ export const VillagerSchema = v.strictObject({
   voice: IdSchema,
 });
 export type VillagerDef = v.InferOutput<typeof VillagerSchema>;
-
-export const VillagersFileSchema = v.strictObject({
-  schema: FileVersionSchema,
-  villagers: v.array(VillagerSchema),
-});

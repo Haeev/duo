@@ -61,7 +61,11 @@ export function createSession(options: SessionOptions): Session {
     if (loaded !== null) {
       const restored = restoreWorld(content, loaded, members);
       if (restored.ok) world = restored.world;
-      else duo.log.warn('sauvegarde non reprise, partie neuve', { reason: restored.reason, dataSchema: loaded.dataSchema });
+      else
+        duo.log.warn('sauvegarde non reprise, partie neuve', {
+          reason: restored.reason,
+          dataSchema: loaded.dataSchema,
+        });
     }
     const hostSim = createSim(content, world ?? createWorld(content, duo.seed, members));
     sim = hostSim;

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "planche",
+  "name": "Planche",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

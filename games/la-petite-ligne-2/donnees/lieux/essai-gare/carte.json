@@ -3,67 +3,62 @@
   "width": 40,
   "height": 40,
   "blocked": [
-    { "x": 0, "y": 0, "w": 40, "h": 2 },
-    { "x": 14, "y": 8, "w": 12, "h": 5 }
+    {
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 2
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "w": 12,
+      "h": 5
+    }
   ],
   "points": {
-    "descente": { "x": 20, "y": 5 },
-    "quai": { "x": 20, "y": 4 },
-    "guichet": { "x": 20, "y": 15 },
-    "depart-joueur-1": { "x": 18.5, "y": 20 },
-    "depart-joueur-2": { "x": 21.5, "y": 20 }
+    "descente": {
+      "x": 20,
+      "y": 5
+    },
+    "quai": {
+      "x": 20,
+      "y": 4
+    },
+    "guichet": {
+      "x": 20,
+      "y": 15
+    },
+    "depart-joueur-1": {
+      "x": 18.5,
+      "y": 20
+    },
+    "depart-joueur-2": {
+      "x": 21.5,
+      "y": 20
+    }
   },
   "objects": [
     {
       "id": "pommier",
-      "model": "arbre-fruitier",
+      "type": "pommier",
       "x": 10.5,
       "y": 22.5,
-      "rotation": 0,
-      "blocks": { "x": 10, "y": 22, "w": 1, "h": 1 },
-      "use": {
-        "verb": "Cueillir",
-        "clip": "reach-up",
-        "seconds": 0.5,
-        "long": false,
-        "when": [],
-        "effects": [{ "type": "give_item", "item": "pomme", "count": 1 }],
-        "stock": { "count": 3, "refillMinutes": 240 }
-      }
+      "rotation": 0
     },
     {
       "id": "pompe",
-      "model": "pompe-a-eau",
+      "type": "pompe",
       "x": 28.5,
       "y": 22.5,
-      "rotation": 0,
-      "blocks": { "x": 28, "y": 22, "w": 1, "h": 1 },
-      "use": {
-        "verb": "Se débarbouiller",
-        "clip": "wash",
-        "seconds": 4,
-        "long": true,
-        "when": [],
-        "effects": [{ "type": "change_need", "need": "hygiene", "amount": 40, "cap": 60 }],
-        "stock": null
-      }
+      "rotation": 0
     },
     {
       "id": "tas-de-bois",
-      "model": "tas-de-buches",
+      "type": "tas-de-bois",
       "x": 12.5,
       "y": 30.5,
-      "rotation": 1,
-      "blocks": { "x": 12, "y": 30, "w": 1, "h": 1 },
-      "use": {
-        "verb": "Prendre",
-        "clip": "pickup",
-        "seconds": 0.5,
-        "long": false,
-        "when": [],
-        "effects": [{ "type": "give_item", "item": "buche", "count": 1 }],
-        "stock": { "count": 8, "refillMinutes": 720 }
-      }
+      "rotation": 1
     }
   ]
 }

@@ -1,6 +1,0 @@
-{
-  "schema": 1,
-  "villagers": [
-    { "id": "cheffe-de-gare", "name": "La cheffe de gare", "temper": "chatty", "look": null, "stands": "guichet", "voice": "medium" }
-  ]
-}

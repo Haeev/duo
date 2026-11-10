@@ -1,0 +1,22 @@
+// GABARIT: un lieu. Un lieu est un dossier autonome: lieu.json, carte.json, puis habitants/,
+// dialogues/, commerces/, quetes/ (un fichier par contenu, voir les autres gabarits).
+// Créer: pnpm nouveau lieu <id>           -> donnees/lieux/<id>/lieu.json et carte.json
+// Schéma: src/donnees/schemas/lieu.ts
+{
+  "schema": 1,
+  // Identifiant = nom du dossier.
+  "id": "exemple-lieu",
+  "name": "Lieu d'exemple",
+  "station": {
+    // Points de la carte: où l'on descend du train, et le quai où il faut être deux pour monter.
+    "arrival": "descente",
+    "platform": "quai",
+    "platformRadius": 3,
+  },
+  // Lieux reliés par le rail. Le lien s'écrit des deux côtés (ici, et dans le lieu.json de l'autre).
+  "links": [],
+  // Activités offertes ici (pêche, insectes...): selon le lieu.
+  "activities": [],
+  // Musiques de jour et de nuit: { "day": "...", "night": "..." }, ou null tant qu'elles manquent.
+  "music": null,
+}

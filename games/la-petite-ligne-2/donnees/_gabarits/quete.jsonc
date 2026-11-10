@@ -1,0 +1,41 @@
+// GABARIT: une suite de quêtes d'un lieu (chapitres et étapes).
+// Créer: pnpm nouveau quete <id> <lieu>   -> donnees/lieux/<lieu>/quetes/<id>.json
+// Schéma: src/donnees/schemas/quete.ts; conditions et effets: src/donnees/schemas/regles.ts
+{
+  "schema": 1,
+  "id": "exemple-quete",
+  // main: suite principale du lieu; side: secondaire; errand: petite demande (rare).
+  "kind": "side",
+  "title": "Une quête d'exemple",
+  // L'habitant qui la donne, ou null.
+  "giver": "cheffe-de-gare",
+  // Conditions qui l'ouvrent (toutes vraies).
+  "requires": [],
+  "chapters": [
+    {
+      "id": "chapitre-1",
+      "title": "Les pommes du quai",
+      "steps": [
+        {
+          "id": "cueillir",
+          "objective": "Cueillir trois pommes pour la cheffe de gare.",
+          // Repère montré 3 secondes à la demande: { "point": "..." }, { "villager": "..." } ou null.
+          "target": { "villager": "cheffe-de-gare" },
+          // Ce qui franchit l'étape (toutes vraies).
+          "done": [{ "type": "item_in_bag", "item": "pomme", "count": 3 }],
+          // true: il faut être deux.
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "essai-gare.pommes-cueillies",
+              "value": true,
+              "by": "duo",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}

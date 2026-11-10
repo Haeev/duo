@@ -27,7 +27,8 @@ duo.reportLoading(0.9);
 
 if (duo.role === 'guest') {
   const deadline = performance.now() + GUEST_WORLD_WAIT_MS;
-  while (!session.ready() && performance.now() < deadline) await new Promise((resolve) => setTimeout(resolve, POLL_MS));
+  while (!session.ready() && performance.now() < deadline)
+    await new Promise((resolve) => setTimeout(resolve, POLL_MS));
 }
 duo.reportLoading(1);
 await duo.ready();
@@ -45,7 +46,13 @@ duo.loop.start({
     const moveY = (duo.input.isDown('down') ? 1 : 0) - (duo.input.isDown('up') ? 1 : 0);
     const norm = moveX !== 0 && moveY !== 0 ? Math.SQRT1_2 : 1;
     if (duo.input.wasPressed('act')) session.view.send({ type: 'act' });
-    session.step({ seq, moveX: moveX * norm, moveY: moveY * norm, run: duo.input.isDown('run'), act: duo.input.isDown('act') });
+    session.step({
+      seq,
+      moveX: moveX * norm,
+      moveY: moveY * norm,
+      run: duo.input.isDown('run'),
+      act: duo.input.isDown('act'),
+    });
   },
   render: () => {
     drawBaseScreen(canvas, session.view, colors);

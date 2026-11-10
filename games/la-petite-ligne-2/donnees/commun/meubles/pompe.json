@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "pompe",
+  "name": "Pompe à eau",
+  "model": "pompe-a-eau",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "relieve",
+      "verb": "Se débarbouiller",
+      "clip": "wash",
+      "seconds": 4,
+      "need": "hygiene",
+      "amount": 40,
+      "cap": 60
+    }
+  ]
+}

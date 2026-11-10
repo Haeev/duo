@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "pain",
+  "name": "Pain",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 25
+  },
+  "tool": null
+}

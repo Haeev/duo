@@ -1,0 +1,20 @@
+// GABARIT: un commerce d'un lieu.
+// Créer: pnpm nouveau commerce <id> <lieu>   -> donnees/lieux/<lieu>/commerces/<id>.json
+// Schéma: src/donnees/schemas/commerce.ts. Pour l'ouvrir en jeu: un meuble comptoir avec la
+// brique { "brick": "shop", "shop": "<id>" }, posé sur la carte du lieu.
+{
+  "schema": 1,
+  "id": "exemple-commerce",
+  "name": "Buvette d'exemple",
+  // L'habitant qui le tient (dossier habitants/ du même lieu).
+  "keeper": "cheffe-de-gare",
+  // Heures d'ouverture, en minutes depuis minuit.
+  "hours": { "from": 480, "to": 1140 },
+  // Ce qu'il vend: prix en euros entiers; stock par jour, ou null (sans limite).
+  "sells": [{ "item": "pain", "price": 3, "dailyStock": 6 }],
+  // Ce qu'il rachète, à son prix: par objet précis ou par famille. Il ne rachète rien d'autre.
+  "buys": [
+    { "item": "pomme", "price": 2 },
+    { "family": "crop", "price": 1 },
+  ],
+}
