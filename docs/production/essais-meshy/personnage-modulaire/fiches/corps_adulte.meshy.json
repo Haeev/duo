@@ -1,0 +1,91 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "corps_adulte",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: corps de base et squelette commun",
+ "purpose": "corps adulte neutre, porteur du squelette commun et des clips partagés",
+ "inputs": [],
+ "conformity": {
+  "nom": "corps",
+  "taille_m": 1.72,
+  "couleur": [
+   0.87,
+   0.62,
+   0.48
+  ],
+  "proportions": {
+   "Head": [
+    1.3,
+    1.3
+   ],
+   "neck": [
+    1.25,
+    0.9
+   ],
+   "Hips": [
+    1.0,
+    1.0
+   ],
+   "Spine": [
+    1.12,
+    0.95
+   ],
+   "Spine01": [
+    1.12,
+    0.95
+   ],
+   "Spine02": [
+    1.1,
+    0.95
+   ],
+   "LeftArm": [
+    1.25,
+    0.85
+   ],
+   "RightArm": [
+    1.25,
+    0.85
+   ],
+   "LeftForeArm": [
+    1.25,
+    0.85
+   ],
+   "RightForeArm": [
+    1.25,
+    0.85
+   ],
+   "LeftHand": [
+    1.3,
+    1.3
+   ],
+   "RightHand": [
+    1.3,
+    1.3
+   ],
+   "LeftUpLeg": [
+    1.05,
+    0.86
+   ],
+   "RightUpLeg": [
+    1.05,
+    0.86
+   ],
+   "LeftLeg": [
+    1.1,
+    0.86
+   ],
+   "RightLeg": [
+    1.1,
+    0.86
+   ],
+   "LeftFoot": [
+    1.2,
+    1.1
+   ],
+   "RightFoot": [
+    1.2,
+    1.1
+   ]
+  }
+ }
+}

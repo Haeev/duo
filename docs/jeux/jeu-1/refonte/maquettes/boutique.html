@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>La Petite Ligne, refonte: boutique</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="refonte.css">
+<style>
+  .shop {
+    position: fixed; left: 50%; top: 6.75rem; z-index: 30; width: 73.75rem; height: 38rem; margin-left: -36.875rem;
+    display: grid; grid-template-columns: 15.5rem 1fr 20.5rem;
+    background: var(--paper); border: 0.1875rem solid var(--ink); border-radius: 1.25rem; box-shadow: var(--shadow-3); overflow: hidden;
+    animation: entre var(--d-slow) var(--ease) both;
+  }
+  @keyframes entre { from { transform: translateY(2rem) scale(0.96); opacity: 0; } }
+  .keeper { position: relative; display: grid; align-content: end; justify-items: center; background: linear-gradient(var(--wood-light), var(--wood)); border-right: 0.1875rem solid var(--ink); }
+  .keeper .v3d { width: 13.5rem; height: 16.5rem; background: none; border: 0; border-radius: 0; margin-bottom: 4.5rem; }
+  .keeper .v3d::after { top: 4rem; }
+  .keeper__counter { position: absolute; left: 0; right: 0; bottom: 0; height: 6.5rem; background: var(--wood-deep); border-top: 0.1875rem solid var(--ink); display: grid; place-items: center; }
+  .keeper__plate { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.875rem; background: var(--paper-raised); border: 0.125rem solid var(--ink); border-radius: 0.625rem; box-shadow: var(--shadow-1); font-family: var(--font-display); font-size: 1.25rem; font-weight: 650; }
+  .keeper .emote { left: 76%; top: 7rem; }
+  .shelves { padding: 1.25rem 1.5rem; position: relative; }
+  .bigtabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .bigtab {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 4rem;
+    background: var(--paper-sunken); border: 0.125rem solid var(--line); border-radius: 0.875rem;
+    font-family: var(--font-display); font-size: 1.375rem; font-weight: 650; color: var(--ink-muted);
+  }
+  .bigtab .ic { width: 2rem; height: 2rem; }
+  .bigtab[aria-selected='true'] { background: var(--ink); color: var(--paper-raised); border-color: var(--ink); box-shadow: var(--shadow-2); }
+  .tile__own { position: absolute; left: 0.25rem; bottom: 0.125rem; font-size: 0.8125rem; font-weight: 800; color: var(--ink-muted); }
+  .sep { display: flex; align-items: center; gap: 0.5rem; margin: 1.25rem 0 0.75rem; color: var(--ink-muted); font-weight: 800; }
+  .sep::after { content: ''; flex: 1; border-top: 0.125rem dashed var(--line); }
+  .mini { width: 2.25rem; height: 2.25rem; border-radius: 50%; overflow: hidden; border: 0.125rem solid var(--ink); background: var(--paper-sunken); flex: none; }
+  .mini svg { width: 100%; height: 130%; display: block; }
+  .side { padding: 1.25rem 1.25rem; background: var(--paper-raised); border-left: 0.125rem solid var(--line); display: grid; align-content: start; justify-items: center; gap: 0.625rem; }
+  .side .v3d { width: 11.5rem; height: 11.5rem; }
+  .side h2 { margin: 0; font-family: var(--font-display); font-size: 1.625rem; font-weight: 650; line-height: 1.2; }
+  .row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  .buyer { position: relative; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.1875rem 0.625rem 0.1875rem 0.1875rem; background: var(--paper); border: 0.125rem solid var(--line); border-radius: 62rem; font-weight: 800; }
+  .buyer--best { border-color: var(--ink); }
+  .buyer--best > .ic { position: absolute; left: 0.5rem; top: -0.875rem; width: 1.25rem; height: 1.25rem; }
+  .stepper { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+  .stepper__n { min-width: 4.5rem; text-align: center; font-family: var(--font-display); font-size: 2rem; font-weight: 650; line-height: 1; }
+  .stepper__n small { font-family: var(--font-text); font-size: 0.875rem; color: var(--ink-muted); font-weight: 750; }
+  .stepper button { display: grid; place-items: center; gap: 0.125rem; width: 3rem; height: 3rem; background: var(--paper); border: 0.125rem solid var(--ink); border-radius: 0.625rem; box-shadow: var(--shadow-1); }
+  .total { display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-size: 1.75rem; font-weight: 650; }
+  .total .ic { color: var(--ink-muted); }
+  .side .btn { width: 100%; font-size: 1.125rem; min-height: 3.25rem; }
+  .foot { position: absolute; left: 1.5rem; right: 1.5rem; bottom: 1rem; display: flex; gap: 1rem; align-items: center; font-size: 0.8125rem; font-weight: 750; color: var(--ink-muted); }
+  .foot span { display: inline-flex; align-items: center; gap: 0.3125rem; }
+  /* Les pièces volent du commerçant vers ta bourse quand tu vends. */
+  .fly { position: fixed; z-index: 70; left: 13rem; top: 19rem; animation: vole 2.6s var(--ease) infinite; }
+  .fly:nth-of-type(2) { animation-delay: 0.12s; } .fly:nth-of-type(3) { animation-delay: 0.24s; }
+  @keyframes vole { 0%, 55% { opacity: 0; transform: none; } 60% { opacity: 1; transform: translate(0, -1.5rem) scale(1.3); } 90% { opacity: 1; transform: translate(-5.5rem, -14.25rem); } 100% { opacity: 0; transform: translate(-5.5rem, -14.25rem) scale(0.6); } }
+  .states { position: fixed; right: 0.75rem; bottom: 0.5rem; z-index: 60; display: flex; gap: 0.375rem; font-size: 0.75rem; font-weight: 750; }
+  .states a { padding: 0.125rem 0.5rem; background: var(--paper-raised); border: 0.0625rem dashed var(--ink); border-radius: 0.25rem; color: var(--ink); text-decoration: none; }
+</style>
+</head>
+<body data-defaut="acheter">
+<div class="scene scene--dim" data-scene="bourg"></div>
+
+<div class="hud-clock" role="status" aria-label="Mardi 5, soleil, 10 h 40. Bourse : 214.">
+  <div class="dial"><div class="dial__sun"></div></div>
+  <div>
+    <div class="hud-clock__day"><i data-i="soleil"></i> mar. 5</div>
+    <div class="hud-clock__time">10&nbsp;h&nbsp;40</div>
+  </div>
+  <div class="purse"><span class="coin"></span>214</div>
+</div>
+
+<main class="shop" aria-label="Boulangerie d'Anselme">
+  <aside class="keeper">
+    <div class="v3d v3d--bust" data-buste="anselme"></div>
+    <div class="emote" data-si="vendre" aria-hidden="true">♪</div>
+    <div class="keeper__counter"><div class="keeper__plate"><i data-i="pain"></i>Anselme</div></div>
+  </aside>
+
+  <section class="shelves">
+    <div class="bigtabs" role="tablist">
+      <a class="bigtab" role="tab" href="#acheter" data-tab="acheter"><i data-i="etagere"></i>Acheter</a>
+      <a class="bigtab" role="tab" href="#vendre" data-tab="vendre"><i data-i="sac"></i><i data-i="fleche"></i>Vendre</a>
+    </div>
+
+    <div data-si="acheter">
+      <div class="grid" role="grid" aria-label="Ce que vend Anselme">
+        <button class="tile" aria-label="Pain de campagne, 3 l'unité"><i data-i="pain" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>3</span><span class="nametag">Pain de campagne</span></button>
+        <button class="tile focus" aria-label="Brioche dorée, 6 l'unité"><i data-i="brioche" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>6</span><span class="nametag">Brioche dorée</span></button>
+        <button class="tile" aria-label="Tarte aux mûres, 12 l'unité"><i data-i="tarte" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>12</span><span class="nametag">Tarte aux mûres</span></button>
+        <button class="tile" aria-label="Sac de farine, 2 l'unité"><i data-i="farine" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>2</span><span class="nametag">Sac de farine</span></button>
+        <button class="tile tile--new" aria-label="Confiture de mûres, 8 l'unité, nouveau"><i data-i="confiture" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>8</span><span class="nametag">Confiture de mûres</span></button>
+        <button class="tile tile--no" aria-label="Gâteau de fête, 250 l'unité : il te manque 36"><i data-i="gateau" class="obj"></i><span class="tile__badge pastille pastille--no"><span class="coin coin--sm"></span>250</span><span class="nametag">Gâteau de fête</span></button>
+      </div>
+    </div>
+
+    <div data-si="vendre">
+      <div class="grid" role="grid" aria-label="Ce qu'Anselme te rachète">
+        <button class="tile focus" aria-label="Œuf frais, tu en as 4, Anselme en donne 2 l'unité"><i data-i="oeuf" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>2</span><span class="tile__own">×4</span><span class="nametag">Œuf frais</span></button>
+        <button class="tile" aria-label="Pomme, tu en as 1, Anselme en donne 1 l'unité"><i data-i="pomme" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>1</span><span class="tile__own">×1</span><span class="nametag">Pomme</span></button>
+        <button class="tile" aria-label="Confiture de mûres, tu en as 1, Anselme en donne 5 l'unité"><i data-i="confiture" class="obj"></i><span class="tile__badge pastille pastille--price"><span class="coin coin--sm"></span>5</span><span class="tile__own">×1</span><span class="nametag">Confiture de mûres</span></button>
+      </div>
+      <!-- Ce que ce commerçant ne rachète pas: rangé à la fin, grisé, pointillé, picto de refus. -->
+      <div class="sep" role="img" aria-label="Anselme n'en veut pas"><span class="mini" data-buste="anselme"></span><i data-i="refus"></i></div>
+      <div class="grid" role="grid" aria-label="Ce qu'Anselme ne rachète pas">
+        <button class="tile tile--no" aria-label="Poisson de rivière : Anselme n'en veut pas"><i data-i="poisson" class="obj"></i><span class="tile__own">×3</span><span class="nametag">Poisson de rivière</span></button>
+        <button class="tile tile--no" aria-label="Bûche : Anselme n'en veut pas"><i data-i="buche" class="obj"></i><span class="tile__own">×2</span><span class="nametag">Bûche</span></button>
+        <button class="tile tile--no" aria-label="Planche : Anselme n'en veut pas"><i data-i="planche" class="obj"></i><span class="tile__own">×10</span><span class="nametag">Planche</span></button>
+        <button class="tile tile--no" aria-label="Radis : Anselme n'en veut pas"><i data-i="radis" class="obj"></i><span class="tile__own">×6</span><span class="nametag">Radis</span></button>
+      </div>
+    </div>
+
+    <div class="foot"><span><span class="key">A</span><span class="key">E</span> acheter, vendre</span><span><span class="key">Q</span><span class="key">D</span> quantité</span><span><span class="key">Retour</span> sortir</span></div>
+  </section>
+
+  <aside class="side" data-si="acheter" aria-live="polite">
+    <div class="v3d"><i data-i="brioche" class="obj"></i></div>
+    <h2>Brioche dorée</h2>
+    <div class="row">
+      <span class="pastille" role="img" aria-label="Faim : plus 30"><i data-i="bol"></i>+30</span>
+      <span class="pastille" role="img" aria-label="Dans ton sac : 0 sur 3"><i data-i="sac"></i>0/3</span>
+    </div>
+    <div class="stepper" role="group" aria-label="Quantité">
+      <button aria-label="Moins (Q)"><i data-i="moins"></i></button>
+      <div class="stepper__n">2</div>
+      <button aria-label="Plus (D)"><i data-i="plus"></i></button>
+    </div>
+    <div class="total" role="img" aria-label="Total : 12"><i data-i="fleche"></i><span class="coin"></span>12</div>
+    <button class="btn btn--primary"><span class="key">Entrée</span>Acheter</button>
+  </aside>
+
+  <aside class="side" data-si="vendre" aria-live="polite">
+    <div class="v3d"><i data-i="oeuf" class="obj"></i></div>
+    <h2>Œuf frais</h2>
+    <!-- Mémoire des prix: qui t'en a déjà donné combien. La couronne: le meilleur prix connu. -->
+    <div class="row" role="group" aria-label="Prix déjà vus : Anselme 2, Odette 1">
+      <span class="buyer buyer--best"><i data-i="couronne"></i><span class="mini" data-buste="anselme"></span><span class="coin coin--sm"></span>2</span>
+      <span class="buyer"><span class="mini" data-buste="odette"></span><span class="coin coin--sm"></span>1</span>
+    </div>
+    <div class="stepper" role="group" aria-label="Quantité">
+      <button aria-label="Moins (Q)"><i data-i="moins"></i></button>
+      <div class="stepper__n">3 <small>/ 4</small></div>
+      <button aria-label="Plus (D)"><i data-i="plus"></i></button>
+    </div>
+    <div class="total" role="img" aria-label="Tu reçois : 6"><i data-i="fleche"></i><span class="coin"></span>6</div>
+    <button class="btn btn--primary"><span class="key">Entrée</span>Vendre</button>
+  </aside>
+</main>
+
+<span class="coin fly" data-si="vendre" aria-hidden="true"></span>
+<span class="coin fly" data-si="vendre" aria-hidden="true"></span>
+<span class="coin fly" data-si="vendre" aria-hidden="true"></span>
+
+<div class="provisoire">Maquette : décor, portrait et objets 3D figurés</div>
+<nav class="states" aria-label="États de la maquette"><a href="#acheter">acheter</a><a href="#vendre">vendre</a></nav>
+<script src="commun.js"></script>
+<script>
+  function onglets() {
+    var e = document.body.getAttribute('data-etat');
+    document.querySelectorAll('[data-tab]').forEach(function (t) {
+      t.setAttribute('aria-selected', String(t.getAttribute('data-tab') === e));
+    });
+  }
+  document.addEventListener('etat', onglets);
+  onglets();
+  // A et E: passer d'Acheter à Vendre.
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'KeyQ') location.hash = 'acheter';
+    if (e.code === 'KeyE') location.hash = 'vendre';
+  });
+</script>
+</body>
+</html>

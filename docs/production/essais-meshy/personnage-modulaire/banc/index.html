@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Banc d'essai: personnage modulaire</title>
+<style>
+ body { margin: 0; font: 14px system-ui, sans-serif; background: #e9e4da; color: #222; }
+ #barre { position: fixed; top: 8px; left: 8px; background: #fffc; padding: 8px 10px; border-radius: 8px; }
+ #barre label { display: block; margin: 3px 0; }
+ #mesures { white-space: pre; font: 12px ui-monospace, monospace; margin-top: 6px; }
+ canvas { display: block; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="barre"><div id="choix"></div><label>Animation <select id="anim"></select></label><div id="mesures"></div></div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+// Paramètres d'adresse: combo=a|b|c|d, anim=walk|idle|run|wave, planche=1 (quatre vues figées), ou une pièce par catégorie (haut=haut_veste).
+const params = new URLSearchParams(location.search);
+const catalogue = await (await fetch('catalogue.json')).json();
+const loader = new GLTFLoader();
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.info.autoReset = false;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe9e4da);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9a8f80, 1.6));
+const sun = new THREE.DirectionalLight(0xfff2dd, 2.2);
+sun.position.set(2, 4, 3);
+scene.add(sun);
+const ground = new THREE.Mesh(new THREE.CircleGeometry(0.9, 48), new THREE.MeshStandardMaterial({ color: 0xd3cbbb, roughness: 1 }));
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+const bodyGltf = await loader.loadAsync(catalogue.corps);
+const body = bodyGltf.scene;
+scene.add(body);
+const bones = new Map();
+const zones = new Map();
+let bodySkinned = null;
+body.traverse((o) => {
+  if (o.isBone) bones.set(o.name, o);
+  if (o.isSkinnedMesh) {
+    bodySkinned = o;
+    o.frustumCulled = false;
+    zones.set(o.material.name.replace('corps_', ''), o);
+  }
+});
+const mixer = new THREE.AnimationMixer(body);
+const actions = new Map(bodyGltf.animations.map((clip) => [clip.name, mixer.clipAction(clip)]));
+
+// Une pièce est liée au squelette du corps par les noms d'os: ses propres os ne servent qu'à l'ordre des matrices inverses.
+const cache = new Map();
+async function loadPiece(name) {
+  if (!cache.has(name)) {
+    const gltf = await loader.loadAsync(`../pieces/${name}.glb`);
+    const meshes = [];
+    gltf.scene.traverse((o) => { if (o.isSkinnedMesh) meshes.push(o); });
+    const root = new THREE.Group();
+    root.name = name;
+    let meta = {};
+    let triangles = 0;
+    for (const mesh of meshes) {
+      meta = { ...meta, ...mesh.userData, ...mesh.parent.userData };
+      const shared = new THREE.Skeleton(mesh.skeleton.bones.map((b) => bones.get(b.name)), mesh.skeleton.boneInverses);
+      const skinned = new THREE.SkinnedMesh(mesh.geometry, mesh.material);
+      skinned.bind(shared, mesh.bindMatrix);
+      skinned.frustumCulled = false;
+      root.add(skinned);
+      triangles += mesh.geometry.index.count / 3;
+    }
+    cache.set(name, { root, meta, triangles });
+  }
+  return cache.get(name);
+}
+
+const current = {};
+const holder = new THREE.Group();
+scene.add(holder);
+async function compose(selection) {
+  holder.clear();
+  for (const mesh of zones.values()) mesh.visible = true;
+  let triangles = 0;
+  for (const category of catalogue.categories) {
+    current[category] = selection[category] ?? '';
+    if (!current[category]) continue;
+    const piece = await loadPiece(current[category]);
+    holder.add(piece.root);
+    triangles += piece.triangles;
+    for (const zone of piece.meta.masque ?? []) zones.get(zone).visible = false;
+  }
+  for (const [zone, mesh] of zones) if (mesh.visible) triangles += mesh.geometry.index.count / 3;
+  return triangles;
+}
+
+function play(name) {
+  for (const action of actions.values()) action.stop();
+  actions.get(name)?.play();
+}
+
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+function view(azimuthDeg, x, y, w, h) {
+  const a = THREE.MathUtils.degToRad(azimuthDeg);
+  camera.aspect = w / h;
+  camera.position.set(Math.sin(a) * 4.3, 1.15, Math.cos(a) * 4.3);
+  camera.lookAt(0, 0.88, 0);
+  camera.updateProjectionMatrix();
+  renderer.setViewport(x, y, w, h);
+  renderer.setScissor(x, y, w, h);
+  renderer.setScissorTest(true);
+  renderer.render(scene, camera);
+}
+
+function measure() {
+  renderer.info.reset();
+  view(25, 0, 0, innerWidth, innerHeight);
+  return { triangles: renderer.info.render.triangles, appels: renderer.info.render.calls, programmes: renderer.info.programs.length };
+}
+
+// Planche figée: face au repos, profil au repos, marche de trois quarts, marche de profil (contact du pas, genou levé).
+function sheet() {
+  const w = innerWidth / 4;
+  const shots = [['idle', 0.5, 0], ['idle', 0.5, 90], ['walk', 0.26, 35], ['walk', 0.78, 90]];
+  shots.forEach(([clip, time, azimuth], i) => {
+    play(clip);
+    mixer.setTime(time);
+    view(azimuth, i * w, 0, w, innerHeight);
+  });
+}
+
+const initial = params.get('combo') ? catalogue.combinaisons[params.get('combo')] : Object.fromEntries(catalogue.categories.map((c) => [c, params.get(c) ?? '']));
+const composed = await compose(initial);
+const choix = document.getElementById('choix');
+for (const category of catalogue.categories) {
+  const label = document.createElement('label');
+  label.textContent = `${category} `;
+  const select = document.createElement('select');
+  for (const name of ['', ...catalogue.pieces[category]]) select.add(new Option(name || '(aucun)', name, false, name === current[category]));
+  select.onchange = async () => { await compose({ ...current, [category]: select.value }); };
+  label.appendChild(select);
+  choix.appendChild(label);
+}
+const animSelect = document.getElementById('anim');
+for (const name of actions.keys()) animSelect.add(new Option(name, name, false, name === (params.get('anim') ?? 'walk')));
+animSelect.onchange = () => play(animSelect.value);
+play(animSelect.value);
+
+window.banc = { pret: false, mesures: null };
+if (params.get('planche')) {
+  document.getElementById('barre').style.display = 'none';
+  mixer.setTime(0.2);
+  const m = measure();
+  sheet();
+  window.banc = { pret: true, mesures: { ...m, triangles_personnage: composed, pieces: { ...current } } };
+} else {
+  const clock = new THREE.Clock();
+  let angle = 25;
+  renderer.setAnimationLoop(() => {
+    mixer.update(clock.getDelta());
+    renderer.info.reset();
+    view(angle, 0, 0, innerWidth, innerHeight);
+    document.getElementById('mesures').textContent = `triangles ${renderer.info.render.triangles}\nappels ${renderer.info.render.calls}`;
+    window.banc.pret = true;
+  });
+  addEventListener('keydown', (e) => { if (e.code === 'ArrowLeft') angle -= 15; if (e.code === 'ArrowRight') angle += 15; });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+ "piece": "haut_gilet",
+ "categorie": "haut",
+ "triangles": 1299,
+ "sommets": 3893,
+ "octets": 188084,
+ "masque": [
+  "torse",
+  "bras",
+  "avant_bras"
+ ],
+ "voie": "B",
+ "donneur": "donneur_homme"
+}

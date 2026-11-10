@@ -1,0 +1,12 @@
+{
+ "piece": "tete_carre",
+ "categorie": "tete",
+ "triangles": 1639,
+ "sommets": 882,
+ "octets": 57640,
+ "masque": [
+  "tete"
+ ],
+ "triangles_bruts": 2100,
+ "echelle": 0.6949183179111449
+}

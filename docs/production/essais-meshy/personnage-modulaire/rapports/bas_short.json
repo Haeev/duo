@@ -1,0 +1,12 @@
+{
+ "piece": "bas_short",
+ "categorie": "bas",
+ "triangles": 929,
+ "sommets": 2785,
+ "octets": 137116,
+ "masque": [
+  "bassin"
+ ],
+ "voie": "B",
+ "donneur": "donneur_homme"
+}

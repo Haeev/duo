@@ -1,0 +1,65 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "bas_pantalon",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-a95e-70d3-a3f4-3b650c34fcfd",
+   "params": {
+    "prompt": "A single pair of long straight trousers with a simple waistband, standing upright, both legs straight, vertical and slightly apart. Clothing item alone, displayed as if worn by an invisible mannequin: hollow, no body, no head, no hands, no legs visible. Sized for a stylized toy figurine about five heads tall with chunky rounded limbs. Front view, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 2000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:02.199Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "bas_pantalon",
+  "categorie": "bas",
+  "mode": "enveloppe",
+  "pose_bras_deg": 0,
+  "masque": [
+   "bassin",
+   "jambes"
+  ],
+  "haut_dz": 0.12,
+  "ecart_min": 0.008,
+  "ecart_max": 0.06,
+  "os_exclus": [
+   "LeftHand",
+   "RightHand",
+   "LeftForeArm",
+   "RightForeArm"
+  ],
+  "couleur": [
+   0.25,
+   0.28,
+   0.4
+  ],
+  "aligner_jambes": true
+ },
+ "status": "essai",
+ "brut": "bas_pantalon.glb"
+}

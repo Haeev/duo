@@ -1,0 +1,12 @@
+{
+ "piece": "tete_barbu",
+ "categorie": "tete",
+ "triangles": 1421,
+ "sommets": 4237,
+ "octets": 204048,
+ "masque": [
+  "tete"
+ ],
+ "voie": "B",
+ "donneur": "donneur_homme"
+}

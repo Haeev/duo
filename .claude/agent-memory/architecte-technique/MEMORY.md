@@ -100,3 +100,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Coque cuite: matériaux passés en `MeshBasicMaterial` avec `map` et `lightMap` (canal 1): la lumière de la scène n'y touche plus, un seul programme pour toute la coque.
 - Piloter le regard dans le faux hôte: un vrai clic Playwright (coordonnées de page, hors des bulles du HUD qui interceptent) verrouille le pointeur, puis des `PointerEvent('pointermove', { movementX, movementY })` synthétiques sur `window` de l'iframe (moins de 300 px chacun) tournent la tête; les touches par `KeyboardEvent` synthétiques (`code`) sur `window`.
 - Ne pas modifier `src/` pendant une capture longue: le serveur de Vite recharge les deux vues et la partie repart à zéro.
+
+## Audit de La Petite Ligne 0.13 pour la refonte (vérifié le 2026-11-10)
+
+- Mesurer la taille de l'état sans toucher au dépôt: test Vitest dans le scratchpad qui importe `tests/aides.ts` (`newSim`) et `src/reseau/etat-transmis.ts` (`sentWorld`) par chemin absolu. Repères: 11 Ko au départ, 52 Ko d'état compact dans la sauvegarde de référence du jour 25 (limite du SDK: 64 Kio par message).
+- Lire un GLB sans Three.js: en-tête de 12 octets, puis longueur et type du morceau JSON; triangles par `accessors[indices].count / 3`, os par `skins[].joints`. `personnages.glb`: 18 os, 49 clips, un seul matériau.
+- La coupe des murs travaille déjà sur un angle continu (`toCamera` et seuil `WALL_FACES_CAMERA` dans `interieurs.ts` et `maison.ts`); `FrameContext.quarter` n'est lu nulle part. Les quarts de tour de `amenagement.ts` et `etat/murs.ts` sont ceux des meubles, pas de la caméra.
+- Classer un gros module pour un audit: table fichier vers sort dans un script Python jetable qui additionne les lignes et signale les fichiers oubliés ou comptés deux fois.
+- Le scratchpad est partagé entre sessions (des centaines de fichiers): y travailler dans un sous-dossier à soi.
+- Pendant une mission de cadrage, d'autres membres écrivent des essais voisins (`docs/production/essais-meshy/personnage-modulaire/` prenait le squelette de Meshy à 24 os): relire `git status` avant de rendre et signaler toute divergence au lieu de la trancher seul.

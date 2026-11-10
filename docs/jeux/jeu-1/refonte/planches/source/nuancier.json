@@ -1,0 +1,8 @@
+{
+  "peaux": [["porcelaine", "#F6DCC8"], ["peche", "#EFC7A6"], ["miel", "#E0AE86"], ["dore", "#C99368"], ["noisette", "#A9744D"], ["cannelle", "#8A5A3B"], ["acajou", "#6B432E"], ["ebene", "#4A2F24"]],
+  "cheveux": [["noir", "#2B2523"], ["brun", "#4A3327"], ["chatain", "#6E4B33"], ["auburn", "#8C4A2E"], ["roux", "#AE5F2E"], ["blond_miel", "#C99A55"], ["blond_paille", "#E2C582"], ["gris", "#9A948C"], ["blanc", "#E9E5DC"], ["poivre_et_sel", "#6A6763"]],
+  "cheveux_joueurs": [["bleu_nuit", "#3E5578"], ["framboise", "#A65C7C"], ["vert_mousse", "#6F8F5A"]],
+  "tissus": [["craie", "#F3EDE0"], ["lin", "#D9CAAE"], ["ficelle", "#B8A17E"], ["moutarde", "#D4A33E"], ["ocre", "#C0803A"], ["rouille", "#A85837"], ["brique", "#8F3B34"], ["coquelicot", "#C5443D"], ["rose_ancien", "#CC9C96"], ["prune", "#7E3F55"], ["lilas", "#A58BB8"], ["ciel", "#A9C7D9"], ["ardoise", "#587F8E"], ["bleu_de_travail", "#44618A"], ["marine", "#2C3B57"], ["canard", "#2F6E73"], ["sauge", "#96A98C"], ["bouteille", "#3F6453"], ["olive", "#7A7B45"], ["noisette", "#96704C"], ["chocolat", "#5E4233"], ["perle", "#B9B7B0"], ["anthracite", "#4A4D52"], ["encre", "#26282E"]],
+  "fixes": [["laiton", "#C8A150"], ["acier", "#8C8E91"], ["cuir", "#8C5A35"], ["cuir_sombre", "#4F3626"], ["semelle", "#3A3331"], ["caoutchouc_clair", "#EDE6D3"], ["oeil", "#2B2A33"], ["blanc_oeil", "#F7F3EA"], ["bouche", "#A2473F"], ["joue", "#E58E84"], ["dent", "#F7F3EA"], ["encre_trait", "#2B2A33"]],
+  "duo": [["aqua", "#5CE1E6"], ["mauve", "#8D6CFF"], ["anis", "#D4F27A"], ["corail", "#FC663F"], ["rose", "#E787B1"], ["vert", "#22B07D"]]
+}

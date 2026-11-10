@@ -1,0 +1,54 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "chaussures_baskets",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-c68c-72bf-8818-6898ae3d5030",
+   "params": {
+    "prompt": "A pair of chunky sneakers, left and right shoe side by side, parallel, slightly apart, toes pointing forward, standing on the ground. Shoes alone, no feet, no legs, no socks. Sized for a stylized toy figurine. Symmetrical pair. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 1500,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:09.662Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "chaussures_baskets",
+  "categorie": "chaussures",
+  "mode": "rigide",
+  "masque": [
+   "pieds"
+  ],
+  "jeu": 1.45,
+  "couleur": [
+   0.92,
+   0.9,
+   0.85
+  ]
+ },
+ "status": "essai",
+ "brut": "chaussures_baskets.glb"
+}

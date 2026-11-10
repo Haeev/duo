@@ -1,0 +1,12 @@
+{
+ "piece": "tete_court",
+ "categorie": "tete",
+ "triangles": 2051,
+ "sommets": 1082,
+ "octets": 68916,
+ "masque": [
+  "tete"
+ ],
+ "triangles_bruts": 2058,
+ "echelle": 0.4668064959490741
+}

@@ -1,0 +1,20 @@
+{
+ "piece": "bas_pantalon",
+ "categorie": "bas",
+ "triangles": 2072,
+ "sommets": 1038,
+ "octets": 67108,
+ "masque": [
+  "bassin",
+  "jambes"
+ ],
+ "triangles_bruts": 2072,
+ "echelle": 0.8473416322365787,
+ "jambes_alignees": [
+  0.061,
+  0.067
+ ],
+ "sommets_dans_le_corps_avant": 647,
+ "sommets_dans_le_corps_apres": 2,
+ "sommets_deplaces": 1701
+}

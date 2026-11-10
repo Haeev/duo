@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>La Petite Ligne, refonte: carnet, onglet Sac</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="refonte.css">
+<style>
+  .carnet {
+    position: fixed; left: 50%; top: 6.75rem; z-index: 30; width: 66.5rem; height: 38rem; margin-left: -35rem;
+    perspective: 120rem; animation: leve var(--d-scene) var(--ease) both;
+  }
+  @keyframes leve { from { transform: translateY(30rem) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
+  .book {
+    position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; padding: 0.75rem;
+    background: var(--wood-deep); border: 0.1875rem solid var(--ink); border-radius: 1.25rem; box-shadow: var(--shadow-3);
+    transform-style: preserve-3d;
+  }
+  .page { position: relative; padding: 1.25rem 1.5rem; background: var(--paper); border: 0.125rem solid var(--ink); }
+  .page--g {
+    border-radius: 0.75rem 0.25rem 0.25rem 0.75rem; border-right-width: 0.0625rem;
+    background: linear-gradient(90deg, var(--paper) 88%, var(--paper-shade));
+    transform-origin: right center; animation: ouvre var(--d-scene) var(--ease) 120ms both; backface-visibility: hidden;
+  }
+  .page--d { border-radius: 0.25rem 0.75rem 0.75rem 0.25rem; border-left-width: 0.0625rem; background: linear-gradient(270deg, var(--paper) 88%, var(--paper-shade)); }
+  @keyframes ouvre { from { transform: rotateY(150deg); } to { transform: rotateY(0); } }
+
+  /* Signets en images sur la tranche droite */
+  .signets { position: absolute; left: 100%; top: 1.75rem; display: grid; gap: 0.375rem; margin-left: -0.1875rem; }
+  .signet {
+    display: flex; align-items: center; gap: 0.5rem; height: 3.5rem; width: 3.5rem; padding: 0 0.75rem; position: relative;
+    background: var(--paper-shade); border: 0.125rem solid var(--ink); border-left: 0; border-radius: 0 0.75rem 0.75rem 0;
+    font-family: var(--font-display); font-weight: 650; font-size: 1.0625rem; color: var(--ink);
+    animation: signet var(--d-slow) var(--ease-bounce) both;
+  }
+  .signet .ic { width: 1.75rem; height: 1.75rem; }
+  .signet span { display: none; }
+  .signet[aria-selected='true'] { width: auto; background: var(--paper); padding-right: 1rem; box-shadow: var(--shadow-2); }
+  .signet[aria-selected='true'] span { display: inline; }
+  .signet--new::after { content: ''; position: absolute; right: -0.3125rem; top: -0.3125rem; width: 0.75rem; height: 0.75rem; border-radius: 50%; background: var(--stamp); border: 0.125rem solid var(--ink); }
+  .signet:nth-child(1) { animation-delay: 300ms; } .signet:nth-child(2) { animation-delay: 340ms; } .signet:nth-child(3) { animation-delay: 380ms; }
+  .signet:nth-child(4) { animation-delay: 420ms; } .signet:nth-child(5) { animation-delay: 460ms; } .signet:nth-child(6) { animation-delay: 500ms; } .signet:nth-child(7) { animation-delay: 540ms; }
+  @keyframes signet { from { transform: translateX(-100%); opacity: 0; } }
+
+  .who { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 0.875rem; font-family: var(--font-display); font-size: 1.375rem; font-weight: 650; }
+  .who .needs { position: static; margin-left: auto; }
+  .who .need { width: 2.5rem; height: 2.5rem; animation: none; }
+  .who .need .ic { width: 1.125rem; height: 1.125rem; }
+  .rack { display: flex; gap: 0.5rem; padding: 0.5rem; margin-bottom: 1.125rem; background: var(--wood); border: 0.125rem solid var(--ink); border-radius: 0.875rem; width: fit-content; }
+  .rack .slot { width: 4rem; height: 4rem; }
+  .rack .slot .ic { width: 2.5rem; height: 2.5rem; }
+  .rack .slot--held { transform: none; }
+  .bag-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; font-weight: 800; }
+  .bag-head .ic { width: 1.75rem; height: 1.75rem; }
+  .nobag {
+    display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 1.25rem; padding: 1.5rem; margin-top: 0.5rem;
+    border: 0.1875rem dashed var(--line); border-radius: 1rem; color: var(--ink-muted);
+  }
+  .nobag > .ic { width: 7rem; height: 7rem; stroke-dasharray: 3 2; opacity: 0.6; }
+  .nobag__how { display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap; font-weight: 800; color: var(--ink); }
+  .mini { width: 2.75rem; height: 2.75rem; border-radius: 50%; overflow: hidden; border: 0.125rem solid var(--ink); background: var(--paper-sunken); flex: none; }
+  .mini svg { width: 100%; height: 130%; display: block; }
+
+  .detail { display: grid; justify-items: center; gap: 0.75rem; height: 100%; align-content: start; }
+  .detail .v3d { width: 15rem; height: 15rem; }
+  .detail h2 { margin: 0; font-family: var(--font-display); font-size: 1.75rem; font-weight: 650; line-height: 1.2; }
+  .detail p { margin: 0; color: var(--ink-muted); font-weight: 600; }
+  .row { display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap; justify-content: center; }
+  .buyer { position: relative; display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem 0.25rem 0.25rem; background: var(--paper-raised); border: 0.125rem solid var(--line); border-radius: 62rem; font-weight: 800; }
+  .buyer .mini { width: 2.25rem; height: 2.25rem; }
+  .buyer--best { border-color: var(--ink); }
+  .buyer--best .ic { position: absolute; left: 0.5rem; top: -0.875rem; width: 1.25rem; height: 1.25rem; }
+  .buyer--unknown { border-style: dashed; color: var(--ink-muted); padding-left: 0.75rem; }
+  .foot { position: absolute; left: 1.5rem; right: 1.5rem; bottom: 1rem; display: flex; gap: 1rem; align-items: center; font-size: 0.8125rem; font-weight: 750; color: var(--ink-muted); }
+  .foot span { display: inline-flex; align-items: center; gap: 0.3125rem; }
+  .states { position: fixed; right: 0.75rem; bottom: 0.5rem; z-index: 60; display: flex; gap: 0.375rem; font-size: 0.75rem; font-weight: 750; }
+  .states a { padding: 0.125rem 0.5rem; background: var(--paper-raised); border: 0.0625rem dashed var(--ink); border-radius: 0.25rem; color: var(--ink); text-decoration: none; }
+</style>
+</head>
+<body data-defaut="sac">
+<div class="scene scene--dim" data-scene="bourg"></div>
+
+<div class="hud-clock" role="status" aria-label="Mardi 5, soleil, 10 h 40. Bourse : 214.">
+  <div class="dial"><div class="dial__sun"></div></div>
+  <div>
+    <div class="hud-clock__day"><i data-i="soleil"></i> mar. 5</div>
+    <div class="hud-clock__time">10&nbsp;h&nbsp;40</div>
+  </div>
+  <div class="purse"><span class="coin"></span>214</div>
+</div>
+
+<main class="carnet" aria-label="Carnet">
+  <div class="book">
+    <section class="page page--g">
+      <div class="who"><span class="token"></span>Camille
+        <div class="needs">
+          <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
+          <div class="need need--bonus" style="--val:82" role="img" aria-label="Sommeil : en forme, bonus"><i data-i="lune"></i></div>
+          <div class="need" style="--val:44" role="img" aria-label="Hygiène : correcte"><i data-i="goutte"></i></div>
+        </div>
+      </div>
+
+      <div class="rack" role="group" aria-label="Barre d'outils">
+        <div class="slot"><span class="slot__key">1</span><i data-i="houe"></i><span class="wear"><i></i></span></div>
+        <div class="slot slot--held" data-si="sac"><span class="slot__key">2</span><i data-i="arrosoir"></i><span class="wear wear--low"><i></i></span></div>
+        <div class="slot slot--held focus" data-si="sans-sac"><span class="slot__key">2</span><i data-i="arrosoir"></i><span class="wear wear--low"><i></i></span></div>
+        <div class="slot"><span class="slot__key">3</span><i data-i="hache"></i><span class="wear"><i></i></span></div>
+        <div class="slot"><span class="slot__key">4</span><i data-i="canne"></i><span class="wear"><i></i></span></div>
+        <div class="slot"><span class="slot__key">5</span><i data-i="pain"></i><span class="slot__n pastille">2/4</span></div>
+        <div class="slot slot--empty"><span class="slot__key">6</span></div>
+      </div>
+
+      <!-- Sac de 10 cases: seules les cases du sac possédé sont dessinées. -->
+      <div data-si="sac">
+        <div class="bag-head"><i data-i="sac"></i><span class="pastille">8/10</span></div>
+        <div class="grid" role="grid" aria-label="Sac de 10 cases">
+          <button class="tile focus" aria-label="Œuf frais, 4 sur 6"><i data-i="oeuf" class="obj"></i><span class="tile__badge pastille">4/6</span><span class="nametag">Œuf frais</span></button>
+          <button class="tile" aria-label="Poisson de rivière, 3 sur 3, pile pleine"><i data-i="poisson" class="obj"></i><span class="tile__badge pastille pastille--full">3/3</span><span class="nametag">Poisson de rivière</span></button>
+          <button class="tile" aria-label="Bûche, 2 sur 5"><i data-i="buche" class="obj"></i><span class="tile__badge pastille">2/5</span><span class="nametag">Bûche</span></button>
+          <button class="tile" aria-label="Planche, 10 sur 10, pile pleine"><i data-i="planche" class="obj"></i><span class="tile__badge pastille pastille--full">10/10</span><span class="nametag">Planche</span></button>
+          <button class="tile" aria-label="Radis, 6 sur 10"><i data-i="radis" class="obj"></i><span class="tile__badge pastille">6/10</span><span class="nametag">Radis</span></button>
+          <button class="tile tile--new" aria-label="Pomme, 1 sur 5, nouveau"><i data-i="pomme" class="obj"></i><span class="tile__badge pastille">1/5</span><span class="nametag">Pomme</span></button>
+          <button class="tile" aria-label="Confiture de mûres, 1 sur 3"><i data-i="confiture" class="obj"></i><span class="tile__badge pastille">1/3</span><span class="nametag">Confiture de mûres</span></button>
+          <button class="tile" aria-label="Sac de grain, 2 sur 4"><i data-i="grain" class="obj"></i><span class="tile__badge pastille">2/4</span><span class="nametag">Sac de grain</span></button>
+          <button class="tile tile--empty" aria-label="Case vide"></button>
+          <button class="tile tile--empty" aria-label="Case vide"></button>
+        </div>
+      </div>
+
+      <!-- Début du jeu: aucun sac, la barre d'outils seule. -->
+      <div class="nobag" data-si="sans-sac" role="img" aria-label="Pas encore de sac. Odette en vend un : 60.">
+        <i data-i="sac"></i>
+        <div class="nobag__how"><i data-i="cadenas"></i><span class="mini" data-buste="odette"></span><span class="pastille pastille--price"><span class="coin coin--sm"></span>60</span></div>
+      </div>
+
+      <div class="foot"><span><span class="key">A</span><span class="key">E</span> onglets</span><span><span class="key">Espace</span> déplacer</span><span><span class="key">Retour</span> fermer</span></div>
+    </section>
+
+    <section class="page page--d" aria-live="polite">
+      <div class="detail" data-si="sac">
+        <div class="v3d"><i data-i="oeuf" class="obj"></i></div>
+        <h2>Œuf frais</h2>
+        <p>Pondu ce matin par tes poules.</p>
+        <div class="row" role="group" aria-label="Qui l'achète">
+          <span class="buyer buyer--best"><i data-i="couronne"></i><span class="mini" data-buste="anselme"></span><span class="coin coin--sm"></span>2</span>
+          <span class="buyer"><span class="mini" data-buste="odette"></span><span class="coin coin--sm"></span>1</span>
+          <span class="buyer buyer--unknown">?</span>
+        </div>
+        <div class="row">
+          <button class="btn btn--primary"><span class="key">Entrée</span>Prendre en main</button>
+          <button class="btn">Poser</button>
+        </div>
+      </div>
+      <div class="detail" data-si="sans-sac">
+        <div class="v3d"><i data-i="arrosoir" class="obj"></i></div>
+        <h2>Vieil arrosoir</h2>
+        <p>Usé&nbsp;: il arrose moins bien.</p>
+        <div class="row" role="group" aria-label="Qui le répare">
+          <span class="buyer"><span class="mini" data-buste="anselme"></span><span class="coin coin--sm"></span>15</span>
+        </div>
+        <div class="row"><button class="btn btn--primary"><span class="key">Entrée</span>En main</button></div>
+      </div>
+      <div class="foot"><span><span class="key">W</span><span class="key">X</span> tourner l'objet</span></div>
+    </section>
+  </div>
+
+  <nav class="signets" role="tablist" aria-label="Onglets du carnet">
+    <button class="signet" role="tab" aria-selected="true" aria-label="Sac"><i data-i="sac"></i><span>Sac</span></button>
+    <button class="signet signet--new" role="tab" aria-selected="false" aria-label="Quêtes, du nouveau"><i data-i="plume"></i><span>Quêtes</span></button>
+    <button class="signet" role="tab" aria-selected="false" aria-label="Habitants"><i data-i="gens"></i><span>Habitants</span></button>
+    <button class="signet" role="tab" aria-selected="false" aria-label="Collections"><i data-i="album"></i><span>Collections</span></button>
+    <button class="signet" role="tab" aria-selected="false" aria-label="Carte"><i data-i="carte"></i><span>Carte</span></button>
+    <button class="signet" role="tab" aria-selected="false" aria-label="Tenues"><i data-i="tenue"></i><span>Tenues</span></button>
+    <button class="signet" role="tab" aria-selected="false" aria-label="Réglages"><i data-i="rouage"></i><span>Réglages</span></button>
+  </nav>
+</main>
+
+<div class="provisoire">Maquette : décor et objets 3D figurés</div>
+<nav class="states" aria-label="États de la maquette"><a href="#sac">sac de 10</a><a href="#sans-sac">sans sac</a></nav>
+<script src="commun.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "chapeau_paille",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-d583-7108-93d6-9b8a7586758c",
+   "params": {
+    "prompt": "A single straw sun hat with a round crown, a wide flat brim and a ribbon band. Hat alone, hollow inside, no head, no face. Sized for a toy figurine with a big round head. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 1000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:13.433Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "chapeau_paille",
+  "categorie": "chapeau",
+  "mode": "rigide",
+  "os": "Head",
+  "largeur_calotte": 0.5,
+  "jeu": 1.06,
+  "dz": 0.03,
+  "couleur": [
+   0.88,
+   0.75,
+   0.45
+  ]
+ },
+ "status": "essai",
+ "brut": "chapeau_paille.glb"
+}

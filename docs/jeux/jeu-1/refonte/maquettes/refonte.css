@@ -1,0 +1,299 @@
+/*
+ * La Petite Ligne, refonte: maquettes de l'interface (référence, pas du code de production).
+ * Jetons repris de games/la-petite-ligne/ui-maquettes/jeton.css (palette et polices actuelles,
+ * en attendant la bible artistique de la refonte), plus les jetons nouveaux d'interface.md, section 6.
+ * Polices OFL déjà au dépôt (CREDITS.md); à défaut, polices du système.
+ */
+
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../../../../../games/la-petite-ligne/ui-maquettes/polices/fraunces-latin-soft-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito Sans Variable';
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url('../../../../../games/la-petite-ligne/ui-maquettes/polices/nunito-sans-latin-wght-normal.woff2') format('woff2');
+}
+
+:root {
+  --paper: #f3ebd4;
+  --paper-raised: #fbf6e9;
+  --paper-sunken: #e6dabd;
+  --paper-shade: #d9ccab;
+  --ink: #2a2522;
+  --ink-muted: #5b4d40;
+  --line: #8a6a43;
+  --wood: #765130;
+  --wood-deep: #5c3d24;
+  --wood-light: #a97749;
+  --on-wood: #fbf6e9;
+  --brass: #e8c77a;
+  --primary: #3f6453;
+  --on-primary: #fbf6e9;
+  --stamp: #a4463b;
+  --night: #2f3f5c;
+  --focus: #24408e;
+  --focus-halo: #fbf6e9;
+  --me: #5ce1e6;
+  --other: #8d6cff;
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-text: 'Nunito Sans Variable', system-ui, sans-serif;
+  --shadow-1: 0 0.125rem 0 0 rgb(42 37 34 / 0.3);
+  --shadow-2: 0.1875rem 0.25rem 0 0 rgb(42 37 34 / 0.32);
+  --shadow-3: 0.3125rem 0.4375rem 0 0 rgb(42 37 34 / 0.36);
+  --d-fast: 120ms;
+  --d-base: 200ms;
+  --d-slow: 320ms;
+  --d-scene: 600ms; /* nouveau: ouverture du carnet, caméra de menu */
+  --d-hint: 3s; /* nouveau: coup d'œil, repli de la barre d'outils */
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* nouveau */
+  --ease-out: cubic-bezier(0.4, 0, 1, 1); /* nouveau */
+  --tile: 5.25rem;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  overflow: hidden;
+  font-family: var(--font-text);
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--ink);
+  background: #9cba6a;
+}
+.ic { width: 1.5rem; height: 1.5rem; flex: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible,
+.focus {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: 0.125rem;
+  box-shadow: 0 0 0 0.125rem var(--focus-halo);
+}
+
+/* ---------- Décor figuré ---------- */
+.scene { position: fixed; inset: 0; z-index: 0; }
+.scene svg { width: 100%; height: 100%; display: block; }
+.scene--dim::after { content: ''; position: absolute; inset: 0; background: rgb(42 37 34 / 0.55); }
+.provisoire {
+  position: fixed; left: 0.75rem; bottom: 0.5rem; z-index: 60;
+  padding: 0.125rem 0.5rem; border: 0.0625rem dashed var(--ink); border-radius: 0.25rem;
+  background: repeating-linear-gradient(135deg, #fbf6e9 0 0.375rem, #e6dabd 0.375rem 0.75rem);
+  font-size: 0.75rem; font-weight: 750; color: var(--ink);
+}
+
+/* ---------- Touche ---------- */
+.key {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.625rem; height: 1.625rem; padding: 0 0.4375rem;
+  border: 0.125rem solid var(--ink); border-bottom-width: 0.25rem; border-radius: 0.375rem;
+  background: var(--paper-raised); color: var(--ink);
+  font-size: 0.8125rem; font-weight: 800; line-height: 1;
+}
+
+/* ---------- HUD: horloge et bourse ---------- */
+.hud-clock {
+  position: fixed; left: 0.75rem; top: 0.75rem; z-index: 10;
+  display: grid; grid-template-columns: auto auto; gap: 0.25rem 0.625rem; align-items: center;
+  padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+  background: var(--wood-deep); color: var(--on-wood);
+  border: 0.125rem solid var(--ink); border-radius: 0.875rem; box-shadow: var(--shadow-2);
+}
+.dial {
+  grid-row: span 2; position: relative; width: 4.5rem; height: 4.5rem; border-radius: 50%;
+  background: linear-gradient(#bfe0ee 0 58%, #86a85a 58%); border: 0.125rem solid var(--ink); overflow: hidden;
+}
+.dial__sun {
+  position: absolute; left: 50%; top: 58%; width: 0; height: 0;
+  animation: astre 12s linear infinite;
+}
+.dial__sun::after {
+  content: ''; position: absolute; left: -0.5625rem; top: -2.1rem; width: 1.125rem; height: 1.125rem;
+  border-radius: 50%; background: #f4c542; border: 0.125rem solid var(--ink);
+}
+@keyframes astre { from { transform: rotate(-70deg); } to { transform: rotate(70deg); } }
+.hud-clock__time { font-family: var(--font-display); font-size: 1.75rem; font-weight: 650; line-height: 1; }
+.hud-clock__day { display: flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; font-weight: 750; }
+.hud-clock__day .ic { width: 1rem; height: 1rem; }
+.purse {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  font-family: var(--font-display); font-size: 1.25rem; font-weight: 650; line-height: 1;
+}
+.coin {
+  width: 1.375rem; height: 1.375rem; border-radius: 50%; flex: none;
+  background: #e8c77a; border: 0.125rem solid var(--ink);
+  box-shadow: inset 0 0 0 0.125rem #c79a3a;
+}
+.coin--sm { width: 0.9375rem; height: 0.9375rem; box-shadow: inset 0 0 0 0.0625rem #c79a3a; border-width: 0.09375rem; }
+
+/* ---------- Médaillon de besoin ---------- */
+.needs { position: fixed; left: 14.75rem; top: 0.75rem; z-index: 10; display: flex; gap: 0.5rem; }
+.need {
+  --val: 70; --ring: var(--primary);
+  position: relative; width: 3rem; height: 3rem; border-radius: 50%;
+  display: grid; place-items: center;
+  background: conic-gradient(var(--ring) calc(var(--val) * 1%), var(--paper-shade) 0);
+  border: 0.125rem solid var(--ink); box-shadow: var(--shadow-1);
+  animation: pop var(--d-base) var(--ease-bounce) both;
+}
+.need::before { content: ''; position: absolute; inset: 0.4375rem; border-radius: 50%; background: var(--paper-raised); border: 0.0625rem solid var(--ink); }
+.need .ic { position: relative; width: 1.375rem; height: 1.375rem; }
+.need--low {
+  --ring: var(--stamp); border-style: dashed;
+  background:
+    repeating-conic-gradient(rgb(251 246 233 / 0.55) 0 4deg, transparent 4deg 9deg),
+    conic-gradient(var(--ring) calc(var(--val) * 1%), var(--paper-shade) 0);
+  animation: pop var(--d-base) var(--ease-bounce) both, bat 1.6s ease-in-out 0.3s infinite;
+}
+.need--bonus::after {
+  content: '★'; position: absolute; right: -0.375rem; top: -0.5rem; font-size: 1rem; color: #c58a12;
+  -webkit-text-stroke: 0.0625rem var(--ink);
+}
+@keyframes pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+/* ---------- Bulles dans le monde ---------- */
+.prompt {
+  position: absolute; z-index: 12; transform: translate(-50%, -100%);
+  display: inline-flex; align-items: center; gap: 0.4375rem; white-space: nowrap;
+  padding: 0.3125rem 0.75rem 0.3125rem 0.375rem;
+  background: var(--paper-raised); border: 0.125rem solid var(--ink); border-radius: 62rem;
+  box-shadow: var(--shadow-2); font-weight: 800;
+  animation: monte var(--d-base) var(--ease-bounce) both;
+}
+.prompt::after {
+  content: ''; position: absolute; left: 50%; bottom: -0.4375rem; width: 0.625rem; height: 0.625rem;
+  background: var(--paper-raised); border: solid var(--ink); border-width: 0 0.125rem 0.125rem 0;
+  transform: translateX(-50%) rotate(45deg);
+}
+@keyframes monte { from { opacity: 0; transform: translate(-50%, -70%) scale(0.7); } to { opacity: 1; transform: translate(-50%, -100%) scale(1); } }
+.target-ring {
+  position: absolute; z-index: 5; transform: translate(-50%, -50%);
+  border: 0.1875rem solid var(--paper-raised); border-radius: 50%;
+  box-shadow: 0 0 0 0.0625rem rgb(42 37 34 / 0.5), 0 0 1rem 0.25rem rgb(251 246 233 / 0.75);
+  animation: rebond 2s var(--ease-bounce) infinite;
+}
+@keyframes rebond { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 8% { transform: translate(-50%, -50%) scale(1.08); } 16% { transform: translate(-50%, -50%) scale(1); } }
+.npc-bubble {
+  position: absolute; z-index: 11; transform: translate(-50%, -100%);
+  width: 2.5rem; height: 2.5rem; display: grid; place-items: center;
+  background: var(--paper-raised); border: 0.125rem solid var(--ink); border-radius: 50% 50% 50% 0.375rem;
+  box-shadow: var(--shadow-1); animation: flotte 1.8s ease-in-out infinite;
+}
+@keyframes flotte { 0%, 100% { margin-top: 0; } 50% { margin-top: -0.375rem; } }
+.emote {
+  position: absolute; z-index: 11; transform: translate(-50%, -100%) rotate(-6deg);
+  font-family: var(--font-display); font-size: 2rem; font-weight: 900; line-height: 1; color: var(--paper-raised);
+  -webkit-text-stroke: 0.3125rem var(--ink); paint-order: stroke fill; letter-spacing: 0.05em;
+  animation: surgit 1.5s var(--ease-bounce) infinite;
+}
+@keyframes surgit { 0% { opacity: 0; transform: translate(-50%, -60%) scale(0.3) rotate(-6deg); } 15%, 80% { opacity: 1; transform: translate(-50%, -100%) scale(1) rotate(-6deg); } 100% { opacity: 0; transform: translate(-50%, -120%) scale(1) rotate(-6deg); } }
+
+/* ---------- Jeton de joueur ---------- */
+.token { width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--me); border: 0.1875rem solid var(--ink); flex: none; }
+.token--other { background: var(--other); border-radius: 0.25rem; transform: rotate(45deg) scale(0.85); }
+
+/* ---------- Barre d'outils ---------- */
+.toolbar {
+  position: fixed; left: 50%; bottom: 0.75rem; z-index: 10; transform: translateX(-50%);
+  display: flex; gap: 0.375rem; padding: 0.375rem;
+  background: var(--wood-deep); border: 0.125rem solid var(--ink); border-radius: 0.875rem; box-shadow: var(--shadow-2);
+  animation: glisse var(--d-slow) var(--ease) both;
+}
+@keyframes glisse { from { transform: translate(-50%, 130%); } to { transform: translate(-50%, 0); } }
+.slot {
+  position: relative; width: 3.25rem; height: 3.25rem; display: grid; place-items: center;
+  background: var(--paper); border: 0.125rem solid var(--ink); border-radius: 0.5rem;
+}
+.slot .ic { width: 2.125rem; height: 2.125rem; }
+.slot--held { transform: translateY(-0.5rem) scale(1.12); background: var(--paper-raised); box-shadow: 0 0 0 0.1875rem var(--brass), var(--shadow-2); }
+.slot--empty { background: var(--paper-sunken); border-style: dashed; }
+.slot__key { position: absolute; left: 0.1875rem; top: 0.0625rem; font-size: 0.6875rem; font-weight: 800; color: var(--ink-muted); }
+.slot__n { position: absolute; right: -0.25rem; bottom: -0.25rem; }
+.wear { position: absolute; left: 0.375rem; right: 0.375rem; bottom: 0.1875rem; height: 0.25rem; border-radius: 0.125rem; background: var(--paper-shade); border: 0.0625rem solid var(--ink); overflow: hidden; }
+.wear i { display: block; height: 100%; width: 80%; background: var(--primary); }
+.wear--low i { width: 22%; background: repeating-linear-gradient(135deg, var(--stamp) 0 0.125rem, #fbf6e9 0.125rem 0.25rem); }
+
+/* ---------- Pastille ---------- */
+.pastille {
+  display: inline-flex; align-items: center; gap: 0.1875rem; padding: 0 0.375rem; height: 1.375rem;
+  background: var(--paper-raised); border: 0.125rem solid var(--ink); border-radius: 62rem;
+  font-size: 0.8125rem; font-weight: 800; line-height: 1; white-space: nowrap; color: var(--ink);
+}
+.pastille--price { background: #f6e3b0; }
+.pastille--full { background: var(--ink); color: var(--paper-raised); }
+.pastille--no { border-style: dashed; color: var(--ink-muted); text-decoration: line-through; text-decoration-thickness: 0.125rem; background: var(--paper-sunken); }
+.pastille .ic { width: 0.875rem; height: 0.875rem; }
+
+/* ---------- Vignette ---------- */
+.grid { display: grid; grid-template-columns: repeat(5, var(--tile)); gap: 0.625rem; }
+.tile {
+  position: relative; width: var(--tile); height: var(--tile); padding: 0; display: grid; place-items: center;
+  background: var(--paper-raised); border: 0.125rem solid var(--line); border-radius: 0.75rem; box-shadow: var(--shadow-1);
+  transition: transform var(--d-base) var(--ease-bounce);
+}
+.tile:hover, .tile.focus { transform: translateY(-0.25rem); border-color: var(--ink); z-index: 3; }
+.tile:hover .obj, .tile.focus .obj { animation: tourne 1.2s ease-in-out infinite alternate; }
+.tile .obj { width: 3.25rem; height: 3.25rem; }
+.tile__badge { position: absolute; right: -0.375rem; top: -0.375rem; z-index: 1; }
+.tile__mark { position: absolute; left: 0.25rem; top: 0.25rem; z-index: 1; }
+.tile--empty { background: var(--paper-sunken); border-style: dashed; box-shadow: none; }
+.tile--no { background: var(--paper-sunken); border-style: dashed; box-shadow: none; }
+.tile--no .obj { opacity: 0.4; filter: grayscale(1); }
+.tile--new::before { content: ''; position: absolute; left: -0.25rem; top: -0.25rem; width: 0.75rem; height: 0.75rem; border-radius: 50%; background: var(--stamp); border: 0.125rem solid var(--ink); z-index: 1; }
+.nametag {
+  position: absolute; left: 50%; top: calc(100% + 0.375rem); transform: translateX(-50%); z-index: 5;
+  padding: 0.125rem 0.5rem; background: var(--ink); color: var(--paper-raised); border-radius: 0.375rem;
+  font-size: 0.8125rem; font-weight: 750; white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity var(--d-fast);
+}
+.tile:hover .nametag, .tile.focus .nametag { opacity: 1; }
+
+/* ---------- Objet 3D figuré ---------- */
+.obj { display: block; }
+/* Dessin plat: il se balance au lieu de faire un tour complet (le vrai modèle 3D, lui, tourne). */
+@keyframes tourne { from { transform: rotateY(-55deg) rotateZ(-4deg); } to { transform: rotateY(55deg) rotateZ(4deg); } }
+.v3d {
+  position: relative; display: grid; place-items: center; perspective: 30rem;
+  background: radial-gradient(circle at 50% 35%, #fffaf0, var(--paper-sunken) 75%);
+  border: 0.125rem solid var(--ink); border-radius: 0.875rem; overflow: hidden;
+}
+.v3d::before {
+  content: ''; position: absolute; left: 50%; bottom: 14%; width: 56%; height: 12%; transform: translateX(-50%);
+  border-radius: 50%; background: var(--paper-shade); border: 0.125rem solid var(--line);
+}
+.v3d::after {
+  content: '3D figurée'; position: absolute; right: 0.25rem; top: 0.25rem; padding: 0 0.3125rem;
+  border: 0.0625rem dashed var(--ink); border-radius: 0.1875rem; font-size: 0.6875rem; font-weight: 750; line-height: 1.4;
+  background: repeating-linear-gradient(135deg, #fbf6e9 0 0.25rem, #e6dabd 0.25rem 0.5rem);
+}
+.v3d > .obj { position: relative; width: 58%; height: 58%; animation: tourne 2.4s ease-in-out infinite alternate; }
+.v3d--bust::before { display: none; }
+.v3d--bust > svg { position: relative; width: 100%; height: 100%; }
+
+/* ---------- Bouton ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0 1rem;
+  background: var(--paper-raised); border: 0.125rem solid var(--ink); border-radius: 0.625rem; box-shadow: var(--shadow-1);
+  font-weight: 800;
+}
+.btn--primary { background: var(--primary); color: var(--on-primary); }
+.btn:active { transform: translateY(0.125rem); box-shadow: none; }
+
+/* ---------- Cœurs ---------- */
+.hearts { display: inline-flex; gap: 0.125rem; color: var(--stamp); }
+.hearts .ic { width: 1rem; height: 1rem; }
+.hearts .off { color: var(--ink-muted); fill: none; }
+
+/* ---------- Animations réduites ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+}
+:root[data-motion='reduced'] *, :root[data-motion='reduced'] *::before, :root[data-motion='reduced'] *::after {
+  animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important;
+}

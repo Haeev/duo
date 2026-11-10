@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>La Petite Ligne, refonte: HUD en jeu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="refonte.css">
+<style>
+  .world { position: fixed; left: 50%; top: 50%; width: 1366px; height: 768px; margin: -384px 0 0 -683px; z-index: 5; pointer-events: none; }
+  .glance-arrow {
+    position: fixed; right: 0.75rem; top: 38%; z-index: 10; display: flex; align-items: center; gap: 0.375rem;
+    padding: 0.375rem 0.5rem 0.375rem 0.625rem; background: var(--paper-raised); border: 0.125rem solid var(--ink);
+    border-radius: 62rem 0.5rem 0.5rem 62rem; box-shadow: var(--shadow-2); font-weight: 800;
+    animation: pointe 0.9s ease-in-out infinite;
+  }
+  .glance-arrow .ic { width: 1.75rem; height: 1.75rem; }
+  @keyframes pointe { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(0.375rem); } }
+  .glance-timer { position: fixed; left: 50%; bottom: 5.25rem; z-index: 10; width: 12rem; height: 0.375rem; margin-left: -6rem; border-radius: 0.25rem; background: rgb(42 37 34 / 0.35); overflow: hidden; }
+  .glance-timer i { display: block; height: 100%; background: var(--paper-raised); transform-origin: left; animation: vide var(--d-hint) linear both; }
+  @keyframes vide { to { transform: scaleX(0); } }
+  .gain { position: absolute; z-index: 12; display: inline-flex; align-items: center; gap: 0.25rem; animation: gain 2.4s var(--ease) infinite; }
+  .gain .ic { width: 1.75rem; height: 1.75rem; }
+  @keyframes gain { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 15% { opacity: 1; transform: translateY(-1.5rem) scale(1); } 70% { opacity: 1; transform: translateY(-2.25rem); } 100% { opacity: 0; transform: translateY(-3.5rem); } }
+  .states { position: fixed; right: 0.75rem; bottom: 0.5rem; z-index: 60; display: flex; gap: 0.375rem; font-size: 0.75rem; font-weight: 750; }
+  .states a { padding: 0.125rem 0.5rem; background: var(--paper-raised); border: 0.0625rem dashed var(--ink); border-radius: 0.25rem; color: var(--ink); text-decoration: none; }
+</style>
+</head>
+<body data-defaut="jeu">
+<div class="scene" data-scene="bourg"></div>
+
+<!-- Permanent: l'heure et la bourse, rien d'autre. -->
+<div class="hud-clock" role="status" aria-label="Mardi 5, soleil, 10 h 40. Bourse : 214.">
+  <div class="dial"><div class="dial__sun"></div></div>
+  <div>
+    <div class="hud-clock__day"><i data-i="soleil"></i> mar. 5</div>
+    <div class="hud-clock__time">10&nbsp;h&nbsp;40</div>
+  </div>
+  <div class="purse"><span class="coin"></span>214</div>
+</div>
+
+<!-- Besoins: seul celui qui change d'état apparaît (ici la faim passe sous 20 %). -->
+<div class="needs" data-si="jeu">
+  <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
+</div>
+<!-- Coup d'œil (F): les trois besoins, la barre d'outils, la direction de la quête, 3 secondes. -->
+<div class="needs" data-si="coup-d-oeil">
+  <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
+  <div class="need need--bonus" style="--val:82" role="img" aria-label="Sommeil : en forme, bonus"><i data-i="lune"></i></div>
+  <div class="need" style="--val:44" role="img" aria-label="Hygiène : correcte"><i data-i="goutte"></i></div>
+</div>
+
+<div class="world">
+  <!-- Cible: l'objet rebondit et brille, la bulle dit l'action. -->
+  <div class="target-ring" style="left:470px;top:540px;width:84px;height:84px"></div>
+  <div class="prompt" style="left:470px;top:478px"><span class="key">Espace</span><i data-i="arrosoir"></i>Arroser</div>
+  <!-- Habitant qui a quelque chose pour nous. -->
+  <div class="npc-bubble" style="left:912px;top:326px" role="img" aria-label="Odette a une histoire pour toi"><i data-i="plume"></i></div>
+  <!-- Onomatopée au-dessus de l'autre joueur. -->
+  <div class="emote" style="left:1090px;top:392px" aria-hidden="true">!!</div>
+  <div class="gain" style="left:1120px;top:470px" data-si="jeu" aria-hidden="true"><i data-i="poisson"></i></div>
+  <div data-si="coup-d-oeil" style="position:absolute;left:1030px;top:400px"><span class="token token--other" style="display:block"></span></div>
+</div>
+
+<div class="glance-arrow" data-si="coup-d-oeil" role="img" aria-label="Ta quête : vers la droite"><i data-i="losange"></i><i data-i="fleche"></i></div>
+<div class="glance-timer" data-si="coup-d-oeil" aria-hidden="true"><i></i></div>
+
+<div class="toolbar" data-si="coup-d-oeil" role="toolbar" aria-label="Barre d'outils">
+  <div class="slot"><span class="slot__key">1</span><i data-i="houe"></i><span class="wear"><i></i></span></div>
+  <div class="slot slot--held"><span class="slot__key">2</span><i data-i="arrosoir"></i><span class="wear wear--low"><i></i></span></div>
+  <div class="slot"><span class="slot__key">3</span><i data-i="hache"></i><span class="wear"><i></i></span></div>
+  <div class="slot"><span class="slot__key">4</span><i data-i="canne"></i><span class="wear"><i></i></span></div>
+  <div class="slot"><span class="slot__key">5</span><i data-i="pain"></i><span class="slot__n pastille">2</span></div>
+  <div class="slot slot--empty"><span class="slot__key">6</span></div>
+</div>
+
+<div class="provisoire">Maquette : décor et objets 3D figurés</div>
+<nav class="states" aria-label="États de la maquette"><a href="#jeu">en jeu</a><a href="#coup-d-oeil">coup d'œil (F)</a></nav>
+
+<script src="commun.js"></script>
+<script>
+  // F: coup d'œil pendant 3 secondes, puis retour.
+  var minuteur;
+  document.addEventListener('keydown', function (e) {
+    if (e.code !== 'KeyF' || e.repeat) return;
+    location.hash = 'coup-d-oeil';
+    clearTimeout(minuteur);
+    minuteur = setTimeout(function () { location.hash = 'jeu'; }, 3000);
+  });
+</script>
+</body>
+</html>

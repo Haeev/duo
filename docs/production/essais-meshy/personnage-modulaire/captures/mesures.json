@@ -1,0 +1,119 @@
+{
+ "a": {
+  "triangles": 9049,
+  "appels": 9,
+  "programmes": 2,
+  "triangles_personnage": 9001,
+  "pieces": {
+   "tete": "tete_carre",
+   "haut": "haut_tshirt",
+   "bas": "bas_jupe",
+   "chaussures": "chaussures_baskets",
+   "chapeau": ""
+  }
+ },
+ "b": {
+  "triangles": 8436,
+  "appels": 6,
+  "programmes": 2,
+  "triangles_personnage": 8388,
+  "pieces": {
+   "tete": "tete_court",
+   "haut": "haut_veste",
+   "bas": "bas_pantalon",
+   "chaussures": "chaussures_baskets",
+   "chapeau": ""
+  }
+ },
+ "c": {
+  "triangles": 10019,
+  "appels": 9,
+  "programmes": 2,
+  "triangles_personnage": 9971,
+  "pieces": {
+   "tete": "tete_court",
+   "haut": "haut_tshirt",
+   "bas": "bas_pantalon",
+   "chaussures": "",
+   "chapeau": "chapeau_paille"
+  }
+ },
+ "d": {
+  "triangles": 8322,
+  "appels": 8,
+  "programmes": 2,
+  "triangles_personnage": 8274,
+  "pieces": {
+   "tete": "tete_carre",
+   "haut": "haut_veste",
+   "bas": "bas_jupe",
+   "chaussures": "chaussures_baskets",
+   "chapeau": "chapeau_paille"
+  }
+ },
+ "e": {
+  "triangles": 6031,
+  "appels": 6,
+  "programmes": 2,
+  "triangles_personnage": 5983,
+  "pieces": {
+   "tete": "tete_barbu",
+   "haut": "haut_gilet",
+   "bas": "bas_short",
+   "chaussures": "chaussures_bottes",
+   "chapeau": ""
+  }
+ },
+ "f": {
+  "triangles": 6101,
+  "appels": 6,
+  "programmes": 2,
+  "triangles_personnage": 6053,
+  "pieces": {
+   "tete": "tete_carre",
+   "haut": "haut_gilet",
+   "bas": "bas_jupe",
+   "chaussures": "chaussures_bottes",
+   "chapeau": ""
+  }
+ },
+ "g": {
+  "triangles": 9855,
+  "appels": 10,
+  "programmes": 2,
+  "triangles_personnage": 9807,
+  "pieces": {
+   "tete": "tete_barbu",
+   "haut": "haut_tshirt",
+   "bas": "bas_short",
+   "chaussures": "chaussures_baskets",
+   "chapeau": "chapeau_paille"
+  }
+ },
+ "h": {
+  "triangles": 7804,
+  "appels": 6,
+  "programmes": 2,
+  "triangles_personnage": 7756,
+  "pieces": {
+   "tete": "tete_court",
+   "haut": "haut_gilet",
+   "bas": "bas_pantalon",
+   "chaussures": "chaussures_bottes",
+   "chapeau": ""
+  }
+ },
+ "corps": {
+  "triangles": 6235,
+  "appels": 9,
+  "programmes": 2,
+  "triangles_personnage": 6187,
+  "pieces": {
+   "tete": "",
+   "haut": "",
+   "bas": "",
+   "chaussures": "",
+   "chapeau": ""
+  }
+ }
+}

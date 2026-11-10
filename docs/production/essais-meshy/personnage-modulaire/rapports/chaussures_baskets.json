@@ -1,0 +1,13 @@
+{
+ "piece": "chaussures_baskets",
+ "categorie": "chaussures",
+ "triangles": 1424,
+ "sommets": 800,
+ "octets": 52752,
+ "masque": [
+  "pieds"
+ ],
+ "triangles_bruts": 1424,
+ "echelle_LeftFoot": 0.22505716772123416,
+ "echelle_RightFoot": 0.2614656390743383
+}

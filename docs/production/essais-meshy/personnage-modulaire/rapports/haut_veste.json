@@ -1,0 +1,17 @@
+{
+ "piece": "haut_veste",
+ "categorie": "haut",
+ "triangles": 1884,
+ "sommets": 1040,
+ "octets": 66072,
+ "masque": [
+  "torse",
+  "bras",
+  "avant_bras"
+ ],
+ "triangles_bruts": 2842,
+ "echelle": 0.856410580180015,
+ "sommets_dans_le_corps_avant": 350,
+ "sommets_dans_le_corps_apres": 7,
+ "sommets_deplaces": 1603
+}

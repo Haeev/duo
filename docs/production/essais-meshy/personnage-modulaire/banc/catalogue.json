@@ -1,0 +1,86 @@
+{
+ "corps": "../pieces/corps.glb",
+ "categories": [
+  "tete",
+  "haut",
+  "bas",
+  "chaussures",
+  "chapeau"
+ ],
+ "pieces": {
+  "tete": [
+   "tete_carre",
+   "tete_court",
+   "tete_barbu"
+  ],
+  "haut": [
+   "haut_tshirt",
+   "haut_veste",
+   "haut_gilet"
+  ],
+  "bas": [
+   "bas_pantalon",
+   "bas_jupe",
+   "bas_short"
+  ],
+  "chaussures": [
+   "chaussures_baskets",
+   "chaussures_bottes"
+  ],
+  "chapeau": [
+   "chapeau_paille"
+  ]
+ },
+ "combinaisons": {
+  "a": {
+   "tete": "tete_carre",
+   "haut": "haut_tshirt",
+   "bas": "bas_jupe",
+   "chaussures": "chaussures_baskets"
+  },
+  "b": {
+   "tete": "tete_court",
+   "haut": "haut_veste",
+   "bas": "bas_pantalon",
+   "chaussures": "chaussures_baskets"
+  },
+  "c": {
+   "tete": "tete_court",
+   "haut": "haut_tshirt",
+   "bas": "bas_pantalon",
+   "chapeau": "chapeau_paille"
+  },
+  "d": {
+   "tete": "tete_carre",
+   "haut": "haut_veste",
+   "bas": "bas_jupe",
+   "chaussures": "chaussures_baskets",
+   "chapeau": "chapeau_paille"
+  },
+  "e": {
+   "tete": "tete_barbu",
+   "haut": "haut_gilet",
+   "bas": "bas_short",
+   "chaussures": "chaussures_bottes"
+  },
+  "f": {
+   "tete": "tete_carre",
+   "haut": "haut_gilet",
+   "bas": "bas_jupe",
+   "chaussures": "chaussures_bottes"
+  },
+  "g": {
+   "tete": "tete_barbu",
+   "haut": "haut_tshirt",
+   "bas": "bas_short",
+   "chaussures": "chaussures_baskets",
+   "chapeau": "chapeau_paille"
+  },
+  "h": {
+   "tete": "tete_court",
+   "haut": "haut_gilet",
+   "bas": "bas_pantalon",
+   "chaussures": "chaussures_bottes"
+  }
+ }
+}

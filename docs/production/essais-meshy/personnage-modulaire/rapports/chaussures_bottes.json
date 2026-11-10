@@ -1,0 +1,13 @@
+{
+ "piece": "chaussures_bottes",
+ "categorie": "chaussures",
+ "triangles": 1377,
+ "sommets": 4099,
+ "octets": 197668,
+ "masque": [
+  "jambes",
+  "pieds"
+ ],
+ "voie": "B",
+ "donneur": "donneur_homme"
+}

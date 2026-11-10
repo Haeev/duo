@@ -1,0 +1,61 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "bas_jupe",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-b707-72dc-a287-6376eb148e07",
+   "params": {
+    "prompt": "A single knee-length flared A-line skirt with a simple waistband, standing upright. Clothing item alone, displayed as if worn by an invisible mannequin: hollow, no body, no head, no hands, no legs visible. Sized for a stylized toy figurine about five heads tall with chunky rounded limbs. Front view, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 1500,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:05.680Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "bas_jupe",
+  "categorie": "bas",
+  "mode": "jupe",
+  "garder_z": [
+   0.24,
+   0.7
+  ],
+  "jusqu_a": "genou",
+  "bas_dz": -0.12,
+  "haut_dz": 0.12,
+  "masque": [
+   "bassin"
+  ],
+  "ecart_min": 0.012,
+  "couleur": [
+   0.3,
+   0.55,
+   0.4
+  ]
+ },
+ "status": "essai",
+ "brut": "bas_jupe.glb"
+}

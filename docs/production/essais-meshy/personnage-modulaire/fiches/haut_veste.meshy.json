@@ -1,0 +1,63 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "haut_veste",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-9aab-74bf-98cf-f4cf4ff181c6",
+   "params": {
+    "prompt": "A single long-sleeved buttoned work jacket with a small collar and two chest pockets, hem at the hips. T-pose: both long sleeves straight out horizontally to the sides. Clothing item alone, displayed as if worn by an invisible mannequin: hollow, no body, no head, no hands, no legs visible. Sized for a stylized toy figurine about five heads tall with chunky rounded limbs. Front view, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 3000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:57:58.433Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "haut_veste",
+  "categorie": "haut",
+  "mode": "enveloppe",
+  "garder_z": [
+   0.22,
+   0.93
+  ],
+  "retirer_petits_ilots": 0.2,
+  "pose_bras_deg": 70,
+  "masque": [
+   "torse",
+   "bras",
+   "avant_bras"
+  ],
+  "ecart_min": 0.01,
+  "ecart_max": 0.08,
+  "couleur": [
+   0.2,
+   0.3,
+   0.5
+  ]
+ },
+ "status": "essai",
+ "brut": "haut_veste.glb"
+}

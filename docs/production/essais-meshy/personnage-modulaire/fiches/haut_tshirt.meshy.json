@@ -1,0 +1,56 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "haut_tshirt",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-84ce-7152-81b6-c3748535a02d",
+   "params": {
+    "prompt": "A single short-sleeved t-shirt with round neck and straight hem at the hips. T-pose: both short sleeves straight out horizontally to the sides. Clothing item alone, displayed as if worn by an invisible mannequin: hollow, no body, no head, no hands, no legs visible. Sized for a stylized toy figurine about five heads tall with chunky rounded limbs. Front view, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 2500,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:57:52.796Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "haut_tshirt",
+  "categorie": "haut",
+  "mode": "enveloppe",
+  "pose_bras_deg": 45,
+  "masque": [
+   "torse"
+  ],
+  "ecart_min": 0.008,
+  "ecart_max": 0.06,
+  "couleur": [
+   0.85,
+   0.25,
+   0.2
+  ]
+ },
+ "status": "essai",
+ "brut": "haut_tshirt.glb"
+}

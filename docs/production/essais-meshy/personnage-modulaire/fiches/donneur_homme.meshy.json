@@ -1,0 +1,113 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "donneur_homme",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: donneur de pièces (voie B)",
+ "purpose": "personnage entier habillé, riggé par Meshy puis découpé par zones en pièces du catalogue",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e5-2ccc-722c-b305-1c73714ef31a",
+   "params": {
+    "prompt": "Stylized toy figurine game character: adult man, about five heads tall, slightly chunky rounded limbs, simple mitten hands, friendly simple face in relief. Short curly hair and a short beard. Wearing a sleeveless padded vest over a long-sleeved shirt, knee-length shorts and rubber boots. T-pose, arms straight out horizontally, legs straight and slightly apart, facing front, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 6000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json",
+    "pose_mode": "t-pose"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:35.827Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  },
+  {
+   "step": "rig",
+   "tool": "meshy_rig",
+   "task_id": "01a1c4e7-7fbd-721d-b08b-08afac24bf6c",
+   "parent_task_id": "01a1c4e5-2ccc-722c-b305-1c73714ef31a",
+   "params": {
+    "height_meters": 1.72
+   },
+   "credits": 5,
+   "created": "2026-11-10",
+   "files": [
+    "Character_output.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 10,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "largeur": 1.0,
+  "pieces": [
+   {
+    "nom": "haut_gilet",
+    "categorie": "haut",
+    "zones": [
+     "torse",
+     "bras",
+     "avant_bras"
+    ],
+    "couleur": [
+     0.75,
+     0.5,
+     0.2
+    ]
+   },
+   {
+    "nom": "bas_short",
+    "categorie": "bas",
+    "zones": [
+     "bassin"
+    ],
+    "couleur": [
+     0.35,
+     0.4,
+     0.3
+    ]
+   },
+   {
+    "nom": "chaussures_bottes",
+    "categorie": "chaussures",
+    "zones": [
+     "jambes",
+     "pieds"
+    ],
+    "couleur": [
+     0.2,
+     0.35,
+     0.3
+    ]
+   },
+   {
+    "nom": "tete_barbu",
+    "categorie": "tete",
+    "zones": [
+     "tete"
+    ],
+    "couleur": [
+     0.87,
+     0.62,
+     0.48
+    ]
+   }
+  ],
+  "tete": 1.2
+ },
+ "status": "essai",
+ "brut_rig": "rig/homme_rig.glb"
+}

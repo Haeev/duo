@@ -1,0 +1,59 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "tete_court",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: pièce de catalogue",
+ "purpose": "essai de la voie A (pièce générée seule, conformée sur le corps commun)",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-f3eb-703a-a205-ce6b0538bba8",
+   "params": {
+    "prompt": "A hair wig alone: short side-parted men's haircut with a small quiff at the front, short on the sides, ears uncovered, sculpted as a few big smooth clumps. Hairpiece only, hollow inside like a cap, to be placed on the big round bald head of a toy figurine. No head, no face, no neck, no body. Front view. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 2000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:21.265Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "credits_budget": 250,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "conformity": {
+  "nom": "tete_court",
+  "categorie": "tete",
+  "mode": "rigide",
+  "os": "Head",
+  "garder_z": [
+   0.1,
+   1.0
+  ],
+  "masque": [
+   "tete"
+  ],
+  "haut_dz": 0.02,
+  "couleur": [
+   0.87,
+   0.62,
+   0.48
+  ]
+ },
+ "status": "essai",
+ "brut": "cheveux_court.glb"
+}

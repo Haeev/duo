@@ -1,0 +1,13 @@
+{
+ "piece": "bas_jupe",
+ "categorie": "bas",
+ "triangles": 781,
+ "sommets": 495,
+ "octets": 35452,
+ "masque": [
+  "bassin"
+ ],
+ "triangles_bruts": 1433,
+ "echelle": 1.4287410196712338,
+ "sommets_pousses": 295
+}

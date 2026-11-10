@@ -1,0 +1,15 @@
+{
+ "piece": "haut_tshirt",
+ "categorie": "haut",
+ "triangles": 2451,
+ "sommets": 1280,
+ "octets": 80016,
+ "masque": [
+  "torse"
+ ],
+ "triangles_bruts": 2451,
+ "echelle": 0.6083636437010718,
+ "sommets_dans_le_corps_avant": 584,
+ "sommets_dans_le_corps_apres": 0,
+ "sommets_deplaces": 1702
+}
