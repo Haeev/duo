@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "id": "sonnerie-essai",
+  "kind": "main",
+  "title": "La sonnerie d'essai",
+  "giver": "cheffe-de-gare",
+  "requires": [
+    {
+      "type": "remembered",
+      "key": "essai-gare.besace",
+      "equals": true
+    }
+  ],
+  "chapters": [
+    {
+      "id": "un-drole-de-bruit",
+      "title": "Un drôle de bruit",
+      "steps": [
+        {
+          "id": "parler",
+          "objective": "Parle à la cheffe de gare, au guichet.",
+          "target": {
+            "villager": "cheffe-de-gare"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "sonnerie-debut",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "essai-gare.sonnerie",
+              "value": "parler",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "essai-gare.sonnerie",
+              "value": "buche",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "buche",
+          "objective": "Rapporte une bûche du tas de bois à la cheffe de gare.",
+          "target": {
+            "point": "bois"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 1,
+              "villager": "cheffe-de-gare"
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "essai-gare.sonnerie",
+              "value": "scene",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "sonnerie"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-sonnerie",
+      "title": "La sonnerie",
+      "steps": [
+        {
+          "id": "ecouter",
+          "objective": "Retrouvez-vous au guichet: quelque chose sonne.",
+          "target": {
+            "point": "guichet"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "sonnerie"
+            }
+          ],
+          "together": true,
+          "onStart": [],
+          "onDone": []
+        },
+        {
+          "id": "raconter",
+          "objective": "Raconte à la cheffe de gare ce que vous avez vu.",
+          "target": {
+            "villager": "cheffe-de-gare"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "sonnerie-recit",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "essai-gare.sonnerie",
+              "value": "ouverte",
+              "by": "duo"
+            },
+            {
+              "type": "unlock_zone",
+              "zone": "voie-nord"
+            }
+          ]
+        },
+        {
+          "id": "voie",
+          "objective": "Allez tous les deux voir le quai du nord, enfin ouvert.",
+          "target": {
+            "point": "quai"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "quai",
+              "who": "both"
+            }
+          ],
+          "together": false,
+          "onStart": [],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "essai-gare.sonnerie",
+              "value": "finie",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

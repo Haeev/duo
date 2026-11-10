@@ -1,0 +1,61 @@
+// GABARIT: une scène scriptée d'un lieu, jouée chez les deux joueurs en même temps.
+// Créer: pnpm nouveau scene <id> <lieu>   -> donnees/lieux/<lieu>/scenes/<id>.json
+// Schéma: src/donnees/schemas/scene.ts; moteur: src/simulation/scenes/README.md
+// Elle se lance par l'effet { "type": "play_scene", "scene": "<id>" } d'une étape, ou par son
+// déclencheur (trigger). Vue jusqu'au bout, elle compte pour { "type": "scene_seen" }.
+{
+  "schema": 1,
+  "id": "exemple-scene",
+  // Titre au carnet (scènes à relire).
+  "title": "Une scène d'exemple",
+  // true: elle attend que les deux joueurs soient réunis pour commencer.
+  "together": true,
+  // Scène à deux asymétrique: le nom de chaque rôle. "a": le joueur qui la déclenche, "b": l'autre.
+  // null: les deux voient la même chose.
+  "roles": { "a": "Au guichet", "b": "Sur le quai" },
+  // Déclencheur de monde, ou null (alors seulement par play_scene).
+  //   "at": heure en minutes depuis minuit (5 h 12 = 312), ou null pour « dès que »;
+  //   "when": conditions (celles des étapes de quête); "repeat": "once" ou "daily".
+  "trigger": null,
+  // Les temps, dans l'ordre. "who": un habitant, "a" ou "b" (personnage d'un joueur), "narrator".
+  "beats": [
+    // Caméra suggérée (la caméra reste libre): { "point": ... } ou { "villager": ... }, en secondes.
+    { "do": "camera", "focus": { "villager": "cheffe-de-gare" }, "seconds": 3 },
+    // Un habitant marche jusqu'à un point de la carte; le temps suivant attend son arrivée.
+    { "do": "walk", "who": "cheffe-de-gare", "to": "guichet" },
+    // Réplique: "to" both, a ou b (scène asymétrique); "emote": surprise, question, joy, anger,
+    // sad, idea ou null; "sound": onomatopée en bulle ou null; "seconds": passe seule, ou null
+    // (attend que chacun l'ait lue, jamais plus de 20 s).
+    {
+      "do": "say",
+      "who": "cheffe-de-gare",
+      "text": "Vous entendez ? On dirait une sonnerie.",
+      "emote": "surprise",
+      "sound": "Ding !",
+      "to": "both",
+      "seconds": null,
+    },
+    { "do": "emote", "who": "a", "emote": "question", "sound": null },
+    // Attente d'une action: une partie par rôle (ou "any"), avec sa consigne et ses conditions.
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Va au guichet.",
+          "done": [{ "type": "reach", "point": "guichet", "who": "one" }],
+        },
+        {
+          "role": "b",
+          "hint": "Va sur le quai.",
+          "done": [{ "type": "reach", "point": "quai", "who": "one" }],
+        },
+      ],
+    },
+    { "do": "fade", "to": "black", "seconds": 1 },
+    // Effets: ceux des étapes de quête.
+    { "do": "effects", "effects": [] },
+    { "do": "wait", "seconds": 1 },
+    { "do": "fade", "to": "clear", "seconds": 1 },
+  ],
+}

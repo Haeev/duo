@@ -13,7 +13,9 @@ import { dialogueSystem } from '../dialogues/index';
 import { cropSystem } from '../cultures/index';
 import { toolSystem } from '../outils/index';
 import { villagerSystem } from '../habitants/index';
+import { questSystem } from '../quetes/index';
 import { bagSystem } from '../sac/index';
+import { sceneSystem } from '../scenes/index';
 import { travelSystem } from '../voyage/index';
 import type { Intent, StepInput } from './entrees';
 import type { GameEvent } from './evenements';
@@ -55,4 +57,6 @@ export const SYSTEMS: readonly GameSystem[] = [
   toolSystem,
   cropSystem,
   villagerSystem,
+  questSystem,
+  sceneSystem,
 ];

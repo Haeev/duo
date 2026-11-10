@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "id": "sonnerie",
+  "title": "La sonnerie",
+  "together": true,
+  "roles": {
+    "a": "Au guichet",
+    "b": "Sur le quai"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "point": "quai"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "say",
+      "who": "cheffe-de-gare",
+      "text": "Écoutez... Deux coups, là-bas. Allez voir, chacun de son côté !",
+      "emote": "surprise",
+      "sound": "Ding ! Ding !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Va jusqu'au guichet.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "guichet",
+              "who": "one"
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Va jusqu'au quai.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "quai",
+              "who": "one"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Au-dessus du guichet, la pendule s'est arrêtée sur 5 h 12.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Une lueur passe au ras des rails, puis s'éteint dans la brume.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "fade",
+      "to": "black",
+      "seconds": 1
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "essai-gare.sonnerie",
+          "value": "vue",
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dites-vous ce que vous avez vu, puis allez le raconter à la cheffe.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": 6
+    }
+  ]
+}

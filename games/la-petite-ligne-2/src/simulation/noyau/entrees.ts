@@ -7,7 +7,9 @@ import { SHOP_INTENTS } from '../commerces/intentions';
 import { DIALOGUE_INTENTS } from '../dialogues/intentions';
 import { TOOL_INTENTS } from '../outils/intentions';
 import { VILLAGER_INTENTS } from '../habitants/intentions';
+import { QUEST_INTENTS } from '../quetes/intentions';
 import { BAG_INTENTS } from '../sac/intentions';
+import { SCENE_INTENTS } from '../scenes/intentions';
 import { TRAVEL_INTENTS } from '../voyage/intentions';
 import { CORE_INTENTS } from './intentions';
 
@@ -43,5 +45,7 @@ export const IntentSchema = v.variant('type', [
   ...DIALOGUE_INTENTS,
   ...TOOL_INTENTS,
   ...VILLAGER_INTENTS,
+  ...QUEST_INTENTS,
+  ...SCENE_INTENTS,
 ]);
 export type Intent = v.InferOutput<typeof IntentSchema>;

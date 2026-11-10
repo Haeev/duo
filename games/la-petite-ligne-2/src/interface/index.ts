@@ -195,6 +195,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'item_gained':
       case 'meal_shared':
       case 'need_tier':
+      case 'quest_done':
+      case 'quest_opened':
+      case 'quest_step_done':
+      case 'scene_beat':
+      case 'scene_ended':
+      case 'scene_started':
       case 'talk_ended':
       case 'talk_page':
       case 'talk_started':

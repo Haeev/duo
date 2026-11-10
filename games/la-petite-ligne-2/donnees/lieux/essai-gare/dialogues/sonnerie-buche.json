@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "sonnerie-buche",
+  "villager": "cheffe-de-gare",
+  "priority": 10,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "essai-gare.sonnerie",
+      "equals": "buche"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "buche",
+              "count": 1
+            }
+          ],
+          "next": "merci"
+        }
+      ],
+      "otherwise": "attente"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Merci ! Chut... Tu entends ? Ça sonne encore.",
+      "emote": "surprise",
+      "next": null
+    },
+    "attente": {
+      "kind": "line",
+      "speaker": "cheffe-de-gare",
+      "text": "Le tas de bois est au sud-ouest, près du pommier.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

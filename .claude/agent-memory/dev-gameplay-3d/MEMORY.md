@@ -612,3 +612,6 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un schéma de brique ne peut pas importer `schemas/briques.ts` (import circulaire, TDZ): le mettre dans son propre fichier sans import de `briques.ts`.
 - Ne jamais lancer `prettier --write` sur un dossier entier: plusieurs fichiers des autres lots (README, `interface/index.ts`) ne sont pas formatés et seraient réécrits. Viser ses fichiers.
 - Dans un worktree isolé, une commande qui mêle `git` et des tubes ou `&&` est refusée: commandes git simples, une par appel; le contrôle des tirets se lance sans `--exclude-dir=.git` (sur `games docs`).
+- Un événement ajouté à `GameEventSchema` casse le `switch` exhaustif de `src/interface/index.ts` (lint): l'ajouter aux cas ignorés.
+- Un champ ajouté à `progress` ne part pas chez l'invité (`reseau/progression.ts` n'envoie que `memory`, `bonds`, `quests`, `collections`, `opened`): un champ facultatif dans un objet déjà envoyé (`QuestSchema`, `CommonSchema`) part sans toucher au réseau.
+- Un dialogue de quête de priorité haute masque l'accueil d'un habitant (tests de dialogue cassés): ouvrir la suite d'essai par un fait de l'accueil (`requires`).
