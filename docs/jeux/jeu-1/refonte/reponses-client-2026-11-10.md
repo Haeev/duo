@@ -514,3 +514,8 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Scènes: joueur figé pendant une réplique qui lui est adressée et pendant l'écran noir; avance après 8 s si un seul a lu.
 - Belvédère: découvert avec la Côte.
 - Hautefonte: le client donnera des images de référence le moment venu.
+- Toits d'Aubrune: lauze pour les bâtiments publics, sauf la halte en tuile.
+- Poste d'aiguillage: il garde son escalier extérieur, déplacé sur un pignon.
+- Scène d'accueil: Firmin qui accourt en 4 secondes, oui.
+- Prologue: l'éditeur de personnage s'ouvre quand le Contrôleur demande la photo, plus au démarrage; « on ne doit pas voir nos personnages avant ça ».
+- Trois remarques épinglées sur la planche des bâtiments: le haut des cheminées doit être un petit toit de métal et non un V; une fenêtre de l'église n'est pas centrée; l'horloge de l'école est très mal faite.
