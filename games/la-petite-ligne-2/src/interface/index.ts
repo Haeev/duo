@@ -143,6 +143,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         send({ type: 'quest_track', quest });
       },
     },
+    // Onglet Tenues: « Changer de tenue » ouvre l'éditeur comme le miroir.
+    openEditor: () => {
+      const world = view.world();
+      const me = view.localIndex();
+      if (world === null || me === null) return;
+      notebook.close();
+      editor.open('mirror', world, me);
+    },
     ...options.notebook,
   });
   const shop = createShopScreen(
