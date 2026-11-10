@@ -17,7 +17,7 @@ import { DATA_FILES } from '../../donnees/fichiers';
 import type { WorldState } from '../../etat/monde';
 import type { GameView } from '../../session';
 import { createPlaceState, createWorld } from '../../simulation/noyau/monde';
-import { createRenderer, type RenderStats, type SceneVolume } from '../index';
+import { createRenderer, gameDecorModels, type RenderStats, type SceneVolume } from '../index';
 import { type GraphicsPreset, DEFAULT_GRAPHICS_OPTIONS } from '../options';
 
 const SEED = 7;
@@ -178,6 +178,7 @@ const view: GameView = {
   onEvent: () => () => undefined,
 };
 
+await gameDecorModels().ready;
 const presetParam = PRESETS.find((p) => p === params.get('qualite')) ?? 'auto';
 const renderer = createRenderer({
   canvas,

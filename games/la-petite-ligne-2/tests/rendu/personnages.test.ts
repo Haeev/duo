@@ -223,7 +223,10 @@ describe('couche des personnages', () => {
     for (let i = 0; i < 60; i += 1) layer.update({ dt: 1 / 60, world, place: bench, cameraYaw: 0 });
     const figure = root.getObjectByName('personnage-player-0');
     const s = CHARACTER_SETTINGS.seat;
-    expect(figure?.position.y ?? 0).toBeCloseTo(s.standIn.height - s.clipSeat, 1);
+    // Assise du modèle livré (manifeste des décors), sinon celle de la forme provisoire.
+    const model = content.props.banc?.model ?? '';
+    const height = s.byModel[model]?.height ?? s.standIn.height;
+    expect(figure?.position.y ?? 0).toBeCloseTo(Math.max(0, height - s.clipSeat), 1);
     expect(layer.stats().figures).toBe(2 + Object.keys(bench.villagers).length);
     layer.dispose();
     expect(layer.stats().figures).toBe(0);

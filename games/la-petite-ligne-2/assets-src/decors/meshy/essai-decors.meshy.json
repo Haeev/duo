@@ -1,0 +1,25 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "essai-decors (non livré: comparaison avec les scripts)",
+ "game": "la-petite-ligne-2",
+ "family": "décor: arbre feuillu et réverbère",
+ "purpose": "juger si Meshy fait mieux que les familles scriptées pour la végétation et le décor riche",
+ "inputs": [],
+ "tasks": [
+  {"step": "aperçu texte vers 3D", "tool": "meshy_text_to_3d", "task_id": "01a1c557-013d-77cf-9292-cf7ef128f0b2",
+   "params": {"prompt": "miniature railway model scenery, smooth vinyl toy style, soft rounded shapes, thick rounded edges, matte flat colors, single object, plain light grey background, no text, no logo, no photorealism, no fine detail, a round deciduous tree: short thick trunk with two branches and a canopy made of a few big soft moss balls", "ai_model": "meshy-t2", "model_type": "smart-topology", "topology": "triangle", "target_polycount": 1500, "target_formats": ["glb"]},
+   "credits": 5, "created": "2026-11-10", "files": ["preview.glb (30 Ko, 1 608 triangles)"], "downloaded": true},
+  {"step": "aperçu texte vers 3D", "tool": "meshy_text_to_3d", "task_id": "01a1c557-0e94-74f8-a886-22bbfd23a96d",
+   "params": {"prompt": "miniature railway model scenery, smooth vinyl toy style, soft rounded shapes, thick rounded edges, matte flat colors, single object, plain light grey background, no text, no logo, no photorealism, no fine detail, an old cast iron street lamp post with a curly bracket and a lantern, dark green paint", "ai_model": "meshy-t2", "model_type": "smart-topology", "topology": "triangle", "target_polycount": 1000, "target_formats": ["glb"]},
+   "credits": 5, "created": "2026-11-10", "files": ["preview.glb (20 Ko, 1 058 triangles)"], "downloaded": true}
+ ],
+ "credits_total": 10,
+ "credits_budget": 60,
+ "balance_before": 2202,
+ "balance_after": 2192,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "artiste-3d",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "result": "sorties brutes hors dépôt (meshy_output/ du scratchpad). Arbre: houppier en grappe de boules plus irrégulière et plus vivante que le script, mais tronc mince et boules détachées; réverbère: console en volute que le script ne fait pas, à 2 fois les triangles du réverbère scripté. Aucun des deux livré."
+}

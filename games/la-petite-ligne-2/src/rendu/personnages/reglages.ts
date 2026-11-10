@@ -2,6 +2,7 @@
  * Réglages des personnages assemblés (lot L6): tout ce qui se règle sans toucher à la logique.
  * Les pièces, les morphologies et les clips viennent du catalogue (lot L5), jamais d'ici.
  */
+import { decorSeats } from '../lieu/decors-manifeste';
 import { RENDER_SETTINGS } from '../reglages';
 
 export const CHARACTER_SETTINGS = {
@@ -49,7 +50,7 @@ export const CHARACTER_SETTINGS = {
      * Par modèle: hauteur du dessus de l'assise (m) et distance du milieu du meuble à son bord
      * avant (m). Le bassin avance pour que les genoux arrivent au bord: les jambes pendent devant.
      */
-    byModel: {} as Readonly<Record<string, { height: number; front: number }>>,
+    byModel: decorSeats() as Readonly<Record<string, { height: number; front: number }>>,
     standIn: {
       height: RENDER_SETTINGS.standIn.propHeight,
       front: 0.5 - RENDER_SETTINGS.standIn.inset,
