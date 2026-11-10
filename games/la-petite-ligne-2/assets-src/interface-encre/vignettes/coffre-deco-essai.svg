@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Coffre de chêne: couvercle plat, panneaux sculptés, coins et moraillon de laiton. -->
+  <g>
+    <path d="M72 42 L84 33 L84 75 L72 84 Z" fill="#4F3626"/>
+    <path d="M10 42 L72 42 L84 33 L22 33 Z" fill="#A87A46"/>
+    <path id="caisse" d="M10 42 L72 42 L72 84 L10 84 Z" fill="#8C5A35"/>
+    <g data-clip="caisse" data-teinte="#4F3626" data-w="0.28" fill="none" stroke="#000">
+    <path d="M16 78 Q30 74 44 78"/>
+    </g>
+    <path d="M8 42 L74 42 L88 32 L22 32 Z" fill="#A87A46"/>
+    <path d="M8 42 L74 42 L74 48 L8 48 Z" fill="#8C5A35" data-w="0.7"/>
+    <path d="M74 42 L88 32 L88 38 L74 48 Z" fill="#4F3626" data-w="0.7"/>
+    <g data-teinte="#4F3626" data-w="0.28" fill="none" stroke="#000">
+    <path d="M24 39 Q40 36 60 37"/>
+    </g>
+    <path d="M15 54 L35 54 L35 78 L15 78 Z" fill="#4F3626" data-w="0.45"/>
+    <path d="M18 57 L32 57 L32 75 L18 75 Z" fill="#8C5A35" data-w="0.35"/>
+    <path d="M25 60 Q30 66 25 72 Q20 66 25 60 Z" fill="#A87A46" data-w="0.3"/>
+    <path d="M47 54 L67 54 L67 78 L47 78 Z" fill="#4F3626" data-w="0.45"/>
+    <path d="M50 57 L64 57 L64 75 L50 75 Z" fill="#8C5A35" data-w="0.35"/>
+    <path d="M57 60 Q62 66 57 72 Q52 66 57 60 Z" fill="#A87A46" data-w="0.3"/>
+    <path d="M38 47 L44 47 L44 58 L38 58 Z" fill="#C8A150" data-w="0.5"/>
+    <path d="M10 79 l5 0 l0 5 Z" fill="#C8A150" data-w="0.35"/>
+    <path d="M67 79 l5 0 l0 5 Z" fill="#C8A150" data-w="0.35"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M74 74 l4 -4 M78 74 l4 -4"/>
+    </g>
+  </g>
+</svg>

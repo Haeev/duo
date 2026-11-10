@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tapis tressé: tapis rond vu de biais, tresse en anneaux de couleurs. -->
+  <g transform="rotate(-4 48 52)">
+    <ellipse id="t" cx="48" cy="60" rx="44" ry="26" fill="#A85837"/>
+    <ellipse cx="48" cy="60" rx="38" ry="22" fill="#C0803A" data-w="0.35"/>
+    <ellipse cx="48" cy="60" rx="31" ry="17.5" fill="#D9CAAE" data-w="0.35"/>
+    <ellipse cx="48" cy="60" rx="24" ry="13.5" fill="#2F6E73" data-w="0.35"/>
+    <ellipse cx="48" cy="60" rx="17" ry="9.5" fill="#D4A33E" data-w="0.35"/>
+    <ellipse cx="48" cy="60" rx="9" ry="5.5" fill="#A85837" data-w="0.35"/>
+    <path data-clip="t" data-w="0" d="M66 32 Q86 82 18 92 L96 96 L96 32 Z" fill="#26282E" fill-opacity="0.35"/>
+    <g data-teinte="#743D2B" data-w="0.3" fill="none" stroke="#000">
+    <path d="M10 58 l3 -3 M16 70 l3 -3 M30 80 l3 -3 M50 84 l3 -3 M70 80 l3 -3 M82 70 l3 -3 M86 56 l3 -3 M78 44 l3 -3 M60 37 l3 -3 M40 36 l3 -3 M20 44 l3 -3"/>
+    </g>
+    <g data-teinte="#F3EDE0" data-w="0.28" fill="none" stroke="#000">
+    <path d="M24 54 l2 -2 M30 66 l2 -2 M46 72 l2 -2 M66 66 l2 -2 M70 52 l2 -2 M52 44 l2 -2 M34 46 l2 -2"/>
+    </g>
+  </g>
+</svg>

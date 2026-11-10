@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Soupe de légumes: le bol de la famille en terre ocre à filet rouille, bouillon orangé, rondelles de carotte, petits pois, vapeur. -->
+  <g data-w="0.5" fill="none" stroke="#000"><path d="M34 22 Q28 14 34 8 Q38 4 34 0 M50 20 Q56 12 50 6 M64 22 Q58 14 64 8"/></g>
+  <g transform="rotate(4 48 58)">
+    <path d="M30 80 Q48 86 66 80 L64 88 Q48 92 32 88 Z" fill="#8E6A26" data-w="0.7"/>
+    <path id="bol" d="M6 46 Q8 82 48 86 Q88 82 90 46 Z" fill="#C0803A"/>
+    <path data-clip="bol" data-w="0" d="M62 40 Q72 80 18 90 L96 96 L96 40 Z" fill="#8E6A26"/>
+    <path data-clip="bol" data-w="0" d="M12 50 L22 50 Q22 66 28 76 Q16 70 12 50 Z" fill="#D4A33E"/>
+    <path data-clip="bol" data-w="0" d="M8 58 Q48 72 90 58 L90 63 Q48 77 8 63 Z" fill="#A85837"/>
+    <ellipse cx="48" cy="46" rx="42" ry="12" fill="#D4A33E" data-w="0.8"/>
+    <ellipse id="soupe" cx="48" cy="47" rx="36" ry="8.5" fill="#D9822E"/>
+    <ellipse data-clip="soupe" data-w="0" cx="56" cy="51" rx="36" ry="8" fill="#A85837"/>
+    <path data-clip="soupe" data-w="0" d="M18 46 Q28 41 42 41 Q30 43 22 48 Z" fill="#FFC264"/>
+    <g data-w="0.45" fill="#FFC264"><ellipse cx="34" cy="45" rx="4" ry="2.4"/><ellipse cx="60" cy="44" rx="4" ry="2.4"/><ellipse cx="50" cy="50" rx="3.6" ry="2.2"/></g>
+    <g data-w="0" fill="#D9822E"><circle cx="34" cy="45" r="1"/><circle cx="60" cy="44" r="1"/><circle cx="50" cy="50" r="0.9"/></g>
+    <g data-w="0.4" fill="#6E9241"><circle cx="44" cy="43" r="1.8"/><circle cx="68" cy="48" r="1.8"/><circle cx="26" cy="49" r="1.6"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M66 74 l6 -6 M60 79 l7 -7 M54 82 l5 -5"/></g>
+  </g>
+</svg>

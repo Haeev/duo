@@ -6,7 +6,9 @@
     <path d="M6 40 L12 47 L12 65 L6 58 Z" fill="#6E4B30"/>
     <path data-clip="face" data-w="0" d="M10 58 L92 50 L92 70 L10 70 Z" fill="#6E4B30"/>
     <g data-w="0.42" fill="none" stroke="#000"><path d="M18 52 Q34 46 46 52 Q58 58 74 48 M24 60 Q40 56 52 60"/></g>
+    <g data-clip="face" data-teinte="#6E4B30" data-w="0.3" fill="none" stroke="#000"><path d="M16 56 Q30 52 42 56 Q54 60 66 55 Q76 51 88 50 M30 62 Q44 60 58 62"/></g>
     <path d="M60 50 Q66 46 70 51 Q66 55 60 50 Z" fill="#6E4B30" data-w="0.5"/>
+    <g data-teinte="#F5E6C6" data-w="0.28" fill="none" stroke="#000"><path d="M26 41 Q36 40 46 40"/></g>
     <g data-w="0.38" fill="none" stroke="#000"><path d="M20 42 Q40 38 60 39 M44 43 Q60 40 78 39"/></g>
     <circle cx="80" cy="47" r="2.6" fill="#8C8E91" data-w="0.55"/>
     <circle cx="20" cy="54" r="2.6" fill="#8C8E91" data-w="0.55"/>

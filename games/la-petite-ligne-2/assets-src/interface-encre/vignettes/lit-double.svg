@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Lit double: tête et pied de bois, deux oreillers, couverture bleue. -->
+  <g>
+    <path id="tete" d="M6 76 L6 26 Q6 16 16 16 L22 16 Q30 16 30 26 L30 70 Z" fill="#A87A46"/>
+    <path data-clip="tete" data-w="0" d="M20 10 L34 10 L34 80 L20 80 Z" fill="#6E4B30"/>
+    <g data-clip="tete" data-teinte="#D7A86A" data-w="0.3" fill="none" stroke="#000">
+    <path d="M10 30 Q12 46 10 62"/>
+    </g>
+    <path d="M24 38 L84 34 L90 40 L30 44 Z" fill="#F3EDE0" data-w="0.6"/>
+    <path id="drap" d="M30 44 L90 40 L90 66 Q60 74 30 72 Z" fill="#587F8E"/>
+    <path id="dessus" d="M44 43 L90 40 L90 56 L48 58 Z" fill="#A9C7D9"/>
+    <path d="M30 44 L44 43 L48 58 L48 74 Q38 76 30 72 Z" fill="#A9C7D9" data-w="0.7"/>
+    <g data-clip="drap" data-teinte="#2C3B57" data-w="0.32" fill="none" stroke="#000">
+    <path d="M56 60 Q66 64 78 60 M54 66 Q70 70 86 64"/>
+    </g>
+    <path d="M48 58 L90 56 L90 66 Q70 72 48 74 Z" fill="none" stroke="#000" data-w="0.45"/>
+    <path id="o1" d="M14 32 Q12 24 22 24 L38 22 Q46 24 44 32 Q40 38 30 38 Q16 40 14 32 Z" fill="#F7F3EA" data-w="0.7"/>
+    <path data-clip="o1" data-w="0" d="M10 33 Q30 34 48 28 L48 42 L10 42 Z" fill="#D9CAAE"/>
+    <g data-clip="o1" data-teinte="#B8A17E" data-w="0.3" fill="none" stroke="#000">
+    <path d="M26 26 Q30 30 28 35"/>
+    </g>
+    <path id="o2" d="M14 46 Q12 38 22 38 L38 36 Q46 38 44 46 Q40 52 30 52 Q16 54 14 46 Z" fill="#F7F3EA" data-w="0.7"/>
+    <path data-clip="o2" data-w="0" d="M10 47 Q30 48 48 42 L48 56 L10 56 Z" fill="#D9CAAE"/>
+    <g data-clip="o2" data-teinte="#B8A17E" data-w="0.3" fill="none" stroke="#000">
+    <path d="M26 40 Q30 44 28 49"/>
+    </g>
+    <path d="M24 72 Q60 76 90 66 L90 72 Q60 82 24 78 Z" fill="#A87A46" data-w="0.7"/>
+    <path d="M84 46 L92 44 L92 84 L86 86 Z" fill="#6E4B30"/>
+    <path d="M80 48 L86 46 L86 86 L80 86 Z" fill="#A87A46"/>
+    <path d="M8 76 L14 76 L14 88 L8 88 Z" fill="#6E4B30" data-w="0.5"/>
+  </g>
+</svg>

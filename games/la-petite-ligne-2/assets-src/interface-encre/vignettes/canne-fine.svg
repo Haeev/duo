@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Canne fine: scion de noyer verni, anneaux de laiton, poignée de liège, gros moulinet; plume de bouchon bleue et blanche. -->
+  <g transform="translate(6 -2) scale(0.9)">
+  <path data-w="0.32" fill="none" stroke="#000" d="M88 8 Q92 38 80 56"/>
+  <path d="M10 88 L20 80 L86 7 L89 9 L24 86 L14 92 Z" fill="#5E4233"/>
+  <path data-w="0" d="M16 90 L22 85 L88 8 L89 9 L24 86 Z" fill="#4F3626"/>
+  <g data-teinte="#96704C" data-w="0.3" fill="none" stroke="#000"><path d="M36 60 L58 36 M64 29 L80 12"/></g>
+  <g fill="#C8A150" data-w="0.4"><circle cx="46" cy="49" r="2.4"/><circle cx="62" cy="31" r="2.1"/><circle cx="76" cy="16" r="1.8"/></g>
+  <path id="liege" d="M4 86 L18 72 L28 82 L14 96 Z" fill="#D9CAAE"/>
+  <path data-clip="liege" data-w="0" d="M10 96 L28 78 L30 84 L16 98 Z" fill="#B8A17E"/>
+  <g data-w="0" fill="#96704C"><circle cx="12" cy="86" r="1"/><circle cx="17" cy="82" r="1"/><circle cx="16" cy="89" r="0.9"/><circle cx="21" cy="84" r="0.9"/></g>
+  <path d="M15 72 L19 68 L29 78 L25 82 Z" fill="#C8A150" data-w="0.5"/>
+  <circle id="moulinet" cx="34" cy="70" r="11" fill="#C8A150"/>
+  <circle data-clip="moulinet" data-w="0" cx="38" cy="74" r="11" fill="#8E6A26"/>
+  <circle cx="34" cy="70" r="7" fill="none" stroke="#000" data-w="0.35"/>
+  <circle cx="34" cy="70" r="3" fill="#F2C55C" data-w="0.5"/>
+  <path d="M42 78 L50 86 L46 90 L38 82 Z" fill="#26282E" data-w="0.6"/>
+  <path id="bouchon" d="M80 54 Q87 62 80 74 Q73 62 80 54 Z" fill="#44618A"/>
+  <path data-clip="bouchon" data-w="0" d="M70 64 L90 64 L90 78 L70 78 Z" fill="#F3EDE0"/>
+  <path d="M80 54 L80 44" data-w="0.5" fill="none" stroke="#000"/>
+  <path d="M80 50 Q76 44 78 40 Q82 44 80 50 Z" fill="#F3EDE0" data-w="0.45"/>
+  <path data-w="0.5" fill="none" stroke="#000" d="M80 74 L80 80 Q80 84 77 83"/>
+  </g>
+</svg>

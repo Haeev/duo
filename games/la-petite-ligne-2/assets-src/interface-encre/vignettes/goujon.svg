@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Goujon: petit poisson de fond (de profil), ventre plat, grosse tête à barbillons, flanc sable taché d'une rangée de points bruns. -->
+  <g transform="translate(2 4) rotate(-10 48 48)">
+    <path d="M68 50 L90 34 L84 52 L90 68 Z" fill="#B8A17E"/>
+    <path data-w="0" d="M80 54 L90 68 L72 52 Z" fill="#96704C"/>
+    <g data-teinte="#5E4233" data-w="0.26" fill="none" stroke="#000"><path d="M76 46 L86 40 M78 56 L86 62"/></g>
+    <path d="M38 36 L46 24 L54 38 Z" fill="#B8A17E" data-w="0.6"/>
+    <path id="corps" d="M6 52 Q10 34 32 34 Q58 34 74 50 Q64 60 44 62 Q20 64 6 52 Z" fill="#B8A17E"/>
+    <path data-clip="corps" data-w="0" d="M0 20 L90 20 L90 46 Q50 36 0 46 Z" fill="#96704C"/>
+    <path data-clip="corps" data-w="0" d="M0 56 Q40 56 80 52 L80 80 L0 80 Z" fill="#F3EDE0"/>
+    <path data-clip="corps" data-w="0" d="M12 44 Q16 38 26 37 L24 40 Q18 41 15 46 Z" fill="#D9CAAE"/>
+    <g data-w="0" fill="#5E4233"><circle cx="32" cy="49" r="2.6"/><circle cx="42" cy="50" r="2.6"/><circle cx="52" cy="50" r="2.4"/><circle cx="61" cy="50" r="2.1"/><circle cx="36" cy="41" r="1.3"/><circle cx="48" cy="42" r="1.3"/><circle cx="58" cy="44" r="1.2"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M22 40 Q28 49 22 60"/>
+    <path d="M28 60 Q34 64 30 70 Q24 66 28 60 Z" fill="#B8A17E" data-w="0.6"/>
+    <circle cx="14" cy="45" r="4.4" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="15" cy="45.5" r="2.2" fill="#231A17" data-w="0"/>
+    <g data-w="0.55" fill="none" stroke="#000"><path d="M7 54 Q4 60 8 64 M10 55 Q10 61 14 63"/></g>
+  </g>
+</svg>

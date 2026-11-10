@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Livre de cuisine: gros livre relié de toile bleu canard, tranche crème, marmite dorée sur la couverture, signet moutarde. -->
+  <g transform="rotate(-10 48 50)">
+    <path d="M22 18 L80 14 L84 76 L26 82 Z" fill="#F3EDE0"/>
+    <g data-teinte="#D9CAAE" data-w="0.3" fill="none" stroke="#000"><path d="M78 22 L82 72 M80 20 L84 70"/></g>
+    <path id="couv" d="M12 22 L74 16 L78 80 L16 86 Z" fill="#2F6E73"/>
+    <path data-clip="couv" data-w="0" d="M54 10 Q66 70 20 92 L96 96 L96 10 Z" fill="#26282E" fill-opacity="0.45"/>
+    <path d="M10 22 L20 21 L24 86 L14 87 Z" fill="#43737A"/>
+    <g data-teinte="#9FD0CF" data-w="0.3" fill="none" stroke="#000"><path d="M16 30 L19 80"/></g>
+    <path d="M30 32 L66 29 L68 40 L31 43 Z" fill="none" stroke="#000" data-w="0.4"/>
+    <path id="marmite" d="M32 56 Q50 52 66 54 Q66 72 50 74 Q34 74 32 56 Z" fill="#D4A33E"/>
+    <path data-clip="marmite" data-w="0" d="M56 50 Q62 70 36 78 L70 78 L70 50 Z" fill="#8E6A26"/>
+    <path d="M30 54 Q50 49 68 52 L68 56 Q50 53 30 58 Z" fill="#F2C55C" data-w="0.5"/>
+    <g data-w="0.45" fill="none" stroke="#000"><path d="M42 48 Q40 44 43 40 M52 47 Q55 43 52 39"/></g>
+    <path d="M58 82 L58 92 L62 88 L66 92 L65 82 Z" fill="#D4A33E" data-w="0.5"/>
+  </g>
+</svg>

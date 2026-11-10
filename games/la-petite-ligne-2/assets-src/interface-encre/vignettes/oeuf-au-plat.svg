@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Oeuf au plat (famille des plats: le mets dans son contenant): assiette crème à liseré rouille, blanc ondulé, gros jaune brillant, poivre. -->
+  <g transform="rotate(-6 48 56)">
+    <ellipse id="assiette" cx="48" cy="58" rx="44" ry="26" fill="#F3EDE0"/>
+    <path data-clip="assiette" data-w="0" d="M66 30 Q84 84 18 92 L96 96 L96 30 Z" fill="#D9CAAE"/>
+    <g data-teinte="#A85837" data-w="0.4" fill="none" stroke="#000"><ellipse cx="48" cy="58" rx="38.5" ry="21.5"/></g>
+    <ellipse cx="48" cy="57" rx="31" ry="16" fill="#D9CAAE" data-w="0.3"/>
+    <path id="blanc" d="M20 54 Q18 42 34 40 Q42 32 56 38 Q74 36 76 50 Q82 62 66 68 Q54 76 40 70 Q22 70 20 54 Z" fill="#F7F3EA"/>
+    <path data-clip="blanc" data-w="0" d="M66 34 Q80 70 34 76 L90 80 L90 34 Z" fill="#F3EDE0"/>
+    <g data-clip="blanc" data-teinte="#D9CAAE" data-w="0.3" fill="none" stroke="#000"><path d="M26 58 Q30 64 38 64 M64 44 Q70 48 70 54"/></g>
+    <circle id="jaune" cx="47" cy="53" r="12" fill="#FFC264"/>
+    <circle data-clip="jaune" data-w="0" cx="52" cy="58" r="12" fill="#D9822E"/>
+    <path data-w="0" d="M40 49 Q42 44 47 43 Q43 47 43 51 Z" fill="#FFE6B0"/>
+    <g data-w="0" fill="#231A17"><circle cx="30" cy="50" r="0.9"/><circle cx="62" cy="62" r="0.9"/><circle cx="58" cy="44" r="0.8"/><circle cx="36" cy="64" r="0.8"/></g>
+  </g>
+</svg>

@@ -5,10 +5,13 @@
     <path id="ecorce" d="M26 34 L80 32 Q90 48 80 66 L26 68 Z" fill="#5E4233"/>
     <path data-clip="ecorce" data-w="0" d="M20 56 L92 52 L92 72 L20 72 Z" fill="#4F3626"/>
     <g data-w="0.45" fill="none" stroke="#000"><path d="M36 40 Q50 38 62 41 M40 48 Q56 46 74 48 M38 58 Q52 56 70 59"/></g>
+    <g data-clip="ecorce" data-teinte="#8C5A35" data-w="0.3" fill="none" stroke="#000"><path d="M44 36 Q56 35 70 37 M46 62 Q60 61 74 62"/></g>
     <ellipse id="bout" cx="26" cy="51" rx="15" ry="17" fill="#D7A86A"/>
     <ellipse data-clip="bout" data-w="0" cx="30" cy="56" rx="15" ry="17" fill="#A87A46"/>
     <ellipse cx="25" cy="50" rx="9" ry="11" fill="none" stroke="#000" data-w="0.42"/>
     <ellipse cx="25" cy="50" rx="3.6" ry="4.6" fill="none" stroke="#000" data-w="0.42"/>
     <path data-w="0.45" fill="none" stroke="#000" d="M25 50 L32 62"/>
+    <g data-clip="bout" data-teinte="#A87A46" data-w="0.3" fill="none" stroke="#000"><ellipse cx="25" cy="50" rx="6.4" ry="8"/></g>
+    <path data-clip="bout" data-w="0" d="M14 44 Q18 36 24 35 Q18 41 17 48 Z" fill="#F5E6C6"/>
   </g>
 </svg>

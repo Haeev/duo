@@ -14,6 +14,9 @@
  * - une forme remplie (`fill` autre que `none`) est peinte puis cernée; `data-w="0"` la laisse
  *   sans contour (ombre, éclat), `data-w="0.6"` amincit son contour;
  * - un trait (`fill="none"`) devient un trait de plume effilé (détails, hachures);
+ * - `data-teinte="#RRGGBB"` (sur la forme ou un groupe): son trait est peint de cette couleur au
+ *   lieu de l'encre; sert aux veines du bois, aux reflets et aux hachures douces, qui enrichissent
+ *   l'intérieur sans le noircir à 48 px;
  * - `data-clip="<id>"`: l'élément est découpé par la forme `<id>` (ombre qui ne déborde pas);
  * - `data-expr="<nom>"` sur un groupe: calque d'expression (portraits), rendu à part, après le
  *   reste, dans `<g class="expr expr--<nom>">`; `class="bouche"` sur un groupe ou une forme: la
@@ -259,7 +262,10 @@ function inkInPage(opts) {
     if (filled) parts.push(paintClone(el));
     if (k > 0) {
       const d = inkOf(el, k, filled);
-      if (d !== '') parts.push(`<path fill="${ink}" d="${d}"/>`);
+      // `data-teinte`: le trait prend une couleur du nuancier au lieu de l'encre (veines, reflets).
+      const tintHost = el.closest('[data-teinte]');
+      const color = tintHost === null || picto ? ink : tintHost.getAttribute('data-teinte');
+      if (d !== '') parts.push(`<path fill="${color}" d="${d}"/>`);
     }
     const clipHost = el.closest('[data-clip]');
     let markup = parts.join('');

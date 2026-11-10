@@ -38,8 +38,24 @@ function pngSize(file: string): [number, number] {
 const objects = new Set<string>();
 for (const f of readdirSync(path.join(PKG, 'donnees', 'commun', 'objets')))
   if (f.endsWith('.json')) objects.add(f.slice(0, -5));
+/** Meubles que les joueurs transportent et posent (`placeable`): ils ont leur vignette aussi. */
+const placeables = new Set<string>();
+for (const f of readdirSync(path.join(PKG, 'donnees', 'commun', 'meubles'))) {
+  if (!f.endsWith('.json')) continue;
+  const m: unknown = JSON.parse(
+    readFileSync(path.join(PKG, 'donnees', 'commun', 'meubles', f), 'utf8'),
+  );
+  if (typeof m === 'object' && m !== null && 'placeable' in m && m.placeable === true)
+    placeables.add(f.slice(0, -5));
+}
 /** Vignettes d'essai dessinées avant leur objet (la lettre des quêtes d'Aubrune). */
 const AHEAD = new Set(['lettre']);
+/**
+ * Objets ou meubles posables admis sans vignette, chacun avec sa raison. Vide: toute la série est
+ * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
+ * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
+ */
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map();
 
 describe('vignettes à la plume', () => {
   const ids = svgIds(path.join(OUT, 'vignettes'));
@@ -47,11 +63,26 @@ describe('vignettes à la plume', () => {
 
   it('chaque vignette a sa source, et chaque source sa vignette', () => {
     expect(ids).toEqual(svgIds(path.join(SRC, 'vignettes')));
-    expect(ids.length).toBeGreaterThanOrEqual(16);
+    expect(ids.length).toBeGreaterThanOrEqual(objects.size + placeables.size - WITHOUT_THUMB.size);
   });
 
-  it('porte le nom d’un objet des données', () => {
-    for (const id of ids) expect(objects.has(id) || AHEAD.has(id), id).toBe(true);
+  it('porte le nom d’un objet ou d’un meuble posable des données', () => {
+    for (const id of ids)
+      expect(objects.has(id) || placeables.has(id) || AHEAD.has(id), id).toBe(true);
+  });
+
+  it('chaque objet et chaque meuble posable a sa vignette (sauf exceptions justifiées)', () => {
+    const drawn = new Set(ids);
+    const missing = [...objects, ...placeables].filter(
+      (id) => !drawn.has(id) && !WITHOUT_THUMB.has(id),
+    );
+    expect(missing).toEqual([]);
+    for (const [id, why] of WITHOUT_THUMB) {
+      expect(why.length, id).toBeGreaterThan(0);
+      expect(drawn.has(id), `${id}: dessinée, à retirer des exceptions`).toBe(false);
+    }
+    expect(objects.size).toBeGreaterThan(0);
+    expect(placeables.size).toBeGreaterThan(0);
   });
 
   it('grille 96, couleurs du nuancier, PNG en 96 et 48 px, sans trait calculé par le moteur', () => {

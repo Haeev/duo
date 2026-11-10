@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Farine: sac de papier kraft au haut roulé, épi de blé imprimé, farine renversée en petit tas et nuage blanc. -->
+  <path d="M8 4 Q14 0 18 6 Q24 2 26 10 Q20 14 14 12 Q6 12 8 4 Z" fill="#F7F3EA" data-w="0.45"/>
+  <g transform="rotate(-6 46 52)">
+    <path id="sac" d="M18 26 L70 22 L76 84 Q46 90 14 84 Z" fill="#D9CAAE"/>
+    <path data-clip="sac" data-w="0" d="M54 16 Q66 66 22 92 L96 96 L96 16 Z" fill="#B8A17E"/>
+    <path data-clip="sac" data-w="0" d="M22 34 L28 34 L24 74 L19 74 Z" fill="#F3EDE0"/>
+    <g data-clip="sac" data-teinte="#B8A17E" data-w="0.3" fill="none" stroke="#000"><path d="M30 80 L34 74 M60 30 L62 40"/></g>
+    <path d="M16 18 L72 14 L72 26 L18 30 Z" fill="#F3EDE0"/>
+    <path data-w="0" d="M50 16 L72 14 L72 26 L50 28 Z" fill="#D9CAAE"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M17 23 L72 19"/>
+    <path data-w="0.6" fill="none" stroke="#000" d="M44 76 L44 44"/>
+    <g fill="#D4A33E" data-w="0.45">
+      <path d="M44 46 Q38 42 40 36 Q46 38 44 46 Z"/><path d="M44 46 Q50 42 48 36 Q42 38 44 46 Z"/>
+      <path d="M44 56 Q36 52 38 46 Q46 48 44 56 Z"/><path d="M44 56 Q52 52 50 46 Q42 48 44 56 Z"/>
+      <path d="M44 66 Q36 62 38 56 Q46 58 44 66 Z"/><path d="M44 66 Q52 62 50 56 Q42 58 44 66 Z"/>
+    </g>
+  </g>
+  <path d="M62 90 Q70 76 80 76 Q92 78 94 90 Z" fill="#F3EDE0"/>
+  <path data-w="0" d="M76 90 Q82 82 92 84 L94 90 Z" fill="#D9CAAE"/>
+  <g data-w="0.4" fill="#F7F3EA"><circle cx="86" cy="68" r="2"/><circle cx="90" cy="60" r="1.4"/></g>
+</svg>

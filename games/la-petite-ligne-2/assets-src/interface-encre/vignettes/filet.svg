@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Filet à insectes: cerceau de laiton, poche de tulle qui flotte, long manche; un papillon s'échappe (ce qu'on y attrape). -->
+  <g transform="translate(46 52) rotate(38) scale(0.98) translate(-48 -48)">
+    <path id="manche" d="M45 40 L51 40 L52 92 Q52 95 48 95 Q44 95 44 92 Z" fill="#A87A46"/>
+    <path data-clip="manche" data-w="0" d="M49 30 L58 30 L58 96 L48.5 96 Z" fill="#6E4B30"/>
+    <g data-teinte="#6E4B30" data-w="0.28" fill="none" stroke="#000"><path d="M46.5 52 q1 8 0 16 M47 76 q1 6 0 10"/></g>
+    <path d="M43 40 L53 40 L53 47 L43 47 Z" fill="#C8A150" data-w="0.5"/>
+    <path id="poche" d="M64 12 Q90 14 88 40 Q86 52 74 46 Q70 36 62 34 Z" fill="#F3EDE0"/>
+    <path data-clip="poche" data-w="0" d="M76 10 Q92 30 80 50 L96 50 L96 10 Z" fill="#D9CAAE"/>
+    <g data-teinte="#B8A17E" data-w="0.28" fill="none" stroke="#000"><path d="M68 18 Q80 26 82 42 M72 15 Q86 22 86 36 M66 26 L84 22 M66 32 L86 30 M70 40 L84 40"/></g>
+    <circle id="maille" cx="48" cy="22" r="17" fill="#D9CAAE"/>
+    <path data-clip="maille" data-w="0" d="M60 0 L70 0 L70 44 L40 44 Q60 34 60 0 Z" fill="#B8A17E"/>
+    <g data-clip="maille" data-teinte="#8C5A35" data-w="0.26" fill="none" stroke="#000"><path d="M30 12 L66 12 M30 20 L66 20 M30 28 L66 28 M30 36 L66 36 M38 4 L38 40 M46 4 L46 40 M54 4 L54 40 M62 4 L62 40"/></g>
+    <path d="M48 2 A20 20 0 1 1 47.9 2 Z M48 6 A16 16 0 1 0 48.1 6 Z" fill-rule="evenodd" fill="#C8A150" data-w="0.7"/>
+  </g>
+  <g transform="translate(18 22) rotate(-14)">
+    <path d="M0 0 Q-10 -12 -14 -4 Q-14 4 0 2 Z" fill="#A58BB8" data-w="0.55"/>
+    <path d="M0 0 Q10 -12 14 -4 Q14 4 0 2 Z" fill="#A58BB8" data-w="0.55"/>
+    <path d="M0 2 Q-8 4 -8 10 Q-3 10 0 3 Z" fill="#7E3F55" data-w="0.5"/>
+    <path d="M0 2 Q8 4 8 10 Q3 10 0 3 Z" fill="#7E3F55" data-w="0.5"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M0 -3 L0 7 M0 -3 Q-2 -8 -4 -9 M0 -3 Q2 -8 4 -9"/>
+  </g>
+</svg>

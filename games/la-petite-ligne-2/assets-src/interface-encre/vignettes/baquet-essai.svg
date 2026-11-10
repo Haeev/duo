@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Baquet: cuve de douelles cerclée de fer, oreilles de prise, eau claire. -->
+  <g>
+    <path d="M6 40 Q4 34 10 34 L14 40 Z" fill="#8C5A35" data-w="0.6"/>
+    <path d="M84 36 Q90 32 90 38 L84 42 Z" fill="#8C5A35" data-w="0.6"/>
+    <path id="cuve" d="M10 40 Q48 32 86 40 L78 82 Q48 92 18 82 Z" fill="#8C5A35"/>
+    <path data-clip="cuve" data-w="0" d="M60 30 Q74 80 20 92 L96 96 L96 30 Z" fill="#4F3626"/>
+    <path data-clip="cuve" data-w="0" d="M14 44 L22 44 L26 80 L20 78 Z" fill="#A87A46"/>
+    <g data-clip="cuve" data-w="0.4" fill="none" stroke="#000">
+    <path d="M30 42 L32 88 M48 40 L48 90 M66 42 L64 88"/>
+    </g>
+    <path d="M10 52 Q48 62 86 52 L85 57 Q48 67 11 57 Z" fill="#8C8E91" data-w="0.5"/>
+    <path d="M10 72 Q48 82 86 72 L85 77 Q48 87 11 77 Z" fill="#8C8E91" data-w="0.5"/>
+    <ellipse cx="48" cy="40" rx="38" ry="9" fill="#A87A46" data-w="0.7"/>
+    <ellipse id="eau" cx="48" cy="41" rx="32" ry="6.5" fill="#6EA9AD" data-w="0.4"/>
+    <path data-clip="eau" data-w="0" d="M30 30 L90 30 L90 50 L40 50 Q66 44 30 30 Z" fill="#43737A"/>
+    <g data-teinte="#9FD0CF" data-w="0.35" fill="none" stroke="#000">
+    <path d="M26 40 Q34 38 42 39 M50 43 Q56 42 62 43"/>
+    </g>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M64 82 l4 -4 M69 82 l4 -4"/>
+    </g>
+  </g>
+</svg>
