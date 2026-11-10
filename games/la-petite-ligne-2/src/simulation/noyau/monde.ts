@@ -7,6 +7,7 @@ import { initialBrickStates } from '../../etat/briques';
 import type { PlayerState } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../../etat/monde';
+import { CORE_TUNING } from './reglages-noyau';
 
 /** Un joueur du duo, tel que la plateforme le donne. */
 export interface Member {
@@ -51,8 +52,24 @@ export function createPlaceState(content: Content, place: PlaceContent): PlaceSt
   return state;
 }
 
-/** Écart entre les deux joueurs à la descente du train (m). */
-const ARRIVAL_SPREAD = 0.8;
+/**
+ * Place les deux joueurs à la descente du train du lieu courant, côte à côte, face au sud (vers
+ * le lieu, le dos à la voie).
+ */
+export function placeAtArrival(content: Content, world: WorldState): void {
+  const place = content.places[world.common.place];
+  const arrival = place?.map.points[place.def.station.arrival];
+  if (arrival === undefined) throw new Error(`point d'arrivée absent: ${world.common.place}`);
+  world.players.forEach((player, index) => {
+    const side = index === 0 ? -1 : 1;
+    player.body = {
+      x: arrival.x + side * CORE_TUNING.arrivalSpread,
+      y: arrival.y,
+      facing: Math.PI / 2,
+      speed: 0,
+    };
+  });
+}
 
 function createPlayer(content: Content, member: Member, x: number, y: number): PlayerState {
   const start = content.needs.start;
@@ -86,22 +103,18 @@ export function createWorld(
   const { start } = content.settings;
   const place = content.places[start.place];
   if (place === undefined) throw new Error(`lieu de départ inconnu: ${start.place}`);
-  const arrival = place.map.points[place.def.station.arrival];
-  if (arrival === undefined)
-    throw new Error(`point d'arrivée absent: ${place.def.station.arrival}`);
   const rng = createRandom(seed).getState();
-  return {
+  const world: WorldState = {
     schema: DATA_SCHEMA,
     tick: 0,
     seed,
     rng: [rng[0], rng[1], rng[2], rng[3]],
     minutes: start.minute,
     common: { phase: 'day', place: start.place, day: 1, weather: 'clear', chest: 0, travel: null },
-    players: [
-      createPlayer(content, members[0], arrival.x - ARRIVAL_SPREAD, arrival.y),
-      createPlayer(content, members[1], arrival.x + ARRIVAL_SPREAD, arrival.y),
-    ],
+    players: [createPlayer(content, members[0], 0, 0), createPlayer(content, members[1], 0, 0)],
     progress: { memory: {}, bonds: {}, quests: {}, collections: {}, opened: [start.place] },
     places: { [start.place]: createPlaceState(content, place) },
   };
+  placeAtArrival(content, world);
+  return world;
 }
