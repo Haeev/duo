@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "graines-tomate",
   "name": "Graines de tomate",
+  "model": "graines-tomate",
   "family": "seed",
   "stack": 20,
   "food": null,

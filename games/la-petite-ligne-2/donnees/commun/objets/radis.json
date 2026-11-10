@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "radis",
   "name": "Radis",
+  "model": "radis",
   "family": "crop",
   "stack": 10,
   "food": {

@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "buche",
   "name": "Bûche",
+  "model": "buche",
   "family": "material",
   "stack": 5,
   "food": null,

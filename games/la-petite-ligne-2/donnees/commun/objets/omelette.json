@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "omelette",
   "name": "Omelette aux herbes",
+  "model": "omelette",
   "family": "food",
   "stack": 3,
   "food": {

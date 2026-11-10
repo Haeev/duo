@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "pomme-cuite",
   "name": "Pomme cuite",
+  "model": "pomme-cuite",
   "family": "food",
   "stack": 3,
   "food": {

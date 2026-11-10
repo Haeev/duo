@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "livre-de-cuisine",
   "name": "Livre de cuisine",
+  "model": "livre-de-cuisine",
   "family": "supply",
   "stack": 1,
   "food": null,

@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "canne-fine",
   "name": "Canne fine",
+  "model": "canne-fine",
   "family": "tool",
   "stack": 1,
   "food": null,

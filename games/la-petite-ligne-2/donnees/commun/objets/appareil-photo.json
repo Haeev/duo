@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "appareil-photo",
   "name": "Appareil photo",
+  "model": "appareil-photo",
   "family": "tool",
   "stack": 1,
   "food": null,

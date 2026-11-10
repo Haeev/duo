@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "perche",
   "name": "Perche",
+  "model": "perche",
   "family": "catch",
   "stack": 3,
   "food": null,

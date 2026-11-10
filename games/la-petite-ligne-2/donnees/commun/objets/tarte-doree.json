@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "tarte-doree",
   "name": "Tarte bien dorée",
+  "model": "tarte-doree",
   "family": "food",
   "stack": 3,
   "food": {

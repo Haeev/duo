@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "pain",
   "name": "Pain",
+  "model": "pain",
   "family": "food",
   "stack": 3,
   "food": {

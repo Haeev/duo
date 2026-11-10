@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "pommes-sautees",
   "name": "Pommes sautées",
+  "model": "pommes-sautees",
   "family": "food",
   "stack": 3,
   "food": {

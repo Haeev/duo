@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "goujon",
   "name": "Goujon",
+  "model": "goujon",
   "family": "catch",
   "stack": 3,
   "food": null,

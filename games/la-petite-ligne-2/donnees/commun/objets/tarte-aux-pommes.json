@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "tarte-aux-pommes",
   "name": "Tarte aux pommes",
+  "model": "tarte-aux-pommes",
   "family": "food",
   "stack": 3,
   "food": {

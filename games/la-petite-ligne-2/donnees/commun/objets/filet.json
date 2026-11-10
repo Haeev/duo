@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "filet",
   "name": "Filet à insectes",
+  "model": "filet",
   "family": "tool",
   "stack": 1,
   "food": null,

@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "tourte-du-quai",
   "name": "Tourte du quai",
+  "model": "tourte-du-quai",
   "family": "food",
   "stack": 1,
   "food": {

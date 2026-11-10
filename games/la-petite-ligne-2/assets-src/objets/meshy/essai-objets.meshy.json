@@ -1,0 +1,45 @@
+{
+  "format": "duo-meshy-sheet/1",
+  "asset": "essai-objets",
+  "game": "la-petite-ligne-2",
+  "family": "objets (nourriture, poissons, contenants, outils)",
+  "purpose": "Deux essais du 2026-11-10. (1) Aperçus sans texture contre les gabarits en aplats. (2) Après la précision du client (modèles texturés, rendu plus réaliste, basse définition d'époque): objets texturés réduits à 800 triangles et 256 px, montrés à côté des aplats (planches/comparaison-aplats-meshy.png). Le client tranche sur pièce.",
+  "inputs": [],
+  "parameters": {
+    "preview": { "ai_model": "meshy-t2.5", "model_type": "smart-topology", "target_polycount": 800, "target_formats": ["glb"] },
+    "prompt_suffix_essai_1": "stylized miniature toy figurine prop, smooth rounded soft shapes, simple readable silhouette, single object, no base, no texture detail, no photorealism, no text",
+    "prompt_suffix_essai_2": "retro 2000s video game prop, realistic proportions, single object, no base",
+    "texture_prompt_suffix": "retro low resolution game texture, hand-painted with a slightly realistic look, soft painted details, matte, no text, no logo",
+    "refine": { "ai_model": "hérité de l'aperçu", "texture_resolution": "2k (défaut), ramenée à 256 px par conformer_essai.py", "enable_pbr": false }
+  },
+  "tasks": [
+    { "step": "apercu", "tool": "meshy_text_to_3d", "task_id": "01a1c573-4b25-7232-af95-ea795c309210", "subject": "truite", "credits": 5 },
+    { "step": "apercu", "tool": "meshy_text_to_3d", "task_id": "01a1c573-5961-769b-b382-1da7334598c2", "subject": "pain de campagne", "credits": 5 },
+    { "step": "apercu", "tool": "meshy_text_to_3d", "task_id": "01a1c573-6f72-7190-8487-80bd1f3f77b3", "subject": "poire", "credits": 5 },
+    { "step": "apercu", "tool": "meshy_text_to_3d", "task_id": "01a1c573-80fb-77de-9f86-cdfe0100d7a9", "subject": "carotte", "credits": 5 },
+    { "step": "apercu", "tool": "meshy_text_to_3d", "task_id": "01a1c583-6c30-7031-b78f-c2cb08382c79", "subject": "bocal de confiture", "credits": 5 },
+    { "step": "apercu", "tool": "meshy_text_to_3d", "task_id": "01a1c583-7c7a-72fc-ad33-8f7048820bf0", "subject": "hache", "credits": 5 },
+    { "step": "texture", "tool": "meshy_text_to_3d_refine", "task_id": "01a1c583-8f17-751b-a1c2-f6f0164e2db9", "parent_task_id": "01a1c573-5961-769b-b382-1da7334598c2", "subject": "pain", "credits": 10 },
+    { "step": "texture", "tool": "meshy_text_to_3d_refine", "task_id": "01a1c583-9feb-73f9-bda9-d8da585a2e3b", "parent_task_id": "01a1c573-4b25-7232-af95-ea795c309210", "subject": "truite", "credits": 10 },
+    { "step": "texture", "tool": "meshy_text_to_3d_refine", "task_id": "01a1c583-ce53-7400-b617-58230e7855d1", "parent_task_id": "01a1c583-6c30-7031-b78f-c2cb08382c79", "subject": "confiture", "credits": 10 },
+    { "step": "texture", "tool": "meshy_text_to_3d_refine", "task_id": "01a1c583-df1d-7438-a69e-1ac9dae451cb", "parent_task_id": "01a1c583-7c7a-72fc-ad33-8f7048820bf0", "subject": "hache", "credits": 10 }
+  ],
+  "credits_total": 70,
+  "credits_budget": 80,
+  "balance": { "before": 2192, "after": 2067, "note": "solde commun au studio: 125 crédits de baisse, dont 70 pour cet essai" },
+  "downloaded": "2026-11-10, sorties brutes hors dépôt (expirent le 2026-11-13)",
+  "conformity": {
+    "script": "assets-src/objets/meshy/conformer_essai.py",
+    "output": "assets/commun/objets/essai-meshy.glb (nœuds pain-meshy, truite-meshy, confiture-meshy, hache-meshy)",
+    "triangles": { "pain": 779, "truite": 794, "confiture": 733, "hache": 779 },
+    "texture": "256 px, JPEG dans le GLB",
+    "size": "plus grande dimension du gabarit de même id, origine au centre du dessous",
+    "not_done": "avant de l'objet non réorienté, point de prise non posé, pas dans index.json (essai)"
+  },
+  "verdict": "Sans texture (essai 1), Meshy ne gagnait pas. Texturé (essai 2), il gagne nettement dans le style décrit par le client: croûte farinée, écailles et points de la truite, toile vichy et étiquette à la fraise du bocal, fil du bois du manche. Pomme et sac de toile non faits: il manquait 30 crédits (15 par objet texturé).",
+  "license": "offre payante du client (licence privée)",
+  "author": "artiste-3d",
+  "date": "2026-11-10",
+  "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+  "status": "en attente de la décision du client"
+}

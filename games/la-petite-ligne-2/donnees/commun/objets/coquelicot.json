@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "coquelicot",
   "name": "Coquelicot",
+  "model": "coquelicot",
   "family": "material",
   "stack": 10,
   "food": null,

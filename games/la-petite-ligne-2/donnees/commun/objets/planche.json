@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "planche",
   "name": "Planche",
+  "model": "planche",
   "family": "material",
   "stack": 10,
   "food": null,

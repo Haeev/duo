@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne (refonte): visionneuse des objets</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: #efe6d4;
+        font:
+          14px system-ui,
+          sans-serif;
+        color: #26282e;
+      }
+      h2 {
+        margin: 12px 0 6px;
+        font-size: 15px;
+      }
+      .grille {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .case {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: #f7f0e1;
+        box-shadow: inset 0 0 0 2px #d9caae;
+        display: grid;
+        place-items: center;
+        position: relative;
+      }
+      .case img {
+        width: 60px;
+        height: 60px;
+      }
+      .case.grande {
+        width: 128px;
+        height: 128px;
+      }
+      .case.grande img {
+        width: 124px;
+        height: 124px;
+      }
+      .case span {
+        position: absolute;
+        bottom: -14px;
+        font-size: 9px;
+        white-space: nowrap;
+      }
+      .vivantes {
+        display: flex;
+        gap: 16px;
+      }
+      .vivante {
+        width: 256px;
+        height: 256px;
+        border-radius: 24px;
+        background: radial-gradient(#fbf6ea, #e7dcc6);
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Vues vivantes (survole une case pour changer l'objet de gauche)</h2>
+    <div class="vivantes">
+      <div id="vivante-a" class="vivante"></div>
+      <div id="vivante-b" class="vivante"></div>
+    </div>
+    <h2>Vignettes à la taille d'une case de sac (64 px)</h2>
+    <div id="petites" class="grille"></div>
+    <h2>De près (128 px)</h2>
+    <div id="grandes" class="grille"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

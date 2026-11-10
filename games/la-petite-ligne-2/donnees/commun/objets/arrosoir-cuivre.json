@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "arrosoir-cuivre",
   "name": "Arrosoir de cuivre",
+  "model": "arrosoir-cuivre",
   "family": "tool",
   "stack": 1,
   "food": null,

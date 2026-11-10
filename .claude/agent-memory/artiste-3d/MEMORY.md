@@ -277,3 +277,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Le rendu du jeu pose un modèle au CENTRE de son emprise (`object.position = volume.x, base, volume.y`); un meuble doit tenir dans ses cases (contrôlé par `verifier_decors.py`).
 - Conflit à suivre: `clipSeat` du clip `sit` vaut 0,50 m, la bible veut des assises à 0,45: le bassin flotte de 5 cm (couche.ts borne à 0).
 - Playwright global: `NODE_PATH=/opt/node22/lib/node_modules`. Le port 5173 et d'autres sont pris par d'autres sessions: `npx vite --port <libre> --strictPort`.
+
+## La Petite Ligne 2: objets et visionneuse (vérifié le 2026-11-10)
+
+- Workbench en arrière-plan rend une image vide (erreurs EGL): planches en Cycles, 8 échantillons (30 s pour 90 objets).
+- Atlas par famille: `bpy.ops.uv.smart_project(scale_to_bounds=True)` en mode édition sur l'objet actif marche sans interface; peindre les îlots avec PIL (`polygon(..., outline=couleur, width=2)` pour border), image chargée puis `pack()`; export `export_vertex_color="NONE"`, sinon GLTFLoader multiplie couleurs de sommets et texture.
+- GLTFLoader sous Node (vitest) échoue sur toute texture (`self is not defined`): dans les tests, lire la partie JSON du GLB à la main.
+- Meshy: un aperçu `meshy-t2.5` s'affine (texture) sans `ai_model` (hérité), 10 crédits. Texturé, il gagne nettement sur nourriture et objets à motifs (vichy, étiquette, écailles); sans texture, à 800 triangles, il perd contre les gabarits.
+- Garde-fou: les patchs Python en heredoc sur un fichier du dépôt sont refusés; écrire le patch dans le scratchpad (Write) puis `python3 patch.py <fichier>`. Les fichiers .mjs sous `src/` cassent eslint (hors projet TS): les mettre dans `assets-src/`.

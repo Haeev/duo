@@ -1,0 +1,756 @@
+# Gabarits des objets de La Petite Ligne (ce qu'on tient, ramasse, range, vend, mange).
+#
+# AJOUTER UN OBJET = copier une entrée [[objets]] de la même famille, changer `id`, `forme`,
+# `taille` et `couleurs`, puis lancer `bash assets-src/objets/construire.sh` (moins de 10 s):
+# il refait les GLB de `assets/commun/objets/`, l'index `index.json` et contrôle tout.
+# Pour qu'un objet du jeu montre ce modèle, sa fiche `donnees/commun/objets/<id>.json` porte
+# `"model": "<id du gabarit>"`. Sans modèle, le jeu montre une vignette générique « provisoire ».
+#
+# Champs communs
+#   id        identifiant (= nom du nœud dans le GLB), minuscules et traits d'union
+#   famille   une des familles ci-dessous: elle choisit le constructeur et le fichier GLB
+#   forme     la variante de la famille (liste par famille ci-dessous)
+#   taille    plus grande dimension de l'objet, en mètres (contrôlée à 12 % près)
+#   couleurs  couleurs des pièces, par nom du nuancier (bible 2.4, `../personnages/nuancier.json`)
+#             ou des couleurs d'Aubrune (bible 7.1, table [couleurs_lieu] plus bas).
+#             Une clé absente prend la couleur par défaut de la famille.
+#   pose      facultatif: "debout" (défaut) ou "couche" pour les objets longs posés à plat.
+#
+# Conventions de sortie: 1 unité = 1 m, Y en haut et avant vers +Z (glTF), origine au centre du
+# dessous, un matériau `objet` mat pour tous, couleurs de sommets, normales lisses (bible 1.1:
+# aucune facette). Chaque objet a un nœud enfant `<id>--grip`: là où la main le tient.
+
+# Bornes de taille plausibles par famille (plus grande dimension, m) et triangles permis.
+[familles]
+fruit     = { min = 0.015, max = 0.40, defaut = { peau = "coquelicot", queue = "chocolat", feuille = "herbe" } }
+legume    = { min = 0.04,  max = 0.50, defaut = { peau = "coquelicot", chair = "craie", feuille = "herbe" } }
+poisson   = { min = 0.08,  max = 0.80, defaut = { dos = "olive", flanc = "perle", ventre = "craie", nageoire = "ficelle", oeil = "oeil", tache = "chocolat" } }
+bocal     = { min = 0.06,  max = 0.25, defaut = { contenu = "prune", couvercle = "coquelicot", lien = "ficelle", etiquette = "craie" } }
+bouteille = { min = 0.15,  max = 0.40, defaut = { contenu = "craie", bouchon = "noisette", etiquette = "lin" } }
+pain      = { min = 0.06,  max = 0.70, defaut = { croute = "ocre", entaille = "lin" } }
+plat      = { min = 0.10,  max = 0.35, defaut = { vaisselle = "craie", lisere = "bleu_de_travail", plat = "ocre", garniture = "herbe" } }
+outil     = { min = 0.30,  max = 1.60, defaut = { manche = "noisette", tete = "acier", virole = "acier", lien = "cuir" } }
+sac       = { min = 0.25,  max = 0.60, defaut = { toile = "lin", rabat = "noisette", sangle = "cuir", boucle = "laiton" } }
+graine    = { min = 0.08,  max = 0.16, defaut = { papier = "lin", bande = "sauge", image = "coquelicot", feuille = "herbe" } }
+fleur     = { min = 0.10,  max = 0.60, defaut = { petale = "coquelicot", coeur = "encre", tige = "herbe" } }
+caillou   = { min = 0.04,  max = 0.25, defaut = { pierre = "pierre_creme", eclat = "acier" } }
+bois      = { min = 0.25,  max = 1.30, defaut = { bois = "noisette", coeur = "lin" } }
+courrier  = { min = 0.12,  max = 0.45, defaut = { papier = "craie", sceau = "coquelicot", ficelle = "ficelle", etiquette = "lin" } }
+cle       = { min = 0.04,  max = 0.20, defaut = { metal = "laiton" } }
+provision = { min = 0.08,  max = 0.30, defaut = { principale = "craie", secondaire = "lin", lien = "ficelle" } }
+piece     = { min = 0.015, max = 0.06, defaut = { metal = "laiton" } }
+
+[triangles]
+min = 200
+max = 800
+
+# Couleurs d'Aubrune (bible 7.1), admises pour les objets en plus du nuancier des personnages.
+[couleurs_lieu]
+herbe = "#93B45E"
+terre_claire = "#CFB489"
+pierre_creme = "#C0B4A1"
+lauze = "#737B86"
+tuile = "#B86B4F"
+enduit = "#EBDCBF"
+volet = "#9B4C3B"
+sauge_aubrune = "#7F9C79"
+bleu_aubrune = "#7090A5"
+
+# ---------------------------------------------------------------------------------------------
+# FRUITS. formes: pomme, poire, prune, ronde (orange, pêche), cerises (deux sur une queue),
+# baies (petit tas de mûres ou de framboises), noisette.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "pomme"
+famille = "fruit"
+forme = "pomme"
+taille = 0.085
+couleurs = { peau = "coquelicot" }
+
+[[objets]]
+id = "pomme-verte"
+famille = "fruit"
+forme = "pomme"
+taille = 0.08
+couleurs = { peau = "olive" }
+
+[[objets]]
+id = "poire"
+famille = "fruit"
+forme = "poire"
+taille = 0.11
+couleurs = { peau = "moutarde" }
+
+[[objets]]
+id = "prune"
+famille = "fruit"
+forme = "prune"
+taille = 0.05
+couleurs = { peau = "prune" }
+
+[[objets]]
+id = "peche"
+famille = "fruit"
+forme = "ronde"
+taille = 0.075
+couleurs = { peau = "rose_ancien" }
+
+[[objets]]
+id = "cerises"
+famille = "fruit"
+forme = "cerises"
+taille = 0.07
+couleurs = { peau = "brique" }
+
+[[objets]]
+id = "mures"
+famille = "fruit"
+forme = "baies"
+taille = 0.05
+couleurs = { peau = "encre" }
+
+[[objets]]
+id = "framboises"
+famille = "fruit"
+forme = "baies"
+taille = 0.045
+couleurs = { peau = "coquelicot" }
+
+[[objets]]
+id = "noisettes"
+famille = "fruit"
+forme = "noisette"
+taille = 0.04
+couleurs = { peau = "noisette", queue = "lin" }
+
+# ---------------------------------------------------------------------------------------------
+# LÉGUMES. formes: racine-ronde (radis, navet), racine-longue (carotte), tomate, potiron, chou,
+# poireau, tubercule (pomme de terre), bulbe (oignon). `chair`: bout ou collet clair.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "radis"
+famille = "legume"
+forme = "racine-ronde"
+taille = 0.11
+couleurs = { peau = "coquelicot", chair = "craie" }
+
+[[objets]]
+id = "radis-croquant"
+famille = "legume"
+forme = "racine-ronde"
+taille = 0.13
+couleurs = { peau = "rose_ancien", chair = "craie", feuille = "sauge_aubrune" }
+
+[[objets]]
+id = "navet"
+famille = "legume"
+forme = "racine-ronde"
+taille = 0.15
+couleurs = { peau = "lilas", chair = "craie" }
+
+[[objets]]
+id = "carotte"
+famille = "legume"
+forme = "racine-longue"
+taille = 0.2
+couleurs = { peau = "ocre" }
+
+[[objets]]
+id = "tomate"
+famille = "legume"
+forme = "tomate"
+taille = 0.075
+couleurs = { peau = "coquelicot" }
+
+[[objets]]
+id = "potiron"
+famille = "legume"
+forme = "potiron"
+taille = 0.3
+couleurs = { peau = "ocre", feuille = "olive" }
+
+[[objets]]
+id = "chou"
+famille = "legume"
+forme = "chou"
+taille = 0.2
+couleurs = { peau = "sauge", chair = "sauge_aubrune" }
+
+[[objets]]
+id = "poireau"
+famille = "legume"
+forme = "poireau"
+taille = 0.45
+couleurs = { peau = "craie", feuille = "bouteille" }
+
+[[objets]]
+id = "pomme-de-terre"
+famille = "legume"
+forme = "tubercule"
+taille = 0.08
+couleurs = { peau = "terre_claire" }
+
+[[objets]]
+id = "oignon"
+famille = "legume"
+forme = "bulbe"
+taille = 0.09
+couleurs = { peau = "rouille", chair = "lin" }
+
+# ---------------------------------------------------------------------------------------------
+# POISSONS. formes: gardon, truite, perche, brochet, carpe, goujon (silhouettes et nageoires).
+# Posés sur le ventre, tête vers l'avant (-Y Blender, +Z glTF). `taches` ajoute des points.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "gardon"
+famille = "poisson"
+forme = "gardon"
+taille = 0.22
+couleurs = { dos = "ardoise", flanc = "perle", ventre = "craie", nageoire = "coquelicot" }
+
+[[objets]]
+id = "truite"
+famille = "poisson"
+forme = "truite"
+taille = 0.32
+couleurs = { dos = "olive", flanc = "lin", ventre = "craie", nageoire = "ficelle", tache = "brique" }
+
+[[objets]]
+id = "perche"
+famille = "poisson"
+forme = "perche"
+taille = 0.25
+couleurs = { dos = "bouteille", flanc = "moutarde", ventre = "craie", nageoire = "coquelicot", tache = "bouteille" }
+
+[[objets]]
+id = "brochet"
+famille = "poisson"
+forme = "brochet"
+taille = 0.65
+couleurs = { dos = "bouteille", flanc = "olive", ventre = "lin", nageoire = "ocre", tache = "blond_paille" }
+
+[[objets]]
+id = "carpe"
+famille = "poisson"
+forme = "carpe"
+taille = 0.45
+couleurs = { dos = "chocolat", flanc = "ocre", ventre = "lin", nageoire = "noisette" }
+
+[[objets]]
+id = "goujon"
+famille = "poisson"
+forme = "goujon"
+taille = 0.12
+couleurs = { dos = "noisette", flanc = "ficelle", ventre = "craie", nageoire = "ficelle", tache = "chocolat" }
+
+# ---------------------------------------------------------------------------------------------
+# BOCAUX et BOUTEILLES. forme: bocal, pot (bocal bas); bouteille, fiole.
+# Le verre se lit par son contenu (bible: aucune transparence dans les menus).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "confiture"
+famille = "bocal"
+forme = "bocal"
+taille = 0.11
+couleurs = { contenu = "brique", couvercle = "coquelicot" }
+
+[[objets]]
+id = "miel"
+famille = "bocal"
+forme = "pot"
+taille = 0.09
+couleurs = { contenu = "moutarde", couvercle = "craie" }
+
+[[objets]]
+id = "lait"
+famille = "bouteille"
+forme = "bouteille"
+taille = 0.26
+couleurs = { contenu = "craie", bouchon = "bleu_de_travail", etiquette = "ciel" }
+
+[[objets]]
+id = "jus-de-pomme"
+famille = "bouteille"
+forme = "bouteille"
+taille = 0.28
+couleurs = { contenu = "ocre", bouchon = "noisette", etiquette = "craie" }
+
+[[objets]]
+id = "sirop"
+famille = "bouteille"
+forme = "fiole"
+taille = 0.18
+couleurs = { contenu = "prune", bouchon = "noisette", etiquette = "lin" }
+
+# ---------------------------------------------------------------------------------------------
+# PAINS. formes: boule, baguette, brioche, croissant.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "pain"
+famille = "pain"
+forme = "boule"
+taille = 0.22
+
+[[objets]]
+id = "baguette"
+famille = "pain"
+forme = "baguette"
+taille = 0.6
+couleurs = { croute = "blond_miel", entaille = "lin" }
+
+[[objets]]
+id = "brioche"
+famille = "pain"
+forme = "brioche"
+taille = 0.12
+couleurs = { croute = "ocre", entaille = "moutarde" }
+
+[[objets]]
+id = "croissant"
+famille = "pain"
+forme = "croissant"
+taille = 0.14
+couleurs = { croute = "ocre", entaille = "blond_miel" }
+
+# ---------------------------------------------------------------------------------------------
+# PLATS. `contenant`: assiette, bol, moule (tourte). formes du contenu: soupe, omelette,
+# salade, ragout, tarte, tourte, poisson-grille.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "soupe-aux-herbes"
+famille = "plat"
+forme = "soupe"
+contenant = "bol"
+taille = 0.15
+couleurs = { plat = "sauge", garniture = "herbe", vaisselle = "craie", lisere = "bleu_de_travail" }
+
+[[objets]]
+id = "tourte-du-quai"
+famille = "plat"
+forme = "tourte"
+contenant = "moule"
+taille = 0.24
+couleurs = { plat = "ocre", garniture = "blond_miel", vaisselle = "rouille" }
+
+[[objets]]
+id = "omelette"
+famille = "plat"
+forme = "omelette"
+contenant = "assiette"
+taille = 0.22
+couleurs = { plat = "moutarde", garniture = "herbe" }
+
+[[objets]]
+id = "salade"
+famille = "plat"
+forme = "salade"
+contenant = "bol"
+taille = 0.17
+couleurs = { plat = "herbe", garniture = "coquelicot", lisere = "canard" }
+
+[[objets]]
+id = "ragout"
+famille = "plat"
+forme = "ragout"
+contenant = "bol"
+taille = 0.16
+couleurs = { plat = "chocolat", garniture = "ocre", vaisselle = "terre_claire", lisere = "rouille" }
+
+[[objets]]
+id = "tarte-aux-pommes"
+famille = "plat"
+forme = "tarte"
+contenant = "assiette"
+taille = 0.24
+couleurs = { plat = "blond_miel", garniture = "moutarde" }
+
+[[objets]]
+id = "poisson-grille"
+famille = "plat"
+forme = "poisson-grille"
+contenant = "assiette"
+taille = 0.26
+couleurs = { plat = "noisette", garniture = "moutarde", lisere = "canard" }
+
+# ---------------------------------------------------------------------------------------------
+# OUTILS. Manche et tête; formes: hache, beche, pioche, canne, filet, arrosoir, serpe.
+# `niveau`: 0 de base, 1 forgé (virole de laiton, lien de cuir, tête plus franche).
+# Le manche est debout, tête en haut; la prise est sur le manche (au tiers du bas).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "hache"
+famille = "outil"
+forme = "hache"
+taille = 0.7
+
+[[objets]]
+id = "hache-forgee"
+famille = "outil"
+forme = "hache"
+niveau = 1
+taille = 0.75
+couleurs = { manche = "chocolat", tete = "anthracite", virole = "laiton" }
+
+[[objets]]
+id = "beche"
+famille = "outil"
+forme = "beche"
+taille = 1.0
+
+[[objets]]
+id = "beche-forgee"
+famille = "outil"
+forme = "beche"
+niveau = 1
+taille = 1.05
+couleurs = { manche = "chocolat", tete = "anthracite", virole = "laiton" }
+
+[[objets]]
+id = "pioche"
+famille = "outil"
+forme = "pioche"
+taille = 0.8
+
+[[objets]]
+id = "pioche-forgee"
+famille = "outil"
+forme = "pioche"
+niveau = 1
+taille = 0.85
+couleurs = { manche = "chocolat", tete = "anthracite", virole = "laiton" }
+
+[[objets]]
+id = "canne"
+famille = "outil"
+forme = "canne"
+taille = 1.5
+couleurs = { manche = "blond_miel", tete = "acier" }
+
+[[objets]]
+id = "canne-fine"
+famille = "outil"
+forme = "canne"
+niveau = 1
+taille = 1.55
+couleurs = { manche = "chocolat", tete = "laiton", virole = "laiton" }
+
+[[objets]]
+id = "filet"
+famille = "outil"
+forme = "filet"
+taille = 0.9
+couleurs = { tete = "craie" }
+
+[[objets]]
+id = "filet-forge"
+famille = "outil"
+forme = "filet"
+niveau = 1
+taille = 0.95
+couleurs = { manche = "chocolat", tete = "ciel", virole = "laiton" }
+
+[[objets]]
+id = "arrosoir"
+famille = "outil"
+forme = "arrosoir"
+taille = 0.42
+couleurs = { tete = "sauge_aubrune", manche = "sauge_aubrune" }
+
+[[objets]]
+id = "arrosoir-cuivre"
+famille = "outil"
+forme = "arrosoir"
+niveau = 1
+taille = 0.45
+couleurs = { tete = "rouille", manche = "laiton", virole = "laiton" }
+
+[[objets]]
+id = "serpe"
+famille = "outil"
+forme = "serpe"
+taille = 0.4
+
+# ---------------------------------------------------------------------------------------------
+# SACS. formes: besace (petit sac à rabat), sacoche (à deux poches), sac-a-dos.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "besace"
+famille = "sac"
+forme = "besace"
+taille = 0.32
+
+[[objets]]
+id = "sacoche"
+famille = "sac"
+forme = "sacoche"
+taille = 0.4
+couleurs = { toile = "sauge", rabat = "cuir" }
+
+[[objets]]
+id = "sac-a-dos"
+famille = "sac"
+forme = "sac-a-dos"
+taille = 0.5
+couleurs = { toile = "bleu_de_travail", rabat = "cuir_sombre" }
+
+# ---------------------------------------------------------------------------------------------
+# GRAINES en sachet de papier: `image` = la couleur de ce qui pousse, montrée en petit volume.
+# formes de l'image: ronde (radis, tomate), longue (carotte), fleur.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "graines-radis"
+famille = "graine"
+forme = "ronde"
+taille = 0.12
+couleurs = { image = "coquelicot", bande = "rose_ancien" }
+
+[[objets]]
+id = "graines-tomate"
+famille = "graine"
+forme = "ronde"
+taille = 0.12
+couleurs = { image = "coquelicot", bande = "brique" }
+
+[[objets]]
+id = "graines-carotte"
+famille = "graine"
+forme = "longue"
+taille = 0.12
+couleurs = { image = "ocre", bande = "moutarde" }
+
+[[objets]]
+id = "graines-fleurs"
+famille = "graine"
+forme = "fleur"
+taille = 0.12
+couleurs = { image = "lilas", bande = "ciel" }
+
+# ---------------------------------------------------------------------------------------------
+# FLEURS coupées. formes: coupe (coquelicot, tulipe), etoile (marguerite), soleil (tournesol).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "coquelicot"
+famille = "fleur"
+forme = "coupe"
+taille = 0.3
+
+[[objets]]
+id = "marguerite"
+famille = "fleur"
+forme = "etoile"
+taille = 0.28
+couleurs = { petale = "craie", coeur = "moutarde" }
+
+[[objets]]
+id = "tournesol"
+famille = "fleur"
+forme = "soleil"
+taille = 0.5
+couleurs = { petale = "moutarde", coeur = "chocolat" }
+
+# ---------------------------------------------------------------------------------------------
+# CAILLOUX ET MINERAIS. formes: galet, minerai (éclats incrustés), fossile (ammonite).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "pierre"
+famille = "caillou"
+forme = "galet"
+taille = 0.12
+
+[[objets]]
+id = "minerai-de-fer"
+famille = "caillou"
+forme = "minerai"
+taille = 0.12
+couleurs = { pierre = "lauze", eclat = "rouille" }
+
+[[objets]]
+id = "minerai-de-cuivre"
+famille = "caillou"
+forme = "minerai"
+taille = 0.12
+couleurs = { pierre = "pierre_creme", eclat = "canard" }
+
+[[objets]]
+id = "fossile-coquille"
+famille = "caillou"
+forme = "fossile"
+taille = 0.1
+couleurs = { pierre = "pierre_creme", eclat = "ficelle" }
+
+# ---------------------------------------------------------------------------------------------
+# BOIS. formes: planche, buche (couchées).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "planche"
+famille = "bois"
+forme = "planche"
+taille = 0.9
+couleurs = { bois = "blond_miel", coeur = "lin" }
+
+[[objets]]
+id = "buche"
+famille = "bois"
+forme = "buche"
+taille = 0.4
+couleurs = { bois = "chocolat", coeur = "terre_claire" }
+
+# ---------------------------------------------------------------------------------------------
+# COURRIER. formes: lettre (enveloppe cachetée), colis (ficelé, étiquette).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "lettre"
+famille = "courrier"
+forme = "lettre"
+taille = 0.18
+
+[[objets]]
+id = "colis"
+famille = "courrier"
+forme = "colis"
+taille = 0.3
+couleurs = { papier = "terre_claire" }
+
+# ---------------------------------------------------------------------------------------------
+# CLÉS et PIÈCES. clé: forme ancienne (anneau, tige, panneton). pièce: posée à plat, en relief.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "cle"
+famille = "cle"
+forme = "ancienne"
+taille = 0.09
+
+[[objets]]
+id = "cle-rouillee"
+famille = "cle"
+forme = "ancienne"
+taille = 0.1
+couleurs = { metal = "rouille" }
+
+[[objets]]
+id = "vieille-piece"
+famille = "piece"
+forme = "piece"
+taille = 0.03
+
+[[objets]]
+id = "piece-d-argent"
+famille = "piece"
+forme = "piece"
+taille = 0.025
+couleurs = { metal = "perle" }
+
+# ---------------------------------------------------------------------------------------------
+# PROVISIONS (fournitures des recettes et du métier). formes: viande, farine, livre, appareil-photo.
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "boeuf"
+famille = "provision"
+forme = "viande"
+taille = 0.15
+couleurs = { principale = "brique", secondaire = "craie", lien = "ficelle" }
+
+[[objets]]
+id = "farine"
+famille = "provision"
+forme = "farine"
+taille = 0.2
+couleurs = { principale = "lin", secondaire = "craie", lien = "ficelle" }
+
+[[objets]]
+id = "livre-de-cuisine"
+famille = "provision"
+forme = "livre"
+taille = 0.2
+couleurs = { principale = "canard", secondaire = "craie", lien = "moutarde" }
+
+[[objets]]
+id = "appareil-photo"
+famille = "provision"
+forme = "appareil-photo"
+taille = 0.13
+couleurs = { principale = "anthracite", secondaire = "cuir_sombre", lien = "laiton" }
+
+# --------------------------------------------------- ajouts des lots pêche et cuisine (2026-11-10)
+[[objets]]
+id = "ablette"
+famille = "poisson"
+forme = "gardon"
+taille = 0.14
+couleurs = { dos = "ardoise", flanc = "perle", ventre = "craie", nageoire = "perle" }
+
+[[objets]]
+id = "tanche"
+famille = "poisson"
+forme = "carpe"
+taille = 0.35
+couleurs = { dos = "bouteille", flanc = "olive", ventre = "moutarde", nageoire = "bouteille" }
+
+[[objets]]
+id = "oeuf"
+famille = "fruit"
+forme = "oeuf"
+taille = 0.055
+couleurs = { peau = "lin" }
+
+[[objets]]
+id = "tartine"
+famille = "pain"
+forme = "tartine"
+taille = 0.16
+couleurs = { croute = "ocre", entaille = "blond_paille" }
+
+[[objets]]
+id = "oeuf-au-plat"
+famille = "plat"
+forme = "oeuf-au-plat"
+contenant = "assiette"
+taille = 0.24
+couleurs = { plat = "craie", garniture = "moutarde", vaisselle = "lin", lisere = "rouille" }
+
+[[objets]]
+id = "pomme-cuite"
+famille = "plat"
+forme = "pomme-cuite"
+contenant = "assiette"
+taille = 0.24
+couleurs = { plat = "brique", garniture = "ocre" }
+
+[[objets]]
+id = "pommes-sautees"
+famille = "plat"
+forme = "ragout"
+contenant = "assiette"
+taille = 0.24
+couleurs = { garniture = "moutarde", plat = "moutarde", lisere = "bouteille" }
+
+[[objets]]
+id = "pot-au-feu"
+famille = "plat"
+forme = "ragout"
+contenant = "bol"
+taille = 0.17
+couleurs = { plat = "noisette", garniture = "brique", vaisselle = "craie", lisere = "bouteille" }
+
+[[objets]]
+id = "soupe-de-legumes"
+famille = "plat"
+forme = "soupe"
+contenant = "bol"
+taille = 0.15
+couleurs = { plat = "ocre", garniture = "coquelicot", lisere = "rouille" }
+
+[[objets]]
+id = "tarte-doree"
+famille = "plat"
+forme = "tarte"
+contenant = "assiette"
+taille = 0.24
+couleurs = { plat = "moutarde", garniture = "ocre", lisere = "rouille" }
+
+[[objets]]
+id = "fossile-d-essai"
+famille = "caillou"
+forme = "fossile"
+taille = 0.09
+couleurs = { pierre = "lauze", eclat = "lin" }

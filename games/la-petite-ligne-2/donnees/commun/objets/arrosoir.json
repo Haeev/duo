@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "arrosoir",
   "name": "Arrosoir",
+  "model": "arrosoir",
   "family": "tool",
   "stack": 1,
   "food": null,

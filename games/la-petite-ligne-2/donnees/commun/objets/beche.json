@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "beche",
   "name": "Bêche",
+  "model": "beche",
   "family": "tool",
   "stack": 1,
   "food": null,

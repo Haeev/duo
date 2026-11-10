@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "fossile-d-essai",
   "name": "Fossile d'essai",
+  "model": "fossile-d-essai",
   "family": "treasure",
   "stack": 10,
   "food": null,

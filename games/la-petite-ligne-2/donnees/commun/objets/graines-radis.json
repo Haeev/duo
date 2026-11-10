@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "graines-radis",
   "name": "Graines de radis",
+  "model": "graines-radis",
   "family": "seed",
   "stack": 20,
   "food": null,

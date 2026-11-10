@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "oeuf-au-plat",
   "name": "Œuf au plat",
+  "model": "oeuf-au-plat",
   "family": "food",
   "stack": 3,
   "food": {

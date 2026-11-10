@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "hache-forgee",
   "name": "Hache forgée",
+  "model": "hache-forgee",
   "family": "tool",
   "stack": 1,
   "food": null,

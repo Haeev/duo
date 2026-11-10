@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "fossile-coquille",
   "name": "Coquille fossile",
+  "model": "fossile-coquille",
   "family": "treasure",
   "stack": 1,
   "food": null,
