@@ -11,14 +11,17 @@ import type { GameEvent } from '../simulation/noyau/evenements';
 import { formatEuros } from '../simulation/sac/argent';
 import { createShopScreen } from './boutique/ecran';
 import { shopRefusalText } from './boutique/textes';
-import { createNotebook } from './carnet';
+import { createNotebook, type NotebookExtras } from './carnet';
+import { UI_SCALE_FACTOR } from './carnet/lectures';
 import { createDialogue, type BabbleInfo } from './dialogue';
+import type { UiSettings } from './carnet/lectures';
 import { createHud, type ProjectToScreen } from './hud';
 import { promptModel } from './modeles';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
 import './interface.css';
+import './carnet/carnet.css';
 
 export type { BabbleInfo } from './dialogue';
 export type { ProjectToScreen } from './hud';
@@ -36,6 +39,8 @@ export interface InterfaceOptions {
   readonly keyLabel?: (code: string) => string;
   /** Animations réduites (`duo.ui.reducedMotion`); le réglage de l'ordinateur compte aussi. */
   readonly reducedMotion?: boolean;
+  /** Branchements des onglets du carnet (sources de lecture, réglages, éditeur de personnage). */
+  readonly notebook?: NotebookExtras;
   /** Babil: une syllabe à jouer (lot L9). */
   readonly onBabble?: (info: BabbleInfo) => void;
   /** Écoute du clavier (`window` par défaut). */
@@ -73,12 +78,14 @@ export function azertyLabel(code: string): string {
 export function createInterface(options: InterfaceOptions): GameInterface {
   const { root, view, send } = options;
   const keyLabel = options.keyLabel ?? azertyLabel;
-  const media = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
-  const reduced = (): boolean => options.reducedMotion === true || media?.matches === true;
+  const media =
+    typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const reduced = (): boolean =>
+    options.reducedMotion === true || media?.matches === true || settingsUi().reducedMotion;
+  const settingsUi = (): UiSettings => notebook.tabs.settings.ui();
 
   const layer = document.createElement('div');
   layer.className = 'lpl-ui';
-  layer.dataset.motion = reduced() ? 'reduced' : 'full';
   layer.innerHTML = spriteMarkup();
   root.append(layer);
 
@@ -93,8 +100,16 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     options.onBabble ?? (() => undefined),
     UI_TUNING.openGuardMs,
   );
-  const notebook = createNotebook(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs);
+  const notebook = createNotebook(
+    layer,
+    view.content,
+    send,
+    keyLabel,
+    UI_TUNING.openGuardMs,
+    options.notebook,
+  );
   const shop = createShopScreen(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, reduced);
+  layer.dataset.motion = reduced() ? 'reduced' : 'full';
 
   function local(): PlayerIndex | null {
     return view.localIndex();
@@ -117,27 +132,48 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
         break;
       case 'money_changed':
-        if (event.who === me) hud.money(now, `${event.delta > 0 ? '+' : ''}${formatEuros(event.delta)}`);
+        if (event.who === me)
+          hud.money(now, `${event.delta > 0 ? '+' : ''}${formatEuros(event.delta)}`);
         else if (event.who === 'chest')
-          hud.notice(now, 'coffre', fill(TEXTS.notices.chestIn, { montant: formatEuros(view.world()?.common.chest ?? 0) }));
+          hud.notice(
+            now,
+            'coffre',
+            fill(TEXTS.notices.chestIn, { montant: formatEuros(view.world()?.common.chest ?? 0) }),
+          );
         break;
       case 'train_waiting':
-        if (!event.loaded[other]) hud.notice(now, 'train', fill(TEXTS.notices.otherLoading, { nom: nameOf(other) }));
+        if (!event.loaded[other])
+          hud.notice(now, 'train', fill(TEXTS.notices.otherLoading, { nom: nameOf(other) }));
         break;
       case 'train_boarded':
         if (event.player === other)
-          hud.notice(now, 'train', fill(event.to === null ? TEXTS.notices.otherLeftTrain : TEXTS.notices.otherAtTrain, { nom: nameOf(other) }));
+          hud.notice(
+            now,
+            'train',
+            fill(event.to === null ? TEXTS.notices.otherLeftTrain : TEXTS.notices.otherAtTrain, {
+              nom: nameOf(other),
+            }),
+          );
         break;
       case 'sleep_waiting':
         hud.notice(
           now,
           'lit',
-          fill(event.player === me ? TEXTS.notices.youSleepWait : TEXTS.notices.otherSleeping, { nom: nameOf(other) }),
+          fill(event.player === me ? TEXTS.notices.youSleepWait : TEXTS.notices.otherSleeping, {
+            nom: nameOf(other),
+          }),
         );
         break;
       case 'item_given':
         if (event.to === me)
-          hud.notice(now, 'sac', fill(TEXTS.notices.given, { nom: nameOf(event.from), objet: view.content.items[event.item]?.name ?? event.item }));
+          hud.notice(
+            now,
+            'sac',
+            fill(TEXTS.notices.given, {
+              nom: nameOf(event.from),
+              objet: view.content.items[event.item]?.name ?? event.item,
+            }),
+          );
         break;
       case 'tool_blunt':
         if (event.player === me) hud.notice(now, 'info', TEXTS.notices.toolBlunt);
@@ -206,6 +242,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const dtMs = Math.max(0, Math.min(250, dt * 1000));
       now += dtMs;
       layer.dataset.motion = reduced() ? 'reduced' : 'full';
+      layer.style.zoom = String(UI_SCALE_FACTOR[settingsUi().scale]);
       const world = view.world();
       const me = local();
       layer.hidden = world === null || me === null;
@@ -218,8 +255,19 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       const prompt = menu
         ? null
-        : promptModel(view.content, world, me, view.aim(me), { act: keyLabel('Space'), board: keyLabel('Enter') });
-      hud.frame({ now, world, local: me, prompt, menu: notebook.isOpen() || shopOpen, yaw: options.cameraYaw() });
+        : promptModel(view.content, world, me, view.aim(me), {
+            act: keyLabel('Space'),
+            board: keyLabel('Enter'),
+          });
+      hud.frame({
+        now,
+        world,
+        local: me,
+        prompt,
+        menu: notebook.isOpen() || shopOpen,
+        yaw: options.cameraYaw(),
+        needsAlways: settingsUi().needsAlways,
+      });
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
     },
     capturing() {

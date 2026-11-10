@@ -1,0 +1,750 @@
+/*
+ * Onglets du carnet (quêtes, habitants, collections, carte, tenues, réglages). Mêmes jetons que
+ * ../interface.css. Tout en rem; seuls transform et opacity s'animent. Tient dans 1064 x 608 px
+ * sans défilement (1366x768).
+ */
+.lpl-ui .carnet {
+  animation: none;
+}
+/* À grande taille d'interface (zoom), le carnet remonte pour rester entier à l'écran. */
+.lpl-ui .carnet {
+  top: min(6.75rem, calc(100% - 38.5rem));
+}
+.lpl-ui .carnet--entre {
+  animation: leve var(--d-scene) var(--ease) both;
+}
+.lpl-ui .page--pleine {
+  grid-column: 1 / -1;
+  border-radius: 0.75rem;
+  border-right-width: 0.125rem;
+  background: var(--paper);
+  display: grid;
+  grid-template-columns: 1fr 12rem;
+  grid-template-rows: auto auto 1fr;
+  column-gap: 1rem;
+  align-content: start;
+  padding-bottom: 3rem;
+}
+.lpl-ui .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lpl-ui .vide {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  margin-top: 4rem;
+  text-align: center;
+  color: var(--ink-muted);
+}
+.lpl-ui .vide h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  color: var(--ink);
+}
+.lpl-ui .vide p {
+  margin: 0;
+  max-width: 20rem;
+}
+.lpl-ui .vide__ic {
+  width: 5rem;
+  height: 5rem;
+  opacity: 0.55;
+  stroke-dasharray: 3 2;
+}
+
+/* Quêtes */
+.lpl-ui .quetes {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+.lpl-ui .quete {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  height: 3.75rem;
+  padding: 0.375rem 0.75rem 0.375rem 0.5rem;
+  text-align: left;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--d-base) var(--ease-bounce);
+}
+.lpl-ui .quete--grande {
+  height: 5.75rem;
+  border-color: var(--ink);
+  background: linear-gradient(100deg, var(--paper-raised) 70%, var(--paper-sunken));
+}
+.lpl-ui .quete.focus {
+  transform: translateY(-0.1875rem);
+  border-color: var(--ink);
+  box-shadow:
+    0 0 0 0.1875rem var(--brass),
+    var(--shadow-2);
+}
+.lpl-ui .quete--finie {
+  background: var(--paper-sunken);
+}
+.lpl-ui .quete__art {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+}
+.lpl-ui .quete--grande .quete__art {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+.lpl-ui .quete__art .obj {
+  width: 100%;
+  height: 100%;
+}
+.lpl-ui .quete__corps {
+  display: grid;
+  gap: 0.3125rem;
+  min-width: 0;
+}
+.lpl-ui .quete__titre {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lpl-ui .quete--grande .quete__titre {
+  font-size: 1.375rem;
+  white-space: normal;
+}
+.lpl-ui .perles {
+  display: flex;
+  gap: 0.3125rem;
+}
+.lpl-ui .perle {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  border: 0.125rem solid var(--ink);
+}
+.lpl-ui .perle--done {
+  background: var(--primary);
+}
+.lpl-ui .perle--current {
+  background: var(--paper-raised);
+  box-shadow: inset 0 0 0 0.1875rem var(--brass);
+}
+.lpl-ui .perle--todo {
+  border-style: dashed;
+  border-color: var(--line);
+}
+.lpl-ui .ruban {
+  position: absolute;
+  right: 0.75rem;
+  top: -0.4375rem;
+  display: grid;
+  place-items: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  background: var(--stamp);
+  color: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.375rem;
+}
+.lpl-ui .ruban .ic {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-ui .tampon {
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-8deg);
+  padding: 0.0625rem 0.5rem;
+  border: 0.1875rem double var(--stamp);
+  border-radius: 0.375rem;
+  color: var(--stamp);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.lpl-ui .tampon--or {
+  position: static;
+  display: inline-block;
+  transform: rotate(-6deg);
+  margin-left: 0.5rem;
+  color: #8a6a1d;
+  border-color: var(--brass);
+  background: rgb(232 199 122 / 0.35);
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
+.lpl-ui .deux {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.375rem;
+  display: flex;
+}
+.lpl-ui .deux .token {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-left: -0.125rem;
+}
+.lpl-ui .pages {
+  position: absolute;
+  left: 1.5rem;
+  bottom: 2.625rem;
+  font-size: 0.8125rem;
+  font-weight: 750;
+  color: var(--ink-muted);
+}
+.lpl-ui .detail--quete {
+  margin-top: 1rem;
+  gap: 0.875rem;
+}
+.lpl-ui .quete__image {
+  width: 11rem;
+  height: 8rem;
+}
+.lpl-ui .detail--quete .etape {
+  max-width: 24rem;
+  color: var(--ink);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  text-align: center;
+  font-weight: 600;
+}
+.lpl-ui .deux-ligne {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+}
+.lpl-ui .deux-ligne .token {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Habitants */
+.lpl-ui .portraits {
+  display: grid;
+  grid-template-columns: repeat(5, 5.25rem);
+  gap: 0.5rem 0.4375rem;
+}
+.lpl-ui .habitant {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.1875rem;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+.lpl-ui .habitant__visage {
+  width: 4.5rem;
+  height: 4.5rem;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #fffaf0, var(--paper-sunken) 80%);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.875rem;
+  transition: transform var(--d-base) var(--ease-bounce);
+}
+.lpl-ui .habitant__visage svg {
+  width: 100%;
+  height: 100%;
+}
+.lpl-ui .habitant.focus .habitant__visage {
+  transform: translateY(-0.25rem);
+  box-shadow:
+    0 0 0 0.1875rem var(--brass),
+    var(--shadow-2);
+}
+.lpl-ui .habitant--inconnu .habitant__visage {
+  border-style: dashed;
+  border-color: var(--line);
+  background: var(--paper-sunken);
+}
+.lpl-ui .habitant--inconnu .habitant__visage svg {
+  filter: brightness(0) opacity(0.22);
+}
+.lpl-ui .habitant.focus .nametag {
+  opacity: 1;
+}
+.lpl-ui .bulle-coin {
+  position: absolute;
+  right: 0.125rem;
+  top: -0.375rem;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 50%;
+}
+.lpl-ui .bulle-coin .ic {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-ui .coeurs {
+  display: inline-flex;
+  gap: 0;
+  color: var(--stamp);
+}
+.lpl-ui .coeur {
+  width: 0.9375rem;
+  height: 0.9375rem;
+}
+.lpl-ui .coeurs--grand .coeur {
+  width: 2rem;
+  height: 2rem;
+}
+.lpl-ui .coeurs--petit .coeur {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-ui .coeurs--gagne {
+  animation: bat 700ms var(--ease-bounce) 2;
+}
+@keyframes bat {
+  50% {
+    transform: scale(1.25);
+  }
+}
+.lpl-ui .detail--habitant {
+  margin-top: 0.25rem;
+  gap: 0.5rem;
+}
+.lpl-ui .buste {
+  width: 8.5rem;
+  height: 9.5rem;
+  overflow: hidden;
+}
+.lpl-ui .buste svg {
+  width: 100%;
+  height: 100%;
+}
+.lpl-ui .buste--inconnu {
+  border-style: dashed;
+  border-color: var(--line);
+}
+.lpl-ui .buste--inconnu svg {
+  filter: brightness(0) opacity(0.2);
+}
+.lpl-ui .detail--habitant .metier {
+  font-size: 0.9375rem;
+}
+.lpl-ui .amitie-autre {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.lpl-ui .amitie-autre .token {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-ui .goutsligne {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.lpl-ui .goutsligne b {
+  min-width: 5.5rem;
+  text-align: right;
+  font-size: 0.875rem;
+}
+.lpl-ui .gout {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.625rem;
+  font-weight: 800;
+}
+.lpl-ui .gout--inconnu {
+  border-style: dashed;
+  background: var(--paper-sunken);
+  color: var(--ink-muted);
+}
+.lpl-ui .gout .obj {
+  width: 2rem;
+  height: 2rem;
+}
+.lpl-ui .detail--habitant .ou {
+  font-size: 0.875rem;
+}
+
+/* Collections */
+.lpl-ui .familles {
+  display: flex;
+  gap: 0.3125rem;
+  margin-bottom: 0.875rem;
+}
+.lpl-ui .famille {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3rem;
+  padding: 0;
+  background: var(--paper-shade);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.625rem;
+  color: var(--ink);
+  transition: transform var(--d-base) var(--ease-bounce);
+}
+.lpl-ui .famille--ouverte {
+  background: var(--paper-raised);
+  transform: translateY(-0.1875rem);
+  box-shadow: var(--shadow-2);
+}
+.lpl-ui .famille__ic {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.lpl-ui .famille__pastille {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.5rem;
+  font-size: 0.6875rem;
+  padding: 0 0.3125rem;
+}
+.lpl-ui .famille--complete {
+  border-color: var(--brass);
+  box-shadow: 0 0 0 0.125rem var(--brass);
+}
+.lpl-ui .famille.focus .nametag,
+.lpl-ui .famille:hover .nametag,
+.lpl-ui .case:hover .nametag,
+.lpl-ui .habitant:hover .nametag {
+  opacity: 1;
+}
+.lpl-ui .compteur {
+  font-family: var(--font-text);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.lpl-ui .cases {
+  display: grid;
+  grid-template-columns: repeat(6, 4.4rem);
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.lpl-ui .case {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  padding: 0;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--d-base) var(--ease-bounce);
+}
+.lpl-ui .case .obj {
+  width: 3rem;
+  height: 3rem;
+}
+.lpl-ui .case--r2 {
+  border: 0.25rem double var(--ink);
+}
+.lpl-ui .case--r3 {
+  border: 0.25rem double var(--stamp);
+  box-shadow:
+    0 0 0 0.125rem var(--brass),
+    var(--shadow-1);
+}
+.lpl-ui .case--r3::before {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.25rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--brass);
+  border: 0.0625rem solid var(--ink);
+  transform: rotate(45deg);
+}
+.lpl-ui .case--vide {
+  background: var(--paper-sunken);
+  border: 0.125rem dashed var(--line);
+  box-shadow: none;
+}
+.lpl-ui .case.focus {
+  transform: translateY(-0.25rem);
+  border-color: var(--focus);
+}
+.lpl-ui .detail--collection {
+  margin-top: 0.75rem;
+  gap: 0.5rem;
+}
+.lpl-ui .v3d--vide {
+  border-style: dashed;
+}
+.lpl-ui .indices {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.875rem;
+  margin: 0.25rem 0;
+  text-align: left;
+}
+.lpl-ui .indices dt {
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+.lpl-ui .indices dd {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+.lpl-ui .indices .inconnu {
+  color: var(--ink-muted);
+  font-weight: 800;
+}
+.lpl-ui .premier {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+}
+.lpl-ui .premier .token {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* Carte */
+.lpl-ui .carte {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  display: grid;
+  place-items: center;
+  height: 30.5rem;
+  margin-top: -0.5rem;
+}
+.lpl-ui .carte-svg {
+  width: 100%;
+  height: 100%;
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  background: #b9c98f;
+}
+.lpl-ui .carte-svg .curseur {
+  animation: bat 1.2s var(--ease) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lpl-ui .carte-svg .jeton-carte {
+  animation: bat 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lpl-ui .carte__lieu {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  gap: 0.375rem;
+  align-content: start;
+  padding: 0.5rem 0.625rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+}
+.lpl-ui .carte__lieu b {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 650;
+}
+.lpl-ui .carte__occupant {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 700;
+}
+.lpl-ui .carte__vide,
+.lpl-ui .carte__ferme {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--ink-muted);
+}
+.lpl-ui .carte__ferme .ic {
+  width: 1rem;
+  height: 1rem;
+}
+.lpl-ui .pastille-visage {
+  display: inline-grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border: 0.125rem solid var(--ink);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-style: normal;
+  background: var(--paper-sunken);
+}
+.lpl-ui .carte__legende {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.lpl-ui .carte__legende > span {
+  display: flex;
+  align-items: center;
+  gap: 0.3125rem;
+}
+.lpl-ui .carte__legende .token {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-ui .ic--cible {
+  width: 1rem;
+  height: 1rem;
+  color: var(--stamp);
+}
+
+/* Tenues */
+.lpl-ui .tenues-slot {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.75rem;
+  height: 24rem;
+  padding: 1rem;
+  text-align: center;
+  color: var(--ink-muted);
+  border: 0.1875rem dashed var(--line);
+  border-radius: 1rem;
+}
+.lpl-ui .tenues-slot__ic {
+  width: 8rem;
+  height: 8rem;
+  opacity: 0.5;
+}
+.lpl-ui .tenues-slot p {
+  margin: 0;
+  max-width: 18rem;
+}
+.lpl-ui .detail--tenues {
+  margin-top: 6rem;
+  gap: 1rem;
+}
+.lpl-ui .detail--tenues h2 {
+  font-size: 1.5rem;
+}
+
+/* Réglages */
+.lpl-ui .reglages {
+  display: grid;
+  gap: 0.625rem;
+}
+.lpl-ui .reglage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0.375rem 0.75rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.75rem;
+}
+.lpl-ui .reglage.focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 0.1875rem var(--brass);
+}
+.lpl-ui .reglage .ic {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+.lpl-ui .reglage__nom {
+  flex: 1;
+  font-weight: 800;
+}
+.lpl-ui .reglage__valeur {
+  min-width: 5.5rem;
+  text-align: center;
+  font-weight: 700;
+}
+.lpl-ui .btn--petit {
+  min-height: 2rem;
+  min-width: 2rem;
+  padding: 0 0.5rem;
+  font-size: 1.125rem;
+  line-height: 1;
+}
+.lpl-ui .jauge {
+  width: 6rem;
+  height: 0.75rem;
+  background: var(--paper-sunken);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.lpl-ui .jauge i {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+}
+.lpl-ui .bascule {
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  background: var(--paper-sunken);
+  border: 0.125rem solid var(--ink);
+  border-radius: 1rem;
+}
+.lpl-ui .bascule i {
+  position: absolute;
+  left: 0.125rem;
+  top: 0.125rem;
+  width: 1rem;
+  height: 1rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 50%;
+  transition: transform var(--d-base) var(--ease-bounce);
+}
+.lpl-ui .bascule--oui {
+  background: var(--primary);
+}
+.lpl-ui .bascule--oui i {
+  transform: translateX(1.25rem);
+}
+.lpl-ui .detail--reglages {
+  margin-top: 6rem;
+  max-width: 20rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.lpl-ui .foot {
+  flex-wrap: wrap;
+  gap: 0.375rem 0.75rem;
+}

@@ -41,6 +41,8 @@ export interface HudFrame {
   /** Un menu couvre l'écran: pas de bulle, la barre reste montrée. */
   readonly menu: boolean;
   readonly yaw: number;
+  /** Réglage « besoins toujours visibles » (carnet, onglet Réglages). */
+  readonly needsAlways?: boolean;
 }
 
 export interface Hud {
@@ -155,7 +157,7 @@ export function createHud(
   }
 
   return {
-    frame({ now, world, local, prompt: model, menu, yaw }) {
+    frame({ now, world, local, prompt: model, menu, yaw, needsAlways = false }) {
       const c = clockModel(world, local);
       setText(time, c.time);
       const dayLabel = day.lastElementChild;
@@ -173,7 +175,7 @@ export function createHud(
 
       const glancing = glance.active(now);
       const me = world.players[local];
-      const list = watcher.update(now, me.needs, me.tiers, glancing || menu);
+      const list = watcher.update(now, me.needs, me.tiers, glancing || menu || needsAlways);
       list.forEach((n, i) => {
         const node = medallions[i];
         if (node === undefined) return;
