@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "la-petite-ligne-2",
   "name": "La Petite Ligne (refonte)",
-  "version": "0.20.1",
+  "version": "0.20.2",
   "sdk": "1.0",
   "view": "iso",
   "engine": "three",
