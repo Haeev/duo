@@ -9,22 +9,13 @@ import { INK_PICTOS } from '../src/interface/pictos-encre';
 import { hasDrawnPortrait, portraitMarkup } from '../src/interface/portrait';
 
 const PKG = path.join(import.meta.dirname, '..');
-const REPO = path.join(PKG, '..', '..');
 const OUT = path.join(PKG, 'assets', 'commun', 'interface');
 const SRC = path.join(PKG, 'assets-src', 'interface-encre');
 
 /** Toutes les couleurs du nuancier 0.2 (personnages, encre, tons des lieux). */
 function palette(): Set<string> {
-  const file = path.join(
-    REPO,
-    'docs',
-    'jeux',
-    'jeu-1',
-    'refonte',
-    'planches',
-    'source',
-    'nuancier-v02.json',
-  );
+  // Copie du nuancier dans le paquet: la publication ne récupère pas `docs/`.
+  const file = path.join(SRC, 'nuancier-v02.json');
   const text = readFileSync(file, 'utf8');
   const colors = new Set([...text.matchAll(/#[0-9A-Fa-f]{6}/g)].map((m) => m[0].toUpperCase()));
   // Lèvres des peaux sombres, fixées par la bible 0.2 (section 2.4) hors du fichier.

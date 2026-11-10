@@ -1,0 +1,18 @@
+{
+  "version": "0.2 encrée, 2026-11-10 (bible 0.2, sections 2.9 et 3). Personnages: une teinte de base par case (ombre par la rampe de lumière). Lieux: trois tons par matière [clair, base, ombre].",
+  "encre": [["encre", "#231A17"], ["encre_nuit", "#141826"], ["encre_hantee", "#10181A"]],
+  "peaux": [["porcelaine", "#F6DCC8"], ["peche", "#EFC7A6"], ["miel", "#E0AE86"], ["dore", "#C99368"], ["noisette", "#A9744D"], ["cannelle", "#8A5A3B"], ["acajou", "#6B432E"], ["ebene", "#4A2F24"]],
+  "cheveux": [["noir", "#2B2523"], ["brun", "#4A3327"], ["chatain", "#6E4B33"], ["auburn", "#8C4A2E"], ["roux", "#AE5F2E"], ["blond_miel", "#C99A55"], ["blond_paille", "#E2C582"], ["gris", "#9A948C"], ["blanc", "#E9E5DC"], ["poivre_et_sel", "#6A6763"]],
+  "cheveux_joueurs": [["bleu_nuit", "#3E5578"], ["framboise", "#A65C7C"], ["vert_mousse", "#6F8F5A"]],
+  "tissus": [["craie", "#F3EDE0"], ["lin", "#D9CAAE"], ["ficelle", "#B8A17E"], ["moutarde", "#D4A33E"], ["ocre", "#C0803A"], ["rouille", "#A85837"], ["brique", "#8F3B34"], ["coquelicot", "#C5443D"], ["rose_ancien", "#CC9C96"], ["prune", "#7E3F55"], ["lilas", "#A58BB8"], ["ciel", "#A9C7D9"], ["ardoise", "#587F8E"], ["bleu_de_travail", "#44618A"], ["marine", "#2C3B57"], ["canard", "#2F6E73"], ["sauge", "#96A98C"], ["bouteille", "#3F6453"], ["olive", "#7A7B45"], ["noisette", "#96704C"], ["chocolat", "#5E4233"], ["perle", "#B9B7B0"], ["anthracite", "#4A4D52"], ["encre", "#26282E"]],
+  "iris": [["noisette", "#6E4B33"], ["brun", "#3A2A22"], ["gris", "#6A6763"], ["bleu", "#44618A"], ["vert", "#3F6453"], ["ambre", "#C0803A"]],
+  "fixes": [["laiton", "#C8A150"], ["acier", "#8C8E91"], ["cuir", "#8C5A35"], ["cuir_sombre", "#4F3626"], ["semelle", "#3A3331"], ["blanc_oeil", "#F7F3EA"], ["bouche", "#A2473F"], ["joue", "#E58E84"]],
+  "duo": [["aqua", "#5CE1E6"], ["mauve", "#8D6CFF"], ["anis", "#D4F27A"], ["corail", "#FC663F"], ["rose", "#E787B1"], ["vert", "#22B07D"]],
+  "lieux": {
+    "aubrune_jour": [["herbe", "#B9C76A", "#93A84E", "#5F7340"], ["terre", "#E6CF9C", "#C7A877", "#8C6F4E"], ["crepi", "#F5E6C6", "#DDC59C", "#A88C6C"], ["tuile", "#D98C62", "#AD6244", "#743D2B"], ["bois", "#D7A86A", "#A87A46", "#6E4B30"], ["pierre", "#DED3BC", "#B6A890", "#7C705F"], ["feuillage", "#9DBB5B", "#6E9241", "#40592D"], ["eau", "#9FD0CF", "#6EA9AD", "#43737A"], ["volet", "#8DB0AE", "#638784", "#3F5A59"]],
+    "aubrune_crepuscule": [["lumiere", "#FFD9A0", "#F2A66E", "#B8704E"], ["ombre", "#8E6A86", "#6A4C6E", "#45324F"], ["herbe", "#C2B36A", "#8D8A4E", "#55553E"], ["crepi", "#F7D2A8", "#D9A887", "#9A7066"]],
+    "aubrune_nuit": [["ciel", "#4A5A85", "#2E3A5C", "#1B2238"], ["herbe", "#5E7A6E", "#435A55", "#2A3A3C"], ["crepi", "#8C93AD", "#6A7090", "#454A66"], ["fenetre", "#FFE2A0", "#FFC46B", "#D9893F"]],
+    "hautefonte": [["pierre_blonde", "#EADDBE", "#CDBB96", "#8F7F66"], ["brique", "#C67A5E", "#A35A44", "#6C3A2E"], ["zinc", "#B3BEC4", "#8C99A3", "#5A646C"], ["fonte", "#5E8A72", "#3F6453", "#25392F"], ["pave", "#BDB5A8", "#958D80", "#625B52"], ["store", "#E0675A", "#C5443D", "#80292A"], ["enseigne", "#F2C55C", "#D4A33E", "#8E6A26"]],
+    "combe_veilleuse": [["herbe_folle", "#8E9A72", "#6B7556", "#3E4637"], ["pierre_moussue", "#9AA394", "#727B6E", "#434A43"], ["bois_gris", "#9A9286", "#726C63", "#45413C"], ["ardoise", "#6E7682", "#4E5560", "#2E333B"], ["brume", "#D2DCD8", "#AFC0BC", "#7E928F"], ["esprit", "#EFFFF0", "#C2EFC6", "#7FBF95"], ["lanterne", "#FFE6B0", "#FFC264", "#D9822E"]]
+  }
+}
