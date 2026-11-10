@@ -8,7 +8,7 @@ import type { PlayerState } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../../etat/monde';
 import { layMapGround } from '../sac/sol';
-import { CORE_TUNING } from './reglages-noyau';
+import { arrivalFrame } from '../voyage/arrivee';
 
 /** Un joueur du duo, tel que la plateforme le donne. */
 export interface Member {
@@ -55,21 +55,16 @@ export function createPlaceState(content: Content, place: PlaceContent): PlaceSt
 }
 
 /**
- * Place les deux joueurs à la descente du train du lieu courant, côte à côte, face au sud (vers
- * le lieu, le dos à la voie).
+ * Place les deux joueurs à la descente du train du lieu courant, côte à côte sur la paire écartée
+ * du lieu (`arrivalFrame`: point d'arrivée et regard des données).
  */
 export function placeAtArrival(content: Content, world: WorldState): void {
   const place = content.places[world.common.place];
-  const arrival = place?.map.points[place.def.station.arrival];
-  if (arrival === undefined) throw new Error(`point d'arrivée absent: ${world.common.place}`);
+  const frame = place === undefined ? null : arrivalFrame(place);
+  if (frame === null) throw new Error(`point d'arrivée absent: ${world.common.place}`);
   world.players.forEach((player, index) => {
-    const side = index === 0 ? -1 : 1;
-    player.body = {
-      x: arrival.x + side * CORE_TUNING.arrivalSpread,
-      y: arrival.y,
-      facing: Math.PI / 2,
-      speed: 0,
-    };
+    const spot = frame.spots[index === 0 ? 0 : 1];
+    player.body = { x: spot.x, y: spot.y, facing: frame.facing, speed: 0 };
   });
 }
 

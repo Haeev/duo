@@ -48,6 +48,11 @@ export const PlaceSchema = v.strictObject({
     platform: IdSchema,
     /** Rayon du quai autour de ce point (m). */
     platformRadius: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(10)),
+    /**
+     * Où regardent les joueurs qui descendent (quarts de tour comme `rotation`: 0 sud, 1 est,
+     * 2 nord, 3 ouest; 0 par défaut). Ils se posent côte à côte de part et d'autre du point.
+     */
+    facing: v.exactOptional(v.picklist([0, 1, 2, 3])),
   }),
   /** Lieux reliés par le rail (le lien doit être écrit des deux côtés). */
   links: v.array(IdSchema),

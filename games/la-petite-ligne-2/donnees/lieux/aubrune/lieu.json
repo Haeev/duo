@@ -5,7 +5,8 @@
   "station": {
     "arrival": "quai",
     "platform": "quai",
-    "platformRadius": 3
+    "platformRadius": 3,
+    "facing": 0
   },
   "links": [],
   "activities": [],

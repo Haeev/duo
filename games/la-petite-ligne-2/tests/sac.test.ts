@@ -91,6 +91,8 @@ describe('sac et barre', () => {
     const sim = newSim(content);
     const [a, b] = sim.world.players;
     a.toolbar[0] = { item: 'pomme', count: 3 };
+    // Hors de portée de main (à la descente, ils ne sont qu'à 1,2 m).
+    b.body.x = a.body.x + 3;
     expect(act(sim, 0, { type: 'give_stack', from: bar(0) })[0]).toMatchObject({
       reason: 'too-far',
     });

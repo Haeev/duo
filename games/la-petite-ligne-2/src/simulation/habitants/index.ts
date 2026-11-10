@@ -26,6 +26,7 @@ import { closedLockSet } from '../lieux/chemins';
 import { currentEntry, goalOf, type Goal } from './planning';
 import { attend, giveGift, showEmote } from './presence';
 import { VILLAGERS } from './reglages';
+import { arrivalFrame } from '../voyage/arrivee';
 
 /** Ce qui ne se sauvegarde pas: le trajet en cours et les minuteries. */
 interface Runtime {
@@ -161,15 +162,15 @@ function spread(
  * joueurs (ils descendent face au lieu, `placeAtArrival`), hors de leur regard et de leur chemin.
  */
 function clearArrival(sim: SimContext, content: PlaceContent, place: PlaceState, goal: Goal): void {
-  const arrival = content.map.points[content.def.station.arrival];
-  if (arrival === undefined) return;
+  const arrival = arrivalFrame(content);
+  if (arrival === null) return;
   const { arrivalClearance: radius, arrivalClearanceSteps: steps } = VILLAGERS;
   const dx = goal.x - arrival.x;
   const dy = goal.y - arrival.y;
   const distance = Math.hypot(dx, dy);
   if (distance >= radius) return;
-  // Les joueurs descendent face au sud (+y): derrière eux, c'est -y.
-  const first = distance > 1e-3 ? Math.atan2(dy, dx) : -Math.PI / 2;
+  // Au point même: derrière les joueurs, à l'opposé de leur regard.
+  const first = distance > 1e-3 ? Math.atan2(dy, dx) : arrival.facing + Math.PI;
   const blockers = placeBlockers(sim.content, content, place, sim.world);
   for (let k = 0; k < steps; k++) {
     // 0, +1, -1, +2, -2...: au plus près du premier sens.
@@ -261,11 +262,11 @@ function updatePresence(
       return false;
     }
     // Il descend du train: sur le quai, puis à pied jusqu'à son poste.
-    const arrival = content.map.points[content.def.station.arrival];
-    if (arrival !== undefined && !snap) {
+    const arrival = arrivalFrame(content);
+    if (arrival !== null && !snap) {
       body.x = arrival.x;
       body.y = arrival.y;
-      body.facing = Math.PI / 2;
+      body.facing = arrival.facing;
       state.presence = 'arriving';
       remember(sim, `habitants.${def.id}.arrive`, true, 'duo');
       sim.emit({ type: 'villager_arrived', villager: def.id });
