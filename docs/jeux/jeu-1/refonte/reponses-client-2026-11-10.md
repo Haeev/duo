@@ -529,3 +529,9 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - La maison du garde-barrière: une chaise barre la route dès l'entrée; on ne voit pas la porte pour sortir; on est téléporté avant d'avoir franchi le seuil, invisible.
 - Les éléments qu'on récolte dehors (arbres, cultures, roches) sont de gros cubes.
 - Firmin « glisse » pendant la scène d'accueil au lieu de marcher.
+
+## Consignes du client pour la nuit du 10 au 11 novembre (22 h 57)
+
+- Le studio continue jusqu'à ce que tout Aubrune soit fini. On ne passe pas au lieu suivant tant que ce chapitre n'est pas terminé et revu par le client.
+- Rythme de nuit: deux membres en parallèle au plus, pour garder du quota; une dizaine d'heures de travail tranquille.
+- Tests décalés: pas de batterie de tests en continu pendant la nuit; on sort du contenu, et on vérifie tout d'un coup le 11 novembre à 8 h (recette complète à deux joueurs comprise). Aucune publication avant cette vérification.
