@@ -196,6 +196,7 @@ function checkEffects(env: Env, effects: readonly StepEffect[], at: string): voi
       case 'give_money':
       case 'change_need':
       case 'give_bag':
+      case 'open_shop':
         env.base.effect(env.content, e, at, problems);
     }
   }

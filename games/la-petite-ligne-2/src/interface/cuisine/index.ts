@@ -424,15 +424,49 @@ export function createKitchen(
       case 'ate':
       case 'bag_changed':
       case 'brick_used':
+      case 'calendar_ended':
+      case 'calendar_started':
+      case 'collection_completed':
+      case 'collection_found':
+      case 'collection_record':
+      case 'comfort_changed':
+      case 'crop_reaped':
       case 'day_started':
+      case 'deco_changed':
+      case 'door_passed':
+      case 'fish_cast':
+      case 'fish_caught':
+      case 'fish_hooked':
+      case 'fish_lost':
       case 'gesture_done':
       case 'gesture_started':
+      case 'harvested':
+      case 'insect_fled':
       case 'item_gained':
       case 'item_given':
+      case 'lock_closed':
+      case 'lock_opened':
+      case 'mirror_opened':
       case 'money_changed':
       case 'need_tier':
+      case 'net_swung':
+      case 'outlook_ready':
+      case 'photo_taken':
+      case 'plot_changed':
       case 'pockets_full':
+      case 'quest_done':
+      case 'quest_opened':
+      case 'quest_step_done':
+      case 'rain_watered':
       case 'recipe_learned':
+      case 'room_progress':
+      case 'room_supplied':
+      case 'scene_beat':
+      case 'scene_ended':
+      case 'scene_started':
+      case 'shop_bought':
+      case 'shop_opened':
+      case 'shop_sold':
       case 'sleep_waiting':
       case 'store_opened':
       case 'talk_ended':
@@ -440,11 +474,20 @@ export function createKitchen(
       case 'talk_started':
       case 'tool_blunt':
       case 'tool_repaired':
+      case 'tool_upgraded':
       case 'train_arrived':
       case 'train_boarded':
       case 'train_departed':
       case 'train_waiting':
       case 'unstuck':
+      case 'villager_arrived':
+      case 'villager_door':
+      case 'villager_gift':
+      case 'villager_greeted':
+      case 'villager_left':
+      case 'villager_reacted':
+      case 'weather_changed':
+      case 'work_hit':
         break;
     }
   }

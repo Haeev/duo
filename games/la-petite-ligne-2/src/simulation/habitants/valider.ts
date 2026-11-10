@@ -49,14 +49,17 @@ function checkVillager(
   if (life === undefined) return;
   const file = `lieux/${place.def.id}/habitants/${villager.id}.json, life`;
   if (condition !== undefined) {
-    life.schedule.forEach((entry, i) =>
-      entry.when?.forEach((c) =>
-        condition(content, c, `${file}, schedule ${String(i)}, when`, problems),
-      ),
-    );
-    life.arrives?.forEach((c) => condition(content, c, `${file}, arrives`, problems));
-    life.leaves?.forEach((c) => condition(content, c, `${file}, leaves`, problems));
+    const lists: [string, readonly Condition[] | null | undefined][] = [
+      ['arrives', life.arrives],
+      ['leaves', life.leaves],
+    ];
+    life.schedule.forEach((entry, i) => {
+      lists.push([`schedule ${String(i)}, when`, entry.when]);
+    });
+    for (const [where, list] of lists)
+      for (const c of list ?? []) condition(content, c, `${file}, ${where}`, problems);
   }
+
   if (!(life.home in place.map.points))
     problems.push(`${file}: point « ${life.home} » (chez lui) absent de la carte`);
   const covered = new Uint8Array(DAY);
