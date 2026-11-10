@@ -11,6 +11,10 @@ import type { GameEvent } from '../simulation/noyau/evenements';
 import { formatEuros } from '../simulation/sac/argent';
 import { createNotebook } from './carnet';
 import { createDialogue, type BabbleInfo } from './dialogue';
+import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
+import { EDITOR_SETTINGS } from './editeur/reglages';
+import { defaultPlayerLook } from '../rendu/personnages/apparence';
+import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
 import { createHud, type ProjectToScreen } from './hud';
 import { promptModel } from './modeles';
 import { spriteMarkup } from './pictos';
@@ -20,6 +24,7 @@ import './interface.css';
 
 export type { BabbleInfo } from './dialogue';
 export type { ProjectToScreen } from './hud';
+export type { EditorPreview, EditorPreviewFactory } from './editeur/editeur';
 
 export interface InterfaceOptions {
   /** Élément qui reçoit l'interface (par-dessus le canevas). */
@@ -36,6 +41,12 @@ export interface InterfaceOptions {
   readonly reducedMotion?: boolean;
   /** Babil: une syllabe à jouer (lot L9). */
   readonly onBabble?: (info: BabbleInfo) => void;
+  /** Aperçu 3D de l'éditeur de personnage (`createCharacterPreview` du rendu). */
+  readonly characterPreview?: EditorPreviewFactory;
+  /** Couleurs des profils (hôte, invité): pièces de départ proches de sa couleur. */
+  readonly playerColors?: readonly [string, string];
+  /** Ouvre l'éditeur au début tant que le joueur n'a pas d'apparence (prologue). Défaut: oui. */
+  readonly editorAtStart?: boolean;
   /** Écoute du clavier (`window` par défaut). */
   readonly keyTarget?: Pick<Window, 'addEventListener' | 'removeEventListener'>;
 }
@@ -71,7 +82,8 @@ export function azertyLabel(code: string): string {
 export function createInterface(options: InterfaceOptions): GameInterface {
   const { root, view, send } = options;
   const keyLabel = options.keyLabel ?? azertyLabel;
-  const media = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const media =
+    typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
   const reduced = (): boolean => options.reducedMotion === true || media?.matches === true;
 
   const layer = document.createElement('div');
@@ -92,6 +104,24 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     UI_TUNING.openGuardMs,
   );
   const notebook = createNotebook(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs);
+  const playerColors = options.playerColors ?? EDITOR_SETTINGS.fallbackAccents;
+  const editor = createCharacterEditor(layer, {
+    data: view.content,
+    send,
+    keyLabel,
+    reduced,
+    ...(options.characterPreview === undefined ? {} : { preview: options.characterPreview }),
+    starter: (player, gender) =>
+      defaultPlayerLook(
+        player,
+        gender,
+        view.content.settings.start.shapes,
+        playerColors[player],
+        view.content.catalogue,
+      ),
+    defaultGender: (player) => CHARACTER_SETTINGS.defaultGenders[player],
+  });
+  let editorShown = options.editorAtStart === false;
 
   function local(): PlayerIndex | null {
     return view.localIndex();
@@ -113,27 +143,48 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
         break;
       case 'money_changed':
-        if (event.who === me) hud.money(now, `${event.delta > 0 ? '+' : ''}${formatEuros(event.delta)}`);
+        if (event.who === me)
+          hud.money(now, `${event.delta > 0 ? '+' : ''}${formatEuros(event.delta)}`);
         else if (event.who === 'chest')
-          hud.notice(now, 'coffre', fill(TEXTS.notices.chestIn, { montant: formatEuros(view.world()?.common.chest ?? 0) }));
+          hud.notice(
+            now,
+            'coffre',
+            fill(TEXTS.notices.chestIn, { montant: formatEuros(view.world()?.common.chest ?? 0) }),
+          );
         break;
       case 'train_waiting':
-        if (!event.loaded[other]) hud.notice(now, 'train', fill(TEXTS.notices.otherLoading, { nom: nameOf(other) }));
+        if (!event.loaded[other])
+          hud.notice(now, 'train', fill(TEXTS.notices.otherLoading, { nom: nameOf(other) }));
         break;
       case 'train_boarded':
         if (event.player === other)
-          hud.notice(now, 'train', fill(event.to === null ? TEXTS.notices.otherLeftTrain : TEXTS.notices.otherAtTrain, { nom: nameOf(other) }));
+          hud.notice(
+            now,
+            'train',
+            fill(event.to === null ? TEXTS.notices.otherLeftTrain : TEXTS.notices.otherAtTrain, {
+              nom: nameOf(other),
+            }),
+          );
         break;
       case 'sleep_waiting':
         hud.notice(
           now,
           'lit',
-          fill(event.player === me ? TEXTS.notices.youSleepWait : TEXTS.notices.otherSleeping, { nom: nameOf(other) }),
+          fill(event.player === me ? TEXTS.notices.youSleepWait : TEXTS.notices.otherSleeping, {
+            nom: nameOf(other),
+          }),
         );
         break;
       case 'item_given':
         if (event.to === me)
-          hud.notice(now, 'sac', fill(TEXTS.notices.given, { nom: nameOf(event.from), objet: view.content.items[event.item]?.name ?? event.item }));
+          hud.notice(
+            now,
+            'sac',
+            fill(TEXTS.notices.given, {
+              nom: nameOf(event.from),
+              objet: view.content.items[event.item]?.name ?? event.item,
+            }),
+          );
         break;
       case 'tool_blunt':
         if (event.player === me) hud.notice(now, 'info', TEXTS.notices.toolBlunt);
@@ -141,6 +192,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'store_opened':
         if (event.player === me) notebook.openStore(event.target, now);
         break;
+      case 'mirror_opened': {
+        const world = view.world();
+        if (event.player === me && world !== null) editor.open('mirror', world, me);
+        break;
+      }
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
       case 'ate':
@@ -169,7 +225,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     if (!(raw instanceof KeyboardEvent)) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
-    if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
+    if (editor.isOpen()) used = editor.key(raw);
+    else if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (raw.code === 'KeyG' && !raw.repeat) {
       hud.glance(now);
@@ -191,18 +248,33 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const me = local();
       layer.hidden = world === null || me === null;
       if (world === null || me === null) return;
+      if (!editorShown && world.players[me].look === null) {
+        editorShown = true;
+        editor.open('create', world, me);
+      }
+      editor.frame(dt, world, me);
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
       const menu = notebook.isOpen() || dialogue.isOpen();
       const prompt = menu
         ? null
-        : promptModel(view.content, world, me, view.aim(me), { act: keyLabel('Space'), board: keyLabel('Enter') });
-      hud.frame({ now, world, local: me, prompt, menu: notebook.isOpen(), yaw: options.cameraYaw() });
+        : promptModel(view.content, world, me, view.aim(me), {
+            act: keyLabel('Space'),
+            board: keyLabel('Enter'),
+          });
+      hud.frame({
+        now,
+        world,
+        local: me,
+        prompt,
+        menu: notebook.isOpen(),
+        yaw: options.cameraYaw(),
+      });
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen());
     },
     capturing() {
-      return dialogue.isOpen() || notebook.isOpen();
+      return editor.isOpen() || dialogue.isOpen() || notebook.isOpen();
     },
     dispose() {
       offEvents();
@@ -210,6 +282,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       hud.dispose();
       dialogue.dispose();
       notebook.dispose();
+      editor.dispose();
       layer.remove();
     },
   };

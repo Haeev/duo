@@ -87,6 +87,8 @@ export const BRICK_SCHEMAS = [
    * pas de zone d'embarquement sans objet.
    */
   v.strictObject({ brick: v.literal('travel') }),
+  /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */
+  v.strictObject({ brick: v.literal('mirror') }),
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);

@@ -48,6 +48,7 @@ export function initialBrickStates(bricks: readonly Brick[]): BrickStates {
       case 'cook':
       case 'repair':
       case 'travel':
+      case 'mirror':
         break;
     }
   }

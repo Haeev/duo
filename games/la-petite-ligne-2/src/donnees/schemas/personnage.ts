@@ -33,6 +33,8 @@ export const LookSchema = v.strictObject({
   shape: IdSchema,
   /** Teinte de peau: indice dans `skins` du catalogue. */
   skin: ColorIndex,
+  /** Taille choisie dans l'éditeur (cm); absente: celle de la morphologie. */
+  height: v.exactOptional(v.pipe(IntSchema, v.minValue(80), v.maxValue(200))),
   /** Une pièce par emplacement au plus; `colors`: indice de couleur de chaque zone teintable. */
   pieces: v.pipe(
     v.array(

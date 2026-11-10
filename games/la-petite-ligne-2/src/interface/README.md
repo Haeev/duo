@@ -8,6 +8,7 @@ DOM sans bibliothèque (socle repris de l'ancien jeu). Elle lit l'état par `Gam
 - `modeles.ts`: modèles de vue purs (horloge, besoins, repli de la barre, bulle, pagination et écriture lettre par lettre, coup d'œil), testés dans `tests/interface.test.ts`.
 - `hud.ts`, `dialogue.ts`, `carnet.ts`: les écrans. `textes.ts`: tous les textes. `reglages.ts`: durées et seuils.
 - `pictos.ts`, `portrait.ts`: pictos du studio; vignettes et portraits provisoires générés depuis l'identifiant.
+- `editeur/`: éditeur de personnage (5.8). `modele.ts` pur (rayons, choix, hasard, testé dans `tests/editeur.test.ts`), `editeur.ts` l'écran, `reglages.ts` (rayons par emplacement, réserves, tailles), `textes.ts`. S'ouvre seul tant que le joueur n'a pas d'apparence (`editorAtStart`), et sur l'événement `mirror_opened`. Aperçu 3D injecté par `characterPreview` (`rendu/personnages/apercu.ts`). Démo: `/src/interface/editeur/demo/index.html` (`#miroir`). Une pièce ajoutée au catalogue y paraît sans code; une pièce étiquetée `habitants` est masquée.
 - `polices/`: Fraunces et Nunito Sans (OFL, déjà dans `CREDITS.md`).
 - `demo/index.html`: l'interface seule sur un état factice (`#repos`, `#bulle`, `#coup-d-oeil`, `#dialogue-ecriture`, `#dialogue-choix`, `#carnet-sans-sac`, `#carnet-sac`, `#rangement`), servie par `pnpm --filter @duo/la-petite-ligne-2 dev` à `/src/interface/demo/index.html`.
 

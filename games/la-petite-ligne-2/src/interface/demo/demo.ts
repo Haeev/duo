@@ -36,9 +36,25 @@ let aim: Aim | null = null;
 if (state === 'bulle') {
   me.needs.hunger = 12;
   me.tiers.hunger = 'low';
-  aim = { kind: 'ground', id: 'sol-1', action: 'pickup', verb: 'Ramasser', refusal: 'pockets-full', x: 0, y: 0 };
+  aim = {
+    kind: 'ground',
+    id: 'sol-1',
+    action: 'pickup',
+    verb: 'Ramasser',
+    refusal: 'pockets-full',
+    x: 0,
+    y: 0,
+  };
 } else if (state !== 'repos') {
-  aim = { kind: 'prop', id: 'pommier', action: 'gather', verb: 'Cueillir', refusal: null, x: 0, y: 0 };
+  aim = {
+    kind: 'prop',
+    id: 'pommier',
+    action: 'gather',
+    verb: 'Cueillir',
+    refusal: null,
+    x: 0,
+    y: 0,
+  };
 }
 if (state === 'coup-d-oeil') {
   me.needs.sleep = 82;
@@ -59,13 +75,32 @@ if (state === 'carnet-sac' || state === 'rangement') {
       { item: 'pomme', count: 4 },
       { item: 'buche', count: 5 },
       { item: 'planche', count: 3 },
-      null, null, null, null, null, null, null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
     ],
   };
 }
 const place = world.places[world.common.place];
 if (state === 'rangement' && place !== undefined)
-  place.objects['demo-coffre'] = { store: [{ item: 'planche', count: 8 }, { item: 'pain', count: 1 }, null, null, null, null, null, null, null, null] };
+  place.objects['demo-coffre'] = {
+    store: [
+      { item: 'planche', count: 8 },
+      { item: 'pain', count: 1 },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    ],
+  };
 
 const listeners = new Set<(event: GameEvent) => void>();
 const root = document.getElementById('ui');
@@ -88,6 +123,7 @@ const ui = createInterface({
     if (sent !== null) sent.textContent = JSON.stringify(intent);
   },
   cameraYaw: () => 0,
+  editorAtStart: false,
 });
 
 function emit(event: GameEvent): void {
@@ -114,11 +150,13 @@ setTimeout(() => {
   }
   if (state === 'coup-d-oeil') press('KeyG');
   if (state === 'carnet-sans-sac' || state === 'carnet-sac') press('KeyC');
-  if (state === 'carnet-sac') setTimeout(() => {
+  if (state === 'carnet-sac')
+    setTimeout(() => {
       press('KeyD');
     }, 400);
   if (state === 'rangement') emit({ type: 'store_opened', player: 0, target: 'demo-coffre' });
-  if (state === 'dialogue-choix') setTimeout(() => {
+  if (state === 'dialogue-choix')
+    setTimeout(() => {
       press('ArrowDown');
     }, 400);
 }, 150);

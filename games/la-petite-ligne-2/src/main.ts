@@ -13,6 +13,7 @@ import { drawTestMarkers } from './entrees/repere-essai';
 import { drawBaseScreen } from './plateforme/ecran-socle';
 import { createInterface } from './interface/index';
 import { createRenderer } from './rendu/index';
+import { createCharacterPreview } from './rendu/personnages/apercu';
 import { createSession } from './session';
 import { SIM_HZ } from './simulation/noyau/constantes';
 
@@ -56,6 +57,8 @@ const ui =
         projectToScreen: (x, y, height) => renderer.projectToScreen(x, y, height),
         keyLabel: (code) => duo.input.keyLabel(code),
         reducedMotion: duo.ui.reducedMotion,
+        playerColors: colors,
+        characterPreview: (surface) => createCharacterPreview(surface, content),
       });
 const controls = createControls({
   input: duo.input,
