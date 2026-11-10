@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "lit-simple",
+  "name": "Lit simple",
+  "model": "lit-simple",
+  "size": {
+    "w": 1,
+    "h": 2
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "repos",
+  "bricks": [
+    {
+      "brick": "sleep",
+      "places": 1,
+      "wakeAt": 100
+    }
+  ]
+}

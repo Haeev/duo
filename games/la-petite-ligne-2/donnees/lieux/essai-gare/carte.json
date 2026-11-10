@@ -36,6 +36,10 @@
     "depart-joueur-2": {
       "x": 21.5,
       "y": 20
+    },
+    "aiguillage": {
+      "x": 24,
+      "y": 5.5
     }
   },
   "objects": [
@@ -59,6 +63,90 @@
       "x": 12.5,
       "y": 30.5,
       "rotation": 1
+    },
+    {
+      "id": "poteau-du-quai",
+      "type": "poteau-de-quai",
+      "x": 17.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "banc-du-quai",
+      "type": "banc",
+      "x": 15,
+      "y": 3.5,
+      "rotation": 2
+    },
+    {
+      "id": "lit-double-de-gare",
+      "type": "lit-double",
+      "x": 17.5,
+      "y": 14,
+      "rotation": 0
+    },
+    {
+      "id": "armoire-de-gare",
+      "type": "armoire",
+      "x": 15.5,
+      "y": 13.5,
+      "rotation": 0
+    },
+    {
+      "id": "coffre-de-gare",
+      "type": "coffre",
+      "x": 17.5,
+      "y": 15.5,
+      "rotation": 0
+    },
+    {
+      "id": "table-du-buffet",
+      "type": "table-a-manger",
+      "x": 31,
+      "y": 15,
+      "rotation": 0
+    },
+    {
+      "id": "chaise-du-buffet-nord",
+      "type": "chaise",
+      "x": 31,
+      "y": 13.5,
+      "rotation": 0
+    },
+    {
+      "id": "chaise-du-buffet-sud",
+      "type": "chaise",
+      "x": 31,
+      "y": 16.5,
+      "rotation": 2
+    },
+    {
+      "id": "marmite-du-buffet",
+      "type": "etal-de-soupe",
+      "x": 33.5,
+      "y": 19.5,
+      "rotation": 0
+    },
+    {
+      "id": "etal-de-tourte-du-buffet",
+      "type": "etal-de-tourte",
+      "x": 35.5,
+      "y": 19.5,
+      "rotation": 0
+    },
+    {
+      "id": "ratelier-de-haches",
+      "type": "etal-de-haches",
+      "x": 33.5,
+      "y": 22.5,
+      "rotation": 0
+    },
+    {
+      "id": "ratelier-de-haches-forgees",
+      "type": "etal-de-haches-forgees",
+      "x": 35.5,
+      "y": 22.5,
+      "rotation": 0
     }
   ]
 }

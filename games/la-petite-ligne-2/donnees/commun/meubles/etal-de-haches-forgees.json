@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "etal-de-haches-forgees",
+  "name": "Râtelier de haches forgées",
+  "model": "ratelier",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "gather",
+      "verb": "Prendre",
+      "clip": "pickup",
+      "seconds": 0.5,
+      "gives": {
+        "item": "hache-forgee",
+        "count": 1
+      },
+      "stock": {
+        "count": 1,
+        "refillMinutes": 1440
+      },
+      "tool": null
+    }
+  ]
+}

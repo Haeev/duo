@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "potager",
+  "villager": "prune",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "bonjour",
+  "nodes": {
+    "bonjour": {
+      "kind": "line",
+      "speaker": "prune",
+      "text": "Oh, des voyageurs ! Pose tes affaires, le potager de la halte ne mord pas.",
+      "emote": "joy",
+      "next": "graines"
+    },
+    "graines": {
+      "kind": "line",
+      "speaker": "prune",
+      "text": "J'y fais pousser des herbes pour la soupe du quai. Tu es [[arrivée|arrivé]] avec un petit creux ?",
+      "emote": "question",
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "soupe",
+          "text": "Un bol de soupe, volontiers.",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_item",
+              "item": "soupe-aux-herbes",
+              "count": 1
+            }
+          ],
+          "next": "servie"
+        },
+        {
+          "id": "confidence",
+          "text": "Parle-moi de toi, Prune.",
+          "when": [
+            {
+              "type": "bond_at_least",
+              "villager": "prune",
+              "points": 5
+            }
+          ],
+          "effects": [
+            {
+              "type": "change_need",
+              "need": "hunger",
+              "amount": 10,
+              "cap": 100
+            },
+            {
+              "type": "remember",
+              "key": "essai-halte.prune.confidence",
+              "value": true,
+              "by": "actor"
+            }
+          ],
+          "next": "confidence"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Plus tard, merci.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "servie": {
+      "kind": "line",
+      "speaker": "prune",
+      "text": "Tiens, encore tiède. Et si tu te laves les mains à la pompe avant, elle sera meilleure !",
+      "emote": "joy",
+      "next": null
+    },
+    "confidence": {
+      "kind": "line",
+      "speaker": "prune",
+      "text": "Je suis venue ici pour le silence, et je suis restée pour les trains. Tiens, une tisane pour le chemin.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

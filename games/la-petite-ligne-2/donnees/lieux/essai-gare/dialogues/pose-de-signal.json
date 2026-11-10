@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "id": "pose-de-signal",
+  "villager": "odilon",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "essai-gare.sac-de-toile",
+              "equals": true
+            }
+          ],
+          "next": "revoir"
+        }
+      ],
+      "otherwise": "bonjour"
+    },
+    "bonjour": {
+      "kind": "line",
+      "speaker": "odilon",
+      "text": "Chut, j'écoute les rails ! Ah, c'est toi. Tu tombes bien : je règle la lanterne de l'aiguillage.",
+      "emote": "idea",
+      "next": "histoire"
+    },
+    "histoire": {
+      "kind": "line",
+      "speaker": "odilon",
+      "text": "Tu es [[venue|venu]] voir comment on guide un train avec une simple lanterne ? Ou tu cherches autre chose ?",
+      "emote": "question",
+      "next": "choix"
+    },
+    "choix": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "sac",
+          "text": "Tu n'aurais pas un sac solide ?",
+          "when": [],
+          "effects": [
+            {
+              "type": "give_bag",
+              "bag": "sac-de-toile"
+            },
+            {
+              "type": "remember",
+              "key": "essai-gare.sac-de-toile",
+              "value": true,
+              "by": "actor"
+            }
+          ],
+          "next": "merci"
+        },
+        {
+          "id": "lanterne",
+          "text": "Montre-moi la lanterne.",
+          "when": [],
+          "effects": [
+            {
+              "type": "change_need",
+              "need": "sleep",
+              "amount": 5,
+              "cap": 100
+            }
+          ],
+          "next": "lanterne"
+        },
+        {
+          "id": "rien",
+          "text": "Je regardais, rien de plus.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "odilon",
+      "text": "Un sac de toile, six poches, jamais servi. Prends-le : il est mieux sur ton dos que dans mon placard.",
+      "emote": "joy",
+      "next": null
+    },
+    "lanterne": {
+      "kind": "line",
+      "speaker": "odilon",
+      "text": "Vert : avance. Rouge : arrête-toi. Bleu : rêve un peu, c'est ma couleur. Tu te sens mieux, non ?",
+      "emote": "joy",
+      "next": null
+    },
+    "revoir": {
+      "kind": "line",
+      "speaker": "odilon",
+      "text": "Alors, ce sac de toile ? Il te va bien. La lanterne, elle, attend toujours son train.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

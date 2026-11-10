@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "odilon",
+  "name": "Odilon, l'aiguilleur",
+  "temper": "dreamy",
+  "look": {
+    "shape": "adult-m-medium",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [2, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [6]
+      },
+      {
+        "slot": "top",
+        "id": "top-sweater",
+        "colors": [14]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [17]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [22]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [1, 0]
+      }
+    ]
+  },
+  "stands": "aiguillage",
+  "voice": "low"
+}

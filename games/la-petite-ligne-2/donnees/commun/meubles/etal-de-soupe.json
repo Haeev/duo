@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "etal-de-soupe",
+  "name": "Marmite de soupe",
+  "model": "marmite",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "gather",
+      "verb": "Se servir",
+      "clip": "pickup",
+      "seconds": 0.5,
+      "gives": {
+        "item": "soupe-aux-herbes",
+        "count": 1
+      },
+      "stock": {
+        "count": 3,
+        "refillMinutes": 240
+      },
+      "tool": null
+    }
+  ]
+}

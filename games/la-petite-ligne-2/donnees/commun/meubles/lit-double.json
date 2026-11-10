@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "lit-double",
+  "name": "Lit double",
+  "model": "lit-double",
+  "size": {
+    "w": 2,
+    "h": 2
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "repos",
+  "bricks": [
+    {
+      "brick": "sleep",
+      "places": 2,
+      "wakeAt": 100
+    }
+  ]
+}
