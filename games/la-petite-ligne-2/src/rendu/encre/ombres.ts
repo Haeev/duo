@@ -65,6 +65,14 @@ interface Keyed {
 export class StageSort {
   private readonly main = new Set<string>();
   private readonly depth = new Set<string>();
+  /**
+   * Clé de famille de chaque maillage, gardée tant que son matériau et sa géométrie restent les
+   * mêmes: sans cela, le tri fabriquait une chaîne (et un `JSON.stringify`) par maillage et par image.
+   */
+  private readonly keys = new WeakMap<
+    object,
+    { material: unknown; geometry: unknown; instanceColor: boolean; key: string; shape: string }
+  >();
   private started = false;
   /** Des maillages attendent encore leur tour (mesure, tests). */
   pending = false;
@@ -78,14 +86,31 @@ export class StageSort {
       const mesh = object as Object3D & Caster;
       if (mesh.isMesh !== true) return;
       const instanced = mesh.isInstancedMesh === true;
-      const shape = `${instanced ? 'i' : ''}${(mesh.instanceColor ?? null) !== null ? 'c' : ''}${
-        mesh.isSkinnedMesh === true ? 's' : ''
-      }${mesh.geometry?.morphAttributes?.position !== undefined ? 'm' : ''}`;
-      const material = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as
-        Keyed | undefined;
-      const key = `${material?.type ?? ''}:${String(material?.fragmentShader?.length ?? 0)}:${JSON.stringify(
-        material?.defines ?? {},
-      )}:${String(material?.side ?? 0)}:${material?.vertexColors === true ? 'v' : ''}:${shape}`;
+      const colored = (mesh.instanceColor ?? null) !== null;
+      let entry = this.keys.get(mesh);
+      if (
+        entry === undefined ||
+        entry.material !== mesh.material ||
+        entry.geometry !== mesh.geometry ||
+        entry.instanceColor !== colored
+      ) {
+        const shape = `${instanced ? 'i' : ''}${colored ? 'c' : ''}${
+          mesh.isSkinnedMesh === true ? 's' : ''
+        }${mesh.geometry?.morphAttributes?.position !== undefined ? 'm' : ''}`;
+        const material = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as
+          Keyed | undefined;
+        entry = {
+          material: mesh.material,
+          geometry: mesh.geometry,
+          instanceColor: colored,
+          shape,
+          key: `${material?.type ?? ''}:${String(material?.fragmentShader?.length ?? 0)}:${JSON.stringify(
+            material?.defines ?? {},
+          )}:${String(material?.side ?? 0)}:${material?.vertexColors === true ? 'v' : ''}:${shape}`,
+        };
+        this.keys.set(mesh, entry);
+      }
+      const { key, shape } = entry;
       let shown = this.main.has(key);
       if (!shown && !admitted) {
         this.main.add(key);
@@ -150,12 +175,26 @@ function depthTarget(size: number): WebGLRenderTarget {
 export class SunShadow {
   readonly target: WebGLRenderTarget;
   readonly camera = new OrthographicCamera(-1, 1, 1, -1, 1, 200);
-  private readonly size: number;
+  readonly size: number;
+  private ready = false;
 
   constructor(private readonly settings: typeof INK_SETTINGS.sunShadow = INK_SETTINGS.sunShadow) {
     this.size = settings.size;
     this.target = depthTarget(this.size);
     this.camera.layers.set(SUN_LAYER);
+  }
+
+  /**
+   * Ambiance sans ombre du soleil (`sunShadow` nul: dedans): la carte n'est pas dessinée, le
+   * nuanceur ne la lit pas. Elle doit seulement exister (vidée une fois), WebGL le veut.
+   */
+  idle(renderer: WebGLRenderer, uniforms: InkUniforms): void {
+    uniforms.uShadowMap.value = this.target.depthTexture;
+    if (this.ready) return;
+    renderer.setRenderTarget(this.target);
+    renderer.clear();
+    renderer.setRenderTarget(null);
+    this.ready = true;
   }
 
   /** Cadre la carte sur un disque de rayon `radius` autour de `center`, calé sur ses texels. */
@@ -189,6 +228,7 @@ export class SunShadow {
     camera.far = s.far;
     camera.updateProjectionMatrix();
     camera.updateMatrixWorld();
+    this.ready = true;
     renderDepth(renderer, scene, depthMaterial, this.target, camera);
     uniforms.uShadowMap.value = this.target.depthTexture;
     uniforms.uShadowTexel.value = 1 / this.size;
@@ -207,7 +247,7 @@ export class SunShadow {
 export class LampShadow {
   readonly target: WebGLRenderTarget;
   readonly camera: PerspectiveCamera;
-  private readonly size: number;
+  readonly size: number;
   private ready = false;
 
   constructor(private readonly settings: typeof INK_SETTINGS.lampShadow = INK_SETTINGS.lampShadow) {

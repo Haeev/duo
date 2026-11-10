@@ -192,3 +192,18 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Sol sans grille à partir d'une grille: texture d'un point par case en filtrage au plus proche, lue en un point décalé par un bruit; les sols posés par l'homme (drapeau dans l'alpha) se lisent sans décalage, leur bord reste droit.
 - Copie isolée: `git merge --ff-only` refuse si mes fichiers modifiés sont touchés en face; `git diff --output=<fichier> -- <chemins>`, `git checkout -- <chemins>`, fusion, puis `git apply --3way` (une commande à la fois, sans variable ni `&&` avec git).
 - Deux os en cinématique inverse dans le repère du monde: plier le genou autour de `cross(tibia, cuisse)` de l'écart d'angle intérieur, puis balancer la cuisse par `setFromUnitVectors`; garder la pose du clip avant et la rendre avant le mélangeur suivant (os non réécrits).
+
+## Rendu encré: optimisation, échelle adaptative et couleurs (2026-11-10, ADR 0023 points 11 à 14)
+
+- `renderer.setClearColor` posé pendant qu'une cible de rendu est active écrit la couleur en linéaire (espace de travail), au canevas en sRGB (`getUnlitUniformColorSpace`). Dans une cible qui garde des valeurs d'écran: `color.setRGB(r, g, b)` sans espace de couleur, les nombres sortent tels quels.
+- Three.js demande toujours un contexte `alpha: true` (il écrit l'alpha à 1 lui-même): `getContextAttributes().alpha` vrai ne dit rien d'un mélange avec la page.
+- Chaîne en post-traitement (cible, puis triangle plein écran): l'anticrénelage du canevas ne lisse rien et coûte la résolution d'un tampon à plusieurs échantillons; le couper à la création du contexte.
+- Échelle interne: tout seuil compté en points (détail, rang de trait, pas de hachure, taille de particule) doit se compter en points du canevas, pas de la cible interne (uniforme « points de la cible par point du canevas »), sinon l'image change de composition à chaque palier. Ne pas aller plus loin: compter en points d'un écran de référence pour « égaliser » un écran dense et un écran ordinaire pâlit le trait peint sur l'écran dense (essayé, écarté sur montage). Comparer avant de normaliser.
+- Résolution interne avec mise à l'échelle finale: la passe de mise à l'échelle coûte ses lectures à pleine taille. Avec cinq lectures, 90 % d'échelle ne rend que 7 % des lectures: paliers utiles à partir de 85 %.
+- Bicubique de Catmull-Rom en cinq lectures filtrées (croix sans les coins), bornée par le minimum et le maximum des cinq: net, sans halo le long des traits noirs.
+- `sampler2DShadow` lu dans une branche: `textureLod(carte, vec3, 0.0)`. `seen * facing`: quand `facing` est nul la carte n'a pas à être lue.
+- Commentaire GLSL dans un littéral de gabarit TypeScript: pas d'accent grave, il ferme la chaîne (erreur TS1005 loin de la cause).
+- Banc à deux vues: `pnpm --filter @duo/sdk-dev build` d'abord (sinon « le faux hôte s'est arrêté (code 1) »). Une touche se donne par `side.press('F9')`; un écran dense par `Emulation.setDeviceMetricsOverride` (CDP) sur la page.
+- Mesure en rendu logiciel: la plupart des écarts entre images dépassent 250 ms; une échelle adaptative doit y rester figée (nom du processeur graphique: SwiftShader, llvmpipe), sinon toutes les captures de recette sortent à l'échelle basse.
+- Dossier de travail partagé entre les membres: prendre un sous-dossier à soi (un `avant/` existait déjà, avec d'autres images). Copie isolée: une commande avec un script Python en ligne est refusée; écrire le script avec l'outil d'écriture, puis `python3 script.py`.
+- Géométrie au quai d'Aubrune: 230 000 triangles dont la moitié pour la carte d'ombre du soleil; ce n'est pas ce qui limite un graphique intégré. Ce qui pèse: points ombrés fois lectures par point (scène 18, contour 22).

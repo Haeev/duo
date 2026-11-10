@@ -183,8 +183,82 @@ export const INK_SETTINGS = {
    */
   placeLamps: { gain: 0.78, minimum: 0.9 },
 
+  /**
+   * Étalonnage commun à toutes les ambiances: facteurs sur leur saturation et leur contraste.
+   * 1 et 1: rien de plus que les ambiances validées. Une hausse légère (proposée: 1,08 et 1,04,
+   * voir `essai-encre.md`, « Couleurs d'un écran à l'autre ») se décide avec le directeur
+   * artistique: elle vaut pour les deux machines.
+   */
+  grade: { saturation: 1, contrast: 1 },
+
   /** Durée du passage d'une ambiance à l'autre quand le joueur entre ou sort (s). */
   indoorFadeSeconds: 0.6,
+
+  /**
+   * Résolution interne adaptative (ADR 0023, point 11): toujours le même rendu, calculé à une
+   * échelle interne (part du côté du tampon du canevas) qui descend d'un palier quand la moyenne
+   * des images dépasse le budget, et remonte quand il y a de la marge. Ce n'est pas un second
+   * niveau de rendu: mêmes passes, mêmes effets, même composition; seule la finesse varie.
+   */
+  resolution: {
+    /** `auto`: adaptative; `fixed`: figée à `fixedScale` (aussi `?echelle=0.8` dans l'adresse). */
+    mode: 'auto' as 'auto' | 'fixed',
+    fixedScale: 1,
+    /** Paramètre d'adresse: `auto` ou une échelle de 0,5 à 1 (recette, comparaison). */
+    param: 'echelle',
+    /** Paliers, du plus fin au plus grossier. Jamais sous 70 % par défaut. */
+    steps: [1, 0.85, 0.75, 0.7] as readonly number[],
+    /** Budget d'une image (ms): le plancher de 30 images par seconde. */
+    budgetMs: 33.4,
+    /** On descend quand la moyenne dépasse `budgetMs * downRatio` pendant `downSeconds`. */
+    downRatio: 1.04,
+    downSeconds: 1.5,
+    /**
+     * On remonte quand le temps prévu au palier du dessus (moyenne x rapport des surfaces) reste
+     * sous `budgetMs * upRatio` pendant `upSeconds`. Une remontée ratée (redescente dans les
+     * `retrySeconds`) multiplie l'attente par `retryFactor`, jusqu'à `maxUpSeconds`: pas de va-et-vient.
+     */
+    upRatio: 0.8,
+    upSeconds: 8,
+    retrySeconds: 20,
+    retryFactor: 2,
+    maxUpSeconds: 240,
+    /** Fenêtre de la moyenne (s), images ignorées (onglet caché, chargement), repos après un changement (s). */
+    averageSeconds: 1.5,
+    ignoreFrameMs: 250,
+    cooldownSeconds: 3,
+    /** Attente après l'arrivée dans un lieu (compilation des programmes, tuiles) avant de juger (s). */
+    warmupSeconds: 4,
+    /**
+     * Unité des seuils de détail et de rang du trait, du pas des hachures des personnages et de
+     * la taille des particules. `false` (défaut): le point du canevas, comme avant; l'échelle
+     * interne n'y change rien, la composition reste la même à tous les paliers. `true`: le point
+     * d'un écran de `referenceWidth` de large, quel que soit l'écran. Essayé et écarté le
+     * 2026-11-10: sur un écran dense le trait peint, plus fin, pâlissait (montage
+     * `encre-perf-ecran-dense.png`); l'ancien comptage donne le rendu le plus proche d'un écran
+     * à l'autre.
+     */
+    sameOnEveryScreen: false as boolean,
+    referenceWidth: 1366,
+    /** Rendu logiciel (tests, banc de captures): l'échelle ne s'adapte pas, elle reste à 1. */
+    softwareFixed: true as boolean,
+  },
+
+  /**
+   * Outil de mesure (ADR 0023, point 12): panneau ouvert par `F9`, par `Ctrl + Maj + M`, ou par
+   * `?mesure=1` dans l'adresse. Rien n'est mesuré sur le processeur graphique tant qu'il est fermé.
+   */
+  meter: {
+    param: 'mesure',
+    key: 'F9',
+    /** Rafraîchissement du panneau (ms). */
+    refreshMs: 500,
+    /** Histogramme des durées d'image: pas (ms) et nombre de cases (la dernière: tout le reste). */
+    binMs: 0.5,
+    bins: 400,
+    /** Écart entre deux images au-delà duquel ce n'est plus du rendu (fenêtre cachée, chargement). */
+    ignoreFrameMs: 1000,
+  },
 
   /**
    * Budgets du style encré par vue (ADR 0022, bible 4.6, technique 3.10), toutes passes comprises.

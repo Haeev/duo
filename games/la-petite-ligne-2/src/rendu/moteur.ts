@@ -306,16 +306,18 @@ class Engine implements GameRenderer {
 
   constructor(private readonly options: RenderOptions) {
     const settings = RENDER_SETTINGS.renderer;
+    const style = options.style ?? INK_SETTINGS.style;
     this.renderer = new WebGLRenderer({
       canvas: options.canvas,
-      antialias: settings.antialias,
+      // En encre, seul un triangle plein écran atteint le canevas (ADR 0023): l'anticrénelage du
+      // canevas n'y lisse rien et coûte sa mémoire et sa résolution à chaque image.
+      antialias: settings.antialias && style !== 'encre',
       powerPreference: 'high-performance',
     });
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = toneMappingOf(settings.toneMapping);
     this.renderer.toneMappingExposure = settings.exposure;
     this.renderer.shadowMap.type = PCFShadowMap;
-    const style = options.style ?? INK_SETTINGS.style;
     this.ink = style === 'encre' ? new InkKit() : null;
     this.cameraSettings =
       this.ink === null
@@ -748,6 +750,8 @@ class Engine implements GameRenderer {
   private measure(dt: number): void {
     const ms = dt * 1000;
     this.frameMs = this.frameMs === 0 ? ms : this.frameMs + (ms - this.frameMs) * 0.05;
+    // En encre, la finesse s'adapte dans le rendu encré lui-même (échelle interne, ADR 0023).
+    if (this.ink !== null) return;
     const change = this.governor.sample(dt);
     if (change === null) return;
     if (change.kind === 'reduced') {
