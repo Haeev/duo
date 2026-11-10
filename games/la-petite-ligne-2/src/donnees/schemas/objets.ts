@@ -26,6 +26,16 @@ export const ToolSchema = v.strictObject({
   bluntGestureSeconds: v.pipe(FiniteSchema, v.minValue(0.2), v.maxValue(1.5)),
 });
 
+/** Bonus exclusif d'un repas spécial pris à deux (cahier 4.4, R26): vocabulaire du moteur, pas un plat. */
+export const MEAL_PERKS = [
+  'extra_catch',
+  'no_tool_wear',
+  'better_prices',
+  'night_rare_glow',
+] as const;
+export const MealPerkSchema = v.picklist(MEAL_PERKS);
+export type MealPerk = (typeof MEAL_PERKS)[number];
+
 export const ItemSchema = v.strictObject({
   schema: FileVersionSchema,
   id: IdSchema,
@@ -38,5 +48,7 @@ export const ItemSchema = v.strictObject({
     v.strictObject({ hunger: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(100)) }),
   ),
   tool: v.nullable(ToolSchema),
+  /** Repas spécial (pile de 1): servi à table aux deux joueurs assis, il donne ce bonus. Absent: plat ordinaire. */
+  meal: v.exactOptional(v.strictObject({ perk: MealPerkSchema })),
 });
 export type ItemDef = v.InferOutput<typeof ItemSchema>;

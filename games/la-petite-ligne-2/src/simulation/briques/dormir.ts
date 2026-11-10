@@ -5,6 +5,7 @@
  */
 import type { Brick } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
+import { wakeUp } from '../besoins/soins';
 import { canSkipNight, skipToMorning } from '../noyau/horloge';
 import { findProp } from '../noyau/obstacles';
 import type { SimContext } from '../noyau/systemes';
@@ -55,8 +56,8 @@ export function sleepThroughNight(sim: SimContext): void {
   if (first === null) return;
   const second = wakeLevel(sim, 1);
   if (second === null) return;
-  const [a, b] = sim.world.players;
-  a.needs.sleep = Math.max(a.needs.sleep, first);
-  b.needs.sleep = Math.max(b.needs.sleep, second);
+  // Sommeil du lit, faim et hygiène en baisse (cahier 4.4, lot L3).
+  wakeUp(sim, 0, first);
+  wakeUp(sim, 1, second);
   skipToMorning(sim);
 }

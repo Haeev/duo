@@ -4,7 +4,15 @@
  * cas dans l'évaluateur et dans `valider.ts`.
  */
 import * as v from 'valibot';
-import { CountSchema, FiniteSchema, IdSchema, NeedIdSchema, type NeedId } from './communs';
+import {
+  CentsSchema,
+  CountSchema,
+  FiniteSchema,
+  IntSchema,
+  IdSchema,
+  NeedIdSchema,
+  type NeedId,
+} from './communs';
 
 /** Valeur retenue dans la mémoire des actions (`progress.memory`). */
 export const FactValueSchema = v.union([v.string(), v.number(), v.boolean()]);
@@ -22,6 +30,8 @@ export type Condition =
   | { type: 'need_at_least'; need: NeedId; value: number }
   | { type: 'item_in_bag'; item: string; count: number }
   | { type: 'place_is'; place: string }
+  /** Points d'amitié du joueur qui agit avec cet habitant (cahier 4.9: 100 par cœur). */
+  | { type: 'bond_at_least'; villager: string; points: number }
   /** Heure de jeu, en minutes depuis minuit (`from` inclus, `to` exclu; la plage peut passer minuit). */
   | { type: 'time_is'; from: number; to: number };
 
@@ -54,6 +64,11 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       count: v.pipe(CountSchema, v.minValue(1)),
     }),
     v.strictObject({ type: v.literal('place_is'), place: IdSchema }),
+    v.strictObject({
+      type: v.literal('bond_at_least'),
+      villager: IdSchema,
+      points: v.pipe(IntSchema, v.minValue(1), v.maxValue(500)),
+    }),
     v.strictObject({ type: v.literal('time_is'), from: Minutes, to: Minutes }),
   ]),
 );
@@ -76,7 +91,8 @@ export const EffectSchema = v.variant('type', [
     item: IdSchema,
     count: v.pipe(CountSchema, v.minValue(1)),
   }),
-  v.strictObject({ type: v.literal('give_money'), amount: v.pipe(CountSchema, v.minValue(1)) }),
+  /** Montant en centimes. */
+  v.strictObject({ type: v.literal('give_money'), amount: v.pipe(CentsSchema, v.minValue(1)) }),
   /** Ajoute `amount` (négatif permis) à un besoin de celui qui agit, sans dépasser `cap`. */
   v.strictObject({
     type: v.literal('change_need'),

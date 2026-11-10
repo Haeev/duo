@@ -179,7 +179,8 @@ describe('action talk', () => {
     expect(sim.world.players[0].talk).toEqual({
       villager: 'cheffe-de-gare',
       dialogue: 'accueil',
-      node: 'tri',
+      // L'aiguillage d'ouverture est traversé d'un coup (lot L3): première réplique affichée.
+      node: 'bonjour',
     });
     const villager = placeOf(sim).villagers['cheffe-de-gare'];
     expect(villager).toMatchObject({ met: [true, false], talkingWith: 0 });
@@ -228,8 +229,10 @@ describe('brique sleep', () => {
     expect(sim.world.common.day).toBe(2);
     expect(sim.world.minutes).toBe(furnished.settings.clock.dayStart);
     // Chacun se réveille avec le sommeil du lit, jamais moins que ce qu'il avait.
-    expect(sim.world.players[0].needs.sleep).toBe(90);
-    expect(sim.world.players[1].needs.sleep).toBe(95);
+    // Couché seul un instant avant l'autre: la sieste a déjà rendu un peu de sommeil.
+    expect(sim.world.players[0].needs.sleep).toBeCloseTo(90, 1);
+    // Le sommeil a un peu baissé (besoins, lot L3) pendant la seconde passée debout avant le lit.
+    expect(sim.world.players[1].needs.sleep).toBeCloseTo(95, 1);
     run(sim, 1);
     expect(sim.world.common.day).toBe(2);
   });

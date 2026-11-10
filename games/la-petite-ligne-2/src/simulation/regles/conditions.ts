@@ -6,6 +6,7 @@ import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Condition } from '../../donnees/schemas/regles';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { bondKey } from '../../etat/progression';
 
 export interface RuleContext {
   readonly world: ReadonlyWorld;
@@ -46,6 +47,11 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       return forActor(ctx, (p) => countHeld(world.players[p], condition.item) >= condition.count);
     case 'place_is':
       return world.common.place === condition.place;
+    case 'bond_at_least':
+      return forActor(
+        ctx,
+        (p) => (world.progress.bonds[bondKey(condition.villager, p)] ?? 0) >= condition.points,
+      );
     case 'time_is': {
       const m = world.minutes;
       // Une plage peut passer minuit (22 h à 2 h).

@@ -35,9 +35,12 @@ export function gestureOf(
   return behaviourOf(BRICK_BEHAVIOURS, action)?.gesture?.(look, player, view) ?? null;
 }
 
-/** Durée d'un geste en pas: aucune action courante ne bloque plus que `gestures.maxSeconds`. */
+/** Durée d'un geste en pas: aucune action courante ne bloque plus que `gestures.maxSeconds` (un geste long s'interrompt). */
 export function gestureTicks(content: Content, spec: GestureSpec): number {
-  const seconds = Math.min(spec.seconds, content.settings.gestures.maxSeconds);
+  const seconds =
+    spec.long === true
+      ? spec.seconds
+      : Math.min(spec.seconds, content.settings.gestures.maxSeconds);
   return Math.max(1, Math.round(seconds * SIM_HZ));
 }
 
@@ -55,5 +58,10 @@ export function predictedGesture(
   if (aim?.refusal !== null) return null;
   const spec = gestureOf(look, player, aim.kind, aim.id, aim.action);
   if (spec === null) return null;
-  return { clip: spec.clip, target: aim.id, ticks: gestureTicks(look.content, spec), long: false };
+  return {
+    clip: spec.clip,
+    target: aim.id,
+    ticks: gestureTicks(look.content, spec),
+    long: spec.long === true,
+  };
 }

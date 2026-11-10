@@ -24,6 +24,8 @@ export interface Look {
 export interface GestureSpec {
   readonly clip: string;
   readonly seconds: number;
+  /** Geste long (la toilette): une direction l'interrompt, il échappe au plafond de 1,5 s. */
+  readonly long?: boolean;
 }
 
 /** Le meuble visé: son instance, la brique déclarée dans ses données et l'état de ses briques. */
@@ -46,6 +48,11 @@ export interface BrickBehaviour<B extends Brick = Brick> {
   gesture?(look: Look, player: PlayerIndex, target: BrickView<B>): GestureSpec | null;
   /** Clé de texte du refus, ou `null` si la brique peut servir à ce joueur maintenant. Pur. */
   refuse(look: Look, player: PlayerIndex, target: BrickView<B>): string | null;
+  /**
+   * `false`: pas de nouveau contrôle à la fin du geste (un geste long qui comble un besoin
+   * finirait refusé une fois le besoin comblé). Absent: contrôle refait.
+   */
+  readonly recheckAtEnd?: boolean;
   /** La brique sert: effet sur l'état (à la fin du geste s'il y en a un). */
   use(sim: SimContext, player: PlayerIndex, target: BrickTarget<B>): void;
 }

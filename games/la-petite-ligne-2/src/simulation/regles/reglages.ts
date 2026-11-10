@@ -5,16 +5,10 @@
  * la section, sans changer les systèmes qui les lisent.
  */
 import type { NeedState } from '../../donnees/schemas/besoins';
+import { CENTS_MAX } from '../../donnees/schemas/communs';
 import type { Effect } from '../../donnees/schemas/regles';
 
-/** Bonus exclusif d'un repas spécial pris à deux (cahier 4.4, R26): vocabulaire du moteur, pas un plat. */
-export const MEAL_PERKS = [
-  'extra_catch',
-  'no_tool_wear',
-  'better_prices',
-  'night_rare_glow',
-] as const;
-export type MealPerk = (typeof MEAL_PERKS)[number];
+export { MEAL_PERKS, type MealPerk } from '../../donnees/schemas/objets';
 
 export interface RulesSettings {
   readonly memory: {
@@ -73,7 +67,7 @@ export const RULES: RulesSettings = {
     betterPrices: 1.1,
   },
   bag: { reach: 1.6 },
-  money: { max: 9999 },
+  money: { max: CENTS_MAX },
   bonds: { firstTalkOfDay: 5, perHeart: 100, hearts: 5, noGainHygiene: ['blocked', 'low'] },
   dialogue: {
     failHygiene: ['blocked', 'low'],

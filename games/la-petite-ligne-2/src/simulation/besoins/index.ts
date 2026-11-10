@@ -9,7 +9,8 @@ import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { stackAt, takeOne } from '../sac/inventaire';
 import { clampGauge, decayFor, tierFor } from './jauges';
-import { expireMealPerks } from './repas';
+import { expireMealPerks, shareSpecialMeal } from './repas';
+import type { SlotRef } from '../sac/cases';
 import { relieveNeed } from './soins';
 
 /** Le meuble d'une instance du lieu courant (carte ou posé par un joueur). */
@@ -30,7 +31,8 @@ function restOf(
   if (objects === undefined) return null;
   for (const id in objects) {
     const states = objects[id];
-    if (states?.sleep?.includes(player) === true) return { lying: true, perMinute: 0 };
+    if (states?.sleep?.includes(player) === true)
+      return { lying: true, perMinute: sim.content.settings.rest.napPerMinute };
     if (states?.sit?.includes(player) === true) {
       const brick = propOf(sim, id)?.bricks.find((b) => b.brick === 'sit');
       return { lying: false, perMinute: brick?.brick === 'sit' ? brick.restPerMinute : 0 };
@@ -54,7 +56,8 @@ function relieveDuringGesture(sim: SimContext, player: PlayerIndex): void {
 function stepPlayer(sim: SimContext, player: PlayerIndex): void {
   const state = sim.world.players[player];
   const input = sim.inputs[player];
-  const effort = state.gesture !== null || (input.run && state.body.speed > 0);
+  // Effort: un geste en cours, ou courir (même contre un obstacle).
+  const effort = state.gesture !== null || (input.run && (input.moveX !== 0 || input.moveY !== 0));
   const rest = restOf(sim, player);
   relieveDuringGesture(sim, player);
   for (const need of NEED_IDS) {
@@ -76,7 +79,29 @@ function stepPlayer(sim: SimContext, player: PlayerIndex): void {
   if (changed) sim.touch('players');
 }
 
+/** Repas spécial servi à table: les deux joueurs assis au meuble visé, la pile de la case se consomme. */
+function serveMeal(sim: SimContext, player: PlayerIndex, from: SlotRef, target: string): void {
+  const state = sim.world.players[player];
+  const stack = stackAt(state, from);
+  const perk = stack === null ? undefined : sim.content.items[stack.item]?.meal?.perk;
+  if (stack === null || perk === undefined) {
+    sim.emit({ type: 'refused', player, reason: 'not-a-meal', target });
+    return;
+  }
+  const refusal = shareSpecialMeal(sim, target, perk);
+  if (refusal !== null) {
+    sim.emit({ type: 'refused', player, reason: refusal, target });
+    return;
+  }
+  takeOne(state, from);
+  sim.touch('players');
+}
+
 function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
+  if (intent.type === 'serve_meal') {
+    serveMeal(sim, player, intent.from, intent.target);
+    return;
+  }
   if (intent.type !== 'eat') return;
   const state = sim.world.players[player];
   const stack = stackAt(state, intent.from);

@@ -3,7 +3,7 @@
  * Chaque lot y ajoute sa section (schéma ici, valeurs dans le JSON, validées au chargement).
  */
 import * as v from 'valibot';
-import { CountSchema, FileVersionSchema, FiniteSchema, IdSchema, IntSchema } from './communs';
+import { CentsSchema, FileVersionSchema, FiniteSchema, IdSchema, IntSchema } from './communs';
 
 const Seconds = v.pipe(FiniteSchema, v.minValue(0));
 /** Minutes de jeu depuis minuit. */
@@ -16,7 +16,8 @@ export const SettingsSchema = v.strictObject({
   start: v.strictObject({
     place: IdSchema,
     minute: MinuteOfDay,
-    money: CountSchema,
+    /** Bourse de départ de chaque joueur, en centimes. */
+    money: CentsSchema,
     /** Silhouette de départ selon le genre choisi (morphologies du catalogue); toutes les pièces vont à tous. */
     shapes: v.strictObject({ f: IdSchema, m: IdSchema }),
   }),

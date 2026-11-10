@@ -17,6 +17,9 @@ export type Id = v.InferOutput<typeof IdSchema>;
 export const FiniteSchema = v.pipe(v.number(), v.finite());
 export const IntSchema = v.pipe(v.number(), v.integer());
 export const CountSchema = v.pipe(IntSchema, v.minValue(0), v.maxValue(9999));
+/** Montant en centimes d'euro (entiers: jamais de flottant), plafonné à 100 000 €. */
+export const CENTS_MAX = 10_000_000;
+export const CentsSchema = v.pipe(IntSchema, v.minValue(0), v.maxValue(CENTS_MAX));
 export const TickSchema = v.pipe(IntSchema, v.minValue(0));
 /** Jauge de 0 à 100. */
 export const GaugeSchema = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(100));

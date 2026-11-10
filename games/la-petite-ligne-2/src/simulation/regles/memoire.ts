@@ -6,7 +6,7 @@ import * as v from 'valibot';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { FactKeySchema, type FactValue } from '../../donnees/schemas/regles';
 import type { Fact } from '../../etat/progression';
-import type { WorldState } from '../../etat/monde';
+import type { ReadonlyWorld } from '../../etat/monde';
 import type { SimContext } from '../noyau/systemes';
 import { RULES } from './reglages';
 
@@ -16,7 +16,7 @@ export function isFactKey(key: string): boolean {
   return v.is(FactKeySchema, key);
 }
 
-export function recall(world: Readonly<WorldState>, key: string): Fact | null {
+export function recall(world: ReadonlyWorld, key: string): Readonly<Fact> | null {
   return world.progress.memory[key] ?? null;
 }
 

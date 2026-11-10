@@ -21,7 +21,10 @@ export const QuestSchema = v.strictObject({
 export const ProgressSchema = v.strictObject({
   /** Mémoire des actions, par clé `lieu.sujet.detail`. */
   memory: v.record(v.string(), FactSchema),
-  /** Points d'amitié par habitant. */
+  /**
+   * Points d'amitié par habitant et par joueur (cahier 4.9), sous la clé `bondKey` (`j0-<habitant>`):
+   * une clé par joueur garde le format d'enregistrement que le réseau envoie par morceaux.
+   */
   bonds: v.record(IdSchema, v.pipe(IntSchema, v.minValue(0))),
   quests: v.record(IdSchema, QuestSchema),
   /** Entrées trouvées, par collection. */
@@ -30,3 +33,11 @@ export const ProgressSchema = v.strictObject({
   opened: v.array(IdSchema),
 });
 export type ProgressState = v.InferOutput<typeof ProgressSchema>;
+
+/** Préfixe des clés d'amitié: un identifiant d'habitant en laisse 37 caractères (`valider.ts` le contrôle). */
+export const BOND_KEY_PREFIX_LENGTH = 3;
+
+/** Clé d'amitié d'un joueur avec un habitant. */
+export function bondKey(villager: string, player: 0 | 1): string {
+  return `j${String(player)}-${villager}`;
+}

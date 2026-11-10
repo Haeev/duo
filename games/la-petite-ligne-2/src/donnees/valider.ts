@@ -12,6 +12,8 @@ import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
 import type { QuestLineDef } from './schemas/quete';
 import type { Condition, Effect } from './schemas/regles';
+import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
+import { validateDialogueTexts } from '../simulation/dialogues/valider';
 
 function checkCondition(content: Content, c: Condition, at: string, problems: string[]): void {
   switch (c.type) {
@@ -27,6 +29,10 @@ function checkCondition(content: Content, c: Condition, at: string, problems: st
       return;
     case 'place_is':
       if (!(c.place in content.places)) problems.push(`${at}: lieu inconnu « ${c.place} »`);
+      return;
+    case 'bond_at_least':
+      if (!Object.values(content.places).some((p) => p.villagers.some((v) => v.id === c.villager)))
+        problems.push(`${at}: habitant inconnu « ${c.villager} »`);
       return;
     case 'remembered':
     case 'need_at_least':
@@ -257,6 +263,11 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
     }
   }
   for (const villager of place.villagers) {
+    // La clé d'amitié par joueur (`bondKey`) préfixe l'identifiant: il doit y tenir.
+    if (villager.id.length + BOND_KEY_PREFIX_LENGTH > 40)
+      problems.push(
+        `${at}, habitant ${villager.id}: identifiant trop long (${String(40 - BOND_KEY_PREFIX_LENGTH)} caractères au plus)`,
+      );
     if (!(villager.stands in map.points))
       problems.push(
         `${at}, habitant ${villager.id}: point « ${villager.stands} » absent de la carte`,
@@ -369,5 +380,7 @@ export function validateContent(content: Content): string[] {
       if (!(place in content.places)) problems.push(`${at}: lieu inconnu « ${place} »`);
   }
   for (const place of Object.values(content.places)) checkPlace(content, place, problems);
+  // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
+  problems.push(...validateDialogueTexts(content));
   return problems;
 }
