@@ -13,6 +13,7 @@ import { createNotebook } from './carnet';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import { createHud, type ProjectToScreen } from './hud';
 import { promptModel } from './modeles';
+import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
@@ -143,6 +144,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         break;
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
+      // La pêche a son médaillon (`peche/`), qui lit ses événements lui-même.
+      case 'fish_cast':
+      case 'fish_caught':
+      case 'fish_hooked':
+      case 'fish_lost':
       case 'ate':
       case 'bag_changed':
       case 'brick_used':
@@ -162,9 +168,16 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         break;
     }
   }
-  const offEvents = view.onEvent(onEvent);
-
   const keyTarget = options.keyTarget ?? window;
+  const fishing = createFishingOverlay({
+    ...{ layer, content: view.content, world: view.world, local, aim: view.aim, send, keyLabel, keyTarget },
+    ...(options.projectToScreen === undefined ? {} : { projectToScreen: options.projectToScreen }),
+  });
+  const offEvents = view.onEvent((event) => {
+    fishing.onEvent(event);
+    onEvent(event);
+  });
+
   const onKey = (raw: Event): void => {
     if (!(raw instanceof KeyboardEvent)) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
@@ -191,6 +204,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const me = local();
       layer.hidden = world === null || me === null;
       if (world === null || me === null) return;
+      fishing.frame(dtMs / 1000);
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
@@ -202,10 +216,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen());
     },
     capturing() {
-      return dialogue.isOpen() || notebook.isOpen();
+      return dialogue.isOpen() || notebook.isOpen() || fishing.capturing();
     },
     dispose() {
       offEvents();
+      fishing.dispose();
       keyTarget.removeEventListener('keydown', onKey);
       hud.dispose();
       dialogue.dispose();

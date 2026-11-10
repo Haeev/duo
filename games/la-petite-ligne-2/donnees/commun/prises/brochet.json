@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "brochet",
+  "kind": "fish",
+  "item": "brochet",
+  "places": ["essai-gare"],
+  "hours": {
+    "from": 540,
+    "to": 1140
+  },
+  "weathers": [],
+  "seasons": ["summer", "autumn", "winter"],
+  "rarity": "rare",
+  "difficulty": 5,
+  "fish": {
+    "force": 0.95,
+    "nervousness": 0.5,
+    "rhythm": {
+      "pull": 2.4,
+      "rest": 1.2
+    },
+    "stamina": 14,
+    "feints": 4,
+    "sizeCm": {
+      "min": 50,
+      "max": 95
+    },
+    "shadow": "large"
+  }
+}

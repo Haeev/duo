@@ -27,7 +27,8 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Habitant | `pnpm nouveau habitant facteur aubrune` | nom, caractère, point de la carte où il se tient, apparence. |
 | Dialogue | `pnpm nouveau dialogue bonjour-facteur aubrune` | `villager`, conditions, nœuds. 150 caractères par réplique, 3 options au plus, toujours une fin. |
 | Recette | `pnpm nouveau recette compote` | poste, ingrédients, résultat (des objets existants). |
-| Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
+| Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. Poisson: bloc `fish` (caractère au combat), puis une ligne dans la `table` d'un coin de pêche. |
+| Coin de pêche | champ `fishing` de `lieu.json` (exemple en commentaire dans `_gabarits/lieu/lieu.jsonc`) | rectangle d'eau (aussi dans `blocked` de la carte), nombre d'ombres, table des poissons. |
 | Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
 | Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | chapitres, étapes, conditions de fin, effets. |
 | Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |

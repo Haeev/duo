@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "perche",
+  "kind": "fish",
+  "item": "perche",
+  "places": ["essai-gare"],
+  "hours": {
+    "from": 540,
+    "to": 1140
+  },
+  "weathers": [],
+  "seasons": [],
+  "rarity": "uncommon",
+  "difficulty": 2.5,
+  "fish": {
+    "force": 0.55,
+    "nervousness": 0.6,
+    "rhythm": {
+      "pull": 1.2,
+      "rest": 1
+    },
+    "stamina": 8,
+    "feints": 3,
+    "sizeCm": {
+      "min": 15,
+      "max": 35
+    },
+    "shadow": "medium"
+  }
+}

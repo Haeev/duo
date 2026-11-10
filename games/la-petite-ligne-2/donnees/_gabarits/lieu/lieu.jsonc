@@ -19,4 +19,9 @@
   "activities": [],
   // Musiques de jour et de nuit: { "day": "...", "night": "..." }, ou null tant qu'elles manquent.
   "music": null,
+  // Facultatif: coins de pêche (schéma src/donnees/schemas/peche.ts). Exemple:
+  // "fishing": [{ "id": "etang", "area": { "x": 10, "y": 10, "w": 6, "h": 4 }, "shadows": 4,
+  //               "table": [{ "catch": "goujon", "weight": 1 }] }]
+  // "area": cases d'eau (à mettre aussi dans "blocked" de la carte); "shadows": ombres visibles
+  // au plus (1 à 8); "table": poissons (commun/prises/, avec un bloc "fish") et poids de tirage.
 }

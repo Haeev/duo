@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "canne-fine",
+  "name": "Canne fine",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "rod",
+    "durability": 60,
+    "gestureSeconds": 0.6,
+    "bluntGestureSeconds": 0.9
+  }
+}

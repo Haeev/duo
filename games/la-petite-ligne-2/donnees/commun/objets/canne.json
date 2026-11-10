@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "canne",
+  "name": "Canne à pêche",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "rod",
+    "durability": 0,
+    "gestureSeconds": 0.6,
+    "bluntGestureSeconds": 0.9
+  }
+}

@@ -4,6 +4,7 @@
  */
 import * as v from 'valibot';
 import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema } from './communs';
+import { FishTraitsSchema } from './peche';
 
 export const CATCH_KINDS = ['fish', 'insect', 'shell', 'fossil', 'treasure'] as const;
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
@@ -26,5 +27,7 @@ export const CatchSchema = v.strictObject({
   rarity: v.picklist(['common', 'uncommon', 'rare']),
   /** Difficulté du mini-jeu, de 1 (facile) à 5. */
   difficulty: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(5)),
+  /** Poisson: son caractère au combat (`schemas/peche.ts`). Absent: il ne se pêche pas. */
+  fish: v.exactOptional(FishTraitsSchema),
 });
 export type CatchDef = v.InferOutput<typeof CatchSchema>;
