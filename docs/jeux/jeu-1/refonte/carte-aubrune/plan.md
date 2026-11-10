@@ -2,17 +2,18 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposition du level-designer, version 0.1, à relire puis à montrer au client avant toute 3D |
+| Statut | version 2: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12) |
 | Date | 2026-11-10 |
 | Source unique | `construire_plan.py` (composition en code), qui écrit `plan.json`, les SVG, les PNG et les tableaux marqués « généré » de ce document |
-| Contrôle | `controler_plan.py` (0 erreur), `controler_plan.py --eprouver` (12 casses vues sur 12) |
+| Contrôle | `controler_plan.py` (0 erreur), `controler_plan.py --eprouver` (18 casses vues sur 18), `assembler_lieu.py` (aucun verrou contournable sur la grille) |
 | Règle suivie | « le plan avant le volume » (CLAUDE.md): la carte 3D sera générée à partir de `plan.json`, jamais l'inverse |
 
 Images: `plan-ensemble.png`, `zone-1-bourg.png` à `zone-7-tunnel.png`, `quetes-acte-1.png` à `quetes-acte-3.png` (SVG de même nom à côté).
 
 ## En bref
 
-- **320 x 208 m** (66 560 m²), contre 164 x 78 m en 0.13: 5,2 fois plus grand. Sept zones, 28 bâtiments, 66 points d'intérêt, 2 km de chemins.
+- **Version 2: 384 x 208 m** (79 872 m²). Tout ce qui est à l'est de x 44,5 a glissé de 64 m vers l'est: la tranchée de l'acte 2 fait 144 m du passage à niveau au poste (80 m en version 1), un peu plus que la ligne morte de l'acte 3 (127 m du passage des Hameaux à la cachette). Les coordonnées citées dans le texte des sections 4 à 8 sont celles de la version 1; les tableaux générés sont à jour.
+- Version 1: 320 x 208 m (66 560 m²), contre 164 x 78 m en 0.13. Sept zones, 28 bâtiments, 66 points d'intérêt, 2 km de chemins.
 - **Un centre et cinq rayons**: le quai et la place au centre; la voie vers l'ouest (le poste), la voie vers l'est (le tunnel), la Côte au nord, le gué et la ferme au sud, le bief et le moulin au sud-ouest. Chaque rayon a son repère visible de loin.
 - **Des zones fermées par l'histoire**: 12 verrous, chacun un obstacle qu'on voit et qu'un habitant lève (un saule couché, un gué emporté, une grille de la Compagnie). Le contrôle vérifie qu'aucune zone ne s'ouvre avant son acte.
 - **Deux sentiers de quête linéaires qui reviennent au centre par un raccourci**: la voie jusqu'au sémaphore (acte 2, retour par la vanne et la berge) et la ligne morte jusqu'au fond du tunnel (acte 3, retour par l'escalier de service, le belvédère et le cimetière).
@@ -40,14 +41,14 @@ Le récit, comme un habitant le raconterait. L'Aubrune coule d'ouest en est au p
 <!-- genere:zones:debut -->
 | Zone | Ouverte à | Surface | Bâtiments | Points d’intérêt |
 |---|---|---|---|---|
-| Le bourg et le passage à niveau | acte 1 | 8748 m² | 23 | 25 |
-| La rivière et le bief | acte 2 | 4028 m² | 0 | 5 |
-| La voie jusqu'au poste d'aiguillage | acte 2 | 2876 m² | 1 | 5 |
-| La Côte | acte 3 | 19710 m² | 1 | 13 |
+| Le bourg et le passage à niveau | acte 1 | 8759 m² | 23 | 25 |
+| La rivière et le bief | acte 2 | 5377 m² | 0 | 6 |
+| La voie jusqu'au poste d'aiguillage | acte 2 | 2218 m² | 1 | 6 |
+| La Côte | acte 3 | 16551 m² | 1 | 13 |
 | Le moulin | acte 3 | 828 m² | 1 | 2 |
 | La ferme | acte 3 | 12715 m² | 2 | 10 |
-| Le tunnel | acte 3 | 7666 m² | 0 | 6 |
-| **Total jouable** | | **56571 m²** sur 66560 m² de carte (320 x 208 m) | 28 | 66 |
+| Le tunnel | acte 3 | 4612 m² | 0 | 6 |
+| **Total jouable** | | **51060 m²** sur 79872 m² de carte (384 x 208 m) | 28 | 68 |
 <!-- genere:zones:fin -->
 
 ## 3. Principes de level design appliqués
@@ -146,17 +147,17 @@ Posés à l'écart sur la même grille ou coupés en place (ADR 0016), à tranch
 <!-- genere:verrous:debut -->
 | Verrou | Où | Obstacle | Ce qui le lève |
 |---|---|---|---|
-| V1 (acte 2) | x 110, y 127 | le saule couché en travers du chemin de la berge | Achille le fait débiter le jour de la leçon de pêche (acte 2) |
-| V2 (acte 2) | x 106, y 97.5 | les ronces de la tranchée, sur la voie | Firmin donne le but « voie dégagée » (acte 2); hache de base |
-| V2b (acte 2) | x 58, y 97.5 | trois frênes couchés sur la voie, trop gros pour la hache de base | hache améliorée par Mado (acte 2): on bute, on revient avec l'outil |
-| V3 (acte 3) | x 118.5, y 135 | le gué emporté par la dernière crue (trois dalles manquent) | Paulin Delmas remet les dalles en arrivant par le train (acte 3) |
-| V4 (acte 3) | x 80, y 110 | le portail de la cour du moulin, cadenassé, et le portillon de la berge | Berthe arrive avec la clé (acte 3) |
-| V5 (acte 3) | x 118.5, y 83 | la barrière forestière de Basile (« coupe en cours ») | Basile vous envoie au bois pour la chambre (acte 3) |
-| V6 (acte 3) | x 156, y 79 | le raidillon du ru, raviné | Basile y pose trois rondins en marches (acte 3) |
-| V7 (acte 3) | x 217, y 63.5 | la porte haute du cimetière, fermée à clé | Marthe prête la clé (acte 3, la coutume) |
-| V8 (acte 3) | x 234, y 97.5 | la grille de la Compagnie en travers de la voie (« Ligne fermée ») | Firmin sort enfin la clé avec la lettre (acte 3); Jeanne connaît un trou, trop petit pour vous |
-| V9 (acte 3, raccourci) | x 252, y 142.8 | la passerelle des Jardins, sans tablier | les planches viennent de la ferme: raccourci ouvert depuis la rive sud (acte 3) |
-| V10 (acte 3, raccourci) | x 292, y 30 | l'escalier de service du tunnel, verrouillé de l'intérieur | on tire le verrou depuis le tunnel: raccourci vers le belvédère (acte 3) |
+| V1 (acte 2) | x 174, y 127 | le saule couché en travers du chemin de la berge | Achille le fait débiter le jour de la leçon de pêche (acte 2) |
+| V2 (acte 2) | x 170, y 97.5 | les ronces de la tranchée, sur la voie | Firmin donne le but « voie dégagée » (acte 2); hache de base |
+| V2b (acte 2) | x 121, y 97.5 | trois frênes couchés sur la voie, trop gros pour la hache de base | hache améliorée par Mado (acte 2): on bute, on revient avec l'outil |
+| V3 (acte 3) | x 182.5, y 135 | le gué emporté par la dernière crue (trois dalles manquent) | Paulin Delmas remet les dalles en arrivant par le train (acte 3) |
+| V4 (acte 3) | x 144, y 110 | le portail de la cour du moulin, cadenassé, et le portillon de la berge | Berthe arrive avec la clé (acte 3) |
+| V5 (acte 3) | x 182.5, y 83 | la barrière forestière de Basile (« coupe en cours ») | Basile vous envoie au bois pour la chambre (acte 3) |
+| V6 (acte 3) | x 220, y 79 | le raidillon du ru, raviné | Basile y pose trois rondins en marches (acte 3) |
+| V7 (acte 3) | x 281, y 63.5 | la porte haute du cimetière, fermée à clé | Marthe prête la clé (acte 3, la coutume) |
+| V8 (acte 3) | x 298, y 97.5 | la grille de la Compagnie en travers de la voie (« Ligne fermée ») | Firmin sort enfin la clé avec la lettre (acte 3); Jeanne connaît un trou, trop petit pour vous |
+| V9 (acte 3, raccourci) | x 316, y 142.8 | la passerelle des Jardins, sans tablier | les planches viennent de la ferme: raccourci ouvert depuis la rive sud (acte 3) |
+| V10 (acte 3, raccourci) | x 356, y 30 | l'escalier de service du tunnel, verrouillé de l'intérieur | on tire le verrou depuis le tunnel: raccourci vers le belvédère (acte 3) |
 | V11 (acte 2, raccourci) | x 31.2, y 104.5 | le portillon du poste, fermé d'un loquet côté voie | on l'ouvre depuis le poste: raccourci vers la vanne et le retour par la berge (acte 2) |
 <!-- genere:verrous:fin -->
 
@@ -216,8 +217,8 @@ Dijkstra sur le graphe des chemins, tous verrous ouverts. Temps: distance divis�
 | le quai | le gué (rive nord) | 45 m | 15 s | 9 s |
 | le quai | l'arrêt du car | 116 m | 39 s | 23 s |
 | le quai | la fosse du bief | 97 m | 32 s | 19 s |
-| le quai | la vanne | 147 m | 49 s | 29 s |
-| le quai | le poste d'aiguillage | 106 m | 35 s | 21 s |
+| le quai | la vanne | 207 m | 1 min 09 | 41 s |
+| le quai | le poste d'aiguillage | 170 m | 57 s | 34 s |
 | le quai | le moulin | 73 m | 24 s | 15 s |
 | le quai | la ferme | 86 m | 29 s | 17 s |
 | le quai | le Gros Noyer | 112 m | 37 s | 22 s |
@@ -230,24 +231,26 @@ Dijkstra sur le graphe des chemins, tous verrous ouverts. Temps: distance divis�
 | la maison | l'épicerie | 44 m | 15 s | 9 s |
 | la maison | le fournil et la mercerie | 58 m | 19 s | 12 s |
 | la maison | le carrefour de l'Église (café, forge) | 84 m | 28 s | 17 s |
-| la maison | le poste d'aiguillage | 98 m | 33 s | 20 s |
+| la maison | le poste d'aiguillage | 162 m | 54 s | 32 s |
 | la maison | le moulin | 53 m | 18 s | 11 s |
 | la maison | la ferme | 53 m | 18 s | 11 s |
 | la maison | l'étang | 105 m | 35 s | 21 s |
 | la maison | la cachette d'Émile | 250 m | 1 min 23 | 50 s |
-| le poste d'aiguillage | le moulin | 123 m | 41 s | 25 s |
+| le poste d'aiguillage | le moulin | 187 m | 1 min 02 | 37 s |
 | le moulin | la ferme | 95 m | 32 s | 19 s |
 | la ferme | l'arrêt du car | 162 m | 54 s | 32 s |
 | le belvédère | l'église | 114 m | 38 s | 23 s |
 | l'étang | l'église | 104 m | 35 s | 21 s |
 | la clairière du Vieux Chêne | l'atelier de Basile | 38 m | 13 s | 8 s |
+| le passage à niveau | le poste d'aiguillage | 144 m | 48 s | 29 s |
+| le passage des Hameaux | la cachette d'Émile | 127 m | 42 s | 25 s |
 <!-- genere:distances:fin -->
 
 Densité d'intérêt (plafond visé: jamais plus de 25 s de marche, soit 75 m, sans rien à faire):
 
 <!-- genere:densite:debut -->
-- Réseau de chemins: 2001 m; 94 points d’intérêt et bâtiments, soit un tous les 21,3 m de chemin en moyenne.
-- Distance moyenne, depuis un point quelconque du réseau, au point d’intérêt le plus proche: 6,6 m (2 s à la marche).
+- Réseau de chemins: 2125 m; 96 points d’intérêt et bâtiments, soit un tous les 22,1 m de chemin en moyenne.
+- Distance moyenne, depuis un point quelconque du réseau, au point d’intérêt le plus proche: 6,9 m (2 s à la marche).
 - Pire cas: 28,0 m (9 s à la marche, 6 s à la course), sur le tronçon trav - pne.
 <!-- genere:densite:fin -->
 
@@ -257,11 +260,11 @@ Densité d'intérêt (plafond visé: jamais plus de 25 s de marche, soit 75 m, s
 | Sentier | Forme | Aller | Retour | Total à la marche | Total à la course |
 |---|---|---|---|---|---|
 | Acte 1, « Logement fourni »: le tour du propriétaire | étoile autour de la place | 336 m | sur place | 1 min 52 | 1 min 07 |
-| Acte 2, « La minute d’écart »: la voie jusqu’au signal | sentier linéaire, retour en boucle | 127 m | 148 m | 1 min 32 | 55 s |
+| Acte 2, « La minute d’écart »: la voie jusqu’au signal | sentier linéaire, retour en boucle | 191 m | 212 m | 2 min 14 | 1 min 21 |
 | Acte 2: la pendule et la leçon de pêche | deux allers courts depuis le centre | 270 m | sur place | 1 min 30 | 54 s |
 | Acte 3, « Ceux qui partent »: le verre de la lanterne | sentier linéaire, retour par le haut | 253 m | 250 m | 2 min 48 | 1 min 41 |
 | Suite « Le fantôme du moulin »: les pas blancs | piste de traces, linéaire | 218 m | sur place | 1 min 13 | 44 s |
-| Suite « Les lettres en retard »: la ligne de la draisine | raccourci sur rail | 277 m | sur place | 1 min 32 | 55 s |
+| Suite « Les lettres en retard »: la ligne de la draisine | raccourci sur rail | 341 m | sur place | 1 min 54 | 1 min 08 |
 <!-- genere:quetes:fin -->
 
 Ces durées sont du déplacement pur; les obstacles, scènes et activités s'y ajoutent.
@@ -275,7 +278,7 @@ L'acte apprend le centre. Du banc du quai, chaque étape se voit depuis la préc
 - **Départ**: Firmin, à la halte. **Étapes**: le passage à niveau; les ronces (V2); le wagon oublié; les frênes couchés (V2b), qui renvoient chez Mado pour la hache améliorée: on bute, on revient avec l'outil, la moitié du chemin est déjà connue. **Point culminant**: le poste, la scène des leviers, le sémaphore qui s'incline.
 - **Retour par raccourci**: le portillon (V11), la descente à la fontaine des cheminots, la passerelle de la vanne, l'île, la fosse du bief (où Achille donnera la leçon de pêche), les planches, la berge, le gué, la maison. On revient par l'eau après être parti par le fer.
 - **Sans flèche**: deux talus et deux rails à l'aller; au retour le sentier descend toujours et suit l'eau vers l'aval; la roue du moulin puis le château d'eau sont en vue.
-- **Limite connue**: l'aller ne fait que 80 m de voie entre le passage à niveau et le poste. Si le client le veut plus long, agrandir de 64 m vers l'ouest (question 2).
+- **Version 2**: 144 m de voie entre le passage à niveau et le poste (oui du client à la question 2). La tranchée fait 6 m de large entre deux talus hors jeu: les frênes (V2b) la barrent d'un talus à l'autre; après eux, la clairière du poste, la voie de garage et le wagon.
 - La pendule et la confidence d'Honorine se jouent sur la Grand-Route, d'un bout à l'autre: Ambroise et Honorine sont à l'est exprès, pour faire traverser le bourg rouvert.
 
 ### Acte 3, « Ceux qui partent »: le verre de la lanterne (`quetes-acte-3.png`)
@@ -347,3 +350,365 @@ Les coutures de l'option B tombent sur des verrous existants (V1, V2, V3, V5 à 
 Hypothèses à faire confirmer par le game-designer: le train du samedi vient de l'ouest (Hautefonte) et le tunnel mène à l'est vers Combe-Veilleuse; Émile est parti à pied par le tunnel; Ambroise loge dans l'ancienne menuiserie, Honorine au bout de la Grand-Route, Marthe au pied du parvis, Barnabé chez Mado; les obstacles des verrous; la vitesse de la draisine.
 
 Questions pour le client, dans le compte rendu du level-designer.
+
+## 12. Version 2: ce qu'il faut pour la 3D
+
+Tout ce qui suit est écrit par `construire_plan.py` dans `plan.json` (champs `bordures`, `habillages`, `sols`, `mobilier`, `vegetation`, `arbres`, `ressources`, `points_nommes`, `interieurs`, `gabarit` de chaque bâtiment; `objet`, `modele`, `pas_encore` de chaque verrou), puis passé dans le lieu par deux étapes:
+
+1. `node games/la-petite-ligne-2/outils/plan-vers-lieu.ts docs/jeux/jeu-1/refonte/carte-aubrune/plan.json <brute.json>`: grille, collisions, zones, verrous, graphe;
+2. `python3 -I docs/jeux/jeu-1/refonte/carte-aubrune/assembler_lieu.py <brute.json>`: écrit `donnees/lieux/aubrune/carte.json`, `climat.json`, `interieurs/*.json` (et `lieu.json` s'il manque): sols détaillés (codes ajoutés au bout de la légende de l'outil, les 14 premiers ne bougent pas), meubles dont le type existe déjà, points nommés, portes par paires, nœuds de portes et d'intérieurs dans le graphe. Il prouve ensuite, verrou par verrou, qu'aucun nœud que le graphe dit fermé n'est atteint en marchant sur la grille, et liste les modèles à créer.
+
+Le format reste `version: 1` pour l'outil du paquet (son schéma l'exige); la révision du contenu est `revision: 2`.
+
+### Corrections de la version 2
+
+- La vanne (`vn`) est sur la berge nord du bief (x 26, y 142,5), à 3,4 m de l'eau: plus aucun nœud sur une case pleine.
+- V2b se tient dans une tranchée de 6 m entre deux talus hors jeu, V11 dans une descente de 4 m entre deux haies, V10 dans l'escalier de service (le rocher de l'éperon est hors jeu: le belvédère ne touche plus le tunnel), et la courbe de la ligne morte est séparée de la Côte par un talus. Le contrôle mesure la largeur du passage au droit de chaque verrou interne à une zone (7 m au plus); l'assembleur le prouve sur la grille.
+- Le ponton de l'acte 1 ne mord plus sur la zone de l'acte 2: la zone du bourg l'englobe (encoche de 5 x 2,5 m sur l'eau).
+- Château d'eau, pigeonnier et Gros Noyer ne sont plus posés sur un chemin.
+- Images: légende élargie, étiquettes de verrou à la largeur du texte, pastilles décalées quand elles couvriraient un numéro de bâtiment, lisières et hors-jeu dessinés.
+
+### Verrous: l'objet qu'on voit et la phrase « pas encore »
+
+<!-- genere:verrous_v2:debut -->
+| Verrou | Objet posé | Modèle | Phrase « pas encore » |
+|---|---|---|---|
+| V1 | arbre couché | `willow-fallen` | Le vieux saule barre le chemin. Pas encore: il faudra une scie, et quelqu'un qui sait par où couper. |
+| V2 | ronces | `brambles-wall` | Les ronces ont avalé la voie. Pas encore: Firmin a dit d'attendre son signal. |
+| V2b | arbres couchés | `ash-trunks-fallen` | Trois frênes en travers des rails, d'un talus à l'autre. Pas encore: ta hache rebondit sur l'écorce. |
+| V3 | dalles manquantes | `ford-stones-missing` | Trois dalles du gué ont filé avec la crue. Pas encore: l'eau est trop vive pour sauter. |
+| V4 | portail cadenassé | `gate-padlocked` | Le portail du moulin est cadenassé. Pas encore: la clé est partie avec le meunier. |
+| V5 | barrière forestière | `forest-barrier` | « Coupe en cours, défense d'entrer. » Pas encore: Basile t'emmènera quand ce sera le moment. |
+| V6 | éboulis | `gully-washout` | Le raidillon s'est raviné, la terre s'effrite sous ton pied. Pas encore: il faudrait des marches. |
+| V7 | grille fermée | `cemetery-gate-locked` | La porte haute du cimetière est fermée à clé. Pas encore: c'est Marthe qui a la clé. |
+| V8 | grille | `company-gate` | « Ligne fermée. Compagnie des chemins de fer. » Pas encore: la grille ne bouge pas d'un pouce. |
+| V9 | passerelle sans tablier | `footbridge-bare` | Il ne reste que les poutres de la passerelle. Pas encore: il manque les planches. |
+| V10 | chaîne | `stair-door-chained` | La porte de l'escalier est fermée d'une chaîne, de l'autre côté. Pas encore: elle s'ouvre d'en bas. |
+| V11 | portillon au loquet | `wicket-latched` | Le portillon est fermé d'un loquet, côté voie. Pas encore: il s'ouvre depuis le poste. |
+<!-- genere:verrous_v2:fin -->
+
+### Lisières
+
+Chaque côté de chaque zone est découpé par voisin (autre zone, hors jeu, bord de carte) et reçoit un habillage: haie, talus, clôture, rivière, bois dense ou muret (`bordures` et `habillages` de `plan.json`, dessinés sur les plans de zone). Le contrôle refuse un contour non couvert ou un habillage hors de cette liste: aucune lisière n'est un mur nu.
+
+### Sols
+
+Par zone: bourg en herbe rase, rivière en prairie humide, voie en friche (ballast sur les rails), Côte en sous-bois, moulin et ferme en pré, tunnel en friche rocheuse. Par chemin: route empierrée, rue pavée, chemin de terre, sentier de terre tassée. Par parcelle et par rectangle: place et parvis pavés, cours en terre battue, potagers en terre de jardin, champs en labour, lande, prairies, galets des grèves, vase de l'étang, gravier du quai.
+
+### Gabarits des bâtiments
+
+Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le repère du monde (le modèle se pose en rotation 0).
+
+<!-- genere:gabarits:debut -->
+| Bâtiment | Gabarit de base | Largeur x profondeur | Étages | Toit | Porte (façade, position) | Couleurs ou note |
+|---|---|---|---|---|---|---|
+| le quai | `quai` | 30 x 4 m | (modèle) | (modèle) | (aucune) | plateforme de 0,55 m, bordure de pierre côté voie, pas de toit |
+| la halte | `house-town` | 10 x 6 m | 1 | croupe | sud 0.50 | murs pierre_claire, toit lauze, menuiseries rouge_cheminot, volets rouge_cheminot, porte rouge_cheminot |
+| la maison du garde-barrière | `house-town` | 11 x 8 m | 2 | deux-pans | est 0.50 | murs enduit, toit tuile, menuiseries creme, volets sauge, porte sauge |
+| l'épicerie-pension Ferrand | `shop-front` | 8 x 10 m | 2 | croupe | est 0.50 | murs enduit_ocre, toit lauze, volets vert_sombre, porte vert_sombre, menuiseries vert_sombre, enseigne vert_sombre |
+| l'atelier de Basile | `shed` | 10 x 8 m | 1 | deux-pans | est 0.50 | murs bois_brut, toit lauze, menuiseries bois_sombre, porte bois_sombre |
+| la maison de Firmin | `house-town` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs pierre, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
+| la remise de la draisine | `shed` | 6 x 5 m | (modèle) | (modèle) | ouest 0.50 | porte charretière de 3 m dans l'axe des rails |
+| le fournil d'Achille | `shop-front` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit, toit tuile, menuiseries miel, porte miel, enseigne bois_sombre |
+| la mercerie-coiffure | `shop-front` | 7 x 7 m | 2 | deux-pans | nord 0.50 | murs enduit_rose, toit tuile, menuiseries creme, volets fleur_rose, porte creme |
+| l'école-mairie | `house-town` | 7 x 6 m | 2 | croupe | sud 0.50 | murs pierre_claire, toit lauze, volets bleu, porte bleu |
+| la maison de Lucie | `house-town` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs enduit, toit tuile, volets bleu, porte bleu |
+| le café de la Halte | `shop-front` | 7 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit_ocre, toit tuile, menuiseries rouge_cheminot, porte rouge_cheminot, enseigne rouge_cheminot |
+| la forge | `shed` | 6 x 6 m | 1 | deux-pans | sud 0.50 | murs pierre, toit lauze, porte bois_sombre |
+| l'atelier d'Ambroise | `shop-front` | 7 x 6 m | 2 | (modèle) | sud 0.50 | murs pierre_claire, toit tuile, menuiseries bois_sombre, enseigne laiton |
+| la maison d'Honorine | `house-town` | 6 x 6 m | 2 | (modèle) | sud 0.50 | murs enduit_rose, toit tuile, volets sauge, porte sauge |
+| la maison aux volets clos | `house-town` | 6 x 6 m | 2 | (modèle) | sud 0.50 | murs enduit, toit tuile, volets bois_gris, porte bois_gris |
+| la maison du bout | `house-town` | 6 x 6 m | 1 | (modèle) | nord 0.50 | murs pierre, toit lauze, volets rouge_cheminot, porte rouge_cheminot |
+| l'église Saint-Aubin | `eglise` | 21 x 12 m | (modèle) | (modèle) | sud 0.50 | modèle à part: nef de 21 x 12 m, clocher carré de 6 m à l'ouest (22 m de haut), portail au sud |
+| le presbytère | `house-town` | 7 x 7 m | 2 | (modèle) | est 0.50 | murs pierre, toit lauze, volets vert_sombre, porte vert_sombre |
+| la maison de Marthe | `house-town` | 6 x 6 m | 2 | (modèle) | est 0.50 | murs enduit, toit tuile, volets bleu, porte bleu |
+| la maison de cheminot (ouest) | `house-town` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs pierre_claire, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
+| la maison de cheminot (est) | `house-town` | 6 x 6 m | 2 | (modèle) | nord 0.50 | murs pierre_claire, toit tuile, volets rouge_cheminot, porte rouge_cheminot |
+| le lavoir | `lavoir` | 5 x 4 m | (modèle) | (modèle) | ouest 0.50 | toit en appentis sur quatre poteaux, ouvert à l'ouest, bassin de pierre à l'est |
+| le poste d'aiguillage | `house-town` | 6 x 4 m | 2 | croupe | nord 0.50 | murs pierre, toit lauze, menuiseries rouge_cheminot, porte rouge_cheminot |
+| le moulin de la Vanne | `house-town` | 8 x 8 m | 2 | deux-pans | nord 0.50 | murs pierre, toit tuile, menuiseries bois_sombre, porte bois_sombre |
+| le logis de la ferme Delmas | `house-town` | 9 x 6 m | 2 | deux-pans | sud 0.50 | murs enduit_ocre, toit tuile, volets sauge, porte sauge |
+| la grange | `shed` | 8 x 10 m | 1 | deux-pans | est 0.50 | murs bois_gris, toit tuile, porte bois_brut |
+| la maison forestière | `house-town` | 6 x 6 m | 1 | (modèle) | est 0.50 | murs pierre, toit lauze, volets vert_sombre, porte vert_sombre |
+<!-- genere:gabarits:fin -->
+
+### Mobilier de lieu
+
+<!-- genere:mobilier:debut -->
+| Objet | Type du jeu | Modèle | Où (x, y) | Face au | Pourquoi |
+|---|---|---|---|---|---|
+| banc-du-quai | banc | `bench-platform` | 200, 100.5 | nord | le banc du réveil: on attend le train face à la voie |
+| banc-quai-ouest | banc | `bench-platform` | 191, 100.5 | nord | second banc du quai, face à la voie |
+| poteau-quai | poteau-de-quai | `poteau-de-quai` | 205.5, 102.5 | sud | là où l'on monte à deux: le point du quai |
+| caisse-commande | (à créer) | `crate` | 207.5, 101.5 | sud | la caisse de la commande du samedi, au pied du poteau |
+| panneau-gare | (à créer) | `platform-sign` | 196, 99.6 | nord | le nom de la halte se lit depuis le train, donc tourné vers la voie |
+| reverbere-quai-1 | (à créer) | `street-lamp` | 188, 102.5 | sud | éclairage du quai aux deux bouts |
+| reverbere-quai-2 | (à créer) | `street-lamp` | 212, 102.5 | sud | éclairage du quai aux deux bouts |
+| reverbere-route-1 | (à créer) | `street-lamp` | 195.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-2 | (à créer) | `street-lamp` | 216.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-3 | (à créer) | `street-lamp` | 240.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-4 | (à créer) | `street-lamp` | 262, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-5 | (à créer) | `street-lamp` | 280.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-6 | (à créer) | `street-lamp` | 302.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-7 | (à créer) | `street-lamp` | 313, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-gue | (à créer) | `street-lamp` | 179.5, 104.5 | sud | au carrefour du passage à niveau, la nuit du dénouement se joue ici |
+| lisse-nord | (à créer) | `level-crossing-gate` | 182.5, 95.4 | sud | la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie |
+| lisse-sud | (à créer) | `level-crossing-gate` | 182.5, 99.6 | sud | la lisse barre la route au sud de la voie |
+| croix-pn-eglise | (à créer) | `crossing-sign` | 256.8, 95 | sud | passage à niveau non gardé: croix de Saint-André au bord de la rue |
+| pompe-de-la-place | pompe | `water-pump` | 208, 113.5 | sud | la pompe de la place, sur l'ancien puits: l'eau de tous et la toilette du matin (acte 1) |
+| banc-place | banc | `bench-park` | 208, 119.4 | nord | face au puits et à la halte: on y voit qui descend du train |
+| ronces-maison-1 | ronces | `buisson` | 167.5, 112.5 | sud | les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1 |
+| ronces-maison-2 | ronces | `buisson` | 176, 119.6 | sud | les ronces du jardin, devant le futur potager |
+| table-tonnelle | table-a-manger | `table-farm` | 197.5, 120 | sud | la tonnelle d'Odette: le souper des pensionnaires |
+| chaise-tonnelle-n | chaise | `chair-farm` | 197, 118.9 | sud | autour de la table de la tonnelle |
+| chaise-tonnelle-s | chaise | `chair-farm` | 198, 121.1 | nord | autour de la table de la tonnelle |
+| banc-ponton | banc | `bench-park` | 201.5, 128.2 | sud | au pied du ponton, face à la rivière et au pigeonnier de l'autre rive |
+| banc-berge | banc | `bench-park` | 248, 124.4 | sud | face à la rivière, à l'ombre des saules |
+| panneau-1 | (à créer) | `signpost` | 179.4, 105 | sud | panneau de carrefour: passage à niveau, Grand-Route, chemin du Moulin, le Gué |
+| panneau-2 | (à créer) | `signpost` | 256.4, 111.5 | sud | panneau de carrefour: rue de l'Église, venelle des Jardins |
+| panneau-3 | (à créer) | `signpost` | 185.6, 85 | sud | panneau de carrefour: chemin forestier, chemin de la Lisière |
+| panneau-4 | (à créer) | `signpost` | 185.6, 123.6 | sud | panneau de carrefour: chemin de la Berge, le Gué |
+| panneau-5 | (à créer) | `signpost` | 317, 111.6 | sud | panneau de carrefour: bout de la Grand-Route, chemin des Jardins, l'arrêt du car |
+| panneau-6 | (à créer) | `signpost` | 150, 105.4 | sud | panneau de carrefour: chemin du Moulin, portail du moulin |
+| boite-lucie | (à créer) | `mailbox` | 248.4, 110.6 | nord | la boîte aux lettres du bourg, à la grille de Lucie, tournée vers la rue |
+| boite-maison | (à créer) | `mailbox` | 179.6, 113.4 | est | la boîte de la maison du garde, à côté de la porte, tournée vers la route: les lettres des habitants |
+| pompe-jardin | pompe | `water-pump` | 179.4, 120.2 | sud | la pompe du jardin: l'eau de l'arrosoir à deux pas du potager |
+| bois-maison | tas-de-bois | `log-pile` | 167.4, 116.5 | sud | bois de chauffage contre le pignon ouest, à l'abri du vent de pluie |
+| bois-atelier | tas-de-bois | `log-pile` | 171, 93 | sud | les grumes refendues de Basile, au sud de l'atelier |
+| haches-basile | etal-de-haches | `ratelier` | 177.2, 90.6 | est | sous l'auvent est: Basile prête ses outils (acte 1) |
+| potager | terre-cultivable | `terre` | 174, 122.5 | sud | le potager de 6 x 4 cases au bout de l'allée du jardin (24 cases) |
+| banc-cretes | banc | `bench-park` | 304, 47.6 | sud | le banc des Crêtes: le bourg entier en contrebas |
+| banc-etang | banc | `bench-park` | 225.5, 39.5 | est | face à l'étang, au coin de pêche |
+| tronc-clairiere | banc | `stump` | 183, 52.4 | nord | un tronc couché sert de banc face au Vieux Chêne |
+| banc-belvedere | banc | `bench-park` | 345, 27.6 | ouest | le belvédère regarde le bourg et le clocher, à l'ouest |
+| abreuvoir | pompe | `water-pump` | 201, 185.6 | sud | la pompe et l'abreuvoir des bêtes, au bout de la cour |
+| tonneaux-ferme | (à créer) | `barrel` | 196.5, 154.4 | sud | tonneaux de cidre contre le logis |
+| caisses-epicerie | (à créer) | `crate` | 194.7, 113.4 | sud | cageots de légumes devant la vitrine d'Odette |
+| tonneau-cafe | (à créer) | `barrel` | 251.6, 106.6 | sud | le tonneau qui sert de table à la terrasse du café |
+<!-- genere:mobilier:fin -->
+
+### Végétation par zones
+
+<!-- genere:vegetation:debut -->
+| Zone | Arbres pour 100 m² | Essences | Sous-étage | Recul des chemins | Pourquoi |
+|---|---|---|---|---|---|
+| La Côte | 4,0 | chêne, hêtre, châtaignier, charme | noisetier, houx, fougère | 4,5 m | bois de coteau exposé au sud: feuillus, châtaigniers vers le bourg, sapins seulement sur les crêtes au nord; clairières et prairies laissées libres |
+| Le tunnel | 1,2 | pin sylvestre, bouleau | genêt, ronce | 3,0 m | friche rocheuse au-dessus de la ligne morte: rien n'est entretenu depuis la fermeture |
+| La voie jusqu'au poste d'aiguillage | 0,6 | frêne, sureau | ronce, églantier | 2,0 m | sur les talus de la tranchée seulement, rien dans le couloir des rails |
+| La rivière et le bief | 1,5 | saule blanc, aulne, peuplier | roseau, iris des marais | 2,0 m | ripisylve: arbres en rang le long des berges, roseaux sur les grèves |
+| Le moulin | 0,4 | noyer, saule têtard | ortie | 3,0 m | deux noyers dans le pré du meunier, saules têtards le long du bief |
+| La ferme | 0,3 | chêne isolé, pommier, noyer | aubépine, charme (haies) | 3,0 m | bocage: arbres dans les haies entre les champs, jamais au milieu d'un champ |
+| Le bourg et le passage à niveau | 0,2 | tilleul, pommier, saule (berge) | lilas, rosier grimpant | 1,5 m | des arbres plantés par les gens: tilleuls aux angles de la place, fruitiers dans les jardins, saules sur la berge |
+<!-- genere:vegetation:fin -->
+
+Arbres singuliers (champ `arbres`): Vieux Chêne, Gros Noyer, les deux chênes de la lisière à abattre (acte 1), deux tilleuls de la place, trois saules de la berge.
+
+### Pêche, culture, récolte, fouille
+
+<!-- genere:ressources:debut -->
+| Ressource | Nature | Où | Acte | Heures | Saisons | Pourquoi |
+|---|---|---|---|---|---|---|
+| peche-ponton | peche | x 204, y 131.5 | 2 | toutes | toutes | eau calme sous le ponton, poissons blancs |
+| peche-aval | peche | x 295, y 134 | 2 | matin et soir | toutes | courant de l'aval: truites au lever et au coucher |
+| peche-fosse | peche | x 132, y 131.4 | 2 | toutes | toutes | la fosse de la Baronne, sous la roue |
+| peche-saule-ile | peche | x 78, y 138.4 | 2 | jour | toutes | à l'ombre du saule têtard |
+| peche-vanne | peche | x 24, y 146 | 2 | toutes | printemps, été, automne | l'eau qui tombe du déversoir: ricochets et brochets |
+| peche-etang | peche | x 227, y 39 | 3 | toutes | toutes | l'étang de la Côte, carpes et tanches |
+| terre-6 | culture | rectangle [171, 120.5, 6, 4] | 1 | toutes | toutes | le potager de départ (6 cases du jeu), au bout de l'allée du jardin |
+| terre-12 | culture | rectangle [166, 120.5, 12, 4] | 1 | toutes | toutes | agrandi à 12 cases après la toiture, vers l'ouest |
+| terre-24 | culture | rectangle [166, 119.5, 12, 6] | 2 | toutes | toutes | 24 cases à l'acte 2: le jardin entier au sud de la maison, le poulailler reste à l'est |
+| champs-location | culture | rectangle [214, 164, 48, 26] | 3 | toutes | toutes | les champs des Delmas, loués par parcelles |
+| mures-tranchee | cueillette | x 146, y 100.2 | 2 | jour | été, automne | les ronces des talus |
+| chataignes | cueillette | x 176, y 72 | 3 | jour | automne | châtaigniers du bas de la Côte, 3 m au sud des troncs (houppier) |
+| champignons | cueillette | x 176, y 25 | 3 | matin | automne | sous-bois humide, le matin après la pluie |
+| myrtilles | cueillette | x 152, y 17 | 3 | jour | été | la lande de la crête |
+| noix | cueillette | x 162, y 184 | 3 | jour | automne | sous le Gros Noyer |
+| pommes-verger | cueillette | x 310, y 120 | 1 | jour | automne | le verger communal |
+| legumes-jardins | cueillette | x 256.5, y 121.5 | 1 | jour | printemps, été | les jardins de la Rive: ce qu'on vous laisse prendre |
+| coquillages-greve | cueillette | x 187, y 128.6 | 1 | matin | toutes | la grève au pied de la berge, eaux basses du matin |
+| coquillages-ile | cueillette | x 104, y 143 | 2 | matin | toutes | la grève de l'Île |
+| insectes-roseaux | insectes | x 116, y 141 | 2 | jour | printemps, été | libellules des roseaux |
+| insectes-cour-ecole | insectes | x 241, y 103 | 2 | jour | toutes | la cour d'Armand |
+| insectes-pre-meunier | insectes | x 144, y 117 | 3 | jour | printemps, été | le pré du meunier |
+| insectes-pre-bas | insectes | x 302, y 159 | 3 | jour | été | papillons du pré bas |
+| insectes-pres-haut | insectes | x 269, y 23 | 3 | nuit | été | lucioles et insectes rares des prés du Haut, la nuit |
+| insectes-clairiere | insectes | x 183, y 50 | 3 | jour | toutes | la clairière |
+| fouille-ballast | fouille | x 112, y 99.8 | 2 | toutes | toutes | le ballast de la voie ouest: boulons, plaques |
+| fouille-talus | fouille | x 288, y 95 | 3 | toutes | toutes | le talus des Hameaux |
+| fouille-courbe | fouille | x 347, y 86 | 3 | toutes | toutes | la courbe de la ligne morte, avec Jeanne |
+| fouille-pierre-levee | fouille | x 119, y 26 | 3 | toutes | toutes | la Pierre Levée |
+| fouille-roche | fouille | x 268, y 51 | 3 | toutes | toutes | la roche aux fossiles |
+| fouille-borne | fouille | x 185, y 185 | 3 | toutes | toutes | la borne de la vieille route |
+| bois-coupe | bois | x 160, y 57 | 3 | jour | toutes | la coupe de Basile: le bois de la chambre |
+| branches-lisiere | bois | x 199, y 88.6 | 1 | jour | toutes | branches tombées à la lisière, de quoi commencer |
+<!-- genere:ressources:fin -->
+
+### Points nommés du dehors
+
+Tous les nœuds du graphe sont aussi des points (`quai`, `hd`, `pl`, `gr4`...). En plus:
+
+<!-- genere:points_nommes:debut -->
+| Point | Rôle | Qui | Pourquoi |
+|---|---|---|---|
+| firmin-quai | poste | Firmin | Firmin attend le train au milieu du quai |
+| firmin-barriere | poste | Firmin | Firmin à la barrière, en l'absence du garde |
+| odette-vitrine | poste | Odette | Odette balaie devant sa porte |
+| basile-etabli | poste | Basile | l'établi sous l'auvent |
+| achille-porte | poste | Achille | Achille sur le pas du fournil, au lever |
+| mado-enclume | poste | Mado | l'enclume dehors, sous l'auvent de la forge |
+| marthe-parvis | poste | Marthe | Marthe au pied du clocher, corde de la cloche |
+| achille-peche | poste | Achille | la pêche du lundi à la fosse |
+| siege-banc-place | siege | tous | le banc de la place |
+| siege-banc-reveil | siege | tous | le banc du réveil |
+| siege-banc-ponton | siege | tous | le banc du ponton |
+| siege-banc-berge | siege | tous | le banc de la berge |
+| siege-tonnelle | siege | Odette | la tonnelle, au souper |
+| guet-moulin | poste | tous | le guet de nuit de la suite du « fantôme », dans la cour du moulin |
+<!-- genere:points_nommes:fin -->
+
+### Intérieurs
+
+Posés dans l'annexe sous le dehors (y 210), reliés au dehors par une paire de portes, et entre niveaux par des escaliers (paires de portes aussi). Légende des plans: `#` cloison, `P` porte, `E` escalier, `*` point nommé, lettre: meuble (initiale de son type).
+
+<!-- genere:interieurs:debut -->
+**la halte** (`interieurs/halte.json`, 9 x 5 m, 45 m², niveau 0): le guichet sépare la salle du bureau; la consigne est le coffre commun des deux joueurs.
+
+```text
+. B . . . . . T .
+. * . . . . . * .
+. . . . . C * . .
+. . . . . . # # .
+. . P . . . . . C
+```
+
+Pièces: salle des pas perdus (5 x 5); guichet (1 x 5); bureau de Firmin (3 x 3); consigne (3 x 2). Meubles: halte-banc (banc), halte-guichet (comptoir, à créer), halte-bureau (table-a-manger), halte-chaise (chaise), halte-consigne (coffre). Points: halte-p-guichet (comptoir, Firmin), halte-p-bureau (siege, Firmin), halte-p-banc (siege).
+
+**la maison du garde, rez-de-chaussée** (`interieurs/maison-rdc.json`, 10 x 7 m, 70 m², niveau 0): au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de la cave part de la chambre.
+
+```text
+. . . . A # . . . .
+. . . . . . . C . P
+. . . . . . . T . .
+E . . . . # . C * *
+. . . . . E # # . .
+. . . . . . . . * .
+. . . . . # . . P C
+```
+
+Pièces: salle (5 x 4); cuisine (5 x 3); chambre (5 x 4); troisième pièce (5 x 3). Meubles: maison-cuisiniere (cuisiniere), maison-plan (plan-de-travail), maison-table (table-a-manger), maison-chaise-1 (chaise), maison-chaise-2 (chaise), lit-de-la-maison (lit-double), maison-armoire (armoire). Points: maison-lit-g (lit), maison-lit-d (lit), maison-cuisine (poste).
+
+**la maison du garde, étage** (`interieurs/maison-etage.json`, 10 x 7 m, 70 m², niveau 1): sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier).
+
+```text
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+. . . . . * . . . .
+. . . . . E . . . .
+. . . . . . . . . .
+. . . . . . . . . .
+```
+
+Pièces: grenier aménageable (10 x 7). Meubles: aucun. Points: maison-etage-milieu (poste).
+
+**la cave de la maison** (`interieurs/maison-cave.json`, 5 x 4 m, 20 m², niveau -1): la lanterne sans verre (acte 3) y attend.
+
+```text
+E . . . .
+. . * . .
+. . . . .
+. . . . C
+```
+
+Pièces: cave voûtée (5 x 4). Meubles: cave-coffre (coffre). Points: cave-lanterne (poste).
+
+**l'épicerie Ferrand** (`interieurs/epicerie-rdc.json`, 7 x 9 m, 63 m², niveau 0): la boutique donne sur la place (porte à l'est), la cuisine derrière.
+
+```text
+. . . . . E .
+. . . . . . .
+. * C . . . P
+. . . . . . .
+. . . . . . .
+# # # . # # #
+. . . . . . .
+. * . . T . .
+C . . . . . E
+```
+
+Pièces: boutique (7 x 5); cuisine (7 x 4). Meubles: epicerie-comptoir (comptoir, à créer), epicerie-etal (etal-de-tourte), epicerie-cuisiniere (cuisiniere), epicerie-table (table-a-manger). Points: odette-comptoir (comptoir, Odette), odette-cuisine (poste, Odette).
+
+**la pension Ferrand, étage** (`interieurs/epicerie-etage.json`, 7 x 9 m, 63 m², niveau 1): la chambre du premier soir, deux lits simples.
+
+```text
+. . . . . . .
+* . * . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+# # # # # # .
+. . . . . . .
+* . . . . . .
+. . . . . . E
+```
+
+Pièces: chambre de la pension (7 x 5); chambre d’Odette (7 x 4). Meubles: lit-pension-1 (lit-simple), lit-pension-2 (lit-simple), odette-lit (lit-simple). Points: pension-lit-a (lit), pension-lit-b (lit), odette-lit-p (lit, Odette).
+
+**le fournil d'Achille** (`interieurs/fournil.json`, 6 x 5 m, 30 m², niveau 0): le four contre le pignon est, côté ru; la boutique sur la rue.
+
+```text
+. . P . . F
+. . . . * .
+# # . * . .
+. . . C . .
+. . . P . .
+```
+
+Pièces: boutique (6 x 3); fournil (6 x 2). Meubles: fournil-four (four), fournil-petrin (plan-de-travail), fournil-comptoir (comptoir, à créer). Points: achille-four (poste, Achille), achille-comptoir (comptoir, Achille).
+
+**la mercerie-coiffure** (`interieurs/mercerie.json`, 6 x 6 m, 36 m², niveau 0): porte au nord sur la rue; la cabine sert à essayer les tenues.
+
+```text
+. . . P . .
+. . C . . .
+. . * . . .
+. . . . # .
+. C * . # *
+. . . . . A
+```
+
+Pièces: boutique (6 x 3); salon de coiffure (4 x 3); cabine (2 x 3). Meubles: mercerie-comptoir (comptoir, à créer), mercerie-fauteuil (chaise), mercerie-armoire (armoire). Points: solange-comptoir (comptoir, Solange), jeanne-fauteuil (poste, Jeanne), mercerie-cabine (poste).
+
+**la forge** (`interieurs/forge.json`, 5 x 5 m, 25 m², niveau 0): foyer au nord sous la hotte; l'enclume est dehors, sous l'auvent.
+
+```text
+. . F . .
+. . * . .
+C . . * E
+. . . . .
+. . P . .
+```
+
+Pièces: forge (5 x 5). Meubles: forge-foyer (four), forge-haches (etal-de-haches-forgees), forge-coffre (coffre). Points: mado-foyer (poste, Mado), mado-etabli (poste, Mado).
+
+**l'atelier de Basile** (`interieurs/atelier-basile.json`, 9 x 7 m, 63 m², niveau 0): atelier d'une pièce, porte à l'est vers l'auvent.
+
+```text
+. . . . P . . . E
+. . . . * . . . .
+. . . . . . . . .
+. . . . . . . . P
+. . . . . . . . .
+. . . . . . . . .
+T . . . . . . . .
+```
+
+Pièces: atelier (9 x 7). Meubles: basile-etabli (plan-de-travail), basile-bois (tas-de-bois), basile-haches (etal-de-haches). Points: basile-p-etabli (poste, Basile).
+
+<!-- genere:interieurs:fin -->
+
+Prévus, pas encore dessinés: café, école-mairie, église et clocher, poste d'aiguillage (cabine à l'étage), moulin (deux niveaux), logis de la ferme, maison de Firmin.
+
+### Repris de l'écriture de l'acte 1
+
+Les objets que les quêtes de l'acte 1 citent sont posés par le plan, à leur place: `banc-du-quai`, `pompe-de-la-place`, `chene-lisiere-1` et `-2`, `ronces-maison-1` et `-2` (contre la ruine), `potager` (au bout de l'allée du jardin), `lit-pension-1` et `-2` (chambre de la pension, à l'étage de l'épicerie), `lit-de-la-maison` (dans la salle de la maison, la seule pièce couverte au début). Un nouveau passage de l'outil ne les efface plus.

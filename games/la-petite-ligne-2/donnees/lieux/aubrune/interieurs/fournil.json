@@ -1,0 +1,53 @@
+{
+ "schema": 1,
+ "id": "fournil",
+ "name": "Le fournil d'Achille",
+ "width": 6,
+ "height": 5,
+ "at": {
+  "x": 68,
+  "y": 210
+ },
+ "blocked": [
+  {
+   "x": 0,
+   "y": 2,
+   "w": 2,
+   "h": 1
+  }
+ ],
+ "points": {
+  "achille-four": {
+   "x": 4.5,
+   "y": 1
+  },
+  "achille-comptoir": {
+   "x": 3,
+   "y": 2.4
+  }
+ },
+ "objects": [
+  {
+   "id": "fournil-four",
+   "type": "four",
+   "x": 5.5,
+   "y": 0.5,
+   "rotation": 0
+  },
+  {
+   "id": "fournil-petrin",
+   "type": "plan-de-travail",
+   "x": 2,
+   "y": 0.5,
+   "rotation": 0
+  }
+ ],
+ "doors": {
+  "fournil-porte": {
+   "x": 3.5,
+   "y": 4.5,
+   "facing": 2,
+   "to": "porte-fournil"
+  }
+ }
+}

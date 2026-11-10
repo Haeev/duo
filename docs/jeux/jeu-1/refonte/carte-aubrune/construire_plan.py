@@ -387,7 +387,449 @@ POINTS_CLES = [('quai', 'le quai'), ('hd', 'la maison'), ('pl', 'la place (pompe
                ('po', "le poste d'aiguillage"), ('mc', 'le moulin'), ('fc', 'la ferme'), ('fs2', 'le Gros Noyer'), ('cl', 'la clairière du Vieux Chêne'),
                ('et', "l'étang"), ('so', 'la source'), ('bv', 'le belvédère'), ('portail', 'le portail du tunnel'), ('tu3', "la cachette d'Émile")]
 PAIRES = [('quai', k) for k, _ in POINTS_CLES if k != 'quai'] + [('hd', k) for k in ('pl_o', 'gr4', 'gr6', 'po', 'mc', 'fc', 'et', 'tu3')] + [
-    ('po', 'mc'), ('mc', 'fc'), ('fc', 'gr9'), ('bv', 'pv'), ('et', 'pv'), ('cl', 'cf0')]
+    ('po', 'mc'), ('mc', 'fc'), ('fc', 'gr9'), ('bv', 'pv'), ('et', 'pv'), ('cl', 'cf0'), ('pn', 'po'), ('pnh', 'tu3')]
+
+# ================================================================ version 2: l'ouest allongé de 64 m (décision du client)
+# Tout ce qui est à l'est de x = 44,5 (bourg, moulin, île, Côte, ferme, tunnel) glisse de 64 m vers l'est;
+# le poste, le sémaphore, la vanne et la prise du bief restent au bord ouest. La tranchée passe de 80 à 144 m.
+ALLONGE, COUPE = 64, 44.5
+L = 320 + ALLONGE
+
+
+def sx(x):
+    return x if x < COUPE else x + ALLONGE
+
+
+def _etirer():
+    for z in ZONES.values():
+        z['poly'] = [(sx(x), y) for x, y in z['poly']]
+    for w in EAUX + RAILS:
+        w['pts'] = [(sx(x), y) for x, y in w['pts']]
+    for lst in (PLANS_EAU,):
+        for w in lst:
+            w['cx'] = sx(w['cx'])
+    for nn in N.values():
+        nn['x'] = sx(nn['x'])
+    for lst in (list(VERROUS.values()), OUVRAGES, REPERES, P):
+        for o in lst:
+            o['x'] = sx(o['x'])
+    for bb in B:
+        x0 = bb['rect'][0]
+        bb['rect'][0] = sx(x0)
+        if bb['porte']:
+            bb['porte'][0] += bb['rect'][0] - x0
+    for pc in PARCELLES:
+        pc['rect'][0] = sx(pc['rect'][0])
+
+
+_etirer()
+_encoche = [(206.5, 129.5), (206.5, 132), (201.5, 132), (201.5, 129.5)]
+# Le ponton (acte 1) avance sur l'eau: la zone du bourg l'englobe, la rivière (acte 2) le contourne.
+_i = ZONES['B']['poly'].index((204, 129.5))
+ZONES['B']['poly'][_i:_i + 1] = _encoche
+_i = ZONES['R']['poly'].index((204, 129.5))
+ZONES['R']['poly'][_i:_i + 1] = _encoche[::-1]
+# La Côte s'arrête à x 100: à l'ouest, le bois du pourtour (décor), qui n'a ni chemin ni raison d'être jouable.
+ZONES['C']['poly'] = [(100, 0), (314, 0), (314, 63), (236, 63), (236, 82), (162, 82), (164, 90), (100, 89.4)]
+# La voie: une clairière au poste, puis une tranchée de 6 m entre deux talus (hors jeu de part et d'autre):
+# les frênes de V2b la barrent d'un talus à l'autre, on ne les contourne pas.
+# La descente du poste est un sentier de 4 m entre deux haies: le portillon V11 la barre d'un bord à l'autre.
+ZONES['V']['poly'] = [(0, 88), (98, 89.3), (100, 94.5), (164, 94.5), (164, 100.5), (100, 100.5), (96, 104), (34, 104),
+                      (34, 110), (40, 118), (40, 134), (34, 137), (26, 136), (30, 110), (30, 104), (0, 104)]
+# Le tunnel: la courbe (séparée de la Côte par un talus), le tunnel sous l'éperon, l'escalier de service et la
+# clairière du belvédère. Le rocher de l'éperon est hors jeu: on ne passe du belvédère au tunnel que par l'escalier (V10).
+ZONES['T']['poly'] = [(296, 66), (336, 66), (350, 56), (360, 50), (360, 32), (352, 32), (352, 40), (314, 40), (314, 18),
+                      (352, 18), (352, 28), (360, 28), (360, 12), (368, 12), (368, 52), (376, 60), (384, 62), (384, 100), (296, 100)]
+ZONES['R']['poly'] = [p for p in ZONES['R']['poly'] if p != (36, 156.5)]
+_i = ZONES['R']['poly'].index((0, 160.5))
+ZONES['R']['poly'][_i:_i] = [(118, 151.5), (84, 155), (36, 156.5)]
+EAUX[0]['pts'] = [(0, 156), (36, 152), (84, 149.5), (118, 146.5), (130, 143)] + EAUX[0]['pts'][3:]
+RAILS[2]['pts'] = [(44, 97.5), (52, 93.5), (84, 93.5)]
+for _k, _x in (('tw1', 160), ('tw2', 146), ('tw3', 128), ('tw4', 112)):
+    N[_k]['x'] = _x
+n('tw6', 72, 97.5, 'V')
+n('i5', 78, 141, 'R')
+N['vn'].update(x=26, y=142.5)
+A[:] = [a for a in A if not ({a['a'], a['b']} in ({'tw4', 'tw5'}, {'i3', 'i4'}))]
+chaine(['tw4', 'tw6', 'tw5'], 'voie', 'la clairière du poste')
+chaine(['i3', 'i5', 'i4'], 'sentier', "sentier de l'Île")
+VERROUS['V2b']['x'] = 121
+for _q in P:
+    if _q['id'] == 'ronces':
+        _q.update(x=146, y=99.8)
+    elif _q['id'] == 'wagon':
+        _q.update(x=72, y=93.5, noeud='tw6')
+    elif _q['id'] == 'fouille_ouest':
+        _q.update(x=112, y=99.8)
+    elif _q['id'] == 'vanne':
+        _q.update(x=24, y=145)
+    elif _q['id'] == 'lisiere':
+        _q.update(x=199, y=88.5)
+    elif _q['id'] == 'coquillages':
+        _q['acte'] = 1
+p('saule_ile', "le saule têtard de l'Île (coin de pêche du bief)", 'activite', 'i5', 78, 138.6, 2)
+p('aiguille', "l'aiguille et la lanterne de la voie de garage", 'histoire', 'tw5', 47, 95.5, 2)
+for _r in REPERES:
+    if _r['id'] == 'chateau_eau':
+        _r.update(x=189, y=87, raison=_r['raison'] + "; posé au nord du chemin de la Lisière, hors du chemin")
+    elif _r['id'] == 'pigeonnier':
+        _r.update(x=213, y=150.5, raison=_r['raison'] + "; à l'angle est du logis, hors du chemin des Champs")
+    elif _r['id'] == 'gros_noyer':
+        _r.update(x=161, y=187, raison=_r['raison'] + "; à 5 m du tour de la ferme, sur sa butte")
+for _q in QUETES:
+    if _q['id'] == 'A2':
+        _q['etapes'] = [('gr2', 'Firmin donne le but'), ('pn', 'le passage à niveau'), ('tw1', 'les ronces (hache)'),
+                        ('tw3', 'les frênes couchés: retour chez Mado, hache améliorée'), ('tw4', 'fouilles du ballast'),
+                        ('tw6', 'le wagon oublié'), ('po', "le poste: scène des leviers, le sémaphore s'incline")]
+POINTS_CLES += [('pnh', 'le passage des Hameaux'), ('pn', 'le passage à niveau')]
+
+# ================================================================ version 2: verrous visibles, lisières habillées
+# Chaque verrou a un objet posé dans le monde et sa phrase « pas encore » (tutoiement; [[f|m]] pour les accords).
+OBJETS_VERROUS = {
+    'V1': ('arbre couché', 'willow-fallen', "Le vieux saule barre le chemin. Pas encore: il faudra une scie, et quelqu'un qui sait par où couper."),
+    'V2': ('ronces', 'brambles-wall', "Les ronces ont avalé la voie. Pas encore: Firmin a dit d'attendre son signal."),
+    'V2b': ('arbres couchés', 'ash-trunks-fallen', "Trois frênes en travers des rails, d'un talus à l'autre. Pas encore: ta hache rebondit sur l'écorce."),
+    'V3': ('dalles manquantes', 'ford-stones-missing', "Trois dalles du gué ont filé avec la crue. Pas encore: l'eau est trop vive pour sauter."),
+    'V4': ('portail cadenassé', 'gate-padlocked', "Le portail du moulin est cadenassé. Pas encore: la clé est partie avec le meunier."),
+    'V5': ('barrière forestière', 'forest-barrier', "« Coupe en cours, défense d'entrer. » Pas encore: Basile t'emmènera quand ce sera le moment."),
+    'V6': ('éboulis', 'gully-washout', "Le raidillon s'est raviné, la terre s'effrite sous ton pied. Pas encore: il faudrait des marches."),
+    'V7': ('grille fermée', 'cemetery-gate-locked', "La porte haute du cimetière est fermée à clé. Pas encore: c'est Marthe qui a la clé."),
+    'V8': ('grille', 'company-gate', "« Ligne fermée. Compagnie des chemins de fer. » Pas encore: la grille ne bouge pas d'un pouce."),
+    'V9': ('passerelle sans tablier', 'footbridge-bare', "Il ne reste que les poutres de la passerelle. Pas encore: il manque les planches."),
+    'V10': ('chaîne', 'stair-door-chained', "La porte de l'escalier est fermée d'une chaîne, de l'autre côté. Pas encore: elle s'ouvre d'en bas."),
+    'V11': ('portillon au loquet', 'wicket-latched', "Le portillon est fermé d'un loquet, côté voie. Pas encore: il s'ouvre depuis le poste."),
+}
+for _k, (_o, _m, _t) in OBJETS_VERROUS.items():
+    VERROUS[_k].update(objet=_o, modele=_m, pas_encore=_t)
+
+# Habillage des lisières: ce qui se voit là où une zone s'arrête (jamais un mur nu). Règle par paire de voisins,
+# exceptions par position. Voisin « hors » = hors des zones (décor), « bord » = bord de la carte.
+HABILLAGES = ('haie', 'talus', 'cloture', 'riviere', 'bois', 'muret')
+REGLE_BORDURE = {
+    ('V', 'hors'): 'talus', ('V', 'C'): 'talus', ('V', 'B'): 'haie', ('V', 'M'): 'haie', ('V', 'R'): 'haie', ('V', 'bord'): 'bois',
+    ('C', 'B'): 'haie', ('C', 'V'): 'talus', ('C', 'T'): 'bois', ('C', 'hors'): 'bois', ('C', 'bord'): 'bois',
+    ('M', 'B'): 'cloture', ('M', 'V'): 'cloture', ('M', 'R'): 'cloture', ('M', 'hors'): 'cloture',
+    ('F', 'R'): 'riviere', ('F', 'B'): 'riviere', ('F', 'hors'): 'haie', ('F', 'bord'): 'haie',
+    ('T', 'B'): 'cloture', ('T', 'C'): 'bois', ('T', 'hors'): 'talus', ('T', 'bord'): 'bois',
+    ('R', 'B'): 'haie', ('R', 'V'): 'haie', ('R', 'M'): 'cloture', ('R', 'F'): 'riviere', ('R', 'hors'): 'haie', ('R', 'bord'): 'riviere',
+    ('B', 'hors'): 'haie', ('B', 'bord'): 'haie', ('B', 'C'): 'haie', ('B', 'V'): 'haie', ('B', 'M'): 'cloture', ('B', 'R'): 'riviere',
+    ('B', 'F'): 'riviere', ('B', 'T'): 'cloture',
+}
+POURQUOI_HABILLAGE = {
+    'haie': "haie vive de noisetiers et d'aubépines, trop dense pour passer, basse pour la caméra (1,2 m)",
+    'talus': "talus de terre embroussaillé (2 m de haut): les flancs de la tranchée ou de la courbe",
+    'cloture': "clôture de bois ou grille (portail, propriété, Compagnie): on voit au travers, on ne passe pas",
+    'riviere': "l'eau elle-même, ou sa berge raide plantée de saules",
+    'bois': "lisière de bois dense: troncs serrés et fourrés, la forêt du pourtour du rendu prend le relais",
+    'muret': "muret de pierre sèche d'un mètre (cimetière, cour)",
+}
+
+# ================================================================ version 2: sols (type de terrain partout)
+SOL_ZONE = {'B': 'herbe-rase', 'R': 'prairie-humide', 'V': 'friche', 'C': 'sous-bois', 'M': 'pre', 'F': 'pre', 'T': 'friche-rocheuse'}
+SOL_CHEMIN = {'route': 'empierre', 'rue': 'paves', 'chemin': 'terre', 'sentier': 'terre-tassee', 'voie': 'ballast', 'interieur': 'pierre'}
+SOL_PARCELLE = {'champs': 'labour', 'pâture': 'pre', 'pré bas': 'prairie-humide', 'jardins de la Rive': 'terre-de-jardin',
+                'verger': 'herbe-haute', 'cimetière': 'herbe-rase', 'place': 'paves', 'parvis': 'paves', "cour de l'école": 'terre-battue',
+                'cour': 'terre-battue', 'cour du moulin': 'terre-battue', 'potager': 'terre-de-jardin', 'poulailler': 'terre-battue'}
+SOLS_SUPPL = [  # rectangles de sol particuliers (x, y, l, h), posés après les parcelles
+    dict(sol='lande', rect=[140, 8, 32, 18], pourquoi="la lande aux myrtilles: sol pauvre de la crête, bruyère et myrtilliers"),
+    dict(sol='prairie', rect=[200, 34, 22, 14], pourquoi="la prairie du milieu, ouverte dans le bois (insectes)"),
+    dict(sol='prairie', rect=[256, 14, 26, 20], pourquoi="les prés du Haut, au-dessus de la source"),
+    dict(sol='prairie', rect=[176, 44, 14, 12], pourquoi="la clairière du Vieux Chêne"),
+    dict(sol='galets', rect=[184, 128, 8, 2], pourquoi="la grève aux coquillages, au pied du chemin de la berge"),
+    dict(sol='galets', rect=[100, 142, 18, 2], pourquoi="la grève de l'Île"),
+    dict(sol='vase', rect=[227, 46, 18, 3], pourquoi="le bord de l'étang côté digue, roseaux"),
+    dict(sol='gravier', rect=[185, 99, 30, 4], pourquoi="le quai: gravier entre deux bordures de pierre"),
+    dict(sol='friche', rect=[40, 88, 58, 16], pourquoi="la clairière du poste: herbe folle sur l'ancien ballast"),
+]
+
+# ================================================================ version 2: gabarits des bâtiments (assets-src/decors/gabarits.toml)
+# Façades écrites dans le repère du monde (nord en haut), le modèle est posé en rotation 0. position: de 0 à 1
+# depuis la gauche vue de dehors (maison.py). Couleurs: noms du nuancier [couleurs] de gabarits.toml.
+GABARITS = {
+    'quai_b': dict(base='quai', note="plateforme de 0,55 m, bordure de pierre côté voie, pas de toit"),
+    'halte': dict(base='house-town', etages=1, hauteur_etage=3.4, toit='croupe', pente=30, fenetres=dict(sud=2, nord=3),
+                  couleurs=dict(murs='pierre_claire', toit='lauze', menuiseries='rouge_cheminot', volets='rouge_cheminot', porte='rouge_cheminot'),
+                  note="bâtiment voyageurs de la Compagnie: un seul niveau haut, auvent côté quai, pendule sur le pignon est"),
+    'maison': dict(base='house-town', etages=2, toit='deux-pans', pente=40, fenetres=dict(sud=3, nord=2, est=2, ouest=1),
+                   couleurs=dict(murs='enduit', toit='tuile', menuiseries='creme', volets='sauge', porte='sauge'),
+                   note="maison finie; au début, ruine: moitié ouest sans toit, murs arasés à 1 m, moitié est couverte d'une bâche"),
+    'epicerie': dict(base='shop-front', etages=2, toit='croupe', pente=35, devanture=dict(facade='est', largeur=4.2, position=0.5),
+                     fenetres=dict(est=2, ouest=2, nord=2, sud=2),
+                     couleurs=dict(murs='enduit_ocre', toit='lauze', volets='vert_sombre', porte='vert_sombre', menuiseries='vert_sombre', enseigne='vert_sombre')),
+    'scierie': dict(base='shed', etages=1, hauteur_etage=3.6, toit='deux-pans', pente=30, fenetres=dict(sud=2, nord=1),
+                    couleurs=dict(murs='bois_brut', toit='lauze', menuiseries='bois_sombre', porte='bois_sombre'),
+                    note="grande porte et auvent de 3 m à l'est sur l'établi"),
+    'firmin': dict(base='house-town', etages=2, toit='deux-pans', pente=40, couleurs=dict(murs='pierre', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot')),
+    'remise': dict(base='shed', note="porte charretière de 3 m dans l'axe des rails"),
+    'fournil': dict(base='shop-front', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='sud', largeur=3.2, position=0.4),
+                    couleurs=dict(murs='enduit', toit='tuile', menuiseries='miel', porte='miel', enseigne='bois_sombre'),
+                    note="cheminée du four sur le pignon est, côté ru"),
+    'mercerie': dict(base='shop-front', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='nord', largeur=3.6, position=0.5),
+                     couleurs=dict(murs='enduit_rose', toit='tuile', menuiseries='creme', volets='fleur_rose', porte='creme')),
+    'ecole': dict(base='house-town', etages=2, toit='croupe', pente=35, couleurs=dict(murs='pierre_claire', toit='lauze', volets='bleu', porte='bleu'),
+                  note="horloge et drapeau au-dessus de la porte: la mairie"),
+    'lucie': dict(base='house-town', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bleu', porte='bleu')),
+    'cafe': dict(base='shop-front', etages=2, toit='deux-pans', pente=40, devanture=dict(facade='sud', largeur=4.0, position=0.5),
+                 couleurs=dict(murs='enduit_ocre', toit='tuile', menuiseries='rouge_cheminot', porte='rouge_cheminot', enseigne='rouge_cheminot')),
+    'forge': dict(base='shed', etages=1, hauteur_etage=3.4, toit='deux-pans', pente=35, couleurs=dict(murs='pierre', toit='lauze', porte='bois_sombre'),
+                  note="grande baie ouverte au sud, cheminée de forge au nord"),
+    'horloger': dict(base='shop-front', etages=2, devanture=dict(facade='sud', largeur=3.0, position=0.5), couleurs=dict(murs='pierre_claire', toit='tuile', menuiseries='bois_sombre', enseigne='laiton')),
+    'honorine': dict(base='house-town', etages=2, couleurs=dict(murs='enduit_rose', toit='tuile', volets='sauge', porte='sauge')),
+    'hameau_b': dict(base='house-town', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bois_gris', porte='bois_gris'), note="volets clos"),
+    'hameau_c': dict(base='house-town', etages=1, couleurs=dict(murs='pierre', toit='lauze', volets='rouge_cheminot', porte='rouge_cheminot')),
+    'eglise': dict(base='eglise', note="modèle à part: nef de 21 x 12 m, clocher carré de 6 m à l'ouest (22 m de haut), portail au sud"),
+    'presbytere': dict(base='house-town', etages=2, couleurs=dict(murs='pierre', toit='lauze', volets='vert_sombre', porte='vert_sombre')),
+    'marthe': dict(base='house-town', etages=2, couleurs=dict(murs='enduit', toit='tuile', volets='bleu', porte='bleu')),
+    'cheminot_o': dict(base='house-town', etages=2, couleurs=dict(murs='pierre_claire', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot'), note="logement type de la Compagnie, jumeau du voisin"),
+    'cheminot_e': dict(base='house-town', etages=2, couleurs=dict(murs='pierre_claire', toit='tuile', volets='rouge_cheminot', porte='rouge_cheminot'), note="logement type de la Compagnie, jumeau du voisin"),
+    'lavoir': dict(base='lavoir', note="toit en appentis sur quatre poteaux, ouvert à l'ouest, bassin de pierre à l'est"),
+    'poste': dict(base='house-town', etages=2, hauteur_etage=2.8, toit='croupe', pente=30, fenetres=dict(sud=2, nord=3, est=2, ouest=2),
+                  couleurs=dict(murs='pierre', toit='lauze', menuiseries='rouge_cheminot', porte='rouge_cheminot'),
+                  note="cabine vitrée à l'étage, escalier extérieur au nord"),
+    'moulin': dict(base='house-town', etages=2, toit='deux-pans', pente=45, couleurs=dict(murs='pierre', toit='tuile', menuiseries='bois_sombre', porte='bois_sombre'),
+                   note="roue de 5 m sur le pignon sud, dans le bief"),
+    'ferme_logis': dict(base='house-town', etages=2, toit='deux-pans', pente=40, couleurs=dict(murs='enduit_ocre', toit='tuile', volets='sauge', porte='sauge')),
+    'grange': dict(base='shed', etages=1, hauteur_etage=5.0, toit='deux-pans', pente=40, couleurs=dict(murs='bois_gris', toit='tuile', porte='bois_brut'),
+                   note="porte charretière de 3,5 m"),
+    'forestiere': dict(base='house-town', etages=1, couleurs=dict(murs='pierre', toit='lauze', volets='vert_sombre', porte='vert_sombre')),
+}
+
+
+def gabarit(bb):
+    """Entrée de gabarit complète (largeur, profondeur, portes) tirée de l'emprise et de la porte du plan."""
+    g = dict(GABARITS[bb['id']])
+    x, y, l, h = bb['rect']
+    g.update(largeur=l, profondeur=h)
+    if bb['porte']:
+        px, py = bb['porte']
+        if abs(px - x) < 1e-6:
+            fac, pos = 'ouest', (py - y) / h
+        elif abs(px - x - l) < 1e-6:
+            fac, pos = 'est', (y + h - py) / h
+        elif abs(py - y) < 1e-6:
+            fac, pos = 'nord', (x + l - px) / l
+        else:
+            fac, pos = 'sud', (px - x) / l
+        g['portes'] = [dict(facade=fac, position=round(pos, 3))]
+        g['facade_porte'] = fac
+    return g
+
+
+for _b in B:
+    _b['gabarit'] = gabarit(_b)
+
+# ================================================================ version 2: mobilier de lieu
+# type: meuble du jeu (donnees/commun/meubles) quand il existe; modele: entrée de gabarits.toml (ou à créer).
+# regarde: ce que le banc regarde (le contrôle vérifie qu'il y fait face).
+M_ = []
+
+
+def mob(i, typ, modele, x, y, rot, pourquoi, regarde=None, acte=1):
+    M_.append(dict(id=i, type=typ, modele=modele, x=x, y=y, rotation=rot, pourquoi=pourquoi, regarde=regarde, acte=acte))
+
+
+mob('banc-du-quai', 'banc', 'bench-platform', 200, 100.5, 2, "le banc du réveil: on attend le train face à la voie", regarde=[200, 97.5])
+mob('banc-quai-ouest', 'banc', 'bench-platform', 191, 100.5, 2, "second banc du quai, face à la voie", regarde=[191, 97.5])
+mob('poteau-quai', 'poteau-de-quai', 'poteau-de-quai', 205.5, 102.5, 0, "là où l'on monte à deux: le point du quai")
+mob('caisse-commande', None, 'crate', 207.5, 101.5, 0, "la caisse de la commande du samedi, au pied du poteau")
+mob('panneau-gare', None, 'platform-sign', 196, 99.6, 2, "le nom de la halte se lit depuis le train, donc tourné vers la voie")
+for _i, _x in enumerate((188, 212)):
+    mob('reverbere-quai-%d' % (_i + 1), None, 'street-lamp', _x, 102.5, 0, "éclairage du quai aux deux bouts")
+for _i, _x in enumerate((195.5, 216.5, 240.5, 262, 280.5, 302.5, 313)):
+    mob('reverbere-route-%d' % (_i + 1), None, 'street-lamp', _x, 111, 0, "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ")
+mob('reverbere-gue', None, 'street-lamp', 179.5, 104.5, 0, "au carrefour du passage à niveau, la nuit du dénouement se joue ici")
+mob('lisse-nord', None, 'level-crossing-gate', 182.5, 95.4, 0, "la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie")
+mob('lisse-sud', None, 'level-crossing-gate', 182.5, 99.6, 0, "la lisse barre la route au sud de la voie")
+mob('croix-pn-eglise', None, 'crossing-sign', 256.8, 95, 0, "passage à niveau non gardé: croix de Saint-André au bord de la rue")
+mob('pompe-de-la-place', 'pompe', 'water-pump', 208, 113.5, 0, "la pompe de la place, sur l'ancien puits: l'eau de tous et la toilette du matin (acte 1)")
+mob('banc-place', 'banc', 'bench-park', 208, 119.4, 2, "face au puits et à la halte: on y voit qui descend du train", regarde=[208, 113.5])
+mob('ronces-maison-1', 'ronces', 'buisson', 167.5, 112.5, 0, "les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1")
+mob('ronces-maison-2', 'ronces', 'buisson', 176, 119.6, 0, "les ronces du jardin, devant le futur potager")
+mob('table-tonnelle', 'table-a-manger', 'table-farm', 197.5, 120, 0, "la tonnelle d'Odette: le souper des pensionnaires")
+mob('chaise-tonnelle-n', 'chaise', 'chair-farm', 197, 118.9, 0, "autour de la table de la tonnelle", regarde=[197, 120])
+mob('chaise-tonnelle-s', 'chaise', 'chair-farm', 198, 121.1, 2, "autour de la table de la tonnelle", regarde=[198, 120])
+mob('banc-ponton', 'banc', 'bench-park', 201.5, 128.2, 0, "au pied du ponton, face à la rivière et au pigeonnier de l'autre rive", regarde=[201.5, 134])
+mob('banc-berge', 'banc', 'bench-park', 248, 124.4, 0, "face à la rivière, à l'ombre des saules", regarde=[248, 134])
+for _i, (_x, _y) in enumerate(((179.4, 105), (256.4, 111.5), (185.6, 85), (185.6, 123.6), (317, 111.6), (150, 105.4))):
+    mob('panneau-%d' % (_i + 1), None, 'signpost', _x, _y, 0,
+        "panneau de carrefour: " + ("passage à niveau, Grand-Route, chemin du Moulin, le Gué", "rue de l'Église, venelle des Jardins",
+                                    "chemin forestier, chemin de la Lisière", "chemin de la Berge, le Gué", "bout de la Grand-Route, chemin des Jardins, l'arrêt du car",
+                                    "chemin du Moulin, portail du moulin")[_i])
+mob('boite-lucie', None, 'mailbox', 248.4, 110.6, 2, "la boîte aux lettres du bourg, à la grille de Lucie, tournée vers la rue")
+mob('boite-maison', None, 'mailbox', 179.6, 113.4, 1, "la boîte de la maison du garde, à côté de la porte, tournée vers la route: les lettres des habitants")
+mob('pompe-jardin', 'pompe', 'water-pump', 179.4, 120.2, 0, "la pompe du jardin: l'eau de l'arrosoir à deux pas du potager")
+mob('bois-maison', 'tas-de-bois', 'log-pile', 167.4, 116.5, 0, "bois de chauffage contre le pignon ouest, à l'abri du vent de pluie")
+mob('bois-atelier', 'tas-de-bois', 'log-pile', 171, 93, 0, "les grumes refendues de Basile, au sud de l'atelier")
+mob('haches-basile', 'etal-de-haches', 'ratelier', 177.2, 90.6, 1, "sous l'auvent est: Basile prête ses outils (acte 1)")
+mob('potager', 'terre-cultivable', 'terre', 174, 122.5, 0, "le potager de 6 x 4 cases au bout de l'allée du jardin (24 cases)")
+mob('banc-cretes', 'banc', 'bench-park', 304, 47.6, 0, "le banc des Crêtes: le bourg entier en contrebas", regarde=[260, 108])
+mob('banc-etang', 'banc', 'bench-park', 225.5, 39.5, 1, "face à l'étang, au coin de pêche", regarde=[236, 40], acte=3)
+mob('tronc-clairiere', 'banc', 'stump', 183, 52.4, 2, "un tronc couché sert de banc face au Vieux Chêne", regarde=[188, 47], acte=3)
+mob('banc-belvedere', 'banc', 'bench-park', 345, 27.6, 3, "le belvédère regarde le bourg et le clocher, à l'ouest", regarde=[252, 73], acte=3)
+mob('abreuvoir', 'pompe', 'water-pump', 201, 185.6, 0, "la pompe et l'abreuvoir des bêtes, au bout de la cour", acte=3)
+mob('tonneaux-ferme', None, 'barrel', 196.5, 154.4, 0, "tonneaux de cidre contre le logis", acte=3)
+mob('caisses-epicerie', None, 'crate', 194.7, 113.4, 0, "cageots de légumes devant la vitrine d'Odette")
+mob('tonneau-cafe', None, 'barrel', 251.6, 106.6, 0, "le tonneau qui sert de table à la terrasse du café", acte=2)
+
+# ================================================================ version 2: végétation par zones
+VEGETATION = [
+    dict(zone='C', densite=4.0, essences=['chêne', 'hêtre', 'châtaignier', 'charme'], sous_etage=['noisetier', 'houx', 'fougère'],
+         modeles=['tree-round', 'tree-fir', 'bush-round', 'grass-tuft'], recul_chemins=4.5,
+         pourquoi="bois de coteau exposé au sud: feuillus, châtaigniers vers le bourg, sapins seulement sur les crêtes au nord; clairières et prairies laissées libres"),
+    dict(zone='T', densite=1.2, essences=['pin sylvestre', 'bouleau'], sous_etage=['genêt', 'ronce'], modeles=['tree-fir', 'bush-flowering'], recul_chemins=3.0,
+         pourquoi="friche rocheuse au-dessus de la ligne morte: rien n'est entretenu depuis la fermeture"),
+    dict(zone='V', densite=0.6, essences=['frêne', 'sureau'], sous_etage=['ronce', 'églantier'], modeles=['bush-round', 'bush-flowering'], recul_chemins=2.0,
+         pourquoi="sur les talus de la tranchée seulement, rien dans le couloir des rails"),
+    dict(zone='R', densite=1.5, essences=['saule blanc', 'aulne', 'peuplier'], sous_etage=['roseau', 'iris des marais'], modeles=['tree-round', 'grass-tuft'], recul_chemins=2.0,
+         pourquoi="ripisylve: arbres en rang le long des berges, roseaux sur les grèves"),
+    dict(zone='M', densite=0.4, essences=['noyer', 'saule têtard'], sous_etage=['ortie'], modeles=['tree-round', 'bush-round'], recul_chemins=3.0,
+         pourquoi="deux noyers dans le pré du meunier, saules têtards le long du bief"),
+    dict(zone='F', densite=0.3, essences=['chêne isolé', 'pommier', 'noyer'], sous_etage=['aubépine', 'charme (haies)'], modeles=['tree-round', 'tree-apple', 'bush-round'], recul_chemins=3.0,
+         pourquoi="bocage: arbres dans les haies entre les champs, jamais au milieu d'un champ"),
+    dict(zone='B', densite=0.2, essences=['tilleul', 'pommier', 'saule (berge)'], sous_etage=['lilas', 'rosier grimpant'], modeles=['tree-round', 'tree-apple', 'bush-flowering', 'flowers-poppy'], recul_chemins=1.5,
+         pourquoi="des arbres plantés par les gens: tilleuls aux angles de la place, fruitiers dans les jardins, saules sur la berge"),
+]
+ARBRES_SINGULIERS = [
+    dict(id='vieux-chene', type='gros-chene', x=188, y=47, pourquoi="repère de la Côte (18 m)"),
+    dict(id='gros-noyer', type='gros-chene', x=161, y=187, pourquoi="repère du sud, noix à l'automne (modèle de noyer à créer, gros arbre en attendant)"),
+    dict(id='chene-lisiere-1', type='chene', x=196, y=86, pourquoi="un des deux arbres à abattre de l'acte 1, au bord du chemin de la Lisière"),
+    dict(id='chene-lisiere-2', type='chene', x=201, y=86, pourquoi="le second arbre à abattre de l'acte 1"),
+    dict(id='tilleul-place-no', type='chene', x=196, y=110.6, pourquoi="tilleul à l'angle nord-ouest de la place (modèle tilleul à créer)"),
+    dict(id='tilleul-place-ne', type='chene', x=212.4, y=110.6, pourquoi="tilleul à l'angle nord-est de la place"),
+    dict(id='saule-berge-1', type='chene', x=228, y=128.6, pourquoi="saule de la berge (modèle saule à créer)"),
+    dict(id='saule-berge-2', type='chene', x=262, y=129.4, pourquoi="saule de la berge"),
+    dict(id='saule-berge-3', type='chene', x=286, y=131.6, pourquoi="saule de la berge"),
+]
+
+# ================================================================ version 2: ressources (pêche, culture, récolte, fouille)
+# heures: plages de l'horloge du jeu; saisons: printemps, été, automne, hiver (toutes si absent).
+RESSOURCES = [
+    dict(id='peche-ponton', nature='peche', eau='aubrune', x=204, y=131.5, noeud='ponton', acte=2, heures='toutes', pourquoi="eau calme sous le ponton, poissons blancs"),
+    dict(id='peche-aval', nature='peche', eau='aubrune', x=295, y=134, noeud='be3', acte=2, heures='matin et soir', pourquoi="courant de l'aval: truites au lever et au coucher"),
+    dict(id='peche-fosse', nature='peche', eau='bief', x=132, y=131.4, noeud='i2', acte=2, heures='toutes', pourquoi="la fosse de la Baronne, sous la roue"),
+    dict(id='peche-saule-ile', nature='peche', eau='bief', x=78, y=138.4, noeud='i5', acte=2, heures='jour', pourquoi="à l'ombre du saule têtard"),
+    dict(id='peche-vanne', nature='peche', eau='aubrune', x=24, y=146, noeud='vn', acte=2, heures='toutes', saisons=['printemps', 'été', 'automne'], pourquoi="l'eau qui tombe du déversoir: ricochets et brochets"),
+    dict(id='peche-etang', nature='peche', eau='etang', x=227, y=39, noeud='et', acte=3, heures='toutes', pourquoi="l'étang de la Côte, carpes et tanches"),
+    dict(id='terre-6', nature='culture', rect=[171, 120.5, 6, 4], acte=1, pourquoi="le potager de départ (6 cases du jeu), au bout de l'allée du jardin"),
+    dict(id='terre-12', nature='culture', rect=[166, 120.5, 12, 4], acte=1, pourquoi="agrandi à 12 cases après la toiture, vers l'ouest"),
+    dict(id='terre-24', nature='culture', rect=[166, 119.5, 12, 6], acte=2, pourquoi="24 cases à l'acte 2: le jardin entier au sud de la maison, le poulailler reste à l'est"),
+    dict(id='champs-location', nature='culture', rect=[214, 164, 48, 26], acte=3, pourquoi="les champs des Delmas, loués par parcelles"),
+    dict(id='mures-tranchee', nature='cueillette', x=146, y=100.2, noeud='tw2', acte=2, saisons=['été', 'automne'], heures='jour', pourquoi="les ronces des talus"),
+    dict(id='chataignes', nature='cueillette', x=176, y=72, noeud='c1', acte=3, saisons=['automne'], heures='jour', pourquoi="châtaigniers du bas de la Côte, 3 m au sud des troncs (houppier)"),
+    dict(id='champignons', nature='cueillette', x=176, y=25, noeud='c6', acte=3, saisons=['automne'], heures='matin', pourquoi="sous-bois humide, le matin après la pluie"),
+    dict(id='myrtilles', nature='cueillette', x=152, y=17, noeud='c5', acte=3, saisons=['été'], heures='jour', pourquoi="la lande de la crête"),
+    dict(id='noix', nature='cueillette', x=162, y=184, noeud='fs2', acte=3, saisons=['automne'], heures='jour', pourquoi="sous le Gros Noyer"),
+    dict(id='pommes-verger', nature='cueillette', x=310, y=120, noeud='cj', acte=1, saisons=['automne'], heures='jour', pourquoi="le verger communal"),
+    dict(id='legumes-jardins', nature='cueillette', x=256.5, y=121.5, noeud='bj', acte=1, saisons=['printemps', 'été'], heures='jour', pourquoi="les jardins de la Rive: ce qu'on vous laisse prendre"),
+    dict(id='coquillages-greve', nature='cueillette', x=187, y=128.6, noeud='bg', acte=1, heures='matin', pourquoi="la grève au pied de la berge, eaux basses du matin"),
+    dict(id='coquillages-ile', nature='cueillette', x=104, y=143, noeud='i4', acte=2, heures='matin', pourquoi="la grève de l'Île"),
+    dict(id='insectes-roseaux', nature='insectes', x=116, y=141, noeud='i3', acte=2, saisons=['printemps', 'été'], heures='jour', pourquoi="libellules des roseaux"),
+    dict(id='insectes-cour-ecole', nature='insectes', x=241, y=103, noeud='gr5', acte=2, heures='jour', pourquoi="la cour d'Armand"),
+    dict(id='insectes-pre-meunier', nature='insectes', x=144, y=117, noeud='me', acte=3, saisons=['printemps', 'été'], heures='jour', pourquoi="le pré du meunier"),
+    dict(id='insectes-pre-bas', nature='insectes', x=302, y=159, noeud='fe3', acte=3, saisons=['été'], heures='jour', pourquoi="papillons du pré bas"),
+    dict(id='insectes-pres-haut', nature='insectes', x=269, y=23, noeud='h1', acte=3, saisons=['été'], heures='nuit', pourquoi="lucioles et insectes rares des prés du Haut, la nuit"),
+    dict(id='insectes-clairiere', nature='insectes', x=183, y=50, noeud='cl', acte=3, heures='jour', pourquoi="la clairière"),
+    dict(id='fouille-ballast', nature='fouille', x=112, y=99.8, noeud='tw4', acte=2, heures='toutes', pourquoi="le ballast de la voie ouest: boulons, plaques"),
+    dict(id='fouille-talus', nature='fouille', x=288, y=95, noeud='pnh', acte=3, heures='toutes', pourquoi="le talus des Hameaux"),
+    dict(id='fouille-courbe', nature='fouille', x=347, y=86, noeud='te3', acte=3, heures='toutes', pourquoi="la courbe de la ligne morte, avec Jeanne"),
+    dict(id='fouille-pierre-levee', nature='fouille', x=119, y=26, noeud='c4', acte=3, heures='toutes', pourquoi="la Pierre Levée"),
+    dict(id='fouille-roche', nature='fouille', x=268, y=51, noeud='e3', acte=3, heures='toutes', pourquoi="la roche aux fossiles"),
+    dict(id='fouille-borne', nature='fouille', x=185, y=185, noeud='vr', acte=3, heures='toutes', pourquoi="la borne de la vieille route"),
+    dict(id='bois-coupe', nature='bois', x=160, y=57, noeud='c2', acte=3, heures='jour', pourquoi="la coupe de Basile: le bois de la chambre"),
+    dict(id='branches-lisiere', nature='bois', x=199, y=88.6, noeud='lis', acte=1, heures='jour', pourquoi="branches tombées à la lisière, de quoi commencer"),
+]
+# Objets du jeu posés pour les ressources qui ont déjà leur type de meuble (briques de récolte).
+TYPE_RESSOURCE = {'fouille': 'point-de-fouille', 'bois': 'branches'}
+
+# ================================================================ version 2: points nommés du dehors (fiches d'habitants)
+POINTS_NOMMES = [
+    dict(id='firmin-quai', x=203, y=101.5, role='poste', qui='Firmin', pourquoi="Firmin attend le train au milieu du quai"),
+    dict(id='firmin-barriere', x=184.5, y=100.5, role='poste', qui='Firmin', pourquoi="Firmin à la barrière, en l'absence du garde"),
+    dict(id='odette-vitrine', x=195, y=116, role='poste', qui='Odette', pourquoi="Odette balaie devant sa porte"),
+    dict(id='basile-etabli', x=178, y=90.5, role='poste', qui='Basile', pourquoi="l'établi sous l'auvent"),
+    dict(id='achille-porte', x=232.5, y=107, role='poste', qui='Achille', pourquoi="Achille sur le pas du fournil, au lever"),
+    dict(id='mado-enclume', x=261.4, y=103.5, role='poste', qui='Mado', pourquoi="l'enclume dehors, sous l'auvent de la forge"),
+    dict(id='marthe-parvis', x=263, y=83.5, role='poste', qui='Marthe', pourquoi="Marthe au pied du clocher, corde de la cloche"),
+    dict(id='achille-peche', x=132, y=132, role='poste', qui='Achille', pourquoi="la pêche du lundi à la fosse"),
+    dict(id='siege-banc-place', x=208, y=119, role='siege', qui=None, pourquoi="le banc de la place"),
+    dict(id='siege-banc-reveil', x=200, y=101, role='siege', qui=None, pourquoi="le banc du réveil"),
+    dict(id='siege-banc-ponton', x=201.5, y=127.8, role='siege', qui=None, pourquoi="le banc du ponton"),
+    dict(id='siege-banc-berge', x=248, y=124, role='siege', qui=None, pourquoi="le banc de la berge"),
+    dict(id='siege-tonnelle', x=197, y=118.6, role='siege', qui='Odette', pourquoi="la tonnelle, au souper"),
+    dict(id='guet-moulin', x=136, y=111, role='poste', qui=None, pourquoi="le guet de nuit de la suite du « fantôme », dans la cour du moulin", acte=3),
+]
+
+# ================================================================ version 2: intérieurs (un fichier par niveau)
+# rect des pièces en coordonnées locales (0, 0 au coin nord-ouest de la pièce, 1 case = 1 m).
+# meubles: (id, type du jeu ou None, modèle, x, y, rotation); points: (id, x, y, rôle, qui).
+# porte: (x, y, regard en arrivant) côté intérieur; escaliers: liens vers un autre niveau.
+INT = []
+
+
+def interieur(i, bat, nom, l, h, pieces, cloisons, meubles, points, porte=None, escaliers=(), niveau=0, note=''):
+    INT.append(dict(id=i, batiment=bat, nom=nom, largeur=l, hauteur=h, surface_m2=l * h, niveau=niveau, pieces=pieces,
+                    cloisons=cloisons, meubles=[dict(id=a, type=b_, modele=c, x=x, y=y, rotation=r) for a, b_, c, x, y, r in meubles],
+                    points=[dict(id=a, x=x, y=y, role=r, qui=q) for a, x, y, r, q in points], porte=porte, escaliers=list(escaliers), note=note))
+
+
+interieur('halte', 'halte', 'la halte', 9, 5,
+          [('salle des pas perdus', [0, 0, 5, 5]), ('guichet', [5, 0, 1, 5]), ('bureau de Firmin', [6, 0, 3, 3]), ('consigne', [6, 3, 3, 2])],
+          [[6, 3, 2, 1]],
+          [('halte-banc', 'banc', 'bench-platform', 1.5, 0.5, 0), ('halte-guichet', None, 'comptoir', 5.5, 2, 1),
+           ('halte-bureau', 'table-a-manger', 'table-farm', 7.5, 0.5, 0), ('halte-chaise', 'chaise', 'chair-farm', 7.5, 1.5, 2),
+           ('halte-consigne', 'coffre', 'chest', 8.5, 4.5, 3)],
+          [('halte-p-guichet', 6.5, 2.5, 'comptoir', 'Firmin'), ('halte-p-bureau', 7.5, 1.6, 'siege', 'Firmin'), ('halte-p-banc', 1.5, 1, 'siege', None)],
+          porte=(2.5, 4.5, 2), note="le guichet sépare la salle du bureau; la consigne est le coffre commun des deux joueurs")
+interieur('maison-rdc', 'maison', 'la maison du garde, rez-de-chaussée', 10, 7,
+          [('salle', [5, 0, 5, 4]), ('cuisine', [5, 4, 5, 3]), ('chambre', [0, 0, 5, 4]), ('troisième pièce', [0, 4, 5, 3])],
+          [[5, 0, 1, 1], [5, 3, 1, 2], [5, 6, 1, 1], [6, 4, 2, 1]],
+          [('maison-cuisiniere', 'cuisiniere', 'stove', 9.5, 6.5, 0), ('maison-plan', 'plan-de-travail', 'plan-de-travail', 8, 6.5, 0),
+           ('maison-table', 'table-a-manger', 'table-farm', 7, 2, 0), ('maison-chaise-1', 'chaise', 'chair-farm', 7, 1, 0),
+           ('maison-chaise-2', 'chaise', 'chair-farm', 7, 3, 2), ('lit-de-la-maison', 'lit-double', 'bed-double', 9, 3, 0), ('maison-armoire', 'armoire', 'wardrobe', 4.5, 0.5, 0)],
+          [('maison-lit-g', 8.6, 3.5, 'lit', None), ('maison-lit-d', 9.4, 3.5, 'lit', None), ('maison-cuisine', 8, 5.5, 'poste', None)],
+          porte=(9.5, 1.5, 3), escaliers=[dict(x=5.5, y=4.5, vers='maison-etage', regard=0), dict(x=0.5, y=3.5, vers='maison-cave', regard=0)],
+          note="au début, la ruine: la moitié ouest (chambre, troisième pièce) sans toit et encombrée de gravats; on dort dans la salle. L'escalier de la cave part de la chambre")
+interieur('maison-etage', 'maison', "la maison du garde, étage", 10, 7,
+          [('grenier aménageable', [0, 0, 10, 7])], [], [], [('maison-etage-milieu', 5, 3.5, 'poste', None)],
+          escaliers=[dict(x=5.5, y=4.5, vers='maison-rdc', regard=2)], niveau=1, note="sous le toit, ouvert à l'acte 2 (chambre d'amis, atelier)")
+interieur('maison-cave', 'maison', 'la cave de la maison', 5, 4, [('cave voûtée', [0, 0, 5, 4])], [],
+          [('cave-coffre', 'coffre', 'chest', 4.5, 3.5, 3)], [('cave-lanterne', 2.5, 1.5, 'poste', None)],
+          escaliers=[dict(x=0.5, y=0.5, vers='maison-rdc', regard=0)], niveau=-1, note="la lanterne sans verre (acte 3) y attend")
+interieur('epicerie-rdc', 'epicerie', "l'épicerie Ferrand", 7, 9,
+          [('boutique', [0, 0, 7, 5]), ('cuisine', [0, 5, 7, 4])], [[0, 5, 3, 1], [4, 5, 3, 1]],
+          [('epicerie-comptoir', None, 'comptoir', 2, 2.5, 1), ('epicerie-etal', 'etal-de-tourte', 'etal', 5.5, 0.5, 0),
+           ('epicerie-cuisiniere', 'cuisiniere', 'stove', 0.5, 8.5, 0), ('epicerie-table', 'table-a-manger', 'table-farm', 4, 7, 0)],
+          [('odette-comptoir', 1, 2.5, 'comptoir', 'Odette'), ('odette-cuisine', 1.5, 7.5, 'poste', 'Odette')],
+          porte=(6.5, 2.5, 3), escaliers=[dict(x=6.5, y=8.5, vers='epicerie-etage', regard=2)], note="la boutique donne sur la place (porte à l'est), la cuisine derrière")
+interieur('epicerie-etage', 'epicerie', 'la pension Ferrand, étage', 7, 9,
+          [('chambre de la pension', [0, 0, 7, 5]), ('chambre d’Odette', [0, 5, 7, 4])], [[0, 5, 6, 1]],
+          [('lit-pension-1', 'lit-simple', 'bed-single', 0.5, 1, 0), ('lit-pension-2', 'lit-simple', 'bed-single', 2.5, 1, 0),
+           ('odette-lit', 'lit-simple', 'bed-single', 0.5, 7, 0)],
+          [('pension-lit-a', 0.5, 1, 'lit', None), ('pension-lit-b', 2.5, 1, 'lit', None), ('odette-lit-p', 0.5, 7, 'lit', 'Odette')],
+          escaliers=[dict(x=6.5, y=8.5, vers='epicerie-rdc', regard=2)], niveau=1, note="la chambre du premier soir, deux lits simples")
+interieur('fournil', 'fournil', "le fournil d'Achille", 6, 5,
+          [('boutique', [0, 2, 6, 3]), ('fournil', [0, 0, 6, 2])], [[0, 2, 2, 1]],
+          [('fournil-four', 'four', 'four', 5.5, 0.5, 0), ('fournil-petrin', 'plan-de-travail', 'plan-de-travail', 2, 0.5, 0),
+           ('fournil-comptoir', None, 'comptoir', 3, 3, 0)],
+          [('achille-four', 4.5, 1, 'poste', 'Achille'), ('achille-comptoir', 3, 2.4, 'comptoir', 'Achille')],
+          porte=(3.5, 4.5, 2), note="le four contre le pignon est, côté ru; la boutique sur la rue")
+interieur('mercerie', 'mercerie', 'la mercerie-coiffure', 6, 6,
+          [('boutique', [0, 0, 6, 3]), ('salon de coiffure', [0, 3, 4, 3]), ('cabine', [4, 3, 2, 3])], [[4, 3, 1, 2]],
+          [('mercerie-comptoir', None, 'comptoir', 2, 1.5, 0), ('mercerie-fauteuil', 'chaise', 'chair-bedroom', 1.5, 4.5, 2),
+           ('mercerie-armoire', 'armoire', 'wardrobe', 5.5, 5.5, 0)],
+          [('solange-comptoir', 2, 2.4, 'comptoir', 'Solange'), ('jeanne-fauteuil', 2.5, 4.5, 'poste', 'Jeanne'), ('mercerie-cabine', 5, 4.5, 'poste', None)],
+          porte=(3.5, 0.5, 0), note="porte au nord sur la rue; la cabine sert à essayer les tenues")
+interieur('forge', 'forge', 'la forge', 5, 5,
+          [('forge', [0, 0, 5, 5])], [],
+          [('forge-foyer', 'four', 'four', 2.5, 0.5, 0), ('forge-haches', 'etal-de-haches-forgees', 'ratelier', 4.5, 2.5, 3), ('forge-coffre', 'coffre', 'chest', 0.5, 2.5, 1)],
+          [('mado-foyer', 2.5, 1.6, 'poste', 'Mado'), ('mado-etabli', 3.5, 2.5, 'poste', 'Mado')],
+          porte=(2.5, 4.5, 2), note="foyer au nord sous la hotte; l'enclume est dehors, sous l'auvent")
+interieur('atelier-basile', 'scierie', "l'atelier de Basile", 9, 7,
+          [('atelier', [0, 0, 9, 7])], [],
+          [('basile-etabli', 'plan-de-travail', 'plan-de-travail', 4, 0.5, 0), ('basile-bois', 'tas-de-bois', 'log-pile', 0.5, 6.5, 0),
+           ('basile-haches', 'etal-de-haches', 'ratelier', 8.5, 0.5, 0)],
+          [('basile-p-etabli', 4, 1.6, 'poste', 'Basile')],
+          porte=(8.5, 3.5, 3), note="atelier d'une pièce, porte à l'est vers l'auvent")
 
 
 # ================================================================ calculs
@@ -489,15 +931,65 @@ def calculer():
     return dist_t, dens
 
 
+def voisin_de(zk, x, y):
+    if not (0 <= x <= L and 0 <= y <= H):
+        return 'bord'
+    for k, z in ZONES.items():
+        if k != zk and dans(z['poly'], x, y):
+            return k
+    return 'hors'
+
+
+def bordures():
+    """Découpe le contour de chaque zone par voisin et lui donne son habillage (règle, puis exceptions)."""
+    out = {}
+    for zk, z in ZONES.items():
+        poly = z['poly']
+        morceaux = []
+        for (x1, y1), (x2, y2) in zip(poly, poly[1:] + poly[:1]):
+            ln = math.hypot(x2 - x1, y2 - y1)
+            if ln < 1e-9:
+                continue
+            nb = max(1, int(math.ceil(ln / 4.0)))
+            nx, ny = (y2 - y1) / ln, -(x2 - x1) / ln
+            debut = len(morceaux)  # on ne fusionne qu'à l'intérieur d'un même côté du polygone
+            for i in range(nb):
+                a = (x1 + (x2 - x1) * i / nb, y1 + (y2 - y1) * i / nb)
+                b_ = (x1 + (x2 - x1) * (i + 1) / nb, y1 + (y2 - y1) * (i + 1) / nb)
+                mx, my = (a[0] + b_[0]) / 2, (a[1] + b_[1]) / 2
+                # le côté extérieur est celui qui n'est pas dans la zone
+                sgn = -1 if dans(poly, mx + nx * 1.2, my + ny * 1.2) else 1
+                v = voisin_de(zk, mx + sgn * nx * 1.5, my + sgn * ny * 1.5)
+                if v != 'bord' and v != 'hors' and v == zk:
+                    v = 'hors'
+                hab = REGLE_BORDURE.get((zk, v), 'haie')
+                if zk == 'V' and v == 'hors' and mx < 98:
+                    hab = 'haie'
+                if zk == 'B' and v == 'hors' and 268 < mx < 292 and my < 82:
+                    hab = 'muret'
+                if len(morceaux) > debut and morceaux[-1]['voisin'] == v and morceaux[-1]['habillage'] == hab and morceaux[-1]['a'] == [round(a[0], 2), round(a[1], 2)]:
+                    morceaux[-1]['a'] = [round(b_[0], 2), round(b_[1], 2)]
+                else:
+                    morceaux.append(dict(de=[round(a[0], 2), round(a[1], 2)], a=[round(b_[0], 2), round(b_[1], 2)], voisin=v, habillage=hab))
+        out[zk] = morceaux
+    return out
+
+
 def ecrire_json(dist_t, dens):
     plan = dict(
-        format='plan-de-lieu', version=1, id='aubrune', nom='Aubrune', echelle='1 unité = 1 m; x vers l’est, y vers le sud',
+        format='plan-de-lieu', version=1, revision=2, statut="version 2, plan validé par le client le 2026-11-10, prêt pour la 3D",
+        id='aubrune', nom='Aubrune', echelle='1 unité = 1 m; x vers l’est, y vers le sud',
         taille=dict(largeur=L, hauteur=H), vitesses=dict(marche=MARCHE, course=COURSE, draisine=DRAISINE),
-        ancien_repere=dict(note='coeur du bourg: ancien (x, y) de halte.json = nouveau (x - 100, y - 84), à 1 ou 2 m près', dx=100, dy=84),
+        ancien_repere=dict(note="coeur du bourg: ancien (x, y) de halte.json = nouveau (x - 164, y - 84), à 1 ou 2 m près (version 2: tout ce qui est à l'est de x 44,5 a glissé de 64 m)", dx=164, dy=84),
+        allongement_ouest=dict(metres=ALLONGE, coupe_x=COUPE, raison="décision du client: le sentier de l'acte 2 (la voie jusqu'au poste) prend la longueur de celui de l'acte 3"),
         zones={k: dict(z, surface_m2=round(aire(z['poly']))) for k, z in ZONES.items()},
         eaux=EAUX, plans_eau=PLANS_EAU, rails=RAILS, noeuds=N, aretes=A, verrous=VERROUS, ouvrages=OUVRAGES, batiments=B,
         reperes=REPERES, points_interet=P, parcelles=PARCELLES, quetes=QUETES,
-        points_cles=[dict(noeud=k, nom=v) for k, v in POINTS_CLES], distances=dist_t, densite=dens)
+        points_cles=[dict(noeud=k, nom=v) for k, v in POINTS_CLES], distances=dist_t, densite=dens,
+        habillages={k: POURQUOI_HABILLAGE[k] for k in HABILLAGES}, bordures=bordures(),
+        sols=dict(par_zone=SOL_ZONE, par_chemin=SOL_CHEMIN, par_parcelle=SOL_PARCELLE, rects=SOLS_SUPPL),
+        mobilier=M_, vegetation=VEGETATION, arbres=ARBRES_SINGULIERS, ressources=RESSOURCES, type_ressource=TYPE_RESSOURCE,
+        points_nommes=POINTS_NOMMES, interieurs=INT)
     lignes = ['{']
     cles = list(plan)
     for i, k in enumerate(cles):
@@ -507,7 +999,7 @@ def ecrire_json(dist_t, dens):
             lignes.append(' %s: [' % json.dumps(k))
             lignes += ['  ' + json.dumps(x, ensure_ascii=False) + (',' if j < len(v) - 1 else '') for j, x in enumerate(v)]
             lignes.append(' ]' + fin)
-        elif isinstance(v, dict) and k in ('noeuds', 'zones', 'verrous'):
+        elif isinstance(v, dict) and k in ('noeuds', 'zones', 'verrous', 'bordures', 'sols'):
             lignes.append(' %s: {' % json.dumps(k))
             ks = list(v)
             lignes += ['  %s: %s%s' % (json.dumps(x), json.dumps(v[x], ensure_ascii=False), ',' if j < len(ks) - 1 else '') for j, x in enumerate(ks)]
@@ -558,6 +1050,47 @@ def tableaux(dist_t, dens):
             cote = 'ouest' if px == x else 'est' if px == x + l else 'nord' if py == y else 'sud'
         bt.append('| %s | %g x %g m | %s | %s | %s |' % (bb['nom'], l, h, bb['qui'], cote, bb['raison']))
     t['batiments'] = bt
+    t['verrous_v2'] = ['| Verrou | Objet posé | Modèle | Phrase « pas encore » |', '|---|---|---|---|'] + [
+        '| %s | %s | `%s` | %s |' % (k, v['objet'], v['modele'], v['pas_encore']) for k, v in VERROUS.items()]
+    gb = ['| Bâtiment | Gabarit de base | Largeur x profondeur | Étages | Toit | Porte (façade, position) | Couleurs ou note |', '|---|---|---|---|---|---|---|']
+    for bb in B:
+        g = bb['gabarit']
+        pt = ', '.join('%s %.2f' % (q['facade'], q['position']) for q in g.get('portes', [])) or '(aucune)'
+        gb.append('| %s | `%s` | %g x %g m | %s | %s | %s | %s |' % (bb['nom'], g['base'], g['largeur'], g['profondeur'], g.get('etages', '(modèle)'),
+                  g.get('toit', '(modèle)'), pt, ', '.join('%s %s' % kv for kv in g.get('couleurs', {}).items()) or g.get('note', '')))
+    t['gabarits'] = gb
+    t['mobilier'] = ['| Objet | Type du jeu | Modèle | Où (x, y) | Face au | Pourquoi |', '|---|---|---|---|---|---|'] + [
+        '| %s | %s | `%s` | %g, %g | %s | %s |' % (m['id'], m['type'] or '(à créer)', m['modele'], m['x'], m['y'], 'sud est nord ouest'.split()[m['rotation']], m['pourquoi'])
+        for m in M_]
+    t['vegetation'] = ['| Zone | Arbres pour 100 m² | Essences | Sous-étage | Recul des chemins | Pourquoi |', '|---|---|---|---|---|---|'] + [
+        '| %s | %s | %s | %s | %s m | %s |' % (ZONES[v['zone']]['nom'], str(v['densite']).replace('.', ','), ', '.join(v['essences']), ', '.join(v['sous_etage']),
+                                            str(v['recul_chemins']).replace('.', ','), v['pourquoi']) for v in VEGETATION]
+    t['ressources'] = ['| Ressource | Nature | Où | Acte | Heures | Saisons | Pourquoi |', '|---|---|---|---|---|---|---|'] + [
+        '| %s | %s | %s | %d | %s | %s | %s |' % (r['id'], r['nature'], ('x %g, y %g' % (r['x'], r['y'])) if 'x' in r else 'rectangle %s' % r['rect'], r['acte'],
+                                               r.get('heures', 'toutes'), ', '.join(r.get('saisons', [])) or 'toutes', r['pourquoi']) for r in RESSOURCES]
+    it = []
+    for i in INT:
+        it.append('**%s** (`interieurs/%s.json`, %d x %d m, %d m², niveau %d): %s.' % (i['nom'], i['id'], i['largeur'], i['hauteur'], i['surface_m2'], i['niveau'], i['note']))
+        grille = [['.'] * i['largeur'] for _ in range(i['hauteur'])]
+        for c in i['cloisons']:
+            for yy in range(c[1], c[1] + c[3]):
+                for xx in range(c[0], c[0] + c[2]):
+                    grille[yy][xx] = '#'
+        for m in i['meubles']:
+            grille[int(m['y'])][int(m['x'])] = (m['type'] or m['modele'])[0].upper()
+        for q in i['points']:
+            grille[int(q['y'])][int(q['x'])] = '*'
+        if i['porte']:
+            grille[int(i['porte'][1])][int(i['porte'][0])] = 'P'
+        for e in i['escaliers']:
+            grille[int(e['y'])][int(e['x'])] = 'E'
+        it += ['', '```text'] + [' '.join(r) for r in grille] + ['```', '',
+               'Pièces: ' + '; '.join('%s (%d x %d)' % (n, r[2], r[3]) for n, r in i['pieces']) + '. Meubles: ' +
+               (', '.join('%s (%s)' % (m['id'], m['type'] or m['modele'] + ', à créer') for m in i['meubles']) or 'aucun') + '. Points: ' +
+               (', '.join('%s (%s%s)' % (q['id'], q['role'], ', ' + q['qui'] if q['qui'] else '') for q in i['points']) or 'aucun') + '.', '']
+    t['interieurs'] = it
+    t['points_nommes'] = ['| Point | Rôle | Qui | Pourquoi |', '|---|---|---|---|'] + [
+        '| %s | %s | %s | %s |' % (q['id'], q['role'], q['qui'] or 'tous', q['pourquoi']) for q in POINTS_NOMMES]
     chemin_md = os.path.join(ICI, 'plan.md')
     if os.path.exists(chemin_md):
         txt = open(chemin_md, encoding='utf-8').read()
@@ -598,6 +1131,7 @@ def fond(detail, attenue=False, numeros=None, noms_bat=True, noms_poi=False, zon
     s = []
     k = detail
     s.append('<rect x="0" y="0" width="%d" height="%d" fill="#B7CC8E"/>' % (L, H))
+    s.append('<rect x="0" y="0" width="%d" height="%d" fill="#A7B38F"/>' % (L, H))
     if zones_teinte:
         for z in ZONES.values():
             s.append('<polygon points="%s" fill="%s" opacity="0.55"/>' % (pts(z['poly']), z['couleur']))
@@ -609,7 +1143,7 @@ def fond(detail, attenue=False, numeros=None, noms_bat=True, noms_poi=False, zon
         x, y = rnd.uniform(0, L), rnd.uniform(0, 96)
         if not (dans(ZONES['C']['poly'], x, y) or dans(ZONES['T']['poly'], x, y)) or y > 93:
             continue
-        if dans(ZONES['T']['poly'], x, y) and y > 60 and x < 300 and (x + y * 0.8) < 345:
+        if dans(ZONES['T']['poly'], x, y) and (y > 60 or x > 352):
             continue
         if min(dseg((x, y), a, b_) for a, b_ in segs) < 4.5:
             continue
@@ -625,6 +1159,14 @@ def fond(detail, attenue=False, numeros=None, noms_bat=True, noms_poi=False, zon
     for pc in PARCELLES:
         x, y, l, h = pc['rect']
         s.append('<rect x="%g" y="%g" width="%g" height="%g" fill="%s" stroke="#8C7B5A" stroke-width="0.25" stroke-dasharray="1 0.8" opacity="0.9"/>' % (x, y, l, h, pc['couleur']))
+    # lisières habillées (version 2)
+    styl = {'haie': ('#4F7244', '0.9 0.7'), 'talus': ('#8C6A45', None), 'cloture': ('#5A4632', '0.4 0.6'), 'bois': ('#3F6453', None), 'muret': ('#9A8F80', None)}
+    for zk, ms in BORD.items():
+        for m in ms:
+            if m['habillage'] in styl:
+                c_, da = styl[m['habillage']]
+                s.append('<line x1="%g" y1="%g" x2="%g" y2="%g" stroke="%s" stroke-width="%g"%s opacity="0.85"/>' % (
+                    m['de'][0], m['de'][1], m['a'][0], m['a'][1], c_, 0.9, ' stroke-dasharray="%s"' % da if da else ''))
     # eau
     for w in EAUX:
         s.append('<polyline points="%s" fill="none" stroke="#7090A5" stroke-width="%g" stroke-linecap="round" stroke-linejoin="round"/>' % (pts(w['pts']), w['largeur']))
@@ -647,7 +1189,7 @@ def fond(detail, attenue=False, numeros=None, noms_bat=True, noms_poi=False, zon
         s.append('<polyline points="%s" fill="none" stroke="#8E8576" stroke-width="3" stroke-linejoin="round"%s/>' % (pts(r['pts']), op))
         s.append('<polyline points="%s" fill="none" stroke="#3D3833" stroke-width="1.5" stroke-dasharray="0.35 0.9" stroke-linejoin="round"%s/>' % (pts(r['pts']), op))
     # la colline au-dessus du tunnel
-    s.append('<path d="M290,56 Q298,44 306,56" fill="none" stroke="#3D3833" stroke-width="1.2"/>')
+    s.append('<path d="M355,57 Q362,45 369,57" fill="none" stroke="#3D3833" stroke-width="1.2"/>')
     # ouvrages
     for o in OUVRAGES:
         if o['nature'] in ('pont', 'passerelle', 'planches', 'gué', 'ponton', 'digue'):
@@ -666,7 +1208,8 @@ def fond(detail, attenue=False, numeros=None, noms_bat=True, noms_poi=False, zon
     # verrous
     for kk, v in VERROUS.items():
         c = '#3F6F8F' if v.get('sens') else '#B3261E'
-        s.append('<rect x="%g" y="%g" width="%g" height="%g" rx="0.8" fill="%s" stroke="#FFFDF5" stroke-width="0.4"/>' % (v['x'] - 2.6 * k, v['y'] - 1.7 * k, 5.2 * k, 3.4 * k, c))
+        lv = max(5.2, 1.55 * len(kk) + 1.4)
+        s.append('<rect x="%g" y="%g" width="%g" height="%g" rx="0.8" fill="%s" stroke="#FFFDF5" stroke-width="0.4"/>' % (v['x'] - lv / 2 * k, v['y'] - 1.7 * k, lv * k, 3.4 * k, c))
         s.append(texte(v['x'], v['y'] + 0.85 * k, kk, 2.3 * k, coul='#FFFFFF', gras=True, halo=False))
     # points d'intérêt
     for q in ([] if sans_poi else P):
@@ -709,7 +1252,7 @@ def nord_echelle(x, y, k):
 def page(nom, vue, largeur_px, elements, panneau=None, titre=None):
     x0, y0, w, h = vue
     ech = largeur_px / w
-    pan = 380 if panneau else 0
+    pan = 480 if panneau else 0
     haut = h * ech + (34 if titre else 0)
     if panneau:
         haut = max(haut, 34 + 30 + 14.5 * len(panneau) + 8 * sum(1 for p_ in panneau if p_[0] == 't'))
@@ -721,7 +1264,7 @@ def page(nom, vue, largeur_px, elements, panneau=None, titre=None):
         m = 50 if ech < 9 else 20
         bx = largeur_px + pan - 20 - m * ech
         o.append('<rect x="%g" y="20" width="%g" height="5" fill="#2E2A26"/><rect x="%g" y="20" width="%g" height="5" fill="#FFFDF5" stroke="#2E2A26" stroke-width="1"/>' % (bx, m * ech / 2, bx + m * ech / 2, m * ech / 2))
-        o.append('<text x="%g" y="15" font-family="DejaVu Sans" font-size="11" fill="#2E2A26" text-anchor="middle">échelle: %d m (%d s de marche, %d s de course)</text>' % (bx + m * ech / 2, m, round(m / MARCHE), round(m / COURSE)))
+        o.append('<text x="%g" y="15" font-family="DejaVu Sans" font-size="11" fill="#2E2A26" text-anchor="end">échelle: %d m (%d s de marche, %d s de course)</text>' % (largeur_px + pan - 12, m, round(m / MARCHE), round(m / COURSE)))
         o.append('<path d="M%g,30 L%g,8 M%g,4 L%g,13 L%g,13 Z" stroke="#2E2A26" stroke-width="2" fill="#2E2A26"/><text x="%g" y="24" font-family="DejaVu Sans" font-size="12" font-weight="bold" fill="#2E2A26">N</text>' % (bx - 30, bx - 30, bx - 30, bx - 35, bx - 25, bx - 22))
     o.append('<svg x="0" y="%d" width="%d" height="%g" viewBox="%g %g %g %g">' % (dy, largeur_px, h * ech, x0, y0, w, h))
     o += elements
@@ -750,6 +1293,7 @@ def page(nom, vue, largeur_px, elements, panneau=None, titre=None):
                 o.append('<text x="%d" y="%d" font-family="DejaVu Sans" font-size="9" font-weight="bold" fill="#FFFFFF" text-anchor="middle">%s</text>' % (xx + 8, yy - 0.8, coul[0]))
             elif kind == 'num':
                 o.append('<text x="%d" y="%d" font-family="DejaVu Sans" font-size="10.5" font-weight="bold" fill="#2E2A26" text-anchor="end">%s</text>' % (xx + 16, yy, coul))
+            txt_ = txt_ if len(txt_) <= 74 else txt_[:72].rstrip() + '...'
             o.append('<text x="%d" y="%d" font-family="DejaVu Sans" font-size="10.5" fill="#2E2A26">%s</text>' % (xx + 24, yy, esc(txt_)))
             yy += 14.5
     o.append('</svg>')
@@ -767,14 +1311,15 @@ def legende_base():
            ('trait', 'sentier (1 m)', ('#B08A56', 2, '4 3')), ('trait', 'marche sur la voie', ('#7A5F47', 2, '2 3')), ('trait', 'tunnel, escalier (couvert)', ('#5B5470', 2, '3 3')),
            ('trait', 'voie ferrée', ('#3D3833', 3, '1 2')), ('carre', 'eau (toujours reliée à sa source)', '#7090A5'),
            ('carre', 'bâtiment habité; point clair: la porte', '#B86B4F'), ('carre', 'bâtiment en réserve (après la fin)', '#A9A39A'),
-           ('etoile', 'repère visible de loin', None), ('carre', 'verrou d’histoire (zone fermée)', '#B3261E'), ('carre', 'raccourci qui se débloque', '#3F6F8F')]
+           ('etoile', 'repère visible de loin', None), ('carre', 'verrou d’histoire (zone fermée)', '#B3261E'), ('carre', 'raccourci qui se débloque', '#3F6F8F'),
+           ('trait', 'lisière: haie, talus, clôture, bois', ('#4F7244', 3, '4 3')), ('carre', 'hors jeu (décor)', '#A7B38F')]
     for kk in ('histoire', 'service', 'activite', 'collecte', 'repos'):
         lg.append(('pastille', NOM_P[kk], COUL_P[kk]))
     return lg
 
 
-LABELS_ZONES = {'B': ('LE BOURG', 222, 118), 'R': ('LA RIVIÈRE ET LE BIEF', 196, 135.3), 'V': ('LA VOIE ET LE POSTE', 62, 87), 'C': ('LA CÔTE', 60, 10),
-                'M': ('LE MOULIN', 64, 105.6), 'F': ('LA FERME', 190, 198), 'T': ('LE TUNNEL', 280, 10)}
+LABELS_ZONES = {'B': ('LE BOURG', 286, 118), 'R': ('LA RIVIÈRE ET LE BIEF', 260, 135.3), 'V': ('LA VOIE ET LE POSTE', 70, 86), 'C': ('LA CÔTE', 130, 10),
+                'M': ('LE MOULIN', 128, 105.6), 'F': ('LA FERME', 254, 198), 'T': ('LE TUNNEL', 334, 10)}
 
 
 def dessiner(dist_t):
@@ -786,25 +1331,25 @@ def dessiner(dist_t):
     for kz, z in ZONES.items():
         court, x, y = LABELS_ZONES[kz]
         el.append(texte(x, y, court + ' (acte %d)' % z['acte'], 3.4, gras=True, coul='#3A342C'))
-    for r, (dx, dy, anc) in zip(REPERES, [(-4, 2.5, 'end'), (0.5, -3.4, 'middle'), (-4, -1.5, 'end'), (-4, 4.5, 'end'), (4, -2, 'start'), (-5, 1, 'end'), (0, 8, 'middle'), (5, 4, 'start')]):
+    for r, (dx, dy, anc) in zip(REPERES, [(-4, 2.5, 'end'), (-4, -1.5, 'end'), (-4, -1.5, 'end'), (-4, 4.5, 'end'), (4, -2, 'start'), (-5, 1, 'end'), (-4, 4, 'end'), (5, 1, 'start')]):
         el.append(texte(r['x'] + dx, r['y'] + dy, r['nom'].replace(' de la halte', ''), 2.8, anc=anc, ital=True))
     for nom_, x, y in (("l'Aubrune", 280, 157.5), ("l'Aubrune", 12, 158), ('le bief', 46, 135), ("l'étang", 172, 41), ('le ru', 168.5, 72), ("l'île du Bief", 58, 143),
-                       ('Grand-Route', 240, 106.3), ('chemin de la Berge', 222, 127), ('chemin forestier', 82, 55), ('sentier des Crêtes', 252, 46), ('la tranchée', 76, 100.6),
-                       ('la ligne morte', 272, 98), ('vieille route', 127, 176), ('prés lointains (décor)', 292, 124), ('prés lointains (décor)', 30, 184), ('bois (décor)', 20, 40), ('chemin des Champs', 182, 156.5), ('vers Hautefonte', 14, 103), ('vers Combe-Veilleuse', 300, 5)):
-        el.append(texte(x, y, nom_, 2.5, ital=True, coul='#4A4034'))
+                       ('Grand-Route', 240, 106.3), ('chemin de la Berge', 222, 127), ('chemin forestier', 82, 55), ('sentier des Crêtes', 252, 46), ('la tranchée', 66, 92.2),
+                       ('la ligne morte', 272, 98), ('vieille route', 127, 176), ('prés lointains (décor)', 292, 124), ('prés lointains (décor)', 30, 184), ('bois (décor)', 30, 40), ('le pré du poste (décor)', 40, 118), ('chemin des Champs', 182, 156.5), ('vers Hautefonte', 14, 103), ('vers Combe-Veilleuse', 300, 5), ("l'éperon (rocher)", 270, 50)):
+        el.append(texte(sx(x) if x not in (14, 12) else x, y, nom_, 2.5, ital=True, coul='#4A4034'))
     lg = legende_base() + [('t', 'Bâtiments (porte du côté du chemin)', None)]
     for i, bb in enumerate(B):
         lg.append(('num', bb['nom'], str(i + 1)))
-    page('plan-ensemble', (0, 0, L, H), 1500, el, lg, "Aubrune: plan d'ensemble, 320 x 208 m (1 case = 1 m), nord en haut")
+    page('plan-ensemble', (0, 0, L, H), 1500, el, lg, "Aubrune, version 2: plan d'ensemble, 384 x 208 m (1 case = 1 m), nord en haut")
 
     # ---- plans de zone
-    vues = {'B': ('zone-1-bourg', (80, 60, 178, 80), 'Zone 1: le bourg et le passage à niveau (acte 1)'),
-            'R': ('zone-2-riviere-bief', (0, 96, 130, 68), 'Zone 2: la rivière et le bief, côté amont (acte 2); l’aval longe le bourg (plan de la zone 1)'),
-            'V': ('zone-3-voie-poste', (0, 84, 126, 60), "Zone 3: la voie jusqu'au poste d'aiguillage (acte 2)"),
-            'C': ('zone-4-cote', (40, 0, 250, 100), 'Zone 4: la Côte (acte 3)'),
-            'M': ('zone-5-moulin', (44, 98, 62, 44), 'Zone 5: le moulin (acte 3)'),
-            'F': ('zone-6-ferme', (62, 122, 212, 84), 'Zone 6: la ferme (acte 3)'),
-            'T': ('zone-7-tunnel', (206, 0, 114, 112), 'Zone 7: le tunnel (acte 3)')}
+    vues = {'B': ('zone-1-bourg', (144, 60, 178, 80), 'Zone 1: le bourg et le passage à niveau (acte 1)'),
+            'R': ('zone-2-riviere-bief', (0, 100, 194, 64), 'Zone 2: la rivière et le bief, côté amont (acte 2); l’aval longe le bourg (zone 1)'),
+            'V': ('zone-3-voie-poste', (0, 80, 190, 64), "Zone 3: la voie jusqu'au poste d'aiguillage (acte 2), tranchée de 64 m de plus"),
+            'C': ('zone-4-cote', (96, 0, 270, 100), 'Zone 4: la Côte (acte 3)'),
+            'M': ('zone-5-moulin', (100, 96, 64, 44), 'Zone 5: le moulin (acte 3)'),
+            'F': ('zone-6-ferme', (126, 122, 212, 84), 'Zone 6: la ferme (acte 3)'),
+            'T': ('zone-7-tunnel', (270, 0, 114, 112), 'Zone 7: le tunnel (acte 3)')}
     for kz, (nom, vue, titre) in vues.items():
         k = vue[2] / 250.0
         el = fond(k, numeros=False, sans_poi=True)
@@ -832,8 +1377,13 @@ def dessiner(dist_t):
                 vus.append((x, x + l, y, y + h))
                 lg.append(('num', bb['nom'] + ' (' + bb['qui'].split(',')[0].split(' (')[0] + ')', str(i + 1)))
         lg.append(('t', 'Points d’intérêt', None))
+        centres = [(bb['rect'][0] + bb['rect'][2] / 2, bb['rect'][1] + bb['rect'][3] / 2) for bb in B]
         for j, q in enumerate(P):
             if dedans(q['x'], q['y']):
+                qx, qy = q['x'], q['y']
+                while any(math.hypot(qx - cx_, qy - cy_) < 4.4 * kk_ for cx_, cy_ in centres):
+                    qx += 1.2 * kk_
+                q = dict(q, x=qx, y=qy)
                 el.append('<circle cx="%g" cy="%g" r="%g" fill="%s" stroke="#FFFDF5" stroke-width="%g"/>' % (q['x'], q['y'], 1.9 * kk_, COUL_P[q['type']], 0.3 * kk_))
                 el.append(texte(q['x'], q['y'] + 0.75 * kk_, str(j + 1), 2.1 * kk_, coul='#FFFFFF', gras=True, halo=False))
                 vus.append((q['x'] - 2 * kk_, q['x'] + 2 * kk_, q['y'] - 2 * kk_, q['y'] + 2 * kk_))
@@ -851,14 +1401,16 @@ def dessiner(dist_t):
             if dedans(v['x'], v['y']):
                 lg.append(('num', v['obstacle'][:60], kk))
         lg += [('t', 'Signes', None), ('etoile', 'repère visible de loin', None), ('carre', 'point clair: la porte du bâtiment', '#B86B4F'),
-               ('carre', 'rouge: verrou; bleu: raccourci', '#B3261E'), ('trait', 'sentier (1 m); plein: chemin, rue, route', ('#B08A56', 2, '4 3'))]
+               ('carre', 'rouge: verrou; bleu: raccourci', '#B3261E'), ('trait', 'sentier (1 m); plein: chemin, rue, route', ('#B08A56', 2, '4 3')),
+               ('trait', 'lisière: haie', ('#4F7244', 3, '4 3')), ('trait', 'lisière: talus', ('#8C6A45', 3, None)), ('trait', 'lisière: clôture, grille', ('#5A4632', 3, '2 3')),
+               ('trait', 'lisière: bois dense', ('#3F6453', 3, None)), ('carre', 'hors jeu (décor: talus, prés, bois)', '#A7B38F')]
         page(nom, vue, 1500, el, lg, titre)
 
     # ---- plans des trajets de quête
     coul_q = {'A1': '#C2410C', 'A2': '#1D4ED8', 'A2p': '#0E7490', 'A3': '#7E22CE', 'S3': '#B45309', 'S5': '#0F766E'}
-    for nom, ids, titre, vue in (('quetes-acte-1', ['A1'], 'Sentiers de quête, acte 1: le tour du propriétaire (bourg)', (84, 76, 130, 62)),
-                                 ('quetes-acte-2', ['A2', 'A2p'], "Sentiers de quête, acte 2: la voie jusqu'au signal, retour par la vanne et la berge", (0, 78, 256, 86)),
-                                 ('quetes-acte-3', ['A3', 'S3', 'S5'], 'Sentiers de quête, acte 3: le tunnel, retour par le belvédère; les pas blancs; la draisine', (20, 0, 300, 172))):
+    for nom, ids, titre, vue in (('quetes-acte-1', ['A1'], 'Sentiers de quête, acte 1: le tour du propriétaire (bourg)', (148, 76, 130, 62)),
+                                 ('quetes-acte-2', ['A2', 'A2p'], "Sentiers de quête, acte 2: la voie jusqu'au signal, retour par la vanne et la berge", (0, 78, 330, 86)),
+                                 ('quetes-acte-3', ['A3', 'S3', 'S5'], 'Sentiers de quête, acte 3: le tunnel, retour par le belvédère; les pas blancs; la draisine', (84, 0, 300, 172))):
         k = vue[2] / 250.0
         el = fond(k, attenue=True)
         lg = [('t', 'Trajets', None)]
@@ -894,6 +1446,7 @@ def dessiner(dist_t):
 
 
 if __name__ == '__main__':
+    BORD = bordures()
     dist_t, dens = calculer()
     ecrire_json(dist_t, dens)
     tableaux(dist_t, dens)

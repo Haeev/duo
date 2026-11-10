@@ -1,0 +1,122 @@
+{
+ "schema": 1,
+ "id": "maison-rdc",
+ "name": "La maison du garde, rez-de-chaussée",
+ "width": 10,
+ "height": 7,
+ "at": {
+  "x": 14,
+  "y": 210
+ },
+ "blocked": [
+  {
+   "x": 5,
+   "y": 0,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "x": 5,
+   "y": 3,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "x": 5,
+   "y": 6,
+   "w": 1,
+   "h": 1
+  },
+  {
+   "x": 6,
+   "y": 4,
+   "w": 2,
+   "h": 1
+  }
+ ],
+ "points": {
+  "maison-lit-g": {
+   "x": 8.5,
+   "y": 4.5
+  },
+  "maison-lit-d": {
+   "x": 9.5,
+   "y": 4.5
+  },
+  "maison-cuisine": {
+   "x": 8,
+   "y": 5.5
+  }
+ },
+ "objects": [
+  {
+   "id": "maison-cuisiniere",
+   "type": "cuisiniere",
+   "x": 9.5,
+   "y": 6.5,
+   "rotation": 0
+  },
+  {
+   "id": "maison-plan",
+   "type": "plan-de-travail",
+   "x": 8,
+   "y": 6.5,
+   "rotation": 0
+  },
+  {
+   "id": "maison-table",
+   "type": "table-a-manger",
+   "x": 7,
+   "y": 2,
+   "rotation": 0
+  },
+  {
+   "id": "maison-chaise-1",
+   "type": "chaise",
+   "x": 7,
+   "y": 1,
+   "rotation": 0
+  },
+  {
+   "id": "maison-chaise-2",
+   "type": "chaise",
+   "x": 7,
+   "y": 3,
+   "rotation": 2
+  },
+  {
+   "id": "lit-de-la-maison",
+   "type": "lit-double",
+   "x": 9,
+   "y": 3,
+   "rotation": 0
+  },
+  {
+   "id": "maison-armoire",
+   "type": "armoire",
+   "x": 4.5,
+   "y": 0.5,
+   "rotation": 0
+  }
+ ],
+ "doors": {
+  "maison-rdc-porte": {
+   "x": 9.5,
+   "y": 1.5,
+   "facing": 3,
+   "to": "porte-maison-maison-rdc"
+  },
+  "maison-rdc-esc-maison-etage": {
+   "x": 5.5,
+   "y": 4.5,
+   "facing": 0,
+   "to": "maison-etage-esc-maison-rdc"
+  },
+  "maison-rdc-esc-maison-cave": {
+   "x": 0.5,
+   "y": 3.5,
+   "facing": 0,
+   "to": "maison-cave-esc-maison-rdc"
+  }
+ }
+}

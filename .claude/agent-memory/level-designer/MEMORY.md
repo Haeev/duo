@@ -111,3 +111,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Piège vu au banc d'épreuve: un croisement « franc » de segments ne voit pas un chemin dont un noeud est posé pile sur l'eau ou sur la voie (pont, passage à niveau): ajouter un contrôle par noeud (noeud dans l'eau ou sur la voie sans ouvrage).
 - Lisibilité: sur un plan dense, numéroter bâtiments et points d'intérêt et mettre les noms dans un panneau à droite; les étiquettes directes se chevauchent dès 20 éléments. Échelle et nord dans le bandeau du titre, jamais sur la carte.
 - Mesurer avant d'écrire: mes longueurs estimées de tête étaient fausses d'un facteur 2 (ligne morte annoncée 160 m, mesurée 93 m). Un sentier linéaire sur une carte de 320 m fait vite moins de 100 m: vérifier la longueur des sentiers de quête dès le premier tracé.
+
+## Plan version 2 vers le lieu (Aubrune, vérifié le 2026-11-10)
+
+- `outils/plan-vers-lieu.ts` exige `version: 1` (littéral): garder `version: 1` et noter la révision du contenu à part (`revision: 2`). Il ne lit ni portes, ni meubles, ni intérieurs: `assembler_lieu.py` (dans le dossier du plan) les ajoute après lui; relancer toujours les deux étapes.
+- Un verrou posé à l'intérieur d'une zone (deux nœuds de la même zone) devient un carré de 7 m au centre du verrou: il ne tient que dans un couloir plus étroit, entouré de hors-jeu (un trou dans les zones est plein pour l'outil). Le relevé de fuites de l'outil ne le voit pas: prouver chaque verrou par remplissage sur la grille, avec les verrous des actes suivants et les raccourcis fermés.
+- Deux zones du même acte qui se touchent n'ont pas de lisière: le belvédère touchait le tunnel, la Côte touchait la courbe, et V8, V10 se contournaient. Séparer par une bande hors jeu (talus, rocher).
+- Le chargeur refuse un point sur une case pleine (banc, lit, eau): poser le point sur la case libre la plus proche (le siège devant le banc, le pêcheur sur la berge). `comptoir-buvette` exige son commerce: ne pas l'employer comme simple comptoir.
+- Ajouter un troisième lieu (`aubrune`) casse `tests/donnees.test.ts` et `tests/aides-sauvegarde.ts`, qui supposent deux lieux d'essai, le premier par ordre alphabétique étant le départ.
+- Garde-fou: les commandes git qui lisent une autre branche passent seules (`git show <branche>:<chemin>`), sans redirection ni enchaînement; les longs scripts de retouche vont dans un fichier du dossier temporaire, à mon nom (`ld-v2/`), car ce dossier est partagé (un `os.py` d'un autre membre y traîne: toujours `python3 -I`).
