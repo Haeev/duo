@@ -21,6 +21,7 @@ import {
   type SlotRefModel,
 } from './modeles';
 import { createCarnetTabs, type CarnetTabsOptions, type TabId } from './carnet/index';
+import { swallowedAtOpening } from './carnet/onglet';
 import { itemThumb } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
@@ -95,6 +96,8 @@ export function createNotebook(
   let focus = 0;
   let held: SlotRefModel | null = null;
   let openedAt = 0;
+  /** Une touche a déjà été reçue depuis l'ouverture: un C qui suit n'est plus un double appui. */
+  let keyedSinceOpen = false;
   /** L'ouverture (le carnet qui monte) ne se joue qu'une fois, pas à chaque redessin. */
   let entering = false;
   let drawn = '';
@@ -578,6 +581,7 @@ export function createNotebook(
       held = null;
       equipNote = null;
       openedAt = now;
+      keyedSinceOpen = false;
       layer.hidden = false;
       redraw();
     },
@@ -588,6 +592,7 @@ export function createNotebook(
       focus = 0;
       held = null;
       openedAt = now;
+      keyedSinceOpen = false;
       layer.hidden = false;
       redraw();
     },
@@ -644,7 +649,9 @@ export function createNotebook(
     },
     key(code, shift, now) {
       if (mode.kind === 'closed' || last === null) return false;
-      if (now - openedAt < openGuardMs) return true;
+      const firstKey = !keyedSinceOpen;
+      keyedSinceOpen = true;
+      if (swallowedAtOpening(mode.kind, code, now - openedAt, openGuardMs, firstKey)) return true;
       const { world, local } = last;
       const current = tabId();
       if (

@@ -48,6 +48,28 @@ export const DIRECTION_KEYS: Readonly<Record<string, Direction>> = {
   KeyS: 'down',
 };
 
+/** Touches qui ferment le carnet: C (celle qui l'ouvre) et Retour arrière. */
+export const CLOSE_KEYS: readonly string[] = ['KeyC', 'Backspace'];
+
+/**
+ * Garde d'ouverture (interface.md, 5.3): seul un second appui immédiat est avalé. Le carnet s'ouvre
+ * par C: si la première touche reçue pendant la garde est C ou Retour arrière, elle est avalée, car
+ * elle le refermerait aussitôt. A, E, les flèches et les actions passent toujours, et après elles C
+ * ferme (geste voulu); sinon C puis E tapés vite menaient au Sac ou aux Quêtes selon le minutage.
+ * Le rangement s'ouvre par Espace sur un meuble: toute touche y est avalée pendant la garde, car
+ * Espace et Entrée y prennent ou rangent.
+ */
+export function swallowedAtOpening(
+  opened: 'notebook' | 'store',
+  code: string,
+  sinceOpenMs: number,
+  guardMs: number,
+  firstKey: boolean,
+): boolean {
+  if (sinceOpenMs >= guardMs) return false;
+  return opened === 'store' || (firstKey && CLOSE_KEYS.includes(code));
+}
+
 /** Dépendances que le carnet donne à ses onglets. */
 export interface TabDeps {
   /** Redessine l'onglet courant (après un clic ou un changement local). */
