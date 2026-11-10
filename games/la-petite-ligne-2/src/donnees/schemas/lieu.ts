@@ -147,6 +147,8 @@ export const LockSchema = v.strictObject({
   opens: v.pipe(v.array(ConditionSchema), v.minLength(1)),
   /** Ce que le joueur voit et ce qui le lève, pour le level designer et le game designer. */
   note: v.optional(TextSchema),
+  /** Phrase courte montrée par la touche d'action tant qu'il est fermé (« pas encore »). */
+  says: v.optional(TextSchema),
 });
 export type LockDef = v.InferOutput<typeof LockSchema>;
 
@@ -208,12 +210,23 @@ export const BuildingSchema = v.strictObject({
 /**
  * Porte qui relie deux grilles du même lieu (le dehors et un intérieur, ou deux intérieurs).
  * Entrer dans sa case mène à la porte `to`, tourné vers `facing`. Les portes vont par paires.
+ * Les champs facultatifs règlent le passage dans ce sens-ci seulement: on ressort toujours.
  */
 export const DoorSchema = v.strictObject({
   x: FiniteSchema,
   y: FiniteSchema,
   facing: QuarterSchema,
   to: IdSchema,
+  /** `walk` (défaut): on passe en marchant dessus; `act`: par la touche d'action sur `object`. */
+  enter: v.optional(v.picklist(['walk', 'act'])),
+  /** Objet visible de la carte (brique `passage`): obligatoire pour `act`. */
+  object: v.optional(IdSchema),
+  /** Fermée à clé tant qu'une de ces conditions est fausse. */
+  opens: v.optional(v.array(ConditionSchema)),
+  /** Porte d'un commerce du lieu: fermée hors de ses heures d'ouverture. */
+  shop: v.optional(IdSchema),
+  /** Phrase courte montrée quand elle est fermée. */
+  says: v.optional(TextSchema),
 });
 export type DoorDef = v.InferOutput<typeof DoorSchema>;
 

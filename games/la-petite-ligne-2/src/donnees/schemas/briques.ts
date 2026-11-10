@@ -89,6 +89,11 @@ export const BRICK_SCHEMAS = [
    * pas de zone d'embarquement sans objet.
    */
   v.strictObject({ brick: v.literal('travel') }),
+  /**
+   * Passage: l'objet visible d'un verrou d'histoire (barrière, éboulis) ou d'une porte à la touche
+   * d'action (`simulation/lieux/`). Ce qu'il fait se lit dans la carte, qui le nomme.
+   */
+  v.strictObject({ brick: v.literal('passage') }),
   /** Points de récolte du monde et terre cultivable (`recolte-briques.ts`). */
   ...HARVEST_BRICK_SCHEMAS,
   /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */

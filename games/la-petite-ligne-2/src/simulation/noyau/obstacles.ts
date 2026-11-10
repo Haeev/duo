@@ -1,13 +1,15 @@
 /**
  * Obstacles du lieu courant: la carte, plus l'emprise des meubles solides (ceux de la carte et
- * ceux posés par les joueurs). Pur et gardé d'un pas à l'autre: la couche des meubles n'est
- * refaite que si un meuble a changé. Sert à l'hôte et à la prédiction de l'invité.
+ * ceux posés par les joueurs) et les verrous d'histoire fermés (`lieux/verrous.ts`). Pur et gardé
+ * d'un pas à l'autre: la couche mobile n'est refaite que si un meuble a changé ou si un verrou
+ * s'est ouvert ou fermé. Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PropDef } from '../../donnees/schemas/meuble';
 import type { PlaceState } from '../../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../../etat/monde';
 import type { Blockers } from './grille';
+import { lockCount, markClosedLocks, refreshLockStates } from '../lieux/verrous';
 
 /** Un meuble en place, qu'il vienne de la carte ou d'un joueur. */
 export interface PropInstance {
@@ -23,6 +25,10 @@ export type ReadPlace = DeepReadonly<PlaceState>;
 interface Cached {
   readonly blockers: Blockers;
   signature: number;
+  /** État des verrous à la dernière construction (1 ouvert), dans l'ordre de la carte. */
+  readonly locks: Uint8Array;
+  /** Objets de la carte qui sont l'obstacle d'un verrou, et l'index de ce verrou. */
+  readonly lockObjects: ReadonlyMap<string, number>;
 }
 
 const cache = new WeakMap<PlaceContent, Cached>();
@@ -38,9 +44,11 @@ export function footprintOf(
   return rotation % 2 === 0 ? def.size : { w: def.size.h, h: def.size.w };
 }
 
-/** Un meuble solide bloque, sauf une porte ouverte (brique `open`). */
-function blocks(def: PropDef, state: ReadPlace, id: string): boolean {
+/** Un meuble solide bloque, sauf une porte ouverte (brique `open`) ou l'obstacle d'un verrou ouvert. */
+function blocks(def: PropDef, state: ReadPlace, id: string, cached: Cached): boolean {
   if (!def.solid) return false;
+  const lock = cached.lockObjects.get(id);
+  if (lock !== undefined) return cached.locks[lock] !== 1;
   return state.objects[id]?.open !== true;
 }
 
@@ -59,9 +67,10 @@ function signatureOf(place: PlaceContent, state: ReadPlace): number {
   return h;
 }
 
-function mark(content: Content, b: Blockers, state: ReadPlace, prop: PropInstance): void {
+function mark(content: Content, cached: Cached, state: ReadPlace, prop: PropInstance): void {
+  const b = cached.blockers;
   const def = content.props[prop.type];
-  if (def === undefined || !blocks(def, state, prop.id)) return;
+  if (def === undefined || !blocks(def, state, prop.id, cached)) return;
   const size = footprintOf(def, prop.rotation);
   const maxX = Math.floor(prop.x + size.w / 2 - EDGE);
   const maxY = Math.floor(prop.y + size.h / 2 - EDGE);
@@ -72,8 +81,13 @@ function mark(content: Content, b: Blockers, state: ReadPlace, prop: PropInstanc
   }
 }
 
-/** Les obstacles d'un lieu dans son état actuel. */
-export function placeBlockers(content: Content, place: PlaceContent, state: ReadPlace): Blockers {
+/** Les obstacles d'un lieu dans son état actuel; `world` dit quels verrous sont ouverts. */
+export function placeBlockers(
+  content: Content,
+  place: PlaceContent,
+  state: ReadPlace,
+  world: ReadonlyWorld,
+): Blockers {
   let cached = cache.get(place);
   if (cached === undefined) {
     const { width, height } = place.map;
@@ -83,18 +97,30 @@ export function placeBlockers(content: Content, place: PlaceContent, state: Read
         for (let cx = Math.max(0, r.x); cx < Math.min(width, r.x + r.w); cx++)
           fixed[cy * width + cx] = 1;
     }
+    const lockObjects = new Map<string, number>();
+    let index = 0;
+    for (const id in place.map.locks ?? {}) {
+      const object = place.map.locks?.[id]?.object;
+      if (object !== undefined && object !== null) lockObjects.set(object, index);
+      index++;
+    }
     cached = {
       blockers: { width, height, fixed, props: new Uint8Array(width * height) },
       signature: Number.NaN,
+      // 2: ni ouvert ni fermé, pour forcer la première construction.
+      locks: new Uint8Array(lockCount(place)).fill(2),
+      lockObjects,
     };
     cache.set(place, cached);
   }
+  const locksChanged = refreshLockStates({ content, world }, place, cached.locks);
   const signature = signatureOf(place, state);
-  if (signature !== cached.signature) {
+  if (signature !== cached.signature || locksChanged) {
     cached.signature = signature;
     cached.blockers.props.fill(0);
-    for (const object of place.map.objects) mark(content, cached.blockers, state, object);
-    for (const placed of state.placed) mark(content, cached.blockers, state, placed);
+    markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);
+    for (const object of place.map.objects) mark(content, cached, state, object);
+    for (const placed of state.placed) mark(content, cached, state, placed);
   }
   return cached.blockers;
 }
@@ -104,7 +130,7 @@ export function currentBlockers(content: Content, world: ReadonlyWorld): Blocker
   const place = content.places[world.common.place];
   const state = world.places[world.common.place];
   if (place === undefined || state === undefined) return null;
-  return placeBlockers(content, place, state);
+  return placeBlockers(content, place, state, world);
 }
 
 /** Le meuble de cet identifiant d'instance, dans la carte ou parmi les meubles posés. */

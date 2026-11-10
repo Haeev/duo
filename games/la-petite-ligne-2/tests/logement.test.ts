@@ -50,6 +50,7 @@ function refusalOf(sim: Sim, candidate: Candidate): string | null {
     content: sim.content,
     place,
     state,
+    world: sim.world,
     housing: def,
     candidate,
     exclude: new Set(),

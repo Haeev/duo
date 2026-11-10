@@ -441,6 +441,7 @@ function decoIntent(sim: SimContext, player: PlayerIndex, ctx: Ctx, intent: Inte
         content: sim.content,
         place: ctx.place,
         state: ctx.pstate,
+        world: sim.world,
         housing: ctx.def,
         candidate: held,
         exclude,

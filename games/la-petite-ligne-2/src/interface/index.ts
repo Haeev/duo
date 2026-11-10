@@ -282,6 +282,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'tool_upgraded':
       case 'villager_arrived':
       case 'villager_door':
+      case 'lock_opened':
+      case 'lock_closed':
+      case 'door_passed':
       case 'villager_gift':
       case 'villager_greeted':
       case 'villager_left':

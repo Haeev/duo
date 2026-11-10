@@ -19,6 +19,7 @@ import { questSystem } from '../quetes/index';
 import { collectionSystem } from '../collections/index';
 import { worldTimeSystem } from '../monde/index';
 import { housingSystem } from '../logement/index';
+import { placeSystem } from '../lieux/index';
 import { bagSystem } from '../sac/index';
 import { sceneSystem } from '../scenes/index';
 import { travelSystem } from '../voyage/index';
@@ -56,6 +57,7 @@ export interface GameSystem {
 /** Ordre d'exécution à chaque pas. */
 export const SYSTEMS: readonly GameSystem[] = [
   travelSystem,
+  placeSystem,
   brickSystem,
   bagSystem,
   shopSystem,

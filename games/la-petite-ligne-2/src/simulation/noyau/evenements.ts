@@ -17,6 +17,7 @@ import { QUEST_EVENTS } from '../quetes/evenements';
 import { COLLECTION_EVENTS } from '../collections/evenements';
 import { WORLD_EVENTS } from '../monde/evenements';
 import { HOUSING_EVENTS } from '../logement/evenements';
+import { PLACE_EVENTS } from '../lieux/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
 import { SCENE_EVENTS } from '../scenes/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
@@ -73,5 +74,6 @@ export const GameEventSchema = v.variant('type', [
   ...COLLECTION_EVENTS,
   ...HOUSING_EVENTS,
   ...FISHING_EVENTS,
+  ...PLACE_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

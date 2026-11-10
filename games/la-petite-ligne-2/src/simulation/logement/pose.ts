@@ -7,7 +7,7 @@ import type { DecoDef, HousingDef, HousingFunction, RoomDef } from '../../donnee
 import type { PropDef } from '../../donnees/schemas/meuble';
 import type { HousingState } from '../../etat/logement';
 import { footprintOf, placeBlockers, type PropInstance, type ReadPlace } from '../noyau/obstacles';
-import type { DeepReadonly } from '../../etat/monde';
+import type { DeepReadonly, ReadonlyWorld } from '../../etat/monde';
 import { HOUSING_TUNING } from './reglages';
 
 export type PlacementRefusal =
@@ -315,6 +315,8 @@ export interface PlacementQuery {
   readonly content: Content;
   readonly place: PlaceContent;
   readonly state: ReadPlace;
+  /** Le monde, pour l'état des verrous du lieu (`placeBlockers`). */
+  readonly world: ReadonlyWorld;
   readonly housing: HousingDef;
   readonly candidate: Candidate;
   /** Instances à ignorer: le meuble en main et ce qui est posé dessus. */
@@ -323,13 +325,13 @@ export interface PlacementQuery {
 
 /** Raison du refus de pose, `null`: la place est bonne. */
 export function placementRefusal(q: PlacementQuery): PlacementRefusal | null {
-  const { content, place, state, housing, candidate } = q;
+  const { content, place, state, world, housing, candidate } = q;
   const def = content.props[candidate.type];
   if (def === undefined) return 'outside';
   const hstate = state.housing?.[housing.id];
   const deco = decoOf(def);
   const box = boxOf(def, candidate);
-  const blockers = placeBlockers(content, place, state);
+  const blockers = placeBlockers(content, place, state, world);
 
   // Zone: une pièce restaurée, ou le jardin pour ce qui va dehors.
   let room: RoomDef | null = null;

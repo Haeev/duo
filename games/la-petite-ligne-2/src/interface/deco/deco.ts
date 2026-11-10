@@ -218,7 +218,15 @@ export function createDecoMode(options: DecoOptions): DecoMode {
       const p = state.placed.find((x) => x.id === hold.prop);
       if (p !== undefined) for (const t of propsOnTop(content, state, p)) exclude.add(t.id);
     }
-    return placementRefusal({ content, place, state, housing: h.def, candidate: c, exclude });
+    return placementRefusal({
+      content,
+      place,
+      state,
+      world: h.world,
+      housing: h.def,
+      candidate: c,
+      exclude,
+    });
   }
 
   function worldAt(ev: MouseEvent): { x: number; y: number } | null {

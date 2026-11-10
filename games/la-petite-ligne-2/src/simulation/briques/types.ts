@@ -48,6 +48,8 @@ export interface BrickBehaviour<B extends Brick = Brick> {
   verbOf?(look: Look, player: PlayerIndex, target: BrickView<B>): string;
   /** Geste joué avant l'effet; absent ou `null`: l'effet est immédiat. */
   gesture?(look: Look, player: PlayerIndex, target: BrickView<B>): GestureSpec | null;
+  /** Vrai: la brique n'offre rien en ce moment, son meuble n'est pas une cible (verrou ouvert). Pur. */
+  inert?(look: Look, player: PlayerIndex, target: BrickView<B>): boolean;
   /** Clé de texte du refus, ou `null` si la brique peut servir à ce joueur maintenant. Pur. */
   refuse(look: Look, player: PlayerIndex, target: BrickView<B>): string | null;
   /**

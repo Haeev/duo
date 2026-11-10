@@ -20,6 +20,7 @@ import { validateVillagerLives } from '../simulation/habitants/valider';
 import { validateStory } from '../simulation/quetes/valider';
 import { checkRecipes } from '../simulation/cuisine/valider';
 import { validateHousings } from '../simulation/logement/valider';
+import { validatePassages } from '../simulation/lieux/valider';
 
 export function checkCondition(
   content: Content,
@@ -353,6 +354,7 @@ function checkLargePlace(content: Content, place: PlaceContent, problems: string
     if (target === undefined) problems.push(`${where}: porte d'arrivée inconnue « ${door.to} »`);
     else if (target.to !== id) problems.push(`${where}: « ${door.to} » ne ramène pas ici`);
     if (!within({ x: door.x, y: door.y, w: 0, h: 0 })) problems.push(`${where}: hors de la carte`);
+    for (const c of door.opens ?? []) checkCondition(content, c, where, problems);
   }
   const objectIds = new Set(map.objects.map((o) => o.id));
   const withBricks = map.objects.filter((o) => (content.props[o.type]?.bricks.length ?? 0) > 0);
@@ -501,5 +503,6 @@ export function validateContent(content: Content): string[] {
   // Suites de quêtes et scènes: références, et aucune suite qui puisse se bloquer.
   problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));
   problems.push(...validateHousings(content));
+  problems.push(...validatePassages(content));
   return problems;
 }

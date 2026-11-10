@@ -6,7 +6,7 @@
 | `systemes.ts` (L0)                             | `SimContext`, `GameSystem`, liste `SYSTEMS`                                                                              |
 | `entrees.ts`, `evenements.ts`, `intentions.ts` | unions réunies à partir des tableaux de chaque lot; événements `day_started` et `unstuck`                                |
 | `monde.ts`                                     | partie neuve, état d'un lieu à la première visite, placement à la descente du train                                      |
-| `grille.ts`, `obstacles.ts`                    | collisions sur la grille du lieu: carte et meubles solides (une porte ouverte ne bloque pas)                             |
+| `grille.ts`, `obstacles.ts`                    | collisions: carte, meubles solides (porte ouverte exceptée), verrous fermés (`lieux/`)                                   |
 | `deplacement.ts`                               | `walkStep` et `canWalk`, purs; `movePlayers` chez l'hôte                                                                 |
 | `deblocage.ts`                                 | personnage pris dans un obstacle ou enfermé                                                                              |
 | `horloge.ts`                                   | heure, nuit, aube, saut de nuit                                                                                          |

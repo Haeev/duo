@@ -20,6 +20,7 @@ import { pickupBehaviour } from './ramasser';
 import { storeBehaviour } from './ranger';
 import type { BrickRegistry, EntityBehaviour } from './types';
 import { travelBehaviour } from '../voyage/brique';
+import { passageBehaviour } from '../lieux/passage';
 
 export type {
   Aim,
@@ -48,6 +49,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   shop: shopBehaviour,
   ...HARVEST_BRICKS,
   mirror: mirrorBehaviour,
+  passage: passageBehaviour,
 };
 
 /** Actions sur ce qui n'est pas un meuble: un objet au sol (`pickup`), un habitant (`talk`). */
