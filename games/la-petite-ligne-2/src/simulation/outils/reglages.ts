@@ -3,13 +3,10 @@
  * designer. Ce qui varie d'un contenu à l'autre vit dans les données (outils, cultures,
  * ressources); ici, les règles communes.
  */
-import type { Weather } from './saison';
 
 export interface HarvestTuning {
   /** Points de pousse d'un jour: sec, puis arrosé ou de pluie (« compte double »). */
   readonly growth: { readonly dry: number; readonly watered: number };
-  /** Météos qui arrosent le potager. */
-  readonly rainWeathers: readonly Weather[];
   /** Bêcher: points de travail d'une case (bêche de base à 3 par coup: 2 coups), geste salissant. */
   readonly till: {
     readonly work: number;
@@ -30,7 +27,6 @@ export interface HarvestTuning {
 
 export const HARVEST_TUNING: HarvestTuning = {
   growth: { dry: 1, watered: 2 },
-  rainWeathers: ['rain'],
   till: { work: 6, clip: 'dig', dirty: true, effort: 0.2 },
   sow: { clip: 'sow', seconds: 0.6 },
   water: { clip: 'water', effort: 0 },
