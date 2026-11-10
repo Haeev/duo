@@ -97,6 +97,14 @@ describe('lieux d’essai', () => {
     expect(placeOf(id).map.objects.some((o) => o.type === 'table-a-manger')).toBe(true);
   });
 
+  it('la halte d’essai a sa cuisine (réchaud, cuisinière, plan de travail, table) et un miroir', () => {
+    const bricks = bricksAt('essai-halte');
+    for (const brick of ['cook', 'mirror']) expect(bricks).toContain(brick);
+    const types = placeOf('essai-halte').map.objects.map((o) => o.type);
+    for (const type of ['rechaud', 'cuisiniere', 'plan-de-travail', 'table-a-manger'])
+      expect(types).toContain(type);
+  });
+
   it.each(PLACES)(
     '%s: chaque meuble et chaque habitant touche une case libre atteignable',
     (id) => {
