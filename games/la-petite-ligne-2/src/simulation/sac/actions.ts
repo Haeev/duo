@@ -6,10 +6,11 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { PlayerState, Stack } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import type { SimContext } from '../noyau/systemes';
-import { addStack, newStack } from './inventaire';
+import type { SlotRef } from './cases';
+import { addStack, newStack, setStack, slotExists, stackAt } from './inventaire';
 
 /** Au plus 80 objets au sol (`etat/lieu.ts`): au-delà, le plus ancien disparaît. */
-const GROUND_MAX = 80;
+export const GROUND_MAX = 80;
 
 export function currentPlace(sim: SimContext): PlaceState | null {
   return sim.world.places[sim.world.common.place] ?? null;
@@ -77,4 +78,34 @@ export function equipBag(sim: SimContext, player: PlayerIndex, bagId: string): b
 /** Distance au sol entre un joueur et un point. */
 export function distanceTo(state: PlayerState, x: number, y: number): number {
   return Math.hypot(state.body.x - x, state.body.y - y);
+}
+
+/**
+ * Équipe le sac contenu dans une case de la barre ou du sac (objet à champ `bag`). L'objet est
+ * consommé; le sac porté jusque-là revient dans les poches s'il a son objet (famille `bag`), sinon
+ * il disparaît comme avec `give_bag`. Renvoie la raison du refus, ou `null`.
+ */
+export function equipBagItem(
+  sim: SimContext,
+  player: PlayerIndex,
+  from: SlotRef,
+): 'empty-slot' | 'not-a-bag' | 'no-slot' | null {
+  const state: PlayerState = sim.world.players[player];
+  if (!slotExists(state, from)) return 'no-slot';
+  const stack = stackAt(state, from);
+  if (stack === null) return 'empty-slot';
+  const bagId = sim.content.items[stack.item]?.bag;
+  if (bagId === undefined) return 'not-a-bag';
+  const previous = state.bag?.id;
+  setStack(state, from, null);
+  if (!equipBag(sim, player, bagId)) {
+    // Données inconnues du validateur: on rend la pile plutôt que de la perdre.
+    setStack(state, from, stack);
+    return 'not-a-bag';
+  }
+  const old = Object.values(sim.content.items).find(
+    (item) => previous !== undefined && item.bag === previous,
+  );
+  if (old !== undefined) giveItem(sim, player, old.id, 1);
+  return null;
 }

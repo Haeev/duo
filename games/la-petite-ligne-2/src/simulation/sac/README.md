@@ -8,3 +8,5 @@
 - `argent.ts`: centimes entiers, `formatEuros` (seule mise en forme des montants), bourse, coffre commun.
 - `briques.ts`: briques `store` et `repair` pour le registre.
 - `index.ts`: intentions `move_stack`, `drop`, `pick_up`, `give_stack`, `chest_deposit`, `chest_withdraw`, `store_put`, `store_take`; chaque refus part en `refused` avec sa raison.
+- `sol.ts`: objets posés au sol par la carte (`groundItems`): posés à la création du lieu, remis chaque matin avec `respawnDaily` (état: `groundDay` de la tranche « lieu »).
+- Sac comme objet: intention `equip_bag` (objet à champ `bag`, `equipBagItem` dans `actions.ts`); le sac porté revient dans les poches. `give_bag` reste valable.

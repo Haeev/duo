@@ -9,7 +9,7 @@ import type { ShopDef } from './schemas/commerce';
 import { shopProblems } from '../simulation/commerces/validation';
 import { NEED_IDS } from './schemas/communs';
 import type { DialogueDef } from './schemas/dialogue';
-import { PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schemas/lieu';
+import { GROUP_MAX_SPAN, PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schemas/lieu';
 import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
 import type { QuestLineDef } from './schemas/quete';
@@ -222,6 +222,53 @@ function checkShop(content: Content, place: PlaceContent, shop: ShopDef, problem
   for (const problem of shopProblems(content, shop)) problems.push(`${at}: ${problem}`);
 }
 
+/** Ensembles de meubles (`group`): deux meubles au moins, un siège au moins, assez proches pour un repas. */
+function checkGroups(content: Content, place: PlaceContent, problems: string[]): void {
+  const groups = new Map<string, MapObject[]>();
+  for (const o of place.map.objects) {
+    if (o.group === undefined) continue;
+    const list = groups.get(o.group);
+    if (list === undefined) groups.set(o.group, [o]);
+    else list.push(o);
+  }
+  for (const [name, members] of groups) {
+    const where = `lieu ${place.def.id}, groupe « ${name} »`;
+    if (members.length < 2) problems.push(`${where}: un groupe réunit deux meubles au moins`);
+    if (!members.some((o) => content.props[o.type]?.bricks.some((b) => b.brick === 'sit')))
+      problems.push(`${where}: aucun meuble à brique \`sit\``);
+    for (const a of members)
+      for (const b of members)
+        if (Math.hypot(a.x - b.x, a.y - b.y) > GROUP_MAX_SPAN)
+          problems.push(
+            `${where}: « ${a.id} » et « ${b.id} » à plus de ${String(GROUP_MAX_SPAN)} m l'un de l'autre`,
+          );
+  }
+}
+
+/** Objets posés au sol par la carte: objet connu, pile permise, dans la carte, hors d'une zone bloquée. */
+function checkGroundItems(
+  content: Content,
+  place: PlaceContent,
+  blockedAt: (x: number, y: number) => boolean,
+  inside: (x: number, y: number) => boolean,
+  problems: string[],
+): void {
+  const ids = new Set<string>();
+  for (const g of place.map.groundItems ?? []) {
+    const where = `lieu ${place.def.id}, objet au sol ${g.id}`;
+    if (ids.has(g.id)) problems.push(`${where}: identifiant en double`);
+    ids.add(g.id);
+    const item = content.items[g.item];
+    if (item === undefined) problems.push(`${where}: objet inconnu « ${g.item} »`);
+    else if (g.count > item.stack)
+      problems.push(
+        `${where}: ${String(g.count)} exemplaires pour une pile de ${String(item.stack)}`,
+      );
+    if (!inside(g.x, g.y)) problems.push(`${where}: hors de la carte`);
+    else if (blockedAt(g.x, g.y)) problems.push(`${where}: dans une zone bloquée`);
+  }
+}
+
 function checkPlace(content: Content, place: PlaceContent, problems: string[]): void {
   const { def, map } = place;
   const at = `lieu ${def.id}`;
@@ -265,6 +312,8 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
         problems.push(`${where}: commerce inconnu « ${brick.shop} » dans ce lieu`);
     }
   }
+  checkGroups(content, place, problems);
+  checkGroundItems(content, place, blockedAt, inside, problems);
   for (const villager of place.villagers) {
     // La clé d'amitié par joueur (`bondKey`) préfixe l'identifiant: il doit y tenir.
     if (villager.id.length + BOND_KEY_PREFIX_LENGTH > 40)
@@ -444,6 +493,13 @@ export function validateContent(content: Content): string[] {
     if (item.tool !== null && item.stack !== 1) problems.push(`${at}: un outil ne s'empile pas`);
     if ((item.family === 'tool') !== (item.tool !== null))
       problems.push(`${at}: famille « tool » et champ \`tool\` vont ensemble`);
+    if ((item.family === 'bag') !== (item.bag !== undefined))
+      problems.push(`${at}: famille « bag » et champ \`bag\` vont ensemble`);
+    if (item.bag !== undefined) {
+      if (!bags.bags.some((b) => b.id === item.bag))
+        problems.push(`${at}: sac inconnu « ${item.bag} »`);
+      if (item.stack !== 1) problems.push(`${at}: un sac ne s'empile pas`);
+    }
   }
   for (const prop of Object.values(content.props)) checkBricks(content, prop, problems);
   for (const recipe of Object.values(content.recipes)) {

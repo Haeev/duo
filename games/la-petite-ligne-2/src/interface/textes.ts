@@ -43,6 +43,7 @@ export const TEXTS = {
     'no-slot': 'Pas de case',
     'no-tool-in-hand': 'Prends un outil',
     'no-train-now': 'Pas de train maintenant',
+    'not-a-bag': 'Pas un sac',
     'not-a-meal': 'Pas un repas',
     'not-edible': 'Ça ne se mange pas',
     'not-enough-money': 'Pas assez d’argent',

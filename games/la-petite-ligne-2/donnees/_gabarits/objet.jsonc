@@ -7,7 +7,7 @@
   "id": "exemple-objet",
   // Nom affiché, 40 caractères au plus.
   "name": "Objet d'exemple",
-  // Famille: food, material, crop, catch, treasure, seed, supply, tool, furniture, clothing.
+  // Famille: food, material, crop, catch, treasure, seed, supply, tool, furniture, clothing, bag.
   // Les commerçants rachètent par famille.
   "family": "food",
   // Pile maximale dans une case (cahier 4.5: poisson 3, bûche 5, planche 10, outil 1).
@@ -26,4 +26,8 @@
   "tool": null,
   // Repas spécial à deux (pile de 1, servi à table): ajouter "meal": { "perk": "no_tool_wear" }
   // (extra_catch, no_tool_wear, better_prices, night_rare_glow). Plat ordinaire: ne rien mettre.
+  // Sac (un objet qu'on achète, trouve ou reçoit, puis équipe): "family": "bag", "stack": 1,
+  // "food": null, "tool": null et "bag": "<id d'un sac de commun/sacs.json>". L'équiper (intention
+  // equip_bag) remplace le sac porté, qui revient dans les poches. L'effet give_bag des dialogues
+  // équipe un sac directement, sans objet.
 }

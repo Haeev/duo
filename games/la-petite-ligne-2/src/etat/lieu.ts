@@ -70,6 +70,8 @@ const placeSlow = {
   /** 80 au plus: au-delà, le rangement retire les plus anciens (budget de la tranche, `reseau/canaux.ts`). */
   ground: v.pipe(v.array(GroundItemSchema), v.maxLength(80)),
   nextGroundId: v.pipe(IntSchema, v.minValue(0)),
+  /** Dernier jour où les objets au sol de la carte ont été posés ou ont réapparu; absent: pas encore (`simulation/sac/sol.ts`). */
+  groundDay: v.exactOptional(v.pipe(IntSchema, v.minValue(1))),
   /** Journée de chaque commerce du lieu (stock vendu, rachats du jour): `simulation/commerces/`. */
   shops: v.exactOptional(v.record(IdSchema, ShopDaySchema)),
 } as const;
@@ -94,7 +96,7 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
       villager.life === undefined
         ? { met: villager.met, talkingWith: villager.talkingWith }
         : { met: villager.met, talkingWith: villager.talkingWith, life: villager.life };
-  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops } = place;
+  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops, groundDay } = place;
   const slow: PlaceSlow = {
     leftOn,
     placed,
@@ -105,5 +107,6 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
     villagers,
   };
   if (shops !== undefined) slow.shops = shops;
+  if (groundDay !== undefined) slow.groundDay = groundDay;
   return slow;
 }

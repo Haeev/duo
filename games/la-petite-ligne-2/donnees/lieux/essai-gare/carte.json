@@ -104,21 +104,27 @@
       "type": "table-a-manger",
       "x": 31,
       "y": 15,
-      "rotation": 0
+      "rotation": 0,
+      "group": "buffet",
+      "pourquoi": "Le buffet de la gare sert les voyageurs: la table est contre la marmite et l'étal, à deux pas du quai."
     },
     {
       "id": "chaise-du-buffet-nord",
       "type": "chaise",
       "x": 31,
       "y": 13.5,
-      "rotation": 0
+      "rotation": 0,
+      "group": "buffet",
+      "pourquoi": "Côté nord de la table, face au sud: on s'assoit vers la table, pas vers le mur."
     },
     {
       "id": "chaise-du-buffet-sud",
       "type": "chaise",
       "x": 31,
       "y": 16.5,
-      "rotation": 2
+      "rotation": 2,
+      "group": "buffet",
+      "pourquoi": "Côté sud de la table, tournée au nord: les deux convives se font face pour le repas à deux."
     },
     {
       "id": "marmite-du-buffet",

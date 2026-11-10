@@ -17,5 +17,36 @@
   },
   // Meubles et éléments du décor posés ici: "type" = un fichier de commun/meubles/.
   // "rotation": quarts de tour (0 façade au sud, 1 à l'est, 2 au nord, 3 à l'ouest).
-  "objects": [{ "id": "banc-du-quai", "type": "banc", "x": 12, "y": 8.5, "rotation": 0 }],
+  // Champs facultatifs d'un meuble:
+  //   "pourquoi": pourquoi il est là, dans ce sens (ignoré du moteur; `pnpm pourquoi` liste les oublis).
+  //   "group": nom d'un ensemble. Une table et ses chaises portent le même "group": le repas spécial
+  //   à deux est alors servi quand les deux joueurs sont assis sur deux meubles du groupe (deux
+  //   meubles au moins, dont un à brique "sit", à 6 m au plus l'un de l'autre). Exemple:
+  //   { "id": "table", "type": "table-a-manger", ..., "group": "repas" },
+  //   { "id": "chaise-1", "type": "chaise", ..., "group": "repas" },
+  //   { "id": "chaise-2", "type": "chaise", ..., "group": "repas" }
+  "objects": [
+    {
+      "id": "banc-du-quai",
+      "type": "banc",
+      "x": 12,
+      "y": 8.5,
+      "rotation": 0,
+      "pourquoi": "Sur le quai, face à la voie, pour attendre le train assis.",
+    },
+  ],
+  // Objets ramassables posés au sol (facultatif, 40 au plus): "item" = un fichier de commun/objets/
+  // (un sac s'y trouve aussi), "count" dans la pile permise. "respawnDaily": true le remet chaque
+  // matin s'il a été ramassé; sans lui, une fois ramassé il ne revient pas. Position hors zone bloquée.
+  "groundItems": [
+    {
+      "id": "pomme-tombee",
+      "item": "pomme",
+      "count": 1,
+      "x": 10,
+      "y": 10,
+      "respawnDaily": true,
+      "pourquoi": "Une pomme tombée du panier d'un voyageur, au bout du quai.",
+    },
+  ],
 }

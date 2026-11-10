@@ -9,6 +9,8 @@
   "schema": 1,
   "id": "exemple-interieur",
   "name": "Nouvelle pièce",
+  // Note de placement (facultative, ignorée du moteur): pourquoi cette pièce est ici et de cette taille.
+  "pourquoi": "Pièce d'exemple.",
   // Taille en cases de 1 m, 64 au plus par côté.
   "width": 8,
   "height": 6,

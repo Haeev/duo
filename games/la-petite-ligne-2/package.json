@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:longues": "vitest run --config vitest.longues.config.ts",
     "nouveau": "node outils/nouveau.ts",
+    "pourquoi": "node outils/controle-pourquoi.ts",
     "vignette": "node assets-src/vignette/generer.mjs"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 /**
- * Repas spécial à deux (cahier 4.4, R26): servi à table, les deux assis au même meuble. Faim au
+ * Repas spécial à deux (cahier 4.4, R26): servi à table, les deux assis au même meuble ou au même groupe de meubles. Faim au
  * maximum pour les deux et un bonus exclusif, qui tient pour chacun tant que sa faim reste
  * au-dessus du seuil. Le bonus vit dans la mémoire des faits (sauvegardée, envoyée à l'invité,
  * lisible par les dialogues), sous une clé par joueur.
@@ -28,10 +28,22 @@ export function hasPerk(world: ReadonlyWorld, player: PlayerIndex, perk: MealPer
   return mealPerkOf(world, player) === perk;
 }
 
-/** Les deux joueurs sont-ils assis au même meuble (une table et ses chaises comptent comme un) ? */
+/**
+ * Les deux joueurs sont-ils assis au même ensemble ? Un ensemble est le meuble visé seul, ou tous
+ * les meubles de la carte qui portent le même `group` que lui (une table et ses chaises). Les
+ * deux places peuvent être sur deux meubles du groupe, ou sur le même.
+ */
 export function seatedTogether(sim: SimContext, target: string): boolean {
-  const seats = sim.world.places[sim.world.common.place]?.objects[target]?.sit ?? [];
-  return seats.includes(0) && seats.includes(1);
+  const { world, content } = sim;
+  const place = world.places[world.common.place];
+  const objects = content.places[world.common.place]?.map.objects ?? [];
+  const group = objects.find((o) => o.id === target)?.group;
+  const members =
+    group === undefined ? [target] : objects.filter((o) => o.group === group).map((o) => o.id);
+  const seated = new Set<number>();
+  for (const id of members)
+    for (const seat of place?.objects[id]?.sit ?? []) if (seat !== null) seated.add(seat);
+  return seated.has(0) && seated.has(1);
 }
 
 export type MealRefusal = 'not-together';

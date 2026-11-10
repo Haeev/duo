@@ -31,6 +31,10 @@ export const INTERIOR_MAX_SIDE = 64;
  * dans la tranche « lieu », dont ce plafond tient le budget (`tests/grands-lieux.test.ts`).
  */
 export const PLACE_BRICK_OBJECTS_MAX = 400;
+/** Écart maximal, en m, entre deux meubles d'un même groupe (une table et ses chaises tiennent dans une pièce). */
+export const GROUP_MAX_SPAN = 6;
+/** Objets posés au sol que la carte déclare, par carte (le sol du lieu en garde 80 au plus). */
+export const MAP_GROUND_MAX = 40;
 
 export const PlaceSchema = v.strictObject({
   schema: FileVersionSchema,
@@ -50,6 +54,8 @@ export const PlaceSchema = v.strictObject({
   activities: v.array(IdSchema),
   /** Musiques du lieu, de jour et de nuit (`assets/lieux/<id>/son/`), `null` tant qu'elles ne sont pas livrées. */
   music: v.nullable(v.strictObject({ day: IdSchema, night: IdSchema })),
+  /** Note de placement: pourquoi ce lieu est là et fait ce qu'il fait. Ignorée du moteur (`donnees/pourquoi.ts`). */
+  pourquoi: v.exactOptional(TextSchema),
 });
 export type PlaceDef = v.InferOutput<typeof PlaceSchema>;
 
@@ -68,8 +74,35 @@ export const MapObjectSchema = v.strictObject({
   y: FiniteSchema,
   /** Quarts de tour: 0 façade au sud, 1 à l'est, 2 au nord, 3 à l'ouest. */
   rotation: QuarterSchema,
+  /**
+   * Ensemble de meubles: tous les meubles de la carte qui portent le même nom forment un seul
+   * ensemble pour le repas à deux (une table et ses chaises: les deux joueurs peuvent être assis
+   * sur deux meubles différents du groupe). Un groupe a deux meubles au moins, dont un à brique
+   * `sit`, tous à `GROUP_MAX_SPAN` m au plus l'un de l'autre.
+   */
+  group: v.exactOptional(IdSchema),
+  /** Note de placement: pourquoi cet élément est ici, dans ce sens (règle « cohérence du monde »). Ignorée du moteur. */
+  pourquoi: v.exactOptional(TextSchema),
 });
 export type MapObject = v.InferOutput<typeof MapObjectSchema>;
+
+/**
+ * Objet ramassable posé au sol par la carte, à une position (une pomme tombée, un sac oublié).
+ * Il apparaît à la première visite du lieu; avec `respawnDaily`, il revient chaque matin s'il a
+ * été ramassé. Sans `respawnDaily`, une fois ramassé, il ne revient pas.
+ */
+export const MapGroundSchema = v.strictObject({
+  id: IdSchema,
+  /** Objet (`commun/objets/<id>.json`); un sac se trouve ainsi. */
+  item: IdSchema,
+  count: v.pipe(IntSchema, v.minValue(1), v.maxValue(99)),
+  x: FiniteSchema,
+  y: FiniteSchema,
+  respawnDaily: v.exactOptional(v.boolean()),
+  /** Note de placement: pourquoi cet objet est ici. Ignorée du moteur. */
+  pourquoi: v.exactOptional(TextSchema),
+});
+export type MapGround = v.InferOutput<typeof MapGroundSchema>;
 
 /**
  * Terrain d'affichage, case par case, en plages (`runs`: code, longueur, code, longueur...) lues
@@ -187,6 +220,8 @@ const mapCore = {
   blocked: v.array(RectSchema),
   points: v.record(IdSchema, PointSchema),
   objects: v.array(MapObjectSchema),
+  /** Objets ramassables posés au sol (facultatif). */
+  groundItems: v.exactOptional(v.pipe(v.array(MapGroundSchema), v.maxLength(MAP_GROUND_MAX))),
   doors: v.optional(v.record(IdSchema, DoorSchema)),
 } as const;
 
@@ -224,5 +259,7 @@ export const InteriorSchema = v.strictObject({
   height: v.pipe(IntSchema, v.minValue(2), v.maxValue(INTERIOR_MAX_SIDE)),
   /** Coin nord-ouest sur la grille du lieu, hors du dehors et à une case au moins de tout autre intérieur. */
   at: v.strictObject({ x: IntSchema, y: IntSchema }),
+  /** Note de placement de la pièce (pourquoi ici, à cette taille). Ignorée du moteur. */
+  pourquoi: v.exactOptional(TextSchema),
 });
 export type InteriorDef = v.InferOutput<typeof InteriorSchema>;

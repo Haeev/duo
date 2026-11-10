@@ -19,4 +19,7 @@
   "activities": [],
   // Musiques de jour et de nuit: { "day": "...", "night": "..." }, ou null tant qu'elles manquent.
   "music": null,
+  // Note de placement (facultative, ignorée du moteur): pourquoi ce lieu existe et est fait ainsi.
+  // `pnpm pourquoi` liste ce qui n'en a pas (règle « cohérence du monde » de CLAUDE.md).
+  "pourquoi": "Lieu d'exemple: sert de modèle.",
 }

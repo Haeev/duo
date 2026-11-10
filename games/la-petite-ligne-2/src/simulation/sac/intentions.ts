@@ -15,6 +15,8 @@ export const BAG_INTENTS = [
   v.strictObject({ type: v.literal('pick_up'), ground: v.pipe(IntSchema, v.minValue(0)) }),
   /** Donne la pile de cette case à l'autre joueur, à portée de main. */
   v.strictObject({ type: v.literal('give_stack'), from: SlotRefSchema }),
+  /** Équipe le sac de cette case (objet à champ `bag`): le sac porté revient dans les poches. */
+  v.strictObject({ type: v.literal('equip_bag'), from: SlotRefSchema }),
   /** Coffre commun: verser de sa bourse, ou en retirer. */
   v.strictObject({ type: v.literal('chest_deposit'), amount: Cents }),
   v.strictObject({ type: v.literal('chest_withdraw'), amount: Cents }),

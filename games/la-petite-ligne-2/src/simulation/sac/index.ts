@@ -8,9 +8,10 @@ import type { Stack } from '../../etat/joueur';
 import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { RULES } from '../regles/reglages';
-import { currentPlace, distanceTo, dropStack } from './actions';
+import { currentPlace, distanceTo, dropStack, equipBagItem } from './actions';
 import { deposit, withdraw } from './argent';
 import type { SlotRef } from './cases';
+import { stepMapGround } from './sol';
 import { addStack, areaSlots, moveBetween, slotExists, stackAt, setStack } from './inventaire';
 
 function refuse(
@@ -114,6 +115,11 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
       sim.touch('players');
       return;
     }
+    case 'equip_bag': {
+      const refusal = equipBagItem(sim, player, intent.from);
+      if (refusal !== null) refuse(sim, player, refusal);
+      return;
+    }
     case 'chest_deposit': {
       const refusal = deposit(sim, player, intent.amount);
       if (refusal !== null) refuse(sim, player, refusal);
@@ -129,4 +135,4 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   }
 }
 
-export const bagSystem: GameSystem = { id: 'sac', intent: onIntent };
+export const bagSystem: GameSystem = { id: 'sac', intent: onIntent, step: stepMapGround };

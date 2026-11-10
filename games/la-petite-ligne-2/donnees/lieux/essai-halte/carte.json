@@ -116,21 +116,27 @@
       "type": "table-a-manger",
       "x": 8,
       "y": 16,
-      "rotation": 0
+      "rotation": 0,
+      "group": "repas-de-la-halte",
+      "pourquoi": "La table est près de la marmite, au milieu de la halte, pour un repas à deux au calme."
     },
     {
       "id": "chaise-de-la-halte-nord",
       "type": "chaise",
       "x": 8,
       "y": 14.5,
-      "rotation": 0
+      "rotation": 0,
+      "group": "repas-de-la-halte",
+      "pourquoi": "Côté nord de la table, face au sud, vers la table."
     },
     {
       "id": "chaise-de-la-halte-sud",
       "type": "chaise",
       "x": 8,
       "y": 17.5,
-      "rotation": 2
+      "rotation": 2,
+      "group": "repas-de-la-halte",
+      "pourquoi": "Côté sud de la table, tournée au nord, en face de l'autre convive."
     },
     {
       "id": "marmite-de-la-halte",
@@ -138,6 +144,33 @@
       "x": 10.5,
       "y": 16,
       "rotation": 0
+    }
+  ],
+  "groundItems": [
+    {
+      "id": "pierre-du-ballast",
+      "item": "pierre",
+      "count": 1,
+      "x": 21.5,
+      "y": 3.4,
+      "pourquoi": "Une pierre du ballast tombée au bord du quai, côté voie: elle ne revient pas une fois ramassée."
+    },
+    {
+      "id": "coquelicots-du-talus",
+      "item": "coquelicot",
+      "count": 2,
+      "x": 12.5,
+      "y": 11.5,
+      "respawnDaily": true,
+      "pourquoi": "Des coquelicots sauvages au bord du chemin de la halte: ils repoussent chaque matin."
+    },
+    {
+      "id": "sac-oublie",
+      "item": "sac-de-toile",
+      "count": 1,
+      "x": 16,
+      "y": 13.9,
+      "pourquoi": "Un voyageur a oublié son sac au pied du banc, devant la pompe: on le trouve en venant s'asseoir."
     }
   ]
 }
