@@ -127,3 +127,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Budget 6 000 triangles par personnage: la tête (visage complet) pèse 1 250, les boutons (n=8) 64 chacun; un bonnet Meshy se réduit par `DECIMATE` au champ `triangles`.
 - Copie isolée: une commande qui contient `source` ou `git show` dans une boucle est refusée; passer par un script Python (subprocess) écrit avec l'outil d'écriture.
 - Three.js: `SkeletonUtils.clone` par personnage, puis fusion manuelle (positions plus deltas de morphose, indices d'os refaits par nom); une vue de profil d'une rangée de personnages demande 14 m d'écart, sinon la caméra entre dans le voisin.
+
+## Corps commun encré et tenues en textures (essai 3, 2026-11-10, `docs/jeux/jeu-1/refonte/essai-style-3/`)
+
+- Meshy par texte ignore « bald » une fois sur deux (queue de cheval, mèche, barbe modelées) et tire vers le culturiste dès qu'on écrit « sturdy » ou « stylized »; une image de concept (`meshy_text_to_image` nano-banana, 3 crédits) puis image vers 3D `meshy-t2.5` sans texture (5) donne une silhouette taillée et caractérisée. Le rig marche sur un modèle sans texture (5).
+- `bpy.ops.uv.smart_project` ou `unwrap` lancé dans la session de l'import glTF: des centaines de triangles sans aire en UV. Enregistrer, rouvrir le .blend, faire une première projection de tout le maillage, puis celle par région.
+- Nommer un script `inspect.py` dans le dossier courant casse `import bpy` (module standard masqué): plantage glog sans message clair.
+- Une pièce par membre: coutures aux frontières de pièces plus un chemin Dijkstra le long d'un côté caché (coût `longueur x (1 + 40 (1 - alignement)²)`), `unwrap(method="MINIMUM_STRETCH")`: 7 à 12 îlots, 0 triangle nul. Rangement maison en étagères par bande (recherche dichotomique de l'échelle).
+- Peinture des tenues par position de repos du texel (rastérisation des UV en numpy): la même fiche habille tous les corps; coordonnées de membre `t` (épaule 0, poignet 1) et angle autour du membre pour coutures, plis et carreaux. Encolure: anneau autour de l'axe du cou, sinon le dessus des épaules reste nu.
+- Occlusion Cycles bruitée: la lisser (gaussienne 2,5 px à 1 024) avant de seuiller des noirs pleins, sinon bords « en fourrure ».
+- `np.maximum(ink, a & b * 0.8)`: `*` passe avant `&` (erreur de type); `& ~False` vaut `& -1` (indexation géante).
+- Three.js, coque d'encre cuite: sommets doublés (`aOutline`), triangles retournés ajoutés dans le groupe du matériau, poussée après `#include <project_vertex>` le long de `(projectionMatrix * vec4(transformedNormal, 0)).xy`, en pixels x `gl_Position.w`. Aucun appel de plus. Un glTF à deux matériaux arrive en deux `SkinnedMesh` à matériau unique (pas de tableau).
+- Rampe toon en éclairage physique: diffus = albédo x (ambiante + soleil x rampe) / pi; pour clair = albédo, intensités x pi. Rampe 4 texels `[0, 128, 255, 255]`, ambiante 0,2 et soleil 0,78: noir coloré, ombre, clair.

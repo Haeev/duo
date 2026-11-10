@@ -1,0 +1,15 @@
+# Coiffure « courte en épis »: volume sur le dessus, côtés dégagés au-dessus des oreilles, nuque courte.
+id = "court"
+colonnes = 16
+rangees = 8
+largeur_frange_deg = 46
+frange_deg = 46          # racine haute: front dégagé
+cotes_deg = 90           # au-dessus de l'oreille
+dos_deg = 118            # nuque
+volume_haut = 0.040
+volume_cotes = 0.009
+aretes = 0.34            # épis marqués
+pointes = 0.018
+evase = 0.0
+meches = 6
+reflets = 5
