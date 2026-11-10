@@ -4,7 +4,8 @@
     duo-python monter.py planche <batiments.json> <dossier des captures> <sortie.png>
 
 Chaque bâtiment est vu à 50 degrés de plongée, face à sa porte, avec une silhouette de 1,70 m
-près du seuil; en bas, deux façades vues de près en lumière rasante (soleil à 20 degrés).
+près du seuil; en bas, deux façades vues de près en lumière rasante (soleil à 20 degrés), puis
+trois vues rapprochées des pièces corrigées (cheminée, travées de l'église, horloge).
 """
 
 import json
@@ -37,7 +38,15 @@ VUES_PROPRES = {
     "lavoir": "lacet=-60",  # le bassin est côté ru, à l'est
     "moulin": "lacet=-28",  # la roue est sur le pignon sud, la porte au nord
     "eglise": "y=7",  # cadrer aussi le clocher
+    "poste": "lacet=150",  # l'escalier est sur le pignon ouest
 }
+# Vues rapprochées des pièces corrigées (remarques du client du 2026-11-10).
+ZOOMS = [
+    ("zoom-cheminee", "id=forge&x=0&z=-3.3&y=6.2&largeur=3.4&lacet=200&plongee=38", "cheminée de la forge: chapeau de tôle à deux pans sur quatre pieds"),
+    ("zoom-eglise", "id=eglise&x=3&z=6&y=3.2&largeur=17&lacet=-8&plongee=28", "église, façade sud: un vitrail au milieu de chaque travée"),
+    ("zoom-horloge", "id=ecole&x=0&z=3&y=5.3&largeur=4.6&lacet=-12&plongee=24", "école-mairie: l'horloge dans son fronton, sur l'axe de la porte"),
+]
+ZOOM = (960, 720)
 
 
 def vues(manifeste):
@@ -45,6 +54,8 @@ def vues(manifeste):
     for nom, ident, _legende in RASANTES:
         demi = manifeste["batiments"][ident]["emprise"]["profondeur"] / 2
         liste.append({"nom": nom, "requete": f"id={ident}&largeur=9.5&lacet=-24&plongee=38&x=0.4&z={demi}&y=2.3&ambiance=crepuscule&dense=0&soleil=plan", "largeur": 1900, "hauteur": 1000})
+    for nom, requete, _legende in ZOOMS:
+        liste.append({"nom": nom, "requete": requete, "largeur": ZOOM[0], "hauteur": ZOOM[1]})
     return liste
 
 
@@ -68,7 +79,10 @@ def planche(manifeste, dossier, sortie):
     bas_grille = titre + rangs * (CASE[1] + bandeau + marge)
     rasante_l = (largeur - 3 * marge) // 2
     rasante_h = round(rasante_l * 1000 / 1900)
-    hauteur = bas_grille + 60 + rasante_h + bandeau + marge
+    zoom_l = (largeur - 4 * marge) // 3
+    zoom_h = round(zoom_l * ZOOM[1] / ZOOM[0])
+    bas_rasantes = bas_grille + 60 + rasante_h + bandeau + marge
+    hauteur = bas_rasantes + 60 + zoom_h + bandeau + marge
     image = Image.new("RGB", (largeur, hauteur), PAPIER)
     d = ImageDraw.Draw(image)
     d.text((marge, 18), "Aubrune: les bâtiments du bourg, assemblés depuis leurs fiches", font=police(40, True), fill=ENCRE)
@@ -101,6 +115,16 @@ def planche(manifeste, dossier, sortie):
         except OSError:
             d.rectangle((x, y, x + rasante_l, y + rasante_h), outline=ENCRE)
         d.text((x + 4, y + rasante_h + 8), legende, font=police(22, True), fill=ENCRE)
+    d.text((marge, bas_rasantes + 12), "Les remarques du 10 novembre, de près: cheminées, travées des façades, horloge", font=police(30, True), fill=ENCRE)
+    for k, (nom, _requete, legende) in enumerate(ZOOMS):
+        x = marge + k * (zoom_l + marge)
+        y = bas_rasantes + 60
+        try:
+            vue = Image.open(f"{dossier}/{nom}.png").convert("RGB").resize((zoom_l, zoom_h), Image.LANCZOS)
+            image.paste(vue, (x, y))
+        except OSError:
+            d.rectangle((x, y, x + zoom_l, y + zoom_h), outline=ENCRE)
+        d.text((x + 4, y + zoom_h + 8), legende, font=police(22, True), fill=ENCRE)
     # Réduite aux deux tiers: la planche se lit entière et pèse trois fois moins dans le dépôt.
     image = image.resize((image.size[0] * 2 // 3, image.size[1] * 2 // 3), Image.LANCZOS)
     image.save(sortie, optimize=True)

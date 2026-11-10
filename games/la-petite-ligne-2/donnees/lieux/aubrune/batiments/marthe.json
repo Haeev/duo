@@ -28,7 +28,7 @@
   "facades": {
     "est": {
       "rdc": ["fenetre-etroite", "porte"],
-      "etage": ["fenetre", "fenetre"]
+      "etage": ["fenetre-etroite", "fenetre-etroite"]
     },
     "ouest": {
       "rdc": ["fenetre"],

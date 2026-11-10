@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "eglise",
   "nom": "l'église Saint-Aubin",
-  "detail": "le clocher carré à l'ouest de la nef, coiffé d'une flèche à quatre pans et d'une croix, ses baies à abat-sons; contreforts le long de la nef, portail en arc au sud",
+  "detail": "le clocher carré à l'ouest de la nef, coiffé d'une flèche à quatre pans et d'une croix, ses baies à abat-sons; contreforts tous les 3 m le long de la nef, un vitrail au milieu de chaque travée, portail en arc au sud; lauze comme les autres bâtiments publics",
   "emprise": {
     "largeur": 21,
     "profondeur": 12
@@ -19,7 +19,7 @@
   "finition": "pierre",
   "couleurs": {
     "murs": "pierre_claire",
-    "toit": "tuile",
+    "toit": "lauze",
     "porte": "bois_sombre",
     "menuiseries": "bois_sombre"
   },
@@ -51,49 +51,37 @@
     {
       "piece": "contrefort",
       "facade": "sud",
-      "position": 0.44,
+      "position": 0.6,
       "monte": 4.7
     },
     {
       "piece": "contrefort",
       "facade": "sud",
-      "position": 0.64,
-      "monte": 4.7
-    },
-    {
-      "piece": "contrefort",
-      "facade": "sud",
-      "position": 0.83,
+      "position": 0.8,
       "monte": 4.7
     },
     {
       "piece": "contrefort",
       "facade": "nord",
-      "position": 0.1,
+      "position": 0.2,
       "monte": 4.7
     },
     {
       "piece": "contrefort",
       "facade": "nord",
-      "position": 0.3,
+      "position": 0.4,
       "monte": 4.7
     },
     {
       "piece": "contrefort",
       "facade": "nord",
-      "position": 0.5,
+      "position": 0.6,
       "monte": 4.7
     },
     {
       "piece": "contrefort",
       "facade": "nord",
-      "position": 0.7,
-      "monte": 4.7
-    },
-    {
-      "piece": "contrefort",
-      "facade": "nord",
-      "position": 0.9,
+      "position": 0.8,
       "monte": 4.7
     },
     {
@@ -123,7 +111,7 @@
       "finition": "pierre",
       "couleurs": {
         "murs": "pierre_claire",
-        "toit": "tuile",
+        "toit": "lauze",
         "porte": "bois_sombre"
       },
       "toit": {

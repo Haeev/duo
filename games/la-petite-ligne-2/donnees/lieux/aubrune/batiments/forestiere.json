@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "forestiere",
   "nom": "la maison forestière",
-  "detail": "maison basse en pierre au bout du chemin: galerie couverte sur poteaux devant la porte, grosse cheminée adossée au pignon",
+  "detail": "maison basse en pierre au bout du chemin: galerie couverte sur poteaux devant la porte, grosse cheminée adossée au pignon; bûcher du garde au nord, à côté du four",
   "emprise": {
     "largeur": 6,
     "profondeur": 6
@@ -11,7 +11,7 @@
   "finition": "pierre",
   "couleurs": {
     "murs": "pierre",
-    "toit": "lauze",
+    "toit": "tuile",
     "volets": "vert_sombre",
     "porte": "vert_sombre"
   },
@@ -51,6 +51,12 @@
       "forme": "four",
       "facade": "nord",
       "position": 0.5
+    },
+    {
+      "piece": "bucher",
+      "facade": "nord",
+      "position": 0.2,
+      "longueur": 1.6
     }
   ]
 }

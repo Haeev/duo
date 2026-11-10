@@ -122,6 +122,20 @@ describe("bâtiments d'Aubrune", () => {
     expect(weight).toBeLessThan(WEIGHT_BUDGET);
   });
 
+  // Règle des travées (remarque du client du 2026-11-10): ouvertures au milieu de leur travée,
+  // étages sur les axes du rez-de-chaussée. Le contrôle assemble les fiches sans Blender.
+  const hasNumpy = spawnSync('python3', ['-c', 'import numpy']).status === 0;
+  it.skipIf(!hasNumpy)(
+    'ont des façades réglées: ouvertures centrées dans leurs travées, étages alignés',
+    () => {
+      const output = execFileSync('python3', [join(SOURCES, 'controle_facades.py'), SHEETS], {
+        encoding: 'utf8',
+      });
+      expect(output.trim()).toBe('ok');
+    },
+    20_000,
+  );
+
   it("tiennent l'emprise et la porte du plan", () => {
     for (const building of map.batiments) {
       if (building.porte === null) continue;

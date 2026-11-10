@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "poste",
   "nom": "le poste d'aiguillage",
-  "detail": "cabine haute et étroite au bord de la voie: grandes baies vitrées à l'étage sur les quatre faces, menuiseries rouge cheminot",
+  "detail": "cabine haute et étroite au bord de la voie: grandes baies vitrées à l'étage, menuiseries rouge cheminot; escalier de pierre sur le pignon ouest, qui part du chemin côté voie et monte au palier de la cabine (la porte du bas reste libre)",
   "emprise": {
     "largeur": 6,
     "profondeur": 4
@@ -66,9 +66,21 @@
       "etage": [
         {
           "type": "fenetre-nue",
-          "largeur": 2.0
+          "largeur": 0.8
+        },
+        {
+          "type": "porte-service",
+          "position": 0.67,
+          "raison": "la porte de la cabine est au bout du pignon, au-dessus du palier: la volée de l'escalier tient dans le reste du mur"
         }
       ]
     }
-  }
+  },
+  "options": [
+    {
+      "piece": "escalier",
+      "facade": "ouest",
+      "position": 0.67
+    }
+  ]
 }

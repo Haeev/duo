@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "hameau-b",
   "nom": "la maison aux volets clos",
-  "detail": "tous les volets fermés, gris de n'avoir pas été repeints: la maison vide du bout de la rue",
+  "detail": "tous les volets fermés, gris de n'avoir pas été repeints: la maison vide du bout de la rue, faîtage nord-sud et pignon sur la rue",
   "emprise": {
     "largeur": 6,
     "profondeur": 6
@@ -17,7 +17,8 @@
   },
   "toit": {
     "forme": "deux-pans",
-    "pente": 45
+    "pente": 45,
+    "faitage": "nord-sud"
   },
   "porte": {
     "facade": "sud",

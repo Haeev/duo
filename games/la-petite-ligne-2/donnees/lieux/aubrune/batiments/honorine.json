@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "honorine",
   "nom": "la maison d'Honorine",
-  "detail": "pignon sur la rue, crépi rose et volets sauge, petit auvent sur consoles au-dessus de la porte; sa fenêtre du pignon nord regarde la voie",
+  "detail": "pignon sur la rue, crépi rose et volets sauge, petit auvent sur consoles au-dessus de la porte; sa fenêtre du pignon nord regarde la voie; petit bûcher au pied du pignon ouest",
   "emprise": {
     "largeur": 6,
     "profondeur": 6
@@ -28,7 +28,7 @@
   "facades": {
     "sud": {
       "rdc": ["fenetre-etroite", "porte"],
-      "etage": ["fenetre", "fenetre"],
+      "etage": ["fenetre-etroite", "fenetre-etroite"],
       "pignon": ["petite-fenetre"]
     },
     "nord": {
@@ -57,6 +57,12 @@
       "piece": "cheminee",
       "forme": "souche",
       "position": 0.8
+    },
+    {
+      "piece": "bucher",
+      "facade": "ouest",
+      "position": 0.86,
+      "longueur": 1.4
     }
   ]
 }

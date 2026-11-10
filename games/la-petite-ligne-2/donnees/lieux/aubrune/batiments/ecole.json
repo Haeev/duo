@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "ecole",
   "nom": "l'école-mairie",
-  "detail": "pierre claire, volets bleus, toit à croupes; l'horloge et le drapeau au-dessus de la porte disent la mairie",
+  "detail": "pierre claire, volets bleus, toit à croupes de lauze; l'horloge dans son fronton au-dessus de la porte et le drapeau disent la mairie",
   "emprise": {
     "largeur": 7,
     "profondeur": 6
@@ -46,10 +46,10 @@
   "options": [
     {
       "piece": "pendule",
+      "forme": "fronton",
       "facade": "sud",
       "position": 0.5,
-      "hauteur": 3.85,
-      "diametre": 0.8
+      "diametre": 0.7
     },
     {
       "piece": "drapeau",
