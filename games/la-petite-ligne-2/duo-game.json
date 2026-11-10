@@ -13,7 +13,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "À deux, de lieu en lieu par le train: une histoire à suivre, une maison à refaire, des voisins à aider. Version d'essai de la refonte.",
-  "whatsNew": "Socle de la refonte: le nouveau jeu démarre à deux sur un écran d'essai. Les parties d'essai repartent de zéro à chaque étape.",
+  "whatsNew": "Première version d'essai de la refonte de La Petite Ligne, à côté de l'ancien jeu qui reste disponible. Elle se construit étape par étape: les parties d'essai repartent de zéro à chaque nouvelle version.",
   "actions": [
     { "id": "up", "label": "Avancer", "keys": ["KeyW"] },
     { "id": "down", "label": "Reculer", "keys": ["KeyS"] },

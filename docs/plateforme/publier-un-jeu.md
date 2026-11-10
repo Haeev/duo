@@ -42,3 +42,36 @@ Sans terminal: onglet **Actions** > workflow **Jeux** > **Run workflow**, choisi
 | « ... y est déjà en ..., plus récente que ... » | Le catalogue a déjà une version plus récente du jeu: jamais de retour en arrière (ADR 0006). Pour annuler une version défectueuse, publier une version supérieure. |
 
 Deux publications de jeux en même temps se suivent pour le catalogue (un seul job de catalogue à la fois). Au-delà de deux, GitHub peut annuler un job de catalogue resté en attente: le recours « Catalogue seul » le rattrape.
+
+## Publier la refonte de La Petite Ligne (`la-petite-ligne-2`)
+
+La refonte est un jeu à part (ADR 0017): identifiant `la-petite-ligne-2`, nom « La Petite Ligne (refonte) », sa propre release `jeu-la-petite-ligne-2-v<version>`. Le workflow **Jeux** la traite comme n'importe quel jeu: l'entrée du catalogue remplace seulement celle de `la-petite-ligne-2`, l'ancien jeu et les autres restent. Seul le script `test` du paquet tourne (moins de 5 secondes en local), jamais `test:longues`.
+
+Déclenchement à la main, sur la branche à publier (l'identifiant à tirets se lit sans ambiguïté dans le tag):
+
+```text
+gh workflow run jeux.yml --ref <branche> -f jeu=la-petite-ligne-2
+```
+
+Ajouter `-f sans_tests=true` pour passer les tests (les types restent contrôlés). La version est lue dans `games/la-petite-ligne-2/duo-game.json` au commit de la branche, et le tag `jeu-la-petite-ligne-2-v<version>` est créé par la release. Sans terminal: onglet **Actions** > **Jeux** > **Run workflow**, `jeu` = `la-petite-ligne-2`.
+
+La vignette provisoire (décor de maquette, ruban « REFONTE ») se régénère avec `pnpm --filter ./games/la-petite-ligne-2 run vignette` (nécessite `rsvg-convert`, fourni par `outils/installer-outils.sh`); sources dans `games/la-petite-ligne-2/assets-src/vignette/`. Elle sera remplacée au jalon des assets définitifs.
+
+## Retirer un jeu du catalogue (par exemple l'ancienne `la-petite-ligne`)
+
+À faire quand la refonte a plus à offrir que l'ancien jeu (ADR 0017: à l'Alpha de la refonte, sur décision du client). Rien de tout cela n'a été lancé. Dans l'ordre:
+
+1. **Prévenir chez les joueurs**: publier d'abord une version de la refonte qui reprend ce qui compte (la mémoire des parties de l'ancien jeu ne passe pas dans le nouveau: nouvel identifiant, sauvegardes séparées, à dire au client).
+2. **Ne plus embarquer l'ancien jeu dans l'installateur**: `BUNDLED_GAMES` dans `apps/duo/electron-builder.config.mjs` désigne aujourd'hui `games/la-petite-ligne` (jeu copié dans l'application, installé au premier lancement), et `build:app` du `package.json` racine le construit. Les deux changent avant la prochaine version de Duo, sinon l'ancien jeu réapparaît à chaque nouvelle installation. Voir aussi les tests de `apps/duo/scripts/tests/jeux-embarques.test.mjs`.
+3. **Retirer l'entrée du catalogue en ligne** (le workflow ne sait qu'ajouter ou remplacer): télécharger `catalogue.json` depuis la release `catalogue`, retirer l'entrée, le remettre, puis relire l'adresse publique:
+
+   ```text
+   gh release download catalogue --pattern catalogue.json --dir catalogue
+   node -e 'const f=require("fs");const c=JSON.parse(f.readFileSync("catalogue/catalogue.json","utf8"));c.jeux=c.jeux.filter(j=>j.id!=="la-petite-ligne");f.writeFileSync("catalogue/catalogue.json",JSON.stringify(c,null,2)+"\n")'
+   gh release upload catalogue catalogue/catalogue.json --clobber
+   ```
+
+   Le filtre a été essayé sur un catalogue simulé à trois jeux (il en reste deux). Le workflow ne remettra pas l'ancien jeu: il ne rajoute que le jeu publié.
+4. **Garder les releases `jeu-la-petite-ligne-v*`**: elles servent d'archive (retour possible, fichiers `.duogame` pour une copie manuelle). Ne pas les supprimer tant qu'un joueur peut en avoir besoin.
+5. **Dossier `games/la-petite-ligne/`**: le supprimer du dépôt dans un commit séparé, après les étapes 2 et 3 (les workflows ne le citent pas, sauf `build:app`), puis relancer `pnpm install` pour mettre à jour `pnpm-lock.yaml` (l'espace de travail prend `games/*` sans liste nommée).
+6. **Chez le client**: ce que Duo fait d'un jeu déjà installé qui sort du catalogue n'est pas décrit par l'ADR 0010, et le code de `apps/duo/src/main/games/` n'en retire aucun (pas de désinstallation trouvée): il reste a priori installé et jouable, sans mise à jour. À vérifier sur les vraies machines avant de l'annoncer.

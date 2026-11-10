@@ -11,6 +11,12 @@
 # Toutes ces releases se créent avec --latest=false (la marque « Latest » reste
 # aux releases de l'application, ADR 0011).
 #
+# Valable pour tout jeu du dossier games/ à manifeste valide, dont la-petite-ligne-2
+# (la refonte, publiée à côté de la-petite-ligne): l'identifiant à tirets et chiffres
+# se lit sans ambiguïté dans le tag, et l'entrée du catalogue remplace seulement celle du
+# même identifiant, les autres jeux restent. Seul le script `test` du jeu tourne ici,
+# jamais `test:longues`.
+#
 # Recours: si la release du jeu existe mais que le catalogue n'a pas suivi
 # (échec ou annulation du job), relancer à la main avec « catalogue seul ».
 name: Jeux
@@ -21,7 +27,7 @@ on:
   workflow_dispatch:
     inputs:
       jeu:
-        description: Identifiant du jeu (dossier games/<id>), par exemple la-petite-ligne
+        description: Identifiant du jeu (dossier games/<id>), par exemple la-petite-ligne-2
         type: string
         required: true
       catalogue_seul:
