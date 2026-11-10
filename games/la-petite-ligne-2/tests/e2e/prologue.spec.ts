@@ -11,13 +11,16 @@ import { startDuo, type Duo, type ProbeWorld } from '../aides-e2e/duo';
 import {
   Journal,
   loadMap,
+  loadSteps,
   playUi,
   point,
+  shareSpots,
+  standSpots,
   seats,
   snapshot,
   walkBoth,
+  actOn,
   calibrateYaw,
-  tapToward,
   windowSize,
   me,
   type Point,
@@ -39,6 +42,14 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
   test.setTimeout(900_000);
   const journal = new Journal();
   const map = loadMap(PLACE);
+  const steps = loadSteps(PLACE, QUEST);
+  /** La cible d'une étape, telle que la quête l'écrit (c'est elle que suit le repère du joueur). */
+  const targetOf = (id: string): { point?: string; villager?: string } => {
+    const step = steps.find((s) => s.id === id);
+    if (step?.target === null || step === undefined)
+      throw new Error(`étape « ${id} » sans cible dans la quête`);
+    return step.target;
+  };
   const duo: Duo = await startDuo(browser, 'p19', { save: null });
   const { host, guest } = duo;
   const [seatH, seatG] = await seats(duo);
@@ -81,16 +92,28 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
     }));
   };
 
+  /** Deux places pour deux joueurs, sans se croiser dans le couloir. */
+  const share = async (spots: readonly Point[]): Promise<readonly [Point, Point]> =>
+    await shareSpots(duo, map, spots, await crowd());
+
   /** Marche des deux; en cas d'échec: constat, capture, puis contournement par téléportation. */
   const goTo = async (
     label: string,
     targets: readonly [Point | null, Point | null],
     facing: number,
     tolerance = 0.55,
+    stop?: (w: ProbeWorld) => boolean,
   ): Promise<void> => {
     await windowSize(duo, true);
     const avoid = await crowd();
-    let result = await walkBoth(duo, targets, { map, journal, label, tolerance, avoid });
+    let result = await walkBoth(duo, targets, {
+      map,
+      journal,
+      label,
+      tolerance,
+      avoid,
+      ...(stop === undefined ? {} : { stop }),
+    });
     if (result.state.includes('bloqué')) {
       // La carte ne donne aucun passage: le joueur essaie quand même, droit devant lui, 8 s.
       const retry = await walkBoth(
@@ -163,40 +186,30 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
     const count = (): number =>
       ctx.lines.filter((l) => l.who === side.who && l.kind === 'dialogue').length;
     const before = count();
-    const aimed = async (): Promise<boolean> =>
-      ((await side.aim(seat.index))?.id ?? '').includes(villager);
-    if (!(await aimed())) {
-      // Comme un joueur: se tourner vers lui par petits pas.
-      await windowSize(duo, true);
-      await tapToward(duo, seat, await villagerAt(villager), aimed, journal);
-      await windowSize(duo, false);
+    // La bulle doit dire « Parler » à cet habitant, sans refus: une couchette voisine peut
+    // prendre la visée, et l'on n'appuie que sur la bonne cible, comme un joueur qui lit la bulle.
+    const aimed = async (): Promise<boolean> => {
+      const aim = await side.aim(seat.index);
+      return (aim?.id ?? '').includes(villager) && (aim?.refusal ?? null) === null;
+    };
+    const talking = async (): Promise<boolean> =>
+      count() > before || (await snapshot(side)).dialogue !== null;
+    const opened = await actOn(duo, seat, await villagerAt(villager), aimed, talking, journal);
+    if (!opened) {
+      const w = await side.world();
+      const p = w === null ? null : me(w, seat);
+      journal.log(
+        `parler à ${villager} impossible chez ${side.who}: corps ${JSON.stringify(p?.body)}, cible ${JSON.stringify(await side.aim(seat.index))}, talk ${JSON.stringify(p?.talk)}, habitant ${JSON.stringify(w?.places[PLACE]?.villagers?.[villager])}`,
+      );
+      await side.shot(`parler-impossible-${villager}-${side.who}`);
+      throw new Error(`parler à ${villager} impossible (${side.who})`);
     }
-    await expect
-      .poll(aimed, { timeout: 10_000 })
-      .toBe(true)
-      .catch(async (e: unknown) => {
-        const w = await side.world();
-        const p = w === null ? null : me(w, seat);
-        journal.log(
-          `cible ${villager} introuvable chez ${side.who}: corps ${JSON.stringify(p?.body)}, cible ${JSON.stringify(await side.aim(seat.index))}, talk ${JSON.stringify(p?.talk)}, habitant ${JSON.stringify(w?.places[PLACE]?.villagers?.[villager])}`,
-        );
-        throw e;
-      });
     await side.shot(`bulle-${villager}-${side.who}`);
-    const verb = (await side.aim(seat.index))?.verb ?? '';
-    journal.log(`cible ${villager} chez ${side.who}: verbe « ${verb} »`);
-    // Un appui qui tombe entre deux images (2 images par seconde ici) peut se perdre: on recommence.
-    let presses = 0;
-    while (presses < 4 && count() === before && (await snapshot(side)).dialogue === null) {
-      await side.press('Space', 400);
-      presses += 1;
-      await side.page.waitForTimeout(2500);
-    }
-    if (presses > 1)
-      journal.log(`parler à ${villager} (${side.who}): ${String(presses)} appuis nécessaires`);
+    // Fini: une réplique lue, le bandeau fermé et la conversation close chez l'hôte (autorité).
     await playUntil(
       `échange avec ${villager} fini (${side.who})`,
-      async () => count() > before && (await snapshot(side)).dialogue === null,
+      async (w) =>
+        count() > before && (await snapshot(side)).dialogue === null && me(w, seat).talk === null,
       90_000,
     );
   };
@@ -212,15 +225,8 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
   await windowSize(duo, false);
   const ctrl = await villagerAt('controleur');
   journal.log(`Contrôleur en ${ctrl.x.toFixed(1)}; ${ctrl.y.toFixed(1)}`);
-  // Se placer à l'ouest du Contrôleur, face à lui: on arrive en marchant vers l'est.
-  await goTo(
-    'papiers: aller au Contrôleur',
-    [
-      { x: ctrl.x - 1.1, y: ctrl.y },
-      { x: ctrl.x - 1.1, y: ctrl.y + 0.5 },
-    ],
-    0,
-  );
+  // Chacun sur une case libre à côté de lui (lues sur la carte), puis on se tourne vers lui.
+  await goTo('papiers: aller au Contrôleur', await share(standSpots(map, ctrl, 2, [ctrl])), 0);
   await Promise.all([host.shot('2-au-controleur-hote'), guest.shot('2-au-controleur-invite')]);
   await talkTo('controleur', seatH);
   await talkTo('controleur', seatG);
@@ -240,37 +246,31 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
   journal.lap('étape papiers (marche, dialogue, éditeur chez les deux)');
   journal.log(`après papiers: ${hhmm(afterPapers.minutes)}, étape ${stepOf(afterPapers)}`);
 
-  // 2. chariot: suivre la cible de l'étape (le point `chariot`), puis demander un sandwich.
-  const chariot = point(map, 'chariot');
+  // 2. chariot: suivre la cible de l'étape, telle que la quête l'écrit, et trouver là celui qui
+  // sert (D6: la cible désignait un point où il n'y avait personne).
+  const cart = targetOf('chariot');
+  const cartAt =
+    cart.villager !== undefined ? await villagerAt(cart.villager) : point(map, cart.point ?? '');
+  const ctrl2 = await villagerAt('controleur');
+  journal.log(
+    `étape chariot: cible ${JSON.stringify(cart)} en ${cartAt.x.toFixed(1)}; ${cartAt.y.toFixed(1)}, Contrôleur en ${ctrl2.x.toFixed(1)}; ${ctrl2.y.toFixed(1)}`,
+  );
   await goTo(
     'chariot: suivre la cible de la quête',
-    [
-      { x: chariot.x - 0.6, y: chariot.y },
-      { x: chariot.x - 0.6, y: chariot.y + 0.5 },
-    ],
+    await share(standSpots(map, cartAt, 2, [ctrl2])),
     0,
-    0.7,
   );
-  const there = await snapshot(host);
-  const aimThere = await host.aim(seatH.index);
-  await host.shot('3-au-point-chariot');
-  if (!aimThere?.id?.includes('controleur'))
+  const reach = Math.hypot(cartAt.x - ctrl2.x, cartAt.y - ctrl2.y);
+  await Promise.all([host.shot('3-chariot-hote'), guest.shot('3-chariot-invite')]);
+  if (reach > 1.2) {
+    const there = await snapshot(host);
     journal.find(
       'majeur',
       'chariot: personne au point que la quête désigne',
-      `étape « chariot » désigne le point « chariot », mais cible d'action à cet endroit: ${JSON.stringify(aimThere)}; bulle: « ${there.prompt} »`,
-      'recette-prologue-chariot-vide',
+      `étape « chariot »: cible ${JSON.stringify(cart)}, le Contrôleur est à ${reach.toFixed(1)} m; bulle: « ${there.prompt} »`,
     );
-  const ctrl2 = await villagerAt('controleur');
-  journal.log(`Contrôleur pendant l'étape chariot: ${ctrl2.x.toFixed(1)}; ${ctrl2.y.toFixed(1)}`);
-  await goTo(
-    'chariot: aller au Contrôleur',
-    [
-      { x: ctrl2.x - 1.1, y: ctrl2.y },
-      { x: ctrl2.x - 1.1, y: ctrl2.y + 0.5 },
-    ],
-    0,
-  );
+    if (STRICT) throw new Error('chariot: personne là où la quête envoie les joueurs (D6)');
+  }
   await talkTo('controleur', seatH);
   const gotSandwich = await playUntil(
     'sandwich servi',
@@ -323,44 +323,64 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
   await host.shot('5-apres-manger-hote');
   journal.lap('étape manger');
 
-  // 4. dormir: retour au compartiment, les deux sur une banquette, saut de nuit.
+  // 4. dormir: suivre la cible de l'étape, puis chacun se couche sur un lit (les meubles à
+  // brique `sleep` de la carte). L'étape ne passe que les deux couchés (D7), alors la nuit saute.
   const day0 = ate.common.day;
   const minutesBeforeSleep = ate.minutes;
-  const room = point(map, 'compartiment');
-  await goTo(
-    'dormir: retour au compartiment',
-    [
-      { x: room.x - 2, y: room.y - 0.5 },
-      { x: room.x + 2, y: room.y - 0.5 },
-    ],
-    -Math.PI / 2,
-    0.9,
+  const beds = map.objects.filter((o) => o.bricks.includes('sleep'));
+  const [bedH, bedG] = beds;
+  if (bedH === undefined || bedG === undefined) throw new Error('il faut un lit par joueur');
+  const night = targetOf('dormir');
+  journal.log(
+    `étape dormir: cible ${JSON.stringify(night)}, lits ${beds.map((b) => b.id).join(', ')}`,
   );
+  const spotH = standSpots(map, bedH, 1)[0];
+  const spotG = spotH === undefined ? undefined : standSpots(map, bedG, 1, [spotH])[0];
+  if (spotH === undefined || spotG === undefined)
+    throw new Error('aucune case libre près des lits');
+  const nightAt = point(map, night.point ?? '');
+  for (const spot of [spotH, spotG]) {
+    const far = Math.hypot(spot.x - nightAt.x, spot.y - nightAt.y);
+    if (far > 2)
+      journal.find(
+        'majeur',
+        'dormir: la cible de l’étape est loin des lits',
+        `cible ${JSON.stringify(night)} à ${far.toFixed(1)} m de la place devant un lit`,
+      );
+  }
+  // La scène du tunnel s'ouvre avec l'étape: on la lit d'abord (personne ne marche pendant une scène).
   await playUntil('scène du tunnel finie', (w) => (w.common.story?.scene ?? null) === null, 90_000);
-  await Promise.all([host.shot('6-compartiment-hote'), guest.shot('6-compartiment-invite')]);
-  const asleep = async (seat: typeof seatH): Promise<void> => {
-    await expect
-      .poll(async () => (await seat.side.aim(seat.index))?.verb ?? null, { timeout: 15_000 })
-      .not.toBeNull();
-    journal.log(`banquette: cible ${JSON.stringify(await seat.side.aim(seat.index))}`);
-    await seat.side.press('Space');
+  await goTo('dormir: aller aux couchettes', [spotH, spotG], -Math.PI / 2);
+  await Promise.all([host.shot('6-couchettes-hote'), guest.shot('6-couchettes-invite')]);
+  const lying = async (seat: typeof seatH): Promise<boolean> => {
+    const objects = (await host.world())?.places[PLACE]?.objects ?? {};
+    return Object.values(objects).some((o) => o.sleep?.includes(seat.index) === true);
   };
-  await asleep(seatH).catch(() => {
-    journal.find(
-      'majeur',
-      'dormir: aucune cible de banquette',
-      'depuis le compartiment, aucune action possible sur une banquette (hôte)',
-    );
-  });
-  await host.page.waitForTimeout(1500);
+  /** Se tourner vers son lit, puis la touche d'action; vrai si le joueur est couché. */
+  const lieDown = async (seat: typeof seatH, bed: (typeof beds)[number]): Promise<boolean> => {
+    const aimed = async (): Promise<boolean> => {
+      const aim = await seat.side.aim(seat.index);
+      return aim?.id === bed.id && (aim.refusal ?? null) === null;
+    };
+    const done = await actOn(duo, seat, bed, aimed, () => lying(seat), journal);
+    journal.log(`lit ${bed.id} (${seat.side.who}): couché ${String(done)}`);
+    return done;
+  };
+  if (!(await lieDown(seatH, bedH)))
+    journal.find('majeur', 'dormir: impossible de se coucher', `hôte devant ${bedH.id}`);
   await host.shot('7-un-seul-couche');
-  await asleep(seatG).catch(() => {
+  // D7: un seul couché, l'étape attend l'autre et la nuit ne saute pas.
+  const alone = await host.world();
+  if (alone !== null && (passed(alone).includes('dormir') || alone.common.day > day0)) {
     journal.find(
       'majeur',
-      'dormir: aucune cible de banquette',
-      'depuis le compartiment, aucune action possible sur une banquette (invité)',
+      'dormir: l’étape passe avec un seul joueur couché',
+      `étape ${stepOf(alone)}, jour ${String(alone.common.day)}, ${hhmm(alone.minutes)}`,
     );
-  });
+    if (STRICT) throw new Error('dormir: étape franchie avec un seul joueur couché (D7)');
+  }
+  if (!(await lieDown(seatG, bedG)))
+    journal.find('majeur', 'dormir: impossible de se coucher', `invité devant ${bedG.id}`);
   const woke = await playUntil(
     'réveil',
     (w) => w.common.day > day0 || passed(w).includes('dormir'),
@@ -376,7 +396,7 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
     (w) => (w.common.story?.scene ?? null) === null,
     90_000,
   );
-  journal.lap('étape dormir (banquettes, saut de nuit, scènes)');
+  journal.lap('étape dormir (couchettes, saut de nuit, scènes)');
 
   // 5. descendre: les deux devant la porte du wagon.
   const door = point(map, 'porte');
@@ -386,12 +406,14 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
   );
   await goTo(
     'descendre: devant la porte',
-    [
+    await share([
       { x: door.x - 0.4, y: door.y },
       { x: door.x + 0.4, y: door.y },
-    ],
+    ]),
     Math.PI / 2,
-    0.45,
+    0.6,
+    // Les deux devant la porte: l'étape passe et le train repart, la marche s'arrête là.
+    (w) => passed(w).includes('descendre') || w.common.place !== PLACE,
   );
   await Promise.all([host.shot('9-porte-hote'), guest.shot('9-porte-invite')]);
   journal.lap('étape descendre (marche jusqu’à la porte)');
@@ -447,11 +469,14 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
       'heure dite par Firmin différente de l’horloge',
       `Firmin: « ${hourSaid[0]} », horloge: ${hhmm(done.minutes)}`,
     );
-  if (/par le car|sur le banc/.test(said))
+  // D9: Firmin peut nier le train (c'est le mystère du cahier), pas l'ignorer: sa réplique du car
+  // doit dire qu'il n'y a plus de train.
+  const carLine = welcomeLines.find((l) => l.text.includes('par le car'))?.text;
+  if (carLine !== undefined && !/train/i.test(carLine))
     journal.find(
       'mineur',
-      'Firmin parle d’un car et d’un banc alors qu’on arrive en train',
-      `réplique: « ${welcomeLines.find((l) => l.text.includes('par le car'))?.text ?? '?'} »`,
+      'Firmin parle d’un car et d’un banc sans nier le train par lequel on arrive',
+      `réplique: « ${carLine} »`,
     );
   journal.log(`répliques lues: ${String(ctx.lines.length)}`);
   for (const l of ctx.lines) journal.log(`  ${l.who} ${l.kind} (${String(l.ms)} ms): ${l.text}`);

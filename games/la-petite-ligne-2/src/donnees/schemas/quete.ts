@@ -44,6 +44,15 @@ export const StoryConditionSchema = v.variant('type', [
   }),
   /** Les deux joueurs à moins de `radius` m l'un de l'autre (défaut: réglages des quêtes). */
   v.strictObject({ type: v.literal('together'), radius: v.exactOptional(Radius) }),
+  /**
+   * Un joueur (`one`) ou les deux (`both`) tiennent cette posture sur un meuble du lieu: assis
+   * (brique `sit`) ou couché (brique `sleep`).
+   */
+  v.strictObject({
+    type: v.literal('posture'),
+    posture: v.picklist(['sit', 'sleep']),
+    who: v.picklist(['one', 'both']),
+  }),
   /** La scène a été jouée jusqu'au bout. */
   v.strictObject({ type: v.literal('scene_seen'), scene: IdSchema }),
   /** Une étape d'une suite (ou, sans `step`, toute la suite) est franchie. */

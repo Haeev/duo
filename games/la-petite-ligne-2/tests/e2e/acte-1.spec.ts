@@ -171,7 +171,7 @@ test('D1 les répliques de la scène d’accueil s’affichent et avancent quand
   // Mesuré en pas de simulation (l'horloge murale s'étire sous charge en rendu logiciel): le temps
   // suivant commence avant la fin du délai du lecteur seul (`soloReadSeconds` depuis la lecture
   // de l'hôte), donc par la lecture de l'invité.
-  const next = /par le car/;
+  const next = /Un train/;
   const before = await host.world();
   const beat0 = before?.common.story?.scene?.beat ?? -1;
   const readAt = before?.common.story?.scene?.readAt;

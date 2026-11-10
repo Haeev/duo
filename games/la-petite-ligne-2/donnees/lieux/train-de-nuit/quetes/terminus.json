@@ -34,9 +34,9 @@
         },
         {
           "id": "chariot",
-          "objective": "Le chariot passe au bout du couloir: demande un sandwich.",
+          "objective": "Le chariot est annoncé au bout du couloir: va voir le Contrôleur et demande un sandwich.",
           "target": {
-            "point": "chariot"
+            "villager": "controleur"
           },
           "done": [
             {
@@ -58,7 +58,7 @@
         },
         {
           "id": "manger",
-          "objective": "Mange ton sandwich avant qu'il refroidisse encore.",
+          "objective": "Mange ton sandwich avant qu'il refroidisse: ouvre ton carnet (touche C), choisis-le, puis Entrée.",
           "target": null,
           "done": [
             {
@@ -73,18 +73,23 @@
         },
         {
           "id": "dormir",
-          "objective": "Retourne au compartiment et allonge-toi sur une banquette.",
+          "objective": "Allongez-vous tous les deux, chacun sur sa couchette: la nuit passera d'un trait.",
           "target": {
-            "point": "compartiment"
+            "point": "couchettes"
           },
           "done": [
+            {
+              "type": "posture",
+              "posture": "sleep",
+              "who": "both"
+            },
             {
               "type": "need_at_least",
               "need": "sleep",
               "value": 80
             }
           ],
-          "together": false,
+          "together": true,
           "onStart": [
             {
               "type": "play_scene",
@@ -108,6 +113,7 @@
             {
               "type": "reach",
               "point": "porte",
+              "radius": 1.5,
               "who": "both"
             }
           ],

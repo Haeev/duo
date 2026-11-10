@@ -51,6 +51,16 @@ export interface ProbeWorld {
       string,
       | {
           readonly ground?: readonly { readonly item: string }[];
+          /** État des briques des meubles: qui est assis (`sit`) ou couché (`sleep`), par place. */
+          readonly objects?: Readonly<
+            Record<
+              string,
+              {
+                readonly sit?: readonly (number | null)[];
+                readonly sleep?: readonly (number | null)[];
+              }
+            >
+          >;
           readonly villagers?: Readonly<
             Record<string, { readonly body: { readonly x: number; readonly y: number } }>
           >;
@@ -81,7 +91,7 @@ export interface Side {
   game(): Frame;
   world(): Promise<ProbeWorld | null>;
   local(): Promise<number>;
-  aim(player: number): Promise<{ id?: string; verb?: string } | null>;
+  aim(player: number): Promise<{ id?: string; verb?: string; refusal?: string | null } | null>;
   /** Appuie une touche (code physique) dans le jeu de cette machine. */
   press(code: string, holdMs?: number): Promise<void>;
   shot(name: string): Promise<string>;
@@ -148,7 +158,7 @@ function side(page: Page, who: 'hôte' | 'invité', slug: string): Side {
         (p) => (window as unknown as WindowWithProbe).__lplSonde?.aim(p) ?? null,
         player,
       );
-      return aim as { id?: string; verb?: string } | null;
+      return aim as { id?: string; verb?: string; refusal?: string | null } | null;
     },
     async press(code, holdMs = 120) {
       // Le clavier de la page va au cadre qui a le focus: on le donne au jeu de cette machine.

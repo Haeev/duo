@@ -27,17 +27,13 @@
       "x": 3.5,
       "y": 4.5
     },
-    "porte-compartiment": {
-      "x": 5.0,
+    "couchettes": {
+      "x": 6.0,
       "y": 4.5
     },
     "couloir": {
       "x": 7.55,
       "y": 3.6
-    },
-    "chariot": {
-      "x": 8.55,
-      "y": 4.45
     },
     "porte": {
       "x": 8.35,

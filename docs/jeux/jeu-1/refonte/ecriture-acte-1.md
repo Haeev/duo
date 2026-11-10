@@ -18,9 +18,9 @@ Prologue (suite `terminus`, lieu `train-de-nuit`, départ prévu à 21 h 30):
 | Étape | Ligne du carnet | Ce qui la franchit | Apprend |
 |---|---|---|---|
 | papiers | Montre tes papiers au Contrôleur, dans le couloir. | dialogue `controleur-papiers` jusqu'à `fin` (chacun le sien, `once: player`) | marcher, parler; **éditeur de personnage au nœud `photo`** |
-| chariot | Le chariot passe au bout du couloir: demande un sandwich. | `controleur-chariot`, nœud `servi` | caméra (le couloir tourne), choix |
-| manger | Mange ton sandwich avant qu'il refroidisse encore. | faim d'un joueur à 85 ou plus | manger, la jauge paraît puis s'efface |
-| dormir | Retourne au compartiment et allonge-toi sur une banquette. | sommeil d'un joueur à 80 ou plus (banquette: réveil à 85) | dormir (saut de nuit à deux, réveil à 6 h) |
+| chariot | Le chariot est annoncé au bout du couloir: va voir le Contrôleur et demande un sandwich. (cible: le Contrôleur) | `controleur-chariot`, nœud `servi` | caméra (le couloir tourne), choix |
+| manger | Mange ton sandwich avant qu'il refroidisse: ouvre ton carnet (touche C), choisis-le, puis Entrée. | faim d'un joueur à 85 ou plus | manger, la jauge paraît puis s'efface |
+| dormir | Allongez-vous tous les deux, chacun sur sa couchette: la nuit passera d'un trait. | les deux couchés (condition `posture`), sommeil d'un joueur à 80 ou plus (couchette: réveil à 85) | dormir (saut de nuit à deux, réveil à 6 h) |
 | descendre | Retrouve ta moitié devant la porte du wagon, et descendez. | les deux à la porte, ensemble | puis « Descendre » (intention `board` vers Aubrune) |
 
 Acte 1 (suite `le-train-de-5h12`, chapitre `logement-fourni`, ouverte à l'arrivée):

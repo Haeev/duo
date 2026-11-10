@@ -33,7 +33,7 @@
     {
       "do": "say",
       "who": "firmin",
-      "text": "Vous êtes venus par le car, vous avez dormi sur le banc. Voilà tout.",
+      "text": "Un train ? Il n'en passe plus, de train. Vous êtes venus par le car, vous avez dormi sur le banc. Voilà tout.",
       "emote": null,
       "sound": null,
       "to": "both",
