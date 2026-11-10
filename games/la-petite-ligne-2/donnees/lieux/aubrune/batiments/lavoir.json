@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "lavoir",
+  "nom": "le lavoir",
+  "detail": "toit en appentis sur poteaux de chêne, ouvert à l'ouest côté chemin; le bassin de pierre dépasse du toit côté ru: on s'agenouille à l'abri, l'eau est à ciel ouvert et se voit de haut",
+  "emprise": {
+    "largeur": 5,
+    "profondeur": 4
+  },
+  "place": {
+    "x": 0,
+    "y": 0,
+    "largeur": 3,
+    "profondeur": 4
+  },
+  "niveaux": 1,
+  "hauteurMurs": 2.25,
+  "murs": "poteaux",
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre",
+    "toit": "tuile"
+  },
+  "toit": {
+    "forme": "appentis",
+    "pente": 20,
+    "basVers": "est",
+    "debord": 0.5
+  },
+  "porte": {
+    "facade": "ouest",
+    "position": 0.5,
+    "modele": "ouverte"
+  },
+  "options": [
+    {
+      "piece": "bassin",
+      "x": 2.3,
+      "y": 0,
+      "longueur": 3.2,
+      "largeur": 1.9,
+      "rotation": 90
+    }
+  ]
+}

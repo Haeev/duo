@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "hameau-b",
+  "nom": "la maison aux volets clos",
+  "detail": "tous les volets fermés, gris de n'avoir pas été repeints: la maison vide du bout de la rue",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit",
+    "toit": "tuile",
+    "volets": "bois_gris",
+    "porte": "bois_gris"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 45
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["fenetre-close", "porte", "fenetre-close"],
+      "etage": ["fenetre-close", "fenetre-close", "fenetre-close"]
+    },
+    "nord": {
+      "rdc": ["fenetre-close"],
+      "etage": ["fenetre-close"]
+    },
+    "est": {
+      "rdc": ["fenetre-close"]
+    },
+    "ouest": {
+      "rdc": ["fenetre-close"],
+      "etage": ["fenetre-close"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.5
+    }
+  ]
+}

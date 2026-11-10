@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "id": "poste",
+  "nom": "le poste d'aiguillage",
+  "detail": "cabine haute et étroite au bord de la voie: grandes baies vitrées à l'étage sur les quatre faces, menuiseries rouge cheminot",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 4
+  },
+  "niveaux": 2,
+  "hauteurMurs": 5.3,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre",
+    "toit": "lauze",
+    "menuiseries": "rouge_cheminot",
+    "porte": "rouge_cheminot",
+    "volets": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "croupe",
+    "pente": 30,
+    "debord": 0.6
+  },
+  "porte": {
+    "facade": "nord",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "nord": {
+      "rdc": ["porte"],
+      "etage": [
+        {
+          "type": "fenetre-nue",
+          "largeur": 1.8
+        },
+        {
+          "type": "fenetre-nue",
+          "largeur": 1.8
+        }
+      ]
+    },
+    "sud": {
+      "rdc": ["petite-fenetre"],
+      "etage": [
+        {
+          "type": "fenetre-nue",
+          "largeur": 1.8
+        },
+        {
+          "type": "fenetre-nue",
+          "largeur": 1.8
+        }
+      ]
+    },
+    "est": {
+      "etage": [
+        {
+          "type": "fenetre-nue",
+          "largeur": 2.0
+        }
+      ]
+    },
+    "ouest": {
+      "etage": [
+        {
+          "type": "fenetre-nue",
+          "largeur": 2.0
+        }
+      ]
+    }
+  }
+}

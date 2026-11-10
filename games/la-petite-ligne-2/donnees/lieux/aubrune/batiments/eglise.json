@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "id": "eglise",
+  "nom": "l'église Saint-Aubin",
+  "detail": "le clocher carré à l'ouest de la nef, coiffé d'une flèche à quatre pans et d'une croix, ses baies à abat-sons; contreforts le long de la nef, portail en arc au sud",
+  "emprise": {
+    "largeur": 21,
+    "profondeur": 12
+  },
+  "budget": 15000,
+  "place": {
+    "x": 6,
+    "y": 0,
+    "largeur": 15,
+    "profondeur": 12
+  },
+  "niveaux": 1,
+  "hauteurMurs": 5.6,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre_claire",
+    "toit": "tuile",
+    "porte": "bois_sombre",
+    "menuiseries": "bois_sombre"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 42,
+    "faitage": "est-ouest",
+    "gouttieres": false
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "cochere",
+    "largeur": 2.2
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["vitrail", "porte", "vitrail", "vitrail", "vitrail"]
+    },
+    "nord": {
+      "rdc": ["vitrail", "vitrail", "vitrail", "vitrail", "vitrail"]
+    },
+    "est": {
+      "rdc": ["vitrail", "vitrail", "vitrail"],
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "contrefort",
+      "facade": "sud",
+      "position": 0.44,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "sud",
+      "position": 0.64,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "sud",
+      "position": 0.83,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "nord",
+      "position": 0.1,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "nord",
+      "position": 0.3,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "nord",
+      "position": 0.5,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "nord",
+      "position": 0.7,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "nord",
+      "position": 0.9,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "est",
+      "position": 0.04,
+      "monte": 4.7
+    },
+    {
+      "piece": "contrefort",
+      "facade": "est",
+      "position": 0.96,
+      "monte": 4.7
+    }
+  ],
+  "annexes": [
+    {
+      "nom": "clocher",
+      "place": {
+        "x": 0,
+        "y": 3,
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "niveaux": 1,
+      "hauteurMurs": 14.5,
+      "finition": "pierre",
+      "couleurs": {
+        "murs": "pierre_claire",
+        "toit": "tuile",
+        "porte": "bois_sombre"
+      },
+      "toit": {
+        "forme": "croupe",
+        "pente": 65,
+        "debord": 0.4,
+        "gouttieres": false
+      },
+      "facades": {
+        "sud": {
+          "rdc": [
+            {
+              "type": "petite-fenetre",
+              "bas": 7.0,
+              "position": 0.5
+            },
+            {
+              "type": "abat-sons",
+              "bas": 11.0,
+              "position": 0.5
+            }
+          ]
+        },
+        "nord": {
+          "rdc": [
+            {
+              "type": "petite-fenetre",
+              "bas": 7.0,
+              "position": 0.5
+            },
+            {
+              "type": "abat-sons",
+              "bas": 11.0,
+              "position": 0.5
+            }
+          ]
+        },
+        "ouest": {
+          "rdc": [
+            {
+              "type": "petite-fenetre",
+              "bas": 7.0,
+              "position": 0.5
+            },
+            {
+              "type": "abat-sons",
+              "bas": 11.0,
+              "position": 0.5
+            }
+          ]
+        },
+        "est": {
+          "rdc": [
+            {
+              "type": "abat-sons",
+              "bas": 11.0
+            }
+          ]
+        }
+      },
+      "options": [
+        {
+          "piece": "croix",
+          "hauteur": 1.7
+        }
+      ]
+    }
+  ]
+}

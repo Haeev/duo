@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "marthe",
+  "nom": "la maison de Marthe",
+  "detail": "maison de la sonneuse: faîtage nord-sud, porte à l'est sous une lucarne, volets bleus",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit",
+    "toit": "tuile",
+    "volets": "bleu",
+    "porte": "bleu"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40,
+    "faitage": "nord-sud"
+  },
+  "porte": {
+    "facade": "est",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "est": {
+      "rdc": ["fenetre-etroite", "porte"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre"],
+      "etage": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre-etroite"]
+    }
+  },
+  "options": [
+    {
+      "piece": "lucarne",
+      "facade": "est",
+      "position": 0.5
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.85
+    }
+  ]
+}

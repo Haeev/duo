@@ -43,6 +43,7 @@ describe('gabarits', () => {
     expect(Object.keys(TEMPLATES).sort()).toEqual(
       [
         'abri',
+        'batiment',
         'commerce',
         'culture',
         'espece',

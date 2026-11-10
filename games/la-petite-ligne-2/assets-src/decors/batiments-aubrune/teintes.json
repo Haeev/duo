@@ -1,0 +1,50 @@
+{
+  "format": "duo-teintes-batiments/1",
+  "lieu": "aubrune",
+  "note": "Teintes d'écran (sRGB) des bâtiments d'Aubrune, accordées à la référence encrée validée. Les noms sont ceux du plan (plan.json, gabarit.couleurs). Chaque teinte de matière a plusieurs tons: une pièce tire le sien, pour que deux pierres ou deux tuiles voisines ne soient jamais identiques.",
+  "murs": {
+    "crepi": {
+      "enduit": ["#F5E6C6", "#F1DDB8", "#F7EAD0"],
+      "enduit_ocre": ["#EBCB93", "#E6C388", "#EFD3A1"],
+      "enduit_rose": ["#EFD0BC", "#EAC6B0", "#F2D8C7"]
+    },
+    "pierre": {
+      "pierre": ["#D2C6AC", "#C9BDA6", "#DAD0B8"],
+      "pierre_claire": ["#E2D8C2", "#DAD0B8", "#E8E0CC"]
+    },
+    "bardage": {
+      "bois_brut": ["#C79E68", "#BD935E", "#D0A973"],
+      "bois_gris": ["#A99E8E", "#9F9484", "#B3A898"]
+    }
+  },
+  "toit": {
+    "tuile": ["#D98C62", "#CF8058", "#E09A70", "#AD6244"],
+    "lauze": ["#B9B0A0", "#A39A8A", "#CCC4B2", "#857E72"]
+  },
+  "peinture": {
+    "bleu_vert": "#8DB0AE",
+    "sauge": "#96A98C",
+    "bleu": "#7C9DB0",
+    "rouge_cheminot": "#B0604C",
+    "vert_sombre": "#557C69",
+    "bois_gris": "#9E9587",
+    "bois_sombre": "#8A6444",
+    "bois_brut": "#C79E68",
+    "miel": "#D7A86A",
+    "creme": "#F3EDE0",
+    "fleur_rose": "#D9919F",
+    "laiton": "#C8A150"
+  },
+  "fixes": {
+    "pierre_de_taille": ["#DED3BC", "#D2C6AC", "#B6A890", "#C9BDA6"],
+    "bois": ["#A87A46", "#9C7040", "#B4854F"],
+    "bois_clair": ["#D7A86A", "#CC9C60", "#DDB277"],
+    "fer": "#4A4D52",
+    "zinc": "#8C8E91",
+    "laiton": "#C8A150",
+    "vitre": "#3C5560",
+    "fond": "#3A2E28",
+    "brique": "#B5654A",
+    "eau": "#6FA3B4"
+  }
+}

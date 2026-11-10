@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "epicerie",
+  "nom": "l'épicerie-pension Ferrand",
+  "detail": "deux vitrines à bandeau vert sombre de part et d'autre de la porte vitrée, enseigne en potence, toit à croupes: le commerce de la place",
+  "emprise": {
+    "largeur": 8,
+    "profondeur": 10
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit_ocre",
+    "toit": "lauze",
+    "volets": "vert_sombre",
+    "porte": "vert_sombre",
+    "menuiseries": "vert_sombre",
+    "enseigne": "vert_sombre"
+  },
+  "toit": {
+    "forme": "croupe",
+    "pente": 35
+  },
+  "porte": {
+    "facade": "est",
+    "position": 0.5,
+    "modele": "vitree"
+  },
+  "facades": {
+    "est": {
+      "rdc": [
+        {
+          "type": "vitrine",
+          "largeur": 2.4
+        },
+        "porte",
+        {
+          "type": "vitrine",
+          "largeur": 2.4
+        }
+      ],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre", "porte-service", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre"],
+      "etage": ["fenetre", "fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "enseigne",
+      "forme": "potence",
+      "facade": "est",
+      "position": 0.5,
+      "hauteur": 3.9
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.5
+    }
+  ]
+}

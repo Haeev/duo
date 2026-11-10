@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "ferme-logis",
+  "nom": "le logis de la ferme Delmas",
+  "detail": "longère au crépi ocre, deux souches aux deux bouts du faîtage, façade au midi sur la cour, volets sauge",
+  "emprise": {
+    "largeur": 9,
+    "profondeur": 6
+  },
+  "niveaux": 2,
+  "finition": "crepi",
+  "couleurs": {
+    "murs": "enduit_ocre",
+    "toit": "tuile",
+    "volets": "sauge",
+    "porte": "sauge"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["fenetre", "porte", "fenetre"],
+      "etage": ["fenetre", "fenetre", "fenetre"]
+    },
+    "nord": {
+      "rdc": ["fenetre-etroite", "porte-service", "fenetre-etroite"],
+      "etage": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "ouest": {
+      "rdc": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.1
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.9
+    }
+  ]
+}

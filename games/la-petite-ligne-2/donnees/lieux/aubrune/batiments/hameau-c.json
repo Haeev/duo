@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "hameau-c",
+  "nom": "la maison du bout",
+  "detail": "maison basse d'un seul niveau en pierre, lucarne côté rue, volets rouge cheminot",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 1,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre",
+    "toit": "lauze",
+    "volets": "rouge_cheminot",
+    "porte": "rouge_cheminot"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 45
+  },
+  "porte": {
+    "facade": "nord",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "nord": {
+      "rdc": ["fenetre-etroite", "porte"]
+    },
+    "sud": {
+      "rdc": ["fenetre", "fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre"],
+      "pignon": ["petite-fenetre"]
+    },
+    "ouest": {
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "lucarne",
+      "facade": "nord",
+      "position": 0.5
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.15
+    }
+  ]
+}

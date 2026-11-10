@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "forge",
+  "nom": "la forge",
+  "detail": "pignon sur la route percé d'une grande baie ouverte, grosse cheminée de forge adossée au pignon nord",
+  "emprise": {
+    "largeur": 6,
+    "profondeur": 6
+  },
+  "niveaux": 1,
+  "hauteurMurs": 3.4,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre",
+    "toit": "lauze",
+    "porte": "bois_sombre",
+    "menuiseries": "bois_sombre"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 35,
+    "faitage": "nord-sud"
+  },
+  "porte": {
+    "facade": "sud",
+    "position": 0.5,
+    "modele": "baie",
+    "largeur": 2.6
+  },
+  "facades": {
+    "sud": {
+      "rdc": ["porte"]
+    },
+    "est": {
+      "rdc": ["fenetre-nue"]
+    },
+    "ouest": {
+      "rdc": ["fenetre-nue"]
+    }
+  },
+  "options": [
+    {
+      "piece": "cheminee",
+      "forme": "four",
+      "facade": "nord",
+      "position": 0.5
+    }
+  ]
+}

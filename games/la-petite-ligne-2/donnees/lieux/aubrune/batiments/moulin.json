@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "moulin",
+  "nom": "le moulin de la Vanne",
+  "detail": "la roue à aubes de 5 m sur le pignon sud, dans le bief; haute bâtisse de pierre, porte au nord sur la cour",
+  "emprise": {
+    "largeur": 8,
+    "profondeur": 8
+  },
+  "budget": 15000,
+  "niveaux": 2,
+  "hauteurMurs": 5.4,
+  "finition": "pierre",
+  "couleurs": {
+    "murs": "pierre",
+    "toit": "tuile",
+    "menuiseries": "bois_sombre",
+    "porte": "bois_sombre",
+    "volets": "bois_sombre"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 45,
+    "faitage": "nord-sud"
+  },
+  "porte": {
+    "facade": "nord",
+    "position": 0.5,
+    "modele": "pleine"
+  },
+  "facades": {
+    "nord": {
+      "rdc": ["fenetre-nue", "porte", "fenetre-nue"],
+      "etage": ["fenetre-nue", "fenetre-nue"],
+      "pignon": ["petite-fenetre"]
+    },
+    "sud": {
+      "pignon": ["petite-fenetre"]
+    },
+    "est": {
+      "rdc": ["fenetre-nue", "fenetre-nue"],
+      "etage": ["fenetre-nue", "fenetre-nue"]
+    },
+    "ouest": {
+      "rdc": ["fenetre-nue", "porte-service"],
+      "etage": ["fenetre-nue", "fenetre-nue"]
+    }
+  },
+  "options": [
+    {
+      "piece": "roue",
+      "facade": "sud",
+      "position": 0.5,
+      "diametre": 5.0,
+      "largeur": 0.9,
+      "enfonce": 0.6
+    },
+    {
+      "piece": "cheminee",
+      "forme": "souche",
+      "position": 0.22
+    }
+  ]
+}

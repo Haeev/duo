@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "grange",
+  "nom": "la grange",
+  "detail": "haute grange en planches grises, porte charretière de 3,5 m à l'est sur la cour, lucarne à foin au-dessus",
+  "emprise": {
+    "largeur": 8,
+    "profondeur": 10
+  },
+  "niveaux": 1,
+  "hauteurMurs": 4.6,
+  "finition": "bardage",
+  "couleurs": {
+    "murs": "bois_gris",
+    "toit": "tuile",
+    "porte": "bois_brut"
+  },
+  "toit": {
+    "forme": "deux-pans",
+    "pente": 40
+  },
+  "porte": {
+    "facade": "est",
+    "position": 0.5,
+    "modele": "grange",
+    "largeur": 3.5,
+    "hauteur": 3.2
+  },
+  "facades": {
+    "est": {
+      "rdc": ["porte"]
+    },
+    "ouest": {
+      "rdc": ["petite-fenetre", "petite-fenetre"]
+    },
+    "nord": {
+      "pignon": ["petite-fenetre"]
+    },
+    "sud": {
+      "pignon": ["petite-fenetre"]
+    }
+  },
+  "options": [
+    {
+      "piece": "lucarne",
+      "facade": "est",
+      "position": 0.5
+    }
+  ]
+}
