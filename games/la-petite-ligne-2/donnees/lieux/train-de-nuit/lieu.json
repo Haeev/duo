@@ -5,9 +5,16 @@
   "station": {
     "arrival": "compartiment",
     "platform": "porte",
-    "platformRadius": 2
+    "platformRadius": 2,
+    "facing": 2
   },
   "links": [],
   "activities": [],
-  "music": null
+  "music": null,
+  "pourquoi": "Une voiture de grande ligne de 7 m sur 3 (grille de 1 m: deux banquettes de 1 m et un couloir de 1 m), couloir central d'un bout à l'autre. À l'ouest, la travée des voyageurs (banquettes face à face, tablette, valises au-dessus); au milieu, la travée de nuit (couchettes); à l'est, le vestibule où se tient le Contrôleur, la porte de descente côté quai et l'intercirculation d'où vient le chariot.",
+  "ambience": {
+    "indoor": true,
+    "lamps": "#ffc27a",
+    "outside": "#05070d"
+  }
 }

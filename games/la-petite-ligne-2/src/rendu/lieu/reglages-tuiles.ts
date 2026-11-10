@@ -6,7 +6,8 @@
  */
 
 /** Ce qu'on entend sous ses pas (son des pas, lot audio). */
-export type SurfaceKind = 'herbe' | 'terre' | 'pave' | 'sable' | 'eau' | 'bois' | 'gravier';
+export type SurfaceKind =
+  'herbe' | 'terre' | 'pave' | 'sable' | 'eau' | 'bois' | 'gravier' | 'tapis';
 
 /** Rendu d'une nature de terrain: couleur du sol, surface entendue, eau ou non. */
 export interface GroundLook {
@@ -18,6 +19,11 @@ export interface GroundLook {
   readonly water?: boolean;
   /** Bord assombri là où elle touche une autre nature (bas-côté d'un chemin). */
   readonly verge?: number;
+  /**
+   * Lames est-ouest (plancher): largeur d'une lame (m) et teinte d'une lame sur deux (part).
+   * Dessinées sur le sol des petits lieux (`floor` de la carte, `sol.ts`).
+   */
+  readonly planks?: { readonly width: number; readonly shade: number };
 }
 
 /**
@@ -43,6 +49,11 @@ export const GROUND_LOOKS: Readonly<Record<string, GroundLook>> = {
   lisiere: { color: '#7d9c52', surface: 'herbe' },
   greve: { color: '#d8c79a', surface: 'sable' },
   annexe: { color: '#000000', surface: 'pave', hidden: true },
+  // Sols d'intérieur des petits lieux (`floor` de la carte): plancher ciré, tapis d'un couloir, et
+  // le vide autour d'une pièce (rien n'est dessiné: le fond de la scène).
+  plancher: { color: '#9a6b45', surface: 'bois', planks: { width: 0.2, shade: 0.88 } },
+  'tapis-de-couloir': { color: '#8c3f35', surface: 'tapis' },
+  vide: { color: '#000000', surface: 'bois', hidden: true },
 };
 
 /** Repli pour une nature inconnue de la table. */

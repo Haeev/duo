@@ -53,7 +53,7 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 
 ## Objets au sol, ensembles, sacs et notes de placement
 
-Quatre ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/lieu/carte.jsonc`, `_gabarits/objet.jsonc`).
+Cinq ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits/lieu/carte.jsonc`, `_gabarits/objet.jsonc`).
 
 | Besoin                       | Recette                                                                                                                                                                                                                                                                            |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -61,6 +61,7 @@ Quatre ajouts de données, sans ligne de moteur (gabarits commentés: `_gabarits
 | Ensemble de meubles          | Donne le même `"group"` aux meubles de la carte qui forment un tout (une table et ses chaises). Le repas spécial à deux est servi quand les deux joueurs sont assis sur deux meubles du groupe. Deux meubles au moins, un à brique `sit`, à 6 m au plus l'un de l'autre.           |
 | Sac comme objet              | Un objet `"family": "bag"`, `"stack": 1`, `"bag": "<id de sacs.json>"`. Il s'achète (commerce), se trouve (`groundItems`) ou se reçoit (`give_item`), puis s'équipe (intention `equip_bag`): le sac porté revient dans les poches. `give_bag` des dialogues reste valable.         |
 | Note de placement `pourquoi` | Texte facultatif sur le lieu (`lieu.json`), chaque meuble, chaque objet au sol et chaque intérieur: pourquoi il est là, dans ce sens, à cette taille. Le moteur l'ignore. `pnpm pourquoi [lieu]` liste ce qui n'en a pas, sans rien bloquer.                                       |
+| Sol d'un petit lieu          | Dans `carte.json` d'un lieu sans `terrain`, `floor`: `{ "nature": "vide", "areas": [{ "x", "y", "w", "h", "nature": "plancher" }] }`, peints dans l'ordre. Natures: `plancher`, `tapis-de-couloir`, `vide` (rien n'est dessiné), `herbe`... Exemple: `lieux/train-de-nuit`.        |
 
 ## Briques (ce qu'un meuble sait faire)
 

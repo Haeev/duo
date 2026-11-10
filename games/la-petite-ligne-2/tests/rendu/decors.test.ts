@@ -24,7 +24,6 @@ function parse(file: string): Promise<GLTF> {
 }
 
 const PROPS_WITHOUT_MODEL = [
-  'banquette',
   'baquet-essai',
   'branches',
   'buffet-essai',
@@ -68,7 +67,13 @@ beforeAll(async () => {
 describe('décors livrés', () => {
   it('charge chaque modèle du manifeste', () => {
     expect(models.size).toBe(Object.keys(DECOR_MANIFEST.models).length);
-    expect(decorFiles()).toEqual(['furniture.glb', 'houses.glb', 'plants.glb', 'street.glb']);
+    expect(decorFiles()).toEqual([
+      'furniture.glb',
+      'houses.glb',
+      'plants.glb',
+      'street.glb',
+      'train.glb',
+    ]);
   });
 
   it('donne son modèle à chaque meuble qui en a un livré, les autres gardent leur forme provisoire', () => {

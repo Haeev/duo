@@ -11,6 +11,7 @@ import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { boxOf, type PlaceDescription, type SceneVolume } from './description';
 import { groundGeometry, standInGeometry } from './formes';
+import { floorGeometry } from './sol';
 
 /**
  * D'où viennent les modèles livrés. `instantiate` rend un objet neuf pour ce nom de modèle, ou
@@ -70,8 +71,11 @@ export class PlaceScene {
   ) {
     this.root.name = 'lieu';
     if (withGround) {
+      const { width, height, floor } = description;
       const ground = new Mesh(
-        this.tracker.track(groundGeometry(description.width, description.height)),
+        this.tracker.track(
+          floor === undefined ? groundGeometry(width, height) : floorGeometry(floor, width, height),
+        ),
         materials.ground,
       );
       ground.receiveShadow = true;

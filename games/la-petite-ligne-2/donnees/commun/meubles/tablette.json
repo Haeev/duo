@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "tablette",
+  "name": "Tablette",
+  "model": "train-table",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": []
+}

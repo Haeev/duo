@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "paroi-au-plan-de-ligne",
+  "name": "Paroi au plan de la ligne",
+  "model": "train-wall-map",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": "voiture-de-nuit",
+  "bricks": []
+}

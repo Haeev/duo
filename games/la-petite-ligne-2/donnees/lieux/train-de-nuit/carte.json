@@ -1,93 +1,345 @@
 {
   "schema": 1,
-  "width": 26,
-  "height": 12,
-  "blocked": [
-    {
-      "x": 0,
-      "y": 0,
-      "w": 26,
-      "h": 2
-    },
-    {
-      "x": 0,
-      "y": 10,
-      "w": 26,
-      "h": 2
-    },
-    {
-      "x": 0,
-      "y": 2,
-      "w": 1,
-      "h": 8
-    },
-    {
-      "x": 25,
-      "y": 2,
-      "w": 1,
-      "h": 8
-    },
-    {
-      "x": 9,
-      "y": 2,
-      "w": 1,
-      "h": 4
-    },
-    {
-      "x": 1,
-      "y": 6,
-      "w": 8,
-      "h": 1
-    },
-    {
-      "x": 10,
-      "y": 6,
-      "w": 3,
-      "h": 1
-    },
-    {
-      "x": 14,
-      "y": 6,
-      "w": 11,
-      "h": 1
-    }
-  ],
+  "width": 11,
+  "height": 9,
+  "floor": {
+    "nature": "vide",
+    "areas": [
+      {
+        "x": 2,
+        "y": 3,
+        "w": 7,
+        "h": 3,
+        "nature": "plancher"
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "w": 5,
+        "h": 1,
+        "nature": "tapis-de-couloir"
+      }
+    ]
+  },
+  "blocked": [],
   "points": {
     "compartiment": {
-      "x": 5,
-      "y": 4
+      "x": 3.5,
+      "y": 4.5
     },
     "porte-compartiment": {
-      "x": 9.5,
-      "y": 6.5
+      "x": 5.0,
+      "y": 4.5
     },
     "couloir": {
-      "x": 12,
-      "y": 8
+      "x": 7.55,
+      "y": 3.6
     },
     "chariot": {
-      "x": 22,
-      "y": 8
+      "x": 8.55,
+      "y": 4.45
     },
     "porte": {
-      "x": 13.5,
-      "y": 9.2
+      "x": 8.35,
+      "y": 5.35
     }
   },
   "objects": [
     {
-      "id": "banquette-ouest",
-      "type": "banquette",
-      "x": 3,
-      "y": 3,
-      "rotation": 0
+      "id": "paroi-nord-2",
+      "type": "paroi-a-fenetre",
+      "x": 2.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
     },
     {
-      "id": "banquette-est",
+      "id": "paroi-nord-3",
+      "type": "paroi-a-fenetre",
+      "x": 3.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
+    },
+    {
+      "id": "paroi-nord-4",
+      "type": "paroi-a-fenetre",
+      "x": 4.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
+    },
+    {
+      "id": "paroi-nord-5",
+      "type": "paroi-a-fenetre",
+      "x": 5.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
+    },
+    {
+      "id": "paroi-nord-6",
+      "type": "paroi-a-fenetre",
+      "x": 6.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
+    },
+    {
+      "id": "paroi-nord-7",
+      "type": "paroi-a-fenetre",
+      "x": 7.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
+    },
+    {
+      "id": "paroi-nord-8",
+      "type": "paroi-a-fenetre",
+      "x": 8.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Flanc nord de la voiture: une fenêtre par mètre, la nuit derrière."
+    },
+    {
+      "id": "paroi-sud-2",
+      "type": "paroi-a-fenetre",
+      "x": 2.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Flanc sud de la voiture, tourné vers l'intérieur."
+    },
+    {
+      "id": "paroi-sud-3",
+      "type": "paroi-a-fenetre",
+      "x": 3.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Flanc sud de la voiture, tourné vers l'intérieur."
+    },
+    {
+      "id": "paroi-sud-4",
+      "type": "paroi-a-fenetre",
+      "x": 4.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Flanc sud de la voiture, tourné vers l'intérieur."
+    },
+    {
+      "id": "paroi-sud-5",
+      "type": "paroi-a-fenetre",
+      "x": 5.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Flanc sud de la voiture, tourné vers l'intérieur."
+    },
+    {
+      "id": "paroi-sud-6",
+      "type": "paroi-a-fenetre",
+      "x": 6.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Flanc sud de la voiture, tourné vers l'intérieur."
+    },
+    {
+      "id": "paroi-sud-7",
+      "type": "paroi-a-fenetre",
+      "x": 7.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Flanc sud de la voiture, tourné vers l'intérieur."
+    },
+    {
+      "id": "porte-du-quai",
+      "type": "porte-de-voiture",
+      "x": 8.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Porte de descente, côté quai, dans le vestibule: on sort par elle à la fin du prologue (point porte)."
+    },
+    {
+      "id": "bout-ouest-nord",
+      "type": "paroi-de-voiture",
+      "x": 1.5,
+      "y": 3.5,
+      "rotation": 1,
+      "pourquoi": "Bout de la voiture, derrière le dossier de la banquette."
+    },
+    {
+      "id": "plan-de-la-ligne",
+      "type": "paroi-au-plan-de-ligne",
+      "x": 1.5,
+      "y": 4.5,
+      "rotation": 1,
+      "pourquoi": "Au bout du couloir central, le plan de la ligne encadré: on le voit en entrant dans la travée."
+    },
+    {
+      "id": "bout-ouest-sud",
+      "type": "paroi-de-voiture",
+      "x": 1.5,
+      "y": 5.5,
+      "rotation": 1,
+      "pourquoi": "Bout de la voiture, derrière le dossier de la banquette."
+    },
+    {
+      "id": "bout-est-nord",
+      "type": "paroi-de-voiture",
+      "x": 9.5,
+      "y": 3.5,
+      "rotation": 3,
+      "pourquoi": "Bout de la voiture côté vestibule."
+    },
+    {
+      "id": "porte-de-la-voiture-suivante",
+      "type": "porte-de-voiture",
+      "x": 9.5,
+      "y": 4.5,
+      "rotation": 3,
+      "pourquoi": "Intercirculation vers la voiture suivante, dans l'axe du couloir: le chariot vient de là."
+    },
+    {
+      "id": "bout-est-sud",
+      "type": "paroi-de-voiture",
+      "x": 9.5,
+      "y": 5.5,
+      "rotation": 3,
+      "pourquoi": "Bout de la voiture côté vestibule."
+    },
+    {
+      "id": "angle-nord-ouest",
+      "type": "angle-de-caisse",
+      "x": 1.5,
+      "y": 2.5,
+      "rotation": 0,
+      "pourquoi": "Coin de caisse: ferme la jonction des deux parois."
+    },
+    {
+      "id": "angle-nord-est",
+      "type": "angle-de-caisse",
+      "x": 9.5,
+      "y": 2.5,
+      "rotation": 3,
+      "pourquoi": "Coin de caisse: ferme la jonction des deux parois."
+    },
+    {
+      "id": "angle-sud-ouest",
+      "type": "angle-de-caisse",
+      "x": 1.5,
+      "y": 6.5,
+      "rotation": 1,
+      "pourquoi": "Coin de caisse: ferme la jonction des deux parois."
+    },
+    {
+      "id": "angle-sud-est",
+      "type": "angle-de-caisse",
+      "x": 9.5,
+      "y": 6.5,
+      "rotation": 2,
+      "pourquoi": "Coin de caisse: ferme la jonction des deux parois."
+    },
+    {
+      "id": "banquette-nord-ouest",
+      "type": "banquette-de-train",
+      "x": 2.325,
+      "y": 3.5,
+      "rotation": 1,
+      "pourquoi": "Dos contre le bout de la voiture, tournée vers l'est: face à l'autre banquette de la travée."
+    },
+    {
+      "id": "tablette-nord",
+      "type": "tablette",
+      "x": 3.5,
+      "y": 3.275,
+      "rotation": 0,
+      "pourquoi": "Fixée sous la fenêtre, entre les deux banquettes face à face: 0,6 m de jambes de chaque côté."
+    },
+    {
+      "id": "banquette-nord-est",
+      "type": "banquette-de-train",
+      "x": 4.675,
+      "y": 3.5,
+      "rotation": 3,
+      "pourquoi": "Tournée vers l'ouest, face à l'autre banquette; son dos touche celui de la couchette."
+    },
+    {
+      "id": "couchette-nord",
       "type": "banquette",
-      "x": 7,
-      "y": 3,
-      "rotation": 0
+      "x": 6.0,
+      "y": 3.5,
+      "rotation": 1,
+      "pourquoi": "Travée de nuit: les deux banquettes tirées en couchette, oreiller à l'ouest (le dos), pieds vers le vestibule."
+    },
+    {
+      "id": "banquette-sud-ouest",
+      "type": "banquette-de-train",
+      "x": 2.325,
+      "y": 5.5,
+      "rotation": 1,
+      "pourquoi": "Dos contre le bout de la voiture, tournée vers l'est: face à l'autre banquette de la travée."
+    },
+    {
+      "id": "tablette-sud",
+      "type": "tablette",
+      "x": 3.5,
+      "y": 5.725,
+      "rotation": 2,
+      "pourquoi": "Fixée sous la fenêtre, entre les deux banquettes face à face: 0,6 m de jambes de chaque côté."
+    },
+    {
+      "id": "banquette-sud-est",
+      "type": "banquette-de-train",
+      "x": 4.675,
+      "y": 5.5,
+      "rotation": 3,
+      "pourquoi": "Tournée vers l'ouest, face à l'autre banquette; son dos touche celui de la couchette."
+    },
+    {
+      "id": "couchette-sud",
+      "type": "banquette",
+      "x": 6.0,
+      "y": 5.5,
+      "rotation": 1,
+      "pourquoi": "Travée de nuit: les deux banquettes tirées en couchette, oreiller à l'ouest (le dos), pieds vers le vestibule."
+    },
+    {
+      "id": "porte-bagages-nord",
+      "type": "porte-bagages",
+      "x": 3.5,
+      "y": 3.2,
+      "rotation": 0,
+      "pourquoi": "Au-dessus de la travée des voyageurs, à 1,80 m: leurs deux valises."
+    },
+    {
+      "id": "porte-bagages-sud",
+      "type": "porte-bagages-vide",
+      "x": 3.5,
+      "y": 5.8,
+      "rotation": 2,
+      "pourquoi": "Le filet d'en face, vide: personne d'autre dans la voiture."
+    },
+    {
+      "id": "applique-nord",
+      "type": "applique",
+      "x": 5.0,
+      "y": 3.089,
+      "rotation": 0,
+      "pourquoi": "Sur le trumeau entre la travée et la couchette, au-dessus des dossiers: éclaire les deux."
+    },
+    {
+      "id": "applique-sud",
+      "type": "applique",
+      "x": 5.0,
+      "y": 5.911,
+      "rotation": 2,
+      "pourquoi": "Sur le trumeau d'en face, même hauteur."
+    },
+    {
+      "id": "applique-vestibule",
+      "type": "applique",
+      "x": 8.0,
+      "y": 3.089,
+      "rotation": 0,
+      "pourquoi": "Éclaire le vestibule, la porte de descente et le Contrôleur."
     }
   ]
 }

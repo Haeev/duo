@@ -7,8 +7,10 @@
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { DeepReadonly } from '../../etat/monde';
 import type { PlaceState } from '../../etat/lieu';
+import type { FloorDef } from '../../donnees/schemas/lieu';
 import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
+import { DECOR_MANIFEST } from './decors-manifeste';
 
 /** Forme simple d'un volume sans modèle. */
 export type StandInShape = 'box' | 'ball' | 'post' | 'slab';
@@ -44,6 +46,8 @@ export interface PlaceDescription {
   readonly width: number;
   readonly height: number;
   readonly volumes: readonly SceneVolume[];
+  /** Sol déclaré par la carte (`sol.ts`); absent: la plaque d'essai. */
+  readonly floor?: FloorDef;
 }
 
 type StandInSettings = typeof RENDER_SETTINGS.standIn;
@@ -111,14 +115,17 @@ export function describePlace(
       h: prop.size.h,
       rotation: object.rotation,
       base: 0,
-      height: settings.propHeight,
+      // Hauteur du modèle livré quand il y en a un: une paroi de 2,15 m doit s'effacer devant
+      // le joueur qu'elle cache, pas seulement sur 0,9 m.
+      height: DECOR_MANIFEST.models[prop.model]?.size.h ?? settings.propHeight,
       shape: 'box',
       occludes: true,
       aimable: true,
     });
   }
   volumes.push(...extras);
-  return { id: place.def.id, width: place.map.width, height: place.map.height, volumes };
+  const { width, height, floor } = place.map;
+  return { id: place.def.id, width, height, volumes, ...(floor === undefined ? {} : { floor }) };
 }
 
 /** Volumes qui changent en cours de partie: meubles posés par les joueurs et objets au sol. */

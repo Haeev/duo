@@ -778,6 +778,246 @@
    "top": 0.75,
    "triangles": 532
   },
+  "train-berth": {
+   "bed": {
+    "height": 0.48,
+    "places": 1
+   },
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 2.0,
+    "h": 1.15,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "couchette-train",
+   "file": "train.glb",
+   "nodes": [
+    "train-berth_mesh"
+   ],
+   "size": {
+    "d": 2.0,
+    "h": 1.15,
+    "w": 1.0
+   },
+   "triangles": 836
+  },
+  "train-door": {
+   "bottom": 0.0,
+   "budget": 600,
+   "collision": {
+    "d": 0.146,
+    "h": 2.15,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "porte-voiture",
+   "file": "train.glb",
+   "nodes": [
+    "train-door_mesh"
+   ],
+   "size": {
+    "d": 0.146,
+    "h": 2.15,
+    "w": 1.0
+   },
+   "triangles": 372
+  },
+  "train-luggage-rack": {
+   "bottom": 1.7141,
+   "budget": 2500,
+   "collision": {
+    "d": 0.392,
+    "h": 2.044,
+    "shape": "box",
+    "w": 2.6
+   },
+   "family": "porte-bagages",
+   "file": "train.glb",
+   "nodes": [
+    "train-luggage-rack_mesh"
+   ],
+   "size": {
+    "d": 0.392,
+    "h": 2.044,
+    "w": 2.6
+   },
+   "triangles": 784
+  },
+  "train-luggage-rack-empty": {
+   "bottom": 1.7141,
+   "budget": 2500,
+   "collision": {
+    "d": 0.392,
+    "h": 1.98,
+    "shape": "box",
+    "w": 2.6
+   },
+   "family": "porte-bagages",
+   "file": "train.glb",
+   "nodes": [
+    "train-luggage-rack-empty_mesh"
+   ],
+   "size": {
+    "d": 0.392,
+    "h": 1.98,
+    "w": 2.6
+   },
+   "triangles": 416
+  },
+  "train-seat": {
+   "bottom": 0.0,
+   "budget": 2500,
+   "collision": {
+    "d": 0.645,
+    "h": 1.15,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "banquette-train",
+   "file": "train.glb",
+   "nodes": [
+    "train-seat_mesh"
+   ],
+   "seat": {
+    "front": 0.325,
+    "height": 0.45
+   },
+   "size": {
+    "d": 0.645,
+    "h": 1.15,
+    "w": 1.0
+   },
+   "triangles": 528
+  },
+  "train-table": {
+   "bottom": 0.0,
+   "budget": 800,
+   "collision": {
+    "d": 0.55,
+    "h": 0.75,
+    "shape": "box",
+    "w": 0.45
+   },
+   "family": "tablette",
+   "file": "train.glb",
+   "nodes": [
+    "train-table_mesh"
+   ],
+   "size": {
+    "d": 0.55,
+    "h": 0.75,
+    "w": 0.45
+   },
+   "top": 0.75,
+   "triangles": 348
+  },
+  "train-wall": {
+   "bottom": 0.0,
+   "budget": 600,
+   "collision": {
+    "d": 0.14,
+    "h": 2.15,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "paroi-voiture",
+   "file": "train.glb",
+   "nodes": [
+    "train-wall_mesh"
+   ],
+   "size": {
+    "d": 0.14,
+    "h": 2.15,
+    "w": 1.0
+   },
+   "triangles": 144
+  },
+  "train-wall-corner": {
+   "bottom": 0.0,
+   "budget": 60,
+   "collision": {
+    "d": 0.14,
+    "h": 2.15,
+    "shape": "box",
+    "w": 0.14
+   },
+   "family": "angle-caisse",
+   "file": "train.glb",
+   "nodes": [
+    "train-wall-corner_mesh"
+   ],
+   "size": {
+    "d": 0.14,
+    "h": 2.15,
+    "w": 0.14
+   },
+   "triangles": 36
+  },
+  "train-wall-lamp": {
+   "bottom": 1.45,
+   "budget": 600,
+   "collision": {
+    "d": 0.178,
+    "h": 1.682,
+    "shape": "box",
+    "w": 0.142
+   },
+   "family": "applique",
+   "file": "train.glb",
+   "nodes": [
+    "train-wall-lamp_mesh"
+   ],
+   "size": {
+    "d": 0.178,
+    "h": 1.682,
+    "w": 0.142
+   },
+   "triangles": 328
+  },
+  "train-wall-map": {
+   "bottom": 0.0,
+   "budget": 600,
+   "collision": {
+    "d": 0.164,
+    "h": 2.15,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "paroi-voiture",
+   "file": "train.glb",
+   "nodes": [
+    "train-wall-map_mesh"
+   ],
+   "size": {
+    "d": 0.164,
+    "h": 2.15,
+    "w": 1.0
+   },
+   "triangles": 204
+  },
+  "train-wall-window": {
+   "bottom": 0.0,
+   "budget": 600,
+   "collision": {
+    "d": 0.165,
+    "h": 2.15,
+    "shape": "box",
+    "w": 1.0
+   },
+   "family": "paroi-voiture",
+   "file": "train.glb",
+   "nodes": [
+    "train-wall-window_mesh"
+   ],
+   "size": {
+    "d": 0.165,
+    "h": 2.15,
+    "w": 1.0
+   },
+   "triangles": 360
+  },
   "tree-apple": {
    "bottom": 0.0,
    "budget": 2500,
