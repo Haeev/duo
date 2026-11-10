@@ -388,7 +388,7 @@ Une collection complète dans un lieu donne un meuble trophée unique. Les meubl
 
 - **Habitants de la 0.13 gardés et refondus** (décision du 10 novembre): mêmes prénoms et mêmes métiers quand ils servent l'histoire, apparence recomposée depuis le nouveau catalogue, caractère resserré, tous les textes et toutes les quêtes réécrits.
 - **Humains** (R43), **personnalités marquées** (R44): chaque habitant a un registre de langue, un tic, un sujet favori, une mauvaise foi bien à lui. Aucun habitant ne ressemble à un autre, y compris physiquement (R50); les habitants secondaires ont la même qualité de modèle et d'écriture que ceux des quêtes, avec moins de texte (R36).
-- **Dialogue** (R37, R63): bandeau bas avec portrait, lettre par lettre (40 caractères par seconde), trois lignes au plus par page; Espace affiche tout, puis passe. **Babil** (R38): chaque habitant a un instrument pour voix (Firmin un basson, Jeanne un pipeau, Honorine une boîte à musique), dont les notes suivent les syllabes et la ponctuation. Émotions en onomatopées stylisées au-dessus de la tête (R51); avant de parler à un joueur à l'hygiène basse, l'habitant affiche « Pouah », et le choix de dialogue qui échouerait porte une goutte barrée: on sait pourquoi avant de choisir.
+- **Dialogue** (R37, R63): bandeau bas avec portrait, lettre par lettre (40 caractères par seconde), trois lignes au plus par page; Espace affiche tout, puis passe. **Babil** (R38): chaque habitant a un instrument pour voix (Firmin un basson, Jeanne un pipeau, Honorine une boîte à musique), dont les notes suivent les syllabes et la ponctuation. Émotions en onomatopées stylisées au-dessus de la tête (R51); avant de parler à un joueur à l'hygiène basse, l'habitant affiche l'onomatopée d'odeur (`bible-artistique.md` 6.2), et le choix de dialogue qui échouerait porte une goutte barrée: on sait pourquoi avant de choisir.
 - **Amitié** (R39): 5 cœurs de 100 points par habitant et par joueur. Jamais de perte.
 
 | Geste | Points | Limite |
@@ -626,25 +626,61 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 
 ## 7. Direction artistique (directeur-artistique)
 
-À rédiger. Cadre fixé par le client: rendu lisse et doux, comme une figurine (R46); proportions actuelles (R45); visages modélisés en relief, émotions en onomatopées stylisées (R51); corps enfant, adulte, âgé, avec 2 ou 3 corpulences (R48); catalogue d'une quinzaine de pièces par catégorie pour sept catégories de vêtements (R49, R50); aucun habitant vu deux fois; la beauté passe avant la fluidité sur le PC (R73). Demandes du design: une identité par lieu, une cible d'action toujours lisible, des portraits pour le bandeau de dialogue.
+Résumé. Document de référence, qui fait foi: `docs/jeux/jeu-1/refonte/bible-artistique.md` (planches dans `planches/`).
+
+- **Fil directeur, validé le 10 novembre: une maquette de train miniature.** La Petite Ligne est un train miniature et son monde est la maquette qu'il traverse: personnages en figurines peintes, maisons de maquette, arbres en boules de mousse, le tout posé à la main par quelqu'un de soigneux. Les trois lieux sont trois dioramas de la même main.
+- **Trois piliers**: doux (surfaces lisses, bords épais et ronds, aplats mats, lumière chaude), miniature (peu de détails, chacun modelé en volume, aucune texture), expressif (chaque habitant se reconnaît à sa silhouette, puis à sa couleur, puis à sa pièce signature).
+- **Personnages**: proportions actuelles gardées (adulte de 5 têtes, R45); corps d'enfant, d'adulte et de personne âgée en 2 ou 3 corpulences (R48), les deux joueurs étant des adultes; **visages en relief à pièces de rechange** (nez, yeux, sourcils, bouche: validé le 10 novembre), huit expressions, et des onomatopées stylisées au-dessus des têtes (R51). Catalogue d'une quinzaine de pièces par catégorie (R50), portables par tous; le choix femme ou homme de l'éditeur ne fait que proposer une silhouette et des pièces de départ (1.5).
+- **Fabrication** (décisions du 10 novembre, d'après l'essai 2: `docs/production/essais-meshy/personnage-modulaire/README.md`, section 8): corps, visages et vêtements par les scripts du studio (rendu de figurine obtenu, proportions exactes, couleur par pièce, aucun crédit); Meshy réservé aux chapeaux, sacs, accessoires et coiffures élaborées, puis aux meubles, bâtiments et paysage, pièce par pièce et sur preuve.
+- **Les deux joueurs**: écusson du profil Duo sur la poitrine et anneau au sol à la couleur et au symbole du profil, lisibles sans distinguer les teintes.
+- **Lieux**: Aubrune tendre, ensoleillée, un peu passée; Hautefonte vive et dense, pierre blonde, zinc et enseignes; Combe-Veilleuse voilée de brume, avec une seule couleur surnaturelle (un vert d'eau pâle) face à l'ambre des lanternes, et des quartiers qui retrouvent leurs couleurs à mesure qu'on les apaise. La bible y parle d'esprits visibles: ils sont réservés au troisième lieu (6.1).
+- **Budgets**: plancher de 30 images par seconde sur le PC (validé le 10 novembre); 350 000 triangles et 200 appels de dessin par vue, 9 000 triangles au plus par personnage.
+- **Demandes du design à la direction artistique**: une cible d'action toujours lisible (rebond, liseré); un portrait par habitant pour le bandeau de dialogue; un objet 3D par entrée de collection; l'autorail crème du 5 h 12, qui doit avoir l'air d'un vrai train, sans effet surnaturel.
 
 ## 8. Direction sonore (sound-designer)
 
-À rédiger. Cadre: un air selon l'heure, la météo et le lieu (R72); un son court par geste (R22); un babil par habitant, sur un timbre d'instrument (4.9); un jingle de prise nouvelle; la cloche et la sonnerie du passage à niveau entendues des deux joueurs dans tout le bourg.
+À écrire par le sound-designer. Intentions connues, à tenir:
+
+- **Musique**: un air selon l'heure, la météo et le lieu (R72). Chaque lieu a sa couleur d'instruments; la nuit jouable a ses propres airs, plus dépouillés.
+- **Babil**: une voix par personnage (R38), sur un timbre d'instrument propre à chacun, dont les notes suivent les syllabes et la ponctuation du texte qui s'écrit (4.9).
+- **Gestes**: un son court par geste, en moins d'un dixième de seconde (R22); un son de refus doux; un jingle pour une prise nouvelle; un son discret pour un changement de palier d'un besoin.
+- **Sons du monde entendus par les deux joueurs**, dans tout le lieu: la cloche de Marthe, la sonnerie du passage à niveau, le sifflet du train du samedi (retours R03 et R19 du 4 novembre).
+- **Le 5 h 12**: deux coups de sonnerie et un roulement lointain qu'on peut prendre pour le vent. Jamais de son inquiétant à Aubrune.
+- **Repas spécial**: une petite scène sonore conviviale (couverts, rires, vapeur).
 
 ## 9. Interface et HUD (ux-ui-designer)
 
-À rédiger. Cadre: presque rien à l'écran (R60); un carnet animé à onglets en images (R61); sac en 3D (R62); bandeau de dialogue bas avec portrait (R63); boutiques en menu (R64); noms au survol dans les menus seulement (R65); carte plein écran (R66); taille des textes actuelle (R67); repère de quête de 3 secondes (R68); bulle sur l'habitant qui a quelque chose pour nous (R69); panneau unique du poulailler (R31).
+Résumé. Document de référence, qui fait foi: `docs/jeux/jeu-1/refonte/interface.md` (maquettes dans `maquettes/`). Les quatre écarts relevés en 12.1 de ce document sont levés par cette version 0.2 (barre repliée, touche G, zoom au clavier, onglets du client).
+
+- **L'écran appartient au monde**: en permanence, l'horloge (cadran où le soleil puis la lune suivent un arc, météo, petit lit à partir de 15 h) et la bourse (une pièce et un nombre). Rien d'autre (R60).
+- **Ce qui vient quand il sert**: la bulle d'action sur la cible (la touche et un verbe), la barre d'outils (repliée après 3 secondes), le médaillon d'un besoin qui change de palier (affiché en continu sous 20), la bulle « j'ai quelque chose » sur un habitant (R69), les onomatopées, le gain qui vole vers la bourse ou la barre, la présentation d'une prise nouvelle, un avis à la fois en haut à droite.
+- **Coup d'œil** (G, 3 secondes): flèche de la quête, besoins, barre d'outils, repère de l'autre joueur.
+- **Dialogue**: bandeau bas avec portrait, texte lettre par lettre, trois lignes au plus, Espace pour tout afficher puis continuer (R37, R63).
+- **Carnet**: un seul objet animé, sept signets en images (Sac, Quêtes, Habitants, Collections, Carte, Tenues, Réglages), les besoins toujours visibles dans son en-tête (R61, R62, R66).
+- **Menus de métier** (boutique, basse-cour, cuisine): même charpente, des vignettes à gauche, le détail à droite, les mêmes touches (R31, R64). Noms au survol dans les menus seulement, 4 mots au plus (R65); taille des textes actuelle (R67).
+- **Mode déco** vu du dessus, à la souris (R52). **Éditeur de personnage** avec le choix femme ou homme en première page, modifiable ensuite (1.5).
+- **Accessibilité**: rien n'est dit par la seule couleur ni par la seule animation; tout se fait au clavier sauf le mode déco; lisible à 1366 x 768.
+- Écart à régler entre documents, sans effet sur les règles: le signe de la remarque d'hygiène (« pff » dans la bible, « Pouah » dans l'interface).
 
 ## 10. Technique (architecte-technique, dev-reseau, tech-artist)
 
-À rédiger. Questions du design: chargement d'un lieu pendant la scène de wagon; simulation réduite des lieux absents; un format de sauvegarde neuf (les anciennes sont abandonnées, R7); le statut d'une séance quittée normalement; R73 (la beauté avant la fluidité) face à la machine de référence, avec un plancher d'images par seconde à fixer.
+Résumé. Document de référence, qui fait foi: `docs/jeux/jeu-1/refonte/technique.md`.
+
+- **Nouveau paquet de jeu à côté de l'ancien** (décision du 10 novembre): deux jeux dans Duo pendant la refonte, puis retrait de l'ancien à l'Alpha du premier lieu. Nouvel identifiant (proposition `petite-ligne`, nom affiché inchangé), modules sains de la 0.13 repris un par un, format de sauvegarde remis à 1.
+- **Parties d'essai remises à zéro à chaque étape** tant que le jeu n'est pas complet (décision du 10 novembre), avec un message clair en jeu; à partir de l'Alpha du premier lieu, toute évolution du format est migrée.
+- **Carte d'Aubrune reprise et retouchée** (décision du 10 novembre); seul le contenu repart de zéro.
+- **Un seul lieu actif**: le train exige les deux joueurs, donc un seul lieu est simulé, chargé et transmis; les autres dorment dans l'état et se rattrapent à l'arrivée (ce qui porte la règle « pendant l'absence » de 4.1). Chargement d'un lieu en 8 secondes au plus sur le PC, couvert par la scène du wagon.
+- **Réseau**: l'hôte fait autorité, l'invité prédit son déplacement et son geste; l'état part en tranches, une par canal, chacune avec un budget testé (le message unique de la 0.13 approchait la limite de 64 Kio).
+- **Caméra libre** sur un angle continu; occultation dehors, ombres stables en rotation, fondu des coupes de murs et de toits.
+- **Personnages modulaires**: squelette commun, pièces fusionnées en un seul maillage par personnage (un appel de dessin par personnage et par passe).
+- **Performances**: 30 images par seconde tenues sur le PC au préréglage Moyenne (plancher validé le 10 novembre), 60 sur le Mac; 350 000 triangles, 200 appels, 128 m sur 128 m par lieu chargé.
+- **Points à caler avec le design**: l'étendue d'Aubrune et le découpage de Hautefonte en quartiers face au budget de 128 m (4.12); la vue à plat ou en perspective, montrée au J1; le statut d'une séance quittée par « Retour au salon » (fin normale, pas « interrompue »).
 
 ## 11. Périmètre (game-designer, manager)
 
-- **Version 1 de la refonte**: Aubrune complet (prologue, trois actes, six suites secondaires, 20 habitants, toutes les activités du tableau 4.7, quatre fêtes, quatre saisons, maison jusqu'à l'étage, collections d'Aubrune), tous les systèmes du socle, le quai de départ vers Hautefonte.
+- **Version 1 de la refonte** (jalons J1 à J3 et finitions d'Aubrune): Aubrune complet (prologue, trois actes, six suites secondaires, 20 habitants, toutes les activités du tableau 4.7, quatre fêtes, quatre saisons, maison jusqu'à l'étage, collections d'Aubrune), tous les systèmes du socle, le quai de départ vers Hautefonte.
 - **Ensuite, par mises à jour**: Hautefonte, puis Combe-Veilleuse, puis d'autres lieux (R75). Sacs de 25 et 30, outils d'un quatrième rang, nouvelles séries de meubles.
-- **Hors périmètre**: mode solo; étal ou vente entre joueurs; musée; décoration du bourg; émotes et signaux; déplacement au clic; romance avec les habitants; combats, mort, échec de quête; horloge réelle; croisement de fleurs; reprise des sauvegardes de la 0.13; manette.
+- **Hors périmètre**: mode solo; étal ou vente entre joueurs; musée; décoration du bourg; émotes et signaux; déplacement au clic; romance avec les habitants; combats, mort, échec de quête; horloge réelle; croisement de fleurs; reprise des sauvegardes de la 0.13; manette; personnages jouables enfants ou âgés; pièces de catalogue réservées à un genre.
 
 ## 12. Critères d'acceptation (proposition, à rendre testables par qa-testeur)
 
@@ -663,7 +699,7 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 
 **Besoins**
 
-- CA-08: une jauge qui passe sous 20 applique le malus du tableau 4.4 dans la seconde et s'affiche; au-dessus de 50, le bonus s'affiche puis l'icône s'efface en 5 secondes.
+- CA-08: une jauge qui passe sous 20 applique le malus du tableau 4.4 dans la seconde et s'affiche; au-dessus de 50, le médaillon s'affiche avec une étoile puis s'efface en 4 secondes; avec le réglage « besoins toujours visibles », les trois médaillons restent affichés.
 - CA-09: faim à 0, la touche d'action sur un arbre ne fait rien d'autre que le geste de refus; sur un plat, elle mange.
 - CA-10: hygiène sous 20, chaque habitant testé dit sa remarque et aucun point d'amitié n'est gagné; à 0, une étape de quête sur dialogue ne se franchit pas, et se franchit après une toilette.
 - CA-11: aucun bonus cumulé ne dépasse 25 % sur une même valeur, hors repas spécial.
@@ -672,10 +708,10 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 
 **Prise en main**
 
-- CA-14: aucun clic dans le monde ne déplace le personnage; la caméra tourne de façon continue sur 360 degrés.
+- CA-14: aucun clic dans le monde ne déplace le personnage; la caméra tourne de façon continue sur 360 degrés; hors mode déco, tout le jeu se joue sans souris (zoom aux flèches haut et bas compris) et aucune action n'utilise la touche Alt.
 - CA-15: toute cible à portée réagit et affiche son verbe avant l'appui; aucune zone du monde ne propose d'action sans objet visible (balayage automatique de la carte).
 - CA-16: chaque action de la liste des gestes a un son, une animation de l'objet touché et des particules, déclenchés en moins de 0,1 s.
-- CA-17: au début d'une partie, le sac n'existe pas et la barre compte 5 emplacements; chaque pile respecte le maximum du tableau 4.5.
+- CA-17: au début d'une partie, le sac n'existe pas et la barre compte 5 emplacements; elle se replie 3 secondes après le dernier changement, sauf réglage contraire; chaque pile respecte le maximum du tableau 4.5.
 - CA-18: un outil de base utilisé 1 000 fois ne change pas; un outil amélioré arrivé à 0 est plus lent que l'outil de base et retrouve ses valeurs après la réparation prévue.
 
 **Économie**
@@ -703,51 +739,81 @@ Chacune dure 1 heure à 1 h 30, en 4 à 6 étapes.
 - CA-30: un duo neuf termine le prologue en moins de 15 minutes sans lire d'autre aide que les bulles d'action.
 - CA-31: chaque étape de la suite principale d'Aubrune peut être franchie par un joueur seul, sauf le dénouement de l'acte 3; un robot la joue de bout en bout.
 - CA-32: une étape franchie par l'un est marquée chez l'autre dans la seconde, et la scène est relisible au carnet.
-- CA-33: la touche G affiche le repère 3 secondes, puis plus rien.
+- CA-33: la touche G affiche pendant 3 secondes la flèche de quête, les besoins, la barre d'outils et le repère de l'autre joueur, puis plus rien.
+- CA-36: jusqu'au dénouement de l'acte 3, aucune scène d'Aubrune ne montre de train sans explication proposée par un habitant, et aucun fantôme ni esprit n'apparaît à Aubrune (relecture du script de l'histoire).
+- CA-37: l'éditeur propose femme ou homme; les deux choix donnent accès aux mêmes pièces du catalogue; l'outil de validation ne trouve aucune balise d'accord incomplète ni aucun accord au joueur hors balise; un parcours de l'acte 1 joué en femme puis en homme n'affiche aucun accord fautif.
+- CA-38: le carnet affiche, pour un objet déjà proposé à deux commerçants, les deux prix vus; un commerçant jamais visité montre un point d'interrogation.
 
 **Sauvegarde et réseau**
 
 - CA-34: quitter au milieu d'une journée puis reprendre rend l'état du dernier point de sauvegarde, sans objet ni euro dupliqué.
 - CA-35: quand un joueur se déconnecte, l'horloge et les besoins de l'autre se figent; ils reprennent au retour.
 
-## 13. Jalons (proposition, dates à fixer par le manager)
+## 13. Jalons
 
-| Jalon | Contenu attendu | Date visée | Validé le |
-|---|---|---|---|
-| 1. Socle jouable | caméra et déplacement au clavier, touche d'action avec cibles et ressenti, trois besoins avec paliers, barre de 5 et besace, bandeau de dialogue avec babil, éditeur de personnage réduit, prologue en train et premier jour de l'acte 1 (pension, pompe, souper, première vente) en formes simples | | |
-| 2. Aubrune, acte 1 et quotidien | maison (première pièce, mode déco), potager, poulailler, outils et usure, sacs, commerçants et prix, pêche, réchaud, horloge complète avec nuit et saut, sauvegarde neuve, 10 habitants | | |
-| 3. Aubrune, histoire complète | actes 2 et 3, scènes à deux, train du samedi, arrivées d'habitants, photo, fouilles, insectes, vraie cuisine et repas spéciaux, carnet et collections, amitié, confidences et souvenirs | | |
-| 4. Aubrune 1.0 | six suites secondaires, fêtes, saisons, maison jusqu'à l'étage, musique, catalogue de personnages, art et son définitifs, recette sur les deux machines | | |
-| 5. Hautefonte | deuxième lieu complet | | |
-| 6. Combe-Veilleuse | troisième lieu complet | | |
+Un seul découpage: celui de `technique.md` (section 5.1). Le contenu de ce cahier y est rangé ci-dessous. Dates à fixer par le manager.
+
+| Jalon | Ce qu'on joue à deux (technique) | Contenu de ce cahier rangé dedans | Date visée | Validé le |
+|---|---|---|---|---|
+| **J1 Socle** | deux lieux de test en formes simples reliés par un train factice; caméra libre; action à une touche sur trois objets types; trois jauges avec leurs effets; barre et premier sac; un dialogue à choix dans la fenêtre lettre par lettre; un personnage modulaire chez chaque joueur | prise en main (sections 4.12 et 5), paliers des besoins (4.4), barre de 5 et besace (4.5), règle du voyage à deux (4.1); données de test: un habitant (Firmin), le dialogue de la lettre d'embauche avec un choix et une variante d'accord (1.5), manger, se débarbouiller, s'allonger | | |
+| **J2 Vivre** | jour de 30 minutes et nuit jouable, dormir, outils qui s'usent et se réparent, commerces par commerçant, potager, mode déco, sac en 3D, habitants à planning avec cœurs, une première suite de quêtes de 5 étapes, éditeur de personnage | horloge complète (4.3), outils (4.5), économie en euros et mémoire des prix (4.6), potager, amitié et souvenirs (4.9), éditeur avec le choix femme ou homme; la suite de 5 étapes est l'acte 1 d'Aubrune, « Logement fourni », précédé du prologue du train, avec les 10 habitants du départ | | |
+| **J3 Aubrune** (Alpha du premier lieu) | carte et art d'Aubrune, sa suite principale, pêche et cuisine en mini-jeux, basse-cour, collections au carnet, maison à restaurer, musique par heure et météo | actes 2 et 3 et leurs scènes à deux, train du samedi et arrivées d'habitants (20 à la fin), photo, fouilles, insectes, repas spéciaux, confidences, maison jusqu'à l'étage, les six suites secondaires, les quatre fêtes, les petites activités, les collections d'Aubrune; retrait de l'ancien jeu | | |
+| **J4 Métropole** | deuxième lieu réel, appartement, activités de ville, commerce en déclin | Hautefonte (6.5), à détailler dans une version de ce cahier avant production | | |
+| **J5 Village hanté** | troisième lieu | Combe-Veilleuse (6.6), à détailler de même | | |
+
+À placer par le manager: la Bêta et la 1.0 d'Aubrune (assets et son définitifs, recette sur les deux machines), entre J3 et J4. Si J3 est trop chargé, les suites secondaires et les fêtes peuvent glisser dans cette Bêta sans toucher à l'histoire principale.
 
 ## 14. Questions ouvertes et décisions
 
-Contradictions repérées dans les réponses (C) et questions nouvelles (Q).
+Contradictions repérées dans les réponses (C), questions (Q) et décisions ajoutées par le client (D). Source des décisions: les deux dernières sections de `reponses-client-2026-11-10.md`.
+
+### 14.1 Décidé
+
+| # | Question | Recommandation de la 0.1 | Décision du client | Date |
+|---|---|---|---|---|
+| C1 | R23 demande trois jauges, R60 presque rien à l'écran | visibles au changement de palier, sous 20 et sur une touche | oui, avec un réglage « toujours visibles »; la touche est G | 2026-11-10 |
+| C2 | Si un seul joueur dort ? | deux au lit pour sauter la nuit, sieste libre pour un seul | oui | 2026-11-10 |
+| C3 | Foule en métropole contre « aucun habitant vu deux fois » | passants composés depuis le catalogue, 20 habitants écrits par lieu | oui | 2026-11-10 |
+| C5 | La beauté avant la fluidité, face au PC de référence | plancher de 30 images par seconde sur le PC | oui | 2026-11-10 |
+| C7 | « Page blanche » et habitants de la 0.13 | les reprendre, réécrits | gardés, avec une refonte de l'apparence et de l'écriture | 2026-11-10 |
+| Q1 | Nom de la monnaie | sou | **l'euro** (la recommandation n'est pas retenue; prix revus en 4.6) | 2026-11-10 |
+| Q2 | Surnaturel dès Aubrune | l'assumer | oui, mais **très doux** dès Aubrune (arc et actes revus en 6.1 et 6.3) | 2026-11-10 |
+| Q4 | Durée d'une saison | 14 jours | 14 jours | 2026-11-10 |
+| D1 | Âge des personnages jouables | (non posée) | deux adultes | 2026-11-10 |
+| D2 | Genre des personnages jouables | (non posée) | **choix femme ou homme dans l'éditeur** (correction du soir, qui remplace « aucun choix de genre »): il règle les accords et propose une silhouette et des pièces de départ; toutes les pièces restent portables par tous (1.5). Lecture du manager, à confirmer par le client | 2026-11-10 |
+| D3 | Barre d'outils | (interface) | repliée après 3 secondes, réglage pour la garder | 2026-11-10 |
+| D4 | Coup d'œil | (interface) | touche G: quête, besoins, autre joueur; plus de touche Alt | 2026-11-10 |
+| D5 | Mémoire des prix par commerçant | (manager) | oui (4.6) | 2026-11-10 |
+| D6 | Direction artistique | (bible) | fil « maquette de train miniature », visages à pièces de rechange | 2026-11-10 |
+| D7 | Fabrication des personnages | (essai 2) | corps, visages et vêtements par les scripts du studio; Meshy pour chapeaux, sacs, accessoires et coiffures élaborées, puis meubles, bâtiments et paysage, sur preuve | 2026-11-10 |
+| D8 | Ancien et nouveau jeu | (technique) | deux jeux dans Duo pendant la refonte, nouveau paquet et nouvel identifiant, puis retrait de l'ancien | 2026-11-10 |
+| D9 | Carte d'Aubrune | (technique) | reprise et retouchée | 2026-11-10 |
+| D10 | Parties d'essai | (technique) | remises à zéro à chaque étape tant que le jeu n'est pas complet | 2026-11-10 |
+
+### 14.2 Encore ouvert
+
+Ces points ne figurent pas dans les décisions écrites du 10 novembre. Le cahier applique la recommandation en attendant.
 
 | # | Question | Options | Recommandation | Décision du client | Date |
 |---|---|---|---|---|---|
-| C1 | R23 demande trois jauges, R60 presque rien à l'écran | toujours visibles; visibles au changement de palier, sous 20 et sur une touche | la seconde (retenue en 4.4) | | |
-| C2 | R3 « on peut dormir pour passer la journée » et R4 « la nuit passe toute seule », avec deux joueurs: que se passe-t-il si un seul dort ? | il faut être deux au lit pour sauter; un seul suffit et l'autre est ramené | deux au lit pour sauter, sieste libre pour un seul (retenu en 4.3) | | |
-| C3 | R36: tous les habitants de même qualité; R50: aucun habitant vu deux fois; or une métropole demande une foule | foule de passants composés par le jeu, sans dialogue long; rues peu peuplées | passants composés depuis le catalogue, une réplique chacun, et 20 habitants écrits par lieu | | |
-| C4 | R28 n'a pas coché « fleurs à planter et à croiser », R56 collectionne les fleurs | fleurs sauvages à cueillir; ajouter le croisement | cueillette seule (retenu en 4.8) | | |
-| C5 | R73 (la beauté avant la fluidité) face au PC de référence | fixer un plancher; laisser libre | plancher de 30 images par seconde sur le PC, réglage de qualité par machine | | |
+| C4 | R28 n'a pas coché « fleurs à planter et à croiser », R56 collectionne les fleurs | fleurs sauvages à cueillir; ajouter le croisement | cueillette seule (4.8) | | |
 | C6 | R12 « toujours faisables seul » et R9 « certaines quêtes peuvent demander d'être deux » | aucune exception; quelques exceptions | exceptions limitées au train, au repas spécial et à un dénouement par lieu | | |
-| C7 | R74 « page blanche » et reprise d'habitants de la 0.13 | reprendre les habitants utiles, réécrits; tout renommer | reprendre (6.2): vous les connaissez, leurs modèles serviront de base, toutes leurs quêtes sont neuves | | |
-| Q1 | Nom de la monnaie | sou, poinçon, rond | sou | | |
-| Q2 | Le fil rouge assume du surnaturel doux dès Aubrune (un train que seule la photo montre), puis des fantômes au troisième lieu | l'assumer; garder Aubrune sans surnaturel | l'assumer: c'est le « mystère » demandé en R8 et il prépare le village hanté | | |
-| Q3 | Émile est retrouvé vivant au troisième lieu | vivant; fantôme lui-même | vivant: des retrouvailles avec Firmin, un ton tendre | | |
-| Q4 | Durée d'une saison | 14 jours; 21 jours | 14: on voit deux saisons pendant l'histoire d'Aubrune | | |
-| Q5 | Noms des lieux: Hautefonte, Combe-Veilleuse | les garder; en proposer d'autres | les garder, après vérification d'homonymie (non faite, voir compte rendu) | | |
-| Q6 | Le titre « La Petite Ligne » | le garder; le changer | le garder: il décrit mieux encore le nouveau jeu | | |
+| Q3 | Émile est retrouvé vivant au troisième lieu | vivant; esprit lui-même | vivant: des retrouvailles avec Firmin, un ton tendre | | |
+| Q5 | Noms des lieux: Hautefonte, Combe-Veilleuse | les garder; en proposer d'autres | les garder, après vérification d'homonymie (non faite) | | |
+| Q6 | Le titre « La Petite Ligne » | le garder; le changer | le garder: il décrit mieux encore le nouveau jeu (`technique.md` garde aussi le nom affiché) | | |
 | Q7 | Besoin à 0: le blocage est-il assez doux ? | comme écrit; plus sévère; sans blocage | comme écrit, avec la soupe d'Odette en secours | | |
-| Q8 | La commande du train du samedi continue-t-elle dans les autres lieux ? | Aubrune seulement; un équivalent par lieu | un équivalent par lieu (la braderie de Hautefonte), à écrire avec chaque lieu | | |
+| Q8 | La commande du train du samedi continue-t-elle dans les autres lieux ? | Aubrune seulement; un équivalent par lieu | un équivalent par lieu, à écrire avec chaque lieu | | |
 | Q9 | Durée visée par lieu | 10 heures; 15 heures; 20 heures et plus | 15 heures (9 à 10 d'histoire, 6 à 8 de suites secondaires), plus le quotidien sans limite | | |
+| Q10 | Les prix en euros: une pièce de maison à 150 € sonne-t-elle juste ? | échelle actuelle (un œuf 0,60 €, une cuisine 150 €); monter les seuls prix du logement (cuisine 1 500 €) et les revenus avec | l'échelle actuelle: des petits nombres lisibles, dans l'esprit maquette; à juger en jouant au J2 | | |
+| Q11 | Changer de genre en cours de partie | libre chez Solange; fixé à la création | libre et gratuit | | |
 
-Signalements au manager (création originale): le babil est un procédé de genre, rendu distinct par les timbres d'instruments; les confidences sont des indices et non une monnaie d'échange, pour ne pas reprendre un mécanisme d'une référence; le logement du troisième lieu est un wagon et non un établissement à remettre en état avec des clients de l'intrigue; la monnaie évite toute clochette. Le motif du train des défunts est un thème de conte, mais un jeu récent de gestion douce où l'on accompagne des esprits existe: nous nous en écartons par l'enquête sur le village, l'absence de bateau et de constructions pour les esprits.
+Points à trancher entre membres, sans le client: l'étendue d'Aubrune et les quartiers de Hautefonte face au budget de 128 m par lieu (architecte-technique, level-designer); le signe de la remarque d'hygiène (bible et interface); le statut d'une séance quittée normalement (architecte-technique).
+
+Signalements au manager (création originale): le babil est un procédé de genre, rendu distinct par les timbres d'instruments; les confidences sont des indices et non une monnaie d'échange, pour ne pas reprendre un mécanisme d'une référence; le logement du troisième lieu est un wagon et non un établissement à remettre en état avec des clients de l'intrigue; l'arrivée se fait par une embauche et non par une panne ou un accident. Le motif du train des défunts est un thème de conte, mais un jeu récent de gestion douce où l'on accompagne des esprits existe: nous nous en écartons par l'enquête sur le village, l'absence de bateau et de constructions pour les esprits, et ce motif n'apparaît pas avant le troisième lieu.
 
 ## 15. Historique
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-11-10 | 0.1 | première rédaction de la refonte, d'après les 75 réponses du client | client, via le manager |
+| 2026-11-10 | 0.2 | décisions du client reportées (section 14): monnaie en euros et prix revus, simulation relancée; surnaturel très doux à Aubrune (arc, prologue et trois actes adoucis, aucun fantôme au premier lieu); habitants de la 0.13 gardés et refondus; joueurs adultes, choix femme ou homme et règle d'écriture des accords; mémoire des prix; contrôles accordés avec `interface.md` (barre repliée, touche G, zoom au clavier, sept onglets); gestes ramenés sous 1,5 seconde; sections 7 à 10 résumées avec renvois; jalons alignés sur `technique.md` | client, via le manager |
