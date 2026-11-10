@@ -4,7 +4,7 @@
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { QuestLineDef } from '../../donnees/schemas/quete';
+import type { ChapterEndDef, QuestLineDef, StepEffect } from '../../donnees/schemas/quete';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { agreeFor } from '../dialogues/accords';
 import { sceneSeenOn } from './faits';
@@ -34,6 +34,11 @@ export interface JournalEntry {
   readonly passed: number;
   readonly total: number;
   readonly tracked: boolean;
+  /**
+   * Histoire dont cette suite est un acte (`saga` des données), pour regrouper les suites au
+   * carnet; absent: suite seule.
+   */
+  readonly saga?: { readonly id: string; readonly title: string; readonly act: number };
 }
 
 const KIND_ORDER: Readonly<Record<QuestLineDef['kind'], number>> = { main: 0, side: 1, errand: 2 };
@@ -68,6 +73,7 @@ export function journal(
       passed: passed.length,
       total: line.chapters.reduce((n, c) => n + c.steps.length, 0),
       tracked: tracked === quest,
+      ...(line.saga === undefined ? {} : { saga: line.saga }),
     });
   }
   return out.sort(
@@ -146,4 +152,46 @@ export function glanceTarget(
     }
   }
   return null;
+}
+
+export interface ChapterEndView {
+  readonly id: string;
+  readonly title: string;
+  /** Lignes accordées pour le joueur qui lit. */
+  readonly lines: readonly string[];
+  /** Ce joueur l'a déjà fermé (il attend l'autre). */
+  readonly closed: boolean;
+}
+
+/** L'écran de fin de chapitre décrit par un effet `travel_to` du lieu, ou `null`. */
+export function findChapterEnd(content: Content, place: string, id: string): ChapterEndDef | null {
+  const data = content.places[place];
+  if (data === undefined) return null;
+  const effects: StepEffect[] = [];
+  for (const line of Object.values(data.quests))
+    for (const chapter of line.chapters)
+      for (const step of chapter.steps) effects.push(...step.onStart, ...step.onDone);
+  for (const scene of Object.values(data.scenes))
+    for (const beat of scene.beats) if (beat.do === 'effects') effects.push(...beat.effects);
+  for (const effect of effects)
+    if (effect.type === 'travel_to' && effect.ending?.id === id) return effect.ending;
+  return null;
+}
+
+/** Ce que l'écran de fin de chapitre affiche à ce joueur, `null`: aucun (ou déjà fermé par les deux). */
+export function chapterEndView(
+  world: ReadonlyWorld,
+  content: Content,
+  player: PlayerIndex,
+): ChapterEndView | null {
+  const ending = world.common.story?.ending;
+  if (ending === undefined) return null;
+  const def = findChapterEnd(content, ending.place, ending.id);
+  if (def === null) return null;
+  return {
+    id: def.id,
+    title: def.title,
+    lines: def.lines.map((line) => agreeFor(world, player, line)),
+    closed: ending.closed[player],
+  };
 }

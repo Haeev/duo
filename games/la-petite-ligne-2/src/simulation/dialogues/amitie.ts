@@ -50,6 +50,26 @@ export function addBond(
   return gained;
 }
 
+/**
+ * Effet `change_bond` (un service rendu, une parole blessante): un gain passe par `addBond`
+ * (hygiène comprise), une perte ne descend jamais sous zéro et laisse les cœurs déjà retenus
+ * dans la mémoire des habitants. Renvoie la variation réelle.
+ */
+export function changeBond(
+  sim: SimContext,
+  player: PlayerIndex,
+  villager: string,
+  points: number,
+): number {
+  if (points >= 0) return addBond(sim, player, villager, points);
+  const before = bondOf(sim, villager, player);
+  const after = Math.max(0, before + points);
+  if (after === before) return 0;
+  sim.world.progress.bonds[bondKey(villager, player)] = after;
+  sim.touch('progress');
+  return after - before;
+}
+
 function todayKey(villager: string, player: PlayerIndex): string {
   return `amitie.${villager}.jour-j${String(player)}`;
 }

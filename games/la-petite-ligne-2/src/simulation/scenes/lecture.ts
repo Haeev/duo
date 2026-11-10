@@ -4,7 +4,8 @@
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { BeatDef, Focus, Role } from '../../donnees/schemas/scene';
+import type { BeatDef, Focus, GestureDef, GestureRun, Role } from '../../donnees/schemas/scene';
+import { SIM_DT } from '../noyau/constantes';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { agreeFor } from '../dialogues/accords';
 import { audienceOf, playerOfRole } from './lecteur';
@@ -24,8 +25,22 @@ export type SceneBeatView =
     }
   | {
       readonly kind: 'await';
-      /** Consignes de ce joueur (son rôle, ou `any`), et si elles sont faites. */
-      readonly hints: readonly { readonly text: string; readonly done: boolean }[];
+      /**
+       * Consignes de ce joueur (son rôle, ou `any`), et si elles sont faites. `gesture`: le geste
+       * demandé, son avancement (0 à 1: maintien ou station écoulés, appui fait) et si la touche
+       * est tenue ou le point atteint; `null`: pas de geste.
+       */
+      readonly hints: readonly {
+        readonly text: string;
+        readonly done: boolean;
+        readonly gesture: {
+          readonly type: GestureDef['type'];
+          readonly progress: number;
+          readonly down: boolean;
+        } | null;
+      }[];
+      /** Les gestes doivent réussir ensemble, à ce délai près (s); `null`: chacun à son tour. */
+      readonly together: number | null;
     }
   | { readonly kind: 'other' };
 
@@ -49,6 +64,21 @@ function focusAt(
   if ('point' in focus) return content.places[place]?.map.points[focus.point] ?? null;
   const body = world.places[place]?.villagers[focus.villager]?.body;
   return body === undefined ? null : { x: body.x, y: body.y };
+}
+
+function gestureView(
+  world: ReadonlyWorld,
+  gesture: GestureDef | undefined,
+  run: GestureRun | undefined,
+): { type: GestureDef['type']; progress: number; down: boolean } | null {
+  if (gesture === undefined) return null;
+  const since = run?.since ?? null;
+  const down = run?.down ?? false;
+  if (since === null) return { type: gesture.type, progress: 0, down };
+  if (gesture.type === 'press') return { type: gesture.type, progress: 1, down };
+  const elapsed = (world.tick - since) * SIM_DT;
+  const progress = gesture.seconds <= 0 ? 1 : Math.min(1, elapsed / gesture.seconds);
+  return { type: gesture.type, progress, down };
 }
 
 export function sceneView(
@@ -79,9 +109,16 @@ export function sceneView(
       kind: 'await',
       hints: beat.parts.flatMap((part, i) =>
         part.role === 'any' || part.role === role
-          ? [{ text: agreeFor(world, player, part.hint), done: run.parts[i] === true }]
+          ? [
+              {
+                text: agreeFor(world, player, part.hint),
+                done: run.parts[i] === true,
+                gesture: gestureView(world, part.gesture, run.gestures?.[i === 0 ? 0 : 1]),
+              },
+            ]
           : [],
       ),
+      together: beat.together ?? null,
     };
   }
   const camera =

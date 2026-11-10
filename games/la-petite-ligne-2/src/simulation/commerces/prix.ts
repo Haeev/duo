@@ -44,6 +44,8 @@ function familyPrice(shop: ShopDef, family: string): number | null {
  * coefficient du prix de sa famille), puis famille; `null`: il n'en veut pas.
  */
 export function basePrice(content: Content, shop: ShopDef, item: string): number | null {
+  // Un objet d'histoire ne se vend pas.
+  if (content.items[item]?.story === true) return null;
   const family = content.items[item]?.family;
   for (const line of shop.buys) {
     if (!('item' in line) || line.item !== item) continue;

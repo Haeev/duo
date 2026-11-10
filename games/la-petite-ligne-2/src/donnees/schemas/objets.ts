@@ -62,5 +62,10 @@ export const ItemSchema = v.strictObject({
    * n'importe quel objet; l'effet `give_bag` des dialogues reste valable.
    */
   bag: v.exactOptional(IdSchema),
+  /**
+   * Objet d'histoire (règlement, lettre, lanterne): reçu et repris par les dialogues et les
+   * étapes, il ne se vend pas et ne se jette pas (il peut se donner à l'autre ou se ranger).
+   */
+  story: v.exactOptional(v.literal(true)),
 });
 export type ItemDef = v.InferOutput<typeof ItemSchema>;

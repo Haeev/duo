@@ -146,6 +146,18 @@
           "key": "aubrune.autorail.en-gare",
           "value": false,
           "by": "duo"
+        },
+        {
+          "type": "travel_to",
+          "place": "hautefonte",
+          "ending": {
+            "id": "a-suivre-hautefonte",
+            "title": "À suivre: Hautefonte",
+            "lines": [
+              "L'autorail file dans la nuit. Hautefonte n'est pas encore sur la ligne: la suite arrive bientôt.",
+              "En attendant, Aubrune vous garde une place. Firmin arrose les radis, comme promis."
+            ]
+          }
         }
       ]
     },

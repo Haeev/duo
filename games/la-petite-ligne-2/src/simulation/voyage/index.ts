@@ -4,6 +4,7 @@
  * direction fait redescendre) puis `travel` (le lieu quitté est figé avec `leftOn`, `common.place`
  * change, la tranche du nouveau lieu part; chaque machine charge et envoie `place_loaded`) puis
  * `arrival` (descente sur le quai, l'horloge a pris les heures du trajet) et retour à `day`.
+ * L'histoire peut aussi faire partir les deux joueurs (effet `travel_to`, `takeDeparture`).
  */
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { endTalk } from '../briques/parler';
@@ -16,6 +17,7 @@ import { addMinutes } from '../noyau/horloge';
 import { createPlaceState, placeAtArrival } from '../noyau/monde';
 import { CORE_TUNING } from '../noyau/reglages-noyau';
 import type { GameSystem, SimContext } from '../noyau/systemes';
+import { STORY } from '../quetes/reglages';
 
 const PLAYERS: readonly PlayerIndex[] = [0, 1];
 
@@ -104,6 +106,37 @@ function depart(sim: SimContext, to: string): void {
   sim.emit({ type: 'train_departed', from, to });
 }
 
+/** Dernier pas où une scène retenait le départ demandé (chez l'hôte seulement, hors de l'état). */
+const heldUntil = new WeakMap<object, number>();
+
+/**
+ * Départ demandé par l'effet `travel_to` (histoire): pris en journée, `departureDelaySeconds`
+ * après la fin de la scène en cours. Vers un lieu du jeu, c'est un vrai départ (sans quai ni
+ * ligne); vers un lieu à venir, l'écran de fin de chapitre décrit dans l'effet s'affiche.
+ */
+function takeDeparture(sim: SimContext): void {
+  const { world } = sim;
+  const story = world.common.story;
+  const departure = story?.departure;
+  if (story === undefined || departure === undefined || world.common.phase !== 'day') return;
+  if (story.scene !== null) {
+    heldUntil.set(world, world.tick);
+    return;
+  }
+  const from = Math.max(departure.since, heldUntil.get(world) ?? 0);
+  if ((world.tick - from) / SIM_HZ < STORY.departureDelaySeconds) return;
+  delete story.departure;
+  heldUntil.delete(world);
+  sim.touch('common');
+  if (sim.content.places[departure.to] !== undefined) {
+    depart(sim, departure.to);
+    return;
+  }
+  if (departure.ending === null) return;
+  story.ending = { place: world.common.place, id: departure.ending, closed: [false, false] };
+  sim.emit({ type: 'chapter_ended', place: world.common.place, ending: departure.ending });
+}
+
 function arrive(sim: SimContext, place: string): void {
   const { world, content } = sim;
   // Le trajet coûte ses heures d'un coup (cahier 4.1); l'horloge est la même dans tous les lieux.
@@ -161,6 +194,7 @@ export const travelSystem: GameSystem = {
     if (travel.boarded[0] && travel.boarded[1]) depart(sim, intent.to);
   },
   step(sim) {
+    takeDeparture(sim);
     const { world, content } = sim;
     const { common } = world;
     const travel = common.travel;

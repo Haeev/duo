@@ -7,13 +7,14 @@ import type { StepEffect, StoryEffect } from '../../donnees/schemas/quete';
 import type { SimContext } from '../noyau/systemes';
 import { applyEffect } from '../regles/effets';
 import { remember } from '../regles/memoire';
-import { arrivalKey, zoneKey } from './faits';
+import { arrivalKey, storyOf, zoneKey } from './faits';
 
 const STORY_TYPES: ReadonlySet<string> = new Set([
   'unlock_zone',
   'villager_arrives',
   'open_quest',
   'play_scene',
+  'travel_to',
 ]);
 
 function isStoryEffect(e: StepEffect): e is StoryEffect {
@@ -50,6 +51,15 @@ export function applyStepEffects(
         break;
       case 'play_scene':
         hooks.playScene(sim, effect.scene, actor);
+        break;
+      case 'travel_to':
+        // Pris par le voyage quand la scène en cours est finie (`voyage/depart.ts`).
+        storyOf(sim.world).departure = {
+          to: effect.place,
+          since: sim.world.tick,
+          ending: effect.ending?.id ?? null,
+        };
+        sim.touch('common');
         break;
     }
   }

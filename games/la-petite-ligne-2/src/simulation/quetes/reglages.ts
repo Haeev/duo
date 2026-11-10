@@ -22,6 +22,11 @@ export interface StorySettings {
   readonly villagerWalkSpeed: number;
   /** Au-delà, une marche de scène se termine en replaçant l'habitant (s). */
   readonly maxWalkSeconds: number;
+  /**
+   * Délai entre la fin de la scène qui demande un départ (`travel_to`) et le départ (s): les
+   * étapes du lieu ont le temps de voir la scène finie avant qu'on le quitte.
+   */
+  readonly departureDelaySeconds: number;
 }
 
 export const STORY: StorySettings = {
@@ -34,4 +39,5 @@ export const STORY: StorySettings = {
   maxLineSeconds: 20,
   villagerWalkSpeed: 1.4,
   maxWalkSeconds: 20,
+  departureDelaySeconds: 1,
 };

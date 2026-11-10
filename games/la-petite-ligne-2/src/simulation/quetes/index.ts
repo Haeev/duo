@@ -11,6 +11,16 @@ import { STORY } from './reglages';
 
 function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   if (intent.type === 'quest_track') trackQuest(sim, player, intent.quest);
+  if (intent.type === 'chapter_end_close') closeChapterEnd(sim, player);
+}
+
+function closeChapterEnd(sim: SimContext, player: PlayerIndex): void {
+  const story = sim.world.common.story;
+  const ending = story?.ending;
+  if (story === undefined || ending === undefined || ending.closed[player]) return;
+  ending.closed[player] = true;
+  if (ending.closed[0] && ending.closed[1]) delete story.ending;
+  sim.touch('common');
 }
 
 export const questSystem: GameSystem = {

@@ -3,6 +3,11 @@
   "id": "la-minute-d-ecart",
   "kind": "main",
   "title": "La minute d'écart",
+  "saga": {
+    "id": "aubrune",
+    "title": "Aubrune",
+    "act": 2
+  },
   "giver": "firmin",
   "requires": [
     {

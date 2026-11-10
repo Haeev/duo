@@ -28,7 +28,12 @@
       "next": "choix",
     },
     // Choix: 2 à 3 options, dont une au moins sans condition. Effets possibles:
-    //   give_item, take_item, give_money, change_need, give_bag, remember
+    //   give_item, take_item, give_money, change_need, give_bag, remember,
+    //   { "type": "take_money", "amount": 250 }   (paiement en centimes: 2,50 €)
+    //   { "type": "change_bond", "villager": "cheffe-de-gare", "points": 20 }   (négatif: perte)
+    // give_item, take_item, give_money et take_money prennent "to": "duo" pour s'appliquer à
+    // chacun des deux joueurs (défaut: celui qui parle). Un échange impossible (poches pleines,
+    // argent insuffisant, objet manquant) est refusé avec sa raison et le choix reste ouvert.
     "choix": {
       "kind": "choice",
       "options": [
@@ -50,6 +55,7 @@
       "next": null,
     },
     // Autres nœuds: { "kind": "branch", "cases": [{ "when": [...], "next": "..." }], "otherwise": "..." }
-    //               { "kind": "effects", "effects": [...], "next": "..." }
+    //               { "kind": "effects", "effects": [...], "next": "...", "otherwise": "..." }
+    //               ("otherwise", facultatif: nœud joué si l'échange est impossible, rien appliqué)
   },
 }

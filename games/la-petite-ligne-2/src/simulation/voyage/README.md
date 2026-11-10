@@ -1,3 +1,3 @@
 # Voyage en train (lot L2)
 
-ADR 0018. Phases de `common.phase`: `day`, `boarding` (les deux sur le quai, chacun valide), `travel` (wagon, chaque machine charge le lieu et envoie `place_loaded`), `arrival`. Le lieu quitté garde `leftOn`; le lieu d'arrivée est créé à la première visite (`createPlaceState`). Réglages: `travel` de `reglages.json`.
+ADR 0018. Phases de `common.phase`: `day`, `boarding` (les deux sur le quai, chacun valide), `travel` (wagon, chaque machine charge le lieu et envoie `place_loaded`), `arrival`. Le lieu quitté garde `leftOn`; le lieu d'arrivée est créé à la première visite (`createPlaceState`). Réglages: `travel` de `reglages.json`. L'histoire fait aussi partir les deux joueurs: effet `travel_to` (`quetes/`), pris par `takeDeparture` en journée, `departureDelaySeconds` après la fin de la scène en cours, sans quai ni ligne; vers un lieu absent du jeu, l'écran de fin de chapitre de l'effet s'affiche à la place.

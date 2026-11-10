@@ -267,7 +267,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'quest_step_done':
       case 'scene_beat':
       case 'scene_ended':
+      case 'scene_gesture':
       case 'scene_started':
+      case 'chapter_ended':
       case 'talk_ended':
       case 'talk_page':
       case 'talk_started':

@@ -3,6 +3,11 @@
   "id": "ceux-qui-partent",
   "kind": "main",
   "title": "Ceux qui partent",
+  "saga": {
+    "id": "aubrune",
+    "title": "Aubrune",
+    "act": 3
+  },
   "giver": "firmin",
   "requires": [
     {
@@ -864,6 +869,12 @@
               "key": "aubrune.acte3.jeanne",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.guide",
+              "value": "tunnel",
+              "by": "duo"
             }
           ]
         },
@@ -895,12 +906,6 @@
               "type": "remember",
               "key": "aubrune.acte3.grille",
               "value": "fait",
-              "by": "duo"
-            },
-            {
-              "type": "remember",
-              "key": "aubrune.acte3.guide",
-              "value": "tunnel",
               "by": "duo"
             }
           ]

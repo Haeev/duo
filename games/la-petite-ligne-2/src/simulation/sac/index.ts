@@ -60,6 +60,10 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
     case 'drop': {
       const stack = checkSlot(sim, player, intent.from);
       if (stack === null) return;
+      if (sim.content.items[stack.item]?.story === true) {
+        refuse(sim, player, 'story-item');
+        return;
+      }
       setStack(state, intent.from, null);
       dropStack(sim, player, stack);
       sim.touch('players');

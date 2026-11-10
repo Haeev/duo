@@ -15,4 +15,6 @@ export const QUEST_EVENTS = [
     by: PlayerIndexSchema,
   }),
   v.strictObject({ type: v.literal('quest_done'), quest: IdSchema }),
+  /** Un départ vers un lieu à venir montre l'écran de fin de chapitre (`chapterEndView`). */
+  v.strictObject({ type: v.literal('chapter_ended'), place: IdSchema, ending: IdSchema }),
 ] as const;

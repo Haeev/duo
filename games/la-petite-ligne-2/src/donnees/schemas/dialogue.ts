@@ -45,10 +45,15 @@ export const DialogueNodeSchema = v.variant('kind', [
     ),
     otherwise: Next,
   }),
+  /**
+   * Effets appliqués d'un bloc. `otherwise`: si l'échange est impossible (poches pleines, argent
+   * insuffisant, objet manquant), rien n'est appliqué, le refus part et le dialogue continue là.
+   */
   v.strictObject({
     kind: v.literal('effects'),
     effects: v.pipe(v.array(EffectSchema), v.minLength(1)),
     next: Next,
+    otherwise: v.exactOptional(IdSchema),
   }),
 ]);
 export type DialogueNode = v.InferOutput<typeof DialogueNodeSchema>;

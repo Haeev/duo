@@ -244,7 +244,7 @@ describe('écriture des actes 2 et 3 d’Aubrune', () => {
     expect(held(sim, 0, 'canne') && held(sim, 1, 'canne')).toBe(true);
     expect(openZones(sim)).toEqual(['b', 'r', 'v']);
     sim.world.minutes = 600;
-    // Au saule débité, Achille quitte le fournil pour la fosse du bief (une centaine de mètres).
+    // Sa leçon donnée, Achille quitte le fournil pour la fosse du bief (une centaine de mètres).
     moveTo(sim, 0, 'bw2');
     wait(sim, 100);
     sim.world.minutes = 600;
@@ -434,5 +434,9 @@ describe('écriture des actes 2 et 3 d’Aubrune', () => {
     playScene(sim, 'en-voiture');
     expect(sim.world.progress.quests[ACT_3]?.done).toBe(true);
     expect(fact(sim, 'aubrune.depart.fait')).toBe(true);
+    // Hautefonte n'existe pas encore: l'écran de fin de chapitre, puis on reste à Aubrune.
+    wait(sim, 1.5);
+    expect(sim.world.common.story?.ending?.id).toBe('a-suivre-hautefonte');
+    expect(sim.world.common.place).toBe(AUBRUNE);
   });
 });

@@ -463,7 +463,9 @@ export function createKitchen(
       case 'room_supplied':
       case 'scene_beat':
       case 'scene_ended':
+      case 'scene_gesture':
       case 'scene_started':
+      case 'chapter_ended':
       case 'shop_bought':
       case 'shop_opened':
       case 'shop_sold':
