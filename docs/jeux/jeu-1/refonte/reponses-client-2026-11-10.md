@@ -519,3 +519,13 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Scène d'accueil: Firmin qui accourt en 4 secondes, oui.
 - Prologue: l'éditeur de personnage s'ouvre quand le Contrôleur demande la photo, plus au démarrage; « on ne doit pas voir nos personnages avant ça ».
 - Trois remarques épinglées sur la planche des bâtiments: le haut des cheminées doit être un petit toit de métal et non un V; une fenêtre de l'église n'est pas centrée; l'horloge de l'école est très mal faite.
+
+## Premier essai du client sur ses deux machines (10 novembre, 22 h 45, version 0.20.1, cinq minutes de jeu)
+
+- « Le style graphique est super », « les graphismes et le style graphique sont magnifiques », « les animations de marche et de course sont super ».
+- Le PC rame légèrement: de l'optimisation à faire.
+- Les couleurs sont plus fades sur le PC que sur le Mac.
+- Entrer dans une maison téléporte: on voit la caméra traverser la carte en une demi-seconde; on voit encore le bord de la carte principale et les intérieurs des bâtiments voisins. À corriger.
+- La maison du garde-barrière: une chaise barre la route dès l'entrée; on ne voit pas la porte pour sortir; on est téléporté avant d'avoir franchi le seuil, invisible.
+- Les éléments qu'on récolte dehors (arbres, cultures, roches) sont de gros cubes.
+- Firmin « glisse » pendant la scène d'accueil au lieu de marcher.
