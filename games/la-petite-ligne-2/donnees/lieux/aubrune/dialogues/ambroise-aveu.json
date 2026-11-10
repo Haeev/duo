@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "ambroise-aveu",
+  "villager": "ambroise",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.aveu-ambroise",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "... Honorine. Évidemment. Elle voit tout, cette fenêtre.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "L'ordre était signé, tamponné, daté. « Avancer d'une minute, exécution immédiate. » J'ai exécuté. J'étais régleur, pas héros.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Une minute d'obéissance. Je la regrette depuis trente ans. Ça fait près de seize millions de minutes de regret. J'ai compté.",
+      "emote": "sad",
+      "next": "n4"
+    },
+    "n4-firmin-1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Dis-le-lui, toi. Moi, devant lui, je ne retrouve que des mots de quatre lettres.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-ordre-1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Dans le boîtier de ma première pendule. On ne jette pas une faute: on la range.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "firmin",
+          "text": "Firmin doit le savoir.",
+          "when": [],
+          "effects": [],
+          "next": "n4-firmin-1"
+        },
+        {
+          "id": "ordre",
+          "text": "Tu as gardé l'ordre ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-ordre-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "S'il veut bien ne pas me regarder, je viendrai régler sa pendule. J'ai la clé dans ma poche. Depuis trente ans.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

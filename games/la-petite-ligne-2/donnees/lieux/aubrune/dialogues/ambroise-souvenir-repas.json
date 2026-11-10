@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-repas",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.repas.dos-a-dos"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "J'ai déjeuné avec Lacombe. Enfin, derrière lui. Il mâche à contretemps, mais il passe le sel avec exactitude.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

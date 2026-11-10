@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "basile-chambre",
+  "villager": "basile",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.chambre",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cave ? Non. Pas sur le plan.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Mais. Chambre pas faite. Plancher d'origine. Dessous: jamais vu.",
+      "emote": "idea",
+      "next": "n3"
+    },
+    "n3-refaire-1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Oui. Du long. Du sec.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-mots-1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Quinze. Fatigué.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "refaire",
+          "text": "On refait la chambre ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-refaire-1"
+        },
+        {
+          "id": "mots",
+          "text": "Tu en dis, des mots, aujourd'hui.",
+          "when": [],
+          "effects": [],
+          "next": "n3-mots-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ma coupe. Là-haut, sur la Côte. Barrière ouverte. Huit bûches.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

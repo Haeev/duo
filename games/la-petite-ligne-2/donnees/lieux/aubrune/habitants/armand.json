@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "id": "armand",
+  "name": "Armand Castagné",
+  "temper": "shy",
+  "look": {
+    "shape": "adult-m-slim",
+    "skin": 5,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [8, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-side-part",
+        "colors": [0]
+      },
+      {
+        "slot": "top",
+        "id": "top-sweater",
+        "colors": [6]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [17]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [1]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [1, 1]
+      }
+    ]
+  },
+  "stands": "gr5",
+  "voice": "shy",
+  "life": {
+    "home": "gr5",
+    "schedule": [
+      {
+        "from": 480,
+        "to": 1020,
+        "at": {
+          "point": "gr5"
+        },
+        "activity": "faire-la-classe",
+        "gesture": null
+      },
+      {
+        "from": 1020,
+        "to": 1200,
+        "at": {
+          "point": "lv"
+        },
+        "activity": "ecouter-les-grenouilles",
+        "gesture": null
+      },
+      {
+        "from": 1200,
+        "to": 480,
+        "at": {
+          "point": "gr5"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "question",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["fossile-coquille"],
+      "liked": ["pomme", "vieille-piece"],
+      "disliked": ["goujon"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      }
+    ],
+    "leaves": null
+  }
+}

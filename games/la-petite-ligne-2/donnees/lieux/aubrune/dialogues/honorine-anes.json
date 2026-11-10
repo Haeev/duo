@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "honorine-anes",
+  "villager": "honorine",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.honorine-prix",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Le train de 5 h 12 ? Je l'ai vu, petite. Et je te le raconterai. Mais j'ai encore un prix. Je suis chère, cette année.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Firmin et Ambroise se sont serré la main sans se regarder. Ça ne compte pas. Je veux les voir manger à la même table.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-jamais-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Devant un pot-au-feu, les hommes veulent toujours. C'est après qu'ils discutent.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-oeuf-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Un œuf, c'était pour une minute. Là, tu me demandes un train entier.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "jamais",
+          "text": "Ils ne voudront jamais.",
+          "when": [],
+          "effects": [],
+          "next": "n3-jamais-1"
+        },
+        {
+          "id": "oeuf",
+          "text": "Un œuf au plat ne suffira pas, cette fois ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-oeuf-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Un vrai pot-au-feu, fait à deux, dans une vraie cuisine. Porte-le au café: Colette saura les asseoir. Elle assoirait un orage.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

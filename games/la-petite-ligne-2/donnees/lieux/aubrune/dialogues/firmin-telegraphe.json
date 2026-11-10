@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-telegraphe",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.telegraphe",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Signal: oui. Voie: oui. Commande: oui. Pendule: demain, si l'autre tête de mule vient. Trois et demi sur quatre.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "J'ai télégraphié au dépôt. Réponse de Rosalie: « Demain. 10 h 04. Faites chauffer le café. »",
+      "emote": "joy",
+      "next": "n3"
+    },
+    "n3-cafe-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "On n'a pas de cafetière non plus. Depuis trente ans. Elle le sait: c'est de l'humour de mécanicienne.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-compte-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je compte toujours. C'est mon métier.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "cafe",
+          "text": "On n'a pas de café.",
+          "when": [],
+          "effects": [],
+          "next": "n3-cafe-1"
+        },
+        {
+          "id": "compte",
+          "text": "Demain ! Compte sur nous.",
+          "when": [],
+          "effects": [],
+          "next": "n3-compte-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Dors tôt. Lave-toi. Demain, il y aura des gens. Ça ne nous est pas arrivé depuis 1987.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

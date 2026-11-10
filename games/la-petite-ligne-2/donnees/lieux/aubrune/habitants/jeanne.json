@@ -46,6 +46,22 @@
     "schedule": [
       {
         "from": 420,
+        "to": 1260,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.acte3.guide",
+            "equals": "tunnel"
+          }
+        ],
+        "at": {
+          "point": "tu2"
+        },
+        "activity": "attendre-au-tunnel",
+        "gesture": null
+      },
+      {
+        "from": 420,
         "to": 720,
         "at": {
           "point": "pl"

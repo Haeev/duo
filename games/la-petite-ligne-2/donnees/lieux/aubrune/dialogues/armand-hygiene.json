@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "armand-hygiene",
+  "villager": "armand",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Je... comment dire. En sciences, on appelle ça un phénomène. Il y a une pompe sur la place. Pardon.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

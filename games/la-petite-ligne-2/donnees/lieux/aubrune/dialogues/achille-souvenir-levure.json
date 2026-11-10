@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-levure",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Cette nuit-là, ma pâte a levé d'un coup, à 5 h 12. La levure, sûrement. Une levure très ponctuelle.",
+      "emote": "question",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "firmin-apres",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.matin",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La barrière était baissée, ce matin. La lanterne, chaude. Je n'ai rien vu. Je dormais. C'est ce que j'ai dit à tout le monde.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Rosalie jure qu'aucun autorail crème ne dort à son dépôt. Odette dit: un camion de laitier. Basile dit: « Rêvé. À deux. Ça arrive. »",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-toi-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je dis qu'à 5 h 12, j'ai entendu « Voie gardée ». Et que personne n'avait dit ça depuis mon oncle.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3-bureau-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le siège n'a que 511 bureaux par étage. Je le sais: j'y ai porté un dossier, en 1985. ... Vas-y quand même.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "toi",
+          "text": "Et toi, tu dis quoi ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-toi-1"
+        },
+        {
+          "id": "bureau",
+          "text": "Regarde: bureau 512, à Hautefonte.",
+          "when": [],
+          "effects": [],
+          "next": "n3-bureau-1"
+        }
+      ]
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Tiens. Sa montre. Arrêtée sur 5 h 12, comme l'était la pendule. Je ne l'ai jamais remontée. Regarde bien.",
+      "emote": "sad",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Cric, cric. Voilà. Elle repart. Trente ans de retard, et elle s'en moque. On va fêter ça: veillée sur le quai. La première.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

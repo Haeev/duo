@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "id": "berthe-farine",
+  "villager": "berthe",
+  "priority": 65,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.farine"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Tu l'entends ? Clac, clac, clac. Trente ans qu'elle se taisait. Elle en a, des choses à dire, ma meule.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "farine",
+          "count": 2
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Tiens: la première mouture. Elle est grise, elle est moche, elle est à nous.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Et donne ton registre. « Berthe Lavergne, Meunière. » Avec un grand M. C'est un métier, pas un passe-temps.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

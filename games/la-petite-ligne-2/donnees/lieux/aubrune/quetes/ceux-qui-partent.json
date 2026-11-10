@@ -1,0 +1,1360 @@
+{
+  "schema": 1,
+  "id": "ceux-qui-partent",
+  "kind": "main",
+  "title": "Ceux qui partent",
+  "giver": "firmin",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "la-minute-d-ecart"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-cave",
+      "title": "Il reste la cave",
+      "steps": [
+        {
+          "id": "chambre",
+          "objective": "« Il reste la cave. » La maison n'en a pas. Demande à Basile, qui la refait pièce par pièce.",
+          "target": {
+            "villager": "basile"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "basile-chambre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.chambre",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.chambre",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v5",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v6",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "unlock_zone",
+              "zone": "c"
+            }
+          ]
+        },
+        {
+          "id": "coupe",
+          "objective": "Monte à la coupe de Basile, sur la Côte, et rapporte-lui huit bûches pour le plancher de la chambre.",
+          "target": {
+            "point": "c2"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 8,
+              "villager": "basile"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.coupe",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.coupe",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "trappe",
+          "objective": "À deux dans la chambre: Basile lève le vieux plancher.",
+          "target": {
+            "point": "hd"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-trappe"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.trappe",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-trappe"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.trappe",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "registre",
+          "objective": "Montre le registre de nuit à Firmin. Surtout les six dernières semaines.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-registre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.registre",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.registre",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-lueur",
+      "title": "La lueur",
+      "steps": [
+        {
+          "id": "lucie",
+          "objective": "Une lueur, ça se photographie. La factrice a un appareil et pas une minute: tente ta chance.",
+          "target": {
+            "villager": "lucie"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "lucie-veille",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.lucie",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.lucie",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "pose-longue",
+          "objective": "Veille jusqu'à 5 h 12, à la barrière, avec Lucie et son appareil sur pied.",
+          "target": {
+            "point": "pn-s"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-pose-longue"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.pose-longue",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.pose-longue",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "developpement",
+          "objective": "Au matin, retrouve Lucie sur la place: la photo est développée.",
+          "target": {
+            "villager": "lucie"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "lucie-photo",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.developpement",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.developpement",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "des-fenetres"
+            }
+          ]
+        },
+        {
+          "id": "tirage",
+          "objective": "Montre la photo à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-photo",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.tirage",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.tirage",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v8",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "unlock_zone",
+              "zone": "t"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vingt-ames",
+      "title": "Vingt âmes",
+      "steps": [
+        {
+          "id": "compte",
+          "objective": "Vingt âmes au registre de la halte: demande à Firmin où en est le compte.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-compte",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.compte",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.compte",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "nuit-du-train",
+          "objective": "Le train des cinq est annoncé pour demain: va dormir.",
+          "target": {
+            "point": "hd"
+          },
+          "done": [
+            {
+              "type": "need_at_least",
+              "need": "sleep",
+              "value": 95
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.nuit-du-train",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.nuit-du-train",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "train-des-cinq",
+          "objective": "En matinée, à deux sur le quai: le deuxième train amène cinq âmes.",
+          "target": {
+            "point": "quai"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "le-train-des-cinq"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.train-des-cinq",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.train-des-cinq",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "gue",
+          "objective": "Paulin ne signera pas tant que sa charrette ne passe pas le gué: porte-lui six pierres plates.",
+          "target": {
+            "villager": "paulin"
+          },
+          "after": ["train-des-cinq"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "pierre",
+              "count": 6,
+              "villager": "paulin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.gue",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.gue",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v3",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v9",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "unlock_zone",
+              "zone": "f"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.decor.gue-refait",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "moulin",
+          "objective": "Berthe signera quand sa meule aura tourné: ouvre la vanne du bief, au bout de l'Île, à l'ouest.",
+          "target": {
+            "point": "v1"
+          },
+          "after": ["train-des-cinq"],
+          "done": [
+            {
+              "type": "reach",
+              "point": "v1",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.moulin",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.moulin",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.decor.moulin-tourne",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "farine",
+          "objective": "La roue tourne ! Retourne voir Berthe, dans la cour du moulin.",
+          "target": {
+            "villager": "berthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "berthe-farine",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.farine",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.farine",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "leon",
+          "objective": "Firmin exige « toute âme sachant l'heure ». Léon a onze ans: va voir s'il la sait.",
+          "target": {
+            "villager": "leon"
+          },
+          "after": ["train-des-cinq"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "leon-heure",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.leon",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.leon",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "pari",
+          "objective": "Il lui faut quelqu'un de sa taille. Jeanne parie sur tout: propose-lui un pari.",
+          "target": {
+            "villager": "jeanne"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "jeanne-pari",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.pari",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.pari",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "midi-moins-dix"
+            }
+          ]
+        },
+        {
+          "id": "registre-plein",
+          "objective": "Les signatures y sont: porte le registre de la halte à Firmin.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": ["gue", "farine", "pari"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-vingt",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.registre-plein",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.registre-plein",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "lumignon",
+          "objective": "« Pour ceux qui partent »: demande à Marthe, sur le parvis, ce qu'était ce lumignon à la barrière.",
+          "target": {
+            "villager": "marthe"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-lumignon",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.lumignon",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.lumignon",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.verrou.v7",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "dalle",
+          "objective": "Monte au cimetière par la rue de l'Église et lis la dalle des Lacombe.",
+          "target": {
+            "point": "ci"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "ci",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.dalle",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.dalle",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-dalle-des-lacombe"
+            }
+          ]
+        },
+        {
+          "id": "marthe-manque",
+          "objective": "Dis à Marthe ce qui manque sur la dalle.",
+          "target": {
+            "villager": "marthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-manque",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.marthe-manque",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.marthe-manque",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "honorine-prix",
+          "objective": "Demande à Honorine si elle a vraiment vu le train de 5 h 12.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-anes",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.honorine-prix",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.honorine-prix",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "repas",
+          "objective": "Un pot-au-feu cuisiné à deux: légumes des Delmas, bœuf d'Odette. Porte la marmite à Colette, au café.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": ["honorine-prix", "gue"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "pot-au-feu",
+              "count": 1,
+              "villager": "colette"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.repas",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.repas",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "dos-a-dos"
+            }
+          ]
+        },
+        {
+          "id": "le-train-d-honorine",
+          "objective": "La marmite est vide: Honorine te doit un train.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-train",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.le-train-d-honorine",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.le-train-d-honorine",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-halte-de-nuit",
+      "title": "La halte de nuit",
+      "steps": [
+        {
+          "id": "jeanne",
+          "objective": "Le verre de la lanterne: Jeanne connaît la cachette d'Émile, au bout de la ligne morte.",
+          "target": {
+            "villager": "jeanne"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "jeanne-cachette",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.jeanne",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.jeanne",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "grille",
+          "objective": "Suis la ligne morte vers l'est et ouvre la grille de la Compagnie avec la clé de Firmin.",
+          "target": {
+            "point": "te1"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "te1",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.grille",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.grille",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.guide",
+              "value": "tunnel",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "guerite",
+          "objective": "Continue le long de la courbe, jusqu'à la guérite du cantonnier.",
+          "target": {
+            "point": "te2"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "te2",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.guerite",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.guerite",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-guerite"
+            }
+          ]
+        },
+        {
+          "id": "tunnel",
+          "objective": "Le portail du tunnel est au bout de la courbe. Entre, jusqu'à la première niche.",
+          "target": {
+            "point": "tu1"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "tu1",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.tunnel",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.tunnel",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "cachette",
+          "objective": "Au fond du tunnel, à deux: la cachette d'Émile.",
+          "target": {
+            "point": "tu3"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-cachette-d-emile"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.cachette",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-cachette-d-emile"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.cachette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "belvedere",
+          "objective": "Tire le verrou de l'escalier de service et monte au belvédère de l'Éperon.",
+          "target": {
+            "point": "bv"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "bv",
+              "who": "one",
+              "radius": 5
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.belvedere",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.belvedere",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "vu-d-en-haut"
+            }
+          ]
+        },
+        {
+          "id": "sertir",
+          "objective": "Redescends par le cimetière et porte le verre à Mado: elle le sertira dans la lanterne.",
+          "target": {
+            "villager": "mado"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "mado-sertir",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.sertir",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.sertir",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.lanterne.prete",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "heure-juste",
+          "objective": "La cloche doit sonner à l'heure juste: demande à Ambroise de combien elle se trompe.",
+          "target": {
+            "villager": "ambroise"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "ambroise-cloche",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.heure-juste",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.heure-juste",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "marthe-sonne",
+          "objective": "Porte à Marthe l'heure certifiée par Ambroise.",
+          "target": {
+            "villager": "marthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-heure",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.marthe-sonne",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.marthe-sonne",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.cloche.juste",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "saindoux",
+          "objective": "La barrière grince depuis trente ans: demande de la graisse à Odette.",
+          "target": {
+            "villager": "odette"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-saindoux",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.saindoux",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.saindoux",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "repetition",
+          "objective": "Répétition générale, à deux: une personne à la barrière, l'autre au bout du quai, lanterne en main.",
+          "target": {
+            "point": "pn-s"
+          },
+          "after": ["sertir", "marthe-sonne", "saindoux"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-repetition"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.repetition",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-repetition"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.repetition",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cinq-heures-douze",
+      "title": "5 h 12",
+      "steps": [
+        {
+          "id": "veillee",
+          "objective": "Cette nuit, à 5 h 12: une personne à la barrière, l'autre à la lanterne. Ne dormez pas trop loin.",
+          "target": {
+            "point": "pn-s"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "l-autorail-creme"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.veillee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.veillee",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "matin",
+          "objective": "Au matin, va voir Firmin sur le quai. Il a la tête de quelqu'un qui n'a pas dormi non plus.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-apres",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.matin",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.matin",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.decor.montre-remontee",
+              "value": true,
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-veillee-du-premier-train"
+            }
+          ]
+        },
+        {
+          "id": "troisieme-lettre",
+          "objective": "Lucie te cherche partout: elle a une lettre pour toi, postée à Hautefonte.",
+          "target": {
+            "villager": "lucie"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "lucie-lettre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.troisieme-lettre",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.troisieme-lettre",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "depart",
+          "objective": "Quand vous serez prêts: sur le quai, à deux, à 5 h 12, cartes de ligne en poche. Le train s'arrête.",
+          "target": {
+            "point": "quai"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "en-voiture"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.depart",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.acte3.depart",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

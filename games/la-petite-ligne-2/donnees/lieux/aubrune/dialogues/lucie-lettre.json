@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "lucie-lettre",
+  "villager": "lucie",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.troisieme-lettre",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ah, te voilà ! Une lettre. Postée à Hautefonte, hier. Hier ! Le courrier de Hautefonte met trois jours. Ha ! ... Je ris, mais bon.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "« Merci pour la lanterne. On y voit clair, d'ici. Bureau 512: frappez fort, je deviens sourd. Amitiés à Firmin, qui a bien tenu le registre. É. L. »",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-firmin-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Il est derrière toi. Il lit par-dessus ton épaule depuis le début. Il fait celui qui regarde un nuage.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-hier-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Je distribue, je n'explique pas. Si j'expliquais le courrier, je ne dormirais plus.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "firmin",
+          "text": "Je la porte à Firmin.",
+          "when": [],
+          "effects": [],
+          "next": "n3-firmin-1"
+        },
+        {
+          "id": "hier",
+          "text": "Hier ? La lanterne, c'était cette nuit.",
+          "when": [],
+          "effects": [],
+          "next": "n3-hier-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Celle-là, garde-la. Et dis-lui toi-même que la barrière est repeinte. Enfin, elle le sera demain.",
+      "emote": "sad",
+      "next": null
+    }
+  }
+}

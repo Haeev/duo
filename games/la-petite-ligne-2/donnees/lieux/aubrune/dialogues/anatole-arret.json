@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "anatole-arret",
+  "villager": "anatole",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Pas de conversation avec le personnel pendant l'arrêt. Article 9. ... Jolie lanterne, cela dit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

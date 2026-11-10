@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "id": "barnabe-quotidien",
+  "villager": "barnabe",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.barnabe",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.barnabe",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.barnabe",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Bonjour, bonjour. Je chantais. Je chante toujours en coupant: l'arbre tombe plus volontiers.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.barnabe",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ah, les gardes ! Mado dit que vous êtes « pas trop [[duo:empotées|empotés]] ». Dans sa bouche, c'est une médaille.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.barnabe",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Bonjour. Tu sens cette odeur de beurre chaud ? Non ? Moi non plus. Je ne sens rien. Je ne sais pas de quoi tu parles.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.barnabe",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Te voilà. J'ai fendu trois stères ce matin, et porté un oisillon sur un kilomètre. Le plus lourd, c'était l'oisillon: il fallait pas le serrer.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.barnabe",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    }
+  }
+}

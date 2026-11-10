@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "odette-minute",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.odette-sait",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La minute ! Trente ans que le bourg marche sur la pointe des pieds autour de cette minute-là.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Je vais te dire: ils ont raison, l'un comme l'autre. C'est bien ça, le malheur. Si l'un des deux avait tort, ce serait réglé depuis longtemps.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Mais moi, je n'y étais pas: je comptais ma caisse. Honorine, si. De sa fenêtre, elle voit la voie.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-ment-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Pour s'amuser. Mais elle dit la vérité à qui lui fait plaisir. C'est son tarif.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ment",
+          "text": "Honorine ment tout le temps.",
+          "when": [],
+          "effects": [],
+          "next": "n4-ment-1"
+        },
+        {
+          "id": "cours",
+          "text": "J'y cours.",
+          "when": [],
+          "effects": [],
+          "next": "fin"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Un conseil: n'y va pas les mains vides. Elle rêve d'un œuf au plat, le jaune entier. Sa sœur les crève toujours.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

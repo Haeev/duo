@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "firmin-compte",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.compte",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "J'ai compté. Dix au bourg. Vous deux: douze. Les trois du train: quinze. Il en manque cinq. Je sais compter, c'est mon métier.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "J'ai écrit aux Delmas, qui cherchaient une ferme: ça fait trois. À Berthe Lavergne, pour le moulin: quatre.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Et Mado attend son Barnabé, qui bûcheronne dans le haut pays: cinq. Tout ce monde-là prend le prochain train.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-pile-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Pile. L'article 40 ne dit pas « environ vingt ». Aucun article ne dit « environ ».",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-manque-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Alors on reste une halte de jour. C'est très bien, une halte de jour. On dort.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pile",
+          "text": "Vingt, pile ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-pile-1"
+        },
+        {
+          "id": "manque",
+          "text": "Et s'il en manque une ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-manque-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le train est annoncé pour demain matin. Dors, et sois sur le quai. Avec une chemise propre, si tu en as une.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

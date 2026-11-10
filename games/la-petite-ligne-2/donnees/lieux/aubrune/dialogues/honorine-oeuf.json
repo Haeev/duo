@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "id": "honorine-oeuf",
+  "villager": "honorine",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.oeuf",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Tiens, tiens. Odette t'envoie, je parie. Et Odette t'a dit mon prix: un œuf au plat, le jaune entier.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "tiens",
+          "text": "Regarde: le jaune est entier.",
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "oeuf-au-plat",
+              "count": 1
+            }
+          ],
+          "effects": [],
+          "next": "n3"
+        },
+        {
+          "id": "plus-tard",
+          "text": "Je reviens avec l'œuf.",
+          "when": [],
+          "effects": [],
+          "next": null
+        }
+      ]
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Magnifique. Rond comme un soleil. Je n'y touche pas.",
+      "emote": "joy",
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Porte-le à Marthe. De ma part. Dis-lui: « Voilà comment on fait. » Et regarde bien sa tête.",
+      "emote": "idea",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Reviens me raconter sa tête. Après, je te dirai la minute. Parole de menteuse.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "odette-saindoux",
+  "villager": "odette",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.saindoux",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "De la graisse ? Pour la barrière ? J'ai du saindoux. Du bon, pour la cuisine, et du moins bon, pour les barrières.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Tu vas me dire pourquoi on graisse une barrière où il ne passe que Rosalie, le matin ? Non ? Tu ne vas pas me le dire.",
+      "emote": "question",
+      "next": "n3"
+    },
+    "n3-reglement-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Le règlement ! Depuis que vous l'avez sorti de sous le buffet, ce livre fait plus de dégâts qu'un sanglier.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-premiere-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "La première ? Avant Solange ? Jure-le sur mes radis.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "reglement",
+          "text": "C'est pour le règlement.",
+          "when": [],
+          "effects": [],
+          "next": "n3-reglement-1"
+        },
+        {
+          "id": "premiere",
+          "text": "Tu le sauras la première.",
+          "when": [],
+          "effects": [],
+          "next": "n3-premiere-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Tiens, ton pot. Et si quelqu'un se promène à la barrière cette nuit, je n'ai rien vu: je dors du côté de la cour.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

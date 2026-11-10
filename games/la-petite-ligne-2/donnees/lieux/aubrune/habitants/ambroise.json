@@ -50,6 +50,22 @@
     "home": "gr7",
     "schedule": [
       {
+        "from": 480,
+        "to": 1140,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.acte2.le-train",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "quai-e"
+        },
+        "activity": "regler-la-pendule",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1140,
         "at": {

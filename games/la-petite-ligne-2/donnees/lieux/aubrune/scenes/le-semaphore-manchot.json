@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "le-semaphore-manchot",
+  "title": "Le sémaphore manchot",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "point": "pg0"
+      },
+      "seconds": 4
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le sémaphore est là, droit comme un reproche. Il lui manque son bras.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le bras est dans les orties, tordu en point d'interrogation. Tu le ramasses: il pèse son poids de règlement.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sur la porte du poste, à la craie: « Leviers: demander à deux. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

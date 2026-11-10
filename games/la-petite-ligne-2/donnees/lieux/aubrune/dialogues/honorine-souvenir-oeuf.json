@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-oeuf",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.marthe-oeuf",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Marthe a mangé mon œuf ! Enfin, ton œuf. Enfin, le nôtre. Quarante ans que je ne l'avais pas nourrie.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "armand-arrivee",
+  "villager": "armand",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.train"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Oh. Bonjour. Pardon. Armand Castagné. Je... l'école. Je suis l'instituteur. Enfin, je vais l'être.",
+      "emote": "question",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "En classe, je parle très bien. C'est dehors que les phrases... Bref. Les fossiles. J'aime beaucoup les fossiles.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Si tu en trouves, ou un insecte, apporte-le dans la cour de l'école. Là, je saurai quoi dire.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

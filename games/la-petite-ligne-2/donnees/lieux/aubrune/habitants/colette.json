@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "colette",
+  "name": "Colette Lafon",
+  "temper": "cheerful",
+  "look": {
+    "shape": "adult-f-round",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [4, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [6]
+      },
+      {
+        "slot": "dress",
+        "id": "dress-simple",
+        "colors": [12]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-pebble",
+        "colors": [3, 0]
+      }
+    ]
+  },
+  "stands": "gr6",
+  "voice": "soft",
+  "life": {
+    "home": "gr6",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1320,
+        "at": {
+          "point": "gr6"
+        },
+        "activity": "tenir-le-cafe",
+        "gesture": null
+      },
+      {
+        "from": 1320,
+        "to": 420,
+        "at": {
+          "point": "gr6"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["truite"],
+      "liked": ["poireau", "carotte", "oeuf"],
+      "disliked": ["sandwich"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      }
+    ],
+    "leaves": null
+  }
+}

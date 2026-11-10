@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "berthe-vanne",
+  "villager": "berthe",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.moulin",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Signer ? Je signe quand ma meule tourne. Une meunière sans meule, c'est une âme à moitié.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "La vanne du bief est fermée depuis trente ans. Elle est au bout de l'Île, à l'ouest. Ouvre-la, et écoute: la roue te dira merci avant moi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

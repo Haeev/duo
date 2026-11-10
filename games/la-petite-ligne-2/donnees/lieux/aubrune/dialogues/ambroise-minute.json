@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "ambroise-minute",
+  "villager": "ambroise",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.version-ambroise",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "La pendule de la halte ? Je l'ai réglée onze mille fois. Elle n'a jamais varié d'une seconde. Jamais.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Le dernier soir, Lacombe a crié devant tout le quai que ma pendule avançait d'une minute. Que j'étais un voleur de minute.",
+      "emote": "anger",
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "On ne vole pas une minute. On la doit, ou on la donne.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-regler-1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Quand il aura présenté ses excuses. Par écrit. À l'heure.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-vraiment-1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "... Évidemment que non. Évidemment.",
+      "emote": "sad",
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "regler",
+          "text": "Tu viendrais la régler ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-regler-1"
+        },
+        {
+          "id": "vraiment",
+          "text": "Elle avançait vraiment ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-vraiment-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Allez. J'ai quarante pendules à remonter, et elles n'attendent pas, elles.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

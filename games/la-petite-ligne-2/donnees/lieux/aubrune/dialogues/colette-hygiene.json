@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "colette-hygiene",
+  "villager": "colette",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Franchement ? Tu sens. Je te le dis parce que je t'aime bien. La pompe, puis reviens: je te garde une chaise.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "id": "margot-quotidien",
+  "villager": "margot",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.margot",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.margot",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.margot",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Bonjour ! Paulin t'a dit non ? C'est sa façon de dire bonjour. Je traduis depuis quinze ans.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.margot",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Te voilà ! J'ai des graines, des œufs, et un mari qui boude un piquet de clôture. Par quoi je commence ?",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.margot",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Bonjour ! Odette m'a déjà tout raconté sur tout le monde. J'ai fait semblant de ne pas écouter. Je sais tout.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.margot",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ah, bonjour ! Léon a dit à l'instituteur qu'il parlait six langues. On en est à expliquer lesquelles.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.margot",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    }
+  }
+}

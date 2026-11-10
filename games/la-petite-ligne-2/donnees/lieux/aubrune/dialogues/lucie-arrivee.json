@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "lucie-arrivee",
+  "villager": "lucie",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.train"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Bonjour-bonjour ! Lucie Arnaud, factrice. Et photographe, quand le courrier dort. Ha !",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Trente ans de courrier en retard pour Aubrune: j'ai trois sacs. Je distribue vite, je ris fort, je ne m'assois jamais.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "La boîte aux lettres est à ma grille, en face de l'école. Si tu écris, écris lisible.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

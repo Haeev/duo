@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-autorail",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Alors, mon autorail ? Crème, tout rond, des fenêtres jaunes ? Tu vois. Pour le préfet, en revanche, j'ai menti.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

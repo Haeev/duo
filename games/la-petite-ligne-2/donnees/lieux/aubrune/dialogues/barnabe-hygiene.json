@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "barnabe-hygiene",
+  "villager": "barnabe",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Oh. Doucement. Je travaille dans la sève et la sueur, et pourtant... Va à la pompe, tu veux ?",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

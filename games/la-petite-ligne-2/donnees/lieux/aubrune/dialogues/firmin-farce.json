@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-farce",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.farce",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Montre. ... Postée avant-hier. À Hautefonte.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Une farce. Une mauvaise farce. Ou un homonyme: des Lacombe, il y en a plein les annuaires.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-cave-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Exactement. Pas de cave. Sur aucun plan. Donc l'affaire est close.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-ecriture-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je reconnais surtout l'heure: celle de ne plus en parler.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "cave",
+          "text": "Quelle cave ? La maison n'en a pas.",
+          "when": [],
+          "effects": [],
+          "next": "n3-cave-1"
+        },
+        {
+          "id": "ecriture",
+          "text": "Tu as reconnu l'écriture.",
+          "when": [],
+          "effects": [],
+          "next": "n3-ecriture-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Je la garde. Avec l'autre. Ma poche ferme à bouton.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

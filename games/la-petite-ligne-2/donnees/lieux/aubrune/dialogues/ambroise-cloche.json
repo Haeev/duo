@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "ambroise-cloche",
+  "villager": "ambroise",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.heure-juste",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "La cloche de Marthe ? Elle retarde de quatre minutes. Depuis 1962. Je le sais, tout le bourg le sait, et personne n'ose.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Marthe sonne d'après la montre de son père. La montre de son père retardait. Son père aussi, d'ailleurs.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-regler-1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "En onze secondes. Encore faut-il qu'elle me la confie. Elle ne confie rien: elle prête, et elle compte.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-trop-1": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "C'est 5 h 16. Autant sonner pour un autre train.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "regler",
+          "text": "Tu peux régler sa montre ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-regler-1"
+        },
+        {
+          "id": "trop",
+          "text": "Quatre minutes, pour un 5 h 12, c'est trop.",
+          "when": [],
+          "effects": [],
+          "next": "n3-trop-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Porte-lui ceci: l'heure de la pendule du quai, relevée ce matin, certifiée, signée. Elle n'aime pas les conseils. Elle respecte les papiers.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

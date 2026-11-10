@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "honorine-train",
+  "villager": "honorine",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.le-train-d-honorine",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Dos à dos ! Colette est une artiste. Bon. J'avais sept ans. Une rage de dents. J'étais à la fenêtre, à 5 h 12.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Un autorail crème, tout rond, avec des fenêtres jaunes. Il ne faisait pas plus de bruit qu'une plume sur un édredon.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Le garde a levé sa lanterne. Le train a ralenti, comme on ôte son chapeau. Et des gens sont montés. Bien habillés. Sans valise.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-gens-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Je n'ai reconnu personne. Enfin si: une dame, qui ressemblait à ma marraine. Mais ma marraine était partie depuis l'hiver.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-marthe-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Marthe dormait. On dort beaucoup, chez les gens qui ne croient à rien. C'est reposant.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "gens",
+          "text": "Qui étaient ces gens ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-gens-1"
+        },
+        {
+          "id": "marthe",
+          "text": "Marthe dit que tu inventes.",
+          "when": [],
+          "effects": [],
+          "next": "n4-marthe-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ma rage de dents est passée dans la nuit. Voilà. Crois ce que tu veux: c'est la seule chose que je ne vends pas.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

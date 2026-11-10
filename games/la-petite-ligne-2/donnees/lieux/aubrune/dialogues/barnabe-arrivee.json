@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "barnabe-arrivee",
+  "villager": "barnabe",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.train2"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Bonjour. Barnabé. Le mari de Mado. C'est vous, les gardes ? Elle m'a tout écrit. J'en ai plein les sabots, de vos nouvelles.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Je bûcheronne à la coupe de Basile, là-haut. Si tu entends chanter dans les bois, c'est moi. Si ça chante faux, c'est moi aussi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

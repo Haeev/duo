@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-laitier",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Un laitier sur des rails, je maintiens. Mais j'ai remis deux couverts de côté, à la pension. On ne sait jamais qui descend.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

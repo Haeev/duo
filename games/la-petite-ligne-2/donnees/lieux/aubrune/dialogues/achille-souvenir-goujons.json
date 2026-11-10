@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-goujons",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fosse",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tes goujons étaient très bons. Je crois. Je me suis endormi dans l'assiette.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
