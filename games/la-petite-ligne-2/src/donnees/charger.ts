@@ -34,6 +34,7 @@ import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
 import { CropSchema, ResourceSchema, type CropDef, type ResourceDef } from './schemas/recolte';
 import { SceneSchema, type SceneDef } from './schemas/scene';
+import { SpeciesSchema, type SpeciesDef } from './schemas/elevage';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
 import {
@@ -80,6 +81,8 @@ export interface Content {
   /** Cultures du potager et ressources du monde (`schemas/recolte.ts`). */
   readonly crops: ById<CropDef>;
   readonly resources: ById<ResourceDef>;
+  /** Espèces de la basse-cour (`schemas/elevage.ts`). */
+  readonly species: ById<SpeciesDef>;
   readonly pieces: ById<PieceDef>;
   readonly places: ById<PlaceContent>;
   /** Calendrier, climats et événements des lieux (`charger-temps.ts`). */
@@ -161,6 +164,7 @@ export function loadContent(files: Files): Content {
   const catches = parseFolder(CatchSchema, files, 'commun/prises', problems);
   const crops = parseFolder(CropSchema, files, 'commun/cultures', problems);
   const resources = parseFolder(ResourceSchema, files, 'commun/ressources', problems);
+  const species = parseFolder(SpeciesSchema, files, 'commun/especes', problems);
 
   const places: Record<string, PlaceContent> = {};
   for (const path of Object.keys(files).sort()) {
@@ -237,6 +241,7 @@ export function loadContent(files: Files): Content {
     catches,
     crops,
     resources,
+    species,
     pieces,
     places,
     ...timeAndBook,

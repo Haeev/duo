@@ -86,6 +86,7 @@ describe('pas de simulation vide', () => {
       'collections',
       'logement',
       'peche',
+      'elevage',
     ]);
   });
 });

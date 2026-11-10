@@ -21,6 +21,7 @@ import { PLACE_EVENTS } from '../lieux/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
 import { SCENE_EVENTS } from '../scenes/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
+import { FARM_EVENTS } from '../elevage/evenements';
 
 export const CORE_EVENTS = [
   /**
@@ -75,5 +76,6 @@ export const GameEventSchema = v.variant('type', [
   ...HOUSING_EVENTS,
   ...FISHING_EVENTS,
   ...PLACE_EVENTS,
+  ...FARM_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

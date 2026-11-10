@@ -53,6 +53,8 @@ const PROPS_WITHOUT_MODEL = [
   'point-de-fouille',
   'pot-de-fleurs-essai',
   'poteau-de-quai',
+  'poulailler',
+  'poulailler-d-essai',
   'rechaud',
   'ronces',
   'table-a-manger',

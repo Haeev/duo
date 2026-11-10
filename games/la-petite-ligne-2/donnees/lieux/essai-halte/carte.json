@@ -144,6 +144,13 @@
       "x": 10.5,
       "y": 16,
       "rotation": 0
+    },
+    {
+      "id": "poulailler",
+      "type": "poulailler-d-essai",
+      "x": 6.5,
+      "y": 22,
+      "rotation": 0
     }
   ],
   "groundItems": [

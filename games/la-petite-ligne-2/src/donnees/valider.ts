@@ -13,6 +13,7 @@ import { GROUP_MAX_SPAN, PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schem
 import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
 import { validateHarvestContent } from './schemas/recolte';
+import { validateFarmContent } from '../simulation/elevage/valider';
 import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
@@ -499,6 +500,7 @@ export function validateContent(content: Content): string[] {
   // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
   problems.push(...validateDialogueTexts(content));
   problems.push(...validateHarvestContent(content));
+  problems.push(...validateFarmContent(content));
   problems.push(...validateVillagerLives(content, checkCondition));
   // Suites de quêtes et scènes: références, et aucune suite qui puisse se bloquer.
   problems.push(...validateStory(content, { condition: checkCondition, effect: checkEffect }));
