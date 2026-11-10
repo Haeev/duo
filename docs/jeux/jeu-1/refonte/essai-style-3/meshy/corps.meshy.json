@@ -1,0 +1,42 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "corps communs de l'essai de style 3 (femme, homme, costaud)",
+ "game": "la-petite-ligne-2",
+ "family": "personnages",
+ "purpose": "essai: corps commun riggé duo-24, tenues en textures seules; non livré dans le jeu",
+ "outil": "Meshy, serveur MCP officiel 0.6.9, par docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+ "date": "2026-11-10",
+ "author": "tech-artist",
+ "license": "offre payante du client: licence privée, propriété du client",
+ "sorties_brutes": "non versionnées (meshy_output/ hors dépôt, liens effacés 3 jours après la tâche)",
+ "inputs": [
+  { "path": "costaud-concept.jpg", "sha256": "92f568d9fe2039ff249c9d737e3d29776ffca47ddace8538963553b833a990a4", "auteur": "Meshy text-to-image (nano-banana), tâche 01a1c5b5-f2ff-7156-bc61-e8de81345aa6, réduite à 432 px" }
+ ],
+ "solde": { "avant": 2052, "apres": 1969, "depense": 83, "budget": 120 },
+ "tasks": [
+  { "etape": "réalisme adouci, femme (abandonné: changement de direction)", "outil": "meshy_text_to_3d", "task_id": "01a1c591-6190-707d-9ce1-77bc5b6834bb", "params": { "ai_model": "meshy-t2.5", "model_type": "smart-topology", "target_polycount": 4800, "pose_mode": "a-pose" }, "credits": 5, "resultat": "5 051 triangles, queue de cheval modelée malgré « bald »" },
+  { "etape": "réalisme adouci, femme, affinage", "outil": "meshy_text_to_3d_refine", "task_id": "01a1c592-a228-732d-b712-837656816ea9", "credits": 10, "resultat": "texture 2 048 en atlas éclaté, torse non couvert" },
+  { "etape": "réalisme adouci, femme, rig", "outil": "meshy_rig", "task_id": "01a1c593-378a-7626-b704-f8cf44bd247c", "credits": 5 },
+  { "etape": "réalisme adouci, homme v1 (refusé: culturiste)", "outil": "meshy_text_to_3d", "task_id": "01a1c591-75d7-7710-b85b-a28a3588afc7", "credits": 5 },
+  { "etape": "réalisme adouci, homme v2", "outil": "meshy_text_to_3d", "task_id": "01a1c592-761d-76b9-91fe-b15298b65596", "credits": 5, "resultat": "corps moyen, mais mèche et barbe modelées" },
+  { "etape": "réalisme adouci, homme v2, affinage", "outil": "meshy_text_to_3d_refine", "task_id": "01a1c593-e346-76df-9bfb-ac7e39ab8ca2", "credits": 10 },
+  { "etape": "réalisme adouci, homme v2, rig", "outil": "meshy_rig", "task_id": "01a1c594-7f80-7482-a2ab-1167abb66919", "credits": 5 },
+  { "etape": "encré, femme (retenu: corps `femme`)", "outil": "meshy_text_to_3d", "task_id": "01a1c597-93a6-70f3-99d2-3f3679e7ce44", "params": { "ai_model": "meshy-t2.5", "model_type": "smart-topology", "target_polycount": 4000, "pose_mode": "a-pose" }, "credits": 5, "resultat": "4 202 triangles, crâne lisse, proportions neutres" },
+  { "etape": "encré, femme, rig sur l'aperçu sans texture", "outil": "meshy_rig", "task_id": "01a1c598-dca9-76b0-8b14-7869bedcaafe", "params": { "height_meters": 1.66 }, "credits": 5 },
+  { "etape": "encré, homme v1 (refusé: culturiste)", "outil": "meshy_text_to_3d", "task_id": "01a1c597-a40c-767f-b51c-47364720541b", "credits": 5 },
+  { "etape": "encré, homme v2 (retenu: corps `homme`)", "outil": "meshy_text_to_3d", "task_id": "01a1c598-bbf7-71c7-a770-caeec0642be0", "credits": 5, "resultat": "chemise et pantalon larges modelés (bourrelets aux manches et à la taille)" },
+  { "etape": "encré, homme v2, rig", "outil": "meshy_rig", "task_id": "01a1c599-8a36-76f6-bbd9-750cd7a4201e", "params": { "height_meters": 1.76 }, "credits": 5 },
+  { "etape": "encré, concept du costaud", "outil": "meshy_text_to_image", "task_id": "01a1c5b5-f2ff-7156-bc61-e8de81345aa6", "params": { "ai_model": "nano-banana", "aspect_ratio": "3:4" }, "credits": 3 },
+  { "etape": "encré, costaud d'après le concept (retenu: corps `costaud`)", "outil": "meshy_image_to_3d", "task_id": "01a1c5b6-5217-73d9-acc6-cb31a1eae541", "params": { "ai_model": "meshy-t2.5", "model_type": "smart-topology", "target_polycount": 3200, "pose_mode": "a-pose", "should_texture": false }, "credits": 5, "resultat": "3 300 triangles, silhouette taillée, bottes, grandes mains" },
+  { "etape": "encré, costaud, rig", "outil": "meshy_rig", "task_id": "01a1c5b7-3fc2-700c-a25e-e7fd72bbcf84", "params": { "height_meters": 1.76 }, "credits": 5 }
+ ],
+ "credits_total": 83,
+ "credits_budget": 120,
+ "consignes": {
+  "encre_texte": "stylized comic book video game character base body, graphic exaggerated proportions, slightly large head, large hands and feet, long legs, angular planar shapes with crisp edges, simple chunky readable forms, smooth bald head like a mannequin with no hair, simple nose, plain tight clothing flush to the body with no folds and no accessories, simple boots, mitten-like hands with fingers together, A-pose, standing straight, symmetrical",
+  "costaud_image": "full body character turnaround front view only, single stylized comic book video game character, sturdy adult village man, exaggerated graphic silhouette: broad angular shoulders, slightly hunched back, thick neck, big hands, chunky boots, short legs, angular planar chiseled forms like a carved wooden figurine, bald smooth head, wearing plain tight grey clothes flush to the body with no folds, no accessories, A-pose arms away from the body, neutral light grey background, flat even lighting, no text"
+ },
+ "conformity": { "script": "../scripts/conformer_corps.py", "triangles_visibles": 2300, "mains_pieds": { "femme": 0.15, "homme": 0.15, "costaud": 0.0 }, "squelette": "duo-24 (rig Meshy, 24 os)", "clips": ["marche (Meshy)", "repos (script)"] },
+ "status": "essai",
+ "next_steps": "voir le compte rendu: concept dessiné par le directeur artistique puis image vers 3D (13 crédits par corps)"
+}

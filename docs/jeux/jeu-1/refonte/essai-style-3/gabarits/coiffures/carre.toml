@@ -1,0 +1,18 @@
+# Coiffure « carré à frange »: rideau jusqu'à la mâchoire, frange sur les sourcils, pointes à l'ourlet.
+# Gabarit: copier ce fichier, changer `id` et les cotes; `coiffure.py` fabrique la coque pour chaque corps.
+id = "carre"
+colonnes = 16            # pans autour de la tête (section anguleuse; 16 x (2 x rangées - 1) triangles)
+rangees = 10             # du sommet à l'ourlet
+largeur_frange_deg = 52  # demi-largeur de la frange vue de face (degrés autour de la tête)
+frange_deg = 60          # bas de la frange, angle depuis le sommet du crâne
+cotes_deg = 100          # bas sur les côtés si pas de rideau
+dos_deg = 120            # bas dans le dos si pas de rideau
+rideau_z = 0.205         # rideau: bas des cheveux, mètres sous le sommet du crâne (absent = pas de rideau)
+volume_haut = 0.030      # épaisseur au sommet (m)
+volume_cotes = 0.016     # épaisseur sur les côtés (m)
+aretes = 0.22            # relief des mèches (section en étoile, part du volume)
+pointes = 0.028          # longueur des pointes de l'ourlet (m)
+evase = 0.02             # évasement du rideau vers le bas (m)
+# Peinture (couleurs du nuancier, section « cheveux »)
+meches = 5               # grandes masses dessinées à l'encre
+reflets = 4              # traits clairs effilés sur le dessus
