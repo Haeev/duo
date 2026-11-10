@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "marthe-lumignon",
+  "villager": "marthe",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.lumignon",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Le lumignon ? On en posait un à la barrière, chaque soir. « Pour ceux qui partent. » Ma mère le faisait. La sienne aussi.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Et le garde levait sa lanterne à 5 h 12. On disait que ça portait bonheur aux voyageurs. On ne disait pas lesquels.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-crois-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Je crois à la cloche. Elle, au moins, je sais qui la tire.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-qui-1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ceux qui partent. Tu poses des questions de quelqu'un qui n'a pas sommeil.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "crois",
+          "text": "Tu y crois ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-crois-1"
+        },
+        {
+          "id": "qui",
+          "text": "Qui partait, à 5 h 12 ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-qui-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Tiens, la clé de la porte haute du cimetière. Va voir la dalle des Lacombe. Compte les noms. Puis reviens me dire ce qui manque.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

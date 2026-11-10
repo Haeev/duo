@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-minute",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.confidence",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Alors, Honorine a parlé ? Et tu ne me racontes rien ? À moi ? Je te fais un prix sur les radis si tu craques.",
+      "emote": "question",
+      "next": null
+    }
+  }
+}

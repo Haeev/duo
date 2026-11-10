@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "id": "rosalie",
+  "name": "Rosalie Vasseur",
+  "temper": "cheerful",
+  "look": {
+    "shape": "adult-f-medium",
+    "skin": 4,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [2, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bun",
+        "colors": [4]
+      },
+      {
+        "slot": "top",
+        "id": "top-tee",
+        "colors": [13]
+      },
+      {
+        "slot": "accessory",
+        "id": "accessory-vest",
+        "colors": [10]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [10]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [0, 1]
+      }
+    ]
+  },
+  "stands": "quai",
+  "voice": "bouncy",
+  "life": {
+    "home": "quai",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1260,
+        "at": {
+          "point": "quai"
+        },
+        "activity": "attendre-le-depart",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "quai"
+        },
+        "activity": "attendre-le-depart",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["pain"],
+      "liked": ["pomme"],
+      "disliked": ["radis"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.train.en-gare"
+      }
+    ],
+    "leaves": [
+      {
+        "type": "remembered",
+        "key": "aubrune.train.en-gare",
+        "equals": false
+      }
+    ]
+  }
+}

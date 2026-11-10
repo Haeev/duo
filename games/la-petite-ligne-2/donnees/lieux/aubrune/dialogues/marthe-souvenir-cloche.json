@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-cloche",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.cloche.juste"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Depuis que je sonne à l'heure, le bourg dîne quatre minutes plus tôt. Les gens ont faim plus vite. C'est curieux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

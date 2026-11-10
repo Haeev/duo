@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "la-deuxieme-lettre",
+  "title": "La deuxième lettre",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans l'enveloppe, une seule ligne, d'une écriture bien droite:",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« Bien [[duo:arrivées|arrivés]] ? Il reste la cave. É. L. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La maison du garde-barrière n'a pas de cave. Basile a le plan: une pièce, une cuisine, une chambre. Pas de cave.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

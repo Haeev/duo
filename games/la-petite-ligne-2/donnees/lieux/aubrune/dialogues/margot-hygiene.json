@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "margot-hygiene",
+  "villager": "margot",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Oh, mon pauvre chou. Je le dis gentiment: va te laver. Paulin le dirait moins gentiment.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

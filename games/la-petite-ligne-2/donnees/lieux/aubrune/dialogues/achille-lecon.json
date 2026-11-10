@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "achille-lecon",
+  "villager": "achille",
+  "priority": 65,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.lecon"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Pêcher ? Mmh. C'est comme le pain: on prépare tout, puis on attend. Je suis très fort pour attendre.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "canne",
+          "count": 1
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tiens, une canne. J'en ai neuf. J'en casse une par an, en dormant dessus.",
+      "emote": "idea",
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Le saule couché barrait la berge: Basile l'a débité ce matin, pour mon four. Le chemin de l'Île est ouvert.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Pars devant: la berge, le saule, puis les planches de l'Île. Je ferme le fournil et j'arrive. Si je tarde, c'est que je dors debout.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

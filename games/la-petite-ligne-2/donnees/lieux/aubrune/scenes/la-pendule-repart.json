@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "id": "la-pendule-repart",
+  "title": "La pendule repart",
+  "together": true,
+  "roles": {
+    "a": "À l'échelle",
+    "b": "À la clé"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte2.le-train",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 480,
+        "to": 780
+      },
+      {
+        "type": "reach",
+        "point": "quai-e",
+        "who": "both",
+        "radius": 6
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "point": "quai-e"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "say",
+      "who": "ambroise",
+      "text": "Lacombe.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Pélissier.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ils se saluent en regardant deux nuages différents.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Tiens l'échelle, sous la pendule.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "quai-e",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Passe la clé de remontage à Ambroise.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "quai-e",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "ambroise",
+      "text": "Onze tours. Pas dix, pas douze. Quelle heure avez-vous, Lacombe ?",
+      "emote": null,
+      "sound": "Cric, cric, cric",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "10 h 01, Pélissier. À la montre de la halte.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "ambroise",
+      "text": "Exact. ... Vous avez toujours eu une bonne montre.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tic. Tac. La grande aiguille quitte 5 h 12, où elle habitait depuis trente ans, et file rattraper son retard.",
+      "emote": null,
+      "sound": "Tic, tac",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Firmin tend la main sans tourner la tête. Ambroise la serre sans lever les yeux. C'est fait. Personne n'a rien vu.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.halte.pendule",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "wait",
+      "seconds": 1
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un sifflet, à l'ouest. Puis un vacarme de bielles, de vapeur et de poules affolées.",
+      "emote": null,
+      "sound": "Tchou ! Tchouuu !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "camera",
+      "focus": {
+        "point": "quai"
+      },
+      "seconds": 4
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.train.en-gare",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte2.train",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "10 h 04. Le train de Rosalie entre en gare d'Aubrune et, pour la première fois en trente ans, il s'arrête.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Aubrune ! Aubrune ! Une minute d'arrêt !",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Il a attendu trente ans pour le crier. Il le crie trois fois.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Trois voyageurs descendent: une factrice pressée, une dame chargée de casseroles, un jeune homme qui salue les poteaux.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

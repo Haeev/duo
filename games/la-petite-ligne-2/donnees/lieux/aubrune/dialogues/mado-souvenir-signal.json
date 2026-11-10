@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-signal",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.halte.signal"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Mon bras de signal ! Je le vois d'ici quand je monte sur l'enclume. Ne dis à personne que je monte sur l'enclume.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

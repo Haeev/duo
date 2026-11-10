@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "id": "la-cachette-d-emile",
+  "title": "La cachette d'Émile",
+  "together": true,
+  "roles": {
+    "a": "À la boîte",
+    "b": "À la lampe"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Avance jusqu'au fond du tunnel, devant l'éboulis.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "tu3",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Décroche la lampe de la dernière niche et rejoins ta moitié.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "tu3",
+              "who": "one",
+              "radius": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "walk",
+      "who": "jeanne",
+      "to": "tu3"
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "Pari nul: j'ai couru, tu as triché avec une clé. C'est la boîte, là, dans le creux du mur.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Une boîte en fer de la Compagnie. Dedans, roulé dans un horaire de 1987: un verre de lanterne, intact.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ta lampe éclaire l'éboulis. Derrière les pierres, la voie continue. Il en vient un souffle tiède, et de la brume.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sous le verre, un mot, d'une écriture bien droite: « Pour les suivants. Ne courez pas dans le tunnel. É. L. »",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sur le rail de droite, au pied de l'éboulis, pas un grain de rouille. Le dessus brille, comme un rail qui sert.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "Armand dit que les tunnels respirent, à cause de la montagne. Moi je dis: ça respire pas tout seul à 5 h 12.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous échangez ce que vous avez vu. Jeanne écoute, pour une fois sans parier.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.lanterne.verre",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.verrou.v10",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte3.guide",
+          "value": "fini",
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "Y a un escalier dans la deuxième niche. Le verrou est de ce côté. Ça monte au belvédère: c'est plus court, et on voit tout.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

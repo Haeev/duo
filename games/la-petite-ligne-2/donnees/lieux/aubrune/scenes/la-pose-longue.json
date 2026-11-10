@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "id": "la-pose-longue",
+  "title": "La pose longue",
+  "together": false,
+  "roles": {
+    "a": "Au déclencheur",
+    "b": "Au chronomètre"
+  },
+  "trigger": {
+    "at": 312,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.pose-longue",
+        "equals": "ouvert"
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1
+    },
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "Chut. J'ai le hoquet quand je chuchote. Hic.",
+      "emote": null,
+      "sound": "Hic !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ding. Ding. Deux coups. La brume se lève sur la voie, exacte au rendez-vous.",
+      "emote": null,
+      "sound": "Ding ! Ding !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu ouvres l'obturateur. Ne le lâche pas avant le « top » de ta moitié.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Compte douze secondes, tout bas. À douze, dis « top ». Pas avant.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "camera",
+      "focus": {
+        "point": "pn-s"
+      },
+      "seconds": 4
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La lueur glisse au ras des rails, sans bruit. Elle met exactement douze secondes à passer la barrière.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Clac. Tu refermes. Tes doigts tremblent un peu. C'est le froid.",
+      "emote": null,
+      "sound": "Clac !",
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Douze. Tu as dit « top » à voix haute. Ta voix a fait un drôle de bruit. C'est la brume.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "Ha ! Ha ! Ha ! ... Pardon. Je ris. C'est rien. Je développe ça ce matin, sur la place. Ha !",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

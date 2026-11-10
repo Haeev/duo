@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "mado-hache",
+  "villager": "mado",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.frenes",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Des frênes ? Avec ça ? Ha ! Ta hache coupe comme un discours de Firmin.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Je te la reforge. Il me faut trois pierres à aiguiser et deux bûches pour le feu. Et ta hache, tiens.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-pierres-1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Sur les grèves, au bord de l'eau. Les plates, les grises. Pas les jolies: les jolies ne valent rien.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pierres",
+          "text": "Les pierres, je les trouve où ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-pierres-1"
+        },
+        {
+          "id": "tope",
+          "text": "Tope là.",
+          "when": [],
+          "effects": [],
+          "next": "fin"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Et après, viens la passer à ma meule de temps en temps. Un outil, c'est comme un mari: ça s'entretient.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

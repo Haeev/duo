@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "berthe-hygiene",
+  "villager": "berthe",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Recule. Tu vas me gâter la mouture. On ne s'approche pas d'une meule dans cet état.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

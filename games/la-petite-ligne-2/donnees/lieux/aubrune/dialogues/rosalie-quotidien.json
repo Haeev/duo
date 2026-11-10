@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "id": "rosalie-quotidien",
+  "villager": "rosalie",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.rosalie",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.rosalie",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Rosalie Vasseur, mécanicienne. Ma locomotive s'appelle Georgette. Ne la regarde pas de travers: elle boude.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.rosalie",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Je repars à l'heure. Toujours. Sauf quand il y a de la tarte. La tarte, c'est un cas de force majeure.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.rosalie",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Un train de nuit crème ? Ha ! À mon dépôt, on a du noir, du vert, et du rouillé. Le crème, c'est pour les desserts.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.rosalie",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "id": "lucie",
+  "name": "Lucie Arnaud",
+  "temper": "chatty",
+  "look": {
+    "shape": "adult-f-slim",
+    "skin": 2,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [3, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bob",
+        "colors": [2]
+      },
+      {
+        "slot": "top",
+        "id": "top-sweater",
+        "colors": [15]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-skirt",
+        "colors": [3]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [1, 0]
+      }
+    ]
+  },
+  "stands": "gr5",
+  "voice": "bright",
+  "life": {
+    "home": "gr5",
+    "schedule": [
+      {
+        "from": 240,
+        "to": 420,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.acte3.pose-longue",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "pn-s"
+        },
+        "activity": "veiller-a-la-barriere",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 720,
+        "at": {
+          "point": "pl"
+        },
+        "activity": "tournee",
+        "gesture": null
+      },
+      {
+        "from": 720,
+        "to": 1140,
+        "at": {
+          "point": "gr5"
+        },
+        "activity": "trier-le-courrier",
+        "gesture": null
+      },
+      {
+        "from": 1140,
+        "to": 1260,
+        "at": {
+          "point": "gr5"
+        },
+        "activity": "developper-des-photos",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "gr5"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["coquelicot"],
+      "liked": ["mures", "tartine"],
+      "disliked": ["pierre"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte2.train"
+      }
+    ],
+    "leaves": null
+  }
+}

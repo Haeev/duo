@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "firmin-photo",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.tirage",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Donne voir.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Neuf fenêtres. L'autorail de nuit en avait neuf. Je les nettoyais, gamin. Dix centimes la fenêtre.",
+      "emote": "sad",
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Tiens. Ta lettre d'embauche. Et celle de Hautefonte. J'ai reconnu l'écriture le premier jour, sur le quai, en pantoufles.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-emile-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "C'est sa main. Je ne dis pas que c'est lui. Je dis que c'est sa main.",
+      "emote": null,
+      "next": "n5"
+    },
+    "n4-pourquoi-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Si c'était vrai, il fallait y aller. Si c'était faux, il fallait le pleurer. J'ai préféré une poche.",
+      "emote": null,
+      "next": "n5"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "emile",
+          "text": "C'est Émile qui nous a [[duo:embauchées|embauchés]].",
+          "when": [],
+          "effects": [],
+          "next": "n4-emile-1"
+        },
+        {
+          "id": "pourquoi",
+          "text": "Pourquoi les avoir gardées ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-pourquoi-1"
+        }
+      ]
+    },
+    "n5": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le règlement a un chapitre pour ça: « Halte de nuit ». Une lanterne, une barrière qui joue, une cloche à l'heure juste, vingt âmes au registre.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Voilà la clé de la grille, au bout de la ligne morte. Pour le verre de la lanterne, vois Jeanne: elle fouille là-bas depuis qu'elle marche.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

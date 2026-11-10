@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "id": "margot",
+  "name": "Margot Delmas",
+  "temper": "chatty",
+  "look": {
+    "shape": "adult-f-medium",
+    "skin": 3,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-round",
+        "colors": [7, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bun",
+        "colors": [1]
+      },
+      {
+        "slot": "top",
+        "id": "top-tank",
+        "colors": [2]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-skirt",
+        "colors": [9]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [2, 0]
+      }
+    ]
+  },
+  "stands": "fc",
+  "voice": "soft",
+  "life": {
+    "home": "fc",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1260,
+        "when": [
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.verrou.v3"
+            }
+          }
+        ],
+        "at": {
+          "point": "bg"
+        },
+        "activity": "attendre-au-gue",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "when": [
+          {
+            "type": "not",
+            "condition": {
+              "type": "remembered",
+              "key": "aubrune.verrou.v3"
+            }
+          }
+        ],
+        "at": {
+          "point": "bg"
+        },
+        "activity": "attendre-au-gue",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 1200,
+        "at": {
+          "point": "fc"
+        },
+        "activity": "tenir-la-cour",
+        "gesture": null
+      },
+      {
+        "from": 1200,
+        "to": 420,
+        "at": {
+          "point": "fc"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["tarte-aux-pommes"],
+      "liked": ["coquelicot", "oeuf"],
+      "disliked": ["pierre"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.train2"
+      }
+    ],
+    "leaves": null
+  }
+}

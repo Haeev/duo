@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "lucie-photo",
+  "villager": "lucie",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.developpement",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Regarde. Regarde ! Une traînée claire, au ras des rails. Et dedans, des carrés. Réguliers. Sept, huit, neuf.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2-fenetres-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Des gouttes ! Des gouttes sur l'objectif. Enfin, je crois. Des gouttes carrées, ça existe ?",
+      "emote": null,
+      "next": "fin"
+    },
+    "n2-reflet-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Je n'avais pas de lampe. J'avais le hoquet. Le hoquet ne fait pas de reflets.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "fenetres",
+          "text": "Des fenêtres ?",
+          "when": [],
+          "effects": [],
+          "next": "n2-fenetres-1"
+        },
+        {
+          "id": "reflet",
+          "text": "Un reflet de ta lampe.",
+          "when": [],
+          "effects": [],
+          "next": "n2-reflet-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Garde le tirage. Montre-le à Firmin. Moi, j'ai une tournée, et je préfère la faire en plein jour, tout à coup.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

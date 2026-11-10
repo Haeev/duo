@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-pendule",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.pendule",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La pendule ? Arrêtée sur 5 h 12. Depuis la fermeture. Ne fais pas cette tête: c'est une heure comme une autre.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Seul un régleur de la Compagnie a le droit d'y toucher. Article 22. Il en reste un. Au bout de la rue.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-ambroise-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Vas-y, toi. Lui et moi, on ne se parle plus. Trente ans. Pour une minute.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-montre-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Celle-ci n'est pas à moi. Et elle ne dit rien. Elle garde.",
+      "emote": "sad",
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ambroise",
+          "text": "Ambroise ? Allons le chercher.",
+          "when": [],
+          "effects": [],
+          "next": "n3-ambroise-1"
+        },
+        {
+          "id": "montre",
+          "text": "Et ta montre, elle dit quelle heure ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-montre-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Demande-lui sa version. Elle est fausse, mais elle est courte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

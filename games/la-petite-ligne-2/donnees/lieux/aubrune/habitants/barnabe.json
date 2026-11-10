@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "barnabe",
+  "name": "Barnabé Tixier",
+  "temper": "dreamy",
+  "look": {
+    "shape": "adult-m-round",
+    "skin": 6,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [5, 0]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-short",
+        "colors": [5]
+      },
+      {
+        "slot": "top",
+        "id": "top-tank",
+        "colors": [7]
+      },
+      {
+        "slot": "bottom",
+        "id": "bottom-trousers",
+        "colors": [0]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [0, 1]
+      }
+    ]
+  },
+  "stands": "gr6",
+  "voice": "low",
+  "life": {
+    "home": "gr6",
+    "schedule": [
+      {
+        "from": 480,
+        "to": 1080,
+        "at": {
+          "point": "c2"
+        },
+        "activity": "bucheronner",
+        "gesture": null
+      },
+      {
+        "from": 1080,
+        "to": 480,
+        "at": {
+          "point": "gr6"
+        },
+        "activity": "rentrer-a-la-forge",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["tarte-aux-pommes"],
+      "liked": ["pain", "buche"],
+      "disliked": ["pierre"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.train2"
+      }
+    ],
+    "leaves": null
+  }
+}

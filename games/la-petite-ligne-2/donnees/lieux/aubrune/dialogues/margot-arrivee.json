@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "margot-arrivee",
+  "villager": "margot",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.train2"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Bonjour ! Margot Delmas. Pardon pour Paulin: il dit non d'abord, par principe, puis il fait oui avec les mains.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Dès que le gué est refait, viens à la ferme: j'aurai des graines, des poules, et du temps pour bavarder. Lui aussi, mais il ne le sait pas.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

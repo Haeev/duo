@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "paulin-gue",
+  "villager": "paulin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.gue",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "pierre",
+              "count": 6
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Trois dalles du gué emportées par la crue. Ma charrette ne nage pas. Six pierres plates, des grèves, et je signe ton papier.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Pas avant. Je suis têtu. Demande à Margot: elle te le dira gentiment.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Six. Des plates. Tu sais choisir un caillou, toi. Pousse-toi, je pose.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Voilà. Un gué. Ça ne se signe pas, un gué, mais ça se respecte. Ton registre, par contre: donne.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "mado-bras",
+  "villager": "mado",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.bras",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "buche",
+              "count": 4
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Un bras de signal ! Trente ans que je rêve d'en redresser un.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Quatre bûches de frêne pour la chauffe, et il est à toi.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Du frêne ! Ça chauffe droit. Donne ce bras... Cling ! Voilà: plus droit que la conscience de Marthe.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Remontez-le à deux: une personne aux leviers, l'autre dehors. Et parlez-vous: ça grippe moins.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

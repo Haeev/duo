@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "id": "le-train-des-cinq",
+  "title": "Le train des cinq",
+  "together": true,
+  "roles": null,
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.train-des-cinq",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 480,
+        "to": 780
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "10 h 04 à la pendule. 10 h 04 au sifflet. Sur le quai, Ambroise range sa montre d'un air de propriétaire.",
+      "emote": null,
+      "sound": "Tchou !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.acte3.train2",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.verrou.v4",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "unlock_zone",
+          "zone": "m"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Descendent: un homme carré avec une fourche, une femme avec un sourire et une liste, un garçon avec un lance-pierre.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "paulin",
+      "text": "Delmas. Paulin. La ferme, c'est par où ? Non, ne me dis pas: je trouverai.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "margot",
+      "text": "Il ne trouvera pas. Bonjour ! Margot. C'est par le gué, je crois ?",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "leon",
+      "text": "Moi, c'est Léon. J'ai déjà conduit un train. Enfin, presque. J'ai touché une manette.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "berthe",
+      "text": "Berthe Lavergne, meunière. J'ai la clé du moulin et trente ans de poussière à engueuler.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le dernier descend de côté, à cause des épaules. Mado a entendu le sifflet depuis la forge. Elle court. Mado ne court jamais.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "barnabe",
+      "text": "Mado ! J'ai rapporté ton dernier fer à cheval. Je l'ai relu tout le long du trajet.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Seize, dix-sept, dix-huit, dix-neuf, vingt. Le compte y est. Reste à les faire signer: une autre paire de manches.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

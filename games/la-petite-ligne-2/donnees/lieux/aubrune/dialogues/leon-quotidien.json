@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "id": "leon-quotidien",
+  "villager": "leon",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.leon",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.leon",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.leon",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Salut ! J'ai déjà vu un loup. Enfin, un chien. Mais gros. Enfin, moyen.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.leon",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Salut ! Je sais lire l'heure, maintenant. Demande-moi. Non, pas maintenant: la pendule est trop loin.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.leon",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Tu sais que j'ai sauté du haut de la grange ? Enfin, du milieu. Enfin, de la botte de foin devant.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.leon",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Salut ! Jeanne dit qu'il y a un train la nuit. Moi, j'en ai déjà vu dix. Enfin, entendu. Enfin, elle m'a raconté.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.leon",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "basile-coupe",
+  "villager": "basile",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.coupe",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "buche",
+              "count": 8
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Huit bûches. La coupe. Là-haut.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Huit. Du beau. Chambre. Venez à deux.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

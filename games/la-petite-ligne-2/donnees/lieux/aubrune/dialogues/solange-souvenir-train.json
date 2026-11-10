@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-train",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Une arrivée en gare, de la vapeur, trois inconnus ! Enfin du théâtre. J'ai pleuré, mais de mon bon profil.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

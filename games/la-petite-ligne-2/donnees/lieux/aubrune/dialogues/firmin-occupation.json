@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-occupation",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.occupation",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Encore toi ? Tu regardes trop la voie. Un garde, ça s'occupe. Tiens: fais donc revenir le train.",
+      "emote": "idea",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le vrai. Celui de Rosalie. Il fait demi-tour à la gare d'avant, six kilomètres plus bas. On l'entend siffler, les jours de vent.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-signe-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Signe ! Il lui faut une halte « en service ». C'est écrit dans le règlement.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-pourquoi-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Une halte fermée, c'est un caillou au bord de la voie. On ne s'arrête pas pour un caillou.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "signe",
+          "text": "Il suffit de lui faire signe ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-signe-1"
+        },
+        {
+          "id": "pourquoi",
+          "text": "Pourquoi il ne monte plus jusqu'ici ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-pourquoi-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le règlement de la Compagnie est resté dans la cuisine du garde-barrière. Sous les gravats. Vois Basile: il refait la cuisine contre six bûches.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

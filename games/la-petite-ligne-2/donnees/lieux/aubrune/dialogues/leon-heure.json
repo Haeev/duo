@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "leon-heure",
+  "villager": "leon",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.leon",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Signer ? Facile. J'ai déjà signé des trucs. Des tas.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "L'heure ? Bien sûr que je sais l'heure. Il est... la grande aiguille est... Il est tard. Voilà.",
+      "emote": "question",
+      "next": "n3"
+    },
+    "n3-pendule-1": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Si ! Mais pas celle-là. Elle est mal faite.",
+      "emote": "anger",
+      "next": "fin"
+    },
+    "n3-rien-1": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Rien de quoi ? Il n'y a rien à dire. ... Merci.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pendule",
+          "text": "Tu ne sais pas lire la pendule.",
+          "when": [],
+          "effects": [],
+          "next": "n3-pendule-1"
+        },
+        {
+          "id": "rien",
+          "text": "Je ne dirai rien.",
+          "when": [],
+          "effects": [],
+          "next": "n3-rien-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Me l'apprends pas, toi: t'es [[grande|grand]], ça compte pas. Faudrait quelqu'un qui... non, rien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

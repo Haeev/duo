@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "id": "l-autorail-creme",
+  "title": "L'autorail crème",
+  "together": true,
+  "roles": {
+    "a": "À la barrière",
+    "b": "À la lanterne"
+  },
+  "trigger": {
+    "at": 312,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.veillee",
+        "equals": "ouvert"
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "fade",
+      "to": "clear",
+      "seconds": 1
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "5 h 12 à la pendule du quai. Au clocher, trois coups: pas un de plus, pas une minute de retard.",
+      "emote": null,
+      "sound": "Dong ! Dong ! Dong !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Baisse la barrière.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "pn-s",
+              "who": "one",
+              "radius": 3
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Lève la lanterne, au bout du quai.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "quai",
+              "who": "one",
+              "radius": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« Voie gardée ! » La barrière descend. Dans la brume, les rails se mettent à chanter.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« Lanterne haute ! » La flamme tient droit. Dans la brume, quelque chose ralentit.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "camera",
+      "focus": {
+        "point": "quai"
+      },
+      "seconds": 4
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "De la brume sort un vieil autorail crème, tout rond, neuf fenêtres jaunes. Il est tout ce qu'il y a de plus réel.",
+      "emote": null,
+      "sound": "Pschhh...",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.autorail.en-gare",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "wait",
+      "seconds": 2
+    },
+    {
+      "do": "say",
+      "who": "anatole",
+      "text": "Aubrune. Trente ans et quatre minutes de retard. On va encore dire que c'est ma faute.",
+      "emote": "anger",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "anatole",
+      "text": "Vos lettres d'embauche. ... Signature conforme. Tampon du jour.",
+      "emote": null,
+      "sound": "Clac ! Clac !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Il poinçonne ta lettre sans la regarder. Sa casquette est trop grande: tu ne vois pas ses yeux. Tu reconnais le poinçon.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Il poinçonne ta lettre sans la regarder. Par une fenêtre jaune, derrière lui: des banquettes. Tu connais ces banquettes.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "anatole",
+      "text": "Deux cartes de ligne. Un ordre de mission: siège de la Compagnie, Hautefonte, bureau 512.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "anatole",
+      "text": "Monsieur Lacombe vous y attend. Enfin, il attend.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "anatole",
+      "text": "Ce train repassera. À 5 h 12. Article premier: l'heure, c'est l'heure. Même trente ans après.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.autorail.en-gare",
+          "value": false,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.lanterne.allumee",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.acte3.cartes",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Il remonte. L'autorail repart sans bruit, et la brume se referme. Dans ta main: une carte de ligne, tiède comme du pain.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}
