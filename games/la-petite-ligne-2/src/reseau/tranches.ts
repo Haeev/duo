@@ -33,6 +33,16 @@ export function sliceMessage(world: WorldState, slice: Slice): SliceMessage<Slic
   }
 }
 
+/**
+ * Arrondi au centième (cm, crad, cm/s) des habitants: sous le pixel (2 cm par pixel sur un écran
+ * de 1366 px pour la vue de 28 m), et le canal rapide d'un grand lieu passe de 1,9 à 1,1 Ko au
+ * pire, 30 fois par seconde. Les joueurs gardent leur précision entière: la réconciliation de la
+ * prédiction la compare à la sienne.
+ */
+function centi(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 export function fastMessage(world: WorldState, content: Content, ack: number): FastMessage {
   const [a, b] = world.players;
   const place = currentPlace(world);
@@ -40,7 +50,8 @@ export function fastMessage(world: WorldState, content: Content, ack: number): F
   const villagers: FastMessage['villagers'] = [];
   for (const def of order) {
     const body = place.villagers[def.id]?.body;
-    if (body !== undefined) villagers.push([body.x, body.y, body.facing, body.speed]);
+    if (body !== undefined)
+      villagers.push([centi(body.x), centi(body.y), centi(body.facing), centi(body.speed)]);
   }
   return {
     tick: world.tick,

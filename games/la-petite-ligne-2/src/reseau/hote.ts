@@ -3,10 +3,12 @@
  * ordre d'arrivée et envoie à l'invité, à chaque pas, les événements, le canal rapide et les
  * tranches qui ont changé (« joueurs » au pas même, « lieu » et « progression » à leur cadence).
  * La file des commandes de l'invité (coussin, rattrapage, commande devinée) est dans
- * `file-commandes.ts`, la progression par différences et par morceaux dans `progression.ts`.
+ * `file-commandes.ts`, la progression par différences et par morceaux dans `progression.ts`,
+ * l'état lent du lieu de même dans `par-cles.ts` (canal 5, `etat-lieu.ts`).
  */
 import type { Logger, Net, NetChannel } from '@duo/sdk';
 import type { PlayerIndex } from '../donnees/schemas/communs';
+import type { PlaceSlow } from '../etat/lieu';
 import type { ProgressState } from '../etat/progression';
 import { SLICES, type Slice } from '../etat/monde';
 import type { Intent, StepInput } from '../simulation/noyau/entrees';
@@ -26,11 +28,12 @@ import {
 import { createCommandQueue } from './file-commandes';
 import {
   cloneProgress,
-  PROGRESS_PART_BUDGET_BYTES,
   PROGRESS_PART_CHANNEL,
   ProgressPartSchema,
   progressParts,
 } from './progression';
+import { PLACE_PART_CHANNEL, PlacePartSchema } from './etat-lieu';
+import { cloneDoc, keyedParts } from './par-cles';
 import { NET_SETTINGS, type NetSettings } from './reglages';
 import { byteLength, fastMessage, sliceMessage } from './tranches';
 
@@ -80,8 +83,10 @@ export interface HostOptions {
   readonly settings?: NetSettings;
 }
 
-type SliceChannels = { readonly [S in Exclude<Slice, 'progress'>]: NetChannel<SliceMessage<S>> };
-type Budgeted = keyof typeof BUDGET_BYTES | 'progressPart';
+type SliceChannels = {
+  readonly [S in Exclude<Slice, 'progress' | 'place'>]: NetChannel<SliceMessage<S>>;
+};
+type Budgeted = keyof typeof BUDGET_BYTES;
 
 export function createHost(
   sim: Sim,
@@ -99,8 +104,11 @@ export function createHost(
   const slices: SliceChannels = {
     common: net.channel(CHANNEL.common, { mode: 'latest', schema: SLICE_SCHEMAS.common }),
     players: net.channel(CHANNEL.players, { mode: 'latest', schema: SLICE_SCHEMAS.players }),
-    place: net.channel(CHANNEL.place, { mode: 'latest', schema: SLICE_SCHEMAS.place }),
   };
+  const placeChannel = net.channel(PLACE_PART_CHANNEL, {
+    mode: 'reliable',
+    schema: PlacePartSchema,
+  });
   const progressChannel = net.channel(PROGRESS_PART_CHANNEL, {
     mode: 'reliable',
     schema: ProgressPartSchema,
@@ -118,6 +126,10 @@ export function createHost(
   /** Progression telle que l'invité la connaît après la dernière révision envoyée. */
   let sentProgress: ProgressState | null = null;
   let progressRev = -1;
+  /** État du lieu tel que l'invité le connaît après la dernière révision envoyée, et son lieu. */
+  let sentPlace: { readonly id: string; readonly state: PlaceSlow } | null = null;
+  let placeRev = -1;
+  let placeFullTick = 0;
   let place = sim.world.common.place;
 
   const unsubscribe = input.onMessage((message) => {
@@ -131,7 +143,7 @@ export function createHost(
    */
   function fits(channel: Budgeted, message: unknown): boolean {
     const bytes = byteLength(message);
-    const budget = channel === 'progressPart' ? PROGRESS_PART_BUDGET_BYTES : BUDGET_BYTES[channel];
+    const budget = BUDGET_BYTES[channel];
     largest[channel] = Math.max(largest[channel] ?? 0, bytes);
     if (bytes > budget) {
       log.error('message hors budget, non envoyé', { channel, bytes, budget });
@@ -170,6 +182,28 @@ export function createHost(
     }
   }
 
+  /**
+   * État lent du lieu: différence depuis la dernière révision, ou complète (`full`, premier envoi,
+   * reprise, changement de lieu). Seules les entités modifiées partent.
+   */
+  function sendPlace(full: boolean): void {
+    const { id, place: current } = sliceMessage(sim.world, 'place');
+    const base = full || sentPlace?.id !== id ? null : sentPlace.state;
+    const head = { target: id, rev: placeRev + 1, baseRev: placeRev, tick: sim.world.tick };
+    const revision = keyedParts(base, current, head, settings.place.partBytes);
+    if (revision.empty && !revision.full) return;
+    for (const part of revision.parts)
+      if (!fits('placePart', part)) {
+        // Un morceau refusé casserait la révision: la prochaine part complète.
+        sentPlace = null;
+        return;
+      }
+    for (const part of revision.parts) placeChannel.send(part);
+    placeRev += 1;
+    sentPlace = { id, state: cloneDoc(current) };
+    if (revision.full) placeFullTick = sim.world.tick;
+  }
+
   function sendSlice(slice: Slice, full = false): void {
     // Un cas par tranche: chaque canal garde le type exact de son message.
     switch (slice) {
@@ -186,11 +220,9 @@ export function createHost(
       case 'progress':
         sendProgress(full || sentProgress === null);
         break;
-      case 'place': {
-        const message = sliceMessage(sim.world, 'place');
-        if (fits(slice, message)) slices.place.send(message);
+      case 'place':
+        sendPlace(full);
         break;
-      }
     }
     sent[slice] = { revision: sim.revisions[slice], tick: sim.world.tick };
   }
@@ -233,7 +265,9 @@ export function createHost(
       for (const slice of SLICES) {
         const due = tick - sent[slice].tick;
         const changed = sim.revisions[slice] !== sent[slice].revision;
-        if (due >= SLICE_KEEPALIVE_TICKS) sendSlice(slice, true);
+        // Le lieu, sur un canal fiable, ne repart complet qu'à son filet (débit d'un grand lieu).
+        const placeFull = tick - placeFullTick >= settings.place.fullEveryTicks;
+        if (due >= SLICE_KEEPALIVE_TICKS) sendSlice(slice, slice !== 'place' || placeFull);
         else if (changed && due >= SLICE_EVERY_TICKS[slice]) sendSlice(slice);
       }
       return sim.events;
@@ -242,6 +276,7 @@ export function createHost(
     resume() {
       queue.reset();
       sentProgress = null;
+      sentPlace = null;
       sendAll();
     },
     onPlaceSwitch(listener) {

@@ -17,6 +17,7 @@ import {
   PROGRESS_PART_CHANNEL,
   ProgressPartSchema,
 } from './progression';
+import { PLACE_PART_BUDGET_BYTES, PLACE_PART_CHANNEL, PlacePartSchema } from './etat-lieu';
 
 /**
  * Canaux (0 à 15), les mêmes chez les deux. Le canal 5 est libre: la progression ne part plus en
@@ -32,6 +33,8 @@ export const CHANNEL = {
   place: 6,
   /** Fiable, schéma `ProgressPartSchema`. */
   progressPart: PROGRESS_PART_CHANNEL,
+  /** Fiable, schéma `PlacePartSchema`: l'état lent du lieu par différences et par morceaux (M3). */
+  placePart: PLACE_PART_CHANNEL,
 } as const;
 
 /** Budget de chaque message, en octets de JSON. Tenu par `tests/tailles.test.ts` et par l'hôte à l'envoi. */
@@ -46,6 +49,8 @@ export const BUDGET_BYTES = {
   place: 32_768,
   /** Un morceau de progression. */
   progressPart: PROGRESS_PART_BUDGET_BYTES,
+  /** Un morceau de l'état du lieu (M3). */
+  placePart: PLACE_PART_BUDGET_BYTES,
 } as const;
 
 /**
@@ -113,3 +118,5 @@ export type SliceMessage<S extends Slice> = v.InferOutput<(typeof SLICE_SCHEMAS)
 
 /** La progression par morceaux (canal `progressPart`, fiable): schéma tenu par `progression.ts`. */
 export { ProgressPartSchema };
+/** L'état du lieu par morceaux (canal `placePart`, fiable): schéma tenu par `etat-lieu.ts`. */
+export { PlacePartSchema };

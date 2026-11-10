@@ -45,6 +45,15 @@ export interface NetSettings {
     /** Taille visée d'un morceau de progression (octets de JSON), sous le budget du canal. */
     readonly partBytes: number;
   };
+  readonly place: {
+    /** Taille visée d'un morceau de l'état du lieu (octets de JSON), sous le budget du canal. */
+    readonly partBytes: number;
+    /**
+     * Filet de sécurité: l'état du lieu repart complet au plus tard tous les N pas. Le canal est
+     * fiable et ordonné, le filet ne sert qu'après un morceau refusé; rare, donc espacé (débit).
+     */
+    readonly fullEveryTicks: number;
+  };
   /** Part du budget au-delà de laquelle l'hôte journalise un avertissement. */
   readonly warnShare: number;
 }
@@ -66,5 +75,6 @@ export const NET_SETTINGS: NetSettings = {
     gestureTimeoutTicks: 45,
   },
   progress: { partBytes: 12_288 },
+  place: { partBytes: 12_288, fullEveryTicks: 900 },
   warnShare: 0.75,
 };

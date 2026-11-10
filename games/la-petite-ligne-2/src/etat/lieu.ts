@@ -94,16 +94,7 @@ export function slowOfPlace(place: PlaceState): PlaceSlow {
       villager.life === undefined
         ? { met: villager.met, talkingWith: villager.talkingWith }
         : { met: villager.met, talkingWith: villager.talkingWith, life: villager.life };
-  const { leftOn, placed, nextPlacedId, objects, ground, nextGroundId, shops } = place;
-  const slow: PlaceSlow = {
-    leftOn,
-    placed,
-    nextPlacedId,
-    objects,
-    ground,
-    nextGroundId,
-    villagers,
-  };
-  if (shops !== undefined) slow.shops = shops;
-  return slow;
+  // Tout le reste part tel quel: un champ ajouté au lieu par un système est transmis sans code
+  // de plus (`reseau/par-cles.ts`, mission M3).
+  return { ...place, villagers };
 }
