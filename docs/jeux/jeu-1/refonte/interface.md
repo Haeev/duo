@@ -32,8 +32,8 @@ EN JEU (HUD)
  |- Espace sur le réchaud, la cuisine  Cuisine: choix de la recette -> mini-jeu -> plat -> EN JEU
  |- Espace sur le plan de la maison  Mode déco (vu du dessus, souris) -> EN JEU
  |- Espace sur un miroir, une armoire  Éditeur de personnage (coiffure, tenue) -> EN JEU
- |- Tab ............................ Carnet: Sac | Quêtes | Habitants | Collections | Carte | Tenues | Réglages
- |- F .............................. Coup d'œil (3 s): direction de la quête suivie, besoins, autre joueur
+ |- C .............................. Carnet: Sac | Quêtes | Habitants | Collections | Carte | Tenues | Réglages
+ |- G .............................. Coup d'œil (3 s): direction de la quête suivie, besoins, autre joueur
  |- Échap .......................... Pause de Duo (modèle de la plateforme)
  '- La nuit tombe .................. Bilan de la journée (les deux joueurs) -> jour suivant
 ```
@@ -44,10 +44,10 @@ Parcours de référence, à vérifier en test avec une personne qui découvre le
 |---|---|---|
 | Parler à un habitant qui a quelque chose pour nous | voir la bulle au-dessus de sa tête, s'approcher, Espace, lire, choisir | 4 |
 | Vendre trois œufs au meilleur prix | Espace sur le commerçant, onglet Vendre (E), choisir l'œuf, monter à 3 (D D), Entrée | 6 |
-| Savoir où aller | F | 1 |
+| Savoir où aller | G | 1 |
 | Nourrir les poules et ramasser les œufs | Espace sur le poulailler, Espace (remplir), D, Espace (ramasser), Retour arrière | 5 |
-| Manger quand on a faim | 1 à 0 pour prendre le plat en main, Espace | 2 |
-| Voir où est un habitant | C (carte) | 1 |
+| Manger quand on a faim | Tab (ou 1 à 5) pour prendre le plat en main, Espace | 2 |
+| Voir où est un habitant | C, puis E jusqu'au signet Carte (le carnet rouvre sur le dernier onglet vu) | 1 à 5 |
 
 ## 3. Le HUD
 
@@ -67,10 +67,10 @@ C'est tout. Ni portrait, ni objectif, ni boutons de caméra, ni barre d'outils p
 | Élément | Apparaît | Disparaît | Place |
 |---|---|---|---|
 | Bulle d'action | un objet ou un habitant est visé (le plus proche dans l'axe du regard, à portée) | on s'éloigne, ou l'action n'est plus possible | au-dessus de l'objet, suit l'objet |
-| Barre d'outils | changement d'outil (1 à 0, W, X), objet ramassé ou perdu, coup d'œil (F), carnet | 3 s après le dernier changement | bas centre |
+| Barre d'outils | changement d'outil (Tab, Maj+Tab, 1 à 5), objet ramassé ou perdu, coup d'œil (G), carnet | 3 s après le dernier changement | bas centre |
 | Besoins | voir 3.3 | voir 3.3 | à droite de l'horloge |
-| Flèche de quête | F | après 3 s | bord de l'écran, dans la direction de l'objectif; si l'objectif est à l'écran, un losange se pose dessus |
-| Repère de l'autre joueur | F | après 3 s | bord de l'écran, jeton à sa couleur et à sa forme |
+| Flèche de quête | G | après 3 s | au sol, devant le personnage, pointée vers l'objectif (cahier, 4.10); si l'objectif est à l'écran, un losange se pose dessus |
+| Repère de l'autre joueur | G | après 3 s | bord de l'écran, jeton à sa couleur et à sa forme |
 | Bulle « j'ai quelque chose » | un habitant a une étape de quête, une demande ou un cadeau pour ce joueur | après lui avoir parlé | au-dessus de l'habitant, visible de loin (taille constante à l'écran, réduite au-delà de 30 m) |
 | Onomatopée | émotion d'un habitant ou d'un joueur (« !! », « ?? », « ... », « Zzz », « ♪ », cœur, « Pouah ») | 1,5 s | au-dessus de la tête, dans le monde |
 | Gain | objet ramassé, argent reçu, cœur d'amitié gagné | 1,2 s | part de l'objet et vole vers la barre d'outils, la bourse ou l'habitant |
@@ -79,24 +79,24 @@ C'est tout. Ni portrait, ni objectif, ni boutons de caméra, ni barre d'outils p
 
 Bulle d'action: une capsule de papier avec la touche (« Espace », libellé lu sur le clavier réel), le picto de l'action et un seul verbe (« Arroser », « Parler », « Ramasser », « Ouvrir »). L'objet visé rebondit une fois (échelle 1 à 1,08 en 200 ms) puis garde un liseré clair et une brillance qui passe toutes les 2 s. Une seule cible à la fois. Si l'action est impossible, la bulle montre ce qui manque en image (arrosoir vide: l'arrosoir barré et une goutte; sac plein: le sac hachuré) et Espace joue un petit « non » de la tête, sans texte.
 
-Barre d'outils: 6 cases à l'arrivée (hypothèse), 10 au plus (touches 1 à 0). La case en main est agrandie et sortie de la rangée. Usure d'un outil: un petit arc sous l'icône, plein quand il est neuf, hachuré et rouge tampon quand il est usé. Quantité d'une pile: pastille « 3 ». Repliée, la barre ne laisse rien à l'écran: l'outil se voit dans la main du personnage. Un réglage « barre d'outils toujours visible » existe (question 1).
+Barre d'outils: 5 cases, pour les outils comme pour les objets (cahier, 4.5). La case en main est agrandie et sortie de la rangée. Usure d'un outil: un petit arc sous l'icône, plein quand il est neuf, hachuré et rouge tampon quand il est usé. Quantité d'une pile: pastille « 3 ». Repliée, la barre ne laisse rien à l'écran: l'outil se voit dans la main du personnage. Un réglage « barre d'outils toujours visible » existe (question 1).
 
 ### 3.3 Les trois besoins
 
-Proposition: trois médaillons ronds (faim: bol, sommeil: lune, hygiène: goutte), chacun entouré d'un anneau qui se vide. Règle de ressenti: **ils n'apparaissent que quand un besoin change d'état**; entre deux changements, c'est le personnage qui parle. Seul le médaillon qui change apparaît, pas les trois.
+Proposition: trois médaillons ronds (faim: bol, sommeil: lune, hygiène: goutte), chacun entouré d'un anneau qui se vide. Règle de ressenti et cahier (4.4): **ils n'apparaissent que quand un besoin change de palier**, et restent affichés sous 20; le reste du temps, c'est le personnage qui parle. Seul le médaillon concerné apparaît, pas les trois.
 
 | Zone (hypothèse du cahier) | Médaillon | Personnage (dans le monde, vu aussi par l'autre joueur) |
 |---|---|---|
 | 50 à 100 %: bonus | caché. À l'entrée dans la zone: le médaillon apparaît 4 s avec une étoile | pas vif, petite étoile à l'entrée |
 | 20 à 50 %: normal | caché. À la sortie du bonus: apparaît 4 s, l'étoile tombe | rien |
-| 1 à 20 %: ralenti | à l'entrée dans la zone: apparaît 6 s, anneau hachuré, bord en pointillé, battement lent, puis se retire; ensuite c'est le personnage qui le dit | faim: main sur le ventre, gargouillis; sommeil: bâillements, « Zzz »; hygiène: petit nuage et mouches |
-| 0 % | seul cas où il reste affiché (il explique pourquoi les actions sont refusées): plus grand, picto barré; la bulle d'action ne propose plus que manger (ou dormir) | marche traînante |
+| 1 à 20 %: ralenti | **reste affiché** tant que le besoin est sous 20 (cahier, 4.4: un malus qui dure doit rester expliqué): anneau hachuré, bord en pointillé, battement lent | faim: main sur le ventre, gargouillis; sommeil: bâillements, « Zzz »; hygiène: petit nuage et mouches |
+| 0 % | reste affiché, plus grand, picto barré; la bulle d'action ne propose plus que manger (ou dormir) | marche traînante |
 
-Ils apparaissent aussi (à la demande, ce ne sont pas des changements subis): pendant qu'on mange, dort ou se lave (l'anneau se remplit sous les yeux), au coup d'œil (F), et toujours dans l'en-tête du carnet. Hygiène basse: l'habitant affiche « Pouah » avant de parler, et le choix de dialogue qui échouerait porte le picto de la goutte barrée (on sait pourquoi avant de choisir). Chaque joueur ne voit que ses propres médaillons; l'état de l'autre se lit sur son personnage.
+Ils apparaissent aussi (à la demande, ce ne sont pas des changements subis): pendant qu'on mange, dort ou se lave (l'anneau se remplit sous les yeux), au coup d'œil (G), et toujours dans l'en-tête du carnet. Hygiène basse: l'habitant affiche « Pouah » avant de parler, et le choix de dialogue qui échouerait porte le picto de la goutte barrée (on sait pourquoi avant de choisir). Chaque joueur ne voit que ses propres médaillons; l'état de l'autre se lit sur son personnage.
 
 ### 3.4 Comportement à 1366x768
 
-Marge du HUD: 12 px. Horloge et bourse: 196 x 96 px. Médaillons: 44 px. Barre d'outils: cases de 52 px, 6 cases = 364 px, 10 cases = 580 px. Bulle d'action: 36 px de haut, jamais sous le bandeau de dialogue ni hors de l'écran (elle glisse le long du bord). Régions ancrées aux coins, jamais en grille (piège connu à 150 %). À 1280x720 et à 125 % puis 150 % de taille d'interface, aucune région ne se chevauche: à contrôler par intersection des rectangles.
+Marge du HUD: 12 px. Horloge et bourse: 196 x 96 px. Médaillons: 44 px. Barre d'outils: cases de 52 px, 5 cases = 306 px. Bulle d'action: 36 px de haut, jamais sous le bandeau de dialogue ni hors de l'écran (elle glisse le long du bord). Régions ancrées aux coins, jamais en grille (piège connu à 150 %). À 1280x720 et à 125 % puis 150 % de taille d'interface, aucune région ne se chevauche: à contrôler par intersection des rectangles.
 
 ## 4. Les touches
 
@@ -112,16 +112,17 @@ Les touches sont lues par position (`KeyboardEvent.code`), les libellés affich�
 | Flèches haut, bas | ArrowUp, ArrowDown | zoomer, dézoomer | vignette voisine, choix de dialogue |
 | Molette | | zoomer (réponse 17) | pages |
 | Clic droit maintenu et glissé | | tourner la caméra | |
-| 1 à 0 | Digit1 à Digit0 | prendre en main la case de la barre d'outils | boutique: quantité directe |
-| W, X | KeyZ, KeyX | outil précédent, suivant | tourner l'objet 3D du détail |
-| F | KeyF | coup d'œil 3 s: direction de la quête, besoins, autre joueur | |
-| Tab | Tab | ouvrir le carnet à son dernier onglet | fermer le carnet |
-| I, C | KeyI, KeyC | carnet sur le sac, carnet sur la carte | |
+| Tab, Maj+Tab | Tab | case suivante, précédente de la barre d'outils | élément suivant, précédent |
+| 1 à 5 | Digit1 à Digit5 | prendre en main la case de la barre d'outils (sans Maj) | boutique: quantité directe |
+| X | KeyX | ranger l'outil (mains libres) | tourner l'objet 3D du détail (avec W, code KeyZ) |
+| G | KeyG | coup d'œil 3 s: flèche de la quête, besoins, autre joueur | |
+| C | KeyC | ouvrir le carnet à son dernier onglet | fermer le carnet |
+| B | KeyB | mode déco, dans le logement | sortir du mode déco |
 | Entrée | Enter | | action principale de la sélection (acheter, vendre, manger, suivre la quête) |
 | Retour arrière | Backspace | | fermer, revenir |
 | Échap | Escape | pause de Duo | pause de Duo (ne ferme aucun menu du jeu: modèle gardé) |
 
-Règles: aucune touche de la rangée des chiffres n'est obligatoire (W et X font le tour de la barre); anti-double-appui de 300 ms à l'ouverture d'un écran; une touche maintenue ne valide jamais deux fois; le focus revient à l'endroit d'où l'on vient. La molette quitte le choix d'outil (usage actuel) pour le zoom: à dire dans l'arrivée en train.
+Règles: aucune touche de la rangée des chiffres n'est obligatoire (Tab fait le tour de la barre); les touches sont reconfigurables (cahier, section 5); anti-double-appui de 300 ms à l'ouverture d'un écran; une touche maintenue ne valide jamais deux fois; le focus revient à l'endroit d'où l'on vient. La molette quitte le choix d'outil (usage actuel) pour le zoom: à dire dans l'arrivée en train.
 
 Exception du mode déco (réponse 52): saisir, glisser et poser se font à la souris. Le clavier y garde: W et X ou molette pour tourner le meuble, Retour arrière pour sortir, A et E pour changer de rayon du stock.
 
@@ -259,7 +260,7 @@ Maquette: `maquettes/basse-cour.html`.
 - **Animations**: le meuble se soulève à la saisie, se pose avec un rebond et une petite poussière.
 - **Commun**: les deux joueurs peuvent décorer en même temps; chacun voit le curseur de l'autre (son jeton).
 - **Accessibilité**: seul écran qui exige la souris (décision du client). Le cahier doit le dire dans les limites connues. Cibles de 44 px au moins.
-- **1366x768**: stock de 232 px à gauche, repliable (touche Tab), la pièce occupe le reste.
+- **1366x768**: stock de 232 px à gauche, repliable (touche C), la pièce occupe le reste.
 
 ### 5.8 Éditeur de personnage
 
@@ -289,7 +290,7 @@ Maquette: `maquettes/basse-cour.html`.
 | `--lpl-duration-base` | 200 ms | apparition d'une bulle, d'un médaillon, rebond d'un objet visé |
 | `--lpl-duration-slow` | 320 ms | bandeau de dialogue, page qui tourne, panneau |
 | `--lpl-duration-scene` (nouveau) | 600 ms | ouverture du carnet, mouvement de caméra vers un menu de métier |
-| `--lpl-duration-hint` (nouveau) | 3 s | coup d'œil (F), barre d'outils avant repli |
+| `--lpl-duration-hint` (nouveau) | 3 s | coup d'œil (G), barre d'outils avant repli |
 
 | Courbe | Valeur | Usage |
 |---|---|---|
@@ -356,12 +357,12 @@ Conséquences:
 |---|---|---|
 | portrait, endurance, objectif, autre joueur, boutons de caméra et barre d'outils en permanence | heure et bourse | réponse 60 |
 | contour blanc de la cible, zones sans objet | l'objet rebondit et brille, bulle avec le verbe; aucune zone sans objet | réponse 21, R05, R11, R17, R21 |
-| objectif affiché en permanence | touche F, 3 secondes | réponse 68 |
+| objectif affiché en permanence | touche G, 3 secondes | réponse 68 |
 | carnet à 7 onglets, caisse, catalogue, garde-robe à part | un carnet, sept signets en images | réponse 61 |
 | plan « Le bourg » abstrait | carte dessinée sur deux pages, habitants en portraits | réponse 66, R12 |
 | basse-cour en tuiles d'état, foin et grain | la scène 3D, trois zones, une nourriture, trois gestes | réponse 31, R20 |
 | bulles au-dessus des têtes | bandeau en bas avec portrait | réponses 37, 63 |
-| A et E par quarts de tour, molette pour l'outil | A et E en continu, molette pour le zoom, W et X pour l'outil | réponse 17 |
+| A et E par quarts de tour, molette pour l'outil | A et E en continu, molette pour le zoom, Tab pour l'outil | réponse 17 |
 | étal du marché, vente à Odette | vente chez chaque commerçant selon son métier, mémoire des prix | réponse 34 |
 
 ### 9.1 Correspondance avec les règles de ressenti
@@ -375,7 +376,7 @@ Conséquences:
 | Dialogue: bandeau, portrait, lettre par lettre, babil, une touche pour tout afficher puis continuer, trois lignes au plus par page | 5.2 |
 | Émotion lisible au-dessus de la tête | 3.2 (onomatopée), section 7 |
 | Aucune action courante ne bloque plus d'une seconde et demie | section 6 (règle 7) |
-| L'heure et l'argent; les besoins seulement quand ils changent d'état | 3.1, 3.3 |
+| L'heure et l'argent; les besoins seulement quand ils changent d'état | 3.1, 3.3 (et affichage maintenu sous 20, comme le cahier, 4.4) |
 | État de la mangeoire visible d'un coup d'œil | 5.5 (« Vu du dehors » et anneau « 3 j ») |
 
 ## 10. Accessibilité, résumé
@@ -391,8 +392,8 @@ Conséquences:
 | N° | Question | Recommandation |
 |---|---|---|
 | 1 | La barre d'outils se replie-t-elle toute seule (elle revient dès qu'on change d'outil ou qu'on ramasse quelque chose), ou reste-t-elle toujours affichée ? | Elle se replie: c'est ton choix « presque rien à l'écran », et l'outil se voit dans la main. Un réglage permet de la garder affichée. |
-| 2 | Les trois besoins: affichés seulement quand l'un d'eux change d'état (puis c'est le personnage qui montre sa faim, sa fatigue, sa saleté; F les rappelle), ou toujours affichés en petit ? | Seulement aux changements d'état, avec un réglage « toujours visibles ». |
-| 3 | La touche F montre pendant 3 secondes la direction de la quête. Peut-elle montrer en même temps tes besoins et où est l'autre joueur ? | Oui: une seule touche « où j'en suis » à retenir. |
+| 2 | Les trois besoins: affichés quand l'un d'eux change de palier et tant qu'il est sous 20 (sinon c'est le personnage qui montre sa faim, sa fatigue, sa saleté; G les rappelle), ou toujours affichés en petit ? | Aux changements de palier et sous 20, avec un réglage « toujours visibles ». |
+| 3 | La touche G montre pendant 3 secondes la direction de la quête. Peut-elle montrer en même temps tes besoins et où est l'autre joueur ? | Oui: une seule touche « où j'en suis » à retenir. |
 | 4 | La bulle d'action: la touche, une image et un verbe (« Arroser »), ou la touche et l'image seulement ? | Avec le verbe: un seul mot, et plus aucun doute sur ce que fait Espace. |
 | 5 | Scènes d'histoire à deux: les deux voient le même bandeau, et qui choisit les réponses ? | Celui qui a lancé la scène choisit, l'autre voit son choix; la phrase suivante attend l'appui des deux. |
 | 6 | Le nom de la nouvelle monnaie doit-il s'afficher ? | Non: une pièce dessinée et un nombre suffisent partout, quel que soit le lieu. Le nom ne sert qu'aux dialogues. |
@@ -405,12 +406,23 @@ Conséquences:
 ## 12. Hypothèses à confirmer par le cahier des charges
 
 - Seuils des besoins: 0 %, 1 à 20 %, 20 à 50 %, 50 à 100 % (bonus), d'après la réponse 23.
-- Barre d'outils de 6 cases au début, 10 au plus. Sacs de 4, 6, 10, 15, 20 cases. Piles: poisson 3, bûche 5, planche 10 (réponse 20).
+- Barre d'outils de 5 cases (cahier, 4.5). Sacs de 4, 6, 10, 15, 20 cases. Piles: poisson 3, bûche 5, planche 10 (réponse 20).
 - Courir avec Maj. Une action par cible; « Donner » passe par un choix du dialogue.
 - Basse-cour: une seule nourriture, mangeoire pour plusieurs jours, nid qui garde les œufs.
 - Monnaie: nom à choisir par le game designer; l'interface n'en dépend pas.
 - Le monde ne se met jamais en pause dans un menu (jeu à deux); seule la pause de Duo fige la partie pour les deux.
 - Polices et palette actuelles gardées jusqu'à la bible artistique de la refonte (directeur-artistique).
+
+### 12.1 Écarts avec le cahier des charges (brouillon 0.1 du game designer)
+
+Les deux documents ont été écrits le même jour. Ce document reprend du cahier: les touches (C carnet, G repère, Tab et 1 à 5 pour la barre, X mains libres, B mode déco, Maj courir), les 5 cases de la barre, les paliers des besoins et leur affichage sous 20, la flèche de quête au sol, la basse-cour à deux gestes (trémie de 20 rations, pondoir de 12: l'anneau montre les rations, « 3 jours » = rations divisées par le nombre de poules). Restent quatre écarts à trancher:
+
+| Sujet | Cahier | Ce document | Recommandation |
+|---|---|---|---|
+| Barre d'outils | toujours à l'écran (section 5) | se replie après 3 s, réglage pour la garder | la replier (réponse 60: « presque rien »); question 1 au client |
+| Voir ses besoins | Alt maintenue | G (coup d'œil), avec la quête et l'autre joueur | éviter Alt: sous Windows, Alt + Espace (la touche d'action) ouvre le menu système de la fenêtre, et Alt seule peut prendre le focus d'un menu. Une seule touche à retenir: G |
+| Zoom | molette seulement | molette, et flèches haut et bas | garder un zoom au clavier: tout doit se faire sans souris hors mode déco |
+| Onglets du carnet | histoire, sac, collections, voisins, carte | sac, quêtes, habitants, collections, carte, tenues, réglages (liste du client) | la liste du client; l'onglet des quêtes peut s'appeler « Histoire » |
 
 ## 13. Les maquettes
 
@@ -418,7 +430,7 @@ Dans `maquettes/`: pages HTML et CSS autonomes (aucun réseau), `refonte.css` (j
 
 | Page | États (ancres) | Ce qui bouge | Ce qu'on peut essayer |
 |---|---|---|---|
-| `hud.html` | `#jeu`, `#coup-d-oeil` | soleil du cadran, cible qui rebondit, bulle d'habitant, onomatopée, gain, médaillon qui bat | F: coup d'œil de 3 s |
+| `hud.html` | `#jeu`, `#coup-d-oeil` | soleil du cadran, cible qui rebondit, bulle d'habitant, onomatopée, gain, médaillon qui bat | G: coup d'œil de 3 s |
 | `dialogue.html` | `#parle`, `#choix` | bandeau qui monte, portrait, texte lettre par lettre, bouche, triangle « suite », choix | Espace: tout afficher, puis les choix |
 | `carnet-sac.html` | `#sac`, `#sans-sac` | carnet qui s'ouvre, signets, objet du détail, survol des cases (nom et objet qui bouge) | survol à la souris |
 | `boutique.html` | `#acheter`, `#vendre` | panneau, objet du détail, pièces qui volent vers la bourse (vendre) | A et E: acheter, vendre |

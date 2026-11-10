@@ -7,14 +7,12 @@
 <link rel="stylesheet" href="refonte.css">
 <style>
   .world { position: fixed; left: 50%; top: 50%; width: 1366px; height: 768px; margin: -384px 0 0 -683px; z-index: 5; pointer-events: none; }
-  .glance-arrow {
-    position: fixed; right: 0.75rem; top: 38%; z-index: 10; display: flex; align-items: center; gap: 0.375rem;
-    padding: 0.375rem 0.5rem 0.375rem 0.625rem; background: var(--paper-raised); border: 0.125rem solid var(--ink);
-    border-radius: 62rem 0.5rem 0.5rem 62rem; box-shadow: var(--shadow-2); font-weight: 800;
-    animation: pointe 0.9s ease-in-out infinite;
-  }
-  .glance-arrow .ic { width: 1.75rem; height: 1.75rem; }
-  @keyframes pointe { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(0.375rem); } }
+  .ground-arrow { position: absolute; z-index: 4; width: 180px; height: 60px; transform: perspective(500px) rotateX(58deg) rotate(-8deg); }
+  .ground-arrow svg { display: block; width: 100%; height: 100%; }
+  .ground-arrow path { animation: defile 0.9s ease-in-out infinite; }
+  .ground-arrow path:nth-child(2) { animation-delay: 0.15s; }
+  .ground-arrow path:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes defile { 0%, 100% { opacity: 0.45; } 40% { opacity: 1; } }
   .glance-timer { position: fixed; left: 50%; bottom: 5.25rem; z-index: 10; width: 12rem; height: 0.375rem; margin-left: -6rem; border-radius: 0.25rem; background: rgb(42 37 34 / 0.35); overflow: hidden; }
   .glance-timer i { display: block; height: 100%; background: var(--paper-raised); transform-origin: left; animation: vide var(--d-hint) linear both; }
   @keyframes vide { to { transform: scaleX(0); } }
@@ -29,7 +27,7 @@
 <div class="scene" data-scene="bourg"></div>
 
 <!-- Permanent: l'heure et la bourse, rien d'autre. -->
-<div class="hud-clock" role="status" aria-label="Mardi 5, soleil, 10 h 40. Bourse : 214.">
+<div class="hud-clock" role="status" aria-label="Mardi 5, soleil, 10 h 40. Bourse : 214.">
   <div class="dial"><div class="dial__sun"></div></div>
   <div>
     <div class="hud-clock__day"><i data-i="soleil"></i> mar. 5</div>
@@ -40,13 +38,13 @@
 
 <!-- Besoins: seul celui qui change d'état apparaît (ici la faim passe sous 20 %). -->
 <div class="needs" data-si="jeu">
-  <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
+  <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
 </div>
-<!-- Coup d'œil (F): les trois besoins, la barre d'outils, la direction de la quête, 3 secondes. -->
+<!-- Coup d'œil (G): les trois besoins, la barre d'outils, la direction de la quête, 3 secondes. -->
 <div class="needs" data-si="coup-d-oeil">
-  <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
-  <div class="need need--bonus" style="--val:82" role="img" aria-label="Sommeil : en forme, bonus"><i data-i="lune"></i></div>
-  <div class="need" style="--val:44" role="img" aria-label="Hygiène : correcte"><i data-i="goutte"></i></div>
+  <div class="need need--low" style="--val:18" role="img" aria-label="Faim : basse"><i data-i="bol"></i></div>
+  <div class="need need--bonus" style="--val:82" role="img" aria-label="Sommeil : en forme, bonus"><i data-i="lune"></i></div>
+  <div class="need" style="--val:44" role="img" aria-label="Hygiène : correcte"><i data-i="goutte"></i></div>
 </div>
 
 <div class="world">
@@ -58,30 +56,32 @@
   <!-- Onomatopée au-dessus de l'autre joueur. -->
   <div class="emote" style="left:1090px;top:392px" aria-hidden="true">!!</div>
   <div class="gain" style="left:1120px;top:470px" data-si="jeu" aria-hidden="true"><i data-i="poisson"></i></div>
+  <!-- Coup d'œil: la flèche de la quête, au sol devant le personnage, pointée vers l'objectif. -->
+  <div class="ground-arrow" data-si="coup-d-oeil" style="left:690px;top:588px" role="img" aria-label="Ta quête : par là, à droite">
+    <svg viewBox="0 0 180 60" aria-hidden="true"><g fill="#e8c77a" stroke="#2a2522" stroke-width="3" stroke-linejoin="round"><path d="M4 8h22l24 22l-24 22H4l24 -22z"/><path d="M58 8h22l24 22l-24 22H58l24 -22z"/><path d="M112 8h22l24 22l-24 22h-22l24 -22z"/></g></svg>
+  </div>
   <div data-si="coup-d-oeil" style="position:absolute;left:1030px;top:400px"><span class="token token--other" style="display:block"></span></div>
 </div>
 
-<div class="glance-arrow" data-si="coup-d-oeil" role="img" aria-label="Ta quête : vers la droite"><i data-i="losange"></i><i data-i="fleche"></i></div>
 <div class="glance-timer" data-si="coup-d-oeil" aria-hidden="true"><i></i></div>
 
-<div class="toolbar" data-si="coup-d-oeil" role="toolbar" aria-label="Barre d'outils">
+<div class="toolbar" data-si="coup-d-oeil" role="toolbar" aria-label="Barre d’outils">
   <div class="slot"><span class="slot__key">1</span><i data-i="houe"></i><span class="wear"><i></i></span></div>
   <div class="slot slot--held"><span class="slot__key">2</span><i data-i="arrosoir"></i><span class="wear wear--low"><i></i></span></div>
   <div class="slot"><span class="slot__key">3</span><i data-i="hache"></i><span class="wear"><i></i></span></div>
   <div class="slot"><span class="slot__key">4</span><i data-i="canne"></i><span class="wear"><i></i></span></div>
   <div class="slot"><span class="slot__key">5</span><i data-i="pain"></i><span class="slot__n pastille">2</span></div>
-  <div class="slot slot--empty"><span class="slot__key">6</span></div>
 </div>
 
-<div class="provisoire">Maquette : décor et objets 3D figurés</div>
-<nav class="states" aria-label="États de la maquette"><a href="#jeu">en jeu</a><a href="#coup-d-oeil">coup d'œil (F)</a></nav>
+<div class="provisoire">Maquette : décor et objets 3D figurés</div>
+<nav class="states" aria-label="États de la maquette"><a href="#jeu">en jeu</a><a href="#coup-d-oeil">coup d’œil (G)</a></nav>
 
 <script src="commun.js"></script>
 <script>
-  // F: coup d'œil pendant 3 secondes, puis retour.
+  // G: coup d'œil pendant 3 secondes, puis retour.
   var minuteur;
   document.addEventListener('keydown', function (e) {
-    if (e.code !== 'KeyF' || e.repeat) return;
+    if (e.code !== 'KeyG' || e.repeat) return;
     location.hash = 'coup-d-oeil';
     clearTimeout(minuteur);
     minuteur = setTimeout(function () { location.hash = 'jeu'; }, 3000);

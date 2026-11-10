@@ -62,7 +62,7 @@ function contraste(a, b) {
           }
         });
         const out = [];
-        document.querySelectorAll('.hud-clock, .needs, .toolbar, .dlg, .choices, .carnet, .signets, .shop, .cards, .keys, .glance-arrow').forEach((el) => {
+        document.querySelectorAll('.hud-clock, .needs, .toolbar, .dlg, .choices, .carnet, .signets, .shop, .cards, .keys').forEach((el) => {
           if (el.hidden || el.closest('[hidden]')) return;
           const r = el.getBoundingClientRect();
           if (r.width && (r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight)) out.push(el.className);
@@ -78,9 +78,9 @@ function contraste(a, b) {
   const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
   const etat = () => page.evaluate(() => document.body.getAttribute('data-etat'));
   await page.goto(url('hud.html'));
-  await page.keyboard.press('KeyF');
+  await page.keyboard.press('KeyG');
   await page.waitForTimeout(300);
-  dit((await etat()) === 'coup-d-oeil', 'HUD: F ouvre le coup d\'œil');
+  dit((await etat()) === 'coup-d-oeil', 'HUD: G ouvre le coup d\'œil');
   dit(await page.isVisible('.toolbar'), 'HUD: la barre d\'outils apparaît au coup d\'œil');
   await page.waitForTimeout(3100);
   dit((await etat()) === 'jeu', 'HUD: le coup d\'œil se referme seul après 3 s');

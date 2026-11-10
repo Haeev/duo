@@ -107,3 +107,11 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - Scènes provisoires en SVG dans un fichier `.js` (chaînes) injecté dans la page: les groupes `[data-si]` se montrent par état, et un même SVG sert à plusieurs vues par `transform` (point visé ramené au centre; vérifier qu'aucun bord de la scène n'apparaît).
 - Jeton de joueur sur fond clair: disque de nuit `#1A1F3D` cerclé d'encre, symbole dans la couleur du profil; distinct en niveaux de gris et sous les trois daltonismes (forme et clarté).
 - Navigation spatiale fiable: distance de bord à bord dans l'axe, plus deux fois l'écart de centre en travers; flèches haut et bas sortent d'un champ d'une ligne.
+
+## Refonte de La Petite Ligne (interface 0.1, 2026-11-10)
+
+- Document: `docs/jeux/jeu-1/refonte/interface.md`; maquettes animées et outils (`capturer.cjs`, `verifier.cjs`, `commun.js` pour les pictos et le décor figuré) dans `docs/jeux/jeu-1/refonte/maquettes/`. Lancer avec `NODE_PATH=/opt/node-tools/node_modules node ...`.
+- En headless, sans capture en cours, les animations CSS n'avancent pas de façon fiable: avant de mesurer ou de capturer un état installé, mener les animations finies à leur terme (`document.getAnimations().forEach(a => a.finish())` dans un try, les boucles lèvent une erreur). Pour les animations réduites, contrôler les styles calculés (durée, nombre d'itérations), pas `playState`.
+- Un dessin plat en `rotateY` complet disparaît de profil: le faire se balancer (-55° à 55°) et dire que le vrai modèle tournera.
+- Un `a` utilisé comme onglet garde son soulignement: `text-decoration: none`.
+- `typographier.py` de `games/la-petite-ligne/ui-maquettes/outils/` s'applique tel quel aux maquettes de la refonte (saute script et style).

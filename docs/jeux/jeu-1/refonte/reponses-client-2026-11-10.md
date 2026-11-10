@@ -453,3 +453,10 @@ Réponse: On repart d'une page blanche
 Choix proposés: Rien de plus.
 
 Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collections etc mais doit etre tres narratif sur son aspect quetes, je cherche vraiment une histoire qui nous mene de lieu en lieu, avec plusieurs heures de jeu à chaque lieu, et les mise a jour pourrons ajouter des lieux au fur et à mesure qu'on avance
+
+## Décisions complémentaires du client (10 novembre, après lecture des premiers livrables)
+
+- Pendant la refonte, deux jeux dans Duo (l'ancien et le nouveau), puis retrait de l'ancien: oui. Donc nouveau paquet de jeu et nouvel identifiant.
+- Carte d'Aubrune: reprise et retouchée.
+- Parties d'essai remises à zéro à chaque étape tant que le jeu n'est pas complet: oui.
+- Modèles 3D: le client autorise à abandonner Meshy là où les créations du studio (scripts Blender) donnent un meilleur résultat. Le choix se fait pièce par pièce, sur preuve.

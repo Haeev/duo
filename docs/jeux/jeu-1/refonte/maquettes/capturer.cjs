@@ -35,7 +35,15 @@ const shots = [
     await page.goto('about:blank');
     await page.goto('file://' + path.join(dir, url));
     await page.waitForTimeout(attente);
+    // Les animations d'entrée sont menées à leur fin: la capture montre l'écran installé.
     const debord = await page.evaluate(() => {
+      document.getAnimations().forEach((an) => {
+        try {
+          an.finish();
+        } catch (e) {
+          /* animation en boucle: sans fin */
+        }
+      });
       const d = document.documentElement;
       return d.scrollWidth > innerWidth || d.scrollHeight > innerHeight;
     });
