@@ -1,6 +1,6 @@
 /**
  * Briques communes des schémas de données et d'état. Les schémas Valibot sont la source unique
- * des types (`v.InferOutput`) et des validateurs (ADR 0017 et 0019).
+ * des types (`v.InferOutput`) et des validateurs (ADR 0017).
  */
 import * as v from 'valibot';
 
