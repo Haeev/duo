@@ -323,3 +323,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le facteur de prix du jeu (`priceFactor` linéaire, pente = sensibilité, borné 0,4 à 1,25) rend une remise rentable seulement si sensibilité x part remisée de l'indice > part remisée du ticket / taux de marge: avec l'indice moyenné sur toutes les envies, aucune remise ne paie jamais. Lire l'indice d'une heure douce sur les seules lignes remisées (ce qu'annonce l'ardoise).
 - Valoriser un groupe en plus au ticket de son profil, pas au ticket moyen du jour: un pressé vaut 2,5 €, une famille 14 €; l'erreur inversait le verdict (heure douce du matin « rentable »).
 - Au village, le week-end et la fête sont presque pleins (capacité douce 42 puis 46 groupes par jour): un levier ne paie qu'en semaine; c'est ce qui crée le choix du moment. Simulation: `docs/jeux/cosy-cafe/demo/simulations/remises_marketing_v0_2.py` (lit les JSON dans le document).
+
+## Refonte de La Petite Ligne (2026-11-10)
+
+- Monnaie d'un jeu de vie: écarter tout nom de clochette ou de grelot (monnaie du jeu de référence). « Sou » retenu en proposition.
+- Besoins à paliers (malus sous 20, bonus au-dessus de 50): caler la perte de sommeil pour qu'une journée laisse juste au-dessus de 50 et une nuit blanche tombe pile à 20 (1,6 point par minute pour 30 + 20 min). Script: `docs/jeux/jeu-1/simulations/refonte_besoins_economie.py`.
+- Sans sac au départ, c'est le nombre de cases libres qui borne le revenu d'un aller-retour; agrandir le sac améliore le confort, les outils améliorent le revenu. Le dire au client pour éviter d'attendre des sacs un effet économique.
+- Durées demandées (jour 30 min, nuit 20 min): une heure de jeu uniforme de 125 s donne jour 6 h à 20 h 30 et nuit 20 h 30 à 6 h.
+- Logement d'un lieu hanté: éviter l'hôtel à remettre en état avec des clients de l'intrigue (trop proche d'une référence du client); wagon de service retenu.
