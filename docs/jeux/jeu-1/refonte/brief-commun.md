@@ -14,7 +14,7 @@ Une vie tranquille à deux en réseau local (potager, pêche, collections, déco
 | `reponses-client-2026-11-10.md` | les réponses et décisions du client, mot pour mot |
 | `technique.md` | architecture, lots, budgets |
 | `interface.md` et `maquettes/` | écrans, touches, règles d'animation |
-| `bible-artistique.md` et `planches/` | style « maquette de train miniature », figurines lisses, nuancier |
+| `bible-artistique.md` et `planches/` | style encré (bande dessinée), chartes des personnages et des décors, nuancier |
 | `references-de-ressenti.md` | section 3: règles de ressenti à respecter |
 | `carte-aubrune/` | plan vu du dessus d'Aubrune (`plan.md`, `plan.json`, images) |
 
