@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "moulin",
   "name": "Le moulin de la Vanne, salle des meules",
+  "style": "atelier",
   "width": 7,
   "height": 7,
   "at": {

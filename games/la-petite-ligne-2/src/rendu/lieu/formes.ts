@@ -52,12 +52,17 @@ function boxAt(
 
 type DoorLook = typeof TILE_SETTINGS.interior;
 
+/** `userData` de la géométrie d'une porte: nombre d'index de sa partie basse (porte coupée). */
+export const DOOR_CUT_COUNT = 'doorCutCount';
+
 /**
  * Porte d'une pièce: deux montants, un linteau, une barre de seuil, et le vantail fermé avec ses
  * deux panneaux et sa poignée du côté de la pièce (+Z). `w`: largeur hors tout, `h`: profondeur
- * de l'encadrement, à cheval sur le mur.
+ * de l'encadrement, à cheval sur le mur. Avec `cutHeight`, la porte se fabrique en deux parts,
+ * le bas d'abord (jusqu'à la coupe, coiffé d'une tranche à l'encre) puis le haut: quand son mur
+ * est coupé devant la caméra, on n'en dessine que le bas (`low`: nombre de boîtes du bas).
  */
-function doorParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
+function doorParts(volume: SceneVolume, look: DoorLook): { parts: BufferGeometry[]; low: number } {
   const { w, h: depth, height } = volume;
   const d = look.door;
   const jamb = look.doorJamb;
@@ -65,16 +70,42 @@ function doorParts(volume: SceneVolume, look: DoorLook): BufferGeometry[] {
   const clear = w - jamb * 2;
   const leafZ = depth / 2 - d.leafDepth / 2 - 0.02;
   const face = leafZ + d.leafDepth / 2;
-  return [
-    boxAt(jamb, height, depth, -(w - jamb) / 2, 0, 0, d.frameColor),
-    boxAt(jamb, height, depth, (w - jamb) / 2, 0, 0, d.frameColor),
-    boxAt(w, head, depth, 0, height - head, 0, d.frameColor),
-    boxAt(clear, 0.04, depth, 0, 0, 0, d.frameColor),
-    boxAt(clear, height - head - 0.04, d.leafDepth, 0, 0.04, leafZ, d.leafColor),
-    boxAt(clear * 0.64, height * 0.3, 0.02, 0, height * 0.14, face + 0.01, d.panelColor),
-    boxAt(clear * 0.64, height * 0.34, 0.02, 0, height * 0.52, face + 0.01, d.panelColor),
-    boxAt(0.07, 0.07, 0.06, clear / 2 - 0.13, height * 0.47, face + 0.03, d.knobColor),
-  ];
+  const cut = volume.cutHeight ?? 0;
+  const lip = 0.006;
+  const low: BufferGeometry[] = [];
+  const high: BufferGeometry[] = [];
+  const caps: BufferGeometry[] = [];
+  // Chaque boîte est tranchée à la hauteur de coupe; `cap`: sa tranche se voit une fois coupée.
+  const part = (
+    bw: number,
+    bh: number,
+    bd: number,
+    x: number,
+    y: number,
+    z: number,
+    color: string,
+    cap = false,
+  ): void => {
+    if (cut <= 0 || y >= cut) {
+      high.push(boxAt(bw, bh, bd, x, y, z, color));
+      return;
+    }
+    const top = Math.min(y + bh, cut - lip);
+    if (top > y) low.push(boxAt(bw, top - y, bd, x, y, z, color));
+    if (y + bh > cut) {
+      high.push(boxAt(bw, y + bh - cut, bd, x, cut, z, color));
+      if (cap) caps.push(boxAt(bw - lip, lip, bd - lip, x, cut - lip, z, look.door.cutColor));
+    }
+  };
+  part(jamb, height, depth, -(w - jamb) / 2, 0, 0, d.frameColor, true);
+  part(jamb, height, depth, (w - jamb) / 2, 0, 0, d.frameColor, true);
+  part(w, head, depth, 0, height - head, 0, d.frameColor);
+  part(clear, 0.04, depth, 0, 0, 0, d.frameColor);
+  part(clear, height - head - 0.04, d.leafDepth, 0, 0.04, leafZ, d.leafColor, true);
+  part(clear * 0.64, height * 0.3, 0.02, 0, height * 0.14, face + 0.01, d.panelColor);
+  part(clear * 0.64, height * 0.34, 0.02, 0, height * 0.52, face + 0.01, d.panelColor);
+  part(0.07, 0.07, 0.06, clear / 2 - 0.13, height * 0.47, face + 0.03, d.knobColor);
+  return { parts: [...low, ...caps, ...high], low: low.length + caps.length };
 }
 
 /** Paillasson: une natte bordée, à plat devant la porte. */
@@ -128,10 +159,14 @@ export function standInGeometry(
           settings.lightness,
         );
   const parts: BufferGeometry[] = [];
+  let cutCount = 0;
   switch (volume.shape) {
-    case 'door':
-      parts.push(...doorParts(volume, doors));
+    case 'door': {
+      const door = doorParts(volume, doors);
+      parts.push(...door.parts);
+      for (const part of door.parts.slice(0, door.low)) cutCount += part.getIndex()?.count ?? 0;
       break;
+    }
     case 'mat':
       parts.push(...matParts(volume, doors));
       break;
@@ -198,6 +233,7 @@ export function standInGeometry(
   if (parts.length > 1) for (const part of parts) part.dispose();
   if (merged === undefined)
     throw new Error(`forme provisoire impossible pour le volume ${volume.id}`);
+  if (cutCount > 0) merged.userData[DOOR_CUT_COUNT] = cutCount;
   return merged;
 }
 

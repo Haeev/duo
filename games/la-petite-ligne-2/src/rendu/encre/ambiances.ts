@@ -133,7 +133,8 @@ const KeySchema = v.partial(
   v.strictObject({
     ...numberEntries,
     ...colorEntries,
-    sun: v.tuple([Degrees, v.pipe(v.number(), v.minValue(0), v.maxValue(90))]),
+    /** `null`: le soleil suit l'heure (une heure du dedans peut ainsi défaire un soleil fixe). */
+    sun: v.nullable(v.tuple([Degrees, v.pipe(v.number(), v.minValue(0), v.maxValue(90))])),
     particles: v.picklist(['poussiere', 'lucioles', 'aucune']),
   }),
 );
@@ -153,6 +154,11 @@ const SheetSchema = v.strictObject({
   pourquoi: v.exactOptional(v.string()),
   dehors: v.exactOptional(KeysSchema),
   dedans: v.exactOptional(KeysSchema),
+  /**
+   * Pièce à fenêtres d'un bâtiment (elle a sa coque d'ombre: le soleil n'y entre que par les
+   * fenêtres): chaque heure part de la même heure du dedans.
+   */
+  piece: v.exactOptional(KeysSchema),
 });
 const ScaleSchema = v.partial(v.strictObject(numberEntries));
 
@@ -185,6 +191,7 @@ type KeyPatch = v.InferOutput<typeof KeySchema>;
 export interface AmbianceSheet {
   readonly dehors: Readonly<Record<AmbianceKey, Readonly<Ambiance>>>;
   readonly dedans: Readonly<Record<AmbianceKey, Readonly<Ambiance>>>;
+  readonly piece: Readonly<Record<AmbianceKey, Readonly<Ambiance>>>;
 }
 
 export interface AmbianceBook {
@@ -214,7 +221,8 @@ function patched(base: Readonly<Ambiance>, patch: KeyPatch | undefined): Ambianc
 /**
  * Résout l'héritage. Dehors: le midi de la fiche part du midi de sa fiche mère, et chaque autre
  * heure part de la même heure de la fiche mère (à défaut, du midi). Dedans: chaque heure part de
- * la même heure du dehors. La fiche `defaut` doit donner un midi complet.
+ * la même heure du dehors. Pièce: chaque heure part de la même heure du dedans. La fiche `defaut`
+ * doit donner un midi complet.
  */
 export function resolveAmbiances(raw: unknown): AmbianceBook {
   const file = v.parse(AmbianceFileSchema, raw);
@@ -236,6 +244,7 @@ export function resolveAmbiances(raw: unknown): AmbianceBook {
     const day = patched(parent?.dehors.midi ?? ({ sun: null } as Ambiance), sheet.dehors?.midi);
     const dehors = {} as Record<AmbianceKey, Ambiance>;
     const dedans = {} as Record<AmbianceKey, Ambiance>;
+    const piece = {} as Record<AmbianceKey, Ambiance>;
     for (const key of AMBIANCE_KEYS) {
       dehors[key] = key === 'midi' ? day : patched(parent?.dehors[key] ?? day, sheet.dehors?.[key]);
       const inside = patched(dehors[key], sheet.dedans?.[key]);
@@ -244,8 +253,15 @@ export function resolveAmbiances(raw: unknown): AmbianceBook {
         parent === null
           ? inside
           : patched(patched(parent.dedans[key], sheet.dehors?.[key]), sheet.dedans?.[key]);
+      piece[key] =
+        parent === null
+          ? patched(inside, sheet.piece?.[key])
+          : patched(
+              patched(patched(parent.piece[key], sheet.dehors?.[key]), sheet.dedans?.[key]),
+              sheet.piece?.[key],
+            );
     }
-    const resolved = { dehors, dedans };
+    const resolved = { dehors, dedans, piece };
     sheets.set(id, resolved);
     return resolved;
   };
@@ -310,6 +326,8 @@ export interface AmbianceQuery {
   readonly indoor: number;
   /** Météo du moment (`clear` ou inconnue: rien de plus). */
   readonly weather: string | null;
+  /** Le dedans est une pièce à fenêtres (ambiances `piece`), et non un lieu clos sans façade. */
+  readonly room?: boolean;
 }
 
 /** L'ambiance d'un instant: fiche du lieu, heure, dedans ou dehors, météo. */
@@ -330,7 +348,8 @@ export function ambianceAt(book: AmbianceBook, query: AmbianceQuery): Ambiance {
     }
   }
   if (query.indoor <= 0) return outside;
-  const inside = blendAmbiances(sheet.dedans[span.from], sheet.dedans[span.to], span.t);
+  const keys = query.room === true ? sheet.piece : sheet.dedans;
+  const inside = blendAmbiances(keys[span.from], keys[span.to], span.t);
   const out = blendAmbiances(outside, inside, query.indoor);
   out.sun = query.indoor >= 0.5 ? inside.sun : null;
   return out;

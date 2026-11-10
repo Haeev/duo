@@ -174,11 +174,13 @@ export const TILE_SETTINGS = {
     maxPerTile: 1200,
   },
   /**
-   * Pièces (rendu encré, ADR 0023): murs coupés à hauteur d'appui pour voir dedans sous tous les
-   * angles, soubassement de pierre, plancher. Une pièce est un monde clos à l'écran: seule celle
-   * du joueur local est dessinée, sur le fond uni `backdrop`. Une porte laisse dans son mur un
-   * vide de la largeur de son passage plus `doorJamb` de chaque côté. Les cloisons (`blocked` de
-   * la pièce) sont des murs de `partitionThickness`, dans l'axe de leur rangée.
+   * Pièces (rendu encré, ADR 0023). Une pièce est un monde clos à l'écran: seule celle du joueur
+   * local est dessinée. Ses matières, ses hauteurs et son fond viennent de son style
+   * (`reglages-pieces.ts`); restent ici l'épaisseur des murs, les portes et les cloisons. Une
+   * porte laisse dans son mur un vide de la largeur de son passage plus `doorJamb` de chaque
+   * côté. Les cloisons (`blocked` de la pièce) sont des murs de `partitionThickness`, dans l'axe
+   * de leur rangée. `wallHeight`, `wallColor`, `plinth*`: murs coupés d'avant les styles
+   * (`interiorWalls`), que le moteur ne dessine plus.
    */
   interior: {
     wallHeight: 1.05,
@@ -188,7 +190,6 @@ export const TILE_SETTINGS = {
     plinthOut: 0.05,
     plinthColor: '#8f8474',
     floorColor: '#b98f5e',
-    backdrop: '#15121a',
     partitionThickness: 0.7,
     doorJamb: 0.12,
     /**
@@ -204,6 +205,8 @@ export const TILE_SETTINGS = {
       leafColor: '#8c6238',
       knobColor: '#e2c26a',
       panelColor: '#74502c',
+      /** Tranche de la porte quand son mur est coupé devant la caméra. */
+      cutColor: '#2a1f1a',
     },
     mat: { depth: 0.56, gap: 0.1, height: 0.035, color: '#b08a4a', edgeColor: '#6b4f2c' },
     hatch: { size: 0.86, curb: 0.09, height: 0.14, curbColor: '#5a4030', wellColor: '#231b18' },

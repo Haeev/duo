@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "forge",
   "name": "La forge",
+  "style": "atelier",
   "width": 5,
   "height": 5,
   "at": {

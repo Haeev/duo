@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "mercerie",
   "name": "La mercerie-coiffure",
+  "style": "commerce",
   "width": 6,
   "height": 6,
   "at": {

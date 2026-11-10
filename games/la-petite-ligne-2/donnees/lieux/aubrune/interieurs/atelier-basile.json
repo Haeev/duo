@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "atelier-basile",
   "name": "L'atelier de Basile",
+  "style": "atelier",
   "width": 9,
   "height": 7,
   "at": {

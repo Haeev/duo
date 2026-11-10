@@ -32,6 +32,7 @@ import type { InkKit } from '../encre/index';
 import { inkUnit } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
 import type { PlaceLights } from '../encre/lumieres';
+import { SHADOW_ONLY } from '../encre/ombres';
 import type { WindowLight } from '../encre/matiere';
 import { INK_SETTINGS } from '../encre/reglages';
 import { createGroundMap } from '../encre/sol';
@@ -39,14 +40,15 @@ import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { GeometryBuilder } from './geometrie';
+import { buildRoom } from './piece-geometrie';
+import { type RoomDef, roomFacades, type RoomObstacle, roomPlan } from './pieces';
+import { ROOM_SETTINGS } from './reglages-pieces';
 import { type SurfaceKind, TILE_SETTINGS, type TileSettings } from './reglages-tuiles';
 import {
   type BuildingShape,
   buildingsByTile,
   type GroundField,
   groundField,
-  type InteriorRect,
-  interiorWalls,
   kindAt,
   surfaceAt,
 } from './terrain-rendu';
@@ -120,12 +122,33 @@ interface CrownFade {
   hidden: boolean;
 }
 
+/** Une pièce construite: ses maillages, ses murs dans leurs deux formes, ses lampes. */
+interface RoomView {
+  readonly group: Group;
+  readonly walls: {
+    readonly nx: number;
+    readonly nz: number;
+    readonly full: Mesh;
+    readonly stub: Mesh;
+    front: boolean;
+  }[];
+  readonly lights: PlaceLights;
+  /** Aucune fenêtre (cave): il y fait nuit à toute heure, lampes allumées. */
+  readonly blind: boolean;
+}
+
+const NO_LIGHTS: PlaceLights = { lamps: [], windows: [] };
+
 export class TiledPlace {
   readonly root = new Group();
   /** Le dehors (tuiles, sol lointain, repères) et les pièces: un seul des deux est dessiné. */
   private readonly outside = new Group();
-  private readonly roomMeshes = new Map<string, Mesh>();
+  private readonly roomViews = new Map<string, RoomView>();
   private shownRoom: string | null = null;
+  /** Façades de chaque pièce (fenêtres), cherchées à la première pièce visitée. */
+  private facades: ReturnType<typeof roomFacades> | null = null;
+  private readonly ink: InkKit | null;
+  private readonly delivered: { readonly place: string; readonly source: BuildingSource } | null;
   readonly occlusion = new Occlusion();
   readonly field: GroundField;
   private readonly tracker = new ResourceTracker();
@@ -158,11 +181,15 @@ export class TiledPlace {
     private readonly settings: TileSettings = TILE_SETTINGS,
     /** Rendu encré (ADR 0023): ses matériaux remplacent les matériaux standard. */
     ink: InkKit | null = null,
-    /** Pièces du lieu (rendu encré: plancher et murs coupés). */
-    private readonly rooms: readonly InteriorRect[] = [],
+    /** Pièces du lieu (rendu encré: sol, murs, fenêtres, lampes; voir `pieces.ts`). */
+    private readonly rooms: readonly RoomDef[] = [],
     /** Bâtiments livrés du lieu (rendu encré): ils remplacent les volumes provisoires. */
     delivered: { readonly place: string; readonly source: BuildingSource } | null = null,
+    /** Meubles du lieu (emprises et hauteurs): une fenêtre ne s'ouvre pas derrière une armoire. */
+    private readonly obstacles: readonly RoomObstacle[] = [],
   ) {
+    this.ink = ink;
+    this.delivered = delivered;
     this.root.name = 'grand-lieu';
     this.outside.name = 'dehors';
     this.root.add(this.outside);
@@ -276,7 +303,6 @@ export class TiledPlace {
     };
     this.far = this.buildFar();
     this.buildLandmarks();
-    if (ink !== null) this.buildRooms();
   }
 
   /** Surface de l'eau: ondulation par la normale, calculée dans le nuanceur (aucun coût au processeur). */
@@ -372,43 +398,58 @@ export class TiledPlace {
   }
 
   /**
-   * Les pièces: pour chacune un maillage (plancher lu dans la carte du sol, murs coupés, cloisons),
-   * caché tant que le joueur local n'y est pas (`showRoom`).
+   * Construit une pièce à sa première visite: son plan (murs, vides, appliques) tiré des données,
+   * puis ses maillages. Sol, quatre murs (entier ou coupé, un seul des deux dessiné), nappe du
+   * fond et coque d'ombre: sept appels de dessin au plus.
    */
-  private buildRooms(): void {
-    if (this.rooms.length === 0) return;
-    const sills = Object.values(doorSills(this.map, DOORS.width));
-    const floor = new Color(this.settings.interior.floorColor);
-    for (const room of this.rooms) {
-      const builder = new GeometryBuilder();
-      builder.begin(room.id);
-      builder.setInk(LAYER.grass, KIND.ground);
-      const { x, y } = room.at;
-      const xe = x + room.width;
-      const ye = y + room.height;
-      builder.quad(
-        [
-          [x, 0, y],
-          [x, 0, ye],
-          [xe, 0, ye],
-          [xe, 0, y],
-        ],
-        [0, 1, 0],
-        [floor],
+  private buildRoom(room: RoomDef): RoomView | null {
+    const ink = this.ink;
+    if (ink === null) return null;
+    const sills = doorSills(this.map, DOORS.width);
+    if (this.facades === null) {
+      const { delivered } = this;
+      this.facades = roomFacades(this.map, this.rooms, sills, (id) =>
+        delivered === null ? null : (delivered.source.sheet?.(delivered.place, id) ?? null),
       );
-      builder.setInk(LAYER.plain);
-      for (const box of interiorWalls(room, sills, this.settings)) builder.box(box);
-      builder.end();
-      const geometry = builder.build();
-      if (geometry === null) continue;
-      const mesh = new Mesh(this.tracker.track(geometry), this.kit.materials.ground);
-      mesh.name = `piece-${room.id}`;
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      mesh.visible = false;
-      this.roomMeshes.set(room.id, mesh);
-      this.root.add(mesh);
     }
+    const plan = roomPlan(
+      room,
+      Object.values(sills),
+      this.facades.get(room.id) ?? null,
+      this.obstacles,
+    );
+    const built = buildRoom(plan);
+    const group = new Group();
+    group.name = `piece-${room.id}`;
+    const material = this.kit.materials.ground;
+    const add = (geometry: BufferGeometry, name: string, look: Material = material): Mesh => {
+      const mesh = new Mesh(this.tracker.track(geometry), look);
+      mesh.name = `${group.name}-${name}`;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+      return mesh;
+    };
+    add(built.floor, 'sol');
+    add(built.backdrop, 'fond', ink.backdrop);
+    const shell = add(built.shell, 'coque');
+    shell.castShadow = true;
+    shell.userData[SHADOW_ONLY] = true;
+    const walls = built.walls.map((wall) => {
+      const full = add(wall.full, `mur-${wall.side}`);
+      const stub = add(wall.stub, `mur-coupe-${wall.side}`);
+      stub.visible = false;
+      return { nx: wall.nx, nz: wall.nz, full, stub, front: false };
+    });
+    group.visible = false;
+    this.root.add(group);
+    const view: RoomView = {
+      group,
+      walls,
+      lights: { lamps: plan.lamps, windows: [] },
+      blind: plan.walls.every((wall) => wall.openings.every((o) => o.kind !== 'window')),
+    };
+    this.roomViews.set(room.id, view);
+    return view;
   }
 
   /**
@@ -417,9 +458,32 @@ export class TiledPlace {
    */
   showRoom(room: string | null): void {
     if (room === this.shownRoom) return;
-    for (const [id, mesh] of this.roomMeshes) mesh.visible = id === room;
+    if (room !== null && !this.roomViews.has(room)) {
+      const def = this.rooms.find((r) => r.id === room);
+      if (def !== undefined) this.buildRoom(def);
+    }
+    for (const [id, view] of this.roomViews) view.group.visible = id === room;
     this.outside.visible = room === null;
     this.shownRoom = room;
+  }
+
+  /**
+   * Murs de la pièce affichée selon la caméra: ceux qui lui tournent le dos sont entiers (murs du
+   * fond), ceux qui sont entre elle et la pièce sont coupés bas. `toCamera`: du sol vers la caméra.
+   */
+  viewRoom(toCamera: { readonly x: number; readonly z: number }): void {
+    const view = this.shownRoom === null ? undefined : this.roomViews.get(this.shownRoom);
+    if (view === undefined) return;
+    const s = ROOM_SETTINGS;
+    const flat = Math.hypot(toCamera.x, toCamera.z) || 1;
+    for (const wall of view.walls) {
+      const facing = (wall.nx * toCamera.x + wall.nz * toCamera.z) / flat;
+      // L'écart garde le mur dans son état tant que la vue reste dans son axe.
+      const limit = s.frontDot + (wall.front ? -s.frontHysteresis : s.frontHysteresis);
+      wall.front = facing > limit;
+      wall.full.visible = !wall.front;
+      wall.stub.visible = wall.front;
+    }
   }
 
   /** Repères (`landmarks`), toujours affichés: tour carrée à toit en pointe, ou grand arbre s'il est en pleine nature. */
@@ -537,9 +601,18 @@ export class TiledPlace {
     }
   }
 
-  /** Rendu encré: lampes de porte et fenêtres de tous les bâtiments du lieu. */
-  lights(): PlaceLights {
-    return this.built;
+  /**
+   * Rendu encré: lampes de porte et fenêtres de tous les bâtiments du lieu, ou, dans une pièce,
+   * ses seules appliques (rien ne traverse les murs, ni du dehors ni d'une pièce voisine).
+   */
+  lights(room: string | null = null): PlaceLights {
+    if (room === null) return this.built;
+    return this.roomViews.get(room)?.lights ?? NO_LIGHTS;
+  }
+
+  /** La pièce affichée n'a aucune fenêtre: le jour n'y entre pas. */
+  roomIsBlind(): boolean {
+    return this.shownRoom !== null && this.roomViews.get(this.shownRoom)?.blind === true;
   }
 
   /** Nature dessinée et surface entendue sous un point (son des pas). */

@@ -322,5 +322,43 @@ export const InteriorSchema = v.strictObject({
   at: v.strictObject({ x: IntSchema, y: IntSchema }),
   /** Note de placement de la pièce (pourquoi ici, à cette taille). Ignorée du moteur. */
   pourquoi: v.exactOptional(TextSchema),
+  /**
+   * Style de la pièce pour le rendu (`ROOM_STYLES` de `rendu/lieu/reglages-pieces.ts`): matière
+   * des murs et du sol, hauteur, plinthe, fenêtres, lampes. Absent: le style par défaut.
+   */
+  style: v.exactOptional(IdSchema),
+  /**
+   * Fenêtres imposées (sinon elles se déduisent des façades du bâtiment): le mur, la place du
+   * milieu le long de ce mur (m depuis son coin nord ou ouest), et au besoin les cotes.
+   */
+  windows: v.exactOptional(
+    v.pipe(
+      v.array(
+        v.strictObject({
+          side: v.picklist(['nord', 'est', 'sud', 'ouest']),
+          at: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(INTERIOR_MAX_SIDE)),
+          width: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.3), v.maxValue(4))),
+          sill: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.2), v.maxValue(3))),
+          height: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.3), v.maxValue(3))),
+        }),
+      ),
+      v.maxLength(24),
+    ),
+  ),
+  /** Tapis posés au sol (cases de la pièce, m); `color` en `#rrggbb`. Ils ne bloquent rien. */
+  rugs: v.exactOptional(
+    v.pipe(
+      v.array(
+        v.strictObject({
+          x: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(INTERIOR_MAX_SIDE)),
+          y: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(INTERIOR_MAX_SIDE)),
+          w: v.pipe(FiniteSchema, v.minValue(0.4), v.maxValue(12)),
+          h: v.pipe(FiniteSchema, v.minValue(0.4), v.maxValue(12)),
+          color: v.exactOptional(v.pipe(v.string(), v.regex(/^#[0-9a-fA-F]{6}$/))),
+        }),
+      ),
+      v.maxLength(8),
+    ),
+  ),
 });
 export type InteriorDef = v.InferOutput<typeof InteriorSchema>;

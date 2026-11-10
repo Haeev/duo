@@ -622,6 +622,45 @@ const PAINTERS: Record<number, Painter> = {
     for (let i = 0; i < 6; i += 1)
       blot(paint, paint.random() * SIZE, paint.random() * SIZE, 70, 44);
   },
+
+  [LAYER.tile]: (ink, _paint, relief) => {
+    // Sol d'intérieur entretenu: des piqûres, deux fêlures fines, un rien d'usure en relief.
+    for (let i = 0; i < 16; i += 1) {
+      const x = ink.random() * SIZE;
+      const y = ink.random() * SIZE;
+      stroke(
+        ink,
+        [[x, y] as const, [x + 2 + ink.random() * 5, y + ink.random() * 3] as const],
+        1.8,
+      );
+    }
+    for (let i = 0; i < 2; i += 1) {
+      let x = ink.random() * SIZE;
+      let y = ink.random() * SIZE;
+      const points: Point[] = [[x, y]];
+      for (let k = 0; k < 3; k += 1) {
+        x += 12 + ink.random() * 20;
+        y += (ink.random() - 0.5) * 26;
+        points.push([x, y]);
+      }
+      stroke(ink, points, 1.5);
+    }
+    for (let i = 0; i < 6; i += 1) {
+      const x = relief.random() * SIZE;
+      const y = relief.random() * SIZE;
+      const r = 20 + relief.random() * 30;
+      raise(
+        relief,
+        [
+          [x - r, y],
+          [x, y - r * 0.6],
+          [x + r, y + r * 0.1],
+          [x + r * 0.2, y + r * 0.7],
+        ],
+        0.44,
+      );
+    }
+  },
 };
 
 /** Flou en boîte, répété trois fois, qui boucle aux bords: il transforme les marches en pentes. */
@@ -652,6 +691,7 @@ const BEVEL: Record<number, number> = {
   [LAYER.wall]: 2,
   [LAYER.leaf]: 4,
   [LAYER.bark]: 2,
+  [LAYER.tile]: 6,
 };
 
 /** Les couches de traits, en tableau de textures (R trait, G second ton, B et A pente du relief). */

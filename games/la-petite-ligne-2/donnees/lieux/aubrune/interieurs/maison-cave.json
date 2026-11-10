@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "maison-cave",
   "name": "La cave de la maison",
+  "style": "cave",
   "width": 5,
   "height": 4,
   "at": {

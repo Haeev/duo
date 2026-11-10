@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "fournil",
   "name": "Le fournil d'Achille",
+  "style": "atelier",
   "width": 6,
   "height": 5,
   "at": {

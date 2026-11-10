@@ -16,6 +16,7 @@ import { inkTag } from '../encre/conversion';
 import { inkCode, KIND, LAYER } from '../encre/couches';
 import type { WindowLight } from '../encre/matiere';
 import { INK_SETTINGS } from '../encre/reglages';
+import type { BuildingSheet } from './pieces';
 
 const URLS = import.meta.glob<string>('../../../assets/lieux/*/batiments/*.glb', {
   query: '?url',
@@ -38,6 +39,11 @@ export interface BuildingModel {
 /** Ce que le rendu d'un lieu demande: le modèle d'un bâtiment de la carte, ou `null`. */
 export interface BuildingSource {
   model(place: string, id: string): BuildingModel | null;
+  /**
+   * Fiche du manifeste (emprise, façade de la porte, fenêtres), connue dès le démarrage, que le
+   * modèle soit chargé ou non: les pièces en tirent leurs fenêtres. Absente: aucune fiche.
+   */
+  sheet?(place: string, id: string): BuildingSheet | null;
 }
 
 function isMesh(object: Object3D): object is Mesh {
@@ -98,6 +104,7 @@ export function mergeBuilding(
 
 export class PlaceBuildings implements BuildingSource {
   private readonly models = new Map<string, BuildingModel>();
+  private readonly sheets = new Map<string, BuildingSheet>();
   /** Résolue quand tous les bâtiments sont chargés (ou ont échoué: volumes provisoires). */
   readonly ready: Promise<void>;
 
@@ -113,6 +120,20 @@ export class PlaceBuildings implements BuildingSource {
       const manifest: BuildingManifest = parsed.output;
       const folder = path.slice(0, path.lastIndexOf('/') + 1);
       Object.entries(manifest.batiments).forEach(([id, sheet], index) => {
+        this.sheets.set(`${manifest.lieu}/${id}`, {
+          width: sheet.emprise.largeur,
+          depth: sheet.emprise.profondeur,
+          door: sheet.porte?.facade ?? null,
+          windows: sheet.fenetres.map((w) => ({
+            x: w.x,
+            z: w.z,
+            nx: w.nx,
+            nz: w.nz,
+            width: w.largeur,
+            sill: w.appui,
+            height: w.hauteur,
+          })),
+        });
         const url = urls[`${folder}${sheet.fichier}`];
         if (url === undefined) return;
         jobs.push(
@@ -146,6 +167,10 @@ export class PlaceBuildings implements BuildingSource {
 
   model(place: string, id: string): BuildingModel | null {
     return this.models.get(`${place}/${id}`) ?? null;
+  }
+
+  sheet(place: string, id: string): BuildingSheet | null {
+    return this.sheets.get(`${place}/${id}`) ?? null;
   }
 
   get size(): number {

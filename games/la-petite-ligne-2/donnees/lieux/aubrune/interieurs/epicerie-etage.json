@@ -67,5 +67,39 @@
       "to": "epicerie-rdc-esc-epicerie-etage"
     }
   },
-  "pourquoi": "la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté"
+  "pourquoi": "la chambre du premier soir, deux lits simples; l'escalier arrive sur un palier, la chambre d'Odette à côté",
+  "windows": [
+    {
+      "side": "nord",
+      "at": 1.9
+    },
+    {
+      "side": "nord",
+      "at": 5.1
+    },
+    {
+      "side": "est",
+      "at": 2.2
+    },
+    {
+      "side": "est",
+      "at": 5.8
+    },
+    {
+      "side": "sud",
+      "at": 1.2
+    },
+    {
+      "side": "sud",
+      "at": 3.0
+    },
+    {
+      "side": "ouest",
+      "at": 2.2
+    },
+    {
+      "side": "ouest",
+      "at": 7.4
+    }
+  ]
 }

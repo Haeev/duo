@@ -27,12 +27,19 @@ import { INK_SETTINGS } from './reglages';
 export const SUN_LAYER = 1;
 export const LAMP_LAYER = 2;
 
+/**
+ * `userData` d'un maillage qui porte l'ombre du soleil sans jamais être dessiné (coque d'une
+ * pièce: plafond et murs pleins, le soleil n'entre que par les fenêtres).
+ */
+export const SHADOW_ONLY = 'inkShadowOnly';
+
 const BIAS = new Matrix4().set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
 const right = new Vector3();
 const up = new Vector3();
 const back = new Vector3();
 
 interface Caster {
+  userData: { [SHADOW_ONLY]?: unknown };
   isMesh?: boolean;
   isInstancedMesh?: boolean;
   isSkinnedMesh?: boolean;
@@ -117,10 +124,11 @@ export class StageSort {
         admitted = true;
         shown = true;
       }
-      if (shown) object.layers.enable(0);
+      const unseen = mesh.userData[SHADOW_ONLY] === true;
+      if (shown && !unseen) object.layers.enable(0);
       else {
         object.layers.disable(0);
-        pending = true;
+        if (!shown) pending = true;
       }
       let casts = shown && mesh.castShadow;
       if (casts && !this.depth.has(shape)) {
@@ -134,7 +142,7 @@ export class StageSort {
       }
       if (casts) {
         object.layers.enable(SUN_LAYER);
-        if (instanced) object.layers.disable(LAMP_LAYER);
+        if (instanced || unseen) object.layers.disable(LAMP_LAYER);
         else object.layers.enable(LAMP_LAYER);
       } else {
         object.layers.disable(SUN_LAYER);

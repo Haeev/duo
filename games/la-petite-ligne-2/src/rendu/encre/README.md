@@ -21,7 +21,7 @@ Revenir à l'ancien rendu: `?rendu=aplats` dans l'adresse du jeu, ou `RenderOpti
 
 1. Dans `donnees/lieux/<lieu>/climat.json`, la saison porte un identifiant `ambience` (par exemple `aubrune-automne`).
 2. Dans `ambiances.json`, ajoute une fiche de ce nom sous `sheets`. Elle hérite de `defaut` (ou de `extends`).
-3. N'écris que ce qui change, par heure repère (`aube`, `midi`, `apres-midi`, `crepuscule`, `nuit`), sous `dehors` et `dedans`. Couleurs en `#rrggbb` ou en trois nombres.
+3. N'écris que ce qui change, par heure repère (`aube`, `midi`, `apres-midi`, `crepuscule`, `nuit`), sous `dehors`, `dedans` (lieu clos sans façade: wagon) et `piece` (pièce à fenêtres d'un bâtiment: elle part du dedans; `"sun": null` y rend le soleil à l'heure, `sunShadow` à 1 le fait entrer par les seules fenêtres). Couleurs en `#rrggbb` ou en trois nombres.
 4. Note l'intention dans `pourquoi`.
 5. `pnpm exec vitest run tests/rendu/encre.test.ts` contrôle le fichier (un exemplaire factice y est ajouté par le test).
 

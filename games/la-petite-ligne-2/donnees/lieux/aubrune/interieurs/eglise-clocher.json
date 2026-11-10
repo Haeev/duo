@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "eglise-clocher",
   "name": "La chambre des cloches",
+  "style": "eglise",
   "width": 5,
   "height": 5,
   "at": {

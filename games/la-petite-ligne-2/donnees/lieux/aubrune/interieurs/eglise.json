@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "eglise",
   "name": "L'église Saint-Aubin",
+  "style": "eglise",
   "width": 20,
   "height": 11,
   "at": {

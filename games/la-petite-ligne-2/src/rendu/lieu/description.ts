@@ -12,6 +12,7 @@ import { DOORS, doorSills, type Sill } from '../../donnees/seuils';
 import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { DECOR_MANIFEST } from './decors-manifeste';
+import { roomStyle } from './reglages-pieces';
 import { TILE_SETTINGS } from './reglages-tuiles';
 
 /**
@@ -39,6 +40,11 @@ export interface SceneVolume {
   readonly shape: StandInShape;
   /** Couleur imposée de la forme simple; absente: teinte tirée de l'identifiant du modèle. */
   readonly color?: string;
+  /**
+   * Porte d'une pièce: hauteur où elle se coupe avec son mur quand il est devant la caméra (la
+   * coupe du style de la pièce). Absente: la porte reste entière.
+   */
+  readonly cutHeight?: number;
   /** Peut cacher un personnage: il s'efface quand il est entre la caméra et le joueur. */
   readonly occludes: boolean;
   /** Peut être la cible de la touche d'action (son identifiant est celui de `PlayerState.aim`). */
@@ -93,6 +99,8 @@ export function doorVolumes(
   sill: Sill,
   indoor: boolean,
   look: DoorLook = TILE_SETTINGS.interior,
+  /** Hauteur de coupe des murs de la pièce (son style); absente: porte jamais coupée. */
+  cutHeight?: number,
 ): SceneVolume[] {
   const rotation = sill.ny > 0.5 ? 0 : sill.nx > 0.5 ? 1 : sill.ny < -0.5 ? 2 : 3;
   const plain = { model: null, rotation, base: 0 } as const;
@@ -137,6 +145,7 @@ export function doorVolumes(
       h: look.door.depth,
       height: look.door.height,
       shape: 'door',
+      ...(cutHeight === undefined ? {} : { cutHeight }),
       occludes: true,
       aimable: true,
     },
@@ -164,8 +173,8 @@ export function describePlace(
     const sill = sills[id];
     if (door.object !== undefined && sill !== undefined) doorOf.set(door.object, sill);
   }
-  const inRoom = (x: number, y: number): boolean =>
-    place.interiors.some(
+  const roomAt = (x: number, y: number): (typeof place.interiors)[number] | undefined =>
+    place.interiors.find(
       (r) => x >= r.at.x && y >= r.at.y && x < r.at.x + r.width && y < r.at.y + r.height,
     );
   (slabs ? place.map.blocked : []).forEach((rect, index) => {
@@ -190,8 +199,9 @@ export function describePlace(
     if (prop === undefined) continue;
     const sill = doorOf.get(object.id);
     if (sill !== undefined && DECOR_MANIFEST.models[prop.model] === undefined) {
-      const indoor = inRoom(sill.x + sill.nx * 0.3, sill.y + sill.ny * 0.3);
-      volumes.push(...doorVolumes(object.id, sill, indoor));
+      const room = roomAt(sill.x + sill.nx * 0.3, sill.y + sill.ny * 0.3);
+      const cut = room === undefined ? undefined : roomStyle(room.style).cut;
+      volumes.push(...doorVolumes(object.id, sill, room !== undefined, undefined, cut));
       continue;
     }
     volumes.push({
