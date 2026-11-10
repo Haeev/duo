@@ -9,7 +9,7 @@ import type { Intent } from '../simulation/noyau/entrees';
 import { el, icon, setText, show, toggle } from './dom';
 import { paginate, Typewriter } from './modeles';
 import { portraitMarkup } from './portrait';
-import { TEXTS } from './textes';
+import { blockedText, TEXTS } from './textes';
 
 export interface BabbleInfo {
   readonly villager: string;
@@ -24,7 +24,14 @@ export interface DialogueWindow {
   /** Touche lue par la fenêtre (vrai: consommée). */
   key(code: string, now: number): boolean;
   choose(index: number): void;
+  /** L'hôte a refusé le choix (le nœud reste): on peut choisir de nouveau. */
+  unlock(): void;
   dispose(): void;
+}
+
+/** Ce qui, dans les options, change l'affichage sans changer de nœud. */
+function optionsKey(view: TalkView): string {
+  return view.options.map((o) => `${o.id}:${o.blocked ?? ''}:${o.fails ?? ''}`).join('|');
 }
 
 export function createDialogue(
@@ -35,6 +42,8 @@ export function createDialogue(
   reduced: () => boolean,
   onBabble: (info: BabbleInfo) => void,
   openGuardMs: number,
+  /** Nom de l'autre joueur, pour les raisons « chez l'autre » d'une option impossible. */
+  otherName: () => string = () => '',
 ): DialogueWindow {
   const bust = el('div', { class: 'dlg__bust' });
   const provisional = el('span', {
@@ -72,22 +81,49 @@ export function createDialogue(
     setText(text, writer.visible);
   }
 
+  /** Option impossible choisie: sa raison ressort un instant (rien n'est envoyé, l'échange échouerait). */
+  let triedUntil = 0;
+  let triedId = '';
+  let clock = 0;
+
   function drawChoices(): void {
     choices.replaceChildren();
     const options = current?.options ?? [];
     options.forEach((option, i) => {
+      const blocked = option.blocked;
+      const why = blocked === null ? null : blockedText(blocked, otherName());
+      const classes = [
+        'choice',
+        i === focus ? 'focus' : '',
+        // Une option impossible prend l'habillage des options qui échoueront (tirets, texte atténué).
+        option.fails !== null || blocked !== null ? 'choice--fails' : '',
+        blocked !== null ? 'choice--blocked' : '',
+        blocked !== null && option.id === triedId && clock < triedUntil ? 'choice--tried' : '',
+      ];
       const button = el(
         'button',
         {
-          class: `choice${i === focus ? ' focus' : ''}${option.fails !== null ? ' choice--fails' : ''}`,
+          class: classes.filter(Boolean).join(' '),
           role: 'option',
           'aria-selected': i === focus ? 'true' : 'false',
+          'aria-disabled': blocked === null ? null : 'true',
+          'aria-label':
+            why === null ? null : `${option.text}. ${TEXTS.dialogue.blockedLabel}\u00a0: ${why}`,
           title: option.fails !== null ? TEXTS.dialogue.fails : null,
           tabindex: '-1',
         },
         [
           option.fails !== null ? el('span', { class: 'barre' }, [icon('goutte')]) : null,
-          option.text,
+          blocked !== null ? el('span', { class: 'barre' }, [icon('refus')]) : null,
+          why === null
+            ? option.text
+            : el('span', { class: 'choice__body' }, [
+                el('span', { class: 'choice__text', text: option.text }),
+                el('span', {
+                  class: 'choice__why',
+                  text: why,
+                }),
+              ]),
         ],
       );
       button.addEventListener('click', () => {
@@ -111,8 +147,14 @@ export function createDialogue(
         }
         return;
       }
-      if (current !== null && current.node === view.node && current.villager === view.villager)
+      if (current !== null && current.node === view.node && current.villager === view.villager) {
+        // Même nœud: seules les raisons d'impossibilité ont pu changer (argent, poches).
+        if (optionsKey(view) !== optionsKey(current)) {
+          current = view;
+          drawChoices();
+        }
         return;
+      }
       const opening = current === null;
       current = view;
       pending = false;
@@ -137,7 +179,12 @@ export function createDialogue(
       drawChoices();
     },
     frame(dtMs) {
+      clock += dtMs;
       if (current === null) return;
+      if (triedId !== '' && clock >= triedUntil) {
+        triedId = '';
+        drawChoices();
+      }
       if (writer.advance(dtMs)) setText(text, writer.visible);
       const typing = !writer.done;
       toggle(bust, 'parle', typing);
@@ -182,8 +229,18 @@ export function createDialogue(
     choose(index) {
       const option = current?.options[index];
       if (option === undefined || pending || !writer.done) return;
+      if (option.blocked !== null) {
+        // L'échange échouerait: on n'envoie rien, la raison déjà écrite ressort un instant.
+        triedId = option.id;
+        triedUntil = clock + 1400;
+        drawChoices();
+        return;
+      }
       pending = true;
       send({ type: 'talk_choose', option: option.id });
+    },
+    unlock() {
+      pending = false;
     },
     dispose() {
       layer.remove();

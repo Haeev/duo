@@ -17,6 +17,12 @@ export const CARNET_TEXTS = {
     page: 'Page {n} sur {max}',
     chapter: 'Chapitre {n} sur {max}, {etat}',
     chapterState: { done: 'fait', current: 'en cours', todo: 'à venir' },
+    /** Une histoire en plusieurs actes (`saga`), réunis en une carte. */
+    act: 'Acte {n} sur {max}, {etat}',
+    actNumber: 'Acte {n}',
+    actDone: 'Fait',
+    sagaLabel: 'Histoire : {titre}',
+    sagaAct: '{titre}, acte {n}',
     pick: 'Choisis une histoire',
     pickKeys: 'choisir',
     followKeys: 'suivre',

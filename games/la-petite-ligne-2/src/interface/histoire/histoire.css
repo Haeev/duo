@@ -1,0 +1,421 @@
+/*
+ * L'histoire à l'écran: fin de chapitre et consignes des scènes à deux. Jetons de `interface.css`;
+ * l'écran de fin garde ses propres couleurs (fond de nuit, texte clair) pour rester lisible quel que
+ * soit le thème. Seuls transform et opacity s'animent. Tout en rem (la taille d'interface compte).
+ */
+
+/* ---------- Fin de chapitre ---------- */
+.lpl-ui .fin {
+  --fin-bg: #26324d;
+  --fin-fg: #fbf6e9;
+  --fin-muted: #cfd7e6;
+  --fin-accent: #e8c77a;
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(1rem, 5vh, 3.5rem) 1.5rem clamp(0.75rem, 3vh, 2rem);
+  background: var(--fin-bg);
+  color: var(--fin-fg);
+  pointer-events: auto;
+  animation: fin-fondu var(--d-scene) var(--ease) both;
+}
+@keyframes fin-fondu {
+  from {
+    opacity: 0;
+  }
+}
+.lpl-ui .fin__page {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: min(42rem, 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  overflow-y: auto;
+  text-align: center;
+}
+.lpl-ui .fin__eyebrow {
+  margin: 0;
+  color: var(--fin-accent);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.lpl-ui .fin__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vh, 3.5rem);
+  font-weight: 650;
+  line-height: 1.12;
+}
+.lpl-ui .fin__rule {
+  width: 4.5rem;
+  height: 0.1875rem;
+  margin: 0.25rem 0 0.5rem;
+  border-radius: 0.125rem;
+  background: var(--fin-accent);
+}
+.lpl-ui .fin__text {
+  display: grid;
+  gap: 0.75rem;
+}
+.lpl-ui .fin__text p {
+  margin: 0;
+  font-size: clamp(1.0625rem, 3vh, 1.375rem);
+  font-weight: 600;
+  line-height: 1.55;
+  animation: fin-lit calc(var(--d-scene) + 200ms) var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 260ms + 200ms);
+}
+@keyframes fin-lit {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+.lpl-ui .fin__foot {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  width: min(42rem, 100%);
+}
+.lpl-ui .fin__who {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.375rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--fin-muted);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.lpl-ui .fin__who-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.lpl-ui .fin__who-item--done {
+  color: var(--fin-fg);
+}
+.lpl-ui .fin__who-item--done span::before {
+  content: '✓ ';
+}
+.lpl-ui .fin__who .token {
+  border-color: var(--fin-fg);
+}
+.lpl-ui .btn.fin__go {
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  font-size: 1.125rem;
+  background: var(--fin-accent);
+  color: #2a2522;
+  border-color: var(--fin-fg);
+}
+.lpl-ui .btn.fin__go.focus {
+  outline: 0.1875rem solid var(--fin-fg);
+  outline-offset: 0.25rem;
+  box-shadow: none;
+}
+.lpl-ui .fin__wait {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 0.125rem;
+  min-height: 3rem;
+  margin: 0;
+  align-content: center;
+  color: var(--fin-fg);
+  font-size: 1rem;
+}
+.lpl-ui .fin__wait b {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 650;
+}
+.lpl-ui .fin__wait span {
+  color: var(--fin-muted);
+  font-weight: 600;
+}
+
+/* ---------- Consignes des scènes à deux ---------- */
+.lpl-ui .scene-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 38;
+}
+.lpl-ui .scene-card {
+  position: absolute;
+  left: 50%;
+  bottom: 6rem;
+  width: min(34rem, calc(100% - 2rem));
+  transform: translateX(-50%);
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 0.875rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.1875rem solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-3);
+  animation: scene-monte var(--d-base) var(--ease-bounce) both;
+}
+@keyframes scene-monte {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 1rem);
+  }
+}
+.lpl-ui .scene-card__role {
+  justify-self: start;
+  margin: 0;
+  padding: 0.0625rem 0.625rem;
+  background: var(--wood-deep);
+  color: var(--on-wood);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+.lpl-ui .scene-card__hint {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.lpl-ui .scene-rows {
+  display: grid;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lpl-ui .scene-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'who what state'
+    'gauge gauge gauge';
+  align-items: center;
+  gap: 0.25rem 0.625rem;
+}
+.lpl-ui .scene-row > .gauge {
+  grid-area: gauge;
+}
+.lpl-ui .scene-row__who {
+  grid-area: who;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+}
+.lpl-ui .scene-row__who b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 800;
+}
+.lpl-ui .scene-row__what {
+  grid-area: what;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  min-width: 0;
+  font-weight: 700;
+}
+.lpl-ui .scene-row--other .scene-row__what {
+  color: var(--ink-muted);
+}
+.lpl-ui .scene-row__state {
+  grid-area: state;
+  justify-self: end;
+  padding: 0 0.5rem;
+  border: 0.125rem dashed var(--ink);
+  border-radius: 62rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.lpl-ui .scene-row[data-state='active'] .scene-row__state {
+  border-style: solid;
+  background: var(--paper-sunken);
+}
+.lpl-ui .scene-row[data-state='done'] .scene-row__state {
+  border-style: solid;
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+.lpl-ui .scene-row[data-state='done'] .scene-row__state::before {
+  content: '✓ ';
+}
+.lpl-ui .scene-row .key--down {
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+.lpl-ui .scene-row .pastille {
+  height: 1.25rem;
+  font-size: 0.75rem;
+}
+.lpl-ui .gauge {
+  display: block;
+  height: 0.875rem;
+  overflow: hidden;
+  background: var(--paper-shade);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+}
+.lpl-ui .gauge i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 90ms linear;
+}
+/* L'autre joueur: hachures plutôt qu'aplat, pour le distinguer sans compter sur la couleur. */
+.lpl-ui .scene-row--other .gauge i {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--focus) 0 0.3125rem,
+    var(--paper-raised) 0.3125rem 0.5rem
+  );
+}
+.lpl-ui .scene-together {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-top: 0.25rem;
+  border-top: 0.125rem dashed var(--line);
+  font-weight: 800;
+}
+.lpl-ui .scene-together__pair {
+  display: inline-flex;
+  align-items: center;
+}
+.lpl-ui .scene-together .token {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+.lpl-ui .scene-together__link {
+  width: 1.5rem;
+  height: 0.1875rem;
+  background: var(--ink);
+}
+.lpl-ui .scene-card[data-state='ensemble'] {
+  background: var(--brass);
+  animation: scene-ensemble var(--d-slow) var(--ease-bounce) both;
+}
+@keyframes scene-ensemble {
+  from {
+    transform: translateX(-50%) scale(0.97);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.lpl-ui .scene-card[data-state='ensemble'] .scene-together {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.lpl-ui .scene-card[data-state='ensemble'] .scene-together__link {
+  height: 0.375rem;
+}
+.lpl-ui .scene-card[data-state='ensemble'] .gauge i {
+  background: var(--ink);
+}
+.lpl-ui .scene-card[data-state='ensemble'] .scene-row__what,
+.lpl-ui .scene-card[data-state='ensemble'] .scene-row--other .scene-row__what {
+  color: var(--ink);
+}
+.lpl-ui .scene-card__msg {
+  margin: 0;
+  padding: 0.125rem 0.625rem;
+  justify-self: start;
+  background: var(--paper-sunken);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  font-weight: 800;
+}
+.lpl-ui .scene-pin {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+}
+.lpl-ui .scene-pin__ring {
+  display: block;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 0.25rem dashed var(--paper-raised);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.1875rem var(--ink),
+    inset 0 0 0 0.1875rem var(--ink);
+  animation: scene-pin 1.2s ease-in-out infinite alternate;
+}
+@keyframes scene-pin {
+  to {
+    transform: scale(1.12);
+  }
+}
+.lpl-ui .scene-pin__label {
+  padding: 0 0.5rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 0.125rem solid var(--ink);
+  border-radius: 62rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ---------- Options de dialogue impossibles ---------- */
+.lpl-ui .choice--blocked {
+  align-items: flex-start;
+  color: var(--ink-muted);
+}
+.lpl-ui .choice--blocked.focus {
+  color: var(--paper-raised);
+}
+.lpl-ui .choice__body {
+  display: grid;
+  gap: 0.0625rem;
+  text-align: left;
+}
+.lpl-ui .choice__why {
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+.lpl-ui .choice--blocked .barre {
+  margin-top: 0.125rem;
+}
+
+/* Option choisie dont la raison saute aux yeux: le mot reprend les couleurs inversées un instant. */
+.lpl-ui .choice--tried .choice__why {
+  padding: 0 0.375rem;
+  background: var(--stamp);
+  color: var(--paper-raised);
+  border-radius: 0.25rem;
+}
+/* Sur l'option choisie (fond d'encre), l'icône d'interdit reprend le laiton: le rouge n'y passe pas le contraste. */
+.lpl-ui .choice.focus .barre {
+  color: var(--brass);
+}
+.lpl-ui .choice.focus .barre::after {
+  background: var(--brass);
+}

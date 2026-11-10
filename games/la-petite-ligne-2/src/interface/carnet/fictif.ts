@@ -57,16 +57,24 @@ export function fakeQuests(): readonly QuestLineRead[] {
     together,
     target: current >= total ? null : { x: 130 + id.length * 3, y: 112 },
   });
+  const saga = (act: number): Pick<QuestLineRead, 'saga'> => ({
+    saga: { id: 'aubrune', title: 'Aubrune', act },
+  });
   return [
-    line(
-      'histoire',
-      'main',
-      'Logement fourni',
-      null,
-      5,
-      2,
-      'Va voir le mécanicien à la halte, il t’attend.',
-    ),
+    {
+      ...line(
+        'histoire',
+        'main',
+        'Logement fourni',
+        null,
+        5,
+        2,
+        'Va voir le mécanicien à la halte, il t’attend.',
+      ),
+      ...saga(2),
+    },
+    // Premier acte de la même histoire, fini: le carnet réunit les deux en une carte.
+    { ...line('histoire-1', 'main', 'Le premier train', null, 3, 3, ''), ...saga(1) },
     line(
       'couture',
       'side',

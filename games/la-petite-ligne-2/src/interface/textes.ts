@@ -2,6 +2,7 @@
  * Tous les textes de l'interface, en français, qui tutoient. La logique n'en écrit aucun: elle
  * lit ce fichier. `{nom}`, `{lieu}`, `{n}`, `{max}`, `{montant}`: valeurs remplies à l'affichage.
  */
+import type { ExchangeRefusal } from '../simulation/dialogues/echanges';
 export const TEXTS = {
   clock: {
     day: 'Jour {n}',
@@ -166,6 +167,17 @@ export const TEXTS = {
     provisional: 'Portrait provisoire',
     choices: 'Ta réponse',
     fails: 'Échouera : lave-toi d’abord',
+    /** Option impossible pour l'instant: sa raison, écrite en clair (`{nom}`: l'autre joueur). */
+    blocked: {
+      'pockets-full': 'Poches pleines : fais de la place',
+      'not-enough-money': 'Pas assez d’argent pour l’instant',
+      'missing-item': 'Il te manque un objet',
+      'other-pockets-full': 'Les poches de {nom} sont pleines',
+      'other-not-enough-money': '{nom} n’a pas assez d’argent',
+      'other-missing-item': 'Il manque un objet à {nom}',
+    } as Readonly<Record<ExchangeRefusal, string>>,
+    blockedDefault: 'Impossible pour l’instant',
+    blockedLabel: 'Impossible',
     next: 'suite',
     close: 'fermer',
     speakerPlayer: 'Toi',
@@ -227,4 +239,9 @@ export function fill(text: string, values: Readonly<Record<string, string | numb
 
 export function refusalText(key: string): string {
   return TEXTS.refusals[key] ?? TEXTS.refusalDefault;
+}
+
+/** Raison écrite d'une option de dialogue impossible (`nom`: l'autre joueur, pour les raisons `other-`). */
+export function blockedText(reason: ExchangeRefusal, otherName: string): string {
+  return fill(TEXTS.dialogue.blocked[reason], { nom: otherName });
 }

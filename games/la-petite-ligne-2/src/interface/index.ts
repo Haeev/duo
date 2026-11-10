@@ -24,6 +24,8 @@ import { createCharacterEditor, type EditorPreviewFactory } from './editeur/edit
 import { EDITOR_SETTINGS } from './editeur/reglages';
 import { defaultPlayerLook } from '../rendu/personnages/apparence';
 import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
+import { createChapterEnd } from './histoire/fin-chapitre';
+import { createSceneOverlay } from './histoire/scene';
 import { createHud, type ProjectToScreen } from './hud';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
@@ -148,6 +150,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     reduced,
     options.onBabble ?? (() => undefined),
     UI_TUNING.openGuardMs,
+    () => {
+      const me = view.localIndex();
+      return me === null ? '' : nameOf(me === 0 ? 1 : 0);
+    },
   );
   const notebook = createNotebook(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, {
     // Suite suivie: l'état partagé fait foi, « Suivre » part en intention (le coup d'œil la lit).
@@ -247,14 +253,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   function onEvent(event: GameEvent): void {
     kitchen.onEvent(event);
     coop.onEvent(event);
+    chapterEnd.onEvent(event, now);
     const me = local();
     if (me === null) return;
+    sceneOverlay.onEvent(event, me, now);
     const other: PlayerIndex = me === 0 ? 1 : 0;
     shop.onEvent(event, me, now);
     workshop.onEvent(event, me, now);
     const shownInNotebook = notebook.onEvent(event, me);
     switch (event.type) {
       case 'refused':
+        if (event.player === me) dialogue.unlock();
         if (event.player === me && !shop.isOpen() && !workshop.isOpen() && !shownInNotebook)
           hud.refusal(now, refusalLine(event.reason, event.target));
         break;
@@ -411,6 +420,27 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     },
   });
   const coop = createCoopScreen(layer, view, send, keyLabel, keyTarget, UI_TUNING.openGuardMs);
+  // Fin de chapitre (écran plein) et consignes des scènes à deux (gestes, jauges).
+  const chapterEnd = createChapterEnd(layer, view.content, send, keyLabel, () => {
+    options.onCue?.('choix');
+  });
+  const sceneOverlay = createSceneOverlay({
+    root: layer,
+    content: view.content,
+    keyLabel,
+    keyTarget,
+    busy: () =>
+      editor.isOpen() ||
+      deco.isOpen() ||
+      dialogue.isOpen() ||
+      shop.isOpen() ||
+      workshop.isOpen() ||
+      notebook.isOpen() ||
+      kitchen.isOpen() ||
+      coop.isOpen() ||
+      chapterEnd.isOpen(),
+    ...(options.projectToScreen === undefined ? {} : { projectToScreen: options.projectToScreen }),
+  });
   const fishing = createFishingOverlay({
     ...{
       layer,
@@ -430,7 +460,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   });
 
   const onKey = (raw: Event): void => {
-    if (!(raw instanceof KeyboardEvent) || kitchen.isOpen() || coop.isOpen()) return;
+    if (!(raw instanceof KeyboardEvent)) return;
+    // La fin de chapitre passe devant tout: une touche pour continuer, le reste est avalé.
+    if (chapterEnd.isOpen()) {
+      if (!raw.repeat && chapterEnd.key(raw.code, now)) raw.preventDefault();
+      return;
+    }
+    if (kitchen.isOpen() || coop.isOpen()) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (editor.isOpen()) used = editor.key(raw);
@@ -493,14 +529,18 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       kitchen.frame(dtMs);
       deco.frame();
       coop.frame(dtMs);
+      chapterEnd.frame(world, me, now);
+      sceneOverlay.frame(world, me, now);
       const shopOpen = shop.isOpen() || workshop.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
-      const prompt = menu
-        ? null
-        : promptModel(view.content, world, me, view.aim(me), {
-            act: keyLabel('Space'),
-            board: keyLabel('Space'),
-          });
+      // Pendant un geste de scène, la touche d'action sert à la scène: pas de bulle d'action.
+      const prompt =
+        menu || sceneOverlay.active()
+          ? null
+          : promptModel(view.content, world, me, view.aim(me), {
+              act: keyLabel('Space'),
+              board: keyLabel('Space'),
+            });
       hud.frame({
         now,
         world,
@@ -523,7 +563,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         kitchen.isOpen() ||
         deco.isOpen() ||
         fishing.capturing() ||
-        coop.isOpen()
+        coop.isOpen() ||
+        chapterEnd.isOpen()
       );
     },
     dispose() {
@@ -540,6 +581,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       kitchen.dispose();
       deco.dispose();
       coop.dispose();
+      chapterEnd.dispose();
+      sceneOverlay.dispose();
       layer.remove();
     },
   };

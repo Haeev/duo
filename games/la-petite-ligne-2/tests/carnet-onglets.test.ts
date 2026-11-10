@@ -50,7 +50,8 @@ describe('carnet: quêtes', () => {
 
   it('la principale d’abord, puis les suites en cours, puis les finies', () => {
     const ids = orderQuests(lines).map((l) => l.id);
-    expect(ids[0]).toBe('histoire');
+    // Les actes d'une même histoire se suivent, du premier au dernier.
+    expect(ids.slice(0, 2)).toEqual(['histoire-1', 'histoire']);
     expect(ids.at(-1)).toBe('vieux');
   });
 
@@ -94,8 +95,9 @@ describe('carnet: quêtes', () => {
   });
 
   it('haut et bas bornent la sélection', () => {
-    expect(moveQuest(lines, 'histoire', -1)).toBe('histoire');
-    expect(moveQuest(lines, 'histoire', 1)).toBe(orderQuests(lines)[1]?.id);
+    expect(moveQuest(lines, 'histoire-1', -1)).toBe('histoire-1');
+    expect(moveQuest(lines, 'histoire-1', 1)).toBe('histoire');
+    expect(moveQuest(lines, 'histoire', 1)).toBe(orderQuests(lines)[2]?.id);
   });
 });
 

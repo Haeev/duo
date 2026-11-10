@@ -129,3 +129,15 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - Pied du carnet (quêtes): il reste 11 px de marge à 1366x768 avant le passage à la ligne; mesurer avant d'élargir une touche ou un écart.
 - La démo qui joue des touches après l'ouverture d'un écran: 500 ms entre C et E au carnet, 900 ms avant la première touche à la boutique (sinon l'état capturé n'est pas le bon).
 
+
+## Histoire à l'écran de La Petite Ligne (fin de chapitre, gestes, options impossibles, sagas)
+
+- Avant ce lot, rien n'affichait `sceneView`: les répliques (`say`) des scènes n'ont toujours pas d'écran, `histoire/scene.ts` ne montre que les attentes (`await`). Chercher `sceneView` hors de `simulation/` avant de supposer qu'un écran existe.
+- L'état de l'autre joueur se lit avec le même modèle pur appelé pour l'autre index (`sceneView(world, content, other)`). Le point et la durée d'un geste ne sont pas dans `sceneView`: relus dans la définition de la scène (`content.places[run.place].scenes[run.id].beats[run.beat]`, parties filtrées par rôle comme `sceneView`).
+- Réponse « sous 0,1 s » chez l'invité: écho local de la touche (keydown et keyup sur `keyTarget`, `performance.now`) qui avance la jauge sans dépasser 98 % et n'affiche jamais « fait » avant l'hôte; la mise à jour du DOM se fait dans l'événement, pas à l'image suivante.
+- Le Write convertit les échappements Unicode écrits dans le texte en vrais caractères: un U+00A0 dans un gabarit de chaîne ou un commentaire fait échouer ESLint (`no-irregular-whitespace`), et un U+2013 écrit dans un test devient un tiret interdit. Construire ces caractères par `String.fromCharCode`, puis relancer le contrôle des tirets.
+- Un nœud de dialogue qui refuse un choix (`refused`) ne change pas de nœud: `dialogue.sync` ne réarmait pas `pending` (fenêtre bloquée). Brancher `refused` sur `dialogue.unlock()` et comparer aussi les options (`blocked`, `fails`) pour redessiner sans changer de nœud.
+- Écran plein sur un thème qui change: garder ses propres couleurs (`--fin-bg`, `--fin-fg`) plutôt que `--paper` et `--ink`, que le thème sombre peut inverser. `.btn--primary` (interface.css, chargé après) bat `.fin__go` de même poids: doubler la classe.
+- `worldSources.quests` passe par `journal` (accords, étapes parallèles): l'étape est la jointure de toutes les étapes ouvertes par « ; », donc longue; la carte d'acte la tronque à 3 lignes (`-webkit-line-clamp`), le détail à droite la montre en entier.
+- `pnpm verifier-carnet` lancé pendant d'autres commandes lourdes donne de faux échecs (8 au lieu de 0): le relancer seul, en arrière-plan (plus de 2 min).
+- Le Vite d'un autre arbre occupe 5391: `--port 5477 --strictPort`. Captures encrées: poser `data-lpl-style="encre"` sur `#ui` après le chargement.
