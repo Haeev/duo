@@ -25,12 +25,9 @@ function parse(file: string): Promise<GLTF> {
 
 const PROPS_WITHOUT_MODEL = [
   'baquet-essai',
-  'branches',
   'buffet-essai',
   'cadre-essai',
-  'caillou',
   'chaise-essai',
-  'chene',
   'coffre-deco-essai',
   'comptoir-buvette',
   'enclume',
@@ -40,22 +37,17 @@ const PROPS_WITHOUT_MODEL = [
   'etal-de-soupe',
   'etal-de-tourte',
   'four',
-  'fruitier',
-  'gros-chene',
   'lampe-essai',
   'lit-double-essai',
   'meule',
   'miroir',
   'plan-de-travail',
-  'point-de-fouille',
   'pot-de-fleurs-essai',
   'poulailler',
   'poulailler-d-essai',
   'rechaud',
-  'ronces',
   'table-essai',
   'tapis-essai',
-  'terre-cultivable',
 ];
 
 let models: DecorModels;
@@ -68,6 +60,9 @@ describe('décors livrés', () => {
   it('charge chaque modèle du manifeste', () => {
     expect(models.size).toBe(Object.keys(DECOR_MANIFEST.models).length);
     expect(decorFiles()).toEqual([
+      'aubrune-arbres.glb',
+      'aubrune-potager.glb',
+      'aubrune-recoltes.glb',
       'furniture.glb',
       'houses.glb',
       'plants.glb',

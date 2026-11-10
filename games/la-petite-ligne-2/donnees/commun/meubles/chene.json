@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "chene",
   "name": "Chêne",
-  "model": "arbre",
+  "model": "oak-tree",
   "size": {
     "w": 1,
     "h": 1

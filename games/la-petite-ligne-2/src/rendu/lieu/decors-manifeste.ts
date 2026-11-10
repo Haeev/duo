@@ -5,6 +5,7 @@
  */
 import * as v from 'valibot';
 import manifestJson from '../../../assets/commun/decors/decors.json';
+import { LAYER, type LayerName } from '../encre/couches';
 
 const Size = v.object({ w: v.number(), d: v.number(), h: v.number() });
 
@@ -29,11 +30,33 @@ const DecorModelSchema = v.object({
       }),
     ),
   ),
+  /** Autres formes du même modèle: chaque exemplaire posé tire la sienne (`variantOf`). */
+  variants: v.optional(v.array(v.string())),
+  /** Modèle à montrer selon l'état: `stump`, `bare`, `winter`, `chipped`, `tilled`, `watered`. */
+  states: v.optional(v.record(v.string(), v.string())),
+  /** Écarts de pose tirés par exemplaire: cap libre, échelle entre deux bornes. */
+  jitter: v.optional(v.object({ yaw: v.boolean(), scale: v.tuple([v.number(), v.number()]) })),
 });
+
+/** Ce que le rendu encré tire du NOM d'un matériau: couche de traits, prise au vent. */
+const DecorMaterialSchema = v.object({
+  layer: v.picklist(Object.keys(LAYER) as LayerName[]),
+  kind: v.optional(v.picklist(['leaf', 'stem'])),
+});
+export type DecorMaterial = v.InferOutput<typeof DecorMaterialSchema>;
 
 export const DecorManifestSchema = v.object({
   format: v.literal('duo-decors/1'),
   models: v.record(v.string(), DecorModelSchema),
+  /** Matériaux aux noms stables (récoltables); un modèle sans ces noms est converti par sa teinte. */
+  materials: v.optional(v.record(v.string(), DecorMaterialSchema)),
+  /** Par modèle de culture (`model` d'une fiche de culture): un modèle par stade, le dernier mûr, et les mêmes à arroser. */
+  crops: v.optional(
+    v.record(
+      v.string(),
+      v.object({ crop: v.string(), stages: v.array(v.string()), thirsty: v.array(v.string()) }),
+    ),
+  ),
 });
 export type DecorManifest = v.InferOutput<typeof DecorManifestSchema>;
 
@@ -54,4 +77,55 @@ export function decorSeats(
 /** Fichiers GLB à charger pour avoir tous les modèles du manifeste. */
 export function decorFiles(manifest: DecorManifest = DECOR_MANIFEST): string[] {
   return [...new Set(Object.values(manifest.models).map((model) => model.file))].sort();
+}
+
+/** Tirage stable de 0 à 1 d'après une clé (l'identifiant d'un exemplaire posé). */
+export function keyDraw(key: string, salt: number): number {
+  let h = 2166136261 ^ salt;
+  for (let i = 0; i < key.length; i++) h = Math.imul(h ^ key.charCodeAt(i), 16777619);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0x5bd1e995);
+  return ((h ^ (h >>> 15)) >>> 0) / 4294967296;
+}
+
+/** La forme que prend cet exemplaire: le modèle lui-même ou l'une de ses variantes livrées. */
+export function variantOf(
+  model: string,
+  key: string,
+  manifest: DecorManifest = DECOR_MANIFEST,
+): string {
+  const all = [model, ...(manifest.models[model]?.variants ?? [])].filter(
+    (id) => manifest.models[id] !== undefined,
+  );
+  return all[Math.floor(keyDraw(key, 1) * all.length)] ?? model;
+}
+
+/**
+ * Le modèle d'un état (`stump`, `bare`, `winter`, `tilled`...), `null` si le modèle n'en a pas:
+ * une ressource récoltée dont il ne reste rien, ou un état sans apparence propre.
+ */
+export function stateModel(
+  model: string,
+  state: string,
+  manifest: DecorManifest = DECOR_MANIFEST,
+): string | null {
+  const id = manifest.models[model]?.states?.[state];
+  return id !== undefined && manifest.models[id] !== undefined ? id : null;
+}
+
+/**
+ * Le modèle d'une case de culture: `model` est celui de la fiche de la culture, `stage` son stade
+ * (`stages.length`: mûre), `thirsty` si elle attend l'arrosoir. `null`: culture sans modèle.
+ */
+export function cropModel(
+  model: string,
+  stage: number,
+  thirsty: boolean,
+  manifest: DecorManifest = DECOR_MANIFEST,
+): string | null {
+  const crop = manifest.crops?.[model];
+  if (crop === undefined) return null;
+  const last = crop.stages.length - 1;
+  const at = Math.min(Math.max(0, Math.floor(stage)), last);
+  return (thirsty ? crop.thirsty[at] : undefined) ?? crop.stages[at] ?? null;
 }

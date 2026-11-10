@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "branches",
   "name": "Branches mortes",
-  "model": "branches",
+  "model": "dead-branches",
   "size": {
     "w": 1,
     "h": 1

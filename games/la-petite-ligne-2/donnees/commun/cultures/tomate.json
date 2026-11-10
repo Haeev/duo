@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "tomate",
   "name": "Tomate",
+  "model": "crop-tomate",
   "seed": "graines-tomate",
   "seasons": ["spring", "summer"],
   "stages": [2, 3, 3],

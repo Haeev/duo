@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "bouleau",
+  "name": "Bouleau",
+  "model": "birch-tree",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "chene"
+    }
+  ]
+}

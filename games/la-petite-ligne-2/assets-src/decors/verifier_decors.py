@@ -30,9 +30,11 @@ def main():
     erreurs = []
     with open(os.path.join(dossier, "decors.json"), encoding="utf-8") as f:
         manifeste = json.load(f)
+    # Les modèles d'une autre chaîne (`source`) ont leur propre contrôle (recoltables-aubrune/verifier.py).
+    autres = {m["file"] for m in manifeste["models"].values() if "source" in m}
     glbs = {}
     for nom in sorted(os.listdir(dossier)):
-        if nom.endswith(".glb"):
+        if nom.endswith(".glb") and nom not in autres:
             glbs[nom] = lire_glb(os.path.join(dossier, nom))
             g = glbs[nom]
             if len(g.get("materials", [])) != 1:
@@ -43,6 +45,8 @@ def main():
                         erreurs.append(f"{nom}/{me['name']}: pas de couleurs de sommets")
     total = 0
     for ident, m in sorted(manifeste["models"].items()):
+        if "source" in m:
+            continue
         g = glbs.get(m["file"])
         if g is None:
             erreurs.append(f"{ident}: fichier {m['file']} absent")

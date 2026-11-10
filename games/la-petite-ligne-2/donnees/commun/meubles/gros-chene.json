@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "gros-chene",
   "name": "Gros chêne",
-  "model": "gros-arbre",
+  "model": "great-oak-tree",
   "size": {
     "w": 2,
     "h": 2

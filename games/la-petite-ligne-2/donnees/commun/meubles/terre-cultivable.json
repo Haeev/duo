@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "terre-cultivable",
   "name": "Terre cultivable",
-  "model": "terre",
+  "model": "garden-bed",
   "size": {
     "w": 6,
     "h": 4

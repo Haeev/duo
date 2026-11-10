@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "caillou",
   "name": "Caillou",
-  "model": "caillou",
+  "model": "stone",
   "size": {
     "w": 1,
     "h": 1

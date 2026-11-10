@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "fruitier",
   "name": "Arbre fruitier",
-  "model": "arbre-fruitier",
+  "model": "apple-tree",
   "size": {
     "w": 1,
     "h": 1

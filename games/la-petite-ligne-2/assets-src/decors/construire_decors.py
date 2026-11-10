@@ -160,7 +160,20 @@ def main():
         print(f"DECOR {entree['id']:<24} {fiche['triangles']:>6} tri  {fiche['size']}")
     for nom, racines in par_fichier.items():
         exporter(os.path.join(sortie, f"{nom}.glb"), racines)
-    with open(os.path.join(sortie, "decors.json"), "w", encoding="utf-8") as f:
+    # Les entrées des autres chaînes (`source`: récoltables d'Aubrune...) et leurs tables restent en place.
+    chemin_manifeste = os.path.join(sortie, "decors.json")
+    if os.path.exists(chemin_manifeste):
+        with open(chemin_manifeste, encoding="utf-8") as f:
+            ancien = json.load(f)
+        for cle, valeur in ancien.items():
+            if cle not in ("format", "models"):
+                manifeste[cle] = valeur
+        for ident, fiche in ancien.get("models", {}).items():
+            if "source" in fiche:
+                if ident in manifeste["models"]:
+                    raise SystemExit(f"identifiant en double avec la chaîne {fiche['source']}: {ident}")
+                manifeste["models"][ident] = fiche
+    with open(chemin_manifeste, "w", encoding="utf-8") as f:
         json.dump(manifeste, f, ensure_ascii=False, indent=1, sort_keys=True)
         f.write("\n")
     blend = os.environ.get("DECORS_BLEND")

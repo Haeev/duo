@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "tas-de-bois",
   "name": "Tas de bois",
-  "model": "log-pile",
+  "model": "woodpile",
   "size": {
     "w": 1,
     "h": 1
