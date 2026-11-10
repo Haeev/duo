@@ -9,6 +9,7 @@ import { NEEDS_EVENTS } from '../besoins/evenements';
 import { BRICK_EVENTS } from '../briques/evenements';
 import { SHOP_EVENTS } from '../commerces/evenements';
 import { DIALOGUE_EVENTS } from '../dialogues/evenements';
+import { TOOL_EVENTS } from '../outils/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
 
@@ -55,5 +56,6 @@ export const GameEventSchema = v.variant('type', [
   ...BAG_EVENTS,
   ...SHOP_EVENTS,
   ...DIALOGUE_EVENTS,
+  ...TOOL_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

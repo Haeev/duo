@@ -319,6 +319,15 @@ describe('au pire', () => {
   });
 });
 
+async function waitForSave<T>(read: () => Promise<T | null>): Promise<T | null> {
+  for (let i = 0; i < 100; i++) {
+    const found = await read();
+    if (found !== null) return found;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  return null;
+}
+
 describe('aller-retour par le faux hôte du SDK', () => {
   it('sauvegarde à l’aube et sur demande, puis hôte et invité retrouvent la partie', async () => {
     const store = createMemoryStore();
@@ -338,8 +347,9 @@ describe('aller-retour par le faux hôte du SDK', () => {
       expect(sim.world.common.day).toBe(2);
       // L'écriture de l'aube part après le pas, pas dedans.
       expect(await store.read(manifest.id, 1)).toBeNull();
-      await new Promise((resolve) => setTimeout(resolve, 20));
-      const dawnSave = await store.read(manifest.id, 1);
+      // Attente bornée plutôt qu'un délai fixe: sous la charge de la suite complète, l'écriture
+      // asynchrone dépasse parfois 20 ms.
+      const dawnSave = await waitForSave(() => store.read(manifest.id, 1));
       expect(dawnSave).not.toBeNull();
       expect(dawnSave?.moment).toBe('auto');
       expect(dawnSave?.label).toMatch(/^Gare d'essai, jour 2, 6 h 0\d/);

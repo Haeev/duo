@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "branches",
+  "name": "Branches mortes",
+  "model": "branches",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "branches"
+    }
+  ]
+}

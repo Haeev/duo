@@ -166,6 +166,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'train_arrived':
       case 'train_departed':
       case 'unstuck':
+      case 'work_hit':
+      case 'harvested':
+      case 'plot_changed':
+      case 'crop_reaped':
+      case 'tool_upgraded':
         break;
     }
   }

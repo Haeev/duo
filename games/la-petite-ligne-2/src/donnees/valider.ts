@@ -13,6 +13,7 @@ import { PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schemas/lieu';
 import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
 import type { QuestLineDef } from './schemas/quete';
+import { validateHarvestContent } from './schemas/recolte';
 import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
@@ -459,5 +460,6 @@ export function validateContent(content: Content): string[] {
   for (const place of Object.values(content.places)) checkPlace(content, place, problems);
   // Accords de genre des répliques (cahier 1.5): balise complète, aucun accord au joueur hors balise.
   problems.push(...validateDialogueTexts(content));
+  problems.push(...validateHarvestContent(content));
   return problems;
 }

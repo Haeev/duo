@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "point-de-fouille",
+  "name": "Sol qui scintille",
+  "model": "scintillement",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "point-de-fouille"
+    }
+  ]
+}

@@ -74,6 +74,8 @@ describe('pas de simulation vide', () => {
       'commerces',
       'besoins',
       'dialogues',
+      'outils',
+      'cultures',
     ]);
   });
 });

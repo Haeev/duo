@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "tomate",
+  "name": "Tomate",
+  "seed": "graines-tomate",
+  "seasons": ["spring", "summer"],
+  "stages": [2, 3, 3],
+  "regrowStage": 2,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "tomate",
+      "count": 2
+    },
+    {
+      "wateredShare": 0.6,
+      "item": "tomate",
+      "count": 3
+    }
+  ]
+}

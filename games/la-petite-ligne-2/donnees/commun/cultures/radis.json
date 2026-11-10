@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "radis",
+  "name": "Radis",
+  "seed": "graines-radis",
+  "seasons": ["spring", "autumn"],
+  "stages": [2, 2],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "radis",
+      "count": 1
+    },
+    {
+      "wateredShare": 0.5,
+      "item": "radis",
+      "count": 2
+    },
+    {
+      "wateredShare": 1,
+      "item": "radis-croquant",
+      "count": 2
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "chene",
+  "name": "Chêne",
+  "kind": "chop",
+  "verb": "Couper",
+  "clip": "chop",
+  "seconds": 1,
+  "tool": "axe",
+  "minTier": 0,
+  "work": 36,
+  "dirty": false,
+  "effort": 0.3,
+  "after": "stump",
+  "respawnDays": 3,
+  "toGround": false,
+  "rolls": 1,
+  "loot": [
+    {
+      "item": "buche",
+      "min": 3,
+      "max": 4,
+      "weight": 1,
+      "rare": false,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    }
+  ]
+}

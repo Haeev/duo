@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "mures",
+  "name": "Mûres",
+  "family": "food",
+  "stack": 10,
+  "food": {
+    "hunger": 4
+  },
+  "tool": null
+}

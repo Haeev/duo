@@ -9,6 +9,26 @@
     "kind": "axe",
     "durability": 0,
     "gestureSeconds": 1,
-    "bluntGestureSeconds": 1
+    "bluntGestureSeconds": 1,
+    "work": {
+      "tier": 0,
+      "power": 6,
+      "bluntPower": 6,
+      "cells": 1,
+      "bluntCells": 1,
+      "upgrade": {
+        "to": "hache-forgee",
+        "cost": {
+          "cents": 3000,
+          "items": [
+            {
+              "item": "buche",
+              "count": 2
+            }
+          ]
+        }
+      },
+      "repair": null
+    }
   }
 }

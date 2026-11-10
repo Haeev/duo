@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "radis-croquant",
+  "name": "Radis croquant",
+  "family": "crop",
+  "stack": 10,
+  "food": {
+    "hunger": 10
+  },
+  "tool": null
+}

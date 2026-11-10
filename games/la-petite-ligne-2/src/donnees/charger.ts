@@ -31,6 +31,7 @@ import {
 import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
+import { CropSchema, ResourceSchema, type CropDef, type ResourceDef } from './schemas/recolte';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
 import { validateContent } from './valider';
@@ -65,6 +66,9 @@ export interface Content {
   readonly props: ById<PropDef>;
   readonly recipes: ById<RecipeDef>;
   readonly catches: ById<CatchDef>;
+  /** Cultures du potager et ressources du monde (`schemas/recolte.ts`). */
+  readonly crops: ById<CropDef>;
+  readonly resources: ById<ResourceDef>;
   readonly pieces: ById<PieceDef>;
   readonly places: ById<PlaceContent>;
 }
@@ -140,6 +144,8 @@ export function loadContent(files: Files): Content {
   const props = parseFolder(PropSchema, files, 'commun/meubles', problems);
   const recipes = parseFolder(RecipeSchema, files, 'commun/recettes', problems);
   const catches = parseFolder(CatchSchema, files, 'commun/prises', problems);
+  const crops = parseFolder(CropSchema, files, 'commun/cultures', problems);
+  const resources = parseFolder(ResourceSchema, files, 'commun/ressources', problems);
 
   const places: Record<string, PlaceContent> = {};
   for (const path of Object.keys(files).sort()) {
@@ -208,6 +214,8 @@ export function loadContent(files: Files): Content {
     props,
     recipes,
     catches,
+    crops,
+    resources,
     pieces,
     places,
   };

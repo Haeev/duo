@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "caillou",
+  "name": "Caillou",
+  "model": "caillou",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "caillou"
+    }
+  ]
+}

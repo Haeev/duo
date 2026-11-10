@@ -154,6 +154,69 @@
       "x": 23,
       "y": 15,
       "rotation": 1
+    },
+    {
+      "id": "potager",
+      "type": "terre-cultivable",
+      "x": 24,
+      "y": 36,
+      "rotation": 0
+    },
+    {
+      "id": "chene",
+      "type": "chene",
+      "x": 3.5,
+      "y": 36.5,
+      "rotation": 0
+    },
+    {
+      "id": "gros-chene",
+      "type": "gros-chene",
+      "x": 7,
+      "y": 36,
+      "rotation": 0
+    },
+    {
+      "id": "branches",
+      "type": "branches",
+      "x": 10.5,
+      "y": 35.5,
+      "rotation": 0
+    },
+    {
+      "id": "caillou",
+      "type": "caillou",
+      "x": 12.5,
+      "y": 37.5,
+      "rotation": 0
+    },
+    {
+      "id": "coquelicots",
+      "type": "coquelicots",
+      "x": 15.5,
+      "y": 37.5,
+      "rotation": 0
+    },
+    {
+      "id": "ronces",
+      "type": "ronces",
+      "x": 30.5,
+      "y": 36.5,
+      "rotation": 0
+    },
+    {
+      "id": "point-de-fouille",
+      "type": "point-de-fouille",
+      "x": 33.5,
+      "y": 36.5,
+      "rotation": 0
+    },
+    {
+      "id": "fruitier",
+      "type": "fruitier",
+      "x": 36.5,
+      "y": 36.5,
+      "rotation": 0
     }
   ]
 }

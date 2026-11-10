@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "arrosoir",
+  "name": "Arrosoir",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "can",
+    "durability": 0,
+    "gestureSeconds": 0.8,
+    "bluntGestureSeconds": 0.8,
+    "work": {
+      "tier": 0,
+      "power": 1,
+      "bluntPower": 1,
+      "cells": 3,
+      "bluntCells": 3,
+      "upgrade": {
+        "to": "arrosoir-cuivre",
+        "cost": {
+          "cents": 3000,
+          "items": []
+        }
+      },
+      "repair": null
+    }
+  }
+}

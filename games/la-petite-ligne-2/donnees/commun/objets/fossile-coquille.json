@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "fossile-coquille",
+  "name": "Coquille fossile",
+  "family": "treasure",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}
