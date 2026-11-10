@@ -1,0 +1,37 @@
+{
+ "donneur": "rond",
+ "faces_par_piece": {
+  "haut": 444,
+  "bas": 583,
+  "tete": 695,
+  "mains": 1126,
+  "cheveux": 3037,
+  "chaussures": 175
+ },
+ "pieces": {
+  "haut": {
+   "triangles": 444,
+   "octets": 24008
+  },
+  "bas": {
+   "triangles": 583,
+   "octets": 28456
+  },
+  "tete": {
+   "triangles": 1215,
+   "octets": 53424
+  },
+  "mains": {
+   "triangles": 1126,
+   "octets": 47204
+  },
+  "cheveux": {
+   "triangles": 3037,
+   "octets": 110088
+  },
+  "chaussures": {
+   "triangles": 175,
+   "octets": 16568
+  }
+ }
+}

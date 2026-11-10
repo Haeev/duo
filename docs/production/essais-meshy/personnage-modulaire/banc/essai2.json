@@ -1,8 +1,69 @@
 {
  "personnages": {
-  "d1": {"titre": "Voie D, adulte moyen: pull, pantalon", "voie": "D", "corps": "../pieces-d/moyen_corps.glb",
-         "pieces": ["../pieces-d/moyen_tete_ronde.glb", "../pieces-d/moyen_cheveux_court.glb", "../pieces-d/moyen_haut_pull.glb", "../pieces-d/moyen_bas_pantalon.glb", "../pieces-d/moyen_chaussures_galet.glb"]},
-  "d2": {"titre": "Voie D, adulte moyen: t-shirt, veste ouverte, jupe", "voie": "D", "corps": "../pieces-d/moyen_corps.glb", "peau": "#A9744D",
-         "pieces": [{"fichier": "../pieces-d/moyen_tete_ronde.glb", "couleurs": {"peau": "#A9744D", "sourcils": "#2B2523"}}, "../pieces-d/moyen_cheveux_carre.glb", "../pieces-d/moyen_haut_tshirt.glb", "../pieces-d/moyen_veste_ouverte.glb", "../pieces-d/moyen_bas_jupe.glb", {"fichier": "../pieces-d/moyen_chaussures_galet.glb", "couleurs": {"cuir": "#8F3B34"}}]}
+  "d1": {
+   "titre": "Voie D, adulte moyen: pull, pantalon",
+   "voie": "D",
+   "corps": "../pieces-d/moyen_corps.glb",
+   "pieces": [
+    "../pieces-d/moyen_tete_ronde.glb",
+    "../pieces-d/moyen_cheveux_court.glb",
+    "../pieces-d/moyen_haut_pull.glb",
+    "../pieces-d/moyen_bas_pantalon.glb",
+    "../pieces-d/moyen_chaussures_galet.glb"
+   ]
+  },
+  "d2": {
+   "titre": "Voie D, adulte moyen: t-shirt, veste ouverte, jupe",
+   "voie": "D",
+   "corps": "../pieces-d/moyen_corps.glb",
+   "peau": "#A9744D",
+   "pieces": [
+    {
+     "fichier": "../pieces-d/moyen_tete_ronde.glb",
+     "couleurs": {
+      "peau": "#A9744D",
+      "sourcils": "#2B2523"
+     }
+    },
+    "../pieces-d/moyen_cheveux_carre.glb",
+    "../pieces-d/moyen_haut_tshirt.glb",
+    "../pieces-d/moyen_veste_ouverte.glb",
+    "../pieces-d/moyen_bas_jupe.glb",
+    {
+     "fichier": "../pieces-d/moyen_chaussures_galet.glb",
+     "couleurs": {
+      "cuir": "#8F3B34"
+     }
+    }
+   ]
+  },
+  "c_moyen": {
+   "titre": "Voie C, adulte moyen de la planche",
+   "voie": "C",
+   "corps": "../pieces-d/moyen_corps.glb",
+   "sans_corps": true,
+   "pieces": [
+    "../pieces-c/moyen_tete.glb",
+    "../pieces-c/moyen_cheveux.glb",
+    "../pieces-c/moyen_mains.glb",
+    "../pieces-c/moyen_haut.glb",
+    "../pieces-c/moyen_bas.glb",
+    "../pieces-c/moyen_chaussures.glb"
+   ]
+  },
+  "c_rond": {
+   "titre": "Voie C, adulte rond de la planche",
+   "voie": "C",
+   "corps": "../pieces-d/moyen_corps.glb",
+   "sans_corps": true,
+   "pieces": [
+    "../pieces-c/rond_tete.glb",
+    "../pieces-c/rond_cheveux.glb",
+    "../pieces-c/rond_mains.glb",
+    "../pieces-c/rond_haut.glb",
+    "../pieces-c/rond_bas.glb",
+    "../pieces-c/rond_chaussures.glb"
+   ]
+  }
  }
 }

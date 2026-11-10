@@ -17,6 +17,9 @@ import bpy
 import bmesh  # après bpy
 from mathutils import Vector
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from figurine import ANKLE, CHIN, COLLAR, CROTCH, H, HEAD_H, HEAD_W, KNEE, WAIST, W_HEAD, X, Z, Builder, chain, face_features, smooth  # noqa: E402
+
 SOURCE, NUANCIER, OUT, BODY_KEY, PREFIX = sys.argv[1:6]
 with open(NUANCIER, encoding="utf-8") as fh:
     N = {fam: dict(v) for fam, v in json.load(fh).items()}
@@ -27,134 +30,12 @@ BODIES = {
     "adult_round": dict(sh=0.455, wa=0.430, hi=0.440, arm=0.100, leg=0.138, d_hi=0.29, d_wa=0.33, d_ch=0.27, belly=0.035),
 }
 B = BODIES[BODY_KEY]
-H, HEAD_H, HEAD_W = 1.70, 0.34, 0.315
-CHIN, COLLAR, WAIST, CROTCH, KNEE, ANKLE = 1.36, 1.325, 0.983, 0.80, 0.462, 0.10
-SHOULDER_Z, HIP_Z = 1.27, 0.82
+SHOULDER_Z, HIP_Z = 1.255, 0.82
 ARM_X = B["sh"] / 2 - B["arm"] / 2
 ARM_LEN = SHOULDER_Z - (CROTCH + 0.035)
 LEG_X = B["hi"] / 4 + 0.004
 HEAD_C = Vector((0, 0, CHIN + HEAD_H / 2))
 HEAD_R = Vector((HEAD_W / 2, 0.150, HEAD_H / 2))
-X, Y, Z = Vector((1, 0, 0)), Vector((0, 1, 0)), Vector((0, 0, 1))
-
-
-def srgb(hexa):
-    c = [int(hexa[i:i + 2], 16) / 255 for i in (1, 3, 5)]
-    return [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
-
-
-def smooth(a, b, t):
-    u = min(max((t - a) / (b - a), 0.0), 1.0)
-    return u * u * (3 - 2 * u)
-
-
-def chain(t, nodes):
-    """Poids le long d'une chaîne d'os: nodes = [(os, position)], mélange lisse entre deux nœuds voisins."""
-    if t <= nodes[0][1]:
-        return {nodes[0][0]: 1.0}
-    for (a, pa), (b, pb) in zip(nodes, nodes[1:]):
-        if t <= pb:
-            k = smooth(pa, pb, t)
-            return {a: 1 - k, b: k}
-    return {nodes[-1][0]: 1.0}
-
-
-class Builder:
-    """Accumule des volumes balayés: sommets, poids, faces, zone ou couleur de chaque face."""
-
-    def __init__(self):
-        self.verts, self.weights, self.faces, self.tags = [], [], [], []
-
-    def sweep(self, stations, n, tag, wfn, cap0=False, cap1=False, keep=None):
-        """stations: [(centre, direction, repère u, rayon u, rayon v)]; tag: nom ou fonction du centre de face."""
-        rings = []
-        for c, d, hint, ru, rv in stations:
-            d = d.normalized()
-            u = (hint - d * hint.dot(d)).normalized()
-            v = d.cross(u)
-            ring = []
-            for j in range(n):
-                a = 2 * math.pi * j / n
-                p = c + u * (ru * math.cos(a)) + v * (rv * math.sin(a))
-                ring.append(len(self.verts))
-                self.verts.append(p)
-                self.weights.append(wfn(p))
-            rings.append(ring)
-        for r0, r1 in zip(rings, rings[1:]):
-            for j in range(n):
-                k = (j + 1) % n
-                f = (r0[j], r0[k], r1[k], r1[j])
-                centre = sum((self.verts[i] for i in f), Vector()) / 4
-                if keep is None or keep(centre):
-                    self.faces.append(f)
-                    self.tags.append(tag(centre) if callable(tag) else tag)
-        for flag, ring, st, flip in ((cap0, rings[0], stations[0], True), (cap1, rings[-1], stations[-1], False)):
-            if flag:
-                i = len(self.verts)
-                self.verts.append(st[0].copy())
-                self.weights.append(wfn(st[0]))
-                for j in range(n):
-                    k = (j + 1) % n
-                    f = (i, ring[k], ring[j]) if flip else (i, ring[j], ring[k])
-                    self.faces.append(f)
-                    self.tags.append(tag(st[0]) if callable(tag) else tag)
-
-    def ellipsoid(self, centre, radii, tag, wfn, n=20, m=12, keep=None, off=0.0):
-        st = []
-        for i in range(1, m):
-            a = -math.pi / 2 + math.pi * i / m
-            st.append((centre + Z * ((radii.z + off) * math.sin(a)), Z, X, (radii.x + off) * math.cos(a), (radii.y + off) * math.cos(a)))
-        self.sweep(st, n, tag, wfn, cap0=keep is None, cap1=keep is None, keep=keep)
-        if keep is None:
-            self.verts[-2] = centre - Z * (radii.z + off)
-            self.verts[-1] = centre + Z * (radii.z + off)
-
-    def to_object(self, name, colors, rig, thickness=0.0):
-        me = bpy.data.meshes.new(name)
-        me.from_pydata([tuple(v) for v in self.verts], [], self.faces)
-        slots = []
-        for t in self.tags:
-            if t not in slots:
-                slots.append(t)
-        for t in slots:
-            mat = bpy.data.materials.get(f"{name}__{t}") or bpy.data.materials.new(f"{name}__{t}")
-            mat.use_nodes = True
-            bsdf = mat.node_tree.nodes["Principled BSDF"]
-            bsdf.inputs["Base Color"].default_value = (*srgb(colors[t][0]), 1)
-            bsdf.inputs["Roughness"].default_value = colors[t][1]
-            if not name.startswith("corps"):
-                mat.name = f"{name}__{t}"
-            else:
-                mat.name = f"corps_{t}"
-            me.materials.append(mat)
-        for p, t in zip(me.polygons, self.tags):
-            p.material_index = slots.index(t)
-            p.use_smooth = True
-        o = bpy.data.objects.new(name, me)
-        bpy.context.scene.collection.objects.link(o)
-        groups = {}
-        for i, w in enumerate(self.weights):
-            total = sum(w.values())
-            for bone, x in w.items():
-                if x > 1e-4:
-                    groups.setdefault(bone, o.vertex_groups.new(name=bone) if bone not in groups else groups[bone]).add([i], x / total, "REPLACE")
-        bpy.context.view_layer.objects.active = o
-        if thickness:
-            mod = o.modifiers.new("epaisseur", "SOLIDIFY")
-            mod.thickness = thickness
-            mod.offset = 1.0
-            bpy.ops.object.modifier_apply(modifier=mod.name)
-            bev = o.modifiers.new("bord", "BEVEL")
-            bev.width = thickness * 0.35
-            bev.segments = 2
-            bev.limit_method = "ANGLE"
-            bev.angle_limit = math.radians(50)
-            bpy.ops.object.modifier_apply(modifier=bev.name)
-            for p in o.data.polygons:
-                p.use_smooth = True
-        o.parent = rig
-        o.modifiers.new("Armature", "ARMATURE").object = rig
-        return o
 
 
 # ---------- profils du corps (off = décalage du vêtement) ----------
@@ -179,7 +60,7 @@ def torso_at(z, off=0.0):
     return rows[-1][1:]
 
 
-def torso_stations(z0, z1, off=0.0, step=0.02):
+def torso_stations(z0, z1, off=0.0, step=0.03):
     count = max(2, round((z1 - z0) / step))
     out = []
     for i in range(count + 1):
@@ -197,7 +78,7 @@ def w_torso(p):
     return w
 
 
-def limb_stations(p0, p1, r0, r1, hint, round0, round1, off=0.0, t0=0.0, t1=1.0, cuts=14, k=4):
+def limb_stations(p0, p1, r0, r1, hint, round0, round1, off=0.0, t0=0.0, t1=1.0, cuts=10, k=3):
     """Gélule de p0 à p1 (bouts arrondis au choix), limitée à la portion [t0, t1] de sa longueur."""
     d = (p1 - p0).normalized()
     st = []
@@ -238,31 +119,6 @@ def w_leg(side):
 def head_surface_y(x, z, off=0.0):
     q = 1 - (x / (HEAD_R.x + off)) ** 2 - ((z - HEAD_C.z) / (HEAD_R.z + off)) ** 2
     return -(HEAD_R.y + off) * math.sqrt(max(q, 0.0))
-
-
-W_HEAD = lambda p: {"Head": 1.0}  # noqa: E731
-
-
-def face_features(b, surface, hair_tag="sourcils"):
-    """Visage simple posé sur la tête: yeux en perles, sourcils en boudins, bouche en arc (bible 2.3, version courte)."""
-    eye_z = H - HEAD_H * 0.56
-    for s in (-1, 1):
-        ex = s * 0.052
-        b.ellipsoid(Vector((ex, surface(ex, eye_z) + 0.004, eye_z)), Vector((0.014, 0.012, 0.017)), "oeil", W_HEAD, n=10, m=8)
-        pts = [Vector((s * x, 0, eye_z + 0.043 + 0.004 * i)) for i, x in enumerate((0.028, 0.052, 0.076))]
-        for p in pts:
-            p.y = surface(p.x, p.z) - 0.003
-        st = [(pts[0], pts[1] - pts[0], Z, 0.004, 0.004), (pts[0] + (pts[1] - pts[0]) * 0.15, pts[1] - pts[0], Z, 0.0065, 0.0065),
-              (pts[1], pts[2] - pts[0], Z, 0.007, 0.007), (pts[2] - (pts[2] - pts[1]) * 0.15, pts[2] - pts[1], Z, 0.0065, 0.0065), (pts[2], pts[2] - pts[1], Z, 0.004, 0.004)]
-        b.sweep(st, 8, hair_tag, W_HEAD, cap0=True, cap1=True)
-    mouth_z = CHIN + HEAD_H * 0.24
-    xs = [-0.034, -0.02, 0.0, 0.02, 0.034]
-    pts = [Vector((x, surface(x, mouth_z + 9 * x * x) - 0.002, mouth_z + 9 * x * x)) for x in xs]
-    st = []
-    for i, p in enumerate(pts):
-        d = pts[min(i + 1, 4)] - pts[max(i - 1, 0)]
-        st.append((p, d, Z, 0.0035 if i in (0, 4) else 0.006, 0.0035 if i in (0, 4) else 0.006))
-    b.sweep(st, 8, "bouche", W_HEAD, cap0=True, cap1=True)
 
 
 # ---------- squelette: os replacés sur les repères de la bible ----------
@@ -336,13 +192,13 @@ def register(name, obj, categorie, masque):
 
 def body(skin):
     b = Builder()
-    b.sweep(torso_stations(0.775, 1.34), 24, lambda c: "bassin" if c.z < WAIST else "torse", w_torso, cap0=True, cap1=True)
+    b.sweep(torso_stations(0.775, 1.34), 18, lambda c: "bassin" if c.z < WAIST else "torse", w_torso, cap0=True, cap1=True)
     b.sweep([(Vector((0, 0, z)), Z, X, 0.043, 0.043) for z in (1.30, 1.33, 1.36, 1.39)], 16, "cou", lambda p: {"neck": 1.0})
     for s in (-1, 1):
         L = "Left" if s > 0 else "Right"
         p0, p1 = arm_ends(s)
         elbow = ARM_X + ARM_LEN / 2
-        b.sweep(limb_stations(p0, p1, B["arm"] / 2, B["arm"] / 2 * 0.9, Z, True, True), 14, lambda c: "bras" if abs(c.x) < elbow else "avant_bras", w_arm(s), cap0=True, cap1=True)
+        b.sweep(limb_stations(p0, p1, B["arm"] / 2, B["arm"] / 2 * 0.9, Z, True, True), 12, lambda c: "bras" if abs(c.x) < elbow else "avant_bras", w_arm(s), cap0=True, cap1=True)
         hand = p1 + X * (s * 0.045)
         wh = lambda p, L=L: {L + "Hand": 1.0}  # noqa: E731
         st = []
@@ -352,7 +208,7 @@ def body(skin):
         b.sweep(st, 14, "mains", wh, cap0=True, cap1=True)
         b.ellipsoid(hand + Vector((-s * 0.012, -0.042, -0.004)), Vector((0.022, 0.017, 0.016)), "mains", wh, n=10, m=8)
         q0, q1 = leg_ends(s)
-        b.sweep(limb_stations(q0, q1, B["leg"] / 2, B["leg"] / 2 * 0.88, X, True, False), 16, lambda c: "cuisses" if c.z > KNEE else "jambes", w_leg(s), cap0=True, cap1=True)
+        b.sweep(limb_stations(q0, q1, B["leg"] / 2, B["leg"] / 2 * 0.88, X, True, False), 12, lambda c: "cuisses" if c.z > KNEE else "jambes", w_leg(s), cap0=True, cap1=True)
     colors = {z: (skin, MAT) for z in ("bassin", "torse", "cou", "bras", "avant_bras", "mains", "cuisses", "jambes")}
     for z in ("bassin", "torse"):
         colors[z] = ("#E4DCCB", MAT)  # sous-vêtement uni de la bible (2.2)
@@ -361,7 +217,7 @@ def body(skin):
 
 def head(name, skin, brows):
     b = Builder()
-    b.ellipsoid(HEAD_C, HEAD_R, "peau", W_HEAD, n=28, m=18)
+    b.ellipsoid(HEAD_C, HEAD_R, "peau", W_HEAD, n=24, m=16)
     for s in (-1, 1):
         b.ellipsoid(HEAD_C + Vector((s * (HEAD_R.x - 0.004), 0.012, -0.03)), Vector((0.016, 0.026, 0.036)), "peau", W_HEAD, n=10, m=8)
     b.ellipsoid(Vector((0, head_surface_y(0, 1.487) - 0.004, 1.487)), Vector((0.017, 0.02, 0.016)), "peau", W_HEAD, n=10, m=8)
@@ -377,7 +233,9 @@ def hair(name, color, style):
         keep = lambda c: c.z > 1.552 - 0.50 * c.y + 0.25 * abs(c.x) * (c.y < 0)  # noqa: E731
     else:  # carré avec frange
         keep = lambda c: c.z > (1.60 if c.y < -0.085 else 1.425)  # noqa: E731
-    b.ellipsoid(HEAD_C, HEAD_R, "cheveux", W_HEAD, n=28, m=22, keep=keep, off=off)
+    b.ellipsoid(HEAD_C, HEAD_R, "cheveux", W_HEAD, n=24, m=18, keep=None if style == "court" else keep, off=off)
+    if style == "court":
+        b.cut = (Vector((0, 0, 1.552)), Vector((0, 0.50, 1.0)))
     o = b.to_object(name, {"cheveux": (color, MAT)}, rig, thickness=0.016 if style == "court" else 0.024)
     register(name, o, "cheveux", [])
 
@@ -403,27 +261,27 @@ def shoes(name, color):
 def sleeves(b, off, t_end, tag):
     for s in (-1, 1):
         p0, p1 = arm_ends(s)
-        b.sweep(limb_stations(p0, p1, B["arm"] / 2, B["arm"] / 2 * 0.9, Z, True, False, off=off, t1=t_end), 14, tag, w_arm(s))
+        b.sweep(limb_stations(p0, p1, B["arm"] / 2, B["arm"] / 2 * 0.9, Z, True, False, off=off, t1=t_end), 12, tag, w_arm(s))
 
 
 def top(name, color, off, hem, sleeve_end, masque, opening=False, categorie="haut"):
     b = Builder()
     keep = (lambda c: not (c.y < 0 and abs(c.x) < 0.045)) if opening else None
-    b.sweep(torso_stations(hem, 1.337 if not opening else 1.315, off), 24, "tissu", w_torso, keep=keep)
+    b.sweep(torso_stations(hem, 1.337 if not opening else 1.315, off), 18, "tissu", w_torso, keep=keep)
     sleeves(b, off * 0.85, sleeve_end, "tissu")
-    o = b.to_object(name, {"tissu": (color, MAT)}, rig, thickness=0.009)
+    o = b.to_object(name, {"tissu": (color, MAT)}, rig, thickness=0.008)
     register(name, o, categorie, masque)
 
 
 def trousers(name, color, leg_end_z, masque):
     b = Builder()
-    off = 0.015
-    b.sweep(torso_stations(0.775, WAIST + 0.03, off), 24, "tissu", w_torso, cap0=True)
+    off = 0.008
+    b.sweep(torso_stations(0.775, WAIST + 0.03, off), 18, "tissu", w_torso, cap0=True)
     for s in (-1, 1):
         q0, q1 = leg_ends(s)
         t1 = (q0.z - leg_end_z) / (q0.z - q1.z)
-        b.sweep(limb_stations(q0, q1, B["leg"] / 2, B["leg"] / 2 * 0.88, X, True, False, off=off, t1=t1), 16, "tissu", w_leg(s))
-    o = b.to_object(name, {"tissu": (color, MAT)}, rig, thickness=0.009)
+        b.sweep(limb_stations(q0, q1, B["leg"] / 2, B["leg"] / 2 * 0.88, X, True, False, off=off, t1=t1), 12, "tissu", w_leg(s))
+    o = b.to_object(name, {"tissu": (color, MAT)}, rig, thickness=0.008)
     register(name, o, "bas", masque)
 
 
@@ -434,7 +292,7 @@ def skirt(name, color, hem_z):
     for i in range(13):
         t = i / 12
         z = top_z + (hem_z - top_z) * t
-        a, d, s = torso_at(max(z, 0.86), 0.016)
+        a, d, s = torso_at(max(z, 0.86), 0.008)
         flare = smooth(0.0, 1.0, t) * 0.085 + 0.02 * t
         st.append((Vector((0, -s * (1 - t), z)), Z, X, a + flare, d + flare))
 
@@ -443,8 +301,8 @@ def skirt(name, color, hem_z):
         legs = 0.75 * smooth(0.25, 1.0, t)
         side = smooth(-0.09, 0.09, p.x)
         return {"Hips": 1 - legs, "LeftUpLeg": legs * side, "RightUpLeg": legs * (1 - side)}
-    b.sweep(st, 28, "tissu", w)
-    o = b.to_object(name, {"tissu": (color, MAT)}, rig, thickness=0.01)
+    b.sweep(st, 22, "tissu", w)
+    o = b.to_object(name, {"tissu": (color, MAT)}, rig, thickness=0.008)
     register(name, o, "bas", ["bassin"])
 
 
@@ -455,9 +313,9 @@ head("tete_ronde", skin_default, N["cheveux"]["chatain" if BODY_KEY == "adult_me
 hair("cheveux_court", N["cheveux"]["chatain"], "court")
 hair("cheveux_carre", N["cheveux"]["noir"], "carre")
 shoes("chaussures_galet", N["fixes"]["cuir_sombre"] if BODY_KEY == "adult_medium" else T["encre"])
-top("haut_tshirt", T["moutarde"], 0.015, WAIST - 0.06, 0.30, ["torse"])
-top("haut_pull", T["ardoise"], 0.022, WAIST - 0.09, 0.975, ["torse", "bras", "avant_bras"])
-top("veste_ouverte", T["canard"], 0.034, WAIST - 0.12, 0.975, [], opening=True, categorie="veste")
+top("haut_tshirt", T["moutarde"], 0.019, WAIST - 0.06, 0.30, ["torse"])
+top("haut_pull", T["ardoise"], 0.021, WAIST - 0.09, 0.975, ["torse", "bras", "avant_bras"])
+top("veste_ouverte", T["canard"], 0.038, WAIST - 0.12, 0.975, [], opening=True, categorie="veste")
 trousers("bas_pantalon", T["marine"], ANKLE - 0.015, ["bassin", "cuisses", "jambes"])
 trousers("bas_short", T["olive"], 0.56, ["bassin"])
 skirt("bas_jupe", T["prune"], 0.50)

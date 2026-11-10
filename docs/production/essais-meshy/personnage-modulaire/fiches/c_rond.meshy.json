@@ -1,0 +1,67 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "game": "la-petite-ligne (essai personnage modulaire, essai 2)",
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "credits_budget": 120,
+ "status": "essai",
+ "asset": "c_rond",
+ "family": "personnage entier d'après un gabarit de la bible (voie C)",
+ "purpose": "essai 2: personnage généré d'après la planche des gabarits, riggé, ramené au squelette commun, découpé par couleurs",
+ "inputs": [
+  {
+   "path": "references/ref_adulte_rond.png",
+   "author": "directeur-artistique (planches/source/planches.py), cadrage par scripts/references_gabarits.py"
+  }
+ ],
+ "tasks": [
+  {
+   "step": "image vers 3D",
+   "tool": "meshy_image_to_3d",
+   "task_id": "01a1c4f5-9e0c-7660-bb4d-e2d5628e2b2b",
+   "params": {
+    "file_path": "references/ref_adulte_rond.png",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 6000,
+    "texture_model": "meshy-n1",
+    "pose_mode": "t-pose",
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 15,
+   "created": "2026-11-10T10:16:32.902Z",
+   "downloaded": true
+  },
+  {
+   "step": "rig",
+   "tool": "meshy_rig",
+   "task_id": "01a1c4f7-80f9-7214-9298-e44d274830f7",
+   "parent_task_id": "01a1c4f5-9e0c-7660-bb4d-e2d5628e2b2b",
+   "params": {
+    "height_meters": 1.7
+   },
+   "credits": 5,
+   "created": "2026-11-10",
+   "downloaded": true
+  }
+ ],
+ "credits_total": 20,
+ "conformity": {
+  "largeur": 1.0,
+  "tete": 1.0,
+  "lissage": true,
+  "emplacements": {
+   "peau": "#6B432E",
+   "cheveux": "#2B2523",
+   "haut": "#C5443D",
+   "bas": "#4A4D52",
+   "chaussures": "#26282E"
+  }
+ }
+}

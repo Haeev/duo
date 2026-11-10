@@ -104,6 +104,7 @@ for (const entry of spec.pieces) {
   }
   for (const zone of meta.masque ?? []) if (zones.has(zone)) zones.get(zone).visible = false;
 }
+if (spec.sans_corps) for (const mesh of zones.values()) mesh.visible = false;
 for (const mesh of zones.values()) if (mesh.visible) triangles += mesh.geometry.index.count / 3;
 
 const mixer = new THREE.AnimationMixer(bodyGltf.scene);
@@ -131,7 +132,8 @@ function view(azimuthDeg, x, w) {
 }
 window.banc = { pret: false };
 if (params.get('planche')) {
-  const shots = [['idle', 0.5, 0], ['idle', 0.5, 35], ['idle', 0.5, 90], ['walk', 0.26, 35], ['walk', 0.78, 90]];
+  const rest = Number(params.get('t') ?? 1.3);
+  const shots = [['idle', rest, 0], ['idle', rest, 35], ['idle', rest, 90], ['walk', 0.26, 35], ['walk', 0.78, 90]];
   const w = innerWidth / shots.length;
   renderer.info.reset();
   shots.forEach(([clip, time, azimuth], i) => {

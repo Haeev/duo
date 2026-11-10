@@ -1,0 +1,36 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "game": "la-petite-ligne (essai personnage modulaire, essai 2)",
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "credits_budget": 120,
+ "status": "essai",
+ "asset": "rigide_chaussures_essai2",
+ "family": "pièce rigide (voie D)",
+ "purpose": "paire de chaussures « galet » par texte: sortie en bottines à lacets, hors consigne (« no laces »), non utilisée",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4f5-aa08-73df-b9c2-b476751e1b9c",
+   "params": {
+    "prompt": "smooth vinyl toy figurine style, soft rounded shapes, thick rounded edges, matte flat colors, single object, plain light grey background, a pair of very simple chunky pebble-shaped toy shoes, rounded toe, thick flat sole, no laces, no tread, left and right shoe side by side, parallel, toes pointing forward, flat on the ground, shoes alone, no feet, no legs, no body, no mannequin, no texture detail, no fabric grain, no pattern, no text, no logo, no photorealism",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 800,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json"
+   },
+   "credits": 5,
+   "created": "2026-11-10T10:16:35.856Z",
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5
+}

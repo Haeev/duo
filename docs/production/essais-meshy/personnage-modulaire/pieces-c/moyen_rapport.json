@@ -1,0 +1,37 @@
+{
+ "donneur": "moyen",
+ "faces_par_piece": {
+  "bas": 1809,
+  "haut": 162,
+  "chaussures": 961,
+  "tete": 1399,
+  "mains": 1456,
+  "cheveux": 116
+ },
+ "pieces": {
+  "bas": {
+   "triangles": 1809,
+   "octets": 60232
+  },
+  "haut": {
+   "triangles": 162,
+   "octets": 18748
+  },
+  "chaussures": {
+   "triangles": 961,
+   "octets": 42764
+  },
+  "tete": {
+   "triangles": 1919,
+   "octets": 74892
+  },
+  "mains": {
+   "triangles": 1456,
+   "octets": 54460
+  },
+  "cheveux": {
+   "triangles": 116,
+   "octets": 15932
+  }
+ }
+}

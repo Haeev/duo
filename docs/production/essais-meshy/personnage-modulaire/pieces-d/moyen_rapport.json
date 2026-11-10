@@ -4,34 +4,34 @@
   "tete_ronde": {
    "categorie": "tete",
    "masque": [],
-   "triangles": 1892,
-   "octets": 65276
+   "triangles": 1660,
+   "octets": 58828
   },
   "cheveux_court": {
    "categorie": "cheveux",
    "masque": [],
-   "triangles": 1968,
-   "octets": 63392
+   "triangles": 892,
+   "octets": 36384
   },
   "cheveux_carre": {
    "categorie": "cheveux",
    "masque": [],
-   "triangles": 2208,
-   "octets": 70116
+   "triangles": 1104,
+   "octets": 45580
   },
   "chaussures_galet": {
    "categorie": "chaussures",
    "masque": [],
    "triangles": 972,
-   "octets": 37620
+   "octets": 37668
   },
   "haut_tshirt": {
    "categorie": "haut",
    "masque": [
     "torse"
    ],
-   "triangles": 5072,
-   "octets": 150304
+   "triangles": 2424,
+   "octets": 83592
   },
   "haut_pull": {
    "categorie": "haut",
@@ -40,14 +40,14 @@
     "bras",
     "avant_bras"
    ],
-   "triangles": 5168,
-   "octets": 153008
+   "triangles": 2496,
+   "octets": 85628
   },
   "veste_ouverte": {
    "categorie": "veste",
    "masque": [],
-   "triangles": 5564,
-   "octets": 164168
+   "triangles": 2492,
+   "octets": 88404
   },
   "bas_pantalon": {
    "categorie": "bas",
@@ -56,28 +56,28 @@
     "cuisses",
     "jambes"
    ],
-   "triangles": 4384,
-   "octets": 131148
+   "triangles": 1992,
+   "octets": 70028
   },
   "bas_short": {
    "categorie": "bas",
    "masque": [
     "bassin"
    ],
-   "triangles": 4384,
-   "octets": 131116
+   "triangles": 1992,
+   "octets": 69996
   },
   "bas_jupe": {
    "categorie": "bas",
    "masque": [
     "bassin"
    ],
-   "triangles": 1904,
-   "octets": 61588
+   "triangles": 1144,
+   "octets": 44216
   }
  },
- "corps_triangles": 4776,
- "corps_octets": 299144,
+ "corps_triangles": 3088,
+ "corps_octets": 248500,
  "clips": [
   "idle",
   "run",
@@ -148,22 +148,22 @@
   "LeftShoulder": [
    0.03,
    0.0,
-   1.27
+   1.255
   ],
   "LeftArm": [
    0.17,
    0.0,
-   1.27
+   1.255
   ],
   "LeftForeArm": [
-   0.3875,
+   0.38,
    0.0,
-   1.27
+   1.255
   ],
   "LeftHand": [
-   0.605,
+   0.59,
    0.0,
-   1.27
+   1.255
   ],
   "neck": [
    0.0,
@@ -188,22 +188,22 @@
   "RightShoulder": [
    -0.03,
    0.0,
-   1.27
+   1.255
   ],
   "RightArm": [
    -0.17,
    0.0,
-   1.27
+   1.255
   ],
   "RightForeArm": [
-   -0.3875,
+   -0.38,
    0.0,
-   1.27
+   1.255
   ],
   "RightHand": [
-   -0.605,
+   -0.59,
    0.0,
-   1.27
+   1.255
   ]
  }
 }

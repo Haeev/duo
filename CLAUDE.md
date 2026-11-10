@@ -55,7 +55,8 @@ Un même rôle peut tourner en plusieurs exemplaires en parallèle (deux devs ga
 - Ce qui tient en quelques commandes, le manager le fait lui-même.
 - Aucun livrable transmis au client sans vérification par le manager (fichiers relus, tests relancés).
 - Carnets: chaque membre a une mémoire persistante dans `.claude/agent-memory/<membre>/`, versionnée avec le dépôt. On y note les apprentissages durables (pièges, conventions, astuces vérifiées), jamais l'avancement ni de secret.
-- Les membres tournent sur le modèle de la session (aucun champ `model` dans les fiches). Pour réduire les coûts, on pourra affecter un modèle plus léger à certains rôles.
+- Modèle par tâche (demande du client, 2026-11-10): le manager choisit le modèle de chaque mission dans son appel, selon la difficulté, et non selon le rôle. Le plus puissant (celui de la session) pour la conception, l'écriture de l'histoire et des dialogues, l'architecture, la simulation, le réseau et les bugs difficiles. Opus pour le développement courant bien cadré et les revues. Sonnet pour les corrections localisées, les données, les icônes, les maquettes, les tests et la mise en conformité. Haiku pour les recherches dans le dépôt, les relevés, les contrôles mécaniques et les mises en forme. En cas de doute sur la qualité rendue, la mission est refaite au cran au-dessus plutôt que livrée.
+- Sobriété (demande du client, 2026-11-10): le studio travaille en continu mais sans brûler le quota. Trois membres en parallèle au plus, deux de préférence; briefs étroits; comptes rendus de 15 lignes; pas de mission dont le résultat ne sert pas l'étape en cours.
 - Outils de génération payants (Meshy, SpriteCook): un budget de crédits dans chaque brief; le membre relève le solde au début et à la fin et liste ses tâches avec leur coût dans le compte rendu.
 - Les fiches évoluent: quand un manque apparaît (outil, convention, piège), le manager met la fiche à jour.
 
