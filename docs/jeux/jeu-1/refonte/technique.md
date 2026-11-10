@@ -500,7 +500,7 @@ Conforme au point 8 du processus (tester en dernier et en petit).
 6. **Sorties de la suite rapide** (à lancer à la demande seulement): tout ce qui joue plus d'une journée de jeu; les bancs de mesure de performances; les captures de recette visuelle; les parcours Playwright complets. De l'ancien jeu, rien n'est repris parmi les 12 fichiers de `vitest.longues.ts`, `tests/ete` et `tests/longue-vie`: ils disparaissent avec le robot et les 61 sauvegardes de référence.
 7. **Sur les vraies machines** (liste « à tester chez le client » de chaque jalon): fluidité au préréglage Moyenne sur le PC, délai ressenti des gestes chez l'invité, temps de chargement d'un lieu, son.
 
-Durée actuelle de la suite rapide de l'ancien jeu: voir le compte rendu de mission (mesure lancée pendant l'audit).
+Mesure du 2026-11-10 sur l'ancien jeu (`vitest run` dans `games/la-petite-ligne`, machine cloud partagée, charge 3 à 4): **16 min 18 s** pour 149 fichiers et 1 247 cas (1 246 passés, 1 sauté, aucun échec), soit déjà plus que le budget de tout le dépôt. Les plus longs: `tests/sauvegarde.test.ts` 434 s, `tests/sauvegardes-reference.test.ts` 349 s, `src/interface/tests/secrets.test.ts` 311 s, `tests/bancs-recette.test.ts` 205 s, `tests/amitie-0-13.test.ts` 130 s, `tests/format-13.test.ts` 117 s, `src/interface/tests/identifiants.test.ts` 104 s, `tests/basile-echelle.test.ts` 101 s (durées par fichier, exécutés en parallèle). Si l'ancien paquet reste publiable pendant la refonte (option B), ces huit fichiers passent dans `vitest.longues.ts`: ils rejouent des sauvegardes et des parties, ce que la règle du 4 novembre réserve à la demande.
 
 ## 7. ADR à écrire et questions
 
