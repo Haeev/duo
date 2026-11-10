@@ -175,8 +175,10 @@ export const TILE_SETTINGS = {
   },
   /**
    * Pièces (rendu encré, ADR 0023): murs coupés à hauteur d'appui pour voir dedans sous tous les
-   * angles, soubassement de pierre, plancher. Une porte laisse un vide de `doorWidth` dans le mur
-   * le plus proche de son point d'arrivée.
+   * angles, soubassement de pierre, plancher. Une pièce est un monde clos à l'écran: seule celle
+   * du joueur local est dessinée, sur le fond uni `backdrop`. Une porte laisse dans son mur un
+   * vide de la largeur de son passage plus `doorJamb` de chaque côté. Les cloisons (`blocked` de
+   * la pièce) sont des murs de `partitionThickness`, dans l'axe de leur rangée.
    */
   interior: {
     wallHeight: 1.05,
@@ -186,9 +188,25 @@ export const TILE_SETTINGS = {
     plinthOut: 0.05,
     plinthColor: '#8f8474',
     floorColor: '#b98f5e',
-    doorWidth: 1.3,
-    /** Un point d'arrivée de porte compte s'il est à moins de cette distance du mur (m). */
-    doorReach: 1.6,
+    backdrop: '#15121a',
+    partitionThickness: 0.7,
+    doorJamb: 0.12,
+    /**
+     * Porte d'une pièce: encadrement et vantail à taille humaine (m), paillasson devant. Dehors,
+     * le bâtiment porte déjà sa porte: seul le paillasson marque le seuil. Porte au sol (escalier,
+     * trappe): un cadre bas et ses marches.
+     */
+    door: {
+      height: 2.05,
+      depth: 0.34,
+      leafDepth: 0.06,
+      frameColor: '#5a4030',
+      leafColor: '#8c6238',
+      knobColor: '#e2c26a',
+      panelColor: '#74502c',
+    },
+    mat: { depth: 0.56, gap: 0.1, height: 0.035, color: '#b08a4a', edgeColor: '#6b4f2c' },
+    hatch: { size: 0.86, curb: 0.09, height: 0.14, curbColor: '#5a4030', wellColor: '#231b18' },
   },
   landmark: {
     /** Repère dans un lieu sauvage (loin des chemins): un grand arbre; sinon une tour. */

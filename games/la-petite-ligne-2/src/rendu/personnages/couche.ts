@@ -53,6 +53,7 @@ import {
   type Posture,
   strideRate,
   targetWeights,
+  standingPosture,
 } from './animation';
 import { composeLook, defaultPlayerLook, hashString, lookKey, resolveLook } from './apparence';
 import {
@@ -683,8 +684,7 @@ export class AssembledCharacters implements CharacterLayer {
 
   private playerPosture(player: DeepReadonly<PlayerState>, seated: boolean): Posture {
     if (seated) return { kind: 'sit' };
-    if (player.gesture !== null) return { kind: 'clip', clip: player.gesture.clip };
-    return { kind: 'stand', speed: player.body.speed };
+    return standingPosture(player.body.speed, player.gesture?.clip ?? null, this.settings);
   }
 
   reset(): void {
@@ -743,6 +743,8 @@ export class AssembledCharacters implements CharacterLayer {
       if (lies !== null) this.lie(figure, lies, frame.dt);
       else
         this.follow(figure, player.body, this.playerPosture(player, seat !== null), seat, frame.dt);
+      figure.object.visible =
+        frame.hidden?.[index] !== true && (frame.visibleAt?.(player.body.x, player.body.y) ?? true);
     }
     const placeId = frame.world.common.place;
     for (const id in frame.place.villagers) {
@@ -753,14 +755,13 @@ export class AssembledCharacters implements CharacterLayer {
       this.villagers.set(id, figure);
       // La vie de l'habitant (planning): absent, assis sur une vraie place, ou en plein geste.
       const life = villagerView({ content: this.view.content, world: frame.world }, id);
-      figure.object.visible = life?.visible ?? true;
+      figure.object.visible =
+        (life?.visible ?? true) && (frame.visibleAt?.(state.body.x, state.body.y) ?? true);
       const seatId = state.life?.seat?.[0] ?? null;
       const seated = life?.pose === 'sit' && seatId !== null;
       const posture: Posture = seated
         ? { kind: 'sit' }
-        : life?.gesture !== null && life?.gesture !== undefined
-          ? { kind: 'clip', clip: life.gesture }
-          : { kind: 'stand', speed: state.body.speed };
+        : standingPosture(state.body.speed, life?.gesture ?? null, this.settings);
       const seat = seated ? this.seatOfObject(frame, seatId) : null;
       this.follow(figure, state.body, posture, seat, frame.dt);
     }

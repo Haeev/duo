@@ -40,12 +40,19 @@ describe('description d’un lieu', () => {
     for (const place of Object.values(content.places)) {
       const description = describePlace(content, place);
       expect(description.width).toBe(place.map.width);
-      expect(description.volumes).toHaveLength(place.map.blocked.length + place.map.objects.length);
+      // Une porte de pièce ajoute son paillasson à son encadrement (`doorVolumes`).
+      const mats = description.volumes.filter((v) => v.id.endsWith('-tapis')).length;
+      expect(description.volumes).toHaveLength(
+        place.map.blocked.length + place.map.objects.length + mats,
+      );
       for (const object of place.map.objects) {
         const volume = description.volumes.find((v) => v.id === object.id);
         const prop = content.props[object.type];
         expect(volume, object.id).toBeDefined();
         if (volume === undefined || prop === undefined) continue;
+        expect(volume.aimable).toBe(true);
+        // L'objet visible d'une porte est dessiné sur son seuil, en porte: pas à la taille du meuble.
+        if (volume.shape === 'door' || volume.shape === 'mat' || volume.shape === 'hatch') continue;
         expect(volume.model).toBe(prop.model);
         expect(volume.aimable).toBe(true);
         // L'emprise tournée est celle des données: un quart de tour échange largeur et profondeur.

@@ -52,6 +52,13 @@ export const RENDER_SETTINGS = {
    */
   sleepFade: { seconds: 1.6, holdPart: 0.25 },
 
+  /**
+   * Passage d'une porte (et tout replacement d'un coup du joueur local): l'image s'éteint en
+   * `outSeconds` sur la vue d'avant, la caméra est reposée au noir, puis l'image revient en
+   * `inSeconds`. `jumpMeters`: déplacement entre deux images qui ne peut pas être une marche.
+   */
+  passage: { outSeconds: 0.18, inSeconds: 0.22, jumpMeters: 3 },
+
   /** Mode léger demandé (tests en rendu logiciel): basse résolution, sans ombres. */
   light: { pixelRatio: 0.5, maxPhysicalPixels: 640 * 360 },
 

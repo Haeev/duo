@@ -27,6 +27,7 @@ import {
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { tileGrid } from '../../donnees/carte';
 import type { MapDef } from '../../donnees/schemas/lieu';
+import { DOORS, doorSills } from '../../donnees/seuils';
 import type { InkKit } from '../encre/index';
 import { inkUnit } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
@@ -121,6 +122,10 @@ interface CrownFade {
 
 export class TiledPlace {
   readonly root = new Group();
+  /** Le dehors (tuiles, sol lointain, repères) et les pièces: un seul des deux est dessiné. */
+  private readonly outside = new Group();
+  private readonly roomMeshes = new Map<string, Mesh>();
+  private shownRoom: string | null = null;
   readonly occlusion = new Occlusion();
   readonly field: GroundField;
   private readonly tracker = new ResourceTracker();
@@ -159,6 +164,8 @@ export class TiledPlace {
     delivered: { readonly place: string; readonly source: BuildingSource } | null = null,
   ) {
     this.root.name = 'grand-lieu';
+    this.outside.name = 'dehors';
+    this.root.add(this.outside);
     this.field = groundField(map, settings);
     this.ring = new TileRing(map, settings.ring);
     const t = this.tracker;
@@ -360,30 +367,59 @@ export class TiledPlace {
     const mesh = new Mesh(this.tracker.track(geometry), [this.kit.materials.ground]);
     mesh.name = 'lointain';
     mesh.receiveShadow = true;
-    this.root.add(mesh);
+    this.outside.add(mesh);
     return mesh;
   }
 
-  /** Murs coupés des pièces, en un maillage (une pièce de contour par pièce du lieu). */
+  /**
+   * Les pièces: pour chacune un maillage (plancher lu dans la carte du sol, murs coupés, cloisons),
+   * caché tant que le joueur local n'y est pas (`showRoom`).
+   */
   private buildRooms(): void {
     if (this.rooms.length === 0) return;
-    const builder = new GeometryBuilder();
-    builder.setInk(LAYER.plain);
-    const doors = Object.values(this.map.doors ?? {})
-      .map((door) => this.map.points[door.to])
-      .filter((point): point is { x: number; y: number } => point !== undefined);
+    const sills = Object.values(doorSills(this.map, DOORS.width));
+    const floor = new Color(this.settings.interior.floorColor);
     for (const room of this.rooms) {
+      const builder = new GeometryBuilder();
       builder.begin(room.id);
-      for (const box of interiorWalls(room, doors, this.settings)) builder.box(box);
+      builder.setInk(LAYER.grass, KIND.ground);
+      const { x, y } = room.at;
+      const xe = x + room.width;
+      const ye = y + room.height;
+      builder.quad(
+        [
+          [x, 0, y],
+          [x, 0, ye],
+          [xe, 0, ye],
+          [xe, 0, y],
+        ],
+        [0, 1, 0],
+        [floor],
+      );
+      builder.setInk(LAYER.plain);
+      for (const box of interiorWalls(room, sills, this.settings)) builder.box(box);
       builder.end();
+      const geometry = builder.build();
+      if (geometry === null) continue;
+      const mesh = new Mesh(this.tracker.track(geometry), this.kit.materials.ground);
+      mesh.name = `piece-${room.id}`;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.visible = false;
+      this.roomMeshes.set(room.id, mesh);
+      this.root.add(mesh);
     }
-    const geometry = builder.build();
-    if (geometry === null) return;
-    const mesh = new Mesh(this.tracker.track(geometry), this.kit.materials.ground);
-    mesh.name = 'pieces';
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    this.root.add(mesh);
+  }
+
+  /**
+   * Dessine le dehors (`null`) ou la seule pièce `room`: une pièce est un monde clos, on n'en
+   * voit ni le dehors ni les pièces rangées à côté d'elle sur la grille.
+   */
+  showRoom(room: string | null): void {
+    if (room === this.shownRoom) return;
+    for (const [id, mesh] of this.roomMeshes) mesh.visible = id === room;
+    this.outside.visible = room === null;
+    this.shownRoom = room;
   }
 
   /** Repères (`landmarks`), toujours affichés: tour carrée à toit en pointe, ou grand arbre s'il est en pleine nature. */
@@ -460,7 +496,7 @@ export class TiledPlace {
     mesh.name = 'reperes';
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    this.root.add(mesh);
+    this.outside.add(mesh);
     this.landmarkTriangles = (geometry.index?.count ?? 0) / 3;
   }
 
@@ -582,7 +618,7 @@ export class TiledPlace {
 
   private attach(view: TileView): void {
     this.views.set(view.tile, view);
-    this.root.add(view.group);
+    this.outside.add(view.group);
     for (const box of view.occluders) {
       if (this.occlusion.add(box)) this.partTile.set(box.id, view.tile);
     }

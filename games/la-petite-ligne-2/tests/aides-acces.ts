@@ -3,14 +3,20 @@
  * depuis le point d'arrivée du lieu. Elle se lit dans les données seules (carte, intérieurs,
  * meubles, quêtes, scènes, habitants) et vaut pour tout lieu, présent ou à venir.
  *
- * La marche suit le jeu: quatre voisins, murs et meubles solides bloquent; marcher sur une porte
- * fait passer à sa jumelle (`portes.ts`: on arrive à 1 m devant elle, ou sur la case libre la plus
- * proche), la case d'une porte ne se traverse donc pas. Les verrous d'histoire bloquent tant que
- * l'état de l'histoire ne les a pas levés; `walkableFromArrival` sans état les compte ouverts.
+ * La marche suit le jeu: quatre voisins, murs et meubles solides bloquent; franchir le seuil d'une
+ * porte (`donnees/seuils.ts`) fait passer à sa jumelle (`portes.ts`: on arrive devant son seuil, ou
+ * sur la case libre la plus proche). Une porte dans un mur se passe depuis la case devant son
+ * seuil; une porte au sol (escalier, trappe) en marchant dessus, sa case ne se traverse donc pas.
+ * Les verrous d'histoire bloquent tant que l'état de l'histoire ne les a pas levés;
+ * `walkableFromArrival` sans état les compte ouverts.
+ *
+ * Devant chaque porte, des deux côtés, 1,5 m restent libres dans son axe (`doorClearanceProblems`):
+ * on ne bute pas sur un meuble en entrant.
  */
 import type { Content, PlaceContent } from '../src/donnees/charger';
 import type { StepCondition } from '../src/donnees/schemas/quete';
 import type { Condition } from '../src/donnees/schemas/regles';
+import { DOORS, doorSills } from '../src/donnees/seuils';
 import { interiorAt } from '../src/simulation/lieux/portes';
 import { PLACES } from '../src/simulation/lieux/reglages';
 import { footprintOf } from '../src/simulation/noyau/obstacles';
@@ -33,14 +39,6 @@ const NEIGHBOURS = [
   [-1, 0],
   [0, 1],
   [0, -1],
-] as const;
-
-/** Pas d'un quart de tour (`facing` d'une porte): 0 sud, 1 est, 2 nord, 3 ouest. */
-const AHEAD = [
-  [0, 1],
-  [1, 0],
-  [0, -1],
-  [-1, 0],
 ] as const;
 
 /** Verrous levés: `undefined` les compte tous ouverts (l'histoire finie). */
@@ -97,16 +95,24 @@ export function walkFromArrival(content: Content, place: PlaceContent, open: Ope
   const { width, height } = place.map;
   const blocked = blockedCells(content, place, open);
   const doors = place.map.doors ?? {};
+  const sills = doorSills(place.map, DOORS.width);
   const doorAt = new Map<number, string>();
   const touching = new Map<number, string[]>();
+  const touch = (i: number, id: string): void => {
+    touching.set(i, [...(touching.get(i) ?? []), id]);
+  };
   for (const [id, d] of Object.entries(doors)) {
+    const sill = sills[id];
+    if (sill === undefined) continue;
+    if (sill.kind === 'wall') {
+      // On la passe depuis la case devant son seuil, en poussant vers le mur.
+      touch(Math.floor(sill.y + sill.ny / 2) * width + Math.floor(sill.x + sill.nx / 2), id);
+      continue;
+    }
     const cx = Math.floor(d.x);
     const cy = Math.floor(d.y);
     doorAt.set(cy * width + cx, id);
-    for (const [dx, dy] of [[0, 0] as const, ...NEIGHBOURS]) {
-      const i = (cy + dy) * width + cx + dx;
-      touching.set(i, [...(touching.get(i) ?? []), id]);
-    }
+    for (const [dx, dy] of [[0, 0] as const, ...NEIGHBOURS]) touch((cy + dy) * width + cx + dx, id);
   }
   const free = (x: number, y: number): boolean =>
     x >= 0 &&
@@ -115,13 +121,13 @@ export function walkFromArrival(content: Content, place: PlaceContent, open: Ope
     y < height &&
     blocked[y * width + x] !== 1 &&
     !doorAt.has(y * width + x);
-  // Arrivée devant la porte `id` (`passDoor`): 1 m devant elle, sinon la case libre la plus proche.
+  // Arrivée devant la porte `id` (`passDoor`): devant son seuil, sinon la case libre la plus proche.
   const arrival = (id: string): number | null => {
-    const d = doors[id];
-    if (d === undefined) return null;
-    const [fx, fy] = AHEAD[d.facing];
-    const x = Math.floor(d.x) + 0.5 + fx * PLACES.arriveOffset;
-    const y = Math.floor(d.y) + 0.5 + fy * PLACES.arriveOffset;
+    const sill = sills[id];
+    if (sill === undefined) return null;
+    const offset = sill.kind === 'floor' ? PLACES.floorArriveOffset : PLACES.arriveOffset;
+    const x = sill.x + sill.nx * offset;
+    const y = sill.y + sill.ny * offset;
     const tx = Math.floor(x);
     const ty = Math.floor(y);
     for (let r = 0; r <= content.settings.movement.freeCellRadius; r++) {
@@ -164,6 +170,41 @@ export function walkFromArrival(content: Content, place: PlaceContent, open: Ope
     for (const [dx, dy] of NEIGHBOURS) if (free(x + dx, y + dy)) visit((y + dy) * width + x + dx);
   }
   return { cells: seen, doors: passed };
+}
+
+/** Dégagement gardé libre devant chaque porte, dans son axe (m). */
+export const DOOR_CLEARANCE = 1.5;
+
+/**
+ * Règle « 1,5 m libre devant chaque porte, des deux côtés »: dans l'axe de chaque porte du lieu
+ * (celle du dehors comme celle de la pièce), aucune case pleine (mur, meuble solide) à moins de
+ * `DOOR_CLEARANCE` de son seuil. Vide: le lieu respecte la règle.
+ */
+export function doorClearanceProblems(content: Content, place: PlaceContent): string[] {
+  const { width, height } = place.map;
+  const blocked = blockedCells(content, place);
+  const sills = doorSills(place.map, DOORS.width);
+  const problems: string[] = [];
+  for (const [id, sill] of Object.entries(sills)) {
+    // Porte au sol: on compte depuis le bord de sa case, du côté où l'on arrive.
+    const from = sill.kind === 'floor' ? 0.5 : 0;
+    for (const reach of [0.5, DOOR_CLEARANCE - 0.25]) {
+      const x = Math.floor(sill.x + sill.nx * (from + reach));
+      const y = Math.floor(sill.y + sill.ny * (from + reach));
+      const full = x < 0 || y < 0 || x >= width || y >= height || blocked[y * width + x] === 1;
+      if (!full) continue;
+      const what = place.map.objects.find(
+        (o) =>
+          content.props[o.type]?.solid === true &&
+          footprintCells(content, o).some((c) => c.x === x && c.y === y),
+      );
+      problems.push(
+        `${place.def.id}: porte « ${id} »: ${what === undefined ? 'un mur' : `le meuble « ${what.id} »`} à moins de ${String(DOOR_CLEARANCE)} m dans son axe (case ${String(x)}; ${String(y)})`,
+      );
+      break;
+    }
+  }
+  return problems;
 }
 
 /** Cases atteintes à pied depuis l'arrivée du lieu, verrous d'histoire ouverts. */

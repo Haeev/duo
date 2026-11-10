@@ -38,12 +38,14 @@ import {
   type CameraInput,
   type CameraPose,
   type CameraSettings,
+  type MapBounds,
   CameraRig,
   screenToWorld,
   towardCamera,
   viewRadius,
 } from './camera';
 import { type Aimable, TargetHighlight } from './cible';
+import { jumped, PassageFade } from './passage';
 import {
   INK_SETTINGS,
   InkKit,
@@ -62,6 +64,7 @@ import {
   type SceneVolume,
 } from './lieu/description';
 import type { BuildingSource } from './lieu/batiments';
+import { Spaces } from './lieu/espaces';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
@@ -192,6 +195,15 @@ export function webglAvailable(): boolean {
 
 type Mutable<T> = { -readonly [K in keyof T]-?: T[K] };
 
+/** Coordonnée d'écran (points CSS) de ce qui ne doit pas se voir pendant un passage. */
+const OFF_SCREEN = -100_000;
+
+interface LastBody {
+  x: number;
+  y: number;
+  known: boolean;
+}
+
 /**
  * Le monde vu par la couche des personnages pendant le trajet: les deux joueurs aux places de la
  * scène du train (corps réécrits à chaque image), sans meuble ni habitant autour d'eux.
@@ -289,9 +301,32 @@ class Engine implements GameRenderer {
     exposure: 1,
     width: 1,
     height: 1,
+    backdrop: null,
   };
   /** Temps restant du fondu de sommeil (s), 0: aucun. */
   private sleepFade = 0;
+  /** Espaces du lieu (le dehors et ses pièces), `null` pour un lieu sans pièce. */
+  private spaces: Spaces | null = null;
+  /** Espace dessiné: la pièce du joueur local, `null` dehors; `undefined`: pas encore posé. */
+  private room: string | null | undefined = undefined;
+  private bounds: MapBounds = { width: 1, height: 1 };
+  /** Fondu des passages de porte: le joueur local déplacé d'un coup. */
+  private readonly passage = new PassageFade();
+  /** Position de chaque joueur à l'image passée, pour reconnaître un déplacement d'un coup. */
+  private readonly lastBodies: readonly [LastBody, LastBody] = [
+    { x: 0, y: 0, known: false },
+    { x: 0, y: 0, known: false },
+  ];
+  /** Joueur caché pour cette image: l'autre, en plein passage (ni à la porte ni arrivé). */
+  private readonly hidden: [boolean, boolean] = [false, false];
+  /** Ce que montrait la dernière image, redessiné tel quel pendant que le noir tombe. */
+  private readonly held = { x: 0, y: 0, radius: 1, valid: false };
+  /** Vrai pendant ces images retenues: l'état est déjà ailleurs, rien ne s'accroche à l'écran. */
+  private holding = false;
+  private readonly visibleAt = (x: number, y: number): boolean =>
+    this.spaces === null || this.spaces.at(x, y) === (this.room ?? null);
+  private readonly volumeShown = (volume: SceneVolume): boolean =>
+    this.spaces === null || this.spaces.shows(this.room ?? null, volume.x, volume.y);
   /** Scène du trajet, construite à l'entrée dans le train et libérée à l'arrivée. */
   private trip: TripScene | null = null;
   private tripCast: TripCast | null = null;
@@ -454,6 +489,7 @@ class Engine implements GameRenderer {
     this.daylight.update(world.minutes, pose.x, pose.y, viewRadius(pose, this.aspect));
     this.background.copy(this.daylight.tableColor);
     this.indoor = false;
+    this.forgetPassage();
     this.draw(dt, world, pose.x, pose.y, viewRadius(pose, this.aspect), null);
     this.measure(dt);
     return true;
@@ -468,6 +504,48 @@ class Engine implements GameRenderer {
     if (this.place !== null) this.place.root.visible = true;
     this.characters.reset();
     this.cutFade = TRIP_SETTINGS.fadeSeconds;
+  }
+
+  /** Arrivée dans un lieu, scène du train: aucun saut à fondre, aucune image à retenir. */
+  private forgetPassage(): void {
+    this.passage.reset();
+    this.held.valid = false;
+    this.holding = false;
+    for (const last of this.lastBodies) last.known = false;
+    this.hidden[0] = false;
+    this.hidden[1] = false;
+  }
+
+  /** Dessine le dehors ou la seule pièce `room`, et y borne la vue. */
+  private showSpace(room: string | null, place: PlaceScene): void {
+    this.room = room;
+    this.bounds = this.spaces?.bounds(room) ?? place.description;
+    place.showWhere(this.spaces === null ? null : this.volumeShown);
+    this.tiled?.showRoom(room);
+  }
+
+  /**
+   * Suit les déplacements d'un coup (porte, replacement). Rend vrai pour celui du joueur local:
+   * le fondu s'en charge. L'autre joueur se pose sans glisser, caché le temps du saut: chez
+   * l'invité, sa position est interpolée entre le départ et l'arrivée pendant une image ou deux.
+   */
+  private trackJumps(world: ReadonlyWorld, local: 0 | 1): boolean {
+    let mine = false;
+    for (const index of PLAYER_INDICES) {
+      const body = world.players[index].body;
+      const last = this.lastBodies[index];
+      const jump = jumped(last.known ? last : null, body);
+      last.x = body.x;
+      last.y = body.y;
+      last.known = true;
+      if (index === local) mine = jump;
+      else {
+        this.hidden[index] = jump;
+        if (jump) this.characters.snap(index);
+      }
+    }
+    this.hidden[local] = false;
+    return mine;
   }
 
   private applyProfile(profile: RenderProfile): void {
@@ -511,15 +589,24 @@ class Engine implements GameRenderer {
     this.tiled = null;
     this.signature = Number.NaN;
     this.lights = null;
+    this.spaces = null;
+    this.room = undefined;
+    this.forgetPassage();
     this.ink?.setGround(null, 1, 1);
     const content = this.options.view.content;
     const place = content.places[id];
     if (place === undefined) return;
+    if (place.interiors.length > 0) this.spaces = new Spaces(place.map, place.interiors);
     // Grand lieu (carte à terrain): sol, décor et bâtiments par tuiles; ses zones pleines ne
     // deviennent pas des dalles (haies, berges, murs les montrent déjà).
     const tiled = place.map.terrain !== undefined;
-    const source = tiled ? { ...place, map: { ...place.map, blocked: [] } } : place;
-    const description = describePlace(content, source, this.options.extras?.(id) ?? []);
+    const description = describePlace(
+      content,
+      place,
+      this.options.extras?.(id) ?? [],
+      undefined,
+      !tiled,
+    );
     this.place = new PlaceScene(
       description,
       {
@@ -623,16 +710,42 @@ class Engine implements GameRenderer {
         this.lights = placeLights(place.volumes(), this.tiled?.lights() ?? null);
     }
 
-    this.characters.update({ dt, world, place: state, cameraYaw: this.rig.yawAngle() });
-
     const local = view.localIndex() ?? 0;
     const body = world.players[local].body;
+    // Passage de porte: l'image d'avant reste et s'éteint, puis tout se pose d'un coup au noir.
+    const step = this.passage.update(dt, this.trackJumps(world, local));
+    this.fade *= step.exposure;
+    this.renderer.toneMappingExposure = RENDER_SETTINGS.renderer.exposure * this.fade;
+    this.holding = step.hold && this.held.valid;
+    if (this.holding) {
+      this.draw(dt, world, this.held.x, this.held.y, this.held.radius, this.lights);
+      this.measure(dt);
+      return;
+    }
+    if (step.cut) {
+      for (const index of PLAYER_INDICES) this.characters.snap(index);
+      this.rig.detach();
+    }
+    const room = this.spaces?.at(body.x, body.y) ?? null;
+    if (room !== this.room) this.showSpace(room, place);
+    // En encre la table est le sol du dehors: une pièce a son plancher, et rien autour.
+    this.table.visible = room === null;
+
+    this.characters.update({
+      dt,
+      world,
+      place: state,
+      cameraYaw: this.rig.yawAngle(),
+      visibleAt: this.visibleAt,
+      hidden: this.hidden,
+    });
+
     const shown = this.characters.playerPosition(local) ?? body;
     this.target.x = shown.x;
     this.target.y = shown.y;
     this.target.speed = body.speed;
     this.target.facing = body.facing;
-    this.rig.update(dt, this.input, this.target, place.description);
+    this.rig.update(dt, this.input, this.target, this.bounds);
     this.input.dragPixels = 0;
     this.input.wheel = 0;
     const pose = this.rig.pose();
@@ -651,15 +764,21 @@ class Engine implements GameRenderer {
     }
     place.applyOcclusion(place.occlusion.update(dt, this.subjects, this.toCamera));
     const radius = viewRadius(pose, this.aspect);
-    this.tiled?.update(
-      dt,
-      shown.x,
-      shown.y,
-      radius,
-      nightShare(world.minutes, RENDER_SETTINGS.lightKeys),
-      this.subjects,
-      this.toCamera,
-    );
+    this.held.x = pose.x;
+    this.held.y = pose.y;
+    this.held.radius = radius;
+    this.held.valid = true;
+    // Dans une pièce, le dehors n'est pas dessiné: ses tuiles restent telles quelles.
+    if (room === null)
+      this.tiled?.update(
+        dt,
+        shown.x,
+        shown.y,
+        radius,
+        nightShare(world.minutes, RENDER_SETTINGS.lightKeys),
+        this.subjects,
+        this.toCamera,
+      );
     this.updateFog(pose.width);
     if (this.overview !== null) this.poseOverview(pose.x, pose.y, this.overview);
 
@@ -709,6 +828,7 @@ class Engine implements GameRenderer {
     frame.viewRadius = radius;
     frame.lights = lights;
     frame.exposure = this.fade;
+    frame.backdrop = typeof this.room === 'string' ? TILE_SETTINGS.interior.backdrop : null;
     frame.width = this.bufferWidth;
     frame.height = this.bufferHeight;
     ink.frame(this.renderer, this.scene, this.camera, frame);
@@ -785,6 +905,14 @@ class Engine implements GameRenderer {
   }
 
   projectToScreen(x: number, y: number, height = 0): { x: number; y: number } | null {
+    // Passage en cours: l'image montre encore le lieu d'avant, où rien du nouvel état ne doit
+    // s'accrocher. Un point loin hors de l'écran, et non `null`: l'interface remettrait sinon sa
+    // bulle à sa place par défaut, bien visible sur le noir qui tombe.
+    if (this.holding) {
+      this.screenPoint.x = OFF_SCREEN;
+      this.screenPoint.y = OFF_SCREEN;
+      return this.screenPoint;
+    }
     const point = this.projected.set(x, height, y);
     this.camera.updateMatrixWorld();
     point.project(this.camera);

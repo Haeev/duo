@@ -685,3 +685,18 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Lacet de caméra déduit d'un déplacement: dans un couloir le pas de biais glisse le long des parois; deux touches (arrière puis droite) et le meilleur des huit lacets à 45 degrés. Près du but, avancer par appuis de 160 ms: une image de rendu logiciel vaut jusqu'à 0,25 s de jeu, soit 0,75 m.
 - Condition d'histoire `posture` (assis ou couché, un ou les deux): « dormir » = les deux couchés. Les tests qui posaient `needs.sleep = 85` pour franchir l'étape doivent coucher les joueurs (`tests/aides-prologue.ts`, lits lus par la brique `sleep`).
 - Un meuble 2 x 1 centré sur une limite de case prend deux rangées: la table de l'épicerie d'Aubrune bouche ainsi le passage vers l'escalier (signalé au manager).
+
+## Intérieurs, portes et passages (La Petite Ligne 2, vérifié le 2026-11-10)
+
+- Un habitant qui glisse en scène: ce n'est pas la vitesse (elle est bien transmise) mais sa posture. À l'heure réelle d'arrivée (8 h) le planning lui donne un geste (`balayer`), le rendu jouait donc le clip du geste pendant la marche. Reproduire à la vraie heure du jeu, pas à celle des sauvegardes d'essai (6 h 10: aucun geste). Règle du rendu: qui se déplace marche (`standingPosture`); la marche de scène retire geste et siège.
+- Passage de porte sans glissement, hôte et invité pareils, sans toucher au réseau: le rendu reconnaît un saut à la position affichée (`jumped`, plus de 3 m entre deux images), retient l'image d'avant pendant que le noir tombe (aucune mise à jour), pose caméra et personnages au noir, puis rouvre. L'autre joueur est caché pendant les images du saut (chez l'invité sa position est interpolée entre départ et arrivée).
+- Pendant les images retenues, `projectToScreen` rend `null`: sinon une bulle de l'interface (la cible du nouvel endroit) se pose n'importe où sur l'ancienne vue.
+- Contre un mur de face la vitesse du corps tombe à zéro (`walkStep`): un déclenchement « en marchant » se lit dans les commandes (`sim.inputs`), pas dans `body.speed`.
+- `put()` des aides de test remplace l'objet `body`: ne pas garder une référence prise avant.
+- La simulation tourne à 30 pas par seconde (`SIM_HZ`), pas 60.
+- Au pas où une scène démarre, ses temps sont lus deux fois (lancement par la quête, puis système des scènes): un temps qui déplace doit se garder d'agir deux fois au même pas.
+- Dans un worktree isolé, toute commande qui mêle `git` (même `git status` dans un tube) ou deux blocs `<<EOF` est refusée en entier: écrire les scripts de retouche par Write dans le scratchpad et les lancer par `python3 chemin.py`.
+- `globalSetup` des parcours e2e relance toute la suite Vitest (l'`include` du fichier de préparation s'ajoute aux tests au lieu de les remplacer): 70 s, et un test lent sous charge fait échouer la recette. Pour itérer: une configuration jetable qui retire `globalSetup` une fois les sauvegardes fabriquées.
+- Captures d'un passage de 0,4 s en rendu logiciel: une rafale de `page.screenshot` pendant la marche (une image du jeu vaut 0,1 s au plus dans le rendu) attrape le noir. Cadrer par `__lplSonde.setCamera(lacet, largeur)`: une porte sur le mur est d'un bâtiment est cachée au lacet de départ (45 degrés), visible à 225.
+- Le fond uni d'un lieu clos passe par `InkFrame.backdrop`; `InkFrame.place` forcerait aussi les lampes.
+

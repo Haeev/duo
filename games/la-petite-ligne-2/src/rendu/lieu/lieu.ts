@@ -74,6 +74,8 @@ export class PlaceScene {
   private readonly inked: Material | null;
   /** Rendu encré: carte du sol d'un petit lieu à sol déclaré (`floor`), `null` sinon. */
   groundMap: Texture | null = null;
+  /** Ce volume est-il dans l'espace affiché ? `null`: tout est affiché. */
+  private shown: ((volume: SceneVolume) => boolean) | null = null;
 
   constructor(
     readonly description: PlaceDescription,
@@ -127,6 +129,7 @@ export class PlaceScene {
     this.root.add(object);
     const view = new VolumeView(volume, object, model !== null, this.glowColor);
     if (volume.occludes) this.occlusion.add(boxOf(volume));
+    object.visible = this.shown?.(volume) ?? true;
     return view;
   }
 
@@ -146,6 +149,16 @@ export class PlaceScene {
       if (this.fixed.has(volume.id)) continue;
       this.dynamic.set(volume.id, this.build(volume));
     }
+  }
+
+  /**
+   * Ne dessine que les volumes de l'espace affiché (le dehors, ou la pièce du joueur local);
+   * `null`: tout. Les volumes posés ensuite suivent la même règle.
+   */
+  showWhere(test: ((volume: SceneVolume) => boolean) | null): void {
+    this.shown = test;
+    for (const map of [this.fixed, this.dynamic])
+      for (const view of map.values()) view.object.visible = test?.(view.volume) ?? true;
   }
 
   /** Tous les volumes affichés, fixes puis dynamiques (lampes du rendu encré). */

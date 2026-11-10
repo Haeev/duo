@@ -11,6 +11,7 @@ import { ShopSchema, type ShopDef } from './schemas/commerce';
 import { DialogueSchema, type DialogueDef } from './schemas/dialogue';
 import { VillagerSchema, type VillagerDef } from './schemas/habitant';
 import { withInteriors } from './carte';
+import { DOORS, withSillObjects } from './seuils';
 import {
   InteriorSchema,
   MapSchema,
@@ -206,7 +207,7 @@ export function loadContent(files: Files): Content {
       );
     places[def.id] = {
       def,
-      map: withInteriors(map, interiors),
+      map: withSillObjects(withInteriors(map, interiors), props, DOORS.prop, DOORS.width),
       interiors,
       villagers,
       dialogues,

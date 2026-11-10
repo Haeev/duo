@@ -37,6 +37,13 @@ export interface CharacterFrame {
   readonly place: DeepReadonly<PlaceState>;
   /** Lacet affiché de la caméra (radians), pour ce qui doit lui faire face. */
   readonly cameraYaw: number;
+  /**
+   * Ce point est-il dans l'espace affiché (le dehors, ou la pièce du joueur local) ? Un personnage
+   * ailleurs n'est pas dessiné. Absent: tout est affiché.
+   */
+  readonly visibleAt?: (x: number, y: number) => boolean;
+  /** Joueurs cachés pour cette image (en plein passage de porte: ni ici ni là-bas). */
+  readonly hidden?: readonly [boolean, boolean];
 }
 
 /**
@@ -212,8 +219,12 @@ class StandInCharacters implements CharacterLayer {
   }
 
   update(frame: CharacterFrame): void {
-    this.follow(this.players[0], frame.world.players[0].body, frame.dt);
-    this.follow(this.players[1], frame.world.players[1].body, frame.dt);
+    for (const index of [0, 1] as const) {
+      const body = frame.world.players[index].body;
+      this.follow(this.players[index], body, frame.dt);
+      this.players[index].object.visible =
+        frame.hidden?.[index] !== true && (frame.visibleAt?.(body.x, body.y) ?? true);
+    }
     for (const id in frame.place.villagers) {
       const state = frame.place.villagers[id];
       if (state === undefined) continue;
@@ -223,6 +234,7 @@ class StandInCharacters implements CharacterLayer {
         this.villagers.set(id, figure);
       }
       this.follow(figure, state.body, frame.dt);
+      figure.object.visible = frame.visibleAt?.(state.body.x, state.body.y) ?? true;
     }
     if (this.villagers.size > 0) {
       for (const [id, figure] of this.villagers) {

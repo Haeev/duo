@@ -253,6 +253,8 @@ export const DoorSchema = v.strictObject({
   shop: v.optional(IdSchema),
   /** Phrase courte montrée quand elle est fermée. */
   says: v.optional(TextSchema),
+  /** Largeur du passage (m), pour une porte plus large qu'une case; absente: celle des réglages. */
+  width: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.6), v.maxValue(4))),
 });
 export type DoorDef = v.InferOutput<typeof DoorSchema>;
 

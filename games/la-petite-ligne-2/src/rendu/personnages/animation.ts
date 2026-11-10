@@ -13,6 +13,20 @@ export type Posture =
 
 export type ClipWeights = Map<string, number>;
 
+/**
+ * Posture d'un personnage debout: le geste en cours (balayer, cueillir) à l'arrêt seulement. Qui
+ * se déplace marche ou court à sa vitesse: sinon il glisserait dans la pose de son geste (marche
+ * de scène, retour au poste).
+ */
+export function standingPosture(
+  speed: number,
+  gesture: string | null,
+  settings: CharacterSettings = CHARACTER_SETTINGS,
+): Posture {
+  const moving = Math.abs(speed) >= settings.locomotion.moving;
+  return gesture !== null && !moving ? { kind: 'clip', clip: gesture } : { kind: 'stand', speed };
+}
+
 /** Poids visés de chaque clip pour cette posture (somme 1). */
 export function targetWeights(
   posture: Posture,

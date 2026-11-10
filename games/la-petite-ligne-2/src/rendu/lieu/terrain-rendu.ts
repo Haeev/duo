@@ -7,6 +7,7 @@
 import type { LayerName } from '../encre/couches';
 import { TILE_SIZE, decodeTerrain } from '../../donnees/carte';
 import type { MapDef } from '../../donnees/schemas/lieu';
+import type { Sill } from '../../donnees/seuils';
 import {
   DEFAULT_LOOK,
   GROUND_LOOKS,
@@ -704,21 +705,28 @@ export function buildingsByTile(
   return out;
 }
 
-/** Emprise d'une pièce sur la grille du lieu (cases). */
+/** Emprise d'une pièce sur la grille du lieu (cases), et ses cloisons (cases de la pièce). */
 export interface InteriorRect {
   readonly id: string;
   readonly at: { readonly x: number; readonly y: number };
   readonly width: number;
   readonly height: number;
+  readonly blocked?: readonly {
+    readonly x: number;
+    readonly y: number;
+    readonly w: number;
+    readonly h: number;
+  }[];
 }
 
 /**
- * Murs coupés d'une pièce: quatre côtés à hauteur d'appui, leur soubassement, et un vide à chaque
- * porte (le point d'arrivée d'une porte est posé dans la pièce, contre son mur). Logique pure.
+ * Murs coupés d'une pièce: quatre côtés à hauteur d'appui avec leur soubassement, un vide à
+ * chaque porte percée dans un de ces murs (`sills`: les seuils du lieu, repère de la carte), et
+ * les cloisons. Logique pure.
  */
 export function interiorWalls(
   room: InteriorRect,
-  doorPoints: readonly { readonly x: number; readonly y: number }[],
+  sills: readonly Pick<Sill, 'kind' | 'x' | 'y' | 'halfWidth'>[],
   settings: TileSettings = TILE_SETTINGS,
 ): BoxItem[] {
   const s = settings.interior;
@@ -728,6 +736,30 @@ export function interiorWalls(
   const x1 = x0 + room.width;
   const y1 = y0 + room.height;
   const t = s.wallThickness;
+  // `outX`, `outZ`: débord du soubassement, en travers du mur seulement (il ne mord pas sur une porte).
+  const wall = (x: number, z: number, w: number, d: number, outX: number, outZ: number): void => {
+    out.push({
+      x,
+      z,
+      base: 0,
+      w: w + outX * 2,
+      h: s.plinthHeight,
+      d: d + outZ * 2,
+      yaw: 0,
+      color: s.plinthColor,
+      layer: 'wall',
+    });
+    out.push({
+      x,
+      z,
+      base: s.plinthHeight,
+      w,
+      h: s.wallHeight - s.plinthHeight,
+      d,
+      yaw: 0,
+      color: s.wallColor,
+    });
+  };
   // Chaque côté: son axe (x ou y), sa position fixe sur l'autre axe, vers le dehors de la pièce.
   const sides = [
     { alongX: true, fixed: y0 - t / 2, from: x0 - t, to: x1 + t, edge: y0 },
@@ -737,14 +769,16 @@ export function interiorWalls(
   ];
   for (const side of sides) {
     const gaps: [number, number][] = [];
-    for (const door of doorPoints) {
-      if (door.x < x0 || door.x > x1 || door.y < y0 || door.y > y1) continue;
-      const away = Math.abs((side.alongX ? door.y : door.x) - side.edge);
-      // La porte appartient au mur le plus proche de son point d'arrivée.
-      const nearest = Math.min(door.y - y0, y1 - door.y, door.x - x0, x1 - door.x);
-      if (away > s.doorReach || away > nearest + 1e-6) continue;
-      const at = side.alongX ? door.x : door.y;
-      gaps.push([at - s.doorWidth / 2, at + s.doorWidth / 2]);
+    for (const sill of sills) {
+      if (sill.kind !== 'wall') continue;
+      const across = side.alongX ? sill.y : sill.x;
+      const along = side.alongX ? sill.x : sill.y;
+      if (Math.abs(across - side.edge) > 1e-3 || along < side.from || along > side.to) continue;
+      // Le seuil est bien sur ce mur de cette pièce (et non sur celui d'une pièce voisine).
+      const other = side.alongX ? sill.x : sill.y;
+      if (other < (side.alongX ? x0 : y0) || other > (side.alongX ? x1 : y1)) continue;
+      const half = sill.halfWidth + s.doorJamb;
+      gaps.push([along - half, along + half]);
     }
     gaps.sort((a, b) => a[0] - b[0]);
     let cursor = side.from;
@@ -756,19 +790,26 @@ export function interiorWalls(
     if (cursor < side.to) spans.push([cursor, side.to]);
     for (const [a, b] of spans) {
       if (b - a < 0.05) continue;
-      const box = (thickness: number, base: number, h: number, color: string): BoxItem => ({
-        x: side.alongX ? (a + b) / 2 : side.fixed,
-        z: side.alongX ? side.fixed : (a + b) / 2,
-        base,
-        w: side.alongX ? b - a : thickness,
-        h,
-        d: side.alongX ? thickness : b - a,
-        yaw: 0,
-        color,
-      });
-      out.push({ ...box(t + s.plinthOut * 2, 0, s.plinthHeight, s.plinthColor), layer: 'wall' });
-      out.push(box(t, s.plinthHeight, s.wallHeight - s.plinthHeight, s.wallColor));
+      if (side.alongX) wall((a + b) / 2, side.fixed, b - a, t, 0, s.plinthOut);
+      else wall(side.fixed, (a + b) / 2, t, b - a, s.plinthOut, 0);
     }
+  }
+  // Cloisons: chaque rectangle plein de la pièce, aminci en travers de sa rangée. Une case seule
+  // suit la rangée (colonne ou ligne) qui porte le plus de cloisons.
+  const blocked = room.blocked ?? [];
+  const inColumn = (x: number): number =>
+    blocked.reduce((n, r) => n + (x >= r.x && x < r.x + r.w ? r.h : 0), 0);
+  const inRow = (y: number): number =>
+    blocked.reduce((n, r) => n + (y >= r.y && y < r.y + r.h ? r.w : 0), 0);
+  const thin = Math.min(1, s.partitionThickness);
+  for (const r of blocked) {
+    const vertical = r.h > r.w || (r.h === r.w && inColumn(r.x) >= inRow(r.y));
+    const cx = x0 + r.x + r.w / 2;
+    const cz = y0 + r.y + r.h / 2;
+    // Un pavé plus large qu'une case (un massif) garde toute son emprise.
+    const w = vertical && r.w === 1 ? thin : r.w;
+    const d = !vertical && r.h === 1 ? thin : r.h;
+    wall(cx, cz, w, d, 0, 0);
   }
   return out;
 }
