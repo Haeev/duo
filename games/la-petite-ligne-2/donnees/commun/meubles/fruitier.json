@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "fruitier",
+  "name": "Arbre fruitier",
+  "model": "arbre-fruitier",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "fruitier"
+    }
+  ]
+}

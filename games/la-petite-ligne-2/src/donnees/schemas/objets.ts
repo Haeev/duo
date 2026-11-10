@@ -1,6 +1,7 @@
 /** `donnees/commun/objets/<id>.json`: tout ce qui tient dans une case (cahier 4.5). Un fichier par objet. */
 import * as v from 'valibot';
 import { ToolKindSchema } from './briques';
+import { ToolWorkSchema } from './recolte';
 import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema, LabelSchema } from './communs';
 
 export const ITEM_FAMILIES = [
@@ -24,6 +25,8 @@ export const ToolSchema = v.strictObject({
   /** Durée d'un geste, en secondes, outil en état puis émoussé. */
   gestureSeconds: v.pipe(FiniteSchema, v.minValue(0.2), v.maxValue(1.5)),
   bluntGestureSeconds: v.pipe(FiniteSchema, v.minValue(0.2), v.maxValue(1.5)),
+  /** Niveau, puissance par coup, amélioration et réparation (`recolte.ts`); absent: outil de base. */
+  work: v.exactOptional(ToolWorkSchema),
 });
 
 /** Bonus exclusif d'un repas spécial pris à deux (cahier 4.4, R26): vocabulaire du moteur, pas un plat. */

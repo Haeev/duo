@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "gros-chene",
+  "name": "Gros chêne",
+  "model": "gros-arbre",
+  "size": {
+    "w": 2,
+    "h": 2
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "gros-chene"
+    }
+  ]
+}

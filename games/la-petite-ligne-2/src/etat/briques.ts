@@ -6,6 +6,7 @@ import * as v from 'valibot';
 import { IntSchema, PlayerIndexSchema, TickSchema } from '../donnees/schemas/communs';
 import type { Brick } from '../donnees/schemas/briques';
 import { StackSchema } from './joueur';
+import { FieldStateSchema, HarvestStateSchema } from '../donnees/schemas/recolte-briques';
 
 const Seat = v.nullable(PlayerIndexSchema);
 
@@ -20,6 +21,9 @@ export const BrickStatesSchema = v.strictObject({
   sleep: v.exactOptional(v.pipe(v.array(Seat), v.maxLength(2))),
   store: v.exactOptional(v.pipe(v.array(v.nullable(StackSchema)), v.maxLength(40))),
   open: v.exactOptional(v.boolean()),
+  /** Point de récolte et terre cultivable (`donnees/schemas/recolte-briques.ts`). */
+  harvest: v.exactOptional(HarvestStateSchema),
+  field: v.exactOptional(FieldStateSchema),
 });
 export type BrickStates = v.InferOutput<typeof BrickStatesSchema>;
 
@@ -48,6 +52,12 @@ export function initialBrickStates(bricks: readonly Brick[]): BrickStates {
       case 'cook':
       case 'repair':
       case 'travel':
+        break;
+      case 'harvest':
+        states.harvest = { work: 0, back: null };
+        break;
+      case 'field':
+        states.field = { cells: [], work: null };
         break;
     }
   }

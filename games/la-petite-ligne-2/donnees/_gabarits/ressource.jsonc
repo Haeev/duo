@@ -1,0 +1,47 @@
+// GABARIT: une ressource du monde (arbre, rocher, fleurs, baies, point de fouille, arbre fruitier).
+// Créer: pnpm nouveau ressource <id>      -> donnees/commun/ressources/<id>.json
+// Schéma: src/donnees/schemas/recolte.ts. Pour la poser: un meuble (gabarit « meuble ») avec la
+// brique { "brick": "harvest", "resource": "<id>" }, puis une ligne dans la carte d'un lieu.
+{
+  "schema": 1,
+  "id": "exemple-ressource",
+  "name": "Ressource d'essai",
+  // Famille du geste, pour l'animation, le son et les particules: chop, pick, dig, shake.
+  "kind": "pick",
+  // Verbe de la bulle d'action (deux mots au plus) et animation du personnage.
+  "verb": "Cueillir",
+  "clip": "pickup",
+  // Durée du geste à mains nues (0,1 à 1,5 s). Avec un outil, c'est la durée de l'outil.
+  "seconds": 0.5,
+  // Outil à tenir (axe, spade, can, rod, net, hammer), null = mains nues; niveau minimal de
+  // l'outil (0 de base, 1 amélioré, 2 fin): une hache de base ne coupe pas le gros chêne.
+  "tool": null,
+  "minTier": 0,
+  // Points de travail avant la récolte. Mains nues: 1 point par coup. Hache de base: 6 par coup.
+  "work": 1,
+  // Geste salissant (l'hygiène baisse), points de faim perdus par coup.
+  "dirty": false,
+  "effort": 0,
+  // Ce qui reste une fois récolté: gone (rien), stump (souche), bare (sans fruits).
+  "after": "gone",
+  // Jours avant de revenir (1 = chaque jour).
+  "respawnDays": 1,
+  // true: le butin tombe au sol autour (fruits secoués); false: dans les poches.
+  "toGround": false,
+  // Tirages par récolte, puis la table: chaque ligne avec ses conditions (heures en minutes
+  // depuis minuit, la plage peut passer minuit; météos clear, overcast, rain, mist, snow;
+  // saisons; [] = toutes) et son poids. « rare »: poids multiplié par la chance des besoins.
+  "rolls": 1,
+  "loot": [
+    {
+      "item": "pomme",
+      "min": 1,
+      "max": 2,
+      "weight": 1,
+      "rare": false,
+      "hours": null,
+      "weathers": [],
+      "seasons": [],
+    },
+  ],
+}

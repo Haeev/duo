@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "arrosoir-cuivre",
+  "name": "Arrosoir de cuivre",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "can",
+    "durability": 200,
+    "gestureSeconds": 0.7,
+    "bluntGestureSeconds": 0.8,
+    "work": {
+      "tier": 1,
+      "power": 1,
+      "bluntPower": 1,
+      "cells": 9,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": {
+        "cents": 150,
+        "items": []
+      }
+    }
+  }
+}

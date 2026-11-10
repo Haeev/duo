@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "coquelicots",
+  "name": "Coquelicots",
+  "model": "fleurs",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "coquelicots"
+    }
+  ]
+}

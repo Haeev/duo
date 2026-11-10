@@ -608,3 +608,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - La raison d'un événement `refused` est un `IdSchema` (minuscules et traits d'union): `too-far`, jamais `too_far`.
 - Les joueurs naissent au point `descente` (près du quai), pas aux points `depart-joueur-*`: un test de portée place les corps lui-même.
 - Tests d'un système hors du pas: construire un `SimContext` à la main (copie de `step`) qui note les tranches touchées; retoucher le contenu en modifiant `dataFiles()` avant `loadContent` (exemplaire factice sans code).
+- Ajouter un événement casse le `switch` exhaustif de `src/interface/index.ts` (lot L7): ajouter ses `case` à la liste ignorée, sans commentaire entre deux `case` (`no-fallthrough`).
+- Un schéma de brique ne peut pas importer `schemas/briques.ts` (import circulaire, TDZ): le mettre dans son propre fichier sans import de `briques.ts`.
+- Ne jamais lancer `prettier --write` sur un dossier entier: plusieurs fichiers des autres lots (README, `interface/index.ts`) ne sont pas formatés et seraient réécrits. Viser ses fichiers.
+- Dans un worktree isolé, une commande qui mêle `git` et des tubes ou `&&` est refusée: commandes git simples, une par appel; le contrôle des tirets se lance sans `--exclude-dir=.git` (sur `games docs`).

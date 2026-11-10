@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "coquelicot",
+  "name": "Coquelicot",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

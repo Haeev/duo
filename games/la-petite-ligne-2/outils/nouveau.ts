@@ -50,6 +50,16 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     folder: 'commun/prises',
     inPlace: false,
   },
+  culture: {
+    files: [{ from: 'culture.jsonc', to: '<id>.json' }],
+    folder: 'commun/cultures',
+    inPlace: false,
+  },
+  ressource: {
+    files: [{ from: 'ressource.jsonc', to: '<id>.json' }],
+    folder: 'commun/ressources',
+    inPlace: false,
+  },
   habitant: {
     files: [{ from: 'habitant.jsonc', to: '<id>.json' }],
     folder: 'lieux/<lieu>/habitants',

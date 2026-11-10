@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "graines-tomate",
+  "name": "Graines de tomate",
+  "family": "seed",
+  "stack": 20,
+  "food": null,
+  "tool": null
+}

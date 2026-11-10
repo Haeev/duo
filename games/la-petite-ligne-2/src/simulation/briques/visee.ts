@@ -157,7 +157,9 @@ export function aimOf(
       const chosen = chooseBrick(look, player, place, prop, def, registry);
       if (chosen === null) return null;
       const { brick, behaviour, refusal, tool } = chosen;
-      const verb = 'verb' in brick ? brick.verb : behaviour.verb;
+      const verb =
+        behaviour.verbOf?.(look, player, brickView(place, prop, brick)) ??
+        ('verb' in brick ? brick.verb : behaviour.verb);
       return { action: brick.brick, verb, refusal, tool };
     });
   };

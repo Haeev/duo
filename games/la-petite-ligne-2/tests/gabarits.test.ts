@@ -40,6 +40,7 @@ describe('gabarits', () => {
     expect(Object.keys(TEMPLATES).sort()).toEqual(
       [
         'commerce',
+        'culture',
         'dialogue',
         'habitant',
         'lieu',
@@ -49,6 +50,7 @@ describe('gabarits', () => {
         'prise',
         'quete',
         'recette',
+        'ressource',
       ].sort(),
     );
     for (const template of Object.values(TEMPLATES)) {

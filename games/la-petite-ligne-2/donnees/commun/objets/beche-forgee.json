@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "beche-forgee",
+  "name": "Bêche forgée",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "spade",
+    "durability": 150,
+    "gestureSeconds": 0.8,
+    "bluntGestureSeconds": 1,
+    "work": {
+      "tier": 1,
+      "power": 6,
+      "bluntPower": 2,
+      "cells": 3,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": {
+        "cents": 200,
+        "items": []
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "terre-cultivable",
+  "name": "Terre cultivable",
+  "model": "terre",
+  "size": {
+    "w": 6,
+    "h": 4
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "field",
+      "tools": ["spade", "can"],
+      "plots": [
+        {
+          "cells": 6,
+          "fact": null
+        },
+        {
+          "cells": 12,
+          "fact": "logement.potager.agrandi"
+        },
+        {
+          "cells": 24,
+          "fact": "logement.potager.grand"
+        }
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@ Tout le contenu est ici, en JSON validé par schéma (`src/donnees/schemas/`). *
 ```text
 commun/        reglages.json, besoins.json, sacs.json
                objets/<id>.json   meubles/<id>.json   recettes/<id>.json   prises/<id>.json
+               cultures/<id>.json   ressources/<id>.json
                personnages/catalogue.json (écrit par le générateur de pièces, lot L5)
 lieux/<lieu>/  lieu.json, carte.json
                habitants/<id>.json   dialogues/<id>.json   commerces/<id>.json   quetes/<id>.json
@@ -28,13 +29,15 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Dialogue | `pnpm nouveau dialogue bonjour-facteur aubrune` | `villager`, conditions, nœuds. 150 caractères par réplique, 3 options au plus, toujours une fin. |
 | Recette | `pnpm nouveau recette compote` | poste, ingrédients, résultat (des objets existants). |
 | Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
+| Culture | `pnpm nouveau culture carotte` | graine (objet `seed`), saisons, stades en points de pousse (jour sec 1, arrosé 2), récolte unique ou qui repousse, qualités. Elle pousse sur tout meuble à brique `field`. |
+| Ressource | `pnpm nouveau ressource noisetier` | geste, outil et niveau minimal, travail, repousse en jours, table de butin (heures, météos, saisons, rare). Pour la poser: un meuble avec la brique `{ "brick": "harvest", "resource": "noisetier" }`, puis une ligne dans la carte. |
 | Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
 | Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | chapitres, étapes, conditions de fin, effets. |
 | Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |
 
 ## Briques (ce qu'un meuble sait faire)
 
-`sit` s'asseoir, `sleep` dormir, `store` ranger, `gather` ramasser ou cueillir, `relieve` soulager un besoin, `shop` vendre et acheter, `cook` cuisiner ou fabriquer, `open` ouvrir, `repair` réparer. Paramètres: `_gabarits/meuble.jsonc`. Une chaise est un meuble avec `sit`; un coffre, un meuble avec `store`; un banc-coffre, les deux.
+`sit` s'asseoir, `sleep` dormir, `store` ranger, `gather` ramasser ou cueillir, `relieve` soulager un besoin, `shop` vendre et acheter, `cook` cuisiner ou fabriquer, `open` ouvrir, `repair` réparer, `harvest` point de récolte d'une ressource (`ressources/`), `field` terre cultivable (parcelles du potager, nombre selon les améliorations). Paramètres: `_gabarits/meuble.jsonc`. Une chaise est un meuble avec `sit`; un coffre, un meuble avec `store`; un banc-coffre, les deux.
 
 Il manque un comportement ? C'est une **brique nouvelle** à demander (schéma, état, comportement: trois fichiers du moteur, une fois), pas un cas particulier à glisser dans un contenu.
 

@@ -1,0 +1,24 @@
+// GABARIT: une culture du potager (cahier 4.7: rien ne meurt, arroser fait pousser plus vite et mieux).
+// Créer: pnpm nouveau culture <id>        -> donnees/commun/cultures/<id>.json
+// Schéma: src/donnees/schemas/recolte.ts. La graine et les récoltes sont des fichiers de commun/objets/.
+{
+  "schema": 1,
+  "id": "exemple-culture",
+  "name": "Culture d'essai",
+  // Objet de famille « seed » qui la sème (une graine ne sème qu'une culture).
+  "seed": "pomme",
+  // Saisons où elle se sème et pousse (spring, summer, autumn, winter). [] = toutes.
+  // Hors saison, une plante déjà semée attend sans mourir.
+  "seasons": [],
+  // Points de pousse de chaque stade jusqu'à la maturité: un jour sec compte 1, un jour arrosé
+  // (ou de pluie) compte 2. [2, 2]: mûre en 2 jours arrosés, ou 4 jours secs.
+  "stages": [2, 2],
+  // Récolte qui repousse: le stade où elle revient (0 = au semis). null = récolte unique.
+  "regrowStage": null,
+  // Qualités, de la plus simple à la meilleure: atteinte quand la part de jours arrosés vaut au
+  // moins « wateredShare » (la première vaut 0). Une qualité peut donner un autre objet ou plus.
+  "qualities": [
+    { "wateredShare": 0, "item": "pomme", "count": 1 },
+    { "wateredShare": 1, "item": "pomme", "count": 2 },
+  ],
+}

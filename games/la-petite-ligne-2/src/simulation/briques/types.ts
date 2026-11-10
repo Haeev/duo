@@ -44,6 +44,8 @@ export type BrickView<B extends Brick = Brick> = BrickTarget<B, DeepReadonly<Bri
 export interface BrickBehaviour<B extends Brick = Brick> {
   /** Verbe de la bulle d'action quand la brique n'en porte pas dans ses données. */
   readonly verb: string;
+  /** Verbe selon la cible et l'outil en main (bêcher, semer, arroser); absent: `verb`. Pur. */
+  verbOf?(look: Look, player: PlayerIndex, target: BrickView<B>): string;
   /** Geste joué avant l'effet; absent ou `null`: l'effet est immédiat. */
   gesture?(look: Look, player: PlayerIndex, target: BrickView<B>): GestureSpec | null;
   /** Clé de texte du refus, ou `null` si la brique peut servir à ce joueur maintenant. Pur. */

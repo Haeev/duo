@@ -9,6 +9,18 @@
     "kind": "axe",
     "durability": 120,
     "gestureSeconds": 0.7,
-    "bluntGestureSeconds": 1.5
+    "bluntGestureSeconds": 1.5,
+    "work": {
+      "tier": 1,
+      "power": 9,
+      "bluntPower": 4,
+      "cells": 1,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": {
+        "cents": 200,
+        "items": []
+      }
+    }
   }
 }

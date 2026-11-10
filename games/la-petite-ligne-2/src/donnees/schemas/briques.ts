@@ -12,6 +12,7 @@
  */
 import * as v from 'valibot';
 import { CountSchema, FiniteSchema, IdSchema, IntSchema, NeedIdSchema } from './communs';
+import { HARVEST_BRICK_SCHEMAS } from './recolte-briques';
 
 export const TOOL_KINDS = ['axe', 'spade', 'can', 'rod', 'net', 'hammer'] as const;
 export const ToolKindSchema = v.picklist(TOOL_KINDS);
@@ -87,6 +88,8 @@ export const BRICK_SCHEMAS = [
    * pas de zone d'embarquement sans objet.
    */
   v.strictObject({ brick: v.literal('travel') }),
+  /** Points de récolte du monde et terre cultivable (`recolte-briques.ts`). */
+  ...HARVEST_BRICK_SCHEMAS,
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);
