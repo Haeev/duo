@@ -96,6 +96,7 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 - Chaque membre, surtout au design, à l'animation, au level design, à l'art et au rendu, se pose pour chaque élément qu'il pose ou modifie: « est-ce que cet élément précis est au bon endroit, dans le bon sens, à la bonne taille ? Pourquoi ? ». Un chemin relie des lieux où l'on va vraiment; un bâtiment est placé là où il servirait dans un vrai bourg; une barrière de passage à niveau barre la route et non la voie, dans le bon sens; une poutre porte quelque chose; un escalier a des marches à taille humaine.
 - La réponse au « pourquoi » s'écrit quand elle n'est pas évidente (carte, bible artistique, compte rendu). Un élément sans raison d'être est déplacé, corrigé ou retiré.
 - Chaque livrable visuel est regardé de près, pas seulement à distance de jeu: rien qui dépasse, flotte ou se traverse.
+- Le plan avant le volume (demande du client, 2026-11-10): tout lieu se conçoit d'abord en plan vu du dessus, à l'échelle, avec ses zones, ses chemins, ses bâtiments, ses repères et le trajet des quêtes; le plan est relu (cohérence, distances, raisons d'être) et montré au client avant toute construction en 3D. La carte 3D est générée à partir de ce plan, jamais l'inverse.
 
 ### Gabarits: ajouter du contenu sans repartir de zéro (demande du client, 2026-11-10)
 
