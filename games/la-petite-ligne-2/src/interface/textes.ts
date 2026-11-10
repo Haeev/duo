@@ -34,6 +34,7 @@ export const TEXTS = {
     'already-cooking': 'Déjà en cuisine',
     'already-sharp': 'Déjà bien affûté',
     'already-watered': 'Déjà arrosé',
+    'bag-not-bigger': 'Pas plus grand',
     'bed-taken': 'Lit déjà pris',
     busy: 'Tu es occupé·e',
     'cannot-cook': 'Rien à cuisiner',
