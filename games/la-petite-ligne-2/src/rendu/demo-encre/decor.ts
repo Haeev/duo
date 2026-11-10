@@ -4,7 +4,7 @@
  * sont trapus: planches de 5 cm, pieds larges, ferrures grossies (bible 0.2, section 3.5).
  * Couleurs: tons clairs du nuancier 0.2; le second ton et l'ombre viennent de la matière.
  */
-import * as THREE from 'three';
+import type * as THREE from 'three';
 
 import { at, GLOW, hex, LAYER, type Rgb, type Sculpt } from './formes';
 
@@ -164,20 +164,31 @@ export function sack(s: Sculpt, matrix: THREE.Matrix4): void {
   });
 }
 
-/** Barrière de bois: poteaux tous les 2 m environ, deux lisses, le tout un peu de travers. */
-export function fence(s: Sculpt, x0: number, x1: number, z: number): void {
+/**
+ * Barrière de bois: poteaux tous les 2 m environ, deux lisses, le tout un peu de travers. Chaque
+ * poteau est planté à la hauteur du terrain; les lisses suivent la pente d'un poteau au suivant.
+ */
+export function fence(
+  s: Sculpt,
+  x0: number,
+  x1: number,
+  z: number,
+  height: (x: number, z: number) => number,
+): void {
   const spans = Math.max(1, Math.round((x1 - x0) / 2.1));
   const step = (x1 - x0) / spans;
-  s.group(at(0, 0, z), () => {
-    for (let i = 0; i <= spans; i += 1) {
-      const x = x0 + i * step;
+  for (let i = 0; i <= spans; i += 1) {
+    const x = x0 + i * step;
+    const ground = height(x, z);
+    // Un objet par travée: le pied encré et le contour se règlent sur chaque poteau.
+    s.group(at(x, ground, z), () => {
       s.box(
         0.15,
-        1.2,
+        1.28,
         0.15,
         at(
-          x,
-          0.58 + lean(x, 0.04),
+          0,
+          0.54 + lean(x, 0.04),
           lean(x + 1, 0.03),
           lean(x, 0.2),
           lean(x + 2, 0.04),
@@ -190,13 +201,21 @@ export function fence(s: Sculpt, x0: number, x1: number, z: number): void {
           wobble: 0.02,
         },
       );
-      if (i === spans) break;
+      if (i === spans) return;
+      const rise = height(x + step, z) - ground;
       for (const y of [0.45, 0.92]) {
         s.box(
-          step + 0.2,
+          Math.hypot(step, rise) + 0.2,
           0.11,
           0.05,
-          at(x + step / 2, y + lean(x + y, 0.03), 0.09, 0, 0, lean(x * 3 + y, 0.035)),
+          at(
+            step / 2,
+            y + rise / 2 + lean(x + y, 0.03),
+            0.09,
+            0,
+            0,
+            Math.atan2(rise, step) + lean(x * 3 + y, 0.035),
+          ),
           {
             color: TONE.wood,
             layer: LAYER.wood,
@@ -205,149 +224,8 @@ export function fence(s: Sculpt, x0: number, x1: number, z: number): void {
           },
         );
       }
-    }
-  });
-}
-
-/**
- * Arbre: tronc coudé à pans, deux branches, houppier en cinq grandes masses cabossées, chacune
- * hérissée de petites touffes qui découpent sa silhouette. Le dessous des masses est un noir
- * plein: vu d'en haut, c'est lui qui détache une masse de la suivante.
- */
-export function tree(s: Sculpt, x: number, z: number, size: number, seed: number): void {
-  const under = hex('#2B3320');
-  s.group(at(x, 0, z, lean(seed, 3)), () => {
-    const bark = { color: TONE.woodOld, layer: LAYER.bark, wobble: 0.03 } as const;
-    const a = new THREE.Vector3(0, 0, 0);
-    const b = new THREE.Vector3(0.18 * size, 1.5 * size, 0.05);
-    const c = new THREE.Vector3(-0.1 * size, 3.0 * size, -0.12);
-    // Empattement: trois racines qui sortent de terre.
-    for (let i = 0; i < 3; i += 1) {
-      const angle = i * 2.1 + seed;
-      s.limb(
-        new THREE.Vector3(0, 0.35 * size, 0),
-        new THREE.Vector3(Math.cos(angle) * 0.75 * size, -0.05, Math.sin(angle) * 0.75 * size),
-        0.2 * size,
-        0.07 * size,
-        5,
-        bark,
-      );
-    }
-    s.limb(a, b, 0.36 * size, 0.25 * size, 6, bark);
-    s.limb(b, c, 0.25 * size, 0.17 * size, 6, bark);
-    s.limb(
-      b,
-      new THREE.Vector3(1.1 * size, 2.7 * size, 0.5 * size),
-      0.14 * size,
-      0.08 * size,
-      5,
-      bark,
-    );
-    s.limb(
-      c,
-      new THREE.Vector3(-1.0 * size, 3.9 * size, -0.4 * size),
-      0.13 * size,
-      0.07 * size,
-      5,
-      bark,
-    );
-    const masses: readonly (readonly [number, number, number, number])[] = [
-      [0, 4.7, 0, 1.7],
-      [1.4, 3.7, 0.6, 1.25],
-      [-1.35, 4.0, -0.5, 1.3],
-      [0.3, 3.8, -1.35, 1.15],
-      [-0.5, 3.55, 1.25, 1.1],
-    ];
-    masses.forEach(([mx, my, mz, r], i) => {
-      s.newId();
-      const tone = i % 2 === 0 ? TONE.leaf : TONE.leafDark;
-      s.blob(
-        r * size,
-        r * size * 0.66,
-        r * size * 0.95,
-        at(mx * size, my * size, mz * size, lean(seed + i, 3)),
-        {
-          color: tone,
-          bottomColor: under,
-          layer: LAYER.leaf,
-          wobble: 0.2 * size,
-        },
-      );
-      // Touffes du pourtour: elles donnent au contour ses dents.
-      const tufts = 7;
-      for (let k = 0; k < tufts; k += 1) {
-        const angle = (k / tufts) * Math.PI * 2 + lean(seed * 3 + i * 7 + k, 0.4);
-        const reach = r * size * (0.82 + lean(seed + i + k * 3, 0.12));
-        const rr = r * size * (0.3 + lean(seed * 5 + k + i, 0.08));
-        s.blob(
-          rr,
-          rr * 0.6,
-          rr,
-          at(
-            mx * size + Math.cos(angle) * reach,
-            my * size - r * size * 0.12 + lean(k + i, 0.2) * size,
-            mz * size + Math.sin(angle) * reach * 0.95,
-            angle,
-          ),
-          {
-            color: k % 3 === 0 ? TONE.leafDark : tone,
-            bottomColor: under,
-            layer: LAYER.leaf,
-            wobble: 0.07 * size,
-          },
-          0,
-        );
-      }
     });
-  });
-}
-
-/** Buisson: deux ou trois masses basses. */
-export function bush(s: Sculpt, x: number, z: number, size: number, seed: number): void {
-  s.group(at(x, 0, z, lean(seed, 3)), () => {
-    const under = hex('#2B3320');
-    s.blob(0.75 * size, 0.55 * size, 0.65 * size, at(0, 0.45 * size, 0), {
-      color: TONE.leafDark,
-      bottomColor: under,
-      layer: LAYER.leaf,
-      wobble: 0.12,
-    });
-    s.newId();
-    s.blob(0.55 * size, 0.42 * size, 0.5 * size, at(0.6 * size, 0.34 * size, 0.2 * size, 1), {
-      color: TONE.leaf,
-      bottomColor: under,
-      layer: LAYER.leaf,
-      wobble: 0.1,
-    });
-    s.newId();
-    s.blob(0.45 * size, 0.36 * size, 0.45 * size, at(-0.5 * size, 0.3 * size, -0.25 * size, 2), {
-      color: TONE.leaf,
-      bottomColor: under,
-      layer: LAYER.leaf,
-      wobble: 0.1,
-    });
-    for (let k = 0; k < 6; k += 1) {
-      const angle = k * 1.05 + seed;
-      s.blob(
-        0.24 * size,
-        0.2 * size,
-        0.24 * size,
-        at(
-          Math.cos(angle) * 0.75 * size,
-          (0.3 + lean(k + seed, 0.15)) * size,
-          Math.sin(angle) * 0.62 * size,
-          angle,
-        ),
-        {
-          color: k % 2 ? TONE.leaf : TONE.leafDark,
-          bottomColor: under,
-          layer: LAYER.leaf,
-          wobble: 0.05,
-        },
-        0,
-      );
-    }
-  });
+  }
 }
 
 /** Voie: deux rails à l'écartement normal (1,435 m) sur traverses de 2,5 m tous les 62 cm. */
@@ -954,6 +832,56 @@ export function roomWall(
       }
     }
     if (panel) {
+      // Plinthe moulurée: une planche de 13 cm en saillie sur le lambris, coiffée d'un quart-de-rond;
+      // elle s'interrompt aux portes. Puis les chambranles: deux montants et une traverse à
+      // corniche autour de chaque vide, en saillie de 3 cm sur le plâtre.
+      s.newId();
+      const sorted = [...openings].sort((a, b) => a.along - b.along);
+      let start = -length / 2;
+      const skirt = (x0: number, x1: number): void => {
+        if (x1 - x0 < 0.05) return;
+        s.box(x1 - x0, 0.13, 0.03, at((x0 + x1) / 2, 0.065, -t / 2 - 0.052), {
+          color: TONE.woodDark,
+          layer: LAYER.grain,
+          grain: 'x',
+          wobble: 0.004,
+        });
+        s.box(x1 - x0, 0.035, 0.045, at((x0 + x1) / 2, 0.145, -t / 2 - 0.048, 0, 0.5, 0), {
+          color: TONE.woodOld,
+          wobble: 0.003,
+        });
+      };
+      for (const o of sorted) {
+        if (o.sill > 0) continue;
+        skirt(start, o.along - o.width / 2 - 0.1);
+        start = o.along + o.width / 2 + 0.1;
+      }
+      skirt(start, length / 2);
+      if (height > 1) {
+        for (const o of sorted) {
+          const top = o.sill + o.height;
+          const casing = { color: TONE.chalk, wobble: 0.004 } as const;
+          for (const sign of [-1, 1]) {
+            s.box(
+              0.09,
+              o.height + 0.05,
+              0.035,
+              at(o.along + sign * (o.width / 2 + 0.045), o.sill + o.height / 2, -t / 2 - 0.016),
+              casing,
+            );
+          }
+          s.box(o.width + 0.26, 0.1, 0.04, at(o.along, top + 0.05, -t / 2 - 0.018), casing);
+          s.box(o.width + 0.34, 0.035, 0.075, at(o.along, top + 0.115, -t / 2 - 0.035), casing);
+          if (o.sill > 0) {
+            // Tablette d'appui et son tasseau: on y pose un pot, on s'y accoude.
+            s.box(o.width + 0.3, 0.04, 0.14, at(o.along, o.sill - 0.005, -t / 2 - 0.06), {
+              color: TONE.woodDark,
+              wobble: 0.004,
+            });
+            s.box(o.width + 0.16, 0.06, 0.03, at(o.along, o.sill - 0.055, -t / 2 - 0.016), casing);
+          }
+        }
+      }
       // Cimaise: la baguette qui coiffe le lambris, interrompue aux vides.
       s.newId();
       let from = -length / 2;

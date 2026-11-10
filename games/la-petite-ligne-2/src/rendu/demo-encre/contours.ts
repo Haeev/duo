@@ -102,7 +102,9 @@ void main() {
         } else {
           float part = partOf(aux);
           float bend = dot(normalOf(aux), normal0);
-          if (abs(part - part0) > 0.5 || bend < 0.35) {
+          // Peau lisse (numéro 63, le visage): aucune arête tracée dedans, quel que soit son modelé.
+          bool sleek = mod(part, 64.0) > 62.5 && mod(part0, 64.0) > 62.5;
+          if (abs(part - part0) > 0.5 || (bend < 0.35 && !sleek)) {
             // Trait intérieur: un rang sous celui du plus petit des deux morceaux.
             rank = min(4, max(sizeOf(part), sizeOf(part0)) + 1);
             hit = 1.0;
