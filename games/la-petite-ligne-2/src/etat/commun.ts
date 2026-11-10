@@ -2,6 +2,7 @@
 import * as v from 'valibot';
 import { CentsSchema, IdSchema, IntSchema, TickSchema } from '../donnees/schemas/communs';
 import { StoryStateSchema } from '../donnees/schemas/scene';
+import { TripArrivalSchema } from '../donnees/schemas/trajet';
 
 /**
  * Phases du jeu (ADR 0018). `day` couvre le jour et la nuit jouable; les trois autres sont le
@@ -24,6 +25,8 @@ export const TravelSchema = v.strictObject({
   since: v.nullable(TickSchema),
   /** Pendant le trajet, chaque joueur a demandé à passer la scène (touche d'action). */
   skip: v.exactOptional(Pair),
+  /** Heure d'arrivée déclarée par le trajet (effet `travel_to`); absente: `travel.clockHours`. */
+  arrival: v.exactOptional(TripArrivalSchema),
 });
 export type TravelState = v.InferOutput<typeof TravelSchema>;
 

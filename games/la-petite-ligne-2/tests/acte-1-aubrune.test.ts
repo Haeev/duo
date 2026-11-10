@@ -215,7 +215,7 @@ describe('écriture du prologue et de l’acte 1', () => {
     if (sim.world.common.place === PROLOGUE) both(sim, 'porte');
     wait(sim, 0.5);
     expect(sim.world.progress.quests.terminus?.done).toBe(true);
-    const night = sim.world.minutes;
+    const nightDay = sim.world.common.day;
     for (
       let i = 0;
       i < 40 && (sim.world.common.place !== AUBRUNE || sim.world.common.phase !== 'day');
@@ -224,9 +224,10 @@ describe('écriture du prologue et de l’acte 1', () => {
       for (const p of [0, 1] as const) act(sim, p, { type: 'place_loaded', place: AUBRUNE });
       wait(sim, 1);
     }
-    expect(sim.world.minutes - night).toBeGreaterThanOrEqual(
-      sim.content.settings.travel.clockHours * 60,
-    );
+    // Train de nuit: on arrive toujours le lendemain à 8 h (« Il est 8 h », dit Firmin).
+    expect(sim.world.minutes).toBeGreaterThanOrEqual(8 * 60);
+    expect(sim.world.minutes).toBeLessThan(8 * 60 + 2);
+    expect(sim.world.common.day).toBe(nightDay + 1);
     expect(sim.world.common.place).toBe(AUBRUNE);
     wait(sim, 0.5);
 

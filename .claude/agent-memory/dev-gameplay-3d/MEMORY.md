@@ -667,3 +667,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Marche de scène: `detourAround` (lecteur.ts) choisit le plus court repère libre autour de la paire; l'ancien détour par un seul bout bloquait l'habitant à son repère quand sa place était à 30° de côté (38 trajets sur 240), jusqu'au plafond de 20 s. La marche presse le pas au-delà de `walkBudgetSeconds` (Firmin: 9,6 s ramenées à 4,1 s).
 - Les sauvegardes de départ (`/tmp/lpl2-e2e-fixtures`) et l'`outputDir` étaient communs à tous les worktrees: une recette lancée ailleurs réécrivait les sauvegardes au milieu de la nôtre (parties d'une autre version, joueurs à l'ancien écart) et effaçait nos pièces jointes. Depuis, ces dossiers portent l'empreinte du chemin du paquet (`tests/aides-e2e/dossiers.ts`).
 - Une capture Playwright en rendu logiciel chargé peut durer plus que les délais de jeu (8 s du lecteur seul): pas de capture entre deux actions dont le parcours mesure l'enchaînement.
+
+## La Petite Ligne 2: marche, course et trajets (vérifié le 2026-11-10)
+
+- Foulées mesurées des clips du squelette commun (`library.stride`): marche 1,46 m par cycle de 1 s (cadence propre 1,46 m/s), course 1,80 m par cycle de 0,625 s (2,88 m/s). Marche 1,5 et course 3,2 m/s jouent les clips à 1,03 et 1,11 de leur cadence. Mesure dans Node: un test jetable qui charge `loadCharacterLibrary` comme `tests/rendu/personnages.test.ts`.
+- Seuils « il court » codés en vitesse absolue, à garder entre la marche reposée (walk x 1,25) et la course fatiguée (run x 0,8): `VILLAGERS.runSpeed` (habitants), `insects.runThreshold` (temps.json), `runFrom`/`runTo` du rendu; test garde-fou dans `tests/marche-course.test.ts`.
+- Le facteur de vitesse des besoins (`modifiersOf(...).speed`) passe par `speedFactorOf` dans `movePlayers` et dans le prédicteur: les tests qui attendent `walkSpeed` exact doivent le multiplier (départ à 70: bien reposé, x 1,1).
+- Heure d'arrivée d'un trajet: `arrival` de l'effet `travel_to` (schéma `donnees/schemas/trajet.ts`), portée par `story.departure` puis `common.travel`, appliquée par `advanceTripClock`. La phase `arrival` dure 1 s: l'horloge dépasse l'heure dite d'environ 0,5 min, tester avec une marge.
+- `CAPTURES` des parcours e2e (`/tmp/lpl2-captures`) est commun aux worktrees: `LPL2_CAPTURES=<scratchpad>` pour ses propres captures.

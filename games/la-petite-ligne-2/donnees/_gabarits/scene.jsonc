@@ -81,6 +81,8 @@
     { "do": "fade", "to": "black", "seconds": 1 },
     // Effets: ceux des étapes de quête. Départ en train à la fin de la scène:
     //   { "type": "travel_to", "place": "<lieu>" }
+    // Heure d'arrivée facultative, `arrival` (voir le gabarit de quête): durée, heure fixe ou nuit:
+    //   { "type": "travel_to", "place": "<lieu>", "arrival": { "kind": "night", "minute": 480, "wakeAt": 85 } }
     // Vers un lieu qui n'existe pas encore, un écran de fin de chapitre est obligatoire:
     //   { "type": "travel_to", "place": "<lieu à venir>",
     //     "ending": { "id": "a-suivre", "title": "À suivre", "lines": ["La suite arrive bientôt."] } }

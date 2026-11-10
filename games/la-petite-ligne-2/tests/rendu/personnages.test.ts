@@ -5,7 +5,7 @@ import { Group, type SkinnedMesh } from 'three';
 import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { Catalogue } from '../../src/donnees/schemas/personnage';
-import { Face, strideRate, targetWeights } from '../../src/rendu/personnages/animation';
+import { Face, leanAngle, strideRate, targetWeights } from '../../src/rendu/personnages/animation';
 import { composeLook, defaultPlayerLook, resolveLook } from '../../src/rendu/personnages/apparence';
 import { assemble, type CharacterLibrary, sectionOf } from '../../src/rendu/personnages/assemblage';
 import { loadCharacterLibrary } from '../../src/rendu/personnages/chargement';
@@ -145,8 +145,8 @@ describe('animation', () => {
     const names = new Set(['idle', 'walk', 'run', 'sit', 'carry']);
     const out = new Map<string, number>();
     expect([...targetWeights({ kind: 'stand', speed: 0 }, names, out)]).toEqual([['idle', 1]]);
-    expect([...targetWeights({ kind: 'stand', speed: 3 }, names, out)]).toEqual([['walk', 1]]);
-    expect([...targetWeights({ kind: 'stand', speed: 5 }, names, out)]).toEqual([['run', 1]]);
+    expect([...targetWeights({ kind: 'stand', speed: 1.5 }, names, out)]).toEqual([['walk', 1]]);
+    expect([...targetWeights({ kind: 'stand', speed: 3.2 }, names, out)]).toEqual([['run', 1]]);
     expect([...targetWeights({ kind: 'sit' }, names, out)]).toEqual([['sit', 1]]);
     expect([...targetWeights({ kind: 'clip', clip: 'reach-up' }, names, out)]).toEqual([
       [CHARACTER_SETTINGS.clips.gesture, 1],
@@ -159,6 +159,50 @@ describe('animation', () => {
     expect(stride).toBeLessThan(3);
     const rate = strideRate(2, stride, library.stride('run'), 0, 1, 0.6);
     expect(rate * stride).toBeCloseTo(2, 5);
+  });
+
+  it('cadence calée sur la marche à 1,5 m/s et la course: le pied posé ne glisse pas', () => {
+    const { walkSpeed, runSpeed } = content.settings.movement;
+    const walk = library.stride('walk');
+    const runStride = library.stride('run');
+    const durations = content.morphologies.clips;
+    const walkSeconds = durations.walk ?? 1;
+    const runSeconds = durations.run ?? 1;
+    // Marche épuisée, normale, reposée; course fatiguée, normale, reposée.
+    for (const speed of [walkSpeed * 0.5, walkSpeed, walkSpeed * 1.1]) {
+      const rate = strideRate(speed, walk, runStride, 0, walkSeconds, runSeconds);
+      expect(rate * walk).toBeCloseTo(speed, 5);
+    }
+    for (const speed of [runSpeed * 0.8, runSpeed, runSpeed * 1.1]) {
+      const rate = strideRate(speed, walk, runStride, 1, walkSeconds, runSeconds);
+      expect(rate * runStride).toBeCloseTo(speed, 5);
+    }
+    // À 1,5 m/s, la marche joue presque à sa cadence propre (ni accélérée ni ralentie de 10 %).
+    expect((walkSpeed / walk) * walkSeconds).toBeGreaterThan(0.9);
+    expect((walkSpeed / walk) * walkSeconds).toBeLessThan(1.1);
+    const names = new Set(['idle', 'walk', 'run']);
+    const out = new Map<string, number>();
+    expect([...targetWeights({ kind: 'stand', speed: walkSpeed * 1.1 }, names, out)]).toEqual([
+      ['walk', 1],
+    ]);
+    expect([...targetWeights({ kind: 'stand', speed: runSpeed * 0.8 }, names, out)]).toEqual([
+      ['run', 1],
+    ]);
+  });
+
+  it('se penche vers l’intérieur du virage, plus en courant, et se redresse en ligne droite', () => {
+    let lean = 0;
+    for (let i = 0; i < 30; i++) lean = leanAngle(lean, 1.5, 2, 1 / 60);
+    expect(lean).toBeGreaterThan(0.05);
+    let fast = 0;
+    for (let i = 0; i < 30; i++) fast = leanAngle(fast, 3.2, 2, 1 / 60);
+    expect(fast).toBeGreaterThan(lean);
+    expect(fast).toBeLessThanOrEqual(CHARACTER_SETTINGS.lean.max);
+    let other = 0;
+    for (let i = 0; i < 30; i++) other = leanAngle(other, 1.5, -2, 1 / 60);
+    expect(other).toBeCloseTo(-lean, 6);
+    for (let i = 0; i < 60; i++) lean = leanAngle(lean, 1.5, 0, 1 / 60);
+    expect(Math.abs(lean)).toBeLessThan(0.01);
   });
 
   it('cligne sur un visage neutre, tient une expression, bouge la bouche au babil', () => {

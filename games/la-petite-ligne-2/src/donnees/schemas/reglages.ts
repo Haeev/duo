@@ -45,6 +45,11 @@ export const SettingsSchema = v.strictObject({
     accelSeconds: Seconds,
     /** Temps pour s'arrêter (s): plus court que l'élan, le personnage ne glisse pas. */
     brakeSeconds: Seconds,
+    /**
+     * Passage de la marche à la course et retour (s): plus long que l'élan, on prend son pas de
+     * course en quelques foulées. Absent: `accelSeconds`.
+     */
+    runShiftSeconds: v.exactOptional(Seconds),
     /** En dessous, une commande de marche compte pour nulle. */
     deadzone: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(0.5)),
     /** Coin de mur: décalage latéral essayé pour passer, pas et maximum (m). */

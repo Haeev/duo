@@ -31,13 +31,26 @@ export const CHARACTER_SETTINGS = {
    */
   locomotion: {
     moving: 0.25,
-    runFrom: 3.3,
-    runTo: 4.6,
-    minRate: 0.6,
+    /**
+     * Marche à 1,5 m/s (1,65 bien reposé), course à 3,2 m/s (2,56 affamé ou fatigué): le fondu
+     * se fait entre les deux. Foulées mesurées des clips: marche 1,46 m par cycle de 1 s (cadence
+     * 1,03 à 1,5 m/s), course 1,80 m par cycle de 0,625 s (1,11 à 3,2 m/s).
+     */
+    runFrom: 2.0,
+    runTo: 2.5,
+    /** Bornes de la cadence: la marche épuisée (0,75 m/s) tient dans `minRate` sans patiner. */
+    minRate: 0.4,
     maxRate: 1.9,
     /** Fondu entre deux postures (s, demi-vie). */
     fadeHalfLife: 0.07,
   },
+
+  /**
+   * Le personnage se penche dans les virages (references-de-ressenti.md, « Déplacement »): angle
+   * (rad) = vitesse au sol (m/s) x vitesse de virage affichée (rad/s) x `perTurn`, borné à `max`,
+   * et lissé (`halfLife`, s). Une fraction de la vraie inclinaison (v.w/g): lisible, sans excès.
+   */
+  lean: { perTurn: 0.03, max: 0.14, halfLife: 0.1 },
 
   /**
    * Assise: hauteur du dessus de l'assise (m) par modèle de meuble; sans entrée, le dessus de la

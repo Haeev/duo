@@ -18,6 +18,7 @@ import {
 } from './communs';
 import { EMOTES } from './dialogue';
 import { StepConditionSchema, StepEffectSchema } from './quete';
+import { TripArrivalSchema } from './trajet';
 
 const Seconds = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(60));
 const Minutes = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1440));
@@ -179,7 +180,12 @@ export const StoryStateSchema = v.strictObject({
   queue: v.pipe(v.array(IdSchema), v.maxLength(4)),
   /** Départ demandé par l'effet `travel_to`, pris quand la scène en cours est finie. */
   departure: v.exactOptional(
-    v.strictObject({ to: IdSchema, since: TickSchema, ending: v.nullable(IdSchema) }),
+    v.strictObject({
+      to: IdSchema,
+      since: TickSchema,
+      ending: v.nullable(IdSchema),
+      arrival: v.exactOptional(TripArrivalSchema),
+    }),
   ),
   /** Écran de fin de chapitre montré (`ending` d'un `travel_to` du lieu); `closed`: fermé par chacun. */
   ending: v.exactOptional(

@@ -64,6 +64,23 @@ export function strideRate(
   return Math.min(natural * l.maxRate, Math.max(natural * l.minRate, wanted));
 }
 
+/**
+ * Inclinaison dans un virage (rad, positive: penché vers la gauche de la marche, vers l'intérieur
+ * d'un virage où le cap croît), lissée depuis `current`. `turnRate`: variation du cap affiché
+ * (rad/s); `speed`: vitesse au sol (m/s). À l'arrêt ou en ligne droite, le corps se redresse.
+ */
+export function leanAngle(
+  current: number,
+  speed: number,
+  turnRate: number,
+  dt: number,
+  settings: CharacterSettings = CHARACTER_SETTINGS,
+): number {
+  const l = settings.lean;
+  const wanted = Math.max(-l.max, Math.min(l.max, Math.abs(speed) * turnRate * l.perTurn));
+  return current + (wanted - current) * approach(dt, l.halfLife);
+}
+
 /** Rapproche les poids affichés des poids visés (fondu), sans allocation. */
 export function blendWeights(
   current: ClipWeights,

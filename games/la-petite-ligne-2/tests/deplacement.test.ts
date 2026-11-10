@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { worldMove } from '../src/entrees/commandes';
 import { SIM_DT } from '../src/simulation/noyau/constantes';
+import { speedFactorOf } from '../src/simulation/noyau/deplacement';
 import { gameContent, newSim } from './aides';
 import { NORTH, put, run, send } from './aides-noyau';
 
@@ -12,16 +13,17 @@ describe('marche et course', () => {
   it('accélère en douceur jusqu’à la vitesse de marche, puis freine sans s’arrêter net', () => {
     const sim = newSim(content);
     put(sim, 0, 10, 20, 0);
+    const walk = walkSpeed * speedFactorOf(content, sim.world, 0);
     run(sim, SIM_DT, { moveX: 1 });
     const body = sim.world.players[0].body;
     expect(body.speed).toBeGreaterThan(0);
-    expect(body.speed).toBeLessThan(walkSpeed);
+    expect(body.speed).toBeLessThan(walk);
     run(sim, accelSeconds + 2 * SIM_DT, { moveX: 1 });
-    expect(body.speed).toBeCloseTo(walkSpeed, 6);
+    expect(body.speed).toBeCloseTo(walk, 6);
     expect(body.facing).toBeCloseTo(0, 6);
     run(sim, SIM_DT);
     expect(body.speed).toBeGreaterThan(0);
-    expect(body.speed).toBeLessThan(walkSpeed);
+    expect(body.speed).toBeLessThan(walk);
     run(sim, brakeSeconds + 2 * SIM_DT);
     expect(body.speed).toBe(0);
   });
@@ -31,7 +33,7 @@ describe('marche et course', () => {
     put(sim, 0, 10, 20, 0);
     run(sim, accelSeconds + 2 * SIM_DT, { moveX: 1 });
     const body = sim.world.players[0].body;
-    expect(body.speed).toBeCloseTo(walkSpeed, 6);
+    expect(body.speed).toBeCloseTo(walkSpeed * speedFactorOf(content, sim.world, 0), 6);
     run(sim, brakeSeconds - SIM_DT);
     expect(body.speed).toBeGreaterThan(0);
     run(sim, 2 * SIM_DT);
@@ -42,16 +44,17 @@ describe('marche et course', () => {
     const sim = newSim(content);
     put(sim, 0, 5, 20, 0);
     put(sim, 1, 5, 25, 0);
+    const factor = speedFactorOf(content, sim.world, 0);
     run(sim, 1, { moveX: 1 }, {});
     const walked = sim.world.players[0].body.x - 5;
     expect(sim.world.players[1].body.x).toBe(5);
     put(sim, 0, 5, 20, 0);
     run(sim, 1, { moveX: 1, run: true });
     const ran = sim.world.players[0].body.x - 5;
-    expect(walked).toBeGreaterThan(walkSpeed * 0.8);
-    expect(walked).toBeLessThan(walkSpeed);
+    expect(walked).toBeGreaterThan(walkSpeed * factor * 0.8);
+    expect(walked).toBeLessThan(walkSpeed * factor);
     expect(ran).toBeGreaterThan(walked * 1.4);
-    expect(sim.world.players[0].body.speed).toBeCloseTo(runSpeed, 6);
+    expect(sim.world.players[0].body.speed).toBeCloseTo(runSpeed * factor, 6);
   });
 });
 

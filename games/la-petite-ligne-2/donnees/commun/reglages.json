@@ -20,11 +20,12 @@
     "seasonDays": 14
   },
   "movement": {
-    "walkSpeed": 3,
-    "runSpeed": 5,
+    "walkSpeed": 1.5,
+    "runSpeed": 3.2,
     "radius": 0.3,
     "accelSeconds": 0.15,
     "brakeSeconds": 0.1,
+    "runShiftSeconds": 0.4,
     "deadzone": 0.1,
     "cornerNudgeStep": 0.05,
     "cornerNudgeMax": 0.35,

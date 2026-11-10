@@ -28,6 +28,7 @@ import { createChapterEnd } from './histoire/fin-chapitre';
 import { createSceneOverlay } from './histoire/scene';
 import { createSceneLine } from './histoire/replique';
 import { createHud, type ProjectToScreen } from './hud';
+import { createRunHint } from './astuce-course';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
@@ -143,6 +144,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
 
   let now = 0;
   const hud = createHud(layer, view.content, keyLabel, options.projectToScreen);
+  const runHint = createRunHint(
+    view.content,
+    typeof localStorage === 'undefined' ? null : localStorage,
+  );
   const dialogue = createDialogue(
     layer,
     view.content,
@@ -575,6 +580,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         needsAlways: settingsUi().needsAlways,
         questTarget: questMarker(world, me),
       });
+      if (runHint.frame(dtMs / 1000, world, me, menu || sceneLine.inScene()))
+        hud.notice(now, 'info', fill(TEXTS.notices.runHint, { touche: keyLabel('ShiftLeft') }));
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
       layer.classList.toggle('lpl-ui--scene', sceneLine.inScene());
     },

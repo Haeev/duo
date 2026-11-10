@@ -11,12 +11,25 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Settings } from '../../donnees/schemas/reglages';
 import type { Body } from '../../etat/joueur';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { modifiersOf, neutralModifiers } from '../besoins/jauges';
 import { postureOf, standUp } from '../briques/postures';
 import { freePlayer } from './deblocage';
 import { bodyCollides, moveBody, type Blockers } from './grille';
 import { currentBlockers } from './obstacles';
 import { CORE_TUNING } from './reglages-noyau';
 import type { SimContext } from './systemes';
+
+/** Modificateurs des besoins relus à chaque pas, sans allocation. */
+const scratch = neutralModifiers();
+
+/** Facteur de vitesse que les besoins donnent à ce joueur (bien reposé, affamé, épuisé). */
+export function speedFactorOf(
+  content: SimContext['content'],
+  world: ReadonlyWorld,
+  player: PlayerIndex,
+): number {
+  return modifiersOf(content, world, player, scratch).speed;
+}
 
 /** Pas passés à pousser sans avancer, pris dans un obstacle. Hors de l'état: ni transmis ni sauvegardé. */
 const stuckSteps = new WeakMap<object, [number, number]>();
@@ -50,9 +63,38 @@ export function canWalk(world: ReadonlyWorld, player: PlayerIndex): boolean {
 }
 
 /**
- * Un pas de marche. La vitesse (`body.speed`) rejoint la vitesse voulue en `accelSeconds` à
- * l'accélération, en `brakeSeconds` au freinage; le personnage se tourne tout de suite vers la
- * direction donnée et garde son cap en freinant. Modifie `body` en place.
+ * Prochaine vitesse au sol. Jusqu'au pas de marche: élan en `accelSeconds`, arrêt en
+ * `brakeSeconds`. Entre la marche et la course: `runShiftSeconds` dans les deux sens, pour prendre
+ * son pas de course en quelques foulées et le quitter sans à-coup.
+ */
+function nextSpeed(
+  speed: number,
+  wanted: number,
+  walkTop: number,
+  runTop: number,
+  movement: Settings['movement'],
+  dt: number,
+): number {
+  const shift = movement.runShiftSeconds ?? movement.accelSeconds;
+  const rate = (span: number, seconds: number): number =>
+    seconds > 0 ? (span / seconds) * dt : Number.POSITIVE_INFINITY;
+  if (speed < wanted) {
+    // Sous le pas de marche, l'élan; au-dessus, le passage à la course.
+    const next =
+      speed < walkTop
+        ? Math.min(walkTop, speed + rate(walkTop, movement.accelSeconds))
+        : speed + rate(runTop - walkTop, shift);
+    return Math.min(wanted, next);
+  }
+  if (speed > walkTop && wanted > 0) return Math.max(wanted, speed - rate(runTop - walkTop, shift));
+  return Math.max(wanted, speed - rate(Math.max(walkTop, speed), movement.brakeSeconds));
+}
+
+/**
+ * Un pas de marche. La vitesse (`body.speed`) rejoint la vitesse voulue (`nextSpeed`); `factor`
+ * est celui des besoins (`modifiersOf(...).speed`). Le personnage se tourne tout de suite vers la
+ * direction donnée (le rendu adoucit le virage et le fait pencher) et garde son cap en freinant.
+ * Modifie `body` en place.
  */
 export function walkStep(
   b: Blockers,
@@ -62,18 +104,14 @@ export function walkStep(
   run: boolean,
   movement: Settings['movement'],
   dt: number,
+  factor = 1,
 ): void {
   const length = Math.hypot(moveX, moveY);
   const wants = length >= CORE_TUNING.moveDeadzone;
-  const top = run ? movement.runSpeed : movement.walkSpeed;
-  const wanted = wants ? top * Math.min(1, length) : 0;
-  // Mise en vitesse en `accelSeconds`, freinage en `brakeSeconds` (plus court: on s'arrête net).
-  const speeding = body.speed < wanted;
-  const seconds = speeding ? movement.accelSeconds : movement.brakeSeconds;
-  const change = seconds > 0 ? (top / seconds) * dt : top;
-  const speed = speeding
-    ? Math.min(wanted, body.speed + change)
-    : Math.max(wanted, body.speed - change);
+  const walkTop = movement.walkSpeed * factor;
+  const runTop = Math.max(walkTop, movement.runSpeed * factor);
+  const wanted = wants ? (run ? runTop : walkTop) * Math.min(1, length) : 0;
+  const speed = nextSpeed(body.speed, wanted, walkTop, runTop, movement, dt);
   if (wants) body.facing = Math.atan2(moveY, moveX);
   if (speed <= 0) {
     body.speed = 0;
@@ -116,8 +154,9 @@ export function movePlayers(sim: SimContext): void {
       stopPlayer(sim, index);
       continue;
     }
-    walkStep(b, player.body, input.moveX, input.moveY, input.run, movement, sim.dt);
-    const pushing = wants && player.body.speed < movement.walkSpeed * 0.05;
+    const factor = speedFactorOf(content, world, index);
+    walkStep(b, player.body, input.moveX, input.moveY, input.run, movement, sim.dt, factor);
+    const pushing = wants && player.body.speed < movement.walkSpeed * factor * 0.05;
     if (pushing && bodyCollides(b, player.body.x, player.body.y, movement.radius)) {
       stuck[index] += 1;
       if (stuck[index] * sim.dt >= CORE_TUNING.stuckSeconds) {

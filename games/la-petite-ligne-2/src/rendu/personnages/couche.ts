@@ -43,7 +43,14 @@ import type { Aimable } from '../cible';
 import { Fadable } from '../fondu';
 import { RENDER_SETTINGS } from '../reglages';
 import { type LyingPose, lyingPose } from './allonge';
-import { Face, blendWeights, type Posture, strideRate, targetWeights } from './animation';
+import {
+  Face,
+  blendWeights,
+  leanAngle,
+  type Posture,
+  strideRate,
+  targetWeights,
+} from './animation';
 import { composeLook, defaultPlayerLook, hashString, lookKey, resolveLook } from './apparence';
 import {
   type AssembledGeometry,
@@ -90,6 +97,8 @@ interface Figure extends Aimable {
   y: number;
   lift: number;
   facing: number;
+  /** Inclinaison dans les virages (rad, `leanAngle`). */
+  lean: number;
   phase: number;
   far: boolean;
   /** Pixels par mètre à l'écran, relevés au dernier rendu de son ombre de contact. */
@@ -345,6 +354,7 @@ export class AssembledCharacters implements CharacterLayer {
       y: 0,
       lift: 0,
       facing: 0,
+      lean: 0,
       phase: 0,
       far: false,
       pixelsPerMeter: 0,
@@ -495,6 +505,7 @@ export class AssembledCharacters implements CharacterLayer {
       figure.y = y;
       figure.lift = lift;
       figure.facing = body.facing;
+      figure.lean = 0;
       figure.placed = true;
     } else {
       const k = approach(dt, this.settings.smoothHalfLife);
@@ -505,12 +516,17 @@ export class AssembledCharacters implements CharacterLayer {
         Math.sin(body.facing - figure.facing),
         Math.cos(body.facing - figure.facing),
       );
-      figure.facing += turn * approach(dt, this.settings.turnHalfLife);
+      const turned = turn * approach(dt, this.settings.turnHalfLife);
+      figure.facing += turned;
+      const speed = posture.kind === 'stand' ? posture.speed : 0;
+      figure.lean = leanAngle(figure.lean, speed, dt > 0 ? turned / dt : 0, dt, this.settings);
     }
     figure.object.position.set(figure.x, figure.lift, figure.y);
     // Cap de l'état: 0 vers l'est, PI/2 vers le sud. Le personnage regarde vers +Z au repos.
     figure.object.rotation.y = Math.PI / 2 - figure.facing;
     figure.tilt.rotation.x = 0;
+    // Autour de l'axe de la marche (+Z du personnage), pivot aux pieds: vers l'intérieur du virage.
+    figure.tilt.rotation.z = figure.lean;
     figure.blob.visible = true;
     figure.blob.position.y = this.settings.contact.lift - figure.lift;
     this.animate(figure, posture, dt);
@@ -537,6 +553,8 @@ export class AssembledCharacters implements CharacterLayer {
     // Rotation de -90 degrés autour de l'axe gauche-droite: la tête part vers -Z (le dos du lit),
     // le visage vers le haut.
     figure.tilt.rotation.x = -Math.PI / 2;
+    figure.tilt.rotation.z = 0;
+    figure.lean = 0;
     figure.blob.visible = false;
     this.animate(figure, STILL, dt);
   }

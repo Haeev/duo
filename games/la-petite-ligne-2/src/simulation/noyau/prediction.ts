@@ -6,12 +6,12 @@
 import type { PredictorFactory } from '../../reseau/prediction';
 import { predictedGesture } from '../briques/geste';
 import { SIM_DT } from './constantes';
-import { canWalk, walkStep } from './deplacement';
+import { canWalk, speedFactorOf, walkStep } from './deplacement';
 import { currentBlockers } from './obstacles';
 
 export const createPredictor: PredictorFactory = (content) => ({
   canWalk,
-  walk(world, _player, body, input) {
+  walk(world, player, body, input) {
     const blockers = currentBlockers(content, world);
     if (blockers === null) return;
     walkStep(
@@ -22,6 +22,7 @@ export const createPredictor: PredictorFactory = (content) => ({
       input.run,
       content.settings.movement,
       SIM_DT,
+      speedFactorOf(content, world, player),
     );
   },
   gesture(world, player, intent) {

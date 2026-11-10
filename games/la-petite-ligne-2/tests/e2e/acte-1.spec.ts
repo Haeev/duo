@@ -54,6 +54,9 @@ test('P18 départ: la fin du prologue mène les deux sur le quai d’Aubrune', a
       40_000,
     );
   const arrived = await host.world();
+  // « On arrive toujours au matin »: le train de nuit dépose les deux à 8 h (« Il est 8 h »).
+  expect(arrived?.minutes ?? 0, 'arrivée à 8 h').toBeGreaterThanOrEqual(8 * 60);
+  expect(arrived?.minutes ?? 0, 'arrivée à 8 h').toBeLessThan(8 * 60 + 5);
   for (const p of arrived?.players ?? [])
     expect(Math.hypot(p.body.x - 204, p.body.y - 102.5), 'sur le quai').toBeLessThan(1.5);
   await duo.until(
