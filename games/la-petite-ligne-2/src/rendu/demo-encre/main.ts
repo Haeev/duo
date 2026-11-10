@@ -5,48 +5,73 @@
  * `http://localhost:5173/src/rendu/demo-encre/index.html`.
  *
  * Souris: glisser pour tourner, molette pour zoomer. Touches (lues par `KeyboardEvent.code`):
- * 1, 2, 3 jour, crépuscule, nuit; I dedans ou dehors; C contour suivant; O ombre suivante;
- * N variante dense du jour; Z Q S D déplacer le point visé; P panneau.
+ * 1, 2, 3, 4 jour, crépuscule, nuit, aube; I dedans ou dehors; C contour suivant; O ombre
+ * suivante; N variante dense du jour; Z Q S D déplacer le point visé; Espace met le temps en
+ * pause; L ombre de la lampe; E effets (brume, particules, lumière des fenêtres); P panneau.
  *
- * Paramètres d'URL: `scene` (exterieur, interieur), `ambiance` (jour, crepuscule, nuit),
- * `contour` (complet, post, coque, aucun), `ombre` (aplat-hachure, aplat, hachure), `x`, `z`,
- * `personnages=sculptes` (formes d'attente au lieu des personnages riggés), `largeur` (m),
- * `lacet` (degrés), `dense=1` (variante de jour plus sombre), `hierarchie=0` (tous les traits à tous les zooms), `panneau=0`.
+ * Paramètres d'URL: `scene` (exterieur, interieur), `ambiance` (jour, crepuscule, nuit, aube),
+ * `contour` (complet, post, aucun), `ombre` (aplat-hachure, aplat, hachure), `x`, `z`,
+ * `largeur` (m), `lacet` (degrés), `dense=1` (variante de jour plus sombre), `hierarchie=0`
+ * (tous les traits à tous les zooms), `joue=0` et `t` (temps figé, en secondes: captures
+ * reproductibles), `lampe=0` (sans ombre de lampe), `effets=0`, `panneau=0`.
  */
 import * as THREE from 'three';
 
-import { ambianceOf, type AmbianceId, type SceneId } from './ambiances';
+import { loadActors, type Actor } from './acteurs';
+import { ambianceOf, type Ambiance, type AmbianceId, type SceneId } from './ambiances';
 import { InkPass, rankWeights } from './contours';
-import { loadFigurines } from './figurines';
+import { createMotes, type Motes } from './effets';
 import {
   applyAmbiance,
-  createFigurineMaterial,
   createInkMaterials,
   createInkUniforms,
+  LampShadow,
+  MAX_WINDOWS,
   SunShadow,
   type ShadowStyle,
 } from './matiere';
-import { buildExterior, buildInterior, type SceneBuild, type View } from './scenes';
-import { createGroundMask, createInkLayers, createNoise } from './textures';
+import {
+  buildExterior,
+  buildInterior,
+  contactGeometry,
+  contactPositions,
+  type ContactSpot,
+  type SceneBuild,
+  type View,
+} from './scenes';
+import { createGroundMap, terrainGeometry, type HeightAt } from './terrain';
+import { createInkLayers, createNoise } from './textures';
 
-type ContourMode = 'complet' | 'post' | 'coque' | 'aucun';
+type ContourMode = 'complet' | 'post' | 'aucun';
+type ViewName = 'large' | 'jeu' | 'proche';
 
 const SCENES: readonly SceneId[] = ['exterieur', 'interieur'];
-const AMBIANCES: readonly AmbianceId[] = ['jour', 'crepuscule', 'nuit'];
-const CONTOURS: readonly ContourMode[] = ['complet', 'post', 'coque', 'aucun'];
+const AMBIANCES: readonly AmbianceId[] = ['jour', 'crepuscule', 'nuit', 'aube'];
+const CONTOURS: readonly ContourMode[] = ['complet', 'post', 'aucun'];
 const SHADOWS: readonly ShadowStyle[] = ['aplat-hachure', 'aplat', 'hachure'];
 
 /** Réglages de l'essai: tout ce qui se voit se règle ici, pas dans les nuanceurs. */
 const SETTINGS = {
-  /** Plongée de la caméra sous l'horizon (décision du client: 50 degrés). */
+  /**
+   * Plongée de la caméra sous l'horizon: 50 degrés au zoom de jeu et au-delà (décision du
+   * client); en zoomant plus près elle s'abaisse jusqu'à 35 degrés, pour que les visages se voient.
+   */
   pitchDeg: 50,
+  closePitchDeg: 35,
+  gameWidth: 18,
   minWidth: 6,
   maxWidth: 40,
   /** Demi-épaisseur du trait à 30 m de largeur de vue, en points d'un écran de 768 de haut. */
   lineRadius: 1.55,
-  /** Épaisseur de la coque inversée, en points d'écran (contour comparé). */
-  hullPixels: 2.6,
   shadowMapSize: 2048,
+  /** Carte d'ombre de la lampe locale: une seule, petite. */
+  lampShadowSize: 512,
+  /** Particules de l'air sur toute la zone. */
+  motes: 90,
+  /** Zoom (points par mètre) où le détail commence à paraître, et où il est plein. */
+  paintedDetail: [45, 85],
+  characterHatch: [80, 150],
+  faceDetail: [34, 80],
 } as const;
 
 interface State {
@@ -62,12 +87,21 @@ interface State {
   dense: boolean;
   /** Hiérarchie du trait selon la taille à l'écran; `false` rejoue l'ancien rendu (comparaison). */
   hierarchy: boolean;
+  /** Le temps avance (marche, vent, brume); `false` le fige à `time`. */
+  play: boolean;
+  time: number;
+  /** Ombre portée par la lampe la plus proche du joueur. */
+  lampShadow: boolean;
+  /** Brume, particules et lumière des fenêtres (coupés pour mesurer leur coût). */
+  effects: boolean;
   panel: boolean;
 }
 
 export interface InkDemoApi {
   /** Images rendues depuis l'ouverture: une capture attend qu'il ait avancé. */
   frames: number;
+  /** Personnages chargés (faux: les fichiers de l'essai 4 manquent). */
+  cast: boolean;
   stats: {
     calls: number;
     triangles: number;
@@ -75,8 +109,11 @@ export interface InkDemoApi {
     /** Image la plus rapide de la série: la mesure la moins sensible à la charge de la machine. */
     fastest: number;
     programs: number;
+    textures: number;
   };
-  set(change: Partial<State> & { view?: 'large' | 'proche' }): void;
+  set(change: Partial<State> & { view?: ViewName }): void;
+  /** Recensement de la scène affichée: triangles par maillage (une passe, sans les ombres). */
+  census(): { name: string; triangles: number; instances: number }[];
 }
 
 declare global {
@@ -96,6 +133,25 @@ function numberParam(params: URLSearchParams, name: string, fallback: number): n
   return Number.isFinite(value) ? value : fallback;
 }
 
+function fade(value: number, range: readonly [number, number]): number {
+  const t = Math.min(1, Math.max(0, (value - range[0]) / (range[1] - range[0])));
+  return t * t * (3 - 2 * t);
+}
+
+const FLAT: HeightAt = () => 0;
+
+interface Staged {
+  readonly root: THREE.Scene;
+  readonly walls: { mesh: THREE.Mesh; nx: number; nz: number; kind: 'full' | 'stub' }[];
+  readonly build: SceneBuild;
+  readonly height: HeightAt;
+  readonly mask: THREE.Texture | null;
+  readonly motes: Motes | null;
+  actors: Actor[];
+  /** Taches de contact des personnages: une géométrie réécrite à chaque image. */
+  feet: THREE.Mesh | null;
+}
+
 async function start(): Promise<void> {
   const canvas = document.querySelector<HTMLCanvasElement>('#scene');
   const panel = document.querySelector<HTMLElement>('#panneau');
@@ -113,16 +169,10 @@ async function start(): Promise<void> {
 
   const params = new URLSearchParams(window.location.search);
   const uniforms = createInkUniforms();
-  // Personnages riggés de l'essai 3 s'ils sont dans le dépôt, sinon les formes sculptées.
-  const wantSculpted = params.get('personnages') === 'sculptes';
-  const probe = { exterieur: buildExterior(true), interieur: buildInterior(true) };
-  const casts = wantSculpted
-    ? null
-    : await Promise.all([loadFigurines(probe.exterieur.cast), loadFigurines(probe.interieur.cast)]);
-  const figurines = casts?.[0] && casts[1] ? { exterieur: casts[0], interieur: casts[1] } : null;
-  const builds: Record<SceneId, SceneBuild> = figurines
-    ? { exterieur: buildExterior(false), interieur: buildInterior(false) }
-    : probe;
+  const builds: Record<SceneId, SceneBuild> = {
+    exterieur: buildExterior(),
+    interieur: buildInterior(),
+  };
   const firstScene = pick(params.get('scene'), SCENES, 'exterieur');
   const firstView = builds[firstScene].view;
   const state: State = {
@@ -136,6 +186,10 @@ async function start(): Promise<void> {
     yaw: numberParam(params, 'lacet', firstView.yaw),
     dense: params.get('dense') === '1',
     hierarchy: params.get('hierarchie') !== '0',
+    play: params.get('joue') !== '0',
+    time: numberParam(params, 't', 0),
+    lampShadow: params.get('lampe') !== '0',
+    effects: params.get('effets') !== '0',
     panel: params.get('panneau') !== '0',
   };
 
@@ -144,109 +198,87 @@ async function start(): Promise<void> {
   uniforms.uNoise.value = noise;
   const materials = createInkMaterials(uniforms);
   const shadow = new SunShadow(SETTINGS.shadowMapSize);
+  const lampShadow = new LampShadow(SETTINGS.lampShadowSize);
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 220);
   const inkPass = new InkPass(2, 2, noise);
 
-  interface Staged {
-    readonly root: THREE.Scene;
-    readonly walls: { mesh: THREE.Mesh; nx: number; nz: number; kind: 'full' | 'stub' }[];
-    readonly hulls: THREE.Mesh[];
-    readonly build: SceneBuild;
-  }
   const stages = new Map<SceneId, Staged>();
   for (const id of SCENES) {
     const build = builds[id];
     const root = new THREE.Scene();
-    const staged: Staged = { root, walls: [], hulls: [], build };
+    const height = build.terrain?.height ?? FLAT;
+    const walls: Staged['walls'] = [];
     for (const piece of build.pieces) {
       const mesh = new THREE.Mesh(piece.geometry, materials.object);
+      mesh.name = piece.wall ? `mur ${piece.wall.kind}` : 'décor';
       mesh.frustumCulled = false;
       if (piece.hidden) mesh.layers.set(1);
       else if (piece.shadow) mesh.layers.enable(1);
+      if (piece.shadow) mesh.layers.enable(2);
       root.add(mesh);
-      if (piece.wall) staged.walls.push({ mesh, ...piece.wall });
-      if (!piece.hidden && !piece.wall) {
-        const hull = new THREE.Mesh(piece.geometry, materials.hull);
-        hull.frustumCulled = false;
-        hull.visible = false;
-        root.add(hull);
-        staged.hulls.push(hull);
-      }
+      if (piece.wall) walls.push({ mesh, ...piece.wall });
     }
-    if (build.ground) {
-      const plane = new THREE.PlaneGeometry(build.ground.size[0], build.ground.size[1]);
-      plane.rotateX(-Math.PI / 2);
-      plane.translate(
-        build.ground.origin[0] + build.ground.size[0] / 2,
-        0,
-        build.ground.origin[1] + build.ground.size[1] / 2,
-      );
-      const ground = new THREE.Mesh(plane, materials.ground);
+    let mask: THREE.Texture | null = null;
+    if (build.terrain) {
+      const ground = new THREE.Mesh(terrainGeometry(build.terrain.spec, height), materials.ground);
+      ground.name = 'terrain';
       ground.renderOrder = -1;
+      ground.frustumCulled = false;
       root.add(ground);
+      mask = createGroundMap(build.terrain.spec, height);
     }
-    for (const figurine of figurines?.[id] ?? []) {
-      const material = createFigurineMaterial(
-        uniforms,
-        figurine.atlas,
-        figurine.traits,
-        figurine.expression,
-      );
-      const mesh = new THREE.Mesh(figurine.geometry, material);
-      mesh.frustumCulled = false;
-      mesh.layers.enable(1);
-      root.add(mesh);
-      const hull = new THREE.Mesh(
-        figurine.geometry,
-        createFigurineMaterial(
-          uniforms,
-          figurine.atlas,
-          figurine.traits,
-          figurine.expression,
-          true,
-        ),
-      );
-      hull.frustumCulled = false;
-      hull.visible = false;
-      root.add(hull);
-      staged.hulls.push(hull);
-    }
-    for (const batch of build.scatter) {
+    for (const batch of [...build.scatter, ...build.plants]) {
       const instanced = new THREE.InstancedMesh(
         batch.geometry,
         materials.object,
         batch.matrices.length,
       );
+      instanced.name = 'species' in batch ? batch.species : batch.shape;
       batch.matrices.forEach((matrix, i) => instanced.setMatrixAt(i, matrix));
       instanced.frustumCulled = false;
-      if (batch.shadow) instanced.layers.enable(1);
+      if (!('shadow' in batch) || batch.shadow) instanced.layers.enable(1);
       root.add(instanced);
     }
-    const contacts = new THREE.Mesh(build.contacts, materials.contact);
+    const contacts = new THREE.Mesh(contactGeometry(build.contacts, height), materials.contact);
     contacts.renderOrder = 5;
     contacts.frustumCulled = false;
     root.add(contacts);
-    stages.set(id, staged);
+    const motes = build.air ? createMotes(uniforms, build.air, height, SETTINGS.motes) : null;
+    if (motes) root.add(motes.mesh);
+    stages.set(id, { root, walls, build, height, mask, motes, actors: [], feet: null });
   }
-  const masks = new Map<SceneId, THREE.Texture>();
 
-  // Images encore à rendre: la page ne redessine que quand quelque chose a changé.
+  // Images encore à rendre: la page ne redessine que si quelque chose a changé ou si le temps court.
   let pending = 4;
+  const times: number[] = [];
   const api: InkDemoApi = {
     frames: 0,
-    stats: { calls: 0, triangles: 0, milliseconds: 0, fastest: 0, programs: 0 },
+    cast: false,
+    stats: { calls: 0, triangles: 0, milliseconds: 0, fastest: 0, programs: 0, textures: 0 },
     set(change) {
       const { view, ...rest } = change;
       Object.assign(state, rest);
       if (Object.keys(rest).length > 0) times.length = 0;
-      if (view) {
-        const preset = view === 'proche' ? builds[state.scene].close : builds[state.scene].view;
-        applyView(preset);
-      }
+      if (view) applyView(viewOf(builds[state.scene], view));
       pending = 2;
+    },
+    census() {
+      const list: { name: string; triangles: number; instances: number }[] = [];
+      stages.get(state.scene)?.root.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        const geometry = object.geometry as THREE.BufferGeometry;
+        const count = geometry.getIndex()?.count ?? geometry.getAttribute('position').count;
+        const instances = object instanceof THREE.InstancedMesh ? object.count : 1;
+        list.push({ name: object.name, triangles: (count / 3) * instances, instances });
+      });
+      return list;
     },
   };
   window.encre = api;
+
+  function viewOf(build: SceneBuild, name: ViewName): View {
+    return name === 'proche' ? build.close : name === 'jeu' ? build.game : build.view;
+  }
 
   function applyView(view: View): void {
     state.x = view.x;
@@ -255,44 +287,117 @@ async function start(): Promise<void> {
     state.yaw = view.yaw;
   }
 
+  // Les personnages: fichiers de l'essai 4, chargés avant la première image.
+  const casts = await Promise.all(SCENES.map((id) => loadActors(builds[id].cast, uniforms)));
+  SCENES.forEach((id, index) => {
+    const stage = stages.get(id);
+    const actors = casts[index];
+    if (!stage || !actors) return;
+    stage.actors = actors;
+    for (const actor of actors) {
+      actor.mesh.name = actor.spec.who;
+      stage.root.add(actor.root);
+    }
+    const spots: ContactSpot[] = actors.map(() => [0, 0, 0, 0.3, 0.2]);
+    const feet = new THREE.Mesh(contactGeometry(spots, FLAT), materials.contact);
+    feet.renderOrder = 5;
+    feet.frustumCulled = false;
+    stage.root.add(feet);
+    stage.feet = feet;
+  });
+  api.cast = casts.every((cast) => cast !== null);
+
   function resize(): void {
     const width = canvas?.clientWidth ?? 1366;
     const height = canvas?.clientHeight ?? 768;
     renderer.setSize(width, height, false);
     inkPass.setSize(width, height);
+    uniforms.uScreen.value.set(width, height);
     pending = 2;
   }
   window.addEventListener('resize', resize);
   resize();
 
-  const times: number[] = [];
+  /** Lampe qui porte l'ombre locale: la plus proche du joueur parmi celles qui le peuvent. */
+  function casterOf(build: SceneBuild, ambiance: Ambiance, player: Actor | undefined): number {
+    if (!state.lampShadow || ambiance.lamps <= 0) return -1;
+    const px = player?.root.position.x ?? state.x;
+    const pz = player?.root.position.z ?? state.z;
+    let best = -1;
+    let bestDistance = Infinity;
+    build.lamps.forEach((lamp, index) => {
+      if (!lamp.shadowFov) return;
+      const distance = Math.hypot(lamp.x - px, lamp.z - pz);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    });
+    return best;
+  }
+
   const probePixel = new Uint8Array(4);
+  let last = performance.now();
   function frame(): void {
     requestAnimationFrame(frame);
+    const now = performance.now();
+    const elapsed = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (state.play) {
+      state.time += elapsed;
+      pending = Math.max(pending, 1);
+    }
     if (pending <= 0) return;
     pending -= 1;
     const stage = stages.get(state.scene);
     if (!stage) return;
     const started = performance.now();
     const build = stage.build;
-    const ambiance = ambianceOf(state.scene, state.ambiance, state.dense);
-    applyAmbiance(uniforms, ambiance, build.lamps, build.keyLamp, state.shadow);
-    if (build.ground) {
-      let mask = masks.get(state.scene);
-      if (!mask) {
-        mask = createGroundMask(build.ground);
-        masks.set(state.scene, mask);
-      }
-      uniforms.uMask.value = mask;
-      uniforms.uMaskRect.value.set(...build.ground.origin, ...build.ground.size);
-    }
+    const full = ambianceOf(state.scene, state.ambiance, state.dense);
+    const ambiance: Ambiance = state.effects
+      ? full
+      : { ...full, mist: 0, spill: 0, particles: 'aucune' };
 
     const size = renderer.getSize(new THREE.Vector2());
     const aspect = size.x / size.y;
     const yaw = (state.yaw * Math.PI) / 180;
-    const pitch = (SETTINGS.pitchDeg * Math.PI) / 180;
+    const closeness = fade(state.width, [SETTINGS.gameWidth, SETTINGS.minWidth]);
+    const pitchDeg = SETTINGS.pitchDeg + (SETTINGS.closePitchDeg - SETTINGS.pitchDeg) * closeness;
+    const pitch = (pitchDeg * Math.PI) / 180;
     const target = new THREE.Vector3(state.x, 0, state.z);
     const forward = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
+
+    // Les fenêtres les plus proches du point visé jettent leur lumière; les autres attendent.
+    const windows = [...build.windows]
+      .sort(
+        (a, b) =>
+          Math.hypot(a.x - state.x, a.z - state.z) - Math.hypot(b.x - state.x, b.z - state.z),
+      )
+      .slice(0, MAX_WINDOWS);
+    applyAmbiance(uniforms, ambiance, build.lamps, build.keyLamp, state.shadow, windows);
+    uniforms.uTime.value = state.time;
+    if (stage.mask && build.terrain) {
+      const plan = build.terrain.spec.plan;
+      uniforms.uMask.value = stage.mask;
+      uniforms.uMaskRect.value.set(...plan.origin, ...plan.size);
+    }
+    stage.motes?.setAmbiance(ambiance);
+
+    // Personnages: animation, place sur le terrain, taches de contact sous leurs pieds.
+    for (const actor of stage.actors) actor.update(state.time, stage.height);
+    if (stage.feet) {
+      const spots: ContactSpot[] = stage.actors.map((actor) => {
+        const { x, z } = actor.root.position;
+        const floor = actor.spec.floor;
+        // Sur un plancher ou un quai, la tache se pose à sa hauteur, pas à celle du terrain dessous.
+        const lift = floor === undefined ? 0 : floor - stage.height(x, z);
+        return [x, lift, z, actor.girth, actor.girth * 0.72];
+      });
+      const attribute = stage.feet.geometry.getAttribute('position');
+      attribute.array.set(contactPositions(spots, stage.height));
+      attribute.needsUpdate = true;
+    }
+
     camera.position
       .copy(target)
       .addScaledVector(forward, -Math.cos(pitch) * 90)
@@ -318,20 +423,28 @@ async function start(): Promise<void> {
       }
     }
 
-    const hull = state.contour === 'coque';
-    for (const mesh of stage.hulls) mesh.visible = hull;
-    uniforms.uHull.value = (SETTINGS.hullPixels * state.width) / size.x;
     const pixelsPerMetre = size.x / state.width;
     const weights = state.hierarchy ? rankWeights(pixelsPerMetre) : [1, 1, 1, 1, 1];
-    // Le trait peint des textures d'objet suit la même règle: il s'efface à la vue large.
-    const fade = Math.min(1, Math.max(0, (pixelsPerMetre - 45) / 40));
-    uniforms.uDetail.value.set(state.hierarchy ? fade * fade * (3 - 2 * fade) : 1, 1);
+    // Le détail suit la même règle que le trait: il s'efface quand la vue s'élargit.
+    uniforms.uDetail.value.set(
+      state.hierarchy ? fade(pixelsPerMetre, SETTINGS.paintedDetail) : 1,
+      fade(pixelsPerMetre, SETTINGS.characterHatch),
+      fade(pixelsPerMetre, SETTINGS.faceDetail),
+    );
     uniforms.uViewDir.value.copy(camera.position).sub(target).normalize();
     uniforms.uPainted.value = state.contour === 'complet' ? 1 : 0;
 
     renderer.info.reset();
-    for (const mesh of stage.hulls) mesh.layers.set(0);
     shadow.update(renderer, stage.root, materials.depth, uniforms, target, state.width * 0.72 + 4);
+    const caster = casterOf(build, ambiance, stage.actors[build.player]);
+    lampShadow.update(
+      renderer,
+      stage.root,
+      materials.depth,
+      uniforms,
+      build.lamps[caster] ?? null,
+      caster,
+    );
     renderer.setRenderTarget(inkPass.target);
     renderer.setClearColor(
       new THREE.Color().setRGB(...ambiance.background, THREE.SRGBColorSpace),
@@ -342,8 +455,7 @@ async function start(): Promise<void> {
     inkPass.setAmbiance(ambiance);
     const zoom = Math.min(1.7, Math.max(0.85, Math.sqrt(30 / state.width)));
     const radius = SETTINGS.lineRadius * zoom * (size.y / 768);
-    const traced = state.contour === 'complet' || state.contour === 'post';
-    inkPass.render(renderer, camera, traced ? radius : 0, weights);
+    inkPass.render(renderer, camera, state.contour === 'aucun' ? 0 : radius, weights);
     // Lire un point force la fin réelle du rendu: sans cela le temps mesuré ne veut rien dire.
     const gl = renderer.getContext();
     gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, probePixel);
@@ -356,17 +468,21 @@ async function start(): Promise<void> {
       milliseconds: times.reduce((sum, value) => sum + value, 0) / times.length,
       fastest: Math.min(...times),
       programs: renderer.info.programs?.length ?? 0,
+      textures: renderer.info.memory.textures,
     };
     api.frames += 1;
-    if (panel) {
-      panel.hidden = !state.panel;
+    if (panel) panel.hidden = !state.panel;
+    if (panel && state.panel) {
       panel.textContent = [
         `${state.scene}, ${state.ambiance}, contour ${state.contour}, ombre ${state.shadow}`,
-        `vue ${state.width.toFixed(1)} m, lacet ${state.yaw.toFixed(0)} degrés`,
+        `vue ${state.width.toFixed(1)} m, lacet ${state.yaw.toFixed(0)} degrés, t ${state.time.toFixed(1)} s`,
         `${api.stats.calls} appels, ${api.stats.triangles} triangles, ${api.stats.programs} programmes`,
         `${api.stats.milliseconds.toFixed(1)} ms par image (rendu logiciel: indicatif)`,
-        '1 2 3 ambiance, I dedans ou dehors, C contour, O ombre, glisser et molette',
-      ].join('\n');
+        api.cast ? '' : "personnages absents (fichiers de l'essai 4 introuvables)",
+        '1 2 3 4 ambiance, I lieu, C contour, O ombre, L lampe, E effets, Espace pause',
+      ]
+        .filter((line) => line !== '')
+        .join('\n');
     }
   }
 
@@ -391,6 +507,9 @@ async function start(): Promise<void> {
       case 'Digit3':
         state.ambiance = 'nuit';
         break;
+      case 'Digit4':
+        state.ambiance = 'aube';
+        break;
       case 'KeyI':
         state.scene = cycle(SCENES, state.scene);
         applyView(builds[state.scene].view);
@@ -403,6 +522,15 @@ async function start(): Promise<void> {
         break;
       case 'KeyN':
         state.dense = !state.dense;
+        break;
+      case 'KeyL':
+        state.lampShadow = !state.lampShadow;
+        break;
+      case 'KeyE':
+        state.effects = !state.effects;
+        break;
+      case 'Space':
+        state.play = !state.play;
         break;
       case 'KeyP':
         state.panel = !state.panel;

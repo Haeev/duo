@@ -3,7 +3,8 @@
 // 1. Dans games/la-petite-ligne-2: npx vite --port 5311 --strictPort
 // 2. node capturer.mjs <dossier de sortie> "<nom>=<json de réglages>" ...
 //    Réglages: ceux de `State` dans src/rendu/demo-encre/main.ts (scene, ambiance, contour, shadow,
-//    dense, hierarchy, x, z, width, yaw), plus "view": "large" ou "proche".
+//    dense, hierarchy, x, z, width, yaw, time, lampShadow, effects), plus "view": "large", "jeu"
+//    ou "proche". Le temps est figé à 3 s (`joue=0&t=3`): deux lancements donnent la même image.
 //    Exemple: node capturer.mjs sortie 'jour={"scene":"exterieur","ambiance":"jour","view":"large"}'
 // Chaque ligne affichée donne les mesures de l'image: appels de dessin, triangles (toutes passes),
 // millisecondes (rendu logiciel: indicatif) et programmes.
@@ -25,7 +26,7 @@ fs.mkdirSync(out, { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
 page.on('pageerror', (error) => process.stderr.write(`[erreur] ${String(error).slice(0, 1500)}\n`));
-await page.goto('http://localhost:5311/src/rendu/demo-encre/index.html?panneau=0', { waitUntil: 'load' });
+await page.goto('http://localhost:5311/src/rendu/demo-encre/index.html?panneau=0&joue=0&t=3', { waitUntil: 'load' });
 await page.waitForFunction(() => (window.encre?.frames ?? 0) >= 2, null, { timeout: 180000 });
 for (const shot of shots) {
   const cut = shot.indexOf('=');

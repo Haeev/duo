@@ -8,11 +8,18 @@
  */
 import * as THREE from 'three';
 
-import { building, plankFloor, platform, type BuildingSpec } from './bati';
+import type { ActorSpec } from './acteurs';
+import {
+  building,
+  plankFloor,
+  platform,
+  platformSteps,
+  windowLights,
+  type BuildingSpec,
+} from './bati';
 import {
   bed,
   bench,
-  bush,
   chair,
   coalBucket,
   coatRack,
@@ -35,18 +42,30 @@ import {
   table,
   TONE,
   track,
-  tree,
   wallLantern,
   windowFrame,
   woodpile,
   type WallOpening,
 } from './decor';
-import type { FigurineSpec } from './figurines';
 import { at, GLOW, hex, LAYER, Sculpt } from './formes';
-import type { Lamp } from './matiere';
+import {
+  basket,
+  boots,
+  broom,
+  cat,
+  footing,
+  hangingHerbs,
+  kettle,
+  longcaseClock,
+  nightstand,
+  rainBarrel,
+  trunk,
+} from './mobilier';
+import type { Lamp, WindowLight } from './matiere';
 import { scatter, type ScatterBatch } from './semis';
-import { character, type CharacterSpec } from './personnages';
+import { heightFunction, type HeightAt, type Rect, type TerrainSpec } from './terrain';
 import type { GroundPlan } from './textures';
+import { plant, type PlantBatch, type PlantSpot } from './vegetation';
 
 export interface ScenePiece {
   readonly geometry: THREE.BufferGeometry;
@@ -56,7 +75,6 @@ export interface ScenePiece {
   readonly hidden?: boolean;
   /** Mur d'intérieur: normale vers le dehors; `full` s'efface côté caméra, `stub` le remplace. */
   readonly wall?: { readonly nx: number; readonly nz: number; readonly kind: 'full' | 'stub' };
-  readonly characters?: boolean;
 }
 
 export interface View {
@@ -67,94 +85,38 @@ export interface View {
   readonly yaw: number;
 }
 
+/** Tache d'ombre de contact: centre, hauteur au-dessus du terrain, demi-axes. */
+export type ContactSpot = readonly [x: number, lift: number, z: number, rx: number, rz: number];
+
 export interface SceneBuild {
   readonly pieces: readonly ScenePiece[];
-  readonly contacts: THREE.BufferGeometry;
+  readonly contacts: readonly ContactSpot[];
   readonly lamps: readonly Lamp[];
   /** Dedans, c'est la lampe qui oriente les hachures; dehors, le soleil. */
   readonly keyLamp: boolean;
-  readonly ground: GroundPlan | null;
+  /** Le terrain: ses données et sa fonction de hauteur (`null`: pas de sol dehors). */
+  readonly terrain: { readonly spec: TerrainSpec; readonly height: HeightAt } | null;
   /** Petits volumes semés sur le sol, un appel de dessin instancié par forme. */
   readonly scatter: readonly ScatterBatch[];
-  /** Les personnages riggés de l'essai 3, aux mêmes places que les personnages sculptés. */
-  readonly cast: readonly FigurineSpec[];
+  /** Arbres et buissons, un appel de dessin instancié par essence. */
+  readonly plants: readonly PlantBatch[];
+  /** Les personnages animés (corps de l'essai 4), et la place du joueur dans cette liste. */
+  readonly cast: readonly ActorSpec[];
+  readonly player: number;
+  /** Fenêtres qui jettent leur lumière sur le sol quand elles sont éclairées. */
+  readonly windows: readonly WindowLight[];
+  /** Zone où flottent poussière et lucioles. */
+  readonly air: Rect | null;
+  /** Vue large, vue au zoom de jeu (18 m de large) et vue proche. */
   readonly view: View;
+  readonly game: View;
   readonly close: View;
 }
 
-/* ------------------------------------------------------------- Habitants */
-
-const PLAYER: CharacterSpec = {
-  height: 1.72,
-  girth: 1,
-  stoop: 0,
-  skin: hex('#EFC7A6'),
-  hair: hex('#3E5578'),
-  top: hex('#D4A33E'),
-  bottom: hex('#2C3B57'),
-  accent: hex('#C5443D'),
-  shoes: hex('#4F3626'),
-  skirt: 0.2,
-  headwear: 'casquette',
-  scarf: true,
-  bag: true,
-  ring: hex('#FC663F'),
-};
-
-/** Le chef de halte: âgé, mince, voûté, uniforme bleu, képi à bandeau rouge, moustache blanche. */
-const OLD_STATIONMASTER: CharacterSpec = {
-  height: 1.68,
-  girth: 0.9,
-  stoop: 0.16,
-  skin: hex('#E0AE86'),
-  hair: hex('#E9E5DC'),
-  top: hex('#44618A'),
-  bottom: hex('#2C3B57'),
-  accent: hex('#C5443D'),
-  shoes: hex('#3A3331'),
-  skirt: 0.22,
-  headwear: 'kepi',
-  moustache: true,
-};
-
-/** L'épicière: ronde, robe coquelicot, grand tablier clair, chignon. */
-const GROCER: CharacterSpec = {
-  height: 1.62,
-  girth: 1.32,
-  stoop: 0,
-  skin: hex('#A9744D'),
-  hair: hex('#8C4A2E'),
-  top: hex('#C5443D'),
-  bottom: hex('#8F3B34'),
-  accent: hex('#F3EDE0'),
-  shoes: hex('#4F3626'),
-  skirt: 0.62,
-  apron: hex('#F3EDE0'),
-  headwear: 'chignon',
-};
-
-/** La petite: 1,30 m, blouse canard, couettes rousses à rubans, panier. */
-const CHILD: CharacterSpec = {
-  height: 1.3,
-  girth: 0.92,
-  stoop: 0,
-  skin: hex('#F6DCC8'),
-  hair: hex('#AE5F2E'),
-  top: hex('#2F6E73'),
-  bottom: hex('#F3EDE0'),
-  accent: hex('#D4A33E'),
-  shoes: hex('#5E4233'),
-  skirt: 0.5,
-  headwear: 'couettes',
-  basket: true,
-};
-
 /** Taches d'ombre de contact: polygones à neuf côtés un peu cabossés, posés au ras du sol. */
-function contactGeometry(
-  spots: readonly (readonly [x: number, y: number, z: number, rx: number, rz: number])[],
-): THREE.BufferGeometry {
+export function contactPositions(spots: readonly ContactSpot[], height: HeightAt): number[] {
   const positions: number[] = [];
-  spots.forEach(([x, y, z, rx, rz], index) => {
+  spots.forEach(([x, lift, z, rx, rz], index) => {
     const ring: [number, number][] = [];
     for (let i = 0; i < 9; i += 1) {
       const angle = (i / 9) * Math.PI * 2;
@@ -162,15 +124,26 @@ function contactGeometry(
         0.82 + 0.3 * Math.abs((Math.sin(index * 12.9898 + i * 78.233) * 43758.5453) % 1);
       ring.push([x + Math.cos(angle) * rx * wobble, z + Math.sin(angle) * rz * wobble]);
     }
+    const y = (px: number, pz: number): number => height(px, pz) + lift + 0.014;
     for (let i = 0; i < 9; i += 1) {
       const a = ring[i];
       const b = ring[(i + 1) % 9];
       if (!a || !b) continue;
-      positions.push(x, y + 0.012, z, b[0], y + 0.012, b[1], a[0], y + 0.012, a[1]);
+      positions.push(x, y(x, z), z, b[0], y(b[0], b[1]), b[1], a[0], y(a[0], a[1]), a[1]);
     }
   });
+  return positions;
+}
+
+export function contactGeometry(
+  spots: readonly ContactSpot[],
+  height: HeightAt,
+): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(contactPositions(spots, height), 3),
+  );
   return geometry;
 }
 
@@ -228,220 +201,22 @@ const HALT: BuildingSpec = {
   ],
 };
 
+function footprint(spec: BuildingSpec): Rect {
+  return {
+    x0: spec.x - spec.w / 2,
+    z0: spec.z - spec.d / 2,
+    x1: spec.x + spec.w / 2,
+    z1: spec.z + spec.d / 2,
+  };
+}
+
 /** Anneau du joueur au sol, à la couleur de son profil (bible 2.10). */
 function playerRing(s: Sculpt, x: number, y: number, z: number): void {
   s.group(at(x, y, z), () => {
     const ring = new THREE.RingGeometry(0.42, 0.52, 14);
     ring.rotateX(-Math.PI / 2);
-    s.add(ring, at(0, 0.02, 0), { color: hex('#FC663F'), wobble: 0.012 });
+    s.add(ring, at(0, 0.03, 0), { color: hex('#FC663F'), wobble: 0.012 });
   });
-}
-
-const EXTERIOR_CAST: readonly FigurineSpec[] = [
-  {
-    body: 'costaud',
-    atlas: 'gaston',
-    hair: 'court',
-    expression: 0,
-    pose: 'assis',
-    time: 0.2,
-    x: 0.75,
-    z: -3.62,
-    heading: 0.1,
-  },
-  {
-    body: 'femme',
-    atlas: 'maelle',
-    hair: 'carre',
-    expression: 1,
-    pose: 'parle',
-    time: 0.4,
-    x: 3.35,
-    z: -1.25,
-    heading: 1.05,
-  },
-  {
-    body: 'femme',
-    atlas: 'lou',
-    hair: 'court',
-    expression: 1,
-    pose: 'repos',
-    time: 1.1,
-    x: 4.75,
-    z: -0.75,
-    heading: -1.2,
-    height: 1.6,
-  },
-  {
-    body: 'homme',
-    atlas: 'basile',
-    hair: 'court',
-    expression: 0,
-    pose: 'marche',
-    time: 0.3,
-    x: -7.2,
-    z: -2.55,
-    heading: 1.25,
-  },
-];
-
-const INTERIOR_CAST: readonly FigurineSpec[] = [
-  {
-    body: 'costaud',
-    atlas: 'gaston',
-    hair: 'court',
-    expression: 1,
-    pose: 'assis',
-    time: 0.2,
-    x: -1.6,
-    z: 0.45,
-    heading: Math.PI / 2 + 0.06,
-  },
-  {
-    body: 'femme',
-    atlas: 'lou',
-    hair: 'court',
-    expression: 1,
-    pose: 'repos',
-    time: 1.1,
-    x: 1.05,
-    z: 1.35,
-    heading: -0.75,
-    height: 1.6,
-  },
-];
-
-export function buildExterior(sculptedPeople: boolean): SceneBuild {
-  const decor = new Sculpt(1);
-  const people = new Sculpt(120);
-
-  // La voie (plan y 97,5), d'un bord à l'autre: c'est elle qui organise tout le lieu.
-  track(decor, -45, 45, 3.5);
-  // Quai de 30 x 4 m (plan x 121 à 151), 30 cm de haut: les quais de campagne étaient bas.
-  platform(decor, -25, 5, 5, 9, 0.3);
-  // Traversée de service (plan x 150): platelage de planches au niveau du rail, au bout du quai.
-  decor.group(at(4, 0, 0), () => {
-    for (const [z, depth] of [
-      [2.2, 0.9],
-      [3.5, 1.28],
-      [4.65, 0.62],
-    ] as const) {
-      const boards = Math.round(depth / 0.21);
-      for (let i = 0; i < boards; i += 1) {
-        decor.box(
-          2.0,
-          0.07,
-          depth / boards - 0.015,
-          at(0, 0.215, z - depth / 2 + ((i + 0.5) * depth) / boards, 0.01 * (i % 3) - 0.01),
-          {
-            color: i % 2 ? TONE.woodDark : TONE.woodOld,
-            layer: LAYER.grain,
-            grain: 'x',
-            wobble: 0.01,
-          },
-        );
-      }
-    }
-    // Rampes de terre calées par une planche, de chaque côté.
-    decor.box(2.0, 0.06, 0.5, at(0, 0.1, 1.55, 0, 0.28, 0), {
-      color: TONE.woodOld,
-      layer: LAYER.grain,
-      grain: 'x',
-    });
-  });
-  // Barrière le long de la voie, côté pré: elle tient les bêtes et les enfants hors des rails;
-  // elle s'ouvre devant la traversée.
-  fence(decor, -45, 2.85, 1.2);
-  fence(decor, 5.15, 45, 1.2);
-
-  building(decor, HOUSE);
-  building(decor, HALT);
-  // Lanterne d'applique à droite de la porte: elle éclaire le seuil et le banc.
-  wallLantern(decor, at(-0.35, 2.3, -4, 0));
-  // Banc contre la façade sud, sous la fenêtre: au soleil, face à la voie, là où le chef de
-  // halte attend son train sans quitter sa porte.
-  bench(decor, at(0.75, 0, -3.56, 0), 1.5);
-  // Bûches à l'abri du pignon ouest, près de la porte: le poêle est juste derrière le mur.
-  woodpile(decor, at(-5.4, 0, -5.4, -Math.PI / 2));
-  // Pendule du quai sur la halte (plan: arrêtée sur 5 h 12), lisible depuis tout le quai.
-  stationClock(decor, at(5, 2.9, 6.3, -Math.PI / 2));
-
-  // Sur le quai: le banc regarde la voie (on y attend le train), le réverbère est entre le banc
-  // et la caisse et sa potence s'avance vers la bordure, qu'il éclaire.
-  bench(decor, at(-10, 0.3, 8.35, Math.PI), 1.6);
-  streetLamp(decor, at(-7.4, 0.3, 8.7, Math.PI));
-  // Caisse de la commande du samedi (plan: 141; 101,5), là où s'arrête le fourgon.
-  crate(decor, at(-5, 0.3, 7.6, 0.25));
-  sack(decor, at(-4.15, 0.3, 8.05, 1));
-
-  // Arbres du pré de Firmin (ombre l'été) et haie basse le long de la barrière.
-  tree(decor, -11.5, -7.2, 1.15, 1);
-  tree(decor, 9.5, -8.6, 1.0, 2);
-  tree(decor, -14.5, -0.4, 0.8, 3);
-  tree(decor, 19, -6, 1.1, 4);
-  tree(decor, -22, -9, 1.2, 5);
-  tree(decor, 15.5, -1.2, 0.75, 6);
-  bush(decor, -6.6, 0.3, 1.0, 1);
-  bush(decor, 9.0, 0.35, 1.1, 2);
-  bush(decor, 3.2, -5.3, 0.9, 3);
-  bush(decor, -9.4, 0.2, 0.8, 4);
-  bush(decor, 12.6, -4.6, 1.0, 5);
-  bush(decor, -17, -4.4, 1.1, 6);
-
-  // Le chef de halte sur son banc; l'épicière et le joueur qui parlent sur le sentier de la
-  // traversée; la petite qui rentre du bourg par le chemin, son panier au bras.
-  if (sculptedPeople) {
-    character(people, OLD_STATIONMASTER, 'assis', 0.75, -3.55, 0.1, 0, 0.47);
-    character(people, GROCER, 'parle', 3.35, -1.25, 1.05);
-    character(people, PLAYER, 'debout', 4.75, -0.75, -1.2);
-    character(people, CHILD, 'marche', -7.2, -2.55, 1.25);
-  } else {
-    playerRing(people, 4.75, 0, -0.75);
-  }
-
-  const contacts = contactGeometry([
-    [0.75, 0, -3.45, 0.95, 0.42],
-    [3.35, 0, -1.25, 0.42, 0.3],
-    [4.75, 0, -0.75, 0.36, 0.26],
-    [-7.2, 0, -2.55, 0.3, 0.2],
-    [-5.4, 0, -5.4, 0.45, 0.85],
-    [-10, 0.3, 8.35, 0.95, 0.36],
-    [-5, 0.3, 7.6, 0.62, 0.46],
-    [-4.15, 0.3, 8.05, 0.34, 0.3],
-    [-7.4, 0.3, 8.7, 0.3, 0.3],
-  ]);
-
-  const ground = GROUND;
-  return {
-    pieces: [
-      { geometry: decor.build(), shadow: true },
-      { geometry: people.build(), shadow: true, characters: true },
-    ],
-    contacts,
-    lamps: [
-      { x: -7.4, y: 3.3, z: 8.1, radius: 6.5 },
-      { x: -0.35, y: 2.3, z: -3.55, radius: 4.6 },
-      // La petite flaque que le joueur porte la nuit (bible 2.10).
-      { x: 4.75, y: 1.3, z: -0.75, radius: 2.3 },
-    ],
-    keyLamp: false,
-    ground,
-    // Semis sur le pré et les chemins, hors des emprises: maison, quai et halte, traversée,
-    // seuil de la porte, bancs.
-    scatter: scatter(ground, { x0: -30, z0: -18, x1: 30, z1: 16 }, [
-      { x0: -5.3, z0: -10.3, x1: 2.3, z1: -3.2 },
-      { x0: -26, z0: 4.7, x1: 15.6, z1: 11.6 },
-      { x0: 2.8, z0: 1.3, x1: 5.2, z1: 5.2 },
-      { x0: -6.2, z0: -6.4, x1: -4.9, z1: -4.4 },
-      // Là où se tiennent les personnages: rien ne pousse sous leurs pieds.
-      { x0: 2.8, z0: -1.8, x1: 5.3, z1: -0.2 },
-      { x0: -7.8, z0: -3.1, x1: -6.6, z1: -2.0 },
-      { x0: 0, z0: -3.6, x1: 1.6, z1: -2.6 },
-    ]),
-    cast: EXTERIOR_CAST,
-    view: { x: -1.5, z: -2.8, width: 32, yaw: -16 },
-    close: { x: 3.9, z: -1.7, width: 8.5, yaw: -16 },
-  };
 }
 
 /** Le sol du coin de halte, tiré du plan: chemins de terre et bande de ballast. */
@@ -497,16 +272,305 @@ const GROUND: GroundPlan = {
   ballast: [{ x: -45, z: 1.85, w: 90, d: 3.3 }],
 };
 
+/**
+ * Le relief du coin de halte. La voie et le quai tiennent le niveau 0 (une voie est posée à
+ * plat); le pré ondule autour. Le fossé draine la plateforme de la voie côté nord, entre le
+ * ballast et la barrière; il est comblé sous la traversée de service. La terre est remontée
+ * contre le dos du quai (on y monte en pente douce depuis la Grand-Route); les charrettes ont
+ * creusé deux ornières dans la Grand-Route; le sol est relevé de 5 cm contre les murs, dont le
+ * pied s'enfonce.
+ */
+const TERRAIN: TerrainSpec = {
+  plan: GROUND,
+  rolling: 0.34,
+  bumps: 0.07,
+  flats: [
+    { x0: -45, z0: 1.95, x1: 45, z1: 9, level: 0, margin: 1.5 },
+    { x0: -25, z0: 8.7, x1: 5, z1: 9.3, level: 0.27, margin: 1.7 },
+    { ...footprint(HOUSE), level: 0.05, margin: 1.5 },
+    { ...footprint(HALT), level: 0.03, margin: 0.5 },
+  ],
+  pathDepth: 0.07,
+  bank: 0.4,
+  ruts: [
+    { path: 3, offset: 0.78, depth: 0.05 },
+    // Le chemin du nord: les roues de la charrette à bras du facteur et des brouettes.
+    { path: 0, offset: 0.46, depth: 0.04 },
+  ],
+  ditches: [{ z: 1.45, x0: -45, x1: 45, halfWidth: 0.42, depth: 0.3, gaps: [[2.7, 5.3]] }],
+  stepX: 0.6,
+  fineZ: [-5, 3],
+  stepZ: 0.2,
+};
+
+/**
+ * Arbres et buissons, chacun à sa place pour une raison: le chêne d'ombre dans le pré de Firmin,
+ * les pommiers à portée de main de la maison, les bouleaux au bord du fossé (ils aiment l'eau),
+ * la haie de noisetiers le long de la barrière, l'églantier là où personne ne fauche (pignon,
+ * pied de clôture).
+ */
+const PLANTS: readonly PlantSpot[] = [
+  { species: 'chene', x: -11.8, z: -7.4, size: 1.08, yaw: 0.4 },
+  { species: 'chene', x: 19.5, z: -6.2, size: 1.0, yaw: 2.1 },
+  { species: 'chene', x: -22.5, z: -9.5, size: 1.15, yaw: 4.0 },
+  { species: 'pommier', x: 6.4, z: -6.3, size: 1.0, yaw: 0.3 },
+  { species: 'pommier', x: 10.2, z: -9.0, size: 0.9, yaw: 2.6 },
+  { species: 'pommier', x: 13.6, z: -5.4, size: 0.95, yaw: 4.4 },
+  { species: 'bouleau', x: -8.6, z: 0.05, size: 0.95, yaw: 0.8 },
+  { species: 'bouleau', x: -15.2, z: -0.5, size: 1.05, yaw: 3.0 },
+  { species: 'bouleau', x: 15.8, z: -0.3, size: 0.9, yaw: 5.1 },
+  { species: 'noisetier', x: -5.4, z: 0.15, size: 1.0, yaw: 0.2 },
+  { species: 'noisetier', x: -11.6, z: 0.2, size: 1.1, yaw: 1.7 },
+  { species: 'noisetier', x: 12.4, z: 0.1, size: 1.05, yaw: 3.3 },
+  { species: 'noisetier', x: -17.5, z: -4.6, size: 1.15, yaw: 4.6 },
+  { species: 'eglantier', x: 2.75, z: -5.5, size: 1.0, yaw: 0.9 },
+  { species: 'eglantier', x: 8.4, z: 0.3, size: 1.05, yaw: 2.4 },
+  { species: 'eglantier', x: -2.2, z: 0.35, size: 0.9, yaw: 4.1 },
+  { species: 'eglantier', x: -6.4, z: -8.6, size: 1.1, yaw: 5.5 },
+];
+
+const EXTERIOR_CAST: readonly ActorSpec[] = [
+  // Gaston sur le banc de la façade, au soleil; Odette et la joueuse (Maëlle) qui parlent sur le
+  // sentier de la traversée; Lou qui fait l'aller et retour sur le chemin; Basile qui attend le
+  // train sur le quai.
+  { who: 'gaston', expression: 'neutre', role: 'assis', x: 0.75, z: -3.5, heading: 0.1 },
+  { who: 'odette', expression: 'parole', role: 'parle', x: 3.35, z: -1.25, heading: 0.3, phase: 2 },
+  { who: 'maelle', expression: 'joie', role: 'repos', x: 4.75, z: -0.75, heading: -0.4, phase: 5 },
+  {
+    who: 'lou',
+    expression: 'joie',
+    role: 'marche',
+    x: -7.2,
+    z: -2.55,
+    heading: 1.25,
+    route: [
+      [-12.5, -2.75],
+      [-6, -2.5],
+      [1.6, -2.5],
+    ],
+    phase: 4.9,
+  },
+  {
+    who: 'basile',
+    expression: 'reflexion',
+    role: 'repos',
+    x: -8.6,
+    z: 6.6,
+    heading: Math.PI,
+    floor: 0.3,
+    phase: 9,
+  },
+];
+
+export function buildExterior(): SceneBuild {
+  const decor = new Sculpt(1);
+  const height = heightFunction(TERRAIN);
+
+  // La voie (plan y 97,5), d'un bord à l'autre: c'est elle qui organise tout le lieu.
+  track(decor, -45, 45, 3.5);
+  // Quai de 30 x 4 m (plan x 121 à 151), 30 cm de haut: les quais de campagne étaient bas.
+  platform(decor, -25, 5, 5, 9, 0.3);
+  // Au bout ouest du quai, deux marches: c'est par là qu'on y monte en venant du chemin.
+  platformSteps(decor, at(-25.44, 0, 7, 0), 2.4);
+  // Traversée de service (plan x 150): platelage de planches au niveau du rail, au bout du quai.
+  decor.group(at(4, 0, 0), () => {
+    for (const [z, depth] of [
+      [2.2, 0.9],
+      [3.5, 1.28],
+      [4.65, 0.62],
+    ] as const) {
+      const boards = Math.round(depth / 0.21);
+      for (let i = 0; i < boards; i += 1) {
+        decor.box(
+          2.0,
+          0.07,
+          depth / boards - 0.015,
+          at(0, 0.215, z - depth / 2 + ((i + 0.5) * depth) / boards, 0.01 * (i % 3) - 0.01),
+          {
+            color: i % 2 ? TONE.woodDark : TONE.woodOld,
+            layer: LAYER.grain,
+            grain: 'x',
+            wobble: 0.01,
+          },
+        );
+      }
+    }
+    // Rampes de terre calées par une planche, de chaque côté.
+    decor.box(2.0, 0.06, 0.5, at(0, 0.1, 1.55, 0, 0.28, 0), {
+      color: TONE.woodOld,
+      layer: LAYER.grain,
+      grain: 'x',
+    });
+  });
+  // Barrière le long de la voie, côté pré, de l'autre côté du fossé: elle tient les bêtes et les
+  // enfants hors des rails; elle s'ouvre devant la traversée.
+  fence(decor, -45, 2.85, 0.85, height);
+  fence(decor, 5.15, 45, 0.85, height);
+
+  building(decor, HOUSE);
+  building(decor, HALT);
+  // Lanterne d'applique à droite de la porte: elle éclaire le seuil et le banc.
+  wallLantern(decor, at(-0.35, 2.3, -4, 0));
+  // Banc contre la façade sud, sous la fenêtre: au soleil, face à la voie, là où Gaston attend
+  // son train sans quitter sa porte.
+  bench(decor, at(0.75, 0.04, -3.56, 0), 1.5);
+  // Bûches à l'abri du pignon ouest, près de la porte: le poêle est juste derrière le mur.
+  woodpile(decor, at(-5.4, 0.04, -5.4, -Math.PI / 2));
+  // Pendule du quai sur la halte (plan: arrêtée sur 5 h 12), lisible depuis tout le quai.
+  stationClock(decor, at(5, 2.9, 6.3, -Math.PI / 2));
+
+  // Sur le quai: le banc regarde la voie (on y attend le train), le réverbère est entre le banc
+  // et la caisse et sa potence s'avance vers la bordure, qu'il éclaire.
+  bench(decor, at(-10, 0.3, 8.35, Math.PI), 1.6);
+  streetLamp(decor, at(-7.4, 0.3, 8.7, Math.PI));
+  // Caisse de la commande du samedi (plan: 141; 101,5), là où s'arrête le fourgon.
+  crate(decor, at(-5, 0.3, 7.6, 0.25));
+  sack(decor, at(-4.15, 0.3, 8.05, 1));
+
+  playerRing(decor, 4.75, height(4.75, -0.75), -0.75);
+
+  const walls = [footprint(HOUSE), footprint(HALT)];
+  return {
+    pieces: [{ geometry: decor.build(), shadow: true }],
+    contacts: [
+      [-5.4, 0.01, -5.4, 0.45, 0.85],
+      [-10, 0.3, 8.35, 0.95, 0.36],
+      [-5, 0.3, 7.6, 0.62, 0.46],
+      [-4.15, 0.3, 8.05, 0.34, 0.3],
+      [-7.4, 0.3, 8.7, 0.3, 0.3],
+      [0.75, 0.01, -3.5, 0.95, 0.4],
+    ],
+    lamps: [
+      { x: -7.4, y: 3.3, z: 8.1, radius: 6.5, shadowFov: 122 },
+      { x: -0.35, y: 2.3, z: -3.55, radius: 4.6, shadowFov: 126 },
+      // La petite flaque que le joueur porte la nuit (bible 2.10): elle éclaire sans ombre.
+      { x: 4.75, y: 1.3, z: -0.75, radius: 2.3 },
+    ],
+    keyLamp: false,
+    terrain: { spec: TERRAIN, height },
+    // Semis sur le pré et les chemins, hors des emprises: bâtiments, quai, traversée, bancs.
+    scatter: scatter(
+      { plan: GROUND, height, walls, ditches: TERRAIN.ditches },
+      { x0: -25, z0: -14, x1: 25, z1: 15 },
+      [
+        ...walls,
+        { x0: -26, z0: 4.7, x1: 5.2, z1: 9.4 },
+        { x0: 2.8, z0: 1.3, x1: 5.2, z1: 5.2 },
+        { x0: -6.2, z0: -6.4, x1: -4.9, z1: -4.4 },
+        // Là où se tiennent les personnages: rien ne pousse sous leurs pieds.
+        { x0: 2.8, z0: -1.8, x1: 5.3, z1: -0.2 },
+        { x0: 0, z0: -3.9, x1: 1.6, z1: -2.6 },
+      ],
+    ),
+    plants: plant(PLANTS, height),
+    cast: EXTERIOR_CAST,
+    player: 2,
+    windows: [...windowLights(HOUSE), ...windowLights(HALT)],
+    air: { x0: -13, z0: -10, x1: 15, z1: 5 },
+    view: { x: -1.5, z: -2.8, width: 32, yaw: -16 },
+    game: { x: 1.2, z: -1.9, width: 18, yaw: -16 },
+    close: { x: 4.0, z: -1.15, width: 6.2, yaw: 30 },
+  };
+}
+
 /* -------------------------------------------------------------- Intérieur */
+
+const INTERIOR_CAST: readonly ActorSpec[] = [
+  {
+    who: 'gaston',
+    expression: 'joie',
+    role: 'assis',
+    x: -1.6,
+    z: 0.45,
+    heading: Math.PI / 2 + 0.06,
+    floor: 0,
+  },
+  {
+    who: 'maelle',
+    expression: 'joie',
+    role: 'repos',
+    x: 1.05,
+    z: 1.35,
+    heading: -0.75,
+    floor: 0,
+    phase: 3,
+  },
+];
 
 const ROOM_W = 6.4;
 const ROOM_D = 5.4;
 const WALL_H = 2.6;
+/** Le plancher est une marche au-dessus du jardin. */
+const FLOOR_DROP = 0.2;
 
-export function buildInterior(sculptedPeople: boolean): SceneBuild {
+/** Le jardin autour de la maison: l'allée de la porte, qui rejoint le chemin au sud. */
+const GARDEN: GroundPlan = {
+  origin: [-20, -18],
+  size: [40, 36],
+  paths: [
+    {
+      points: [
+        [0, 3.1],
+        [0.2, 5.5],
+        [-0.3, 8.6],
+      ],
+      width: 1.3,
+    },
+    {
+      points: [
+        [-20, 9.6],
+        [0, 9.2],
+        [20, 9.8],
+      ],
+      width: 2.1,
+    },
+  ],
+  ballast: [],
+};
+
+const HOUSE_RECT: Rect = {
+  x0: -ROOM_W / 2 - 0.3,
+  z0: -ROOM_D / 2 - 0.3,
+  x1: ROOM_W / 2 + 0.3,
+  z1: ROOM_D / 2 + 0.3,
+};
+
+/** Le jardin est 20 cm sous le plancher; il ondule un peu et l'allée y est creusée. */
+const GARDEN_TERRAIN: TerrainSpec = {
+  plan: GARDEN,
+  rolling: 0.22,
+  bumps: 0.06,
+  flats: [{ ...HOUSE_RECT, level: -FLOOR_DROP, margin: 2.5 }],
+  pathDepth: 0.06,
+  bank: 0.36,
+  ruts: [],
+  ditches: [],
+  stepX: 0.5,
+  fineZ: [3, 11],
+  stepZ: 0.25,
+};
+
+/**
+ * Ce qu'on voit du dehors autour de la pièce: le pommier de la cour, la haie de noisetiers qui
+ * ferme le jardin côté chemin, l'églantier contre le pignon.
+ */
+const GARDEN_PLANTS: readonly PlantSpot[] = [
+  { species: 'pommier', x: 6.6, z: -3.2, size: 0.95, yaw: 1.2 },
+  { species: 'pommier', x: -7.2, z: 3.4, size: 0.85, yaw: 3.9 },
+  { species: 'noisetier', x: -3.4, z: 7.6, size: 1.05, yaw: 0.5 },
+  { species: 'noisetier', x: -5.3, z: 7.8, size: 0.95, yaw: 2.2 },
+  { species: 'noisetier', x: 3.2, z: 7.7, size: 1.1, yaw: 4.4 },
+  { species: 'noisetier', x: 5.4, z: 7.5, size: 0.9, yaw: 1.1 },
+  { species: 'eglantier', x: 4.4, z: -1.6, size: 0.9, yaw: 2.0 },
+  { species: 'eglantier', x: -4.6, z: -3.4, size: 1.0, yaw: 5.0 },
+  { species: 'bouleau', x: -8.5, z: -5.5, size: 1.0, yaw: 0.7 },
+  { species: 'chene', x: 9.5, z: 6.5, size: 0.95, yaw: 3.0 },
+];
+
+export function buildInterior(): SceneBuild {
   const room = new Sculpt(1);
-  const people = new Sculpt(150);
   const pieces: ScenePiece[] = [];
+  const height = heightFunction(GARDEN_TERRAIN);
 
   plankFloor(room, ROOM_W + 0.6, ROOM_D + 0.6);
 
@@ -610,6 +674,17 @@ export function buildInterior(sculptedPeople: boolean): SceneBuild {
       // Patère à côté de la porte: on y pend la veste en rentrant.
       coatRack(full, wall.matrix.clone().multiply(at(1.75, 1.75, -0.15, Math.PI)), hex('#44618A'));
     }
+    // Le pied du mur, vu du dehors: une assise de moellons du jardin jusqu'au plancher (la
+    // pierre de seuil prend sa place devant la porte).
+    footing(
+      room,
+      wall.matrix,
+      wall.length + 0.6,
+      FLOOR_DROP,
+      wall.openings
+        .filter((o) => o.sill === 0)
+        .map((o) => [o.along - o.width / 2 - 0.2, o.along + o.width / 2 + 0.2] as const),
+    );
     const side = { nx: wall.nx, nz: wall.nz };
     pieces.push({ geometry: full.build(), shadow: true, wall: { ...side, kind: 'full' } });
     pieces.push({ geometry: glass.build(), shadow: false, wall: { ...side, kind: 'full' } });
@@ -639,27 +714,47 @@ export function buildInterior(sculptedPeople: boolean): SceneBuild {
   // Bûches rangées contre le mur ouest, à deux pas du poêle; paillasson devant la porte.
   woodpile(room, at(-2.95, 0, -0.9, -Math.PI / 2));
   doormat(room, at(0, 0, 2.25, 0));
-  // Le dehors, deviné autour de la maison: un sol d'herbe, que la vignette laisse dans l'ombre.
-  room.group(at(0, -0.12, 0), () => {
-    room.box(60, 0.1, 60, at(0, -0.05, 0), {
-      color: hex('#7C8C48'),
-      layer: LAYER.grass,
-      wobble: 0,
+  // Près de la porte: les bottes du jardin et le balai dans l'angle; l'horloge contre le mur
+  // est, face à la table, là où tout le monde la voit; la malle au pied du lit; le chevet.
+  boots(room, at(0.95, 0, 2.35, 0.3));
+  broom(room, at(-2.95, 0, 2.45, 0.8));
+  longcaseClock(room, at(2.93, 0, -0.75, -Math.PI / 2));
+  trunk(room, at(1.55, 0, 2.2, 0.06));
+  nightstand(room, at(2.85, 0, -0.05, -Math.PI / 2));
+  // Le chat dort sur l'édredon; la bouilloire chauffe; le panier de pommes attend près du buffet.
+  cat(room, at(2.55, 0.56, 1.75, 0.8));
+  kettle(room, at(-2.3, 0.86, -2.25, 0.9));
+  basket(room, at(0.45, 0, -2.3, 0.4));
+  sack(room, at(-0.95, 0, -2.45, 0.3));
+  // Herbes du jardin mises à sécher sous la sablière du mur du fond.
+  hangingHerbs(room, at(-0.2, WALL_H - 0.2, -ROOM_D / 2 + 0.02, 0));
+
+  // Dehors: la pierre de seuil et sa marche, le tonneau sous la gouttière au coin sud-est, le
+  // tas de bois à l'abri du pignon ouest, la barrière du jardin qui s'ouvre sur l'allée.
+  room.group(at(0, -FLOOR_DROP, ROOM_D / 2 + 0.3), () => {
+    room.box(1.5, 0.2, 0.5, at(0, 0.1, 0.22, 0.02), {
+      color: TONE.stone,
+      layer: LAYER.face,
+      wobble: 0.02,
+    });
+    room.box(1.2, 0.1, 0.4, at(0.05, 0.03, 0.62, -0.03), {
+      color: TONE.stoneDark,
+      layer: LAYER.face,
+      wobble: 0.02,
     });
   });
+  rainBarrel(room, at(ROOM_W / 2 + 0.75, height(ROOM_W / 2 + 0.75, 3.2), 3.2, 0.4));
+  woodpile(room, at(-ROOM_W / 2 - 0.75, height(-ROOM_W / 2 - 0.75, 0.6), 0.6, Math.PI / 2));
+  bench(room, at(-2.2, height(-2.2, 3.35), 3.38, 0), 1.4);
+  fence(room, -9, -0.9, 6.9, height);
+  fence(room, 1.1, 9, 6.9, height);
 
-  // Firmin à table; le joueur debout, qui vient d'entrer.
-  if (sculptedPeople) {
-    character(people, OLD_STATIONMASTER, 'assis', -1.52, 0.45, Math.PI / 2 + 0.06, 0, 0.5);
-    character(people, PLAYER, 'debout', 1.05, 1.35, -0.75);
-  } else {
-    playerRing(people, 1.05, 0, 1.35);
-  }
+  // Gaston à table; le joueur debout, qui vient d'entrer.
+  playerRing(room, 1.05, 0, 1.35);
 
   pieces.push({ geometry: room.build(), shadow: true });
-  pieces.push({ geometry: people.build(), shadow: true, characters: true });
 
-  const contacts = contactGeometry([
+  const contacts: ContactSpot[] = [
     [-0.5, 0.045, 0.45, 0.85, 0.55],
     [-1.55, 0.045, 0.45, 0.36, 0.36],
     [-0.2, 0.045, 1.25, 0.34, 0.34],
@@ -669,20 +764,40 @@ export function buildInterior(sculptedPeople: boolean): SceneBuild {
     [1.7, 0, -2.4, 0.95, 0.42],
     [2.6, 0, 1.25, 0.66, 1.2],
     [-1.7, 0, -2.4, 0.24, 0.24],
-  ]);
+    [1.55, 0, 2.2, 0.55, 0.34],
+    [2.93, 0, -0.75, 0.24, 0.32],
+    [0.45, 0, -2.3, 0.26, 0.24],
+  ];
 
   return {
     pieces,
-    contacts,
+    // Les taches sont données au-dessus du plancher; le terrain, lui, est une marche plus bas.
+    contacts: contacts.map(([x, lift, z, rx, rz]) => [x, lift + FLOOR_DROP, z, rx, rz]),
     lamps: [
-      { x: -0.3, y: 1.15, z: 0.35, radius: 3.5 },
+      // La lampe à pétrole de la table: c'est elle qui porte les ombres de la pièce.
+      { x: -0.3, y: 1.15, z: 0.35, radius: 3.5, shadowFov: 150 },
       { x: -2.45, y: 0.42, z: -1.75, radius: 1.35 },
     ],
     keyLamp: true,
-    ground: null,
-    scatter: [],
+    terrain: { spec: GARDEN_TERRAIN, height },
+    scatter: scatter(
+      { plan: GARDEN, height, walls: [HOUSE_RECT], ditches: [] },
+      { x0: -11, z0: -9, x1: 11, z1: 11 },
+      [
+        HOUSE_RECT,
+        { x0: -0.9, z0: 2.9, x1: 0.9, z1: 4.2 },
+        { x0: -3.1, z0: 2.9, x1: -1.3, z1: 3.9 },
+        { x0: -4.6, z0: -0.4, x1: -3.4, z1: 1.6 },
+        { x0: 3.4, z0: 2.6, x1: 4.5, z1: 3.8 },
+      ],
+    ),
+    plants: plant(GARDEN_PLANTS, height),
     cast: INTERIOR_CAST,
+    player: 1,
+    windows: [],
+    air: null,
     view: { x: 0.1, z: -0.5, width: 12.4, yaw: -28 },
+    game: { x: 0.1, z: -0.5, width: 12.4, yaw: -28 },
     close: { x: -0.3, z: 0.3, width: 6.5, yaw: -28 },
   };
 }

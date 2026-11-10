@@ -1,90 +1,133 @@
 # Essai du rendu « bande dessinée encrée »
 
-Tech-artist, 2026-11-10. Page d'essai: `games/la-petite-ligne-2/src/rendu/demo-encre/` (`pnpm dev`, puis `/src/rendu/demo-encre/index.html`; touches et paramètres en tête de `main.ts`). Captures: `captures/encre-*.png`, toutes sorties du vrai rendu Three.js à 1366 x 768, sans retouche. Outils: `captures/outils-encre/`. Rien n'est branché au jeu.
+Tech-artist, 2026-11-10, passe 3. Page d'essai: `games/la-petite-ligne-2/src/rendu/demo-encre/` (`pnpm dev`, puis `/src/rendu/demo-encre/index.html`; touches et paramètres en tête de `main.ts`). Captures: `captures/encre-*.png`, toutes sorties du vrai rendu Three.js à 1366 x 768, sans retouche, temps figé (`joue=0&t=3`). Outils: `captures/outils-encre/`. Rien n'est branché au jeu.
 
-## Les trois règles du client, appliquées partout
+## Les règles du client, appliquées partout
 
-1. **Éviter le plat absolu.** Aucune surface n'est un plan lisse avec un dessin dessus. Le relief vient de la géométrie d'abord, du nuanceur ensuite. Contrôle de chaque capture: « où est le plat absolu ? ».
-2. **La lisibilité passe avant la quantité d'encre.** Le trait est hiérarchisé selon la taille à l'écran; les aplats de couleur font le travail de lecture, le noir cerne et pose l'ombre.
-3. **Volume ou texture.** Tout ce qui borde, ponctue ou dépasse du sol est un vrai petit volume; la texture du sol ne garde que le dessin à plat.
+1. **Éviter le plat absolu.** Le relief vient de la géométrie d'abord, du nuanceur ensuite. Depuis la passe 3 le sol lui-même est un terrain.
+2. **La lisibilité passe avant la quantité d'encre.** Trait hiérarchisé selon la taille à l'écran; les aplats font la lecture, le noir cerne et pose l'ombre.
+3. **Volume ou texture.** Ce qui borde, ponctue ou dépasse du sol est un vrai petit volume; la texture ne garde que le dessin à plat.
+4. **Un seul niveau de rendu** pour le Mac et le PC (UHD 620, 1366 x 768, plancher de 30 images par seconde): aucun réglage de qualité, les effets ont un coût fixe et borné.
+5. **Caméra**: 50 degrés de plongée au zoom de jeu (18 m de large) et au-delà; en zoomant plus près elle s'abaisse jusqu'à 35 degrés à 6 m (les visages se voient). Libre de tourner et de zoomer (6 à 40 m).
 
 ## Ce que montre la scène
 
-- Dehors: le coin de la halte d'Aubrune tiré du plan (origine au point 146; 94): voie, quai de 30 x 4 m dallé pierre à pierre, traversée de service en planches, barrière côté pré, maison de Firmin (7 x 6 m, étage, porte de 2,05 m), halte, pendule arrêtée sur 5 h 12, réverbère entre le banc et la caisse, chemin de terre bordé de pierres. Un joueur et trois habitants (assis, en train de parler, en marche).
-- Dedans: la pièce de la même maison, murs effacés côté caméra (leur pied reste), plancher en lames posées une à une, lambris, pan de bois, poêle, buffet, lit, table, chaises, tapis, lampe, étagère, rideaux.
-- Ambiances: dehors jour, jour « dense », crépuscule, nuit; dedans jour, jour « dense », nuit. Les variantes denses (même heure, valeurs plus basses, noirs pleins, vignette marquée) sont là pour que le client tranche sur image.
-- Écarts au plan, voulus: la halte a une seconde porte à l'ouest, de plain-pied sur le quai; le banc du chef de halte est contre sa façade (le banc du quai reste à sa place, face à la voie).
+- Dehors: le coin de la halte d'Aubrune tiré du plan (origine au point 146; 94): voie, quai de 30 x 4 m et ses marches de bout, traversée de service, fossé, barrière, maison de Firmin, halte, pendule arrêtée sur 5 h 12, réverbère, chemin de terre. Cinq personnages animés: Gaston assis sur le banc, Odette qui parle à la joueuse (Maëlle) sur le sentier, Lou qui va et vient sur le chemin, Basile qui attend sur le quai.
+- Dedans: la pièce de la même maison (murs effacés côté caméra), et autour d'elle son jardin: soubassement de moellons, pierre de seuil, allée, banc, tonneau sous la gouttière, tas de bois, barrière, pommiers, haie.
+- Ambiances: dehors jour, jour « dense », crépuscule, nuit, aube; dedans jour, jour « dense », nuit.
+- Écarts au plan, voulus: seconde porte de la halte à l'ouest, de plain-pied sur le quai; banc de Gaston contre sa façade; fossé entre le ballast et la barrière (il draine la voie), comblé sous la traversée.
+
+## Passe 3: ce qui a changé
+
+| Sujet             | Avant                                                         | Maintenant                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Personnages       | corps de l'essai 3 figés en géométrie                         | les 5 corps de l'essai 4 avec leur squelette: clips `marche` et `repos` joués, gestes posés par-dessus à chaque image (s'asseoir, parler, regarder, respirer), marche qui suit le relief; atlas de traits à la plume (grille de `traits.json`, `traits-<id>.png`); un appel de dessin par personnage (corps, tête, coiffure et col fondus, coiffure et col liés à un os) |
+| Nuanceur          | variante à part, greffe sur `MeshToonMaterial` dans l'essai 4 | un seul `ShaderMaterial` de volumes pour décor, semis, végétation et personnages (variante `ATLAS`, squelette par les morceaux `skinning_*` de Three.js); le sol partage la même lumière                                                                                                                                                                                 |
+| Visage            | taches d'ombre                                                | masque du visage: ton clair garanti, ombre à deux tons sans relief ni hachure, aucune arête intérieure (numéro de morceau « peau lisse »), traits épaissis d'un demi-point d'écran                                                                                                                                                                                       |
+| Végétation        | polyèdres                                                     | touffes en festons: calotte bombée, bord découpé en dents inégales, feuilles détachées, normales qui rayonnent du coeur (l'ombre dessine une masse), bord d'ombre dentelé, noir plein dessous, vent dans le nuanceur de sommets (et dans la passe d'ombre); 3 arbres (chêne, bouleau, pommier) et 2 buissons (noisetier, églantier), un appel instancié par essence      |
+| Sol               | un plan                                                       | terrain: bosses du pré, chemin creusé de 7 cm avec talus, ornières, fossé de 30 cm, terre remontée au dos du quai, sol relevé de 5 cm contre les murs (leur pied s'enfonce) et herbe haute à leur pied; les tons de l'herbe suivent la pente vraie; de près, lit de gravillons en relief                                                                                 |
+| Pierres et fleurs | boîtes biseautées, pastilles                                  | galets cabossés de quatre gabarits (rond, plat, dressé, moussu), étirés un par un, à demi enterrés; coquelicots à quatre pétales en coupe, marguerites en étoile                                                                                                                                                                                                         |
+| Lumière           | flaques sans ombre                                            | ombre portée par la lampe la plus proche du joueur (une carte de 512 en cône, une seule à la fois); rectangle de lumière des fenêtres sur le sol dehors, croisillon compris (calcul direct); brume au sol en deux voiles à bord net (crépuscule, nuit, aube); lucioles ou poussière (un appel instancié); reflet du ciel en bandes sur les vitres de jour                |
+| Intérieur         | pré vide autour, peu d'objets                                 | jardin autour de la pièce; plinthe moulurée, chambranles à corniche, tablettes d'appui; horloge comtoise, malle, chevet, chat, bottes, balai, bouilloire, panier, sac, herbes pendues                                                                                                                                                                                    |
 
 ## Choix faits, sur preuve
 
-| Question | Retenu | Pourquoi (capture) |
-|---|---|---|
-| Contour | Post-traitement sur numéros d'objet et de morceau, normales et profondeur, hiérarchisé | `encre-contours-compares.png`: la coque inversée ne cerne que la silhouette, d'un trait maigre, sans arêtes ni joints, et s'ouvre sur les planches fines; le post-traitement donne silhouettes, arêtes et joints en une passe, et le trait peint des textures ajoute le détail de près |
-| Trait irrégulier | Épaisseur de 55 à 145 % et tremblé d'un demi-trait, tirés d'un bruit ancré au monde | le trait ne grouille pas quand la caméra bouge; tremblé réduit sur les petits objets, où il doublait les lignes |
-| Ombrage | 3 tons francs (clair, demi-teinte, ombre) multipliés à l'aplat; l'ombre est une couleur de l'ambiance | les trois faces d'un volume ont trois valeurs; prune le soir, bleu la nuit |
-| Ombre portée | Aplat net teinté avec hachures lâches | `encre-ombres-comparees.png`: l'aplat seul est propre mais lisse; les hachures seules ne posent plus les objets au sol; les deux ensemble donnent l'ombre encrée des références |
-| Sol | Carte des matières floue seuillée par un bruit, bord cerné, deux couches de touffes à deux échelles et deux angles, plages claires qui suivent le soleil | aucune grille ni répétition lisible à 32 m de large |
-| Ambiance | Teinte, saturation, contraste et vignette dans la passe d'encrage; flaques de lampe à deux anneaux nets dans les nuanceurs | `encre-exterieur-jeu-nuit.png`, `encre-interieur-nuit.png` |
-| Couleur | Tout en valeurs d'écran, sans éclairage physique | un ton du nuancier 0.2 ressort tel qu'écrit; la pièce porte le ton clair, la texture le ton de base, la lumière l'ombre |
+| Question             | Retenu                                                                                 | Pourquoi                                                                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contour              | Post-traitement sur numéros d'objet et de morceau, normales et profondeur, hiérarchisé | `encre-contours-compares.png` (passe 1): la coque inversée ne cerne que la silhouette; la coque comparée a été retirée du code à la passe 3   |
+| Trait irrégulier     | Épaisseur de 55 à 145 % et tremblé d'un demi-trait, bruit ancré au monde               | `encre-stabilite.png`: six images d'une rotation de 25 degrés pendant que Lou marche; hachures, bord d'ombre et trait restent attachés au sol |
+| Ombrage              | 3 tons francs multipliés à l'aplat; l'ombre est une couleur de l'ambiance              | prune le jour dense et le soir, bleu la nuit                                                                                                  |
+| Ombre portée         | Aplat net teinté avec hachures lâches                                                  | `encre-ombres-comparees.png` (passe 1)                                                                                                        |
+| Ombre de lampe       | Une seule carte en cône, lampe la plus proche du joueur                                | `encre-interieur-nuit.png` (chaises, table, personnages), `encre-exterieur-jeu-nuit.png` (Gaston et son banc)                                 |
+| Lumière des fenêtres | Calcul direct par fenêtre (8 au plus, les plus proches du point visé)                  | ni texture ni passe; `encre-chemin-rasant.png`, `encre-exterieur-jeu-nuit.png`                                                                |
+| Feuillage            | Géométrie instanciée, pas de carte découpée                                            | le contour par numéros le cerne sans surcoût; pas de tri ni de transparence                                                                   |
+| Couleur              | Tout en valeurs d'écran, sans éclairage physique                                       | un ton du nuancier ressort tel qu'écrit                                                                                                       |
 
-Avis contraire à la bible 0.2 (section 4.1), à arbitrer: elle écarte le post-traitement pour son coût. Mesuré ici, il ajoute une passe plein écran de 22 lectures de texture par pixel et une seconde sortie de rendu (pas de second rendu de la scène), contre 30 % de triangles et 6 appels de plus pour la coque sur cette vue. Il est identique sur les deux machines (même Chromium, WebGL2). Seule une mesure sur l'UHD 620 tranchera; la version économe est prête (quatre directions au lieu de huit, ou coque pour les seuls personnages).
+Avis contraire à la bible 0.2 (section 4.1), toujours à arbitrer: elle écarte le post-traitement pour son coût (une passe plein écran de 22 lectures par pixel).
 
 ## Hiérarchie du trait (lisibilité)
 
-- Chaque objet et chaque morceau reçoit, à la fabrication, une classe de taille mesurée sur sa boîte (2,5 m et plus, 1 m, 40 cm, moins): rien à déclarer.
-- Cinq rangs de trait: silhouette d'objet (rang = classe de l'objet de devant), puis traits intérieurs (un rang sous le plus petit des deux morceaux). Un rang est tracé quand ce qu'il cerne dépasse 12 à 28 points à l'écran (`rankWeights`): à 32 m de large une fenêtre est un cadre et une couleur; au zoom de jeu on voit ses petits bois; de près, les veines.
-- Seuls les deux premiers rangs sont épais. Le trait peint des textures d'objet s'efface sous 45 à 85 points par mètre. Hachures, noirs pleins et pied encré: sur les grands objets seulement, jamais sur un personnage.
-- Personnages: un seul contour, aucun trait intérieur avant le plan rapproché, ombre relevée vers la demi-teinte, liseré clair côté soleil, tache de contact au sol.
-- Contrôle `outils-encre/taux_noir.py` (part de pixels sous 0,22 de luminance par bloc de 64): façade en vue large 24 % avant, 20 % après; blocs au-dessus d'un tiers: 6 sur 252 en vue large de jour, 14 au zoom de jeu (voie et ombres des arbres). Limite: la mesure confond l'encre et les aplats sombres (traverses, vitres); au zoom de jeu elle ne bouge pas (23 %) alors que l'image est nettement plus lisible (`encre-lisibilite-avant-apres.png`).
+- Chaque objet et chaque morceau reçoit à la fabrication une classe de taille mesurée sur sa boîte. Cinq rangs de trait; un rang est tracé quand ce qu'il cerne dépasse 12 à 28 points à l'écran (`rankWeights`). Seuls les deux premiers rangs sont épais.
+- Le détail suit la même règle (`SETTINGS` de `main.ts`): trait peint des textures de 45 à 85 points par mètre, hachures et gravillons de 80 à 150, traits du visage de 34 à 80; les niveaux de loin des atlas de personnages sont des aplats.
+- Personnages: un seul contour, teintes poussées de 18 %, ombre relevée, liseré clair côté soleil, tache de contact qui les suit.
 
 ## Nuanceurs et ombres
 
-Trois nuanceurs maison (`matiere.ts`, `contours.ts`), aucun matériau standard, plus une passe de profondeur pour l'ombre.
+- **Volumes** (`OBJECT_*`, `matiere.ts`): aplat de la pièce, second ton et trait de la couche de texture, relief, lumière encrée, vitres, flammes, feuillage, vent. Variante `ATLAS` (personnages): atlas, hauteur dans l'alpha (normale penchée et sommets poussés), traits du visage, hachures ancrées au personnage et de près seulement.
+- **Sol** (`GROUND_*`): matières par carte seuillée, bord cerné, touffes, pente du terrain lue dans la même carte (canaux B et A).
+- **Lumière encrée** (`LIGHTING`): trois tons, ombre du soleil (5 lectures), flaques de lampe, ombre de la lampe locale (5 lectures), fenêtres, hachures projetées sur le monde, noirs pleins, pied encré, brume.
+- **Ombre de contact**, **particules** (`effets.ts`), **encrage** (`contours.ts`).
+- Réglages par lieu et par ambiance en données (`ambiances.ts`, type `Ambiance`).
 
-- **Volumes** (`OBJECT_*`): aplat de la pièce, second ton et trait lus dans la couche de texture, relief (la pente lue en B et A penche la normale avant le choix du ton: un joint tombe dans l'ombre, une arête prend le clair), lumière encrée, lueur des vitres et des flammes. Variante `ATLAS` pour les personnages (couleur lue dans leur atlas), variante `HULL` pour la coque comparée, instanciation pour le semis.
-- **Sol** (`GROUND_*`): matières par carte seuillée, bord cerné, touffes, cailloux et ballast en relief, même lumière.
-- **Ombre de contact** (`CONTACT_*`): taches anguleuses multipliées au ton d'ombre de l'ambiance, sous les pieds et les meubles.
-- **Lumière encrée** (`LIGHTING`): ombre du soleil lue en 5 points filtrés puis seuillée (bord net, sans escalier ni acné sur les captures; il ondule parce que le point lu se décale de 5 à 7 cm selon un bruit), flaques de lampe, hachures à 45 degrés projetées sur le monde (elles ne nagent pas), serrées quand la face se détourne, noirs pleins par plaques, pied des murs noirci et hachuré.
-- **Encrage** (`contours.ts`): trait hiérarchisé, teinte, saturation, contraste, vignette.
+## Gabarits: ajouter sans coder
 
-Réglages par lieu et par ambiance, en données (`ambiances.ts`, type `Ambiance`): direction du soleil, trois tons, encre, hachures (propre, portée), noirs pleins, relief, pied encré, lampes, lueur des vitres, vignette, teinte, saturation, contraste, tons du sol, relevé et liseré des personnages. Réglages du trait: `SETTINGS` (`main.ts`) et `rankWeights`.
-
-Ce qu'un nouvel objet doit fournir pour en profiter sans code: sa géométrie avec normales à plat, une couleur par morceau (ton clair du nuancier), une couche de trait par morceau (bois, planche seule, pierre seule, enduit, tuile, feuillage, écorce, uni) avec des UV en mètres (4 m par carreau), et son pied à y = 0. Numéros, classes de taille, contour, ombre, hachures et relief en découlent.
-
-Non fait: l'ombre portée par les lampes (les flaques éclairent sans découper l'ombre des objets), version économe à étudier: une seule carte d'ombre de 512 pour la lampe la plus proche du joueur.
-
-## Volume ou texture, et gabarit de dispersion
-
-- Volume: pierres de bordure, cailloux, touffes hautes, fleurs, racines, dalles, lames, tuiles, moellons du soubassement, chaînes d'angle, linteaux, chevrons, faîtières, gouttière. Texture: touffes rases, veines, fissures, éclats, taches du second ton.
-- `semis.ts`: un petit décor = une forme dans `SHAPES` et une ligne dans `RULES` (forme, nature de sol parmi herbe, terre, bord, ballast, densité par mètre carré, échelle, plaques). Semis déterministe, hors des emprises données par la scène; un appel de dessin instancié par forme. Sur cette vue: 7 formes, 12 appels (7 à l'image, 5 à l'ombre: les cailloux n'en projettent pas), triangles compris dans le total des mesures.
-- Preuve en lumière rasante: `encre-chemin-rasant.png`, `encre-relief-mur.png`.
+- **Petit décor semé** (`semis.ts`): une forme dans `SHAPES`, une ligne dans `RULES` (nature de sol: herbe, terre, bord, ballast, fossé, pied de mur).
+- **Essence** (`vegetation.ts`): une fonction dans `SPECIES` (tronc, branches, touffes par `tuft`), puis des emplacements `PlantSpot`.
+- **Relief d'un lieu** (`terrain.ts`): une fiche `TerrainSpec` (bosses, emprises à niveau, creux des chemins, ornières, fossés).
+- **Personnage** (`acteurs.ts`): une ligne `ActorSpec` (fiche de l'essai 4, expression par son nom, rôle, trajet); les fichiers sont pris par leur nom.
+- **Bâtiment** (`BuildingSpec`), **ambiance** (`Ambiance`), **objet** (une fonction autour de son pied, posée par une matrice).
 
 ## Mesures
 
-| Vue | Appels | Triangles (toutes passes) | Programmes |
-|---|---|---|---|
-| Dehors, post-traitement (retenu) | 27 | 140 360 | 8 |
-| Dehors, coque inversée | 33 | 182 916 | 10 |
-| Dedans | 21 | 22 966 | 8 |
+| Vue                                     | Appels | Triangles (toutes passes) | Programmes |
+| --------------------------------------- | ------ | ------------------------- | ---------- |
+| Dehors, jour                            | 45     | 302 738                   | 10         |
+| Dehors, nuit (ombre de lampe, lucioles) | 51     | 338 463                   | 10         |
+| Dedans, jardin compris                  | 55     | 136 612                   | 10         |
 
-- Budget de la bible: 350 000 triangles, 200 appels, 4 programmes. Triangles et appels tenus; programmes dépassés (8: volumes, sol, contact, encrage, profondeur, leurs variantes instanciées et un par personnage, à ramener à un seul par un tableau d'atlas).
-- Textures: 13 couches de 512 en RGBA (18 Mo avec mipmaps; 9 Mo en deux textures R et RG), carte d'ombre de 2 048 (16 Mo), cibles de rendu 12 Mo.
-- Temps par image sous Chromium logiciel, machine chargée (charge 10 à 17): 0,45 à 3 s, trop bruité pour classer les réglages; dans une même série, sans contour 0,45 s, coque 0,7 s, post-traitement 1,1 à 1,3 s. Ces chiffres ne disent rien du GPU.
-- Estimation UHD 620 (non mesurée): 1,05 million de pixels, passe principale à 9 lectures de texture, encrage à 22, ombre en profondeur seule; ordre de grandeur attendu 8 à 14 ms, donc au-dessus de 30 images par seconde. À mesurer sur le PC.
+- Budget de la bible: 350 000 triangles, 200 appels, 4 programmes. Triangles tenus de peu la nuit, appels tenus, programmes dépassés.
+- Une passe de couleur dehors: 180 000 triangles environ, dont terrain 34 800, décor bâti 22 720, semis 80 000, végétation 33 000, personnages 13 000 (2 600 chacun). La passe d'ombre du soleil redessine tout sauf fleurs et cailloux; celle de la lampe seulement le bâti et les personnages (35 700).
+- Programmes: volumes (simple, instancié, personnage), sol, contact, profondeur (simple, instanciée, à squelette), particules, encrage. Pour revenir vers 6: tout instancier (une seule variante de volumes et de profondeur).
+- Textures (61 Mo environ): 13 couches de trait de 512 (18 Mo avec mipmaps), ombre du soleil 2 048 (16 Mo), cibles de rendu (12,6 Mo), 5 atlas de personnages (7 Mo), 5 atlas de traits de 512 x 384 (5,2 Mo), carte du sol 720 x 560 (1,6 Mo), ombre de lampe 512 (1 Mo).
+- Lectures de texture par pixel: volumes 9 le jour et 16 la nuit (5 pour l'ombre de lampe, 2 pour la brume, sautées quand elles sont éteintes), sol 17 le jour et 24 la nuit, encrage 22.
+- Temps par image sous Chromium logiciel, machine chargée (charge 13): 0,6 à 2,6 s, inutilisable pour classer les réglages. Rien ici ne dit le temps sur le GPU.
+- Estimation UHD 620 (non mesurée): 1,05 million de pixels; le sol (17 à 24 lectures) et l'encrage (22) sont les deux postes lourds. Ordre de grandeur attendu 11 à 18 ms: au-dessus de 30 images par seconde, sans marge pour 60.
 
-## Ce qui reste loin des références
+Versions économes prêtes ou à une ligne, si la mesure sur le PC déçoit:
 
-1. Les personnages viennent de l'essai 3 (corps riggés, figés dans une pose pour cette page): mains du costaud énormes, visages trop petits pour être lus au zoom de jeu, pas de skinning dans le nuanceur. Les personnages sculptés (`personnages=sculptes`) sont pires: cubiques.
-2. Les arbres restent des polyèdres: il leur faut des masses de feuillage modelées à la main (Blender) avec un contour découpé.
-3. Les références sont peintes: dégradés de lumière, brume, particules, flaques qui découpent les ombres. Ici la lumière est franche partout; il manque l'ombre des lampes, une brume légère et les effets.
-4. Le sol reste un plan: son modelé n'est que dans les tons. Un vrai relief demande le terrain du jeu.
-5. Le trait reste un trait de machine: épaisseur variable mais pas de pleins et déliés selon la courbure, pas d'accroche aux angles.
-6. De jour clair, l'image est propre mais plus sage que les références; les variantes denses, le crépuscule et la nuit s'en approchent davantage.
+| Effet                | Version économe                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Ombre de lampe       | une lecture au lieu de cinq (bord un peu crénelé); carte rendue une image sur deux; coupée de jour (déjà le cas) |
+| Lumière des fenêtres | 4 fenêtres au lieu de 8; ou cuite dans la carte du sol par lieu                                                  |
+| Encrage              | 4 directions au lieu de 8 (11 lectures)                                                                          |
+| Sol                  | une seule couche de touffes, gravillons coupés (2 lectures de moins)                                             |
+| Ombre du soleil      | carte de 1 024, 3 lectures                                                                                       |
+| Semis                | densités divisées par deux hors du rayon de 15 m autour du joueur                                                |
 
-## Ce que le style impose aux gabarits
+## Ce qu'il faudra porter dans le moteur (matière pour un ADR)
 
-- **Objet**: morceaux séparés et épais (chants, pieds, ferrures en volume), un ton clair par morceau, une couche de trait, pas de texture de couleur; de guingois de 1 à 3 degrés; pas de détail de moins de 5 cm en volume.
-- **Sol**: une carte des matières à 8 points par mètre tirée du plan, des tons par ambiance, une ligne de semis par petit décor.
-- **Bâtiment**: une fiche (`BuildingSpec`: emprise, hauteurs, couleurs, ouvertures); le relief (soubassement, chaînes, encadrements, toit en rangs) est fabriqué par le gabarit.
-- **Personnage**: un atlas de couleur en aplats clairs (l'ombre vient de la lumière, pas de la peinture), peu de trait intérieur (il ne se voit que de près), valeurs séparées entre tête, haut et bas, une silhouette lisible à 60 points.
-- **Ambiance**: une fiche `Ambiance` par lieu et par heure.
+1. **Deux sorties de rendu et une passe d'encrage**: cible à deux textures (couleur; normale, morceau, pièce) plus profondeur. À décider: accepter le post-traitement malgré la bible 4.1.
+2. **Numéros et classes de taille à la fabrication**: tout maillage du jeu doit porter `aMeta` (couche, pièce, nature, morceau) et `aFoot`. À faire dans la chaîne d'assets (glTF: attributs personnalisés `_META`, `_FOOT`), pas à l'exécution.
+3. **Un nuanceur de volumes unique** avec ses variantes (instancié, squelette, atlas): les personnages du catalogue doivent arriver en un seul maillage par personnage, coiffure et accessoires liés à un os.
+4. **Terrain en données**: `TerrainSpec` par lieu, tiré du plan; la simulation doit lire la même hauteur que le rendu (marche, pose des objets). La fonction de hauteur est pure et sans Three.js: elle peut vivre côté simulation.
+5. **Ambiances en données** (`Ambiance`), interpolées dans le temps (non fait ici: on passe d'une fiche à l'autre d'un coup).
+6. **Ombres**: carte du soleil cadrée sur la vue et calée sur ses texels; une carte de lampe pour la lampe la plus proche du joueur local (chaque machine choisit la sienne: rien à synchroniser).
+7. **Gabarits de contenu**: semis (`RULES`), essences (`SPECIES`), bâtiments (`BuildingSpec`), acteurs (`ActorSpec`), à brancher sur les schémas validés du paquet.
+8. **Caméra**: plongée fonction du zoom (50 à 35 degrés).
+9. **Mesure sur l'UHD 620** avant tout: c'est elle qui choisit entre la version pleine et les versions économes; elle fixe aussi le budget de programmes.
+10. **Gestes par-dessus les clips**: le mélangeur d'animation ne réécrit pas un os dont la valeur ne change pas; tout geste posé à la main doit remettre l'os à la pose du clip avant de s'appliquer.
+
+## Notes franches, capture par capture (contre les références du client)
+
+| Capture                                                 | Note | Pourquoi                                                                                                                |
+| ------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------- |
+| `encre-exterieur-jeu-nuit`                              | 9    | fenêtres qui jettent leur croisillon, ombre de Gaston sous la lanterne, brume, lucioles, noirs pleins: dense et lisible |
+| `encre-exterieur-nuit` (large)                          | 9    | trois foyers de lumière, masses d'arbres découpées                                                                      |
+| `encre-interieur-nuit`                                  | 9    | ombres de la lampe à pétrole qui rayonnent, jardin dans la nuit                                                         |
+| `encre-relief-mur`                                      | 9    | pierre à pierre, pied de mur dans l'herbe, gravillons                                                                   |
+| `encre-exterieur-jeu-jour-dense`                        | 8,5  | lisible et dense; les feuillages restent des festons anguleux (« artichaut »)                                           |
+| `encre-exterieur-jour-dense` (large)                    | 8,5  | même réserve sur les houppiers vus de haut, tous de même famille                                                        |
+| `encre-interieur-jour-dense`, `encre-interieur-proche`  | 8,5  | pièce habitée, visages lisibles à 35 degrés; le chat se lit mal                                                         |
+| `encre-exterieur-jeu-crepuscule`, `encre-chemin-rasant` | 8,5  | relief du chemin net en lumière rasante; beaucoup de hachures au sol                                                    |
+| `encre-exterieur-proche`                                | 8    | visages visibles et traits lisibles, matière au sol; têtes de l'essai 4 encore sommaires, mains raides                  |
+| `encre-exterieur-jeu-jour`, `encre-exterieur-jour`      | 8    | propre mais sage: le jour clair reste moins proche des références                                                       |
+| `encre-exterieur-jeu-aube`                              | 7,5  | la brume en plaques pâles fait « camouflage »; tout le lieu est dans l'ombre du soleil bas                              |
+
+## Ce qui bloque sous 9
+
+1. **Feuillage**: la géométrie en festons a des facettes de 30 à 60 cm; les références ont des masses peintes à la main. Pour passer 9: des touffes modelées dans Blender (silhouette dessinée, 3 ou 4 variantes par essence), même nuanceur.
+2. **Têtes et mains**: modelé de l'essai 4 en cours de reprise par un autre membre; le chargement prendra les nouveaux GLB sous le même nom. Les coiffures « tignasse » (Basile, Lou) couvrent le visage vu de haut: à retailler dans leur fiche.
+3. **Jour clair**: par nature moins dense; le client tranchera entre jour clair et jour dense.
+4. **Trait de machine**: épaisseur variable mais ni pleins ni déliés selon la courbure.
+5. **Aube**: la brume demande des nappes en volume (cartes posées au sol) plutôt qu'un voile dans le nuanceur.
+6. **Clip de repos**: une seule pose dans les fichiers actuels; la vie vient des gestes posés par code.

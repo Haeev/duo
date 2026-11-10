@@ -6,10 +6,11 @@
  * (dessus clair, flanc à l'ombre) et la passe d'encrage le cerne d'un trait fin. Une même
  * fonction, pilotée par une fiche (`BuildingSpec`), fait la maison et la halte.
  */
-import type * as THREE from 'three';
+import * as THREE from 'three';
 
 import { lean, TONE } from './decor';
 import { at, GLOW, hex, LAYER, type Rgb, type Sculpt } from './formes';
+import type { WindowLight } from './matiere';
 
 /** Tirage reproductible entre 0 et 1. */
 function rand(seed: number): number {
@@ -419,6 +420,59 @@ export function building(s: Sculpt, spec: BuildingSpec): void {
 }
 
 /**
+ * Fenêtres du rez-de-chaussée d'un bâtiment, pour la lumière qu'elles jettent dehors la nuit:
+ * milieu de l'appui sur le nu du mur, taille, normale vers le dehors.
+ */
+export function windowLights(spec: BuildingSpec): WindowLight[] {
+  const lights: WindowLight[] = [];
+  const origin = new THREE.Vector3();
+  const outward = new THREE.Vector3();
+  for (const opening of spec.openings) {
+    if (opening.kind !== 'window' || (opening.floor ?? 0) !== 0) continue;
+    const frame = wallFrame(spec, opening.side);
+    origin.set(opening.along, 0.95, 0).applyMatrix4(frame.matrix);
+    outward.set(0, 0, 1).transformDirection(frame.matrix);
+    lights.push({
+      x: origin.x,
+      sill: origin.y,
+      z: origin.z,
+      width: 0.95,
+      height: 1.25,
+      nx: outward.x,
+      nz: outward.z,
+    });
+  }
+  return lights;
+}
+
+/**
+ * Bout de quai: deux marches de pierre pour monter du chemin (le quai fait 30 cm: une marche de
+ * 15 cm, puis le quai). Repère: pied des marches à l'origine, on monte vers +x, largeur le long de z.
+ */
+export function platformSteps(s: Sculpt, matrix: THREE.Matrix4, width: number): void {
+  s.group(matrix, () => {
+    let z = -width / 2;
+    let k = 0;
+    while (z < width / 2 - 0.05) {
+      const length = Math.min(0.55 + rand(k * 7 + 3) * 0.5, width / 2 - z);
+      s.box(
+        0.42,
+        0.17,
+        length - 0.02,
+        at(0.2, 0.075 + lean(k, 0.006), z + length / 2, lean(k + 1, 0.01)),
+        {
+          color: STONES[k % STONES.length] ?? TONE.stone,
+          layer: LAYER.face,
+          wobble: 0.01,
+        },
+      );
+      z += length;
+      k += 1;
+    }
+  });
+}
+
+/**
  * Quai: un massif et, dessus, des dalles posées une à une (rangs de 67 cm, longueurs inégales,
  * désaffleurées de quelques millimètres); la bordure côté voie (-z) est en pierres plus hautes.
  */
@@ -448,14 +502,16 @@ export function platform(
         const seed = row * 53 + k * 11;
         const length = Math.min((edge ? 0.9 : 0.6) + rand(seed) * 0.7, x1 - x);
         const thick = edge ? height : 0.09;
+        // Bordure: la pierre de rive côté voie déborde de 6 cm et dépasse de 2 cm, en nez de marche.
+        const nose = row === 0 ? 0.06 : 0;
         s.box(
           length - 0.022,
           thick,
-          depth - 0.022,
+          depth - 0.022 + nose,
           at(
             x + length / 2,
-            height - thick / 2 + lean(seed + 1, 0.007),
-            z0 + (row + 0.5) * depth,
+            height - thick / 2 + lean(seed + 1, 0.007) + (row === 0 ? 0.02 : 0),
+            z0 + (row + 0.5) * depth - nose / 2,
             lean(seed + 2, 0.008),
             lean(seed + 3, 0.004),
             lean(seed + 4, 0.004),

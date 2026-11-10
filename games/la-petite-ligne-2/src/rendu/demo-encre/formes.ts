@@ -40,8 +40,11 @@ export const LAYER_COUNT = 13;
 /** Côté d'un carreau de texture, en mètres: 512 points pour 4 m, un trait de 3 points fait 2,3 cm. */
 export const TILE_METRES = 4;
 
-/** Lueur d'une face: vitre (éclairée de l'intérieur ou par le ciel) ou flamme. */
-export const GLOW = { none: 0, window: 1, flame: 2 } as const;
+/**
+ * Nature d'une face, lue par le nuanceur: vitre (éclairée de l'intérieur ou par le ciel), flamme,
+ * feuillage (bord d'ombre dentelé, noir plein dessous, vent) ou tige souple (vent seulement).
+ */
+export const GLOW = { none: 0, window: 1, flame: 2, leaf: 3, stem: 4 } as const;
 
 export interface PartOptions {
   readonly color: Rgb;
@@ -55,6 +58,11 @@ export interface PartOptions {
   readonly wobble?: number;
   /** Axe local le long duquel courent les traits de la couche (fil du bois, rangs de tuiles). */
   readonly grain?: 'x' | 'y' | 'z';
+  /**
+   * Centre d'une masse ronde, dans le repère de la pièce: les normales rayonnent de ce point au
+   * lieu d'être à plat, et l'ombre dessine une masse au lieu de facettes (feuillages).
+   */
+  readonly round?: readonly [number, number, number];
 }
 
 /** Classe de taille d'un objet ou d'un morceau, d'après la diagonale de sa boîte (m). */
@@ -182,6 +190,8 @@ export class Sculpt {
     const edgeB = new THREE.Vector3();
     const localNormal = new THREE.Vector3();
     const worldNormal = new THREE.Vector3();
+    const roundNormal = new THREE.Vector3();
+    const centre = options.round ? new THREE.Vector3(...options.round).applyMatrix4(world) : null;
     for (let i = 0; i < local.count; i += 3) {
       for (let k = 0; k < 3; k += 1) {
         const v = p[k as 0 | 1 | 2];
@@ -218,7 +228,12 @@ export class Sculpt {
         const q = w[k as 0 | 1 | 2];
         this.positions.push(q.x, q.y, q.z);
         partBox.expandByPoint(q);
-        this.normals.push(worldNormal.x, worldNormal.y, worldNormal.z);
+        if (centre) {
+          roundNormal.subVectors(q, centre).normalize();
+          this.normals.push(roundNormal.x, roundNormal.y, roundNormal.z);
+        } else {
+          this.normals.push(worldNormal.x, worldNormal.y, worldNormal.z);
+        }
         this.colors.push(color[0], color[1], color[2]);
         this.uvs.push(v[uAxis] / TILE_METRES + offsetU, v[vAxis] / TILE_METRES + offsetV);
         // Deuxième valeur: l'objet (posée à sa fermeture). Quatrième: le morceau; deux planches
@@ -227,7 +242,8 @@ export class Sculpt {
         this.feet.push(this.foot);
       }
     }
-    const partCode = (seed % 63) + 1 + 64 * sizeClass(partBox.getSize(edgeA).length());
+    // Numéros de morceau de 1 à 62: le 63 est réservé à la peau lisse des personnages.
+    const partCode = (seed % 62) + 1 + 64 * sizeClass(partBox.getSize(edgeA).length());
     for (let i = partStart; i < this.positions.length / 3; i += 1) this.metas[i * 4 + 3] = partCode;
     if (geometry !== source) geometry.dispose();
     source.dispose();
@@ -302,37 +318,12 @@ export class Sculpt {
   build(): THREE.BufferGeometry {
     this.closeObject();
     const geometry = new THREE.BufferGeometry();
-    const count = this.positions.length / 3;
-    // Normales lissées par point soudé: la coque inversée (contour comparé) s'écarte le long
-    // d'elles; avec les normales à plat, elle s'ouvrirait à chaque arête.
-    const sums = new Map<string, [number, number, number]>();
-    const keys: string[] = [];
-    for (let i = 0; i < count; i += 1) {
-      const key = `${Math.round((this.positions[i * 3] ?? 0) * 500)}|${Math.round(
-        (this.positions[i * 3 + 1] ?? 0) * 500,
-      )}|${Math.round((this.positions[i * 3 + 2] ?? 0) * 500)}|${this.metas[i * 4 + 1] ?? 0}`;
-      keys.push(key);
-      const sum = sums.get(key) ?? [0, 0, 0];
-      sum[0] += this.normals[i * 3] ?? 0;
-      sum[1] += this.normals[i * 3 + 1] ?? 0;
-      sum[2] += this.normals[i * 3 + 2] ?? 0;
-      sums.set(key, sum);
-    }
-    const smooth = new Float32Array(count * 3);
-    keys.forEach((key, i) => {
-      const sum = sums.get(key) ?? [0, 1, 0];
-      const length = Math.hypot(sum[0], sum[1], sum[2]) || 1;
-      smooth[i * 3] = sum[0] / length;
-      smooth[i * 3 + 1] = sum[1] / length;
-      smooth[i * 3 + 2] = sum[2] / length;
-    });
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.positions, 3));
     geometry.setAttribute('normal', new THREE.Float32BufferAttribute(this.normals, 3));
     geometry.setAttribute('aColor', new THREE.Float32BufferAttribute(this.colors, 3));
     geometry.setAttribute('uv', new THREE.Float32BufferAttribute(this.uvs, 2));
     geometry.setAttribute('aMeta', new THREE.Float32BufferAttribute(this.metas, 4));
     geometry.setAttribute('aFoot', new THREE.Float32BufferAttribute(this.feet, 1));
-    geometry.setAttribute('aSmooth', new THREE.BufferAttribute(smooth, 3));
     geometry.computeBoundingSphere();
     return geometry;
   }
