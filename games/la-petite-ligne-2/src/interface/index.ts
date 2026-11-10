@@ -9,6 +9,8 @@ import { talkView } from '../simulation/dialogues/conversation';
 import type { Intent } from '../simulation/noyau/entrees';
 import type { GameEvent } from '../simulation/noyau/evenements';
 import { formatEuros } from '../simulation/sac/argent';
+import { createShopScreen } from './boutique/ecran';
+import { shopRefusalText } from './boutique/textes';
 import { createNotebook } from './carnet';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import { createHud, type ProjectToScreen } from './hud';
@@ -92,6 +94,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     UI_TUNING.openGuardMs,
   );
   const notebook = createNotebook(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs);
+  const shop = createShopScreen(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, reduced);
 
   function local(): PlayerIndex | null {
     return view.localIndex();
@@ -105,9 +108,10 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     const me = local();
     if (me === null) return;
     const other: PlayerIndex = me === 0 ? 1 : 0;
+    shop.onEvent(event, me, now);
     switch (event.type) {
       case 'refused':
-        if (event.player === me) hud.refusal(now, refusalText(event.reason));
+        if (event.player === me && !shop.isOpen()) hud.refusal(now, shopRefusalText(event.reason) ?? refusalText(event.reason));
         break;
       case 'pockets_full':
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
@@ -146,6 +150,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'ate':
       case 'bag_changed':
       case 'brick_used':
+      case 'shop_bought':
+      case 'shop_opened':
+      case 'shop_sold':
       case 'day_started':
       case 'gesture_done':
       case 'gesture_started':
@@ -170,6 +177,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
     if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
+    else if (shop.isOpen()) used = shop.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (raw.code === 'KeyG' && !raw.repeat) {
       hud.glance(now);
@@ -194,15 +202,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
-      const menu = notebook.isOpen() || dialogue.isOpen();
+      shop.frame(world, me, now);
+      const shopOpen = shop.isOpen();
+      const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       const prompt = menu
         ? null
         : promptModel(view.content, world, me, view.aim(me), { act: keyLabel('Space'), board: keyLabel('Enter') });
-      hud.frame({ now, world, local: me, prompt, menu: notebook.isOpen(), yaw: options.cameraYaw() });
-      layer.classList.toggle('lpl-ui--menu', notebook.isOpen());
+      hud.frame({ now, world, local: me, prompt, menu: notebook.isOpen() || shopOpen, yaw: options.cameraYaw() });
+      layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
     },
     capturing() {
-      return dialogue.isOpen() || notebook.isOpen();
+      return dialogue.isOpen() || notebook.isOpen() || shop.isOpen();
     },
     dispose() {
       offEvents();
@@ -210,6 +220,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       hud.dispose();
       dialogue.dispose();
       notebook.dispose();
+      shop.dispose();
       layer.remove();
     },
   };

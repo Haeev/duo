@@ -1,20 +1,52 @@
-// GABARIT: un commerce d'un lieu.
+// GABARIT: un commerce d'un lieu (cahier 4.6: on ne vend qu'aux commerçants, chacun à son prix).
 // Créer: pnpm nouveau commerce <id> <lieu>   -> donnees/lieux/<lieu>/commerces/<id>.json
-// Schéma: src/donnees/schemas/commerce.ts. Pour l'ouvrir en jeu: un meuble comptoir avec la
-// brique { "brick": "shop", "shop": "<id>" }, posé sur la carte du lieu.
+// Schéma: src/donnees/schemas/commerce.ts. Moteur: src/simulation/commerces/ (rien à y toucher).
+// Pour l'ouvrir en jeu: un meuble comptoir avec la brique { "brick": "shop", "shop": "<id>" },
+// posé sur la carte du lieu, et/ou un dialogue du commerçant avec l'effet
+// { "type": "open_shop", "shop": "<id>" }. L'identifiant doit être unique dans tout le jeu.
 {
   "schema": 1,
   "id": "exemple-commerce",
   "name": "Buvette d'exemple",
   // L'habitant qui le tient (dossier habitants/ du même lieu).
   "keeper": "cheffe-de-gare",
-  // Heures d'ouverture, en minutes depuis minuit.
+  // Facultatif: picto du métier sur sa plaque (sprite de l'interface: pain, etagere, outil...).
+  "icon": "etagere",
+  // Heures d'ouverture, en minutes depuis minuit (8 h = 480, 19 h = 1140). Peut passer minuit.
   "hours": { "from": 480, "to": 1140 },
-  // Ce qu'il vend: prix en euros entiers; stock par jour, ou null (sans limite).
-  "sells": [{ "item": "pain", "price": 3, "dailyStock": 6 }],
-  // Ce qu'il rachète, à son prix: par objet précis ou par famille. Il ne rachète rien d'autre.
-  "buys": [
-    { "item": "pomme", "price": 2 },
-    { "family": "crop", "price": 1 },
+  // Ce qu'il vend. Prix en CENTIMES, multiples de 10 (120 = 1,20 €).
+  //   dailyStock: exemplaires par réassort, ou null (sans limite).
+  //   restockDays (facultatif): jours entre deux réassorts, 1 par défaut (chaque matin).
+  //   unlock (facultatif): condition (comme dans les dialogues) pour que l'article apparaisse:
+  //     fait d'histoire { "type": "remembered", "key": "..." } ou amitié
+  //     { "type": "bond_at_least", "villager": "<habitant>", "points": 100 } (100 points = 1 cœur).
+  //   payment (facultatif): "purse" (sa bourse, défaut), "purse-or-chest" (au choix, le coffre
+  //     commun: meubles), "household" (le coffre commun, complété par la bourse: pièces de la maison).
+  "sells": [
+    { "item": "pain", "price": 120, "dailyStock": 6 },
+    {
+      "item": "hache-forgee",
+      "price": 3000,
+      "dailyStock": 1,
+      "restockDays": 7,
+      "unlock": { "type": "bond_at_least", "villager": "cheffe-de-gare", "points": 100 },
+    },
   ],
+  // Ce qu'il rachète, à SON prix (centimes): par objet précis ou par famille d'objets; l'objet
+  // précis l'emporte. Un objet peut aussi prendre un coefficient du prix de sa famille ici:
+  // { "item": "pomme", "factor": 1.5 } (il faut alors une ligne "family" pour sa famille).
+  // Tout le reste, il n'en veut pas: l'écran le grise avec la phrase "refusal".
+  "buys": [
+    { "item": "pomme", "price": 60 },
+    { "family": "material", "price": 40 },
+  ],
+  // Facultatif: ce qu'il dépense au plus par jour en rachats (centimes). Absent: sans plafond.
+  "dailyBuyCap": 3000,
+  // Facultatif: candidats au besoin du jour (écrit à la craie, payé 50 % de plus,
+  // src/simulation/commerces/reglages.ts). Absent: les objets précis de "buys".
+  "dailyNeeds": ["pomme"],
+  // Facultatif: bonus d'amitié sur ses rachats, à partir de N cœurs du joueur.
+  "friendship": [{ "hearts": 3, "factor": 1.1 }],
+  // Facultatif: ce qu'il dit, avec son caractère, de ce qu'il ne rachète pas.
+  "refusal": "Ça ? Je n'en saurais que faire, moi.",
 }

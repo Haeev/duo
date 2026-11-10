@@ -67,7 +67,14 @@ describe('pas de simulation vide', () => {
   });
 
   it('branche un système par lot, chacun sous son nom de dossier', () => {
-    expect(SYSTEMS.map((s) => s.id)).toEqual(['voyage', 'briques', 'sac', 'besoins', 'dialogues']);
+    expect(SYSTEMS.map((s) => s.id)).toEqual([
+      'voyage',
+      'briques',
+      'sac',
+      'commerces',
+      'besoins',
+      'dialogues',
+    ]);
   });
 });
 

@@ -8,14 +8,14 @@
  * Canal proposé à L0 (`canaux.ts`): 8, fiable, budget 16 Kio. Tant qu'il n'y est pas, il vit ici.
  */
 import * as v from 'valibot';
-import { IdSchema, IntSchema, TickSchema } from '../donnees/schemas/communs';
+import { CentsSchema, IdSchema, IntSchema, TickSchema } from '../donnees/schemas/communs';
 import { FactSchema, ProgressSchema, QuestSchema, type ProgressState } from '../etat/progression';
 
 export const PROGRESS_PART_CHANNEL = 8;
 export const PROGRESS_PART_BUDGET_BYTES = 16_384;
 
 /** Les dictionnaires de la progression, envoyés clé par clé. */
-const RECORDS = ['memory', 'bonds', 'quests', 'collections'] as const;
+const RECORDS = ['memory', 'bonds', 'quests', 'collections', 'prices'] as const;
 type RecordKey = (typeof RECORDS)[number];
 
 const MAX_KEYS = 400;
@@ -25,6 +25,7 @@ const SetSchema = v.strictObject({
   bonds: v.exactOptional(v.record(IdSchema, v.pipe(IntSchema, v.minValue(0)))),
   quests: v.exactOptional(v.record(IdSchema, QuestSchema)),
   collections: v.exactOptional(v.record(IdSchema, v.array(IdSchema))),
+  prices: v.exactOptional(v.record(IdSchema, v.record(IdSchema, CentsSchema))),
   opened: v.exactOptional(v.array(IdSchema)),
 });
 const KeysSchema = v.pipe(v.array(v.string()), v.maxLength(MAX_KEYS));
@@ -33,6 +34,7 @@ const DropSchema = v.strictObject({
   bonds: v.exactOptional(KeysSchema),
   quests: v.exactOptional(KeysSchema),
   collections: v.exactOptional(KeysSchema),
+  prices: v.exactOptional(KeysSchema),
 });
 
 export const ProgressPartSchema = v.strictObject({
@@ -56,7 +58,7 @@ function bytes(value: unknown): number {
 }
 
 function emptyProgress(): ProgressState {
-  return { memory: {}, bonds: {}, quests: {}, collections: {}, opened: [] };
+  return { memory: {}, bonds: {}, quests: {}, collections: {}, opened: [], prices: {} };
 }
 
 /** Copie profonde par JSON: l'hôte garde ce qu'il a envoyé, sans partage avec le monde. */

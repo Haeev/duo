@@ -29,7 +29,7 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Dialogue | `pnpm nouveau dialogue bonjour-facteur aubrune` | `villager`, conditions, nœuds. 150 caractères par réplique, 3 options au plus, toujours une fin. |
 | Recette | `pnpm nouveau recette compote` | poste, ingrédients, résultat (des objets existants). |
 | Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
-| Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
+| Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes (stock, réassort, déblocage, paiement), rachats à son prix (objet, coefficient, famille), plafond du jour, besoin du jour, amitié. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte, ou l'effet `open_shop` dans un dialogue du commerçant. Identifiant unique dans tout le jeu. Moteur: `src/simulation/commerces/README.md`. |
 | Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | chapitres, étapes, conditions de fin, effets. |
 | Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |
 | Grand lieu | `pnpm nouveau lieu hautefonte`, puis `node outils/plan-vers-lieu.ts <plan.json> donnees/lieux/hautefonte/carte.json` | le plan vu du dessus du level designer est la source de `carte.json` (ADR 0022): ne pas retoucher la carte produite, corriger le plan et relancer. Les meubles s'ajoutent dans `objects` (400 meubles à briques au plus par lieu). |
@@ -44,5 +44,5 @@ Il manque un comportement ? C'est une **brique nouvelle** à demander (schéma, 
 ## Conventions
 
 - Identifiants: minuscules, chiffres, traits d'union. Textes en français, tutoiement.
-- Prix en euros entiers. Heures en minutes depuis minuit (6 h = 360). Carte en cases de 1 m, x vers l'est, y vers le sud.
+- Prix en centimes d'euro, multiples de 10 (120 = 1,20 €). Heures en minutes depuis minuit (6 h = 360). Carte en cases de 1 m, x vers l'est, y vers le sud.
 - Valeurs de gameplay: `commun/reglages.json` et `commun/besoins.json`, jamais dans le code.

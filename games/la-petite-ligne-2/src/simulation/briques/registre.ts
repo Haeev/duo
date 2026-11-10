@@ -8,6 +8,7 @@
  * un test dans `tests/`. Contrat: `types.ts`.
  */
 import { NEEDS_BRICKS } from '../besoins/briques';
+import { shopBehaviour } from '../commerces/brique';
 import { BAG_BRICKS } from '../sac/briques';
 import { sitBehaviour } from './asseoir';
 import { sleepBehaviour } from './dormir';
@@ -40,6 +41,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   ...NEEDS_BRICKS,
   ...BAG_BRICKS,
   travel: travelBehaviour,
+  shop: shopBehaviour,
 };
 
 /** Actions sur ce qui n'est pas un meuble: un objet au sol (`pickup`), un habitant (`talk`). */

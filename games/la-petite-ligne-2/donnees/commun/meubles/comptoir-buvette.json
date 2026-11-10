@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "comptoir-buvette",
+  "name": "Comptoir de buvette",
+  "model": "comptoir",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": "gare",
+  "bricks": [
+    {
+      "brick": "shop",
+      "shop": "buvette-de-la-gare"
+    }
+  ]
+}

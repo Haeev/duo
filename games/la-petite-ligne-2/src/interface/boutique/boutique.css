@@ -1,0 +1,567 @@
+/*
+ * Boutique (interface.md 5.4, maquette `maquettes/boutique.html`): panneau de 1180 x 608 px à
+ * 108 px du haut à 1366x768; commerçant 248 px, grille de 6 vignettes de 84 px, détail 328 px.
+ * Seuls transform et opacity s'animent.
+ */
+.lpl-ui .shop-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+}
+.lpl-ui .shop {
+  position: absolute;
+  left: 50%;
+  top: 6.75rem;
+  width: min(73.75rem, calc(100% - 1.5rem));
+  height: min(38rem, calc(100% - 7.5rem));
+  transform: translateX(-50%);
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 15.5rem 1fr 20.5rem;
+  background: var(--paper);
+  border: 0.1875rem solid var(--ink);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+  animation: shop-in var(--d-slow) var(--ease) both;
+}
+.lpl-ui .shop--still {
+  animation: none;
+}
+@keyframes shop-in {
+  from {
+    transform: translateX(-50%) translateY(2rem) scale(0.96);
+    opacity: 0;
+  }
+}
+
+/* Le commerçant derrière son comptoir */
+.lpl-ui .shop-keeper {
+  position: relative;
+  display: grid;
+  align-content: end;
+  justify-items: center;
+  background: linear-gradient(#a8743f, var(--wood));
+  border-right: 0.1875rem solid var(--ink);
+}
+.lpl-ui .shop-bust {
+  width: 13.5rem;
+  height: 16.5rem;
+  margin-bottom: 4.5rem;
+  display: grid;
+  align-items: end;
+}
+.lpl-ui .shop-bust svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.lpl-ui .shop-bust--yes svg {
+  animation: shop-nod 0.5s var(--ease);
+  transform-origin: 50% 100%;
+}
+.lpl-ui .shop-bust--joy svg {
+  animation: shop-nod 0.5s var(--ease) 2;
+  transform-origin: 50% 100%;
+}
+.lpl-ui .shop-bust--no svg {
+  animation: shop-no 0.45s var(--ease);
+}
+@keyframes shop-nod {
+  40% {
+    transform: translateY(0.375rem) scaleY(0.97);
+  }
+}
+@keyframes shop-no {
+  25% {
+    transform: translateX(-0.375rem);
+  }
+  50% {
+    transform: translateX(0.375rem);
+  }
+  75% {
+    transform: translateX(-0.25rem);
+  }
+}
+.lpl-ui .shop-keeper__tag {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+}
+.lpl-ui .shop-keeper__counter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6.5rem;
+  background: var(--wood-deep);
+  border-top: 0.1875rem solid var(--ink);
+  display: grid;
+  place-items: center;
+}
+.lpl-ui .shop-keeper__plate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 14rem;
+  padding: 0.375rem 0.875rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.625rem;
+  box-shadow: var(--shadow-1);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: center;
+}
+.lpl-ui .shop-emote {
+  position: absolute;
+  left: 72%;
+  top: 5.5rem;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--ink);
+  animation: shop-emote 1.2s var(--ease) both;
+}
+@keyframes shop-emote {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.lpl-ui .shop-say {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-1);
+  font-weight: 800;
+  text-align: center;
+  animation: shop-pop var(--d-base) var(--ease-bounce) both;
+}
+.lpl-ui .shop-say--no {
+  border-style: dashed;
+  color: var(--stamp);
+}
+@keyframes shop-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+/* Rayons */
+.lpl-ui .shop-shelves {
+  position: relative;
+  padding: 1.25rem 1.5rem 3.5rem;
+  min-width: 0;
+}
+.lpl-ui .shop-bigtabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.lpl-ui .shop-bigtab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 4rem;
+  background: var(--paper-sunken);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.875rem;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 650;
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-bigtab .ic {
+  width: 2rem;
+  height: 2rem;
+}
+.lpl-ui .shop-bigtab[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--paper-raised);
+  border-color: var(--ink);
+  box-shadow: var(--shadow-2);
+}
+.lpl-ui .shop-grid {
+  display: grid;
+  grid-template-columns: repeat(6, var(--tile));
+  gap: 0.625rem 0.75rem;
+}
+.lpl-ui .shop-tile {
+  position: relative;
+  width: var(--tile);
+  height: var(--tile);
+  padding: 0.75rem;
+  display: grid;
+  place-items: center;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--d-fast) var(--ease);
+}
+.lpl-ui .shop-tile .obj {
+  width: 3rem;
+  height: 3rem;
+}
+.lpl-ui .shop-tile.focus {
+  transform: translateY(-0.125rem);
+}
+.lpl-ui .shop-tile__price {
+  position: absolute;
+  right: -0.375rem;
+  top: -0.625rem;
+}
+.lpl-ui .shop-tile__price--no {
+  border-style: dashed;
+  text-decoration: line-through;
+  text-decoration-thickness: 0.125rem;
+}
+.lpl-ui .shop-tile__price--no .coin {
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+.lpl-ui .shop-tile__price--need {
+  background: var(--brass);
+}
+.lpl-ui .shop-tile__own {
+  position: absolute;
+  left: 0.3125rem;
+  bottom: 0.125rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-tile__stock {
+  position: absolute;
+  right: 0.3125rem;
+  bottom: 0.125rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-tile--too-expensive,
+.lpl-ui .shop-tile--out-of-stock {
+  border-style: dashed;
+  background: var(--paper-sunken);
+}
+.lpl-ui .shop-tile--out-of-stock .obj,
+.lpl-ui .shop-tile--refused .obj {
+  opacity: 0.45;
+}
+.lpl-ui .shop-tile--refused {
+  border-style: dashed;
+  border-color: var(--line);
+  background: var(--paper-sunken);
+  box-shadow: none;
+}
+.lpl-ui .shop-tile__no {
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-nametag {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.375rem);
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--ink);
+  color: var(--paper-raised);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.lpl-ui .shop-sep {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2.25rem 0 0.75rem;
+  color: var(--ink-muted);
+  font-weight: 800;
+  font-size: 0.875rem;
+}
+.lpl-ui .shop-sep::after {
+  content: '';
+  flex: 1;
+  min-width: 1rem;
+  border-top: 0.125rem dashed var(--line);
+}
+.lpl-ui .shop-sep__text {
+  font-style: italic;
+  max-width: 26rem;
+}
+.lpl-ui .shop-mini {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 0.125rem solid var(--ink);
+  background: var(--paper-sunken);
+  flex: none;
+  display: block;
+}
+.lpl-ui .shop-mini svg {
+  width: 100%;
+  height: 130%;
+  display: block;
+}
+.lpl-ui .shop-empty {
+  margin: 1rem 0;
+  color: var(--ink-muted);
+  font-weight: 800;
+}
+.lpl-ui .shop-foot {
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  font-weight: 750;
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-foot > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+}
+
+/* Détail */
+.lpl-ui .shop-side {
+  padding: 1.25rem;
+  background: var(--paper-raised);
+  border-left: 0.125rem solid var(--line);
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.625rem;
+}
+.lpl-ui .shop-v3d {
+  position: relative;
+  width: 11.5rem;
+  height: 11.5rem;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 45%, #fffaf0, var(--paper-sunken));
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.75rem;
+}
+.lpl-ui .shop-v3d .obj {
+  width: 6rem;
+  height: 6rem;
+}
+.lpl-ui .shop-v3d__tag {
+  position: absolute;
+  right: 0.375rem;
+  top: 0.375rem;
+}
+.lpl-ui .shop-side h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+}
+.lpl-ui .shop-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.lpl-ui .shop-row .pastille .ic {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.lpl-ui .shop-buyer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.625rem 0.1875rem 0.1875rem;
+  background: var(--paper);
+  border: 0.125rem solid var(--line);
+  border-radius: 62rem;
+  font-weight: 800;
+}
+.lpl-ui .shop-buyer--best {
+  border-color: var(--ink);
+}
+.lpl-ui .shop-buyer--here {
+  background: var(--paper-sunken);
+}
+.lpl-ui .shop-buyer > .ic {
+  position: absolute;
+  left: 0.5rem;
+  top: -0.875rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.lpl-ui .shop-known-none {
+  font-size: 0.875rem;
+  font-weight: 750;
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.lpl-ui .shop-stepper__n {
+  min-width: 4.5rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 650;
+  line-height: 1;
+}
+.lpl-ui .shop-stepper__n small {
+  font-family: var(--font-text);
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  font-weight: 750;
+}
+.lpl-ui .shop-stepper button {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  background: var(--paper);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.625rem;
+  box-shadow: var(--shadow-1);
+}
+.lpl-ui .shop-total {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 650;
+}
+.lpl-ui .shop-total .ic {
+  color: var(--ink-muted);
+}
+.lpl-ui .shop-chest {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  padding: 0.375rem 0.625rem;
+  background: var(--paper);
+  border: 0.125rem dashed var(--line);
+  border-radius: 0.625rem;
+  font-weight: 800;
+}
+.lpl-ui .shop-chest--on {
+  border-style: solid;
+  border-color: var(--ink);
+  background: var(--brass);
+}
+.lpl-ui .shop-chest small {
+  width: 100%;
+  font-weight: 750;
+}
+.lpl-ui .shop-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 3.25rem;
+  background: var(--primary);
+  color: var(--on-primary);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-2);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+.lpl-ui .shop-btn--off {
+  background: var(--paper-sunken);
+  color: var(--ink-muted);
+  border-style: dashed;
+  box-shadow: none;
+}
+.lpl-ui .shop-why {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+
+/* Pièces qui volent entre le comptoir et la bourse (5 au plus) */
+.lpl-ui .shop-coins {
+  position: absolute;
+  left: 13rem;
+  top: 19rem;
+  z-index: 60;
+  pointer-events: none;
+}
+.lpl-ui .shop-coins .coin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+.lpl-ui .shop-coins--in .coin {
+  animation: shop-coin-in 400ms var(--ease) both;
+}
+.lpl-ui .shop-coins--out .coin {
+  animation: shop-coin-out 400ms var(--ease) both;
+}
+@keyframes shop-coin-in {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate(-6.5rem, -16rem) scale(0.7);
+  }
+}
+@keyframes shop-coin-out {
+  0% {
+    opacity: 1;
+    transform: translate(-6.5rem, -16rem);
+  }
+  100% {
+    opacity: 0.2;
+    transform: none;
+  }
+}
+.lpl-ui[data-motion='reduced'] .shop,
+.lpl-ui[data-motion='reduced'] .shop-bust svg,
+.lpl-ui[data-motion='reduced'] .shop-say {
+  animation-duration: 120ms;
+}
