@@ -42,6 +42,7 @@ describe('gabarits', () => {
         'commerce',
         'dialogue',
         'habitant',
+        'interieur',
         'lieu',
         'meuble',
         'objet',
@@ -132,6 +133,20 @@ describe('gabarits', () => {
       (files['lieux/essai-halte/lieu.json']?.links as string[]).push('bout-de-ligne');
     });
     expect(linked.places['essai-halte']?.def.links).toContain('bout-de-ligne');
+  });
+
+  it('intérieur: une pièce ajoutée sous le dehors, reliée par une paire de portes, est sur la grille du lieu', () => {
+    const content = withNew('interieur', 'remise-d-essai', 'essai-gare', (value, files) => {
+      const map = files['lieux/essai-gare/carte.json'];
+      if (map === undefined) return;
+      map.outdoor = { x: 0, y: 0, w: map.width, h: map.height };
+      value.at = { x: 2, y: Number(map.height) + 2 };
+      map.height = Number(map.height) + 10;
+      map.doors = { 'piece-porte-dehors': { x: 20, y: 20, facing: 0, to: 'piece-porte' } };
+    });
+    const map = content.places['essai-gare']?.map;
+    expect(map?.points['piece-milieu']).toEqual({ x: 6, y: 45 });
+    expect(map?.doors?.['piece-porte']?.to).toBe('piece-porte-dehors');
   });
 
   it('refuse un type inconnu, un identifiant mal formé et un lieu manquant', () => {

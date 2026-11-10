@@ -10,7 +10,15 @@ import { NeedsFileSchema, type NeedsFile } from './schemas/besoins';
 import { ShopSchema, type ShopDef } from './schemas/commerce';
 import { DialogueSchema, type DialogueDef } from './schemas/dialogue';
 import { VillagerSchema, type VillagerDef } from './schemas/habitant';
-import { MapSchema, PlaceSchema, type MapDef, type PlaceDef } from './schemas/lieu';
+import { withInteriors } from './carte';
+import {
+  InteriorSchema,
+  MapSchema,
+  PlaceSchema,
+  type InteriorDef,
+  type MapDef,
+  type PlaceDef,
+} from './schemas/lieu';
 import { PropSchema, type PropDef } from './schemas/meuble';
 import { ItemSchema, type ItemDef } from './schemas/objets';
 import {
@@ -32,7 +40,10 @@ type ById<T> = Readonly<Record<string, T>>;
 /** Un lieu: un dossier autonome branché sur le socle commun. */
 export interface PlaceContent {
   readonly def: PlaceDef;
+  /** La carte, intérieurs fusionnés (`withInteriors`): une seule grille pour tout le moteur. */
   readonly map: MapDef;
+  /** Les intérieurs tels qu'écrits, par ordre d'identifiant (le rendu y lit leur emprise). */
+  readonly interiors: readonly InteriorDef[];
   /** Dans l'ordre des noms de fichiers (c'est aussi l'ordre du canal rapide). */
   readonly villagers: readonly VillagerDef[];
   readonly dialogues: readonly DialogueDef[];
@@ -145,12 +156,32 @@ export function loadContent(files: Files): Content {
     );
     const shops = parseFolder(ShopSchema, files, `${base}/commerces`, problems);
     const quests = parseFolder(QuestLineSchema, files, `${base}/quetes`, problems);
+    const interiors = Object.values(
+      parseFolder(InteriorSchema, files, `${base}/interieurs`, problems),
+    );
     if (def === null || map === null) continue;
+    // Un point ou une porte d'intérieur qui porterait le nom d'un autre l'écraserait à la fusion.
+    const seen = new Set([...Object.keys(map.points), ...Object.keys(map.doors ?? {})]);
+    for (const room of interiors) {
+      for (const id of [...Object.keys(room.points), ...Object.keys(room.doors ?? {})]) {
+        if (seen.has(id))
+          problems.push(`${base}/interieurs/${room.id}.json: « ${id} » déjà pris dans ce lieu`);
+        seen.add(id);
+      }
+    }
     if (def.id !== folder)
       problems.push(
         `${path}: l'identifiant « ${def.id} » doit être le nom du dossier « ${folder} »`,
       );
-    places[def.id] = { def, map, villagers, dialogues, shops, quests };
+    places[def.id] = {
+      def,
+      map: withInteriors(map, interiors),
+      interiors,
+      villagers,
+      dialogues,
+      shops,
+      quests,
+    };
   }
 
   if (

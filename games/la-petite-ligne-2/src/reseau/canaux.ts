@@ -48,6 +48,14 @@ export const BUDGET_BYTES = {
   progressPart: PROGRESS_PART_BUDGET_BYTES,
 } as const;
 
+/**
+ * Borne de l'état des meubles d'un lieu (`place.objects`), en octets de JSON (ADR 0022). Dans un
+ * grand lieu, il ne tient plus dans la tranche « lieu » au pire (59 Ko mesurés pour Aubrune): il
+ * part par différences et par morceaux sur le canal 5, comme la progression (lot L1). Ce n'est
+ * pas une taille de message: aucun message ne dépasse 32 Kio.
+ */
+export const PLACE_OBJECTS_STATE_BYTES = 65_536;
+
 /** Une tranche lourde part au plus tous les N pas; « joueurs » et « commun » partent au pas même. */
 export const SLICE_EVERY_TICKS: Readonly<Record<Slice, number>> = {
   common: 1,

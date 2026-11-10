@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| Version | 0.2 (2026-11-10) |
+| Version | 0.3 (2026-11-10) |
 | Auteur | architecte-technique |
-| Statut | plan suivi; décisions formalisées par les ADR 0017 à 0021 (proposées) |
+| Statut | plan suivi; décisions formalisées par les ADR 0017 à 0022 (proposées) |
 | Sources | `reponses-client-2026-11-10.md` (fait foi), `references-de-ressenti.md` section 3 (exigences), `retours/2026-11-04/retours.md`, ADR 0005, 0007, 0009, 0010, 0013, 0016, `docs/production/meshy.md`, code de `games/la-petite-ligne` 0.13.0 |
 
 Les règles de ressenti de `references-de-ressenti.md` (section 3) sont prises ici comme exigences techniques. Elles sont citées « RR » suivies du sujet (RR Réponse, RR Caméra, RR Attente...).
@@ -18,6 +18,7 @@ Le client a tranché le 2026-11-10 (fin de `reponses-client-2026-11-10.md`); là
 | Paquet | nouveau paquet `games/la-petite-ligne-2`, identifiant `la-petite-ligne-2`, « La Petite Ligne (refonte) », 0.20.0; l'ancien reste publiable puis sera retiré | ADR 0017; remplace la proposition `petite-ligne` de 2.3 |
 | Contenu | un fichier par contenu, gabarits, briques de comportement: ajouter une chaise ne touche pas au moteur | ADR 0017; complète 3.1 et 3.3 |
 | Lieux | un seul lieu actif; Aubrune repart de la carte actuelle, retouchée | ADR 0018 |
+| Grands lieux | une grille jusqu'à 512 m, tuiles de rendu de 32 m, intérieurs sur la même grille, plan vu du dessus comme source (outil `plan-vers-lieu.ts`) | ADR 0022; section 3.2.1; remplace le budget de 128 x 128 m |
 | Réseau | état en tranches; budgets relevés à 32 Kio pour `progress` et `place` après mesure | ADR 0019; remplace les budgets de 3.7 |
 | Ressenti | prédiction du geste chez l'invité, mini-jeux locaux, gestes de 1,5 s au plus | ADR 0020 |
 | Squelette | **24 os** (`duo-24`), et non les 18 os recommandés en 3.4: la chaîne des pièces retenue par le client est bâtie dessus; les clips de la 0.13 utiles sont à reporter | ADR 0021; remplace 3.4 sur ce point |
@@ -218,6 +219,32 @@ interface LieuState {
 - **Voyage** (machine à états dans `commun.phase`): `jour` puis `embarquement` (les deux sur le quai, chacun confirme) puis `voyage` (scène du train, 20 à 40 s, qui couvre le chargement) puis `arrivee`. L'hôte fige le lieu quitté (`parti`), l'invité charge les données du lieu depuis son propre paquet (mêmes versions garanties par la poignée de main, ADR 0006) et envoie `lieu_pret`; l'hôte attend les deux, avec un message après 30 s. Au retour dans un lieu, un rattrapage simple et borné rejoue les jours écoulés (cultures, stocks des commerces), sans simuler les habitants.
 - **Chargement et déchargement au rendu**: `Renderer.chargerLieu(id)` libère tout ce qui appartient au lieu par un `ResourceTracker` par lieu (classe existante) et garde le commun (personnages, matériaux, interface). Les données d'un lieu sont un morceau de code à part (`import()` dynamique), pour ne pas tout analyser au démarrage. Contrôle: après dix allers-retours, `renderer.info.memory` (géométries, textures) et le nombre de programmes reviennent à leur valeur de départ.
 - **Ajout d'un lieu par mise à jour**: un lieu est un dossier de données et un dossier d'assets, livré par une mise à jour normale du jeu (ADR 0010, paquet complet). Budget: 25 Mo par lieu, 150 Mo pour le paquet; au-delà, il faudra des paquets par lieu (ADR à écrire le moment venu, pas avant).
+
+#### 3.2.1 Grands lieux (ADR 0022, ajout du 2026-11-10)
+
+Le plan d'Aubrune (320 x 208 m) dépasse de 4,1 fois l'ancien budget de 128 x 128 m. Décision: **une seule grille logique par lieu** (512 m de côté au plus), **des tuiles de rendu de 32 m** chargées par chaque machine autour de son propre joueur, les **intérieurs sur la même grille** dans une annexe sous le dehors, reliés par des paires de portes, et **le plan vu du dessus comme source** du lieu.
+
+| Élément | Où | Format |
+|---|---|---|
+| Plan (source) | `docs/jeux/jeu-1/refonte/carte-aubrune/plan.json`, écrit par `construire_plan.py` | zones et actes, eaux, rails, nœuds et arêtes, verrous, ouvrages, bâtiments, repères, points d'intérêt, parcelles |
+| Outil | `games/la-petite-ligne-2/outils/plan-vers-lieu.ts` | `node outils/plan-vers-lieu.ts <plan.json> <carte.json> [--lieu <id>] [--annexe <m>]` |
+| Carte produite | `donnees/lieux/<lieu>/carte.json` (`MapSchema`) | `blocked`, `points` (les nœuds), `terrain` (plages), `zones`, `locks`, `graph`, `landmarks`, `interests`, `buildings`, `outdoor` |
+| Intérieurs | `donnees/lieux/<lieu>/interieurs/<id>.json` (`InteriorSchema`, gabarit `interieur`) | petite grille posée à `at` sous le dehors, fusionnée au chargement (`withInteriors`) |
+| Lecture | `src/donnees/carte.ts` | `decodeTerrain`, `tileGrid`, `tileOf`, `tilesAround`, `byTile`, `withInteriors` |
+
+Essai sur Aubrune (machine cloud): 0,2 s, 47 Ko de JSON, 81 920 cases (annexe de 48 m comprise), 80 tuiles, 185 rectangles pleins, 3 063 plages de terrain; aucune fuite vers une zone fermée, tous les nœuds atteignables verrous ouverts, tout le premier acte atteignable verrous fermés; un nœud sur l'eau (`vn`, la vanne) à reprendre dans le plan.
+
+Ce qui se transmet: rien de nouveau par la surface. Le canal rapide garde ses 32 mobiles (1 968 octets au pire); la tranche « lieu » au pire d'Aubrune pèse 59 429 octets, dont 38 912 pour l'état des meubles, qui part donc par différences et par morceaux sur le canal 5 (mission M3). Les verrous n'ont pas d'état: ils se lisent dans la progression.
+
+**Missions qui en découlent** (à attribuer par le manager):
+
+| N° | Pour | Mission | Fichiers | Critères d'acceptation |
+|---|---|---|---|---|
+| M1 | dev-gameplay-3d (rendu) | **Rendu par tuiles.** `src/rendu/lieu/` construit le lieu tuile par tuile: sol de la tuile depuis `decodeTerrain` (quads fusionnés par code, un matériau par nature de terrain), décor instancié par tuile (`byTile` sur `objects`, un `InstancedMesh` ou `BatchedMesh` par famille de matériau et par tuile), bâtiments du plan en volumes simples tant que les modèles manquent, lisières habillées (haie, talus, berge: jamais un mur invisible). Chargement des tuiles de `tilesAround(joueur local, rayon de vue + 8 m)`, déchargement au-delà de rayon + 32 m (hystérésis), construction étalée (4 ms par image au plus), un `ResourceTracker` par tuile. Repères (`landmarks`) toujours affichés, un niveau de détail simplifié hors des tuiles chargées. Intérieur: quand le joueur local est hors du dehors (`outdoor`), on n'affiche que l'intérieur où il est, caméra bornée à son emprise. | `src/rendu/lieu/`, `src/rendu/camera.ts` (bornes) | Aubrune générée affichée à deux vues, joueurs aux deux bouts: captures; budgets de 3.10 par tuile et par vue relevés à la page de mesure; dix allers-retours entre le quai et le tunnel ramènent géométries, textures et programmes à leur compte de départ |
+| M2 | dev-gameplay-3d (simulation) | **Verrous, portes, habitants sur le graphe.** `obstacles.ts`: rectangles des verrous fermés ajoutés aux murs, cache invalidé à la révision de la progression; portes: entrer dans la case d'une porte téléporte à l'autre, tourné vers `facing` (événement pour le fondu du rendu); habitants: trajet long par Dijkstra sur `graph` (arêtes à verrou fermé exclues), A* local entre nœuds proches dans une fenêtre de 64 m; hors de 40 m des deux joueurs, un pas sur 10, le long du graphe sans A*. | `src/simulation/noyau/`, `src/simulation/` (dossier des habitants) | test court: un verrou s'ouvre au fait `<lieu>.verrou.<id>`; une porte mène et ramène; un habitant traverse Aubrune du quai à la ferme; pas de l'hôte sous 2 ms au pire avec 32 habitants (banc hors suite rapide) |
+| M3 | dev-reseau | **Meubles par morceaux.** L'état des meubles du lieu (`place.objects`) quitte la tranche « lieu » et part par différences et par morceaux sur le canal 5, fiable, en généralisant `src/reseau/progression.ts` (dictionnaire de dictionnaires); `slowOfPlace` n'emporte plus `objects`. | `src/reseau/`, `src/etat/lieu.ts` (champ retiré de la tranche, ajout minimal signalé) | `tests/grands-lieux.test.ts` passe avec la tranche « lieu » entière sous 32 Kio; morceaux sous 16 Kio; reprise de liaison et arrivée tardive couvertes par le banc à deux |
+| M4 | level-designer, puis tech-artist | **Blockout depuis la carte.** Script Blender qui lit `carte.json` (terrain, bâtiments, lisières, verrous, repères) et produit le blockout par tuile, sans retouche à la main; corrections du plan signalées par l'outil (`vn` sur l'eau; talus autour des verrous internes comme V2b); un `object` posé pour chaque verrou. | `docs/jeux/jeu-1/refonte/carte-aubrune/`, `assets-src/lieux/aubrune/` | le blockout et `carte.json` sortent du même plan; captures de près de chaque verrou et de chaque lisière |
+| M5 | level-designer | **Intérieurs d'Aubrune** par le gabarit `interieur`, posés dans l'annexe, avec leurs paires de portes. | `donnees/lieux/aubrune/interieurs/` | chargement sans erreur; chaque bâtiment à `interior` a son fichier |
 
 ### 3.3 Quêtes, dialogues, scènes, mémoire
 
@@ -429,11 +456,22 @@ Budgets par lieu, à la vue la plus chargée, passes principale et d'ombre compr
 | Programmes | 14 | 12 aujourd'hui, plus le fondu des coupes et les couleurs de sommets skinnées |
 | Lumières ponctuelles | 4, en nombre constant | le nombre de lampes entre dans la clé des programmes: jamais d'ajout ni de retrait à chaud |
 | Textures en mémoire vidéo | 96 Mo | lieu 48, personnages 16, ombres 16, interface et visionneuse 16 |
-| Taille de carte | 128 x 128 m | A* mesuré à 1 ms sur 100 m (ADR 0016) |
+| Taille de carte | 512 x 512 m (ADR 0022; 128 x 128 avant les grands lieux) | une grille; A* mesuré à 1 ms sur 100 m (ADR 0016), donc seulement entre nœuds proches, trajets longs sur le graphe du plan |
 | Chargement d'un lieu | 8 s sur le PC | couvert par la scène du train |
 | Poids d'un lieu dans le paquet | 25 Mo | |
-| État d'un lieu sur le réseau | 24 Ko | voir 3.7 |
+| État d'un lieu sur le réseau | tranche « lieu » 32 Kio, état des meubles 64 Kio par morceaux | voir 3.2.1 et ADR 0022 |
 | Pas de simulation | 2 ms de processeur au pire | 30 pas par seconde |
+
+Budgets par tuile de 32 m (ADR 0022). La vue la plus large (28 m) couvre 4 tuiles au plus; 9 sont chargées autour du joueur local.
+
+| Poste, par tuile | Budget | Remarque |
+|---|---|---|
+| Triangles du décor et du terrain | 50 000 | 4 tuiles visibles tiennent les 200 000 de la vue |
+| Appels de dessin, par passe | 12 | décor instancié par famille de matériau et par tuile; sol de la tuile en un maillage |
+| Construction | 4 ms par image, étalée | tuile prête avant d'entrer dans la vue (chargement à rayon de vue + 8 m) |
+| Déchargement | au-delà de rayon + 32 m | hystérésis: pas d'aller-retour de chargement au bord d'une tuile |
+| Repères lointains | 8 par lieu, 2 000 triangles chacun hors des tuiles chargées | toujours affichés (clocher, château d'eau) |
+| Niveau de détail | aucun sur le décor courant; un pour les repères | caméra orthographique: rien n'est loin dans la vue |
 
 Niveaux de qualité: le panneau Options existant (Auto, Haute, Moyenne, Basse, Personnalisé; ombres, netteté, effets) se garde. Ajouts: un quatrième réglage « ombres des personnages » (Haute: tous; Moyenne: joueurs et habitants à moins de 12 m; Basse: pastille au sol) et la densité des semis. Le mode Auto change de consigne avec la réponse 73: il ne réduit plus la qualité que sous 24 images par seconde tenues 5 secondes (réglages `autoLight` de `qualite.ts`), et jamais la netteté avant les ombres.
 
@@ -560,4 +598,5 @@ Mesure du 2026-11-10 sur l'ancien jeu (`vitest run` dans `games/la-petite-ligne`
 | Version | Date | Changement |
 |---|---|---|
 | 0.1 | 2026-11-10 | Première version: audit, recommandation, architecture cible, jalons, tests, ADR et questions. |
+| 0.3 | 2026-11-10 | Grands lieux (ADR 0022): section 3.2.1, budgets par tuile en 3.10, missions M1 à M5. |
 | 0.2 | 2026-11-10 | Décisions du client reportées en tête (nouveau paquet, gabarits et briques, squelette de 24 os, euro, horaires); renvoi aux ADR 0017 à 0021; socle du lot L0 posé. |

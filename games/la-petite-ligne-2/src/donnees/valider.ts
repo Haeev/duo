@@ -3,11 +3,12 @@
  * référence existe, tout graphe de dialogue est parcourable, aucun geste courant ne dépasse la
  * durée permise. Renvoie la liste des problèmes, vide si tout va bien.
  */
+import { terrainProblem } from './carte';
 import type { Content, PlaceContent } from './charger';
 import type { ShopDef } from './schemas/commerce';
 import { NEED_IDS } from './schemas/communs';
 import type { DialogueDef } from './schemas/dialogue';
-import type { MapObject } from './schemas/lieu';
+import { PLACE_BRICK_OBJECTS_MAX, type MapObject } from './schemas/lieu';
 import type { PropDef } from './schemas/meuble';
 import type { Look } from './schemas/personnage';
 import type { QuestLineDef } from './schemas/quete';
@@ -275,9 +276,85 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
     if (villager.look !== null)
       checkLook(content, villager.look, `${at}, habitant ${villager.id}`, problems);
   }
+  checkLargePlace(content, place, problems);
   for (const d of place.dialogues) checkDialogue(content, place, d, problems);
   for (const shop of Object.values(place.shops)) checkShop(content, place, shop, problems);
   for (const quest of Object.values(place.quests)) checkQuest(content, place, quest, problems);
+}
+
+interface Box {
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+}
+
+function overlaps(a: Box, b: Box): boolean {
+  return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+}
+
+/** Grands lieux (ADR 0022): terrain, intérieurs, portes, verrous, graphe des chemins. */
+function checkLargePlace(content: Content, place: PlaceContent, problems: string[]): void {
+  const { def, map } = place;
+  const at = `lieu ${def.id}`;
+  const whole: Box = { x: 0, y: 0, w: map.width, h: map.height };
+  const within = (b: Box): boolean =>
+    b.x >= 0 && b.y >= 0 && b.x + b.w <= map.width && b.y + b.h <= map.height;
+  if (map.terrain !== undefined) {
+    const problem = terrainProblem(map.terrain, map.width, map.height);
+    if (problem !== null) problems.push(`${at}, terrain: ${problem}`);
+  }
+  const outdoor = map.outdoor ?? whole;
+  if (!within(outdoor)) problems.push(`${at}: le dehors déborde de la carte`);
+  const rooms: { id: string; box: Box }[] = [];
+  for (const room of place.interiors) {
+    // Le mur posé autour de l'intérieur compte dans son emprise.
+    const box = { x: room.at.x - 1, y: room.at.y - 1, w: room.width + 2, h: room.height + 2 };
+    const where = `${at}, intérieur ${room.id}`;
+    if (!within(box)) problems.push(`${where}: hors de la carte (mur compris)`);
+    if (overlaps(box, outdoor)) problems.push(`${where}: posé sur le dehors`);
+    for (const other of rooms)
+      if (overlaps(box, other.box)) problems.push(`${where}: chevauche l'intérieur ${other.id}`);
+    rooms.push({ id: room.id, box });
+  }
+  const doors = map.doors ?? {};
+  for (const [id, door] of Object.entries(doors)) {
+    const where = `${at}, porte ${id}`;
+    const target = doors[door.to];
+    if (target === undefined) problems.push(`${where}: porte d'arrivée inconnue « ${door.to} »`);
+    else if (target.to !== id) problems.push(`${where}: « ${door.to} » ne ramène pas ici`);
+    if (!within({ x: door.x, y: door.y, w: 0, h: 0 })) problems.push(`${where}: hors de la carte`);
+  }
+  const objectIds = new Set(map.objects.map((o) => o.id));
+  const withBricks = map.objects.filter((o) => (content.props[o.type]?.bricks.length ?? 0) > 0);
+  if (withBricks.length > PLACE_BRICK_OBJECTS_MAX)
+    problems.push(
+      `${at}: ${String(withBricks.length)} meubles à briques, ${String(PLACE_BRICK_OBJECTS_MAX)} au plus (budget de la tranche « lieu »)`,
+    );
+  const locks = map.locks ?? {};
+  for (const [id, lock] of Object.entries(locks)) {
+    const where = `${at}, verrou ${id}`;
+    if (!lock.rects.every(within)) problems.push(`${where}: hors de la carte`);
+    if (lock.object !== null && !objectIds.has(lock.object))
+      problems.push(`${where}: objet inconnu « ${lock.object} »`);
+    for (const c of lock.opens) checkCondition(content, c, where, problems);
+  }
+  const nodes = map.graph?.nodes ?? {};
+  for (const [id, node] of Object.entries(nodes))
+    if (!within({ x: node.x, y: node.y, w: 0, h: 0 }))
+      problems.push(`${at}, nœud ${id}: hors de la carte`);
+  for (const edge of map.graph?.edges ?? []) {
+    const where = `${at}, chemin ${edge.a}-${edge.b}`;
+    for (const end of [edge.a, edge.b])
+      if (!(end in nodes)) problems.push(`${where}: nœud inconnu « ${end} »`);
+    if (edge.lock !== null && !(edge.lock in locks))
+      problems.push(`${where}: verrou inconnu « ${edge.lock} »`);
+  }
+  for (const [id, poi] of Object.entries(map.interests ?? {}))
+    if (!(poi.node in nodes)) problems.push(`${at}, intérêt ${id}: nœud inconnu « ${poi.node} »`);
+  for (const [id, zone] of Object.entries(map.zones ?? {}))
+    if (zone.polygon.some(([x, y]) => !within({ x, y, w: 0, h: 0 })))
+      problems.push(`${at}, zone ${id}: polygone hors de la carte`);
 }
 
 function checkLook(content: Content, look: Look, at: string, problems: string[]): void {
