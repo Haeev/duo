@@ -1,6 +1,6 @@
 {
   "name": "@duo/la-petite-ligne-2",
-  "version": "0.20.0",
+  "version": "0.20.1",
   "private": true,
   "type": "module",
   "description": "La Petite Ligne (refonte): jeu de vie narratif à deux, de lieu en lieu par le train (Three.js, l'hôte fait autorité).",
