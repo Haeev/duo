@@ -208,6 +208,25 @@ describe('couche des personnages', () => {
     // Deux maillages visibles par personnage (corps et tête), le gabarit nu caché.
     expect(meshes.length).toBe(2 * (2 + villagers));
     for (const id of Object.keys(place.villagers)) expect(layer.aimable(id)).not.toBeNull();
+    // La vie de l'habitant (`villagerView`): absent du lieu, il n'est pas dessiné.
+    const extra = place.villagers['figurant-essai'];
+    if (extra === undefined) throw new Error('figurant');
+    extra.life = {
+      presence: 'away',
+      entry: 0,
+      activity: null,
+      pose: 'stand',
+      gesture: null,
+      seat: null,
+      emote: null,
+      emoteUntil: 0,
+      gaze: null,
+    };
+    layer.update({ dt: 1 / 60, world, place, cameraYaw: 0 });
+    expect(root.getObjectByName('personnage-figurant-essai')?.visible).toBe(false);
+    delete extra.life;
+    layer.update({ dt: 1 / 60, world, place, cameraYaw: 0 });
+    expect(root.getObjectByName('personnage-figurant-essai')?.visible).toBe(true);
     // Assis sur le banc de la halte: le personnage monte sur l'assise, devant le meuble.
     const halte = content.places['essai-halte'];
     if (halte === undefined) throw new Error('halte');

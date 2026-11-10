@@ -52,6 +52,7 @@ import {
   headMorphs,
 } from './assemblage';
 import { CHARACTER_SETTINGS, type CharacterSettings } from './reglages';
+import { villagerView } from '../../simulation/habitants/lecture';
 
 interface Shared {
   readonly geometry: AssembledGeometry;
@@ -437,17 +438,22 @@ export class AssembledCharacters implements CharacterLayer {
     for (const object in objects) {
       const seats = objects[object]?.sit;
       if (!(seats?.includes(index) ?? false)) continue;
-      const placeId = frame.world.common.place;
-      const type =
-        this.view.content.places[placeId]?.map.objects.find((o) => o.id === object)?.type ??
-        frame.place.placed.find((p) => p.id === object)?.type;
-      const model = type === undefined ? undefined : this.view.content.props[type]?.model;
-      return (
-        (model === undefined ? undefined : this.settings.seat.byModel[model]) ??
-        this.settings.seat.standIn
-      );
+      return this.seatOfObject(frame, object);
     }
     return null;
+  }
+
+  /** Assise d'un meuble du lieu (modèle livré, sinon forme provisoire). */
+  private seatOfObject(frame: CharacterFrame, object: string): { height: number; front: number } {
+    const placeId = frame.world.common.place;
+    const type =
+      this.view.content.places[placeId]?.map.objects.find((o) => o.id === object)?.type ??
+      frame.place.placed.find((p) => p.id === object)?.type;
+    const model = type === undefined ? undefined : this.view.content.props[type]?.model;
+    return (
+      (model === undefined ? undefined : this.settings.seat.byModel[model]) ??
+      this.settings.seat.standIn
+    );
   }
 
   private follow(
@@ -610,7 +616,18 @@ export class AssembledCharacters implements CharacterLayer {
       const { ref, look } = this.villagerLook(placeId, id, library);
       const figure = this.ensure(this.villagers.get(id) ?? null, id, ref, look, library);
       this.villagers.set(id, figure);
-      this.follow(figure, state.body, { kind: 'stand', speed: state.body.speed }, null, frame.dt);
+      // La vie de l'habitant (planning): absent, assis sur une vraie place, ou en plein geste.
+      const life = villagerView({ content: this.view.content, world: frame.world }, id);
+      figure.object.visible = life?.visible ?? true;
+      const seatId = state.life?.seat?.[0] ?? null;
+      const seated = life?.pose === 'sit' && seatId !== null;
+      const posture: Posture = seated
+        ? { kind: 'sit' }
+        : life?.gesture !== null && life?.gesture !== undefined
+          ? { kind: 'clip', clip: life.gesture }
+          : { kind: 'stand', speed: state.body.speed };
+      const seat = seated ? this.seatOfObject(frame, seatId) : null;
+      this.follow(figure, state.body, posture, seat, frame.dt);
     }
     if (this.villagers.size > Object.keys(frame.place.villagers).length) {
       for (const [id, figure] of this.villagers) {
