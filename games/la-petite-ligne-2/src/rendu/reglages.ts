@@ -46,6 +46,12 @@ export const RENDER_SETTINGS = {
     minCrispRatio: 1.5,
   },
 
+  /**
+   * Fondu au noir quand les deux joueurs ont dormi (événement `day_started` avec `slept`): durée
+   * totale (s), descente puis remontée de l'exposition, et part tenue au noir au milieu.
+   */
+  sleepFade: { seconds: 1.6, holdPart: 0.25 },
+
   /** Mode léger demandé (tests en rendu logiciel): basse résolution, sans ombres. */
   light: { pixelRatio: 0.5, maxPhysicalPixels: 640 * 360 },
 

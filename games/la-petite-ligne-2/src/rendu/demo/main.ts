@@ -165,6 +165,14 @@ const view: GameView = {
   content,
   role: 'host',
   world: () => world,
+  frame: () => world,
+  // La visée simulée de la page (`me.aim`), sous la forme que rend la simulation.
+  aim: (player) => {
+    const id = world.players[player].aim;
+    return id === null
+      ? null
+      : { kind: 'prop', id, action: 'talk', verb: '', refusal: null, x: 0, y: 0 };
+  },
   localIndex: () => 0,
   send: () => undefined,
   onEvent: () => () => undefined,

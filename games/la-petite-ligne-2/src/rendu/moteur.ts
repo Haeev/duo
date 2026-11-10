@@ -87,8 +87,13 @@ export interface RenderStats {
 }
 
 export interface GameRenderer {
-  /** Une image: `dt` secondes depuis la précédente (`FrameInfo.dt` de la boucle du SDK). */
-  frame(dt: number): void;
+  /**
+   * Une image: `dt` secondes depuis la précédente, `alpha` l'avancement entre deux pas
+   * (`FrameInfo` de la boucle du SDK). Le moteur dessine `view.frame(alpha)`.
+   */
+  frame(dt: number, alpha?: number): void;
+  /** Lieu construit et affiché (`null`: aucun), pour annoncer `place_loaded` à l'hôte. */
+  placeId(): string | null;
   /**
    * Commandes de caméra, à donner à chaque pas ou à chaque image: `turn` et `zoom` sont tenues
    * (la dernière valeur compte), `dragPixels` et `wheel` s'ajoutent jusqu'à la prochaine image.
@@ -176,6 +181,9 @@ class Engine implements GameRenderer {
   private readonly subjects: { x: number; y: number; z: number }[] = [{ x: 0, y: 0, z: 0 }];
   private readonly toCamera = { x: 0, y: 1, z: 0 };
   private readonly background = new Color();
+  /** Temps restant du fondu de sommeil (s), 0: aucun. */
+  private sleepFade = 0;
+  private readonly offEvent: () => void;
   private disposed = false;
 
   constructor(private readonly options: RenderOptions) {
@@ -214,6 +222,23 @@ class Engine implements GameRenderer {
       ),
     );
     this.applyProfile(this.governor.currentProfile());
+    this.offEvent = options.view.onEvent((event) => {
+      if (event.type === 'unstuck') this.characters.snap(event.player);
+      else if (event.type === 'day_started' && event.slept)
+        this.sleepFade = RENDER_SETTINGS.sleepFade.seconds;
+    });
+  }
+
+  /** Exposition du fondu de sommeil: 1 hors fondu, descend à 0, tient, puis remonte. */
+  private fadeExposure(dt: number): number {
+    if (this.sleepFade <= 0) return 1;
+    this.sleepFade = Math.max(0, this.sleepFade - dt);
+    const { seconds, holdPart } = RENDER_SETTINGS.sleepFade;
+    const progress = 1 - this.sleepFade / seconds;
+    const ramp = (1 - holdPart) / 2;
+    if (progress < ramp) return 1 - progress / ramp;
+    if (progress < ramp + holdPart) return 0;
+    return (progress - ramp - holdPart) / ramp;
   }
 
   private applyProfile(profile: RenderProfile): void {
@@ -291,11 +316,13 @@ class Engine implements GameRenderer {
     camera.updateProjectionMatrix();
   }
 
-  frame(dt: number): void {
+  frame(dt: number, alpha = 0): void {
     if (this.disposed) return;
     this.resize();
     const view = this.options.view;
-    const world = view.world();
+    // L'état à dessiner (chez l'invité: les autres interpolés, soi-même prédit), pas l'état logique.
+    const world = view.frame(alpha);
+    this.renderer.toneMappingExposure = RENDER_SETTINGS.renderer.exposure * this.fadeExposure(dt);
     const placeId = world?.common.place ?? null;
     if (placeId !== (this.place?.description.id ?? null)) {
       if (placeId === null) {
@@ -343,7 +370,7 @@ class Engine implements GameRenderer {
     }
     place.applyOcclusion(place.occlusion.update(dt, this.subjects, this.toCamera));
 
-    this.highlight.update(dt, world.players[local].aim, this.resolveAim);
+    this.highlight.update(dt, view.aim(local)?.id ?? null, this.resolveAim);
 
     this.daylight.update(world.minutes, pose.x, pose.y, viewRadius(pose, this.aspect));
     this.background.copy(this.daylight.tableColor);
@@ -382,6 +409,10 @@ class Engine implements GameRenderer {
     this.input.zoom = input.zoom ?? 0;
     this.input.dragPixels += input.dragPixels ?? 0;
     this.input.wheel += input.wheel ?? 0;
+  }
+
+  placeId(): string | null {
+    return this.place?.description.id ?? null;
   }
 
   cameraYaw(): number {
@@ -427,6 +458,7 @@ class Engine implements GameRenderer {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.offEvent();
     this.highlight.dispose();
     this.place?.dispose();
     this.place = null;

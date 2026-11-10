@@ -15,6 +15,7 @@ import { talkBehaviour } from './parler';
 import { pickupBehaviour } from './ramasser';
 import { storeBehaviour } from './ranger';
 import type { BrickRegistry, EntityBehaviour } from './types';
+import { travelBehaviour } from '../voyage/brique';
 
 export type {
   Aim,
@@ -38,6 +39,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   store: storeBehaviour,
   ...NEEDS_BRICKS,
   ...BAG_BRICKS,
+  travel: travelBehaviour,
 };
 
 /** Actions sur ce qui n'est pas un meuble: un objet au sol (`pickup`), un habitant (`talk`). */

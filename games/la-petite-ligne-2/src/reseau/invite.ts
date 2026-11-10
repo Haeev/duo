@@ -184,6 +184,8 @@ export function createGuest(
 
   function onFast(message: FastMessage): void {
     if (message.tick < placeSince) return;
+    // Positions d'un autre lieu que le lieu connu (voyage en cours): elles n'ont rien à faire ici.
+    if (common !== null && message.place !== common.common.place) return;
     if (fast !== null && message.tick <= fast.tick) return;
     fast = message;
     stale = true;
@@ -247,7 +249,8 @@ export function createGuest(
     if (common === null || players === null || known === null || place === null || fast === null)
       return null;
     // Pendant une bascule, on garde l'ancien état entier tant que le nouveau lieu n'est pas complet.
-    if (place.id !== common.common.place || fast.tick < placeSince) return assembled;
+    if (place.id !== common.common.place || fast.place !== place.id || fast.tick < placeSince)
+      return assembled;
     if (status.kind !== 'settled' || status.place !== place.id)
       status = { kind: 'settled', place: place.id };
     return {
@@ -268,8 +271,7 @@ export function createGuest(
     if (stale) {
       assembled = assemble();
       stale = false;
-      if (assembled !== null && me === null)
-        me = assembled.players[0].member === member ? 0 : 1;
+      if (assembled !== null && me === null) me = assembled.players[0].member === member ? 0 : 1;
     }
     return assembled;
   }

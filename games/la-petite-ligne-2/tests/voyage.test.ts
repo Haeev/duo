@@ -2,10 +2,11 @@
 import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
 import { WorldSchema } from '../src/etat/monde';
+import { aimOf } from '../src/simulation/briques/visee';
 import { canSkipNight, isNight } from '../src/simulation/noyau/horloge';
 import { boardingChoices } from '../src/simulation/voyage/index';
 import { gameContent, newSim } from './aides';
-import { put, run, send, SOUTH } from './aides-noyau';
+import { contentWith, put, run, send, SOUTH } from './aides-noyau';
 
 const content = gameContent();
 const { clock, travel } = content.settings;
@@ -138,5 +139,20 @@ describe('voyage en train', () => {
     const events = run(sim, travel.slowLoadSeconds + 0.5);
     expect(events).toContainEqual({ type: 'train_waiting', loaded: [true, false] });
     expect(sim.world.common.phase).toBe('travel');
+  });
+});
+
+describe('brique travel', () => {
+  it('un poteau du quai se vise et fait monter dans le train vers le premier lieu desservi', () => {
+    const withPole = contentWith(
+      [{ id: 'poteau-essai', bricks: [{ brick: 'travel' }] }],
+      [{ id: 'poteau', type: 'poteau-essai', x: 22.5, y: 4.5 }],
+    );
+    const sim = newSim(withPole);
+    put(sim, 0, 21.4, 4.5, 0);
+    expect(aimOf(sim, 0)).toMatchObject({ id: 'poteau', verb: 'Monter', refusal: null });
+    send(sim, 0, { type: 'act' });
+    expect(sim.world.common.travel?.boarded[0]).toBe(true);
+    expect(sim.world.common.travel?.to).toBe('essai-halte');
   });
 });

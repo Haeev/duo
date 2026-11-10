@@ -43,7 +43,7 @@ export function createCommandQueue(settings: NetSettings['input']): CommandQueue
    */
   function catchUp(): void {
     let before = last;
-    for (let i = 0; i < frames.length && frames.length > settings.idleBuffered; ) {
+    for (let i = 0; i < frames.length && frames.length > settings.idleBuffered;) {
       const frame = frames[i];
       if (frame === undefined) break;
       if (idleAfter(frame, before)) frames.splice(i, 1);

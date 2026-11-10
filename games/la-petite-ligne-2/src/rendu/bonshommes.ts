@@ -46,6 +46,8 @@ export interface CharacterLayer {
   /** Arrivée dans un lieu: les personnages se posent d'un coup, sans glisser depuis l'ancien. */
   reset(): void;
   update(frame: CharacterFrame): void;
+  /** Le joueur a été replacé (événement `unstuck`): pas de glissé, il se pose d'un coup. */
+  snap(index: 0 | 1): void;
   /** Pieds affichés du joueur, sur la carte (x est, y sud); `null` avant la première image. */
   playerPosition(index: 0 | 1): { readonly x: number; readonly y: number } | null;
   /** Habitant visé par la touche d'action (identifiant de l'état), pour le faire réagir. */
@@ -188,6 +190,10 @@ class StandInCharacters implements CharacterLayer {
     for (const figure of this.players) figure.placed = false;
     for (const figure of this.villagers.values()) this.remove(figure);
     this.villagers.clear();
+  }
+
+  snap(index: 0 | 1): void {
+    this.players[index].placed = false;
   }
 
   update(frame: CharacterFrame): void {
