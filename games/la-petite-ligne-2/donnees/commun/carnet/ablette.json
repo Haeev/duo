@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "ablette",
+  "category": "poissons",
+  "name": "Ablette",
+  "place": "essai-gare",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "Une ablette argentée, vive comme un éclair."
+}

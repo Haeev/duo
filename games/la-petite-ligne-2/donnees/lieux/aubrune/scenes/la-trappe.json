@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "id": "la-trappe",
+  "title": "La trappe",
+  "together": true,
+  "roles": {
+    "a": "Au pied-de-biche",
+    "b": "À la lampe"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Toi, levier. Toi, lampe.",
+      "emote": "idea",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Glisse le pied-de-biche sous la lame, côté fenêtre.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "hd",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Éclaire le vieux plancher de la chambre.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "hd",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La troisième lame vient toute seule. Elle n'était pas clouée. Elle était posée.",
+      "emote": null,
+      "sound": "Crac",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sous ta main, un anneau de fer. Une trappe. Sur aucun plan.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dans le rond de ta lampe: une échelle de meunier, aux marches usées en leur milieu. On est beaucoup descendu ici.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Cave.",
+      "emote": "surprise",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Pas sur le plan. Et pourtant.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "En bas: une table, un tabouret, un gros registre, et une lanterne de garde. Il lui manque son verre.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu ouvres le registre. Une colonne par jour, des années de jours. Une seule ligne à chaque fois: « 5 h 12, passé. »",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu éclaires la dernière page: après la nuit de la fermeture, les lignes continuent. Six semaines. D'une autre écriture.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous comparez à voix haute. La première main est droite et sûre. La seconde s'applique, et tremble un peu.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.maison.chambre",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.maison.cave",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

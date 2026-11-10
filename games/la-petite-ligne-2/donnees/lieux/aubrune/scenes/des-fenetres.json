@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "des-fenetres",
+  "title": "Des fenêtres",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "walk",
+      "who": "jeanne",
+      "to": "pl"
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "Fais voir ! ... Des fenêtres. C'est des fenêtres. Avec de la lumière dedans.",
+      "emote": "idea",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "Des gouttes, Jeanne. Sur l'objectif.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "jeanne",
+      "text": "Neuf gouttes carrées, à la queue leu leu, toutes à la même hauteur ? Je parie ma collection de caramels.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "... Je ne parie pas avec les enfants. Ils gagnent.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

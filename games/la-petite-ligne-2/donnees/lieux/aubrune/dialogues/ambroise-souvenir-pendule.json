@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-pendule",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.halte.pendule"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Elle tient l'heure. Je passe vérifier chaque matin, par hasard. Lacombe est là aussi, par hasard.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

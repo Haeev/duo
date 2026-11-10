@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "lucie-hygiene",
+  "villager": "lucie",
+  "priority": 90,
+  "when": [
+    {
+      "type": "not",
+      "condition": {
+        "type": "need_at_least",
+        "need": "hygiene",
+        "value": 21
+      }
+    }
+  ],
+  "once": null,
+  "start": "odeur",
+  "nodes": {
+    "odeur": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ouh là ! Ha ! Pardon, je ris. Mais non, vraiment: la pompe. Tu vas me faner les timbres.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}

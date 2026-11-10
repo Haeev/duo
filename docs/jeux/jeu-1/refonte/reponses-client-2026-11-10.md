@@ -474,3 +474,18 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Cartes (10 novembre, midi): les lieux seront plus grands, pour porter le jeu narratif et l'exploration, avec une construction plus cohérente. Méthode demandée: d'abord la carte vue du dessus, ensuite la carte 3D. Les quêtes peuvent mener à des endroits à progression linéaire. S'inspirer de la façon dont les grands jeux et les jeux indépendants construisent leurs lieux et guident le joueur.
 - Rush: de 13 h le 10 novembre à 13 h le 11, jusqu'à 15 membres en parallèle (Opus, Sonnet, Haiku) pour construire la base.
 - Gabarits: tout contenu s'ajoute en copiant un modèle, sans repartir de zéro (règle inscrite dans CLAUDE.md).
+
+## Décisions du client du 10 novembre, après-midi
+
+- Plan d'Aubrune: oui aux quatre questions (taille à confirmer en volumes, zone ouest allongée de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1). Le plan version 2 les applique (384 x 208 m).
+- Direction graphique définitive: le style « encré », un rendu de bande dessinée vu de haut (contours noirs épais et irréguliers, ombres en aplats et hachures, couleurs peintes à deux ou trois tons, formes anguleuses, sols dessinés à la main, ambiance lumineuse forte). Le client: « voilà exactement le style "encré", j'avais pas le mot pour décrire ce que je voulais ». Cette direction remplace le fil « maquette de train miniature », les figurines lisses et la piste des jeux de vie des années 2000 évoquée le même jour. Les images de référence du client ne sont pas versionnées: on en garde la technique, sans rien reprendre.
+- Caméra à 50 degrés de plongée par défaut, libre de tourner et de zoomer: oui.
+- Personnages à environ 7 têtes de haut, mains et pieds un peu grossis: oui.
+- Ambiance sombre réservée au village hanté; Aubrune chaude et claire de jour: oui.
+- Même rendu sur le Mac et le PC: oui.
+- Aucune production en série avant validation de la scène d'essai par le client: oui.
+- Scène d'essai demandée: de vraies images du moteur, avec 3 habitants, 1 joueur, une maison vue de dehors, une vue de dedans avec des meubles, et quelques images d'interface.
+- Notation: le manager note chaque image sur 10 avec une justification, contre les références du client. Une image sous 9 repart au travail.
+- Son: le client installe Suno pour l'audio; non visible depuis la session cloud à ce jour, licence à vérifier selon son offre avant tout usage en production.
+- Shaders et ombres: le client leur donne un grand rôle dans l'esthétique, à soigner. Les surfaces doivent avoir de la profondeur (relief des murs, des sols et des toits): des aplats sur des volumes plats font « factice ».
+- Écriture des actes 2 et 3 d'Aubrune, oui aux sept propositions de l'auteur: « vingt âmes » au lieu de « douze foyers »; premier train « le lendemain » et non « le samedi »; confidences d'Honorine après un service rendu plutôt qu'à un nombre de cœurs; Firmin a tenu le registre six semaines; scène de la dalle des Lacombe au cimetière gardée; départ pour Hautefonte quand on veut après la Veillée; sac de toile offert en fin d'acte 2 et sac à dos en fin d'acte 3.

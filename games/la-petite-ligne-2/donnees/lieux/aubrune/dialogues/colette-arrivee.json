@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "colette-arrivee",
+  "villager": "colette",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.train"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Colette Lafon. Je rouvre le café de la Halte. J'ai les casseroles, il me manque les clients: tu tombes bien.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Chez moi, on dit ce qu'on pense et on finit son assiette. Dans cet ordre ou dans l'autre.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Et le dimanche: quilles. Je ne perds jamais. Je préviens, c'est plus honnête.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

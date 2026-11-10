@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "berthe",
+  "name": "Berthe Lavergne",
+  "temper": "grumpy",
+  "look": {
+    "shape": "adult-f-round",
+    "skin": 2,
+    "pieces": [
+      {
+        "slot": "body",
+        "id": "body-base",
+        "colors": []
+      },
+      {
+        "slot": "head",
+        "id": "head-square",
+        "colors": [0, 1]
+      },
+      {
+        "slot": "hair",
+        "id": "hair-bun",
+        "colors": [8]
+      },
+      {
+        "slot": "dress",
+        "id": "dress-simple",
+        "colors": [1]
+      },
+      {
+        "slot": "shoes",
+        "id": "shoes-boots",
+        "colors": [1, 1]
+      }
+    ]
+  },
+  "stands": "mc",
+  "voice": "medium",
+  "life": {
+    "home": "mc",
+    "schedule": [
+      {
+        "from": 420,
+        "to": 1260,
+        "at": {
+          "point": "mc"
+        },
+        "activity": "moudre",
+        "gesture": null
+      },
+      {
+        "from": 1260,
+        "to": 420,
+        "at": {
+          "point": "mc"
+        },
+        "activity": "dormir",
+        "gesture": null
+      }
+    ],
+    "greeting": "joy",
+    "reactions": [
+      {
+        "act": "runs",
+        "emote": "surprise"
+      },
+      {
+        "act": "dirty",
+        "emote": "smell"
+      }
+    ],
+    "gifts": {
+      "loved": ["pain"],
+      "liked": ["farine", "truite"],
+      "disliked": ["mures"]
+    },
+    "arrives": [
+      {
+        "type": "remembered",
+        "key": "aubrune.acte3.train2"
+      }
+    ],
+    "leaves": null
+  }
+}

@@ -154,5 +154,9 @@ describe('brique travel', () => {
     send(sim, 0, { type: 'act' });
     expect(sim.world.common.travel?.boarded[0]).toBe(true);
     expect(sim.world.common.travel?.to).toBe('essai-halte');
+    // À bord, la même touche sur le même poteau fait redescendre (plus de touche Entrée provisoire).
+    expect(aimOf(sim, 0)).toMatchObject({ id: 'poteau', verb: 'Descendre', refusal: null });
+    send(sim, 0, { type: 'act' });
+    expect(sim.world.common.travel?.boarded[0] ?? false).toBe(false);
   });
 });

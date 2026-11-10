@@ -2,7 +2,9 @@
  * Démonstration de l'interface seule, sur une vraie partie neuve et un état factice choisi par
  * l'ancre de l'adresse (`#repos`, `#bulle`, `#coup-d-oeil`, `#dialogue-ecriture`,
  * `#dialogue-choix`, `#carnet-sans-sac`, `#carnet-sac`, `#rangement`, et un onglet du carnet:
- * `#carnet-quetes`, `-habitants`, `-collections`, `-carte`, `-tenues`, `-reglages`). Sert aux captures.
+ * `#carnet-quetes`, `-habitants`, `-collections`, `-carte`, `-tenues`, `-reglages`, chacun avec le
+ * suffixe `-long` pour un contenu très long; le sac en objet: `#carnet-sac-equiper`, `-refus`,
+ * `-malle`). Sert aux captures.
  * Les onglets lisent un état factice (`carnet/fictif.ts`) et le vrai plan d'Aubrune.
  */
 import { loadContent } from '../../donnees/charger';
@@ -12,7 +14,7 @@ import type { WorldState } from '../../etat/monde';
 import type { Aim } from '../../simulation/briques/types';
 import type { GameEvent } from '../../simulation/noyau/evenements';
 import { createWorld } from '../../simulation/noyau/monde';
-import { dummySources } from '../carnet/fictif';
+import { dummySources, stressSources } from '../carnet/fictif';
 import { parsePlan } from '../carnet/plan';
 import { memoryFollow } from '../carnet/quetes';
 import { createInterface } from '../index';
@@ -38,7 +40,10 @@ me.body.y = 10;
 other.body.x = 22;
 other.body.y = 4;
 const TABS_DEMO = ['quetes', 'habitants', 'collections', 'carte', 'tenues', 'reglages'] as const;
-const tabStep = TABS_DEMO.findIndex((t) => state === `carnet-${t}`) + 1;
+// Suffixe `-long`: contenu très long pour vérifier le défilement (banc des petites fenêtres).
+const longContent = state.endsWith('-long');
+const tabName = longContent ? state.slice(0, -'-long'.length) : state;
+const tabStep = TABS_DEMO.findIndex((t) => tabName === `carnet-${t}`) + 1;
 if (tabStep > 0) {
   // Les joueurs au quai d'Aubrune, en mètres du plan.
   me.body.x = 140;
@@ -100,6 +105,25 @@ if (state === 'carnet-sac' || state === 'rangement') {
     ],
   };
 }
+// Sacs en objet: `-equiper` (une besace de 4 cases porte un sac de toile de 6: possible), `-refus`
+// (un sac à dos de 10 cases porte un sac de toile de 6: refusé, expliqué), `-malle` (20 cases pleines).
+const bagState = /^carnet-sac-(equiper|refus|malle)$/.exec(state)?.[1];
+if (bagState !== undefined) {
+  const total = bagState === 'malle' ? 20 : bagState === 'refus' ? 10 : 4;
+  const slots: (null | { item: string; count: number })[] = Array.from(
+    { length: total },
+    () => null,
+  );
+  slots[0] = { item: 'sac-de-toile', count: 1 };
+  if (bagState === 'malle')
+    ['pomme', 'buche', 'planche', 'pain'].forEach((item, i) => {
+      for (let k = 0; k < 4; k += 1) slots[1 + i * 4 + k] = { item, count: 2 + k };
+    });
+  me.bag = {
+    id: bagState === 'malle' ? 'malle-a-bretelles' : bagState === 'refus' ? 'sac-a-dos' : 'besace',
+    slots,
+  };
+}
 const place = world.places[world.common.place];
 if (state === 'rangement' && place !== undefined)
   place.objects['demo-coffre'] = {
@@ -136,10 +160,25 @@ const ui = createInterface({
   },
   send(intent) {
     if (sent !== null) sent.textContent = JSON.stringify(intent);
+    // Illustration seulement: la vraie réponse vient de la simulation (`equip_bag`, testée à part).
+    if (intent.type === 'equip_bag' && intent.from.area === 'bag') {
+      const def = content.bags.bags.find((b) => b.id === content.items['sac-de-toile']?.bag);
+      if (def === undefined || me.bag === null) return;
+      const kept = me.bag.slots.filter((_, i) => i !== intent.from.index);
+      me.bag = { id: def.id, slots: Array.from({ length: def.slots }, (_, i) => kept[i] ?? null) };
+      setTimeout(() => {
+        emit({ type: 'bag_changed', player: 0, bag: def.id });
+      }, 50);
+    }
   },
   cameraYaw: () => 0,
   notebook: {
-    sources: dummySources(parsePlan(planAubrune), ['M', 'F', 'T', 'C']),
+    sources: (longContent ? stressSources : dummySources)(parsePlan(planAubrune), [
+      'M',
+      'F',
+      'T',
+      'C',
+    ]),
     follow: memoryFollow('histoire'),
   },
   editorAtStart: false,
@@ -168,7 +207,13 @@ setTimeout(() => {
     emit({ type: 'money_changed', who: 0, delta: 120 });
   }
   if (state === 'coup-d-oeil') press('KeyG');
-  if (state === 'carnet-sans-sac' || state === 'carnet-sac') press('KeyC');
+  if (state === 'carnet-sans-sac' || state === 'carnet-sac' || bagState !== undefined)
+    press('KeyC');
+  if (bagState !== undefined)
+    setTimeout(() => {
+      // Un pas en bas: de la barre (une rangée de 5 cases) à la première case du sac.
+      press('KeyS');
+    }, 400);
   if (tabStep > 0) {
     press('KeyC');
     setTimeout(() => {

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "solange-sac-a-dos",
+  "villager": "solange",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Deux gardes en mission à Hautefonte, avec une besace ? Pas sur ma scène !",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_bag",
+          "bag": "sac-a-dos"
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Tiens: un sac à dos. Dix poches. J'y ai cousu ton nom à l'intérieur, et une épingle de sûreté, pour le trac.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié aura le sien. Et à Hautefonte, tiens-toi [[droite|droit]]: on représente la mercerie.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

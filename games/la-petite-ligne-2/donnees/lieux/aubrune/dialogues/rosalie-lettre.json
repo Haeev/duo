@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "id": "rosalie-lettre",
+  "villager": "rosalie",
+  "priority": 65,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.rosalie"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "C'est donc vous, les gardes ! Rosalie Vasseur. Joli signal. Il penche un peu, mais il penche avec conviction.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_bag",
+          "bag": "sac-de-toile"
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "La commande est chargée, la paie du dépôt suit. Et voilà un sac de toile: cadeau de la maison, on en a trop.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ah, et ça: arrivé au dépôt avant-hier, à votre nom. Postée à Hautefonte. Expéditeur: É. Lacombe.",
+      "emote": "surprise",
+      "next": "n5"
+    },
+    "n5-emile-1": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Connais pas. Mais il écrit bien droit, pour quelqu'un qui n'existe pas à mon dépôt.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n5-nuit-1": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "De nuit ? Ha ! Pas de mon dépôt, en tout cas. Un train de travaux, peut-être. Ou un rêve à deux places.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "n5": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "emile",
+          "text": "Lacombe ? Émile Lacombe ?",
+          "when": [],
+          "effects": [],
+          "next": "n5-emile-1"
+        },
+        {
+          "id": "nuit",
+          "text": "On a pris le train de nuit, nous.",
+          "when": [],
+          "effects": [],
+          "next": "n5-nuit-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ouvre-la donc. Moi, je repars à 10 h 40, et à l'heure: j'ai une réputation.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

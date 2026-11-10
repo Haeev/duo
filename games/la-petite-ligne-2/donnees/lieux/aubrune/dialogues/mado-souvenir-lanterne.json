@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-lanterne",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lanterne.allumee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ma lanterne a tenu ? Évidemment. Barnabé a pleuré en la voyant briller. Il pleure aussi devant les brioches.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

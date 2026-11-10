@@ -190,6 +190,15 @@ describe('sacs comme objets', () => {
     const carried = [...player.toolbar, ...(player.bag?.slots ?? [])];
     expect(carried.some((s) => s?.item === 'sac-de-toile')).toBe(true);
     expect(carried.find((s) => s?.item === 'pierre')?.count).toBe(3);
+    // Le sac de toile, plus petit, ne remplace pas le sac à dos.
+    const back = carried.findIndex((s) => s?.item === 'sac-de-toile');
+    const from =
+      back < player.toolbar.length
+        ? bar(back)
+        : { area: 'bag' as const, index: back - player.toolbar.length };
+    expect(act(sim, 0, { type: 'equip_bag', from })).toContainEqual(
+      expect.objectContaining({ type: 'refused', reason: 'bag-not-bigger' }),
+    );
   });
 
   it('un objet qui n’est pas un sac est refusé, et l’effet give_bag des dialogues reste valable', () => {

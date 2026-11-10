@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-train",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "J'ai crié « Aubrune, une minute d'arrêt ». Trois fois. La deuxième était pour le plaisir.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "vu-d-en-haut",
+  "title": "Vu d'en haut",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tout Aubrune sous tes yeux: la rivière, le clocher, le signal incliné, la pendule qu'on devine à l'heure.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Et la voie. D'ici, on voit qu'elle ne s'arrête pas au tunnel. Elle y entre, voilà tout.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "En bas, la barrière et le bout du quai: vingt mètres entre les deux. Une lanterne se verrait de l'une à l'autre.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

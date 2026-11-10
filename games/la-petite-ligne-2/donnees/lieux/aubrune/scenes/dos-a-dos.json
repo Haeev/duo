@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "dos-a-dos",
+  "title": "Dos à dos",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "villager": "colette"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "say",
+      "who": "colette",
+      "text": "Je les ai assis dos à dos. Même table, d'un certain point de vue.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Par la vitre du café: deux dos, deux serviettes au col, deux cuillères qui montent et descendent au même rythme.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Une main cherche le sel par-dessus une épaule. Une autre main le lui passe. Aucune tête ne tourne.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "colette",
+      "text": "Ils ont fini la marmite et se sont disputé le fond. Par gestes. Je crois que c'est le début d'une grande amitié.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.repas.dos-a-dos",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

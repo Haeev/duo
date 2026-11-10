@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "firmin-vingt",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.registre-plein",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Paulin Delmas. Margot Delmas. « Léon Delmas, il est midi moins dix. » Berthe Lavergne, avec un M comme une cathédrale.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Barnabé Tixier a signé, et dessiné une brioche à côté. Je ne veux pas savoir pourquoi.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Vingt âmes. Aubrune n'en avait pas compté autant depuis 1987. Je vais m'asseoir une minute. Une vraie.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

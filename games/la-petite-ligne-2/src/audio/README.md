@@ -17,6 +17,8 @@ Un son du monde naît d'un événement de l'hôte ou de l'état, jamais d'une en
 
 Fichiers sonores: `assets/commun/son/{effets,babil,ambiances}/`. Sources et script de génération: `assets-src/son/` (`generer.py`, `controler.py`, mesures dans `mesures.csv`).
 
+La **musique** (airs par heure, météo et lieu, silences, jingles) a son propre dossier et sa propre table: `musique/README.md`.
+
 ## Ce que le joueur entend, et d'où ça vient
 
 - **Gestes, objets, argent, besoins, train, réveil**: les événements de `GameView.onEvent`, par `evenements.json`. `audience: "own"` garde un retour privé pour son joueur; `"both"` joue chez les deux, et le geste de l'autre joueur est placé à sa position et 3 dB plus bas (`otherPlayerDb`).

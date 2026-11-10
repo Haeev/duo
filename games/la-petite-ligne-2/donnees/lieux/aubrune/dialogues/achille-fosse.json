@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "achille-fosse",
+  "villager": "achille",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fosse",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "goujon",
+              "count": 2
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Lance là où l'eau fait un rond sombre. Attends la touche. Ferre. Moi, je... mmh...",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Zzz.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh ? Deux goujons, et je te dis le secret de la fosse. Je ne dormais pas: je surveillais le bouchon de l'intérieur.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Deux goujons ! Bravo. Ces deux-là sont pour mon dîner: c'est le prix de la leçon.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Le secret: il y a là-dessous une perche qu'on appelle la Baronne. Mon grand-père l'a ratée. Mon père aussi.",
+      "emote": null,
+      "next": "a3"
+    },
+    "a3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Moi, je ne la rate pas: je dors avant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

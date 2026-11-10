@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "id": "honorine-confidence",
+  "villager": "honorine",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.confidence",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle a dit qu'il manquait de sel ? Ha ! Donc il était parfait. Bon. Un prix est un prix. Assieds-toi.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La nuit de la fermeture, la Compagnie a envoyé un ordre à Ambroise: avancer la pendule d'une minute.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Pour que le dernier train parte une minute plus tôt. Sans Émile. Il aurait refusé de fermer la ligne, tu comprends: on l'a semé.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ambroise a obéi. Firmin l'a vu. La pendule avançait, c'est vrai. Et Ambroise n'a rien volé, c'est vrai aussi.",
+      "emote": null,
+      "next": "n5"
+    },
+    "n5-mens-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Je mens sur les préfets, les renards et mon âge. Jamais sur les gens qui partent.",
+      "emote": null,
+      "next": "n6"
+    },
+    "n5": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "mens",
+          "text": "Tu ne mens pas, là ?",
+          "when": [],
+          "effects": [],
+          "next": "n5-mens-1"
+        },
+        {
+          "id": "emile",
+          "text": "Et Émile, alors ?",
+          "when": [],
+          "effects": [],
+          "next": "n6"
+        }
+      ]
+    },
+    "n6": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Émile est arrivé sur le quai à l'heure. La vraie. Il a regardé les feux du train rapetisser. Il a remis sa casquette.",
+      "emote": null,
+      "next": "n7"
+    },
+    "n7": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Et il est parti derrière. À pied, sur la voie. Ça, je l'ai vu de ma fenêtre, et je ne l'ai jamais inventé.",
+      "emote": "sad",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Va le dire à ces deux ânes. Séparément: ensemble, ils n'entendent rien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

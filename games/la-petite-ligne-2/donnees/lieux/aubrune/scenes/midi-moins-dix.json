@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "midi-moins-dix",
+  "title": "Midi moins dix",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Plus tard, sous la pendule du quai: deux petites silhouettes, et un doigt pointé vers le cadran.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« Midi moins... moins dix ! » Un lance-pierre change de poche. Puis revient: Jeanne l'a prêté « pour toujours ».",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Au registre de la halte, d'une écriture qui penche: « Léon Delmas. Il est midi moins dix. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

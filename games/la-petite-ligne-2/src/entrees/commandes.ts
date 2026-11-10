@@ -9,7 +9,6 @@ import type { GameAction } from '../actions';
 import type { CameraInput } from '../rendu/camera';
 import type { GameView } from '../session';
 import type { StepInput } from '../simulation/noyau/entrees';
-import { boardingChoices } from '../simulation/voyage/index';
 
 /** Ce que les commandes demandent au rendu 3D: la caméra et le repère de l'écran. */
 export interface ControlsCamera {
@@ -111,7 +110,6 @@ export function createControls(options: ControlsOptions): Controls {
       const act = input.wasPressed('act');
       const next = input.wasPressed('slot-next');
       const stow = input.wasPressed('stow');
-      const confirm = input.wasPressed('confirm');
       const picked = SLOTS.map((action) => input.wasPressed(action));
       if (!captured) {
         if (act) view.send({ type: 'act' });
@@ -121,16 +119,6 @@ export function createControls(options: ControlsOptions): Controls {
         if (next && me !== null && me.toolbar.length > 0)
           view.send({ type: 'select_slot', slot: ((me.selected ?? -1) + 1) % me.toolbar.length });
         if (stow) view.send({ type: 'select_slot', slot: null });
-
-        // Tant qu'aucun poteau de quai n'existe dans les données: Entrée monte dans le train vers
-        // le premier lieu desservi, ou en redescend.
-        if (confirm && world !== null && local !== null) {
-          if (world.common.travel?.boarded[local] === true) view.send({ type: 'board', to: null });
-          else {
-            const to = boardingChoices({ content: view.content, world }, local)[0];
-            if (to !== undefined) view.send({ type: 'board', to });
-          }
-        }
       }
 
       return {

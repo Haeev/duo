@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "armoire",
   "name": "Armoire",
-  "model": "armoire",
+  "model": "wardrobe",
   "size": {
     "w": 1,
     "h": 1

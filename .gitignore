@@ -17,3 +17,6 @@ __pycache__/
 
 # Sorties brutes du serveur MCP Meshy (seuls les assets mis en conformité se versionnent)
 meshy_output/
+
+# Copies d'écoute M4A des musiques (`generer.py --ecoute`): hors jeu, jamais versionnées.
+games/la-petite-ligne-2/assets-src/son/musique/ecoute/

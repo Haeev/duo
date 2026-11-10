@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "firmin-commande",
+  "villager": "firmin",
+  "priority": 58,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.acte2.commande-jardin",
+          "equals": "ouvert"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.acte2.commande-riviere",
+          "equals": "ouvert"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.acte2.commande-bois",
+          "equals": "ouvert"
+        }
+      ]
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La première commande du dépôt: six radis, quatre œufs, trois goujons, cinq bûches. Sur le quai, étiquetés, alignés.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ce que tu m'apportes, je le coche. Ce qui manque partira au train suivant: une commande, ce n'est pas une punition.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

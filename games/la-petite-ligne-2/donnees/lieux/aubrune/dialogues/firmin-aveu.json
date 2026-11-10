@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "firmin-aveu",
+  "villager": "firmin",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.aveu-firmin",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Un ordre ? De la Compagnie ? ... Alors ce n'est pas lui qui m'a volé la minute. C'est elle.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Trente ans que j'en veux au mauvais bonhomme. Ça fait un sacré retard.",
+      "emote": "sad",
+      "next": "n3"
+    },
+    "n3-excuses-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Par écrit et à l'heure, je parie ? Il les aura. Mais pas de vive voix: je bafouille après 9 h 30.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-regard-1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Parfait. J'ai trente ans d'entraînement à regarder ailleurs.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "excuses",
+          "text": "Tu lui dois des excuses.",
+          "when": [],
+          "effects": [],
+          "next": "n3-excuses-1"
+        },
+        {
+          "id": "regard",
+          "text": "Il viendra, si tu ne le regardes pas.",
+          "when": [],
+          "effects": [],
+          "next": "n3-regard-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Qu'il vienne le jour du train. Je tiendrai l'échelle. On n'a pas besoin de se voir pour tenir une échelle.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

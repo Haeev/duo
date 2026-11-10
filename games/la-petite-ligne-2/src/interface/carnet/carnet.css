@@ -6,9 +6,15 @@
 .lpl-ui .carnet {
   animation: none;
 }
-/* À grande taille d'interface (zoom), le carnet remonte pour rester entier à l'écran. */
+/*
+ * Le carnet reste entier à l'écran: il remonte si la fenêtre est basse et se décale vers la gauche
+ * si la fenêtre est étroite, pour que le signet ouvert (son nom compris, 11 rem au plus) reste
+ * visible. Largeur du livre 66,5 rem; décalage habituel: 2 rem vers la gauche du centre.
+ */
 .lpl-ui .carnet {
   top: min(6.75rem, calc(100% - 38.5rem));
+  left: max(0.5rem, min(calc(50% - 35rem), calc(100% - 77.5rem)));
+  margin-left: 0;
 }
 .lpl-ui .carnet--entre {
   animation: leve var(--d-scene) var(--ease) both;
@@ -18,12 +24,13 @@
   border-radius: 0.75rem;
   border-right-width: 0.125rem;
   background: var(--paper);
+}
+.lpl-ui .page--pleine > .page__zone {
   display: grid;
   grid-template-columns: 1fr 12rem;
   grid-template-rows: auto auto 1fr;
   column-gap: 1rem;
   align-content: start;
-  padding-bottom: 3rem;
 }
 .lpl-ui .sr-only {
   position: absolute;
@@ -207,9 +214,7 @@
   margin-left: -0.125rem;
 }
 .lpl-ui .pages {
-  position: absolute;
-  left: 1.5rem;
-  bottom: 2.625rem;
+  margin-top: 0.75rem;
   font-size: 0.8125rem;
   font-weight: 750;
   color: var(--ink-muted);
@@ -747,4 +752,87 @@
 .lpl-ui .foot {
   flex-wrap: wrap;
   gap: 0.375rem 0.75rem;
+}
+
+/*
+ * Défilement: chaque page a une zone qui défile (molette, PageHaut et PageBas, et le focus qui la
+ * suit); le pied de page et le coffre restent en bas, hors de la zone. La marge négative et le
+ * remplissage de 0,5 rem laissent voir les pastilles et le liseré de focus au bord de la zone.
+ */
+.lpl-ui .carnet .page {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.lpl-ui .carnet .page__zone {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: -0.5rem;
+  padding: 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.lpl-ui .carnet .foot,
+.lpl-ui .carnet .chest {
+  position: static;
+  flex: none;
+  margin-top: 0.625rem;
+}
+/* Les noms au survol ne gonflent pas la zone qui défile tant qu'ils sont cachés. */
+.lpl-ui .carnet .page__zone .nametag {
+  display: none;
+}
+.lpl-ui .carnet .page__zone :is(.focus, :hover) > .nametag {
+  display: block;
+}
+
+/* Équiper un sac: la fiche de l'objet cède un peu de hauteur à la réponse, sous le bouton. */
+.lpl-ui .detail--sac .v3d {
+  width: 10.5rem;
+  height: 10.5rem;
+}
+
+.lpl-ui .btn--off {
+  border-style: dashed;
+  background: var(--paper-sunken);
+  color: var(--ink-muted);
+  box-shadow: none;
+}
+.lpl-ui .equip-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 21rem;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--line);
+  border-radius: 0.625rem;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+}
+.lpl-ui .equip-note .ic {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.lpl-ui .equip-note--ok {
+  border-color: var(--primary);
+}
+.lpl-ui .equip-note--ok .ic {
+  color: var(--primary);
+}
+.lpl-ui .equip-note--refus {
+  border-style: dashed;
+  border-color: var(--stamp);
+}
+.lpl-ui .equip-note--refus .ic {
+  color: var(--stamp);
 }

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "id": "mado-hache-moitie",
+  "villager": "mado",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.hache-forgee",
+      "equals": "fait"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "item_in_bag",
+        "item": "hache-forgee",
+        "count": 1
+      }
+    },
+    {
+      "type": "item_in_bag",
+      "item": "hache",
+      "count": 1
+    },
+    {
+      "type": "item_in_bag",
+      "item": "pierre",
+      "count": 3
+    },
+    {
+      "type": "item_in_bag",
+      "item": "buche",
+      "count": 2
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ah, l'autre moitié ! Donne tout ça. Cling ! Cling !",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_item",
+          "item": "pierre",
+          "count": 3
+        },
+        {
+          "type": "take_item",
+          "item": "buche",
+          "count": 2
+        },
+        {
+          "type": "take_item",
+          "item": "hache",
+          "count": 1
+        },
+        {
+          "type": "give_item",
+          "item": "hache-forgee",
+          "count": 1
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Voilà. Deux haches forgées dans la même maison. Ne vous disputez pas: elles coupent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

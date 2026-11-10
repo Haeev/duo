@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "basile-cuisine",
+  "villager": "basile",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.cuisine",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "buche",
+              "count": 6
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Cuisine. Six bûches.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Lisière. Ça repousse.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Six. Bien. Recule.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

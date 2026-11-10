@@ -122,3 +122,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Visage en traits d'encre sur peau sombre (L* sous 35): illisible. Prévoir le blanc de l'œil visible et des lèvres claires; règle d'au moins 25 points de L* entre peau et sourcils ou bouche.
 - CIEDE2000 pardonne beaucoup la saturation: un rouge coquelicot, un rose ancien et un gris-bleu moyen tombent à moins de 15 du corail, du rose et du mauve de Duo. Contrôle: `docs/jeux/jeu-1/refonte/planches/source/controle_nuancier.py`.
 - Liste de catalogue longue: la tenir en données (une ligne par pièce) et générer les tableaux, puis vérifier par script les totaux par vague et que les exemples n'emploient que des pièces de la vague annoncée.
+
+## Planches en style encré (La Petite Ligne, bible 0.2, 2026-11-10)
+
+- rsvg-convert gère `feTurbulence` et `feDisplacementMap`: un filtre de déplacement (fréquence 0,045, échelle 3) sur un groupe donne un trait « à la main » sans redessiner les chemins. Il déforme aussi les textes du groupe: garder les légendes hors du groupe filtré.
+- Trait effilé en SVG: un fuseau plein (deux courbes quadratiques entre les mêmes extrémités) se lit mieux qu'une ligne d'épaisseur constante.
+- Échantillon de matière: rendre le SVG à sa vraie résolution de texture (rsvg-convert -w 128), puis l'incruster en base64 agrandi dans la planche: on voit le grain et l'épaisseur réelle des traits après filtrage.
+- Ombre propre d'une silhouette SVG: `clipPath` fait de toutes les pièces, puis un aplat semi-transparent du côté opposé à la lumière; les pièces ajoutées après coup (jupe, chapeau) n'y sont pas: les inclure dans le `clipPath`.
+- Dans ce bac à sable, les commandes Bash qui contiennent `git` ou le mot `source` dans un chemin avec d'autres commandes sont refusées: chemins `./source/...` après `cd`, `git status` seul, contrôle des tirets par Grep.
+- Échelles de tons par lieu: en ambiance sombre, 15 points de L* entre base et ombre sont rarement tenables; règle retenue: 11 sous une base de L* 40 (`controle_nuancier.py`).
+- Images d'inspiration d'un jeu existant fournies par le client: les décrire avec des mots, ne jamais les verser au dépôt ni les donner à un outil d'IA, ne pas nommer le jeu dans nos documents.

@@ -89,13 +89,17 @@ export function equipBagItem(
   sim: SimContext,
   player: PlayerIndex,
   from: SlotRef,
-): 'empty-slot' | 'not-a-bag' | 'no-slot' | null {
+): 'empty-slot' | 'not-a-bag' | 'no-slot' | 'bag-not-bigger' | null {
   const state: PlayerState = sim.world.players[player];
   if (!slotExists(state, from)) return 'no-slot';
   const stack = stackAt(state, from);
   if (stack === null) return 'empty-slot';
   const bagId = sim.content.items[stack.item]?.bag;
   if (bagId === undefined) return 'not-a-bag';
+  // Un sac pas plus grand que celui qu'on porte ne s'équipe pas (on perdrait des cases).
+  const slotsOf = (id: string | undefined): number =>
+    sim.content.bags.bags.find((bag) => bag.id === id)?.slots ?? 0;
+  if (state.bag !== null && slotsOf(bagId) <= slotsOf(state.bag.id)) return 'bag-not-bigger';
   const previous = state.bag?.id;
   setStack(state, from, null);
   if (!equipBag(sim, player, bagId)) {

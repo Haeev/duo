@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-montre",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La montre de mon oncle fait tic-tac dans ma poche. Ça chatouille. Je ne m'en plains pas.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

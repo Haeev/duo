@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "id": "le-reglement-retrouve",
+  "title": "Le règlement sous le buffet",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Scie. Cloue. Cuisine.",
+      "emote": null,
+      "sound": "Tac ! Tac !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sous le vieux buffet, calant le pied trop court depuis trente ans: un gros livre gris.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« Compagnie de la Petite Ligne. Règlement général. Ne pas utiliser comme cale. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "basile",
+      "text": "Tiens. Lourd.",
+      "emote": "idea",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Au fond de la cuisine, un réchaud de cheminot. Il marche encore: la Compagnie faisait du solide.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.maison.cuisine",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.maison.rechaud",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

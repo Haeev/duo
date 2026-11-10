@@ -47,6 +47,22 @@
       {
         "from": 420,
         "to": 1080,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.acte2.fosse",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "i2"
+        },
+        "activity": "pecher-a-la-fosse",
+        "gesture": null
+      },
+      {
+        "from": 420,
+        "to": 1080,
         "at": {
           "point": "gr4"
         },

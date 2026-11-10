@@ -190,7 +190,7 @@ export interface FishEntryView {
 
 /** Les poissons du jeu pour le carnet, dans l'ordre des identifiants. */
 export function fishCollectionView(content: Content, world: ReadonlyWorld): FishEntryView[] {
-  const seen = world.progress.collections[FISHING.collection] ?? [];
+  const album = world.progress.album?.f ?? {};
   const out: FishEntryView[] = [];
   for (const id of Object.keys(content.catches).sort()) {
     const def = fishOf(content, id);
@@ -202,7 +202,7 @@ export function fishCollectionView(content: Content, world: ReadonlyWorld): Fish
     out.push({
       catch: id,
       item: def.item,
-      seen: seen.includes(id),
+      seen: album[id] !== undefined,
       records: [record(0), record(1)],
     });
   }

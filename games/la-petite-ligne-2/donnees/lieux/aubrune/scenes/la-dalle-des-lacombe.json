@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "la-dalle-des-lacombe",
+  "title": "La dalle des Lacombe",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Une dalle grise, des dahlias frais. Quelqu'un vient ici toutes les semaines, à heure fixe: on le devine.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Cinq Lacombe, gravés bien droit: des gardes-barrières, des chefs de halte, une lampiste. Sous le dernier nom, la pierre est restée nue.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Pas d'Émile. Pas de date. Juste la place, laissée propre, comme un siège qu'on garde dans un train.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

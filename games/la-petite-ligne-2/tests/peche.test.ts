@@ -2,6 +2,7 @@
 // données, combat selon l'espèce, partie jouée localement et validée par l'hôte.
 import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
+import { loadContent } from '../src/donnees/charger';
 import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import { BUDGET_BYTES } from '../src/reseau/canaux';
 import { SIM_DT } from '../src/simulation/noyau/constantes';
@@ -26,7 +27,7 @@ import { fishOf, gameSeconds, shadowPosition } from '../src/simulation/peche/omb
 import { FISHING } from '../src/simulation/peche/reglages';
 import { countItem } from '../src/simulation/sac/inventaire';
 import { act, contentWith, wait } from './aides-l3';
-import { gameContent, newSim } from './aides';
+import { dataFiles, gameContent, newSim } from './aides';
 
 const SOUTH = Math.PI / 2;
 /** Bord nord de l’étang de la gare d’essai (cases 3 à 10, 29 à 33; les chênes bordent sa rive sud). */
@@ -210,7 +211,8 @@ describe('pêche: partie jouée chez le pêcheur, validée par l hôte', () => {
     });
     if (caught?.type !== 'fish_caught') return;
     expect(countItem(sim.world.players[0], caught.catch)).toBe(caught.count);
-    expect(sim.world.progress.collections[FISHING.collection]).toContain(caught.catch);
+    // Le carnet des collections (album) fait foi pour les espèces vues.
+    expect(sim.world.progress.album?.f[caught.catch]).toBeDefined();
     expect(sim.world.progress.memory[recordKey(0, caught.catch)]?.v).toBe(caught.sizeMm);
     const entry = fishCollectionView(sim.content, sim.world).find((f) => f.catch === caught.catch);
     expect(entry).toMatchObject({ seen: true, records: [caught.sizeMm, 0] });
@@ -310,5 +312,15 @@ describe('pêche: partie jouée chez le pêcheur, validée par l hôte', () => {
     expect(sim.world.players[0].toolbar[0]?.wear).toBe(59);
     const line = played.intents.find((i) => i.type === 'fish_hooked');
     expect(line).toBeDefined();
+  });
+});
+
+describe('pêche: contrôle des données', () => {
+  it('une table de coin de pêche qui nomme une prise sans bloc fish est refusée', () => {
+    const files = dataFiles() as Record<string, { fishing?: { table: { catch: string }[] }[] }>;
+    const spot = files['lieux/essai-gare/lieu.json']?.fishing?.[0];
+    if (spot === undefined) throw new Error('étang absent');
+    spot.table[0] = { ...spot.table[0], catch: 'pomme' };
+    expect(() => loadContent(files)).toThrow(/« pomme » n'est pas une prise avec un bloc fish/);
   });
 });

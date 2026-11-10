@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "mado-sertir",
+  "villager": "mado",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.sertir",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Un verre de la Compagnie ! Soufflé à la bouche, regarde les bulles. On n'en fait plus. On ne fait plus rien, d'ailleurs, sauf moi.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "La lanterne de ta cave ? Barnabé est allé la chercher. Il fait trois pas, ça fait le trajet.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Cling. Voilà. Sertie. Elle tient l'eau, le vent et les regards de Firmin.",
+      "emote": "joy",
+      "next": "n4"
+    },
+    "n4-belle-1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Elle est exacte. C'est mieux que belle: ça dure.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-crois-1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Je crois qu'une lanterne bien faite éclaire. Le reste, c'est de la littérature pour Honorine.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "belle",
+          "text": "Elle est belle.",
+          "when": [],
+          "effects": [],
+          "next": "n4-belle-1"
+        },
+        {
+          "id": "crois",
+          "text": "Tu y crois, toi, au 5 h 12 ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-crois-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Mèche neuve, huile propre. Allume-la seulement à l'heure. Une lanterne de garde, ça ne s'allume pas pour faire joli.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

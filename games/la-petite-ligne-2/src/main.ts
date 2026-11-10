@@ -15,6 +15,13 @@ import { createInterface } from './interface/index';
 import { createRenderer, gameDecorModels } from './rendu/index';
 import { createCharacterPreview } from './rendu/personnages/apercu';
 import { createSession } from './session';
+import { createGameAudio } from './audio/index';
+import { createGameMusic } from './audio/musique/index';
+import { DEFAULT_UI_SETTINGS } from './interface/carnet/lectures';
+import { memorySettings } from './interface/carnet/options';
+import { parsePlan } from './interface/carnet/plan';
+import { DEFAULT_GRAPHICS_OPTIONS } from './rendu/options';
+import planAubrune from '../../../docs/jeux/jeu-1/refonte/carte-aubrune/plan.json';
 import { SIM_HZ } from './simulation/noyau/constantes';
 
 /** Attente du premier état chez l'invité avant de se déclarer prêt (ms), et pas de l'attente. */
@@ -45,6 +52,41 @@ const colors = [duo.host.colorHex, duo.guest.colorHex] as const;
 await gameDecorModels().ready;
 const renderer = createRenderer({ canvas, view: session.view, playerColors: colors });
 if (renderer === null) duo.log.warn('WebGL2 indisponible: plan 2D de repli');
+// Son et musique: nés des événements de l'hôte et de l'état, entendus chez les deux joueurs.
+const sound = createGameAudio({
+  audio: duo.audio,
+  view: session.view,
+  random: duo.random('son'),
+  cameraYaw: () => renderer?.cameraYaw() ?? 0,
+  warn: (message, data) => {
+    duo.log.warn(message, data);
+  },
+});
+const music = createGameMusic({
+  audio: duo.audio,
+  view: session.view,
+  random: duo.random('musique'),
+  warn: (message, data) => {
+    duo.log.warn(message, data);
+  },
+});
+// Réglages du carnet: volume par le son, qualité par le rendu. Le plan n'existe que pour Aubrune
+// (les lieux d'essai n'en ont pas: l'onglet Carte le dit).
+const aubrunePlan = parsePlan(planAubrune);
+if (aubrunePlan === null) duo.log.warn('plan d’Aubrune illisible: onglet Carte vide');
+const plans = aubrunePlan === null ? {} : { aubrune: aubrunePlan };
+const settings = memorySettings(
+  {
+    get: () => renderer?.graphics() ?? DEFAULT_GRAPHICS_OPTIONS,
+    set: (options) => {
+      renderer?.setGraphics(options);
+    },
+  },
+  { ...DEFAULT_UI_SETTINGS, volume: Math.round(sound.settings().master * 100) },
+  (next) => {
+    sound.setSettings({ master: next.volume / 100 });
+  },
+);
 // L'interface HTML se pose sur le canevas; le repli sans WebGL2 n'en a pas besoin (plan d'essai).
 const ui =
   renderer === null
@@ -61,7 +103,20 @@ const ui =
         reducedMotion: duo.ui.reducedMotion,
         playerColors: colors,
         characterPreview: (surface) => createCharacterPreview(surface, content),
+        onBabble: (info) => {
+          sound.onBabble(info);
+        },
+        onCue: (cue) => {
+          sound.cue(cue);
+        },
+        notebook: { settings, sourcesExtras: { plans } },
       });
+// Reprise de partie: ce que la sauvegarde a donné à dire (partie neuve, invité remplacé).
+if (session.notice !== null) ui?.notice(session.notice.message);
+// Pause de la plateforme: on enregistre (l'hôte seul écrit; chez l'invité, refus silencieux).
+duo.on('pause', () => {
+  void session.saveNow();
+});
 // Sonde des parcours de recette, seulement sur demande de l'adresse (`?sonde=1`).
 if (new URLSearchParams(location.search).get('sonde') === '1')
   void import('./plateforme/sonde-essai').then((m) => m.installTestProbe({ session, renderer }));
@@ -101,6 +156,8 @@ duo.loop.start({
   render: (frame) => {
     if (renderer !== null) {
       renderer.frame(frame.dt, frame.alpha);
+      sound.frame(frame.dt);
+      music.frame(frame.dt);
       // Après le rendu: la projection lit la caméra de l'image qui vient d'être dessinée.
       ui?.frame(frame.dt);
       return;
@@ -114,6 +171,8 @@ duo.loop.start({
 
 duo.on('stop', () => {
   ui?.dispose();
+  music.dispose();
+  sound.dispose();
   renderer?.dispose();
   session.dispose();
   duo.dispose();

@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "le-wagon-oublie",
+  "title": "Le wagon oublié",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "camera",
+      "focus": {
+        "point": "tw3"
+      },
+      "seconds": 3
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un wagon de service de la Compagnie, mangé par le lierre. La porte coulisse sans grincer: quelqu'un l'a graissée.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dedans: une couverture, trois caramels, et des bâtons tracés à la craie sur la paroi. Par paquets de cinq.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Quarante et un bâtons. Au-dessus, d'une écriture appliquée: « 5 h 12 ».",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Plus loin, trois frênes sont couchés en travers des rails. Trop gros pour ta hache.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.acte2.wagon-vu",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

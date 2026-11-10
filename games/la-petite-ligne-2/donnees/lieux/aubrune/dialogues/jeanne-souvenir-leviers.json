@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-leviers",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.halte.signal"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tu as touché le levier « NE PAS T... » ? Non ? Moi non plus. Enfin si. Il ne fait rien. Enfin presque.",
+      "emote": "idea",
+      "next": null
+    }
+  }
+}

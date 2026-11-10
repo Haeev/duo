@@ -151,6 +151,38 @@
       "x": 6.5,
       "y": 22,
       "rotation": 0
+    },
+    {
+      "id": "miroir-de-cabane",
+      "type": "miroir",
+      "x": 23.5,
+      "y": 18.5,
+      "rotation": 2,
+      "pourquoi": "Dans la cabane, contre le mur sud à côté de la porte: on s'y regarde avant de sortir."
+    },
+    {
+      "id": "plan-de-travail-de-la-halte",
+      "type": "plan-de-travail",
+      "x": 8,
+      "y": 12.5,
+      "rotation": 0,
+      "pourquoi": "Coin cuisine en plein air, au nord de la table du repas: on prépare, puis on sert à deux pas."
+    },
+    {
+      "id": "rechaud-de-la-halte",
+      "type": "rechaud",
+      "x": 10.5,
+      "y": 12.5,
+      "rotation": 0,
+      "pourquoi": "À droite du plan de travail, à côté de la marmite: les feux restent du même côté."
+    },
+    {
+      "id": "cuisiniere-de-la-halte",
+      "type": "cuisiniere",
+      "x": 5.5,
+      "y": 12.5,
+      "rotation": 0,
+      "pourquoi": "À gauche du plan de travail: la cuisinière et le réchaud encadrent le plan."
     }
   ],
   "groundItems": [

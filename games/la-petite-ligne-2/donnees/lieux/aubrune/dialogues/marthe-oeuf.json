@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "marthe-oeuf",
+  "villager": "marthe",
+  "priority": 60,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.marthe-oeuf",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "item_in_bag",
+              "item": "oeuf-au-plat",
+              "count": 1
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Tu as quelque chose pour moi ? Non ? Alors je sonne midi. Ça, au moins, c'est à l'heure.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "De la part d'Honorine ? « Voilà comment on fait » ?",
+      "emote": "anger",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "... Il est bon. Ne le lui dis pas. Dis-lui qu'il manquait de sel.",
+      "emote": null,
+      "next": "a3"
+    },
+    "a3": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Et dis-lui que quarante ans, ça commence à faire long, pour une robe.",
+      "emote": "sad",
+      "next": null
+    }
+  }
+}
