@@ -37,6 +37,26 @@ export function icon(id: string, className = 'ic'): SVGSVGElement {
   return svg;
 }
 
+/** Vrai si l'événement vient d'une souris qui a bougé (et pas d'un survol rejoué par la page). */
+export function pointerMoved(event: Pick<MouseEvent, 'movementX' | 'movementY'>): boolean {
+  return event.movementX !== 0 || event.movementY !== 0;
+}
+
+/**
+ * Le survol donne le focus du clavier, mais seulement quand la souris bouge vraiment. Chromium
+ * rejoue un survol quand le contenu passe sous un pointeur immobile (le carnet qui monte, une
+ * liste redessinée): `mouseenter` faisait alors sauter le focus sur une case que le joueur n'a
+ * jamais visée, et Entrée, P ou T agissaient sur cette case vide.
+ */
+export function onPointerHover(
+  node: Pick<HTMLElement, 'addEventListener'>,
+  hover: () => void,
+): void {
+  node.addEventListener('mousemove', (event) => {
+    if (pointerMoved(event)) hover();
+  });
+}
+
 export function setText(node: Element, text: string): void {
   if (node.textContent !== text) node.textContent = text;
 }
