@@ -13,7 +13,7 @@ import {
   TickSchema,
 } from '../donnees/schemas/communs';
 import { NeedStateSchema } from '../donnees/schemas/besoins';
-import { LookSchema } from '../donnees/schemas/personnage';
+import { GenderSchema, LookSchema } from '../donnees/schemas/personnage';
 
 /** Une pile dans une case. `wear`: usages restants d'un outil amélioré (absent: sans usure). */
 export const StackSchema = v.strictObject({
@@ -65,6 +65,12 @@ const slow = {
   name: LabelSchema,
   /** `null` tant que le personnage n'est pas créé dans l'éditeur. */
   look: v.nullable(LookSchema),
+  /**
+   * Genre choisi à la création (décision du client du 2026-11-10): il règle les accords des textes
+   * et la silhouette de départ (`start.shapes`), rien d'autre; toutes les pièces vont à tous.
+   * `null` tant que le personnage n'est pas créé.
+   */
+  gender: v.nullable(GenderSchema),
   /** Bourse du joueur, en euros entiers (réponse 10: chacun la sienne). */
   money: CountSchema,
   /** La barre: toujours là, même sans sac. */
@@ -94,6 +100,7 @@ export type PlayerState = v.InferOutput<typeof PlayerSchema>;
 
 /** Les champs lents d'un joueur, dans l'ordre du schéma (copie de surface). */
 export function slowOf(player: PlayerState): PlayerSlow {
-  const { member, name, look, money, toolbar, bag, selected, tiers, gesture, talk, aim } = player;
-  return { member, name, look, money, toolbar, bag, selected, tiers, gesture, talk, aim };
+  const { member, name, look, gender, money, toolbar, bag, selected, tiers, gesture, talk, aim } =
+    player;
+  return { member, name, look, gender, money, toolbar, bag, selected, tiers, gesture, talk, aim };
 }

@@ -1,8 +1,10 @@
 /**
- * Réglages du noyau qui n'ont pas encore leur place dans `donnees/commun/reglages.json` (schéma
- * tenu par L0). Typés et réunis ici pour rester réglables; à déplacer dans `reglages.json` quand
- * L0 aura ajouté les champs (liste dans le compte rendu du lot L2).
+ * Réglages du noyau. Leurs valeurs vivent désormais dans `donnees/commun/reglages.json`
+ * (sections `movement`, `reach`, `gestures`, `travel`); ce fichier les expose sous leurs anciens
+ * noms le temps que les appels lisent `content.settings` directement.
  */
+import settings from '../../../donnees/commun/reglages.json';
+
 export interface CoreTuning {
   /** En dessous, une commande de marche compte pour nulle. */
   readonly moveDeadzone: number;
@@ -25,15 +27,18 @@ export interface CoreTuning {
   readonly standUpGap: number;
 }
 
+const { movement, reach, gestures, travel } = settings;
+
+/** Valeurs lues dans `reglages.json` (schéma: `src/donnees/schemas/reglages.ts`), validées au chargement du contenu. */
 export const CORE_TUNING: CoreTuning = {
-  moveDeadzone: 0.1,
-  cornerNudgeStep: 0.05,
-  cornerNudgeMax: 0.35,
-  stuckSeconds: 1,
-  freeCellRadius: 8,
-  arrivalSpread: 0.8,
-  arrivalSeconds: 1,
-  aimDistanceWeight: 0.5,
-  pickupClip: 'pickup',
-  standUpGap: 0.05,
+  moveDeadzone: movement.deadzone,
+  cornerNudgeStep: movement.cornerNudgeStep,
+  cornerNudgeMax: movement.cornerNudgeMax,
+  stuckSeconds: movement.stuckSeconds,
+  freeCellRadius: movement.freeCellRadius,
+  arrivalSpread: travel.arrivalSpread,
+  arrivalSeconds: travel.arrivalSeconds,
+  aimDistanceWeight: reach.aimDistanceWeight,
+  pickupClip: gestures.pickupClip,
+  standUpGap: movement.standUpGap,
 };

@@ -77,6 +77,7 @@ function createPlayer(content: Content, member: Member, x: number, y: number): P
     member: member.id,
     name: member.name.slice(0, 40),
     look: null,
+    gender: null,
     money: content.settings.start.money,
     toolbar: Array.from({ length: content.bags.toolbarSlots }, () => null),
     bag: null,

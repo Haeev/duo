@@ -46,6 +46,7 @@ export function fastMessage(world: WorldState, content: Content, ack: number): F
     tick: world.tick,
     ack,
     minutes: world.minutes,
+    place: world.common.place,
     players: [
       [a.body.x, a.body.y, a.body.facing, a.body.speed],
       [b.body.x, b.body.y, b.body.facing, b.body.speed],

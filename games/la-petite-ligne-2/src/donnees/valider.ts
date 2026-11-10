@@ -286,6 +286,44 @@ function checkLook(content: Content, look: Look, at: string, problems: string[])
 export function validateContent(content: Content): string[] {
   const problems: string[] = [];
   const { settings, needs, bags } = content;
+  const { catalogue, morphologies } = content;
+  const personnages = 'commun/personnages';
+  for (const shape of catalogue.shapes) {
+    const morphs = morphologies.shapes[shape.id]?.morphs;
+    if (morphs === undefined)
+      problems.push(
+        `${personnages}/morphologies.json: morphologie « ${shape.id} » du catalogue absente`,
+      );
+    // Chaque morphologie a une silhouette, femme ou homme: c'est elle que règle le genre du joueur.
+    else if (morphs.includes('f') === morphs.includes('m'))
+      problems.push(
+        `${personnages}/morphologies.json, ${shape.id}: une silhouette et une seule (f ou m)`,
+      );
+  }
+  for (const id of Object.keys(morphologies.shapes)) {
+    if (!catalogue.shapes.some((shape) => shape.id === id))
+      problems.push(`${personnages}/morphologies.json: morphologie « ${id} » absente du catalogue`);
+  }
+  for (const piece of catalogue.pieces) {
+    for (const region of piece.covers) {
+      if (!morphologies.regions.includes(region))
+        problems.push(`${personnages}/catalogue.json, ${piece.id}: région inconnue « ${region} »`);
+    }
+    const colors = morphologies.defaults[piece.id];
+    // Sans couleurs par défaut, une pièce prend la première couleur de chaque zone.
+    if (colors !== undefined && colors.length !== piece.zones.length)
+      problems.push(
+        `${personnages}/morphologies.json, ${piece.id}: ${colors.length} couleurs par défaut pour ${piece.zones.length} zones`,
+      );
+  }
+  for (const gender of ['f', 'm'] as const) {
+    const id = settings.start.shapes[gender];
+    const morphs = morphologies.shapes[id]?.morphs;
+    if (morphs === undefined)
+      problems.push(`commun/reglages.json: silhouette de départ inconnue « ${id} »`);
+    else if (!morphs.includes(gender))
+      problems.push(`commun/reglages.json: « ${id} » n'est pas une silhouette « ${gender} »`);
+  }
   if (!(settings.start.place in content.places))
     problems.push(`commun/reglages.json: lieu de départ inconnu « ${settings.start.place} »`);
   if (settings.movement.runSpeed < settings.movement.walkSpeed)

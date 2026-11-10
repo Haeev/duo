@@ -13,7 +13,13 @@ import { VillagerSchema, type VillagerDef } from './schemas/habitant';
 import { MapSchema, PlaceSchema, type MapDef, type PlaceDef } from './schemas/lieu';
 import { PropSchema, type PropDef } from './schemas/meuble';
 import { ItemSchema, type ItemDef } from './schemas/objets';
-import { CatalogueSchema, type Catalogue, type PieceDef } from './schemas/personnage';
+import {
+  CatalogueSchema,
+  MorphologiesSchema,
+  type Catalogue,
+  type Morphologies,
+  type PieceDef,
+} from './schemas/personnage';
 import { CatchSchema, type CatchDef } from './schemas/prise';
 import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
@@ -41,6 +47,8 @@ export interface Content {
   readonly bags: BagsFile;
   /** Catalogue des personnages (morphologies, peaux), et ses pièces par identifiant. */
   readonly catalogue: Catalogue;
+  /** Conventions partagées par le générateur de pièces et l'assemblage. */
+  readonly morphologies: Morphologies;
   readonly items: ById<ItemDef>;
   /** Meubles et éléments interactifs du décor. */
   readonly props: ById<PropDef>;
@@ -111,6 +119,12 @@ export function loadContent(files: Files): Content {
   const needs = parse(NeedsFileSchema, files, 'commun/besoins.json', problems);
   const bags = parse(BagsFileSchema, files, 'commun/sacs.json', problems);
   const catalogue = parse(CatalogueSchema, files, 'commun/personnages/catalogue.json', problems);
+  const morphologies = parse(
+    MorphologiesSchema,
+    files,
+    'commun/personnages/morphologies.json',
+    problems,
+  );
   const items = parseFolder(ItemSchema, files, 'commun/objets', problems);
   const props = parseFolder(PropSchema, files, 'commun/meubles', problems);
   const recipes = parseFolder(RecipeSchema, files, 'commun/recettes', problems);
@@ -139,7 +153,13 @@ export function loadContent(files: Files): Content {
     places[def.id] = { def, map, villagers, dialogues, shops, quests };
   }
 
-  if (settings === null || needs === null || bags === null || catalogue === null)
+  if (
+    settings === null ||
+    needs === null ||
+    bags === null ||
+    catalogue === null ||
+    morphologies === null
+  )
     throw new ContentError(problems);
   const pieces: Record<string, PieceDef> = {};
   for (const piece of catalogue.pieces) {
@@ -152,6 +172,7 @@ export function loadContent(files: Files): Content {
     needs,
     bags,
     catalogue,
+    morphologies,
     items,
     props,
     recipes,

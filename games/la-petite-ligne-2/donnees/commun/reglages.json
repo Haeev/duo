@@ -1,6 +1,17 @@
 {
   "schema": 1,
-  "start": { "place": "essai-gare", "minute": 600, "money": 20 },
+  "start": {
+    "place": "essai-gare",
+    "minute": 600,
+    "money": 20,
+    "shapes": {
+      "f": "adult-f-medium",
+      "m": "adult-m-medium"
+    }
+  },
+  "rest": {
+    "napPerMinute": 6
+  },
   "clock": {
     "secondsPerHour": 125,
     "dayStart": 360,
@@ -8,9 +19,42 @@
     "sleepFrom": 900,
     "seasonDays": 14
   },
-  "movement": { "walkSpeed": 3, "runSpeed": 5, "radius": 0.3, "accelSeconds": 0.15 },
-  "reach": { "action": 1.4, "aimHalfAngleDeg": 70 },
-  "gestures": { "maxSeconds": 1.5, "pickSeconds": 0.5, "eatSeconds": 1.2 },
-  "travel": { "clockHours": 2, "minSeconds": 20, "slowLoadSeconds": 30, "from": 360, "to": 1200 },
-  "dialogue": { "maxChars": 150, "charsPerSecond": 40, "maxOptions": 3 }
+  "movement": {
+    "walkSpeed": 3,
+    "runSpeed": 5,
+    "radius": 0.3,
+    "accelSeconds": 0.15,
+    "brakeSeconds": 0.1,
+    "deadzone": 0.1,
+    "cornerNudgeStep": 0.05,
+    "cornerNudgeMax": 0.35,
+    "stuckSeconds": 1,
+    "freeCellRadius": 8,
+    "standUpGap": 0.05
+  },
+  "reach": {
+    "action": 1.2,
+    "aimHalfAngleDeg": 50,
+    "aimDistanceWeight": 0.5
+  },
+  "gestures": {
+    "maxSeconds": 1.5,
+    "pickSeconds": 0.5,
+    "eatSeconds": 1.2,
+    "pickupClip": "pickup"
+  },
+  "travel": {
+    "clockHours": 2,
+    "minSeconds": 20,
+    "slowLoadSeconds": 30,
+    "from": 360,
+    "to": 1200,
+    "arrivalSpread": 0.8,
+    "arrivalSeconds": 1
+  },
+  "dialogue": {
+    "maxChars": 150,
+    "charsPerSecond": 40,
+    "maxOptions": 3
+  }
 }

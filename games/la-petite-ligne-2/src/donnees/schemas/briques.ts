@@ -3,6 +3,12 @@
  * données (`bricks`). Une chaise est « un meuble avec la brique s'asseoir », jamais un cas
  * particulier du moteur. Ajouter une brique: son schéma ici, son état dans `etat/briques.ts`, son
  * comportement dans `simulation/briques/`; ensuite tout contenu peut la déclarer sans code.
+ *
+ * Ne sont pas des briques: ramasser un objet au sol (`pickup`) et parler à un habitant (`talk`).
+ * Ces deux actions visent des entités de l'état qui ne sont pas des meubles et qu'aucune donnée
+ * de meuble ne déclare: elles restent des comportements d'entité du registre
+ * (`simulation/briques/registre.ts`, `ENTITY_BEHAVIOURS`). Un habitant parle parce qu'il a des
+ * dialogues; un objet au sol se ramasse parce qu'il est au sol.
  */
 import * as v from 'valibot';
 import { CountSchema, FiniteSchema, IdSchema, IntSchema, NeedIdSchema } from './communs';
@@ -75,6 +81,12 @@ export const BRICK_SCHEMAS = [
     tools: v.pipe(v.array(ToolKindSchema), v.minLength(1)),
     seconds: GestureSeconds,
   }),
+  /**
+   * Prendre le train: la portière ou le poteau du quai. Les destinations sont les `links` du lieu;
+   * il faut être deux à l'avoir validé pour partir (ADR 0018). C'est l'objet visible du voyage:
+   * pas de zone d'embarquement sans objet.
+   */
+  v.strictObject({ brick: v.literal('travel') }),
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);

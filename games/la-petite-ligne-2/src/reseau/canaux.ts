@@ -12,16 +12,26 @@ import type { Slice } from '../etat/monde';
 import { ProgressSchema } from '../etat/progression';
 import { IntentSchema, StepInputSchema } from '../simulation/noyau/entrees';
 import { GameEventSchema } from '../simulation/noyau/evenements';
+import {
+  PROGRESS_PART_BUDGET_BYTES,
+  PROGRESS_PART_CHANNEL,
+  ProgressPartSchema,
+} from './progression';
 
-/** Canaux (0 à 15), les mêmes chez les deux. Le canal 7 est réservé aux activités (pêche, mini-jeux). */
+/**
+ * Canaux (0 à 15), les mêmes chez les deux. Le canal 5 est libre: la progression ne part plus en
+ * tranche entière mais par différences et par morceaux, sur un canal fiable (`progression.ts`).
+ * Le canal 7 est réservé aux activités (pêche, mini-jeux).
+ */
 export const CHANNEL = {
   guestInput: 0,
   common: 1,
   fast: 2,
   events: 3,
   players: 4,
-  progress: 5,
   place: 6,
+  /** Fiable, schéma `ProgressPartSchema`. */
+  progressPart: PROGRESS_PART_CHANNEL,
 } as const;
 
 /** Budget de chaque message, en octets de JSON. Tenu par `tests/tailles.test.ts` et par l'hôte à l'envoi. */
@@ -31,8 +41,11 @@ export const BUDGET_BYTES = {
   fast: 3072,
   events: 4096,
   players: 8192,
+  /** Taille de la progression entière: plus un message, mais la borne de l'état (sauvegarde, test « au pire »). */
   progress: 32_768,
   place: 32_768,
+  /** Un morceau de progression. */
+  progressPart: PROGRESS_PART_BUDGET_BYTES,
 } as const;
 
 /** Une tranche lourde part au plus tous les N pas; « joueurs » et « commun » partent au pas même. */
@@ -63,6 +76,8 @@ export const FastSchema = v.strictObject({
   /** Dernière commande de l'invité jouée par l'hôte (réconciliation de la prédiction), -1 avant la première. */
   ack: v.pipe(IntSchema, v.minValue(-1)),
   minutes: FiniteSchema,
+  /** Lieu de ces positions: pendant un voyage, l'invité écarte un instantané d'un lieu qu'il n'a pas encore. */
+  place: IdSchema,
   players: v.tuple([MoverSchema, MoverSchema]),
   needs: v.tuple([GaugesSchema, GaugesSchema]),
   /** Habitants du lieu courant, dans l'ordre de ses données. */
@@ -87,3 +102,6 @@ export const SLICE_SCHEMAS = {
   place: v.strictObject({ tick: TickSchema, id: IdSchema, place: PlaceSlowSchema }),
 } as const;
 export type SliceMessage<S extends Slice> = v.InferOutput<(typeof SLICE_SCHEMAS)[S]>;
+
+/** La progression par morceaux (canal `progressPart`, fiable): schéma tenu par `progression.ts`. */
+export { ProgressPartSchema };
