@@ -1,0 +1,14 @@
+# Corps commun « homme ». Homme adulte: grand, voûté, petit ventre, grand nez.
+# Gabarit: copier ce fichier pour un nouveau corps (rig Meshy dans <dossier>/homme/marche.glb), lancer
+# `python3 scripts/construire.py --corps <dossier>` et régler les valeurs sur la planche `.travail/reperes-homme.png`.
+id = "homme"
+triangles = 2300      # triangles visibles (la coque d'encre double le compte)
+mains = 0.92          # échelle des mains autour du poignet (1 = tel que généré)
+pieds = 1.0           # échelle des pieds autour de la cheville
+tete = 0.84           # échelle de la tête autour de la base du crâne (viser 7 têtes; enfant 5,5)
+
+[visage]              # repères relevés sur le modelé de ce corps: le visage dessiné tombe sur le visage sculpté
+menton = 0.321        # du sommet du crâne au menton, en mètres, tête à l'échelle 1
+yeux = 0.33          # centre des yeux, fraction de la hauteur de tête depuis le sommet
+bouche = 0.74        # trait de la bouche, même unité
+ecart = 0.15         # demi-distance entre les yeux, fraction de la hauteur de tête

@@ -1,0 +1,20 @@
+{
+ "date": "2026-11-10",
+ "source": "scripts/scene.html (Three.js 0.187, Chromium SwiftShader, renderer.info), scripts/construire.py, tailles des fichiers",
+ "par_personnage": {
+  "triangles_visibles": { "corps": 2300, "coiffure": "172 (chignon) à 310 (tignasse)", "col": 56 },
+  "triangles_avec_coque_d_encre": { "maelle": 5190, "basile": 5220, "gaston": 5100, "odette": 4944, "lou": 5220, "plafond_bible": 6000 },
+  "appels_de_dessin": { "corps": 1, "tete": 1, "coiffure": 1, "col": "1 si la tenue a un col", "ombre_de_contact": 1, "coque_d_encre": 0, "passe_d_ombre": "3 ou 4", "remarque": "coiffure et col partagent l'atlas et le programme du corps: fusionnés à l'assemblage, il reste 2 appels plus l'ombre de contact (et 2 dans la passe d'ombre)" },
+  "textures": { "atlas_personnel": "512 x 512 RGBA, couleur plus hauteur, mipmaps fournis (1,4 Mo en mémoire)", "atlas_commun_des_traits": "512 x 128, partagé (0,35 Mo)", "carte_d_ombre": "2 048 x 2 048, une pour la vue (16 Mo, budget « ombres » de la bible)" },
+  "fichiers": { "corps_glb_avec_clips_sans_image": "148 à 153 Ko", "coiffure_glb": "7 à 13 Ko", "col_glb": "3 Ko", "atlas_png": "157 à 199 Ko", "niveaux_de_loin_png": "63 à 77 Ko" },
+  "proportions": { "hauteurs_m": { "femme": 1.638, "homme": 1.725, "costaud": 1.777, "agee": 1.521, "enfant": 1.271 }, "tetes": { "femme": 6.7, "homme": 6.4, "costaud": 7.1, "agee": 6.5, "enfant": 5.3 } }
+ },
+ "vue_du_jeu_50_degres": { "personnages": 5, "appels": 81, "triangles": 82855, "detail": "passe d'ombre comprise; dont 27 appels pour les masses de feuillage qui ne font que porter l'ombre de l'arbre (à instancier: 1 appel), 6 pour le décor instancié (pierres, touffes, piquets: 3 appels, 2 passes), 1 pour le sol" },
+ "programmes": { "encre": "4 variantes (corps, tête, décor instancié, sol)", "ombres": "ceux de Three.js", "passes_plein_ecran": 0 },
+ "couts": {
+  "un_vetement_de_plus": { "credits": 0, "triangles": 0, "appels": 0, "memoire": "0 (même atlas)", "minutes_machine": "2 s par atlas", "minutes_humaines": "10 à 20 (copier une fiche TOML, régler cotes et couleurs, regarder la planche)" },
+  "une_coiffure_de_plus": { "credits": 0, "minutes_machine": "3 s par corps", "minutes_humaines": "20 à 40" },
+  "un_corps_de_plus": { "credits": "13 (concept 3, image vers 3D sans texture 5, rig 5); compter un concept refait sur trois (3 de plus)", "minutes_machine": "2 (génération) + 25 s (conformation et occlusion)", "minutes_humaines": "20 à 30 (choix du concept, échelles, repères du visage sur la planche de réglage)" }
+ },
+ "credits_meshy": { "avant": 1969, "apres": 1895, "depense": 74, "budget": 150 }
+}

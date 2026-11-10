@@ -1,0 +1,259 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "corps communs de l'essai de style 4 (femme, homme, costaud, âgée, enfant)",
+ "game": "la-petite-ligne-2",
+ "family": "personnages",
+ "purpose": "essai: un corps commun par gabarit, parti d'une image de concept; tenues, visages et cheveux par fiches; non livré dans le jeu",
+ "outil": "Meshy, serveur MCP officiel 0.6.9, par docs/production/essais-meshy/scripts/meshy-mcp.mjs",
+ "date": "2026-11-10",
+ "author": "tech-artist",
+ "license": "offre payante du client: licence privée, propriété du client",
+ "sorties_brutes": "non versionnées (meshy_output/ hors dépôt, liens effacés 3 jours après la tâche)",
+ "inputs": [
+  {
+   "path": "costaud-concept.jpg",
+   "sha256": "bfcbcc838d1ce5bc3cf277dd1f20674aa433a257a7945fabd4d026420b17e277",
+   "auteur": "Meshy text-to-image (nano-banana), tâche 01a1c5c2-1fde-73f2-9572-9b56972b554c, réduite à 432 px"
+  },
+  {
+   "path": "agee-concept.jpg",
+   "sha256": "d200383eccd47f5b5f1530a28dfe73dc7bcc53e94d48d407986188f4a8a36ef2",
+   "auteur": "Meshy text-to-image (nano-banana), tâche 01a1c5c2-2e4a-7566-8d92-b981d16ff023, réduite à 432 px"
+  },
+  {
+   "path": "femme-concept.jpg",
+   "sha256": "ab855c3288af1865298c8a487c7efc124b56ccc04fb3aec01d485e5e333de307",
+   "auteur": "Meshy text-to-image (nano-banana), tâche 01a1c5c3-3a83-720c-825b-b5a2d5f93365, réduite à 432 px"
+  },
+  {
+   "path": "homme-concept.jpg",
+   "sha256": "94e3ad298b89ddf2c31fcdd0e83b327208a5451233dd63944885d8e9b26e6a25",
+   "auteur": "Meshy text-to-image (nano-banana), tâche 01a1c5c3-4004-713c-a332-0f367c7c2729, réduite à 432 px"
+  },
+  {
+   "path": "enfant-concept.jpg",
+   "sha256": "f0a806ba43f764cafd78933b358cb28bde7c6be89638fbf8e33c0c5b047f6b7f",
+   "auteur": "Meshy text-to-image (nano-banana), tâche 01a1c5c3-4757-707b-a3bc-2001d10f5791, réduite à 432 px"
+  }
+ ],
+ "solde": {
+  "avant": 1969,
+  "apres": 1895,
+  "depense_de_la_mission": 74,
+  "budget": 150,
+  "remarque": "le solde est commun au studio: l'écart peut inclure d'autres missions"
+ },
+ "tasks": [
+  {
+   "etape": "concept femme (écarté: fil de fer ou tête démesurée)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c2-06a4-72cd-97a8-25560618a419",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept homme (écarté: fil de fer ou tête démesurée)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c2-1235-72c6-8b00-1cef92a562b2",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept costaud (retenu)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c2-1fde-73f2-9572-9b56972b554c",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept agee (retenu)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c2-2e4a-7566-8d92-b981d16ff023",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept enfant (écarté: fil de fer ou tête démesurée)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c2-36d2-75ec-97ca-63a426e5a9ca",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept femme-b (retenu)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c3-3a83-720c-825b-b5a2d5f93365",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept homme-b (retenu)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c3-4004-713c-a332-0f367c7c2729",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "concept enfant-b (retenu)",
+   "outil": "meshy_text_to_image",
+   "task_id": "01a1c5c3-4757-707b-a3bc-2001d10f5791",
+   "params": {
+    "ai_model": "nano-banana",
+    "aspect_ratio": "3:4"
+   },
+   "credits": 3
+  },
+  {
+   "etape": "corps `femme` d'après le concept",
+   "outil": "meshy_image_to_3d",
+   "task_id": "01a1c5c4-090d-718b-8814-8dc930f51a27",
+   "params": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 3600,
+    "pose_mode": "a-pose",
+    "should_texture": false
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `femme`, rig et marche",
+   "outil": "meshy_rig",
+   "task_id": "01a1c5c5-2a03-71df-8f4b-cd6bd0376012",
+   "params": {
+    "height_meters": 1.66
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `homme` d'après le concept",
+   "outil": "meshy_image_to_3d",
+   "task_id": "01a1c5c4-14ff-77de-a432-973528894eac",
+   "params": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 3600,
+    "pose_mode": "a-pose",
+    "should_texture": false
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `homme`, rig et marche",
+   "outil": "meshy_rig",
+   "task_id": "01a1c5c5-430b-74ca-addd-8a062c035ff7",
+   "params": {
+    "height_meters": 1.78
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `costaud` d'après le concept",
+   "outil": "meshy_image_to_3d",
+   "task_id": "01a1c5c4-2177-7661-9802-1b72307f1f00",
+   "params": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 3600,
+    "pose_mode": "a-pose",
+    "should_texture": false
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `costaud`, rig et marche",
+   "outil": "meshy_rig",
+   "task_id": "01a1c5c5-6522-767d-8745-758c832eb658",
+   "params": {
+    "height_meters": 1.76
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `agee` d'après le concept",
+   "outil": "meshy_image_to_3d",
+   "task_id": "01a1c5c4-2d42-73d7-ab68-63d6ae30b8fd",
+   "params": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 3600,
+    "pose_mode": "a-pose",
+    "should_texture": false
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `agee`, rig et marche",
+   "outil": "meshy_rig",
+   "task_id": "01a1c5c5-8dcc-724d-b4dd-d38394555e69",
+   "params": {
+    "height_meters": 1.55
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `enfant` d'après le concept",
+   "outil": "meshy_image_to_3d",
+   "task_id": "01a1c5c4-39b5-7561-86a8-8b2b88df4ddc",
+   "params": {
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "target_polycount": 3600,
+    "pose_mode": "a-pose",
+    "should_texture": false
+   },
+   "credits": 5
+  },
+  {
+   "etape": "corps `enfant`, rig et marche",
+   "outil": "meshy_rig",
+   "task_id": "01a1c5c5-a4cf-70a6-9ce8-329e0f73278a",
+   "params": {
+    "height_meters": 1.3
+   },
+   "credits": 5
+  }
+ ],
+ "credits_total": 74,
+ "credits_budget": 150,
+ "consignes": {
+  "commun": "full body front view of a single character, stylized comic book video game character design, angular chiseled planar shapes like a carved wooden figurine, exaggerated characterful silhouette, gentle and funny, not heroic, not a warrior, {tetes}, completely bald smooth head with no hair and no hat, clearly visible neck, wearing a plain tight grey long-sleeve top with a simple round neckline and plain tight grey trousers flush to the body with no folds, simple chunky shoes, open hands with fingers together, hands only slightly larger than natural, A-pose with straight arms 40 degrees away from the body, legs slightly apart, symmetrical, neutral light grey background, flat even lighting, no cast shadow, no text",
+  "femme": "adult village woman in her thirties, long neck, narrow sloping shoulders, wide hips and strong thighs, pointed chin, long sharp nose, big feet, low-poly faceted look with hard flat planes, sturdy limbs with real thickness, thick calves and forearms, the head is large: exactly one seventh of the total height, full body front view of a single character, stylized comic book video game character design, angular chiseled planar shapes like a carved wooden figurine, exaggerated characterful silhouette, gentle and funny, not heroic, not a warrior, about seven heads tall, completely bald smooth head with no hair and no hat, clearly visible neck, wearing a plain tight grey long-sleeve top with a simple round neckline and plain tight grey trousers flush to the body with no folds, simple chunky shoes, open hands with fingers together, hands only slightly larger than natural, A-pose with straight arms 40 degrees away from the body, legs slightly apart, symmetrical, neutral light grey background, flat even lighting, no cast shadow, no text",
+  "homme": "tall adult man in his forties, long narrow face, big nose, big ears, small pot belly, slightly stooped, bony knees, long arms, low-poly faceted look with hard flat planes, sturdy limbs with real thickness, thick calves and forearms, the head is large: exactly one seventh of the total height, full body front view of a single character, stylized comic book video game character design, angular chiseled planar shapes like a carved wooden figurine, exaggerated characterful silhouette, gentle and funny, not heroic, not a warrior, about seven heads tall, completely bald smooth head with no hair and no hat, clearly visible neck, wearing a plain tight grey long-sleeve top with a simple round neckline and plain tight grey trousers flush to the body with no folds, simple chunky shoes, open hands with fingers together, hands only slightly larger than natural, A-pose with straight arms 40 degrees away from the body, legs slightly apart, symmetrical, neutral light grey background, flat even lighting, no cast shadow, no text",
+  "costaud": "sturdy barrel-chested adult village man, broad angular shoulders, short thick neck, big square jaw, small eyes, broken nose, short sturdy legs, medium-sized hands, full body front view of a single character, stylized comic book video game character design, angular chiseled planar shapes like a carved wooden figurine, exaggerated characterful silhouette, gentle and funny, not heroic, not a warrior, about seven heads tall, completely bald smooth head with no hair and no hat, clearly visible neck, wearing a plain tight grey long-sleeve top with a simple round neckline and plain tight grey trousers flush to the body with no folds, simple chunky shoes, open hands with fingers together, hands only slightly larger than natural, A-pose with straight arms 40 degrees away from the body, legs slightly apart, symmetrical, neutral light grey background, flat even lighting, no cast shadow, no text",
+  "agee": "small elderly grandmother, rounded hunched back, head pushed forward, plump pear-shaped body, thin legs, hooked nose, pointed chin, kind face, full body front view of a single character, stylized comic book video game character design, angular chiseled planar shapes like a carved wooden figurine, exaggerated characterful silhouette, gentle and funny, not heroic, not a warrior, about six and a half heads tall, completely bald smooth head with no hair and no hat, clearly visible neck, wearing a plain tight grey long-sleeve top with a simple round neckline and plain tight grey trousers flush to the body with no folds, simple chunky shoes, open hands with fingers together, hands only slightly larger than natural, A-pose with straight arms 40 degrees away from the body, legs slightly apart, symmetrical, neutral light grey background, flat even lighting, no cast shadow, no text",
+  "enfant": "child about nine years old, round cheeks, big ears, snub nose, knobbly knees, slightly large feet, low-poly faceted look with hard flat planes, sturdy limbs with real thickness, the head is only a little larger than natural: one fifth of the total height, full body front view of a single character, stylized comic book video game character design, angular chiseled planar shapes like a carved wooden figurine, exaggerated characterful silhouette, gentle and funny, not heroic, not a warrior, about five and a half heads tall, completely bald smooth head with no hair and no hat, clearly visible neck, wearing a plain tight grey long-sleeve top with a simple round neckline and plain tight grey trousers flush to the body with no folds, simple chunky shoes, open hands with fingers together, hands only slightly larger than natural, A-pose with straight arms 40 degrees away from the body, legs slightly apart, symmetrical, neutral light grey background, flat even lighting, no cast shadow, no text"
+ },
+ "conformity": {
+  "script": "../scripts/conformer_corps.py",
+  "fiches": "../gabarits/corps/*.toml",
+  "triangles_visibles": 2300,
+  "squelette": "duo-24 (rig Meshy, 24 os)",
+  "clips": [
+   "marche (Meshy)",
+   "repos (script)"
+  ]
+ },
+ "status": "essai"
+}

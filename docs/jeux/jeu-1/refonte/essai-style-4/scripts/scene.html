@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Essai de style 4: personnages encrés, denses, lisibles de haut</title>
+<style>body { margin: 0; background: #14110f; } canvas { display: block; }</style>
+<script type="importmap">
+{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+// Planche de l'essai 4 (style « bande dessinée encrée », bible 0.2, consignes du client du 2026-11-10).
+// Un nuanceur encré pour tout (personnages, décor instancié, sol): ombre teintée, hachures ancrées à l'objet et
+// d'épaisseur constante à l'écran, liseré clair côté soleil, ombre portée nette, relief tiré de la carte de
+// hauteur des atlas (canal alpha), coque d'encre cuite dans la géométrie, vignette dans le matériau.
+// Lisibilité: les niveaux de mip 2 et suivants des atlas sont des aplats sans trait; hachures et traits du
+// visage fondent avec la distance. `?vue=<nom>` rend une seule case en grand (réglages).
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+const ESSAI = '/docs/jeux/jeu-1/refonte/essai-style-4/';
+const ESSAI3 = '/docs/jeux/jeu-1/refonte/essai-style-3/';
+const params = new URLSearchParams(location.search);
+const W = innerWidth, H = innerHeight;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.autoClear = false;
+renderer.info.autoReset = false;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+
+// Un seul soleil: il donne la direction de la rampe et la carte d'ombre. Les tons viennent des uniformes.
+const sun = new THREE.DirectionalLight(0xffffff, 1);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 44 });
+sun.shadow.bias = -0.0005;
+sun.shadow.normalBias = 0.014;
+scene.add(sun, sun.target);
+
+const V3 = (r, g, b) => new THREE.Vector3(r, g, b);
+const AMBIANCES = {
+  jour: { fond: 0x1d2419, lit: V3(1.0, 0.95, 0.84), mul: V3(0.34, 0.29, 0.44), add: V3(0.004, 0.002, 0.010), rim: V3(0.30, 0.26, 0.12), dir: [-0.75, 1.0, 0.55], vig: 0.6, lampe: 0, encre: 0x1c1512 },
+  crepuscule: { fond: 0x2a1c2a, lit: V3(1.10, 0.66, 0.38), mul: V3(0.30, 0.20, 0.46), add: V3(0.022, 0.006, 0.040), rim: V3(0.55, 0.26, 0.06), dir: [-1.0, 0.42, -0.12], vig: 0.55, lampe: 0.35, encre: 0x1a1018 },
+  nuit: { fond: 0x0b0e18, lit: V3(0.30, 0.40, 0.66), mul: V3(0.085, 0.12, 0.27), add: V3(0.003, 0.006, 0.022), rim: V3(0.10, 0.16, 0.30), dir: [0.55, 1.0, 0.35], vig: 0.7, lampe: 1, encre: 0x070912 },
+};
+const U = {
+  uRes: { value: new THREE.Vector2(W, H) }, uView: { value: new THREE.Vector4(0, 0, W, H) }, uPx: { value: 3.0 },
+  uInk: { value: new THREE.Color(0x1c1512) }, uLit: { value: V3(1, 1, 1) }, uShadeMul: { value: V3(0.4, 0.4, 0.6) },
+  uShadeAdd: { value: V3(0, 0, 0) }, uRim: { value: V3(0.2, 0.2, 0.1) }, uVig: { value: 0.3 },
+  uDetail: { value: 1 }, uHatchPx: { value: 5.0 }, uBias: { value: -1.0 },
+  uLampPos: { value: V3(0, 0, 0) }, uLampCol: { value: V3(2.1, 1.3, 0.55) }, uLampR: { value: 3.6 }, uLampOn: { value: 0 },
+};
+const LAMPE = new THREE.Vector3(1.9, 1.55, 1.05);   // lanterne du piquet, au bord du chemin
+function setAmbiance(name) {
+  const a = AMBIANCES[name];
+  sun.position.set(...a.dir).normalize().multiplyScalar(18);
+  scene.background = new THREE.Color(a.fond);
+  U.uInk.value.set(a.encre);
+  U.uLit.value.copy(a.lit); U.uShadeMul.value.copy(a.mul); U.uShadeAdd.value.copy(a.add); U.uRim.value.copy(a.rim);
+  U.uVig.value = a.vig; U.uLampOn.value = a.lampe;
+  if (lanternGlass) lanternGlass.material.color.set(a.lampe > 0.2 ? 0xffe2a0 : 0x8a7a55);
+  if (halo) { halo.visible = a.lampe > 0.2; halo.material.opacity = 0.5 * a.lampe; }
+  for (const m of canopy) m.visible = name === 'jour';   // soleil rasant ou lune: l'ombre de l'arbre sort du cadre
+}
+let lanternGlass = null, halo = null;
+const canopy = [];
+
+// ---------------------------------------------------------------- nuanceur encré
+// variante: 'corps' (peau du squelette, relief), 'tete' (plus les traits du visage), 'decor' (instancié, normale
+// de coque à part), 'sol' (sans coque). Un programme par variante.
+const ENCRE_GLSL = /* glsl */`
+  uniform vec3 uInk, uLit, uShadeMul, uShadeAdd, uRim, uLampPos, uLampCol;
+  uniform float uVig, uDetail, uHatchPx, uLampR, uLampOn, uHatch;
+  uniform vec4 uView;
+  vec3 encre(vec3 albedo, vec3 N, vec3 V, vec3 L, float sh, vec3 vpos, vec2 anchor, float ground) {
+    float ndl = dot(N, L);
+    float lit = smoothstep(0.10, 0.13, ndl) * sh;
+    vec3 cl = albedo * uLit;
+    // Ombre teintée: la teinte glisse vers la couleur d'ombre du lieu, la matière garde sa saturation.
+    vec3 cs = albedo * uShadeMul + uShadeAdd * (0.4 + albedo * 2.0);
+    vec3 c = mix(cs, cl, lit);
+    vec2 q = gl_FragCoord.xy - anchor;
+    if (ground < 0.5) {
+      // Troisième ton: le creux de l'ombre, plus dense.
+      float deep = smoothstep(-0.50, -0.54, ndl);
+      c = mix(c, cs * 0.66, deep * (1.0 - lit));
+      // Hachures: ancrées à l'objet (elles le suivent sans glisser), pas constant à l'écran.
+      float h1 = fract((q.x + q.y * 0.85) / uHatchPx);
+      float pen = 1.0 - smoothstep(0.13, 0.27, ndl);
+      c = mix(c, cs, step(h1, 0.5 * pen) * lit * uDetail * uHatch);
+      float h2 = fract((q.x - q.y * 0.85) / uHatchPx);
+      float dp = smoothstep(-0.45, -0.9, ndl);
+      c = mix(c, uInk, step(h2, 0.30 * dp) * (1.0 - lit) * uDetail * uHatch * 0.85);
+      // Liseré clair: seulement du côté du soleil, sinon halo autour des mains.
+      float fres = 1.0 - max(dot(N, V), 0.0);
+      c += uRim * step(0.70, fres) * step(0.32, ndl) * sh;
+    }
+    // Lanterne: flaque à deux anneaux nets, qui éclaire aussi les volumes tournés vers elle.
+    vec3 dl = uLampPos - vpos;
+    float dist = length(dl);
+    float nl2 = ground > 0.5 ? 1.0 : step(0.05, dot(N, dl / dist));
+    float wob = sin(atan(dl.z, dl.x) * 7.0) * 0.05 + sin(atan(dl.z, dl.x) * 3.0 + 1.0) * 0.06;
+    float k1 = step(dist, uLampR * (1.0 + wob)) * nl2 * uLampOn;
+    float k2 = step(dist, uLampR * (0.56 + wob * 0.6)) * nl2 * uLampOn;
+    c = mix(c, max(c, albedo * uLampCol * 0.45), k1);
+    c = mix(c, max(c, albedo * uLampCol), k2);
+    vec2 p = (gl_FragCoord.xy - uView.xy) / uView.zw - 0.5;
+    float v = smoothstep(0.18, 0.66, length(p * vec2(0.92, 1.0)));
+    return c * (1.0 - uVig * v);
+  }`;
+function inkMaterial({ map = null, variante = 'corps', traits = null, push = 0, color = 0xffffff }) {
+  const m = new THREE.MeshToonMaterial({ map, color });
+  const perso = variante === 'corps' || variante === 'tete';
+  const hull = variante !== 'sol';
+  const relief = perso && map;
+  m.userData.push = { value: push };
+  m.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, U);
+    sh.uniforms.traitsMap = { value: traits?.map ?? null };
+    sh.uniforms.uCell = traits?.cell ?? { value: 0 };
+    sh.uniforms.uPush = m.userData.push;
+    sh.uniforms.uHatch = { value: variante === 'tete' ? 0 : 1 };   // pas de hachures sur les visages: ils restent nets
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', `#include <common>
+        attribute float aOutline; attribute vec2 traitsUv; attribute vec3 aHullN;
+        varying float vOutline; varying vec2 vTraits; flat varying vec2 vAnchor;
+        uniform vec2 uRes; uniform float uPx; uniform float uPush; uniform vec4 uView;
+        ${relief ? 'uniform sampler2D map;' : ''}`)
+      .replace('#include <uv_vertex>', `#include <uv_vertex>
+        vOutline = aOutline; vTraits = traitsUv;`)
+      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        ${relief ? 'transformed += normalize(objectNormal) * (textureLod(map, uv, 0.0).a - 0.44) * uPush;' : ''}`)
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        vec4 org = vec4(0.0, 0.0, 0.0, 1.0);
+        #ifdef USE_INSTANCING
+          org = instanceMatrix * org;
+        #endif
+        org = projectionMatrix * modelViewMatrix * org;
+        vAnchor = uView.xy + (org.xy / org.w * 0.5 + 0.5) * uView.zw;
+        ${hull ? `if (aOutline > 0.5) {
+          ${variante === 'decor' ? `vec3 hn = aHullN;
+          #ifdef USE_INSTANCING
+            hn = mat3(instanceMatrix) * hn;
+          #endif
+          hn = normalMatrix * hn;` : 'vec3 hn = transformedNormal;'}
+          vec2 n2 = normalize((projectionMatrix * vec4(hn, 0.0)).xy + 1e-5);
+          // Trait un peu irrégulier (80 à 120 %), lié au corps: il ne grouille pas.
+          float k = 0.8 + 0.4 * (0.5 + 0.5 * sin(position.x * 0.31 + position.y * 0.17) * sin(position.z * 0.23 - position.y * 0.11 + 1.7));
+          gl_Position.xy += n2 * uPx * k * 2.0 / uRes * gl_Position.w;
+        }` : ''}`);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying float vOutline; varying vec2 vTraits; flat varying vec2 vAnchor;
+        uniform sampler2D traitsMap; uniform float uCell; uniform float uBias;
+        ${ENCRE_GLSL}`)
+      .replace('#include <shadowmap_pars_fragment>', '#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>')
+      .replace('#include <map_fragment>', `
+        float hRelief = 0.5;
+        #ifdef USE_MAP
+          vec4 sampledDiffuseColor = texture2D(map, vMapUv, ${perso ? 'uBias' : '0.0'});
+          diffuseColor.rgb *= sampledDiffuseColor.rgb;
+          hRelief = sampledDiffuseColor.a;
+        #endif
+        ${traits ? `if (vTraits.x > 0.0 && vTraits.x < 1.0 && vTraits.y > 0.0 && vTraits.y < 1.0) {
+          vec4 t = texture2D(traitsMap, vec2((vTraits.x + uCell) / 4.0, vTraits.y));
+          diffuseColor.rgb = mix(diffuseColor.rgb, t.rgb, t.a * uDetail);
+        }` : ''}`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+        ${relief ? `{
+          // Relief: la carte de hauteur de l'atlas (1 = 2 cm) incline la normale, donc la rampe à tons francs.
+          vec3 sx = dFdx(-vViewPosition), sy = dFdy(-vViewPosition);
+          vec3 r1 = cross(sy, normal), r2 = cross(normal, sx);
+          float det = dot(sx, r1);
+          vec3 grad = sign(det) * (dFdx(hRelief) * r1 + dFdy(hRelief) * r2);
+          normal = normalize(abs(det) * normal - 0.036 * grad);
+        }` : ''}`)
+      .replace('#include <opaque_fragment>', `
+        #if NUM_DIR_LIGHTS > 0
+          vec3 sunDir = directionalLights[0].direction;
+        #else
+          vec3 sunDir = vec3(0.0, 1.0, 0.0);
+        #endif
+        outgoingLight = encre(diffuseColor.rgb, normal, normalize(vViewPosition), sunDir, smoothstep(0.40, 0.60, getShadowMask()), -vViewPosition, vAnchor, ${variante === 'sol' ? '1.0' : '0.0'});
+        if (vOutline > 0.5) outgoingLight = uInk;
+        #include <opaque_fragment>`);
+  };
+  m.customProgramCacheKey = () => `encre-${variante}-${relief ? 'r' : ''}${traits ? 't' : ''}`;
+  return m;
+}
+
+// Coque cuite: sommets doublés (aOutline = 1), triangles retournés; aucun appel de dessin en plus.
+function bakeOutline(geo, hullNormals = null) {
+  const n = geo.attributes.position.count;
+  const out = new THREE.BufferGeometry();
+  for (const [name, attr] of Object.entries(geo.attributes)) {
+    const a = new attr.array.constructor(attr.array.length * 2);
+    a.set(attr.array); a.set(attr.array, attr.array.length);
+    out.setAttribute(name, new THREE.BufferAttribute(a, attr.itemSize, attr.normalized));
+  }
+  const flag = new Float32Array(n * 2); flag.fill(1, n);
+  out.setAttribute('aOutline', new THREE.BufferAttribute(flag, 1));
+  const t = geo.attributes.uv1 ? geo.attributes.uv1.array : new Float32Array(n * 2).fill(-4);
+  const tu = new Float32Array(n * 4); tu.set(t); tu.fill(-4, n * 2);
+  out.setAttribute('traitsUv', new THREE.BufferAttribute(tu, 2));
+  const hn = new Float32Array(n * 6);
+  const src = hullNormals ?? geo.attributes.normal.array;
+  hn.set(src); hn.set(src, n * 3);
+  out.setAttribute('aHullN', new THREE.BufferAttribute(hn, 3));
+  const idx = geo.index ? geo.index.array : [...Array(n).keys()];
+  const res = [];
+  for (let i = 0; i < idx.length; i += 1) res.push(idx[i]);
+  for (let i = 0; i < idx.length; i += 3) res.push(idx[i] + n, idx[i + 2] + n, idx[i + 1] + n);
+  out.setIndex(res);
+  out.boundingSphere = geo.boundingSphere?.clone() ?? null;
+  out.boundingBox = geo.boundingBox?.clone() ?? null;
+  return out;
+}
+
+// ---------------------------------------------------------------- textures
+const loader = new GLTFLoader();
+const BMP = { premultiplyAlpha: 'none', colorSpaceConversion: 'none' };
+// Atlas d'un personnage. Avec `efface`, les niveaux de mip viennent du fichier `.loin.png`: niveau 1 à mi-détail,
+// niveaux 2 et suivants en aplats sans trait. Sans, mipmaps ordinaires (pour comparer).
+async function loadAtlas(url, efface) {
+  const l0 = await createImageBitmap(await (await fetch(url)).blob(), BMP);
+  const tex = new THREE.Texture(l0);
+  tex.flipY = false; tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearMipmapLinearFilter; tex.magFilter = THREE.LinearFilter;
+  if (efface) {
+    const far = await (await fetch(url.replace('.png', '.loin.png'))).blob();
+    const levels = [l0, await createImageBitmap(far, 0, 0, 256, 256, BMP), await createImageBitmap(far, 256, 0, 128, 128, BMP)];
+    for (let s = 64; s >= 1; s /= 2) levels.push(await createImageBitmap(far, 256, 0, 128, 128, { ...BMP, resizeWidth: s, resizeHeight: s, resizeQuality: 'high' }));
+    tex.mipmaps = levels; tex.generateMipmaps = false;
+  }
+  tex.needsUpdate = true;
+  return tex;
+}
+const cache = {};
+async function glb(url) { cache[url] ??= loader.loadAsync(url); return cache[url]; }
+const traitsTex = await new Promise((ok) => new THREE.TextureLoader().load(ESSAI + 'atlas/traits.png', (t) => { t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; ok(t); }));
+
+// ---------------------------------------------------------------- personnages
+const contactGeo = (() => {
+  // Ombre de contact: un aplat d'encre à bord net, un peu irrégulier (polygone à 11 côtés).
+  const s = new THREE.Shape();
+  for (let k = 0; k < 11; k += 1) { const a = (k / 11) * Math.PI * 2; const r = 1 + 0.12 * Math.sin(k * 2.3); s[k ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r * 0.72); }
+  return new THREE.ShapeGeometry(s);
+})();
+const contactMat = new THREE.MeshBasicMaterial({ color: 0x0d0a0c, transparent: true, opacity: 0.62, depthWrite: false });
+async function personnage({ corps, atlas, coiffure, col = false, expression = 0, efface = true }) {
+  const g = await glb(ESSAI + `modeles/${corps}.glb`);
+  const root = SkeletonUtils.clone(g.scene);
+  const map = await loadAtlas(ESSAI + atlas, efface);
+  const cell = { value: expression };
+  let tris = 0, headBone = null, chestBone = null, height = 0, scaleW = 1;
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    if (!o.isSkinnedMesh) return;
+    o.geometry.computeBoundingBox();
+    height = Math.max(height, o.geometry.boundingBox.max.y, o.geometry.boundingBox.max.z);
+    scaleW = 1;
+  });
+  // Poussée des sommets par le relief: 2,6 cm pour la hauteur pleine (le maillage exporté est en mètres).
+  const push = 0.026 / scaleW;
+  const matCorps = inkMaterial({ map, variante: 'corps', push });
+  const matTete = inkMaterial({ map, variante: 'tete', traits: { map: traitsTex, cell }, push: push * 0.4 });
+  const matCheveux = inkMaterial({ map, variante: 'corps', push: 0 });
+  root.traverse((o) => {
+    if (o.isBone && o.name === 'Head') headBone = o;
+    if (o.isBone && o.name === 'Spine') chestBone = o;
+    if (o.isSkinnedMesh) {
+      o.geometry = bakeOutline(o.geometry);
+      o.material = o.material.name === 'tete' ? matTete : matCorps;
+      o.frustumCulled = false; o.castShadow = true; o.receiveShadow = true;
+      tris += o.geometry.index.count / 3;
+    }
+  });
+  const holder = new THREE.Group();
+  holder.add(root);
+  if (coiffure) {
+    const h = await glb(ESSAI + `modeles/${corps}-${coiffure}.glb`);
+    const hair = h.scene.clone(true);
+    hair.traverse((o) => { if (o.isMesh) { o.geometry = bakeOutline(o.geometry); o.material = matCheveux; o.castShadow = true; o.receiveShadow = true; tris += o.geometry.index.count / 3; } });
+    headBone.attach(hair);
+  }
+  if (col) {
+    // Col en volume: une pièce commune, posée sur chaque corps, qui suit la poitrine.
+    const h = await glb(ESSAI + `modeles/${corps}-col.glb`);
+    const piece = h.scene.clone(true);
+    piece.traverse((o) => { if (o.isMesh) { o.geometry = bakeOutline(o.geometry); o.material = matCheveux; o.castShadow = true; tris += o.geometry.index.count / 3; } });
+    chestBone.attach(piece);
+  }
+  const blob = new THREE.Mesh(contactGeo, contactMat);
+  blob.rotation.x = -Math.PI / 2; blob.position.y = 0.012; blob.scale.setScalar(corps === 'costaud' ? 0.36 : corps === 'enfant' ? 0.22 : 0.27);
+  blob.renderOrder = 2;
+  holder.add(blob);
+  scene.add(holder);
+  const mixer = new THREE.AnimationMixer(root);
+  const clips = Object.fromEntries(g.animations.map((a) => [a.name, a]));
+  const api = {
+    holder, tris, cell, height, corps,
+    pose(name, t = 0) {
+      mixer.stopAllAction(); const c = clips[name]; if (c) { mixer.clipAction(c).play(); mixer.setTime(t); } holder.updateMatrixWorld(true);
+    },
+    head() { holder.updateMatrixWorld(true); return headBone.getWorldPosition(new THREE.Vector3()); },
+    at(x, z, ry, clip = 'repos', t = 0) { holder.position.set(x, 0, z); holder.rotation.y = ry; api.pose(clip, t); },
+  };
+  return api;
+}
+
+// ---------------------------------------------------------------- sol et décor en volume
+// Le chemin serpente: sa ligne médiane en mètres (la texture du sol et les pierres posées en volume la suivent).
+const TUILE = 8;
+const pathZ = (x) => { const u = ((((x + 12) / TUILE) % 1) + 1) % 1; return 1.55 + (45 * Math.sin(2 * Math.PI * u) + 18 * Math.sin(4 * Math.PI * u + 1)) * (TUILE / 1024); };
+function paintGround() {
+  // Dessin à plat seulement (aplats, touffes en V, ornières): tout ce qui a un volume est posé en 3D.
+  const c = document.createElement('canvas');
+  c.width = c.height = 1024;
+  const g = c.getContext('2d');
+  let seed = 23;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const pal = { herbe: ['#74853F', '#566A33', '#3B4B27', '#27341F'], terre: ['#A88F5E', '#8A7048', '#5F4A33'], encre: '#1F1814' };
+  const py = (x) => { const z = pathZ(-12 + (x / 1024) * TUILE); return ((z + 12) % TUILE) / TUILE * 1024; };
+  const poly = (x, y, r, n, sq, col) => {
+    // Chaque plaque est redessinée sur les tuiles voisines: le motif boucle sans coupure.
+    const rs = []; for (let a = 0; a < n; a += 1) rs.push(r * (0.62 + rnd() * 0.5));
+    g.fillStyle = col;
+    for (const ox of [-1024, 0, 1024]) for (const oy of [-1024, 0, 1024]) { g.beginPath(); rs.forEach((rr, a) => g.lineTo(x + ox + Math.cos((a / n) * 6.283) * rr, y + oy + Math.sin((a / n) * 6.283) * rr * sq)); g.fill(); }
+  };
+  g.fillStyle = pal.herbe[1]; g.fillRect(0, 0, 1024, 1024);
+  for (let k = 0; k < 9; k += 1) poly(rnd() * 1024, rnd() * 1024, 110 + rnd() * 120, 9, 0.7, pal.herbe[2]);
+  for (let k = 0; k < 9; k += 1) poly(rnd() * 1024, rnd() * 1024, 30 + rnd() * 60, 7, 0.65, pal.herbe[0]);
+  for (let k = 0; k < 6; k += 1) poly(rnd() * 1024, rnd() * 1024, 40 + rnd() * 50, 7, 0.6, pal.herbe[3]);
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  const path = (dy = 0) => { g.beginPath(); for (let x = -40; x <= 1064; x += 8) g.lineTo(x, py(x) + dy); };
+  g.strokeStyle = pal.herbe[3]; g.lineWidth = 232; path(4); g.stroke();
+  g.strokeStyle = pal.terre[1]; g.lineWidth = 196; path(); g.stroke();
+  g.strokeStyle = pal.terre[0]; g.lineWidth = 86; path(-8); g.stroke();
+  g.strokeStyle = pal.terre[2]; g.lineWidth = 16; path(74); g.stroke();
+  // Ornières: deux traits d'encre interrompus qui suivent le chemin.
+  g.strokeStyle = pal.encre; g.lineWidth = 3.2;
+  for (const dy of [-34, 38]) for (let x = rnd() * 60; x < 1024; x += 70 + rnd() * 90) { g.beginPath(); for (let t = 0; t < 34 + rnd() * 40; t += 6) g.lineTo(x + t, py(x + t) + dy + Math.sin(t * 0.2) * 1.5); g.stroke(); }
+  g.restore();
+  // Touffes en V à l'encre, par grappes (jamais sur le chemin), denses dans les plaques sombres.
+  g.strokeStyle = pal.encre; g.lineCap = 'round';
+  for (let k = 0; k < 26; k += 1) {
+    const cx = 60 + rnd() * 900, cy = 60 + rnd() * 900;
+    for (let j = 0; j < 4 + rnd() * 4; j += 1) {
+      const x = cx + (rnd() - 0.5) * 90, y = cy + (rnd() - 0.5) * 60;
+      if (Math.abs(y - py(x)) < 124 || Math.abs(y - py(x) - 1024) < 124 || Math.abs(y - py(x) + 1024) < 124) continue;
+      const s = 7 + rnd() * 6;
+      g.lineWidth = 3.0 + rnd() * 1.4;
+      g.beginPath(); g.moveTo(x - s * 0.7, y - s); g.lineTo(x, y); g.lineTo(x + s * 0.6, y - s * 1.1); g.stroke();
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(24 / TUILE, 24 / TUILE); t.anisotropy = 8;
+  return t;
+}
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(24, 24), inkMaterial({ map: paintGround(), variante: 'sol' }));
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
+scene.add(ground);
+
+let seedD = 5;
+const rd = () => ((seedD = (seedD * 16807) % 2147483647) / 2147483647);
+const decorMat = inkMaterial({ variante: 'decor' });
+function instanced(geo, hullN, items) {
+  const mesh = new THREE.InstancedMesh(bakeOutline(geo, hullN), decorMat, items.length);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color();
+  items.forEach((it, i) => {
+    q.setFromEuler(new THREE.Euler(it.rx ?? 0, it.ry ?? 0, it.rz ?? 0));
+    m.compose(new THREE.Vector3(it.x, it.y ?? 0, it.z), q, new THREE.Vector3(it.sx, it.sy, it.sz ?? it.sx));
+    mesh.setMatrixAt(i, m); mesh.setColorAt(i, col.set(it.c));
+  });
+  mesh.castShadow = true; mesh.receiveShadow = true; mesh.frustumCulled = false;
+  scene.add(mesh);
+  return mesh;
+}
+{
+  // Pierre: icosaèdre cabossé à facettes franches (normales plates), coque le long du rayon (pas de fente).
+  const ico = new THREE.IcosahedronGeometry(1, 0).toNonIndexed();
+  const p = ico.attributes.position;
+  const jit = new Map();
+  for (let i = 0; i < p.count; i += 1) {
+    const key = [p.getX(i), p.getY(i), p.getZ(i)].map((v) => v.toFixed(3)).join();
+    if (!jit.has(key)) jit.set(key, 0.78 + rd() * 0.45);
+    const k = jit.get(key);
+    p.setXYZ(i, p.getX(i) * k, Math.max(p.getY(i) * k * 0.75, -0.25), p.getZ(i) * k);
+  }
+  ico.computeVertexNormals();
+  const hull = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i += 1) { const v = new THREE.Vector3(p.getX(i), p.getY(i), p.getZ(i)).normalize(); hull.set([v.x, v.y, v.z], i * 3); }
+  const PIERRE = [0xa59a84, 0x8b8272, 0x736b60, 0x968d7c];
+  const stones = [];
+  // Pierres de bordure: elles tiennent le bord du chemin, par petits groupes, plus grosses dans les courbes.
+  for (let x = -11.5; x < 11.5; x += 0.28 + rd() * 0.5) {
+    if (rd() < 0.42) continue;
+    const side = rd() > 0.5 ? 1 : -1;
+    const s = 0.085 + rd() * 0.11;
+    stones.push({ x, z: pathZ(x) + side * (0.80 + rd() * 0.08), y: s * 0.12, sx: s * (1 + rd() * 0.5), sy: s * (0.7 + rd() * 0.4), sz: s, ry: rd() * 6.3, c: PIERRE[Math.floor(rd() * 4)] });
+  }
+  // Cailloux: semés sur la terre du chemin, hors des ornières.
+  for (let k = 0; k < 70; k += 1) {
+    const x = -11 + rd() * 22; const s = 0.022 + rd() * 0.03;
+    stones.push({ x, z: pathZ(x) + (rd() - 0.5) * 1.2, y: s * 0.3, sx: s * 1.3, sy: s * 0.8, sz: s, ry: rd() * 6.3, c: PIERRE[Math.floor(rd() * 4)] });
+  }
+  // Deux rochers: un repère dans le pré, un autre de l'autre côté du chemin.
+  stones.push({ x: -2.6, z: -1.3, y: 0.05, sx: 0.42, sy: 0.3, sz: 0.34, ry: 0.6, c: 0x8b8272 }, { x: -2.25, z: -1.05, y: 0.02, sx: 0.2, sy: 0.15, sz: 0.2, ry: 2, c: 0xa59a84 }, { x: 3.4, z: 2.9, y: 0.04, sx: 0.36, sy: 0.24, sz: 0.3, ry: 1.2, c: 0x736b60 });
+  instanced(ico, hull, stones);
+
+  // Touffe haute: sept brins en pyramide à trois pans, pliés, qui s'écartent du pied.
+  const pos = [], hn = [];
+  for (let b = 0; b < 7; b += 1) {
+    const a = (b / 7) * 6.283 + rd(), lean = 0.25 + rd() * 0.45, hgt = 0.7 + rd() * 0.5, w = 0.085;
+    const dir = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
+    const base = dir.clone().multiplyScalar(0.07);
+    const mid = base.clone().addScaledVector(dir, lean * 0.3).setY(hgt * 0.55);
+    const tip = base.clone().addScaledVector(dir, lean).setY(hgt);
+    const ring = (c, r) => [0, 1, 2].map((k) => { const t = a + 1.57 + (k / 3) * 6.283; return c.clone().add(new THREE.Vector3(Math.cos(t) * r, 0, Math.sin(t) * r)); });
+    const r0 = ring(base, w), r1 = ring(mid, w * 0.7);
+    const tri = (p0, p1, p2, c0, c1, c2) => { for (const [pp, cc] of [[p0, c0], [p1, c1], [p2, c2]]) { pos.push(pp.x, pp.y, pp.z); const n = pp.clone().sub(cc).setY(0); if (n.lengthSq() < 1e-8) n.copy(dir).setY(0.6); n.normalize(); hn.push(n.x, n.y, n.z); } };
+    for (let k = 0; k < 3; k += 1) {
+      const k2 = (k + 1) % 3;
+      tri(r0[k], r1[k], r0[k2], base, mid, base); tri(r0[k2], r1[k], r1[k2], base, mid, mid); tri(r1[k], tip, r1[k2], mid, tip, mid);
+    }
+  }
+  const tuft = new THREE.BufferGeometry();
+  tuft.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  tuft.computeVertexNormals();
+  const HERBE = [0x7e9044, 0x5f7636, 0x90a050, 0x4d632f];
+  const tufts = [];
+  // Touffes hautes: en lisière du chemin (là où on ne marche pas) et par bouquets dans le pré.
+  for (let x = -11.5; x < 11.5; x += 0.5 + rd() * 0.9) {
+    const side = rd() > 0.5 ? 1 : -1; const s = 0.2 + rd() * 0.16;
+    tufts.push({ x, z: pathZ(x) + side * (0.98 + rd() * 0.25), sx: s, sy: s * (0.8 + rd() * 0.5), ry: rd() * 6.3, c: HERBE[Math.floor(rd() * 4)] });
+  }
+  for (let k = 0; k < 16; k += 1) {
+    const cx = -9 + rd() * 18, cz = -8 + rd() * 7.5;
+    if (Math.abs(cx + 0.2) < 2.6 && Math.abs(cz) < 1.6) continue;   // le pré où se tiennent les personnages reste dégagé
+    for (let j = 0; j < 2 + rd() * 3; j += 1) { const s = 0.18 + rd() * 0.2; tufts.push({ x: cx + (rd() - 0.5) * 0.7, z: cz + (rd() - 0.5) * 0.6, sx: s, sy: s * (0.8 + rd() * 0.6), ry: rd() * 6.3, c: HERBE[Math.floor(rd() * 4)] }); }
+  }
+  instanced(tuft, new Float32Array(hn), tufts);
+
+  // Piquets de clôture le long du chemin (côté pré), un peu de guingois; le grand porte la lanterne.
+  const cyl = new THREE.CylinderGeometry(0.75, 1, 1, 6, 1).toNonIndexed(); cyl.translate(0, 0.5, 0); cyl.computeVertexNormals();
+  const cp = cyl.attributes.position; const ch = new Float32Array(cp.count * 3);
+  for (let i = 0; i < cp.count; i += 1) { const v = new THREE.Vector3(cp.getX(i), (cp.getY(i) - 0.5) * 0.6, cp.getZ(i)).normalize(); ch.set([v.x, v.y, v.z], i * 3); }
+  const posts = [];
+  for (let x = -10.5; x < 11; x += 1.5) { if (Math.abs(x - LAMPE.x) < 0.7) continue; posts.push({ x, z: pathZ(x) - 1.12, sx: 0.05 + rd() * 0.012, sy: 0.72 + rd() * 0.16, rz: (rd() - 0.5) * 0.16, rx: (rd() - 0.5) * 0.12, ry: rd() * 3, c: rd() > 0.5 ? 0x6e5238 : 0x5a4330 }); }
+  posts.push({ x: LAMPE.x, z: LAMPE.z, sx: 0.06, sy: LAMPE.y - 0.16, ry: 0.4, c: 0x4f3a2a });
+  posts.push({ x: LAMPE.x, z: LAMPE.z, y: LAMPE.y + 0.14, sx: 0.15, sy: 0.07, ry: 0.4, c: 0x2e2622 });   // chapeau de la lanterne
+  posts.push({ x: LAMPE.x, z: LAMPE.z, y: LAMPE.y - 0.17, sx: 0.12, sy: 0.04, ry: 0.4, c: 0x2e2622 });   // socle
+  instanced(cyl, ch, posts);
+  lanternGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.07, 0.28, 6), new THREE.MeshBasicMaterial({ color: 0x8a7a55 }));
+  lanternGlass.position.copy(LAMPE);
+  scene.add(lanternGlass);
+  // Halo: un disque à bord net, additif, toujours face à la caméra.
+  halo = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xffb45a, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.5 }));
+  halo.scale.setScalar(0.62); halo.position.copy(LAMPE); halo.visible = false;
+  scene.add(halo);
+}
+
+// Ombre d'un grand arbre hors champ (au nord-ouest du pré): des masses de feuillage qui ne font que porter
+// leur ombre. Le jour devient dense, avec des flaques de soleil où se tiennent les personnages.
+{
+  const leaf = new THREE.IcosahedronGeometry(1, 0);
+  let sc = 77; const rc = () => ((sc = (sc * 16807) % 2147483647) / 2147483647);
+  const mat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+  const blobs = [];
+  // Deux houppiers: une grosse masse au coeur, des touffes plus petites en couronne (bord d'ombre découpé).
+  for (const [cx, cy, cz, R] of [[-10.4, 6.4, 0.4, 3.4]]) {
+    blobs.push([cx, cy, cz, R * 0.62]);
+    for (let k = 0; k < 26; k += 1) { const a = rc() * 6.283, d = R * (0.45 + rc() * 0.6); blobs.push([cx + Math.cos(a) * d, cy + (rc() - 0.5) * 1.6, cz + Math.sin(a) * d, 0.45 + rc() * 0.75]); }
+  }
+  for (const [x, y2, z, r] of blobs) { const m = new THREE.Mesh(leaf, mat); m.position.set(x, y2, z); m.scale.set(r, r * 0.55, r); m.rotation.y = x; m.castShadow = true; m.userData.ombreSeule = true; scene.add(m); canopy.push(m); }
+}
+
+// ---------------------------------------------------------------- prises de vue
+const persp = new THREE.PerspectiveCamera(30, 1, 0.05, 120);
+const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+function render(rect, cam, px, pxPerM) {
+  U.uRes.value.set(rect.w, rect.h);
+  U.uView.value.set(rect.x, H - rect.y - rect.h, rect.w, rect.h);
+  U.uPx.value = px;
+  // Détail (hachures, traits du visage): plein au-dessus de 150 px par mètre, nul sous 80.
+  U.uDetail.value = noFade ? 1 : THREE.MathUtils.smoothstep(pxPerM, 80, 150);
+  U.uHatchPx.value = THREE.MathUtils.clamp(pxPerM / 28, 5.0, 8.0);
+  cam.updateMatrixWorld(true);
+  U.uLampPos.value.copy(LAMPE).applyMatrix4(cam.matrixWorldInverse);
+  renderer.setViewport(rect.x, H - rect.y - rect.h, rect.w, rect.h);
+  renderer.setScissor(rect.x, H - rect.y - rect.h, rect.w, rect.h);
+  renderer.setScissorTest(true);
+  renderer.clear();
+  renderer.render(scene, cam);
+}
+let noFade = false;
+function shot(rect, from, to, fov = 28, px = 3.0) {
+  persp.fov = fov; persp.aspect = rect.w / rect.h; persp.position.copy(from); persp.lookAt(to); persp.updateProjectionMatrix();
+  U.uVig.value = AMBIANCES[current].vig * (fov < 20 ? 0.45 : 1);
+  sun.target.position.copy(to).setY(0); sun.target.updateMatrixWorld();
+  const a = AMBIANCES[current]; sun.position.set(...a.dir).normalize().multiplyScalar(18).add(sun.target.position);
+  render(rect, persp, px, rect.h / (2 * from.distanceTo(to) * Math.tan(THREE.MathUtils.degToRad(fov / 2))));
+}
+// Vue du jeu: caméra orthographique à `deg` degrés; un personnage de 1,7 m debout fait `charPx` pixels de haut.
+function gameShot(rect, target, deg, charPx = 60) {
+  const r = THREE.MathUtils.degToRad(deg);
+  const pxPerM = charPx / (1.7 * Math.cos(r) + 0.35 * Math.sin(r));
+  const hw = rect.w / pxPerM / 2, hh = rect.h / pxPerM / 2;
+  Object.assign(ortho, { left: -hw, right: hw, top: hh, bottom: -hh }); ortho.updateProjectionMatrix();
+  ortho.position.copy(target).add(new THREE.Vector3(0, Math.sin(r), Math.cos(r)).multiplyScalar(40)); ortho.lookAt(target);
+  sun.target.position.copy(target).setY(0); sun.target.updateMatrixWorld();
+  const a = AMBIANCES[current]; sun.position.set(...a.dir).normalize().multiplyScalar(18).add(sun.target.position);
+  U.uVig.value = AMBIANCES[current].vig;
+  render(rect, ortho, Math.max(1.5, pxPerM / 40), pxPerM);
+}
+let current = 'jour';
+const ambiance = (n) => { current = n; setAmbiance(n); };
+
+const labels = [];
+const mesures = {};
+try {
+  ambiance('jour');
+  const INDEX = await (await fetch(ESSAI + 'atlas/index.json')).json();
+  const DEF = Object.fromEntries(['maelle', 'basile', 'gaston', 'odette', 'lou'].map((k) => [k, { corps: INDEX[k].corps, coiffure: INDEX[k].coiffure, col: INDEX[k].col }]));
+  const P = {};
+  for (const [k, d] of Object.entries(DEF)) P[k] = await personnage({ ...d, atlas: `atlas/${k}.png` });
+  const NF = {};   // les mêmes sans effacement (mipmaps ordinaires), pour la comparaison
+  for (const [k, d] of Object.entries(DEF)) NF[k] = await personnage({ ...d, atlas: `atlas/${k}.png`, efface: false });
+  const TENUES = ['carreaux-jean', 'mariniere-short', 'pull-toile'];
+  const CORPS_X = [['femme', 'carre'], ['costaud', 'brosse'], ['enfant', 'tignasse']];
+  const X = [];
+  for (const t of TENUES) for (const [c, coif] of CORPS_X) X.push({ t, c, p: await personnage({ corps: c, coiffure: coif, col: INDEX._tenues[t].col, atlas: `.travail/croix/${c}-${t}.png` }) });
+  const all = [...Object.values(P), ...Object.values(NF), ...X.map((x) => x.p)];
+  const only = (...keep) => { for (const p of all) p.holder.visible = keep.includes(p); };
+  mesures.triangles = Object.fromEntries(Object.entries(P).map(([k, p]) => [k, p.tris]));
+  mesures.hauteurs = Object.fromEntries(Object.entries(P).map(([k, p]) => [k, +p.height.toFixed(3)]));
+
+  const vue = params.get('vue');
+  const full = { x: 0, y: 0, w: W, h: H };
+  const cw = W / 10, rowH = 310;
+  let y = 30;
+  labels.push(['Essai 4: cinq corps d\'après concept (Meshy), riggés duo-24; tenues, visages et cheveux peints par fiches; nuanceur encré; un seul niveau de rendu', 10, 6, 17]);
+
+  // Rangées 1 et 2: les cinq corps de face, de dos, en marche, au repos (vu de trois quarts, d'un peu plus haut).
+  const order = ['maelle', 'basile', 'gaston', 'odette', 'lou'];
+  const STUDIO = { x: -0.5, z: 4.6 };   // pré dégagé de l'autre côté du chemin: rien entre la caméra et le personnage
+  const portrait = (c, rect, kind) => {
+    only(c);
+    const tgt = new THREE.Vector3(STUDIO.x, 0.93, STUDIO.z);
+    const cam = (x, y2, z) => new THREE.Vector3(STUDIO.x + x, y2, STUDIO.z + z);
+    if (kind === 'face') { c.at(STUDIO.x, STUDIO.z, 0, 'repos'); shot(rect, cam(0, 1.2, 9.4), tgt, 13); }
+    if (kind === 'dos') { c.at(STUDIO.x, STUDIO.z, Math.PI, 'repos'); shot(rect, cam(0, 1.2, 9.4), tgt, 13); }
+    if (kind === 'marche') { c.at(STUDIO.x, STUDIO.z, Math.PI / 2 + 0.3, 'marche', 0.3); shot(rect, cam(0.4, 1.2, 9.4), tgt, 13); }
+    if (kind === 'repos') { c.at(STUDIO.x, STUDIO.z, 0.55, 'repos'); shot(rect, cam(1.2, 4.6, 8.2), tgt, 13); }
+  };
+  if (!vue) {
+    let i = 0;
+    for (const key of order) for (const kind of ['face', 'dos', 'marche', 'repos']) {
+      const rect = { x: (i % 10) * cw, y: y + Math.floor(i / 10) * (rowH + 4), w: cw, h: rowH };
+      portrait(P[key], rect, kind);
+      labels.push([`${key}: ${kind}`, rect.x + 5, rect.y + 4, 12]);
+      i += 1;
+    }
+    y += 2 * (rowH + 4);
+    // Rangée 3: trois tenues croisées sur trois corps (la même fiche de tenue habille chaque corps).
+    const xw = W / 9, r3 = 270;
+    X.forEach((x, k) => {
+      only(x.p); x.p.at(STUDIO.x, STUDIO.z, 0.45, 'repos');
+      shot({ x: k * xw, y, w: xw, h: r3 }, new THREE.Vector3(STUDIO.x + 1.4, 3.4, STUDIO.z + 8.6), new THREE.Vector3(STUDIO.x, 0.9, STUDIO.z), 13.5);
+      labels.push([`${x.t} / ${x.c}`, k * xw + 5, y + 4, 12]);
+    });
+    y += r3 + 4;
+  }
+  // Rangée 4: quatre expressions en gros plan (quatre visages: les repères viennent de la fiche de chaque corps).
+  const r4 = 280, ew = 300;
+  const EXPR = [['maelle', 0, 'neutre'], ['gaston', 1, 'joie'], ['lou', 2, 'surprise'], ['odette', 3, 'sommeil']];
+  const visage = (rect, key, cellule) => {
+    const c = P[key]; only(c); c.at(STUDIO.x, STUDIO.z, 0.0, 'repos'); c.cell.value = cellule;
+    const h = c.head(); h.y += 0.07;
+    shot(rect, new THREE.Vector3(h.x + 0.25, h.y + 0.08, h.z + 3.2), h, 8.2, 3.0);
+    c.cell.value = 0;
+  };
+  const place = (S) => {
+    S.maelle.at(-0.9, 0.15, 0.7, 'marche', 0.2); S.basile.at(0.75, -0.55, -0.6, 'repos');
+    S.lou.at(0.1, 0.75, 2.5, 'marche', 0.55); S.odette.at(-1.9, -0.75, 0.5, 'repos'); S.gaston.at(1.75, 0.35, -0.5, 'marche', 0.7);
+  };
+  const tgt = new THREE.Vector3(-0.1, 0.5, 0.25);
+  const proche = (rect) => {
+    only(...Object.values(P)); place(P);
+    const p = P.maelle.holder.position;
+    shot(rect, new THREE.Vector3(p.x + 1.6, 4.0, p.z + 4.6), new THREE.Vector3(p.x + 0.8, 0.8, p.z - 0.1), 30, 3);
+  };
+  if (!vue) {
+    EXPR.forEach(([key, cellule, nom], k) => { visage({ x: k * ew, y, w: ew, h: r4 }, key, cellule); labels.push([`expression: ${nom} (${key})`, k * ew + 5, y + 4, 12]); });
+    proche({ x: 4 * ew, y, w: W - 4 * ew, h: r4 });
+    labels.push(['vue proche (zoom le plus serré du jeu)', 4 * ew + 5, y + 4, 12]);
+    y += r4 + 4;
+    // Rangée 5: la vue du jeu à 50 degrés, personnage de 60 px: jour dense, crépuscule, nuit.
+    const r5 = 380, w3 = W / 3;
+    only(...Object.values(P)); place(P);
+    ['jour', 'crepuscule', 'nuit'].forEach((amb, k) => {
+      ambiance(amb);
+      if (k === 0) renderer.info.reset();
+      gameShot({ x: k * w3, y, w: w3, h: r5 }, tgt, 50);
+      if (k === 0) mesures.vueJeu = { appels: renderer.info.render.calls, triangles: renderer.info.render.triangles, personnages: 5 };
+      labels.push([`vue du jeu, 50 degrés, ${amb} (échelle 1: personnage de 60 px)`, k * w3 + 5, y + 4, 12]);
+    });
+    y += r5 + 4;
+    // Rangée 6: la même vue de jour sans l'effacement des détails, puis avec, agrandie deux fois; et l'essai 3.
+    const r6 = H - y;
+    ambiance('jour');
+    only(...Object.values(NF)); place(NF); noFade = true;
+    gameShot({ x: 0, y, w: w3, h: r6 }, tgt, 50, 120);
+    noFade = false; only(...Object.values(P)); place(P);
+    gameShot({ x: w3, y, w: w3, h: r6 }, tgt, 50, 120);
+    labels.push(['sans effacement (mipmaps ordinaires, hachures gardées), 120 px', 5, y + 4, 12], ['avec effacement (aplats de loin, détail fondu), 120 px', w3 + 5, y + 4, 12]);
+    mesures.textures = renderer.info.memory.textures;
+    mesures.geometries = renderer.info.memory.geometries;
+    mesures.programmes = renderer.info.programs?.map((p) => p.cacheKey.slice(0, 40));
+    mesures.essai3 = { x: 2 * w3, y, w: w3, h: r6 };
+  } else {
+    const amb = params.get('amb') ?? 'jour'; ambiance(amb);
+    if (vue === 'jeu') { only(...Object.values(P)); place(P); gameShot(full, tgt, 50, Number(params.get('px') ?? 60)); }
+    if (vue === 'jeu-sans') { only(...Object.values(NF)); place(NF); noFade = true; gameShot(full, tgt, 50, Number(params.get('px') ?? 60)); }
+    if (vue === 'proche') proche(full);
+    if (vue === 'visage') visage(full, params.get('qui') ?? 'maelle', Number(params.get('cellule') ?? 0));
+    if (vue === 'portraits') {
+      const key = params.get('qui') ?? 'maelle';
+      ['face', 'dos', 'marche', 'repos'].forEach((kind, k) => portrait(P[key], { x: k * W / 4, y: 0, w: W / 4, h: H }, kind));
+    }
+    if (vue === 'croix') X.forEach((x, k) => { only(x.p); x.p.at(STUDIO.x, STUDIO.z, 0.45, 'repos'); shot({ x: (k % 5) * W / 5, y: Math.floor(k / 5) * H / 2, w: W / 5, h: H / 2 }, new THREE.Vector3(STUDIO.x + 1.4, 3.4, STUDIO.z + 8.6), new THREE.Vector3(STUDIO.x, 0.9, STUDIO.z), 13.5); });
+    if (vue === 'visages') EXPR.forEach(([key, cellule], k) => visage({ x: k * W / 4, y: 0, w: W / 4, h: H }, key, cellule));
+  }
+  const sheet = document.createElement('canvas');
+  sheet.width = W; sheet.height = H;
+  const ctx = sheet.getContext('2d');
+  ctx.fillStyle = '#14110f'; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(renderer.domElement, 0, 0);
+  if (mesures.essai3) {
+    // L'essai 3 à côté: sa vue du jeu de jour, reprise telle quelle de sa planche.
+    const img = new Image(); img.src = ESSAI3 + 'comparaison.png'; await img.decode();
+    const r = mesures.essai3; const sw = 600, sh = Math.min(360, 600 * r.h / r.w);
+    ctx.drawImage(img, 600, 738, sw, sh, r.x, r.y, r.w, r.h);
+    labels.push(['essai 3, pour mesurer le progrès (sa vue du jeu de jour, 60 px, 55 degrés)', r.x + 5, r.y + 4, 12]);
+    delete mesures.essai3;
+  }
+  for (const [text, x, yy, size] of labels) { ctx.font = `bold ${size}px sans-serif`; ctx.fillStyle = 'rgba(20,17,15,0.82)'; const w = ctx.measureText(text).width; ctx.fillRect(x - 4, yy - 2, w + 8, size + 6); ctx.fillStyle = '#efe6d2'; ctx.textBaseline = 'top'; ctx.fillText(text, x, yy); }
+  window.banc = { pret: true, mesures, image: sheet.toDataURL('image/png') };
+} catch (e) {
+  window.banc = { erreur: String(e.stack ?? e), mesures, image: renderer.domElement.toDataURL('image/png') };
+}
+</script>
+</body>
+</html>

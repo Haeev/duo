@@ -1,0 +1,14 @@
+# Corps commun « femme ». Femme adulte: long cou, épaules tombantes, hanches larges.
+# Gabarit: copier ce fichier pour un nouveau corps (rig Meshy dans <dossier>/femme/marche.glb), lancer
+# `python3 scripts/construire.py --corps <dossier>` et régler les valeurs sur la planche `.travail/reperes-femme.png`.
+id = "femme"
+triangles = 2300      # triangles visibles (la coque d'encre double le compte)
+mains = 0.92          # échelle des mains autour du poignet (1 = tel que généré)
+pieds = 1.0           # échelle des pieds autour de la cheville
+tete = 0.92           # échelle de la tête autour de la base du crâne (viser 7 têtes; enfant 5,5)
+
+[visage]              # repères relevés sur le modelé de ce corps: le visage dessiné tombe sur le visage sculpté
+menton = 0.265        # du sommet du crâne au menton, en mètres, tête à l'échelle 1
+yeux = 0.39          # centre des yeux, fraction de la hauteur de tête depuis le sommet
+bouche = 0.73        # trait de la bouche, même unité
+ecart = 0.155         # demi-distance entre les yeux, fraction de la hauteur de tête
