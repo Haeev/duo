@@ -121,15 +121,18 @@ describe('sauvegarde', () => {
 
   it('dit pourquoi elle refuse: autre format, état abîmé, autre duo', () => {
     const data = JSON.parse(JSON.stringify(newSim(content).world)) as Record<string, unknown>;
-    expect(restoreWorld(content, { dataSchema: 15, data }, MEMBERS)).toEqual({
+    expect(restoreWorld(content, { dataSchema: 15, data }, MEMBERS)).toMatchObject({
       ok: false,
-      reason: 'format 15, attendu 1',
+      reason: 'format 15, plus récent que 1',
     });
     expect(
       restoreWorld(content, { dataSchema: 1, data: { ...data, minutes: 'midi' } }, MEMBERS),
     ).toMatchObject({ ok: false, reason: expect.stringMatching(/^minutes/) as unknown });
     expect(
-      restoreWorld(content, { dataSchema: 1, data }, [MEMBERS[0], { id: 'autre', name: 'Zoé' }]),
-    ).toEqual({ ok: false, reason: 'sauvegarde d’un autre duo' });
+      restoreWorld(content, { dataSchema: 1, data }, [
+        { id: 'autre', name: 'Zoé' },
+        { id: 'encore', name: 'Léo' },
+      ]),
+    ).toMatchObject({ ok: false, reason: 'sauvegarde d’un autre duo' });
   });
 });

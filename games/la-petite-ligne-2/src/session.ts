@@ -2,14 +2,15 @@
  * Une séance de jeu sur cette machine: hôte (simulation, sauvegardes) ou invité (état reçu),
  * derrière la même `GameView`. Sans DOM: testable dans Node avec `startLocalDuo` du faux hôte.
  */
-import type { DuoContext } from '@duo/sdk';
+import type { DuoContext, SaveStatus } from '@duo/sdk';
 import type { GameAction } from './actions';
 import type { Content } from './donnees/charger';
 import type { PlayerIndex } from './donnees/schemas/communs';
 import type { ReadonlyWorld, WorldState } from './etat/monde';
 import { createGuest, type Guest } from './reseau/invite';
 import { createHost, type Host } from './reseau/hote';
-import { restoreWorld, snapshotOf } from './sauvegarde/sauvegarde';
+import { createSaveTrigger, type SaveTrigger } from './sauvegarde/declencheur';
+import { restoreWorld, snapshotOf, type ResumeNotice } from './sauvegarde/sauvegarde';
 import type { Aim } from './simulation/briques/types';
 import { aimOf } from './simulation/briques/visee';
 import type { Intent, StepInput } from './simulation/noyau/entrees';
@@ -54,6 +55,10 @@ export interface Session {
   /** Un pas de la boucle à pas fixe, avec les commandes tenues du joueur local. */
   step(input: StepInput): void;
   ready(): boolean;
+  /** Remarque de la reprise à montrer aux joueurs (partie neuve après refus, remplaçant), `null` sinon. */
+  readonly notice: ResumeNotice | null;
+  /** Sauvegarde sur demande (hôte); chez l'invité: `refused`. */
+  saveNow(): Promise<SaveStatus>;
   /** Simulation de l'hôte (tests et outils), `null` chez l'invité. */
   hostSim(): Sim | null;
   dispose(): void;
@@ -68,6 +73,8 @@ export function createSession(options: SessionOptions): Session {
   let guest: Guest | null = null;
   let sim: Sim | null = null;
   let local: PlayerIndex = 0;
+  let notice: ResumeNotice | null = null;
+  let saves: SaveTrigger | null = null;
 
   if (duo.role === 'host') {
     const members: [Member, Member] = [
@@ -78,6 +85,7 @@ export function createSession(options: SessionOptions): Session {
     const loaded = duo.saves.loaded;
     if (loaded !== null) {
       const restored = restoreWorld(content, loaded, members);
+      notice = restored.notice;
       if (restored.ok) world = restored.world;
       else
         duo.log.warn('sauvegarde non reprise, partie neuve', {
@@ -89,7 +97,14 @@ export function createSession(options: SessionOptions): Session {
     sim = hostSim;
     local = hostSim.world.players[0].member === duo.localPlayer.id ? 0 : 1;
     host = createHost(hostSim, duo.net, duo.log, local, { advance: step });
-    duo.saves.provide(() => snapshotOf(hostSim.world));
+    duo.saves.provide(() => snapshotOf(hostSim.world, content));
+    saves = createSaveTrigger({
+      target: duo.saves,
+      snapshot: () => snapshotOf(hostSim.world, content),
+      warn: (message, details) => {
+        duo.log.warn(message, details);
+      },
+    });
     host.sendAll();
   } else {
     const g = createGuest(content, duo.net, duo.localPlayer.id, {
@@ -149,17 +164,24 @@ export function createSession(options: SessionOptions): Session {
     view,
     step(input) {
       if (host !== null) {
-        for (const event of host.step(input)) for (const listener of listeners) listener(event);
+        const events = host.step(input);
+        saves?.notify(events);
+        for (const event of events) for (const listener of listeners) listener(event);
       } else guest?.step(input);
     },
     ready() {
       return guest === null ? true : guest.ready();
+    },
+    notice,
+    saveNow() {
+      return saves?.saveNow() ?? Promise.resolve('refused');
     },
     hostSim() {
       return sim;
     },
     dispose() {
       offResume();
+      saves?.dispose();
       host?.dispose();
       guest?.dispose();
       listeners.clear();
