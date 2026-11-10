@@ -25,6 +25,11 @@ export interface CoreTuning {
   readonly pickupClip: string;
   /** Marge entre un siège et le personnage qui se relève (m). */
   readonly standUpGap: number;
+  /**
+   * Personnages qui se chevauchent (deux joueurs, un joueur et un habitant): part du
+   * chevauchement rendue par seconde. Poussée douce, jamais un mur: on finit toujours par passer.
+   */
+  readonly bodyPushPerSecond: number;
 }
 
 const { movement, reach, gestures, travel } = settings;
@@ -41,4 +46,6 @@ export const CORE_TUNING: CoreTuning = {
   aimDistanceWeight: reach.aimDistanceWeight,
   pickupClip: gestures.pickupClip,
   standUpGap: movement.standUpGap,
+  // En attente d'une place dans `reglages.json` (section `movement`, lot L0).
+  bodyPushPerSecond: 10,
 };

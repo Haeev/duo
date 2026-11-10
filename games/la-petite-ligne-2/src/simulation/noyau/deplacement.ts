@@ -50,9 +50,9 @@ export function canWalk(world: ReadonlyWorld, player: PlayerIndex): boolean {
 }
 
 /**
- * Un pas de marche. La vitesse (`body.speed`) rejoint la vitesse voulue en `accelSeconds`, à
- * l'accélération comme au freinage; le personnage se tourne tout de suite vers la direction
- * donnée et garde son cap en freinant. Modifie `body` en place.
+ * Un pas de marche. La vitesse (`body.speed`) rejoint la vitesse voulue en `accelSeconds` à
+ * l'accélération, en `brakeSeconds` au freinage; le personnage se tourne tout de suite vers la
+ * direction donnée et garde son cap en freinant. Modifie `body` en place.
  */
 export function walkStep(
   b: Blockers,
@@ -67,11 +67,13 @@ export function walkStep(
   const wants = length >= CORE_TUNING.moveDeadzone;
   const top = run ? movement.runSpeed : movement.walkSpeed;
   const wanted = wants ? top * Math.min(1, length) : 0;
-  const change = movement.accelSeconds > 0 ? (top / movement.accelSeconds) * dt : top;
-  const speed =
-    body.speed < wanted
-      ? Math.min(wanted, body.speed + change)
-      : Math.max(wanted, body.speed - change);
+  // Mise en vitesse en `accelSeconds`, freinage en `brakeSeconds` (plus court: on s'arrête net).
+  const speeding = body.speed < wanted;
+  const seconds = speeding ? movement.accelSeconds : movement.brakeSeconds;
+  const change = seconds > 0 ? (top / seconds) * dt : top;
+  const speed = speeding
+    ? Math.min(wanted, body.speed + change)
+    : Math.max(wanted, body.speed - change);
   if (wants) body.facing = Math.atan2(moveY, moveX);
   if (speed <= 0) {
     body.speed = 0;
@@ -123,5 +125,65 @@ export function movePlayers(sim: SimContext): void {
         if (freePlayer(content, world, index)) sim.emit({ type: 'unstuck', player: index });
       }
     } else stuck[index] = 0;
+  }
+  separateBodies(sim, b);
+}
+
+/**
+ * Écarte de `share` du chevauchement le corps `body` de (x, y), s'il ne finit pas dans un mur.
+ * `tie`: sens est (1) ou ouest (-1) pour deux corps exactement superposés.
+ */
+function nudge(
+  b: Blockers,
+  body: Body,
+  x: number,
+  y: number,
+  gap: number,
+  share: number,
+  radius: number,
+  tie = 1,
+): void {
+  const dx = body.x - x;
+  const dy = body.y - y;
+  const distance = Math.hypot(dx, dy);
+  const overlap = gap - distance;
+  if (overlap <= 0) return;
+  // Deux corps exactement superposés: sens fixé par l'appelant, le même sur les deux machines.
+  const ux = distance > 1e-6 ? dx / distance : tie;
+  const uy = distance > 1e-6 ? dy / distance : 0;
+  const nx = body.x + ux * overlap * share;
+  const ny = body.y + uy * overlap * share;
+  if (bodyCollides(b, nx, ny, radius)) return;
+  body.x = nx;
+  body.y = ny;
+}
+
+/**
+ * Les joueurs ne traversent plus l'autre joueur ni les habitants: chaque pas rend une part du
+ * chevauchement (`bodyPushPerSecond`). Seuls les joueurs libres de marcher bougent; un habitant
+ * garde sa route (son système le mène), c'est le joueur qui s'écarte.
+ */
+function separateBodies(sim: SimContext, b: Blockers): void {
+  const { world, content } = sim;
+  const place = world.places[world.common.place];
+  if (place === undefined) return;
+  const radius = content.settings.movement.radius;
+  const gap = radius * 2;
+  const share = Math.min(1, CORE_TUNING.bodyPushPerSecond * sim.dt);
+  const [first, second] = world.players;
+  const free0 = canWalk(world, 0);
+  const free1 = canWalk(world, 1);
+  if (free0 && free1) {
+    const x0 = first.body.x;
+    const y0 = first.body.y;
+    nudge(b, first.body, second.body.x, second.body.y, gap, share / 2, radius);
+    nudge(b, second.body, x0, y0, gap, share / 2, radius, -1);
+  } else if (free0) nudge(b, first.body, second.body.x, second.body.y, gap, share, radius);
+  else if (free1) nudge(b, second.body, first.body.x, first.body.y, gap, share, radius);
+  for (const id in place.villagers) {
+    const villager = place.villagers[id];
+    if (villager === undefined) continue;
+    if (free0) nudge(b, first.body, villager.body.x, villager.body.y, gap, share, radius);
+    if (free1) nudge(b, second.body, villager.body.x, villager.body.y, gap, share, radius);
   }
 }

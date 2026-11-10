@@ -6,7 +6,7 @@ import { gameContent, newSim } from './aides';
 import { NORTH, put, run, send } from './aides-noyau';
 
 const content = gameContent();
-const { walkSpeed, runSpeed, radius, accelSeconds } = content.settings.movement;
+const { walkSpeed, runSpeed, radius, accelSeconds, brakeSeconds } = content.settings.movement;
 
 describe('marche et course', () => {
   it('accélère en douceur jusqu’à la vitesse de marche, puis freine sans s’arrêter net', () => {
@@ -22,7 +22,19 @@ describe('marche et course', () => {
     run(sim, SIM_DT);
     expect(body.speed).toBeGreaterThan(0);
     expect(body.speed).toBeLessThan(walkSpeed);
-    run(sim, accelSeconds + 2 * SIM_DT);
+    run(sim, brakeSeconds + 2 * SIM_DT);
+    expect(body.speed).toBe(0);
+  });
+
+  it('freine en `brakeSeconds`, plus court que la mise en vitesse', () => {
+    const sim = newSim(content);
+    put(sim, 0, 10, 20, 0);
+    run(sim, accelSeconds + 2 * SIM_DT, { moveX: 1 });
+    const body = sim.world.players[0].body;
+    expect(body.speed).toBeCloseTo(walkSpeed, 6);
+    run(sim, brakeSeconds - SIM_DT);
+    expect(body.speed).toBeGreaterThan(0);
+    run(sim, 2 * SIM_DT);
     expect(body.speed).toBe(0);
   });
 
@@ -128,5 +140,29 @@ describe('commande relative à la caméra', () => {
     expect(Math.hypot(out.moveX, out.moveY)).toBeCloseTo(1, 9);
     worldMove(0, 0, 1.2, out);
     expect(out).toEqual({ moveX: 0, moveY: 0 });
+  });
+});
+
+describe('corps des personnages', () => {
+  it('un joueur ne traverse pas l’autre: il le pousse doucement, sans rester bloqué', () => {
+    const sim = newSim(content);
+    put(sim, 0, 10, 20, 0);
+    put(sim, 1, 11, 20, 0);
+    run(sim, 0.5, { moveX: 1 });
+    const [a, b] = sim.world.players;
+    expect(Math.hypot(a.body.x - b.body.x, a.body.y - b.body.y)).toBeGreaterThan(radius);
+    // Superposés exactement: ils se séparent en quelques dixièmes de seconde.
+    put(sim, 0, 10, 20, 0);
+    put(sim, 1, 10, 20, 0);
+    run(sim, 0.6);
+    expect(Math.hypot(a.body.x - b.body.x, a.body.y - b.body.y)).toBeGreaterThan(radius * 1.5);
+  });
+
+  it('un joueur contourne un autre en appuyant de biais: il finit par passer', () => {
+    const sim = newSim(content);
+    put(sim, 1, 12, 20, 0);
+    put(sim, 0, 10, 20.1, 0);
+    run(sim, 3, { moveX: 1 });
+    expect(sim.world.players[0].body.x).toBeGreaterThan(13);
   });
 });

@@ -30,7 +30,10 @@ function worstCase(): Sim {
   const full: Stack = { item: 'hache-forgee', count: 1, wear: 120 };
   for (const player of sim.world.players) {
     player.toolbar = player.toolbar.map(() => ({ ...full }));
-    player.bag = { id: 'malle-a-bretelles', slots: Array.from({ length: 20 }, () => ({ ...full })) };
+    player.bag = {
+      id: 'malle-a-bretelles',
+      slots: Array.from({ length: 20 }, () => ({ ...full })),
+    };
     player.talk = { villager: 'cheffe-de-gare', dialogue: 'accueil', node: 'question' };
     player.gesture = { clip: 'reach-up', target: 'pommier', until: 999_999, long: false };
   }
@@ -93,7 +96,9 @@ let MEASURED: Record<string, number> = {};
 
 describe('garde de taille', () => {
   afterAll(() => {
-    process.stdout.write(`plus gros messages envoyés au pire (octets): ${JSON.stringify(MEASURED)}\n`);
+    process.stdout.write(
+      `plus gros messages envoyés au pire (octets): ${JSON.stringify(MEASURED)}\n`,
+    );
   });
 
   it('chaque message réellement envoyé tient son budget sur l’état au pire, et l’invité le reçoit entier', () => {
@@ -147,7 +152,8 @@ describe('progression par différences et par morceaux', () => {
     expect(byteLength(parts[0])).toBeLessThan(300);
     const full = progressParts(null, before, 4, 3, 90, NET_SETTINGS.progress.partBytes);
     expect(full.length).toBeGreaterThan(1);
-    for (const part of full) expect(byteLength(part)).toBeLessThanOrEqual(PROGRESS_PART_BUDGET_BYTES);
+    for (const part of full)
+      expect(byteLength(part)).toBeLessThanOrEqual(PROGRESS_PART_BUDGET_BYTES);
     const guest = createProgressAssembler();
     let done = null;
     for (const part of full) done = guest.receive(part);
@@ -177,18 +183,22 @@ describe('bascule de lieu', () => {
     const halte = content.places['essai-halte'];
     if (halte === undefined) throw new Error('lieu essai-halte absent');
     let switchAt = -1;
-    const duo = pair(sim, { latencyMs: 80, jitterMs: 20, lossPercent: 5 }, {
-      advance(s, inputs, intents) {
-        step(s, inputs, intents);
-        if (s.world.tick !== switchAt) return;
-        // Ce que fera le système « voyage » (L2): nouveau lieu, voyage en cours.
-        s.world.places['essai-halte'] = createPlaceState(content, halte);
-        s.world.common.place = 'essai-halte';
-        s.world.common.phase = 'travel';
-        s.revisions.common += 1;
-        s.revisions.place += 1;
+    const duo = pair(
+      sim,
+      { latencyMs: 80, jitterMs: 20, lossPercent: 5 },
+      {
+        advance(s, inputs, intents) {
+          step(s, inputs, intents);
+          if (s.world.tick !== switchAt) return;
+          // Ce que fera le système « voyage » (L2): nouveau lieu, voyage en cours.
+          s.world.places['essai-halte'] = createPlaceState(content, halte);
+          s.world.common.place = 'essai-halte';
+          s.world.common.phase = 'travel';
+          s.revisions.common += 1;
+          s.revisions.place += 1;
+        },
       },
-    });
+    );
     const hostSwitches: PlaceSwitch[] = [];
     const guestSwitches: { from: string; to: string }[] = [];
     duo.host.onPlaceSwitch((c) => hostSwitches.push(c));

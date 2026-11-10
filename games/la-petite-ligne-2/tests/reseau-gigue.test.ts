@@ -216,9 +216,7 @@ describe('prédiction du début de geste', () => {
       const bench = armed({ latencyMs, jitterMs: latencyMs / 4, lossPercent: 5 });
       const pressedAt = bench.now();
       bench.frame(0, { type: 'act' });
-      const started = bench.events.findIndex(
-        (e) => e.type === 'gesture_started' && e.player === 1,
-      );
+      const started = bench.events.findIndex((e) => e.type === 'gesture_started' && e.player === 1);
       expect(started).toBeGreaterThanOrEqual(0);
       // Réponse dans l'image même de l'appui: moins d'un dixième de seconde.
       expect(bench.now() - pressedAt).toBeLessThan(100);

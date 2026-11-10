@@ -15,10 +15,10 @@
   "description": "À deux, de lieu en lieu par le train: une histoire à suivre, une maison à refaire, des voisins à aider. Version d'essai de la refonte.",
   "whatsNew": "Socle de la refonte: le nouveau jeu démarre à deux sur un écran d'essai. Les parties d'essai repartent de zéro à chaque étape.",
   "actions": [
-    { "id": "up", "label": "Avancer", "keys": ["KeyW", "ArrowUp"] },
-    { "id": "down", "label": "Reculer", "keys": ["KeyS", "ArrowDown"] },
-    { "id": "left", "label": "Aller à gauche", "keys": ["KeyA", "ArrowLeft"] },
-    { "id": "right", "label": "Aller à droite", "keys": ["KeyD", "ArrowRight"] },
+    { "id": "up", "label": "Avancer", "keys": ["KeyW"] },
+    { "id": "down", "label": "Reculer", "keys": ["KeyS"] },
+    { "id": "left", "label": "Aller à gauche", "keys": ["KeyA"] },
+    { "id": "right", "label": "Aller à droite", "keys": ["KeyD"] },
     { "id": "run", "label": "Courir", "keys": ["ShiftLeft"] },
     { "id": "act", "label": "Agir", "keys": ["Space"] },
     { "id": "camera-left", "label": "Tourner la caméra à gauche", "keys": ["KeyQ"] },
@@ -30,8 +30,18 @@
       "mouse": ["right"],
       "rebindable": false
     },
-    { "id": "zoom-in", "label": "Rapprocher la caméra", "keys": [], "mouse": ["wheel-up"] },
-    { "id": "zoom-out", "label": "Éloigner la caméra", "keys": [], "mouse": ["wheel-down"] },
+    {
+      "id": "zoom-in",
+      "label": "Rapprocher la caméra",
+      "keys": ["ArrowUp"],
+      "mouse": ["wheel-up"]
+    },
+    {
+      "id": "zoom-out",
+      "label": "Éloigner la caméra",
+      "keys": ["ArrowDown"],
+      "mouse": ["wheel-down"]
+    },
     { "id": "slot-next", "label": "Emplacement suivant de la barre", "keys": ["Tab"] },
     { "id": "slot-1", "label": "Emplacement 1 de la barre", "keys": ["Digit1"] },
     { "id": "slot-2", "label": "Emplacement 2 de la barre", "keys": ["Digit2"] },
