@@ -24,6 +24,8 @@ import type { OccluderBox } from '../occultation';
 import { ResourceTracker } from '../ressources';
 import { FadingMesh, GeometryBuilder } from './geometrie';
 import type { TileSettings } from './reglages-tuiles';
+import type { Relief } from './relief';
+import { reliefGround } from './relief-sol';
 import {
   type BlobItem,
   type BoxItem,
@@ -64,6 +66,8 @@ export interface TileKit {
   readonly models?: ReadonlyMap<number, readonly ModeledBuilding[]>;
   readonly materials: TileMaterials;
   readonly shapes: TileShapes;
+  /** Relief du sol (rendu encré): le sol, le décor et le semis en suivent la hauteur; absent: sol plan. */
+  readonly relief?: Relief | null;
 }
 
 const matrix = new Matrix4();
@@ -117,8 +121,10 @@ export class TileView {
     this.group.traverse((object) => {
       // Le semis (cailloux, touffes) ne porte pas d'ombre: elle ne se verrait pas, et la passe
       // d'ombre redessinerait des milliers de petits volumes.
+      // Le sol en relief non plus: quelques centimètres ne portent aucune ombre lisible.
       if ((object as Partial<Mesh>).isMesh === true)
-        object.castShadow = cast && object.userData.semis !== true;
+        object.castShadow =
+          cast && object.userData.semis !== true && object.userData.ground !== true;
     });
   }
 
@@ -250,6 +256,18 @@ function groundOf(kit: TileKit, tile: number): BufferGeometry | null {
   return builder.build();
 }
 
+/** Pose une boîte du décor sur le sol en relief: son pied s'y enfonce un peu (rien ne flotte). */
+function settle(relief: Relief, item: BoxItem): void {
+  const h = relief.heightAt(item.x, item.z);
+  if (item.base > 0) {
+    item.base += h;
+    return;
+  }
+  const bury = relief.settings.mesh.bury;
+  item.base = h - bury;
+  item.h += bury;
+}
+
 function waterOf(kit: TileKit, tile: number): BufferGeometry | null {
   const { field, settings, map } = kit;
   const { width, looks, cells } = field;
@@ -330,7 +348,7 @@ function putBlob(mesh: InstancedMesh, i: number, item: BlobItem): void {
 export function crownBlob(tree: TreeItem): BlobItem {
   return {
     x: tree.x,
-    y: tree.trunkHeight + tree.crownHeight * 0.45,
+    y: (tree.ground ?? 0) + tree.trunkHeight + tree.crownHeight * 0.45,
     z: tree.z,
     rx: tree.crownRadius,
     ry: tree.crownHeight,
@@ -344,12 +362,30 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   const view = new TileView(tile);
   const { materials, shapes } = kit;
 
-  const ground = groundOf(kit, tile);
-  if (ground !== null) {
-    const mesh = new Mesh(view.tracker.track(ground), materials.ground);
-    mesh.name = 'sol';
-    mesh.receiveShadow = true;
-    view.add(mesh);
+  const relief = kit.relief ?? null;
+  if (relief === null) {
+    const flat = groundOf(kit, tile);
+    if (flat !== null) {
+      const mesh = new Mesh(view.tracker.track(flat), materials.ground);
+      mesh.name = 'sol';
+      mesh.receiveShadow = true;
+      view.add(mesh);
+    }
+  } else {
+    // Le sol en relief va par morceaux: ceux qui sortent du champ ne sont pas dessinés.
+    const { x0, y0, x1, y1 } = tileRect(kit.map, tile);
+    const side = relief.settings.mesh.chunk;
+    for (let cy = y0; cy < y1; cy += side)
+      for (let cx = x0; cx < x1; cx += side) {
+        const chunk = { x0: cx, y0: cy, x1: Math.min(x1, cx + side), y1: Math.min(y1, cy + side) };
+        const shaped = yield* reliefGround(relief, chunk);
+        if (shaped === null) continue;
+        const mesh = new Mesh(view.tracker.track(shaped), materials.ground);
+        mesh.name = 'sol';
+        mesh.receiveShadow = true;
+        mesh.userData.ground = true;
+        view.add(mesh);
+      }
   }
   yield;
   const water = waterOf(kit, tile);
@@ -362,6 +398,14 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   yield;
 
   const decor = tileDecor(kit.field, kit.map, tile, kit.settings);
+  if (relief !== null) {
+    // Le sol en relief ne porte pas d'ombre: les rails rejoignent les traverses (boîtes
+    // instanciées), qui en portent, sans appel de dessin de plus.
+    decor.boxes.push(...railPieces(kit.map, tile, kit.settings));
+    for (const item of decor.boxes) settle(relief, item);
+    for (const tree of decor.trees) tree.ground = relief.heightAt(tree.x, tree.z);
+    for (const bush of decor.bushes) bush.y += relief.heightAt(bush.x, bush.z);
+  }
   view.trees = decor.trees;
   yield;
   instances(view, shapes.box, materials.instanced, decor.boxes.length, 'boites', (mesh, i) => {
@@ -372,10 +416,16 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     const tree = decor.trees[i];
     if (tree === undefined) return;
     rotation.identity();
+    // Le tronc part d'un peu sous le sol: sur une pente, son pied ne laisse pas de jour.
+    const sunk = relief === null ? 0 : relief.settings.mesh.bury;
     matrix.compose(
-      position.set(tree.x, 0, tree.z),
+      position.set(tree.x, (tree.ground ?? 0) - sunk, tree.z),
       rotation,
-      scale.set(tree.trunkRadius, tree.trunkHeight + tree.crownHeight * 0.3, tree.trunkRadius),
+      scale.set(
+        tree.trunkRadius,
+        tree.trunkHeight + tree.crownHeight * 0.3 + sunk,
+        tree.trunkRadius,
+      ),
     );
     mesh.setMatrixAt(i, matrix);
     mesh.setColorAt(i, color.set(kit.settings.decor.trunkColor));
@@ -406,6 +456,10 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   if (shapes.pebble !== undefined && shapes.tuft !== undefined) {
     // Semis de petits volumes: ce qui ponctue le sol est un volume, pas un dessin à plat.
     const semis = tileSemis(kit.field, kit.map, tile, kit.settings);
+    if (relief !== null) {
+      for (const pebble of semis.pebbles) pebble.y += relief.heightAt(pebble.x, pebble.z);
+      for (const tuft of semis.tufts) settle(relief, tuft);
+    }
     const stones = instances(
       view,
       shapes.pebble,

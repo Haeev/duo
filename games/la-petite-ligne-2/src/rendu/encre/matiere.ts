@@ -687,10 +687,14 @@ void main() {
       // Herbe: trois tons en grandes plages, qui se déplacent avec l'heure comme sur un pré bosselé.
       vec3 big = texture(uNoise, g * 0.021).rgb;
       vec2 lay = vec2(big.r + nB.b * 0.7, big.g + nB.r * 0.7) - 0.85;
-      float toward = dot(lay, normalize(uSunDir.xz + 1e-4)) * 0.42;
-      base *= mix(1.0, mix(1.0, uGroundTones.x, step(0.13, toward)) * mix(1.0, uGroundTones.y, step(toward, -0.15)), grassy);
+      vec2 sunward = normalize(uSunDir.xz + 1e-4);
+      // Sol en relief: la pente vraie s'ajoute aux plages de l'herbe et vaut pour toute nature de
+      // sol (un talus tourné vers le soleil prend le ton clair, son vis-à-vis le ton sombre). La
+      // tranche d'un sol déclaré (face debout) garde la normale du dessus.
+      N = N.y > 0.7 ? N : vec3(0.0, 1.0, 0.0);
+      float toward = dot(lay, sunward) * 0.42 * grassy + dot(N.xz, sunward) * ${INK_SETTINGS.ground.slopeTone.toFixed(2)};
+      base *= mix(1.0, uGroundTones.x, step(0.13, toward)) * mix(1.0, uGroundTones.y, step(toward, -0.15));
       tuv = g * mix(1.0, uGroundTones.w, fine);
-      N = vec3(0.0, 1.0, 0.0);
       inkGain = 1.0;
     }
     // Dalles posées en volume (dessus du quai): même motif serré que le sol dallé.

@@ -44,6 +44,11 @@ export interface CharacterFrame {
   readonly visibleAt?: (x: number, y: number) => boolean;
   /** Joueurs cachés pour cette image (en plein passage de porte: ni ici ni là-bas). */
   readonly hidden?: readonly [boolean, boolean];
+  /**
+   * Hauteur du sol affiché sous un point de la carte (relief d'un grand lieu, m): les pieds et
+   * l'ombre de contact la suivent. Absente: sol plan. La simulation n'en sait rien.
+   */
+  readonly ground?: ((x: number, y: number) => number) | null;
 }
 
 /**
@@ -122,6 +127,8 @@ class StandInCharacters implements CharacterLayer {
   private readonly blobMaterial: Material;
   private readonly players: [Figure, Figure];
   private readonly villagers = new Map<string, Figure>();
+  /** Hauteur du sol affiché (relief d'un grand lieu), donnée par le moteur à chaque image. */
+  private ground: ((x: number, y: number) => number) | null = null;
   private readonly glowColor = new Color(RENDER_SETTINGS.target.rimColor);
 
   constructor(
@@ -203,7 +210,7 @@ class StandInCharacters implements CharacterLayer {
       );
       figure.facing += turn * approach(dt, this.settings.turnHalfLife);
     }
-    figure.object.position.set(figure.x, 0, figure.y);
+    figure.object.position.set(figure.x, this.ground?.(figure.x, figure.y) ?? 0, figure.y);
     // Cap de l'état: 0 vers l'est, PI/2 vers le sud. Le bonhomme regarde vers +Z au repos.
     figure.object.rotation.y = Math.PI / 2 - figure.facing;
   }
@@ -219,6 +226,7 @@ class StandInCharacters implements CharacterLayer {
   }
 
   update(frame: CharacterFrame): void {
+    this.ground = frame.ground ?? null;
     for (const index of [0, 1] as const) {
       const body = frame.world.players[index].body;
       this.follow(this.players[index], body, frame.dt);

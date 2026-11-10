@@ -40,6 +40,7 @@ import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { GeometryBuilder } from './geometrie';
 import { type SurfaceKind, TILE_SETTINGS, type TileSettings } from './reglages-tuiles';
+import { createRelief, type Relief } from './relief';
 import {
   type BuildingShape,
   buildingsByTile,
@@ -148,6 +149,8 @@ export class TiledPlace {
   private readonly fadeBase: FadeMaterial;
   /** Rendu encré: carte du sol du lieu (`null` dans l'ancien rendu). */
   readonly groundMap: Texture | null;
+  /** Rendu encré: relief du sol du lieu (`null` dans l'ancien rendu: sol plan). */
+  readonly relief: Relief | null;
   private readonly built: PlaceLights;
   private readonly probe = { x: 0, y: 0, z: 0 };
   private buildMs = 0;
@@ -167,6 +170,8 @@ export class TiledPlace {
     this.outside.name = 'dehors';
     this.root.add(this.outside);
     this.field = groundField(map, settings);
+    // Le relief est une affaire du rendu encré: l'ancien rendu garde son sol plan.
+    this.relief = ink === null ? null : createRelief(this.field, map);
     this.ring = new TileRing(map, settings.ring);
     const t = this.tracker;
     const standard = (roughness: number): MeshStandardMaterial =>
@@ -209,6 +214,13 @@ export class TiledPlace {
             ),
           );
     const buildings = buildingsByTile(map, settings);
+    // Sol en relief: une plateforme (le quai) est faite de dalles et de bordures, plus d'une boîte.
+    if (this.relief !== null)
+      for (const [tile, list] of buildings)
+        buildings.set(
+          tile,
+          list.filter((shape) => shape.doorSide !== null),
+        );
     const models = new Map<number, ModeledBuilding[]>();
     const windows: WindowLight[] = [];
     if (ink !== null && delivered !== null)
@@ -248,6 +260,7 @@ export class TiledPlace {
       settings,
       buildings,
       models,
+      relief: this.relief,
       materials: {
         ground,
         water,
@@ -429,11 +442,13 @@ export class TiledPlace {
     for (const mark of Object.values(this.map.landmarks ?? {})) {
       const i = Math.floor(mark.y) * this.field.width + Math.floor(mark.x);
       const wild = this.field.wild[i] ?? 0;
+      // Le pied du repère part d'un peu sous le sol en relief: il ne flotte sur aucune pente.
+      const foot = this.heightAt(mark.x, mark.y) - (this.relief?.settings.mesh.bury ?? 0);
       if (wild >= s.landmark.treeWildCells) {
         builder.box({
           x: mark.x,
           z: mark.y,
-          base: 0,
+          base: foot,
           w: 0.9,
           h: mark.height * 0.55,
           d: 0.9,
@@ -449,7 +464,7 @@ export class TiledPlace {
           this.blobInto(
             builder,
             mark.x + dx,
-            mark.height * (0.62 + 0.1 * k),
+            foot + mark.height * (0.62 + 0.1 * k),
             mark.y + dz,
             mark.height * 0.28 * k,
             mark.height * 0.24 * k,
@@ -461,7 +476,7 @@ export class TiledPlace {
         builder.box({
           x: mark.x,
           z: mark.y,
-          base: 0,
+          base: foot,
           w: side,
           h: shaft,
           d: side,
@@ -473,7 +488,7 @@ export class TiledPlace {
           cz: mark.y,
           w: side + 0.5,
           d: side + 0.5,
-          base: shaft,
+          base: foot + shaft,
           ridge: mark.height - shaft,
           alongX: true,
           color: s.landmark.towerRoofColor,
@@ -483,7 +498,7 @@ export class TiledPlace {
           cz: mark.y,
           w: side + 0.5,
           d: side + 0.5,
-          base: shaft,
+          base: foot + shaft,
           ridge: mark.height - shaft,
           alongX: false,
           color: s.landmark.towerRoofColor,
@@ -549,6 +564,11 @@ export class TiledPlace {
 
   kindAt(x: number, y: number): string | null {
     return kindAt(this.field, x, y);
+  }
+
+  /** Hauteur du sol affiché sous un point de la carte (m); 0 sans relief. */
+  heightAt(x: number, y: number): number {
+    return this.relief?.heightAt(x, y) ?? 0;
   }
 
   /**

@@ -124,6 +124,11 @@ export const INK_SETTINGS = {
     fallback: { color: '#A3B659', layer: 'grass' as LayerName },
     /** Écart des trois tons de l'herbe autour de sa teinte (clair, sombre). */
     grassTones: [1.09, 0.87] as const,
+    /**
+     * Sol en relief: poids de la pente vraie dans le choix du ton (clair vers le soleil, sombre à
+     * l'opposé). À 2,5, une pente de 5 % suffit à changer de ton: un talus de chemin se lit.
+     */
+    slopeTone: 2.5,
   },
 
   /** Eau: tons des bandes et vitesse des vaguelettes. */

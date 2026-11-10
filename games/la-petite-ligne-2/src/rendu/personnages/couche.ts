@@ -42,6 +42,7 @@ import {
   createStandInCharacters,
 } from '../bonshommes';
 import { approach } from '../camera';
+import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
 import type { Aimable } from '../cible';
 import { Fadable } from '../fondu';
 import { RENDER_SETTINGS } from '../reglages';
@@ -105,6 +106,8 @@ interface Figure extends Aimable {
   x: number;
   y: number;
   lift: number;
+  /** Hauteur du sol affiché sous ses pieds (relief d'un grand lieu), rattrapée en douceur. */
+  ground: number;
   facing: number;
   /** Inclinaison dans les virages (rad, `leanAngle`). */
   lean: number;
@@ -185,6 +188,8 @@ export class AssembledCharacters implements CharacterLayer {
   private readonly composed = new Map<string, Look>();
   private readonly players: [Figure | null, Figure | null] = [null, null];
   private readonly villagers = new Map<string, Figure>();
+  /** Hauteur du sol affiché (relief d'un grand lieu), donnée par le moteur à chaque image. */
+  private ground: ((x: number, y: number) => number) | null = null;
   private readonly unsubscribe: () => void;
   private library: CharacterLibrary | null = null;
   private fallback: CharacterLayer | null;
@@ -395,6 +400,7 @@ export class AssembledCharacters implements CharacterLayer {
       x: 0,
       y: 0,
       lift: 0,
+      ground: 0,
       facing: 0,
       lean: 0,
       phase: 0,
@@ -549,10 +555,12 @@ export class AssembledCharacters implements CharacterLayer {
     // Le bassin pose sur l'assise à sa vraie hauteur, quelle que soit celle du clip (0,50 m pour
     // le gabarit adulte): les jambes sont ensuite ramenées au sol une à une (`groundLegs`).
     const lift = seat === null ? 0 : seat.height - this.settings.seat.clipSeat * figure.legScale;
+    const ground = this.ground?.(x, y) ?? 0;
     if (!figure.placed) {
       figure.x = x;
       figure.y = y;
       figure.lift = lift;
+      figure.ground = ground;
       figure.facing = body.facing;
       figure.lean = 0;
       figure.placed = true;
@@ -561,6 +569,8 @@ export class AssembledCharacters implements CharacterLayer {
       figure.x += (x - figure.x) * k;
       figure.y += (y - figure.y) * k;
       figure.lift += (lift - figure.lift) * approach(dt, this.settings.locomotion.fadeHalfLife);
+      // Une marche (bordure, quai) se monte en douceur: la hauteur ne saute pas d'une image à l'autre.
+      figure.ground += (ground - figure.ground) * approach(dt, RELIEF_SETTINGS.stepHalfLife);
       const turn = Math.atan2(
         Math.sin(body.facing - figure.facing),
         Math.cos(body.facing - figure.facing),
@@ -570,16 +580,35 @@ export class AssembledCharacters implements CharacterLayer {
       const speed = posture.kind === 'stand' ? posture.speed : 0;
       figure.lean = leanAngle(figure.lean, speed, dt > 0 ? turned / dt : 0, dt, this.settings);
     }
-    figure.object.position.set(figure.x, figure.lift, figure.y);
+    figure.object.position.set(figure.x, figure.ground + figure.lift, figure.y);
     // Cap de l'état: 0 vers l'est, PI/2 vers le sud. Le personnage regarde vers +Z au repos.
     figure.object.rotation.y = Math.PI / 2 - figure.facing;
     figure.tilt.rotation.x = 0;
     // Autour de l'axe de la marche (+Z du personnage), pivot aux pieds: vers l'intérieur du virage.
     figure.tilt.rotation.z = figure.lean;
     figure.blob.visible = true;
-    figure.blob.position.y = this.settings.contact.lift - figure.lift;
+    // L'ombre de contact se pose sur le plus haut du sol qu'elle couvre: sur un talus ou une
+    // bordure, aucune de ses parties ne passe dessous.
+    figure.blob.position.y =
+      this.settings.contact.lift -
+      figure.lift +
+      this.contactRise(figure.x, figure.y, figure.ground);
     this.animate(figure, posture, dt);
     if (seat !== null) this.groundLegs(figure);
+  }
+
+  /** De combien le sol dépasse la hauteur des pieds sous l'ombre de contact (m), 0 sur un sol plan. */
+  private contactRise(x: number, y: number, feet: number): number {
+    const ground = this.ground;
+    if (ground === null) return 0;
+    const r = this.settings.contact.depth / 2;
+    return Math.max(
+      0,
+      ground(x - r, y) - feet,
+      ground(x + r, y) - feet,
+      ground(x, y - r) - feet,
+      ground(x, y + r) - feet,
+    );
   }
 
   /**
@@ -613,8 +642,9 @@ export class AssembledCharacters implements CharacterLayer {
     figure.y = pose.y;
     figure.facing = pose.facing;
     figure.lift = pose.height + this.settings.lie.back * scale;
+    figure.ground = this.ground?.(pose.x, pose.y) ?? 0;
     figure.placed = true;
-    figure.object.position.set(figure.x, figure.lift, figure.y);
+    figure.object.position.set(figure.x, figure.ground + figure.lift, figure.y);
     figure.object.rotation.y = Math.PI / 2 - figure.facing;
     // Rotation de -90 degrés autour de l'axe gauche-droite: la tête part vers -Z (le dos du lit),
     // le visage vers le haut.
@@ -704,6 +734,7 @@ export class AssembledCharacters implements CharacterLayer {
   }
 
   update(frame: CharacterFrame): void {
+    this.ground = frame.ground ?? null;
     if (this.fallback !== null) {
       this.fallback.update(frame);
       return;

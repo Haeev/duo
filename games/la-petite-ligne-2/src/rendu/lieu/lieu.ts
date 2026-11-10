@@ -83,6 +83,8 @@ export class PlaceScene {
     private readonly models: ModelSource | null,
     /** Faux pour un grand lieu: son sol est dessiné tuile par tuile (`grand-lieu.ts`). */
     withGround = true,
+    /** Sol en relief d'un grand lieu: hauteur sous un point de la carte; absent: sol plan. */
+    private readonly heightAt: ((x: number, y: number) => number) | null = null,
   ) {
     this.inked = materials.ink ?? null;
     this.root.name = 'lieu';
@@ -124,7 +126,9 @@ export class PlaceScene {
       }
     });
     object.name = volume.id;
-    object.position.set(volume.x, volume.base, volume.y);
+    // Posé sur le sol tel qu'il est affiché: rien ne flotte ni ne s'enfonce sur un sol en relief.
+    const ground = this.heightAt?.(volume.x, volume.y) ?? 0;
+    object.position.set(volume.x, volume.base + ground, volume.y);
     object.rotation.y = (volume.rotation * Math.PI) / 2;
     this.root.add(object);
     const view = new VolumeView(volume, object, model !== null, this.glowColor);
