@@ -37,6 +37,9 @@ function checkCondition(content: Content, c: Condition, at: string, problems: st
     case 'remembered':
     case 'need_at_least':
     case 'time_is':
+    case 'weather_is':
+    case 'season_is':
+    case 'weekday_is':
       return;
   }
 }

@@ -33,9 +33,26 @@ export type Condition =
   /** Points d'amitié du joueur qui agit avec cet habitant (cahier 4.9: 100 par cœur). */
   | { type: 'bond_at_least'; villager: string; points: number }
   /** Heure de jeu, en minutes depuis minuit (`from` inclus, `to` exclu; la plage peut passer minuit). */
-  | { type: 'time_is'; from: number; to: number };
+  | { type: 'time_is'; from: number; to: number }
+  /** Temps du monde (`simulation/monde/`): météo du lieu courant, saison, jour de la semaine. */
+  | { type: 'weather_is'; weathers: string[] }
+  | { type: 'season_is'; seasons: string[] }
+  | { type: 'weekday_is'; weekdays: string[] };
 
 const Minutes = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1440));
+// Listes recopiées de `etat/commun.ts`, `prise.ts` et `temps.ts` (qui importent ce fichier):
+// `tests/monde-temps.test.ts` vérifie qu'elles restent égales.
+export const WORLD_WEATHERS = ['clear', 'overcast', 'rain', 'mist', 'snow', 'storm'] as const;
+export const WORLD_SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
+export const WORLD_WEEKDAYS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+] as const;
 
 export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
   v.variant('type', [
@@ -70,6 +87,18 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       points: v.pipe(IntSchema, v.minValue(1), v.maxValue(500)),
     }),
     v.strictObject({ type: v.literal('time_is'), from: Minutes, to: Minutes }),
+    v.strictObject({
+      type: v.literal('weather_is'),
+      weathers: v.pipe(v.array(v.picklist(WORLD_WEATHERS)), v.minLength(1)),
+    }),
+    v.strictObject({
+      type: v.literal('season_is'),
+      seasons: v.pipe(v.array(v.picklist(WORLD_SEASONS)), v.minLength(1)),
+    }),
+    v.strictObject({
+      type: v.literal('weekday_is'),
+      weekdays: v.pipe(v.array(v.picklist(WORLD_WEEKDAYS)), v.minLength(1)),
+    }),
   ]),
 );
 

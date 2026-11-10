@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "seasons": {
+    "spring": {
+      "weights": {
+        "clear": 25,
+        "overcast": 25,
+        "rain": 15,
+        "mist": 35
+      },
+      "ambience": "halte-printemps"
+    },
+    "summer": {
+      "weights": {
+        "clear": 40,
+        "overcast": 20,
+        "rain": 10,
+        "mist": 25,
+        "storm": 5
+      },
+      "ambience": "halte-ete"
+    },
+    "autumn": {
+      "weights": {
+        "clear": 15,
+        "overcast": 25,
+        "rain": 20,
+        "mist": 40
+      },
+      "ambience": "halte-automne"
+    },
+    "winter": {
+      "weights": {
+        "clear": 15,
+        "overcast": 25,
+        "rain": 5,
+        "mist": 35,
+        "snow": 20
+      },
+      "ambience": "halte-hiver"
+    }
+  },
+  "changeChance": 0.35
+}

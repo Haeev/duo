@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "luciole-d-essai",
+  "category": "insectes",
+  "name": "Luciole",
+  "place": "essai-gare",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1260,
+      "to": 180
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer"]
+  },
+  "text": "Une luciole! Sa petite lampe clignote dans le filet."
+}

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "vue-du-quai",
+  "entry": "carte-du-quai",
+  "target": {
+    "type": "point",
+    "place": "essai-gare",
+    "point": "quai"
+  },
+  "conditions": [
+    {
+      "type": "time_is",
+      "from": 360,
+      "to": 720
+    }
+  ]
+}

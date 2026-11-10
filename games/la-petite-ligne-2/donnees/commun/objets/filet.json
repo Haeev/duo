@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "filet",
+  "name": "Filet à insectes",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "net",
+    "durability": 0,
+    "gestureSeconds": 0.6,
+    "bluntGestureSeconds": 0.6
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "appareil-photo",
+  "name": "Appareil photo",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "camera",
+    "durability": 0,
+    "gestureSeconds": 0.4,
+    "bluntGestureSeconds": 0.4
+  }
+}

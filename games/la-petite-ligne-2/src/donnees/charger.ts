@@ -25,6 +25,12 @@ import { QuestLineSchema, type QuestLineDef } from './schemas/quete';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
+import {
+  loadTimeAndBook,
+  validateTimeAndBook,
+  type BookContent,
+  type TimeContent,
+} from './charger-temps';
 import { validateContent } from './valider';
 
 type ById<T> = Readonly<Record<string, T>>;
@@ -56,6 +62,10 @@ export interface Content {
   readonly catches: ById<CatchDef>;
   readonly pieces: ById<PieceDef>;
   readonly places: ById<PlaceContent>;
+  /** Calendrier, climats et événements des lieux (`charger-temps.ts`). */
+  readonly time: TimeContent;
+  /** Collections, insectes, sujets de photo, zones de terrain (`charger-temps.ts`). */
+  readonly book: BookContent;
 }
 
 export class ContentError extends Error {
@@ -153,7 +163,9 @@ export function loadContent(files: Files): Content {
     places[def.id] = { def, map, villagers, dialogues, shops, quests };
   }
 
+  const timeAndBook = loadTimeAndBook(files, problems);
   if (
+    timeAndBook === null ||
     settings === null ||
     needs === null ||
     bags === null ||
@@ -179,8 +191,9 @@ export function loadContent(files: Files): Content {
     catches,
     pieces,
     places,
+    ...timeAndBook,
   };
-  problems.push(...validateContent(content));
+  problems.push(...validateContent(content), ...validateTimeAndBook(content));
   if (problems.length > 0) throw new ContentError(problems);
   return content;
 }

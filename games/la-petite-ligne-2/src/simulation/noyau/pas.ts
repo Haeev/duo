@@ -80,6 +80,7 @@ export function step(
     dt: SIM_DT,
     random: sim.random,
     inputs,
+    events: sim.events,
     emit(event) {
       sim.events.push(event);
     },

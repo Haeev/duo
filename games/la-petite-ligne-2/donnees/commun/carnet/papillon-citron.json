@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "papillon-citron",
+  "category": "insectes",
+  "name": "Papillon citron",
+  "place": "essai-gare",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 1200
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Un papillon citron! Il tient dans le creux de ta main."
+}

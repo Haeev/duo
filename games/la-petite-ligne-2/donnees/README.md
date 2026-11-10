@@ -3,10 +3,12 @@
 Tout le contenu est ici, en JSON validé par schéma (`src/donnees/schemas/`). **Un contenu = un fichier dont le nom est l'identifiant.** Ajouter un fichier suffit: rien à inscrire ailleurs, aucune ligne de moteur. `pnpm test` dit ce qui cloche, avec le fichier et le champ.
 
 ```text
-commun/        reglages.json, besoins.json, sacs.json
+commun/        reglages.json, besoins.json, sacs.json, temps.json, collections.json
                objets/<id>.json   meubles/<id>.json   recettes/<id>.json   prises/<id>.json
+               carnet/<id>.json   insectes/<id>.json   photos/<id>.json
                personnages/catalogue.json (écrit par le générateur de pièces, lot L5)
-lieux/<lieu>/  lieu.json, carte.json
+lieux/<lieu>/  lieu.json, carte.json, climat.json et nature.json (facultatifs)
+               evenements/<id>.json
                habitants/<id>.json   dialogues/<id>.json   commerces/<id>.json   quetes/<id>.json
 _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le jeu)
 ```
@@ -30,6 +32,11 @@ _gabarits/     un gabarit commenté par type de contenu (jamais chargés par le 
 | Prise | `pnpm nouveau prise gardon` | l'objet obtenu, les lieux, heures, météos, saisons, rareté. |
 | Commerce | `pnpm nouveau commerce epicerie aubrune` | tenancier, horaires, ventes, rachats. Pour l'ouvrir: un meuble comptoir avec la brique `shop` sur la carte. |
 | Quête | `pnpm nouveau quete le-train-de-5h12 aubrune` | chapitres, étapes, conditions de fin, effets. |
+| Entrée de collection | `pnpm nouveau entree-de-collection gardon` | catégorie (`collections.json`), lieu, source (objet, insecte, photo, air, manuelle), rareté, ligne de texte. |
+| Insecte | `pnpm nouveau insecte machaon` | son entrée (source `insect`), lieux, terrains (zones de `nature.json` du lieu), rareté, poids, fuite. |
+| Sujet de photo | `pnpm nouveau sujet-photo vue-du-pont` | son entrée (source `photo`), la cible (point, objet de carte, habitant, insecte, événement), conditions. |
+| Événement | `pnpm nouveau evenement fete-des-barrieres aubrune` | date ou règle hebdomadaire, durée, heures, conditions d'histoire, ce qu'il active (faits, habitants, commerce, scène, air). |
+| Climat d'un lieu | copier `defaultClimate` de `commun/temps.json` dans `lieux/<lieu>/climat.json` | poids des météos par saison, ambiance par saison (rendu, son), chance de changement dans la journée. |
 | Lieu | `pnpm nouveau lieu hautefonte` | carte, gare; relier au rail: `links` ici et dans le lieu voisin. Puis ses habitants, dialogues, commerces, quêtes dans son dossier. |
 
 ## Briques (ce qu'un meuble sait faire)

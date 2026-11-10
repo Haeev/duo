@@ -7,7 +7,7 @@ import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema } from './communs'
 
 export const CATCH_KINDS = ['fish', 'insect', 'shell', 'fossil', 'treasure'] as const;
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
-export const CATCH_WEATHERS = ['clear', 'overcast', 'rain', 'mist', 'snow'] as const;
+export const CATCH_WEATHERS = ['clear', 'overcast', 'rain', 'mist', 'snow', 'storm'] as const;
 
 const MinuteOfDay = v.pipe(IntSchema, v.minValue(0), v.maxValue(1440));
 

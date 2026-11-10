@@ -7,6 +7,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Condition } from '../../donnees/schemas/regles';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey } from '../../etat/progression';
+import { calendarOf } from '../monde/calendrier';
 
 export interface RuleContext {
   readonly world: ReadonlyWorld;
@@ -59,6 +60,12 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
         ? m >= condition.from && m < condition.to
         : m >= condition.from || m < condition.to;
     }
+    case 'weather_is':
+      return condition.weathers.includes(world.common.weather);
+    case 'season_is':
+      return condition.seasons.includes(calendarOf(ctx.content, world.common.day).season);
+    case 'weekday_is':
+      return condition.weekdays.includes(calendarOf(ctx.content, world.common.day).weekday);
   }
 }
 

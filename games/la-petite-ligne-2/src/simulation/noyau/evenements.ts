@@ -7,7 +7,9 @@ import * as v from 'valibot';
 import { IdSchema, IntSchema, PlayerIndexSchema } from '../../donnees/schemas/communs';
 import { NEEDS_EVENTS } from '../besoins/evenements';
 import { BRICK_EVENTS } from '../briques/evenements';
+import { COLLECTION_EVENTS } from '../collections/evenements';
 import { DIALOGUE_EVENTS } from '../dialogues/evenements';
+import { WORLD_EVENTS } from '../monde/evenements';
 import { BAG_EVENTS } from '../sac/evenements';
 import { TRAVEL_EVENTS } from '../voyage/evenements';
 
@@ -53,5 +55,7 @@ export const GameEventSchema = v.variant('type', [
   ...NEEDS_EVENTS,
   ...BAG_EVENTS,
   ...DIALOGUE_EVENTS,
+  ...WORLD_EVENTS,
+  ...COLLECTION_EVENTS,
 ]);
 export type GameEvent = v.InferOutput<typeof GameEventSchema>;

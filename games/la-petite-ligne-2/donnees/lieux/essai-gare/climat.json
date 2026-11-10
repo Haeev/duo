@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "seasons": {
+    "spring": {
+      "weights": {
+        "clear": 45,
+        "overcast": 25,
+        "rain": 20,
+        "mist": 8,
+        "storm": 2
+      },
+      "ambience": "bourg-printemps"
+    },
+    "summer": {
+      "weights": {
+        "clear": 60,
+        "overcast": 15,
+        "rain": 10,
+        "mist": 3,
+        "storm": 12
+      },
+      "ambience": "bourg-ete"
+    },
+    "autumn": {
+      "weights": {
+        "clear": 30,
+        "overcast": 30,
+        "rain": 25,
+        "mist": 15
+      },
+      "ambience": "bourg-automne"
+    },
+    "winter": {
+      "weights": {
+        "clear": 30,
+        "overcast": 30,
+        "rain": 10,
+        "mist": 10,
+        "snow": 20
+      },
+      "ambience": "bourg-hiver"
+    }
+  },
+  "changeChance": 0.25
+}

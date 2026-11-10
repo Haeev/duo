@@ -13,7 +13,7 @@
 import * as v from 'valibot';
 import { CountSchema, FiniteSchema, IdSchema, IntSchema, NeedIdSchema } from './communs';
 
-export const TOOL_KINDS = ['axe', 'spade', 'can', 'rod', 'net', 'hammer'] as const;
+export const TOOL_KINDS = ['axe', 'spade', 'can', 'rod', 'net', 'hammer', 'camera'] as const;
 export const ToolKindSchema = v.picklist(TOOL_KINDS);
 
 export const STATIONS = ['stove', 'kitchen', 'workbench'] as const;

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-du-quai",
+  "category": "cartes-postales",
+  "name": "Le quai au matin",
+  "place": "essai-gare",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "Le quai au matin, collé au carnet."
+}

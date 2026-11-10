@@ -1,0 +1,23 @@
+// GABARIT: une espèce d'insecte à attraper au filet.
+// Créer: pnpm nouveau insecte machaon   -> donnees/commun/insectes/<id>.json
+// Il faut aussi son entrée du carnet (pnpm nouveau entree-de-collection machaon, source { "type": "insect" })
+// et, dans le lieu, une zone du terrain voulu (lieux/<lieu>/nature.json). Schéma: src/donnees/schemas/collections.ts.
+{
+  "schema": 1,
+  "id": "exemple-insecte",
+  // Entrée du carnet (source « insect »).
+  "entry": "papillon-citron",
+  // Objet reçu à la capture (commun/objets/), ou null: seulement le carnet.
+  "item": null,
+  "places": ["essai-gare"],
+  // Terrains des zones de nature.json où il se pose (pre, bois, berge...).
+  "terrains": ["pre"],
+  // Heures (minutes depuis minuit, la plage peut passer minuit), météos, saisons; [] = toutes.
+  "rarity": { "hours": { "from": 360, "to": 1200 }, "weathers": [], "seasons": [] },
+  // Poids de tirage parmi les espèces possibles (commune 10, rare 1).
+  "weight": 5,
+  // Un joueur qui court à moins de cette distance (m) le fait fuir; vitesse de fuite (m/s); rayon de vol (m).
+  "alertRadius": 3,
+  "fleeSpeed": 4,
+  "wander": 1,
+}

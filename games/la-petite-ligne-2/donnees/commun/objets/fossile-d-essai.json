@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "fossile-d-essai",
+  "name": "Fossile d'essai",
+  "family": "treasure",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

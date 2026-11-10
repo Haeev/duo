@@ -159,6 +159,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'train_arrived':
       case 'train_departed':
       case 'unstuck':
+      case 'calendar_ended':
+      case 'calendar_started':
+      case 'collection_completed':
+      case 'collection_found':
+      case 'collection_record':
+      case 'insect_fled':
+      case 'net_swung':
+      case 'outlook_ready':
+      case 'photo_taken':
+      case 'rain_watered':
+      case 'weather_changed':
         break;
     }
   }

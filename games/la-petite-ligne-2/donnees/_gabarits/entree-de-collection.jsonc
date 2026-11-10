@@ -1,0 +1,25 @@
+// GABARIT: une entrée du carnet des collections (poisson, insecte, fossile, fleur, tenue, recette, carte postale, musique).
+// Créer: pnpm nouveau entree-de-collection gardon   -> donnees/commun/carnet/<id>.json
+// Schéma: src/donnees/schemas/collections.ts. Catégories: commun/collections.json.
+{
+  "schema": 1,
+  "id": "exemple-entree",
+  // Catégorie de commun/collections.json (poissons, insectes, tresors, fleurs, tenues, recettes, cartes-postales, musiques).
+  "category": "tresors",
+  "name": "Entrée d'exemple",
+  // Lieu de la collection (une collection complète dans un lieu donne son trophée).
+  "place": "essai-gare",
+  // Comment elle s'inscrit:
+  //   { "type": "item", "item": "<objet>" }  dès qu'un joueur reçoit l'objet (pêche, fouille, cadeau, achat);
+  //   { "type": "insect" }  par un insecte (commun/insectes/) qui la nomme;
+  //   { "type": "photo" }   par un sujet de photo (commun/photos/) qui la nomme;
+  //   { "type": "tune" }    par un air entendu (événement du calendrier, champ « tune »);
+  //   { "type": "manual" }  par un système qui appelle recordFind.
+  "source": { "type": "manual" },
+  // Rareté montrée au carnet après la première prise ou un indice: heures (from = to: toute la journée),
+  // météos (clear, overcast, rain, mist, snow, storm), saisons (spring, summer, autumn, winter); [] = toutes.
+  // null: sans condition.
+  "rarity": { "hours": { "from": 360, "to": 1200 }, "weathers": [], "seasons": [] },
+  // Ligne de la présentation d'une prise nouvelle (tutoiement).
+  "text": "Une trouvaille d'exemple, rien que pour toi.",
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "fossile-d-essai",
+  "category": "tresors",
+  "name": "Fossile d'essai",
+  "place": "essai-gare",
+  "source": {
+    "type": "item",
+    "item": "fossile-d-essai"
+  },
+  "rarity": null,
+  "text": "Un fossile en spirale, tout froid dans ta main."
+}
