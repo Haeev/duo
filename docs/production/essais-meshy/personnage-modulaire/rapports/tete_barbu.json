@@ -2,8 +2,8 @@
  "piece": "tete_barbu",
  "categorie": "tete",
  "triangles": 1421,
- "sommets": 4237,
- "octets": 204048,
+ "sommets": 726,
+ "octets": 49464,
  "masque": [
   "tete"
  ],

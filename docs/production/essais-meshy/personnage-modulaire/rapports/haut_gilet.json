@@ -2,8 +2,8 @@
  "piece": "haut_gilet",
  "categorie": "haut",
  "triangles": 1299,
- "sommets": 3893,
- "octets": 188084,
+ "sommets": 706,
+ "octets": 47844,
  "masque": [
   "torse",
   "bras",

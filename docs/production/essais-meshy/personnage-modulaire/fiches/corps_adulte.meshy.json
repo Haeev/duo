@@ -87,5 +87,72 @@
     1.1
    ]
   }
- }
+ },
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e4-5800-713e-9062-bd69a49fad04",
+   "params": {
+    "prompt": "Base body mannequin for a stylized toy figurine game character: adult human, gender neutral, bald head with no hair, friendly simple face sculpted in relief (small rounded nose, ears, closed smiling mouth, simple round eyes), about five heads tall, slightly chunky rounded limbs, simple mitten hands, simple rounded bare feet. Wearing only a plain tight seamless bodysuit: no clothes, no shoes, no accessories. T-pose, arms straight out horizontally, legs straight and slightly apart, facing front, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 6000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json",
+    "pose_mode": "t-pose"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:57:40.991Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  },
+  {
+   "step": "rig (marche et course offertes)",
+   "tool": "meshy_rig",
+   "task_id": "01a1c4e7-6e4d-754d-884c-8c8d594ec9ad",
+   "parent_task_id": "01a1c4e4-5800-713e-9062-bd69a49fad04",
+   "params": {
+    "height_meters": 1.72
+   },
+   "credits": 5,
+   "created": "2026-11-10",
+   "files": [
+    "Character_output.glb",
+    "Animation_Walking_withSkin.glb",
+    "Animation_Running_withSkin.glb"
+   ],
+   "downloaded": true
+  },
+  {
+   "step": "animations",
+   "tool": "meshy_animate",
+   "task_id": "01a1c4e7-b9ab-72fb-a0bd-859926490d50",
+   "parent_task_id": "01a1c4e7-6e4d-754d-884c-8c8d594ec9ad",
+   "params": {
+    "action_ids": [
+     11,
+     28
+    ]
+   },
+   "credits": 6,
+   "created": "2026-11-10",
+   "files": [
+    "animation.glb (clips Idle_02, Big_Wave_Hello)"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 16,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "credits_budget": 250,
+ "status": "essai"
 }

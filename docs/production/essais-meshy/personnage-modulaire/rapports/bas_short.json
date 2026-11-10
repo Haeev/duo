@@ -2,8 +2,8 @@
  "piece": "bas_short",
  "categorie": "bas",
  "triangles": 929,
- "sommets": 2785,
- "octets": 137116,
+ "sommets": 510,
+ "octets": 37004,
  "masque": [
   "bassin"
  ],

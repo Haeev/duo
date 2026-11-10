@@ -1,0 +1,40 @@
+{
+ "format": "duo-meshy-sheet/1",
+ "asset": "donneur_femme",
+ "game": "la-petite-ligne (essai personnage modulaire)",
+ "family": "personnage: donneur de pièces (voie B)",
+ "purpose": "second donneur, écarté: la sortie ignore la consigne (corps nu réaliste, ni pull ni jupe); ni riggé ni découpé",
+ "inputs": [],
+ "tasks": [
+  {
+   "step": "aperçu texte vers 3D",
+   "tool": "meshy_text_to_3d",
+   "task_id": "01a1c4e5-017f-72da-919e-70823e7dddef",
+   "params": {
+    "prompt": "Stylized toy figurine game character: adult woman, about five heads tall, slightly chunky rounded limbs, simple mitten hands, friendly simple face in relief. Hair in a high ponytail. Wearing a thick knitted sweater with rolled collar, a calf-length straight skirt and ankle boots. T-pose, arms straight out horizontally, legs straight and slightly apart, facing front, symmetrical. Smooth soft rounded surfaces like a matte vinyl toy figurine, clean simple shapes, thick soft volumes, no wrinkles, no fine detail, no text, no logo, no photorealism.",
+    "ai_model": "meshy-t2.5",
+    "model_type": "smart-topology",
+    "topology": "triangle",
+    "target_polycount": 6000,
+    "target_formats": [
+     "glb"
+    ],
+    "response_format": "json",
+    "pose_mode": "t-pose"
+   },
+   "credits": 5,
+   "created": "2026-11-10T09:58:24.760Z",
+   "files": [
+    "preview.glb"
+   ],
+   "downloaded": true
+  }
+ ],
+ "credits_total": 5,
+ "license": "offre payante du client: licence privée, propriété du client",
+ "author": "tech-artist",
+ "date": "2026-11-10",
+ "client": "@meshy-ai/meshy-mcp-server 0.6.9",
+ "credits_budget": 250,
+ "status": "écarté"
+}
