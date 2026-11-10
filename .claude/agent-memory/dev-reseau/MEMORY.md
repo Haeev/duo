@@ -59,6 +59,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Mesure de taille sur les 8 graines de l'endurance: environ 6 min 30 en un seul test temporaire qui calcule l'avant et l'après sur la même partie (même robot, même graine). Le gros de l'état en fin de démo: `characters` 9 à 9,4 Ko, `counters` 3,7 à 3,9 Ko, `fishing` 3,3 à 4,5 Ko.
 - Mesures avant et après: le manager prend des instantanés `wip` pendant les missions. Comparer avec le commit de départ (`git show <départ>:chemin`), jamais avec HEAD. Copie de mesure hors dépôt: imports en chemins absolus, `node_modules` relié à celui du jeu, `vitest run --root <dossier>`.
 
+## Réseau de La Petite Ligne 2 (vérifié le 2026-11-10)
+
+- Copie isolée: l'outil Bash refuse aussi les heredocs et les scripts Python qui réécrivent un fichier, et toute commande composée qui contient `git`; passer par Write et Edit, une commande git seule par appel.
+- Commande devinée par l'hôte: chaque devinée « marche » à la place d'un arrêt fait glisser l'invité d'un pas (5 cm à 1,5 m/s) après l'arrêt, jamais de recul. Six devinées (0.13) donnaient 30 cm au banc avec 5 % de pertes; deux, 10 cm. Le reste se supprimerait par un retour arrière du seul corps de l'invité chez l'hôte (non fait).
+- Banc à 60 images et 30 pas: commencer la marche sur une image paire, sinon la réponse et l'écart à l'idéal sont décalés d'une image.
+- Geste prédit: l'abandon « sans réponse » se décide quand l'accusé du canal rapide atteint la commande qui portait l'intention (les événements du même pas partent avant le rapide, sur la même connexion). Une confirmation tardive après abandon se rejoue comme un événement normal.
+
 ## Systèmes (faits lus, à confirmer sur les machines du client)
 
 - macOS, TN3179: autorisation « Réseau local » exigée pour TCP sortant vers le LAN, tout envoi UDP, la connexion d'une socket UDP, la réception de diffusion; pas pour écouter et accepter en TCP ni recevoir de l'UDP unicast. Interfaces VPN hors du « réseau local ». Aucune API pour lire l'état; première opération parfois refusée avant la réponse; connecter une socket UDP à une adresse locale déclenche l'alerte sans trafic. Ne jamais supposer `en0` = Wi-Fi.
