@@ -82,16 +82,16 @@ def simule_besoins(p: dict, jours: int, rng: random.Random) -> dict:
                 siestes=siestes / jours, forme=forme / eveil)
 
 
-# --- Économie de départ (sous) ---
-VALEUR_PAR_CASE = 50.0     # une pile vendue au bon commerçant (moyenne du tableau des prix)
+# --- Économie de départ (euros; tous les prix sont des multiples de 0,10) ---
+VALEUR_PAR_CASE = 5.0     # une pile vendue au bon commerçant (moyenne du tableau des prix)
 MIN_PAR_CASE = 2.0         # minutes réelles pour remplir une pile avec les outils de base
 MIN_TRAJET_VENTE = 1.5
 CASES_LIBRES_DEPART = 2    # barre de 5, dont 3 outils
-SACS = [(0, 4), (350, 6), (900, 10)]            # (prix, cases) disponibles à Aubrune
-OUTILS_AMELIORES = 300     # par outil, gain de vitesse x1,5 sur la récolte
+SACS = [(0, 4), (35, 6), (90, 10)]            # (prix, cases) disponibles à Aubrune
+OUTILS_AMELIORES = 30     # par outil, gain de vitesse x1,5 sur la récolte
 NB_OUTILS = 3
-REPAS_ACHETES = 14.0       # sous par plat si on ne cuisine pas
-MAISON = [("cuisine", 1500), ("chambre", 3000), ("troisième pièce", 4500), ("étage", 8000)]
+REPAS_ACHETES = 1.4        # euros par plat si on ne cuisine pas
+MAISON = [("cuisine", 150), ("chambre", 300), ("troisième pièce", 450), ("étage", 800)]
 MEUBLES_PAR_JOUR = 0.10    # part du revenu commun qui part en meubles et tenues
 
 
@@ -158,12 +158,12 @@ def main() -> None:
     print(f"Sommeil après une journée de {JOUR:.0f} min: {100 - SOMMEIL_MIN * JOUR:.0f}; "
           f"après un jour et une nuit blanche ({JOUR + NUIT:.0f} min): {100 - SOMMEIL_MIN * (JOUR + NUIT):.0f}.")
 
-    print("\n== Économie: revenu d'un joueur (sous par minute de récolte, puis par journée à 40 % de récolte) ==")
+    print("\n== Économie: revenu d'un joueur (euros par minute de récolte, puis par journée à 40 % de récolte) ==")
     for cases, vitesse, nom in [(2, 1.0, "sans sac, outils de base"), (6, 1.0, "besace de 4"),
                                 (8, 1.0, "sac de 6"), (8, 1.5, "sac de 6, outils améliorés"),
                                 (12, 1.5, "sac de 10, outils améliorés")]:
         r = revenu_minute(cases, vitesse)
-        print(f"  {nom:30s}: {r:5.1f} sous/min, {r * JOUR * 0.4:4.0f} sous/journée")
+        print(f"  {nom:30s}: {r:5.2f} euros/min, {r * JOUR * 0.4:5.1f} euros/journée")
     print("\n== Économie: jour de jeu où le duo s'offre chaque palier ==")
     for nom, part, commune in [("duo tranquille (25 % de récolte)", 0.25, 0.5),
                                ("duo médian (40 %)", 0.40, 0.5),
