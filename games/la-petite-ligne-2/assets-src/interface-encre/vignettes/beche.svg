@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Bêche: poignée en D, manche épais, fer large avec marchepied. -->
+  <g transform="translate(4 2) rotate(-18 48 50) scale(0.94)">
+    <path d="M38 6 L58 6 Q61 6 61 10 L60 20 L36 21 L35 10 Q35 6 38 6 Z M41 10 L41 15 L55 15 L55 10 Z" fill-rule="evenodd" fill="#A87A46"/>
+    <path id="manche" d="M44 19 L52 19 L53 52 L45 52 Z" fill="#A87A46"/>
+    <path data-clip="manche" data-w="0" d="M49 10 L60 10 L60 60 L50 60 Z" fill="#6E4B30"/>
+    <path data-clip="manche" data-w="0" d="M45 22 L47 22 L47 48 L45 48 Z" fill="#D7A86A"/>
+    <path d="M41 46 L57 45 L57 56 L41 57 Z" fill="#8C8E91"/>
+    <circle cx="49" cy="51" r="2.4" fill="#C8A150" data-w="0.5"/>
+    <path id="fer" d="M30 55 L68 53 Q70 74 62 86 Q49 94 36 86 Q28 74 30 55 Z" fill="#B9B7B0"/>
+    <path data-clip="fer" data-w="0" d="M52 50 L74 50 L74 96 L30 96 L30 84 Q50 82 52 50 Z" fill="#8C8E91"/>
+    <path data-clip="fer" data-w="0" d="M33 58 L42 58 L36 78 L33 74 Z" fill="#F7F3EA"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M30 60 L68 58"/>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M58 70 l5 -5 M56 77 l6 -6 M53 83 l6 -6"/></g>
+  </g>
+</svg>

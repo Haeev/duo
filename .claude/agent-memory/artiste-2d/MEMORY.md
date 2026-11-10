@@ -17,3 +17,11 @@
 - Contrôle: `node games/la-petite-ligne/ui-maquettes/outils/planche-vignettes.cjs [sortie.png]` (palette, L* disque et sujet, planche 40/60/190 px en couleur et en gris). Onglet en jeu: `capturer-souvenirs.cjs <url> "" tour-NN vignettes`, serveur Vite du jeu sur un port libre (5197 est souvent pris par une autre copie: `--strictPort` le signale).
 - Lisibilité à 40 px: un oiseau en vol se lit par des ailes larges en M aplati, pas par une croix; un poisson tenu au bec se lit en biais avec queue fourchue et oeil; une échelle se lit par ses barreaux (montants espacés d'au moins 4 unités).
 - Les scénarios de démo `souvenirs-*` ne montrent que héron, oies, échelle, mésanges, renard, vers luisants, poules et mot de Lucie: les autres vignettes ne se vérifient que sur la planche.
+
+## La Petite Ligne 2: images « à la plume » (interface encrée, thème sombre)
+
+- Moteur `games/la-petite-ligne-2/assets-src/interface-encre/encrer.mjs`: source SVG simple (aplats, traits `fill="none"`), contour calculé dans Chromium (`getPointAtLength`), rubans pleins et déliés orientés pareil en règle nonzero (un ruban par morceau entre deux coins, un disque au coin; anneau en « trou de serrure » sans coin). Pas de `stroke` en sortie: rendu identique dans Chromium, rsvg-convert et `<img>`.
+- Liseré clair par `<use href="#d" stroke=...>` derrière le groupe dessiné: les enfants sans `stroke` l'héritent. Les calques d'expression restent hors de ce groupe (le CSS du document ne voit pas l'intérieur d'un `<use>`).
+- Portraits inline: identifiants préfixés `__P__`, remplacés à l'affichage par un compteur (deux portraits dans la page). Une `class="bouche"` = un seul groupe par calque (le moteur regroupe les éléments consécutifs).
+- Pictos du sprite: `currentColor`, ombre en `fill-opacity`, aucun `clipPath`; un décimal et `minSeg` 0,32 tiennent le sprite à 85 Ko. Le générateur repasse Prettier sur `pictos-encre.ts`.
+- Outil Bash refusé dans ce worktree pour les heredocs Python avec `>`, les `cat > fichier <<EOF` multiples et les commandes qui contiennent « git » ou « source »: écrire les fichiers avec Write, remplacer par `rep.py` (JSON de paires) dans le scratchpad.

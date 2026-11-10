@@ -1,16 +1,50 @@
 /**
- * Portrait provisoire d'un habitant, généré depuis son identifiant (teintes de peau, de cheveux et
- * de vêtement stables). Il tient la place du buste 3D (interface.md, section 8) et se marque
- * « provisoire » dans la fenêtre de dialogue. La bouche bouge pendant l'écriture (classe `parle`).
- * Dessin à l'encre: formes anguleuses, aplats à deux tons (l'ombre est un voile d'encre du côté
- * droit), quelques hachures sous le menton.
+ * Portrait d'un habitant ou d'un joueur. Les portraits dessinés à la plume sont dans
+ * `assets/commun/interface/portraits/<id>.svg` (générés depuis `assets-src/interface-encre/
+ * portraits/`): trois calques d'expression (neutre, content, soucieux) et une bouche (`.bouche`)
+ * qui bouge pendant l'écriture (classe `parle`). L'expression se choisit par `mood`, ou par un
+ * ancêtre: `data-expr="content|soucieux"`, ou l'humeur du marchand (`shop-bust--joy`, `--yes`,
+ * `--no`); voir `plume.css`. Sans dessin, un substitut est généré depuis l'identifiant
+ * (teintes stables) et se marque « provisoire » dans la fenêtre de dialogue.
  */
 import { hueOf } from './pictos';
+import './plume.css';
+
+export type PortraitMood = 'neutre' | 'content' | 'soucieux';
+
+const DRAWN = import.meta.glob<string>('../../assets/commun/interface/portraits/*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const DRAWN_BY_ID = new Map(
+  Object.entries(DRAWN).map(([path, svg]) => [path.slice(path.lastIndexOf('/') + 1, -4), svg]),
+);
+
+/** Les joueurs partagent le portrait d'essai `joueur` tant que l'éditeur n'en dessine pas. */
+const PLAYER_IDS = /^(joueur|player)(-\d+)?$/;
+
+let serial = 0;
+
+/** Vrai si l'identifiant a un portrait dessiné (sinon: substitut provisoire). */
+export function hasDrawnPortrait(id: string): boolean {
+  return DRAWN_BY_ID.has(PLAYER_IDS.test(id) ? 'joueur' : id);
+}
 
 const SKINS = ['#f1c9a5', '#e0ac85', '#c68863', '#9a6646', '#6f4630'] as const;
 const INK = '#2a2522';
 
-export function portraitMarkup(id: string): string {
+export function portraitMarkup(id: string, mood?: PortraitMood): string {
+  const drawn = DRAWN_BY_ID.get(PLAYER_IDS.test(id) ? 'joueur' : id);
+  if (drawn !== undefined) {
+    // Deux portraits dans la page (buste et miniature): chacun ses identifiants internes.
+    serial += 1;
+    const expr = mood === undefined ? '' : ` data-expr="${mood}"`;
+    return drawn
+      .trim()
+      .replace(/__P__/g, `lpl-p${String(serial)}-`)
+      .replace('<svg ', `<svg class="lpl-por"${expr} aria-hidden="true" `);
+  }
   const h = hueOf(id);
   const skin = SKINS[h % SKINS.length] ?? SKINS[0];
   const hair = `hsl(${(h * 7) % 360} 35% ${20 + (h % 30)}%)`;

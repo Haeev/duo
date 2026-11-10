@@ -93,7 +93,8 @@
   font-weight: 800;
 }
 .planche .pl-cadre--clair {
-  color: var(--paper-raised);
+  /* Texte sombre des fonds clairs (accent, encre pleine) du thème sombre. */
+  color: var(--on-accent);
 }
 .planche .pl-teinte {
   display: grid;

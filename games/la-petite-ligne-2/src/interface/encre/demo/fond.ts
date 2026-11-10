@@ -2,7 +2,22 @@
  * Fond provisoire de la démonstration: un pré vu de haut, peint à la main dans les tons du style
  * encré (aplats à deux ou trois tons, traits d'encre, hachures). Il tient la place des captures du
  * moteur (`docs/jeux/jeu-1/refonte/captures/encre-*.png`) tant qu'elles n'existent pas.
+ * Ambiance (thème sombre, retour du client du 2026-11-10): crépuscule (teinte prune, bible 3.1,
+ * vignette 30 %) ou nuit (bleu de nuit, vignette 50 %), posée en voile par-dessus le dessin.
  */
+const AMBIANCES = {
+  crepuscule: { tint: '#A98299', light: '#F2A66E', vignette: 0.5 },
+  nuit: { tint: '#5A6890', light: '#FFC46B', vignette: 0.65 },
+} as const;
+
+/** Voile d'ambiance: teinte multipliée, flaque de lumière chaude au centre, bords assombris. */
+function ambianceOverlay(ambiance: keyof typeof AMBIANCES): string {
+  const a = AMBIANCES[ambiance];
+  return `<defs><radialGradient id="vig" cx="50%" cy="52%" r="70%"><stop offset="0.45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${String(a.vignette)}"/></radialGradient><radialGradient id="flaque" cx="50%" cy="55%" r="38%"><stop offset="0" stop-color="${a.light}" stop-opacity="0.35"/><stop offset="1" stop-color="${a.light}" stop-opacity="0"/></radialGradient></defs>
+    <rect width="1366" height="768" fill="${a.tint}" style="mix-blend-mode:multiply"/>
+    <rect width="1366" height="768" fill="url(#flaque)" style="mix-blend-mode:screen"/>
+    <rect width="1366" height="768" fill="url(#vig)"/>`;
+}
 const INK = '#1d1a17';
 
 /** Touffe d'herbe: trois coups de plume. */
@@ -33,7 +48,10 @@ function tree(x: number, y: number, r: number, fruit: boolean): string {
   </g>`;
 }
 
-export function provisionalBackdrop(kind: 'exterieur' | 'interieur'): string {
+export function provisionalBackdrop(
+  kind: 'exterieur' | 'interieur',
+  ambiance: keyof typeof AMBIANCES = 'crepuscule',
+): string {
   if (kind === 'interieur') {
     const planks = Array.from({ length: 12 }, (_, i) => {
       const y = i * 64;
@@ -52,6 +70,7 @@ export function provisionalBackdrop(kind: 'exterieur' | 'interieur'): string {
       <path d="M432 300l482-12 18 226-512 14z" fill="#efb3a2" stroke="${INK}" stroke-width="4"/>
       <path d="M1090 150l150-6 8 150-152 8z" fill="#8a6a4a" stroke="${INK}" stroke-width="7" stroke-linejoin="bevel"/>
       <path d="M1112 172l108-4 4 106-108 6z" fill="#b08a62" stroke="${INK}" stroke-width="3"/>
+      ${ambianceOverlay(ambiance)}
     </svg>`;
   }
   const tufts = [
@@ -90,5 +109,6 @@ export function provisionalBackdrop(kind: 'exterieur' | 'interieur'): string {
       <path d="M930 150l300-28" fill="none"/><path d="M932 176l300-28" fill="none"/>
       <path d="M946 132l8 62-16 2-8-62zM1076 120l8 62-16 2-8-62zM1206 108l8 62-16 2-8-62z"/>
     </g>
+    ${ambianceOverlay(ambiance)}
   </svg>`;
 }

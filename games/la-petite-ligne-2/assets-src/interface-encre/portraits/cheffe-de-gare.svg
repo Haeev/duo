@@ -1,0 +1,67 @@
+<!--
+  La cheffe de gare (lieu d'essai `essai-gare`, buvette de la gare): la quarantaine, carrée,
+  casquette de service marine à plaque de laiton (insigne inventé: une roue et un rail), tresse
+  brune sur l'épaule, veste marine à boutons de laiton, foulard coquelicot. Peau noisette, ombre
+  cannelle. Calques d'expression: neutre, content, soucieux.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
+  <!-- Veste et foulard -->
+  <path id="veste" d="M8 232 L20 186 Q38 166 70 162 L120 162 Q152 166 170 186 L182 232 Z" fill="#2C3B57"/>
+  <path data-clip="veste" data-w="0" d="M124 152 Q172 176 156 232 L190 232 L190 152 Z" fill="#26282E"/>
+  <path data-w="0.5" fill="none" stroke="#000" d="M95 178 L95 232"/>
+  <g data-w="0.55" fill="#C8A150"><circle cx="84" cy="196" r="3.4"/><circle cx="84" cy="216" r="3.4"/><circle cx="106" cy="196" r="3.4"/><circle cx="106" cy="216" r="3.4"/></g>
+  <path id="cou" d="M78 136 L112 136 L112 166 Q95 172 78 166 Z" fill="#A9744D"/>
+  <path data-clip="cou" data-w="0" d="M70 130 L120 130 L120 152 Q95 158 70 150 Z" fill="#8A5A3B"/>
+  <path d="M70 162 Q95 176 120 162 L116 178 L95 186 L74 178 Z" fill="#C5443D"/>
+  <path d="M95 184 L104 200 L94 204 L88 196 Z" fill="#C5443D" data-w="0.7"/>
+  <!-- Tresse sur l'épaule -->
+  <path d="M136 112 Q150 140 142 166 Q138 180 146 196 L134 198 Q126 176 132 160 Q138 138 128 118 Z" fill="#4A3327"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M134 140 l8 4 M134 156 l8 2 M134 172 l9 2"/></g>
+  <circle cx="141" cy="198" r="5" fill="#C5443D" data-w="0.6"/>
+  <!-- Oreilles et tête -->
+  <ellipse cx="45" cy="106" rx="9" ry="13" fill="#A9744D"/>
+  <ellipse cx="145" cy="106" rx="9" ry="13" fill="#8A5A3B"/>
+  <path id="tete" d="M48 80 Q50 50 95 48 Q140 50 142 80 L142 112 Q138 146 106 152 L84 152 Q52 146 48 112 Z" fill="#A9744D"/>
+  <path data-clip="tete" data-w="0" d="M122 44 Q154 104 104 160 L170 160 L170 44 Z" fill="#8A5A3B"/>
+  <path d="M48 92 Q46 70 62 66 L128 66 Q144 70 142 92 Q130 78 110 80 Q90 76 70 82 Q56 82 48 92 Z" fill="#4A3327"/>
+  <!-- Nez et grain de beauté -->
+  <path data-w="0" d="M99 104 Q108 112 103 120 Q97 122 92 118 Z" fill="#8A5A3B"/>
+  <path data-w="0.55" fill="none" stroke="#000" d="M94 100 Q88 114 94 120 Q100 122 105 118"/>
+  <circle cx="122" cy="128" r="1.8" fill="#4A2F24" data-w="0"/>
+  <!-- Casquette de service -->
+  <path d="M44 74 Q70 62 95 62 Q120 62 146 74 Q150 82 140 84 Q95 74 50 84 Q40 82 44 74 Z" fill="#26282E"/>
+  <path id="calot" d="M50 66 Q46 30 95 26 Q144 30 140 66 Q95 58 50 66 Z" fill="#2C3B57"/>
+  <path data-clip="calot" data-w="0" d="M112 20 Q146 40 140 70 L160 70 L160 20 Z" fill="#26282E"/>
+  <path d="M52 56 Q95 48 138 56 L139 66 Q95 58 51 66 Z" fill="#C5443D" data-w="0.7"/>
+  <path d="M84 34 Q95 28 106 34 L104 48 Q95 52 86 48 Z" fill="#C8A150" data-w="0.7"/>
+  <g data-w="0.4" fill="none" stroke="#000"><path d="M89 41 Q95 35 101 41 Q95 47 89 41 Z M86 46 L104 46"/></g>
+
+  <!-- Neutre: franche, un demi-sourire -->
+  <g data-expr="neutre">
+    <ellipse cx="74" cy="102" rx="8.5" ry="7" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="116" cy="102" rx="8.5" ry="7" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="75" cy="103" r="4.4" fill="#3A2A22"/><circle cx="115" cy="103" r="4.4" fill="#3A2A22"/><circle cx="73.4" cy="101.2" r="1.5" fill="#F7F3EA"/><circle cx="113.4" cy="101.2" r="1.5" fill="#F7F3EA"/></g>
+    <path d="M62 90 Q74 84 86 88 Q74 88 64 94 Z" fill="#4A3327" data-w="0.5"/>
+    <path d="M128 90 Q116 84 104 88 Q116 88 126 94 Z" fill="#4A3327" data-w="0.5"/>
+    <g class="bouche"><path d="M84 134 Q96 138 108 131 Q104 140 95 140 Q87 140 84 134 Z" fill="#D9A08F" data-w="0.5"/></g>
+  </g>
+  <!-- Content: rire franc -->
+  <g data-expr="content">
+    <path data-w="0.75" fill="none" stroke="#000" d="M65 105 Q74 96 83 105 M107 105 Q116 96 125 105"/>
+    <path d="M62 86 Q74 78 86 84 Q74 84 64 90 Z" fill="#4A3327" data-w="0.5"/>
+    <path d="M128 86 Q116 78 104 84 Q116 84 126 90 Z" fill="#4A3327" data-w="0.5"/>
+    <g class="bouche">
+      <path id="rire" d="M78 128 Q95 132 112 126 Q108 146 95 146 Q82 146 78 128 Z" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="rire" data-w="0" d="M76 126 L114 124 L112 134 Q95 136 78 134 Z" fill="#F7F3EA"/>
+    </g>
+  </g>
+  <!-- Soucieux: un sourcil froncé, l'autre levé, bouche de travers -->
+  <g data-expr="soucieux">
+    <ellipse cx="74" cy="103" rx="8.5" ry="6" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="116" cy="102" rx="8.5" ry="7.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="72" cy="104" r="4" fill="#3A2A22"/><circle cx="113" cy="103" r="4.2" fill="#3A2A22"/><circle cx="70.6" cy="102.4" r="1.3" fill="#F7F3EA"/><circle cx="111.6" cy="101.4" r="1.3" fill="#F7F3EA"/></g>
+    <path d="M62 94 Q74 88 86 94 Q74 92 64 98 Z" fill="#4A3327" data-w="0.5"/>
+    <path d="M128 84 Q116 80 104 88 Q116 86 126 90 Z" fill="#4A3327" data-w="0.5"/>
+    <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M84 136 Q92 134 98 137 Q103 139 108 134"/></g>
+  </g>
+</svg>
