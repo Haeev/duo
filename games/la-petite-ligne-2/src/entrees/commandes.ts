@@ -29,6 +29,11 @@ export interface ControlsOptions {
   readonly cameraYaw?: () => number;
   /** Rendu 3D: s'il est là, il reçoit les commandes de caméra et donne le repère de l'écran. */
   readonly camera?: ControlsCamera | null;
+  /**
+   * Un écran de l'interface (dialogue, carnet, rangement) a pris le clavier: ni déplacement, ni
+   * action, ni caméra ne partent à la simulation tant que c'est vrai.
+   */
+  readonly captured?: () => boolean;
 }
 
 export interface Controls {
@@ -67,6 +72,8 @@ export function createControls(options: ControlsOptions): Controls {
   let seq = 0;
   const move = { moveX: 0, moveY: 0 };
   const cameraInput = { turn: 0, zoom: 0, dragPixels: 0, wheel: 0 };
+  /** Capture au pas précédent: l'appui qui referme un écran ne doit pas agir sur le monde. */
+  let wasCaptured = false;
 
   return {
     step() {
@@ -75,8 +82,11 @@ export function createControls(options: ControlsOptions): Controls {
       const local = view.localIndex();
       const me = world === null || local === null ? null : world.players[local];
 
-      const forward = (input.isDown('up') ? 1 : 0) - (input.isDown('down') ? 1 : 0);
-      const side = (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
+      const captured = wasCaptured || (options.captured?.() ?? false);
+      wasCaptured = options.captured?.() ?? false;
+
+      const forward = captured ? 0 : (input.isDown('up') ? 1 : 0) - (input.isDown('down') ? 1 : 0);
+      const side = captured ? 0 : (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
       if (camera === null) worldMove(forward, side, options.cameraYaw?.() ?? 0, move);
       else {
         const length = Math.hypot(forward, side);
@@ -86,40 +96,49 @@ export function createControls(options: ControlsOptions): Controls {
         // Caméra: A et E tournent (tenues), flèches haut et bas zooment, glissé au bouton droit,
         // molette. Le pointeur et la molette du SDK s'accumulent sur un pas.
         const pointer = input.pointer;
-        cameraInput.turn =
-          (input.isDown('camera-right') ? 1 : 0) - (input.isDown('camera-left') ? 1 : 0);
-        cameraInput.zoom = (input.isDown('zoom-in') ? 1 : 0) - (input.isDown('zoom-out') ? 1 : 0);
-        cameraInput.dragPixels = pointer.right ? pointer.movementX : 0;
-        cameraInput.wheel = pointer.wheel;
+        cameraInput.turn = captured
+          ? 0
+          : (input.isDown('camera-right') ? 1 : 0) - (input.isDown('camera-left') ? 1 : 0);
+        cameraInput.zoom = captured
+          ? 0
+          : (input.isDown('zoom-in') ? 1 : 0) - (input.isDown('zoom-out') ? 1 : 0);
+        cameraInput.dragPixels = pointer.right && !captured ? pointer.movementX : 0;
+        cameraInput.wheel = captured ? 0 : pointer.wheel;
         camera.pushCameraInput(cameraInput);
       }
 
-      if (input.wasPressed('act')) {
-        // Provisoire, jusqu'à la fenêtre de dialogue du lot L7: Espace referme le dialogue ouvert.
-        if (me !== null && me.talk !== null) view.send({ type: 'talk_close' });
-        else view.send({ type: 'act' });
-      }
-      SLOTS.forEach((action, slot) => {
-        if (input.wasPressed(action)) view.send({ type: 'select_slot', slot });
-      });
-      if (input.wasPressed('stow')) view.send({ type: 'select_slot', slot: null });
+      // Les appuis sont toujours lus (ils ne restent pas en attente), mais ignorés sous capture.
+      const act = input.wasPressed('act');
+      const next = input.wasPressed('slot-next');
+      const stow = input.wasPressed('stow');
+      const confirm = input.wasPressed('confirm');
+      const picked = SLOTS.map((action) => input.wasPressed(action));
+      if (!captured) {
+        if (act) view.send({ type: 'act' });
+        picked.forEach((pressed, slot) => {
+          if (pressed) view.send({ type: 'select_slot', slot });
+        });
+        if (next && me !== null && me.toolbar.length > 0)
+          view.send({ type: 'select_slot', slot: ((me.selected ?? -1) + 1) % me.toolbar.length });
+        if (stow) view.send({ type: 'select_slot', slot: null });
 
-      // Provisoire, jusqu'à l'invite « Monter » du lot L7: Entrée sur le quai monte dans le train
-      // vers le premier lieu desservi, ou en redescend.
-      if (input.wasPressed('confirm') && world !== null && local !== null) {
-        if (world.common.travel?.boarded[local] === true) view.send({ type: 'board', to: null });
-        else {
-          const to = boardingChoices({ content: view.content, world }, local)[0];
-          if (to !== undefined) view.send({ type: 'board', to });
+        // Tant qu'aucun poteau de quai n'existe dans les données: Entrée monte dans le train vers
+        // le premier lieu desservi, ou en redescend.
+        if (confirm && world !== null && local !== null) {
+          if (world.common.travel?.boarded[local] === true) view.send({ type: 'board', to: null });
+          else {
+            const to = boardingChoices({ content: view.content, world }, local)[0];
+            if (to !== undefined) view.send({ type: 'board', to });
+          }
         }
       }
 
       return {
         seq,
-        moveX: move.moveX,
-        moveY: move.moveY,
-        run: input.isDown('run'),
-        act: input.isDown('act'),
+        moveX: captured ? 0 : move.moveX,
+        moveY: captured ? 0 : move.moveY,
+        run: !captured && input.isDown('run'),
+        act: !captured && input.isDown('act'),
       };
     },
   };

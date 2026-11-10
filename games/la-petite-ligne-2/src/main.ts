@@ -11,6 +11,7 @@ import { DATA_FILES } from './donnees/fichiers';
 import { createControls } from './entrees/commandes';
 import { drawTestMarkers } from './entrees/repere-essai';
 import { drawBaseScreen } from './plateforme/ecran-socle';
+import { createInterface } from './interface/index';
 import { createRenderer } from './rendu/index';
 import { createSession } from './session';
 import { SIM_HZ } from './simulation/noyau/constantes';
@@ -41,7 +42,27 @@ const colors = [duo.host.colorHex, duo.guest.colorHex] as const;
 // Rendu 3D; sans WebGL2, repli sur le plan 2D du socle et ses repères d'essai.
 const renderer = createRenderer({ canvas, view: session.view, playerColors: colors });
 if (renderer === null) duo.log.warn('WebGL2 indisponible: plan 2D de repli');
-const controls = createControls({ input: duo.input, view: session.view, camera: renderer });
+// L'interface HTML se pose sur le canevas; le repli sans WebGL2 n'en a pas besoin (plan d'essai).
+const ui =
+  renderer === null
+    ? null
+    : createInterface({
+        root: document.body,
+        view: session.view,
+        send: (intent) => {
+          session.view.send(intent);
+        },
+        cameraYaw: () => renderer.cameraYaw(),
+        projectToScreen: (x, y, height) => renderer.projectToScreen(x, y, height),
+        keyLabel: (code) => duo.input.keyLabel(code),
+        reducedMotion: duo.ui.reducedMotion,
+      });
+const controls = createControls({
+  input: duo.input,
+  view: session.view,
+  camera: renderer,
+  captured: () => ui?.capturing() ?? false,
+});
 /** La vue telle que la dessine l'écran de repli: son `world()` rend l'état à afficher de l'image. */
 const shown = {
   ...session.view,
@@ -72,6 +93,8 @@ duo.loop.start({
   render: (frame) => {
     if (renderer !== null) {
       renderer.frame(frame.dt, frame.alpha);
+      // Après le rendu: la projection lit la caméra de l'image qui vient d'être dessinée.
+      ui?.frame(frame.dt);
       return;
     }
     // L'image lit l'état à afficher (interpolé et prédit chez l'invité), pas l'état logique.
@@ -82,6 +105,7 @@ duo.loop.start({
 });
 
 duo.on('stop', () => {
+  ui?.dispose();
   renderer?.dispose();
   session.dispose();
   duo.dispose();
