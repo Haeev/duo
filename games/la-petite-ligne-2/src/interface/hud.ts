@@ -43,6 +43,8 @@ export interface HudFrame {
   readonly yaw: number;
   /** Réglage « besoins toujours visibles » (carnet, onglet Réglages). */
   readonly needsAlways?: boolean;
+  /** Repère de l'étape suivie (`glanceTarget`), montré par le coup d'œil; absent: rien. */
+  readonly questTarget?: { readonly x: number; readonly y: number; readonly label: string } | null;
 }
 
 export interface Hud {
@@ -157,7 +159,8 @@ export function createHud(
   }
 
   return {
-    frame({ now, world, local, prompt: model, menu, yaw, needsAlways = false }) {
+    frame(f) {
+      const { now, world, local, prompt: model, menu, yaw, needsAlways = false } = f;
       const c = clockModel(world, local);
       setText(time, c.time);
       const dayLabel = day.lastElementChild;
@@ -245,6 +248,23 @@ export function createHud(
           const h = root.clientHeight || window.innerHeight;
           otherToken.style.left = `${Math.round(w / 2 + Math.sin(dir.angle) * (w / 2 - 80))}px`;
           otherToken.style.top = `${Math.round(h / 2 - Math.cos(dir.angle) * (h / 2 - 70))}px`;
+        }
+        const target = f.questTarget ?? null;
+        show(quest, target !== null);
+        if (target !== null) {
+          quest.setAttribute('aria-label', target.label);
+          quest.title = target.label;
+          const qDir = otherDirection(me.body, { x: target.x, y: target.y }, yaw);
+          const onScreen = project?.(target.x, target.y, TOKEN_HEIGHT) ?? null;
+          if (onScreen !== null) {
+            quest.style.left = `${Math.round(onScreen.x)}px`;
+            quest.style.top = `${Math.round(onScreen.y)}px`;
+          } else {
+            const w = root.clientWidth || window.innerWidth;
+            const h = root.clientHeight || window.innerHeight;
+            quest.style.left = `${Math.round(w / 2 + Math.sin(qDir.angle) * (w / 2 - 80))}px`;
+            quest.style.top = `${Math.round(h / 2 - Math.cos(qDir.angle) * (h / 2 - 70))}px`;
+          }
         }
         const bar = timer.firstElementChild;
         if (bar instanceof HTMLElement)

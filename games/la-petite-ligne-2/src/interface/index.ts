@@ -4,6 +4,7 @@
  * libellés selon le clavier réel (`keyLabel`, du SDK).
  */
 import type { PlayerIndex } from '../donnees/schemas/communs';
+import type { ReadonlyWorld } from '../etat/monde';
 import type { GameView } from '../session';
 import { talkView } from '../simulation/dialogues/conversation';
 import type { Intent } from '../simulation/noyau/entrees';
@@ -30,6 +31,7 @@ import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
 import { passageSays } from '../simulation/lieux/index';
+import { glanceTarget } from '../simulation/quetes/lecture';
 
 import './interface.css';
 import './carnet/carnet.css';
@@ -121,14 +123,19 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     options.onBabble ?? (() => undefined),
     UI_TUNING.openGuardMs,
   );
-  const notebook = createNotebook(
-    layer,
-    view.content,
-    send,
-    keyLabel,
-    UI_TUNING.openGuardMs,
-    options.notebook,
-  );
+  const notebook = createNotebook(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, {
+    // Suite suivie: l'état partagé fait foi, « Suivre » part en intention (le coup d'œil la lit).
+    follow: {
+      get: () => {
+        const me = view.localIndex();
+        return me === null ? null : (view.world()?.common.story?.tracked[me] ?? null);
+      },
+      set: (quest) => {
+        send({ type: 'quest_track', quest });
+      },
+    },
+    ...options.notebook,
+  });
   const shop = createShopScreen(
     layer,
     view.content,
@@ -180,6 +187,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
 
   function nameOf(player: PlayerIndex): string {
     return view.world()?.players[player].name ?? '';
+  }
+
+  /** Repère du coup d'œil: l'étape ouverte de la suite suivie, dans le lieu où l'on joue. */
+  function questMarker(
+    world: ReadonlyWorld,
+    me: PlayerIndex,
+  ): { x: number; y: number; label: string } | null {
+    const target = glanceTarget(world, view.content, me);
+    return target === null
+      ? null
+      : { x: target.target.x, y: target.target.y, label: target.objective };
   }
 
   /** Texte d'un refus; devant un verrou ou une porte fermée, la phrase des données d'abord. */
@@ -434,6 +452,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         menu: notebook.isOpen() || shopOpen,
         yaw: options.cameraYaw(),
         needsAlways: settingsUi().needsAlways,
+        questTarget: questMarker(world, me),
       });
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
     },

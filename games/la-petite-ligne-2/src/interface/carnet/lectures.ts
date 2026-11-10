@@ -12,6 +12,7 @@
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { bondKey } from '../../etat/progression';
+import { glanceTarget, journal } from '../../simulation/quetes/lecture';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { GraphicsOptions } from '../../rendu/options';
 import { UI_TUNING } from '../reglages';
@@ -205,43 +206,43 @@ function targetOf(
 /** Adaptateurs sur l'état réel; ce qui manque est vide (jamais inventé). */
 export function worldSources(content: Content, extras: WorldSourcesExtras = {}): CarnetSources {
   return {
-    quests(world) {
-      const lines: QuestLineRead[] = [];
-      const placeId = world.common.place;
-      for (const place of Object.values(content.places)) {
-        for (const def of Object.values(place.quests)) {
-          const progress = world.progress.quests[def.id];
-          if (progress === undefined) continue;
-          const index = Math.max(
-            0,
-            def.chapters.findIndex((c) => c.id === progress.chapter),
-          );
-          const chapter = def.chapters[index];
-          const step = chapter?.steps.find((s) => s.id === progress.step) ?? chapter?.steps[0];
-          const giver = def.giver === null ? null : place.villagers.find((x) => x.id === def.giver);
-          const target =
-            progress.done || place.def.id !== placeId
+    quests(world, local) {
+      // Le moteur de quêtes fait foi: étapes ouvertes (en parallèle comprises), textes accordés
+      // pour ce joueur, repère du coup d'œil quand la suite est suivie.
+      const glance = glanceTarget(world, content, local);
+      return journal(world, content, local).map((entry) => {
+        const place = content.places[entry.place];
+        const def = place?.quests[entry.quest];
+        const progress = world.progress.quests[entry.quest];
+        const index = Math.max(0, def?.chapters.findIndex((c) => c.id === progress?.chapter) ?? 0);
+        const giver =
+          def?.giver === null || def === undefined
+            ? undefined
+            : place?.villagers.find((x) => x.id === def.giver);
+        const first = entry.steps[0];
+        const firstDef = def?.chapters.flatMap((c) => c.steps).find((st) => st.id === first?.id);
+        const target =
+          glance?.quest === entry.quest
+            ? { x: glance.target.x, y: glance.target.y }
+            : entry.done || place === undefined || entry.place !== world.common.place
               ? null
-              : targetOf(place, step?.target ?? null);
-          lines.push({
-            id: def.id,
-            kind: def.kind,
-            title: def.title,
-            giver:
-              giver === undefined || giver === null ? null : { id: giver.id, name: giver.name },
-            chapters: def.chapters.map((c, i) => ({
-              id: c.id,
-              title: c.title,
-              state: progress.done || i < index ? 'done' : i === index ? 'current' : 'todo',
-            })),
-            finished: progress.done,
-            step: progress.done ? '' : (step?.objective ?? ''),
-            together: progress.done ? false : (step?.together ?? false),
-            target,
-          });
-        }
-      }
-      return lines;
+              : targetOf(place, firstDef?.target ?? null);
+        return {
+          id: entry.quest,
+          kind: entry.kind,
+          title: entry.title,
+          giver: giver === undefined ? null : { id: giver.id, name: giver.name },
+          chapters: (def?.chapters ?? []).map((c, i) => ({
+            id: c.id,
+            title: c.title,
+            state: entry.done || i < index ? 'done' : i === index ? 'current' : 'todo',
+          })),
+          finished: entry.done,
+          step: entry.steps.map((st) => st.objective).join(' ; '),
+          together: entry.steps.some((st) => st.together),
+          target,
+        };
+      });
     },
     villagers(world, local) {
       const other: PlayerIndex = local === 0 ? 1 : 0;
