@@ -1,0 +1,93 @@
+{
+  "aim": "cible",
+  "cues": {
+    "carnet-ouvre": "carnet-ouvre",
+    "carnet-ferme": "carnet-ferme",
+    "rangement-ferme": "rangement-ferme",
+    "choix": "choix",
+    "poser": "poser",
+    "refus": "refus"
+  },
+  "rules": [
+    {
+      "on": "gesture_started",
+      "where": { "clip": "wash" },
+      "sound": "eau-pompe",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "gesture_done",
+      "where": { "clip": "pickup" },
+      "sound": "ramasser",
+      "audience": "both",
+      "placed": true
+    },
+    { "on": "gesture_done", "sound": "reussite", "audience": "both", "placed": true },
+    { "on": "refused", "sound": "refus", "audience": "own", "placed": false },
+    {
+      "on": "brick_used",
+      "where": { "brick": "sit" },
+      "sound": "asseoir",
+      "audience": "both",
+      "placed": true
+    },
+    { "on": "store_opened", "sound": "rangement-ouvre", "audience": "both", "placed": true },
+    { "on": "pockets_full", "sound": "sac-plein", "audience": "own", "placed": false },
+    { "on": "tool_blunt", "sound": "refus", "audience": "own", "placed": false },
+    {
+      "on": "money_changed",
+      "where": { "delta": { "gt": 0 } },
+      "sound": "monnaie",
+      "actor": "who",
+      "audience": "own",
+      "placed": false
+    },
+    {
+      "on": "money_changed",
+      "where": { "delta": { "lt": 0 } },
+      "sound": "monnaie",
+      "actor": "who",
+      "audience": "own",
+      "placed": false
+    },
+    {
+      "on": "need_tier",
+      "where": { "state": "low" },
+      "sound": "palier-bas",
+      "audience": "own",
+      "placed": false
+    },
+    {
+      "on": "need_tier",
+      "where": { "state": "blocked" },
+      "sound": "palier-bas",
+      "audience": "own",
+      "placed": false
+    },
+    {
+      "on": "need_tier",
+      "where": { "state": "bonus" },
+      "sound": "palier-bonus",
+      "audience": "own",
+      "placed": false
+    },
+    { "on": "meal_shared", "sound": "palier-bonus", "audience": "own", "placed": false },
+    { "on": "talk_page", "sound": "page", "audience": "own", "placed": false },
+    {
+      "on": "day_started",
+      "where": { "slept": true },
+      "sound": "reveil",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "train_boarded",
+      "where": { "to": { "notNull": true } },
+      "sound": "embarquement",
+      "audience": "both",
+      "placed": false
+    },
+    { "on": "train_arrived", "sound": "train-arrive", "audience": "both", "placed": false }
+  ]
+}

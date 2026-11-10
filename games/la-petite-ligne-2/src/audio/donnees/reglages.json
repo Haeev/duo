@@ -1,0 +1,19 @@
+{
+  "space": {
+    "refDistance": 3,
+    "rolloff": 0.6,
+    "cullDistance": 40,
+    "panWidth": 8,
+    "panAmount": 0.8,
+    "otherPlayerDb": -3
+  },
+  "steps": {
+    "strideMeters": 0.85,
+    "minSpeed": 0.4,
+    "default": "grass",
+    "surfaces": { "grass": "pas-herbe", "dirt": "pas-terre", "paved": "pas-pave" }
+  },
+  "maxVoices": 24,
+  "defaults": { "master": 0.8, "effects": 1, "interface": 0.9, "babble": 0.8, "ambience": 0.8 },
+  "storageKey": "la-petite-ligne-2.son"
+}

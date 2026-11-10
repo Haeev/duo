@@ -1,0 +1,10 @@
+{
+  "dawn": [5.5, 7.5],
+  "dusk": [19, 21],
+  "fadeSeconds": 3,
+  "layers": {
+    "jour": { "file": "ambiances/jour.ogg", "when": "day", "volumeDb": -22 },
+    "nuit": { "file": "ambiances/nuit.ogg", "when": "night", "volumeDb": -22 },
+    "trajet": { "file": "ambiances/trajet.ogg", "when": "travel", "volumeDb": -16 }
+  }
+}
