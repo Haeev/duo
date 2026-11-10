@@ -496,3 +496,4 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Publication: la refonte est publiée dans Duo à côté de l'ancien jeu dès le soir du 10 novembre, comme version d'essai.
 - Suno: annoncé par le client pour l'audio, non visible depuis la session cloud; licence à vérifier avant usage.
 - Référence du style validée par le client (« oui parfait »): la capture de nuit de la scène d'essai encrée au zoom de jeu (`captures/encre-exterieur-jeu-nuit.png`, passe 3). Le portage du rendu encré dans le jeu s'y mesure.
+- Seconde référence du style, pour les intérieurs (« je la trouve magnifique aussi »): `captures/encre-interieur-jour-dense.png` (passe 3).
