@@ -8,6 +8,7 @@ export { AssembledCharacters, assembledCharacters } from './couche';
 export { CharacterLibrary, assemble, createRig } from './assemblage';
 export { composeLook, defaultPlayerLook, resolveLook } from './apparence';
 export { loadCharacterLibrary } from './chargement';
+export { createCharacterPreview, type CharacterPreview, PREVIEW_SETTINGS } from './apercu';
 export { CHARACTER_SETTINGS } from './reglages';
 
 /** La couche du jeu: GLB du catalogue chargés au lancement, bonshommes provisoires en attendant. */

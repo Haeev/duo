@@ -90,6 +90,8 @@ export const BRICK_SCHEMAS = [
   v.strictObject({ brick: v.literal('travel') }),
   /** Points de récolte du monde et terre cultivable (`recolte-briques.ts`). */
   ...HARVEST_BRICK_SCHEMAS,
+  /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */
+  v.strictObject({ brick: v.literal('mirror') }),
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);

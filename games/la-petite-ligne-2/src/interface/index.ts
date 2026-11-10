@@ -15,6 +15,10 @@ import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import type { UiSettings } from './carnet/lectures';
+import { createCharacterEditor, type EditorPreviewFactory } from './editeur/editeur';
+import { EDITOR_SETTINGS } from './editeur/reglages';
+import { defaultPlayerLook } from '../rendu/personnages/apparence';
+import { CHARACTER_SETTINGS } from '../rendu/personnages/reglages';
 import { createHud, type ProjectToScreen } from './hud';
 import { promptModel } from './modeles';
 import { spriteMarkup } from './pictos';
@@ -25,6 +29,7 @@ import './carnet/carnet.css';
 
 export type { BabbleInfo } from './dialogue';
 export type { ProjectToScreen } from './hud';
+export type { EditorPreview, EditorPreviewFactory } from './editeur/editeur';
 
 export interface InterfaceOptions {
   /** Élément qui reçoit l'interface (par-dessus le canevas). */
@@ -43,6 +48,12 @@ export interface InterfaceOptions {
   readonly notebook?: NotebookExtras;
   /** Babil: une syllabe à jouer (lot L9). */
   readonly onBabble?: (info: BabbleInfo) => void;
+  /** Aperçu 3D de l'éditeur de personnage (`createCharacterPreview` du rendu). */
+  readonly characterPreview?: EditorPreviewFactory;
+  /** Couleurs des profils (hôte, invité): pièces de départ proches de sa couleur. */
+  readonly playerColors?: readonly [string, string];
+  /** Ouvre l'éditeur au début tant que le joueur n'a pas d'apparence (prologue). Défaut: oui. */
+  readonly editorAtStart?: boolean;
   /** Écoute du clavier (`window` par défaut). */
   readonly keyTarget?: Pick<Window, 'addEventListener' | 'removeEventListener'>;
 }
@@ -110,6 +121,24 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   );
   const shop = createShopScreen(layer, view.content, send, keyLabel, UI_TUNING.openGuardMs, reduced);
   layer.dataset.motion = reduced() ? 'reduced' : 'full';
+  const playerColors = options.playerColors ?? EDITOR_SETTINGS.fallbackAccents;
+  const editor = createCharacterEditor(layer, {
+    data: view.content,
+    send,
+    keyLabel,
+    reduced,
+    ...(options.characterPreview === undefined ? {} : { preview: options.characterPreview }),
+    starter: (player, gender) =>
+      defaultPlayerLook(
+        player,
+        gender,
+        view.content.settings.start.shapes,
+        playerColors[player],
+        view.content.catalogue,
+      ),
+    defaultGender: (player) => CHARACTER_SETTINGS.defaultGenders[player],
+  });
+  let editorShown = options.editorAtStart === false;
 
   function local(): PlayerIndex | null {
     return view.localIndex();
@@ -181,6 +210,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'store_opened':
         if (event.player === me) notebook.openStore(event.target, now);
         break;
+      case 'mirror_opened': {
+        const world = view.world();
+        if (event.player === me && world !== null) editor.open('mirror', world, me);
+        break;
+      }
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
       case 'ate':
@@ -229,7 +263,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     if (!(raw instanceof KeyboardEvent)) return;
     if (raw.repeat && (raw.code === 'Space' || raw.code === 'Enter')) return;
     let used = false;
-    if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
+    if (editor.isOpen()) used = editor.key(raw);
+    else if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
     else if (shop.isOpen()) used = shop.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (raw.code === 'KeyG' && !raw.repeat) {
@@ -253,6 +288,11 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       const me = local();
       layer.hidden = world === null || me === null;
       if (world === null || me === null) return;
+      if (!editorShown && world.players[me].look === null) {
+        editorShown = true;
+        editor.open('create', world, me);
+      }
+      editor.frame(dt, world, me);
       dialogue.sync(talkView(view.content, world, me), now);
       dialogue.frame(dtMs);
       notebook.frame(world, me);
@@ -277,7 +317,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
     },
     capturing() {
-      return dialogue.isOpen() || notebook.isOpen() || shop.isOpen();
+      return editor.isOpen() || dialogue.isOpen() || notebook.isOpen() || shop.isOpen();
     },
     dispose() {
       offEvents();
@@ -286,6 +326,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.dispose();
       notebook.dispose();
       shop.dispose();
+      editor.dispose();
       layer.remove();
     },
   };

@@ -14,6 +14,7 @@ import { HARVEST_BRICKS } from '../outils/briques';
 import { sitBehaviour } from './asseoir';
 import { sleepBehaviour } from './dormir';
 import { talkBehaviour } from './parler';
+import { mirrorBehaviour } from './miroir';
 import { pickupBehaviour } from './ramasser';
 import { storeBehaviour } from './ranger';
 import type { BrickRegistry, EntityBehaviour } from './types';
@@ -44,6 +45,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   travel: travelBehaviour,
   shop: shopBehaviour,
   ...HARVEST_BRICKS,
+  mirror: mirrorBehaviour,
 };
 
 /** Actions sur ce qui n'est pas un meuble: un objet au sol (`pickup`), un habitant (`talk`). */

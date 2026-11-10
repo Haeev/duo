@@ -1,0 +1,309 @@
+/*
+ * Éditeur de personnage (interface 5.8). Jetons de `interface.css`; tout en rem. À 1366 x 768:
+ * personnage à gauche, rayons à droite, tout tient sans défilement. Seuls transform et opacity
+ * s'animent.
+ */
+.lpl-ui .lpl-ed {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: minmax(18rem, 27rem) minmax(0, 36rem);
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: radial-gradient(ellipse at 30% 40%, var(--paper-raised), var(--paper) 70%);
+}
+.lpl-ui .lpl-ed__stage {
+  position: relative;
+  align-self: center;
+  height: min(37.5rem, calc(100vh - 2.5rem));
+  border: 0.1875rem solid var(--ink);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #efe6d2;
+  box-shadow: var(--shadow-2);
+}
+.lpl-ui .lpl-ed__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+.lpl-ui .lpl-ed__canvas:active {
+  cursor: grabbing;
+}
+.lpl-ui .lpl-ed__loading {
+  position: absolute;
+  inset: auto 0 45% 0;
+  margin: 0;
+  text-align: center;
+  color: var(--ink-muted);
+  font-weight: 700;
+}
+.lpl-ui .lpl-ed__hint {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.5rem;
+  margin: 0;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  background: rgb(251 246 233 / 0.85);
+  font-size: 0.8125rem;
+  font-weight: 750;
+}
+.lpl-ui .lpl-ed__panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 0.5rem;
+}
+.lpl-ui .lpl-ed__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.lpl-ui .lpl-ed__tabs {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: nowrap;
+}
+.lpl-ui .lpl-ed__tab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  padding: 0.125rem;
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem 0.5rem 0.25rem 0.25rem;
+  background: var(--paper-sunken);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--d-fast) var(--ease);
+}
+.lpl-ui .lpl-ed__tab img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.lpl-ui .lpl-ed__tab-name {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 0.125rem);
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  opacity: 0;
+}
+.lpl-ui .lpl-ed__tab[aria-selected='true'] {
+  background: var(--paper-raised);
+  transform: translateY(-0.1875rem);
+}
+.lpl-ui .lpl-ed__tab[aria-selected='true'] .lpl-ed__tab-name {
+  opacity: 1;
+}
+
+.lpl-ui .lpl-ed__grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  background: var(--paper-raised);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+.lpl-ui .lpl-ed__section {
+  margin: 0.375rem 0 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.lpl-ui .lpl-ed__note {
+  margin: -0.25rem 0 0.25rem;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-ed__row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.lpl-ui .lpl-ed__tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--tile);
+  height: var(--tile);
+  padding: 0;
+  border: 0.125rem solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--paper);
+  transition: transform var(--d-fast) var(--ease);
+}
+.lpl-ui .lpl-ed__tile img {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: contain;
+  margin-bottom: 0.625rem;
+}
+.lpl-ui .lpl-ed__label {
+  position: absolute;
+  left: 0.125rem;
+  right: 0.125rem;
+  bottom: 0.0625rem;
+  overflow: hidden;
+  font-size: 0.6875rem;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lpl-ui .lpl-ed__tile.is-chosen {
+  border-color: var(--primary);
+  border-width: 0.1875rem;
+  background: #e3ecdf;
+}
+.lpl-ui .lpl-ed__tile.is-chosen::after {
+  content: '✓';
+  position: absolute;
+  top: 0.125rem;
+  right: 0.25rem;
+  font-weight: 900;
+  color: var(--primary);
+}
+.lpl-ui .lpl-ed__tile:hover,
+.lpl-ui .lpl-ed__swatch:hover {
+  transform: translateY(-0.125rem);
+}
+.lpl-ui .lpl-ed__initial {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-ed__none {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-ed__ruler {
+  width: 1.25rem;
+  height: 3.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: var(--wood);
+  transform-origin: bottom;
+  transform: scaleY(calc(0.4 + var(--h) * 0.6));
+}
+.lpl-ui .lpl-ed__swatch {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0.125rem solid var(--ink);
+  border-radius: 50%;
+  background: var(--c);
+  transition: transform var(--d-fast) var(--ease);
+}
+.lpl-ui .lpl-ed__swatch.is-chosen {
+  box-shadow:
+    0 0 0 0.1875rem var(--paper-raised),
+    0 0 0 0.375rem var(--primary);
+}
+.lpl-ui .lpl-ed__swatch.is-reserved {
+  border-style: dashed;
+}
+.lpl-ui .is-pop {
+  animation: lpl-ed-pop var(--d-base) var(--ease-bounce);
+}
+@keyframes lpl-ed-pop {
+  from {
+    transform: scale(0.85);
+  }
+}
+.lpl-ui[data-motion='reduced'] .is-pop {
+  animation: none;
+}
+
+.lpl-ui .lpl-ed__bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.lpl-ui .lpl-ed__field {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  position: relative;
+}
+.lpl-ui .lpl-ed__name {
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  background: var(--paper-raised);
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.lpl-ui .lpl-ed__name:focus {
+  outline: 0.1875rem solid var(--focus);
+  outline-offset: 0.125rem;
+}
+.lpl-ui .lpl-ed__error {
+  position: absolute;
+  top: 100%;
+  margin: 0.125rem 0 0;
+  color: var(--stamp);
+  font-size: 0.75rem;
+}
+.lpl-ui .lpl-ed__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2.75rem;
+  padding: 0 1rem;
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  background: var(--paper-raised);
+  font-weight: 800;
+  box-shadow: var(--shadow-1);
+}
+.lpl-ui .lpl-ed__button--primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.lpl-ui .lpl-ed__die {
+  font-size: 1.375rem;
+  line-height: 1;
+}
+.lpl-ui .lpl-ed__keys {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+.lpl-ui .lpl-ed__other {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border: 0.125rem solid var(--ink);
+  border-radius: 1rem;
+  background: var(--paper-sunken);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+.lpl-ui .lpl-ed__other.is-ready {
+  background: #e3ecdf;
+}

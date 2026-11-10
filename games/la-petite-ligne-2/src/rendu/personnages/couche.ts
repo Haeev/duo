@@ -63,6 +63,8 @@ interface Figure extends Aimable {
   readonly object: Group;
   readonly key: string;
   readonly shape: string;
+  /** Taille choisie dans l'éditeur (cm), cuite dans l'échelle du squelette. */
+  readonly chosenHeight: number | undefined;
   readonly height: number;
   readonly legScale: number;
   readonly root: Object3D;
@@ -266,7 +268,7 @@ export class AssembledCharacters implements CharacterLayer {
 
   private create(id: string, look: Look, library: CharacterLibrary): Figure {
     const { key, shared, shape } = this.acquire(look, library);
-    const { root, skeletonOf } = createRig(library, shape);
+    const { root, skeletonOf } = createRig(library, shape, look.height);
     const parent = skeletonOf.parent ?? root;
     const bind = (geometry: AssembledGeometry['body']): SkinnedMesh => {
       const mesh = new SkinnedMesh(geometry, this.material);
@@ -310,6 +312,7 @@ export class AssembledCharacters implements CharacterLayer {
       object,
       key,
       shape,
+      chosenHeight: look.height,
       height: library.height(shape),
       legScale: (lengths?.legs ?? 1) * (lengths?.scale ?? 1),
       root,
@@ -367,7 +370,7 @@ export class AssembledCharacters implements CharacterLayer {
     if (current !== null && current.lookRef === lookRef) return current;
     const look = lookOf();
     const key = lookKey(resolveLook(look, library.catalogue, library.morphologies));
-    if (current !== null && current.key === key) {
+    if (current !== null && current.key === key && current.chosenHeight === look.height) {
       current.lookRef = lookRef;
       return current;
     }

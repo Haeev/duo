@@ -345,10 +345,14 @@ export function headMorphs(geometry: BufferGeometry): Readonly<Record<string, nu
   return typeof value === 'object' && value !== null ? (value as Record<string, number>) : {};
 }
 
-/** Squelette d'un personnage: copie du gabarit, longueurs de l'âge appliquées. */
+/**
+ * Squelette d'un personnage: copie du gabarit, longueurs de l'âge appliquées. `height` (cm, choix
+ * de l'éditeur) met l'ensemble à l'échelle par rapport à la taille de la morphologie.
+ */
 export function createRig(
   library: CharacterLibrary,
   shape: string,
+  height?: number,
 ): {
   root: Object3D;
   skeletonOf: SkinnedMesh;
@@ -373,5 +377,6 @@ export function createRig(
     root.getObjectByName('Head')?.scale.setScalar(lengths.head);
     root.scale.setScalar(lengths.scale);
   }
+  if (height !== undefined) root.scale.multiplyScalar(height / 100 / library.height(shape));
   return { root, skeletonOf: skinned };
 }

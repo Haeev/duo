@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne (refonte): éditeur de personnage</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #2a2522;
+      }
+      #envoi {
+        position: fixed;
+        left: 0.5rem;
+        bottom: 0.25rem;
+        z-index: 100;
+        max-width: 60%;
+        font: 0.625rem monospace;
+        color: #2a2522;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ui"></div>
+    <div id="envoi"></div>
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

@@ -142,6 +142,7 @@ const ui = createInterface({
     sources: dummySources(parsePlan(planAubrune), ['M', 'F', 'T', 'C']),
     follow: memoryFollow('histoire'),
   },
+  editorAtStart: false,
 });
 
 function emit(event: GameEvent): void {

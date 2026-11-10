@@ -55,6 +55,7 @@ function coreIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void 
   } else if (intent.type === 'set_look') {
     actor.name = intent.name;
     actor.look = intent.look;
+    if (intent.gender !== undefined) actor.gender = intent.gender;
     sim.touch('players');
   } else if (intent.type === 'unstick') {
     // Debout et libre de ses gestes seulement: une place assise se quitte en marchant.
