@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { checkAgreementTags, resolveAgreement } from '../src/simulation/dialogues/accords';
 import { heartKey } from '../src/simulation/dialogues/amitie';
 import { talkView } from '../src/simulation/dialogues/conversation';
+import { DIALOGUES } from '../src/simulation/dialogues/reglages';
 import { agreementTagShare, validateDialogueTexts } from '../src/simulation/dialogues/valider';
 import type { Sim } from '../src/simulation/noyau/pas';
 import { act, contentWith } from './aides-l3';
@@ -137,6 +138,9 @@ describe('dialogues', () => {
       'Te voilà revenue. Je peux te dire un secret ?',
     );
     act(sim, 0, { type: 'talk_next' });
+    // La cheffe tient la buvette: sa boutique est proposée en dernière page (défaut D2).
+    expect(sim.world.players[0].talk?.node).toBe(DIALOGUES.shopOffer.node);
+    act(sim, 0, { type: 'talk_close' });
     openTalk(sim, 0);
     expect(sim.world.players[0].talk?.dialogue).toBe('accueil');
   });

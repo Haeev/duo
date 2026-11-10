@@ -4,6 +4,7 @@
  */
 import type { Content } from '../../donnees/charger';
 import { checkAgreementTags, hasAgreementTag } from './accords';
+import { DIALOGUES } from './reglages';
 
 /** Tous les textes d'un dialogue, avec leur emplacement. */
 function* textsOf(content: Content): Generator<{ at: string; text: string }> {
@@ -22,6 +23,20 @@ export function validateDialogueTexts(content: Content): string[] {
   const problems: string[] = [];
   for (const { at, text } of textsOf(content))
     for (const problem of checkAgreementTags(text)) problems.push(`${at}: ${problem}`);
+  // La page « boutique » des commerçants porte un nœud réservé (`commerce.ts`).
+  const reserved = DIALOGUES.shopOffer.node;
+  for (const place of Object.values(content.places)) {
+    for (const dialogue of place.dialogues)
+      if (reserved in dialogue.nodes)
+        problems.push(
+          `lieu ${place.def.id}, dialogue ${dialogue.id}: nœud « ${reserved} » réservé`,
+        );
+    for (const shop of Object.values(place.shops))
+      if (shop.talk !== undefined)
+        for (const text of [shop.talk.open, shop.talk.leave])
+          for (const problem of checkAgreementTags(text))
+            problems.push(`lieu ${place.def.id}, commerce ${shop.id}: ${problem}`);
+  }
   return problems;
 }
 

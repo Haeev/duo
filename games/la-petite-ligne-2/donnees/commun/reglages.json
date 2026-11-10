@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "start": {
-    "place": "essai-gare",
-    "minute": 600,
+    "place": "train-de-nuit",
+    "minute": 1290,
     "money": 2000,
     "shapes": {
       "f": "adult-f-medium",
@@ -35,7 +35,8 @@
   "reach": {
     "action": 1.2,
     "aimHalfAngleDeg": 50,
-    "aimDistanceWeight": 0.5
+    "aimDistanceWeight": 0.5,
+    "aimLookHalfAngleDeg": 20
   },
   "gestures": {
     "maxSeconds": 1.5,

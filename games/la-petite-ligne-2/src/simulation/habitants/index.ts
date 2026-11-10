@@ -155,6 +155,35 @@ function spread(
   }
 }
 
+/**
+ * Le point où descendent les joueurs reste dégagé: un poste à moins de `arrivalClearance` est
+ * repoussé sur ce cercle, d'abord dans son propre sens; s'il est au point même, derrière les
+ * joueurs (ils descendent face au lieu, `placeAtArrival`), hors de leur regard et de leur chemin.
+ */
+function clearArrival(sim: SimContext, content: PlaceContent, place: PlaceState, goal: Goal): void {
+  const arrival = content.map.points[content.def.station.arrival];
+  if (arrival === undefined) return;
+  const { arrivalClearance: radius, arrivalClearanceSteps: steps } = VILLAGERS;
+  const dx = goal.x - arrival.x;
+  const dy = goal.y - arrival.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance >= radius) return;
+  // Les joueurs descendent face au sud (+y): derrière eux, c'est -y.
+  const first = distance > 1e-3 ? Math.atan2(dy, dx) : -Math.PI / 2;
+  const blockers = placeBlockers(sim.content, content, place, sim.world);
+  for (let k = 0; k < steps; k++) {
+    // 0, +1, -1, +2, -2...: au plus près du premier sens.
+    const turn = (k % 2 === 1 ? 1 : -1) * Math.ceil(k / 2);
+    const a = first + (2 * Math.PI * turn) / steps;
+    const x = arrival.x + Math.cos(a) * radius;
+    const y = arrival.y + Math.sin(a) * radius;
+    if (bodyCollides(blockers, x, y, VILLAGERS.radius)) continue;
+    goal.x = x;
+    goal.y = y;
+    return;
+  }
+}
+
 /** Choisit le but de la ligne en cours et le trajet pour y aller (ou l'y pose: `snap`). */
 function head(
   sim: SimContext,
@@ -174,7 +203,10 @@ function head(
   sim.touch('place');
   rt.goal =
     entry === undefined ? null : goalOf(sim.content, content, entry.at, seatTakenIn(place, id));
-  if (rt.goal !== null && rt.goal.seat === null) spread(sim, content, place, id, rt.goal);
+  if (rt.goal !== null && rt.goal.seat === null) {
+    clearArrival(sim, content, place, rt.goal);
+    spread(sim, content, place, id, rt.goal);
+  }
   rt.route = null;
   rt.next = 0;
   rt.waited = 0;
@@ -396,6 +428,53 @@ function partnerOf(
   return { x: other.body.x, y: other.body.y, id: withId };
 }
 
+/**
+ * À son poste mais plus à sa place: une scène l'a mené ailleurs, ou on l'a poussé. Pas pendant
+ * une scène (elle le place elle-même), ni en conversation, ni assis.
+ */
+function strayed(
+  sim: SimContext,
+  villager: VillagerState,
+  state: VillagerLifeState,
+  rt: Runtime,
+): boolean {
+  if ((sim.world.common.story?.scene ?? null) !== null) return false;
+  if (state.presence !== 'here' || state.seat !== null || villager.talkingWith !== null)
+    return false;
+  if (rt.route !== null || rt.goal === null) return false;
+  const { x, y } = villager.body;
+  return Math.hypot(rt.goal.x - x, rt.goal.y - y) > VILLAGERS.returnDistance;
+}
+
+/** Il retourne à pied au but de sa ligne en cours (activité suspendue le temps du trajet). */
+function backToPost(
+  sim: SimContext,
+  content: PlaceContent,
+  place: PlaceState,
+  state: VillagerLifeState,
+  rt: Runtime,
+  body: { readonly x: number; readonly y: number },
+): void {
+  const goal = rt.goal;
+  if (goal === null) return;
+  rt.route = findRoute(
+    sim.content,
+    content,
+    place,
+    body.x,
+    body.y,
+    goal.x,
+    goal.y,
+    closedLockSet(sim),
+  );
+  rt.next = 0;
+  rt.waited = 0;
+  state.activity = null;
+  state.gesture = null;
+  state.pose = 'walk';
+  sim.touch('place');
+}
+
 function liveOne(
   sim: SimContext,
   content: PlaceContent,
@@ -447,7 +526,8 @@ function liveOne(
           rt,
           snap && state.presence === 'here',
         );
-      }
+      } else if (strayed(sim, villager, state, rt))
+        backToPost(sim, content, place, state, rt, villager.body);
     }
   }
   if (state.presence === 'away') return;

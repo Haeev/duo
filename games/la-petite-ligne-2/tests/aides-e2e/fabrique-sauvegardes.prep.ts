@@ -1,12 +1,13 @@
 // Fabrique les sauvegardes de départ des parcours (lancé par `globalSetup` de Playwright, par
-// Vitest car le contenu du jeu se charge par `import.meta.glob`). Parties posées directement à
-// Aubrune (le départ réglé du jeu est la gare d'essai): avant la scène d'accueil, après elle, et
-// acte 1 fini.
+// Vitest car le contenu du jeu se charge par `import.meta.glob`). Le jeu part du prologue (train
+// de nuit): la gare d'essai (parcours des règles), le prologue à sa dernière étape, et des
+// parties posées à Aubrune: avant la scène d'accueil, après elle, et acte 1 fini.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
 import { createWorld } from '../../src/simulation/noyau/monde';
-import { MEMBERS, SEED } from '../aides';
+import { gameDataFiles, MEMBERS, SEED } from '../aides';
+import { loadContent } from '../../src/donnees/charger';
 import { contentWith, wait } from '../aides-l3';
 import { createSim } from '../../src/simulation/noyau/pas';
 import type { WorldState } from '../../src/etat/monde';
@@ -40,6 +41,46 @@ function write(name: string, label: string, world: WorldState): void {
   };
   writeFileSync(join(FIXTURES, `${name}.json`), JSON.stringify(save));
 }
+
+it('fabrique la sauvegarde « essai-gare » (partie neuve à la gare d’essai, 10 h)', () => {
+  // Le jeu part du prologue; les parcours des règles partent d'ici (`startDuo` par défaut).
+  write(
+    'essai-gare',
+    'Gare d’essai, 10 h',
+    createWorld(
+      contentWith(() => undefined),
+      SEED,
+      MEMBERS,
+    ),
+  );
+});
+
+it('fabrique la sauvegarde « train-de-nuit-porte » (prologue joué jusqu’à la porte du wagon)', () => {
+  // Le vrai départ du jeu (prologue), avancé par la simulation jusqu'à la dernière étape.
+  const content = loadContent(gameDataFiles());
+  const sim = createSim(content, createWorld(content, SEED, MEMBERS));
+  wait(sim, 0.5);
+  expect(sim.world.common.place).toBe('train-de-nuit');
+  const terminus = content.places['train-de-nuit']?.quests.terminus;
+  const steps = terminus?.chapters.flatMap((c) => c.steps.map((st) => st.id)) ?? [];
+  sim.world.progress.quests.terminus = {
+    chapter: 'prologue',
+    step: 'descendre',
+    done: false,
+    passed: steps.slice(0, -1),
+  };
+  // La scène du compartiment est passée, la nuit aussi: réveil à 6 h, dans le compartiment (loin de la porte).
+  const story = sim.world.common.story;
+  if (story !== undefined) story.scene = null;
+  sim.world.minutes = 6 * 60;
+  const room = content.places['train-de-nuit']?.map.points.compartiment ?? { x: 5, y: 4 };
+  sim.world.players[0].body = { x: room.x - 0.6, y: room.y, facing: 0, speed: 0 };
+  sim.world.players[1].body = { x: room.x + 0.6, y: room.y, facing: 0, speed: 0 };
+  wait(sim, 0.5);
+  expect(sim.world.common.place).toBe('train-de-nuit');
+  expect(sim.world.common.story?.departure, 'pas encore de départ').toBeUndefined();
+  write('train-de-nuit-porte', 'Train de nuit, la porte', sim.world);
+});
 
 it('fabrique la sauvegarde « aubrune » (6 h 10, avant la scène d’accueil)', () => {
   write('aubrune', 'Aubrune, 6 h 10', createWorld(aubruneContent(), SEED, MEMBERS));

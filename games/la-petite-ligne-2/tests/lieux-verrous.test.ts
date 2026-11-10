@@ -31,8 +31,8 @@ function aubrune(): ReturnType<typeof newSim> {
     id: 'aubrune',
     name: 'Aubrune',
     station: { arrival: 'quai', platform: 'quai', platformRadius: 3 },
-    // Aubrune existe désormais (lot d'écriture): le lien du train de nuit doit rester réciproque.
-    links: ['train-de-nuit'],
+    // On arrive à Aubrune par la fin du prologue (effet `travel_to`), sans ligne en retour.
+    links: [],
     activities: [],
     music: null,
   };

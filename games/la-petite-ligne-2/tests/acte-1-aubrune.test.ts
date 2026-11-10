@@ -210,17 +210,23 @@ describe('écriture du prologue et de l’acte 1', () => {
     wait(sim, 0.5);
     expect(passed(sim, 'terminus')).toContain('dormir');
     playScene(sim);
-    both(sim, 'porte');
+    // Les deux devant la porte: l'étape finit le prologue, dont l'effet `travel_to` fait partir
+    // le train vers Aubrune, sans quai ni horaire (le trajet prend ses heures d'un coup).
+    if (sim.world.common.place === PROLOGUE) both(sim, 'porte');
     wait(sim, 0.5);
     expect(sim.world.progress.quests.terminus?.done).toBe(true);
-
-    // On descend: le voyage du lot L2 mène à Aubrune (au matin, dans la fenêtre des trains).
-    sim.world.minutes = 6 * 60 + 10;
-    for (const p of [0, 1] as const) act(sim, p, { type: 'board', to: AUBRUNE });
-    for (let i = 0; i < 40 && sim.world.common.phase !== 'day'; i++) {
+    const night = sim.world.minutes;
+    for (
+      let i = 0;
+      i < 40 && (sim.world.common.place !== AUBRUNE || sim.world.common.phase !== 'day');
+      i++
+    ) {
       for (const p of [0, 1] as const) act(sim, p, { type: 'place_loaded', place: AUBRUNE });
       wait(sim, 1);
     }
+    expect(sim.world.minutes - night).toBeGreaterThanOrEqual(
+      sim.content.settings.travel.clockHours * 60,
+    );
     expect(sim.world.common.place).toBe(AUBRUNE);
     wait(sim, 0.5);
 

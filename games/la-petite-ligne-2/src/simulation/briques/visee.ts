@@ -5,7 +5,8 @@
  *
  * Choix: parmi ce qui est à portée et dans le cône devant le personnage, d'abord ce qui sert
  * l'outil en main, puis ce qui peut servir, enfin ce qui est refusé (la bulle dit ce qui manque);
- * à rang égal, le plus proche de l'axe du regard.
+ * à rang égal, ce qui est dans le regard (`aimLookHalfAngleDeg`) avant ce qui n'est que plus
+ * proche, puis le plus proche de l'axe du regard.
  */
 import type { Brick, BrickId } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
@@ -125,6 +126,9 @@ export function aimOf(
   const { x: px, y: py, facing } = actor.body;
   const reach = content.settings.reach.action;
   const halfAngle = (content.settings.reach.aimHalfAngleDeg * Math.PI) / 180;
+  const lookDeg =
+    content.settings.reach.aimLookHalfAngleDeg ?? content.settings.reach.aimHalfAngleDeg;
+  const lookHalfAngle = (lookDeg * Math.PI) / 180;
   let best: Aim | null = null;
   let bestRank = Number.POSITIVE_INFINITY;
 
@@ -142,7 +146,10 @@ export function aimOf(
     const picked = pick();
     if (picked === null) return;
     const tier = picked.tool && picked.refusal === null ? 0 : picked.refusal === null ? 1 : 2;
-    const rank = tier * 10 + angle / halfAngle + (CORE_TUNING.aimDistanceWeight * distance) / reach;
+    // Hors du regard: après tout ce qui est dans le regard, même plus loin (écart et distance < 2).
+    const unseen = angle > lookHalfAngle ? 2 : 0;
+    const rank =
+      tier * 10 + unseen + angle / halfAngle + (CORE_TUNING.aimDistanceWeight * distance) / reach;
     if (rank >= bestRank) return;
     bestRank = rank;
     best = { kind, id, action: picked.action, verb: picked.verb, refusal: picked.refusal, x, y };

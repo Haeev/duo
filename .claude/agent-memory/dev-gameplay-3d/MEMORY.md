@@ -628,3 +628,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Champ facultatif d'état sans défaut à écrire partout: `v.exactOptional` et `delete` pour l'effacer (pas `v.optional(x, défaut)`, qui oblige chaque littéral à l'écrire).
 - `tests/dialogues.test.ts` compare `talkView(...).options` par `toEqual`: un champ ajouté aux options demande de mettre à jour ce test.
 - Outil Bash isolé: `python3 - <<'EOF'` passe s'il est seul dans la commande après `cd`; suivi d'un `&&` ou d'un autre appel, toute la commande est refusée (rien ne s'exécute). Vérifier par `git diff --stat` après coup.
+
+## La Petite Ligne 2: départ du jeu et recette D2 à D4 (vérifié le 2026-11-10)
+
+- Le jeu part du prologue (`train-de-nuit`, 21 h 30); les tests unitaires partent de la gare d'essai par `dataFiles()` (`TEST_START` de `tests/aides.ts`), le vrai départ se lit par `gameDataFiles()`. Parcours e2e: `startDuo` charge par défaut la sauvegarde `essai-gare`; `save: null` donne une vraie partie neuve.
+- Worktree neuf: construire aussi `pnpm --filter @duo/sdk-dev build`, sinon le faux hôte des parcours e2e s'arrête (code 1, « Pages du faux hôte absentes »).
+- Les points nommés du plan (`points_nommes`, ex. `firmin-quai`) ne sortent pas de `outils/plan-vers-lieu.ts`: `grands-lieux` et `lieux-verrous` chargent cette carte brute, donc une fiche qui les cite casse ces tests.
+- Un habitant déplacé par une scène (`walk`) ou poussé revient à son poste à la relecture du planning (`backToPost`), jamais pendant une scène. Point d'arrivée des joueurs dégagé: `arrivalClearance` (habitants/reglages.ts).
+- Commerçant: champ `talk` du commerce = page « voir la boutique » ajoutée en fin de toute conversation (nœud réservé `DIALOGUES.shopOffer.node`); les tests qui enchaînent deux dialogues avec la cheffe de gare doivent clore cette page (`talk_close`).
+- Le contrôle `reach` d'une étape a 2,5 m de rayon (`STORY.reachRadius`): une sauvegarde fabriquée doit poser les joueurs loin du point, sinon l'étape (et un `travel_to`) part tout de suite.

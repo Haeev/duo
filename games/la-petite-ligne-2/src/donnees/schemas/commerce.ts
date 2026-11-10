@@ -82,5 +82,11 @@ export const ShopSchema = v.strictObject({
   ),
   /** Ce qu'il dit, avec son caractère, d'un objet qu'il ne rachète pas (« Ça sent la vase. »). */
   refusal: v.exactOptional(TextSchema),
+  /**
+   * Choix offert à la fin de toute conversation avec le commerçant, boutique ouverte, quand le
+   * dialogue joué ne l'ouvre pas lui-même (`simulation/dialogues/`): `open` ouvre la boutique,
+   * `leave` clôt. Ainsi un dialogue de quête ne masque jamais le commerce.
+   */
+  talk: v.exactOptional(v.strictObject({ open: TextSchema, leave: TextSchema })),
 });
 export type ShopDef = v.InferOutput<typeof ShopSchema>;

@@ -13,7 +13,7 @@ On ne vend qu'aux commerçants: chacun ne rachète que ce qui touche à son mét
 ## Ouvrir une boutique
 
 - La touche d'action sur un meuble comptoir dont la brique est `{ "brick": "shop", "shop": "<id>" }`.
-- Ou le commerçant: une option de son dialogue avec l'effet `{ "type": "open_shop", "shop": "<id>" }` (fermé: l'option a un `when` `time_is`, et l'habitant le dit en dialogue).
+- Ou le commerçant: le champ `talk` du commerce ajoute « voir » à la fin de chacun de ses dialogues (`simulation/dialogues/commerce.ts`); un dialogue peut aussi porter l'effet `{ "type": "open_shop", "shop": "<id>" }` (fermé: l'option a un `when` `time_is`, et l'habitant le dit en dialogue).
 - Événement `shop_opened`; l'interface montre `interface/boutique/`.
 
 ## Paiement (`payment` d'un article)

@@ -198,7 +198,8 @@ describe('effets de dialogue: amitié, argent, objets pour chacun, refus expliqu
     expect(countHeld(sim.world.players[1], 'pomme')).toBe(1);
     const bond = sim.world.progress.bonds[bondKey(CHEF, 0)] ?? 0;
     expect(bond).toBeGreaterThanOrEqual(30);
-    // Une perte ne descend pas sous zéro.
+    // Une perte ne descend pas sous zéro (on clôt d'abord la page de la buvette, défaut D2).
+    act(sim, 0, { type: 'talk_close' });
     choose(sim, 0, 'facher');
     expect(sim.world.progress.bonds[bondKey(CHEF, 0)]).toBe(0);
   });

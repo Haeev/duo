@@ -1,12 +1,12 @@
-// Défauts signalés à confirmer (rapport de recette, D2 et D3). D2 constate le défaut: il passe
-// tant que le défaut existe et devra être retourné à la correction. D3 est un relevé (mesures.txt).
+// Défauts de la recette du jalon 1, retournés après correction: D2 (la cheffe de gare propose sa
+// buvette après un dialogue de quête) et D3 (personne collé au joueur au point d'arrivée; relevé
+// des distances dans mesures.txt).
 import { appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { CAPTURES, startDuo, type Duo } from '../aides-e2e/duo';
 
 const GUICHET = { x: 20, y: 15 };
-const COMPTOIR = { x: 23, y: 15 };
 
 /** Parle à la cheffe de gare et lit les pages jusqu'à la fin (choix: premier). */
 async function talkToChief(duo: Duo, label: string): Promise<string[]> {
@@ -34,7 +34,7 @@ async function talkToChief(duo: Duo, label: string): Promise<string[]> {
   return pages;
 }
 
-test('D2 la boutique de la gare s’ouvre par la cheffe de gare, pas seulement par le comptoir', async ({
+test('D2 la boutique de la gare s’ouvre en parlant à la cheffe de gare, après sa quête', async ({
   browser,
 }) => {
   const duo = await startDuo(browser, 'd2-boutique');
@@ -45,24 +45,22 @@ test('D2 la boutique de la gare s’ouvre par la cheffe de gare, pas seulement p
   expect(first.join('|')).toContain('Bienvenue');
   await duo.until(host, 'besace', (w) => w.players[hi]?.bag !== null);
   await host.page.waitForTimeout(2000);
-  // 2e conversation: attendu, l'accueil « Alors, cette besace ? » avec « Je regarde ta buvette ».
+  // 2e conversation: le dialogue de quête (la sonnerie) passe, puis la cheffe propose sa buvette
+  // en dernière page; le premier choix (Entrée) ouvre la boutique.
   const second = await talkToChief(duo, 'b');
   const text = second.join('|');
-  expect(text, 'D2: le dialogue de quête passe avant l’accueil').toContain('sonner');
-  expect(text, 'D2: aucune entrée vers la buvette').not.toContain('buvette');
-  expect(await host.game().locator('.lpl-ui .boutique, .lpl-ui .shop').count()).toBe(0);
-  // Par le comptoir, la boutique s'ouvre.
-  await duo.teleport(hi, COMPTOIR.x - 1.5, COMPTOIR.y, 0);
-  await expect
-    .poll(async () => (await host.aim(hi))?.id ?? null, { timeout: 20_000 })
-    .toBe('comptoir-buvette');
-  await host.press('Space');
-  await host.page.waitForTimeout(1500);
-  await host.shot('c-comptoir');
+  expect(text, 'le dialogue de quête passe d’abord').toContain('sonner');
+  expect(text, 'D2: la buvette est proposée en parlant à la cheffe').toContain(
+    'CHOIX: Je regarde ta buvette.',
+  );
+  const shop = host.game().locator('.lpl-ui .shop');
+  await expect(shop).toBeVisible();
+  await host.page.waitForTimeout(800);
+  await host.shot('c-boutique-par-la-cheffe');
   await duo.close();
 });
 
-test('D3 relevé: les habitants d’Aubrune autour des joueurs sur le quai', async ({ browser }) => {
+test('D3 aucun habitant d’Aubrune collé aux joueurs sur le quai (relevé)', async ({ browser }) => {
   const duo = await startDuo(browser, 'd3-habitant-colle', { save: 'aubrune-apres-scene' });
   const { host } = duo;
   const hi = await host.local();
@@ -88,6 +86,15 @@ test('D3 relevé: les habitants d’Aubrune autour des joueurs sur le quai', asy
     await near(`immobile ${i}`);
   }
   await host.shot('2-immobile');
+  // D3 corrigé: personne ne stationne contre le joueur au point d'arrivée.
+  const still = await host.world();
+  const me = still?.players[hi];
+  const closest = Math.min(
+    ...Object.values(still?.places.aubrune?.villagers ?? {}).map((v) =>
+      me === undefined ? Infinity : Math.hypot(v.body.x - me.body.x, v.body.y - me.body.y),
+    ),
+  );
+  expect(closest, 'D3: aucun habitant collé au joueur sur le quai').toBeGreaterThan(1.3);
   for (let i = 0; i < 6; i++) {
     await host.press('KeyA', 800);
     await host.page.waitForTimeout(700);
