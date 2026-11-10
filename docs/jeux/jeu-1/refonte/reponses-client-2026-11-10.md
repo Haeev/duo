@@ -498,3 +498,19 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Référence du style validée par le client (« oui parfait »): la capture de nuit de la scène d'essai encrée au zoom de jeu (`captures/encre-exterieur-jeu-nuit.png`, passe 3). Le portage du rendu encré dans le jeu s'y mesure.
 - Seconde référence du style, pour les intérieurs (« je la trouve magnifique aussi »): `captures/encre-interieur-jour-dense.png` (passe 3).
 - Identité visuelle par lieu: chaque lieu a son apparence propre. Aubrune est un village de campagne; Hautefonte est une grande ville, inspirée de Metz (ville que le client adore); Combe-Veilleuse est un village hanté, aux bâtiments et au mobilier d'aspect abandonné. Un asset se crée une fois et se pose plusieurs fois à l'intérieur de son lieu; le mobilier et les bâtiments ne sont pas les mêmes d'un lieu à l'autre. Restent communs aux trois lieux: le moteur, le rendu, l'interface, les gabarits, les briques, les corps et les vêtements de base.
+
+## Réponses du client par le tableau de bord (10 novembre, 19 h 55)
+
+- Combe-Veilleuse: oui, une partie des bâtiments sera faite en vieillissant ceux d'Aubrune.
+- Rush à quinze membres: prolongé jusqu'à la fin d'Aubrune, puis retour à trois.
+- Personnages: on garde les grosses têtes (pas de réduction de 10 %); silhouettes très typées: oui.
+- Déplacement: marche à 1,5 m/s et course à part.
+- Caméra: zoom de jeu par défaut de 18 m de large; elle s'abaisse au zoom le plus serré.
+- Contour d'encre par traitement de l'image entière: oui, sous réserve de la mesure sur le PC.
+- Interface: thème sombre et trait des vignettes validés; la série complète des vignettes est lancée.
+- Musique d'Aubrune: « ça me va, on garde ».
+- Suno: un courriel est parti au support; d'ici leur réponse, on fait sans Suno.
+- Train de nuit: on arrive toujours au matin, quoi que les joueurs aient fait.
+- Scènes: joueur figé pendant une réplique qui lui est adressée et pendant l'écran noir; avance après 8 s si un seul a lu.
+- Belvédère: découvert avec la Côte.
+- Hautefonte: le client donnera des images de référence le moment venu.
