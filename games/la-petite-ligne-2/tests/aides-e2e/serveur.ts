@@ -7,10 +7,15 @@ import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { e2eTempName } from './dossiers';
 
 const SERVER = join(import.meta.dirname, '../../../../packages/sdk-dev/src/serveur/servir.ts');
-/** Dossier des sauvegardes de départ fabriquées par `fabrique-sauvegardes.prep.ts`. */
-export const FIXTURES = join(tmpdir(), 'lpl2-e2e-fixtures');
+/**
+ * Dossier des sauvegardes de départ fabriquées par `fabrique-sauvegardes.prep.ts`, propre à cette
+ * copie du dépôt (`e2eTempName`): deux recettes lancées en même temps depuis deux copies
+ * (worktrees) s'écrasaient leurs sauvegardes, et un parcours partait d'une partie d'une autre version.
+ */
+export const FIXTURES = join(tmpdir(), e2eTempName('lpl2-e2e-fixtures'));
 
 const running = new Set<ChildProcess>();
 // Un parcours qui échoue avant `close` ne doit pas laisser de faux hôte derrière lui.

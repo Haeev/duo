@@ -4,6 +4,7 @@ Une scène (`donnees/lieux/<lieu>/scenes/<id>.json`, schéma `src/donnees/schema
 
 - Lancement: effet `play_scene` d'une étape, ou déclencheur de monde (`trigger`: heure `at` avec un retard permis, conditions `when`, `once` ou `daily`). Une scène `together` attend que les deux soient réunis; une scène lancée pendant une autre attend en file (4 au plus).
 - `lecteur.ts` (hôte): l'état tient dans `common.story.scene` (temps en cours, rôle `a`, lectures, parties faites, caméra, fondu); il part chez l'invité et se sauvegarde, d'où la reprise exacte après une reconnexion. Rien n'est figé: une réplique passe quand chaque joueur concerné l'a lue, ou `soloReadSeconds` après la lecture du premier (`readAt`: l'autre a toujours ce délai pour finir), et jamais après `maxLineSeconds`. Changer de lieu abandonne la scène sans la compter vue.
+- `walk`: l'habitant s'arrête en face des joueurs s'il les rejoint (`stageSpot`), les contourne sans les traverser (`detourAround`), et presse le pas quand sa marche dépasserait `walkBudgetSeconds` (`SCENE_STAGING`, `reglages.ts`): personne n'attend longtemps une réplique. Test: `tests/arrivee.test.ts`.
 - Scène à deux asymétrique: `roles` nomme les deux rôles; `a` revient au joueur qui la lance, `b` à l'autre; `say.to` et `await.parts[].role` les visent.
 - `lecture.ts` (interface et rendu, sur les deux machines): `sceneView` donne la réplique accordée, si elle s'adresse au joueur, ses consignes, la caméra suggérée et le fondu.
 

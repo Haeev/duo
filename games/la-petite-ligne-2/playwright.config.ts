@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { defineConfig } from '@playwright/test';
+import { e2eTempName } from './tests/aides-e2e/dossiers';
 
 // Environnement cloud: Chromium préinstallé d'une autre révision que celle de @playwright/test.
 const preinstalled = '/opt/pw-browsers/chromium';
@@ -21,7 +22,8 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: 'list',
-  outputDir: join(tmpdir(), 'lpl2-e2e-resultats'),
+  // Propre à cette copie du dépôt: deux recettes simultanées s'effaçaient leurs pièces jointes.
+  outputDir: join(tmpdir(), e2eTempName('lpl2-e2e-resultats')),
   use: {
     viewport: { width: 960, height: 540 },
     launchOptions: executablePath === undefined ? {} : { executablePath },

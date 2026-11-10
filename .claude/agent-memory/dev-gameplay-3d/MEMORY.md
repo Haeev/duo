@@ -642,3 +642,10 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 
 - Chromium rejoue `mouseover`/`mouseenter` quand le contenu passe sous un pointeur immobile (carnet qui monte du bas). Le pointeur des parcours e2e reste où Playwright a cliqué (« Héberger et continuer »): `mouseenter` mettait le focus du carnet sur la case 5. Le survol passe par `onPointerHover` (`src/interface/dom.ts`, `mousemove` avec `movementX/Y` non nuls); test garde-fou `tests/survol.test.ts`.
 - Dans le carnet, les chiffres 1 à 5 ne font rien: viser une case par D (ou les flèches) depuis la case 1.
+
+## Parcours e2e sous charge (La Petite Ligne 2, vérifié le 2026-11-10)
+
+- Deux horloges ralentissent sous charge en rendu logiciel: la simulation (rattrapage borné à 15 pas, 0,25 s de jeu par image, `stepper.ts` du SDK) et l'horloge de l'interface (`frame` de `src/interface/index.ts`, écart borné à 250 ms). Une image de 0,9 s ne compte que 0,25 s: un parcours qui mesure en temps mural une minuterie de l'interface (coup d'œil) ou attend une marche de scène échoue sans défaut du jeu. Mesurer en temps de l'interface (somme des écarts `requestAnimationFrame` bornés à 250 ms, part déjà écoulée lue sur la barre du minuteur) ou en pas de simulation.
+- Marche de scène: `detourAround` (lecteur.ts) choisit le plus court repère libre autour de la paire; l'ancien détour par un seul bout bloquait l'habitant à son repère quand sa place était à 30° de côté (38 trajets sur 240), jusqu'au plafond de 20 s. La marche presse le pas au-delà de `walkBudgetSeconds` (Firmin: 9,6 s ramenées à 4,1 s).
+- Les sauvegardes de départ (`/tmp/lpl2-e2e-fixtures`) et l'`outputDir` étaient communs à tous les worktrees: une recette lancée ailleurs réécrivait les sauvegardes au milieu de la nôtre (parties d'une autre version, joueurs à l'ancien écart) et effaçait nos pièces jointes. Depuis, ces dossiers portent l'empreinte du chemin du paquet (`tests/aides-e2e/dossiers.ts`).
+- Une capture Playwright en rendu logiciel chargé peut durer plus que les délais de jeu (8 s du lecteur seul): pas de capture entre deux actions dont le parcours mesure l'enchaînement.

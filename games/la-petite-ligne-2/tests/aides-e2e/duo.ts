@@ -26,7 +26,16 @@ export interface ProbeWorld {
       readonly boarded: readonly [boolean, boolean];
       readonly skip?: readonly [boolean, boolean];
     } | null;
-    readonly story?: { readonly scene?: { readonly id: string } | null } | null;
+    readonly story?: {
+      readonly scene?: {
+        readonly id: string;
+        readonly beat?: number;
+        /** Pas où le temps en cours a commencé. */
+        readonly since?: number;
+        /** Pas de la première lecture du temps en cours. */
+        readonly readAt?: number;
+      } | null;
+    } | null;
   };
   readonly players: readonly ProbePlayer[];
   readonly progress?: {

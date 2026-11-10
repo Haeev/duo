@@ -5,7 +5,9 @@
 // l'étape « quai ». P18b: après la scène, Firmin reçoit la lettre et l'étape avance. D1 (corrigé):
 // les répliques de la scène s'affichent chez les deux et avancent quand les deux ont lu.
 import { expect, test } from '@playwright/test';
-import { startDuo, type Side } from '../aides-e2e/duo';
+import { SIM_DT } from '../../src/simulation/noyau/constantes';
+import { STORY } from '../../src/simulation/quetes/reglages';
+import { startDuo, type ProbeWorld, type Side } from '../aides-e2e/duo';
 
 const QUEST = 'le-train-de-5h12';
 
@@ -160,16 +162,33 @@ test('D1 les répliques de la scène d’accueil s’affichent et avancent quand
   await expect(waiting).toContainText('On attend');
   await expect(line(guest).locator('.scene-line__read--done')).toContainText('a lu');
   await expect(line(guest).getByText(/Personne n.est descendu ici/)).toBeVisible();
-  await host.shot('2-attente-de-l-invite');
-  await guest.shot('2-l-hote-a-lu');
+  // Pas de capture ici: en rendu logiciel chargé, deux captures peuvent durer plus que les 8 s de
+  // jeu du délai du lecteur seul, et la réplique passait d'elle-même avant que l'invité ne lise.
   // L'invité lit à son tour: la réplique suivante arrive chez les deux, sans attendre le délai.
+  // Mesuré en pas de simulation (l'horloge murale s'étire sous charge en rendu logiciel): le temps
+  // suivant commence avant la fin du délai du lecteur seul (`soloReadSeconds` depuis la lecture
+  // de l'hôte), donc par la lecture de l'invité.
   const next = /par le car/;
-  for (let i = 0; i < 4 && !(await line(guest).getByText(next).isVisible()); i++) {
+  const before = await host.world();
+  const beat0 = before?.common.story?.scene?.beat ?? -1;
+  const readAt = before?.common.story?.scene?.readAt;
+  expect(readAt, 'lecture de l’hôte notée').toBeDefined();
+  const advanced = (w: ProbeWorld): boolean => (w.common.story?.scene?.beat ?? -1) > beat0;
+  for (let i = 0; i < 4; i++) {
+    const now = await host.world();
+    if (now !== null && advanced(now)) break;
     await guest.press('Space');
     await guest.page.waitForTimeout(400);
   }
+  const after = await duo.until(host, 'réplique suivante chez l’hôte', advanced, 15_000);
+  const since = after.common.story?.scene?.since ?? Infinity;
+  expect(
+    (since - (readAt ?? 0)) * SIM_DT,
+    'avance par la lecture des deux, avant le délai du lecteur seul (s de jeu)',
+  ).toBeLessThan(STORY.soloReadSeconds);
+  // La réplique s'écrit lettre à lettre en temps de l'interface, lui aussi étiré sous charge.
   for (const side of [host, guest])
-    await expect(line(side).getByText(next)).toBeVisible({ timeout: 3_000 });
+    await expect(line(side).getByText(next)).toBeVisible({ timeout: 15_000 });
   await guest.shot('3-replique-suivante');
   // Réplique du récit pour un seul rôle: l'un la lit, l'autre voit qu'on la lit.
   for (const side of [host, guest])
