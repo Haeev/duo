@@ -98,6 +98,19 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Pièces qui flottent: `BVHTree.overlap` entre pièces (une pièce enfoncée dans une autre ne flotte pas), puis distance au plus proche; seuil de 2 mm.
 - Capture Three.js d'un personnage: `renderer.info.memory.textures` compte aussi la texture des os et celle des cibles de morphose.
 
+## Rendu encré (essai du 2026-11-10, `games/la-petite-ligne-2/src/rendu/demo-encre/`, note `docs/jeux/jeu-1/refonte/essai-encre.md`)
+
+- `ShaderMaterial` avec `glslVersion: GLSL3`: Three.js ne déclare plus `gl_FragColor`; déclarer `layout(location = 0) out highp vec4` soi-même, et `location = 1` pour une cible à deux sorties (`WebGLRenderTarget` avec `count: 2`). `cast` est un mot réservé en GLSL ES 3.0 (comme `flat` et `half`).
+- Mélange par multiplication dans une cible à deux sorties: écrire `vec4(1.0)` dans la seconde sortie la laisse intacte (ombres de contact sans trait de contour autour).
+- Carte d'ombre maison: `DepthTexture` avec `compareFunction = LessEqualCompare` et filtre linéaire, lue en `sampler2DShadow`; seuiller la valeur filtrée donne un bord net sans escalier. Pour un bord tremblé, décaler le point lu de quelques centimètres selon un bruit, pas le seuil (le seuil ne bouge le bord que d'un texel et fait du grain).
+- Contour par post-traitement: numéro d'objet et numéro de morceau sur un octet chacun (6 bits de numéro, 2 bits de classe de taille mesurée sur la boîte à la fabrication), normale en octaèdre sur deux canaux. Le trait appartient à l'objet de devant (comparer les profondeurs) et prend son rang; un rang n'est tracé qu'au-dessus de 12 à 28 points à l'écran. Sans cette hiérarchie, une façade devient un amas de traits à la vue large (retour du client).
+- Bruits du trait et des hachures en coordonnées du monde (caméra orthographique: position = origine + droite x u + haut x v + avant x profondeur): rien ne nage quand la caméra bouge.
+- Relief sans carte de normales à part: pente de la carte de hauteur dans les canaux B et A de la texture de trait, repère de la face tiré de `dFdx` et `dFdy` de la position et des UV; la normale penchée alimente la rampe à tons francs.
+- Les objets fins (brins d'herbe, tiges) sont mangés par un contour de silhouette: leur donner une petite classe de taille, ou les élargir.
+- Page de démonstration qui ne redessine qu'au changement: compter les images restantes (2 par changement), sinon une capture qui attend « deux images de plus » n'arrive jamais. Lire le canevas par `toDataURL` demande `preserveDrawingBuffer: true`.
+- Temps par image sous SwiftShader: `gl.finish()` ne suffit pas, lire un pixel (`readPixels`) pour forcer la fin; machine chargée (charge 10 à 17), 0,5 à 3 s par image, inutilisable pour comparer deux réglages.
+- Fichiers d'un autre membre nécessaires à une page: les reprendre de sa branche sans les indexer; `import.meta.glob` avec un chemin relatif hors du paquet marche en développement et rend un objet vide si le dossier manque (prévoir le repli).
+
 ## Personnage modulaire avec Meshy (essai du 2026-11-10, `docs/production/essais-meshy/personnage-modulaire/`)
 
 - Texte seul: Meshy ignore « seul », « sans tête », « cinq têtes de haut » environ une fois sur deux (veste sur buste, jupe en robe sur mannequin, perruque livrée avec tête et socle, corps réaliste de 7,5 têtes). `pose_mode` ne vaut que pour un personnage: un vêtement seul sort manches à 45 ou 75 degrés.
