@@ -146,3 +146,14 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - `worldSources.quests` passe par `journal` (accords, étapes parallèles): l'étape est la jointure de toutes les étapes ouvertes par « ; », donc longue; la carte d'acte la tronque à 3 lignes (`-webkit-line-clamp`), le détail à droite la montre en entier.
 - `pnpm verifier-carnet` lancé pendant d'autres commandes lourdes donne de faux échecs (8 au lieu de 0): le relancer seul, en arrière-plan (plus de 2 min).
 - Le Vite d'un autre arbre occupe 5391: `--port 5477 --strictPort`. Captures encrées: poser `data-lpl-style="encre"` sur `#ui` après le chargement.
+
+## Page Artifact du tableau de bord (`outils/tableau-de-bord/`)
+
+- Banc: `node outils/tableau-de-bord/essai/capturer.cjs <sortie>` (fausse base `db` en mémoire injectée par `addInitScript`, 61 captures en 90 s, contrôles console, débordement, clavier, contrastes).
+- Dans le banc, ne jamais attendre le chargement de toutes les images: celles en `loading="lazy"` hors écran ne se chargent jamais (blocage sans délai). Attente bornée par `Promise.race`.
+- Un cadre en `overflow: hidden` défile quand un bouton hors champ y reçoit le focus (barre d'outils décalée): `overflow: clip`, et recentrer la marque focalisée.
+- L'instantané `onSnapshot` peut arriver avant ou après la promesse de l'écriture: poser l'intention de focus avant d'écrire et ne la consommer que quand la carte a été reconstruite.
+- Message bref au-dessus d'un `<dialog>` modal: `popover="manual"` rouvert à chaque message (couche supérieure), sinon il reste dessous.
+- Échap dans un dialogue avec brouillon: écouter `keydown` ET `cancel`, avec une garde de 250 ms, sinon le second événement ferme le dialogue.
+- `outils/` est linté en entier (lint typé): tout dossier de scripts de navigateur doit être ignoré dans `outils/eslint.config.js`; Prettier (`prettier --check .`) s'applique aussi aux `.html` et `.js` du dossier.
+- La garde de l'arbre isolé refuse une commande qui contient le mot « git » (même `.gitignore`) mêlé à des redirections: écrire le fichier avec Write.
