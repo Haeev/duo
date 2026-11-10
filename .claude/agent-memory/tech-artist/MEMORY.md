@@ -108,3 +108,7 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `import bmesh` avant `import bpy` échoue sous duo-python (module introuvable). Le rig de Meshy rend des sommets séparés par face: `remove_doubles` avant de lisser.
 - Three.js: lier une pièce au squelette d'un autre fichier par `new Skeleton(os du corps retrouvés par nom, boneInverses de la pièce)` puis `bind(skeleton, bindMatrix)`; une matière par zone du corps donne un maillage par zone, que l'on cache sous un vêtement.
 - Dossiers de `meshy_output/`: le suffixe ne porte que 8 caractères de l'identifiant, commun à des tâches lancées la même minute; lire le chemin rendu par `meshy_download_model`.
+- Essai 2 (même jour): image vers 3D d'après une vue de face seule = corps en fil de fer, et `meshy-n1` laisse le dos noir (pas gris): une découpe par couleurs de texture devine le dos de travers. Compter les faces par couleur trompe (topologie intelligente: grandes faces sur les aplats): compter à l'aire.
+- Le pied d'un rig de Meshy pointe vers le bas au repos: ramené sur un os de pied à plat, la chaussure se dresse. Redresser avant de figer.
+- Vêtement sans traversée par construction: le volume du corps décalé (bas 8 mm, haut 19 mm, veste 38 mm), mêmes poids, Solidify de 8 mm, corps masqué dessous (`scripts/voie_d.py`, `figurine.py`). Replacer les os d'un rig sans casser ses clips: `eb.align_roll(ancien axe z)` après avoir posé tête et queue.
+- Ombre portée d'un `SkinnedMesh` lisse: `bias` -0,0004, `normalBias` 0,012, `PCFSoftShadowMap`, pas d'acné sur les captures.

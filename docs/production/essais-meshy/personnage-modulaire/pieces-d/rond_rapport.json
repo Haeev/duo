@@ -1,0 +1,209 @@
+{
+ "corps": "adult_round",
+ "pieces": {
+  "tete_ronde": {
+   "categorie": "tete",
+   "masque": [],
+   "triangles": 1660,
+   "octets": 58728
+  },
+  "cheveux_court": {
+   "categorie": "cheveux",
+   "masque": [],
+   "triangles": 892,
+   "octets": 36280
+  },
+  "cheveux_carre": {
+   "categorie": "cheveux",
+   "masque": [],
+   "triangles": 1104,
+   "octets": 45472
+  },
+  "chaussures_galet": {
+   "categorie": "chaussures",
+   "masque": [],
+   "triangles": 972,
+   "octets": 37568
+  },
+  "haut_tshirt": {
+   "categorie": "haut",
+   "masque": [
+    "torse"
+   ],
+   "triangles": 2424,
+   "octets": 83488
+  },
+  "haut_pull": {
+   "categorie": "haut",
+   "masque": [
+    "torse",
+    "bras",
+    "avant_bras"
+   ],
+   "triangles": 2496,
+   "octets": 85520
+  },
+  "veste_ouverte": {
+   "categorie": "veste",
+   "masque": [],
+   "triangles": 2492,
+   "octets": 88296
+  },
+  "bas_pantalon": {
+   "categorie": "bas",
+   "masque": [
+    "bassin",
+    "cuisses",
+    "jambes"
+   ],
+   "triangles": 1992,
+   "octets": 70188
+  },
+  "bas_short": {
+   "categorie": "bas",
+   "masque": [
+    "bassin"
+   ],
+   "triangles": 1992,
+   "octets": 70156
+  },
+  "bas_jupe": {
+   "categorie": "bas",
+   "masque": [
+    "bassin"
+   ],
+   "triangles": 1144,
+   "octets": 44112
+  }
+ },
+ "corps_triangles": 3088,
+ "corps_octets": 248424,
+ "clips": [
+  "idle",
+  "run",
+  "walk",
+  "wave"
+ ],
+ "os": {
+  "Hips": [
+   0.0,
+   0.0,
+   0.9
+  ],
+  "LeftUpLeg": [
+   0.114,
+   0.0,
+   0.82
+  ],
+  "LeftLeg": [
+   0.114,
+   0.0,
+   0.462
+  ],
+  "LeftFoot": [
+   0.114,
+   0.0,
+   0.1
+  ],
+  "LeftToeBase": [
+   0.114,
+   -0.11,
+   0.03
+  ],
+  "RightUpLeg": [
+   -0.114,
+   0.0,
+   0.82
+  ],
+  "RightLeg": [
+   -0.114,
+   0.0,
+   0.462
+  ],
+  "RightFoot": [
+   -0.114,
+   0.0,
+   0.1
+  ],
+  "RightToeBase": [
+   -0.114,
+   -0.11,
+   0.03
+  ],
+  "Spine02": [
+   0.0,
+   0.0,
+   0.99
+  ],
+  "Spine01": [
+   0.0,
+   0.0,
+   1.09
+  ],
+  "Spine": [
+   0.0,
+   0.0,
+   1.19
+  ],
+  "LeftShoulder": [
+   0.03,
+   0.0,
+   1.255
+  ],
+  "LeftArm": [
+   0.1775,
+   0.0,
+   1.255
+  ],
+  "LeftForeArm": [
+   0.3875,
+   0.0,
+   1.255
+  ],
+  "LeftHand": [
+   0.5975,
+   0.0,
+   1.255
+  ],
+  "neck": [
+   0.0,
+   0.0,
+   1.31
+  ],
+  "Head": [
+   0.0,
+   0.0,
+   1.37
+  ],
+  "head_end": [
+   0.0238,
+   -0.0428,
+   1.6871
+  ],
+  "headfront": [
+   0.0,
+   -0.1049,
+   1.37
+  ],
+  "RightShoulder": [
+   -0.03,
+   0.0,
+   1.255
+  ],
+  "RightArm": [
+   -0.1775,
+   0.0,
+   1.255
+  ],
+  "RightForeArm": [
+   -0.3875,
+   0.0,
+   1.255
+  ],
+  "RightHand": [
+   -0.5975,
+   0.0,
+   1.255
+  ]
+ }
+}

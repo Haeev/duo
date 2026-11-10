@@ -64,6 +64,23 @@
     "../pieces-c/rond_bas.glb",
     "../pieces-c/rond_chaussures.glb"
    ]
+  },
+  "d3": {
+   "titre": "Voie D, adulte rond: t-shirt, short",
+   "voie": "D",
+   "corps": "../pieces-d/rond_corps.glb",
+   "pieces": [
+    "../pieces-d/rond_tete_ronde.glb",
+    "../pieces-d/rond_cheveux_carre.glb",
+    {
+     "fichier": "../pieces-d/rond_haut_tshirt.glb",
+     "couleurs": {
+      "tissu": "#C5443D"
+     }
+    },
+    "../pieces-d/rond_bas_short.glb",
+    "../pieces-d/rond_chaussures_galet.glb"
+   ]
   }
  }
 }

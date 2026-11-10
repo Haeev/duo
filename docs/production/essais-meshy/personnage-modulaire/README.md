@@ -4,8 +4,8 @@
 |---|---|
 | Date | 2026-11-10 |
 | Auteur | tech-artist |
-| Statut | essai terminé, résultat partiel: l'assemblage est prouvé, la qualité des pièces ne l'est pas |
-| Crédits | 71 sur 250 (solde 2 323 avant, 2 252 après; 14 tâches, toutes réussies) |
+| Statut | essai 1: assemblage prouvé, qualité non; **essai 2 (section 8): la voie D donne des figurines lisses, la voie C est écartée** |
+| Crédits | essai 1: 71 sur 250 (2 323 avant, 2 252 après, 14 tâches); essai 2: 50 sur 120 (2 252 avant, 2 202 après, 6 tâches) |
 | Besoin | réponses 43 à 51 du client: catalogue de pièces générées par Meshy, assemblées sur un squelette commun, rendu lisse de figurine, proportions actuelles |
 
 ## 1. Verdict en cinq lignes
@@ -169,3 +169,103 @@ node banc/capturer.mjs games/la-petite-ligne/node_modules/three captures     pla
 Les sorties brutes ne sont pas versionnées: sans elles, `construire.sh` ne peut pas refaire les pièces (les fichiers de Meshy s'effacent le 2026-11-13). Le banc et les captures se relancent sans elles.
 
 Non fait: `verifier_asset.py` (les pièces de l'essai n'ont ni palette ni nom de la bible, il les refuserait toutes); validateur glTF; fusion en un appel de dessin; course et salut regardés sur capture.
+
+## 8. Essai 2 (2026-11-10): voie C contre voie D
+
+Cible: bible artistique de la refonte (sections 2, 3.2, 5.1) et planche `01-gabarits.png`: adulte de 1,70 m à 5 têtes, formes rondes, moufles, couleur par pièce, nuancier. Planche pour le client: `captures/essai-2-comparaison.png`; par voie: `captures/essai-2-voie-c.png`, `captures/essai-2-voie-d.png`; corpulence ronde: `captures/essai-2-d3.png`; mesures: `captures/essai-2-mesures.json`.
+
+### 8.1 Verdict
+
+**La voie D est la chaîne à retenir pour le corps et les vêtements. La voie C est écartée.** Meshy reste utile pour les seules pièces rigides qui ont du volume et du caractère (chapeaux, sacs, coiffures élaborées), une fois réglés les deux points de la section 8.5.
+
+| | Voie C (personnage généré d'après la planche, riggé, découpé) | Voie D (corps et vêtements par script) |
+|---|---|---|
+| Rendu « figurine lisse » | non: silhouette en fil de fer, membres maigres, pieds en pointe, visage brouillé | oui: volumes ronds et pleins, bords épais, ombrage doux |
+| Proportions de la bible | tête ramenée à 34 cm par le script, mais carrure et membres de Meshy (la référence de face ne donne aucune profondeur fiable) | exactes par construction (cotes de la section 2.1 dans le script) |
+| Couleur par pièce | fausse: `meshy-n1` ne peint que la face vue, le dos sort noir; le remplissage par voisinage donne un pull marine au lieu d'ardoise et des jambes couleur peau | exacte: une matière du nuancier par emplacement de couleur |
+| Traversées | aucune (un seul maillage découpé), mais pièces non interchangeables | aucune au repos ni à la marche sur les captures: le vêtement est le volume du corps décalé, il a ses poids, et le corps est masqué dessous |
+| Pièces interchangeables | non démontré: chaque donneur a sa carrure | oui: 10 pièces, 3 personnages composés, 2 corpulences par un paramètre |
+| Coût | 20 crédits par personnage (image vers 3D texturée 15, rig 5) | 0 crédit |
+| Triangles, appels | 6 400 à 6 600, 20 appels | 10 700 à 12 900, 34 à 38 appels (à réduire, 8.5) |
+
+### 8.2 Tâches Meshy (50 crédits, solde 2 252 avant, 2 202 après)
+
+| # | Tâche | Outil | Crédits | Résultat |
+|---|---|---|---|---|
+| 15 | `01a1c4f5-92ad-72bb-b97f-3e53630d9625` adulte moyen d'après `references/ref_adulte_moyen.png` | image vers 3D, `meshy-t2.5`, 6 000 faces, texture `meshy-n1`, pose en T | 15 | fidèle à la référence de face, pose en T, formes simples; corps mince, dos non peint |
+| 16 | `01a1c4f5-9e0c-7660-bb4d-e2d5628e2b2b` adulte rond d'après `references/ref_adulte_rond.png` | idem | 15 | idem; la corpulence ronde de la référence n'est pas rendue |
+| 17 | `01a1c4f7-6e92-743f-9bad-a8508fa1273a` rig du n° 15 | `meshy_rig`, 1,70 m | 5 | 24 os |
+| 18 | `01a1c4f7-80f9-7214-9298-e44d274830f7` rig du n° 16 | `meshy_rig`, 1,70 m | 5 | 24 os |
+| 19 | `01a1c4f5-aa08-73df-b9c2-b476751e1b9c` chaussures « galet » | texte vers 3D, 800 faces, préfixe de la bible (5.2) | 5 | bottines à lacets malgré « no laces »: non utilisées |
+| 20 | `01a1c4f5-bb87-750d-94f6-60ea3ec36cfe` bonnet à pompon | texte vers 3D, 800 faces | 5 | forme juste, côtes marquées; non conformé faute de temps |
+
+Fiches: `fiches/c_moyen.meshy.json`, `c_rond.meshy.json`, `rigide_chaussures_essai2.meshy.json`, `rigide_bonnet.meshy.json`. Références: `references/` (un gabarit de la planche du directeur artistique, seul, fond gris, par `scripts/references_gabarits.py`).
+
+### 8.3 Voie C: ce qui a été fait et pourquoi elle échoue
+
+`scripts/voie_c.py`: donneur ramené os par os sur le squelette commun, tête mise à 34 cm, couleur de chaque face lue dans la texture, une pièce par emplacement (tête, cheveux, mains, haut, bas, chaussures), visage simple posé par lancer de rayon.
+
+1. **La référence de face ne porte pas le volume.** Meshy rend ce qu'il voit: des jambes de 6 cm, un torse plat. Il faudrait une référence en volume (rendu 3D de trois quarts), c'est-à-dire avoir déjà le modèle.
+2. **Le dos n'est pas peint** (noir): la découpe par couleurs devine le dos d'après le bord, et se trompe.
+3. **Le pied du rig de Meshy pointe vers le bas au repos**: ramené sur un os de pied à plat, la chaussure se dresse en pointe. C'est aussi la cause des baskets ratées de l'essai 1. Corrigeable (redresser le pied avant de figer), non fait.
+4. **Le visage posé par script se superpose au relief et aux traits de Meshy**: il faudrait une tête sans visage, ce que le texte n'a jamais donné (essai 1).
+5. Même réussie, la voie C donnerait un personnage par génération, pas des pièces à la carrure commune.
+
+### 8.4 Voie D: ce qui a été fait
+
+`scripts/voie_d.py` et `scripts/figurine.py` (0 crédit, 25 s par gabarit):
+
+- **Squelette**: les 24 os communs replacés sur les repères de la bible (cou 1,31 m, taille, entrejambe, genou 0,46 m, cheville 0,10 m, pied à plat), orientation de repos gardée: les clips `walk`, `run`, `idle`, `wave` se rejouent sans retouche.
+- **Corps**: volumes balayés lisses (torse en tonneau à section elliptique, membres en gélules, tête ellipsoïde de 34 x 31,5 cm, moufles avec pouce, cou de 8,6 cm), 3 088 triangles, sections `tete`, `cou`, `torse`, `bras`, `avant_bras`, `mains`, `bassin`, `cuisses`, `jambes`.
+- **Vêtements**: le même volume décalé (bas 8 mm, haut 19 à 21 mm, veste 38 mm), ouvert aux coutures de la bible (col à 1,337 m, ourlet 6 à 12 cm sous la taille, manche courte à mi-bras, manche longue avant la main, bas de pantalon sur la chaussure), épaissi de 8 mm. T-shirt, pull, veste ouverte, pantalon, short, jupe évasée (poids en dégradé bassin vers cuisses). **Salopette non faite.**
+- **Tête et visage**: yeux en perles, sourcils en boudins à la couleur des cheveux, bouche en arc, nez, oreilles; deux coiffures en coque (courte, carré à frange); chaussures en galet avec semelle.
+- **Corpulences**: `adult_medium` et `adult_round` sortent du même script par leurs cotes (carrure, taille, bassin, bras, jambe): toutes les pièces suivent.
+- **Banc** (`banc/essai2.html`): lumière principale chaude avec ombre portée douce, contre-jour froid, ciel, sol clair, ombre de contact; couleur d'une pièce changée par emplacement sans régénérer (peau, tissu, cuir).
+
+Mesures (Three.js 0.187, `captures/essai-2-mesures.json`): d1 10 692 triangles, 34 appels, 282 Ko de pièces; d2 12 884, 38, 350 Ko; d3 11 240, 36, 288 Ko; 4 programmes. Pièces de 36 à 88 Ko; corps 243 Ko avec ses 4 clips.
+
+### 8.5 Défauts vus sur les captures de la voie D, et risques
+
+- **Repos**: le clip `idle` (action 11 de Meshy) écarte les jambes et avance le bras droit. C'est le clip, pas le corps: choisir une autre attente (3 crédits) ou l'écrire dans Blender.
+- **Coiffures en casque**: lisses mais pauvres. C'est la famille où Meshy apporterait le plus (mèches, chignons, boucles), à condition d'obtenir une coiffure sans tête. Piste à essayer: image de référence de la coiffure posée sur notre tête grise, puis soustraction de la tête par script.
+- **Épaules**: la boule de la manche dépasse un peu du torse (épaulette). Ourlet de jupe relevé d'un côté à la marche.
+- **Budget**: 10 700 à 12 900 triangles pour 5 000 visés, car chaque vêtement a une paroi intérieure. Garder la paroi extérieure et le seul bord: environ 6 000. 34 à 38 appels: une matière par emplacement de couleur; fusion sur la palette commune à la composition, comme dans le jeu actuel.
+- **Visage**: version courte (3 éléments). Les pièces de rechange de la bible (nez, yeux, bouches, paupières) restent à écrire sur le même principe.
+- **Enfant et âgé**: non générés; le script prend les cotes d'un gabarit, mais le dos rond de l'âgé et les repères de l'enfant demandent leur table de repères.
+- **Pièces rigides de Meshy sur ce corps**: non démontré dans cet essai (bonnet généré, non posé). `conformer_piece.py` en mode `rigide` les posait dans l'essai 1; la calotte commune de la bible (2.3) rend le calage simple.
+- Course, salut et position assise non regardés. Vêtements amples (cape, robe longue) hors de portée d'une coque décalée: os de jupe ou clip dédié.
+
+### 8.6 Quelle voie pour quelles familles
+
+| Famille (bible, section 4) | Voie | Coût par pièce |
+|---|---|---|
+| Corps (8), pièces du visage (25), lunettes (10) | script | 0 crédit; 1 à 2 h pour le premier, puis une table de cotes |
+| Hauts, vestes, bas, robes, salopettes (46) | script: coque décalée du corps, variantes par paramètres (longueur, col, manche, ouverture, bande en relief) | 0 crédit; 20 à 40 min par nouvelle coupe, quelques minutes par variante |
+| Chaussures (14) | script pour les galets simples, Meshy pour bottes et sabots (pied à plat imposé) | 0 ou 5 à 10 crédits |
+| Coiffures (16), pilosité (6) | script pour les coques simples; Meshy à essayer pour les formes riches | 0 ou 10 à 15 crédits |
+| Têtes (15) | script (ellipsoïde commun au-dessus de la ligne de chapeau, variations sous la ligne) | 0 crédit |
+| Chapeaux (15), sacs et accessoires (16) | Meshy, texte ou image, puis `conformer_piece.py` rigide | 5 à 10 crédits, 10 à 15 min |
+
+### 8.7 Estimation révisée du catalogue
+
+| Poste | Hypothèse | Crédits |
+|---|---|---|
+| Chapeaux, sacs, accessoires (31 pièces) | 5 par génération, 1,6 génération par pièce | 250 |
+| Coiffures et chaussures confiées à Meshy (une quinzaine) | 10 par pièce, 1,6 essai | 240 |
+| Clips (attentes, gestes: une vingtaine d'actions) | 3 par action | 60 |
+| Marge de 30 % | | 165 |
+| **Total** | | **environ 700** (au lieu de 2 200) |
+
+Temps: le poids passe des crédits au temps de script. Environ 120 pièces scriptées ou paramétrées: 40 à 60 h de travail pour l'artiste 3D et le tech-artist, revue du directeur artistique comprise. Estimation tirée de cet essai (corps, 10 pièces, 2 corpulences et le banc en 80 min), non mesurée sur un catalogue.
+
+### 8.8 Reprendre l'essai 2
+
+```text
+python3 scripts/references_gabarits.py docs/jeux/jeu-1/refonte/planches/source references
+duo-python scripts/voie_d.py pieces/corps.glb docs/jeux/jeu-1/refonte/planches/source/nuancier.json pieces-d adult_medium moyen
+duo-python scripts/voie_d.py pieces/corps.glb docs/jeux/jeu-1/refonte/planches/source/nuancier.json pieces-d adult_round rond
+duo-python scripts/voie_c.py fiches/c_moyen.meshy.json pieces-d/moyen_corps.glb <bruts>/rigmoyen.glb pieces-c moyen
+node banc/capturer2.mjs games/la-petite-ligne/node_modules/three captures [d1 d2 d3 c_moyen c_rond]
+```
+
+La voie D se relance sans aucune sortie brute (elle ne lit que `pieces/corps.glb` pour le squelette et les clips). La voie C a besoin des rigs de Meshy, hors dépôt, effacés le 2026-11-13. Les planches réunies (`essai-2-voie-c.png`, `essai-2-voie-d.png`, `essai-2-comparaison.png`) ont été montées avec Pillow à partir des bandes de `capturer2.mjs`.

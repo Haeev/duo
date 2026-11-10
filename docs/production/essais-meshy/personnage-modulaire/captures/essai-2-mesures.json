@@ -30,5 +30,13 @@
   "programmes": 4,
   "triangles_personnage": 6580,
   "octets_pieces": 279748
+ },
+ "d3": {
+  "titre": "Voie D, adulte rond: t-shirt, short",
+  "triangles_image": 22546,
+  "appels": 36,
+  "programmes": 4,
+  "triangles_personnage": 11240,
+  "octets_pieces": 295412
  }
 }
