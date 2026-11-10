@@ -30,18 +30,21 @@ La 0.13 envoie son état en un seul message JSON, jusqu'à 5 fois par seconde, d
 |---|---|---|---|---|
 | 0 `guestInput` | commandes et intentions de l'invité | fiable | chaque pas | 2 048 |
 | 1 `common` | phase, lieu courant, jour, météo, coffre, voyage | dernier | au pas du changement | 1 024 |
-| 2 `fast` | positions des joueurs et des habitants du lieu, heure, jauges des besoins, accusé | dernier | chaque pas | 3 072 |
+| 2 `fast` | lieu, positions des joueurs et des habitants du lieu, heure, jauges des besoins, accusé | dernier | chaque pas | 3 072 |
 | 3 `events` | événements du pas | fiable | au pas où ils naissent | 4 096 |
 | 4 `players` | sac, barre, argent, apparence, geste, dialogue, visée, paliers des besoins | dernier | au pas du changement | 8 192 |
-| 5 `progress` | mémoire, amitiés, quêtes, collections, lieux ouverts | dernier | au changement, tous les 15 pas au plus | 32 768 |
+| 5 | libre depuis l'intégration du lot L1 (la progression part sur le canal 8) | | | |
 | 6 `place` | meubles posés, état des briques, objets au sol, état discret des habitants | dernier | au changement, tous les 6 pas au plus | 32 768 |
 | 7 | réservé aux activités (pêche, mini-jeu vu par le partenaire) | dernier | pendant l'activité | 4 096 |
+| 8 `progressPart` | progression (mémoire, amitiés, quêtes, collections, lieux ouverts) par différences et par morceaux | fiable | au changement, tous les 15 pas au plus | 16 384 par morceau |
 
 1. Une tranche a un compteur de révision; un système qui l'écrit appelle `touch(tranche)`. Les champs qui bougent à chaque pas (`body`, `needs`, `minutes`) vivent sur le canal rapide et ne déclenchent aucun envoi de tranche.
 2. **Aucun budget ne dépasse 32 Kio**, la moitié de la limite du SDK. Les bornes des schémas d'état (200 meubles posés, 80 objets au sol, 40 cases) sont accordées aux budgets, et `tests/tailles.test.ts` le tient sur un état fabriqué « au pire ». Relevé du socle: `players` 4 338, `progress` 29 331, `place` 24 323, `fast` 184 octets.
 3. **Jamais d'arrêt pour une taille**: l'hôte mesure chaque message; hors budget, il ne l'envoie pas et le journalise.
 4. **Validation chez l'invité**: un schéma Valibot par tranche, strict, champ par champ. Les mêmes schémas valident la sauvegarde.
 5. Sans changement, chaque tranche repart tous les 150 pas (filet de sécurité). Au départ et à la reprise: `sendAll`.
+
+6. **Progression par morceaux** (ajout du 2026-11-10, lot L1): la progression entière approchait son budget (29 Ko pour 32 Kio); elle part en révisions sur un canal fiable, complètes ou en différences, découpées en morceaux de 16 Kio au plus (`src/reseau/progression.ts`). La borne de 32 Kio reste celle de l'état (sauvegarde, test « au pire »).
 
 ## Conséquences
 

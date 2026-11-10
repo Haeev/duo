@@ -55,4 +55,4 @@ Dans `technique.md` (version 0.1, avant l'essai 2), j'avais recommandé les 18 o
 - Report des clips de 18 vers 24 os: non essayé; les estimations ci-dessus sont des ordres de grandeur. Un essai sur trois clips (`pickup`, `sit`, `fish_cast`) doit précéder le report en série.
 - Morphologies enfant et âgé par échelles d'os (l'essai ne les a pas générées; le catalogue en déclare déjà une de chaque).
 - Coût de la fusion à l'exécution et nombre d'appels réels, à mesurer par le lot L6 dans Three.js 0.187.
-- Le catalogue livré distingue des morphologies `adult-f-*` et `adult-m-*`, alors que le client a décidé « aucun choix de genre, toutes les pièces vont à tous »: à accorder avec le directeur artistique (question de nommage ou de fond).
+- Genre (décision du client du 2026-11-10, après cet ADR): chaque joueur choisit femme ou homme; ce choix règle les accords des textes et la silhouette de départ (`start.shapes` de `reglages.json`), et toutes les pièces restent portables par tous. Les morphologies `adult-f-*` et `adult-m-*` du catalogue sont donc valides; `morphologies.json` est validé par `MorphologiesSchema`.
