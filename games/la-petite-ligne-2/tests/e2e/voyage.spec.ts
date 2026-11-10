@@ -2,15 +2,7 @@
 import { appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
-import { CAPTURES, startDuo, type Duo, type ProbeWorld } from '../aides-e2e/duo';
-
-/** Poteau de quai de chaque lieu d'essai (brique `travel`): on monte en le visant, touche d'action. */
-const POTEAU: Readonly<Record<string, { x: number; y: number }>> = {
-  'essai-gare': { x: 17.5, y: 4.5 },
-  'essai-halte': { x: 18.5, y: 4.5 },
-};
-const EAST = 0;
-const WEST = Math.PI;
+import { BOARDING, CAPTURES, startDuo, type Duo, type ProbeWorld } from '../aides-e2e/duo';
 
 /** Ce qui doit survivre au voyage (CA-02), par joueur. */
 function kept(w: ProbeWorld): string {
@@ -29,9 +21,9 @@ async function travel(
 ): Promise<number> {
   const { host, guest } = duo;
   const [hi, gi] = [await host.local(), await guest.local()];
-  const poteau = POTEAU[from] ?? { x: 17.5, y: 4.5 };
-  await duo.teleport(hi, poteau.x - 0.9, poteau.y, EAST);
-  await duo.teleport(gi, poteau.x + 0.9, poteau.y, WEST);
+  const { stand, facing } = BOARDING[from] ?? { stand: [], facing: 0 };
+  await duo.teleport(hi, stand[0]?.x ?? 0, stand[0]?.y ?? 0, facing);
+  await duo.teleport(gi, stand[1]?.x ?? 0, stand[1]?.y ?? 0, facing);
   await host.page.waitForTimeout(800);
   // CA-01: un seul joueur monte, le train ne part pas.
   await host.press('Space');

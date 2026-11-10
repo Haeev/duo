@@ -5,6 +5,7 @@ import { mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, type Browser, type BrowserContext, type Frame, type Page } from '@playwright/test';
+import { startServer, type Serveur } from './serveur';
 
 /** Dossier des captures (`LPL2_CAPTURES` pour le changer). */
 export const CAPTURES = process.env.LPL2_CAPTURES ?? join(tmpdir(), 'lpl2-captures');
@@ -20,11 +21,33 @@ export interface ProbeWorld {
     readonly place: string;
     readonly day: number;
     readonly chest: number;
-    readonly travel: { readonly to: string } | null;
+    readonly travel: {
+      readonly to: string;
+      readonly boarded: readonly [boolean, boolean];
+      readonly skip?: readonly [boolean, boolean];
+    } | null;
+    readonly story?: { readonly scene?: { readonly id: string } | null } | null;
   };
   readonly players: readonly ProbePlayer[];
+  readonly progress?: {
+    readonly quests: Readonly<
+      Record<
+        string,
+        { readonly step: string; readonly done: boolean; readonly passed?: readonly string[] }
+      >
+    >;
+  };
   readonly places: Readonly<
-    Record<string, { readonly ground?: readonly { readonly item: string }[] } | undefined>
+    Record<
+      string,
+      | {
+          readonly ground?: readonly { readonly item: string }[];
+          readonly villagers?: Readonly<
+            Record<string, { readonly body: { readonly x: number; readonly y: number } }>
+          >;
+        }
+      | undefined
+    >
   >;
 }
 
@@ -49,7 +72,7 @@ export interface Side {
   game(): Frame;
   world(): Promise<ProbeWorld | null>;
   local(): Promise<number>;
-  aim(player: number): Promise<{ target?: string; verb?: string } | null>;
+  aim(player: number): Promise<{ id?: string; verb?: string } | null>;
   /** Appuie une touche (code physique) dans le jeu de cette machine. */
   press(code: string, holdMs?: number): Promise<void>;
   shot(name: string): Promise<string>;
@@ -114,7 +137,7 @@ function side(page: Page, who: 'hôte' | 'invité', slug: string): Side {
         (p) => (window as unknown as WindowWithProbe).__lplSonde?.aim(p) ?? null,
         player,
       );
-      return aim as { target?: string; verb?: string } | null;
+      return aim as { id?: string; verb?: string } | null;
     },
     async press(code, holdMs = 120) {
       // Le clavier de la page va au cadre qui a le focus: on le donne au jeu de cette machine.
@@ -157,12 +180,38 @@ const KEY_OF: Readonly<Record<string, string>> = {
 };
 
 /** L'un héberge, l'autre rejoint; renvoie quand les deux jeux tournent et que la sonde répond. */
+export interface StartOptions {
+  /** Sauvegarde de départ (`tests/aides-e2e/fabrique-sauvegardes.prep.ts`); sans elle, partie neuve. */
+  readonly save?: string;
+  /** Appelé avant la première navigation de l'invité (écoute de la WebSocket). */
+  readonly onGuestPage?: (page: Page) => void;
+}
+
+/** Profils fixes: ceux d'une sauvegarde de départ (les joueurs sont reconnus par leur identifiant). */
+const PROFILES = [
+  { id: 'membre-a', name: 'Loïc', color: 'orb' },
+  { id: 'membre-b', name: 'Zoé', color: 'crescent' },
+] as const;
+
 export async function startDuo(
   browser: Browser,
   slug: string,
-  onGuestPage?: (page: Page) => void,
+  options: StartOptions = {},
 ): Promise<Duo> {
-  const contexts = [await browser.newContext(), await browser.newContext()] as const;
+  const { save, onGuestPage } = options;
+  // Un faux hôte à soi (port et dossier de données propres): chaque parcours part d'une partie
+  // connue, quoi qu'aient laissé les parcours précédents.
+  const server: Serveur = await startServer(save);
+  const baseURL = server.url;
+  const contexts = [
+    await browser.newContext({ baseURL }),
+    await browser.newContext({ baseURL }),
+  ] as const;
+  for (const [i, ctx] of contexts.entries())
+    await ctx.addInitScript((profile) => {
+      if (window === window.top)
+        localStorage.setItem('duo-sdk-dev:profil', JSON.stringify(profile));
+    }, PROFILES[i] ?? PROFILES[0]);
   // Le faux hôte ouvre `/jeu/` sans paramètre: une redirection y ajoute la sonde.
   for (const ctx of contexts)
     await ctx.route(
@@ -183,8 +232,12 @@ export async function startDuo(
   onGuestPage?.(guestPage);
   await hostPage.goto('/');
   await hostPage.getByLabel('Ton pseudo').fill('Loïc');
-  // Chaque parcours part d'une partie neuve, même si un parcours précédent a enregistré la sienne.
-  await hostPage.getByRole('button', { name: /^Héberger( une nouvelle partie)?$/ }).click();
+  await hostPage
+    .getByRole('button', {
+      name: save === undefined ? 'Héberger' : 'Héberger et continuer',
+      exact: true,
+    })
+    .click();
   await guestPage.goto('/');
   await guestPage.getByLabel('Ton pseudo').fill('Zoé');
   await guestPage.getByRole('button', { name: 'Rejoindre' }).click();
@@ -231,6 +284,7 @@ export async function startDuo(
     },
     async close() {
       for (const ctx of contexts) await ctx.close();
+      await server.close();
     },
   };
   // La sonde se charge par un import différé: attendre qu'elle réponde des deux côtés.
@@ -243,3 +297,33 @@ export async function startDuo(
 export function distance(p: ProbePlayer, x: number, y: number): number {
   return Math.hypot(p.body.x - x, p.body.y - y);
 }
+
+/**
+ * Où se tenir pour monter dans le train, par lieu d'essai: à moins d'un mètre du poteau de quai
+ * (brique `travel`) et dans le rayon du quai (`station.platformRadius`, 3 m autour du point
+ * « quai »), côté quai. Se tenir de l'autre côté du poteau donne « Monter » barré, « Va sur le quai ».
+ */
+export const BOARDING: Readonly<
+  Record<
+    string,
+    {
+      readonly stand: readonly [{ x: number; y: number }, { x: number; y: number }];
+      readonly facing: number;
+    }
+  >
+> = {
+  'essai-gare': {
+    stand: [
+      { x: 18.4, y: 4.1 },
+      { x: 18.4, y: 4.9 },
+    ],
+    facing: Math.PI,
+  },
+  'essai-halte': {
+    stand: [
+      { x: 17.6, y: 4.1 },
+      { x: 17.6, y: 4.9 },
+    ],
+    facing: 0,
+  },
+};

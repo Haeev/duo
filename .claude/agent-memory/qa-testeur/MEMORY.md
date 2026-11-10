@@ -98,3 +98,11 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Portée d'action 1,2 m au point le plus proche de l'emprise, cône de 50 degrés: placer le joueur à moins d'un mètre, face à l'objet, et vérifier `aim(i)` avant d'appuyer (un meuble voisin, armoire ou coffre, peut prendre la cible).
 - Voyage: la phase `travel` dure au moins 20 s et jusqu'à 47 s en rendu logiciel (chargement du lieu): délai d'arrivée d'au moins 60 s.
 - L'horloge système de l'environnement fait foi pour le temps de mission (`date`), pas l'estimation au jugé.
+
+## Isolation des parcours de La Petite Ligne 2 (vérifié le 2026-11-10)
+
+- Cause des parcours rouges en série: une sauvegarde laissée dans le dossier de données change l'accueil du faux hôte (« Héberger » devient « Héberger et continuer » et « Héberger une nouvelle partie », dont le `confirm()` est refusé d'office par Playwright): l'hôte ne démarre jamais. Remède: un faux hôte par parcours (`tests/aides-e2e/serveur.ts`: port libre, `--donnees` propre, déjà prévu par `servir`), aucun ajout au SDK.
+- Sauvegardes de départ (Aubrune, après la scène, acte 2): fabriquées par Vitest (`tests/aides-e2e/fabrique-sauvegardes.prep.ts`, lancé par `globalSetup`), car le contenu du jeu passe par `import.meta.glob`. Profils fixes `membre-a` et `membre-b` posés par `addInitScript` (sinon « sauvegarde d'un autre duo »). Le départ réglé du jeu (`reglages.json`) est la gare d'essai: Aubrune ne s'atteint que par une sauvegarde.
+- Poteau de quai: se tenir côté quai (rayon 3 m autour du point « quai ») et à moins d'un mètre, sinon « Monter » est barré (« Va sur le quai »); un joueur à 50 degrés du cône ne reçoit pas la cible. `aim()` rend `{kind, id, action, verb, refusal, x, y}`: lire `id`, pas `target`.
+- Playwright: `browser.newContext()` reprend `use.viewport` (960x540 ici) mais le `baseURL` retiré de la config n'existe plus: le passer à la main. `pkill` est refusé par l'environnement: un passage lancé en sous-shell ne s'arrête pas, le lancer avec `run_in_background`.
+- Une scène (`say`) passe au délai de 10 s: aucune couche d'interface ne dessine les répliques de scène et rien n'envoie `scene_next` (constat du 2026-11-10).
