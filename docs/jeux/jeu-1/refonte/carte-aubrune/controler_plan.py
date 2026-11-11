@@ -1292,7 +1292,7 @@ def controler_acces(d, carte, fiches, interieurs=None, types=None, lieu=LIEU):
 
 
 CIRCULATION = ('route', 'rue', 'chemin', 'sentier')
-BARRENT = ('lisse-fleurie',)        # types qui barrent une route par nature (contournés par l'accotement)
+BARRENT = ('lisse-fleurie', 'lisse-de-passage-a-niveau')        # types qui barrent une route par nature (contournés par l'accotement)
 RECUL_POSTE = 1.0                   # m entre un poste d'habitant de la fête et un objet solide de son décor
 PORTEE_LAMPES, LAMPES_MAX = 26.0, 6  # `INK_SETTINGS.lights.reach` et `MAX_LAMPS` (src/rendu/encre)
 

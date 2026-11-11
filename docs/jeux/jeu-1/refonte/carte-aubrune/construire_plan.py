@@ -1849,21 +1849,27 @@ mob('estrade-fanfare', 'estrade-de-fanfare', _MODELES['estrade-de-fanfare'], 175
 mob('panneau-commande', 'panneau-d-affichage', _MODELES['panneau-d-affichage'], 207.5, 102.5, 0,
     "la commande de la semaine, à la craie, sur la troisième rangée du quai (hors du bord): Rosalie l'écrit à 3 m de "
     "son poste, on la lit en montant de la Grand-Route par le passage; face au sud, vers qui arrive")
+_HORS_FETE_LISSES = [dict(type='not', condition=dict(type='all', conditions=list(_LISSES)))]
 for _m in M_:
     # 3. Le tonneau du café: sur la terrasse d'herbe rase au sud de la Grand-Route, où sont aussi les quilles.
     if _m['id'] == 'tonneau-cafe':
         _m.update(type='tonneau', x=256.5, y=111.5,
                   pourquoi="le tonneau qui sert de table à la terrasse du café, en face de la porte, de l'autre côté de "
                            "la Grand-Route (herbe rase, côté soleil, au bout du jeu de quilles): il ne barre plus la route")
-    # 4. Les lisses ordinaires attendent leur meuble (`lisse-de-passage-a-niveau`): positions préparées, non posées.
+    # 4. Les lisses ordinaires du passage gardé (`lisse-de-passage-a-niveau`): en travers de la route du Gué, socle à
+    #    droite de qui arrive, jamais là où la lisse fleurie est baissée (plan.md, section 20).
     elif _m['id'] == 'lisse-nord':
-        _m.update(x=182.5, y=95.5,
-                  pourquoi="en travers de la route du Gué au nord de la voie, socle sur l'accotement ouest (à droite de qui "
-                           "descend vers le sud); cachée quand la lisse fleurie est baissée")
+        _m.update(type='lisse-de-passage-a-niveau', modele=_MODELES['lisse-de-passage-a-niveau'], x=182.5, y=95.5, rotation=0,
+                  when=_HORS_FETE_LISSES,
+                  pourquoi="en travers de la route du Gué au nord de la voie, socle (poteau et lanterne) au bord ouest de la "
+                           "chaussée, à droite de qui descend vers le sud, bras de 4 m sur toute la chaussée; absente quand la "
+                           "lisse fleurie, qui la remplace, est baissée")
     elif _m['id'] == 'lisse-sud':
-        _m.update(x=182.5, y=99.5, rotation=2,
-                  pourquoi="en travers de la route du Gué au sud de la voie, socle sur l'accotement est (à droite de qui "
-                           "monte vers le nord, côté maison de Firmin); cachée quand la lisse fleurie est baissée")
+        _m.update(type='lisse-de-passage-a-niveau', modele=_MODELES['lisse-de-passage-a-niveau'], x=182.5, y=99.5, rotation=2,
+                  when=_HORS_FETE_LISSES,
+                  pourquoi="en travers de la route du Gué au sud de la voie, socle au bord est de la chaussée, à droite de qui "
+                           "monte vers le nord, côté maison de Firmin (qui se tient contre lui); absente quand la lisse fleurie "
+                           "est baissée")
 # 6. Les ardoises du chantier de la maison (lot du chantier, 2026-11-11), ajoutées à la main dans l'intérieur: l'assembleur
 #    efface tout objet absent du plan, elles entrent donc dans le plan avec leur condition. L'ardoise de la salle quitte
 #    le milieu de la pièce (elle y coupait le passage de 2 m de la porte au lit et aux escaliers) pour la cloison ouest.
@@ -2123,7 +2129,7 @@ def tableaux(dist_t, dens):
     t['gabarits'] = gb
     t['mobilier'] = ['| Objet | Type du jeu | Modèle | Où (x, y) | Face au | Pourquoi |', '|---|---|---|---|---|---|'] + [
         '| %s | %s | `%s` | %g, %g | %s | %s |' % (m['id'], m['type'] or '(à créer)', m['modele'], m['x'], m['y'], 'sud est nord ouest'.split()[m['rotation']], m['pourquoi'])
-        for m in M_ if not m.get('when')]
+        for m in M_ if not m.get('fete')]
 
     def _cond(m):
         out = []
@@ -2136,7 +2142,7 @@ def tableaux(dist_t, dens):
     _lum = lambda m: 'oui' if (_MAN.get(m['modele']) or {}).get('light') else ''
     t['fetes'] = ['| Objet | Type du jeu | Fête | Où (x, y) | Face au | En plus de la fête | Lampe | Pourquoi |', '|---|---|---|---|---|---|---|---|'] + [
         '| %s | %s | %s | %g, %g | %s | %s | %s | %s |' % (m['id'], m['type'], m['fete'], m['x'], m['y'], 'sud est nord ouest'.split()[m['rotation']],
-                                                       _cond(m), _lum(m), m['pourquoi']) for m in M_ if m.get('when')]
+                                                       _cond(m), _lum(m), m['pourquoi']) for m in M_ if m.get('fete')]
     t['vegetation'] = ['| Zone | Arbres pour 100 m² | Essences | Sous-étage | Recul des chemins | Pourquoi |', '|---|---|---|---|---|---|'] + [
         '| %s | %s | %s | %s | %s m | %s |' % (ZONES[v['zone']]['nom'], str(v['densite']).replace('.', ','), ', '.join(v['essences']), ', '.join(v['sous_etage']),
                                             str(v['recul_chemins']).replace('.', ','), v['pourquoi']) for v in VEGETATION]
