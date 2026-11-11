@@ -333,7 +333,13 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
             const source = content.book.entries[e.id]?.source;
             return {
               id: e.id,
-              thumb: source?.type === 'item' ? source.item : e.id,
+              // Une recette montre son plat: la fiche du carnet nomme la recette, la recette son plat.
+              thumb:
+                source?.type === 'item'
+                  ? source.item
+                  : source?.type === 'recipe'
+                    ? (content.recipes[source.recipe]?.output.item ?? e.id)
+                    : e.id,
               name: e.name,
               rarity: 1,
               found,

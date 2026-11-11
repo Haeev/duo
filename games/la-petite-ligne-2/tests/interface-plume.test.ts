@@ -135,18 +135,30 @@ describe('vignettes à la plume', () => {
       expect(objects.has(id) || placeables.has(id) || BOOK.has(id) || AHEAD.has(id), id).toBe(true);
   });
 
-  it('une recette du carnet montre la vignette de son plat (`source.item`)', () => {
-    const dishes = [...BOOK.values()].flatMap((e) =>
-      typeof e === 'object' &&
-      e !== null &&
-      'source' in e &&
-      typeof e.source === 'object' &&
-      e.source !== null &&
-      'item' in e.source &&
-      typeof e.source.item === 'string'
-        ? [e.source.item]
-        : [],
-    );
+  it('une recette du carnet montre la vignette de son plat (plat de la recette nommée)', () => {
+    const recipeDir = path.join(PKG, 'donnees', 'commun', 'recettes');
+    const dishes = [...BOOK.values()].flatMap((e) => {
+      if (typeof e !== 'object' || e === null || !('source' in e)) return [];
+      const source = e.source;
+      if (typeof source !== 'object' || source === null) return [];
+      if ('item' in source && typeof source.item === 'string') return [source.item];
+      if ('recipe' in source && typeof source.recipe === 'string') {
+        const recipe: unknown = JSON.parse(
+          readFileSync(path.join(recipeDir, `${source.recipe}.json`), 'utf8'),
+        );
+        if (
+          typeof recipe === 'object' &&
+          recipe !== null &&
+          'output' in recipe &&
+          typeof recipe.output === 'object' &&
+          recipe.output !== null &&
+          'item' in recipe.output &&
+          typeof recipe.output.item === 'string'
+        )
+          return [recipe.output.item];
+      }
+      return [];
+    });
     expect(dishes.length).toBeGreaterThan(0);
     for (const item of dishes) expect(thumbUrl(item), item).not.toBeNull();
   });
