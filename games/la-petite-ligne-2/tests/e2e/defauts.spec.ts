@@ -1,5 +1,5 @@
-// Défauts de la recette du jalon 1, retournés après correction: D2 (la cheffe de gare propose sa
-// buvette après un dialogue de quête) et D3 (personne collé au joueur au point d'arrivée; relevé
+// Défauts de la recette du jalon 1, retournés après correction: D2 (la buvette de la cheffe de gare
+// reste ouvrable après son dialogue de quête, par le comptoir tenu) et D3 (personne collé au joueur au point d'arrivée; relevé
 // des distances dans mesures.txt).
 import { appendFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -7,6 +7,7 @@ import { expect, test } from '@playwright/test';
 import { CAPTURES, startDuo, type Duo } from '../aides-e2e/duo';
 
 const GUICHET = { x: 20, y: 15 };
+const COMPTOIR = { x: 23, y: 15 };
 
 /** Parle à la cheffe de gare et lit les pages jusqu'à la fin (choix: premier). */
 async function talkToChief(duo: Duo, label: string): Promise<string[]> {
@@ -34,7 +35,7 @@ async function talkToChief(duo: Duo, label: string): Promise<string[]> {
   return pages;
 }
 
-test('D2 la boutique de la gare s’ouvre en parlant à la cheffe de gare, après sa quête', async ({
+test('D2 la boutique de la gare s’ouvre au comptoir, après le dialogue de quête de la cheffe', async ({
   browser,
 }) => {
   const duo = await startDuo(browser, 'd2-boutique');
@@ -45,14 +46,20 @@ test('D2 la boutique de la gare s’ouvre en parlant à la cheffe de gare, aprè
   expect(first.join('|')).toContain('Bienvenue');
   await duo.until(host, 'besace', (w) => w.players[hi]?.bag !== null);
   await host.page.waitForTimeout(2000);
-  // 2e conversation: le dialogue de quête (la sonnerie) passe, puis la cheffe propose sa buvette
-  // en dernière page; le premier choix (Entrée) ouvre la boutique.
+  // 2e conversation: le dialogue de quête (la sonnerie) passe, sans offre de boutique derrière lui
+  // (une réplique d'histoire ou de quête ne débouche jamais sur la boutique). Une fois cette
+  // réplique entendue, la touche d'action sur le comptoir tenu ouvre la buvette.
   const second = await talkToChief(duo, 'b');
   const text = second.join('|');
   expect(text, 'le dialogue de quête passe d’abord').toContain('sonner');
-  expect(text, 'D2: la buvette est proposée en parlant à la cheffe').toContain(
-    'CHOIX: Je regarde ta buvette.',
+  expect(text, 'pas d’offre de boutique derrière une réplique de quête').not.toContain(
+    'Je regarde ta buvette.',
   );
+  await duo.teleport(hi, COMPTOIR.x - 1.3, COMPTOIR.y, 0);
+  await expect
+    .poll(async () => (await host.aim(hi))?.id ?? null, { timeout: 20_000 })
+    .toBe('comptoir-buvette');
+  await host.press('Space');
   const shop = host.game().locator('.lpl-ui .shop');
   await expect(shop).toBeVisible();
   await host.page.waitForTimeout(800);
