@@ -670,6 +670,34 @@
   width: 0.875rem;
   height: 0.875rem;
 }
+/* Écouter un air: triangle de lecture, carré d'arrêt quand il joue (forme, pas seulement couleur). */
+.lpl-ui .ecoute {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.lpl-ui .ecoute__ic {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0.4375rem 0 0.4375rem 0.75rem;
+  border-color: transparent transparent transparent currentColor;
+}
+.lpl-ui .ecoute--joue .ecoute__ic {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 0;
+  background: currentColor;
+}
+.lpl-ui .ecoute:disabled .ecoute__ic {
+  border-left-style: dashed;
+  opacity: 0.6;
+}
+.lpl-ui .ecoute__why {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
 
 /* Carte */
 .lpl-ui .carte {

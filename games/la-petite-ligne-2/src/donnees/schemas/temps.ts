@@ -189,6 +189,11 @@ export const CalendarEventSchema = v.strictObject({
    */
   announce: v.boolean(),
   /**
+   * Où il se tient, tel qu'il se lit après le nom dans l'annonce, préposition comprise (« sur le
+   * parvis », « à la halte »). Absent: l'annonce dit le nom et l'heure seulement.
+   */
+  where: v.exactOptional(LabelSchema),
+  /**
    * Ce que l'événement allume. Qui vient se règle dans les plannings des habitants, et une scène
    * par son déclencheur: tous deux lisent l'événement par la condition `event_is`.
    */

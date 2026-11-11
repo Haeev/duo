@@ -20,6 +20,7 @@
     }
   ],
   "announce": true,
+  "where": "sur le parvis",
   "activates": {
     "facts": [],
     "shop": null,

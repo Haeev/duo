@@ -7,7 +7,7 @@ import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { DEFAULT_GRAPHICS_OPTIONS, type GraphicsOptions } from '../../rendu/options';
-import { createCollectionsTab } from './collections';
+import { createCollectionsTab, type ListenPort } from './collections';
 import { createMapTab } from './carte';
 import { dummySources } from './fictif';
 import { createVillagersTab, type SharedTabState } from './habitants';
@@ -23,9 +23,11 @@ import { createSettingsTab, memorySettings } from './options';
 import { createQuestsTab, memoryFollow, type FollowStore } from './quetes';
 import { createOutfitsTab } from './tenues';
 import { decisionReminderTexts } from '../rappel-decision';
+import { agendaLines } from '../annonce';
 
 export type { CarnetSources, SettingsPort, UiSettings } from './lectures';
 export type { FollowStore } from './quetes';
+export type { ListenPort } from './collections';
 export type { TabId } from './onglet';
 
 export interface CarnetTabsOptions {
@@ -43,6 +45,8 @@ export interface CarnetTabsOptions {
   /** Ouvre l'éditeur de personnage (autre lot). */
   readonly openEditor?: () => void;
   readonly follow?: FollowStore;
+  /** Écoute des airs de la collection (régie de musique); absente: airs sans enregistrement. */
+  readonly listen?: ListenPort;
 }
 
 export interface CarnetTabs {
@@ -84,12 +88,14 @@ export function createCarnetTabs(options: CarnetTabsOptions): CarnetTabs {
       (w, l) => sources.quests(w, l),
       follow,
       (w, l) => decisionReminderTexts(w, options.content, l),
+      (w) => agendaLines(options.content, w),
     ),
     villagers: createVillagersTab(deps, (w, l) => sources.villagers(w, l), shared),
     collections: createCollectionsTab(
       deps,
       (w, l) => sources.collections(w, l),
       (i, w) => w.players[i].name,
+      options.listen ?? null,
     ),
     map: createMapTab(deps, {
       read: (w, l) => sources.map(w, l),

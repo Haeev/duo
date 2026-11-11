@@ -5,7 +5,9 @@
  * `#carnet-sans-sac`, `#carnet-sac`, `#rangement`, et un onglet du carnet:
  * `#carnet-quetes`, `-habitants`, `-collections`, `-carte`, `-tenues`, `-reglages`, chacun avec le
  * suffixe `-long` pour un contenu très long; le sac en objet: `#carnet-sac-equiper`, `-refus`,
- * `-malle`). Sert aux captures.
+ * `-malle`; l'écoute d'un air: `#carnet-collections-ecouter`; l'annonce d'une fête: `#annonce-veille`
+ * (le soir, avis), `#annonce-coup-d-oeil` (G), `#annonce-carnet` (onglet Quêtes); `?joueur=1`:
+ * l'écran de l'autre joueur). Sert aux captures.
  * Les onglets lisent un état factice (`carnet/fictif.ts`) et le vrai plan d'Aubrune.
  */
 import { loadContent } from '../../donnees/charger';
@@ -29,6 +31,15 @@ const world: WorldState = createWorld(content, 7, [
   { id: 'b', name: 'Sacha' },
 ]);
 const state = location.hash.slice(1) || 'repos';
+/** `?joueur=1`: le même état vu par l'autre joueur (Sacha). */
+const localPlayer: PlayerIndex = new URLSearchParams(location.search).get('joueur') === '1' ? 1 : 0;
+// Annonce: la veille au soir de la Nuit des lumignons, l'état partagé l'annonce pour demain.
+const agendaDemo = /^annonce-(veille|coup-d-oeil|carnet)$/.exec(state)?.[1];
+if (agendaDemo !== undefined) {
+  world.common.place = 'aubrune';
+  world.common.outlook = { weather: 'clear', events: ['nuit-des-lumignons'] };
+}
+const listenDemo = state === 'carnet-collections-ecouter';
 const me = world.players[0];
 const other = world.players[1];
 world.minutes = 10 * 60 + 40;
@@ -49,9 +60,13 @@ const longContent = state.endsWith('-long');
 const sagaDemo = /^carnet-quetes-histoire(-3)?$/.exec(state);
 const tabName = longContent
   ? state.slice(0, -'-long'.length)
-  : sagaDemo === null
-    ? state
-    : 'carnet-quetes';
+  : listenDemo
+    ? 'carnet-collections'
+    : agendaDemo === 'carnet'
+      ? 'carnet-quetes'
+      : sagaDemo === null
+        ? state
+        : 'carnet-quetes';
 const tabStep = TABS_DEMO.findIndex((t) => tabName === `carnet-${t}`) + 1;
 if (tabStep > 0) {
   // Les joueurs au quai d'Aubrune, en mètres du plan.
@@ -132,6 +147,8 @@ if (sagaDemo !== null) {
       passed: ['chambre', 'coupe', 'trappe', 'registre'],
     };
 }
+// L'annonce de la veille paraît le soir (`AGENDA_UI.eveFrom`).
+if (agendaDemo !== undefined) world.minutes = 18 * 60 + 20;
 if (state === 'coup-d-oeil') {
   me.needs.sleep = 82;
   me.tiers.sleep = 'bonus';
@@ -209,6 +226,7 @@ if (state === 'rangement' && place !== undefined)
     ],
   };
 
+let listening: string | null = null;
 const listeners = new Set<(event: GameEvent) => void>();
 const root = document.getElementById('ui');
 if (!(root instanceof HTMLElement)) throw new Error('#ui absent');
@@ -219,7 +237,7 @@ const ui = createInterface({
   view: {
     content,
     world: () => world,
-    localIndex: (): PlayerIndex => 0,
+    localIndex: (): PlayerIndex => localPlayer,
     aim: () => aim,
     onEvent(listener) {
       listeners.add(listener);
@@ -246,6 +264,17 @@ const ui = createInterface({
         ? (longContent ? stressSources : dummySources)(parsePlan(planAubrune), ['M', 'F', 'T', 'C'])
         : worldSources(content),
     follow: memoryFollow(sagaDemo === null ? 'histoire' : 'la-minute-d-ecart'),
+    // Écoute factice: la régie de musique n'est pas chargée dans la démonstration.
+    listen: {
+      can: () => true,
+      play: (id) => {
+        listening = id;
+      },
+      stop: () => {
+        listening = null;
+      },
+      current: () => listening,
+    },
   },
   ...(histoire.project
     ? {
@@ -292,6 +321,16 @@ setTimeout(() => {
       for (const event of later.apply()) emit(event);
     }, later.at);
   if (state === 'coup-d-oeil') press('KeyG');
+  if (agendaDemo === 'coup-d-oeil')
+    setTimeout(() => {
+      press('KeyG');
+    }, 400);
+  if (listenDemo)
+    setTimeout(() => {
+      // Famille des musiques (la huitième), puis Entrée: Écouter.
+      for (let i = 0; i < 7; i += 1) press('Tab');
+      press('Enter');
+    }, 900);
   if (state === 'carnet-sans-sac' || state === 'carnet-sac' || bagState !== undefined)
     press('KeyC');
   if (bagState !== undefined)

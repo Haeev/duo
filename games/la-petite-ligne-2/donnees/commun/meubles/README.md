@@ -11,5 +11,5 @@ Une fiche par meuble (`<id>.json`, gabarit `donnees/_gabarits/meuble.jsonc`, rec
 5. L'objet se dessine à cette hauteur, ne bloque pas, ne se vise pas (la touche d'action reste celle du porteur), disparaît avec son porteur s'il est conditionné (`when`), et sa lampe éclaire de sa vraie hauteur.
 6. Une chaîne est permise (un livre sur un plateau sur une table), quatre niveaux au plus.
 7. Le validateur refuse: porteur inconnu, porteur sans `top`, centre hors de l'emprise du porteur, objet posé à brique ou solide.
-8. Le mode déco des joueurs n'est pas concerné: il garde sa propre règle `deco.surface` (`src/simulation/logement/pose.ts`).
+8. Le mode déco des joueurs garde sa propre règle `deco.surface` (`src/simulation/logement/pose.ts`). Au rendu, un meuble de la couche `top` posé par un joueur sur une surface se dessine sur le plateau du porteur (`top` de sa fiche, sinon la hauteur de son modèle), et sa lampe éclaire de là (`describeDynamic`, `src/rendu/lieu/description.ts`).
 9. Test court: `tests/poses.test.ts` (une table et une lampe factices).

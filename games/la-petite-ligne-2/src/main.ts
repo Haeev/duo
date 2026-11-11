@@ -125,7 +125,21 @@ const ui =
         onCue: (cue) => {
           sound.cue(cue);
         },
-        notebook: { settings, sourcesExtras: { plans } },
+        notebook: {
+          settings,
+          sourcesExtras: { plans },
+          // Bouton « Écouter » des airs du carnet: local à ce joueur, par la régie de musique.
+          listen: {
+            can: (id) => music.listenable(id),
+            play: (id) => {
+              music.listen(id);
+            },
+            stop: () => {
+              music.stopListening();
+            },
+            current: () => music.listening(),
+          },
+        },
         objectViewer,
         editorAtStart: !probed,
       });

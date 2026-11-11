@@ -105,6 +105,11 @@ export const MusicTableSchema = v.strictObject({
     /** Fondu enchaîné entre deux morceaux, fondu d'entrée et de sortie autour d'un silence (s). */
     crossfadeSeconds: v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(20)),
     fadeSeconds: v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(20)),
+    /**
+     * Écoute d'un air depuis le carnet: fondu court (s) de l'ambiance qui s'efface, de l'air qui
+     * entre et qui sort (le bouton doit répondre tout de suite). Absent: 1 s.
+     */
+    listenFadeSeconds: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.1), v.maxValue(4))),
     /** Après un thème d'arrivée, la musique attend ce délai (s). */
     arrivalHoldSeconds: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(30)),
     /** Délai minimal (s) entre deux lectures du même jingle. */

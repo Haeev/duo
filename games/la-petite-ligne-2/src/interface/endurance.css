@@ -1,13 +1,15 @@
 /*
  * Jauge d'endurance du HUD (`endurance.ts`): un trait sous l'horloge, aux couleurs du panneau de
- * l'horloge (bois sombre, texte clair), donc juste dans les deux thèmes. Seuls transform et
- * opacity s'animent, et seulement à l'apparition.
+ * l'horloge, donc juste dans les deux thèmes (le thème sombre lui donne le cadre découpé du
+ * cartouche, `encre/encre.css`). Seuls transform et opacity s'animent, à l'apparition.
  */
 .lpl-ui .stamina {
   --stamina-len: 1;
   --stamina-w: 6.5rem;
+  /* Écart sous l'horloge: le thème sombre l'élargit, car le cadre déborde du côté de l'ombre. */
+  --stamina-gap: 0.375rem;
   position: absolute;
-  /* Sous le panneau de l'horloge (0,75 rem du haut, 5,8 rem de haut), sans le toucher. */
+  /* Repli sans ancrage CSS: sous l'horloge de taille ordinaire (0,75 rem du haut, 5,8 rem de haut). */
   left: 0.75rem;
   top: 7rem;
   z-index: 40;
@@ -116,6 +118,20 @@
 }
 .lpl-ui .stamina--quick .stamina__boost {
   display: block;
+}
+/*
+ * Position relative à l'horloge (ancrage CSS, Chromium 125 et plus): la jauge suit le bas réel
+ * du cartouche, quelle que soit sa hauteur (taille d'interface, police, thème).
+ */
+@supports (anchor-name: --lpl-horloge) {
+  .lpl-ui .hud-clock {
+    anchor-name: --lpl-horloge;
+  }
+  .lpl-ui .stamina {
+    position-anchor: --lpl-horloge;
+    left: anchor(left);
+    top: calc(anchor(bottom) + var(--stamina-gap));
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .lpl-ui .stamina {

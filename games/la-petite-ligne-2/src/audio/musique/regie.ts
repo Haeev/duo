@@ -51,6 +51,8 @@ export interface MusicState {
   readonly modifiers: readonly string[];
   readonly lowpassHz: number | null;
   readonly decoded: readonly string[];
+  /** Air écouté depuis le carnet (`listen`), `null`: aucun. */
+  readonly listening: string | null;
 }
 
 export interface MusicDirector {
@@ -63,6 +65,18 @@ export interface MusicDirector {
   playJingle(id: string, own?: boolean): void;
   /** Résolu quand les jingles sont décodés. */
   ready(): Promise<void>;
+  /** Ce morceau existe-t-il dans la table (un air du carnet qui a son enregistrement) ? */
+  listenable(trackId: string): boolean;
+  /**
+   * Écoute d'un air, pour ce joueur seulement (bouton « Écouter » du carnet): la musique
+   * d'ambiance s'efface, l'air passe une fois en entier, sans les couches de météo, puis
+   * l'ambiance revient. Un second appel remplace l'air. `false`: morceau inconnu.
+   */
+  listen(trackId: string): boolean;
+  /** Arrête l'écoute (fermer le carnet, « Arrêter »); l'ambiance revient. Sans écoute: rien. */
+  stopListening(): void;
+  /** Air écouté, `null`: aucun (l'écoute finie d'elle-même revient à `null`). */
+  listening(): string | null;
   dispose(): void;
 }
 
@@ -164,7 +178,12 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
 
   /** Libère les morceaux décodés les plus anciens (jamais celui qui joue ou s'éteint). */
   function evict(): void {
-    const inUse = new Set([active?.track, ...leaving.map((v) => v.track)]);
+    const inUse = new Set([
+      active?.track,
+      listened?.track,
+      listened?.voice?.track,
+      ...leaving.map((v) => v.track),
+    ]);
     while (decoded.length > timing.residentTracks + inUse.size) {
       const index = decoded.findIndex((id) => !inUse.has(id));
       if (index < 0) return;
@@ -184,15 +203,27 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
   let active: Voice | null = null;
   const leaving: Voice[] = [];
   const starting = new Set<string>();
+  /**
+   * Écoute d'un air du carnet: la voix (nulle pendant le décodage) et l'instant de fin, sur
+   * l'horloge des images. Elle passe après le recul des jingles, avant le niveau du joueur, sans
+   * passe-bas ni couches: on écoute l'air tel qu'il est.
+   */
+  const listenFade = timing.listenFadeSeconds ?? 1;
+  let listened: { readonly track: string; voice: Voice | null; endsAt: number } | null = null;
 
-  function startVoice(id: string, loaded: Loaded, fadeSeconds: number): Voice | null {
+  function startVoice(
+    id: string,
+    loaded: Loaded,
+    fadeSeconds: number,
+    out: AudioNode = sum,
+  ): Voice | null {
     const def = table.tracks[id];
     if (def === undefined) return null;
     const t = ctx.currentTime + 0.05;
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0, t);
     gain.gain.setTargetAtTime(1, t, fadeSeconds / 3);
-    gain.connect(sum);
+    gain.connect(out);
     const stems = new Map<string, { gain: GainNode; source: AudioBufferSourceNode }>();
     for (const [role, stem] of Object.entries(def.stems)) {
       const buffer = loaded.stems.get(role);
@@ -335,7 +366,8 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
     const pacing = table.pacings[lastChoice.pacing] ?? null;
     const step = pacer.update(dt, wanted, pacing);
     quiet = step.mode === 'quiet';
-    follow(step.track);
+    // Pendant une écoute, l'ambiance se tait; le rythme continue de compter.
+    follow(listened === null ? step.track : null);
     const t = ctx.currentTime;
     tone.frequency.setTargetAtTime(lastChoice.lowpassHz ?? OPEN_HZ, t, 2);
     shade.gain.setTargetAtTime(dbToGain(lastChoice.gainDb), t, 2);
@@ -370,12 +402,45 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
   }
 
   function pacerTrackNow(): string | null {
-    return quiet || clock < holdUntil ? null : lastChoice.track;
+    return quiet || clock < holdUntil || listened !== null ? null : lastChoice.track;
+  }
+
+  function listen(trackId: string): boolean {
+    const def = table.tracks[trackId];
+    if (disposed || def === undefined) return false;
+    stopListening(false);
+    if (active !== null) {
+      release(active, listenFade);
+      active = null;
+    }
+    const mine = { track: trackId, voice: null as Voice | null, endsAt: Infinity };
+    listened = mine;
+    void loadTrack(trackId).then((loaded) => {
+      // Arrêtée ou remplacée pendant le décodage: rien ne part.
+      if (disposed || listened !== mine) return;
+      if (loaded === null) {
+        listened = null;
+        return;
+      }
+      mine.voice = startVoice(trackId, loaded, listenFade, duck);
+      // L'air passe une fois: sa sortie s'achève quand la boucle reviendrait au début.
+      mine.endsAt = clock + Math.max(listenFade, def.seconds - listenFade);
+    });
+    return true;
+  }
+
+  function stopListening(resume = true): void {
+    if (listened === null) return;
+    if (listened.voice !== null) release(listened.voice, listenFade);
+    listened = null;
+    // L'ambiance revient tout de suite, sans attendre le prochain tick.
+    if (resume) follow(pacerTrackNow());
   }
 
   function frame(dt: number): void {
     if (disposed) return;
     clock += dt;
+    if (listened !== null && clock >= listened.endsAt) stopListening();
     tickClock += dt;
     if (tickClock < timing.tickSeconds) return;
     const elapsed = tickClock;
@@ -398,13 +463,26 @@ export function createMusicDirector(options: MusicOptions): MusicDirector {
       modifiers: lastChoice.modifiers,
       lowpassHz: lastChoice.lowpassHz,
       decoded: [...decoded],
+      listening: listened?.track ?? null,
     }),
     playJingle,
     ready: () => ready,
+    listenable: (trackId) => table.tracks[trackId] !== undefined,
+    listen,
+    stopListening: () => {
+      stopListening();
+    },
+    listening: () => listened?.track ?? null,
     dispose() {
       disposed = true;
       unsubscribe();
-      for (const voice of [...(active === null ? [] : [active]), ...leaving]) {
+      const heard = listened?.voice ?? null;
+      listened = null;
+      for (const voice of [
+        ...(active === null ? [] : [active]),
+        ...(heard === null ? [] : [heard]),
+        ...leaving,
+      ]) {
         for (const { source } of voice.stems.values()) {
           try {
             source.stop();

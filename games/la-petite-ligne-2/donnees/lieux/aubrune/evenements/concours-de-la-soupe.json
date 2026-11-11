@@ -24,6 +24,7 @@
     }
   ],
   "announce": true,
+  "where": "sur la place",
   "activates": {
     "facts": [],
     "shop": null,
