@@ -8,8 +8,9 @@
  *   douceur: même code des deux côtés, aucun à-coup pour la caméra.
  * - À bord: `riders` dit où est assis chaque joueur sur le véhicule affiché; la couche des
  *   personnages les y pose sans lissage (ils ne traînent pas derrière leur banc).
- * - Parties mobiles: le nœud `balancier` du modèle bascule vers la place qui vient de pomper, les
- *   nœuds `roue-avant` et `roue-arriere` tournent avec le chemin parcouru.
+ * - Parties mobiles, lues dans le manifeste des décors (`nodes` du modèle): un nœud à débattement
+ *   (le balancier) bascule de son débattement vers la place qui vient de pomper, un nœud à rayon
+ *   (une roue) tourne avec le chemin parcouru. Aucun nom de nœud ici.
  * - Sans modèle livré: le modèle de repli de la fiche ramené au gabarit du plancher (sinon une
  *   dalle), deux bancs et un balancier provisoires aux mesures de la fiche.
  * - Occultation: un véhicule qui passe devant un joueur à pied se fond (choix du client), jamais
@@ -51,13 +52,14 @@ export const RAIL_VEHICLE_LOOK = {
   catchHalfLife: 0.1,
   /** Estime: l'état est prolongé à sa vitesse pendant ce temps au plus (s). */
   aheadSeconds: 0.4,
-  /** Balancier: angle de chaque côté de l'horizontale (rad) et demi-vie de sa bascule (s). */
+  /**
+   * Balancier provisoire (sans modèle livré): angle de chaque côté de l'horizontale (rad); le
+   * modèle livré donne le sien (`debattement` du manifeste). Demi-vie de la bascule (s).
+   */
   leverAngle: 0.24,
   leverHalfLife: 0.06,
-  /** Rayon de roulement des roues du modèle (m): un tour tous les 1,57 m. */
-  wheelRadius: 0.25,
-  /** Nœuds mobiles du modèle livré. */
-  nodes: { lever: 'balancier', wheels: ['roue-avant', 'roue-arriere'] },
+  /** Nom du balancier provisoire. */
+  standInLever: 'balancier',
   /** Formes provisoires, tant que le modèle n'est pas livré (m, couleurs de sommets). */
   standIn: {
     deck: '#7a6248',
@@ -89,14 +91,24 @@ export interface RiderPose extends Place2 {
   front: number;
 }
 
+type Axis = 'x' | 'y' | 'z';
+
+/** Une partie mobile du modèle affiché: le balancier (`angle`, rad) ou une roue (`radius`, m). */
+interface MovingPart {
+  readonly object: Object3D;
+  readonly axis: Axis;
+  readonly angle: number;
+  readonly radius: number;
+}
+
 interface View {
   readonly def: RailVehicleDef;
   /** Identifiant de cible (`vehicule-<id>`), aussi clé d'occultation. */
   readonly key: string;
   readonly object: Object3D;
   readonly fadable: Fadable;
-  readonly lever: Object3D | null;
-  readonly wheels: readonly Object3D[];
+  readonly levers: readonly MovingPart[];
+  readonly wheels: readonly MovingPart[];
   readonly pose: VehiclePose;
   readonly min: { x: number; y: number; z: number };
   readonly max: { x: number; y: number; z: number };
@@ -110,6 +122,7 @@ interface View {
   age: number;
   /** Vitesse affichée, signée le long de la voie (m/s). */
   run: number;
+  /** Bascule affichée du balancier, de -1 (vers la place 1) à 1 (vers la place 0). */
   angle: number;
   /** Côté où penche le balancier (place du dernier coup), et le pas du dernier coup lu dans l'état. */
   side: 0 | 1 | null;
@@ -213,14 +226,25 @@ export class RailVehicleLayer {
     if (!body.delivered && isMesh(body.object))
       paint(body.object.geometry, RAIL_VEHICLE_LOOK.standIn.deck);
     object.add(body.object);
-    let lever = delivered ? (object.getObjectByName(RAIL_VEHICLE_LOOK.nodes.lever) ?? null) : null;
-    if (!delivered) lever = this.standIn(def, object);
-    const wheels: Object3D[] = [];
+    const levers: MovingPart[] = [];
+    const wheels: MovingPart[] = [];
     if (delivered)
-      for (const name of RAIL_VEHICLE_LOOK.nodes.wheels) {
-        const wheel = object.getObjectByName(name);
-        if (wheel !== undefined) wheels.push(wheel);
+      for (const [name, node] of Object.entries(this.manifest.models[def.model]?.nodes ?? {})) {
+        const part = object.getObjectByName(name);
+        if (part === undefined) continue;
+        const axis = node.axe ?? 'x';
+        if (node.rayon !== undefined)
+          wheels.push({ object: part, axis, angle: 0, radius: node.rayon });
+        else if (node.debattement !== undefined)
+          levers.push({ object: part, axis, angle: (node.debattement * Math.PI) / 180, radius: 0 });
       }
+    else
+      levers.push({
+        object: this.standIn(def, object),
+        axis: 'x',
+        angle: RAIL_VEHICLE_LOOK.leverAngle,
+        radius: 0,
+      });
     object.traverse((child) => {
       if (!isMesh(child)) return;
       child.castShadow = true;
@@ -233,7 +257,7 @@ export class RailVehicleLayer {
       key,
       object,
       fadable: new Fadable(object, this.glowColor),
-      lever,
+      levers,
       wheels,
       pose: { model: def.model, x: 0, y: 0, yaw: 0, front, back },
       min: { x: 0, y: 0, z: 0 },
@@ -295,7 +319,7 @@ export class RailVehicleLayer {
       paint(box(look.post, look.pivot, look.post, 0, deck + look.pivot / 2, 0), look.iron),
     );
     const lever = new Group();
-    lever.name = RAIL_VEHICLE_LOOK.nodes.lever;
+    lever.name = RAIL_VEHICLE_LOOK.standInLever;
     lever.position.set(0, deck + look.pivot, 0);
     const moving = merged([
       paint(box(look.beam, look.beam, look.leverHalf * 2, 0, 0, 0), look.iron),
@@ -366,11 +390,12 @@ export class RailVehicleLayer {
         view.riders[0] = state.riders[0];
         view.riders[1] = state.riders[1];
       }
+      // `angle`: part de la bascule (-1 à 1), chaque balancier la fait à son propre débattement.
       const side = view.side;
-      const wanted = side === null ? 0 : side === 0 ? look.leverAngle : -look.leverAngle;
+      const wanted = side === null ? 0 : side === 0 ? 1 : -1;
       view.angle += (wanted - view.angle) * approach(dt, look.leverHalfLife);
-      if (view.lever !== null) view.lever.rotation.x = view.angle;
-      for (const wheel of view.wheels) wheel.rotation.x += rolled / look.wheelRadius;
+      for (const lever of view.levers) lever.object.rotation[lever.axis] = view.angle * lever.angle;
+      for (const wheel of view.wheels) wheel.object.rotation[wheel.axis] += rolled / wheel.radius;
       if (state === undefined || !out) continue;
       for (const index of [0, 1] as const) {
         const player = state.riders[index];

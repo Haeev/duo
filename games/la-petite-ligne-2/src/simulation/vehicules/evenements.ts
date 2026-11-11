@@ -49,6 +49,17 @@ export const VEHICLE_EVENTS = [
     vehicle: IdSchema,
     dir: v.picklist([1, -1]),
   }),
+  /**
+   * Frein serré (`on` vrai) ou desserré par ce joueur; `speed`: la vitesse à ce moment (m/s): à
+   * l'arrêt, la même touche ne fait que retourner le sens de marche.
+   */
+  v.strictObject({
+    type: v.literal('vehicle_brake'),
+    vehicle: IdSchema,
+    player: PlayerIndexSchema,
+    on: v.boolean(),
+    speed: v.pipe(FiniteSchema, v.minValue(0)),
+  }),
   /** Arrêté devant un passant sur la voie, il repart, voie libre: un petit coup de timbre. */
   v.strictObject({ type: v.literal('vehicle_bell'), vehicle: IdSchema }),
   /** Un train s'annonce sur sa voie: il est temps de rentrer. */

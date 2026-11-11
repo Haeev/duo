@@ -16,7 +16,7 @@ import { modifiersOf, neutralModifiers } from '../besoins/jauges';
 import { postureOf, standUp } from '../briques/postures';
 import { riddenBy } from '../vehicules/places';
 import { freePlayer } from './deblocage';
-import { bodyCollides, moveBody, type Blockers } from './grille';
+import { bodyCollides, keepOffBars, moveBody, type Blockers } from './grille';
 import { currentBlockers } from './obstacles';
 import { CORE_TUNING } from './reglages-noyau';
 import type { SimContext } from './systemes';
@@ -129,6 +129,8 @@ export function walkStep(
     Math.sin(body.facing) * speed * dt,
     movement.radius,
   );
+  // Une barrière de passage à niveau baissée: on s'y arrête en venant de la route.
+  keepOffBars(b, fromX, fromY, body, movement.radius);
   const done = Math.hypot(body.x - fromX, body.y - fromY) / dt;
   // En glissant le long d'un mur on garde son élan; arrêté de face, il tombe.
   body.speed = done < speed * 0.5 ? done : speed;

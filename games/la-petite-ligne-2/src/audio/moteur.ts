@@ -25,7 +25,8 @@ import {
   saveSettings,
   type AudioSettings,
 } from './reglages';
-import { soundForEvent } from './regles';
+import { soundsForEvent, type HeardEvent } from './regles';
+import { heldPick, heldValue, JointTracker, type JointHit } from './tenus';
 import { CATEGORIES, type Category, type SoundDef } from './schemas';
 import type { AudioTables } from './table';
 
@@ -266,12 +267,78 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
   }
 
   // --- Événements de la simulation -----------------------------------------------------------
+  /** Un événement (de la simulation, ou que le moteur se donne): chaque règle qui convient joue. */
+  function hear(event: HeardEvent): void {
+    for (const hit of soundsForEvent(tables.events, event, view.localIndex())) {
+      if (hit.stop) silence(hit.sound);
+      else playAt(hit.sound, hit.actor, hit.placed, hit.own);
+    }
+  }
   const unsubscribe = view.onEvent((event: GameEvent) => {
-    const hit = soundForEvent(tables.events, event, view.localIndex());
-    if (hit === null) return;
-    if (hit.stop) silence(hit.sound);
-    else playAt(hit.sound, hit.actor, hit.placed, hit.own);
+    hear(event);
   });
+
+  // --- Sons tenus réglés par le monde (roulement selon la vitesse) -----------------------------
+  interface HeldVoice {
+    readonly sound: string;
+    readonly source: AudioBufferSourceNode;
+    readonly gain: GainNode;
+  }
+  const heldVoices: (HeldVoice | null)[] = tables.tuning.held.map(() => null);
+
+  function fadeOut(voice: HeldVoice, seconds: number): void {
+    const t = ctx.currentTime;
+    voice.gain.gain.cancelScheduledValues(t);
+    voice.gain.gain.setValueAtTime(voice.gain.gain.value, t);
+    voice.gain.gain.linearRampToValueAtTime(0, t + seconds);
+    voice.source.stop(t + seconds + 0.02);
+  }
+
+  function startHeld(id: string, rate: number, seconds: number): HeldVoice | null {
+    const def = tables.sounds[id];
+    const buffer = def === undefined ? undefined : buffers.get(def.files[0] ?? '');
+    if (def === undefined || buffer === undefined) return null;
+    const t = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    const from = Math.min(def.loop?.from ?? 0, buffer.duration);
+    source.loopStart = from;
+    source.loopEnd = Math.min(def.loop?.to ?? buffer.duration, buffer.duration);
+    source.playbackRate.value = rate;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(dbToGain(def.volumeDb), t + seconds);
+    source.connect(gain);
+    gain.connect(categoryNodes[def.category]);
+    source.onended = (): void => {
+      source.disconnect();
+      gain.disconnect();
+    };
+    // Pris dans la boucle, pas à l'attaque du fichier: le fondu croisé ne fait pas de coup.
+    source.start(t, from);
+    return { sound: id, source, gain };
+  }
+
+  function updateHeld(world: ReturnType<GameView['world']>): void {
+    const t = ctx.currentTime;
+    tables.tuning.held.forEach((def, index) => {
+      const pick =
+        world?.common.phase === 'day' ? heldPick(def, heldValue(world, def.source)) : null;
+      const voice = heldVoices[index] ?? null;
+      if (voice !== null && voice.sound === pick?.sound) {
+        voice.source.playbackRate.setTargetAtTime(pick.rate, t, 0.1);
+        return;
+      }
+      if (voice !== null) fadeOut(voice, def.crossfadeSeconds);
+      heldVoices[index] =
+        pick === null ? null : startHeld(pick.sound, pick.rate, def.crossfadeSeconds);
+    });
+  }
+
+  // --- Joints de rail ---------------------------------------------------------------------------
+  const joints = tables.tuning.joints === undefined ? null : new JointTracker(tables.tuning.joints);
+  const jointHits: JointHit[] = [];
 
   // --- Babil ------------------------------------------------------------------------------------
   const babbler = new Babbler(tables.voices, random);
@@ -355,8 +422,13 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
     if (disposed) return;
     const world = view.world();
     const local = view.localIndex();
+    updateHeld(world);
     if (world === null || local === null) return;
     if (world.common.phase === 'day') {
+      if (joints !== null) {
+        joints.update(world, dt, jointHits);
+        for (const hit of jointHits) hear(hit);
+      }
       for (const index of [0, 1] as const) {
         const body = world.players[index].body;
         if (trackers[index].update(body) > 0) {
@@ -372,6 +444,7 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
       }
     } else {
       for (const tracker of trackers) tracker.reset();
+      joints?.reset();
       lastAim = null;
     }
     ambienceClock += dt;
@@ -402,6 +475,13 @@ export function createAudioEngine(options: AudioEngineOptions): AudioEngine {
       for (const voice of active.values()) {
         try {
           voice.source.stop();
+        } catch {
+          // Déjà arrêtée.
+        }
+      }
+      for (const voice of heldVoices) {
+        try {
+          voice?.source.stop();
         } catch {
           // Déjà arrêtée.
         }

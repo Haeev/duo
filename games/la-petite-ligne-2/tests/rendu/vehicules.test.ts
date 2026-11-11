@@ -7,6 +7,7 @@ import type { PlayerIndex } from '../../src/donnees/schemas/communs';
 import type { RailVehicleState } from '../../src/etat/vehicules';
 import { leverMark, vehicleLine, vehicleView } from '../../src/interface/vehicule';
 import type { ModelSource } from '../../src/rendu/lieu/lieu';
+import { DECOR_MANIFEST } from '../../src/rendu/lieu/decors-manifeste';
 import { RAIL_VEHICLE_LOOK, RailVehicleLayer } from '../../src/rendu/lieu/vehicules';
 import { SIM_HZ } from '../../src/simulation/noyau/constantes';
 import { idleInput } from '../../src/simulation/noyau/entrees';
@@ -22,6 +23,11 @@ const content = contentWith((files) => {
   settings.start = { ...settings.start, place: 'aubrune', minute: 600 };
 });
 const place = content.places.aubrune ?? fail('Aubrune absente');
+const def = place.vehicles.draisine ?? fail('draisine absente');
+/** Parties mobiles du modèle livré, lues dans le manifeste des décors. */
+const nodes = DECOR_MANIFEST.models.draisine?.nodes ?? {};
+const LEVER_ANGLE = ((nodes.balancier?.debattement ?? 0) * Math.PI) / 180;
+const WHEEL_RADIUS = nodes['roue-avant']?.rayon ?? 0;
 
 function fail(message: string): never {
   throw new Error(message);
@@ -110,13 +116,13 @@ describe('véhicules de voie à l’écran', () => {
     expect(object.position.z).toBeCloseTo(97.5, 5);
     expect(object.rotation.y).toBeCloseTo(Math.PI / 2, 5);
     const [front, back] = layer.riders;
-    // Le joueur 0 à l'avant regarde l'ouest (son vis-à-vis), les pieds sur le plancher (50 cm).
+    // Le joueur 0 à l'avant regarde l'ouest (son vis-à-vis), les pieds sur le plancher de la fiche.
     expect(front?.x).toBeCloseTo(214.85, 5);
     expect(back?.x).toBeCloseTo(213.15, 5);
     expect(Math.cos(front?.facing ?? 0)).toBeCloseTo(-1, 5);
     expect(Math.cos(back?.facing ?? Math.PI)).toBeCloseTo(1, 5);
-    expect(front?.floor).toBeCloseTo(0.62, 5);
-    expect(front?.height).toBeCloseTo(0.42, 5);
+    expect(front?.floor).toBeCloseTo(0.12 + def.body.deck, 5);
+    expect(front?.height).toBeCloseTo(def.seats[0].height, 5);
     expect(layer.carrying(0)).toBe('draisine');
     // La cible de la touche d'action réagit (lueur), comme un meuble.
     expect(layer.aimable('vehicule-draisine')?.object).toBe(object);
@@ -144,12 +150,16 @@ describe('véhicules de voie à l’écran', () => {
       from = Math.min(from, vehicle(sim).s);
     });
     // Il descend du côté de l'avant (angle positif) quand le joueur 0 pompe, de l'autre ensuite.
-    expect(Math.max(...seen)).toBeGreaterThan(RAIL_VEHICLE_LOOK.leverAngle * 0.9);
-    expect(Math.min(...seen)).toBeLessThan(-RAIL_VEHICLE_LOOK.leverAngle * 0.9);
+    // Le débattement du modèle livré: 14 degrés de chaque côté.
+    expect(LEVER_ANGLE).toBeCloseTo((14 * Math.PI) / 180, 5);
+    expect(Math.max(...seen)).toBeGreaterThan(LEVER_ANGLE * 0.9);
+    expect(Math.max(...seen)).toBeLessThanOrEqual(LEVER_ANGLE + 1e-9);
+    expect(Math.min(...seen)).toBeLessThan(-LEVER_ANGLE * 0.9);
     // Roues: un tour par 2 PI fois le rayon parcouru, dans le sens de la marche.
     const rolled = vehicle(sim).s - 214;
     expect(rolled).toBeGreaterThan(5);
-    expect(wheel.rotation.x).toBeCloseTo(rolled / RAIL_VEHICLE_LOOK.wheelRadius, 0);
+    expect(WHEEL_RADIUS).toBeGreaterThan(0);
+    expect(wheel.rotation.x).toBeCloseTo(rolled / WHEEL_RADIUS, 0);
     // À bord, la caméra anticipe vers l'est, à la vitesse du véhicule.
     const motion = { speed: 0, facing: 0 };
     expect(layer.motion(1, motion)).toBe(true);
@@ -173,9 +183,9 @@ describe('véhicules de voie à l’écran', () => {
       expect(meshes).toBe(3);
       const base = object.children[0] ?? fail('plancher absent');
       if (models.length > 0) {
-        // Le fourgon (2,93 x 4,00 x 9,92) ramené à 1,7 m de large, 0,5 de haut, 2,6 de long.
+        // Le fourgon (2,93 x 4,00 x 9,92) ramené au gabarit du plancher de la fiche.
         expect(base.scale.x * 2.925).toBeCloseTo(1.7, 5);
-        expect(base.scale.y * 4.004).toBeCloseTo(0.5, 5);
+        expect(base.scale.y * 4.004).toBeCloseTo(def.body.deck, 5);
         expect(base.scale.z * 9.92).toBeCloseTo(2.6, 5);
       }
       // Deux coups (pas 0 et 14), puis le fléau a le temps de finir sa bascule.

@@ -29,6 +29,7 @@ import { attend, giveGift, showEmote } from './presence';
 import { VILLAGERS } from './reglages';
 import { arrivalFrame } from '../voyage/arrivee';
 import { inTrainWay, segmentAcrossStoppedTrain, trainsPresent } from '../monde/trains';
+import { crossesClosedBarrier } from '../monde/barrieres';
 
 /** Ce qui ne se sauvegarde pas: le trajet en cours et les minuteries. */
 interface Runtime {
@@ -211,7 +212,10 @@ function trainAvoid(sim: SimContext, content: PlaceContent): AvoidSegment | null
   return (ax, ay, bx, by) => segmentAcrossStoppedTrain(sim, content, ax, ay, bx, by, 0);
 }
 
-/** Un pas de (x, y) vers (nx, ny) entrerait-il sur le chemin d'un train ? (en sortir est permis) */
+/**
+ * Un pas de (x, y) vers (nx, ny) entrerait-il sur le chemin d'un train, ou passerait-il une
+ * barrière baissée depuis la route ? (en sortir est permis)
+ */
 function stepsOnTrain(
   sim: SimContext,
   content: PlaceContent,
@@ -222,7 +226,10 @@ function stepsOnTrain(
 ): boolean {
   // Le centre du corps hors de la caisse: on attend au bord du quai (à 1,5 m de l'axe), comme
   // les joueurs, sans jamais être au-dessus des rails.
-  return inTrainWay(sim, content, nx, ny, 0) && !inTrainWay(sim, content, x, y, 0);
+  if (inTrainWay(sim, content, nx, ny, 0) && !inTrainWay(sim, content, x, y, 0)) return true;
+  // Une barrière de passage à niveau baissée: il attend devant, venu de la route (sorti de la
+  // voie, il passe).
+  return crossesClosedBarrier(sim, content, x, y, nx, ny, VILLAGERS.radius);
 }
 
 const NO_DOORS: ReadonlySet<string> = new Set();

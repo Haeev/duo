@@ -580,6 +580,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'vehicle_turned':
       case 'vehicle_warning':
       case 'vehicle_bell':
+      case 'vehicle_brake':
       case 'shelter_opened':
       case 'shelter_filled':
       case 'shelter_collected':

@@ -283,26 +283,20 @@
     },
     { "on": "vehicle_stroke", "sound": "draisine-balancier", "audience": "both", "placed": true },
     {
-      "on": "vehicle_started",
-      "sound": "draisine-roulement-moyenne",
+      "on": "vehicle_stopped",
+      "where": { "end": true },
+      "sound": "draisine-butee",
       "audience": "both",
       "placed": false
     },
     {
-      "on": "vehicle_stopped",
-      "sound": "draisine-roulement-moyenne",
+      "on": "vehicle_brake",
+      "where": { "on": true, "speed": { "gt": 0.5 } },
+      "sound": "draisine-frein",
       "audience": "both",
-      "placed": false,
-      "stop": true
+      "placed": true
     },
-    {
-      "on": "vehicle_in",
-      "where": { "reason": "train" },
-      "sound": "draisine-roulement-moyenne",
-      "audience": "both",
-      "placed": false,
-      "stop": true
-    },
+    { "on": "vehicle_joint", "sound": "draisine-joint", "audience": "both", "placed": false },
     {
       "on": "vehicle_seat",
       "where": { "seat": { "notNull": true } },

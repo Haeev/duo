@@ -3,17 +3,19 @@
  * ceux posés par les joueurs) et les verrous d'histoire fermés (`lieux/verrous.ts`). Pur et gardé
  * d'un pas à l'autre: la couche mobile n'est refaite que si un meuble a changé ou si un verrou
  * s'est ouvert ou fermé, ou si un train d'événement a bougé (`monde/trains.ts`), ou si un véhicule
- * de voie s'est arrêté ou est reparti (`vehicules/emprise.ts`). Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
+ * de voie s'est arrêté ou est reparti (`vehicules/emprise.ts`), ou si une barrière de passage à
+ * niveau s'est baissée ou levée (`monde/barrieres.ts`: ses lisses vont dans `bars`, hors de la grille). Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PropDef } from '../../donnees/schemas/meuble';
 import type { PlaceState } from '../../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../../etat/monde';
 import { isPosed } from '../../donnees/poses';
-import type { Blockers } from './grille';
+import type { Bar, Blockers } from './grille';
 import { conditionalObjects, refreshPresence } from '../lieux/presents';
 import { lockCount, markClosedLocks, refreshLockStates } from '../lieux/verrous';
 import { markTrainCells, trainSignature } from '../monde/trains';
+import { barrierSignature, closedBars } from '../monde/barrieres';
 import { markVehicleCells, vehicleSignature } from '../vehicules/emprise';
 
 /** Un meuble en place, qu'il vienne de la carte ou d'un joueur. */
@@ -29,6 +31,8 @@ export type ReadPlace = DeepReadonly<PlaceState>;
 
 interface Cached {
   readonly blockers: Blockers;
+  /** Lisses baissées, le même tableau que `blockers.bars` (refait avec la couche mobile). */
+  readonly bars: Bar[];
   signature: number;
   /** État des verrous à la dernière construction (1 ouvert), dans l'ordre de la carte. */
   readonly locks: Uint8Array;
@@ -42,6 +46,8 @@ interface Cached {
   trains: number;
   /** Empreinte des véhicules de voie arrêtés (`vehicleSignature`). */
   vehicles: number;
+  /** Barrières de passage à niveau baissées (`barrierSignature`). */
+  barriers: number;
 }
 
 const cache = new WeakMap<PlaceContent, Cached>();
@@ -122,8 +128,10 @@ export function placeBlockers(
       if (object !== undefined && object !== null) lockObjects.set(object, index);
       index++;
     }
+    const bars: Bar[] = [];
     cached = {
-      blockers: { width, height, fixed, props: new Uint8Array(width * height) },
+      blockers: { width, height, fixed, props: new Uint8Array(width * height), bars },
+      bars,
       signature: Number.NaN,
       // 2: ni ouvert ni fermé, pour forcer la première construction.
       locks: new Uint8Array(lockCount(place)).fill(2),
@@ -132,6 +140,7 @@ export function placeBlockers(
       conditional: new Map(conditionalObjects(place).map((o, i) => [o.id, i])),
       trains: Number.NaN,
       vehicles: Number.NaN,
+      barriers: Number.NaN,
     };
     cache.set(place, cached);
   }
@@ -140,16 +149,19 @@ export function placeBlockers(
   const signature = signatureOf(place, state);
   const trains = trainSignature({ content, world }, place);
   const vehicles = vehicleSignature(state);
+  const barriers = barrierSignature({ content, world }, place);
   if (
     signature !== cached.signature ||
     locksChanged ||
     presenceChanged ||
     trains !== cached.trains ||
-    vehicles !== cached.vehicles
+    vehicles !== cached.vehicles ||
+    barriers !== cached.barriers
   ) {
     cached.signature = signature;
     cached.trains = trains;
     cached.vehicles = vehicles;
+    cached.barriers = barriers;
     cached.blockers.props.fill(0);
     markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);
     // Un objet posé sur un meuble (champ `on`) ne bloque jamais: il n'occupe pas le sol.
@@ -160,6 +172,8 @@ export function placeBlockers(
     markTrainCells({ content, world }, place, cached.blockers.props);
     // Un véhicule de voie posé à l'arrêt (la draisine): on le contourne.
     markVehicleCells(place, state, cached.blockers.props);
+    // Une barrière de passage à niveau baissée: sa lisse, franchissable dans un seul sens.
+    closedBars({ content, world }, place, cached.bars);
   }
   return cached.blockers;
 }

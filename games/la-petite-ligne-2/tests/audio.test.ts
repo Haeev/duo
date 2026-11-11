@@ -9,7 +9,7 @@ import { place } from '../src/audio/espace';
 import { createAudioEngine, type AudioEngineOptions } from '../src/audio/moteur';
 import { StepTracker, stepSound } from '../src/audio/pas';
 import { loadSettings } from '../src/audio/reglages';
-import { soundForEvent } from '../src/audio/regles';
+import { soundForEvent, soundsForEvent } from '../src/audio/regles';
 import { loadTables, parseTables, type AudioTables } from '../src/audio/table';
 import { loadContent } from '../src/donnees/charger';
 import type { GameEvent } from '../src/simulation/noyau/evenements';
@@ -146,6 +146,32 @@ describe('événement vers son', () => {
     expect(
       soundForEvent(tables.events, { type: 'train_boarded', player: 0, to: 'ailleurs' }, 0)?.sound,
     ).toBe('embarquement');
+  });
+
+  it('une règle `also` laisse le même événement jouer la suivante (factice, tables seules)', () => {
+    const rule = (sound: string, also: boolean): (typeof tables.events.rules)[number] => ({
+      on: 'unstuck',
+      where: {},
+      sound,
+      actor: 'player',
+      audience: 'both',
+      placed: false,
+      ...(also ? { also: true } : {}),
+    });
+    const table = {
+      ...tables.events,
+      rules: [rule('reussite', true), rule('ramasser', false), rule('refus', false)],
+    };
+    const event: GameEvent = { type: 'unstuck', player: 0 };
+    expect(soundsForEvent(table, event, 0).map((hit) => hit.sound)).toEqual([
+      'reussite',
+      'ramasser',
+    ]);
+    // Sans `also`, le premier gabarit décide seul, comme avant.
+    expect(soundForEvent(table, event, 0)?.sound).toBe('reussite');
+    expect(() =>
+      parseTables({ ...tables, sounds: tables.sounds, events: table, tuning: tables.tuning }),
+    ).not.toThrow();
   });
 });
 
@@ -293,7 +319,7 @@ function fakeHost(): {
     createGain: () => ({ ...node(), gain: param() }),
     createStereoPanner: () => ({ ...node(), pan: { value: 0 } }),
     createBufferSource: () => {
-      const rate = { value: 1 };
+      const rate = { value: 1, setTargetAtTime: (): void => undefined };
       const source: Record<string, unknown> = {
         ...node(),
         buffer: null,
@@ -355,6 +381,57 @@ describe('moteur', () => {
     expect(started.length).toBe(base + 1);
     engine.cue('carnet-ouvre');
     expect(started.length).toBe(base + 2);
+    engine.dispose();
+  });
+
+  it('fond les allures du roulement selon la vitesse de la draisine, et se tait à l arrêt', async () => {
+    const { host, started } = fakeHost();
+    const body = { x: 0, y: 0, facing: 0, speed: 0 };
+    const draisine = { out: true, speed: 0 };
+    const world = {
+      minutes: 600,
+      common: { phase: 'day', place: 'aubrune' },
+      players: [{ body }, { body }],
+      places: { aubrune: { vehicles: { draisine } } },
+    };
+    const view = {
+      content: { places: {} },
+      localIndex: () => 0,
+      world: () => world,
+      aim: () => null,
+      onEvent: () => () => undefined,
+    } as unknown as AudioEngineOptions['view'];
+    const engine = createAudioEngine({
+      host,
+      view,
+      tables: loadTables(),
+      assetUrl: (f) => `/${f}`,
+      random: {
+        int: (a: number) => a,
+        float: (a: number, b: number) => (a + b) / 2,
+      } as unknown as AudioEngineOptions['random'],
+      cameraYaw: () => 0,
+      load: () => Promise.resolve({ duration: 5.5, length: 1, numberOfChannels: 1 } as AudioBuffer),
+    });
+    await engine.ready();
+    const loops = (): number => started.filter((s) => s.loop).length;
+    engine.frame(1 / 60);
+    const still = loops();
+    // Au pas: l'allure lente, un peu ralentie; puis la moyenne prend le relais (fondu croisé).
+    draisine.speed = 1;
+    engine.frame(1 / 60);
+    expect(loops()).toBe(still + 1);
+    expect(started.at(-1)?.rate).toBeCloseTo(0.9 + 0.2 * (0.7 / 3.2), 5);
+    engine.frame(1 / 60);
+    expect(loops()).toBe(still + 1);
+    draisine.speed = 7;
+    engine.frame(1 / 60);
+    expect(loops()).toBe(still + 2);
+    // À l'arrêt, rien ne repart; la boucle en cours s'éteint d'elle-même.
+    draisine.speed = 0;
+    engine.frame(1 / 60);
+    engine.frame(1 / 60);
+    expect(loops()).toBe(still + 2);
     engine.dispose();
   });
 

@@ -5,7 +5,7 @@
   "pourquoi": "La draisine no 2 d'Émile Lacombe, confiée par la sixième lettre aux deux gardes de la halte: une plateforme à quatre roues et un balancier, faite pour visiter la voie à deux. Elle dort dans sa remise au bout du quai, sort par la porte de l'ouest et se pose sur la ligne à la traversée de service. Raccourci le long de la voie, du poste au tunnel, là où les ronces et la grille le permettent.",
   "model": "draisine",
   "fallback": "luggage-van",
-  "body": { "front": 1.3, "back": 1.3, "halfWidth": 0.85, "height": 1.55, "deck": 0.5 },
+  "body": { "front": 1.3, "back": 1.3, "halfWidth": 0.85, "height": 1.7, "deck": 0.82 },
   "seats": [
     {
       "name": "Au balancier avant",

@@ -4,16 +4,16 @@ Un son du monde naît d'un événement de l'hôte ou de l'état, jamais d'une en
 
 ## Ce qu'il y a ici
 
-| Fichier                                                                                 | Rôle                                                                                                                                                   |
-| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `donnees/sons.json`                                                                     | un son par entrée: fichiers (variantes), catégorie, volume (dB), variation de hauteur et de niveau, priorité, voix simultanées, délai minimal          |
-| `donnees/evenements.json`                                                               | `rules`: événement de la simulation vers son (premier gabarit qui convient), `cues`: signaux de l'interface vers son, `aim`: son de la cible visée     |
-| `donnees/voix.json`                                                                     | `timbres` (fichier et note enregistrée), `voices` (une voix: timbre, hauteur de base, gamme, étendue, débit, longueur des voyelles), ponctuation       |
-| `donnees/ambiances.json`                                                                | couches de jour, de nuit et de voyage, heures de l'aube et du soir, durée du fondu                                                                     |
-| `donnees/reglages.json`                                                                 | écoute placée (distances, panoramique, autre joueur), pas (foulée, surfaces), plafond de voix, volumes par défaut                                      |
-| `schemas.ts`, `table.ts`                                                                | schémas Valibot et contrôle croisé (un son nommé qui n'existe pas, un timbre trop loin de sa note, un fichier absent: l'erreur nomme fichier et champ) |
-| `regles.ts`, `babil.ts`, `pas.ts`, `ambiance.ts`, `espace.ts`, `reglages.ts`, `pool.ts` | logique pure, testée dans Node                                                                                                                         |
-| `moteur.ts`, `index.ts`, `fichiers.ts`                                                  | Web Audio: graphe, lecture, boucles; `createGameAudio`                                                                                                 |
+| Fichier                                                                                             | Rôle                                                                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `donnees/sons.json`                                                                                 | un son par entrée: fichiers (variantes), catégorie, volume (dB), variation de hauteur et de niveau, priorité, voix simultanées, délai minimal          |
+| `donnees/evenements.json`                                                                           | `rules`: événement de la simulation vers son (premier gabarit qui convient), `cues`: signaux de l'interface vers son, `aim`: son de la cible visée     |
+| `donnees/voix.json`                                                                                 | `timbres` (fichier et note enregistrée), `voices` (une voix: timbre, hauteur de base, gamme, étendue, débit, longueur des voyelles), ponctuation       |
+| `donnees/ambiances.json`                                                                            | couches de jour, de nuit et de voyage, heures de l'aube et du soir, durée du fondu                                                                     |
+| `donnees/reglages.json`                                                                             | écoute placée (distances, panoramique, autre joueur), pas (foulée, surfaces), plafond de voix, volumes par défaut                                      |
+| `schemas.ts`, `table.ts`                                                                            | schémas Valibot et contrôle croisé (un son nommé qui n'existe pas, un timbre trop loin de sa note, un fichier absent: l'erreur nomme fichier et champ) |
+| `regles.ts`, `babil.ts`, `pas.ts`, `tenus.ts`, `ambiance.ts`, `espace.ts`, `reglages.ts`, `pool.ts` | logique pure, testée dans Node                                                                                                                         |
+| `moteur.ts`, `index.ts`, `fichiers.ts`                                                              | Web Audio: graphe, lecture, boucles; `createGameAudio`                                                                                                 |
 
 Fichiers sonores: `assets/commun/son/{effets,babil,ambiances}/`. Sources et script de génération: `assets-src/son/` (`generer.py`, deuxième lot dans `sons_aubrune.py` rendu et mesuré par `mesurer_lot.py`, troisième lot (draisine, applaudissements, épuisette) dans `sons_lot3.py` (`mesurer_lot.py --lot 3`, `planche_lot.py --lot 3`), `controler.py`, mesures dans `mesures.csv`).
 
@@ -35,7 +35,10 @@ La **musique** (airs par heure, météo et lieu, silences, jingles) a son propre
 2. Ajoute une entrée à `donnees/sons.json` (copie d'une voisine).
 3. S'il répond à un événement de la simulation, ajoute une ligne à `rules` de `donnees/evenements.json` (cas précis avant cas général); s'il répond à l'interface, une ligne à `cues`.
 4. Son tenu (une sonnerie qui dure tant qu'un état dure): `loop` (`from`, `to` en secondes, sur deux attaques du fichier) dans `sons.json`, une règle qui le joue et une règle `"stop": true` qui le fait taire (fondu `heldFadeSeconds` de `reglages.json`); exemple: `crossing_bell` et `passage-a-niveau`.
-5. `pnpm test`: le test des tables dit ce qui cloche. Aucune ligne de moteur.
+5. Plusieurs sons pour un même événement: `"also": true` sur une règle laisse la recherche continuer après elle (la règle suivante qui convient joue aussi, ou fait taire son son).
+6. Son tenu réglé par une valeur du monde (le roulement de la draisine selon sa vitesse): une entrée de `held` dans `reglages.json` (`source`: `vehicle.speed`; `steps`: seuil `from` et son en boucle de chaque allure; `rate`: vitesse de lecture du seuil d'une allure au suivant, `top` pour la dernière; `crossfadeSeconds`). Le moteur fond une allure dans l'autre et se tait sous le premier seuil (`tenus.ts`, aucune règle d'événement).
+7. Joints de rail: `joints` dans `reglages.json` (`everyMeters`, décalage des essieux `axles`, `minSpeed`, `event`): le moteur compte le chemin de chaque véhicule de voie sorti et se donne l'événement nommé (`vehicle`, `axle`), joué par une règle ordinaire de `rules`.
+8. `pnpm test`: le test des tables dit ce qui cloche. Aucune ligne de moteur.
 
 ## Recette: ajouter une voix de personnage
 

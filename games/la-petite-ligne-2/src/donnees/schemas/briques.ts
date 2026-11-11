@@ -136,6 +136,19 @@ export const BRICK_SCHEMAS = [
    * `logements/<id>.json`); sans pièce, ou pièce finie, il est inerte (`simulation/logement/chantier.ts`).
    */
   v.strictObject({ brick: v.literal('worksite') }),
+  /**
+   * Barrière de passage à niveau: liée au passage à niveau le plus proche de sa voie, elle se
+   * baisse quand il sonne (un train va passer) et se relève quand il se tait. Baissée, elle barre
+   * la route du côté de la route seulement: qui est déjà engagé sur la voie en sort
+   * (`simulation/monde/barrieres.ts`). `node`: la partie mobile du modèle (son débattement est
+   * dans le manifeste des décors, `baissee` et `levee`); `seconds`: durée de sa course à l'écran.
+   * Rien n'est sauvegardé: l'état se déduit de l'heure et des trains. Pas une cible.
+   */
+  v.strictObject({
+    brick: v.literal('barrier'),
+    node: IdSchema,
+    seconds: v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(20)),
+  }),
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);
