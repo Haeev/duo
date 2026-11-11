@@ -70,12 +70,19 @@ function sideAt(dx: number, dz: number): Side4 | null {
 /** Toutes les files d'un lieu, rangées par case (index `y * width + x`). */
 export class RunLayout {
   readonly cells = new Map<number, RunCell>();
+  /** Cases prises par une sorte sans module (le relief du sol les dessine): rien n'y est posé. */
+  readonly reserved = new Set<number>();
 
-  constructor(readonly width: number) {}
+  constructor(
+    readonly width: number,
+    /** Les sortes posées (grossissement et ligne du dessus de leurs modules). */
+    readonly sorts: Readonly<Record<string, RunSort>> = RUN_SORTS,
+  ) {}
 
-  /** La case porte-t-elle un module de file ? (le décor provisoire n'y pose plus de boîte) */
+  /** La case appartient-elle à une file ? (le décor provisoire n'y pose plus de boîte) */
   covers(x: number, y: number): boolean {
-    return this.cells.has(y * this.width + x);
+    const i = y * this.width + x;
+    return this.cells.has(i) || this.reserved.has(i);
   }
 
   /** Cases de file d'une tuile, par sorte (une sorte, un maillage fusionné). */
@@ -163,7 +170,7 @@ export function layRuns(
   manifest: DecorManifest = DECOR_MANIFEST,
 ): RunLayout {
   const { width, height, names, cells } = field;
-  const layout = new RunLayout(width);
+  const layout = new RunLayout(width, sorts);
   const nameAt = (x: number, y: number): string =>
     x < 0 || y < 0 || x >= width || y >= height ? '' : (names[cells[y * width + x] ?? 0] ?? '');
   const owner = new Map<number, string>();
@@ -222,6 +229,10 @@ export function layRuns(
   for (const [i, id] of owner) {
     const sort = sorts[id];
     if (sort === undefined) continue;
+    if (sort.modules.length === 0) {
+      layout.reserved.add(i);
+      continue;
+    }
     const x = i % width;
     const y = Math.floor(i / width);
     const linked = new Set<Side4>();

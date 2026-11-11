@@ -48,6 +48,11 @@ export const GROUND_LOOKS: Readonly<Record<string, GroundLook>> = {
   quai: { color: '#cfc4b0', surface: 'pave' },
   lisiere: { color: '#7d9c52', surface: 'herbe' },
   greve: { color: '#d8c79a', surface: 'sable' },
+  // Natures de la légende d'Aubrune qui ne sont pas de l'herbe: le carré de terre d'un potager,
+  // la vase et les galets d'un bord d'eau.
+  potager: { color: '#b29468', surface: 'terre' },
+  vase: { color: '#8a785a', surface: 'terre' },
+  galets: { color: '#bdb5a2', surface: 'gravier' },
   annexe: { color: '#000000', surface: 'pave', hidden: true },
   // Sols d'intérieur des petits lieux (`floor` de la carte): plancher ciré, tapis d'un couloir, et
   // le vide autour d'une pièce (rien n'est dessiné: le fond de la scène).

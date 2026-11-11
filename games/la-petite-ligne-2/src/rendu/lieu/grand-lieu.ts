@@ -34,7 +34,7 @@ import type { PlaceLights } from '../encre/lumieres';
 import { SHADOW_ONLY } from '../encre/ombres';
 import type { WindowLight } from '../encre/matiere';
 import { INK_SETTINGS } from '../encre/reglages';
-import { createGroundMap } from '../encre/sol';
+import { createEdgeMap, createGroundMap } from '../encre/sol';
 import { Fadable } from '../fondu';
 import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
@@ -179,6 +179,8 @@ export class TiledPlace {
   private readonly fadeBase: FadeMaterial;
   /** Rendu encré: carte du sol du lieu (`null` dans l'ancien rendu). */
   readonly groundMap: Texture | null;
+  /** Rendu encré: limites de sol adoucies du lieu (décalage du point lu), `null` sans relief. */
+  readonly groundShift: Texture | null;
   /** Rendu encré: relief du sol du lieu (`null` dans l'ancien rendu: sol plan). */
   readonly relief: Relief | null;
   private readonly built: PlaceLights;
@@ -249,6 +251,16 @@ export class TiledPlace {
               settings.ground.bankColor,
               rooms,
               settings.interior.floorColor,
+            ),
+          );
+    this.groundShift =
+      this.relief === null
+        ? null
+        : t.track(
+            createEdgeMap(
+              this.relief.edges.bytes,
+              this.relief.edges.columns,
+              this.relief.edges.rows,
             ),
           );
     const buildings = buildingsByTile(map, settings);
@@ -434,7 +446,10 @@ export class TiledPlace {
           c.set(look.water === true ? settings.water.color : look.color);
           const dense = name === 'hors-jeu' || wild / (step * step) > settings.decor.wildFull - 3;
           if (dense) c.multiplyScalar(settings.far.woodShade);
-          const level = look.water === true ? settings.ground.waterLevel : 0;
+          const level =
+            look.water !== true
+              ? 0
+              : (this.relief?.settings.water.level ?? settings.ground.waterLevel);
           const xe = Math.min(x1, x + step);
           const ye = Math.min(y1, y + step);
           builder.quad(

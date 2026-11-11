@@ -33,7 +33,9 @@ import {
   ZeroFactor,
 } from 'three';
 import type { Ambiance } from './ambiances';
-import { LAYER, SLEEK_PART, TILE_METRES } from './couches';
+import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
+import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
+import { hex, LAYER, SLEEK_PART, TILE_METRES } from './couches';
 import { INK_SETTINGS } from './reglages';
 
 export const MAX_LAMPS = 4;
@@ -109,6 +111,10 @@ export interface InkUniforms {
   uGroundMap: IUniform<Texture | null>;
   /** xy décalage, zw échelle (mètres vers la carte); z nul: pas de carte, teinte de repli. */
   uGroundRect: IUniform<Vector4>;
+  /** Limites de sol adoucies: décalage du point lu, un vecteur par sommet de la grille des cases. */
+  uGroundShiftMap: IUniform<Texture | null>;
+  /** xy échelle (mètres vers la carte des décalages), zw demi-point; x nul: pas de décalage. */
+  uGroundShift: IUniform<Vector4>;
   /** Sol sans carte: teinte (sRGB) et code de couche. */
   uGroundFallback: IUniform<Vector4>;
   /** x ton clair de l'herbe, y ton sombre, z ondulation des bords (m), w échelle des motifs serrés. */
@@ -159,6 +165,8 @@ export function createInkUniforms(): InkUniforms {
     uNoise: { value: null },
     uGroundMap: { value: null },
     uGroundRect: { value: new Vector4(0, 0, 0, 0) },
+    uGroundShiftMap: { value: null },
+    uGroundShift: { value: new Vector4(0, 0, 0, 0) },
     uGroundFallback: {
       // Teinte d'écran telle qu'écrite (sRGB): `getHexString` la rend sans conversion.
       value: new Vector4(
@@ -462,6 +470,8 @@ out vec3 vColor;
 out float vFoot;
 flat out vec4 vMeta;
 flat out float vSwap;
+// Sol en relief: 1 + la distance à l'eau (m, bornée à 2) du point affiché; 0: sol sans berge.
+out float vShore;
 #if defined(CHARACTER) || defined(ATLAS)
   flat out vec2 vAnchor;
   uniform vec2 uScreen;
@@ -519,8 +529,11 @@ void main() {
   number = mod(number + floor(turn * 61.0), 62.0) + 1.0;
   float piece = uOwn.x > 0.5 ? uOwn.x : sizeBits * 64.0 + number;
   if (uOwn.y > 0.5) part = ${String(SLEEK_PART + 64)}.0;
+  vShore = 0.0;
   if (kind > 4.5) {
-    // Sol et eau: ni pièce ni morceau, le contour ne les cerne pas.
+    // Sol et eau: ni pièce ni morceau, le contour ne les cerne pas. Le quatrième nombre du sol
+    // porte sa distance à l'eau.
+    vShore = aInk.w;
     piece = 0.0;
     part = 0.0;
   }
@@ -559,6 +572,7 @@ in vec3 vColor;
 in float vFoot;
 flat in vec4 vMeta;
 flat in float vSwap;
+in float vShore;
 uniform vec4 uWindowGlow;
 uniform vec4 uGlint;
 uniform vec4 uFlameGlow;
@@ -583,9 +597,23 @@ uniform vec4 uOwn;
 #else
   uniform sampler2D uGroundMap;
   uniform vec4 uGroundRect;
+  uniform sampler2D uGroundShiftMap;
+  uniform vec4 uGroundShift;
   uniform vec4 uGroundFallback;
   uniform vec4 uGroundTones;
   uniform vec3 uWater;
+  // Limites de sol adoucies: le sol affiché en g est celui de la grille en g + décalage(g). Le
+  // décalage est rangé par noeud d'un treillis (octet 128: nul), lu en filtrage linéaire.
+  vec2 groundPoint(vec2 g) {
+    if (uGroundShift.x <= 0.0) return g;
+    vec2 d = texture(uGroundShiftMap, g * uGroundShift.xy + uGroundShift.zw).rg * 255.0 - 128.0;
+    return g + d * ${(EDGE_SETTINGS.span / 127).toFixed(6)};
+  }
+  // La case lue est-elle de l'eau ? (bit 5 de l'alpha de la carte du sol)
+  float waterCell(vec2 p) {
+    float code = floor(texture(uGroundMap, p * uGroundRect.zw + uGroundRect.xy).a * 255.0 + 0.5);
+    return step(31.5, mod(code, 64.0));
+  }
 #endif
 ${LIGHTING}
 // Teintes un peu poussées: de haut et de loin, chaque personnage se lit à sa couleur.
@@ -655,24 +683,29 @@ void main() {
     if (vSwap > 0.5) tuv = tuv.yx;
     float inkGain = step(floor(vMeta.y / 64.0), 1.5) * step(floor(vMeta.w / 64.0), 1.5);
     float border = 0.0;
+    // Liseré d'eau claire au pied d'une berge: ni hachure ni trait dessus.
+    float foam = 0.0;
     float flatGround = step(4.5, kind) * step(kind, 5.5);
     float water = step(5.5, kind);
     if (flatGround > 0.5) {
-      // Sol: teinte et matière de la case lues dans la carte du lieu. Le point lu ondule selon
-      // un bruit: le bord entre deux natures est sinueux, jamais la grille; le bord d'un sol
-      // posé par l'homme (quai, rue pavée) reste droit.
+      // Sol: teinte et matière de la case lues dans la carte du lieu, au point décalé par les
+      // limites adoucies (la frontière entre deux natures ne suit pas la grille); un léger
+      // tremblé s'y ajoute. Le bord d'un sol posé par l'homme (quai, rue pavée) reste droit.
       vec2 g = vWorld.xz;
       vec3 nA = texture(uNoise, g * 0.33 + 0.11).rgb;
       vec3 nB = texture(uNoise, g * 0.085 + 0.37).rgb;
       vec4 cell = uGroundFallback;
       float code = uGroundFallback.a;
       if (uGroundRect.z > 0.0) {
-        vec2 warp = ((nA.rg - 0.5) * 0.9 + (nB.gb - 0.5) * 1.1) * uGroundTones.z;
-        vec4 straight = texture(uGroundMap, g * uGroundRect.zw + uGroundRect.xy);
-        vec4 bent = texture(uGroundMap, (g + warp) * uGroundRect.zw + uGroundRect.xy);
+        vec2 gs = groundPoint(g);
+        // Tremblé du trait: un bruit serré, écrêté (il passe l'essentiel du temps près de son
+        // maximum: le bord tremble franchement sans jamais dépasser l'écart permis).
+        vec2 warp = clamp((nA.rg - 0.5) * 2.6 + (nB.gb - 0.5) * 0.8, -1.0, 1.0) * uGroundTones.z;
+        vec4 straight = texture(uGroundMap, gs * uGroundRect.zw + uGroundRect.xy);
+        vec4 bent = texture(uGroundMap, (gs + warp) * uGroundRect.zw + uGroundRect.xy);
         float hard = max(step(127.5, straight.a * 255.0), step(127.5, bent.a * 255.0));
         cell = mix(bent, straight, hard);
-        vec2 probe = mix(g + warp, g, hard) + vec2(0.07, 0.05);
+        vec2 probe = mix(gs + warp, gs, hard) + vec2(0.07, 0.05);
         vec4 next = texture(uGroundMap, probe * uGroundRect.zw + uGroundRect.xy);
         // Trait interrompu le long du bord, de près seulement.
         border = step(0.012, distance(next.rgb, cell.rgb)) * step(0.3, nA.b) * uDetail.y;
@@ -681,9 +714,28 @@ void main() {
       code = mod(code, 128.0);
       float fine = step(63.5, code);
       code = mod(code, 64.0);
+      float wet = step(31.5, code);
+      code = mod(code, 32.0);
       float grassy = step(15.5, code);
       layer = mod(code, 16.0);
       base = cell.rgb;
+      // Berge: à moins de 80 cm environ de l'eau, l'herbe laisse voir la terre (bord tremblé, l'ourlet
+      // d'herbe reste en haut de la pente); plus bas la terre est mouillée, et au ras de l'eau un
+      // liseré clair bat lentement.
+      float above = vWorld.y - (${RELIEF_SETTINGS.water.level.toFixed(3)});
+      float bankEdge = ${RELIEF_SETTINGS.bank.earth.toFixed(3)} + (nA.b + nB.g - 1.0) * ${RELIEF_SETTINGS.bank.earthNoise.toFixed(3)};
+      float bank = step(0.5, vShore) * max(grassy, wet) * step(vShore - 1.0, bankEdge);
+      if (bank > 0.5) {
+        base = vec3(${hex(RELIEF_SETTINGS.bank.color)
+          .map((c) => c.toFixed(4))
+          .join(', ')});
+        base *= mix(1.0, ${RELIEF_SETTINGS.bank.wetShade.toFixed(2)}, step(above, ${RELIEF_SETTINGS.bank.wet.toFixed(3)} + (nA.r - 0.5) * 0.04));
+        layer = ${String(LAYER.dirt)}.0;
+        grassy = 0.0;
+        border = 0.0;
+        float lap = ${RELIEF_SETTINGS.bank.foam.toFixed(3)} + ${RELIEF_SETTINGS.bank.lap.toFixed(3)} * sin(uTime * 0.8 + nB.r * 19.0 + nA.g * 5.0);
+        foam = step(above, lap);
+      }
       // Herbe: trois tons en grandes plages, qui se déplacent avec l'heure comme sur un pré bosselé.
       vec3 big = texture(uNoise, g * 0.021).rgb;
       vec2 lay = vec2(big.r + nB.b * 0.7, big.g + nB.r * 0.7) - 0.85;
@@ -694,8 +746,11 @@ void main() {
       N = N.y > 0.7 ? N : vec3(0.0, 1.0, 0.0);
       float toward = dot(lay, sunward) * 0.42 * grassy + dot(N.xz, sunward) * ${INK_SETTINGS.ground.slopeTone.toFixed(2)};
       base *= mix(1.0, uGroundTones.x, step(0.13, toward)) * mix(1.0, uGroundTones.y, step(toward, -0.15));
+      base = mix(base, vec3(${hex(INK_SETTINGS.water.rim)
+        .map((c) => c.toFixed(4))
+        .join(', ')}), foam);
       tuv = g * mix(1.0, uGroundTones.w, fine);
-      inkGain = 1.0;
+      inkGain = 1.0 - foam;
     }
     // Dalles posées en volume (dessus du quai): même motif serré que le sol dallé.
     if (flatGround < 0.5 && abs(layer - ${String(LAYER.slab)}.0) < 0.5) tuv *= uGroundTones.w;
@@ -708,12 +763,35 @@ void main() {
     // Second ton peint: la tache de la texture fait passer du ton clair au ton de base.
     base *= mix(1.0, 0.85, smoothstep(0.4, 0.6, drawn.g));
     if (water > 0.5) {
-      // Eau: deux bandes de ton qui glissent, ni hachure ni relief; l'ombre y reste un aplat.
+      // Eau: trois tons en plages qui glissent lentement, un fil clair au bord des plages
+      // claires, et une frange plus claire le long des berges (la carte du sol dit où est la
+      // terre); ni hachure ni relief, l'ombre y reste un aplat.
       vec2 g = vWorld.xz;
       float t = uTime * uWater.z;
       float wave = texture(uNoise, g * 0.12 + vec2(t * 0.05, t * 0.02)).r
         + texture(uNoise, g * 0.31 - vec2(t * 0.03, t * 0.06)).g;
-      base = vColor * mix(1.0, uWater.x, step(1.14, wave)) * mix(1.0, uWater.y, step(wave, 0.84));
+      float tone = mix(1.0, uWater.x, step(1.14, wave)) * mix(1.0, uWater.y, step(wave, 0.84));
+      float glint = step(abs(wave - 1.17), 0.012) * step(0.62, texture(uNoise, g * 0.07 + 0.5).b);
+      float shallow = 0.0;
+      float shore = 0.0;
+      if (uGroundRect.z > 0.0) {
+        vec2 gs = groundPoint(g);
+        float wob = texture(uNoise, g * 0.21 + vec2(t * 0.02, 0.0)).b;
+        float r1 = ${INK_SETTINGS.water.shore[0].toFixed(2)} * (0.75 + wob * 0.5);
+        float r2 = ${INK_SETTINGS.water.shore[1].toFixed(2)} * (0.75 + wob * 0.5);
+        shore = 1.0 - min(
+          min(waterCell(gs + vec2(r1, 0.0)), waterCell(gs - vec2(r1, 0.0))),
+          min(waterCell(gs + vec2(0.0, r1)), waterCell(gs - vec2(0.0, r1))));
+        shallow = 1.0 - min(
+          min(waterCell(gs + vec2(r2, r2) * 0.707), waterCell(gs - vec2(r2, r2) * 0.707)),
+          min(waterCell(gs + vec2(r2, -r2) * 0.707), waterCell(gs - vec2(r2, -r2) * 0.707)));
+      }
+      shallow = max(shallow, shore);
+      base = vColor * tone * mix(1.0, ${INK_SETTINGS.water.shallow.toFixed(2)}, shallow);
+      vec3 rim = vec3(${hex(INK_SETTINGS.water.rim)
+        .map((c) => c.toFixed(4))
+        .join(', ')});
+      base = mix(base, rim, max(shore * ${INK_SETTINGS.water.rimShare.toFixed(2)}, glint * 0.55));
       bent = N;
       inkGain = 0.0;
       drawn = vec4(0.0, 0.0, 0.5, 0.5);
@@ -723,7 +801,7 @@ void main() {
     float under = leafy * smoothstep(0.0, -0.16, N.y) * smoothstep(0.3, -0.05, dot(N, uSunDir));
     color = mix(color, uInk, under * 0.9);
     // Le trait peint des textures s'efface quand la vue s'élargit: de loin, un aplat propre.
-    color = mix(color, uInk, max(drawn.r * uDetail.x, border));
+    color = mix(color, uInk, max(drawn.r * uDetail.x, border) * (1.0 - foam));
     float pane = step(0.5, kind) * step(kind, 1.5);
     float flame = step(1.5, kind) * step(kind, 2.5);
     if (pane > 0.5) {

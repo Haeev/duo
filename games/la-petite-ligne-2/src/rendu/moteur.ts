@@ -706,6 +706,8 @@ class Engine implements GameRenderer {
       this.tiled?.groundMap ?? this.place.groundMap,
       place.map.width,
       place.map.height,
+      this.tiled?.groundShift ?? null,
+      this.tiled?.relief?.edges.steps ?? 1,
     );
     this.characters.reset();
     this.rig.detach();

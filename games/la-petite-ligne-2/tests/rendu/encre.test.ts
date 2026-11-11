@@ -293,7 +293,8 @@ describe('carte du sol', () => {
     expect(data[7]).toBe(LAYER.slab + 64 + 128);
     // L'eau se lit comme la terre de sa berge: le bord de l'eau ondule dans la boue.
     expect([...data.slice(8, 11)]).toEqual([0x6e, 0x5a, 0x42]);
-    expect(data[11]).toBe(LAYER.dirt);
+    // Bit 5: une case d'eau (terre de la berge sous l'eau, frange claire au bord).
+    expect(data[11]).toBe(LAYER.dirt + 32);
     expect(data[15]).toBe(LAYER.plain + 128);
   });
 

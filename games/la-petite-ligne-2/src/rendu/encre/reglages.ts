@@ -3,6 +3,7 @@
  * niveau de rendu pour le Mac et le PC: aucune de ces valeurs ne dépend de la machine. Les
  * ambiances (tons, encre, lampes, vignette) sont des données: `ambiances.json`.
  */
+import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
 import type { SurfaceKind } from '../lieu/reglages-tuiles';
 import type { LayerName } from './couches';
 
@@ -124,8 +125,12 @@ export const INK_SETTINGS = {
     hard: ['pave', 'bois', 'tapis'] as readonly SurfaceKind[],
     /** La table (sol hors des tuiles, plancher des pièces) passe juste sous le sol des tuiles (m). */
     tableDrop: 0.012,
-    /** Ondulation du bord entre deux natures de sol (m). */
-    warp: 0.55,
+    /**
+     * Tremblé du bord entre deux natures de sol (m, écart maximal): le trait d'encre n'est pas
+     * tiré à la règle. La forme de la frontière vient des limites adoucies (`lisieres.ts`), dont
+     * `EDGE_SETTINGS.ragged` réserve cet écart.
+     */
+    warp: EDGE_SETTINGS.ragged,
     /** Sol d'un lieu sans terrain (lieux d'essai): un pré. */
     fallback: { color: '#A3B659', layer: 'grass' as LayerName },
     /** Écart des trois tons de l'herbe autour de sa teinte (clair, sombre). */
@@ -137,8 +142,20 @@ export const INK_SETTINGS = {
     slopeTone: 2.5,
   },
 
-  /** Eau: tons des bandes et vitesse des vaguelettes. */
-  water: { light: 1.14, dark: 0.84, speed: 0.35 },
+  /**
+   * Eau: tons des plages et vitesse de leur glissement (lent: une rivière de plaine); frange
+   * plus claire le long des berges (`shore`: largeurs en mètres de la frange vive et du haut-fond,
+   * `shallow`: ton du haut-fond, `rim`: teinte de l'eau claire, `rimShare`: sa part dans la frange).
+   */
+  water: {
+    light: 1.14,
+    dark: 0.84,
+    speed: 0.22,
+    shore: [0.3, 0.95] as const,
+    shallow: 1.13,
+    rim: '#b5dcd9',
+    rimShare: 0.5,
+  },
 
   /** Personnages: teintes poussées (1: inchangées) pour qu'ils se lisent de haut. */
   character: { saturation: 1.18, gain: 1.06 },

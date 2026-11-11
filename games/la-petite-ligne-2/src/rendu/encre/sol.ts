@@ -1,12 +1,21 @@
 /**
  * Rendu encré: la carte du sol d'un grand lieu (ADR 0023). Une texture d'un point par case de
  * 1 m: la teinte d'écran de la nature de la case (telle qu'écrite dans `reglages-tuiles.ts`), et
- * dans l'alpha la couche de traits (4 bits), « herbe » (bit 4: trois tons en plages) et « sol
- * posé par l'homme » (bit 7: son bord reste droit). Le nuanceur la lit en un point qui ondule:
- * le bord entre un pré et un chemin est sinueux, la grille ne se voit plus. Une seule texture
- * pour tout le lieu (512 x 512 au plus, 1 Mo), libérée avec lui.
+ * dans l'alpha la couche de traits (4 bits), « herbe » (bit 4: trois tons en plages), « eau »
+ * (bit 5: la terre de sa berge, et la frange claire de l'eau) et « sol posé par l'homme » (bit 7:
+ * son bord reste droit). Le nuanceur la lit au point décalé par les limites adoucies (seconde
+ * texture: un vecteur par noeud d'un treillis, `lieu/lisieres.ts`): le bord entre un pré et un
+ * chemin ne suit plus la grille. Deux textures pour tout le lieu (512 x 512 au plus, 1,5 Mo),
+ * libérées avec lui.
  */
-import { DataTexture, NearestFilter, RGBAFormat, UnsignedByteType } from 'three';
+import {
+  DataTexture,
+  LinearFilter,
+  NearestFilter,
+  RGBAFormat,
+  RGFormat,
+  UnsignedByteType,
+} from 'three';
 import type { FloorDef } from '../../donnees/schemas/lieu';
 import type { GroundLook } from '../lieu/reglages-tuiles';
 import { floorLook, floorNatures } from '../lieu/sol';
@@ -35,7 +44,7 @@ function texelOf(
     Math.round(r * 255),
     Math.round(g * 255),
     Math.round(b * 255),
-    layer + grassy + fine + hard,
+    layer + grassy + (water && !hidden ? 32 : 0) + fine + hard,
   ];
 }
 
@@ -71,6 +80,21 @@ function textureOf(data: Uint8Array, width: number, height: number): DataTexture
   texture.minFilter = NearestFilter;
   texture.magFilter = NearestFilter;
   texture.generateMipmaps = false;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/**
+ * La texture des limites adoucies d'un grand lieu: le décalage de chaque sommet de la grille
+ * (`EdgeField.bytes`), lu en filtrage linéaire. L'appelant la suit et la libère avec le lieu.
+ */
+export function createEdgeMap(bytes: Uint8Array, columns: number, rows: number): DataTexture {
+  const texture = new DataTexture(bytes, columns, rows, RGFormat, UnsignedByteType);
+  texture.minFilter = LinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.generateMipmaps = false;
+  // Lignes de longueur impaire sur deux octets: pas d'alignement sur quatre.
+  texture.unpackAlignment = 1;
   texture.needsUpdate = true;
   return texture;
 }

@@ -52,6 +52,14 @@ export class GeometryBuilder {
     this.pieceCode = code;
   }
 
+  /**
+   * Rendu encré, sol en relief seulement (qui n'a ni pièce ni morceau): distance à l'eau (m) de
+   * ce qui suit, bornée à 2. Près de l'eau, le nuanceur montre la terre de la berge.
+   */
+  shore(distance: number): void {
+    this.partCode = 1 + Math.min(2, Math.max(0, distance));
+  }
+
   /** Rendu encré: morceau suivant (son trait intérieur), classé d'après `diagonal` (m); `null`: aucun. */
   part(diagonal: number | null): void {
     this.partCode = diagonal === null ? 0 : inkCode(this.parts++, diagonal);
@@ -66,13 +74,21 @@ export class GeometryBuilder {
     normals: readonly number[],
     indices: readonly number[],
     color: Color,
+    /** Distance à l'eau de chaque sommet (m, voir `shore`); absente: celle posée par `shore`. */
+    shores?: readonly number[],
   ): void {
     const start = this.positions.length / 3;
     for (let i = 0; i < positions.length; i += 3) {
       this.positions.push(positions[i] ?? 0, positions[i + 1] ?? 0, positions[i + 2] ?? 0);
       this.normals.push(normals[i] ?? 0, normals[i + 1] ?? 1, normals[i + 2] ?? 0);
       this.colors.push(color.r, color.g, color.b);
-      this.inks.push(this.layer, this.pieceCode, this.kind, this.partCode);
+      const shore = shores?.[i / 3];
+      this.inks.push(
+        this.layer,
+        this.pieceCode,
+        this.kind,
+        shore === undefined ? this.partCode : 1 + Math.min(2, Math.max(0, shore)),
+      );
     }
     for (const index of indices) this.indices.push(start + index);
   }
