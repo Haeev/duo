@@ -10,20 +10,11 @@ import { postFaults } from './aides-postes';
 import { gameDataFiles } from './aides';
 
 /**
- * Fautes connues qui demandent de retoucher une pièce ou une carte (travail du level designer,
- * signalé au manager le 2026-11-11). La liste ne fait que rétrécir: une faute nouvelle fait
- * échouer le test, une faute corrigée aussi, tant qu'elle n'est pas retirée d'ici.
+ * Fautes connues qui demandent de retoucher une pièce ou une carte: aucune. Une faute nouvelle fait
+ * échouer le test; la liste existe pour y consigner, avec sa raison, une faute qu'on ne peut pas
+ * corriger en données.
  */
-const KNOWN: readonly string[] = [
-  // Café: la table de l'est a sa façade contre le mur est (`rotation` 1, à tourner en 3, vers
-  // ses chaises); la chaise 3 est posée là où se tient le client du comptoir.
-  'aubrune/cafe-table-2 place 0 (assis): face au mur (mur (112, 213))',
-  'aubrune/cafe-table-2 place 1 (assis): face au mur (mur (112, 212))',
-  'aubrune/colette tenir-le-cafe: devant cafe-comptoir, le client à cafe (110.5, 212.4) coupe cafe-chaise-3',
-  // Gare d'essai: la chaise nord du buffet est dans la rangée du mur (table à une case du mur).
-  'essai-gare/chaise-du-buffet-nord (chaise) à dehors (31, 13.5) coupe mur (30, 13), mur (31, 13)',
-  'essai-gare/chaise-du-buffet-nord place 0 (assis) à dehors (31, 13.5) coupe mur (30, 13), mur (31, 13)',
-];
+const KNOWN: readonly string[] = [];
 
 describe('postes des habitants, sièges et lits', () => {
   const content: Content = loadContent(gameDataFiles());
