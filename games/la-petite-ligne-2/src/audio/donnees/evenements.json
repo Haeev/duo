@@ -6,7 +6,13 @@
     "rangement-ferme": "rangement-ferme",
     "choix": "choix",
     "poser": "poser",
-    "refus": "refus"
+    "refus": "refus",
+    "cuisine-chop": "cuisine-decoupe",
+    "cuisine-stir": "cuisine-mijote",
+    "cuisine-heat": "cuisine-friture",
+    "peche-moulinet": "peche-moulinet",
+    "peche-bouchon": "peche-bouchon",
+    "meuble-tourner": "meuble-tourner"
   },
   "rules": [
     {
@@ -38,7 +44,7 @@
     {
       "on": "money_changed",
       "where": { "delta": { "gt": 0 } },
-      "sound": "monnaie",
+      "sound": "pieces-vente",
       "actor": "who",
       "audience": "own",
       "placed": false
@@ -46,9 +52,115 @@
     {
       "on": "money_changed",
       "where": { "delta": { "lt": 0 } },
-      "sound": "monnaie",
+      "sound": "pieces-achat",
       "actor": "who",
       "audience": "own",
+      "placed": false
+    },
+    { "on": "fish_cast", "sound": "peche-lancer", "audience": "both", "placed": true },
+    { "on": "fish_hooked", "sound": "peche-touche", "audience": "both", "placed": true },
+    { "on": "fish_caught", "sound": "peche-prise", "audience": "both", "placed": true },
+    {
+      "on": "fish_lost",
+      "where": { "reason": "escaped" },
+      "sound": "peche-casse",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "fish_lost",
+      "where": { "reason": "missed" },
+      "sound": "peche-bouchon",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "fish_lost",
+      "where": { "reason": "cancelled" },
+      "sound": "peche-moulinet",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "dish_cooked",
+      "where": { "quality": 1 },
+      "sound": "plat-rate",
+      "audience": "both",
+      "placed": true
+    },
+    { "on": "dish_cooked", "sound": "plat-reussi", "audience": "both", "placed": true },
+    {
+      "on": "deco_changed",
+      "where": { "action": "drop" },
+      "sound": "meuble-poser",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "deco_changed",
+      "where": { "action": "cancel" },
+      "sound": "meuble-poser",
+      "audience": "both",
+      "placed": true
+    },
+    {
+      "on": "deco_changed",
+      "where": { "action": "store" },
+      "sound": "meuble-ranger",
+      "audience": "both",
+      "placed": true
+    },
+    { "on": "deco_changed", "sound": "meuble-soulever", "audience": "both", "placed": true },
+    { "on": "door_passed", "sound": "porte", "audience": "both", "placed": true },
+    { "on": "shop_opened", "sound": "clochette-boutique", "audience": "both", "placed": true },
+    {
+      "on": "decision_changed",
+      "where": { "state": "agreed" },
+      "sound": "decision-accord",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "decision_changed",
+      "where": { "state": "split" },
+      "sound": "decision-desaccord",
+      "audience": "both",
+      "placed": false
+    },
+    { "on": "photo_taken", "sound": "photo-declic", "audience": "both", "placed": true },
+    {
+      "on": "scene_beat",
+      "where": { "scene": "la-sonnerie-de-5h12", "beat": 1 },
+      "sound": "cinq-douze",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "scene_beat",
+      "where": { "scene": "la-pose-longue", "beat": 2 },
+      "sound": "cinq-douze",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "scene_beat",
+      "where": { "scene": "la-felee-sonne", "beat": 0 },
+      "sound": "cloche-felee",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "scene_beat",
+      "where": { "scene": "en-voiture", "beat": 1 },
+      "sound": "cloche-marthe",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "scene_beat",
+      "where": { "scene": "l-autorail-creme", "beat": 1 },
+      "sound": "cloche-marthe",
+      "audience": "both",
       "placed": false
     },
     {

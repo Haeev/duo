@@ -124,7 +124,10 @@ describe('événement vers son', () => {
 
   it('lit les bornes et les paliers', () => {
     const gain: GameEvent = { type: 'money_changed', who: 0, delta: 250 };
-    expect(soundForEvent(tables.events, gain, 0)?.sound).toBe('monnaie');
+    expect(soundForEvent(tables.events, gain, 0)?.sound).toBe('pieces-vente');
+    expect(
+      soundForEvent(tables.events, { type: 'money_changed', who: 0, delta: -40 }, 0)?.sound,
+    ).toBe('pieces-achat');
     expect(
       soundForEvent(tables.events, { type: 'money_changed', who: 'chest', delta: 5 }, 0),
     ).toBeNull();
@@ -143,6 +146,33 @@ describe('événement vers son', () => {
     expect(
       soundForEvent(tables.events, { type: 'train_boarded', player: 0, to: 'ailleurs' }, 0)?.sound,
     ).toBe('embarquement');
+  });
+});
+
+describe('sons d Aubrune (deuxième lot)', () => {
+  it('relie pêche, cuisine, déco, portes et scènes aux sons par les seules tables', () => {
+    const sound = (event: GameEvent): string | undefined =>
+      soundForEvent(tables.events, event, 0)?.sound;
+    expect(sound({ type: 'fish_hooked', player: 1 })).toBe('peche-touche');
+    expect(sound({ type: 'fish_lost', player: 0, reason: 'escaped' })).toBe('peche-casse');
+    const dish = (quality: number): GameEvent => ({
+      type: 'dish_cooked',
+      player: 0,
+      recipe: 'soupe',
+      quality,
+      item: 'soupe',
+      count: 1,
+      first: false,
+      shared: false,
+    });
+    expect(sound(dish(1))).toBe('plat-rate');
+    expect(sound(dish(3))).toBe('plat-reussi');
+    expect(
+      sound({ type: 'deco_changed', player: 0, action: 'store', prop: null, item: 'chaise' }),
+    ).toBe('meuble-ranger');
+    expect(sound({ type: 'scene_beat', scene: 'la-sonnerie-de-5h12', beat: 1 })).toBe('cinq-douze');
+    expect(sound({ type: 'scene_beat', scene: 'la-sonnerie-de-5h12', beat: 0 })).toBeUndefined();
+    expect(tables.events.cues['cuisine-chop']).toBe('cuisine-decoupe');
   });
 });
 
@@ -210,6 +240,10 @@ describe('espace, pas et ambiances', () => {
     expect(steps).toBe(Math.floor(4 / tables.tuning.steps.strideMeters));
     expect(tracker.update({ x: 4, y: 0, speed: 0 })).toBe(0);
     expect(stepSound(tables.tuning.steps, 'paved')).toBe('pas-pave');
+    // Surfaces du rendu (`SurfaceKind`): plancher, gué, galets.
+    expect(stepSound(tables.tuning.steps, 'bois')).toBe('pas-bois');
+    expect(stepSound(tables.tuning.steps, 'eau')).toBe('pas-eau');
+    expect(stepSound(tables.tuning.steps, 'gravier')).toBe('pas-gravier');
     expect(stepSound(tables.tuning.steps, 'inconnue')).toBe('pas-herbe');
   });
 
