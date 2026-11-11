@@ -1,0 +1,57 @@
+<!--
+  Généré par generer-portraits.mjs depuis portraits/fiches.json: ne pas retoucher ce fichier.
+  Le Contrôleur (Anatole), la cinquantaine, contrôleur du train de nuit: visage maigre et long, bonnet chocolat trop grand enfoncé jusqu'aux yeux (on ne voit jamais ses yeux), pull chocolat et gilet perle de sa fiche, plaque de laiton, pince à poinçonner à la main. Peau pêche. Il se distingue de Firmin (même tenue) par le visage long, glabre, et le bonnet bas.
+  Calques d'expression: neutre, content, soucieux, surpris, fache.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
+  <path id="haut" d="M14 232 Q18 182 60 166 L130 166 Q172 182 176 232 Z" fill="#5E4233"/>
+  <path data-clip="haut" data-w="0" d="M126 156 Q184 184 150 232 L190 232 L190 156 Z" fill="#4F3626"/>
+  <path d="M30 232 Q34 184 64 168 L73 166 Q77 202 85 232 Z" fill="#B9B7B0"/>
+  <path id="gilet-d" d="M160 232 Q156 184 126 168 L117 166 Q113 202 105 232 Z" fill="#B9B7B0"/>
+  <path data-clip="gilet-d" data-w="0" d="M130 162 Q180 192 146 232 L190 232 L190 162 Z" fill="#8C8E91"/>
+  <g data-w="0.45" fill="#C8A150"><circle cx="79" cy="192" r="2.8"/><circle cx="80.2" cy="210" r="2.8"/><circle cx="81.4" cy="228" r="2.8"/></g>
+  <path id="cou" d="M80 136 L110 136 L110 170 Q95 178 80 170 Z" fill="#EFC7A6"/>
+  <path data-clip="cou" data-w="0" d="M74 132 L116 132 L116 154 Q95 160 74 152 Z" fill="#E0AE86"/>
+  <path d="M73 164 Q95 182 117 164 L121 170 Q95 192 69 170 Z" fill="#5E4233" data-w="0.55"/>
+  <ellipse cx="51" cy="104" rx="10" ry="13" fill="#EFC7A6"/>
+  <ellipse cx="139" cy="104" rx="10" ry="13" fill="#E0AE86"/>
+  <path id="tete" d="M95 42 Q137 44 139 94 Q138 134 116 154 Q95 166 74 154 Q52 134 51 94 Q53 44 95 42 Z" fill="#EFC7A6"/>
+  <path data-clip="tete" data-w="0" d="M124 44 Q152 110 100 168 L170 168 L170 44 Z" fill="#E0AE86"/>
+  <path data-w="0.35" fill="none" stroke="#000" d="M79 122 Q73 136 76 144 M111 122 Q117 136 114 144"/>
+  <path data-w="0" d="M96 102 L104 122 Q97 126 91 123 Z" fill="#E0AE86"/>
+  <path data-w="0.55" fill="none" stroke="#000" d="M94 100 L87 122 Q93 126 101 122"/>
+  <path d="M50 100 Q48 114 55 120 L61 104 Z" fill="#2B2523" data-w="0.5"/>
+  <path d="M140 100 Q142 114 135 120 L129 104 Z" fill="#231A17" data-w="0.5"/>
+  <circle id="pompon" cx="95" cy="20" r="12" fill="#8F3B34"/>
+  <path id="bonnet" d="M47 94 Q43 28 95 26 Q147 28 143 94 Z" fill="#5E4233"/>
+  <path data-clip="bonnet" data-w="0" d="M117 22 Q149 48 143 94 L169 94 L169 22 Z" fill="#4F3626"/>
+  <path data-w="0.4" fill="none" stroke="#000" d="M73 36 Q69 56 71 88 M99 30 L99 86 M125 38 Q129 56 127 88"/>
+  <path id="revers" d="M43 108 Q95 98 147 108 L145 88 Q95 78 45 88 Z" fill="#5E4233"/>
+  <path data-clip="revers" data-w="0" d="M125 74 L159 74 L159 114 L135 114 Z" fill="#4F3626"/>
+  <path data-w="0.4" fill="none" stroke="#000" d="M53 84.2 l0 14 M63.5 83.2 l0 14 M74 82.1 l0 14 M84.5 81.1 l0 14 M95 80 l0 14 M105.5 81.1 l0 14 M116 82.1 l0 14 M126.5 83.2 l0 14 M137 84.2 l0 14"/>
+  <path d="M125 188 L143 186 L145 196 L127 198 Z" fill="#C8A150" data-w="0.5"/>
+  <path data-w="0.35" fill="none" stroke="#000" d="M130 192 L140 191"/>
+  <path d="M33 232 Q25 212 41 204 L65 204 Q77 214 67 232 Z" fill="#EFC7A6"/>
+  <path d="M41 204 L55 172 L63 174 L53 206 Z" fill="#8C8E91" data-w="0.6"/>
+  <path d="M55 206 L73 176 L80 180 L65 208 Z" fill="#8C8E91" data-w="0.6"/>
+  <circle cx="59" cy="172" r="5" fill="#B9B7B0" data-w="0.5"/>
+  <path d="M47 214 Q55 210 63 214 M45 222 Q55 218 65 222" fill="none" stroke="#000" data-w="0.5"/>
+  <g data-expr="neutre">
+    <g class="bouche"><path d="M84 141 Q95 139 106 141 L105 144 Q95 142.5 85 144 Z" fill="#A2473F" data-w="0.5"/></g>
+  </g>
+  <g data-expr="content">
+    <g data-w="0"><ellipse cx="65" cy="122" rx="9" ry="5.5" fill="#E58E84"/><ellipse cx="125" cy="122" rx="9" ry="5.5" fill="#E58E84"/></g>
+    <g class="bouche"><path id="c-rire" d="M77 136 Q95 140 113 135 Q109 155 95 156 Q81 155 77 136 Z" fill="#A2473F" data-w="0.6"/><path data-clip="c-rire" data-w="0" d="M75 134 L115 133 L113 141 Q95 143 77 141 Z" fill="#F7F3EA"/><path data-clip="c-rire" data-w="0" d="M85 153 Q95 146 105 153 L105 160 L85 160 Z" fill="#E58E84"/></g>
+  </g>
+  <g data-expr="soucieux">
+    <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M85 143 Q90 138 95 142 Q100 146 105 140"/></g>
+    <path d="M131 90 Q137 100 133 104 Q127 102 131 90 Z" fill="#A9C7D9" data-w="0.5"/>
+  </g>
+  <g data-expr="surpris">
+    <g class="bouche"><ellipse id="u-bouche" cx="95" cy="143" rx="6.5" ry="8.5" fill="#A2473F" data-w="0.6"/><path data-clip="u-bouche" data-w="0" d="M88 147 Q95 143 102 147 L102 153 L88 153 Z" fill="#E58E84"/></g>
+  </g>
+  <g data-expr="fache">
+    <path data-w="0.45" fill="none" stroke="#000" d="M91 92 L93 98 M99 92 L97 98"/>
+    <g class="bouche"><path id="f-bouche" d="M81 145 Q89 137 95 137 Q101 137 109 145 Q95 143 81 145 Z" fill="#A2473F" data-w="0.6"/><path data-clip="f-bouche" data-w="0" d="M81 136 L109 136 L109 140 L81 140 Z" fill="#F7F3EA"/></g>
+  </g>
+</svg>

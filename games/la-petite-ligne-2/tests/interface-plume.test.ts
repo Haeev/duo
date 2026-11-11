@@ -6,7 +6,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { spriteMarkup, itemThumb, thumbUrl } from '../src/interface/pictos';
 import { INK_PICTOS } from '../src/interface/pictos-encre';
-import { hasDrawnPortrait, portraitMarkup } from '../src/interface/portrait';
+import { hasDrawnPortrait, portraitMarkup, PORTRAIT_MOODS } from '../src/interface/portrait';
 
 const PKG = path.join(import.meta.dirname, '..');
 const OUT = path.join(PKG, 'assets', 'commun', 'interface');
@@ -213,13 +213,13 @@ describe('portraits à la plume', () => {
   const ids = svgIds(path.join(OUT, 'portraits'));
   const colors = palette();
 
-  it('Firmin, Odette et un joueur, chacun en trois expressions avec sa bouche', () => {
+  it('Firmin, Odette et un joueur, chacun en cinq expressions avec sa bouche', () => {
     for (const id of ['firmin', 'odette', 'joueur']) expect(ids).toContain(id);
     for (const id of ids) {
       const svg = readFileSync(path.join(OUT, 'portraits', `${id}.svg`), 'utf8');
-      for (const e of ['neutre', 'content', 'soucieux'])
+      for (const e of PORTRAIT_MOODS)
         expect(svg, `${id} ${e}`).toContain(`class="expr expr--${e}"`);
-      expect(svg.match(/class="bouche"/g)?.length, id).toBe(3);
+      expect(svg.match(/class="bouche"/g)?.length, id).toBe(PORTRAIT_MOODS.length);
       for (const c of colorsOf(svg)) expect(colors.has(c), `${id}: ${c}`).toBe(true);
     }
   });

@@ -2,7 +2,7 @@
   Un des deux joueurs (portrait d'essai, l'apparence réelle viendra de l'éditeur): jeune adulte
   arrivé par le train, cheveux bleu nuit en épi (teinte réservée aux joueurs), écharpe moutarde
   de voyage, veste canard, écusson du profil Duo sur la poitrine (rond aqua: l'hôte, bible 2.10).
-  Peau dorée, ombre noisette. Calques d'expression: neutre, content, soucieux.
+  Peau dorée, ombre noisette. Calques d'expression: neutre, content, soucieux, surpris, fache.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
   <!-- Veste et écharpe -->
@@ -60,5 +60,31 @@
     <path d="M62 90 Q76 88 86 78 Q82 88 64 94 Z" fill="#2C3B57" data-w="0.5"/>
     <path d="M128 90 Q114 88 104 78 Q108 88 126 94 Z" fill="#2C3B57" data-w="0.5"/>
     <g class="bouche"><path data-w="0.6" fill="none" stroke="#000" d="M86 138 Q92 133 98 137 Q103 140 108 134"/></g>
+  </g>
+  <!-- Surpris: yeux ronds, sourcils hauts, bouche en O -->
+  <g data-expr="surpris">
+    <ellipse cx="74" cy="101" rx="9" ry="9.5" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="116" cy="101" rx="9" ry="9.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="74.6" cy="101" r="3.4" fill="#3A2A22"/><circle cx="115.4" cy="101" r="3.4" fill="#3A2A22"/><circle cx="73" cy="99.2" r="1.3" fill="#F7F3EA"/><circle cx="113.8" cy="99.2" r="1.3" fill="#F7F3EA"/></g>
+    <path d="M62 82 Q74 70 86 80 Q74 76 64 86 Z" fill="#2C3B57" data-w="0.5"/>
+    <path d="M128 82 Q116 70 104 80 Q116 76 126 86 Z" fill="#2C3B57" data-w="0.5"/>
+    <g class="bouche">
+      <ellipse id="rond" cx="95" cy="137" rx="6.5" ry="8.5" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="rond" data-w="0" d="M88 141 Q95 137 102 141 L102 147 L88 147 Z" fill="#E58E84"/>
+    </g>
+  </g>
+  <!-- Fâché: paupières en biais, sourcils froncés, plis entre les yeux, dents serrées -->
+  <g data-expr="fache">
+    <path id="colere-g" d="M65 99 L83 103 Q78 109 74 109 Q67 109 65 99 Z" fill="#F7F3EA" data-w="0.5"/>
+    <path id="colere-d" d="M125 99 L107 103 Q112 109 116 109 Q123 109 125 99 Z" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle data-clip="colere-g" cx="75.2" cy="105" r="4" fill="#3A2A22"/><circle data-clip="colere-d" cx="114.8" cy="105" r="4" fill="#3A2A22"/></g>
+    <path data-w="0.9" fill="none" stroke="#000" d="M64 98.5 L84 103 M126 98.5 L106 103"/>
+    <path d="M61 88 Q74 86 87 96 Q74 92 63 93 Z" fill="#2C3B57" data-w="0.5"/>
+    <path d="M129 88 Q116 86 103 96 Q116 92 127 93 Z" fill="#2C3B57" data-w="0.5"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M91 92 L93 98 M99 92 L97 98"/>
+    <g class="bouche">
+      <path id="dents" d="M81 140 Q89 132 95 132 Q101 132 109 140 Q95 138 81 140 Z" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="dents" data-w="0" d="M80 131 L110 131 L110 135.5 L80 135.5 Z" fill="#F7F3EA"/>
+    </g>
   </g>
 </svg>

@@ -1,16 +1,35 @@
 /**
  * Portrait d'un habitant ou d'un joueur. Les portraits dessinés à la plume sont dans
  * `assets/commun/interface/portraits/<id>.svg` (générés depuis `assets-src/interface-encre/
- * portraits/`): trois calques d'expression (neutre, content, soucieux) et une bouche (`.bouche`)
- * qui bouge pendant l'écriture (classe `parle`). L'expression se choisit par `mood`, ou par un
- * ancêtre: `data-expr="content|soucieux"`, ou l'humeur du marchand (`shop-bust--joy`, `--yes`,
- * `--no`); voir `plume.css`. Sans dessin, un substitut est généré depuis l'identifiant
- * (teintes stables) et se marque « provisoire » dans la fenêtre de dialogue.
+ * portraits/`): cinq calques d'expression (`PORTRAIT_MOODS`) et une bouche (`.bouche`) qui bouge
+ * pendant l'écriture (classe `parle`). L'expression se choisit par `mood`, ou par un ancêtre:
+ * `data-expr="<humeur>"`, ou l'humeur du marchand (`shop-bust--joy`, `--yes`, `--no`); voir
+ * `plume.css`. L'émotion d'une réplique (`emote` des données) donne l'humeur par `moodOfEmote`.
+ * Sans dessin, un substitut est généré depuis l'identifiant (teintes stables) et se marque
+ * « provisoire »; `tests/portraits-habitants.test.ts` veille à ce qu'aucun personnage qui parle
+ * n'en ait besoin.
  */
 import { hueOf } from './pictos';
 import './plume.css';
 
-export type PortraitMood = 'neutre' | 'content' | 'soucieux';
+/** Calques d'expression de chaque portrait dessiné, dans l'ordre des sources. */
+export const PORTRAIT_MOODS = ['neutre', 'content', 'soucieux', 'surpris', 'fache'] as const;
+export type PortraitMood = (typeof PORTRAIT_MOODS)[number];
+
+const MOOD_OF_EMOTE: Readonly<Record<string, PortraitMood>> = {
+  joy: 'content',
+  idea: 'content',
+  sad: 'soucieux',
+  surprise: 'surpris',
+  anger: 'fache',
+};
+/**
+ * Humeur du portrait pour l'émotion d'une réplique (`emote` des dialogues et des scènes). L'idée
+ * éclaire le visage; la question garde le visage neutre (le signe « ? » suffit).
+ */
+export function moodOfEmote(emote: string | null): PortraitMood {
+  return (emote === null ? undefined : MOOD_OF_EMOTE[emote]) ?? 'neutre';
+}
 
 const DRAWN = import.meta.glob<string>('../../assets/commun/interface/portraits/*.svg', {
   query: '?raw',

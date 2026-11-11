@@ -2,7 +2,7 @@
   Odette Ferrand, 61 ans, épicière et logeuse: gourmande, bavarde, sait tout et le répète.
   Visage rond (fiche: tête ronde, peau 1 pêche), chignon poivre et sel planté d'un crayon
   (l'épicière qui note tout), petites lunettes rondes au bout du nez, joues toujours roses,
-  robe rouille à col claudine. Calques d'expression: neutre, content, soucieux.
+  robe rouille à col claudine. Calques d'expression: neutre, content, soucieux, surpris, fache.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 230" data-trait="6" data-pas="1.1" data-tremble="0.45" data-halo="4">
   <!-- Buste: robe rouille, col claudine -->
@@ -72,5 +72,31 @@
     <path d="M72 88 Q86 88 86 101 Q86 114 72 114 Q58 114 58 101 Q58 88 72 88 Z"/>
     <path d="M118 88 Q132 88 132 101 Q132 114 118 114 Q104 114 104 101 Q104 88 118 88 Z"/>
     <path d="M86 99 Q95 94 104 99"/>
+  </g>
+  <!-- Surpris: yeux ronds, sourcils hauts, bouche en O -->
+  <g data-expr="surpris">
+    <ellipse cx="72" cy="99" rx="9" ry="9.5" fill="#F7F3EA" data-w="0.5"/>
+    <ellipse cx="118" cy="99" rx="9" ry="9.5" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle cx="72.6" cy="99" r="3.4" fill="#44618A"/><circle cx="117.4" cy="99" r="3.4" fill="#44618A"/><circle cx="71" cy="97.2" r="1.3" fill="#F7F3EA"/><circle cx="115.8" cy="97.2" r="1.3" fill="#F7F3EA"/></g>
+    <path d="M60 80 Q72 68 84 78 Q72 74 62 84 Z" fill="#6A6763" data-w="0.5"/>
+    <path d="M130 80 Q118 68 106 78 Q118 74 128 84 Z" fill="#6A6763" data-w="0.5"/>
+    <g class="bouche">
+      <ellipse id="rond" cx="95" cy="137" rx="6.5" ry="8.5" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="rond" data-w="0" d="M88 141 Q95 137 102 141 L102 147 L88 147 Z" fill="#E58E84"/>
+    </g>
+  </g>
+  <!-- Fâché: paupières en biais, sourcils froncés, plis entre les yeux, dents serrées -->
+  <g data-expr="fache">
+    <path id="colere-g" d="M63 97 L81 101 Q76 107 72 107 Q65 107 63 97 Z" fill="#F7F3EA" data-w="0.5"/>
+    <path id="colere-d" d="M127 97 L109 101 Q114 107 118 107 Q125 107 127 97 Z" fill="#F7F3EA" data-w="0.5"/>
+    <g data-w="0"><circle data-clip="colere-g" cx="73.2" cy="103" r="4" fill="#44618A"/><circle data-clip="colere-d" cx="116.8" cy="103" r="4" fill="#44618A"/></g>
+    <path data-w="0.9" fill="none" stroke="#000" d="M62 96.5 L82 101 M128 96.5 L108 101"/>
+    <path d="M59 86 Q72 84 85 94 Q72 90 61 91 Z" fill="#6A6763" data-w="0.5"/>
+    <path d="M131 86 Q118 84 105 94 Q118 90 129 91 Z" fill="#6A6763" data-w="0.5"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M91 90 L93 96 M99 90 L97 96"/>
+    <g class="bouche">
+      <path id="dents" d="M81 140 Q89 132 95 132 Q101 132 109 140 Q95 138 81 140 Z" fill="#A2473F" data-w="0.6"/>
+      <path data-clip="dents" data-w="0" d="M80 131 L110 131 L110 135.5 L80 135.5 Z" fill="#F7F3EA"/>
+    </g>
   </g>
 </svg>

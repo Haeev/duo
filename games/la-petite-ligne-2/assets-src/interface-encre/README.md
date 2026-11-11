@@ -4,6 +4,7 @@
 - `encrer.mjs`: le moteur « à la plume » (contour plein et délié, tremblé, effilé; liseré clair).
 - `generer-images.mjs`: vignettes, pictos et portraits depuis `vignettes/`, `pictos/pictos.svg`, `portraits/`.
 - `planche-images.cjs`: planche de contrôle (vignettes en 96 et 48 px, pictos, portraits).
+- `generer-portraits.mjs`: écrit les sources des portraits composés depuis `portraits/fiches.json` (même trait que les portraits faits main, cinq expressions); `planche-portraits.cjs`: planche de tous les portraits d'habitants.
 - `generer-meubles.py`: écrit les sources des vignettes de meubles (même projection de trois quarts, séries de couleur miel et sauge); on modifie le script, pas ces SVG.
 - `planche-serie.cjs`: planches de la série des vignettes par famille (outils, poissons, potager, cuisine, provisions, meubles), en 96 et 48 px sur case sombre; `--grand` ajoute le 192 px.
 - `capturer.cjs`, `verifier.cjs`: captures et contrôles de l'interface (voir `src/interface/encre/README.md`).
@@ -20,7 +21,17 @@ Chaque objet de `donnees/commun/objets/` et chaque meuble posable (`placeable`) 
 4. Regarder `node assets-src/interface-encre/planche-serie.cjs /tmp <id>[,<id>...] --grand`, puis la planche de sa famille (`planche-serie.cjs <dossier> <famille>`).
 5. Rien d'autre: l'interface prend le dessin à la place de la pastille (`itemThumb`), et le test contrôle couleurs, tailles et couverture.
 
-## Ajouter un picto ou un portrait
+## Ajouter un picto
 
 - Picto: un `<symbol id>` de plus dans `pictos/pictos.svg`, puis `generer-images.mjs pictos` (réécrit `src/interface/pictos-encre.ts`); `icon('<id>')` l'affiche.
-- Portrait: copier `portraits/odette.svg` sous l'id de l'habitant, garder les trois calques `data-expr` (neutre, content, soucieux) et une `class="bouche"` par calque, puis `generer-images.mjs portraits <id>`. `portraitMarkup(id)` le prend; sinon, substitut généré.
+
+## Ajouter un portrait d'habitant
+
+Chaque habitant de chaque lieu a son portrait, en cinq expressions (neutre, content, soucieux, surpris, fache); `tests/portraits-habitants.test.ts` échoue sinon, ou si une réplique demande une expression absente (émotion de la réplique: `moodOfEmote` dans `src/interface/portrait.ts`).
+
+1. Lire la fiche de l'habitant (`donnees/lieux/<lieu>/habitants/<id>.json`): silhouette, peau, pièces et couleurs du catalogue; et ses trois lignes dans `ecriture-habitants.md` (âge, métier, caractère).
+2. Copier l'entrée la plus proche de `portraits/fiches.json` sous l'id de l'habitant (le `_gabarit` liste les champs et leurs valeurs); reprendre ses couleurs, choisir l'humeur au repos (`bouche`) et un ou deux accessoires de métier (`PROPS` de `generer-portraits.mjs`; un accessoire nouveau s'y ajoute en quelques lignes). Même personne sous deux ids: `{ "comme": "<id>" }`.
+3. `node assets-src/interface-encre/generer-portraits.mjs <id>`: écrit la source `portraits/<id>.svg` (ne pas la retoucher).
+4. `NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/generer-images.mjs portraits <id>`: écrit le portrait encré et un PNG par expression.
+5. Regarder `NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/planche-portraits.cjs /tmp/planche.png <id>` (tous en neutre avec leur nom, les cinq expressions de `<id>`, la rangée en 64 px): silhouette reconnaissable en petit, rien qui dépasse.
+6. `pnpm exec vitest run --clearCache` (le cache de Vitest ne voit pas un SVG nouveau), puis `pnpm exec vitest run tests/portraits-habitants.test.ts`. Rien d'autre: `portraitMarkup(id)` le prend, l'étiquette « provisoire » disparaît. Un portrait fait main (Odette, Firmin) garde les cinq calques `data-expr` et une `class="bouche"` par calque.

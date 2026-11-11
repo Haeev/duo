@@ -1,14 +1,27 @@
 /*
  * Images à la plume (`pictos.ts`, `portrait.ts`). Expressions des portraits dessinés: un seul
- * calque visible. Neutre par défaut;
- * content ou soucieux selon `data-expr` (sur le portrait ou un ancêtre) ou l'humeur du marchand.
+ * calque visible. Neutre par défaut; content, soucieux, surpris ou fache selon `data-expr` (sur le
+ * portrait ou un ancêtre) ou l'humeur du marchand.
  */
-.lpl-por .expr--content,
-.lpl-por .expr--soucieux {
+.lpl-por :is(.expr--content, .expr--soucieux, .expr--surpris, .expr--fache) {
   display: none;
 }
-.lpl-por:is([data-expr='content'], [data-expr='soucieux']) .expr--neutre,
-:is([data-expr='content'], [data-expr='soucieux'], .shop-bust--joy, .shop-bust--yes, .shop-bust--no)
+.lpl-por:is(
+    [data-expr='content'],
+    [data-expr='soucieux'],
+    [data-expr='surpris'],
+    [data-expr='fache']
+  )
+  .expr--neutre,
+:is(
+    [data-expr='content'],
+    [data-expr='soucieux'],
+    [data-expr='surpris'],
+    [data-expr='fache'],
+    .shop-bust--joy,
+    .shop-bust--yes,
+    .shop-bust--no
+  )
   .lpl-por:not([data-expr])
   .expr--neutre {
   display: none;
@@ -21,6 +34,14 @@
 }
 .lpl-por[data-expr='soucieux'] .expr--soucieux,
 :is([data-expr='soucieux'], .shop-bust--no) .lpl-por:not([data-expr]) .expr--soucieux {
+  display: inline;
+}
+.lpl-por[data-expr='surpris'] .expr--surpris,
+[data-expr='surpris'] .lpl-por:not([data-expr]) .expr--surpris {
+  display: inline;
+}
+.lpl-por[data-expr='fache'] .expr--fache,
+[data-expr='fache'] .lpl-por:not([data-expr]) .expr--fache {
   display: inline;
 }
 
