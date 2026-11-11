@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-sel",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ma boîte à sel ? Rangée. Jusqu'à la prochaine brouille. Dans ce bourg, je ne chôme jamais longtemps.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

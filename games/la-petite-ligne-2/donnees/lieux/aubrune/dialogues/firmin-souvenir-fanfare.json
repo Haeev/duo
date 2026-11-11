@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-fanfare",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La fanfare jouait en mesure. Le train avait quarante secondes d'avance. Personne n'est parfait.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

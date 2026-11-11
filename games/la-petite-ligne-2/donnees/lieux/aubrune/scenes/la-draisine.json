@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "id": "la-draisine",
+  "title": "La draisine no 2",
+  "together": true,
+  "roles": {
+    "a": "Au balancier avant",
+    "b": "Au balancier arrière"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Va à la remise, au bout du quai, côté lisière: la porte donne sur les rails.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "n2",
+              "who": "one",
+              "radius": 5
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Rejoins la remise de la draisine avec ta moitié.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "n2",
+              "who": "one",
+              "radius": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La clé tourne comme si on l'avait graissée hier. Sous une bâche: une plateforme à quatre roues et un grand balancier. La draisine no 2.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu montes à l'avant. D'ici, la voie file vers l'ouest jusqu'au poste. Annonce « voie libre » quand tu ne vois personne sur les rails.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu montes à l'arrière. Le frein est sous ton pied. Ne le lâche que quand ta moitié annonce « voie libre ».",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Pompe: appuie sur le balancier et tiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Pompe en même temps que ta moitié: appuie et tiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 2
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La draisine grince, hésite, puis roule. Trois mètres. Dix. Le vent de la course, à l'allure d'un cheval qui a le temps.",
+      "emote": null,
+      "sound": "Couic ! Couic !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "walk",
+      "who": "firmin",
+      "to": "n2"
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Halte ! Article 52: « La draisine ne sort que sur ordre écrit du chef de ligne. »",
+      "emote": "anger",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous lui tendez le feuillet. Il lit. Il relit. Il le retourne, au cas où le chef de ligne aurait écrit autre chose derrière.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "« Merci d'avance. » ... Trente ans dans ma consigne. Il aurait pu me le dire à moi. J'étais là.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "C'est un ordre écrit. Rien à redire. Trois arrêts: le poste, la halte, le tunnel. On sonne aux passages. Et on la rentre le soir.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.draisine.sortie",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

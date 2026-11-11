@@ -1,0 +1,551 @@
+{
+  "schema": 1,
+  "id": "les-lettres-en-retard",
+  "kind": "side",
+  "title": "Les lettres en retard",
+  "giver": "lucie",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "ceux-qui-partent",
+      "step": "registre"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-consigne",
+      "title": "La consigne",
+      "steps": [
+        {
+          "id": "consigne",
+          "objective": "Lucie a trouvé une ligne étrange au registre de la Poste. Va la voir: sur la place le matin, à sa grille ensuite.",
+          "target": {
+            "villager": "lucie"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "lucie-consigne",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.consigne",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.consigne",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "franc",
+          "objective": "Firmin exige son « franc de garde »: déterre une vieille pièce à la bêche, aux fouilles du talus, et porte-la-lui.",
+          "target": {
+            "villager": "firmin"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "vieille-piece",
+              "count": 1,
+              "villager": "firmin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.franc",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.franc",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "sac",
+          "objective": "À deux devant la porte de la halte: une personne au casier, l'autre au registre. Le sac attend depuis trente ans.",
+          "target": {
+            "point": "gr2"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "le-sac-postal"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.sac",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "le-sac-postal"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.sac",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "six-lettres",
+      "title": "Six lettres",
+      "steps": [
+        {
+          "id": "basile",
+          "objective": "Le pli de B. Cornu: rends-le à Basile, à son atelier. C'est lui qui dit si sa lettre part encore.",
+          "target": {
+            "villager": "basile"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "basile-lettre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.basile",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.basile",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "odette",
+          "objective": "Basile a dit « porte-la »: remets ses quatre pages à Odette. Trente ans de retard, pas un jour de plus.",
+          "target": {
+            "villager": "odette"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "odette-lettre",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.odette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.odette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "marthe",
+          "objective": "Le pli de M. Bousquet: rends-le à Marthe, sur le parvis.",
+          "target": {
+            "villager": "marthe"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-dette",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.marthe",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.marthe",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "interets",
+          "objective": "Honorine veut ses intérêts: quatre poignées de mûres, cueillies aux ronces de la tranchée.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "mures",
+              "count": 4,
+              "villager": "honorine"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.interets",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.interets",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "recu",
+          "objective": "Porte à Marthe le reçu de sa sœur. Et regarde bien sa tête.",
+          "target": {
+            "villager": "marthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-recu",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.recu",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.recu",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "colette",
+          "objective": "Le pli de L. Lafon est adressé à une pensionnaire de quatorze ans: Colette, aujourd'hui au café.",
+          "target": {
+            "villager": "colette"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "colette-recette",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.colette",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.colette",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "oeufs",
+          "objective": "Colette refait la tarte de sa mère: il lui manque deux œufs. Ton poulailler en a.",
+          "target": {
+            "villager": "colette"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "oeuf",
+              "count": 2,
+              "villager": "colette"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.oeufs",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.oeufs",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "firmin",
+          "objective": "Le pli de F. Lacombe à la Direction: rends-le à Firmin. Doucement.",
+          "target": {
+            "villager": "firmin"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "firmin-mutation",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.firmin",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.firmin",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "achille",
+          "objective": "« Achille, 8 ans, au Père Noël »: rends sa lettre au boulanger.",
+          "target": {
+            "villager": "achille"
+          },
+          "after": [],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "achille-noel",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.achille",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.achille",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-sixieme",
+      "title": "La sixième",
+      "steps": [
+        {
+          "id": "sixieme",
+          "objective": "Cinq lettres rendues. Lucie garde la sixième: va la lui réclamer.",
+          "target": {
+            "villager": "lucie"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "lucie-sixieme",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.sixieme",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.sixieme",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "mains-propres",
+          "objective": "Rejoins ta moitié auprès de Lucie: la sixième lettre se remet en mains propres, les quatre.",
+          "target": {
+            "villager": "lucie"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-sixieme-lettre"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.mains-propres",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-sixieme-lettre"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.mains-propres",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "remise",
+          "objective": "La clé ouvre la remise, au bout du quai: allez-y à deux, la draisine se pompe à quatre bras.",
+          "target": {
+            "point": "n2"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-draisine"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.remise",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-draisine"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.remise",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_money",
+              "amount": 1200,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "lucie",
+              "points": 40,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "firmin",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "basile",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "marthe",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.lettres.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

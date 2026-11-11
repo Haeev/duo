@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "achille-canne-fine",
+  "villager": "achille",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.epilogue"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh. Tiens: la canne fine de grand-père. Elle a raté la Baronne trois générations de suite. Avec toi, elle changera d'habitudes.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "canne-fine",
+          "count": 1
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Et pour une fois, je ne me suis pas rendormi. Enfin, pas tout de suite après la touche.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

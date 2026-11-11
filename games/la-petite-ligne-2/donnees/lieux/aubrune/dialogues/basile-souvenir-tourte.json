@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-tourte",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.odette",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Dimanche. Tourte. Pour deux. ... J'ai mis une chemise.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

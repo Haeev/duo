@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "jeanne-baronne",
+  "villager": "jeanne",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.heure",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La Baronne ? Je l'ai vue. Je parie que tu ne me crois pas. Je parie que si. Bon: je parie.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Elle monte quand la lumière tombe sur le bief, entre sept et neuf du soir. Elle fait un rond grand comme une roue de brouette.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-pari-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je parie que non. Si je perds, je te dois le respect. C'est tout ce que j'ai, avec trois caramels.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-heure-1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je note tout. 5 h 12, la Baronne, les éternuements de Firmin. J'ai un carnet par mystère.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "pari",
+          "text": "Tu paries qu'on la sort ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-pari-1"
+        },
+        {
+          "id": "heure",
+          "text": "Comment tu sais l'heure ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-heure-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Et pas d'ombre sur l'eau. Elle déteste. Moi aussi, d'ailleurs.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

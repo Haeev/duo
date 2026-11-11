@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "achille-baronne",
+  "villager": "achille",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.legende",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh. La Baronne. Tu veux savoir ? Assieds-toi. Non, reste debout: assis, je m'endors, et toi avec.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Une perche longue comme ma pelle à four. Grand-père Anselme l'a ferrée en 1934: elle a cassé le crin. Papa, en 1962: elle a pris la canne.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Moi, je la tiens chaque été. Enfin, mon bouchon plonge. C'est ce qu'on me raconte: je dors toujours avant la touche.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-aider-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "À deux ? Mmh. Personne n'a jamais essayé à deux. Dans la famille, on rate seul.",
+      "emote": "idea",
+      "next": "fin"
+    },
+    "n4-vieille-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ou sa fille. Ou sa petite-fille. Chez nous aussi, on est trois générations. Ça se vaut.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "aider",
+          "text": "On la sort pour toi ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-aider-1"
+        },
+        {
+          "id": "vieille",
+          "text": "Une perche de 1934, vraiment ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-vieille-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Il faut son heure et son appât. L'heure, Jeanne la connaît: elle traîne au bief. L'appât, c'est Colette: le café a tout vu passer.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

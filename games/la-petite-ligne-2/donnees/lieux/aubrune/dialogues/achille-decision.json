@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "id": "achille-decision",
+  "villager": "achille",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.decision",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "L'alliance, je la garde. Dans le pot à levain. Mais elle ? Trois générations pour la sortir, et je ne sais pas quoi en faire.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Colette la veut au café, en friture, pour tout le bourg. Jeanne veut qu'elle retourne à l'eau. Moi, je veux dormir. Décidez à deux, à voix haute.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-relacher-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh. Oui. Qu'elle fasse rater les suivants. Il faut bien que les pêcheurs d'après aient une excuse.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-friture-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh. Oui. Grand-père disait: un poisson qu'on relâche se raconte un an, un poisson qu'on partage se raconte cent ans.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-attendre-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Parlez. Elle attend depuis 1934, elle a le temps. Moi aussi: je ferme les yeux pour mieux écouter.",
+      "emote": null,
+      "next": null
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "relacher",
+          "text": "On la relâche.",
+          "when": [],
+          "effects": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.sort",
+              "value": "relachee",
+              "by": "duo"
+            }
+          ],
+          "next": "n3-relacher-1"
+        },
+        {
+          "id": "friture",
+          "text": "On l'offre au café.",
+          "when": [],
+          "effects": [
+            {
+              "type": "remember",
+              "key": "aubrune.baronne.sort",
+              "value": "friture",
+              "by": "duo"
+            }
+          ],
+          "next": "n3-friture-1"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "n3-attendre-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Va le dire à Colette. Moi, je reste un peu au bord. Je crois que je n'ai plus sommeil. C'est très inquiétant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

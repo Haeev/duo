@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "id": "le-concert-du-quai",
+  "title": "Le concert du quai",
+  "together": true,
+  "roles": {
+    "a": "Au triangle",
+    "b": "Aux cymbales"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fanfare.concert",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 480,
+        "to": 1140
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "walk",
+      "who": "solange",
+      "to": "quai"
+    },
+    {
+      "do": "walk",
+      "who": "barnabe",
+      "to": "quai"
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Une fanfare sur mon quai. Article 31: « Les manifestations sonores sont soumises au chef de halte. » ... Accordé. Jouez juste.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.train.en-gare",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un sifflet, un panache: le train de Rosalie débouche de la tranchée. Armand lève sa baguette. De dos. Face à la locomotive.",
+      "emote": null,
+      "sound": "Tchou ! Tchou !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Triangle sur le temps fort. Cette fois, tu vois la baguette. Ta moitié ne voit que le dos d'Armand: fais-lui signe du menton.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Cymbales avec le triangle. Tu ne vois que le dos du chef et le menton de ta moitié. C'est assez. « Un, deux, et... »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Sur « et », frappe le triangle: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Sur « et », claque les cymbales: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La fanfare de la halte attaque. Le bugle tient sa note. Le trombone n'a plus de vase. Les cymbales tombent pile.",
+      "emote": null,
+      "sound": "Ting ! Tchac ! Pouet !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "De sa cabine, Rosalie crie par-dessus la vapeur: « Une fanfare ! Pour moi ? Rejouez, que j'entende sans le sifflet ! »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "Je me retourne ? Je me retourne. Bonjour. C'était nous. C'était moi. Je dirigeais.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "solange",
+      "text": "Salue, Armand. Plus bas. Voilà. Maintenant tu peux avoir le trac: c'est fini, il ne sert plus à rien.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le train repart dans son nuage. Rosalie siffle la mesure jusqu'au tournant de la tranchée. Presque juste.",
+      "emote": null,
+      "sound": "Tchou !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.train.en-gare",
+          "value": false,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.fanfare.fondee",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

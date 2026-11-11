@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "solange-boutons",
+  "villager": "solange",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.boutons",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Une fanfare ! Enfin du spectacle. Donne la caisse: je recouds la peau ce soir, au point de matelassier.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Mais une fanfare sans galons, c'est une file d'attente. Il me faut des boutons dorés: deux vieilles pièces. Je les perce, je les couds.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

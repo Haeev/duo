@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "id": "la-felee-sonne",
+  "title": "La Fêlée sonne",
+  "together": true,
+  "roles": {
+    "a": "Les yeux au clocher",
+    "b": "Les yeux sur la rue"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.robe.guet",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 1320,
+        "to": 60
+      },
+      {
+        "type": "reach",
+        "point": "pv",
+        "who": "both",
+        "radius": 6
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Minuit moins le quart. Le parvis est vide. Puis, là-haut: trois coups sourds, fêlés, pas du tout à l'heure.",
+      "emote": null,
+      "sound": "Dong. Dong. Dong.",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu lèves les yeux. Derrière les abat-son, deux petites ombres se baissent trop tard. La plus petite a fait « chut » à la plus grande.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu regardes la rue. Deux chandelles sortent en même temps: une du côté du presbytère, une tout au bout de la Grand-Route. Elles s'arrêtent net.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "walk",
+      "who": "marthe",
+      "to": "pv"
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Constat: trois coups, minuit moins le quart, et ma sœur dehors, en bonnet, au bout de la rue. Donc ce n'est pas elle. C'est contrariant.",
+      "emote": "anger",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Là-bas, la deuxième chandelle fait demi-tour. Marthe aussi. Elles sont sorties ensemble, elles rentrent ensemble, à cent mètres d'écart.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous comparez à voix haute: deux ombres en haut, deux chandelles en bas. Quelqu'un tire les ficelles. Au sens propre, peut-être.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "marthe",
+      "text": "Le clocher n'est pas fermé. Je ne monte plus à l'échelle, à cause de mon genou. Montez demain, au jour. Et ne touchez pas à la grande.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.robe.ombres",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

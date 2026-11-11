@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "colette-truite-merci",
+  "villager": "colette",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.truite",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "truite",
+      "count": 1
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Belle bête ! L'œil vif: elle fera un fond du tonnerre.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ma marmite passe la nuit sur la terrasse. Une soupe, ça se repose comme une pâte. Demande à Achille, il fait pareil avec lui-même.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "odette-vexee",
+  "villager": "odette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.vexee",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Un pot-au-feu. Chez Colette. Avec MON bœuf. Tout le bourg en parle. Enfin: j'en parle à tout le bourg.",
+      "emote": "anger",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Je ne suis pas vexée. Je constate. On cuisine chez la concurrence, on me prend ma viande et on me laisse les os.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3-meilleure-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Évidemment ! La soupe aux herbes de maman. Trente ans que je la sers, personne n'en est mort.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-colette-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Elle cuisine FORT. Ce n'est pas pareil.",
+      "emote": "anger",
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "meilleure",
+          "text": "Ta soupe reste la meilleure.",
+          "when": [],
+          "effects": [],
+          "next": "n3-meilleure-1"
+        },
+        {
+          "id": "colette",
+          "text": "Colette cuisine bien, tu sais.",
+          "when": [],
+          "effects": [],
+          "next": "n3-colette-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Je sors ma marmite sur la place. Qu'elle sorte la sienne. Le bourg goûte, le bourg vote. Va le lui dire. Avec les formes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

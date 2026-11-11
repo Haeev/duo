@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "id": "la-repetition-de-la-fanfare",
+  "title": "La répétition",
+  "together": true,
+  "roles": {
+    "a": "Au triangle",
+    "b": "Aux cymbales"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fanfare.repetition",
+        "equals": "ouvert"
+      },
+      {
+        "type": "time_is",
+        "from": 480,
+        "to": 1020
+      },
+      {
+        "type": "reach",
+        "point": "gr5",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "once"
+  },
+  "beats": [
+    {
+      "do": "walk",
+      "who": "solange",
+      "to": "gr5"
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "En place. Barnabé au bugle. Solange au trombone. Les gardes: triangle et cymbales. C'est la partie la plus exposée. Pardon.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "Mesure à deux temps. Je compte, vous entrez sur « et ». Pas avant « et ». Pas après. « Et » est un moment très précis.",
+      "emote": "idea",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ton triangle marque le temps fort. Tu ne vois pas la baguette d'Armand: ta moitié la voit. Demande-lui de compter tout haut.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tes cymbales tombent avec le triangle. Toi, tu vois la baguette: compte tout haut pour ta moitié. « Un, deux, et... »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Sur « et », frappe le triangle: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Sur « et », claque les cymbales: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Ting et tchac tombent ensemble. Le bugle suit avec une note de retard. Le trombone crache un reste de vase. C'est une fanfare.",
+      "emote": null,
+      "sound": "Ting ! Tchac !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "solange",
+      "text": "Magnifique ! Affreux, mais magnifique. Et on a un chef: regardez comme il se tient, avec sa baguette. On dirait qu'il a grandi.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "armand",
+      "text": "Le concert est pour demain, sur le quai, à l'arrivée du train. J'ai prévenu le train. Enfin, Firmin. Enfin, j'ai laissé un mot.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fanfare.repetee",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

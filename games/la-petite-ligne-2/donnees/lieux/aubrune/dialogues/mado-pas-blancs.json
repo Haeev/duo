@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "mado-pas-blancs",
+  "villager": "mado",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.mado",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Bon. Tu as vu les sabots. Je ne sais pas mentir: je sais taper. Demande-moi autre chose.",
+      "emote": "anger",
+      "next": "n2"
+    },
+    "n2-barnabe-1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Je n'ai rien dit. J'ai juré de ne rien dire. Je hoche la tête: c'est différent.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n2-beurre-1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "C'est le charbon. Un charbon spécial. Au beurre. ... Oh, ça va.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n2": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "barnabe",
+          "text": "C'est Barnabé, le géant pâle ?",
+          "when": [],
+          "effects": [],
+          "next": "n2-barnabe-1"
+        },
+        {
+          "id": "beurre",
+          "text": "Ça sent le beurre chaud, chez toi.",
+          "when": [],
+          "effects": [],
+          "next": "n2-beurre-1"
+        }
+      ]
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Il a honte, mon grand. « Un bûcheron, ça ne fait pas de la brioche. » Voilà ce qu'il dit. Alors il pétrit la nuit, au moulin, en cachette.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ne le dénonce pas à Berthe. Attrape-le en douceur, cette nuit, la main dans la pâte. Qu'il le dise lui-même. Il ne mord pas: il fredonne.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

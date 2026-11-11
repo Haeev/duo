@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "odette-radis-merci",
+  "villager": "odette",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.radis",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "radis",
+      "count": 4
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Quatre radis, les fanes bien vertes ! Ma soupe est sauvée.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Elle mijote cette nuit sous la tonnelle. Le frais de la nuit, c'est le secret. Ne le répète pas: je m'en charge.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

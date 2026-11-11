@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "colette-recette",
+  "villager": "colette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.colette",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "« Mlle Colette Lafon, pensionnat de Hautefonte. » C'est l'écriture de maman. J'avais quatorze ans.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "« Ma grande, tu réclames la tarte du dimanche. La voici, puisque tu ne rentres plus que pour les vacances. »",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Trois pommes, la farine du moulin, un œuf. Et tout en bas: « Le secret, c'est de ne pas ouvrir le four pour vérifier. Fais confiance. »",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-jamais-1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Jamais. Je la refais de mémoire depuis vingt ans. Elle est bonne. Ce n'est pas elle.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-four-1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Toutes les cinq minutes. Je tiens ça de mon père.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "jamais",
+          "text": "Tu ne l'avais jamais eue ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-jamais-1"
+        },
+        {
+          "id": "four",
+          "text": "Et toi, tu ouvrais le four ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-four-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Je la fais ce soir. J'ai les pommes, j'ai la farine. Il me manque deux œufs: Achille rafle tout. Tu m'en trouves ?",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-soupe",
+  "villager": "colette",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.soupe-colette",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une soupe pour moi ? Je me méfie: depuis deux nuits, tout ce qui mijote dans ce bourg finit salé. Reviens avec la marmite, on verra.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

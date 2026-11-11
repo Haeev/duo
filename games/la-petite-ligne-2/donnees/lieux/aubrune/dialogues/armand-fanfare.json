@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "armand-fanfare",
+  "villager": "armand",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.idee",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Oh. Bonjour. J'ai... les archives de l'école. Un cahier: « Fanfare de la halte d'Aubrune, 1961 à 1987. » Vingt-six ans de couacs, notés au crayon.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Un train qui arrive sans fanfare, c'est un train qui arrive. Avec une fanfare, c'est un événement. Pardon. Je m'emporte.",
+      "emote": "idea",
+      "next": "n3"
+    },
+    "n3-diriger-1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Moi ? Devant des gens ? Avec une baguette, je suis quelqu'un d'autre. Enfin, je crois. Je n'ai jamais essayé devant des gens.",
+      "emote": "surprise",
+      "next": "fin"
+    },
+    "n3-instruments-1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Trois, d'après le cahier. Les autres ont été vendus pour payer le dernier banquet.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "diriger",
+          "text": "Tu la dirigerais ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-diriger-1"
+        },
+        {
+          "id": "instruments",
+          "text": "Il reste des instruments ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-instruments-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Le bugle: chez Barnabé, c'était celui de son père. La grosse caisse: à la forge. Le trombone: « tombé au bief, concert du 14 juillet 1986 ».",
+      "emote": null,
+      "next": null
+    }
+  }
+}

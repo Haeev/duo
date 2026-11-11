@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-draisine",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.remise",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "La draisine est rentrée à 19 h 02 hier. Deux minutes de retard. Je note. Je ne dis rien, mais je note.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

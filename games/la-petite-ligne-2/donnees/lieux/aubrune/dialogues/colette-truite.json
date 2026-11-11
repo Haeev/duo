@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-truite",
+  "villager": "colette",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.truite",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une truite de l'aval, là où la berge tourne. Et ne me dis pas ce qu'Odette met dans sa soupe: je gagne à la loyale. ... Des fanes, c'est ça ?",
+      "emote": null,
+      "next": null
+    }
+  }
+}

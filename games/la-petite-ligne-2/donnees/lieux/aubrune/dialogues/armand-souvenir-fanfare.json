@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-fanfare",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Je dirige de dos. Les grenouilles sont un peu vexées: elles, elles avaient droit à mon profil.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

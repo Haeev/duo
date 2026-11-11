@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "les-pas-blancs",
+  "title": "Les pas blancs",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Les pas blancs longent le chemin du Moulin, traversent la Grand-Route sans regarder, et s'arrêtent net. Derrière la forge.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Contre le mur: une paire de sabots, pointure quarante-sept, blancs jusqu'à la cheville. Sur le rebord, un torchon plié sur quelque chose de tiède.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "mado",
+      "text": "Qu'est-ce que tu cherches derrière chez moi ? Des pas blancs ? Chez une forgeronne, tout est noir. Ha ! Ha ! ... Ha.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Mado rit trop fort, et trop longtemps. Elle s'est mise devant le torchon. Ça sent le beurre chaud jusqu'au milieu de la route.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    }
+  ]
+}

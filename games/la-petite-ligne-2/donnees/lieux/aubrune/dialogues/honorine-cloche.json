@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "id": "honorine-cloche",
+  "villager": "honorine",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.honorine",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La Fêlée ? Ce n'est pas moi. À quatre-vingt-neuf ans, je ne grimpe plus aux clochers. Depuis mardi.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "C'est Marthe qui sonne en dormant. Elle est somnambule. Enfin, elle devrait l'être: ça arrangerait mon histoire.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "La robe ? La robe de noces de maman. En 1977, je me remariais. La veille: plus de robe dans l'armoire.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Marthe disait que c'était son tour de la porter. Son tour ! Elle n'avait même pas de fiancé. Elle l'a cachée, voilà tout.",
+      "emote": "anger",
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Demande-lui sa version. Elle sera fausse, mais elle est courte: c'est toujours ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "berthe-brioche",
+  "villager": "berthe",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.brioche"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Mon fantôme pétrit chez Achille, et il me paie la farine en bois fendu. Ma meule est vexée: elle aimait bien avoir de la visite.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "farine",
+          "count": 2
+        },
+        {
+          "type": "give_item",
+          "item": "pain",
+          "count": 1
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Tiens: deux mesures de farine, et un pain de sa première fournée. Il est tressé. Tout ce qu'il touche est tressé, maintenant.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

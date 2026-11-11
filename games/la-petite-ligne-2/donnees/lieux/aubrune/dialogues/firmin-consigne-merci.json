@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "firmin-consigne-merci",
+  "villager": "firmin",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.franc",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "vieille-piece",
+      "count": 1
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Une pièce de 1987. Poids réglementaire. La consigne est ouverte.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Rejoins ta moitié devant la halte: le casier du fond est coincé depuis la fermeture, et je veux des témoins. On ne sait jamais ce qui sort d'un sac.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

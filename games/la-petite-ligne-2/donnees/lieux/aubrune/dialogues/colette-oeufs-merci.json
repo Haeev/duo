@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "colette-oeufs-merci",
+  "villager": "colette",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.oeufs",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "oeuf",
+      "count": 2
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Deux beaux œufs ! Je n'ouvrirai pas le four. Je regarderai par le carreau. Ça ne compte pas, le carreau.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "livre-de-cuisine",
+          "count": 1
+        }
+      ],
+      "next": "a3"
+    },
+    "a3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Tiens: j'ai recopié la lettre dans un cahier. Garde-le. Une recette qui dort trente ans dans un sac, une fois suffit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

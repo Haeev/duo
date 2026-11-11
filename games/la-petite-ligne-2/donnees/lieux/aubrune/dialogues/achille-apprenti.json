@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "achille-apprenti",
+  "villager": "achille",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.parrain",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Mmh ? Barnabé ? Il m'a posé une brioche sur le comptoir ce matin, sans un mot, et il est reparti à reculons.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tressée à quatre. Beurre froid. Pâte reposée... Mmh. Elle a trop travaillé, sa pâte. Comme lui. Mais elle a du cœur.",
+      "emote": "idea",
+      "next": "n3"
+    },
+    "n3-prends-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "À quatre heures du matin, je prends n'importe qui d'éveillé. J'en cherche depuis quinze ans.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-honte-1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Honte ? De nourrir les gens ? Moi, j'ai honte de dormir. Ça ne m'a jamais arrêté.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "prends",
+          "text": "Tu le prends en apprentissage ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-prends-1"
+        },
+        {
+          "id": "honte",
+          "text": "Il a honte de pétrir.",
+          "when": [],
+          "effects": [],
+          "next": "n3-honte-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Dis-lui: demain, quatre heures, par la porte de devant. Pas par derrière. Un boulanger entre par devant, même grand.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

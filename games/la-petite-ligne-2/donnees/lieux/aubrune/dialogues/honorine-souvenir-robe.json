@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-robe",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Jeudi, je monte au clocher. Marthe me pousse. Elle dit « soutient ». Je dis « pousse ». On verra en haut.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

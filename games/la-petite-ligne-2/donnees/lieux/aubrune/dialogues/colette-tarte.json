@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "colette-tarte",
+  "villager": "colette",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.oeufs",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Goûte. ... Voilà. C'est elle. C'est le dimanche de mes huit ans, à la miette près.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "tarte-aux-pommes",
+          "count": 1
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta part. Mange-la, ou offre-la: une tarte aux pommes, ça ouvre bien des portes. Et je n'ai pas ouvert le four. Presque pas.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

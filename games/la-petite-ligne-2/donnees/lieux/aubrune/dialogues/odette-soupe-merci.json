@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "odette-soupe-merci",
+  "villager": "odette",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.soupe-odette",
+      "equals": "ouvert"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "soupe-de-legumes",
+      "count": 1
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "... Oh. Les carottes en gros dés. Maman les coupait comme ça. « Pour qu'on sache ce qu'on mange. »",
+      "emote": "surprise",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Et Colette a goûté la même ? Elle a dit quoi ? Non. Je vais le lui demander. En face. Avec ma louche.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

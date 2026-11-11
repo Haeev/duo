@@ -1,0 +1,416 @@
+{
+  "schema": 1,
+  "id": "le-fantome-du-moulin",
+  "kind": "side",
+  "title": "Le fantôme du moulin",
+  "giver": "berthe",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "ceux-qui-partent",
+      "step": "registre-plein"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "onze-kilos",
+      "title": "Onze kilos de farine",
+      "steps": [
+        {
+          "id": "farine",
+          "objective": "Berthe a fini de compter sa farine. Va la voir dans la cour du moulin, et parle fort: la meule est jalouse.",
+          "target": {
+            "villager": "berthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "berthe-fantome",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.farine",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.farine",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "leon",
+          "objective": "Léon jure qu'il a vu un géant pâle. Fais-le parler: au pré le matin, sur la place l'après-midi.",
+          "target": {
+            "villager": "leon"
+          },
+          "after": ["farine"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "leon-geant",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.leon",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.leon",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "jeanne",
+          "objective": "Jeanne aussi a vu quelque chose au moulin. Elle a sûrement un carnet là-dessus.",
+          "target": {
+            "villager": "jeanne"
+          },
+          "after": ["farine"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "jeanne-geant",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.jeanne",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.jeanne",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "mures",
+          "objective": "Le tarif des témoins: quatre poignées de mûres pour Léon, cueillies aux ronces.",
+          "target": {
+            "villager": "leon"
+          },
+          "after": ["leon", "jeanne"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "mures",
+              "count": 4,
+              "villager": "leon"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.mures",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.mures",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deux-nuits",
+      "title": "Deux nuits de guet",
+      "steps": [
+        {
+          "id": "premier-guet",
+          "objective": "Cette nuit, de 23 h à 2 h, à deux dans la cour du moulin, à la cachette de Léon. Pas un bruit.",
+          "target": {
+            "point": "mc"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "le-geant-pale"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.premier-guet",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.premier-guet",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "piste",
+          "objective": "Au jour, suis les pas blancs: le portail, le chemin du Moulin, la Grand-Route. Ils mènent bien quelque part.",
+          "target": {
+            "point": "gr6"
+          },
+          "done": [
+            {
+              "type": "reach",
+              "point": "gr6",
+              "who": "one",
+              "radius": 4
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.piste",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.piste",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "les-pas-blancs"
+            }
+          ]
+        },
+        {
+          "id": "mado",
+          "objective": "Mado rit trop fort, et elle cache un torchon. Demande-lui gentiment.",
+          "target": {
+            "villager": "mado"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "mado-pas-blancs",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.mado",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.mado",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "second-guet",
+          "objective": "Cette nuit, de 23 h à 2 h, retour au moulin à deux: une personne à la porte, l'autre au portillon. En douceur.",
+          "target": {
+            "point": "mc"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-main-dans-la-pate"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.second-guet",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.second-guet",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-tete-haute",
+      "title": "La tête haute",
+      "steps": [
+        {
+          "id": "parrain",
+          "objective": "Berthe l'a dit: on l'envoie chez un boulanger. Parle de Barnabé à Achille, au fournil.",
+          "target": {
+            "villager": "achille"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "achille-apprenti",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.parrain",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.parrain",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "tablier",
+          "objective": "Barnabé fait les cent pas près du fournil sans oser entrer. Porte-lui la réponse d'Achille.",
+          "target": {
+            "villager": "barnabe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "barnabe-tablier",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.tablier",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.tablier",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-tete-haute"
+            }
+          ]
+        },
+        {
+          "id": "brioche",
+          "objective": "Va dire à Berthe où dort son fantôme, maintenant. Elle a quelque chose pour toi.",
+          "target": {
+            "villager": "berthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "berthe-brioche",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.brioche",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.brioche",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "berthe",
+              "points": 60,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "barnabe",
+              "points": 40,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "leon",
+              "points": 10,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "jeanne",
+              "points": 10,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.fantome.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

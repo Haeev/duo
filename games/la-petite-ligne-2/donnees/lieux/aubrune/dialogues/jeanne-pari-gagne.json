@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "jeanne-pari-gagne",
+  "villager": "jeanne",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Elles se sont dit bonsoir ! Mieux: elles se sont dit « tais-toi ». J'ai gagné mon pari, et c'était contre moi-même.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "fossile-coquille",
+          "count": 1
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Tiens: ma plus belle coquille. Je paie mes dettes. Et la ficelle, on la garde: on ne sait jamais qui d'autre il faudra faire sortir.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -40,6 +40,22 @@
     "home": "gr6",
     "schedule": [
       {
+        "from": 600,
+        "to": 960,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.soupe.concours",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "pl"
+        },
+        "activity": "sortir-sa-marmite",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1320,
         "at": {

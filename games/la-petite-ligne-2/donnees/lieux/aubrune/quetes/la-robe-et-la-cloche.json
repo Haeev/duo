@@ -1,0 +1,384 @@
+{
+  "schema": 1,
+  "id": "la-robe-et-la-cloche",
+  "kind": "side",
+  "title": "La robe et la cloche",
+  "giver": "marthe",
+  "requires": [
+    {
+      "type": "quest_step",
+      "quest": "ceux-qui-partent",
+      "step": "marthe-sonne"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-felee",
+      "title": "La Fêlée",
+      "steps": [
+        {
+          "id": "felee",
+          "objective": "Marthe est contrariée: une cloche sonne sans elle. Va la voir sur le parvis.",
+          "target": {
+            "villager": "marthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-felee",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.felee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.felee",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "honorine",
+          "objective": "Marthe accuse sa sœur. Va demander à Honorine ce qu'elle fait de ses nuits.",
+          "target": {
+            "villager": "honorine"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-cloche",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.honorine",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.honorine",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "version",
+          "objective": "Quarante ans de brouille pour une robe: demande à Marthe sa version. Elle est courte.",
+          "target": {
+            "villager": "marthe"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-robe",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.version",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.version",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "guet",
+          "objective": "Cette nuit, de 22 h à 1 h, à deux sur le parvis: la Fêlée sonne toute seule, et Marthe veut un constat.",
+          "target": {
+            "point": "pv"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-felee-sonne"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.guet",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.guet",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "le-clocher",
+      "title": "Le clocher",
+      "steps": [
+        {
+          "id": "clocher",
+          "objective": "Au jour, à deux sur le parvis: on monte à la chambre des cloches par l'échelle du sonneur.",
+          "target": {
+            "point": "pv"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-robe-dans-le-clocher"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.clocher",
+              "value": "ouvert",
+              "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-robe-dans-le-clocher"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.clocher",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "jeanne",
+          "objective": "Une ficelle, des miettes de biscuit, deux enfants qui regardent ailleurs: va parler à Jeanne.",
+          "target": {
+            "villager": "jeanne"
+          },
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "jeanne-ficelle",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.jeanne",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.jeanne",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "mot-marthe",
+          "objective": "Porte à Marthe le mot de sa mère, trouvé sur la robe.",
+          "target": {
+            "villager": "marthe"
+          },
+          "after": ["jeanne"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "marthe-mot",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.mot-marthe",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.mot-marthe",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "mot-honorine",
+          "objective": "Porte à Honorine le mot de sa mère, trouvé sur la robe.",
+          "target": {
+            "villager": "honorine"
+          },
+          "after": ["jeanne"],
+          "done": [
+            {
+              "type": "talked",
+              "dialogue": "honorine-mot",
+              "node": "fin"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.mot-honorine",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.mot-honorine",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "la-coulee",
+      "title": "La coulée",
+      "steps": [
+        {
+          "id": "bois",
+          "objective": "Un prétexte pour les réunir: refondre la Fêlée. Mado demande quatre bûches pour un feu de deux jours.",
+          "target": {
+            "villager": "mado"
+          },
+          "done": [
+            {
+              "type": "deliver",
+              "item": "buche",
+              "count": 4,
+              "villager": "mado"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.bois",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.bois",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "coulee",
+          "objective": "En journée, à deux devant la forge: une personne au soufflet, l'autre à la louche. Les sœurs donnent la note.",
+          "target": {
+            "point": "gr6"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-coulee"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.coulee",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.robe.coulee",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "marthe",
+              "points": 50,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "honorine",
+              "points": 50,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "mado",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "jeanne",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "leon",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.robe.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

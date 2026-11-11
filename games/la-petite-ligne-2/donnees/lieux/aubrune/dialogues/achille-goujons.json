@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "achille-goujons",
+  "villager": "achille",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.goujons",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Deux goujons du ponton. Des inconnus. Mmh. C'est bien une idée de cafetière: elle sait ce que valent les habitués.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

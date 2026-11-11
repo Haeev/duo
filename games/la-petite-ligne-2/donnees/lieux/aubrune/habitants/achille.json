@@ -45,6 +45,22 @@
     "home": "gr4",
     "schedule": [
       {
+        "from": 1080,
+        "to": 1260,
+        "when": [
+          {
+            "type": "remembered",
+            "key": "aubrune.baronne.affut",
+            "equals": "ouvert"
+          }
+        ],
+        "at": {
+          "point": "i2"
+        },
+        "activity": "guetter-la-baronne",
+        "gesture": null
+      },
+      {
         "from": 420,
         "to": 1080,
         "when": [

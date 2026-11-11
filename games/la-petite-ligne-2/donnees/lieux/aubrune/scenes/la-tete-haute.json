@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "id": "la-tete-haute",
+  "title": "La tête haute",
+  "together": false,
+  "roles": null,
+  "trigger": null,
+  "beats": [
+    {
+      "do": "walk",
+      "who": "barnabe",
+      "to": "gr4"
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Barnabé remonte la Grand-Route en tablier blanc, une brioche tressée dans chaque main. Il marche droit. Il chante, et pas tout bas.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "achille",
+      "text": "À l'heure. Éveillé. Et il chante. Mmh. Ça va me changer.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "barnabe",
+      "text": "Barnabé Tixier. Bûcheron, apprenti boulanger. Dans cet ordre le jour, dans l'autre avant l'aube.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Sur la place, Léon explique qu'il avait reconnu Barnabé dès le début. Jeanne écrit dans son carnet: « Fantôme no 1: résolu. Adresse: la forge. »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fantome.apprenti",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

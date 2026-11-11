@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "marthe-recu",
+  "villager": "marthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.recu",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Un reçu. Signé. Daté d'aujourd'hui. « Trop tard, mais reçu. »",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "...",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Je vais l'encadrer. Dans l'entrée. Qu'on le voie en arrivant.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ne lui dis pas que j'ai souri. Dis-lui que son écriture penche. Elle a toujours penché, son écriture.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "id": "la-sixieme-lettre",
+  "title": "La sixième lettre",
+  "together": true,
+  "roles": {
+    "a": "À l'enveloppe",
+    "b": "Au feuillet"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "Quatre mains propres. Bien. Une personne décachette, l'autre lit. Moi, je regarde ailleurs. Je regarde très mal ailleurs.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La cire craque. Quelque chose de lourd glisse dans ta paume: une clé de fer, plate, graissée, roulée dans du papier de soie.",
+      "emote": null,
+      "sound": "Crac",
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Un feuillet plié en quatre, à l'en-tête de la Compagnie. Trois lignes, d'une écriture droite et sûre. Tu la connais: celle du registre de la cave.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« La draisine est dans la remise. Elle roule si on la pompe à deux. Merci d'avance. É. L. »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "À l'anneau de la clé, une étiquette de laiton: « Remise. Draisine no 2. À rendre au chef de ligne. »",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous échangez à voix haute ce que vous tenez: une clé, un merci. Il manque le milieu de l'histoire.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "« Merci d'avance » ? Ha ! Ha ! ... Pardon. Il attendait des remplaçants, il a écrit d'avance, personne n'est venu. C'est tout bête.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "lucie",
+      "text": "Sauf qu'il a écrit « deux ». Bon. Les gardes, ça va par deux, c'est connu. Voilà. Je file: j'ai du retard sur mon avance.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.draisine.cle",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

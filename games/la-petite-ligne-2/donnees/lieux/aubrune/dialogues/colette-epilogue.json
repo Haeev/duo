@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "colette-epilogue",
+  "villager": "colette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.epilogue",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "tri",
+  "nodes": {
+    "tri": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.baronne.sort",
+              "equals": "friture"
+            }
+          ],
+          "next": "a1"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Relâchée ! Trois générations de Pradel pour la sortir, et vous la remettez à l'eau. C'est idiot. C'est beau. C'est très beau.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Lucie a fait la photo avant. Elle est au mur, à côté du grand-père trempé. Les pêcheurs viendront de loin pour la rater: c'est bon pour le café.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une perche de 1934, entre nous ? Sa petite-fille, plutôt. Et l'anneau traînait au fond: elle l'aura pris hier pour un ver. Mais chut.",
+      "emote": null,
+      "next": null
+    },
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La Baronne en friture ! Tout le bourg à ma table, et Achille qui raconte, les yeux ouverts. Je n'avais jamais vu ses yeux.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "J'ai gardé l'arête pour le mur, sous la photo du grand-père trempé. Ça fait une belle fin, et un bel appétit.",
+      "emote": null,
+      "next": "a3"
+    },
+    "a3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Une perche de 1934, entre nous ? Sa petite-fille, plutôt. Et l'anneau traînait au fond: elle l'aura pris hier pour un ver. Mais chut.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

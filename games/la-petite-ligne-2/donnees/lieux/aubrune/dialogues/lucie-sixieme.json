@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "id": "lucie-sixieme",
+  "villager": "lucie",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.sixieme",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Cinq sur six en une tournée ! Tu as le pied postal. Lent, mais postal. Ha !",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "La sixième. Pas de timbre, pas de dos. Et l'adresse... Écoute bien: « Aux deux nouveaux gardes de la halte d'Aubrune. »",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Déposée le 14 octobre 1987. Ce soir-là, il n'y avait pas de nouveaux gardes. Il n'y en a pas eu avant vous.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-farce-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Une farce de trente ans, cachetée à la cire ? Il faudrait de la suite dans les idées.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4-nous-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "C'est ce que dit l'adresse. Moi, je distribue, je ne discute pas avec les enveloppes.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "farce",
+          "text": "Encore une farce ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-farce-1"
+        },
+        {
+          "id": "nous",
+          "text": "Elle est pour nous, alors.",
+          "when": [],
+          "effects": [],
+          "next": "n4-nous-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Appelle ta moitié. Celle-là, je la remets en mains propres, et il m'en faut quatre. Dépêche: j'ai six minutes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

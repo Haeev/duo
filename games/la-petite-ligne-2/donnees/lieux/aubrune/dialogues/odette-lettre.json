@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "id": "odette-lettre",
+  "villager": "odette",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.odette",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Une lettre ? Pour moi ? De qui ? Non, ne dis rien, je devine. Du notaire. De ma cousine. De... Basile ?",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "...",
+      "emote": "surprise",
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Quatre pages. Il écrit « votre soupe », « vos mains », « le quai à six heures ». Et il a souligné « si vous voulez bien ».",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4-silence-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Marque le jour. Ça n'arrivera pas deux fois.",
+      "emote": null,
+      "next": "n5"
+    },
+    "n4-repondre-1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Par la poste ? Pour que ça mette trente ans ? Ah non.",
+      "emote": null,
+      "next": "n5"
+    },
+    "n4": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "silence",
+          "text": "Odette ? Tu ne dis plus rien.",
+          "when": [],
+          "effects": [],
+          "next": "n4-silence-1"
+        },
+        {
+          "id": "repondre",
+          "text": "Tu vas lui répondre ?",
+          "when": [],
+          "effects": [],
+          "next": "n4-repondre-1"
+        }
+      ]
+    },
+    "n5": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Je sais tout sur tout le monde depuis trente ans. Et ça dormait dans un sac, à cent mètres. Cet âne aurait pu le dire en face.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Dis-lui que dimanche, il y a de la tourte. Pour deux. Il comprendra. Il a tout son temps: il rabote.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

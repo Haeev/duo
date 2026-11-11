@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "lucie-consigne",
+  "villager": "lucie",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.consigne",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Bonjour-bonjour ! J'ai épluché le registre de la Poste. Année 1987: « Un sac en souffrance, consigne de la halte d'Aubrune. »",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "En souffrance ! Trente ans ! Un sac postal ne souffre pas trente ans. Pas dans mon secteur. Ha !",
+      "emote": "anger",
+      "next": "n3"
+    },
+    "n3-ouvrir-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Pas si vite: la consigne est fermée, et la clé est dans la poche de Firmin. Avec tout le reste.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3-dedans-1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Du papier ! C'est ce que je réponds à Odette. À toi, je dis: du papier qui attend.",
+      "emote": null,
+      "next": "fin"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "ouvrir",
+          "text": "Allons l'ouvrir.",
+          "when": [],
+          "effects": [],
+          "next": "n3-ouvrir-1"
+        },
+        {
+          "id": "dedans",
+          "text": "Il y a quoi, dedans ?",
+          "when": [],
+          "effects": [],
+          "next": "n3-dedans-1"
+        }
+      ]
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Demande-lui la clé. À moi, il répond par des numéros d'articles. Toi, il t'aime bien: il te répond par des horaires.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

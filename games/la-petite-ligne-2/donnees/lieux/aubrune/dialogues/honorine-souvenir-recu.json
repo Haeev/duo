@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-recu",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.recu",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle a encadré mon reçu ? Dans l'entrée ? Alors je lui en dois un autre: pour le cadre.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

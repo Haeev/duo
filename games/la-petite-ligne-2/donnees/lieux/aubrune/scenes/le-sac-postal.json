@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "id": "le-sac-postal",
+  "title": "Le sac postal",
+  "together": true,
+  "roles": {
+    "a": "Au casier",
+    "b": "Au registre"
+  },
+  "trigger": null,
+  "beats": [
+    {
+      "do": "walk",
+      "who": "firmin",
+      "to": "gr2"
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "J'ai roulé le casier du fond jusqu'au seuil: dedans, on n'y voit rien. Trente ans qu'il a son cadenas. Je n'ai jamais regardé. Article 19.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Va devant la porte de la halte: le casier cadenassé est sur le seuil.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "gr2",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        },
+        {
+          "role": "b",
+          "hint": "Va devant la porte de la halte: Firmin te tend le registre de la consigne.",
+          "done": [
+            {
+              "type": "reach",
+              "point": "gr2",
+              "who": "one",
+              "radius": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "La clé de Firmin tourne à moitié. La porte du casier a gonflé: il faut tirer, et que quelqu'un tienne le battant.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Registre de la consigne, dernière page: « 14 octobre 1987, 21 h 40. Un sac postal, six plis. Départ par le premier train. »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Dessous, d'une écriture pressée: « Il n'y a pas eu de premier train. »",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Tire la porte du casier: appuie et tiens bon.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 1.5
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Tiens le battant pendant que ta moitié tire: appuie et tiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 1.5
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Le casier cède d'un coup. Un sac de toile grise glisse sur le seuil: plombé, ficelé, intact.",
+      "emote": null,
+      "sound": "Clonk !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu sors les plis un par un. Au dos, les expéditeurs: B. Cornu. M. Bousquet. L. Lafon. F. Lacombe. « Achille, 8 ans ». Le sixième n'a pas de dos.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Tu suis la colonne « destinataire »: Mlle Ferrand. Mme Valade. Mlle C. Lafon, au pensionnat. La Direction. Le Père Noël. La sixième ligne est vide.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous lisez à voix haute, une colonne par bouche. Ce courrier n'est jamais arrivé ici: il n'est jamais parti. Tout le bourg a écrit le même soir.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Six plis. Je signe la décharge. Ce qui se passe après la décharge ne me regarde pas. Surtout le mien.",
+      "emote": "sad",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Lucie passe en courant, sans s'arrêter: « Une lettre en retard revient d'abord à qui l'a écrite ! La sixième, je la garde pour la fin ! Ha ! »",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.lettres.sac-ouvert",
+          "value": true,
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

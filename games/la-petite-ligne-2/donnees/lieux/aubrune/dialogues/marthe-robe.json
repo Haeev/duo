@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "marthe-robe",
+  "villager": "marthe",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.version",
+      "equals": "ouvert"
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ma version est un fait. Honorine avait déjà porté la robe, en 1950. Maman avait dit: la prochaine fois, c'est pour Marthe.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Elle l'a voulue une deuxième fois. La veille, la robe n'était plus là. Elle l'a vendue, ou donnée, pour que je ne l'aie jamais.",
+      "emote": null,
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Quarante ans. Et maintenant, on me sonne la Fêlée la nuit. Veille avec ta moitié, ce soir, sur le parvis. Je veux un constat.",
+      "emote": "anger",
+      "next": null
+    }
+  }
+}
