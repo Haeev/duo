@@ -442,3 +442,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Réplique « une fois par jour et par joueur »: lire le fait daté du moteur `entendu.<lieu>.<dialogue>.j<n>` (`days_since` avec `of: actor`, dialogue `once: null`, priorité 10 ou plus); un `remember` avec `of: actor` n'est pas reconnu par `writable()` de `tests/habitants-aubrune.test.ts`.
 - Un plan `source: villager` ou `quest` n'est connu que par le fait `fabrication.plan.<id>` (effet `remember`); sans lui, l'amélioration ou le meuble est inatteignable. Vérifier qu'un fichier écrit chaque fait lu par un palier (`logement.potager.*`, `logement.poulailler.*`).
 - Un audit se fait sur les données et le code, pas sur les documents d'écriture: plusieurs règles « décrites » (blocage à 0 par `onlyReliefFor`, poules d'Odette) ne sont branchées nulle part.
+
+## Confidences et repas à deux en données (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Enchaîner deux paliers sans toucher au premier: `remembered` sur `dialogues.aubrune.<premier palier>` avec `of: actor` et `equals: true` (le fait vaut le nœud en cours tant que le dialogue n'est pas fini). Par joueur et exact, quel que soit l'ordre des noms de fichiers.
+- Une habitude racontée hors écran (« chaque matin à 6 h 52 ») sera vérifiée par un duo curieux, et le planning dit autre chose: l'écrire au passé, ou sans heure. Vérifier aussi où se tient l'habitant avant un « ferme la porte » (Ambroise est dehors, à `gr7`).
+- Avant d'écrire une confidence sur un duo d'habitants, relire leurs répliques croisées: le torchon de Colette, « je n'avais jamais vu ses yeux », le « trois nouvelles, deux sont vraies » d'Odette et le « trente ans que je rêve d'en redresser un » de Mado étaient déjà écrits; la bonne confidence éclaire une réplique que les joueurs ont entendue vingt fois.
+- `tests/commerces-aubrune.test.ts` achète chaque article dans un monde `lateGame` qui ne pose que quelques faits: un `unlock` nouveau doit lire un de ces faits (`aubrune.acte2.train`, pas `aubrune.acte2.fini`), sinon « locked ».
+- Une recette sans entrée de carnet passe tous les contrôles; l'entrée, elle, ferait échouer le compte épinglé (`COUNTS.recettes` de `tests/collections-aubrune.test.ts`). Le signaler plutôt que toucher au test.
+- Repas à deux: `after` ne va que de la seconde part vers la première; durée par geste: couper 0,6 s, remuer 0,5, dresser 1,2, cuire 1,88, assaisonner 1,56, plus 1 s par étape; total des deux parts entre 15 et 40 s. La maison du garde a un plan de travail et une cuisinière, pas de four.
+- Valeur de « Mains sûres »: hache forgée 120 coups, 4 par chêne, 13 chênes qui repoussent en 3 jours: environ une pierre à aiguiser par semaine. Le bonus dure tant que la faim dépasse 50 (2 points par minute réelle). Toujours compter avant d'écrire qu'un bonus « vaut » tant.
+- Le plan du nichoir (source `quest`) n'est donné par personne et l'objet ne sert à rien: ne pas l'offrir tant qu'il ne se pose pas.

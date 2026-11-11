@@ -8,7 +8,7 @@ Fiches: `games/la-petite-ligne-2/donnees/lieux/aubrune/commerces/`. Chaque comme
 
 | Commerce | Tenu par | Où | Heures | En rayon | Rachète | Plafond par jour |
 |---|---|---|---|---|---|---|
-| Épicerie Ferrand | Odette | comptoir de la boutique, face à la porte de la place | 7 h à 21 h | pomme, farine, grain, graines de radis, de tomate, de carotte et de poireau, plants de pomme de terre, livre de cuisine (avec le réchaud), bœuf (avec le repas de l'acte 3) | ce qui se mange, au prix le plus bas | 20 € |
+| Épicerie Ferrand | Odette | comptoir de la boutique, face à la porte de la place | 7 h à 21 h | pomme, farine, grain, graines de radis, de tomate, de carotte et de poireau, plants de pomme de terre, livre de cuisine (avec le réchaud), bœuf (avec le repas de l'acte 3), tourte du quai (une par semaine, dès le retour du train) | ce qui se mange, au prix le plus bas | 20 € |
 | Fournil Pradel | Achille | comptoir devant le four, à droite en entrant | 7 h à 18 h | pain, tarte aux pommes | œufs (le mieux payé), pommes, mûres, bûches, tartes | 15 € |
 | Café de la Halte | Colette (acte 2) | comptoir au fond de la salle, à droite | 7 h à 22 h | soupe de légumes (plat du jour), omelette | poissons, légumes, œufs, plats cuisinés (le mieux payé) | 85 € |
 | Mercerie Mérigot | Solange | comptoir de la boutique, à l'ouest de la porte | 7 h à 19 h 30 | sac de toile (après les besaces), filet à insectes | coquelicots, vieilles pièces | 10 € |
@@ -65,6 +65,7 @@ Prix de base en euros. « Meilleur rachat » dit où porter l'objet: c'est la le
 | Pain | non | | 1,20 (Fournil) |
 | Farine | non | | 0,80 (Épicerie) |
 | Morceau de bœuf | non | | 3,50 (Épicerie) |
+| Tourte du quai | non | | 12,00 (Épicerie, une par semaine) |
 | Grain (la ration) | non | | 0,10 (Delmas), 0,20 (Épicerie) |
 | Graines de radis (la graine) | non | | 0,20 (Delmas, Épicerie) |
 | Graines de tomate (la graine) | non | | 0,60 (Delmas), 0,80 (Épicerie) |
@@ -100,6 +101,21 @@ Ce qui rapporte reste ce qui se récolte, se pêche ou se pond, borné par le li
 | Soupe de légumes | Colette 3,50, Odette 2,00 | 2,00 et 1,50 | les trois légumes se cultivent depuis le 2026-11-11, mais s'achètent toujours chez les Delmas (4,80 € les trois): à 3,50, deux soupes parfaites rapporteraient 7,00 € de légumes achetés 4,80 €, une boucle d'argent. Le prix reste donc à 2,00 tant que l'étal vend les légumes |
 | Planche | Basile l'achète 1,40 | il la vend 1,60 et ne la rachète pas | aucun plan ne fait de planche |
 | Ferraille, plume, coquille, girolle, insectes, fossile en double | prix prévus | absents | objets à créer, ou sans acheteur |
+
+### La tourte du quai (2026-11-11)
+
+Le repas spécial « Mains sûres » (les outils améliorés ne s'usent pas, tant que la faim reste au-dessus de 50: 25 minutes réelles au repos, 2 points par minute) se prenait gratuitement toutes les 12 heures à un étal de l'épicerie: le bonus était permanent et ne coûtait rien (audit du 11 novembre, B.11). L'étal est retiré; la tourte se cuisine à deux, ou s'achète au prix plein.
+
+| | Valeur | Raison |
+|---|---|---|
+| Recette (`commun/recettes/tourte-du-quai.json`) | plan de travail: 2 farines, 1 œuf (pétrir, saler, foncer le moule); cuisinière: 2 pommes de terre, 1 poireau (émincer, faire fondre, cuire) | « pâte d'Achille, farce d'Odette »: une part par joueur, sur les deux postes de la cuisine de la maison (pas de four chez le garde); la cuisson attend le moule foncé, il faut se le dire |
+| Mini-jeu | 32 s en tout: 14,9 s au plan de travail, 17,2 s à la cuisinière | même gabarit que le pot-au-feu (36 s); bornes du validateur: 15 à 40 s |
+| Ingrédients au prix du rayon | 7,20 € (farine 1,60; œuf 1,00 au prix d'Achille; pommes de terre 2,80 et poireau 1,80 chez les Delmas) | 2,60 € et quelques graines pour un duo qui cultive ses légumes; le pot-au-feu en coûte 11,30 |
+| En rayon chez Odette | 12,00 €, une par semaine (`restockDays` 7), dès le retour du train (`aubrune.acte2.train`) | les autres plats en rayon se vendent au prix de leurs ingrédients (tarte: 4,50 pour 4,50); un repas à bonus se paie 1,7 fois les siens, pour que cuisiner reste le bon choix; « le plat des jours de train » revient avec le train |
+| Rachat | aucun | repas spécial: il ne se revend nulle part, donc aucune boucle d'argent (contrôle « cuisiner puis revendre ») |
+| Ce que le bonus épargne | peu d'argent: une hache forgée tient 120 coups, soit 30 chênes (4 coups par chêne), et la carte en porte 13 qui repoussent en 3 jours: environ une pierre à aiguiser (1,50 €) par semaine | à 12 €, la tourte achetée ne se rembourse jamais: c'est un confort (faim à 100 pour les deux, aucun affûtage) ou un cadeau (Odette et Honorine l'adorent), pas un placement |
+
+Comment on apprend la recette: Odette la donne avec sa seconde confidence, à 4 cœurs (`odette-secret-fil`, `ecriture-habitants.md` section 10). La première Veillée du premier train devait la donner aussi (`ecriture-fetes.md`, section 8): une ligne `give_recipe` à ajouter à la suite de la fête. Odette annonce le rayon une fois par joueur (`odette-souvenir-tourte-en-rayon`): une par semaine, douze euros, à manger à table, à deux.
 
 ## 3. Le revenu d'une journée à deux
 
@@ -212,7 +228,7 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 ## 7. Trois signalements
 
 - L'assembleur du plan (`carte-aubrune/assembler_lieu.py`) n'est plus rejouable tel quel: il réécrit les intérieurs sans les champs ajoutés depuis à la main (`style`, tapis, étage de la pension). Seuls les comptoirs ont été reportés dans les fichiers versionnés.
-- L'étal de l'épicerie donne encore une tourte du quai gratuite toutes les 12 heures (repas spécial): à retirer ou à mettre en rayon.
+- ~~L'étal de l'épicerie donne encore une tourte du quai gratuite toutes les 12 heures.~~ Fait le 2026-11-11 (section 2, « La tourte du quai »): l'étal est retiré de `interieurs/epicerie-rdc.json` (une cagette de légumes à sa place, sous le rayonnage du mur nord); le plan du bourg cite encore `epicerie-etal` (`plan.json`, `carte-aubrune/plan.json`, `plan.md`, `construire_plan.py`): à aligner avant de relancer l'assembleur.
 - Le râtelier de Basile prête des haches de base sans fin: sans danger tant qu'aucun commerçant ne rachète d'outil (le test le garde).
 
 ## 8. Historique des réglages
@@ -222,3 +238,4 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 | 2026-11-11 | Version 1 | première économie d'Aubrune |
 | 2026-11-11 | Rachats: bûche chez Basile 0,60 à 1,40; pierre 0,30 à 0,60; vieille pièce 1,20 à 2,00; radis croquant 1,00 à 2,00 (Café) et 0,80 à 1,40 (Épicerie); omelette 2,20 à 2,80; poissons multipliés par 2,4 (goujon 2,90, ablette 2,40, perche 4,80, tanche 6,00, truite 7,20, brochet 12,00). Plafonds: Basile 12 à 35 €, Colette 45 à 85 €. Pot-au-feu de l'acte 3 conditionné à la cuisine payée. | le client trouve la maison trop lente (cuisine au jour 10, étage au jour 82 pour un duo tranquille) et veut le pot-au-feu dans la cuisine de la maison. Cible: environ deux fois plus vite, 40 à 50 € par jour à l'acte 1. Prix des pièces inchangés (cahier). L'omelette ne peut dépasser 2,89 € sans être rachetée plus cher qu'elle ne se vend (3,50 €, amitié et repas compris), d'où 2,80 €; les œufs crus restent à 1,00 € pour que cuisiner paie toujours. |
 | 2026-11-11 | Collections d'Aubrune: 10 poissons nouveaux rachetés au café (2,00 à 9,60 €), graines de fleurs en rayon (0,30 à 0,50 €), 9 trésors « rares » ajoutés aux fouilles; fleurs, insectes, trésors et nouveaux plats sans rachat. | `collections-aubrune.md`. Le prix moyen d'une prise passe de 4,72 à 4,31 € (plus de poissons communs): duo tranquille 103,30 à 99,40 € (acte 2) et 104,90 à 101,10 € (acte 3); médian et appliqué inchangés (plafond du café). Les fouilles rendent environ 1,50 € de moins par jour en vieilles pièces (non compté par le script). |
+| 2026-11-11 | Tourte du quai: étal gratuit retiré de l'épicerie; recette à deux postes (farine, œuf; pommes de terre, poireau); en rayon chez Odette à 12,00 €, une par semaine, dès le retour du train. | audit B.11: le bonus « Mains sûres » était permanent et gratuit. Aucun effet sur le revenu (la tourte ne se revend pas). |

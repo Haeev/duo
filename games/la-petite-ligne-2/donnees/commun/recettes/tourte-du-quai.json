@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "tourte-du-quai",
+  "name": "Tourte du quai",
+  "station": "counter",
+  "inputs": [
+    {
+      "item": "farine",
+      "count": 2
+    },
+    {
+      "item": "oeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "tourte-du-quai",
+    "count": 1
+  },
+  "seconds": 32,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "stir",
+      "count": 8
+    },
+    {
+      "kind": "season",
+      "count": 2
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ],
+  "second": {
+    "station": "kitchen",
+    "inputs": [
+      {
+        "item": "pomme-de-terre",
+        "count": 2
+      },
+      {
+        "item": "poireau",
+        "count": 1
+      }
+    ],
+    "steps": [
+      {
+        "kind": "chop",
+        "count": 8
+      },
+      {
+        "kind": "heat",
+        "count": 2
+      },
+      {
+        "kind": "heat",
+        "count": 3,
+        "after": 2
+      }
+    ]
+  }
+}
