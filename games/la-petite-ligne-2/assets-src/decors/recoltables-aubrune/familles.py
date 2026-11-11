@@ -908,5 +908,10 @@ FAMILLES = {"arbre": arbre, "buisson": buisson, "rocher": rocher, "fleur": fleur
 
 # Haies, talus de berge, rangs du labour, meubles et ouvrages: `amenagements.py`.
 from amenagements import FAMILLES_AMENAGEMENTS  # noqa: E402
+# Objets d'intérieur: `interieurs.py`; trains vus du dehors: `vehicules.py`.
+from interieurs import FAMILLES_INTERIEURS  # noqa: E402
+from vehicules import FAMILLES_VEHICULES  # noqa: E402
 
 FAMILLES.update(FAMILLES_AMENAGEMENTS)
+FAMILLES.update(FAMILLES_INTERIEURS)
+FAMILLES.update(FAMILLES_VEHICULES)

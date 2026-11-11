@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 import { InkKit, inkifyModel, inkTag, KIND, LAYER } from '../../../../src/rendu/encre/index';
+import { hex } from '../../../../src/rendu/encre/couches';
 import { createFloorMap } from '../../../../src/rendu/encre/sol';
 import { DecorModels } from '../../../../src/rendu/lieu/decors';
 import { DECOR_MANIFEST, variantOf } from '../../../../src/rendu/lieu/decors-manifeste';
@@ -105,6 +106,8 @@ async function start() {
     let triangles = 0;
     const missing = [];
     const files = new Map();
+    // Lampes des modèles posés (`light` du manifeste), si la vue les demande (`lumieres`).
+    const lamps = [];
     for (const item of vue.objets) {
       // Vues de famille: le modèle nommé, tel quel (on cherche une clé qui ne tire pas une autre
       // forme). Compositions (`tirage`): la forme, le cap et l'échelle tirés comme en jeu.
@@ -129,8 +132,23 @@ async function start() {
           triangles += (index ? index.count : child.geometry.getAttribute('position').count) / 3;
         }
       });
-      object.position.set(item.x, 0, item.z);
+      // `y`: un objet posé sur un meuble (le plateau qui le porte), comme le rendu l'élèvera.
+      object.position.set(item.x, item.y ?? 0, item.z);
       object.rotation.y = ((item.quart ?? 0) * Math.PI) / 2;
+      const light = DECOR_MANIFEST.models[item.modele]?.light;
+      if (vue.lumieres === true && light !== undefined) {
+        const turn = object.rotation.y;
+        const [lx, ly, lz] = light.at;
+        lamps.push({
+          x: item.x + lx * Math.cos(turn) + lz * Math.sin(turn),
+          y: (item.y ?? 0) + ly,
+          z: item.z - lx * Math.sin(turn) + lz * Math.cos(turn),
+          radius: light.radius,
+          shadow: false,
+          ...(light.color === undefined ? {} : { color: hex(light.color) }),
+          ...(light.gain === undefined ? {} : { gain: light.gain }),
+        });
+      }
       if (item.fusion === undefined) {
         scene.add(object);
         continue;
@@ -169,7 +187,7 @@ async function start() {
     }
     for (const person of vue.silhouettes ?? []) {
       const figure = silhouette(kit.volume);
-      figure.position.set(person.x, 0, person.z);
+      figure.position.set(person.x, person.y ?? 0, person.z);
       figure.rotation.y = person.cap ?? 0;
       scene.add(figure);
     }
@@ -204,7 +222,7 @@ async function start() {
       focusZ: cz,
       viewRadius: Math.hypot(span, depth) / 2,
       toCamera,
-      lights: null,
+      lights: lamps.length > 0 ? { lamps, windows: [] } : null,
       exposure: 1,
       width: w,
       height: h,

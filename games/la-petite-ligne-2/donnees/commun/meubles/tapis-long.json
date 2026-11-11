@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "tapis-long",
+  "name": "Chemin de couloir",
+  "model": "rug-runner",
+  "size": {
+    "w": 3,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": true,
+  "series": null,
+  "bricks": [],
+  "deco": {
+    "layer": "rug",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}

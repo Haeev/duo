@@ -55,7 +55,39 @@ const AHEAD = new Set(['lettre']);
  * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
  * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
  */
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map();
+/** Objets d'intérieur livrés en 3D le 2026-11-11 (`recoltables-aubrune/interieurs.py`), avant leur dessin. */
+const NEW_DECOR = 'modèle 3D livré avant sa vignette: à dessiner par l’artiste 2D';
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map([
+  ['balai', NEW_DECOR],
+  ['banc-de-table', NEW_DECOR],
+  ['bocaux-de-confiture', NEW_DECOR],
+  ['boites-a-provisions', NEW_DECOR],
+  ['bouquet', NEW_DECOR],
+  ['buches-d-interieur', NEW_DECOR],
+  ['cadre-ovale', NEW_DECOR],
+  ['cadre-paysage', NEW_DECOR],
+  ['cadre-portrait', NEW_DECOR],
+  ['caisse-de-legumes', NEW_DECOR],
+  ['corbeille-de-pain', NEW_DECOR],
+  ['etagere-murale', NEW_DECOR],
+  ['horloge-murale', NEW_DECOR],
+  ['journal', NEW_DECOR],
+  ['lampe-a-petrole', NEW_DECOR],
+  ['lampe-de-table', NEW_DECOR],
+  ['panier-a-linge', NEW_DECOR],
+  ['patere', NEW_DECOR],
+  ['pendule', NEW_DECOR],
+  ['pile-de-livres', NEW_DECOR],
+  ['poele', NEW_DECOR],
+  ['pots-de-gres', NEW_DECOR],
+  ['rideau-de-porte', NEW_DECOR],
+  ['seau', NEW_DECOR],
+  ['tabouret-de-ferme', NEW_DECOR],
+  ['tapis-long', NEW_DECOR],
+  ['tapis-rond', NEW_DECOR],
+  ['tonnelet', NEW_DECOR],
+  ['vaisselier', NEW_DECOR],
+]);
 
 describe('vignettes à la plume', () => {
   const ids = svgIds(path.join(OUT, 'vignettes'));

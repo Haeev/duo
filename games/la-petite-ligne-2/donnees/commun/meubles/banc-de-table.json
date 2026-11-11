@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "banc-de-table",
+  "name": "Banc de table",
+  "model": "table-bench",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "sit",
+      "seats": 2,
+      "restPerMinute": 6
+    }
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "indoor",
+    "comfort": 1
+  }
+}
