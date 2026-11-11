@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "ardoise-a-craie",
+  "name": "Ardoise à craie",
+  "model": "chalk-board",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

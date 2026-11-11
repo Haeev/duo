@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "capucine",
   "name": "Capucine",
-  "model": "crop-radis",
+  "model": "crop-capucine",
   "seed": "graines-capucine",
   "seasons": ["spring", "summer"],
   "stages": [2, 2],

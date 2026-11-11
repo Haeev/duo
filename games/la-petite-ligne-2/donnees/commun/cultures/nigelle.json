@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "nigelle",
   "name": "Nigelle de Damas",
-  "model": "crop-radis",
+  "model": "crop-nigelle",
   "seed": "graines-nigelle",
   "seasons": ["spring", "summer"],
   "stages": [2, 2],

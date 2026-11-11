@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "muguet",
   "name": "Muguet",
-  "model": "crop-radis",
+  "model": "crop-muguet",
   "seed": "griffes-de-muguet",
   "seasons": ["spring"],
   "stages": [3, 3],

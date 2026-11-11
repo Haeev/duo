@@ -507,8 +507,9 @@ def _meuble(sorte: str, entree: dict, ctx: Contexte, graine: float, vide: bool) 
     elif sorte.startswith("comptoir"):
         garniture = entree.get("garniture", "buvette")
         if garniture == "cafe":
-            # Petit comptoir de café, une case: dessus de zinc, cafetière et tasses.
-            _comptoir_corps(s, ctx, 0.92, 0.56, 1.0, -0.12, "peint_vert", "metal", "zinc")
+            # Petit comptoir de café, une case: caisson de bois (le vert d'eau sortait de la gamme
+            # chaude du bourg et se lisait comme un meuble moderne), dessus de zinc, cafetière, tasses.
+            _comptoir_corps(s, ctx, 0.92, 0.56, 1.0, -0.12, "bois_meuble", "metal", "zinc")
             _pot(s, -0.2, 1.0, -0.16, 0.08, 0.2, ctx.un("zinc"), contenu=ctx.un("fer"), mat="metal")
             barre(s, (-0.12, 1.12, -0.16), (-0.06, 1.17, -0.16), 0.014, 4, "metal", ctx.un("zinc"))
             for k, x in enumerate((0.08, 0.26)):
@@ -516,8 +517,48 @@ def _meuble(sorte: str, entree: dict, ctx: Contexte, graine: float, vide: bool) 
                 colonne(s, x, -0.05, 1.008, 1.06, 0.038, 6, "vitre", ctx.un("creme"), dessus=ctx.un("cafe"))
             colonne(s, 0.3, -0.28, 1.0, 1.25, 0.04, 6, "vitre", ctx.un("verre_bouteille"))
             notice["top"] = 1.0
+        elif garniture == "fournil":
+            # Vitrine du fournil (2 cases): un bas d'armoire en bois, et dessus une caisse vitrée à
+            # cadre de bois, le pan avant incliné vers le client. Le verre se dit par son cadre et
+            # par deux reflets obliques: les pains restent visibles dedans, de la caméra comme du
+            # client.
+            w, d, h, z0 = 1.9, 0.62, 0.82, -0.1
+            _comptoir_corps(s, ctx, w, d, h, z0, "bois_meuble", "bois", "bois_clair")
+            clair, sombre = ctx.un("bois_clair"), ctx.un("bois_sombre")
+            y0, y1 = h, h + 0.36
+            zf, zb = z0 + d / 2 - 0.02, z0 - d / 2 + 0.06
+            zh = zf - 0.16
+            # Fond plein (côté marchand: les portes coulissantes), montants et traverses.
+            boite(s, -w / 2 + 0.04, w / 2 - 0.04, y0, y1, zb - 0.02, zb, "bois", sombre, sans="y-")
+            for x in (-w / 2 + 0.04, 0.0, w / 2 - 0.04):
+                boite(s, x - 0.025, x + 0.025, y0, y1, zb - 0.02, zb + 0.03, "bois", clair, sans="y-")
+                a = math.atan2(zf - zh, y1 - y0 - 0.06)
+                s.box(0.05, math.hypot(zf - zh, y1 - y0 - 0.06), 0.05, at(x, (y0 + 0.06 + y1) / 2, (zf + zh) / 2, 0, -a), "bois", clair, tremble=0.002)
+            boite(s, -w / 2 + 0.02, w / 2 - 0.02, y0, y0 + 0.06, zf - 0.04, zf + 0.01, "bois", clair, sans="y-")
+            # Traverses du dessus (arrière et avant): entre elles, le verre.
+            boite(s, -w / 2 + 0.02, w / 2 - 0.02, y1 - 0.04, y1, zb - 0.02, zb + 0.05, "bois", clair, sans="y-")
+            boite(s, -w / 2 + 0.02, w / 2 - 0.02, y1 - 0.04, y1, zh - 0.04, zh + 0.02, "bois", clair, sans="y-")
+            for x in (-w / 2 + 0.03, w / 2 - 0.03):
+                boite(s, x - 0.02, x + 0.02, y1 - 0.04, y1, zh, zf, "bois", clair, sans="y-")
+            # Pains sur l'étagère (le bas de la vitrine): miches, couronne, baguettes.
+            for k in range(3):
+                a = k * 2.1 + graine
+                s.galet(0.12, 0.085, 0.1, at(-0.55 + k * 0.22, y0 + 0.01, z0 - 0.02 + 0.06 * (k % 2), a), "fruit", ctx.un("pain", k), graine + k, points=9, pose=0.15)
+            s.tube([(0.18 + 0.14 * math.cos(t / 8 * math.tau), y0 + 0.04, z0 + 0.14 * math.sin(t / 8 * math.tau), 0.04) for t in range(9)], 5, "fruit", ctx.un("pain", 1))
+            for k in range(3):
+                barre(s, (0.42, y0 + 0.04 + 0.05 * k, z0 - 0.18 + 0.12 * k), (0.86, y0 + 0.04 + 0.05 * k, z0 - 0.12 + 0.12 * k), 0.03, 5, "fruit", ctx.un("pain", k + 1), coupe=ctx.un("pain", 2))
+            # Reflets du verre: deux bandes claires obliques sur le dessus et sur le pan avant.
+            glace = ctx.tons("glace")
+            for k, x in enumerate((-0.62, -0.5, 0.3)):
+                larg = 0.07 if k != 1 else 0.035
+                s.morceau([(x, y1 + 0.004, zb + 0.04), (x + larg, y1 + 0.004, zb + 0.04), (x + larg + 0.12, y1 + 0.004, zh - 0.01), (x + 0.12, y1 + 0.004, zh - 0.01)], [(0, 1, 2, 3)], "vitre", glace[k % len(glace)], coeur=(x, y1 - 1, 0))
+                pa, pb = (zh, y1 - 0.03), (zf - 0.02, y0 + 0.07)
+                s.morceau([(x + 0.12, pa[1], pa[0] + 0.006), (x + 0.12 + larg, pa[1], pa[0] + 0.006), (x + 0.2 + larg, pb[1], pb[0] + 0.006), (x + 0.2, pb[1], pb[0] + 0.006)], [(0, 1, 2, 3)], "vitre", glace[(k + 1) % len(glace)], coeur=(x, y0, z0 - 1))
+            notice["top"] = round(y1, 3)
         else:
-            peinture = {"epicerie": "peint_bleu", "fournil": "peint_creme", "mercerie": "peint_rose", "buvette": "bois_meuble"}[garniture]
+            # Comptoirs peints aux tons du bourg (nuancier-v02, aubrune_jour): le vert des volets
+            # pour l'épicerie, la tuile pour la mercerie (le bleu et le rose pastel en sortaient).
+            peinture = {"epicerie": "peint_volet", "mercerie": "peint_tuile", "buvette": "bois_meuble"}[garniture]
             dessus = "zinc" if garniture == "buvette" else "bois_clair"
             _comptoir_corps(s, ctx, 1.9, 0.62, 0.98, -0.1, peinture, "metal" if dessus == "zinc" else "bois", dessus)
             y = 0.98
@@ -531,15 +572,6 @@ def _meuble(sorte: str, entree: dict, ctx: Contexte, graine: float, vide: bool) 
                 for k, x in enumerate((0.1, 0.3, 0.5)):
                     colonne(s, x, -0.22, y, y + 0.22, 0.075, 7, "vitre", ctx.un("bonbons", k), dessus=ctx.un("fer_clair"))
                 s.tube([(0.72, y + 0.01, -0.02, 0.01), (0.72, y + 0.2, -0.02, 0.07)], 5, "etoffe", ctx.un("papier"), bouts=(False, True))
-            elif garniture == "fournil":
-                # Corbeille de miches et baguettes posées en travers.
-                s.tube([(-0.45, y, -0.14, 0.2), (-0.45, y + 0.1, -0.14, 0.24)], 9, "bois", ctx.un("osier"), bouts=(False, False))
-                for k in range(3):
-                    a = k * 2.1 + graine
-                    s.galet(0.12, 0.08, 0.1, at(-0.45 + math.cos(a) * 0.09, y + 0.05, -0.14 + math.sin(a) * 0.08, a), "fruit", ctx.un("pain", k), graine + k, points=9, pose=0.15)
-                for k in range(3):
-                    barre(s, (0.05 + k * 0.05, y + 0.03 + 0.0, -0.3 + k * 0.02), (0.62 + k * 0.05, y + 0.03, -0.12 + k * 0.03), 0.03, 5, "fruit", ctx.un("pain", k + 1), coupe=ctx.un("pain", 2))
-                s.galet(0.13, 0.08, 0.12, at(0.75, y, -0.25, 0.3), "fruit", ctx.un("pain"), graine + 9, points=9, pose=0.15)
             elif garniture == "mercerie":
                 # Coupons de tissu roulés, mètre de bois, bobines.
                 for k in range(3):
@@ -831,6 +863,179 @@ def _assises(s, ctx, r, y0, y1, pans, hauteur_assise, teintes, mat="moellon", z_
     return n
 
 
+def _coteau(s: Atelier, ctx, W, H, prof, graine):
+    """Coteau du tunnel (revue visuelle du 2026-11-11, correction 11): une colline modelée, pas un
+    plan. Derrière le parapet, la crête monte à 9 m puis redescend au nord; de chaque côté, la
+    terre est retenue par les murs en aile (sa surface affleure leur couronnement) et descend vers
+    la voie en flancs; elle s'efface au pré à 15 m de l'axe. Normales lissées (relief lu par
+    l'ombre), terre nue là où la pente est raide, rochers et arbustes posés sur la surface."""
+    angle_mur, long_mur = 0.5, 3.0
+    z_mur0 = prof / 2
+    z_mur1 = z_mur0 + long_mur * math.cos(angle_mur)
+    bord = W / 2 + 0.05
+    loin = 15.0
+
+    def couronne(z):
+        """Bord intérieur de la terre au-dessus d'un mur en aile, et sa hauteur."""
+        zz = min(max(z, z_mur0), z_mur1)
+        x = W / 2 + 0.25 + (zz - z_mur0) * math.tan(angle_mur) - 0.27
+        part = (zz - z_mur0) / (z_mur1 - z_mur0)
+        h = H * 0.85 + (0.9 - H * 0.85) * part + 0.03
+        return x, h
+
+    # Rangs (z) et profil de la crête au fil de z: derrière le portail, puis devant (flancs).
+    arriere = [(-14.0, 0.0), (-11.0, 4.6), (-8.0, 7.6), (-5.5, 8.8), (-3.5, 9.0), (-2.0, 8.7), (-prof / 2, H + 0.72)]
+    devant = [(prof / 2, None), (1.3, None), (2.2, None), (z_mur1, None), (3.9, 0.45), (4.7, 0.0)]
+    parts = (0.0, 0.07, 0.18, 0.34, 0.54, 0.76, 1.0)
+    centre = (-3.0, -1.0, 1.0, 3.0)
+
+    def chute(t):
+        return 0.5 * (1 + math.cos(math.pi * min(1.0, max(0.0, t)) ** 1.25))
+
+    lignes = []
+    for z, crete in arriere:
+        ligne = []
+        for sgn in (-1, 1):
+            for t in parts:
+                ligne.append((sgn * (bord + t * (loin - bord)), crete * chute(t), z))
+        ligne += [(x, crete, z) for x in centre]
+        lignes.append(sorted(ligne))
+    for z, fin in devant:
+        x_in, h_in = couronne(z)
+        if fin is not None:
+            h_in = fin
+            x_in += (z - z_mur1) * 0.6
+        ligne = []
+        for sgn in (-1, 1):
+            for t in parts:
+                ligne.append((sgn * (x_in + t * (loin - x_in)), h_in * chute(t), z))
+        lignes.append(sorted(ligne))
+    # Tissu: les rangs de derrière ont 18 colonnes, ceux de devant 14 (pas de terre sur la voie).
+    v, faces, couleurs = [], [], []
+    herbe = ctx.tons("gazon_berge")
+    terre = ctx.tons("terre_berge")
+    debut = []
+    for ligne in lignes:
+        debut.append(len(v))
+        v += ligne
+    n_ar = len(arriere)
+    for r in range(len(lignes) - 1):
+        a, b = lignes[r], lignes[r + 1]
+        ia, ib = debut[r], debut[r + 1]
+        if len(a) == len(b):
+            paires = [(i, i) for i in range(len(a) - 1)] if r < n_ar - 1 else [(i, i) for i in range(len(a) - 1) if i != len(a) // 2 - 1]
+        else:
+            # Raccord du rang du portail (18 colonnes) au premier rang de devant (14): les
+            # colonnes du centre s'arrêtent au parapet.
+            k = len(parts)
+            paires = [(i, i) for i in range(k - 1)] + [(len(a) - k + i, len(b) - k + i) for i in range(k - 1)]
+        for i, j in paires:
+            quad = (ia + i, ia + i + 1, ib + j + 1, ib + j)
+            faces.append(quad)
+            p = np.array([v[q] for q in quad])
+            n = np.cross(p[2] - p[0], p[3] - p[1])
+            raide = abs(n[1]) / (np.linalg.norm(n) + 1e-9) < 0.62
+            g = graine + r * 7.3 + i * 3.1
+            couleurs.append(terre[int(tirage(g) * len(terre)) % len(terre)] if raide else herbe[int(tirage(g) * len(herbe)) % len(herbe)])
+    s.morceau(v, faces, "gazon", couleurs, coeur=(0, -30, -4), lisse=True)
+    # Rochers qui percent la terre (le coteau est de pierre sous l'herbe), arbustes et deux
+    # jeunes arbres: posés sur des sommets du tissu, enfoncés pour ne jamais flotter.
+    pierres = ctx.tons("pierre_claire")
+    haie = ctx.tons("haie")
+    places = []
+    for r, ligne in enumerate(lignes):
+        for i, p in enumerate(ligne):
+            if 0.6 < p[1] < 9.5 and abs(p[0]) < 13.5 and p[2] > -12:
+                places.append((r, i, p))
+    for k, (r, i, p) in enumerate(places):
+        g = graine + k * 5.7
+        tir = tirage(g)
+        x, y, z = p
+        if tir < 0.2:
+            rr = entre(0.35, 0.7, g + 1)
+            s.galet(rr * 1.3, rr * 0.8, rr, at(x + penche(g, 0.3), y - rr * 0.35, z + penche(g + 2, 0.3), g), "pierre", pierres[k % len(pierres)], g, points=11, dessus=ctx.un("pierre_dessus"), pose=0.2)
+        elif tir < 0.52:
+            rr = entre(0.45, 0.8, g + 3)
+            bosse(s, x + penche(g, 0.4), y - 0.15, z + penche(g + 4, 0.4), rr, rr * 1.15, g, haie[k % len(haie)], pans=5, dessus=haie[(k + 2) % len(haie)])
+    for sgn, (x, z) in ((-1, (-8.0, -3.6)), (1, (9.2, -5.4))):
+        y = next(p[1] for ligne in lignes for p in ligne if abs(p[0] - x) < 1.6 and abs(p[2] - z) < 1.1)
+        s.tube([(x, y - 0.2, z, 0.16), (x + 0.1 * sgn, y + 1.6, z, 0.1)], 5, "ecorce", ctx.un("ecorce_chene"), bouts=(False, True))
+        for k in range(3):
+            a = graine + k * 2.1
+            bosse(s, x + math.cos(a) * 0.5, y + 1.3 + 0.45 * (k == 2), z + math.sin(a) * 0.5, 0.95, 1.4, graine * 3 + k, haie[k % len(haie)], pans=6, dessus=haie[(k + 1) % len(haie)])
+
+
+# ====================================================================== voie en tranchée (modules)
+def _voie_profil(talus: bool):
+    """Profil en travers d'une voie (x, y), de l'ouest à l'est: épaulement de ballast sous les
+    traverses du jeu (lit de 2,9 m, dessus au ras du sol, sous les 12 cm des traverses), banquette,
+    fossé d'eau, puis le talus de tranchée (1,6 m de haut) ou le pré."""
+    demi = [(1.3, 0.035), (1.6, 0.05), (2.05, 0.0), (2.35, 0.0), (2.55, 0.0), (2.9, 0.0), (3.1, 0.12)]
+    if talus:
+        # Le talus monte à 1,6 m puis redescend au pré par son revers: aucun bord ouvert.
+        demi += [(3.9, 0.7), (4.8, 1.35), (5.5, 1.6), (6.3, 1.05), (7.2, 0.0)]
+    else:
+        demi += [(3.5, 0.06)]
+    return [(-x, y) for x, y in reversed(demi)] + demi
+
+
+def voie(entree: dict, ctx: Contexte) -> list[dict]:
+    """Module de voie, un mètre le long de z, posé bout à bout sous les rails du jeu (le jeu dessine
+    traverses et rails; le module dessine ce qui les porte et les draine). `sorte`: "tranchee"
+    (talus des deux côtés, la voie entre dans le coteau du tunnel) ou "remblai" (voie au ras du
+    pré, fossés seulement). Les deux bouts ont le même profil sans tremblé: les modules se suivent."""
+    out = []
+    formes = [{"suffixe": "", "graine": entree["graine"]}] + [{"suffixe": "-" + v["suffixe"], "graine": v["graine"]} for v in entree.get("variantes", [])]
+    ids = [entree["id"] + f["suffixe"] for f in formes]
+    talus = entree["sorte"] == "tranchee"
+    profil = _voie_profil(talus)
+    ballast = ctx.tons("ballast")
+    herbe = ctx.tons("gazon_berge")
+    terre = ctx.tons("terre_berge")
+    eau = ctx.un("eau_sombre")
+    for f in formes:
+        g = f["graine"]
+        s = Atelier(g)
+        v, faces, couleurs = [], [], []
+        for z in (-0.5, 0.5):
+            v += [(x, y, z) for x, y in profil]
+        n = len(profil)
+        for i in range(n - 1):
+            faces.append((i, i + 1, n + i + 1, n + i))
+            xm = abs((profil[i][0] + profil[i + 1][0]) / 2)
+            if xm < 2.05:
+                couleurs.append(ballast[(i + int(g)) % len(ballast)])
+            elif 2.35 < xm < 2.9:
+                couleurs.append(eau)
+            elif xm < 3.1:
+                couleurs.append(terre[i % len(terre)])
+            else:
+                couleurs.append(herbe[(i + int(g)) % len(herbe)])
+        # Normales tirées du seul profil (lisse par sommet en travers): deux modules se raccordent.
+        s.morceau(v, faces, "terre", couleurs, coeur=(0, -20, 0), lisse=True)
+        # Cailloux du ballast sur l'épaulement, et quelques pierres au pied du talus.
+        for k in range(6):
+            sgn = -1 if k % 2 else 1
+            x = sgn * entre(1.35, 1.95, g + k * 2.3)
+            z = entre(-0.4, 0.4, g + k * 4.1)
+            rr = entre(0.05, 0.08, g + k)
+            s.galet(rr, rr * 0.6, rr, at(x, 0.02, z, k), "pierre", ballast[k % len(ballast)], g + k, points=7, pose=0.3)
+        if talus:
+            for k in range(3):
+                sgn = -1 if k % 2 else 1
+                x = sgn * entre(3.3, 4.6, g + k * 3.7)
+                z = entre(-0.35, 0.35, g + k * 1.9)
+                y = float(np.interp(abs(x), [p[0] for p in profil[n // 2:]], [p[1] for p in profil[n // 2:]]))
+                if tirage(g + k * 9.1) < 0.5:
+                    rr = entre(0.14, 0.24, g + k)
+                    s.galet(rr * 1.2, rr * 0.7, rr, at(x, y - rr * 0.3, z, k), "pierre", ctx.un("pierre_claire", k), g + k, points=9, pose=0.25)
+                else:
+                    bosse(s, x, y - 0.06, z, 0.24, 0.3, g * 3 + k, ctx.un("haie", k), mat="feuillage", pans=5, borne=None)
+        notice = "un mètre de voie en tranchée: ballast sous les traverses du jeu, fossés d'eau, talus de 1,6 m" if talus else "un mètre de voie au ras du pré: ballast et fossés"
+        out.append(_modele(entree["id"] + f["suffixe"], s, states={}, variants=[i for i in ids if i != entree["id"]] if f["suffixe"] == "" else [], pourquoi=notice))
+    return out
+
+
 def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
     sorte = entree["sorte"]
     g = entree["graine"]
@@ -1021,22 +1226,9 @@ def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
             fs = [(0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7), (4, 5, 6, 7)]
             with s.groupe(at(x, 0, prof / 2, sgn * 0.5) @ at(-x, 0, -prof / 2)):
                 s.morceau(pts, fs, "moellon", mo)
-        # Talus de terre et d'herbe au-dessus du portail: le coteau que le tunnel traverse.
-        herbe = ctx.tons("gazon_berge")
-        v3 = [(-W / 2 - 1.2, 0.0, -prof / 2), (W / 2 + 1.2, 0.0, -prof / 2), (-W / 2 - 1.2, H + 0.7, -prof / 2), (W / 2 + 1.2, H + 0.7, -prof / 2),
-              (-W / 2 - 1.2, H + 1.3, -3.4), (W / 2 + 1.2, H + 1.3, -3.4)]
-        s.morceau(v3, [(2, 3, 5, 4)], "gazon", herbe[0], coeur=(0, 0, 0))
-        # Le coteau redescend de chaque côté jusqu'au haut des murs en aile, puis au pré: la tête
-        # du tunnel est enfoncée dans la colline, pas posée seule dans l'herbe.
-        for sgn in (-1, 1):
-            a = (sgn * (W / 2 + 1.2), H + 0.7, -prof / 2)
-            b = (sgn * (W / 2 + 1.2), H + 1.3, -3.4)
-            e = (sgn * (W / 2 + 0.35), H * 0.85 + 0.05, prof / 2 - 0.1)
-            f = (sgn * (W / 2 + 1.75), 0.95, prof / 2 + 2.6)
-            g2 = (sgn * (W / 2 + 2.6), 0.0, prof / 2 + 3.2)
-            h2 = (sgn * (W / 2 + 7.0), 0.0, -3.4)
-            pts = [a, b, e, f, g2, h2]
-            s.morceau(pts, [(0, 1, 5), (0, 5, 2), (2, 5, 3), (3, 5, 4)], "gazon", herbe[1 % len(herbe)], coeur=(sgn * 3.0, -4.0, -1.5))
+        # Le coteau que le tunnel traverse, en volume: il monte derrière le parapet, redescend en
+        # flancs sur les murs en aile, porte rochers et arbustes.
+        _coteau(s, ctx, W, H, prof, entree["graine"])
         return [_modele(entree["id"], s, states={}, variants=[], pourquoi=entree.get("pourquoi"))]
     if sorte == "pigeonnier":
         # Pigeonnier carré de 3,4 m: rez de moellons, étage enduit, bandeau de pierre qui arrête les
@@ -1081,4 +1273,4 @@ def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
     raise SystemExit(f"{entree['id']}: sorte d'ouvrage inconnue « {sorte} »")
 
 
-FAMILLES_AMENAGEMENTS = {"haie": haie, "talus": talus, "rang": rang, "meuble": meuble, "luminaire": luminaire, "ouvrage": ouvrage}
+FAMILLES_AMENAGEMENTS = {"haie": haie, "talus": talus, "rang": rang, "voie": voie, "meuble": meuble, "luminaire": luminaire, "ouvrage": ouvrage}

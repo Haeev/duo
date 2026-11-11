@@ -29,6 +29,8 @@ luminaire = "aubrune-luminaires"
 ouvrage = "aubrune-ouvrages"
 objet = "aubrune-objets"
 vehicule = "aubrune-trains"
+fete = "aubrune-fetes"
+voie = "aubrune-lisieres"
 
 # Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
 [budgets]
@@ -53,6 +55,10 @@ ouvrage = 2500
 # Objets d'intérieur: 150 (300 pour les gros, `budget` de l'entrée). Un train: 2 500 par véhicule.
 objet = 150
 vehicule = 2500
+# Décor des fêtes (meubles du dehors posés un jour de fête): comme un meuble.
+fete = 600
+# Voie en tranchée: module de 1 m le long de la voie, mais large (ballast, fossés, talus).
+voie = 240
 
 # ---------------------------------------------------------------- matériaux (noms stables)
 # Le rendu encré tire du NOM la couche de traits et la prise au vent (`nature`: leaf = feuillage
@@ -197,6 +203,41 @@ carotte = ["#D97A2E"]
 tresse = ["#B0604C", "#7C9DB0", "#E6D6B2", "#96A98C"]
 reliure = ["#7A3B32", "#3F5A6E", "#5E6E3E", "#8A6444"]
 encre_journal = ["#9A9184"]
+# Potager: légumes du concours de la soupe (carotte, poireau, pomme de terre).
+fanes = ["#7FA84A", "#6F9A42", "#93B85A"]
+poireau_feuille = ["#94B48C", "#86A882", "#A3C198"]
+poireau_fut = ["#EDE8D4", "#DCD6BC"]
+feuille_patate = ["#6E9244", "#5F8240", "#7FA14E"]
+fleur_patate = ["#F3EDE0", "#E6DCEF"]
+# Fleurs des collections (couleurs de collections-aubrune-assets.md).
+capucine = ["#E07A2E", "#D9682A", "#E8963A"]
+feuille_capucine = ["#9CBF6A", "#8BB05E", "#ADCB7A"]
+souci = ["#E8962A", "#F0B83A"]
+pensee = ["#5E3F86", "#E8C24A"]
+giroflee = ["#B5523A", "#C98A3A", "#A8452F"]
+bleuet = ["#4F7CC4", "#5E8BD0"]
+feuille_grise = ["#8FA58A", "#7F9A7E", "#A0B49A"]
+tournesol = ["#E8B832", "#F0C445"]
+coeur_tournesol = ["#5A3A22"]
+nigelle = ["#7FA6DE", "#6F98D4"]
+marguerite = ["#F5F0E4", "#EFE8D8"]
+muguet = ["#F7F3E8"]
+violette = ["#6E4A9A", "#7C58A8"]
+oeillet = ["#B8323A", "#A82C38"]
+rose_ancienne = ["#EDB8BC", "#F2C8C6"]
+coeur_rose = ["#D98A96"]
+feuille_rosier = ["#4E6E3A", "#5A7A42", "#46663A"]
+# Fêtes.
+terre_cuite = ["#C26E4A", "#B5603E"]
+coquille = ["#F3EAD8"]
+cire = ["#F0E2B0"]
+lampions = ["#D2523F", "#E3B24A", "#E8963A", "#F3EDE0"]
+craie = ["#EDE9DF"]
+# Comptoirs peints, ramenés au nuancier du bourg (nuancier-v02, aubrune_jour): le vert des volets
+# et la tuile, au lieu du bleu et du rose pastel.
+peint_volet = ["#638784"]
+peint_tuile = ["#AD6244"]
+ballast = ["#9C958A", "#8A8378", "#ABA498"]
 
 # ---------------------------------------------------------------- essences d'arbres
 # `fut`: hauteur du tronc jusqu'à la fourche, rayon au pied, pans. `houppier`: forme (rond, ovale,
@@ -473,6 +514,226 @@ fruit_vert = "tomate_verte"
 fleur = "fleur_tomate"
 graine = 379
 
+# Légumes du panier du concours de la soupe. Leur fiche de culture n'existe pas encore: `stades`
+# en tient lieu (la fiche le remplacera). Ports de `plantes.py`: `fanes` (touffe fine et dressée,
+# épaule orange à maturité), `eventail` (feuilles plates dans un seul plan, fût blanc),
+# `touffe` (butte de feuillage, fleurs, puis fanes jaunies et tubercules au pied).
+[[modeles]]
+id = "crop-carotte"
+famille = "culture"
+culture = "carotte"
+stades = 3
+port = "fanes"
+plants = 6
+hauteur = 0.32
+fruit = "carotte"
+graine = 383
+
+[[modeles]]
+id = "crop-poireau"
+famille = "culture"
+culture = "poireau"
+stades = 3
+port = "eventail"
+plants = 6
+hauteur = 0.55
+fruit = "poireau_fut"
+graine = 389
+
+[[modeles]]
+id = "crop-pomme-de-terre"
+famille = "culture"
+culture = "pomme-de-terre"
+stades = 3
+port = "touffe"
+plants = 3
+hauteur = 0.45
+fruit = "patate"
+graine = 397
+
+# Fleurs des collections (port `fleur` de `plantes.py`): levée, feuillage, bouton coloré, fleur.
+# `forme`: silhouette de la fleur vue de haut (etoile, marguerite, capitule, pompon, pensee, coupe,
+# cornet, collerette, frange, rose, grappe, clochettes). `feuillage`: lance (couronne de feuilles,
+# par défaut), ronde, larges, fines, buisson. `fleurs`: têtes par plant; `rayon`: d'une tête (m);
+# `corolle`, `coeur`, `feuille`: teintes. Hauteur en fleur: celle de la fiche des collections.
+[[modeles]]
+id = "crop-capucine"
+famille = "culture"
+culture = "capucine"
+port = "fleur"
+forme = "cornet"
+feuillage = "ronde"
+plants = 3
+hauteur = 0.3
+fleurs = 3
+rayon = 0.07
+corolle = "capucine"
+coeur = "bouton_or"
+feuille = "feuille_capucine"
+graine = 1003
+
+[[modeles]]
+id = "crop-souci"
+famille = "culture"
+culture = "souci"
+port = "fleur"
+forme = "pompon"
+plants = 3
+hauteur = 0.4
+fleurs = 1
+rayon = 0.085
+corolle = "souci"
+coeur = "coeur_tournesol"
+graine = 1009
+
+[[modeles]]
+id = "crop-pensee"
+famille = "culture"
+culture = "pensee"
+port = "fleur"
+forme = "pensee"
+plants = 6
+hauteur = 0.15
+fleurs = 1
+rayon = 0.065
+corolle = "pensee"
+coeur = "noir"
+graine = 1013
+
+[[modeles]]
+id = "crop-giroflee"
+famille = "culture"
+culture = "giroflee"
+port = "fleur"
+forme = "grappe"
+plants = 3
+hauteur = 0.4
+fleurs = 2
+rayon = 0.04
+corolle = "giroflee"
+graine = 1019
+
+[[modeles]]
+id = "crop-bleuet"
+famille = "culture"
+culture = "bleuet"
+port = "fleur"
+forme = "etoile"
+feuillage = "fines"
+plants = 3
+hauteur = 0.6
+fleurs = 3
+ecart = 0.13
+rayon = 0.07
+corolle = "bleuet"
+coeur = "fond"
+feuille = "feuille_grise"
+graine = 1021
+
+[[modeles]]
+id = "crop-tournesol"
+famille = "culture"
+culture = "tournesol"
+port = "fleur"
+forme = "capitule"
+plants = 2
+hauteur = 1.6
+rayon = 0.21
+corolle = "tournesol"
+coeur = "coeur_tournesol"
+graine = 1031
+
+[[modeles]]
+id = "crop-nigelle"
+famille = "culture"
+culture = "nigelle"
+port = "fleur"
+forme = "collerette"
+feuillage = "fines"
+plants = 3
+hauteur = 0.45
+fleurs = 2
+rayon = 0.08
+corolle = "nigelle"
+coeur = "tige"
+graine = 1033
+
+[[modeles]]
+id = "crop-marguerite"
+famille = "culture"
+culture = "marguerite"
+port = "fleur"
+forme = "marguerite"
+plants = 3
+hauteur = 0.5
+fleurs = 2
+rayon = 0.085
+corolle = "marguerite"
+coeur = "bouton_or"
+graine = 1039
+
+[[modeles]]
+id = "crop-muguet"
+famille = "culture"
+culture = "muguet"
+port = "fleur"
+forme = "clochettes"
+feuillage = "larges"
+plants = 6
+hauteur = 0.26
+rayon = 0.04
+corolle = "muguet"
+graine = 1049
+
+[[modeles]]
+id = "crop-violette"
+famille = "culture"
+culture = "violette"
+port = "fleur"
+forme = "coupe"
+plants = 6
+hauteur = 0.12
+fleurs = 2
+ecart = 0.07
+rayon = 0.05
+corolle = "violette"
+coeur = "creme"
+graine = 1051
+
+[[modeles]]
+id = "crop-oeillet-de-poete"
+famille = "culture"
+culture = "oeillet-de-poete"
+port = "fleur"
+forme = "frange"
+plants = 3
+hauteur = 0.45
+fleurs = 1
+rayon = 0.085
+corolle = "oeillet"
+coeur = "creme"
+graine = 1061
+
+# Un rosier par case (1 m en fleur): buisson et roses, plus que le budget d'un petit plant.
+[[modeles]]
+id = "crop-rose-des-lacombe"
+famille = "culture"
+culture = "rose-des-lacombe"
+port = "fleur"
+forme = "rose"
+feuillage = "buisson"
+plants = 1
+hauteur = 1.0
+fleurs = 4
+ecart = 0.26
+tige = 0.012
+rayon = 0.085
+corolle = "rose_ancienne"
+coeur = "coeur_rose"
+feuille = "feuille_rosier"
+budget = 260
+graine = 1063
+
 # ================================================================ aménagements (amenagements.py)
 # Modules de lisière, de 1 m, posés case par case. Le module court d'ouest en est (x); ses deux
 # bouts ont le même profil quelle que soit la forme: n'importe quelle suite de formes se raccorde.
@@ -505,6 +766,22 @@ id = "field-row"
 famille = "rang"
 graine = 433
 variantes = [{ suffixe = "b", graine = 439 }]
+
+# Voie: un mètre le long de z, posé bout à bout sous les traverses et les rails que le jeu
+# dessine (lit de ballast, fossés d'eau). `tranchee`: talus de 1,6 m des deux côtés, à l'approche
+# du tunnel; `remblai`: au ras du pré (la lisière, la halte). Pas encore posés par le moteur.
+[[modeles]]
+id = "rail-cutting"
+famille = "voie"
+sorte = "tranchee"
+graine = 441
+variantes = [{ suffixe = "b", graine = 447 }]
+
+[[modeles]]
+id = "rail-bed"
+famille = "voie"
+sorte = "remblai"
+graine = 451
 
 # ---------------------------------------------------------------- meubles (fiches de donnees/commun/meubles)
 # Origine au centre de l'emprise de la fiche; avant vers +z: le côté d'où l'on s'en sert.
@@ -558,7 +835,7 @@ famille = "meuble"
 sorte = "comptoir"
 garniture = "fournil"
 graine = 479
-pourquoi = "comptoir du fournil: corbeille de miches et baguettes"
+pourquoi = "vitrine du fournil: bas de bois, caisse vitrée à cadre de bois et dessus de verre, les pains dedans, vus du client et de la caméra"
 
 [[modeles]]
 id = "comptoir-mercerie"
@@ -670,6 +947,94 @@ sorte = "lanterne-murale"
 graine = 619
 lumiere = { rayon = 3.6 }
 pourquoi = "lanterne de porte sur sa potence (2,3 m): elle dit qu'une maison est ouverte et éclaire le seuil"
+
+# ---------------------------------------------------------------- décor des fêtes (fetes.py)
+# Meubles du dehors posés un jour de fête (fiches de donnees/commun/meubles, lus sur
+# `aubrune.fete.jour`). Origine au centre de l'emprise, avant vers +z. Ce qui brûle est en
+# `flamme` et `lumiere` donne la flaque, comme les lanternes. Ajouter: copier l'entrée de la même
+# `sorte`, changer `id` et `graine`, puis une fiche voisine avec `"model": "<id>"`.
+[[modeles]]
+id = "festival-candle"
+famille = "fete"
+sorte = "lumignon"
+graine = 1201
+lumiere = { rayon = 1.8, couleur = "#F2A65A", force = 0.55 }
+pourquoi = "lumignon de la Nuit des lumignons: cire coulée dans une coquille d'œuf, sur une soucoupe; une lumière par âme, posée là où elle compte"
+
+[[modeles]]
+id = "lampion-garland"
+famille = "fete"
+sorte = "guirlande"
+graine = 1203
+lumiere = { rayon = 4.0, couleur = "#F2B46A", force = 0.5 }
+pourquoi = "guirlande de lampions (4 cases): poteau à l'ouest, sept lampions jusqu'au poteau suivant; 2,4 m au plus bas, on passe dessous"
+
+[[modeles]]
+id = "lampion-pole"
+famille = "fete"
+sorte = "poteau-guirlande"
+graine = 1207
+pourquoi = "poteau qui ferme une file de guirlandes à l'est"
+
+[[modeles]]
+id = "bandstand"
+famille = "fete"
+sorte = "estrade"
+graine = 1209
+budget = 1100
+pourquoi = "estrade de la fanfare (4 x 3 cases): plancher à 60 cm, marches devant, cordon de fanions, chaises, pupitres et grosse caisse"
+
+[[modeles]]
+id = "festival-cauldron"
+famille = "fete"
+sorte = "grande-marmite"
+graine = 1213
+etats = ["bare"]
+lumiere = { rayon = 3.2, couleur = "#E2843A", force = 0.75 }
+pourquoi = "grand chaudron du concours de la soupe (2 x 2 cases), pendu au trépied au-dessus d'un feu cerclé de pierres"
+
+[[modeles]]
+id = "brazier"
+famille = "fete"
+sorte = "brasero"
+graine = 1217
+lumiere = { rayon = 3.6, couleur = "#E2843A", force = 0.8 }
+pourquoi = "brasero de Mado sur le quai, la veillée d'hiver: on s'y chauffe les mains, les pommes de terre cuisent dans la braise"
+
+[[modeles]]
+id = "crossing-gate-flowered"
+famille = "fete"
+sorte = "lisse-fleurie"
+graine = 1223
+pourquoi = "lisse du passage à niveau baissée en travers de la route (5 cases), enroulée de fleurs: la Fête des barrières fleuries"
+
+[[modeles]]
+id = "festival-banner"
+famille = "fete"
+sorte = "banderole"
+graine = 1229
+pourquoi = "banderole tendue entre deux perches (4 cases) au-dessus du passage: le nom de la fête, face au sud"
+
+[[modeles]]
+id = "banquet-table"
+famille = "fete"
+sorte = "table-banquet"
+graine = 1231
+pourquoi = "grande table du banquet (3 cases): nappe, bols de soupe, pain, pichets, la tourte au milieu; les bancs à côté"
+
+[[modeles]]
+id = "tapped-barrel"
+famille = "fete"
+sorte = "tonneau-en-perce"
+graine = 1237
+pourquoi = "tonneau de cidre du café mis en perce sur la route: debout sur son chantier, robinet devant, cruche dessous"
+
+[[modeles]]
+id = "chalk-board"
+famille = "fete"
+sorte = "ardoise"
+graine = 1249
+pourquoi = "ardoise à craie sur chevalet: la devise de la veillée, le menu du banquet; penchée pour se lire debout"
 
 # ---------------------------------------------------------------- ouvrages: les repères du lieu
 # Origine au pied, au centre; avant vers +z (la voie, l'eau, le chemin).

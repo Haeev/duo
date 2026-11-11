@@ -73,6 +73,7 @@ const NEW_DECOR = [
   'journal',
   'lampe-a-petrole',
   'lampe-de-table',
+  'lumignon',
   'panier-a-linge',
   'patere',
   'pendule',

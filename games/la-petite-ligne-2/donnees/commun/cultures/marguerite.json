@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "marguerite",
   "name": "Marguerite",
-  "model": "crop-radis",
+  "model": "crop-marguerite",
   "seed": "graines-marguerite",
   "seasons": ["spring", "summer"],
   "stages": [2, 2],

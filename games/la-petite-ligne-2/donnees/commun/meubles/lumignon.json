@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "lumignon",
+  "name": "Lumignon",
+  "model": "festival-candle",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": true,
+  "series": null,
+  "bricks": [],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "both",
+    "comfort": 1
+  }
+}

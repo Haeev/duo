@@ -877,9 +877,14 @@ def _tuteur(s: Atelier, ctx: Contexte, entree: dict, x, z, graine, stade: int, s
 
 def culture(entree: dict, ctx: Contexte) -> list[dict]:
     fiche = ctx.cultures.get(entree["culture"])
-    if fiche is None:
-        raise SystemExit(f"{entree['id']}: culture inconnue « {entree['culture']} » (donnees/commun/cultures)")
-    stades = len(fiche["stages"])
+    if fiche is not None:
+        stades = len(fiche["stages"])
+    elif "stades" in entree:
+        # Fiche de culture pas encore écrite: le nombre de stades de l'entrée en tient lieu; la
+        # fiche le remplace dès qu'elle existe (relancer construire.sh).
+        stades = entree["stades"]
+    else:
+        raise SystemExit(f"{entree['id']}: culture inconnue « {entree['culture']} » (donnees/commun/cultures), ou `stades` à donner")
     graine = entree["graine"]
     plants = entree["plants"]
     out = []
@@ -895,6 +900,8 @@ def culture(entree: dict, ctx: Contexte) -> list[dict]:
                     _rosette(s, ctx, entree, x, z, g, stade / stades if stade < stades else 1.0, stade == stades, soif)
                 elif entree["port"] == "tuteur":
                     _tuteur(s, ctx, entree, x, z, g, stade, stades, soif)
+                elif entree["port"] in PORTS:
+                    PORTS[entree["port"]](s, ctx, entree, x, z, g, stade, stades, soif)
                 else:
                     raise SystemExit(f"{entree['id']}: port inconnu « {entree['port']} »")
             ident = f"{entree['id']}-{stade}" + ("-thirsty" if soif else "")
@@ -911,7 +918,12 @@ from amenagements import FAMILLES_AMENAGEMENTS  # noqa: E402
 # Objets d'intérieur: `interieurs.py`; trains vus du dehors: `vehicules.py`.
 from interieurs import FAMILLES_INTERIEURS  # noqa: E402
 from vehicules import FAMILLES_VEHICULES  # noqa: E402
+# Ports des cultures (carotte, poireau, pomme de terre, fleurs): `plantes.py`; décor des fêtes:
+# `fetes.py`.
+from plantes import PORTS  # noqa: E402
+from fetes import FAMILLES_FETES  # noqa: E402
 
 FAMILLES.update(FAMILLES_AMENAGEMENTS)
 FAMILLES.update(FAMILLES_INTERIEURS)
 FAMILLES.update(FAMILLES_VEHICULES)
+FAMILLES.update(FAMILLES_FETES)

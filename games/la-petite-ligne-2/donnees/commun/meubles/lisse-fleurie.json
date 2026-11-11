@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "lisse-fleurie",
+  "name": "Lisse fleurie",
+  "model": "crossing-gate-flowered",
+  "size": {
+    "w": 5,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "oeillet-de-poete",
   "name": "Œillet de poète",
-  "model": "crop-radis",
+  "model": "crop-oeillet-de-poete",
   "seed": "graines-oeillet",
   "seasons": ["spring", "summer"],
   "stages": [3, 2],

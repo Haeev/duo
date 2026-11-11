@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "banderole",
+  "name": "Banderole",
+  "model": "festival-banner",
+  "size": {
+    "w": 4,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}
