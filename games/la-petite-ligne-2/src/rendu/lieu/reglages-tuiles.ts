@@ -113,6 +113,8 @@ export const TILE_SETTINGS = {
     treeSparse: 0.006,
     treeWild: 0.09,
     treeOutside: 0.16,
+    /** Natures hors du couloir de jeu: on n'y va jamais, le bois s'y allège (`GroundField.away`). */
+    outside: ['hors-jeu'],
     /** Buissons près des chemins (part des cases d'herbe à 1 à 4 cases d'un chemin). */
     bushNear: 0.035,
     trunkColor: '#6e5440',
@@ -126,6 +128,8 @@ export const TILE_SETTINGS = {
     bankColor: '#7f8c4f',
     fenceHeight: 1.1,
     fenceColor: '#8a7058',
+    /** Rendu encré: modèle livré de clôture (manifeste des décors) posé le long de la voie. */
+    fenceModel: 'fence',
   },
   building: {
     /** Hauteur des murs: base, plus une part du petit côté, bornée (m). */
@@ -172,6 +176,12 @@ export const TILE_SETTINGS = {
     /** Les touffes s'espacent loin de tout aménagement (cases), pour tenir le budget. */
     wildThin: 14,
     maxPerTile: 1200,
+    /**
+     * Garde (m) de chaque semis: distance tenue de l'emprise d'un meuble (un potager en est un),
+     * d'un repère, d'un bâtiment, et du bord de toute autre surface (chemin, dallage, voie, eau).
+     * Un arbre garde la place de son pied; un buisson, sa boule.
+     */
+    clear: { tufts: 0.3, pebbles: 0.12, trees: 1, bushes: 0.6 },
   },
   /**
    * Pièces (rendu encré, ADR 0023). Une pièce est un monde clos à l'écran: seule celle du joueur
@@ -214,6 +224,8 @@ export const TILE_SETTINGS = {
   landmark: {
     /** Repère dans un lieu sauvage (loin des chemins): un grand arbre; sinon une tour. */
     treeWildCells: 4,
+    /** Un meuble de la carte à moins de cette distance (m) du repère en tient lieu: pas de volume provisoire. */
+    sameAs: 1,
     towerColor: '#d2c4a6',
     towerRoofColor: '#7c5a4a',
   },

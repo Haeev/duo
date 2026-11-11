@@ -19,11 +19,19 @@ import {
 } from 'three';
 import type { MapDef } from '../../donnees/schemas/lieu';
 import { KIND, LAYER, SWAP } from '../encre/couches';
+import { SHADOW_ONLY } from '../encre/ombres';
 import { Fadable } from '../fondu';
 import type { OccluderBox } from '../occultation';
 import { ResourceTracker } from '../ressources';
 import { FadingMesh, GeometryBuilder } from './geometrie';
-import { DECOR_MANIFEST, type DecorManifest, jitterOf, variantOf } from './decors-manifeste';
+import {
+  DECOR_MANIFEST,
+  type DecorManifest,
+  jitterOf,
+  stateModel,
+  variantOf,
+} from './decors-manifeste';
+import type { KeepOut } from './emprises';
 import { HARVEST_LOOK, type HarvestLookSettings } from './reglages-recoltes';
 import type { TileSettings } from './reglages-tuiles';
 import type { Relief } from './relief';
@@ -95,6 +103,16 @@ export interface TileKit {
   /** Choix des modèles semés et manifeste où les lire (par défaut ceux du jeu). */
   readonly look?: HarvestLookSettings;
   readonly manifest?: DecorManifest;
+  /** Emprises où rien ne se sème (meubles, potagers, bâtiments, bords de chemin); absent: partout. */
+  readonly keepOut?: KeepOut | null;
+  /** Faux: les clôtures de la voie sont posées en modèles livrés par le lieu, pas en boîtes. */
+  readonly fences?: boolean;
+}
+
+/** Végétation semée d'une tuile: ce qui se dessine, et ce qui en porte l'ombre sans se dessiner. */
+interface Plantings {
+  readonly shown: Map<string, { model: string; twinned: boolean; list: Planting[] }>;
+  readonly casters: Map<string, { model: string; list: Planting[] }>;
 }
 
 /** L'instance qui montre un arbre (son houppier s'efface devant le joueur). */
@@ -157,9 +175,13 @@ export class TileView {
       // Le semis (cailloux, touffes) ne porte pas d'ombre: elle ne se verrait pas, et la passe
       // d'ombre redessinerait des milliers de petits volumes.
       // Le sol en relief non plus: quelques centimètres ne portent aucune ombre lisible.
+      // Un arbre dont l'ombre est portée par sa version allégée n'en porte pas lui-même.
       if ((object as Partial<Mesh>).isMesh === true)
         object.castShadow =
-          cast && object.userData.semis !== true && object.userData.ground !== true;
+          cast &&
+          object.userData.semis !== true &&
+          object.userData.ground !== true &&
+          object.userData.shadowTwin !== true;
     });
   }
 
@@ -432,7 +454,14 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   }
   yield;
 
-  const decor = tileDecor(kit.field, kit.map, tile, kit.settings);
+  const decor = tileDecor(
+    kit.field,
+    kit.map,
+    tile,
+    kit.settings,
+    kit.keepOut ?? null,
+    kit.fences !== false,
+  );
   if (relief !== null) {
     // Le sol en relief ne porte pas d'ombre: les rails rejoignent les traverses (boîtes
     // instanciées), qui en portent, sans appel de dessin de plus.
@@ -453,34 +482,63 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   else {
     // Un maillage instancié par modèle tiré et par morceau de tuile: un appel de dessin par forme,
     // quel que soit le nombre, et un bois hors du champ n'est pas dessiné.
-    for (const { model, list } of planted.values()) {
+    const pose = (mesh: InstancedMesh, i: number, item: Planting): void => {
+      rotation.setFromAxisAngle(up, item.yaw);
+      matrix.compose(position.set(item.x, item.y, item.z), rotation, scale.setScalar(item.scale));
+      mesh.setMatrixAt(i, matrix);
+      mesh.setColorAt(i, color.set('#ffffff'));
+    };
+    for (const { model, twinned, list } of planted.shown.values()) {
       const geometry = kit.plants?.geometryOf(model) ?? null;
       if (geometry === null) continue;
-      instances(view, geometry, materials.instanced, list.length, model, (mesh, i) => {
-        const item = list[i];
-        if (item === undefined) return;
-        rotation.setFromAxisAngle(up, item.yaw);
-        matrix.compose(position.set(item.x, item.y, item.z), rotation, scale.setScalar(item.scale));
-        mesh.setMatrixAt(i, matrix);
-        mesh.setColorAt(i, color.set('#ffffff'));
-        if (item.tree === null) return;
-        view.crownSlots[item.tree] = { mesh, slot: i, color: '#ffffff' };
-        // Boîte du houppier: la largeur réelle du modèle tel qu'il est posé.
-        const size = (kit.manifest ?? DECOR_MANIFEST).models[model]?.size;
-        const half = (Math.max(size?.w ?? 2, size?.d ?? 2) * item.scale) / 2;
-        view.crownBoxes[item.tree] = {
-          id: String(item.tree),
-          min: { x: item.x - half, y: item.y, z: item.z - half },
-          max: { x: item.x + half, y: item.y + (size?.h ?? 4) * item.scale, z: item.z + half },
-        };
-      });
+      const shown = instances(
+        view,
+        geometry,
+        materials.instanced,
+        list.length,
+        model,
+        (mesh, i) => {
+          const item = list[i];
+          if (item === undefined) return;
+          pose(mesh, i, item);
+          if (item.tree === null) return;
+          view.crownSlots[item.tree] = { mesh, slot: i, color: '#ffffff' };
+          // Boîte du houppier: la largeur réelle du modèle tel qu'il est posé.
+          const size = (kit.manifest ?? DECOR_MANIFEST).models[model]?.size;
+          const half = (Math.max(size?.w ?? 2, size?.d ?? 2) * item.scale) / 2;
+          view.crownBoxes[item.tree] = {
+            id: String(item.tree),
+            min: { x: item.x - half, y: item.y, z: item.z - half },
+            max: { x: item.x + half, y: item.y + (size?.h ?? 4) * item.scale, z: item.z + half },
+          };
+        },
+      );
+      if (shown !== null && twinned) shown.userData.shadowTwin = true;
+    }
+    // L'ombre des arbres: leur version allégée aux mêmes places, jamais dessinée, rangée par
+    // morceaux plus grands (la carte d'ombre couvre tout le disque vu: moins d'appels).
+    for (const { model, list } of planted.casters.values()) {
+      const geometry = kit.plants?.geometryOf(model) ?? null;
+      if (geometry === null) continue;
+      const twin = instances(
+        view,
+        geometry,
+        materials.instanced,
+        list.length,
+        `${model}-ombre`,
+        (mesh, i) => {
+          const item = list[i];
+          if (item !== undefined) pose(mesh, i, item);
+        },
+      );
+      if (twin !== null) twin.userData[SHADOW_ONLY] = true;
     }
   }
   yield;
 
   if (shapes.pebble !== undefined && shapes.tuft !== undefined) {
     // Semis de petits volumes: ce qui ponctue le sol est un volume, pas un dessin à plat.
-    const semis = tileSemis(kit.field, kit.map, tile, kit.settings);
+    const semis = tileSemis(kit.field, kit.map, tile, kit.settings, kit.keepOut ?? null);
     if (relief !== null) {
       for (const pebble of semis.pebbles) pebble.y += relief.heightAt(pebble.x, pebble.z);
       for (const tuft of semis.tufts) settle(relief, tuft);
@@ -648,19 +706,19 @@ function pick<T>(list: readonly T[], t: number): T | undefined {
  * Végétation semée en modèles livrés: pour chaque arbre et buisson du décor, une essence tirée de
  * sa place (`look.semis`), puis sa variante, son cap et sa taille (`variantOf`, `jitterOf`): la
  * même forme à chaque chargement de la tuile et chez les deux joueurs. Rangée par morceau de
- * tuile (`semis.chunk`) et par modèle.
+ * tuile (`semis.chunk`) et par modèle. Loin du couloir de jeu (`semis.light.beyond`), un arbre prend
+ * sa version allégée; l'ombre de tous est portée par cette version (`casters`, `shadowChunk`).
  * `null`: une essence manque au manifeste ou à la source (le moteur garde troncs et boules).
  */
-function plantings(
-  kit: TileKit,
-  decor: TileDecor,
-  tile: number,
-): Map<string, { model: string; list: Planting[] }> | null {
+function plantings(kit: TileKit, decor: TileDecor, tile: number): Plantings | null {
   const look = kit.look ?? HARVEST_LOOK;
   const manifest = kit.manifest ?? DECOR_MANIFEST;
   const { x0, y0 } = tileRect(kit.map, tile);
   const side = look.semis.chunk;
-  const out = new Map<string, { model: string; list: Planting[] }>();
+  const out: Plantings = { shown: new Map(), casters: new Map() };
+  const light = look.semis.light;
+  const chunkOf = (x: number, z: number, size: number): string =>
+    `${String(Math.floor((x - x0) / size))}:${String(Math.floor((z - y0) / size))}`;
   const place = (
     choices: readonly string[],
     x: number,
@@ -668,23 +726,48 @@ function plantings(
     z: number,
     size: number,
     tree: number | null,
+    away = 0,
   ): boolean => {
     const essence = pick(choices, hash01(Math.floor(x * 10), Math.floor(z * 10), 41));
     if (essence === undefined || manifest.models[essence] === undefined) return false;
     const key = `semis:${String(Math.round(x * 100))}:${String(Math.round(z * 100))}`;
-    const model = variantOf(essence, key, manifest);
-    if (kit.plants?.geometryOf(model) === null) return false;
+    const whole = variantOf(essence, key, manifest);
+    if (kit.plants?.geometryOf(whole) === null) return false;
+    // La version allégée de cette forme, si elle est livrée et chargée.
+    const far = light === null ? null : stateModel(whole, light.state, manifest);
+    const slim = far !== null && kit.plants?.geometryOf(far) !== null ? far : null;
+    // Au fond du bois, la forme allégée de l'essence elle-même si une seule suffit (`variants`).
+    const base =
+      light === null || light.variants ? null : stateModel(essence, light.state, manifest);
+    const deep = base !== null && kit.plants?.geometryOf(base) !== null ? base : slim;
+    const model = deep !== null && light !== null && away > light.beyond ? deep : whole;
+    // Qui porte son ombre: près du couloir, sa version allégée (un peu rétrécie sous l'arbre
+    // entier); au fond du bois, la forme d'ombre de l'essence, sinon lui-même.
+    const shadeState = light?.deepShadow ?? null;
+    const shade = shadeState === null ? null : stateModel(essence, shadeState, manifest);
+    const deepCaster = shade !== null && kit.plants?.geometryOf(shade) !== null ? shade : model;
+    const caster = light?.shadow !== true ? null : model === whole ? slim : deepCaster;
     const { yaw, scale } = jitterOf(essence, key, manifest);
-    const chunk = `${String(Math.floor((x - x0) / side))}:${String(Math.floor((z - y0) / side))}`;
-    const group = out.get(`${chunk}|${model}`) ?? { model, list: [] };
-    group.list.push({ x, y, z, yaw, scale: scale * size, tree });
-    out.set(`${chunk}|${model}`, group);
+    const posed = { x, y, z, yaw, scale: scale * size, tree };
+    const shownKey = `${chunkOf(x, z, side)}|${model}`;
+    const group = out.shown.get(shownKey) ?? { model, twinned: caster !== null, list: [] };
+    group.list.push(posed);
+    out.shown.set(shownKey, group);
+    if (caster !== null && light !== null) {
+      const casterKey = `${chunkOf(x, z, light.shadowChunk)}|${caster}`;
+      const twins = out.casters.get(casterKey) ?? { model: caster, list: [] };
+      twins.list.push(
+        model === whole ? { ...posed, scale: posed.scale * light.shadowShrink } : posed,
+      );
+      out.casters.set(casterKey, twins);
+    }
     return true;
   };
   for (const [i, tree] of decor.trees.entries()) {
     // La taille tirée par le décor (0,75 à 1,35) reste, resserrée autour de celle du modèle.
     const size = 0.8 + ((tree.trunkHeight / 1.7 - 0.75) / 0.6) * 0.4;
-    if (!place(look.semis.trees, tree.x, tree.ground ?? 0, tree.z, size, i)) return null;
+    if (!place(look.semis.trees, tree.x, tree.ground ?? 0, tree.z, size, i, tree.away ?? 0))
+      return null;
   }
   for (const bush of decor.bushes) {
     // Le pied du buisson: le bas de sa boule (posée sur le sol, relief compris).

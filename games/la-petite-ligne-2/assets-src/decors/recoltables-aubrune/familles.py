@@ -34,6 +34,7 @@ class Contexte:
     def __init__(self, gabarits: dict, cultures: dict[str, dict]):
         self.teintes = {nom: [hexa(c) for c in liste] for nom, liste in gabarits["teintes"].items()}
         self.essences = gabarits.get("essences", {})
+        self.gabarits = gabarits
         self.cultures = cultures
 
     def tons(self, nom: str):
@@ -50,6 +51,10 @@ def _modele(ident: str, s: Atelier, **notice) -> dict:
 
 
 # ====================================================================== arbres
+# États qui sont des versions allégées d'un arbre (`[allege.<état>]`), pas des états de jeu.
+ALLEGES = ("far", "shade")
+
+
 def _masses(h: dict, base: float, graine: float, taille: float):
     """Places des masses du houppier (x, y, z, rayon) selon sa forme; y est le bas de la masse."""
     R, H, n = h["rayon"] * taille, h["hauteur"] * taille, h["masses"]
@@ -221,14 +226,27 @@ def _un_arbre(e: dict, ctx: Contexte, graine: float, taille: float, etat: str) -
         _souche(s, e, ctx, graine, taille)
         return s
     h = e["houppier"]
-    pts = _tronc(s, e, ctx, graine, taille)
     base = e["fut"]["hauteur"] * taille
     masses = _masses(h, base, graine, taille)
+    tons = ctx.tons(e["feuillage"])
+    if etat in ALLEGES:
+        # Versions allégées, réglées par `[allege.<état>]` de recoltables.toml: le même fût et les
+        # mêmes masses aux mêmes places, sans racines, ni branches (cachées sous le houppier), ni
+        # feuilles détachées, et des touffes à moins de pans. `far`: avec ses festons, la même
+        # silhouette vue de haut (bois hors du couloir de jeu, ombre des arbres proches). `shade`:
+        # sans festons, masses élargies de `gonfle` pour couvrir leur place (ombre du bois lointain).
+        a = ctx.gabarits["allege"][etat]
+        s.tube(_fut(e, graine, taille), a["pans"], "ecorce", ctx.tons(e["ecorce"])[0], tors=0.1)
+        for i, (x, y, z, r) in enumerate(masses):
+            ordre = [tons[(i + k) % len(tons)] for k in range(len(tons))]
+            festons = h.get("festons", 3) + (1 if i == 0 else 0) if a.get("festons", True) else 0
+            s.touffe(x, y, z, r * a.get("gonfle", 1.0), graine + i * 1.37, ordre, festons=festons, segments=a["segments"] + (1 if i == 0 else 0), dome=h.get("dome", 0.72), dents=h.get("dents", 0.34), laches=0, rangs=a["rangs"], pans_festons=a.get("segments_festons"))
+        return s
+    pts = _tronc(s, e, ctx, graine, taille)
     hiver = etat == "winter"
     _branches(s, e, ctx, pts, masses, graine, taille, hiver)
     if hiver:
         return s
-    tons = ctx.tons(e["feuillage"])
     for i, (x, y, z, r) in enumerate(masses):
         ordre = [tons[(i + k) % len(tons)] for k in range(len(tons))]
         s.touffe(x, y, z, r, graine + i * 1.37, ordre, festons=h.get("festons", 3) + (1 if i == 0 else 0), segments=h.get("segments", 9) + (1 if i == 0 else 0), dome=h.get("dome", 0.72), dents=h.get("dents", 0.34), laches=1)
@@ -265,7 +283,8 @@ def arbre(entree: dict, ctx: Contexte) -> list[dict]:
                 etats_ids[etat] = f"{entree['id']}-stump"
                 continue
             etats_ids[etat] = f"{ident}-{etat}"
-            out.append(_modele(etats_ids[etat], _un_arbre(e, ctx, f["graine"], f["taille"], etat), etat=etat, de=ident, collision={"shape": "cylinder", "r": round(r * f["taille"], 3)}))
+            budget = {"famille_budget": f"arbre_{etat}"} if etat in ALLEGES else {}
+            out.append(_modele(etats_ids[etat], _un_arbre(e, ctx, f["graine"], f["taille"], etat), etat=etat, de=ident, collision={"shape": "cylinder", "r": round(r * f["taille"], 3)}, **budget))
         out.append(
             _modele(
                 ident,

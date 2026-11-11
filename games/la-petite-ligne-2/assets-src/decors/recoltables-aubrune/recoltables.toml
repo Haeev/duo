@@ -25,6 +25,8 @@ parcelle = "aubrune-potager"
 # Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
 [budgets]
 arbre = 1200
+arbre_far = 520
+arbre_shade = 220
 buisson = 300
 rocher = 300
 fleur = 200
@@ -135,6 +137,28 @@ fut = { hauteur = 1.75, rayon = 0.22, pans = 6, sinuosite = 0.2, penche = 0.3 }
 houppier = { forme = "plat", rayon = 1.55, hauteur = 1.5, masses = 5, festons = 3, segments = 9, dome = 0.6, dents = 0.3 }
 pourquoi = "l'arbre du verger: bas, tordu, penché par le vent d'ouest, pommes à portée de main"
 
+# ---------------------------------------------------------------- arbres allégés (états `far`, `shade`)
+# Un arbre qui liste ces états reçoit des versions allégées tirées de la même graine: même fût et
+# mêmes masses aux mêmes places, sans racines, branches ni feuilles détachées. Le rendu s'en sert
+# pour tenir le budget du bois (`semis.light` de `src/rendu/lieu/reglages-recoltes.ts`).
+# `far`: avec ses festons, la silhouette vue de haut ne change pas; posée dans le bois hors du
+# couloir de jeu, et ombre portée des arbres entiers.
+# `shade`: sans festons, jamais dessinée: l'ombre portée du bois hors du couloir de jeu.
+# `pans`: pans du fût; `segments`, `rangs`: pans et rangs d'une masse; `segments_festons`: pans
+# d'un feston; `festons = false`: aucun; `gonfle`: masses élargies pour couvrir la place des festons.
+[allege.far]
+pans = 5
+segments = 6
+rangs = 2
+segments_festons = 4
+
+[allege.shade]
+pans = 3
+segments = 6
+rangs = 2
+festons = false
+gonfle = 1.14
+
 # ================================================================ modèles
 # ---------------------------------------------------------------- arbres
 # `etats`: stump (abattu: souche et bûches), winter (sans feuilles), bare (sans fruits).
@@ -145,7 +169,7 @@ famille = "arbre"
 essence = "chene"
 graine = 11
 variantes = [{ suffixe = "b", graine = 27, taille = 0.9 }]
-etats = ["stump", "winter"]
+etats = ["stump", "winter", "far", "shade"]
 
 [[modeles]]
 id = "great-oak-tree"
@@ -160,7 +184,7 @@ famille = "arbre"
 essence = "frene"
 graine = 41
 variantes = [{ suffixe = "b", graine = 57, taille = 0.92 }]
-etats = ["stump", "winter"]
+etats = ["stump", "winter", "far", "shade"]
 
 [[modeles]]
 id = "birch-tree"
@@ -168,7 +192,7 @@ famille = "arbre"
 essence = "bouleau"
 graine = 71
 variantes = [{ suffixe = "b", graine = 83, taille = 0.9 }]
-etats = ["stump", "winter"]
+etats = ["stump", "winter", "far", "shade"]
 
 [[modeles]]
 id = "apple-tree"

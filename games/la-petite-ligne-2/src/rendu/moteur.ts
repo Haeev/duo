@@ -69,7 +69,14 @@ import type { BuildingSource } from './lieu/batiments';
 import { Spaces } from './lieu/espaces';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
-import { fieldVolumes, harvestSignature, markerVolumes, placeStates } from './lieu/recoltes';
+import {
+  fenceVolumes,
+  fieldVolumes,
+  harvestSignature,
+  markerVolumes,
+  placeStates,
+} from './lieu/recoltes';
+import { fenceRuns, groundField } from './lieu/terrain-rendu';
 import { ROOM_SETTINGS } from './lieu/reglages-pieces';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
 import type { TilePlants } from './lieu/tuile';
@@ -636,11 +643,18 @@ class Engine implements GameRenderer {
     // Grand lieu (carte à terrain): sol, décor et bâtiments par tuiles; ses zones pleines ne
     // deviennent pas des dalles (haies, berges, murs les montrent déjà).
     const tiled = place.map.terrain !== undefined;
+    // Clôtures de la voie en modèles livrés (rendu encré), si la source des décors en a le modèle.
+    const fences =
+      tiled &&
+      this.ink !== null &&
+      (this.options.models?.instantiate(TILE_SETTINGS.decor.fenceModel) ?? null) !== null
+        ? fenceVolumes(fenceRuns(groundField(place.map, TILE_SETTINGS)))
+        : [];
     const description = describePlace(
       content,
       place,
       // Repères des coins de pêche et des zones à insectes: fixes, tirés des données du lieu.
-      [...markerVolumes(content, id), ...(this.options.extras?.(id) ?? [])],
+      [...markerVolumes(content, id), ...fences, ...(this.options.extras?.(id) ?? [])],
       undefined,
       !tiled,
     );
@@ -666,6 +680,7 @@ class Engine implements GameRenderer {
             };
           }),
         this.plants(),
+        fences.length > 0,
       );
       this.scene.add(this.tiled.root);
     }
@@ -767,7 +782,7 @@ class Engine implements GameRenderer {
       // déjà transmis, les mêmes chez l'hôte et chez l'invité.
       if (placeContent !== undefined) place.setStates(placeStates(look, placeContent, state));
       place.setDynamic([
-        ...describeDynamic(view.content, state),
+        ...describeDynamic(view.content, state, undefined, placeContent),
         ...(placeContent === undefined ? [] : fieldVolumes(view.content, placeContent, state)),
       ]);
       this.refreshLights(place);

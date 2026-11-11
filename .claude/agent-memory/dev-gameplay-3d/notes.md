@@ -75,3 +75,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - `renderer.info.memory.geometries` ne compte que ce qui a été dessiné au moins une fois: pour un contrôle de fuite, comparer deux états obtenus par le même chemin (l'hystérésis rend l'anneau dépendant du trajet), pas un départ frais et un retour.
 - Page de démonstration qui importe un outil Node (`outils/plan-vers-lieu.ts`): config Vite à soi dans le dossier de la page (`resolve.alias` de `node:fs` et `node:url` vers un module vide, `define: { 'process.argv': '[]' }`), lancée par `pnpm exec vite --config <page>/vite.config.ts` depuis le paquet. Un `prettier --write` pendant une capture recharge la page (HMR) et casse `page.evaluate`.
 - Boucle `for` d'un parcours en largeur sur un tableau qui grandit: `for (const i of queue)` suit la longueur (règle `prefer-for-of`).
+
+## La Petite Ligne 2: budget du dehors et banc d'ensemble (vérifié le 2026-11-11)
+
+- Banc `tests/rendu-encre/ensemble.spec.ts`: `LPL2_VUES=a,b` ne joue que ces vues (15 s par vue), `LPL2_PASSES=1` ouvre l'outil de mesure (F9) et relève appels et triangles par passe (`__lplMesure.passes()`: ombre du soleil, lampe, scène, contour). Toujours mesurer par passe avant de choisir un levier: au quai, sans un arbre, l'image coûte déjà 258 000 triangles (121 000 d'ombre, 136 000 de scène).
+- La passe d'ombre du soleil couvre le disque vu plus 6 m: un maillage instancié qui touche ce disque est dessiné en entier. Ombres portées par des jumeaux allégés jamais dessinés (`userData[SHADOW_ONLY]`, même forme « instancié et coloré » donc aucun programme de plus), rangés par gros morceaux (16 m); maillages dessinés par petits morceaux (8 m).
+- Une version allégée garde la silhouette si elle garde le NOMBRE de festons (leur angle dépend du compte dans `touffe`): on ne réduit que les pans et les rangs. États `far` et `shade` du manifeste, réglés par `[allege.*]` de `recoltables.toml`.
+- L'icosaèdre de Three.js n'a pas de sommet au pôle: seules 2 faces sur 20 sont sous y = -0,5; retirer « le dessous » d'un caillou ne rapporte rien.
+- Natures d'Aubrune absentes de `GROUND_LOOKS` (sous-bois, prairie, potager, place...): elles prennent l'herbe par défaut; les arbres semés ne poussent que sur `hors-jeu` et `pre`.
+- Heredoc Python refusé dès qu'il est long ou suivi d'une autre commande: scripts de retouche par Write dans le scratchpad (paires ancien/nouveau avec `assert count == 1`), lancés par `python3 script.py .`.
