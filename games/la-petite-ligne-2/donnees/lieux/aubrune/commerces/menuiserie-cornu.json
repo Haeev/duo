@@ -25,10 +25,10 @@
   "buys": [
     {
       "item": "buche",
-      "price": 60
+      "price": 140
     }
   ],
-  "dailyBuyCap": 1200,
+  "dailyBuyCap": 3500,
   "dailyNeeds": ["buche"],
   "friendship": [
     {

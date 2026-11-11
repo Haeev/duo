@@ -373,7 +373,17 @@ describe('écriture des actes 2 et 3 d’Aubrune', () => {
     talk(sim, 0, 'marthe');
     talk(sim, 0, 'honorine', 'oeuf');
     carry(sim, 0, { 'pot-au-feu': 1 });
-    talk(sim, 0, 'colette');
+    // Sans la cuisine payée, Colette renvoie chez Basile et la marmite reste au joueur.
+    expect(talk(sim, 0, 'colette')).toContain('colette-repas#s2');
+    expect(held(sim, 0, 'pot-au-feu')).toBe(true);
+    expect(fact(sim, 'aubrune.acte3.repas')).toBe('ouvert');
+    sim.world.progress.memory['aubrune.maison-du-garde.cuisine'] = {
+      v: 'restored',
+      by: 'duo',
+      day: sim.world.common.day,
+    };
+    expect(talk(sim, 0, 'colette')).toContain('colette-repas#a1');
+    expect(held(sim, 0, 'pot-au-feu')).toBe(false);
     playScene(sim, 'dos-a-dos');
     expect(talk(sim, 0, 'honorine', 'gens')).toContain('honorine-train#fin');
     expect(sim.world.progress.quests[ACT_3]?.chapter).toBe('la-halte-de-nuit');
