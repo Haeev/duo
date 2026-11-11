@@ -10,6 +10,7 @@
   "solid": true,
   "placeable": true,
   "series": "campagne-essai",
+  "top": 0.9,
   "bricks": [
     {
       "brick": "store",

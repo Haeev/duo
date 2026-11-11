@@ -10,6 +10,7 @@
   "solid": true,
   "placeable": false,
   "series": null,
+  "top": 0.98,
   "bricks": [
     {
       "brick": "shop",

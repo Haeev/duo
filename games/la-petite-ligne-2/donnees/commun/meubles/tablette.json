@@ -10,5 +10,6 @@
   "solid": true,
   "placeable": false,
   "series": "voiture-de-nuit",
+  "top": 0.75,
   "bricks": []
 }

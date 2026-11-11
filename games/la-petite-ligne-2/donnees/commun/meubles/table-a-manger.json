@@ -10,6 +10,7 @@
   "solid": true,
   "placeable": true,
   "series": null,
+  "top": 0.75,
   "bricks": [
     {
       "brick": "sit",

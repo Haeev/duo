@@ -18,6 +18,9 @@
   "placeable": true,
   // Série de meubles assortis ("cuisine-de-campagne", "gare"), ou null.
   "series": null,
+  // Hauteur du plateau en m, facultative: ce qu'on y pose (champ "on" d'un objet de carte, voir
+  // lieu/carte.jsonc) se dessine à cette hauteur. Table 0,75, comptoir 0,98, étagère 1,5. Absent: rien ne s'y pose.
+  "top": 0.75,
   // Briques, dans l'ordre de priorité de la touche d'action (une de chaque sorte au plus):
   //   { "brick": "sit", "seats": 1, "restPerMinute": 6 }                       s'asseoir
   //   { "brick": "sleep", "places": 2, "wakeAt": 100 }                         dormir

@@ -8,6 +8,7 @@ import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PropDef } from '../../donnees/schemas/meuble';
 import type { PlaceState } from '../../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../../etat/monde';
+import { isPosed } from '../../donnees/poses';
 import type { Blockers } from './grille';
 import { conditionalObjects, refreshPresence } from '../lieux/presents';
 import { lockCount, markClosedLocks, refreshLockStates } from '../lieux/verrous';
@@ -132,7 +133,9 @@ export function placeBlockers(
     cached.signature = signature;
     cached.blockers.props.fill(0);
     markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);
-    for (const object of place.map.objects) mark(content, cached, state, object);
+    // Un objet posé sur un meuble (champ `on`) ne bloque jamais: il n'occupe pas le sol.
+    for (const object of place.map.objects)
+      if (!isPosed(object)) mark(content, cached, state, object);
     for (const placed of state.placed) mark(content, cached, state, placed);
   }
   return cached.blockers;

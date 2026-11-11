@@ -10,6 +10,7 @@
   "solid": false,
   "placeable": true,
   "series": null,
+  "top": 1.5,
   "bricks": [],
   "deco": {
     "layer": "wall",

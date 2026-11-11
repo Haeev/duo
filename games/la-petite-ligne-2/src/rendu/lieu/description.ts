@@ -8,6 +8,7 @@ import type { Content, PlaceContent } from '../../donnees/charger';
 import type { DeepReadonly } from '../../etat/monde';
 import type { PlaceState } from '../../etat/lieu';
 import type { FloorDef } from '../../donnees/schemas/lieu';
+import { isPosed, objectsById, poseHeight } from '../../donnees/poses';
 import { DOORS, doorSills, type Sill } from '../../donnees/seuils';
 import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
@@ -212,6 +213,7 @@ export function describePlace(
       aimable: false,
     });
   });
+  const byId = objectsById(place.map.objects);
   for (const object of place.map.objects) {
     const prop = content.props[object.type];
     // Les données sont contrôlées au chargement: un type inconnu n'arrive pas jusqu'ici.
@@ -231,14 +233,16 @@ export function describePlace(
       w: prop.size.w,
       h: prop.size.h,
       rotation: object.rotation,
-      base: 0,
+      base: poseHeight(content.props, byId, object) ?? 0,
       // Hauteur du modèle livré quand il y en a un: une paroi de 2,15 m doit s'effacer devant
       // le joueur qu'elle cache, pas seulement sur 0,9 m.
       height: DECOR_MANIFEST.models[prop.model]?.size.h ?? settings.propHeight,
       shape: 'box',
       // Une lampe sur son fût ne cache personne: effacée, elle éteindrait sa lanterne à l'écran.
-      occludes: DECOR_MANIFEST.models[prop.model]?.light === undefined,
-      aimable: true,
+      // Un objet posé sur un meuble (champ `on`) est du décor: il ne cache personne et ne se vise
+      // pas, la cible de la touche d'action reste celle de son porteur.
+      occludes: !isPosed(object) && DECOR_MANIFEST.models[prop.model]?.light === undefined,
+      aimable: !isPosed(object),
     });
   }
   volumes.push(...extras);

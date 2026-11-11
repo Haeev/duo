@@ -114,6 +114,14 @@ export const MapObjectSchema = v.strictObject({
    * fiche du meuble.
    */
   resource: v.exactOptional(IdSchema),
+  /**
+   * Objet posé sur un meuble (une lampe sur une table, des bocaux sur une étagère). Deux écritures:
+   * l'identifiant d'un autre objet de la même carte (le porteur, dont la fiche déclare `top`: le
+   * centre de l'objet doit tomber dans l'emprise du porteur), ou une hauteur en m (sur une
+   * cheminée, un rebord). Il se dessine à cette hauteur, ne bloque jamais, ne se vise pas et suit
+   * la présence de son porteur (`when` hérité). Décor seulement: sans brique. Voir `donnees/poses.ts`.
+   */
+  on: v.exactOptional(v.union([IdSchema, v.pipe(FiniteSchema, v.minValue(0.02), v.maxValue(4))])),
   /** Note de placement: pourquoi cet élément est ici, dans ce sens (règle « cohérence du monde »). Ignorée du moteur. */
   pourquoi: v.exactOptional(TextSchema),
 });
