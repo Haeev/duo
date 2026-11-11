@@ -128,6 +128,70 @@ class Plan:
         return total, aretes
 
 
+_FICHES = None
+
+
+def fiches_meubles():
+    global _FICHES
+    if _FICHES is None:
+        dossier = os.path.join(ICI, '..', '..', '..', '..', '..', 'games', 'la-petite-ligne-2', 'donnees', 'commun', 'meubles')
+        _FICHES = {f[:-5]: json.load(open(os.path.join(dossier, f), encoding='utf-8')) for f in os.listdir(dossier) if f.endswith('.json')}
+    return _FICHES
+
+
+def controler_habillage(it):
+    """Petits objets d'une pièce (couches `floor`, `rug`, `wall` des fiches): un objet mural pend à un mur debout
+    (la caméra regarde du sud-ouest: mur nord en rotation 0, mur est en rotation 3), hors d'une cloison; un objet
+    de plateau (`top`) n'est pas posé tant que le rendu ne sait pas l'élever; rien sur un point, rien dans les deux
+    cases devant une porte ou un escalier (1,5 m libres), rien dans l'emprise d'un meuble encore sans modèle."""
+    err = []
+    F = fiches_meubles()
+    W, H = it['largeur'], it['hauteur']
+    cloison = {(x, y) for cx, cy, cw, ch in it['cloisons'] for x in range(cx, cx + cw) for y in range(cy, cy + ch)}
+    devant = set()
+    portes = ([tuple(it['porte'])] if it['porte'] else []) + [(e['x'], e['y'], e['regard']) for e in it['escaliers']]
+    for px, py, r in portes:
+        dx, dy = ((0, 1), (1, 0), (0, -1), (-1, 0))[r]
+        devant |= {(int(px) + k * dx, int(py) + k * dy) for k in (1, 2)}
+    points = {(int(p['x']), int(p['y'])) for p in it['points']}
+    reserve = set()
+    for m in it['meubles']:
+        if m['type'] is None:
+            reserve |= {(int(m['x']) + i, int(m['y']) + j) for i in (-1, 0) for j in (-1, 0)} | {(int(m['x']), int(m['y']))}
+    for m in it['meubles']:
+        deco = (F.get(m['type']) or {}).get('deco')
+        if not deco or 'pourquoi' not in m:
+            continue
+        c = (int(m['x']), int(m['y']))
+        quoi = "intérieur %s: objet %s" % (it['id'], m['id'])
+        if deco['layer'] == 'top':
+            err.append("%s: objet de plateau, le rendu ne sait pas encore le poser sur un meuble" % quoi)
+        elif deco['layer'] == 'wall':
+            if not ((c[1] == 0 and m['rotation'] == 0) or (c[0] == W - 1 and m['rotation'] == 3)):
+                err.append("%s: objet mural hors d'un mur debout (nord en rotation 0, est en rotation 3)" % quoi)
+            if c in cloison:
+                err.append("%s: accroché à une cloison, que le rendu ne dessine pas" % quoi)
+        else:
+            for cc in emprise_type(m, F):
+                if cc in devant and deco['layer'] != 'rug':
+                    err.append("%s: dans les 1,5 m devant une porte ou un escalier (case %d, %d)" % (quoi, cc[0], cc[1]))
+                if cc in points and deco['layer'] != 'rug':
+                    err.append("%s: posé sur un point (case %d, %d)" % (quoi, cc[0], cc[1]))
+                if cc in reserve:
+                    err.append("%s: dans l'emprise d'un meuble encore sans modèle (case %d, %d)" % (quoi, cc[0], cc[1]))
+                if cc in cloison or not (0 <= cc[0] < W and 0 <= cc[1] < H):
+                    err.append("%s: dans une cloison ou hors de la pièce" % quoi)
+    return err
+
+
+def emprise_type(m, F):
+    t = F[m['type']]['size']
+    w, h = (t['w'], t['h']) if m['rotation'] % 2 == 0 else (t['h'], t['w'])
+    x0, x1 = math.floor(m['x'] - w / 2 + 1e-6), math.floor(m['x'] + w / 2 - 1e-6)
+    y0, y1 = math.floor(m['y'] - h / 2 + 1e-6), math.floor(m['y'] + h / 2 - 1e-6)
+    return [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)]
+
+
 def controler(d, md=None):
     err, info = [], []
     P = Plan(d)
@@ -383,6 +447,7 @@ def controler(d, md=None):
         for it in d['interieurs']:
             if not it['porte'] and not it['escaliers']:
                 err.append("intérieur %s: ni porte ni escalier" % it['id'])
+            err += controler_habillage(it)
         info.append("version 2: %d lisières habillées, %d objets de lieu, %d intérieurs, %d ressources" % (
             sum(len(v) for v in d['bordures'].values()), len(d['mobilier']), len(d['interieurs']), len(d['ressources'])))
 

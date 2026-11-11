@@ -3848,6 +3848,366 @@
       "pourquoi": "contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église: Mado s'y tient côté rue, au poste mado-enclume (amélioration et réparation des outils)",
       "regarde": null,
       "acte": 1
+    },
+    {
+      "id": "cageot-ferme-1",
+      "type": "caisse-de-legumes",
+      "modele": "vegetable-crate",
+      "x": 212.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "cageots de la récolte du potager de la ferme, au bord du chemin des Champs: la charrette les prend là",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cageot-ferme-2",
+      "type": "caisse-de-legumes",
+      "modele": "vegetable-crate",
+      "x": 213.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "cageots de la récolte, au bord du chemin",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "cageot-ferme-3",
+      "type": "caisse-de-legumes",
+      "modele": "vegetable-crate",
+      "x": 214.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "cageots de la récolte, au bord du chemin",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "seau-potager-ferme",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 210.5,
+      "y": 157.5,
+      "rotation": 0,
+      "pourquoi": "le seau d'arrosage, au coin du potager",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "banc-champs",
+      "type": "banc-de-table",
+      "modele": "table-bench",
+      "x": 228,
+      "y": 156.5,
+      "rotation": 0,
+      "pourquoi": "le banc où Margot et Paulin cassent la croûte, au bord du chemin, face à leurs champs",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "panier-champs",
+      "type": "panier-a-linge",
+      "modele": "laundry-basket",
+      "x": 229.5,
+      "y": 156.5,
+      "rotation": 0,
+      "pourquoi": "le panier du casse-croûte, à côté du banc",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "tonnelet-labour",
+      "type": "tonnelet",
+      "modele": "small-keg",
+      "x": 213.5,
+      "y": 163.5,
+      "rotation": 0,
+      "pourquoi": "le tonnelet d'eau des travailleurs, au coin du labour",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "seau-labour",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 212.5,
+      "y": 164.5,
+      "rotation": 0,
+      "pourquoi": "le seau des bêtes de trait, au coin du labour",
+      "regarde": null,
+      "acte": 3,
+      "vue": "ferme"
+    },
+    {
+      "id": "bois-logis-1",
+      "type": "buches-d-interieur",
+      "modele": "indoor-logs",
+      "x": 201.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "le bois de chauffe empilé contre le mur nord du logis, sous l'avant-toit",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "bois-logis-2",
+      "type": "buches-d-interieur",
+      "modele": "indoor-logs",
+      "x": 202.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "le bois de chauffe contre le mur nord du logis",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "tonnelet-logis",
+      "type": "tonnelet",
+      "modele": "small-keg",
+      "x": 204.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "un tonnelet qui attend le cidre, contre le mur nord, à l'ombre",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "banc-talus",
+      "type": "banc-de-table",
+      "modele": "table-bench",
+      "x": 196,
+      "y": 143.5,
+      "rotation": 2,
+      "pourquoi": "un banc à mi-pente, face à la rivière et au bourg: Margot y écosse",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "panier-talus",
+      "type": "panier-a-linge",
+      "modele": "laundry-basket",
+      "x": 197.5,
+      "y": 143.5,
+      "rotation": 0,
+      "pourquoi": "le panier de légumes à écosser, à côté du banc",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "seau-talus",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 192.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "le seau puisé à la rivière, en haut de la berge (Margot descend à la grève le matin)",
+      "regarde": null,
+      "acte": 3,
+      "vue": "talus"
+    },
+    {
+      "id": "banc-cheminots",
+      "type": "banc",
+      "modele": "bench-platform",
+      "x": 152,
+      "y": 101.5,
+      "rotation": 2,
+      "pourquoi": "le banc des cheminots face à la voie: on y regarde passer les trains",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "bois-cheminots-1",
+      "type": "buches-d-interieur",
+      "modele": "indoor-logs",
+      "x": 157.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "le bois fendu des logements de la Compagnie, au pied de la clôture",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "bois-cheminots-2",
+      "type": "buches-d-interieur",
+      "modele": "indoor-logs",
+      "x": 158.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "le bois fendu des logements de la Compagnie",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "cageot-cheminots",
+      "type": "caisse-de-legumes",
+      "modele": "vegetable-crate",
+      "x": 147.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "un cageot du jardin des cheminots, au bord de leur chemin",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "seau-cheminots",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 148.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "le seau d'arrosage du jardin des cheminots",
+      "regarde": null,
+      "acte": 1,
+      "vue": "cloture"
+    },
+    {
+      "id": "tonnelet-pension",
+      "type": "tonnelet",
+      "modele": "small-keg",
+      "x": 188.5,
+      "y": 121.5,
+      "rotation": 0,
+      "pourquoi": "le tonnelet de cidre d'Odette contre le mur sud de la pension, à l'ombre",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "panier-pension",
+      "type": "panier-a-linge",
+      "modele": "laundry-basket",
+      "x": 191.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le linge des pensionnaires, qu'Odette étend au soleil de la berge",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "seau-pension",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 190.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le seau de la lessive, à côté du panier",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "bois-flotte-1",
+      "type": "buches-d-interieur",
+      "modele": "indoor-logs",
+      "x": 193.5,
+      "y": 128.5,
+      "rotation": 0,
+      "pourquoi": "du bois flotté tiré de la grève, qui sèche au-dessus de l'eau",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "bois-flotte-2",
+      "type": "buches-d-interieur",
+      "modele": "indoor-logs",
+      "x": 194.5,
+      "y": 128.5,
+      "rotation": 0,
+      "pourquoi": "du bois flotté qui sèche",
+      "regarde": null,
+      "acte": 1,
+      "vue": "berge"
+    },
+    {
+      "id": "seau-pompe",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 208,
+      "y": 114.5,
+      "rotation": 0,
+      "pourquoi": "le seau sous le bec de la pompe de la place",
+      "regarde": null,
+      "acte": 1,
+      "vue": "rue-du-bourg"
+    },
+    {
+      "id": "tonnelet-tonnelle",
+      "type": "tonnelet",
+      "modele": "small-keg",
+      "x": 195.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le cidre du souper de la tonnelle, au pied de la pension",
+      "regarde": null,
+      "acte": 1,
+      "vue": "rue-du-bourg"
+    },
+    {
+      "id": "panier-lessive",
+      "type": "panier-a-linge",
+      "modele": "laundry-basket",
+      "x": 210.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "la lessive descendue à la rivière, posée en haut de la berge",
+      "regarde": null,
+      "acte": 1,
+      "vue": "rue-du-bourg"
+    },
+    {
+      "id": "seau-lessive",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 211.5,
+      "y": 122.5,
+      "rotation": 0,
+      "pourquoi": "le seau de rinçage de la lessive",
+      "regarde": null,
+      "acte": 1,
+      "vue": "rue-du-bourg"
+    },
+    {
+      "id": "tonnelet-garage",
+      "type": "tonnelet",
+      "modele": "small-keg",
+      "x": 97.5,
+      "y": 94.5,
+      "rotation": 0,
+      "pourquoi": "un tonnelet de graisse d'aiguillage oublié par la Compagnie au bord de la plaine du garage",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
+    },
+    {
+      "id": "seau-garage",
+      "type": "seau",
+      "modele": "bucket",
+      "x": 96.5,
+      "y": 94.5,
+      "rotation": 0,
+      "pourquoi": "le seau de graisse, à côté",
+      "regarde": null,
+      "acte": 2,
+      "vue": "oree"
     }
   ],
   "vegetation": [
@@ -4294,7 +4654,8 @@
       "noeud": "tw4",
       "acte": 2,
       "heures": "toutes",
-      "pourquoi": "le ballast de la voie ouest: boulons, plaques"
+      "pourquoi": "le ballast de la voie ouest: boulons, plaques",
+      "fiche": "fouille-ballast"
     },
     {
       "id": "fouille-talus",
@@ -4324,7 +4685,8 @@
       "noeud": "c4",
       "acte": 3,
       "heures": "toutes",
-      "pourquoi": "la Pierre Levée"
+      "pourquoi": "la Pierre Levée",
+      "fiche": "fouille-pierre-levee"
     },
     {
       "id": "fouille-roche",
@@ -4334,7 +4696,8 @@
       "noeud": "e3",
       "acte": 3,
       "heures": "toutes",
-      "pourquoi": "la roche aux fossiles"
+      "pourquoi": "la roche aux fossiles",
+      "fiche": "fouille-roche"
     },
     {
       "id": "fouille-borne",
@@ -4550,6 +4913,87 @@
           "x": 8.5,
           "y": 4.5,
           "rotation": 3
+        },
+        {
+          "id": "halte-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 8.5,
+          "y": 0.5,
+          "rotation": 3,
+          "pourquoi": "l'horloge de Firmin, au coin de son bureau: il la lit du guichet (il parle en horaires)"
+        },
+        {
+          "id": "halte-affiche",
+          "type": "cadre-paysage",
+          "modele": "picture-landscape",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'affiche de la ligne au-dessus du banc des voyageurs"
+        },
+        {
+          "id": "halte-reglement",
+          "type": "cadre-portrait",
+          "modele": "picture-portrait",
+          "x": 8.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le règlement de la Compagnie encadré au-dessus du bureau de Firmin"
+        },
+        {
+          "id": "halte-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 8.5,
+          "y": 1.5,
+          "rotation": 3,
+          "pourquoi": "la patère de Firmin dans son bureau (casquette, pèlerine); à trois cœurs, il en visse une seconde à ton nom"
+        },
+        {
+          "id": "halte-poele",
+          "type": "poele",
+          "modele": "wood-stove",
+          "x": 3.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le poêle de la salle d'attente, au milieu, à 1 m du mur des fenêtres; le guichet garde ses deux cases de clients"
+        },
+        {
+          "id": "halte-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le bois du poêle, contre le mur nord, entre deux fenêtres"
+        },
+        {
+          "id": "halte-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 0.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "le balai de Firmin: la salle des pas perdus se balaie après chaque train"
+        },
+        {
+          "id": "halte-colis",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 7.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "un cageot en consigne, qui attend le train du samedi"
+        },
+        {
+          "id": "halte-fut",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 6.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "un fût expédié par la ligne, en consigne"
         }
       ],
       "points": [
@@ -4643,6 +5087,78 @@
           "x": 6.5,
           "y": 6.5,
           "rotation": 2
+        },
+        {
+          "id": "maison-rdc-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 9.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "contre le mur nord, à côté de la porte d'entrée: on y prend sa veste en sortant"
+        },
+        {
+          "id": "maison-rdc-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 8.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "au-dessus du bout de table: on la lit de la table, du lit et de la porte"
+        },
+        {
+          "id": "maison-rdc-portrait",
+          "type": "cadre-ovale",
+          "modele": "picture-oval",
+          "x": 9.5,
+          "y": 3.5,
+          "rotation": 3,
+          "pourquoi": "au mur est, au-dessus de la tête du lit"
+        },
+        {
+          "id": "maison-rdc-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 9.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "au pied du lit, contre le mur est, hors du passage de la porte"
+        },
+        {
+          "id": "maison-rdc-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 9.5,
+          "y": 5.5,
+          "rotation": 0,
+          "pourquoi": "l'eau tirée à la pompe du jardin, posée à côté de la cuisinière"
+        },
+        {
+          "id": "maison-rdc-tapis-de-sol",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 7.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "le passage de la porte vers la cuisine et le lit, là où l'on marche le plus"
+        },
+        {
+          "id": "maison-rdc-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 3.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le balai du déblayage, laissé dans la chambre en ruine"
+        },
+        {
+          "id": "maison-rdc-seau-gravats",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 2.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le seau des gravats de la chambre en ruine"
         }
       ],
       "points": [
@@ -4691,6 +5207,33 @@
           "x": 4.5,
           "y": 3.5,
           "rotation": 3
+        },
+        {
+          "id": "maison-cave-etagere",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'étagère des conserves contre le mur nord, au frais"
+        },
+        {
+          "id": "maison-cave-caisse",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les pommes de terre de l'hiver, au frais et dans le noir"
+        },
+        {
+          "id": "maison-cave-tonnelet",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "un tonnelet de vin oublié par l'ancien garde"
         }
       ],
       "points": [{ "id": "cave-lanterne", "x": 2.5, "y": 1.5, "role": "poste", "qui": null }],
@@ -4746,6 +5289,150 @@
           "x": 2,
           "y": 7.5,
           "rotation": 0
+        },
+        {
+          "id": "epicerie-rdc-etagere-1",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les rayons de l'épicerie, côté Odette, derrière le comptoir"
+        },
+        {
+          "id": "epicerie-rdc-etagere-2",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les rayons de l'épicerie, entre les deux fenêtres"
+        },
+        {
+          "id": "epicerie-rdc-etagere-3",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 6.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les rayons de l'épicerie, dans le coin de la porte"
+        },
+        {
+          "id": "epicerie-rdc-caisse-1",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la réserve de pommes de terre, derrière le comptoir"
+        },
+        {
+          "id": "epicerie-rdc-caisse-2",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "un cageot de pommes à côté de l'étal"
+        },
+        {
+          "id": "epicerie-rdc-tonnelet",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 0.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "l'huile au détail, derrière le comptoir"
+        },
+        {
+          "id": "epicerie-rdc-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 6.5,
+          "y": 4.5,
+          "rotation": 3,
+          "pourquoi": "au mur est, vue du comptoir: l'heure de fermer"
+        },
+        {
+          "id": "epicerie-rdc-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 6.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "à côté de la porte: Odette balaie devant chez elle"
+        },
+        {
+          "id": "epicerie-rdc-portrait",
+          "type": "cadre-portrait",
+          "modele": "picture-portrait",
+          "x": 6.5,
+          "y": 6.5,
+          "rotation": 3,
+          "pourquoi": "dans la cuisine, le portrait de sa mère (celle des cerises)"
+        },
+        {
+          "id": "epicerie-rdc-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 0.5,
+          "y": 7.5,
+          "rotation": 0,
+          "pourquoi": "le bois de la cuisinière, à côté d'elle"
+        },
+        {
+          "id": "epicerie-rdc-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 2.5,
+          "y": 8.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de la cuisine, entre la cuisinière et la table"
+        },
+        {
+          "id": "epicerie-rdc-vaisselier",
+          "type": "vaisselier",
+          "modele": "dresser",
+          "x": 2,
+          "y": 6.5,
+          "rotation": 0,
+          "pourquoi": "la vaisselle du souper, face à la table, dos à la cloison de la boutique"
+        },
+        {
+          "id": "epicerie-rdc-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 5.5,
+          "y": 6.5,
+          "rotation": 0,
+          "pourquoi": "le linge des pensionnaires, au pied de l'escalier, prêt à monter"
+        },
+        {
+          "id": "epicerie-rdc-tonnelet-2",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 5.5,
+          "y": 8.5,
+          "rotation": 0,
+          "pourquoi": "le cidre, sous l'escalier"
+        },
+        {
+          "id": "epicerie-rdc-caisse-3",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 4.5,
+          "y": 8.5,
+          "rotation": 0,
+          "pourquoi": "les légumes du souper à éplucher"
+        },
+        {
+          "id": "epicerie-rdc-tapis-de-sol",
+          "type": "tapis-rond",
+          "modele": "rug-round",
+          "x": 2,
+          "y": 8,
+          "rotation": 0,
+          "pourquoi": "sous la table du souper"
         }
       ],
       "points": [
@@ -4797,6 +5484,87 @@
           "x": 0.5,
           "y": 7,
           "rotation": 0
+        },
+        {
+          "id": "epicerie-etage-gravure",
+          "type": "cadre-paysage",
+          "modele": "picture-landscape",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "une gravure entre les deux lits, au-dessus de la place de la table de nuit"
+        },
+        {
+          "id": "epicerie-etage-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 6.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la patère des pensionnaires, dans le coin le plus proche du palier"
+        },
+        {
+          "id": "epicerie-etage-portrait",
+          "type": "cadre-portrait",
+          "modele": "picture-portrait",
+          "x": 6.5,
+          "y": 3.5,
+          "rotation": 3,
+          "pourquoi": "un portrait au mur est de la chambre"
+        },
+        {
+          "id": "epicerie-etage-etagere",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 6.5,
+          "y": 4.5,
+          "rotation": 3,
+          "pourquoi": "l'étagère où l'on pose ses affaires, près du palier"
+        },
+        {
+          "id": "epicerie-etage-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le linge sale des pensionnaires, sous la fenêtre"
+        },
+        {
+          "id": "epicerie-etage-tapis-de-sol",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 2.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "la descente de lit au pied des deux lits"
+        },
+        {
+          "id": "epicerie-etage-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 4.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret qui sert de table de nuit au second lit"
+        },
+        {
+          "id": "epicerie-etage-odette-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 0.5,
+          "y": 8.5,
+          "rotation": 0,
+          "pourquoi": "le panier d'Odette au pied de son lit"
+        },
+        {
+          "id": "epicerie-etage-odette-tapis-rond",
+          "type": "tapis-rond",
+          "modele": "rug-round",
+          "x": 3,
+          "y": 8,
+          "rotation": 0,
+          "pourquoi": "le tapis tressé de la chambre d'Odette, à côté du lit"
         }
       ],
       "points": [
@@ -4845,6 +5613,105 @@
           "x": 5,
           "y": 2.5,
           "rotation": 0
+        },
+        {
+          "id": "fournil-etagere",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les moules et les bannetons au-dessus du pétrin"
+        },
+        {
+          "id": "fournil-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le bois du four rangé contre lui, côté pétrin, hors de sa gueule"
+        },
+        {
+          "id": "fournil-affiche",
+          "type": "cadre-paysage",
+          "modele": "picture-landscape",
+          "x": 5.5,
+          "y": 1.5,
+          "rotation": 3,
+          "pourquoi": "au mur est, face au comptoir"
+        },
+        {
+          "id": "fournil-etagere-pains",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 5.5,
+          "y": 2.5,
+          "rotation": 3,
+          "pourquoi": "les pains rangés derrière le comptoir"
+        },
+        {
+          "id": "fournil-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 5.5,
+          "y": 3.5,
+          "rotation": 3,
+          "pourquoi": "l'heure des fournées, lue du comptoir"
+        },
+        {
+          "id": "fournil-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 5.5,
+          "y": 4.5,
+          "rotation": 3,
+          "pourquoi": "le tablier et la veste d'Achille, près de la porte"
+        },
+        {
+          "id": "fournil-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 0.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "l'eau du pétrin, à côté de lui"
+        },
+        {
+          "id": "fournil-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 2.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "la farine se balaie devant le pétrin"
+        },
+        {
+          "id": "fournil-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 0.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret où Achille somnole entre deux fournées"
+        },
+        {
+          "id": "fournil-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 0.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "les toiles à pâtons propres, revenues de la lessive"
+        },
+        {
+          "id": "fournil-tapis-de-sol",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 3.5,
+          "y": 2.5,
+          "rotation": 1,
+          "pourquoi": "l'allée de la porte au comptoir"
         }
       ],
       "points": [
@@ -4893,6 +5760,78 @@
           "x": 5.5,
           "y": 5.5,
           "rotation": 0
+        },
+        {
+          "id": "mercerie-rubans",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les bobines et les rubans, à gauche en entrant"
+        },
+        {
+          "id": "mercerie-boutons",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les boîtes de boutons, au-dessus du bout du comptoir"
+        },
+        {
+          "id": "mercerie-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 5.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les manteaux des clientes, près de la porte"
+        },
+        {
+          "id": "mercerie-affiche",
+          "type": "cadre-portrait",
+          "modele": "picture-portrait",
+          "x": 5.5,
+          "y": 1.5,
+          "rotation": 3,
+          "pourquoi": "une affiche de théâtre encadrée: le seul souvenir de scène que Solange montre"
+        },
+        {
+          "id": "mercerie-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 0.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "les serviettes du salon de coiffure"
+        },
+        {
+          "id": "mercerie-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 0.5,
+          "y": 5.5,
+          "rotation": 0,
+          "pourquoi": "les cheveux se balaient au coin du salon"
+        },
+        {
+          "id": "mercerie-tapis-de-sol",
+          "type": "tapis-rond",
+          "modele": "rug-round",
+          "x": 2,
+          "y": 4,
+          "rotation": 0,
+          "pourquoi": "sous le fauteuil de coiffure"
+        },
+        {
+          "id": "mercerie-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 3.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret où l'on attend son tour au salon"
         }
       ],
       "points": [
@@ -4938,6 +5877,69 @@
           "x": 0.5,
           "y": 2.5,
           "rotation": 1
+        },
+        {
+          "id": "forge-fers",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les fers à cheval et les clous, au mur nord"
+        },
+        {
+          "id": "forge-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le tablier de cuir de Mado"
+        },
+        {
+          "id": "forge-outils",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 4.5,
+          "y": 1.5,
+          "rotation": 3,
+          "pourquoi": "les pinces et les marteaux au mur est, au-dessus du râtelier"
+        },
+        {
+          "id": "forge-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le seau de trempe à côté du foyer"
+        },
+        {
+          "id": "forge-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le bois du foyer, de l'autre côté"
+        },
+        {
+          "id": "forge-tonnelet",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 0.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "la réserve d'eau, près du coffre"
+        },
+        {
+          "id": "forge-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 0.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "à côté de la porte"
         }
       ],
       "points": [
@@ -4982,6 +5984,87 @@
           "x": 8.5,
           "y": 0.5,
           "rotation": 0
+        },
+        {
+          "id": "atelier-basile-rabots",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les rabots et les gouges (dont celui qu'il te prête)"
+        },
+        {
+          "id": "atelier-basile-outils",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les serre-joints, au mur nord"
+        },
+        {
+          "id": "atelier-basile-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 7.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la veste de Basile, entre l'établi et le râtelier"
+        },
+        {
+          "id": "atelier-basile-planches",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 8.5,
+          "y": 5.5,
+          "rotation": 3,
+          "pourquoi": "les petites planches choisies, au mur est"
+        },
+        {
+          "id": "atelier-basile-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 8.5,
+          "y": 6.5,
+          "rotation": 0,
+          "pourquoi": "les copeaux se balaient vers le coin"
+        },
+        {
+          "id": "atelier-basile-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 5.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de la pierre à affûter, à côté de l'établi"
+        },
+        {
+          "id": "atelier-basile-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 5.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret de l'établi"
+        },
+        {
+          "id": "atelier-basile-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 2.5,
+          "y": 6.5,
+          "rotation": 0,
+          "pourquoi": "les chutes de bois, près du tas (une case libre entre eux: on y prend le bois)"
+        },
+        {
+          "id": "atelier-basile-tonnelet",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 0.5,
+          "y": 5.5,
+          "rotation": 0,
+          "pourquoi": "la colle et l'huile de lin"
         }
       ],
       "points": [{ "id": "basile-p-etabli", "x": 4, "y": 1.6, "role": "poste", "qui": "Basile" }],
@@ -5074,6 +6157,78 @@
           "x": 5.5,
           "y": 2.5,
           "rotation": 0
+        },
+        {
+          "id": "cafe-etagere-1",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les tasses et les boîtes de chicorée au-dessus du plan de travail"
+        },
+        {
+          "id": "cafe-etagere-2",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 2.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la vaisselle du café, au-dessus du plan de travail"
+        },
+        {
+          "id": "cafe-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 5.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'heure des trains, derrière le comptoir: Colette la lit en servant"
+        },
+        {
+          "id": "cafe-portrait",
+          "type": "cadre-portrait",
+          "modele": "picture-portrait",
+          "x": 5.5,
+          "y": 4.5,
+          "rotation": 3,
+          "pourquoi": "un portrait au-dessus de la table du fond (pas en y 3: il masquerait la fenêtre est)"
+        },
+        {
+          "id": "cafe-tonnelet",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 0.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "le tonnelet de vin du pays, au coin de la salle, loin du soleil de la vitrine"
+        },
+        {
+          "id": "cafe-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 0.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de la cuisinière, posée à côté d'elle"
+        },
+        {
+          "id": "cafe-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 2.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "appuyé à côté de la porte, sans gêner l'entrée"
+        },
+        {
+          "id": "cafe-tapis-de-sol",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 3.5,
+          "y": 2.5,
+          "rotation": 1,
+          "pourquoi": "l'allée de la porte au comptoir: on s'y essuie les pieds"
         }
       ],
       "points": [
@@ -5133,6 +6288,51 @@
           "x": 1,
           "y": 3.5,
           "rotation": 0
+        },
+        {
+          "id": "ecole-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 5.5,
+          "y": 4.5,
+          "rotation": 3,
+          "pourquoi": "les blouses et les cartables, près de la porte"
+        },
+        {
+          "id": "ecole-poele",
+          "type": "poele",
+          "modele": "wood-stove",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le poêle de la classe, dans le coin nord-ouest"
+        },
+        {
+          "id": "ecole-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 0.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le bois du poêle, à côté de lui"
+        },
+        {
+          "id": "ecole-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 4.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "la classe se balaie le soir; appuyé à côté de la porte, au mur sud ouvert par la porte"
+        },
+        {
+          "id": "ecole-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 1.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de l'éponge du tableau"
         }
       ],
       "points": [{ "id": "armand-tableau", "x": 3.5, "y": 1.5, "role": "poste", "qui": "Armand" }],
@@ -5215,6 +6415,51 @@
           "x": 14.5,
           "y": 8,
           "rotation": 1
+        },
+        {
+          "id": "eglise-tapis-1",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 8.5,
+          "y": 5.5,
+          "rotation": 0,
+          "pourquoi": "le tapis de l'allée centrale, de l'arc du clocher vers le chœur"
+        },
+        {
+          "id": "eglise-tapis-2",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 11.5,
+          "y": 5.5,
+          "rotation": 0,
+          "pourquoi": "le tapis de l'allée centrale"
+        },
+        {
+          "id": "eglise-tapis-3",
+          "type": "tapis-long",
+          "modele": "rug-runner",
+          "x": 14.5,
+          "y": 5.5,
+          "rotation": 0,
+          "pourquoi": "le tapis de l'allée centrale, jusqu'au chœur"
+        },
+        {
+          "id": "eglise-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 4.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "Marthe range son balai dans la base du clocher"
+        },
+        {
+          "id": "eglise-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 4.5,
+          "y": 7.5,
+          "rotation": 0,
+          "pourquoi": "et son seau, de l'autre côté de l'arc"
         }
       ],
       "points": [
@@ -5268,6 +6513,42 @@
           "x": 0.5,
           "y": 2.5,
           "rotation": 1
+        },
+        {
+          "id": "poste-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'heure exacte des trains, au mur nord"
+        },
+        {
+          "id": "poste-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la veste de l'aiguilleur, au pied de l'escalier"
+        },
+        {
+          "id": "poste-plan-voies",
+          "type": "cadre-paysage",
+          "modele": "picture-landscape",
+          "x": 4.5,
+          "y": 1.5,
+          "rotation": 3,
+          "pourquoi": "le tableau des circulations au mur est"
+        },
+        {
+          "id": "poste-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 3.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "à côté de l'escalier, hors de son arrivée"
         }
       ],
       "points": [{ "id": "poste-bas", "x": 2.5, "y": 1.5, "role": "poste", "qui": null }],
@@ -5301,6 +6582,33 @@
           "x": 0.5,
           "y": 2.5,
           "rotation": 1
+        },
+        {
+          "id": "poste-cabine-poele",
+          "type": "poele",
+          "modele": "wood-stove",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le poêle de la cabine, dans le coin, loin des leviers"
+        },
+        {
+          "id": "poste-cabine-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 0.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "son bois"
+        },
+        {
+          "id": "poste-cabine-plan-voies",
+          "type": "cadre-paysage",
+          "modele": "picture-landscape",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 3,
+          "pourquoi": "le plan des voies, au mur est, au bout des leviers"
         }
       ],
       "points": [
@@ -5336,6 +6644,42 @@
           "x": 6.5,
           "y": 6.5,
           "rotation": 3
+        },
+        {
+          "id": "moulin-portrait",
+          "type": "cadre-portrait",
+          "modele": "picture-portrait",
+          "x": 6.5,
+          "y": 3.5,
+          "rotation": 3,
+          "pourquoi": "le portrait de Marguerite, sa mère, face aux meules qui portent son nom"
+        },
+        {
+          "id": "moulin-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 5.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "la farine se balaie autour des meules"
+        },
+        {
+          "id": "moulin-tabouret",
+          "type": "tabouret-de-ferme",
+          "modele": "stool-farm",
+          "x": 1.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "le tabouret d'où Berthe écoute sa meule"
+        },
+        {
+          "id": "moulin-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 5.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "à droite de la porte"
         }
       ],
       "points": [{ "id": "berthe-meules", "x": 4.5, "y": 3.5, "role": "poste", "qui": "Berthe" }],
@@ -5377,6 +6721,24 @@
           "x": 0.5,
           "y": 1,
           "rotation": 0
+        },
+        {
+          "id": "moulin-etage-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la veste du meunier, près du lit, entre les deux fenêtres"
+        },
+        {
+          "id": "moulin-etage-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le linge de Berthe, à la tête du lit"
         }
       ],
       "points": [
@@ -5445,6 +6807,96 @@
           "x": 7.5,
           "y": 0.5,
           "rotation": 0
+        },
+        {
+          "id": "ferme-logis-etagere",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "les écuelles, à côté du plan de travail"
+        },
+        {
+          "id": "ferme-logis-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'horloge de la ferme, entre les fenêtres, vue de la table"
+        },
+        {
+          "id": "ferme-logis-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 7.5,
+          "y": 4.5,
+          "rotation": 3,
+          "pourquoi": "les vestes de travail, du côté de la porte"
+        },
+        {
+          "id": "ferme-logis-seau",
+          "type": "seau",
+          "modele": "bucket",
+          "x": 3.5,
+          "y": 1.5,
+          "rotation": 0,
+          "pourquoi": "l'eau de la cuisine, devant le plan de travail"
+        },
+        {
+          "id": "ferme-logis-buches",
+          "type": "buches-d-interieur",
+          "modele": "indoor-logs",
+          "x": 0.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "le bois de la cuisinière, une case plus loin: la case devant elle reste libre"
+        },
+        {
+          "id": "ferme-logis-caisse",
+          "type": "caisse-de-legumes",
+          "modele": "vegetable-crate",
+          "x": 0.5,
+          "y": 3.5,
+          "rotation": 0,
+          "pourquoi": "les légumes du potager de la ferme"
+        },
+        {
+          "id": "ferme-logis-tonnelet",
+          "type": "tonnelet",
+          "modele": "small-keg",
+          "x": 0.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "le cidre de la ferme"
+        },
+        {
+          "id": "ferme-logis-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 7.5,
+          "y": 2.5,
+          "rotation": 0,
+          "pourquoi": "le linge à repriser, à côté de la table"
+        },
+        {
+          "id": "ferme-logis-balai",
+          "type": "balai",
+          "modele": "broom",
+          "x": 3.5,
+          "y": 4.5,
+          "rotation": 0,
+          "pourquoi": "à côté de la porte"
+        },
+        {
+          "id": "ferme-logis-tapis-de-sol",
+          "type": "tapis-rond",
+          "modele": "rug-round",
+          "x": 6,
+          "y": 3,
+          "rotation": 0,
+          "pourquoi": "sous la table"
         }
       ],
       "points": [
@@ -5489,6 +6941,51 @@
           "x": 1.5,
           "y": 3.5,
           "rotation": 0
+        },
+        {
+          "id": "marthe-soeur",
+          "type": "cadre-ovale",
+          "modele": "picture-oval",
+          "x": 0.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "le portrait de sa sœur, au-dessus de la tête du lit"
+        },
+        {
+          "id": "marthe-horloge",
+          "type": "horloge-murale",
+          "modele": "wall-clock",
+          "x": 1.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "l'heure exacte de la sonneuse, vue du lit"
+        },
+        {
+          "id": "marthe-etagere",
+          "type": "etagere-murale",
+          "modele": "wall-shelf",
+          "x": 3.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "au mur nord, près de la porte"
+        },
+        {
+          "id": "marthe-patere",
+          "type": "patere",
+          "modele": "coat-rack",
+          "x": 4.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "la pèlerine et la clé de l'église, près de la porte"
+        },
+        {
+          "id": "marthe-panier",
+          "type": "panier-a-linge",
+          "modele": "laundry-basket",
+          "x": 2.5,
+          "y": 0.5,
+          "rotation": 0,
+          "pourquoi": "sous la fenêtre"
         }
       ],
       "points": [{ "id": "marthe-lit-p", "x": 1.5, "y": 1.5, "role": "lit", "qui": "Marthe" }],

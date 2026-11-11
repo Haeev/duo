@@ -37,6 +37,69 @@
       "x": 8.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "atelier-basile-rabots",
+      "type": "etagere-murale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-outils",
+      "type": "etagere-murale",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-patere",
+      "type": "patere",
+      "x": 7.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-planches",
+      "type": "etagere-murale",
+      "x": 8.5,
+      "y": 5.5,
+      "rotation": 3
+    },
+    {
+      "id": "atelier-basile-balai",
+      "type": "balai",
+      "x": 8.5,
+      "y": 6.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-seau",
+      "type": "seau",
+      "x": 5.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-tabouret",
+      "type": "tabouret-de-ferme",
+      "x": 5.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-buches",
+      "type": "buches-d-interieur",
+      "x": 2.5,
+      "y": 6.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-tonnelet",
+      "type": "tonnelet",
+      "x": 0.5,
+      "y": 5.5,
+      "rotation": 0
     }
   ],
   "doors": {

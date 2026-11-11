@@ -23,6 +23,27 @@
       "x": 4.5,
       "y": 3.5,
       "rotation": 3
+    },
+    {
+      "id": "maison-cave-etagere",
+      "type": "etagere-murale",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "maison-cave-caisse",
+      "type": "caisse-de-legumes",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "maison-cave-tonnelet",
+      "type": "tonnelet",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
     }
   ],
   "doors": {

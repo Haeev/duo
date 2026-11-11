@@ -52,6 +52,62 @@
       "x": 5.5,
       "y": 5.5,
       "rotation": 0
+    },
+    {
+      "id": "mercerie-rubans",
+      "type": "etagere-murale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-boutons",
+      "type": "etagere-murale",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-patere",
+      "type": "patere",
+      "x": 5.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-affiche",
+      "type": "cadre-portrait",
+      "x": 5.5,
+      "y": 1.5,
+      "rotation": 3
+    },
+    {
+      "id": "mercerie-panier",
+      "type": "panier-a-linge",
+      "x": 0.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-balai",
+      "type": "balai",
+      "x": 0.5,
+      "y": 5.5,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-tapis-de-sol",
+      "type": "tapis-rond",
+      "x": 2,
+      "y": 4,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-tabouret",
+      "type": "tabouret-de-ferme",
+      "x": 3.5,
+      "y": 3.5,
+      "rotation": 0
     }
   ],
   "doors": {

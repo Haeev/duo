@@ -41,6 +41,20 @@
       "x": 0.5,
       "y": 1,
       "rotation": 0
+    },
+    {
+      "id": "moulin-etage-patere",
+      "type": "patere",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-etage-panier",
+      "type": "panier-a-linge",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
     }
   ],
   "doors": {

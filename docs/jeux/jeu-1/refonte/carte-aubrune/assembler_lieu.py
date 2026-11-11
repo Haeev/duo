@@ -35,7 +35,7 @@ ANNEXE_Y = 210  # sous le dehors (208) et son mur
 
 # Ce que le script écrit lui-même; tout autre champ trouvé dans un fichier existant a été ajouté à la main.
 ECRITS_PIECE = {'schema', 'id', 'name', 'width', 'height', 'at', 'blocked', 'points', 'objects', 'doors', 'pourquoi'}
-ECRITS_MEUBLE = {'id', 'type', 'x', 'y', 'rotation'}
+ECRITS_MEUBLE = {'id', 'type', 'x', 'y', 'rotation', 'resource'}
 ECRITS_PORTE = {'x', 'y', 'facing', 'to'}
 
 
@@ -140,7 +140,11 @@ def main(brute):
     for r in plan['ressources']:
         t = plan['type_ressource'].get(r['nature'])
         if t and t in types and 'x' in r:
-            objets.append(dict(id=gid(r['id']), type=t, x=r['x'], y=r['y'], rotation=0, pourquoi=r['pourquoi'][:400]))
+            o = dict(id=gid(r['id']), type=t, x=r['x'], y=r['y'], rotation=0)
+            # Un coin qui a sa fiche de ressource (`commun/ressources/<fiche>.json`) la porte: sa table remplace celle du type.
+            if r.get('fiche'):
+                o['resource'] = r['fiche']
+            objets.append(dict(o, pourquoi=r['pourquoi'][:400]))
     for k, v in plan['verrous'].items():
         manquants.setdefault(v['modele'], []).append('verrou')
         # La phrase « pas encore » montrée par la touche d'action tant que le verrou est fermé.

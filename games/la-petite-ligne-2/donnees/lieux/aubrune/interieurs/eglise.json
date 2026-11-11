@@ -87,6 +87,41 @@
       "x": 14.5,
       "y": 8,
       "rotation": 1
+    },
+    {
+      "id": "eglise-tapis-1",
+      "type": "tapis-long",
+      "x": 8.5,
+      "y": 5.5,
+      "rotation": 0
+    },
+    {
+      "id": "eglise-tapis-2",
+      "type": "tapis-long",
+      "x": 11.5,
+      "y": 5.5,
+      "rotation": 0
+    },
+    {
+      "id": "eglise-tapis-3",
+      "type": "tapis-long",
+      "x": 14.5,
+      "y": 5.5,
+      "rotation": 0
+    },
+    {
+      "id": "eglise-balai",
+      "type": "balai",
+      "x": 4.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "eglise-seau",
+      "type": "seau",
+      "x": 4.5,
+      "y": 7.5,
+      "rotation": 0
     }
   ],
   "doors": {

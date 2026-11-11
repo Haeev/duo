@@ -41,6 +41,55 @@
       "x": 0.5,
       "y": 2.5,
       "rotation": 1
+    },
+    {
+      "id": "forge-fers",
+      "type": "etagere-murale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-patere",
+      "type": "patere",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-outils",
+      "type": "etagere-murale",
+      "x": 4.5,
+      "y": 1.5,
+      "rotation": 3
+    },
+    {
+      "id": "forge-seau",
+      "type": "seau",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-buches",
+      "type": "buches-d-interieur",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-tonnelet",
+      "type": "tonnelet",
+      "x": 0.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-balai",
+      "type": "balai",
+      "x": 0.5,
+      "y": 4.5,
+      "rotation": 0
     }
   ],
   "doors": {

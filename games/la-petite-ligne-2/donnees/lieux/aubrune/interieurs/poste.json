@@ -23,6 +23,34 @@
       "x": 0.5,
       "y": 2.5,
       "rotation": 1
+    },
+    {
+      "id": "poste-horloge",
+      "type": "horloge-murale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "poste-patere",
+      "type": "patere",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "poste-plan-voies",
+      "type": "cadre-paysage",
+      "x": 4.5,
+      "y": 1.5,
+      "rotation": 3
+    },
+    {
+      "id": "poste-balai",
+      "type": "balai",
+      "x": 3.5,
+      "y": 2.5,
+      "rotation": 0
     }
   ],
   "doors": {

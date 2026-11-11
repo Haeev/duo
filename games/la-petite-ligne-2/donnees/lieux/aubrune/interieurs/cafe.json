@@ -79,6 +79,62 @@
       "x": 5.5,
       "y": 2.5,
       "rotation": 0
+    },
+    {
+      "id": "cafe-etagere-1",
+      "type": "etagere-murale",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "cafe-etagere-2",
+      "type": "etagere-murale",
+      "x": 2.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "cafe-horloge",
+      "type": "horloge-murale",
+      "x": 5.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "cafe-portrait",
+      "type": "cadre-portrait",
+      "x": 5.5,
+      "y": 4.5,
+      "rotation": 3
+    },
+    {
+      "id": "cafe-tonnelet",
+      "type": "tonnelet",
+      "x": 0.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "cafe-seau",
+      "type": "seau",
+      "x": 0.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "cafe-balai",
+      "type": "balai",
+      "x": 2.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "cafe-tapis-de-sol",
+      "type": "tapis-long",
+      "x": 3.5,
+      "y": 2.5,
+      "rotation": 1
     }
   ],
   "doors": {

@@ -36,6 +36,41 @@
       "x": 1.5,
       "y": 3.5,
       "rotation": 0
+    },
+    {
+      "id": "marthe-soeur",
+      "type": "cadre-ovale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-horloge",
+      "type": "horloge-murale",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-etagere",
+      "type": "etagere-murale",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-patere",
+      "type": "patere",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "marthe-panier",
+      "type": "panier-a-linge",
+      "x": 2.5,
+      "y": 0.5,
+      "rotation": 0
     }
   ],
   "doors": {

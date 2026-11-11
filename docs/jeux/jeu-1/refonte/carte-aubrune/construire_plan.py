@@ -1145,6 +1145,254 @@ for _m in M_:
         _m.update(x=210.5, pourquoi="éclairage du quai, au bout est, au-dessus de la marche de la traversée de service: la potence vers la voie")
 
 
+# ================================================================ version 5: revue visuelle du 2026-11-11 (corrections 2 et 5)
+# 1. Intérieurs habités. Objets d'intérieur livrés le 2026-11-11 (`donnees/commun/meubles`), posés selon qui vit là.
+#    Règles (contrôlées par `verifier_habite` plus bas et par controler_plan.py):
+#    - Le rendu pose un objet de la carte au sol (`base: 0`) et n'a pas de champ « posé sur »: les objets de plateau
+#      (couche `top`: lampes, pendule, journal, livres, bocaux, boîtes, pots, bouquet, corbeille de pain) attendent
+#      ce moyen; leur place prévue est dans plan.md (section 16). Ici: objets de sol, tapis et objets muraux.
+#    - La caméra regarde du sud-ouest (lacet 45): les murs nord et est restent debout, les murs sud et ouest sont
+#      coupés. Un objet mural va donc au mur nord (rotation 0, dos au nord) ou au mur est (rotation 3), jamais sur
+#      une fenêtre ni une porte (relevé des fenêtres du rendu), jamais sur une cloison (le rendu ne la dessine pas).
+#    - 1,5 m libres devant chaque porte et chaque escalier (les deux cases devant); aucun objet sur un point;
+#      rien dans l'emprise prévue d'un meuble encore sans modèle (guichet, tableau, meules, autel, leviers, cloche).
+#    - Un objet haut (vaisselier, poêle) se pose contre un mur debout ou à plus de 0,75 m d'une fenêtre.
+_MODELES = {f[:-5]: json.load(open(os.path.join(_DOSSIER_MEUBLES, f), encoding='utf-8'))['model']
+            for f in sorted(os.listdir(_DOSSIER_MEUBLES)) if f.endswith('.json')}
+HABITE = {
+    # La maison du garde: les joueurs la meublent eux-mêmes (stock, décoration); on n'y met que ce qu'une salle
+    # commune a toujours, et dans la moitié en ruine les outils du déblayage.
+    'maison-rdc': [
+        ('patere', 'patere', 9.5, 0.5, 0, "contre le mur nord, à côté de la porte d'entrée: on y prend sa veste en sortant"),
+        ('horloge', 'horloge-murale', 8.5, 0.5, 0, "au-dessus du bout de table: on la lit de la table, du lit et de la porte"),
+        ('portrait', 'cadre-ovale', 9.5, 3.5, 3, "au mur est, au-dessus de la tête du lit"),
+        ('panier', 'panier-a-linge', 9.5, 2.5, 0, "au pied du lit, contre le mur est, hors du passage de la porte"),
+        ('seau', 'seau', 9.5, 5.5, 0, "l'eau tirée à la pompe du jardin, posée à côté de la cuisinière"),
+        ('tapis-de-sol', 'tapis-long', 7.5, 2.5, 0, "le passage de la porte vers la cuisine et le lit, là où l'on marche le plus"),
+        ('balai', 'balai', 3.5, 1.5, 0, "le balai du déblayage, laissé dans la chambre en ruine"),
+        ('seau-gravats', 'seau', 2.5, 0.5, 0, "le seau des gravats de la chambre en ruine"),
+    ],
+    'maison-cave': [
+        ('etagere', 'etagere-murale', 1.5, 0.5, 0, "l'étagère des conserves contre le mur nord, au frais"),
+        ('caisse', 'caisse-de-legumes', 3.5, 0.5, 0, "les pommes de terre de l'hiver, au frais et dans le noir"),
+        ('tonnelet', 'tonnelet', 4.5, 0.5, 0, "un tonnelet de vin oublié par l'ancien garde"),
+    ],
+    'halte': [
+        ('horloge', 'horloge-murale', 8.5, 0.5, 3, "l'horloge de Firmin, au coin de son bureau: il la lit du guichet (il parle en horaires)"),
+        ('affiche', 'cadre-paysage', 0.5, 0.5, 0, "l'affiche de la ligne au-dessus du banc des voyageurs"),
+        ('reglement', 'cadre-portrait', 8.5, 0.5, 0, "le règlement de la Compagnie encadré au-dessus du bureau de Firmin"),
+        ('patere', 'patere', 8.5, 1.5, 3, "la patère de Firmin dans son bureau (casquette, pèlerine); à trois cœurs, il en visse une seconde à ton nom"),
+        ('poele', 'poele', 3.5, 1.5, 0, "le poêle de la salle d'attente, au milieu, à 1 m du mur des fenêtres; le guichet garde ses deux cases de clients"),
+        ('buches', 'buches-d-interieur', 3.5, 0.5, 0, "le bois du poêle, contre le mur nord, entre deux fenêtres"),
+        ('balai', 'balai', 0.5, 3.5, 0, "le balai de Firmin: la salle des pas perdus se balaie après chaque train"),
+        ('colis', 'caisse-de-legumes', 7.5, 4.5, 0, "un cageot en consigne, qui attend le train du samedi"),
+        ('fut', 'tonnelet', 6.5, 4.5, 0, "un fût expédié par la ligne, en consigne"),
+    ],
+    # Colette: « le tabouret du bout devient le tien » (à trois cœurs).
+    'cafe': [
+        ('etagere-1', 'etagere-murale', 1.5, 0.5, 0, "les tasses et les boîtes de chicorée au-dessus du plan de travail"),
+        ('etagere-2', 'etagere-murale', 2.5, 0.5, 0, "la vaisselle du café, au-dessus du plan de travail"),
+        ('horloge', 'horloge-murale', 5.5, 0.5, 0, "l'heure des trains, derrière le comptoir: Colette la lit en servant"),
+        ('portrait', 'cadre-portrait', 5.5, 4.5, 3, "un portrait au-dessus de la table du fond (pas en y 3: il masquerait la fenêtre est)"),
+        # Le tabouret du bout du comptoir attend: devant ce comptoir d'une case, il prendrait la place du client.
+        # Pas de bûches: toute case pleine de la rangée y 1 enfermerait la cuisinière, et (3; 0) est le seul passage
+        # vers la place de Colette derrière le comptoir.
+        ('tonnelet', 'tonnelet', 0.5, 4.5, 0, "le tonnelet de vin du pays, au coin de la salle, loin du soleil de la vitrine"),
+        ('seau', 'seau', 0.5, 1.5, 0, "l'eau de la cuisinière, posée à côté d'elle"),
+        ('balai', 'balai', 2.5, 4.5, 0, "appuyé à côté de la porte, sans gêner l'entrée"),
+        ('tapis-de-sol', 'tapis-long', 3.5, 2.5, 1, "l'allée de la porte au comptoir: on s'y essuie les pieds"),
+    ],
+    # Odette: épicerie devant, cuisine et souper des pensionnaires derrière; « le bocal de derrière: les cerises de sa mère ».
+    'epicerie-rdc': [
+        ('etagere-1', 'etagere-murale', 0.5, 0.5, 0, "les rayons de l'épicerie, côté Odette, derrière le comptoir"),
+        ('etagere-2', 'etagere-murale', 3.5, 0.5, 0, "les rayons de l'épicerie, entre les deux fenêtres"),
+        ('etagere-3', 'etagere-murale', 6.5, 0.5, 0, "les rayons de l'épicerie, dans le coin de la porte"),
+        ('caisse-1', 'caisse-de-legumes', 1.5, 0.5, 0, "la réserve de pommes de terre, derrière le comptoir"),
+        ('caisse-2', 'caisse-de-legumes', 4.5, 0.5, 0, "un cageot de pommes à côté de l'étal"),
+        ('tonnelet', 'tonnelet', 0.5, 4.5, 0, "l'huile au détail, derrière le comptoir"),
+        ('horloge', 'horloge-murale', 6.5, 4.5, 3, "au mur est, vue du comptoir: l'heure de fermer"),
+        ('balai', 'balai', 6.5, 3.5, 0, "à côté de la porte: Odette balaie devant chez elle"),
+        ('portrait', 'cadre-portrait', 6.5, 6.5, 3, "dans la cuisine, le portrait de sa mère (celle des cerises)"),
+        ('buches', 'buches-d-interieur', 0.5, 7.5, 0, "le bois de la cuisinière, à côté d'elle"),
+        ('seau', 'seau', 2.5, 8.5, 0, "l'eau de la cuisine, entre la cuisinière et la table"),
+        ('vaisselier', 'vaisselier', 2, 6.5, 0, "la vaisselle du souper, face à la table, dos à la cloison de la boutique"),
+        ('panier', 'panier-a-linge', 5.5, 6.5, 0, "le linge des pensionnaires, au pied de l'escalier, prêt à monter"),
+        ('tonnelet-2', 'tonnelet', 5.5, 8.5, 0, "le cidre, sous l'escalier"),
+        ('caisse-3', 'caisse-de-legumes', 4.5, 8.5, 0, "les légumes du souper à éplucher"),
+        ('tapis-de-sol', 'tapis-rond', 2, 8, 0, "sous la table du souper"),
+    ],
+    'epicerie-etage': [
+        ('gravure', 'cadre-paysage', 3.5, 0.5, 0, "une gravure entre les deux lits, au-dessus de la place de la table de nuit"),
+        ('patere', 'patere', 6.5, 0.5, 0, "la patère des pensionnaires, dans le coin le plus proche du palier"),
+        ('portrait', 'cadre-portrait', 6.5, 3.5, 3, "un portrait au mur est de la chambre"),
+        ('etagere', 'etagere-murale', 6.5, 4.5, 3, "l'étagère où l'on pose ses affaires, près du palier"),
+        ('panier', 'panier-a-linge', 4.5, 0.5, 0, "le linge sale des pensionnaires, sous la fenêtre"),
+        ('tapis-de-sol', 'tapis-long', 2.5, 2.5, 0, "la descente de lit au pied des deux lits"),
+        ('tabouret', 'tabouret-de-ferme', 4.5, 1.5, 0, "le tabouret qui sert de table de nuit au second lit"),
+        ('odette-panier', 'panier-a-linge', 0.5, 8.5, 0, "le panier d'Odette au pied de son lit"),
+        ('odette-tapis-rond', 'tapis-rond', 3, 8, 0, "le tapis tressé de la chambre d'Odette, à côté du lit"),
+    ],
+    # Achille: « à moitié endormi »; le fournil derrière, la boutique devant.
+    'fournil': [
+        ('etagere', 'etagere-murale', 0.5, 0.5, 0, "les moules et les bannetons au-dessus du pétrin"),
+        ('buches', 'buches-d-interieur', 4.5, 0.5, 0, "le bois du four rangé contre lui, côté pétrin, hors de sa gueule"),
+        ('affiche', 'cadre-paysage', 5.5, 1.5, 3, "au mur est, face au comptoir"),
+        ('etagere-pains', 'etagere-murale', 5.5, 2.5, 3, "les pains rangés derrière le comptoir"),
+        ('horloge', 'horloge-murale', 5.5, 3.5, 3, "l'heure des fournées, lue du comptoir"),
+        ('patere', 'patere', 5.5, 4.5, 3, "le tablier et la veste d'Achille, près de la porte"),
+        ('seau', 'seau', 0.5, 1.5, 0, "l'eau du pétrin, à côté de lui"),
+        ('balai', 'balai', 2.5, 1.5, 0, "la farine se balaie devant le pétrin"),
+        ('tabouret', 'tabouret-de-ferme', 0.5, 3.5, 0, "le tabouret où Achille somnole entre deux fournées"),
+        ('panier', 'panier-a-linge', 0.5, 4.5, 0, "les toiles à pâtons propres, revenues de la lessive"),
+        ('tapis-de-sol', 'tapis-long', 3.5, 2.5, 1, "l'allée de la porte au comptoir"),
+    ],
+    # Solange: ancienne comédienne (« a quitté la scène par trac »).
+    'mercerie': [
+        ('rubans', 'etagere-murale', 0.5, 0.5, 0, "les bobines et les rubans, à gauche en entrant"),
+        ('boutons', 'etagere-murale', 1.5, 0.5, 0, "les boîtes de boutons, au-dessus du bout du comptoir"),
+        ('patere', 'patere', 5.5, 0.5, 0, "les manteaux des clientes, près de la porte"),
+        ('affiche', 'cadre-portrait', 5.5, 1.5, 3, "une affiche de théâtre encadrée: le seul souvenir de scène que Solange montre"),
+        ('panier', 'panier-a-linge', 0.5, 3.5, 0, "les serviettes du salon de coiffure"),
+        ('balai', 'balai', 0.5, 5.5, 0, "les cheveux se balaient au coin du salon"),
+        ('tapis-de-sol', 'tapis-rond', 2, 4, 0, "sous le fauteuil de coiffure"),
+        ('tabouret', 'tabouret-de-ferme', 3.5, 3.5, 0, "le tabouret où l'on attend son tour au salon"),
+    ],
+    # Mado: rit fort, tape; elle écrit à Barnabé sur des fers à cheval.
+    'forge': [
+        ('fers', 'etagere-murale', 0.5, 0.5, 0, "les fers à cheval et les clous, au mur nord"),
+        ('patere', 'patere', 4.5, 0.5, 0, "le tablier de cuir de Mado"),
+        ('outils', 'etagere-murale', 4.5, 1.5, 3, "les pinces et les marteaux au mur est, au-dessus du râtelier"),
+        ('seau', 'seau', 1.5, 0.5, 0, "le seau de trempe à côté du foyer"),
+        ('buches', 'buches-d-interieur', 3.5, 0.5, 0, "le bois du foyer, de l'autre côté"),
+        ('tonnelet', 'tonnelet', 0.5, 3.5, 0, "la réserve d'eau, près du coffre"),
+        ('balai', 'balai', 0.5, 4.5, 0, "à côté de la porte"),
+    ],
+    # Basile: trois mots par phrase; il parle à ses planches et prête son rabot.
+    'atelier-basile': [
+        ('rabots', 'etagere-murale', 0.5, 0.5, 0, "les rabots et les gouges (dont celui qu'il te prête)"),
+        ('outils', 'etagere-murale', 1.5, 0.5, 0, "les serre-joints, au mur nord"),
+        ('patere', 'patere', 7.5, 0.5, 0, "la veste de Basile, entre l'établi et le râtelier"),
+        ('planches', 'etagere-murale', 8.5, 5.5, 3, "les petites planches choisies, au mur est"),
+        ('balai', 'balai', 8.5, 6.5, 0, "les copeaux se balaient vers le coin"),
+        ('seau', 'seau', 5.5, 0.5, 0, "l'eau de la pierre à affûter, à côté de l'établi"),
+        ('tabouret', 'tabouret-de-ferme', 5.5, 1.5, 0, "le tabouret de l'établi"),
+        ('buches', 'buches-d-interieur', 2.5, 6.5, 0, "les chutes de bois, près du tas (une case libre entre eux: on y prend le bois)"),
+        ('tonnelet', 'tonnelet', 0.5, 5.5, 0, "la colle et l'huile de lin"),
+    ],
+    # Armand: instituteur et secrétaire de mairie; il fait la leçon au squelette (modèle à créer).
+    'ecole': [
+        ('patere', 'patere', 5.5, 4.5, 3, "les blouses et les cartables, près de la porte"),
+        ('poele', 'poele', 0.5, 0.5, 0, "le poêle de la classe, dans le coin nord-ouest"),
+        ('buches', 'buches-d-interieur', 0.5, 1.5, 0, "le bois du poêle, à côté de lui"),
+        ('balai', 'balai', 4.5, 4.5, 0, "la classe se balaie le soir; appuyé à côté de la porte, au mur sud ouvert par la porte"),
+        ('seau', 'seau', 1.5, 4.5, 0, "l'eau de l'éponge du tableau"),
+    ],
+    # Margot et Paulin: la salle commune de la ferme.
+    'ferme-logis': [
+        ('etagere', 'etagere-murale', 3.5, 0.5, 0, "les écuelles, à côté du plan de travail"),
+        ('horloge', 'horloge-murale', 4.5, 0.5, 0, "l'horloge de la ferme, entre les fenêtres, vue de la table"),
+        ('patere', 'patere', 7.5, 4.5, 3, "les vestes de travail, du côté de la porte"),
+        ('seau', 'seau', 3.5, 1.5, 0, "l'eau de la cuisine, devant le plan de travail"),
+        ('buches', 'buches-d-interieur', 0.5, 2.5, 0, "le bois de la cuisinière, une case plus loin: la case devant elle reste libre"),
+        ('caisse', 'caisse-de-legumes', 0.5, 3.5, 0, "les légumes du potager de la ferme"),
+        ('tonnelet', 'tonnelet', 0.5, 4.5, 0, "le cidre de la ferme"),
+        ('panier', 'panier-a-linge', 7.5, 2.5, 0, "le linge à repriser, à côté de la table"),
+        ('balai', 'balai', 3.5, 4.5, 0, "à côté de la porte"),
+        ('tapis-de-sol', 'tapis-rond', 6, 3, 0, "sous la table"),
+    ],
+    # Marthe: sèche, exacte; « un coup de cloche en moins pour sa sœur ».
+    'marthe': [
+        ('soeur', 'cadre-ovale', 0.5, 0.5, 0, "le portrait de sa sœur, au-dessus de la tête du lit"),
+        ('horloge', 'horloge-murale', 1.5, 0.5, 0, "l'heure exacte de la sonneuse, vue du lit"),
+        ('etagere', 'etagere-murale', 3.5, 0.5, 0, "au mur nord, près de la porte"),
+        ('patere', 'patere', 4.5, 0.5, 0, "la pèlerine et la clé de l'église, près de la porte"),
+        ('panier', 'panier-a-linge', 2.5, 0.5, 0, "sous la fenêtre"),
+    ],
+    # Berthe: sa meule s'appelle Marguerite, comme sa mère.
+    'moulin': [
+        ('portrait', 'cadre-portrait', 6.5, 3.5, 3, "le portrait de Marguerite, sa mère, face aux meules qui portent son nom"),
+        ('balai', 'balai', 5.5, 3.5, 0, "la farine se balaie autour des meules"),
+        ('tabouret', 'tabouret-de-ferme', 1.5, 1.5, 0, "le tabouret d'où Berthe écoute sa meule"),
+        ('seau', 'seau', 5.5, 0.5, 0, "à droite de la porte"),
+    ],
+    'moulin-etage': [
+        ('patere', 'patere', 3.5, 0.5, 0, "la veste du meunier, près du lit, entre les deux fenêtres"),
+        ('panier', 'panier-a-linge', 1.5, 0.5, 0, "le linge de Berthe, à la tête du lit"),
+    ],
+    'eglise': [
+        ('tapis-1', 'tapis-long', 8.5, 5.5, 0, "le tapis de l'allée centrale, de l'arc du clocher vers le chœur"),
+        ('tapis-2', 'tapis-long', 11.5, 5.5, 0, "le tapis de l'allée centrale"),
+        ('tapis-3', 'tapis-long', 14.5, 5.5, 0, "le tapis de l'allée centrale, jusqu'au chœur"),
+        ('balai', 'balai', 4.5, 3.5, 0, "Marthe range son balai dans la base du clocher"),
+        ('seau', 'seau', 4.5, 7.5, 0, "et son seau, de l'autre côté de l'arc"),
+    ],
+    'poste': [
+        ('horloge', 'horloge-murale', 0.5, 0.5, 0, "l'heure exacte des trains, au mur nord"),
+        ('patere', 'patere', 4.5, 0.5, 0, "la veste de l'aiguilleur, au pied de l'escalier"),
+        ('plan-voies', 'cadre-paysage', 4.5, 1.5, 3, "le tableau des circulations au mur est"),
+        ('balai', 'balai', 3.5, 2.5, 0, "à côté de l'escalier, hors de son arrivée"),
+    ],
+    'poste-cabine': [
+        ('poele', 'poele', 0.5, 0.5, 0, "le poêle de la cabine, dans le coin, loin des leviers"),
+        ('buches', 'buches-d-interieur', 0.5, 1.5, 0, "son bois"),
+        ('plan-voies', 'cadre-paysage', 4.5, 0.5, 3, "le plan des voies, au mur est, au bout des leviers"),
+    ],
+}
+for _it in INT:
+    for _s, _t, _x, _y, _r, _pq in HABITE.get(_it['id'], ()):
+        _it['meubles'].append(dict(id='%s-%s' % (_it['id'], _s), type=_t, modele=_MODELES[_t], x=_x, y=_y, rotation=_r, pourquoi=_pq))
+
+# 2. Vues de jour trop vides dehors. Seuls des types de meubles sans brique de récolte (le décor ajouté n'est pas
+#    récoltable, l'économie ne bouge pas). Les rochers, buissons, herbes sauvages, tonneaux, caisses, bancs de ferme,
+#    tas de bûches, puits, auges et clôtures ont un modèle livré mais aucun type de meuble: listés dans plan.md (section 16).
+DECOR_VUES = [
+    # ferme (220, 162): les champs des Delmas et leur potager.
+    ('ferme', 'cageot-ferme-1', 'caisse-de-legumes', 212.5, 157.5, 0, "cageots de la récolte du potager de la ferme, au bord du chemin des Champs: la charrette les prend là"),
+    ('ferme', 'cageot-ferme-2', 'caisse-de-legumes', 213.5, 157.5, 0, "cageots de la récolte, au bord du chemin"),
+    ('ferme', 'cageot-ferme-3', 'caisse-de-legumes', 214.5, 157.5, 0, "cageots de la récolte, au bord du chemin"),
+    ('ferme', 'seau-potager-ferme', 'seau', 210.5, 157.5, 0, "le seau d'arrosage, au coin du potager"),
+    ('ferme', 'banc-champs', 'banc-de-table', 228, 156.5, 0, "le banc où Margot et Paulin cassent la croûte, au bord du chemin, face à leurs champs"),
+    ('ferme', 'panier-champs', 'panier-a-linge', 229.5, 156.5, 0, "le panier du casse-croûte, à côté du banc"),
+    ('ferme', 'tonnelet-labour', 'tonnelet', 213.5, 163.5, 0, "le tonnelet d'eau des travailleurs, au coin du labour"),
+    ('ferme', 'seau-labour', 'seau', 212.5, 164.5, 0, "le seau des bêtes de trait, au coin du labour"),
+    # talus (196, 141.5): l'arrière du logis de la ferme, entre son mur nord et la rivière.
+    ('talus', 'bois-logis-1', 'buches-d-interieur', 201.5, 146.5, 0, "le bois de chauffe empilé contre le mur nord du logis, sous l'avant-toit"),
+    ('talus', 'bois-logis-2', 'buches-d-interieur', 202.5, 146.5, 0, "le bois de chauffe contre le mur nord du logis"),
+    ('talus', 'tonnelet-logis', 'tonnelet', 204.5, 146.5, 0, "un tonnelet qui attend le cidre, contre le mur nord, à l'ombre"),
+    ('talus', 'banc-talus', 'banc-de-table', 196, 143.5, 2, "un banc à mi-pente, face à la rivière et au bourg: Margot y écosse"),
+    ('talus', 'panier-talus', 'panier-a-linge', 197.5, 143.5, 0, "le panier de légumes à écosser, à côté du banc"),
+    ('talus', 'seau-talus', 'seau', 192.5, 140.5, 0, "le seau puisé à la rivière, en haut de la berge (Margot descend à la grève le matin)"),
+    # clôture (151, 101.5): le pré des cheminots, entre leur chemin et la clôture de la voie.
+    ('cloture', 'banc-cheminots', 'banc', 152, 101.5, 2, "le banc des cheminots face à la voie: on y regarde passer les trains"),
+    ('cloture', 'bois-cheminots-1', 'buches-d-interieur', 157.5, 100.5, 0, "le bois fendu des logements de la Compagnie, au pied de la clôture"),
+    ('cloture', 'bois-cheminots-2', 'buches-d-interieur', 158.5, 100.5, 0, "le bois fendu des logements de la Compagnie"),
+    ('cloture', 'cageot-cheminots', 'caisse-de-legumes', 147.5, 104.5, 0, "un cageot du jardin des cheminots, au bord de leur chemin"),
+    ('cloture', 'seau-cheminots', 'seau', 148.5, 104.5, 0, "le seau d'arrosage du jardin des cheminots"),
+    # berge (195.5, 127.2): l'arrière de la pension d'Odette, la berge et la grève.
+    ('berge', 'tonnelet-pension', 'tonnelet', 188.5, 121.5, 0, "le tonnelet de cidre d'Odette contre le mur sud de la pension, à l'ombre"),
+    ('berge', 'panier-pension', 'panier-a-linge', 191.5, 122.5, 0, "le linge des pensionnaires, qu'Odette étend au soleil de la berge"),
+    ('berge', 'seau-pension', 'seau', 190.5, 122.5, 0, "le seau de la lessive, à côté du panier"),
+    ('berge', 'bois-flotte-1', 'buches-d-interieur', 193.5, 128.5, 0, "du bois flotté tiré de la grève, qui sèche au-dessus de l'eau"),
+    ('berge', 'bois-flotte-2', 'buches-d-interieur', 194.5, 128.5, 0, "du bois flotté qui sèche"),
+    # rue du bourg (204, 124): la place, la tonnelle et la descente au ponton.
+    ('rue-du-bourg', 'seau-pompe', 'seau', 208, 114.5, 0, "le seau sous le bec de la pompe de la place"),
+    ('rue-du-bourg', 'tonnelet-tonnelle', 'tonnelet', 195.5, 122.5, 0, "le cidre du souper de la tonnelle, au pied de la pension"),
+    ('rue-du-bourg', 'panier-lessive', 'panier-a-linge', 210.5, 122.5, 0, "la lessive descendue à la rivière, posée en haut de la berge"),
+    ('rue-du-bourg', 'seau-lessive', 'seau', 211.5, 122.5, 0, "le seau de rinçage de la lessive"),
+    # orée (104, 90): la plaine du garage, au bord du ballast.
+    ('oree', 'tonnelet-garage', 'tonnelet', 97.5, 94.5, 0, "un tonnelet de graisse d'aiguillage oublié par la Compagnie au bord de la plaine du garage"),
+    ('oree', 'seau-garage', 'seau', 96.5, 94.5, 0, "le seau de graisse, à côté"),
+]
+for _v, _i, _t, _x, _y, _r, _pq in DECOR_VUES:
+    mob(_i, _t, _MODELES[_t], _x, _y, _r, _pq, acte=1 if _v in ('berge', 'rue-du-bourg', 'cloture') else 2 if _v == 'oree' else 3)
+    M_[-1]['vue'] = _v
+
+# 3. Fouilles qui ont leur fiche de ressource (`donnees/commun/ressources/<id>.json`): l'objet la porte (`resource`).
+for _r in RESSOURCES:
+    if _r['id'] in ('fouille-roche', 'fouille-ballast', 'fouille-pierre-levee'):
+        _r['fiche'] = _r['id']
+
+
 # ================================================================ calculs
 def dist(a, b):
     return math.hypot(N[a]['x'] - N[b]['x'], N[a]['y'] - N[b]['y'])

@@ -58,6 +58,69 @@
       "x": 8.5,
       "y": 4.5,
       "rotation": 3
+    },
+    {
+      "id": "halte-horloge",
+      "type": "horloge-murale",
+      "x": 8.5,
+      "y": 0.5,
+      "rotation": 3
+    },
+    {
+      "id": "halte-affiche",
+      "type": "cadre-paysage",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-reglement",
+      "type": "cadre-portrait",
+      "x": 8.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-patere",
+      "type": "patere",
+      "x": 8.5,
+      "y": 1.5,
+      "rotation": 3
+    },
+    {
+      "id": "halte-poele",
+      "type": "poele",
+      "x": 3.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-buches",
+      "type": "buches-d-interieur",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-balai",
+      "type": "balai",
+      "x": 0.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-colis",
+      "type": "caisse-de-legumes",
+      "x": 7.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "halte-fut",
+      "type": "tonnelet",
+      "x": 6.5,
+      "y": 4.5,
+      "rotation": 0
     }
   ],
   "doors": {

@@ -61,6 +61,118 @@
       "x": 2,
       "y": 7.5,
       "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-etagere-1",
+      "type": "etagere-murale",
+      "x": 0.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-etagere-2",
+      "type": "etagere-murale",
+      "x": 3.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-etagere-3",
+      "type": "etagere-murale",
+      "x": 6.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-caisse-1",
+      "type": "caisse-de-legumes",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-caisse-2",
+      "type": "caisse-de-legumes",
+      "x": 4.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-tonnelet",
+      "type": "tonnelet",
+      "x": 0.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-horloge",
+      "type": "horloge-murale",
+      "x": 6.5,
+      "y": 4.5,
+      "rotation": 3
+    },
+    {
+      "id": "epicerie-rdc-balai",
+      "type": "balai",
+      "x": 6.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-portrait",
+      "type": "cadre-portrait",
+      "x": 6.5,
+      "y": 6.5,
+      "rotation": 3
+    },
+    {
+      "id": "epicerie-rdc-buches",
+      "type": "buches-d-interieur",
+      "x": 0.5,
+      "y": 7.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-seau",
+      "type": "seau",
+      "x": 2.5,
+      "y": 8.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-vaisselier",
+      "type": "vaisselier",
+      "x": 2,
+      "y": 6.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-panier",
+      "type": "panier-a-linge",
+      "x": 5.5,
+      "y": 6.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-tonnelet-2",
+      "type": "tonnelet",
+      "x": 5.5,
+      "y": 8.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-caisse-3",
+      "type": "caisse-de-legumes",
+      "x": 4.5,
+      "y": 8.5,
+      "rotation": 0
+    },
+    {
+      "id": "epicerie-rdc-tapis-de-sol",
+      "type": "tapis-rond",
+      "x": 2,
+      "y": 8,
+      "rotation": 0
     }
   ],
   "doors": {

@@ -23,6 +23,34 @@
       "x": 6.5,
       "y": 6.5,
       "rotation": 3
+    },
+    {
+      "id": "moulin-portrait",
+      "type": "cadre-portrait",
+      "x": 6.5,
+      "y": 3.5,
+      "rotation": 3
+    },
+    {
+      "id": "moulin-balai",
+      "type": "balai",
+      "x": 5.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-tabouret",
+      "type": "tabouret-de-ferme",
+      "x": 1.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-seau",
+      "type": "seau",
+      "x": 5.5,
+      "y": 0.5,
+      "rotation": 0
     }
   ],
   "doors": {
