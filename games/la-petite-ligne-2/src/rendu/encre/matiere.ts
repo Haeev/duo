@@ -36,6 +36,7 @@ import type { Ambiance } from './ambiances';
 import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
 import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
 import { hex, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
+import { RENDER_SETTINGS } from '../reglages';
 import { INK_SETTINGS } from './reglages';
 
 /**
@@ -55,6 +56,26 @@ export const INK_INNER = 'inkInner';
  * (m, monde) où l'étage commence.
  */
 export type InkInner = Vector4;
+
+/** Découpe d'occultation propre d'un objet (`userData.inkCut` d'un maillage), lue à chaque dessin. */
+export const INK_CUT = 'inkCut';
+
+/**
+ * Découpe d'un objet (`occultation.ts`): `state` x part d'ouverture (0: plein), y mode (0: ouvert
+ * sur le dehors, houppier ou repère; 1: bâtiment, dedans coupé), z hauteur de son sol (m, monde);
+ * `rect` son emprise au sol (x0, z0, x1, z1, m, monde).
+ */
+export interface InkCut {
+  readonly state: Vector4;
+  readonly rect: Vector4;
+}
+
+export function createInkCut(): InkCut {
+  return { state: new Vector4(), rect: new Vector4() };
+}
+
+/** Nombre de joueurs autour desquels un volume s'ouvre (le joueur local et l'autre). */
+export const MAX_CUT_SUBJECTS = 2;
 
 export interface Lamp {
   readonly x: number;
@@ -173,13 +194,35 @@ export interface InkUniforms {
   uGroundTones: IUniform<Vector4>;
   /** Eau: x ton clair, y ton sombre, z vitesse. */
   uWater: IUniform<Vector3>;
+  /** Pieds des joueurs autour desquels les volumes s'ouvrent (w: 1 si présent). */
+  uCutSubject: IUniform<Vector4[]>;
+  /** Découpe: x, y demi-axes de l'ellipse (m), z couronne (part du rayon), w distance devant le joueur. */
+  uCutShape: IUniform<Vector4>;
+  /** Découpe: x hauteur de coupe, y centre de l'ellipse (au-dessus des pieds), z pas de la trame, w épaisseur des murs. */
+  uCutKeep: IUniform<Vector4>;
+  /** Teintes d'écran du dedans d'un bâtiment ouvert: sol, faces intérieures des murs. */
+  uCutFloor: IUniform<Vector3>;
+  uCutWall: IUniform<Vector3>;
 }
 
 export function createInkUniforms(): InkUniforms {
   const four = (count: number): Vector4[] => Array.from({ length: count }, () => new Vector4());
   const g = INK_SETTINGS.ground;
   const fallback = new Color(g.fallback.color);
+  const cut = RENDER_SETTINGS.occlusion.cut;
   return {
+    uCutSubject: { value: four(MAX_CUT_SUBJECTS) },
+    uCutShape: {
+      value: new Vector4(
+        cut.radius[0],
+        cut.radius[1],
+        cut.band / ((cut.radius[0] + cut.radius[1]) / 2),
+        cut.front,
+      ),
+    },
+    uCutKeep: { value: new Vector4(cut.keep, cut.center, cut.stroke, cut.wall) },
+    uCutFloor: { value: new Vector3(...hex(cut.floorColor)) },
+    uCutWall: { value: new Vector3(...hex(cut.wallColor)) },
     uSunDir: { value: new Vector3(0, 1, 0) },
     uLit: { value: new Vector3(1, 1, 1) },
     uHalf: { value: new Vector3(1, 1, 1) },
@@ -655,6 +698,14 @@ uniform vec4 uGlow;
 uniform vec4 uOwn;
 #if defined(CHARACTER) || defined(ATLAS)
   flat in vec2 vAnchor;
+#else
+  uniform vec4 uCutSubject[${String(MAX_CUT_SUBJECTS)}];
+  uniform vec4 uCutShape;
+  uniform vec4 uCutKeep;
+  uniform vec3 uCutFloor;
+  uniform vec3 uCutWall;
+  uniform vec4 uCut;
+  uniform vec4 uCutRect;
 #endif
 #ifdef ATLAS
   in vec2 vUv;
@@ -685,6 +736,45 @@ uniform vec4 uOwn;
   }
 #endif
 ${LIGHTING}
+#if !defined(CHARACTER) && !defined(ATLAS)
+// Découpe d'occultation, point par point (occultation.ts: cutZone puis cutInterior, mêmes calculs).
+// Rend -1: plein; 0: ouvert, on voit ce qui est derrière; 1: tranche d'un mur coupé; 2: sol du
+// dedans; 3: face intérieure d'un mur.
+float cutSight(vec3 wp) {
+  vec2 flatView = uViewDir.xz;
+  vec3 right = length(flatView) < 1e-6 ? vec3(1.0, 0.0, 0.0) : normalize(vec3(uViewDir.z, 0.0, -uViewDir.x));
+  vec3 up = cross(uViewDir, right);
+  for (int i = 0; i < ${String(MAX_CUT_SUBJECTS)}; i++) {
+    vec4 s = uCutSubject[i];
+    if (s.w <= 0.0) continue;
+    float cutY = s.y + uCutKeep.x;
+    if (wp.y < cutY) continue;
+    vec3 v = wp - s.xyz - vec3(0.0, uCutKeep.y, 0.0);
+    if (dot(v, uViewDir) < uCutShape.w) continue;
+    float reach = length(vec2(dot(v, right) / uCutShape.x, dot(v, up) / uCutShape.y)) / uCut.x;
+    if (reach >= 1.0 + uCutShape.z) continue;
+    if (reach >= 1.0) {
+      // Couronne en trame d'encre: des traits obliques ancrés au monde, de plus en plus pleins
+      // vers le dehors (aucun fondu, aucune transparence).
+      float t = (reach - 1.0) / uCutShape.z;
+      float stripe = fract((dot(wp, right) + dot(wp, up)) / uCutKeep.z);
+      if (stripe < t) continue;
+    }
+    if (uCut.y < 0.5) return 0.0;
+    // Joueur dans l'emprise (sous un débord): tout s'ouvre, rien du dedans ne le recouvre.
+    if (all(greaterThan(s.xz, uCutRect.xy)) && all(lessThan(s.xz, uCutRect.zw))) return 0.0;
+    float dy = max(uViewDir.y, 1e-3);
+    vec2 q = wp.xz - flatView * ((wp.y - cutY) / dy);
+    float edge = min(min(q.x - uCutRect.x, uCutRect.z - q.x), min(q.y - uCutRect.y, uCutRect.w - q.y));
+    if (edge < 0.0) return 0.0;
+    if (edge < uCutKeep.w) return 1.0;
+    vec2 p = wp.xz - flatView * (max(wp.y - uCut.z, 0.0) / dy);
+    float inner = min(min(p.x - uCutRect.x, uCutRect.z - p.x), min(p.y - uCutRect.y, uCutRect.w - p.y));
+    return inner >= uCutKeep.w ? 2.0 : 3.0;
+  }
+  return -1.0;
+}
+#endif
 // Teintes un peu poussées: de haut et de loin, chaque personnage se lit à sa couleur.
 vec3 pushed(vec3 c) {
   return clamp(mix(vec3(dot(c, vec3(0.3, 0.59, 0.11))), c, uCharacter.z) * uCharacter.w, 0.0, 1.0);
@@ -709,6 +799,26 @@ vec3 figure(vec3 skin, vec3 N, vec3 lightN, float body) {
 }
 #endif
 void main() {
+  #if !defined(CHARACTER) && !defined(ATLAS)
+    // Volume ouvert devant un joueur: le morceau qui le cache disparaît (la passe d'ombre ne lit pas
+    // ce nuanceur: l'ombre portée reste entière), et un bâtiment montre son dedans coupé.
+    float sight = uCut.x > 0.0 ? cutSight(vWorld) : -1.0;
+    if (sight > -0.5) {
+      if (sight < 0.5) discard;
+      vec3 inside = uInk;
+      vec3 facing = vec3(0.0, 1.0, 0.0);
+      if (sight > 2.5) {
+        inside = uCutWall * mix(uShade, uHalf, 0.5);
+        facing = normalize(vec3(uViewDir.x, 0.0, uViewDir.z) + vec3(0.0, 1e-4, 0.0));
+      } else if (sight > 1.5) {
+        inside = uCutFloor * uShade;
+      }
+      gColor = vec4(inside, 1.0);
+      // Morceaux à part (tranche, sol, murs): le contour cerne la coupe.
+      gAux = vec4(packNormal(facing), (floor(vMeta.w / 64.0) * 64.0 + 60.0 + sight) / 255.0, vMeta.y / 255.0);
+      return;
+    }
+  #endif
   vec3 N = normalize(vNormal);
   if (!gl_FrontFacing) N = -N;
   vec3 color;
@@ -1013,6 +1123,8 @@ void main() {
 `;
 
 interface OwnUniforms {
+  uCut: IUniform<Vector4>;
+  uCutRect: IUniform<Vector4>;
   uTint: IUniform<Color>;
   uOpacity: IUniform<number>;
   uFaded: IUniform<number>;
@@ -1022,6 +1134,12 @@ interface OwnUniforms {
 }
 
 const NO_INNER = new Vector4(0, 0, 0, 0);
+const NO_CUT = createInkCut();
+
+function isInkCut(value: unknown): value is InkCut {
+  const cut = value as Partial<InkCut> | null | undefined;
+  return cut?.state instanceof Vector4 && cut.rect instanceof Vector4;
+}
 
 export type InkVariant = 'volume' | 'character' | 'atlas';
 
@@ -1055,6 +1173,8 @@ export class InkMaterial extends ShaderMaterial {
     extra: Record<string, IUniform> = {},
   ) {
     const own: OwnUniforms = {
+      uCut: { value: NO_CUT.state },
+      uCutRect: { value: NO_CUT.rect },
       uTint: { value: new Color(1, 1, 1) },
       uOpacity: { value: 1 },
       uFaded: { value: 0 },
@@ -1094,6 +1214,10 @@ export class InkMaterial extends ShaderMaterial {
     const own = this.own;
     const inner = object?.userData[INK_INNER];
     own.uInner.value = inner instanceof Vector4 ? inner : NO_INNER;
+    const cut = object?.userData[INK_CUT];
+    const shown = isInkCut(cut) ? cut : NO_CUT;
+    own.uCut.value = shown.state;
+    own.uCutRect.value = shown.rect;
     own.uOpacity.value = this.opacity;
     own.uFaded.value = this.transparent ? 1 : 0;
     own.uGlow.value.set(this.emissive.r, this.emissive.g, this.emissive.b, this.emissiveIntensity);
