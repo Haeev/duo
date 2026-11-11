@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "table-de-chevet-sauge",
+  "name": "Table de chevet sauge",
+  "model": "train-table",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "campagne",
+  "top": 0.75,
+  "bricks": [],
+  "deco": {
+    "layer": "floor",
+    "surface": true,
+    "where": "indoor",
+    "comfort": 2
+  }
+}

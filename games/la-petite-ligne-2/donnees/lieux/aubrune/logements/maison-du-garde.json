@@ -61,11 +61,13 @@
               "type": "remembered",
               "key": "aubrune.maison.premiere-piece"
             }
-          ]
+          ],
+          "says": "Sans toit, balayer ne sert à rien: la pluie referait le travail."
         }
       ],
       "unlocks": ["sleep", "store"],
-      "clue": null
+      "clue": null,
+      "site": "maison-chantier-salle"
     },
     {
       "id": "cuisine",
@@ -99,11 +101,13 @@
               "type": "remembered",
               "key": "aubrune.maison.cuisine"
             }
-          ]
+          ],
+          "says": "Pas encore de devis: Basile n'a pas chiffré la cuisine."
         }
       ],
       "unlocks": ["cook", "store"],
-      "clue": "Sous la vieille plaque, un carnet de menus. Chaque dimanche: « Pot-au-feu. En faire trop: on ne sait jamais qui descend du train. »"
+      "clue": "Sous la vieille plaque, un carnet de menus. Chaque dimanche: « Pot-au-feu. En faire trop: on ne sait jamais qui descend du train. »",
+      "site": "maison-chantier-cuisine"
     },
     {
       "id": "chambre",
@@ -137,11 +141,13 @@
               "type": "remembered",
               "key": "aubrune.maison.chambre"
             }
-          ]
+          ],
+          "says": "Pas encore de devis: Basile n'a pas chiffré la chambre."
         }
       ],
       "unlocks": ["sleep", "store"],
-      "clue": "Un clou au mur, poli par l'usage, à hauteur d'épaule: la place d'une casquette. Dessous, au crayon: « Ne pas oublier la lanterne. »"
+      "clue": "Un clou au mur, poli par l'usage, à hauteur d'épaule: la place d'une casquette. Dessous, au crayon: « Ne pas oublier la lanterne. »",
+      "site": "maison-chantier-chambre"
     },
     {
       "id": "troisieme-piece",
@@ -174,7 +180,8 @@
         }
       ],
       "unlocks": ["wash", "store"],
-      "clue": "Dans le placard, une pile d'indicateurs de la Petite Ligne, un par année. Dans tous, la page d'Aubrune est cornée."
+      "clue": "Dans le placard, une pile d'indicateurs de la Petite Ligne, un par année. Dans tous, la page d'Aubrune est cornée.",
+      "site": "maison-chantier-troisieme-piece"
     },
     {
       "id": "etage",
@@ -207,7 +214,8 @@
         }
       ],
       "unlocks": ["sleep", "store", "wash"],
-      "clue": "De la lucarne, on voit la barrière, le quai et la voie jusqu'à la courbe. Sur l'appui, deux ronds dans le bois: un bol, une lanterne."
+      "clue": "De la lucarne, on voit la barrière, le quai et la voie jusqu'à la courbe. Sur l'appui, deux ronds dans le bois: un bol, une lanterne.",
+      "site": "maison-chantier-etage"
     },
     {
       "id": "cave",
@@ -232,11 +240,13 @@
               "type": "remembered",
               "key": "aubrune.maison.cave"
             }
-          ]
+          ],
+          "says": "Personne ne sait encore ce qui dort sous ces gravats."
         }
       ],
       "unlocks": ["store"],
-      "clue": null
+      "clue": null,
+      "site": "maison-chantier-cave"
     }
   ],
   "garden": {

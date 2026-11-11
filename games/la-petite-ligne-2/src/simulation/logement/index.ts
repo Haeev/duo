@@ -7,15 +7,17 @@ import type { PlaceContent } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { HousingDef, RoomDef } from '../../donnees/schemas/logement';
 import { initialBrickStates } from '../../etat/briques';
+import type { PlayerState } from '../../etat/joueur';
 import type { HousingState } from '../../etat/logement';
 import type { PlaceState } from '../../etat/lieu';
 import { postureOf } from '../briques/postures';
 import type { Intent } from '../noyau/entrees';
 import { findProp } from '../noyau/obstacles';
 import type { GameSystem, SimContext } from '../noyau/systemes';
-import { evaluateAll } from '../regles/conditions';
 import { remember } from '../regles/memoire';
-import { countItem, removeItem } from '../sac/inventaire';
+import type { SlotRef } from '../sac/cases';
+import { areaSlots, countItem, removeItem, setStack, stackAt } from '../sac/inventaire';
+import { currentStage, nearRoom, stageReady, stageRefusal as stageRefusalOf } from './chantier';
 import { comfortLevel, comfortOf, ensureHousings, housingAt } from './etat';
 import { comfortFactDetail, housingFactKey, RESTORED } from './faits';
 import { placementRefusal, propsOnTop, snapCandidate } from './pose';
@@ -48,11 +50,9 @@ function contextOf(sim: SimContext, housing: string): Ctx | null {
   return state === undefined ? null : { place, pstate, def, state };
 }
 
-function near(sim: SimContext, player: PlayerIndex, room: RoomDef): boolean {
+function near(sim: SimContext, player: PlayerIndex, ctx: Ctx, room: RoomDef): boolean {
   const { x, y } = sim.world.players[player].body;
-  const a = room.area;
-  const r = HOUSING_TUNING.reach;
-  return x >= a.x - r && x <= a.x + a.w + r && y >= a.y - r && y <= a.y + a.h + r;
+  return nearRoom(sim, ctx.place, room, x, y);
 }
 
 /** Refus pour commencer ou poursuivre l'étape en cours d'une pièce, `null`: on peut. */
@@ -62,16 +62,7 @@ function stageRefusal(
   ctx: Ctx,
   room: RoomDef,
 ): string | null {
-  const progress = ctx.state.rooms[room.id];
-  if (progress === undefined || progress.state === 'restored') return 'room-done';
-  const stage = room.stages[progress.stage];
-  if (stage === undefined) return 'room-done';
-  if (room.requires.some((r) => ctx.state.rooms[r]?.state !== 'restored'))
-    return 'room-needs-other';
-  if (!evaluateAll({ world: sim.world, content: sim.content, actor: player }, stage.when))
-    return 'room-story-not-yet';
-  if (!near(sim, player, room)) return 'too-far';
-  return null;
+  return stageRefusalOf(sim, player, ctx.place, ctx.state, room);
 }
 
 function factKey(sim: SimContext, def: HousingDef, detail: string): string {
@@ -223,6 +214,12 @@ function work(sim: SimContext, player: PlayerIndex, ctx: Ctx, room: RoomDef, on:
   tryAdvance(sim, ctx, room);
 }
 
+/** L'étape en cours a-t-elle reçu ses matériaux et son argent ? Sinon, rien à faire au marteau. */
+function readyToWork(ctx: Ctx, room: RoomDef): boolean {
+  const current = currentStage(room, ctx.state);
+  return current !== null && stageReady(current.stage, current.progress);
+}
+
 function stepWork(sim: SimContext, ctx: Ctx): void {
   const working = ctx.state.working;
   for (const p of [0, 1] as const) {
@@ -234,7 +231,8 @@ function stepWork(sim: SimContext, ctx: Ctx): void {
       room === undefined ||
       player.body.speed > HOUSING_TUNING.workStopSpeed ||
       player.talk !== null ||
-      !near(sim, p, room)
+      !near(sim, p, ctx, room) ||
+      !readyToWork(ctx, room)
     ) {
       working[p] = null;
       sim.touch('place');
@@ -267,6 +265,60 @@ function stepSleep(sim: SimContext, ctx: Ctx): void {
     if (bed === null || housingAt(ctx.place, ctx.pstate, bed.x, bed.y)?.id !== ctx.def.id) continue;
     const needs = sim.world.players[p].needs;
     needs.sleep = Math.min(100, needs.sleep + bonus);
+  }
+}
+
+// --- Meubles du sac vers l'inventaire de la maison ---
+
+/**
+ * Range dans l'inventaire du logement le meuble d'une case (objet à champ `prop`, fiche posable).
+ * Rend la clé du refus, ou `null`: la pile a quitté le sac.
+ */
+function stowSlot(
+  sim: SimContext,
+  player: PlayerIndex,
+  ctx: Ctx,
+  holder: PlayerState,
+  ref: SlotRef,
+): string | null {
+  const stack = stackAt(holder, ref);
+  if (stack === null) return 'empty-slot';
+  const prop = sim.content.items[stack.item]?.prop;
+  if (prop === undefined || sim.content.props[prop]?.placeable !== true) return 'not-furniture';
+  setStack(holder, ref, null);
+  ctx.state.stock[prop] = (ctx.state.stock[prop] ?? 0) + stack.count;
+  sim.touch('players');
+  sim.touch('place');
+  sim.emit({
+    type: 'furniture_stowed',
+    player,
+    housing: ctx.def.id,
+    item: stack.item,
+    prop,
+    count: stack.count,
+  });
+  return null;
+}
+
+function atHome(sim: SimContext, player: PlayerIndex, ctx: Ctx): boolean {
+  const { x, y } = sim.world.players[player].body;
+  return housingAt(ctx.place, ctx.pstate, x, y)?.id === ctx.def.id;
+}
+
+/** « Ranger à la maison » depuis le sac: il faut être chez soi. */
+function stow(sim: SimContext, player: PlayerIndex, ctx: Ctx, ref: SlotRef): void {
+  const refusal = atHome(sim, player, ctx)
+    ? stowSlot(sim, player, ctx, sim.world.players[player], ref)
+    : 'deco-not-home';
+  if (refusal !== null) refuse(sim, player, refusal);
+}
+
+/** À l'ouverture du mode déco: tous les meubles du sac et de la barre rejoignent l'inventaire. */
+function stowAll(sim: SimContext, player: PlayerIndex, ctx: Ctx): void {
+  const holder = sim.world.players[player];
+  for (const area of ['toolbar', 'bag'] as const) {
+    const count = areaSlots(holder, area)?.length ?? 0;
+    for (let index = 0; index < count; index++) stowSlot(sim, player, ctx, holder, { area, index });
   }
 }
 
@@ -331,12 +383,12 @@ function decoIntent(sim: SimContext, player: PlayerIndex, ctx: Ctx, intent: Inte
   switch (intent.type) {
     case 'deco_mode': {
       if (intent.on) {
-        const { x, y } = sim.world.players[player].body;
-        if (housingAt(ctx.place, ctx.pstate, x, y)?.id !== ctx.def.id) {
+        if (!atHome(sim, player, ctx)) {
           refuse(sim, player, 'deco-not-home');
           return;
         }
         ctx.state.decorating[player] = true;
+        stowAll(sim, player, ctx);
       } else {
         release(sim, player, ctx);
         ctx.state.decorating[player] = false;
@@ -546,6 +598,15 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
       if (intent.type === 'housing_supply') supply(sim, player, ctx, room);
       else if (intent.type === 'housing_pay') payStage(sim, player, ctx, room);
       else work(sim, player, ctx, room, intent.on);
+      return;
+    }
+    case 'furniture_stow': {
+      const ctx = contextOf(sim, intent.housing);
+      if (ctx === null) {
+        refuse(sim, player, 'gone');
+        return;
+      }
+      stow(sim, player, ctx, intent.from);
       return;
     }
     case 'deco_mode':

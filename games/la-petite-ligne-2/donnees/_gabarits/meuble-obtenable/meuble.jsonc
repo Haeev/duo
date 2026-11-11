@@ -1,0 +1,28 @@
+// GABARIT: un meuble obtenable, première moitié: la fiche du meuble posé (ce qu'on voit dans la
+// maison, ce qu'il sait faire). Seconde moitié: l'objet du sac, `meuble-obtenable/objet.jsonc`.
+// Créer les deux d'un coup: pnpm nouveau meuble-obtenable <id>
+//   -> donnees/commun/meubles/<id>.json et donnees/commun/objets/<id>.json
+// Schéma: src/donnees/schemas/meuble.ts; briques: src/donnees/schemas/briques.ts
+// Recette complète (dix lignes): donnees/commun/meubles/README.md, « Ajouter un meuble obtenable ».
+{
+  "schema": 1,
+  "id": "exemple-meuble-obtenable",
+  // Nom dans la liste du mode déco.
+  "name": "Tabouret d'exemple",
+  // Nœud du modèle 3D (`assets/commun/decors/decors.json`). Inconnu: une forme simple provisoire.
+  "model": "stool",
+  // Emprise au sol en cases de 1 m, façade au sud.
+  "size": { "w": 1, "h": 1 },
+  // true: on ne traverse pas son emprise.
+  "solid": true,
+  // Obligatoire ici: sans "placeable": true, l'objet ne se range pas à la maison.
+  "placeable": true,
+  // Série de meubles assortis ("campagne", "gare"), ou null.
+  "series": null,
+  // Ce qu'il sait faire une fois posé (voir meuble.jsonc): s'asseoir, ranger, dormir... ou rien.
+  "bricks": [{ "brick": "sit", "seats": 1, "restPerMinute": 6 }],
+  // Mode déco: couche ("floor" au sol, "rug" tapis, "top" sur un meuble, "wall" au mur), surface
+  // (on pose dessus; donner alors aussi "top": hauteur du plateau en m), où ("indoor", "outdoor",
+  // "both") et confort (0 à 10: tabouret 1, étagère 2, buffet 3, lit 4).
+  "deco": { "layer": "floor", "surface": false, "where": "both", "comfort": 1 },
+}

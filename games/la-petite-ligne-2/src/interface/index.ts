@@ -17,6 +17,9 @@ import { createNotebook, type NotebookExtras } from './carnet';
 import { UI_SCALE_FACTOR } from './carnet/lectures';
 import { createKitchen } from './cuisine/index';
 import { createCoopScreen } from './basse-cour/ecran';
+import { createWorksiteScreen } from './chantier/ecran';
+import { SITE_TEXTS } from './chantier/textes';
+import { DECO_TEXTS } from './deco/textes';
 import { createDecoMode, decoHousingFor } from './deco/deco';
 import { createDialogue, type BabbleInfo } from './dialogue';
 import { createDialogueScreens } from './ecrans-dialogue';
@@ -234,6 +237,15 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     UI_TUNING.openGuardMs,
     reduced,
   );
+  // Chantier d'une pièce du logement (touche d'action devant son ardoise).
+  const worksite = createWorksiteScreen(
+    layer,
+    view.content,
+    send,
+    keyLabel,
+    UI_TUNING.openGuardMs,
+    (player) => nameOf(player),
+  );
   layer.dataset.motion = reduced() ? 'reduced' : 'full';
   const playerColors = options.playerColors ?? EDITOR_SETTINGS.fallbackAccents;
   const editor = createCharacterEditor(layer, {
@@ -271,6 +283,17 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     return view.world()?.players[player].name ?? '';
   }
 
+  /** Nom d'une pièce de logement du lieu courant (avis de chantier). */
+  function roomName(room: string, housing?: string): string {
+    const place = view.content.places[view.world()?.common.place ?? ''];
+    for (const def of Object.values(place?.housings ?? {})) {
+      if (housing !== undefined && def.id !== housing) continue;
+      const found = def.rooms.find((r) => r.id === room);
+      if (found !== undefined) return found.name;
+    }
+    return room;
+  }
+
   /** Repère du coup d'œil: l'étape ouverte de la suite suivie, dans le lieu où l'on joue. */
   function questMarker(
     world: ReadonlyWorld,
@@ -302,11 +325,19 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     const other: PlayerIndex = me === 0 ? 1 : 0;
     shop.onEvent(event, me, now);
     workshop.onEvent(event, me, now);
+    const shownInSite = worksite.onEvent(event, me, now);
+    deco.onEvent(event, me);
     const shownInNotebook = notebook.onEvent(event, me);
     switch (event.type) {
       case 'refused':
         if (event.player === me) dialogue.unlock();
-        if (event.player === me && !shop.isOpen() && !workshop.isOpen() && !shownInNotebook)
+        if (
+          event.player === me &&
+          !shop.isOpen() &&
+          !workshop.isOpen() &&
+          !shownInNotebook &&
+          !shownInSite
+        )
           hud.refusal(now, refusalLine(event.reason, event.target));
         break;
       case 'pockets_full':
@@ -388,6 +419,40 @@ export function createInterface(options: InterfaceOptions): GameInterface {
           editor.open('mirror', world, me);
         break;
       }
+      // Chantier: ce que fait l'autre se lit aussi hors de l'écran de chantier.
+      case 'room_supplied':
+        if (!shownInSite && event.player === other)
+          hud.notice(
+            now,
+            'info',
+            fill(SITE_TEXTS.notices.supplied, {
+              nom: nameOf(other),
+              quoi: `${view.content.items[event.item]?.name ?? event.item} x ${String(event.count)}`,
+              piece: roomName(event.room),
+            }),
+          );
+        break;
+      case 'room_progress':
+        if (!shownInSite || event.done)
+          hud.notice(
+            now,
+            'info',
+            fill(event.done ? SITE_TEXTS.notices.finished : SITE_TEXTS.notices.stage, {
+              piece: roomName(event.room, event.housing),
+            }),
+          );
+        break;
+      case 'furniture_stowed':
+        // En mode déco, la liste de l'inventaire le dit elle-même.
+        if (event.player === me && !shownInNotebook && !deco.isOpen())
+          hud.notice(
+            now,
+            'sac',
+            fill(DECO_TEXTS.stowed, {
+              meuble: view.content.props[event.prop]?.name ?? event.prop,
+            }),
+          );
+        break;
       // Les autres événements ne touchent pas l'interface: les changements de palier
       // (`need_tier`) se lisent dans l'état, le médaillon paraît; le babil part de l'écriture.
       // La pêche a son médaillon (`peche/`), qui lit ses événements lui-même.
@@ -455,8 +520,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'photo_taken':
       case 'rain_watered':
       case 'weather_changed':
-      case 'room_progress':
-      case 'room_supplied':
+      case 'worksite_opened':
       case 'deco_changed':
       case 'comfort_changed':
       case 'shelter_opened':
@@ -503,6 +567,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.isOpen() ||
       shop.isOpen() ||
       workshop.isOpen() ||
+      worksite.isOpen() ||
       notebook.isOpen() ||
       kitchen.isOpen() ||
       coop.isOpen() ||
@@ -524,6 +589,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       dialogue.isOpen() ||
       shop.isOpen() ||
       workshop.isOpen() ||
+      worksite.isOpen() ||
       notebook.isOpen() ||
       kitchen.isOpen() ||
       coop.isOpen() ||
@@ -563,6 +629,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     else if (dialogue.isOpen()) used = dialogue.key(raw.code, now);
     else if (shop.isOpen()) used = shop.key(raw.code, now);
     else if (workshop.isOpen()) used = workshop.key(raw.code, now);
+    else if (worksite.isOpen()) used = worksite.key(raw.code, now);
     else if (notebook.isOpen()) used = notebook.key(raw.code, raw.shiftKey, now);
     else if (sceneLine.key(raw.code, now)) used = true;
     else if (raw.code === 'KeyG' && !raw.repeat) {
@@ -619,13 +686,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       }
       shop.frame(world, me, now);
       workshop.frame(world, me, now);
+      worksite.frame(world, me, now);
       kitchen.frame(dtMs);
       deco.frame();
       coop.frame(dtMs);
       chapterEnd.frame(world, me, now);
       sceneOverlay.frame(world, me, now);
       sceneLine.frame(world, me, now, dtMs);
-      const shopOpen = shop.isOpen() || workshop.isOpen();
+      const shopOpen = shop.isOpen() || workshop.isOpen() || worksite.isOpen();
       const menu = notebook.isOpen() || dialogue.isOpen() || shopOpen;
       // Pendant une scène (hors attente) ou un geste de scène, la touche d'action sert à la
       // scène: pas de bulle d'action.
@@ -666,6 +734,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         notebook.isOpen() ||
         shop.isOpen() ||
         workshop.isOpen() ||
+        worksite.isOpen() ||
         kitchen.isOpen() ||
         deco.isOpen() ||
         fishing.capturing() ||
@@ -686,6 +755,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       notebook.dispose();
       shop.dispose();
       workshop.dispose();
+      worksite.dispose();
       editor.dispose();
       kitchen.dispose();
       deco.dispose();

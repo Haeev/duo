@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "coffre-a-linge-miel",
+  "name": "Coffre à linge miel",
+  "model": "chest",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "campagne",
+  "top": 0.655,
+  "bricks": [
+    {
+      "brick": "store",
+      "slots": 8
+    }
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": true,
+    "where": "indoor",
+    "comfort": 2
+  }
+}

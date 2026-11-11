@@ -124,6 +124,12 @@ export const BRICK_SCHEMAS = [
   }),
   /** Se regarder: rouvre l'éditeur de personnage de ce joueur, avec son apparence courante. */
   v.strictObject({ brick: v.literal('mirror') }),
+  /**
+   * Chantier d'une pièce de logement: l'objet visible (une ardoise de devis) devant lequel on
+   * apporte, paie et travaille. La pièce est celle qui le nomme (`site` de la pièce, dans
+   * `logements/<id>.json`); sans pièce, ou pièce finie, il est inerte (`simulation/logement/chantier.ts`).
+   */
+  v.strictObject({ brick: v.literal('worksite') }),
 ] as const;
 
 export const BrickSchema = v.variant('brick', [...BRICK_SCHEMAS]);

@@ -24,6 +24,7 @@ import type { BrickRegistry, EntityBehaviour } from './types';
 import { travelBehaviour } from '../voyage/brique';
 import { passageBehaviour } from '../lieux/passage';
 import { shelterBehaviour } from '../elevage/abri';
+import { worksiteBehaviour } from '../logement/chantier';
 
 export type {
   Aim,
@@ -54,6 +55,7 @@ export const BRICK_BEHAVIOURS: BrickRegistry = {
   mirror: mirrorBehaviour,
   passage: passageBehaviour,
   shelter: shelterBehaviour,
+  worksite: worksiteBehaviour,
   ...CRAFT_BRICKS,
 };
 

@@ -58,6 +58,7 @@ export function initialBrickStates(bricks: readonly Brick[]): BrickStates {
       case 'mirror':
       case 'passage':
       case 'craft':
+      case 'worksite':
         break;
       case 'harvest':
         states.harvest = { work: 0, back: null };

@@ -40,6 +40,10 @@
   // "food": null, "tool": null et "bag": "<id d'un sac de commun/sacs.json>". L'équiper (intention
   // equip_bag) remplace le sac porté, qui revient dans les poches. L'effet give_bag des dialogues
   // équipe un sac directement, sans objet.
+  // Meuble (un objet qu'on fabrique, achète ou reçoit, puis range à la maison): "family":
+  // "furniture", "stack": 1 et "prop": "<id d'une fiche de commun/meubles, placeable>". Le mode
+  // déco et « Ranger à la maison » le font passer du sac à l'inventaire de la maison. Les deux
+  // fichiers d'un coup: pnpm nouveau meuble-obtenable <id> (gabarit meuble-obtenable/).
   // Objet d'histoire (règlement, lettre, lanterne): ajouter "story": true. Il ne se vend pas et
   // ne se jette pas; les dialogues et les étapes le donnent et le reprennent (give_item, take_item).
 }

@@ -74,5 +74,11 @@ export const ItemSchema = v.strictObject({
    * étapes, il ne se vend pas et ne se jette pas (il peut se donner à l'autre ou se ranger).
    */
   story: v.exactOptional(v.literal(true)),
+  /**
+   * Meuble (famille `furniture`): la fiche `commun/meubles/<id>.json` que cet objet
+   * devient une fois rangé dans l'inventaire de la maison (dépôt à l'ouverture du mode déco, ou
+   * « Ranger à la maison » depuis le sac). Fabriqué, acheté ou reçu comme tout objet.
+   */
+  prop: v.exactOptional(IdSchema),
 });
 export type ItemDef = v.InferOutput<typeof ItemSchema>;

@@ -1,0 +1,25 @@
+// GABARIT: un meuble obtenable, seconde moitié: l'objet du sac (ce qu'on fabrique, achète ou
+// reçoit). Rangé à la maison, il devient le meuble de `meuble-obtenable/meuble.jsonc`.
+// Créer les deux d'un coup: pnpm nouveau meuble-obtenable <id>
+// Schéma: src/donnees/schemas/objets.ts
+// Pour l'obtenir, au choix, sans ligne de moteur:
+//   - à l'établi: un plan (`pnpm nouveau plan <id>`) dont "makes" est
+//     { "kind": "furniture", "variants": [{ "color": "#c8955a", "item": "<id de cet objet>" }] };
+//   - en boutique: une ligne dans "sells" d'un commerce,
+//     { "item": "<id de cet objet>", "price": 1200, "dailyStock": 1, "payment": "purse-or-chest" };
+//   - par l'histoire: l'effet give_item d'un dialogue ou d'une étape de quête.
+{
+  "schema": 1,
+  "id": "exemple-meuble-obtenable",
+  // Nom dans le sac et en boutique. Deux couleurs: deux objets et deux fiches de meuble.
+  "name": "Tabouret d'exemple",
+  // Obligatoire: un meuble est de la famille "furniture" (les commerçants rachètent par famille).
+  "family": "furniture",
+  // Un meuble ne s'empile pas.
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  // La fiche du meuble posé (`commun/meubles/<id>.json`, "placeable": true). `pnpm nouveau`
+  // écrit ici l'identifiant demandé; plusieurs objets peuvent mener à la même fiche.
+  "prop": "<id>",
+}

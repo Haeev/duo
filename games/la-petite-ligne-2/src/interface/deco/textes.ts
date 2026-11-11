@@ -13,6 +13,8 @@ export const DECO_TEXTS = {
   keys: 'Souris: glisser · Molette ou {w} {x}: tourner · Clic droit: ranger · {tab}: meuble suivant · {a} {e}: inventaire · {entree}: sortir de l’inventaire · {espace}: saisir, poser · {retour}: sortir',
   levels: ['Nue', 'Habitable', 'Accueillante', 'Douillette', 'Chaleureuse'] as readonly string[],
   ok: 'Ça va ici',
+  stowed: '{meuble}: rangé à la maison',
+  stowedList: 'Sorti de ton sac: {meubles}',
 };
 
 export const REASON_TEXTS: Readonly<Record<PlacementRefusal, string>> = {

@@ -1,6 +1,7 @@
 /** Intentions du logement et du mode déco. Positions en mètres de la carte du lieu. */
 import * as v from 'valibot';
 import { FiniteSchema, IdSchema } from '../../donnees/schemas/communs';
+import { SlotRefSchema } from '../sac/cases';
 
 const Rotation = v.picklist([0, 1, 2, 3]);
 const Coord = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(128));
@@ -17,6 +18,11 @@ export const HOUSING_INTENTS = [
     room: IdSchema,
     on: v.boolean(),
   }),
+  /**
+   * Ranger à la maison le meuble de cette case (objet à champ `prop`): il quitte le sac pour
+   * l'inventaire du logement où l'on se tient. Ouvrir le mode déco y range tous ceux du sac.
+   */
+  v.strictObject({ type: v.literal('furniture_stow'), housing: IdSchema, from: SlotRefSchema }),
   /** Entrer dans le mode déco ou en sortir (ce qu'on tient revient à sa place). */
   v.strictObject({ type: v.literal('deco_mode'), housing: IdSchema, on: v.boolean() }),
   /** Saisir un meuble posé: il est verrouillé pour l'autre joueur. */

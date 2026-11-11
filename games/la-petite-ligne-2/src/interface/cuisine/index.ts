@@ -447,6 +447,9 @@ export function createKitchen(
       case 'collection_found':
       case 'collection_record':
       case 'comfort_changed':
+      case 'clock_struck':
+      case 'worksite_opened':
+      case 'furniture_stowed':
       case 'crop_reaped':
       case 'day_started':
       case 'deco_changed':

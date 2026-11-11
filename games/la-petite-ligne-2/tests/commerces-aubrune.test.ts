@@ -379,9 +379,11 @@ describe('maison du garde-barrière', () => {
       return housing;
     };
     const [a, b] = sim.world.players;
-    // Dans la salle, à deux pas du coin cuisine (annexe de la carte: intérieur du rez-de-chaussée).
-    a.body = { x: 22, y: 213.5, facing: 0, speed: 0 };
-    b.body = { x: 23, y: 213.5, facing: 0, speed: 0 };
+    // Dans la salle, à deux pas du coin cuisine (annexe de la carte: intérieur du rez-de-chaussée),
+    // sur des cases libres: un joueur posé dans l'emprise du lit en est sorti dès qu'un meuble de
+    // la carte paraît (les ardoises de chantier), et se retrouve trop loin de la cuisine.
+    a.body = { x: 20.5, y: 214.5, facing: 0, speed: 0 };
+    b.body = { x: 21.5, y: 214.5, facing: 0, speed: 0 };
     const work = (player: PlayerIndex, room: string): string[] =>
       refusals(act(sim, player, { type: 'housing_work', housing: HOUSE, room, on: true }));
 

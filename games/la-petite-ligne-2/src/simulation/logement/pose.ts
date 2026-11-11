@@ -8,6 +8,8 @@ import type { PropDef } from '../../donnees/schemas/meuble';
 import type { HousingState } from '../../etat/logement';
 import { footprintOf, placeBlockers, type PropInstance, type ReadPlace } from '../noyau/obstacles';
 import type { DeepReadonly, ReadonlyWorld } from '../../etat/monde';
+import { isObjectPresent } from '../lieux/presents';
+import type { PlaceLook } from '../lieux/verrous';
 import { HOUSING_TUNING } from './reglages';
 
 export type PlacementRefusal =
@@ -145,15 +147,100 @@ function zoneBox(housing: HousingDef): Box {
   return box ?? { x0: 0, y0: 0, x1: 0, y1: 0 };
 }
 
-/** Meubles en place dans l'emprise du logement, sauf ceux de `exclude` (le meuble en main). */
+export interface Rect {
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+}
+
+/** Deux morceaux d'un logement se touchent à travers une cloison ou un mur d'un mètre. */
+const WALL_GAP = 1.5;
+
+function rectGap(a: Rect, b: Rect): number {
+  const dx = Math.max(0, a.x - (b.x + b.w), b.x - (a.x + a.w));
+  const dy = Math.max(0, a.y - (b.y + b.h), b.y - (a.y + a.h));
+  return Math.max(dx, dy);
+}
+
+function rectDistance(r: Rect, x: number, y: number): number {
+  const dx = Math.max(0, r.x - x, x - (r.x + r.w));
+  const dy = Math.max(0, r.y - y, y - (r.y + r.h));
+  return Math.hypot(dx, dy);
+}
+
+/**
+ * Le morceau du logement autour d'un point: les pièces présentes et le jardin qui se touchent.
+ * Un logement peut tenir en plusieurs morceaux éloignés sur la carte du lieu (rez-de-chaussée,
+ * étage et cave sont des intérieurs séparés, le jardin est dehors): on y marche de l'un à
+ * l'autre par une porte, jamais d'une traite. Le mode déco montre un morceau, et le passage
+ * libre se juge dans un morceau. Hors de tout morceau: le plus proche.
+ */
+export function housingPart(
+  housing: HousingDef,
+  hstate: DeepReadonly<HousingState> | undefined,
+  x: number,
+  y: number,
+): Rect[] {
+  const rects: Rect[] = housing.rooms
+    .filter((room) => roomState(room, hstate) !== 'absent')
+    .map((room) => room.area);
+  if (housing.garden !== null) rects.push(housing.garden);
+  let start: Rect | null = null;
+  let best = Number.POSITIVE_INFINITY;
+  for (const rect of rects) {
+    const d = rectDistance(rect, x, y);
+    if (d < best) {
+      best = d;
+      start = rect;
+    }
+  }
+  if (start === null) return [];
+  const part = [start];
+  for (let grown = true; grown;) {
+    grown = false;
+    for (const rect of rects) {
+      if (part.includes(rect) || !part.some((other) => rectGap(rect, other) <= WALL_GAP)) continue;
+      part.push(rect);
+      grown = true;
+    }
+  }
+  return part;
+}
+
+/** Boîte d'un morceau, murs compris (un mètre autour). */
+function partBox(part: readonly Rect[]): Box {
+  let box: Box | null = null;
+  for (const rect of part) {
+    const r = rectBox(rect);
+    box =
+      box === null
+        ? r
+        : {
+            x0: Math.min(box.x0, r.x0),
+            y0: Math.min(box.y0, r.y0),
+            x1: Math.max(box.x1, r.x1),
+            y1: Math.max(box.y1, r.y1),
+          };
+  }
+  if (box === null) return { x0: 0, y0: 0, x1: 0, y1: 0 };
+  return { x0: box.x0 - 1, y0: box.y0 - 1, x1: box.x1 + 1, y1: box.y1 + 1 };
+}
+
+/**
+ * Meubles en place dans l'emprise du logement, sauf ceux de `exclude` (le meuble en main).
+ * `only`: ne garder que ceux d'une boîte (un morceau du logement) et, avec `look`, que les
+ * meubles de carte présents (un meuble conditionné absent n'encombre rien).
+ */
 export function presentProps(
   content: Content,
   place: PlaceContent,
   state: ReadPlace,
   housing: HousingDef,
   exclude: ReadonlySet<string>,
+  only?: { readonly within: Box; readonly look: PlaceLook },
 ): Present[] {
-  const zone = zoneBox(housing);
+  const zone = only?.within ?? zoneBox(housing);
   const out: Present[] = [];
   const consider = (instance: PropInstance): void => {
     if (exclude.has(instance.id)) return;
@@ -162,7 +249,8 @@ export function presentProps(
     const box = boxOf(def, instance);
     if (overlaps(box, zone)) out.push({ instance, def, box });
   };
-  for (const object of place.map.objects) consider(object);
+  for (const object of place.map.objects)
+    if (only === undefined || isObjectPresent(only.look, object)) consider(object);
   for (const placed of state.placed) consider(placed);
   return out;
 }
@@ -219,96 +307,126 @@ function doorBox(door: { x: number; y: number }): Box {
   return { x0: door.x - d, y0: door.y - d, x1: door.x + d, y1: door.y + d };
 }
 
+/** Un côté du lit touche-t-il une case d'une de ces composantes ? */
+function bedReached(
+  labels: Int32Array,
+  wanted: ReadonlySet<number>,
+  cellOf: (x: number, y: number) => number,
+  bed: Box,
+  step: number,
+): boolean {
+  const hit = (x: number, y: number): boolean => {
+    const cell = cellOf(x, y);
+    return cell >= 0 && wanted.has(labels[cell] ?? -1);
+  };
+  for (let x = bed.x0 + step / 2; x < bed.x1; x += step)
+    if (hit(x, bed.y0 - step / 2) || hit(x, bed.y1 + step / 2)) return true;
+  for (let y = bed.y0 + step / 2; y < bed.y1; y += step)
+    if (hit(bed.x0 - step / 2, y) || hit(bed.x1 + step / 2, y)) return true;
+  return false;
+}
+
 /**
- * Passage libre: depuis la porte d'entrée, on atteint toutes les portes et un côté de chaque lit,
- * sur une grille au pas de pose, sans traverser murs ni meubles solides au sol.
+ * Passage libre dans un morceau du logement, sur une grille au pas de pose, sans traverser murs
+ * ni meubles solides au sol: le meuble à poser ne coupe rien de ce qui communiquait. Deux portes
+ * qu'on reliait à pied restent reliées; un lit dont on atteignait un côté depuis une porte le
+ * garde; un lit qu'on pose doit avoir un côté atteignable. Juger « par rapport à avant » compte:
+ * une pièce encore en ruine, une trappe sous les gravats ne se rejoignent pas, sans que ce soit
+ * la faute du meuble.
  */
-export function pathIsFree(
+export function pathStaysFree(
   housing: HousingDef,
   hstate: DeepReadonly<HousingState> | undefined,
   fixed: { readonly fixed: Uint8Array; readonly width: number; readonly height: number },
+  within: Box,
   solids: readonly Box[],
   beds: readonly Box[],
+  candidate: { readonly box: Box; readonly bed: boolean },
 ): boolean {
   const step = HOUSING_TUNING.gridStep;
-  const zone = zoneBox(housing);
-  const doors = [housing.entrance, ...housing.doors];
-  const x0 = Math.min(zone.x0, ...doors.map((d) => d.x - 1));
-  const y0 = Math.min(zone.y0, ...doors.map((d) => d.y - 1));
-  const x1 = Math.max(zone.x1, ...doors.map((d) => d.x + 1));
-  const y1 = Math.max(zone.y1, ...doors.map((d) => d.y + 1));
-  const cols = Math.ceil((x1 - x0) / step);
-  const rows = Math.ceil((y1 - y0) / step);
-  const walk = new Uint8Array(cols * rows);
+  const { x0, y0 } = within;
+  const doors = [housing.entrance, ...housing.doors].filter((d) => containsPoint(within, d.x, d.y));
+  const cols = Math.ceil((within.x1 - x0) / step);
+  const rows = Math.ceil((within.y1 - y0) / step);
   const centre = (i: number, origin: number): number => origin + (i + 0.5) * step;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = centre(c, x0);
-      const y = centre(r, y0);
-      const cx = Math.floor(x);
-      const cy = Math.floor(y);
-      if (cx < 0 || cy < 0 || cx >= fixed.width || cy >= fixed.height) continue;
-      if (fixed.fixed[cy * fixed.width + cx] === 1) continue;
-      const isDoor = doors.some((d) => Math.abs(d.x - x) <= 0.5 && Math.abs(d.y - y) <= 0.5);
-      if (!isDoor) {
-        const room = roomAt(housing, x, y);
-        if (room !== null) {
-          if (roomState(room, hstate) !== 'restored') continue;
-        } else if (!inHousing(housing, hstate, x, y)) continue;
-      }
-      if (
-        solids.some((b) => containsPoint(b, x, y) && x > b.x0 && x < b.x1 && y > b.y0 && y < b.y1)
-      )
-        continue;
-      walk[r * cols + c] = 1;
-    }
-  }
   const cellOf = (x: number, y: number): number => {
     const c = Math.floor((x - x0) / step);
     const r = Math.floor((y - y0) / step);
     return c < 0 || r < 0 || c >= cols || r >= rows ? -1 : r * cols + c;
   };
-  const seen = new Uint8Array(cols * rows);
-  const start = cellOf(housing.entrance.x, housing.entrance.y);
-  if (start < 0 || walk[start] !== 1) return false;
-  const queue = [start];
-  seen[start] = 1;
-  while (queue.length > 0) {
-    const cell = queue.pop() ?? 0;
-    const c = cell % cols;
-    const r = (cell - c) / cols;
-    const next = [
-      c > 0 ? cell - 1 : -1,
-      c < cols - 1 ? cell + 1 : -1,
-      r > 0 ? cell - cols : -1,
-      r < rows - 1 ? cell + cols : -1,
-    ];
-    for (const n of next)
-      if (n >= 0 && walk[n] === 1 && seen[n] === 0) {
-        seen[n] = 1;
-        queue.push(n);
+  /** Composante de chaque case (-1: on n'y marche pas), meubles solides `blocks` posés. */
+  const label = (blocks: readonly Box[]): Int32Array => {
+    const labels = new Int32Array(cols * rows).fill(-1);
+    const walk = new Uint8Array(cols * rows);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = centre(c, x0);
+        const y = centre(r, y0);
+        const cx = Math.floor(x);
+        const cy = Math.floor(y);
+        if (cx < 0 || cy < 0 || cx >= fixed.width || cy >= fixed.height) continue;
+        if (fixed.fixed[cy * fixed.width + cx] === 1) continue;
+        const isDoor = doors.some((d) => Math.abs(d.x - x) <= 0.5 && Math.abs(d.y - y) <= 0.5);
+        if (!isDoor) {
+          const room = roomAt(housing, x, y);
+          if (room !== null) {
+            if (roomState(room, hstate) !== 'restored') continue;
+          } else if (!inHousing(housing, hstate, x, y)) continue;
+        }
+        if (blocks.some((b) => x > b.x0 && x < b.x1 && y > b.y0 && y < b.y1)) continue;
+        walk[r * cols + c] = 1;
       }
-  }
-  for (const door of doors) {
-    const cell = cellOf(door.x, door.y);
-    if (cell < 0 || seen[cell] !== 1) return false;
-  }
-  for (const bed of beds) {
-    // Un côté du lit atteignable: une cellule juste autour de l'emprise.
-    let reached = false;
-    for (let x = bed.x0 + step / 2; x < bed.x1 && !reached; x += step)
-      for (const y of [bed.y0 - step / 2, bed.y1 + step / 2]) {
-        const cell = cellOf(x, y);
-        if (cell >= 0 && seen[cell] === 1) reached = true;
+    }
+    let next = 0;
+    const queue: number[] = [];
+    for (let start = 0; start < walk.length; start++) {
+      if (walk[start] !== 1 || labels[start] !== -1) continue;
+      labels[start] = next;
+      queue.push(start);
+      while (queue.length > 0) {
+        const cell = queue.pop() ?? 0;
+        const c = cell % cols;
+        const r = (cell - c) / cols;
+        const around = [
+          c > 0 ? cell - 1 : -1,
+          c < cols - 1 ? cell + 1 : -1,
+          r > 0 ? cell - cols : -1,
+          r < rows - 1 ? cell + cols : -1,
+        ];
+        for (const n of around)
+          if (n >= 0 && walk[n] === 1 && labels[n] === -1) {
+            labels[n] = next;
+            queue.push(n);
+          }
       }
-    for (let y = bed.y0 + step / 2; y < bed.y1 && !reached; y += step)
-      for (const x of [bed.x0 - step / 2, bed.x1 + step / 2]) {
-        const cell = cellOf(x, y);
-        if (cell >= 0 && seen[cell] === 1) reached = true;
-      }
-    if (!reached) return false;
+      next += 1;
+    }
+    return labels;
+  };
+  const before = label(solids);
+  const after = label([...solids, candidate.box]);
+  const doorCells = doors.map((d) => cellOf(d.x, d.y)).filter((cell) => cell >= 0);
+  const at = (labels: Int32Array, cell: number): number => labels[cell] ?? -1;
+  for (let i = 0; i < doorCells.length; i++) {
+    const a = doorCells[i] ?? -1;
+    if (at(before, a) < 0) continue;
+    if (at(after, a) < 0) return false;
+    for (let j = i + 1; j < doorCells.length; j++) {
+      const b = doorCells[j] ?? -1;
+      if (at(before, a) === at(before, b) && at(after, a) !== at(after, b)) return false;
+    }
   }
-  return true;
+  const fromDoors = (labels: Int32Array): Set<number> =>
+    new Set(doorCells.map((cell) => at(labels, cell)).filter((l) => l >= 0));
+  const reachBefore = fromDoors(before);
+  const reachAfter = fromDoors(after);
+  for (const bed of beds)
+    if (
+      bedReached(before, reachBefore, cellOf, bed, step) &&
+      !bedReached(after, reachAfter, cellOf, bed, step)
+    )
+      return false;
+  return !candidate.bed || bedReached(after, reachAfter, cellOf, candidate.box, step);
 }
 
 export interface PlacementQuery {
@@ -354,7 +472,13 @@ export function placementRefusal(q: PlacementQuery): PlacementRefusal | null {
   }
   if (onFixed(blockers.fixed, blockers.width, blockers.height, box)) return 'wall';
 
-  const others = presentProps(content, place, state, housing, q.exclude);
+  // Seul compte le morceau du logement où l'on pose (rez-de-chaussée, étage, cave, jardin): le
+  // reste de la carte du lieu, et les meubles conditionnés absents, n'encombrent rien ici.
+  const within = partBox(housingPart(housing, hstate, candidate.x, candidate.y));
+  const others = presentProps(content, place, state, housing, q.exclude, {
+    within,
+    look: { content, world },
+  });
   // Même couche: pas de chevauchement (le tapis passe sous le reste, l'objet va sur une surface).
   for (const other of others) {
     const layer = decoOf(other.def).layer;
@@ -382,10 +506,10 @@ export function placementRefusal(q: PlacementQuery): PlacementRefusal | null {
 
   if (blocksWalk(def)) {
     const solids = others.filter((o) => blocksWalk(o.def)).map((o) => o.box);
-    solids.push(box);
     const beds = others.filter((o) => functionsOf(o.def).includes('sleep')).map((o) => o.box);
-    if (functionsOf(def).includes('sleep')) beds.push(box);
-    if (!pathIsFree(housing, hstate, blockers, solids, beds)) return 'blocks-path';
+    const candidateBed = { box, bed: functionsOf(def).includes('sleep') };
+    if (!pathStaysFree(housing, hstate, blockers, within, solids, beds, candidateBed))
+      return 'blocks-path';
   }
   return null;
 }
