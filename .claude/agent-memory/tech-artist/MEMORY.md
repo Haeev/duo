@@ -120,13 +120,6 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Recensement des triangles par maillage (`window.encre.census()`) avant d'ajouter du semis: une marguerite en boîtes coûtait 232 triangles, les gravillons 35 000 à eux seuls.
 - Fichiers d'un autre membre nécessaires à une page: les reprendre de sa branche sans les indexer; `import.meta.glob` avec un chemin relatif hors du paquet marche en développement et rend un objet vide si le dossier manque (prévoir le repli).
 
-## Occultation encrée (découpe, vérifié le 2026-11-11)
-
-- Un volume qui cache le joueur s'ouvre dans le nuanceur des volumes (`cutSight`, `discard` sous une branche uniforme): état propre par objet dans `userData.inkCut`, lu dans `onBeforeRender` comme `inkInner`. Ni copie, ni transparence, ni programme de plus (programmes 12 vers 11 sur la vue de la maison, appels et triangles inchangés); la passe d'ombre ne lit pas ce nuanceur: l'ombre portée reste entière.
-- Dedans d'un bâtiment ouvert sans géométrie: le regard descend analytiquement jusqu'au plan de coupe puis au sol, dans l'emprise passée en uniforme (`cutInterior`). Pour un repère, prendre l'emprise des sommets proches du pied, pas la boîte (cuve du château d'eau plus large que le fût: les joueurs passaient sous le poché).
-- Les grands arbres de la carte sont des volumes de `PlaceScene` (`lieu.ts`), pas des houppiers instanciés de `tuile.ts`: les deux chemins sont à traiter.
-- Banc `ensemble.spec.ts`: le `globalSetup` relance des tests vitest qui expirent sous forte charge; une copie de la config sans `globalSetup` (sauvegardes déjà dans `/tmp/lpl2-e2e-fixtures-*`) contourne. `LPL2_PASSES=1` perd parfois son panneau en route (relancer). Un `place: null` après 120 s vient de la charge, pas forcément du code: vérifier par une petite spécification qui relève `__lplSonde.stats()`.
-
 ## Personnage modulaire avec Meshy (essai du 2026-11-10, `docs/production/essais-meshy/personnage-modulaire/`)
 
 - Texte seul: Meshy ignore « seul », « sans tête », « cinq têtes de haut » environ une fois sur deux (veste sur buste, jupe en robe sur mannequin, perruque livrée avec tête et socle, corps réaliste de 7,5 têtes). `pose_mode` ne vaut que pour un personnage: un vêtement seul sort manches à 45 ou 75 degrés.

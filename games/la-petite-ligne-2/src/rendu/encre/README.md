@@ -17,10 +17,6 @@ Le style « bande dessinée encrée » du jeu. `index.ts` (`InkKit`) est ce que 
 
 Revenir à l'ancien rendu: `?rendu=aplats` dans l'adresse du jeu, ou `RenderOptions.style`.
 
-## Occultation: la découpe autour des joueurs
-
-Un bâtiment livré, un repère ou un houppier qui cache un joueur (le local, et l'autre s'il est à l'écran) ne s'efface pas: il reste plein, ombre portée comprise, et s'ouvre seulement en ellipse autour de chaque joueur, bordée d'une trame de traits obliques. Un bâtiment ouvert est coupé à hauteur d'appui: la tranche des murs en encre pleine, son sol et ses faces intérieures en tons sombres de l'ambiance, jamais l'herbe sous son emprise. Le tout dans le nuanceur des volumes (`cutSight`, un `discard` ou une teinte), commandé par `userData.inkCut` de l'objet: ni passe, ni transparence, ni copie, ni programme de plus. Décision et calculs de référence: `../occultation.ts` (`cutZone`, `cutInterior`); réglages: `RENDER_SETTINGS.occlusion.cut` et `holdSeconds`. L'ancien rendu garde son fondu.
-
 ## Ajouter une ambiance (aucun code)
 
 1. Dans `donnees/lieux/<lieu>/climat.json`, la saison porte un identifiant `ambience` (par exemple `aubrune-automne`).

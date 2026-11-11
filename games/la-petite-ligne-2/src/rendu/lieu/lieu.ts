@@ -21,7 +21,7 @@ import {
 import type { Aimable } from '../cible';
 import { inkifyModel, inkTag } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
-import { createInkCut, INK_INNER, type InkCut, type InkInner } from '../encre/matiere';
+import { INK_INNER, type InkInner } from '../encre/matiere';
 import { createFloorMap } from '../encre/sol';
 import { Fadable, isMesh } from '../fondu';
 import { Occlusion, type OccluderBox } from '../occultation';
@@ -110,12 +110,6 @@ class VolumeView implements Aimable {
 export class PlaceScene {
   readonly root = new Group();
   readonly occlusion = new Occlusion();
-  /**
-   * Rendu encré, au dehors d'un grand lieu (le moteur le dit, `setCutting`): un volume qui cache
-   * un joueur s'ouvre autour de lui (houppier d'un grand arbre, charrette) au lieu de s'effacer.
-   */
-  private cutting = false;
-  private readonly cuts = new Map<string, InkCut>();
   private readonly tracker = new ResourceTracker();
   private readonly fixed = new Map<string, VolumeView>();
   private readonly dynamic = new Map<string, VolumeView>();
@@ -240,8 +234,6 @@ export class PlaceScene {
   }
 
   private drop(view: VolumeView): void {
-    view.fadable.setCut(null);
-    this.cuts.delete(view.volume.id);
     view.fadable.dispose();
     view.object.removeFromParent();
     this.occlusion.remove(view.volume.id);
@@ -376,41 +368,12 @@ export class PlaceScene {
     return view?.volume.aimable === true && !view.empty ? view : null;
   }
 
-  /** Applique les opacités (ou les découpes) que l'occultation vient de changer. */
+  /** Applique les opacités que l'occultation vient de changer. */
   applyOcclusion(changed: readonly string[]): void {
     for (const id of changed) {
       const view = this.fixed.get(id) ?? this.dynamic.get(id);
-      if (view === undefined) continue;
-      const opacity = this.occlusion.opacity(id);
-      if (!this.cutting) {
-        view.setOpacity(opacity);
-        continue;
-      }
-      // Découpe ouverte sur le dehors: un arbre ou une charrette n'a pas de dedans à montrer.
-      const cut = this.cuts.get(id) ?? createInkCut();
-      cut.state.x = this.occlusion.openness(id);
-      const open = cut.state.x > 0;
-      if (view.fadable.setCut(open ? cut : null)) {
-        if (open) this.cuts.set(id, cut);
-        else this.cuts.delete(id);
-        view.setOpacity(1);
-      } else view.setOpacity(opacity);
-    }
-  }
-
-  /**
-   * Découpe (rendu encré, au dehors) ou fondu (pièces, petits lieux, ancien rendu). En changeant,
-   * les volumes ouverts reprennent l'autre forme à leur ouverture du moment.
-   */
-  setCutting(on: boolean): void {
-    if (on === this.cutting) return;
-    this.cutting = on;
-    for (const id of this.cuts.keys()) {
-      const view = this.fixed.get(id) ?? this.dynamic.get(id);
-      view?.fadable.setCut(null);
       view?.setOpacity(this.occlusion.opacity(id));
     }
-    this.cuts.clear();
   }
 
   /** Volumes affichés, et combien le sont par une forme provisoire. */

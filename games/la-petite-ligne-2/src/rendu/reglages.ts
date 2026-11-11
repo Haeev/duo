@@ -148,44 +148,6 @@ export const RENDER_SETTINGS = {
      * cachent rien d'utile, et effacés ils deviendraient des fantômes au milieu de la pièce.
      */
     minHeight: 1.35,
-    /**
-     * Temps minimal (s) qu'un volume reste ouvert après le dernier rayon qui le touchait: en
-     * longeant un mur, un rayon qui frôle son bord ne le fait pas battre d'une image à l'autre.
-     */
-    holdSeconds: 0.35,
-    /**
-     * Rendu encré: le volume ne s'efface plus, il s'ouvre par une découpe autour de chaque joueur
-     * (nuanceur des volumes, aucune passe ni transparence). Tout se compte dans le plan de l'écran
-     * (caméra orthographique: des mètres vus de face) depuis un point placé `center` au-dessus des
-     * pieds. Voir `cutAt` et `cutInterior` dans `occultation.ts`, que le nuanceur suit à la lettre.
-     */
-    cut: {
-      /** Demi-axes de l'ellipse ouverte (m à l'écran): en largeur, en hauteur. */
-      radius: [0.85, 1.05] as const,
-      /** Hauteur du centre de l'ellipse au-dessus des pieds (m): la poitrine. */
-      center: 0.85,
-      /** Couronne en trame d'encre autour de l'ouverture (m à l'écran): des traits qui s'amincissent. */
-      band: 0.3,
-      /** Pas des traits de la trame (m à l'écran). */
-      stroke: 0.2,
-      /** Seul ce qui est devant le joueur d'au moins cette distance (m, vers la caméra) s'ouvre. */
-      front: 0.2,
-      /**
-       * Hauteur de coupe au-dessus des pieds (m): plus bas, rien ne s'ouvre. Le bas des murs reste
-       * (soubassement), comme une maquette d'architecte coupée à hauteur d'appui.
-       */
-      keep: 0.55,
-      /**
-       * Repère livré: son emprise (pour le dedans coupé) est celle de ses sommets à moins de
-       * `baseHeight` (m) de son pied. Un château d'eau a une cuve bien plus large que son fût.
-       */
-      baseHeight: 1.5,
-      /** Épaisseur des murs coupés (m), dessinée en encre pleine (poché) sur le plan de coupe. */
-      wall: 0.32,
-      /** Teintes d'écran du dedans d'un bâtiment ouvert: sol, face intérieure des murs (multipliées par l'ombre de l'ambiance). */
-      floorColor: '#5a5048',
-      wallColor: '#8a7c6c',
-    },
   },
 
   target: {

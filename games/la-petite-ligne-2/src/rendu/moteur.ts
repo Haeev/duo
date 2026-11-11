@@ -315,8 +315,6 @@ class Engine implements GameRenderer {
     this.place?.aimable(id) ?? this.characters.aimable(id);
   private frameMs = 0;
   private readonly subjects: { x: number; y: number; z: number }[] = [{ x: 0, y: 0, z: 0 }];
-  /** L'autre joueur, ajouté aux personnages à garder visibles quand il est à l'écran. */
-  private readonly partner = { x: 0, y: 0, z: 0 };
   private readonly toCamera = { x: 0, y: 1, z: 0 };
   private readonly background = new Color();
   /** Exposition des fondus au noir (sommeil, train), de 0 à 1. */
@@ -609,34 +607,6 @@ class Engine implements GameRenderer {
     tiled.lightBuildings(this.litBuildings, dt);
     for (const lamp of this.lights?.lamps ?? [])
       if (lamp.follows !== undefined) lamp.share = tiled.buildingShare(lamp.follows);
-  }
-
-  /**
-   * L'autre joueur compte parmi les personnages à garder visibles (occultation) s'il est posé dans
-   * le même espace (dehors ou même pièce), visible, et dans le rayon de la vue.
-   */
-  private placePartner(
-    world: ReadonlyWorld,
-    local: 0 | 1,
-    room: string | null,
-    centerX: number,
-    centerY: number,
-    radius: number,
-  ): void {
-    const other = local === 0 ? 1 : 0;
-    const body = world.players[other].body;
-    const shown = this.characters.playerPosition(other);
-    const near =
-      shown !== null &&
-      !this.hidden[other] &&
-      (this.spaces?.at(body.x, body.y) ?? null) === room &&
-      Math.hypot(shown.x - centerX, shown.y - centerY) <= radius;
-    this.subjects.length = 1;
-    if (!near) return;
-    this.partner.x = shown.x;
-    this.partner.y = room === null ? this.groundAt(shown.x, shown.y) : 0;
-    this.partner.z = shown.y;
-    this.subjects.push(this.partner);
   }
 
   /**
@@ -937,11 +907,8 @@ class Engine implements GameRenderer {
       subject.y = room === null ? this.groundAt(shown.x, shown.y) : 0;
       subject.z = shown.y;
     }
-    const radius = viewRadius(pose, this.aspect);
-    this.placePartner(world, local, room, pose.x, pose.y, radius);
-    // Au dehors d'un grand lieu (où le nuanceur connaît les joueurs), les volumes s'ouvrent.
-    place.setCutting(this.tiled !== null && room === null);
     place.applyOcclusion(place.occlusion.update(dt, this.subjects, this.toCamera));
+    const radius = viewRadius(pose, this.aspect);
     this.held.x = pose.x;
     this.held.y = pose.y;
     this.held.radius = radius;

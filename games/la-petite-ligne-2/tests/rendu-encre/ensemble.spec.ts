@@ -88,12 +88,6 @@ const VIEWS: readonly View[] = [
   { name: 'tunnel', x: 361, y: 59, minutes: 16 * 60, yaw: 0, width: 30 },
   // Le bois le plus dense du lieu (végétation semée): la vue du budget.
   { name: 'bois', x: 48, y: 16, minutes: 16 * 60, width: 18 },
-  // Occultation (découpe autour des joueurs): les deux joueurs derrière la maison (au nord, la
-  // caméra au sud), derrière le château d'eau, sous le houppier du Vieux Chêne.
-  { name: 'occultation-maison', x: 172.5, y: 110.3, minutes: 16 * 60, yaw: 0, width: 18 },
-  { name: 'occultation-maison-nuit', x: 172.5, y: 110.3, minutes: 22 * 60, yaw: 0, width: 18 },
-  { name: 'occultation-chateau-d-eau', x: 188.4, y: 84.6, minutes: 16 * 60, yaw: 0, width: 18 },
-  { name: 'occultation-arbre', x: 186.6, y: 43.8, minutes: 16 * 60, yaw: 0, width: 18 },
 ];
 
 async function stats(side: Side): Promise<Stats> {

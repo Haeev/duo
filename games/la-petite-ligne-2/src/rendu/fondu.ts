@@ -4,7 +4,6 @@
  * s'efface ou qu'il est visé, il reçoit ses propres copies, libérées au retour à la normale.
  */
 import { Color, type Material, type Mesh, type Object3D } from 'three';
-import { INK_CUT, isInkMaterial, type InkCut } from './encre/matiere';
 
 interface Part {
   readonly mesh: Mesh;
@@ -77,20 +76,6 @@ export class Fadable {
         copy.emissiveIntensity = glow;
       }
     }
-  }
-
-  /**
-   * Rendu encré: la découpe d'occultation (`occultation.ts`) au lieu du fondu. Elle passe par
-   * `userData` de chaque maillage et se lit à chaque dessin: ni copie de matériau, ni transparence,
-   * ni programme de plus. Rend faux (et ne touche à rien) si un morceau n'est pas encré: l'ancien
-   * rendu garde son fondu.
-   */
-  setCut(cut: InkCut | null): boolean {
-    if (!this.parts.every((part) => isInkMaterial(part.original))) return false;
-    for (const part of this.parts) {
-      part.mesh.userData[INK_CUT] = cut ?? undefined;
-    }
-    return true;
   }
 
   /** Copies en service (contrôle de fuite). */
