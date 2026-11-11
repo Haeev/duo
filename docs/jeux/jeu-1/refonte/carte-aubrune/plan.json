@@ -3290,25 +3290,49 @@
     },
     {
       "id": "lisse-nord",
-      "type": null,
+      "type": "lisse-de-passage-a-niveau",
       "modele": "crossing-gate",
       "x": 182.5,
       "y": 95.5,
       "rotation": 0,
-      "pourquoi": "en travers de la route du Gué au nord de la voie, socle sur l'accotement ouest (à droite de qui descend vers le sud); cachée quand la lisse fleurie est baissée",
+      "pourquoi": "en travers de la route du Gué au nord de la voie, socle (poteau et lanterne) au bord ouest de la chaussée, à droite de qui descend vers le sud, bras de 4 m sur toute la chaussée; absente quand la lisse fleurie, qui la remplace, est baissée",
       "regarde": null,
-      "acte": 1
+      "acte": 1,
+      "when": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "all",
+            "conditions": [
+              { "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" },
+              { "type": "remembered", "key": "aubrune.barrieres.lisses", "equals": "baissees" }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "lisse-sud",
-      "type": null,
+      "type": "lisse-de-passage-a-niveau",
       "modele": "crossing-gate",
       "x": 182.5,
       "y": 99.5,
       "rotation": 2,
-      "pourquoi": "en travers de la route du Gué au sud de la voie, socle sur l'accotement est (à droite de qui monte vers le nord, côté maison de Firmin); cachée quand la lisse fleurie est baissée",
+      "pourquoi": "en travers de la route du Gué au sud de la voie, socle au bord est de la chaussée, à droite de qui monte vers le nord, côté maison de Firmin (qui se tient contre lui); absente quand la lisse fleurie est baissée",
       "regarde": null,
-      "acte": 1
+      "acte": 1,
+      "when": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "all",
+            "conditions": [
+              { "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" },
+              { "type": "remembered", "key": "aubrune.barrieres.lisses", "equals": "baissees" }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "croix-pn-eglise",

@@ -572,6 +572,46 @@
       "pourquoi": "à la porte de l'épicerie-pension, côté place: les pensionnaires rentrent à la nuit"
     },
     {
+      "id": "lisse-nord",
+      "type": "lisse-de-passage-a-niveau",
+      "x": 182.5,
+      "y": 95.5,
+      "rotation": 0,
+      "when": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "all",
+            "conditions": [
+              { "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" },
+              { "type": "remembered", "key": "aubrune.barrieres.lisses", "equals": "baissees" }
+            ]
+          }
+        }
+      ],
+      "pourquoi": "en travers de la route du Gué au nord de la voie, socle (poteau et lanterne) au bord ouest de la chaussée, à droite de qui descend vers le sud, bras de 4 m sur toute la chaussée; absente quand la lisse fleurie, qui la remplace, est baissée"
+    },
+    {
+      "id": "lisse-sud",
+      "type": "lisse-de-passage-a-niveau",
+      "x": 182.5,
+      "y": 99.5,
+      "rotation": 2,
+      "when": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "all",
+            "conditions": [
+              { "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" },
+              { "type": "remembered", "key": "aubrune.barrieres.lisses", "equals": "baissees" }
+            ]
+          }
+        }
+      ],
+      "pourquoi": "en travers de la route du Gué au sud de la voie, socle au bord est de la chaussée, à droite de qui monte vers le nord, côté maison de Firmin (qui se tient contre lui); absente quand la lisse fleurie est baissée"
+    },
+    {
       "id": "pompe-de-la-place",
       "type": "pompe",
       "x": 208,
