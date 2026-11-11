@@ -577,7 +577,7 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 
 - Sur le montage avant et après de la découpe autour des joueurs, le client: « fondu fantome : meilleur ». Il préfère le fondu d'origine (le bâtiment entier devient translucide). La découpe en ellipse est annulée (fusion 9831234 annulée); ne pas la reproposer.
 
-## 11 novembre, 10 h 50: premières remarques du client sur les modèles 3D
+## 11 novembre, 10 h 48: premières remarques du client sur les modèles 3D
 
 - Par l'onglet « Modèles 3D » du tableau de bord (qui marche donc chez lui), 22 remarques entre 10 h 11 et 10 h 27: feu de la marmite mal fait et à animer; four à animer quand il est allumé; poulailler très moche; ronces qu'on ne reconnaît pas; trois trous dans le portail du tunnel; raccord de la grue à eau; trait au milieu du miroir; drapeau de l'école mal fixé; buse de la pompe vers le haut; robinet manquant sur la baignoire; anciens modèles d'avant le style encré jugés très moches (remise, devanture, maison de ville, tabouret, poteau indicateur) à supprimer ou corriger; gilet des personnages « hideux, rien à garder ».
 - Leçon: le client juge chaque modèle de près, sous tous les angles; un modèle doit être fermé, sans pièce qui flotte, et reconnaissable. Les anciens modèles encore au manifeste sont à retirer.
