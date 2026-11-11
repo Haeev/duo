@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Banc de table: longue planche sur deux tréteaux pleins, entretoise. -->
+  <g>
+    <path d="M20 50 L28 44 L30 78 L23 84 Z" fill="#6E4B30"/>
+    <path d="M12 50 L21 50 L24 84 L9 84 Z" fill="#A87A46"/>
+    <path d="M68 50 L76 44 L78 78 L71 84 Z" fill="#6E4B30"/>
+    <path d="M60 50 L69 50 L72 84 L57 84 Z" fill="#A87A46"/>
+    <path d="M21 64 L60 64 L60 69 L21 69 Z" fill="#6E4B30" data-w="0.6"/>
+    <path d="M80 42 L92 33 L92 41 L80 50 Z" fill="#6E4B30"/>
+    <path d="M4 42 L80 42 L92 33 L16 33 Z" fill="#D7A86A"/>
+    <path id="assise" d="M4 42 L80 42 L80 50 L4 50 Z" fill="#A87A46"/>
+    <g data-teinte="#A87A46" data-w="0.3" fill="none" stroke="#000">
+    <path d="M12 39 Q40 37 70 38 M18 36 Q48 34 78 35"/>
+    </g>
+    <path data-w="0" d="M10 41 L30 41 L34 38 L14 38 Z" fill="#F5E6C6"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M70 80 l4 -4 M74 80 l4 -4"/>
+    </g>
+  </g>
+</svg>

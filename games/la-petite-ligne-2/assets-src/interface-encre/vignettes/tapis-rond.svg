@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tapis rond: tapis tressé de chiffons, anneaux canard, crème, rouge, moutarde et sauge. -->
+  <g>
+    <ellipse cx="48" cy="64" rx="44" ry="25" fill="#26282E" data-w="0"/>
+    <ellipse id="t" cx="48" cy="61" rx="44" ry="25" fill="#2F6E73"/>
+    <path data-clip="t" data-w="0" d="M66 34 Q88 80 18 92 L96 96 L96 34 Z" fill="#25392F"/>
+    <ellipse cx="48" cy="61" rx="37" ry="21" fill="#F3EDE0" data-w="0.32"/>
+    <ellipse cx="48" cy="61" rx="30" ry="17" fill="#C5443D" data-w="0.32"/>
+    <ellipse cx="48" cy="61" rx="23" ry="13" fill="#D4A33E" data-w="0.32"/>
+    <ellipse cx="48" cy="61" rx="16" ry="9" fill="#96A98C" data-w="0.32"/>
+    <ellipse cx="48" cy="61" rx="8" ry="4.6" fill="#C5443D" data-w="0.32"/>
+    <g data-teinte="#231A17" data-w="0.28" fill="none" stroke="#000">
+    <path d="M87.1 62.2 l2.8 -2.4 M83.1 72.2 l2.8 -2.4 M71.9 80.2 l2.8 -2.4 M55.6 84.6 l2.8 -2.4 M37.6 84.6 l2.8 -2.4 M21.3 80.2 l2.8 -2.4 M10.1 72.2 l2.8 -2.4 M6.1 62.2 l2.8 -2.4 M10.1 52.2 l2.8 -2.4 M21.3 44.2 l2.8 -2.4 M37.6 39.8 l2.8 -2.4 M55.6 39.8 l2.8 -2.4 M71.9 44.2 l2.8 -2.4 M83.1 52.2 l2.8 -2.4 M73.1 62.2 l2.8 -2.4 M70.5 68.7 l2.8 -2.4 M63.1 73.9 l2.8 -2.4 M52.5 76.8 l2.8 -2.4 M40.7 76.8 l2.8 -2.4 M30.1 73.9 l2.8 -2.4 M22.7 68.7 l2.8 -2.4 M20.1 62.2 l2.8 -2.4 M22.7 55.7 l2.8 -2.4 M30.1 50.5 l2.8 -2.4 M40.7 47.6 l2.8 -2.4 M52.5 47.6 l2.8 -2.4 M63.1 50.5 l2.8 -2.4 M70.5 55.7 l2.8 -2.4 M58.6 62.2 l2.8 -2.4 M57.4 65.2 l2.8 -2.4 M54.1 67.5 l2.8 -2.4 M49.3 68.8 l2.8 -2.4 M43.9 68.8 l2.8 -2.4 M39.1 67.5 l2.8 -2.4 M35.8 65.2 l2.8 -2.4 M34.6 62.2 l2.8 -2.4 M35.8 59.2 l2.8 -2.4 M39.1 56.9 l2.8 -2.4 M43.9 55.6 l2.8 -2.4 M49.3 55.6 l2.8 -2.4 M54.1 56.9 l2.8 -2.4 M57.4 59.2 l2.8 -2.4"/>
+    </g>
+  </g>
+</svg>

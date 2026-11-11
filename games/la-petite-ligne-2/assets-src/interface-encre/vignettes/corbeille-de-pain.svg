@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Corbeille de pain: corbeille d'osier ovale, une miche entaillée, un morceau de baguette. -->
+  <g>
+    <ellipse cx="48" cy="56" rx="38" ry="10" fill="#8E6A26" data-w="0.6"/>
+    <path id="miche" d="M14 58 Q12 34 36 30 Q58 30 60 52 Q40 62 14 58 Z" fill="#C0803A"/>
+    <path data-clip="miche" data-w="0" d="M44 26 Q66 40 50 64 L70 64 L70 26 Z" fill="#8C5A35"/>
+    <path data-clip="miche" data-w="0" d="M20 46 Q22 36 32 34 Q24 40 24 50 Z" fill="#E2C582"/>
+    <g data-teinte="#F5E6C6" data-w="0.45" fill="none" stroke="#000">
+    <path d="M26 40 Q34 36 40 42 M30 50 Q40 44 48 50"/>
+    </g>
+    <path id="baguette" d="M44 52 L76 30 Q84 28 86 34 Q86 38 80 42 L54 60 Z" fill="#D4A33E"/>
+    <path data-clip="baguette" data-w="0" d="M50 62 L86 38 L90 40 L56 66 Z" fill="#8E6A26"/>
+    <g data-teinte="#F5E6C6" data-w="0.4" fill="none" stroke="#000">
+    <path d="M60 44 L66 44 M68 38 L74 38 M76 33 L80 33"/>
+    </g>
+    <ellipse cx="48" cy="56" rx="5" ry="6" fill="#F5E6C6" data-w="0.45"/>
+    <path id="corbeille" d="M10 56 Q48 68 86 56 L80 80 Q48 92 16 80 Z" fill="#C99A55"/>
+    <path data-clip="corbeille" data-w="0" d="M62 50 Q80 74 40 94 L96 96 L96 50 Z" fill="#8E6A26"/>
+    <g data-clip="corbeille" data-teinte="#8E6A26" data-w="0.32" fill="none" stroke="#000">
+    <path d="M12 66 Q48 78 84 66 M14 74 Q48 86 82 74 M24 62 L22 86 M36 65 L35 90 M48 66 L48 92 M60 65 L61 90 M72 62 L74 86"/>
+    </g>
+    <path d="M10 56 Q48 68 86 56 L86 60 Q48 72 10 60 Z" fill="#E2C582" data-w="0.5"/>
+  </g>
+</svg>

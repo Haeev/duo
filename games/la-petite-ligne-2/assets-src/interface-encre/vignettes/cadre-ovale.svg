@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Cadre ovale: médaillon doré suspendu, portrait d'un aïeul à moustache, col blanc, fond ardoise. -->
+  <g>
+    <path d="M34 16 L48 4 L62 16" fill="none" stroke="#000" data-w="0.5"/>
+    <ellipse id="cadre" cx="48" cy="52" rx="29" ry="39" fill="#C8A150"/>
+    <path data-clip="cadre" data-w="0" d="M60 8 Q86 64 26 96 L96 96 L96 8 Z" fill="#8E6A26"/>
+    <g data-clip="cadre" data-teinte="#F2C55C" data-w="0.35" fill="none" stroke="#000">
+    <path d="M24 44 Q26 26 38 17"/>
+    </g>
+    <ellipse id="fond" cx="48" cy="52" rx="21" ry="30" fill="#587F8E" data-w="0.5"/>
+    <path data-clip="fond" data-w="0" d="M58 18 Q74 56 40 86 L80 86 L80 18 Z" fill="#2C3B57"/>
+    <path data-clip="fond" d="M26 86 Q28 68 48 65 Q68 68 70 86 Z" fill="#26282E" data-w="0.5"/>
+    <path data-clip="fond" d="M42 65 L48 73 L54 65 Z" fill="#F3EDE0" data-w="0.35"/>
+    <path d="M45 58 L51 58 L51 66 L45 66 Z" fill="#E0AE86" data-w="0.35"/>
+    <ellipse cx="48" cy="48" rx="9" ry="11" fill="#EFC7A6" data-w="0.45"/>
+    <path d="M39 46 Q38 35 48 35 Q58 35 57 46 Q55 40 48 40 Q41 40 39 46 Z" fill="#9A948C" data-w="0.4"/>
+    <path d="M42 53 Q48 50 54 53 Q51 55 48 54 Q45 55 42 53 Z" fill="#6A6763" data-w="0.3"/>
+    <g data-w="0" fill="#231A17">
+    <circle cx="44.5" cy="47" r="0.9"/>
+    <circle cx="51.5" cy="47" r="0.9"/>
+    </g>
+  </g>
+</svg>

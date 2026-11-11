@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tonnelet: couché sur son chantier, douelles, deux cercles de fer, robinet de laiton. -->
+  <g transform="rotate(-3 48 52)">
+    <path d="M18 72 L30 72 L32 88 L16 88 Z" fill="#5E4233"/>
+    <path d="M62 72 L74 72 L76 88 L60 88 Z" fill="#5E4233"/>
+    <path data-w="0" d="M26 72 L30 72 L32 88 L28 88 Z" fill="#4F3626"/>
+    <path data-w="0" d="M70 72 L74 72 L76 88 L72 88 Z" fill="#4F3626"/>
+    <path id="fut" d="M14 38 Q48 26 82 38 Q88 56 82 74 Q48 86 14 74 Q8 56 14 38 Z" fill="#A87A46"/>
+    <path data-clip="fut" data-w="0" d="M60 26 Q88 70 30 90 L96 96 L96 26 Z" fill="#6E4B30"/>
+    <path data-clip="fut" data-w="0" d="M16 44 Q30 36 46 35 Q28 40 22 52 Z" fill="#D7A86A"/>
+    <g data-clip="fut" data-teinte="#6E4B30" data-w="0.3" fill="none" stroke="#000">
+    <path d="M12 48 Q48 38 86 48 M10 58 Q48 50 88 58 M12 68 Q48 62 86 68"/>
+    </g>
+    <path data-clip="fut" d="M21 20 Q17 56 21 92 L27 92 Q23 56 27 20 Z" fill="#4A4D52" data-w="0.45"/>
+    <path data-clip="fut" d="M67 20 Q63 56 67 92 L73 92 Q69 56 73 20 Z" fill="#4A4D52" data-w="0.45"/>
+    <ellipse cx="13" cy="56" rx="5" ry="17" fill="#D7A86A" data-w="0.6"/>
+    <path d="M45 62 L51 62 L51 72 L49 78 L47 72 Z" fill="#C8A150" data-w="0.5"/>
+    <path d="M43 61 L53 61 L53 64 L43 64 Z" fill="#8E6A26" data-w="0.45"/>
+    <circle cx="48" cy="58" r="2.6" fill="#C8A150" data-w="0.45"/>
+  </g>
+</svg>

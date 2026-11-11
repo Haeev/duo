@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Poêle: fonte sur quatre pieds, porte vitrée où danse le feu, bouilloire de cuivre, tuyau qui monte. -->
+  <g>
+    <path d="M58 40 L64 40 L64 4 L58 4 Z" fill="#4A4D52"/>
+    <path data-w="0" d="M61.5 40 L64 40 L64 4 L61.5 4 Z" fill="#26282E"/>
+    <path d="M56 20 L66 20 L66 24 L56 24 Z" fill="#8C8E91" data-w="0.5"/>
+    <path d="M22 76 L28 76 L27 88 L23 88 Z" fill="#26282E" data-w="0.6"/>
+    <path d="M58 76 L64 76 L63 88 L59 88 Z" fill="#26282E" data-w="0.6"/>
+    <path d="M34 70 L40 70 L39 82 L35 82 Z" fill="#26282E" data-w="0.6"/>
+    <path d="M68 69 L74 69 L73 81 L69 81 Z" fill="#26282E" data-w="0.6"/>
+    <path d="M66 42 L78 33 L78 67 L66 76 Z" fill="#26282E"/>
+    <path d="M18 42 L66 42 L78 33 L30 33 Z" fill="#8C8E91"/>
+    <path id="corps" d="M18 42 L66 42 L66 76 L18 76 Z" fill="#4A4D52"/>
+    <path d="M16 42 L68 42 L68 45 L16 45 Z" fill="#8C8E91" data-w="0.5"/>
+    <path d="M24 50 L52 50 L52 71 L24 71 Z" fill="#26282E" data-w="0.5"/>
+    <path id="feu" d="M27 53 L49 53 L49 68 L27 68 Z" fill="#D9822E" data-w="0"/>
+    <path data-clip="feu" data-w="0" d="M28 68 Q30 58 34 62 Q36 54 40 62 Q44 56 46 68 Z" fill="#FFC264"/>
+    <path data-clip="feu" data-w="0" d="M34 68 Q37 62 39 66 Q41 62 43 68 Z" fill="#FFE6B0"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M27 60.5 L49 60.5 M34.3 53 L34.3 68 M41.6 53 L41.6 68"/>
+    </g>
+    <circle cx="57" cy="60" r="2.2" fill="#C8A150" data-w="0.45"/>
+    <path id="bouilloire" d="M26 40 Q24 27 35 25 Q46 27 44 40 Z" fill="#AD6244"/>
+    <path data-clip="bouilloire" data-w="0" d="M38 22 Q48 30 40 42 L50 42 L50 22 Z" fill="#743D2B"/>
+    <path data-w="0" d="M29 36 Q29 29 33 27 L33 37 Z" fill="#D98C62"/>
+    <path d="M43 33 L52 26 L53 29 L45 36 Z" fill="#AD6244" data-w="0.5"/>
+    <path d="M29 27 Q35 17 41 27" fill="none" stroke="#000" data-w="0.55"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M68 66 l4 -4 M72 66 l4 -4"/>
+    </g>
+  </g>
+</svg>

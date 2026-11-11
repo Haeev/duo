@@ -1,5 +1,6 @@
 /**
- * Écrit les sources des vignettes de sachets de graines de fleurs (`vignettes/graines-<fleur>.svg`):
+ * Écrit les sources des vignettes de sachets de graines de fleurs (`vignettes/graines-<fleur>.svg`)
+ * et des légumes du potager semés en graines (carotte, poireau):
  * le sachet de papier de la famille (celui de `graines-radis`), une bande de couleur, la fleur
  * dessinée en petit sur le devant et quelques graines tombées, propres à chaque espèce.
  * On modifie ce script, pas les SVG écrits.
@@ -129,6 +130,28 @@ const SACHETS = {
     <g data-w="0" fill="#C5443D"><circle cx="41" cy="50" r="3.4"/><circle cx="55" cy="50" r="3.4"/><circle cx="48" cy="58" r="3.4"/></g>
     <g data-w="0" fill="#8F3B34"><circle cx="41" cy="50" r="1.3"/><circle cx="55" cy="50" r="1.3"/><circle cx="48" cy="58" r="1.3"/></g>`,
     graines: grains('#3A3331'),
+  },
+  // Semences du potager: même sachet, le légume dessiné à la place de la fleur.
+  'graines-carotte': {
+    note: 'Sachet de graines de carotte: bande ocre, carotte en biais avec ses fanes, graines minuscules brun clair.',
+    bande: '#C0803A',
+    tourne: -6,
+    fleur: `<g data-w="0.45" fill="#6E9241"><path d="M54 46 Q54 36 58 32 Q60 40 57 47 Z"/><path d="M56 47 Q62 38 68 38 Q64 46 58 49 Z"/><path d="M53 46 Q48 38 50 32 Q55 38 55 46 Z"/></g>
+    <path id="fleur" d="M52 46 Q58 46 60 52 L40 72 Q37 74 36 71 Z" fill="#D9822E"/>
+    <path data-clip="fleur" data-w="0" d="M60 50 L64 54 L40 76 L38 72 Z" fill="#A85837"/>
+    <g data-teinte="#A85837" data-w="0.3" fill="none" stroke="#000"><path d="M47 56 l3 3 M43 62 l3 2"/></g>`,
+    graines: grains('#B8A17E'),
+  },
+  'graines-poireau': {
+    note: 'Sachet de graines de poireau: bande vert bouteille, poireau debout (fût blanc, feuilles vertes en éventail, radicelles), graines noires.',
+    bande: '#3F6453',
+    tourne: 6,
+    fleur: `<g data-w="0.45" fill="#6E9241"><path d="M46 56 Q38 46 34 40 Q42 42 48 52 Z"/><path d="M50 56 Q58 46 64 42 Q58 52 52 58 Z"/></g>
+    <path d="M46 56 Q44 44 46 38 Q52 44 51 56 Z" fill="#40592D" data-w="0.45"/>
+    <path id="fleur" d="M45 55 L51 55 L51 72 Q48 75 45 72 Z" fill="#F3EDE0"/>
+    <path data-clip="fleur" data-w="0" d="M45 55 L51 55 L51 61 L45 61 Z" fill="#B9C76A"/>
+    <g data-w="0.4" fill="none" stroke="#000"><path d="M47 74 L45 78 M48 74 L48 79 M49 74 L51 78"/></g>`,
+    graines: grains('#231A17', 'croissant'),
   },
 };
 

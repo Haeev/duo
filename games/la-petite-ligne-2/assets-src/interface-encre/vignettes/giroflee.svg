@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
-  <!-- Giroflée (fleur coupée): tige raide portant une grappe de petites fleurs brique à quatre pétales et cœur ocre, boutons verts en tête, feuilles étroites. -->
-  <path data-w="0.8" fill="none" stroke="#000" d="M50 30 Q48 62 40 94"/>
-  <path d="M46 70 Q28 64 20 52 Q34 56 47 64 Z" fill="#6E9241" data-w="0.6"/>
-  <path d="M46 78 Q62 70 74 62 Q66 74 47 84 Z" fill="#6E9241" data-w="0.6"/>
-  <path data-w="0" d="M47 66 Q34 60 24 54 Q36 58 47 64 Z" fill="#40592D"/>
-  <g data-w="0.55" fill="#6E9241"><ellipse cx="50" cy="12" rx="3.4" ry="5"/><ellipse cx="43" cy="16" rx="3" ry="4.4"/><ellipse cx="57" cy="16" rx="3" ry="4.4"/></g>
-  <g data-w="0.6" fill="#A85837">
-    <path d="M36 28 Q34 20 40 20 Q42 14 47 18 Q52 20 48 26 Q52 32 46 34 Q42 38 38 34 Q30 32 36 28 Z"/>
-    <path d="M58 26 Q56 18 62 18 Q64 12 69 16 Q74 18 70 24 Q74 30 68 32 Q64 36 60 32 Q52 30 58 26 Z"/>
-    <path d="M26 46 Q24 38 30 38 Q32 32 37 36 Q42 38 38 44 Q42 50 36 52 Q32 56 28 52 Q20 50 26 46 Z"/>
-    <path d="M48 44 Q46 36 52 36 Q54 30 59 34 Q64 36 60 42 Q64 48 58 50 Q54 54 50 50 Q42 48 48 44 Z"/>
-    <path d="M66 50 Q64 42 70 42 Q72 36 77 40 Q82 42 78 48 Q82 54 76 56 Q72 60 68 56 Q60 54 66 50 Z"/>
+  <!-- Giroflée (fleur coupée), reprise du 2026-11-11 pour la lisibilité en petit: un épi aéré de cinq fleurs à quatre pétales qui rapetissent vers le haut, ton brique clair et cœur jaune, contours fins, boutons verts en tête, deux feuilles étroites. -->
+  <path data-w="0.7" fill="none" stroke="#000" d="M50 20 Q52 50 46 70 Q42 82 40 94"/>
+  <path data-w="0.5" fill="none" stroke="#000" d="M48 60 L40 62 M50 50 L58 54 M50 40 L44 42 M51 32 L58 34"/>
+  <path d="M45 74 Q30 72 22 62 Q36 64 46 70 Z" fill="#6E9241" data-w="0.5"/>
+  <path d="M44 80 Q58 76 68 68 Q62 80 44 86 Z" fill="#9DBB5B" data-w="0.5"/>
+  <path data-w="0" d="M46 72 Q34 70 26 64 Q38 67 46 70 Z" fill="#40592D"/>
+  <g data-w="0.45" fill="#6E9241"><ellipse cx="51" cy="13" rx="2.6" ry="4"/><ellipse cx="45" cy="17" rx="2.2" ry="3.4"/><ellipse cx="56" cy="18" rx="2.2" ry="3.4"/></g>
+  <g data-w="0.45" fill="#C67A5E">
+    <path d="M36.3 59.9 Q31.7 51.3 37.4 52.1 Q43.1 52.9 38.1 62.3 Q46.7 57.7 45.9 63.4 Q45.1 69.1 35.7 64.1 Q40.3 72.7 34.6 71.9 Q28.9 71.1 33.9 61.7 Q25.3 66.3 26.1 60.6 Q26.9 54.9 36.3 59.9 Z"/>
+    <path d="M61.6 54.0 Q54.7 47.8 60.0 46.7 Q65.3 45.6 64.0 55.6 Q70.2 48.7 71.3 54.0 Q72.4 59.3 62.4 58.0 Q69.3 64.2 64.0 65.3 Q58.7 66.4 60.0 56.4 Q53.8 63.3 52.7 58.0 Q51.6 52.7 61.6 54.0 Z"/>
+    <path d="M42.6 40.3 Q40.3 32.4 44.9 34.0 Q49.5 35.7 43.7 42.6 Q51.6 40.3 50.0 44.9 Q48.3 49.5 41.4 43.7 Q43.7 51.6 39.1 50.0 Q34.5 48.3 40.3 41.4 Q32.4 43.7 34.0 39.1 Q35.7 34.5 42.6 40.3 Z"/>
+    <path d="M60.0 32.4 Q55.7 26.5 60.0 26.5 Q64.3 26.5 61.6 34.0 Q67.5 29.7 67.5 34.0 Q67.5 38.3 60.0 35.6 Q64.3 41.5 60.0 41.5 Q55.7 41.5 58.4 34.0 Q52.5 38.3 52.5 34.0 Q52.5 29.7 60.0 32.4 Z"/>
+    <path d="M48.6 24.9 Q48.0 19.1 51.0 20.8 Q54.0 22.5 49.1 26.6 Q54.9 26.0 53.2 29.0 Q51.5 32.0 47.4 27.1 Q48.0 32.9 45.0 31.2 Q42.0 29.5 46.9 25.4 Q41.1 26.0 42.8 23.0 Q44.5 20.0 48.6 24.9 Z"/>
   </g>
-  <g data-w="0" fill="#8F3B34"><path d="M42 34 Q46 32 48 26 Q50 32 44 36 Z"/><path d="M64 32 Q68 30 70 24 Q72 30 66 34 Z"/><path d="M32 52 Q36 50 38 44 Q40 50 34 54 Z"/><path d="M54 50 Q58 48 60 42 Q62 48 56 52 Z"/><path d="M72 56 Q76 54 78 48 Q80 54 74 58 Z"/></g>
-  <g data-w="0" fill="#D9A887"><path d="M38 24 Q40 22 42 22 Q40 24 39 27 Z"/><path d="M60 22 Q62 20 64 20 Q62 22 61 25 Z"/><path d="M28 42 Q30 40 32 40 Q30 42 29 45 Z"/><path d="M50 40 Q52 38 54 38 Q52 40 51 43 Z"/><path d="M68 46 Q70 44 72 44 Q70 46 69 49 Z"/></g>
-  <g data-w="0.35" fill="#C0803A"><circle cx="41" cy="27" r="2"/><circle cx="63" cy="25" r="2"/><circle cx="31" cy="45" r="2"/><circle cx="53" cy="43" r="2"/><circle cx="71" cy="49" r="2"/></g>
+  <g data-w="0" fill="#A85837"><path d="M37 62 Q42 64 45 63 Q43 68 36 64 Z"/><path d="M62 56 Q68 58 71 56 Q68 62 62 58 Z"/><path d="M42 42 Q47 44 49 45 Q46 48 41 44 Z"/></g>
+  <g data-w="0" fill="#F2C55C"><circle cx="36" cy="62" r="2"/><circle cx="62" cy="56" r="1.9"/><circle cx="42" cy="42" r="1.7"/><circle cx="60" cy="34" r="1.5"/><circle cx="48" cy="26" r="1.2"/></g>
 </svg>

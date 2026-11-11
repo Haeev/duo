@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Cadre portrait: cadre de noyer en hauteur, une femme en buste à chignon, robe rouge, fond vert sombre. -->
+  <g transform="rotate(2 48 52)">
+    <path d="M34 12 L48 3 L62 12" fill="none" stroke="#000" data-w="0.5"/>
+    <path id="cadre" d="M14 10 L82 9 L83 88 L15 89 Z M24 20 L72 19 L73 78 L25 79 Z" fill-rule="evenodd" fill="#5E4233"/>
+    <path data-clip="cadre" data-w="0" d="M68 4 L96 4 L96 96 L0 96 L0 82 Q76 82 68 4 Z" fill="#4F3626"/>
+    <g data-clip="cadre" data-teinte="#96704C" data-w="0.32" fill="none" stroke="#000">
+    <path d="M17 13 L76 12 M17 16 L18 82"/>
+    </g>
+    <path id="toile" d="M24 20 L72 19 L73 79 L25 80 Z" fill="#3F6453" data-w="0.5"/>
+    <path data-clip="toile" data-w="0" d="M56 14 Q76 54 40 84 L80 84 L80 14 Z" fill="#25392F"/>
+    <path data-clip="toile" d="M28 82 Q30 64 48 61 Q66 64 68 82 Z" fill="#C5443D" data-w="0.5"/>
+    <path data-clip="toile" data-w="0" d="M56 64 Q66 68 68 82 L56 82 Z" fill="#8F3B34"/>
+    <path d="M45 54 L51 54 L51 62 L45 62 Z" fill="#E0AE86" data-w="0.35"/>
+    <path d="M40 32 Q40 22 48 22 Q56 22 56 32 L57 44 Q48 40 39 44 Z" fill="#6E4B33" data-w="0.45"/>
+    <circle cx="48" cy="21" r="5" fill="#6E4B33" data-w="0.45"/>
+    <ellipse cx="48" cy="44" rx="8" ry="10.4" fill="#EFC7A6" data-w="0.45"/>
+    <path d="M40 40 Q42 32 48 32 Q54 32 56 40 Q52 36 48 36 Q44 36 40 40 Z" fill="#6E4B33" data-w="0"/>
+    <g data-w="0" fill="#231A17">
+    <circle cx="45" cy="44" r="0.9"/>
+    <circle cx="51" cy="44" r="0.9"/>
+    </g>
+    <path data-w="0" d="M46 50 Q48 51.4 50 50 Q48 52 46 50 Z" fill="#A2473F"/>
+  </g>
+</svg>

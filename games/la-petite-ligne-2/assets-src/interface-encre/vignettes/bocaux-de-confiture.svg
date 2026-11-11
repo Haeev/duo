@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Bocaux de confiture: mûre, fraise et abricot, couvercles de tissu à carreaux noués, étiquettes. -->
+  <g>
+    <path id="b2" d="M36 38 Q36 34 40 34 L56 34 Q60 34 60 38 L60 60 Q60 64 56 64 L40 64 Q36 64 36 60 Z" fill="#7E3F55"/>
+    <path data-clip="b2" data-w="0" d="M50 30 Q62 54 44 66 L64 68 L64 30 Z" fill="#45324F"/>
+    <path data-w="0" d="M38.5 40 L41 40 L41 58 L38.5 58 Z" fill="#F7F3EA"/>
+    <path d="M40 47.5 L56 47.5 L56 56.5 L40 56.5 Z" fill="#F5E6C6" data-w="0.35"/>
+    <path id="b2t" d="M33 38 Q48 25 63 38 L61 41 L57 39 L48 42 L39 39 L35 41 Z" fill="#F3EDE0"/>
+    <g data-clip="b2t" data-teinte="#44618A" data-w="0.4" fill="none" stroke="#000">
+    <path d="M36 28 L36 42 M45 28 L45 42 M51 28 L51 42 M60 28 L60 42 M32 33 L64 33"/>
+    </g>
+    <path d="M35 36.6 Q48 38 61 36.6" fill="none" stroke="#000" data-w="0.45"/>
+    <path id="b1" d="M12 58 Q12 54 16 54 L34 54 Q38 54 38 58 L38 82 Q38 86 34 86 L16 86 Q12 86 12 82 Z" fill="#C5443D"/>
+    <path data-clip="b1" data-w="0" d="M27 50 Q40 76 21 88 L42 90 L42 50 Z" fill="#80292A"/>
+    <path data-w="0" d="M14.5 60 L17 60 L17 80 L14.5 80 Z" fill="#F7F3EA"/>
+    <path d="M16 68.4 L34 68.4 L34 78 L16 78 Z" fill="#F5E6C6" data-w="0.35"/>
+    <path id="b1t" d="M9 58 Q25 45 41 58 L39 61 L35 59 L25 62 L15 59 L11 61 Z" fill="#F3EDE0"/>
+    <g data-clip="b1t" data-teinte="#C5443D" data-w="0.4" fill="none" stroke="#000">
+    <path d="M12 48 L12 62 M22 48 L22 62 M28 48 L28 62 M38 48 L38 62 M8 53 L42 53"/>
+    </g>
+    <path d="M11 56.6 Q25 58 39 56.6" fill="none" stroke="#000" data-w="0.45"/>
+    <path id="b3" d="M59 64 Q59 60 63 60 L79 60 Q83 60 83 64 L83 84 Q83 88 79 88 L63 88 Q59 88 59 84 Z" fill="#D9822E"/>
+    <path data-clip="b3" data-w="0" d="M73 56 Q85 78 67 90 L87 92 L87 56 Z" fill="#B8704E"/>
+    <path data-w="0" d="M61.5 66 L64 66 L64 82 L61.5 82 Z" fill="#F7F3EA"/>
+    <path d="M63 72.6 L79 72.6 L79 81 L63 81 Z" fill="#F5E6C6" data-w="0.35"/>
+    <path id="b3t" d="M56 64 Q71 51 86 64 L84 67 L80 65 L71 68 L62 65 L58 67 Z" fill="#F3EDE0"/>
+    <g data-clip="b3t" data-teinte="#6E9241" data-w="0.4" fill="none" stroke="#000">
+    <path d="M59 54 L59 68 M68 54 L68 68 M74 54 L74 68 M83 54 L83 68 M55 59 L87 59"/>
+    </g>
+    <path d="M58 62.6 Q71 64 84 62.6" fill="none" stroke="#000" data-w="0.45"/>
+  </g>
+</svg>

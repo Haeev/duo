@@ -55,51 +55,7 @@ const AHEAD = new Set(['lettre']);
  * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
  * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
  */
-/** Objets d'intérieur livrés en 3D le 2026-11-11 (`recoltables-aubrune/interieurs.py`), avant leur dessin. */
-const NEW_DECOR = [
-  'balai',
-  'banc-de-table',
-  'bocaux-de-confiture',
-  'boites-a-provisions',
-  'bouquet',
-  'buches-d-interieur',
-  'cadre-ovale',
-  'cadre-paysage',
-  'cadre-portrait',
-  'caisse-de-legumes',
-  'corbeille-de-pain',
-  'etagere-murale',
-  'horloge-murale',
-  'journal',
-  'lampe-a-petrole',
-  'lampe-de-table',
-  'lumignon',
-  'panier-a-linge',
-  'patere',
-  'pendule',
-  'pile-de-livres',
-  'poele',
-  'pots-de-gres',
-  'rideau-de-porte',
-  'seau',
-  'tabouret-de-ferme',
-  'tapis-long',
-  'tapis-rond',
-  'tonnelet',
-  'vaisselier',
-] as const;
-/** Semences des cultures ajoutées le 2026-11-11, en attente de leur dessin. */
-const NEW_SEEDS = ['graines-carotte', 'graines-poireau', 'plants-de-pomme-de-terre'] as const;
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
-  ...NEW_DECOR.map((id): [string, string] => [
-    id,
-    'modèle 3D livré avant sa vignette: à dessiner par l’artiste 2D',
-  ]),
-  ...NEW_SEEDS.map((id): [string, string] => [
-    id,
-    'semence livrée avant sa vignette: à dessiner par l’artiste 2D',
-  ]),
-]);
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>();
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):
  * le carnet les montre par leur identifiant (`itemThumb`), elles ont leur vignette aussi.

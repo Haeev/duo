@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Pendule de cheminée: socle à pieds de laiton, corps de noyer en chapelle, fronton, épi, cadran d'émail. -->
+  <g transform="rotate(-3 48 52)">
+    <path d="M74 74 L84 67 L84 75 L74 82 Z" fill="#4F3626"/>
+    <path d="M14 74 L74 74 L84 67 L24 67 Z" fill="#96704C"/>
+    <path id="socle" d="M14 74 L74 74 L74 82 L14 82 Z" fill="#5E4233"/>
+    <path d="M16 82 L23 82 L23 88 L16 88 Z" fill="#C8A150" data-w="0.45"/>
+    <path d="M65 82 L72 82 L72 88 L65 88 Z" fill="#C8A150" data-w="0.45"/>
+    <path d="M66 38 L75 31 L75 67 L66 74 Z" fill="#4F3626"/>
+    <path d="M20 38 L66 38 L75 31 L29 31 Z" fill="#96704C"/>
+    <path id="corps" d="M20 38 L66 38 L66 74 L20 74 Z" fill="#5E4233"/>
+    <g data-clip="corps" data-teinte="#4F3626" data-w="0.28" fill="none" stroke="#000">
+    <path d="M24 70 Q32 66 40 70 M50 72 Q56 68 62 71"/>
+    </g>
+    <path d="M66 38 L75 31 L52 13 L43 20 Z" fill="#96704C"/>
+    <path id="fronton" d="M18 38 L68 38 L43 20 Z" fill="#5E4233"/>
+    <path data-clip="fronton" data-w="0" d="M43 18 L70 18 L70 40 L50 40 Z" fill="#4F3626"/>
+    <circle cx="47.5" cy="15" r="3.4" fill="#C8A150" data-w="0.45"/>
+    <circle cx="43" cy="56" r="13" fill="#C8A150" data-w="0.5"/>
+    <circle cx="43" cy="56" r="10.4" fill="#F7F3EA" data-w="0.35"/>
+    <g data-teinte="#231A17" data-w="0.3" fill="none" stroke="#000">
+    <path d="M43 46.6 L43 49 M43 63 L43 65.4 M33.6 56 L36 56 M50 56 L52.4 56"/>
+    </g>
+    <g data-w="0.5" fill="none" stroke="#000">
+    <path d="M43 56 L38 52 M43 56 L45 47.6"/>
+    </g>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M68 66 l4 -4 M72 66 l4 -4"/>
+    </g>
+  </g>
+</svg>
