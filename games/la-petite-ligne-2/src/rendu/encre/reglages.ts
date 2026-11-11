@@ -360,6 +360,44 @@ export const INK_SETTINGS = {
    * Mémoire: celle que le rendu encré ajoute au lieu (couches de traits, cartes d'ombre, cibles).
    */
   budget: { triangles: 350_000, calls: 200, programs: 14, textureMegabytes: 64 },
+
+  /**
+   * Feux vivants (matériaux `flamme` et `braise` des modèles, `conversion.ts`), tout dans le
+   * nuanceur des volumes: aucun programme ni passe de plus.
+   */
+  fire: {
+    /**
+     * Une pièce en `flamme` est une langue de feu si elle finit en pointe: la tranche du haut
+     * (`tipBand` de sa hauteur) tient dans `tipShare` de sa largeur. Sinon c'est un verre de lampe
+     * (lanterne, abat-jour, lampion): il luit sans bouger, comme avant.
+     */
+    tipBand: 0.12,
+    tipShare: 0.3,
+    /** Balancement de la pointe (part de la hauteur de la langue) et étirement vertical (part). */
+    sway: 0.16,
+    stretch: 0.18,
+    /** Tons d'écran du cœur, du milieu et de la pointe; seuils de hauteur (0 pied, 1 pointe). */
+    core: '#ffe58a',
+    middle: '#ffb43c',
+    tip: '#ec5f24',
+    bands: [0.38, 0.72] as const,
+    /** Braise: ton chaud ajouté, période du rougeoiement (s) et part qui varie. */
+    ember: '#ff6a2a',
+    emberPeriod: 3.2,
+    emberPulse: 0.3,
+    /**
+     * Lampe portée par un objet à flamme, par famille de modèle: `flicker`, part de l'intensité qui
+     * vacille (la flaque respire aussi un peu: 40 % de cette part sur son rayon); `day`: le feu
+     * brûle aussi le jour (feux de fête), sinon il suit l'allumage de la lampe. Une famille
+     * absente ne vacille pas (lanternes, véhicules).
+     */
+    families: {
+      fete: { flicker: 0.12, day: true },
+      objet: { flicker: 0.07, day: false },
+    } as Readonly<Record<string, { readonly flicker: number; readonly day: boolean }>>,
+    /** Mouvement réduit (option du joueur): part du mouvement des langues gardée, lampes fixes. */
+    reducedMotion: 0.3,
+  },
 } as const;
 
 export type InkSettings = typeof INK_SETTINGS;

@@ -29,6 +29,8 @@ MATERIAUX = (
     "gazon", "moellon", "crepi", "tuile", "bardage", "metal", "vitre", "etoffe", "flamme",
     # Fenêtres des voitures de voyageurs: allumées avec les lampes (`vehicules.py`).
     "vitrage",
+    # Braises des foyers: elles rougeoient (rendu encré, nature `ember`).
+    "braise",
 )
 
 

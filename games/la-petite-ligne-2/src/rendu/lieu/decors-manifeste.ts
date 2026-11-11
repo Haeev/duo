@@ -51,10 +51,14 @@ const DecorModelSchema = v.object({
   ),
 });
 
-/** Ce que le rendu encré tire du NOM d'un matériau: couche de traits, prise au vent, verre d'une lampe (`flame`). */
+/**
+ * Ce que le rendu encré tire du NOM d'un matériau: couche de traits, prise au vent, verre d'une
+ * lampe (`flame`), feu vivant (`fire`: langues qui ondulent; un morceau qui ne finit pas en pointe reste un verre) et
+ * braise qui rougeoie (`ember`).
+ */
 const DecorMaterialSchema = v.object({
   layer: v.picklist(Object.keys(LAYER) as LayerName[]),
-  kind: v.optional(v.picklist(['leaf', 'stem', 'flame'])),
+  kind: v.optional(v.picklist(['leaf', 'stem', 'flame', 'fire', 'ember'])),
 });
 export type DecorMaterial = v.InferOutput<typeof DecorMaterialSchema>;
 

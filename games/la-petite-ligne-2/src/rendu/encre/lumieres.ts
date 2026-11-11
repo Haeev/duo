@@ -7,7 +7,7 @@
  */
 import { DECOR_MANIFEST, type DecorManifest, keyDraw } from '../lieu/decors-manifeste';
 import type { SceneVolume } from '../lieu/description';
-import { hex } from './couches';
+import { firePhase, hex } from './couches';
 import type { InkInner, Lamp, WindowLight } from './matiere';
 import { INK_SETTINGS } from './reglages';
 
@@ -61,7 +61,9 @@ export function hostOf(
 
 /**
  * Lampe d'un modèle qui déclare sa lumière, posé en (x, z) au cap `yaw` (radians autour de Y,
- * comme `Object3D.rotation.y`) et à l'échelle `scale`, son pied à la hauteur `ground`.
+ * comme `Object3D.rotation.y`) et à l'échelle `scale`, son pied à la hauteur `ground`. `family`
+ * (famille du modèle): un objet à flamme (`INK_SETTINGS.fire.families`) a une lampe qui vacille
+ * avec son feu, et un feu qui brûle aussi le jour s'il le dit.
  */
 export function modelLamp(
   id: string,
@@ -74,8 +76,10 @@ export function modelLamp(
     readonly scale?: number;
   },
   options: PlaceLightOptions = {},
+  family?: string,
 ): Lamp {
   const scale = pose.scale ?? 1;
+  const fire = family === undefined ? undefined : INK_SETTINGS.fire.families[family];
   const cos = Math.cos(pose.yaw);
   const sin = Math.sin(pose.yaw);
   const [ax, ay, az] = light.at;
@@ -92,6 +96,13 @@ export function modelLamp(
     ...(options.outdoor === true ? { phase: lampPhase(id) } : {}),
     ...(follows === undefined ? {} : { follows }),
     ...(glass === undefined ? {} : { glass }),
+    ...(fire === undefined
+      ? {}
+      : {
+          flicker: fire.flicker,
+          flickerPhase: firePhase(pose.x, pose.z),
+          burnsByDay: fire.day,
+        }),
   };
 }
 
@@ -123,6 +134,7 @@ export function placeLights(
             ...(volume.scale === undefined ? {} : { scale: volume.scale }),
           },
           options,
+          model.family,
         ),
       );
       continue;

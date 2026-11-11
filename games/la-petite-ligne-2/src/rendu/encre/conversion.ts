@@ -136,6 +136,57 @@ export function connectedParts(
 }
 
 /**
+ * Morceaux d'un matériau `flamme` qui sont des langues de feu (1) plutôt qu'un verre de lampe (0):
+ * la tranche du haut tient dans une petite part de la largeur (`INK_SETTINGS.fire.tipShare`).
+ */
+function fireTongues(
+  position: Attribute,
+  part: Uint32Array,
+  count: number,
+  min: Float32Array,
+  max: Float32Array,
+): Uint8Array {
+  const s = INK_SETTINGS.fire;
+  const lo = new Float32Array(count * 2).fill(Infinity);
+  const hi = new Float32Array(count * 2).fill(-Infinity);
+  for (let i = 0; i < position.count; i++) {
+    const p = part[i] ?? 0;
+    const top = max[p * 3 + 1] ?? 0;
+    const height = top - (min[p * 3 + 1] ?? 0);
+    if (position.getY(i) < top - height * s.tipBand) continue;
+    const x = position.getX(i);
+    const z = position.getZ(i);
+    lo[p * 2] = Math.min(lo[p * 2] ?? x, x);
+    hi[p * 2] = Math.max(hi[p * 2] ?? x, x);
+    lo[p * 2 + 1] = Math.min(lo[p * 2 + 1] ?? z, z);
+    hi[p * 2 + 1] = Math.max(hi[p * 2 + 1] ?? z, z);
+  }
+  const tongue = new Uint8Array(count);
+  for (let p = 0; p < count; p++) {
+    const wide = Math.max(
+      (max[p * 3] ?? 0) - (min[p * 3] ?? 0),
+      (max[p * 3 + 2] ?? 0) - (min[p * 3 + 2] ?? 0),
+    );
+    const tip = Math.max(
+      (hi[p * 2] ?? 0) - (lo[p * 2] ?? 0),
+      (hi[p * 2 + 1] ?? 0) - (lo[p * 2 + 1] ?? 0),
+    );
+    tongue[p] = wide > 1e-5 && tip <= wide * s.tipShare ? 1 : 0;
+  }
+  return tongue;
+}
+
+/**
+ * Premier nombre de `aInk` d'un sommet de langue de feu: hauteur de la langue en centimètres
+ * (partie entière) et place du sommet de son pied à sa pointe (partie décimale, de 0 à 0,999).
+ */
+export function fireHeight(y: number, foot: number, top: number): number {
+  const height = Math.max(0, top - foot);
+  const along = height > 1e-6 ? (y - foot) / height : 0;
+  return Math.max(1, Math.round(height * 100)) + Math.min(0.999, Math.max(0, along));
+}
+
+/**
  * Pose `aInk` sur une géométrie (une fois: un second appel ne fait rien). Rend la géométrie.
  */
 export function inkTag(geometry: BufferGeometry, options: InkTagOptions = {}): BufferGeometry {
@@ -200,10 +251,14 @@ export function inkTag(geometry: BufferGeometry, options: InkTagOptions = {}): B
     kinds[p] = options.kind ?? (pane ? KIND.window : rule?.leafy === true ? KIND.leaf : KIND.none);
     if (pane) layers[p] = LAYER.plain;
   }
+  const fire = options.kind === KIND.fire ? fireTongues(position, part, count, min, max) : null;
+  if (fire !== null) for (let p = 0; p < count; p++) if (fire[p] !== 1) kinds[p] = KIND.flame;
   const ink = new Float32Array(position.count * 4);
   for (let i = 0; i < position.count; i++) {
     const p = part[i] ?? 0;
     ink[i * 4] = layers[p] ?? 0;
+    if (fire?.[p] === 1)
+      ink[i * 4] = fireHeight(position.getY(i), min[p * 3 + 1] ?? 0, max[p * 3 + 1] ?? 0);
     ink[i * 4 + 1] = pieceCode;
     ink[i * 4 + 2] = kinds[p] ?? 0;
     ink[i * 4 + 3] = codes[p] ?? 1;

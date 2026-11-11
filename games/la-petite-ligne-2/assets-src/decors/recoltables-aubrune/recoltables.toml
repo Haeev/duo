@@ -82,7 +82,8 @@ bardage = { couche = "wood" }                  # planches jointives (poulailler)
 metal = { couche = "plain" }
 vitre = { couche = "plain" }                   # verre, glace, bocaux
 etoffe = { couche = "plain" }
-flamme = { couche = "plain", nature = "flame" }  # verre d'une lampe: il luit quand elle est allumée
+flamme = { couche = "plain", nature = "fire" }   # langue de feu (finit en pointe): elle ondule; sinon verre d'une lampe qui luit allumée
+braise = { couche = "plain", nature = "ember" }  # braises: elles rougeoient lentement
 vitrage = { couche = "plain", nature = "flame" }  # fenêtres d'une voiture de voyageurs: allumées avec les lampes
 
 # ---------------------------------------------------------------- nuancier d'Aubrune (teintes d'écran)
