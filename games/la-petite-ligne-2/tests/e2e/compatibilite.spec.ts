@@ -63,12 +63,14 @@ test('K1 deux fabrications différentes sous le même numéro: message clair, pa
     'empreinte trouvée dans le jeu servi (sinon: refaire `vite build`)',
   ).toBeGreaterThan(0);
 
-  // Le message clair, chez l'invité et chez l'hôte.
+  // Le message clair, chez l'invité et chez l'hôte (`COMPAT_TEXTS.different`): ce qui ne va pas,
+  // ce que cela empêche, et quoi faire, sur les deux machines.
   for (const side of [guest, host]) {
     const alert = side.game().locator(ALERT);
     await expect(alert, `message chez ${side.who}`).toBeVisible({ timeout: 60_000 });
-    await expect(alert).toContainText('pas tout à fait les mêmes');
-    await expect(alert).toContainText('relancez Duo');
+    await expect(alert).toContainText('pas tout à fait la même version');
+    await expect(alert).toContainText('la partie ne peut pas commencer');
+    await expect(alert).toContainText('fermez et rouvrez Duo sur vos deux machines');
   }
   await shot(guest, '1-message-invite');
   await shot(host, '1-message-hote');

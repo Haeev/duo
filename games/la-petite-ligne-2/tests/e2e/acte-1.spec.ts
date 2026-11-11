@@ -4,12 +4,25 @@
 // Aubrune (`fabrique-sauvegardes.prep.ts`). P18a: la scène d'accueil démarre chez les deux avec
 // l'étape « quai ». P18b: après la scène, Firmin reçoit la lettre et l'étape avance. D1 (corrigé):
 // les répliques de la scène s'affichent chez les deux et avancent quand les deux ont lu.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { SIM_DT } from '../../src/simulation/noyau/constantes';
 import { STORY } from '../../src/simulation/quetes/reglages';
 import { startDuo, type ProbeWorld, type Side } from '../aides-e2e/duo';
 
 const QUEST = 'le-train-de-5h12';
+
+/** Durées du trajet, lues dans les réglages du jeu (Playwright n'importe pas les JSON de `src/`). */
+const TRAVEL = (
+  JSON.parse(
+    readFileSync(join(import.meta.dirname, '../../donnees/commun/reglages.json'), 'utf8'),
+  ) as { travel: { minSeconds: number; arrivalSeconds: number } }
+).travel;
+/** Attente murale du trajet: large, la machine de recette simule au ralenti (rendu logiciel). */
+const TRIP_WALL_MS = 120_000;
+/** Temps de jeu toléré en plus: les deux lectures du monde qui encadrent l'arrivée. */
+const TRIP_MARGIN_SECONDS = 3;
 
 const passed = (w: { progress?: { quests: Record<string, { passed?: readonly string[] }> } }) =>
   w.progress?.quests[QUEST]?.passed ?? [];
@@ -38,6 +51,7 @@ test('P18 départ: une partie neuve commence dans le train de nuit', async ({ br
 });
 
 test('P18 départ: la fin du prologue mène les deux sur le quai d’Aubrune', async ({ browser }) => {
+  test.setTimeout(300_000);
   const duo = await startDuo(browser, 'depart', { save: 'train-de-nuit-porte' });
   const { host, guest } = duo;
   await duo.until(host, 'dans le train', (w) => w.common.place === 'train-de-nuit');
@@ -45,19 +59,31 @@ test('P18 départ: la fin du prologue mène les deux sur le quai d’Aubrune', a
   // « descendre » finit le prologue, dont l'effet fait partir le train vers Aubrune.
   await duo.teleport(0, 8.05, 5.35, Math.PI / 2);
   await duo.teleport(1, 8.65, 5.35, Math.PI / 2);
-  await duo.until(host, 'en route', (w) => w.common.phase === 'travel');
-  for (const side of [host, guest])
-    await duo.until(
-      side,
-      `quai d’Aubrune chez ${side.who}`,
-      (w) => w.common.place === 'aubrune' && w.common.phase === 'day',
-      40_000,
-    );
-  const arrived = await host.world();
+  const leaving = await duo.until(host, 'en route', (w) => w.common.phase === 'travel');
+  const since = leaving.common.travel?.since ?? null;
+  if (since === null) throw new Error('trajet sans pas de départ');
+  // Le trajet se mesure en temps de jeu, pas à la montre: en rendu logiciel, la simulation
+  // avance deux à quatre fois moins vite que l'horloge murale (rattrapage borné du SDK), et dix
+  // secondes de trajet en prennent trente à quarante. L'attente murale est donc large; la durée
+  // vérifiée est celle de la simulation, entre le pas du départ et le retour à la journée.
+  const onPlatform = (w: ProbeWorld): boolean =>
+    w.common.place === 'aubrune' && w.common.phase === 'day';
+  const landed = await duo.until(host, 'quai d’Aubrune chez hôte', onPlatform, TRIP_WALL_MS);
+  // Ni attente d'un vote, ni chargement qui traîne, ni voie barrée: la scène du trajet dure
+  // `travel.minSeconds`, la descente `travel.arrivalSeconds`, et la journée reprend aussitôt.
+  const tripSeconds = (landed.tick - since) * SIM_DT;
+  expect(tripSeconds, 'durée du trajet, en secondes de jeu').toBeGreaterThanOrEqual(
+    TRAVEL.minSeconds + TRAVEL.arrivalSeconds,
+  );
+  expect(tripSeconds, 'durée du trajet, en secondes de jeu').toBeLessThan(
+    TRAVEL.minSeconds + TRAVEL.arrivalSeconds + TRIP_MARGIN_SECONDS,
+  );
+  await duo.until(guest, 'quai d’Aubrune chez invité', onPlatform, TRIP_WALL_MS);
   // « On arrive toujours au matin »: le train de nuit dépose les deux à 8 h (« Il est 8 h »).
-  expect(arrived?.minutes ?? 0, 'arrivée à 8 h').toBeGreaterThanOrEqual(8 * 60);
-  expect(arrived?.minutes ?? 0, 'arrivée à 8 h').toBeLessThan(8 * 60 + 5);
-  for (const p of arrived?.players ?? [])
+  expect(landed.minutes, 'arrivée à 8 h').toBeGreaterThanOrEqual(8 * 60);
+  expect(landed.minutes, 'arrivée à 8 h').toBeLessThan(8 * 60 + 5);
+  expect(landed.players).toHaveLength(2);
+  for (const p of landed.players)
     expect(Math.hypot(p.body.x - 204, p.body.y - 102.5), 'sur le quai').toBeLessThan(1.5);
   await duo.until(
     host,
