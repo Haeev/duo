@@ -82,9 +82,25 @@ export const ItemSchema = v.strictObject({
    * Instrument de musique (pile de 1, `tool: null`): en main à un endroit où jouer (brique
    * `perform`), il ouvre le cahier de fanfare. `timbre`: son nom dans la table des timbres
    * (`src/audio/musique/donnees/timbres.json`); `tier`: 0 de base (les trois premiers airs du
-   * cahier), 1 amélioré (six), 2 fin (tous), cahier 4.5.
+   * cahier), 1 amélioré (six), 2 fin (tous), cahier 4.5. `holds`: tenue d'accord, airs joués
+   * avant qu'il ne se désaccorde (cahier 4.5: 20); 0: il ne se désaccorde jamais; absent: la
+   * valeur des réglages (`MUSIC.tuning.holdAirs`). Moteur: `simulation/musique/accord.ts`.
    */
-  instrument: v.exactOptional(v.strictObject({ timbre: IdSchema, tier: v.picklist([0, 1, 2]) })),
+  instrument: v.exactOptional(
+    v.strictObject({
+      timbre: IdSchema,
+      tier: v.picklist([0, 1, 2]),
+      holds: v.exactOptional(v.pipe(IntSchema, v.minValue(0), v.maxValue(99))),
+    }),
+  ),
+  /**
+   * Diapason (pile de 1): avec lui dans les poches, ou tenu en main par l'autre joueur tout près,
+   * on accorde soi-même son instrument depuis le cahier de fanfare. `midi`: la note de référence
+   * qu'il donne (69: le la à 440 Hz).
+   */
+  tuner: v.exactOptional(
+    v.strictObject({ midi: v.pipe(IntSchema, v.minValue(40), v.maxValue(96)) }),
+  ),
   /**
    * Meuble (famille `furniture`): la fiche `commun/meubles/<id>.json` que cet objet
    * devient une fois rangé dans l'inventaire de la maison (dépôt à l'ouverture du mode déco, ou

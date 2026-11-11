@@ -47,6 +47,10 @@
   // "furniture", "stack": 1 et "prop": "<id d'une fiche de commun/meubles, placeable>". Le mode
   // déco et « Ranger à la maison » le font passer du sac à l'inventaire de la maison. Les deux
   // fichiers d'un coup: pnpm nouveau meuble-obtenable <id> (gabarit meuble-obtenable/).
+  // Instrument de musique (en main à un endroit où jouer, il ouvre le cahier de fanfare):
+  // "stack": 1, "tool": null et "instrument": { "timbre": "cornet", "tier": 0, "holds": 20 }
+  // (timbre de src/audio/musique/donnees/timbres.json; tier 0, 1 ou 2; holds: tenue d'accord, airs
+  // joués avant de se désaccorder, 0 pour jamais). Diapason: "stack": 1 et "tuner": { "midi": 69 }.
   // Objet d'histoire (règlement, lettre, lanterne): ajouter "story": true. Il ne se vend pas et
   // ne se jette pas; les dialogues et les étapes le donnent et le reprennent (give_item, take_item).
 }

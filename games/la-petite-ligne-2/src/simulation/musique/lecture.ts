@@ -7,6 +7,7 @@ import type { Content } from '../../donnees/charger';
 import type { AirNote, AirScore, PlayableAirDef } from '../../donnees/schemas/air';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ItemDef } from '../../donnees/schemas/objets';
+import type { Stack } from '../../etat/joueur';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { isFound } from '../collections/registre';
 import { recall } from '../regles/memoire';
@@ -20,11 +21,17 @@ export function heldInstrument(
   content: Content,
   world: ReadonlyWorld,
   player: PlayerIndex,
-): { readonly item: string; readonly instrument: Instrument } | null {
+): {
+  readonly item: string;
+  readonly instrument: Instrument;
+  readonly stack: Readonly<Stack>;
+} | null {
   const state = world.players[player];
   const stack = state.selected === null ? null : (state.toolbar[state.selected] ?? null);
   const instrument = stack === null ? undefined : content.items[stack.item]?.instrument;
-  return stack === null || instrument === undefined ? null : { item: stack.item, instrument };
+  return stack === null || instrument === undefined
+    ? null
+    : { item: stack.item, instrument, stack };
 }
 
 /** Les airs qui ont leur partition, dans l'ordre du cahier. */

@@ -863,3 +863,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - État déduit de l'heure (sonnerie d'un passage: `crossingClosed`): rien à sauvegarder; le rendu va vers la cible à vitesse constante et se pose d'un coup à la première image.
 - Banc de captures léger sans faux hôte: une page jetable sous `src/rendu/demo/` qui charge `DATA_FILES` modifiés, fabrique le monde, `createRenderer`, et rend `canvas.toDataURL()` juste après N `renderer.frame`. Les personnages se chargent après la première image (attendre 20 s); un joueur posé à plus de 3 m déclenche le fondu de passage: rendre 60 images avant la capture. Playwright global: `NODE_PATH=/opt/node22/lib/node_modules`.
 - Son: un événement que le moteur se donne (joints de rail) passe par les mêmes `rules` que ceux de la simulation (`soundsForEvent` accepte `{ type }`); une boucle réglée par une valeur du monde ne passe pas par `VoicePool`.
+
+## Accord des instruments (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- État d'un objet sans toucher à la sauvegarde ni au réseau: réutiliser `Stack.wear` (déjà sauvegardé, transmis, gardé par `addStack`/`takeOne`/`moveStack` qui copient `{ ...stack }` dès que `wear` existe). Absent = état neuf: une partie d'avant se lit sans migration. Valable seulement pour un objet sans bloc `tool` (le validateur de la musique le garantit).
+- Condition ou effet neuf des données: `schemas/regles.ts` (type et schéma), `regles/conditions.ts` ou `regles/effets.ts`, puis les deux `switch` exhaustifs de `donnees/valider.ts` et `quetes/valider.ts`; aucun code de `dialogues/` à toucher.
+- Réplique de dialogue: 150 caractères au plus (le chargement refuse au-delà); « vous » sans adjectif accordé (« vous-mêmes » plutôt que « seuls »).
+- Un objet neuf sans vignette fait échouer `tests/interface-plume.test.ts`: la vignette s'écrit dans `assets/`; hors périmètre, l'inscrire dans `WITHOUT_THUMB` avec sa raison et le signaler.
+- Battement audible sans calcul: deux oscillateurs (diapason pur, note de l'instrument décalée en `detune`) sur le même bus; le repère visuel suit `beatHz = f * |2^(c/1200) - 1|`.

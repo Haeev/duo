@@ -69,7 +69,7 @@ Gabarit commenté: `_gabarits/air-jouable.jsonc`. Moteur: `src/simulation/musiqu
 4. Remplis le haut du fichier: `order` (rang au cahier), `difficulty`, l'extrait (`fromBar`, `bars`, 25 à 45 s), `minGapMs`, la voix `solo` et, si l'air s'y prête, les deux voix `duo` (appel et réponse, ou chant et contrechant).
 5. `pnpm partition <id>` écrit le bloc `score` (les notes: instant, touche, hauteur, durée). Ne le retouche jamais à la main: change le haut du fichier et relance.
 6. `pnpm test`: le validateur nomme toute faute, et le test refuse une partition qui ne sort pas du script.
-7. **Instrument**: un objet (`pnpm nouveau objet <id>`) avec `"stack": 1`, `"tool": null` et `"instrument": { "timbre": "cornet", "tier": 0 }` (`tier` 0 de base: les trois premiers rangs du cahier; 1: six; 2: tous). Un timbre nouveau est une entrée de `src/audio/musique/donnees/timbres.json`.
+7. **Instrument**: un objet (`pnpm nouveau objet <id>`) avec `"stack": 1`, `"tool": null` et `"instrument": { "timbre": "cornet", "tier": 0, "holds": 20 }` (`tier` 0 de base: les trois premiers rangs du cahier; 1: six; 2: tous; `holds`: tenue d'accord, airs joués avant de se désaccorder, 0 pour jamais). Un timbre nouveau est une entrée de `src/audio/musique/donnees/timbres.json`. Un diapason: `"tuner": { "midi": 69 }` sur un objet de pile 1.
 8. **Endroit où jouer**: ajoute `{ "brick": "perform" }` aux briques d'un meuble (en tête s'il sert aussi à autre chose). L'estrade de la fanfare, le pupitre de musique et le banc l'ont déjà.
 9. Pour donner un instrument: l'effet `{ "type": "give_item", "item": "cornet", "count": 1, "to": "duo" }` d'un dialogue ou d'une étape, ou une ligne de vente d'un commerce.
 

@@ -23,6 +23,7 @@ import {
 } from './modeles';
 import { createCarnetTabs, type CarnetTabsOptions, type TabId } from './carnet/index';
 import { swallowedAtOpening } from './carnet/onglet';
+import { MUSIC_TEXTS } from './musique/textes';
 import { itemThumb } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
@@ -172,6 +173,13 @@ export function createNotebook(
         if (bar instanceof HTMLElement) bar.style.width = `${Math.round(model.wear * 100)}%`;
         node.append(arc);
       }
+      if (model.tune !== null && model.tune !== 'just')
+        node.append(
+          el('span', {
+            class: `tile__tune tile__tune--${model.tune}`,
+            text: MUSIC_TEXTS.tune[model.tune],
+          }),
+        );
       node.append(el('span', { class: 'nametag', text: model.name }));
     }
     node.addEventListener('click', onClick);
@@ -263,7 +271,9 @@ export function createNotebook(
           text:
             model.wear !== null
               ? fill(TEXTS.notebook.wear, { n: Math.round((1 - model.wear) * 100) })
-              : fill(TEXTS.notebook.count, { n: model.count, max: model.limit }),
+              : model.tune !== null
+                ? fill(TEXTS.notebook.tune, { mot: MUSIC_TEXTS.tune[model.tune] })
+                : fill(TEXTS.notebook.count, { n: model.count, max: model.limit }),
         }),
       );
       const row = el('div', { class: 'row' });

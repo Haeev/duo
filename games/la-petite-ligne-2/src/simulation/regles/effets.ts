@@ -18,6 +18,7 @@ import { revealLook } from './apparence';
 import { bump, playerFactKey, remember } from './memoire';
 import { giveEntry, givePiece, givePlan, giveRecipe } from './recompenses';
 import { choose } from '../quetes/decisions';
+import { tunePlayer } from '../musique/accord';
 
 export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect): void {
   switch (effect.type) {
@@ -75,6 +76,9 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
       return;
     case 'reveal_look':
       for (const p of effectTargets(actor, effect.to)) revealLook(sim, p);
+      return;
+    case 'tune_instrument':
+      for (const p of effectTargets(actor, effect.to)) tunePlayer(sim, p);
       return;
     case 'adopt_animal': {
       const refusal = adoptStoryAnimal(sim, actor, effect);

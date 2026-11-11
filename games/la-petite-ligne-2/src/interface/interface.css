@@ -1038,6 +1038,21 @@
   top: -0.375rem;
   z-index: 1;
 }
+/* Instrument désaccordé (cahier 4.5): le mot, en étiquette au coin de la case. */
+.lpl-ui .tile__tune {
+  position: absolute;
+  left: -0.25rem;
+  top: -0.375rem;
+  z-index: 1;
+  padding: 0 0.3125rem;
+  border: 0.0625rem solid var(--line, #2a2522);
+  border-radius: 0.375rem;
+  background: var(--accent, #f2c14e);
+  color: var(--on-accent, #1d1a17);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
 .lpl-ui .tile--empty {
   background: var(--paper-sunken);
   border-style: dashed;

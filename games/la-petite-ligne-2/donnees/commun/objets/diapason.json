@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "diapason",
+  "name": "Diapason",
+  "family": "supply",
+  "stack": 1,
+  "food": null,
+  "tool": null,
+  "tuner": {
+    "midi": 69
+  }
+}

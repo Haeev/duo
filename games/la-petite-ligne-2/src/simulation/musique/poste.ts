@@ -14,6 +14,16 @@ import { assistFactor } from '../aide';
 import { modifiersOf } from '../besoins/jauges';
 import type { Intent } from '../noyau/entrees';
 import type { GameEvent } from '../noyau/evenements';
+import {
+  beatHz,
+  createTuningGesture,
+  forkFor,
+  toleranceFor,
+  tuneCents,
+  tuneState,
+  type TuneState,
+  type TuningGesture,
+} from './accord';
 import type { MusicResult, VoiceId } from './evenements';
 import { windowScaleOf, windowsOf } from './jugement';
 import { heldInstrument, leadMs, notesOf, songbook, type SongbookLine } from './lecture';
@@ -46,6 +56,8 @@ export interface StageSound {
     readonly atMs: number | null;
     readonly ms: number;
     readonly sour: boolean;
+    /** Décalage de hauteur de l'instrument désaccordé (cents, 0: juste). */
+    readonly cents: number;
   }): number;
   /** Une note déjà partie se met à sonner faux. */
   sour(id: number): void;
@@ -56,6 +68,19 @@ export interface StageSound {
   level(gain: number): void;
   /** Fin ou abandon: l'accompagnement s'efface, la musique du lieu revient. */
   stop(): void;
+  /**
+   * L'accordage au diapason: le diapason sonne sa note (`midi`), l'instrument la tient, décalé de
+   * `cents`, tant que `holding`; le battement entre les deux s'entend de lui-même. `null`: tout se
+   * tait. Appelé à chaque image du geste. Absent: accordage silencieux (le repère visuel suffit).
+   */
+  tuning?(
+    spec: {
+      readonly timbre: string;
+      readonly midi: number;
+      readonly cents: number;
+      readonly holding: boolean;
+    } | null,
+  ): void;
 }
 
 export interface DeskOptions {
@@ -82,6 +107,23 @@ export type DeskView =
       readonly lines: readonly SongbookLine[];
       readonly selected: number;
       readonly partner: boolean;
+      /** Accord de l'instrument en main. */
+      readonly tune: TuneState;
+      /** Un diapason est à portée (dans ses poches, ou en main de l'autre tout près). */
+      readonly tuner: boolean;
+    }
+  /**
+   * L'accordage au diapason: tenir la note jusqu'à ce que le battement cesse. `beatHz`: le
+   * battement (0: plus rien), pour le repère visuel; `result`: le dernier lâcher.
+   */
+  | {
+      readonly kind: 'tune';
+      readonly cents: number;
+      readonly beatHz: number;
+      readonly holding: boolean;
+      /** L'autre tient le diapason. */
+      readonly pair: boolean;
+      readonly result: 'tuned' | 'again' | null;
     }
   /** On a rejoint l'autre, qui choisit l'air. */
   | { readonly kind: 'wait' }
@@ -111,6 +153,8 @@ export type DeskView =
       readonly listeners: number;
       readonly mine: MusicResult;
       readonly other: MusicResult | null;
+      /** Accord de son instrument pendant l'air: les auditeurs en disent un mot gentil. */
+      readonly tune: TuneState;
     };
 
 export interface Desk {
@@ -121,8 +165,12 @@ export interface Desk {
   move(delta: number): void;
   /** Valider: lancer l'air choisi, ou fermer le mot de la fin. */
   confirm(): void;
-  /** Quitter: ranger l'instrument, à tout moment. */
+  /** Quitter: ranger l'instrument, à tout moment (pendant l'accordage: revenir au cahier). */
   leave(): void;
+  /** Depuis le cahier: prendre le diapason, si l'instrument n'est pas juste et qu'il y en a un. */
+  tune(): void;
+  /** Accordage: tenir (`true`) ou lâcher (`false`) la note. */
+  hold(down: boolean): void;
   /** Frappe d'une touche de jeu à l'instant `airMs` de l'air. */
   press(lane: number, airMs: number): Hit | null;
   view(): DeskView;
@@ -136,6 +184,7 @@ interface Heard {
   readonly verdicts: (Verdict | null)[];
   readonly plan: PartnerVoice;
   readonly timbre: string;
+  readonly cents: number;
   /** Notes de l'autre déjà parties, par rang, pour les faire sonner faux après coup. */
   readonly sounding: Map<number, number>;
 }
@@ -153,7 +202,7 @@ type State =
       score: AirScore;
       lead: number;
       startAtMs: number;
-      mine: { voice: VoiceId; game: Performance; timbre: string };
+      mine: { voice: VoiceId; game: Performance; timbre: string; cents: number; tune: TuneState };
       partner: Heard | null;
       last: { verdict: Verdict; lane: number; atMs: number } | null;
     }
@@ -161,9 +210,21 @@ type State =
       kind: 'result';
       age: number;
       view: Extract<DeskView, { kind: 'result' }>;
+    }
+  | {
+      kind: 'tune';
+      target: string;
+      partner: boolean;
+      gesture: TuningGesture;
+      fork: { readonly midi: number; readonly pair: boolean };
+      timbre: string;
+      result: 'tuned' | 'again' | null;
+      /** Temps depuis le dernier lâcher (ms): « c'est juste » reste un instant, puis le cahier revient. */
+      age: number;
     };
 
 const RESULT_MS = 9000;
+const TUNED_MS = 1600;
 const FALLBACK_TIMBRE = 'cornet';
 
 /** Niveau d'un air entendu à `distance` mètres de qui le joue (`MUSIC.listen`), de 0 à 1. */
@@ -188,7 +249,13 @@ export function createDesk(options: DeskOptions): Desk {
 
   function close(): void {
     if (state.kind === 'play' || state.kind === 'listen') sound.stop();
+    if (state.kind === 'tune') sound.tuning?.(null);
     state = { kind: 'closed' };
+  }
+
+  function backToBook(target: string, partner: boolean): void {
+    sound.tuning?.(null);
+    state = { kind: 'book', target, selected: 0, partner };
   }
 
   function heardOf(score: AirScore, voice: VoiceId, player: PlayerIndex): Heard {
@@ -199,6 +266,7 @@ export function createDesk(options: DeskOptions): Desk {
       verdicts: notes.map(() => null),
       plan: createPartnerVoice(notes),
       timbre: timbreOf(player),
+      cents: centsOf(player),
       sounding: new Map(),
     };
   }
@@ -217,6 +285,7 @@ export function createDesk(options: DeskOptions): Desk {
           atMs: command.atMs,
           ms: written[3],
           sour: false,
+          cents: heard.cents,
         }),
       );
     }
@@ -241,6 +310,7 @@ export function createDesk(options: DeskOptions): Desk {
             atMs: command.type === 'play' && !command.late ? command.atMs : null,
             ms: written[3],
             sour: command.type === 'couac',
+            cents: heard.cents,
           }),
         );
     }
@@ -260,6 +330,25 @@ export function createDesk(options: DeskOptions): Desk {
     const world = options.world();
     const held = world === null ? null : heldInstrument(content, world, player);
     return held?.instrument.timbre ?? FALLBACK_TIMBRE;
+  }
+
+  /** Décalage de hauteur de l'instrument en main de ce joueur (désaccord), 0 s'il est juste. */
+  function centsOf(player: PlayerIndex): number {
+    const world = options.world();
+    const held = world === null ? null : heldInstrument(content, world, player);
+    return held === null ? 0 : tuneCents(held.instrument, held.stack);
+  }
+
+  function tuneOf(player: PlayerIndex): TuneState {
+    const world = options.world();
+    const held = world === null ? null : heldInstrument(content, world, player);
+    return held === null ? 'just' : tuneState(held.instrument, held.stack);
+  }
+
+  function forkOf(): { readonly midi: number; readonly pair: boolean } | null {
+    const world = options.world();
+    const me = options.local();
+    return world === null || me === null ? null : forkFor(content, world, me);
   }
 
   function lines(): SongbookLine[] {
@@ -290,7 +379,11 @@ export function createDesk(options: DeskOptions): Desk {
             event.leader === me
               ? { kind: 'book', target: event.target, selected: 0, partner: false }
               : { kind: 'wait', target: event.target };
-        } else if (state.kind === 'book' && state.target === event.target) state.partner = true;
+        } else if (
+          (state.kind === 'book' || state.kind === 'tune') &&
+          state.target === event.target
+        )
+          state.partner = true;
         break;
       case 'music_started': {
         const voice = event.voices[me];
@@ -329,6 +422,8 @@ export function createDesk(options: DeskOptions): Desk {
             voice,
             game: createPerformance(notesOf(score, voice), windowsOf(windowScaleOf(assist, needs))),
             timbre: timbreOf(me),
+            cents: centsOf(me),
+            tune: tuneOf(me),
           },
           partner: mateVoice === null ? null : heardOf(score, mateVoice, mate),
           last: null,
@@ -352,6 +447,7 @@ export function createDesk(options: DeskOptions): Desk {
         }
         if (state.kind !== 'play' || state.target !== event.target) break;
         const mine = event.results[me];
+        const tune = state.mine.tune;
         sound.stop();
         if (mine === null) {
           state = { kind: 'closed' };
@@ -370,6 +466,7 @@ export function createDesk(options: DeskOptions): Desk {
             listeners: event.listeners,
             mine,
             other: event.results[me === 0 ? 1 : 0],
+            tune,
           },
         };
         break;
@@ -377,7 +474,8 @@ export function createDesk(options: DeskOptions): Desk {
       case 'music_closed':
         if (event.player === me || (state.kind === 'listen' && event.player === state.performer))
           close();
-        else if (state.kind === 'book' && state.target === event.target) state.partner = false;
+        else if ((state.kind === 'book' || state.kind === 'tune') && state.target === event.target)
+          state.partner = false;
         break;
       case 'refused':
         // L'instrument de l'un ne sait pas cet air, l'air n'est pas prêt: le cahier reste ouvert.
@@ -390,6 +488,21 @@ export function createDesk(options: DeskOptions): Desk {
   return {
     onEvent,
     frame(dtMs) {
+      if (state.kind === 'tune') {
+        state.gesture.advance(dtMs);
+        state.age += dtMs;
+        if (state.result === 'tuned' && state.age > TUNED_MS) {
+          backToBook(state.target, state.partner);
+          return;
+        }
+        sound.tuning?.({
+          timbre: state.timbre,
+          midi: state.fork.midi,
+          cents: state.result === 'tuned' ? 0 : state.gesture.cents(),
+          holding: state.gesture.holding(),
+        });
+        return;
+      }
       if (state.kind === 'result') {
         state.age += dtMs;
         if (state.age > RESULT_MS) state = { kind: 'closed' };
@@ -425,7 +538,42 @@ export function createDesk(options: DeskOptions): Desk {
         startAtMs: Math.round(options.sessionNow() + leadMs(line.air.score)),
       });
     },
+    tune() {
+      if (state.kind !== 'book') return;
+      const me = options.local();
+      const world = options.world();
+      const fork = forkOf();
+      if (me === null || world === null || fork === null || tuneOf(me) === 'just') return;
+      sound.level(1);
+      state = {
+        kind: 'tune',
+        target: state.target,
+        partner: state.partner,
+        gesture: createTuningGesture(centsOf(me), toleranceFor(world, me, fork.pair)),
+        fork,
+        timbre: timbreOf(me),
+        result: null,
+        age: 0,
+      };
+    },
+    hold(down) {
+      if (state.kind !== 'tune' || state.result === 'tuned') return;
+      if (down) {
+        state.gesture.press();
+        return;
+      }
+      const result = state.gesture.release();
+      if (result === null) return;
+      state.result = result;
+      state.age = 0;
+      if (result === 'tuned')
+        options.send({ type: 'music_tune', cents: Math.round(state.gesture.cents()) });
+    },
     leave() {
+      if (state.kind === 'tune') {
+        backToBook(state.target, state.partner);
+        return;
+      }
       if (state.kind === 'closed' || state.kind === 'listen') return;
       if (state.kind !== 'result') options.send({ type: 'music_leave' });
       close();
@@ -446,6 +594,7 @@ export function createDesk(options: DeskOptions): Desk {
           atMs: null,
           ms: written[3],
           sour: hit.verdict === 'false',
+          cents: state.mine.cents,
         });
       return hit;
     },
@@ -454,12 +603,25 @@ export function createDesk(options: DeskOptions): Desk {
         case 'closed':
         case 'listen':
           return { kind: 'closed' };
-        case 'book':
+        case 'book': {
+          const me = options.local();
           return {
             kind: 'book',
             lines: lines(),
             selected: state.selected,
             partner: state.partner,
+            tune: me === null ? 'just' : tuneOf(me),
+            tuner: forkOf() !== null,
+          };
+        }
+        case 'tune':
+          return {
+            kind: 'tune',
+            cents: state.gesture.cents(),
+            beatHz: state.result === 'tuned' ? 0 : beatHz(state.fork.midi, state.gesture.cents()),
+            holding: state.gesture.holding(),
+            pair: state.fork.pair,
+            result: state.result,
           };
         case 'wait':
           return { kind: 'wait' };

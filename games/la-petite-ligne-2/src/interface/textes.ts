@@ -91,6 +91,7 @@ export const TEXTS = {
     'instrument-too-simple': 'Instrument trop simple',
     'music-playing': 'Air en cours',
     'need-instrument': 'Il faut un instrument',
+    'need-tuner': 'Il faut un diapason',
     'need-rod': 'Il faut une canne',
     'needs-axe': 'Il faut une hache',
     'needs-camera': 'Il faut un appareil',
@@ -255,6 +256,8 @@ export const TEXTS = {
     slotLabel: '{objet}, {n} sur {max}',
     slotFull: ', pile pleine',
     wear: 'Usure : {n} %',
+    /** Accord d'un instrument (cahier 4.5): « juste », « un peu faux », « faux ». */
+    tune: 'Accord : {mot}',
     count: '{n} sur {max}',
     eat: 'Manger',
     drop: 'Poser',

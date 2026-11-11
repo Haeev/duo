@@ -10,6 +10,7 @@
   "story": true,
   "instrument": {
     "timbre": "clarinette",
-    "tier": 1
+    "tier": 1,
+    "holds": 20
   }
 }

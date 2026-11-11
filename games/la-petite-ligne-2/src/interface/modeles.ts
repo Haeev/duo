@@ -10,6 +10,7 @@ import type { Stack } from '../etat/joueur';
 import type { Aim } from '../simulation/briques/types';
 import { stackLimit } from '../simulation/sac/inventaire';
 import { toolWearRatio } from '../simulation/sac/outils';
+import { tuneState, type TuneState } from '../simulation/musique/accord';
 import { formatEuros } from '../simulation/sac/argent';
 import { onPlatform } from '../simulation/voyage/index';
 import { UI_TUNING, type UiTuning } from './reglages';
@@ -131,6 +132,8 @@ export interface SlotModel {
   readonly full: boolean;
   /** Part d'usure restante (0 à 1) d'un outil qui s'use, sinon `null`. */
   readonly wear: number | null;
+  /** Accord d'un instrument (juste, un peu faux, faux), sinon `null`. */
+  readonly tune: TuneState | null;
   readonly edible: boolean;
 }
 
@@ -166,6 +169,7 @@ export function slotModel(content: Content, stack: DeepReadonly<Stack> | null): 
     limit,
     full: stack.count >= limit && limit > 1,
     wear: durability > 0 ? toolWearRatio(content, stack) : null,
+    tune: def?.instrument === undefined ? null : tuneState(def.instrument, stack),
     edible: def?.food !== null && def?.food !== undefined,
   };
 }

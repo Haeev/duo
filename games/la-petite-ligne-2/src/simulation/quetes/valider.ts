@@ -305,6 +305,7 @@ function checkEffects(env: Env, effects: readonly StepEffect[], at: string): voi
       case 'give_piece':
       case 'choose':
       case 'reveal_look':
+      case 'tune_instrument':
       case 'adopt_animal':
         env.base.effect(env.content, e, at, problems);
     }

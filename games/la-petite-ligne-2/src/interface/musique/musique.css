@@ -437,6 +437,77 @@
   margin: 0.25rem 0;
 }
 
+/* Accord: le mot à côté de l'instrument, la ligne qui dit où l'accorder, l'accordage. */
+.lpl-mus-tune {
+  margin-left: 0.375rem;
+  padding: 0 0.4375rem;
+  border-radius: 0.375rem;
+  background: var(--paper-sunken, #efe6cf);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+.lpl-mus-tune[data-tune='slight'],
+.lpl-mus-tune[data-tune='off'] {
+  background: var(--accent, #f2c14e);
+  color: var(--on-accent, #1d1a17);
+}
+.lpl-mus-tunewhere {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.lpl-mus-result .tuneword {
+  font-style: italic;
+}
+.lpl-mus[data-kind='tune'] {
+  align-items: center;
+  padding: 0;
+}
+.lpl-mus-tuning {
+  width: min(28rem, 94cqw);
+  text-align: center;
+}
+.lpl-mus-tuning header {
+  justify-content: center;
+}
+.lpl-mus-help {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+.lpl-mus-fork {
+  position: relative;
+  width: 7rem;
+  height: 7rem;
+  margin: 0.75rem auto;
+}
+.lpl-mus-fork .ring {
+  position: absolute;
+  inset: 1.5rem;
+  border-radius: 50%;
+  border: 0.25rem solid var(--line, #2a2522);
+}
+.lpl-mus-fork .ring.beat {
+  border-color: var(--accent, #8a5a1b);
+  border-style: dashed;
+  will-change: transform;
+}
+.lpl-mus-tuning[data-holding='oui'] .ring.fork {
+  border-width: 0.375rem;
+}
+.lpl-mus-tuning[data-result='tuned'] .ring.beat {
+  border-style: solid;
+}
+.lpl-mus-calm,
+.lpl-mus-tuneword {
+  min-height: 1.25rem;
+  margin: 0.125rem 0;
+  font-weight: 700;
+}
+.lpl-mus-tuning[data-result='tuned'] .lpl-mus-tuneword {
+  color: var(--accent, #8a5a1b);
+  font-size: 1.25rem;
+}
+
 @keyframes lpl-mus-pop {
   from {
     transform: scale(1.5);

@@ -55,9 +55,15 @@ export function validateMusic(content: Content): string[] {
     });
   }
   for (const item of Object.values(content.items)) {
-    if (item.instrument === undefined) continue;
     const path = `commun/objets/${item.id}.json`;
+    if (item.tuner !== undefined && item.stack !== 1)
+      problems.push(`${path}, stack: un diapason ne s'empile pas (1)`);
+    if (item.tuner !== undefined && item.instrument !== undefined)
+      problems.push(`${path}: un objet est un instrument ou un diapason, pas les deux`);
+    if (item.instrument === undefined) continue;
     if (item.stack !== 1) problems.push(`${path}, stack: un instrument ne s'empile pas (1)`);
+    // L'accord vit dans le champ `wear` de la pile, qui appartient sinon à l'usure des outils.
+    if (item.tool !== null) problems.push(`${path}, tool: un instrument n'est pas un outil (null)`);
   }
   return problems;
 }

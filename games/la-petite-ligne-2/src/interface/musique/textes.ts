@@ -37,6 +37,38 @@ export const MUSIC_TEXTS = {
   hatDone: 'Le chapeau a déjà tourné aujourd’hui.',
   listeners: ['Personne n’écoutait: joué pour le plaisir.', '1 auditeur', '{n} auditeurs'],
   friends: ['', '1 amitié qui monte', '{n} amitiés qui montent'],
+  /** Accord de l'instrument (cahier 4.5), le mot du cahier de fanfare et du sac. */
+  tune: { just: 'juste', slight: 'un peu faux', off: 'faux' },
+  /** À l'ouverture du cahier, l'instrument pas juste: où l'accorder. */
+  tuneWhere: {
+    slight:
+      'Ton instrument commence à pencher. Armand, l’instituteur, l’accorde sans rien demander, ou toi-même avec un diapason.',
+    off: 'Ton instrument sonne faux. Armand, l’instituteur, l’accorde sans rien demander, ou toi-même avec un diapason.',
+  },
+  tuneKey: 'accorder au diapason',
+  tuneTitle: 'Accorder au diapason',
+  tuneHelp:
+    'Tiens {touche}: ta note glisse vers celle du diapason. Le battement ralentit, puis se tait: lâche à ce moment-là.',
+  tunePair: '{nom} tient le diapason: à deux, on s’entend mieux.',
+  tuneHold: 'tenir la note',
+  tuneBack: 'revenir au cahier',
+  tuneCalm: 'Ça ne bat presque plus.',
+  tuneBeat: 'Ça bat.',
+  tuneTuned: 'C’est juste !',
+  tuneAgain: 'Ça bat encore un peu. Reprends, rien n’est perdu.',
+  /** Le mot des auditeurs quand l'instrument n'était pas juste: gentil et drôle, jamais un reproche. */
+  tuneListeners: {
+    slight: [
+      'Quelqu’un a murmuré: « C’est joli. Un peu penché, mais joli. »',
+      '« L’air a pris un petit coup de froid », a souri quelqu’un.',
+    ],
+    off: [
+      'On a souri: « Ça grince un peu, mais ça vient du cœur ! »',
+      'Quelqu’un a ri tout bas: « Même les grenouilles du lavoir sont plus justes. Mais moins drôles. »',
+    ],
+  },
+  tuneAlone: 'Même les moineaux ont penché la tête.',
+  tuneAfter: 'Un petit accord chez Armand, et ça repartira.',
 } as const;
 
 export function fillText(text: string, values: Readonly<Record<string, string | number>>): string {

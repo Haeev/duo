@@ -2,7 +2,7 @@
  * Démonstration de la musique jouée, sans simulation ni réseau: les événements de l'hôte sont
  * fabriqués, deux robots jouent. Sert aux captures et à l'enregistrement d'écoute.
  *
- * Adresse: `?ecran=cahier|attente|jeu|resultat` (défaut `jeu`), `joueur=0|1` (la machine montrée),
+ * Adresse: `?ecran=cahier|attente|jeu|resultat|accord` (défaut `jeu`), `faux=1|peu`, `joueur=0|1` (la machine montrée),
  * `duo=1`, `air=<id>`, `t=<secondes de l'air>`, `robots=maladroit,parfait` (joueur 0, joueur 1),
  * `mouvement=reduit`, `style=ancien`. Deux pages `joueur=0` et `joueur=1` au même `t` montrent les
  * deux machines du même instant d'un duo.
@@ -174,6 +174,7 @@ async function renderListening(): Promise<Listening> {
           atMs: press.atMs,
           ms: written[3],
           sour: hit.verdict === 'false',
+          cents: 0,
         });
       }
       game.advance(1e9);
@@ -206,6 +207,15 @@ function showScreen(): void {
   world.players[0].toolbar[0] = { item: 'cornet', count: 1 };
   world.players[1].toolbar[0] = { item: 'clarinette', count: 1 };
   for (const player of world.players) player.selected = 0;
+  // `faux=1` (ou `faux=peu`): l'instrument de la machine montrée est désaccordé, un diapason en
+  // poche; `ecran=accord`: l'accordage, la note tenue `t` secondes.
+  const faux = params.get('faux');
+  if (faux !== null || params.get('ecran') === 'accord') {
+    const mine = world.players[me];
+    const held = mine.toolbar[0];
+    if (held !== null && held !== undefined) held.wear = faux === 'peu' ? 7 : 0;
+    mine.toolbar[1] = { item: 'diapason', count: 1 };
+  }
   world.progress.memory['musique.joue.air-canon-de-la-repetition'] = { v: 3, by: 'duo', day: 1 };
   world.progress.memory['musique.joue.air-marche-de-la-halte'] = { v: 2, by: 'duo', day: 2 };
 
@@ -254,6 +264,19 @@ function showScreen(): void {
     stage.frame(400);
     if (screen === 'cahier') window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS' }));
     stage.frame(16);
+    return;
+  }
+  if (screen === 'accord') {
+    stage.frame(400);
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyQ' }));
+    stage.frame(16);
+    window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
+    const holdMs = Number(params.get('t') ?? '1') * 1000;
+    for (let t = 0; t < holdMs; t += 16) stage.frame(16);
+    if (params.get('lache') === '1') {
+      window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space' }));
+      stage.frame(16);
+    }
     return;
   }
 
