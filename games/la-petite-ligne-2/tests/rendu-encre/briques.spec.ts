@@ -109,10 +109,12 @@ test('briques: cuisine avant et après achat, habitante au lit', async ({ browse
   const { host, guest } = duo;
   const [hi, gi] = await ready(duo);
   // Rez-de-chaussée de la maison du garde (pièce en (14; 210)): la cuisine tient contre le mur
-  // sud, à l'est. Vue du nord: les deux meubles de face, contre le mur entier.
+  // sud, à l'est. Caméra de jeu (plongée de 50 degrés, 18 m), sur la diagonale du nord-est: les
+  // deux meubles de trois quarts, les murs nord et est coupés. Le cadrage de face à 9 m d'avant
+  // se lisait comme une vue de dessus (revue visuelle du 2026-11-11).
   await duo.teleport(hi, 21.2, 214.6, Math.PI / 2);
   await duo.teleport(gi, 20.3, 213.2, Math.PI / 2);
-  await Promise.all([camera(host, 180, 9), camera(guest, 180, 9)]);
+  await Promise.all([camera(host, 225, 18), camera(guest, 225, 18)]);
   await big(duo);
   await host.page.waitForTimeout(POSE);
   await shot(host, 'cuisine-avant-achat');

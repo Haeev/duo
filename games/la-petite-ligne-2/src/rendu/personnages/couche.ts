@@ -109,6 +109,8 @@ interface Figure extends Aimable {
   readonly mixer: AnimationMixer;
   readonly actions: ReadonlyMap<string, AnimationAction>;
   readonly weights: Map<string, number>;
+  /** Faux tant qu'il n'a pas pris sa pose à sa place (création, porte franchie): pas de fondu. */
+  animated: boolean;
   readonly face: Face;
   readonly fadable: Fadable;
   lookRef: unknown;
@@ -427,6 +429,7 @@ export class AssembledCharacters implements CharacterLayer {
       mixer,
       actions,
       weights: new Map(),
+      animated: false,
       face: new Face(hashString(id)),
       fadable,
       lookRef: null,
@@ -611,6 +614,7 @@ export class AssembledCharacters implements CharacterLayer {
     const lift = seat === null ? 0 : seat.height - this.settings.seat.clipSeat * figure.legScale;
     const ground = this.ground?.(x, y) ?? 0;
     if (!figure.placed) {
+      figure.animated = false;
       figure.x = x;
       figure.y = y;
       figure.lift = lift;
@@ -692,6 +696,7 @@ export class AssembledCharacters implements CharacterLayer {
    */
   private lie(figure: Figure, pose: LyingPose, dt: number): void {
     const scale = this.tallness(figure) / ADULT_HEIGHT;
+    if (!figure.placed) figure.animated = false;
     figure.x = pose.x;
     figure.y = pose.y;
     figure.facing = pose.facing;
@@ -717,7 +722,22 @@ export class AssembledCharacters implements CharacterLayer {
     figure.legPose.restore();
     const names = new Set(figure.actions.keys());
     targetWeights(posture, names, target, this.settings);
-    blendWeights(figure.weights, target, dt, this.settings.locomotion.fadeHalfLife);
+    // Un clip absent (geste pas livré, catalogue incomplet) laisserait le squelette au repos de
+    // liaison, bras écartés: on joue le repos à sa place.
+    let known = 0;
+    for (const [name, weight] of target) if (figure.actions.has(name)) known += weight;
+    if (known < 1e-3) {
+      target.clear();
+      const fallback = figure.actions.has(c.idle) ? c.idle : figure.actions.keys().next().value;
+      if (fallback !== undefined) target.set(fallback, 1);
+    }
+    // Personnage qui vient de paraître (création, retour après une porte): il prend sa pose tout
+    // de suite. Le fondu depuis zéro le montrait quelques images dans sa pose de liaison.
+    if (figure.weights.size === 0 || !figure.animated) {
+      figure.weights.clear();
+      for (const [name, weight] of target) figure.weights.set(name, weight);
+      figure.animated = true;
+    } else blendWeights(figure.weights, target, dt, this.settings.locomotion.fadeHalfLife);
     const walk = figure.actions.get(c.walk);
     const run = figure.actions.get(c.run);
     if (posture.kind === 'stand' && walk !== undefined && run !== undefined) {
@@ -904,6 +924,26 @@ export class AssembledCharacters implements CharacterLayer {
     if (this.fallback !== null) return this.fallback.playerPosition(index);
     const figure = this.players[index];
     return figure?.placed === true ? figure : null;
+  }
+
+  /**
+   * Somme des poids des clips joués par ce personnage (`player-0`, `player-1` ou l'identifiant
+   * d'un habitant), `null` s'il n'est pas affiché. Sous 1, le reste est la pose de liaison (bras
+   * écartés): contrôle des tests.
+   */
+  animationWeight(id: string): number | null {
+    const figure =
+      id === 'player-0'
+        ? this.players[0]
+        : id === 'player-1'
+          ? this.players[1]
+          : this.villagers.get(id);
+    if (figure === null || figure === undefined) return null;
+    let sum = 0;
+    for (const action of figure.actions.values())
+      // Marche et course ont une vitesse nulle (phase posée à la main): elles comptent quand même.
+      if (action.enabled && action.isScheduled()) sum += action.getEffectiveWeight();
+    return sum;
   }
 
   aimable(id: string): Aimable | null {
