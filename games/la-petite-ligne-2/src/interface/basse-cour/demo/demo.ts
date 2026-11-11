@@ -15,11 +15,18 @@ import { azertyLabel } from '../../index';
 import { createCoopScreen } from '../ecran';
 import '../../interface.css';
 
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
+
 // Le poulailler d'essai vit à la halte d'essai: la démonstration le pose au lieu de départ.
 const COOP = 'poulailler';
 const gare = DATA_FILES['lieux/essai-gare/carte.json'] as { objects: unknown[] };
+const settings = DATA_FILES['commun/reglages.json'] as { start: Record<string, unknown> };
 const content = loadContent({
   ...DATA_FILES,
+  // La partie commence à la gare d'essai (le jeu, lui, part désormais du wagon).
+  'commun/reglages.json': { ...settings, start: { ...settings.start, place: 'essai-gare' } },
   'lieux/essai-gare/carte.json': {
     ...gare,
     objects: [

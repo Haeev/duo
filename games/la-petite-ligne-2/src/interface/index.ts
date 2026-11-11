@@ -3,6 +3,7 @@
  * (`GameView`) et envoie des intentions; touches lues par position (`KeyboardEvent.code`),
  * libellés selon le clavier réel (`keyLabel`, du SDK).
  */
+import { createAssistSync } from './carnet/memoire';
 import type { PlayerIndex } from '../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../etat/monde';
 import type { GameView } from '../session';
@@ -668,6 +669,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   keyTarget.addEventListener('keydown', onKey);
 
   let notebookWasOpen = false;
+  const assistSync = createAssistSync();
   return {
     notice(text) {
       hud.notice(now, 'info', text);
@@ -693,6 +695,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         if (lookRevealed(world, me) && world.players[me].look === null)
           editor.open('create', world, me);
       }
+      // Cran d'aide de ce joueur: redit à l'hôte tant que son état ne le porte pas.
+      const assistIntent = assistSync.frame(now, world, me, settingsUi().assist);
+      if (assistIntent !== null) send(assistIntent);
       editor.frame(dt, world, me);
       dialogueScreens.frame();
       fishing.frame(dtMs / 1000);
@@ -732,6 +737,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         menu: notebook.isOpen() || shopOpen,
         yaw: options.cameraYaw(),
         needsAlways: settingsUi().needsAlways,
+        toolbarAlways: settingsUi().toolbarAlways,
         questTarget: questMarker(world, me),
       });
       vehicleGauge.frame(now, world, me, menu);

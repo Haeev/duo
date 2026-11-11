@@ -25,7 +25,7 @@ Intentions: `fish_cast` (avec `bait` facultatif), `fish_hooked`, `fish_result`, 
 
 ## Pêche à deux (`crew: "pair"`)
 
-Elle ne mord qu'avec son appât et l'autre joueur à moins de `FISHING.pair.radius` m, sans ligne. L'hôte ferre lui-même au plongeon du bouchon (l'appât est mangé), puis juge seul: à la canne, `fish_hold` (Espace tenu) pendant ses élans la fatigue (`holdSeconds`); fatiguée, elle plonge d'un côté puis remonte de ce côté; à l'épuisette, `fish_net` dans le bon couloir pendant la remontée, la canne tenue, la sort. Raté: elle replonge, un peu reposée (`missKeep`). Trop long (`maxSeconds`): elle casse la ligne et reste dans le coin, on peut réessayer aussitôt avec un autre appât. Les deux écrans diffèrent (`interface/peche`): ressenti sans eau à la canne, eau sans ressenti à l'épuisette.
+Elle ne mord qu'avec son appât et l'autre joueur à moins de `FISHING.pair.radius` m, sans ligne. L'hôte ferre lui-même au plongeon du bouchon (l'appât est mangé), puis juge seul: à la canne, `fish_hold` (Espace tenu) pendant ses élans la fatigue (`holdSeconds`); fatiguée, elle plonge d'un côté puis remonte de ce côté; à l'épuisette, `fish_net` dans le bon couloir pendant la remontée, la canne tenue, la sort. Raté: elle replonge, un peu reposée (`missKeep`). Trop long (`maxSeconds`): elle casse la ligne et reste dans le coin, on peut réessayer aussitôt avec un autre appât. Les deux écrans diffèrent (`interface/peche`): ressenti sans eau à la canne, eau sans ressenti à l'épuisette. Aide réglable (`simulation/aide`): figée à la touche dans le combat, `rodAid` raccourcit le temps à tenir et adoucit la pénalité, `netAid` allonge la remontée et l'avance des bulles. Seul, l'aide entre dans `help` de la ligne (ferrage et secteur vert).
 
 ## Pour se brancher
 

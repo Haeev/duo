@@ -9,6 +9,7 @@
  * (`progress.collections`), les joueurs. Pas encore dans l'état: métier, goûts, planning, bulles
  * « j'ai quelque chose », conditions de rencontre des collections, plan du lieu, zones fermées.
  */
+import type { AssistLevel } from '../../etat/joueur';
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { bondKey } from '../../etat/progression';
@@ -148,6 +149,12 @@ export interface UiSettings {
   readonly needsAlways: boolean;
   readonly scale: UiScale;
   readonly reducedMotion: boolean;
+  /** Barre d'outils toujours dépliée (CA-17: sinon elle se replie 3 s après le dernier changement). */
+  readonly toolbarAlways: boolean;
+  /** Vibration d'écran sur les gros coups (arbre qui tombe, gros poisson); coupée par `reducedMotion`. */
+  readonly shake: boolean;
+  /** Aide des mini-jeux de ce joueur (`simulation/aide`), envoyée à l'hôte, jamais montrée à l'autre. */
+  readonly assist: AssistLevel;
 }
 
 export const DEFAULT_UI_SETTINGS: UiSettings = {
@@ -155,6 +162,9 @@ export const DEFAULT_UI_SETTINGS: UiSettings = {
   needsAlways: false,
   scale: 'normal',
   reducedMotion: false,
+  toolbarAlways: false,
+  shake: true,
+  assist: 'normal',
 };
 
 /** Facteur de chaque taille d'interface (police racine du carnet et du HUD). */

@@ -13,6 +13,7 @@ import type { SimContext } from '../noyau/systemes';
 import { calendarOf, minutesSinceDawn } from '../monde/calendrier';
 import { giveItem } from '../sac/actions';
 import { toolCondition, wearTool } from '../sac/outils';
+import { assistFactor } from '../aide/index';
 import { boostedWeight, rarityMet, recordFind } from './registre';
 import { heldToolKind, inCone } from './visee';
 
@@ -89,12 +90,14 @@ export function stepInsects(sim: SimContext, place: PlaceState): void {
       remove(sim, state, insect);
       continue;
     }
-    for (const player of world.players) {
+    for (const index of [0, 1] as const) {
+      const player = world.players[index];
       const dx = insect.x - player.body.x;
       const dy = insect.y - player.body.y;
       const distance = Math.hypot(dx, dy);
-      if (player.body.speed <= content.time.file.insects.runThreshold || distance > def.alertRadius)
-        continue;
+      // L'aide du joueur (`simulation/aide`) lui laisse approcher plus près en courant.
+      const alert = def.alertRadius / assistFactor(world, index);
+      if (player.body.speed <= content.time.file.insects.runThreshold || distance > alert) continue;
       remove(sim, state, insect);
       const norm = distance > 0 ? distance : 1;
       sim.emit({
@@ -140,13 +143,16 @@ export function swingNet(sim: SimContext, player: PlayerIndex, place: PlaceState
   // Portée et état lus dans la fiche du filet tenu (filet de base, amélioré, émoussé).
   const stack = actor.selected === null ? null : (actor.toolbar[actor.selected] ?? null);
   const tool = stack === null ? null : (sim.content.items[stack.item]?.tool ?? null);
-  const reach = tool?.reach ?? netReach;
+  // L'aide du joueur élargit la portée et l'angle du coup de filet.
+  const aid = assistFactor(sim.world, player);
+  const reach = (tool?.reach ?? netReach) * aid;
+  const halfAngle = Math.min(180, netHalfAngleDeg * aid);
   const torn = stack !== null && toolCondition(sim.content, stack) === 'blunt';
   const list = place.insects?.list ?? [];
   let best: InsectState | null = null;
   let bestDistance = Infinity;
   for (const insect of list) {
-    const distance = inCone(actor.body, insect.x, insect.y, reach, netHalfAngleDeg);
+    const distance = inCone(actor.body, insect.x, insect.y, reach, halfAngle);
     if (distance !== null && distance < bestDistance) {
       best = insect;
       bestDistance = distance;

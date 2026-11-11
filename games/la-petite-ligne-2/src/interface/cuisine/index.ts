@@ -8,6 +8,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { CookStepKind, RecipeDef } from '../../donnees/schemas/recette';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { modifiersOf } from '../../simulation/besoins/jauges';
+import { assistFactor } from '../../simulation/aide/index';
 import { createMinigame, windowScaleOf, type Minigame } from '../../simulation/cuisine/minijeu';
 import {
   allInputs,
@@ -66,8 +67,7 @@ export interface KitchenView {
 }
 
 export interface KitchenOptions {
-  /** Aide réglable (0, 1, 2) et cuisine tranquille, réglages locaux du joueur. */
-  readonly assist?: () => 0 | 1 | 2;
+  /** Cuisine tranquille, réglage local du joueur. L'aide se lit dans l'état (`assistFactor`). */
   readonly calm?: () => boolean;
   /** Temps forts pour le son et le rendu: gestes notés, plat, scène du repas. */
   readonly onCue?: (cue: CookCue) => void;
@@ -290,6 +290,8 @@ export function createKitchen(
     if (html !== lastHtml) {
       root.innerHTML = html;
       lastHtml = html;
+      // Livre plus haut que la fenêtre (1366 x 768, 960 x 540): la recette choisie reste en vue.
+      root.querySelector('.lpl-cook-card.sel')?.scrollIntoView({ block: 'nearest' });
     }
     root.hidden = screen.kind === 'closed';
   }
@@ -297,8 +299,9 @@ export function createKitchen(
   function windowScale(): number {
     const world = view.world();
     const me = view.localIndex();
-    const needs = world === null || me === null ? 1 : modifiersOf(content, world, me).minigame;
-    return windowScaleOf(needs, options.assist?.() ?? 0, options.calm?.() ?? false);
+    if (world === null || me === null) return windowScaleOf(1, 1, options.calm?.() ?? false);
+    const needs = modifiersOf(content, world, me).minigame;
+    return windowScaleOf(needs, assistFactor(world, me), options.calm?.() ?? false);
   }
 
   function readBook(): void {

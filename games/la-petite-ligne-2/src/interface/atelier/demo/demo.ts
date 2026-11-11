@@ -15,10 +15,19 @@ import { createSim, step } from '../../../simulation/noyau/pas';
 import { createInterface } from '../../index';
 import { loadPortraits } from '../../portrait';
 
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
+
 // Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
 await loadPortraits();
 
-const content = loadContent(DATA_FILES);
+// La partie commence à la gare d'essai, où sont l'établi, la meule et la forge de la démonstration.
+const settings = DATA_FILES['commun/reglages.json'] as { start: Record<string, unknown> };
+const content = loadContent({
+  ...DATA_FILES,
+  'commun/reglages.json': { ...settings, start: { ...settings.start, place: 'essai-gare' } },
+});
 const world = createWorld(content, 7, [
   { id: 'a', name: 'Camille' },
   { id: 'b', name: 'Sacha' },

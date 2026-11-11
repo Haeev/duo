@@ -60,6 +60,14 @@ export const TalkSchema = v.strictObject({
   node: IdSchema,
 });
 
+/**
+ * Cran d'aide des mini-jeux, choisi par chaque joueur dans ses réglages (cahier 2.4, CA-23):
+ * Normal, Coup de pouce, Grand coup de pouce. L'hôte l'applique (`simulation/aide`).
+ */
+export const ASSIST_LEVELS = ['normal', 'nudge', 'big'] as const;
+export const AssistLevelSchema = v.picklist(ASSIST_LEVELS);
+export type AssistLevel = v.InferOutput<typeof AssistLevelSchema>;
+
 const slow = {
   /** Identifiant de membre du duo: le personnage suit le joueur, jamais le rôle d'hôte ou d'invité. */
   member: v.pipe(v.string(), v.maxLength(64)),
@@ -92,6 +100,8 @@ const slow = {
   talk: v.nullable(TalkSchema),
   /** Ce que vise la touche d'action (objet de la carte ou habitant), calculé par la simulation. */
   aim: v.nullable(IdSchema),
+  /** Cran d'aide envoyé par sa machine (`set_assist`); absent: « normal » (parties d'avant). */
+  assist: v.exactOptional(AssistLevelSchema),
 } as const;
 
 /** Ce qui part dans la tranche « joueurs ». */
@@ -109,7 +119,7 @@ export type PlayerState = v.InferOutput<typeof PlayerSchema>;
 /** Les champs lents d'un joueur, dans l'ordre du schéma (copie de surface). */
 export function slowOf(player: PlayerState): PlayerSlow {
   const { member, name, look, gender, money, toolbar, bag, selected, tiers, staminaMods } = player;
-  const { gesture, talk, aim } = player;
+  const { gesture, talk, aim, assist } = player;
   return {
     member,
     name,
@@ -124,5 +134,6 @@ export function slowOf(player: PlayerState): PlayerSlow {
     gesture,
     talk,
     aim,
+    ...(assist === undefined ? {} : { assist }),
   };
 }

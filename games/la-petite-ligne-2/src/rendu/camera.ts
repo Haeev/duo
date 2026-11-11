@@ -59,6 +59,30 @@ export interface CameraPose {
 const TAU = Math.PI * 2;
 const DEG = Math.PI / 180;
 
+/** Vibration d'écran des gros coups (cahier 5, CA-14 à 16), réglable sans toucher à la logique. */
+export interface CameraShakeSettings {
+  /** Durée par défaut (s). */
+  readonly seconds: number;
+  /** Écart au plus fort, en part de la largeur de vue (même ressenti à tout zoom). */
+  readonly share: number;
+  /** Fréquence des secousses (Hz). */
+  readonly hertz: number;
+}
+
+export const CAMERA_SHAKE: CameraShakeSettings = { seconds: 0.15, share: 0.008, hertz: 26 };
+
+/**
+ * Demandes de vibration: un compteur que chaque `CameraRig` compare au sien à son `update`. Le
+ * jeu décide quand vibrer (réglage du joueur, mouvement réduit): le rendu ne fait que l'appliquer.
+ */
+const shakeRequests = { serial: 0, seconds: CAMERA_SHAKE.seconds };
+
+/** Fait vibrer la vue `seconds` secondes (la dernière demande l'emporte). */
+export function requestCameraShake(seconds: number = CAMERA_SHAKE.seconds): void {
+  shakeRequests.serial += 1;
+  shakeRequests.seconds = Math.max(0, seconds);
+}
+
 /** Part du chemin faite en `dt` secondes pour un demi-rattrapage en `halfLife` secondes. */
 export function approach(dt: number, halfLife: number): number {
   if (halfLife <= 0) return 1;
@@ -106,6 +130,11 @@ export class CameraRig {
   private x = 0;
   private y = 0;
   private placed = false;
+  /** Vibration: dernière demande vue, temps restant, durée totale, horloge des secousses. */
+  private shakeSeen = shakeRequests.serial;
+  private shakeLeft = 0;
+  private shakeTotal = 0;
+  private shakeClock = 0;
 
   constructor(private readonly settings: CameraSettings = RENDER_SETTINGS.camera) {
     this.yaw = wrapAngle(settings.defaultYawDeg * DEG);
@@ -137,6 +166,16 @@ export class CameraRig {
   update(dt: number, input: CameraInput, target: CameraTarget, bounds: MapBounds): void {
     const s = this.settings;
     if (!this.placed) this.snapTo(target, bounds);
+    if (this.shakeSeen !== shakeRequests.serial) {
+      this.shakeSeen = shakeRequests.serial;
+      this.shakeLeft = shakeRequests.seconds;
+      this.shakeTotal = shakeRequests.seconds;
+      this.shakeClock = 0;
+    }
+    if (this.shakeLeft > 0) {
+      this.shakeLeft = Math.max(0, this.shakeLeft - dt);
+      this.shakeClock += dt;
+    }
 
     // Rotation: la vitesse monte et retombe en douceur (inertie courte), le glissé est direct.
     const wantedRate = Math.max(-1, Math.min(1, input.turn ?? 0)) * s.yawSpeedDeg * DEG;
@@ -201,9 +240,13 @@ export class CameraRig {
     const t = Math.min(1, Math.max(0, (this.width - s.minWidth) / (full - s.minWidth)));
     // Adouci surtout tout près: l'inclinaison retrouve vite sa plongée entière en s'éloignant.
     const eased = 1 - (1 - t) * (1 - t);
+    // Vibration: deux sinus désaccordés, amortis au carré jusqu'à zéro.
+    const fade = this.shakeTotal > 0 ? (this.shakeLeft / this.shakeTotal) ** 2 : 0;
+    const amp = fade * CAMERA_SHAKE.share * this.width;
+    const phase = this.shakeClock * CAMERA_SHAKE.hertz * TAU;
     return {
-      x: this.x,
-      y: this.y,
+      x: this.x + amp * Math.sin(phase),
+      y: this.y + amp * Math.sin(phase * 1.37 + 1),
       yaw: this.yaw,
       pitch: (s.pitchNearDeg + (s.pitchFarDeg - s.pitchNearDeg) * eased) * DEG,
       width: this.width,

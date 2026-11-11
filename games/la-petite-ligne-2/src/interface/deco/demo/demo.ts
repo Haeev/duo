@@ -12,8 +12,17 @@ import { createSim, step } from '../../../simulation/noyau/pas';
 import { azertyLabel } from '../../index';
 import { createDecoMode } from '../deco';
 
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
+
 const HOUSE = 'maison-essai';
-const content = loadContent(DATA_FILES);
+// La maison d'essai est à la gare d'essai: la partie y commence (le jeu, lui, part du wagon).
+const settings = DATA_FILES['commun/reglages.json'] as { start: Record<string, unknown> };
+const content = loadContent({
+  ...DATA_FILES,
+  'commun/reglages.json': { ...settings, start: { ...settings.start, place: 'essai-gare' } },
+});
 const sim = createSim(
   content,
   createWorld(content, 7, [
@@ -80,8 +89,12 @@ if (scene === 'deux') {
 for (const player of [0, 1] as const) {
   const host = document.getElementById(`vue-${String(player)}`);
   if (host === null) continue;
+  // Comme en jeu, le mode déco se pose dans la couche d'interface (ses couleurs, son thème).
+  const layer = document.createElement('div');
+  layer.className = 'lpl-ui';
+  host.append(layer);
   const mode = createDecoMode({
-    layer: host,
+    layer,
     content,
     world: () => sim.world,
     localIndex: () => player,

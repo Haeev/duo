@@ -255,6 +255,8 @@
 }
 .lpl-ui .shop-tile.focus {
   transform: translateY(-0.125rem);
+  /* Au-dessus de ses voisines: son étiquette de nom déborde sur la rangée du dessous. */
+  z-index: 3;
 }
 .lpl-ui .shop-tile__price {
   position: absolute;
@@ -641,4 +643,30 @@
 }
 .lpl-ui .shop-why--mine {
   color: var(--ink);
+}
+/* Pièce déjà à toi: une mention à la place du bouton d'achat. */
+.lpl-ui .shop-mine {
+  box-sizing: border-box;
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0;
+  min-height: 3.25rem;
+  font: 800 1.25rem var(--font-display);
+  color: var(--ink);
+  border: 0.125rem solid var(--accent);
+  border-radius: 0.75rem;
+}
+.lpl-ui .shop-mine .ic {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+/* Thème sombre: le conseil d'une pièce à toi n'est pas un refus (ni rouge, ni hachures). */
+[data-lpl-style='encre'] .lpl-ui .shop-why.shop-why--mine {
+  color: var(--ink);
+  font-weight: 700;
+  rotate: none;
 }

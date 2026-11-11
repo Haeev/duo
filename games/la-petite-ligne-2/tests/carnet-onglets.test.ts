@@ -329,6 +329,13 @@ describe('carnet: tenues et réglages', () => {
     expect(adjustSetting(state, 'motion', 1).ui.reducedMotion).toBe(true);
     expect(adjustSetting(state, 'scale', 1).ui.scale).toBe('large');
     expect(adjustSetting(state, 'scale', -1).ui.scale).toBe('xlarge');
+    // Aide (trois crans, dans les deux sens), barre toujours visible, vibration.
+    expect(adjustSetting(state, 'assist', 1).ui.assist).toBe('nudge');
+    expect(adjustSetting(state, 'assist', -1).ui.assist).toBe('big');
+    expect(adjustSetting(state, 'toolbar', 1).ui.toolbarAlways).toBe(true);
+    expect(adjustSetting(state, 'shake', 1).ui.shake).toBe(false);
+    const muted = adjustSetting(state, 'motion', 1);
+    expect(settingsModel(muted).find((r) => r.id === 'shake')?.muted).toBe(true);
     expect(adjustSetting(state, 'graphics', 1).gfx.preset).toBe('high');
     expect(adjustSetting(state, 'graphics', -1).gfx.preset).toBe('low');
   });

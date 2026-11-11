@@ -14,6 +14,10 @@ import { azertyLabel } from '../../index';
 import { createKitchen } from '../index';
 import '../../interface.css';
 
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
+
 const content = loadContent(DATA_FILES);
 const world: WorldState = createWorld(content, 7, [
   { id: 'a', name: 'Camille' },

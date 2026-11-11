@@ -63,6 +63,16 @@
   grid-template-columns: repeat(4, 176px);
   gap: 12px;
   margin-top: 12px;
+  /* Le livre tient dans la fenêtre: les recettes défilent, l'en-tête et les touches restent. */
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px;
+}
+.lpl-cook-book {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 2rem);
+  box-sizing: border-box;
 }
 .lpl-cook-card {
   border: 2px solid #c9bda4;
@@ -357,4 +367,72 @@
 [data-motion='reduced'] .lpl-cook *,
 [data-motion='reduced'] .lpl-cook-meal * {
   animation: none !important;
+}
+
+/*
+ * Thème sombre (`encre/encre.css`): la cuisine avait ses couleurs en dur (crème, encre). Les
+ * panneaux passent au brun presque noir à liseré bouton d'or, le texte au clair et chaud; les
+ * jauges gardent leurs couleurs (feu, zone dorée), lisibles sur le creux sombre.
+ */
+[data-lpl-style='encre'] .lpl-cook {
+  color: var(--ink);
+}
+[data-lpl-style='encre']
+  :is(.lpl-cook-book, .lpl-cook-result, .lpl-cook-frieze, .lpl-cook-keys, .lpl-cook-meal) {
+  background: var(--paper);
+  border-color: var(--accent);
+  color: var(--ink);
+  box-shadow: var(--shadow-3);
+}
+[data-lpl-style='encre'] .lpl-cook-card {
+  background: var(--paper-raised);
+  border-color: var(--line);
+}
+[data-lpl-style='encre'] .lpl-cook-card.sel {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.1875rem var(--accent);
+}
+[data-lpl-style='encre'] .lpl-cook kbd {
+  background: var(--paper-raised);
+  border-color: var(--ink);
+  color: var(--ink);
+  box-shadow: 0 0.1875rem 0 var(--dark-shadow);
+}
+[data-lpl-style='encre'] .lpl-cook kbd.on {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+[data-lpl-style='encre'] .lpl-cook-gauge {
+  background: var(--paper-sunken);
+  border-color: var(--line);
+}
+[data-lpl-style='encre'] :is(.lpl-cook-beat, .lpl-cook-dots i.on) {
+  background: var(--ink);
+}
+[data-lpl-style='encre'] .lpl-cook-dots i {
+  background: var(--paper-sunken);
+  border-color: var(--ink);
+}
+[data-lpl-style='encre'] .lpl-cook-star {
+  stroke: var(--ink);
+}
+[data-lpl-style='encre']
+  :is(.lpl-cook-dish .badge, .lpl-cook-in.missing b, .lpl-cook-step.now, .lpl-cook-result .new) {
+  color: var(--stamp);
+}
+[data-lpl-style='encre'] .lpl-cook-in.missing .obj {
+  outline-color: var(--stamp);
+}
+[data-lpl-style='encre'] :is(.lpl-cook-step.g3, .lpl-cook-step.g2) {
+  color: var(--primary);
+}
+[data-lpl-style='encre'] .lpl-cook-mark {
+  -webkit-text-stroke: 1px var(--dark-shadow);
+}
+[data-lpl-style='encre'] .lpl-cook-meal {
+  color: var(--ink);
+}
+/* Recette inconnue: une silhouette claire et pâle (noire, elle disparaissait sur le sombre). */
+[data-lpl-style='encre'] .lpl-cook-card.unknown .lpl-cook-dish .obj {
+  filter: brightness(0) invert(0.9) opacity(0.22);
 }

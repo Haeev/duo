@@ -23,6 +23,9 @@ import { createSurfaceLookup } from './audio/sol';
 import { createGameMusic, createGameStage } from './audio/musique/index';
 import { DEFAULT_UI_SETTINGS } from './interface/carnet/lectures';
 import { memorySettings } from './interface/carnet/options';
+import { loadUiSettings, saveUiSettings } from './interface/carnet/memoire';
+import { shakeSecondsFor, shakeWanted } from './interface/secousse';
+import { requestCameraShake } from './rendu/camera';
 import { parsePlan } from './interface/carnet/plan';
 import { DEFAULT_GRAPHICS_OPTIONS } from './rendu/options';
 import planAubrune from '../donnees/lieux/aubrune/plan.json';
@@ -100,6 +103,7 @@ const objectViewer = createGameObjectViewer(content.items, { reducedMotion: duo.
 const aubrunePlan = parsePlan(planAubrune);
 if (aubrunePlan === null) duo.log.warn('plan d’Aubrune illisible: onglet Carte vide');
 const plans = aubrunePlan === null ? {} : { aubrune: aubrunePlan };
+const storage = typeof localStorage === 'undefined' ? null : localStorage;
 const settings = memorySettings(
   {
     get: () => renderer?.graphics() ?? DEFAULT_GRAPHICS_OPTIONS,
@@ -107,11 +111,24 @@ const settings = memorySettings(
       renderer?.setGraphics(options);
     },
   },
-  { ...DEFAULT_UI_SETTINGS, volume: Math.round(sound.settings().master * 100) },
+  // Réglages gardés d'une séance à l'autre (aide, barre, vibration...); le volume est celui du son.
+  {
+    ...loadUiSettings(storage, DEFAULT_UI_SETTINGS),
+    volume: Math.round(sound.settings().master * 100),
+  },
   (next) => {
     sound.setSettings({ master: next.volume / 100 });
+    saveUiSettings(storage, next);
   },
 );
+// Vibration d'écran des gros coups: réglable, coupée par le mouvement réduit (jeu, Duo, système).
+const reducedMedia =
+  typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+const offShake = session.view.onEvent((event) => {
+  const seconds = shakeSecondsFor(content, event, session.view.localIndex());
+  const reduced = duo.ui.reducedMotion || reducedMedia?.matches === true;
+  if (seconds > 0 && shakeWanted(settings.ui(), reduced)) requestCameraShake(seconds);
+});
 // Thème sombre de l'interface (validé par le client le 10 novembre): `?interface=ancien` rend
 // l'habillage clair d'avant, pour comparer.
 if (new URLSearchParams(location.search).get('interface') !== 'ancien')
@@ -217,6 +234,7 @@ duo.loop.start({
 
 duo.on('stop', () => {
   offNetAlert();
+  offShake();
   ui?.dispose();
   stageSound.dispose();
   music.dispose();

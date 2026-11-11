@@ -28,6 +28,7 @@ import { farmSystem } from '../elevage/index';
 import { vehicleSystem } from '../vehicules/index';
 import { musicSystem } from '../musique/index';
 import { orderSystem } from '../commandes/index';
+import { assistSystem } from '../aide/index';
 import type { Intent, StepInput } from './entrees';
 import type { GameEvent } from './evenements';
 
@@ -82,6 +83,7 @@ export const SYSTEMS: readonly GameSystem[] = [
   housingSystem,
   fishingSystem,
   farmSystem,
+  assistSystem,
   musicSystem,
   // Après tous les autres: il lit les objets reçus pendant le pas (`item_gained`).
   orderSystem,

@@ -186,7 +186,7 @@ describe('pêche: prise unique à deux', () => {
 
   it('juge l’épuisette: au fond, à côté, canne molle, puis la bonne', () => {
     const seed = 1234;
-    const at = { kind: 'pull' as const, side: 0 as const, into: 0, length: 1 };
+    const at = { kind: 'pull' as const, side: 0 as const, into: 0, length: 1, warn: 0 };
     const phase = pairPhaseAt(seed, 10, 0, { ...at });
     expect(phase.kind).toBe('dive');
     const riseAt = phase.length + 0.5;

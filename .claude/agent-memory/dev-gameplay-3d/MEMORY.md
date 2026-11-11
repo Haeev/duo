@@ -837,3 +837,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Les poches ne tiennent pas 25 bûches: dans un test, ranger les grosses quantités dans un rangement (`objects[id].store[i] = { item, count }`).
 - Ports du serveur Vite: d'autres membres en tiennent (5391, 5947...); `ss -ltnp` avant, `--strictPort --host 127.0.0.1`, attendre « ready » avant la capture. Playwright global: `require('/opt/node22/lib/node_modules/playwright')`.
 - Thème sombre: la classe `focus` reçoit le contour global d'`encre.css` (décalé de 0,44 rem, il déborde sur la ligne voisine); prendre une classe à soi. Une `.key` posée sur du papier hors du carnet garde le cadre sombre: la redéfinir sous `[data-lpl-style='encre']`.
+
+## Aide par joueur, vibration, thème sombre des écrans (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Aide des mini-jeux: `assistFactor(world, player)` (`simulation/aide`), cran dans `players[i].assist` (facultatif: ni migration ni sauvegarde cassée), envoyé par `set_assist` tant que l'état de l'hôte diffère. Un mini-jeu rejoué par l'hôte fige le facteur à son départ (`line.help`, `pair.rodAid`/`netAid`).
+- Réglages de la machine gardés par `localStorage` (`interface/carnet/memoire.ts`), comme le son et le rappel de course.
+- Vibration d'écran sans toucher au moteur: `requestCameraShake()` de `rendu/camera.ts` (compteur de module lu par chaque `CameraRig.update`, décalage dans `pose()`); `main.ts` décide (`interface/secousse.ts`).
+- Thème sombre: les jetons d'`encre.css` ne vivent que sous `.lpl-ui`; un écran à couleurs en dur (cuisine, déco) demande ses propres règles `[data-lpl-style='encre']`. Les CSS des écrans passent avant `encre.css`: à spécificité égale, `encre.css` gagne (doubler la classe).
+- Pages de démonstration: le jeu part maintenant du wagon; celles qui montrent la gare d'essai (atelier, basse-cour, déco) règlent `commun/reglages.json` `start.place` sur `essai-gare`. Démos en deux moitiés: largeurs en `cqw` (`container-type: size`), pas en `vw`.
+- `prettier --write` sur un dossier reformate aussi les README des autres membres: viser les fichiers touchés.

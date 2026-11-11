@@ -4,7 +4,8 @@
  * (achat fait), `#vente` (vente faite), `#pauvre` (bourse insuffisante). Un second commerce et
  * son tenancier sont ajoutés ici seulement, pour montrer la mémoire des prix et sa couronne.
  * `#mercerie`: la vraie mercerie de Solange à Aubrune, ses pièces de tenue (vignettes 3D de
- * l'aperçu de l'éditeur), la casquette déjà à toi; `#mercerie-achat`: le gilet acheté.
+ * l'aperçu de l'éditeur), la casquette déjà à toi; `#mercerie-achat`: le gilet acheté;
+ * `#mercerie-a-toi`: la casquette choisie (mention « À toi », sans bouton).
  */
 import { loadContent } from '../../../donnees/charger';
 import { DATA_FILES } from '../../../donnees/fichiers';
@@ -18,6 +19,10 @@ import { createCharacterPreview } from '../../../rendu/personnages/apercu';
 import { createSim, step } from '../../../simulation/noyau/pas';
 import { createInterface } from '../../index';
 import { loadPortraits } from '../../portrait';
+
+// Thème sombre validé par le client, posé comme dans `main.ts`; `?interface=ancien`: l'habillage clair.
+if (new URLSearchParams(location.search).get('interface') !== 'ancien')
+  document.documentElement.dataset.lplStyle = 'encre';
 
 // Portraits dessinés: lot à part, attendu avant toute interface (comme `main.ts`).
 await loadPortraits();
@@ -142,14 +147,22 @@ const keys: Readonly<Record<string, readonly string[]>> = {
   refus: ['KeyE', 'ArrowRight', 'ArrowRight', 'Enter'],
   mercerie: ['ArrowRight'],
   'mercerie-achat': ['ArrowRight', 'Enter'],
+  'mercerie-a-toi': [
+    'ArrowRight',
+    'ArrowRight',
+    'ArrowRight',
+    'ArrowRight',
+    'ArrowRight',
+    'ArrowRight',
+  ],
 };
 // La mercerie s'ouvre par son événement, puis la garde d'ouverture de l'écran passe.
-let delay = mercerie ? 1200 : 500;
+let delay = mercerie ? 2000 : 500;
 for (const code of keys[state] ?? []) {
   setTimeout(() => {
     press(code);
   }, delay);
-  delay += 150;
+  delay += 350;
 }
 setTimeout(() => {
   document.body.dataset.ready = 'oui';

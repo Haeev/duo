@@ -194,7 +194,7 @@ export function createFishingOverlay(options: FishingOverlayOptions): FishingOve
   let netting = false;
   /** Message d'un plongeon raté ou d'un poisson parti, sur les deux écrans (s). */
   let noticeLeft = 0;
-  const phaseOut: PairPhase = { kind: 'pull', side: 0, into: 0, length: 1 };
+  const phaseOut: PairPhase = { kind: 'pull', side: 0, into: 0, length: 1, warn: 0 };
 
   function steer(): -1 | 0 | 1 {
     return keys.left === keys.right ? 0 : keys.left ? -1 : 1;
