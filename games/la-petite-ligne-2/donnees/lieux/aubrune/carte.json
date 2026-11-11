@@ -724,6 +724,22 @@
       "pourquoi": "la pompe et l'abreuvoir des bêtes, au bout de la cour"
     },
     {
+      "id": "tonneaux-ferme",
+      "type": "tonneau",
+      "x": 196.5,
+      "y": 154.5,
+      "rotation": 0,
+      "pourquoi": "tonneaux de cidre contre le logis"
+    },
+    {
+      "id": "caisses-epicerie",
+      "type": "caisse",
+      "x": 194.5,
+      "y": 113.5,
+      "rotation": 0,
+      "pourquoi": "cageots de légumes devant la vitrine d'Odette"
+    },
+    {
       "id": "caillou-greve-1",
       "type": "caillou",
       "x": 185,
@@ -1098,6 +1114,606 @@
       "y": 94.5,
       "rotation": 0,
       "pourquoi": "le seau de graisse, à côté"
+    },
+    {
+      "id": "cloture-potager-n1",
+      "type": "cloture",
+      "x": 211,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas"
+    },
+    {
+      "id": "cloture-potager-n2",
+      "type": "cloture",
+      "x": 213,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas"
+    },
+    {
+      "id": "cloture-potager-n3",
+      "type": "cloture",
+      "x": 215,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas"
+    },
+    {
+      "id": "cloture-potager-n4",
+      "type": "cloture",
+      "x": 217,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas"
+    },
+    {
+      "id": "cloture-potager-n5",
+      "type": "cloture",
+      "x": 219,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas"
+    },
+    {
+      "id": "cloture-potager-n6",
+      "type": "cloture",
+      "x": 221,
+      "y": 152.5,
+      "rotation": 0,
+      "pourquoi": "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas"
+    },
+    {
+      "id": "cloture-potager-e1",
+      "type": "cloture",
+      "x": 222.5,
+      "y": 154,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté est"
+    },
+    {
+      "id": "cloture-potager-e2",
+      "type": "cloture",
+      "x": 222.5,
+      "y": 156,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté est; le côté du chemin reste ouvert"
+    },
+    {
+      "id": "cloture-potager-o1",
+      "type": "cloture",
+      "x": 209.5,
+      "y": 154,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté de la cour"
+    },
+    {
+      "id": "cloture-potager-o2",
+      "type": "cloture",
+      "x": 209.5,
+      "y": 156,
+      "rotation": 1,
+      "pourquoi": "la clôture du potager, côté de la cour"
+    },
+    {
+      "id": "herbes-pre-1",
+      "type": "herbes-hautes",
+      "x": 224.5,
+      "y": 149.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré, que la faux n'a pas encore prise"
+    },
+    {
+      "id": "buisson-pre-1",
+      "type": "buisson",
+      "x": 229.5,
+      "y": 149.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de la haie vive qui borde le pré au nord"
+    },
+    {
+      "id": "buisson-pre-2",
+      "type": "buisson",
+      "x": 232.5,
+      "y": 150.5,
+      "rotation": 0,
+      "pourquoi": "la haie vive du pré"
+    },
+    {
+      "id": "epierrage-1",
+      "type": "rocher",
+      "x": 224.5,
+      "y": 153.5,
+      "rotation": 0,
+      "pourquoi": "le tas d'épierrage: les pierres sorties du champ, au coin du potager"
+    },
+    {
+      "id": "epierrage-2",
+      "type": "rocher-moussu",
+      "x": 225.5,
+      "y": 153.5,
+      "rotation": 0,
+      "pourquoi": "le tas d'épierrage, les plus vieilles pierres moussues"
+    },
+    {
+      "id": "epierrage-3",
+      "type": "rocher",
+      "x": 224.5,
+      "y": 154.5,
+      "rotation": 0,
+      "pourquoi": "le tas d'épierrage"
+    },
+    {
+      "id": "herbes-pre-2",
+      "type": "herbes-hautes",
+      "x": 230.5,
+      "y": 153.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré"
+    },
+    {
+      "id": "herbes-pre-3",
+      "type": "herbes-hautes",
+      "x": 228.5,
+      "y": 151.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré"
+    },
+    {
+      "id": "bloc-pre",
+      "type": "gros-rocher-moussu",
+      "x": 210,
+      "y": 167,
+      "rotation": 0,
+      "pourquoi": "le bloc que la charrue contourne depuis toujours, au coin du pré"
+    },
+    {
+      "id": "herbes-labour-1",
+      "type": "herbes-hautes",
+      "x": 212.5,
+      "y": 167.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la tournière, au bout des sillons"
+    },
+    {
+      "id": "herbes-labour-2",
+      "type": "herbes-hautes",
+      "x": 211.5,
+      "y": 169.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la tournière"
+    },
+    {
+      "id": "herbes-labour-3",
+      "type": "herbes-hautes",
+      "x": 209.5,
+      "y": 171.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré"
+    },
+    {
+      "id": "herbes-labour-4",
+      "type": "herbes-hautes",
+      "x": 211.5,
+      "y": 173.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré"
+    },
+    {
+      "id": "buisson-labour-1",
+      "type": "buisson",
+      "x": 209.5,
+      "y": 163.5,
+      "rotation": 0,
+      "pourquoi": "un buisson au bord du chemin, à l'angle du pré"
+    },
+    {
+      "id": "buisson-labour-2",
+      "type": "buisson",
+      "x": 213.5,
+      "y": 172.5,
+      "rotation": 0,
+      "pourquoi": "un buisson au bout du labour"
+    },
+    {
+      "id": "epierrage-4",
+      "type": "rocher",
+      "x": 213.5,
+      "y": 166.5,
+      "rotation": 0,
+      "pourquoi": "les pierres jetées hors du labour, au bord du champ"
+    },
+    {
+      "id": "epierrage-5",
+      "type": "rocher-moussu",
+      "x": 213.5,
+      "y": 167.5,
+      "rotation": 0,
+      "pourquoi": "les pierres jetées hors du labour"
+    },
+    {
+      "id": "buisson-berge-1",
+      "type": "buisson",
+      "x": 187.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de berge en haut du talus, les racines dans la pente"
+    },
+    {
+      "id": "herbes-berge-1",
+      "type": "herbes-hautes",
+      "x": 189.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge, que personne ne fauche"
+    },
+    {
+      "id": "herbes-berge-2",
+      "type": "herbes-hautes",
+      "x": 196.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge"
+    },
+    {
+      "id": "herbes-berge-3",
+      "type": "herbes-hautes",
+      "x": 200.5,
+      "y": 140.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge"
+    },
+    {
+      "id": "herbes-berge-4",
+      "type": "herbes-hautes",
+      "x": 203.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du haut de la berge"
+    },
+    {
+      "id": "bloc-talus",
+      "type": "gros-rocher-moussu",
+      "x": 190,
+      "y": 144,
+      "rotation": 0,
+      "pourquoi": "un bloc moussu à mi-pente, tombé du talus il y a longtemps"
+    },
+    {
+      "id": "rocher-talus",
+      "type": "rocher",
+      "x": 193.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "une pierre du talus"
+    },
+    {
+      "id": "herbes-talus-1",
+      "type": "herbes-hautes",
+      "x": 187.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la pente"
+    },
+    {
+      "id": "herbes-talus-2",
+      "type": "herbes-hautes",
+      "x": 191.5,
+      "y": 148.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la pente"
+    },
+    {
+      "id": "herbes-talus-3",
+      "type": "herbes-hautes",
+      "x": 196.5,
+      "y": 147.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la pente"
+    },
+    {
+      "id": "buisson-talus",
+      "type": "buisson",
+      "x": 199.5,
+      "y": 143.5,
+      "rotation": 0,
+      "pourquoi": "un buisson au coin du logis, côté rivière"
+    },
+    {
+      "id": "buches-pignon",
+      "type": "tas-de-buches",
+      "x": 199.5,
+      "y": 148.5,
+      "rotation": 0,
+      "pourquoi": "les bûches empilées contre le pignon ouest du logis"
+    },
+    {
+      "id": "baquet-margot",
+      "type": "baquet",
+      "x": 202,
+      "y": 143.5,
+      "rotation": 0,
+      "pourquoi": "le baquet de lessive de Margot, en haut de la berge: elle rince à la rivière"
+    },
+    {
+      "id": "tonneau-cheminots",
+      "type": "tonneau",
+      "x": 147.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "le tonneau d'eau de pluie du jardin des cheminots"
+    },
+    {
+      "id": "herbes-voie-1",
+      "type": "herbes-hautes",
+      "x": 149.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au pied de la clôture de la voie, où la faux ne passe pas"
+    },
+    {
+      "id": "herbes-voie-2",
+      "type": "herbes-hautes",
+      "x": 154.5,
+      "y": 100.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au pied de la clôture"
+    },
+    {
+      "id": "herbes-voie-3",
+      "type": "herbes-hautes",
+      "x": 155.5,
+      "y": 101.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au pied de la clôture"
+    },
+    {
+      "id": "buisson-cheminots",
+      "type": "buisson",
+      "x": 159.5,
+      "y": 101.5,
+      "rotation": 0,
+      "pourquoi": "un buisson qui ferme le pré à l'est"
+    },
+    {
+      "id": "rocher-cheminots",
+      "type": "rocher",
+      "x": 153.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "une borne de pierre oubliée par la Compagnie"
+    },
+    {
+      "id": "caisse-cheminots",
+      "type": "caisse",
+      "x": 150.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "une caisse de la Compagnie qui sert de table au jardin"
+    },
+    {
+      "id": "herbes-cheminots-1",
+      "type": "herbes-hautes",
+      "x": 151.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré des cheminots"
+    },
+    {
+      "id": "herbes-cheminots-2",
+      "type": "herbes-hautes",
+      "x": 157.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du pré des cheminots"
+    },
+    {
+      "id": "herbes-cheminots-3",
+      "type": "herbes-hautes",
+      "x": 143.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute au bord du jardin"
+    },
+    {
+      "id": "herbes-greve-1",
+      "type": "herbes-hautes",
+      "x": 194.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "une touffe de joncs au bord de l'eau"
+    },
+    {
+      "id": "herbes-greve-2",
+      "type": "herbes-hautes",
+      "x": 198.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "une touffe de joncs au bord de l'eau"
+    },
+    {
+      "id": "buisson-tonnelle",
+      "type": "buisson",
+      "x": 199.5,
+      "y": 123.5,
+      "rotation": 0,
+      "pourquoi": "un sureau au coin de la tonnelle, côté rivière"
+    },
+    {
+      "id": "buisson-oree-1",
+      "type": "buisson",
+      "x": 101.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée: la forêt gagne sur le sous-bois"
+    },
+    {
+      "id": "buisson-oree-2",
+      "type": "buisson",
+      "x": 104.5,
+      "y": 86.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée"
+    },
+    {
+      "id": "buisson-oree-3",
+      "type": "buisson",
+      "x": 108.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée"
+    },
+    {
+      "id": "buisson-oree-4",
+      "type": "buisson",
+      "x": 112.5,
+      "y": 86.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de l'orée"
+    },
+    {
+      "id": "herbes-oree-1",
+      "type": "herbes-hautes",
+      "x": 102.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "herbes-oree-2",
+      "type": "herbes-hautes",
+      "x": 106.5,
+      "y": 83.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "herbes-oree-3",
+      "type": "herbes-hautes",
+      "x": 110.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "herbes-oree-4",
+      "type": "herbes-hautes",
+      "x": 114.5,
+      "y": 83.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "herbes-oree-5",
+      "type": "herbes-hautes",
+      "x": 103.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "herbes-oree-6",
+      "type": "herbes-hautes",
+      "x": 108.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "herbes-oree-7",
+      "type": "herbes-hautes",
+      "x": 112.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute du sous-bois"
+    },
+    {
+      "id": "bloc-oree",
+      "type": "gros-rocher-moussu",
+      "x": 106,
+      "y": 86,
+      "rotation": 0,
+      "pourquoi": "un bloc moussu au pied de la forêt"
+    },
+    {
+      "id": "rocher-oree-1",
+      "type": "rocher-moussu",
+      "x": 110.5,
+      "y": 82.5,
+      "rotation": 0,
+      "pourquoi": "une pierre moussue du sous-bois"
+    },
+    {
+      "id": "rocher-oree-2",
+      "type": "rocher-moussu",
+      "x": 101.5,
+      "y": 81.5,
+      "rotation": 0,
+      "pourquoi": "une pierre moussue du sous-bois"
+    },
+    {
+      "id": "buches-oree",
+      "type": "tas-de-buches",
+      "x": 114.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "les bûches d'une ancienne coupe, laissées à sécher au bord du bois"
+    },
+    {
+      "id": "herbes-friche-1",
+      "type": "herbes-hautes",
+      "x": 94.5,
+      "y": 85.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage"
+    },
+    {
+      "id": "herbes-friche-2",
+      "type": "herbes-hautes",
+      "x": 97.5,
+      "y": 87.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage"
+    },
+    {
+      "id": "herbes-friche-3",
+      "type": "herbes-hautes",
+      "x": 95.5,
+      "y": 90.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage"
+    },
+    {
+      "id": "herbes-friche-4",
+      "type": "herbes-hautes",
+      "x": 98.5,
+      "y": 92.5,
+      "rotation": 0,
+      "pourquoi": "l'herbe haute de la friche du garage"
+    },
+    {
+      "id": "buisson-friche-1",
+      "type": "buisson",
+      "x": 93.5,
+      "y": 88.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de la friche"
+    },
+    {
+      "id": "buisson-friche-2",
+      "type": "buisson",
+      "x": 96.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un buisson de la friche"
+    },
+    {
+      "id": "rocher-friche",
+      "type": "rocher",
+      "x": 98.5,
+      "y": 89.5,
+      "rotation": 0,
+      "pourquoi": "un rocher laissé là quand on a tracé la voie, dans la friche"
     },
     {
       "id": "vieux-chene",

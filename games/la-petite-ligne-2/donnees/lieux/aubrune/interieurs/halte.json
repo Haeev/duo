@@ -121,6 +121,30 @@
       "x": 6.5,
       "y": 4.5,
       "rotation": 0
+    },
+    {
+      "id": "halte-lampe",
+      "type": "lampe-de-table",
+      "x": 8.45,
+      "y": 0.32,
+      "rotation": 0,
+      "on": "halte-bureau"
+    },
+    {
+      "id": "halte-registres",
+      "type": "pile-de-livres",
+      "x": 8.05,
+      "y": 0.3,
+      "rotation": 0,
+      "on": "halte-bureau"
+    },
+    {
+      "id": "halte-journal",
+      "type": "journal",
+      "x": 7.55,
+      "y": 0.65,
+      "rotation": 0,
+      "on": "halte-bureau"
     }
   ],
   "doors": {

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "cloture",
+  "name": "Clôture",
+  "model": "fence",
+  "size": {
+    "w": 2,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

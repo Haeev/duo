@@ -108,6 +108,37 @@
       "x": 3.5,
       "y": 3.5,
       "rotation": 0
+    },
+    {
+      "id": "mercerie-seau",
+      "type": "seau",
+      "x": 0.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "mercerie-boites-boutons",
+      "type": "boites-a-provisions",
+      "x": 2.77,
+      "y": 1.4,
+      "rotation": 1,
+      "on": "mercerie-comptoir"
+    },
+    {
+      "id": "mercerie-bouquet",
+      "type": "bouquet",
+      "x": 2.0,
+      "y": 1.6,
+      "rotation": 0,
+      "on": "mercerie-comptoir"
+    },
+    {
+      "id": "mercerie-patrons",
+      "type": "pile-de-livres",
+      "x": 2.35,
+      "y": 1.65,
+      "rotation": 0,
+      "on": "mercerie-comptoir"
     }
   ],
   "doors": {

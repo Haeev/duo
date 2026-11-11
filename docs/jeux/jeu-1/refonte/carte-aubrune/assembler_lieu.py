@@ -35,7 +35,16 @@ ANNEXE_Y = 210  # sous le dehors (208) et son mur
 
 # Ce que le script écrit lui-même; tout autre champ trouvé dans un fichier existant a été ajouté à la main.
 ECRITS_PIECE = {'schema', 'id', 'name', 'width', 'height', 'at', 'blocked', 'points', 'objects', 'doors', 'pourquoi'}
-ECRITS_MEUBLE = {'id', 'type', 'x', 'y', 'rotation', 'resource'}
+ECRITS_MEUBLE = {'id', 'type', 'x', 'y', 'rotation', 'resource', 'on'}
+
+
+def objet(m, **plus):
+    """Un meuble du plan tel que le lieu l'écrit; `on`: le porteur (même pièce) ou une hauteur en mètres."""
+    o = dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation'])
+    if m.get('on') is not None:
+        o['on'] = m['on']
+    o.update(plus)
+    return o
 ECRITS_PORTE = {'x', 'y', 'facing', 'to'}
 
 
@@ -134,7 +143,7 @@ def main(brute):
     objets = []
     for m in plan['mobilier'] + [dict(a, rotation=0, modele=a['type']) for a in plan['arbres']]:
         if m['type'] in types:
-            objets.append(dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation'], pourquoi=m['pourquoi'][:400]))
+            objets.append(objet(m, pourquoi=m['pourquoi'][:400]))
         else:
             manquants.setdefault(m['modele'], []).append(m['id'])
     for r in plan['ressources']:
@@ -208,7 +217,7 @@ def main(brute):
                     points={}, objects=[], doors={}, pourquoi=it['note'][:400])
         for m in it['meubles']:
             if m['type'] in types:
-                room['objects'].append(dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation']))
+                room['objects'].append(objet(m))
             else:
                 manquants.setdefault(m['modele'], []).append(m['id'])
         noeud_entree = None

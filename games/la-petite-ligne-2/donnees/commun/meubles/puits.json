@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "puits",
+  "name": "Puits",
+  "model": "well",
+  "size": {
+    "w": 2,
+    "h": 2
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

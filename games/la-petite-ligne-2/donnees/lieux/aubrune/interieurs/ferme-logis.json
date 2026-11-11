@@ -131,6 +131,30 @@
       "x": 6,
       "y": 3,
       "rotation": 0
+    },
+    {
+      "id": "ferme-logis-lampe",
+      "type": "lampe-a-petrole",
+      "x": 6.4,
+      "y": 2.35,
+      "rotation": 0,
+      "on": "logis-table"
+    },
+    {
+      "id": "ferme-logis-pain",
+      "type": "corbeille-de-pain",
+      "x": 5.85,
+      "y": 2.55,
+      "rotation": 0,
+      "on": "logis-table"
+    },
+    {
+      "id": "ferme-logis-pots",
+      "type": "pots-de-gres",
+      "x": 1.23,
+      "y": 0.4,
+      "rotation": 1,
+      "on": "logis-plan"
     }
   ],
   "doors": {

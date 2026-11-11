@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "herbes-hautes",
+  "name": "Herbes hautes",
+  "model": "wild-herbs",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

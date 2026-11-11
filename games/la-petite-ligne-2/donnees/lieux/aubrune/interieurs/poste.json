@@ -51,6 +51,22 @@
       "x": 3.5,
       "y": 2.5,
       "rotation": 0
+    },
+    {
+      "id": "poste-lampe",
+      "type": "lampe-de-table",
+      "x": 0.5,
+      "y": 2.3,
+      "rotation": 1,
+      "on": "poste-coffre"
+    },
+    {
+      "id": "poste-registre",
+      "type": "journal",
+      "x": 0.5,
+      "y": 2.7,
+      "rotation": 1,
+      "on": "poste-coffre"
     }
   ],
   "doors": {

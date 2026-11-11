@@ -90,6 +90,43 @@
       "x": 0.5,
       "y": 4.5,
       "rotation": 0
+    },
+    {
+      "id": "forge-fers-neufs",
+      "type": "caisse",
+      "x": 4.5,
+      "y": 3.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-tonneau",
+      "type": "tonneau",
+      "x": 4.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-tabouret",
+      "type": "tabouret-de-ferme",
+      "x": 1.5,
+      "y": 1.5,
+      "rotation": 0
+    },
+    {
+      "id": "forge-lampe",
+      "type": "lampe-a-petrole",
+      "x": 0.5,
+      "y": 2.25,
+      "rotation": 1,
+      "on": "forge-coffre"
+    },
+    {
+      "id": "forge-clous",
+      "type": "boites-a-provisions",
+      "x": 0.5,
+      "y": 2.65,
+      "rotation": 1,
+      "on": "forge-coffre"
     }
   ],
   "doors": {

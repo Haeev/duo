@@ -1393,6 +1393,245 @@ for _r in RESSOURCES:
         _r['fiche'] = _r['id']
 
 
+# ================================================================ version 6: objets posés sur les meubles, décor du dehors (2026-11-11)
+# 1. Le moyen qui manquait existe: un objet d'une pièce déclare `on` (l'identifiant de son porteur, dans la même
+#    pièce) et le rendu le pose sur le plateau (`top` de la fiche du porteur; `src/donnees/poses.ts`). La place de
+#    chaque objet se donne dans le repère du modèle du porteur (gx le long du meuble, gz vers sa façade), sur la
+#    partie du plateau que le modèle laisse libre (relevé des sommets au-dessus du plateau: la balance et les bocaux
+#    du comptoir d'Odette, la cafetière de Colette, les miches d'Achille, les coupons de Solange restent seuls).
+#    Règles (controler_plan.py, `controler_habillage`): porteur dans la pièce, avec `top`; centre dans la boîte du
+#    modèle du porteur; pas deux objets l'un dans l'autre; rien qui monte à 1,3 m ou plus à moins de 0,75 m d'un mur
+#    (le rendu y décalerait une fenêtre). Rien ne se pose sur un tabouret ni sur une chaise: on s'y assoit.
+#    Les objets posés ne bloquent pas et ne se visent pas: on s'assoit toujours à la table, le comptoir sert toujours.
+def _local(m, gx, gz):
+    a = m['rotation'] * math.pi / 2
+    return (round(m['x'] + gx * math.cos(a) + gz * math.sin(a), 3), round(m['y'] - gx * math.sin(a) + gz * math.cos(a), 3))
+
+
+SUR = {
+    # pièce: (suffixe, type, porteur, gx, gz, rotation par rapport au porteur, pourquoi)
+    'maison-rdc': [
+        ('lampe', 'lampe-a-petrole', 'maison-table', 0.42, -0.2, 0, "la lampe du repas, au bout de la table côté mur: on y mange et on y lit le soir"),
+        ('pain', 'corbeille-de-pain', 'maison-table', -0.05, -0.12, 0, "la miche du jour au milieu de la table"),
+        ('journal', 'journal', 'maison-table', -0.45, 0.18, 2, "le journal du matin, déplié devant la chaise"),
+        ('pots', 'pots-de-gres', 'maison-plan', -0.77, -0.15, 1, "la saumure et le cidre, au bout du plan de travail près de la cuisinière"),
+    ],
+    'maison-cave': [
+        ('bocaux', 'bocaux-de-confiture', 'cave-coffre', -0.2, 0, 0, "les confitures de l'ancien garde, au frais sur le coffre"),
+        ('pots', 'pots-de-gres', 'cave-coffre', 0.22, 0.01, 1, "les pots de grès de la saumure, à côté"),
+    ],
+    'halte': [
+        ('lampe', 'lampe-de-table', 'halte-bureau', 0.45, -0.18, 0, "la lampe du bureau de Firmin: il fait ses écritures avant le premier train"),
+        ('registres', 'pile-de-livres', 'halte-bureau', 0.05, -0.2, 0, "les registres de la halte (billets, colis, retards)"),
+        ('journal', 'journal', 'halte-bureau', -0.45, 0.15, 0, "le journal que le train du matin dépose, devant sa chaise"),
+    ],
+    'cafe': [
+        ('pendule', 'pendule', 'cafe-comptoir', -0.2, 0.11, 0, "la pendule du zinc, cadran vers la salle: les clients y lisent l'heure du train"),
+        ('boites', 'boites-a-provisions', 'cafe-plan', -0.07, -0.2, 0, "le café, le sucre et la chicorée, au milieu du plan de travail"),
+        ('bocaux', 'bocaux-de-confiture', 'cafe-plan', -0.77, -0.1, 1, "les confitures du petit déjeuner, au bout du plan, près de la cuisinière"),
+        ('bouquet-1', 'bouquet', 'cafe-table-1', 0, -0.22, 0, "un bouquet du pré, côté mur: on ne le renverse pas en s'asseyant"),
+        ('pain', 'corbeille-de-pain', 'cafe-table-1', 0.35, 0.05, 0, "la corbeille de pain des casse-croûte"),
+        ('journal', 'journal', 'cafe-table-2', -0.4, 0.1, 0, "le journal du café, qui passe de table en table"),
+        ('bouquet-2', 'bouquet', 'cafe-table-2', 0.35, -0.2, 0, "le bouquet de la seconde table, contre le mur est"),
+    ],
+    'epicerie-rdc': [
+        ('bocaux', 'bocaux-de-confiture', 'epicerie-comptoir', 0.3, 0.08, 0, "les confitures à vendre, devant la balance, côté client"),
+        ('boites', 'boites-a-provisions', 'epicerie-comptoir', -0.45, 0.17, 0, "les boîtes de sucre et de café au détail, au bord du comptoir"),
+        ('pain', 'corbeille-de-pain', 'epicerie-table', 0.2, 0, 0, "le pain du souper des pensionnaires"),
+        ('lampe', 'lampe-a-petrole', 'epicerie-table', -0.4, -0.15, 0, "la lampe du souper, du côté de la cuisinière"),
+    ],
+    'epicerie-etage': [
+        ('chevet-lampe', 'lampe-de-table', 'epicerie-etage-chevet', 0, 0, 0, "la lampe des pensionnaires, entre les deux lits"),
+        ('odette-livres', 'pile-de-livres', 'epicerie-etage-odette-chevet', -0.13, 0, 0, "les cahiers de comptes d'Odette, qu'elle reprend au lit"),
+        ('odette-lampe', 'lampe-a-petrole', 'epicerie-etage-odette-chevet', 0.17, 0, 0, "sa lampe de chevet"),
+    ],
+    'fournil': [
+        ('pain', 'corbeille-de-pain', 'fournil-comptoir', 0.15, 0.08, 0, "la corbeille des pains du jour, devant les miches, côté client"),
+        ('boites', 'boites-a-provisions', 'fournil-petrin', -0.07, -0.2, 0, "le sel, le sucre et le levain, au milieu du pétrin"),
+    ],
+    'mercerie': [
+        ('boites-boutons', 'boites-a-provisions', 'mercerie-comptoir', 0.77, -0.1, 1, "les boîtes de boutons, au bout du comptoir"),
+        ('bouquet', 'bouquet', 'mercerie-comptoir', 0, 0.1, 0, "le bouquet de Solange au milieu du comptoir: une loge d'actrice garde toujours des fleurs"),
+        ('patrons', 'pile-de-livres', 'mercerie-comptoir', 0.35, 0.15, 0, "les catalogues de patrons, ouverts aux clientes"),
+    ],
+    'forge': [
+        ('lampe', 'lampe-a-petrole', 'forge-coffre', 0.25, 0, 0, "la lampe de Mado sur le coffre: la forge est sombre hors du foyer"),
+        ('clous', 'boites-a-provisions', 'forge-coffre', -0.15, 0, 0, "les boîtes de clous à ferrer"),
+    ],
+    'atelier-basile': [
+        ('carnet', 'pile-de-livres', 'basile-etabli', -0.07, -0.2, 0, "le carnet de cotes de Basile, au milieu de l'établi"),
+        ('lampe', 'lampe-a-petrole', 'basile-etabli', -0.77, -0.15, 0, "la lampe de l'établi, au bout, loin des copeaux du rabot"),
+    ],
+    'ecole': [
+        ('registres', 'pile-de-livres', 'ecole-table-mairie', -0.4, 0, 0, "les registres de l'état civil, sur la table de la mairie"),
+        ('lampe', 'lampe-de-table', 'ecole-table-mairie', 0.45, -0.15, 0, "la lampe du secrétaire de mairie: Armand écrit le soir"),
+        ('journal', 'journal', 'ecole-table-mairie', 0.05, 0.15, 0, "le journal officiel, à afficher à la porte"),
+        ('bouquet', 'bouquet', 'ecole-table-mairie', -0.05, -0.2, 0, "le bouquet que les enfants cueillent pour le maître"),
+        ('cahiers', 'pile-de-livres', 'ecole-caisse', 0, 0, 0, "les cahiers ramassés, à corriger"),
+    ],
+    'ferme-logis': [
+        ('lampe', 'lampe-a-petrole', 'logis-table', 0.4, -0.15, 0, "la lampe de la veillée, au bout de la table"),
+        ('pain', 'corbeille-de-pain', 'logis-table', -0.15, 0.05, 0, "la miche de la ferme"),
+        ('pots', 'pots-de-gres', 'logis-plan', -0.77, -0.1, 1, "les pots de grès du lard et du cidre, au bout du plan près de la cuisinière"),
+    ],
+    'marthe': [
+        ('lampe', 'lampe-a-petrole', 'marthe-table', 0.5, -0.1, 0, "la lampe de Marthe, du côté du mur"),
+        ('journal', 'journal', 'marthe-table', -0.4, 0.2, 0, "le journal, devant sa chaise: elle y vérifie l'heure des offices"),
+        ('bouquet', 'bouquet', 'marthe-table', 0.05, -0.15, 0, "le bouquet qu'elle prend aux fleurs de l'autel quand elles fanent"),
+        ('missel', 'pile-de-livres', 'marthe-chevet', 0, 0, 0, "son missel et l'almanach, au chevet"),
+    ],
+    'moulin': [
+        ('lampe', 'lampe-a-petrole', 'moulin-sacs', -0.2, 0, 0, "la lampe de Berthe, sur le coffre aux sacs"),
+        ('moutures', 'pile-de-livres', 'moulin-sacs', 0.2, 0, 0, "le livre des moutures: qui a apporté quoi, et combien"),
+    ],
+    'moulin-etage': [
+        ('lampe', 'lampe-a-petrole', 'moulin-grain-1', 0, 0, 0, "la lampe du grenier, posée sur le coffre à grain"),
+    ],
+    'poste': [
+        ('lampe', 'lampe-de-table', 'poste-coffre', 0.2, 0, 0, "la lampe de l'aiguilleur, sur le coffre"),
+        ('registre', 'journal', 'poste-coffre', -0.2, 0, 0, "le registre des circulations, ouvert à la page du jour"),
+    ],
+}
+# Objets de sol ajoutés pour tenir 12 petits objets par pièce de vie (même règles que la version 5).
+HABITE_6 = {
+    'epicerie-etage': [
+        ('chevet', 'caisse', 1.5, 0.5, 0, "une caisse retournée sert de table de nuit entre les deux lits des pensionnaires"),
+        ('odette-chevet', 'caisse', 1.5, 6.5, 0, "la table de nuit d'Odette, une caisse de l'épicerie, à la tête de son lit"),
+    ],
+    'mercerie': [
+        ('seau', 'seau', 0.5, 4.5, 0, "l'eau tiède du shampoing, à côté du fauteuil de coiffure"),
+    ],
+    'forge': [
+        ('fers-neufs', 'caisse', 4.5, 3.5, 0, "la caisse des fers neufs, sous le râtelier"),
+        ('tonneau', 'tonneau', 4.5, 4.5, 0, "l'eau de pluie où l'on remplit le seau de trempe"),
+        ('tabouret', 'tabouret-de-ferme', 1.5, 1.5, 0, "le tabouret où Mado s'assied pour ferrer, près du foyer"),
+    ],
+    'atelier-basile': [
+        ('chevilles', 'caisse', 6.5, 0.5, 0, "la caisse des chevilles et des clous, au bout de l'établi"),
+    ],
+    'ecole': [
+        ('caisse', 'caisse', 4.5, 1.5, 0, "la caisse des ardoises et des craies, au pied de l'armoire"),
+        ('tabouret', 'tabouret-de-ferme', 2.5, 1.5, 0, "le tabouret du maître, à côté du tableau"),
+    ],
+    'marthe': [
+        ('seau', 'seau', 4.5, 4.5, 0, "l'eau de la toilette, dans le coin le plus loin du lit"),
+        ('tapis-de-sol', 'tapis-rond', 3, 3, 0, "le tapis tressé devant la porte"),
+        ('chevet', 'caisse', 1.5, 0.5, 0, "une caisse en guise de table de chevet, à la tête du lit"),
+    ],
+    'moulin': [
+        ('caisse', 'caisse', 5.5, 6.5, 0, "la caisse du son, à côté du coffre aux sacs"),
+        ('tonneau', 'tonneau', 6.5, 4.5, 0, "le tonneau de farine blutée, prêt à livrer (le coffre aux sacs reste abordable par le nord)"),
+    ],
+    'moulin-etage': [
+        ('caisse', 'caisse', 6.5, 2.5, 0, "une caisse de grain, à la suite des coffres"),
+        ('tonneau', 'tonneau', 6.5, 3.5, 0, "le tonneau de son du grenier"),
+    ],
+}
+for _it in INT:
+    for _s, _t, _x, _y, _r, _pq in HABITE_6.get(_it['id'], ()):
+        _it['meubles'].append(dict(id='%s-%s' % (_it['id'], _s), type=_t, modele=_MODELES[_t], x=_x, y=_y, rotation=_r, pourquoi=_pq))
+    _par_id = {m['id']: m for m in _it['meubles']}
+    for _s, _t, _p, _gx, _gz, _r, _pq in SUR.get(_it['id'], ()):
+        _x, _y = _local(_par_id[_p], _gx, _gz)
+        _it['meubles'].append(dict(id='%s-%s' % (_it['id'], _s), type=_t, modele=_MODELES[_t], x=_x, y=_y,
+                                   rotation=(_par_id[_p]['rotation'] + _r) % 4, on=_p, pourquoi=_pq))
+
+# 2. Décor du dehors sans récolte (fiches du 2026-11-11 sur des modèles déjà livrés: rocher, gros rocher, buisson,
+#    herbes hautes, tonneau, caisse, banc de ferme, tas de bûches, puits, abreuvoir de pierre, baquet, clôture).
+#    Les objets du plan qui attendaient ces types les reçoivent, recentrés sur leur case.
+for _m in M_:
+    if _m['id'] == 'tonneaux-ferme':
+        _m.update(type='tonneau', x=196.5, y=154.5)
+    elif _m['id'] == 'caisses-epicerie':
+        _m.update(type='caisse', x=194.5, y=113.5)
+    # Le tonneau de la terrasse du café (251,6; 106,6) reste sans type: posé, il barrerait la Grand-Route.
+# Vues du dehors (captures `ensemble-*`, critère du directeur artistique: aucune zone vide de plus de 4 x 4 m à
+# l'écran). Rien sur un chemin, une route, un seuil, un nœud ni contre un point; rien de récoltable.
+DECOR_6 = [
+    # ferme (220, 162): le potager de la ferme se clôt côté pré (les poules et les bêtes n'y entrent pas) et reste
+    # ouvert sur le chemin des Champs, où l'on charge les cageots. Les pierres sorties du labour s'entassent au bord.
+    *[('ferme', 'cloture-potager-n%d' % _i, 'cloture', _x, 152.5, 0, "la clôture du potager de la ferme, côté pré: les bêtes n'y entrent pas")
+      for _i, _x in enumerate((211, 213, 215, 217, 219, 221), 1)],
+    ('ferme', 'cloture-potager-e1', 'cloture', 222.5, 154, 1, "la clôture du potager, côté est"),
+    ('ferme', 'cloture-potager-e2', 'cloture', 222.5, 156, 1, "la clôture du potager, côté est; le côté du chemin reste ouvert"),
+    ('ferme', 'cloture-potager-o1', 'cloture', 209.5, 154, 1, "la clôture du potager, côté de la cour"),
+    ('ferme', 'cloture-potager-o2', 'cloture', 209.5, 156, 1, "la clôture du potager, côté de la cour"),
+    ('ferme', 'herbes-pre-1', 'herbes-hautes', 224.5, 149.5, 0, "l'herbe haute du pré, que la faux n'a pas encore prise"),
+    ('ferme', 'buisson-pre-1', 'buisson', 229.5, 149.5, 0, "un buisson de la haie vive qui borde le pré au nord"),
+    ('ferme', 'buisson-pre-2', 'buisson', 232.5, 150.5, 0, "la haie vive du pré"),
+    ('ferme', 'epierrage-1', 'rocher', 224.5, 153.5, 0, "le tas d'épierrage: les pierres sorties du champ, au coin du potager"),
+    ('ferme', 'epierrage-2', 'rocher-moussu', 225.5, 153.5, 0, "le tas d'épierrage, les plus vieilles pierres moussues"),
+    ('ferme', 'epierrage-3', 'rocher', 224.5, 154.5, 0, "le tas d'épierrage"),
+    ('ferme', 'herbes-pre-2', 'herbes-hautes', 230.5, 153.5, 0, "l'herbe haute du pré"),
+    ('ferme', 'herbes-pre-3', 'herbes-hautes', 228.5, 151.5, 0, "l'herbe haute du pré"),
+    ('ferme', 'bloc-pre', 'gros-rocher-moussu', 210, 167, 0, "le bloc que la charrue contourne depuis toujours, au coin du pré"),
+    ('ferme', 'herbes-labour-1', 'herbes-hautes', 212.5, 167.5, 0, "l'herbe haute de la tournière, au bout des sillons"),
+    ('ferme', 'herbes-labour-2', 'herbes-hautes', 211.5, 169.5, 0, "l'herbe haute de la tournière"),
+    ('ferme', 'herbes-labour-3', 'herbes-hautes', 209.5, 171.5, 0, "l'herbe haute du pré"),
+    ('ferme', 'herbes-labour-4', 'herbes-hautes', 211.5, 173.5, 0, "l'herbe haute du pré"),
+    ('ferme', 'buisson-labour-1', 'buisson', 209.5, 163.5, 0, "un buisson au bord du chemin, à l'angle du pré"),
+    ('ferme', 'buisson-labour-2', 'buisson', 213.5, 172.5, 0, "un buisson au bout du labour"),
+    ('ferme', 'epierrage-4', 'rocher', 213.5, 166.5, 0, "les pierres jetées hors du labour, au bord du champ"),
+    ('ferme', 'epierrage-5', 'rocher-moussu', 213.5, 167.5, 0, "les pierres jetées hors du labour"),
+    # talus (196, 141.5): l'arrière du logis, la pente vers la rivière.
+    ('talus', 'buisson-berge-1', 'buisson', 187.5, 140.5, 0, "un buisson de berge en haut du talus, les racines dans la pente"),
+    ('talus', 'herbes-berge-1', 'herbes-hautes', 189.5, 140.5, 0, "l'herbe haute du haut de la berge, que personne ne fauche"),
+    ('talus', 'herbes-berge-2', 'herbes-hautes', 196.5, 140.5, 0, "l'herbe haute du haut de la berge"),
+    ('talus', 'herbes-berge-3', 'herbes-hautes', 200.5, 140.5, 0, "l'herbe haute du haut de la berge"),
+    ('talus', 'herbes-berge-4', 'herbes-hautes', 203.5, 141.5, 0, "l'herbe haute du haut de la berge"),
+    ('talus', 'bloc-talus', 'gros-rocher-moussu', 190, 144, 0, "un bloc moussu à mi-pente, tombé du talus il y a longtemps"),
+    ('talus', 'rocher-talus', 'rocher', 193.5, 146.5, 0, "une pierre du talus"),
+    ('talus', 'herbes-talus-1', 'herbes-hautes', 187.5, 146.5, 0, "l'herbe haute de la pente"),
+    ('talus', 'herbes-talus-2', 'herbes-hautes', 191.5, 148.5, 0, "l'herbe haute de la pente"),
+    ('talus', 'herbes-talus-3', 'herbes-hautes', 196.5, 147.5, 0, "l'herbe haute de la pente"),
+    ('talus', 'buisson-talus', 'buisson', 199.5, 143.5, 0, "un buisson au coin du logis, côté rivière"),
+    ('talus', 'buches-pignon', 'tas-de-buches', 199.5, 148.5, 0, "les bûches empilées contre le pignon ouest du logis"),
+    ('talus', 'baquet-margot', 'baquet', 202, 143.5, 0, "le baquet de lessive de Margot, en haut de la berge: elle rince à la rivière"),
+    # clôture (151, 101.5): le pré des cheminots le long de la voie.
+    ('cloture', 'tonneau-cheminots', 'tonneau', 147.5, 102.5, 0, "le tonneau d'eau de pluie du jardin des cheminots"),
+    ('cloture', 'herbes-voie-1', 'herbes-hautes', 149.5, 100.5, 0, "l'herbe haute au pied de la clôture de la voie, où la faux ne passe pas"),
+    ('cloture', 'herbes-voie-2', 'herbes-hautes', 154.5, 100.5, 0, "l'herbe haute au pied de la clôture"),
+    ('cloture', 'herbes-voie-3', 'herbes-hautes', 155.5, 101.5, 0, "l'herbe haute au pied de la clôture"),
+    ('cloture', 'buisson-cheminots', 'buisson', 159.5, 101.5, 0, "un buisson qui ferme le pré à l'est"),
+    ('cloture', 'rocher-cheminots', 'rocher', 153.5, 103.5, 0, "une borne de pierre oubliée par la Compagnie"),
+    ('cloture', 'caisse-cheminots', 'caisse', 150.5, 103.5, 0, "une caisse de la Compagnie qui sert de table au jardin"),
+    ('cloture', 'herbes-cheminots-1', 'herbes-hautes', 151.5, 104.5, 0, "l'herbe haute du pré des cheminots"),
+    ('cloture', 'herbes-cheminots-2', 'herbes-hautes', 157.5, 104.5, 0, "l'herbe haute du pré des cheminots"),
+    ('cloture', 'herbes-cheminots-3', 'herbes-hautes', 143.5, 103.5, 0, "l'herbe haute au bord du jardin"),
+    # berge (195.5, 127.2): la grève et le bout de la tonnelle.
+    ('berge', 'herbes-greve-1', 'herbes-hautes', 194.5, 129.5, 0, "une touffe de joncs au bord de l'eau"),
+    ('berge', 'herbes-greve-2', 'herbes-hautes', 198.5, 129.5, 0, "une touffe de joncs au bord de l'eau"),
+    ('berge', 'buisson-tonnelle', 'buisson', 199.5, 123.5, 0, "un sureau au coin de la tonnelle, côté rivière"),
+    # orée (104, 90): le sous-bois au nord de la voie passe à la forêt par des buissons et des pierres moussues; la
+    # friche du garage, à l'ouest, garde ses herbes et ses ronciers bas.
+    ('oree', 'buisson-oree-1', 'buisson', 101.5, 87.5, 0, "un buisson de l'orée: la forêt gagne sur le sous-bois"),
+    ('oree', 'buisson-oree-2', 'buisson', 104.5, 86.5, 0, "un buisson de l'orée"),
+    ('oree', 'buisson-oree-3', 'buisson', 108.5, 87.5, 0, "un buisson de l'orée"),
+    ('oree', 'buisson-oree-4', 'buisson', 112.5, 86.5, 0, "un buisson de l'orée"),
+    ('oree', 'herbes-oree-1', 'herbes-hautes', 102.5, 84.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'herbes-oree-2', 'herbes-hautes', 106.5, 83.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'herbes-oree-3', 'herbes-hautes', 110.5, 84.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'herbes-oree-4', 'herbes-hautes', 114.5, 83.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'herbes-oree-5', 'herbes-hautes', 103.5, 80.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'herbes-oree-6', 'herbes-hautes', 108.5, 80.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'herbes-oree-7', 'herbes-hautes', 112.5, 80.5, 0, "l'herbe haute du sous-bois"),
+    ('oree', 'bloc-oree', 'gros-rocher-moussu', 106, 86, 0, "un bloc moussu au pied de la forêt"),
+    ('oree', 'rocher-oree-1', 'rocher-moussu', 110.5, 82.5, 0, "une pierre moussue du sous-bois"),
+    ('oree', 'rocher-oree-2', 'rocher-moussu', 101.5, 81.5, 0, "une pierre moussue du sous-bois"),
+    ('oree', 'buches-oree', 'tas-de-buches', 114.5, 87.5, 0, "les bûches d'une ancienne coupe, laissées à sécher au bord du bois"),
+    ('oree', 'herbes-friche-1', 'herbes-hautes', 94.5, 85.5, 0, "l'herbe haute de la friche du garage"),
+    ('oree', 'herbes-friche-2', 'herbes-hautes', 97.5, 87.5, 0, "l'herbe haute de la friche du garage"),
+    ('oree', 'herbes-friche-3', 'herbes-hautes', 95.5, 90.5, 0, "l'herbe haute de la friche du garage"),
+    ('oree', 'herbes-friche-4', 'herbes-hautes', 98.5, 92.5, 0, "l'herbe haute de la friche du garage"),
+    ('oree', 'buisson-friche-1', 'buisson', 93.5, 88.5, 0, "un buisson de la friche"),
+    ('oree', 'buisson-friche-2', 'buisson', 96.5, 84.5, 0, "un buisson de la friche"),
+    ('oree', 'rocher-friche', 'rocher', 98.5, 89.5, 0, "un rocher laissé là quand on a tracé la voie, dans la friche"),
+]
+for _v, _i, _t, _x, _y, _r, _pq in DECOR_6:
+    mob(_i, _t, _MODELES[_t], _x, _y, _r, _pq, acte=1 if _v in ('berge', 'rue-du-bourg', 'cloture') else 2 if _v == 'oree' else 3)
+    M_[-1]['vue'] = _v
+
+
 # ================================================================ calculs
 def dist(a, b):
     return math.hypot(N[a]['x'] - N[b]['x'], N[a]['y'] - N[b]['y'])
@@ -1640,7 +1879,10 @@ def tableaux(dist_t, dens):
                 for xx in range(c[0], c[0] + c[2]):
                     grille[yy][xx] = '#'
         # Toute l'emprise du meuble, telle que le jeu la bloque (centre, taille du type, rotation).
+        # Un objet posé sur un meuble (`on`) ne prend pas de case: il est listé avec son porteur.
         for m in i['meubles']:
+            if m.get('on') is not None:
+                continue
             for xx, yy in emprise(m):
                 if 0 <= yy < i['hauteur'] and 0 <= xx < i['largeur']:
                     grille[yy][xx] = (m['type'] or m['modele'])[0].upper()
@@ -1652,7 +1894,8 @@ def tableaux(dist_t, dens):
             grille[int(e['y'])][int(e['x'])] = 'E'
         it += ['', '```text'] + [' '.join(r) for r in grille] + ['```', '',
                'Pièces: ' + '; '.join('%s (%d x %d)' % (n, r[2], r[3]) for n, r in i['pieces']) + '. Meubles: ' +
-               (', '.join('%s (%s)' % (m['id'], m['type'] or m['modele'] + ', à créer') for m in i['meubles']) or 'aucun') + '. Points: ' +
+               (', '.join('%s (%s%s)' % (m['id'], m['type'] or m['modele'] + ', à créer', ', sur ' + m['on'] if m.get('on') else '')
+                          for m in i['meubles']) or 'aucun') + '. Points: ' +
                (', '.join('%s (%s%s)' % (q['id'], q['role'], ', ' + q['qui'] if q['qui'] else '') for q in i['points']) or 'aucun') + '.', '']
     t['interieurs'] = it
     t['ordre_histoire'] = ['| Acte | Étape (fiche) | Verrous levés | Zone ouverte | Ce qui s’ouvre sur la carte |', '|---|---|---|---|---|'] + [

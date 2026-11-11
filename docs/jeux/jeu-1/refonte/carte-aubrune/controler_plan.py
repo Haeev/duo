@@ -139,12 +139,152 @@ def fiches_meubles():
     return _FICHES
 
 
+_MANIFESTE = None
+
+
+def manifeste():
+    global _MANIFESTE
+    if _MANIFESTE is None:
+        f = os.path.join(ICI, '..', '..', '..', '..', '..', 'games', 'la-petite-ligne-2', 'assets', 'commun', 'decors', 'decors.json')
+        _MANIFESTE = json.load(open(f, encoding='utf-8'))['models']
+    return _MANIFESTE
+
+
+# Le rendu décale une fenêtre derrière tout volume de 1,3 m et plus à 0,75 m d'un mur (`tallObject`, `spanAlong`).
+HAUT_FENETRE, PORTEE_FENETRE = 1.3, 0.75
+
+
+_BORNES = {}
+
+
+def bornes_glb(modele):
+    """(xmin, zmin, xmax, zmax) du modèle dans son repère, lus dans le GLB (bornes des sommets de chaque maillage,
+    transformées par les nœuds): un comptoir n'est pas centré sur son origine (le zinc déborde côté client)."""
+    if modele in _BORNES:
+        return _BORNES[modele]
+    import struct
+    s = manifeste()[modele]
+    f = os.path.join(ICI, '..', '..', '..', '..', '..', 'games', 'la-petite-ligne-2', 'assets', 'commun', 'decors', s['file'])
+    b = open(f, 'rb').read()
+    js = json.loads(b[20:20 + struct.unpack_from('<I', b, 12)[0]])
+
+    def mat(n):
+        t = n.get('translation', [0, 0, 0]); x, y, z, w = n.get('rotation', [0, 0, 0, 1]); sc = n.get('scale', [1, 1, 1])
+        r = [[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+             [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+             [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]]
+        return lambda p: [sum(r[i][j] * p[j] * sc[j] for j in range(3)) + t[i] for i in range(3)]
+
+    pts = []
+
+    def visiter(i, f):
+        n = js['nodes'][i]
+        g = mat(n)
+        h = lambda p: f(g(p))
+        if 'mesh' in n:
+            for prim in js['meshes'][n['mesh']]['primitives']:
+                a = js['accessors'][prim['attributes']['POSITION']]
+                for cx in (a['min'][0], a['max'][0]):
+                    for cy in (a['min'][1], a['max'][1]):
+                        for cz in (a['min'][2], a['max'][2]):
+                            pts.append(h([cx, cy, cz]))
+        for c in n.get('children', []):
+            visiter(c, h)
+    visiter([i for i, n in enumerate(js['nodes']) if n.get('name') == modele][0], lambda p: p)
+    _BORNES[modele] = (min(p[0] for p in pts), min(p[2] for p in pts), max(p[0] for p in pts), max(p[2] for p in pts))
+    return _BORNES[modele]
+
+
+def modele_de(m):
+    """Le modèle que le rendu dessine: celui de la fiche du type (le `modele` du plan n'est qu'une indication)."""
+    return fiches_meubles()[m['type']]['model']
+
+
+def boite_modele(m):
+    """Boîte au sol (x0, y0, x1, y1) du modèle d'un meuble posé, dans le repère de la pièce (origine du modèle au
+    centre de l'objet; gx le long du meuble, gz vers sa façade)."""
+    a = m['rotation'] * math.pi / 2
+    ca, sa = round(math.cos(a)), round(math.sin(a))
+    xmin, zmin, xmax, zmax = bornes_glb(modele_de(m))
+    coins = [(xmin, zmin), (xmax, zmax)]
+    pts = [(m['x'] + gx * ca + gz * sa, m['y'] - gx * sa + gz * ca) for gx in (coins[0][0], coins[1][0]) for gz in (coins[0][1], coins[1][1])]
+    return (min(p[0] for p in pts), min(p[1] for p in pts), max(p[0] for p in pts), max(p[1] for p in pts))
+
+
+def controler_poses(it):
+    """Objets posés sur un meuble (`on`, version 6): fiche sans brique et non solide; porteur dans la même pièce, avec
+    un plateau (`top`); centre dans la boîte du modèle du porteur (sinon il flotte au bord), pas dans un autre objet
+    posé; et rien de 1,3 m ou plus (plateau compris) à 0,75 m d'un mur, sauf au droit d'un porteur aussi haut: le
+    rendu y décalerait une fenêtre."""
+    err = []
+    F = fiches_meubles()
+    M = manifeste()
+    W, H = it['largeur'], it['hauteur']
+    par_id = {m['id']: m for m in it['meubles']}
+
+    def hauteur(m, n=0):
+        on = m.get('on')
+        if on is None:
+            return 0.0
+        if isinstance(on, (int, float)):
+            return float(on)
+        p = par_id.get(on)
+        if p is None or n > 3 or (F.get(p['type']) or {}).get('top') is None:
+            return None
+        h = hauteur(p, n + 1)
+        return None if h is None else h + F[p['type']]['top']
+
+    def murs(x0, y0, x1, y1):
+        return [k for k, g in (('nord', y0), ('ouest', x0), ('sud', H - y1), ('est', W - x1)) if g <= PORTEE_FENETRE]
+
+    poses = [m for m in it['meubles'] if m.get('on') is not None]
+    for m in poses:
+        quoi = "intérieur %s: objet posé %s" % (it['id'], m['id'])
+        f = F.get(m['type'])
+        if f is None:
+            err.append("%s: type %s sans fiche" % (quoi, m['type']))
+            continue
+        if f.get('bricks') or f.get('solid'):
+            err.append("%s: un objet posé est du décor (ni brique, ni solide)" % quoi)
+        base = hauteur(m)
+        if base is None:
+            err.append("%s: porteur %s absent de la pièce, sans plateau ou chaîne trop longue" % (quoi, m['on']))
+            continue
+        p = par_id.get(m['on']) if isinstance(m['on'], str) else None
+        if p is not None:
+            x0, y0, x1, y1 = boite_modele(p)
+            if not (x0 <= m['x'] <= x1 and y0 <= m['y'] <= y1):
+                err.append("%s: centre (%.2f, %.2f) hors du plateau de %s (%.2f..%.2f, %.2f..%.2f)" % (quoi, m['x'], m['y'], p['id'], x0, x1, y0, y1))
+        total = base + M[modele_de(m)]['size']['h']
+        if total >= HAUT_FENETRE:
+            pres = murs(m['x'] - 0.5, m['y'] - 0.5, m['x'] + 0.5, m['y'] + 0.5)
+            if pres:
+                couvert = p is not None and M[modele_de(p)]['size']['h'] >= HAUT_FENETRE
+                if couvert:
+                    t = F[p['type']]['size']
+                    w, h = (t['w'], t['h']) if p['rotation'] % 2 == 0 else (t['h'], t['w'])
+                    couvert = abs(m['x'] - p['x']) <= (w - 1) / 2 + 1e-6 and abs(m['y'] - p['y']) <= (h - 1) / 2 + 1e-6
+                if not couvert:
+                    err.append("%s: monte à %.2f m à moins de %.2f m du mur %s (le rendu y décalerait une fenêtre)" % (quoi, total, PORTEE_FENETRE, '/'.join(pres)))
+    for i, a in enumerate(poses):
+        for b in poses[i + 1:]:
+            if a['on'] != b['on']:
+                continue
+            ra = max(M[modele_de(a)]['size']['w'], M[modele_de(a)]['size']['d']) / 2
+            rb = max(M[modele_de(b)]['size']['w'], M[modele_de(b)]['size']['d']) / 2
+            if math.hypot(a['x'] - b['x'], a['y'] - b['y']) < 0.8 * (ra + rb):
+                err.append("intérieur %s: %s et %s se chevauchent sur %s" % (it['id'], a['id'], b['id'], a['on']))
+    return err
+
+
 def controler_habillage(it):
     """Petits objets d'une pièce (couches `floor`, `rug`, `wall` des fiches): un objet mural pend à un mur debout
     (la caméra regarde du sud-ouest: mur nord en rotation 0, mur est en rotation 3), hors d'une cloison; un objet
-    de plateau (`top`) n'est pas posé tant que le rendu ne sait pas l'élever; rien sur un point, rien dans les deux
-    cases devant une porte ou un escalier (1,5 m libres), rien dans l'emprise d'un meuble encore sans modèle."""
-    err = []
+    de plateau (`top`) est posé sur un meuble (`on`, contrôlé par `controler_poses`); rien sur un point, rien dans
+    les deux cases devant une porte ou un escalier (1,5 m libres), rien dans l'emprise d'un meuble encore sans modèle."""
+    err = controler_poses(it)
+    ids = [m['id'] for m in it['meubles']]
+    err += ["intérieur %s: identifiant %s en double" % (it['id'], i) for i in sorted({i for i in ids if ids.count(i) > 1})]
     F = fiches_meubles()
     W, H = it['largeur'], it['hauteur']
     cloison = {(x, y) for cx, cy, cw, ch in it['cloisons'] for x in range(cx, cx + cw) for y in range(cy, cy + ch)}
@@ -160,12 +300,16 @@ def controler_habillage(it):
             reserve |= {(int(m['x']) + i, int(m['y']) + j) for i in (-1, 0) for j in (-1, 0)} | {(int(m['x']), int(m['y']))}
     for m in it['meubles']:
         deco = (F.get(m['type']) or {}).get('deco')
+        if m.get('on') is not None:
+            continue
+        if deco is None and 'pourquoi' in m and (F.get(m['type']) or {}).get('size'):
+            deco = {'layer': 'floor'}
         if not deco or 'pourquoi' not in m:
             continue
         c = (int(m['x']), int(m['y']))
         quoi = "intérieur %s: objet %s" % (it['id'], m['id'])
         if deco['layer'] == 'top':
-            err.append("%s: objet de plateau, le rendu ne sait pas encore le poser sur un meuble" % quoi)
+            err.append("%s: objet de plateau posé au sol: lui donner son porteur (`on`)" % quoi)
         elif deco['layer'] == 'wall':
             if not ((c[1] == 0 and m['rotation'] == 0) or (c[0] == W - 1 and m['rotation'] == 3)):
                 err.append("%s: objet mural hors d'un mur debout (nord en rotation 0, est en rotation 3)" % quoi)
@@ -1002,7 +1146,8 @@ def controler_gabarit_interieurs(L, prives=frozenset()):
     for o in L.objets:
         t = L.types[o['type']]
         w, h = (t['w'], t['h']) if o['rotation'] % 2 == 0 else (t['h'], t['w'])
-        if o['salle'] and len(o['cases']) != w * h:
+        # Un objet posé sur un meuble (`on`) ne bloque rien: il se place où le plateau le porte.
+        if o['salle'] and len(o['cases']) != w * h and o.get('on') is None:
             ax, ay = L.salles[o['salle']][:2]
             err.append("meuble « %s » (%s, %d x %d) dans « %s »: posé à cheval (%g; %g), il bloque %d cases" % (
                 o['id'], o['type'], w, h, o['salle'], o['x'] - ax, o['y'] - ay, len(o['cases'])))
@@ -1203,6 +1348,25 @@ def eprouver(d):
     def porte_mal_gabaritee(c):
         bat(c, 'forge')['gabarit']['facade_porte'] = 'nord'
 
+    def piece(c, i):
+        return next(it for it in c['interieurs'] if it['id'] == i)
+
+    def objet_de(c, salle, i):
+        return next(m for m in piece(c, salle)['meubles'] if m['id'] == i)
+
+    def lampe_au_bord(c):
+        objet_de(c, 'maison-rdc', 'maison-rdc-lampe')['y'] = 0.95
+
+    def lampe_sur_la_chaise(c):
+        objet_de(c, 'maison-rdc', 'maison-rdc-lampe')['on'] = 'maison-chaise-1'
+
+    def bouquet_contre_la_fenetre(c):
+        objet_de(c, 'cafe', 'cafe-pendule').update(x=4.3, y=1.2)
+        objet_de(c, 'cafe', 'cafe-comptoir').update(y=0.5)
+
+    def pain_sur_la_lampe(c):
+        objet_de(c, 'maison-rdc', 'maison-rdc-pain').update(x=7.38, y=0.32)
+
     essais = [("porte du lavoir côté ru", lavoir_cote_riviere, "tourne le dos"), ("carré d'eau au milieu de rien", carre_d_eau, "isolé"),
               ("ru qui n'arrive nulle part", ru_coupe, "exutoire"), ("chemin en impasse", impasse, "impasse sans raison"),
               ("pont retiré", sans_pont, "dans l'eau"), ("passage à niveau retiré", sans_pn, "sans passage à niveau"),
@@ -1218,7 +1382,11 @@ def eprouver(d):
               ("salle de la maison murée (signalement 2)", salle_fermee_maison, "porte « maison-rdc-esc-maison-cave »"),
               ("escalier du moulin qui fait arriver dans le mur", escalier_dans_le_mur, "hors de « moulin-etage »"),
               ("chaise du café à cheval sur quatre cases", chaise_a_cheval, "posé à cheval"),
-              ("baie de 1 m vers l'escalier de l'épicerie", baie_d_un_metre, "pas de passage de 2 m")]
+              ("baie de 1 m vers l'escalier de l'épicerie", baie_d_un_metre, "pas de passage de 2 m"),
+              ("lampe au bord de la table, hors du plateau", lampe_au_bord, "hors du plateau"),
+              ("lampe posée sur une chaise", lampe_sur_la_chaise, "sans plateau"),
+              ("pendule du zinc contre le mur nord", bouquet_contre_la_fenetre, "décalerait une fenêtre"),
+              ("corbeille posée dans la lampe", pain_sur_la_lampe, "se chevauchent")]
     res = [casse(*e) for e in essais]
     print("banc d'épreuve: %d casses vues sur %d" % (sum(res), len(res)))
     return all(res)

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "tas-de-buches",
+  "name": "Tas de bûches",
+  "model": "log-pile",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

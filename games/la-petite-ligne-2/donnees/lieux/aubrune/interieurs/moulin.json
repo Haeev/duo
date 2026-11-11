@@ -51,6 +51,36 @@
       "x": 5.5,
       "y": 0.5,
       "rotation": 0
+    },
+    {
+      "id": "moulin-caisse",
+      "type": "caisse",
+      "x": 5.5,
+      "y": 6.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-tonneau",
+      "type": "tonneau",
+      "x": 6.5,
+      "y": 4.5,
+      "rotation": 0
+    },
+    {
+      "id": "moulin-lampe",
+      "type": "lampe-a-petrole",
+      "x": 6.5,
+      "y": 6.3,
+      "rotation": 3,
+      "on": "moulin-sacs"
+    },
+    {
+      "id": "moulin-moutures",
+      "type": "pile-de-livres",
+      "x": 6.5,
+      "y": 6.7,
+      "rotation": 3,
+      "on": "moulin-sacs"
     }
   ],
   "doors": {

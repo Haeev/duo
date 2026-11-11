@@ -100,6 +100,29 @@
       "x": 0.5,
       "y": 5.5,
       "rotation": 0
+    },
+    {
+      "id": "atelier-basile-chevilles",
+      "type": "caisse",
+      "x": 6.5,
+      "y": 0.5,
+      "rotation": 0
+    },
+    {
+      "id": "atelier-basile-carnet",
+      "type": "pile-de-livres",
+      "x": 3.93,
+      "y": 0.3,
+      "rotation": 0,
+      "on": "basile-etabli"
+    },
+    {
+      "id": "atelier-basile-lampe",
+      "type": "lampe-a-petrole",
+      "x": 3.23,
+      "y": 0.35,
+      "rotation": 0,
+      "on": "basile-etabli"
     }
   ],
   "doors": {

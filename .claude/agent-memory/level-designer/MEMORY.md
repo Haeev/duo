@@ -149,7 +149,7 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Tout objet de 1,3 m et plus (`tallObject`) collé à un mur masque la fenêtre de son pan (emprise de la case + 0,08): elle glisse ou disparaît. Le balai (1,4 m) compte. Relevé jetable des fenêtres: vitest `--dir` qui appelle `describePlace`, `doorSills`, `roomFacades` (avec `new PlaceBuildings(undefined, () => new Promise(() => undefined))`) et `roomPlan`; comparer avant et après.
 - Un comptoir d'une case a son client sur la case devant lui (`postes-habitants`): rien de solide là. Toute case pleine dans une rangée de cuisine de 1 m peut enfermer la cuisinière: relancer `controler_plan.py` (règle d'accès) après chaque objet solide.
 - Un identifiant d'objet qui finit par `-tapis` passe pour le paillasson d'une porte (`tests/rendu/chargement.test.ts` compte les volumes): nommer un tapis posé `<pièce>-tapis-de-sol`.
-- Dehors, seuls les types de `donnees/commun/meubles` se posent; rochers, buissons, herbes, tonneau, caisse, puits ont un modèle mais pas de type: les demander, ne pas détourner un type récoltable (`caillou`, `branches`, `tas-de-bois` à brique `gather`).
+- Dehors, seuls les types de `donnees/commun/meubles` se posent; ne pas détourner un type récoltable (`caillou`, `branches`, `tas-de-bois` à brique `gather`). Types de décor sans récolte depuis le 2026-11-11: `rocher(-moussu)`, `gros-rocher(-moussu)`, `buisson` (modèle sans baies), `herbes-hautes`, `tonneau`, `caisse`, `banc-de-ferme`, `tas-de-buches`, `puits`, `abreuvoir-de-pierre`, `baquet`, `cloture`.
 
 ## Ce que le rendu lit vraiment (Aubrune, vérifié le 2026-11-11)
 
@@ -157,3 +157,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Repère: sa nature (`kind`) doit avoir une entrée de `LANDMARK_LOOKS` (`reglages-files.ts`, données), sinon il devient arbre ou tour. Les repères ne bloquent aucune case.
 - Assises: un banc à `seats: 2` partage sa largeur; chaque joueur prend la première place libre, et deux bancs face à face numérotent en miroir: deux joueurs seuls sur leurs bancs se retrouvent en diagonale (0,5 m). Les données n'y peuvent rien sans meuble à cheval.
 - Le garde-fou de la copie isolée refuse les heredocs et les `git` enchaînés: scripts écrits avec Write dans le dossier temporaire, lancés avec `python3 -I`; remplacements de texte comptés (nombre attendu par motif) pour ne rien toucher par accident.
+
+## Poser sur un meuble (champ `on`, Aubrune version 6, vérifié le 2026-11-11)
+
+- Le validateur du jeu ne contrôle que la case du porteur; le modèle est plus petit (table 1,40 x 0,80 sur deux cases) et pas toujours centré sur son origine (comptoirs: z de -0,43 à +0,25, le zinc déborde côté client). Lire les bornes dans le GLB: `accessors[POSITION].min/max` transformés par les nœuds (sans lire les sommets).
+- Les comptoirs livrés portent déjà leur décor (balance, cafetière, miches, coupons): relever les triangles au-dessus de `top` en vue de dessus (grille de 5 cm, triangles échantillonnés, pas seulement les sommets) et poser sur le reste. L'étagère murale et le vaisselier sont pleins ou trop profonds de 0,1 m: rien dessus.
+- Fenêtres: le rendu passe `base + height` au relevé des murs (`moteur.ts`, obstacles de `TiledPlace`) avec l'emprise de la fiche (1 x 1 autour du centre): un objet posé de 1,3 m et plus (pendule ou bouquet sur un comptoir) à 0,75 m d'un mur décale la fenêtre.
+- `tabouret-de-ferme` a la brique `sit`: rien dessus. Une `caisse` (plateau 0,60 m) fait un chevet honnête.
+- Les tests qui déplacent un meuble pour casser l'accès (`tests/points-de-quete.test.ts`) doivent déplacer aussi ce qui est posé dessus, sinon le validateur refuse le lieu avant la casse.
+- Le contrôle « à cheval » de `controler_plan.py` et la grille ASCII des intérieurs doivent ignorer les objets posés (ils ne prennent pas de case).
+- Mesure d'une vue `ensemble-*` (lacet 0, largeur W): le sol couvre W x 0,97 W autour du centre; lacet 45: axes (x + y)/racine 2 à l'écran, (x - y)/racine 2 en profondeur. Compter la circulation (route, rue, chemin) comme pleine: on n'y pose rien.
