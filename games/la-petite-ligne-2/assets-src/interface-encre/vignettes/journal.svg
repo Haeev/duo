@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Journal: feuille imprimée, titre en bandeau noir, une gravure, des colonnes, un coin corné. -->
+  <g transform="rotate(7 48 52)">
+    <path id="page" d="M14 14 L80 10 L84 70 L72 84 L18 86 Z" fill="#F3EDE0"/>
+    <path data-clip="page" data-w="0" d="M62 6 Q90 50 50 92 L96 96 L96 6 Z" fill="#D9CAAE"/>
+    <path d="M19 18 L75 15 L75 27 L19 30 Z" fill="#231A17" data-w="0.4"/>
+    <g data-teinte="#F3EDE0" data-w="0.4" fill="none" stroke="#000">
+    <path d="M26 23.6 L30 23.4 M33 23.2 L44 22.6 M47 22.4 L52 22.2 M55 22 L68 21.4"/>
+    </g>
+    <path d="M21 34 L46 33 L46 50 L21 51 Z" fill="#B6A890" data-w="0.4"/>
+    <path data-w="0" d="M22 50 L28 42 L32 46 L38 38 L45 49 Z" fill="#7C705F"/>
+    <circle cx="40" cy="37" r="2" fill="#F5E6C6" data-w="0"/>
+    <g data-teinte="#4A4D52" data-w="0.32" fill="none" stroke="#000">
+    <path d="M21 56 L45 55.4 M21 61 L45 60.4 M21 66 L45 65.4 M21 71 L45 70.4 M21 76 L45 75.4 M21 81 L45 80.4 M50 36 L74 35.4 M50 41 L74 40.4 M50 46 L74 45.4 M50 51 L74 50.4 M50 56 L74 55.4 M50 61 L74 60.4 M50 66 L74 65.4 M50 71 L74 70.4"/>
+    </g>
+    <path d="M48 33 L49 84" fill="none" stroke="#000" data-w="0.3"/>
+    <path d="M84 70 L72 84 L70 72 Z" fill="#DDC59C" data-w="0.5"/>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Pots de grès: deux pots à saumure vernis brun en haut, une cruche. -->
+  <g>
+    <path id="p1" d="M14 36 Q8 60 16 86 L46 86 Q54 60 48 36 Z" fill="#CDBB96"/>
+    <path data-clip="p1" data-w="0" d="M36 30 Q52 60 38 92 L56 92 L56 30 Z" fill="#8F7F66"/>
+    <path data-clip="p1" data-w="0" d="M6 30 L56 30 L56 52 Q30 56 6 50 Z" fill="#8C5A35"/>
+    <path data-clip="p1" data-w="0" d="M16 54 Q18 46 22 42 Q20 52 21 64 Z" fill="#EADDBE"/>
+    <ellipse cx="31" cy="36" rx="17" ry="4.4" fill="#5E4233" data-w="0.6"/>
+    <ellipse cx="31" cy="36.6" rx="12" ry="2.6" fill="#4F3626" data-w="0"/>
+    <path id="p2" d="M48 56 Q44 72 50 88 L72 88 Q78 72 74 56 Z" fill="#CDBB96"/>
+    <path data-clip="p2" data-w="0" d="M66 52 Q78 72 66 92 L82 92 L82 52 Z" fill="#8F7F66"/>
+    <path data-clip="p2" data-w="0" d="M44 52 L80 52 L80 66 Q60 70 44 66 Z" fill="#8C5A35"/>
+    <ellipse cx="61" cy="56" rx="13" ry="3.4" fill="#5E4233" data-w="0.6"/>
+    <ellipse cx="61" cy="56.4" rx="9" ry="2" fill="#4F3626" data-w="0"/>
+    <path id="cruche" d="M72 60 Q66 46 72 36 L70 28 L84 28 L82 36 Q90 46 84 60 Q78 62 72 60 Z" fill="#EADDBE"/>
+    <path data-clip="cruche" data-w="0" d="M80 26 Q92 44 80 64 L94 64 L94 26 Z" fill="#8F7F66"/>
+    <path data-clip="cruche" data-w="0" d="M66 24 L90 24 L90 38 Q78 40 66 38 Z" fill="#8C5A35"/>
+    <path d="M70 29 L66 25 L72 27 Z" fill="#8C5A35" data-w="0.45"/>
+    <path d="M84 34 Q92 38 86 50" fill="none" stroke="#000" data-w="0.6"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M36 80 l4 -4 M40 80 l4 -4"/>
+    </g>
+  </g>
+</svg>

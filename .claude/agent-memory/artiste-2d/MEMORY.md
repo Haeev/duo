@@ -55,4 +55,6 @@
 
 - Le carnet montre une entrée par `itemThumb(thumb)`: `source.item` pour une recette (le plat), sinon l'id de l'entrée (insectes, trésors posés à la main). Planche: `planche-collections.cjs <dossier> <famille>` (44 px sombre et papier). Sachets de fleurs générés par `generer-sachets.mjs`.
 - Petites formes dans un sachet ou une fleur étoilée: `data-w` 0,5 sur la forme, sinon le contour plein en fait une tache noire à 44 px. Pas de `fill-opacity` dans les vignettes: peindre l'ombre avant les motifs, en ton opaque.
+- Objets d'intérieur (2026-11-11): dans `generer-meubles.py`, section « objets d'intérieur ». Un cadre évidé (`fill-rule="evenodd"`) ne découpe pas son ombre `data-clip` par le trou: peindre le cadre d'abord, la toile ensuite (avec `data-w` 0,5 pour réencrer le bord intérieur).
+- Une fleur vue de face à arcs symétriques (cœur de rose, pétales en croissant, ourlet clair dessous) se lit comme un visage qui fait la moue: dessiner la rose de trois quarts (coupe pâle, pétales intérieurs qui dépassent en désordre). Chiffres à lire (horaire): tracés en traits `data-w` 0,6 de 16 unités de haut, pas en petits traits teintés.
 - Un clou à tête ronde vu de face se lit loupe: montrer la tranche de la tête (ellipse sombre décalée) et une tige trapue en biseau. Insectes en diagonale: garder les pattes à moins de 40 du centre, sinon la rotation les coupe.

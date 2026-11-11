@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Rideau de porte: rideau rouge plissé sur sa tringle de laiton, retenu de côté par une embrasse moutarde. -->
+  <g>
+    <path d="M26 40 L58 92 L28 92 Z" fill="#231A17" data-w="0"/>
+    <path id="rideau" d="M10 15 L86 15 L86 91 L58 91 Q40 72 26 56 Q32 74 32 91 L13 91 Q17 72 22 56 Q12 36 10 15 Z" fill="#C5443D"/>
+    <g data-clip="rideau" data-w="0" fill="#8F3B34">
+    <path d="M24 14 L32 14 L28 50 L22 50 Z"/>
+    <path d="M44 14 L52 14 L56 62 L48 56 Z"/>
+    <path d="M64 14 L72 14 L74 92 L66 92 Z"/>
+    <path d="M80 14 L88 14 L88 92 L82 92 Z"/>
+    <path d="M24 62 L28 62 L30 92 L26 92 Z"/>
+    </g>
+    <g data-clip="rideau" data-teinte="#E0675A" data-w="0.32" fill="none" stroke="#000">
+    <path d="M16 18 Q18 34 20 48 M38 18 Q40 36 44 52 M58 18 L60 66 M76 18 L77 88"/>
+    </g>
+    <path d="M14 54 Q24 52 32 57 L31 62 Q22 58 15 59 Z" fill="#D4A33E" data-w="0.5"/>
+    <path d="M30 58 L34 68 L30 70 Z" fill="#D4A33E" data-w="0.4"/>
+    <path d="M6 11 L90 11 L90 15 L6 15 Z" fill="#C8A150" data-w="0.6"/>
+    <circle cx="6" cy="13" r="3" fill="#C8A150" data-w="0.45"/>
+    <circle cx="90" cy="13" r="3" fill="#C8A150" data-w="0.45"/>
+  </g>
+</svg>

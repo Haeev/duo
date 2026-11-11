@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Lumignon des fêtes: coquille d'œuf remplie de suif sur une soucoupe de terre cuite, flamme allumée. -->
+  <g>
+    <path id="soucoupe" d="M12 76 Q12 90 48 91 Q84 90 84 76 Z" fill="#AD6244"/>
+    <path data-clip="soucoupe" data-w="0" d="M60 70 Q78 84 48 96 L96 96 L96 70 Z" fill="#743D2B"/>
+    <ellipse cx="48" cy="76" rx="36" ry="9" fill="#D98C62" data-w="0.6"/>
+    <ellipse cx="48" cy="77" rx="27" ry="6" fill="#AD6244" data-w="0.35"/>
+    <path id="coquille" d="M30 76 Q25 58 32 47 L36 50 L40 44 L45 49 L50 43 L55 49 L60 44 L63 49 Q71 58 66 76 Q48 84 30 76 Z" fill="#F5E6C6"/>
+    <path data-clip="coquille" data-w="0" d="M56 40 Q74 60 56 84 L80 84 L80 40 Z" fill="#DDC59C"/>
+    <path data-clip="coquille" data-w="0" d="M33 64 Q33 56 37 52 Q36 60 37 70 Z" fill="#F7F3EA"/>
+    <g data-w="0" fill="#C7A877">
+    <circle cx="44" cy="64" r="0.9"/>
+    <circle cx="54" cy="70" r="0.8"/>
+    <circle cx="58" cy="60" r="0.9"/>
+    </g>
+    <path d="M35 49 Q48 54 61 49 Q55 46 48 46.6 Q41 46 35 49 Z" fill="#FFE6B0" data-w="0.35"/>
+    <path d="M48 48 L48 40" fill="none" stroke="#000" data-w="0.4"/>
+    <path d="M48 41 Q41 31 48 14 Q55 31 48 41 Z" fill="#FFC264" data-w="0.45"/>
+    <path data-w="0" d="M48 38 Q45 32 48 24 Q51 32 48 38 Z" fill="#FFE6B0"/>
+  </g>
+</svg>

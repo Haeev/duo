@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Horloge murale (régulateur): lunette de noyer, cadran d'émail cerclé de laiton, caisse vitrée, balancier. -->
+  <g>
+    <path d="M62 44 L68 40 L68 84 L62 88 Z" fill="#4F3626"/>
+    <path id="caisse" d="M34 44 L62 44 L62 88 L34 88 Z" fill="#5E4233"/>
+    <path d="M32 88 L64 88 L56 94 L40 94 Z" fill="#5E4233" data-w="0.6"/>
+    <path id="vitre" d="M38 49 L58 49 L58 83 L38 83 Z" fill="#2C3B57" data-w="0.5"/>
+    <path d="M47 48 L49 48 L49 70 L47 70 Z" fill="#C8A150" data-w="0.3"/>
+    <circle cx="48" cy="73" r="5.4" fill="#C8A150" data-w="0.45"/>
+    <circle cx="46.4" cy="71.4" r="1.6" fill="#F2C55C" data-w="0"/>
+    <path data-clip="vitre" data-w="0" d="M39 50 L46 50 L39 64 Z" fill="#587F8E"/>
+    <path d="M30 44 L66 44 L66 40 L30 40 Z" fill="#96704C" data-w="0.6"/>
+    <circle id="lunette" cx="48" cy="24" r="21" fill="#5E4233"/>
+    <path data-clip="lunette" data-w="0" d="M60 0 Q78 30 48 48 L80 48 L80 0 Z" fill="#4F3626"/>
+    <g data-clip="lunette" data-teinte="#96704C" data-w="0.32" fill="none" stroke="#000">
+    <path d="M31 18 Q36 8 46 5"/>
+    </g>
+    <circle cx="48" cy="24" r="16" fill="#C8A150" data-w="0.5"/>
+    <circle cx="48" cy="24" r="13.4" fill="#F7F3EA" data-w="0.35"/>
+    <g data-teinte="#231A17" data-w="0.32" fill="none" stroke="#000">
+    <path d="M48 12.6 L48 15.4 M48 32.6 L48 35.4 M36.6 24 L39.4 24 M56.6 24 L59.4 24"/>
+    </g>
+    <g data-w="0.55" fill="none" stroke="#000">
+    <path d="M48 24 L41.5 19.5 M48 24 L50.5 14"/>
+    </g>
+    <circle cx="48" cy="24" r="1.4" fill="#231A17" data-w="0"/>
+    <g data-w="0.35" fill="none" stroke="#000">
+    <path d="M63 82 l4 -4"/>
+    </g>
+  </g>
+</svg>

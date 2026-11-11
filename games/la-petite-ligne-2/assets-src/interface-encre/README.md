@@ -7,7 +7,8 @@
 - `generer-portraits.mjs`: écrit les sources des portraits composés depuis `portraits/fiches.json` (même trait que les portraits faits main, cinq expressions); `planche-portraits.cjs`: planche de tous les portraits d'habitants.
 - `generer-meubles.py`: écrit les sources des vignettes de meubles (même projection de trois quarts, séries de couleur miel et sauge); on modifie le script, pas ces SVG.
 - `planche-serie.cjs`: planches de la série des vignettes par famille (outils, poissons, potager, cuisine, provisions, meubles), en 96 et 48 px sur case sombre; `--grand` ajoute le 192 px.
-- `generer-sachets.mjs`: écrit les sources des sachets de graines de fleurs (`graines-<fleur>`: le sachet de `graines-radis`, une bande, la fleur en petit, les graines tombées); on modifie le script, pas ces SVG.
+- `generer-sachets.mjs`: écrit les sources des sachets de graines de fleurs et de légumes (`graines-<fleur>`, `graines-carotte`, `graines-poireau`: le sachet de `graines-radis`, une bande, la plante en petit, les graines tombées); on modifie le script, pas ces SVG.
+- `generer-meubles.py` écrit aussi les objets d'intérieur d'Aubrune (lampes, horloges, cadres, vaisselle, tapis, lumignon...), chacun dessiné d'après son modèle 3D (`assets-src/decors/recoltables-aubrune/interieurs.py`, `fetes.py`).
 - `planche-collections.cjs`: planches des vignettes des collections du carnet par famille (poissons, insectes, fleurs, graines, tresors, plats) en 192, 96 et 44 px (case de la barre du sac) sur case sombre, et en 44 px sur le papier du carnet.
 - `capturer.cjs`, `verifier.cjs`: captures et contrôles de l'interface (voir `src/interface/encre/README.md`).
 
