@@ -290,6 +290,9 @@ describe('migration des parties de la version 1', () => {
     expect(read.from).toBe(1);
     expect(read.world.schema).toBe(2);
     for (const p of [0, 1] as const) expect(lookRevealed(read.world, p)).toBe(true);
+    // Clés figées en littéral: la migration ne suit pas les réglages vivants.
+    expect(read.world.progress.memory['joueurs.apparence.j0']).toBeDefined();
+    expect(read.world.progress.memory['joueurs.apparence.j1']).toBeDefined();
     expect(read.world.players[0].look).toEqual(composed);
     expect(read.world.players[0].money).toBe(data.players[0].money);
     // Les faits d'avant sont gardés, et la migration ne touche pas à ce qu'on lui donne.

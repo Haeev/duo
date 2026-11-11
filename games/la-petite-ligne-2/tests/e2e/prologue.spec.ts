@@ -18,6 +18,7 @@ import {
   standSpots,
   seats,
   snapshot,
+  waitDialoguesClosed,
   walkBoth,
   actOn,
   calibrateYaw,
@@ -235,7 +236,7 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
     (w) => passed(w).includes('papiers'),
     60_000,
   );
-  await playUntil('dialogues fermés', () => true, 1);
+  await waitDialoguesClosed(duo, ctx);
   for (const side of [host, guest])
     if (!ctx.shown.has(`editeur:${side.who}`))
       journal.find(
@@ -279,7 +280,7 @@ test('P19 partie neuve: du train de nuit au quai d’Aubrune', async ({ browser 
       w.players.some((p) => p.toolbar.some((s) => s?.item === 'sandwich')),
     60_000,
   );
-  await playUntil('dialogue chariot fermé', () => true, 1);
+  await waitDialoguesClosed(duo, ctx);
   journal.lap('étape chariot (chercher le Contrôleur, sandwich)');
   journal.log(`sandwich: besoins ${JSON.stringify(gotSandwich.players.map((p) => p.needs))}`);
 
