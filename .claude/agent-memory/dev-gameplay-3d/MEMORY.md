@@ -710,3 +710,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le biais de l'ombre du soleil vaut 14 cm (0,0009 sur 160 m de profondeur): rien de plus bas ne porte d'ombre. Le sol en relief sort donc de la passe d'ombre (moins d'appels qu'avant), les rails passent dans les boîtes instanciées.
 - Sol par morceaux de 16 m plutôt que par tuile de 32 m: Three.js écarte par sphère englobante, quatre tuiles entières passaient pour une vue de 18 m. Le surcoût à l'écran a été divisé par deux pour trois appels de plus par tuile.
 - Banc de rendu: `packages/sdk-dev/dist` doit exister (`pnpm --filter @duo/sdk-dev build`), sinon « le faux hôte s'est arrêté (code 1) ». Pour capturer l'invité en `?rendu=aplats`: `onGuestPage` pose une route après celle de la sonde (la dernière posée gagne).
+
+## Récoltables à l'écran (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- `tests/plan-copie.test.ts` exige que `donnees/lieux/aubrune/plan.json` reste identique à `docs/jeux/jeu-1/refonte/carte-aubrune/plan.json`: ne pas retoucher la copie seule (et `globalSetup` des bancs e2e lance toute la suite: un écart casse la capture avant même le jeu).
+- Mesurer « avant » sans worktree de plus: copier ses fichiers dans le scratchpad (`cp --parents`), `git checkout HEAD -- <fichiers>`, construire et capturer, puis recopier. Vérifier par `git diff --stat` que le décompte est revenu au même.
+- Banc des captures sans relancer Vitest à chaque essai: une copie jetable de `tests/rendu-encre/playwright.config.ts` sans `globalSetup` (les sauvegardes de départ existent déjà), à supprimer à la fin.
+- Végétation semée en vrais modèles: environ 950 triangles par arbre contre 92 pour tronc et boule. Le bois le plus dense d'Aubrune passe de 237 k à 900 k triangles dessinés; instancier par morceau de 16 m (et non par tuile) ramène à 583 k pour 57 appels de plus.
+- Les légendes de terrain des grands lieux ont des natures sans entrée dans `GROUND_LOOKS` (prairie, friche, herbe-rase): lire leur surface par `GROUND_LOOKS[n] ?? DEFAULT_LOOK`, comme `surfaceAt`.
+- `Box3.setFromObject` sur l'objet posé donne une boîte d'occultation juste (variante, cap, échelle, état, relief), sans passer par le manifeste.

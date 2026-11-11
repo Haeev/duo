@@ -66,7 +66,6 @@ describe('décors livrés', () => {
       'aubrune-recoltes.glb',
       'furniture.glb',
       'houses.glb',
-      'plants.glb',
       'street.glb',
       'train.glb',
     ]);

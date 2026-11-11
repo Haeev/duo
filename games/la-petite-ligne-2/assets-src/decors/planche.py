@@ -1,6 +1,6 @@
 """Planche de contrôle des décors (Cycles): tous les modèles en grille, mannequin de 1,80 m.
 
-Usage: duo-python planche.py <dossier des GLB> <sortie.png> [famille de fichiers: furniture,street,plants,houses] [azimut]
+Usage: duo-python planche.py <dossier des GLB> <sortie.png> [famille de fichiers: furniture,street,houses] [azimut]
 Les modèles sont rangés par fichier, l'avant (sud) vers la caméra de trois quarts.
 """
 import math
@@ -12,7 +12,7 @@ from mathutils import Vector
 
 args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
 dossier, sortie = args[0], args[1]
-fichiers = args[2].split(",") if len(args) > 2 else ["furniture", "street", "plants", "houses"]
+fichiers = args[2].split(",") if len(args) > 2 else ["furniture", "street", "houses"]
 azimut = float(args[3]) if len(args) > 3 else -25.0
 
 bpy.ops.wm.read_factory_settings(use_empty=True)

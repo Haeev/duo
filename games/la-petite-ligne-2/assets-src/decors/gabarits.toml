@@ -302,54 +302,10 @@ id = "log-pile"
 famille = "buches"
 couleurs = { bois = "ecorce" }
 
-# ---------------------------------------------------------------- végétation (boules de mousse lisses)
-[[modeles]]
-id = "tree-round"
-famille = "arbre"
-hauteur = 5.5
-
-[[modeles]]
-id = "tree-fir"
-famille = "arbre"
-forme = "conique"
-hauteur = 6.0
-tronc = 1.0
-feuillage = "sapin"
-
-[[modeles]]
-id = "tree-apple"              # pommier: plus petit, quelques pommes sur le houppier (cueillette)
-famille = "arbre"
-hauteur = 4.0
-tronc = 1.5
-feuillage_clair = "herbe"
-fruits = [[0.7, -0.5, 0.0], [-0.6, -0.55, 0.15], [0.1, -0.85, -0.2], [0.55, 0.4, 0.4], [-0.3, -0.2, 0.75]]
-
-[[modeles]]
-id = "bush-round"
-famille = "buisson"
-
-[[modeles]]
-id = "bush-flowering"
-famille = "buisson"
-rayon = 0.45
-feuillage = "feuillage_sombre"
-feuillage_clair = "feuillage"
-fleur = "fleur_rose"
-fleurs = [[0.4, -0.75, 0.95], [-0.45, -0.6, 1.0], [0.0, -0.6, 1.25], [0.8, -0.2, 0.9], [-0.8, -0.3, 0.85], [0.2, -0.3, 1.5], [-0.25, 0.1, 1.55]]
-
-[[modeles]]
-id = "grass-tuft"
-famille = "touffe"
-couleur = "herbe_haute"
-
-[[modeles]]
-id = "flowers-poppy"
-famille = "fleurs"
-teintes = ["coquelicot", "moutarde", "craie"]
-
-[[modeles]]
-id = "stump"
-famille = "souche"
+# ---------------------------------------------------------------- végétation
+# Arbres, buissons, fleurs et souches du dehors: `recoltables-aubrune/recoltables.toml` (style
+# encré, états et variantes). Les familles `arbre`, `buisson`, `touffe`, `fleurs` et `souche`
+# d'ici n'ont plus de modèle.
 
 # ---------------------------------------------------------------- maisons (famille paramétrique)
 # largeur (X, est-ouest) et profondeur (Y) = emprise des murs; etages = niveaux pleins;

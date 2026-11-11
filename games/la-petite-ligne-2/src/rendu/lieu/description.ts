@@ -12,6 +12,8 @@ import { DOORS, doorSills, type Sill } from '../../donnees/seuils';
 import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { DECOR_MANIFEST } from './decors-manifeste';
+import { groundModelOf } from './recoltes';
+import { HARVEST_LOOK } from './reglages-recoltes';
 import { roomStyle } from './reglages-pieces';
 import { TILE_SETTINGS } from './reglages-tuiles';
 
@@ -49,6 +51,20 @@ export interface SceneVolume {
   readonly occludes: boolean;
   /** Peut être la cible de la touche d'action (son identifiant est celui de `PlayerState.aim`). */
   readonly aimable: boolean;
+  /**
+   * Point de la carte où se lit la hauteur du sol (relief); absent: le centre. Les cases d'un
+   * potager se posent ainsi à la hauteur du potager, pas chacune à la sienne.
+   */
+  readonly foot?: { readonly x: number; readonly y: number };
+  /** Forme provisoire commune à tous les volumes qui la demandent (`bundle`: ballot d'un objet au sol). */
+  readonly standIn?: 'bundle';
+  /** Échelle du modèle (un objet ramassé posé au sol); absente: 1. */
+  readonly scale?: number;
+  /**
+   * Volume dynamique sans visée ni effacement, posé en instance avec ceux du même modèle (un
+   * appel de dessin par modèle: les cases et les plants d'un potager).
+   */
+  readonly batch?: boolean;
 }
 
 export interface PlaceDescription {
@@ -251,21 +267,27 @@ export function describeDynamic(
       aimable: true,
     });
   }
+  const bundle = HARVEST_LOOK.ground.bundle;
   for (const item of state.ground) {
+    // Le modèle de ce qu'on a ramassé (une pierre, des branches), sinon un ballot: jamais un cube.
+    const model = groundModelOf(content, item.stack.item);
+    const size = model === null ? undefined : DECOR_MANIFEST.models[model]?.size;
+    const k = HARVEST_LOOK.ground.modelScale;
     volumes.push({
       id: `sol-${String(item.id)}`,
-      model: null,
+      model,
       x: item.x,
       y: item.y,
-      w: settings.itemSize,
-      h: settings.itemSize,
+      w: size === undefined ? bundle.w : size.w * k,
+      h: size === undefined ? bundle.d : size.d * k,
       rotation: 0,
       base: 0,
-      height: settings.itemSize,
+      height: size === undefined ? bundle.h : size.h * k,
       shape: 'box',
       color: settings.itemColor,
       occludes: false,
       aimable: false,
+      ...(model === null ? { standIn: 'bundle' as const } : { scale: k }),
     });
   }
   return volumes;

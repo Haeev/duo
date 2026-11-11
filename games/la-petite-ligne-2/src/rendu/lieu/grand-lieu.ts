@@ -20,8 +20,6 @@ import {
   type Material,
   MeshStandardMaterial,
   type Texture,
-  Quaternion,
-  Vector3,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -54,7 +52,7 @@ import {
   surfaceAt,
 } from './terrain-rendu';
 import type { BuildingSource } from './batiments';
-import { buildTile, crownBlob, type ModeledBuilding, type TileKit, TileView } from './tuile';
+import { buildTile, type ModeledBuilding, type TileKit, type TilePlants, TileView } from './tuile';
 import { TileRing, tileDistance, tileRect } from './tuiles';
 
 /** Compteurs du rendu par tuiles (construits, pas dessinés: la vue n'en montre qu'une partie). */
@@ -78,11 +76,7 @@ export interface TileStats {
   readonly geometries: number;
 }
 
-const matrix = new Matrix4();
 const hidden = new Matrix4().makeScale(0, 0, 0);
-const rotation = new Quaternion();
-const position = new Vector3();
-const scale = new Vector3();
 
 /** Géométrie unité à couleurs de sommets blanches (la couleur vient de l'instance). */
 function white(geometry: BufferGeometry): BufferGeometry {
@@ -116,7 +110,10 @@ function pebbleShape(): BufferGeometry {
 
 interface CrownFade {
   readonly view: TileView;
-  readonly index: number;
+  /** L'instance cachée pendant le fondu, et sa matrice à lui rendre. */
+  readonly source: InstancedMesh;
+  readonly slot: number;
+  readonly matrix: Matrix4;
   readonly mesh: Mesh;
   readonly material: FadeMaterial;
   opacity: number;
@@ -190,6 +187,8 @@ export class TiledPlace {
     delivered: { readonly place: string; readonly source: BuildingSource } | null = null,
     /** Meubles du lieu (emprises et hauteurs): une fenêtre ne s'ouvre pas derrière une armoire. */
     private readonly obstacles: readonly RoomObstacle[] = [],
+    /** Modèles livrés de la végétation semée (rendu encré); `null`: troncs et boules. */
+    plants: TilePlants | null = null,
   ) {
     this.ink = ink;
     this.delivered = delivered;
@@ -288,6 +287,7 @@ export class TiledPlace {
       buildings,
       models,
       relief: this.relief,
+      plants: ink === null ? null : plants,
       materials: {
         ground,
         water,
@@ -770,8 +770,7 @@ export class TiledPlace {
     const seen = new Set<string>();
     for (const feet of subjects) {
       for (const view of this.views.values()) {
-        const crowns = view.crowns;
-        if (crowns === null) continue;
+        if (view.crownSlots.length === 0) continue;
         const { x0, y0, x1, y1 } = tileRect(this.map, view.tile);
         if (
           feet.x < x0 - reach ||
@@ -797,7 +796,7 @@ export class TiledPlace {
           }
           if (!hit && fade === undefined) return;
           seen.add(key);
-          if (fade === undefined) this.startCrownFade(key, view, crowns, index);
+          if (fade === undefined) this.startCrownFade(key, view, index);
           else fade.hidden = hit;
         });
       }
@@ -816,39 +815,38 @@ export class TiledPlace {
     }
   }
 
-  private startCrownFade(key: string, view: TileView, crowns: InstancedMesh, index: number): void {
-    const tree = view.trees[index];
-    if (tree === undefined) return;
-    const blob = crownBlob(tree);
+  private startCrownFade(key: string, view: TileView, index: number): void {
+    const part = view.crownSlots[index];
+    if (part === undefined) return;
+    const saved = new Matrix4();
+    part.mesh.getMatrixAt(part.slot, saved);
     const material = this.fadeBase.clone();
-    material.color.set(blob.color);
+    material.color.set(part.color);
     material.transparent = true;
     material.depthWrite = false;
     material.opacity = 1;
-    const mesh = new Mesh(this.kit.shapes.blob, material);
-    mesh.position.set(blob.x, blob.y, blob.z);
-    mesh.scale.set(blob.rx, blob.ry, blob.rz);
+    // La copie partage la géométrie de l'instance (boule ou modèle livré) et prend sa pose.
+    const mesh = new Mesh(part.mesh.geometry, material);
+    saved.decompose(mesh.position, mesh.quaternion, mesh.scale);
     mesh.name = 'houppier-fondu';
     view.group.add(mesh);
-    crowns.setMatrixAt(index, hidden);
-    crowns.instanceMatrix.needsUpdate = true;
-    this.crownFades.set(key, { view, index, mesh, material, opacity: 1, hidden: true });
+    part.mesh.setMatrixAt(part.slot, hidden);
+    part.mesh.instanceMatrix.needsUpdate = true;
+    this.crownFades.set(key, {
+      view,
+      source: part.mesh,
+      slot: part.slot,
+      matrix: saved,
+      mesh,
+      material,
+      opacity: 1,
+      hidden: true,
+    });
   }
 
   private dropCrownFade(key: string, fade: CrownFade): void {
-    const tree = fade.view.trees[fade.index];
-    const crowns = fade.view.crowns;
-    if (tree !== undefined && crowns !== null) {
-      const blob = crownBlob(tree);
-      rotation.identity();
-      matrix.compose(
-        position.set(blob.x, blob.y, blob.z),
-        rotation,
-        scale.set(blob.rx, blob.ry, blob.rz),
-      );
-      crowns.setMatrixAt(fade.index, matrix);
-      crowns.instanceMatrix.needsUpdate = true;
-    }
+    fade.source.setMatrixAt(fade.slot, fade.matrix);
+    fade.source.instanceMatrix.needsUpdate = true;
     fade.mesh.removeFromParent();
     fade.material.dispose();
     this.crownFades.delete(key);

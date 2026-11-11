@@ -101,6 +101,39 @@ export function variantOf(
 }
 
 /**
+ * Écarts de pose d'un exemplaire, tirés de sa clé et de la fiche du modèle demandé (pas de celle
+ * de sa variante ni de son état): un arbre abattu garde le cap et la taille de l'arbre debout.
+ */
+export function jitterOf(
+  model: string,
+  key: string,
+  manifest: DecorManifest = DECOR_MANIFEST,
+): { yaw: number; scale: number } {
+  const jitter = manifest.models[model]?.jitter;
+  if (jitter === undefined) return { yaw: 0, scale: 1 };
+  const [low, high] = jitter.scale;
+  return {
+    yaw: jitter.yaw ? keyDraw(key, 2) * Math.PI * 2 : 0,
+    scale: low + (high - low) * keyDraw(key, 3),
+  };
+}
+
+/**
+ * Le modèle montré pour un exemplaire: sa variante (tirée de `key`), puis l'état de cette
+ * variante, ou à défaut celui du modèle demandé. Un état sans modèle propre garde la variante.
+ */
+export function shownModel(
+  model: string,
+  key: string,
+  state: string | null = null,
+  manifest: DecorManifest = DECOR_MANIFEST,
+): string {
+  const variant = variantOf(model, key, manifest);
+  if (state === null) return variant;
+  return stateModel(variant, state, manifest) ?? stateModel(model, state, manifest) ?? variant;
+}
+
+/**
  * Le modèle d'un état (`stump`, `bare`, `winter`, `tilled`...), `null` si le modèle n'en a pas:
  * une ressource récoltée dont il ne reste rien, ou un état sans apparence propre.
  */

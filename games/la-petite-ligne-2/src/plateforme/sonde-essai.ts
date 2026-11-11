@@ -5,11 +5,15 @@
  * l'hôte seulement, place un joueur, règle un besoin ou l'heure, pour ne pas marcher ni attendre
  * en rendu logiciel. Les réglages marquent la tranche touchée, comme un système (`touch`).
  */
+import type { BrickStates } from '../etat/briques';
 import type { PlayerState } from '../etat/joueur';
+import type { PlaceState } from '../etat/lieu';
 import type { GameRenderer } from '../rendu/moteur';
 import type { Session } from '../session';
 
 type NeedId = 'hunger' | 'sleep' | 'hygiene';
+type GroundItem = PlaceState['ground'][number];
+type PlacedProp = PlaceState['placed'][number];
 
 export interface TestProbe {
   readonly role: 'host' | 'guest';
@@ -33,6 +37,19 @@ export interface TestProbe {
   setMoney(player: number, cents: number): boolean;
   /** Cadre la vue de cette machine: lacet (degrés) et largeur (m). Faux sans rendu. */
   setCamera(yawDeg: number, width: number): boolean;
+  /**
+   * Hôte seulement: retouche l'état du lieu courant (états des briques par meuble, objets au sol),
+   * pour montrer un arbre abattu ou un potager semé sans jouer les gestes. Faux chez l'invité.
+   */
+  patchPlace(patch: PlacePatch): boolean;
+}
+
+/** Retouche de la sonde: champs de l'état d'un lieu, tels que la sauvegarde les écrit. */
+export interface PlacePatch {
+  readonly objects?: Readonly<Record<string, BrickStates>>;
+  readonly ground?: readonly GroundItem[];
+  /** Meubles posés (mode déco), ajoutés à ceux du lieu. */
+  readonly placed?: readonly PlacedProp[];
 }
 
 export interface ProbeOptions {
@@ -89,6 +106,20 @@ export function installTestProbe(options: ProbeOptions): TestProbe {
       if (target === null || s === null) return false;
       target.money = cents;
       s.revisions.players += 1;
+      return true;
+    },
+    patchPlace(patch) {
+      const s = sim();
+      const place = s?.world.places[s.world.common.place];
+      if (s === null || place === undefined) return false;
+      for (const [id, states] of Object.entries(patch.objects ?? {}))
+        place.objects[id] = structuredClone(states);
+      if (patch.ground !== undefined) {
+        place.ground = structuredClone([...patch.ground]);
+        place.nextGroundId = Math.max(place.nextGroundId, ...place.ground.map((g) => g.id + 1));
+      }
+      for (const prop of patch.placed ?? []) place.placed.push(structuredClone(prop));
+      s.revisions.place += 1;
       return true;
     },
     setCamera(yawDeg, width) {

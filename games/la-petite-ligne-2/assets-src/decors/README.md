@@ -6,7 +6,7 @@ Tout sort d'un fichier de données, `gabarits.toml`, par un script unique (envir
 bash games/la-petite-ligne-2/assets-src/decors/construire.sh
 ```
 
-Sorties: `assets/commun/decors/<fichier>.glb` (`furniture`, `street`, `plants`, `houses`: un nœud racine par modèle, nommé par son `id`) et `assets/commun/decors/decors.json` (manifeste: fichier, emprise, triangles, accroches, collision). Le script finit par `VERIFICATION decors: ... 0 erreur(s)`.
+Sorties: `assets/commun/decors/<fichier>.glb` (`furniture`, `street`, `houses`: un nœud racine par modèle, nommé par son `id`) et `assets/commun/decors/decors.json` (manifeste: fichier, emprise, triangles, accroches, collision). Le script finit par `VERIFICATION decors: ... 0 erreur(s)`.
 
 ## Ajouter un décor (aucun code)
 
@@ -15,7 +15,7 @@ Sorties: `assets/commun/decors/<fichier>.glb` (`furniture`, `street`, `plants`, 
 3. Règle la forme: champs de la famille (en tête de chaque fonction de `familles.py`, et en tête de `maison.py` pour les maisons).
 4. Choisis les couleurs: `couleurs = { bois = "...", peinture = "...", tissu = "...", metal = "..." }` (noms de `[couleurs]` ou des tissus du nuancier des personnages). Une maison: `murs`, `toit`, `menuiseries`, `volets`, `porte`, `soubassement`, `enseigne`, `store`.
 5. Lance `construire.sh`: modèles, manifeste et contrôle.
-6. Regarde-le: `duo-python assets-src/decors/planche.py assets/commun/decors <sortie.png> furniture` (ou `street,plants`, `houses`), avec le mannequin de 1,80 m.
+6. Regarde-le: `duo-python assets-src/decors/planche.py assets/commun/decors <sortie.png> furniture` (ou `street`, `houses`), avec le mannequin de 1,80 m.
 7. Pour qu'un meuble du jeu l'affiche: son `id` dans le champ `model` de sa fiche (`donnees/commun/meubles/<id>.json`). Le rendu le trouve seul; une assise donne sa hauteur aux personnages assis (`decorSeats`).
 
 Preuve: `chair-farm-sage` (coloris sauge de la chaise de ferme) tient en 3 lignes; `shed` (remise de 6 x 5, toit en appentis, porte à l'ouest) est une maison de plus en 15 lignes.

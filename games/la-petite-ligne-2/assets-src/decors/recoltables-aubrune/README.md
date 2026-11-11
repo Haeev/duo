@@ -15,6 +15,7 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 2. Change `id` (anglais, minuscules, traits d'union) et `graine` (elle fixe la forme).
 3. Arbre: choisis ou copie une `[essences.<nom>]` (fût, houppier, teintes, fruits). Culture: `culture` est l'identifiant de sa fiche `donnees/commun/cultures/`, dont le nombre de stades est lu.
 4. Ajoute au besoin `variantes` (autres formes tirées à la pose) et `etats` (`stump`, `winter`, `bare`, `chipped`).
+   `pose = { cap = true, echelle = [a, b] }`: écarts de pose propres au modèle et à ses variantes, à la place de ceux de la famille (un modèle trop petit à la caméra de jeu se grossit ici, sans retoucher les formes).
 5. Une teinte nouvelle: une ligne dans `[teintes]` (deux ou trois tons, une pièce tire le sien).
 6. `bash construire.sh`: modèles, manifeste et contrôle (budget, sol, matériaux, états attendus par les fiches).
 7. Branche la fiche: `"model": "<id>"` dans `donnees/commun/meubles/<meuble>.json`, ou `"model": "crop-<culture>"` dans la fiche de la culture.
@@ -23,7 +24,7 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 
 ## Ce que le rendu lit
 
-- **Modèle d'un meuble**: `model` de sa fiche (inchangé). `DecorModels.instantiate(model, clé)` tire la forme (`variants`), le cap et l'échelle (`jitter`) de la clé de l'exemplaire; sans clé, du rang de pose.
+- **Modèle d'un meuble**: `model` de sa fiche (inchangé). `DecorModels.instantiate(model, clé, état)` tire la forme (`variants`), le cap et l'échelle (`jitter`) de la clé de l'exemplaire (son identifiant dans le lieu: la même forme chez les deux joueurs); l'état garde ce cap et cette échelle. Ce que le jeu lit dans l'état transmis: `src/rendu/lieu/recoltes.ts` (README du dossier).
 - **États** (`decors-manifeste.ts`): `stateModel(model, état)` rend le modèle de `stump` (arbre abattu), `bare` (sans fruits, tas vide), `winter` (sans feuilles), `chipped` (rocher entamé), `tilled` et `watered` (case bêchée, arrosée, de 1 m, à poser sur le potager); `null`: il ne reste rien (`after: "gone"`).
 - **Cultures**: `cropModel(crop.model, stade, à arroser)` rend le modèle d'une case (le stade `stages.length` est mûr). Les plants sont posés sur les billons: même origine que la case bêchée.
 - **Matériaux** (table `materials` du manifeste, lue par `mergeNamed` de `decors.ts`): la couche de traits et la prise au vent viennent du NOM; la teinte de `COLOR_0`. Chaque modèle est fusionné au chargement en un seul maillage (un appel de dessin par exemplaire).
@@ -65,4 +66,6 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 
 ## Livrés sans fiche de jeu (à brancher par le game designer et le level designer)
 
-`berry-bush` (buisson à baies), `rock`, `rock-mossy`, `boulder`, `boulder-mossy` et leurs états `chipped` (aucune ressource de pierre à miner dans les données), `wild-herbs`, `fishing-spot` et `insect-spot` (les coins de pêche et les zones à insectes sont des rectangles de `lieu.json` et `nature.json`, sans meuble). Les états `winter` attendent que le rendu lise la saison.
+`berry-bush` (buisson à baies), `rock`, `rock-mossy`, `boulder`, `boulder-mossy` et leurs états `chipped` (aucune ressource de pierre à miner dans les données), `wild-herbs`. Les états `winter` attendent que le rendu lise la saison.
+
+Branchés sans meuble: `fishing-spot` sur la berge de chaque coin de pêche de `lieu.json`, `insect-spot` dans les zones de `nature.json` (`markers` de `src/rendu/lieu/reglages-recoltes.ts`); `oak-tree`, `ash-tree`, `birch-tree` et `berry-bush-bare` pour la végétation semée par tuile (`semis`).
