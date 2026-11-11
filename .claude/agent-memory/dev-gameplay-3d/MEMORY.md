@@ -766,3 +766,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - À Aubrune les ombres du soleil partent vers le nord: ce qui est au nord du quai (le train) ne l'ombre jamais; contrôler l'ombre par un lacet de 200 degrés (vue du nord).
 - Les appels d'une même vue varient d'une vingtaine selon l'heure (habitants, lampes, passes): un coût de quelques appels ne se mesure pas par différence entre deux heures; le compter (un appel par véhicule et par passe).
 - Résultats de la dernière suite Vitest: `node_modules/.vite/vitest/<empreinte>/results.json` (`failed` par fichier), utile quand la sortie est tronquée.
+## Aperçu encré de l'éditeur de personnage (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un second `InkKit` sur un autre canevas marche tel quel (`new InkKit(undefined, { meter: false })`: sinon F9 ouvre deux panneaux). `ink.frame` exige une `OrthographicCamera`; le trait se règle sur la hauteur de la cible: `ink.strokeHeight = innerHeight * pixelRatio` donne au petit canevas le trait du jeu.
+- Même lumière qu'en jeu sans toucher au soleil: caméra au lacet de départ du jeu (45 degrés, `towardCamera`) et personnage tourné de `-lacet` pour être de face.
+- Ne jamais `forceContextLoss` le canevas d'une fenêtre qu'on rouvre: `getContext` rendrait le contexte perdu. `dispose` seul, le nouveau `WebGLRenderer` reprend le même contexte (mesuré: un seul contexte vivant après dix ouvertures).
+- `InkKit` ne se construit pas dans Node (couches dessinées sur un canevas 2D): `vi.mock` de `encre/textures` (`createInkLayers`, `createNoise` en textures d'un point) et un faux `WebGLRenderer` suffisent pour tester création et libération.
+- La démonstration de l'éditeur en `#miroir` ne s'ouvre pas (apparence non révélée): rouvrir par `window.editeur.mirror()` après une première validation sur la page normale. Thème sombre: poser `dataset.lplStyle = 'encre'` après le chargement (dans `addInitScript`, `documentElement` est nul).
+- Capture d'une page de jeu en rendu logiciel: `page.screenshot` dépasse 120 s; lire `canvas.toDataURL()` juste après un `renderer.frame` dans la page (et recommencer si l'image est vide: le souffle du rendu encré saute des images).

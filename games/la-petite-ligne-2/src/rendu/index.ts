@@ -1,6 +1,6 @@
 /** Rendu 3D (lot L4): ce que les autres lots importent. */
 import { createRenderer as createEngine, type GameRenderer, type RenderOptions } from './moteur';
-import { INK_SETTINGS } from './encre/reglages';
+import { addressStyle } from './encre/reglages';
 import { gamePlaceBuildings } from './lieu/batiments';
 import { gameDecorModels } from './lieu/decors';
 import { gameCharacters } from './personnages/index';
@@ -11,8 +11,7 @@ export { webglAvailable } from './moteur';
 export function createRenderer(options: RenderOptions): GameRenderer | null {
   // Interrupteur de transition (ADR 0023): `?rendu=aplats` rend l'ancien rendu sans rien changer
   // d'autre; sans paramètre, le style de `INK_SETTINGS.style` (encre).
-  const asked = new URLSearchParams(globalThis.location.search).get(INK_SETTINGS.styleParam);
-  const style = asked === 'aplats' || asked === 'encre' ? asked : INK_SETTINGS.style;
+  const style = addressStyle(globalThis.location.search);
   return createEngine({
     characters: gameCharacters(options.view),
     models: gameDecorModels(),
