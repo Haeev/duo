@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Carpe de l'étang (de profil): grosse carpe cuivrée, dos haut, grandes écailles en filet, lèvres épaisses, deux paires de barbillons. -->
+  <g transform="translate(0 3) rotate(-10 48 48)">
+    <path d="M70 48 L92 28 Q86 48 92 70 Z" fill="#A85837"/>
+    <path data-w="0" d="M82 52 L92 70 L72 50 Z" fill="#743D2B"/>
+    <path d="M34 28 Q40 16 50 22 L66 30 L62 34 Z" fill="#A85837"/>
+    <path id="corps" d="M6 52 Q10 26 38 24 Q64 24 76 48 Q66 70 40 72 Q12 72 6 52 Z" fill="#C0803A"/>
+    <path data-clip="corps" data-w="0" d="M0 10 L90 10 L90 42 Q50 32 0 44 Z" fill="#A85837"/>
+    <path data-clip="corps" data-w="0" d="M0 62 Q40 60 80 52 L80 80 L0 80 Z" fill="#D4A33E"/>
+    <path data-clip="corps" data-w="0" d="M58 20 Q86 52 40 82 L90 82 L90 20 Z" fill="#8C5A35"/>
+    <path data-clip="corps" data-w="0" d="M10 44 Q14 32 28 28 L26 32 Q18 35 13 46 Z" fill="#F2C55C"/>
+    <g data-clip="corps" data-teinte="#743D2B" data-w="0.36" fill="none" stroke="#000"><path d="M30 34 q6 4 0 9 q6 4 0 9 q6 4 0 9 q6 4 0 9 M40 32 q6 4 0 9 q6 4 0 9 q6 4 0 9 q6 4 0 9 M50 33 q6 4 0 9 q6 4 0 9 q6 4 0 9 M60 37 q6 4 0 9 q6 4 0 9 q5 4 0 8"/></g>
+    <path data-w="0.5" fill="none" stroke="#000" d="M22 34 Q30 48 22 64"/>
+    <path d="M28 62 Q38 68 32 78 Q24 70 28 62 Z" fill="#A85837" data-w="0.6"/>
+    <path d="M54 68 Q62 72 60 80 Q52 76 54 68 Z" fill="#A85837" data-w="0.6"/>
+    <circle cx="15" cy="44" r="4.2" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="15.5" cy="44" r="2.2" fill="#231A17" data-w="0"/>
+    <path d="M4 52 Q8 49 12 52 Q8 56 4 54 Z" fill="#D98C62" data-w="0.5"/>
+    <g data-w="0.5" fill="none" stroke="#000"><path d="M6 55 Q3 60 5 64 M10 55 Q10 60 13 62"/></g>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Griffes de muguet: trois rhizomes bruns couchés en botte, bourgeons pointus crème au bout, radicelles dessous, liés par une ficelle nouée. -->
+  <g transform="rotate(-18 48 50)">
+    <g data-w="0.45" fill="none" stroke="#000"><path d="M70 56 Q76 66 72 76 M74 52 Q84 58 86 68 M66 58 Q66 70 60 78 M72 44 Q84 46 90 52"/></g>
+    <path id="r1" d="M14 40 Q14 34 22 34 L74 38 Q80 40 78 46 L22 46 Q14 46 14 40 Z" fill="#8C5A35"/>
+    <path data-clip="r1" data-w="0" d="M10 43 L90 43 L90 50 L10 50 Z" fill="#5E4233"/>
+    <path id="r2" d="M12 52 Q12 46 20 46 L76 48 Q82 50 80 56 L20 58 Q12 58 12 52 Z" fill="#96704C"/>
+    <path data-clip="r2" data-w="0" d="M10 55 L90 54 L90 62 L10 62 Z" fill="#5E4233"/>
+    <path id="r3" d="M16 64 Q16 58 24 58 L72 58 Q78 60 76 66 L24 70 Q16 70 16 64 Z" fill="#8C5A35"/>
+    <path data-clip="r3" data-w="0" d="M10 66 L90 64 L90 74 L10 74 Z" fill="#5E4233"/>
+    <g data-teinte="#C7A877" data-w="0.3" fill="none" stroke="#000"><path d="M30 38 L30 42 M46 39 L46 43 M60 40 L60 44 M34 50 L34 54 M54 50 L54 54 M38 61 L38 65 M58 61 L58 65"/></g>
+    <path d="M4 38 Q8 30 16 34 Q14 40 16 44 Q8 44 4 38 Z" fill="#F3EDE0" data-w="0.55"/>
+    <path d="M2 52 Q6 44 14 48 Q12 52 14 56 Q6 58 2 52 Z" fill="#F3EDE0" data-w="0.55"/>
+    <path d="M6 64 Q10 56 18 60 Q16 64 18 68 Q10 70 6 64 Z" fill="#F3EDE0" data-w="0.55"/>
+    <g data-w="0" fill="#B9C76A"><path d="M6 37 Q9 33 13 35 Q10 36 8 39 Z"/><path d="M4 51 Q7 47 11 49 Q8 50 6 53 Z"/><path d="M8 63 Q11 59 15 61 Q12 62 10 65 Z"/></g>
+    <path d="M42 30 L48 30 L50 74 L44 74 Z" fill="#B8A17E" data-w="0.55"/>
+    <path d="M44 76 Q36 84 34 90 M48 76 Q52 84 58 88" data-w="0.55" fill="none" stroke="#000"/>
+  </g>
+</svg>

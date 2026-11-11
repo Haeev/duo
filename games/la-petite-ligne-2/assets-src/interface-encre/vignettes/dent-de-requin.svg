@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Dent de requin fossile: grande dent triangulaire, émail noir brillant à reflet clair, bords finement dentelés, racine brune en V. -->
+  <g transform="rotate(-12 48 50)">
+    <path id="racine" d="M14 66 Q16 58 26 58 L70 58 Q80 58 82 66 Q80 80 66 78 Q56 74 48 80 Q40 74 30 78 Q16 80 14 66 Z" fill="#8C5A35"/>
+    <path data-clip="racine" data-w="0" d="M50 70 Q66 70 84 62 L84 90 L44 90 Z" fill="#4F3626"/>
+    <path data-clip="racine" data-w="0" d="M18 64 Q22 60 30 60 Q24 64 22 70 Z" fill="#C0803A"/>
+    <path id="email" d="M22 60 Q30 40 40 22 Q46 10 50 8 Q54 14 58 24 Q66 42 74 60 Q48 66 22 60 Z" fill="#4A4D52"/>
+    <path data-clip="email" data-w="0" d="M52 6 Q62 40 50 66 L90 66 L90 6 Z" fill="#26282E"/>
+    <path data-clip="email" data-w="0" d="M34 48 Q40 30 48 14 Q46 30 40 50 Z" fill="#8C8E91"/>
+    <path data-w="0" d="M38 40 Q42 30 46 22 Q44 32 41 42 Z" fill="#F7F3EA"/>
+    <g data-teinte="#8C8E91" data-w="0.3" fill="none" stroke="#000"><path d="M26 54 l2 1 M30 46 l2 1 M34 38 l2 1 M38 30 l2 1 M66 46 l-2 1 M62 38 l-2 1 M70 54 l-2 1"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M24 60 Q48 66 72 60"/>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M60 72 l5 -5 M66 74 l6 -6"/></g>
+  </g>
+</svg>

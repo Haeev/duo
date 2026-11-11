@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Ver luisant (vu de dessus, sur un brin d'herbe): petite larve allongée brune à anneaux, bout du corps vert phosphorescent entouré de sa lueur. -->
+  <circle cx="72" cy="30" r="20" fill="#C2EFC6" data-w="0"/>
+  <circle cx="72" cy="30" r="13" fill="#EFFFF0" data-w="0"/>
+  <path d="M8 90 Q30 64 50 50 Q70 36 90 8 Q92 14 88 18 Q72 42 54 56 Q32 72 14 92 Z" fill="#6E9241"/>
+  <path data-w="0" d="M14 92 Q32 72 54 56 Q72 42 88 18 L90 22 Q74 46 56 60 Q34 76 18 94 Z" fill="#40592D"/>
+  <g data-teinte="#40592D" data-w="0.3" fill="none" stroke="#000"><path d="M16 86 Q40 62 84 16"/></g>
+  <path id="ver" d="M18 72 Q20 66 26 66 L64 36 Q70 30 78 30 Q84 34 80 40 L32 76 Q24 80 18 72 Z" fill="#5E4233"/>
+  <path data-clip="ver" data-w="0" d="M20 80 Q50 64 84 38 L96 50 L20 96 Z" fill="#4F3626"/>
+  <path data-clip="ver" data-w="0" d="M22 70 Q26 66 30 67 L62 42 L62 44 L30 70 Q26 70 24 72 Z" fill="#96704C"/>
+  <path data-clip="ver" data-w="0" d="M66 20 L96 20 L96 50 L68 50 Q72 40 66 20 Z" fill="#D4F27A"/>
+  <g data-clip="ver" data-teinte="#B8A17E" data-w="0.32" fill="none" stroke="#000"><path d="M28 66 L34 74 M34 61 L40 69 M40 57 L46 65 M46 52 L52 60 M52 48 L58 56 M58 43 L64 51"/></g>
+  <g data-w="0.5" fill="none" stroke="#000"><path d="M84 22 L88 18 M88 32 L94 32 M82 42 L86 48"/></g>
+  <circle cx="21" cy="72" r="1.2" fill="#F7F3EA" data-w="0"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Barbeau (de profil): poisson long, museau pointu tourné vers le bas, quatre barbillons, dos brun-vert piqueté, ventre crème, nageoires orange. -->
+  <g transform="translate(0 2) rotate(-9 48 48)">
+    <path d="M74 48 L92 32 Q88 48 92 64 L74 52 Z" fill="#C0803A"/>
+    <path data-w="0" d="M84 54 L92 64 L76 52 Z" fill="#A85837"/>
+    <path d="M40 40 L46 26 L56 40 Z" fill="#8D8A4E" data-w="0.6"/>
+    <path id="corps" d="M4 60 Q8 46 26 42 Q54 38 80 48 Q68 60 38 62 Q16 64 4 60 Z" fill="#B8A17E"/>
+    <path data-clip="corps" data-w="0" d="M0 30 L90 30 L90 49 Q50 42 0 52 Z" fill="#8D8A4E"/>
+    <path data-clip="corps" data-w="0" d="M0 57 Q40 57 90 52 L90 80 L0 80 Z" fill="#F3EDE0"/>
+    <g data-clip="corps" data-w="0" fill="#55553E"><circle cx="30" cy="46" r="1.2"/><circle cx="38" cy="44" r="1.2"/><circle cx="46" cy="45" r="1.2"/><circle cx="54" cy="44" r="1.1"/><circle cx="62" cy="46" r="1.1"/><circle cx="34" cy="50" r="1"/><circle cx="50" cy="49" r="1"/><circle cx="66" cy="49" r="1"/></g>
+    <path data-clip="corps" data-w="0" d="M12 52 Q16 46 26 45 L24 47 Q18 49 14 54 Z" fill="#E6CF9C"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M22 46 Q26 54 22 61"/>
+    <path d="M28 60 Q36 64 32 72 Q26 68 28 60 Z" fill="#C0803A" data-w="0.6"/>
+    <path d="M50 60 Q58 64 56 72 Q48 68 50 60 Z" fill="#C0803A" data-w="0.6"/>
+    <path d="M62 58 Q70 62 68 68 Q62 66 62 58 Z" fill="#C0803A" data-w="0.55"/>
+    <circle cx="16" cy="52" r="3.4" fill="#F7F3EA" data-w="0.55"/>
+    <circle cx="16.4" cy="52" r="1.7" fill="#231A17" data-w="0"/>
+    <g data-w="0.5" fill="none" stroke="#000"><path d="M6 61 Q4 66 6 70 M9 62 Q8 67 11 70 M12 62 Q13 66 16 68 M7 61 Q2 63 1 66"/></g>
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Grand paon de nuit (vu de dessus): très grand papillon de nuit qui remplit la case, ailes larges gris-brun, bande crème en zigzag, quatre gros ocelles cerclés, antennes en plumes, corps velu. -->
+  <path id="ad" d="M50 38 Q62 14 88 12 Q96 26 90 44 Q70 52 50 48 Z" fill="#9A9286"/>
+  <path data-clip="ad" data-w="0" d="M92 30 Q80 54 52 48 L96 58 Z" fill="#726C63"/>
+  <path id="pd" d="M50 50 Q72 50 88 60 Q92 78 74 86 Q58 86 52 72 Q49 62 49 56 Z" fill="#9A9286"/>
+  <path data-clip="pd" data-w="0" d="M90 62 Q82 92 52 74 L60 96 L96 96 Z" fill="#726C63"/>
+  <path id="ag" d="M46 38 Q34 14 8 12 Q0 26 6 44 Q26 52 46 48 Z" fill="#9A9286"/>
+  <path data-clip="ag" data-w="0" d="M8 30 Q12 18 24 16 Q16 24 12 36 Z" fill="#B6A890"/>
+  <path id="pg" d="M46 50 Q24 50 8 60 Q4 78 22 86 Q38 86 44 72 Q47 62 47 56 Z" fill="#9A9286"/>
+  <g data-teinte="#EADDBE" data-w="0.5" fill="none" stroke="#000"><path d="M88 16 L82 20 L86 26 L80 30 L84 36 L78 40 M8 16 L14 20 L10 26 L16 30 L12 36 L18 40 M86 64 L80 70 L84 76 L78 82 M10 64 L16 70 L12 76 L18 82"/></g>
+  <circle cx="68" cy="32" r="7" fill="#EADDBE" data-w="0.45"/>
+  <circle cx="68" cy="32" r="4.6" fill="#231A17" data-w="0"/>
+  <circle cx="69.4" cy="30.6" r="1.4" fill="#F7F3EA" data-w="0"/>
+  <circle cx="28" cy="32" r="7" fill="#EADDBE" data-w="0.45"/>
+  <circle cx="28" cy="32" r="4.6" fill="#231A17" data-w="0"/>
+  <circle cx="29.4" cy="30.6" r="1.4" fill="#F7F3EA" data-w="0"/>
+  <circle cx="68" cy="68" r="6.6" fill="#EADDBE" data-w="0.45"/>
+  <circle cx="68" cy="68" r="4.2" fill="#231A17" data-w="0"/>
+  <circle cx="69.2" cy="66.8" r="1.3" fill="#F7F3EA" data-w="0"/>
+  <circle cx="28" cy="68" r="6.6" fill="#EADDBE" data-w="0.45"/>
+  <circle cx="28" cy="68" r="4.2" fill="#231A17" data-w="0"/>
+  <circle cx="29.2" cy="66.8" r="1.3" fill="#F7F3EA" data-w="0"/>
+  <path d="M48 32 Q53 36 53 48 Q53 62 48 70 Q43 62 43 48 Q43 36 48 32 Z" fill="#5E4233" data-w="0.6"/>
+  <g data-teinte="#9A9286" data-w="0.3" fill="none" stroke="#000"><path d="M45 48 L51 48 M45 54 L51 54 M46 60 L50 60"/></g>
+  <circle cx="48" cy="30" r="3.6" fill="#5E4233" data-w="0.55"/>
+  <path d="M46 28 Q38 20 34 10 Q42 14 47 26 Z" fill="#B8A17E" data-w="0.45"/>
+  <path d="M50 28 Q58 20 62 10 Q54 14 49 26 Z" fill="#B8A17E" data-w="0.45"/>
+</svg>

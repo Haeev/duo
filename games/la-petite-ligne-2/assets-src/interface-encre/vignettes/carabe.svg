@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Carabe des bois (vu de dessus, en course): coléoptère allongé, élytres cuivrées striées en long à bord vert métal, corselet vert, longues pattes et antennes. -->
+  <g transform="rotate(-24 48 50)">
+    <g data-w="0.8" fill="none" stroke="#000"><path d="M38 38 L22 30 L14 34 M36 54 L18 52 L10 58 M38 70 L24 80 L20 90 M58 38 L74 28 L80 20 M60 54 L78 56 L86 62 M58 70 L70 82 L72 92 M44 16 Q36 8 28 6 M52 16 Q60 8 68 6"/></g>
+    <path d="M42 18 Q42 12 48 12 Q54 12 54 18 Q54 24 48 24 Q42 24 42 18 Z" fill="#3F6453" data-w="0.55"/>
+    <path id="corselet" d="M36 30 Q36 22 48 22 Q60 22 60 30 Q60 40 48 42 Q36 40 36 30 Z" fill="#5E8A72"/>
+    <path data-clip="corselet" data-w="0" d="M54 20 Q64 34 46 44 L64 44 L64 20 Z" fill="#3F6453"/>
+    <path id="elytres" d="M48 42 Q64 42 64 62 Q62 84 48 90 Q34 84 32 62 Q32 42 48 42 Z" fill="#C0803A"/>
+    <path data-clip="elytres" data-w="0" d="M0 0 L36 0 L36 96 L0 96 Z M60 0 L96 0 L96 96 L60 96 Z" fill="#5E8A72"/>
+    <path data-clip="elytres" data-w="0" d="M54 44 Q66 72 46 92 L96 96 L96 44 Z" fill="#A85837"/>
+    <g data-clip="elytres" data-teinte="#743D2B" data-w="0.32" fill="none" stroke="#000"><path d="M40 46 Q38 66 42 86 M44 44 L44 88 M52 44 L52 88 M56 46 Q58 66 54 86"/></g>
+    <path data-clip="elytres" data-w="0" d="M38 56 Q40 48 45 46 Q42 52 42 60 Z" fill="#F2C55C"/>
+    <path data-w="0.5" fill="none" stroke="#000" d="M48 43 L48 89"/>
+  </g>
+</svg>

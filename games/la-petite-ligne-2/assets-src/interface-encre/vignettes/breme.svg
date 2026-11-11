@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Brème (de profil): poisson très haut et plat, dos bossu, petite tête, flancs bronze, longue nageoire anale grise. -->
+  <g transform="translate(0 2) rotate(-8 48 48)">
+    <path d="M70 50 L90 30 Q84 50 90 72 Z" fill="#6A6763"/>
+    <path data-w="0" d="M80 54 L90 72 L72 52 Z" fill="#4A4D52"/>
+    <path d="M50 18 Q56 6 64 22 Z" fill="#6A6763"/>
+    <path d="M36 72 Q52 86 68 66 L60 64 Q50 74 40 70 Z" fill="#6A6763" data-w="0.6"/>
+    <path id="corps" d="M8 54 Q14 34 30 22 Q46 12 60 22 Q74 36 76 52 Q66 70 44 76 Q20 76 8 54 Z" fill="#C0803A"/>
+    <path data-clip="corps" data-w="0" d="M0 10 L90 10 L90 40 Q50 30 0 46 Z" fill="#96704C"/>
+    <path data-clip="corps" data-w="0" d="M0 64 Q40 62 80 54 L80 90 L0 90 Z" fill="#D4A33E"/>
+    <path data-clip="corps" data-w="0" d="M60 16 Q84 52 44 84 L90 84 L90 16 Z" fill="#8C5A35"/>
+    <path data-clip="corps" data-w="0" d="M14 48 Q20 34 32 28 L30 32 Q22 38 17 50 Z" fill="#F2C55C"/>
+    <g data-teinte="#5E4233" data-w="0.26" fill="none" stroke="#000"><path d="M34 44 q3 -2 6 0 M46 42 q3 -2 6 0 M58 46 q3 -2 6 0 M38 54 q3 -2 6 0 M50 54 q3 -2 6 0 M62 54 q3 -2 6 0 M42 34 q3 -2 6 0 M44 64 q3 -2 6 0"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M24 40 Q30 52 24 64"/>
+    <path d="M28 62 Q36 66 32 74 Q26 70 28 62 Z" fill="#6A6763" data-w="0.6"/>
+    <circle cx="16" cy="50" r="3.6" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="16.5" cy="50" r="1.8" fill="#231A17" data-w="0"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M8 55 L12 56"/>
+  </g>
+</svg>

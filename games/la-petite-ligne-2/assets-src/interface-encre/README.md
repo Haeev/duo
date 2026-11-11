@@ -7,6 +7,8 @@
 - `generer-portraits.mjs`: écrit les sources des portraits composés depuis `portraits/fiches.json` (même trait que les portraits faits main, cinq expressions); `planche-portraits.cjs`: planche de tous les portraits d'habitants.
 - `generer-meubles.py`: écrit les sources des vignettes de meubles (même projection de trois quarts, séries de couleur miel et sauge); on modifie le script, pas ces SVG.
 - `planche-serie.cjs`: planches de la série des vignettes par famille (outils, poissons, potager, cuisine, provisions, meubles), en 96 et 48 px sur case sombre; `--grand` ajoute le 192 px.
+- `generer-sachets.mjs`: écrit les sources des sachets de graines de fleurs (`graines-<fleur>`: le sachet de `graines-radis`, une bande, la fleur en petit, les graines tombées); on modifie le script, pas ces SVG.
+- `planche-collections.cjs`: planches des vignettes des collections du carnet par famille (poissons, insectes, fleurs, graines, tresors, plats) en 192, 96 et 44 px (case de la barre du sac) sur case sombre, et en 44 px sur le papier du carnet.
 - `capturer.cjs`, `verifier.cjs`: captures et contrôles de l'interface (voir `src/interface/encre/README.md`).
 
 Outils lancés depuis le paquet, avec `NODE_PATH=/opt/node-tools/node_modules` (Playwright) et `rsvg-convert` (`outils/installer-outils.sh`).
@@ -20,6 +22,16 @@ Chaque objet de `donnees/commun/objets/` et chaque meuble posable (`placeable`) 
 3. `node assets-src/interface-encre/generer-images.mjs vignettes <id>[,<id>...]`: écrit `assets/commun/interface/vignettes/<id>.svg`, `-96.png` et `-48.png`.
 4. Regarder `node assets-src/interface-encre/planche-serie.cjs /tmp <id>[,<id>...] --grand`, puis la planche de sa famille (`planche-serie.cjs <dossier> <famille>`).
 5. Rien d'autre: l'interface prend le dessin à la place de la pastille (`itemThumb`), et le test contrôle couleurs, tailles et couverture.
+
+## Ajouter une vignette de collection (poisson, insecte, fleur, trésor, plat)
+
+Le carnet montre chaque entrée de `donnees/commun/carnet/` par sa vignette: celle de l'objet de la source pour une recette (`source.item`, le plat), sinon celle qui porte l'identifiant de l'entrée (insecte, trésor de l'histoire). `tests/interface-plume.test.ts` exige un dessin pour chaque insecte et chaque prise posée à la main.
+
+1. Copier la vignette la plus proche de la famille sous `vignettes/<id>.svg`: poisson de profil tête à gauche (`gardon`), insecte vu de dessus ailes ouvertes (`papillon-citron`) ou de profil (`criquet-des-patures`), fleur coupée avec sa tige (`marguerite`), plat dans son contenant (`truite-grillee`, `compotee-de-mures`, `tarte-aux-mures`). Un sachet de graines de fleur: une entrée dans `generer-sachets.mjs`, puis `node assets-src/interface-encre/generer-sachets.mjs <id>`.
+2. Donner à chaque espèce sa silhouette et deux couleurs qui la distinguent de ses voisines de famille; les petites formes colorées prennent `data-w` 0,4 à 0,5 (le contour plein les noircit à 44 px).
+3. `NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/generer-images.mjs vignettes <id>`.
+4. `NODE_PATH=/opt/node-tools/node_modules node assets-src/interface-encre/planche-collections.cjs /tmp <famille>`: regarder la vignette à 44 px sur fond sombre et sur papier, près de ses voisines.
+5. `pnpm exec vitest run --clearCache`, puis `pnpm exec vitest run tests/interface-plume.test.ts`. Rien d'autre: la pastille à lettres disparaît du carnet et du sac.
 
 ## Ajouter un picto
 

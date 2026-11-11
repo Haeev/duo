@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Sachet de graines de bleuet: bande bleue, bleuet étoilé en dentelle, graines grises à aigrette. Écrit par generer-sachets.mjs: modifier le script, pas ce fichier. -->
+  <g transform="rotate(5 48 48)">
+    <path id="sachet" d="M22 18 L30 14 L38 19 L46 13 L54 18 L62 13 L70 18 L74 84 L20 86 Z" fill="#F5E6C6"/>
+    <path data-clip="sachet" data-w="0" d="M60 10 L80 10 L80 90 L40 90 Q66 60 60 10 Z" fill="#DDC59C"/>
+    <g data-clip="sachet" data-teinte="#A88C6C" data-w="0.3" fill="none" stroke="#000"><path d="M22 40 L28 40 M66 46 L72 46 M24 80 L30 74"/></g>
+    <path d="M24 26 L71 24 L72 32 L25 34 Z" fill="#44618A" data-w="0.6"/>
+    <path data-w="0.6" fill="none" stroke="#000" d="M48 64 L46 78"/>
+    <path id="fleur" data-w="0.5" d="M48 40 L50 46 L54 41 L54 48 L60 45 L58 51 L64 52 L58 55 L62 60 L55 59 L55 66 L50 61 L46 66 L45 59 L38 61 L41 55 L34 53 L40 50 L36 45 L43 47 L43 41 L46 46 Z" fill="#44618A"/>
+    <path data-clip="fleur" data-w="0" d="M56 38 Q68 60 44 70 L70 70 L70 38 Z" fill="#2C3B57"/>
+    <circle cx="48" cy="53" r="3.4" fill="#2C3B57" data-w="0.4"/>
+    <g data-w="0.4" fill="none" stroke="#000"><path d="M28 81 L40 81"/></g>
+  </g>
+  <g data-w="0.45" fill="#B6A890"><ellipse cx="78" cy="88" rx="3" ry="2"/><ellipse cx="87" cy="83" rx="3" ry="2"/><ellipse cx="85" cy="92" rx="3" ry="2"/></g>
+</svg>

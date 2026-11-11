@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Vairon (de profil): tout petit poisson fuselé, dos olive tacheté, bande dorée, ventre rouge coquelicot. Plus petit que les autres dans la case. -->
+  <g transform="translate(2 4) rotate(-10 48 48)">
+    <path d="M64 48 L84 36 L79 49 L84 62 Z" fill="#7A7B45"/>
+    <path data-w="0" d="M78 51 L84 62 L68 50 Z" fill="#55553E"/>
+    <path d="M40 40 Q44 30 52 38 Z" fill="#7A7B45" data-w="0.6"/>
+    <path id="corps" d="M12 50 Q20 38 38 38 Q58 38 68 48 Q58 60 38 61 Q20 61 12 50 Z" fill="#D4A33E"/>
+    <path data-clip="corps" data-w="0" d="M0 20 L90 20 L90 46 Q50 40 0 46 Z" fill="#7A7B45"/>
+    <path data-clip="corps" data-w="0" d="M0 55 Q40 52 80 50 L80 80 L0 80 Z" fill="#C5443D"/>
+    <g data-clip="corps" data-w="0" fill="#3E4637"><circle cx="30" cy="42" r="2.2"/><circle cx="38" cy="44" r="2.4"/><circle cx="46" cy="42" r="2.2"/><circle cx="54" cy="45" r="2.2"/><circle cx="61" cy="47" r="1.8"/></g>
+    <path data-clip="corps" data-w="0" d="M15 46 Q20 40 28 40 L26 42 Q20 43 17 48 Z" fill="#F2C55C"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M24 42 Q29 50 24 58"/>
+    <path d="M30 58 Q36 62 32 68 Q27 64 30 58 Z" fill="#C5443D" data-w="0.55"/>
+    <circle cx="18" cy="48" r="4" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="18.6" cy="48" r="2" fill="#231A17" data-w="0"/>
+  </g>
+</svg>

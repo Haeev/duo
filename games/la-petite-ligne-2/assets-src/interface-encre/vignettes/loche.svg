@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Loche franche (de profil): petit poisson allongé couché sur le fond (ventre plat, presque à l'horizontale), six barbillons, marbrures brunes sur sable et olive, queue ronde. -->
+  <g transform="translate(0 2) rotate(-4 48 48)">
+    <path d="M76 50 Q92 42 92 54 Q92 66 76 60 Z" fill="#B8A17E"/>
+    <path data-w="0" d="M80 58 Q90 60 92 56 Q90 66 76 60 Z" fill="#8C6F4E"/>
+    <g data-teinte="#5E4233" data-w="0.28" fill="none" stroke="#000"><path d="M82 50 L82 60 M87 49 L87 61"/></g>
+    <path d="M42 44 Q48 34 56 44 Z" fill="#B8A17E" data-w="0.6"/>
+    <path id="corps" d="M8 56 Q10 44 26 44 L68 46 Q80 48 80 55 Q72 63 34 63 Q12 63 8 56 Z" fill="#C7A877"/>
+    <path data-clip="corps" data-w="0" d="M0 30 L90 30 L90 50 Q50 46 0 50 Z" fill="#7A7B45"/>
+    <path data-clip="corps" data-w="0" d="M0 60 Q40 59 90 57 L90 80 L0 80 Z" fill="#E6CF9C"/>
+    <g data-clip="corps" data-w="0" fill="#5E4233"><path d="M24 48 Q28 46 30 50 Q28 54 24 52 Z"/><path d="M34 52 Q40 49 42 54 Q38 57 34 55 Z"/><path d="M46 47 Q51 46 52 50 Q49 53 45 51 Z"/><path d="M54 53 Q60 51 61 55 Q57 58 54 56 Z"/><path d="M63 48 Q68 48 68 52 Q64 54 62 51 Z"/><path d="M70 53 Q74 52 75 55 Q72 57 70 56 Z"/></g>
+    <path data-clip="corps" data-w="0" d="M12 52 Q14 47 22 46 L20 48 Q16 49 14 53 Z" fill="#E6CF9C"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M20 47 Q23 54 20 61"/>
+    <path d="M24 61 Q30 64 28 70 Q22 66 24 61 Z" fill="#B8A17E" data-w="0.55"/>
+    <circle cx="14" cy="50" r="3.2" fill="#F7F3EA" data-w="0.55"/>
+    <circle cx="14.4" cy="50" r="1.6" fill="#231A17" data-w="0"/>
+    <g data-w="0.5" fill="none" stroke="#000"><path d="M8 57 Q3 59 2 63 M9 58 Q6 62 6 66 M11 59 Q10 63 12 67"/></g>
+    <g data-teinte="#5E4233" data-w="0.35" fill="none" stroke="#000"><path d="M8 56 Q4 55 2 57 M10 59 Q7 64 8 68 M13 60 Q14 64 16 66"/></g>
+  </g>
+</svg>

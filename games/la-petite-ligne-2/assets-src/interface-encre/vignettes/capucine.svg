@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Capucine (fleur coupée): fleur orange en cornet à cinq pétales et éperon, grande feuille ronde à nervures en rayons, tige souple. -->
+  <path data-w="0.75" fill="none" stroke="#000" d="M48 52 Q44 72 34 92"/>
+  <path data-w="0.6" fill="none" stroke="#000" d="M40 76 Q30 68 26 62"/>
+  <path id="feuille" d="M26 62 Q8 66 6 50 Q6 36 22 34 Q38 34 40 48 Q40 62 26 62 Z" fill="#9DBB5B"/>
+  <path data-clip="feuille" data-w="0" d="M34 32 Q46 60 14 66 L44 70 L44 32 Z" fill="#6E9241"/>
+  <g data-clip="feuille" data-teinte="#40592D" data-w="0.3" fill="none" stroke="#000"><path d="M23 49 L10 42 M23 49 L20 36 M23 49 L34 38 M23 49 L38 54 M23 49 L28 62 M23 49 L12 60"/></g>
+  <circle cx="23" cy="49" r="1.6" fill="#40592D" data-w="0"/>
+  <path d="M60 30 Q74 22 86 10 Q84 22 70 36 Z" fill="#D9822E" data-w="0.6"/>
+  <path id="fleur" d="M48 50 Q30 50 26 34 Q24 22 36 22 Q38 12 50 14 Q60 8 68 18 Q80 20 76 32 Q82 44 70 46 Q62 56 48 50 Z" fill="#D9822E"/>
+  <path data-clip="fleur" data-w="0" d="M66 10 Q84 44 44 56 L96 60 L96 10 Z" fill="#B8704E"/>
+  <path data-clip="fleur" data-w="0" d="M30 34 Q30 26 38 25 Q34 30 34 38 Z" fill="#FFC264"/>
+  <g data-teinte="#AD6244" data-w="0.32" fill="none" stroke="#000"><path d="M50 36 L36 26 M50 36 L50 18 M50 36 L64 22 M50 36 L70 38 M50 36 L42 46"/></g>
+  <g data-teinte="#8F3B34" data-w="0.4" fill="none" stroke="#000"><path d="M48 32 L42 30 M50 31 L50 26 M53 32 L58 28"/></g>
+  <circle cx="50" cy="36" r="3.6" fill="#F2C55C" data-w="0.45"/>
+</svg>

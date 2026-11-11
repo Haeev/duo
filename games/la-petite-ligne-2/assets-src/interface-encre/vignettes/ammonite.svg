@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Ammonite: la coquille seule (pas sur un galet, à la différence de la coquille fossile), pierre ocre enroulée en spirale, côtes régulières en rayons, ouverture ébréchée. -->
+  <g transform="rotate(10 48 50)">
+    <path id="coquille" d="M48 10 Q82 10 86 46 Q86 82 50 86 Q14 86 10 52 Q10 30 26 20 L32 30 Q20 38 22 52 Q24 74 48 74 Q72 72 74 48 Q72 24 48 22 Z" fill="#C7A877"/>
+    <path data-clip="coquille" data-w="0" d="M74 14 Q92 70 30 92 L96 96 L96 14 Z" fill="#8C6F4E"/>
+    <path data-clip="coquille" data-w="0" d="M14 46 Q16 28 30 20 Q22 32 20 48 Z" fill="#E6CF9C"/>
+    <path id="tour" d="M48 22 Q72 24 74 48 Q72 72 48 74 Q24 74 22 52 Q22 36 34 30 Q48 26 58 36 Q64 46 58 56 Q50 64 40 58 Q34 52 38 44 Q44 38 50 44 Q52 50 46 50 Z" fill="#B6A890"/>
+    <path data-clip="tour" data-w="0" d="M64 26 Q80 64 40 78 L80 80 L80 26 Z" fill="#7C705F"/>
+    <path data-clip="tour" data-w="0" d="M26 48 Q28 36 36 32 Q30 40 30 50 Z" fill="#DED3BC"/>
+    <g data-teinte="#8C6F4E" data-w="0.42" fill="none" stroke="#000"><path d="M48 11 L48 22 M64 14 L60 25 M77 24 L69 31 M84 38 L74 42 M86 52 L74 52 M82 66 L72 61 M72 78 L65 69 M58 85 L55 74 M44 86 L44 74 M30 82 L34 71 M18 72 L26 64 M12 58 L23 56 M12 44 L22 46"/></g>
+    <g data-teinte="#7C705F" data-w="0.36" fill="none" stroke="#000"><path d="M58 36 L68 30 M62 48 L72 48 M58 58 L66 66 M46 62 L44 72 M36 56 L28 62 M34 44 L24 42 M42 36 L38 28"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M66 76 l6 -6 M58 82 l7 -7 M74 68 l5 -5"/></g>
+  </g>
+</svg>

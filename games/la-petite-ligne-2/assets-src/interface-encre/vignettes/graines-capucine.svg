@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Sachet de graines de capucine: bande orange, capucine en cornet et feuille ronde, grosses graines ridées vert-brun. Écrit par generer-sachets.mjs: modifier le script, pas ce fichier. -->
+  <g transform="rotate(6 48 48)">
+    <path id="sachet" d="M22 18 L30 14 L38 19 L46 13 L54 18 L62 13 L70 18 L74 84 L20 86 Z" fill="#F5E6C6"/>
+    <path data-clip="sachet" data-w="0" d="M60 10 L80 10 L80 90 L40 90 Q66 60 60 10 Z" fill="#DDC59C"/>
+    <g data-clip="sachet" data-teinte="#A88C6C" data-w="0.3" fill="none" stroke="#000"><path d="M22 40 L28 40 M66 46 L72 46 M24 80 L30 74"/></g>
+    <path d="M24 26 L71 24 L72 32 L25 34 Z" fill="#D9822E" data-w="0.6"/>
+    <circle cx="38" cy="64" r="8" fill="#9DBB5B" data-w="0.55"/>
+    <g data-teinte="#40592D" data-w="0.28" fill="none" stroke="#000"><path d="M38 64 L32 58 M38 64 L44 60 M38 64 L38 72"/></g>
+    <path id="fleur" data-w="0.5" d="M50 62 Q38 60 38 50 Q40 42 48 44 Q52 38 58 42 Q66 44 62 52 Q64 60 50 62 Z" fill="#D9822E"/>
+    <path data-clip="fleur" data-w="0" d="M60 40 Q68 60 48 66 L70 66 L70 40 Z" fill="#B8704E"/>
+    <path d="M58 46 L66 38 L62 48 Z" fill="#D9822E" data-w="0.45"/>
+    <circle cx="51" cy="52" r="2.4" fill="#F2C55C" data-w="0.35"/>
+    <g data-w="0.4" fill="none" stroke="#000"><path d="M28 81 L40 81"/></g>
+  </g>
+  <g data-w="0.45" fill="#8D8A4E"><circle cx="78" cy="88" r="2.6"/><circle cx="87" cy="83" r="2.6"/><circle cx="85" cy="92" r="2.6"/></g>
+</svg>

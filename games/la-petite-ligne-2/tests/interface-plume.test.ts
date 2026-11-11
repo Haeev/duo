@@ -55,62 +55,6 @@ const AHEAD = new Set(['lettre']);
  * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
  * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
  */
-/** Objets des collections d'Aubrune, en attente de leur dessin (liste pour l'artiste ci-dessous). */
-const COLLECTIONS_AUBRUNE = [
-  'ammonite',
-  'anguille',
-  'barbeau',
-  'belemnite',
-  'bille-d-agate',
-  'bleuet',
-  'bouton-de-livree',
-  'bouture-de-rosier',
-  'breme',
-  'capucine',
-  'carpe',
-  'chevesne',
-  'clou-de-voie-date',
-  'compotee-de-mures',
-  'dent-de-requin',
-  'friture',
-  'gardon',
-  'giroflee',
-  'graines-bleuet',
-  'graines-capucine',
-  'graines-giroflee',
-  'graines-marguerite',
-  'graines-nigelle',
-  'graines-oeillet',
-  'graines-pensee',
-  'graines-souci',
-  'graines-tournesol',
-  'gratin',
-  'griffes-de-muguet',
-  'jeton-de-cantine',
-  'loche',
-  'marguerite',
-  'matelote',
-  'muguet',
-  'nigelle',
-  'oeillet-de-poete',
-  'ombre',
-  'oursin-fossile',
-  'pain-perdu',
-  'pensee',
-  'perche-meuniere',
-  'plants-de-violette',
-  'pointe-de-silex',
-  'rose-des-lacombe',
-  'rotengle',
-  'salade-de-radis',
-  'souci',
-  'tarte-aux-mures',
-  'tomates-farcies',
-  'tournesol',
-  'truite-grillee',
-  'vairon',
-  'violette',
-] as const;
 /** Objets d'intérieur livrés en 3D le 2026-11-11 (`recoltables-aubrune/interieurs.py`), avant leur dessin. */
 const NEW_DECOR = [
   'balai',
@@ -143,16 +87,39 @@ const NEW_DECOR = [
   'tonnelet',
   'vaisselier',
 ] as const;
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
-  ...COLLECTIONS_AUBRUNE.map((id): [string, string] => [
-    id,
-    'collections d’Aubrune: à dessiner, voir docs/jeux/jeu-1/refonte/collections-aubrune-assets.md',
-  ]),
-  ...NEW_DECOR.map((id): [string, string] => [
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>(
+  NEW_DECOR.map((id): [string, string] => [
     id,
     'modèle 3D livré avant sa vignette: à dessiner par l’artiste 2D',
   ]),
-]);
+);
+/**
+ * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):
+ * le carnet les montre par leur identifiant (`itemThumb`), elles ont leur vignette aussi.
+ */
+const BOOK = new Map<string, unknown>();
+for (const f of readdirSync(path.join(PKG, 'donnees', 'commun', 'carnet')))
+  if (f.endsWith('.json'))
+    BOOK.set(
+      f.slice(0, -5),
+      JSON.parse(readFileSync(path.join(PKG, 'donnees', 'commun', 'carnet', f), 'utf8')),
+    );
+const sourceType = (e: unknown): unknown =>
+  typeof e === 'object' &&
+  e !== null &&
+  'source' in e &&
+  typeof e.source === 'object' &&
+  e.source !== null &&
+  'type' in e.source
+    ? e.source.type
+    : null;
+/** Entrées du carnet qui ont besoin de leur dessin: insectes et prises posées à la main (poissons, trésors). */
+const BOOK_DRAWN = [...BOOK]
+  .filter(([id, e]) => {
+    const type = sourceType(e);
+    return (type === 'insect' || type === 'manual') && !id.endsWith('-d-essai');
+  })
+  .map(([id]) => id);
 
 describe('vignettes à la plume', () => {
   const ids = svgIds(path.join(OUT, 'vignettes'));
@@ -163,9 +130,31 @@ describe('vignettes à la plume', () => {
     expect(ids.length).toBeGreaterThanOrEqual(objects.size + placeables.size - WITHOUT_THUMB.size);
   });
 
-  it('porte le nom d’un objet ou d’un meuble posable des données', () => {
+  it('porte le nom d’un objet, d’un meuble posable ou d’une entrée du carnet', () => {
     for (const id of ids)
-      expect(objects.has(id) || placeables.has(id) || AHEAD.has(id), id).toBe(true);
+      expect(objects.has(id) || placeables.has(id) || BOOK.has(id) || AHEAD.has(id), id).toBe(true);
+  });
+
+  it('une recette du carnet montre la vignette de son plat (`source.item`)', () => {
+    const dishes = [...BOOK.values()].flatMap((e) =>
+      typeof e === 'object' &&
+      e !== null &&
+      'source' in e &&
+      typeof e.source === 'object' &&
+      e.source !== null &&
+      'item' in e.source &&
+      typeof e.source.item === 'string'
+        ? [e.source.item]
+        : [],
+    );
+    expect(dishes.length).toBeGreaterThan(0);
+    for (const item of dishes) expect(thumbUrl(item), item).not.toBeNull();
+  });
+
+  it('chaque insecte et chaque trésor posé à la main du carnet a sa vignette', () => {
+    const drawn = new Set(ids);
+    expect(BOOK_DRAWN.length).toBeGreaterThan(0);
+    expect(BOOK_DRAWN.filter((id) => !drawn.has(id))).toEqual([]);
   });
 
   it('chaque objet et chaque meuble posable a sa vignette (sauf exceptions justifiées)', () => {

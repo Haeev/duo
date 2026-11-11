@@ -90,6 +90,8 @@ export type CollectionFamily = (typeof COLLECTION_FAMILIES)[number];
 
 export interface CollectionEntryRead {
   readonly id: string;
+  /** Vignette montrée: l'objet de la source (le plat d'une recette), sinon l'entrée elle-même. */
+  readonly thumb?: string;
   readonly name: string;
   readonly rarity: 1 | 2 | 3;
   readonly found: boolean;
@@ -328,8 +330,10 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
           family,
           entries: category.entries.map((e) => {
             const found = e.by[0] || e.by[1];
+            const source = content.book.entries[e.id]?.source;
             return {
               id: e.id,
+              thumb: source?.type === 'item' ? source.item : e.id,
               name: e.name,
               rarity: 1,
               found,

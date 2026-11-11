@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Friture d'ablettes: cornet de papier crème roulé, pointe en bas, rempli de petites ablettes frites dorées (têtes et queues qui dépassent), grains de sel. -->
+  <g transform="rotate(-14 48 50)">
+    <g data-w="0.5">
+      <path d="M22 40 Q22 24 34 20 Q42 22 40 30 L36 26 L34 34 Z" fill="#D4A33E"/>
+      <path d="M40 34 Q36 14 46 8 Q54 12 52 22 L48 16 L46 26 Z" fill="#F2C55C"/>
+      <path d="M52 30 Q56 12 70 12 Q74 20 66 26 L66 18 L60 28 Z" fill="#D4A33E"/>
+      <path d="M62 38 Q70 24 82 28 Q82 36 72 38 L76 32 L68 40 Z" fill="#F2C55C"/>
+      <path d="M30 34 Q34 28 42 30 Q40 36 32 38 Z" fill="#C0803A"/>
+      <path d="M58 34 Q66 30 70 34 Q66 40 58 38 Z" fill="#C0803A"/>
+    </g>
+    <g data-w="0" fill="#231A17"><circle cx="36" cy="24" r="1.3"/><circle cx="48" cy="12" r="1.2"/><circle cx="68" cy="16" r="1.2"/><circle cx="78" cy="30" r="1.2"/></g>
+    <path id="cornet" d="M14 36 Q48 46 86 34 L52 92 Z" fill="#F5E6C6"/>
+    <path data-clip="cornet" data-w="0" d="M60 30 Q66 64 44 96 L96 96 L96 30 Z" fill="#DDC59C"/>
+    <path data-clip="cornet" data-w="0" d="M20 40 Q30 44 40 44 Q34 52 30 56 Z" fill="#F7F3EA"/>
+    <path d="M14 36 Q48 46 86 34 Q84 42 78 44 Q48 54 20 44 Q14 42 14 36 Z" fill="#F5E6C6" data-w="0.6"/>
+    <g data-teinte="#A88C6C" data-w="0.35" fill="none" stroke="#000"><path d="M30 50 Q50 54 64 44 M40 66 Q52 66 58 58"/></g>
+    <g data-w="0" fill="#F7F3EA"><circle cx="40" cy="22" r="0.9"/><circle cx="58" cy="22" r="0.9"/><circle cx="66" cy="32" r="0.8"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M58 70 l6 -6 M54 78 l6 -6"/></g>
+  </g>
+</svg>

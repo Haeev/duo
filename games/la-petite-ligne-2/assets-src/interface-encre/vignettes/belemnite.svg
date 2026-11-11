@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Bélemnite: rostre fossile en balle de fusil, couché en diagonale, ambre translucide et lisse, long reflet clair, bout cassé qui montre les cernes. -->
+  <g transform="rotate(-38 48 48)">
+    <path id="rostre" d="M14 38 L70 36 Q90 40 92 48 Q90 56 70 60 L14 58 Z" fill="#D9822E"/>
+    <path data-clip="rostre" data-w="0" d="M0 52 Q50 54 96 50 L96 70 L0 70 Z" fill="#B8704E"/>
+    <path data-clip="rostre" data-w="0" d="M18 42 L66 40 Q80 42 86 46 Q72 44 18 46 Z" fill="#FFE6B0"/>
+    <g data-clip="rostre" data-teinte="#F2A66E" data-w="0.3" fill="none" stroke="#000"><path d="M22 50 L70 50 M30 54 L64 54"/></g>
+    <ellipse cx="14" cy="48" rx="5" ry="10" fill="#F2A66E"/>
+    <g data-teinte="#B8704E" data-w="0.32" fill="none" stroke="#000"><ellipse cx="14" cy="48" rx="3" ry="6.4"/><ellipse cx="14" cy="48" rx="1.2" ry="2.8"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M40 60 l4 -4 M48 60 l4 -4 M56 60 l4 -4"/></g>
+  </g>
+</svg>

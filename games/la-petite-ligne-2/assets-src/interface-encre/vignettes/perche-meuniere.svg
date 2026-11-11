@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Perche meunière: assiette crème à liseré moutarde, deux filets de perche farinés et dorés, noisette de beurre qui fond, persil haché, quartier de citron. -->
+  <g transform="rotate(4 48 56)">
+    <ellipse id="assiette" cx="48" cy="60" rx="44" ry="25" fill="#F3EDE0"/>
+    <path data-clip="assiette" data-w="0" d="M66 32 Q84 86 18 92 L96 96 L96 32 Z" fill="#D9CAAE"/>
+    <g data-teinte="#D4A33E" data-w="0.4" fill="none" stroke="#000"><ellipse cx="48" cy="60" rx="38.5" ry="20.5"/></g>
+    <path id="f1" d="M14 58 Q20 48 40 48 Q60 50 72 56 Q64 62 42 62 Q20 62 14 58 Z" fill="#F2C55C"/>
+    <path data-clip="f1" data-w="0" d="M10 58 Q40 60 76 56 L76 70 L10 70 Z" fill="#D4A33E"/>
+    <g data-clip="f1" data-teinte="#C0803A" data-w="0.3" fill="none" stroke="#000"><path d="M28 50 Q30 56 28 61 M40 49 Q42 55 40 62 M52 50 Q54 56 52 62"/></g>
+    <path id="f2" d="M20 70 Q26 62 46 62 Q66 64 78 70 Q70 76 48 76 Q26 76 20 70 Z" fill="#F2C55C"/>
+    <path data-clip="f2" data-w="0" d="M16 72 Q46 74 82 70 L82 84 L16 84 Z" fill="#C0803A"/>
+    <g data-clip="f2" data-teinte="#C0803A" data-w="0.3" fill="none" stroke="#000"><path d="M34 64 Q36 70 34 75 M46 63 Q48 69 46 76 M58 64 Q60 70 58 76"/></g>
+    <path d="M40 52 Q44 46 50 48 Q54 52 50 56 Q44 58 40 52 Z" fill="#FFE2A0" data-w="0.45"/>
+    <path data-w="0" d="M42 52 Q44 50 47 50 Q44 52 44 54 Z" fill="#F7F3EA"/>
+    <g data-w="0" fill="#6E9241"><circle cx="30" cy="56" r="1.2"/><circle cx="58" cy="54" r="1.1"/><circle cx="36" cy="68" r="1.1"/><circle cx="62" cy="70" r="1.2"/><circle cx="50" cy="66" r="1"/></g>
+    <path d="M72 42 Q84 42 86 52 L72 50 Z" fill="#F2C55C" data-w="0.5"/>
+    <path data-w="0" d="M74 44 Q82 44 84 50 L74 48 Z" fill="#FFE2A0"/>
+  </g>
+</svg>

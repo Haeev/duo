@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tomates farcies: plat ovale de faïence crème, trois tomates rouges dorées au four, farce brune qui dépasse, chapeaux posés de travers avec leur queue verte. -->
+  <g transform="rotate(-4 48 58)">
+    <path id="plat" d="M6 56 Q8 80 48 84 Q88 80 90 56 Z" fill="#F3EDE0"/>
+    <path data-clip="plat" data-w="0" d="M62 50 Q72 80 18 90 L96 96 L96 50 Z" fill="#D9CAAE"/>
+    <ellipse cx="48" cy="56" rx="42" ry="15" fill="#F3EDE0" data-w="0.8"/>
+    <ellipse cx="48" cy="57" rx="36" ry="11" fill="#A85837" data-w="0.4"/>
+    <path id="t1" d="M12 56 Q12 40 26 40 Q40 40 40 56 Q38 68 26 68 Q12 68 12 56 Z" fill="#C5443D"/>
+    <path data-clip="t1" data-w="0" d="M34 36 Q44 60 20 72 L44 72 L44 36 Z" fill="#8F3B34"/>
+    <path id="t3" d="M56 56 Q56 40 70 40 Q84 40 84 56 Q82 68 70 68 Q56 68 56 56 Z" fill="#C5443D"/>
+    <path data-clip="t3" data-w="0" d="M78 36 Q88 60 64 72 L88 72 L88 36 Z" fill="#8F3B34"/>
+    <path id="t2" d="M32 62 Q32 46 48 46 Q64 46 64 62 Q62 76 48 76 Q32 76 32 62 Z" fill="#C5443D"/>
+    <path data-clip="t2" data-w="0" d="M56 42 Q68 68 42 80 L68 80 L68 42 Z" fill="#8F3B34"/>
+    <g data-w="0" fill="#E58E84"><path d="M16 50 Q18 44 24 43 Q19 48 19 54 Z"/><path d="M36 56 Q38 50 44 49 Q39 54 39 60 Z"/><path d="M60 50 Q62 44 68 43 Q63 48 63 54 Z"/></g>
+    <g data-w="0.45" fill="#8C5A35"><ellipse cx="26" cy="42" rx="11" ry="4"/><ellipse cx="70" cy="42" rx="11" ry="4"/><ellipse cx="48" cy="48" rx="12" ry="4.2"/></g>
+    <g data-w="0" fill="#5E4233"><circle cx="22" cy="42" r="1.2"/><circle cx="30" cy="43" r="1"/><circle cx="66" cy="42" r="1.2"/><circle cx="74" cy="41" r="1"/><circle cx="44" cy="48" r="1.2"/><circle cx="52" cy="49" r="1"/></g>
+    <g data-w="0.5" fill="#C5443D"><path d="M18 38 Q24 30 34 34 Q30 40 20 40 Z"/><path d="M62 36 Q70 30 78 36 Q72 40 62 39 Z"/><path d="M40 44 Q48 36 58 42 Q52 46 42 46 Z"/></g>
+    <g data-w="0.45" fill="#6E9241"><path d="M26 34 L24 28 L28 31 L30 26 L30 33 Z"/><path d="M70 34 L68 28 L72 31 L74 26 L74 33 Z"/><path d="M49 41 L47 35 L51 38 L53 33 L53 40 Z"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M64 78 l6 -6 M58 82 l6 -6"/></g>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Hanneton commun (vu de dessus): coléoptère trapu, élytres rousses, corselet et tête noirs, antennes en éventail, triangles blancs sur les flancs, bout pointu. -->
+  <g transform="rotate(-14 48 50)">
+    <g data-w="0.85" fill="none" stroke="#000"><path d="M34 40 L20 34 L14 38 M32 54 L16 54 L10 60 M34 68 L22 78 L20 86 M62 40 L76 34 L82 38 M64 54 L80 54 L86 60 M62 68 L74 78 L76 86"/></g>
+    <path d="M48 84 L52 94 L44 94 Z" fill="#3A3331" data-w="0.5"/>
+    <g data-w="0.4" fill="#F3EDE0"><path d="M30 58 L26 62 L31 64 Z"/><path d="M30 68 L26 72 L32 73 Z"/><path d="M66 58 L70 62 L65 64 Z"/><path d="M66 68 L70 72 L64 73 Z"/></g>
+    <path d="M40 18 Q40 12 48 12 Q56 12 56 18 Q56 24 48 24 Q40 24 40 18 Z" fill="#3A3331" data-w="0.55"/>
+    <g data-w="0.5" fill="none" stroke="#000"><path d="M42 14 L34 10 M54 14 L62 10"/></g>
+    <path d="M34 10 L26 2 L28 10 L22 6 L28 14 Z" fill="#AE5F2E" data-w="0.45"/>
+    <path d="M62 10 L70 2 L68 10 L74 6 L68 14 Z" fill="#AE5F2E" data-w="0.45"/>
+    <path d="M34 30 Q34 22 48 22 Q62 22 62 30 Q62 40 48 40 Q34 40 34 30 Z" fill="#3A3331"/>
+    <path data-w="0" d="M38 28 Q40 25 46 25 Q42 28 41 32 Z" fill="#6A6763"/>
+    <path id="elytres" d="M48 38 Q66 38 66 56 Q66 78 48 86 Q30 78 30 56 Q30 38 48 38 Z" fill="#AE5F2E"/>
+    <path data-clip="elytres" data-w="0" d="M58 34 Q72 66 44 90 L96 96 L96 34 Z" fill="#8C4A2E"/>
+    <path data-clip="elytres" data-w="0" d="M34 54 Q36 44 44 41 Q38 48 38 58 Z" fill="#D9822E"/>
+    <g data-clip="elytres" data-teinte="#743D2B" data-w="0.3" fill="none" stroke="#000"><path d="M40 44 L40 76 M56 44 L56 76"/></g>
+    <path data-w="0.5" fill="none" stroke="#000" d="M48 39 L48 85"/>
+  </g>
+</svg>
