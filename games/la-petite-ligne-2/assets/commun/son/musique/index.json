@@ -1,4 +1,60 @@
 {
+  "air-canon-de-la-repetition": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-carillon-des-deux-soeurs": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-chanson-des-marmites": {
+    "seconds": 72.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-chant-de-la-coupe": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-marche-de-la-halte": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-sifflet-du-samedi": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-sonnerie-de-5h12": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
+  "air-valse-de-la-minute": {
+    "seconds": 64.0,
+    "stems": [
+      "air",
+      "fond"
+    ]
+  },
   "bourg-apres-midi": {
     "seconds": 64.0,
     "stems": [

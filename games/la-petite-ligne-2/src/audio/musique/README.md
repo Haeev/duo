@@ -28,7 +28,7 @@ Chaque morceau = deux tiges mono qui bouclent ensemble (`fond`: basse, accompagn
 
 ## Recette: ajouter un morceau
 
-1. Écris-le dans `assets-src/son/musique/aubrune.py` (une fonction qui rend un `Morceau` et ses tiges), ajoute-le à `MORCEAUX`. Reste dans les notes de sol majeur (le test d'écriture le vérifie), durée entière en secondes.
+1. Écris-le dans `assets-src/son/musique/aubrune.py` (une fonction qui rend un `Morceau` et ses tiges), ajoute-le à `MORCEAUX`. Un air de la collection du carnet va dans `airs.py` (liste `AIRS`) et porte l'identifiant de sa fiche (`air-marche-de-la-halte`): le carnet le retrouve par ce nom. Reste dans les notes de sol majeur (le test d'écriture le vérifie), durée entière en secondes.
 2. `duo-python -I assets-src/son/musique/verifier_ecriture.py` (aucune faute), `duo-python -I assets-src/son/musique/generer.py --seulement <id>`, puis `controler.py` (-16 LUFS, crêtes sous -1 dBFS, raccord).
 3. Dans `musique.json`: une entrée `tracks` (`seconds`, une entrée par tige avec `file`, `pan`, `volumeDb`) et une règle `rules` qui le choisit.
 4. `pnpm test`: la table dit ce qui cloche. Aucune ligne de moteur.

@@ -159,3 +159,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Un `toile(d)` trop courte tronque net le dernier coup posé (cloche coupée visible au spectrogramme comme un bord vertical): dimensionner la toile sur le dernier départ plus la durée du coup, puis `fondu` en fin.
 - Test de décodage rapide: un seul processus ffmpeg avec toutes les entrées et une sortie `-f null` par entrée (`-map i:a`), 1,4 s pour 80 fichiers; un ffmpeg par fichier dépasse 20 s sous charge.
 - `money_changed` part aussi pour les achats en boutique: un son de boutique sur `shop_bought` doublerait celui de l'argent; brancher l'argent par le signe de `delta`.
+
+## La Petite Ligne (refonte): airs de la collection (vérifié le 2026-11-11)
+
+- mido écrit les noms de piste et de morceau en latin-1: un titre avec « œ » plante l'écriture MIDI et laisse un fichier tronqué (EOFError à la relecture). Titres MIDI sans œ (« soeurs »).
+- `assets-src/son/` et `assets-src/son/musique/` ont chacun un `generer.py`: un script de `musique/` qui importe `generer` doit mettre son propre dossier en tête de `sys.path` (insérer le parent d'abord, puis le dossier).
+- Schéma des fiches du carnet strict (`CollectionEntrySchema`): pas de champ fichier possible sans code; un air se relie à sa fiche par l'identifiant du morceau (`tracks.<id de l'entrée>`).
+- Huit airs de 64 à 72 s en deux tiges Opus 36k: 4,8 Mo; la musique d'Aubrune passe à 11,09 Mo sur le plafond de 12 Mo de `controler.py`: le prochain lot devra baisser le débit ou relever le plafond.
+- FluidR3 n'a pas de bugle ni de bugle à pistons: trompette (0:56) jouée entre ré 4 et mi 5, vélocité 70 à 80.
+- Rendu des huit airs: 3 min 20 sur une machine chargée; `--seulement air-` les isole (aucun autre identifiant ne contient « air- »).

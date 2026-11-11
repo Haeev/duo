@@ -89,6 +89,70 @@
         "fond": { "file": "musique/fete-fond.ogg", "pan": -0.25, "volumeDb": 0 },
         "air": { "file": "musique/fete-air.ogg", "pan": 0.25, "volumeDb": 0 }
       }
+    },
+    "air-marche-de-la-halte": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/air-marche-de-la-halte-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/air-marche-de-la-halte-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-valse-de-la-minute": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/air-valse-de-la-minute-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/air-valse-de-la-minute-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-carillon-des-deux-soeurs": {
+      "seconds": 64,
+      "stems": {
+        "fond": {
+          "file": "musique/air-carillon-des-deux-soeurs-fond.ogg",
+          "pan": -0.2,
+          "volumeDb": 0
+        },
+        "air": { "file": "musique/air-carillon-des-deux-soeurs-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-chanson-des-marmites": {
+      "seconds": 72,
+      "stems": {
+        "fond": { "file": "musique/air-chanson-des-marmites-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/air-chanson-des-marmites-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-canon-de-la-repetition": {
+      "seconds": 64,
+      "stems": {
+        "fond": {
+          "file": "musique/air-canon-de-la-repetition-fond.ogg",
+          "pan": -0.2,
+          "volumeDb": 0
+        },
+        "air": { "file": "musique/air-canon-de-la-repetition-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-chant-de-la-coupe": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/air-chant-de-la-coupe-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/air-chant-de-la-coupe-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-sifflet-du-samedi": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/air-sifflet-du-samedi-fond.ogg", "pan": -0.2, "volumeDb": 0 },
+        "air": { "file": "musique/air-sifflet-du-samedi-air.ogg", "pan": 0.2, "volumeDb": 0 }
+      }
+    },
+    "air-sonnerie-de-5h12": {
+      "seconds": 64,
+      "stems": {
+        "fond": { "file": "musique/air-sonnerie-de-5h12-fond.ogg", "pan": -0.15, "volumeDb": 0 },
+        "air": { "file": "musique/air-sonnerie-de-5h12-air.ogg", "pan": 0.15, "volumeDb": 0 }
+      }
     }
   },
   "jingles": {
@@ -154,11 +218,82 @@
       "play": "train",
       "pacing": "steady"
     },
+    {
+      "id": "fete-barrieres-jour",
+      "when": {
+        "events": ["fete-des-barrieres-fleuries"],
+        "bands": ["aube", "matin", "apres-midi"]
+      },
+      "play": "air-marche-de-la-halte",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-barrieres-bal",
+      "when": { "events": ["fete-des-barrieres-fleuries"] },
+      "play": "fete",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-lumignons-jour",
+      "when": { "events": ["nuit-des-lumignons"], "bands": ["aube", "matin", "apres-midi"] },
+      "play": "air-carillon-des-deux-soeurs",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-lumignons-nuit",
+      "when": { "events": ["nuit-des-lumignons"] },
+      "play": "air-sonnerie-de-5h12",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-soupe-jour",
+      "when": { "events": ["concours-de-la-soupe"], "bands": ["aube", "matin", "apres-midi"] },
+      "play": "air-chanson-des-marmites",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-soupe-bal",
+      "when": { "events": ["concours-de-la-soupe"] },
+      "play": "fete",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-premier-train-jour",
+      "when": { "events": ["veillee-du-premier-train"], "bands": ["aube", "matin", "apres-midi"] },
+      "play": "air-sifflet-du-samedi",
+      "pacing": "long"
+    },
+    {
+      "id": "fete-premier-train-nuit",
+      "when": { "events": ["veillee-du-premier-train"] },
+      "play": "air-sonnerie-de-5h12",
+      "pacing": "long"
+    },
+    {
+      "id": "veillee-du-quai",
+      "when": {
+        "events": [
+          "premiere-veillee-du-quai",
+          "veillee-du-quai-printemps",
+          "veillee-du-quai-ete",
+          "veillee-du-quai-automne",
+          "veillee-du-quai-hiver"
+        ]
+      },
+      "play": "air-valse-de-la-minute",
+      "pacing": "long"
+    },
     { "id": "fete", "when": { "events": ["fete-d-essai"] }, "play": "fete", "pacing": "long" },
     {
       "id": "train-du-samedi",
       "when": { "events": ["visiteur-du-samedi"] },
       "play": "train",
+      "pacing": "normal"
+    },
+    {
+      "id": "train-du-samedi-aubrune",
+      "when": { "events": ["train-du-samedi"] },
+      "play": "air-sifflet-du-samedi",
       "pacing": "normal"
     },
     {
