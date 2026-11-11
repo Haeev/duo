@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Plume de héron: longue, étroite, grise, légèrement cintrée, barbes fines en chevrons, calamus nu. -->
+  <g transform="translate(48 48) rotate(38) scale(1.02) translate(-48 -48)">
+    <path id="vane" d="M48 90 Q36 62 38 32 Q40 14 48 3 Q58 16 59 36 Q60 64 48 90 Z" fill="#B9B7B0"/>
+    <path data-clip="vane" data-w="0" d="M49 0 L66 0 L66 96 L48 96 Q62 62 61 34 Q60 14 49 0 Z" fill="#8C8E91"/>
+    <path data-w="0" d="M40 34 Q42 18 47 9 Q44 24 43 40 Z" fill="#F3EDE0"/>
+    <path d="M44 78 L52 78 L51 94 Q48 96 45 94 Z" fill="#F3EDE0" data-w="0.45"/>
+    <g data-teinte="#4A4D52" data-w="0.3" fill="none" stroke="#000"><path d="M47 76 L40 68 M48 64 L40 55 M48 52 L40 43 M48 40 L41 32 M49 70 L56 62 M49 58 L57 49 M49 46 L58 38 M49 34 L56 26"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M48 90 Q47 50 48 10"/>
+    <path data-w="0.4" fill="none" stroke="#000" d="M44 22 L47 28"/>
+  </g>
+</svg>

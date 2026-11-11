@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Perle de rivière: perle d'eau douce un peu irrégulière, nacre rosée, nichée dans une valve de mulette (dedans bleuté pour que la perle ressorte). -->
+  <g transform="rotate(-6 48 50)">
+    <path id="valve" d="M4 62 Q6 40 48 38 Q90 40 92 62 Q88 90 48 90 Q8 90 4 62 Z" fill="#6E4B30"/>
+    <path data-clip="valve" data-w="0" d="M64 40 L96 40 L96 96 L24 96 Q70 90 76 50 Z" fill="#4F3626"/>
+    <path id="nacre" d="M12 62 Q14 48 48 46 Q82 48 84 62 Q80 82 48 82 Q16 82 12 62 Z" fill="#A9C7D9"/>
+    <path data-clip="nacre" data-w="0" d="M60 46 L90 46 L90 90 L28 90 Q64 84 72 56 Z" fill="#A58BB8"/>
+    <path data-clip="nacre" data-w="0" d="M16 62 Q18 54 32 52 Q24 58 24 70 Z" fill="#F3EDE0"/>
+    <g data-clip="valve" data-teinte="#96704C" data-w="0.32" fill="none" stroke="#000"><path d="M8 62 Q12 82 30 86 M92 62 Q90 80 74 88"/></g>
+    <path id="perle" d="M47 26 Q68 25 69 46 Q68 68 47 68 Q27 67 26 46 Q27 26 47 26 Z" fill="#F3EDE0"/>
+    <path data-clip="perle" data-w="0" d="M60 24 L80 24 L80 76 L36 76 Q66 66 64 44 Z" fill="#CC9C96"/>
+    <path data-clip="perle" data-w="0" d="M32 54 Q40 64 56 62 Q44 68 34 62 Z" fill="#A9C7D9"/>
+    <path data-w="0" d="M32 40 Q34 32 44 30 Q38 36 36 48 Z" fill="#F7F3EA"/>
+    <path data-w="0" d="M54 33 l2.4 4.6 l4.6 2.4 l-4.6 2.4 l-2.4 4.6 l-2.4 -4.6 l-4.6 -2.4 l4.6 -2.4 Z" fill="#F7F3EA"/>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M72 84 l6 -6 M64 88 l6 -6"/></g>
+  </g>
+</svg>

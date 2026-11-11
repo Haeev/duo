@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Plume de martin-pêcheur: courte et large, bleu électrique, rayures turquoise, bout arrondi (l'autre plume est longue et grise). -->
+  <g transform="translate(48 50) rotate(-30) translate(-48 -48)">
+    <path id="vane" d="M48 86 Q26 70 26 44 Q28 18 48 8 Q68 18 70 44 Q70 70 48 86 Z" fill="#44618A"/>
+    <path data-clip="vane" data-w="0" d="M52 4 L80 4 L80 92 L40 92 Q66 72 64 44 Q62 22 52 4 Z" fill="#2C3B57"/>
+    <path data-clip="vane" data-w="0" d="M30 42 Q32 24 46 14 Q38 28 38 48 Z" fill="#A9C7D9"/>
+    <g data-clip="vane" data-teinte="#5CE1E6" data-w="0.9" fill="none" stroke="#000"><path d="M30 34 Q48 22 66 34 M28 46 Q48 34 68 46 M32 58 Q48 46 64 58"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M48 90 Q47 50 48 12"/>
+    <g data-teinte="#2F6E73" data-w="0.3" fill="none" stroke="#000"><path d="M48 70 L36 62 M48 56 L34 50 M49 70 L60 62 M49 56 L62 50 M48 40 L40 34 M49 40 L58 34"/></g>
+    <path d="M44 84 L52 84 L51 94 Q48 96 45 94 Z" fill="#F3EDE0" data-w="0.45"/>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M62 70 l5 -5 M56 76 l6 -6"/></g>
+  </g>
+</svg>
