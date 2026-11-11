@@ -167,19 +167,31 @@ bourrelet = false
 zones = [{ id = "principale", famille = "tissus", defaut = "craie" }]
 tags = ["ete"]
 
-# Pièce ajoutée par une seule entrée de données (preuve du gabarit, 2026-11-10): gilet sans manches porté sur un haut.
+# --- base "veste": coque ouverte posée sur le buste (gilets, cardigans, vestes). Champs de "torse" (couche,
+# ourlet, col, manches) et en plus: col_v = hauteur du bas de l'encolure en V (absent: ras du cou);
+# encolure = demi-largeur du V en haut; ouverture = largeur du devant ouvert sur toute la hauteur;
+# pointes = descente de l'ourlet en pointe sur le devant; emmanchure = trous de bras quand manches = 0
+# (largeur gardée à l'épaule = demi-carrure - emmanchure x bras, 0.55 par défaut, 0 sans trou); bande = hauteur des côtes en bas et aux poignets (0: aucune); boutons = nombre;
+# poches = liste [bas, haut, angle depuis le milieu du devant en degrés, demi-largeur en degrés];
+# revers = col rabattu et revers sur le V; martingale = demi-ceinture et boucle dans le dos.
+# Zones: principale, puis boutons (couleurs fixes), puis dos facultatif (dos d'une autre étoffe).
+# Gilet refait le 2026-11-11 (retour du client: l'ancien, une coque en boîte, était « hideux »): même id.
 [[pieces]]
 id = "accessory-vest"
 nom = "Gilet sans manches"
+description = "Un gilet boutonné en drap, pointu devant, à porter sur une chemise."
 slot = "accessory"
-base = "torse"
-couche = 0.034
+base = "veste"
+couche = 0.036
 ourlet = 0.10
-manches = 0.0
-ouverture = 0.09
-col = 1.315
-bourrelet = false
-zones = [{ id = "principale", famille = "tissus", defaut = "bouteille" }]
+pointes = 0.05
+col = 1.325
+col_v = 1.06
+encolure = 0.062
+boutons = 4
+poches = [[0.925, 0.955, 30, 9]]
+martingale = true
+zones = [{ id = "principale", famille = "tissus", defaut = "bouteille" }, { id = "boutons", famille = "fixes", couleurs = ["laiton", "cuir_sombre", "acier"], defaut = "laiton" }, { id = "dos", famille = "tissus", couleurs = ["anthracite", "encre", "perle", "chocolat", "marine", "lin"], defaut = "anthracite" }]
 tags = ["travail"]
 
 # --- base "jambes": culotte et deux jambes. longueur = part de la jambe couverte (0.3 short, 0.6 pantacourt,
@@ -214,6 +226,7 @@ base = "jupe"
 couche = 0.008
 bas = 0.50
 evasement = 0.10
+suivi = 0.8
 zones = [{ id = "principale", famille = "tissus", defaut = "prune" }]
 tags = ["quotidien"]
 
@@ -228,6 +241,7 @@ manches = 0.3
 col = 1.337
 bas = 0.48
 evasement = 0.11
+suivi = 0.8
 zones = [{ id = "principale", famille = "tissus", defaut = "coquelicot" }]
 tags = ["quotidien"]
 
@@ -368,3 +382,190 @@ bas = 1.555
 cheveux = "flat"
 zones = [{ id = "principale", famille = "tissus", defaut = "coquelicot" }]
 tags = ["froid"]
+
+# ---------------------------------------------------------------- garde-robe d'Aubrune (2026-11-11)
+# Pièces à gagner ou à acheter: étiquette `a-gagner` (cachée de l'éditeur tant que le duo ne l'a pas reçue,
+# effet `give_piece`). `mercerie` = en rayon chez Solange Mérigot, `prix` en centimes (lu par la future
+# ligne de vente de pièce, voir README.md; le catalogue ne l'exporte pas encore). Les autres sont des
+# récompenses de quêtes et de fêtes. `description`: une ligne affichée avec le nom.
+[[pieces]]
+id = "top-cardigan"
+nom = "Gilet de laine"
+description = "Un gilet tricoté à côtes, boutonné jusqu'au V, chaud sans être lourd."
+slot = "top"
+base = "veste"
+couche = 0.022
+ourlet = 0.11
+col = 1.33
+col_v = 1.10
+encolure = 0.058
+manches = 0.97
+bande = 0.035
+boutons = 5
+poches = [[0.885, 0.945, 33, 10]]
+zones = [{ id = "principale", famille = "tissus", couleurs = ["moutarde", "bouteille", "lin", "rouille", "marine", "prune", "perle"], defaut = "moutarde" }, { id = "boutons", famille = "fixes", couleurs = ["cuir_sombre", "laiton", "caoutchouc_clair"], defaut = "cuir_sombre" }]
+tags = ["a-gagner", "mercerie", "froid"]
+prix = 2800
+
+[[pieces]]
+id = "top-work-jacket"
+nom = "Veste de travail"
+description = "La veste de toile des ateliers, à revers et grandes poches, faite pour durer."
+slot = "top"
+base = "veste"
+couche = 0.027
+ourlet = 0.15
+col = 1.335
+ouverture = 0.05
+col_v = 1.15
+encolure = 0.03
+revers = true
+manches = 0.97
+boutons = 4
+poches = [[0.855, 0.945, 31, 13], [1.12, 1.165, 36, 9]]
+zones = [{ id = "principale", famille = "tissus", couleurs = ["bleu_de_travail", "marine", "olive", "noisette", "anthracite"], defaut = "bleu_de_travail" }, { id = "boutons", famille = "fixes", couleurs = ["acier", "laiton"], defaut = "acier" }]
+tags = ["a-gagner", "travail"]
+
+# --- base "jambes" (voir plus haut), avec revers = hauteur du revers retroussé au bas.
+[[pieces]]
+id = "bottom-corduroy"
+nom = "Pantalon de velours"
+description = "Un pantalon de velours côtelé, large, aux revers retroussés: le pantalon des champs."
+slot = "bottom"
+base = "jambes"
+couche = 0.013
+longueur = 0.97
+revers = 0.05
+zones = [{ id = "principale", famille = "tissus", couleurs = ["noisette", "chocolat", "olive", "bouteille", "ficelle", "rouille"], defaut = "noisette" }]
+tags = ["a-gagner", "mercerie", "travail", "froid"]
+prix = 2400
+
+# --- base "jupe" (voir plus haut), avec suivi = part du mouvement des jambes reprise à l'ourlet (0.5 par défaut;
+# au-delà, l'ourlet suit aussi le tibia sous le genou: obligatoire pour une jupe qui descend sous le genou).
+[[pieces]]
+id = "bottom-long-skirt"
+nom = "Jupe longue"
+description = "Une jupe ample jusqu'au mollet, qui tourne quand on danse à la fête."
+slot = "bottom"
+base = "jupe"
+couche = 0.010
+bas = 0.30
+evasement = 0.20
+suivi = 0.92
+zones = [{ id = "principale", famille = "tissus", couleurs = ["prune", "marine", "bouteille", "brique", "lin", "ocre"], defaut = "prune" }]
+tags = ["a-gagner", "mercerie", "quotidien"]
+prix = 2200
+
+# --- base "salopette": jambes (champs de "jambes"), culotte montée par-dessus le haut (couche_haut), bavette
+# (hauteur du haut), poche, bretelles et boutons. Zones: toile, puis boutons (couleurs fixes).
+[[pieces]]
+id = "bottom-overalls"
+nom = "Salopette"
+description = "La salopette de toile du jardin et de l'atelier, à boutons de laiton."
+slot = "bottom"
+base = "salopette"
+couche = 0.012
+longueur = 0.97
+revers = 0.045
+couche_haut = 0.046
+bavette = 1.20
+zones = [{ id = "principale", famille = "tissus", couleurs = ["bleu_de_travail", "marine", "olive", "ficelle", "brique"], defaut = "bleu_de_travail" }, { id = "boutons", famille = "fixes", couleurs = ["laiton", "acier"], defaut = "laiton" }]
+tags = ["a-gagner", "travail"]
+
+# --- base "robe" (voir plus haut), avec bouffant = renflement des manches, suivi (comme "jupe"),
+# col_claudine et ceinture (vrai ou faux) dans la deuxième zone.
+[[pieces]]
+id = "dress-sunday"
+nom = "Robe du dimanche"
+description = "La robe des grands jours, col claudine et ceinture nouée: pour la messe ou le bal."
+slot = "dress"
+base = "robe"
+couche = 0.019
+manches = 0.36
+bouffant = 0.012
+col = 1.337
+bas = 0.36
+evasement = 0.17
+suivi = 0.85
+col_claudine = true
+ceinture = true
+zones = [{ id = "principale", famille = "tissus", couleurs = ["ciel", "coquelicot", "rose_ancien", "lilas", "sauge", "marine", "moutarde"], defaut = "ciel" }, { id = "garniture", famille = "tissus", couleurs = ["craie", "lin", "marine", "encre"], defaut = "craie" }]
+tags = ["a-gagner", "fete"]
+
+# --- base "sabot": sabots de bois, bride de cuir. Zones: bois, puis bride (couleurs fixes).
+[[pieces]]
+id = "shoes-clogs"
+nom = "Sabots"
+description = "Des sabots de bois taillés d'une pièce, pointe relevée: ils claquent sur les pavés."
+slot = "shoes"
+base = "sabot"
+zones = [{ id = "bois", famille = "tissus", couleurs = ["noisette", "ocre", "ficelle", "chocolat"], defaut = "noisette" }, { id = "bride", famille = "fixes", couleurs = ["cuir_sombre", "cuir"], defaut = "cuir_sombre" }]
+tags = ["a-gagner", "mercerie", "travail"]
+prix = 1600
+
+# --- bases "casquette" et "chapeau": coiffes tenues par la tête, faites ici (pas de Meshy). cheveux = comme
+# "meshy-rigide". casquette: front et nuque = hauteurs du bord. chapeau: bas = hauteur du bord, bord = rayon;
+# zones: paille, puis ruban.
+[[pieces]]
+id = "hat-cap"
+nom = "Casquette"
+description = "La casquette plate des hommes du bourg, qu'on soulève pour dire bonjour."
+slot = "hat"
+base = "casquette"
+front = 1.625
+nuque = 1.555
+cheveux = "flat"
+zones = [{ id = "principale", famille = "tissus", couleurs = ["anthracite", "ficelle", "noisette", "bouteille", "marine", "perle"], defaut = "anthracite" }]
+tags = ["a-gagner", "mercerie", "quotidien"]
+prix = 900
+
+[[pieces]]
+id = "hat-straw"
+nom = "Chapeau de paille"
+description = "Un grand chapeau de paille à ruban, pour les foins et les après-midi d'été."
+slot = "hat"
+base = "chapeau"
+bas = 1.600
+bord = 0.29
+cheveux = "flat"
+zones = [{ id = "paille", famille = "tissus", couleurs = ["ficelle", "lin", "ocre"], defaut = "ficelle" }, { id = "ruban", famille = "tissus", couleurs = ["coquelicot", "marine", "encre", "bouteille", "ciel"], defaut = "coquelicot" }]
+tags = ["a-gagner", "ete", "fete"]
+
+# --- bases "echarpe", "foulard", "tablier": accessoires posés sur le buste.
+# echarpe: pan = hauteur du bout du pan long; zones: laine, puis rayures. foulard: pointe = hauteur de la pointe.
+# tablier: couche (au-dessus des hauts), bavette, bas, largeur (demi-largeur du devant), suivi; zones: toile,
+# puis liens et poche.
+[[pieces]]
+id = "accessory-scarf"
+nom = "Écharpe"
+description = "Une écharpe de grosse laine rayée au bout: deux tours, et l'hiver recule."
+slot = "accessory"
+base = "echarpe"
+pan = 1.02
+zones = [{ id = "laine", famille = "tissus", couleurs = ["coquelicot", "moutarde", "marine", "bouteille", "prune", "perle"], defaut = "coquelicot" }, { id = "rayures", famille = "tissus", couleurs = ["craie", "moutarde", "encre", "ciel"], defaut = "craie" }]
+tags = ["a-gagner", "mercerie", "froid"]
+prix = 1200
+
+[[pieces]]
+id = "accessory-neckerchief"
+nom = "Foulard"
+description = "Un foulard de coton noué au cou, le mouchoir rouge des moissons."
+slot = "accessory"
+base = "foulard"
+pointe = 1.20
+zones = [{ id = "principale", famille = "tissus", couleurs = ["coquelicot", "bleu_de_travail", "moutarde", "bouteille", "craie"], defaut = "coquelicot" }]
+tags = ["a-gagner", "travail", "ete"]
+
+[[pieces]]
+id = "accessory-apron"
+nom = "Tablier"
+description = "Un tablier de toile à bavette et grande poche, noué dans le dos."
+slot = "accessory"
+base = "tablier"
+couche = 0.052
+bavette = 1.19
+bas = 0.60
+largeur = 0.22
+suivi = 0.9
+zones = [{ id = "toile", famille = "tissus", couleurs = ["lin", "craie", "ciel", "bleu_de_travail", "ficelle"], defaut = "lin" }, { id = "liens", famille = "tissus", couleurs = ["ficelle", "craie", "coquelicot", "marine"], defaut = "ficelle" }]
+tags = ["a-gagner", "travail"]

@@ -194,6 +194,7 @@
     {
       "id": "accessory-vest",
       "name": "Gilet sans manches",
+      "description": "Un gilet boutonné en drap, pointu devant, à porter sur une chemise.",
       "slot": "accessory",
       "file": "accessory.glb",
       "node": "accessory-vest",
@@ -228,10 +229,18 @@
             "#4a4d52",
             "#26282e"
           ]
+        },
+        {
+          "id": "boutons",
+          "colors": ["#c8a150", "#4f3626", "#8c8e91"]
+        },
+        {
+          "id": "dos",
+          "colors": ["#4a4d52", "#26282e", "#b9b7b0", "#5e4233", "#2c3b57", "#d9caae"]
         }
       ],
       "tags": ["travail"],
-      "triangles": 372
+      "triangles": 964
     },
     {
       "id": "bottom-trousers",
@@ -660,6 +669,254 @@
       ],
       "tags": ["froid"],
       "triangles": 827
+    },
+    {
+      "id": "top-cardigan",
+      "name": "Gilet de laine",
+      "description": "Un gilet tricoté à côtes, boutonné jusqu'au V, chaud sans être lourd.",
+      "slot": "top",
+      "file": "top.glb",
+      "node": "top-cardigan",
+      "covers": ["upper-arm-a", "upper-arm-b", "forearm"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#d4a33e", "#3f6453", "#d9caae", "#a85837", "#2c3b57", "#7e3f55", "#b9b7b0"]
+        },
+        {
+          "id": "boutons",
+          "colors": ["#4f3626", "#c8a150", "#ede6d3"]
+        }
+      ],
+      "tags": ["a-gagner", "mercerie", "froid"],
+      "triangles": 1652
+    },
+    {
+      "id": "top-work-jacket",
+      "name": "Veste de travail",
+      "description": "La veste de toile des ateliers, à revers et grandes poches, faite pour durer.",
+      "slot": "top",
+      "file": "top.glb",
+      "node": "top-work-jacket",
+      "covers": ["upper-arm-a", "upper-arm-b", "forearm"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#44618a", "#2c3b57", "#7a7b45", "#96704c", "#4a4d52"]
+        },
+        {
+          "id": "boutons",
+          "colors": ["#8c8e91", "#c8a150"]
+        }
+      ],
+      "tags": ["a-gagner", "travail"],
+      "triangles": 1808
+    },
+    {
+      "id": "bottom-corduroy",
+      "name": "Pantalon de velours",
+      "description": "Un pantalon de velours côtelé, large, aux revers retroussés: le pantalon des champs.",
+      "slot": "bottom",
+      "file": "bottom.glb",
+      "node": "bottom-corduroy",
+      "covers": ["pelvis", "thigh-a", "thigh-b", "shin"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#96704c", "#5e4233", "#7a7b45", "#3f6453", "#b8a17e", "#a85837"]
+        }
+      ],
+      "tags": ["a-gagner", "mercerie", "travail", "froid"],
+      "triangles": 920
+    },
+    {
+      "id": "bottom-long-skirt",
+      "name": "Jupe longue",
+      "description": "Une jupe ample jusqu'au mollet, qui tourne quand on danse à la fête.",
+      "slot": "bottom",
+      "file": "bottom.glb",
+      "node": "bottom-long-skirt",
+      "covers": ["pelvis", "thigh-a"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#7e3f55", "#2c3b57", "#3f6453", "#8f3b34", "#d9caae", "#c0803a"]
+        }
+      ],
+      "tags": ["a-gagner", "mercerie", "quotidien"],
+      "triangles": 384
+    },
+    {
+      "id": "bottom-overalls",
+      "name": "Salopette",
+      "description": "La salopette de toile du jardin et de l'atelier, à boutons de laiton.",
+      "slot": "bottom",
+      "file": "bottom.glb",
+      "node": "bottom-overalls",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#44618a", "#2c3b57", "#7a7b45", "#b8a17e", "#8f3b34"]
+        },
+        {
+          "id": "boutons",
+          "colors": ["#c8a150", "#8c8e91"]
+        }
+      ],
+      "tags": ["a-gagner", "travail"],
+      "triangles": 1732
+    },
+    {
+      "id": "dress-sunday",
+      "name": "Robe du dimanche",
+      "description": "La robe des grands jours, col claudine et ceinture nouée: pour la messe ou le bal.",
+      "slot": "dress",
+      "file": "dress.glb",
+      "node": "dress-sunday",
+      "covers": ["torso", "upper-arm-a", "pelvis", "thigh-a"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#a9c7d9", "#c5443d", "#cc9c96", "#a58bb8", "#96a98c", "#2c3b57", "#d4a33e"]
+        },
+        {
+          "id": "garniture",
+          "colors": ["#f3ede0", "#d9caae", "#2c3b57", "#26282e"]
+        }
+      ],
+      "tags": ["a-gagner", "fete"],
+      "triangles": 1400
+    },
+    {
+      "id": "shoes-clogs",
+      "name": "Sabots",
+      "description": "Des sabots de bois taillés d'une pièce, pointe relevée: ils claquent sur les pavés.",
+      "slot": "shoes",
+      "file": "shoes.glb",
+      "node": "shoes-clogs",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "bois",
+          "colors": ["#96704c", "#c0803a", "#b8a17e", "#5e4233"]
+        },
+        {
+          "id": "bride",
+          "colors": ["#4f3626", "#8c5a35"]
+        }
+      ],
+      "tags": ["a-gagner", "mercerie", "travail"],
+      "triangles": 576
+    },
+    {
+      "id": "hat-cap",
+      "name": "Casquette",
+      "description": "La casquette plate des hommes du bourg, qu'on soulève pour dire bonjour.",
+      "slot": "hat",
+      "file": "hat.glb",
+      "node": "hat-cap",
+      "covers": [],
+      "hair": "flat",
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#4a4d52", "#b8a17e", "#96704c", "#3f6453", "#2c3b57", "#b9b7b0"]
+        }
+      ],
+      "tags": ["a-gagner", "mercerie", "quotidien"],
+      "triangles": 320
+    },
+    {
+      "id": "hat-straw",
+      "name": "Chapeau de paille",
+      "description": "Un grand chapeau de paille à ruban, pour les foins et les après-midi d'été.",
+      "slot": "hat",
+      "file": "hat.glb",
+      "node": "hat-straw",
+      "covers": [],
+      "hair": "flat",
+      "zones": [
+        {
+          "id": "paille",
+          "colors": ["#b8a17e", "#d9caae", "#c0803a"]
+        },
+        {
+          "id": "ruban",
+          "colors": ["#c5443d", "#2c3b57", "#26282e", "#3f6453", "#a9c7d9"]
+        }
+      ],
+      "tags": ["a-gagner", "ete", "fete"],
+      "triangles": 380
+    },
+    {
+      "id": "accessory-scarf",
+      "name": "Écharpe",
+      "description": "Une écharpe de grosse laine rayée au bout: deux tours, et l'hiver recule.",
+      "slot": "accessory",
+      "file": "accessory.glb",
+      "node": "accessory-scarf",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "laine",
+          "colors": ["#c5443d", "#d4a33e", "#2c3b57", "#3f6453", "#7e3f55", "#b9b7b0"]
+        },
+        {
+          "id": "rayures",
+          "colors": ["#f3ede0", "#d4a33e", "#26282e", "#a9c7d9"]
+        }
+      ],
+      "tags": ["a-gagner", "mercerie", "froid"],
+      "triangles": 480
+    },
+    {
+      "id": "accessory-neckerchief",
+      "name": "Foulard",
+      "description": "Un foulard de coton noué au cou, le mouchoir rouge des moissons.",
+      "slot": "accessory",
+      "file": "accessory.glb",
+      "node": "accessory-neckerchief",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": ["#c5443d", "#44618a", "#d4a33e", "#3f6453", "#f3ede0"]
+        }
+      ],
+      "tags": ["a-gagner", "travail", "ete"],
+      "triangles": 416
+    },
+    {
+      "id": "accessory-apron",
+      "name": "Tablier",
+      "description": "Un tablier de toile à bavette et grande poche, noué dans le dos.",
+      "slot": "accessory",
+      "file": "accessory.glb",
+      "node": "accessory-apron",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "toile",
+          "colors": ["#d9caae", "#f3ede0", "#a9c7d9", "#44618a", "#b8a17e"]
+        },
+        {
+          "id": "liens",
+          "colors": ["#b8a17e", "#f3ede0", "#c5443d", "#2c3b57"]
+        }
+      ],
+      "tags": ["a-gagner", "travail"],
+      "triangles": 744
     }
   ]
 }

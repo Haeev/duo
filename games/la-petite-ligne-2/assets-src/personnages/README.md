@@ -12,14 +12,37 @@ Sorties: `assets/commun/personnages/<emplacement>.glb` (un nœud par pièce, squ
 
 1. Ouvre `gabarits.toml` et repère une entrée du même genre (`[[pieces]]` de même `base`, ou `[corpulences.*]`, `[[morphologies]]`).
 2. Copie-la juste en dessous et change `id` (emplacement en tête: `top-`, `bottom-`, `dress-`, `shoes-`, `hair-`, `head-`, `hat-`, `accessory-`).
-3. Règle la forme: `couche`, `ourlet`, `manches`, `ouverture`, `col` (base `torse`); `longueur` (`jambes`); `bas`, `evasement` (`jupe`, `robe`); `tige` (`galet`); `front`, `nuque`, `meches` (`coiffure`); `machoire`, `menton`, `nez` (`tete`).
-4. Choisis les couleurs: `zones` (famille du nuancier, couleur par défaut, liste `couleurs` pour restreindre).
-5. Ajoute des `tags` (lieu, saison, caractère) pour le tirage des habitants.
-6. Lance `construire.sh`: il fabrique les GLB, le catalogue, et contrôle tout (`VERIFICATION ... 0 erreur(s)`).
-7. Regarde la pièce: `node docs/production/essais-meshy/personnage-modulaire/banc/capturer3.mjs games/la-petite-ligne/node_modules/three <sortie.png> 1400 560 "planche=piece&id=<id>"` après avoir ajouté deux tenues d'essai sous `pieces` dans `banc/essai3-looks.json`.
+3. Règle la forme (champs commentés dans `gabarits.toml` au-dessus de chaque base): `torse`, `veste` (gilet, cardigan, veste: V, emmanchures, boutons, poches, revers), `jambes` (`revers` au bas), `salopette`, `jupe` et `robe` (`suivi` dès que l'ourlet passe sous le genou), `galet`, `sabot`, `casquette`, `chapeau`, `echarpe`, `foulard`, `tablier`, `coiffure`, `tete`.
+4. Choisis les couleurs: `zones` (famille du nuancier, couleur par défaut, liste `couleurs` pour restreindre), un `nom` et une `description` d'une ligne.
+5. Ajoute des `tags` (lieu, saison, caractère) pour le tirage des habitants; `a-gagner` pour une pièce de récompense ou de boutique (cachée de l'éditeur jusqu'à l'effet `give_piece`), plus `mercerie` et `prix` (centimes) pour une pièce vendue.
+6. Lance `construire.sh`: il fabrique les GLB, le catalogue, et contrôle tout (`VERIFICATION ... 0 erreur(s)`); puis `pnpm exec prettier --write` sur `catalogue.json` et `morphologies.json`.
+7. Regarde la pièce dans le rendu encré du jeu: ajoute-la à `PIECES` de `planche-encre/planche_tenues.py`, puis `bash planche-encre/planche.sh planche <sortie.png> <id>` (face et dos, deux silhouettes) et `bash planche-encre/planche.sh controle <sortie.png> <id>` (marche, course, assis, couché); `ECHELLE=2.5` pour des vues plus grandes.
 8. Pièce de Meshy (chapeau, sac): pose son GLB dans `meshy/` avec sa fiche, puis copie l'entrée `hat-beanie-pompom` (`base = "meshy-rigide"`: `os`, `largeur`, `bas`).
 9. Les sections du corps masquées (`covers`) se déduisent des longueurs; les corpulences et silhouettes s'appliquent d'office à la nouvelle pièce.
 10. Preuve du 2026-11-10: le gilet `accessory-vest` a été ajouté par sa seule entrée (12 lignes), 2 s de script.
+
+## Garde-robe d'Aubrune (2026-11-11)
+
+Douze pièces à gagner (étiquette `a-gagner`), toutes faites par le script, aucun crédit Meshy:
+
+| Id | Nom | Source |
+|---|---|---|
+| `top-cardigan` | Gilet de laine | mercerie, 28 € |
+| `bottom-corduroy` | Pantalon de velours | mercerie, 24 € |
+| `bottom-long-skirt` | Jupe longue | mercerie, 22 € |
+| `shoes-clogs` | Sabots | mercerie, 16 € |
+| `accessory-scarf` | Écharpe | mercerie, 12 € |
+| `hat-cap` | Casquette | mercerie, 9 € |
+| `top-work-jacket` | Veste de travail | récompense |
+| `bottom-overalls` | Salopette | récompense |
+| `dress-sunday` | Robe du dimanche | récompense (fête) |
+| `hat-straw` | Chapeau de paille | récompense (fête) |
+| `accessory-neckerchief` | Foulard | récompense |
+| `accessory-apron` | Tablier | récompense |
+
+Brique qui manque pour la vente: un commerce ne vend que des objets (`sells[].item`). Il faudrait une ligne de vente de pièce (`{ "piece": "<id>", "price": 2800 }` dans `sells`, ou un objet de famille `clothing` avec un champ `piece`, comme `bag`) dont l'achat appelle `givePiece` (`src/simulation/regles/recompenses.ts`). D'ici là, les six pièces `mercerie` restent à gagner; leur `prix` est dans `gabarits.toml` (non exporté). Les pièces à gagner peuvent être portées par les habitants (tirage de `composeLook`), jamais par le look de départ d'un joueur.
+
+Le gilet `accessory-vest` a été refait le 2026-11-11 (même id, trois zones au lieu d'une: les apparences qui le portent restent valides, les zones nouvelles prennent leur couleur par défaut).
 
 ## Fichiers
 
@@ -32,6 +55,7 @@ Sorties: `assets/commun/personnages/<emplacement>.glb` (un nœud par pièce, squ
 | `nuancier.json` | copie de `docs/jeux/jeu-1/refonte/planches/source/nuancier.json` (à recopier si la bible change) |
 | `source/squelette-meshy.glb` | squelette de 24 os et clips `walk` et `run` du rig de Meshy (tâche `01a1c4e7-6e4d-754d-884c-8c8d594ec9ad`), par `extraire_squelette.py` |
 | `meshy/` | pièces rigides générées par Meshy et leurs fiches |
+| `planche-encre/` | planche des tenues dans l'aperçu encré du jeu (`planche.sh`, page servie par Vite, `planche_tenues.py` pour la liste des vues et le montage) |
 
 ## Conventions lues par l'assemblage (L6)
 
