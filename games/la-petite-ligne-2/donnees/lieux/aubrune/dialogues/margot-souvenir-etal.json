@@ -5,17 +5,9 @@
   "priority": 30,
   "when": [
     {
-      "type": "any",
-      "conditions": [
-        {
-          "type": "remembered",
-          "key": "dialogues.aubrune.margot-boutique.j0"
-        },
-        {
-          "type": "remembered",
-          "key": "dialogues.aubrune.margot-boutique.j1"
-        }
-      ]
+      "type": "remembered",
+      "key": "commerces.cour-des-delmas.premier-achat",
+      "of": "actor"
     }
   ],
   "once": "player",

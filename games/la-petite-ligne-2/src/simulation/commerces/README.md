@@ -23,7 +23,7 @@ Le commerçant se tient derrière son comptoir, hors de portée de la touche d'a
 1. Il a un dialogue en attente (`pendingDialogue` de `dialogues/conversation.ts`): priorité d'au moins `DIALOGUES.pendingPriority` (10: histoire, quête, souvenir, première rencontre), pas encore entendu ce jour par ce joueur (fait daté `entendu.<lieu>.<dialogue>.j<joueur>`), ou une décision à deux qui attend sa réponse. La bulle dit « Parler », et ce dialogue se joue d'abord.
 2. Sinon la boutique s'ouvre (« Acheter »); l'écran de boutique garde « Parler » (touche P, intention `shop_talk`), qui ouvre la conversation et referme la boutique chez ce joueur.
 
-Une réplique d'histoire ou de quête n'est jamais suivie de l'offre de la boutique (`shopOffered`). Valable pour tout commerce: ajouter `"held": true` à la brique du comptoir. Test court: `tests/comptoir-tenu.test.ts`, `tests/decision-rappel.test.ts`.
+La première écoute du jour d'une réplique d'histoire ou de quête n'est pas suivie de l'offre de la boutique (`shopOffered`), ni une réplique dite par-dessus le comptoir. Réentendue le même jour en parlant au commerçant en face (à portée de la touche d'action), elle débouche sur l'offre comme une conversation ordinaire: le fait « entendu » compte les écoutes du jour, sans champ nouveau dans l'état. Valable pour tout commerce: ajouter `"held": true` à la brique du comptoir. Test court: `tests/comptoir-tenu.test.ts`, `tests/decision-rappel.test.ts`.
 
 ## Paiement (`payment` d'un article)
 
@@ -32,6 +32,10 @@ Une réplique d'histoire ou de quête n'est jamais suivie de l'offre de la bouti
 ## Refus (`refused`, `target` = identifiant du commerce)
 
 `gone`, `too-far`, `shop-closed`, `not-sold`, `locked` (article pas encore débloqué), `out-of-stock`, `pockets-full`, `not-enough-money`, `chest-not-allowed`, `not-wanted` (pas dans son métier), `not-enough-items`, `shop-cap-reached` (plafond d'achat du jour), `purse-full`. Textes: `interface/boutique/textes.ts`.
+
+## Faits retenus (`faits.ts`)
+
+Chaque achat et chaque vente écrivent dans la mémoire des faits, lue par les dialogues et les quêtes (clés: `SHOP_TUNING.facts`): `commerces.<commerce>.premier-achat.j<n>` et `premiere-vente.j<n>` (l'objet, daté du premier jour), `ventes.<commerce>.<objet>` (total vendu par le duo) et `.j<n>` (par joueur). Le validateur des quêtes les connaît (`shopFacts`): une faute de commerce ou d'objet est refusée au chargement. Test court: `tests/faits-briques.test.ts`.
 
 ## État
 

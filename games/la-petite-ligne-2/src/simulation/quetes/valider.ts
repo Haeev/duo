@@ -15,8 +15,12 @@ import type {
 } from '../../donnees/schemas/quete';
 import type { Condition, Effect, FactValue } from '../../donnees/schemas/regles';
 import type { SceneDef } from '../../donnees/schemas/scene';
+import { firstBuyKey, shopFacts, soldKey } from '../commerces/faits';
 import { checkAgreementTags } from '../dialogues/accords';
+import { housingFacts } from '../logement/faits';
+import { playerFactKey } from '../regles/memoire';
 import { isStoryCondition } from './conditions';
+import { decisionKey } from './decisions';
 import { prerequisites } from './moteur';
 
 /** Les contrôles de référence des conditions et effets communs (`donnees/valider.ts`). */
@@ -29,8 +33,10 @@ interface Env {
   readonly content: Content;
   readonly place: PlaceContent;
   readonly base: BaseCheckers;
-  /** Valeurs écrites par un effet `remember` des données, par clé. */
-  readonly facts: ReadonlyMap<string, ReadonlySet<FactValue>>;
+  /** Valeurs des faits que le jeu peut écrire, par clé (`collectFacts`). */
+  readonly facts: ReadonlyMap<string, FactValues>;
+  /** Familles de faits contrôlées (`checkedHeads`). */
+  readonly heads: ReadonlySet<string>;
   /** Scènes lancées par un effet `play_scene` du lieu. */
   readonly played: ReadonlySet<string>;
   /** Écrans de fin de chapitre du lieu déjà vus, et où. */
@@ -55,18 +61,61 @@ function walk(value: unknown, visit: (node: Record<string, unknown>) => void): v
   }
 }
 
-function collectFacts(content: Content): Map<string, Set<FactValue>> {
-  const facts = new Map<string, Set<FactValue>>();
+/** Valeurs possibles d'un fait; `null`: un compteur, toute valeur numérique. */
+type FactValues = ReadonlySet<FactValue> | null;
+
+/**
+ * Faits que le jeu peut écrire: effets `remember` et `bump` des données (avec `of: "actor"`, la clé
+ * de chacun des deux joueurs), et faits du moteur qui se déduisent des données: pièces et confort
+ * des logements, décisions à deux déclarées par les étapes, achats et ventes des commerces.
+ */
+function collectFacts(content: Content): Map<string, FactValues> {
+  const facts = new Map<string, FactValues>();
+  const add = (key: string, values: FactValues): void => {
+    const known = facts.get(key);
+    if (known === null || values === null) facts.set(key, null);
+    else facts.set(key, new Set([...(known ?? []), ...values]));
+  };
   walk([content.items, content.props, content.places], (node) => {
-    if (node.type !== 'remember' || typeof node.key !== 'string') return;
+    if ((node.type !== 'remember' && node.type !== 'bump') || typeof node.key !== 'string') return;
     const value = node.value;
-    if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean')
-      return;
-    const set = facts.get(node.key) ?? new Set<FactValue>();
-    set.add(value);
-    facts.set(node.key, set);
+    let values: FactValues;
+    if (node.type === 'bump') values = null;
+    else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
+      values = new Set([value]);
+    else return;
+    const key = node.key;
+    if (node.of === 'actor') for (const p of [0, 1] as const) add(playerFactKey(key, p), values);
+    else add(key, values);
   });
+  for (const place of Object.values(content.places)) {
+    for (const def of Object.values(place.housings))
+      for (const [key, values] of housingFacts(place.def.id, def)) add(key, values);
+    for (const shop of Object.values(place.shops))
+      for (const [key, values] of shopFacts(content, shop)) add(key, values);
+    for (const line of Object.values(place.quests))
+      for (const chapter of line.chapters)
+        for (const step of chapter.steps) {
+          if (step.decision === undefined) continue;
+          const options = new Set<FactValue>(step.decision.options);
+          add(decisionKey(step.decision.id), options);
+          for (const p of [0, 1] as const) add(decisionKey(step.decision.id, p), options);
+        }
+  }
   return facts;
+}
+
+/**
+ * Familles de faits contrôlées: celles d'un lieu (`<lieu>.sujet`) et celles que le moteur écrit
+ * d'après les données (décisions, commerces). Les autres (habitants, dialogues, souvenirs) ne
+ * se contrôlent pas ici.
+ */
+function checkedHeads(content: Content): Set<string> {
+  const heads = new Set(Object.keys(content.places));
+  heads.add(decisionKey('x').split('.')[0] ?? '');
+  heads.add(firstBuyKey('x').split('.')[0] ?? '');
+  heads.add(soldKey('x', 'y').split('.')[0] ?? '');
+  return heads;
 }
 
 function collectPlayed(place: PlaceContent): Set<string> {
@@ -89,16 +138,22 @@ function checkFact(env: Env, c: Condition, at: string): void {
   }
   if (c.type === 'time_is' && c.from === c.to)
     env.problems.push(`${at}: condition impossible, plage d'heure vide (${String(c.from)})`);
-  if (c.type !== 'remembered') return;
+  if (c.type !== 'remembered' && c.type !== 'days_since' && c.type !== 'fact_at_least') return;
   const head = c.key.split('.')[0] ?? '';
-  if (!(head in env.content.places)) return;
-  const values = env.facts.get(c.key);
-  if (values === undefined)
-    env.problems.push(`${at}: condition impossible, aucune donnée n'écrit le fait « ${c.key} »`);
-  else if (c.equals !== undefined && !values.has(c.equals))
+  if (!env.heads.has(head)) return;
+  const key = c.of === undefined ? c.key : playerFactKey(c.key, 0);
+  const values = env.facts.get(key);
+  if (values === undefined) {
+    env.problems.push(`${at}: condition impossible, aucune donnée n'écrit le fait « ${key} »`);
+    return;
+  }
+  if (values === null) return;
+  if (c.type === 'remembered' && c.equals !== undefined && !values.has(c.equals))
     env.problems.push(
-      `${at}: condition impossible, le fait « ${c.key} » ne vaut jamais ${JSON.stringify(c.equals)}`,
+      `${at}: condition impossible, le fait « ${key} » ne vaut jamais ${JSON.stringify(c.equals)}`,
     );
+  if (c.type === 'fact_at_least' && ![...values].some((x) => typeof x === 'number'))
+    env.problems.push(`${at}: condition impossible, le fait « ${key} » n'est jamais un nombre`);
 }
 
 function checkCondition(env: Env, c: StepCondition, at: string, scope: StepScope | null): void {
@@ -175,10 +230,11 @@ function checkContradictions(env: Env, conditions: readonly StepCondition[], at:
   const wanted = new Map<string, FactValue>();
   for (const c of conditions) {
     if (c.type !== 'remembered' || c.equals === undefined) continue;
-    const other = wanted.get(c.key);
+    const id = c.of === undefined ? c.key : `${c.key} (${c.of})`;
+    const other = wanted.get(id);
     if (other !== undefined && other !== c.equals)
-      env.problems.push(`${at}: condition impossible, « ${c.key} » exigé à deux valeurs`);
-    wanted.set(c.key, c.equals);
+      env.problems.push(`${at}: condition impossible, « ${id} » exigé à deux valeurs`);
+    wanted.set(id, c.equals);
   }
 }
 
@@ -224,6 +280,7 @@ function checkEffects(env: Env, effects: readonly StepEffect[], at: string): voi
         }
         break;
       case 'remember':
+      case 'bump':
       case 'give_item':
       case 'take_item':
       case 'give_money':
@@ -425,6 +482,7 @@ function checkSagas(content: Content, problems: string[]): void {
 export function validateStory(content: Content, base: BaseCheckers): string[] {
   const problems: string[] = [];
   const facts = collectFacts(content);
+  const heads = checkedHeads(content);
   const owner = new Map<string, string>();
   for (const place of Object.values(content.places)) {
     const env: Env = {
@@ -432,6 +490,7 @@ export function validateStory(content: Content, base: BaseCheckers): string[] {
       place,
       base,
       facts,
+      heads,
       played: collectPlayed(place),
       endings: new Map(),
       problems,

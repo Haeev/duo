@@ -17,6 +17,7 @@ import { evaluateAll } from '../regles/conditions';
 import { remember } from '../regles/memoire';
 import { countItem, removeItem } from '../sac/inventaire';
 import { comfortLevel, comfortOf, ensureHousings, housingAt } from './etat';
+import { comfortFactDetail, housingFactKey, RESTORED } from './faits';
 import { placementRefusal, propsOnTop, snapCandidate } from './pose';
 import { HOUSING_TUNING } from './reglages';
 
@@ -74,7 +75,7 @@ function stageRefusal(
 }
 
 function factKey(sim: SimContext, def: HousingDef, detail: string): string {
-  return `${sim.world.common.place}.${def.id}.${detail}`;
+  return housingFactKey(sim.world.common.place, def.id, detail);
 }
 
 function refreshComfort(sim: SimContext, ctx: Ctx): void {
@@ -88,7 +89,7 @@ function refreshComfort(sim: SimContext, ctx: Ctx): void {
   if (level !== before) sim.emit({ type: 'comfort_changed', housing: ctx.def.id, level });
   // Faits pour les quêtes: un palier atteint reste acquis (indicateur doux, jamais punitif).
   for (let n = 1; n <= level; n++) {
-    const key = factKey(sim, ctx.def, `confort-${String(n)}`);
+    const key = factKey(sim, ctx.def, comfortFactDetail(n));
     if (sim.world.progress.memory[key] === undefined) remember(sim, key, true, 'duo');
   }
 }
@@ -111,7 +112,7 @@ function tryAdvance(sim: SimContext, ctx: Ctx, room: RoomDef): void {
       ctx.state.working[0] === room.id ? null : ctx.state.working[0],
       ctx.state.working[1] === room.id ? null : ctx.state.working[1],
     ];
-    remember(sim, factKey(sim, ctx.def, room.id), 'restored', 'duo');
+    remember(sim, factKey(sim, ctx.def, room.id), RESTORED, 'duo');
   } else progress.stage = finished + 1;
   sim.touch('place');
   sim.emit({ type: 'room_progress', housing: ctx.def.id, room: room.id, stage: finished, done });

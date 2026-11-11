@@ -18,6 +18,17 @@ export interface ShopTuning {
   readonly maxCount: number;
   /** Objets distincts retenus au plus par commerce à l'ouverture (mémoire des prix). */
   readonly rememberOnOpen: number;
+  /**
+   * Faits écrits par les commerces (`faits.ts`), lus par les dialogues et les quêtes:
+   * `<prefix>.<commerce>.<firstBuy>.j<n>`, `<prefix>.<commerce>.<firstSale>.j<n>` (l'objet, daté du
+   * premier jour), `<sold>.<commerce>.<objet>` (total vendu par le duo) et `.j<n>` (par joueur).
+   */
+  readonly facts: {
+    readonly prefix: string;
+    readonly firstBuy: string;
+    readonly firstSale: string;
+    readonly sold: string;
+  };
 }
 
 export const SHOP_TUNING: ShopTuning = {
@@ -27,4 +38,10 @@ export const SHOP_TUNING: ShopTuning = {
   keeperReach: 1.5,
   maxCount: 99,
   rememberOnOpen: 40,
+  facts: {
+    prefix: 'commerces',
+    firstBuy: 'premier-achat',
+    firstSale: 'premiere-vente',
+    sold: 'ventes',
+  },
 };

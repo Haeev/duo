@@ -9,7 +9,7 @@ import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey } from '../../etat/progression';
 import { modifiersOf } from '../besoins/jauges';
 import type { SimContext } from '../noyau/systemes';
-import { recall, remember } from '../regles/memoire';
+import { playerFactKey, recall, remember } from '../regles/memoire';
 import { RULES } from '../regles/reglages';
 
 /** Points d'amitié de ce joueur avec cet habitant. */
@@ -70,13 +70,19 @@ export function changeBond(
   return after - before;
 }
 
-function todayKey(villager: string, player: PlayerIndex): string {
-  return `amitie.${villager}.jour-j${String(player)}`;
+/**
+ * Dernier jour où ce joueur a parlé à cet habitant (`amitie.<habitant>.jour.j<n>`, daté et valant
+ * ce jour). Écrit au début de la conversation, après le choix du dialogue: la condition
+ * `days_since` (`"of": "actor"`) y lit le temps passé sans le voir. Avant le 2026-11-11, la clé
+ * finissait par `jour-j<n>`: une sauvegarde plus ancienne repart sans ce souvenir.
+ */
+export function lastTalkKey(villager: string, player: PlayerIndex): string {
+  return playerFactKey(`amitie.${villager}.jour`, player);
 }
 
 /** Première conversation du jour avec cet habitant: ses points, une fois par jour et par joueur. */
 export function greet(sim: SimContext, player: PlayerIndex, villager: string): void {
-  const key = todayKey(villager, player);
+  const key = lastTalkKey(villager, player);
   if (recall(sim.world, key)?.v === sim.world.common.day) return;
   remember(sim, key, sim.world.common.day, player);
   addBond(sim, player, villager, RULES.bonds.firstTalkOfDay);

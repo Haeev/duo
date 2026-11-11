@@ -22,6 +22,7 @@ import {
   shopDef,
   stockLeft,
 } from './prix';
+import { noteBuy, noteSale } from './faits';
 import { SHOP_TUNING } from './reglages';
 
 /** Raisons de refus des commerces (textes: `interface/boutique/textes.ts`). */
@@ -193,6 +194,7 @@ function buy(
     sim.emit({ type: 'money_changed', who: player, delta: -fromPurse });
   }
   addItem(sim.content, state, line.item, intent.count);
+  noteBuy(sim, player, shop.id, line.item);
   sim.touch('players');
   sim.touch('place');
   sim.emit({ type: 'item_gained', player, item: line.item, count: intent.count });
@@ -240,6 +242,7 @@ function sell(
   const day = dayOf(sim, shop);
   if (day !== null) day.spent += total;
   rememberPrice(sim, intent.item, shop.id, offer.base);
+  noteSale(sim, player, shop.id, intent.item, intent.count);
   sim.touch('players');
   sim.touch('place');
   sim.emit({

@@ -5,17 +5,9 @@
   "priority": 30,
   "when": [
     {
-      "type": "any",
-      "conditions": [
-        {
-          "type": "remembered",
-          "key": "amitie.colette.coeur-1.j0"
-        },
-        {
-          "type": "remembered",
-          "key": "amitie.colette.coeur-1.j1"
-        }
-      ]
+      "type": "remembered",
+      "key": "amitie.colette.coeur-1",
+      "of": "other"
     },
     {
       "type": "not",

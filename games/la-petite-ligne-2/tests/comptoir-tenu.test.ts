@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Content } from '../src/donnees/charger';
 import { aimOf } from '../src/simulation/briques/visee';
-import { talkView } from '../src/simulation/dialogues/conversation';
+import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
 import { DIALOGUES } from '../src/simulation/dialogues/reglages';
 import type { Sim } from '../src/simulation/noyau/pas';
 import { remember } from '../src/simulation/regles/memoire';
@@ -110,6 +110,36 @@ describe('comptoir tenu', () => {
     // Le lendemain, la nouvelle repasse avant la boutique.
     sim.world.common.day += 1;
     expect(aimOf(sim, 0)?.verb).toBe('Parler');
+  });
+
+  it('en face: la nouvelle réentendue le même jour débouche sur l’offre de la boutique', () => {
+    const sim = sim10h(content);
+    remember(contextOf(sim), NEWS, true, 'duo');
+    // Première écoute du jour, par-dessus le comptoir: pas d'offre derrière la réplique.
+    expect(startTalk(contextOf(sim), 0, KEEPER)).toBe(true);
+    expect(readThrough(sim)).toEqual(['odette-essai-comptoir#n1']);
+    expect(sim.world.players[0].talk).toBeNull();
+    // Réentendue par-dessus le comptoir: toujours pas d'offre (le comptoir ouvre la boutique).
+    startTalk(contextOf(sim), 0, KEEPER);
+    readThrough(sim);
+    expect(sim.world.players[0].talk).toBeNull();
+    // Réentendue ce jour-là en face: la boutique est proposée, comme après le quotidien.
+    const keeper = sim.world.places[AUBRUNE]?.villagers[KEEPER]?.body;
+    if (keeper === undefined) throw new Error('Odette absente');
+    Object.assign(sim.world.players[0].body, { x: keeper.x + 0.9, y: keeper.y });
+    startTalk(contextOf(sim), 0, KEEPER);
+    expect(readThrough(sim)).toEqual(['odette-essai-comptoir#n1']);
+    expect(sim.world.players[0].talk?.node).toBe(DIALOGUES.shopOffer.node);
+    expect(act(sim, 0, { type: 'talk_choose', option: DIALOGUES.shopOffer.open })).toContainEqual({
+      type: 'shop_opened',
+      player: 0,
+      shop: SHOP,
+    });
+    // Le lendemain, la première écoute repasse sans offre.
+    sim.world.common.day += 1;
+    startTalk(contextOf(sim), 0, KEEPER);
+    readThrough(sim);
+    expect(sim.world.players[0].talk).toBeNull();
   });
 
   it('« Parler » depuis la boutique: la conversation ordinaire, puis l’offre de la boutique', () => {

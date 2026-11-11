@@ -20,6 +20,18 @@
   //   { "type": "decision_is", "decision": "<décision>", "state": "agreed", "option": "<a>" }
   //       décision à deux: agreed (prise, sur "option" si elle est donnée), split (deux avis:
   //       inviter à se mettre d'accord), mine (qui parle a choisi), theirs (l'autre a choisi)
+  // Faits par joueur (clé finie par .j0 ou .j1): "of": "actor" lit celui de qui parle, "other"
+  // celui de l'autre joueur (« ta moitié m'a vendu douze œufs »). La clé s'écrit sans le .j:
+  //   { "type": "remembered", "key": "habitants.colette.cadeaux", "of": "other" }
+  //   { "type": "fact_at_least", "key": "ventes.epicerie-ferrand.oeuf", "of": "other", "value": 12 }
+  //       (compteur: au moins tant; sans "of", le total du duo)
+  //   { "type": "days_since", "key": "amitie.colette.jour", "of": "actor", "atLeast": 3 }
+  //       (jours depuis la dernière écriture du fait, "atLeast" et ou "atMost"; ici: trois jours
+  //       sans lui parler. Fait absent: faux)
+  // Faits que le moteur écrit (src/simulation/regles/README.md): premier achat et première vente
+  //   "commerces.<commerce>.premier-achat" / "premiere-vente" (l'objet), totaux vendus
+  //   "ventes.<commerce>.<objet>", "souvenirs.premiere-prise", "souvenirs.nuit-blanche" (avec
+  //   "of"), "souvenirs.pluie-ensemble" (le duo, daté du dernier jour de pluie passé dehors).
   "when": [],
   // "duo": une seule fois pour les deux; "player": une fois chacun; null: à volonté.
   "once": null,
@@ -39,6 +51,8 @@
     },
     // Choix: 2 à 3 options, dont une au moins sans condition. Effets possibles:
     //   give_item, take_item, give_money, change_need, give_bag, remember,
+    //   { "type": "bump", "key": "aubrune.colette.tournees", "by": "actor", "of": "actor" }
+    //       (compteur: +1, ou "amount"; "of": "actor" l'attache à qui parle, comme pour remember)
     //   { "type": "reveal_look" }   (le personnage de qui parle sort de l'ombre: jusque-là, une
     //       silhouette sans traits ni tenue; "to": "duo" pour les deux)
     //   { "type": "take_money", "amount": 250 }   (paiement en centimes: 2,50 €)

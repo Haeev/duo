@@ -5,17 +5,9 @@
   "priority": 30,
   "when": [
     {
-      "type": "any",
-      "conditions": [
-        {
-          "type": "remembered",
-          "key": "habitants.margot.cadeaux.j0"
-        },
-        {
-          "type": "remembered",
-          "key": "habitants.margot.cadeaux.j1"
-        }
-      ]
+      "type": "remembered",
+      "key": "habitants.margot.cadeaux",
+      "of": "actor"
     }
   ],
   "once": "player",
@@ -28,11 +20,8 @@
           "when": [
             {
               "type": "remembered",
-              "key": "dialogues.aubrune.margot-souvenir-cadeau.j0"
-            },
-            {
-              "type": "remembered",
-              "key": "dialogues.aubrune.margot-souvenir-cadeau.j1"
+              "key": "habitants.margot.cadeaux",
+              "of": "other"
             }
           ],
           "next": "moitie"

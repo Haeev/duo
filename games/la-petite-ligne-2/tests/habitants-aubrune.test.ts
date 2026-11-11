@@ -66,8 +66,16 @@ function typed(value: unknown, type: string, out: Json[] = []): Json[] {
   return out;
 }
 
+/** Clés des faits lus (`of`: la clé de l'un des joueurs, `.j0`). */
 function conditionKeys(conditions: readonly Condition[]): string[] {
-  return typed(conditions, 'remembered').map((c) => String(c.key));
+  return ['remembered', 'days_since', 'fact_at_least']
+    .flatMap((type) => typed(conditions, type))
+    .map((c) => `${String(c.key)}${c.of === undefined ? '' : '.j0'}`);
+}
+
+/** La clé qu'écrit `satisfy` pour une condition sur un fait: `of` vu du joueur 0 qui agit. */
+function factKeyFor(c: { key: string; of?: 'actor' | 'other' }): string {
+  return c.of === undefined ? c.key : `${c.key}.j${c.of === 'actor' ? '0' : '1'}`;
 }
 
 /** Les faits que les données d'Aubrune écrivent, et ceux que le moteur écrit de lui-même. */
@@ -82,7 +90,10 @@ function writable(): (key: string) => boolean {
   const once = p.dialogues.filter((d) => d.once === 'player').map((d) => d.id);
   const heard = p.dialogues.filter((d) => d.once === null && d.priority >= 10).map((d) => d.id);
   const rooms = Object.values(p.housings).flatMap((h) => h.rooms.map((r) => `${h.id}.${r.id}`));
+  const shops = Object.keys(p.shops).join('|');
   const engine = [
+    new RegExp(`^commerces\\.(${shops})\\.(premier-achat|premiere-vente)\\.j[01]$`),
+    new RegExp(`^ventes\\.(${shops})\\.[a-z0-9-]+(\\.j[01])?$`),
     new RegExp(`^habitants\\.(${villagers})\\.(cadeaux|adore)\\.j[01]$`),
     new RegExp(`^amitie\\.(${villagers})\\.coeur-[1-5]\\.j[01]$`),
     new RegExp(`^dialogues\\.${AUBRUNE}\\.(${once.join('|')})\\.j[01]$`),
@@ -115,7 +126,21 @@ function satisfy(sim: Sim, conditions: readonly Condition[]): void {
         break;
       }
       case 'remembered':
-        world.progress.memory[c.key] = { v: c.equals ?? true, by: 'duo', day: world.common.day };
+        world.progress.memory[factKeyFor(c)] = {
+          v: c.equals ?? true,
+          by: 'duo',
+          day: world.common.day,
+        };
+        break;
+      case 'fact_at_least':
+        world.progress.memory[factKeyFor(c)] = { v: c.value, by: 'duo', day: world.common.day };
+        break;
+      case 'days_since':
+        world.progress.memory[factKeyFor(c)] = {
+          v: true,
+          by: 'duo',
+          day: world.common.day - (c.atLeast ?? 0),
+        };
         break;
       case 'bond_at_least':
         world.progress.bonds[bondKey(c.villager, 0)] = c.points;

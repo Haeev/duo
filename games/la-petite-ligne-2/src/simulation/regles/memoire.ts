@@ -16,6 +16,15 @@ export function isFactKey(key: string): boolean {
   return v.is(FactKeySchema, key);
 }
 
+/** Clé d'un fait attaché à un joueur (`<clé>.j0`, `<clé>.j1`), convention de tous les faits par joueur. */
+export function playerFactKey(key: string, player: PlayerIndex): string {
+  return `${key}.j${String(player)}`;
+}
+
+export function otherPlayer(player: PlayerIndex): PlayerIndex {
+  return player === 0 ? 1 : 0;
+}
+
 export function recall(world: ReadonlyWorld, key: string): Readonly<Fact> | null {
   return world.progress.memory[key] ?? null;
 }
