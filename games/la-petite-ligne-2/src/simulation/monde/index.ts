@@ -6,6 +6,7 @@
 import type { WorldState } from '../../etat/monde';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { remember } from '../regles/memoire';
+import { noteMemories } from '../regles/souvenirs';
 import { activeEvents, announcedFor } from './agenda';
 import { morningWeather, weatherAt } from './meteo';
 
@@ -80,6 +81,7 @@ function step(sim: SimContext): void {
     sim.emit({ type: 'calendar_started', place, event: event.id });
   }
   memo.active = now;
+  noteMemories(sim);
 }
 
 export const worldTimeSystem: GameSystem = { id: 'monde', step };

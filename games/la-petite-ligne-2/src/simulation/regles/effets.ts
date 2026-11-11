@@ -14,15 +14,20 @@ import { effectTargets } from '../dialogues/echanges';
 import { earn, pay } from '../sac/argent';
 import { removeItem } from '../sac/inventaire';
 import { revealLook } from './apparence';
-import { remember } from './memoire';
+import { bump, playerFactKey, remember } from './memoire';
 import { giveEntry, givePiece, givePlan, giveRecipe } from './recompenses';
 import { choose } from '../quetes/decisions';
 
 export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect): void {
   switch (effect.type) {
     case 'remember':
-      remember(sim, effect.key, effect.value, effect.by === 'duo' ? 'duo' : actor);
+    case 'bump': {
+      const key = effect.of === 'actor' ? playerFactKey(effect.key, actor) : effect.key;
+      const by = effect.by === 'duo' ? 'duo' : actor;
+      if (effect.type === 'remember') remember(sim, key, effect.value, by);
+      else bump(sim, key, by, effect.amount ?? 1);
       return;
+    }
     case 'give_item':
       for (const p of effectTargets(actor, effect.to)) giveItem(sim, p, effect.item, effect.count);
       return;

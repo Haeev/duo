@@ -127,6 +127,8 @@ La présence de Rosalie et du Contrôleur (`arrives`, `leaves`) n'a pas changé:
 
 ## 6. Ce que le moteur ne permet pas encore
 
+Mise à jour du 2026-11-11: les points 1 à 6 ont leurs briques (`src/simulation/regles/README.md`, « Faits par joueur, durées, compteurs »): `"of": "actor" | "other"` sur `remembered`, `days_since`, `fact_at_least` et l'effet `bump`; faits des commerces (premier achat, première vente, totaux vendus), dernier jour de conversation (`amitie.<id>.jour`), première prise, nuit blanche, pluie passée dehors ensemble. Cinq souvenirs s'en servent déjà (cadeau et jaloux de Colette et de Margot, étal de Margot). Restent la tenue portée (point 5) et les points 7 et 8.
+
 1. **Qui parle.** Aucune condition ne dit « ce fait vient de celui qui agit » ou « de l'autre » (`remembered` avec `by: mine | theirs`, ou une clé à motif `{moi}`, `{moitie}`). Les répliques sur ta moitié passent par l'ordre de passage et par l'écart de cœurs; « Ta moitié m'a vendu douze œufs hier » reste hors de portée.
 2. **Absence et retard.** Les faits sont datés, mais aucune condition ne compare des jours (`days_since` d'un fait, par exemple du dernier bonjour `habitants.<id>.salut.j<n>`). Pas de « trois jours sans te voir ».
 3. **Premier achat.** Les commerces n'écrivent aucun fait (achat, vente, total). Les souvenirs de Colette et de Margot lisent la première visite à l'étal, pas un achat.

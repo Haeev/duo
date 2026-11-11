@@ -27,6 +27,7 @@ import {
 } from './lecture';
 import { fishOf, gameSeconds, shadowPosition, waveOf, type Shadow } from './ombres';
 import { FISHING } from './reglages';
+import { noteFirstCatch } from '../regles/souvenirs';
 
 type FishingIntent = Extract<Intent, { type: `fish_${string}` }>;
 
@@ -191,6 +192,7 @@ function land(
   // Une seule source des espèces vues: l'album des collections (taille en cm pour son record).
   const isNew = progress.album?.f[def.id] === undefined;
   recordFind(sim, player, def.id, sizeMm / 10);
+  noteFirstCatch(sim, player, def.id);
   const key = recordKey(player, def.id);
   const previous = progress.memory[key]?.v;
   const record = typeof previous !== 'number' || sizeMm > previous;

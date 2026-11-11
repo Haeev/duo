@@ -18,6 +18,7 @@ import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
+import { isFactKey, playerFactKey } from '../simulation/regles/memoire';
 import { WARDROBE } from '../simulation/regles/recompenses';
 import { decisionOptions } from '../simulation/quetes/decisions';
 import { validateStory } from '../simulation/quetes/valider';
@@ -39,6 +40,14 @@ function checkDecision(
     problems.push(`${at}: décision inconnue « ${decision} » (aucune étape ne la déclare)`);
   else if (option !== undefined && !options.includes(option))
     problems.push(`${at}: la décision « ${decision} » n'a pas d'option « ${option} »`);
+}
+
+/** Un fait attaché à un joueur (`of`) reçoit `.j0` ou `.j1`: la clé complète doit rester valide. */
+function checkOwnedKey(key: string, of: string | undefined, at: string, problems: string[]): void {
+  if (of !== undefined && !isFactKey(playerFactKey(key, 0)))
+    problems.push(
+      `${at}: clé « ${key} » trop longue pour un fait par joueur (trois segments au plus)`,
+    );
 }
 
 export function checkCondition(
@@ -69,6 +78,16 @@ export function checkCondition(
       checkDecision(content, c.decision, c.option, at, problems);
       return;
     case 'remembered':
+    case 'fact_at_least':
+      checkOwnedKey(c.key, c.of, at, problems);
+      return;
+    case 'days_since':
+      checkOwnedKey(c.key, c.of, at, problems);
+      if (c.atLeast === undefined && c.atMost === undefined)
+        problems.push(`${at}: days_since sans borne (atLeast ou atMost)`);
+      else if (c.atLeast !== undefined && c.atMost !== undefined && c.atLeast > c.atMost)
+        problems.push(`${at}: days_since impossible, atLeast au-delà de atMost`);
+      return;
     case 'need_at_least':
     case 'money_at_least':
     case 'time_is':
@@ -126,6 +145,9 @@ export function checkEffect(content: Content, e: Effect, at: string, problems: s
       checkDecision(content, e.decision, e.option, at, problems);
       return;
     case 'remember':
+    case 'bump':
+      checkOwnedKey(e.key, e.of, at, problems);
+      return;
     case 'give_money':
     case 'take_money':
     case 'change_need':

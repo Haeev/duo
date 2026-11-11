@@ -775,9 +775,9 @@
           "after": ["honorine-prix", "gue"],
           "done": [
             {
-              "type": "talked",
-              "dialogue": "colette-repas",
-              "node": "a1"
+              "type": "remembered",
+              "key": "aubrune.maison-du-garde.cuisine",
+              "equals": "restored"
             },
             {
               "type": "deliver",

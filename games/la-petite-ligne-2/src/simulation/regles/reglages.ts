@@ -53,6 +53,21 @@ export interface RulesSettings {
     /** Effets qui font d'une option un échange. */
     readonly exchangeEffects: readonly Effect['type'][];
   };
+  /**
+   * Faits de souvenirs écrits par le moteur (`regles/souvenirs.ts`), lus par les dialogues: clés et
+   * seuils. Par joueur, la clé reçoit `.j0` ou `.j1` (lire avec `"of"`).
+   */
+  readonly memories: {
+    /** Première prise à la pêche de ce joueur (l'espèce, datée du jour): `<clé>.j<n>`. */
+    readonly firstCatchKey: string;
+    /** Aube arrivée sans que ce joueur dorme (la nuit ne s'est pas sautée au lit): `<clé>.j<n>`. */
+    readonly sleeplessKey: string;
+    /** Les deux dehors, l'un près de l'autre, sous l'un de ces temps (au nom du duo, daté du jour). */
+    readonly rainTogetherKey: string;
+    readonly rainWeathers: readonly string[];
+    /** Distance (m) entre les deux joueurs pour être « ensemble » sous la pluie. */
+    readonly togetherRadius: number;
+  };
   readonly look: {
     /**
      * Préfixe du fait « apparence révélée » d'un joueur (`<préfixe>.j0`, `<préfixe>.j1`): absent,
@@ -79,6 +94,13 @@ export const RULES: RulesSettings = {
   dialogue: {
     failHygiene: ['blocked', 'low'],
     exchangeEffects: ['give_item', 'take_item', 'give_money', 'take_money', 'give_bag', 'remember'],
+  },
+  memories: {
+    firstCatchKey: 'souvenirs.premiere-prise',
+    sleeplessKey: 'souvenirs.nuit-blanche',
+    rainTogetherKey: 'souvenirs.pluie-ensemble',
+    rainWeathers: ['rain', 'storm'],
+    togetherRadius: 8,
   },
   look: { revealedPrefix: 'joueurs.apparence' },
 };

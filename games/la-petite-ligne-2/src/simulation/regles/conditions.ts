@@ -4,11 +4,12 @@
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { Condition } from '../../donnees/schemas/regles';
+import type { Condition, FactOwner } from '../../donnees/schemas/regles';
 import type { ReadonlyWorld } from '../../etat/monde';
-import { bondKey } from '../../etat/progression';
+import { bondKey, type Fact } from '../../etat/progression';
 import { calendarOf } from '../monde/calendrier';
 import { choiceOf, decisionState, decisionTaken } from '../quetes/decisions';
+import { otherPlayer, playerFactKey } from './memoire';
 
 export interface RuleContext {
   readonly world: ReadonlyWorld;
@@ -29,6 +30,25 @@ function forActor(ctx: RuleContext, test: (player: PlayerIndex) => boolean): boo
   return ctx.actor === null ? test(0) || test(1) : test(ctx.actor);
 }
 
+/**
+ * Le fait lu par une condition: la clé telle quelle, ou (`of`) celle de celui qui agit ou de
+ * l'autre joueur. Sans joueur qui agit, l'un ou l'autre des deux suffit.
+ */
+function factTest(
+  ctx: RuleContext,
+  key: string,
+  of: FactOwner | undefined,
+  test: (fact: Readonly<Fact>) => boolean,
+): boolean {
+  const memory = ctx.world.progress.memory;
+  const read = (k: string): boolean => {
+    const fact = memory[k];
+    return fact !== undefined && test(fact);
+  };
+  if (of === undefined) return read(key);
+  return forActor(ctx, (p) => read(playerFactKey(key, of === 'actor' ? p : otherPlayer(p))));
+}
+
 export function evaluate(ctx: RuleContext, condition: Condition): boolean {
   const { world } = ctx;
   switch (condition.type) {
@@ -38,11 +58,28 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       return condition.conditions.some((c) => evaluate(ctx, c));
     case 'not':
       return !evaluate(ctx, condition.condition);
-    case 'remembered': {
-      const fact = world.progress.memory[condition.key];
-      if (fact === undefined) return false;
-      return condition.equals === undefined || fact.v === condition.equals;
-    }
+    case 'remembered':
+      return factTest(
+        ctx,
+        condition.key,
+        condition.of,
+        (fact) => condition.equals === undefined || fact.v === condition.equals,
+      );
+    case 'days_since':
+      return factTest(ctx, condition.key, condition.of, (fact) => {
+        const days = world.common.day - fact.day;
+        return (
+          (condition.atLeast === undefined || days >= condition.atLeast) &&
+          (condition.atMost === undefined || days <= condition.atMost)
+        );
+      });
+    case 'fact_at_least':
+      return factTest(
+        ctx,
+        condition.key,
+        condition.of,
+        (fact) => typeof fact.v === 'number' && fact.v >= condition.value,
+      );
     case 'need_at_least':
       return forActor(ctx, (p) => world.players[p].needs[condition.need] >= condition.value);
     case 'item_in_bag':

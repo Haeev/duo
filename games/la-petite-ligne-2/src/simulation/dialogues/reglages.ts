@@ -14,8 +14,9 @@ export interface DialogueTuning {
   readonly pendingPriority: number;
   /**
    * Fait daté « entendu » d'un dialogue qui se répète (`once` nul) et qui a quelque chose à dire:
-   * `<préfixe>.<lieu>.<dialogue>.j<joueur>`. Entendu dans la journée, il ne repasse plus avant
-   * la boutique du comptoir tenu.
+   * `<préfixe>.<lieu>.<dialogue>.j<joueur>`, qui compte les écoutes du jour (daté du jour).
+   * Entendu dans la journée, il ne repasse plus avant la boutique du comptoir tenu; réentendu en
+   * face du commerçant, il est suivi de l'offre de la boutique (`commerce.ts`).
    */
   readonly heardPrefix: string;
 }

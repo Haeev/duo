@@ -1,5 +1,5 @@
 // Défauts de la recette du jalon 1, retournés après correction: D2 (la buvette de la cheffe de gare
-// reste ouvrable après son dialogue de quête, par le comptoir tenu) et D3 (personne collé au joueur au point d'arrivée; relevé
+// reste ouvrable après son dialogue de quête, par le comptoir tenu, puis en face) et D3 (personne collé au joueur au point d'arrivée; relevé
 // des distances dans mesures.txt).
 import { appendFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -64,6 +64,18 @@ test('D2 la boutique de la gare s’ouvre au comptoir, après le dialogue de qu�
   await expect(shop).toBeVisible();
   await host.page.waitForTimeout(800);
   await host.shot('c-boutique-par-la-cheffe');
+  // 3e conversation, en face: la réplique de quête, déjà entendue ce jour, débouche sur l'offre de
+  // la buvette comme une conversation ordinaire; le premier choix (Entrée) ouvre la boutique.
+  await host.press('Backspace');
+  await expect(shop).toBeHidden();
+  const third = await talkToChief(duo, 'd');
+  expect(
+    third.join('|'),
+    'en face, la buvette est proposée après une réplique réentendue',
+  ).toContain('CHOIX: Je regarde ta buvette.');
+  await expect(shop).toBeVisible();
+  await host.page.waitForTimeout(800);
+  await host.shot('e-boutique-en-face');
   await duo.close();
 });
 

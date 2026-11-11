@@ -21,6 +21,14 @@ export type FactValue = v.InferOutput<typeof FactValueSchema>;
 /** Clé de mémoire: `lieu.sujet.detail`. */
 export const FactKeySchema = v.pipe(v.string(), v.regex(/^[a-z][a-z0-9-]*(\.[a-z0-9-]+){0,3}$/));
 
+/**
+ * Fait attaché à un joueur (`of`): la clé reçoit le suffixe `.j0` ou `.j1` de celui qui agit
+ * (`actor`) ou de l'autre joueur (`other`), comme les faits par joueur du moteur
+ * (`habitants.<id>.cadeaux.j1`). La clé donnée a donc trois segments au plus.
+ */
+export const FACT_OWNERS = ['actor', 'other'] as const;
+export type FactOwner = (typeof FACT_OWNERS)[number];
+
 /** États d'une décision à deux que lit la condition `decision_is`. */
 export const DECISION_IS = ['agreed', 'split', 'mine', 'theirs'] as const;
 export type DecisionIs = (typeof DECISION_IS)[number];
@@ -29,8 +37,15 @@ export type Condition =
   | { type: 'all'; conditions: Condition[] }
   | { type: 'any'; conditions: Condition[] }
   | { type: 'not'; condition: Condition }
-  /** Fait retenu égal à `equals` (absent: le fait existe). */
-  | { type: 'remembered'; key: string; equals?: FactValue }
+  /** Fait retenu égal à `equals` (absent: le fait existe); `of`: fait de qui agit ou de l'autre. */
+  | { type: 'remembered'; key: string; equals?: FactValue; of?: FactOwner }
+  /**
+   * Jours écoulés depuis la dernière écriture du fait (`aujourd'hui - jour du fait`), entre
+   * `atLeast` et `atMost` (bornes comprises, l'une au moins). Fait absent: faux.
+   */
+  | { type: 'days_since'; key: string; of?: FactOwner; atLeast?: number; atMost?: number }
+  /** Compteur retenu (fait numérique) d'au moins `value`. Absent ou non numérique: faux. */
+  | { type: 'fact_at_least'; key: string; of?: FactOwner; value: number }
   | { type: 'need_at_least'; need: NeedId; value: number }
   | { type: 'item_in_bag'; item: string; count: number }
   /** La bourse du joueur qui agit contient au moins `amount` centimes. */
@@ -52,6 +67,7 @@ export type Condition =
   | { type: 'weekday_is'; weekdays: string[] };
 
 const Minutes = v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1440));
+const Days = v.pipe(IntSchema, v.minValue(0), v.maxValue(10000));
 // Listes recopiées de `etat/commun.ts`, `prise.ts` et `temps.ts` (qui importent ce fichier):
 // `tests/monde-temps.test.ts` vérifie qu'elles restent égales.
 export const WORLD_WEATHERS = ['clear', 'overcast', 'rain', 'mist', 'snow', 'storm'] as const;
@@ -81,6 +97,20 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       type: v.literal('remembered'),
       key: FactKeySchema,
       equals: v.exactOptional(FactValueSchema),
+      of: v.exactOptional(v.picklist(FACT_OWNERS)),
+    }),
+    v.strictObject({
+      type: v.literal('days_since'),
+      key: FactKeySchema,
+      of: v.exactOptional(v.picklist(FACT_OWNERS)),
+      atLeast: v.exactOptional(Days),
+      atMost: v.exactOptional(Days),
+    }),
+    v.strictObject({
+      type: v.literal('fact_at_least'),
+      key: FactKeySchema,
+      of: v.exactOptional(v.picklist(FACT_OWNERS)),
+      value: FiniteSchema,
     }),
     v.strictObject({
       type: v.literal('need_at_least'),
@@ -128,12 +158,34 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
 export const EffectTargetSchema = v.picklist(['actor', 'duo']);
 
 export const EffectSchema = v.variant('type', [
-  /** Écrit un fait dans la mémoire, au nom du joueur qui agit (`by: 'duo'`: au nom des deux). */
+  /**
+   * Écrit un fait dans la mémoire, au nom du joueur qui agit (`by: 'duo'`: au nom des deux).
+   * `of: 'actor'`: le fait est attaché à celui qui agit (suffixe `.j0` ou `.j1` de la clé).
+   */
   v.strictObject({
     type: v.literal('remember'),
     key: FactKeySchema,
     value: FactValueSchema,
     by: v.picklist(['actor', 'duo']),
+    of: v.exactOptional(v.literal('actor')),
+  }),
+  /**
+   * Compteur: ajoute `amount` (1 par défaut, négatif permis) au fait numérique (0 s'il est absent),
+   * lu par `fact_at_least`. `by` et `of` comme pour `remember`.
+   */
+  v.strictObject({
+    type: v.literal('bump'),
+    key: FactKeySchema,
+    amount: v.exactOptional(
+      v.pipe(
+        IntSchema,
+        v.minValue(-1000),
+        v.maxValue(1000),
+        v.check((n) => n !== 0, 'pas nul'),
+      ),
+    ),
+    by: v.picklist(['actor', 'duo']),
+    of: v.exactOptional(v.literal('actor')),
   }),
   /** `to`: à celui qui agit (défaut) ou à chacun des deux (`duo`); refusé si les poches sont pleines. */
   v.strictObject({

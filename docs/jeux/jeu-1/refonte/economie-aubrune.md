@@ -141,7 +141,7 @@ L'étape `repas` de l'acte 3 (suite `ceux-qui-partent`) ne se franchit que si le
 - les mains vides, Colette dit: « Mais un pot-au-feu pareil se mitonne chez soi, et la maison du garde n'a pas encore de cuisine. Va voir Basile pour le devis: 150 €. », puis la recette;
 - avec une marmite cuisinée ailleurs, elle la laisse au joueur: « Elle sent bon, ta marmite. Mais Honorine a dit une vraie cuisine: la vôtre, à la maison du garde. Ces deux-là sentiraient la différence. » puis « Pas encore de cuisine ? Va voir Basile pour le devis: 150 €, quelques planches, quelques pierres. Garde la marmite, je garde le plan de table. »
 
-Rien d'autre n'attend: les autres étapes de l'acte 3 et les suites secondaires qui ne dépendent pas du repas restent ouvertes. Seules attendent la suite de l'acte 3 après le repas et la guerre de la soupe, ouverte par lui. La condition passe par le dialogue parce que le validateur des quêtes ne connaît pas les faits écrits par les logements; une marmite cuisinée ailleurs avant le paiement est acceptée une fois la cuisine payée.
+Rien d'autre n'attend: les autres étapes de l'acte 3 et les suites secondaires qui ne dépendent pas du repas restent ouvertes. Seules attendent la suite de l'acte 3 après le repas et la guerre de la soupe, ouverte par lui. Depuis le 2026-11-11, l'étape lit directement le fait du logement (`aubrune.maison-du-garde.cuisine` vaut `restored`), que le validateur des quêtes connaît; le dialogue `colette-repas` ne fait plus que dire la réplique. Une marmite cuisinée ailleurs avant le paiement est acceptée une fois la cuisine payée.
 
 ## 5. Les répliques de comptoir
 

@@ -18,7 +18,7 @@ import { RULES } from '../regles/reglages';
 import { choiceOf, decisionState } from '../quetes/decisions';
 import { agreeFor } from './accords';
 import { greet } from './amitie';
-import { shopOffered, talkingShop } from './commerce';
+import { faceToFace, shopOffered, talkingShop } from './commerce';
 import { exchangeRefusal, type ExchangeRefusal } from './echanges';
 import { DIALOGUES } from './reglages';
 
@@ -88,6 +88,29 @@ export function pickDialogue(
 /** Clé du fait « entendu » d'un dialogue qui se répète et qui a quelque chose à dire. */
 export function heardKey(place: string, dialogue: DialogueDef, player: PlayerIndex): string {
   return `${DIALOGUES.heardPrefix}.${place}.${dialogue.id}.j${String(player)}`;
+}
+
+/**
+ * Fois où ce joueur a ouvert ce dialogue aujourd'hui, d'après le fait « entendu » (sa valeur
+ * compte les écoutes du jour; `true`, d'une sauvegarde d'avant le compte, vaut une).
+ */
+function heardToday(world: ReadonlyWorld, key: string): number {
+  const fact = recall(world, key);
+  if (fact?.day !== world.common.day) return 0;
+  return typeof fact.v === 'number' ? fact.v : 1;
+}
+
+/**
+ * Ce joueur réentend ce dialogue d'histoire ou de quête: il l'avait déjà ouvert aujourd'hui avant
+ * cette conversation-ci. La boutique lui est alors proposée derrière, comme après le quotidien.
+ */
+export function heardAgain(
+  look: { readonly world: ReadonlyWorld },
+  player: PlayerIndex,
+  dialogue: DialogueDef,
+): boolean {
+  if (dialogue.once !== null) return false;
+  return heardToday(look.world, heardKey(look.world.common.place, dialogue, player)) >= 2;
 }
 
 /** Ce dialogue a quelque chose à dire (histoire, quête, souvenir), au-delà du quotidien. */
@@ -167,7 +190,9 @@ export function endTalk(sim: SimContext, player: PlayerIndex): void {
 /** Montre la page réservée qui propose la boutique du commerçant (`commerce.ts`), si elle s'offre. */
 function offerShop(sim: SimContext, player: PlayerIndex, dialogue: DialogueDef): boolean {
   const talk = sim.world.players[player].talk;
-  if (talk === null || shopOffered(sim, talk.villager, dialogue) === null) return false;
+  if (talk === null) return false;
+  const again = heardAgain(sim, player, dialogue) && faceToFace(sim, player, talk.villager);
+  if (shopOffered(sim, talk.villager, dialogue, again) === null) return false;
   talk.node = DIALOGUES.shopOffer.node;
   sim.touch('players');
   sim.emit({
@@ -264,7 +289,11 @@ export function startTalk(sim: SimContext, player: PlayerIndex, villager: string
       : (resumeNode(sim.world, place.def.id, dialogue, player) ?? dialogue.start);
   if (dialogue.once !== null)
     remember(sim, onceKey(place.def.id, dialogue, player), from, onceAuthor(dialogue, player));
-  else if (hasNews(dialogue)) remember(sim, heardKey(place.def.id, dialogue, player), true, player);
+  else if (hasNews(dialogue)) {
+    // Fois entendues ce jour (une ancienne sauvegarde a `true`: une fois).
+    const key = heardKey(place.def.id, dialogue, player);
+    remember(sim, key, heardToday(sim.world, key) + 1, player);
+  }
   state.talk = { villager, dialogue: dialogue.id, node: from };
   villagerState.met[player] = true;
   villagerState.talkingWith = player;
