@@ -567,3 +567,4 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Le client, après la publication de la 0.21.0: « Feux verts : tu as un budget de 20 agents ».
 - Lecture du manager (à lui de la corriger): 20 missions de membres au total pour finir Aubrune, deux en parallèle au plus, modèle économe quand la tâche est cadrée, compte tenu à jour dans le tableau de bord.
 - Missions 1 et 2 lancées: collections d'Aubrune en données; modèles des trains et des objets d'intérieur.
+- Correction du client: « Non 20 agents pour bosser en même temps ». Le budget est donc de 20 membres en parallèle, pas de 20 missions au total. Limite matérielle constatée: la machine a 4 cœurs et 15 Go; le manager monte à 13 membres avec des tests bridés (`--maxWorkers=2`, une capture à la fois) et complète quand des places lourdes se libèrent.
