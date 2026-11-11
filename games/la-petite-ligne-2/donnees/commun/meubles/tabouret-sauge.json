@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "tabouret-sauge",
   "name": "Tabouret sauge",
-  "model": "stool",
+  "model": "stool-farm",
   "size": {
     "w": 1,
     "h": 1

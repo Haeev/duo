@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "etagere-sauge",
   "name": "Étagère sauge",
-  "model": "shelf",
+  "model": "wall-shelf",
   "size": {
     "w": 1,
     "h": 1
