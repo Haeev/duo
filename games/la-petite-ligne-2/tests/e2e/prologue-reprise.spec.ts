@@ -8,7 +8,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
-import { startDuo, type ProbeWorld } from '../aides-e2e/duo';
+import { startDuo, type ProbeWorld, type Side } from '../aides-e2e/duo';
 import {
   actOn,
   calibrateYaw,
@@ -29,6 +29,21 @@ import {
 const QUEST = 'terminus';
 const PLACE = 'train-de-nuit';
 
+/** Départ du prologue (« Il est 21 h 30 »), et minutes de jeu laissées à la scène pour s'ouvrir. */
+const START_MINUTES = 21 * 60 + 30;
+const OPENING_MINUTES = 2;
+/** Attente murale de l'ouverture: large, le premier dessin est lent en rendu logiciel. */
+const OPENING_WALL_MS = 60_000;
+
+/** L'heure affichée au HUD, en minutes; `null` tant que l'interface n'est pas posée. */
+async function hudMinutes(side: Side): Promise<number | null> {
+  return await side.game().evaluate(() => {
+    const text = document.querySelector('.lpl-ui .hud-clock__time')?.textContent ?? '';
+    const read = /(\d+)\s*h\s*(\d+)/.exec(text);
+    return read === null ? null : Number(read[1]) * 60 + Number(read[2]);
+  });
+}
+
 const newContext = (journal: Journal): UiContext => ({
   journal,
   slug: 'p20',
@@ -45,7 +60,30 @@ test('P19b partie neuve sans sonde: pas d’éditeur au démarrage, le wagon tou
   const journal = new Journal('p19b-releves.txt');
   const duo = await startDuo(browser, 'p19b', { save: null, probe: false });
   const { host, guest } = duo;
-  await host.page.waitForTimeout(6000);
+  // « running » vient avant le premier dessin: le jeu charge encore ses décors, bâtit le rendu et
+  // pose l'interface, ce qui prend plusieurs secondes en rendu logiciel. On attend donc l'état
+  // réel (le bandeau de la scène chez les deux), pas une durée; « tout de suite » se vérifie à
+  // l'horloge du jeu, qui ne tourne qu'une fois la boucle lancée.
+  const opened = await Promise.all(
+    [host, guest].map(async (side) => {
+      const t0 = Date.now();
+      for (;;) {
+        const s = await snapshot(side);
+        expect(s.editor, `pas d’éditeur avant la scène chez ${side.who}`).toBe(false);
+        if (s.scene !== null) return await hudMinutes(side);
+        if (Date.now() - t0 > OPENING_WALL_MS)
+          throw new Error(`Délai dépassé (${side.who}): la scène du compartiment ne s’ouvre pas`);
+        await side.page.waitForTimeout(250);
+      }
+    }),
+  );
+  journal.log(`P19b heure du jeu à l'ouverture de la scène: ${JSON.stringify(opened)}`);
+  for (const minutes of opened) {
+    expect(minutes, 'heure du jeu lisible au HUD').not.toBeNull();
+    expect(minutes ?? Infinity, 'la scène s’ouvre dès le départ, à 21 h 30').toBeLessThanOrEqual(
+      START_MINUTES + OPENING_MINUTES,
+    );
+  }
   const [sh, sg] = [await snapshot(host), await snapshot(guest)];
   journal.log(
     `P19b éditeur ouvert au démarrage: hôte ${String(sh.editor)}, invité ${String(sg.editor)}`,

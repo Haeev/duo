@@ -161,6 +161,29 @@ describe('corps des personnages', () => {
     expect(Math.hypot(a.body.x - b.body.x, a.body.y - b.body.y)).toBeGreaterThan(radius * 1.5);
   });
 
+  it('deux joueurs posés l’un dans l’autre s’écartent de deux rayons en une demi-seconde', () => {
+    // Le cas du parcours P10 (`tests/e2e/interface.spec.ts`): 10 cm d'écart au départ, sans
+    // toucher aux commandes. Chaque pas rend un tiers du chevauchement, moitié chacun.
+    const sim = newSim(content);
+    put(sim, 0, 24, 26, 0);
+    put(sim, 1, 24.1, 26, 0);
+    const [a, b] = sim.world.players;
+    const apart = (): number => Math.hypot(a.body.x - b.body.x, a.body.y - b.body.y);
+    run(sim, 2 * SIM_DT);
+    expect(apart(), 'déjà en train de s’écarter').toBeGreaterThan(0.3);
+    expect(apart(), 'poussée douce, pas un saut').toBeLessThan(2 * radius - 0.05);
+    run(sim, 0.5 - 2 * SIM_DT);
+    expect(apart(), 'écart minimal après une demi-seconde').toBeGreaterThanOrEqual(
+      2 * radius - 0.05,
+    );
+    run(sim, 1);
+    expect(apart(), 'au repos: bord à bord, jamais plus loin').toBeCloseTo(2 * radius, 3);
+    // Personne n'est poussé seul: chacun a fait la moitié du chemin, sur la ligne qui les relie.
+    expect(24 - a.body.x).toBeCloseTo(b.body.x - 24.1, 9);
+    expect(a.body.y).toBe(26);
+    expect(b.body.y).toBe(26);
+  });
+
   it('un joueur contourne un autre en appuyant de biais: il finit par passer', () => {
     const sim = newSim(content);
     put(sim, 1, 12, 20, 0);

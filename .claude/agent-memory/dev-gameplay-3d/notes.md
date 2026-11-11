@@ -108,3 +108,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - L'interface ignore `outlook_ready` et ne lit pas `common.outlook` (état juste, rien d'affiché au 2026-11-11).
 - Sonde dans un test long: script Python de remplacement sur le fichier de test, lancement filtré (`-t`), puis `git checkout` du fichier. Une commande qui enchaîne `mkdir` puis `cp` hors du scratchpad échoue en bloc: créer les dossiers à part.
 
+## La Petite Ligne 2: parcours à deux et horloge du jeu (vérifié le 2026-11-11)
+
+- En rendu logiciel à deux vues, une image lourde tombe toutes les 1,2 à 1,5 s et ne rattrape que 8 pas (`ceil(30 / 4)`): la simulation avance à 11 pas par seconde murale, soit 0,3 à 0,4 fois le temps réel, moins encore sous charge. Tout délai mural d'un parcours qui borne une durée de jeu (trajet de 10 s en 40 s, « attendre 2 s » la fin d'une poussée, « attendre 6 s » la première scène) casse dès que la machine est chargée. Écrire l'attente en pas (`w.tick >= t0 + n`, `travel.since`) ou sur l'état, avec une attente murale large, et vérifier la durée en temps de jeu.
+- Signature d'un délai mural trop court: une valeur lue en plein mouvement qui correspond à un nombre entier de pas (écart de 0,378 m entre deux joueurs: 2 pas de poussée). Le rejouer dans Node pas à pas donne le compte.
+- `data-statut="running"` arrive avant le premier dessin: après `duo.ready()`, le jeu charge encore les décors, bâtit le rendu puis l'interface (4 s chez l'hôte en rendu logiciel). Sans la sonde, attendre l'interface (`.lpl-ui .scene-line` visible), pas une durée; l'heure du HUD (`.hud-clock__time`) donne le temps de jeu sans sonde.
+- Relevé jetable dans un parcours: fichier `tests/e2e/zz-*.spec.ts` qui écrit dans le scratchpad (`LPL2_SONDE`), lancé par `pnpm exec playwright test` (sans `vite build`), puis supprimé. `--repeat-each 3` joue trois fois de suite avec une seule préparation.
+

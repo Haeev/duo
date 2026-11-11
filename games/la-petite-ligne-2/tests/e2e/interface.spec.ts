@@ -1,7 +1,11 @@
 // P07 coup d'œil fermé après 3 s (CA-33), P08 immobile pendant le carnet, P09 coffre commun
 // depuis la gare (CA-20), P10 poussée entre joueurs.
 import { expect, test } from '@playwright/test';
+import { SIM_HZ } from '../../src/simulation/noyau/constantes';
 import { distance, startDuo } from '../aides-e2e/duo';
+
+/** Temps de jeu laissé à deux joueurs superposés pour s'écarter (s). */
+const PUSH_SECONDS = 0.5;
 
 test('coup d’œil, carnet immobile, coffre commun, poussée', async ({ browser }) => {
   const duo = await startDuo(browser, 'p07-interface');
@@ -92,12 +96,21 @@ test('coup d’œil, carnet immobile, coffre commun, poussée', async ({ browser
   await guest.press('KeyC');
   await expect(guest.game().locator('.lpl-ui .carnet')).toBeHidden();
 
-  // P10: deux joueurs posés l'un dans l'autre se séparent (rayon 0,3 m chacun).
+  // P10: deux joueurs posés l'un dans l'autre se séparent (rayon 0,3 m chacun). Le délai se
+  // compte en pas de simulation: en rendu logiciel chargé, une image dure plus d'une seconde et
+  // ne rattrape que quelques pas, si bien que deux secondes à la montre n'en valaient parfois que
+  // deux (écart lu à 0,38 m, en pleine poussée). Une demi-seconde de jeu suffit à la poussée
+  // (`tests/deplacement.test.ts` en fixe la loi).
   await duo.teleport(hi, 24, 26);
   await duo.teleport(gi, 24.1, 26);
-  await host.page.waitForTimeout(2000);
-  const pushed = await host.world();
-  const [a, b] = [pushed?.players[hi], pushed?.players[gi]];
+  const overlapAt = (await host.world())?.tick;
+  if (overlapAt === undefined) throw new Error('monde absent chez l’hôte');
+  const pushed = await duo.until(
+    host,
+    'une demi-seconde de jeu après la superposition',
+    (w) => w.tick >= overlapAt + PUSH_SECONDS * SIM_HZ,
+  );
+  const [a, b] = [pushed.players[hi], pushed.players[gi]];
   if (a === undefined || b === undefined) throw new Error('joueurs absents');
   await host.shot('5-poussee');
   expect(distance(a, b.body.x, b.body.y), 'écart après poussée (m)').toBeGreaterThanOrEqual(0.55);

@@ -24,6 +24,10 @@ export interface ProbeWorld {
     readonly travel: {
       readonly to: string;
       readonly boarded: readonly [boolean, boolean];
+      /** Chaque machine a chargé le lieu d'arrivée. */
+      readonly loaded?: readonly [boolean, boolean];
+      /** Pas du départ (trajet) puis de l'arrivée (descente); `null` tant qu'on monte. */
+      readonly since?: number | null;
       readonly skip?: readonly [boolean, boolean];
     } | null;
     readonly story?: {
