@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "margot-cadeau-salopette",
+  "villager": "margot",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.soupe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Deux cuisinières qui partagent une louche ! Honorine dit que c'est grâce à mes légumes. Je la crois, c'est plus simple.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_piece",
+          "piece": "bottom-overalls"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Tiens: une salopette de la ferme, pour ton potager. La terre ne tache pas, elle décore. Paulin a hoché la tête: elle te plaira.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

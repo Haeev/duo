@@ -17,6 +17,8 @@ import {
 } from '../../simulation/commerces/prix';
 import { formatEuros } from '../../simulation/sac/argent';
 import { el, icon } from '../dom';
+import type { EditorPreviewFactory } from '../editeur/editeur';
+import { EDITOR_TEXTS } from '../editeur/textes';
 import { itemThumb } from '../pictos';
 import { portraitMarkup } from '../portrait';
 import { UI_TUNING } from '../reglages';
@@ -36,6 +38,13 @@ const SYMBOLS: Readonly<Record<string, string>> = {
   plus: `<path ${S} d="M5 12h14M12 5v14"/>`,
   echoppe: `<g ${S}><path d="M3 10l2-6h14l2 6M4 10v10h16V10M3 10h18M9 20v-6h6v6"/></g>`,
   parole: `<g ${S}><path d="M4 5h16v10H10l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/></g>`,
+  // Pièces de tenue, un picto par emplacement: repli tant que la vignette 3D n'est pas faite.
+  'tenue-top': `<path ${S} d="M8 4L3 7l2 4 3-1v10h8V10l3 1 2-4-5-3c-1 2-2 3-4 3S9 6 8 4z"/>`,
+  'tenue-bottom': `<path ${S} d="M7 3h10l1 18h-4l-2-11-2 11H6z"/>`,
+  'tenue-dress': `<path ${S} d="M9 3h6l-1 5 5 13H5l5-13z"/>`,
+  'tenue-shoes': `<path ${S} d="M4 7h5c0 3 3 4 7 5 3 1 5 2 5 4v2H3v-3c0-3 1-5 1-8z"/>`,
+  'tenue-hat': `<g ${S}><path d="M7 14c0-4 2-7 5-7s5 3 5 7"/><path d="M3 16c0-1 2-2 4-2h10c2 0 4 1 4 2s-4 2-9 2-9-1-9-2z"/></g>`,
+  'tenue-accessory': `<g ${S}><path d="M5 5c3 2 11 2 14 0l1 3c-3 3-13 3-16 0z"/><path d="M13 9l2 11h-3l-1-11"/></g>`,
 };
 const COLUMNS = 6;
 
@@ -57,6 +66,8 @@ export function createShopScreen(
   keyLabel: (code: string) => string,
   openGuardMs: number,
   reduced: () => boolean,
+  /** Aperçu du personnage de l'éditeur: vignettes 3D des pièces de tenue. Absent: un picto. */
+  preview?: EditorPreviewFactory,
 ): ShopScreen {
   const layer = el('div', { class: 'shop-layer' });
   layer.innerHTML = `<svg width="0" height="0" style="position:absolute" aria-hidden="true">${Object.entries(
@@ -79,6 +90,70 @@ export function createShopScreen(
   let last: { world: ReadonlyWorld; me: PlayerIndex } | null = null;
 
   const shops = allShops(content);
+
+  /**
+   * Vignettes des pièces de tenue, faites par l'aperçu de l'éditeur (même rendu, même cadrage que
+   * ses cases) sur la silhouette et la peau du joueur, puis l'aperçu est libéré aussitôt: aucun
+   * contexte WebGL ne reste ouvert. Gardées pour la partie (adresses d'images de 128 px).
+   */
+  const pieceThumbs = new Map<string, string>();
+  let thumbsBusy = false;
+  let thumbsFailed = false;
+  const thumbKey = (piece: string, shape: string, skin: number): string =>
+    `${piece}|${shape}|${String(skin)}`;
+  function lookOf(world: ReadonlyWorld, me: PlayerIndex): { shape: string; skin: number } {
+    const state = world.players[me];
+    // Sans apparence encore (démonstration), la silhouette de départ du jeu.
+    const shape = state.look?.shape ?? content.settings.start.shapes[state.gender ?? 'f'];
+    return { shape, skin: state.look?.skin ?? 0 };
+  }
+  function makeThumbs(world: ReadonlyWorld, me: PlayerIndex): void {
+    if (preview === undefined || thumbsBusy || thumbsFailed || ui === null) return;
+    const lines = shops.get(ui.shop)?.pieces ?? [];
+    const { shape, skin } = lookOf(world, me);
+    const missing = lines.filter((l) => !pieceThumbs.has(thumbKey(l.piece, shape, skin)));
+    if (missing.length === 0) return;
+    thumbsBusy = true;
+    preview(document.createElement('canvas')).then(
+      (ready) => {
+        try {
+          for (const line of missing) {
+            const def = content.pieces[line.piece];
+            if (def === undefined) continue;
+            const defaults = content.morphologies.defaults[def.id] ?? [];
+            const colors = def.zones.map((_, i) => defaults[i] ?? 0);
+            const url = ready.thumbnail(
+              { shape, skin, pieces: [{ slot: def.slot, id: def.id, colors }] },
+              'piece',
+            );
+            pieceThumbs.set(thumbKey(def.id, shape, skin), url);
+          }
+        } finally {
+          ready.dispose();
+          thumbsBusy = false;
+          drawn = '';
+        }
+      },
+      () => {
+        // Modèles absents (tests, repli): le picto de l'emplacement reste.
+        thumbsBusy = false;
+        thumbsFailed = true;
+      },
+    );
+  }
+  /** Image d'une case: l'objet, ou la vignette 3D de la pièce (à défaut son picto d'emplacement). */
+  function tileImage(tile: ShopTile): string {
+    if (tile.kind === 'item') return itemThumb(tile.item, tile.name);
+    const look = last === null ? null : lookOf(last.world, last.me);
+    const url =
+      look === null ? undefined : pieceThumbs.get(thumbKey(tile.item, look.shape, look.skin));
+    if (url !== undefined)
+      return `<img class="obj obj--tenue" src="${url}" alt="" aria-hidden="true" draggable="false">`;
+    const picto =
+      `tenue-${tile.slot ?? ''}` in SYMBOLS ? `tenue-${tile.slot ?? ''}` : 'tenue-accessory';
+    return `<svg class="obj obj--tenue-picto" aria-hidden="true"><use href="#lpl-i-${picto}"/></svg>`;
+  }
+
   /** La réplique du commerçant de la boutique ouverte (sa fiche), à défaut le texte commun. */
   function keeperSays(moment: ShopMoment, common: string): string {
     const shop = ui === null ? undefined : shops.get(ui.shop);
@@ -108,13 +183,17 @@ export function createShopScreen(
           ? 'not-wanted'
           : detail.tile.state === 'out-of-stock'
             ? 'out-of-stock'
-            : ui.tab === 'buy'
-              ? 'not-enough-money'
-              : 'shop-cap-reached';
+            : detail.tile.state === 'owned'
+              ? 'already-owned'
+              : ui.tab === 'buy'
+                ? 'not-enough-money'
+                : 'shop-cap-reached';
       say(keeperRefuses(reason), 'no', performance.now());
       return;
     }
-    if (ui.tab === 'buy')
+    if (detail.tile.kind === 'piece')
+      send({ type: 'shop_buy_piece', shop: ui.shop, piece: detail.tile.item });
+    else if (ui.tab === 'buy')
       send({
         type: 'shop_buy',
         shop: ui.shop,
@@ -164,11 +243,39 @@ export function createShopScreen(
               prix: formatEuros(tile.unit ?? 0),
             });
     const node = el('button', {
-      class: `shop-tile shop-tile--${tile.state}${model?.focus === index ? ' focus' : ''}`,
-      'aria-label': label,
+      class: `shop-tile shop-tile--${tile.state}${tile.kind === 'piece' ? ' shop-tile--piece' : ''}${model?.focus === index ? ' focus' : ''}`,
+      'aria-label':
+        tile.kind === 'item'
+          ? label
+          : fill(tile.state === 'owned' ? SHOP_TEXTS.pieceMine : SHOP_TEXTS.piecePrice, {
+              objet: tile.name,
+              prix: formatEuros(tile.unit ?? 0),
+            }),
       'data-index': index,
+      'data-item': tile.item,
     });
-    node.innerHTML = itemThumb(tile.item, tile.name);
+    node.innerHTML = tileImage(tile);
+    if (tile.kind === 'piece') {
+      // Une pièce de tenue: son prix, ou « à toi » si elle est déjà dans ta garde-robe.
+      if (tile.state === 'owned')
+        node.append(el('span', { class: 'pastille shop-tile__mine', text: SHOP_TEXTS.mineShort }));
+      else if (tile.unit !== null)
+        node.append(
+          el(
+            'span',
+            {
+              class: `pastille shop-tile__price${tile.state === 'ok' ? '' : ' shop-tile__price--no'}`,
+            },
+            [el('span', { class: 'coin coin--sm' }), formatEuros(tile.unit)],
+          ),
+        );
+      if (model?.focus === index)
+        node.append(el('span', { class: 'shop-nametag', text: tile.name }));
+      node.addEventListener('click', () => {
+        setUi({ focus: index, quantity: 1 });
+      });
+      return node;
+    }
     if (tile.unit !== null) {
       const price = el(
         'span',
@@ -333,50 +440,68 @@ export function createShopScreen(
     const side = el('aside', { class: 'shop-side', 'aria-live': 'polite' });
     const d = m.detail;
     if (d !== null) {
+      const piece = d.tile.kind === 'piece';
       const thumb = el('div', { class: 'shop-v3d' });
-      thumb.innerHTML = itemThumb(d.tile.item, d.tile.name);
-      thumb.append(
-        el('span', {
-          class: 'provisoire shop-v3d__tag',
-          text: SHOP_TEXTS.provisional.replace('Portrait', 'Image'),
-        }),
-      );
-      const pastilles = el('div', { class: 'shop-row' }, [
-        d.hunger === null
-          ? null
-          : el(
+      thumb.innerHTML = tileImage(d.tile);
+      if (!piece)
+        thumb.append(
+          el('span', {
+            class: 'provisoire shop-v3d__tag',
+            text: SHOP_TEXTS.provisional.replace('Portrait', 'Image'),
+          }),
+        );
+      const slotName = EDITOR_TEXTS.slots[d.tile.slot ?? ''] ?? d.tile.slot ?? '';
+      const pastilles = piece
+        ? el('div', { class: 'shop-row' }, [
+            el(
               'span',
               {
                 class: 'pastille',
                 role: 'img',
-                'aria-label': fill(SHOP_TEXTS.hunger, { n: d.hunger }),
+                'aria-label': fill(SHOP_TEXTS.slot, { slot: slotName }),
               },
-              [icon('bol'), `+${String(d.hunger)}`],
+              [icon('tenue'), slotName],
             ),
-        el(
-          'span',
-          {
-            class: 'pastille',
-            role: 'img',
-            'aria-label': fill(SHOP_TEXTS.owned, { n: d.tile.owned }),
-          },
-          [icon('sac'), String(d.tile.owned)],
-        ),
-        m.tab === 'buy' && d.tile.stock !== null
-          ? el(
+            d.tile.state === 'owned'
+              ? el('span', { class: 'pastille pastille--full', text: SHOP_TEXTS.mineShort })
+              : null,
+          ])
+        : el('div', { class: 'shop-row' }, [
+            d.hunger === null
+              ? null
+              : el(
+                  'span',
+                  {
+                    class: 'pastille',
+                    role: 'img',
+                    'aria-label': fill(SHOP_TEXTS.hunger, { n: d.hunger }),
+                  },
+                  [icon('bol'), `+${String(d.hunger)}`],
+                ),
+            el(
               'span',
               {
                 class: 'pastille',
                 role: 'img',
-                'aria-label': fill(SHOP_TEXTS.stock, { n: d.tile.stock }),
+                'aria-label': fill(SHOP_TEXTS.owned, { n: d.tile.owned }),
               },
-              [icon('etagere'), String(d.tile.stock)],
-            )
-          : null,
-        d.tile.need
-          ? el('span', { class: 'pastille pastille--full', text: SHOP_TEXTS.need })
-          : null,
-      ]);
+              [icon('sac'), String(d.tile.owned)],
+            ),
+            m.tab === 'buy' && d.tile.stock !== null
+              ? el(
+                  'span',
+                  {
+                    class: 'pastille',
+                    role: 'img',
+                    'aria-label': fill(SHOP_TEXTS.stock, { n: d.tile.stock }),
+                  },
+                  [icon('etagere'), String(d.tile.stock)],
+                )
+              : null,
+            d.tile.need
+              ? el('span', { class: 'pastille pastille--full', text: SHOP_TEXTS.need })
+              : null,
+          ]);
       const knownRow =
         m.tab === 'sell'
           ? el(
@@ -475,21 +600,32 @@ export function createShopScreen(
             ? (shopRefusalText('out-of-stock') ?? '')
             : d.tile.state === 'too-expensive'
               ? `${shopRefusalText('not-enough-money') ?? ''}${fill(SHOP_TEXTS.tooExpensive, { montant: formatEuros((d.tile.unit ?? 0) - purse) })}`
-              : d.quantity === 0 && m.tab === 'sell'
-                ? (shopRefusalText('shop-cap-reached') ?? '')
-                : null;
+              : d.tile.state === 'owned'
+                ? SHOP_TEXTS.mine
+                : d.quantity === 0 && m.tab === 'sell'
+                  ? (shopRefusalText('shop-cap-reached') ?? '')
+                  : null;
       const refused = d.tile.state === 'refused';
       side.append(
         thumb,
         el('h2', { text: d.tile.name }),
+        d.tile.description === null
+          ? ''
+          : el('p', { class: 'shop-desc', text: d.tile.description }),
         pastilles,
         knownRow ?? '',
-        refused ? '' : stepper,
+        refused || piece ? '' : stepper,
         refused ? '' : total,
         chestRow ?? '',
         action,
       );
-      if (why !== null) side.append(el('p', { class: 'shop-why' }, [icon('refus'), why]));
+      if (why !== null)
+        side.append(
+          el('p', { class: `shop-why${d.tile.state === 'owned' ? ' shop-why--mine' : ''}` }, [
+            icon(d.tile.state === 'owned' ? 'tenue' : 'refus'),
+            why,
+          ]),
+        );
     }
 
     const panel = el(
@@ -569,6 +705,12 @@ export function createShopScreen(
             flyCoins(event.count, false);
           }
           return;
+        case 'shop_piece_bought':
+          if (event.player === me && ui?.shop === event.shop) {
+            say(keeperSays('bought', SHOP_TEXTS.bought), 'yes', performance.now());
+            flyCoins(1, false);
+          }
+          return;
         case 'shop_sold':
           if (event.player === me && ui?.shop === event.shop) {
             say(keeperSays('sold', SHOP_TEXTS.sold), event.need ? 'joy' : 'yes', performance.now());
@@ -590,7 +732,9 @@ export function createShopScreen(
     },
     frame(world, me) {
       last = { world, me };
-      if (ui !== null) render(world, me);
+      if (ui === null) return;
+      makeThumbs(world, me);
+      render(world, me);
     },
     key(code, now) {
       if (ui === null) return false;
@@ -654,6 +798,7 @@ export function createShopScreen(
       }
     },
     dispose() {
+      pieceThumbs.clear();
       layer.remove();
     },
   };

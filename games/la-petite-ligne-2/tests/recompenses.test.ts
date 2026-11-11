@@ -22,7 +22,7 @@ const REWARDS = [
   { type: 'give_recipe', recipe: 'soupe-factice' },
   { type: 'give_plan', plan: 'petrin-factice' },
   { type: 'give_entry', entry: 'carte-factice' },
-  { type: 'give_piece', piece: 'chapeau-factice' },
+  { type: 'give_piece', piece: 'chapeau-factice', to: 'duo' },
 ];
 
 /** Les gabarits copiés tels quels, plus une quête d'une étape (être ensemble) qui donne `rewards`. */
@@ -84,8 +84,8 @@ describe('effets de récompense', () => {
     const sim = newSim(content);
     expect(isKnown(sim.world, recipe)).toBe(false);
     expect(isPlanKnown(sim.world, craft)).toBe(false);
-    expect(isPieceOwned(sim.world, hat)).toBe(false);
-    expect(wardrobeOf(content.catalogue, sim.world).pieces).not.toContainEqual(hat);
+    expect(isPieceOwned(sim.world, hat, 0)).toBe(false);
+    expect(wardrobeOf(content.catalogue, sim.world, 0).pieces).not.toContainEqual(hat);
     const events = wait(sim, 0.5);
     for (const [kind, id] of [
       ['recipe', 'soupe-factice'],
@@ -93,6 +93,13 @@ describe('effets de récompense', () => {
       ['piece', 'chapeau-factice'],
     ])
       expect(events).toContainEqual({ type: 'reward_given', by: 0, kind, id });
+    // La pièce de tenue (`to: 'duo'`) entre dans chacune des deux garde-robes, annoncée à chacun.
+    expect(events).toContainEqual({
+      type: 'reward_given',
+      by: 1,
+      kind: 'piece',
+      id: 'chapeau-factice',
+    });
     expect(events).toContainEqual(
       expect.objectContaining({ type: 'collection_found', entry: 'carte-factice', first: true }),
     );
@@ -100,7 +107,8 @@ describe('effets de récompense', () => {
     expect(isKnown(sim.world, recipe)).toBe(true);
     expect(isPlanKnown(sim.world, craft)).toBe(true);
     expect(isFound(sim.world, 'carte-factice')).toBe(true);
-    expect(wardrobeOf(content.catalogue, sim.world).pieces).toContainEqual(hat);
+    for (const p of [0, 1] as const)
+      expect(wardrobeOf(content.catalogue, sim.world, p).pieces).toContainEqual(hat);
     // Tout tient dans la progression (sauvegarde et réseau): elle reste valide.
     expect(v.is(ProgressSchema, sim.world.progress)).toBe(true);
   });

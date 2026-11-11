@@ -26,6 +26,14 @@
       "restockDays": 7
     }
   ],
+  "pieces": [
+    { "piece": "top-cardigan", "price": 2800 },
+    { "piece": "bottom-corduroy", "price": 2400 },
+    { "piece": "bottom-long-skirt", "price": 2200 },
+    { "piece": "shoes-clogs", "price": 1600 },
+    { "piece": "accessory-scarf", "price": 1200 },
+    { "piece": "hat-cap", "price": 900 }
+  ],
   "buys": [
     {
       "item": "coquelicot",

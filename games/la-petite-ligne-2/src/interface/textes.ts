@@ -188,7 +188,7 @@ export const TEXTS = {
     reward: {
       recipe: 'Nouvelle recette : {nom}',
       plan: 'Nouveau plan : {nom}',
-      piece: 'Une tenue de plus au miroir : {nom}',
+      piece: 'Nouvelle pièce dans ta garde-robe : {nom}',
     },
     /** Rappel de la course, une fois (`astuce-course.ts`); `{touche}` selon le clavier réel. */
     runHint: 'Maintiens {touche} pour courir (ça creuse un peu l’appétit)',

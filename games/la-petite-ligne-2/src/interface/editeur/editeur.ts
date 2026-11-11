@@ -79,7 +79,7 @@ type BarItem = (typeof BAR)[number];
 
 export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): CharacterEditor {
   const S = EDITOR_SETTINGS;
-  // Le catalogue du duo: sans les pièces à gagner pas encore gagnées (relu à chaque ouverture).
+  // La garde-robe de ce joueur: sans les pièces à gagner qu'il n'a pas (relue à chaque ouverture).
   let data = deps.data;
   const categories = editorCategories(data.catalogue, S);
 
@@ -557,7 +557,7 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
   return {
     open(nextMode, world, me) {
       const state = world.players[me];
-      data = { ...deps.data, catalogue: wardrobeOf(deps.data.catalogue, world) };
+      data = { ...deps.data, catalogue: wardrobeOf(deps.data.catalogue, world, me) };
       mode = nextMode;
       player = me;
       const gender = state.gender ?? deps.defaultGender(me);

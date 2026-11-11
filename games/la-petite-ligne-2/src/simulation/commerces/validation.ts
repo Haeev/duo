@@ -1,10 +1,11 @@
 /**
  * Contrôles d'un commerce que le schéma ne peut pas faire seul (appelés par `donnees/valider.ts`):
- * objets connus, coefficient sans prix de famille, besoin du jour impossible, identifiant en double
+ * objets et pièces de tenue connus, coefficient sans prix de famille, besoin du jour impossible, identifiant en double
  * (la mémoire des prix range les commerces par identifiant, tous lieux confondus).
  */
 import type { Content } from '../../donnees/charger';
 import type { ShopDef } from '../../donnees/schemas/commerce';
+import { WARDROBE } from '../regles/recompenses';
 import { basePrice } from './prix';
 
 export function shopProblems(content: Content, shop: ShopDef): string[] {
@@ -12,6 +13,17 @@ export function shopProblems(content: Content, shop: ShopDef): string[] {
   const known = (item: string): boolean => item in content.items;
   for (const line of shop.sells)
     if (!known(line.item)) problems.push(`objet vendu inconnu « ${line.item} »`);
+  const pieces = new Set<string>();
+  for (const line of shop.pieces ?? []) {
+    const piece = content.pieces[line.piece];
+    if (piece === undefined) problems.push(`pièce de tenue vendue inconnue « ${line.piece} »`);
+    else if (!piece.tags.includes(WARDROBE.lockedTag))
+      problems.push(
+        `pièce « ${line.piece} » en vente sans l'étiquette « ${WARDROBE.lockedTag} » (déjà à tous)`,
+      );
+    if (pieces.has(line.piece)) problems.push(`pièce vendue en double: ${line.piece}`);
+    pieces.add(line.piece);
+  }
   const seen = new Set<string>();
   for (const line of shop.buys) {
     const key = 'item' in line ? line.item : `famille ${line.family}`;

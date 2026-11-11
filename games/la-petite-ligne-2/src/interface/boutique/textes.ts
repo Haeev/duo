@@ -38,6 +38,12 @@ export const SHOP_TEXTS = {
   keysQty: 'quantité',
   keysChest: 'coffre',
   keysClose: 'sortir',
+  /** Pièces de tenue (ligne `pieces` du commerce): une seule, pour ta garde-robe. */
+  piecePrice: '{objet}, pièce de tenue, {prix}',
+  pieceMine: '{objet}, pièce de tenue, déjà à toi',
+  mineShort: 'À toi',
+  mine: 'Déjà à toi : change de tenue au miroir ou dans le carnet (Tenues).',
+  slot: 'Emplacement : {slot}',
   bought: 'Merci !',
   sold: 'Marché conclu.',
   /** Raisons de refus des commerces (clés de la simulation, `simulation/commerces/index.ts`). */
@@ -53,6 +59,7 @@ export const SHOP_TEXTS = {
     'not-enough-items': 'Tu n’en as pas assez',
     'shop-cap-reached': 'Plus de sous pour aujourd’hui',
     'purse-full': 'Bourse pleine',
+    'already-owned': 'Déjà à toi',
     'too-far': 'Trop loin',
     gone: 'Plus là',
   } as Readonly<Record<string, string>>,

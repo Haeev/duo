@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "honorine-cadeau-robe",
+  "villager": "honorine",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Le coffre de maman n'avait pas qu'une robe de noces. Il y avait aussi une robe du dimanche, pliée dans du papier de soie.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_piece",
+          "piece": "dress-sunday"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle est pour toi. Marthe dit qu'elle était à elle. Elle ment, pour une fois. Porte-la quand tu veux: le dimanche, ça se décide.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -37,6 +37,15 @@
       "unlock": { "type": "bond_at_least", "villager": "cheffe-de-gare", "points": 100 },
     },
   ],
+  // Facultatif: pièces de tenue en vente (mercerie, grand magasin). Une pièce du catalogue des
+  // personnages (donnees/commun/personnages/catalogue.json) étiquetée "a-gagner"; prix en
+  // centimes. L'achat, de la bourse seule, la met dans la garde-robe de l'acheteur seul (chacun
+  // ses tenues); déjà à lui, l'écran dit « À toi » et elle ne se rachète pas. Sans stock.
+  // Elle se porte ensuite au miroir ou par le carnet (onglet Tenues). "unlock" comme pour "sells".
+  "pieces": [
+    { "piece": "hat-cap", "price": 900 },
+    // { "piece": "top-cardigan", "price": 2800, "unlock": { "type": "remembered", "key": "..." } },
+  ],
   // Ce qu'il rachète, à SON prix (centimes): par objet précis ou par famille d'objets; l'objet
   // précis l'emporte. Un objet peut aussi prendre un coefficient du prix de sa famille ici:
   // { "item": "pomme", "factor": 1.5 } (il faut alors une ligne "family" pour sa famille).

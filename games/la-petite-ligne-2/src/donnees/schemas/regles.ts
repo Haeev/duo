@@ -258,7 +258,8 @@ export const EffectSchema = v.variant('type', [
   v.strictObject({ type: v.literal('open_shop'), shop: IdSchema }),
   /**
    * Récompenses qui ne sont ni un objet ni de l'argent (`simulation/regles/recompenses.ts`),
-   * acquises au duo et annoncées aux deux joueurs. Déjà acquise: sans effet.
+   * acquises au duo et annoncées aux deux joueurs (sauf la pièce de tenue, à chacun). Déjà
+   * acquise: sans effet.
    */
   /** Apprend une recette à apprendre (`known: "learned"` de `commun/recettes/<id>.json`). */
   v.strictObject({ type: v.literal('give_recipe'), recipe: IdSchema }),
@@ -266,8 +267,15 @@ export const EffectSchema = v.variant('type', [
   v.strictObject({ type: v.literal('give_plan'), plan: IdSchema }),
   /** Inscrit une entrée au carnet des collections (carte postale, musique: `commun/collections/`). */
   v.strictObject({ type: v.literal('give_entry'), entry: IdSchema }),
-  /** Ajoute à la garde-robe une pièce de tenue à gagner (étiquette `a-gagner` du catalogue). */
-  v.strictObject({ type: v.literal('give_piece'), piece: IdSchema }),
+  /**
+   * Ajoute une pièce de tenue à gagner (étiquette `a-gagner` du catalogue) à la garde-robe de celui
+   * qui agit, ou de chacun avec `to: 'duo'` (les tenues sont à chacun, cahier 2.1). Déjà à lui: rien.
+   */
+  v.strictObject({
+    type: v.literal('give_piece'),
+    piece: IdSchema,
+    to: v.exactOptional(EffectTargetSchema),
+  }),
   /**
    * Décision à deux: celui qui agit dit son choix. Elle n'est prise que si l'autre dit le même
    * (`decision` et ses options: champ `decision` d'une étape de quête; lire par `decision_is`).

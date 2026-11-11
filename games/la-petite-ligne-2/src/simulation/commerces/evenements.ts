@@ -20,6 +20,14 @@ export const SHOP_EVENTS = [
     cents: CentsSchema,
     chest: CentsSchema,
   }),
+  /** Pièce de tenue achetée: elle est dans la garde-robe de ce joueur (annoncée par `reward_given`). */
+  v.strictObject({
+    type: v.literal('shop_piece_bought'),
+    player: PlayerIndexSchema,
+    shop: IdSchema,
+    piece: IdSchema,
+    cents: CentsSchema,
+  }),
   /** Vente faite; `need`: c'était le besoin du jour (une belle vente, « ♪ »). */
   v.strictObject({
     type: v.literal('shop_sold'),

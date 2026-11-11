@@ -225,6 +225,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     keyLabel,
     UI_TUNING.openGuardMs,
     reduced,
+    options.characterPreview,
   );
   const workshop = createWorkshopScreen(
     layer,
@@ -372,6 +373,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
           );
         break;
       case 'reward_given': {
+        // Une pièce de tenue n'entre que dans la garde-robe de qui la reçoit (`by`): à lui seul l'annonce.
+        if (event.kind === 'piece' && event.by !== me) break;
         const c = view.content;
         const name =
           event.kind === 'recipe'
@@ -407,6 +410,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'bag_changed':
       case 'brick_used':
       case 'shop_bought':
+      case 'shop_piece_bought':
       case 'shop_opened':
       case 'shop_sold':
       case 'day_started':

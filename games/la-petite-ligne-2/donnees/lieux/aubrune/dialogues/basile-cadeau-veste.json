@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "basile-cadeau-veste",
+  "villager": "basile",
+  "priority": 58,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "La lettre. Arrivée. Trente ans après. Grâce à toi.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_piece",
+          "piece": "top-work-jacket"
+        }
+      ],
+      "next": "fin"
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Tiens. Veste de travail. Toile solide, grandes poches. Pour les planches. Ça dure.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}
