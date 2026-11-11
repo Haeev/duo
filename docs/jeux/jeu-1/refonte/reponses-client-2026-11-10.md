@@ -542,3 +542,9 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - **q20, toits des commerces**: épicerie, forge et atelier de Basile en tuile; la maison forestière reste en tuile.
 - **q21, Firmin nie le train**: on garde (« venus par le car »), le billet poinçonné le contredit ensuite.
 - **q22, coût de la course**: non à la simple faim accélérée. Le client veut une jauge d'endurance en plus de la perte de faim, avec l'idée de renforcer la jauge par des plats (« booster la jauge avec des boost de nourriture ? »). À concevoir par le game-designer avant de coder.
+
+## Nuit du 10 au 11 novembre: quota et sobriété
+
+- Vers 5 h 30 le quota a été épuisé: deux missions coupées (éditeur à la photo, nuit d'Aubrune), travail conservé sur le disque.
+- 6 h 15, le client: « Tu peux reprendre (j'ai réinitialisé exceptionnellement le quota maximal, maintenant sois plus économe) ».
+- Règle appliquée depuis: une seule mission à la fois, modèle moins coûteux quand la tâche est cadrée, finir l'engagé avant d'ouvrir du neuf, vérifications lancées par le manager lui-même plutôt que par un membre.
