@@ -72,6 +72,23 @@ export function checkCondition(
     case 'item_in_bag':
       if (!(c.item in content.items)) problems.push(`${at}: objet inconnu « ${c.item} »`);
       return;
+    case 'item_owned':
+      for (const item of c.items)
+        if (!(item in content.items)) problems.push(`${at}: objet inconnu « ${item} »`);
+      return;
+    case 'harvested':
+      // L'objet doit exister dans la carte d'un lieu (intérieurs compris) avec une brique `harvest`.
+      for (const id of c.objects) {
+        const found = Object.values(content.places).some((p) =>
+          p.map.objects.some(
+            (o) =>
+              o.id === id &&
+              (content.props[o.type]?.bricks.some((b) => b.brick === 'harvest') ?? false),
+          ),
+        );
+        if (!found) problems.push(`${at}: aucun objet récoltable « ${id} » dans les cartes`);
+      }
+      return;
     case 'place_is':
       if (!(c.place in content.places)) problems.push(`${at}: lieu inconnu « ${c.place} »`);
       return;

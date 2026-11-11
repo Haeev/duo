@@ -84,7 +84,12 @@ function writable(): (key: string) => boolean {
   const p = place();
   const written = new Set<string>();
   for (const source of [p.dialogues, p.quests, p.scenes])
-    for (const effect of typed(source, 'remember')) written.add(String(effect.key));
+    for (const effect of typed(source, 'remember')) {
+      written.add(String(effect.key));
+      // Fait attaché à qui agit (`of: "actor"`): la clé reçoit `.j0` ou `.j1`.
+      if (effect.of === 'actor')
+        for (const j of ['j0', 'j1']) written.add(`${String(effect.key)}.${j}`);
+    }
   for (const event of content.time.events[AUBRUNE] ?? [])
     for (const fact of event.activates.facts) written.add(fact.key);
   const villagers = p.villagers.map((v) => v.id).join('|');
@@ -171,6 +176,8 @@ function satisfy(sim: Sim, conditions: readonly Condition[]): void {
       case 'place_is':
       case 'season_is':
       case 'weekday_is':
+      case 'item_owned':
+      case 'harvested':
         break;
     }
   }

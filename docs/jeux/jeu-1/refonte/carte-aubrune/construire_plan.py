@@ -665,8 +665,13 @@ mob('lisse-sud', None, 'crossing-gate',182.5, 99.6, 0, "la lisse barre la route 
 mob('croix-pn-eglise', None, 'crossing-sign', 256.8, 95, 0, "passage à niveau non gardé: croix de Saint-André au bord de la rue")
 mob('pompe-de-la-place', 'pompe', 'water-pump', 208, 113.5, 0, "la pompe de la place, sur l'ancien puits: l'eau de tous et la toilette du matin (acte 1)")
 mob('banc-place', 'banc', 'bench-platform', 208, 119.4, 2, "face au puits et à la halte: on y voit qui descend du train", regarde=[208, 113.5])
-mob('ronces-maison-1', 'ronces', 'buisson', 167.5, 112.5, 0, "les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1")
-mob('ronces-maison-2', 'ronces', 'buisson', 176, 119.6, 0, "les ronces du jardin, devant le futur potager")
+# Ronces de la maison (type `ronces-maison`, ressource du même nom): des ronces à arracher, pas à cueillir. On les
+# arrache à la bêche que Basile vient de prêter, racines comprises, sinon elles repoussent; la hache sert aux chênes de
+# la lisière. Toute saison (la partie commence au printemps), rien à récolter, et elles ne reviennent jamais: le jardin
+# et le pignon sont dégagés pour de bon. L'étape `debroussailler` passe quand les deux sont arrachées (condition
+# `harvested`). Les mûres de l'été et de l'automne sont dans la tranchée (`ronces-tranchee-*`, type `ronces`).
+mob('ronces-maison-1', 'ronces-maison', 'buisson', 167.5, 112.5, 0, "les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à la bêche à l'acte 1, avant de refaire le toit (on ne monte pas d'échelle dans les ronces)")
+mob('ronces-maison-2', 'ronces-maison', 'buisson', 176, 119.6, 0, "les ronces du jardin, devant le futur potager: arrachées à la bêche, racines comprises, avant de bêcher le premier carré")
 mob('table-tonnelle', 'table-a-manger', 'table-farm', 197.5, 120, 0, "la tonnelle d'Odette: le souper des pensionnaires")
 mob('chaise-tonnelle-n', 'chaise', 'chair-farm', 197, 118.9, 0, "autour de la table de la tonnelle", regarde=[197, 120])
 mob('chaise-tonnelle-s', 'chaise', 'chair-farm', 198, 121.1, 2, "autour de la table de la tonnelle", regarde=[198, 120])

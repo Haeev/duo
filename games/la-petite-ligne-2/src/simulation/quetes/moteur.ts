@@ -9,8 +9,12 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { QuestLineDef, QuestStepDef } from '../../donnees/schemas/quete';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { SimContext } from '../noyau/systemes';
+import type { Effect } from '../../donnees/schemas/regles';
+import type { PlayerState } from '../../etat/joueur';
+import { exchangeRefusal, type ExchangeRefusal } from '../dialogues/echanges';
 import type { RuleContext } from '../regles/conditions';
 import { removeItem } from '../sac/inventaire';
+import { STORY } from './reglages';
 import { evaluateStepAll, playersTogether } from './conditions';
 import { applyStepEffects, type StoryHooks } from './effets';
 import { storyOf } from './faits';
@@ -107,20 +111,55 @@ export function openQuest(
   return true;
 }
 
-/** Remet à l'habitant les objets des conditions `deliver` de l'étape. */
-function handOver(sim: SimContext, step: QuestStepDef, actor: PlayerIndex): void {
+/** Retire des poches les objets des conditions `deliver` de l'étape; `true` si l'un l'a été. */
+function takeDelivered(
+  players: readonly [PlayerState, PlayerState],
+  step: QuestStepDef,
+  actor: PlayerIndex,
+): boolean {
+  let changed = false;
   for (const c of step.done) {
     if (c.type !== 'deliver') continue;
     const order: PlayerIndex[] = actor === 0 ? [0, 1] : [1, 0];
     for (const p of order) {
-      const player = sim.world.players[p];
+      const player = players[p];
       if (player.talk?.villager !== c.villager) continue;
       if (removeItem(player, c.item, c.count)) {
-        sim.touch('players');
+        changed = true;
         break;
       }
     }
   }
+  return changed;
+}
+
+/** Remet à l'habitant les objets des conditions `deliver` de l'étape. */
+function handOver(sim: SimContext, step: QuestStepDef, actor: PlayerIndex): void {
+  if (takeDelivered(sim.world.players, step, actor)) sim.touch('players');
+}
+
+/**
+ * Le don de l'étape (`give_item` de `onDone`) tiendrait-il dans les poches, une fois les objets
+ * remis à l'habitant ? Rejoué sur une copie des deux joueurs; `null`: il passe (ou rien à donner).
+ */
+export function stepGiftRefusal(
+  look: { readonly world: ReadonlyWorld; readonly content: Content },
+  step: QuestStepDef,
+  actor: PlayerIndex,
+): ExchangeRefusal | null {
+  const gifts: Effect[] = [];
+  for (const e of step.onDone) if (e.type === 'give_item') gifts.push(e);
+  if (gifts.length === 0) return null;
+  const players: [PlayerState, PlayerState] = [
+    structuredClone(look.world.players[0]) as PlayerState,
+    structuredClone(look.world.players[1]) as PlayerState,
+  ];
+  takeDelivered(players, step, actor);
+  return exchangeRefusal(
+    { world: { ...look.world, players }, content: look.content },
+    actor,
+    gifts,
+  );
 }
 
 /** Franchit une étape ouverte, pour les deux joueurs. */
@@ -184,7 +223,14 @@ export function checkQuests(sim: SimContext, hooks: StoryHooks): void {
     if (state === undefined || state.done) continue;
     for (const step of activeSteps(line, passedOf(sim.world, line.id))) {
       const actor = stepActor(sim, step);
-      if (actor !== null) passStep(sim, line, step, actor, hooks);
+      if (actor === null) continue;
+      // Un don d'étape ne tombe jamais au sol: l'étape attend qu'il y ait de la place.
+      const refused = stepGiftRefusal(sim, step, actor);
+      if (refused === null) passStep(sim, line, step, actor, hooks);
+      else if (sim.world.tick % STORY.giftReminderTicks < STORY.checkEveryTicks) {
+        const target = sim.world.players[actor].talk?.villager ?? null;
+        sim.emit({ type: 'refused', player: actor, reason: refused, target });
+      }
     }
   }
 }

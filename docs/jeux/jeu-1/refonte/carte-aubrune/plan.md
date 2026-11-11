@@ -465,8 +465,8 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | croix-pn-eglise | (à créer) | `crossing-sign` | 256.8, 95 | sud | passage à niveau non gardé: croix de Saint-André au bord de la rue |
 | pompe-de-la-place | pompe | `water-pump` | 208, 113.5 | sud | la pompe de la place, sur l'ancien puits: l'eau de tous et la toilette du matin (acte 1) |
 | banc-place | banc | `bench-platform` | 208, 119.4 | nord | face au puits et à la halte: on y voit qui descend du train |
-| ronces-maison-1 | ronces | `bramble` | 167.5, 112.5 | sud | les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1 |
-| ronces-maison-2 | ronces | `bramble` | 176, 119.6 | sud | les ronces du jardin, devant le futur potager |
+| ronces-maison-1 | ronces-maison | `bramble` | 167.5, 112.5 | sud | les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à la bêche à l'acte 1, avant de refaire le toit (on ne monte pas d'échelle dans les ronces) |
+| ronces-maison-2 | ronces-maison | `bramble` | 176, 119.6 | sud | les ronces du jardin, devant le futur potager: arrachées à la bêche, racines comprises, avant de bêcher le premier carré |
 | table-tonnelle | table-a-manger | `table-farm` | 197.5, 120 | sud | la tonnelle d'Odette: le souper des pensionnaires |
 | chaise-tonnelle-n | chaise | `chair-farm` | 197, 118.9 | sud | autour de la table de la tonnelle |
 | chaise-tonnelle-s | chaise | `chair-farm` | 198, 121.1 | nord | autour de la table de la tonnelle |

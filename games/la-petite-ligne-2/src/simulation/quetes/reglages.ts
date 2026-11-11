@@ -30,6 +30,12 @@ export interface StorySettings {
    * étapes du lieu ont le temps de voir la scène finie avant qu'on le quitte.
    */
   readonly departureDelaySeconds: number;
+  /**
+   * Une étape faite dont le don (`give_item` de `onDone`) ne tient pas dans les poches attend
+   * qu'on fasse de la place (rien ne tombe au sol): le refus « poches pleines » est redit tous
+   * les N pas, pas à chaque évaluation.
+   */
+  readonly giftReminderTicks: number;
 }
 
 export const STORY: StorySettings = {
@@ -43,4 +49,5 @@ export const STORY: StorySettings = {
   villagerWalkSpeed: 1.4,
   maxWalkSeconds: 20,
   departureDelaySeconds: 1,
+  giftReminderTicks: 150,
 };

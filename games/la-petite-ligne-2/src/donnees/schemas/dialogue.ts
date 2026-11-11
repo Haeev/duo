@@ -60,6 +60,8 @@ export const DialogueNodeSchema = v.variant('kind', [
   /**
    * Effets appliqués d'un bloc. `otherwise`: si l'échange est impossible (poches pleines, argent
    * insuffisant, objet manquant), rien n'est appliqué, le refus part et le dialogue continue là.
+   * Sans `otherwise`, un don qui ne tient pas dans les poches n'est pas donné non plus: l'habitant
+   * dit qu'il le garde (`pocketsFull`), la conversation se ferme et reprendra à ce bloc.
    */
   v.strictObject({
     kind: v.literal('effects'),

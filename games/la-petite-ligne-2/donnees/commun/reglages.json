@@ -57,6 +57,7 @@
   "dialogue": {
     "maxChars": 150,
     "charsPerSecond": 40,
-    "maxOptions": 3
+    "maxOptions": 3,
+    "pocketsFull": "Tes poches sont pleines. Fais de la place, je te le garde."
   }
 }

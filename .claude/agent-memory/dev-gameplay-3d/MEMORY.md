@@ -871,3 +871,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Réplique de dialogue: 150 caractères au plus (le chargement refuse au-delà); « vous » sans adjectif accordé (« vous-mêmes » plutôt que « seuls »).
 - Un objet neuf sans vignette fait échouer `tests/interface-plume.test.ts`: la vignette s'écrit dans `assets/`; hors périmètre, l'inscrire dans `WITHOUT_THUMB` avec sa raison et le signaler.
 - Battement audible sans calcul: deux oscillateurs (diapason pur, note de l'instrument décalée en `detune`) sur le même bus; le repère visuel suit `beatHz = f * |2^(c/1200) - 1|`.
+
+## Blocages d'histoire d'Aubrune (La Petite Ligne refonte, vérifié le 2026-11-11)
+
+- Un dialogue `once: "player"` dont `when` lit un fait que l'étape réécrit à son passage (`equals: "ouvert"` puis `onDone` « fait ») n'est entendu que par le premier joueur: le second n'a jamais eu les outils de Basile. Lire le fait sans `equals`.
+- Une option `next: null` d'un dialogue `once` (« Je repasserai ») épuise le dialogue: si une étape attend son nœud `fin`, l'histoire se bloque. Faire passer l'étape sur un fait écrit par l'effet du don (`remembered ... of: actor`), pas sur `talked`.
+- `exchangeRefusal` ne contrôlait que les options et les blocs `effects` avec `otherwise`; un bloc sans `otherwise` et les `onDone` de quêtes passaient par `giveItem`, qui fait tomber le reste au sol.
+- `tests/aides-visite.ts` (`visitObject`) cherche une place à `reach.action` du centre de l'objet: un buisson 1 x 1 coincé entre un mur et le potager ne se vise que depuis le bord de l'emprise plus la portée; `tests/aides-geste.ts` (`faceObject`) cherche jusqu'à une demi-case plus loin.
+- La chaîne du plan d'Aubrune est rejouable: `construire_plan.py`, `prettier --ignore-path= --write` sur le `plan.json` des docs (le dossier `docs/` est ignoré par prettier), `plan-vers-lieu.ts`, `assembler_lieu.py`. Seul écart parasite au 2026-11-11: l'ordre d'un objet de `interieurs/epicerie-rdc.json`, à remettre par `git checkout` du fichier.
+- Les heredocs Python qui modifient un fichier du dépôt passent tant qu'ils sont courts; un long heredoc ou un `cat >>` avec `$(...)` est refusé: préférer Edit.

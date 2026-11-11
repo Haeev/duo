@@ -184,9 +184,9 @@
         },
         {
           "id": "nuit-pension",
-          "objective": "Dors à la pension: deux lits sont faits, à côté de l'épicerie.",
+          "objective": "Dors à la pension: deux lits à l'étage de l'épicerie, par l'escalier du fond de la cuisine. On se couche dès {coucher}.",
           "target": {
-            "point": "pl-o"
+            "point": "pension-lit-a"
           },
           "done": [
             {
@@ -214,9 +214,9 @@
           },
           "done": [
             {
-              "type": "talked",
-              "dialogue": "basile-outils",
-              "node": "fin"
+              "type": "remembered",
+              "key": "aubrune.acte1.outils-recus",
+              "of": "actor"
             }
           ],
           "together": false,
@@ -239,16 +239,15 @@
         },
         {
           "id": "debroussailler",
-          "objective": "Arrache les ronces devant la maison.",
+          "objective": "Bêche en main, arrache les ronces de la maison: au pignon ouest et au jardin.",
           "target": {
-            "point": "hd"
+            "point": "jd"
           },
           "after": ["outils"],
           "done": [
             {
-              "type": "item_in_bag",
-              "item": "mures",
-              "count": 2
+              "type": "harvested",
+              "objects": ["ronces-maison-1", "ronces-maison-2"]
             }
           ],
           "together": false,
@@ -533,7 +532,7 @@
           "id": "premiere-nuit",
           "objective": "Première nuit dans la maison: couchez-vous dans la pièce au toit neuf.",
           "target": {
-            "point": "hd"
+            "point": "maison-lit-g"
           },
           "after": ["toit", "besaces", "vente-achille"],
           "done": [

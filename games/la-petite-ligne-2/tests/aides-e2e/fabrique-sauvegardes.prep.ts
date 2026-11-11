@@ -219,8 +219,14 @@ it('fabrique la sauvegarde « aubrune-recette » (briques, salle restaurée, dev
   sim.world.minutes = 600;
   wait(sim, 1);
   write('aubrune-recette', 'Aubrune, recette du contenu', sim.world);
-  // La même partie au premier jour de l'été (jour 15, 10 h): les ronces ont des mûres (leur
-  // butin n'a lieu qu'en été et en automne; au printemps, « Cueillir » est barré).
+  // La même partie au premier jour de l'été (jour 15, 10 h), l'hôte avec la bêche de Basile:
+  // les ronces du jardin s'arrachent (toute saison, `ronces-maison`).
+  // Dans la barre (touches 1 à 5): ce qu'elle tenait à cette case passe dans le sac.
+  const spadeAt = a.toolbar.findIndex((st) => st?.item !== 'pain' && st?.item !== 'hache');
+  expect(spadeAt).toBeGreaterThanOrEqual(0);
+  const moved = a.toolbar[spadeAt] ?? null;
+  a.toolbar[spadeAt] = { item: 'beche', count: 1 };
+  if (moved !== null) expect(addItem(content, a, moved.item, moved.count)).toBe(0);
   sim.world.common.day = 15;
   sim.world.minutes = 14 * 1440 + 600;
   wait(sim, 1);

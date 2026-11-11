@@ -971,7 +971,7 @@
           "id": "veille-du-train",
           "objective": "Le train est annoncé pour demain: une bonne nuit, et une toilette à la pompe.",
           "target": {
-            "point": "hd"
+            "point": "maison-lit-g"
           },
           "done": [
             {

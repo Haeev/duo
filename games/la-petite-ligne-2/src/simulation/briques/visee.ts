@@ -18,6 +18,7 @@ import { isWallCell, type Blockers } from '../noyau/grille';
 import {
   currentBlockers,
   footprintOf,
+  harvestedAway,
   type PropInstance,
   type ReadPlace,
 } from '../noyau/obstacles';
@@ -165,6 +166,8 @@ export function aimOf(
   const considerProp = (prop: PropInstance): void => {
     const def = content.props[prop.type];
     if (def === undefined || def.bricks.length === 0) return;
+    // Parti avec sa ressource (ronces arrachées): plus dessiné, plus visé.
+    if (harvestedAway(content, def, place, prop.id, world.common.day)) return;
     // Point de l'emprise le plus proche du personnage: un banc large se vise par n'importe quel bout.
     const size = footprintOf(def, prop.rotation);
     const x = Math.max(prop.x - size.w / 2, Math.min(px, prop.x + size.w / 2));

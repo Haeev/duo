@@ -103,6 +103,11 @@ export const SettingsSchema = v.strictObject({
     maxChars: v.pipe(IntSchema, v.minValue(40), v.maxValue(400)),
     charsPerSecond: Positive,
     maxOptions: v.pipe(IntSchema, v.minValue(2), v.maxValue(4)),
+    /**
+     * Ce que dit un habitant quand son don ne tient pas dans les poches (rien n'est donné, il le
+     * garde): texte par défaut, remplacé par `pocketsFull` de sa fiche s'il en a un.
+     */
+    pocketsFull: v.pipe(v.string(), v.minLength(1), v.maxLength(150)),
   }),
 });
 export type Settings = v.InferOutput<typeof SettingsSchema>;

@@ -7,8 +7,11 @@ import type { PlayerIndex } from '../src/donnees/schemas/communs';
 import type { DialogueDef } from '../src/donnees/schemas/dialogue';
 import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
 import type { Sim } from '../src/simulation/noyau/pas';
+import { calendarOf } from '../src/simulation/monde/calendrier';
+import { countHeld } from '../src/simulation/regles/conditions';
 import { giveItem } from '../src/simulation/sac/actions';
 import { sceneView } from '../src/simulation/scenes/lecture';
+import { faceObject, holdFromToolbar, strikeUntilHarvested } from './aides-geste';
 import { act, contentWith, contextOf, wait } from './aides-l3';
 import { lieDown, propsWithBrick } from './aides-prologue';
 import { visit } from './aides-visite';
@@ -262,7 +265,18 @@ describe('écriture du prologue et de l’acte 1', () => {
     // Basile, les ronces, les chênes, les besaces.
     talk(sim, 0, 'basile', 'merci');
     talk(sim, 1, 'basile', 'merci');
-    giveItem(contextOf(sim), 1, 'mures', 2);
+    // Chacun a ses outils (0.22.0: le second n'avait rien). Les ronces de la maison, au premier
+    // jour du printemps: bêche en main, le vrai geste, sans objet offert.
+    expect(calendarOf(sim.content, sim.world.common.day).season).toBe('spring');
+    for (const p of [0, 1] as const) expect(countHeld(sim.world.players[p], 'beche')).toBe(1);
+    holdFromToolbar(sim, 1, 'beche');
+    for (const id of ['ronces-maison-1', 'ronces-maison-2']) {
+      faceObject(sim, 1, id);
+      expect(strikeUntilHarvested(sim, 1, id)).toBeGreaterThan(0);
+    }
+    sim.world.players[1].selected = sim.world.players[1].toolbar.findIndex((s) => s === null);
+    wait(sim, 0.5);
+    expect(passed(sim, 'le-train-de-5h12')).toContain('debroussailler');
     talk(sim, 0, 'solange', 'merci');
     talk(sim, 1, 'solange', 'merci');
     // Avec la besace (4 cases de plus), six bûches tiennent dans le sac.

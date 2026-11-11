@@ -59,6 +59,17 @@ export type Condition =
   | { type: 'need_at_least'; need: NeedId; value: number }
   | { type: 'item_in_bag'; item: string; count: number }
   /**
+   * Au moins `count` exemplaires de ces objets (l'un ou l'autre, comptés ensemble) à celui qui agit:
+   * barre, sac, et rangements de tous les lieux (coffres, partagés par le duo). Pour savoir s'il a
+   * encore un outil prêté, même rangé ou amélioré à la forge.
+   */
+  | { type: 'item_owned'; items: string[]; count: number }
+  /**
+   * Tous ces objets de la carte du lieu courant (meubles à brique `harvest`) ont été récoltés et ne
+   * sont pas revenus: les ronces de la maison arrachées (ressource sans retour, `respawnDays: null`).
+   */
+  | { type: 'harvested'; objects: string[] }
+  /**
    * Celui qui agit porte un instrument désaccordé (un peu faux ou faux, `simulation/musique/accord.ts`);
    * sans joueur qui agit, l'un ou l'autre.
    */
@@ -142,6 +153,15 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       type: v.literal('item_in_bag'),
       item: IdSchema,
       count: v.pipe(CountSchema, v.minValue(1)),
+    }),
+    v.strictObject({
+      type: v.literal('item_owned'),
+      items: v.pipe(v.array(IdSchema), v.minLength(1), v.maxLength(8)),
+      count: v.pipe(CountSchema, v.minValue(1)),
+    }),
+    v.strictObject({
+      type: v.literal('harvested'),
+      objects: v.pipe(v.array(IdSchema), v.minLength(1), v.maxLength(16)),
     }),
     v.strictObject({ type: v.literal('instrument_out_of_tune') }),
     v.strictObject({

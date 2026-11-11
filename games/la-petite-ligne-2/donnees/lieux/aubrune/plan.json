@@ -3369,23 +3369,23 @@
     },
     {
       "id": "ronces-maison-1",
-      "type": "ronces",
+      "type": "ronces-maison",
       "modele": "bramble",
       "x": 167.5,
       "y": 112.5,
       "rotation": 0,
-      "pourquoi": "les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à l'acte 1",
+      "pourquoi": "les ronces qui ont envahi la ruine, contre le pignon ouest: on les arrache à la bêche à l'acte 1, avant de refaire le toit (on ne monte pas d'échelle dans les ronces)",
       "regarde": null,
       "acte": 1
     },
     {
       "id": "ronces-maison-2",
-      "type": "ronces",
+      "type": "ronces-maison",
       "modele": "bramble",
       "x": 176,
       "y": 119.6,
       "rotation": 0,
-      "pourquoi": "les ronces du jardin, devant le futur potager",
+      "pourquoi": "les ronces du jardin, devant le futur potager: arrachées à la bêche, racines comprises, avant de bêcher le premier carré",
       "regarde": null,
       "acte": 1
     },

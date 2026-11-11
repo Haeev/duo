@@ -94,13 +94,17 @@ export const ResourceSchema = v.strictObject({
   effort: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(5)),
   /** Ce qui reste une fois récolté, pour le rendu: rien, une souche, un arbre sans fruits. */
   after: v.picklist(['gone', 'stump', 'bare']),
-  /** Jours avant la repousse ou la réapparition. */
-  respawnDays: v.pipe(IntSchema, v.minValue(1), v.maxValue(56)),
+  /**
+   * Jours avant la repousse ou la réapparition; `null`: ne revient jamais (les ronces arrachées
+   * devant la maison: le débroussaillage est fait une fois pour toutes).
+   */
+  respawnDays: v.nullable(v.pipe(IntSchema, v.minValue(1), v.maxValue(56))),
   /** Le butin tombe au sol autour de la ressource (fruits secoués) au lieu d'aller dans les poches. */
   toGround: v.boolean(),
   /** Tirages par récolte; chaque tirage choisit une entrée possible maintenant. */
   rolls: v.pipe(IntSchema, v.minValue(1), v.maxValue(5)),
-  loot: v.pipe(v.array(LootEntrySchema), v.minLength(1), v.maxLength(24)),
+  /** Vide permis: un geste qui ne rapporte rien (arracher des ronces), sans refus de saison. */
+  loot: v.pipe(v.array(LootEntrySchema), v.maxLength(24)),
 });
 export type ResourceDef = v.InferOutput<typeof ResourceSchema>;
 

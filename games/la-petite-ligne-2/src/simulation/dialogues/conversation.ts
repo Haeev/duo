@@ -231,6 +231,41 @@ function offerShop(sim: SimContext, player: PlayerIndex, dialogue: DialogueDef):
   return true;
 }
 
+/** Le refus vient d'un don qui ne tient pas dans les poches (de qui agit ou de l'autre). */
+function isGiftRefusal(refused: ExchangeRefusal): boolean {
+  return refused === 'pockets-full' || refused === 'other-pockets-full';
+}
+
+/**
+ * Un don d'histoire ne tombe jamais au sol: rien n'est donné, l'habitant dit qu'il le garde (page
+ * réservée), et un dialogue `once` reprendra à `resume` (le don ou le choix qui le porte).
+ */
+function refuseGift(
+  sim: SimContext,
+  player: PlayerIndex,
+  dialogue: DialogueDef,
+  resume: string,
+): void {
+  const talk = sim.world.players[player].talk;
+  if (talk === null) return;
+  if (dialogue.once !== null)
+    remember(
+      sim,
+      onceKey(sim.world.common.place, dialogue, player),
+      resume,
+      onceAuthor(dialogue, player),
+    );
+  talk.node = DIALOGUES.giftRefused.node;
+  sim.touch('players');
+  sim.emit({
+    type: 'talk_page',
+    player,
+    villager: talk.villager,
+    node: talk.node,
+    speaker: talk.villager,
+  });
+}
+
 /** Avance jusqu'à la prochaine réplique ou au prochain choix; `null`: fin du dialogue. */
 function enter(
   sim: SimContext,
@@ -248,12 +283,16 @@ function enter(
         id = node.cases.find((c) => evaluateAll(ctx, c.when))?.next ?? node.otherwise;
         continue;
       case 'effects': {
-        const refused =
-          node.otherwise === undefined ? null : exchangeRefusal(sim, player, node.effects);
-        if (refused !== null) {
+        const refused = exchangeRefusal(sim, player, node.effects);
+        if (refused !== null && (node.otherwise !== undefined || isGiftRefusal(refused))) {
           const villager = sim.world.players[player].talk?.villager ?? null;
           sim.emit({ type: 'refused', player, reason: refused, target: villager });
-          id = node.otherwise ?? null;
+          // Un don sans place et sans suite prévue: rien n'est donné, on reprendra ici.
+          if (node.otherwise === undefined) {
+            refuseGift(sim, player, dialogue, id);
+            return;
+          }
+          id = node.otherwise;
           continue;
         }
         applyEffects(sim, player, node.effects);
@@ -345,7 +384,11 @@ export function talkNext(sim: SimContext, player: PlayerIndex): void {
   const talk = sim.world.players[player].talk;
   const dialogue = currentDialogue(sim, player);
   if (talk === null) return;
-  if (dialogue === null || talk.node === DIALOGUES.shopClosed.node) {
+  if (
+    dialogue === null ||
+    talk.node === DIALOGUES.shopClosed.node ||
+    talk.node === DIALOGUES.giftRefused.node
+  ) {
     endTalk(sim, player);
     return;
   }
@@ -390,6 +433,7 @@ export function talkChoose(sim: SimContext, player: PlayerIndex, optionId: strin
   const refused = exchangeRefusal(sim, player, option.effects);
   if (refused !== null) {
     sim.emit({ type: 'refused', player, reason: refused, target: talk.villager });
+    if (isGiftRefusal(refused)) refuseGift(sim, player, dialogue, talk.node);
     return;
   }
   applyEffects(sim, player, option.effects);
@@ -485,6 +529,18 @@ export function talkView(
       node: talk.node,
       speaker: talk.villager,
       text: agreeFor(world, player, text),
+      emote: null,
+      options: [],
+      opens: null,
+    };
+  }
+  if (talk.node === DIALOGUES.giftRefused.node) {
+    const villager = placeContent(content, world)?.villagers.find((v) => v.id === talk.villager);
+    return {
+      villager: talk.villager,
+      node: talk.node,
+      speaker: talk.villager,
+      text: agreeFor(world, player, villager?.pocketsFull ?? content.settings.dialogue.pocketsFull),
       emote: null,
       options: [],
       opens: null,
