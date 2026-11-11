@@ -36,12 +36,25 @@ const DecorModelSchema = v.object({
   states: v.optional(v.record(v.string(), v.string())),
   /** Écarts de pose tirés par exemplaire: cap libre, échelle entre deux bornes. */
   jitter: v.optional(v.object({ yaw: v.boolean(), scale: v.tuple([v.number(), v.number()]) })),
+  /**
+   * Le modèle éclaire: foyer dans son repère (m, avant vers +z), rayon de la flaque au sol,
+   * couleur ajoutée (sinon la teinte des lampes de l'ambiance), force, ombre locale ou non.
+   */
+  light: v.optional(
+    v.object({
+      at: v.tuple([v.number(), v.number(), v.number()]),
+      radius: v.pipe(v.number(), v.minValue(0.5), v.maxValue(12)),
+      color: v.optional(v.pipe(v.string(), v.regex(/^#[0-9a-fA-F]{6}$/))),
+      gain: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(3))),
+      shadow: v.optional(v.boolean()),
+    }),
+  ),
 });
 
-/** Ce que le rendu encré tire du NOM d'un matériau: couche de traits, prise au vent. */
+/** Ce que le rendu encré tire du NOM d'un matériau: couche de traits, prise au vent, verre d'une lampe (`flame`). */
 const DecorMaterialSchema = v.object({
   layer: v.picklist(Object.keys(LAYER) as LayerName[]),
-  kind: v.optional(v.picklist(['leaf', 'stem'])),
+  kind: v.optional(v.picklist(['leaf', 'stem', 'flame'])),
 });
 export type DecorMaterial = v.InferOutput<typeof DecorMaterialSchema>;
 

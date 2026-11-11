@@ -444,16 +444,22 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | poteau-quai | poteau-de-quai | `poteau-de-quai` | 205.5, 102.5 | sud | là où l'on monte à deux: le point du quai |
 | caisse-commande | (à créer) | `crate` | 207.5, 101.5 | sud | la caisse de la commande du samedi, au pied du poteau |
 | panneau-gare | (à créer) | `platform-sign` | 196, 99.6 | nord | le nom de la halte se lit depuis le train, donc tourné vers la voie |
-| reverbere-quai-1 | (à créer) | `street-lamp` | 188, 102.5 | sud | éclairage du quai aux deux bouts |
-| reverbere-quai-2 | (à créer) | `street-lamp` | 212, 102.5 | sud | éclairage du quai aux deux bouts |
-| reverbere-route-1 | (à créer) | `street-lamp` | 195.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-route-2 | (à créer) | `street-lamp` | 216.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-route-3 | (à créer) | `street-lamp` | 240.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-route-4 | (à créer) | `street-lamp` | 262, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-route-5 | (à créer) | `street-lamp` | 280.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-route-6 | (à créer) | `street-lamp` | 302.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-route-7 | (à créer) | `street-lamp` | 313, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
-| reverbere-gue | (à créer) | `street-lamp` | 179.5, 104.5 | sud | au carrefour du passage à niveau, la nuit du dénouement se joue ici |
+| reverbere-quai-1 | lanterne-de-quai | `platform-lantern` | 188, 102.5 | nord | éclairage du quai, au bout ouest: la potence vers la voie |
+| reverbere-quai-2 | lanterne-de-quai | `platform-lantern` | 212, 102.5 | nord | éclairage du quai, au bout est, devant la halte: la potence vers la voie |
+| reverbere-quai-3 | lanterne-de-quai | `platform-lantern` | 203, 102.5 | nord | au milieu du quai, entre le banc du réveil et le poteau où l'on monte: on attend le train sous elle |
+| reverbere-route-1 | reverbere | `street-lantern` | 195.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-2 | reverbere | `street-lantern` | 216.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-3 | reverbere | `street-lantern` | 240.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-4 | reverbere | `street-lantern` | 262, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-5 | reverbere | `street-lantern` | 280.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-6 | reverbere | `street-lantern` | 302.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-route-7 | reverbere | `street-lantern` | 313, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
+| reverbere-gue | reverbere | `street-lantern` | 179.5, 104.5 | sud | au carrefour du passage à niveau, la nuit du dénouement se joue ici |
+| reverbere-place | reverbere | `street-lantern` | 205.5, 120.4 | sud | au sud de la place, près du banc: la pompe et le banc se trouvent la nuit, et la descente vers la berge |
+| reverbere-parvis | reverbere | `street-lantern` | 257.5, 81 | sud | sur le parvis, à gauche du portail en sortant: on trouve la rue de l'Église en quittant l'office du soir |
+| lanterne-halte | lanterne-de-porte | `wall-lantern` | 221.2, 105.03 | sud | à droite de la porte de la halte, côté place: la gare se trouve de loin, même le dernier train parti |
+| lanterne-cafe | lanterne-de-porte | `wall-lantern` | 255.4, 106.03 | sud | entre la porte et la vitrine du café: allumée, elle dit que Colette sert encore |
+| lanterne-epicerie | lanterne-de-porte | `wall-lantern` | 194.03, 117.2 | est | à la porte de l'épicerie-pension, côté place: les pensionnaires rentrent à la nuit |
 | lisse-nord | (à créer) | `level-crossing-gate` | 182.5, 95.4 | sud | la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie |
 | lisse-sud | (à créer) | `level-crossing-gate` | 182.5, 99.6 | sud | la lisse barre la route au sud de la voie |
 | croix-pn-eglise | (à créer) | `crossing-sign` | 256.8, 95 | sud | passage à niveau non gardé: croix de Saint-André au bord de la rue |

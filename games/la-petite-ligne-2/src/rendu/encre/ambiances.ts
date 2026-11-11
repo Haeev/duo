@@ -36,6 +36,12 @@ export interface Ambiance {
   /** Personnages: part de l'ombre relevée vers la demi-teinte, et force du liseré clair. */
   characterLift: number;
   characterRim: number;
+  /**
+   * Teinte du liseré des personnages et sa part (0: le liseré est leur couleur éclaircie; 1: il
+   * est de cette teinte). La nuit, un liseré froid détache leur silhouette hors des lampes.
+   */
+  characterRimColor: Rgb;
+  characterRimTint: number;
   /** Force des lampes (0: éteintes) et couleur ajoutée dans leur flaque. */
   lamps: number;
   lampColor: Rgb;
@@ -77,6 +83,7 @@ const NUMBERS = [
   'grime',
   'characterLift',
   'characterRim',
+  'characterRimTint',
   'lamps',
   'windowAmount',
   'spill',
@@ -95,6 +102,7 @@ const COLORS = [
   'half',
   'shade',
   'ink',
+  'characterRimColor',
   'lampColor',
   'windowGlow',
   'glint',

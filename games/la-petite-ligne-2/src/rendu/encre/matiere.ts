@@ -35,11 +35,26 @@ import {
 import type { Ambiance } from './ambiances';
 import { EDGE_SETTINGS } from '../lieu/reglages-lisieres';
 import { RELIEF_SETTINGS } from '../lieu/reglages-relief';
-import { hex, LAYER, SLEEK_PART, TILE_METRES } from './couches';
+import { hex, LAYER, type Rgb, SLEEK_PART, TILE_METRES } from './couches';
 import { INK_SETTINGS } from './reglages';
 
-export const MAX_LAMPS = 4;
+/**
+ * Bornes du nuanceur: lampes et fenêtres éclairées prises en compte à la fois, les plus proches
+ * du point visé (`INK_SETTINGS.lights.reach`). Au-delà, une lampe garde son verre allumé mais ne
+ * pose plus de flaque.
+ */
+export const MAX_LAMPS = 6;
 export const MAX_WINDOWS = 8;
+
+/** État de lumière propre d'un objet (`userData.inkInner` d'un maillage), lu à chaque dessin. */
+export const INK_INNER = 'inkInner';
+
+/**
+ * Lumière propre d'un objet: x mode (0 celle de l'ambiance, 1 part de la lueur des vitres de
+ * l'ambiance, 2 part absolue: une lampe), y part du rez-de-chaussée, z part de l'étage, w hauteur
+ * (m, monde) où l'étage commence.
+ */
+export type InkInner = Vector4;
 
 export interface Lamp {
   readonly x: number;
@@ -48,6 +63,38 @@ export interface Lamp {
   readonly radius: number;
   /** La lampe peut porter l'ombre locale (une seule à la fois, la plus proche du joueur). */
   readonly shadow: boolean;
+  /** Couleur ajoutée dans sa flaque, à la place de la teinte des lampes de l'ambiance. */
+  readonly color?: Rgb;
+  /** Force propre (1 par défaut). */
+  readonly gain?: number;
+  /**
+   * Lampe du dehors: son rang d'allumage de 0 à 1 (elle s'allume à la tombée du jour, les
+   * premières d'abord, `INK_SETTINGS.lamps`). Absent: allumée dès que l'ambiance a des lampes.
+   */
+  readonly phase?: number;
+  /** Bâtiment qui la porte (lanterne de porte): elle suit son éclairage (`share`). */
+  readonly follows?: string;
+  /** Part d'allumage imposée de 0 à 1 (le bâtiment qui la porte); absente: 1. */
+  share?: number;
+  /** Verre de son modèle: le rendu y écrit son état à chaque image. */
+  readonly glass?: InkInner;
+}
+
+/**
+ * Part d'allumage d'une lampe pour une force de lampes d'ambiance: les lampes du dehors
+ * s'allument l'une après l'autre entre `from` et `from + spread + ramp`, les autres suivent
+ * l'ambiance telle quelle.
+ */
+export function lampPower(
+  amount: number,
+  lamp: Pick<Lamp, 'phase' | 'share'>,
+  settings: typeof INK_SETTINGS.lamps = INK_SETTINGS.lamps,
+): number {
+  const share = lamp.share ?? 1;
+  if (amount <= 0) return 0;
+  if (lamp.phase === undefined) return share;
+  const start = settings.from + lamp.phase * settings.spread;
+  return Math.min(1, Math.max(0, (amount - start) / settings.ramp)) * share;
 }
 
 /** Fenêtre éclairée de l'intérieur: elle pose son rectangle de lumière sur le sol dehors. */
@@ -61,6 +108,8 @@ export interface WindowLight {
   /** Normale du mur, vers le dehors. */
   readonly nx: number;
   readonly nz: number;
+  /** Bâtiment éclairé de l'intérieur (0: éteint, 1: plein); absent: 1. */
+  power?: number;
 }
 
 /** Uniformes communs: une seule instance, partagée par tous les matériaux encrés. */
@@ -78,6 +127,8 @@ export interface InkUniforms {
   uDetail: IUniform<Vector3>;
   /** Personnages: x ombre relevée, y liseré clair, z saturation, w gain. */
   uCharacter: IUniform<Vector4>;
+  /** Liseré des personnages: teinte, et part de cette teinte dans le liseré (0: leur couleur éclaircie). */
+  uRim: IUniform<Vector4>;
   uViewDir: IUniform<Vector3>;
   /** Taille de la cible de la scène (points): elle suit l'échelle interne. */
   uScreen: IUniform<Vector2>;
@@ -87,7 +138,8 @@ export interface InkUniforms {
   /** Vent: direction au sol fois la force (0: air immobile). */
   uWind: IUniform<Vector2>;
   uLampPos: IUniform<Vector4[]>;
-  uLampColor: IUniform<Vector3>;
+  /** Couleur ajoutée par chaque lampe dans sa flaque (sa force comprise); w: sa part d'allumage. */
+  uLampTint: IUniform<Vector4[]>;
   /** Numéro de la lampe qui porte l'ombre locale (-1: aucune). */
   uLampCaster: IUniform<number>;
   uLampShadowMap: IUniform<Texture | null>;
@@ -139,13 +191,14 @@ export function createInkUniforms(): InkUniforms {
     uCharacter: {
       value: new Vector4(0.3, 0.2, INK_SETTINGS.character.saturation, INK_SETTINGS.character.gain),
     },
+    uRim: { value: new Vector4(1, 1, 1, 0) },
     uViewDir: { value: new Vector3(0, 1, 0) },
     uScreen: { value: new Vector2(1366, 768) },
     uPixel: { value: 1 },
     uTime: { value: 0 },
     uWind: { value: new Vector2() },
     uLampPos: { value: four(MAX_LAMPS) },
-    uLampColor: { value: new Vector3() },
+    uLampTint: { value: four(MAX_LAMPS) },
     uLampCaster: { value: -1 },
     uLampShadowMap: { value: null },
     uLampShadowMatrix: { value: new Matrix4() },
@@ -207,20 +260,30 @@ export function applyAmbiance(
   uniforms.uRelief.value.set(ambiance.relief, ambiance.grime);
   uniforms.uCharacter.value.x = ambiance.characterLift;
   uniforms.uCharacter.value.y = ambiance.characterRim;
+  uniforms.uRim.value.set(...ambiance.characterRimColor, ambiance.characterRimTint);
   const lit = ambiance.lamps > 0;
   uniforms.uLampPos.value.forEach((slot, i) => {
     const lamp = lamps[i];
-    if (lamp !== undefined && lit) slot.set(lamp.x, lamp.y, lamp.z, lamp.radius);
-    else slot.set(0, 0, 0, 0);
+    const tint = uniforms.uLampTint.value[i];
+    const power = lamp === undefined || !lit ? 0 : lampPower(ambiance.lamps, lamp);
+    if (lamp === undefined || power <= 0) {
+      slot.set(0, 0, 0, 0);
+      tint?.set(0, 0, 0, 0);
+      return;
+    }
+    slot.set(lamp.x, lamp.y, lamp.z, lamp.radius);
+    const color = lamp.color ?? ambiance.lampColor;
+    const force = ambiance.lamps * power * (lamp.gain ?? 1);
+    tint?.set(color[0] * force, color[1] * force, color[2] * force, power);
   });
-  uniforms.uLampColor.value.set(...ambiance.lampColor).multiplyScalar(ambiance.lamps);
   const spill = ambiance.windowAmount > 0 && ambiance.spill > 0;
   uniforms.uWinA.value.forEach((slot, i) => {
     const w = spill ? windows[i] : undefined;
     const other = uniforms.uWinB.value[i];
-    if (w !== undefined) {
+    const power = w === undefined ? 0 : (w.power ?? 1);
+    if (w !== undefined && power > 0) {
       slot.set(w.x, w.sill, w.z, w.width / 2);
-      other?.set(w.nx, w.nz, w.height, 1);
+      other?.set(w.nx, w.nz, w.height, power);
     } else {
       slot.set(0, 0, 0, 0);
       other?.set(0, 0, 0, 0);
@@ -285,7 +348,7 @@ uniform vec3 uInk;
 uniform vec4 uHatch;
 uniform vec2 uRelief;
 uniform vec4 uLampPos[${String(MAX_LAMPS)}];
-uniform vec3 uLampColor;
+uniform vec4 uLampTint[${String(MAX_LAMPS)}];
 uniform float uLampCaster;
 uniform highp sampler2DShadow uLampShadowMap;
 uniform mat4 uLampShadowMatrix;
@@ -341,7 +404,7 @@ float lampSeen(vec3 wp, vec3 N, vec2 tremble) {
 float windowSpill(vec3 wp, vec3 N, vec2 tremble) {
   float lit = 0.0;
   for (int i = 0; i < ${String(MAX_WINDOWS)}; i++) {
-    if (uWinB[i].w < 0.5) continue;
+    if (uWinB[i].w <= 0.0) continue;
     vec2 n = uWinB[i].xy;
     vec3 c = uWinA[i].xyz;
     vec2 rel = wp.xz + tremble - c.xz;
@@ -358,7 +421,7 @@ float windowSpill(vec3 wp, vec3 N, vec2 tremble) {
     float bars = step(0.045, abs(hitAlong)) * step(0.04, abs(h - uWinB[i].z * 0.55));
     vec3 toLamp = normalize(vec3(-n.x * (outward + 1.2), lampY - wp.y, -n.y * (outward + 1.2)));
     float facing = step(0.05, dot(N, toLamp));
-    lit = max(lit, inside * bars * facing * mix(1.0, 0.55, step(0.62, 1.0 - t)));
+    lit = max(lit, inside * bars * facing * mix(1.0, 0.55, step(0.62, 1.0 - t)) * uWinB[i].w);
   }
   return lit;
 }
@@ -381,7 +444,9 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
   // Au-delà de 0,95 (le masque du visage), c'est le ton clair lui-même qui est garanti.
   light = mix(light, max(light, mix(uHalf, uLit, 0.4 + 0.55 * step(0.95, lift))), min(lift, 1.0));
 
+  // Chaque lampe ajoute sa couleur dans sa flaque; la plus forte l'emporte là où deux se croisent.
   float pool = 0.0;
+  vec3 lampLight = vec3(0.0);
   float casterSeen = uLampCaster >= 0.0 ? lampSeen(wp, flatN, tremble * 0.6) : 1.0;
   for (int i = 0; i < ${String(MAX_LAMPS)}; i++) {
     float radius = uLampPos[i].w;
@@ -392,11 +457,13 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
       float lampFacing = smoothstep(0.0, 0.08, dot(N, dn));
       float ring = (1.0 - smoothstep(0.97, 1.0, reach)) * 0.45 + (1.0 - smoothstep(0.56, 0.59, reach)) * 0.55;
       float visible = abs(float(i) - uLampCaster) < 0.5 ? casterSeen : 1.0;
-      pool = max(pool, ring * lampFacing * visible);
+      float amount = ring * lampFacing * visible;
+      pool = max(pool, amount * uLampTint[i].w);
+      lampLight = max(lampLight, uLampTint[i].rgb * amount);
     }
   }
   float spill = uWinColor.a > 0.0 ? windowSpill(wp, N, tremble * 0.5) : 0.0;
-  light += uLampColor * pool + uWinColor.rgb * uWinColor.a * spill;
+  light += lampLight + uWinColor.rgb * uWinColor.a * spill;
   float glow = max(pool, spill);
   vec3 color = base * light;
 
@@ -428,7 +495,7 @@ vec3 inkLight(vec3 base, vec3 wp, vec3 flatN, vec3 N, float foot, float inkGain,
       + texture(uNoise, wp.xz * 0.083 - uTime * vec2(0.004, 0.007)).g * 0.4;
     float body = drift * low * (0.6 + 0.4 * low);
     float veil = smoothstep(0.50, 0.515, body) * 0.3 + smoothstep(0.6, 0.615, body) * 0.28;
-    color = mix(color, uMistColor + uLampColor * pool * 0.35, veil * uMist.x);
+    color = mix(color, uMistColor + lampLight * 0.35, veil * uMist.x);
   }
   return color;
 }
@@ -579,6 +646,8 @@ uniform vec4 uFlameGlow;
 uniform vec3 uViewDir;
 uniform vec3 uDetail;
 uniform vec4 uCharacter;
+uniform vec4 uRim;
+uniform vec4 uInner;
 uniform float uOpacity;
 uniform float uFaded;
 uniform float uPixel;
@@ -633,7 +702,10 @@ vec3 figure(vec3 skin, vec3 N, vec3 lightN, float body) {
   float pen = smoothstep(-0.25, -0.8, ndl);
   color = mix(color, uInk, step(stripe, 0.3 * pen) * uDetail.z * body * 0.8);
   float rim = smoothstep(0.56, 0.64, 1.0 - dot(N, uViewDir)) * smoothstep(0.0, 0.12, dot(N, uSunDir));
-  return mix(color, min(color * 1.35 + 0.08, vec3(1.0)), rim * uCharacter.y);
+  // Le liseré clair est sa couleur éclaircie le jour; la nuit il prend la teinte froide de
+  // l'ambiance, qui détache la silhouette hors des flaques de lumière.
+  vec3 edge = mix(min(color * 1.35 + 0.08, vec3(1.0)), uRim.rgb, uRim.a);
+  return mix(color, edge, rim * uCharacter.y);
 }
 #endif
 void main() {
@@ -811,9 +883,19 @@ void main() {
       float d = dot(vWorld.xz, tangent) + vWorld.y * 0.75 + dot(uViewDir.xz, tangent) * 0.9;
       float band = step(fract(d * 0.85), 0.2) + step(abs(fract(d * 0.85) - 0.34), 0.035);
       color = mix(color, uGlint.rgb, min(band, 1.0) * uGlint.a);
-      color = mix(color, uWindowGlow.rgb, uWindowGlow.a);
+      // Éclairée ou non: l'objet le dit (bâtiment: rez-de-chaussée et étage), sinon l'ambiance.
+      float inner = uInner.x > 0.5 ? (vWorld.y > uInner.w ? uInner.z : uInner.y) : 1.0;
+      color = mix(color, uWindowGlow.rgb, uWindowGlow.a * inner);
     }
-    color = mix(color, uFlameGlow.rgb, flame * uFlameGlow.a);
+    if (flame > 0.5) {
+      // Verre d'une lampe: allumé, il prend la teinte chaude des flammes, ou la sienne s'il est
+      // franchement coloré (feu rouge d'un signal).
+      float top = max(max(base.r, base.g), max(base.b, 0.001));
+      vec3 hue = base / top;
+      float vivid = smoothstep(0.5, 0.75, 1.0 - min(hue.r, min(hue.g, hue.b)));
+      float on = uInner.x > 1.5 ? uInner.y : uFlameGlow.a;
+      color = mix(color, mix(uFlameGlow.rgb, hue, vivid), on);
+    }
   #endif
   // Lueur de l'objet visé (liseré et brillance qui passe), ajoutée telle quelle.
   color += uGlow.rgb * uGlow.a;
@@ -936,7 +1018,10 @@ interface OwnUniforms {
   uFaded: IUniform<number>;
   uGlow: IUniform<Vector4>;
   uOwn: IUniform<Vector4>;
+  uInner: IUniform<Vector4>;
 }
+
+const NO_INNER = new Vector4(0, 0, 0, 0);
 
 export type InkVariant = 'volume' | 'character' | 'atlas';
 
@@ -975,6 +1060,7 @@ export class InkMaterial extends ShaderMaterial {
       uFaded: { value: 0 },
       uGlow: { value: new Vector4() },
       uOwn: { value: new Vector4(inkOptions.piece ?? 0, inkOptions.sleek === true ? 1 : 0, 0, 0) },
+      uInner: { value: NO_INNER },
     };
     const variant = inkOptions.variant ?? 'volume';
     super({
@@ -993,9 +1079,21 @@ export class InkMaterial extends ShaderMaterial {
 
   private readonly extra: Record<string, IUniform>;
 
-  /** Appelé par Three.js avant chaque dessin: l'état « standard » passe dans les uniformes. */
-  override onBeforeRender(): void {
+  /**
+   * Appelé par Three.js avant chaque dessin: l'état « standard » passe dans les uniformes, et la
+   * lumière propre de l'objet dessiné (`userData.inkInner`: bâtiment éclairé, verre d'une lampe).
+   * Un matériau partagé sert ainsi à des objets allumés et éteints, sans copie ni programme de plus.
+   */
+  override onBeforeRender(
+    _renderer?: unknown,
+    _scene?: unknown,
+    _camera?: unknown,
+    _geometry?: unknown,
+    object?: { readonly userData: Record<string, unknown> },
+  ): void {
     const own = this.own;
+    const inner = object?.userData[INK_INNER];
+    own.uInner.value = inner instanceof Vector4 ? inner : NO_INNER;
     own.uOpacity.value = this.opacity;
     own.uFaded.value = this.transparent ? 1 : 0;
     own.uGlow.value.set(this.emissive.r, this.emissive.g, this.emissive.b, this.emissiveIntensity);

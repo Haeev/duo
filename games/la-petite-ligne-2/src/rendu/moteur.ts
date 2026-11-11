@@ -22,7 +22,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import type { Content } from '../donnees/charger';
+import type { Content, PlaceContent } from '../donnees/charger';
 import type { Body } from '../etat/joueur';
 import type { PlaceState } from '../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../etat/monde';
@@ -57,7 +57,7 @@ import {
   LAYER,
   type RenderStyle,
 } from './encre/index';
-import { placeLights } from './encre/lumieres';
+import { type LampHost, placeLights } from './encre/lumieres';
 import {
   describeDynamic,
   describePlace,
@@ -67,6 +67,12 @@ import {
 } from './lieu/description';
 import type { BuildingSource } from './lieu/batiments';
 import { Spaces } from './lieu/espaces';
+import {
+  type BuildingLight,
+  buildingFinder,
+  buildingLights,
+  gameLightSheets,
+} from './lieu/eclairage';
 import { type TileStats, TiledPlace } from './lieu/grand-lieu';
 import { type ModelSource, PlaceScene } from './lieu/lieu';
 import { mapSignature, mapStates } from './lieu/presents';
@@ -261,6 +267,11 @@ class Engine implements GameRenderer {
   /** Rendu encré (ADR 0023), `null` dans l'ancien rendu en aplats. */
   private readonly ink: InkKit | null;
   private lights: InkLights | null = null;
+  /** Bâtiments éclairés de l'intérieur: recalculés quand la minute du jeu change. */
+  private litBuildings: ReadonlyMap<string, BuildingLight> = new Map();
+  private litMinute = Number.NaN;
+  private litFinder: ((x: number, y: number) => string | null) | null = null;
+  private lampHosts: readonly LampHost[] = [];
   private indoor = false;
   private readonly daylight: Daylight;
   private readonly highlight: TargetHighlight;
@@ -559,7 +570,43 @@ class Engine implements GameRenderer {
     if (this.ink === null) return;
     const volumes =
       this.spaces === null ? place.volumes() : [...place.volumes()].filter(this.volumeShown);
-    this.lights = placeLights(volumes, this.tiled?.lights(this.room ?? null) ?? null);
+    const outdoor = this.tiled !== null && (this.room ?? null) === null;
+    this.lights = placeLights(
+      volumes,
+      this.tiled?.lights(this.room ?? null) ?? null,
+      undefined,
+      undefined,
+      {
+        outdoor,
+        heightAt: (this.tiled?.relief ?? null) === null ? null : this.groundAt,
+        hosts: outdoor ? this.lampHosts : [],
+        glassOf: (volume) => place.glassOf(volume),
+      },
+    );
+  }
+
+  /**
+   * Fenêtres et lanternes de porte selon la vie du lieu (`lieu/eclairage.ts`): la table des
+   * bâtiments éclairés est refaite quand la minute du jeu change, le fondu se fait à chaque image.
+   */
+  private lightBuildings(dt: number, world: ReadonlyWorld, place: PlaceContent | undefined): void {
+    const tiled = this.tiled;
+    if (tiled === null || this.ink === null || place === undefined) return;
+    const minute = Math.floor(world.minutes) + world.common.day * 1440;
+    if (minute !== this.litMinute) {
+      this.litMinute = minute;
+      this.litFinder ??= buildingFinder(place);
+      this.litBuildings = buildingLights(
+        { content: this.options.view.content, world },
+        place,
+        gameLightSheets(place.def.id),
+        undefined,
+        this.litFinder,
+      );
+    }
+    tiled.lightBuildings(this.litBuildings, dt);
+    for (const lamp of this.lights?.lamps ?? [])
+      if (lamp.follows !== undefined) lamp.share = tiled.buildingShare(lamp.follows);
   }
 
   /**
@@ -636,6 +683,12 @@ class Engine implements GameRenderer {
     this.harvested = Number.NaN;
     this.mapped = Number.NaN;
     this.lights = null;
+    this.litMinute = Number.NaN;
+    this.litFinder = null;
+    this.litBuildings = new Map();
+    this.lampHosts = Object.entries(this.options.view.content.places[id]?.map.buildings ?? {}).map(
+      ([host, building]) => ({ id: host, ...building.rect }),
+    );
     this.spaces = null;
     this.room = undefined;
     this.forgetPassage();
@@ -850,7 +903,8 @@ class Engine implements GameRenderer {
     const subject = this.subjects[0];
     if (subject !== undefined) {
       subject.x = shown.x;
-      subject.y = 0;
+      // Ses pieds sont sur le sol affiché: un meuble bas le reste aussi sur un sol en relief.
+      subject.y = room === null ? this.groundAt(shown.x, shown.y) : 0;
       subject.z = shown.y;
     }
     place.applyOcclusion(place.occlusion.update(dt, this.subjects, this.toCamera));
@@ -863,7 +917,7 @@ class Engine implements GameRenderer {
     if (room !== null) {
       this.tiled?.viewRoom(this.toCamera);
       if (this.tiled !== null) place.cutDoors(this.toCamera, ROOM_SETTINGS.frontDot);
-    } else
+    } else {
       this.tiled?.update(
         dt,
         shown.x,
@@ -873,6 +927,8 @@ class Engine implements GameRenderer {
         this.subjects,
         this.toCamera,
       );
+      this.lightBuildings(dt, world, placeContent);
+    }
     this.updateFog(pose.width);
     if (this.overview !== null) this.poseOverview(pose.x, pose.y, this.overview);
 

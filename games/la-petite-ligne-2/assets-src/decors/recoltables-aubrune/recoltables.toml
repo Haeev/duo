@@ -25,6 +25,7 @@ haie = "aubrune-lisieres"
 talus = "aubrune-lisieres"
 rang = "aubrune-lisieres"
 meuble = "aubrune-meubles"
+luminaire = "aubrune-luminaires"
 ouvrage = "aubrune-ouvrages"
 
 # Plafonds de triangles. Culture: par plant (`plants` du manifeste), le modèle est une case de 1 m.
@@ -45,6 +46,7 @@ haie = 60
 talus = 60
 rang = 60
 meuble = 600
+luminaire = 300
 ouvrage = 2500
 
 # ---------------------------------------------------------------- matériaux (noms stables)
@@ -69,6 +71,7 @@ bardage = { couche = "wood" }                  # planches jointives (poulailler)
 metal = { couche = "plain" }
 vitre = { couche = "plain" }                   # verre, glace, bocaux
 etoffe = { couche = "plain" }
+flamme = { couche = "plain", nature = "flame" }  # verre d'une lampe: il luit quand elle est allumée
 
 # ---------------------------------------------------------------- nuancier d'Aubrune (teintes d'écran)
 # Accordé à la scène d'essai validée (`src/rendu/demo-encre/`): herbe tendre, terre blonde, bois miel.
@@ -164,6 +167,7 @@ cuir = ["#5A3A28"]
 paille = ["#E1C477", "#D4B566"]
 soupe = ["#C98A43"]
 feu_rouge = ["#D2452F"]
+verre_lampe = ["#EFE2B4"]
 feu_vert = ["#6FAE6A"]
 
 # ---------------------------------------------------------------- essences d'arbres
@@ -611,6 +615,34 @@ graine = 563
 etats = ["bare"]
 pourquoi = "marmite de soupe sur son trépied, les braises dessous"
 
+# ---------------------------------------------------------------- luminaires: les lampes du dehors
+# Origine au pied, au centre; avant vers +z (ce que la lampe éclaire). `lumiere`: rayon de la flaque
+# au sol (m); au besoin `couleur` ("#rrggbb", ajoutée dans la flaque à la place de la teinte des
+# lampes de l'ambiance) et `force` (1 par défaut). Le foyer est calculé par la forme.
+[[modeles]]
+id = "street-lantern"
+famille = "luminaire"
+sorte = "reverbere"
+graine = 613
+lumiere = { rayon = 5.4 }
+pourquoi = "réverbère de fonte de la Grand-Route et de la place (3,2 m): une flaque tous les 20 m, on va de l'une à l'autre"
+
+[[modeles]]
+id = "platform-lantern"
+famille = "luminaire"
+sorte = "lanterne-quai"
+graine = 617
+lumiere = { rayon = 5.0 }
+pourquoi = "lanterne de quai (3 m): l'abat-jour d'émail rabat la lumière sur les dalles, au bord où l'on monte"
+
+[[modeles]]
+id = "wall-lantern"
+famille = "luminaire"
+sorte = "lanterne-murale"
+graine = 619
+lumiere = { rayon = 3.6 }
+pourquoi = "lanterne de porte sur sa potence (2,3 m): elle dit qu'une maison est ouverte et éclaire le seuil"
+
 # ---------------------------------------------------------------- ouvrages: les repères du lieu
 # Origine au pied, au centre; avant vers +z (la voie, l'eau, le chemin).
 [[modeles]]
@@ -631,6 +663,7 @@ pourquoi = "grue à eau au bord de la voie: le bras pivote au-dessus de la locom
 id = "semaphore"
 famille = "ouvrage"
 sorte = "semaphore"
+lumiere = { rayon = 6.5, couleur = "#B4301C", force = 0.9 }
 graine = 577
 pourquoi = "sémaphore (10 m) au bout de la tranchée: bras à l'horizontale, voie fermée"
 

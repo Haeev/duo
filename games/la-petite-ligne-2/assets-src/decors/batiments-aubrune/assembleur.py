@@ -353,7 +353,7 @@ def assembler(fiche: dict, nuancier: dict, economie: int = 0):
     corps = [Corps(fiche, emprise, {}, nuancier, True)]
     for annexe in fiche.get("annexes", []):
         corps.append(Corps(annexe, emprise, fiche.get("couleurs", {}), nuancier, False))
-    notice = {"fenetres": [], "porte": None, "hauteur": 0.0}
+    notice = {"fenetres": [], "lueurs": [], "porte": None, "hauteur": 0.0}
 
     # La porte d'entrée se donne sur l'emprise: on cherche le mur qui la porte.
     porte = fiche.get("porte")
@@ -577,6 +577,13 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
                     s.box(0.08, a_y - y, 0.04, at(x, (y + a_y) / 2, 0.02), "bardage", T.mur[(k % 2) + 1], grain="y", tremble=0.004, sans="z-y-y+")
                 y = max(y, b_y)
 
+    def lueur(x, bas, largeur, hauteur):
+        """Ouverture vitrée du rez-de-chaussée qui n'est pas une fenêtre (devanture, porte à carreaux,
+        vitrail): éclairée, elle jette aussi sa lumière dehors. Les pièces n'en font pas des fenêtres."""
+        p = matrice @ np.array([x, bas, 0, 1.0])
+        n = matrice @ np.array([0, 0, 1, 0.0])
+        notice["lueurs"].append({"x": round(float(p[0]), 3), "appui": round(float(bas), 3), "z": round(float(p[2]), 3), "largeur": round(float(largeur), 3), "hauteur": round(float(hauteur), 3), "nx": round(float(n[0]), 3), "nz": round(float(n[2]), 3)})
+
     for e, x, niveau in places:
         t = e["type"]
         g = int(graine + x * 10 + niveau * 3) % 1000
@@ -584,15 +591,20 @@ def _facade(s: Atelier, c: Corps, cote, longueur, graine, economie, porte, porte
             # Une porte d'étage n'a pas de marche: son palier est celui de l'escalier.
             with s.groupe(at(x, niveau, 0)):
                 P.porte(s, T, e.get("modele", "pleine"), e.get("linteau", "bois" if c.finition != "pierre" else "pierre"), g, marches=0 if niveau > 0 else 1)
+            if niveau == 0 and e.get("modele") == "vitree":
+                lueur(x, P.SEUIL + 0.95, P.PORTE_LARGE - 0.26, P.PORTE_HAUT - 1.07)
         elif t == "vitrine":
             with s.groupe(at(x, 0, 0)):
                 P.vitrine(s, T, e["largeur"], g)
+            lueur(x, 0.85, e["largeur"] - 0.1, 1.45)
         elif t in ("grange", "cochere", "baie"):
             with s.groupe(at(x, 0, 0)):
                 P.porte_de_grange(s, T, e["largeur"], e["_h"], g, cochere=t == "cochere", ouverte=t == "baie")
         elif t == "vitrail":
             with s.groupe(at(x, e["_bas"], 0)):
                 P.vitrail(s, T, e["_l"], e["_h"], g)
+            if niveau == 0:
+                lueur(x, e["_bas"], e["_l"], e["_h"])
         elif t == "abat-sons":
             with s.groupe(at(x, e["_bas"], 0)):
                 P.abat_sons(s, T, e["_l"], e["_h"], g)

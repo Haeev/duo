@@ -26,7 +26,7 @@ from scipy.spatial import ConvexHull
 MATERIAUX = (
     "feuillage", "ecorce", "bois", "pierre", "mousse", "terre", "tige", "fruit", "fleur",
     # Aménagements (haies, berges, meubles, ouvrages): mêmes noms que les bâtiments d'Aubrune.
-    "gazon", "moellon", "crepi", "tuile", "bardage", "metal", "vitre", "etoffe",
+    "gazon", "moellon", "crepi", "tuile", "bardage", "metal", "vitre", "etoffe", "flamme",
 )
 
 

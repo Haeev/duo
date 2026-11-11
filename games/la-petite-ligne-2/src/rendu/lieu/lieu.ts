@@ -16,16 +16,19 @@ import {
   Quaternion,
   type Texture,
   Vector3,
+  Vector4,
 } from 'three';
 import type { Aimable } from '../cible';
 import { inkifyModel, inkTag } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
+import { INK_INNER, type InkInner } from '../encre/matiere';
 import { createFloorMap } from '../encre/sol';
 import { Fadable, isMesh } from '../fondu';
 import { Occlusion, type OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { bundleGeometry } from './ballot';
+import { DECOR_MANIFEST } from './decors-manifeste';
 import { boxOf, footprint, type PlaceDescription, type SceneVolume } from './description';
 import { DOOR_CUT_COUNT, groundGeometry, standInGeometry } from './formes';
 import { MAP_STATES } from './presents';
@@ -122,6 +125,8 @@ export class PlaceScene {
   private bundle: BufferGeometry | null = null;
   /** Volumes dynamiques groupés par modèle (`batch`): un appel de dessin par modèle. */
   private batches: Batch[] = [];
+  /** Verre des lampes posées (modèles à lumière déclarée), par identifiant de volume. */
+  private readonly glasses = new Map<string, InkInner>();
 
   constructor(
     readonly description: PlaceDescription,
@@ -177,10 +182,19 @@ export class PlaceScene {
       if (this.inked !== null) inkTag(geometry, { layer: LAYER.plain });
       object = new Mesh(geometry, this.materials.standIn);
     }
+    // Lampe: son verre s'allume avec elle (le rendu encré écrit son état dans ce vecteur).
+    const lit =
+      model !== null && volume.model !== null && this.inked !== null
+        ? DECOR_MANIFEST.models[volume.model]?.light
+        : undefined;
+    const glass = lit === undefined ? null : new Vector4(2, 0, 0, 0);
+    if (glass === null) this.glasses.delete(volume.id);
+    else this.glasses.set(volume.id, glass);
     object.traverse((child) => {
       if (isMesh(child)) {
         child.castShadow = volume.shape !== 'slab';
         child.receiveShadow = true;
+        if (glass !== null) child.userData[INK_INNER] = glass;
       }
     });
     object.name = volume.id;
@@ -223,6 +237,7 @@ export class PlaceScene {
     view.fadable.dispose();
     view.object.removeFromParent();
     this.occlusion.remove(view.volume.id);
+    this.glasses.delete(view.volume.id);
     if (!view.modelled && isMesh(view.object) && view.object.geometry !== this.bundle)
       this.tracker.release(view.object.geometry);
   }
@@ -340,6 +355,11 @@ export class PlaceScene {
   *volumes(): Generator<SceneVolume> {
     for (const view of this.fixed.values()) if (!view.empty) yield view.volume;
     for (const view of this.dynamic.values()) if (!view.empty) yield view.volume;
+  }
+
+  /** Verre de la lampe posée pour ce volume, si son modèle déclare une lumière. */
+  glassOf(volume: string): InkInner | undefined {
+    return this.glasses.get(volume);
   }
 
   /** L'objet de la scène qui porte cet identifiant, s'il peut être visé. */

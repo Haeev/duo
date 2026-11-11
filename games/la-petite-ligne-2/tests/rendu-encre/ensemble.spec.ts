@@ -58,6 +58,11 @@ const VIEWS: readonly View[] = [
   { name: 'quai-jour', x: 203, y: 103.2, minutes: 17 * 60 },
   { name: 'quai-nuit', x: 203, y: 103.2, minutes: 22 * 60 },
   { name: 'rue-du-bourg', x: 204, y: 124, minutes: 16 * 60 + 30 },
+  // Foyers de lumière de la nuit: rue et café, place, tombée du jour, comptoir du café.
+  { name: 'nuit-rue-du-bourg', x: 227, y: 109.5, minutes: 21 * 60, yaw: 0, width: 24 },
+  { name: 'nuit-place', x: 205.5, y: 122, minutes: 23 * 60 + 30 },
+  { name: 'crepuscule-rue', x: 227, y: 109.5, minutes: 19 * 60 + 30, yaw: 0, width: 24 },
+  { name: 'comptoir-non-estompe', x: 109.6, y: 210.6, minutes: 10 * 60, yaw: 0, width: 10 },
   { name: 'lisiere', x: 192.5, y: 89, minutes: 16 * 60, yaw: 0, width: 22 },
   { name: 'potager', x: 176.5, y: 125.8, minutes: 16 * 60, width: 16 },
   { name: 'berge', x: 195.5, y: 127.2, minutes: 16 * 60, yaw: 0, width: 18 },

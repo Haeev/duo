@@ -1,2151 +1,2202 @@
 {
- "batiments": {
-  "cafe": {
-   "boite": [
-    [
-     -3.921,
-     -0.018,
-     -3.688
-    ],
-    [
-     3.922,
-     9.257,
-     3.953
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": 0.0
+  "batiments": {
+    "cafe": {
+      "boite": [
+        [-3.921, -0.018, -3.688],
+        [3.922, 9.257, 3.953]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 1.333,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "cafe.glb",
+      "hauteur": 9.257,
+      "lueurs": [
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.12,
+          "hauteur": 0.99,
+          "largeur": 0.74,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 3.0
+        },
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.025,
+          "z": 3.0
+        }
+      ],
+      "morceaux": 716,
+      "noeud": "cafe",
+      "nom": "le café de la Halte",
+      "octets": 445776,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 4669,
+      "trianglesParMateriau": {
+        "bois": 380,
+        "crepi": 271,
+        "metal": 576,
+        "pierre": 1574,
+        "tuile": 1304,
+        "vitre": 26,
+        "volet": 538
+      }
     },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 1.333,
-     "z": -3.0
+    "cheminot-e": {
+      "boite": [
+        [-3.422, -0.011, -3.687],
+        [3.96, 9.084, 3.707]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 1.775,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "cheminot-e.glb",
+      "hauteur": 9.084,
+      "lueurs": [],
+      "morceaux": 687,
+      "noeud": "cheminot-e",
+      "nom": "la maison de cheminot (est)",
+      "octets": 486816,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -3.0
+      },
+      "triangles": 5154,
+      "trianglesParMateriau": {
+        "bardage": 108,
+        "bois": 1324,
+        "metal": 518,
+        "moellon": 130,
+        "pierre": 1694,
+        "tuile": 1064,
+        "vitre": 18,
+        "volet": 298
+      }
     },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 0.0
+    "cheminot-o": {
+      "boite": [
+        [-3.961, -0.016, -3.729],
+        [3.42, 9.084, 3.705]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -1.775,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "cheminot-o.glb",
+      "hauteur": 9.084,
+      "lueurs": [],
+      "morceaux": 685,
+      "noeud": "cheminot-o",
+      "nom": "la maison de cheminot (ouest)",
+      "octets": 485308,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -3.0
+      },
+      "triangles": 5138,
+      "trianglesParMateriau": {
+        "bardage": 108,
+        "bois": 1324,
+        "metal": 518,
+        "moellon": 130,
+        "pierre": 1678,
+        "tuile": 1064,
+        "vitre": 18,
+        "volet": 298
+      }
+    },
+    "ecole": {
+      "boite": [
+        [-4.133, -0.018, -3.685],
+        [4.139, 8.841, 3.907]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 1.45,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -1.45,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "ecole.glb",
+      "hauteur": 8.841,
+      "lueurs": [],
+      "morceaux": 835,
+      "noeud": "ecole",
+      "nom": "l'école-mairie",
+      "octets": 552416,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 5833,
+      "trianglesParMateriau": {
+        "bois": 400,
+        "metal": 1114,
+        "moellon": 169,
+        "pierre": 1886,
+        "tuile": 1810,
+        "vitre": 24,
+        "volet": 430
+      }
+    },
+    "eglise": {
+      "boite": [
+        [-11.129, -0.011, -6.788],
+        [11.285, 22.804, 6.79]
+      ],
+      "budget": 15000,
+      "economie": 2,
+      "emprise": {
+        "largeur": 21,
+        "profondeur": 12
+      },
+      "fenetres": [
+        {
+          "appui": 7.0,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -7.5,
+          "z": 3.0
+        },
+        {
+          "appui": 7.0,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -7.5,
+          "z": -3.0
+        },
+        {
+          "appui": 7.0,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -10.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "eglise.glb",
+      "hauteur": 22.804,
+      "lueurs": [
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.825,
+          "z": 6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.715,
+          "z": 6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 6.0,
+          "z": 6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 9.11,
+          "z": 6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 10.5,
+          "z": 2.875
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 10.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 10.5,
+          "z": -2.875
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 9.11,
+          "z": -6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 6.0,
+          "z": -6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 3.0,
+          "z": -6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -6.0
+        },
+        {
+          "appui": 1.7,
+          "hauteur": 2.6,
+          "largeur": 0.8,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -3.11,
+          "z": -6.0
+        }
+      ],
+      "morceaux": 2129,
+      "noeud": "eglise",
+      "nom": "l'église Saint-Aubin",
+      "octets": 1343860,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 6.0
+      },
+      "triangles": 14222,
+      "trianglesParMateriau": {
+        "bois": 722,
+        "metal": 298,
+        "moellon": 240,
+        "pierre": 7830,
+        "tuile": 5060,
+        "vitre": 32,
+        "volet": 40
+      }
+    },
+    "epicerie": {
+      "boite": [
+        [-4.681, -0.016, -5.637],
+        [4.951, 9.541, 5.637]
+      ],
+      "budget": 6000,
+      "economie": 2,
+      "emprise": {
+        "largeur": 8,
+        "profondeur": 10
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.617,
+          "z": 5.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.617,
+          "z": 5.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 1.617,
+          "z": -5.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -1.617,
+          "z": -5.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -4.0,
+          "z": -2.775
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -4.0,
+          "z": 2.775
+        }
+      ],
+      "fichier": "epicerie.glb",
+      "hauteur": 9.541,
+      "lueurs": [
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 2.3,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 4.0,
+          "z": 2.775
+        },
+        {
+          "appui": 1.12,
+          "hauteur": 0.99,
+          "largeur": 0.74,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 4.0,
+          "z": 0.0
+        },
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 2.3,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 4.0,
+          "z": -2.775
+        }
+      ],
+      "morceaux": 892,
+      "noeud": "epicerie",
+      "nom": "l'épicerie-pension Ferrand",
+      "octets": 564616,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 4.0,
+        "z": 0.0
+      },
+      "triangles": 5938,
+      "trianglesParMateriau": {
+        "bois": 606,
+        "crepi": 372,
+        "metal": 720,
+        "pierre": 1574,
+        "tuile": 1950,
+        "vitre": 34,
+        "volet": 682
+      }
+    },
+    "ferme-logis": {
+      "boite": [
+        [-4.92, -0.017, -3.672],
+        [4.92, 9.258, 3.682]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 9,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.525,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.525,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 4.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 2.525,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -2.525,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -4.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "ferme-logis.glb",
+      "hauteur": 9.258,
+      "lueurs": [],
+      "morceaux": 832,
+      "noeud": "ferme-logis",
+      "nom": "le logis de la ferme Delmas",
+      "octets": 511240,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 5364,
+      "trianglesParMateriau": {
+        "bois": 470,
+        "crepi": 388,
+        "metal": 692,
+        "pierre": 1948,
+        "tuile": 1468,
+        "vitre": 26,
+        "volet": 372
+      }
+    },
+    "firmin": {
+      "boite": [
+        [-3.923, -0.019, -3.693],
+        [3.918, 8.92, 3.673]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "firmin.glb",
+      "hauteur": 8.92,
+      "lueurs": [],
+      "morceaux": 718,
+      "noeud": "firmin",
+      "nom": "la maison de Firmin",
+      "octets": 448628,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 4698,
+      "trianglesParMateriau": {
+        "bois": 414,
+        "crepi": 354,
+        "metal": 582,
+        "pierre": 1758,
+        "tuile": 1204,
+        "vitre": 24,
+        "volet": 362
+      }
+    },
+    "forestiere": {
+      "boite": [
+        [-3.691, -0.021, -3.961],
+        [4.793, 6.985, 3.416]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 1.775
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "forestiere.glb",
+      "hauteur": 6.985,
+      "lueurs": [],
+      "morceaux": 580,
+      "noeud": "forestiere",
+      "nom": "la maison forestière",
+      "octets": 401804,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 3.0,
+        "z": 0.0
+      },
+      "triangles": 4242,
+      "trianglesParMateriau": {
+        "bardage": 96,
+        "bois": 1232,
+        "metal": 326,
+        "moellon": 88,
+        "pierre": 1176,
+        "tuile": 1210,
+        "vitre": 8,
+        "volet": 106
+      }
+    },
+    "forge": {
+      "boite": [
+        [-3.689, -0.012, -3.701],
+        [3.696, 7.268, 3.453]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "forge.glb",
+      "hauteur": 7.268,
+      "lueurs": [],
+      "morceaux": 432,
+      "noeud": "forge",
+      "nom": "la forge",
+      "octets": 262776,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 2732,
+      "trianglesParMateriau": {
+        "bois": 166,
+        "metal": 206,
+        "moellon": 56,
+        "pierre": 1202,
+        "tuile": 1098,
+        "vitre": 4
+      }
+    },
+    "fournil": {
+      "boite": [
+        [-3.919, -0.017, -3.683],
+        [4.202, 9.285, 3.952]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 1.333,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "fournil.glb",
+      "hauteur": 9.285,
+      "lueurs": [
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.12,
+          "hauteur": 0.99,
+          "largeur": 0.74,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 3.0
+        },
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.025,
+          "z": 3.0
+        }
+      ],
+      "morceaux": 641,
+      "noeud": "fournil",
+      "nom": "le fournil d'Achille",
+      "octets": 400336,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 4174,
+      "trianglesParMateriau": {
+        "bois": 292,
+        "crepi": 212,
+        "metal": 464,
+        "moellon": 14,
+        "pierre": 1550,
+        "tuile": 1198,
+        "vitre": 18,
+        "volet": 426
+      }
+    },
+    "grange": {
+      "boite": [
+        [-4.674, -0.015, -5.423],
+        [4.685, 8.423, 5.42]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 8,
+        "profondeur": 10
+      },
+      "fenetres": [
+        {
+          "appui": 1.4,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -4.0,
+          "z": -1.75
+        },
+        {
+          "appui": 1.4,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -4.0,
+          "z": 1.75
+        }
+      ],
+      "fichier": "grange.glb",
+      "hauteur": 8.423,
+      "lueurs": [],
+      "morceaux": 800,
+      "noeud": "grange",
+      "nom": "la grange",
+      "octets": 438252,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 4.0,
+        "z": 0.0
+      },
+      "triangles": 4579,
+      "trianglesParMateriau": {
+        "bardage": 520,
+        "bois": 296,
+        "crepi": 5,
+        "metal": 160,
+        "pierre": 1408,
+        "tuile": 2128,
+        "vitre": 10,
+        "volet": 52
+      }
+    },
+    "halte": {
+      "boite": [
+        [-7.384, -0.018, -3.693],
+        [5.639, 6.872, 3.695]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 10,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.775,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.775,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 5.0,
+          "z": 1.2
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 2.925,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -2.925,
+          "z": -3.0
+        }
+      ],
+      "fichier": "halte.glb",
+      "hauteur": 6.872,
+      "lueurs": [
+        {
+          "appui": 1.12,
+          "hauteur": 0.99,
+          "largeur": 0.74,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 3.0
+        }
+      ],
+      "morceaux": 809,
+      "noeud": "halte",
+      "nom": "la halte",
+      "octets": 510316,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 5384,
+      "trianglesParMateriau": {
+        "bois": 448,
+        "metal": 914,
+        "moellon": 106,
+        "pierre": 1626,
+        "tuile": 2054,
+        "vitre": 14,
+        "volet": 222
+      }
+    },
+    "hameau-b": {
+      "boite": [
+        [-3.69, -0.018, -3.421],
+        [3.707, 9.74, 3.628]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [],
+      "fichier": "hameau-b.glb",
+      "hauteur": 9.74,
+      "lueurs": [],
+      "morceaux": 628,
+      "noeud": "hameau-b",
+      "nom": "la maison aux volets clos",
+      "octets": 402028,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 4202,
+      "trianglesParMateriau": {
+        "bois": 218,
+        "crepi": 334,
+        "metal": 550,
+        "pierre": 1630,
+        "tuile": 1120,
+        "vitre": 20,
+        "volet": 330
+      }
+    },
+    "hameau-c": {
+      "boite": [
+        [-3.422, -0.021, -3.67],
+        [3.958, 7.439, 3.691]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 1.775,
+          "z": -3.0
+        }
+      ],
+      "fichier": "hameau-c.glb",
+      "hauteur": 7.439,
+      "lueurs": [],
+      "morceaux": 593,
+      "noeud": "hameau-c",
+      "nom": "la maison du bout",
+      "octets": 404512,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -3.0
+      },
+      "triangles": 4265,
+      "trianglesParMateriau": {
+        "bardage": 84,
+        "bois": 1048,
+        "metal": 358,
+        "moellon": 121,
+        "pierre": 1278,
+        "tuile": 1224,
+        "vitre": 14,
+        "volet": 138
+      }
+    },
+    "honorine": {
+      "boite": [
+        [-3.961, -0.02, -3.422],
+        [3.701, 9.441, 4.077]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.775,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "honorine.glb",
+      "hauteur": 9.441,
+      "lueurs": [],
+      "morceaux": 697,
+      "noeud": "honorine",
+      "nom": "la maison d'Honorine",
+      "octets": 482024,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 5088,
+      "trianglesParMateriau": {
+        "bardage": 84,
+        "bois": 1228,
+        "crepi": 230,
+        "metal": 486,
+        "pierre": 1618,
+        "tuile": 1156,
+        "vitre": 20,
+        "volet": 266
+      }
+    },
+    "horloger": {
+      "boite": [
+        [-3.919, -0.014, -3.697],
+        [3.915, 9.74, 3.949]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "horloger.glb",
+      "hauteur": 9.74,
+      "lueurs": [
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -2.025,
+          "z": 3.0
+        },
+        {
+          "appui": 1.12,
+          "hauteur": 0.99,
+          "largeur": 0.74,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 3.0
+        }
+      ],
+      "morceaux": 729,
+      "noeud": "horloger",
+      "nom": "l'atelier d'Ambroise",
+      "octets": 471864,
+      "porte": {
+        "facade": "sud",
+        "position": 0.5,
+        "x": 0.0,
+        "z": 3.0
+      },
+      "triangles": 4968,
+      "trianglesParMateriau": {
+        "bois": 282,
+        "metal": 1036,
+        "moellon": 166,
+        "pierre": 1774,
+        "tuile": 1252,
+        "vitre": 24,
+        "volet": 434
+      }
+    },
+    "lavoir": {
+      "boite": [
+        [-2.768, -0.016, -2.351],
+        [2.288, 3.664, 2.35]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 5,
+        "profondeur": 4
+      },
+      "fenetres": [],
+      "fichier": "lavoir.glb",
+      "hauteur": 3.664,
+      "lueurs": [],
+      "morceaux": 106,
+      "noeud": "lavoir",
+      "nom": "le lavoir",
+      "octets": 64488,
+      "porte": {
+        "facade": "ouest",
+        "position": 0.5,
+        "x": -2.5,
+        "z": 0.0
+      },
+      "triangles": 642,
+      "trianglesParMateriau": {
+        "bois": 168,
+        "pierre": 140,
+        "tuile": 332,
+        "vitre": 2
+      }
+    },
+    "lucie": {
+      "boite": [
+        [-3.42, -0.017, -3.731],
+        [3.42, 9.441, 3.71]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.283,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -1.775,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "lucie.glb",
+      "hauteur": 9.441,
+      "lueurs": [],
+      "morceaux": 671,
+      "noeud": "lucie",
+      "nom": "la maison de Lucie",
+      "octets": 423940,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -3.0
+      },
+      "triangles": 4437,
+      "trianglesParMateriau": {
+        "bois": 380,
+        "crepi": 281,
+        "metal": 518,
+        "pierre": 1730,
+        "tuile": 1208,
+        "vitre": 22,
+        "volet": 298
+      }
+    },
+    "maison": {
+      "boite": [
+        [-5.917, -0.019, -4.705],
+        [6.135, 10.097, 4.702]
+      ],
+      "budget": 6000,
+      "economie": 2,
+      "emprise": {
+        "largeur": 11,
+        "profondeur": 8
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -3.175,
+          "z": 4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -0.0,
+          "z": 4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 3.175,
+          "z": 4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 5.5,
+          "z": 2.275
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 5.5,
+          "z": -2.275
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 2.117,
+          "z": -4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -2.117,
+          "z": -4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -5.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "maison.glb",
+      "hauteur": 10.097,
+      "lueurs": [],
+      "morceaux": 901,
+      "noeud": "maison",
+      "nom": "la maison du garde-barrière",
+      "octets": 552344,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 5.5,
+        "z": 0.0
+      },
+      "triangles": 5803,
+      "trianglesParMateriau": {
+        "bois": 606,
+        "crepi": 315,
+        "metal": 828,
+        "pierre": 1864,
+        "tuile": 1632,
+        "vitre": 36,
+        "volet": 522
+      }
+    },
+    "marthe": {
+      "boite": [
+        [-3.697, -0.023, -3.421],
+        [3.702, 9.258, 3.419]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 6
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.0,
+          "z": 1.775
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.7,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.0,
+          "z": 0.0
+        }
+      ],
+      "fichier": "marthe.glb",
+      "hauteur": 9.258,
+      "lueurs": [],
+      "morceaux": 631,
+      "noeud": "marthe",
+      "nom": "la maison de Marthe",
+      "octets": 401756,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 3.0,
+        "z": 0.0
+      },
+      "triangles": 4201,
+      "trianglesParMateriau": {
+        "bois": 358,
+        "crepi": 277,
+        "metal": 486,
+        "pierre": 1646,
+        "tuile": 1148,
+        "vitre": 20,
+        "volet": 266
+      }
+    },
+    "mercerie": {
+      "boite": [
+        [-3.919, -0.011, -4.451],
+        [3.922, 9.676, 4.213]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 7
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.45,
+          "z": 3.5
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.45,
+          "z": 3.5
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": 0.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 0.0
+        }
+      ],
+      "fichier": "mercerie.glb",
+      "hauteur": 9.676,
+      "lueurs": [
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 2.025,
+          "z": -3.5
+        },
+        {
+          "appui": 1.12,
+          "hauteur": 0.99,
+          "largeur": 0.74,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.5
+        },
+        {
+          "appui": 0.85,
+          "hauteur": 1.45,
+          "largeur": 1.6,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -2.025,
+          "z": -3.5
+        }
+      ],
+      "morceaux": 760,
+      "noeud": "mercerie",
+      "nom": "la mercerie-coiffure",
+      "octets": 468704,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -3.5
+      },
+      "triangles": 4913,
+      "trianglesParMateriau": {
+        "bois": 414,
+        "crepi": 275,
+        "metal": 568,
+        "pierre": 1654,
+        "tuile": 1428,
+        "vitre": 30,
+        "volet": 544
+      }
+    },
+    "moulin": {
+      "boite": [
+        [-4.681, -0.841, -4.638],
+        [4.693, 11.141, 5.457]
+      ],
+      "budget": 15000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 8,
+        "profondeur": 8
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 4.0,
+          "z": 1.483
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 4.0,
+          "z": -1.483
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 2.275,
+          "z": -4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": -2.275,
+          "z": -4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -4.0,
+          "z": -1.55
+        }
+      ],
+      "fichier": "moulin.glb",
+      "hauteur": 11.141,
+      "lueurs": [],
+      "morceaux": 868,
+      "noeud": "moulin",
+      "nom": "le moulin de la Vanne",
+      "octets": 543532,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -4.0
+      },
+      "triangles": 5712,
+      "trianglesParMateriau": {
+        "bois": 1038,
+        "metal": 254,
+        "moellon": 188,
+        "pierre": 2330,
+        "tuile": 1856,
+        "vitre": 26,
+        "volet": 20
+      }
+    },
+    "poste": {
+      "boite": [
+        [-4.058, -0.016, -2.955],
+        [3.78, 6.919, 2.781]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 4
+      },
+      "fenetres": [
+        {
+          "appui": 1.4,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 2.0
+        }
+      ],
+      "fichier": "poste.glb",
+      "hauteur": 6.919,
+      "lueurs": [],
+      "morceaux": 497,
+      "noeud": "poste",
+      "nom": "le poste d'aiguillage",
+      "octets": 324076,
+      "porte": {
+        "facade": "nord",
+        "position": 0.5,
+        "x": 0.0,
+        "z": -2.0
+      },
+      "triangles": 3379,
+      "trianglesParMateriau": {
+        "bois": 272,
+        "metal": 280,
+        "moellon": 119,
+        "pierre": 1456,
+        "tuile": 1218,
+        "vitre": 14,
+        "volet": 20
+      }
+    },
+    "presbytere": {
+      "boite": [
+        [-4.139, -0.018, -4.187],
+        [4.134, 9.677, 4.177]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 7,
+        "profondeur": 7
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.45,
+          "z": 3.5
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.45,
+          "z": 3.5
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": 2.025
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 1.0,
+          "nz": 0.0,
+          "x": 3.5,
+          "z": -2.025
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -3.5
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": -1.45
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": -1.0,
+          "nz": 0.0,
+          "x": -3.5,
+          "z": 1.45
+        }
+      ],
+      "fichier": "presbytere.glb",
+      "hauteur": 9.677,
+      "lueurs": [],
+      "morceaux": 838,
+      "noeud": "presbytere",
+      "nom": "le presbytère",
+      "octets": 517716,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 3.5,
+        "z": 0.0
+      },
+      "triangles": 5438,
+      "trianglesParMateriau": {
+        "bois": 426,
+        "metal": 678,
+        "moellon": 178,
+        "pierre": 1742,
+        "tuile": 1928,
+        "vitre": 28,
+        "volet": 458
+      }
+    },
+    "remise": {
+      "boite": [
+        [-3.458, -0.013, -3.211],
+        [3.422, 5.323, 3.193]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 6,
+        "profondeur": 5
+      },
+      "fenetres": [
+        {
+          "appui": 1.4,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 0.0,
+          "z": 2.5
+        },
+        {
+          "appui": 1.4,
+          "hauteur": 0.7,
+          "largeur": 0.6,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -2.5
+        }
+      ],
+      "fichier": "remise.glb",
+      "hauteur": 5.323,
+      "lueurs": [],
+      "morceaux": 392,
+      "noeud": "remise",
+      "nom": "la remise de la draisine",
+      "octets": 235240,
+      "porte": {
+        "facade": "ouest",
+        "position": 0.5,
+        "x": -3.0,
+        "z": 0.0
+      },
+      "triangles": 2428,
+      "trianglesParMateriau": {
+        "bardage": 294,
+        "bois": 182,
+        "metal": 160,
+        "pierre": 900,
+        "tuile": 840,
+        "vitre": 4,
+        "volet": 48
+      }
+    },
+    "scierie": {
+      "boite": [
+        [-5.421, -0.018, -4.698],
+        [8.228, 6.375, 4.688]
+      ],
+      "budget": 6000,
+      "economie": 0,
+      "emprise": {
+        "largeur": 10,
+        "profondeur": 8
+      },
+      "fenetres": [
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": -1.817,
+          "z": 4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": 1.0,
+          "x": 1.817,
+          "z": 4.0
+        },
+        {
+          "appui": 1.0,
+          "hauteur": 1.25,
+          "largeur": 0.95,
+          "nx": 0.0,
+          "nz": -1.0,
+          "x": 0.0,
+          "z": -4.0
+        }
+      ],
+      "fichier": "scierie.glb",
+      "hauteur": 6.375,
+      "lueurs": [],
+      "morceaux": 789,
+      "noeud": "scierie",
+      "nom": "l'atelier de Basile",
+      "octets": 425856,
+      "porte": {
+        "facade": "est",
+        "position": 0.5,
+        "x": 5.0,
+        "z": 0.0
+      },
+      "triangles": 4456,
+      "trianglesParMateriau": {
+        "bardage": 476,
+        "bois": 380,
+        "metal": 160,
+        "pierre": 1240,
+        "tuile": 2148,
+        "vitre": 8,
+        "volet": 44
+      }
     }
-   ],
-   "fichier": "cafe.glb",
-   "hauteur": 9.257,
-   "morceaux": 716,
-   "noeud": "cafe",
-   "nom": "le café de la Halte",
-   "octets": 445776,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 4669,
-   "trianglesParMateriau": {
-    "bois": 380,
-    "crepi": 271,
-    "metal": 576,
-    "pierre": 1574,
-    "tuile": 1304,
-    "vitre": 26,
-    "volet": 538
-   }
   },
-  "cheminot-e": {
-   "boite": [
-    [
-     -3.422,
-     -0.011,
-     -3.687
-    ],
-    [
-     3.96,
-     9.084,
-     3.707
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 1.775,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "cheminot-e.glb",
-   "hauteur": 9.084,
-   "morceaux": 687,
-   "noeud": "cheminot-e",
-   "nom": "la maison de cheminot (est)",
-   "octets": 486816,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -3.0
-   },
-   "triangles": 5154,
-   "trianglesParMateriau": {
-    "bardage": 108,
-    "bois": 1324,
-    "metal": 518,
-    "moellon": 130,
-    "pierre": 1694,
-    "tuile": 1064,
-    "vitre": 18,
-    "volet": 298
-   }
-  },
-  "cheminot-o": {
-   "boite": [
-    [
-     -3.961,
-     -0.016,
-     -3.729
-    ],
-    [
-     3.42,
-     9.084,
-     3.705
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -1.775,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "cheminot-o.glb",
-   "hauteur": 9.084,
-   "morceaux": 685,
-   "noeud": "cheminot-o",
-   "nom": "la maison de cheminot (ouest)",
-   "octets": 485308,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -3.0
-   },
-   "triangles": 5138,
-   "trianglesParMateriau": {
-    "bardage": 108,
-    "bois": 1324,
-    "metal": 518,
-    "moellon": 130,
-    "pierre": 1678,
-    "tuile": 1064,
-    "vitre": 18,
-    "volet": 298
-   }
-  },
-  "ecole": {
-   "boite": [
-    [
-     -4.133,
-     -0.018,
-     -3.685
-    ],
-    [
-     4.139,
-     8.841,
-     3.907
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -2.025,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 2.025,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 1.45,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -1.45,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "ecole.glb",
-   "hauteur": 8.841,
-   "morceaux": 835,
-   "noeud": "ecole",
-   "nom": "l'école-mairie",
-   "octets": 552416,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 5833,
-   "trianglesParMateriau": {
-    "bois": 400,
-    "metal": 1114,
-    "moellon": 169,
-    "pierre": 1886,
-    "tuile": 1810,
-    "vitre": 24,
-    "volet": 430
-   }
-  },
-  "eglise": {
-   "boite": [
-    [
-     -11.129,
-     -0.011,
-     -6.788
-    ],
-    [
-     11.285,
-     22.804,
-     6.79
-    ]
-   ],
-   "budget": 15000,
-   "economie": 2,
-   "emprise": {
-    "largeur": 21,
-    "profondeur": 12
-   },
-   "fenetres": [
-    {
-     "appui": 7.0,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -7.5,
-     "z": 3.0
-    },
-    {
-     "appui": 7.0,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -7.5,
-     "z": -3.0
-    },
-    {
-     "appui": 7.0,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -10.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "eglise.glb",
-   "hauteur": 22.804,
-   "morceaux": 2129,
-   "noeud": "eglise",
-   "nom": "l'église Saint-Aubin",
-   "octets": 1343860,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 6.0
-   },
-   "triangles": 14222,
-   "trianglesParMateriau": {
-    "bois": 722,
-    "metal": 298,
-    "moellon": 240,
-    "pierre": 7830,
-    "tuile": 5060,
-    "vitre": 32,
-    "volet": 40
-   }
-  },
-  "epicerie": {
-   "boite": [
-    [
-     -4.681,
-     -0.016,
-     -5.637
-    ],
-    [
-     4.951,
-     9.541,
-     5.637
-    ]
-   ],
-   "budget": 6000,
-   "economie": 2,
-   "emprise": {
-    "largeur": 8,
-    "profondeur": 10
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.617,
-     "z": 5.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.617,
-     "z": 5.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 1.617,
-     "z": -5.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -1.617,
-     "z": -5.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -4.0,
-     "z": -2.775
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -4.0,
-     "z": 2.775
-    }
-   ],
-   "fichier": "epicerie.glb",
-   "hauteur": 9.541,
-   "morceaux": 892,
-   "noeud": "epicerie",
-   "nom": "l'épicerie-pension Ferrand",
-   "octets": 564616,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 4.0,
-    "z": 0.0
-   },
-   "triangles": 5938,
-   "trianglesParMateriau": {
-    "bois": 606,
-    "crepi": 372,
-    "metal": 720,
-    "pierre": 1574,
-    "tuile": 1950,
-    "vitre": 34,
-    "volet": 682
-   }
-  },
-  "ferme-logis": {
-   "boite": [
-    [
-     -4.92,
-     -0.017,
-     -3.672
-    ],
-    [
-     4.92,
-     9.258,
-     3.682
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 9,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -2.525,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 2.525,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 4.5,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 2.525,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -2.525,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -4.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "ferme-logis.glb",
-   "hauteur": 9.258,
-   "morceaux": 832,
-   "noeud": "ferme-logis",
-   "nom": "le logis de la ferme Delmas",
-   "octets": 511240,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 5364,
-   "trianglesParMateriau": {
-    "bois": 470,
-    "crepi": 388,
-    "metal": 692,
-    "pierre": 1948,
-    "tuile": 1468,
-    "vitre": 26,
-    "volet": 372
-   }
-  },
-  "firmin": {
-   "boite": [
-    [
-     -3.923,
-     -0.019,
-     -3.693
-    ],
-    [
-     3.918,
-     8.92,
-     3.673
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -2.025,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 2.025,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "firmin.glb",
-   "hauteur": 8.92,
-   "morceaux": 718,
-   "noeud": "firmin",
-   "nom": "la maison de Firmin",
-   "octets": 448628,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 4698,
-   "trianglesParMateriau": {
-    "bois": 414,
-    "crepi": 354,
-    "metal": 582,
-    "pierre": 1758,
-    "tuile": 1204,
-    "vitre": 24,
-    "volet": 362
-   }
-  },
-  "forestiere": {
-   "boite": [
-    [
-     -3.691,
-     -0.021,
-     -3.961
-    ],
-    [
-     4.793,
-     6.985,
-     3.416
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 0.0,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 1.775
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "forestiere.glb",
-   "hauteur": 6.985,
-   "morceaux": 580,
-   "noeud": "forestiere",
-   "nom": "la maison forestière",
-   "octets": 401804,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 3.0,
-    "z": 0.0
-   },
-   "triangles": 4242,
-   "trianglesParMateriau": {
-    "bardage": 96,
-    "bois": 1232,
-    "metal": 326,
-    "moellon": 88,
-    "pierre": 1176,
-    "tuile": 1210,
-    "vitre": 8,
-    "volet": 106
-   }
-  },
-  "forge": {
-   "boite": [
-    [
-     -3.689,
-     -0.012,
-     -3.701
-    ],
-    [
-     3.696,
-     7.268,
-     3.453
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "forge.glb",
-   "hauteur": 7.268,
-   "morceaux": 432,
-   "noeud": "forge",
-   "nom": "la forge",
-   "octets": 262776,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 2732,
-   "trianglesParMateriau": {
-    "bois": 166,
-    "metal": 206,
-    "moellon": 56,
-    "pierre": 1202,
-    "tuile": 1098,
-    "vitre": 4
-   }
-  },
-  "fournil": {
-   "boite": [
-    [
-     -3.919,
-     -0.017,
-     -3.683
-    ],
-    [
-     4.202,
-     9.285,
-     3.952
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 1.333,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "fournil.glb",
-   "hauteur": 9.285,
-   "morceaux": 641,
-   "noeud": "fournil",
-   "nom": "le fournil d'Achille",
-   "octets": 400336,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 4174,
-   "trianglesParMateriau": {
-    "bois": 292,
-    "crepi": 212,
-    "metal": 464,
-    "moellon": 14,
-    "pierre": 1550,
-    "tuile": 1198,
-    "vitre": 18,
-    "volet": 426
-   }
-  },
-  "grange": {
-   "boite": [
-    [
-     -4.674,
-     -0.015,
-     -5.423
-    ],
-    [
-     4.685,
-     8.423,
-     5.42
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 8,
-    "profondeur": 10
-   },
-   "fenetres": [
-    {
-     "appui": 1.4,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -4.0,
-     "z": -1.75
-    },
-    {
-     "appui": 1.4,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -4.0,
-     "z": 1.75
-    }
-   ],
-   "fichier": "grange.glb",
-   "hauteur": 8.423,
-   "morceaux": 800,
-   "noeud": "grange",
-   "nom": "la grange",
-   "octets": 438252,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 4.0,
-    "z": 0.0
-   },
-   "triangles": 4579,
-   "trianglesParMateriau": {
-    "bardage": 520,
-    "bois": 296,
-    "crepi": 5,
-    "metal": 160,
-    "pierre": 1408,
-    "tuile": 2128,
-    "vitre": 10,
-    "volet": 52
-   }
-  },
-  "halte": {
-   "boite": [
-    [
-     -7.384,
-     -0.018,
-     -3.693
-    ],
-    [
-     5.639,
-     6.872,
-     3.695
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 10,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -2.775,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 2.775,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 5.0,
-     "z": 1.2
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 2.925,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -2.925,
-     "z": -3.0
-    }
-   ],
-   "fichier": "halte.glb",
-   "hauteur": 6.872,
-   "morceaux": 809,
-   "noeud": "halte",
-   "nom": "la halte",
-   "octets": 510316,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 5384,
-   "trianglesParMateriau": {
-    "bois": 448,
-    "metal": 914,
-    "moellon": 106,
-    "pierre": 1626,
-    "tuile": 2054,
-    "vitre": 14,
-    "volet": 222
-   }
-  },
-  "hameau-b": {
-   "boite": [
-    [
-     -3.69,
-     -0.018,
-     -3.421
-    ],
-    [
-     3.707,
-     9.74,
-     3.628
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [],
-   "fichier": "hameau-b.glb",
-   "hauteur": 9.74,
-   "morceaux": 628,
-   "noeud": "hameau-b",
-   "nom": "la maison aux volets clos",
-   "octets": 402028,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 4202,
-   "trianglesParMateriau": {
-    "bois": 218,
-    "crepi": 334,
-    "metal": 550,
-    "pierre": 1630,
-    "tuile": 1120,
-    "vitre": 20,
-    "volet": 330
-   }
-  },
-  "hameau-c": {
-   "boite": [
-    [
-     -3.422,
-     -0.021,
-     -3.67
-    ],
-    [
-     3.958,
-     7.439,
-     3.691
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 1.775,
-     "z": -3.0
-    }
-   ],
-   "fichier": "hameau-c.glb",
-   "hauteur": 7.439,
-   "morceaux": 593,
-   "noeud": "hameau-c",
-   "nom": "la maison du bout",
-   "octets": 404512,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -3.0
-   },
-   "triangles": 4265,
-   "trianglesParMateriau": {
-    "bardage": 84,
-    "bois": 1048,
-    "metal": 358,
-    "moellon": 121,
-    "pierre": 1278,
-    "tuile": 1224,
-    "vitre": 14,
-    "volet": 138
-   }
-  },
-  "honorine": {
-   "boite": [
-    [
-     -3.961,
-     -0.02,
-     -3.422
-    ],
-    [
-     3.701,
-     9.441,
-     4.077
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.775,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "honorine.glb",
-   "hauteur": 9.441,
-   "morceaux": 697,
-   "noeud": "honorine",
-   "nom": "la maison d'Honorine",
-   "octets": 482024,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 5088,
-   "trianglesParMateriau": {
-    "bardage": 84,
-    "bois": 1228,
-    "crepi": 230,
-    "metal": 486,
-    "pierre": 1618,
-    "tuile": 1156,
-    "vitre": 20,
-    "volet": 266
-   }
-  },
-  "horloger": {
-   "boite": [
-    [
-     -3.919,
-     -0.014,
-     -3.697
-    ],
-    [
-     3.915,
-     9.74,
-     3.949
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 2.025,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "horloger.glb",
-   "hauteur": 9.74,
-   "morceaux": 729,
-   "noeud": "horloger",
-   "nom": "l'atelier d'Ambroise",
-   "octets": 471864,
-   "porte": {
-    "facade": "sud",
-    "position": 0.5,
-    "x": 0.0,
-    "z": 3.0
-   },
-   "triangles": 4968,
-   "trianglesParMateriau": {
-    "bois": 282,
-    "metal": 1036,
-    "moellon": 166,
-    "pierre": 1774,
-    "tuile": 1252,
-    "vitre": 24,
-    "volet": 434
-   }
-  },
-  "lavoir": {
-   "boite": [
-    [
-     -2.768,
-     -0.016,
-     -2.351
-    ],
-    [
-     2.288,
-     3.664,
-     2.35
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 5,
-    "profondeur": 4
-   },
-   "fenetres": [],
-   "fichier": "lavoir.glb",
-   "hauteur": 3.664,
-   "morceaux": 106,
-   "noeud": "lavoir",
-   "nom": "le lavoir",
-   "octets": 64488,
-   "porte": {
-    "facade": "ouest",
-    "position": 0.5,
-    "x": -2.5,
-    "z": 0.0
-   },
-   "triangles": 642,
-   "trianglesParMateriau": {
-    "bois": 168,
-    "pierre": 140,
-    "tuile": 332,
-    "vitre": 2
-   }
-  },
-  "lucie": {
-   "boite": [
-    [
-     -3.42,
-     -0.017,
-     -3.731
-    ],
-    [
-     3.42,
-     9.441,
-     3.71
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.283,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -1.775,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "lucie.glb",
-   "hauteur": 9.441,
-   "morceaux": 671,
-   "noeud": "lucie",
-   "nom": "la maison de Lucie",
-   "octets": 423940,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -3.0
-   },
-   "triangles": 4437,
-   "trianglesParMateriau": {
-    "bois": 380,
-    "crepi": 281,
-    "metal": 518,
-    "pierre": 1730,
-    "tuile": 1208,
-    "vitre": 22,
-    "volet": 298
-   }
-  },
-  "maison": {
-   "boite": [
-    [
-     -5.917,
-     -0.019,
-     -4.705
-    ],
-    [
-     6.135,
-     10.097,
-     4.702
-    ]
-   ],
-   "budget": 6000,
-   "economie": 2,
-   "emprise": {
-    "largeur": 11,
-    "profondeur": 8
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -3.175,
-     "z": 4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -0.0,
-     "z": 4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 3.175,
-     "z": 4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 5.5,
-     "z": 2.275
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 5.5,
-     "z": -2.275
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 2.117,
-     "z": -4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -2.117,
-     "z": -4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -5.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "maison.glb",
-   "hauteur": 10.097,
-   "morceaux": 901,
-   "noeud": "maison",
-   "nom": "la maison du garde-barrière",
-   "octets": 552344,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 5.5,
-    "z": 0.0
-   },
-   "triangles": 5803,
-   "trianglesParMateriau": {
-    "bois": 606,
-    "crepi": 315,
-    "metal": 828,
-    "pierre": 1864,
-    "tuile": 1632,
-    "vitre": 36,
-    "volet": 522
-   }
-  },
-  "marthe": {
-   "boite": [
-    [
-     -3.697,
-     -0.023,
-     -3.421
-    ],
-    [
-     3.702,
-     9.258,
-     3.419
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 6
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 0.0,
-     "z": 3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.0,
-     "z": 1.775
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.7,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -3.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.0,
-     "z": 0.0
-    }
-   ],
-   "fichier": "marthe.glb",
-   "hauteur": 9.258,
-   "morceaux": 631,
-   "noeud": "marthe",
-   "nom": "la maison de Marthe",
-   "octets": 401756,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 3.0,
-    "z": 0.0
-   },
-   "triangles": 4201,
-   "trianglesParMateriau": {
-    "bois": 358,
-    "crepi": 277,
-    "metal": 486,
-    "pierre": 1646,
-    "tuile": 1148,
-    "vitre": 20,
-    "volet": 266
-   }
-  },
-  "mercerie": {
-   "boite": [
-    [
-     -3.919,
-     -0.011,
-     -4.451
-    ],
-    [
-     3.922,
-     9.676,
-     4.213
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 7
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.45,
-     "z": 3.5
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.45,
-     "z": 3.5
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": 0.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 0.0
-    }
-   ],
-   "fichier": "mercerie.glb",
-   "hauteur": 9.676,
-   "morceaux": 760,
-   "noeud": "mercerie",
-   "nom": "la mercerie-coiffure",
-   "octets": 468704,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -3.5
-   },
-   "triangles": 4913,
-   "trianglesParMateriau": {
-    "bois": 414,
-    "crepi": 275,
-    "metal": 568,
-    "pierre": 1654,
-    "tuile": 1428,
-    "vitre": 30,
-    "volet": 544
-   }
-  },
-  "moulin": {
-   "boite": [
-    [
-     -4.681,
-     -0.841,
-     -4.638
-    ],
-    [
-     4.693,
-     11.141,
-     5.457
-    ]
-   ],
-   "budget": 15000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 8,
-    "profondeur": 8
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 4.0,
-     "z": 1.483
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 4.0,
-     "z": -1.483
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 2.275,
-     "z": -4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": -2.275,
-     "z": -4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -4.0,
-     "z": -1.55
-    }
-   ],
-   "fichier": "moulin.glb",
-   "hauteur": 11.141,
-   "morceaux": 868,
-   "noeud": "moulin",
-   "nom": "le moulin de la Vanne",
-   "octets": 543532,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -4.0
-   },
-   "triangles": 5712,
-   "trianglesParMateriau": {
-    "bois": 1038,
-    "metal": 254,
-    "moellon": 188,
-    "pierre": 2330,
-    "tuile": 1856,
-    "vitre": 26,
-    "volet": 20
-   }
-  },
-  "poste": {
-   "boite": [
-    [
-     -4.058,
-     -0.016,
-     -2.955
-    ],
-    [
-     3.78,
-     6.919,
-     2.781
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 4
-   },
-   "fenetres": [
-    {
-     "appui": 1.4,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 0.0,
-     "z": 2.0
-    }
-   ],
-   "fichier": "poste.glb",
-   "hauteur": 6.919,
-   "morceaux": 497,
-   "noeud": "poste",
-   "nom": "le poste d'aiguillage",
-   "octets": 324076,
-   "porte": {
-    "facade": "nord",
-    "position": 0.5,
-    "x": 0.0,
-    "z": -2.0
-   },
-   "triangles": 3379,
-   "trianglesParMateriau": {
-    "bois": 272,
-    "metal": 280,
-    "moellon": 119,
-    "pierre": 1456,
-    "tuile": 1218,
-    "vitre": 14,
-    "volet": 20
-   }
-  },
-  "presbytere": {
-   "boite": [
-    [
-     -4.139,
-     -0.018,
-     -4.187
-    ],
-    [
-     4.134,
-     9.677,
-     4.177
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 7,
-    "profondeur": 7
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.45,
-     "z": 3.5
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.45,
-     "z": 3.5
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": 2.025
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 1.0,
-     "nz": 0.0,
-     "x": 3.5,
-     "z": -2.025
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -3.5
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": -1.45
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": -1.0,
-     "nz": 0.0,
-     "x": -3.5,
-     "z": 1.45
-    }
-   ],
-   "fichier": "presbytere.glb",
-   "hauteur": 9.677,
-   "morceaux": 838,
-   "noeud": "presbytere",
-   "nom": "le presbytère",
-   "octets": 517716,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 3.5,
-    "z": 0.0
-   },
-   "triangles": 5438,
-   "trianglesParMateriau": {
-    "bois": 426,
-    "metal": 678,
-    "moellon": 178,
-    "pierre": 1742,
-    "tuile": 1928,
-    "vitre": 28,
-    "volet": 458
-   }
-  },
-  "remise": {
-   "boite": [
-    [
-     -3.458,
-     -0.013,
-     -3.211
-    ],
-    [
-     3.422,
-     5.323,
-     3.193
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 6,
-    "profondeur": 5
-   },
-   "fenetres": [
-    {
-     "appui": 1.4,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 0.0,
-     "z": 2.5
-    },
-    {
-     "appui": 1.4,
-     "hauteur": 0.7,
-     "largeur": 0.6,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -2.5
-    }
-   ],
-   "fichier": "remise.glb",
-   "hauteur": 5.323,
-   "morceaux": 392,
-   "noeud": "remise",
-   "nom": "la remise de la draisine",
-   "octets": 235240,
-   "porte": {
-    "facade": "ouest",
-    "position": 0.5,
-    "x": -3.0,
-    "z": 0.0
-   },
-   "triangles": 2428,
-   "trianglesParMateriau": {
-    "bardage": 294,
-    "bois": 182,
-    "metal": 160,
-    "pierre": 900,
-    "tuile": 840,
-    "vitre": 4,
-    "volet": 48
-   }
-  },
-  "scierie": {
-   "boite": [
-    [
-     -5.421,
-     -0.018,
-     -4.698
-    ],
-    [
-     8.228,
-     6.375,
-     4.688
-    ]
-   ],
-   "budget": 6000,
-   "economie": 0,
-   "emprise": {
-    "largeur": 10,
-    "profondeur": 8
-   },
-   "fenetres": [
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": -1.817,
-     "z": 4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": 1.0,
-     "x": 1.817,
-     "z": 4.0
-    },
-    {
-     "appui": 1.0,
-     "hauteur": 1.25,
-     "largeur": 0.95,
-     "nx": 0.0,
-     "nz": -1.0,
-     "x": 0.0,
-     "z": -4.0
-    }
-   ],
-   "fichier": "scierie.glb",
-   "hauteur": 6.375,
-   "morceaux": 789,
-   "noeud": "scierie",
-   "nom": "l'atelier de Basile",
-   "octets": 425856,
-   "porte": {
-    "facade": "est",
-    "position": 0.5,
-    "x": 5.0,
-    "z": 0.0
-   },
-   "triangles": 4456,
-   "trianglesParMateriau": {
-    "bardage": 476,
-    "bois": 380,
-    "metal": 160,
-    "pierre": 1240,
-    "tuile": 2148,
-    "vitre": 8,
-    "volet": 44
-   }
-  }
- },
- "format": "duo-batiments/1",
- "lieu": "aubrune",
- "materiaux": [
-  "pierre",
-  "moellon",
-  "crepi",
-  "tuile",
-  "bois",
-  "bardage",
-  "volet",
-  "vitre",
-  "metal"
- ]
+  "format": "duo-batiments/1",
+  "lieu": "aubrune",
+  "materiaux": ["pierre", "moellon", "crepi", "tuile", "bois", "bardage", "volet", "vitre", "metal"]
 }
