@@ -3,8 +3,10 @@
 // les répliques, passent par l'éditeur de personnage, et un journal de tout ce qui cloche.
 import { appendFileSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { test } from '@playwright/test';
 import type { Duo, ProbePlayer, ProbeWorld, Side } from './duo';
 import { CAPTURES } from './duo';
+import { waitChoicesReady } from './conversation';
 
 const PLACES = join(import.meta.dirname, '../../donnees/lieux');
 const PROPS = join(import.meta.dirname, '../../donnees/commun/meubles');
@@ -139,22 +141,49 @@ export function planPath(
   from: Point,
   to: Point,
   avoid: readonly Point[] = [],
+  options: {
+    /**
+     * Parti d'une case à éviter, le trajet se trace depuis la case libre la plus proche. Après une
+     * porte, le joueur arrive au bord de la case de cette porte (exactement dessus pour une porte
+     * au mur sud ou est): un trajet tracé depuis cette case pouvait longer le seuil, et le premier
+     * pas faisait repasser la porte (relevé: hôte arrivé en 71,50; 214,00 dans le fournil, touches
+     * bas et droite, ressorti dans la rue). Aucune étape n'est ajoutée dans l'axe de la porte: un
+     * joueur qui la dépasse (commandes en retard) y reviendrait dos à la pièce, et ressortirait.
+     */
+    readonly leaveAvoided?: boolean;
+  } = {},
 ): Point[] | null {
+  // Un habitant barre le passage: on le contourne (sauf si c'est le but lui-même).
+  const avoided = (cx: number, cy: number): boolean =>
+    avoid.some(
+      (a) =>
+        Math.hypot(a.x - (cx + 0.5), a.y - (cy + 0.5)) < 0.85 &&
+        Math.hypot(a.x - to.x, a.y - to.y) > 1.2,
+    );
   const free = (cx: number, cy: number): boolean => {
     if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return false;
-    // Un habitant barre le passage: on le contourne (sauf si c'est le but lui-même).
-    if (
-      avoid.some(
-        (a) =>
-          Math.hypot(a.x - (cx + 0.5), a.y - (cy + 0.5)) < 0.85 &&
-          Math.hypot(a.x - to.x, a.y - to.y) > 1.2,
-      )
-    )
-      return false;
-    return isFree(map, cx, cy);
+    return !avoided(cx, cy) && isFree(map, cx, cy);
   };
   const key = (cx: number, cy: number): number => cy * map.width + cx;
-  const start = { x: Math.floor(from.x), y: Math.floor(from.y) };
+  let start = { x: Math.floor(from.x), y: Math.floor(from.y) };
+  if (options.leaveAvoided === true && avoided(start.x, start.y)) {
+    let best: { x: number; y: number } | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        const cx = start.x + dx;
+        const cy = start.y + dy;
+        if ((dx === 0 && dy === 0) || !free(cx, cy)) continue;
+        // Pas de coin coupé, comme dans le parcours des cases.
+        if (dx !== 0 && dy !== 0 && (!free(cx, start.y) || !free(start.x, cy))) continue;
+        const distance = Math.hypot(cx + 0.5 - from.x, cy + 0.5 - from.y);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = { x: cx, y: cy };
+        }
+      }
+    if (best !== null) start = best;
+  }
   const goal = { x: Math.floor(to.x), y: Math.floor(to.y) };
   const prev = new Map<number, number>([[key(start.x, start.y), -1]]);
   const queue: { x: number; y: number }[] = [start];
@@ -202,6 +231,11 @@ export class Journal {
   readonly timings: { label: string; seconds: number }[] = [];
   private readonly seen = new Set<string>();
   private readonly file: string;
+  /**
+   * Copie dans le dossier de pièces du parcours en cours (à côté de ses captures d'échec): rejoué
+   * (`--repeat-each`), un parcours récrit son journal, et celui de l'échec était perdu.
+   */
+  private readonly copy: string | null;
   private readonly t0 = Date.now();
   private mark = Date.now();
 
@@ -209,10 +243,24 @@ export class Journal {
     this.file = join(CAPTURES, name);
     mkdirSync(dirname(this.file), { recursive: true });
     writeFileSync(this.file, '');
+    this.copy = Journal.outputCopy(name);
+  }
+
+  private static outputCopy(name: string): string | null {
+    try {
+      const path = test.info().outputPath(name);
+      writeFileSync(path, '');
+      return path;
+    } catch {
+      // Hors d'un parcours Playwright (test rapide des aides): pas de dossier de pièces.
+      return null;
+    }
   }
 
   log(text: string): void {
-    appendFileSync(this.file, `[${((Date.now() - this.t0) / 1000).toFixed(1)} s] ${text}\n`);
+    const line = `[${((Date.now() - this.t0) / 1000).toFixed(1)} s] ${text}\n`;
+    appendFileSync(this.file, line);
+    if (this.copy !== null) appendFileSync(this.copy, line);
   }
 
   /** Un défaut; `once` évite de répéter le même relevé à chaque image. */
@@ -530,6 +578,8 @@ export async function playUi(side: Side, ctx: UiContext): Promise<boolean> {
       return true;
     }
     if (await pressedRecently(ctx, side, `dialogue:${s.dialogue.text}`)) return true;
+    // Des choix: Entrée, une fois leur garde passée (`aides-e2e/conversation.ts`).
+    if (s.dialogue.choices.length > 0) await waitChoicesReady(side);
     await side.press(s.dialogue.choices.length > 0 ? 'Enter' : 'Space');
     await side.page.waitForTimeout(350);
     return true;
@@ -594,6 +644,8 @@ const TAP_MS = 170;
 /** Après un petit pas: délai pour voir le joueur bouger chez l'hôte, puis pour le voir arrêté (ms). */
 const PULSE_SEEN_MS = 1200;
 const PULSE_SETTLE_MS = 2500;
+/** Relevés gardés par marche pour le journal d'une marche inachevée (moitié au début, moitié à la fin). */
+const TRAIL_KEPT = 40;
 
 /**
  * Attend chez l'hôte l'effet d'un petit pas parti de `from`: le joueur bouge ou se tourne, puis
@@ -632,6 +684,27 @@ async function settleAfterPulse(
     await duo.host.page.waitForTimeout(60);
   }
 }
+/**
+ * Change les touches tenues d'une machine d'un seul geste: les relâchements et les appuis partent
+ * ensemble, comme une main qui se lève ou change de direction. Envoyés l'un après l'autre, chaque
+ * événement attendait le suivant d'une image: en rendu logiciel (une image toutes les 100 à
+ * 160 ms, jusqu'à 8 pas de simulation rattrapés d'un coup), le jeu voyait alors une image entière
+ * avec une seule des deux touches d'une diagonale. Relevé du 2026-11-11 (24 petits pas « bas et
+ * gauche » de 170 ms): relâchés à la suite, 21 finissent tournés vers la dernière touche lâchée
+ * (plein ouest, jusqu'à 0,4 m de marche en plus); relâchés ensemble, 24 sur 24 gardent la diagonale.
+ */
+export async function changeKeys(
+  side: Side,
+  up: readonly string[],
+  down: readonly string[],
+): Promise<void> {
+  const keyboard = side.page.keyboard;
+  await Promise.all([
+    ...up.map((key) => keyboard.up(key)),
+    ...down.map((key) => keyboard.down(key)),
+  ]);
+}
+
 /** Dernier lacet de caméra déduit, par machine: il survit d'une marche à l'autre. */
 const YAW = new WeakMap<Side, number>();
 
@@ -652,6 +725,8 @@ export async function walkBoth(
     readonly straight?: boolean;
     /** Points à contourner (habitants). */
     readonly avoid?: readonly Point[];
+    /** Les points à contourner sont des cases de porte: parti de l'une d'elles, on la quitte d'abord (`planPath`). */
+    readonly leaveAvoided?: boolean;
     /** La marche n'a plus lieu d'être (étape franchie, lieu quitté): on s'arrête, arrivés. */
     readonly stop?: (w: ProbeWorld) => boolean;
   },
@@ -668,6 +743,15 @@ export async function walkBoth(
   const stuckSince = [0, 0];
   /** Durée du petit pas de chaque joueur: allongée tant qu'il reste sans effet. */
   const pulse = [PULSE_MS, PULSE_MS];
+  /**
+   * Relevés de la marche (position, cap, touches), sans répéter un relevé identique: les premiers
+   * et les derniers sont écrits au journal si elle n'aboutit pas (le début dit comment le joueur
+   * s'est égaré, la fin où il est resté).
+   */
+  const trailStart: string[] = [];
+  const trailEnd: string[] = [];
+  let trailCut = false;
+  const lastReading: (string | null)[] = [null, null];
   /** Dans la tolérance: où et depuis quand (horloge et pas de l'hôte) le joueur ne bouge plus. */
   const rest: ({ x: number; y: number; since: number; tick: number } | null)[] = [null, null];
   const t0 = Date.now();
@@ -683,16 +767,11 @@ export async function walkBoth(
     const seat = duoSeats[i];
     const mine = held[i];
     if (seat === undefined || mine === undefined) return;
-    for (const key of [...mine])
-      if (!want.has(key)) {
-        await seat.side.page.keyboard.up(key);
-        mine.delete(key);
-      }
-    for (const key of want)
-      if (!mine.has(key)) {
-        await seat.side.page.keyboard.down(key);
-        mine.add(key);
-      }
+    const up = [...mine].filter((key) => !want.has(key));
+    const down = [...want].filter((key) => !mine.has(key));
+    await changeKeys(seat.side, up, down);
+    for (const key of up) mine.delete(key);
+    for (const key of down) mine.add(key);
   };
   const initial = await duo.host.world();
   const initialGuest = initial;
@@ -702,7 +781,11 @@ export async function walkBoth(
     if (target === null || target === undefined || w === null) continue;
     const here = me(w, seat).body;
     const route =
-      options.straight === true ? [target] : planPath(map, here, target, options.avoid ?? []);
+      options.straight === true
+        ? [target]
+        : planPath(map, here, target, options.avoid ?? [], {
+            leaveAvoided: options.leaveAvoided === true,
+          });
     if (route === null) {
       state[i] = 'bloqué';
       journal.log(`aucun chemin sur la carte (${options.label}, joueur ${String(i)})`);
@@ -754,6 +837,19 @@ export async function walkBoth(
         if (s < -0.38) want.add('a');
         if (remaining > 4) want.add('Shift');
         await setKeys(i, want);
+        const reading = `joueur ${String(i)} en ${here.x.toFixed(2)}; ${here.y.toFixed(2)} cap ${here.facing.toFixed(2)}, reste ${remaining.toFixed(2)} m, touches « ${[...want].join('')} »`;
+        if (reading !== lastReading[i]) {
+          lastReading[i] = reading;
+          const line = `[${((Date.now() - t0) / 1000).toFixed(1)} s] ${reading}, pas ${String(w.tick)}`;
+          if (trailStart.length < TRAIL_KEPT / 2) trailStart.push(line);
+          else {
+            trailEnd.push(line);
+            if (trailEnd.length > TRAIL_KEPT / 2) {
+              trailEnd.shift();
+              trailCut = true;
+            }
+          }
+        }
         // Près du but, de petits pas: en rendu logiciel une image dure jusqu'à un quart de seconde
         // de jeu, une touche tenue ferait dépasser la cible de près d'un mètre.
         const moved = before === null || Math.hypot(here.x - before.x, here.y - before.y) > 0.02;
@@ -785,6 +881,10 @@ export async function walkBoth(
     await setKeys(0, new Set());
     await setKeys(1, new Set());
   }
+  if (state.some((st) => st === 'bloqué' || st === 'trop long'))
+    journal.log(
+      `marche « ${options.label} » inachevée (${state.join(', ')}), relevés:\n  ${[...trailStart, ...(trailCut ? ['(...)'] : []), ...trailEnd].join('\n  ')}`,
+    );
   return { state: [state[0] ?? 'sans cible', state[1] ?? 'sans cible'] };
 }
 
@@ -886,13 +986,16 @@ export async function tapToward(
       window.focus();
       document.body.focus();
     });
-    journal.log(
-      `TAP ${seat.side.who} ${keys.join('')} depuis ${here.x.toFixed(2)},${here.y.toFixed(2)} cap ${here.facing.toFixed(2)} lacet ${yaw.toFixed(2)}`,
-    );
-    for (const k of keys) await seat.side.page.keyboard.down(k);
+    await changeKeys(seat.side, [], keys);
     await seat.side.page.waitForTimeout(tapMs);
-    for (const k of keys) await seat.side.page.keyboard.up(k);
+    await changeKeys(seat.side, keys, []);
     const seen = await settleAfterPulse(duo, seat, here);
+    const after = await duo.host.world();
+    const body = after === null ? null : me(after, seat).body;
+    const aim = await duo.host.aim(seat.index);
+    journal.log(
+      `TAP ${seat.side.who} ${keys.join('')} depuis ${here.x.toFixed(2)},${here.y.toFixed(2)} cap ${here.facing.toFixed(2)} lacet ${yaw.toFixed(2)}: ${seen ? 'vu' : 'sans effet'}, arrivé en ${body?.x.toFixed(2) ?? '?'},${body?.y.toFixed(2) ?? '?'} cap ${body?.facing.toFixed(2) ?? '?'}, vise chez l'hôte ${aim?.id ?? 'rien'}`,
+    );
     if (seen || lost >= 3) n += 1;
     else lost += 1;
     tapMs = seen ? TAP_MS : Math.min(tapMs * 1.5, PULSE_MAX_MS);
