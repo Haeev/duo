@@ -61,6 +61,8 @@ Dans cet ordre, les plus visibles d'abord.
 | 3.8 | **Meubles en deux teintes vraiment différentes** (miel et sauge se confondent) | artiste 3D | planche des deux teintes côte à côte |
 | 3.9 | **Modèles provisoires à remplacer**: poteaux indicateurs, boîtes aux lettres, panneau de commande, diapason, trouvailles de berge | artiste 3D | contrôle des volumes vert, captures relues |
 | 3.10 | **Score cumulé dans Duo** et vignette rechargée après mise à jour (déjà codée): **Duo 0.4.1**, à réinstaller sur les deux machines | dev plateforme, build | essais Electron verts, release marquée « Latest » |
+| 3.11 | **Reportés du lot 1** (plus gros que prévu, constat du 11 novembre au soir): l'ardoise du besoin du jour devant chaque boutique (modèle, pose dans le plan, texte dessiné dans le monde); les touches des mini-jeux lues par les actions du manifeste et non par le clavier en direct; le souvenir de tenue (condition « porte telle pièce » et répliques des habitants) | artiste 3D, dev gameplay 3D, game-designer | chacun a son test court |
+| 3.12 | **Baquet de bois et nichoir**: le baquet de la maison montre le modèle de la baignoire, le nichoir une forme provisoire | artiste 3D | modèles et vignettes définitifs |
 
 ## Lot 4: les gros (une demi-journée ou plus chacun, environ trois jours)
 
