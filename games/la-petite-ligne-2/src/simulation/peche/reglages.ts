@@ -56,6 +56,33 @@ export const FISHING = {
   quality: { cleanSeconds: 0.75, max: 3 },
   /** L'autre joueur à moins de N m à la prise tend l'épuisette. */
   together: { radius: 4 },
+  /**
+   * Pêche à deux (prise unique `crew: "pair"`, `a-deux.ts`). À la canne on sent ses élans (côté,
+   * force) sans la voir et l'on tient la touche; à l'épuisette on voit l'ombre remonter sans rien
+   * sentir et l'on plonge. Rien n'est perdu à l'échec: elle repart, on recommence.
+   */
+  pair: {
+    /** L'épuisette doit être à moins de N m de la canne (au lancer et pendant le combat). */
+    radius: 7,
+    /** Secondes à tenir la canne pendant ses élans pour la fatiguer. */
+    holdSeconds: 3,
+    /** Tenir pendant qu'elle souffle la brusque: elle reprend N s de forces par seconde. */
+    restPenalty: 0.5,
+    /** Avant la fatigue: élans (côté tiré au hasard) et souffles, durées en s. */
+    pull: { min: 1.3, max: 2.2 },
+    rest: { min: 0.9, max: 1.5 },
+    /** Fatiguée: elle plonge (on sent le côté), puis remonte de ce côté (on la voit), en s. */
+    dive: { min: 1.2, max: 2 },
+    rise: 1.8,
+    /** Bulles avant la remontée: l'épuisette a le temps de se placer (s). */
+    warn: 0.7,
+    /** Plongeon raté: part du temps tenu qu'on garde (elle replonge, un peu moins fatiguée). */
+    missKeep: 0.5,
+    /** Au-delà, elle casse la ligne et repart (s depuis la touche). */
+    maxSeconds: 75,
+    /** Épuisette d'un couloir à l'autre (gauche, milieu, droite), chez le joueur (s). */
+    laneSeconds: 0.25,
+  },
   /** Une taille au-dessus de cette part de la plage fait un « gros poisson » (vibration d'écran). */
   bigShare: 0.85,
   /** Journal des touches: longueur maximale (caractères), pour tenir dans un message de l'invité. */

@@ -282,6 +282,120 @@
     transform: rotate(360deg);
   }
 }
+/* Appât de la ligne, pendant la visée. */
+.lpl-peche__appat,
+.lpl-peche__consigne {
+  position: absolute;
+  margin: 0;
+  padding: 0.25rem 0.625rem;
+  font: 650 0.875rem/1.3 var(--font-text);
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.5rem;
+  box-shadow: 0.1875rem 0.25rem 0 rgb(42 37 34 / 0.32);
+}
+.lpl-peche__appat {
+  right: 3%;
+  bottom: calc(6% + min(19rem, 40vw) * 0.66);
+}
+.lpl-peche__consigne {
+  /* À gauche du médaillon et au-dessus de la barre d'objets: rien ne se chevauche, même étroit. */
+  left: 3%;
+  bottom: 6.5rem;
+  max-width: min(30rem, calc(94% - min(19rem, 40vw) - 1rem));
+}
+.lpl-peche__appat,
+.lpl-peche__consigne,
+.lpl-peche__ressenti,
+.lpl-peche__eaux {
+  display: none;
+}
+.lpl-peche[data-phase='aim'] .lpl-peche__appat:not([hidden]),
+.lpl-peche[data-phase='avis'] .lpl-peche__consigne,
+.lpl-peche[data-phase^='pair'] .lpl-peche__consigne,
+.lpl-peche[data-phase='pair-canne'] .lpl-peche__ressenti,
+.lpl-peche[data-phase='pair-epuisette'] .lpl-peche__eaux {
+  display: block;
+}
+.lpl-peche[data-phase^='pair'] .lpl-peche__jeu,
+.lpl-peche[data-phase='avis'] .lpl-peche__jeu,
+.lpl-peche[data-phase^='pair'] .lpl-peche__repere {
+  display: none;
+}
+
+/* Pêche à deux, à la canne: le ressenti seul (aucune eau, aucune ombre). */
+.lpl-peche__ressenti,
+.lpl-peche__eaux {
+  position: absolute;
+  right: 3%;
+  bottom: 9%;
+  width: min(19rem, 40vw);
+  overflow: visible;
+}
+.lpl-peche__eaux {
+  filter: drop-shadow(0.1875rem 0.25rem 0 rgb(42 37 34 / 0.32));
+}
+.lpl-peche__ressenti-arc {
+  fill: none;
+  stroke: var(--paper-raised);
+  stroke-width: 20;
+  stroke-linecap: round;
+}
+.lpl-peche__tire path {
+  fill: var(--stamp);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+.lpl-peche__forces-titre {
+  font: 750 12px var(--font-text);
+  text-anchor: middle;
+  fill: var(--ink);
+}
+.lpl-peche__forces-fond {
+  fill: var(--paper-raised);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.lpl-peche__forces {
+  fill: var(--primary);
+}
+
+/* Pêche à deux, à l'épuisette: l'eau vue de la berge, trois couloirs. */
+.lpl-peche__eaux-fond {
+  fill: #3d6f8a;
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.lpl-peche__couloirs {
+  stroke: rgb(255 255 255 / 0.25);
+  stroke-width: 2;
+  stroke-dasharray: 6 8;
+}
+.lpl-peche__ombre {
+  fill: #14222c;
+}
+.lpl-peche__bulles circle {
+  fill: none;
+  stroke: var(--paper-raised);
+  stroke-width: 2.5;
+}
+.lpl-peche__berge {
+  fill: var(--wood);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+.lpl-peche__epuisette path {
+  fill: rgb(255 255 255 / 0.18);
+  stroke: var(--paper-raised);
+  stroke-width: 4;
+}
+.lpl-peche__epuisette line {
+  stroke: var(--wood);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
 [data-motion='reduced'] .lpl-peche * {
   animation: none !important;
   transition: none !important;

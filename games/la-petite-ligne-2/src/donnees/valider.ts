@@ -700,6 +700,22 @@ export function validateContent(content: Content): string[] {
     if (!(entry.item in content.items)) problems.push(`${at}: objet inconnu « ${entry.item} »`);
     for (const place of entry.places)
       if (!(place in content.places)) problems.push(`${at}: lieu inconnu « ${place} »`);
+    for (const bait of entry.baits ?? [])
+      if (!(bait.item in content.items)) problems.push(`${at}: appât inconnu « ${bait.item} »`);
+    const unique = entry.unique;
+    if (unique === undefined) continue;
+    if (entry.fish === undefined)
+      problems.push(`${at}: une prise unique est un poisson (bloc fish)`);
+    if (unique.bait !== null && !(unique.bait in content.items))
+      problems.push(`${at}: appât inconnu « ${unique.bait} »`);
+    for (const c of unique.when) checkCondition(content, c, `${at}, unique.when`, problems);
+    const spots = entry.places.flatMap((p) => content.places[p]?.def.fishing ?? []);
+    // Un lieu sans aucun coin (carte brute d'un plan, en essai) ne la porte pas, sans faute.
+    if (spots.length > 0 && !spots.some((s) => s.id === unique.spot))
+      problems.push(`${at}: coin de pêche « ${unique.spot} » absent de ses lieux`);
+    // Elle n'est tirée dans aucune table: son ombre vient de sa fiche seule.
+    if (spots.some((s) => s.table.some((row) => row.catch === entry.id)))
+      problems.push(`${at}: une prise unique ne va dans aucune table de coin de pêche`);
   }
   for (const place of Object.values(content.places)) checkPlace(content, place, problems);
   checkEvents(content, problems);

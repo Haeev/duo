@@ -455,6 +455,8 @@ export function createKitchen(
       case 'fish_caught':
       case 'fish_hooked':
       case 'fish_lost':
+      case 'fish_net_missed':
+      case 'clock_struck':
       case 'gesture_done':
       case 'gesture_started':
       case 'harvested':

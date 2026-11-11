@@ -395,6 +395,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'fish_caught':
       case 'fish_hooked':
       case 'fish_lost':
+      case 'fish_net_missed':
       case 'ate':
       case 'cook_cancelled':
       case 'cook_part_done':

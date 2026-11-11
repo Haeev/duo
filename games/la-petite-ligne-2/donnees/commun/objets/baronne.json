@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "baronne",
+  "name": "La Baronne",
+  "model": "perche",
+  "family": "catch",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

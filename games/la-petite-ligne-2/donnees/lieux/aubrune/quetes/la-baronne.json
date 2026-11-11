@@ -112,17 +112,16 @@
         },
         {
           "id": "goujons",
-          "objective": "Deux goujons du ponton, un par ligne: pêche-les au ponton de la berge, et porte-les à Achille.",
+          "objective": "Deux goujons du ponton, un par ligne: pêche-les au ponton de la berge et montre-les à Achille. Garde-les: ce sont les appâts.",
           "target": {
             "villager": "achille"
           },
           "after": ["heure", "appat"],
           "done": [
             {
-              "type": "deliver",
-              "item": "goujon",
-              "count": 2,
-              "villager": "achille"
+              "type": "talked",
+              "dialogue": "achille-goujons-merci",
+              "node": "a2"
             }
           ],
           "together": false,
@@ -151,14 +150,14 @@
       "steps": [
         {
           "id": "affut",
-          "objective": "Ce soir, entre 19 h et 21 h, à deux à la fosse du bief: une personne à la canne, l'autre à l'épuisette.",
+          "objective": "Ce soir, entre 19 h et 21 h, à deux à la fosse du bief: l'un à la canne amorcée d'un goujon, l'autre à l'épuisette.",
           "target": {
             "point": "peche-fosse"
           },
           "done": [
             {
-              "type": "scene_seen",
-              "scene": "la-baronne-mord"
+              "type": "remembered",
+              "key": "aubrune.baronne.sortie"
             }
           ],
           "together": false,
@@ -176,6 +175,10 @@
               "key": "aubrune.baronne.affut",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "play_scene",
+              "scene": "la-baronne-alliance"
             }
           ]
         },

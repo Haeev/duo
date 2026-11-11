@@ -55,7 +55,12 @@ const AHEAD = new Set(['lettre']);
  * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
  * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
  */
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>();
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
+  [
+    'baronne',
+    'prise unique qui reste à l’épuisette (`toBag: false`): elle ne passe jamais par le sac ni la boutique',
+  ],
+]);
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):
  * le carnet les montre par leur identifiant (`itemThumb`), elles ont leur vignette aussi.

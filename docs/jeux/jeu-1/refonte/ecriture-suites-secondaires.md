@@ -28,8 +28,8 @@ Trois générations de boulangers ont raté la même perche. Achille dort toujou
 |---|---|---|---|
 | legende | fournil (`gr4`) | dialogue `achille-baronne` | |
 | heure, appat (en parallèle) | `pl` ou `pn-s`; café (`gr6`) | dialogues `jeanne-baronne`, `colette-baronne` | une personne par témoin |
-| goujons | `ponton`, puis Achille | remettre 2 goujons | pêche |
-| affut | fosse du bief (`i2`), **à deux**, de 19 h à 21 h | scène `la-baronne-mord` | scène à gestes |
+| goujons | `ponton`, puis Achille | montrer 2 goujons (dialogue `achille-goujons-merci`); on les garde pour l'appât | pêche |
+| affut | fosse du bief (`i2`), **à deux**, de 19 h à 21 h | la prise unique `baronne` (fait `aubrune.baronne.sortie`), entre les scènes `la-baronne-mord` et `la-baronne-alliance` | pêche à deux (canne amorcée d'un goujon, épuisette) |
 | decision | Achille | dialogue `achille-decision`: relâcher, offrir au café, ou « on en parle d'abord » | décision |
 | epilogue | café | dialogue `colette-epilogue` (une fin par décision) | |
 
@@ -147,7 +147,7 @@ Faits à lire par le rendu, le son et le level design: `aubrune.draisine.sortie`
 2. **La draisine**: aucun véhicule. La suite s'arrête à la scène où on la sort; la course et le raccourci (poste, halte, tunnel) attendent une brique « véhicule sur rail à deux ».
 3. **Récompenses du cahier sans effet pour les donner**: recette (friture, brioche, les six soupes), plan (pétrin, vraie cuisine), entrée de collection (cartes postales, musiques), pièce de tenue (tenues anciennes), instrument jouable, fête (automne, été). Remplacées par de l'argent, des objets existants et de l'amitié.
 4. **Objets d'histoire sans modèle**: plis, clé, alliance, instruments, robe, brioche sont des faits. À créer si l'on veut les tenir: une brioche, une friture, la Baronne (prise unique de la fosse).
-5. **Pêche scénarisée**: la Baronne ne passe pas par le mini-jeu de pêche (pas de prise unique conditionnée ni d'appât); sa touche est une scène à gestes.
+5. **Pêche scénarisée** (livré le 2026-11-11): la Baronne est une prise unique conditionnée (`commun/prises/baronne.json`, bloc `unique`), qui ne mord qu'au goujon et se pêche à deux par le vrai mini-jeu (`src/simulation/peche/a-deux.ts`). Les goujons de la quête restent au sac: ce sont les appâts.
 6. **Points d'intérieur et postes du plan dans l'histoire**: `tests/grands-lieux.test.ts` et `tests/lieux-verrous.test.ts` chargent les quêtes sur la carte brute du plan, sans intérieurs ni postes ajoutés à l'assemblage. Une fiche qui cite `halte-p-guichet`, `clocher-vue`, `guet-moulin`, `peche-fosse`, `siege-tonnelle` ou `mado-enclume` les fait échouer. Les suites ne citent donc que des nœuds du plan: le sac postal s'ouvre sur le seuil de la halte, la montée au clocher est racontée depuis le parvis (comme la trappe de l'acte 3). Quand ces deux essais chargeront la carte assemblée, six `reach` suffisent à rentrer les scènes dans leurs pièces. De même, aucun planning ne mène un habitant dans un intérieur: la nuit, Odette, Marthe et Berthe sont debout à leur poste pendant que le texte les dit couchées.
 7. **Rassemblement**: au concours et au concert, seuls les habitants de la suite viennent (même manque que pour la Veillée).
 8. **« Le lendemain »**: les étapes `nuit` passent par la jauge de sommeil (même fragilité que l'histoire principale).
