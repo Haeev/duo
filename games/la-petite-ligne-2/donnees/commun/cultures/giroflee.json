@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "giroflee",
   "name": "Giroflée",
-  "model": "crop-radis",
+  "model": "crop-giroflee",
   "seed": "graines-giroflee",
   "seasons": ["spring"],
   "stages": [3, 2],

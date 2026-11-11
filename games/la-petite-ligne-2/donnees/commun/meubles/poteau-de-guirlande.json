@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "poteau-de-guirlande",
+  "name": "Poteau de guirlande",
+  "model": "lampion-pole",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

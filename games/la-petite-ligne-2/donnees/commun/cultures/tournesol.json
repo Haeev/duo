@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "tournesol",
   "name": "Tournesol",
-  "model": "crop-radis",
+  "model": "crop-tournesol",
   "seed": "graines-tournesol",
   "seasons": ["summer"],
   "stages": [3, 3],

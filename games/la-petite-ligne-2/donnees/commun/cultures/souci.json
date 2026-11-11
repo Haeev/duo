@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "souci",
   "name": "Souci",
-  "model": "crop-radis",
+  "model": "crop-souci",
   "seed": "graines-souci",
   "seasons": ["spring", "summer", "autumn"],
   "stages": [2, 1],

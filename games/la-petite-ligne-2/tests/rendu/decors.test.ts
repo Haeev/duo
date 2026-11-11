@@ -48,6 +48,7 @@ describe('décors livrés', () => {
     expect(models.size).toBe(Object.keys(DECOR_MANIFEST.models).length);
     expect(decorFiles()).toEqual([
       'aubrune-arbres.glb',
+      'aubrune-fetes.glb',
       'aubrune-lisieres.glb',
       'aubrune-luminaires.glb',
       'aubrune-meubles.glb',

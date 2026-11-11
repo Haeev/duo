@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "pensee",
   "name": "Pensée",
-  "model": "crop-radis",
+  "model": "crop-pensee",
   "seed": "graines-pensee",
   "seasons": ["autumn", "winter", "spring"],
   "stages": [3, 2],

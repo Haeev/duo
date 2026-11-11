@@ -1,14 +1,98 @@
 {
   "crops": {
+    "crop-bleuet": {
+      "crop": "bleuet",
+      "stages": ["crop-bleuet-0", "crop-bleuet-1", "crop-bleuet-2"],
+      "thirsty": ["crop-bleuet-0-thirsty", "crop-bleuet-1-thirsty"]
+    },
+    "crop-capucine": {
+      "crop": "capucine",
+      "stages": ["crop-capucine-0", "crop-capucine-1", "crop-capucine-2"],
+      "thirsty": ["crop-capucine-0-thirsty", "crop-capucine-1-thirsty"]
+    },
+    "crop-carotte": {
+      "crop": "carotte",
+      "stages": ["crop-carotte-0", "crop-carotte-1", "crop-carotte-2", "crop-carotte-3"],
+      "thirsty": ["crop-carotte-0-thirsty", "crop-carotte-1-thirsty", "crop-carotte-2-thirsty"]
+    },
+    "crop-giroflee": {
+      "crop": "giroflee",
+      "stages": ["crop-giroflee-0", "crop-giroflee-1", "crop-giroflee-2"],
+      "thirsty": ["crop-giroflee-0-thirsty", "crop-giroflee-1-thirsty"]
+    },
+    "crop-marguerite": {
+      "crop": "marguerite",
+      "stages": ["crop-marguerite-0", "crop-marguerite-1", "crop-marguerite-2"],
+      "thirsty": ["crop-marguerite-0-thirsty", "crop-marguerite-1-thirsty"]
+    },
+    "crop-muguet": {
+      "crop": "muguet",
+      "stages": ["crop-muguet-0", "crop-muguet-1", "crop-muguet-2"],
+      "thirsty": ["crop-muguet-0-thirsty", "crop-muguet-1-thirsty"]
+    },
+    "crop-nigelle": {
+      "crop": "nigelle",
+      "stages": ["crop-nigelle-0", "crop-nigelle-1", "crop-nigelle-2"],
+      "thirsty": ["crop-nigelle-0-thirsty", "crop-nigelle-1-thirsty"]
+    },
+    "crop-oeillet-de-poete": {
+      "crop": "oeillet-de-poete",
+      "stages": ["crop-oeillet-de-poete-0", "crop-oeillet-de-poete-1", "crop-oeillet-de-poete-2"],
+      "thirsty": ["crop-oeillet-de-poete-0-thirsty", "crop-oeillet-de-poete-1-thirsty"]
+    },
+    "crop-pensee": {
+      "crop": "pensee",
+      "stages": ["crop-pensee-0", "crop-pensee-1", "crop-pensee-2"],
+      "thirsty": ["crop-pensee-0-thirsty", "crop-pensee-1-thirsty"]
+    },
+    "crop-poireau": {
+      "crop": "poireau",
+      "stages": ["crop-poireau-0", "crop-poireau-1", "crop-poireau-2", "crop-poireau-3"],
+      "thirsty": ["crop-poireau-0-thirsty", "crop-poireau-1-thirsty", "crop-poireau-2-thirsty"]
+    },
+    "crop-pomme-de-terre": {
+      "crop": "pomme-de-terre",
+      "stages": [
+        "crop-pomme-de-terre-0",
+        "crop-pomme-de-terre-1",
+        "crop-pomme-de-terre-2",
+        "crop-pomme-de-terre-3"
+      ],
+      "thirsty": [
+        "crop-pomme-de-terre-0-thirsty",
+        "crop-pomme-de-terre-1-thirsty",
+        "crop-pomme-de-terre-2-thirsty"
+      ]
+    },
     "crop-radis": {
       "crop": "radis",
       "stages": ["crop-radis-0", "crop-radis-1", "crop-radis-2"],
       "thirsty": ["crop-radis-0-thirsty", "crop-radis-1-thirsty"]
     },
+    "crop-rose-des-lacombe": {
+      "crop": "rose-des-lacombe",
+      "stages": ["crop-rose-des-lacombe-0", "crop-rose-des-lacombe-1", "crop-rose-des-lacombe-2"],
+      "thirsty": ["crop-rose-des-lacombe-0-thirsty", "crop-rose-des-lacombe-1-thirsty"]
+    },
+    "crop-souci": {
+      "crop": "souci",
+      "stages": ["crop-souci-0", "crop-souci-1", "crop-souci-2"],
+      "thirsty": ["crop-souci-0-thirsty", "crop-souci-1-thirsty"]
+    },
     "crop-tomate": {
       "crop": "tomate",
       "stages": ["crop-tomate-0", "crop-tomate-1", "crop-tomate-2", "crop-tomate-3"],
       "thirsty": ["crop-tomate-0-thirsty", "crop-tomate-1-thirsty", "crop-tomate-2-thirsty"]
+    },
+    "crop-tournesol": {
+      "crop": "tournesol",
+      "stages": ["crop-tournesol-0", "crop-tournesol-1", "crop-tournesol-2"],
+      "thirsty": ["crop-tournesol-0-thirsty", "crop-tournesol-1-thirsty"]
+    },
+    "crop-violette": {
+      "crop": "violette",
+      "stages": ["crop-violette-0", "crop-violette-1", "crop-violette-2"],
+      "thirsty": ["crop-violette-0-thirsty", "crop-violette-1-thirsty"]
     }
   },
   "format": "duo-decors/1",
@@ -505,6 +589,27 @@
         "ecorce": 312
       }
     },
+    "bandstand": {
+      "bottom": 0.0,
+      "budget": 1100,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "estrade de la fanfare (4 x 3 cases): plancher à 60 cm, marches devant, cordon de fanions, chaises, pupitres et grosse caisse",
+      "size": {
+        "d": 2.994,
+        "h": 2.554,
+        "w": 3.807
+      },
+      "source": "recoltables-aubrune",
+      "top": 0.6,
+      "triangles": 610,
+      "trianglesParMateriau": {
+        "bardage": 8,
+        "bois": 476,
+        "etoffe": 92,
+        "metal": 34
+      }
+    },
     "bank": {
       "bottom": 0.0,
       "budget": 60,
@@ -604,6 +709,27 @@
         "pierre": 18,
         "terre": 6,
         "tige": 4
+      }
+    },
+    "banquet-table": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "grande table du banquet (3 cases): nappe, bols de soupe, pain, pichets, la tourte au milieu; les bancs à côté",
+      "size": {
+        "d": 0.888,
+        "h": 0.968,
+        "w": 2.88
+      },
+      "source": "recoltables-aubrune",
+      "top": 0.76,
+      "triangles": 414,
+      "trianglesParMateriau": {
+        "bois": 50,
+        "etoffe": 26,
+        "fruit": 74,
+        "vitre": 264
       }
     },
     "barrel": {
@@ -1228,6 +1354,30 @@
         "tige": 36
       }
     },
+    "brazier": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "light": {
+        "at": [0.0, 0.95, 0.0],
+        "color": "#E2843A",
+        "gain": 0.8,
+        "radius": 3.6
+      },
+      "pourquoi": "brasero de Mado sur le quai, la veillée d'hiver: on s'y chauffe les mains, les pommes de terre cuisent dans la braise",
+      "size": {
+        "d": 0.727,
+        "h": 1.094,
+        "w": 0.742
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "flamme": 41,
+        "metal": 91
+      }
+    },
     "bread-basket": {
       "bottom": 0.0,
       "budget": 150,
@@ -1350,6 +1500,24 @@
       },
       "triangles": 844
     },
+    "chalk-board": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "ardoise à craie sur chevalet: la devise de la veillée, le menu du banquet; penchée pour se lire debout",
+      "size": {
+        "d": 0.621,
+        "h": 1.504,
+        "w": 0.767
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 150,
+      "trianglesParMateriau": {
+        "bois": 90,
+        "etoffe": 60
+      }
+    },
     "chest": {
       "bottom": 0.0,
       "budget": 1200,
@@ -1454,18 +1622,19 @@
       "budget": 600,
       "family": "meuble",
       "file": "aubrune-meubles.glb",
-      "pourquoi": "comptoir du fournil: corbeille de miches et baguettes",
+      "pourquoi": "vitrine du fournil: bas de bois, caisse vitrée à cadre de bois et dessus de verre, les pains dedans, vus du client et de la caméra",
       "size": {
         "d": 0.683,
-        "h": 1.151,
+        "h": 1.193,
         "w": 1.905
       },
       "source": "recoltables-aubrune",
-      "top": 0.98,
-      "triangles": 172,
+      "top": 1.18,
+      "triangles": 354,
       "trianglesParMateriau": {
-        "bois": 70,
-        "fruit": 102
+        "bois": 172,
+        "fruit": 170,
+        "vitre": 12
       }
     },
     "comptoir-mercerie": {
@@ -1506,6 +1675,1382 @@
       },
       "top": 0.6,
       "triangles": 684
+    },
+    "crop-bleuet-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.662,
+        "h": 0.168,
+        "w": 0.234
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-bleuet",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-bleuet-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.662,
+        "h": 0.168,
+        "w": 0.234
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-bleuet",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-bleuet-1": {
+      "bottom": 0.1426,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.734,
+        "h": 0.669,
+        "w": 0.325
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-bleuet",
+        "state": "growing"
+      },
+      "triangles": 204,
+      "trianglesParMateriau": {
+        "fleur": 72,
+        "tige": 132
+      }
+    },
+    "crop-bleuet-1-thirsty": {
+      "bottom": 0.1409,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.949,
+        "h": 0.566,
+        "w": 0.547
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-bleuet",
+        "state": "thirsty"
+      },
+      "triangles": 204,
+      "trianglesParMateriau": {
+        "fleur": 72,
+        "tige": 132
+      }
+    },
+    "crop-bleuet-2": {
+      "bottom": 0.1429,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.802,
+        "h": 0.793,
+        "w": 0.394
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-bleuet",
+        "state": "ripe"
+      },
+      "triangles": 432,
+      "trianglesParMateriau": {
+        "fleur": 288,
+        "tige": 144
+      }
+    },
+    "crop-capucine-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.68,
+        "h": 0.168,
+        "w": 0.2
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-capucine",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-capucine-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.68,
+        "h": 0.168,
+        "w": 0.2
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-capucine",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-capucine-1": {
+      "bottom": 0.1419,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.795,
+        "h": 0.436,
+        "w": 0.378
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-capucine",
+        "state": "growing"
+      },
+      "triangles": 288,
+      "trianglesParMateriau": {
+        "fleur": 72,
+        "tige": 216
+      }
+    },
+    "crop-capucine-1-thirsty": {
+      "bottom": 0.1399,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.848,
+        "h": 0.384,
+        "w": 0.386
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-capucine",
+        "state": "thirsty"
+      },
+      "triangles": 288,
+      "trianglesParMateriau": {
+        "fleur": 72,
+        "tige": 216
+      }
+    },
+    "crop-capucine-2": {
+      "bottom": 0.1423,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.904,
+        "h": 0.532,
+        "w": 0.535
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-capucine",
+        "state": "ripe"
+      },
+      "triangles": 414,
+      "trianglesParMateriau": {
+        "fleur": 126,
+        "tige": 288
+      }
+    },
+    "crop-carotte-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.669,
+        "h": 0.165,
+        "w": 0.667
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "growing"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-carotte-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.669,
+        "h": 0.165,
+        "w": 0.667
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "thirsty"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-carotte-1": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.876,
+        "h": 0.303,
+        "w": 0.832
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "growing"
+      },
+      "triangles": 384,
+      "trianglesParMateriau": {
+        "tige": 384
+      }
+    },
+    "crop-carotte-1-thirsty": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.971,
+        "h": 0.222,
+        "w": 0.934
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "thirsty"
+      },
+      "triangles": 384,
+      "trianglesParMateriau": {
+        "tige": 384
+      }
+    },
+    "crop-carotte-2": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.958,
+        "h": 0.343,
+        "w": 0.959
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "growing"
+      },
+      "triangles": 576,
+      "trianglesParMateriau": {
+        "tige": 576
+      }
+    },
+    "crop-carotte-2-thirsty": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 1.093,
+        "h": 0.241,
+        "w": 1.079
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "thirsty"
+      },
+      "triangles": 576,
+      "trianglesParMateriau": {
+        "tige": 576
+      }
+    },
+    "crop-carotte-3": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 1.026,
+        "h": 0.383,
+        "w": 1.034
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-carotte",
+        "state": "ripe"
+      },
+      "triangles": 744,
+      "trianglesParMateriau": {
+        "fruit": 168,
+        "tige": 576
+      }
+    },
+    "crop-giroflee-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.692,
+        "h": 0.168,
+        "w": 0.156
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-giroflee",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-giroflee-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.692,
+        "h": 0.168,
+        "w": 0.156
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-giroflee",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-giroflee-1": {
+      "bottom": 0.1427,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.803,
+        "h": 0.476,
+        "w": 0.333
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-giroflee",
+        "state": "growing"
+      },
+      "triangles": 384,
+      "trianglesParMateriau": {
+        "fleur": 240,
+        "tige": 144
+      }
+    },
+    "crop-giroflee-1-thirsty": {
+      "bottom": 0.1411,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.843,
+        "h": 0.407,
+        "w": 0.385
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-giroflee",
+        "state": "thirsty"
+      },
+      "triangles": 384,
+      "trianglesParMateriau": {
+        "fleur": 240,
+        "tige": 144
+      }
+    },
+    "crop-giroflee-2": {
+      "bottom": 0.143,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.869,
+        "h": 0.593,
+        "w": 0.336
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-giroflee",
+        "state": "ripe"
+      },
+      "triangles": 432,
+      "trianglesParMateriau": {
+        "fleur": 240,
+        "tige": 192
+      }
+    },
+    "crop-marguerite-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.675,
+        "h": 0.168,
+        "w": 0.241
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-marguerite",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-marguerite-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.675,
+        "h": 0.168,
+        "w": 0.241
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-marguerite",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-marguerite-1": {
+      "bottom": 0.1431,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.782,
+        "h": 0.596,
+        "w": 0.339
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-marguerite",
+        "state": "growing"
+      },
+      "triangles": 192,
+      "trianglesParMateriau": {
+        "fleur": 48,
+        "tige": 144
+      }
+    },
+    "crop-marguerite-1-thirsty": {
+      "bottom": 0.1419,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.856,
+        "h": 0.512,
+        "w": 0.454
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-marguerite",
+        "state": "thirsty"
+      },
+      "triangles": 192,
+      "trianglesParMateriau": {
+        "fleur": 48,
+        "tige": 144
+      }
+    },
+    "crop-marguerite-2": {
+      "bottom": 0.1432,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.844,
+        "h": 0.689,
+        "w": 0.414
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-marguerite",
+        "state": "ripe"
+      },
+      "triangles": 408,
+      "trianglesParMateriau": {
+        "fleur": 216,
+        "tige": 192
+      }
+    },
+    "crop-muguet-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.658,
+        "h": 0.168,
+        "w": 0.641
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-muguet",
+        "state": "growing"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-muguet-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.658,
+        "h": 0.168,
+        "w": 0.641
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-muguet",
+        "state": "thirsty"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-muguet-1": {
+      "bottom": 0.1428,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.817,
+        "h": 0.344,
+        "w": 0.774
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-muguet",
+        "state": "growing"
+      },
+      "triangles": 444,
+      "trianglesParMateriau": {
+        "fleur": 240,
+        "tige": 204
+      }
+    },
+    "crop-muguet-1-thirsty": {
+      "bottom": 0.1428,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.851,
+        "h": 0.344,
+        "w": 0.846
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-muguet",
+        "state": "thirsty"
+      },
+      "triangles": 444,
+      "trianglesParMateriau": {
+        "fleur": 240,
+        "tige": 204
+      }
+    },
+    "crop-muguet-2": {
+      "bottom": 0.143,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.876,
+        "h": 0.409,
+        "w": 0.893
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-muguet",
+        "state": "ripe"
+      },
+      "triangles": 444,
+      "trianglesParMateriau": {
+        "fleur": 240,
+        "tige": 204
+      }
+    },
+    "crop-nigelle-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.677,
+        "h": 0.168,
+        "w": 0.274
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-nigelle",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-nigelle-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.677,
+        "h": 0.168,
+        "w": 0.274
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-nigelle",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-nigelle-1": {
+      "bottom": 0.1429,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.724,
+        "h": 0.557,
+        "w": 0.247
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-nigelle",
+        "state": "growing"
+      },
+      "triangles": 144,
+      "trianglesParMateriau": {
+        "fleur": 48,
+        "tige": 96
+      }
+    },
+    "crop-nigelle-1-thirsty": {
+      "bottom": 0.1407,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.879,
+        "h": 0.48,
+        "w": 0.314
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-nigelle",
+        "state": "thirsty"
+      },
+      "triangles": 144,
+      "trianglesParMateriau": {
+        "fleur": 48,
+        "tige": 96
+      }
+    },
+    "crop-nigelle-2": {
+      "bottom": 0.143,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.872,
+        "h": 0.645,
+        "w": 0.375
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-nigelle",
+        "state": "ripe"
+      },
+      "triangles": 324,
+      "trianglesParMateriau": {
+        "fleur": 144,
+        "tige": 180
+      }
+    },
+    "crop-oeillet-de-poete-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.664,
+        "h": 0.168,
+        "w": 0.243
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-oeillet-de-poete",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-oeillet-de-poete-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.664,
+        "h": 0.168,
+        "w": 0.243
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-oeillet-de-poete",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-oeillet-de-poete-1": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.768,
+        "h": 0.523,
+        "w": 0.362
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-oeillet-de-poete",
+        "state": "growing"
+      },
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "fleur": 24,
+        "tige": 108
+      }
+    },
+    "crop-oeillet-de-poete-1-thirsty": {
+      "bottom": 0.1417,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.828,
+        "h": 0.454,
+        "w": 0.392
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-oeillet-de-poete",
+        "state": "thirsty"
+      },
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "fleur": 24,
+        "tige": 108
+      }
+    },
+    "crop-oeillet-de-poete-2": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.82,
+        "h": 0.577,
+        "w": 0.439
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-oeillet-de-poete",
+        "state": "ripe"
+      },
+      "triangles": 342,
+      "trianglesParMateriau": {
+        "fleur": 186,
+        "tige": 156
+      }
+    },
+    "crop-pensee-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.707,
+        "h": 0.168,
+        "w": 0.601
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pensee",
+        "state": "growing"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-pensee-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.707,
+        "h": 0.168,
+        "w": 0.601
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pensee",
+        "state": "thirsty"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-pensee-1": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.693,
+        "h": 0.312,
+        "w": 0.607
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pensee",
+        "state": "growing"
+      },
+      "triangles": 264,
+      "trianglesParMateriau": {
+        "fleur": 48,
+        "tige": 216
+      }
+    },
+    "crop-pensee-1-thirsty": {
+      "bottom": 0.1418,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.711,
+        "h": 0.286,
+        "w": 0.617
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pensee",
+        "state": "thirsty"
+      },
+      "triangles": 264,
+      "trianglesParMateriau": {
+        "fleur": 48,
+        "tige": 216
+      }
+    },
+    "crop-pensee-2": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.716,
+        "h": 0.325,
+        "w": 0.641
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pensee",
+        "state": "ripe"
+      },
+      "triangles": 396,
+      "trianglesParMateriau": {
+        "fleur": 84,
+        "tige": 312
+      }
+    },
+    "crop-poireau-0": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.668,
+        "h": 0.244,
+        "w": 0.624
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "growing"
+      },
+      "triangles": 24,
+      "trianglesParMateriau": {
+        "tige": 24
+      }
+    },
+    "crop-poireau-0-thirsty": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.668,
+        "h": 0.244,
+        "w": 0.624
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "thirsty"
+      },
+      "triangles": 24,
+      "trianglesParMateriau": {
+        "tige": 24
+      }
+    },
+    "crop-poireau-1": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.907,
+        "h": 0.368,
+        "w": 0.877
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "growing"
+      },
+      "triangles": 222,
+      "trianglesParMateriau": {
+        "fruit": 78,
+        "tige": 144
+      }
+    },
+    "crop-poireau-1-thirsty": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.929,
+        "h": 0.37,
+        "w": 0.905
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "thirsty"
+      },
+      "triangles": 222,
+      "trianglesParMateriau": {
+        "fruit": 78,
+        "tige": 144
+      }
+    },
+    "crop-poireau-2": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.988,
+        "h": 0.439,
+        "w": 0.982
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "growing"
+      },
+      "triangles": 318,
+      "trianglesParMateriau": {
+        "fruit": 78,
+        "tige": 240
+      }
+    },
+    "crop-poireau-2-thirsty": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 1.024,
+        "h": 0.441,
+        "w": 1.015
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "thirsty"
+      },
+      "triangles": 318,
+      "trianglesParMateriau": {
+        "fruit": 78,
+        "tige": 240
+      }
+    },
+    "crop-poireau-3": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 1.072,
+        "h": 0.59,
+        "w": 1.075
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-poireau",
+        "state": "ripe"
+      },
+      "triangles": 318,
+      "trianglesParMateriau": {
+        "fruit": 78,
+        "tige": 240
+      }
+    },
+    "crop-pomme-de-terre-0": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.685,
+        "h": 0.168,
+        "w": 0.22
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "growing"
+      },
+      "triangles": 72,
+      "trianglesParMateriau": {
+        "terre": 24,
+        "tige": 48
+      }
+    },
+    "crop-pomme-de-terre-0-thirsty": {
+      "bottom": 0.1336,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.685,
+        "h": 0.168,
+        "w": 0.22
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "thirsty"
+      },
+      "triangles": 72,
+      "trianglesParMateriau": {
+        "terre": 24,
+        "tige": 48
+      }
+    },
+    "crop-pomme-de-terre-1": {
+      "bottom": 0.0851,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.88,
+        "h": 0.239,
+        "w": 0.496
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "growing"
+      },
+      "triangles": 76,
+      "trianglesParMateriau": {
+        "feuillage": 76
+      }
+    },
+    "crop-pomme-de-terre-1-thirsty": {
+      "bottom": 0.0553,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.921,
+        "h": 0.169,
+        "w": 0.59
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "thirsty"
+      },
+      "triangles": 76,
+      "trianglesParMateriau": {
+        "feuillage": 76
+      }
+    },
+    "crop-pomme-de-terre-2": {
+      "bottom": 0.0731,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.983,
+        "h": 0.275,
+        "w": 0.583
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "growing"
+      },
+      "triangles": 410,
+      "trianglesParMateriau": {
+        "feuillage": 158,
+        "fleur": 252
+      }
+    },
+    "crop-pomme-de-terre-2-thirsty": {
+      "bottom": 0.0373,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.999,
+        "h": 0.174,
+        "w": 0.688
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "thirsty"
+      },
+      "triangles": 158,
+      "trianglesParMateriau": {
+        "feuillage": 158
+      }
+    },
+    "crop-pomme-de-terre-3": {
+      "bottom": 0.0612,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 1.051,
+        "h": 0.278,
+        "w": 0.661
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-pomme-de-terre",
+        "state": "ripe"
+      },
+      "triangles": 261,
+      "trianglesParMateriau": {
+        "feuillage": 158,
+        "fruit": 103
+      }
     },
     "crop-radis-0": {
       "bottom": 0.1556,
@@ -1616,6 +3161,232 @@
       "trianglesParMateriau": {
         "fruit": 48,
         "tige": 288
+      }
+    },
+    "crop-rose-des-lacombe-0": {
+      "bottom": 0.1556,
+      "budget": 260,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 1,
+      "size": {
+        "d": 0.098,
+        "h": 0.168,
+        "w": 0.066
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-rose-des-lacombe",
+        "state": "growing"
+      },
+      "triangles": 16,
+      "trianglesParMateriau": {
+        "tige": 16
+      }
+    },
+    "crop-rose-des-lacombe-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 260,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 1,
+      "size": {
+        "d": 0.098,
+        "h": 0.168,
+        "w": 0.066
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-rose-des-lacombe",
+        "state": "thirsty"
+      },
+      "triangles": 16,
+      "trianglesParMateriau": {
+        "tige": 16
+      }
+    },
+    "crop-rose-des-lacombe-1": {
+      "bottom": 0.2474,
+      "budget": 260,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 1,
+      "size": {
+        "d": 0.519,
+        "h": 0.645,
+        "w": 0.627
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-rose-des-lacombe",
+        "state": "growing"
+      },
+      "triangles": 86,
+      "trianglesParMateriau": {
+        "feuillage": 54,
+        "fleur": 32
+      }
+    },
+    "crop-rose-des-lacombe-1-thirsty": {
+      "bottom": 0.2256,
+      "budget": 260,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 1,
+      "size": {
+        "d": 0.675,
+        "h": 0.583,
+        "w": 0.773
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-rose-des-lacombe",
+        "state": "thirsty"
+      },
+      "triangles": 86,
+      "trianglesParMateriau": {
+        "feuillage": 54,
+        "fleur": 32
+      }
+    },
+    "crop-rose-des-lacombe-2": {
+      "bottom": 0.3839,
+      "budget": 260,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 1,
+      "size": {
+        "d": 0.757,
+        "h": 0.776,
+        "w": 0.864
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-rose-des-lacombe",
+        "state": "ripe"
+      },
+      "triangles": 186,
+      "trianglesParMateriau": {
+        "feuillage": 82,
+        "fleur": 104
+      }
+    },
+    "crop-souci-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.685,
+        "h": 0.168,
+        "w": 0.208
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-souci",
+        "state": "growing"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-souci-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.685,
+        "h": 0.168,
+        "w": 0.208
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-souci",
+        "state": "thirsty"
+      },
+      "triangles": 48,
+      "trianglesParMateriau": {
+        "tige": 48
+      }
+    },
+    "crop-souci-1": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.772,
+        "h": 0.499,
+        "w": 0.309
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-souci",
+        "state": "growing"
+      },
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "fleur": 24,
+        "tige": 108
+      }
+    },
+    "crop-souci-1-thirsty": {
+      "bottom": 0.1415,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.791,
+        "h": 0.436,
+        "w": 0.336
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-souci",
+        "state": "thirsty"
+      },
+      "triangles": 132,
+      "trianglesParMateriau": {
+        "fleur": 24,
+        "tige": 108
+      }
+    },
+    "crop-souci-2": {
+      "bottom": 0.1436,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 3,
+      "size": {
+        "d": 0.886,
+        "h": 0.566,
+        "w": 0.358
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-souci",
+        "state": "ripe"
+      },
+      "triangles": 312,
+      "trianglesParMateriau": {
+        "fleur": 156,
+        "tige": 156
       }
     },
     "crop-tomate-0": {
@@ -1783,6 +3554,253 @@
         "feuillage": 157,
         "fruit": 96,
         "tige": 24
+      }
+    },
+    "crop-tournesol-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 2,
+      "size": {
+        "d": 0.67,
+        "h": 0.168,
+        "w": 0.487
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-tournesol",
+        "state": "growing"
+      },
+      "triangles": 32,
+      "trianglesParMateriau": {
+        "tige": 32
+      }
+    },
+    "crop-tournesol-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 2,
+      "size": {
+        "d": 0.67,
+        "h": 0.168,
+        "w": 0.487
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-tournesol",
+        "state": "thirsty"
+      },
+      "triangles": 32,
+      "trianglesParMateriau": {
+        "tige": 32
+      }
+    },
+    "crop-tournesol-1": {
+      "bottom": 0.143,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 2,
+      "size": {
+        "d": 0.829,
+        "h": 1.394,
+        "w": 0.74
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-tournesol",
+        "state": "growing"
+      },
+      "triangles": 160,
+      "trianglesParMateriau": {
+        "fleur": 16,
+        "tige": 144
+      }
+    },
+    "crop-tournesol-1-thirsty": {
+      "bottom": 0.1429,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 2,
+      "size": {
+        "d": 0.857,
+        "h": 1.214,
+        "w": 0.722
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-tournesol",
+        "state": "thirsty"
+      },
+      "triangles": 160,
+      "trianglesParMateriau": {
+        "fleur": 16,
+        "tige": 144
+      }
+    },
+    "crop-tournesol-2": {
+      "bottom": 0.1431,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 2,
+      "size": {
+        "d": 0.943,
+        "h": 1.88,
+        "w": 0.813
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-tournesol",
+        "state": "ripe"
+      },
+      "triangles": 296,
+      "trianglesParMateriau": {
+        "fleur": 120,
+        "tige": 176
+      }
+    },
+    "crop-violette-0": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.711,
+        "h": 0.168,
+        "w": 0.641
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-violette",
+        "state": "growing"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-violette-0-thirsty": {
+      "bottom": 0.1556,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.711,
+        "h": 0.168,
+        "w": 0.641
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-violette",
+        "state": "thirsty"
+      },
+      "triangles": 96,
+      "trianglesParMateriau": {
+        "tige": 96
+      }
+    },
+    "crop-violette-1": {
+      "bottom": 0.1415,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.723,
+        "h": 0.278,
+        "w": 0.644
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-violette",
+        "state": "growing"
+      },
+      "triangles": 384,
+      "trianglesParMateriau": {
+        "fleur": 96,
+        "tige": 288
+      }
+    },
+    "crop-violette-1-thirsty": {
+      "bottom": 0.1404,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.755,
+        "h": 0.257,
+        "w": 0.656
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-violette",
+        "state": "thirsty"
+      },
+      "triangles": 384,
+      "trianglesParMateriau": {
+        "fleur": 96,
+        "tige": 288
+      }
+    },
+    "crop-violette-2": {
+      "bottom": 0.142,
+      "budget": 150,
+      "cell": true,
+      "family": "culture",
+      "file": "aubrune-potager.glb",
+      "plants": 6,
+      "size": {
+        "d": 0.761,
+        "h": 0.294,
+        "w": 0.692
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "crop-violette",
+        "state": "ripe"
+      },
+      "triangles": 552,
+      "trianglesParMateriau": {
+        "fleur": 168,
+        "tige": 384
+      }
+    },
+    "crossing-gate-flowered": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "lisse du passage à niveau baissée en travers de la route (5 cases), enroulée de fleurs: la Fête des barrières fleuries",
+      "size": {
+        "d": 0.49,
+        "h": 1.141,
+        "w": 4.883
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 356,
+      "trianglesParMateriau": {
+        "bois": 112,
+        "etoffe": 8,
+        "fleur": 120,
+        "metal": 60,
+        "tige": 56
       }
     },
     "cuisiniere": {
@@ -2026,6 +4044,108 @@
         "w": 2.02
       },
       "triangles": 464
+    },
+    "festival-banner": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "banderole tendue entre deux perches (4 cases) au-dessus du passage: le nom de la fête, face au sud",
+      "size": {
+        "d": 0.129,
+        "h": 3.202,
+        "w": 3.933
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 220,
+      "trianglesParMateriau": {
+        "bois": 20,
+        "etoffe": 184,
+        "metal": 16
+      }
+    },
+    "festival-candle": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "light": {
+        "at": [0.0, 0.13, 0.0],
+        "color": "#F2A65A",
+        "gain": 0.55,
+        "radius": 1.8
+      },
+      "pourquoi": "lumignon de la Nuit des lumignons: cire coulée dans une coquille d'œuf, sur une soucoupe; une lumière par âme, posée là où elle compte",
+      "size": {
+        "d": 0.19,
+        "h": 0.168,
+        "w": 0.19
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 84,
+      "trianglesParMateriau": {
+        "bois": 7,
+        "flamme": 8,
+        "terre": 22,
+        "vitre": 47
+      }
+    },
+    "festival-cauldron": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "light": {
+        "at": [0.0, 0.25, 0.0],
+        "color": "#E2843A",
+        "gain": 0.75,
+        "radius": 3.2
+      },
+      "pourquoi": "grand chaudron du concours de la soupe (2 x 2 cases), pendu au trépied au-dessus d'un feu cerclé de pierres",
+      "size": {
+        "d": 1.613,
+        "h": 1.911,
+        "w": 1.605
+      },
+      "source": "recoltables-aubrune",
+      "states": {
+        "bare": "festival-cauldron-bare"
+      },
+      "triangles": 346,
+      "trianglesParMateriau": {
+        "bois": 64,
+        "flamme": 20,
+        "metal": 158,
+        "pierre": 104
+      }
+    },
+    "festival-cauldron-bare": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "light": {
+        "at": [0.0, 0.25, 0.0],
+        "color": "#E2843A",
+        "gain": 0.75,
+        "radius": 3.2
+      },
+      "size": {
+        "d": 1.613,
+        "h": 1.911,
+        "w": 1.605
+      },
+      "source": "recoltables-aubrune",
+      "stateOf": {
+        "model": "festival-cauldron",
+        "state": "bare"
+      },
+      "triangles": 326,
+      "trianglesParMateriau": {
+        "bois": 64,
+        "metal": 158,
+        "pierre": 104
+      }
     },
     "field-row": {
       "bottom": 0.0,
@@ -2457,6 +4577,49 @@
         "w": 0.432
       },
       "triangles": 504
+    },
+    "lampion-garland": {
+      "bottom": 0.0003,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "light": {
+        "at": [0.0, 2.3, 0.04],
+        "color": "#F2B46A",
+        "gain": 0.5,
+        "radius": 4.0
+      },
+      "pourquoi": "guirlande de lampions (4 cases): poteau à l'ouest, sept lampions jusqu'au poteau suivant; 2,4 m au plus bas, on passe dessous",
+      "size": {
+        "d": 0.2,
+        "h": 3.052,
+        "w": 3.96
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 528,
+      "trianglesParMateriau": {
+        "bois": 10,
+        "flamme": 392,
+        "metal": 126
+      }
+    },
+    "lampion-pole": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "poteau qui ferme une file de guirlandes à l'est",
+      "size": {
+        "d": 0.127,
+        "h": 3.05,
+        "w": 0.094
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 18,
+      "trianglesParMateriau": {
+        "bois": 10,
+        "metal": 8
+      }
     },
     "laundry-basket": {
       "bottom": 0.0,
@@ -3138,6 +5301,63 @@
         "metal": 8,
         "tige": 6,
         "tuile": 20
+      }
+    },
+    "rail-bed": {
+      "bottom": 0.0,
+      "budget": 240,
+      "family": "voie",
+      "file": "aubrune-lisieres.glb",
+      "pourquoi": "un mètre de voie au ras du pré: ballast et fossés",
+      "size": {
+        "d": 1.0,
+        "h": 0.12,
+        "w": 7.0
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 90,
+      "trianglesParMateriau": {
+        "pierre": 60,
+        "terre": 30
+      }
+    },
+    "rail-cutting": {
+      "bottom": 0.0,
+      "budget": 240,
+      "family": "voie",
+      "file": "aubrune-lisieres.glb",
+      "pourquoi": "un mètre de voie en tranchée: ballast sous les traverses du jeu, fossés d'eau, talus de 1,6 m",
+      "size": {
+        "d": 1.0,
+        "h": 1.6,
+        "w": 14.4
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 148,
+      "trianglesParMateriau": {
+        "feuillage": 30,
+        "pierre": 72,
+        "terre": 46
+      },
+      "variants": ["rail-cutting-b"]
+    },
+    "rail-cutting-b": {
+      "bottom": 0.0,
+      "budget": 240,
+      "family": "voie",
+      "file": "aubrune-lisieres.glb",
+      "pourquoi": "un mètre de voie en tranchée: ballast sous les traverses du jeu, fossés d'eau, talus de 1,6 m",
+      "size": {
+        "d": 1.0,
+        "h": 1.6,
+        "w": 14.4
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 145,
+      "trianglesParMateriau": {
+        "feuillage": 30,
+        "pierre": 69,
+        "terre": 46
       }
     },
     "railcar": {
@@ -3840,6 +6060,25 @@
         "vitre": 8
       }
     },
+    "tapped-barrel": {
+      "bottom": 0.0,
+      "budget": 600,
+      "family": "fete",
+      "file": "aubrune-fetes.glb",
+      "pourquoi": "tonneau de cidre du café mis en perce sur la route: debout sur son chantier, robinet devant, cruche dessous",
+      "size": {
+        "d": 0.813,
+        "h": 1.11,
+        "w": 0.688
+      },
+      "source": "recoltables-aubrune",
+      "triangles": 315,
+      "trianglesParMateriau": {
+        "bois": 108,
+        "metal": 108,
+        "vitre": 99
+      }
+    },
     "tin-canisters": {
       "bottom": 0.0,
       "budget": 150,
@@ -4102,16 +6341,18 @@
       "file": "aubrune-ouvrages.glb",
       "pourquoi": "tête du tunnel (8 m): la voie entre par l'arc dans l'axe z, le coteau au-dessus",
       "size": {
-        "d": 7.05,
-        "h": 8.6,
-        "w": 24.0
+        "d": 18.7,
+        "h": 10.734,
+        "w": 30.0
       },
       "source": "recoltables-aubrune",
-      "triangles": 399,
+      "triangles": 2217,
       "trianglesParMateriau": {
-        "gazon": 10,
+        "ecorce": 26,
+        "feuillage": 813,
+        "gazon": 348,
         "moellon": 120,
-        "pierre": 269
+        "pierre": 910
       }
     },
     "vegetable-crate": {

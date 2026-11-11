@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "guirlande-de-lampions",
+  "name": "Guirlande de lampions",
+  "model": "lampion-garland",
+  "size": {
+    "w": 4,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

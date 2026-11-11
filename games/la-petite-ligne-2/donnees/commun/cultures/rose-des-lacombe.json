@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "rose-des-lacombe",
   "name": "Rose des Lacombe",
-  "model": "crop-radis",
+  "model": "crop-rose-des-lacombe",
   "seed": "bouture-de-rosier",
   "seasons": ["spring", "summer", "autumn"],
   "stages": [4, 3],

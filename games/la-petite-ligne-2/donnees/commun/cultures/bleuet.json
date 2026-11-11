@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "bleuet",
   "name": "Bleuet",
-  "model": "crop-radis",
+  "model": "crop-bleuet",
   "seed": "graines-bleuet",
   "seasons": ["spring", "summer"],
   "stages": [2, 2],

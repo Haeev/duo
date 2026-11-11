@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "tonneau-en-perce",
+  "name": "Tonneau en perce",
+  "model": "tapped-barrel",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

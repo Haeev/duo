@@ -60,7 +60,9 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 | `recoltables.toml`               | budgets, matériaux, nuancier, essences, modèles: la seule chose à modifier |
 | `formes.py`                      | atelier des formes (touffe, fût, galet, feuille), numpy et scipy           |
 | `familles.py`                    | une fonction par famille, variantes et états                               |
-| `amenagements.py`                | haies, talus, rangs du labour, meubles, ouvrages (repères)                 |
+| `amenagements.py`                | haies, talus, rangs du labour, voie, meubles, ouvrages (repères)           |
+| `plantes.py`                     | ports des cultures: carotte, poireau, pomme de terre, fleurs               |
+| `fetes.py`                       | décor des fêtes (meubles du dehors, lumières)                              |
 | `construire.py`, `construire.sh` | écriture des GLB par Blender, manifeste, puis contrôle                     |
 | `verifier.py`                    | contrôle sans Blender (GLB, budgets, sol, fiches du jeu)                   |
 | `planche/`                       | page de contrôle sur le rendu encré du jeu, captures, montage              |
@@ -108,6 +110,15 @@ Ajouter un objet: copier l'entrée `famille = "objet"` la plus proche dans `reco
 `railcar` (l'autorail du 5 h 12), et le train du samedi: `tank-engine`, `passenger-coach`, `luggage-van` (budget 2 500 par véhicule). Origine au centre du véhicule au niveau du ballast, longueur le long de z, avant vers +z; mesures de la voie du jeu: roues sur le rail (dessus à 0,26 m, rails à 0,72 m de l'axe), caisse de 2,7 m (15 cm de jeu au nez du quai à 1,5 m de l'axe), plancher à 1 m, deux marches de 29 cm sous chaque porte, portes des deux côtés. Les vitres des voyageurs sont en `vitrage` (verre qui s'allume avec les lampes, comme `flamme`): la nuit la caisse est éclairée; `lumiere` pose la flaque de la voiture sur le quai. Tampon contre tampon: autorail 14,52 m, locomotive 8,9 m (tampons de 4,46 m à l'avant et 4,61 m à l'arrière du centre), voiture 12,92 m, fourgon 9,92 m. Aucun véhicule n'est branché: le rendu des trains (`src/rendu/voyage/`, quai d'Aubrune) les lira par leur identifiant.
 
 Planche: `bash planche/trains-interieurs.sh` (11 vues, environ 3 min), qui écrit `docs/jeux/jeu-1/refonte/planches/trains-et-interieurs.png`.
+
+## Cultures, fêtes, voie (troisième lot)
+
+Planche: `bash planche/cultures-fetes.sh` (9 vues, environ 3 min), qui écrit `docs/jeux/jeu-1/refonte/planches/cultures-fetes-reprises.png`.
+
+- **Cultures** (`plantes.py`, ports à côté de `rosette` et `tuteur`): `fanes` (carotte), `eventail` (poireau), `touffe` (pomme de terre), `fleur` (les douze fleurs des collections). Une fleur se règle dans son entrée: `forme` (silhouette vue de haut: etoile, marguerite, capitule, pompon, pensee, coupe, cornet, collerette, frange, rose, grappe, clochettes), `feuillage` (lance, ronde, larges, fines, buisson), `fleurs` par plant, `rayon` d'une tête, teintes `corolle`, `coeur`, `feuille`. Ajouter une fleur: copier l'entrée la plus proche, changer `id`, `culture`, `graine` et les teintes, `construire.sh`, puis `"model": "crop-<id>"` dans sa fiche. Une culture sans fiche (`carotte`, `poireau`, `pomme-de-terre` aujourd'hui) donne `stades`: la fiche le remplace dès qu'elle existe. Têtes de 4 à 8 cm de rayon, un peu tournées vers le sud: plus petites, elles se perdent dans leur trait à la caméra de jeu.
+- **Fêtes** (`fetes.py`, famille `fete`, `aubrune-fetes.glb`, budget 600): `festival-candle` (lumignon), `lampion-garland` (4 cases, poteau ouest; `lampion-pole` ferme la file à l'est), `bandstand` (4 x 3), `festival-cauldron` (2 x 2, état `bare`), `brazier`, `crossing-gate-flowered` (5 x 1, bras le long de x: tourner la fiche pour qu'il barre la route), `festival-banner` (4 x 1), `banquet-table` (3 x 1), `tapped-barrel`, `chalk-board`. Ce qui brûle est en `flamme`, avec `lumiere`. Fiches dans `donnees/commun/meubles/` (seul `lumignon` est posable par les joueurs); rien n'est posé sur les cartes.
+- **Voie** (famille `voie`, `aubrune-lisieres.glb`): `rail-cutting` (et `-b`, tranchée: ballast, fossés d'eau, talus de 1,6 m et son revers) et `rail-bed` (au ras du pré), un mètre le long de z, sous les traverses du jeu. Pas encore posés par le moteur (une sorte de file à ajouter à `RUN_SORTS`, ou au relief).
+- **Reprises** (revue visuelle du 2026-11-11): `tunnel-portal` porte son coteau modelé (crête à 9 m, flancs retenus par les murs en aile, rochers, arbustes, deux jeunes arbres); `comptoir-fournil` est une vitrine (bas de bois, caisse vitrée à cadre, pains visibles par le dessus); comptoirs de l'épicerie au vert des volets, de la mercerie à la tuile, du café en bois (nuancier-v02, `aubrune_jour`).
 
 ## Livrés sans fiche de jeu (à brancher par le game designer et le level designer)
 

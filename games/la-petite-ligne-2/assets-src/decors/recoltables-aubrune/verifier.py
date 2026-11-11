@@ -21,7 +21,7 @@ POIDS_MAX = 2_500_000
 # Une case de potager fait 1 m; le feuillage d'un plant mûr peut déborder un peu sur l'allée.
 CASE_MAX = {"parcelle": 1.0, "culture": 1.12}
 # Modules posés case par case sur une file (aménagements).
-MODULES = ("haie", "talus", "rang")
+MODULES = ("haie", "talus", "rang", "voie")
 
 
 def lire_glb(chemin):
@@ -95,11 +95,13 @@ def main():
         # Module de file (haie, talus, rang): il court sur exactement 1 m et ne déborde pas de
         # sa case, sinon deux modules voisins se chevauchent ou laissent un jour.
         if m["family"] in MODULES:
-            long_axe = 2 if m["family"] == "rang" else 0
+            long_axe = 2 if m["family"] in ("rang", "voie") else 0
             travers = 0 if long_axe == 2 else 2
+            # Un module de voie est large (ballast, fossés, talus): seule sa longueur est d'un mètre.
+            large = m["family"] == "voie"
             if abs(mini[long_axe] + 0.5) > 0.002:
                 erreurs.append(f"{ident}: le module commence à {mini[long_axe]:.3f} m (attendu -0,5)")
-            if maxi[long_axe] > 0.502 or mini[long_axe] < -0.502 or maxi[travers] > 0.502 or mini[travers] < -0.502:
+            if maxi[long_axe] > 0.502 or mini[long_axe] < -0.502 or (not large and (maxi[travers] > 0.502 or mini[travers] < -0.502)):
                 erreurs.append(f"{ident}: déborde de sa case de 1 m ({mini} .. {maxi})")
         if m.get("cell") and max(m["size"]["w"], m["size"]["d"]) > CASE_MAX[m["family"]] + 0.001:
             erreurs.append(f"{ident}: {m['size']['w']} x {m['size']['d']} m déborde de sa case")
@@ -135,7 +137,7 @@ def main():
             continue
         fiche = lire_json(os.path.join(donnees, "meubles", nom))
         # Meuble de cette chaîne: posé au centre de son emprise, il doit tenir dans ses cases.
-        if fiche["model"] in bornes and miens[fiche["model"]]["family"] in ("meuble", "objet"):
+        if fiche["model"] in bornes and miens[fiche["model"]]["family"] in ("meuble", "objet", "fete"):
             mini, maxi = bornes[fiche["model"]]
             demi_w, demi_d = fiche["size"]["w"] / 2 + 0.005, fiche["size"]["h"] / 2 + 0.005
             if mini[0] < -demi_w or maxi[0] > demi_w or mini[2] < -demi_d or maxi[2] > demi_d:

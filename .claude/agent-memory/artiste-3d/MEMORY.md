@@ -345,3 +345,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `construire.py` écrit `decors.json` en indentation 1: passer `pnpm exec prettier --write` dessus avant de rendre (la version versionnée est formatée).
 - Ids de fiche à éviter: `tabouret` (le test des gabarits l'ajoute lui-même). Tout meuble posable sans vignette fait échouer `interface-plume.test.ts`: l'inscrire dans `WITHOUT_THUMB` avec sa raison. Ajouter un GLB au dossier des décors: l'inscrire dans la liste de `tests/rendu/decors.test.ts`.
 - Planche de pièce: vue de biais `lacet: -35` (murs nord et ouest visibles), `large` 9,5, centre décalé vers le nord-ouest (les objets muraux montent dans l'image). Objets « sur un meuble »: champ `y` des objets de la page (`planche.mjs`), lumières des modèles posés par `lumieres: true`.
+
+## Cultures, fêtes et coteau encrés (vérifié le 2026-11-11)
+
+- Plantes au rendu encré: une lame dressée (brin, feuille presque verticale) est vue par la tranche et sort noire; fanes, poireaux et feuilles de muguet doivent s'ouvrir en gerbe ou retomber en arc pour montrer leur dessus. Tiges de 6 à 7 mm de rayon au plus: plus épaisses, le trait en fait des bâtons noirs.
+- Têtes de fleur: étoiles fines (rapport creux sous 0,5) noyées dans leur contour; garder 7 à 8 pointes et un creux de 0,6, rayon de 4 à 8 cm, inclinées vers le sud. Coeur en pyramide à 4 pans (4 triangles) plutôt qu'en octaèdre: le budget de 150 par plant tient.
+- Vitre de décor opaque (couche `plain`): une vitrine se dit par son cadre et deux reflets obliques en `vitre`, dessus ouvert, sinon elle cache ce qu'elle montre.
+- Planche: un point haut apparaît plus au nord à l'écran (h / tan 50 degrés): pour voir un coteau de 9 m derrière un portail, centrer la vue 8 à 10 m plus au nord que le portail. Modules de voie: `fusion` par sorte dans les objets de la vue.
+- Patchs: `python3 - fichier <<'EOF'` passe s'il est seul dans la commande; tout enchaînement (`&&`, `;`) avec un heredoc ou une boucle complexe est refusé dans un arbre isolé: script dans le scratchpad, puis appel simple.
