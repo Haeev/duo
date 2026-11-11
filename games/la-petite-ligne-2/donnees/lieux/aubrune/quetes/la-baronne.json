@@ -153,7 +153,7 @@
           "id": "affut",
           "objective": "Ce soir, entre 19 h et 21 h, à deux à la fosse du bief: une personne à la canne, l'autre à l'épuisette.",
           "target": {
-            "point": "i2"
+            "point": "peche-fosse"
           },
           "done": [
             {

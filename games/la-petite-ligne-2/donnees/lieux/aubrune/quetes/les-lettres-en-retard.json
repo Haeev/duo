@@ -81,9 +81,9 @@
         },
         {
           "id": "sac",
-          "objective": "À deux devant la porte de la halte: une personne au casier, l'autre au registre. Le sac attend depuis trente ans.",
+          "objective": "À deux dans la halte, au guichet: une personne au casier, l'autre au registre. Le sac attend depuis trente ans.",
           "target": {
-            "point": "gr2"
+            "point": "halte-p-guichet"
           },
           "done": [
             {

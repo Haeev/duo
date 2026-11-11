@@ -147,9 +147,9 @@
       "steps": [
         {
           "id": "clocher",
-          "objective": "Au jour, à deux sur le parvis: on monte à la chambre des cloches par l'échelle du sonneur.",
+          "objective": "Au jour, à deux: par la nef et l'échelle du sonneur, jusqu'à la chambre des cloches.",
           "target": {
-            "point": "pv"
+            "point": "clocher-vue"
           },
           "done": [
             {
@@ -314,9 +314,9 @@
         },
         {
           "id": "coulee",
-          "objective": "En journée, à deux devant la forge: une personne au soufflet, l'autre à la louche. Les sœurs donnent la note.",
+          "objective": "En journée, à deux à l'enclume de la forge: une personne au soufflet, l'autre à la louche. Les sœurs donnent la note.",
           "target": {
-            "point": "gr6"
+            "point": "mado-enclume"
           },
           "done": [
             {

@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -899,6 +899,7 @@
 <polygon points="362,47.956 362.673,49.5738 364.419,49.7139 363.089,50.8538 363.495,52.5581 362,51.6448 360.505,52.5581 360.911,50.8538 359.581,49.7139 361.327,49.5738" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,184.456 161.673,186.074 163.419,186.214 162.089,187.354 162.495,189.058 161,188.145 159.505,189.058 159.911,187.354 158.581,186.214 160.327,186.074" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,147.956 213.673,149.574 215.419,149.714 214.089,150.854 214.495,152.558 213,151.645 211.505,152.558 211.911,150.854 210.581,149.714 212.327,149.574" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,92.756 189.673,94.3738 191.419,94.5139 190.089,95.6538 190.495,97.3581 189,96.4448 187.505,97.3581 187.911,95.6538 186.581,94.5139 188.327,94.3738" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <text x="204.5" y="150.848" font-family="DejaVu Sans" font-size="2.4592" text-anchor="middle" font-weight="bold" fill="#FFFFFF">26</text>
 <text x="188" y="167.848" font-family="DejaVu Sans" font-size="2.4592" text-anchor="middle" font-weight="bold" fill="#FFFFFF">27</text>
 <circle cx="205.5" cy="130.5" r="1.6112" fill="#C2812B" stroke="#FFFDF5" stroke-width="0.2544"/>

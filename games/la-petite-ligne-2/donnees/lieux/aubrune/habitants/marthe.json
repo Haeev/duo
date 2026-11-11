@@ -42,7 +42,7 @@
   "stands": "re1",
   "voice": "medium",
   "life": {
-    "home": "re1",
+    "home": "marthe-lit-p",
     "schedule": [
       {
         "from": 420,
@@ -66,7 +66,7 @@
         "from": 1260,
         "to": 420,
         "at": {
-          "point": "re1"
+          "bed": "marthe-lit"
         },
         "activity": "dormir",
         "gesture": null

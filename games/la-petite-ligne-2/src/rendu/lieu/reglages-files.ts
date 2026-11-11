@@ -120,6 +120,14 @@ export const LANDMARK_LOOKS: Readonly<Record<string, LandmarkLook>> = {
     snap: true,
     sink: 0.1,
   },
+  'grue-a-eau': {
+    pourquoi:
+      'en face du château d’eau, au bord de la voie: son bras pivote au-dessus de la locomotive',
+    model: 'water-crane',
+    facing: { rule: 'toward-rail' },
+    snap: true,
+    sink: 0.05,
+  },
   signal: {
     pourquoi: 'le sémaphore montre son bras à la voie qu’il ferme',
     model: 'semaphore',

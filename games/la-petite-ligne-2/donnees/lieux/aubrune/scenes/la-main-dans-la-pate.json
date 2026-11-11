@@ -22,7 +22,7 @@
       },
       {
         "type": "reach",
-        "point": "mc",
+        "point": "guet-moulin",
         "who": "both",
         "radius": 6
       }
@@ -60,9 +60,9 @@
           "done": [
             {
               "type": "reach",
-              "point": "mc",
+              "point": "guet-moulin",
               "who": "one",
-              "radius": 6
+              "radius": 3
             }
           ]
         }

@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -899,6 +899,7 @@
 <polygon points="362,47.26 362.857,49.3205 365.081,49.4988 363.387,50.9505 363.904,53.1212 362,51.958 360.096,53.1212 360.613,50.9505 358.919,49.4988 361.143,49.3205" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,183.76 161.857,185.82 164.081,185.999 162.387,187.451 162.904,189.621 161,188.458 159.096,189.621 159.613,187.451 157.919,185.999 160.143,185.82" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,147.26 213.857,149.32 216.081,149.499 214.387,150.951 214.904,153.121 213,151.958 211.096,153.121 211.613,150.951 209.919,149.499 212.143,149.32" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,92.06 189.857,94.1205 192.081,94.2988 190.387,95.7505 190.904,97.9212 189,96.758 187.096,97.9212 187.613,95.7505 185.919,94.2988 188.143,94.1205" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <text x="171" y="89.08" font-family="DejaVu Sans" font-size="3.132" text-anchor="middle" font-weight="bold" fill="#FFFFFF">5</text>
 <text x="208.5" y="88.08" font-family="DejaVu Sans" font-size="3.132" text-anchor="middle" font-weight="bold" fill="#FFFFFF">6</text>
 <text x="223" y="93.58" font-family="DejaVu Sans" font-size="3.132" text-anchor="middle" font-weight="bold" fill="#FFFFFF">7</text>
@@ -954,6 +955,7 @@
 <text x="189" y="79.5912" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.78624" stroke-linejoin="round" opacity="0.9">le château d'eau de la halte</text><text x="189" y="79.5912" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le château d'eau de la halte</text>
 <text x="188" y="42.68" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.78624" stroke-linejoin="round" opacity="0.9">le Vieux Chêne</text><text x="188" y="42.68" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le Vieux Chêne</text>
 <text x="362" y="46.18" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.78624" stroke-linejoin="round" opacity="0.9">le portail du tunnel</text><text x="362" y="46.18" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le portail du tunnel</text>
+<text x="149.913" y="90.98" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.78624" stroke-linejoin="round" opacity="0.9">la grue à eau</text><text x="149.913" y="90.98" font-family="DejaVu Sans" font-size="2.808" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">la grue à eau</text>
 <text x="182.5" y="102.468" font-family="DejaVu Sans" font-size="2.16" text-anchor="middle" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.6048" stroke-linejoin="round" opacity="0.9">PN garde</text><text x="182.5" y="102.468" font-family="DejaVu Sans" font-size="2.16" text-anchor="middle" font-style="italic" fill="#5A4632">PN garde</text>
 <text x="214" y="100.968" font-family="DejaVu Sans" font-size="2.16" text-anchor="middle" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.6048" stroke-linejoin="round" opacity="0.9">traversée</text><text x="214" y="100.968" font-family="DejaVu Sans" font-size="2.16" text-anchor="middle" font-style="italic" fill="#5A4632">traversée</text>
 <text x="259.5" y="102.468" font-family="DejaVu Sans" font-size="2.16" text-anchor="middle" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.6048" stroke-linejoin="round" opacity="0.9">PN eglise</text><text x="259.5" y="102.468" font-family="DejaVu Sans" font-size="2.16" text-anchor="middle" font-style="italic" fill="#5A4632">PN eglise</text>

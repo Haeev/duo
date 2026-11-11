@@ -14,6 +14,10 @@
     "moulin-grenier": {
       "x": 3.5,
       "y": 3.5
+    },
+    "berthe-lit-p": {
+      "x": 1.5,
+      "y": 1.5
     }
   },
   "objects": [
@@ -30,6 +34,13 @@
       "x": 6.5,
       "y": 1.5,
       "rotation": 3
+    },
+    {
+      "id": "berthe-lit",
+      "type": "lit-simple",
+      "x": 0.5,
+      "y": 1,
+      "rotation": 0
     }
   ],
   "doors": {
@@ -40,5 +51,5 @@
       "to": "moulin-esc-moulin-etage"
     }
   },
-  "pourquoi": "le grain monté en sacs, la trémie au-dessus des meules"
+  "pourquoi": "le grain monté en sacs, la trémie au-dessus des meules; le lit de Berthe au coin nord-ouest: le meunier dort au moulin, il entend la meule et la vanne"
 }

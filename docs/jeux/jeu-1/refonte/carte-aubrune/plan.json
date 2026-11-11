@@ -905,11 +905,11 @@
     {
       "id": "quai_b",
       "nom": "le quai",
-      "rect": [185, 99, 30, 4],
+      "rect": [185, 99, 27, 4],
       "porte": null,
       "noeud": "quai",
       "qui": "tous",
-      "raison": "le coeur: le train s'arrête là, la caisse de la commande, le tableau, la cloche et la pendule y sont",
+      "raison": "le coeur: le train s'arrête là, la caisse de la commande, le tableau, la cloche et la pendule y sont; 27 m: il s'arrête à 3 m de la halte, où passe la traversée de service",
       "acte": 1,
       "ancien": "platform",
       "interieur": null,
@@ -917,7 +917,7 @@
       "gabarit": {
         "base": "quai",
         "note": "plateforme de 0,55 m, bordure de pierre côté voie, pas de toit",
-        "largeur": 30,
+        "largeur": 27,
         "profondeur": 4
       }
     },
@@ -1431,7 +1431,7 @@
       "raison": "maison de la sonneuse, au pied du parvis, porte à l'est sur la rue de l'Église",
       "acte": 1,
       "ancien": "sexton_house",
-      "interieur": null,
+      "interieur": "une salle: lit, table: 25 m²",
       "sur_rail": null,
       "gabarit": {
         "base": "house-town",
@@ -1732,6 +1732,15 @@
       "h": 10,
       "raison": "vu depuis le ponton par-dessus la rivière: donne envie de passer le gué bien avant qu'il soit refait; à l'angle est du logis, hors du chemin des Champs",
       "nature": "pigeonnier"
+    },
+    {
+      "id": "grue_eau",
+      "nom": "la grue à eau",
+      "x": 189,
+      "y": 95.3,
+      "h": 3.6,
+      "nature": "grue-a-eau",
+      "raison": "en face du château d'eau, qui la remplit par une conduite enterrée; au bord nord de la voie, son bras pivote au-dessus de la locomotive à l'arrêt devant le quai"
     }
   ],
   "points_interet": [
@@ -3010,16 +3019,16 @@
         "pourquoi": "la lande aux myrtilles: sol pauvre de la crête, bruyère et myrtilliers"
       },
       {
-        "sol": "prairie",
+        "sol": "pre",
         "rect": [200, 34, 22, 14],
         "pourquoi": "la prairie du milieu, ouverte dans le bois (insectes)"
       },
       {
-        "sol": "prairie",
+        "sol": "pre",
         "rect": [256, 14, 26, 20],
         "pourquoi": "les prés du Haut, au-dessus de la source"
       },
-      { "sol": "prairie", "rect": [176, 44, 14, 12], "pourquoi": "la clairière du Vieux Chêne" },
+      { "sol": "pre", "rect": [176, 44, 14, 12], "pourquoi": "la clairière du Vieux Chêne" },
       {
         "sol": "galets",
         "rect": [184, 128, 8, 2],
@@ -3037,7 +3046,7 @@
       },
       {
         "sol": "gravier",
-        "rect": [185, 99, 30, 4],
+        "rect": [185, 99, 27, 4],
         "pourquoi": "le quai: gravier entre deux bordures de pierre"
       },
       {
@@ -3118,10 +3127,10 @@
       "id": "reverbere-quai-2",
       "type": "lanterne-de-quai",
       "modele": "platform-lantern",
-      "x": 212,
+      "x": 210.5,
       "y": 102.5,
       "rotation": 2,
-      "pourquoi": "éclairage du quai, au bout est, devant la halte: la potence vers la voie",
+      "pourquoi": "éclairage du quai, au bout est, au-dessus de la marche de la traversée de service: la potence vers la voie",
       "regarde": null,
       "acte": 1
     },
@@ -3536,10 +3545,10 @@
       "id": "haches-basile",
       "type": "etal-de-haches",
       "modele": "ratelier",
-      "x": 177.2,
-      "y": 90.6,
+      "x": 176.5,
+      "y": 90.5,
       "rotation": 1,
-      "pourquoi": "sous l'auvent est: Basile prête ses outils (acte 1)",
+      "pourquoi": "sous l'auvent est, dos au mur de l'atelier, à côté de la porte: Basile prête ses outils (acte 1)",
       "regarde": null,
       "acte": 1
     },
@@ -3789,10 +3798,10 @@
       "id": "poulailler-jardin",
       "type": "poulailler",
       "modele": "poulailler",
-      "x": 161,
+      "x": 161.5,
       "y": 120,
       "rotation": 0,
-      "pourquoi": "le poulailler du jardin, à 6 m du pignon ouest de la maison: son parc (6 x 4 m) descend vers la berge sans toucher le chemin",
+      "pourquoi": "le poulailler du jardin (3 x 2 m) en haut de son parc, à 5,5 m du pignon ouest de la maison: sa rampe descend au sud dans le parc, qui ne touche pas le chemin",
       "regarde": null,
       "acte": 1
     },
@@ -3806,6 +3815,39 @@
       "pourquoi": "le wagon oublié sur la voie de garage, porte côté ligne: la cabane de Jeanne (41 bâtons à la craie)",
       "regarde": null,
       "acte": 2
+    },
+    {
+      "id": "coquelicots-verger",
+      "type": "coquelicots",
+      "modele": "poppies",
+      "x": 305.5,
+      "y": 124.5,
+      "rotation": 0,
+      "pourquoi": "dans l'herbe haute du verger, qu'on ne fauche qu'en juillet: la seule touffe du bourg (la mercerie les rachète)",
+      "regarde": null,
+      "acte": 1
+    },
+    {
+      "id": "coquelicots-champs",
+      "type": "coquelicots",
+      "modele": "poppies",
+      "x": 236.5,
+      "y": 162.5,
+      "rotation": 0,
+      "pourquoi": "sur la tournière des champs des Delmas, entre le chemin des Champs et le labour: le coquelicot pousse au bord des blés",
+      "regarde": null,
+      "acte": 3
+    },
+    {
+      "id": "enclume-forge",
+      "type": "enclume",
+      "modele": "enclume",
+      "x": 262.5,
+      "y": 103.5,
+      "rotation": 3,
+      "pourquoi": "contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église: Mado s'y tient côté rue, au poste mado-enclume (amélioration et réparation des outils)",
+      "regarde": null,
+      "acte": 1
     }
   ],
   "vegetation": [
@@ -3978,6 +4020,13 @@
       "x": 171,
       "y": 60,
       "pourquoi": "la coupe de Basile, vers le carrefour du bas"
+    },
+    {
+      "id": "pommier-verger",
+      "type": "fruitier",
+      "x": 309.5,
+      "y": 118.5,
+      "pourquoi": "le pommier du verger communal: on le secoue, les pommes tombent dans l'herbe; le coin de cueillette est au sud-est, côté caméra, hors du houppier"
     }
   ],
   "ressources": [
@@ -5320,12 +5369,23 @@
           "x": 6.5,
           "y": 1.5,
           "rotation": 3
+        },
+        {
+          "id": "berthe-lit",
+          "type": "lit-simple",
+          "modele": "bed-single",
+          "x": 0.5,
+          "y": 1,
+          "rotation": 0
         }
       ],
-      "points": [{ "id": "moulin-grenier", "x": 3.5, "y": 3.5, "role": "poste", "qui": null }],
+      "points": [
+        { "id": "moulin-grenier", "x": 3.5, "y": 3.5, "role": "poste", "qui": null },
+        { "id": "berthe-lit-p", "x": 1.5, "y": 1.5, "role": "lit", "qui": "Berthe" }
+      ],
       "porte": null,
       "escaliers": [{ "x": 0.5, "y": 6.5, "vers": "moulin", "regard": 2 }],
-      "note": "le grain monté en sacs, la trémie au-dessus des meules"
+      "note": "le grain monté en sacs, la trémie au-dessus des meules; le lit de Berthe au coin nord-ouest: le meunier dort au moulin, il entend la meule et la vanne"
     },
     {
       "id": "ferme-logis",
@@ -5394,6 +5454,47 @@
       "porte": [4.5, 4.5, 2],
       "escaliers": [],
       "note": "une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour"
+    },
+    {
+      "id": "marthe",
+      "batiment": "marthe",
+      "nom": "la maison de Marthe",
+      "largeur": 5,
+      "hauteur": 5,
+      "surface_m2": 25,
+      "niveau": 0,
+      "pieces": [["salle", [0, 0, 5, 5]]],
+      "cloisons": [],
+      "meubles": [
+        {
+          "id": "marthe-lit",
+          "type": "lit-simple",
+          "modele": "bed-single",
+          "x": 0.5,
+          "y": 1,
+          "rotation": 0
+        },
+        {
+          "id": "marthe-table",
+          "type": "table-a-manger",
+          "modele": "table-farm",
+          "x": 1,
+          "y": 4.5,
+          "rotation": 0
+        },
+        {
+          "id": "marthe-chaise",
+          "type": "chaise",
+          "modele": "chair-farm",
+          "x": 1.5,
+          "y": 3.5,
+          "rotation": 0
+        }
+      ],
+      "points": [{ "id": "marthe-lit-p", "x": 1.5, "y": 1.5, "role": "lit", "qui": "Marthe" }],
+      "porte": [4.5, 2.5, 3],
+      "escaliers": [],
+      "note": "la maison de la sonneuse: une salle, le lit au fond contre le mur ouest, la table au midi; 1,5 m libres devant la porte, à l'est sur la rue de l'Église"
     }
   ],
   "ordre_histoire": [

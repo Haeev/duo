@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | version 3: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12), raccordé à l'histoire écrite des actes 1 à 3 (section 13) |
+| Statut | version 3: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12), raccordé à l'histoire écrite des actes 1 à 3 (section 13); manques de la nuit du 2026-11-11 comblés (section 15) |
 | Date | 2026-11-10 |
 | Source unique | `construire_plan.py` (composition en code), qui écrit `plan.json`, les SVG, les PNG et les tableaux marqués « généré » de ce document |
 | Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (26 casses vues sur 26), `assembler_lieu.py` (aucun verrou contournable sur la grille); règle d'accès des intérieurs et du dehors (section 14), aussi tenue par `tests/points-de-quete.test.ts` du jeu |
@@ -166,7 +166,7 @@ Les obstacles et ce qui les lève sont des propositions au game-designer: le pla
 <!-- genere:batiments:debut -->
 | Bâtiment | Emprise | Qui | Porte | Pourquoi là, pourquoi dans ce sens |
 |---|---|---|---|---|
-| le quai | 30 x 4 m | tous | (pas de porte: plateforme) | le coeur: le train s'arrête là, la caisse de la commande, le tableau, la cloche et la pendule y sont |
+| le quai | 27 x 4 m | tous | (pas de porte: plateforme) | le coeur: le train s'arrête là, la caisse de la commande, le tableau, la cloche et la pendule y sont; 27 m: il s'arrête à 3 m de la halte, où passe la traversée de service |
 | la halte | 10 x 6 m | Firmin (bureau), consigne | sud | au bout est du quai, en ligne avec lui; porte au sud, sur la Grand-Route, là où arrivent les voyageurs à pied |
 | la maison du garde-barrière | 11 x 8 m | les deux joueurs | est | au passage à niveau; porte à l'est, vers la route: le garde sort et il est à sa barrière en dix pas. Emprise de la maison finie (88 m²), la ruine du début n'en occupe que la moitié est |
 | l'épicerie-pension Ferrand | 8 x 10 m | Odette | est | borde la place à l'ouest, vitrine et porte vers la place: on la voit en descendant du quai |
@@ -404,7 +404,7 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 <!-- genere:gabarits:debut -->
 | Bâtiment | Gabarit de base | Largeur x profondeur | Étages | Toit | Porte (façade, position) | Couleurs ou note |
 |---|---|---|---|---|---|---|
-| le quai | `quai` | 30 x 4 m | (modèle) | (modèle) | (aucune) | plateforme de 0,55 m, bordure de pierre côté voie, pas de toit |
+| le quai | `quai` | 27 x 4 m | (modèle) | (modèle) | (aucune) | plateforme de 0,55 m, bordure de pierre côté voie, pas de toit |
 | la halte | `house-town` | 10 x 6 m | 1 | croupe | sud 0.50 | murs pierre_claire, toit lauze, menuiseries rouge_cheminot, volets rouge_cheminot, porte rouge_cheminot |
 | la maison du garde-barrière | `house-town` | 11 x 8 m | 2 | deux-pans | est 0.50 | murs enduit, toit tuile, menuiseries creme, volets sauge, porte sauge |
 | l'épicerie-pension Ferrand | `shop-front` | 8 x 10 m | 2 | croupe | est 0.50 | murs enduit_ocre, toit lauze, volets vert_sombre, porte vert_sombre, menuiseries vert_sombre, enseigne vert_sombre |
@@ -445,7 +445,7 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | caisse-commande | (à créer) | `crate` | 207.5, 101.5 | sud | la caisse de la commande du samedi, au pied du poteau |
 | panneau-gare | (à créer) | `platform-sign` | 196, 99.6 | nord | le nom de la halte se lit depuis le train, donc tourné vers la voie |
 | reverbere-quai-1 | lanterne-de-quai | `platform-lantern` | 188, 102.5 | nord | éclairage du quai, au bout ouest: la potence vers la voie |
-| reverbere-quai-2 | lanterne-de-quai | `platform-lantern` | 212, 102.5 | nord | éclairage du quai, au bout est, devant la halte: la potence vers la voie |
+| reverbere-quai-2 | lanterne-de-quai | `platform-lantern` | 210.5, 102.5 | nord | éclairage du quai, au bout est, au-dessus de la marche de la traversée de service: la potence vers la voie |
 | reverbere-quai-3 | lanterne-de-quai | `platform-lantern` | 203, 102.5 | nord | au milieu du quai, entre le banc du réveil et le poteau où l'on monte: on attend le train sous elle |
 | reverbere-route-1 | reverbere | `street-lantern` | 195.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
 | reverbere-route-2 | reverbere | `street-lantern` | 216.5, 111 | sud | la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ |
@@ -483,7 +483,7 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | pompe-jardin | pompe | `water-pump` | 179.5, 121.5 | sud | la pompe du jardin: l'eau de l'arrosoir à deux pas du potager |
 | bois-maison | tas-de-bois | `log-pile` | 167.4, 116.5 | sud | bois de chauffage contre le pignon ouest, à l'abri du vent de pluie |
 | bois-atelier | tas-de-bois | `log-pile` | 171, 93 | sud | les grumes refendues de Basile, au sud de l'atelier |
-| haches-basile | etal-de-haches | `ratelier` | 177.2, 90.6 | est | sous l'auvent est: Basile prête ses outils (acte 1) |
+| haches-basile | etal-de-haches | `ratelier` | 176.5, 90.5 | est | sous l'auvent est, dos au mur de l'atelier, à côté de la porte: Basile prête ses outils (acte 1) |
 | potager | terre-cultivable | `terre` | 174, 122.5 | sud | le potager de 6 x 4 cases au bout de l'allée du jardin (24 cases) |
 | banc-cretes | banc | `bench-park` | 304, 47.6 | sud | le banc des Crêtes: le bourg entier en contrebas |
 | banc-etang | banc | `bench-park` | 225.5, 39.5 | est | face à l'étang, au coin de pêche |
@@ -506,8 +506,11 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | ronces-tranchee-1 | ronces | `buisson` | 144.5, 95.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
 | ronces-tranchee-2 | ronces | `buisson` | 148.5, 95.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
 | ronces-tranchee-3 | ronces | `buisson` | 146.5, 99.5 | sud | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
-| poulailler-jardin | poulailler | `poulailler` | 161, 120 | sud | le poulailler du jardin, à 6 m du pignon ouest de la maison: son parc (6 x 4 m) descend vers la berge sans toucher le chemin |
+| poulailler-jardin | poulailler | `poulailler` | 161.5, 120 | sud | le poulailler du jardin (3 x 2 m) en haut de son parc, à 5,5 m du pignon ouest de la maison: sa rampe descend au sud dans le parc, qui ne touche pas le chemin |
 | wagon-oublie | (à créer) | `wagon-old` | 69, 93.5 | sud | le wagon oublié sur la voie de garage, porte côté ligne: la cabane de Jeanne (41 bâtons à la craie) |
+| coquelicots-verger | coquelicots | `poppies` | 305.5, 124.5 | sud | dans l'herbe haute du verger, qu'on ne fauche qu'en juillet: la seule touffe du bourg (la mercerie les rachète) |
+| coquelicots-champs | coquelicots | `poppies` | 236.5, 162.5 | sud | sur la tournière des champs des Delmas, entre le chemin des Champs et le labour: le coquelicot pousse au bord des blés |
+| enclume-forge | enclume | `enclume` | 262.5, 103.5 | ouest | contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église: Mado s'y tient côté rue, au poste mado-enclume (amélioration et réparation des outils) |
 <!-- genere:mobilier:fin -->
 
 ### Végétation par zones
@@ -817,11 +820,11 @@ E . . . . . C
 
 Pièces: salle des meules (7 x 7). Meubles: moulin-meules (millstones, à créer), moulin-sacs (coffre). Points: berthe-meules (poste, Berthe).
 
-**le grenier du moulin** (`interieurs/moulin-etage.json`, 7 x 7 m, 49 m², niveau 1): le grain monté en sacs, la trémie au-dessus des meules.
+**le grenier du moulin** (`interieurs/moulin-etage.json`, 7 x 7 m, 49 m², niveau 1): le grain monté en sacs, la trémie au-dessus des meules; le lit de Berthe au coin nord-ouest: le meunier dort au moulin, il entend la meule et la vanne.
 
 ```text
-. . . . . . C
-. . . . . . C
+L . . . . . C
+L * . . . . C
 . . . . . . .
 . . . * . . .
 . . . . . . .
@@ -829,7 +832,7 @@ Pièces: salle des meules (7 x 7). Meubles: moulin-meules (millstones, à créer
 E . . . . . .
 ```
 
-Pièces: grenier à grain (7 x 7). Meubles: moulin-grain-1 (coffre), moulin-grain-2 (coffre). Points: moulin-grenier (poste).
+Pièces: grenier à grain (7 x 7). Meubles: moulin-grain-1 (coffre), moulin-grain-2 (coffre), berthe-lit (lit-simple). Points: moulin-grenier (poste), berthe-lit-p (lit, Berthe).
 
 **le logis de la ferme Delmas** (`interieurs/ferme-logis.json`, 8 x 5 m, 40 m², niveau 0): une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour.
 
@@ -842,6 +845,18 @@ C P P . . . . A
 ```
 
 Pièces: salle commune (8 x 5). Meubles: logis-cuisiniere (cuisiniere), logis-plan (plan-de-travail), logis-table (table-a-manger), logis-chaise-1 (chaise), logis-chaise-2 (chaise), logis-armoire (armoire). Points: margot-cuisine (poste, Margot), paulin-table (poste, Paulin).
+
+**la maison de Marthe** (`interieurs/marthe.json`, 5 x 5 m, 25 m², niveau 0): la maison de la sonneuse: une salle, le lit au fond contre le mur ouest, la table au midi; 1,5 m libres devant la porte, à l'est sur la rue de l'Église.
+
+```text
+L . . . .
+L * . . .
+. . . . P
+. C . . .
+T T . . .
+```
+
+Pièces: salle (5 x 5). Meubles: marthe-lit (lit-simple), marthe-table (table-a-manger), marthe-chaise (chaise). Points: marthe-lit-p (lit, Marthe).
 
 <!-- genere:interieurs:fin -->
 
@@ -900,7 +915,7 @@ Types existants seulement (`donnees/commun/meubles` et `ressources`): chênes (`
 | ronces-tranchee-1 | ronces | 144.5, 95.5 | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
 | ronces-tranchee-2 | ronces | 148.5, 95.5 | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
 | ronces-tranchee-3 | ronces | 146.5, 99.5 | les ronces des talus de la tranchée (tw2): mûres de l'été et de l'automne, sans barrer la voie |
-| poulailler-jardin | poulailler | 161, 120 | le poulailler du jardin, à 6 m du pignon ouest de la maison: son parc (6 x 4 m) descend vers la berge sans toucher le chemin |
+| poulailler-jardin | poulailler | 161.5, 120 | le poulailler du jardin (3 x 2 m) en haut de son parc, à 5,5 m du pignon ouest de la maison: sa rampe descend au sud dans le parc, qui ne touche pas le chemin |
 | wagon-oublie | (à créer: `wagon-old`) | 69, 93.5 | le wagon oublié sur la voie de garage, porte côté ligne: la cabane de Jeanne (41 bâtons à la craie) |
 | chene-lisiere-3 | chene | 186, 84.2 | lisière: les bûches de l'acte 2 (cuisine, commande, hache); repousse en 3 jours, à 3 m du château d'eau |
 | chene-lisiere-4 | chene | 192.5, 84 | lisière: second chêne de l'acte 2, hors du chemin forestier |
@@ -977,3 +992,57 @@ Deux contrôles disent la même chose: `controler_plan.py` (section « accès »
 Aucune porte de bâtiment n'a bougé: toutes les portes d'entrée restent au droit de la porte du plan (et des fiches de bâtiments). Seuls les escaliers intérieurs ont changé de sens d'arrivée ou de place.
 
 Défaut vu hors de la règle, pas corrigé ici: 49 objets du dehors sont posés à cheval (chênes, cailloux, bancs, pompe, tas de bois, poulailler, potager), centres entiers pour un meuble de 1 m ou demi-entiers pour un meuble de 2 m; aucun ne coupe un passage (la règle d'accès passe), mais chacun bloque 2 à 6 cases de plus que son emprise. Proposition: arrondir les centres dans l'assembleur, après vérification des tests qui citent ces positions.
+
+## 15. Manques relevés la nuit du 2026-11-11
+
+Tout passe par `construire_plan.py` (bloc « version 4 »), puis l'outil du paquet et l'assembleur; `controler_plan.py`: 0 erreur, 255 éléments accessibles dans 20 intérieurs et le dehors (243 dans 19 avant).
+
+| Élément | Où | Pourquoi là, dans ce sens |
+|---|---|---|
+| Grue à eau (repère `grue_eau`, nature `grue-a-eau`, modèle `water-crane`) | x 189, y 95,3 | en face du château d'eau (x 189, y 87), qui la remplit par une conduite enterrée de 8 m droit vers le sud; au bord nord de la voie, colonne à 2,2 m de l'axe des rails: le bras tourne au-dessus de la locomotive à l'arrêt devant le quai. Le rendu l'oriente vers la voie (entrée de données dans `LANDMARK_LOOKS`) |
+| Maison de Marthe (`interieurs/marthe.json`, 5 x 5 m) | porte à l'est, au droit de la porte du plan | une salle: le lit au fond contre le mur ouest, loin de la rue; la table au midi, sous la fenêtre au soleil; 1,5 m libres devant la porte. Ni cuisinière ni armoire: on ne cuisine ni ne range chez une voisine |
+| Lit de Berthe (grenier du moulin) | coin nord-ouest | le meunier dort au moulin, au-dessus des meules: il entend la meule et la vanne la nuit; loin de l'escalier (sud-ouest) et des sacs de grain (est) |
+| Plannings de nuit | `habitants/marthe.json`, `berthe.json` | de 21 h à 7 h, `{ "bed": "marthe-lit" }` et `{ "bed": "berthe-lit" }`; chez soi: le point au chevet (`marthe-lit-p`, `berthe-lit-p`), comme Odette |
+| Pommier (`pommier-verger`, type `fruitier`) | verger communal, x 309,5, y 118,5 | le coin de cueillette `pommes-verger` est 1,5 m au sud-est, côté caméra, hors du houppier |
+| Coquelicots (`coquelicots-verger`, `coquelicots-champs`) | herbe haute du verger (acte 1); tournière des champs des Delmas, entre le chemin des Champs et le labour (acte 3) | le coquelicot pousse dans l'herbe qu'on ne fauche qu'en juillet et au bord des blés |
+| Enclume (`enclume-forge`, type `enclume`) | x 262,5, y 103,5 | contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église; Mado se tient côté rue (`mado-enclume`), le foyer est derrière le mur. L'amélioration d'outil a enfin son meuble |
+| Râtelier de Basile | x 176,5, y 90,5, façade à l'est | dos au mur est de l'atelier, à côté de la porte (il flottait à 1,2 m du mur) |
+| Poulailler du jardin | x 161,5, y 120 | posé sur ses 3 x 2 cases (il en bloquait 4 x 2), en haut de son parc; la rampe du modèle descend au sud dans le parc |
+| Quai | 27 m au lieu de 30 | la traversée de service coupait le bout est du quai (cases 212 à 214, rang 99): le quai s'arrête maintenant 3 m avant la halte, la traversée passe entre les deux au niveau des rails, on monte sur le quai d'une marche. Lanterne du bout est ramenée en x 210,5 |
+
+Revenu possible ajouté, tirages à leur moyenne, sans besoin du jour ni amitié (méthode de `economie-aubrune.md`, section 3): pommier, 2 tirages de 1 à 2 pommes par jour, 3 x 0,70 = 2,10 €; coquelicots, 1 à 2 fleurs par touffe et par jour au printemps et en été, 1,5 x 0,60 = 0,90 € par touffe. Actes 1 et 2: 3,00 € par jour (2,10 € en automne et en hiver); acte 3: 3,90 €. Au plus haut tirage: 5,20 €. La fiche commune `fruitier` donne des pommes toute l'année; le plan les voulait à l'automne (`pommes-verger`): à trancher par le game designer dans `donnees/commun/ressources/fruitier.json`.
+
+### Natures du sol sans aspect ou sans arbres
+
+Le rendu ne connaît pas l'aspect de neuf natures écrites par le plan et l'outil (peintes en herbe par repli, `DEFAULT_LOOK`), et ne sème d'arbres que sur `herbe`, `hors-jeu` et `pre` (`tileDecor`):
+
+| Nature | Cases | D'où elle vient | Aspect | Arbres semés |
+|---|---|---|---|---|
+| `sous-bois` | 13 532 | la Côte (zone) | non | non: la Côte, bois de 4 arbres pour 100 m² dans le plan, n'en a aucun hors des arbres posés |
+| `friche-rocheuse` | 4 041 | le tunnel (zone) | non | non (plan: 1,2 pour 100 m²) |
+| `herbe-rase` | 3 786 | le bourg (zone) | non | non (plan: 0,2 pour 100 m²) |
+| `friche` | 1 422 | la voie (zone), la clairière du poste | non | non (plan: 0,6 sur les talus) |
+| `prairie-humide` | 1 156 | la rivière (zone) | non | non (plan: 1,5, ripisylve) |
+| `lande` | 482 | la crête aux myrtilles | non | non (voulu) |
+| `cimetiere` | 186 | parcelle | non | non (voulu) |
+| `verger` | 182 | parcelle | non | non (le pommier est posé) |
+| `place` | 148 | place et parvis | non (pavés attendus) | non (voulu) |
+
+Corrigé par le plan: `prairie` (clairières de la Côte, prairie du milieu, prés du Haut) était un second nom de `pre`, que le rendu connaît; ces cases prennent l'aspect du pré et ses arbres isolés. Le reste relève du rendu, sans code moteur: une ligne par nature dans `GROUND_LOOKS` (`reglages-tuiles.ts`), et un semis d'arbres par nature au lieu des trois noms écrits dans `tileDecor` (densités du tableau « Végétation par zones », section 12, déjà dans `plan.json`, champ `vegetation`). Renommer `sous-bois` en `herbe` rendrait les arbres tout de suite, mais tous en pleine version (seul `hors-jeu` est allégé): le budget du bois est à mesurer d'abord.
+
+### Les six points des suites secondaires remis à leur place
+
+Les essais des grands lieux chargent maintenant les points, meubles et portes de la carte assemblée (`withAssembly`): les étapes qui visaient un nœud du dehors visent leur point.
+
+| Suite, étape | Avant | Maintenant |
+|---|---|---|
+| Les lettres, le sac postal | `gr2`, devant la halte | `halte-p-guichet`, dans la halte (Firmin y marche; répliques du seuil ajustées: casier tiré jusqu'au guichet, Lucie passe la tête par la porte) |
+| La robe, le clocher | `pv`, le parvis | `clocher-vue`, la chambre des cloches |
+| La robe, la coulée | `gr6`, le carrefour | `mado-enclume`, l'enclume (les deux sœurs restent au carrefour) |
+| Le fantôme, les deux guets | `mc`, la porte du moulin | `guet-moulin`, la cachette de Léon dans la cour |
+| La Baronne, l'affût; la fanfare, le trombone | `i2`, le sentier de l'Île | `peche-fosse`, le coin de pêche sous la roue |
+| La soupe, le guet du sel | `pl-o`, devant l'épicerie | `siege-tonnelle`, sous la tonnelle |
+
+### Hors du plan
+
+Train de nuit: les deux joueurs s'assoient en diagonale (mesuré: (2,33; 3,75) et (4,67; 3,25)), parce que chacun prend la première place libre de sa banquette et que deux banquettes face à face numérotent leurs places en miroir. Les données du lieu n'y peuvent rien sans poser une banquette à cheval sur le couloir. Correctif de code proposé: prendre la place libre la plus proche du joueur (`freeSeat` de `simulation/briques/postures.ts`).

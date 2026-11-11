@@ -14,11 +14,11 @@
       "parts": [
         {
           "role": "a",
-          "hint": "Va sur le parvis, devant la porte de l'église.",
+          "hint": "Monte à la chambre des cloches: la nef, puis l'échelle du sonneur.",
           "done": [
             {
               "type": "reach",
-              "point": "pv",
+              "point": "clocher-vue",
               "who": "one",
               "radius": 4
             }
@@ -26,11 +26,11 @@
         },
         {
           "role": "b",
-          "hint": "Rejoins ta moitié sur le parvis, devant la porte de l'église.",
+          "hint": "Rejoins ta moitié en haut du clocher, dans la chambre des cloches.",
           "done": [
             {
               "type": "reach",
-              "point": "pv",
+              "point": "clocher-vue",
               "who": "one",
               "radius": 4
             }
