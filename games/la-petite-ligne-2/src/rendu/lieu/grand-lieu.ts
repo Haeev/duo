@@ -21,6 +21,7 @@ import {
   type Material,
   MeshStandardMaterial,
   type Texture,
+  Vector3,
   Vector4,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
@@ -33,11 +34,20 @@ import { inkUnit } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
 import { modelLamp, type PlaceLights } from '../encre/lumieres';
 import { SHADOW_ONLY } from '../encre/ombres';
-import { INK_INNER, type InkInner, type Lamp, type WindowLight } from '../encre/matiere';
+import {
+  createInkCut,
+  INK_CUT,
+  INK_INNER,
+  type InkCut,
+  type InkInner,
+  type Lamp,
+  MAX_CUT_SUBJECTS,
+  type WindowLight,
+} from '../encre/matiere';
 import { INK_SETTINGS } from '../encre/reglages';
 import { createEdgeMap, createGroundMap } from '../encre/sol';
 import { Fadable } from '../fondu';
-import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
+import { Occlusion, opennessOf, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
 import { DECOR_MANIFEST } from './decors-manifeste';
@@ -124,8 +134,36 @@ interface CrownFade {
   readonly matrix: Matrix4;
   readonly mesh: Mesh;
   readonly material: FadeMaterial;
+  /** Rendu encré: la découpe de la copie (restée opaque), à la place de son fondu. */
+  readonly cut: InkCut | null;
   opacity: number;
   hidden: boolean;
+}
+
+/**
+ * Découpe d'un repère livré: dedans coupé, emprise prise sur ses sommets proches du pied (en
+ * monde), pas sur sa boîte entière (cuve, auvent, bras plus larges que le fût).
+ */
+function landmarkCut(mesh: Mesh, geometry: BufferGeometry, foot: number): InkCut {
+  const cut = createInkCut();
+  const reach = foot + RENDER_SETTINGS.occlusion.cut.baseHeight;
+  const position = geometry.getAttribute('position');
+  const point = new Vector3();
+  let x0 = Number.POSITIVE_INFINITY;
+  let z0 = Number.POSITIVE_INFINITY;
+  let x1 = Number.NEGATIVE_INFINITY;
+  let z1 = Number.NEGATIVE_INFINITY;
+  for (let i = 0; i < position.count; i++) {
+    point.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
+    if (point.y > reach) continue;
+    x0 = Math.min(x0, point.x);
+    z0 = Math.min(z0, point.z);
+    x1 = Math.max(x1, point.x);
+    z1 = Math.max(z1, point.z);
+  }
+  cut.state.set(0, x0 < x1 ? 1 : 0, foot, 0);
+  cut.rect.set(x0, z0, x1, z1);
+  return cut;
 }
 
 /** Une pièce construite: ses maillages, ses murs dans leurs deux formes, ses lampes. */
@@ -185,6 +223,8 @@ export class TiledPlace {
   private farDirty = true;
   private readonly shadowed = new Map<number, boolean>();
   private readonly crownFades = new Map<string, CrownFade>();
+  /** Rendu encré: découpe de chaque volume ouvert (bâtiment livré, repère), par identifiant. */
+  private readonly cuts = new Map<string, InkCut>();
   private readonly time = { value: 0 };
   private readonly glass: Material & { emissiveIntensity: number };
   private readonly fadeBase: FadeMaterial;
@@ -710,8 +750,10 @@ export class TiledPlace {
     mesh.updateMatrixWorld(true);
     const box = new Box3().setFromObject(mesh);
     const id = mesh.name;
-    if (this.occlusion.add({ id, min: box.min.clone(), max: box.max.clone() }))
+    if (this.occlusion.add({ id, min: box.min.clone(), max: box.max.clone() })) {
       this.landmarkFades.set(id, new Fadable(mesh, new Color(0, 0, 0)));
+      if (this.ink !== null) this.cuts.set(id, landmarkCut(mesh, geometry, box.min.y));
+    }
     // Repère qui éclaire (le feu du sémaphore): sa lampe, et son verre allumé avec elle.
     const light = DECOR_MANIFEST.models[pose.model]?.light;
     if (light !== undefined) {
@@ -870,15 +912,54 @@ export class TiledPlace {
     }
     this.time.value += dt;
     this.glass.emissiveIntensity = night * this.settings.building.glowNight;
+    this.placeCutSubjects(subjects);
     for (const id of this.occlusion.update(dt, subjects, toCamera)) {
       const view = this.views.get(this.partTile.get(id) ?? -1);
       const opacity = this.occlusion.opacity(id);
-      this.landmarkFades.get(id)?.apply(opacity, 0);
+      const landmark = this.landmarkFades.get(id);
+      if (landmark !== undefined && !this.cutOpen(id, landmark)) landmark.apply(opacity, 0);
       if (view === undefined) continue;
       for (const mesh of view.fading) mesh.setOpacity(id, opacity);
-      view.models.get(id)?.apply(opacity, 0);
+      const model = view.models.get(id);
+      if (model !== undefined && !this.cutOpen(id, model)) model.apply(opacity, 0);
     }
     this.updateCrowns(dt, subjects, toCamera);
+  }
+
+  /** Rendu encré: les pieds des joueurs à garder visibles, lus par le nuanceur des volumes. */
+  private placeCutSubjects(subjects: readonly Vec3[]): void {
+    const slots = this.ink?.uniforms.uCutSubject.value;
+    if (slots === undefined) return;
+    for (let i = 0; i < MAX_CUT_SUBJECTS; i++) {
+      const feet = subjects[i];
+      slots[i]?.set(feet?.x ?? 0, feet?.y ?? 0, feet?.z ?? 0, feet === undefined ? 0 : 1);
+    }
+  }
+
+  /**
+   * Rendu encré: ouvre le volume `id` par la découpe (dedans coupé: c'est un bâtiment ou un repère
+   * plein, jamais l'herbe sous son emprise). Faux dans l'ancien rendu: le fondu s'applique.
+   */
+  private cutOpen(id: string, fadable: Fadable): boolean {
+    if (this.ink === null) return false;
+    const amount = this.occlusion.openness(id);
+    // Un repère garde sa découpe (emprise de son pied) d'une ouverture à l'autre.
+    const kept = this.landmarkFades.has(id);
+    let cut = this.cuts.get(id);
+    if (cut === undefined) {
+      const box = this.occlusion.box(id);
+      if (box === null) return false;
+      cut = createInkCut();
+      cut.state.set(0, 1, box.min.y, 0);
+      cut.rect.set(box.min.x, box.min.z, box.max.x, box.max.z);
+    }
+    cut.state.x = amount;
+    if (amount <= 0) {
+      if (!kept) this.cuts.delete(id);
+      return fadable.setCut(null);
+    }
+    this.cuts.set(id, cut);
+    return fadable.setCut(cut);
   }
 
   private build(x: number, y: number, viewRadius: number): void {
@@ -924,6 +1005,7 @@ export class TiledPlace {
     for (const box of view.occluders) {
       this.occlusion.remove(box.id);
       this.partTile.delete(box.id);
+      this.cuts.delete(box.id);
     }
     for (const [key, fade] of this.crownFades)
       if (fade.view === view) this.dropCrownFade(key, fade);
@@ -1004,7 +1086,8 @@ export class TiledPlace {
         goal < fade.opacity
           ? Math.max(goal, fade.opacity - stepSize)
           : Math.min(goal, fade.opacity + stepSize);
-      fade.material.opacity = fade.opacity;
+      if (fade.cut === null) fade.material.opacity = fade.opacity;
+      else fade.cut.state.x = opennessOf(fade.opacity, s.fadedOpacity);
       if (fade.opacity >= 1 && !fade.hidden) this.dropCrownFade(key, fade);
     }
   }
@@ -1016,11 +1099,14 @@ export class TiledPlace {
     part.mesh.getMatrixAt(part.slot, saved);
     const material = this.fadeBase.clone();
     material.color.set(part.color);
-    material.transparent = true;
-    material.depthWrite = false;
+    // Rendu encré: la copie reste opaque et s'ouvre autour des joueurs (découpe sur le dehors).
+    const cut = this.ink === null ? null : createInkCut();
+    material.transparent = cut === null;
+    material.depthWrite = cut !== null;
     material.opacity = 1;
     // La copie partage la géométrie de l'instance (boule ou modèle livré) et prend sa pose.
     const mesh = new Mesh(part.mesh.geometry, material);
+    if (cut !== null) mesh.userData[INK_CUT] = cut;
     saved.decompose(mesh.position, mesh.quaternion, mesh.scale);
     mesh.name = 'houppier-fondu';
     view.group.add(mesh);
@@ -1033,6 +1119,7 @@ export class TiledPlace {
       matrix: saved,
       mesh,
       material,
+      cut,
       opacity: 1,
       hidden: true,
     });
@@ -1088,8 +1175,12 @@ export class TiledPlace {
   }
 
   dispose(): void {
-    for (const fade of this.landmarkFades.values()) fade.dispose();
+    for (const fade of this.landmarkFades.values()) {
+      fade.setCut(null);
+      fade.dispose();
+    }
     this.landmarkFades.clear();
+    this.cuts.clear();
     for (const tile of [...this.views.keys()]) this.unload(tile);
     for (const tile of [...this.pending.keys()]) this.unload(tile);
     this.ring.clear();
