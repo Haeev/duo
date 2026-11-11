@@ -548,3 +548,16 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Vers 5 h 30 le quota a été épuisé: deux missions coupées (éditeur à la photo, nuit d'Aubrune), travail conservé sur le disque.
 - 6 h 15, le client: « Tu peux reprendre (j'ai réinitialisé exceptionnellement le quota maximal, maintenant sois plus économe) ».
 - Règle appliquée depuis: une seule mission à la fois, modèle moins coûteux quand la tâche est cadrée, finir l'engagé avant d'ouvrir du neuf, vérifications lancées par le manager lui-même plutôt que par un membre.
+
+## Réponses du tableau de bord, 11 novembre à 6 h 23 (q24 à q29)
+
+- **q24, saturation des couleurs**: non, les couleurs du Mac sont bien. La hausse préparée n'est pas appliquée.
+- **q25, écriture des suites secondaires**: oui aux trois (lettres rendues à leurs auteurs, deux fins de la Baronne, explication raisonnable de chaque mystère).
+- **q27, rythme de la maison**: trop lent. À accélérer (revenu ou coûts), sans créer de boucle d'argent.
+- **q28, pot-au-feu de l'acte 3**: oui, il demande d'avoir payé la cuisine (150 euros); cuisinière et plan de travail apparaissent à l'achat.
+- **q29, trains**: oui aux deux (train du samedi, autorail de chaque nuit). Reste à les montrer à l'écran.
+- Sans réponse à 8 h: q23 (relevé du PC), q26 (murs coupés et appliques des intérieurs).
+
+## Publication du 11 novembre
+
+- Version 0.21.0 publiée à 7 h 56 après 744 tests rapides, tous les paquets du dépôt verts et 25 parcours à deux joueurs en mode strict.
