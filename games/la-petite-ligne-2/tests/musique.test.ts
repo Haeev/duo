@@ -350,6 +350,39 @@ describe('régie', () => {
     director.dispose();
   });
 
+  it("écoute un air du carnet: l'ambiance s'efface, l'air passe une fois, l'ambiance revient", async () => {
+    const { director, started } = setup();
+    await director.ready();
+    for (let i = 0; i < 12; i++) director.frame(1);
+    await settle();
+    expect(director.state().track).toBe('bourg-matin');
+    expect(director.listenable('air-marche-de-la-halte')).toBe(true);
+    expect(director.listenable('air-inconnu')).toBe(false);
+    expect(director.listen('air-inconnu')).toBe(false);
+    const before = started.length;
+    expect(director.listen('air-marche-de-la-halte')).toBe(true);
+    await settle();
+    expect(director.listening()).toBe('air-marche-de-la-halte');
+    expect(director.state()).toMatchObject({ track: null, listening: 'air-marche-de-la-halte' });
+    expect(started.length).toBe(before + 2); // ses deux tiges
+    // Les ticks suivants ne relancent pas l'ambiance pendant l'écoute.
+    for (let i = 0; i < 10; i++) director.frame(1);
+    await settle();
+    expect(director.state().track).toBeNull();
+    // Arrêter: l'ambiance revient tout de suite.
+    director.stopListening();
+    await settle();
+    expect(director.listening()).toBeNull();
+    expect(director.state().track).toBe('bourg-matin');
+    // Écoutée jusqu'au bout, elle s'arrête seule.
+    director.listen('air-marche-de-la-halte');
+    await settle();
+    for (let i = 0; i < 70; i++) director.frame(1);
+    await settle();
+    expect(director.listening()).toBeNull();
+    director.dispose();
+  });
+
   it('garde un réglage de volume séparé', () => {
     const { director } = setup();
     expect(director.settings().music).toBe(0.8);

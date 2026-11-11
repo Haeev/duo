@@ -180,7 +180,28 @@ describe('carnet: collections', () => {
     const m = collectionsModel(fakeCollections(), 7, 0);
     expect(m.families[7]?.complete).toBe(true);
     expect(m.families[7]?.counter).toBe('8/8');
-    expect(m.detail?.canListen).toBe(true);
+    // Sans régie (démonstration, tests): l'air est dit sans enregistrement.
+    expect(m.detail?.listen).toBe('missing');
+  });
+
+  it("un air trouvé s'écoute puis s'arrête par la régie", () => {
+    const id = collectionsModel(fakeCollections(), 7, 0).detail?.id ?? '';
+    let current: string | null = null;
+    const port = {
+      can: (track: string): boolean => track === id,
+      play: (track: string): void => {
+        current = track;
+      },
+      stop: (): void => {
+        current = null;
+      },
+      current: (): string | null => current,
+    };
+    expect(collectionsModel(fakeCollections(), 7, 0, port).detail?.listen).toBe('play');
+    port.play(id);
+    expect(collectionsModel(fakeCollections(), 7, 0, port).detail?.listen).toBe('stop');
+    // Une entrée d'une autre famille n'a pas de bouton.
+    expect(collectionsModel(fakeCollections(), 0, 0, port).detail?.listen).toBe('none');
   });
 
   it('la fiche ne montre que les conditions découvertes', () => {

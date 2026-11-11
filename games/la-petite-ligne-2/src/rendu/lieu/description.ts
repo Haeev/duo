@@ -282,6 +282,57 @@ export function hidingFootprints(
   return out;
 }
 
+/** Jeu de la pose du mode déco (`containsPoint` de `simulation/logement/pose.ts`). */
+const DECO_EPS = 1e-6;
+
+/**
+ * Hauteur où se pose un meuble du mode déco: au sol, ou sur le plateau du meuble qui le porte.
+ * La règle de pose (`deco.surface`, `simulation/logement/pose.ts`) est la même: un objet de la
+ * couche `top` a son centre dans l'emprise d'une surface, de la carte ou posée par un joueur. Le
+ * plateau est le `top` de la fiche du porteur, sinon la hauteur de son modèle livré, sinon celle
+ * de la forme simple; un porteur de la carte lui-même posé (`on`) ajoute sa propre hauteur.
+ */
+function decoBase(
+  content: Content,
+  state: DeepReadonly<PlaceState>,
+  placed: { readonly id: string; readonly type: string; readonly x: number; readonly y: number },
+  settings: StandInSettings,
+  place: PlaceContent | undefined,
+): number {
+  const def = content.props[placed.type];
+  if (def?.deco?.layer !== 'top') return 0;
+  let best = 0;
+  const consider = (
+    carrier: {
+      readonly id: string;
+      readonly type: string;
+      readonly x: number;
+      readonly y: number;
+      readonly rotation: number;
+    },
+    below: number,
+  ): void => {
+    if (carrier.id === placed.id) return;
+    const prop = content.props[carrier.type];
+    if (prop?.deco?.surface !== true) return;
+    const size = footprint({ ...prop.size, rotation: (carrier.rotation % 4) as 0 | 1 | 2 | 3 });
+    if (
+      Math.abs(placed.x - carrier.x) > size.w / 2 + DECO_EPS ||
+      Math.abs(placed.y - carrier.y) > size.h / 2 + DECO_EPS
+    )
+      return;
+    const top = prop.top ?? DECOR_MANIFEST.models[prop.model]?.size.h ?? settings.propHeight;
+    best = Math.max(best, below + top);
+  };
+  if (place !== undefined) {
+    const byId = objectsById(place.map.objects);
+    for (const object of place.map.objects)
+      consider(object, poseHeight(content.props, byId, object) ?? 0);
+  }
+  for (const other of state.placed) consider(other, 0);
+  return best;
+}
+
 /**
  * Volumes qui changent en cours de partie: meubles posés par les joueurs et objets au sol.
  * `place`: le lieu, pour sortir un objet au sol de l'emprise d'un meuble (sous un banc, on ne le
@@ -298,6 +349,7 @@ export function describeDynamic(
   for (const placed of state.placed) {
     const prop = content.props[placed.type];
     if (prop === undefined) continue;
+    const base = decoBase(content, state, placed, settings, place);
     volumes.push({
       id: placed.id,
       model: prop.model,
@@ -306,10 +358,13 @@ export function describeDynamic(
       w: prop.size.w,
       h: prop.size.h,
       rotation: placed.rotation,
-      base: 0,
+      // Une lampe posée sur la table se dessine sur son plateau, et sa lumière part de là
+      // (`encre/lumieres.ts` lit `base`).
+      base,
       height: settings.propHeight,
       shape: 'box',
-      occludes: true,
+      // Posé sur un meuble, comme un objet de carte posé (`on`): du décor qui ne cache personne.
+      occludes: base === 0,
       aimable: true,
     });
   }

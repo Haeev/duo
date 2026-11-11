@@ -5,6 +5,7 @@
     "preroll": 1,
     "crossfadeSeconds": 6,
     "fadeSeconds": 4,
+    "listenFadeSeconds": 0.8,
     "arrivalHoldSeconds": 5,
     "jingleCooldownSeconds": 2,
     "otherPlayerDb": -3,

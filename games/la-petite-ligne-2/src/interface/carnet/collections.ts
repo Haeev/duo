@@ -53,7 +53,24 @@ export interface EntryDetailModel {
     readonly known: boolean;
   }[];
   readonly firstBy: { readonly kind: 'player' | 'duo'; readonly index: 0 | 1 | null } | null;
-  readonly canListen: boolean;
+  /**
+   * Bouton d'écoute d'un air trouvé: `play` (Écouter), `stop` (cet air joue: Arrêter),
+   * `missing` (pas encore d'enregistrement: bouton éteint, raison écrite), `none` (pas un air).
+   */
+  readonly listen: 'none' | 'play' | 'stop' | 'missing';
+}
+
+/**
+ * Écoute des airs du carnet, locale au joueur (`audio/musique/regie.ts`: `listen`,
+ * `stopListening`). Absente (démonstration sans son, tests): les airs sont dits sans enregistrement.
+ */
+export interface ListenPort {
+  /** L'air a-t-il un enregistrement (morceau de la table, nommé comme l'entrée) ? */
+  can(trackId: string): boolean;
+  play(trackId: string): void;
+  stop(): void;
+  /** Air écouté, `null`: aucun. */
+  current(): string | null;
 }
 
 export interface CollectionsModel {
@@ -72,7 +89,21 @@ function clueList(
   return { value: values.map((v) => names[v] ?? v).join(', '), known: true };
 }
 
-function detailOf(entry: CollectionEntryRead, family: CollectionFamily): EntryDetailModel {
+function listenState(
+  entry: CollectionEntryRead,
+  family: CollectionFamily,
+  listen: ListenPort | null,
+): EntryDetailModel['listen'] {
+  if (family !== 'music' || !entry.found) return 'none';
+  if (listen?.can(entry.id) !== true) return 'missing';
+  return listen.current() === entry.id ? 'stop' : 'play';
+}
+
+function detailOf(
+  entry: CollectionEntryRead,
+  family: CollectionFamily,
+  listen: ListenPort | null,
+): EntryDetailModel {
   const moments = clueList(entry.clues.moments, T.moments);
   const weathers = clueList(entry.clues.weathers, T.weathers);
   const seasons = clueList(entry.clues.seasons, T.seasons);
@@ -98,7 +129,7 @@ function detailOf(entry: CollectionEntryRead, family: CollectionFamily): EntryDe
         : entry.firstBy === 'duo'
           ? { kind: 'duo', index: null }
           : { kind: 'player', index: entry.firstBy },
-    canListen: family === 'music' && entry.found,
+    listen: listenState(entry, family, listen),
   };
 }
 
@@ -106,6 +137,7 @@ export function collectionsModel(
   read: readonly CollectionRead[],
   familyIndex: number,
   selected: number,
+  listen: ListenPort | null = null,
 ): CollectionsModel {
   const families = COLLECTION_FAMILIES.map((family) => {
     const entries = read.find((c) => c.family === family)?.entries ?? [];
@@ -135,7 +167,7 @@ export function collectionsModel(
       rarity: e.rarity,
     })),
     selected: at,
-    detail: chosen === undefined ? null : detailOf(chosen, family),
+    detail: chosen === undefined ? null : detailOf(chosen, family, listen),
   };
 }
 
@@ -178,13 +210,21 @@ export function createCollectionsTab(
   deps: TabDeps,
   read: (world: ReadonlyWorld, local: PlayerIndex) => readonly CollectionRead[],
   names: (index: 0 | 1, world: ReadonlyWorld) => string,
+  listen: ListenPort | null = null,
 ): Tab {
   let familyIndex = 0;
   let selected = 0;
 
+  function toggleListen(id: string, state: EntryDetailModel['listen']): void {
+    if (listen === null) return;
+    if (state === 'stop') listen.stop();
+    else if (state === 'play') listen.play(id);
+    deps.invalidate();
+  }
+
   return {
     render(world, local) {
-      const model = collectionsModel(read(world, local), familyIndex, selected);
+      const model = collectionsModel(read(world, local), familyIndex, selected, listen);
       const tabs = el('div', { class: 'familles', role: 'tablist' });
       model.families.forEach((f, i) => {
         const node = el(
@@ -273,17 +313,40 @@ export function createCollectionsTab(
             ]),
           );
         }
-        if (d.canListen)
-          page.append(el('button', { class: 'btn btn--primary', tabindex: '-1', text: T.listen }));
+        if (d.listen !== 'none') {
+          const playing = d.listen === 'stop';
+          const button = el(
+            'button',
+            {
+              class: `btn ecoute${playing ? ' ecoute--joue' : ' btn--primary'}`,
+              tabindex: '-1',
+              'aria-pressed': playing ? 'true' : 'false',
+            },
+            [
+              el('span', { class: 'key', text: deps.keyLabel('Enter') }),
+              el('span', { class: 'ecoute__ic', 'aria-hidden': 'true' }),
+              playing ? T.stop : T.listen,
+            ],
+          );
+          button.disabled = d.listen === 'missing';
+          button.addEventListener('click', () => {
+            toggleListen(d.id, d.listen);
+          });
+          page.append(button);
+          if (d.listen === 'missing')
+            page.append(el('p', { class: 'ecoute__why', text: T.noRecording }));
+          else if (playing)
+            page.append(el('p', { class: 'ecoute__why', role: 'status', text: T.playing }));
+        }
         right.push(page);
       }
       return { left, right, full: false };
     },
     signature(world, local) {
-      return JSON.stringify([read(world, local), familyIndex, selected]);
+      return JSON.stringify([read(world, local), familyIndex, selected, listen?.current() ?? null]);
     },
     key(code, shift, world, local) {
-      const model = collectionsModel(read(world, local), familyIndex, selected);
+      const model = collectionsModel(read(world, local), familyIndex, selected, listen);
       const dir = DIRECTION_KEYS[code];
       if (dir !== undefined) {
         selected = moveEntry(model.cells.length, model.selected, dir);
@@ -297,16 +360,25 @@ export function createCollectionsTab(
         deps.invalidate();
         return true;
       }
+      if (code === 'Enter') {
+        const d = model.detail;
+        if (d !== null && (d.listen === 'play' || d.listen === 'stop'))
+          toggleListen(d.id, d.listen);
+        return true;
+      }
       return false;
     },
     hints() {
       return [
         { codes: ['KeyW', 'KeyA', 'KeyS', 'KeyD'], label: CARNET_TEXTS.villagers.keys },
         { codes: ['Tab'], label: T.familyKeys },
+        { codes: ['Enter'], label: T.listenKeys },
       ];
     },
     closed() {
       selected = 0;
+      // Fermer le carnet arrête l'écoute: l'ambiance revient.
+      if (listen !== null && listen.current() !== null) listen.stop();
     },
   };
 }

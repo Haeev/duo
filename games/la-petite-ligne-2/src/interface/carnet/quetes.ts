@@ -11,6 +11,7 @@ import { itemThumb } from '../pictos';
 import { fill } from '../textes';
 import { CARNET_TUNING } from './parametres';
 import type { QuestLineRead } from './lectures';
+import { AGENDA_UI, agendaLineNode, type AgendaLine } from '../annonce';
 import { DIRECTION_KEYS, type Tab, type TabDeps } from './onglet';
 import { CARNET_TEXTS } from './textes';
 
@@ -450,6 +451,8 @@ export function createQuestsTab(
   lines: (world: ReadonlyWorld, local: PlayerIndex) => readonly QuestLineRead[],
   follow: FollowStore,
   reminders: (world: ReadonlyWorld, local: PlayerIndex) => readonly QuestReminder[] = () => [],
+  /** Événements annoncés (`../annonce.ts`): une ligne en tête, jusqu'à la fin de l'événement. */
+  agenda: (world: ReadonlyWorld) => readonly AgendaLine[] = () => [],
 ): Tab {
   let selected: string | null = null;
   const current = (world: ReadonlyWorld, local: PlayerIndex): QuestsModel =>
@@ -459,7 +462,12 @@ export function createQuestsTab(
     render(world, local) {
       const all = lines(world, local);
       const model = questsModel(all, follow.get(), selected);
-      const left: (HTMLElement | null)[] = reminders(world, local).map(reminderNode);
+      const left: (HTMLElement | null)[] = [
+        ...agenda(world)
+          .slice(0, AGENDA_UI.maxLines)
+          .map((line) => agendaLineNode(line, 'carnet')),
+        ...reminders(world, local).map(reminderNode),
+      ];
       if (model.empty) {
         const none = el('div', { class: 'vide' }, [
           icon('plume', 'ic vide__ic'),
@@ -532,7 +540,13 @@ export function createQuestsTab(
       return { left, right, full: false };
     },
     signature(world, local) {
-      return JSON.stringify([lines(world, local), reminders(world, local), follow.get(), selected]);
+      return JSON.stringify([
+        lines(world, local),
+        reminders(world, local),
+        agenda(world).map((l) => l.sentence),
+        follow.get(),
+        selected,
+      ]);
     },
     key(code, _shift, world, local) {
       const all = lines(world, local);

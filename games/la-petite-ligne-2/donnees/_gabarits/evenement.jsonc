@@ -26,6 +26,9 @@
   "conditions": [],
   // Annoncé la veille aux deux joueurs (l'interface le montre avec la météo du lendemain).
   "announce": true,
+  // Facultatif: où il se tient, lu après le nom dans l'annonce, préposition comprise
+  // (« Demain : Fête d'exemple, sur la place, à partir de 10 h »).
+  "where": "sur la place",
   "activates": {
     // Faits écrits au début, au nom du duo, pour un état qui dure au-delà de la journée (clé lieu.sujet.detail).
     "facts": [],

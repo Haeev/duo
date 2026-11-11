@@ -45,7 +45,7 @@ type Mode =
 /** Ce que le jeu branche aux onglets autres que le Sac (sources de lecture, réglages, éditeur). */
 export type NotebookExtras = Pick<
   CarnetTabsOptions,
-  'sources' | 'sourcesExtras' | 'settings' | 'openEditor' | 'follow'
+  'sources' | 'sourcesExtras' | 'settings' | 'openEditor' | 'follow' | 'listen'
 >;
 
 export interface Notebook {

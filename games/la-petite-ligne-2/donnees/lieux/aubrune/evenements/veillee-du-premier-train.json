@@ -20,6 +20,7 @@
     }
   ],
   "announce": true,
+  "where": "sur le quai",
   "activates": {
     "facts": [],
     "shop": null,

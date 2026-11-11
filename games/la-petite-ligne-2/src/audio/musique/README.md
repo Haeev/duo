@@ -26,6 +26,10 @@ Fichiers sonores: `assets/commun/son/musique/` (OGG Opus). Partitions, rendu et 
 
 Chaque morceau = deux tiges mono qui bouclent ensemble (`fond`: basse, accompagnement, rythme; `air`: mélodie, contrechant, éclats). Fichier: amorce de `preroll` s, boucle, amorce; lecture avec `loopStart` et `loopEnd` (jamais `<audio loop>`, qui marque le raccord). Décodage à la demande à `decodeRate` (24 kHz: environ 96 Ko par seconde et par tige); au plus `residentTracks` morceaux gardés en plus de celui qui joue.
 
+## Écouter un air depuis le carnet
+
+`listen(trackId)` joue un morceau de la table une fois en entier, pour ce joueur seulement: l'ambiance s'efface (`timing.listenFadeSeconds`), l'air passe sans couches ni passe-bas, puis l'ambiance revient. `stopListening()` l'arrête (bouton « Arrêter », fermeture du carnet); `listening()` dit l'air en cours, `listenable(id)` s'il existe. Un air de la collection porte l'identifiant de sa fiche: rien d'autre à brancher.
+
 ## Recette: ajouter un morceau
 
 1. Écris-le dans `assets-src/son/musique/aubrune.py` (une fonction qui rend un `Morceau` et ses tiges), ajoute-le à `MORCEAUX`. Un air de la collection du carnet va dans `airs.py` (liste `AIRS`) et porte l'identifiant de sa fiche (`air-marche-de-la-halte`): le carnet le retrouve par ce nom. Reste dans les notes de sol majeur (le test d'écriture le vérifie), durée entière en secondes.

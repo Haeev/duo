@@ -1,0 +1,136 @@
+/*
+ * Annonce des événements (`annonce.ts`): avis du HUD en haut à droite, sous les avis courts;
+ * ligne du coup d'œil au-dessus de sa minuterie; ligne en tête de l'onglet Quêtes. Mêmes couleurs
+ * que le rappel de décision (panneau sombre, texte clair, accent bouton d'or), quel que soit le
+ * thème: posée sur une page de papier, la ligne garde ses couleurs. Le thème sombre donne à l'avis
+ * et à la ligne du coup d'œil le cadre découpé des cartouches (`encre/encre.css`).
+ * Contrastes: texte 13,4 pour 1, détail 7,2, accent 11,0 sur le fond.
+ */
+.lpl-ui :is(.annonce, .annonce-ligne) {
+  --annonce-fond: #221d1b;
+  --annonce-texte: #f0e4c8;
+  --annonce-doux: #b9aa8d;
+  --annonce-accent: #ffc83d;
+  background: var(--annonce-fond);
+  color: var(--annonce-texte);
+  border: 0.125rem solid var(--annonce-accent);
+  border-radius: 0.75rem;
+  box-shadow: 0.125rem 0.125rem 0 0 rgb(0 0 0 / 0.5);
+}
+.lpl-ui :is(.annonce, .annonce-coup-d-oeil, .annonce-ligne)[hidden] {
+  display: none;
+}
+.lpl-ui .annonce__ic {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--annonce-accent);
+}
+
+/* Avis: haut droite, sous l'avis court (qui tient la première ligne), un seul à la fois. */
+.lpl-ui .annonce {
+  position: absolute;
+  right: 0.75rem;
+  top: 4.75rem;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  max-width: min(22rem, 40vw);
+  padding: 0.625rem 0.875rem 0.625rem 0.625rem;
+  animation: annonce-entre var(--d-base) var(--ease) both;
+}
+@keyframes annonce-entre {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+.lpl-ui .annonce__corps {
+  display: grid;
+  gap: 0.125rem;
+  line-height: 1.25;
+}
+.lpl-ui .annonce__lead {
+  color: var(--annonce-accent);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.lpl-ui .annonce__nom {
+  font-family: var(--font-display, inherit);
+  font-size: 1.125rem;
+  font-weight: 850;
+}
+.lpl-ui .annonce__detail {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+/* Le jour même: un trait plein en tête, pour le distinguer de la veille sans la couleur. */
+.lpl-ui .annonce--jour .annonce__lead::before {
+  content: '';
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.375rem;
+  background: var(--annonce-accent);
+  vertical-align: 0.0625rem;
+}
+
+/* Lignes (coup d'œil, carnet): tout sur une ligne, le détail passe à la ligne si besoin. */
+.lpl-ui .annonce-ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  padding: 0.375rem 0.75rem 0.375rem 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+}
+.lpl-ui .annonce-ligne .annonce__ic {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.lpl-ui .annonce-ligne__lead {
+  color: var(--annonce-accent);
+  font-weight: 800;
+}
+.lpl-ui .annonce-ligne__nom {
+  font-weight: 850;
+}
+.lpl-ui .annonce-ligne__detail {
+  color: var(--annonce-doux);
+  font-weight: 700;
+}
+/* En cours: le liseré passe en plein accent épais (forme), la veille en trait simple. */
+.lpl-ui .annonce-ligne--now {
+  border-width: 0.1875rem;
+}
+.lpl-ui .annonce-coup-d-oeil {
+  position: absolute;
+  left: 50%;
+  /*
+   * Au-dessus de la minuterie du coup d'œil (5,25 rem du bas) et de la bulle d'action quand elle
+   * n'est pas accrochée à un objet (6,5 rem du bas, 2,25 rem de haut, plus le débord du cadre).
+   */
+  bottom: 9.75rem;
+  z-index: 36;
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  width: max-content;
+  max-width: min(36rem, 90vw);
+  translate: -50% 0;
+}
+.lpl-ui .annonce-ligne--carnet {
+  margin-bottom: 0.625rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lpl-ui .annonce {
+    animation: none;
+  }
+}
+.lpl-ui[data-motion='reduced'] .annonce {
+  animation-duration: 1ms;
+}

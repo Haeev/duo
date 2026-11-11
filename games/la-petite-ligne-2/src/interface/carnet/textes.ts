@@ -71,7 +71,11 @@ export const CARNET_TEXTS = {
     firstBy: 'Trouvé en premier par {nom}',
     firstByDuo: 'Trouvé à deux',
     listen: 'Écouter',
+    stop: 'Arrêter',
+    playing: 'Il joue chez toi seulement.',
+    noRecording: 'Cet air n’a pas encore d’enregistrement.',
     familyKeys: 'famille',
+    listenKeys: 'écouter',
     moments: { morning: 'Matin', day: 'Journée', evening: 'Soir', night: 'Nuit' },
     weathers: {
       clear: 'Beau temps',

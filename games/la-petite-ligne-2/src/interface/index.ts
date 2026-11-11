@@ -31,6 +31,7 @@ import { createSceneLine } from './histoire/replique';
 import { createHud, type ProjectToScreen } from './hud';
 import { createRunHint } from './astuce-course';
 import { createDecisionBanner } from './rappel-decision';
+import { createAgendaHud } from './annonce';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
@@ -152,6 +153,9 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   let now = 0;
   const hud = createHud(layer, view.content, keyLabel, options.projectToScreen);
   const decisionBanner = createDecisionBanner(layer, view.content);
+  // Fêtes et veillées annoncées: avis la veille au soir et à l'ouverture, ligne du coup d'œil.
+  const agenda = createAgendaHud(layer, view.content);
+  let glanceUntil = -1;
   const runHint = createRunHint(
     view.content,
     typeof localStorage === 'undefined' ? null : localStorage,
@@ -563,6 +567,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     else if (sceneLine.key(raw.code, now)) used = true;
     else if (raw.code === 'KeyG' && !raw.repeat) {
       hud.glance(now);
+      glanceUntil = now + UI_TUNING.glanceMs;
       used = true;
     } else if (raw.code === 'KeyB' && !raw.repeat) {
       const home = decoHousingFor(view.content, view.world(), local());
@@ -643,6 +648,12 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       });
       // Rappel durable d'une décision à deux: caché sous un menu, visible pendant le dialogue.
       decisionBanner.frame(world, me, notebook.isOpen() || shopOpen || editor.isOpen(), now);
+      agenda.frame(
+        now,
+        world,
+        notebook.isOpen() || shopOpen || editor.isOpen() || chapterEnd.isOpen(),
+        now < glanceUntil,
+      );
       if (runHint.frame(dtMs / 1000, world, me, menu || sceneLine.inScene()))
         hud.notice(now, 'info', fill(TEXTS.notices.runHint, { touche: keyLabel('ShiftLeft') }));
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
@@ -670,6 +681,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       keyTarget.removeEventListener('keydown', onKey);
       hud.dispose();
       decisionBanner.dispose();
+      agenda.dispose();
       dialogue.dispose();
       notebook.dispose();
       shop.dispose();
