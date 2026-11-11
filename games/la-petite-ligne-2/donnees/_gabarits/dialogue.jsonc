@@ -6,7 +6,10 @@
   "id": "exemple-dialogue",
   // L'habitant à qui l'on parle (fichier du dossier habitants/ du même lieu).
   "villager": "cheffe-de-gare",
-  // Parmi les dialogues dont "when" est vrai, le plus prioritaire est joué.
+  // Parmi les dialogues dont "when" est vrai, le plus prioritaire est joué. À partir de 10
+  // (DIALOGUES.pendingPriority), il a quelque chose à dire (histoire, quête, souvenir, première
+  // rencontre): il passe avant la boutique au comptoir tenu et n'est pas suivi de l'offre de la
+  // boutique. En dessous (0: quotidien), conversation ordinaire.
   "priority": 0,
   // Conditions, toutes vraies. Exemples:
   //   { "type": "remembered", "key": "essai-gare.besace", "equals": true }

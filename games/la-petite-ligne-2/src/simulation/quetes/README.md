@@ -20,7 +20,7 @@ Une suite (`donnees/lieux/<lieu>/quetes/<id>.json`, schéma `src/donnees/schemas
 2. Un dialogue du lieu offre chaque option: `"effects": [{ "type": "choose", "decision": "<décision>", "option": "<a>" }]`.
 3. Après le choix, un nœud `branch` sur `decision_is`: `agreed` (avec `option`: la suite), `split` (le texte invite à se mettre d'accord), sinon une réplique d'attente.
 4. La décision n'est prise que si les deux choix concordent; avant, chacun peut changer d'avis; prise, elle ne bouge plus (`decisions.ts`).
-5. État: trois faits de la mémoire (`decisions.<id>.j0`, `.j1`, `decisions.<id>`), donc sauvegardés et transmis sans rien ajouter. Événement `decision_changed` (`waiting`, `split`, `agreed`), annoncé par l'interface.
+5. État: trois faits de la mémoire (`decisions.<id>.j0`, `.j1`, `decisions.<id>`), donc sauvegardés et transmis sans rien ajouter. Événement `decision_changed` (`waiting`, `split`, `agreed`), annoncé par l'interface. Tant qu'elle est ouverte et que l'un a choisi, un rappel durable (bandeau du HUD, ligne en tête de l'onglet Quêtes) la nomme par le titre de la suite, avec les mots du choix de chacun et l'habitant à qui répondre, tirés du dialogue qui l'offre (`decisionReminders` de `lecture.ts`, `interface/rappel-decision.ts`). Au comptoir tenu, ce dialogue reste « Parler » tant qu'il attend la réponse du joueur.
 6. Le chargement refuse une décision sans accord attendu, une option qu'aucun dialogue n'offre, un `choose` vers une décision inconnue.
 7. Exemple livré: `la-baronne.json` et `achille-decision.json`. Test court: `tests/decision-a-deux.test.ts`.
 

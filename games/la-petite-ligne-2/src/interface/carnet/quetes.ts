@@ -420,10 +420,36 @@ function cardNode(
   return node;
 }
 
+/** Rappel d'une décision à deux ouverte (`interface/rappel-decision.ts`), en tête de l'onglet. */
+export interface QuestReminder {
+  readonly quest: string;
+  readonly head: string;
+  readonly body: string;
+  readonly split: boolean;
+}
+
+function reminderNode(r: QuestReminder): HTMLElement {
+  return el(
+    'div',
+    {
+      class: `decision-rappel decision-rappel--carnet${r.split ? ' decision-rappel--desaccord' : ''}`,
+      role: 'note',
+    },
+    [
+      icon('info'),
+      el('div', {}, [
+        el('b', { class: 'decision-rappel__titre', text: r.head }),
+        el('span', { class: 'decision-rappel__texte', text: r.body }),
+      ]),
+    ],
+  );
+}
+
 export function createQuestsTab(
   deps: TabDeps,
   lines: (world: ReadonlyWorld, local: PlayerIndex) => readonly QuestLineRead[],
   follow: FollowStore,
+  reminders: (world: ReadonlyWorld, local: PlayerIndex) => readonly QuestReminder[] = () => [],
 ): Tab {
   let selected: string | null = null;
   const current = (world: ReadonlyWorld, local: PlayerIndex): QuestsModel =>
@@ -433,14 +459,14 @@ export function createQuestsTab(
     render(world, local) {
       const all = lines(world, local);
       const model = questsModel(all, follow.get(), selected);
-      const left: (HTMLElement | null)[] = [];
+      const left: (HTMLElement | null)[] = reminders(world, local).map(reminderNode);
       if (model.empty) {
         const none = el('div', { class: 'vide' }, [
           icon('plume', 'ic vide__ic'),
           el('h2', { text: T.none }),
           el('p', { text: T.noneHint }),
         ]);
-        return { left: [none], right: [null], full: false };
+        return { left: [...left, none], right: [null], full: false };
       }
       const pick = (id: string) => () => {
         selected = id;
@@ -506,7 +532,7 @@ export function createQuestsTab(
       return { left, right, full: false };
     },
     signature(world, local) {
-      return JSON.stringify([lines(world, local), follow.get(), selected]);
+      return JSON.stringify([lines(world, local), reminders(world, local), follow.get(), selected]);
     },
     key(code, _shift, world, local) {
       const all = lines(world, local);

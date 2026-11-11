@@ -7,6 +7,8 @@ export const SHOP_TEXTS = {
   provisional: 'Portrait provisoire',
   buy: 'Acheter',
   sell: 'Vendre',
+  talk: 'Parler',
+  talkLabel: 'Parler à {nom} ({touche})',
   buyGrid: 'Ce que vend {nom}',
   sellGrid: 'Ce que {nom} te rachète',
   refusedGrid: 'Ce que {nom} ne rachète pas',

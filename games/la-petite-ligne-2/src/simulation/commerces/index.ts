@@ -9,6 +9,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ShopDay } from '../../etat/lieu';
 import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
+import { talkBehaviour } from '../briques/parler';
 import { RULES } from '../regles/reglages';
 import { earn } from '../sac/argent';
 import { addItem, countItem, removeItem, roomFor } from '../sac/inventaire';
@@ -252,6 +253,29 @@ function sell(
   });
 }
 
+/**
+ * « Parler » de l'écran de boutique: la conversation avec le commerçant, à portée de lui ou d'un
+ * de ses comptoirs (on lui parle par-dessus). Même contrôle et même effet que la touche d'action
+ * sur lui (`briques/parler.ts`); la boutique se referme chez ce joueur.
+ */
+function talkToKeeper(sim: SimContext, player: PlayerIndex, id: string): void {
+  const actor = sim.world.players[player];
+  if (actor.talk !== null || actor.gesture !== null) return;
+  const shop = shopDef(sim, id);
+  if (shop === null) {
+    refuse(sim, player, 'gone', id);
+    return;
+  }
+  if (!nearShop(sim.content, sim.world, shop, player)) {
+    refuse(sim, player, 'too-far', id);
+    return;
+  }
+  // Le refus vise le commerce: l'écran de boutique, encore ouvert, le fait dire au commerçant.
+  const refusal = talkBehaviour.refuse(sim, player, shop.keeper);
+  if (refusal !== null) sim.emit({ type: 'refused', player, reason: refusal, target: id });
+  else talkBehaviour.use(sim, player, shop.keeper);
+}
+
 function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- chaque système ignore les intentions des autres
   switch (intent.type) {
@@ -260,6 +284,9 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
       return;
     case 'shop_sell':
       sell(sim, player, intent);
+      return;
+    case 'shop_talk':
+      talkToKeeper(sim, player, intent.shop);
       return;
     default:
       return;

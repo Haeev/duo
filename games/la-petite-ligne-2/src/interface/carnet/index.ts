@@ -22,6 +22,7 @@ import type { Tab, TabDeps, TabHint, TabId, TabPages } from './onglet';
 import { createSettingsTab, memorySettings } from './options';
 import { createQuestsTab, memoryFollow, type FollowStore } from './quetes';
 import { createOutfitsTab } from './tenues';
+import { decisionReminderTexts } from '../rappel-decision';
 
 export type { CarnetSources, SettingsPort, UiSettings } from './lectures';
 export type { FollowStore } from './quetes';
@@ -78,7 +79,12 @@ export function createCarnetTabs(options: CarnetTabsOptions): CarnetTabs {
   };
 
   const tabs: Readonly<Record<TabId, Tab>> = {
-    quests: createQuestsTab(deps, (w, l) => sources.quests(w, l), follow),
+    quests: createQuestsTab(
+      deps,
+      (w, l) => sources.quests(w, l),
+      follow,
+      (w, l) => decisionReminderTexts(w, options.content, l),
+    ),
     villagers: createVillagersTab(deps, (w, l) => sources.villagers(w, l), shared),
     collections: createCollectionsTab(
       deps,

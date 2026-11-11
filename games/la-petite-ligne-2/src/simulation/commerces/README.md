@@ -5,8 +5,8 @@ On ne vend qu'aux commerçants: chacun ne rachète que ce qui touche à son mét
 ## Fichiers
 
 - `prix.ts`: lecture pure (hôte, invité, interface): ouverture, prix de base (objet, coefficient de famille, famille), besoin du jour (tiré de la graine et du jour, payé `dailyNeedFactor` fois), bonus d'amitié (`friendship`), modificateur `sellPrice` des besoins (repas `better_prices`), stock et réassort, plafond du jour, mémoire des prix.
-- `index.ts`: système `commerces`: intentions `shop_buy` (avec `chest` pour le coffre commun) et `shop_sell`, `openShop` (brique et effet de dialogue), `rememberPrice`.
-- `brique.ts`: brique `shop` (comptoir), inscrite dans `briques/registre.ts`.
+- `index.ts`: système `commerces`: intentions `shop_buy` (avec `chest` pour le coffre commun), `shop_sell` et `shop_talk` (« Parler » de l'écran de boutique), `openShop` (brique et effet de dialogue), `rememberPrice`.
+- `brique.ts`: brique `shop` (comptoir), inscrite dans `briques/registre.ts`; comptoir tenu (`counterKeeper`).
 - `validation.ts`: contrôles appelés par `donnees/valider.ts` (objets connus, coefficient sans prix de famille, besoin du jour impossible, identifiant en double dans le jeu).
 - `reglages.ts`: besoin du jour (x1,5), pas des prix (0,10 €), portée (2,5 m), quantité maximale.
 
@@ -15,6 +15,15 @@ On ne vend qu'aux commerçants: chacun ne rachète que ce qui touche à son mét
 - La touche d'action sur un meuble comptoir dont la brique est `{ "brick": "shop", "shop": "<id>" }`.
 - Ou le commerçant: le champ `talk` du commerce ajoute « voir » à la fin de chacun de ses dialogues (`simulation/dialogues/commerce.ts`); un dialogue peut aussi porter l'effet `{ "type": "open_shop", "shop": "<id>" }` (fermé: l'option a un `when` `time_is`, et l'habitant le dit en dialogue).
 - Événement `shop_opened`; l'interface montre `interface/boutique/`.
+
+## Comptoir tenu (`"held": true` de la brique `shop`)
+
+Le commerçant se tient derrière son comptoir, hors de portée de la touche d'action depuis le côté client. Sur un comptoir tenu, la touche s'adresse à lui (`counterKeeper`), s'il est debout à moins de `keeperReach` (1,5 m) de l'emprise du comptoir:
+
+1. Il a un dialogue en attente (`pendingDialogue` de `dialogues/conversation.ts`): priorité d'au moins `DIALOGUES.pendingPriority` (10: histoire, quête, souvenir, première rencontre), pas encore entendu ce jour par ce joueur (fait daté `entendu.<lieu>.<dialogue>.j<joueur>`), ou une décision à deux qui attend sa réponse. La bulle dit « Parler », et ce dialogue se joue d'abord.
+2. Sinon la boutique s'ouvre (« Acheter »); l'écran de boutique garde « Parler » (touche P, intention `shop_talk`), qui ouvre la conversation et referme la boutique chez ce joueur.
+
+Une réplique d'histoire ou de quête n'est jamais suivie de l'offre de la boutique (`shopOffered`). Valable pour tout commerce: ajouter `"held": true` à la brique du comptoir. Test court: `tests/comptoir-tenu.test.ts`, `tests/decision-rappel.test.ts`.
 
 ## Paiement (`payment` d'un article)
 

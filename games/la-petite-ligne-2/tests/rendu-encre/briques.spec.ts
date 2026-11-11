@@ -15,7 +15,7 @@ interface Probe {
     stats(): { readonly place: string | null } | null;
     setCamera(yawDeg: number, width: number): boolean;
     setMoney(player: number, cents: number): boolean;
-    remember(key: string): boolean;
+    remember(key: string, value?: string | boolean): boolean;
   };
 }
 
@@ -46,6 +46,8 @@ interface Lives {
 const SIZE = { width: 1366, height: 768 } as const;
 const POSE = Number(process.env.LPL2_POSE ?? 6000);
 const PLACE = 'aubrune';
+/** Lacet de la vue du fournil, depuis la rue: le comptoir de face, Achille derrière. */
+const CAMERA_FOURNIL = Number(process.env.LPL2_LACET_FOURNIL ?? 20);
 
 async function big(duo: Duo): Promise<void> {
   for (const side of [duo.host, duo.guest]) await side.page.setViewportSize(SIZE);
@@ -65,9 +67,18 @@ async function shot(side: Side, name: string): Promise<string> {
   return path;
 }
 
+/** Capture sous un nom libre (preuves d'une mission), sans le préfixe du banc. */
+async function shotAs(side: Side, name: string): Promise<string> {
+  mkdirSync(CAPTURES, { recursive: true });
+  const path = join(CAPTURES, `${name}.png`);
+  const frame = await side.game().frameElement();
+  await frame.screenshot({ path, timeout: 120_000 });
+  return path;
+}
+
 /** Les deux écrans côte à côte (hôte à gauche, invité à droite), par ImageMagick. */
-function join2(paths: readonly string[], name: string): void {
-  execFileSync('convert', [...paths, '+append', join(CAPTURES, `briques-${name}.png`)]);
+function join2(paths: readonly string[], name: string, prefix = 'briques-'): void {
+  execFileSync('convert', [...paths, '+append', join(CAPTURES, `${prefix}${name}.png`)]);
 }
 
 async function camera(side: Side, yaw: number, width: number): Promise<void> {
@@ -160,69 +171,122 @@ test('briques: commerçante au comptoir, décision à deux', async ({ browser })
   const duo = await startDuo(browser, 'briques-bourg', { save: 'aubrune-briques' });
   const { host, guest } = duo;
   const [hi, gi] = await ready(duo);
+
+  // Deux plannings au même poste (`pl`, de 7 h à 12 h): Lucie et Jeanne côte à côte, jamais l'une
+  // dans l'autre.
+  const pair = (w: ProbeWorld): readonly { x: number; y: number }[] | null => {
+    const all = (w as unknown as Lives).places[PLACE]?.villagers ?? {};
+    const a = all.lucie;
+    const b = all.jeanne;
+    if (a === undefined || b === undefined) return null;
+    if (Math.hypot(a.body.x - 204, a.body.y - 116) > 2.5) return null;
+    if (Math.hypot(b.body.x - 204, b.body.y - 116) > 2.5) return null;
+    return [a.body, b.body];
+  };
+  // Les joueurs près de la place: les habitants alentour vivent à pleine fréquence.
+  await duo.teleport(hi, 205.5, 119.5, -Math.PI / 2);
+  await duo.teleport(gi, 202.5, 119.5, -Math.PI / 2);
+  const posted = pair(
+    await duo.until(host, 'Lucie et Jeanne au poste', (w) => pair(w) !== null, 120_000),
+  );
+  const [lucie, jeanne] = posted ?? [];
+  if (lucie === undefined || jeanne === undefined) throw new Error('Lucie et Jeanne absentes');
+  const mid = { x: (lucie.x + jeanne.x) / 2, y: (lucie.y + jeanne.y) / 2 };
+  await duo.teleport(hi, mid.x + 1.3, mid.y + 1.3, Math.PI);
+  await duo.teleport(gi, mid.x - 1.8, mid.y + 2.6, -Math.PI / 2);
+  await Promise.all([camera(host, 45, 7), camera(guest, 45, 7)]);
+  await big(duo);
+  await host.page.waitForTimeout(POSE);
+  await shotAs(host, 'deux-au-meme-point');
+  await small(duo);
+
   // Épicerie (pièce en (48; 210)): comptoir en (50,5; 213), façade à l'est, l'épicière derrière.
+  // Une lettre pour elle (fait d'une suite): elle a quelque chose à dire, la touche lui parle
+  // par-dessus le comptoir, depuis le côté client.
   await duo.teleport(hi, 51.4, 213, Math.PI);
   await duo.teleport(gi, 52.7, 213.9, Math.PI);
-  await Promise.all([camera(host, 290, 9), camera(guest, 290, 9)]);
+  await Promise.all([camera(host, 200, 8), camera(guest, 200, 8)]);
+  const opened = await host
+    .game()
+    .evaluate(
+      () =>
+        (window as unknown as Probe).__lplSonde?.remember('aubrune.lettres.odette', 'ouvert') ??
+        false,
+    );
+  expect(opened, 'fait retenu').toBe(true);
+  await expect
+    .poll(async () => (await host.aim(hi))?.verb ?? null, { timeout: 30_000 })
+    .toBe('Parler');
+  await big(duo);
+  await host.page.waitForTimeout(POSE);
+  await shot(host, 'comptoir-parler-bulle');
+  await host.press('Space');
+  const talking = (side: Side) => side.game().locator('.lpl-ui .dialogue');
+  await expect(talking(host)).toBeVisible();
+  await host.page.waitForTimeout(2500);
+  await shotAs(host, 'comptoir-parler');
+  const closeTalk = async (side: Side): Promise<void> => {
+    for (let i = 0; i < 12 && (await talking(side).isVisible()); i++) {
+      await side.press('Backspace');
+      await side.page.waitForTimeout(700);
+    }
+    await expect(talking(side)).toBeHidden();
+  };
+  await closeTalk(host);
+  // Entendue ce jour: le comptoir ouvre la boutique, qui garde « Parler ».
   await expect
     .poll(async () => (await host.aim(hi))?.verb ?? null, { timeout: 30_000 })
     .toBe('Acheter');
-  await big(duo);
-  await host.page.waitForTimeout(POSE);
-  await shot(host, 'commercant-avant');
   await host.press('Space');
   const shop = host.game().locator('.lpl-ui .shop');
   await expect(shop).toBeVisible();
+  await expect(host.game().locator('.lpl-ui .shop-talk')).toBeVisible();
   await host.page.waitForTimeout(1500);
   // Achat du premier article: la réplique `bought` de la fiche.
   await host.press('Enter');
-  await host.page.waitForTimeout(1200);
-  await shot(host, 'commercant-au-comptoir');
+  // La réplique paraît à l'image qui suit l'achat; en rendu logiciel, deux images peuvent être
+  // séparées de 1,3 s (sonde du 2026-11-11): attendre la bulle plutôt qu'un délai fixe.
+  const says = host.game().locator('.lpl-ui .shop-say');
+  await expect(says).toBeVisible();
+  await host.page.waitForTimeout(400);
+  await shotAs(host, 'comptoir-boutique');
   // Vente (onglet « Vendre », premier objet racheté): la réplique `sold`.
   await host.page.waitForTimeout(4500);
   await host.press('KeyE');
   await host.page.waitForTimeout(800);
   await shot(host, 'boutique-vendre-refus');
+  await expect(says).toBeHidden({ timeout: 60_000 });
   await host.press('Enter');
-  await host.page.waitForTimeout(1200);
+  await expect(says).toBeVisible();
+  await host.page.waitForTimeout(400);
   await shot(host, 'boutique-vendu');
-  // Un objet qu'elle ne rachète pas (dernière tuile): la réplique `refusal`.
-  await host.page.waitForTimeout(4500);
-  for (let i = 0; i < 6; i++) await host.press('ArrowRight', 60);
-  await host.press('Enter');
-  await host.page.waitForTimeout(1200);
-  await shot(host, 'boutique-refus');
-  // Bourse vide: la réplique `noMoney`.
-  await host.page.waitForTimeout(4500);
-  await host.game().evaluate((p) => (window as unknown as Probe).__lplSonde?.setMoney(p, 0), hi);
-  await host.press('KeyQ');
-  await host.page.waitForTimeout(800);
-  await host.press('Enter');
-  await host.page.waitForTimeout(1200);
-  await shot(host, 'boutique-sans-argent');
-  await host.press('Backspace');
+  // « Parler » (P) depuis la boutique: la conversation s'ouvre, la boutique s'efface.
+  await host.page.waitForTimeout(1500);
+  await host.press('KeyP');
+  await expect(talking(host)).toBeVisible();
   await expect(shop).toBeHidden();
+  await host.page.waitForTimeout(1500);
+  await shot(host, 'boutique-parler');
+  await closeTalk(host);
 
-  // Fournil (pièce en (68; 210)): le boulanger derrière son comptoir, les deux joueurs près de lui.
+  // Fournil (pièce en (68; 210)): le boulanger derrière son comptoir (en (73; 212,5)), les deux
+  // joueurs devant, côté rue: on lui dit la décision par-dessus le comptoir.
   await small(duo);
-  const world = (await duo.until(host, 'monde lu', () => true)) as unknown as Lives;
-  const baker = world.places[PLACE]?.villagers?.achille?.body;
-  if (baker === undefined) throw new Error('boulanger absent');
-  await duo.teleport(hi, baker.x - 1, baker.y + 0.1, 0);
-  await duo.teleport(gi, baker.x - 0.6, baker.y - 0.8, Math.atan2(0.8, 0.6));
-  await Promise.all([camera(host, 20, 8), camera(guest, 20, 8)]);
+  await duo.teleport(hi, 72.6, 213.9, -Math.PI / 2);
+  await duo.teleport(gi, 73.6, 213.9, -Math.PI / 2);
+  await Promise.all([camera(host, CAMERA_FOURNIL, 8), camera(guest, CAMERA_FOURNIL, 8)]);
   for (const [side, index] of [
     [host, hi],
     [guest, gi],
   ] as const)
     await expect
-      .poll(async () => (await side.aim(index))?.id ?? null, { timeout: 30_000 })
-      .toBe('achille');
+      .poll(async () => (await side.aim(index))?.verb ?? null, { timeout: 30_000 })
+      .toBe('Parler');
   await big(duo);
   const choices = (side: Side) => side.game().locator('.lpl-ui .choice');
   const reach = async (side: Side): Promise<void> => {
     await side.press('Space');
-    await expect(side.game().locator('.lpl-ui .dialogue')).toBeVisible();
+    await expect(talking(side)).toBeVisible();
     for (let i = 0; i < 12 && !(await choices(side).first().isVisible()); i++) {
       await side.press('Space');
       await side.page.waitForTimeout(700);
@@ -231,31 +295,37 @@ test('briques: commerçante au comptoir, décision à deux', async ({ browser })
   };
   // L'invité choisit seul (deuxième option, « On l'offre au café »): l'hôte n'a encore rien dit.
   await reach(guest);
-  await shot(guest, 'decision-choix-invite');
   await guest.press('KeyS');
   await guest.press('Enter');
-  // L'avis de l'hôte ne dure que quelques secondes: sa capture d'abord.
-  await host.page.waitForTimeout(700);
-  const waiting = [await shot(host, 'decision-attente-hote')];
-  await guest.page.waitForTimeout(2500);
-  waiting.push(await shot(guest, 'decision-attente-invite'));
-  join2(waiting, 'decision-a-deux');
-  // L'invité referme sa conversation, puis l'hôte choisit l'autre option: deux avis.
-  const talking = guest.game().locator('.lpl-ui .dialogue');
-  for (let i = 0; i < 8 && (await talking.isVisible()); i++) {
-    await guest.press('Backspace');
-    await guest.page.waitForTimeout(700);
-  }
-  await expect(talking).toBeHidden();
-  await host.page.waitForTimeout(4500);
-  await shot(host, 'decision-apres-avis-hote');
+  await guest.page.waitForTimeout(1500);
+  await shot(guest, 'decision-une-voix-invite');
+  await closeTalk(guest);
+  // Pas de boutique derrière la réplique de quête.
+  await expect(guest.game().locator('.lpl-ui .shop')).toBeHidden();
+  // L'avis de 4 s est passé: le rappel reste, chez chacun de son point de vue.
+  await host.page.waitForTimeout(5000);
+  const waiting = [
+    await shot(host, 'decision-rappel-hote'),
+    await shot(guest, 'decision-rappel-invite'),
+  ];
+  join2(waiting, 'decision-rappel', '');
+  // L'hôte choisit l'autre option: deux avis, et chacun peut changer d'avis.
   await reach(host);
   await host.press('Enter');
-  await guest.page.waitForTimeout(700);
-  const split = [await shot(guest, 'decision-desaccord-invite')];
-  await host.page.waitForTimeout(2500);
-  split.unshift(await shot(host, 'decision-desaccord-hote'));
-  join2(split, 'decision-a-deux-desaccord');
+  await host.page.waitForTimeout(1500);
+  await closeTalk(host);
+  await host.page.waitForTimeout(5000);
+  const split = [
+    await shot(host, 'decision-desaccord-hote'),
+    await shot(guest, 'decision-desaccord-invite'),
+  ];
+  join2(split, 'decision-desaccord', '');
+  // L'onglet Quêtes du carnet garde la même ligne.
+  await guest.press('KeyC');
+  await guest.page.waitForTimeout(1500);
+  await guest.press('KeyE');
+  await guest.page.waitForTimeout(1500);
+  await shot(guest, 'decision-carnet-invite');
   expect(duo.errors).toEqual([]);
   await duo.close();
 });

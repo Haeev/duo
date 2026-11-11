@@ -20,7 +20,7 @@ import { el, icon } from '../dom';
 import { itemThumb } from '../pictos';
 import { portraitMarkup } from '../portrait';
 import { UI_TUNING } from '../reglages';
-import { fill } from '../textes';
+import { fill, refusalText } from '../textes';
 import { shopModel, type ShopModel, type ShopTab, type ShopTile, type ShopUiState } from './modele';
 import { SHOP_TEXTS, shopRefusalText } from './textes';
 import './boutique.css';
@@ -35,6 +35,7 @@ const SYMBOLS: Readonly<Record<string, string>> = {
   moins: `<path ${S} d="M5 12h14"/>`,
   plus: `<path ${S} d="M5 12h14M12 5v14"/>`,
   echoppe: `<g ${S}><path d="M3 10l2-6h14l2 6M4 10v10h16V10M3 10h18M9 20v-6h6v6"/></g>`,
+  parole: `<g ${S}><path d="M4 5h16v10H10l-4 4v-4H4z"/><path d="M8 9h8M8 12h5"/></g>`,
 };
 const COLUMNS = 6;
 
@@ -86,7 +87,9 @@ export function createShopScreen(
   function keeperRefuses(reason: string): string {
     const shop = ui === null ? undefined : shops.get(ui.shop);
     return (
-      (shop === undefined ? null : shopSaysRefusal(shop, reason)) ?? shopRefusalText(reason) ?? ''
+      (shop === undefined ? null : shopSaysRefusal(shop, reason)) ??
+      shopRefusalText(reason) ??
+      refusalText(reason)
     );
   }
 
@@ -128,6 +131,11 @@ export function createShopScreen(
     const shown = Math.min(maxMs, Math.max(baseMs, text.length * perCharMs));
     message = { text, until: now + shown, mood };
     drawn = '';
+  }
+
+  /** « Parler »: la conversation avec le commerçant, par-dessus le comptoir (intention `shop_talk`). */
+  function talk(): void {
+    if (ui !== null) send({ type: 'shop_talk', shop: ui.shop });
   }
 
   function keyChip(code: string): HTMLElement {
@@ -238,12 +246,27 @@ export function createShopScreen(
       });
       return b;
     };
+    const talkButton = (name: string): HTMLElement => {
+      const b = el(
+        'button',
+        {
+          class: 'shop-talk',
+          'aria-label': fill(SHOP_TEXTS.talkLabel, { nom: name, touche: keyLabel('KeyP') }),
+        },
+        [icon('parole'), SHOP_TEXTS.talk, keyChip('KeyP')],
+      );
+      b.addEventListener('click', talk);
+      return b;
+    };
     const wanted = m.tiles.slice(0, m.refusedFrom);
     const refused = m.tiles.slice(m.refusedFrom);
     const shelves = el('section', { class: 'shop-shelves' }, [
-      el('div', { class: 'shop-bigtabs', role: 'tablist' }, [
-        tab('buy', SHOP_TEXTS.buy, ['etagere']),
-        tab('sell', SHOP_TEXTS.sell, ['sac', 'fleche']),
+      el('div', { class: 'shop-bigtabs' }, [
+        el('div', { class: 'shop-bigtabs__tabs', role: 'tablist' }, [
+          tab('buy', SHOP_TEXTS.buy, ['etagere']),
+          tab('sell', SHOP_TEXTS.sell, ['sac', 'fleche']),
+        ]),
+        talkButton(keeperName),
       ]),
       wanted.length === 0 && refused.length === 0
         ? el(
@@ -557,6 +580,10 @@ export function createShopScreen(
           if (event.player === me && ui !== null && event.target === ui.shop)
             say(keeperRefuses(event.reason), 'no', performance.now());
           return;
+        // « Parler » a ouvert la conversation: la boutique s'efface derrière le dialogue.
+        case 'talk_started':
+          if (event.player === me && ui !== null) close();
+          return;
         default:
           return;
       }
@@ -614,6 +641,9 @@ export function createShopScreen(
         case 'Enter':
         case 'Space':
           confirm();
+          return true;
+        case 'KeyP':
+          talk();
           return true;
         case 'Backspace':
           close();

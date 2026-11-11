@@ -128,8 +128,11 @@ const SPREAD_RADIUS = 0.75;
 const SPREAD_COUNT = 6;
 
 /**
- * Plusieurs habitants au même point (la cheffe au guichet, un client): il prend la première place
- * libre de la couronne autour, jamais l'un dans l'autre ni dans un mur.
+ * Plusieurs habitants au même point (la cheffe au guichet, un client, deux plannings sur la même
+ * place): deux personnages ne s'arrêtent jamais au même endroit. Une place est tenue par qui s'y
+ * tient déjà, et aussi par qui y va: le but choisi par un autre la réserve, même s'il marche
+ * encore (deux départs à la même heure, ou l'heure avancée d'un coup). Le second prend la
+ * première place libre de la couronne autour, jamais l'un dans l'autre ni dans un mur.
  */
 function spread(
   sim: SimContext,
@@ -138,13 +141,18 @@ function spread(
   self: string,
   goal: Goal,
 ): void {
+  const near = (x: number, y: number, ox: number, oy: number): boolean =>
+    Math.hypot(ox - x, oy - y) < VILLAGERS.radius * 2;
+  const goals = runtimesOf(sim.world);
   const taken = (x: number, y: number): boolean => {
     for (const id in place.villagers) {
       const other = place.villagers[id];
       if (id === self || other === undefined || other.life?.presence === 'away') continue;
-      // Un habitant en marche ne tient pas sa place: seul compte celui qui est à son poste.
+      const reserved = goals.get(id)?.goal ?? null;
+      if (reserved !== null && near(x, y, reserved.x, reserved.y)) return true;
+      // Un habitant en marche ne tient que la place où il va (ci-dessus), pas celle où il passe.
       if (other.life?.pose === 'walk') continue;
-      if (Math.hypot(other.body.x - x, other.body.y - y) < VILLAGERS.radius * 2) return true;
+      if (near(x, y, other.body.x, other.body.y)) return true;
     }
     return false;
   };
@@ -505,6 +513,13 @@ function liveOne(
   }
   const state = villager.life;
   const body = villager.body;
+  // Reprise d'une sauvegarde faite en pleine marche: le trajet n'est pas sauvegardé. Celui qui
+  // arrivait est là, et chacun reprend sa ligne d'emploi du temps depuis son poste, sinon il
+  // resterait figé à mi-chemin, en posture de marche.
+  if (snap && (state.presence === 'arriving' || state.presence === 'here')) {
+    state.presence = 'here';
+    state.entry = -1;
+  }
   const near = state.presence !== 'away' && nearPlayers(sim, body.x, body.y);
   const tick = sim.world.tick;
   // Loin: un pas sur `farEveryTicks`, décalé d'un habitant à l'autre pour lisser la charge.

@@ -9,6 +9,11 @@ export interface ShopTuning {
   readonly priceStep: number;
   /** Distance (m) au commerçant ou à son comptoir pour acheter et vendre. */
   readonly reach: number;
+  /**
+   * Distance (m) entre le commerçant et l'emprise de son comptoir tenu (`held`) pour qu'il soit
+   * tenu pour derrière son comptoir: la touche d'action s'adresse alors à lui.
+   */
+  readonly keeperReach: number;
   /** Exemplaires au plus par achat ou par vente. */
   readonly maxCount: number;
   /** Objets distincts retenus au plus par commerce à l'ouverture (mémoire des prix). */
@@ -19,6 +24,7 @@ export const SHOP_TUNING: ShopTuning = {
   dailyNeedFactor: 1.5,
   priceStep: 10,
   reach: 2.5,
+  keeperReach: 1.5,
   maxCount: 99,
   rememberOnOpen: 40,
 };

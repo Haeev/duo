@@ -13,7 +13,8 @@
   "bricks": [
     {
       "brick": "shop",
-      "shop": "buvette-de-la-gare"
+      "shop": "buvette-de-la-gare",
+      "held": true
     }
   ]
 }

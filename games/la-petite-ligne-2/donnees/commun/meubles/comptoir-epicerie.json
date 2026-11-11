@@ -13,7 +13,8 @@
   "bricks": [
     {
       "brick": "shop",
-      "shop": "epicerie-ferrand"
+      "shop": "epicerie-ferrand",
+      "held": true
     }
   ]
 }

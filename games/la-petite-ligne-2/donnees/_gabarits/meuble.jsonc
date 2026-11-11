@@ -30,6 +30,9 @@
   //   { "brick": "relieve", "verb": "Se laver", "clip": "wash", "seconds": 4,
   //     "need": "hygiene", "amount": 40, "cap": 60 }                           soulager un besoin
   //   { "brick": "shop", "shop": "<commerce du lieu>" }                        vendre et acheter
+  //   { "brick": "shop", "shop": "<commerce>", "held": true }   comptoir tenu: le commerçant se
+  //     tient derrière; de face, la touche d'action lui parle s'il a quelque chose à dire
+  //     (histoire, quête, première rencontre), sinon ouvre la boutique
   //   { "brick": "cook", "station": "stove" }                                  cuisiner, fabriquer
   //   { "brick": "open", "startsOpen": false }                                 ouvrir
   //   { "brick": "repair", "tools": ["axe", "spade"], "seconds": 1.5 }         réparer

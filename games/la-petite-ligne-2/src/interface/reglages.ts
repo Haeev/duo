@@ -30,8 +30,12 @@ export interface UiTuning {
    * `perCharMs` par caractère (une phrase de la fiche du commerce se lit en entier), `maxMs` au plus.
    */
   readonly shopSay: { readonly baseMs: number; readonly perCharMs: number; readonly maxMs: number };
+  /** Relecture du rappel des décisions à deux ouvertes (ms): quelques fois par seconde suffit. */
+  readonly reminderReadMs: number;
   /** Gain d'argent qui flotte près de la bourse (ms). */
   readonly moneyFloatMs: number;
+  /** Montée et fondu d'entrée de ce gain (ms). */
+  readonly moneyRiseMs: number;
   /** Pas du coffre commun (centimes), et pas avec Maj. */
   readonly chestStepCents: number;
   readonly chestBigStepCents: number;
@@ -65,7 +69,9 @@ export const UI_TUNING: UiTuning = {
   refusalMs: 1600,
   noticeMs: 4000,
   shopSay: { baseMs: 1800, perCharMs: 55, maxMs: 7000 },
+  reminderReadMs: 250,
   moneyFloatMs: 1200,
+  moneyRiseMs: 240,
   chestStepCents: 100,
   chestBigStepCents: 1000,
   nightFrom: 20 * 60,
