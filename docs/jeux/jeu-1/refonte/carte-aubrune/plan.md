@@ -2,10 +2,10 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | version 3: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12), raccordé à l'histoire écrite des actes 1 à 3 (section 13); manques de la nuit du 2026-11-11 comblés (section 15) |
+| Statut | version 3: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12), raccordé à l'histoire écrite des actes 1 à 3 (section 13); manques de la nuit du 2026-11-11 comblés (section 15); décor des fêtes et des veillées, présent le jour de la fête seulement (section 18) |
 | Date | 2026-11-10 |
 | Source unique | `construire_plan.py` (composition en code), qui écrit `plan.json`, les SVG, les PNG et les tableaux marqués « généré » de ce document |
-| Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (26 casses vues sur 26), `assembler_lieu.py` (aucun verrou contournable sur la grille); règle d'accès des intérieurs et du dehors (section 14), aussi tenue par `tests/points-de-quete.test.ts` du jeu |
+| Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (36 casses vues sur 36, dont 6 du décor des fêtes), `assembler_lieu.py` (aucun verrou contournable sur la grille); règle d'accès des intérieurs et du dehors (section 14), aussi tenue par `tests/points-de-quete.test.ts` du jeu |
 | Règle suivie | « le plan avant le volume » (CLAUDE.md): la carte 3D sera générée à partir de `plan.json`, jamais l'inverse |
 
 Images: `plan-ensemble.png`, `zone-1-bourg.png` à `zone-7-tunnel.png`, `quetes-acte-1.png` à `quetes-acte-3.png` (SVG de même nom à côté).
@@ -1304,3 +1304,146 @@ Le modèle `comptoir-cafe` mesure 0,92 x 0,63 m: une fiche de deux cases laisser
 | barque retournée et nasse | barque 3,5 x 1,2 m (4 x 2 cases), nasse 0,6 m (1 case) | berge: sur la grève, à l'ouest des bois flottés (vers 186; 128,5) |
 | piquets à ruban rouge (Paulin) | piquet de 1,2 m, ruban; une file de 4 à 6 piquets espacés de 3 m | ferme: au bord du labour, la limite que Paulin dispute (le long de x 214, y 165 à 175) |
 | comptoir de café de deux cases | 1,90 x 0,63 m, zinc à 1 m | café: à la place du comptoir actuel (4,5; 1,5), pour rendre son tabouret à Colette |
+
+## 18. Le décor des fêtes et des veillées (version 7, 2026-11-11)
+
+Les quatre fêtes et la veillée du quai (`../ecriture-fetes.md`) se voient maintenant le jour où elles ont lieu. 63 objets de carte, tous posés par le plan (`construire_plan.py`, section « version 7 »), chacun avec sa condition `when`, que l'assembleur écrit dans `carte.json` (le plan l'emporte sur une retouche à la main; les `when` ajoutés à la main dans les intérieurs restent conservés).
+
+### Quand le décor paraît
+
+- **Toute la fête**: `event_is` sur la fête, en `begun`. Le décor paraît quand la fête commence (10 h, ou 18 h 30 pour une veillée) et disparaît à l'aube suivante, quand l'agenda ne dit plus « commencée aujourd'hui »: le bourg a rangé avant le matin (`le-bourg-range-la-fete`, 6 h à 10 h, ne fait plus que relever les lisses).
+- **Les lisses fleuries** demandent en plus `aubrune.barrieres.lisses` = `baissees`: c'est la scène d'ouverture qui les baisse, la clôture qui les relève. Relevées, elles ne se dessinent pas: aucun jour ordinaire ne montre de lisse (le modèle levé n'existe pas; les lisses du plan, `level-crossing-gate`, n'ont pas de type), la fête ne fait pas exception.
+- **Les lumignons**: de 10 h à 20 h 30, les 21 lumignons coulés refroidissent en rangs sur le parvis; de 20 h 30 à l'aube, chacun est posé là où son habitant le veille (`time_is`). Celui de Rosalie s'éteint à 22 h, quand son train repart.
+- **Le quai** porte un décor commun à toutes les veillées (les cinq fiches de veillée du quai) et à la Veillée du premier train: brasero, deux bancs, trois guirlandes. Les guirlandes servent aussi à la fête des barrières (le bout ouest du quai accueille Ambroise, Martial et Rosalie, et Achille sur le banc).
+
+### Où, et pourquoi là
+
+```text
+Passage à niveau et quai (x 172 à 215, y 94 à 105): F décor solide, f décor non solide, * point, = voie, q bord du quai
+             8         9         0         1
+     23456789012345678901234567890123456789012345
+  95 ,,,,,,,,FFFFF,,,,,,,,,,,,,,,,,,,========cccc   lisse nord (barrières)
+  96 ========RRRRR===========================cccc
+  97 ========RR*RR===========================cc*c
+  98 ========RRRRR===========================ccc=
+  99 ,,,,,,,,fFFFfrrqqqqqqqqqqqqqqqqqqqqqqqqqcccB   lisse sud (barrières); lumignons de Firmin et Jeanne
+ 100 ,,FFF,,,RRRR*rrrrrOOrrrrrrrOOrrrrrrrrrrrrrrB   bord du quai libre (rangées 99 et 100)
+ 101 ,,FFF,,,RR*RRrr*rrrrrrrrrrrr*rr*rrrrrrrrfrrB
+ 102 ,,FFF,,,RRRRRrroorrrrrFFFrrrrroo*OrrrroFr*rB   table de la tourte (hiver), brasero
+ 103 ,,FFF,,,RRRRRrrrrrrrrrrrrrrrrrrrfrrrrrrrrrrB   rue du quai libre
+ 104 ,,,,,F,offfff,F,,fffffffffffffffff,,FF,FF,,B   estrade, tonneaux, banderoles, guirlandes, bancs
+ 105 ,,,,,,,,RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR   Grand-Route
+
+La place (x 194 à 213, y 110 à 122), concours de la soupe
+           0         1
+     45678901234567890123
+ 111 ,OOppppprrrrFppppOO,   ardoise du palmarès
+ 112 ,pppFFpprrrrpppFFpp,   marmite des mères (ouest), panade du moulin (est)
+ 113 OpppFFpprrrrpOOFFpp,
+ 116 D*r*rrrrrr*rcccccccc   pl-o, pl
+ 118 ,fOOpppprrrrpOO*ppp,   banc d'Honorine et sa place
+ 119 ,pOOOppprrropOOpFFp,   banc nord
+ 120 ,pOOOppprrroppppFFF,   grande table
+ 121 ,ppOOppprrrrppppFFp,   banc sud
+```
+
+- **Barrières fleuries.** Les deux lisses barrent la route du Gué en travers (bras est-ouest), une de chaque côté de la voie, jamais sur la voie: c'est ce que dit la scène (« la route du Gué est fermée, pour la plus belle raison de l'année »). On passe à pied par l'accotement, une case d'herbe libre à chaque bout (contrôlé). Firmin se tient contre la lisse sud, c'est son poste; Jeanne, Léon et Solange à 2 m au sud. La banderole est tendue au-dessus de la route, entre le carrefour et la lisse sud, face au sud: on la lit en venant du bourg. Le tonneau du café est sur l'herbe au coin du passage, à 5 m du carrefour où se tient Colette, hors de la route.
+- **Nuit des lumignons.** Le jour, trois rangs de sept sur le parvis, à l'est du portail (deux cases libres devant la porte), au pied de la façade et près de Marthe, qui coule la cire. La nuit, un lumignon par habitant à un ou deux mètres de son poste de nuit, à l'endroit que l'écriture lui donne (`fete-lumignon-<habitant>`): Firmin et Jeanne aux deux coins de la route au bord de la voie, Odette sous la tonnelle, Basile à l'établi, Achille sous la fenêtre du fournil, Solange au seuil de la mercerie (hors des deux cases devant la porte), Mado au pied de l'enclume (rien ne se pose sur l'enclume), Barnabé devant la forge, Ambroise sur le quai côté bourg, Honorine deux à son seuil, Marthe au pied du clocher (à l'ouest du portail: le clocher est à l'ouest de la nef), Lucie à la boîte aux lettres, Colette sur la terrasse du café, Armand contre le lavoir, Paulin et Margot au gué, Léon en haut de la grève, Berthe au bout du ponton, Martial au cimetière, Rosalie sur le quai face à sa locomotive. Le lumignon n'est pas solide: il ne barre rien, même posé sur une route.
+- **Concours de la soupe.** Les deux marmites se font face de part et d'autre de la rue du Bourg, au nord de la place, à 2 et 3 m de la rue: la soupe des mères côté épicerie (Odette et Colette se tiennent devant, `pl-o`), la panade du moulin à l'est de la pompe, que l'on atteint toujours par l'ouest et le sud. Chacun goûte une marmite différente: elles sont à 11 m l'une de l'autre, on se décrit ce qu'on a goûté. La grande table et ses deux bancs au sud-est, à côté du banc où Honorine préside (sa place et le devant du banc restent libres). L'ardoise du palmarès au coin nord-est, face au sud, lisible depuis le carrefour.
+- **Veillée du premier train.** Le quai fait 5 m et le train du samedi reste à quai jusqu'à 22 h: les deux rangées du bord restent vides, la rue qui longe le quai au sud aussi. La table de la tourte va sur la troisième rangée, entre les deux bancs du quai, son long côté vers la voie (« la place du voyageur »): on passe au nord sur 3 m. L'estrade (4 x 3 m) n'a pas sa place sur le quai: elle est sur l'herbe à l'ouest de la route du Gué, face au quai, à 1 m du bord de la voie, et son ombre de caméra ne tombe que sur l'herbe et la voie. Le tonneau au pied du bout ouest, près de Jeanne, Solange, Lucie et Armand. La banderole au-dessus du passage qui monte de la Grand-Route au quai, face au sud.
+- **Veillées du quai.** Le brasero de Mado au bout est, sur la troisième rangée, à 1,5 m du poste `quai-e` (Mado, Barnabé, Basile, Berthe), à côté de la lanterne; deux bancs de ferme sur l'herbe au sud de la rue, face au feu et à la voie. Trois guirlandes sur l'herbe au sud du quai, du banc ouest au passage vers la Grand-Route (poteau de chaque guirlande à l'ouest, poteau de bout à l'est, à l'ouest du passage qu'il laisse libre): le quai est éclairé sans que rien n'y soit posé.
+
+### Lumières
+
+Le rendu pose une flaque de lumière pour les 6 lampes allumées les plus proches du point visé, à 26 m au plus (`MAX_LAMPS` de `src/rendu/encre/matiere.ts`, `INK_SETTINGS.lights.reach`); au-delà, une lampe garde son verre allumé sans flaque. Une fête ajoute (relevé de `controler_plan.py`, lampes de modèle seulement, sans les fenêtres):
+
+| Fête | Lampes ajoutées | Au pire, à 26 m d'un poste | Dont lampes de fête | Où |
+|---|---|---|---|---|
+| Barrières fleuries | 3 guirlandes | 9 | 3 | `quai-o` |
+| Nuit des lumignons, de 20 h 30 à l'aube | 21 lumignons | 18 | 10 | `pl-o` |
+| Nuit des lumignons, de 10 h à 20 h 30 | 21 lumignons (sur le parvis, éteints de jour) | 26 | 21 | `mado-enclume` |
+| Concours de la soupe | 2 feux de marmite | 11 | 2 | `gr1` |
+| Veillée du premier train | 3 guirlandes, 1 brasero | 13 | 4 | `quai` |
+| Veillées du quai (cinq fiches) | 3 guirlandes, 1 brasero | 13 | 4 | `quai` |
+
+Répartition: sur le quai, trois guirlandes au lieu de quatre, le brasero à l'autre bout, et les trois lanternes du quai déjà là: depuis le milieu du quai, les 6 flaques sont la lanterne du milieu (1 m), la guirlande est (4,9 m), la lanterne est (6,5 m), le brasero (7,5 m), la guirlande du milieu (8,7 m) et le premier réverbère de la Grand-Route (12 m); la guirlande ouest (12,7 m) prend la place du réverbère dès qu'on fait trois pas vers l'ouest. La nuit des lumignons est faite de petites flaques (1,8 m de rayon), à un ou deux mètres de chaque habitant: au passage à niveau, les flaques sont celles de Firmin et de Jeanne (2,8 m), du réverbère du gué et de la lanterne ouest du quai; aucun poste n'a plus de dix lumignons à 26 m. Le seul amas est le parvis de jour, quand les lumignons ne brûlent pas encore; à la tombée du jour, avant 20 h 30, six seulement y posent leur flaque.
+
+### Contrôles (`controler_fetes`)
+
+Rien sur la voie (sol `voie`, ou à moins de 1,6 m des rails: au passage à niveau, le sol est celui de la route) ni sur les deux rangées du bord du quai; rien sur un point, un nœud, une porte ni les deux cases devant elle; rien de solide sur une route, une rue, un chemin ou un sentier (sauf les lisses, qui barrent par nature et se contournent par leurs deux bouts), ni à moins de 1 m d'un poste d'habitant de sa fête (0,4 m pour la lisse et le garde qui la manœuvre); pour chaque fête, son décor posé et celui des autres absent, tous ses postes s'atteignent à pied depuis le quai. La règle d'accès (section 14) est aussi tenue avec tout le décor posé à la fois. Test court: `tests/meubles-conditionnes.test.ts` (aucun décor un jour ordinaire, le concours seul le jour du concours, rangé le lendemain, lisses après la scène d'ouverture, lumignons du parvis puis du bourg, celui de Rosalie éteint à 22 h). Banc d'épreuve (`--eprouver`): lisse posée sur les rails, marmite au milieu de la rue, table au bord du quai, brasero sur le poste de Mado, poste muré par le décor, fête inconnue: six casses, six vues.
+
+Coût mesuré: relire la présence des 63 objets (plus les 3 de la maison) prend 40 µs par appel sur la machine de travail chargée (charge 18 sur 4 cœurs); le moteur la relit à chaque pas de simulation. Si la cible (i3 de 2018) en souffre, un cache dans `presents.ts`, relu à chaque minute de jeu et à chaque fait retenu, suffirait (les `when` du lieu ne lisent que l'heure, l'agenda et des faits).
+
+### Ce qui manque encore
+
+- Une lisse fleurie levée (et une lisse ordinaire, baissée ou levée, avec son type): aujourd'hui, hors de la fête, le passage à niveau n'a pas de lisse dessinée.
+- Le tonneau de la terrasse du café n'a toujours pas de place sans barrer la Grand-Route: le lumignon de Colette est posé sur la terrasse, pas sur le tonneau.
+- La lumière qui dérive au ponton (Berthe), la table de cire du parvis, la cloche du quai, le tableau des horaires et sa devise, les treillis et les pétales des barrières: pas de modèle.
+
+<!-- genere:fetes:debut -->
+| Objet | Type du jeu | Fête | Où (x, y) | Face au | En plus de la fête | Lampe | Pourquoi |
+|---|---|---|---|---|---|---|---|
+| fete-lisse-nord | lisse-fleurie | barrières | 182.5, 95.5 | sud | `aubrune.barrieres.lisses` = `baissees` |  | la lisse nord baissée en travers de la route, sur la rangée d'herbe au nord de la voie, jamais sur la voie |
+| fete-lisse-sud | lisse-fleurie | barrières | 182.5, 99.5 | sud | `aubrune.barrieres.lisses` = `baissees` |  | la lisse sud baissée en travers de la route, juste au sud de la voie: Jeanne, Léon et Solange se tiennent à son pied (pn-s, 2 m au sud) |
+| fete-barrieres-banderole | banderole | barrières | 182.5, 104.5 | sud | toute la fête |  | au-dessus de la route du Gué, entre le carrefour et la lisse sud, face au sud: on la lit en venant du bourg; non solide, elle ne barre rien |
+| fete-barrieres-tonneau | tonneau-en-perce | barrières | 177.5, 104.5 | sud | toute la fête |  | le tonneau du café mis en perce par Colette, sur l'herbe au coin du passage à niveau: à 5 m du carrefour où elle se tient (gr0), hors de la route |
+| fete-lumignon-parvis-01 | lumignon | lumignons (jour) | 261.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-02 | lumignon | lumignons (jour) | 262.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-03 | lumignon | lumignons (jour) | 263.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-04 | lumignon | lumignons (jour) | 264.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-05 | lumignon | lumignons (jour) | 265.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-06 | lumignon | lumignons (jour) | 266.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-07 | lumignon | lumignons (jour) | 267.5, 79.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-08 | lumignon | lumignons (jour) | 261.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-09 | lumignon | lumignons (jour) | 262.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-10 | lumignon | lumignons (jour) | 263.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-11 | lumignon | lumignons (jour) | 264.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-12 | lumignon | lumignons (jour) | 265.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-13 | lumignon | lumignons (jour) | 266.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-14 | lumignon | lumignons (jour) | 267.5, 80.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-15 | lumignon | lumignons (jour) | 262.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-16 | lumignon | lumignons (jour) | 263.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-17 | lumignon | lumignons (jour) | 264.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-18 | lumignon | lumignons (jour) | 265.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-19 | lumignon | lumignons (jour) | 266.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-20 | lumignon | lumignons (jour) | 267.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-parvis-21 | lumignon | lumignons (jour) | 268.5, 84.5 | sud | de 10 h 00 à 20 h 30 | oui | un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail |
+| fete-lumignon-firmin | lumignon | lumignons (nuit) | 184.5, 99.5 | sud | de 20 h 30 à 6 h 00 | oui | à la barrière, coin est de la route au bord de la voie, à côté de son poste (pour son oncle) |
+| fete-lumignon-jeanne | lumignon | lumignons (nuit) | 180.5, 99.5 | sud | de 20 h 30 à 6 h 00 | oui | à côté, coin ouest de la route au bord de la voie, en face de Firmin (pour le train de 5 h 12) |
+| fete-lumignon-odette | lumignon | lumignons (nuit) | 195.5, 118.5 | sud | de 20 h 30 à 6 h 00 | oui | sous la tonnelle, au coin de la pension, près de la table du souper |
+| fete-lumignon-basile | lumignon | lumignons (nuit) | 177.5, 91.5 | sud | de 20 h 30 à 6 h 00 | oui | au pied de l'établi, sous l'auvent de l'atelier |
+| fete-lumignon-achille | lumignon | lumignons (nuit) | 230.5, 106.5 | sud | de 20 h 30 à 6 h 00 | oui | sous la fenêtre du fournil, à l'ouest de la porte |
+| fete-lumignon-solange | lumignon | lumignons (nuit) | 234.5, 110.5 | sud | de 20 h 30 à 6 h 00 | oui | devant la mercerie, à côté du seuil (hors des deux cases devant la porte) |
+| fete-lumignon-mado | lumignon | lumignons (nuit) | 262.5, 102.5 | sud | de 20 h 30 à 6 h 00 | oui | au pied de l'enclume, côté nord: le lumignon ne se pose pas sur l'enclume, il se pose contre |
+| fete-lumignon-barnabe | lumignon | lumignons (nuit) | 264.5, 106.5 | sud | de 20 h 30 à 6 h 00 | oui | devant la forge, à l'ouest de la porte, côté rue de l'Église |
+| fete-lumignon-ambroise | lumignon | lumignons (nuit) | 204.5, 103.5 | sud | de 20 h 30 à 6 h 00 | oui | sur le quai, côté bourg, sous la pendule de la halte (pour la minute) |
+| fete-lumignon-honorine-1 | lumignon | lumignons (nuit) | 283.5, 106.5 | sud | de 20 h 30 à 6 h 00 | oui | sur son seuil, à gauche de la porte (pour sa marraine) |
+| fete-lumignon-honorine-2 | lumignon | lumignons (nuit) | 286.5, 106.5 | sud | de 20 h 30 à 6 h 00 | oui | sur son seuil, à droite de la porte (« pour le plaisir ») |
+| fete-lumignon-marthe | lumignon | lumignons (nuit) | 251.5, 79.5 | sud | de 20 h 30 à 6 h 00 | oui | au pied du clocher, à l'ouest du portail |
+| fete-lumignon-lucie | lumignon | lumignons (nuit) | 249.5, 110.5 | sud | de 20 h 30 à 6 h 00 | oui | au pied de la boîte aux lettres du bourg, à sa grille |
+| fete-lumignon-colette | lumignon | lumignons (nuit) | 252.5, 106.5 | sud | de 20 h 30 à 6 h 00 | oui | sur la terrasse du café, entre la porte et le coin de la vitrine |
+| fete-lumignon-armand | lumignon | lumignons (nuit) | 220.5, 117.5 | sud | de 20 h 30 à 6 h 00 | oui | contre le lavoir, à côté de son ouverture |
+| fete-lumignon-paulin | lumignon | lumignons (nuit) | 181.5, 129.5 | sud | de 20 h 30 à 6 h 00 | oui | au gué, sur la route qui descend à l'eau |
+| fete-lumignon-margot | lumignon | lumignons (nuit) | 180.5, 129.5 | sud | de 20 h 30 à 6 h 00 | oui | au gué, à côté de celui de Paulin |
+| fete-lumignon-leon | lumignon | lumignons (nuit) | 185.5, 127.5 | sud | de 20 h 30 à 6 h 00 | oui | en haut de la grève, au bord du chemin de la berge |
+| fete-lumignon-berthe | lumignon | lumignons (nuit) | 202.5, 129.5 | sud | de 20 h 30 à 6 h 00 | oui | au bout du ponton (le sien part sur l'eau: la lumière qui dérive n'existe pas encore) |
+| fete-lumignon-martial | lumignon | lumignons (nuit) | 282.5, 74.5 | sud | de 20 h 30 à 6 h 00 | oui | au cimetière, au bord de l'allée, entre les tombes: un seul, pour tous |
+| fete-lumignon-rosalie | lumignon | lumignons (nuit) | 212.5, 101.5 | sud | de 20 h 30 à 22 h 00 | oui | sur le quai, au bout est, face à la locomotive à l'arrêt, jusqu'au départ de 22 h |
+| fete-soupe-marmite-meres | grande-marmite | soupe | 199, 113 | sud | toute la fête | oui | la soupe des mères (Odette et Colette), côté épicerie, à 2 m de la rue: on y goûte depuis la place |
+| fete-soupe-marmite-moulin | grande-marmite | soupe | 210, 113 | sud | toute la fête | oui | la panade du moulin (Berthe), en face, à l'est de la pompe: la pompe s'atteint toujours par l'ouest et le sud |
+| fete-soupe-table | table-de-banquet | soupe | 211.5, 120.5 | sud | toute la fête |  | la grande table du concours, au sud-est de la place, à côté du banc où Honorine préside |
+| fete-soupe-banc-nord | banc-de-table | soupe | 211, 119.5 | sud | toute la fête |  | le banc nord de la grande table, face à elle; le devant du banc d'Honorine reste libre |
+| fete-soupe-banc-sud | banc-de-table | soupe | 211, 121.5 | nord | toute la fête |  | le banc sud de la grande table, face à elle |
+| fete-soupe-ardoise | ardoise-a-craie | soupe | 206.5, 111.5 | sud | toute la fête |  | l'ardoise du palmarès, au coin nord-est de la place, face au sud: on la lit depuis le carrefour |
+| fete-quai-guirlande-1 | guirlande-de-lampions | quai | 191.5, 104.5 | sud | toute la fête | oui | guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus |
+| fete-quai-guirlande-2 | guirlande-de-lampions | quai | 195.5, 104.5 | sud | toute la fête | oui | guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus |
+| fete-quai-guirlande-3 | guirlande-de-lampions | quai | 199.5, 104.5 | sud | toute la fête | oui | guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus |
+| fete-quai-poteau | poteau-de-guirlande | quai | 201.5, 104.5 | sud | toute la fête |  | le poteau du bout de la file, à l'ouest du passage vers la Grand-Route, qu'il laisse libre |
+| fete-quai-brasero | brasero | quai | 211.5, 102.5 | sud | toute la fête | oui | le brasero de Mado au bout est du quai, sur la troisième rangée (hors du bord), à côté de la lanterne: Mado, Barnabé, Basile et Berthe se tiennent autour (quai-e, à 1,5 m); la rue qui longe le quai au sud reste libre |
+| fete-quai-banc-1 | banc-de-ferme | quai | 212, 104.5 | nord | toute la fête |  | un banc sur l'herbe au sud de la rue du quai, face au brasero et à la voie |
+| fete-quai-banc-2 | banc-de-ferme | quai | 209, 104.5 | nord | toute la fête |  | un second banc à côté, face au quai: les vieux s'assoient, les autres restent debout autour du feu |
+| fete-hiver-table | table-de-banquet | hiver | 195.5, 102.5 | sud | toute la fête |  | la table de la tourte sur la dernière rangée du quai, entre les deux bancs, son long côté vers la voie (« côté voie, c'est la place du voyageur »): on passe au nord (3 m) et par la rue du quai au sud |
+| fete-hiver-banderole | banderole | hiver | 204, 104.5 | sud | toute la fête |  | au-dessus du passage qui monte de la Grand-Route au quai, face au sud: on la lit en arrivant |
+| fete-hiver-tonneau | tonneau-en-perce | hiver | 186.5, 104.5 | sud | toute la fête |  | le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o) |
+| fete-hiver-estrade | estrade-de-fanfare | hiver | 175.5, 102 | est | toute la fête |  | l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie |
+<!-- genere:fetes:fin -->

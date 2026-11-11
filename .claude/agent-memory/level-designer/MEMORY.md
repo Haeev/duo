@@ -158,6 +158,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Assises: un banc à `seats: 2` partage sa largeur; chaque joueur prend la première place libre, et deux bancs face à face numérotent en miroir: deux joueurs seuls sur leurs bancs se retrouvent en diagonale (0,5 m). Les données n'y peuvent rien sans meuble à cheval.
 - Le garde-fou de la copie isolée refuse les heredocs et les `git` enchaînés: scripts écrits avec Write dans le dossier temporaire, lancés avec `python3 -I`; remplacements de texte comptés (nombre attendu par motif) pour ne rien toucher par accident.
 
+## Décor de fête conditionné (`when`, Aubrune version 7, vérifié le 2026-11-11)
+
+- `when` passe par la chaîne: `fete(...)` dans `construire_plan.py` le met sur l'objet du plan, `assembler_lieu.py` l'écrit (le plan l'emporte; un `when` ajouté à la main dans un intérieur reste conservé). `event_is` en `begun` = du début de la fête à l'aube suivante; `time_is` (minutes, plage qui peut passer minuit) découpe jour et nuit.
+- `tests/meubles-conditionnes.test.ts` comparait la liste exacte des absents d'Aubrune: tout décor conditionné l'allonge (filtrer `fete-`). `tests/aides-postes.ts` et la règle d'accès comptent les solides conditionnés comme toujours posés: le pire cas, tous décors à la fois.
+- Quai d'Aubrune: rangées 99 à 102 (rect du plan), la rangée 103 est une rue qui le longe; bord = 99 et 100. Au passage à niveau, le sol des cases sur les rails est `route`: tester la distance aux `rails` de la carte, pas seulement la nature `voie`.
+- Lampes: `MAX_LAMPS` = 6 (`src/rendu/encre/matiere.ts`, pas `eclairage.ts`), les plus proches du point visé à 26 m; la lumière d'un modèle est dans `assets/commun/decors/decors.json` (`light`), pas dans la fiche du meuble.
+- Coût: relire la présence de 66 meubles conditionnés = 40 µs par appel (machine chargée), à chaque pas; `fetes-aubrune.test.ts` dépasse déjà ses 20 s sous charge sans le décor.
+
 ## Poser sur un meuble (champ `on`, Aubrune version 6, vérifié le 2026-11-11)
 
 - Le validateur du jeu ne contrôle que la case du porteur; le modèle est plus petit (table 1,40 x 0,80 sur deux cases) et pas toujours centré sur son origine (comptoirs: z de -0,43 à +0,25, le zinc déborde côté client). Lire les bornes dans le GLB: `accessors[POSITION].min/max` transformés par les nœuds (sans lire les sommets).

@@ -5108,6 +5108,1052 @@
       "regarde": null,
       "acte": 2,
       "vue": "oree"
+    },
+    {
+      "id": "fete-lisse-nord",
+      "type": "lisse-fleurie",
+      "modele": "crossing-gate-flowered",
+      "x": 182.5,
+      "y": 95.5,
+      "rotation": 0,
+      "pourquoi": "la lisse nord baissée en travers de la route, sur la rangée d'herbe au nord de la voie, jamais sur la voie",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" },
+        { "type": "remembered", "key": "aubrune.barrieres.lisses", "equals": "baissees" }
+      ],
+      "fete": "barrières"
+    },
+    {
+      "id": "fete-lisse-sud",
+      "type": "lisse-fleurie",
+      "modele": "crossing-gate-flowered",
+      "x": 182.5,
+      "y": 99.5,
+      "rotation": 0,
+      "pourquoi": "la lisse sud baissée en travers de la route, juste au sud de la voie: Jeanne, Léon et Solange se tiennent à son pied (pn-s, 2 m au sud)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" },
+        { "type": "remembered", "key": "aubrune.barrieres.lisses", "equals": "baissees" }
+      ],
+      "fete": "barrières"
+    },
+    {
+      "id": "fete-barrieres-banderole",
+      "type": "banderole",
+      "modele": "festival-banner",
+      "x": 182.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "au-dessus de la route du Gué, entre le carrefour et la lisse sud, face au sud: on la lit en venant du bourg; non solide, elle ne barre rien",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" }],
+      "fete": "barrières"
+    },
+    {
+      "id": "fete-barrieres-tonneau",
+      "type": "tonneau-en-perce",
+      "modele": "tapped-barrel",
+      "x": 177.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "le tonneau du café mis en perce par Colette, sur l'herbe au coin du passage à niveau: à 5 m du carrefour où elle se tient (gr0), hors de la route",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["fete-des-barrieres-fleuries"], "when": "begun" }],
+      "fete": "barrières"
+    },
+    {
+      "id": "fete-lumignon-parvis-01",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 261.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-02",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 262.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-03",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 263.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-04",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 264.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-05",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 265.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-06",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 266.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-07",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 267.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-08",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 261.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-09",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 262.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-10",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 263.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-11",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 264.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-12",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 265.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-13",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 266.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-14",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 267.5,
+      "y": 80.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-15",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 262.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-16",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 263.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-17",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 264.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-18",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 265.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-19",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 266.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-20",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 267.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-parvis-21",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 268.5,
+      "y": 84.5,
+      "rotation": 0,
+      "pourquoi": "un lumignon coulé qui refroidit sur le parvis, en rang au pied de la façade, à 2 m au moins du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 600, "to": 1230 }
+      ],
+      "fete": "lumignons (jour)"
+    },
+    {
+      "id": "fete-lumignon-firmin",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 184.5,
+      "y": 99.5,
+      "rotation": 0,
+      "pourquoi": "à la barrière, coin est de la route au bord de la voie, à côté de son poste (pour son oncle)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-jeanne",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 180.5,
+      "y": 99.5,
+      "rotation": 0,
+      "pourquoi": "à côté, coin ouest de la route au bord de la voie, en face de Firmin (pour le train de 5 h 12)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-odette",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 195.5,
+      "y": 118.5,
+      "rotation": 0,
+      "pourquoi": "sous la tonnelle, au coin de la pension, près de la table du souper",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-basile",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 177.5,
+      "y": 91.5,
+      "rotation": 0,
+      "pourquoi": "au pied de l'établi, sous l'auvent de l'atelier",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-achille",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 230.5,
+      "y": 106.5,
+      "rotation": 0,
+      "pourquoi": "sous la fenêtre du fournil, à l'ouest de la porte",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-solange",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 234.5,
+      "y": 110.5,
+      "rotation": 0,
+      "pourquoi": "devant la mercerie, à côté du seuil (hors des deux cases devant la porte)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-mado",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 262.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "au pied de l'enclume, côté nord: le lumignon ne se pose pas sur l'enclume, il se pose contre",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-barnabe",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 264.5,
+      "y": 106.5,
+      "rotation": 0,
+      "pourquoi": "devant la forge, à l'ouest de la porte, côté rue de l'Église",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-ambroise",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 204.5,
+      "y": 103.5,
+      "rotation": 0,
+      "pourquoi": "sur le quai, côté bourg, sous la pendule de la halte (pour la minute)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-honorine-1",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 283.5,
+      "y": 106.5,
+      "rotation": 0,
+      "pourquoi": "sur son seuil, à gauche de la porte (pour sa marraine)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-honorine-2",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 286.5,
+      "y": 106.5,
+      "rotation": 0,
+      "pourquoi": "sur son seuil, à droite de la porte (« pour le plaisir »)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-marthe",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 251.5,
+      "y": 79.5,
+      "rotation": 0,
+      "pourquoi": "au pied du clocher, à l'ouest du portail",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-lucie",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 249.5,
+      "y": 110.5,
+      "rotation": 0,
+      "pourquoi": "au pied de la boîte aux lettres du bourg, à sa grille",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-colette",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 252.5,
+      "y": 106.5,
+      "rotation": 0,
+      "pourquoi": "sur la terrasse du café, entre la porte et le coin de la vitrine",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-armand",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 220.5,
+      "y": 117.5,
+      "rotation": 0,
+      "pourquoi": "contre le lavoir, à côté de son ouverture",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-paulin",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 181.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "au gué, sur la route qui descend à l'eau",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-margot",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 180.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "au gué, à côté de celui de Paulin",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-leon",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 185.5,
+      "y": 127.5,
+      "rotation": 0,
+      "pourquoi": "en haut de la grève, au bord du chemin de la berge",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-berthe",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 202.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "au bout du ponton (le sien part sur l'eau: la lumière qui dérive n'existe pas encore)",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-martial",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 282.5,
+      "y": 74.5,
+      "rotation": 0,
+      "pourquoi": "au cimetière, au bord de l'allée, entre les tombes: un seul, pour tous",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 360 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-lumignon-rosalie",
+      "type": "lumignon",
+      "modele": "festival-candle",
+      "x": 212.5,
+      "y": 101.5,
+      "rotation": 0,
+      "pourquoi": "sur le quai, au bout est, face à la locomotive à l'arrêt, jusqu'au départ de 22 h",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        { "type": "event_is", "events": ["nuit-des-lumignons"], "when": "begun" },
+        { "type": "time_is", "from": 1230, "to": 1320 }
+      ],
+      "fete": "lumignons (nuit)"
+    },
+    {
+      "id": "fete-soupe-marmite-meres",
+      "type": "grande-marmite",
+      "modele": "festival-cauldron",
+      "x": 199,
+      "y": 113,
+      "rotation": 0,
+      "pourquoi": "la soupe des mères (Odette et Colette), côté épicerie, à 2 m de la rue: on y goûte depuis la place",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["concours-de-la-soupe"], "when": "begun" }],
+      "fete": "soupe"
+    },
+    {
+      "id": "fete-soupe-marmite-moulin",
+      "type": "grande-marmite",
+      "modele": "festival-cauldron",
+      "x": 210,
+      "y": 113,
+      "rotation": 0,
+      "pourquoi": "la panade du moulin (Berthe), en face, à l'est de la pompe: la pompe s'atteint toujours par l'ouest et le sud",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["concours-de-la-soupe"], "when": "begun" }],
+      "fete": "soupe"
+    },
+    {
+      "id": "fete-soupe-table",
+      "type": "table-de-banquet",
+      "modele": "banquet-table",
+      "x": 211.5,
+      "y": 120.5,
+      "rotation": 0,
+      "pourquoi": "la grande table du concours, au sud-est de la place, à côté du banc où Honorine préside",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["concours-de-la-soupe"], "when": "begun" }],
+      "fete": "soupe"
+    },
+    {
+      "id": "fete-soupe-banc-nord",
+      "type": "banc-de-table",
+      "modele": "table-bench",
+      "x": 211,
+      "y": 119.5,
+      "rotation": 0,
+      "pourquoi": "le banc nord de la grande table, face à elle; le devant du banc d'Honorine reste libre",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["concours-de-la-soupe"], "when": "begun" }],
+      "fete": "soupe"
+    },
+    {
+      "id": "fete-soupe-banc-sud",
+      "type": "banc-de-table",
+      "modele": "table-bench",
+      "x": 211,
+      "y": 121.5,
+      "rotation": 2,
+      "pourquoi": "le banc sud de la grande table, face à elle",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["concours-de-la-soupe"], "when": "begun" }],
+      "fete": "soupe"
+    },
+    {
+      "id": "fete-soupe-ardoise",
+      "type": "ardoise-a-craie",
+      "modele": "chalk-board",
+      "x": 206.5,
+      "y": 111.5,
+      "rotation": 0,
+      "pourquoi": "l'ardoise du palmarès, au coin nord-est de la place, face au sud: on la lit depuis le carrefour",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["concours-de-la-soupe"], "when": "begun" }],
+      "fete": "soupe"
+    },
+    {
+      "id": "fete-quai-guirlande-1",
+      "type": "guirlande-de-lampions",
+      "modele": "lampion-garland",
+      "x": 191.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "fete-des-barrieres-fleuries",
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-quai-guirlande-2",
+      "type": "guirlande-de-lampions",
+      "modele": "lampion-garland",
+      "x": 195.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "fete-des-barrieres-fleuries",
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-quai-guirlande-3",
+      "type": "guirlande-de-lampions",
+      "modele": "lampion-garland",
+      "x": 199.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "guirlande de lampions sur l'herbe au sud du quai, entre le quai et la Grand-Route: elle éclaire le quai sans rien poser dessus",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "fete-des-barrieres-fleuries",
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-quai-poteau",
+      "type": "poteau-de-guirlande",
+      "modele": "lampion-pole",
+      "x": 201.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "le poteau du bout de la file, à l'ouest du passage vers la Grand-Route, qu'il laisse libre",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "fete-des-barrieres-fleuries",
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-quai-brasero",
+      "type": "brasero",
+      "modele": "brazier",
+      "x": 211.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "le brasero de Mado au bout est du quai, sur la troisième rangée (hors du bord), à côté de la lanterne: Mado, Barnabé, Basile et Berthe se tiennent autour (quai-e, à 1,5 m); la rue qui longe le quai au sud reste libre",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-quai-banc-1",
+      "type": "banc-de-ferme",
+      "modele": "bench-farm",
+      "x": 212,
+      "y": 104.5,
+      "rotation": 2,
+      "pourquoi": "un banc sur l'herbe au sud de la rue du quai, face au brasero et à la voie",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-quai-banc-2",
+      "type": "banc-de-ferme",
+      "modele": "bench-farm",
+      "x": 209,
+      "y": 104.5,
+      "rotation": 2,
+      "pourquoi": "un second banc à côté, face au quai: les vieux s'assoient, les autres restent debout autour du feu",
+      "regarde": null,
+      "acte": 1,
+      "when": [
+        {
+          "type": "event_is",
+          "events": [
+            "veillee-du-premier-train",
+            "veillee-du-quai-printemps",
+            "veillee-du-quai-ete",
+            "veillee-du-quai-automne",
+            "veillee-du-quai-hiver",
+            "premiere-veillee-du-quai"
+          ],
+          "when": "begun"
+        }
+      ],
+      "fete": "quai"
+    },
+    {
+      "id": "fete-hiver-table",
+      "type": "table-de-banquet",
+      "modele": "banquet-table",
+      "x": 195.5,
+      "y": 102.5,
+      "rotation": 0,
+      "pourquoi": "la table de la tourte sur la dernière rangée du quai, entre les deux bancs, son long côté vers la voie (« côté voie, c'est la place du voyageur »): on passe au nord (3 m) et par la rue du quai au sud",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
+      "fete": "hiver"
+    },
+    {
+      "id": "fete-hiver-banderole",
+      "type": "banderole",
+      "modele": "festival-banner",
+      "x": 204,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "au-dessus du passage qui monte de la Grand-Route au quai, face au sud: on la lit en arrivant",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
+      "fete": "hiver"
+    },
+    {
+      "id": "fete-hiver-tonneau",
+      "type": "tonneau-en-perce",
+      "modele": "tapped-barrel",
+      "x": 186.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o)",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
+      "fete": "hiver"
+    },
+    {
+      "id": "fete-hiver-estrade",
+      "type": "estrade-de-fanfare",
+      "modele": "bandstand",
+      "x": 175.5,
+      "y": 102,
+      "rotation": 1,
+      "pourquoi": "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie",
+      "regarde": null,
+      "acte": 1,
+      "when": [{ "type": "event_is", "events": ["veillee-du-premier-train"], "when": "begun" }],
+      "fete": "hiver"
     }
   ],
   "vegetation": [

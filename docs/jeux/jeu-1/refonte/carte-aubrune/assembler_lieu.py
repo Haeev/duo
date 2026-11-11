@@ -18,6 +18,7 @@ Ce qui s'ajoute à la main dans les fichiers du lieu est conservé d'une passe �
 le script n'écrit pas lui-même. Dans un intérieur: l'habillage du rendu (`style`, `rugs`, `windows`); sur un meuble ou
 une porte, d'un intérieur comme de `carte.json`, retrouvés par leur identifiant: les conditions de jeu (`when` d'un
 meuble, `opens` et `says` d'une porte, `group`...). Un meuble ou une porte qui disparaît du plan perd ses ajouts.
+Un objet du plan qui porte lui-même `when` (décor des fêtes, version 7) l'écrit tel quel: le plan l'emporte.
 Relancer le script sans toucher au plan ne change donc aucun fichier.
 """
 import json
@@ -43,6 +44,9 @@ def objet(m, **plus):
     o = dict(id=m['id'], type=m['type'], x=m['x'], y=m['y'], rotation=m['rotation'])
     if m.get('on') is not None:
         o['on'] = m['on']
+    # Condition de présence venue du plan (décor de fête): le plan la porte, une retouche à la main ne l'écrase pas.
+    if m.get('when') is not None:
+        o['when'] = m['when']
     o.update(plus)
     return o
 ECRITS_PORTE = {'x', 'y', 'facing', 'to'}
@@ -64,7 +68,8 @@ def conserver_elements(objets, portes, ancien, gardes, ecrits=ECRITS_MEUBLE):
     vieux_objets = {o['id']: o for o in ancien.get('objects', [])}
     for o in objets:
         for k, v in vieux_objets.get(o['id'], {}).items():
-            if k not in ecrits:
+            # `when` écrit par le plan l'emporte; celui ajouté à la main (meuble d'intérieur) est gardé.
+            if k not in ecrits and k not in o:
                 o[k] = v
                 gardes.append('%s.%s' % (o['id'], k))
     for k_porte, d in portes.items():
