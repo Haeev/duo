@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "fossile-coquille",
+  "category": "tresors",
+  "name": "Coquille fossile",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "fossile-coquille"
+  },
+  "rarity": null,
+  "text": "Une coquille de pierre, striée comme au premier jour. La mer est passée par ici, il y a très longtemps."
+}

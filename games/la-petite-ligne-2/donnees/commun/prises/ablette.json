@@ -3,7 +3,7 @@
   "id": "ablette",
   "kind": "fish",
   "item": "ablette",
-  "places": ["essai-gare"],
+  "places": ["aubrune", "essai-gare"],
   "hours": {
     "from": 360,
     "to": 1440

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "pieride-du-chou",
+  "category": "insectes",
+  "name": "Piéride du chou",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1140
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Une piéride blanche, qui vise les choux des autres. Odette la chasse au torchon."
+}

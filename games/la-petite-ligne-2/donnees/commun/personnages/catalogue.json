@@ -1,756 +1,665 @@
 {
- "schema": 1,
- "skeleton": "duo-24",
- "shapes": [
-  {
-   "id": "adult-f-slim",
-   "age": "adult",
-   "build": "slim",
-   "height": 1.7
-  },
-  {
-   "id": "adult-f-medium",
-   "age": "adult",
-   "build": "medium",
-   "height": 1.7
-  },
-  {
-   "id": "adult-f-round",
-   "age": "adult",
-   "build": "round",
-   "height": 1.7
-  },
-  {
-   "id": "adult-m-slim",
-   "age": "adult",
-   "build": "slim",
-   "height": 1.7
-  },
-  {
-   "id": "adult-m-medium",
-   "age": "adult",
-   "build": "medium",
-   "height": 1.7
-  },
-  {
-   "id": "adult-m-round",
-   "age": "adult",
-   "build": "round",
-   "height": 1.7
-  },
-  {
-   "id": "child-medium",
-   "age": "child",
-   "build": "medium",
-   "height": 1.197
-  },
-  {
-   "id": "elder-medium",
-   "age": "elder",
-   "build": "medium",
-   "height": 1.598
-  }
- ],
- "skins": [
-  "#f6dcc8",
-  "#efc7a6",
-  "#e0ae86",
-  "#c99368",
-  "#a9744d",
-  "#8a5a3b",
-  "#6b432e",
-  "#4a2f24"
- ],
- "pieces": [
-  {
-   "id": "body-base",
-   "name": "Corps",
-   "slot": "body",
-   "file": "body.glb",
-   "node": "body-base",
-   "covers": [],
-   "hair": null,
-   "zones": [],
-   "tags": [],
-   "triangles": 2240
-  },
-  {
-   "id": "top-tee",
-   "name": "T-shirt",
-   "slot": "top",
-   "file": "top.glb",
-   "node": "top-tee",
-   "covers": [
-    "torso",
-    "upper-arm-a"
-   ],
-   "hair": null,
-   "zones": [
+  "schema": 1,
+  "skeleton": "duo-24",
+  "shapes": [
     {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "quotidien"
-   ],
-   "triangles": 664
-  },
-  {
-   "id": "top-sweater",
-   "name": "Pull col roulé",
-   "slot": "top",
-   "file": "top.glb",
-   "node": "top-sweater",
-   "covers": [
-    "torso",
-    "upper-arm-a",
-    "upper-arm-b",
-    "forearm"
-   ],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "quotidien",
-    "froid"
-   ],
-   "triangles": 1008
-  },
-  {
-   "id": "top-tank",
-   "name": "Débardeur",
-   "slot": "top",
-   "file": "top.glb",
-   "node": "top-tank",
-   "covers": [
-    "torso"
-   ],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "ete"
-   ],
-   "triangles": 384
-  },
-  {
-   "id": "accessory-vest",
-   "name": "Gilet sans manches",
-   "slot": "accessory",
-   "file": "accessory.glb",
-   "node": "accessory-vest",
-   "covers": [],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "travail"
-   ],
-   "triangles": 372
-  },
-  {
-   "id": "bottom-trousers",
-   "name": "Pantalon droit",
-   "slot": "bottom",
-   "file": "bottom.glb",
-   "node": "bottom-trousers",
-   "covers": [
-    "pelvis",
-    "thigh-a",
-    "thigh-b",
-    "shin"
-   ],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "quotidien"
-   ],
-   "triangles": 800
-  },
-  {
-   "id": "bottom-shorts",
-   "name": "Short",
-   "slot": "bottom",
-   "file": "bottom.glb",
-   "node": "bottom-shorts",
-   "covers": [
-    "pelvis",
-    "thigh-a"
-   ],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "ete"
-   ],
-   "triangles": 520
-  },
-  {
-   "id": "bottom-skirt",
-   "name": "Jupe trapèze",
-   "slot": "bottom",
-   "file": "bottom.glb",
-   "node": "bottom-skirt",
-   "covers": [
-    "pelvis",
-    "thigh-a"
-   ],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "quotidien"
-   ],
-   "triangles": 384
-  },
-  {
-   "id": "dress-simple",
-   "name": "Robe t-shirt",
-   "slot": "dress",
-   "file": "dress.glb",
-   "node": "dress-simple",
-   "covers": [
-    "torso",
-    "upper-arm-a",
-    "pelvis",
-    "thigh-a"
-   ],
-   "hair": null,
-   "zones": [
-    {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
-    }
-   ],
-   "tags": [
-    "quotidien"
-   ],
-   "triangles": 952
-  },
-  {
-   "id": "shoes-pebble",
-   "name": "Bottines",
-   "slot": "shoes",
-   "file": "shoes.glb",
-   "node": "shoes-pebble",
-   "covers": [],
-   "hair": null,
-   "zones": [
-    {
-     "id": "cuir",
-     "colors": [
-      "#8c5a35",
-      "#4f3626",
-      "#ede6d3"
-     ]
+      "id": "adult-f-slim",
+      "age": "adult",
+      "build": "slim",
+      "height": 1.7
     },
     {
-     "id": "semelle",
-     "colors": [
-      "#3a3331",
-      "#ede6d3"
-     ]
-    }
-   ],
-   "tags": [
-    "quotidien"
-   ],
-   "triangles": 488
-  },
-  {
-   "id": "shoes-boots",
-   "name": "Bottes",
-   "slot": "shoes",
-   "file": "shoes.glb",
-   "node": "shoes-boots",
-   "covers": [],
-   "hair": null,
-   "zones": [
-    {
-     "id": "cuir",
-     "colors": [
-      "#3f6453",
-      "#d4a33e",
-      "#26282e",
-      "#8f3b34"
-     ]
+      "id": "adult-f-medium",
+      "age": "adult",
+      "build": "medium",
+      "height": 1.7
     },
     {
-     "id": "semelle",
-     "colors": [
-      "#3a3331",
-      "#ede6d3"
-     ]
-    }
-   ],
-   "tags": [
-    "pluie"
-   ],
-   "triangles": 568
-  },
-  {
-   "id": "head-round",
-   "name": "Ronde",
-   "slot": "head",
-   "file": "head.glb",
-   "node": "head-round",
-   "covers": [],
-   "hair": null,
-   "zones": [
-    {
-     "id": "sourcils",
-     "colors": [
-      "#2b2523",
-      "#4a3327",
-      "#6e4b33",
-      "#8c4a2e",
-      "#ae5f2e",
-      "#c99a55",
-      "#e2c582",
-      "#9a948c",
-      "#e9e5dc",
-      "#6a6763"
-     ]
+      "id": "adult-f-round",
+      "age": "adult",
+      "build": "round",
+      "height": 1.7
     },
     {
-     "id": "bouche",
-     "colors": [
-      "#a2473f",
-      "#f7f3ea"
-     ]
-    }
-   ],
-   "tags": [
-    "doux"
-   ],
-   "triangles": 1648
-  },
-  {
-   "id": "head-square",
-   "name": "Carrée",
-   "slot": "head",
-   "file": "head.glb",
-   "node": "head-square",
-   "covers": [],
-   "hair": null,
-   "zones": [
-    {
-     "id": "sourcils",
-     "colors": [
-      "#2b2523",
-      "#4a3327",
-      "#6e4b33",
-      "#8c4a2e",
-      "#ae5f2e",
-      "#c99a55",
-      "#e2c582",
-      "#9a948c",
-      "#e9e5dc",
-      "#6a6763"
-     ]
+      "id": "adult-m-slim",
+      "age": "adult",
+      "build": "slim",
+      "height": 1.7
     },
     {
-     "id": "bouche",
-     "colors": [
-      "#a2473f",
-      "#f7f3ea"
-     ]
-    }
-   ],
-   "tags": [
-    "marque"
-   ],
-   "triangles": 1648
-  },
-  {
-   "id": "hair-short",
-   "name": "Court",
-   "slot": "hair",
-   "file": "hair.glb",
-   "node": "hair-short",
-   "covers": [],
-   "hair": null,
-   "zones": [
+      "id": "adult-m-medium",
+      "age": "adult",
+      "build": "medium",
+      "height": 1.7
+    },
     {
-     "id": "cheveux",
-     "colors": [
-      "#2b2523",
-      "#4a3327",
-      "#6e4b33",
-      "#8c4a2e",
-      "#ae5f2e",
-      "#c99a55",
-      "#e2c582",
-      "#9a948c",
-      "#e9e5dc",
-      "#6a6763"
-     ]
-    }
-   ],
-   "tags": [
-    "court"
-   ],
-   "triangles": 900
-  },
-  {
-   "id": "hair-side-part",
-   "name": "Raie de côté",
-   "slot": "hair",
-   "file": "hair.glb",
-   "node": "hair-side-part",
-   "covers": [],
-   "hair": null,
-   "zones": [
+      "id": "adult-m-round",
+      "age": "adult",
+      "build": "round",
+      "height": 1.7
+    },
     {
-     "id": "cheveux",
-     "colors": [
-      "#2b2523",
-      "#4a3327",
-      "#6e4b33",
-      "#8c4a2e",
-      "#ae5f2e",
-      "#c99a55",
-      "#e2c582",
-      "#9a948c",
-      "#e9e5dc",
-      "#6a6763"
-     ]
-    }
-   ],
-   "tags": [
-    "raie"
-   ],
-   "triangles": 812
-  },
-  {
-   "id": "hair-bun",
-   "name": "Chignon haut",
-   "slot": "hair",
-   "file": "hair.glb",
-   "node": "hair-bun",
-   "covers": [],
-   "hair": null,
-   "zones": [
+      "id": "child-medium",
+      "age": "child",
+      "build": "medium",
+      "height": 1.197
+    },
     {
-     "id": "cheveux",
-     "colors": [
-      "#2b2523",
-      "#4a3327",
-      "#6e4b33",
-      "#8c4a2e",
-      "#ae5f2e",
-      "#c99a55",
-      "#e2c582",
-      "#9a948c",
-      "#e9e5dc",
-      "#6a6763"
-     ]
+      "id": "elder-medium",
+      "age": "elder",
+      "build": "medium",
+      "height": 1.598
     }
-   ],
-   "tags": [
-    "chignon"
-   ],
-   "triangles": 912
-  },
-  {
-   "id": "hair-bob",
-   "name": "Carré",
-   "slot": "hair",
-   "file": "hair.glb",
-   "node": "hair-bob",
-   "covers": [],
-   "hair": null,
-   "zones": [
+  ],
+  "skins": ["#f6dcc8", "#efc7a6", "#e0ae86", "#c99368", "#a9744d", "#8a5a3b", "#6b432e", "#4a2f24"],
+  "pieces": [
     {
-     "id": "cheveux",
-     "colors": [
-      "#2b2523",
-      "#4a3327",
-      "#6e4b33",
-      "#8c4a2e",
-      "#ae5f2e",
-      "#c99a55",
-      "#e2c582",
-      "#9a948c",
-      "#e9e5dc",
-      "#6a6763"
-     ]
-    }
-   ],
-   "tags": [
-    "carre"
-   ],
-   "triangles": 1336
-  },
-  {
-   "id": "hat-beanie-pompom",
-   "name": "Bonnet à pompon",
-   "slot": "hat",
-   "file": "hat.glb",
-   "node": "hat-beanie-pompom",
-   "covers": [],
-   "hair": "flat",
-   "zones": [
+      "id": "body-base",
+      "name": "Corps",
+      "slot": "body",
+      "file": "body.glb",
+      "node": "body-base",
+      "covers": [],
+      "hair": null,
+      "zones": [],
+      "tags": [],
+      "triangles": 2240
+    },
     {
-     "id": "principale",
-     "colors": [
-      "#f3ede0",
-      "#d9caae",
-      "#b8a17e",
-      "#d4a33e",
-      "#c0803a",
-      "#a85837",
-      "#8f3b34",
-      "#c5443d",
-      "#cc9c96",
-      "#7e3f55",
-      "#a58bb8",
-      "#a9c7d9",
-      "#587f8e",
-      "#44618a",
-      "#2c3b57",
-      "#2f6e73",
-      "#96a98c",
-      "#3f6453",
-      "#7a7b45",
-      "#96704c",
-      "#5e4233",
-      "#b9b7b0",
-      "#4a4d52",
-      "#26282e"
-     ]
+      "id": "top-tee",
+      "name": "T-shirt",
+      "slot": "top",
+      "file": "top.glb",
+      "node": "top-tee",
+      "covers": ["torso", "upper-arm-a"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["quotidien"],
+      "triangles": 664
+    },
+    {
+      "id": "top-sweater",
+      "name": "Pull col roulé",
+      "slot": "top",
+      "file": "top.glb",
+      "node": "top-sweater",
+      "covers": ["torso", "upper-arm-a", "upper-arm-b", "forearm"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["quotidien", "froid"],
+      "triangles": 1008
+    },
+    {
+      "id": "top-tank",
+      "name": "Débardeur",
+      "slot": "top",
+      "file": "top.glb",
+      "node": "top-tank",
+      "covers": ["torso"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["ete"],
+      "triangles": 384
+    },
+    {
+      "id": "accessory-vest",
+      "name": "Gilet sans manches",
+      "slot": "accessory",
+      "file": "accessory.glb",
+      "node": "accessory-vest",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["travail"],
+      "triangles": 372
+    },
+    {
+      "id": "bottom-trousers",
+      "name": "Pantalon droit",
+      "slot": "bottom",
+      "file": "bottom.glb",
+      "node": "bottom-trousers",
+      "covers": ["pelvis", "thigh-a", "thigh-b", "shin"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["quotidien"],
+      "triangles": 800
+    },
+    {
+      "id": "bottom-shorts",
+      "name": "Short",
+      "slot": "bottom",
+      "file": "bottom.glb",
+      "node": "bottom-shorts",
+      "covers": ["pelvis", "thigh-a"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["ete"],
+      "triangles": 520
+    },
+    {
+      "id": "bottom-skirt",
+      "name": "Jupe trapèze",
+      "slot": "bottom",
+      "file": "bottom.glb",
+      "node": "bottom-skirt",
+      "covers": ["pelvis", "thigh-a"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["quotidien"],
+      "triangles": 384
+    },
+    {
+      "id": "dress-simple",
+      "name": "Robe t-shirt",
+      "slot": "dress",
+      "file": "dress.glb",
+      "node": "dress-simple",
+      "covers": ["torso", "upper-arm-a", "pelvis", "thigh-a"],
+      "hair": null,
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["quotidien"],
+      "triangles": 952
+    },
+    {
+      "id": "shoes-pebble",
+      "name": "Bottines",
+      "slot": "shoes",
+      "file": "shoes.glb",
+      "node": "shoes-pebble",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "cuir",
+          "colors": ["#8c5a35", "#4f3626", "#ede6d3"]
+        },
+        {
+          "id": "semelle",
+          "colors": ["#3a3331", "#ede6d3"]
+        }
+      ],
+      "tags": ["quotidien"],
+      "triangles": 488
+    },
+    {
+      "id": "shoes-boots",
+      "name": "Bottes",
+      "slot": "shoes",
+      "file": "shoes.glb",
+      "node": "shoes-boots",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "cuir",
+          "colors": ["#3f6453", "#d4a33e", "#26282e", "#8f3b34"]
+        },
+        {
+          "id": "semelle",
+          "colors": ["#3a3331", "#ede6d3"]
+        }
+      ],
+      "tags": ["pluie"],
+      "triangles": 568
+    },
+    {
+      "id": "head-round",
+      "name": "Ronde",
+      "slot": "head",
+      "file": "head.glb",
+      "node": "head-round",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "sourcils",
+          "colors": [
+            "#2b2523",
+            "#4a3327",
+            "#6e4b33",
+            "#8c4a2e",
+            "#ae5f2e",
+            "#c99a55",
+            "#e2c582",
+            "#9a948c",
+            "#e9e5dc",
+            "#6a6763"
+          ]
+        },
+        {
+          "id": "bouche",
+          "colors": ["#a2473f", "#f7f3ea"]
+        }
+      ],
+      "tags": ["doux"],
+      "triangles": 1648
+    },
+    {
+      "id": "head-square",
+      "name": "Carrée",
+      "slot": "head",
+      "file": "head.glb",
+      "node": "head-square",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "sourcils",
+          "colors": [
+            "#2b2523",
+            "#4a3327",
+            "#6e4b33",
+            "#8c4a2e",
+            "#ae5f2e",
+            "#c99a55",
+            "#e2c582",
+            "#9a948c",
+            "#e9e5dc",
+            "#6a6763"
+          ]
+        },
+        {
+          "id": "bouche",
+          "colors": ["#a2473f", "#f7f3ea"]
+        }
+      ],
+      "tags": ["marque"],
+      "triangles": 1648
+    },
+    {
+      "id": "hair-short",
+      "name": "Court",
+      "slot": "hair",
+      "file": "hair.glb",
+      "node": "hair-short",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "cheveux",
+          "colors": [
+            "#2b2523",
+            "#4a3327",
+            "#6e4b33",
+            "#8c4a2e",
+            "#ae5f2e",
+            "#c99a55",
+            "#e2c582",
+            "#9a948c",
+            "#e9e5dc",
+            "#6a6763"
+          ]
+        }
+      ],
+      "tags": ["court"],
+      "triangles": 900
+    },
+    {
+      "id": "hair-side-part",
+      "name": "Raie de côté",
+      "slot": "hair",
+      "file": "hair.glb",
+      "node": "hair-side-part",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "cheveux",
+          "colors": [
+            "#2b2523",
+            "#4a3327",
+            "#6e4b33",
+            "#8c4a2e",
+            "#ae5f2e",
+            "#c99a55",
+            "#e2c582",
+            "#9a948c",
+            "#e9e5dc",
+            "#6a6763"
+          ]
+        }
+      ],
+      "tags": ["raie"],
+      "triangles": 812
+    },
+    {
+      "id": "hair-bun",
+      "name": "Chignon haut",
+      "slot": "hair",
+      "file": "hair.glb",
+      "node": "hair-bun",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "cheveux",
+          "colors": [
+            "#2b2523",
+            "#4a3327",
+            "#6e4b33",
+            "#8c4a2e",
+            "#ae5f2e",
+            "#c99a55",
+            "#e2c582",
+            "#9a948c",
+            "#e9e5dc",
+            "#6a6763"
+          ]
+        }
+      ],
+      "tags": ["chignon"],
+      "triangles": 912
+    },
+    {
+      "id": "hair-bob",
+      "name": "Carré",
+      "slot": "hair",
+      "file": "hair.glb",
+      "node": "hair-bob",
+      "covers": [],
+      "hair": null,
+      "zones": [
+        {
+          "id": "cheveux",
+          "colors": [
+            "#2b2523",
+            "#4a3327",
+            "#6e4b33",
+            "#8c4a2e",
+            "#ae5f2e",
+            "#c99a55",
+            "#e2c582",
+            "#9a948c",
+            "#e9e5dc",
+            "#6a6763"
+          ]
+        }
+      ],
+      "tags": ["carre"],
+      "triangles": 1336
+    },
+    {
+      "id": "hat-beanie-pompom",
+      "name": "Bonnet à pompon",
+      "slot": "hat",
+      "file": "hat.glb",
+      "node": "hat-beanie-pompom",
+      "covers": [],
+      "hair": "flat",
+      "zones": [
+        {
+          "id": "principale",
+          "colors": [
+            "#f3ede0",
+            "#d9caae",
+            "#b8a17e",
+            "#d4a33e",
+            "#c0803a",
+            "#a85837",
+            "#8f3b34",
+            "#c5443d",
+            "#cc9c96",
+            "#7e3f55",
+            "#a58bb8",
+            "#a9c7d9",
+            "#587f8e",
+            "#44618a",
+            "#2c3b57",
+            "#2f6e73",
+            "#96a98c",
+            "#3f6453",
+            "#7a7b45",
+            "#96704c",
+            "#5e4233",
+            "#b9b7b0",
+            "#4a4d52",
+            "#26282e"
+          ]
+        }
+      ],
+      "tags": ["froid"],
+      "triangles": 827
     }
-   ],
-   "tags": [
-    "froid"
-   ],
-   "triangles": 827
-  }
- ]
+  ]
 }

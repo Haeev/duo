@@ -3,7 +3,7 @@
   "id": "goujon",
   "kind": "fish",
   "item": "goujon",
-  "places": ["essai-gare"],
+  "places": ["aubrune", "essai-gare"],
   "hours": {
     "from": 360,
     "to": 1440

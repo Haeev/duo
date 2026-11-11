@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "oeillet-de-poete",
+  "name": "Œillet de poète",
+  "family": "crop",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

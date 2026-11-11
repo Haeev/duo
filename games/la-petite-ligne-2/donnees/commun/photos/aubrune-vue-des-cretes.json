@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "aubrune-vue-des-cretes",
+  "entry": "carte-aubrune-vue-des-cretes",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "k2"
+  },
+  "conditions": [
+    {
+      "type": "weather_is",
+      "weathers": ["clear"]
+    }
+  ]
+}

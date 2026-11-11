@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "anax-empereur",
+  "entry": "anax-empereur",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["berge"],
+  "rarity": {
+    "hours": {
+      "from": 600,
+      "to": 1020
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer"]
+  },
+  "weight": 2,
+  "alertRadius": 4,
+  "fleeSpeed": 8,
+  "wander": 2
+}

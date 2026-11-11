@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "matelote",
+  "name": "Matelote du bief",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 65
+  },
+  "tool": null
+}

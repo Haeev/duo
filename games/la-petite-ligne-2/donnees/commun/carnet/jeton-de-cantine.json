@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "jeton-de-cantine",
+  "category": "tresors",
+  "name": "Jeton de cantine",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "jeton-de-cantine"
+  },
+  "rarity": null,
+  "text": "Un jeton de la cantine des cheminots: « bon pour une soupe ». Colette dit qu'il vaut encore."
+}

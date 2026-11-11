@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "pointe-de-silex",
+  "name": "Pointe de silex",
+  "family": "treasure",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

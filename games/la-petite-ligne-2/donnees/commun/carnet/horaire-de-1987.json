@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "horaire-de-1987",
+  "category": "tresors",
+  "name": "Horaire de 1987",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "L'horaire de la Petite Ligne qui entourait le verre de lanterne. Le 5 h 12 y est encore imprimé."
+}

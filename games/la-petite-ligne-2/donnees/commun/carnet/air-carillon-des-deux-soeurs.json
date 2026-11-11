@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-carillon-des-deux-soeurs",
+  "category": "musiques",
+  "name": "Carillon des deux sœurs",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "La Fêlée refondue, qui sonne juste à côté de sa grande sœur. Marthe et Honorine l'écoutent ensemble."
+}

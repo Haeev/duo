@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "loche",
+  "category": "poissons",
+  "name": "Loche franche",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 720
+    },
+    "weathers": [],
+    "seasons": []
+  },
+  "text": "Une loche à moustaches, collée aux galets du matin. Elle a l'air de bouder."
+}

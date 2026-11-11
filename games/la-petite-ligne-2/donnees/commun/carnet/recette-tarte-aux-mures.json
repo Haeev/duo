@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-tarte-aux-mures",
+  "category": "recettes",
+  "name": "Tarte aux mûres",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "tarte-aux-mures"
+  },
+  "rarity": null,
+  "text": "Une tarte aux mûres des talus, la pâte encore tiède. Achille dit qu'elle a le goût de la fin d'été."
+}

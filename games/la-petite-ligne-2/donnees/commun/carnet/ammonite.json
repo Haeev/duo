@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "ammonite",
+  "category": "tresors",
+  "name": "Ammonite",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "ammonite"
+  },
+  "rarity": null,
+  "text": "Une ammonite enroulée sur elle-même, lourde dans la paume. Armand voudra la montrer à toute la classe."
+}

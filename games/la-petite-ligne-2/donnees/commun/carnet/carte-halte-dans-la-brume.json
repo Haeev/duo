@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-halte-dans-la-brume",
+  "category": "cartes-postales",
+  "name": "La halte dans la brume",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "La halte dans la brume du matin: la pendule, le banc, et rien au bout des rails."
+}

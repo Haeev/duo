@@ -732,6 +732,11 @@
               "key": "aubrune.acte3.marthe-manque",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "bouture-de-rosier",
+              "count": 1
             }
           ]
         },
@@ -763,6 +768,10 @@
               "key": "aubrune.acte3.honorine-prix",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "pot-au-feu-du-dimanche"
             }
           ]
         },
@@ -980,6 +989,10 @@
               "key": "aubrune.acte3.tunnel",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "lampe-de-mineur"
             }
           ]
         },
@@ -1014,6 +1027,10 @@
               "key": "aubrune.acte3.cachette",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "horaire-de-1987"
             }
           ]
         },
@@ -1259,6 +1276,10 @@
               "key": "aubrune.acte3.veillee",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-sonnerie-de-5h12"
             }
           ]
         },

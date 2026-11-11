@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "place-aux-lumieres",
+  "entry": "carte-place-aux-lumieres",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "pl"
+  },
+  "conditions": [
+    {
+      "type": "time_is",
+      "from": 1260,
+      "to": 1440
+    }
+  ]
+}

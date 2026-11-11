@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "rose-des-lacombe",
+  "category": "fleurs",
+  "name": "Rose des Lacombe",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "rose-des-lacombe"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Une rose ancienne, rose pâle et très parfumée, de celles qu'on plantait près des gares. Celle-ci vient de la dalle des Lacombe."
+}

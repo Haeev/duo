@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "ombre",
+  "kind": "fish",
+  "item": "ombre",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 420,
+    "to": 660
+  },
+  "weathers": ["clear", "mist"],
+  "seasons": ["autumn", "winter"],
+  "rarity": "rare",
+  "difficulty": 4,
+  "fish": {
+    "force": 0.55,
+    "nervousness": 0.8,
+    "rhythm": {
+      "pull": 1.5,
+      "rest": 1.0
+    },
+    "stamina": 10,
+    "feints": 2,
+    "sizeCm": {
+      "min": 25,
+      "max": 45
+    },
+    "shadow": "medium"
+  }
+}

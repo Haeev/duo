@@ -3,10 +3,17 @@
   "id": "ablette",
   "category": "poissons",
   "name": "Ablette",
-  "place": "essai-gare",
+  "place": "aubrune",
   "source": {
     "type": "manual"
   },
-  "rarity": null,
-  "text": "Une ablette argentée, vive comme un éclair."
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 1440
+    },
+    "weathers": [],
+    "seasons": []
+  },
+  "text": "Une ablette argentée, vive comme un reflet. Elles tournent par bancs sous le ponton."
 }

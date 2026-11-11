@@ -104,6 +104,46 @@
       "price": 1200
     },
     {
+      "item": "gardon",
+      "price": 260
+    },
+    {
+      "item": "vairon",
+      "price": 200
+    },
+    {
+      "item": "loche",
+      "price": 220
+    },
+    {
+      "item": "rotengle",
+      "price": 280
+    },
+    {
+      "item": "chevesne",
+      "price": 440
+    },
+    {
+      "item": "breme",
+      "price": 420
+    },
+    {
+      "item": "barbeau",
+      "price": 520
+    },
+    {
+      "item": "carpe",
+      "price": 960
+    },
+    {
+      "item": "anguille",
+      "price": 840
+    },
+    {
+      "item": "ombre",
+      "price": 880
+    },
+    {
       "item": "oeuf-au-plat",
       "price": 120
     },

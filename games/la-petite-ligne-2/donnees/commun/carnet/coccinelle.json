@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "coccinelle",
+  "category": "insectes",
+  "name": "Coccinelle à sept points",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1140
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Une coccinelle à sept points: Jeanne a parié que tu n'oserais pas compter."
+}

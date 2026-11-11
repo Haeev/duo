@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-oeuf-au-plat",
+  "category": "recettes",
+  "name": "Œuf au plat",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "oeuf-au-plat"
+  },
+  "rarity": null,
+  "text": "Un œuf au plat, jaune entier. Le premier plat de la maison, et pas le plus facile."
+}

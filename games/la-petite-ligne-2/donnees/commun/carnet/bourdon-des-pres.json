@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "bourdon-des-pres",
+  "category": "insectes",
+  "name": "Bourdon des prés",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1140
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Un bourdon tout rond, poudré de pollen. Il ronchonne comme Ambroise."
+}

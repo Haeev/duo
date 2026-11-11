@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "lucane",
+  "category": "insectes",
+  "name": "Lucane cerf-volant",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1140,
+      "to": 1380
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["summer"]
+  },
+  "text": "Un lucane cerf-volant, cornes en avant, qui vole droit comme un vieux biplan. Le plus gros coléoptère du bois."
+}

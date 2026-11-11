@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "oursin-fossile",
+  "name": "Oursin fossile",
+  "family": "treasure",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

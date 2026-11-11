@@ -3,7 +3,7 @@
   "id": "tanche",
   "kind": "fish",
   "item": "tanche",
-  "places": ["essai-gare"],
+  "places": ["aubrune", "essai-gare"],
   "hours": {
     "from": 1080,
     "to": 360

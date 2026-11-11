@@ -42,6 +42,16 @@ Prix de base en euros. « Meilleur rachat » dit où porter l'objet: c'est la le
 | Tanche | 6,00 (Café) | | |
 | Truite fario | 7,20 (Café) | 2,00 (Épicerie) | |
 | Brochet | 12,00 (Café) | | |
+| Vairon | 2,00 (Café) | | |
+| Loche franche | 2,20 (Café) | | |
+| Gardon | 2,60 (Café) | | |
+| Rotengle | 2,80 (Café) | | |
+| Brème | 4,20 (Café) | | |
+| Chevesne | 4,40 (Café) | | |
+| Barbeau | 5,20 (Café) | | |
+| Anguille | 8,40 (Café) | | |
+| Ombre commun | 8,80 (Café) | | |
+| Carpe de l'étang | 9,60 (Café) | | |
 | Œuf au plat | 1,20 (Café) | | |
 | Omelette aux herbes | 2,80 (Café) | | 3,50 (Café) |
 | Soupe de légumes | 2,00 (Café) | 1,50 (Épicerie) | 3,00 (Café) |
@@ -58,6 +68,7 @@ Prix de base en euros. « Meilleur rachat » dit où porter l'objet: c'est la le
 | Grain (la ration) | non | | 0,10 (Delmas), 0,20 (Épicerie) |
 | Graines de radis (la graine) | non | | 0,20 (Delmas, Épicerie) |
 | Graines de tomate (la graine) | non | | 0,60 (Delmas), 0,80 (Épicerie) |
+| Graines de fleurs (la graine) | non | | capucine, souci 0,30, pensée, giroflée 0,40 (Épicerie); bleuet, marguerite 0,30, nigelle 0,40, tournesol 0,50 (Delmas) |
 | Planche | non | | 1,60 (Menuiserie) |
 | Pierre à aiguiser | non | | 1,50 (Forge) |
 | Hache, bêche | non | | 8,00 (Forge) |
@@ -94,12 +105,12 @@ Modèle: le duo passe une part de sa journée (30 minutes réelles) à récolter
 | Période | Duo tranquille (25 % du temps) | Duo médian (40 %) | Duo appliqué (55 %) |
 |---|---|---|---|
 | Acte 1 (jours 1 à 4) | 49,90 € | 49,90 € | 49,90 € |
-| Acte 2 (jours 5 à 10) | 103,30 € | 131,40 € | 131,40 € |
-| Acte 3 et après | 104,90 € | 133,60 € | 133,60 € |
+| Acte 2 (jours 5 à 10) | 99,40 € | 131,40 € | 131,40 € |
+| Acte 3 et après | 101,10 € | 133,60 € | 133,60 € |
 
 Le pain de la journée (deux par joueur) retire 4,80 €.
 
-Journée type du duo médian à l'acte 3, cuisine achetée: radis croquants 22,80 €, omelettes 12,00 €, bûches 32,40 € (23 bûches), pêche 48,40 € (10 poissons), vieilles pièces 6,00 €, pierres 6,00 €: 127,60 €. Aucune activité ne dépasse 40 % de la journée: pêche 38 %, bûches 25 %, radis 18 %.
+Journée type du duo médian à l'acte 3, cuisine achetée: radis croquants 22,80 €, omelettes 12,00 €, bûches 32,40 € (23 bûches), pêche 48,40 € (11 poissons), vieilles pièces 6,00 €, pierres 6,00 €: 127,60 €. Aucune activité ne dépasse 40 % de la journée: pêche 38 %, bûches 25 %, radis 18 %.
 
 Lecture:
 
@@ -184,3 +195,4 @@ Les jours suivants, le bonjour est celui du quotidien de l'habitant, suivi du ch
 |---|---|---|
 | 2026-11-11 | Version 1 | première économie d'Aubrune |
 | 2026-11-11 | Rachats: bûche chez Basile 0,60 à 1,40; pierre 0,30 à 0,60; vieille pièce 1,20 à 2,00; radis croquant 1,00 à 2,00 (Café) et 0,80 à 1,40 (Épicerie); omelette 2,20 à 2,80; poissons multipliés par 2,4 (goujon 2,90, ablette 2,40, perche 4,80, tanche 6,00, truite 7,20, brochet 12,00). Plafonds: Basile 12 à 35 €, Colette 45 à 85 €. Pot-au-feu de l'acte 3 conditionné à la cuisine payée. | le client trouve la maison trop lente (cuisine au jour 10, étage au jour 82 pour un duo tranquille) et veut le pot-au-feu dans la cuisine de la maison. Cible: environ deux fois plus vite, 40 à 50 € par jour à l'acte 1. Prix des pièces inchangés (cahier). L'omelette ne peut dépasser 2,89 € sans être rachetée plus cher qu'elle ne se vend (3,50 €, amitié et repas compris), d'où 2,80 €; les œufs crus restent à 1,00 € pour que cuisiner paie toujours. |
+| 2026-11-11 | Collections d'Aubrune: 10 poissons nouveaux rachetés au café (2,00 à 9,60 €), graines de fleurs en rayon (0,30 à 0,50 €), 9 trésors « rares » ajoutés aux fouilles; fleurs, insectes, trésors et nouveaux plats sans rachat. | `collections-aubrune.md`. Le prix moyen d'une prise passe de 4,72 à 4,31 € (plus de poissons communs): duo tranquille 103,30 à 99,40 € (acte 2) et 104,90 à 101,10 € (acte 3); médian et appliqué inchangés (plafond du café). Les fouilles rendent environ 1,50 € de moins par jour en vieilles pièces (non compté par le script). |

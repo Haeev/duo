@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-vanne-du-bief",
+  "category": "cartes-postales",
+  "name": "La vanne du bief",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "La vanne du bief au soleil, l'eau qui tombe en dentelle. Les ricochets partent d'ici."
+}

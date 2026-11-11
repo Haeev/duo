@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "hanneton",
+  "category": "insectes",
+  "name": "Hanneton commun",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1200,
+      "to": 1380
+    },
+    "weathers": ["clear"],
+    "seasons": ["spring"]
+  },
+  "text": "Un hanneton qui vrombit autour de la lumière, maladroit et têtu. Marthe dit qu'ils annoncent les cerises."
+}

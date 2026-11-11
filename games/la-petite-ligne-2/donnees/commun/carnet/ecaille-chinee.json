@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ecaille-chinee",
+  "category": "insectes",
+  "name": "Écaille chinée",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1260,
+      "to": 180
+    },
+    "weathers": ["clear", "overcast", "mist"],
+    "seasons": ["summer"]
+  },
+  "text": "Une écaille chinée, rayée de crème, qui cache un dessous rouge vif. Elle ne sort qu'à la lueur des réverbères."
+}

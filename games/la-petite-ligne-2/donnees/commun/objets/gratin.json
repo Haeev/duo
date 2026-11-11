@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "gratin",
+  "name": "Gratin de pommes de terre",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 60
+  },
+  "tool": null
+}

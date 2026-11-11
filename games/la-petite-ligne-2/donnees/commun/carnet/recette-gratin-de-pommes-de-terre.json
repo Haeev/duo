@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-gratin-de-pommes-de-terre",
+  "category": "recettes",
+  "name": "Gratin de pommes de terre",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "gratin"
+  },
+  "rarity": null,
+  "text": "Un gratin doré qui gratte au fond du plat. Le meilleur morceau, c'est le coin."
+}

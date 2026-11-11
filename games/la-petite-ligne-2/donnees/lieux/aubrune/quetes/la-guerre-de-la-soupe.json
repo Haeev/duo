@@ -44,6 +44,10 @@
               "key": "aubrune.soupe.vexee",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "tomates-farcies"
             }
           ]
         },
@@ -141,6 +145,10 @@
               "key": "aubrune.soupe.truite",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "truite-grillee"
             }
           ]
         }
@@ -473,6 +481,10 @@
               "key": "aubrune.soupe.fini",
               "value": true,
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-chanson-des-marmites"
             }
           ]
         }

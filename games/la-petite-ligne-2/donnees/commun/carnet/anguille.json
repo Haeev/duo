@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "anguille",
+  "category": "poissons",
+  "name": "Anguille",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1260,
+      "to": 300
+    },
+    "weathers": ["overcast", "rain", "storm"],
+    "seasons": ["summer", "autumn"]
+  },
+  "text": "Une anguille, sortie d'une nuit d'orage. Elle se tortille comme une phrase d'Honorine."
+}

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "giroflee",
+  "category": "fleurs",
+  "name": "Giroflée",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "giroflee"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring"]
+  },
+  "text": "Une giroflée couleur de brique, qui sent le clou de girofle. Elle pousse aussi dans les vieux murs."
+}

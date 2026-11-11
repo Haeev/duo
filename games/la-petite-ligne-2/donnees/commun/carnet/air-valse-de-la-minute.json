@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-valse-de-la-minute",
+  "category": "musiques",
+  "name": "Valse de la minute",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "La valse qu'Ambroise sifflote en réglant la pendule. Firmin la connaît par cœur, il ne le dira pas."
+}

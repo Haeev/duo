@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "clocher-sous-la-neige",
+  "entry": "carte-clocher-sous-la-neige",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "pv"
+  },
+  "conditions": [
+    {
+      "type": "weather_is",
+      "weathers": ["snow"]
+    }
+  ]
+}

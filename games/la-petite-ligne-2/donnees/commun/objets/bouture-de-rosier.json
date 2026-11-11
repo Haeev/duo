@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "bouture-de-rosier",
+  "name": "Bouture de rosier",
+  "family": "seed",
+  "stack": 20,
+  "food": null,
+  "tool": null
+}

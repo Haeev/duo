@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "gros-noyer-en-automne",
+  "entry": "carte-gros-noyer-en-automne",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "fs2"
+  },
+  "conditions": [
+    {
+      "type": "season_is",
+      "seasons": ["autumn"]
+    }
+  ]
+}

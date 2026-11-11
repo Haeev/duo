@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "vairon",
+  "kind": "fish",
+  "item": "vairon",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 420,
+    "to": 1200
+  },
+  "weathers": [],
+  "seasons": ["spring", "summer", "autumn"],
+  "rarity": "common",
+  "difficulty": 1,
+  "fish": {
+    "force": 0.15,
+    "nervousness": 0.9,
+    "rhythm": {
+      "pull": 0.7,
+      "rest": 1.0
+    },
+    "stamina": 3,
+    "feints": 1,
+    "sizeCm": {
+      "min": 5,
+      "max": 11
+    },
+    "shadow": "small"
+  }
+}

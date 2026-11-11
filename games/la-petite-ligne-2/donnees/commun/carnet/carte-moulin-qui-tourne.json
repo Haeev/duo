@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-moulin-qui-tourne",
+  "category": "cartes-postales",
+  "name": "Le moulin qui tourne",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "La roue du moulin qui tourne de nouveau, et Berthe qui parle à sa meule."
+}

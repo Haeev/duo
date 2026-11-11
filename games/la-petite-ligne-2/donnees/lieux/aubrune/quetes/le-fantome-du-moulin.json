@@ -311,6 +311,10 @@
               "key": "aubrune.fantome.parrain",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "pain-perdu"
             }
           ]
         },
@@ -346,6 +350,10 @@
             {
               "type": "play_scene",
               "scene": "la-tete-haute"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-chant-de-la-coupe"
             }
           ]
         },

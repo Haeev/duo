@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "barbeau",
+  "kind": "fish",
+  "item": "barbeau",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 1080,
+    "to": 360
+  },
+  "weathers": [],
+  "seasons": ["spring", "summer", "autumn"],
+  "rarity": "uncommon",
+  "difficulty": 3.5,
+  "fish": {
+    "force": 0.75,
+    "nervousness": 0.45,
+    "rhythm": {
+      "pull": 2.2,
+      "rest": 1.2
+    },
+    "stamina": 11,
+    "feints": 2,
+    "sizeCm": {
+      "min": 30,
+      "max": 65
+    },
+    "shadow": "large"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "barbeau",
+  "category": "poissons",
+  "name": "Barbeau",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1080,
+      "to": 360
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Un barbeau à quatre barbillons, qui fouille le courant à la nuit tombante. Il tire vers le fond, toujours."
+}

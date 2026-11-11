@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "salade-de-radis",
+  "name": "Salade de radis",
+  "station": "counter",
+  "inputs": [
+    {
+      "item": "radis",
+      "count": 3
+    }
+  ],
+  "output": {
+    "item": "salade-de-radis",
+    "count": 1
+  },
+  "seconds": 8,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 10
+    },
+    {
+      "kind": "season",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ],
+  "learn": {
+    "trial": true
+  }
+}

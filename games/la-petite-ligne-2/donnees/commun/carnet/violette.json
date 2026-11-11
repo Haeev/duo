@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "violette",
+  "category": "fleurs",
+  "name": "Violette",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "violette"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring", "autumn"]
+  },
+  "text": "Une violette, toute petite et toute parfumée. Basile en glissait dans ses lettres, il y a trente ans."
+}

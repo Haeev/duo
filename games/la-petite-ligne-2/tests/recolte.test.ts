@@ -143,9 +143,9 @@ describe('ressources du monde', () => {
     expect(hits(events).at(-1)).toMatchObject({ action: 'dig', done: true });
     expect(sim.world.players[0].needs.hygiene).toBeLessThan(hygiene - 1.5);
     const found = events.find((e) => e.type === 'harvested');
-    expect(['vieille-piece', 'fossile-coquille']).toContain(
-      found?.type === 'harvested' && found.item,
-    );
+    // La trouvaille sort de la table du sol qui scintille (pièces, fossiles et trésors du lieu).
+    const table = content.resources['point-de-fouille']?.loot.map((l) => l.item) ?? [];
+    expect(table).toContain(found?.type === 'harvested' && found.item);
   });
 
   it('table de butin: chance des besoins sur les rares (`rareLuck`) et exemplaire en plus (`extraCatch`)', () => {

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-salade-de-radis",
+  "category": "recettes",
+  "name": "Salade de radis",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "salade-de-radis"
+  },
+  "rarity": null,
+  "text": "Une salade de radis tranchés fin, qui croque sous la dent. Le potager en une assiette."
+}

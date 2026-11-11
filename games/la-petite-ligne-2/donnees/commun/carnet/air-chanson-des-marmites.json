@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-chanson-des-marmites",
+  "category": "musiques",
+  "name": "Chanson des marmites",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "La chanson du concours de la soupe, que tout le bourg reprend en tapant sur les couvercles."
+}

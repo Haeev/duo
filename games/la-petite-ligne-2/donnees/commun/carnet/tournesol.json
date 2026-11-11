@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "tournesol",
+  "category": "fleurs",
+  "name": "Tournesol",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "tournesol"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["summer"]
+  },
+  "text": "Un tournesol plus haut que Léon, qui suit le soleil toute la journée. Le soir, il a le cou fatigué."
+}

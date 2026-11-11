@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "lampe-de-mineur",
+  "category": "tresors",
+  "name": "Lampe de mineur",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": null,
+  "text": "La lampe de mineur oubliée dans la première niche du tunnel. Tu l'as laissée à sa place, notée au carnet."
+}

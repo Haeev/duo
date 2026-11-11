@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "carpe",
+  "category": "poissons",
+  "name": "Carpe de l'étang",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1140,
+      "to": 420
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["summer", "autumn"]
+  },
+  "text": "Une carpe cuivrée, plus vieille que la digue peut-être. On dit au bourg qu'elle connaît chaque appât par son nom."
+}

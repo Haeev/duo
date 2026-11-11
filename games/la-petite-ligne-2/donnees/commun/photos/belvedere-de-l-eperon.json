@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "belvedere-de-l-eperon",
+  "entry": "carte-belvedere-de-l-eperon",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "bv"
+  },
+  "conditions": []
+}

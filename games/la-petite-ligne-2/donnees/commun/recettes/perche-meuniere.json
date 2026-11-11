@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "perche-meuniere",
+  "name": "Perche meunière",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "perche",
+      "count": 1
+    },
+    {
+      "item": "farine",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "perche-meuniere",
+    "count": 1
+  },
+  "seconds": 12,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 4
+    },
+    {
+      "kind": "season",
+      "count": 4
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ]
+}

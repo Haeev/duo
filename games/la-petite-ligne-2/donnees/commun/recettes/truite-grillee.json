@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "truite-grillee",
+  "name": "Truite grillée",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "truite",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "truite-grillee",
+    "count": 1
+  },
+  "seconds": 10,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 6
+    },
+    {
+      "kind": "season",
+      "count": 3
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "giroflee",
+  "name": "Giroflée",
+  "model": "crop-radis",
+  "seed": "graines-giroflee",
+  "seasons": ["spring"],
+  "stages": [3, 2],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "giroflee",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "giroflee",
+      "count": 2
+    }
+  ]
+}

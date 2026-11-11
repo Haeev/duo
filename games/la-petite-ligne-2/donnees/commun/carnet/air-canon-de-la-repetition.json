@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-canon-de-la-repetition",
+  "category": "musiques",
+  "name": "Canon de la répétition",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "L'air de la répétition devant l'école, en canon, parce que personne ne partait ensemble."
+}

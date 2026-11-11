@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "oeillet-de-poete",
+  "name": "Œillet de poète",
+  "model": "crop-radis",
+  "seed": "graines-oeillet",
+  "seasons": ["spring", "summer"],
+  "stages": [3, 2],
+  "regrowStage": 1,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "oeillet-de-poete",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "oeillet-de-poete",
+      "count": 2
+    }
+  ]
+}

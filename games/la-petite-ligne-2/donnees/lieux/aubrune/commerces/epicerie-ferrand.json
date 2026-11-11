@@ -52,6 +52,26 @@
         "type": "remembered",
         "key": "aubrune.acte3.repas"
       }
+    },
+    {
+      "item": "graines-capucine",
+      "price": 30,
+      "dailyStock": 5
+    },
+    {
+      "item": "graines-souci",
+      "price": 30,
+      "dailyStock": 5
+    },
+    {
+      "item": "graines-pensee",
+      "price": 40,
+      "dailyStock": 5
+    },
+    {
+      "item": "graines-giroflee",
+      "price": 40,
+      "dailyStock": 5
     }
   ],
   "buys": [

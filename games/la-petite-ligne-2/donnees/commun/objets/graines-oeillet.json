@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "graines-oeillet",
+  "name": "Graines d'œillet de poète",
+  "family": "seed",
+  "stack": 20,
+  "food": null,
+  "tool": null
+}

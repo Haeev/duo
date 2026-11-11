@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-matelote-du-bief",
+  "category": "recettes",
+  "name": "Matelote du bief",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "matelote"
+  },
+  "rarity": null,
+  "text": "Une matelote des poissons du bief, mijotée au poireau. Elle sent la rivière en dimanche."
+}

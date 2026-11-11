@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "oeillet-de-poete",
+  "category": "fleurs",
+  "name": "Œillet de poète",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "oeillet-de-poete"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Un œillet de poète, rouge bordé de blanc: la boutonnière des musiciens de la fanfare."
+}

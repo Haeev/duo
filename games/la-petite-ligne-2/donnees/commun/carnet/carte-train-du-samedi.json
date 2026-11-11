@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-train-du-samedi",
+  "category": "cartes-postales",
+  "name": "Le train du samedi",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "Le train du samedi à quai, et tout le bourg qui fait semblant de passer par hasard."
+}

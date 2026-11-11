@@ -73,7 +73,9 @@ describe('collections', () => {
     const find = sim.world.progress.album?.f['fossile-d-essai'];
     expect(find?.slice(0, 2)).toEqual([0, 1]);
     expect(find?.slice(5, 7)).toEqual([2, 1]);
-    const tresors = collectionBook(sim.world, content).find((c) => c.id === 'tresors');
+    const tresors = collectionBook(sim.world, content, 'essai-gare').find(
+      (c) => c.id === 'tresors',
+    );
     expect(tresors).toMatchObject({ found: 1, total: 1 });
     expect(tresors?.entries[0]).toMatchObject({ by: [true, true], firstBy: 0 });
     expect(

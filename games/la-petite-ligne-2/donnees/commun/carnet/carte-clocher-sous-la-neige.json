@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-clocher-sous-la-neige",
+  "category": "cartes-postales",
+  "name": "Le clocher sous la neige",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "Le clocher sous la neige. Marthe a sonné quand même, pour qu'on sache l'heure."
+}

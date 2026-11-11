@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "tomates-farcies",
+  "name": "Tomates farcies",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 60
+  },
+  "tool": null
+}

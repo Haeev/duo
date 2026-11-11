@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "friture-d-ablettes",
+  "name": "Friture d'ablettes",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "ablette",
+      "count": 3
+    }
+  ],
+  "output": {
+    "item": "friture",
+    "count": 1
+  },
+  "seconds": 2,
+  "known": "learned",
+  "learn": {
+    "trial": true
+  }
+}

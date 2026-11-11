@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "compotee-de-mures",
+  "name": "Compotée de mûres",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 25
+  },
+  "tool": null
+}

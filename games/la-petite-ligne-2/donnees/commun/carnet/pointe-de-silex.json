@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "pointe-de-silex",
+  "category": "tresors",
+  "name": "Pointe de silex",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "pointe-de-silex"
+  },
+  "rarity": null,
+  "text": "Une pointe de flèche en silex, taillée bien avant la Compagnie. Armand en a les mains qui tremblent."
+}

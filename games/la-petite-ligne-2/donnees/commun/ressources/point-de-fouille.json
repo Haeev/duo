@@ -45,6 +45,96 @@
       "hours": null,
       "weathers": ["rain", "mist"],
       "seasons": []
+    },
+    {
+      "item": "ammonite",
+      "min": 1,
+      "max": 1,
+      "weight": 0.5,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "dent-de-requin",
+      "min": 1,
+      "max": 1,
+      "weight": 0.4,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": ["autumn", "winter"]
+    },
+    {
+      "item": "oursin-fossile",
+      "min": 1,
+      "max": 1,
+      "weight": 0.5,
+      "rare": true,
+      "hours": null,
+      "weathers": ["rain", "mist"],
+      "seasons": []
+    },
+    {
+      "item": "belemnite",
+      "min": 1,
+      "max": 1,
+      "weight": 0.3,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "pointe-de-silex",
+      "min": 1,
+      "max": 1,
+      "weight": 0.3,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "bouton-de-livree",
+      "min": 1,
+      "max": 1,
+      "weight": 0.5,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "jeton-de-cantine",
+      "min": 1,
+      "max": 1,
+      "weight": 0.4,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "bille-d-agate",
+      "min": 1,
+      "max": 1,
+      "weight": 0.4,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": ["spring", "summer"]
+    },
+    {
+      "item": "clou-de-voie-date",
+      "min": 1,
+      "max": 1,
+      "weight": 0.5,
+      "rare": true,
+      "hours": null,
+      "weathers": [],
+      "seasons": []
     }
   ]
 }

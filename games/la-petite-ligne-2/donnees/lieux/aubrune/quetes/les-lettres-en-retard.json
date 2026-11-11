@@ -179,6 +179,11 @@
               "key": "aubrune.lettres.odette",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "plants-de-violette",
+              "count": 2
             }
           ]
         },
@@ -338,6 +343,10 @@
               "key": "aubrune.lettres.oeufs",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "omelette-aux-herbes"
             }
           ]
         },

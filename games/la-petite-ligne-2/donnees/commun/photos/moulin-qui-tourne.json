@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "moulin-qui-tourne",
+  "entry": "carte-moulin-qui-tourne",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "mc"
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.moulin-tourne",
+      "equals": true
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "anguille",
+  "name": "Anguille",
+  "family": "catch",
+  "stack": 3,
+  "food": null,
+  "tool": null
+}

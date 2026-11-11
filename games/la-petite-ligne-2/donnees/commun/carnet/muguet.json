@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "muguet",
+  "category": "fleurs",
+  "name": "Muguet",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "muguet"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring"]
+  },
+  "text": "Un brin de muguet, clochettes blanches et parfum de printemps. Marthe et Honorine en offraient à leur mère."
+}

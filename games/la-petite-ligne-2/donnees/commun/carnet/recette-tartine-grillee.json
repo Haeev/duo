@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-tartine-grillee",
+  "category": "recettes",
+  "name": "Tartine grillée",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "tartine"
+  },
+  "rarity": null,
+  "text": "Une tartine grillée sur le réchaud. Le petit déjeuner de qui se lève avant le train."
+}

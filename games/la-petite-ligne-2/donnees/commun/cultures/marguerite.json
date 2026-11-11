@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "marguerite",
+  "name": "Marguerite",
+  "model": "crop-radis",
+  "seed": "graines-marguerite",
+  "seasons": ["spring", "summer"],
+  "stages": [2, 2],
+  "regrowStage": 1,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "marguerite",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "marguerite",
+      "count": 2
+    }
+  ]
+}

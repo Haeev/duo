@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "marguerite",
+  "category": "fleurs",
+  "name": "Marguerite",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "marguerite"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Une marguerite, un peu, beaucoup, passionnément. Jeanne a déjà arraché toutes les autres."
+}

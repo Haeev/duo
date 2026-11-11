@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "rose-des-lacombe",
+  "name": "Rose des Lacombe",
+  "family": "crop",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

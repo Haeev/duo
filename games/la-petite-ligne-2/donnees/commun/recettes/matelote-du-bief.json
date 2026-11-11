@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "matelote-du-bief",
+  "name": "Matelote du bief",
+  "station": "kitchen",
+  "inputs": [
+    {
+      "item": "perche",
+      "count": 1
+    },
+    {
+      "item": "goujon",
+      "count": 2
+    },
+    {
+      "item": "poireau",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "matelote",
+    "count": 1
+  },
+  "seconds": 20,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 6
+    },
+    {
+      "kind": "stir",
+      "count": 6
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    }
+  ],
+  "quality": {
+    "perfect": {
+      "item": "matelote",
+      "count": 2
+    }
+  },
+  "learn": {
+    "book": "livre-de-cuisine"
+  }
+}

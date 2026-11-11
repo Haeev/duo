@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "pain-perdu",
+  "name": "Pain perdu",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 40
+  },
+  "tool": null
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-friture-d-ablettes",
+  "category": "recettes",
+  "name": "Friture d'ablettes",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "friture"
+  },
+  "rarity": null,
+  "text": "Une friture d'ablettes, croustillante et brûlante. On la mange avec les doigts, au bord de l'eau."
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "griffes-de-muguet",
+  "name": "Griffes de muguet",
+  "family": "seed",
+  "stack": 20,
+  "food": null,
+  "tool": null
+}

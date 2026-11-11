@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "capucine",
+  "category": "fleurs",
+  "name": "Capucine",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "capucine"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Une capucine orange, aux feuilles rondes où la pluie fait des perles. Elle grimpe partout où on la laisse."
+}

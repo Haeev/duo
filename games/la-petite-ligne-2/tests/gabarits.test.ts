@@ -128,7 +128,7 @@ describe('gabarits', () => {
 
   it('recette, prise, commerce, quête et pièce de personnage: chaque gabarit se charge tel quel', () => {
     expect(withNew('recette', 'compote', null).recipes.compote?.station).toBe('stove');
-    expect(withNew('prise', 'gardon', null).catches.gardon?.kind).toBe('fish');
+    expect(withNew('prise', 'poisson-factice', null).catches['poisson-factice']?.kind).toBe('fish');
     expect(
       withNew('commerce', 'buvette', 'essai-gare').places['essai-gare']?.shops.buvette?.keeper,
     ).toBe('cheffe-de-gare');

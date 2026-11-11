@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "tournesol",
+  "name": "Tournesol",
+  "family": "crop",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

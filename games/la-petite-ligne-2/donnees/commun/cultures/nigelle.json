@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "nigelle",
+  "name": "Nigelle de Damas",
+  "model": "crop-radis",
+  "seed": "graines-nigelle",
+  "seasons": ["spring", "summer"],
+  "stages": [2, 2],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "nigelle",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "nigelle",
+      "count": 2
+    }
+  ]
+}

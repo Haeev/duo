@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "gratin-de-pommes-de-terre",
+  "name": "Gratin de pommes de terre",
+  "station": "kitchen",
+  "inputs": [
+    {
+      "item": "pomme-de-terre",
+      "count": 3
+    },
+    {
+      "item": "oeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "gratin",
+    "count": 1
+  },
+  "seconds": 20,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 8
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    }
+  ],
+  "quality": {
+    "perfect": {
+      "item": "gratin",
+      "count": 2
+    }
+  },
+  "learn": {
+    "book": "livre-de-cuisine"
+  }
+}

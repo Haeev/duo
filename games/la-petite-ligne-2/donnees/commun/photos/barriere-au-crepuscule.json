@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "barriere-au-crepuscule",
+  "entry": "carte-barriere-au-crepuscule",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "pn-s"
+  },
+  "conditions": [
+    {
+      "type": "time_is",
+      "from": 1170,
+      "to": 1290
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "breme",
+  "category": "poissons",
+  "name": "Brème",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 1440
+    },
+    "weathers": ["overcast", "rain", "mist"],
+    "seasons": []
+  },
+  "text": "Une brème plate et dorée, lente comme un dimanche de pluie. Elle se laisse tirer, puis se met en travers."
+}
