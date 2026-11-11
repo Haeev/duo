@@ -218,6 +218,16 @@ export const t = {
     installerFichier: 'Installer un jeu depuis un fichier',
     retour: 'Retour',
   },
+  /** Avis de nouvelle version de Duo (M-35, ADR 0011). */
+  versionDuo: {
+    titre: (version: string): string => fr`Duo ${version} est disponible`,
+    deuxOrdinateurs: fr`Installe-la par-dessus Duo sur les deux ordinateurs, pour continuer à jouer ensemble. Tes sauvegardes et tes jeux sont gardés.`,
+    navigateur: fr`Le téléchargement s'ouvre dans ton navigateur.`,
+    tropAncien: (system: string, minimum: string): string =>
+      fr`Cette version demande ${system} ${minimum} ou plus récent : cet ordinateur ne peut pas l'installer.`,
+    telecharger: 'Télécharger',
+    plusTard: 'Plus tard',
+  },
   reglages: {
     titre: 'Réglages',
     affichage: 'Affichage',

@@ -12,6 +12,7 @@ import {
   ipcMain,
   net,
   session,
+  shell,
   type IpcMainInvokeEvent,
 } from 'electron';
 import {
@@ -38,6 +39,7 @@ import { createNotebookStore } from './notebook';
 import { Platform } from './platform';
 import { APP_ORIGIN, handleAppProtocol, handleGameProtocol, registerSchemes } from './protocols';
 import { hardenSession } from './security';
+import { AppVersionChecker, REPOSITORY_URL, VERSION_FILE_URL } from './versions';
 import { AppWindow } from './window';
 
 const APP_USER_MODEL_ID = 'io.github.haeev.duo';
@@ -95,6 +97,15 @@ function installedGamesDir(): string {
 function catalogueUrl(): string | null {
   if (DUO_TEST) return process.env.DUO_TEST_CATALOGUE_URL ?? null;
   return CATALOGUE_URL;
+}
+
+/**
+ * Fichier de version de Duo (ADR 0011). Une version de test ne lit que
+ * `DUO_TEST_VERSION_URL` (fichier servi en local), et rien sans elle.
+ */
+function versionFileUrl(): string | null {
+  if (DUO_TEST) return process.env.DUO_TEST_VERSION_URL ?? null;
+  return VERSION_FILE_URL;
 }
 
 /** Paquets téléchargés en https; une version de test admet aussi la boucle locale. */
@@ -294,6 +305,42 @@ async function start(): Promise<void> {
         });
   let updaterStarted = false;
 
+  /** Liens ouverts par l'avis de version dans une version de test, au lieu du navigateur. */
+  const openedLinks: string[] = [];
+  const versionUrl = versionFileUrl();
+  const versionChecker: AppVersionChecker | null =
+    versionUrl === null
+      ? null
+      : new AppVersionChecker({
+          url: versionUrl,
+          fetch: (target, init) => net.fetch(target, { signal: init.signal }),
+          machine: {
+            appVersion: app.getVersion(),
+            platform: process.platform,
+            arch: process.arch,
+            systemVersion: process.getSystemVersion(),
+          },
+          journal,
+          onChange: (view) => {
+            platform.setAppUpdate(view);
+          },
+        });
+  const openDownload = (): void => {
+    const link = versionChecker?.downloadUrl();
+    // Seules les adresses du dépôt de Duo s'ouvrent (déjà validées à la lecture).
+    if (!link?.startsWith(REPOSITORY_URL)) return;
+    journal.write('info', 'versions', 'open-download', { url: link });
+    if (DUO_TEST) {
+      openedLinks.push(link);
+      return;
+    }
+    void shell.openExternal(link).catch((error: unknown) => {
+      journal.write('warn', 'versions', 'open-failed', {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    });
+  };
+
   const platform: Platform = new Platform({
     journal,
     store,
@@ -319,6 +366,15 @@ async function start(): Promise<void> {
             },
             playAnyway: (gameId) => {
               updater.playAnyway(gameId);
+            },
+          },
+    appUpdate:
+      versionChecker === null
+        ? null
+        : {
+            download: openDownload,
+            later: () => {
+              versionChecker.later();
             },
           },
     onIdleChange: (idle) => {
@@ -372,6 +428,7 @@ async function start(): Promise<void> {
         if (!updaterStarted) {
           updaterStarted = true;
           updater?.start();
+          versionChecker?.start();
         }
       },
       onFullscreenChange: (fullscreen) => {
@@ -419,6 +476,7 @@ async function start(): Promise<void> {
     // ⌘Q pendant une partie: même confirmation que la fermeture de la fenêtre (M-15).
     if (platform.interceptClose()) return;
     updater?.stop();
+    versionChecker?.stop();
     void platform.shutdown().finally(() => {
       shutdownDone = true;
       app.quit();
@@ -432,6 +490,8 @@ async function start(): Promise<void> {
       liaison: () => liaison.stats(),
       dataDir: userData,
       checkGames: () => updater?.check() ?? null,
+      checkAppVersion: () => versionChecker?.check() ?? null,
+      openedLinks: () => [...openedLinks],
       platformView: () => ({
         visible: appWindow?.platformView.getVisible() ?? null,
         bounds: appWindow?.platformView.getBounds() ?? null,

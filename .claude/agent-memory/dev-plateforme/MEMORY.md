@@ -69,3 +69,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Un bug « marche sur le Mac, pas sur le PC » peut tenir au rôle (hôte ou invité) plutôt qu'au système: le Mac du client héberge en général. Reproduire d'abord à deux avec `startLocalDuo` (latence 5 ms) avant de chercher du côté de Windows.
 - Une intention de l'invité doit être jouée par l'hôte au pas de l'entrée où elle est née: appliquée au pas d'une entrée plus ancienne, un geste à maintien lit « Agir relâché » et s'annule aussitôt.
 - `createInputState.keyDown(code, repeat)`: une répétition ne vaut jamais un appui; un appui non répété d'une touche déjà tenue (keyup perdu) vaut un nouvel appui.
+
+## Avis de nouvelle version et releases (vérifié le 2026-11-11)
+
+- Sans release d'application marquée explicitement « Latest » (toutes en préversion), GitHub prend pour `releases/latest` la release de jeu la plus récente, malgré `--latest=false`: liens stables et `duo-version.json` répondent 404. Contrôle: `gh api repos/Haeev/duo/releases/latest -q .tag_name`.
+- `gh release list/view` passent par GraphQL, refusé dans les sessions: utiliser `gh api repos/Haeev/duo/releases...` (REST).
+- Un test TypeScript qui doit appeler un outil `.mjs` d'`outils/` sans déclarations: `await import(urlCalculée)` puis transtypage vers une interface à propriétés fonctions (les méthodes déclenchent `unbound-method`).
+- Version de test: `DUO_TEST_VERSION_URL` (fichier servi en local), `__duoTest.checkAppVersion()` et `__duoTest.openedLinks()` (le lien n'ouvre pas le navigateur).

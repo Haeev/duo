@@ -87,7 +87,7 @@ Si l'autre ordinateur n'apparaît pas au bout d'une minute: le bouton « Que fai
 
 ## 5. Mettre Duo à jour
 
-Duo ne se met pas encore à jour tout seul. Quand le studio annonce une nouvelle version, tu la trouves sur la page des versions de Duo, <https://github.com/Haeev/duo/releases>, avec les mêmes noms de fichiers:
+Duo ne se met pas encore à jour tout seul. Depuis la version 0.4.0, il te prévient: quand une nouvelle version est publiée, un bandeau « Duo X.Y.Z est disponible » apparaît dans la bibliothèque (jamais pendant une partie). « Télécharger » ouvre dans ton navigateur le fichier de ton ordinateur; « Plus tard » le cache jusqu'au prochain lancement de Duo. Tu trouves aussi chaque version sur la page des versions de Duo, <https://github.com/Haeev/duo/releases>, avec les mêmes noms de fichiers. Installe-la sur les deux ordinateurs:
 
 - **Mac**: télécharge le nouveau Duo-macOS.dmg, glisse Duo sur Applications et choisis **Remplacer**. Au lancement, refais le passage par « Ouvrir quand même » (partie 2).
 - **PC**: télécharge le nouveau Duo-Windows.exe et lance-le. SmartScreen s'affiche de nouveau: « Informations complémentaires », puis « Exécuter quand même ».

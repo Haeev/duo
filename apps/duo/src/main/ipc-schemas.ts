@@ -31,6 +31,8 @@ export const INTENT_SCHEMAS: {
   'library:opened': NoArgument,
   'update:retry': NoArgument,
   'update:play-anyway': v.object({ gameId: v.pipe(v.string(), v.regex(/^[a-z][a-z0-9-]{1,31}$/)) }),
+  'app-update:download': NoArgument,
+  'app-update:later': NoArgument,
 };
 
 export type IntentCheck<C extends IntentChannel> =
