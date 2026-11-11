@@ -1,5 +1,5 @@
 /** Contrôles des logements entre fichiers: objets, meubles et pièces référencés existent, pièces disjointes. */
-import type { Content } from '../../donnees/charger';
+import type { Content, PlaceContent } from '../../donnees/charger';
 
 function overlap(
   a: { x: number; y: number; w: number; h: number },
@@ -43,6 +43,58 @@ export function validateHousings(content: Content): string[] {
         else if (!prop.placeable) problems.push(`${at}: meuble « ${type} » non posable`);
       }
     }
+    problems.push(...siteProblems(content, place));
+  }
+  problems.push(...furnitureItemProblems(content));
+  return problems;
+}
+
+const hasWorksite = (content: Content, type: string): boolean =>
+  content.props[type]?.bricks.some((b) => b.brick === 'worksite') === true;
+
+/** Chantiers: chaque `site` nomme un objet de la carte à brique `worksite`, et un seul par pièce. */
+function siteProblems(content: Content, place: PlaceContent): string[] {
+  const problems: string[] = [];
+  const owners = new Map<string, string>();
+  for (const def of Object.values(place.housings)) {
+    for (const room of def.rooms) {
+      if (room.site === undefined) continue;
+      const where = `lieux/${place.def.id}/logements/${def.id}.json, pièce ${room.id}`;
+      const object = place.map.objects.find((o) => o.id === room.site);
+      if (object === undefined)
+        problems.push(`${where}: chantier « ${room.site} » absent de la carte du lieu`);
+      else if (!hasWorksite(content, object.type))
+        problems.push(
+          `${where}: le meuble du chantier « ${room.site} » n'a pas la brique worksite`,
+        );
+      if (room.stages.length === 0)
+        problems.push(`${where}: un chantier (\`site\`) sans étape ne sert à rien`);
+      const other = owners.get(room.site);
+      if (other !== undefined)
+        problems.push(`${where}: le chantier « ${room.site} » sert déjà la pièce « ${other} »`);
+      owners.set(room.site, room.id);
+    }
+  }
+  for (const object of place.map.objects)
+    if (hasWorksite(content, object.type) && !owners.has(object.id))
+      problems.push(
+        `lieux/${place.def.id}: le chantier « ${object.id} » n'est nommé par aucune pièce (\`site\`)`,
+      );
+  return problems;
+}
+
+/** Objets meubles: famille `furniture` et fiche posable vont ensemble. */
+function furnitureItemProblems(content: Content): string[] {
+  const problems: string[] = [];
+  for (const item of Object.values(content.items)) {
+    const at = `commun/objets/${item.id}.json`;
+    if (item.family === 'furniture' && item.prop === undefined)
+      problems.push(`${at}: un objet de famille furniture déclare sa fiche de meuble (\`prop\`)`);
+    if (item.prop === undefined) continue;
+    const prop = content.props[item.prop];
+    if (item.family !== 'furniture') problems.push(`${at}: \`prop\` demande la famille furniture`);
+    if (prop === undefined) problems.push(`${at}: fiche de meuble inconnue « ${item.prop} »`);
+    else if (!prop.placeable) problems.push(`${at}: meuble « ${item.prop} » non posable`);
   }
   return problems;
 }

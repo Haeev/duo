@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "ardoise-de-chantier",
+  "name": "Ardoise de chantier",
+  "model": "chalk-board",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "worksite"
+    }
+  ]
+}

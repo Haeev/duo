@@ -468,6 +468,8 @@ export function createKitchen(
       case 'vehicle_stopped':
       case 'vehicle_turned':
       case 'vehicle_warning':
+      case 'worksite_opened':
+      case 'furniture_stowed':
       case 'crop_reaped':
       case 'day_started':
       case 'deco_changed':

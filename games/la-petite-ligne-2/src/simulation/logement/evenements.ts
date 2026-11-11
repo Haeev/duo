@@ -19,6 +19,23 @@ export const HOUSING_EVENTS = [
     item: IdSchema,
     count: IntSchema,
   }),
+  /** La touche d'action sur un chantier (brique `worksite`): son écran s'ouvre chez ce joueur. */
+  v.strictObject({
+    type: v.literal('worksite_opened'),
+    player: PlayerIndexSchema,
+    target: IdSchema,
+    housing: IdSchema,
+    room: IdSchema,
+  }),
+  /** Des meubles du sac (objets à champ `prop`) sont entrés dans l'inventaire de la maison. */
+  v.strictObject({
+    type: v.literal('furniture_stowed'),
+    player: PlayerIndexSchema,
+    housing: IdSchema,
+    item: IdSchema,
+    prop: IdSchema,
+    count: IntSchema,
+  }),
   /** Un meuble saisi, posé ou rangé (le meuble se soulève, se pose avec un rebond et une poussière). */
   v.strictObject({
     type: v.literal('deco_changed'),

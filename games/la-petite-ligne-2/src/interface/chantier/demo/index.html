@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne (refonte): démonstration du chantier et des meubles</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: system-ui, sans-serif;
+      }
+      /* Le monde figuré: le sol et le mur de la cuisine en ruine, à la place du rendu 3D. */
+      body {
+        background: linear-gradient(#6f6253 0 38%, #8a7459 38% 100%);
+      }
+      .monde {
+        position: fixed;
+        left: 0.75rem;
+        bottom: 0.5rem;
+        z-index: 100;
+        padding: 0.125rem 0.5rem;
+        border: 1px dashed #2a2522;
+        border-radius: 0.25rem;
+        background: #fbf6e9;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ui"></div>
+    <div class="monde">Démonstration : monde figuré, vraie simulation du logement</div>
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

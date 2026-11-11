@@ -10,6 +10,7 @@ import type { GameEvent } from '../simulation/noyau/evenements';
 import type { Intent } from '../simulation/noyau/entrees';
 import { el, icon, onPointerHover } from './dom';
 import { equipModel, equippedText } from './equiper';
+import { stowedText, stowModel } from './ranger-maison';
 import {
   chestModel,
   gridMove,
@@ -270,6 +271,10 @@ export function createNotebook(
       if (model.edible) row.append(button('Enter', TEXTS.notebook.eat, true));
       if (equip.kind !== 'none')
         row.append(button('Enter', TEXTS.notebook.equip, true, equip.kind === 'refused'));
+      // Un meuble (objet à fiche de meuble) se range dans l'inventaire de la maison, chez soi.
+      const stow = stowModel(content, world, local, model.item);
+      if (stow.kind !== 'none')
+        row.append(button('Enter', TEXTS.notebook.stow, true, stow.kind === 'refused'));
       row.append(
         button('KeyP', TEXTS.notebook.drop, false),
         button('KeyT', TEXTS.notebook.give, false),
@@ -277,6 +282,7 @@ export function createNotebook(
       page.append(row);
       // Un bouton refusé dit toujours pourquoi.
       if (equip.kind === 'refused') refusedNote = equip.text;
+      if (stow.kind === 'refused') refusedNote = stow.text;
     }
     // Sinon, la réponse de la partie (le sac équipé a quitté sa case: la fiche est alors vide).
     const reason = refusedNote === null ? equipNote : { ok: false, text: refusedNote };
@@ -532,6 +538,8 @@ export function createNotebook(
   ): void {
     const model = equipModel(content, itemId, world.players[local].bag?.id ?? null);
     if (model.kind === 'ready') send({ type: 'equip_bag', from: ref });
+    const stow = stowModel(content, world, local, itemId);
+    if (stow.kind === 'ready') send({ type: 'furniture_stow', housing: stow.housing, from: ref });
   }
 
   /** PageHaut et PageBas: fait défiler la zone qui déborde (la page de droite d'abord). */
@@ -600,6 +608,8 @@ export function createNotebook(
       if (mode.kind !== 'notebook' || tab !== 0) return false;
       if (event.type === 'bag_changed' && event.player === local)
         equipNote = { ok: true, text: equippedText(content, event.bag) };
+      else if (event.type === 'furniture_stowed' && event.player === local)
+        equipNote = { ok: true, text: stowedText(content, event.prop) };
       else if (event.type === 'refused' && event.player === local)
         equipNote = { ok: false, text: refusalText(event.reason) };
       else return false;

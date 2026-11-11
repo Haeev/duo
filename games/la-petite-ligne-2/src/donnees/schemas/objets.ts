@@ -85,5 +85,11 @@ export const ItemSchema = v.strictObject({
    * cahier), 1 amélioré (six), 2 fin (tous), cahier 4.5.
    */
   instrument: v.exactOptional(v.strictObject({ timbre: IdSchema, tier: v.picklist([0, 1, 2]) })),
+  /**
+   * Meuble (famille `furniture`): la fiche `commun/meubles/<id>.json` que cet objet
+   * devient une fois rangé dans l'inventaire de la maison (dépôt à l'ouverture du mode déco, ou
+   * « Ranger à la maison » depuis le sac). Fabriqué, acheté ou reçu comme tout objet.
+   */
+  prop: v.exactOptional(IdSchema),
 });
 export type ItemDef = v.InferOutput<typeof ItemSchema>;

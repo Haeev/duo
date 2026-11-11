@@ -27,6 +27,8 @@
       // Étapes, dans l'ordre. Chacune: matériaux (objets du sac, apportables en plusieurs fois et
       // à deux), prix (coffre commun puis bourse de qui paie), secondes de travail d'un joueur
       // seul (plus vite à deux), conditions d'histoire (vocabulaire des quêtes) pour commencer.
+      // "says" (facultatif): la phrase de l'écran de chantier tant que "when" est faux
+      // ("Pas encore de devis: Basile n'a pas chiffré la cuisine.").
       "stages": [
         {
           "name": "Déblayer",
@@ -36,6 +38,15 @@
           "when": [],
         },
       ],
+      // Chantier jouable (facultatif): "site": "<id d'un objet de la carte du lieu>", un meuble à
+      // brique worksite (`ardoise-de-chantier`) posé dans la carte ou l'intérieur. Devant lui, la
+      // touche d'action ouvre l'écran de chantier (apporter, payer, travailler). Il peut se tenir
+      // hors de la pièce (au pied de l'escalier d'un étage à bâtir). Donne-lui un "when" pour
+      // qu'il paraisse à son tour et parte à la fin:
+      //   { "id": "piece-chantier", "type": "ardoise-de-chantier", "x": 12.5, "y": 14.5, "rotation": 0,
+      //     "when": [{ "type": "not", "condition":
+      //       { "type": "remembered", "key": "<lieu>.<logement>.<pièce>" } }] }
+      // Sans "site", la pièce ne se restaure que par une scène ou un test.
       // Ce que la pièce restaurée permet d'installer: "sleep", "cook", "wash", "store".
       "unlocks": ["sleep", "store"],
       // Indice de l'histoire trouvé à la fin (cahier 4.2), ou null.

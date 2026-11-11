@@ -7,7 +7,7 @@
  * Le plan est dessiné ici sur un canevas (formes simples). Quand le rendu fournira une caméra du
  * dessus (`DecoOptions.topView`), le canevas ne dessinera plus que les aperçus par-dessus la 3D.
  */
-import type { Content } from '../../donnees/charger';
+import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { HousingDef } from '../../donnees/schemas/logement';
 import type { Hold } from '../../etat/logement';
@@ -16,6 +16,7 @@ import { comfortLevel, housingAt } from '../../simulation/logement/etat';
 import {
   boxOf,
   decoOf,
+  housingPart,
   placementRefusal,
   propsOnTop,
   roomState,
@@ -23,11 +24,14 @@ import {
   type Box,
   type Candidate,
   type PlacementRefusal,
+  type Rect,
 } from '../../simulation/logement/pose';
 import { HOUSING_TUNING } from '../../simulation/logement/reglages';
 import type { Intent } from '../../simulation/noyau/entrees';
+import type { GameEvent } from '../../simulation/noyau/evenements';
 import { decoPicto } from './pictos';
 import { DECO_TEXTS, REASON_TEXTS } from './textes';
+import { isObjectPresent } from '../../simulation/lieux/presents';
 import './deco.css';
 
 /** Projection monde (m) vers écran (px CSS), et retour, fournie par le rendu en vue du dessus. */
@@ -53,6 +57,8 @@ export interface DecoMode {
   close(): void;
   isOpen(): boolean;
   key(code: string): boolean;
+  /** Un meuble du sac vient d'entrer dans l'inventaire: la liste le dit. */
+  onEvent(event: GameEvent, me: PlayerIndex): void;
   frame(): void;
   dispose(): void;
 }
@@ -77,13 +83,21 @@ function fill(text: string, values: Readonly<Record<string, string>>): string {
   return text.replace(/\{(\w+)\}/g, (_m, k: string) => values[k] ?? '');
 }
 
+/** Marge (m) autour du morceau montré: ce que le plan peut laisser voir sur ses bords. */
+const NEARBY_MARGIN = 6;
+
+interface Nearby {
+  readonly blocked: PlaceContent['map']['blocked'];
+  readonly objects: PlaceContent['map']['objects'];
+}
+
 export function createDecoMode(options: DecoOptions): DecoMode {
   const { content, send } = options;
   const root = document.createElement('div');
   root.className = 'lpl-deco';
   root.hidden = true;
   root.innerHTML = `
-    <aside class="lpl-deco__stock"><h2></h2><ul></ul><p class="lpl-deco__comfort"></p></aside>
+    <aside class="lpl-deco__stock"><h2></h2><ul></ul><p class="lpl-deco__stowed" role="status" hidden></p><p class="lpl-deco__comfort"></p></aside>
     <div class="lpl-deco__plan"><canvas></canvas><div class="lpl-deco__badge" hidden></div></div>
     <footer class="lpl-deco__bar">
       <button type="button" data-act="rotate"></button>
@@ -102,6 +116,7 @@ export function createDecoMode(options: DecoOptions): DecoMode {
   const badge = q('.lpl-deco__badge', HTMLDivElement);
   const list = q('.lpl-deco__stock ul', HTMLUListElement);
   const comfortEl = q('.lpl-deco__comfort', HTMLParagraphElement);
+  const stowedEl = q('.lpl-deco__stowed', HTMLParagraphElement);
   q('.lpl-deco__stock h2', HTMLHeadingElement).textContent = DECO_TEXTS.stock;
   q('[data-act=rotate]', HTMLButtonElement).textContent = DECO_TEXTS.rotate;
   q('[data-act=store]', HTMLButtonElement).textContent = DECO_TEXTS.store;
@@ -128,6 +143,11 @@ export function createDecoMode(options: DecoOptions): DecoMode {
   let selected: string | null = null;
   let stockKey = '';
   let view: TopView | null = null;
+  /** Le morceau du logement montré (pièces voisines, ou jardin), fixé à l'ouverture. */
+  let zone: readonly Rect[] = [];
+  /** Meubles entrés du sac depuis l'ouverture, par nom. */
+  let stowed: string[] = [];
+  let nearby: Nearby | null = null;
 
   function housing(): { def: HousingDef; world: ReadonlyWorld; me: PlayerIndex } | null {
     const world = options.world();
@@ -148,10 +168,39 @@ export function createDecoMode(options: DecoOptions): DecoMode {
     return Object.entries(hstate(world, def)?.stock ?? {}).sort(([a], [b]) => a.localeCompare(b));
   }
 
-  /** Projection par défaut: le logement entier dans le canevas, marges comprises. */
-  function fitView(def: HousingDef): TopView {
-    const boxes = def.rooms.map((r) => r.area);
-    if (def.garden !== null) boxes.push(def.garden);
+  /** Le morceau du logement où se tient le joueur (`housingPart`); relu tant qu'il est vide. */
+  function currentZone(def: HousingDef, world: ReadonlyWorld, me: PlayerIndex): readonly Rect[] {
+    if (zone.length === 0) {
+      const { x, y } = world.players[me].body;
+      zone = housingPart(def, hstate(world, def), x, y);
+      nearby = null;
+    }
+    return zone;
+  }
+
+  /**
+   * Murs et meubles de la carte autour du morceau montré, relevés une fois par ouverture: la
+   * carte d'un bourg en compte des milliers, le plan n'en dessine qu'une poignée par image.
+   */
+  function nearbyOf(place: PlaceContent, shown: readonly Rect[]): Nearby {
+    if (nearby !== null) return nearby;
+    const x0 = Math.min(...shown.map((r) => r.x)) - NEARBY_MARGIN;
+    const y0 = Math.min(...shown.map((r) => r.y)) - NEARBY_MARGIN;
+    const x1 = Math.max(...shown.map((r) => r.x + r.w)) + NEARBY_MARGIN;
+    const y1 = Math.max(...shown.map((r) => r.y + r.h)) + NEARBY_MARGIN;
+    nearby = {
+      blocked: place.map.blocked.filter(
+        (b) => b.x < x1 && b.x + b.w > x0 && b.y < y1 && b.y + b.h > y0,
+      ),
+      objects: place.map.objects.filter((o) => o.x > x0 && o.x < x1 && o.y > y0 && o.y < y1),
+    };
+    return nearby;
+  }
+
+  /** Projection par défaut: le morceau du logement où l'on se tient, marges comprises. */
+  function fitView(def: HousingDef, world: ReadonlyWorld, me: PlayerIndex): TopView {
+    const shown = currentZone(def, world, me);
+    const boxes = shown.length > 0 ? [...shown] : def.rooms.map((r) => r.area);
     const x0 = Math.min(...boxes.map((b) => b.x)) - 1;
     const y0 = Math.min(...boxes.map((b) => b.y)) - 1;
     const x1 = Math.max(...boxes.map((b) => b.x + b.w)) + 1;
@@ -339,11 +388,16 @@ export function createDecoMode(options: DecoOptions): DecoMode {
   function takeCentered(type: string): void {
     const h = housing();
     if (h === null) return;
-    const room =
-      h.def.rooms.find((r) => roomState(r, hstate(h.world, h.def)) === 'restored') ??
-      h.def.rooms[0];
-    if (room === undefined) return;
-    take(type, room.area.x + room.area.w / 2, room.area.y + room.area.h / 2);
+    // Dans le morceau montré: la pièce restaurée où l'on se tient, sinon la première, sinon le jardin.
+    const shown = currentZone(h.def, h.world, h.me);
+    const { x, y } = h.world.players[h.me].body;
+    const ready = h.def.rooms.filter(
+      (r) => shown.includes(r.area) && roomState(r, hstate(h.world, h.def)) === 'restored',
+    );
+    const here = (r: Rect): boolean => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+    const area = (ready.find((r) => here(r.area)) ?? ready[0])?.area ?? shown[0];
+    if (area === undefined) return;
+    take(type, area.x + area.w / 2, area.y + area.h / 2);
   }
 
   function cycleSelection(): void {
@@ -354,19 +408,9 @@ export function createDecoMode(options: DecoOptions): DecoMode {
         const def = content.props[p.type];
         if (def === undefined) return false;
         const b = boxOf(def, p);
-        return (
-          h.def.rooms.some(
-            (r) =>
-              b.x0 >= r.area.x &&
-              b.x1 <= r.area.x + r.area.w &&
-              b.y0 >= r.area.y &&
-              b.y1 <= r.area.y + r.area.h,
-          ) ||
-          (h.def.garden !== null &&
-            b.x0 >= h.def.garden.x &&
-            b.x1 <= h.def.garden.x + h.def.garden.w &&
-            b.y0 >= h.def.garden.y &&
-            b.y1 <= h.def.garden.y + h.def.garden.h)
+        // Seuls les meubles du morceau montré: on ne saisit pas ce qu'on ne voit pas.
+        return currentZone(h.def, h.world, h.me).some(
+          (r) => b.x0 >= r.x && b.x1 <= r.x + r.w && b.y0 >= r.y && b.y1 <= r.y + r.h,
         );
       })
       .map((p) => p.id);
@@ -434,8 +478,12 @@ export function createDecoMode(options: DecoOptions): DecoMode {
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, h);
     const external = options.topView?.(def) ?? null;
-    const v = external ?? fitView(def);
+    const v = external ?? fitView(def, world, me);
     view = v;
+    // Bornes du plan montré (m): rien ne se dessine au-delà (la carte du lieu est vaste).
+    const seen = { a: v.toWorld(0, 0), z: v.toWorld(w, h) };
+    const visible = (b: Box): boolean =>
+      b.x1 >= seen.a.x && b.x0 <= seen.z.x && b.y1 >= seen.a.y && b.y0 <= seen.z.y;
     const ppm = v.pixelsPerMeter();
     const place = content.places[world.common.place];
     const state = world.places[world.common.place];
@@ -443,7 +491,7 @@ export function createDecoMode(options: DecoOptions): DecoMode {
     if (place === undefined || state === undefined) return;
     if (external === null) {
       // Jardin, pièces, murs: le plan du logement.
-      if (def.garden !== null) {
+      if (def.garden !== null && currentZone(def, world, me).includes(def.garden)) {
         const g = rectPath(v, {
           x0: def.garden.x,
           y0: def.garden.y,
@@ -470,13 +518,13 @@ export function createDecoMode(options: DecoOptions): DecoMode {
         c.fillStyle = s === 'restored' ? COLORS.paper : COLORS.ruin;
         c.fillRect(r.x, r.y, r.w, r.h);
         if (s !== 'restored') hatch(c, r, 'rgba(92,61,36,0.35)');
-        c.fillStyle = COLORS.ink;
-        c.font = `600 ${String(Math.max(11, ppm * 0.4))}px system-ui, sans-serif`;
-        c.fillText(room.name, r.x + 6, r.y + r.h - 6);
       }
+      const around = nearbyOf(place, currentZone(def, world, me));
       c.fillStyle = COLORS.wall;
-      for (const b of place.map.blocked) {
-        const r = rectPath(v, { x0: b.x, y0: b.y, x1: b.x + b.w, y1: b.y + b.h });
+      for (const b of around.blocked) {
+        const box = { x0: b.x, y0: b.y, x1: b.x + b.w, y1: b.y + b.h };
+        if (!visible(box)) continue;
+        const r = rectPath(v, box);
         c.fillRect(r.x, r.y, r.w, r.h);
       }
       // Seuils des portes: le passage dans le mur, et la zone à laisser libre en pointillé.
@@ -497,12 +545,16 @@ export function createDecoMode(options: DecoOptions): DecoMode {
         c.strokeRect(z.x, z.y, z.w, z.h);
         c.setLineDash([]);
       }
-      // Meubles posés, du tapis au mur.
+      // Meubles posés, du tapis au mur. Les meubles de carte conditionnés absents (une
+      // cuisinière à venir) ne se dessinent pas.
+      const look = { content, world };
+      const props = [...around.objects.filter((o) => isObjectPresent(look, o)), ...state.placed];
       const layers = ['rug', 'floor', 'top', 'wall'] as const;
       for (const layer of layers) {
-        for (const p of [...place.map.objects, ...state.placed]) {
+        for (const p of props) {
           const pd = content.props[p.type];
           if (pd === undefined || decoOf(pd).layer !== layer) continue;
+          if (!visible(boxOf(pd, p))) continue;
           const r = rectPath(v, boxOf(pd, p));
           const inset = layer === 'top' ? ppm * 0.15 : layer === 'wall' ? 0 : 1;
           const rr =
@@ -529,6 +581,20 @@ export function createDecoMode(options: DecoOptions): DecoMode {
             c.fillText(pd.name, rr.x + 4, rr.y + Math.max(12, ppm * 0.32), rr.w - 8);
           }
         }
+      }
+    }
+    if (external === null) {
+      // Nom de chaque pièce, par-dessus les meubles: une étiquette dans son coin, toujours lisible.
+      c.font = '700 13px system-ui, sans-serif';
+      for (const room of def.rooms) {
+        if (roomState(room, hs) === 'absent' || !currentZone(def, world, me).includes(room.area))
+          continue;
+        const at = v.toScreen(room.area.x, room.area.y + room.area.h);
+        const width = c.measureText(room.name).width + 12;
+        c.fillStyle = COLORS.ink;
+        c.fillRect(at.x + 4, at.y - 24, width, 20);
+        c.fillStyle = COLORS.paper;
+        c.fillText(room.name, at.x + 10, at.y - 10);
       }
     }
     // Les meubles en main: l'autre (liseré et jeton à sa couleur), puis le mien (vert ou hachuré rouge).
@@ -630,6 +696,9 @@ export function createDecoMode(options: DecoOptions): DecoMode {
       housingId = id;
       root.hidden = false;
       stockKey = '';
+      zone = [];
+      stowed = [];
+      stowedEl.hidden = true;
       send({ type: 'deco_mode', housing: id, on: true });
     },
     close() {
@@ -702,6 +771,12 @@ export function createDecoMode(options: DecoOptions): DecoMode {
         default:
           return false;
       }
+    },
+    onEvent(event, me) {
+      if (housingId === null || event.type !== 'furniture_stowed' || event.player !== me) return;
+      stowed.push(content.props[event.prop]?.name ?? event.prop);
+      stowedEl.textContent = fill(DECO_TEXTS.stowedList, { meubles: stowed.join(', ') });
+      stowedEl.hidden = false;
     },
     frame() {
       const h = housing();

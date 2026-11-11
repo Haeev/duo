@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "tabouret-miel",
+  "name": "Tabouret miel",
+  "model": "stool",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": true,
+  "placeable": true,
+  "series": "campagne",
+  "bricks": [
+    {
+      "brick": "sit",
+      "seats": 1,
+      "restPerMinute": 6
+    }
+  ],
+  "deco": {
+    "layer": "floor",
+    "surface": false,
+    "where": "both",
+    "comfort": 1
+  }
+}

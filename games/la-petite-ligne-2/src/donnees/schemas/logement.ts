@@ -45,6 +45,8 @@ export const StageSchema = v.strictObject({
   work: v.pipe(FiniteSchema, v.minValue(0), v.maxValue(600)),
   /** Conditions d'histoire (mémoire, amitié...) pour commencer l'étape; vide: libre. */
   when: v.array(ConditionSchema),
+  /** Phrase de l'écran de chantier tant que `when` est faux (« Basile n'a pas fait son devis »). */
+  says: v.exactOptional(TextSchema),
 });
 export type StageDef = v.InferOutput<typeof StageSchema>;
 
@@ -63,6 +65,12 @@ export const RoomSchema = v.strictObject({
   unlocks: v.array(HousingFunctionSchema),
   /** Indice de l'histoire livré à la fin de la restauration (cahier 4.2: jamais qu'un achat). */
   clue: v.nullable(TextSchema),
+  /**
+   * Chantier de la pièce: l'objet de la carte du lieu (meuble à brique `worksite`, une ardoise de
+   * devis) devant lequel on apporte, paie et travaille. Il peut se tenir hors de la pièce (au
+   * pied de l'escalier d'un étage à bâtir). Absent: la pièce n'a pas de chantier jouable.
+   */
+  site: v.exactOptional(IdSchema),
 });
 export type RoomDef = v.InferOutput<typeof RoomSchema>;
 

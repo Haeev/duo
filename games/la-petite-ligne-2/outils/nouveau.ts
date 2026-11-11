@@ -33,6 +33,15 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     folder: 'commun/meubles',
     inPlace: false,
   },
+  // Un meuble obtenable: sa fiche de meuble posé et l'objet du sac qui y mène (champ `prop`).
+  'meuble-obtenable': {
+    files: [
+      { from: 'meuble-obtenable/meuble.jsonc', to: 'meubles/<id>.json' },
+      { from: 'meuble-obtenable/objet.jsonc', to: 'objets/<id>.json' },
+    ],
+    folder: 'commun',
+    inPlace: false,
+  },
   'piece-de-personnage': {
     files: [{ from: 'piece-de-personnage.jsonc', to: '<id>.json' }],
     folder: 'commun/personnages',
@@ -185,10 +194,15 @@ export function stripComments(text: string): string {
     .replace(/,(\s*[}\]])/g, '$1');
 }
 
-/** Le contenu d'un gabarit, lu comme du JSON, avec l'identifiant voulu s'il en porte un. */
+/**
+ * Le contenu d'un gabarit, lu comme du JSON, avec l'identifiant voulu s'il en porte un. Un champ
+ * qui vaut `"<id>"` reçoit aussi l'identifiant: deux fichiers créés ensemble se nomment ainsi
+ * l'un l'autre (l'objet d'un meuble obtenable et sa fiche).
+ */
 export function fromTemplate(text: string, id: string): Record<string, unknown> {
   const value = JSON.parse(stripComments(text)) as Record<string, unknown>;
   if ('id' in value) value.id = id;
+  for (const [key, field] of Object.entries(value)) if (field === '<id>') value[key] = id;
   return value;
 }
 

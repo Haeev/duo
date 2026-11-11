@@ -104,15 +104,20 @@ describe('maison du garde d’Aubrune (données livrées)', () => {
   it('cuisinière et plan de travail à l’achat de la cuisine', () => {
     const sim = atAubrune();
     // Les pots de grès posés sur le plan de travail (`on`) s'en vont et reviennent avec lui.
-    // (Le décor des fêtes, absent un jour ordinaire, est essayé plus bas.)
-    const maison = (): string[] => [...absentObjects(sim)].filter((id) => !id.startsWith('fete-'));
-    expect(maison().sort()).toEqual(['maison-cuisiniere', 'maison-plan', 'maison-rdc-pots']);
+    // (Le décor des fêtes, absent un jour ordinaire, est essayé plus bas; les ardoises de chantier
+    // des pièces suivantes attendent la salle: `tests/chantier.test.ts`.)
+    const kitchen = ['maison-cuisiniere', 'maison-plan', 'maison-rdc-pots'];
+    const absent = (): string[] =>
+      [...absentObjects(sim)]
+        .filter((id) => !id.startsWith('fete-') && !id.startsWith('maison-chantier-'))
+        .sort();
+    expect(absent()).toEqual(kitchen);
     sim.world.progress.memory['aubrune.maison-du-garde.cuisine'] = {
       v: 'restored',
       by: 'duo',
       day: 3,
     };
-    expect(maison()).toEqual([]);
+    expect(absent()).toEqual([]);
   });
 
   it('escaliers de l’étage et de la cave fermés jusqu’à leur étape, avec leur phrase', () => {

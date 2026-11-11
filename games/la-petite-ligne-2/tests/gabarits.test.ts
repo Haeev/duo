@@ -60,6 +60,7 @@ describe('gabarits', () => {
         'lieu',
         'logement',
         'meuble',
+        'meuble-obtenable',
         'objet',
         'piece-de-personnage',
         'plan',
@@ -106,6 +107,29 @@ describe('gabarits', () => {
     expect(v.safeParse(SLICE_SCHEMAS.place, JSON.parse(JSON.stringify(message))).success).toBe(
       true,
     );
+  });
+
+  it('meuble obtenable: un pouf tiré du gabarit se range à la maison et se pose, sans autre changement', () => {
+    const content = withNew('meuble-obtenable', 'pouf', null);
+    expect(content.items.pouf).toMatchObject({ family: 'furniture', prop: 'pouf' });
+    expect(content.props.pouf?.placeable).toBe(true);
+    const sim = newSim(content);
+    const HOUSE = 'maison-essai';
+    send(sim, 0, { type: 'deco_mode', housing: HOUSE, on: false });
+    const state = sim.world.places['essai-gare']?.housing?.[HOUSE];
+    if (state === undefined) throw new Error('logement absent');
+    for (const room of Object.values(state.rooms)) room.state = 'restored';
+    // Reçu comme n'importe quel objet (fabriqué, acheté, donné), le joueur chez lui.
+    sim.world.players[0].toolbar[0] = { item: 'pouf', count: 1 };
+    sim.world.players[0].body = { x: 29.5, y: 11, facing: 0, speed: 0 };
+    send(sim, 0, { type: 'deco_mode', housing: HOUSE, on: true });
+    expect(state.stock.pouf).toBe(1);
+    expect(sim.world.players[0].toolbar[0]).toBeNull();
+    send(sim, 0, { type: 'deco_take', housing: HOUSE, prop: 'pouf', x: 28.5, y: 7.5, rotation: 0 });
+    send(sim, 0, { type: 'deco_drop', housing: HOUSE });
+    const placed = sim.world.places['essai-gare']?.placed.find((p) => p.type === 'pouf');
+    expect(placed).toMatchObject({ x: 28.5, y: 7.5 });
+    expect(sim.world.places['essai-gare']?.objects[placed?.id ?? '']).toEqual({ sit: [null] });
   });
 
   it('habitant: un facteur ajouté par un seul fichier se tient à son poste chez les deux joueurs', () => {

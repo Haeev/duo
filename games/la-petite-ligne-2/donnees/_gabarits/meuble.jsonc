@@ -39,5 +39,7 @@
   //   { "brick": "cook", "station": "stove" }                                  cuisiner, fabriquer
   //   { "brick": "open", "startsOpen": false }                                 ouvrir
   //   { "brick": "repair", "tools": ["axe", "spade"], "seconds": 1.5 }         réparer
+  //   { "brick": "worksite" }   chantier d'une pièce de logement (une ardoise de devis): la
+  //     pièce le nomme par son champ "site" (logement.jsonc); sans pièce, il est inerte
   "bricks": [{ "brick": "sit", "seats": 1, "restPerMinute": 6 }],
 }

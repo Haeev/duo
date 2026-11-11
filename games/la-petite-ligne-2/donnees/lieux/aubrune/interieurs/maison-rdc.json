@@ -198,6 +198,128 @@
       "y": 6.65,
       "rotation": 3,
       "on": "maison-plan"
+    },
+    {
+      "id": "maison-chantier-salle",
+      "type": "ardoise-de-chantier",
+      "x": 7.5,
+      "y": 3.5,
+      "rotation": 0,
+      "when": [
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "aubrune.maison-du-garde.salle"
+          }
+        }
+      ],
+      "pourquoi": "au milieu de la salle, tournée vers le sud: on lit le devis depuis le bas de la pièce; hors de l'axe de la porte d'entrée et de l'escalier, des chaises de la table, et un côté du lit reste libre; elle part quand la salle est faite"
+    },
+    {
+      "id": "maison-chantier-cuisine",
+      "type": "ardoise-de-chantier",
+      "x": 7.5,
+      "y": 6.5,
+      "rotation": 2,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.salle"
+        },
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "aubrune.maison-du-garde.cuisine"
+          }
+        }
+      ],
+      "pourquoi": "contre le mur sud, là où Basile montera le plan de travail: elle marque l'emplacement de la cuisine et lui laisse la place une fois l'ouvrage fini"
+    },
+    {
+      "id": "maison-chantier-chambre",
+      "type": "ardoise-de-chantier",
+      "x": 1.5,
+      "y": 0.5,
+      "rotation": 0,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.salle"
+        },
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "aubrune.maison-du-garde.chambre"
+          }
+        }
+      ],
+      "pourquoi": "contre le mur nord de la chambre, sous la future fenêtre que l'étape pose"
+    },
+    {
+      "id": "maison-chantier-troisieme-piece",
+      "type": "ardoise-de-chantier",
+      "x": 2.5,
+      "y": 6.5,
+      "rotation": 2,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.chambre"
+        },
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "aubrune.maison-du-garde.troisieme-piece"
+          }
+        }
+      ],
+      "pourquoi": "contre le mur sud de la troisième pièce, hors de l'axe du passage vers la cuisine"
+    },
+    {
+      "id": "maison-chantier-etage",
+      "type": "ardoise-de-chantier",
+      "x": 4.5,
+      "y": 4.5,
+      "rotation": 3,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.troisieme-piece"
+        },
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "aubrune.maison-du-garde.etage"
+          }
+        }
+      ],
+      "pourquoi": "au pied de l'escalier, côté troisième pièce: l'étage se bâtit après elle, on lit le devis en levant les yeux vers les trois marches"
+    },
+    {
+      "id": "maison-chantier-cave",
+      "type": "ardoise-de-chantier",
+      "x": 1.5,
+      "y": 3.5,
+      "rotation": 1,
+      "when": [
+        {
+          "type": "remembered",
+          "key": "aubrune.maison-du-garde.salle"
+        },
+        {
+          "type": "not",
+          "condition": {
+            "type": "remembered",
+            "key": "aubrune.maison-du-garde.cave"
+          }
+        }
+      ],
+      "pourquoi": "à côté de la trappe de la cave, dos aux gravats: on déblaie là où l'on descendra"
     }
   ],
   "doors": {
