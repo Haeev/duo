@@ -596,3 +596,11 @@ Réponse:  | le jeu est un animal crossing dans son gameplay de farm, collection
 - Recette à deux joueurs des nouveautés: six parcours verts, un rouge sur un vrai défaut (la cuisine de la maison ne peut pas se payer: aucun écran n'envoie les actions de chantier).
 - Questions posées au client dans le tableau de bord, en attente: q30 (Nour et Inès en réserve), q31 (petites activités: draisine et quilles), q32 (musique jouée sans désaccord), q33 (cinq retraits mineurs et deux points à acter). En attendant, le manager suit les recommandations sans rien détruire.
 - Vague lancée: chantier de la maison payable et meubles posables; musique jouée à deux; petits trous de règle (blocage à 0, poules d'Odette, gestes à deux, outils restants, résultat de séance pour Duo); vente et gain des tenues; reprise de qualité des tenues.
+
+## 11 novembre, 15 h 55: vignette du jeu, Duo 0.4.0, recette de l'après-midi
+
+- Vignette du jeu dans Duo: le client trouvait l'ancienne « moche ». Nouvelle vignette faite à partir de l'image de crépuscule de la scène d'essai du style encré (pas une capture d'Aubrune: le manager l'a d'abord présentée à tort comme « une vraie image du jeu », puis corrigé). Le client: « garde cette vignette c'est bien ». Elle part avec la prochaine version du jeu. Sa réaction (« magnifique j'adore ») fixe la cible: Aubrune doit égaler cette image partout.
+- Duo ne se met pas à jour seul et l'avis de nouvelle version n'a jamais été codé; les joueurs ont Duo 0.3.0, la 0.3.1 n'a jamais été publiée. Le client demande pourquoi la 0.4.0 attendrait demain: réponse du manager, c'était de la prudence. Mission lancée: avis de nouvelle version, préparation de la 0.4.0, check-list. Publication de l'application seulement sur son accord explicite (question q34).
+- Recette de 14 h 16: suite rapide 1 017 tests verts; parcours à deux joueurs 25 sur 32. Quatre rouges étaient des parcours mal réglés (délai d'horloge sur une durée de jeu), corrigés. Restent deux comptoirs et la décision à deux, en reprise.
+- Estimation donnée au client du temps de jeu disponible en rushant: 6 à 7 h pour l'histoire d'Aubrune, 10 à 12 h avec les suites et la maison jusqu'à la troisième pièce, 15 à 20 h pour tout voir (une année de jeu). Non mesuré: personne n'a joué ce contenu.
+- Questions ouvertes au tableau de bord: q30 à q35.
