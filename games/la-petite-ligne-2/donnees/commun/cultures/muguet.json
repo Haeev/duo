@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "muguet",
+  "name": "Muguet",
+  "model": "crop-radis",
+  "seed": "griffes-de-muguet",
+  "seasons": ["spring"],
+  "stages": [3, 3],
+  "regrowStage": 1,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "muguet",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "muguet",
+      "count": 2
+    }
+  ]
+}

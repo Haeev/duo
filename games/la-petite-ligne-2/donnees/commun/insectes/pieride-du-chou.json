@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "pieride-du-chou",
+  "entry": "pieride-du-chou",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["potager"],
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1140
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "weight": 10,
+  "alertRadius": 2.5,
+  "fleeSpeed": 3.5,
+  "wander": 0.9
+}

@@ -3,10 +3,17 @@
   "id": "brochet",
   "category": "poissons",
   "name": "Brochet",
-  "place": "essai-gare",
+  "place": "aubrune",
   "source": {
     "type": "manual"
   },
-  "rarity": null,
-  "text": "Un brochet aux dents fines: il t’a bien fait lutter."
+  "rarity": {
+    "hours": {
+      "from": 540,
+      "to": 1140
+    },
+    "weathers": [],
+    "seasons": ["summer", "autumn", "winter"]
+  },
+  "text": "Un brochet aux dents fines, tapi sous la vanne. Il t'a fait lutter pour chaque mètre."
 }

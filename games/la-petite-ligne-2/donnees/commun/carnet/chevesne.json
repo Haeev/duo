@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "chevesne",
+  "category": "poissons",
+  "name": "Chevesne",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 540,
+      "to": 1140
+    },
+    "weathers": ["clear"],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Un chevesne à grosse tête, méfiant comme un vieux du café. Il guettait les sauterelles qui tombent."
+}

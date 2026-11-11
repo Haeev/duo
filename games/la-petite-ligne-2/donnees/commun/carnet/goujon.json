@@ -3,10 +3,17 @@
   "id": "goujon",
   "category": "poissons",
   "name": "Goujon",
-  "place": "essai-gare",
+  "place": "aubrune",
   "source": {
     "type": "manual"
   },
-  "rarity": null,
-  "text": "Un petit goujon tacheté, sorti du fond de l’étang."
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 1440
+    },
+    "weathers": [],
+    "seasons": []
+  },
+  "text": "Un goujon tacheté, sorti du fond sableux. Achille dit qu'il n'a jamais su nager droit."
 }

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "truite-grillee",
+  "name": "Truite grillée",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 45
+  },
+  "tool": null
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "loche",
+  "name": "Loche franche",
+  "family": "catch",
+  "stack": 3,
+  "food": null,
+  "tool": null
+}

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "pain-perdu",
+  "name": "Pain perdu",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "pain",
+      "count": 1
+    },
+    {
+      "item": "oeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "pain-perdu",
+    "count": 1
+  },
+  "seconds": 10,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "stir",
+      "count": 8
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 4
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "croix-de-chemin",
+  "entry": "carte-croix-de-chemin",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "croix"
+  },
+  "conditions": [
+    {
+      "type": "time_is",
+      "from": 1080,
+      "to": 1260
+    }
+  ]
+}

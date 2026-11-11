@@ -712,6 +712,10 @@
               "key": "aubrune.acte2.aveu-firmin",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-valse-de-la-minute"
             }
           ]
         },

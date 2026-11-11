@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "rose-des-lacombe",
+  "name": "Rose des Lacombe",
+  "model": "crop-radis",
+  "seed": "bouture-de-rosier",
+  "seasons": ["spring", "summer", "autumn"],
+  "stages": [4, 3],
+  "regrowStage": 1,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "rose-des-lacombe",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "rose-des-lacombe",
+      "count": 2
+    }
+  ]
+}

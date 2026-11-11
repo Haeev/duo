@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "ver-luisant",
+  "entry": "ver-luisant",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["pre", "lisiere"],
+  "rarity": {
+    "hours": {
+      "from": 1320,
+      "to": 120
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer"]
+  },
+  "weight": 2,
+  "alertRadius": 2,
+  "fleeSpeed": 1.5,
+  "wander": 0.3
+}

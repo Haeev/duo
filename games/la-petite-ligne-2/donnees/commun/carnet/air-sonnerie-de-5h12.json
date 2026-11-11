@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-sonnerie-de-5h12",
+  "category": "musiques",
+  "name": "Sonnerie de 5 h 12",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "La sonnerie de 5 h 12, cloche et sifflet mêlés dans la nuit. Le bourg ne l'avait pas entendue depuis 1987."
+}

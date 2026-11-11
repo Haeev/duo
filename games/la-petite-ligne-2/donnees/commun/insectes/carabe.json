@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "carabe",
+  "entry": "carabe",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["bois"],
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": ["rain", "mist", "overcast"],
+    "seasons": []
+  },
+  "weight": 4,
+  "alertRadius": 2,
+  "fleeSpeed": 2.5,
+  "wander": 0.4
+}

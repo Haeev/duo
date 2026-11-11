@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-croix-de-chemin",
+  "category": "cartes-postales",
+  "name": "La croix de chemin",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "La croix de chemin de la vieille route, au soleil couchant. Les blés lui arrivent à l'épaule."
+}

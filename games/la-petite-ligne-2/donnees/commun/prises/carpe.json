@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "carpe",
+  "kind": "fish",
+  "item": "carpe",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 1140,
+    "to": 420
+  },
+  "weathers": ["clear", "overcast"],
+  "seasons": ["summer", "autumn"],
+  "rarity": "rare",
+  "difficulty": 4.5,
+  "fish": {
+    "force": 0.9,
+    "nervousness": 0.25,
+    "rhythm": {
+      "pull": 3.0,
+      "rest": 1.6
+    },
+    "stamina": 16,
+    "feints": 3,
+    "sizeCm": {
+      "min": 40,
+      "max": 80
+    },
+    "shadow": "huge"
+  }
+}

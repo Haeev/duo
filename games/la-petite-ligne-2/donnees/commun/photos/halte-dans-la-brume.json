@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "id": "halte-dans-la-brume",
+  "entry": "carte-halte-dans-la-brume",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "quai"
+  },
+  "conditions": [
+    {
+      "type": "time_is",
+      "from": 360,
+      "to": 600
+    },
+    {
+      "type": "weather_is",
+      "weathers": ["mist"]
+    }
+  ]
+}

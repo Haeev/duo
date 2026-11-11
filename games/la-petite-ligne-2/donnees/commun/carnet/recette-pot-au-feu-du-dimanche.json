@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-pot-au-feu-du-dimanche",
+  "category": "recettes",
+  "name": "Pot-au-feu du dimanche",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "pot-au-feu"
+  },
+  "rarity": null,
+  "text": "Le pot-au-feu du dimanche, fait à deux dans la cuisine de la maison. Honorine a eu son train."
+}

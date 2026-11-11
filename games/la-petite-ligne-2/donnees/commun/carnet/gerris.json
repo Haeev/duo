@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "gerris",
+  "category": "insectes",
+  "name": "Gerris",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1200
+    },
+    "weathers": ["clear", "overcast", "mist", "rain"],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Un gerris, qui patine sur l'eau sans jamais se mouiller les pieds. Léon l'appelle le facteur du bief."
+}

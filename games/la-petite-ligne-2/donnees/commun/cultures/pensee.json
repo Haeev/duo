@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "pensee",
+  "name": "Pensée",
+  "model": "crop-radis",
+  "seed": "graines-pensee",
+  "seasons": ["autumn", "winter", "spring"],
+  "stages": [3, 2],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "pensee",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "pensee",
+      "count": 2
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   "id": "perche",
   "kind": "fish",
   "item": "perche",
-  "places": ["essai-gare"],
+  "places": ["aubrune", "essai-gare"],
   "hours": {
     "from": 540,
     "to": 1140

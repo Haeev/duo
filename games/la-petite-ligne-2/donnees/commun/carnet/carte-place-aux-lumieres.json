@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-place-aux-lumieres",
+  "category": "cartes-postales",
+  "name": "La place aux lumières",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "La place un soir d'été, les réverbères allumés et la tonnelle qui bavarde encore."
+}

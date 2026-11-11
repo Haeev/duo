@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "carpe",
+  "name": "Carpe de l'étang",
+  "family": "catch",
+  "stack": 3,
+  "food": null,
+  "tool": null
+}

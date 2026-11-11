@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-omelette-aux-herbes",
+  "category": "recettes",
+  "name": "Omelette aux herbes",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "omelette"
+  },
+  "rarity": null,
+  "text": "Une omelette aux herbes, baveuse comme il faut. Colette la plie en trois, jamais en deux."
+}

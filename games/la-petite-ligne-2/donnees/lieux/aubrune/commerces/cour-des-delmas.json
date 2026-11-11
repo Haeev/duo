@@ -38,6 +38,26 @@
       "item": "graines-tomate",
       "price": 60,
       "dailyStock": null
+    },
+    {
+      "item": "graines-bleuet",
+      "price": 30,
+      "dailyStock": 5
+    },
+    {
+      "item": "graines-tournesol",
+      "price": 50,
+      "dailyStock": 5
+    },
+    {
+      "item": "graines-nigelle",
+      "price": 40,
+      "dailyStock": 5
+    },
+    {
+      "item": "graines-marguerite",
+      "price": 30,
+      "dailyStock": 5
     }
   ],
   "buys": [

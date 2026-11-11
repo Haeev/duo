@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-etang-au-soir",
+  "category": "cartes-postales",
+  "name": "L'étang de la Côte",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "L'étang de la Côte au soir, lisse comme un miroir, une carpe qui fait des ronds."
+}

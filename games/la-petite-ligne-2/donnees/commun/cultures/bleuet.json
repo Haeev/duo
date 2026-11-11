@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "bleuet",
+  "name": "Bleuet",
+  "model": "crop-radis",
+  "seed": "graines-bleuet",
+  "seasons": ["spring", "summer"],
+  "stages": [2, 2],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "bleuet",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "bleuet",
+      "count": 2
+    }
+  ]
+}

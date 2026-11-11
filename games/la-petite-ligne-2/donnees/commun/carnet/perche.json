@@ -3,10 +3,17 @@
   "id": "perche",
   "category": "poissons",
   "name": "Perche",
-  "place": "essai-gare",
+  "place": "aubrune",
   "source": {
     "type": "manual"
   },
-  "rarity": null,
-  "text": "Une perche rayée, nageoire dressée."
+  "rarity": {
+    "hours": {
+      "from": 540,
+      "to": 1140
+    },
+    "weathers": [],
+    "seasons": []
+  },
+  "text": "Une perche rayée, nageoire dressée. Pas la Baronne, mais elle en a l'air."
 }

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "calopteryx",
+  "category": "insectes",
+  "name": "Caloptéryx éclatant",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 540,
+      "to": 1080
+    },
+    "weathers": ["clear"],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Une demoiselle bleu nuit, aux ailes qui battent comme un cœur. Elle ne quitte pas l'eau courante."
+}

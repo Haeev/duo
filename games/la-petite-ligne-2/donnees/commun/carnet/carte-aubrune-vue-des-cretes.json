@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-aubrune-vue-des-cretes",
+  "category": "cartes-postales",
+  "name": "Aubrune vue des Crêtes",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "Aubrune vue du banc des Crêtes: le clocher, la halte, la ligne qui file vers l'est."
+}

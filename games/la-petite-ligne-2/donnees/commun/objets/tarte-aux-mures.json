@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "tarte-aux-mures",
+  "name": "Tarte aux mûres",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 60
+  },
+  "tool": null
+}

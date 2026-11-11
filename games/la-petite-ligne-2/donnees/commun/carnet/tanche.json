@@ -3,10 +3,17 @@
   "id": "tanche",
   "category": "poissons",
   "name": "Tanche",
-  "place": "essai-gare",
+  "place": "aubrune",
   "source": {
     "type": "manual"
   },
-  "rarity": null,
-  "text": "Une tanche toute verte et glissante."
+  "rarity": {
+    "hours": {
+      "from": 1080,
+      "to": 360
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["summer", "autumn"]
+  },
+  "text": "Une tanche toute verte et glissante, l'œil rouge. Elle sent la vase et l'été."
 }

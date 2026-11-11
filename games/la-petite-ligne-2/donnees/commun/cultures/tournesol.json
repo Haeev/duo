@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "tournesol",
+  "name": "Tournesol",
+  "model": "crop-radis",
+  "seed": "graines-tournesol",
+  "seasons": ["summer"],
+  "stages": [3, 3],
+  "regrowStage": null,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "tournesol",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "tournesol",
+      "count": 2
+    }
+  ]
+}

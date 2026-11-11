@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "rotengle",
+  "category": "poissons",
+  "name": "Rotengle",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 600,
+      "to": 1200
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Un rotengle aux nageoires rouges, qui monte gober au soleil. On le prend pour un gardon, il le prend mal."
+}

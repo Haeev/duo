@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "nigelle",
+  "name": "Nigelle de Damas",
+  "family": "crop",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

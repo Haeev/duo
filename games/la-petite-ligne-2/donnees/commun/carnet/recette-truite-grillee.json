@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-truite-grillee",
+  "category": "recettes",
+  "name": "Truite grillée",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "truite-grillee"
+  },
+  "rarity": null,
+  "text": "La truite grillée de Colette, peau dorée, chair rose. Le secret: ne pas y toucher pendant qu'elle cuit."
+}

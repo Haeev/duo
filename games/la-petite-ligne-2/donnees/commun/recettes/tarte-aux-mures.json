@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "tarte-aux-mures",
+  "name": "Tarte aux mûres",
+  "station": "oven",
+  "inputs": [
+    {
+      "item": "mures",
+      "count": 4
+    },
+    {
+      "item": "farine",
+      "count": 1
+    },
+    {
+      "item": "oeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "tarte-aux-mures",
+    "count": 1
+  },
+  "seconds": 20,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 6,
+      "pace": 0.8
+    },
+    {
+      "kind": "plate",
+      "count": 5
+    },
+    {
+      "kind": "heat",
+      "count": 3,
+      "pace": 0.8
+    }
+  ],
+  "quality": {
+    "perfect": {
+      "item": "tarte-aux-mures",
+      "count": 2
+    }
+  },
+  "learn": {
+    "book": "livre-de-cuisine"
+  }
+}

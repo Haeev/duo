@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "paon-du-jour",
+  "category": "insectes",
+  "name": "Paon-du-jour",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 600,
+      "to": 1020
+    },
+    "weathers": ["clear"],
+    "seasons": []
+  },
+  "text": "Un paon-du-jour, avec ses quatre yeux peints sur les ailes. On le croise même au soleil d'hiver."
+}

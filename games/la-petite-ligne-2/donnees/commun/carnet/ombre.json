@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ombre",
+  "category": "poissons",
+  "name": "Ombre commun",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 660
+    },
+    "weathers": ["clear", "mist"],
+    "seasons": ["autumn", "winter"]
+  },
+  "text": "Un ombre et sa grande nageoire en drapeau, qui sent le thym à ce qu'on dit. L'eau froide du matin lui va bien."
+}

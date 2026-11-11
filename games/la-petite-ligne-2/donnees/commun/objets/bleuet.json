@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "bleuet",
+  "name": "Bleuet",
+  "family": "crop",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

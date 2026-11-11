@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "bille-d-agate",
+  "category": "tresors",
+  "name": "Bille d'agate",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "bille-d-agate"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer"]
+  },
+  "text": "Une bille d'agate veinée de rouge. Perdue par un enfant du bourg, il y a cinquante ans ou plus."
+}

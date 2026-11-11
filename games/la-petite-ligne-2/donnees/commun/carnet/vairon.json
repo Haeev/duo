@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "vairon",
+  "category": "poissons",
+  "name": "Vairon",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1200
+    },
+    "weathers": [],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Un vairon minuscule, au ventre rouge comme un coquelicot. Il vit là où l'eau chante."
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "carabe",
+  "category": "insectes",
+  "name": "Carabe des bois",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": ["rain", "mist", "overcast"],
+    "seasons": []
+  },
+  "text": "Un carabe aux reflets de cuivre, sorti après la pluie. Il court plus vite que tu ne crois."
+}

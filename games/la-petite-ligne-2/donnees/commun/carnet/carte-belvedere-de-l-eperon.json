@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-belvedere-de-l-eperon",
+  "category": "cartes-postales",
+  "name": "Le belvédère de l'Éperon",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "Du belvédère de l'Éperon, toute la vallée, et la courbe de la ligne morte."
+}

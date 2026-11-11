@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "gardon",
+  "kind": "fish",
+  "item": "gardon",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 360,
+    "to": 1440
+  },
+  "weathers": [],
+  "seasons": [],
+  "rarity": "common",
+  "difficulty": 1.5,
+  "fish": {
+    "force": 0.35,
+    "nervousness": 0.5,
+    "rhythm": {
+      "pull": 1.2,
+      "rest": 1.3
+    },
+    "stamina": 5,
+    "feints": 2,
+    "sizeCm": {
+      "min": 10,
+      "max": 30
+    },
+    "shadow": "small"
+  }
+}

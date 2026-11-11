@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "grand-paon-de-nuit",
+  "category": "insectes",
+  "name": "Grand paon de nuit",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1260,
+      "to": 60
+    },
+    "weathers": ["clear", "overcast"],
+    "seasons": ["spring"]
+  },
+  "text": "Un grand paon de nuit, large comme une main, venu cogner au réverbère. Le plus grand papillon du pays."
+}

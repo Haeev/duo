@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "jeton-de-cantine",
+  "name": "Jeton de cantine",
+  "family": "treasure",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

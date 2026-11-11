@@ -3,7 +3,7 @@
   "id": "brochet",
   "kind": "fish",
   "item": "brochet",
-  "places": ["essai-gare"],
+  "places": ["aubrune", "essai-gare"],
   "hours": {
     "from": 540,
     "to": 1140

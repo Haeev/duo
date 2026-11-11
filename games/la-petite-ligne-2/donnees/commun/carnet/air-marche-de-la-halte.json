@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-marche-de-la-halte",
+  "category": "musiques",
+  "name": "Marche de la halte",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "La marche de la fanfare d'Armand, jouée sur le quai. Le trombone a un temps d'avance."
+}

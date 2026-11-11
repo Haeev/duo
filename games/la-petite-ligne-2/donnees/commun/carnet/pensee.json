@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "pensee",
+  "category": "fleurs",
+  "name": "Pensée",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "pensee"
+  },
+  "rarity": {
+    "hours": {
+      "from": 0,
+      "to": 0
+    },
+    "weathers": [],
+    "seasons": ["autumn", "winter", "spring"]
+  },
+  "text": "Une pensée violette et jaune, avec sa petite figure de chat. Elle fleurit même sous le givre."
+}

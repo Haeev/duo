@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "clou-de-voie-date",
+  "category": "tresors",
+  "name": "Clou de voie daté",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "clou-de-voie-date"
+  },
+  "rarity": null,
+  "text": "Un clou de traverse, la tête frappée d'un « 34 ». L'année où l'on a posé la ligne, dit Firmin."
+}

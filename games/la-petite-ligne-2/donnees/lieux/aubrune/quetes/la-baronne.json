@@ -270,6 +270,10 @@
               "key": "aubrune.baronne.fini",
               "value": true,
               "by": "duo"
+            },
+            {
+              "type": "give_recipe",
+              "recipe": "perche-meuniere"
             }
           ]
         }

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "grande-sauterelle",
+  "category": "insectes",
+  "name": "Grande sauterelle verte",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1020,
+      "to": 1380
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer"]
+  },
+  "text": "Une grande sauterelle verte, longue comme ton doigt. Elle chante le soir, perchée sur les hautes herbes."
+}

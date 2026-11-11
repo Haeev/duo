@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "souci",
+  "name": "Souci",
+  "model": "crop-radis",
+  "seed": "graines-souci",
+  "seasons": ["spring", "summer", "autumn"],
+  "stages": [2, 1],
+  "regrowStage": 1,
+  "qualities": [
+    {
+      "wateredShare": 0,
+      "item": "souci",
+      "count": 1
+    },
+    {
+      "wateredShare": 1,
+      "item": "souci",
+      "count": 2
+    }
+  ]
+}

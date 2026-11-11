@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "compotee-de-mures",
+  "name": "Compotée de mûres",
+  "station": "stove",
+  "inputs": [
+    {
+      "item": "mures",
+      "count": 3
+    },
+    {
+      "item": "pomme",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "compotee-de-mures",
+    "count": 1
+  },
+  "seconds": 2,
+  "known": "learned",
+  "learn": {
+    "trial": true
+  }
+}

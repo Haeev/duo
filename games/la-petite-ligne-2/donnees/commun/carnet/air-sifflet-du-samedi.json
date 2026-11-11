@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-sifflet-du-samedi",
+  "category": "musiques",
+  "name": "Le sifflet du samedi",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "Deux coups de sifflet, une note longue: Rosalie annonce le train à tout le bourg."
+}

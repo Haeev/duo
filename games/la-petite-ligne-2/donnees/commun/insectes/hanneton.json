@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "hanneton",
+  "entry": "hanneton",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["reverberes", "lisiere"],
+  "rarity": {
+    "hours": {
+      "from": 1200,
+      "to": 1380
+    },
+    "weathers": ["clear"],
+    "seasons": ["spring"]
+  },
+  "weight": 4,
+  "alertRadius": 2,
+  "fleeSpeed": 2,
+  "wander": 1.2
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "loche",
+  "kind": "fish",
+  "item": "loche",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 360,
+    "to": 720
+  },
+  "weathers": [],
+  "seasons": [],
+  "rarity": "common",
+  "difficulty": 1.5,
+  "fish": {
+    "force": 0.2,
+    "nervousness": 0.7,
+    "rhythm": {
+      "pull": 0.8,
+      "rest": 1.2
+    },
+    "stamina": 3,
+    "feints": 3,
+    "sizeCm": {
+      "min": 6,
+      "max": 12
+    },
+    "shadow": "small"
+  }
+}

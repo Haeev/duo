@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "anax-empereur",
+  "category": "insectes",
+  "name": "Anax empereur",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 600,
+      "to": 1020
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer"]
+  },
+  "text": "Un anax empereur, la plus grande libellule du bief. Il patrouille les roseaux comme un garde champêtre."
+}

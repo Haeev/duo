@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "bouton-de-livree",
+  "category": "tresors",
+  "name": "Bouton de livrée",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "bouton-de-livree"
+  },
+  "rarity": null,
+  "text": "Un bouton de laiton aux armes de la Compagnie, tombé d'une veste de chef de halte."
+}

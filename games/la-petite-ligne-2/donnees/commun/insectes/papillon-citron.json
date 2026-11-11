@@ -3,8 +3,8 @@
   "id": "papillon-citron",
   "entry": "papillon-citron",
   "item": null,
-  "places": ["essai-gare"],
-  "terrains": ["pre"],
+  "places": ["aubrune", "essai-gare"],
+  "terrains": ["pre", "lisiere"],
   "rarity": {
     "hours": {
       "from": 360,

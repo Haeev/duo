@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "criquet-des-patures",
+  "category": "insectes",
+  "name": "Criquet des pâtures",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 600,
+      "to": 1140
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer", "autumn"]
+  },
+  "text": "Un criquet des pâtures, qui chante en frottant ses pattes. Le pré entier lui répond."
+}

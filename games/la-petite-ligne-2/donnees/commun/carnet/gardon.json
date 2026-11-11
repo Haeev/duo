@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "gardon",
+  "category": "poissons",
+  "name": "Gardon",
+  "place": "aubrune",
+  "source": {
+    "type": "manual"
+  },
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 1440
+    },
+    "weathers": [],
+    "seasons": []
+  },
+  "text": "Un gardon à l'œil rouge, le poisson de tous les dimanches. Firmin en pêchait déjà en culottes courtes."
+}

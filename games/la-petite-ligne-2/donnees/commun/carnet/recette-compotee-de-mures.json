@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "recette-compotee-de-mures",
+  "category": "recettes",
+  "name": "Compotée de mûres",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "compotee-de-mures"
+  },
+  "rarity": null,
+  "text": "Une compotée de mûres et de pomme, violette jusqu'aux doigts. Elle tache, elle console."
+}

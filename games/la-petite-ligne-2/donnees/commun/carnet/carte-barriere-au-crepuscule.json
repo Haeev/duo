@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "carte-barriere-au-crepuscule",
+  "category": "cartes-postales",
+  "name": "La barrière au crépuscule",
+  "place": "aubrune",
+  "source": {
+    "type": "photo"
+  },
+  "rarity": null,
+  "text": "La barrière du passage à niveau, à l'heure où l'on allume le lumignon."
+}

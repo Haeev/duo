@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "paon-du-jour",
+  "entry": "paon-du-jour",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["lisiere", "pre"],
+  "rarity": {
+    "hours": {
+      "from": 600,
+      "to": 1020
+    },
+    "weathers": ["clear"],
+    "seasons": []
+  },
+  "weight": 5,
+  "alertRadius": 3,
+  "fleeSpeed": 4,
+  "wander": 1
+}

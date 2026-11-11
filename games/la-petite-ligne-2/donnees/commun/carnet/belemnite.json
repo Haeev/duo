@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "belemnite",
+  "category": "tresors",
+  "name": "Bélemnite",
+  "place": "aubrune",
+  "source": {
+    "type": "item",
+    "item": "belemnite"
+  },
+  "rarity": null,
+  "text": "Une bélemnite, comme une balle de pierre polie. Honorine jure que c'est une flèche de la foudre."
+}

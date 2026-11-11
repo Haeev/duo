@@ -55,7 +55,68 @@ const AHEAD = new Set(['lettre']);
  * dessinée. Un nouvel objet des données sans dessin fait échouer le test « chaque objet a sa
  * vignette »: dessiner la vignette (recette dans `assets-src/interface-encre/README.md`) ou l'inscrire ici.
  */
-const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map();
+/** Objets des collections d'Aubrune, en attente de leur dessin (liste pour l'artiste ci-dessous). */
+const COLLECTIONS_AUBRUNE = [
+  'ammonite',
+  'anguille',
+  'barbeau',
+  'belemnite',
+  'bille-d-agate',
+  'bleuet',
+  'bouton-de-livree',
+  'bouture-de-rosier',
+  'breme',
+  'capucine',
+  'carpe',
+  'chevesne',
+  'clou-de-voie-date',
+  'compotee-de-mures',
+  'dent-de-requin',
+  'friture',
+  'gardon',
+  'giroflee',
+  'graines-bleuet',
+  'graines-capucine',
+  'graines-giroflee',
+  'graines-marguerite',
+  'graines-nigelle',
+  'graines-oeillet',
+  'graines-pensee',
+  'graines-souci',
+  'graines-tournesol',
+  'gratin',
+  'griffes-de-muguet',
+  'jeton-de-cantine',
+  'loche',
+  'marguerite',
+  'matelote',
+  'muguet',
+  'nigelle',
+  'oeillet-de-poete',
+  'ombre',
+  'oursin-fossile',
+  'pain-perdu',
+  'pensee',
+  'perche-meuniere',
+  'plants-de-violette',
+  'pointe-de-silex',
+  'rose-des-lacombe',
+  'rotengle',
+  'salade-de-radis',
+  'souci',
+  'tarte-aux-mures',
+  'tomates-farcies',
+  'tournesol',
+  'truite-grillee',
+  'vairon',
+  'violette',
+] as const;
+const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map(
+  COLLECTIONS_AUBRUNE.map((id) => [
+    id,
+    'collections d’Aubrune: à dessiner, voir docs/jeux/jeu-1/refonte/collections-aubrune-assets.md',
+  ]),
+);
 
 describe('vignettes à la plume', () => {
   const ids = svgIds(path.join(OUT, 'vignettes'));

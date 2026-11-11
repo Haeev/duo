@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "tomates-farcies",
+  "name": "Tomates farcies",
+  "station": "kitchen",
+  "inputs": [
+    {
+      "item": "tomate",
+      "count": 2
+    },
+    {
+      "item": "boeuf",
+      "count": 1
+    }
+  ],
+  "output": {
+    "item": "tomates-farcies",
+    "count": 1
+  },
+  "seconds": 20,
+  "known": "learned",
+  "steps": [
+    {
+      "kind": "chop",
+      "count": 6
+    },
+    {
+      "kind": "stir",
+      "count": 5
+    },
+    {
+      "kind": "heat",
+      "count": 3
+    },
+    {
+      "kind": "plate",
+      "count": 3
+    }
+  ],
+  "quality": {
+    "perfect": {
+      "item": "tomates-farcies",
+      "count": 2
+    }
+  }
+}

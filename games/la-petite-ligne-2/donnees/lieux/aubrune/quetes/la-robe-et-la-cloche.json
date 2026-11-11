@@ -375,6 +375,15 @@
               "key": "aubrune.robe.fini",
               "value": true,
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-carillon-des-deux-soeurs"
+            },
+            {
+              "type": "give_item",
+              "item": "griffes-de-muguet",
+              "count": 2
             }
           ]
         }

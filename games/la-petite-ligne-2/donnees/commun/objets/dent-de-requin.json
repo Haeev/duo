@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "dent-de-requin",
+  "name": "Dent de requin",
+  "family": "treasure",
+  "stack": 1,
+  "food": null,
+  "tool": null
+}

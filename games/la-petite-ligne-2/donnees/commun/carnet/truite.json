@@ -2,11 +2,18 @@
   "schema": 1,
   "id": "truite",
   "category": "poissons",
-  "name": "Truite",
-  "place": "essai-gare",
+  "name": "Truite fario",
+  "place": "aubrune",
   "source": {
     "type": "manual"
   },
-  "rarity": null,
-  "text": "Une truite mouchetée, fraîche comme la source."
+  "rarity": {
+    "hours": {
+      "from": 360,
+      "to": 1440
+    },
+    "weathers": ["rain", "overcast", "mist"],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "text": "Une truite fario mouchetée de rouge. Elle ne mord que quand le ciel se couvre."
 }

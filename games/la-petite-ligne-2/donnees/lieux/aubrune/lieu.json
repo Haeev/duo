@@ -33,6 +33,18 @@
         {
           "catch": "perche",
           "weight": 2
+        },
+        {
+          "catch": "gardon",
+          "weight": 4
+        },
+        {
+          "catch": "rotengle",
+          "weight": 2
+        },
+        {
+          "catch": "breme",
+          "weight": 1
         }
       ]
     },
@@ -57,6 +69,26 @@
         {
           "catch": "ablette",
           "weight": 2
+        },
+        {
+          "catch": "vairon",
+          "weight": 3
+        },
+        {
+          "catch": "loche",
+          "weight": 2
+        },
+        {
+          "catch": "chevesne",
+          "weight": 2
+        },
+        {
+          "catch": "barbeau",
+          "weight": 2
+        },
+        {
+          "catch": "ombre",
+          "weight": 1
         }
       ]
     },
@@ -85,6 +117,18 @@
         {
           "catch": "brochet",
           "weight": 1
+        },
+        {
+          "catch": "breme",
+          "weight": 2
+        },
+        {
+          "catch": "barbeau",
+          "weight": 1
+        },
+        {
+          "catch": "anguille",
+          "weight": 1
         }
       ]
     },
@@ -109,6 +153,18 @@
         {
           "catch": "tanche",
           "weight": 2
+        },
+        {
+          "catch": "gardon",
+          "weight": 3
+        },
+        {
+          "catch": "rotengle",
+          "weight": 2
+        },
+        {
+          "catch": "anguille",
+          "weight": 1
         }
       ]
     },
@@ -133,6 +189,26 @@
         {
           "catch": "ablette",
           "weight": 2
+        },
+        {
+          "catch": "vairon",
+          "weight": 2
+        },
+        {
+          "catch": "loche",
+          "weight": 3
+        },
+        {
+          "catch": "chevesne",
+          "weight": 1
+        },
+        {
+          "catch": "ombre",
+          "weight": 1
+        },
+        {
+          "catch": "anguille",
+          "weight": 1
         }
       ]
     },
@@ -156,6 +232,22 @@
         },
         {
           "catch": "goujon",
+          "weight": 2
+        },
+        {
+          "catch": "carpe",
+          "weight": 1
+        },
+        {
+          "catch": "rotengle",
+          "weight": 3
+        },
+        {
+          "catch": "gardon",
+          "weight": 2
+        },
+        {
+          "catch": "breme",
           "weight": 2
         }
       ]

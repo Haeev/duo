@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "air-chant-de-la-coupe",
+  "category": "musiques",
+  "name": "Chant de la coupe",
+  "place": "aubrune",
+  "source": {
+    "type": "tune"
+  },
+  "rarity": null,
+  "text": "Le chant de Barnabé, qui garde le rythme de la hache. Il le fredonne en pétrissant, maintenant."
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ver-luisant",
+  "category": "insectes",
+  "name": "Ver luisant",
+  "place": "aubrune",
+  "source": {
+    "type": "insect"
+  },
+  "rarity": {
+    "hours": {
+      "from": 1320,
+      "to": 120
+    },
+    "weathers": ["clear"],
+    "seasons": ["summer"]
+  },
+  "text": "Un ver luisant, petite lampe verte dans l'herbe. Le bourg l'appelle la lanterne du chef de halte."
+}

@@ -381,6 +381,15 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Un meuble dont le `model` n'est pas dans le manifeste des décors fait échouer `tests/rendu/decors.test.ts` (liste épinglée): prendre un modèle livré (`table-farm`, `barrel`, `shelf`) en attendant.
 - Aubrune est bornée par ce que la carte produit, pas par le temps (13 chênes, 10 cailloux, 6 fouilles): seule la pêche absorbe du temps en plus. Script: `docs/jeux/jeu-1/simulations/economie_aubrune.py` (lit les données du jeu).
 
+## Collections en données (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Sources du carnet: poisson = entrée `manual` du même id que la prise (la pêche appelle `recordFind`); insecte `insect` (sans objet possible: `item: null`); fleur, trésor, recette = `item` (une entrée par objet, l'achat inscrit aussi); carte `photo` (sujet de `commun/photos/`); air `tune` (`give_entry` ou `activates.tune` d'un événement). `give_entry` accepte toute entrée: les trésors d'histoire se donnent à la fin d'une étape.
+- Brancher sans écrire de dialogue: ajouter `give_entry`, `give_recipe`, `give_item` dans `onDone` d'étapes existantes (`give_item` poches pleines: l'objet tombe au sol).
+- Un objet sans dessin fait échouer `tests/interface-plume.test.ts`: l'inscrire dans `COLLECTIONS_AUBRUNE` (raison obligatoire). Une culture sans `model` fait échouer `tests/rendu/recoltables.test.ts`: modèle provisoire `crop-radis` (2 stades).
+- Pièges: `regrowStage` est un indice de stade (moins que `stages.length`); mini-jeu d'une recette entre 15 et 40 s (environ 4 gestes de plus qu'on ne croit); `catchAvailable` lit `from === to` comme vide (les entrées du carnet, elles, comme « toute heure »); une ligne de butin ajoutée change le tirage seedé des tests (`recolte.test.ts` sur `caillou`): ne pas toucher aux ressources ramassées à la main, préférer la fouille.
+- Le script d'économie compte la pêche par la moyenne des poids des tables (sans rareté) et ignore les lignes de butin `rare`. Zones de `nature.json`: placer avec le terrain décodé de `carte.json` (runs) et contrôler contre `blocked`; le total des `max` reste sous 40 (`InsectsStateSchema`).
+- Ids pris par les tests comme factices (`compote`, `buvette`; `gardon` renommé `poisson-factice`): vérifier `tests/gabarits.test.ts` avant de nommer un contenu réel.
+
 ## Vie quotidienne des habitants en données (La Petite Ligne 2, vérifié le 2026-11-11)
 
 - Faits que le moteur écrit seul et qu'un dialogue peut lire: `habitants.<id>.cadeaux.j<n>` (compteur), `.adore.j<n>` (l'objet adoré), `amitie.<id>.coeur-<n>.j<n>`, `dialogues.<lieu>.<dialogue>.j<n>` (dialogue `once: player` ouvert), `entendu.<lieu>.<dialogue>.j<n>` (dialogue répété de priorité 10 et plus, donc la remarque d'hygiène), `<lieu>.<logement>.<pièce>` = `restored`, `scenes.<lieu>.<scène>`. Les commerces n'écrivent rien.

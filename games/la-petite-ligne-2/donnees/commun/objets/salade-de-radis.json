@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "salade-de-radis",
+  "name": "Salade de radis",
+  "family": "food",
+  "stack": 3,
+  "food": {
+    "hunger": 20
+  },
+  "tool": null
+}

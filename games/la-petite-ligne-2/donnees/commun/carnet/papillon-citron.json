@@ -3,7 +3,7 @@
   "id": "papillon-citron",
   "category": "insectes",
   "name": "Papillon citron",
-  "place": "essai-gare",
+  "place": "aubrune",
   "source": {
     "type": "insect"
   },
@@ -15,5 +15,5 @@
     "weathers": ["clear", "overcast"],
     "seasons": ["spring", "summer"]
   },
-  "text": "Un papillon citron! Il tient dans le creux de ta main."
+  "text": "Un papillon citron, premier jaune du printemps. Il tient dans le creux de ta main."
 }

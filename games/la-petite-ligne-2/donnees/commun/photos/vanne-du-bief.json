@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "vanne-du-bief",
+  "entry": "carte-vanne-du-bief",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "vn"
+  },
+  "conditions": [
+    {
+      "type": "weather_is",
+      "weathers": ["clear"]
+    }
+  ]
+}

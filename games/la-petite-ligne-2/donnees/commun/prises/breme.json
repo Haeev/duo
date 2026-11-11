@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "breme",
+  "kind": "fish",
+  "item": "breme",
+  "places": ["aubrune"],
+  "hours": {
+    "from": 360,
+    "to": 1440
+  },
+  "weathers": ["overcast", "rain", "mist"],
+  "seasons": [],
+  "rarity": "uncommon",
+  "difficulty": 2.5,
+  "fish": {
+    "force": 0.5,
+    "nervousness": 0.2,
+    "rhythm": {
+      "pull": 2.0,
+      "rest": 1.6
+    },
+    "stamina": 9,
+    "feints": 1,
+    "sizeCm": {
+      "min": 30,
+      "max": 60
+    },
+    "shadow": "large"
+  }
+}

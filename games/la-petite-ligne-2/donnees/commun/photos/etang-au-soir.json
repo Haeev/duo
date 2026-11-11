@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "etang-au-soir",
+  "entry": "carte-etang-au-soir",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "et"
+  },
+  "conditions": [
+    {
+      "type": "time_is",
+      "from": 1080,
+      "to": 1260
+    }
+  ]
+}

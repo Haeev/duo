@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "train-du-samedi",
+  "entry": "carte-train-du-samedi",
+  "target": {
+    "type": "point",
+    "place": "aubrune",
+    "point": "quai"
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.train.en-gare",
+      "equals": true
+    }
+  ]
+}

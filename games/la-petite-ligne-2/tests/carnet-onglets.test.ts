@@ -207,9 +207,9 @@ describe('carnet: collections', () => {
     const content = gameContent();
     const world = createWorld(content, SEED, MEMBERS);
     const sources = worldSources(content, { catalogue: fakeCollections() });
-    const recipes = sources.collections(world, 0).find((c) => c.family === 'recipes');
-    const fake = fakeCollections().find((c) => c.family === 'recipes');
-    expect(recipes?.entries.map((e) => e.id)).toEqual(fake?.entries.map((e) => e.id));
+    const outfits = sources.collections(world, 0).find((c) => c.family === 'outfits');
+    const fake = fakeCollections().find((c) => c.family === 'outfits');
+    expect(outfits?.entries.map((e) => e.id)).toEqual(fake?.entries.map((e) => e.id));
   });
 });
 

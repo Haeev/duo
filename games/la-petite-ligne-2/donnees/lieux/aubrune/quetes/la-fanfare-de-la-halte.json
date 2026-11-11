@@ -209,6 +209,10 @@
               "key": "aubrune.fanfare.repetition",
               "value": "fait",
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-canon-de-la-repetition"
             }
           ]
         },
@@ -372,6 +376,15 @@
               "key": "aubrune.fanfare.fini",
               "value": true,
               "by": "duo"
+            },
+            {
+              "type": "give_entry",
+              "entry": "air-marche-de-la-halte"
+            },
+            {
+              "type": "give_item",
+              "item": "graines-oeillet",
+              "count": 3
             }
           ]
         }

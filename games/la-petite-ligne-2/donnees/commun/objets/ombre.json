@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "ombre",
+  "name": "Ombre commun",
+  "family": "catch",
+  "stack": 3,
+  "food": null,
+  "tool": null
+}

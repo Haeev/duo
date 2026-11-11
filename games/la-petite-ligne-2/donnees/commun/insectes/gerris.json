@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "gerris",
+  "entry": "gerris",
+  "item": null,
+  "places": ["aubrune"],
+  "terrains": ["berge"],
+  "rarity": {
+    "hours": {
+      "from": 420,
+      "to": 1200
+    },
+    "weathers": ["clear", "overcast", "mist", "rain"],
+    "seasons": ["spring", "summer", "autumn"]
+  },
+  "weight": 8,
+  "alertRadius": 1.5,
+  "fleeSpeed": 3,
+  "wander": 0.5
+}
