@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-pendule",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.halte.pendule"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "5 h 12 à ma montre, 5 h 12 à la pendule du quai. Trente ans que j'attendais de comparer. Nous sommes d'accord.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

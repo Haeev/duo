@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-cadeau",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.mado.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.mado.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.mado-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.mado-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Pour moi ? Ha ! Donne. Je ne sais pas ouvrir doucement, je te préviens. Cling ! Voilà. Merci !",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta moitié l'autre jour, toi aujourd'hui ! Vous me ramollissez. Une forgeronne ramollie, ça ne s'est jamais vu. Continuez.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

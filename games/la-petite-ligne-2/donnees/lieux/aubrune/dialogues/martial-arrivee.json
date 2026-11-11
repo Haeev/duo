@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "martial-arrivee",
+  "villager": "martial",
+  "priority": 50,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Bonjour ! Martial Roques, curé. Six clochers, un vélo. Ne cherche pas la soutane: elle se prenait dans la chaîne.",
+      "emote": "joy",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "On m'a dit: « Aubrune, vingt âmes, un train revenu. » J'ai demandé qui avait fait ça. On m'a répondu: « les gardes ». Enchanté.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Le presbytère est contre l'église, porte sur le parvis. Frappe fort: si je ne réponds pas, c'est que je suis dans une côte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

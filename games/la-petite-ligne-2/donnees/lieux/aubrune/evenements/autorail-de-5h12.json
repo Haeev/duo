@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "autorail-de-5h12",
+  "name": "Autorail de 5 h 12",
+  "kind": "visitor",
+  "when": {
+    "type": "weekly",
+    "weekday": "monday",
+    "seasons": []
+  },
+  "days": 7,
+  "hours": {
+    "from": 312,
+    "to": 345
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.depart.fait"
+    }
+  ],
+  "announce": false,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.autorail.en-gare",
+        "value": true
+      }
+    ],
+    "villagers": ["anatole"],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  }
+}

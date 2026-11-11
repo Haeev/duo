@@ -183,6 +183,64 @@
         {
           "when": [
             {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.achille",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.achille",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.achille",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.achille",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.achille",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.achille",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
               "type": "time_is",
               "from": 360,
               "to": 720
@@ -230,7 +288,7 @@
     "soir": {
       "kind": "line",
       "speaker": "achille",
-      "text": "Le soir, je pêche. Enfin, je tiens une canne et je ferme les yeux.",
+      "text": "Le soir, je m'assois sur la place et je regarde les étoiles lever. Elles prennent leur temps. Elles ont raison.",
       "emote": null,
       "next": null
     },
@@ -238,6 +296,20 @@
       "kind": "line",
       "speaker": "achille",
       "text": "Chut... À cette heure, la farine dort. Moi presque. Le four, jamais.",
+      "emote": null,
+      "next": null
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "La pluie fait lever la pâte. Ou c'est moi qui le crois.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "La brume, c'est de la farine qui flotte. Je m'y sens chez moi.",
       "emote": null,
       "next": null
     }

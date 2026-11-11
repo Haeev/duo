@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-ami",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "anatole",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Tu peux me tutoyer pendant l'arrêt. Article... il n'y a pas d'article. C'est moi qui décide. C'est très inhabituel. J'ai chaud.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

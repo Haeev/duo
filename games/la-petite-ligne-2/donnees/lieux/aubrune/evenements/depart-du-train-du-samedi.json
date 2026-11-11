@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "depart-du-train-du-samedi",
+  "name": "Départ du train du samedi",
+  "kind": "other",
+  "when": {
+    "type": "weekly",
+    "weekday": "saturday",
+    "seasons": []
+  },
+  "days": 1,
+  "hours": {
+    "from": 880,
+    "to": 900
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    }
+  ],
+  "announce": false,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.train.en-gare",
+        "value": false
+      }
+    ],
+    "villagers": [],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  }
+}

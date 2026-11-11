@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-ami",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "solange",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Toi, je te coiffe sans commenter. C'est un privilège: demande aux autres ce qu'ils entendent pendant que je coupe.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

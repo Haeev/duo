@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-veillee",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "La nuit de l'autorail, j'ai chanté tout bas depuis la forge. Pour accompagner. Un train qui revient, ça mérite un fond sonore.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

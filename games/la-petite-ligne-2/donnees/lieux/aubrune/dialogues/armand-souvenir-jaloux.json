@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-jaloux",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.armand.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.armand.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "armand",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ta moitié et moi, on parle sans que je rougisse. Avec toi, je... regarde, ça recommence. Reviens souvent. Ça s'use, la timidité.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

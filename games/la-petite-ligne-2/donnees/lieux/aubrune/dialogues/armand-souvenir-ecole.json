@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-ecole",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.ecole-ouverte"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "L'école a rouvert parce que le train est revenu. J'ai une élève: Jeanne. Elle compte pour quatre. Pour cinq, les jours de pari.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

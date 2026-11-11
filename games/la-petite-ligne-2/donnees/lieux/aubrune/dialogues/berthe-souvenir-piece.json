@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-piece",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.cuisine",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Une cuisine neuve ! Il te faut de la farine de la semaine, pas de la vieille. Passe: je la mouds devant toi, tu verras la différence.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

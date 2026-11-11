@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-pluie",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.lucie-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.lucie-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Il pleut et tu sors quand même ? Bienvenue dans le métier. Le courrier ne fond pas, la factrice non plus. Ha !",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ta moitié est passée sous la même averse. Deux personnes qui ne fondent pas dans la même maison: je note, bon terrain pour le courrier.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

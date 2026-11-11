@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-draisine",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.draisine.sortie"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Une draisine circule sur ma voie. Deux places, quatre bras, aucun billet. Je devrais verbaliser. Je préfère demander: elle grimpe bien ?",
+      "emote": null,
+      "next": null
+    }
+  }
+}

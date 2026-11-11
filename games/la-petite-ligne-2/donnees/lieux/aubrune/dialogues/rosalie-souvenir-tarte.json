@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-tarte",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lettres.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Il paraît qu'on fait de la tarte, chez vous. Je dis ça, je ne dis rien. Je repars à 14 h 40. Largement le temps d'une part.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

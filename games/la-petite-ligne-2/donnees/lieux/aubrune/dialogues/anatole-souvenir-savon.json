@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-savon",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.anatole-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.anatole-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Tenue correcte. Je le signale parce que l'autre nuit, j'ai dû invoquer l'article 22. Je n'aime pas invoquer l'article 22.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

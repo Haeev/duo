@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-cadeau",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.paulin.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.paulin.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.paulin-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.paulin-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Non. Enfin... c'est pour moi ? Alors oui. Mais ne recommence pas tous les jours: je ne saurais plus quoi dire.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Ta moitié d'abord, toi ensuite. C'est un coup monté. Non, ça ne me fait rien. J'ai une poussière. Dans les deux yeux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

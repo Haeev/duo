@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "depart-de-l-autorail",
+  "name": "Départ de l'autorail",
+  "kind": "other",
+  "when": {
+    "type": "weekly",
+    "weekday": "monday",
+    "seasons": []
+  },
+  "days": 7,
+  "hours": {
+    "from": 345,
+    "to": 365
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.depart.fait"
+    }
+  ],
+  "announce": false,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.autorail.en-gare",
+        "value": false
+      }
+    ],
+    "villagers": [],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  }
+}

@@ -183,6 +183,78 @@
         {
           "when": [
             {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.jeanne",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.jeanne",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.jeanne",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.jeanne",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.jeanne",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.jeanne",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 360,
+              "to": 720
+            },
+            {
+              "type": "remembered",
+              "key": "aubrune.decor.ecole-ouverte"
+            }
+          ],
+          "next": "x-ecole"
+        },
+        {
+          "when": [
+            {
               "type": "time_is",
               "from": 360,
               "to": 720
@@ -238,6 +310,27 @@
       "kind": "line",
       "speaker": "jeanne",
       "text": "Chut ! Je ne suis pas là. Si Solange demande, je dors.",
+      "emote": null,
+      "next": null
+    },
+    "x-ecole": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "L'école a rouvert. Là, c'est la récré. Une récré longue. Je parie qu'Armand ose pas traverser la place pour venir me chercher.",
+      "emote": null,
+      "next": null
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je parie que je saute dans dix flaques sans me mouiller. J'en suis à deux.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "La brume, c'est le meilleur temps pour les cachettes.",
       "emote": null,
       "next": null
     }

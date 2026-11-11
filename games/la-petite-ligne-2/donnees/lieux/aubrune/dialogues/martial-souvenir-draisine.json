@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-draisine",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.draisine.sortie"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Une draisine ! Quatre bras sur un levier, et ça file sur le plat. J'ai demandé à l'essayer. Je n'ai pas dit que j'avais peur. J'avais peur.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

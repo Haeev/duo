@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-veille",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.berthe-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.berthe-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Qui va là ? Ah, toi. La nuit, mon moulin a l'oreille fine. Moi aussi. File dormir: la roue tourne très bien toute seule.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Encore chez vous ! Ta moitié rôdait l'autre nuit. Si c'est pour compter mes sacs, c'est fait, et le compte est bon.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

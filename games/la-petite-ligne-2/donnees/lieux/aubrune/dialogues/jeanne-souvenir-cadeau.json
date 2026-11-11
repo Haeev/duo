@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-cadeau",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.jeanne.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.jeanne.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.jeanne-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.jeanne-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Un cadeau ! J'avais parié avec moi-même que personne m'en ferait cette année. J'ai perdu. Je me dois une bille.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ta moitié m'en a fait un aussi ! Je parie que vous vous êtes pas donné le mot. Si ? Zut. Je me dois encore une bille.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

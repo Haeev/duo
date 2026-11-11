@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-pluie",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.berthe-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.berthe-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Il pleut. Le bief monte, la roue force, la meule chante plus aigu. Elle adore ça. C'est une diva.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ta moitié est venue sous la pluie, toi aussi. Ma meule a compté: deux visites par temps de chien. Elle est flattée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

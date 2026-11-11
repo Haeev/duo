@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-jaloux",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.honorine.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.honorine.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "honorine",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié connaît trois de mes vraies histoires. Toi, tu n'as eu que les fausses. Elles sont meilleures, mais tout de même. Reviens.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

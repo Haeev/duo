@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-ami",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "odette",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Toi, tu as droit au bocal de derrière. Les cerises de ma mère. Je ne les vends pas, je ne les montre pas. Tends la main.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

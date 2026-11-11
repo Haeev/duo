@@ -183,6 +183,64 @@
         {
           "when": [
             {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.solange",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.solange",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.solange",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.solange",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.solange",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.solange",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
               "type": "time_is",
               "from": 360,
               "to": 720
@@ -238,6 +296,20 @@
       "kind": "line",
       "speaker": "solange",
       "text": "Tu rôdes ? Très bien. Les plus belles entrées se font la nuit.",
+      "emote": null,
+      "next": null
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "La pluie défrise tout le monde. Mes affaires reprennent.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Brume: le décor parfait pour une entrée mystérieuse.",
       "emote": null,
       "next": null
     }

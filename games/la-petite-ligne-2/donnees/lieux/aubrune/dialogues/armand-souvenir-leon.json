@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-leon",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.pari",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Léon lit l'heure, maintenant. Il me la donne toutes les dix minutes. C'est très bien. C'est épuisant.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

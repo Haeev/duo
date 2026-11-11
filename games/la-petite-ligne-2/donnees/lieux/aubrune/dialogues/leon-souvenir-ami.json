@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-ami",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "leon",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "T'es de ma bande, alors je te le dis: le foin du fond, c'est le meilleur pour sauter. Je le dis à personne. Enfin, à Jeanne. Enfin, à toi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-adore",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.ambroise.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.ambroise.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Une vieille pièce. Frappée droit, tranche nette. On savait travailler. Je la mets sous la cloche de verre. Ne me regarde pas comme ça.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

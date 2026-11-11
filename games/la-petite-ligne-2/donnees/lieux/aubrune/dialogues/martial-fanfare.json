@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "martial-fanfare",
+  "villager": "martial",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fanfare.fondee"
+    }
+  ],
+  "once": "player",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Une fanfare, et personne ne me dit rien ? J'ai entendu le concert depuis la côte. J'ai failli lâcher le guidon pour applaudir.",
+      "emote": "surprise",
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Il paraît que la grosse caisse n'a personne derrière elle. Je la réclame. J'ai les bras de quelqu'un qui monte son vélo au clocher.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Armand a dit oui. Enfin: il a rougi, hoché la tête et renversé son pupitre. Je joue le samedi, à l'arrivée du train. Un coup. Bien placé.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

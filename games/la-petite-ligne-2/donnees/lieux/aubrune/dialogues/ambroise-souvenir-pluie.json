@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "ambroise-souvenir-pluie",
+  "villager": "ambroise",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.ambroise-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.ambroise-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Tu mouilles mon parquet. L'humidité dérègle tout. ... Reste là, près du poêle. Je dis ça pour le parquet.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "ambroise",
+      "text": "Ta moitié a dégoutté ici il y a une heure. J'ai épongé. Je recommence. Pas d'excuses: ça prend du temps.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

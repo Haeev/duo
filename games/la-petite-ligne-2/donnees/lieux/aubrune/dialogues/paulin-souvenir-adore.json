@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-adore",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.paulin.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.paulin.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Une pomme de terre. Ferme, propre, pas un œil de travers. Je ne dis pas que c'est mieux que les miennes. Je ne dis rien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

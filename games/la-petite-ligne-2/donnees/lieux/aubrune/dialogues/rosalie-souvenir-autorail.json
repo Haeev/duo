@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-autorail",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Alors, ce train crème ? Tout le dépôt en parle. Je maintiens: pas de chez nous. Mais je regarde les voies de garage autrement.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

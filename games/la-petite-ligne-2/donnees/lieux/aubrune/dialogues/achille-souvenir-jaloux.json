@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-jaloux",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.achille.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.achille.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "achille",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ta moitié a son quignon mis de côté. Le tien... je l'ai mangé en dormant. Viens plus souvent, je m'en souviendrai.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

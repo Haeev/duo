@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-jaloux",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.mado.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.mado.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "mado",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta moitié crie déjà « Mado ! » depuis la rue. Toi, tu frappes encore avant d'entrer. Entre donc !",
+      "emote": null,
+      "next": null
+    }
+  }
+}

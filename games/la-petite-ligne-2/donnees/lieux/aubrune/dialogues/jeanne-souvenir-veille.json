@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-veille",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.jeanne-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.jeanne-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Chut ! T'as rien vu. Je dors, là. Officiellement. Je parie que tu sais pas marcher sans faire craquer le gravier.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ta moitié m'a déjà vue dehors la nuit. Elle a rien dit à Solange. Toi non plus, hein ? On parie ? Non, on parie pas là-dessus.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

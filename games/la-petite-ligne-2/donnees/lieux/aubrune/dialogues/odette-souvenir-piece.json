@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-piece",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.cuisine",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Une cuisine chez vous ! C'en est fini de ma soupe du premier soir, alors. Je suis vexée. Achète-moi du sel, ça passera.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

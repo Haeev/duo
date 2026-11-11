@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-pluie",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.firmin-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.firmin-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Tu viens par ce temps. Le règlement dit: « le service est assuré par tous les temps ». Personne ne l'avait appliqué depuis 1987.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié est passée sous l'averse à l'heure pile. Toi, avec quatre minutes d'écart. Je ne juge pas. Je note.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

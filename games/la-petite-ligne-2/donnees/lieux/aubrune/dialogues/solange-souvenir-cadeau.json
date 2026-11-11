@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-cadeau",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.solange.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.solange.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.solange-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.solange-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Un cadeau ! En coulisses, on appelait ça « un bouquet de première ». Je fais la révérence. Regarde bien: je ne la fais qu'une fois.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié est entrée en scène avant toi, avec un cadeau aussi. Tu fais le rappel. C'est très bien joué, les rappels.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-cadeau",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.firmin.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.firmin.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.firmin-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.firmin-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Un cadeau. Reçu à l'heure dite, en bon état. Je signe. ... C'est une habitude. Merci, garde.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Deuxième colis du même foyer: ta moitié a livré le premier. Je vais ouvrir une ligne au registre: « Arrivages agréables ».",
+      "emote": null,
+      "next": null
+    }
+  }
+}

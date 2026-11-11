@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-pluie",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.leon-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.leon-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "La pluie, ça me fait rien. Je suis déjà resté dehors sous un orage. Enfin, sous l'auvent. Enfin, à la fenêtre.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ta moitié est venue sous la pluie aussi ? Moi, je cours entre les gouttes. Enfin, entre presque toutes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

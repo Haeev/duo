@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-ami",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "paulin",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Bon. Tu peux marcher dans mes rangs. Pas sur les poireaux. Entre les poireaux. Je ne dis pas ça à dix personnes. Je ne le dis à personne.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

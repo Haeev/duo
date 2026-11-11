@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-pluie",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.odette-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.odette-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Il pleut des cordes, et te voilà quand même ! Ça, c'est de la clientèle. Entre, égoutte-toi, raconte-moi qui tu as croisé.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié est entrée ici sous l'averse. J'ai tout su en deux minutes: où, pourquoi, avec quoi dans le sac. Toi, tu es plus dur à lire.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

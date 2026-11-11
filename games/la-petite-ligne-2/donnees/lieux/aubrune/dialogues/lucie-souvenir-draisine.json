@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-draisine",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.draisine.sortie"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Une draisine ! Quatre bras, deux rails. Prête-la-moi: ma tournée du haut de la ligne passe de deux heures à vingt minutes. Ha !",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

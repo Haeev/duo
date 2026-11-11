@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-registre",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.registre-plein",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Vingt âmes au registre, et nous trois dedans. Léon a signé avec un paraphe. Il s'était entraîné sur ma nappe.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

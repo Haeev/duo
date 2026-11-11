@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-cadeau",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.marthe.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.marthe.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.marthe-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.marthe-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Un cadeau. Pour quoi faire ? ... Ce n'est pas une question. C'est un remerciement. Je les réussis mal.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié d'abord, toi ensuite. Deux cadeaux. Je n'ai rien demandé. Je garde les deux. Inutile de le répéter.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-pluie",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.armand-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.armand-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Il pleut. Les grenouilles sont contentes, donc moi aussi. Enfin, je crois. Je n'ai pas vérifié pour moi.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ta moitié est passée sous la pluie aussi. J'ai dit « bonjour » sans bafouiller. Demande-lui. C'est vrai.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

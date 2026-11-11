@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-savon",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.marthe-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.marthe-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Propre. C'est mieux. L'autre jour, j'ai sonné un coup de plus. Les gens ont cru à une fête. C'était un avertissement.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

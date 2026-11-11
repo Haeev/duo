@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-piece",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.cave",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Vous avez déblayé la cave. Une cave propre, c'est une maison qui n'a plus rien à cacher. Je parle des maisons.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

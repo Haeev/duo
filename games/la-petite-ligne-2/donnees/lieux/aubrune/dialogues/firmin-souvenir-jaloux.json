@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-jaloux",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.firmin.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.firmin.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "firmin",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié a droit au café du bureau, maintenant. Toi, pas encore. C'est une question de régularité. Passe à heures fixes.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

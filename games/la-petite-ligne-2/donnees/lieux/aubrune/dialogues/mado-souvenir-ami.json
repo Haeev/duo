@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-ami",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "mado",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Tiens, tape. Si, tape ! Sur l'enclume, un bon coup. ... Voilà. Personne ne tape sur mon enclume. Sauf mon homme, et toi.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

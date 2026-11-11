@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-voyage",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.depart.fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Tu as voyagé dans ma voiture. Je me souviens de tous les voyageurs de cette ligne. Cela fait deux. Le compte est vite tenu, mais il est exact.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

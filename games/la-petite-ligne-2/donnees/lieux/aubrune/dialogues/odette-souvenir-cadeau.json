@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "odette-souvenir-cadeau",
+  "villager": "odette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.odette.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.odette.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.odette-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.odette-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Un cadeau ! Pose-le là, que tout le monde le voie. À midi, le bourg entier saura qu'on sait vivre, chez les gardes. Je m'en occupe.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié m'a gâtée l'autre jour ! Je l'ai dit à tout le monde. Je vais devoir refaire la tournée pour toi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

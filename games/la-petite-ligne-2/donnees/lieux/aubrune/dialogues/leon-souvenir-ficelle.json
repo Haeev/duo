@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-ficelle",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.robe.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "La ficelle de la cloche, c'était Jeanne et moi. Surtout moi. Enfin, c'était son idée. Mais c'est moi qui tirais fort.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

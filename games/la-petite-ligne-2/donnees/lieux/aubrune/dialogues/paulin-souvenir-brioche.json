@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-brioche",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Un bûcheron qui fait de la brioche. J'ai dit non. Puis j'ai goûté. Maintenant je dis: un bûcheron qui fait de la brioche. Point.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

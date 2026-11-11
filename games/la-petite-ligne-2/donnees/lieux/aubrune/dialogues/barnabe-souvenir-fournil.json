@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-fournil",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.apprenti"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Cinq heures, le fournil. Achille dort debout, je pétris, on ne se dit rien. C'est le meilleur moment de ma journée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

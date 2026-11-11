@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-savon",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.basile-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.basile-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Propre. Mieux. L'autre jour: non. Rien dit. Pensé fort.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

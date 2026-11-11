@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-pluie",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.margot-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.margot-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Quelle averse ! Viens sous l'auvent. Paulin est dehors: il dit que la pluie ne mouille que ceux qui se plaignent.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta moitié s'est abritée ici tout à l'heure. On a parlé de toi. En bien ! Presque uniquement en bien.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "mado-souvenir-adore",
+  "villager": "mado",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.mado.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.mado.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Une belle pierre ! Plate, dense, sans veine. Les gens m'offrent des fleurs, d'habitude. Toi, tu as compris à qui tu parlais.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

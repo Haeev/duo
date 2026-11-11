@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "margot-souvenir-etal",
+  "villager": "margot",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "dialogues.aubrune.margot-boutique.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "dialogues.aubrune.margot-boutique.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Depuis que tu viens à l'étal, je mets les plus belles carottes devant. Paulin dit que c'est de la réclame. C'est de l'amitié avec une botte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

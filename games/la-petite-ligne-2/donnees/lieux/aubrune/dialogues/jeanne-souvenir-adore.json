@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-adore",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.jeanne.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.jeanne.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Trop bien ! Ça va dans ma boîte à trésors. Je te dis pas où elle est. Je parie que tu trouves pas. Indice: c'est pas sous mon lit.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

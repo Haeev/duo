@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "achille-souvenir-savon",
+  "villager": "achille",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.achille-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.achille-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Tu sens le linge propre... L'autre jour, ma pâte a refusé de lever à ton passage. Elle est sensible. Moi, je n'ai rien dit: je dormais.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

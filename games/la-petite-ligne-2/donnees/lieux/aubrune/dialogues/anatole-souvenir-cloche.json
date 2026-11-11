@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-cloche",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.cloche.juste"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "On me dit que la cloche sonne juste. Je passe trop tôt pour l'entendre. Je le regrette. Ce n'est pas réglementaire, de regretter.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

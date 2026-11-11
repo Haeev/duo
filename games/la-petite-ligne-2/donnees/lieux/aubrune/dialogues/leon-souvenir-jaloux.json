@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-jaloux",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.leon.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.leon.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "leon",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ta moitié connaît ma cabane. Enfin, j'en ai pas encore. Mais quand j'en aurai une, ta moitié saura où. Toi, faut qu'on se voie plus.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

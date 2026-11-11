@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-adore",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.basile.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.basile.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Belle planche. Fil droit. Pas un nœud. Je la garde. Pour rien. Pour regarder.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

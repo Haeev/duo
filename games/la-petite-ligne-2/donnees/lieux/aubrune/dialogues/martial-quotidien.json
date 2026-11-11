@@ -1,0 +1,431 @@
+{
+  "schema": 1,
+  "id": "martial-quotidien",
+  "villager": "martial",
+  "priority": 0,
+  "when": [],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.martial",
+              "equals": 1
+            }
+          ],
+          "next": "b1"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.martial",
+              "equals": 2
+            }
+          ],
+          "next": "b2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.martial",
+              "equals": 3
+            }
+          ],
+          "next": "b3"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.martial",
+              "equals": 4
+            }
+          ],
+          "next": "b4"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour.martial",
+              "equals": 5
+            }
+          ],
+          "next": "b5"
+        }
+      ],
+      "otherwise": "b0"
+    },
+    "b0": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Bonjour, bonjour ! Excuse le souffle: la côte du cimetière fait neuf pour cent. Je l'ai montée en danseuse. Enfin, presque toute.",
+      "emote": null,
+      "next": "t0"
+    },
+    "t0": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.martial",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b1": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ah, les gardes ! Je suis passé devant votre barrière à vélo. J'ai sonné. C'est ma façon de bénir sans descendre de selle.",
+      "emote": null,
+      "next": "t1"
+    },
+    "t1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.martial",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b2": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Bonjour ! Six clochers, un vélo, deux mollets. Fais le calcul: Aubrune est le seul où l'on m'attend avec du café.",
+      "emote": null,
+      "next": "t2"
+    },
+    "t2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.martial",
+          "value": 3,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b3": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Te voilà ! J'ai fait un sermon de sept minutes, dimanche. Marthe a chronométré. Elle dit huit. Elle compte les silences.",
+      "emote": null,
+      "next": "t3"
+    },
+    "t3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.martial",
+          "value": 4,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b4": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Bonjour ! Vent de face ce matin: je l'ai pris comme une pénitence. Vent de dos au retour: je l'ai pris comme une réponse.",
+      "emote": null,
+      "next": "t4"
+    },
+    "t4": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.martial",
+          "value": 5,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "b5": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Salut à toi ! Je cherche une rustine. Pas pour moi. Pour le vélo. Enfin, pour moi aussi, certains soirs.",
+      "emote": null,
+      "next": "t5"
+    },
+    "t5": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour.martial",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.martial",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.martial",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.martial",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.martial",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.martial",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.martial",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "weekday_is",
+              "weekdays": ["saturday"]
+            },
+            {
+              "type": "time_is",
+              "from": 570,
+              "to": 880
+            },
+            {
+              "type": "remembered",
+              "key": "aubrune.fanfare.fondee"
+            }
+          ],
+          "next": "fanfare"
+        },
+        {
+          "when": [
+            {
+              "type": "weekday_is",
+              "weekdays": ["sunday"]
+            },
+            {
+              "type": "time_is",
+              "from": 540,
+              "to": 690
+            }
+          ],
+          "next": "messe"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 390,
+              "to": 420
+            }
+          ],
+          "next": "aube"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 420,
+              "to": 540
+            }
+          ],
+          "next": "cimetiere"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 540,
+              "to": 720
+            }
+          ],
+          "next": "tournee"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 810
+            }
+          ],
+          "next": "cafe"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 810,
+              "to": 990
+            }
+          ],
+          "next": "croix"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 990,
+              "to": 1140
+            }
+          ],
+          "next": "place"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1140,
+              "to": 1230
+            }
+          ],
+          "next": "soir"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Il pleut ! À vélo, chaque flaque est un baptême. J'ai été baptisé onze fois depuis ce matin.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Brume. Je roule à la sonnette: un coup tous les dix tours de pédale. Les brebis s'écartent. Les paroissiens, moins.",
+      "emote": null,
+      "next": null
+    },
+    "fanfare": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Le samedi, j'attends le train avec la grosse caisse. Un coup à l'entrée en gare, un coup au départ. Entre les deux, je la porte. Pénitence.",
+      "emote": null,
+      "next": null
+    },
+    "messe": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Dimanche: messe à dix heures. Sermon court, cantique long. On retient mieux ce qu'on chante que ce qu'on écoute.",
+      "emote": null,
+      "next": null
+    },
+    "aube": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "À l'aube, j'ouvre l'église. Marthe arrive juste après. Elle vérifie que j'ai bien ouvert. J'ai toujours bien ouvert.",
+      "emote": null,
+      "next": null
+    },
+    "cimetiere": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Le matin, j'arrose au cimetière. Les fleurs d'abord. Puis je lis les noms à voix haute: personne n'aime qu'on oublie le sien.",
+      "emote": null,
+      "next": null
+    },
+    "tournee": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "En matinée, je fais la tournée des écarts à vélo, jusqu'à la maison du bout. Personne n'y habite encore. Je sonne quand même.",
+      "emote": null,
+      "next": null
+    },
+    "cafe": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "À midi, je déjeune chez Colette. Plat du jour, sans discuter. C'est la seule personne du bourg à qui j'obéis sans prier d'abord.",
+      "emote": null,
+      "next": null
+    },
+    "croix": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "L'après-midi, je descends à la croix de chemin. La vieille route continuait, avant. Je m'assois, je regarde où elle allait.",
+      "emote": null,
+      "next": null
+    },
+    "place": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "En fin de journée, je traverse la place en roue libre. On m'arrête six fois. C'est le but: un curé, ça se croise.",
+      "emote": null,
+      "next": null
+    },
+    "soir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Le soir, je ferme l'église et je regonfle mes pneus. L'un nourrit l'âme, l'autre le mollet. Ne me demande pas lequel.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Je dors au presbytère, le vélo dans le couloir. Il a sa place: on a fait trop de route ensemble pour qu'il couche dehors.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

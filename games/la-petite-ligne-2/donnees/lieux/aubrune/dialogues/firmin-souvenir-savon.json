@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-savon",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.firmin-hygiene.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "entendu.aubrune.firmin-hygiene.j1"
+        }
+      ]
+    },
+    {
+      "type": "need_at_least",
+      "need": "hygiene",
+      "value": 60
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Tenue réglementaire. Bien. L'autre jour, j'ai failli fermer le guichet. Il est déjà fermé, mais je l'aurais refermé.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

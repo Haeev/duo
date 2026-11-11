@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-ami",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "rosalie",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Tu veux tirer le sifflet ? Une fois. Courte. ... Voilà. Tu es la troisième personne au monde à l'avoir fait. La deuxième, c'était moi.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

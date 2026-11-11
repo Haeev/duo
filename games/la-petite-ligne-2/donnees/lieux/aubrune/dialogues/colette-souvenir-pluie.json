@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-pluie",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.colette-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.colette-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Entre, tu dégoulines. Les jours de pluie, mon café fait salle comble: personne n'a soif, tout le monde a froid.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié s'est séchée ici tout à l'heure. Vous devriez acheter un parapluie pour deux. Ou venir plus souvent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

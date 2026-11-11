@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-adore",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.armand.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.armand.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Une coquille fossile ! Cent cinquante millions d'années, et elle finit dans ma poche. Je la montre demain aux élèves. De loin.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

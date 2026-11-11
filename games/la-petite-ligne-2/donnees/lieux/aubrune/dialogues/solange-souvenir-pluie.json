@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-pluie",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.solange-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.solange-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Mon pauvre chou, tu ressembles à un rideau de scène après l'orage. Entre. La pluie décoiffe tout le monde: c'est ma haute saison.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié est passée tout à l'heure, sous la même pluie. Je vous fais un prix de gros sur le séchage. Non, c'est faux. Mais je vous plains en double.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

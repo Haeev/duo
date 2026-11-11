@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "basile-souvenir-pluie",
+  "villager": "basile",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.basile-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.basile-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Pluie. Tu viens quand même. Entre. Sciure sèche. Assieds-toi.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Ta moitié. Sous la pluie. Toi aussi. Du solide. Comme du chêne.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

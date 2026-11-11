@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-piece",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.troisieme-piece",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Une pièce de plus chez vous. Bien. Une maison, c'est comme un champ: ça se regagne mètre par mètre. Je n'ai rien dit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-relachee",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.baronne.sort",
+      "equals": "relachee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La photo de la Baronne est au mur. Tout le monde dit qu'elle était plus grosse. Elle grossit à chaque tournée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

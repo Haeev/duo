@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-pluie",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.marthe-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.marthe-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Il pleut. Tu es dehors. Moi aussi. Nous sommes deux à manquer de bon sens. Mets-toi sous le porche.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié est passée sous la pluie. Elle a salué. Toi aussi. Chez vous, on a des manières. Je ne sais pas d'où elles viennent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

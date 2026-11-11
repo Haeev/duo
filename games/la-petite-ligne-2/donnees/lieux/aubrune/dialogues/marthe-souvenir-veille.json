@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "marthe-souvenir-veille",
+  "villager": "marthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.marthe-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.marthe-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "On ne traîne pas la nuit. Sauf les chats, le vent, et toi. Assieds-toi sur la marche. Je ne dormais pas. Ne le dis à personne.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié l'autre nuit, toi celle-ci. Je vais finir par laisser un banc. Non. La marche suffit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

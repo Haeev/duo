@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-ami",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "honorine",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Approche, petit oiseau. À toi, je dirai toujours la vérité. ... Non, c'est faux. Mais je te dirai quand je mens. De temps en temps.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

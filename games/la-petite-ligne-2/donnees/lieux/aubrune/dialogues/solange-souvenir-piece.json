@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-piece",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.chambre",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Une chambre ! Il te faut des rideaux. J'ai un velours de scène, rouge, lourd, superbe. Trop pour une chambre. Prends-le quand même.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

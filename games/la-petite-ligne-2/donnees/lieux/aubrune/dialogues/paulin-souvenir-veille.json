@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-veille",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.paulin-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.paulin-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Non. Pas à cette heure. La ferme dort. Moi, je vérifie le loquet du poulailler, c'est différent. File.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Encore quelqu'un de chez vous. Ta moitié rôdait l'autre nuit. Mon loquet tient très bien, merci. Bonne nuit. Non: bonsoir.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

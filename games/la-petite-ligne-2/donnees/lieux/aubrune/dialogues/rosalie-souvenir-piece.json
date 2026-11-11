@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-piece",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.chambre",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Une chambre finie ? Alors j'apporte des rideaux au prochain train. Le dépôt en a trop, et ils sont laids. Vous verrez: on s'y attache.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

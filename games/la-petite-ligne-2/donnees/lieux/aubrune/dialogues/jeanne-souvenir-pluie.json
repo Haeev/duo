@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-pluie",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.jeanne-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.jeanne-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je parie que tes chaussettes sont plus mouillées que les miennes. Montre. ... Bon, égalité. Les flaques du quai sont les meilleures, viens !",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ta moitié a sauté dans la grande flaque avec moi ! Enfin, à côté. Les grands sautent toujours à côté.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

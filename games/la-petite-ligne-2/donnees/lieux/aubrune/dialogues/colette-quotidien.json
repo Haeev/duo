@@ -183,6 +183,64 @@
         {
           "when": [
             {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.colette",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.colette",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.colette",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.colette",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.colette",
+                  "equals": 3
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.colette",
+                  "equals": 5
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
               "type": "time_is",
               "from": 360,
               "to": 720
@@ -238,6 +296,20 @@
       "kind": "line",
       "speaker": "colette",
       "text": "La nuit, je compte les verres. Il en manque toujours un. Je soupçonne Honorine. Elle a une poche profonde.",
+      "emote": null,
+      "next": null
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Il pleut: la terrasse est rentrée, les clients aussi. Un café plein un jour de pluie, ça sent la laine mouillée et la bonne humeur.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Brume. On ne voit pas l'église d'ici. Marthe sonne quand même: elle n'a jamais eu besoin de voir pour avoir raison.",
       "emote": null,
       "next": null
     }

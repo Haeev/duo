@@ -60,7 +60,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b1": {
       "kind": "line",
@@ -79,7 +79,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b2": {
       "kind": "line",
@@ -98,7 +98,7 @@
           "by": "duo"
         }
       ],
-      "next": null
+      "next": "moment"
     },
     "b3": {
       "kind": "line",
@@ -117,6 +117,134 @@
           "by": "duo"
         }
       ],
+      "next": "moment"
+    },
+    "moment": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["rain", "storm"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.margot",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.margot",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "pluie"
+        },
+        {
+          "when": [
+            {
+              "type": "weather_is",
+              "weathers": ["mist"]
+            },
+            {
+              "type": "any",
+              "conditions": [
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.margot",
+                  "equals": 1
+                },
+                {
+                  "type": "remembered",
+                  "key": "aubrune.tour.margot",
+                  "equals": 3
+                }
+              ]
+            }
+          ],
+          "next": "brume"
+        },
+        {
+          "when": [
+            {
+              "type": "not",
+              "condition": {
+                "type": "remembered",
+                "key": "aubrune.verrou.v3"
+              }
+            }
+          ],
+          "next": "gue"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 420,
+              "to": 720
+            }
+          ],
+          "next": "matin"
+        },
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 720,
+              "to": 1200
+            }
+          ],
+          "next": "apres-midi"
+        }
+      ],
+      "otherwise": "nuit"
+    },
+    "pluie": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Il pleut ! Les poules boudent, Paulin sourit. Enfin, il desserre les dents. Pour lui, c'est un sourire.",
+      "emote": null,
+      "next": null
+    },
+    "brume": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Quelle brume ! J'ai perdu Paulin entre deux rangs, ce matin. Je l'ai retrouvé au bruit: il disait non à un piquet.",
+      "emote": null,
+      "next": null
+    },
+    "gue": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "On campe à la grève en attendant le gué. Paulin fait la tête à la rivière. Elle ne cède pas. Lui non plus.",
+      "emote": null,
+      "next": null
+    },
+    "matin": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Le matin, la cour sent la terre mouillée et le café. Je sors l'étal à sept heures. Les carottes d'abord: elles aiment être vues.",
+      "emote": null,
+      "next": null
+    },
+    "apres-midi": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "L'après-midi, je tiens la cour et je trie les graines. Paulin est aux champs. On se parle par-dessus la haie, à coups de menton.",
+      "emote": null,
+      "next": null
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "À cette heure, je ferme les volets et je compte les poules. Il en manque toujours une. Elle revient toujours. C'est son heure à elle.",
+      "emote": null,
       "next": null
     }
   }

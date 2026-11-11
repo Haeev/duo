@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-cadeau",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.rosalie.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.rosalie.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.rosalie-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.rosalie-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Un cadeau pour la mécanicienne ? D'habitude, on me donne des colis à porter, pas à garder. Je le pose en cabine, près du sifflet.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ta moitié d'abord, toi ensuite ! Georgette va croire qu'on la courtise. Elle a raison.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

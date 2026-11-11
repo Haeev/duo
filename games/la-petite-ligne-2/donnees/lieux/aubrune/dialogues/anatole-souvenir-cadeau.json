@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-cadeau",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.anatole.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.anatole.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.anatole-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.anatole-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Les gratifications sont interdites. Article 14. ... Pose-le là. L'article 14 ne dit rien de ce qui est posé.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Deux gratifications d'un même foyer. L'article 14 ne prévoit pas le cas. Je vais devoir écrire à la Compagnie. Merci quand même.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

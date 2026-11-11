@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "colette-souvenir-carte",
+  "villager": "colette",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "dialogues.aubrune.colette-boutique.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "dialogues.aubrune.colette-boutique.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Tu as vu ma carte: un plat, un seul. Un jour, un client a demandé « autre chose ». Je lui ai servi le même, dans une autre assiette.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

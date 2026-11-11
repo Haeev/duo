@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-jaloux",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.rosalie.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.rosalie.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "rosalie",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ta moitié est déjà montée en cabine. Toi, tu en es au marchepied. Ça vient, ça vient: Georgette se méfie, puis elle adopte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

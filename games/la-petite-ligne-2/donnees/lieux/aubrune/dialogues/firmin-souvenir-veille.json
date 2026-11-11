@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "firmin-souvenir-veille",
+  "villager": "firmin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.firmin-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.firmin-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "22 h passées. Le quai est fermé au public. Tu n'es pas le public: tu es de la maison. Reste. On ne dit rien, c'est le service de nuit.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié a fait le quart d'avant. Vous vous relayez sans le savoir. C'est comme ça qu'on tenait la halte, autrefois.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "jeanne-souvenir-ami",
+  "villager": "jeanne",
+  "priority": 30,
+  "when": [
+    {
+      "type": "bond_at_least",
+      "villager": "jeanne",
+      "points": 300
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "T'es dans mon carnet. Page des gens sûrs. Y a toi, Solange, et un chat que j'ai vu une fois. C'est une page très dure à avoir.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

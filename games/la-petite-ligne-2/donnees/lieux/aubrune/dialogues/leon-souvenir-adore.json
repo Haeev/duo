@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-adore",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.leon.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.leon.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Des mûres ! Je peux en manger mille. Enfin, cent. Enfin, j'ai mal au ventre après vingt, mais c'est le ventre qui exagère.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

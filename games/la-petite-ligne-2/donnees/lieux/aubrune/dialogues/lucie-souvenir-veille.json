@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-veille",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.lucie-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.lucie-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "À cette heure-ci ? Si c'est pour une lettre urgente, c'est non. Si c'est pour regarder les étoiles, j'ai un pied d'appareil.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Vous vous relayez, ou quoi ? Ta moitié est passée l'autre nuit. Je vais finir par vous distribuer des horaires.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

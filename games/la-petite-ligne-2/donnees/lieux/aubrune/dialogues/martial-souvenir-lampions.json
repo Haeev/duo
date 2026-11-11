@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-lampions",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.decor.veillee"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Les lampions du quai restent allumés depuis la Veillée. De la côte, à vélo, on dirait une crèche avec des rails. Je ne le dirai pas en chaire.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-cadeau",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.martial.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.martial.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.martial-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.martial-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Un cadeau ! D'ordinaire, on me donne des œufs, des intentions et des pneus usés. Celui-ci, je le garde pour moi. On me le pardonnera.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ta moitié d'abord, toi ensuite ! Deux offrandes d'un même foyer. Mon tronc est trop petit. Je prendrai la sacoche.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

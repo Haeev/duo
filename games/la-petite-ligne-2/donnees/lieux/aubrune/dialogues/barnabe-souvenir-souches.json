@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-souches",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.coupe",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Vous avez coupé là-haut avant mon retour. J'ai vu les souches: propres. Tu as demandé pardon à l'arbre ? Moi, toujours.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "lucie-souvenir-veillee",
+  "villager": "lucie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Le matin de la Veillée, j'ai pris quarante photos. Trente-neuf floues. Je riais, ou je pleurais: dans les deux cas, ça bouge.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

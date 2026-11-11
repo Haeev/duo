@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "leon-souvenir-cadeau",
+  "villager": "leon",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.leon.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.leon.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.leon-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.leon-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Un cadeau ! J'en ai déjà eu des tas. Enfin, quelques-uns. Enfin, c'est le premier d'ici. Merci.",
+      "emote": "joy",
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ta moitié m'en a donné un aussi ! Ça m'en fait cent. Enfin, deux. Mais deux de la même maison, c'est rare.",
+      "emote": "joy",
+      "next": null
+    }
+  }
+}

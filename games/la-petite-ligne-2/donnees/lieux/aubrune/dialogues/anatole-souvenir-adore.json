@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "anatole-souvenir-adore",
+  "villager": "anatole",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.anatole.adore.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.anatole.adore.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Un billet poinçonné. De ma pince: je reconnais le trou. Il est net. ... On ne me rend jamais mon travail. Je le garde.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

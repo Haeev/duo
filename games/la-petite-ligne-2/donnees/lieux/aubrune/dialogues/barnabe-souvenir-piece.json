@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "barnabe-souvenir-piece",
+  "villager": "barnabe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.maison-du-garde.etage",
+      "equals": "restored"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Un étage ! Les poutres, c'est du chêne de la coupe ? Tape dessus un coup: si ça sonne clair, c'est un des miens.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

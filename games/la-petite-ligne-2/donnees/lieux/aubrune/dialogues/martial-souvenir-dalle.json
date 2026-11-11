@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "martial-souvenir-dalle",
+  "villager": "martial",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.dalle",
+      "equals": "fait"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Au cimetière, sur la dalle des Lacombe, il reste une place nue. Firmin la fleurit le jeudi. Je ne demande rien. On arrose côte à côte.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

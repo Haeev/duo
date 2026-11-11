@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "paulin-souvenir-pluie",
+  "villager": "paulin",
+  "priority": 30,
+  "when": [
+    {
+      "type": "weather_is",
+      "weathers": ["rain", "storm"]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.paulin-souvenir-pluie.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.paulin-souvenir-pluie.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Il pleut. Bien. La terre boit. Ne me dis pas que c'est triste: ici, c'est la pluie qui travaille, et elle ne demande rien.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Ta moitié est venue sous l'averse, toi aussi. Chez vous, on n'est pas en sucre. C'est le premier compliment que je fais cette année.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

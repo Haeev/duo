@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "armand-souvenir-veille",
+  "villager": "armand",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.armand-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.armand-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Oh ! Tu m'as fait peur. Je... je corrige tard. Ne dis pas aux élèves que je dors avec une lampe allumée.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Encore quelqu'un de chez vous, la nuit ! Ta moitié m'a fait renverser l'encrier, l'autre soir. Cette fois, j'ai tenu bon.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

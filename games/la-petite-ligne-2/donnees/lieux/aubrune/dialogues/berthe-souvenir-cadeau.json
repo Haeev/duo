@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-cadeau",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "habitants.berthe.cadeaux.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "habitants.berthe.cadeaux.j1"
+        }
+      ]
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.berthe-souvenir-cadeau.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.berthe-souvenir-cadeau.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Un cadeau. Bon. Je le montre à ma meule: elle aime savoir ce qui entre ici. Elle dit merci. Moi aussi, mais elle l'a dit avant.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ta moitié, puis toi. Ma meule dit que vous lorgnez sur la farine. Moi, je dis que chez vous, on sait vivre.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "rosalie-souvenir-retard",
+  "villager": "rosalie",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.fini"
+    },
+    {
+      "type": "time_is",
+      "from": 840,
+      "to": 880
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.rosalie-souvenir-retard.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.rosalie-souvenir-retard.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Tu arrives à la dernière minute ! Georgette souffle déjà. Parle vite, ou parle en marchant: elle ne sait pas attendre.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "rosalie",
+      "text": "Ta moitié aussi arrive quand je desserre les freins. Chez vous, on aime les quais qui bougent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

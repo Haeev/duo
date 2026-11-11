@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "solange-souvenir-jaloux",
+  "villager": "solange",
+  "priority": 30,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "amitie.solange.coeur-1.j0"
+        },
+        {
+          "type": "remembered",
+          "key": "amitie.solange.coeur-1.j1"
+        }
+      ]
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "bond_at_least",
+        "villager": "solange",
+        "points": 100
+      }
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié a déjà un surnom chez moi. Toi, je cherche encore. Un surnom, ça se mérite: il faut que tu m'aies fait rire trois fois.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

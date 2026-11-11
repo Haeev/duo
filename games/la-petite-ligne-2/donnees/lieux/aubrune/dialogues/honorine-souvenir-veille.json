@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "id": "honorine-souvenir-veille",
+  "villager": "honorine",
+  "priority": 30,
+  "when": [
+    {
+      "type": "time_is",
+      "from": 1320,
+      "to": 300
+    }
+  ],
+  "once": "player",
+  "start": "qui",
+  "nodes": {
+    "qui": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.honorine-souvenir-veille.j0"
+            },
+            {
+              "type": "remembered",
+              "key": "dialogues.aubrune.honorine-souvenir-veille.j1"
+            }
+          ],
+          "next": "moitie"
+        }
+      ],
+      "otherwise": "souvenir"
+    },
+    "souvenir": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Tu ne dors pas ? À mon âge, on dort par politesse. La nuit, je compte les fenêtres allumées. Avec la vôtre, ça en fait une de plus.",
+      "emote": null,
+      "next": null
+    },
+    "moitie": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié est venue l'autre nuit. Je lui ai raconté ma fugue de 1950. Demande-lui si elle m'a crue.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "berthe-souvenir-fantome",
+  "villager": "berthe",
+  "priority": 30,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fantome.fini"
+    }
+  ],
+  "once": "player",
+  "start": "souvenir",
+  "nodes": {
+    "souvenir": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Mon fantôme pesait quatre-vingt-dix kilos et sentait le beurre. Ma meule le savait avant moi. Elle n'a rien dit: elle est loyale.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

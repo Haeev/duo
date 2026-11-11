@@ -81,8 +81,8 @@
     ],
     "gifts": {
       "loved": ["billet-poinconne"],
-      "liked": [],
-      "disliked": []
+      "liked": ["lanterne", "soupe-aux-herbes", "oeuf-au-plat", "tartine"],
+      "disliked": ["sandwich", "goujon"]
     },
     "arrives": [
       {
