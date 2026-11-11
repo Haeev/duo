@@ -190,6 +190,15 @@ export function createHud(
         `${fill(TEXTS.clock.label, { n: world.common.day, heure: c.time, montant: c.money })} ${TEXTS.clock.weather[weather]}.`,
       );
       show(gain, now < gainUntil);
+      if (now < gainUntil) {
+        // Fondu d'entrée mené ici, sans animation CSS: animée par le navigateur, la pastille
+        // ouvrait un trou dans le canevas 3D sous la boutique (rendu logiciel, banc des briques).
+        const t = Math.min(1, (now - (gainUntil - UI_TUNING.moneyFloatMs)) / UI_TUNING.moneyRiseMs);
+        const opacity = t.toFixed(2);
+        const lift = `translateY(${((1 - t) * 0.5).toFixed(3)}rem)`;
+        if (gain.style.opacity !== opacity) gain.style.opacity = opacity;
+        if (gain.style.transform !== lift) gain.style.transform = lift;
+      }
 
       const glancing = glance.active(now);
       const me = world.players[local];

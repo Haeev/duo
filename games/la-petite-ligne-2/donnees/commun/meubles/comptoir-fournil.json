@@ -13,7 +13,8 @@
   "bricks": [
     {
       "brick": "shop",
-      "shop": "fournil-pradel"
+      "shop": "fournil-pradel",
+      "held": true
     }
   ]
 }

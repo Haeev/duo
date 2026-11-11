@@ -15,4 +15,6 @@ export const SHOP_INTENTS = [
     chest: v.boolean(),
   }),
   v.strictObject({ type: v.literal('shop_sell'), shop: IdSchema, item: IdSchema, count: Count }),
+  /** « Parler » de l'écran de boutique: la conversation avec le commerçant, s'il est là. */
+  v.strictObject({ type: v.literal('shop_talk'), shop: IdSchema }),
 ] as const;

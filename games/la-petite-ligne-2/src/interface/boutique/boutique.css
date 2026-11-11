@@ -168,9 +168,37 @@
 }
 .lpl-ui .shop-bigtabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
+}
+.lpl-ui .shop-bigtabs__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+/* « Parler »: plus discret que les deux onglets, le commerçant reste à portée de voix. */
+.lpl-ui .shop-talk {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 4rem;
+  padding: 0 1rem;
+  background: var(--paper-raised);
+  border: 0.125rem solid var(--ink);
+  border-radius: 0.875rem;
+  box-shadow: var(--shadow-1);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+.lpl-ui .shop-talk .ic {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.lpl-ui .shop-talk .key {
+  font-size: 0.75rem;
 }
 .lpl-ui .shop-bigtab {
   display: flex;

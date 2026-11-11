@@ -6,8 +6,22 @@ export interface DialogueTuning {
    * nœud réservé (refusé dans les fichiers de dialogue) et identifiants de ses deux options.
    */
   readonly shopOffer: { readonly node: string; readonly open: string; readonly leave: string };
+  /**
+   * Priorité à partir de laquelle un dialogue a quelque chose à dire (histoire, quête, souvenir,
+   * première rencontre, remarque sur l'hygiène): au comptoir tenu, il passe avant la boutique, et
+   * l'offre de la boutique ne le suit pas. En dessous: conversation ordinaire (quotidien).
+   */
+  readonly pendingPriority: number;
+  /**
+   * Fait daté « entendu » d'un dialogue qui se répète (`once` nul) et qui a quelque chose à dire:
+   * `<préfixe>.<lieu>.<dialogue>.j<joueur>`. Entendu dans la journée, il ne repasse plus avant
+   * la boutique du comptoir tenu.
+   */
+  readonly heardPrefix: string;
 }
 
 export const DIALOGUES: DialogueTuning = {
   shopOffer: { node: 'offre-du-commerce', open: 'voir-le-commerce', leave: 'au-revoir' },
+  pendingPriority: 10,
+  heardPrefix: 'entendu',
 };

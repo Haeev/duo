@@ -85,8 +85,12 @@ export const BRICK_SCHEMAS = [
     brick: v.literal('store'),
     slots: v.pipe(IntSchema, v.minValue(1), v.maxValue(40)),
   }),
-  /** Vendre et acheter: le comptoir d'un commerce du lieu (`commerces/<id>.json`). */
-  v.strictObject({ brick: v.literal('shop'), shop: IdSchema }),
+  /**
+   * Vendre et acheter: le comptoir d'un commerce du lieu (`commerces/<id>.json`). `held`: comptoir
+   * tenu par son commerçant, qui se tient derrière; depuis le côté client, la touche d'action
+   * s'adresse à lui quand il a quelque chose à dire (`simulation/commerces/brique.ts`).
+   */
+  v.strictObject({ brick: v.literal('shop'), shop: IdSchema, held: v.optional(v.boolean()) }),
   /** Cuisiner ou fabriquer: les recettes de ce poste. */
   v.strictObject({ brick: v.literal('cook'), station: v.picklist(STATIONS) }),
   /** Ouvrir et fermer (porte, portillon, volet). */

@@ -29,6 +29,7 @@ import { createSceneOverlay } from './histoire/scene';
 import { createSceneLine } from './histoire/replique';
 import { createHud, type ProjectToScreen } from './hud';
 import { createRunHint } from './astuce-course';
+import { createDecisionBanner } from './rappel-decision';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
 import { spriteMarkup } from './pictos';
@@ -144,6 +145,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
 
   let now = 0;
   const hud = createHud(layer, view.content, keyLabel, options.projectToScreen);
+  const decisionBanner = createDecisionBanner(layer, view.content);
   const runHint = createRunHint(
     view.content,
     typeof localStorage === 'undefined' ? null : localStorage,
@@ -601,6 +603,8 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         needsAlways: settingsUi().needsAlways,
         questTarget: questMarker(world, me),
       });
+      // Rappel durable d'une décision à deux: caché sous un menu, visible pendant le dialogue.
+      decisionBanner.frame(world, me, notebook.isOpen() || shopOpen || editor.isOpen(), now);
       if (runHint.frame(dtMs / 1000, world, me, menu || sceneLine.inScene()))
         hud.notice(now, 'info', fill(TEXTS.notices.runHint, { touche: keyLabel('ShiftLeft') }));
       layer.classList.toggle('lpl-ui--menu', notebook.isOpen() || shopOpen);
@@ -627,6 +631,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       fishing.dispose();
       keyTarget.removeEventListener('keydown', onKey);
       hud.dispose();
+      decisionBanner.dispose();
       dialogue.dispose();
       notebook.dispose();
       shop.dispose();

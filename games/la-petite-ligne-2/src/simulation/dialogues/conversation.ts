@@ -15,6 +15,7 @@ import { evaluateAll, type RuleContext } from '../regles/conditions';
 import { applyEffects } from '../regles/effets';
 import { recall, remember } from '../regles/memoire';
 import { RULES } from '../regles/reglages';
+import { choiceOf, decisionState } from '../quetes/decisions';
 import { agreeFor } from './accords';
 import { greet } from './amitie';
 import { shopOffered, talkingShop } from './commerce';
@@ -59,6 +60,52 @@ export function pickDialogue(
     if (best === null || dialogue.priority > best.priority) best = dialogue;
   }
   return best;
+}
+
+/** Clé du fait « entendu » d'un dialogue qui se répète et qui a quelque chose à dire. */
+export function heardKey(place: string, dialogue: DialogueDef, player: PlayerIndex): string {
+  return `${DIALOGUES.heardPrefix}.${place}.${dialogue.id}.j${String(player)}`;
+}
+
+/** Ce dialogue a quelque chose à dire (histoire, quête, souvenir), au-delà du quotidien. */
+export function hasNews(dialogue: DialogueDef): boolean {
+  return dialogue.priority >= DIALOGUES.pendingPriority;
+}
+
+/**
+ * Ce dialogue attend encore la réponse de ce joueur à une décision à deux qu'il offre (option à
+ * effet `choose`): il n'a rien choisi, ou les deux avis divergent et il peut changer d'avis.
+ */
+function awaitsAnswer(world: ReadonlyWorld, player: PlayerIndex, dialogue: DialogueDef): boolean {
+  for (const node of Object.values(dialogue.nodes)) {
+    if (node.kind !== 'choice') continue;
+    for (const option of node.options)
+      for (const effect of option.effects) {
+        if (effect.type !== 'choose') continue;
+        const state = decisionState(world, effect.decision);
+        if (state === 'split') return true;
+        if (state !== 'agreed' && choiceOf(world, effect.decision, player) === null) return true;
+      }
+  }
+  return false;
+}
+
+/**
+ * Le dialogue que cet habitant a en attente pour ce joueur, `null` s'il n'a que le quotidien à
+ * dire: le plus prioritaire, s'il a quelque chose à dire et n'a pas déjà été entendu ce jour (un
+ * dialogue `once` ne se rejoue jamais, il est donc toujours neuf). Une décision à deux qui attend
+ * la réponse de ce joueur le garde en attente, même entendu.
+ */
+export function pendingDialogue(
+  look: { readonly world: ReadonlyWorld; readonly content: Content },
+  player: PlayerIndex,
+  villager: string,
+): DialogueDef | null {
+  const dialogue = pickDialogue(look, player, villager);
+  if (dialogue === null || !hasNews(dialogue)) return null;
+  if (dialogue.once !== null || awaitsAnswer(look.world, player, dialogue)) return dialogue;
+  const heard = recall(look.world, heardKey(look.world.common.place, dialogue, player));
+  return heard !== null && heard.day === look.world.common.day ? null : dialogue;
 }
 
 /** Une option est un échange (effets qui comptent) et l'hygiène du joueur la fait échouer. */
@@ -179,6 +226,7 @@ export function startTalk(sim: SimContext, player: PlayerIndex, villager: string
       true,
       dialogue.once === 'duo' ? 'duo' : player,
     );
+  else if (hasNews(dialogue)) remember(sim, heardKey(place.def.id, dialogue, player), true, player);
   state.talk = { villager, dialogue: dialogue.id, node: dialogue.start };
   villagerState.met[player] = true;
   villagerState.talkingWith = player;

@@ -1,7 +1,8 @@
 // GABARIT: un commerce d'un lieu (cahier 4.6: on ne vend qu'aux commerçants, chacun à son prix).
 // Créer: pnpm nouveau commerce <id> <lieu>   -> donnees/lieux/<lieu>/commerces/<id>.json
 // Schéma: src/donnees/schemas/commerce.ts. Moteur: src/simulation/commerces/ (rien à y toucher).
-// Pour l'ouvrir en jeu: un meuble comptoir avec la brique { "brick": "shop", "shop": "<id>" },
+// Pour l'ouvrir en jeu: un meuble comptoir avec la brique { "brick": "shop", "shop": "<id>" }
+// ("held": true quand le commerçant se tient derrière: de face, on lui parle par-dessus),
 // posé sur la carte du lieu, et/ou en parlant au commerçant: le champ "talk" (en bas) ajoute le
 // choix à la fin de chacun de ses dialogues; un dialogue peut aussi porter l'effet
 // { "type": "open_shop", "shop": "<id>" } là où il le veut. L'identifiant doit être unique dans tout le jeu.
@@ -63,8 +64,10 @@
     "sold": "Voilà qui fera mon affaire.",
     "noMoney": "Ah. Il manque quelques sous, je crois.",
   },
-  // Recommandé: le choix offert à la FIN de toute conversation avec le commerçant, boutique
-  // ouverte (open: ouvre la boutique, leave: clôt). Ainsi un dialogue de quête ne cache jamais
-  // la boutique. Pas de page en plus si le dialogue joué ouvre déjà ce commerce (open_shop).
+  // Recommandé: le choix offert à la fin d'une conversation ordinaire avec le commerçant,
+  // boutique ouverte (open: ouvre la boutique, leave: clôt). Jamais après un dialogue qui a
+  // quelque chose à dire (priorité 10 et plus: histoire, quête), ni si le dialogue joué ouvre
+  // déjà ce commerce (open_shop). Le comptoir tenu ("held") ouvre la boutique dès que ce
+  // dialogue a été entendu dans la journée: une quête ne cache jamais la boutique.
   "talk": { "open": "Voyons ce que tu vends.", "leave": "Une autre fois." },
 }

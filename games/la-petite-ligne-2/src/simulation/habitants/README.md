@@ -15,7 +15,7 @@ Un habitant vit si sa fiche a un bloc `life` (schéma `src/donnees/schemas/vie-h
 ## Règles
 
 - **Planning**: la première ligne qui convient l'emporte. Les lignes sans filtre couvrent les 24 heures (contrôlé), et à 3 h il est chez lui (`home`). Le jour 1 est un lundi; une saison dure `clock.seasonDays` jours, en partant du printemps.
-- **Jamais dans le vide**: une ligne se tient à un point de la carte, sur une place d'un meuble à brique `sit` (même placement que la brique), ou devant ou derrière un meuble. Un point déjà tenu par un autre habitant: il prend une place libre de la couronne autour.
+- **Jamais dans le vide**: une ligne se tient à un point de la carte, sur une place d'un meuble à brique `sit` (même placement que la brique), ou devant ou derrière un meuble. Deux personnages ne s'arrêtent jamais sur la même place: un point déjà tenu par un autre habitant, ou visé par un autre qui y marche encore (deux plannings au même point à la même heure), et il prend une place libre de la couronne autour (`spread`; test `tests/deux-au-meme-point.test.ts`).
 - **Descente dégagée**: aucun poste à moins de `arrivalClearance` (2,2 m) du point d'arrivée des joueurs (`station.arrival`); un poste trop proche est repoussé sur ce cercle, dans son propre sens, ou derrière les joueurs s'il tombe sur le point même (première place libre parmi `arrivalClearanceSteps`).
 - **Retour au poste**: à plus de `returnDistance` de son but sans trajet (mené ailleurs par une scène, poussé), il y retourne à pied à la relecture suivante du planning; jamais pendant une scène, une conversation ou assis.
 - **Commerces**: une ligne `shop` ouvre le commerce quand le commerçant est arrivé à son poste (`isShopOpen`). Un commerçant sans `life` suit les heures du commerce.

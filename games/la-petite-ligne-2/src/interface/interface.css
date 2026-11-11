@@ -237,17 +237,12 @@
   color: var(--ink);
   font-weight: 800;
   font-size: 0.875rem;
-  animation: gain 1.2s var(--ease) both;
+  /* Fondu d'entrée mené par `hud.ts` (pas d'animation CSS: voir là-bas). */
 }
-@keyframes gain {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-  20% {
-    opacity: 1;
-    transform: none;
-  }
+/* Sous un menu (boutique), le panneau couvrirait la pastille: elle passe à droite de la bourse. */
+.lpl-ui--menu .purse__gain {
+  left: calc(100% + 0.5rem);
+  bottom: 0.625rem;
 }
 .lpl-ui .coin {
   width: 1.375rem;
@@ -437,6 +432,66 @@
     opacity: 0;
     transform: translateY(-0.75rem);
   }
+}
+
+/*
+ * Rappel d'une décision à deux ouverte (`rappel-decision.ts`): bandeau discret en haut au centre,
+ * au thème sombre (panneau brun presque noir, texte clair et chaud, liseré bouton d'or), quel que
+ * soit le thème du reste. Le désaccord se dit par un liseré en tirets, pas par la seule couleur.
+ */
+.lpl-ui .decision-rappel {
+  --rappel-fond: #221d1b;
+  --rappel-texte: #f0e4c8;
+  --rappel-doux: #b9aa8d;
+  --rappel-accent: #ffc83d;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.4375rem 0.875rem;
+  background: var(--rappel-fond);
+  color: var(--rappel-texte);
+  border: 0.125rem solid var(--rappel-accent);
+  border-radius: 0.75rem;
+  box-shadow: 0.125rem 0.125rem 0 0 rgb(0 0 0 / 0.5);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.lpl-ui .decision-rappel[hidden] {
+  display: none;
+}
+.lpl-ui .decision-rappel > .ic {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--rappel-accent);
+}
+.lpl-ui .decision-rappel__titre {
+  display: block;
+  color: var(--rappel-accent);
+  font-weight: 800;
+}
+.lpl-ui .decision-rappel__texte {
+  display: block;
+  color: var(--rappel-texte);
+}
+.lpl-ui .decision-rappel--desaccord {
+  border-style: dashed;
+}
+/* Dans le HUD: en haut au centre, entre l'horloge et les avis, sous les menus. */
+.lpl-ui > .decision-rappel {
+  position: absolute;
+  left: 50%;
+  top: 0.75rem;
+  z-index: 39;
+  max-width: min(34rem, calc(100% - 34rem));
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: fondu var(--d-slow) var(--ease) both;
+}
+/* Dans l'onglet Quêtes du carnet: une ligne en tête, au-dessus des suites. */
+.lpl-ui .decision-rappel--carnet {
+  margin-bottom: 0.75rem;
 }
 
 /* Jeton */

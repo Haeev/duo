@@ -2,12 +2,13 @@
  * Lecture de l'histoire pour l'interface (lot L7), chez l'hôte comme chez l'invité: carnet des
  * quêtes, scènes à relire, direction du coup d'œil. Fonctions pures sur l'état reçu.
  */
-import type { Content } from '../../donnees/charger';
+import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ChapterEndDef, QuestLineDef, StepEffect } from '../../donnees/schemas/quete';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { agreeFor } from '../dialogues/accords';
 import { doorChain } from '../lieux/traversee';
+import { choiceOf, decisionState } from './decisions';
 import { sceneSeenOn } from './faits';
 import { activeSteps, currentChapter, findQuest } from './moteur';
 import { STORY } from './reglages';
@@ -160,6 +161,85 @@ export function glanceTarget(
     }
   }
   return null;
+}
+
+/**
+ * Rappel d'une décision à deux encore ouverte (HUD et carnet), pour ce joueur. Tout se lit dans les
+ * données: le titre de la suite nomme la décision; l'habitant et les mots du choix sont ceux du
+ * dialogue qui l'offre (option qui porte l'effet `choose`).
+ */
+export interface DecisionReminder {
+  readonly quest: string;
+  readonly decision: string;
+  /** Titre de la suite (la décision nommée). */
+  readonly title: string;
+  /** `waiting`: un seul a choisi; `split`: deux avis différents. */
+  readonly state: 'waiting' | 'split';
+  /** À qui le dire (identifiant et nom), `null`: aucun dialogue du lieu ne l'offre. */
+  readonly villager: { readonly id: string; readonly name: string } | null;
+  /** Les mots du choix de ce joueur et de l'autre, accordés; `null`: pas encore choisi. */
+  readonly mine: string | null;
+  readonly theirs: string | null;
+}
+
+/** Le dialogue qui offre cette option de la décision, et les mots de l'option (sans point final). */
+function decisionOffer(
+  place: PlaceContent,
+  decision: string,
+  option: string | null,
+): { villager: string; text: string | null } | null {
+  let first: { villager: string; text: string | null } | null = null;
+  for (const dialogue of place.dialogues)
+    for (const node of Object.values(dialogue.nodes)) {
+      if (node.kind !== 'choice') continue;
+      for (const o of node.options)
+        for (const effect of o.effects) {
+          if (effect.type !== 'choose' || effect.decision !== decision) continue;
+          if (effect.option === option)
+            return { villager: dialogue.villager, text: o.text.replace(/[.!]+$/u, '') };
+          first ??= { villager: dialogue.villager, text: null };
+        }
+    }
+  return first;
+}
+
+/** Les décisions à deux ouvertes (étape en cours, pas encore prise) où l'un au moins a choisi. */
+export function decisionReminders(
+  world: ReadonlyWorld,
+  content: Content,
+  player: PlayerIndex,
+): DecisionReminder[] {
+  const out: DecisionReminder[] = [];
+  const other: PlayerIndex = player === 0 ? 1 : 0;
+  for (const [quest, progress] of Object.entries(world.progress.quests)) {
+    if (progress.done) continue;
+    const found = findQuest(content, quest);
+    const place = found === null ? undefined : content.places[found.place];
+    if (found === null || place === undefined) continue;
+    for (const step of activeSteps(found.line, progress.passed ?? [])) {
+      const decision = step.decision?.id;
+      if (decision === undefined) continue;
+      const state = decisionState(world, decision);
+      if (state !== 'waiting' && state !== 'split') continue;
+      const words = (who: PlayerIndex): string | null => {
+        const choice = choiceOf(world, decision, who);
+        const text = choice === null ? null : decisionOffer(place, decision, choice)?.text;
+        return text === null || text === undefined ? choice : agreeFor(world, player, text);
+      };
+      const offer = decisionOffer(place, decision, null);
+      const def = offer === null ? undefined : place.villagers.find((v) => v.id === offer.villager);
+      out.push({
+        quest,
+        decision,
+        title: found.line.title,
+        state,
+        villager: def === undefined ? null : { id: def.id, name: def.name },
+        mine: words(player),
+        theirs: words(other),
+      });
+    }
+  }
+  return out;
 }
 
 export interface ChapterEndView {

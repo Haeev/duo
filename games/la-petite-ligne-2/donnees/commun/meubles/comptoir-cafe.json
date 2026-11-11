@@ -13,7 +13,8 @@
   "bricks": [
     {
       "brick": "shop",
-      "shop": "cafe-de-la-halte"
+      "shop": "cafe-de-la-halte",
+      "held": true
     }
   ]
 }

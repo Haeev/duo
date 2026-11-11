@@ -80,7 +80,7 @@ function talkToChief(sim: Sim, option = 'oui'): string[] {
 }
 
 describe('D2: un dialogue de quête ne masque pas la boutique du commerçant', () => {
-  it('après la besace, la sonnerie passe, puis la buvette est proposée et s’ouvre', () => {
+  it('après la besace, la sonnerie passe sans boutique derrière; le comptoir ouvre la buvette', () => {
     const sim = newSim(gameContent());
     put(sim, 0, 20, 16, -Math.PI / 2);
     talkToChief(sim);
@@ -90,14 +90,13 @@ describe('D2: un dialogue de quête ne masque pas la boutique du commerçant', (
     wait(sim, 1);
     const seen = talkToChief(sim);
     expect(seen[0]).toMatch(/^sonnerie-debut#/);
-    const view = talkView(sim.content, sim.world, 0);
-    expect(view?.options.map((o) => [o.id, o.text])).toEqual([
-      [DIALOGUES.shopOffer.open, 'Je regarde ta buvette.'],
-      [DIALOGUES.shopOffer.leave, 'Je passais dire bonjour.'],
-    ]);
-    const events = act(sim, 0, { type: 'talk_choose', option: DIALOGUES.shopOffer.open });
-    expect(events).toContainEqual({ type: 'shop_opened', player: 0, shop: 'buvette-de-la-gare' });
+    // Une réplique de quête ne débouche pas sur la boutique: la conversation se clôt.
     expect(sim.world.players[0].talk).toBeNull();
+    // Le comptoir, lui, ouvre la buvette: la quête ne la cache jamais.
+    put(sim, 0, 24.6, 15, Math.PI);
+    expect(aimOf(sim, 0)).toMatchObject({ id: 'comptoir-buvette', verb: 'Acheter' });
+    const events = act(sim, 0, { type: 'act' });
+    expect(events).toContainEqual({ type: 'shop_opened', player: 0, shop: 'buvette-de-la-gare' });
   });
 
   it('boutique fermée (la nuit): pas de page en plus', () => {
