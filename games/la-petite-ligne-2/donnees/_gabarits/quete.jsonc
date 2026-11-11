@@ -83,6 +83,7 @@
           //   { "type": "give_plan", "plan": "<plan à apprendre>" }
           //   { "type": "give_entry", "entry": "<entrée de collection>" }   (carte postale, musique)
           //   { "type": "give_piece", "piece": "<pièce de tenue à gagner>" }   (étiquette "a-gagner")
+          //   { "type": "adopt_animal", "species": "<espèce>", "name": "<nom>", "shelter": "<abri de la carte>" }
           "onStart": [],
           "onDone": [
             {

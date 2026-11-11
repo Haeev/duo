@@ -15,7 +15,7 @@
     {
       "brick": "craft",
       "station": "workbench",
-      "services": ["make"]
+      "services": ["make", "repair"]
     }
   ]
 }

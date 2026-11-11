@@ -29,6 +29,10 @@ export const ToolSchema = v.strictObject({
   bluntGestureSeconds: v.pipe(FiniteSchema, v.minValue(0.2), v.maxValue(1.5)),
   /** Niveau, puissance par coup, amélioration et réparation (`recolte.ts`); absent: outil de base. */
   work: v.exactOptional(ToolWorkSchema),
+  /** Portée du geste en m (le filet); absente: la portée commune (`temps.json`, `netReach`). */
+  reach: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(4))),
+  /** Émoussé: part des prises qui s'échappent (le filet troué: une sur deux). Absente: aucune. */
+  bluntEscape: v.exactOptional(v.pipe(FiniteSchema, v.minValue(0), v.maxValue(1))),
 });
 
 /** Bonus exclusif d'un repas spécial pris à deux (cahier 4.4, R26): vocabulaire du moteur, pas un plat. */

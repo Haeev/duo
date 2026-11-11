@@ -335,6 +335,72 @@ export function adoptAnimal(
   return null;
 }
 
+/** Bête offerte par l'histoire (effet `adopt_animal`), telle que les données la décrivent. */
+export interface StoryAnimal {
+  readonly species: string;
+  readonly name: string;
+  /** Identifiant du meuble abri, sur la carte d'un lieu ou posé dans un logement. */
+  readonly shelter: string;
+  readonly robe?: string;
+}
+
+/**
+ * L'abri `shelter` où qu'il soit (lieu courant ou autre lieu déjà ouvert): son lieu, ses
+ * paramètres et son état. Un même identifiant d'abri ne sert qu'une fois par jeu (`valider.ts`).
+ */
+function findShelter(
+  sim: SimContext,
+  shelter: string,
+): { params: ShelterBrick; state: ShelterState } | null {
+  for (const placeId in sim.world.places) {
+    const place = sim.world.places[placeId];
+    const state = place?.objects[shelter]?.shelter;
+    if (place === undefined || state === undefined) continue;
+    const type =
+      sim.content.places[placeId]?.map.objects.find((one) => one.id === shelter)?.type ??
+      place.placed.find((one) => one.id === shelter)?.type;
+    const params = type === undefined ? null : paramsOf(sim, type);
+    if (params !== null) return { params, state };
+  }
+  return null;
+}
+
+/**
+ * Une bête offerte par l'histoire arrive, nommée, dans l'abri dit. Déjà là (même nom): rien, pour
+ * qu'un dialogue redit ou une option choisie par les deux ne la donne pas deux fois. Rend le refus,
+ * ou `null`.
+ */
+export function adoptStoryAnimal(
+  sim: SimContext,
+  player: PlayerIndex | null,
+  gift: StoryAnimal,
+): string | null {
+  const found = findShelter(sim, gift.shelter);
+  const species = sim.content.species[gift.species];
+  if (found === null || species === undefined || found.params.species !== gift.species)
+    return 'no-target';
+  const { params, state } = found;
+  if (state.animals.some((one) => one.name === gift.name)) return null;
+  if (state.animals.length >= placeLimit(sim, params)) return 'shelter-full';
+  const robe =
+    species.robes.find((one) => one.id === gift.robe)?.id ?? sim.random.pick(species.robes).id;
+  const animal = state.nextId;
+  state.animals.push({
+    id: animal,
+    name: gift.name.slice(0, 40),
+    robe,
+    love: 0,
+    petted: [0, 0],
+    hungry: 0,
+    since: 0,
+    laid: 0,
+  });
+  state.nextId += 1;
+  sim.touch('place');
+  sim.emit({ type: 'animal_arrived', by: player, target: gift.shelter, animal });
+  return null;
+}
+
 export function buy(sim: SimContext, player: PlayerIndex, id: string): string | null {
   const ref = readShelter(sim, id);
   if (ref === null) return 'no-target';

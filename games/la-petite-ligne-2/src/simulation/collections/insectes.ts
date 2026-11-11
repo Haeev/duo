@@ -12,7 +12,7 @@ import type { Content } from '../../donnees/charger';
 import type { SimContext } from '../noyau/systemes';
 import { calendarOf, minutesSinceDawn } from '../monde/calendrier';
 import { giveItem } from '../sac/actions';
-import { wearTool } from '../sac/outils';
+import { toolCondition, wearTool } from '../sac/outils';
 import { boostedWeight, rarityMet, recordFind } from './registre';
 import { heldToolKind, inCone } from './visee';
 
@@ -137,17 +137,25 @@ export function swingNet(sim: SimContext, player: PlayerIndex, place: PlaceState
   const actor = sim.world.players[player];
   if (heldToolKind(sim.content, actor) !== 'net') return null;
   const { netReach, netHalfAngleDeg } = sim.content.time.file.insects;
+  // Portée et état lus dans la fiche du filet tenu (filet de base, amélioré, émoussé).
+  const stack = actor.selected === null ? null : (actor.toolbar[actor.selected] ?? null);
+  const tool = stack === null ? null : (sim.content.items[stack.item]?.tool ?? null);
+  const reach = tool?.reach ?? netReach;
+  const torn = stack !== null && toolCondition(sim.content, stack) === 'blunt';
   const list = place.insects?.list ?? [];
   let best: InsectState | null = null;
   let bestDistance = Infinity;
   for (const insect of list) {
-    const distance = inCone(actor.body, insect.x, insect.y, netReach, netHalfAngleDeg);
+    const distance = inCone(actor.body, insect.x, insect.y, reach, netHalfAngleDeg);
     if (distance !== null && distance < bestDistance) {
       best = insect;
       bestDistance = distance;
     }
   }
   if (actor.selected !== null) wearTool(sim, player, actor.selected);
+  // Filet troué: une partie des prises passe à travers les mailles.
+  const escape = torn ? (tool?.bluntEscape ?? 0) : 0;
+  if (best !== null && escape > 0 && sim.random.chance(escape)) best = null;
   const caught = best === null ? null : (sim.content.book.insects[best.s] ?? null);
   sim.emit({ type: 'net_swung', player, insect: caught?.id ?? null });
   if (best === null || caught === null || place.insects === undefined) return null;

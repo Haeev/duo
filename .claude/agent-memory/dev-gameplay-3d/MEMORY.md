@@ -774,3 +774,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `InkKit` ne se construit pas dans Node (couches dessinées sur un canevas 2D): `vi.mock` de `encre/textures` (`createInkLayers`, `createNoise` en textures d'un point) et un faux `WebGLRenderer` suffisent pour tester création et libération.
 - La démonstration de l'éditeur en `#miroir` ne s'ouvre pas (apparence non révélée): rouvrir par `window.editeur.mirror()` après une première validation sur la page normale. Thème sombre: poser `dataset.lplStyle = 'encre'` après le chargement (dans `addInitScript`, `documentElement` est nul).
 - Capture d'une page de jeu en rendu logiciel: `page.screenshot` dépasse 120 s; lire `canvas.toDataURL()` juste après un `renderer.frame` dans la page (et recommencer si l'image est vide: le souffle du rendu encré saute des images).
+
+## Petits manques d'Aubrune: blocage, adoption, gestes à deux, séance (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un refus calculé dans `aimOf`/`chooseBrick` (visée) vaut chez l'hôte et chez l'invité: `predictedGesture` ne prédit rien si `aim.refusal` n'est pas nul. Les intentions hors touche d'action (filet, pêche, atelier) se filtrent dans `step` de `noyau/pas.ts`, avant les systèmes.
+- `onlyReliefFor` prenait un `PlayerState` mutable: un `DeepReadonly` du monde ne passe pas (`look.pieces` en lecture seule); typer le paramètre sur `{ tiers }` seul.
+- Une mémoire de coups hors de l'état (WeakMap sur `sim.world`, comme `pendings` des briques ou `workshops`) ne touche ni sauvegarde ni réseau: c'est la voie pour une règle « à deux dans une fenêtre » (`regles/a-deux.ts`).
+- Le SDK envoie `sessionEnd` avec `stats: []` quand la plateforme arrête une séance (`connect.ts`, cas `stop`): seul `SaveSnapshot.progress` atteint l'historique; aucun point d'entrée pour des statistiques de séance d'un jeu `session` sans fin propre.
+- Un objet nouveau exige sa vignette (`tests/interface-plume.test.ts`): variante d'une source voisine par échange de tons, `generer-images.mjs vignettes <id>`, `planche-serie.cjs <dossier> <ids> --grand`, puis `vitest run --clearCache`.
+- Sous une charge de 20 à 25 sur 4 cœurs, les parcours longs d'Aubrune (actes 2 et 3, fêtes, suites) dépassent 20 s: les relancer seuls avec `--testTimeout=200000` pour distinguer lenteur et faute.

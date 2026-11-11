@@ -16,7 +16,18 @@
       "bluntPower": 6,
       "cells": 1,
       "bluntCells": 1,
-      "upgrade": null,
+      "upgrade": {
+        "to": "marteau-forge",
+        "cost": {
+          "cents": 3000,
+          "items": [
+            {
+              "item": "planche",
+              "count": 1
+            }
+          ]
+        }
+      },
       "repair": null
     }
   }

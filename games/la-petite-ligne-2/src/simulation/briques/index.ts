@@ -7,6 +7,7 @@
 import type { BrickId } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Stack } from '../../etat/joueur';
+import { exhaustedActionRefusal } from '../besoins/blocage';
 import { isObjectAbsent } from '../lieux/presents';
 import { findProp, footprintOf, type PropInstance } from '../noyau/obstacles';
 import type { GameSystem, SimContext } from '../noyau/systemes';
@@ -206,6 +207,11 @@ export const brickSystem: GameSystem = {
       if (found === null) return;
       if (distanceToProp(sim, player, found.prop) > sim.content.settings.reach.action) {
         sim.emit({ type: 'refused', player, reason: 'too-far', target: intent.target });
+        return;
+      }
+      const exhausted = exhaustedActionRefusal(sim, player, intent.brick);
+      if (exhausted !== null) {
+        sim.emit({ type: 'refused', player, reason: exhausted, target: intent.target });
         return;
       }
       begin(sim, player, 'prop', intent.target, intent.brick, found.prop.x, found.prop.y);

@@ -10,6 +10,7 @@ import {
   FiniteSchema,
   IntSchema,
   IdSchema,
+  LabelSchema,
   NeedIdSchema,
   type NeedId,
 } from './communs';
@@ -279,5 +280,18 @@ export const EffectSchema = v.variant('type', [
    * sans effet.
    */
   v.strictObject({ type: v.literal('reveal_look'), to: v.exactOptional(EffectTargetSchema) }),
+  /**
+   * Une bête offerte par l'histoire arrive dans un abri de basse-cour (`simulation/elevage/`):
+   * `shelter` est l'identifiant du meuble abri sur la carte (brique `shelter` de cette espèce),
+   * dans n'importe quel lieu déjà ouvert; `name` son nom; `robe` (facultative) une robe de
+   * l'espèce, sinon tirée. Une bête du même nom déjà là: sans effet. Abri plein: refusé.
+   */
+  v.strictObject({
+    type: v.literal('adopt_animal'),
+    species: IdSchema,
+    name: LabelSchema,
+    shelter: IdSchema,
+    robe: v.exactOptional(IdSchema),
+  }),
 ]);
 export type Effect = v.InferOutput<typeof EffectSchema>;

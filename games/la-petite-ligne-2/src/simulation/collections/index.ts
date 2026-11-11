@@ -6,6 +6,7 @@
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
+import { exhaustedIntentRefusal } from '../besoins/blocage';
 import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { currentPlace } from '../sac/actions';
@@ -78,6 +79,15 @@ function intent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   else if (intent.type === 'act' && actor.aim === null) {
     const held = heldToolKind(sim.content, actor);
     if (held === 'net' || held === 'camera') kind = held;
+  }
+  // La touche d'action filet ou appareil en main: un geste de travail, refusé à faim ou sommeil 0.
+  const exhausted =
+    kind === null || intent.type !== 'act'
+      ? null
+      : exhaustedIntentRefusal(sim, player, kind === 'net' ? 'net_swing' : 'photo_take');
+  if (exhausted !== null) {
+    sim.emit({ type: 'refused', player, reason: exhausted, target: null });
+    return;
   }
   if (kind === 'net') swingNet(sim, player, place);
   else if (kind === 'camera') takePhoto(sim, player, place);

@@ -31,6 +31,8 @@ const KEYS = [
   'other-missing-item',
   'other-not-enough-money',
   'story-item',
+  'exhausted-hunger',
+  'exhausted-sleep',
 ];
 
 describe('textes des refus', () => {

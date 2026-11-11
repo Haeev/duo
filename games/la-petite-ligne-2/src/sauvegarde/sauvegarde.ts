@@ -9,6 +9,7 @@ import { DATA_SCHEMA, type WorldState } from '../etat/monde';
 import type { Member } from '../simulation/noyau/monde';
 import { readSave, type ReadFailure } from './format';
 import { matchMembers, seatMembers, settleForResume } from './reprise';
+import { storyProgress } from './seance';
 import { fillText, SAVE_TEXTS } from './textes';
 
 const LABEL_MAX = 40;
@@ -57,8 +58,11 @@ export function labelOf(summary: SaveSummary): string {
  * tout de suite (avant le prochain pas), et une copie profonde coûterait autant que l'écriture.
  */
 export function snapshotOf(world: WorldState, content?: Content): SaveSnapshot {
+  // Avancement de l'histoire: la plateforme le reprend dans la fiche, l'historique et le score.
+  const progress = content === undefined ? null : storyProgress(content, world);
   return {
     label: labelOf(summaryOf(world, content)),
+    ...(progress === null ? {} : { progress }),
     dataSchema: DATA_SCHEMA,
     data: world,
   };

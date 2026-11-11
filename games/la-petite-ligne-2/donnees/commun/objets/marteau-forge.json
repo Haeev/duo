@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "marteau-forge",
+  "name": "Marteau forgé",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "hammer",
+    "durability": 100,
+    "gestureSeconds": 1,
+    "bluntGestureSeconds": 1,
+    "work": {
+      "tier": 1,
+      "power": 9,
+      "bluntPower": 4,
+      "cells": 1,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": {
+        "cents": 0,
+        "items": [
+          {
+            "item": "planche",
+            "count": 1
+          }
+        ]
+      }
+    }
+  }
+}

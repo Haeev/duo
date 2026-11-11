@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "filet-renforce",
+  "name": "Filet renforcé",
+  "makes": {
+    "kind": "upgrade",
+    "from": "filet"
+  },
+  "station": "forge",
+  "materials": [],
+  "work": 1,
+  "source": "start",
+  "series": null
+}

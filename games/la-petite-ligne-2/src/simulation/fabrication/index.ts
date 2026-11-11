@@ -14,6 +14,7 @@ import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { SIM_HZ } from '../noyau/constantes';
 import { bump, remember } from '../regles/memoire';
+import { finishedTogether, noteStrike, togetherCount } from '../regles/a-deux';
 import { giveItem } from '../sac/actions';
 import { pay } from '../sac/argent';
 import { countItem, removeItem } from '../sac/inventaire';
@@ -255,10 +256,12 @@ function strike(sim: SimContext, player: PlayerIndex, target: string): void {
   if (tooSoon(sim, player, hit.seconds)) return;
   job.points = Math.min(plan.work, job.points + hit.power);
   job.struck[player] = true;
+  noteStrike(sim, player, target);
   sim.emit({ type: 'craft_hit', player, target, plan: plan.id, progress: job.points / plan.work });
   if (job.points < plan.work) return;
 
   shop.jobs.delete(target);
+  const together = finishedTogether(sim, target);
   const output = planOutput(plan, job.variant);
   if (output === null || !hasMaterials(sim, job.by, station, plan.materials)) {
     refuse(sim, job.by, 'missing-materials', target);
@@ -273,7 +276,8 @@ function strike(sim: SimContext, player: PlayerIndex, target: string): void {
   }
   const first = (sim.world.progress.memory[planKey(plan.id)]?.v ?? 0) === 0;
   bump(sim, planKey(plan.id), job.struck[0] && job.struck[1] ? 'duo' : job.by);
-  giveItem(sim, job.by, output.item, output.count);
+  // À deux au même établi, dans la fenêtre (R12): l'ouvrage rapporte davantage.
+  giveItem(sim, job.by, output.item, together ? togetherCount(sim, output.count) : output.count);
   sim.emit({
     type: 'crafted',
     player: job.by,

@@ -5,8 +5,10 @@
  * la section, sans changer les systèmes qui les lisent.
  */
 import type { NeedState } from '../../donnees/schemas/besoins';
-import { CENTS_MAX } from '../../donnees/schemas/communs';
+import { CENTS_MAX, type NeedId } from '../../donnees/schemas/communs';
 import type { Effect } from '../../donnees/schemas/regles';
+import type { ActionId } from '../briques/types';
+import type { Intent } from '../noyau/entrees';
 
 export { MEAL_PERKS, type MealPerk } from '../../donnees/schemas/objets';
 
@@ -29,6 +31,36 @@ export interface RulesSettings {
     readonly extraCatchChance: number;
     /** Multiplicateur des prix de rachat (`better_prices`). */
     readonly betterPrices: number;
+    /**
+     * Besoin à 0 dont le palier porte `onlyRelief` (faim, sommeil; cahier 4.4, CA-09): seules
+     * restent permises les actions qui le soulagent (`besoins/blocage.ts`). `relief`: par besoin,
+     * actions de la touche d'action (briques, `pickup`, `talk`) et intentions encore permises.
+     * Parler et commercer restent permis à qui a faim: c'est ainsi qu'on trouve à manger (la
+     * soupe offerte, l'épicerie). `free`: toujours permises (passer une porte, prendre le train),
+     * pour qu'aucun blocage ne soit sans issue. `gatedIntents`: les intentions de travail (hors
+     * touche d'action) soumises au blocage; les autres ne le sont jamais (manger, acheter).
+     */
+    readonly exhausted: {
+      readonly relief: Readonly<
+        Partial<
+          Record<
+            NeedId,
+            { readonly actions: readonly ActionId[]; readonly intents: readonly Intent['type'][] }
+          >
+        >
+      >;
+      readonly free: readonly ActionId[];
+      readonly gatedIntents: readonly Intent['type'][];
+    };
+  };
+  /**
+   * Gestes à deux (cahier R12): quand les deux joueurs ont frappé le même point de récolte ou
+   * travaillé au même établi, chacun au plus `windowSeconds` avant le coup qui termine, le butin
+   * est multiplié par `lootFactor` (la part fractionnaire se tire à l'aléa, pour une moyenne juste).
+   */
+  readonly together: {
+    readonly lootFactor: number;
+    readonly windowSeconds: number;
   };
   readonly bag: {
     /** Distance (m) pour ramasser au sol, donner à l'autre joueur ou ranger dans un meuble. */
@@ -87,7 +119,30 @@ export const RULES: RulesSettings = {
     specialMealKeepAbove: 50,
     extraCatchChance: 0.1,
     betterPrices: 1.1,
+    exhausted: {
+      relief: {
+        hunger: {
+          actions: ['talk', 'shop', 'store', 'pickup', 'gather', 'cook', 'sleep', 'sit'],
+          intents: ['cook_start'],
+        },
+        sleep: { actions: ['sleep', 'sit'], intents: [] },
+      },
+      free: ['passage', 'travel', 'open'],
+      gatedIntents: [
+        'net_swing',
+        'photo_take',
+        'fish_cast',
+        'craft_start',
+        'craft_strike',
+        'craft_tool',
+        'housing_work',
+        'cook_start',
+        'shelter_fill',
+        'shelter_collect',
+      ],
+    },
   },
+  together: { lootFactor: 1.5, windowSeconds: 3 },
   bag: { reach: 1.6 },
   money: { max: CENTS_MAX },
   bonds: { firstTalkOfDay: 5, perHeart: 100, hearts: 5, noGainHygiene: ['blocked', 'low'] },

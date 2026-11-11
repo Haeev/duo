@@ -21,4 +21,22 @@ describe('carnet: quêtes lues dans le moteur', () => {
     const tracked = sources.quests(sim.world, 0).find((q) => q.id === 'sonnerie-essai');
     expect(tracked?.target).not.toBeNull();
   });
+
+  it('hygiène trop basse: l’étape sur dialogue dit « Un brin de toilette d’abord » (cahier 4.4)', () => {
+    const sim = newSim(content);
+    sim.world.progress.quests['sonnerie-essai'] = {
+      chapter: 'un-drole-de-bruit',
+      step: 'parler',
+      done: false,
+    };
+    const sources = worldSources(content);
+    const clean = sources.quests(sim.world, 0).find((q) => q.id === 'sonnerie-essai')?.step ?? '';
+    expect(clean).not.toContain('toilette');
+    sim.world.players[0].tiers.hygiene = 'blocked';
+    const dirty = sources.quests(sim.world, 0).find((q) => q.id === 'sonnerie-essai')?.step ?? '';
+    expect(dirty.startsWith('Un brin de toilette d’abord.')).toBe(true);
+    expect(dirty).toContain(clean);
+    // Le carnet de l'autre joueur, propre, ne change pas.
+    expect(sources.quests(sim.world, 1).find((q) => q.id === 'sonnerie-essai')?.step).toBe(clean);
+  });
 });

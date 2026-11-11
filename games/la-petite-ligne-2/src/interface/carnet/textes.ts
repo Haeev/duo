@@ -14,6 +14,8 @@ export const CARNET_TEXTS = {
     done: 'Terminée',
     together: 'À deux',
     togetherHint: 'Il faut être deux pour cette étape.',
+    /** Hygiène trop basse: l'étape sur dialogue attend une toilette (cahier 4.4). `{etape}`: la ligne. */
+    washFirst: 'Un brin de toilette d’abord. Ensuite : {etape}',
     page: 'Page {n} sur {max}',
     chapter: 'Chapitre {n} sur {max}, {etat}',
     chapterState: { done: 'fait', current: 'en cours', todo: 'à venir' },
