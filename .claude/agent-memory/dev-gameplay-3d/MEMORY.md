@@ -798,3 +798,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Un AABB d'occultation de repère géant (coteau du tunnel, 30 x 19 m) fond tout le repère dès qu'un joueur s'en approche, même devant lui.
 - Capture du trajet en train (10 s): la machine chargée retarde l'horloge de la scène; viser `LPL2_ATTENTE_TRAJET` de 7 s et vérifier l'étape sur l'image.
 - Machine partagée (charge 16 à 21 sur 4 cœurs): les longs fichiers dépassent 20 s et les parcours e2e meurent au battement (« Le jeu ne répond plus »): relancer seuls avec `--testTimeout=120000`.
+## Petits manques d'Aubrune: blocage, adoption, gestes à deux, séance (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Un refus calculé dans `aimOf`/`chooseBrick` (visée) vaut chez l'hôte et chez l'invité: `predictedGesture` ne prédit rien si `aim.refusal` n'est pas nul. Les intentions hors touche d'action (filet, pêche, atelier) se filtrent dans `step` de `noyau/pas.ts`, avant les systèmes.
+- `onlyReliefFor` prenait un `PlayerState` mutable: un `DeepReadonly` du monde ne passe pas (`look.pieces` en lecture seule); typer le paramètre sur `{ tiers }` seul.
+- Une mémoire de coups hors de l'état (WeakMap sur `sim.world`, comme `pendings` des briques ou `workshops`) ne touche ni sauvegarde ni réseau: c'est la voie pour une règle « à deux dans une fenêtre » (`regles/a-deux.ts`).
+- Le SDK envoie `sessionEnd` avec `stats: []` quand la plateforme arrête une séance (`connect.ts`, cas `stop`): seul `SaveSnapshot.progress` atteint l'historique; aucun point d'entrée pour des statistiques de séance d'un jeu `session` sans fin propre.
+- Un objet nouveau exige sa vignette (`tests/interface-plume.test.ts`): variante d'une source voisine par échange de tons, `generer-images.mjs vignettes <id>`, `planche-serie.cjs <dossier> <ids> --grand`, puis `vitest run --clearCache`.
+- Sous une charge de 20 à 25 sur 4 cœurs, les parcours longs d'Aubrune (actes 2 et 3, fêtes, suites) dépassent 20 s: les relancer seuls avec `--testTimeout=200000` pour distinguer lenteur et faute.

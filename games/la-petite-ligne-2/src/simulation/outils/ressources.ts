@@ -12,6 +12,7 @@ import type { HarvestState } from '../../donnees/schemas/recolte-briques';
 import type { DeepReadonly } from '../../etat/monde';
 import type { BrickBehaviour, BrickView, Look } from '../briques/types';
 import type { SimContext } from '../noyau/systemes';
+import { finishedTogether, noteStrike, togetherCount } from '../regles/a-deux';
 import { giveItem } from '../sac/actions';
 import { newStack } from '../sac/inventaire';
 import { drawLoot, lootAvailable, type Drawn } from './butin';
@@ -125,6 +126,7 @@ export const harvestBehaviour: BrickBehaviour<HarvestBrick> = {
     }
     const held = resource.tool === null ? null : heldOf(sim, player);
     strike(sim, player, held?.slot ?? null, resource.effort, resource.dirty);
+    noteStrike(sim, player, target.id);
     state.work = Math.min(resource.work, state.work + strokePower(sim, player, resource));
     const done = state.work >= resource.work;
     sim.emit({
@@ -140,6 +142,9 @@ export const harvestBehaviour: BrickBehaviour<HarvestBrick> = {
       state.back = sim.world.common.day + resource.respawnDays;
       const { rareLuck, extraCatch } = luckOf(sim, player);
       const drawn = drawLoot(sim, resource, rareLuck, extraCatch);
+      // À deux sur le même point (R12): le butin est multiplié.
+      if (finishedTogether(sim, target.id))
+        for (const one of drawn) one.count = togetherCount(sim, one.count);
       if (resource.toGround) dropAround(sim, target.x, target.y, drawn);
       else for (const { item, count } of drawn) giveItem(sim, player, item, count);
       for (const { item, count, rare } of drawn)

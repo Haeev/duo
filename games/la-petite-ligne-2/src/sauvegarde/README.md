@@ -9,6 +9,7 @@ L'état complet (tous les lieux) en JSON, un seul emplacement, écrit par l'hôt
 | `reprise.ts`     | `matchMembers`/`seatMembers` (règle de l'invité différent), `settleForResume` (remise d'aplomb)                        |
 | `declencheur.ts` | écriture à l'aube et à chaque arrivée en train, sur demande; hors du pas, une à la fois                                |
 | `textes.ts`      | textes français de la fiche du salon et des messages de reprise                                                        |
+| `seance.ts`      | avancement de l'histoire (`storyProgress`), relevé et résumé d'une séance (`tallyOf`, `sessionSummary`)                |
 
 ## Quand ça s'écrit
 
@@ -19,7 +20,7 @@ L'état complet (tous les lieux) en JSON, un seul emplacement, écrit par l'hôt
 
 ## Fiche du salon
 
-`label` (40 caractères): `Lieu, jour N, H h MM (Prénom et Prénom)`. Si c'est trop long, les prénoms sautent, puis le nom du lieu est coupé. Pas de `progress` tant que le cahier ne définit pas l'avancement de l'histoire.
+`label` (40 caractères): `Lieu, jour N, H h MM (Prénom et Prénom)`. Si c'est trop long, les prénoms sautent, puis le nom du lieu est coupé. `progress` (0 à 1, `seance.ts`): étapes franchies sur toutes les étapes des suites principales en actes (`kind: "main"` avec `saga`: aujourd'hui l'histoire d'Aubrune); la plateforme le reprend dans l'historique et le score cumulé. `sessionSummary` résume une séance en trois nombres (jours vécus, étapes de quête franchies, entrées de collection ajoutées) depuis le relevé `tallyOf` de son ouverture; le SDK ne permet pas encore de les envoyer quand la plateforme arrête la séance (voir le compte rendu du 2026-11-11).
 
 ## Reprise
 

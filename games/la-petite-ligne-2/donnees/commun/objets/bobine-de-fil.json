@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "bobine-de-fil",
+  "name": "Bobine de fil",
+  "family": "supply",
+  "stack": 5,
+  "food": null,
+  "tool": null
+}

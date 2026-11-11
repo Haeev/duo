@@ -16,7 +16,11 @@ import { glanceTarget, journal } from '../../simulation/quetes/lecture';
 import { collectionBook } from '../../simulation/collections/registre';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { GraphicsOptions } from '../../rendu/options';
+import type { QuestLineDef } from '../../donnees/schemas/quete';
+import { RULES } from '../../simulation/regles/reglages';
+import { fill } from '../textes';
 import { UI_TUNING } from '../reglages';
+import { CARNET_TEXTS } from './textes';
 import type { PlanRead } from './plan';
 
 // ---------- Quêtes ----------
@@ -243,6 +247,19 @@ function targetOf(
   return spot === undefined ? null : { x: spot.x, y: spot.y };
 }
 
+/** Une étape ouverte se franchit en parlant à un habitant, et l'hygiène la ferait échouer. */
+function waitsForWash(
+  dirty: boolean,
+  entry: { readonly done: boolean; readonly steps: readonly { readonly id: string }[] },
+  def: QuestLineDef | undefined,
+): boolean {
+  if (!dirty || entry.done || def === undefined) return false;
+  const open = new Set(entry.steps.map((st) => st.id));
+  return def.chapters.some((c) =>
+    c.steps.some((st) => open.has(st.id) && st.target !== null && 'villager' in st.target),
+  );
+}
+
 /** Adaptateurs sur l'état réel; ce qui manque est vide (jamais inventé). */
 export function worldSources(content: Content, extras: WorldSourcesExtras = {}): CarnetSources {
   return {
@@ -250,6 +267,8 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
       // Le moteur de quêtes fait foi: étapes ouvertes (en parallèle comprises), textes accordés
       // pour ce joueur, repère du coup d'œil quand la suite est suivie.
       const glance = glanceTarget(world, content, local);
+      // Hygiène trop basse: une étape sur dialogue attend (cahier 4.4), le carnet le dit.
+      const dirty = RULES.dialogue.failHygiene.includes(world.players[local].tiers.hygiene);
       return journal(world, content, local).map((entry) => {
         const place = content.places[entry.place];
         const def = place?.quests[entry.quest];
@@ -278,7 +297,11 @@ export function worldSources(content: Content, extras: WorldSourcesExtras = {}):
             state: entry.done || i < index ? 'done' : i === index ? 'current' : 'todo',
           })),
           finished: entry.done,
-          step: entry.steps.map((st) => st.objective).join(' ; '),
+          step: waitsForWash(dirty, entry, def)
+            ? fill(CARNET_TEXTS.quests.washFirst, {
+                etape: entry.steps.map((st) => st.objective).join(' ; '),
+              })
+            : entry.steps.map((st) => st.objective).join(' ; '),
           together: entry.steps.some((st) => st.together),
           target,
           ...(entry.saga === undefined ? {} : { saga: entry.saga }),

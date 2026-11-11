@@ -8,6 +8,7 @@ import { createRandom, hashState, type RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { SLICES, type Slice, type WorldState } from '../../etat/monde';
+import { exhaustedIntentRefusal } from '../besoins/blocage';
 import { postureOf } from '../briques/postures';
 import { SIM_DT } from './constantes';
 import { freePlayer } from './deblocage';
@@ -100,6 +101,12 @@ export function step(
     },
   };
   for (const { player, intent } of intents) {
+    // Faim ou sommeil à 0: les intentions de travail sont refusées, avec ce qu'il faut faire.
+    const exhausted = exhaustedIntentRefusal(context, player, intent.type);
+    if (exhausted !== null) {
+      context.emit({ type: 'refused', player, reason: exhausted, target: null });
+      continue;
+    }
     coreIntent(context, player, intent);
     for (const system of SYSTEMS) system.intent?.(context, player, intent);
   }

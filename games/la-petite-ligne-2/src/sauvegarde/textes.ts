@@ -5,6 +5,12 @@ export const SAVE_TEXTS = {
   labelWithPlayers: '{place}, jour {day}, {hours} h {minutes} ({players})',
   labelWithoutPlace: 'Jour {day}, {hours} h {minutes}',
   playersJoin: ' et ',
+  /** Statistiques d'une séance pour l'historique de Duo (32 caractères au plus). */
+  session: {
+    days: 'Jours vécus',
+    steps: 'Étapes de quête franchies',
+    entries: 'Entrées de collection ajoutées',
+  },
   refused: {
     olderStage:
       'Cette partie d’essai date d’une étape précédente du jeu et ne peut plus être reprise. Une partie neuve commence.',

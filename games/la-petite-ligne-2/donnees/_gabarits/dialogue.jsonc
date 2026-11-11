@@ -57,6 +57,9 @@
     //       silhouette sans traits ni tenue; "to": "duo" pour les deux)
     //   { "type": "take_money", "amount": 250 }   (paiement en centimes: 2,50 €)
     //   { "type": "change_bond", "villager": "cheffe-de-gare", "points": 20 }   (négatif: perte)
+    //   { "type": "adopt_animal", "species": "poule", "name": "Pimprenelle",
+    //     "shelter": "poulailler-jardin", "robe": "blanche" }   (une bête offerte arrive à l'abri de
+    //       la carte, robe facultative; même nom déjà là: rien. Exemple: aubrune/odette-poules)
     // give_item, take_item, give_money et take_money prennent "to": "duo" pour s'appliquer à
     // chacun des deux joueurs (défaut: celui qui parle). Un échange impossible (poches pleines,
     // argent insuffisant, objet manquant) est refusé avec sa raison et le choix reste ouvert.

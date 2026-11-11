@@ -38,6 +38,20 @@
               "key": "aubrune.poules.nombre",
               "value": 2,
               "by": "duo"
+            },
+            {
+              "type": "adopt_animal",
+              "species": "poule",
+              "name": "Pimprenelle",
+              "shelter": "poulailler-jardin",
+              "robe": "blanche"
+            },
+            {
+              "type": "adopt_animal",
+              "species": "poule",
+              "name": "Capucine",
+              "shelter": "poulailler-jardin",
+              "robe": "rousse"
             }
           ],
           "next": "pondu"
@@ -76,6 +90,20 @@
               "key": "aubrune.poules.nombre",
               "value": 2,
               "by": "duo"
+            },
+            {
+              "type": "adopt_animal",
+              "species": "poule",
+              "name": "Pimprenelle",
+              "shelter": "poulailler-jardin",
+              "robe": "blanche"
+            },
+            {
+              "type": "adopt_animal",
+              "species": "poule",
+              "name": "Capucine",
+              "shelter": "poulailler-jardin",
+              "robe": "rousse"
             }
           ],
           "next": "pondu"

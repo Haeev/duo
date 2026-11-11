@@ -10,6 +10,23 @@
     "kind": "rod",
     "durability": 60,
     "gestureSeconds": 0.6,
-    "bluntGestureSeconds": 0.9
+    "bluntGestureSeconds": 0.9,
+    "work": {
+      "tier": 1,
+      "power": 1,
+      "bluntPower": 1,
+      "cells": 1,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": {
+        "cents": 0,
+        "items": [
+          {
+            "item": "bobine-de-fil",
+            "count": 1
+          }
+        ]
+      }
+    }
   }
 }

@@ -159,7 +159,37 @@ export function checkEffect(content: Content, e: Effect, at: string, problems: s
     case 'change_need':
     case 'reveal_look':
       return;
+    case 'adopt_animal':
+      checkAdoption(content, e, at, problems);
+      return;
   }
+}
+
+/** Bête offerte: l'espèce existe, l'abri est sur une carte et loge cette espèce, la robe aussi. */
+function checkAdoption(
+  content: Content,
+  e: Extract<Effect, { type: 'adopt_animal' }>,
+  at: string,
+  problems: string[],
+): void {
+  const species = content.species[e.species];
+  if (species === undefined) {
+    problems.push(`${at}: espèce inconnue « ${e.species} »`);
+    return;
+  }
+  if (e.robe !== undefined && !species.robes.some((r) => r.id === e.robe))
+    problems.push(`${at}: robe « ${e.robe} » inconnue de l'espèce « ${e.species} »`);
+  const shelters = Object.values(content.places).flatMap((p) =>
+    p.map.objects.filter((o) => o.id === e.shelter),
+  );
+  if (shelters.length !== 1) {
+    problems.push(`${at}: abri « ${e.shelter} » absent des cartes (ou nommé deux fois)`);
+    return;
+  }
+  const type = shelters[0]?.type ?? '';
+  const brick = content.props[type]?.bricks.find((b) => b.brick === 'shelter');
+  if (brick?.brick !== 'shelter' || brick.species !== e.species)
+    problems.push(`${at}: « ${e.shelter} » n'est pas un abri pour l'espèce « ${e.species} »`);
 }
 
 function checkDialogue(

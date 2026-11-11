@@ -6,6 +6,7 @@
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { Effect } from '../../donnees/schemas/regles';
 import { relieveNeed } from '../besoins/soins';
+import { adoptStoryAnimal } from '../elevage/abri';
 import { openShop } from '../commerces/index';
 import type { SimContext } from '../noyau/systemes';
 import { equipBag, giveItem } from '../sac/actions';
@@ -75,6 +76,12 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
     case 'reveal_look':
       for (const p of effectTargets(actor, effect.to)) revealLook(sim, p);
       return;
+    case 'adopt_animal': {
+      const refusal = adoptStoryAnimal(sim, actor, effect);
+      if (refusal !== null)
+        sim.emit({ type: 'refused', player: actor, reason: refusal, target: effect.shelter });
+      return;
+    }
   }
 }
 

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "marteau-forge",
+  "name": "Marteau forgé",
+  "makes": {
+    "kind": "upgrade",
+    "from": "marteau"
+  },
+  "station": "forge",
+  "materials": [],
+  "work": 1,
+  "source": "start",
+  "series": null
+}

@@ -77,6 +77,8 @@ export const TEXTS = {
     'empty-slot': 'Case vide',
     'feeder-full': 'Mangeoire pleine',
     'fish-no-water': 'Pas d’eau ici',
+    'exhausted-hunger': 'Trop faim, mange d’abord',
+    'exhausted-sleep': 'Épuisé·e, allonge-toi d’abord',
     'fish-none': 'Rien ne mord',
     'gift-already-today': 'Déjà offert aujourd’hui',
     gone: 'Plus là',

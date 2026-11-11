@@ -120,7 +120,10 @@ export function modifiersOf(
 }
 
 /** Besoin qui réserve la touche d'action à son seul soulagement (faim ou sommeil à 0), ou `null`. */
-export function onlyReliefFor(content: Content, state: Readonly<PlayerState>): NeedId | null {
+export function onlyReliefFor(
+  content: Content,
+  state: { readonly tiers: Readonly<PlayerState['tiers']> },
+): NeedId | null {
   for (const need of NEED_IDS) {
     const tier = needDef(content, need)?.tiers.find((t) => t.state === state.tiers[need]);
     if (tier?.onlyRelief === true) return need;

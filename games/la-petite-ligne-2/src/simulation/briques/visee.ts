@@ -12,6 +12,7 @@ import type { Brick, BrickId } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import { isPosed } from '../../donnees/poses';
 import type { PropDef } from '../../donnees/schemas/meuble';
+import { exhaustedActionRefusal } from '../besoins/blocage';
 import { isObjectPresent } from '../lieux/presents';
 import { isWallCell, type Blockers } from '../noyau/grille';
 import {
@@ -79,7 +80,9 @@ export function chooseBrick(
     const behaviour = behaviourOf(registry, brick.brick);
     if (behaviour === undefined) continue;
     if (behaviour.inert?.(look, player, brickView(place, prop, brick)) === true) continue;
-    const refusal = behaviour.refuse(look, player, brickView(place, prop, brick));
+    const refusal =
+      exhaustedActionRefusal(look, player, brick.brick) ??
+      behaviour.refuse(look, player, brickView(place, prop, brick));
     const withTool = wantsTool(brick, tool);
     const found = { brick, behaviour, refusal, tool: withTool };
     if (refusal !== null) fallback ??= found;
@@ -186,7 +189,7 @@ export function aimOf(
     consider('ground', id, item.x, item.y, () => ({
       action: 'pickup',
       verb: pickup.verb,
-      refusal: pickup.refuse(look, player, id),
+      refusal: exhaustedActionRefusal(look, player, 'pickup') ?? pickup.refuse(look, player, id),
       tool: false,
     }));
   }
@@ -196,7 +199,7 @@ export function aimOf(
     consider('villager', id, body.x, body.y, () => ({
       action: 'talk',
       verb: talk.verb,
-      refusal: talk.refuse(look, player, id),
+      refusal: exhaustedActionRefusal(look, player, 'talk') ?? talk.refuse(look, player, id),
       tool: false,
     }));
   }

@@ -32,7 +32,10 @@
   //   "repair": null }
   // tier: niveau (0 de base, 1 amélioré, 2 fin); power: points de travail par coup (le chêne en
   // demande 36); cells: cases du potager par coup (bêche, arrosoir); upgrade: amélioration à la
-  // forge; repair: prix d'une réparation payée (null: ne se répare pas).
+  // forge; repair: prix d'une réparation payée (null: ne se répare pas), en centimes et en
+  // matériaux (la ficelle du filet, la bobine de la canne), à un poste qui offre "repair".
+  // Facultatifs dans "tool": "reach": 1.5 (portée du geste en m, le filet) et "bluntEscape": 0.5
+  // (émoussé: part des prises qui s'échappent). Exemple: commun/objets/filet-renforce.json.
   "tool": null,
   // Repas spécial à deux (pile de 1, servi à table): ajouter "meal": { "perk": "no_tool_wear" }
   // (extra_catch, no_tool_wear, better_prices, night_rare_glow). Plat ordinaire: ne rien mettre.

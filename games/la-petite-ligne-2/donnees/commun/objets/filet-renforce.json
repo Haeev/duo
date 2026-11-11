@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "filet-renforce",
+  "name": "Filet renforcé",
+  "family": "tool",
+  "stack": 1,
+  "food": null,
+  "tool": {
+    "kind": "net",
+    "durability": 80,
+    "gestureSeconds": 0.6,
+    "bluntGestureSeconds": 0.6,
+    "work": {
+      "tier": 1,
+      "power": 1,
+      "bluntPower": 1,
+      "cells": 1,
+      "bluntCells": 1,
+      "upgrade": null,
+      "repair": {
+        "cents": 0,
+        "items": [
+          {
+            "item": "ficelle",
+            "count": 1
+          }
+        ]
+      }
+    },
+    "reach": 1.5,
+    "bluntEscape": 0.5
+  }
+}
