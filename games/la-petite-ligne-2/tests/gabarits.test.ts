@@ -65,6 +65,7 @@ describe('gabarits', () => {
         'ressource',
         'scene',
         'sujet-photo',
+        'vehicule',
       ].sort(),
     );
     for (const template of Object.values(TEMPLATES)) {

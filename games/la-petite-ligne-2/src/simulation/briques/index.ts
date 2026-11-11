@@ -10,6 +10,8 @@ import type { Stack } from '../../etat/joueur';
 import { exhaustedActionRefusal } from '../besoins/blocage';
 import { isObjectAbsent } from '../lieux/presents';
 import { findProp, footprintOf, type PropInstance } from '../noyau/obstacles';
+import { refuseVehicle, useVehicle } from '../vehicules/cible';
+import { riddenBy } from '../vehicules/places';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { sleepThroughNight } from './dormir';
 import { gestureOf, gestureTicks } from './geste';
@@ -81,7 +83,10 @@ function perform(
   let refusal: string | null = 'gone';
   let use: (() => void) | null = null;
   if (kind === 'prop') {
-    const found = action === 'pickup' || action === 'talk' ? null : propBrick(sim, id, action);
+    const found =
+      action === 'pickup' || action === 'talk' || action === 'vehicle'
+        ? null
+        : propBrick(sim, id, action);
     const behaviour =
       found === null ? undefined : behaviourOf(BRICK_BEHAVIOURS, found.target.params.brick);
     if (found !== null && behaviour !== undefined) {
@@ -98,6 +103,11 @@ function perform(
         sim.emit({ type: 'brick_used', player, target: id, brick });
       };
     }
+  } else if (kind === 'vehicle') {
+    refusal = refuseVehicle(sim, player, id);
+    use = (): void => {
+      useVehicle(sim, player, id);
+    };
   } else {
     const behaviour = kind === 'ground' ? ENTITY_BEHAVIOURS.pickup : ENTITY_BEHAVIOURS.talk;
     refusal = behaviour.refuse(sim, player, id);
@@ -139,7 +149,7 @@ function begin(
   sim.emit({ type: 'gesture_started', player, clip: spec.clip, target: id });
 }
 
-/** Libre d'agir: en journée, debout, sans geste ni dialogue en cours. */
+/** Libre d'agir: en journée, debout (ni assis ni à bord d'un véhicule), sans geste ni dialogue en cours. */
 function canAct(sim: SimContext, player: PlayerIndex): boolean {
   const { world } = sim;
   const actor = world.players[player];
@@ -147,7 +157,8 @@ function canAct(sim: SimContext, player: PlayerIndex): boolean {
   if (actor.gesture !== null || actor.talk !== null) return false;
   if (world.common.travel?.boarded[player] === true) return false;
   const place = world.places[world.common.place];
-  return place !== undefined && postureOf(place, player) === null;
+  if (place === undefined || riddenBy(place, player) !== null) return false;
+  return postureOf(place, player) === null;
 }
 
 /** Les cases d'un rangement à portée du joueur, `null` sinon (rien n'est dit: l'interface a fermé). */

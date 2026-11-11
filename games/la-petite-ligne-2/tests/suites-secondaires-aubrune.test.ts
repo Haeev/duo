@@ -118,6 +118,50 @@ function talk(sim: Sim, player: PlayerIndex, villager: string, option?: string):
   return seen;
 }
 
+/**
+ * L'aller et retour en draisine, joué pour de vrai: on la sort à la porte de la remise, chacun
+ * monte de son côté, coups de balancier alternés jusqu'au passage de l'Église, frein, sens
+ * inversé, retour à la halte, frein.
+ */
+function rideDraisine(sim: Sim): void {
+  const state = (): { s: number; speed: number; stop: string | null; dir: number } => {
+    const vehicle = sim.world.places[AUBRUNE]?.vehicles?.draisine;
+    if (vehicle === undefined) throw new Error('draisine sans état');
+    return vehicle;
+  };
+  const braking: [StepInput, StepInput] = [{ ...idleInput(0), run: true }, idleInput(0)];
+  const pumpUntil = (reached: () => boolean): void => {
+    for (let i = 0; i < 1800 && !reached(); i++)
+      if (i % 14 === 0) act(sim, i % 28 === 0 ? 0 : 1, { type: 'act' });
+      else wait(sim, 1 / 30);
+  };
+  Object.assign(sim.world.players[0].body, { x: 219.3, y: 92.5, facing: 0 });
+  act(sim, 0, { type: 'act' });
+  expect(state().stop).toBe('halte');
+  for (const p of [0, 1] as const) {
+    const x = state().s + (p === 0 ? 0.9 : -0.9);
+    Object.assign(sim.world.players[p].body, { x, y: 98.6, facing: -Math.PI / 2 });
+    act(sim, p, { type: 'act' });
+  }
+  expect(sim.world.places[AUBRUNE]?.vehicles?.draisine?.riders).toEqual([0, 1]);
+  pumpUntil(() => state().s >= 253);
+  wait(sim, 4, braking);
+  expect(state()).toMatchObject({ speed: 0, stop: 'eglise' });
+  wait(sim, 0.2);
+  wait(sim, 0.1, braking);
+  wait(sim, 0.2);
+  expect(state().dir).toBe(-1);
+  pumpUntil(() => state().s <= 221);
+  wait(sim, 4, braking);
+  expect(state()).toMatchObject({ speed: 0, stop: 'halte' });
+  wait(sim, 0.5);
+  // À l'arrêt, une direction fait descendre chacun de son côté.
+  const south = { ...idleInput(0), moveY: 1 };
+  wait(sim, 0.1, [south, south]);
+  expect(sim.world.places[AUBRUNE]?.vehicles?.draisine?.riders).toEqual([null, null]);
+  wait(sim, 0.2);
+}
+
 function holding(...players: PlayerIndex[]): [StepInput, StepInput] {
   return [
     { ...idleInput(0), act: players.includes(0) },
@@ -252,7 +296,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     expect(side.filter((d) => d.priority >= 60).map((d) => d.id)).toEqual([]);
   });
 
-  it('« Les lettres en retard »: la consigne, six lettres rendues, la clé de la draisine', () => {
+  it('« Les lettres en retard »: la consigne, six lettres rendues, la clé de la draisine, l’aller et retour', () => {
     const Q = 'les-lettres-en-retard';
     const sim = aubrune(Q);
     expect(sim.world.progress.quests[Q]?.done).toBe(false);
@@ -298,6 +342,12 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     both(sim, 'n2');
     wait(sim, 0.5);
     playScene(sim, 'la-draisine');
+    expect(fact(sim, 'aubrune.draisine.sortie')).toBe(true);
+    // La suite ne s'arrête plus à la scène: l'aller et retour se joue sur la vraie voie.
+    wait(sim, 0.5);
+    expect(sim.world.progress.quests[Q]).toMatchObject({ step: 'aller', done: false });
+    rideDraisine(sim);
+    expect(fact(sim, 'aubrune.draisine.retour')).toBe(true);
     expect(sim.world.progress.quests[Q]?.done).toBe(true);
     expect(passed(sim, Q)).toHaveLength(stepsOf(sim, Q).length);
     expect(sim.world.players.map((p, i) => p.money - (money[i] ?? 0))).toEqual([1200, 1200]);

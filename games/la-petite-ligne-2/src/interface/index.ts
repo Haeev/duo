@@ -29,6 +29,7 @@ import { createChapterEnd } from './histoire/fin-chapitre';
 import { createSceneOverlay } from './histoire/scene';
 import { createSceneLine } from './histoire/replique';
 import { createHud, type ProjectToScreen } from './hud';
+import { createVehicleGauge } from './vehicule';
 import { createRunHint } from './astuce-course';
 import { createDecisionBanner } from './rappel-decision';
 import { createAgendaHud } from './annonce';
@@ -38,6 +39,7 @@ import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
 import { passageSays } from '../simulation/lieux/index';
+import { parseVehicleAim } from '../simulation/vehicules/cible';
 import { hydrateThumbnails, type ObjectViewer } from '../rendu/objets/index';
 import { glanceTarget } from '../simulation/quetes/lecture';
 import { lookRevealed } from '../simulation/regles/apparence';
@@ -153,6 +155,13 @@ export function createInterface(options: InterfaceOptions): GameInterface {
   let now = 0;
   const hud = createHud(layer, view.content, keyLabel, options.projectToScreen);
   const decisionBanner = createDecisionBanner(layer, view.content);
+  // Indicateur de rythme de la draisine, pour qui est à bord.
+  const vehicleGauge = createVehicleGauge(
+    layer,
+    view.content,
+    keyLabel,
+    () => view.world()?.common.place ?? null,
+  );
   // Fêtes et veillées annoncées: avis la veille au soir et à l'ouverture, ligne du coup d'œil.
   const agenda = createAgendaHud(layer, view.content);
   let glanceUntil = -1;
@@ -304,11 +313,23 @@ export function createInterface(options: InterfaceOptions): GameInterface {
     shop.onEvent(event, me, now);
     workshop.onEvent(event, me, now);
     const shownInNotebook = notebook.onEvent(event, me);
+    const vehicleNotice = vehicleGauge.onEvent(event, me, now);
+    if (vehicleNotice !== null) hud.notice(now, 'train', vehicleNotice);
     switch (event.type) {
       case 'refused':
         if (event.player === me) dialogue.unlock();
         if (event.player === me && !shop.isOpen() && !workshop.isOpen() && !shownInNotebook)
           hud.refusal(now, refusalLine(event.reason, event.target));
+        // Un train est attendu: la fiche du véhicule dit pourquoi il ne part pas.
+        if (event.player === me && event.reason === 'train-due' && event.target !== null) {
+          const world = view.world();
+          const vehicle = parseVehicleAim(event.target)?.vehicle;
+          const sheet =
+            world === null || vehicle === undefined
+              ? undefined
+              : view.content.places[world.common.place]?.vehicles[vehicle];
+          if (sheet !== undefined) hud.notice(now, 'train', sheet.lines.trainDue);
+        }
         break;
       case 'pockets_full':
         if (event.player === me) hud.notice(now, 'sac', TEXTS.notices.pocketsFull);
@@ -465,6 +486,14 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'room_supplied':
       case 'deco_changed':
       case 'comfort_changed':
+      case 'vehicle_out':
+      case 'vehicle_in':
+      case 'vehicle_seat':
+      case 'vehicle_stroke':
+      case 'vehicle_started':
+      case 'vehicle_stopped':
+      case 'vehicle_turned':
+      case 'vehicle_warning':
       case 'shelter_opened':
       case 'shelter_filled':
       case 'shelter_collected':
@@ -652,6 +681,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
         needsAlways: settingsUi().needsAlways,
         questTarget: questMarker(world, me),
       });
+      vehicleGauge.frame(now, world, me, menu);
       // Rappel durable d'une décision à deux: caché sous un menu, visible pendant le dialogue.
       decisionBanner.frame(world, me, notebook.isOpen() || shopOpen || editor.isOpen(), now);
       agenda.frame(
@@ -686,6 +716,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       fishing.dispose();
       keyTarget.removeEventListener('keydown', onKey);
       hud.dispose();
+      vehicleGauge.dispose();
       decisionBanner.dispose();
       agenda.dispose();
       dialogue.dispose();

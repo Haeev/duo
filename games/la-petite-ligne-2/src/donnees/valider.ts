@@ -16,6 +16,8 @@ import type { Look } from './schemas/personnage';
 import { validateHarvestContent } from './schemas/recolte';
 import { validateFarmContent } from '../simulation/elevage/valider';
 import type { Condition, Effect } from './schemas/regles';
+import type { RailVehicleDef } from './schemas/vehicule';
+import { lineOf } from '../simulation/vehicules/voie';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
@@ -490,6 +492,52 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
   checkLargePlace(content, place, problems);
   for (const d of place.dialogues) checkDialogue(content, place, d, problems);
   for (const shop of Object.values(place.shops)) checkShop(content, place, shop, problems);
+  for (const vehicle of Object.values(place.vehicles))
+    checkVehicle(content, place, vehicle, problems);
+}
+
+/** Un véhicule de voie: ses voies et ses points existent, ses arrêts tiennent entre ses butées. */
+function checkVehicle(
+  content: Content,
+  place: PlaceContent,
+  vehicle: RailVehicleDef,
+  problems: string[],
+): void {
+  const at = `lieu ${place.def.id}, véhicule ${vehicle.id}`;
+  const rails = place.map.rails ?? [];
+  for (const track of [vehicle.track, vehicle.garage.track])
+    if (!rails.some((rail) => rail.id === track))
+      problems.push(`${at}: voie inconnue « ${track} »`);
+  const spots = [
+    vehicle.launch,
+    vehicle.range.from,
+    vehicle.range.to,
+    ...vehicle.stops.map((stop) => stop.at),
+  ];
+  for (const spot of spots)
+    if (!(spot.point in place.map.points)) problems.push(`${at}: point inconnu « ${spot.point} »`);
+  const ids = new Set<string>();
+  for (const stop of vehicle.stops) {
+    if (ids.has(stop.id)) problems.push(`${at}: arrêt « ${stop.id} » en double`);
+    ids.add(stop.id);
+    for (const rule of stop.arrive ?? []) {
+      const where = `${at}, arrêt ${stop.id}`;
+      for (const c of rule.when) checkCondition(content, c, where, problems);
+      for (const e of rule.effects) checkEffect(content, e, where, problems);
+    }
+  }
+  for (const c of vehicle.available) checkCondition(content, c, `${at}, available`, problems);
+  const line = lineOf(place, vehicle);
+  if (line === null) return;
+  const inRange = (s: number): boolean => s >= line.from - 1e-6 && s <= line.to + 1e-6;
+  if (!inRange(line.launch)) problems.push(`${at}: le point de pose est hors des butées`);
+  for (const stop of line.stops)
+    if (!inRange(stop.s)) problems.push(`${at}: l'arrêt « ${stop.id} » est hors des butées`);
+  const { drive } = vehicle;
+  if (drive.jam >= drive.beat - drive.tolerance)
+    problems.push(`${at}: « jam » doit rester sous le battement moins la tolérance`);
+  if (drive.lost <= drive.beat + drive.tolerance)
+    problems.push(`${at}: « lost » doit dépasser le battement plus la tolérance`);
 }
 
 interface Box {

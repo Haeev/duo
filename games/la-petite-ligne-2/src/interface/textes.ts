@@ -149,6 +149,8 @@ export const TEXTS = {
     'story-item': 'Objet d’histoire, gardé',
     'too-dirty': 'Lave-toi d’abord',
     'too-far': 'Trop loin',
+    'train-due': 'Un train arrive',
+    'vehicle-moving': 'Ça roule encore',
     'too-fast': 'Trop vite',
     'tool-too-weak': 'Outil trop faible',
     'train-gone': 'Le train est parti',
@@ -194,6 +196,17 @@ export const TEXTS = {
     },
     /** Rappel de la course, une fois (`astuce-course.ts`); `{touche}` selon le clavier réel. */
     runHint: 'Maintiens {touche} pour courir (ça creuse un peu l’appétit)',
+  },
+  /** Indicateur d'un véhicule de voie (`vehicule.ts`). */
+  vehicle: {
+    pump: 'pomper',
+    brake: 'frein',
+    turn: 'changer de sens',
+    leave: 'descendre',
+    alone: 'Il manque ta moitié à bord',
+    nextAt: '{nom} à {metres} m',
+    then: '{ici}, puis {suite}',
+    end: 'le bout de la voie',
   },
   glance: {
     other: '{nom}, à {n} m',

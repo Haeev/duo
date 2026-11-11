@@ -46,6 +46,8 @@ Un événement peut amener un train (champ `train`): il arrive en freinant pour 
 
 Passages à niveau: là où une voie à ciel ouvert croise une case de route ou de rue (`TRAINS.crossing.natures`; la carte n'a pas d'autre donnée des ouvrages). La sonnerie (`crossing_bell`, `ringing` vrai puis faux, émis par `index.ts`) part quand une rame qui va passer sur la route commence à freiner, ou démarre, et se tait quand sa queue l'a dégagée; le son tenu est dans `audio/donnees/evenements.json`. Habitants: l'emprise d'une rame va de sa place à celle où elle va (`reachFrom`, `reachTo`); un habitant n'y entre pas (`inTrainWay`), il attend au bord et cherche au bout de `trainRetrySeconds` un chemin par un autre passage (arêtes du graphe qui croisent une rame à quai évitées, `segmentAcrossStoppedTrain`; une rame qui passe, on l'attend).
 
+La pose le long des rails (`trackOf`, `poseOnTrack`) et l'annonce d'un train sur une voie (`minutesToTrain`) servent aussi aux véhicules de voie des joueurs (`simulation/vehicules/`: la draisine cède toujours la voie).
+
 Ajouter un train (aucun code):
 
 1. `pnpm nouveau evenement <id> <lieu>`, ou un événement existant: heures d'arrêt (`from`) et de départ (`to`).

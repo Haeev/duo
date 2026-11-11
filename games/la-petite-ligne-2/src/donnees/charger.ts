@@ -37,6 +37,7 @@ import { PlanSchema, type PlanDef } from './schemas/plan';
 import { RecipeSchema, type RecipeDef } from './schemas/recette';
 import { CropSchema, ResourceSchema, type CropDef, type ResourceDef } from './schemas/recolte';
 import { SceneSchema, type SceneDef } from './schemas/scene';
+import { RailVehicleSchema, type RailVehicleDef } from './schemas/vehicule';
 import { SpeciesSchema, type SpeciesDef } from './schemas/elevage';
 import { SettingsSchema, type Settings } from './schemas/reglages';
 import { BagsFileSchema, type BagsFile } from './schemas/sacs';
@@ -65,6 +66,8 @@ export interface PlaceContent {
   readonly scenes: ById<SceneDef>;
   /** Logements du lieu (`logements/<id>.json`). */
   readonly housings: ById<HousingDef>;
+  /** Véhicules de voie du lieu (`vehicules/<id>.json`): la draisine. */
+  readonly vehicles: ById<RailVehicleDef>;
 }
 
 /** Tout le contenu du jeu, lu et contrôlé. Il ne change jamais pendant une partie. */
@@ -192,6 +195,7 @@ export function loadContent(files: Files): Content {
     );
     const scenes = parseFolder(SceneSchema, files, `${base}/scenes`, problems);
     const housings = parseFolder(HousingSchema, files, `${base}/logements`, problems);
+    const vehicles = parseFolder(RailVehicleSchema, files, `${base}/vehicules`, problems);
     if (def === null || map === null) continue;
     // Un point ou une porte d'intérieur qui porterait le nom d'un autre l'écraserait à la fusion.
     const seen = new Set([...Object.keys(map.points), ...Object.keys(map.doors ?? {})]);
@@ -218,6 +222,7 @@ export function loadContent(files: Files): Content {
       quests,
       scenes,
       housings,
+      vehicles,
     };
   }
 

@@ -50,6 +50,24 @@ export interface CharacterFrame {
    * l'ombre de contact la suivent. Absente: sol plan. La simulation n'en sait rien.
    */
   readonly ground?: ((x: number, y: number) => number) | null;
+  /**
+   * Joueurs à bord d'un véhicule de voie (`lieu/vehicules.ts`): où chacun est assis sur le
+   * véhicule tel qu'il est affiché, `null` à pied. Absent: personne à bord.
+   */
+  readonly riders?: readonly [CarriedSeat | null, CarriedSeat | null];
+}
+
+/** Une place sur un véhicule qui roule: le personnage y est posé d'un bloc, sans lissage. */
+export interface CarriedSeat {
+  readonly x: number;
+  readonly y: number;
+  /** Cap du corps: 0 vers l'est, PI/2 vers le sud. */
+  readonly facing: number;
+  /** Hauteur du plancher (m): les pieds s'y posent. */
+  readonly floor: number;
+  /** Dessus de l'assise au-dessus du plancher, et son bord avant depuis son centre (m). */
+  readonly height: number;
+  readonly front: number;
 }
 
 /**

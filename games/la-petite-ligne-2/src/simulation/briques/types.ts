@@ -73,13 +73,16 @@ export interface EntityBehaviour {
   use(sim: SimContext, player: PlayerIndex, id: string): void;
 }
 
-export type AimKind = 'prop' | 'ground' | 'villager';
-export type ActionId = BrickId | 'pickup' | 'talk';
+export type AimKind = 'prop' | 'ground' | 'villager' | 'vehicle';
+export type ActionId = BrickId | 'pickup' | 'talk' | 'vehicle';
 
 /** La cible de la touche d'action d'un joueur et ce que fera l'appui. */
 export interface Aim {
   readonly kind: AimKind;
-  /** Identifiant dans l'état: instance de meuble, habitant, ou `sol-<n>` pour un objet au sol. */
+  /**
+   * Identifiant dans l'état: instance de meuble, habitant, `sol-<n>` pour un objet au sol,
+   * `vehicule-<id>` ou `remise-<id>` pour un véhicule de voie (`vehicules/cible.ts`).
+   */
   readonly id: string;
   readonly action: ActionId;
   /** Un seul verbe, à montrer avant l'appui. */

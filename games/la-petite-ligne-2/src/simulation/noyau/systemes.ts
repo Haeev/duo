@@ -25,6 +25,7 @@ import { bagSystem } from '../sac/index';
 import { sceneSystem } from '../scenes/index';
 import { travelSystem } from '../voyage/index';
 import { farmSystem } from '../elevage/index';
+import { vehicleSystem } from '../vehicules/index';
 import type { Intent, StepInput } from './entrees';
 import type { GameEvent } from './evenements';
 
@@ -60,6 +61,8 @@ export interface GameSystem {
 export const SYSTEMS: readonly GameSystem[] = [
   travelSystem,
   placeSystem,
+  // Avant les briques: à bord, la touche d'action est un coup de balancier, pas une visée.
+  vehicleSystem,
   brickSystem,
   bagSystem,
   shopSystem,

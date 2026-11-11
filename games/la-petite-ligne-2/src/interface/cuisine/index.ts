@@ -448,6 +448,14 @@ export function createKitchen(
       case 'collection_found':
       case 'collection_record':
       case 'comfort_changed':
+      case 'vehicle_out':
+      case 'vehicle_in':
+      case 'vehicle_seat':
+      case 'vehicle_stroke':
+      case 'vehicle_started':
+      case 'vehicle_stopped':
+      case 'vehicle_turned':
+      case 'vehicle_warning':
       case 'crop_reaped':
       case 'day_started':
       case 'deco_changed':

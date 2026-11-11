@@ -16,6 +16,7 @@ import { VillagerLifeStateSchema } from './habitants';
 import { BodySchema, StackSchema } from './joueur';
 import { HousingStateSchema } from './logement';
 import { FishingPlaceStateSchema } from './peche';
+import { RailVehiclesSchema } from './vehicules';
 
 const villagerSlow = {
   /** Déjà rencontré par chaque joueur. */
@@ -83,6 +84,8 @@ const placeSlow = {
   housing: v.exactOptional(v.record(IdSchema, HousingStateSchema)),
   /** Pêche (`etat/peche.ts`), absente tant que personne n'a pêché ici. */
   fishing: v.exactOptional(FishingPlaceStateSchema),
+  /** Véhicules de voie du lieu (`simulation/vehicules/`); absent d'ici: rangé dans sa remise. */
+  vehicles: v.exactOptional(RailVehiclesSchema),
 } as const;
 
 /** Ce qui part dans la tranche « lieu »: tout, sauf les positions des habitants (canal rapide). */

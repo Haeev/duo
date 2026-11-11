@@ -2,7 +2,8 @@
  * Obstacles du lieu courant: la carte, plus l'emprise des meubles solides (ceux de la carte et
  * ceux posés par les joueurs) et les verrous d'histoire fermés (`lieux/verrous.ts`). Pur et gardé
  * d'un pas à l'autre: la couche mobile n'est refaite que si un meuble a changé ou si un verrou
- * s'est ouvert ou fermé, ou si un train d'événement a bougé (`monde/trains.ts`). Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
+ * s'est ouvert ou fermé, ou si un train d'événement a bougé (`monde/trains.ts`), ou si un véhicule
+ * de voie s'est arrêté ou est reparti (`vehicules/emprise.ts`). Sert à l'hôte et à la prédiction de l'invité, qui lit la même progression.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
 import type { PropDef } from '../../donnees/schemas/meuble';
@@ -13,6 +14,7 @@ import type { Blockers } from './grille';
 import { conditionalObjects, refreshPresence } from '../lieux/presents';
 import { lockCount, markClosedLocks, refreshLockStates } from '../lieux/verrous';
 import { markTrainCells, trainSignature } from '../monde/trains';
+import { markVehicleCells, vehicleSignature } from '../vehicules/emprise';
 
 /** Un meuble en place, qu'il vienne de la carte ou d'un joueur. */
 export interface PropInstance {
@@ -38,6 +40,8 @@ interface Cached {
   readonly conditional: ReadonlyMap<string, number>;
   /** Empreinte des trains présents à la dernière construction (`trainSignature`). */
   trains: number;
+  /** Empreinte des véhicules de voie arrêtés (`vehicleSignature`). */
+  vehicles: number;
 }
 
 const cache = new WeakMap<PlaceContent, Cached>();
@@ -127,6 +131,7 @@ export function placeBlockers(
       present: new Uint8Array(conditionalObjects(place).length).fill(2),
       conditional: new Map(conditionalObjects(place).map((o, i) => [o.id, i])),
       trains: Number.NaN,
+      vehicles: Number.NaN,
     };
     cache.set(place, cached);
   }
@@ -134,14 +139,17 @@ export function placeBlockers(
   const presenceChanged = refreshPresence({ content, world }, place, cached.present);
   const signature = signatureOf(place, state);
   const trains = trainSignature({ content, world }, place);
+  const vehicles = vehicleSignature(state);
   if (
     signature !== cached.signature ||
     locksChanged ||
     presenceChanged ||
-    trains !== cached.trains
+    trains !== cached.trains ||
+    vehicles !== cached.vehicles
   ) {
     cached.signature = signature;
     cached.trains = trains;
+    cached.vehicles = vehicles;
     cached.blockers.props.fill(0);
     markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);
     // Un objet posé sur un meuble (champ `on`) ne bloque jamais: il n'occupe pas le sol.
@@ -150,6 +158,8 @@ export function placeBlockers(
     for (const placed of state.placed) mark(content, cached, state, placed);
     // Un train d'événement à quai ou qui passe: sa caisse barre la voie (règle des données).
     markTrainCells({ content, world }, place, cached.blockers.props);
+    // Un véhicule de voie posé à l'arrêt (la draisine): on le contourne.
+    markVehicleCells(place, state, cached.blockers.props);
   }
   return cached.blockers;
 }
