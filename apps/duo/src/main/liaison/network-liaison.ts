@@ -289,6 +289,10 @@ export class NetworkLiaison implements Liaison {
     this.route({ type: 'stop', seat: 'host', reason, summary }, { type: 'stop', reason });
   }
 
+  reportSummary(matchId: string, summary: EndSummary): void {
+    if (this.own.lastEnd?.matchId === matchId) this.applyOwn({ type: 'summary', matchId, summary });
+  }
+
   sendGame(message: GameRelayMessage): void {
     const link = this.link;
     if (link === null) return;

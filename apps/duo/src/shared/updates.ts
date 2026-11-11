@@ -8,12 +8,23 @@ export type UpdateCheckView =
   | { readonly kind: 'ok' }
   | { readonly kind: 'unreachable' };
 
+/**
+ * Cause d'un échec, pour le message affiché: `integrity` quand l'archive reçue ne
+ * correspond pas à l'empreinte du catalogue (rien n'est installé).
+ */
+export type UpdateFailureCause = 'download' | 'integrity' | 'install';
+
 /** Mise à jour d'un jeu installé. */
 export type GameUpdateView =
   | { readonly kind: 'available'; readonly version: string }
   | { readonly kind: 'downloading'; readonly version: string; readonly progress: number }
   | { readonly kind: 'installing'; readonly version: string }
-  | { readonly kind: 'failed'; readonly version: string; readonly playAnyway: boolean }
+  | {
+      readonly kind: 'failed';
+      readonly version: string;
+      readonly playAnyway: boolean;
+      readonly cause: UpdateFailureCause;
+    }
   | { readonly kind: 'done'; readonly version: string };
 
 export type LaunchGate =

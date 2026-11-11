@@ -58,6 +58,8 @@ export const HostSessionSchema = v.object({
             v.maxLength(3),
             v.readonly(),
           ),
+          // Duo 0.4; objet non strict: une application plus ancienne retire ce champ sans erreur.
+          progress: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
         }),
       ),
     }),

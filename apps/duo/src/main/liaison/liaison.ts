@@ -87,6 +87,11 @@ export interface Liaison {
   requestResume(): void;
   /** Arrête la partie; `summary`: résumé du jeu de l'hôte (fin de partie ou de séance). */
   stopMatch(reason: StopReason, summary?: EndSummary): void;
+  /**
+   * Hôte seulement: résumé que le jeu donne après l'arrêt (séance arrêtée par la plateforme).
+   * Il complète la fin de la partie `matchId` et part chez l'autre avec l'état du salon.
+   */
+  reportSummary(matchId: string, summary: EndSummary): void;
   /** Relaie un message du jeu vers l'instance de l'autre machine. */
   sendGame(message: GameRelayMessage): void;
 

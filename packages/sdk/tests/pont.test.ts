@@ -1,5 +1,10 @@
 // Le SDK face à une plateforme minimale, sur un vrai MessageChannel (Node).
-import type { GameMessage, InitMessage, PlatformMessage } from '@duo/protocol';
+import {
+  GameMessageSchema,
+  type GameMessage,
+  type InitMessage,
+  type PlatformMessage,
+} from '@duo/protocol';
 import { afterEach, describe, expect, it } from 'vitest';
 import { connect, v, type DuoContext } from '../src/index';
 import { utf8Length } from '../src/net';
@@ -110,7 +115,7 @@ async function open(init: InitMessage): Promise<{ duo: DuoContext; platform: Pla
 describe('pont du SDK', () => {
   it('se présente, reçoit init et expose rôle, joueurs et graine', async () => {
     const { duo, platform: p } = await open(initMessage('guest'));
-    expect(p.received[0]).toEqual({ type: 'hello', bridge: '1.1', sdk: '1.1.0' });
+    expect(p.received[0]).toEqual({ type: 'hello', bridge: '1.1', sdk: '1.2.0' });
     expect(duo.role).toBe('guest');
     expect(duo.localPlayer).toMatchObject({ id: 'b', name: 'Sacha', local: true });
     expect(duo.remotePlayer).toMatchObject({ id: 'a', local: false });
@@ -250,6 +255,54 @@ describe('pont du SDK', () => {
       finished: false,
       progress: 0.5,
     });
+  });
+
+  it('envoie le résumé de séance fourni par le jeu à l’arrêt, borné aux limites du pont', async () => {
+    const { duo, platform: p } = await open(initMessage('host'));
+    if (duo.role !== 'host') throw new Error('rôle inattendu');
+    let day = 1;
+    duo.results.provideSummary(() => ({
+      progress: 1.7,
+      stats: [
+        { label: 'Jours vécus', value: String(day) },
+        { label: '', value: 'écartée: sans libellé' },
+        {
+          label: 'Un libellé beaucoup trop long pour la fiche du jeu',
+          value: '12345678901234567890',
+        },
+        { label: 'Étapes franchies', value: '2' },
+        { label: 'Quatrième, de trop', value: '9' },
+      ],
+    }));
+    day = 3;
+    const ready = duo.ready();
+    p.send({ type: 'start', atSessionMs: 0 });
+    await ready;
+    p.send({ type: 'stop', reason: 'stopped', save: false });
+    const end = await p.next('sessionEnd');
+    // La plateforme valide chaque message par le schéma du pont: le résumé doit y passer tel quel.
+    expect(v.safeParse(GameMessageSchema, end).success).toBe(true);
+    expect(end).toEqual({
+      type: 'sessionEnd',
+      finished: false,
+      progress: 1,
+      stats: [
+        { label: 'Jours vécus', value: '3' },
+        { label: 'Un libellé beaucoup trop long po', value: '1234567890123456' },
+        { label: 'Étapes franchies', value: '2' },
+      ],
+    });
+  });
+
+  it('un fournisseur de résumé en erreur ne bloque pas la fin de la séance', async () => {
+    const { duo, platform: p } = await open(initMessage('host'));
+    if (duo.role !== 'host') throw new Error('rôle inattendu');
+    duo.results.provideSummary(() => {
+      throw new Error('monde déjà libéré');
+    });
+    p.send({ type: 'stop', reason: 'stopped', save: false });
+    expect(await p.next('sessionEnd')).toEqual({ type: 'sessionEnd', finished: false, stats: [] });
+    expect(await p.next('log')).toMatchObject({ level: 'error' });
   });
 
   it('mesure la taille UTF-8 sans allouer', () => {

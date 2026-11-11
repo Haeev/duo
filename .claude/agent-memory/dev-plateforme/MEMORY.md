@@ -26,6 +26,15 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Le Chromium préinstallé (`/opt/pw-browsers/chromium-*/chrome-linux64/chrome`) ne correspond pas toujours à la version attendue par `@playwright/test`: passer `executablePath` en repli.
 - La garde des copies isolées refuse les commandes bash longues ou avec heredoc: écrire le script dans le dossier temporaire de la session, puis `python3 <script>`.
 
+- La garde des copies isolées refuse aussi toute commande qui contient le mot `git` hors d'une commande git simple (même `--exclude-dir=.git` du contrôle des tirets): faire ce contrôle avec l'outil Grep (motif `[\x{2014}\x{2013}]`).
+
+## Résumé de séance et historique (vérifié le 2026-11-11)
+
+- Ajouter une fonction au SDK sans toucher au pont garde la compatibilité dans les deux sens: monter la mineure du pont rendrait un jeu neuf « indisponible » dans l'application des joueurs. Passer par les champs déjà prévus (`sessionEnd.stats`, `progress`).
+- `GameHost.stop`: la fin de la sauvegarde de sortie libérait l'arrêt avant le `sessionEnd` du jeu, qui part juste après: le résumé était perdu. Paramètre `awaitEnd` (hôte d'un jeu `session`).
+- La liaison entre deux Duo valide l'état du salon par `v.object` (non strict): un champ facultatif ajouté (`summary.progress`) est ignoré sans erreur par une application plus ancienne.
+- `tests/unit/local-liaison.test.ts` dépasse parfois son délai quand la machine est chargée (charge 11 à 16 sur 4 cœurs): relancer seul.
+
 ## Conventions de l'application
 
 - État publié complet à chaque changement (micro-tâche), notifications par clé (`ToastKind`): tous les textes restent dans `renderer/textes.ts`, typographie posée par `fr`.

@@ -43,6 +43,11 @@ export interface EndSummary {
   readonly outcome: 'success' | 'failure' | 'draw' | 'win-host' | 'win-guest' | null;
   /** Jusqu'à trois statistiques, textes du jeu. */
   readonly stats: readonly { readonly label: string; readonly value: string }[];
+  /**
+   * Avancement déclaré par le jeu, de 0 à 1 (Duo 0.4). Facultatif sur la liaison: une
+   * application plus ancienne ne l'envoie pas et l'ignore à la réception.
+   */
+  readonly progress?: number | undefined;
 }
 
 export interface MatchEnd {
@@ -81,6 +86,7 @@ export type SessionInput =
       readonly reason: Exclude<EndReason, 'guest-gone'>;
       readonly summary?: EndSummary | undefined;
     }
+  | { readonly type: 'summary'; readonly matchId: string; readonly summary: EndSummary }
   | { readonly type: 'link'; readonly up: boolean }
   | { readonly type: 'guest-gone' }
   | { readonly type: 'tick' };
@@ -255,6 +261,11 @@ function apply(
         },
       };
     }
+    case 'summary':
+      // Résumé arrivé après l'arrêt (séance arrêtée par la plateforme): il complète la fin sans
+      // en remplacer un déjà donné par le jeu (fin de partie ou fin de démo).
+      if (state.lastEnd?.matchId !== input.matchId || state.lastEnd.summary !== null) return state;
+      return { ...state, lastEnd: { ...state.lastEnd, summary: input.summary } };
     case 'stop':
       if (match === null) return state;
       return {

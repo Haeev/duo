@@ -5,7 +5,7 @@
  * franchies, entrées de collection ajoutées. Lecture pure de l'état, sans rien sauvegarder de plus:
  * le point de départ de la séance se relève à son ouverture (`tallyOf`).
  */
-import type { SessionSummary } from '@duo/sdk';
+import type { HostResults, SessionSummary } from '@duo/sdk';
 import type { Content } from '../donnees/charger';
 import type { QuestLineDef } from '../donnees/schemas/quete';
 import type { ReadonlyWorld } from '../etat/monde';
@@ -60,6 +60,20 @@ export function tallyOf(content: Content, world: ReadonlyWorld): SessionTally {
     0,
   );
   return { day: world.common.day, steps, entries };
+}
+
+/**
+ * Branche le résumé de la séance sur Duo (SDK 1.2, `results.provideSummary`): le relevé de départ
+ * est pris tout de suite, à l'ouverture, et le résumé est calculé quand la plateforme arrête la
+ * séance. `world` est relu à ce moment-là, l'état ayant pu être remplacé entre-temps.
+ */
+export function provideSessionSummary(
+  results: Pick<HostResults, 'provideSummary'>,
+  content: Content,
+  world: () => ReadonlyWorld,
+): void {
+  const start = tallyOf(content, world());
+  results.provideSummary(() => sessionSummary(content, start, world()));
 }
 
 /** Le résultat de la séance commencée à `start`: avancement et trois statistiques (écran de fin, historique). */

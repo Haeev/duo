@@ -147,3 +147,12 @@ Le pont 1.0 est implémenté par `packages/protocol` (schémas Valibot, source d
 - **Fin d'une séance**: `sessionEnd` porte `finished`; `true` quand le jeu termine la séance de lui-même (fin de la démo de La Petite Ligne), `false` en réponse à `stop`.
 - **`pauseRequest`**: Échap vue par le SDK. N'arrive jamais dans Duo, où Échap est interceptée par le principal; sert au faux hôte.
 - **Sauvegarde**: `saveRequest` porte le moment demandé (`auto` ou `exit`); la sauvegarde de sortie est écrite avant que le jeu ne reçoive l'événement `stop`.
+
+## Précision: résumé de séance (SDK 1.2, Duo 0.4.0, 2026-11-11)
+
+- **Besoin**: « sauvegardes, historique et score cumulé » dès le premier jeu. Un jeu `session` arrêté par la plateforme (« Retour au salon ») répondait `sessionEnd` avec `stats: []`: l'historique ne savait rien de la séance.
+- **API**: `results.provideSummary(() => SessionSummary | null)`, hôte d'un jeu `session`. Le SDK lit le fournisseur à l'arrêt, après la sauvegarde de sortie, et l'envoie dans le `sessionEnd` existant; `endSession()` sans argument le lit aussi. Un fournisseur qui lève une erreur est journalisé, la séance se termine quand même.
+- **Bornes**: celles du pont 1.0 (`ResultStatSchema`): trois statistiques, libellé de 32 caractères, valeur de 16, progression de 0 à 1. Le SDK coupe ce qui dépasse avant l'envoi (un message hors schéma serait écarté par la plateforme); la plateforme revalide à l'arrivée (Valibot) et à l'écriture de l'historique.
+- **Aucun changement du pont** (reste 1.1, mineure inchangée): le message et ses champs existaient. Conséquences: un jeu construit avec le SDK 1.2 garde `"sdk": "1.0"` ou `"1.1"` dans son manifeste et tourne dans Duo 0.3.x, qui reçoit le résumé et l'ignore; un jeu publié avec un SDK plus ancien tourne dans Duo 0.4.0, qui inscrit sa séance sans statistiques (progression de la dernière sauvegarde).
+- **Côté plateforme**: l'hôte attend le `sessionEnd` d'une séance qu'il arrête (même délai de 2 s que la sauvegarde de sortie), puis complète la fin de la partie (`summary` du salon, avec `progress`) qui part chez l'invité par la liaison; champ facultatif, ignoré par une application plus ancienne.
+

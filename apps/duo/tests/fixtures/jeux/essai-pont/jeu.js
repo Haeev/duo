@@ -140,8 +140,19 @@
       case 'stop': {
         state.stopped = message.reason;
         var exit = state.role === 'host' && message.save ? writeSave('exit') : Promise.resolve();
+        // Comme @duo/sdk 1.2 avec `results.provideSummary`: le résumé de la séance part en
+        // réponse à l'arrêt, après la sauvegarde de sortie.
         exit.then(function () {
-          if (state.role === 'host') send({ type: 'sessionEnd', stats: [], finished: false });
+          if (state.role !== 'host') return;
+          send({
+            type: 'sessionEnd',
+            stats: [
+              { label: 'Appuis ici', value: String(state.count) },
+              { label: 'Appuis là-bas', value: String(state.peerCount) },
+            ],
+            progress: Math.min(1, state.count / 4),
+            finished: false,
+          });
         });
         break;
       }

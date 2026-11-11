@@ -1,4 +1,6 @@
+import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
+import { HostSessionSchema } from '../../src/main/liaison/local/wire';
 import {
   COUNTDOWN_MS,
   EMPTY_SESSION,
@@ -143,6 +145,36 @@ describe('partie (F05, F06)', () => {
     expect(stopped.match).toBeNull();
     expect(stopped.lastEnd).toMatchObject({ reason: 'stopped', by: 'host', durationMs: 60_000 });
     expect(stopped.salon?.guestJoined).toBe(true);
+  });
+
+  it('le résumé arrivé après l’arrêt complète la fin, une fois, et passe la liaison', () => {
+    const stopped = run([[{ type: 'stop', seat: 'host', reason: 'stopped' }, 70_000]], loaded);
+    expect(stopped.lastEnd?.summary).toBeNull();
+    const summary = {
+      outcome: null,
+      stats: [{ label: 'Jours vécus', value: '2' }],
+      progress: 0.35,
+    };
+    const other = run([[{ type: 'summary', matchId: 'autre-partie', summary }, 70_100]], stopped);
+    expect(other).toBe(stopped);
+    const completed = run([[{ type: 'summary', matchId: 'partie-1', summary }, 70_100]], stopped);
+    expect(completed.rev).toBe(stopped.rev + 1);
+    expect(completed.lastEnd).toMatchObject({ reason: 'stopped', summary });
+    // Un second résumé ne remplace pas le premier.
+    const again = run(
+      [[{ type: 'summary', matchId: 'partie-1', summary: { ...summary, stats: [] } }, 70_200]],
+      completed,
+    );
+    expect(again).toBe(completed);
+    // La liaison porte l'avancement; une application plus ancienne le retire sans erreur.
+    const wire = v.parse(HostSessionSchema, JSON.parse(JSON.stringify(toWire(completed, 0))));
+    expect(wire.lastEnd?.summary).toEqual(summary);
+    const older = { outcome: summary.outcome, stats: summary.stats };
+    const fromOlder = v.parse(HostSessionSchema, {
+      ...toWire(completed, 0),
+      lastEnd: { ...completed.lastEnd, summary: older },
+    });
+    expect(fromOlder.lastEnd?.summary).toEqual(older);
   });
 
   it('un invité qui disparaît termine la partie et libère sa place', () => {

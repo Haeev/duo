@@ -21,6 +21,7 @@ import {
   type IntentChannel,
 } from '../shared/ipc';
 import { parseCommandLine } from './args';
+import { LocalHistory } from './data/local-history';
 import { LocalSaves } from './data/local-saves';
 import { MachineStore } from './data/store';
 import { scanGames, type Catalog, type GameEntry, type GameRoot } from './games/catalog';
@@ -297,6 +298,7 @@ async function start(): Promise<void> {
     journal,
     store,
     saves: new LocalSaves(userData),
+    history: new LocalHistory(userData),
     liaison,
     machineId: loaded.machineId,
     appVersion: app.getVersion(),

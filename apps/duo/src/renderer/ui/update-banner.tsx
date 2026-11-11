@@ -17,6 +17,9 @@ export const majTextes = {
   aJour: (game: string, version: string): string => fr`${game} est à jour (version ${version}).`,
   echec: (game: string, version: string): string =>
     fr`La mise à jour ${de(game)} vers ${version} n'a pas pu se faire. Vérifie la connexion à Internet, puis réessaie.`,
+  /** L'archive reçue ne correspond pas à l'empreinte du catalogue: rien n'a été installé. */
+  echecIntegrite: (game: string, version: string, installed: string): string =>
+    fr`Le fichier de la mise à jour ${de(game)} vers ${version} est arrivé abîmé : Duo ne l'a pas installé. Ta version ${installed} reste jouable ; tu peux réessayer le téléchargement.`,
   reessayer: 'Réessayer',
   jouerQuandMeme: (version: string): string => fr`Jouer quand même (version ${version})`,
   raisonMaj: fr`Attends la fin de la mise à jour pour jouer.`,
@@ -92,7 +95,11 @@ export function UpdateBanner({ game }: { game: GameSummary }): JSX.Element | nul
           data-testid={testId}
           data-etat="failed"
         >
-          <p class="petit">{majTextes.echec(game.name, update.version)}</p>
+          <p class="petit">
+            {update.cause === 'integrity'
+              ? majTextes.echecIntegrite(game.name, update.version, game.version)
+              : majTextes.echec(game.name, update.version)}
+          </p>
           <div class="bandeau-maj-actions">
             <button
               type="button"

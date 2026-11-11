@@ -78,6 +78,9 @@ export type CheckResult =
 
 class Busy extends Error {}
 
+/** Archive reçue dont l'empreinte SHA-256 diffère de celle du catalogue: jamais installée. */
+class IntegrityError extends Error {}
+
 function describe(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -276,7 +279,9 @@ export class GameUpdater {
           return { kind: 'deferred' };
         }
         // Les autres jeux continuent: un échec ne laisse pas leurs mises à jour en attente.
-        this.setStatus(entry.id, { kind: 'failed', version: entry.version, playAnyway });
+        // La version installée n'est pas touchée: elle reste jouable (« Jouer quand même »).
+        const cause = error instanceof IntegrityError ? 'integrity' : 'download';
+        this.setStatus(entry.id, { kind: 'failed', version: entry.version, playAnyway, cause });
         failure ??= {
           kind: 'failed',
           step: 'download',
@@ -295,7 +300,7 @@ export class GameUpdater {
         archive,
         move: true,
         expected: { id: entry.id, version: entry.version },
-        sha256: entry.sha256,
+        ...(entry.sha256 === undefined ? {} : { sha256: entry.sha256 }),
       });
       await rm(archive, { force: true });
       if (outcome.ok) {
@@ -310,7 +315,12 @@ export class GameUpdater {
       } else if (outcome.reason === 'not-newer') {
         this.setStatus(entry.id, null);
       } else {
-        this.setStatus(entry.id, { kind: 'failed', version: entry.version, playAnyway });
+        this.setStatus(entry.id, {
+          kind: 'failed',
+          version: entry.version,
+          playAnyway,
+          cause: 'install',
+        });
         failure ??= {
           kind: 'failed',
           step: 'install',
@@ -386,9 +396,17 @@ export class GameUpdater {
       );
       if (received !== entry.taille)
         throw new Error(`${received} octets reçus, ${entry.taille} attendus`);
-      // Fichier abîmé: supprimé, la recherche suivante recommence (UX 7.3).
-      if (hash.digest('hex') !== entry.sha256)
-        throw new Error('empreinte SHA-256 différente du catalogue');
+      // Fichier abîmé ou remplacé: supprimé, la recherche suivante recommence (UX 7.3).
+      // Catalogue ancien sans empreinte: seule la signature du paquet, contrôlée à l'installation, protège.
+      const digest = hash.digest('hex');
+      if (entry.sha256 === undefined) {
+        this.deps.journal.write('warn', 'games', 'catalogue-entry-without-sha256', {
+          id: entry.id,
+          version: entry.version,
+        });
+      } else if (digest !== entry.sha256) {
+        throw new IntegrityError(`empreinte SHA-256 ${digest}, ${entry.sha256} attendue`);
+      }
       await rename(partial, target);
       return target;
     } catch (error) {

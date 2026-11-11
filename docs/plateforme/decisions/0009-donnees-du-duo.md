@@ -177,3 +177,8 @@ Le dossier ne contient, en fait de données personnelles, que les pseudos. Ni no
 - Chargement de 2 000 entrées d'historique (2 000 fichiers) sous Windows, antivirus actif: moins d'1 s exigé (CA-PF-064). Repli si la mesure échoue: un cache d'index reconstructible.
 - Reprises sur `EPERM` et `EBUSY` face à Microsoft Defender sur le PC du client (CA-PF-053 en CI Windows d'abord).
 - Durabilité de `fsync` sous macOS (Node n'emploie pas `F_FULLFSYNC`): acceptable pour une coupure de courant rare, à surveiller.
+
+## Précision: historique du prototype (Duo 0.4.0, 2026-11-11)
+
+En attendant les duos et la réplication (lot L9), comme les sauvegardes locales: chaque machine inscrit elle-même chaque partie ou séance terminée dans `<userData>/historique-local/<jeu>/<AAAAMMJJTHHMMSSZ>-<partieId>.json` (schéma 1: jeu et version, `match` ou `session`, place de la machine, fin, durée jouée hors pauses, raison, issue, progression, trois statistiques au plus). Les deux machines partent de la même fin décidée par l'hôte, donc de la même entrée; le résumé que le jeu donne après l'arrêt la complète une fois, au même fichier. Un échec du chargement n'est pas inscrit. Le salon montre les trois dernières entrées du jeu (« Dernières séances »). Limites: pas de marqueur `live/` (Duo fermé pendant une partie n'inscrit rien), pas d'écran Historique ni de score cumulé encore; le lot L9 reprendra ces fichiers dans `duos/<duoId>/history/`.
+

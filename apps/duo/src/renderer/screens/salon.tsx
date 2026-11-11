@@ -2,9 +2,9 @@
 // quand c'est dit des deux côtés, puis le compte à rebours (UX section 2).
 import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
-import type { AppState, Profile, SalonNews, SalonView } from '../../shared/state';
+import type { AppState, HistoryItemView, Profile, SalonNews, SalonView } from '../../shared/state';
 import { send } from '../bridge';
-import { durationRange, fr, t, when } from '../textes';
+import { durationRange, fr, percent, playedMinutes, t, when } from '../textes';
 import { ActionList, Chip, Dialog, Icon, PlayerCard, Sky, useCountdown } from '../ui/components';
 import { useEscape, useInitialFocus } from '../ui/keyboard';
 import { UpdateBanner, gateFor, gateReason } from '../ui/update-banner';
@@ -74,6 +74,59 @@ function SaveBlock({ salon, hostName }: { salon: SalonView; hostName: string }):
         </label>
       ))}
       {game.saves.help !== null && <p class="petit texte-second">{game.saves.help}</p>}
+    </div>
+  );
+}
+
+// Dernières séances de ce jeu sur cet ordinateur: date, durée, avancement, et les
+// trois nombres que le jeu donne avec leur libellé (résumé de séance, SDK 1.2).
+/** « Aujourd'hui à 21 h 40 » en début de ligne (UX 5.4). */
+function capitalized(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function HistoryBlock({
+  items,
+  session,
+}: {
+  items: readonly HistoryItemView[];
+  session: boolean;
+}): JSX.Element {
+  const texts = t.salon.historique;
+  return (
+    <div class="carte carte-historique" data-testid="salon-historique">
+      <h2 class="surtitre">{texts.titre(session)}</h2>
+      {items.length === 0 ? (
+        <p class="petit texte-second">{texts.vide(session)}</p>
+      ) : (
+        <ol class="historique-liste">
+          {items.map((item) => {
+            const result = texts.resultat[item.result];
+            return (
+              <li key={item.matchId} class="historique-entree" data-testid="historique-entree">
+                <p class="petit">
+                  <span class="libelle">{capitalized(when(item.endedAt))}</span>
+                  <span class="texte-second"> · {playedMinutes(item.durationMs)}</span>
+                  {result !== '' && <span class="texte-second"> · {result}</span>}
+                </p>
+                {item.progress !== null && (
+                  <p class="petit texte-second">{texts.avancement(percent(item.progress))}</p>
+                )}
+                {item.stats.length > 0 && (
+                  <dl class="historique-stats">
+                    {item.stats.map((stat) => (
+                      <div key={stat.label} class="historique-stat">
+                        <dt class="petit texte-second">{stat.label}</dt>
+                        <dd class="libelle">{stat.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </div>
   );
 }
@@ -289,6 +342,7 @@ export function Salon({
               setNotesOpen(true);
             }}
           />
+          <HistoryBlock items={salon.history} session={salon.game.play === 'session'} />
         </aside>
       </main>
       {seconds !== null && (

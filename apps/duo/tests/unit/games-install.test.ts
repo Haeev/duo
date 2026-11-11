@@ -275,4 +275,47 @@ describe('recherche des jeux', () => {
       sha256: packages.get('1.1.0')?.sha256,
     });
   });
+
+  it('empreinte différente: échec « intégrité », la version installée reste en place et jouable', async () => {
+    const gamesDir = path.join(work, 'donnees-6', 'games');
+    const installer = new GameInstaller({
+      gamesDir,
+      trustedKeys: [TEST_KEY],
+      effectiveVersion: () => null,
+    });
+    const first = await installer.install({ archive: archive('1.0.0'), move: false });
+    expect(first).toMatchObject({ ok: true, version: '1.0.0' });
+    const pointer = path.join(gamesDir, 'essai-pont', 'current.json');
+    const before = await readFile(pointer, 'utf8');
+
+    const installed: string[] = [];
+    catalogue = JSON.stringify({ schema: 1, jeux: [entry({ sha256: 'c'.repeat(64) })] });
+    const instance = updater(gamesDir, installed);
+    expect(await instance.check()).toMatchObject({ kind: 'failed', step: 'download' });
+    expect(instance.snapshot().games.get('essai-pont')).toEqual({
+      kind: 'failed',
+      version: '1.1.0',
+      playAnyway: false,
+      cause: 'integrity',
+    });
+    expect(installed).toEqual([]);
+    expect(await readFile(pointer, 'utf8')).toBe(before);
+    expect(await readdir(path.join(gamesDir, 'essai-pont'))).not.toContain('1.1.0');
+    expect(await readdir(path.join(gamesDir, '.incoming'))).toEqual([]);
+    const games = await scanGames([{ source: 'installed', dir: gamesDir }]);
+    expect(games.games.map((game) => game.manifest.version)).toEqual(['1.0.0']);
+  });
+
+  it('catalogue ancien sans empreinte: installe le paquet, dont la signature reste contrôlée', async () => {
+    const gamesDir = path.join(work, 'donnees-7', 'games');
+    const installed: string[] = [];
+    const ancienne = entry();
+    delete ancienne.sha256;
+    catalogue = JSON.stringify({ schema: 1, jeux: [ancienne] });
+    expect(await updater(gamesDir, installed).check()).toEqual({ kind: 'done', installed: 1 });
+    expect(installed).toEqual(['essai-pont@1.1.0']);
+    expect(
+      JSON.parse(await readFile(path.join(gamesDir, 'essai-pont', 'current.json'), 'utf8')),
+    ).toEqual({ schema: 1, version: '1.1.0', sha256: null });
+  });
 });

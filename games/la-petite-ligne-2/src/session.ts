@@ -19,6 +19,7 @@ import { createGuest, type Guest } from './reseau/invite';
 import { createHost, type Host } from './reseau/hote';
 import { createSaveTrigger, type SaveTrigger } from './sauvegarde/declencheur';
 import { restoreWorld, snapshotOf, type ResumeNotice } from './sauvegarde/sauvegarde';
+import { provideSessionSummary } from './sauvegarde/seance';
 import type { Aim } from './simulation/briques/types';
 import { aimOf } from './simulation/briques/visee';
 import type { Intent, StepInput } from './simulation/noyau/entrees';
@@ -149,6 +150,7 @@ export function createSession(options: SessionOptions): Session {
     local = hostSim.world.players[0].member === duo.localPlayer.id ? 0 : 1;
     host = createHost(hostSim, net, duo.log, local, { advance: step });
     duo.saves.provide(() => snapshotOf(hostSim.world, content));
+    provideSessionSummary(duo.results, content, () => hostSim.world);
     saves = createSaveTrigger({
       target: duo.saves,
       snapshot: () => snapshotOf(hostSim.world, content),

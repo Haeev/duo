@@ -2,11 +2,12 @@
 // la liaison provisoire, avec le jeu d'essai du pont: le parcours complet d'une
 // séance, puis un jeu qui plante et un jeu qui se fige.
 import { execFile } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { expect, test, type Page } from '@playwright/test';
 import {
+  APP_DIR,
   FIXTURE_GAMES,
   SCREENSHOTS,
   closeDuo,
@@ -30,6 +31,9 @@ interface EssaiState {
   pausedBy: string | null;
   saveResults: string[];
 }
+
+/** Captures versionnées du bloc « Dernières séances » (preuve pour la revue). */
+const HISTORY_CAPTURES = path.join(APP_DIR, '..', '..', 'docs', 'plateforme', 'captures');
 
 function essai(page: Page): Promise<EssaiState> {
   return page.evaluate(() => (window as unknown as { __essai: EssaiState }).__essai);
@@ -171,6 +175,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await expect(camille.platform.getByTestId('ecran-fin')).toContainText(
       'Progression enregistrée.',
     );
+    // Résumé de séance envoyé par le jeu en réponse à l'arrêt: écran de fin des deux côtés.
+    await expect(camille.platform.getByTestId('fin-statistiques')).toContainText('Appuis ici');
+    await expect(sacha.platform.getByTestId('fin-statistiques')).toContainText('Appuis ici');
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-fin-seance.png') });
 
     const head = JSON.parse(
@@ -193,6 +200,29 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await expect(camille.platform.getByTestId('sauvegarde-continue')).toBeChecked();
     await expect(sacha.platform.getByTestId('salon-sauvegarde-invite')).toContainText('Compteur 1');
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-salon-continuer.png') });
+
+    // Historique: la séance est inscrite sur les deux ordinateurs, avec avancement et nombres.
+    for (const instance of [camille, sacha]) {
+      const block = instance.platform.getByTestId('salon-historique');
+      await expect(block.getByTestId('historique-entree')).toHaveCount(1, { timeout: 5000 });
+      await expect(block).toContainText('Appuis ici');
+      await expect(block).toContainText('Appuis là-bas');
+      await expect(block).toContainText('Avancement');
+      await block.scrollIntoViewIfNeeded();
+    }
+    await camille.platform.screenshot({
+      path: path.join(HISTORY_CAPTURES, 'salon-historique-hote.png'),
+    });
+    await sacha.platform.screenshot({
+      path: path.join(HISTORY_CAPTURES, 'salon-historique-invite.png'),
+    });
+    // Les deux ordinateurs ont leur copie de l'entrée, avec le résumé du jeu.
+    for (const instance of [camille, sacha]) {
+      const dir = path.join(instance.dataDir, 'historique-local', 'essai-pont');
+      const [file] = await readdir(dir);
+      const entry = JSON.parse(await readFile(path.join(dir, file ?? ''), 'utf8')) as unknown;
+      expect(entry).toMatchObject({ reason: 'stopped', progress: 0.25, stats: { length: 2 } });
+    }
 
     // Nouvelle séance: le jeu de l'hôte reçoit la sauvegarde dans init (sens principal vers jeu).
     await camille.platform.getByTestId('salon-pret').click();

@@ -76,10 +76,29 @@ export interface SalonNews {
   readonly isNew: boolean;
 }
 
+/** Une partie ou séance passée, vue de cette machine (salon, « Dernières séances »). */
+export interface HistoryItemView {
+  readonly matchId: string;
+  readonly endedAt: number;
+  /** Temps joué hors pauses. */
+  readonly durationMs: number;
+  /**
+   * `session`: séance quittée normalement; `interrupted`: plantage, départ de l'autre ou
+   * partie arrêtée avant sa fin; les autres, issue d'une partie vue de cette machine.
+   */
+  readonly result: 'session' | 'interrupted' | 'won' | 'lost' | 'draw' | 'success' | 'failure';
+  /** Avancement déclaré par le jeu (0 à 1), `null` s'il n'en donne pas. */
+  readonly progress: number | null;
+  /** Trois nombres au plus, avec leur libellé, fournis par le jeu. */
+  readonly stats: readonly { readonly label: string; readonly value: string }[];
+}
+
 export interface SalonView {
   readonly role: 'host' | 'guest';
   readonly game: GameSummary;
   readonly news: SalonNews;
+  /** Dernières parties ou séances de ce jeu sur cet ordinateur, la plus récente d'abord. */
+  readonly history: readonly HistoryItemView[];
   readonly saveChoice: SaveChoice;
   /** Sauvegarde reprise, vue de l'hôte (l'invité la voit aussi). */
   readonly save: SaveSummary | null;

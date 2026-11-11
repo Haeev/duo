@@ -71,6 +71,28 @@ const SALON: SalonView = {
     ],
     isNew: true,
   },
+  history: [
+    {
+      matchId: 'seance-2',
+      endedAt: Date.now() - 86_400_000,
+      durationMs: 47 * 60_000,
+      result: 'session',
+      progress: 0.35,
+      stats: [
+        { label: 'Jours vécus', value: '2' },
+        { label: 'Étapes de quête franchies', value: '4' },
+        { label: 'Entrées de collection ajoutées', value: '3' },
+      ],
+    },
+    {
+      matchId: 'seance-1',
+      endedAt: Date.now() - 3 * 86_400_000,
+      durationMs: 12 * 60_000,
+      result: 'interrupted',
+      progress: 0.2,
+      stats: [],
+    },
+  ],
   saveChoice: 'continue',
   save: GAME.lastSave,
   selfReady: false,

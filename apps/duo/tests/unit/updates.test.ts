@@ -43,10 +43,16 @@ describe('règle de lancement', () => {
 
   it('échec: bloqué jusqu’à « Jouer quand même », puis jouable', () => {
     expect(
-      launchGate({ kind: 'failed', version: '1.1.0', playAnyway: false }, { kind: 'ok' }).kind,
+      launchGate(
+        { kind: 'failed', version: '1.1.0', playAnyway: false, cause: 'download' },
+        { kind: 'ok' },
+      ).kind,
     ).toBe('failed');
     expect(
-      launchGate({ kind: 'failed', version: '1.1.0', playAnyway: true }, { kind: 'ok' }).kind,
+      launchGate(
+        { kind: 'failed', version: '1.1.0', playAnyway: true, cause: 'download' },
+        { kind: 'ok' },
+      ).kind,
     ).toBe('open');
   });
 
@@ -111,7 +117,12 @@ describe('contrôle rapide', () => {
     expect(kinds).toContain('available');
     expect(kinds).toContain('downloading');
     const failed = instance.snapshot().games.get('essai-pont') ?? null;
-    expect(failed).toEqual({ kind: 'failed', version: '1.1.0', playAnyway: false });
+    expect(failed).toEqual({
+      kind: 'failed',
+      version: '1.1.0',
+      playAnyway: false,
+      cause: 'download',
+    });
     expect(launchGate(failed, instance.snapshot().check).kind).toBe('failed');
 
     await instance.retry();
