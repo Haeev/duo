@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "bois-flotte",
+  "name": "Bois flotté",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

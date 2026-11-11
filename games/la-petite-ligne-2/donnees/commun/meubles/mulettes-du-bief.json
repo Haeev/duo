@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "mulettes-du-bief",
+  "name": "Mulettes de l'anse",
+  "model": "stone-b",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "mulettes-du-bief"
+    }
+  ]
+}

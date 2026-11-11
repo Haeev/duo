@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "coquille-de-limnee",
+  "name": "Coquille d'escargot d'eau",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}

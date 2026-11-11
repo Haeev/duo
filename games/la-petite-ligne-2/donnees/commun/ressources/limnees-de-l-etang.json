@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "limnees-de-l-etang",
+  "name": "Escargots d'eau vides",
+  "kind": "pick",
+  "verb": "Ramasser",
+  "clip": "pickup",
+  "seconds": 0.5,
+  "tool": null,
+  "minTier": 0,
+  "work": 1,
+  "dirty": false,
+  "effort": 0,
+  "after": "gone",
+  "respawnDays": 1,
+  "toGround": false,
+  "rolls": 1,
+  "loot": [
+    {
+      "item": "coquille-de-limnee",
+      "min": 1,
+      "max": 2,
+      "weight": 1,
+      "rare": false,
+      "hours": null,
+      "weathers": ["clear", "overcast"],
+      "seasons": ["spring", "summer", "autumn"]
+    },
+    {
+      "item": "coquille-de-limnee",
+      "min": 2,
+      "max": 3,
+      "weight": 1,
+      "rare": false,
+      "hours": null,
+      "weathers": ["rain", "mist", "storm", "snow"],
+      "seasons": ["spring", "summer", "autumn"]
+    }
+  ]
+}

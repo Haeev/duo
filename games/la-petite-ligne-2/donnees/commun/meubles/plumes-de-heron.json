@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "plumes-de-heron",
+  "name": "Plumes au bord de l'eau",
+  "model": "wild-herbs",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "plumes-de-heron"
+    }
+  ]
+}

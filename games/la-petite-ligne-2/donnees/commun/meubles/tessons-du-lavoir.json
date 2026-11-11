@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "tessons-du-lavoir",
+  "name": "Tessons au fond de la rigole",
+  "model": "stone-b",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": [
+    {
+      "brick": "harvest",
+      "resource": "tessons-du-lavoir"
+    }
+  ]
+}

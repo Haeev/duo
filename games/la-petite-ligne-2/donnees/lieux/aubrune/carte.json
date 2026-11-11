@@ -2510,6 +2510,158 @@
       "pourquoi": "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie"
     },
     {
+      "id": "berge-coquilles-gue-1",
+      "type": "coquilles-de-greve",
+      "x": 187.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "grève du gué: le courant ralentit avant le gué et dépose les coquilles vides des mulettes sur le gravier"
+    },
+    {
+      "id": "berge-coquilles-gue-2",
+      "type": "coquilles-de-greve",
+      "x": 190.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "grève du gué, côté aval: second dépôt de coquilles, entre deux pierres plates"
+    },
+    {
+      "id": "berge-galets-gue",
+      "type": "galets-veines",
+      "x": 192.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "bout aval de la grève: les galets veinés de quartz roulés depuis la Côte s'y arrêtent, avec les pierres plates"
+    },
+    {
+      "id": "berge-laisse-joncs",
+      "type": "laisse-de-crue",
+      "x": 197.5,
+      "y": 129.5,
+      "rotation": 0,
+      "pourquoi": "au pied des joncs, à côté du bois flotté qui sèche: les joncs retiennent ce que la rivière charrie"
+    },
+    {
+      "id": "berge-tessons-lavoir",
+      "type": "tessons-du-lavoir",
+      "x": 225.5,
+      "y": 119.5,
+      "rotation": 0,
+      "pourquoi": "au pied du lavoir, côté bassin, sur la rive ouest de la rigole: les assiettes rincées au bassin y laissent leurs éclats"
+    },
+    {
+      "id": "berge-tessons-rigole",
+      "type": "tessons-du-lavoir",
+      "x": 226.5,
+      "y": 128.5,
+      "rotation": 0,
+      "pourquoi": "à la bouche de la rigole, où elle rend à l'Aubrune ce qu'on a lavé: les tessons roulés s'arrêtent dans l'angle, sous le saule"
+    },
+    {
+      "id": "berge-plumes-aval",
+      "type": "plumes-de-heron",
+      "x": 264.5,
+      "y": 130.5,
+      "rotation": 0,
+      "pourquoi": "sous le saule têtard de l'aval, au sud-est du tronc (vu de la caméra): le héron y pêche à l'aube et y laisse ses plumes"
+    },
+    {
+      "id": "berge-laisse-aval",
+      "type": "laisse-de-crue",
+      "x": 272.5,
+      "y": 130.5,
+      "rotation": 0,
+      "pourquoi": "là où la rive s'avance dans le courant: la crue y dépose son bois avant le coude"
+    },
+    {
+      "id": "berge-coquilles-ile",
+      "type": "coquilles-de-greve",
+      "x": 37.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "grève de l'Île, au pied de la vanne: l'eau qui tombe du déversoir y roule les coquilles"
+    },
+    {
+      "id": "berge-galets-ile",
+      "type": "galets-veines",
+      "x": 46.5,
+      "y": 146.5,
+      "rotation": 0,
+      "pourquoi": "bout est de la grève de l'Île, après les pierres plates: les galets du déversoir"
+    },
+    {
+      "id": "berge-mulettes-anse-1",
+      "type": "mulettes-du-bief",
+      "x": 48.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "l'anse du bief, côté Île: l'eau se calme en sortant de la vanne, les mulettes vivent dans le sable clair (la perle est là)"
+    },
+    {
+      "id": "berge-mulettes-anse-2",
+      "type": "mulettes-du-bief",
+      "x": 52.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "l'anse du bief, plus à l'est: le second lit de mulettes, au bord du sentier de l'Île sans le toucher"
+    },
+    {
+      "id": "berge-plumes-anse",
+      "type": "plumes-de-heron",
+      "x": 56.5,
+      "y": 141.5,
+      "rotation": 0,
+      "pourquoi": "le bout de l'anse, où l'eau est la plus basse: le héron y pêche à l'aube, le martin-pêcheur file au ras de l'eau"
+    },
+    {
+      "id": "berge-laisse-ile",
+      "type": "laisse-de-crue",
+      "x": 70.5,
+      "y": 145.5,
+      "rotation": 0,
+      "pourquoi": "rive sud de l'Île, face à la rivière: la pointe que la crue recouvre et où elle laisse son bois"
+    },
+    {
+      "id": "berge-limnees-etang-o",
+      "type": "limnees-de-l-etang",
+      "x": 230.5,
+      "y": 46.5,
+      "rotation": 0,
+      "pourquoi": "bord de vase de l'étang, à l'ouest de la bonde: les escargots d'eau des roseaux y laissent leurs coquilles"
+    },
+    {
+      "id": "berge-limnees-etang-e",
+      "type": "limnees-de-l-etang",
+      "x": 242.5,
+      "y": 46.5,
+      "rotation": 0,
+      "pourquoi": "bord de vase de l'étang, à l'est, au pied du sentier de la digue"
+    },
+    {
+      "id": "berge-plumes-etang",
+      "type": "plumes-de-heron",
+      "x": 234.5,
+      "y": 47.5,
+      "rotation": 0,
+      "pourquoi": "la vase à l'est de la bonde, eau basse: le héron de l'étang y guette à l'aube"
+    },
+    {
+      "id": "cote-girolles-1",
+      "type": "girolles",
+      "x": 180.5,
+      "y": 26.5,
+      "rotation": 0,
+      "pourquoi": "sous-bois humide à l'est du chemin forestier, au carrefour du haut: les girolles de l'été et de l'automne, le matin"
+    },
+    {
+      "id": "cote-girolles-2",
+      "type": "girolles",
+      "x": 174.5,
+      "y": 29.5,
+      "rotation": 0,
+      "pourquoi": "sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles"
+    },
+    {
       "id": "vieux-chene",
       "type": "gros-chene",
       "x": 188,

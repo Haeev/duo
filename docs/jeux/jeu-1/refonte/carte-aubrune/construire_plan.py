@@ -1766,6 +1766,70 @@ fete('fete-hiver-estrade', 'estrade-de-fanfare', 175.5, 102, 1, _quand(HIVER), '
      "l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie")
 
 
+# ================================================================ version 8: coquillages et rivière (cahier 4.7, 2026-11-11)
+# Trouvailles de berge: une ressource par sorte de rive (`donnees/commun/ressources/<id>.json`), un meuble du même
+# identifiant qui la porte, un point par case au bord de l'eau, jamais sur un chemin ni un seuil. Le meuble porte le nom
+# de sa ressource: une ligne de plus ici suffit pour un point de plus. Contrôle: `controler_trouvailles.py`.
+# Pas de coquillage de mer: Aubrune est dans les terres (mulettes, escargots d'eau, galets, bois, faïence, plumes).
+TROUVAILLES = [
+    # acte 1, la grève du gué: graviers au pied de la berge, à l'ouest des pierres plates (rangée 129, cailloux)
+    ('berge-coquilles-gue-1', 'coquilles-de-greve', 187.5, 129.5, 1,
+     "grève du gué: le courant ralentit avant le gué et dépose les coquilles vides des mulettes sur le gravier"),
+    ('berge-coquilles-gue-2', 'coquilles-de-greve', 190.5, 129.5, 1,
+     "grève du gué, côté aval: second dépôt de coquilles, entre deux pierres plates"),
+    ('berge-galets-gue', 'galets-veines', 192.5, 129.5, 1,
+     "bout aval de la grève: les galets veinés de quartz roulés depuis la Côte s'y arrêtent, avec les pierres plates"),
+    ('berge-laisse-joncs', 'laisse-de-crue', 197.5, 129.5, 1,
+     "au pied des joncs, à côté du bois flotté qui sèche: les joncs retiennent ce que la rivière charrie"),
+    # acte 1, le lavoir et sa rigole: ce qu'on casse en lavant file avec l'eau claire
+    ('berge-tessons-lavoir', 'tessons-du-lavoir', 225.5, 119.5, 1,
+     "au pied du lavoir, côté bassin, sur la rive ouest de la rigole: les assiettes rincées au bassin y laissent leurs éclats"),
+    ('berge-tessons-rigole', 'tessons-du-lavoir', 226.5, 128.5, 1,
+     "à la bouche de la rigole, où elle rend à l'Aubrune ce qu'on a lavé: les tessons roulés s'arrêtent dans l'angle, sous le saule"),
+    # acte 1, la rive aval: les saules têtards où le héron guette au lever du jour
+    ('berge-plumes-aval', 'plumes-de-heron', 264.5, 130.5, 1,
+     "sous le saule têtard de l'aval, au sud-est du tronc (vu de la caméra): le héron y pêche à l'aube et y laisse ses plumes"),
+    ('berge-laisse-aval', 'laisse-de-crue', 272.5, 130.5, 1,
+     "là où la rive s'avance dans le courant: la crue y dépose son bois avant le coude"),
+    # acte 2, l'Île: la grève de la vanne et l'anse du bief
+    ('berge-coquilles-ile', 'coquilles-de-greve', 37.5, 146.5, 2,
+     "grève de l'Île, au pied de la vanne: l'eau qui tombe du déversoir y roule les coquilles"),
+    ('berge-galets-ile', 'galets-veines', 46.5, 146.5, 2,
+     "bout est de la grève de l'Île, après les pierres plates: les galets du déversoir"),
+    ('berge-mulettes-anse-1', 'mulettes-du-bief', 48.5, 141.5, 2,
+     "l'anse du bief, côté Île: l'eau se calme en sortant de la vanne, les mulettes vivent dans le sable clair (la perle est là)"),
+    ('berge-mulettes-anse-2', 'mulettes-du-bief', 52.5, 141.5, 2,
+     "l'anse du bief, plus à l'est: le second lit de mulettes, au bord du sentier de l'Île sans le toucher"),
+    ('berge-plumes-anse', 'plumes-de-heron', 56.5, 141.5, 2,
+     "le bout de l'anse, où l'eau est la plus basse: le héron y pêche à l'aube, le martin-pêcheur file au ras de l'eau"),
+    ('berge-laisse-ile', 'laisse-de-crue', 70.5, 145.5, 2,
+     "rive sud de l'Île, face à la rivière: la pointe que la crue recouvre et où elle laisse son bois"),
+    # acte 3, l'étang de la Côte: la vase du bord, côté digue (eau dormante: escargots d'eau)
+    ('berge-limnees-etang-o', 'limnees-de-l-etang', 230.5, 46.5, 3,
+     "bord de vase de l'étang, à l'ouest de la bonde: les escargots d'eau des roseaux y laissent leurs coquilles"),
+    ('berge-limnees-etang-e', 'limnees-de-l-etang', 242.5, 46.5, 3,
+     "bord de vase de l'étang, à l'est, au pied du sentier de la digue"),
+    ('berge-plumes-etang', 'plumes-de-heron', 234.5, 47.5, 3,
+     "la vase à l'est de la bonde, eau basse: le héron de l'étang y guette à l'aube"),
+    # acte 3, les girolles: sous-bois humide au carrefour du haut (c6), de part et d'autre du chemin, jamais dessus
+    ('cote-girolles-1', 'girolles', 180.5, 26.5, 3,
+     "sous-bois humide à l'est du chemin forestier, au carrefour du haut: les girolles de l'été et de l'automne, le matin"),
+    ('cote-girolles-2', 'girolles', 174.5, 29.5, 3,
+     "sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles"),
+]
+# Modèle de repli de chaque meuble (manifeste des décors) en attendant les siens: liste pour l'artiste dans plan.md.
+_REPLI = {'coquilles-de-greve': 'stone-b', 'mulettes-du-bief': 'stone-b', 'galets-veines': 'stone-c',
+          'laisse-de-crue': 'dead-branches-b', 'tessons-du-lavoir': 'stone-b', 'plumes-de-heron': 'wild-herbs',
+          'limnees-de-l-etang': 'stone-b', 'girolles': 'wild-herbs'}
+for _i, _t, _x, _y, _a, _pq in TROUVAILLES:
+    mob(_i, _t, _REPLI[_t], _x, _y, 0, _pq, acte=_a)
+for _r in RESSOURCES:
+    if _r['id'] in ('coquillages-greve', 'coquillages-ile'):
+        _r.update(heures='toutes', pourquoi=_r['pourquoi'] + "; coquilles, galets et bois flotté (version 8): plus après la pluie")
+    elif _r['id'] == 'champignons':
+        _r.update(saisons=['été', 'automne'], pourquoi="girolles du sous-bois humide, le matin (plus quand il pleut), posées en version 8")
+
+
 # ================================================================ calculs
 def dist(a, b):
     return math.hypot(N[a]['x'] - N[b]['x'], N[a]['y'] - N[b]['y'])

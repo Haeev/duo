@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "plumes-de-heron",
+  "name": "Plumes au bord de l'eau",
+  "kind": "pick",
+  "verb": "Ramasser",
+  "clip": "pickup",
+  "seconds": 0.5,
+  "tool": null,
+  "minTier": 0,
+  "work": 1,
+  "dirty": false,
+  "effort": 0,
+  "after": "gone",
+  "respawnDays": 1,
+  "toGround": false,
+  "rolls": 1,
+  "loot": [
+    {
+      "item": "plume-de-heron",
+      "min": 1,
+      "max": 1,
+      "weight": 1,
+      "rare": false,
+      "hours": {
+        "from": 360,
+        "to": 540
+      },
+      "weathers": [],
+      "seasons": []
+    },
+    {
+      "item": "plume-de-martin-pecheur",
+      "min": 1,
+      "max": 1,
+      "weight": 0.12,
+      "rare": true,
+      "hours": {
+        "from": 360,
+        "to": 540
+      },
+      "weathers": [],
+      "seasons": []
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 | Statut | version 3: plan validé par le client le 2026-11-10 (taille, ouest allongé de 64 m, ferme sur la rive sud derrière le gué, rive du bourg ouverte dès l'acte 1), complété pour la 3D (section 12), raccordé à l'histoire écrite des actes 1 à 3 (section 13); manques de la nuit du 2026-11-11 comblés (section 15); décor des fêtes et des veillées, présent le jour de la fête seulement (section 18) |
 | Date | 2026-11-10 |
 | Source unique | `construire_plan.py` (composition en code), qui écrit `plan.json`, les SVG, les PNG et les tableaux marqués « généré » de ce document |
-| Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (36 casses vues sur 36, dont 6 du décor des fêtes), `assembler_lieu.py` (aucun verrou contournable sur la grille); règle d'accès des intérieurs et du dehors (section 14), aussi tenue par `tests/points-de-quete.test.ts` du jeu |
+| Contrôle | `controler_plan.py` (0 erreur, dont l'ordre réel de l'histoire relu dans les fiches et rejoué sur la grille du lieu), `controler_plan.py --eprouver` (36 casses vues sur 36, dont 6 du décor des fêtes), `assembler_lieu.py` (aucun verrou contournable sur la grille); règle d'accès des intérieurs et du dehors (section 14), aussi tenue par `tests/points-de-quete.test.ts` du jeu; `controler_trouvailles.py` (0 erreur: les 19 trouvailles de berge, section 19) |
 | Règle suivie | « le plan avant le volume » (CLAUDE.md): la carte 3D sera générée à partir de `plan.json`, jamais l'inverse |
 
 Images: `plan-ensemble.png`, `zone-1-bourg.png` à `zone-7-tunnel.png`, `quetes-acte-1.png` à `quetes-acte-3.png` (SVG de même nom à côté).
@@ -616,6 +616,25 @@ Une entrée de `assets-src/decors/gabarits.toml` par bâtiment, façades dans le
 | buisson-friche-1 | buisson | `berry-bush-bare` | 93.5, 88.5 | sud | un buisson de la friche |
 | buisson-friche-2 | buisson | `berry-bush-bare` | 96.5, 84.5 | sud | un buisson de la friche |
 | rocher-friche | rocher | `rock` | 98.5, 89.5 | sud | un rocher laissé là quand on a tracé la voie, dans la friche |
+| berge-coquilles-gue-1 | coquilles-de-greve | `stone-b` | 187.5, 129.5 | sud | grève du gué: le courant ralentit avant le gué et dépose les coquilles vides des mulettes sur le gravier |
+| berge-coquilles-gue-2 | coquilles-de-greve | `stone-b` | 190.5, 129.5 | sud | grève du gué, côté aval: second dépôt de coquilles, entre deux pierres plates |
+| berge-galets-gue | galets-veines | `stone-c` | 192.5, 129.5 | sud | bout aval de la grève: les galets veinés de quartz roulés depuis la Côte s'y arrêtent, avec les pierres plates |
+| berge-laisse-joncs | laisse-de-crue | `dead-branches-b` | 197.5, 129.5 | sud | au pied des joncs, à côté du bois flotté qui sèche: les joncs retiennent ce que la rivière charrie |
+| berge-tessons-lavoir | tessons-du-lavoir | `stone-b` | 225.5, 119.5 | sud | au pied du lavoir, côté bassin, sur la rive ouest de la rigole: les assiettes rincées au bassin y laissent leurs éclats |
+| berge-tessons-rigole | tessons-du-lavoir | `stone-b` | 226.5, 128.5 | sud | à la bouche de la rigole, où elle rend à l'Aubrune ce qu'on a lavé: les tessons roulés s'arrêtent dans l'angle, sous le saule |
+| berge-plumes-aval | plumes-de-heron | `wild-herbs` | 264.5, 130.5 | sud | sous le saule têtard de l'aval, au sud-est du tronc (vu de la caméra): le héron y pêche à l'aube et y laisse ses plumes |
+| berge-laisse-aval | laisse-de-crue | `dead-branches-b` | 272.5, 130.5 | sud | là où la rive s'avance dans le courant: la crue y dépose son bois avant le coude |
+| berge-coquilles-ile | coquilles-de-greve | `stone-b` | 37.5, 146.5 | sud | grève de l'Île, au pied de la vanne: l'eau qui tombe du déversoir y roule les coquilles |
+| berge-galets-ile | galets-veines | `stone-c` | 46.5, 146.5 | sud | bout est de la grève de l'Île, après les pierres plates: les galets du déversoir |
+| berge-mulettes-anse-1 | mulettes-du-bief | `stone-b` | 48.5, 141.5 | sud | l'anse du bief, côté Île: l'eau se calme en sortant de la vanne, les mulettes vivent dans le sable clair (la perle est là) |
+| berge-mulettes-anse-2 | mulettes-du-bief | `stone-b` | 52.5, 141.5 | sud | l'anse du bief, plus à l'est: le second lit de mulettes, au bord du sentier de l'Île sans le toucher |
+| berge-plumes-anse | plumes-de-heron | `wild-herbs` | 56.5, 141.5 | sud | le bout de l'anse, où l'eau est la plus basse: le héron y pêche à l'aube, le martin-pêcheur file au ras de l'eau |
+| berge-laisse-ile | laisse-de-crue | `dead-branches-b` | 70.5, 145.5 | sud | rive sud de l'Île, face à la rivière: la pointe que la crue recouvre et où elle laisse son bois |
+| berge-limnees-etang-o | limnees-de-l-etang | `stone-b` | 230.5, 46.5 | sud | bord de vase de l'étang, à l'ouest de la bonde: les escargots d'eau des roseaux y laissent leurs coquilles |
+| berge-limnees-etang-e | limnees-de-l-etang | `stone-b` | 242.5, 46.5 | sud | bord de vase de l'étang, à l'est, au pied du sentier de la digue |
+| berge-plumes-etang | plumes-de-heron | `wild-herbs` | 234.5, 47.5 | sud | la vase à l'est de la bonde, eau basse: le héron de l'étang y guette à l'aube |
+| cote-girolles-1 | girolles | `wild-herbs` | 180.5, 26.5 | sud | sous-bois humide à l'est du chemin forestier, au carrefour du haut: les girolles de l'été et de l'automne, le matin |
+| cote-girolles-2 | girolles | `wild-herbs` | 174.5, 29.5 | sud | sous-bois de l'autre côté du chemin, en contrebas: second rond de girolles |
 <!-- genere:mobilier:fin -->
 
 ### Végétation par zones
@@ -651,13 +670,13 @@ Arbres singuliers (champ `arbres`): Vieux Chêne, Gros Noyer, les deux chênes d
 | champs-location | culture | rectangle [214, 164, 48, 26] | 3 | toutes | toutes | les champs des Delmas, loués par parcelles |
 | mures-tranchee | cueillette | x 146, y 100.2 | 2 | jour | été, automne | les ronces des talus |
 | chataignes | cueillette | x 176, y 72 | 3 | jour | automne | châtaigniers du bas de la Côte, 3 m au sud des troncs (houppier) |
-| champignons | cueillette | x 176, y 25 | 3 | matin | automne | sous-bois humide, le matin après la pluie |
+| champignons | cueillette | x 176, y 25 | 3 | matin | été, automne | girolles du sous-bois humide, le matin (plus quand il pleut), posées en version 8 |
 | myrtilles | cueillette | x 152, y 17 | 3 | jour | été | la lande de la crête |
 | noix | cueillette | x 162, y 184 | 3 | jour | automne | sous le Gros Noyer |
 | pommes-verger | cueillette | x 310, y 120 | 1 | jour | automne | le verger communal |
 | legumes-jardins | cueillette | x 256.5, y 121.5 | 1 | jour | printemps, été | les jardins de la Rive: ce qu'on vous laisse prendre |
-| coquillages-greve | cueillette | x 187, y 128.6 | 1 | matin | toutes | la grève au pied de la berge, eaux basses du matin |
-| coquillages-ile | cueillette | x 42, y 146.6 | 2 | matin | toutes | la grève de l'Île |
+| coquillages-greve | cueillette | x 187, y 128.6 | 1 | toutes | toutes | la grève au pied de la berge, eaux basses du matin; coquilles, galets et bois flotté (version 8): plus après la pluie |
+| coquillages-ile | cueillette | x 42, y 146.6 | 2 | toutes | toutes | la grève de l'Île; coquilles, galets et bois flotté (version 8): plus après la pluie |
 | insectes-roseaux | insectes | x 116, y 141 | 2 | jour | printemps, été | libellules des roseaux |
 | insectes-cour-ecole | insectes | x 241, y 103 | 2 | jour | toutes | la cour d'Armand |
 | insectes-pre-meunier | insectes | x 144, y 117 | 3 | jour | printemps, été | le pré du meunier |
@@ -1447,3 +1466,143 @@ Coût mesuré: relire la présence des 63 objets (plus les 3 de la maison) prend
 | fete-hiver-tonneau | tonneau-en-perce | hiver | 186.5, 104.5 | sud | toute la fête |  | le tonneau en perce sur l'herbe au pied du bout ouest du quai, près de Jeanne, Solange, Lucie et Armand (quai-o) |
 | fete-hiver-estrade | estrade-de-fanfare | hiver | 175.5, 102 | est | toute la fête |  | l'estrade sur l'herbe à l'ouest de la route du Gué, face à l'est (vers le quai): le quai, 5 m de profondeur et le train à quai, n'a pas la place de 4 x 3 m; à 1 m du bord de la voie |
 <!-- genere:fetes:fin -->
+
+## 19. Coquillages et rivière (version 8, 2026-11-11)
+
+Activité cochée par le client (cahier 4.7, R28; audit du 11 novembre, B.7): « ramassage au bord de l'eau, selon l'heure et la pluie ». Aubrune est dans les terres: pas de coquillage de mer, mais ce qu'une rivière de campagne, un bief et un étang laissent sur leurs rives. Tout est en données (`donnees/commun/objets`, `ressources`, `meubles`, lignes de rachat des commerces) et posé par le plan (`construire_plan.py`, section « version 8 »), sans une ligne de moteur.
+
+### Intention
+
+- **Ce qu'elle enseigne**: regarder le bord de l'eau. Le matin tôt et après la pluie, la rive change; le joueur apprend qu'Aubrune vit avec son temps.
+- **Ce qu'elle met à l'épreuve**: rien de difficile. Une promenade, des gestes d'une demi-seconde, des surprises rares (une plume bleue, une perle).
+- **Émotion visée**: la flânerie à deux, les poches pleines de petites choses, le « regarde ce que j'ai trouvé ». Le revenu reste modeste (voir plus bas): on y va pour la balade, pas pour la bourse.
+- **À deux**: rien n'exige les deux joueurs (activité de détente), mais la tournée se partage naturellement: l'un prend la grève du gué, l'autre le lavoir; chaque point donne à celui qui le ramasse, et chacun revient le lendemain.
+
+### Les trouvailles
+
+Description d'une phrase (ton du jeu): le schéma des objets n'a pas de champ de description (seules les pièces de tenue en ont un). Les phrases sont prêtes ici pour le jour où il existera (demande au développeur, via le manager), ou pour des entrées de carnet si le manager en décide.
+
+| Objet (`id`) | Pile | Description | Rachat | Ressource, conditions | Rareté | Repousse |
+|---|---|---|---|---|---|---|
+| Coquille de rivière (`coquille-de-riviere`) | 10 | La maison vide d'une mulette, nacrée dedans comme un dimanche. | Solange 1,20 (boutons de nacre), Café 0,60 (pots de la terrasse) | `coquilles-de-greve`: 1 par temps sec, 2 ou 3 sous la pluie, la brume, l'orage ou la neige; `mulettes-du-bief`: 1 ou 2 | commune | 1 jour (grèves), 2 jours (anse) |
+| Coquille d'escargot d'eau (`coquille-de-limnee`) | 10 | Une spirale grande comme un ongle: l'escargot est parti sans laisser d'adresse. | Solange 0,40 (le bord de ses boîtes à boutons) | `limnees-de-l-etang`: 1 ou 2 par temps sec, 2 ou 3 par temps mouillé; printemps, été, automne | commune | 1 jour |
+| Galet veiné (`galet-veine`) | 5 | Un galet zébré de quartz blanc: Solange jure qu'il tient un patron mieux qu'un poids en fonte. | Solange 0,90 (poids à patron) | `galets-veines`: 1 | commune | 2 jours |
+| Bois flotté (`bois-flotte`) | 10 | Une branche que la rivière a polie, blanchie, puis rendue un peu plus loin. | Solange 0,70 (sa vitrine), Café 0,50 (allume le poêle) | `laisse-de-crue`: 1 par temps sec, 2 ou 3 par temps mouillé | commune | 1 jour |
+| Tesson de faïence (`tesson-de-faience`) | 10 | Un éclat d'assiette à fleurs bleues, adouci par l'eau: quelqu'un, au lavoir, n'a rien dit. | Café 1,00 (Colette recolle le service du café, lavé au lavoir) | `tessons-du-lavoir`: 1 | commune | 2 jours |
+| Plume de héron (`plume-de-heron`) | 10 | Longue, grise et légère: le héron l'a perdue en faisant semblant de ne pas te voir. | Solange 0,80 (chapeaux) | `plumes-de-heron`: 1, de 6 h à 9 h seulement | commune | 1 jour |
+| Plume de martin-pêcheur (`plume-de-martin-pecheur`) | 10 | Un éclat de bleu tombé d'un oiseau trop pressé. | Solange 2,40 (chapeaux du dimanche) | `plumes-de-heron`, même heure, poids 0,12 contre 1 (une plume sur neuf) | rare (chance des besoins) | 1 jour |
+| Perle de rivière (`perle-de-riviere`, trésor) | 1 | Une perle d'eau douce, pas tout à fait ronde, comme les meilleures choses. | Solange 6,00 | `mulettes-du-bief`, poids 0,05 contre 1 (une fois sur vingt et une à l'anse) | rare (chance des besoins) | 2 jours |
+| Girolle (`girolle`) | 10 | Un champignon couleur d'abricot qui sent la forêt et le beurre à venir. | Café 1,60, Épicerie 1,00 (prix du cahier, 4.6) | `girolles`: 1 ou 2 par temps sec, 2 ou 3 par temps mouillé, de 6 h à 12 h, été et automne | commune | 2 jours |
+
+Hors saison, hors de l'heure ou par un temps qui n'ouvre aucune ligne, la touche d'action répond « rien pour l'instant » (`nothing-now`) au lieu de ramasser.
+
+**Condition qui manque au moteur: « il a plu hier »**. Le cahier dit « après la pluie »; le butin ne lit que le temps du moment (`lootAvailable`, `outils/butin.ts`). En attendant, « plus après la pluie » s'écrit « plus quand il pleut, bruine ou neige » (`rain`, `mist`, `storm`, `snow`). Ce qu'il faudrait (une brique, pas un contenu): un champ facultatif d'une ligne de butin, `"rainedYesterday": true`, vrai si le temps du lieu, la veille, a été au moins une heure dans `wateringWeathers` entre `dayStart` et `nightStart`. `weatherAt(content, seed, place, day - 1, minute)` est déterministe: aucun état nouveau à sauvegarder ni à transmettre. Les fiches passeraient alors de `weathers` à `rainedYesterday` sans autre retouche.
+
+### Où (raison d'être de chaque point)
+
+Dix-neuf points, chacun sur une case au bord de l'eau (une case d'eau parmi les huit voisines; sauf les girolles, en sous-bois), jamais sur une route, une rue, un chemin, un sentier, un ouvrage ni un seuil, seul sur sa case (décor des fêtes compris). Leur « pourquoi » est dans le tableau du mobilier (section 12, généré) et dans `carte.json`.
+
+Lettres: C coquilles, G galets, L laisse de crue (bois flotté), T tessons, P plumes, M mulettes, E escargots d'eau, R girolles. Sols: `~` eau, `g` galets, `v` vase, `'` herbe rase, `"` prairie humide, `s` sous-bois, `:` chemin, `,` sentier, `=` route ou rue, `O` ouvrage, `B` bâtiment, `X` bloqué, `*` autre objet.
+
+La grève du gué et le lavoir (acte 1), x 176 à 235, y 112 à 132:
+
+```text
+         8         9         0         1         2         3
+     678901234567890123456789012345678901234567890123456789012345
+ 118 BBB,====='BBBBBBBB'pp*pppp====ppppppp'''':::''''''~~~'''''''
+ 119 *,,,====='BBBBBBBB'ppppppp====pp*pppp'''':::'''''T~~~'''''''
+ 120 PP''====='BBBBBBBB'pp*pppp===*ppppppp'''':::'''''''~~'''''''
+ 124 ''''====='''''''''''''''''====:::::::::::::::::::::OO:::::::
+ 127 ::::=====:::::::::::::::::====:::::::::::::::::::::OO:::::::
+ 128 ''''=====ggggggg'**''''''*====''''''''''''''''''''T~*'''''''
+ 129 ''''====***C**C*G'*''L*'''==OO~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 130 XXXX==OOO~~~~~~~~~~~~~~~~~OOOO~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+La rive aval (acte 1), x 258 à 277, y 128 à 131: le saule têtard (`*`, x 262) et ses plumes au sud-est, la laisse de crue où la rive s'avance:
+
+```text
+       6         7
+     89012345678901234567
+ 129 ''''*'''''''''''::::
+ 130 ~~~'''P'''''''L'''''
+ 131 ~~~~~~~~~~~~~~~~''''
+```
+
+L'Île (acte 2), x 30 à 75, y 139 à 147: l'anse du bief au nord, la grève de la vanne au sud-ouest, la pointe de crue au sud-est:
+
+```text
+     3         4         5         6         7
+     0123456789012345678901234567890123456789012345
+ 140 ,,,,O~~~~~~~~~~~~~~~~~~~~~~"""""""""""""""",,,
+ 141 ,"~OO~~~~~~~~~~~""M"""M"""P""""""",,,,,,,,,,,,
+ 142 ~~~OOO""""""""""""""""""",,,,,,,,,,,,,,,,,,"""
+ 145 ~""""",,,,,,,,,,""""""""""""""""""""""""L"""~~
+ 146 """"""gCg*g*g*g*Gg"""""""~~~~~~~~~~~~~~~~~~~~~
+ 147 """"""~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+L'étang de la Côte (acte 3), bord de vase côté digue, x 222 à 251, y 45 à 49; les girolles au carrefour du haut (c6), de part et d'autre du chemin forestier (x 174 et 180, y 26 et 29):
+
+```text
+             3         4         5
+     234567890123456789012345678901
+  45 s,,,ssss~~~~~~~~~~~~ssssssss,,
+  46 s,,,,vvvEv~~~~~~~vvvEvvsssss,,
+  47 s,,,,vvvv~~vPvvvvvvvvvvsss,,,,
+  48 s,,s,,vvv~~vvvvvvvv,,,,,,,,,,,
+  49 s,,s,,,,OOO,,,,,,,,,,,,,,,,sss
+```
+
+### Déroulé et promenade
+
+Tournée du plus proche voisin depuis la porte de la maison du garde-barrière, et retour, verrous des actes suivants fermés (`controler_trouvailles.py`, parcours sur la grille sans traverser l'eau), à la marche du plan (1,5 m/s):
+
+| Acte | Points | Nouveauté | Promenade | À la marche | Avec les gestes | Difficulté (1 à 5) |
+|---|---|---|---|---|---|---|
+| 1 | 8: grève du gué, joncs, lavoir et sa rigole, saule de l'aval | coquilles, galets, bois flotté, tessons, plumes à l'aube | 218 m | 2,4 min | 3 min | 1 |
+| 2 | 14: plus la grève de la vanne, l'anse du bief, la pointe de l'Île | mulettes et la perle | 524 m | 5,8 min | 7 min | 1 |
+| 3 | 19: plus la vase de l'étang et les girolles du haut | escargots d'eau, girolles | 715 m | 7,9 min | 9 à 10 min | 1 |
+
+Temps forts d'une tournée complète: la grève au pied de la maison (on y descend en dix secondes), le lavoir et la bouche de sa rigole, le saule de l'aval (à l'aube, la plume), puis la montée à l'étang par le bourg et le bois (la vase, le héron), le détour des girolles, et la longue descente vers l'Île pour finir à la vanne, au bruit du déversoir. Ordre réel: grève du gué, rigole, lavoir, saule de l'aval, pointe aval, étang, girolles, pointe de l'Île, anse, grève de la vanne.
+
+### Ce que ça rapporte (comparé aux autres revenus)
+
+Moyenne par jour avec les 19 points, en automne, au meilleur rachat (calcul sur les fiches):
+
+| Moment | Total | Solange | Café |
+|---|---|---|---|
+| Journée, temps sec | 10,80 € | 9,80 € | 1,00 € |
+| Aube, temps sec | 16,11 € | 12,71 € | 3,40 € |
+| Journée, pluie | 20,15 € | 19,15 € | 1,00 € |
+| Aube, pluie | 27,06 € | 22,06 € | 5,00 € |
+
+Le plafond de Solange (10 € par jour, `dailyBuyCap`) borne le tout: au-delà, le bois flotté et les coquilles vont au café à moitié prix, le reste attend le lendemain. Une tournée de dix minutes rapporte donc 11 à 20 € au duo, soit 1 à 2 € par minute; la pêche en rapporte 5,90 (11 poissons, 48,40 € en huit minutes, section 3 de `../economie-aubrune.md`), les bûches et le potager restent au-dessus aussi. À l'acte 1, les 8 points donnent environ 6 € (12 % des 49,90 € de la journée bornée par la carte). L'activité complète le reste sans le rendre inutile; elle ne passe pas devant la pêche, même sous la pluie.
+
+### Modèles et vignettes à faire (pour les artistes)
+
+Les meubles se dessinent en attendant avec un modèle existant du manifeste des décors (aucune caisse rayée):
+
+| Meuble (`id`) | Repli actuel | Modèle à faire | Taille | Description |
+|---|---|---|---|---|
+| `coquilles-de-greve` | `stone-b` | `river-shells` | 0,5 x 0,5 m, 5 cm de haut | trois ou quatre valves de mulette, nacre en dedans, sur un lit de gravier |
+| `mulettes-du-bief` | `stone-b` | `mussel-bed` | 0,6 x 0,4 m, 6 cm | mulettes entrouvertes plantées dans le sable clair, au ras de l'eau |
+| `galets-veines` | `stone-c` | `veined-pebbles` | 0,4 x 0,4 m, 6 cm | deux ou trois galets gris zébrés de blanc |
+| `laisse-de-crue` | `dead-branches-b` | `driftwood` | 1,0 x 0,3 m, 12 cm | branche blanchie et lisse, quelques brindilles et une touffe d'herbe sèche prises dedans |
+| `tessons-du-lavoir` | `stone-b` | `faience-shards` | 0,3 x 0,3 m, 3 cm | éclats de faïence blanche à fleurs bleues parmi des cailloux |
+| `plumes-de-heron` | `wild-herbs` | `heron-feathers` | 0,4 x 0,3 m, 10 cm | une longue plume grise piquée dans la vase, une autre couchée; se lit à 10 m |
+| `limnees-de-l-etang` | `stone-b` | `pond-snail-shells` | 0,3 x 0,3 m, 4 cm | coquilles brunes en spirale pointue dans la vase |
+| `girolles` | `wild-herbs` | `chanterelles` | 0,5 x 0,5 m, 8 cm | un rond de cinq ou six girolles orangées dans la mousse |
+
+Vignettes d'objets (artiste 2D, à la plume, grille 96, PNG 96 et 48 px; inscrites en attendant dans les exceptions provisoires de `tests/interface-plume.test.ts`): `coquille-de-riviere` (valve ovale, nacre visible), `coquille-de-limnee` (spirale pointue brune), `galet-veine` (galet plat gris à veine blanche), `bois-flotte` (branche blanchie, nœud), `tesson-de-faience` (éclat blanc, fleur bleue coupée), `plume-de-heron` (longue plume grise), `plume-de-martin-pecheur` (petite plume bleu vif à base orangée), `perle-de-riviere` (perle irrégulière, reflet rosé), `girolle` (girolle orangée, lames qui descendent sur le pied). Modèles 3D d'objets (sac): `galet-veine` réutilise `pierre`; les huit autres sont à ajouter à `assets-src/objets/gabarits.toml`.
+
+### Contrôles
+
+- `python3 -I controler_trouvailles.py`: 0 erreur (sol, case seule, bord de l'eau, zone de l'acte, atteint à pied à son acte), et la promenade par acte.
+- `controler_plan.py`: 0 erreur après la chaîne (outil, assembleur, copie du plan).
+- `tests/trouvailles-berge.test.ts`: coquille par temps sec, rien de plus le jour même, retour le lendemain; deux ou trois sous la pluie; plume refusée à midi, ramassée à l'aube.
+- Les rachats sont tenus par `tests/commerces-aubrune.test.ts` (chaque ligne s'achète, rien en rayon, aucun besoin du jour en rayon).
+
+### Collections (décision au manager)
+
+Rien n'entre au carnet: le cahier (4.8) ne prévoit pas de collection de coquillages, et la famille « Fossiles et trésors » est comptée à 12 (`tests/collections-aubrune.test.ts`). La perle de rivière et la plume de martin-pêcheur feraient de belles entrées « trésor » rares; c'est une modification du contrat (compte du cahier) à décider avec le client.

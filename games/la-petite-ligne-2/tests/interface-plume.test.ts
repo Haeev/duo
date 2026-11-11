@@ -69,6 +69,19 @@ const WITHOUT_THUMB: ReadonlyMap<string, string> = new Map<string, string>([
   ['clarinette', 'instrument de la musique jouée: vignette à dessiner'],
   ['cornet', 'instrument de la musique jouée: vignette à dessiner'],
   ['pupitre', 'pupitre de musique: vignette à dessiner'],
+  // Provisoire (2026-11-11): trouvailles de berge et girolle, vignettes commandées à l'artiste 2D
+  // (liste dans `docs/jeux/jeu-1/refonte/carte-aubrune/plan.md`, section des trouvailles de berge).
+  ...[
+    'coquille-de-riviere',
+    'coquille-de-limnee',
+    'galet-veine',
+    'bois-flotte',
+    'tesson-de-faience',
+    'plume-de-heron',
+    'plume-de-martin-pecheur',
+    'perle-de-riviere',
+    'girolle',
+  ].map((id): [string, string] => [id, 'trouvaille de berge: vignette provisoire, à dessiner']),
 ]);
 /**
  * Entrées du carnet des collections qui ne sont pas des objets (insectes, trésors de l'histoire):

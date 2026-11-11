@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "plume-de-heron",
+  "name": "Plume de héron",
+  "family": "material",
+  "stack": 10,
+  "food": null,
+  "tool": null
+}
