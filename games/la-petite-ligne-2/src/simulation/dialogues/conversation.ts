@@ -60,6 +60,25 @@ function resumeNode(
   return typeof at === 'string' && Object.hasOwn(dialogue.nodes, at) ? at : null;
 }
 
+/** Ce dialogue peut se jouer pour ce joueur: il n'est pas épuisé et ses conditions sont vraies. */
+function isPlayable(
+  world: ReadonlyWorld,
+  place: PlaceContent,
+  ctx: RuleContext,
+  dialogue: DialogueDef,
+  player: PlayerIndex,
+): boolean {
+  if (dialogue.once !== null) {
+    const played = recall(world, onceKey(place.def.id, dialogue, player));
+    // Allé au bout: épuisé. Entamé: il se reprend, sauf si l'autre le lit en ce moment (`duo`).
+    const other: PlayerIndex = player === 0 ? 1 : 0;
+    const busy = world.players[other].talk?.dialogue === dialogue.id;
+    if (played !== null && (typeof played.v !== 'string' || (dialogue.once === 'duo' && busy)))
+      return false;
+  }
+  return evaluateAll(ctx, dialogue.when);
+}
+
 /** Le dialogue à jouer: le plus prioritaire dont les conditions sont vraies et qui n'est pas épuisé. */
 export function pickDialogue(
   sim: { readonly world: ReadonlyWorld; readonly content: Content },
@@ -72,18 +91,27 @@ export function pickDialogue(
   let best: DialogueDef | null = null;
   for (const dialogue of place.dialogues) {
     if (dialogue.villager !== villager) continue;
-    if (dialogue.once !== null) {
-      const played = recall(sim.world, onceKey(place.def.id, dialogue, player));
-      // Allé au bout: épuisé. Entamé: il se reprend, sauf si l'autre le lit en ce moment (`duo`).
-      const other: PlayerIndex = player === 0 ? 1 : 0;
-      const busy = sim.world.players[other].talk?.dialogue === dialogue.id;
-      if (played !== null && (typeof played.v !== 'string' || (dialogue.once === 'duo' && busy)))
-        continue;
-    }
-    if (!evaluateAll(ctx, dialogue.when)) continue;
-    if (best === null || dialogue.priority > best.priority) best = dialogue;
+    if (best !== null && dialogue.priority <= best.priority) continue;
+    if (isPlayable(sim.world, place, ctx, dialogue, player)) best = dialogue;
   }
   return best;
+}
+
+/**
+ * Tous les dialogues que cet habitant pourrait jouer pour ce joueur, du plus prioritaire au moins
+ * prioritaire (à égalité: l'ordre des données, comme `pickDialogue`, qui rend le premier).
+ */
+export function playableDialogues(
+  sim: { readonly world: ReadonlyWorld; readonly content: Content },
+  player: PlayerIndex,
+  villager: string,
+): DialogueDef[] {
+  const place = placeContent(sim.content, sim.world);
+  if (place === null) return [];
+  const ctx: RuleContext = { world: sim.world, content: sim.content, actor: player };
+  return place.dialogues
+    .filter((d) => d.villager === villager && isPlayable(sim.world, place, ctx, d, player))
+    .sort((a, b) => b.priority - a.priority);
 }
 
 /** Clé du fait « entendu » d'un dialogue qui se répète et qui a quelque chose à dire. */
@@ -123,7 +151,11 @@ export function hasNews(dialogue: DialogueDef): boolean {
  * Ce dialogue attend encore la réponse de ce joueur à une décision à deux qu'il offre (option à
  * effet `choose`): il n'a rien choisi, ou les deux avis divergent et il peut changer d'avis.
  */
-function awaitsAnswer(world: ReadonlyWorld, player: PlayerIndex, dialogue: DialogueDef): boolean {
+export function awaitsAnswer(
+  world: ReadonlyWorld,
+  player: PlayerIndex,
+  dialogue: DialogueDef,
+): boolean {
   for (const node of Object.values(dialogue.nodes)) {
     if (node.kind !== 'choice') continue;
     for (const option of node.options)
@@ -137,22 +169,13 @@ function awaitsAnswer(world: ReadonlyWorld, player: PlayerIndex, dialogue: Dialo
   return false;
 }
 
-/**
- * Le dialogue que cet habitant a en attente pour ce joueur, `null` s'il n'a que le quotidien à
- * dire: le plus prioritaire, s'il a quelque chose à dire et n'a pas déjà été entendu ce jour (un
- * dialogue `once` ne se rejoue jamais, il est donc toujours neuf). Une décision à deux qui attend
- * la réponse de ce joueur le garde en attente, même entendu.
- */
-export function pendingDialogue(
-  look: { readonly world: ReadonlyWorld; readonly content: Content },
+/** Ce joueur a déjà ouvert aujourd'hui ce dialogue qui se répète (fait « entendu » du jour). */
+export function heardThisDay(
+  world: ReadonlyWorld,
   player: PlayerIndex,
-  villager: string,
-): DialogueDef | null {
-  const dialogue = pickDialogue(look, player, villager);
-  if (dialogue === null || !hasNews(dialogue)) return null;
-  if (dialogue.once !== null || awaitsAnswer(look.world, player, dialogue)) return dialogue;
-  const heard = recall(look.world, heardKey(look.world.common.place, dialogue, player));
-  return heard !== null && heard.day === look.world.common.day ? null : dialogue;
+  dialogue: DialogueDef,
+): boolean {
+  return heardToday(world, heardKey(world.common.place, dialogue, player)) >= 1;
 }
 
 /** Une option est un échange (effets qui comptent) et l'hygiène du joueur la fait échouer. */
@@ -274,13 +297,22 @@ function enter(
   endTalk(sim, player);
 }
 
-/** Ouvre la conversation (touche d'action sur un habitant). `false` s'il n'a rien à dire. */
-export function startTalk(sim: SimContext, player: PlayerIndex, villager: string): boolean {
+/**
+ * Ouvre la conversation (touche d'action sur un habitant). `false` s'il n'a rien à dire. `chosen`:
+ * le dialogue à jouer au lieu du plus prioritaire (la réplique d'histoire du comptoir tenu,
+ * `histoire.ts`); son écoute du jour est alors retenue quelle que soit sa priorité.
+ */
+export function startTalk(
+  sim: SimContext,
+  player: PlayerIndex,
+  villager: string,
+  chosen?: DialogueDef,
+): boolean {
   const state = sim.world.players[player];
   const place = placeContent(sim.content, sim.world);
   const villagerState = sim.world.places[sim.world.common.place]?.villagers[villager];
   if (state.talk !== null || place === null || villagerState === undefined) return false;
-  const dialogue = pickDialogue(sim, player, villager);
+  const dialogue = chosen ?? pickDialogue(sim, player, villager);
   if (dialogue === null) {
     sim.emit({ type: 'refused', player, reason: 'nothing-to-say', target: villager });
     return false;
@@ -292,7 +324,7 @@ export function startTalk(sim: SimContext, player: PlayerIndex, villager: string
       : (resumeNode(sim.world, place.def.id, dialogue, player) ?? dialogue.start);
   if (dialogue.once !== null)
     remember(sim, onceKey(place.def.id, dialogue, player), from, onceAuthor(dialogue, player));
-  else if (hasNews(dialogue)) {
+  else if (hasNews(dialogue) || chosen !== undefined) {
     // Fois entendues ce jour (une ancienne sauvegarde a `true`: une fois).
     const key = heardKey(place.def.id, dialogue, player);
     remember(sim, key, heardToday(sim.world, key) + 1, player);

@@ -108,3 +108,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - L'interface ignore `outlook_ready` et ne lit pas `common.outlook` (état juste, rien d'affiché au 2026-11-11).
 - Sonde dans un test long: script Python de remplacement sur le fichier de test, lancement filtré (`-t`), puis `git checkout` du fichier. Une commande qui enchaîne `mkdir` puis `cp` hors du scratchpad échoue en bloc: créer les dossiers à part.
 
+
+## La Petite Ligne 2: comptoirs, dialogues et parcours à deux (vérifié le 2026-11-11)
+
+- Comptoir tenu: seule la réplique d'histoire passe avant la boutique (`counterDialogue` de `dialogues/histoire.ts`): dialogue attendu (`talked`) ou ouvert (fait d'un `onStart` lu avec `equals`) par une étape OUVERTE, `deliver` avec les objets en main, décision à deux en attente, secours d'un besoin à 0. Un dialogue factice de test n'est de l'histoire que relié à une suite factice; le chargement refuse un fait que rien n'écrit (ajouter un dialogue jamais joué qui l'écrit).
+- Dans un parcours, Espace sur des choix affichés valide le choix au focus, et Espace dans la boutique achète: ne jamais appuyer « jusqu'à ce que » avec des pauses fixes. Aides: `tests/aides-e2e/conversation.ts` (`readTalk`, `pickChoice`, `readToEnd`, `actUntil`), qui n'appuient que sur une réplique entièrement affichée (`.dlg__next` visible).
+- La touche d'action est ignorée 300 ms après la fermeture d'un écran (`actReleaseGuardMs`): un Espace enchaîné aussitôt est avalé; `actUntil` le rejoue si l'état prouve qu'il n'a rien fait.
+- `talked` avec `node`: en lecture lente (parcours) l'étape passe, en lecture immédiate (test Node sans `wait`) non; un parcours qui « réentend » une réplique doit compter que l'histoire a avancé.
+- Dans un arbre de travail isolé, les commandes avec heredoc ou trop composées sont refusées: scripts par Write dans le scratchpad, puis `python3 script.py .`.
+- Marche des parcours (`walkBoth` de `tests/aides-e2e/prologue.ts`) sous charge (charge moyenne 5 à 6 sur 4 cœurs): un appui de 160 ms plus court qu'une image n'est jamais vu par le jeu, et les commandes de l'invité arrivent en retard (joueur relevé à près d'un mètre du but après « arrivé », hors de l'axe d'une porte). Règle: décider chaque petit pas sur une position arrêtée chez l'hôte (`settleAfterPulse`), et n'être « arrivé » qu'immobile. `passDoor` journalise où se tenait le joueur quand la porte ne passe pas.
+- Le dossier des pièces d'échec de Playwright est vidé au lancement suivant: lire captures et `error-context.md` avant de relancer.

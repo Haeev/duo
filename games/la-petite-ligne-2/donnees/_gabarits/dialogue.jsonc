@@ -8,8 +8,13 @@
   "villager": "cheffe-de-gare",
   // Parmi les dialogues dont "when" est vrai, le plus prioritaire est joué. À partir de 10
   // (DIALOGUES.pendingPriority), il a quelque chose à dire (histoire, quête, souvenir, première
-  // rencontre): il passe avant la boutique au comptoir tenu et n'est pas suivi de l'offre de la
-  // boutique. En dessous (0: quotidien), conversation ordinaire.
+  // rencontre): il n'est pas suivi de l'offre de la boutique. En dessous (0: quotidien),
+  // conversation ordinaire.
+  // Au comptoir tenu d'un commerçant, la priorité ne compte pas: seule sa réplique d'HISTOIRE
+  // passe avant la boutique (le dialogue qu'une étape de quête ouverte attend par "talked", ou
+  // qu'elle ouvre par un fait de son "onStart" lu ici avec "equals"; une décision à deux). Un
+  // souvenir, une confidence, un cadeau se disent par « Parler » de la boutique ou en face: rien à
+  // déclarer ici (src/simulation/commerces/README.md, « Comptoir tenu »).
   "priority": 0,
   // Conditions, toutes vraies. Exemples:
   //   { "type": "remembered", "key": "essai-gare.besace", "equals": true }

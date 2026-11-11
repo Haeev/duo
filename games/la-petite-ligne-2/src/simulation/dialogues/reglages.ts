@@ -18,15 +18,17 @@ export interface DialogueTuning {
   readonly orderOffer: { readonly node: string; readonly open: string; readonly leave: string };
   /**
    * Priorité à partir de laquelle un dialogue a quelque chose à dire (histoire, quête, souvenir,
-   * première rencontre, remarque sur l'hygiène): au comptoir tenu, il passe avant la boutique, et
-   * l'offre de la boutique ne le suit pas. En dessous: conversation ordinaire (quotidien).
+   * première rencontre, remarque sur l'hygiène): l'offre de la boutique ne le suit pas à sa
+   * première écoute du jour. En dessous: conversation ordinaire (quotidien). Ce qui passe avant la
+   * boutique au comptoir tenu ne dépend pas de la priorité: c'est l'histoire seule (`histoire.ts`).
    */
   readonly pendingPriority: number;
   /**
    * Fait daté « entendu » d'un dialogue qui se répète (`once` nul) et qui a quelque chose à dire:
    * `<préfixe>.<lieu>.<dialogue>.j<joueur>`, qui compte les écoutes du jour (daté du jour).
-   * Entendu dans la journée, il ne repasse plus avant la boutique du comptoir tenu; réentendu en
-   * face du commerçant, il est suivi de l'offre de la boutique (`commerce.ts`).
+   * Entendue dans la journée, une réplique d'histoire ne repasse plus avant la boutique du
+   * comptoir tenu; réentendue en face du commerçant, elle est suivie de l'offre de la boutique
+   * (`commerce.ts`).
    */
   readonly heardPrefix: string;
 }

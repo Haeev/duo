@@ -128,7 +128,7 @@ requestAnimationFrame(loop);
 
 /** Ouvre la boutique comme la touche d'action sur le comptoir, puis joue les touches de l'état. */
 if (mercerie)
-  // Comptoir tenu: la touche d'action irait d'abord aux dialogues en attente de Solange.
+  // Comptoir tenu: la touche d'action irait d'abord à une réplique d'histoire en attente de Solange.
   setTimeout(() => {
     const opened: GameEvent = { type: 'shop_opened', player: 0, shop: MERCERIE };
     for (const listener of listeners) listener(opened);

@@ -20,10 +20,19 @@ On ne vend qu'aux commerçants: chacun ne rachète que ce qui touche à son mét
 
 Le commerçant se tient derrière son comptoir, hors de portée de la touche d'action depuis le côté client. Sur un comptoir tenu, la touche s'adresse à lui (`counterKeeper`), s'il est debout à moins de `keeperReach` (1,5 m) de l'emprise du comptoir:
 
-1. Il a un dialogue en attente (`pendingDialogue` de `dialogues/conversation.ts`): priorité d'au moins `DIALOGUES.pendingPriority` (10: histoire, quête, souvenir, première rencontre), pas encore entendu ce jour par ce joueur (fait daté `entendu.<lieu>.<dialogue>.j<joueur>`), ou une décision à deux qui attend sa réponse. La bulle dit « Parler », et ce dialogue se joue d'abord.
-2. Sinon la boutique s'ouvre (« Acheter »); l'écran de boutique garde « Parler » (touche P, intention `shop_talk`), qui ouvre la conversation et referme la boutique chez ce joueur.
+1. Il a une réplique d'HISTOIRE en attente pour ce joueur (`counterDialogue` de `dialogues/histoire.ts`): la bulle dit « Parler », cette réplique se joue (elle, et non la plus prioritaire), une fois, puis le comptoir vend.
+2. Sinon la boutique s'ouvre (« Acheter »), au premier appui; l'écran de boutique garde « Parler » (touche P, intention `shop_talk`), qui ouvre la conversation ordinaire (la plus prioritaire d'abord) et referme la boutique chez ce joueur.
 
-La première écoute du jour d'une réplique d'histoire ou de quête n'est pas suivie de l'offre de la boutique (`shopOffered`), ni une réplique dite par-dessus le comptoir. Réentendue le même jour en parlant au commerçant en face (à portée de la touche d'action), elle débouche sur l'offre comme une conversation ordinaire: le fait « entendu » compte les écoutes du jour, sans champ nouveau dans l'état. Valable pour tout commerce: ajouter `"held": true` à la brique du comptoir. Test court: `tests/comptoir-tenu.test.ts`, `tests/decision-rappel.test.ts`.
+Seule l'histoire passe avant la boutique. Un commerçant a toujours quelque chose à dire (souvenirs, confidences, cadeaux, dons de plans, fêtes, première visite): si tout cela passait d'abord, on n'achèterait plus sans épuiser ses répliques. Ce reste se dit par « Parler » de la boutique, ou en face de lui hors du comptoir. Est de l'histoire, sans rien déclarer dans le dialogue (tout se lit dans les suites du lieu):
+
+- le dialogue qu'une étape OUVERTE d'une suite en cours attend (`talked` de son `done`), ou qu'elle a ouvert (un `remember` de son `onStart` écrit le fait que le `when` du dialogue lit avec `equals`: la convention `"ouvert"` des suites d'Aubrune); l'étape franchie, il redevient une réplique ordinaire;
+- la remise d'objets qu'une étape ouverte attend chez ce commerçant (`deliver`), quand ce joueur tient les objets;
+- une décision à deux qui attend la réponse de ce joueur (elle repasse même déjà entendue);
+- par exception, la réplique qui soulage sans rien demander un besoin à 0 du joueur (la soupe offerte à qui a faim et pas un sou: cahier 4.4, jamais de blocage sans issue).
+
+Une fois: un dialogue `once` s'épuise; un dialogue à volonté ne repasse pas le jour où ce joueur l'a entendu (fait daté `entendu.<lieu>.<dialogue>.j<joueur>`). Un dialogue à volonté plus prioritaire que l'histoire (la remarque d'hygiène) la masque comme en face: la boutique s'ouvre.
+
+La première écoute du jour d'une réplique d'histoire ou de quête n'est pas suivie de l'offre de la boutique (`shopOffered`), ni une réplique dite par-dessus le comptoir. Réentendue le même jour en parlant au commerçant en face (à portée de la touche d'action), elle débouche sur l'offre comme une conversation ordinaire: le fait « entendu » compte les écoutes du jour, sans champ nouveau dans l'état. Valable pour tout commerce: ajouter `"held": true` à la brique du comptoir. Test court: `tests/comptoir-tenu.test.ts`, `tests/decision-rappel.test.ts`. Test court: `tests/comptoir-tenu.test.ts` (trois dialogues en attente: un seul appui avant la boutique), `tests/decision-rappel.test.ts`.
 
 ## Paiement (`payment` d'un article)
 

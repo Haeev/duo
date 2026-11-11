@@ -78,7 +78,8 @@
   // Recommandé: le choix offert à la fin d'une conversation ordinaire avec le commerçant,
   // boutique ouverte (open: ouvre la boutique, leave: clôt). Jamais après un dialogue qui a
   // quelque chose à dire (priorité 10 et plus: histoire, quête), ni si le dialogue joué ouvre
-  // déjà ce commerce (open_shop). Le comptoir tenu ("held") ouvre la boutique dès que ce
-  // dialogue a été entendu dans la journée: une quête ne cache jamais la boutique.
+  // déjà ce commerce (open_shop). Le comptoir tenu ("held") ouvre la boutique au premier appui,
+  // sauf réplique d'histoire en attente (quête en cours, décision à deux), dite d'abord, une fois:
+  // ni une quête ni un souvenir ne cachent la boutique.
   "talk": { "open": "Voyons ce que tu vends.", "leave": "Une autre fois." },
 }
