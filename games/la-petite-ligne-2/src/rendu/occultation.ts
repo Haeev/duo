@@ -65,7 +65,11 @@ export class Occlusion {
 
   constructor(private readonly settings: OcclusionSettings = RENDER_SETTINGS.occlusion) {}
 
-  /** Déclare un volume. Trop bas pour cacher un personnage: ignoré, il reste toujours plein. */
+  /**
+   * Déclare un volume. Plus bas que les épaules d'un personnage debout au sol (`minHeight`):
+   * ignoré, il reste toujours plein. La même règle se rejoue par personnage dans `update`, à
+   * partir de ses pieds, pour un volume posé plus haut que le sol.
+   */
   add(box: OccluderBox): boolean {
     if (box.max.y < this.settings.minHeight) return false;
     this.entries.set(box.id, { box, hidden: false, opacity: 1 });
@@ -115,6 +119,9 @@ export class Occlusion {
     margin: number,
   ): boolean {
     for (const feet of subjects) {
+      // Meuble bas (comptoir, table, muret): son dessus n'atteint pas les épaules de ce
+      // personnage, où qu'il soit posé (sol en relief, estrade). Il reste plein.
+      if (box.max.y < feet.y + this.settings.minHeight) continue;
       for (const height of this.settings.probeHeights) {
         const origin = { x: feet.x, y: feet.y + height, z: feet.z };
         // Le volume sur lequel le personnage est posé, ou qu'il touche du pied sans être derrière,

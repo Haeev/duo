@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "lanterne-de-quai",
+  "name": "Lanterne de quai",
+  "model": "platform-lantern",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": "gare",
+  "bricks": []
+}

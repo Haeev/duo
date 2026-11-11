@@ -10,6 +10,8 @@ Familles:
   raccordent sans couture. Seul l'intérieur du module varie d'une forme à l'autre.
 - `meuble`: un meuble d'intérieur ou de cour. Origine au centre de son emprise (la fiche du jeu),
   avant vers +z: le côté d'où l'on s'en sert. Il tient dans ses cases.
+- `luminaire`: une lampe du dehors (réverbère, lanterne de quai, lanterne de porte). Son verre est
+  en matériau `flamme`, son foyer va au manifeste (`light`): le rendu en tire la flaque au sol.
 - `ouvrage`: un repère du lieu (château d'eau, sémaphore, roue, portail, pigeonnier). Origine au
   pied, au centre; avant vers +z (vers la voie, l'eau ou le chemin qui le justifie).
 
@@ -723,6 +725,81 @@ def meuble(entree: dict, ctx: Contexte) -> list[dict]:
     return out
 
 
+# ====================================================================== luminaires (lampes du dehors)
+def _lanterne(s, ctx, x, y, z, cote, haut, fer, chapeau=True):
+    """Lanterne à quatre vitres: cage de fer, verre (`flamme`: il luit la nuit), chapeau à quatre pans.
+
+    (x, y, z): centre du fond de la cage. Rend le foyer (le milieu du verre)."""
+    c = cote / 2
+    boite(s, x - c - 0.02, x + c + 0.02, y - 0.04, y, z - c - 0.02, z + c + 0.02, "metal", fer[0], tremble=0.0)
+    boite(s, x - c, x + c, y, y + haut, z - c, z + c, "flamme", ctx.un("verre_lampe"), tremble=0.0, sans="y- y+")
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            boite(s, x + sx * c - 0.014, x + sx * c + 0.014, y, y + haut, z + sz * c - 0.014, z + sz * c + 0.014, "metal", fer[1], tremble=0.0, sans="y- y+")
+    if chapeau:
+        d = c + 0.07
+        pts = [(x - d, y + haut, z - d), (x + d, y + haut, z - d), (x + d, y + haut, z + d), (x - d, y + haut, z + d), (x, y + haut + cote * 0.6, z)]
+        s.morceau(pts, [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4)], "metal", fer[0], coeur=(pts[4][0], pts[0][1] - 0.3, pts[4][2]))
+        s.octa(0.035, 0.05, 0.035, at(x, y + haut + cote * 0.6 + 0.03, z), "metal", fer[1])
+    return [round(x, 3), round(y + haut / 2, 3), round(z, 3)]
+
+
+def _lumiere(entree: dict, foyer) -> dict:
+    """Entrée `light` du manifeste: le foyer du modèle et les réglages `lumiere` de l'entrée."""
+    reglage = entree.get("lumiere")
+    if reglage is None:
+        raise SystemExit(f"{entree['id']}: un modèle qui éclaire donne `lumiere = {{ rayon = ... }}`")
+    out = {"at": [float(v) for v in foyer], "radius": float(reglage["rayon"])}
+    if "couleur" in reglage:
+        out["color"] = reglage["couleur"]
+    if "force" in reglage:
+        out["gain"] = float(reglage["force"])
+    return out
+
+
+def luminaire(entree: dict, ctx: Contexte) -> list[dict]:
+    """Lampe du dehors. Origine au pied, au centre; avant vers +z (ce qu'elle éclaire).
+
+    Le verre est en matériau `flamme`: le rendu l'allume avec la lampe. Le foyer (`light.at` du
+    manifeste) est calculé ici, là où est le verre; `lumiere` de l'entrée donne le rayon de la
+    flaque au sol et, au besoin, sa couleur."""
+    sorte = entree["sorte"]
+    s = Atelier(entree["graine"])
+    fer = ctx.tons("fer")
+    if sorte == "reverbere":
+        # Réverbère de rue en fonte (3,2 m): socle évasé, fût mince, traverse d'appui de l'échelle
+        # de l'allumeur sous la lanterne, lanterne à quatre vitres.
+        s.tube([(0, 0, 0, 0.17), (0, 0.12, 0, 0.17), (0, 0.5, 0, 0.1), (0, 0.62, 0, 0.075)], 6, "metal", fer[0], bouts=(False, False))
+        s.tube([(0, 0.62, 0, 0.06), (0, 2.5, 0, 0.042), (0, 2.62, 0, 0.07)], 6, "metal", fer[1], bouts=(False, True))
+        barre(s, (-0.3, 2.36, 0), (0.3, 2.36, 0), 0.02, 4, "metal", fer[0])
+        foyer = _lanterne(s, ctx, 0.0, 2.66, 0.0, 0.3, 0.36, fer)
+    elif sorte == "lanterne-quai":
+        # Lanterne de quai (3 m): poteau de bois peint sur dé de pierre, potence de fer vers le
+        # bord du quai (+z), abat-jour d'émail blanc qui rabat la lumière sur les dalles.
+        boite(s, -0.14, 0.14, 0, 0.28, -0.14, 0.14, "pierre", ctx.un("pierre_claire"), dessus=ctx.un("pierre_claire", 1))
+        boite(s, -0.065, 0.065, 0.28, 3.0, -0.065, 0.065, "bois", ctx.un("peint_vert"), tremble=0.002)
+        barre(s, (0, 2.86, 0.0), (0, 2.86, 0.62), 0.022, 4, "metal", fer[0], bouts=(False, True))
+        barre(s, (0, 2.42, 0.06), (0, 2.84, 0.42), 0.014, 3, "metal", fer[1], bouts=(False, False))
+        barre(s, (0, 2.86, 0.55), (0, 2.74, 0.55), 0.012, 3, "metal", fer[1], bouts=(False, False))
+        s.tube([(0, 2.74, 0.55, 0.05), (0, 2.68, 0.55, 0.09), (0, 2.6, 0.55, 0.3)], 8, "metal", ctx.un("email"), bouts=(True, False))
+        s.tube([(0, 2.66, 0.55, 0.075), (0, 2.5, 0.55, 0.095), (0, 2.42, 0.55, 0.05)], 6, "flamme", ctx.un("verre_lampe"), bouts=(False, True))
+        foyer = [0.0, 2.52, 0.55]
+    elif sorte == "lanterne-murale":
+        # Lanterne de porte: platine vissée au mur (le mur est derrière, en -z), potence en col de
+        # cygne, lanterne à quatre vitres à 2,3 m: au-dessus d'une tête, sous le linteau de l'étage.
+        boite(s, -0.07, 0.07, 2.08, 2.52, 0.0, 0.03, "metal", fer[0], tremble=0.0, sans="y- z-")
+        barre(s, (0, 2.46, 0.03), (0, 2.6, 0.34), 0.016, 4, "metal", fer[1], bouts=(False, False))
+        barre(s, (0, 2.14, 0.03), (0, 2.56, 0.26), 0.012, 3, "metal", fer[1], bouts=(False, False))
+        barre(s, (0, 2.6, 0.34), (0, 2.52, 0.34), 0.012, 3, "metal", fer[1], bouts=(False, False))
+        foyer = _lanterne(s, ctx, 0.0, 2.14, 0.34, 0.22, 0.28, fer, chapeau=False)
+        d = 0.19
+        pts = [(-d, 2.42, 0.34 - d), (d, 2.42, 0.34 - d), (d, 2.42, 0.34 + d), (-d, 2.42, 0.34 + d), (0, 2.53, 0.34)]
+        s.morceau(pts, [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4)], "metal", fer[0], coeur=(pts[4][0], pts[0][1] - 0.3, pts[4][2]))
+    else:
+        raise SystemExit(f"{entree['id']}: sorte de luminaire inconnue « {sorte} »")
+    return [_modele(entree["id"], s, states={}, variants=[], pourquoi=entree.get("pourquoi"), light=_lumiere(entree, foyer))]
+
+
 # ====================================================================== ouvrages (repères du lieu)
 def _echelle(s, x, z, y0, y1, largeur, ctx, mat="metal", couleur=None, axe="x", ecart=0.3):
     """Échelle droite: deux montants et des barreaux tous les 30 cm."""
@@ -831,12 +908,13 @@ def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
             anneau(s, (0.18 + k * 0.17, y, 0.21), 0.0, 0.07, 0.02, 7, "vitre", ctx.un(c), axe="z", faces_bord=False)
         # Lanterne au sommet et chapeau.
         boite(s, -0.14, 0.14, H, H + 0.32, -0.14, 0.14, "metal", fer[0], tremble=0.0)
-        boite(s, -0.1, 0.1, H + 0.06, H + 0.24, 0.14, 0.15, "vitre", ctx.un("feu_rouge"), tremble=0.0, sans="y- z-")
+        boite(s, -0.1, 0.1, H + 0.06, H + 0.24, 0.14, 0.15, "flamme", ctx.un("feu_rouge"), tremble=0.0, sans="y- z-")
         s.tube([(0, H + 0.32, 0, 0.22), (0, H + 0.5, 0, 0.04)], 4, "metal", fer[1], bouts=(False, False))
         # Levier de manœuvre au pied et son fil vers le haut.
         barre(s, (0.42, 0.45, 0.42), (0.6, 1.25, 0.6), 0.03, 4, "metal", ctx.un("peint_rouge"), bouts=(False, True))
         barre(s, (0.1, 1.0, 0.12), (0.1, y - 0.2, 0.2), 0.008, 3, "metal", fer[1], bouts=(False, False))
-        return [_modele(entree["id"], s, states={}, variants=[], pourquoi=entree.get("pourquoi"))]
+        # Le feu rouge de la lanterne (voie fermée) regarde la voie: son foyer est devant le verre.
+        return [_modele(entree["id"], s, states={}, variants=[], pourquoi=entree.get("pourquoi"), light=_lumiere(entree, (0.0, H + 0.15, 0.3)))]
     if sorte == "roue":
         # Roue à aubes de 6,6 m: deux jantes, rayons, aubes, moyeu sur deux piles de pierre. Le bas
         # plonge dans le bief (le sol du lieu y est creusé). Construite axe est-ouest puis tournée:
@@ -991,4 +1069,4 @@ def ouvrage(entree: dict, ctx: Contexte) -> list[dict]:
     raise SystemExit(f"{entree['id']}: sorte d'ouvrage inconnue « {sorte} »")
 
 
-FAMILLES_AMENAGEMENTS = {"haie": haie, "talus": talus, "rang": rang, "meuble": meuble, "ouvrage": ouvrage}
+FAMILLES_AMENAGEMENTS = {"haie": haie, "talus": talus, "rang": rang, "meuble": meuble, "luminaire": luminaire, "ouvrage": ouvrage}

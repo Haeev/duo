@@ -94,8 +94,40 @@ export const INK_SETTINGS = {
   lights: { reach: 26, lampRadius: 5.2, lampHeightShare: 0.86, windowReach: 3.4 },
 
   /**
-   * Lampes des modèles livrés, par famille du manifeste des décors: hauteur du foyer en part de la
-   * hauteur du modèle, rayon de la flaque (m). Une famille absente n'éclaire pas.
+   * Allumage des lampes du dehors selon la force des lampes de l'ambiance (0 le jour, 1 la nuit):
+   * rien sous `from`; chaque lampe a son rang (tiré de son identifiant) et s'allume entre
+   * `from + rang x spread` et `ramp` plus loin. À la tombée du jour elles s'allument l'une après
+   * l'autre, à l'aube elles s'éteignent de même.
+   */
+  lamps: { from: 0.3, spread: 0.3, ramp: 0.15 },
+
+  /**
+   * Bâtiments éclairés de l'intérieur (`lieu/eclairage.ts`): d'après les heures des commerces, les
+   * plannings des habitants et l'`eclairage` des fiches de bâtiments, sans aucun bâtiment nommé.
+   */
+  buildingLights: {
+    /** Durée de l'allumage ou de l'extinction d'un bâtiment (s). */
+    fadeSeconds: 2.5,
+    /** Activités de planning où l'habitant dort (en plus d'une ligne tenue dans un lit). */
+    asleep: ['dormir'] as readonly string[],
+    /**
+     * On ne s'endort pas en passant la porte: la chambre reste éclairée entre `bedtime[0]` et
+     * `bedtime[1]` minutes après l'heure du coucher (durée tirée de l'identifiant de l'habitant).
+     */
+    bedtime: [15, 50] as const,
+    /** Un habitant à moins de `doorReach` mètres d'une porte est chez celui dont c'est la porte. */
+    doorReach: 3,
+    /** Une lampe à moins de `attachReach` mètres d'une façade est portée par ce bâtiment. */
+    attachReach: 0.35,
+    /** Hauteur où commence l'étage d'un bâtiment à plusieurs niveaux (m au-dessus de son pied). */
+    upperFrom: 2.7,
+  },
+
+  /**
+   * Lampes des modèles livrés sans lumière déclarée au manifeste (`light`), par famille: hauteur
+   * du foyer en part de la hauteur du modèle, rayon de la flaque (m). Une famille absente
+   * n'éclaire pas. Un modèle de la chaîne des décors déclare sa lumière lui-même (`lumiere` de
+   * son entrée, voir le README): rien à ajouter ici.
    */
   lampFamilies: {
     reverbere: { heightShare: 0.86, radius: 5.2, shadow: true },

@@ -236,7 +236,8 @@ export function describePlace(
       // le joueur qu'elle cache, pas seulement sur 0,9 m.
       height: DECOR_MANIFEST.models[prop.model]?.size.h ?? settings.propHeight,
       shape: 'box',
-      occludes: true,
+      // Une lampe sur son fût ne cache personne: effacée, elle éteindrait sa lanterne à l'écran.
+      occludes: DECOR_MANIFEST.models[prop.model]?.light === undefined,
       aimable: true,
     });
   }

@@ -70,7 +70,9 @@
           "saturation": 1,
           "contrast": 1,
           "background": "#231A17",
-          "sunShadow": 1
+          "sunShadow": 1,
+          "characterRimColor": "#FFFFFF",
+          "characterRimTint": 0
         },
         "apres-midi": {
           "lit": [0.97, 0.9, 0.77],
@@ -94,7 +96,7 @@
           "ink": "#1F1620",
           "hatchCast": 0.28,
           "blackFill": 0.35,
-          "lamps": 0.7,
+          "lamps": 0.8,
           "lampColor": [0.5, 0.36, 0.1],
           "windowGlow": "#FFC46B",
           "windowAmount": 1,
@@ -136,7 +138,11 @@
           "tint": [0.96, 0.98, 1.04],
           "saturation": 1,
           "contrast": 1,
-          "background": "#0E1220"
+          "background": "#0E1220",
+          "characterRimColor": "#B4CDF7",
+          "characterRimTint": 0.8,
+          "characterRim": 1,
+          "characterLift": 0.9
         },
         "aube": {
           "lit": [1, 0.88, 0.8],
@@ -145,7 +151,7 @@
           "ink": "#1A1A26",
           "hatchCast": 0.5,
           "blackFill": 0.3,
-          "lamps": 0.45,
+          "lamps": 0.3,
           "lampColor": [0.42, 0.3, 0.1],
           "windowGlow": "#FFC46B",
           "windowAmount": 1,
@@ -234,7 +240,10 @@
           "particles": "aucune",
           "vignette": 0.92,
           "vignetteStart": 0.3,
-          "tint": [1, 0.97, 0.94]
+          "tint": [1, 0.97, 0.94],
+          "characterRimTint": 0,
+          "characterRim": 0.9,
+          "characterLift": 0.8
         },
         "aube": {
           "sun": [205, 31],

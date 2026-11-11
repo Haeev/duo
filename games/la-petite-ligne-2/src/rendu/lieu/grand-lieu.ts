@@ -21,6 +21,7 @@ import {
   type Material,
   MeshStandardMaterial,
   type Texture,
+  Vector4,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -30,15 +31,17 @@ import { DOORS, doorSills } from '../../donnees/seuils';
 import type { InkKit } from '../encre/index';
 import { inkUnit } from '../encre/conversion';
 import { KIND, LAYER } from '../encre/couches';
-import type { PlaceLights } from '../encre/lumieres';
+import { modelLamp, type PlaceLights } from '../encre/lumieres';
 import { SHADOW_ONLY } from '../encre/ombres';
-import type { WindowLight } from '../encre/matiere';
+import { INK_INNER, type InkInner, type Lamp, type WindowLight } from '../encre/matiere';
 import { INK_SETTINGS } from '../encre/reglages';
 import { createEdgeMap, createGroundMap } from '../encre/sol';
 import { Fadable } from '../fondu';
 import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
+import { DECOR_MANIFEST } from './decors-manifeste';
+import { type BuildingLight, gameLightSheets } from './eclairage';
 import { type Footprint, KeepOut } from './emprises';
 import { type LandmarkPose, landmarkPoses, layRuns, sortAvailable } from './files';
 import { RUN_SORTS } from './reglages-files';
@@ -141,6 +144,14 @@ interface RoomView {
 }
 
 const NO_LIGHTS: PlaceLights = { lamps: [], windows: [] };
+const DARK: BuildingLight = { ground: 0, upper: 0 };
+
+/** Un bâtiment livré et ce qui s'allume avec lui: ses vitres, ses rectangles de lumière dehors. */
+interface LitBuilding {
+  /** Lumière propre du maillage (`userData.inkInner`): parts du rez-de-chaussée et de l'étage. */
+  readonly inner: InkInner;
+  readonly windows: WindowLight[];
+}
 
 export class TiledPlace {
   readonly root = new Group();
@@ -184,6 +195,11 @@ export class TiledPlace {
   /** Rendu encré: relief du sol du lieu (`null` dans l'ancien rendu: sol plan). */
   readonly relief: Relief | null;
   private readonly built: PlaceLights;
+  /** Lampes du dehors du lieu: portes des bâtiments provisoires, repères qui éclairent. */
+  private readonly outdoorLamps: Lamp[] = [];
+  /** Bâtiments livrés, par identifiant: leur éclairage se fond vers ce que dit la vie du bourg. */
+  private readonly lit = new Map<string, LitBuilding>();
+  private litOnce = false;
   private readonly probe = { x: 0, y: 0, z: 0 };
   private buildMs = 0;
   private maxStepMs = 0;
@@ -273,6 +289,7 @@ export class TiledPlace {
         );
     const models = new Map<number, ModeledBuilding[]>();
     const windows: WindowLight[] = [];
+    const sheets = delivered === null ? null : gameLightSheets(delivered.place);
     if (ink !== null && delivered !== null)
       for (const [tile, list] of buildings) {
         const kept: BuildingShape[] = [];
@@ -284,19 +301,42 @@ export class TiledPlace {
           }
           const { rect } = shape;
           const tileModels = models.get(tile) ?? [];
-          tileModels.push({ id: shape.id, geometry: model.geometry, height: model.height, rect });
+          // Éteint tant que rien ne l'éclaire; l'étage commence au-dessus du rez-de-chaussée
+          // (un bâtiment d'un seul niveau n'en a pas: ses grandes baies sont au rez-de-chaussée).
+          const levels = sheets?.get(shape.id)?.levels ?? 2;
+          const split = levels < 2 ? 1e6 : INK_SETTINGS.buildingLights.upperFrom;
+          const entry: LitBuilding = { inner: new Vector4(1, 0, 0, split), windows: [] };
+          this.lit.set(shape.id, entry);
+          tileModels.push({
+            id: shape.id,
+            geometry: model.geometry,
+            height: model.height,
+            rect,
+            inner: entry.inner,
+          });
           models.set(tile, tileModels);
-          // Fenêtres du manifeste, du repère du bâtiment à celui du lieu.
-          for (const w of model.windows)
-            windows.push({ ...w, x: w.x + rect.x + rect.w / 2, z: w.z + rect.y + rect.h / 2 });
+          // Ouvertures du manifeste, du repère du bâtiment à celui du lieu.
+          for (const w of model.windows) {
+            const placed: WindowLight = {
+              ...w,
+              x: w.x + rect.x + rect.w / 2,
+              z: w.z + rect.y + rect.h / 2,
+              power: 0,
+            };
+            entry.windows.push(placed);
+            windows.push(placed);
+          }
         }
         buildings.set(tile, kept);
       }
     const lamp = INK_SETTINGS.lights;
+    // Dehors, aucune lampe ne porte d'ombre locale (budget: les flaques seules).
+    for (const list of buildings.values())
+      for (const b of list)
+        for (const l of b.lamps)
+          this.outdoorLamps.push({ ...l, radius: lamp.lampRadius, shadow: false });
     this.built = {
-      lamps: [...buildings.values()].flatMap((list) =>
-        list.flatMap((b) => b.lamps.map((l) => ({ ...l, radius: lamp.lampRadius, shadow: true }))),
-      ),
+      lamps: this.outdoorLamps,
       windows: [
         ...windows,
         ...[...buildings.values()].flatMap((list) => list.flatMap((b) => b.windows)),
@@ -672,6 +712,20 @@ export class TiledPlace {
     const id = mesh.name;
     if (this.occlusion.add({ id, min: box.min.clone(), max: box.max.clone() }))
       this.landmarkFades.set(id, new Fadable(mesh, new Color(0, 0, 0)));
+    // Repère qui éclaire (le feu du sémaphore): sa lampe, et son verre allumé avec elle.
+    const light = DECOR_MANIFEST.models[pose.model]?.light;
+    if (light !== undefined) {
+      const glass = new Vector4(2, 0, 0, 0);
+      mesh.userData[INK_INNER] = glass;
+      this.outdoorLamps.push(
+        modelLamp(
+          id,
+          light,
+          { x: pose.x, z: pose.z, ground: mesh.position.y, yaw: pose.yaw, scale: pose.scale },
+          { outdoor: true, glassOf: () => glass },
+        ),
+      );
+    }
     const count = geometry.index?.count ?? geometry.getAttribute('position').count;
     this.landmarkTriangles += count / 3;
     this.landmarkCalls += 1;
@@ -737,6 +791,31 @@ export class TiledPlace {
   lights(room: string | null = null): PlaceLights {
     if (room === null) return this.built;
     return this.roomViews.get(room)?.lights ?? NO_LIGHTS;
+  }
+
+  /**
+   * Éclaire les bâtiments livrés selon `targets` (`eclairage.ts`; absent de la table: éteint):
+   * vitres et rectangles de lumière se fondent en `fadeSeconds`, d'un coup à la première image.
+   */
+  lightBuildings(targets: ReadonlyMap<string, BuildingLight>, dt: number): void {
+    const step = this.litOnce
+      ? dt / Math.max(0.01, INK_SETTINGS.buildingLights.fadeSeconds)
+      : Number.POSITIVE_INFINITY;
+    this.litOnce = true;
+    const toward = (from: number, to: number): number =>
+      to > from ? Math.min(to, from + step) : Math.max(to, from - step);
+    for (const [id, entry] of this.lit) {
+      const goal = targets.get(id) ?? DARK;
+      const { inner } = entry;
+      inner.y = toward(inner.y, goal.ground);
+      inner.z = toward(inner.z, goal.upper);
+      for (const w of entry.windows) w.power = inner.y;
+    }
+  }
+
+  /** Part éclairée du rez-de-chaussée d'un bâtiment (lanterne de sa porte); inconnu: 1. */
+  buildingShare(id: string): number {
+    return this.lit.get(id)?.inner.y ?? 1;
   }
 
   /** La pièce affichée n'a aucune fenêtre: le jour n'y entre pas. */

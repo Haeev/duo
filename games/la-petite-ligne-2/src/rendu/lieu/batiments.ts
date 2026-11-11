@@ -32,7 +32,7 @@ export interface BuildingModel {
   /** Géométrie fusionnée, origine au milieu de l'emprise, au sol; elle reste à la source. */
   readonly geometry: BufferGeometry;
   readonly height: number;
-  /** Fenêtres du rez-de-chaussée, dans le repère du bâtiment (m depuis le milieu de l'emprise). */
+  /** Ouvertures vitrées du rez-de-chaussée, dans le repère du bâtiment (m depuis le milieu de l'emprise). */
   readonly windows: readonly WindowLight[];
 }
 
@@ -145,7 +145,8 @@ export class PlaceBuildings implements BuildingSource {
               this.models.set(`${manifest.lieu}/${id}`, {
                 geometry,
                 height: sheet.hauteur,
-                windows: sheet.fenetres.map((w) => ({
+                // Fenêtres, puis devantures, portes à carreaux et vitraux: tout ce qui éclaire dehors.
+                windows: [...sheet.fenetres, ...(sheet.lueurs ?? [])].map((w) => ({
                   x: w.x,
                   sill: w.appui,
                   z: w.z,

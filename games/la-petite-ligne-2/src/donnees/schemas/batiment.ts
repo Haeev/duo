@@ -1,9 +1,10 @@
 /**
  * `donnees/lieux/<lieu>/batiments/<id>.json`: la fiche d'un bâtiment, dont l'assembleur
  * (`assets-src/decors/batiments-aubrune/`) tire le modèle `assets/lieux/<lieu>/batiments/<id>.glb`.
- * L'identifiant est celui du bâtiment dans `buildings` de la carte du lieu. Le moteur ne lit pas
- * cette fiche: il lit le manifeste `batiments.json` écrit à côté des modèles. Les façades sont
- * nommées dans le repère du monde (le modèle se pose en rotation 0, au centre de l'emprise).
+ * L'identifiant est celui du bâtiment dans `buildings` de la carte du lieu. Le moteur lit le
+ * manifeste `batiments.json` écrit à côté des modèles; de cette fiche, il ne lit que les niveaux
+ * et l'`eclairage` (`rendu/lieu/eclairage.ts`). Les façades sont nommées dans le repère du monde
+ * (le modèle se pose en rotation 0, au centre de l'emprise).
  */
 import * as v from 'valibot';
 import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema } from './communs';
@@ -148,6 +149,30 @@ const body = {
   options: v.exactOptional(v.pipe(v.array(Option), v.maxLength(16))),
 };
 
+const Minute = v.pipe(IntSchema, v.minValue(0), v.maxValue(1440));
+
+/**
+ * Éclairage propre d'un bâtiment sans habitant ni commerce pour l'allumer (gare, église): des
+ * plages d'heures où ses fenêtres sont éclairées de l'intérieur. Un commerce s'éclaire à ses
+ * heures d'ouverture et une maison selon le planning de ses habitants, sans rien écrire ici.
+ */
+export const BuildingLightingSchema = v.pipe(
+  v.array(
+    v.strictObject({
+      /** Plage en minutes depuis minuit (`de` inclus, `a` exclu; elle peut passer minuit). */
+      de: Minute,
+      a: Minute,
+      /** Niveaux éclairés; absent: le rez-de-chaussée. */
+      niveau: v.exactOptional(v.picklist(['rdc', 'etage', 'tout'])),
+      /** Force de 0 à 1 (une veilleuse: 0,4); absente: 1. */
+      force: v.exactOptional(Fraction),
+      pourquoi: v.pipe(v.string(), v.minLength(10), v.maxLength(200)),
+    }),
+  ),
+  v.maxLength(6),
+);
+export type BuildingLighting = v.InferOutput<typeof BuildingLightingSchema>;
+
 export const BuildingSheetSchema = v.strictObject({
   schema: FileVersionSchema,
   id: IdSchema,
@@ -169,6 +194,7 @@ export const BuildingSheetSchema = v.strictObject({
     }),
   ),
   ...body,
+  eclairage: v.exactOptional(BuildingLightingSchema),
   annexes: v.exactOptional(
     v.pipe(
       v.array(
@@ -179,6 +205,17 @@ export const BuildingSheetSchema = v.strictObject({
   ),
 });
 export type BuildingSheet = v.InferOutput<typeof BuildingSheetSchema>;
+
+/** Ouverture vitrée: milieu de l'appui sur le nu du mur (m depuis le centre de l'emprise), cotes, normale. */
+const Glazing = v.object({
+  x: FiniteSchema,
+  appui: FiniteSchema,
+  z: FiniteSchema,
+  largeur: FiniteSchema,
+  hauteur: FiniteSchema,
+  nx: FiniteSchema,
+  nz: FiniteSchema,
+});
 
 /** Entrée du manifeste `assets/lieux/<lieu>/batiments/batiments.json`: ce que le rendu lit. */
 export const BuildingManifestSchema = v.object({
@@ -201,17 +238,12 @@ export const BuildingManifestSchema = v.object({
         v.object({ facade: Side, position: Fraction, x: FiniteSchema, z: FiniteSchema }),
       ),
       /** Fenêtres du rez-de-chaussée: celles qui jettent leur lumière dehors la nuit. */
-      fenetres: v.array(
-        v.object({
-          x: FiniteSchema,
-          appui: FiniteSchema,
-          z: FiniteSchema,
-          largeur: FiniteSchema,
-          hauteur: FiniteSchema,
-          nx: FiniteSchema,
-          nz: FiniteSchema,
-        }),
-      ),
+      fenetres: v.array(Glazing),
+      /**
+       * Autres ouvertures vitrées du rez-de-chaussée (devanture, porte à carreaux, vitrail):
+       * éclairées, elles jettent aussi leur lumière dehors; les pièces n'en font pas des fenêtres.
+       */
+      lueurs: v.optional(v.array(Glazing)),
     }),
   ),
 });

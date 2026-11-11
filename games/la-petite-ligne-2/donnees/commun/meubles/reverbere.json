@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "reverbere",
+  "name": "Réverbère",
+  "model": "street-lantern",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": "bourg",
+  "bricks": []
+}

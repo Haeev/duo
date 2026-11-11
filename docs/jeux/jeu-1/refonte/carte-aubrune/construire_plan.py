@@ -638,11 +638,21 @@ mob('banc-quai-ouest', 'banc', 'bench-platform', 191, 100.5, 2, "second banc du 
 mob('poteau-quai', 'poteau-de-quai', 'poteau-de-quai', 205.5, 102.5, 0, "là où l'on monte à deux: le point du quai")
 mob('caisse-commande', None, 'crate', 207.5, 101.5, 0, "la caisse de la commande du samedi, au pied du poteau")
 mob('panneau-gare', None, 'platform-sign', 196, 99.6, 2, "le nom de la halte se lit depuis le train, donc tourné vers la voie")
-for _i, _x in enumerate((188, 212)):
-    mob('reverbere-quai-%d' % (_i + 1), None, 'street-lamp', _x, 102.5, 0, "éclairage du quai aux deux bouts")
+# Lampes du dehors: chacune a son meuble du jeu (`reverbere`, `lanterne-de-quai`, `lanterne-de-porte`), dont le modèle
+# porte la lumière (manifeste des décors). Une lanterne de quai tourne sa potence vers la voie (rotation 2: le nord);
+# une lanterne de porte est vissée sur la façade, à côté de la porte, et regarde la rue.
+for _i, (_x, _pq) in enumerate(((188, "éclairage du quai, au bout ouest: la potence vers la voie"),
+                               (212, "éclairage du quai, au bout est, devant la halte: la potence vers la voie"),
+                               (203, "au milieu du quai, entre le banc du réveil et le poteau où l'on monte: on attend le train sous elle"))):
+    mob('reverbere-quai-%d' % (_i + 1), 'lanterne-de-quai', 'platform-lantern', _x, 102.5, 2, _pq)
 for _i, _x in enumerate((195.5, 216.5, 240.5, 262, 280.5, 302.5, 313)):
-    mob('reverbere-route-%d' % (_i + 1), None, 'street-lamp', _x, 111, 0, "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ")
-mob('reverbere-gue', None, 'street-lamp', 179.5, 104.5, 0, "au carrefour du passage à niveau, la nuit du dénouement se joue ici")
+    mob('reverbere-route-%d' % (_i + 1), 'reverbere', 'street-lantern', _x, 111, 0, "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ")
+mob('reverbere-gue', 'reverbere', 'street-lantern', 179.5, 104.5, 0, "au carrefour du passage à niveau, la nuit du dénouement se joue ici")
+mob('reverbere-place', 'reverbere', 'street-lantern', 205.5, 120.4, 0, "au sud de la place, près du banc: la pompe et le banc se trouvent la nuit, et la descente vers la berge")
+mob('reverbere-parvis', 'reverbere', 'street-lantern', 257.5, 81, 0, "sur le parvis, à gauche du portail en sortant: on trouve la rue de l'Église en quittant l'office du soir")
+mob('lanterne-halte', 'lanterne-de-porte', 'wall-lantern', 221.2, 105.03, 0, "à droite de la porte de la halte, côté place: la gare se trouve de loin, même le dernier train parti")
+mob('lanterne-cafe', 'lanterne-de-porte', 'wall-lantern', 255.4, 106.03, 0, "entre la porte et la vitrine du café: allumée, elle dit que Colette sert encore", acte=2)
+mob('lanterne-epicerie', 'lanterne-de-porte', 'wall-lantern', 194.03, 117.2, 1, "à la porte de l'épicerie-pension, côté place: les pensionnaires rentrent à la nuit")
 mob('lisse-nord', None, 'level-crossing-gate', 182.5, 95.4, 0, "la lisse barre la route (bras est-ouest) au nord de la voie, jamais la voie")
 mob('lisse-sud', None, 'level-crossing-gate', 182.5, 99.6, 0, "la lisse barre la route au sud de la voie")
 mob('croix-pn-eglise', None, 'crossing-sign', 256.8, 95, 0, "passage à niveau non gardé: croix de Saint-André au bord de la rue")

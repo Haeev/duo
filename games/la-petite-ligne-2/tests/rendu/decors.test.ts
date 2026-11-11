@@ -49,6 +49,7 @@ describe('décors livrés', () => {
     expect(decorFiles()).toEqual([
       'aubrune-arbres.glb',
       'aubrune-lisieres.glb',
+      'aubrune-luminaires.glb',
       'aubrune-meubles.glb',
       'aubrune-ouvrages.glb',
       'aubrune-potager.glb',

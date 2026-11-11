@@ -34,6 +34,7 @@ import {
   type InkMaterialOptions,
   type InkUniforms,
   type Lamp,
+  lampPower,
   MAX_LAMPS,
   MAX_WINDOWS,
   type WindowLight,
@@ -97,6 +98,7 @@ export interface InkFrame {
 }
 
 const NO_LIGHTS: InkLights = { lamps: [], windows: [] };
+const windowLit = (window: WindowLight): boolean => (window.power ?? 1) > 0;
 const MINUTES_PER_DAY = 1440;
 const BYTES_PER_MEGABYTE = 1024 * 1024;
 /** Rendu logiciel (tests, banc): reconnu au nom du processeur graphique. */
@@ -105,7 +107,10 @@ const CHART_EXPECTED: readonly number[] = COLOR_CHART.flat();
 /** Distances de `nearest`, réutilisées d'un appel à l'autre. */
 const distances: number[] = [];
 
-/** Garde dans `out` les `max` éléments de `all` les plus proches de (x, z), du plus proche au plus loin. */
+/**
+ * Garde dans `out` les `max` éléments de `all` les plus proches de (x, z), du plus proche au plus
+ * loin. `keep`: seuls ces éléments comptent (une lampe éteinte ne prend la place d'aucune autre).
+ */
 export function nearest<T extends { readonly x: number; readonly z: number }>(
   all: readonly T[],
   x: number,
@@ -113,10 +118,12 @@ export function nearest<T extends { readonly x: number; readonly z: number }>(
   max: number,
   reach: number,
   out: T[],
+  keep?: (item: T) => boolean,
 ): T[] {
   out.length = 0;
   distances.length = 0;
   for (const item of all) {
+    if (keep !== undefined && !keep(item)) continue;
     const d = Math.hypot(item.x - x, item.z - z);
     if (d > reach) continue;
     let at = distances.length;
@@ -379,8 +386,32 @@ export class InkKit {
       ambiance.background = hex(frame.backdrop);
     this.current = ambiance;
     const lights = frame.lights ?? NO_LIGHTS;
-    nearest(lights.lamps, frame.focusX, frame.focusZ, MAX_LAMPS, s.lights.reach, this.lamps);
-    nearest(lights.windows, frame.focusX, frame.focusZ, MAX_WINDOWS, s.lights.reach, this.windows);
+    // Le verre de chaque lampe du lieu suit son allumage, qu'elle pose une flaque ou non.
+    const amount = ambiance.lamps;
+    for (const lamp of lights.lamps) {
+      if (lamp.glass === undefined) continue;
+      const power = lampPower(amount, lamp);
+      lamp.glass.set(2, power, power, 0);
+    }
+    const lampLit = (lamp: Lamp): boolean => lampPower(amount, lamp) > 0;
+    nearest(
+      lights.lamps,
+      frame.focusX,
+      frame.focusZ,
+      MAX_LAMPS,
+      s.lights.reach,
+      this.lamps,
+      lampLit,
+    );
+    nearest(
+      lights.windows,
+      frame.focusX,
+      frame.focusZ,
+      MAX_WINDOWS,
+      s.lights.reach,
+      this.windows,
+      windowLit,
+    );
     applyAmbiance(u, ambiance, this.lamps, this.windows);
     this.sunDirection(frame.minutes, ambiance, frame.room === true);
     u.uTime.value += frame.dt;

@@ -237,3 +237,5 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Budget: l'orée était à 298 903 triangles pour un plafond de 300 000; mesurer la vue la plus serrée avant de choisir une technique (ici: zéro triangle pour l'eau, la terre et le liseré; bandes en travers seulement pour les sillons).
 - Copie isolée: un `python3 - <<EOF` long ou un `mkdir && cat > ... &&` est refusé; écrire le script avec l'outil d'écriture puis `python3 fichier.py` depuis le dossier du jeu. Deux bancs en rendu logiciel et `pnpm test` en même temps: un test à délai (20 s) échoue par manque de processeur, le relancer seul.
 
+- Banc `tests/rendu-encre/ensemble.spec.ts` dans un arbre neuf: « le faux hôte s'est arrêté (code 1) » veut dire que `packages/sdk-dev/dist` manque (`pnpm --filter @duo/sdk-dev build`, 1 s). Sa préparation rejoue toute la suite vitest: un test rouge la bloque.
+- Sauvegarde `aubrune-apres-scene` du banc: les habitants absents à 7 h (Colette...) le restent après `setMinutes`; un commerce peut donc paraître fermé le soir en capture. Pour prouver les fenêtres, cadrer la halte et le fournil (227, 109.5, lacet 0).

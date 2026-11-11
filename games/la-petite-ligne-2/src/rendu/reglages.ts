@@ -142,8 +142,12 @@ export const RENDER_SETTINGS = {
     hysteresis: 0.35,
     /** Une forme en boule ne remplit pas sa boîte: part de la boîte qui compte pour l'occultation. */
     ballShare: 0.78,
-    /** Un volume plus bas que ça ne cache jamais un personnage (m). */
-    minHeight: 1.1,
+    /**
+     * Un volume dont le dessus est plus bas que ça au-dessus des pieds du personnage ne s'efface
+     * jamais (m): un comptoir, une table, un muret laissent voir la tête et les épaules, ils ne
+     * cachent rien d'utile, et effacés ils deviendraient des fantômes au milieu de la pièce.
+     */
+    minHeight: 1.35,
   },
 
   target: {

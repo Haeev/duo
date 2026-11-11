@@ -444,6 +444,134 @@
       "pourquoi": "là où l'on monte à deux: le point du quai"
     },
     {
+      "id": "reverbere-quai-1",
+      "type": "lanterne-de-quai",
+      "x": 188,
+      "y": 102.5,
+      "rotation": 2,
+      "pourquoi": "éclairage du quai, au bout ouest: la potence vers la voie"
+    },
+    {
+      "id": "reverbere-quai-2",
+      "type": "lanterne-de-quai",
+      "x": 212,
+      "y": 102.5,
+      "rotation": 2,
+      "pourquoi": "éclairage du quai, au bout est, devant la halte: la potence vers la voie"
+    },
+    {
+      "id": "reverbere-quai-3",
+      "type": "lanterne-de-quai",
+      "x": 203,
+      "y": 102.5,
+      "rotation": 2,
+      "pourquoi": "au milieu du quai, entre le banc du réveil et le poteau où l'on monte: on attend le train sous elle"
+    },
+    {
+      "id": "reverbere-route-1",
+      "type": "reverbere",
+      "x": 195.5,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-route-2",
+      "type": "reverbere",
+      "x": 216.5,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-route-3",
+      "type": "reverbere",
+      "x": 240.5,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-route-4",
+      "type": "reverbere",
+      "x": 262,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-route-5",
+      "type": "reverbere",
+      "x": 280.5,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-route-6",
+      "type": "reverbere",
+      "x": 302.5,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-route-7",
+      "type": "reverbere",
+      "x": 313,
+      "y": 111,
+      "rotation": 0,
+      "pourquoi": "la Grand-Route éclairée côté sud, entre les façades, tous les 20 m environ"
+    },
+    {
+      "id": "reverbere-gue",
+      "type": "reverbere",
+      "x": 179.5,
+      "y": 104.5,
+      "rotation": 0,
+      "pourquoi": "au carrefour du passage à niveau, la nuit du dénouement se joue ici"
+    },
+    {
+      "id": "reverbere-place",
+      "type": "reverbere",
+      "x": 205.5,
+      "y": 120.4,
+      "rotation": 0,
+      "pourquoi": "au sud de la place, près du banc: la pompe et le banc se trouvent la nuit, et la descente vers la berge"
+    },
+    {
+      "id": "reverbere-parvis",
+      "type": "reverbere",
+      "x": 257.5,
+      "y": 81,
+      "rotation": 0,
+      "pourquoi": "sur le parvis, à gauche du portail en sortant: on trouve la rue de l'Église en quittant l'office du soir"
+    },
+    {
+      "id": "lanterne-halte",
+      "type": "lanterne-de-porte",
+      "x": 221.2,
+      "y": 105.03,
+      "rotation": 0,
+      "pourquoi": "à droite de la porte de la halte, côté place: la gare se trouve de loin, même le dernier train parti"
+    },
+    {
+      "id": "lanterne-cafe",
+      "type": "lanterne-de-porte",
+      "x": 255.4,
+      "y": 106.03,
+      "rotation": 0,
+      "pourquoi": "entre la porte et la vitrine du café: allumée, elle dit que Colette sert encore"
+    },
+    {
+      "id": "lanterne-epicerie",
+      "type": "lanterne-de-porte",
+      "x": 194.03,
+      "y": 117.2,
+      "rotation": 1,
+      "pourquoi": "à la porte de l'épicerie-pension, côté place: les pensionnaires rentrent à la nuit"
+    },
+    {
       "id": "pompe-de-la-place",
       "type": "pompe",
       "x": 208,

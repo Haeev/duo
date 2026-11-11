@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "lanterne-de-porte",
+  "name": "Lanterne de porte",
+  "model": "wall-lantern",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": "bourg",
+  "bricks": []
+}

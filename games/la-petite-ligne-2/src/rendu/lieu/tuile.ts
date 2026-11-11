@@ -20,6 +20,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { MapDef } from '../../donnees/schemas/lieu';
 import { KIND, LAYER, SWAP } from '../encre/couches';
+import { INK_INNER, type InkInner } from '../encre/matiere';
 import { SHADOW_ONLY } from '../encre/ombres';
 import { Fadable } from '../fondu';
 import type { OccluderBox } from '../occultation';
@@ -145,6 +146,8 @@ export interface ModeledBuilding {
   readonly geometry: BufferGeometry;
   readonly height: number;
   readonly rect: { x: number; y: number; w: number; h: number };
+  /** Lumière propre du bâtiment (rendu encré): ses vitres s'allument selon la vie du lieu. */
+  readonly inner?: InkInner;
 }
 
 const modelGlow = new Color(0, 0, 0);
@@ -620,6 +623,7 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     mesh.name = b.id;
     mesh.position.set(b.rect.x + b.rect.w / 2, 0, b.rect.y + b.rect.h / 2);
     mesh.receiveShadow = true;
+    if (b.inner !== undefined) mesh.userData[INK_INNER] = b.inner;
     view.add(mesh);
     const wallId = `${b.id}-murs`;
     view.models.set(wallId, new Fadable(mesh, modelGlow));

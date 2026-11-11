@@ -79,6 +79,17 @@ Ce qui restait en blocs provisoires, dans la même chaîne (mêmes teintes, mêm
 
 Ajouter un meuble: copier l'entrée `[[modeles]]` de la même `sorte` (ou une garniture de comptoir: `buvette`, `epicerie`, `fournil`, `mercerie`, `cafe`), changer `id` et `graine`, `etats = ["bare"]` si la fiche a un stock qui se vide, puis `construire.sh` (il refuse un meuble qui sort des cases de sa fiche) et `"model": "<id>"` dans la fiche. Une forme nouvelle de meuble est une branche de `_meuble`.
 
+### Ajouter une sorte de lampe (aucun code)
+
+1. Dans `recoltables.toml`, copier une entrée `famille = "luminaire"` (`street-lantern`, `platform-lantern`, `door-lantern`), changer `id`, `graine`, `pourquoi`; `lumiere = { rayon = 5.0 }` (rayon de la flaque, m), au besoin `couleur = "#rrggbb"` et `force`. Le verre se peint en `flamme`: il luit quand la lampe est allumée.
+2. `construire.sh`: le manifeste reçoit `light` (foyer calculé par la forme, rayon, couleur).
+3. Copier une fiche `donnees/commun/meubles/reverbere.json`, changer `id`, `name` et `"model": "<id>"`.
+4. Poser des meubles de ce type dans `carte.json` du lieu, chacun avec son `pourquoi` (où l'on passe la nuit).
+5. Rendu (`src/rendu/encre/lumieres.ts`): au dehors, la lampe s'allume à son rang à la tombée du jour (`INK_SETTINGS.lamps`); contre une façade (`attachReach`), elle suit l'éclairage du bâtiment.
+6. Fenêtres: un commerce s'éclaire à ses heures, une maison selon le planning de ses habitants; un bâtiment sans habitant déclare `eclairage` (plages `de`, `a`, `niveau`, `force`) dans sa fiche de `batiments/`.
+7. Borne: les `MAX_LAMPS` (6) lampes et `MAX_WINDOWS` (8) fenêtres allumées les plus proches du point visé posent leur lumière; les autres gardent leur verre allumé.
+8. Test: `tests/rendu/eclairage.test.ts`.
+
 Modules de file (haie, talus, rang): chaque module court d'ouest en est sur exactement 1 m (le rang, du nord au sud), ses deux bouts ont le même profil, sans tremblé, et des normales tirées du profil seul: n'importe quelle suite de formes se raccorde. `bout` ferme la file à l'est, `angle` tourne de l'ouest vers le nord (haie), `angle` et `angle_rentrant` suivent l'eau au sud et à l'est (talus); le rendu les tourne d'un quart de tour pour les autres côtés. Le contrôle refuse un module qui ne commence pas à -0,5 m ou qui sort de sa case.
 
 Branchement en jeu (`src/rendu/lieu/files.ts`, données dans `reglages-files.ts`, recette dans `src/rendu/lieu/README.md`):

@@ -179,5 +179,18 @@
         }
       ]
     }
+  ],
+  "eclairage": [
+    {
+      "de": 1020,
+      "a": 1230,
+      "pourquoi": "l'office du soir: Martial ferme l'église à 20 h 30, les vitraux s'éteignent avec lui"
+    },
+    {
+      "de": 1230,
+      "a": 390,
+      "force": 0.4,
+      "pourquoi": "la lampe du sanctuaire ne s'éteint jamais: les vitraux gardent une lueur toute la nuit"
+    }
   ]
 }

@@ -73,5 +73,18 @@
       "forme": "souche",
       "position": 0.8
     }
+  ],
+  "eclairage": [
+    {
+      "de": 960,
+      "a": 1320,
+      "pourquoi": "le guichet et la salle d'attente restent éclairés jusqu'au départ du dernier train du soir"
+    },
+    {
+      "de": 1320,
+      "a": 420,
+      "force": 0.55,
+      "pourquoi": "la veilleuse du chef de halte: la gare se trouve de nuit, même fermée"
+    }
   ]
 }
