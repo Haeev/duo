@@ -6,7 +6,18 @@
   "family": "food",
   "stack": 1,
   "food": {
-    "hunger": 70
+    "hunger": 70,
+    "stamina": {
+      "refill": 1,
+      "capacity": {
+        "extra": 0.5,
+        "seconds": 480
+      },
+      "recovery": {
+        "factor": 1.5,
+        "seconds": 480
+      }
+    }
   },
   "tool": null,
   "meal": {

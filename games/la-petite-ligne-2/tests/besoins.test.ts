@@ -21,11 +21,14 @@ describe('besoins', () => {
     expect(a.needs.sleep).toBeCloseTo(70 - 1.6, 1);
     expect(a.needs.hygiene).toBeCloseTo(70 - 1, 1);
     const running = newSim(content);
-    // Course vers l'est, sur le quai dégagé.
+    // Course vers l'est.
     const run = { ...idleInput(0), moveX: 1, run: true };
-    wait(running, 60, [run, idleInput(0)]);
-    expect(running.world.players[0].needs.hunger).toBeCloseTo(70 - 3, 1);
-    expect(running.world.players[1].needs.hunger).toBeCloseTo(70 - 2, 1);
+    // 10 s sur le quai dégagé: la course coûte quand on court pour de bon (pas contre un mur, ni
+    // essoufflé), et dure moins qu'une jauge d'endurance (`besoins.json`, `stamina.runSeconds`).
+    put(running, 0, 5, 20, 0);
+    wait(running, 10, [run, idleInput(0)]);
+    expect(running.world.players[0].needs.hunger).toBeCloseTo(70 - 0.5, 1);
+    expect(running.world.players[1].needs.hunger).toBeCloseTo(70 - 1 / 3, 1);
   });
 
   it('change de palier sous 20 et à 0, avec un événement et la tranche « joueurs »', () => {

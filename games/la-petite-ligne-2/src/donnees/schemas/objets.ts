@@ -3,6 +3,7 @@ import * as v from 'valibot';
 import { ToolKindSchema } from './briques';
 import { ToolWorkSchema } from './recolte';
 import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema, LabelSchema } from './communs';
+import { FoodStaminaSchema } from './endurance';
 
 export const ITEM_FAMILIES = [
   'food',
@@ -49,9 +50,15 @@ export const ItemSchema = v.strictObject({
   family: v.picklist(ITEM_FAMILIES),
   /** Pile maximale dans une case (1: ne s'empile pas). */
   stack: v.pipe(IntSchema, v.minValue(1), v.maxValue(99)),
-  /** Points de faim rendus en le mangeant, `null` s'il ne se mange pas. */
+  /**
+   * Points de faim rendus en le mangeant, `null` s'il ne se mange pas. `stamina` (facultatif):
+   * renfort d'endurance de la bouchée (`schemas/endurance.ts`).
+   */
   food: v.nullable(
-    v.strictObject({ hunger: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(100)) }),
+    v.strictObject({
+      hunger: v.pipe(FiniteSchema, v.minValue(1), v.maxValue(100)),
+      stamina: v.exactOptional(FoodStaminaSchema),
+    }),
   ),
   tool: v.nullable(ToolSchema),
   /** Repas spécial (pile de 1): servi à table aux deux joueurs assis, il donne ce bonus. Absent: plat ordinaire. */

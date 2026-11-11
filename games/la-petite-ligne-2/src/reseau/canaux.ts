@@ -6,6 +6,7 @@
 import * as v from 'valibot';
 import { FiniteSchema, IdSchema, IntSchema, TickSchema } from '../donnees/schemas/communs';
 import { CommonSchema } from '../etat/commun';
+import { StaminaValueSchema } from '../etat/endurance';
 import { PlayerSlowSchema } from '../etat/joueur';
 import { PlaceSlowSchema } from '../etat/lieu';
 import type { Slice } from '../etat/monde';
@@ -83,7 +84,7 @@ const MoverSchema = v.tuple([FiniteSchema, FiniteSchema, FiniteSchema, FiniteSch
 /** Les trois jauges: faim, sommeil, hygiène. */
 const GaugesSchema = v.tuple([FiniteSchema, FiniteSchema, FiniteSchema]);
 
-/** Ce qui bouge à chaque pas: positions, heure et jauges des besoins. */
+/** Ce qui bouge à chaque pas: positions, heure, jauges des besoins et endurance. */
 export const FastSchema = v.strictObject({
   tick: TickSchema,
   /** Dernière commande de l'invité jouée par l'hôte (réconciliation de la prédiction), -1 avant la première. */
@@ -93,6 +94,8 @@ export const FastSchema = v.strictObject({
   place: IdSchema,
   players: v.tuple([MoverSchema, MoverSchema]),
   needs: v.tuple([GaugesSchema, GaugesSchema]),
+  /** Jauge d'endurance de chaque joueur (part de la jauge de base). */
+  stamina: v.tuple([StaminaValueSchema, StaminaValueSchema]),
   /** Habitants du lieu courant, dans l'ordre de ses données. */
   villagers: v.pipe(v.array(MoverSchema), v.maxLength(32)),
 });

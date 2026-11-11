@@ -5,6 +5,7 @@
  */
 import type { PredictorFactory } from '../../reseau/prediction';
 import { predictedGesture } from '../briques/geste';
+import { canRun } from '../besoins/endurance';
 import { SIM_DT } from './constantes';
 import { canWalk, speedFactorOf, walkStep } from './deplacement';
 import { currentBlockers } from './obstacles';
@@ -19,7 +20,7 @@ export const createPredictor: PredictorFactory = (content) => ({
       body,
       input.moveX,
       input.moveY,
-      input.run,
+      input.run && canRun(world, player),
       content.settings.movement,
       SIM_DT,
       speedFactorOf(content, world, player),

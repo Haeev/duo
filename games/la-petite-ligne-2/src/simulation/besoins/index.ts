@@ -1,6 +1,7 @@
 /**
  * Système « besoins » (lot L3): faim, sommeil et hygiène baissent avec le temps et l'effort,
- * remontent en mangeant, en se reposant et en se lavant. Un changement de palier part dans la
+ * remontent en mangeant, en se reposant et en se lavant. L'endurance (`endurance.ts`) suit la
+ * course et la posture. Un changement de palier part dans la
  * tranche « joueurs » et en événement `need_tier` (le seul moment où le médaillon paraît).
  */
 import type { PropDef } from '../../donnees/schemas/meuble';
@@ -8,7 +9,8 @@ import { NEED_IDS, type PlayerIndex } from '../../donnees/schemas/communs';
 import type { Intent } from '../noyau/entrees';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { stackAt, takeOne } from '../sac/inventaire';
-import { clampGauge, decayFor, tierFor } from './jauges';
+import { applyFoodStamina, stepStamina, type StaminaPosture } from './endurance';
+import { clampGauge, decayFor, modifiersOf, neutralModifiers, tierFor } from './jauges';
 import { expireMealPerks, shareSpecialMeal } from './repas';
 import type { SlotRef } from '../sac/cases';
 import { relieveNeed } from './soins';
@@ -53,12 +55,31 @@ function relieveDuringGesture(sim: SimContext, player: PlayerIndex): void {
   relieveNeed(sim, player, brick.need, (brick.amount / brick.seconds) * sim.dt, brick.cap);
 }
 
+/** Modificateurs relus à chaque pas, sans allocation. */
+const scratch = neutralModifiers();
+
+/** Posture de l'endurance: couché, assis, en course (au-dessus du pas de marche), en marche, arrêté. */
+function postureOf(
+  sim: SimContext,
+  player: PlayerIndex,
+  rest: { lying: boolean } | null,
+): StaminaPosture {
+  if (rest !== null) return rest.lying ? 'lying' : 'seated';
+  const speed = sim.world.players[player].body.speed;
+  if (speed <= 0) return 'still';
+  const walkTop =
+    sim.content.settings.movement.walkSpeed *
+    modifiersOf(sim.content, sim.world, player, scratch).speed;
+  return speed > walkTop + 1e-6 ? 'run' : 'walk';
+}
+
 function stepPlayer(sim: SimContext, player: PlayerIndex): void {
   const state = sim.world.players[player];
-  const input = sim.inputs[player];
-  // Effort: un geste en cours, ou courir (même contre un obstacle).
-  const effort = state.gesture !== null || (input.run && (input.moveX !== 0 || input.moveY !== 0));
   const rest = restOf(sim, player);
+  const posture = postureOf(sim, player, rest);
+  // Effort: un geste en cours, ou courir pour de bon (essoufflé, la touche de course ne coûte rien).
+  const effort = state.gesture !== null || posture === 'run';
+  stepStamina(sim, player, posture);
   relieveDuringGesture(sim, player);
   for (const need of NEED_IDS) {
     if (need === 'sleep' && rest !== null) {
@@ -112,6 +133,7 @@ function onIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void {
   }
   takeOne(state, intent.from);
   relieveNeed(sim, player, 'hunger', food.hunger);
+  if (food.stamina !== undefined) applyFoodStamina(sim, player, food.stamina);
   sim.touch('players');
   sim.emit({ type: 'ate', player, item: stack.item });
 }

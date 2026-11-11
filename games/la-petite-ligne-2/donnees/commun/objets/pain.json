@@ -6,7 +6,10 @@
   "family": "food",
   "stack": 3,
   "food": {
-    "hunger": 25
+    "hunger": 25,
+    "stamina": {
+      "refill": 0.25
+    }
   },
   "tool": null
 }

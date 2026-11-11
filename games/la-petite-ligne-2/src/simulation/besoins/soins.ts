@@ -5,6 +5,7 @@
 import type { NeedId, PlayerIndex } from '../../donnees/schemas/communs';
 import type { SimContext } from '../noyau/systemes';
 import { RULES } from '../regles/reglages';
+import { restStamina } from './endurance';
 import { clampGauge } from './jauges';
 
 /** Ajoute `amount` à un besoin sans dépasser `cap`; une jauge déjà au-dessus de `cap` ne baisse pas. */
@@ -21,12 +22,16 @@ export function relieveNeed(
   else needs[need] = clampGauge(before + amount);
 }
 
-/** Réveil après une nuit au lit (cahier 4.4): sommeil au niveau du lit, faim et hygiène en baisse. */
+/**
+ * Réveil après une nuit au lit (cahier 4.4): sommeil au niveau du lit, faim et hygiène en baisse,
+ * endurance pleine.
+ */
 export function wakeUp(sim: SimContext, player: PlayerIndex, wakeAt: number): void {
   const needs = sim.world.players[player].needs;
   needs.sleep = Math.max(needs.sleep, clampGauge(wakeAt));
   needs.hunger = clampGauge(needs.hunger - RULES.needs.nightHungerLoss);
   needs.hygiene = clampGauge(needs.hygiene - RULES.needs.nightHygieneLoss);
+  restStamina(sim, player);
 }
 
 /** Un geste salissant (bêcher, fouiller): appelé par les briques concernées. */

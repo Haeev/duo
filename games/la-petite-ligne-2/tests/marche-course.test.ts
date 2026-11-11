@@ -73,7 +73,7 @@ describe('marche et course', () => {
     expect(sim.world.players[1].body.speed).toBeCloseTo(runSpeed * 0.5, 6);
   });
 
-  it('la course creuse l’appétit (faim 1,5 fois plus vite), sans fatigue ni jauge d’endurance', () => {
+  it('la course creuse l’appétit (faim 1,5 fois plus vite), sans fatigue', () => {
     const hunger = content.needs.needs.find((n) => n.id === 'hunger');
     const sleep = content.needs.needs.find((n) => n.id === 'sleep');
     expect(hunger?.effortFactor).toBe(1.5);

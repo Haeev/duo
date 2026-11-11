@@ -17,7 +17,13 @@
   // Pile maximale dans une case (cahier 4.5: poisson 3, bûche 5, planche 10, outil 1).
   "stack": 5,
   // Se mange: points de faim rendus. Sinon: null.
-  "food": { "hunger": 10 },
+  // Renfort d'endurance (facultatif), dans "food": "stamina": { ... } avec au moins un des trois:
+  //   "refill": 0.25                                  part de la jauge rendue tout de suite (0,05 à 1)
+  //   "capacity": { "extra": 0.25, "seconds": 240 }   jauge plus longue d'un quart, 4 minutes réelles
+  //   "recovery": { "factor": 1.5, "seconds": 240 }   recharge 1,5 fois plus rapide, 4 minutes
+  // Repères: pomme 0,15; pain 0,25; plat chaud 0,5 et un renfort; grand plat 1 et deux renforts.
+  // Deux renforts du même genre ne s'additionnent pas (le plus fort, la fin la plus tardive).
+  "food": { "hunger": 10, "stamina": { "refill": 0.15 } },
   // Outil: { "kind": "axe", "durability": 0, "gestureSeconds": 1, "bluntGestureSeconds": 1 }
   // (durability 0 = outil de base, inusable), avec "family": "tool" et "stack": 1. Sinon: null.
   // Travail d'un coup (facultatif, sans lui: niveau 0, 1 point, 1 case), dans "tool":

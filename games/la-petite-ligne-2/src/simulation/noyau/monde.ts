@@ -4,6 +4,7 @@ import type { Content, PlaceContent } from '../../donnees/charger';
 import type { NeedState } from '../../donnees/schemas/besoins';
 import type { NeedId } from '../../donnees/schemas/communs';
 import { initialBrickStates } from '../../etat/briques';
+import { freshStaminaMods } from '../../etat/endurance';
 import type { PlayerState } from '../../etat/joueur';
 import type { PlaceState } from '../../etat/lieu';
 import { DATA_SCHEMA, type WorldState } from '../../etat/monde';
@@ -85,11 +86,13 @@ function createPlayer(content: Content, member: Member, x: number, y: number): P
       sleep: tierOf(content, 'sleep', start),
       hygiene: tierOf(content, 'hygiene', start),
     },
+    staminaMods: freshStaminaMods(),
     gesture: null,
     talk: null,
     aim: null,
     body: { x, y, facing: Math.PI / 2, speed: 0 },
     needs: { hunger: start, sleep: start, hygiene: start },
+    stamina: 1,
   };
 }
 

@@ -1,6 +1,6 @@
 /**
  * Tranche « joueurs ». Les champs lents (sac, argent, apparence, geste, dialogue) partent quand
- * ils changent, au pas même; `body` et `needs` bougent à chaque pas et partent sur le canal rapide.
+ * ils changent, au pas même; `body`, `needs` et `stamina` bougent à chaque pas et partent sur le canal rapide.
  */
 import * as v from 'valibot';
 import {
@@ -14,6 +14,7 @@ import {
 } from '../donnees/schemas/communs';
 import { NeedStateSchema } from '../donnees/schemas/besoins';
 import { GenderSchema, LookSchema } from '../donnees/schemas/personnage';
+import { StaminaModsField, StaminaValueField } from './endurance';
 
 /** Une pile dans une case. `wear`: usages restants d'un outil amélioré (absent: sans usure). */
 export const StackSchema = v.strictObject({
@@ -85,6 +86,8 @@ const slow = {
     sleep: NeedStateSchema,
     hygiene: NeedStateSchema,
   }),
+  /** Essoufflement et renforts d'endurance (`etat/endurance.ts`); la jauge part sur le canal rapide. */
+  staminaMods: StaminaModsField,
   gesture: v.nullable(GestureSchema),
   talk: v.nullable(TalkSchema),
   /** Ce que vise la touche d'action (objet de la carte ou habitant), calculé par la simulation. */
@@ -95,12 +98,31 @@ const slow = {
 export const PlayerSlowSchema = v.strictObject(slow);
 export type PlayerSlow = v.InferOutput<typeof PlayerSlowSchema>;
 
-export const PlayerSchema = v.strictObject({ ...slow, body: BodySchema, needs: NeedsSchema });
+export const PlayerSchema = v.strictObject({
+  ...slow,
+  body: BodySchema,
+  needs: NeedsSchema,
+  stamina: StaminaValueField,
+});
 export type PlayerState = v.InferOutput<typeof PlayerSchema>;
 
 /** Les champs lents d'un joueur, dans l'ordre du schéma (copie de surface). */
 export function slowOf(player: PlayerState): PlayerSlow {
-  const { member, name, look, gender, money, toolbar, bag, selected, tiers, gesture, talk, aim } =
-    player;
-  return { member, name, look, gender, money, toolbar, bag, selected, tiers, gesture, talk, aim };
+  const { member, name, look, gender, money, toolbar, bag, selected, tiers, staminaMods } = player;
+  const { gesture, talk, aim } = player;
+  return {
+    member,
+    name,
+    look,
+    gender,
+    money,
+    toolbar,
+    bag,
+    selected,
+    tiers,
+    staminaMods,
+    gesture,
+    talk,
+    aim,
+  };
 }
