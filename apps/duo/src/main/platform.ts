@@ -614,7 +614,9 @@ export class Platform {
       play: manifest.play,
       durationMinutes: manifest.durationMinutes,
       description: manifest.description,
-      thumbnailUrl: `duo-game://${manifest.id}/${manifest.thumbnail}`,
+      // La version dans l'adresse: après la mise à jour d'un jeu, la bibliothèque recharge sa
+      // vignette au lieu de garder l'ancienne image en mémoire sous la même adresse.
+      thumbnailUrl: `duo-game://${manifest.id}/${manifest.thumbnail}?v=${encodeURIComponent(manifest.version)}`,
       actions: manifest.actions.map((action) => ({
         id: action.id,
         label: action.label,
