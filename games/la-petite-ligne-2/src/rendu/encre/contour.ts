@@ -19,8 +19,8 @@ import {
   Mesh,
   NearestFilter,
   OrthographicCamera,
+  RawShaderMaterial,
   Scene,
-  ShaderMaterial,
   type Texture,
   UnsignedIntType,
   Vector2,
@@ -31,7 +31,13 @@ import {
 import type { Ambiance } from './ambiances';
 import { INK_SETTINGS } from './reglages';
 
+// Nuanceur brut (`RawShaderMaterial`): Three.js n'y ajoute rien et ne range pas son programme
+// selon la cible. Un `ShaderMaterial` en compilait deux, l'un pour la cible de l'image finie
+// (échelle interne sous 1), l'autre pour le canevas: un programme de trop au budget.
 const VERTEX = /* glsl */ `
+precision highp float;
+in vec3 position;
+in vec2 uv;
 out vec2 vUv;
 void main() {
   vUv = uv;
@@ -40,6 +46,9 @@ void main() {
 `;
 
 const FRAGMENT = /* glsl */ `
+precision highp float;
+precision highp int;
+precision highp sampler2D;
 layout(location = 0) out highp vec4 gColor;
 in vec2 vUv;
 uniform sampler2D tColor;
@@ -120,6 +129,53 @@ vec3 normalOf(vec4 aux) {
   return normalize(n);
 }
 
+// Une direction de prise (k de 0 à 3: deux longues, droites, et deux courtes, diagonales): deux
+// lectures de part et d'autre du point, morceau, pièce, normale et profondeur.
+void probe(int k, vec2 uv, float radius, float depth0, float piece0, float part0, vec3 normal0,
+    inout vec4 acc) {
+  float angle = 0.4 + float(k) * 0.7853982;
+  bool isShort = (k == 1 || k == 3);
+  vec2 offset = vec2(cos(angle), sin(angle)) * uTexel * radius * (isShort ? 0.5 : 1.0);
+  float depths[2];
+  for (int s = 0; s < 2; s++) {
+    vec2 at = uv + (s == 0 ? offset : -offset);
+    vec4 aux = texture(tAux, at);
+    float depth = texture(tDepth, at).r;
+    depths[s] = depth;
+    float piece = pieceOf(aux);
+    float hit = 0.0;
+    int rank = 4;
+    if (abs(piece - piece0) > 0.5) {
+      // Silhouette: le trait appartient à l'objet de devant, et prend son rang.
+      rank = sizeOf(depth < depth0 ? piece : piece0);
+      hit = 1.0;
+    } else {
+      float part = partOf(aux);
+      float bend = dot(normalOf(aux), normal0);
+      // Peau lisse (numéro 63, le visage): aucune arête tracée dedans, quel que soit son modelé.
+      bool sleek = mod(part, 64.0) > 62.5 && mod(part0, 64.0) > 62.5;
+      // Le sol (morceau 0) ne se cerne pas lui-même: son relief est dans sa texture.
+      bool ground = part < 0.5 && part0 < 0.5;
+      if (abs(part - part0) > 0.5 || (bend < 0.35 && !sleek && !ground)) {
+        // Trait intérieur: un rang sous celui du plus petit des deux morceaux.
+        rank = min(4, max(sizeOf(part), sizeOf(part0)) + 1);
+        hit = 1.0;
+      }
+    }
+    float weight = hit * uRankWeight[rank];
+    // Les traits des deux premiers rangs sont épais (prises longues et courtes); les autres ne
+    // comptent que sur les prises courtes: ils restent fins.
+    if (isShort) acc.y += weight;
+    else if (rank <= 1) acc.x += weight;
+  }
+  // Saut de profondeur dans un même objet (un toit devant son mur): dérivée seconde, donc nulle
+  // sur un plan quelle que soit sa pente.
+  float leap = step(0.3, abs(depths[0] + depths[1] - 2.0 * depth0) * uDepthRange);
+  float jump = leap * uRankWeight[sizeOf(piece0)];
+  if (isShort) acc.y += jump;
+  else acc.x += jump;
+}
+
 void main() {
   if (uUpscale > 0.5) {
     gColor = vec4(upscaled(), 1.0);
@@ -141,51 +197,13 @@ void main() {
     // Épaisseur de 55 à 145 % le long du trait, et un tremblement d'un demi-trait.
     float radius = uRadius * (0.55 + 0.9 * nz.r);
     vec2 uv = vUv + (nz2.gb - 0.5) * uTexel * uWobble * calm;
-    float thick = 0.0;
-    float thin = 0.0;
-    for (int k = 0; k < 4; k++) {
-      // Quatre directions: deux longues (droites) et deux courtes (diagonales).
-      float angle = 0.4 + float(k) * 0.7853982;
-      bool isShort = (k == 1 || k == 3);
-      vec2 offset = vec2(cos(angle), sin(angle)) * uTexel * radius * (isShort ? 0.5 : 1.0);
-      float depths[2];
-      for (int s = 0; s < 2; s++) {
-        vec2 at = uv + (s == 0 ? offset : -offset);
-        vec4 aux = texture(tAux, at);
-        float depth = texture(tDepth, at).r;
-        depths[s] = depth;
-        float piece = pieceOf(aux);
-        float hit = 0.0;
-        int rank = 4;
-        if (abs(piece - piece0) > 0.5) {
-          // Silhouette: le trait appartient à l'objet de devant, et prend son rang.
-          rank = sizeOf(depth < depth0 ? piece : piece0);
-          hit = 1.0;
-        } else {
-          float part = partOf(aux);
-          float bend = dot(normalOf(aux), normal0);
-          // Peau lisse (numéro 63, le visage): aucune arête tracée dedans, quel que soit son modelé.
-          bool sleek = mod(part, 64.0) > 62.5 && mod(part0, 64.0) > 62.5;
-          // Le sol (morceau 0) ne se cerne pas lui-même: son relief est dans sa texture.
-          bool ground = part < 0.5 && part0 < 0.5;
-          if (abs(part - part0) > 0.5 || (bend < 0.35 && !sleek && !ground)) {
-            // Trait intérieur: un rang sous celui du plus petit des deux morceaux.
-            rank = min(4, max(sizeOf(part), sizeOf(part0)) + 1);
-            hit = 1.0;
-          }
-        }
-        float weight = hit * uRankWeight[rank];
-        // Les traits des deux premiers rangs sont épais (prises longues et courtes); les autres
-        // ne comptent que sur les prises courtes: ils restent fins.
-        if (isShort) thin += weight;
-        else if (rank <= 1) thick += weight;
-      }
-      // Saut de profondeur dans un même objet (un toit devant son mur): dérivée seconde, donc
-      // nulle sur un plan quelle que soit sa pente.
-      float jump = step(0.3, abs(depths[0] + depths[1] - 2.0 * depth0) * uDepthRange) * uRankWeight[sizeOf(piece0)];
-      if (isShort) thin += jump;
-      else thick += jump;
-    }
+    // Accumulateurs: x épais, y fin. Les quatre directions sont toujours lues: sauter les
+    // diagonales courtes quand les prises longues ne voient rien amincissait les joints fins
+    // (rainure d'un plancher plus étroite que le rayon), essayé et écarté le 2026-11-11.
+    vec4 acc = vec4(0.0);
+    for (int k = 0; k < 4; k++) probe(k, uv, radius, depth0, piece0, part0, normal0, acc);
+    float thick = acc.x;
+    float thin = acc.y;
     float line = clamp(max(thin * 0.8, thick * 0.55), 0.0, 1.0);
     color = mix(color, uInk, line);
   }
@@ -247,7 +265,7 @@ export const COLOR_CHART: readonly (readonly [number, number, number])[] = [
 
 export class InkPass {
   readonly target: WebGLRenderTarget;
-  private readonly material: ShaderMaterial;
+  private readonly material: RawShaderMaterial;
   private readonly scene = new Scene();
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly triangle = new BufferGeometry();
@@ -265,7 +283,7 @@ export class InkPass {
       texture.magFilter = NearestFilter;
       texture.generateMipmaps = false;
     }
-    this.material = new ShaderMaterial({
+    this.material = new RawShaderMaterial({
       glslVersion: GLSL3,
       vertexShader: VERTEX,
       fragmentShader: FRAGMENT,

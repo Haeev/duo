@@ -146,6 +146,54 @@ export const RELIEF_SETTINGS = {
       bumps: 0.06,
       spread: 0.45,
     },
+    'sous-bois': {
+      pourquoi:
+        'le sol d’un bois de coteau: racines, souches et feuilles le bossellent plus qu’un pré',
+      level: -0.05,
+      edge: 'souple',
+      bumps: 0.055,
+      spread: 0.45,
+    },
+    'friche-rocheuse': {
+      pourquoi: 'la roche affleure sous l’herbe sèche: des bosses franches, à peine creusées',
+      level: -0.04,
+      edge: 'souple',
+      bumps: 0.05,
+      spread: 0.4,
+    },
+    lande: {
+      pourquoi: 'la crête: touradons de bruyère et de myrtilliers, un sol bosselé mais bas',
+      level: -0.05,
+      edge: 'souple',
+      bumps: 0.04,
+      spread: 0.45,
+    },
+    'prairie-humide': {
+      pourquoi: 'la prairie de la rivière: plus basse que le pré, presque plane (l’eau la nivelle)',
+      level: -0.08,
+      edge: 'souple',
+      bumps: 0.015,
+      spread: 0.6,
+    },
+    place: {
+      pourquoi:
+        'la place et le parvis: de gros pavés de grès (40 x 33 cm), comme devant une église, assez pour que la place se distingue de la rue qui la traverse',
+      level: 0,
+      edge: 'rigide',
+      paving: {
+        length: 0.4,
+        jitter: 0.2,
+        rows: 3,
+        stroke: 0.45,
+        layer: 'tile',
+        joint: 0.018,
+        depth: 0.02,
+        uneven: 0.006,
+        tone: 0.09,
+        chamfer: 0.008,
+      },
+      kerb: { width: 0.14, length: 0.5, height: 0.025 },
+    },
     chemin: {
       pourquoi: 'chemin de terre creusé par les passages, un petit talus d’herbe sur ses bords',
       level: -0.125,
@@ -153,7 +201,7 @@ export const RELIEF_SETTINGS = {
       bumps: 0.012,
       spread: 0.4,
       rim: { height: 0.045, width: 0.6 },
-      joins: ['route', 'rue'],
+      joins: ['route', 'rue', 'place'],
     },
     sentier: {
       pourquoi: 'sentier: moins passant que le chemin, donc moins creusé',
@@ -162,7 +210,7 @@ export const RELIEF_SETTINGS = {
       bumps: 0.015,
       spread: 0.35,
       rim: { height: 0.02, width: 0.45 },
-      joins: ['route', 'rue'],
+      joins: ['route', 'rue', 'place'],
     },
     voie: {
       pourquoi: 'ballast: un lit de cailloux tenu à niveau sous les rails, un fossé le draine',

@@ -15,6 +15,7 @@ import {
   type PassIndex,
   PASSES,
   type RenderSnapshot,
+  type PageInfo,
   reportText,
 } from './mesure';
 import { INK_SETTINGS } from './reglages';
@@ -224,10 +225,42 @@ export class InkMeter {
     this.note = note;
   }
 
+  /**
+   * La page autour du canevas, lue au moment du relevé (jamais à chaque image): canevas opaque
+   * ou non, flous d'arrière-plan CSS affichés, cadence de l'écran (écart le plus fréquent entre
+   * deux rappels d'image, arrondi aux cadences courantes).
+   */
+  private page(): PageInfo | null {
+    const renderer = this.renderer;
+    if (renderer === null || typeof document === 'undefined') return null;
+    const opaque = renderer.getContext().getContextAttributes()?.alpha === false;
+    let blurs = 0;
+    for (const element of document.querySelectorAll<HTMLElement>('body *')) {
+      if (element.offsetParent === null && element.tagName !== 'BODY') continue;
+      const style = getComputedStyle(element);
+      const filter = style.backdropFilter;
+      if (filter !== '' && filter !== 'none') blurs += 1;
+    }
+    let best = 60;
+    let bestCount = -1;
+    for (const hz of [60, 75, 90, 120, 144]) {
+      let count = 0;
+      const beat = 1000 / hz;
+      this.log.forEachBin((ms, n) => {
+        if (Math.abs(ms - beat) < 1.5) count += n;
+      });
+      if (count > bestCount) {
+        bestCount = count;
+        best = hz;
+      }
+    }
+    return { opaque, blurs, refreshHz: best };
+  }
+
   /** Le relevé en texte (`null` tant que le panneau n'a jamais été ouvert). */
   report(): string | null {
     if (this.host === null || this.machine === null) return null;
-    return reportText(this.log, this.host.snapshot(), this.machine);
+    return reportText(this.log, this.host.snapshot(), this.machine, this.page());
   }
 
   private copy(): void {

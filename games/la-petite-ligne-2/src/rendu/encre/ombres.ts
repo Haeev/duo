@@ -6,7 +6,9 @@
  * puis seuillées dans le nuanceur: un bord net, sans escalier.
  */
 import {
+  type Camera,
   DepthTexture,
+  Frustum,
   LessEqualCompare,
   LinearFilter,
   type Material,
@@ -15,6 +17,7 @@ import {
   OrthographicCamera,
   PerspectiveCamera,
   type Scene,
+  Sphere,
   UnsignedIntType,
   Vector3,
   type WebGLRenderer,
@@ -37,6 +40,20 @@ const BIAS = new Matrix4().set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0
 const right = new Vector3();
 const up = new Vector3();
 const back = new Vector3();
+const frustum = new Frustum();
+const viewProjection = new Matrix4();
+const reach = new Sphere();
+
+/**
+ * Ce que les passes peuvent s'épargner: un personnage hors du champ, un volume dont l'ombre ne
+ * tombe nulle part dans le champ. La caméra de la vue, la direction vers le soleil (unitaire),
+ * et si la carte d'ombre du soleil est dessinée à cette image.
+ */
+export interface ViewCull {
+  camera: Camera;
+  readonly toSun: Vector3;
+  sun: boolean;
+}
 
 interface Caster {
   userData: { [SHADOW_ONLY]?: unknown };
@@ -44,9 +61,12 @@ interface Caster {
   isInstancedMesh?: boolean;
   isSkinnedMesh?: boolean;
   castShadow: boolean;
+  frustumCulled: boolean;
+  boundingSphere?: Sphere | null;
   instanceColor?: unknown;
-  geometry?: { morphAttributes?: { position?: unknown } };
+  geometry?: { morphAttributes?: { position?: unknown }; boundingSphere?: Sphere | null };
   material?: unknown;
+  skeleton?: { bones: readonly Object3D[] };
 }
 
 interface Keyed {
@@ -84,9 +104,15 @@ export class StageSort {
   /** Des maillages attendent encore leur tour (mesure, tests). */
   pending = false;
 
-  sort(root: Object3D): void {
+  sort(root: Object3D, view: ViewCull | null = null): void {
     // La toute première image ne compile que la passe de contour.
     let admitted = !this.started;
+    if (view !== null) {
+      // Matrices à jour avant d'en tirer les sphères (un volume posé à cette image compris).
+      root.updateMatrixWorld();
+      viewProjection.multiplyMatrices(view.camera.projectionMatrix, view.camera.matrixWorldInverse);
+      frustum.setFromProjectionMatrix(viewProjection);
+    }
     this.started = true;
     let pending = false;
     root.traverseVisible((object) => {
@@ -125,7 +151,10 @@ export class StageSort {
         shown = true;
       }
       const unseen = mesh.userData[SHADOW_ONLY] === true;
-      if (shown && !unseen) object.layers.enable(0);
+      // Un personnage se dessine toujours pour Three.js (ses bornes au repos sont fausses une fois
+      // animé): on l'écarte ici quand il est hors du champ, d'après la place de son squelette.
+      const offscreen = view !== null && mesh.isSkinnedMesh === true && !inView(mesh, view, false);
+      if (shown && !unseen && !offscreen) object.layers.enable(0);
       else {
         object.layers.disable(0);
         if (!shown) pending = true;
@@ -141,7 +170,8 @@ export class StageSort {
         }
       }
       if (casts) {
-        object.layers.enable(SUN_LAYER);
+        if (view?.sun === true && !inView(mesh, view, true)) object.layers.disable(SUN_LAYER);
+        else object.layers.enable(SUN_LAYER);
         if (instanced || unseen) object.layers.disable(LAMP_LAYER);
         else object.layers.enable(LAMP_LAYER);
       } else {
@@ -151,6 +181,48 @@ export class StageSort {
     });
     this.pending = pending;
   }
+}
+
+/**
+ * Sphère englobante d'un maillage dans le monde (dans `reach`), ou faux si on ne la connaît pas.
+ * Un personnage: une sphère prudente autour de la racine de son squelette (le bassin), qui
+ * contient tout le corps debout, assis ou couché.
+ */
+function worldBounds(mesh: Object3D & Caster): boolean {
+  if (mesh.isSkinnedMesh === true) {
+    const pelvis = mesh.skeleton?.bones[0];
+    if (pelvis === undefined) return false;
+    reach.center.setFromMatrixPosition(pelvis.matrixWorld);
+    reach.radius = INK_SETTINGS.sunShadow.characterRadius;
+    return true;
+  }
+  if (!mesh.frustumCulled) return false;
+  const own =
+    mesh.isInstancedMesh === true
+      ? (mesh.boundingSphere ?? null)
+      : (mesh.geometry?.boundingSphere ?? null);
+  if (own === null) return false;
+  reach.copy(own).applyMatrix4(mesh.matrixWorld);
+  return true;
+}
+
+/**
+ * Ce maillage (`shadow` faux) ou son ombre (`shadow` vrai) peut-il paraître dans le champ ? Pour
+ * l'ombre, la sphère englobante est étirée le long des rayons du soleil jusque sous le sol (le
+ * fond de l'eau): tout ce qui reçoit une ombre visible est dans le volume vu par la caméra, et
+ * l'ombre d'un point est sur le segment qui le relie au sol à l'opposé du soleil. Prudent: une
+ * sphère autour du segment entier. Sans bornes connues: oui.
+ */
+function inView(mesh: Object3D & Caster, view: ViewCull, shadow: boolean): boolean {
+  if (!worldBounds(mesh)) return true;
+  if (shadow) {
+    const s = INK_SETTINGS.sunShadow;
+    const rise = Math.max(0, reach.center.y + reach.radius - s.cullFloor);
+    const length = Math.min(s.maxRadius * 2, rise / Math.max(view.toSun.y, s.cullMinSine));
+    reach.center.addScaledVector(view.toSun, -length / 2);
+    reach.radius += length / 2;
+  }
+  return frustum.intersectsSphere(reach);
 }
 
 function renderDepth(

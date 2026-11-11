@@ -15,9 +15,12 @@ import { hash01 } from './terrain-rendu';
 const PAVING_PIECE = inkCode(0, 99);
 /** Taille nominale d'une pierre de bordure pour son trait (m): joints au trait fin. */
 const KERB_DIAGONAL = 1.2;
-/** Rangées de cases, puis pierres, construites entre deux pauses. */
-const ROWS_PER_STEP = 2;
-const STONES_PER_STEP = 250;
+/**
+ * Cases de sol (une case serrée compte pour autant de cases que ses sous-cases), puis pierres,
+ * construites entre deux pauses: la construction s'étale sur plus d'images.
+ */
+const CELLS_PER_STEP = 48;
+const STONES_PER_STEP = 120;
 
 interface Rect {
   readonly x0: number;
@@ -384,7 +387,7 @@ function* paving(builder: GeometryBuilder, relief: Relief, rect: Rect): Generato
   const color = new Color();
   builder.piece(PAVING_PIECE);
   builder.part(null);
-  builder.setInk(LAYER.plain);
+  builder.setInk(LAYER.plain, KIND.joint);
   for (let cy = rect.y0; cy < rect.y1; cy++)
     for (let cx = rect.x0; cx < rect.x1; cx++) {
       const profile = relief.profileAt(cx, cy);
@@ -450,6 +453,8 @@ export function* reliefGround(relief: Relief, rect: Rect): Generator<void, Buffe
   const builder = new GeometryBuilder();
   const fine = relief.settings.mesh.fine;
   const e = 1 / fine;
+  // Travail fait depuis la dernière pause, en cases simples (une case serrée en vaut `fine`²).
+  let work = 0;
   for (let cy = rect.y0; cy < rect.y1; cy++) {
     for (let cx = rect.x0; cx < rect.x1; cx++) {
       const profile = relief.profileAt(cx, cy);
@@ -459,9 +464,18 @@ export function* reliefGround(relief: Relief, rect: Rect): Generator<void, Buffe
         builder.setInk(LAYER.grass, KIND.ground);
         builder.shore(2);
         const ridged = relief.ridged(cx, cy);
-        if (relief.resolution(cx, cy) > 1) fineCell(builder, relief, cx, cy, fine);
-        else if (ridged !== null) ridgedCell(builder, relief, cx, cy, ridged, fine, e);
-        else coarseCell(builder, relief, cx, cy, e);
+        if (relief.resolution(cx, cy) > 1) {
+          fineCell(builder, relief, cx, cy, fine);
+          work += fine * fine;
+        } else if (ridged !== null) {
+          ridgedCell(builder, relief, cx, cy, ridged, fine, e);
+          work += fine;
+        } else coarseCell(builder, relief, cx, cy, e);
+        work += 1;
+        if (work >= CELLS_PER_STEP) {
+          work = 0;
+          yield;
+        }
         continue;
       }
       if (profile.paving === undefined) {
@@ -480,7 +494,11 @@ export function* reliefGround(relief: Relief, rect: Rect): Generator<void, Buffe
       }
       risers(builder, relief, cx, cy);
     }
-    if ((cy - rect.y0) % ROWS_PER_STEP === ROWS_PER_STEP - 1) yield;
+    work += rect.x1 - rect.x0;
+    if (work >= CELLS_PER_STEP) {
+      work = 0;
+      yield;
+    }
   }
   bankRoots(builder, relief, rect);
   yield* paving(builder, relief, rect);

@@ -864,12 +864,14 @@ void main() {
     float inkGain = max(step(floor(vMeta.y / 64.0), 1.5) * step(floor(vMeta.w / 64.0), 1.5), keepInk);
     gTickPx = length(fwidth(vWorld.xz));
     // Hachures courtes à l'ombre: le sol, et le dessus des dalles et pavés qui gardent l'encre.
-    gTicks = max(step(4.5, kind) * step(kind, 5.5), keepInk * step(0.7, an.y));
+    gTicks = max(step(4.5, kind) * step(kind, 5.5), max(keepInk, step(6.5, kind) * step(kind, 7.5)) * step(0.7, an.y));
     float border = 0.0;
     // Liseré d'eau claire au pied d'une berge: ni hachure ni trait dessus.
     float foam = 0.0;
     float flatGround = step(4.5, kind) * step(kind, 5.5);
     float water = step(5.5, kind) * step(kind, 6.5);
+    // Fond des joints d'un dallage: relevé à l'ombre (les hachures courtes s'y lisent encore).
+    float joint = step(6.5, kind) * step(kind, 7.5);
     if (flatGround > 0.5) {
       // Sol: teinte et matière de la case lues dans la carte du lieu, au point décalé par les
       // limites adoucies (la frontière entre deux natures ne suit pas la grille); un léger
@@ -979,7 +981,7 @@ void main() {
       inkGain = 0.0;
       drawn = vec4(0.0, 0.0, 0.5, 0.5);
     }
-    color = inkLight(base, vWorld, N, bent, flatGround > 0.5 ? 100.0 : vFoot, inkGain, 0.0);
+    color = inkLight(base, vWorld, N, bent, flatGround > 0.5 ? 100.0 : vFoot, inkGain, joint * ${INK_SETTINGS.ground.jointLift.toFixed(2)});
     // Noir plein sous les touffes, du côté détourné du soleil: il détache une masse de la suivante.
     float under = leafy * smoothstep(0.0, -0.16, N.y) * smoothstep(0.3, -0.05, dot(N, uSunDir));
     color = mix(color, uInk, under * 0.9);

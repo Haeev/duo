@@ -154,6 +154,8 @@ export interface ModeledBuilding {
 }
 
 const modelGlow = new Color(0, 0, 0);
+/** Au-delà de tant d'instances d'une forme semée, la construction rend la main après elle. */
+const PLANTS_PER_STEP = 40;
 
 export class TileView {
   readonly group = new Group();
@@ -476,6 +478,8 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     const mesh = new Mesh(view.tracker.track(water), materials.water);
     mesh.name = 'eau';
     mesh.receiveShadow = true;
+    // Une nappe plane sous le sol ne porte d'ombre sur rien qu'on voie.
+    mesh.userData.ground = true;
     view.add(mesh);
   }
   yield;
@@ -489,6 +493,8 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     kit.fences !== false,
     kit.runs ?? null,
   );
+  // Une pause après chaque calcul lourd: la construction s'étale sur plus d'images (`buildMsPerFrame`).
+  yield;
   if (relief !== null) {
     // Le sol en relief ne porte pas d'ombre: les rails rejoignent les traverses (boîtes
     // instanciées), qui en portent, sans appel de dessin de plus.
@@ -503,8 +509,10 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
     const item = decor.boxes[i];
     if (item !== undefined) putBox(mesh, i, item);
   });
+  yield;
   const planted =
     kit.plants === undefined || kit.plants === null ? null : plantings(kit, decor, tile);
+  yield;
   if (planted === null) trunksAndBlobs(kit, view, decor);
   else {
     // Un maillage instancié par modèle tiré et par morceau de tuile: un appel de dessin par forme,
@@ -541,7 +549,10 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
         },
       );
       if (shown !== null && twinned) shown.userData.shadowTwin = true;
+      // Une forme par étape au fond d'un bois dense (des centaines d'instances chacune).
+      if (list.length > PLANTS_PER_STEP) yield;
     }
+    yield;
     // L'ombre des arbres: leur version allégée aux mêmes places, jamais dessinée, rangée par
     // morceaux plus grands (la carte d'ombre couvre tout le disque vu: moins d'appels).
     for (const { model, list } of planted.casters.values()) {
@@ -599,11 +610,16 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
   if (shapes.pebble !== undefined && shapes.tuft !== undefined) {
     // Semis de petits volumes: ce qui ponctue le sol est un volume, pas un dessin à plat.
     const semis = tileSemis(kit.field, kit.map, tile, kit.settings, kit.keepOut ?? null);
+    yield;
     if (relief !== null) {
       for (const pebble of semis.pebbles) pebble.y += relief.heightAt(pebble.x, pebble.z);
+      yield;
       for (const tuft of semis.tufts) settle(relief, tuft);
+      yield;
       // Les pierres de la berge rejoignent les cailloux: pas d'appel de dessin de plus.
-      semis.pebbles.push(...bankStones(relief, tileRect(kit.map, tile), kit.keepOut ?? null));
+      const banked = yield* bankStones(relief, tileRect(kit.map, tile), kit.keepOut ?? null);
+      semis.pebbles.push(...banked);
+      yield;
     }
     const stones = instances(
       view,
@@ -625,6 +641,7 @@ export function* buildTile(kit: TileKit, tile: number): Generator<void, TileView
         mesh.setMatrixAt(i, matrix);
       },
     );
+    yield;
     const blades = instances(
       view,
       shapes.tuft,
@@ -784,16 +801,17 @@ function runGeometry(
  * tombent sur la pente de terre que le relief montre entre l'ourlet d'herbe et l'eau (la ligne
  * lissée, pas les cases). À demi enterrées; les plus basses trempent dans l'eau.
  */
-function bankStones(
+function* bankStones(
   relief: Relief,
   rect: { x0: number; y0: number; x1: number; y1: number },
   keepOut: KeepOut | null,
-): BlobItem[] {
+): Generator<void, BlobItem[]> {
   const bank = relief.settings.bank;
   const level = relief.settings.water.level;
   const out: BlobItem[] = [];
+  let laid = 0;
   const wet = (x: number, y: number): boolean => relief.lookAt(x, y)?.water === true;
-  for (let y = rect.y0; y < rect.y1; y++)
+  for (let y = rect.y0; y < rect.y1; y++) {
     for (let x = rect.x0; x < rect.x1; x++) {
       if (!relief.isSoft(x, y)) continue;
       const own = wet(x, y);
@@ -826,6 +844,13 @@ function bankStones(
         });
       }
     }
+    // La hauteur et la distance à l'eau se calculent pierre par pierre: une pause après chaque
+    // rangée qui en a posé (une berge longe parfois toute la tuile).
+    if (out.length > laid) {
+      laid = out.length;
+      yield;
+    }
+  }
   return out;
 }
 
@@ -904,12 +929,25 @@ function plantings(kit: TileKit, decor: TileDecor, tile: number): Plantings | nu
     size: number,
     tree: number | null,
     away = 0,
+    stump = false,
   ): boolean => {
     const essence = pick(choices, hash01(Math.floor(x * 10), Math.floor(z * 10), 41));
     if (essence === undefined || manifest.models[essence] === undefined) return false;
     const key = `semis:${String(Math.round(x * 100))}:${String(Math.round(z * 100))}`;
     const whole = variantOf(essence, key, manifest);
     if (kit.plants?.geometryOf(whole) === null) return false;
+    // Une souche (nature à `trees.stumps`): l'état `stump` de l'essence, sans ombre ni houppier.
+    const cut = stump
+      ? (stateModel(whole, 'stump', manifest) ?? stateModel(essence, 'stump', manifest))
+      : null;
+    if (cut !== null && kit.plants?.geometryOf(cut) !== null) {
+      const { yaw, scale } = jitterOf(essence, key, manifest);
+      const shownKey = `${chunkOf(x, z, side)}|${cut}`;
+      const group = out.shown.get(shownKey) ?? { model: cut, twinned: false, list: [] };
+      group.list.push({ x, y, z, yaw, scale: scale * size, tree: null });
+      out.shown.set(shownKey, group);
+      return true;
+    }
     // La version allégée de cette forme, si elle est livrée et chargée.
     const far = light === null ? null : stateModel(whole, light.state, manifest);
     const slim = far !== null && kit.plants?.geometryOf(far) !== null ? far : null;
@@ -943,8 +981,18 @@ function plantings(kit: TileKit, decor: TileDecor, tile: number): Plantings | nu
   for (const [i, tree] of decor.trees.entries()) {
     // La taille tirée par le décor (0,75 à 1,35) reste, resserrée autour de celle du modèle.
     const size = 0.8 + ((tree.trunkHeight / 1.7 - 0.75) / 0.6) * 0.4;
-    if (!place(look.semis.trees, tree.x, tree.ground ?? 0, tree.z, size, i, tree.away ?? 0))
-      return null;
+    const stump = tree.stump === true;
+    const placed = place(
+      look.semis.trees,
+      tree.x,
+      tree.ground ?? 0,
+      tree.z,
+      size,
+      i,
+      tree.away ?? 0,
+      stump,
+    );
+    if (!placed) return null;
   }
   for (const bush of decor.bushes) {
     // Le pied du buisson: le bas de sa boule (posée sur le sol, relief compris).

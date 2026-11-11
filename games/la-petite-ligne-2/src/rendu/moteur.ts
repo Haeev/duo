@@ -50,6 +50,7 @@ import { jumped, PassageFade } from './passage';
 import {
   INK_SETTINGS,
   InkKit,
+  inkContext,
   type InkFrame,
   type InkLights,
   inkTag,
@@ -83,7 +84,7 @@ import {
   markerVolumes,
   placeStates,
 } from './lieu/recoltes';
-import { fenceRuns, groundField } from './lieu/terrain-rendu';
+import { fenceRuns, placeGroundField } from './lieu/terrain-rendu';
 import { ROOM_SETTINGS } from './lieu/reglages-pieces';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
 import { TrainLayer, type TrainStats } from './lieu/trains';
@@ -391,6 +392,7 @@ class Engine implements GameRenderer {
     const style = options.style ?? INK_SETTINGS.style;
     this.renderer = new WebGLRenderer({
       canvas: options.canvas,
+      ...(style === 'encre' ? { context: inkContext(options.canvas) } : {}),
       // En encre, seul un triangle plein écran atteint le canevas (ADR 0023): l'anticrénelage du
       // canevas n'y lisse rien et coûte sa mémoire et sa résolution à chaque image.
       antialias: settings.antialias && style !== 'encre',
@@ -737,7 +739,7 @@ class Engine implements GameRenderer {
       tiled &&
       this.ink !== null &&
       (this.options.models?.instantiate(TILE_SETTINGS.decor.fenceModel) ?? null) !== null
-        ? fenceVolumes(fenceRuns(groundField(place.map, TILE_SETTINGS)))
+        ? fenceVolumes(fenceRuns(placeGroundField(place.map, TILE_SETTINGS)))
         : [];
     const description = describePlace(
       content,
@@ -907,7 +909,6 @@ class Engine implements GameRenderer {
       this.signature = signature;
       this.harvested = harvested;
       this.mapped = mapped;
-      this.highlight.release();
       // États des récoltables (souche, buisson cueilli...), cases du potager, meubles que
       // l'histoire n'a pas encore posés et portes qu'elle tient fermées: lus dans l'état déjà
       // transmis, les mêmes chez l'hôte et chez l'invité.
@@ -919,6 +920,8 @@ class Engine implements GameRenderer {
         ...describeDynamic(view.content, state, undefined, placeContent),
         ...(placeContent === undefined ? [] : fieldVolumes(view.content, placeContent, state)),
       ]);
+      // Seuls les volumes qui changent sont refaits: la cible garde son liseré, sauf si c'est elle.
+      this.highlight.releaseIfDetached();
       this.refreshLights(place);
     }
 

@@ -35,7 +35,18 @@ Végétation semée (rendu encré): les arbres et buissons tirés par `tileDecor
 
 Emprises (`emprises.ts`, logique pure): rien ne se sème (touffes, cailloux, arbres, buissons) dans l'emprise d'un meuble de la carte (un potager en est un), d'un repère ou d'un bâtiment, ni à cheval sur une autre surface que la sienne (une touffe ne dépasse pas sur un chemin ou un dallage, un caillou du chemin reste dans le chemin). Les gardes se règlent dans `semis.clear` de `reglages-tuiles.ts`. Aucun code pour un meuble de plus: son emprise vient de sa fiche. Les meubles posés par les joueurs en cours de partie ne déplacent pas le semis (il est construit avec la tuile).
 
-Budget du bois (`semis.light` de `reglages-recoltes.ts`): à plus de `beyond` cases hors du couloir de jeu (`GroundField.away`, natures `decor.outside`), un arbre semé prend sa version allégée (état `far` du manifeste: même graine, mêmes masses, mêmes festons). L'ombre de tous les arbres semés est portée par des maillages jamais dessinés (`SHADOW_ONLY`), rangés par morceaux de `shadowChunk`: la version `far` pour un arbre entier, la forme `shade` (sans festons) au fond du bois. Une essence sans ces états reste entière et porte son ombre elle-même. Mesures à 1366 x 768 (`ensemble.spec.ts`): bois le plus dense (48, 16) 582 000 triangles et 139 appels avant, 248 000 et 129 après; orée vue du couloir (104, 90) 562 000 et 185 avant, 312 000 et 180 après.
+### Ajouter une nature de sol d'un grand lieu (aucun code)
+
+1. La nature est dans la légende de la carte (`terrain.legend`, produite par `outils/plan-vers-lieu.ts`).
+2. Dans `GROUND_LOOKS` de `reglages-tuiles.ts`, copie l'entrée la plus proche (`sous-bois` pour un bois, `friche` pour des herbes hautes, `place` pour un dallage) et donne-lui son nom.
+3. `color` et `surface` (son des pas, semis de cailloux de la surface).
+4. `trees`: arbres semés par case (`near` au bord de l'aménagé, `wild` loin de lui), `stumps` (part de souches), `bushes` (buissons au bord des chemins). Les densités du plan sont en arbres pour 100 m²: 4 pour 100 m² font 0,04 par case.
+5. `outside: true` si l'on n'y va pas hors des sentiers: ses arbres prennent leur version allégée à plus de `semis.light.beyond` cases d'une autre nature (budget du bois).
+6. `cover`: feuilles mortes (`litter`, par case), touffes (`tufts`, part des cases) et leur taille (`tuftSize`, largeur et hauteur en multiples de la touffe d'herbe). Aucun appel de dessin de plus: ce sont les instances des touffes.
+7. Relief: un profil du même nom dans `reglages-relief.ts` si les bosses de sa surface ne conviennent pas (voir « Ajouter une nature de sol en relief »).
+8. `pnpm exec vitest run tests/rendu/tuiles.test.ts`: chaque nature de la légende d'Aubrune doit avoir son aspect, et une nature factice y sème arbres, souches, feuilles et fougères.
+
+Budget du bois (`semis.light` de `reglages-recoltes.ts`): à plus de `beyond` cases hors du couloir de jeu (`GroundField.away`, natures à `outside` de `GROUND_LOOKS`), un arbre semé prend sa version allégée (état `far` du manifeste: même graine, mêmes masses, mêmes festons). L'ombre de tous les arbres semés est portée par des maillages jamais dessinés (`SHADOW_ONLY`), rangés par morceaux de `shadowChunk`: la version `far` pour un arbre entier, la forme `shade` (sans festons) au fond du bois. Une essence sans ces états reste entière et porte son ombre elle-même. Mesures à 1366 x 768 (`ensemble.spec.ts`): bois le plus dense (48, 16) 582 000 triangles et 139 appels avant, 248 000 et 129 après; orée vue du couloir (104, 90) 562 000 et 185 avant, 312 000 et 180 après.
 
 ### Files et repères livrés (`files.ts`, données dans `reglages-files.ts`)
 

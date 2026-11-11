@@ -9,7 +9,9 @@ import {
   type MachineInfo,
   type RenderSnapshot,
   reportText,
+  rhythm,
 } from '../../src/rendu/encre/mesure';
+import { startCap } from '../../src/rendu/encre/index';
 import { INK_SETTINGS } from '../../src/rendu/encre/reglages';
 
 const R = INK_SETTINGS.resolution;
@@ -200,5 +202,38 @@ describe('outil de mesure', () => {
       MACHINE,
     );
     expect(text).toContain('écart maximal 13 sur 255 (ÉCART)');
+  });
+});
+
+describe('ce que les passes ne disent pas (relevé du PC du client, 2026-11-11)', () => {
+  it('rend le rythme des images et le reste du temps hors des passes', () => {
+    const log = new FrameLog();
+    const pixels = 1920 * 1080;
+    Object.assign(log.passes[2] ?? {}, { calls: 19, triangles: 13000, pixels, gpuMs: 10.8 });
+    Object.assign(log.passes[3] ?? {}, { calls: 1, triangles: 1, pixels, gpuMs: 12.8 });
+    // Une image sur deux attend deux battements, l'autre trois (écran à 60 Hz).
+    for (let i = 0; i < 300; i += 1) log.add(i % 2 === 0 ? 33.3 : 50, 5);
+    const [one, two, three, more] = rhythm(log, 60);
+    expect(one).toBe(0);
+    expect(two).toBeCloseTo(0.5, 5);
+    expect(three).toBeCloseTo(0.5, 5);
+    expect(more).toBe(0);
+    const page = { opaque: true, blurs: 2, refreshHz: 60 };
+    const text = reportText(log, { ...SNAPSHOT, scaleCap: 0.71 }, MACHINE, page);
+    for (const wanted of [
+      'Somme des passes sur le processeur graphique: 23,6 ms; reste du temps par image: 18,',
+      'Rythme (écran à 60 Hz): 0 % des images en un battement, 50 % en deux, 50 % en trois',
+      "canevas opaque, flous d'arrière-plan CSS affichés: 2",
+      'Départ plafonné (processeur graphique intégré): 71 %',
+    ])
+      expect(text).toContain(wanted);
+  });
+
+  it('plafonne la définition interne de départ sur un processeur graphique intégré seulement', () => {
+    const intel = 'ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0)';
+    const cap = startCap(intel, 1920, 1080);
+    expect(1920 * cap * 1080 * cap).toBeCloseTo(R.integrated.maxPixels, -2);
+    expect(startCap(intel, 1366, 768)).toBe(1);
+    expect(startCap('Apple M1', 2880, 1800)).toBe(1);
   });
 });

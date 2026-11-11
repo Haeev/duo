@@ -151,6 +151,14 @@ export class TargetHighlight {
     this.current = null;
   }
 
+  /**
+   * Après une reconstruction des volumes du lieu: lâche la cible seulement si son objet a été
+   * retiré de la scène (refait par son nouvel état). Les autres gardent leur liseré.
+   */
+  releaseIfDetached(): void {
+    if (this.current !== null && this.current.aimable.object.parent === null) this.release();
+  }
+
   dispose(): void {
     this.release();
     this.rim.dispose();

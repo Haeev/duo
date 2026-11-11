@@ -62,6 +62,8 @@ export const KIND = {
   stem: 4,
   ground: 5,
   water: 6,
+  /** Fond des joints d'un dallage: relevé à l'ombre, pour que les hachures courtes s'y lisent. */
+  joint: 7,
   /**
    * Langue de feu (matériau `flamme` qui finit en pointe): elle ondule, vacille et glisse du jaune
    * à l'orangé. Au-delà de 15, une nature ne prend pas `SWAP` (le nuanceur ne la décompose pas).

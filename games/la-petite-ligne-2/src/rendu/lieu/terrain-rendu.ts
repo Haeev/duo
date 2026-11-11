@@ -49,7 +49,7 @@ export interface GroundField {
   readonly wild: Uint8Array;
   /**
    * Distance (cases, bornée à 255) au couloir de jeu: 0 partout où l'on peut aller, puis ce qu'il
-   * faut franchir de cases hors jeu (`decor.outside`) pour y revenir. Absente: tout est à 0.
+   * faut franchir de cases hors du couloir (natures à `outside`) pour y revenir. Absente: tout est à 0.
    */
   readonly away?: Uint8Array;
 }
@@ -76,11 +76,13 @@ function neighbours4(i: number, width: number, height: number, out: number[]): n
 export function groundField(
   map: Pick<MapDef, 'terrain' | 'width' | 'height'>,
   settings: TileSettings = TILE_SETTINGS,
+  /** Aspect de chaque nature (les tests y ajoutent une nature factice). */
+  table: Readonly<Record<string, GroundLook>> = GROUND_LOOKS,
 ): GroundField {
   const { width, height } = map;
   const legend = map.terrain?.legend ?? ['herbe'];
   const names = [...legend, ...DERIVED];
-  const looks = names.map((name) => GROUND_LOOKS[name] ?? DEFAULT_LOOK);
+  const looks = names.map((name) => table[name] ?? DEFAULT_LOOK);
   const index = (name: string): number => names.indexOf(name);
   const cells = decodeTerrain(map) ?? new Uint8Array(width * height);
   const n = width * height;
@@ -120,10 +122,27 @@ export function groundField(
 
   // Distance à l'aménagé, par vagues depuis toutes les cases aménagées.
   const wild = waves(cells, width, height, (code) => BUILT.has(names[code] ?? ''));
-  // Distance au couloir de jeu, par vagues depuis tout ce qui n'est pas hors jeu.
-  const outside: readonly string[] = settings.decor.outside;
-  const away = waves(cells, width, height, (code) => !outside.includes(names[code] ?? ''));
+  // Distance au couloir de jeu, par vagues depuis toute nature qui n'est pas `outside`.
+  const away = waves(cells, width, height, (code) => looks[code]?.outside !== true);
   return { width, height, names, looks, cells, wild, away };
+}
+
+const fields = new WeakMap<object, { settings: TileSettings; field: GroundField }>();
+
+/**
+ * Le champ du sol d'une carte, calculé une fois par carte et par réglages: le moteur, le grand
+ * lieu et les emprises des objets au sol le demandent tous à l'entrée d'un lieu (revue de code
+ * du 2026-11-11, mi7). Le champ rendu ne se modifie pas.
+ */
+export function placeGroundField(
+  map: Pick<MapDef, 'terrain' | 'width' | 'height'>,
+  settings: TileSettings = TILE_SETTINGS,
+): GroundField {
+  const known = fields.get(map);
+  if (known?.settings === settings) return known.field;
+  const field = groundField(map, settings);
+  fields.set(map, { settings, field });
+  return field;
 }
 
 /** Distance (cases, bornée à 255) de chaque case à la plus proche case de départ, par vagues. */
@@ -198,6 +217,8 @@ export interface TreeItem {
   ground?: number;
   /** Distance (cases) au couloir de jeu (`GroundField.away`); absente: 0, dans le couloir. */
   away?: number;
+  /** Une souche seulement (`trees.stumps` de la nature): ni houppier ni ombre portée. */
+  stump?: boolean;
 }
 /** Boule (houppier, buisson): centre et demi-tailles. */
 export interface BlobItem {
@@ -280,14 +301,10 @@ export function tileDecor(
       const name = names[cells[i] ?? 0] ?? '';
       const w = wild[i] ?? 255;
       const r = hash01(x, y, 1);
-      if (name === 'herbe' || name === 'hors-jeu' || name === 'pre') {
+      const sown = field.looks[cells[i] ?? 0]?.trees;
+      if (sown !== undefined) {
         const share = Math.min(1, Math.max(0, (w - d.wildStart) / (d.wildFull - d.wildStart)));
-        const density =
-          name === 'hors-jeu'
-            ? d.treeOutside
-            : name === 'pre'
-              ? d.treeSparse
-              : d.treeSparse + (d.treeWild - d.treeSparse) * share;
+        const density = sown.near + ((sown.wild ?? sown.near) - sown.near) * share;
         if (w >= 2 && r < density) {
           const s = 0.75 + hash01(x, y, 2) * 0.6;
           const tx = x + 0.2 + hash01(x, y, 3) * 0.6;
@@ -302,8 +319,9 @@ export function tileDecor(
             crownHeight: 1.6 * s,
             color: pick(d.crownColors, hash01(x, y, 5)),
             away: field.away?.[i] ?? 0,
+            ...(hash01(x, y, 9) < (sown.stumps ?? 0) ? { stump: true } : {}),
           });
-        } else if (name === 'herbe' && w >= 1 && w <= 4 && r > 1 - d.bushNear) {
+        } else if (sown.bushes === true && w >= 1 && w <= 4 && r > 1 - d.bushNear) {
           const s = 0.35 + hash01(x, y, 6) * 0.35;
           if (keepOut?.free(x + 0.5, y + 0.5, clear.bushes) === false) continue;
           bushes.push({
@@ -934,22 +952,46 @@ export function tileSemis(
           color: pick(colors.length > 0 ? colors : ['#b6a890'], hash01(x, y + k * 3, 68)),
         });
       }
-      const grass = s.tufts[look.surface] ?? 0;
+      const cover = look.cover;
+      // Feuilles mortes: la forme de la touffe écrasée à plat (cinq triangles, aucun appel de
+      // plus), couchée sur le sol, une teinte par feuille.
+      const litter = cover?.litter ?? 0;
+      const leaves = Math.floor(litter) + (hash01(x, y, 81) < litter % 1 ? 1 : 0);
+      for (let k = 0; k < leaves && tufts.length < s.maxPerTile; k++) {
+        const lx = x + hash01(x * 5 + k, y, 82);
+        const lz = y + hash01(x, y * 3 + k, 83);
+        if (keepOut?.free(lx, lz, s.clear.tufts) === false) continue;
+        const size =
+          s.litter.size[0] + hash01(x + k, y, 84) * (s.litter.size[1] - s.litter.size[0]);
+        tufts.push({
+          x: lx,
+          z: lz,
+          // Base non nulle: posée sur le relief telle quelle, sans être enfoncée (`settle`).
+          base: 0.002,
+          w: size,
+          h: s.litter.height,
+          d: size * 0.7,
+          yaw: hash01(x, y + k, 85) * Math.PI * 2,
+          color: pick(cover?.litterColors ?? s.tuftColors, hash01(x + k, y, 86)),
+        });
+      }
+      const grass = cover?.tufts ?? s.tufts[look.surface] ?? 0;
       const thin = (field.wild[i] ?? 0) > s.wildThin ? 0.35 : 1;
       if (grass > 0 && hash01(x, y, 71) < grass * thin && tufts.length < s.maxPerTile) {
-        const h = s.tuftHeight[0] + hash01(x, y, 72) * (s.tuftHeight[1] - s.tuftHeight[0]);
+        const [wide, tall] = cover?.tuftSize ?? [1, 1];
+        const h = (s.tuftHeight[0] + hash01(x, y, 72) * (s.tuftHeight[1] - s.tuftHeight[0])) * tall;
         const tx = x + hash01(x, y, 73);
         const tz = y + hash01(x, y, 74);
-        if (keepOut?.free(tx, tz, s.clear.tufts) === false) continue;
+        if (keepOut?.free(tx, tz, s.clear.tufts * Math.max(1, wide * 0.5)) === false) continue;
         tufts.push({
           x: tx,
           z: tz,
           base: 0,
-          w: s.tuftWidth * (0.8 + hash01(x, y, 75) * 0.6),
+          w: s.tuftWidth * wide * (0.8 + hash01(x, y, 75) * 0.6),
           h,
-          d: s.tuftWidth * (0.8 + hash01(x, y, 76) * 0.6),
+          d: s.tuftWidth * wide * (0.8 + hash01(x, y, 76) * 0.6),
           yaw: hash01(x, y, 77) * Math.PI,
-          color: pick(s.tuftColors, hash01(x, y, 78)),
+          color: pick(cover?.tuftColors ?? s.tuftColors, hash01(x, y, 78)),
         });
       }
     }
