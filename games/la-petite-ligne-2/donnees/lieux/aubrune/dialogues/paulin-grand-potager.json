@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "id": "paulin-grand-potager",
+  "villager": "paulin",
+  "priority": 26,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    },
+    {
+      "type": "remembered",
+      "key": "logement.potager.agrandi"
+    }
+  ],
+  "once": "duo",
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Non. Je ne suis pas passé chez vous cette nuit avec la charrue.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "logement.potager.grand",
+          "value": true,
+          "by": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "logement.poulailler.grand",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Et si quelqu'un l'a fait, ça fait vingt-quatre carrés. Et huit places au poulailler. Je dis ça.",
+      "emote": null,
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "paulin",
+      "text": "Des gardes qui tiennent la barrière, ça mange. Voilà.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

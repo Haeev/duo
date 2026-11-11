@@ -24,6 +24,25 @@
       "speaker": "basile",
       "text": "Reste le dessus.",
       "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "fabrication.plan.coffre-a-linge-campagne",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "n4"
+    },
+    "n4": {
+      "kind": "line",
+      "speaker": "basile",
+      "text": "Trois pièces, du linge. Un coffre. Voilà le plan.",
+      "emote": null,
       "next": null
     }
   }
