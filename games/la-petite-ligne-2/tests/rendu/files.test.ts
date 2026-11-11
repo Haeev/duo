@@ -219,7 +219,7 @@ describe('repères livrés', () => {
 
   it('pose un modèle par nature, tourné par la voie ou l’eau', () => {
     expect(poses.map((p) => p.model).sort()).toEqual(
-      ['dovecote', 'mill-wheel', 'semaphore', 'tunnel-portal', 'water-tower'].sort(),
+      ['dovecote', 'mill-wheel', 'semaphore', 'tunnel-portal', 'water-crane', 'water-tower'].sort(),
     );
     // Vidange et bras vers la voie, au sud; roue en travers du bief qui coule le long de x.
     expect(pose('chateau-eau').yaw).toBeCloseTo(0, 5);
@@ -233,8 +233,8 @@ describe('repères livrés', () => {
     // Emprise: le modèle tourné, autour du point du repère.
     const tower = pose('chateau-eau');
     expect(tower.footprint.x1 - tower.footprint.x0).toBeCloseTo(4.9, 1);
-    // La grue à eau n'a pas de place dans les données du lieu: rien n'est inventé.
-    expect(poses.some((p) => p.model === 'water-crane')).toBe(false);
+    // La grue à eau, posée par le plan en face du château d'eau: son bras vers la voie, au sud.
+    expect(pose('grue-eau').yaw).toBeCloseTo(0, 5);
   });
 
   it('gabarit: une nature de repère factice prend son modèle sans code', () => {

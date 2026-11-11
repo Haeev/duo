@@ -28,7 +28,7 @@
           "done": [
             {
               "type": "reach",
-              "point": "pl-o",
+              "point": "siege-tonnelle",
               "who": "one",
               "radius": 4
             }
@@ -101,7 +101,7 @@
     {
       "do": "walk",
       "who": "honorine",
-      "to": "pl-o"
+      "to": "siege-tonnelle"
     },
     {
       "do": "say",
@@ -152,7 +152,7 @@
           "done": [
             {
               "type": "reach",
-              "point": "pl-o",
+              "point": "siege-tonnelle",
               "who": "one",
               "radius": 6
             }

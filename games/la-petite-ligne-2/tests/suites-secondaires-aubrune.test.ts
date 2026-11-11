@@ -260,7 +260,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     carry(sim, 0, { 'vieille-piece': 1 });
     expect(talk(sim, 0, 'firmin')[0]).toBe('firmin-consigne-merci#a1');
     expect(held(sim, 0, 'vieille-piece')).toBe(false);
-    both(sim, 'gr2');
+    both(sim, 'halte-p-guichet');
     wait(sim, 0.5);
     playScene(sim, 'le-sac-postal');
     expect(sim.world.progress.quests[Q]?.chapter).toBe('six-lettres');
@@ -367,7 +367,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     wait(sim, 110);
     expect(distance(sim, 'achille', 'i2')).toBeLessThan(3);
     sim.world.minutes = 1150;
-    both(sim, 'i2');
+    both(sim, 'peche-fosse');
     wait(sim, 1);
     playScene(sim, 'la-baronne-mord');
     expect(fact(sim, 'aubrune.baronne.sortie')).toBe(true);
@@ -418,7 +418,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
 
     // Première nuit: on se tait ensemble, Berthe éternue, le géant file.
     sim.world.minutes = 1385;
-    both(sim, 'mc');
+    both(sim, 'guet-moulin');
     wait(sim, 1);
     playScene(sim, 'le-geant-pale');
     nightThenMorning(sim);
@@ -429,7 +429,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
 
     // Seconde nuit: une personne à la porte, l'autre au portillon.
     sim.world.minutes = 1385;
-    both(sim, 'mc');
+    both(sim, 'guet-moulin');
     wait(sim, 1);
     playScene(sim, 'la-main-dans-la-pate');
     expect(fact(sim, 'aubrune.fantome.demasque')).toBe(true);
@@ -457,7 +457,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     carry(sim, 1, { pierre: 3 });
     expect(talk(sim, 1, 'mado')[0]).toBe('mado-caisse-merci#a1');
     sim.world.minutes = 600;
-    both(sim, 'i2');
+    both(sim, 'peche-fosse');
     wait(sim, 1);
     playScene(sim, 'le-trombone-du-bief');
     carry(sim, 0, { 'vieille-piece': 2 });
@@ -499,7 +499,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
 
     // Le clocher: le coffre se lève à deux; la ficelle mène à Jeanne.
     nightThenMorning(sim);
-    both(sim, 'pv');
+    both(sim, 'clocher-vue');
     wait(sim, 0.5);
     playScene(sim, 'la-robe-dans-le-clocher');
     expect(talk(sim, 1, 'jeanne', 'combien')).toContain('jeanne-ficelle#fin');
@@ -510,7 +510,7 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     carry(sim, 0, { buche: 4 });
     expect(talk(sim, 0, 'mado')[0]).toBe('mado-coulee-merci#a1');
     sim.world.minutes = 600;
-    both(sim, 'gr6');
+    both(sim, 'mado-enclume');
     wait(sim, 1);
     playScene(sim, 'la-coulee');
     expect(sim.world.progress.quests[Q]?.done).toBe(true);

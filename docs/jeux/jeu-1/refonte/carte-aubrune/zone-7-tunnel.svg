@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -899,6 +899,7 @@
 <polygon points="362,48.25 362.595,49.6809 364.14,49.8047 362.963,50.8129 363.323,52.3203 362,51.5125 360.677,52.3203 361.037,50.8129 359.86,49.8047 361.405,49.6809" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,184.75 161.595,186.181 163.14,186.305 161.963,187.313 162.323,188.82 161,188.012 159.677,188.82 160.037,187.313 158.86,186.305 160.405,186.181" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,148.25 213.595,149.681 215.14,149.805 213.963,150.813 214.323,152.32 213,151.512 211.677,152.32 212.037,150.813 210.86,149.805 212.405,149.681" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,93.05 189.595,94.4809 191.14,94.6047 189.963,95.6129 190.323,97.1203 189,96.3125 187.677,97.1203 188.037,95.6129 186.86,94.6047 188.405,94.4809" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <text x="275.5" y="103.456" font-family="DejaVu Sans" font-size="1.3224" text-anchor="middle" font-weight="bold" fill="#FFFFFF">14</text>
 <text x="285" y="103.456" font-family="DejaVu Sans" font-size="1.3224" text-anchor="middle" font-weight="bold" fill="#FFFFFF">15</text>
 <text x="297" y="103.456" font-family="DejaVu Sans" font-size="1.3224" text-anchor="middle" font-weight="bold" fill="#FFFFFF">16</text>

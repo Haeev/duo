@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -899,6 +899,7 @@
 <polygon points="362,48.22 362.603,49.6699 364.168,49.7954 362.976,50.8171 363.34,52.3446 362,51.526 360.66,52.3446 361.024,50.8171 359.832,49.7954 361.397,49.6699" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,184.72 161.603,186.17 163.168,186.295 161.976,187.317 162.34,188.845 161,188.026 159.66,188.845 160.024,187.317 158.832,186.295 160.397,186.17" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,148.22 213.603,149.67 215.168,149.795 213.976,150.817 214.34,152.345 213,151.526 211.66,152.345 212.024,150.817 210.832,149.795 212.397,149.67" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,93.02 189.603,94.4699 191.168,94.5954 189.976,95.6171 190.34,97.1446 189,96.326 187.66,97.1446 188.024,95.6171 186.832,94.5954 188.397,94.4699" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <text x="173.5" y="115.76" font-family="DejaVu Sans" font-size="2.204" text-anchor="middle" font-weight="bold" fill="#FFFFFF">3</text>
 <text x="171" y="88.76" font-family="DejaVu Sans" font-size="2.204" text-anchor="middle" font-weight="bold" fill="#FFFFFF">5</text>
 <text x="153" y="113.76" font-family="DejaVu Sans" font-size="2.204" text-anchor="middle" font-weight="bold" fill="#FFFFFF">21</text>

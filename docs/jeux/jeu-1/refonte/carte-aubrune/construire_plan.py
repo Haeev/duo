@@ -1078,6 +1078,72 @@ interieur('ferme-logis', 'ferme_logis', 'le logis de la ferme Delmas', 8, 5, [('
           porte=(4.5, 4.5, 2), note="une salle commune: la cuisine au nord-ouest, la grande table à l'est de l'allée, la porte au midi sur la cour")
 
 
+# ================================================================ version 4: manques relevés la nuit du 2026-11-11
+# 1. La grue à eau: la locomotive fait de l'eau en face du château d'eau, qui la remplit par une conduite enterrée
+#    (8 m, droit vers le sud). Elle est au bord nord de la voie, colonne à 2,2 m de l'axe des rails: son bras
+#    pivote au-dessus du tender. Repère en données (`landmarks.kind`), modèle livré `water-crane`.
+REPERES.append(dict(id='grue_eau', nom='la grue à eau', x=189, y=95.3, h=3.6, nature='grue-a-eau',
+                    raison="en face du château d'eau, qui la remplit par une conduite enterrée; au bord nord de la voie, son bras pivote au-dessus de la locomotive à l'arrêt devant le quai"))
+# 2. Les lits des habitants qui dormaient debout (section 8 de ecriture-suites-secondaires.md).
+#    Marthe: une pièce de 5 x 5, porte à l'est sur la rue de l'Église (au droit de la porte du plan); le lit contre
+#    le mur ouest, au fond, loin de la rue; la table contre le mur sud, sous la fenêtre au soleil. Ni cuisinière ni
+#    armoire: on ne cuisine ni ne range chez une voisine.
+interieur('marthe', 'marthe', 'la maison de Marthe', 5, 5, [('salle', [0, 0, 5, 5])], [],
+          [('marthe-lit', 'lit-simple', 'bed-single', 0.5, 1, 0), ('marthe-table', 'table-a-manger', 'table-farm', 1, 4.5, 0),
+           ('marthe-chaise', 'chaise', 'chair-farm', 1.5, 3.5, 0)],
+          [('marthe-lit-p', 1.5, 1.5, 'lit', 'Marthe')],
+          porte=(4.5, 2.5, 3), note="la maison de la sonneuse: une salle, le lit au fond contre le mur ouest, la table au midi; 1,5 m libres devant la porte, à l'est sur la rue de l'Église")
+for _b in B:
+    if _b['id'] == 'marthe':
+        _b['interieur'] = 'une salle: lit, table: 25 m²'
+#    Berthe: le meunier dort au moulin, au grenier au-dessus des meules: il entend la meule et la vanne la nuit.
+#    Le lit dans le coin nord-ouest, loin de l'escalier (sud-ouest) et des sacs de grain (est).
+for _it in INT:
+    if _it['id'] == 'moulin-etage':
+        _it['meubles'].append(dict(id='berthe-lit', type='lit-simple', modele='bed-single', x=0.5, y=1, rotation=0))
+        _it['points'].append(dict(id='berthe-lit-p', x=1.5, y=1.5, role='lit', qui='Berthe'))
+        _it['note'] = "le grain monté en sacs, la trémie au-dessus des meules; le lit de Berthe au coin nord-ouest: le meunier dort au moulin, il entend la meule et la vanne"
+# 3. Un pommier et deux touffes de coquelicots (types existants `fruitier` et `coquelicots`). Revenu possible ajouté,
+#    tirages à leur moyenne (méthode de economie-aubrune.md, section 3): pommier 2 tirages de 1 à 2 pommes par jour,
+#    3 x 0,70 = 2,10 EUR; coquelicots 1 à 2 fleurs par jour et par touffe, au printemps et en été, 1,5 x 0,60 = 0,90 EUR
+#    chacune. Total: 3,90 EUR par jour au printemps et en été (2,10 EUR le reste de l'année), 5,20 EUR au plus haut tirage.
+ARBRES_SINGULIERS.append(dict(id='pommier-verger', type='fruitier', x=309.5, y=118.5,
+                              pourquoi="le pommier du verger communal: on le secoue, les pommes tombent dans l'herbe; le coin de cueillette est au sud-est, côté caméra, hors du houppier"))
+mob('coquelicots-verger', 'coquelicots', 'poppies', 305.5, 124.5, 0,
+    "dans l'herbe haute du verger, qu'on ne fauche qu'en juillet: la seule touffe du bourg (la mercerie les rachète)")
+mob('coquelicots-champs', 'coquelicots', 'poppies', 236.5, 162.5, 0,
+    "sur la tournière des champs des Delmas, entre le chemin des Champs et le labour: le coquelicot pousse au bord des blés", acte=3)
+# 4. L'enclume dehors, contre le mur ouest de la forge, sous l'auvent qui donne sur la rue de l'Église: Mado y tape
+#    côté rue, face à l'est (poste `mado-enclume`), le foyer est derrière le mur.
+mob('enclume-forge', 'enclume', 'enclume', 262.5, 103.5, 3,
+    "contre le mur ouest de la forge, sous l'auvent, au bord de la rue de l'Église: Mado s'y tient côté rue, au poste mado-enclume (amélioration et réparation des outils)")
+#    Le râtelier de Basile, dos au mur est de l'atelier (il était à 1,2 m du mur, sans appui), à côté de la porte;
+#    le poulailler du jardin posé sur ses cases (3 x 2), sa rampe au sud vers le parc.
+for _m in M_:
+    if _m['id'] == 'haches-basile':
+        _m.update(x=176.5, y=90.5, pourquoi="sous l'auvent est, dos au mur de l'atelier, à côté de la porte: Basile prête ses outils (acte 1)")
+    elif _m['id'] == 'poulailler-jardin':
+        _m.update(x=161.5, pourquoi="le poulailler du jardin (3 x 2 m) en haut de son parc, à 5,5 m du pignon ouest de la maison: sa rampe descend au sud dans le parc, qui ne touche pas le chemin")
+# 5. Sols: « prairie » était un second nom du pré (`pre`), que le rendu connaît; les autres natures sans aspect sont
+#    listées dans plan.md (section 15), leur aspect et leur semis d'arbres relèvent du rendu.
+for _s in SOLS_SUPPL:
+    if _s['sol'] == 'prairie':
+        _s['sol'] = 'pre'
+# 6. La traversée de service ne coupe plus le bout du quai: le quai s'arrête 3 m avant la halte (27 m), la
+#    traversée passe entre les deux, au niveau des rails, et l'on monte sur le quai d'une marche (bordure de 12 cm).
+for _b in B:
+    if _b['id'] == 'quai_b':
+        _b['rect'][2] = 27
+        _b['gabarit'] = gabarit(_b)
+        _b['raison'] += "; 27 m: il s'arrête à 3 m de la halte, où passe la traversée de service"
+for _s in SOLS_SUPPL:
+    if _s['sol'] == 'gravier':
+        _s['rect'] = [185, 99, 27, 4]
+for _m in M_:
+    if _m['id'] == 'reverbere-quai-2':
+        _m.update(x=210.5, pourquoi="éclairage du quai, au bout est, au-dessus de la marche de la traversée de service: la potence vers la voie")
+
+
 # ================================================================ calculs
 def dist(a, b):
     return math.hypot(N[a]['x'] - N[b]['x'], N[a]['y'] - N[b]['y'])

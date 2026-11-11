@@ -139,4 +139,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - « Attendu dans cet état » = le nœud du graphe le plus proche (même salle, ou dehors) est atteint par le graphe: aucune fausse alerte derrière les verrous. Python (`controler_acces`) et TS (`unreachableStoryElements`) donnent la même liste: les comparer sur les fichiers d'avant (`git archive` dans le dossier temporaire, puis un test vitest jetable `--dir`).
 - 2 m pour deux joueurs: blocs 2 x 2 libres, pas diagonal permis (1,41 m entre deux coins). Le seuil d'arrivée d'une porte de façade n'est jamais dans un bloc s'il touche un meuble: laisser libres les deux cases de part et d'autre de l'arrivée.
 - Le rendu des intérieurs ne dessine pas les cloisons (`blocked` des intérieurs), seulement le mur d'entourage: une cloison est un mur invisible en jeu (vu sur captures, 2026-11-10).
+- Un point d'intérieur vit dans le fichier de sa pièce, pas dans `carte.json`: le chargeur les fusionne (`src/donnees/carte.ts`), un script qui ne lit que la carte doit aussi lire `interieurs/*.json`.
 - Captures en jeu d'un intérieur: spec Playwright temporaire dans `tests/e2e/` (sauvegarde `aubrune`, `duo.teleport`, `host.shot`, `LPL2_CAPTURES=<dossier>`), après `npx vite build` et `pnpm --filter @duo/sdk-dev build`; la supprimer ensuite.
+
+## Ce que le rendu lit vraiment (Aubrune, vérifié le 2026-11-11)
+
+- Sol: une nature absente de `GROUND_LOOKS` (`reglages-tuiles.ts`) est peinte en herbe sans bruit (`DEFAULT_LOOK`); le décor ne sème d'arbres que sur `herbe`, `hors-jeu` et `pre` (`tileDecor`). Toute nature inventée par le plan (`sous-bois`, `place`...) est donc un sol d'herbe nu: vérifier la liste avant d'en créer une, préférer un nom déjà connu quand c'est le même sol.
+- Repère: sa nature (`kind`) doit avoir une entrée de `LANDMARK_LOOKS` (`reglages-files.ts`, données), sinon il devient arbre ou tour. Les repères ne bloquent aucune case.
+- Assises: un banc à `seats: 2` partage sa largeur; chaque joueur prend la première place libre, et deux bancs face à face numérotent en miroir: deux joueurs seuls sur leurs bancs se retrouvent en diagonale (0,5 m). Les données n'y peuvent rien sans meuble à cheval.
+- Le garde-fou de la copie isolée refuse les heredocs et les `git` enchaînés: scripts écrits avec Write dans le dossier temporaire, lancés avec `python3 -I`; remplacements de texte comptés (nombre attendu par motif) pour ne rien toucher par accident.

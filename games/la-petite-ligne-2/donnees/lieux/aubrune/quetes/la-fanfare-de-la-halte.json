@@ -116,7 +116,7 @@
           "id": "trombone",
           "objective": "Le trombone dort au fond de la fosse du bief depuis 1986: allez-y à deux, de jour, canne en main.",
           "target": {
-            "point": "i2"
+            "point": "peche-fosse"
           },
           "after": ["idee"],
           "done": [

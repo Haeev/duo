@@ -12,12 +12,12 @@
     {
       "do": "walk",
       "who": "firmin",
-      "to": "gr2"
+      "to": "halte-p-guichet"
     },
     {
       "do": "say",
       "who": "firmin",
-      "text": "J'ai roulé le casier du fond jusqu'au seuil: dedans, on n'y voit rien. Trente ans qu'il a son cadenas. Je n'ai jamais regardé. Article 19.",
+      "text": "J'ai tiré le casier de la consigne jusqu'au guichet: au fond, on n'y voit rien. Trente ans qu'il a son cadenas. Je n'ai jamais regardé. Article 19.",
       "emote": null,
       "sound": null,
       "to": "both",
@@ -28,11 +28,11 @@
       "parts": [
         {
           "role": "a",
-          "hint": "Va devant la porte de la halte: le casier cadenassé est sur le seuil.",
+          "hint": "Entre dans la halte: le casier cadenassé attend devant le guichet.",
           "done": [
             {
               "type": "reach",
-              "point": "gr2",
+              "point": "halte-p-guichet",
               "who": "one",
               "radius": 4
             }
@@ -40,11 +40,11 @@
         },
         {
           "role": "b",
-          "hint": "Va devant la porte de la halte: Firmin te tend le registre de la consigne.",
+          "hint": "Entre dans la halte: Firmin te tend le registre de la consigne par le guichet.",
           "done": [
             {
               "type": "reach",
-              "point": "gr2",
+              "point": "halte-p-guichet",
               "who": "one",
               "radius": 4
             }
@@ -106,7 +106,7 @@
     {
       "do": "say",
       "who": "narrator",
-      "text": "Le casier cède d'un coup. Un sac de toile grise glisse sur le seuil: plombé, ficelé, intact.",
+      "text": "Le casier cède d'un coup. Un sac de toile grise glisse sur le plancher: plombé, ficelé, intact.",
       "emote": null,
       "sound": "Clonk !",
       "to": "both",
@@ -151,7 +151,7 @@
     {
       "do": "say",
       "who": "narrator",
-      "text": "Lucie passe en courant, sans s'arrêter: « Une lettre en retard revient d'abord à qui l'a écrite ! La sixième, je la garde pour la fin ! Ha ! »",
+      "text": "Lucie passe la tête par la porte, sans entrer: « Une lettre en retard revient d'abord à qui l'a écrite ! La sixième, je la garde pour la fin ! Ha ! »",
       "emote": null,
       "sound": null,
       "to": "both",

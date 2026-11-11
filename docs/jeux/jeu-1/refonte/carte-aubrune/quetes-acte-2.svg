@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -967,6 +967,7 @@
 <polygon points="362,46.54 363.047,49.0583 365.766,49.2763 363.695,51.0507 364.328,53.7037 362,52.282 359.672,53.7037 360.305,51.0507 358.234,49.2763 360.953,49.0583" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,183.04 162.047,185.558 164.766,185.776 162.695,187.551 163.328,190.204 161,188.782 158.672,190.204 159.305,187.551 157.234,185.776 159.953,185.558" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,146.54 214.047,149.058 216.766,149.276 214.695,151.051 215.328,153.704 213,152.282 210.672,153.704 211.305,151.051 209.234,149.276 211.953,149.058" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,91.34 190.047,93.8583 192.766,94.0763 190.695,95.8507 191.328,98.5037 189,97.082 186.672,98.5037 187.305,95.8507 185.234,94.0763 187.953,93.8583" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <rect x="0" y="0" width="384" height="208" fill="#FFFDF5" opacity="0.45"/>
 <polyline points="220,108 204,108 204,102.5 187,101.5 182.5,101.5 182.5,97.5 160,97.5 146,97.5 112,97.5 80,97.5 63,97.5 44,97.5 39,100" fill="none" stroke="#1D4ED8" stroke-width="1.98" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
 <polyline points="39,100 34,100 33,108 35,124 32.5,139.5 37,145.5 78,141 118,139.5 132,134.5 143.5,132.8 149,129.5 164,128 182.5,126.5 182.5,115" fill="none" stroke="#1D4ED8" stroke-width="1.98" stroke-dasharray="3.96 2.64" stroke-linejoin="round" opacity="0.9"/>
@@ -975,6 +976,7 @@
 <text x="30" y="89.22" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.96096" stroke-linejoin="round" opacity="0.9">le sémaphore</text><text x="30" y="89.22" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le sémaphore</text>
 <text x="138" y="122.32" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.96096" stroke-linejoin="round" opacity="0.9">la roue du moulin</text><text x="138" y="122.32" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">la roue du moulin</text>
 <text x="213" y="145.22" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.96096" stroke-linejoin="round" opacity="0.9">le pigeonnier de la ferme</text><text x="213" y="145.22" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le pigeonnier de la ferme</text>
+<text x="189" y="90.02" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.96096" stroke-linejoin="round" opacity="0.9">la grue à eau</text><text x="189" y="90.02" font-family="DejaVu Sans" font-size="3.432" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">la grue à eau</text>
 <line x1="214.688" y1="103.188" x2="214.688" y2="96.324" stroke="#0E7490" stroke-width="0.66"/>
 <circle cx="214.688" cy="103.188" r="1.188" fill="#0E7490"/>
 <line x1="165.188" y1="129.188" x2="165.188" y2="136.052" stroke="#0E7490" stroke-width="0.66"/>

@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -967,6 +967,7 @@
 <polygon points="362,46.9 362.952,49.1894 365.424,49.3875 363.541,51.0006 364.116,53.4125 362,52.12 359.884,53.4125 360.459,51.0006 358.576,49.3875 361.048,49.1894" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,183.4 161.952,185.689 164.424,185.888 162.541,187.501 163.116,189.912 161,188.62 158.884,189.912 159.459,187.501 157.576,185.888 160.048,185.689" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,146.9 213.952,149.189 216.424,149.388 214.541,151.001 215.116,153.412 213,152.12 210.884,153.412 211.459,151.001 209.576,149.388 212.048,149.189" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,91.7 189.952,93.9894 192.424,94.1875 190.541,95.8006 191.116,98.2125 189,96.92 186.884,98.2125 187.459,95.8006 185.576,94.1875 188.048,93.9894" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <rect x="0" y="0" width="384" height="208" fill="#FFFDF5" opacity="0.45"/>
 <polyline points="182.5,115 182.5,108 204,108 220,108 228,108 234,108 246.5,108 259.5,108 275.5,108 291.5,108 291.5,97.5 304,97.5 326,94 344,84 356,70 362,52 363.5,36 364,30 364,18" fill="none" stroke="#7E22CE" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
 <polyline points="364,18 364,30 348,30 326,36 304,44 281,55 281,66.5 281,74 276,81.5 259.5,82.5 259.5,90 259.5,97.5 259.5,108 246.5,108 234,108 228,108 220,108 204,108 204,102.5 187,101.5 182.5,101.5" fill="none" stroke="#7E22CE" stroke-width="1.8" stroke-dasharray="3.6 2.4" stroke-linejoin="round" opacity="0.9"/>
@@ -978,6 +979,7 @@
 <text x="188" y="42.2" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.8736" stroke-linejoin="round" opacity="0.9">le Vieux Chêne</text><text x="188" y="42.2" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le Vieux Chêne</text>
 <text x="362" y="45.7" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.8736" stroke-linejoin="round" opacity="0.9">le portail du tunnel</text><text x="362" y="45.7" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le portail du tunnel</text>
 <text x="213" y="145.7" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.8736" stroke-linejoin="round" opacity="0.9">le pigeonnier de la ferme</text><text x="213" y="145.7" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le pigeonnier de la ferme</text>
+<text x="189" y="90.5" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.8736" stroke-linejoin="round" opacity="0.9">la grue à eau</text><text x="189" y="90.5" font-family="DejaVu Sans" font-size="3.12" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">la grue à eau</text>
 <line x1="281" y1="66.5" x2="281" y2="72.74" stroke="#7E22CE" stroke-width="0.6"/>
 <circle cx="281" cy="66.5" r="1.08" fill="#7E22CE"/>
 <line x1="139.08" y1="114.08" x2="139.08" y2="120.32" stroke="#B45309" stroke-width="0.6"/>

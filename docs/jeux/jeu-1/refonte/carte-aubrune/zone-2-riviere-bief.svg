@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -899,6 +899,7 @@
 <polygon points="362,48.172 362.616,49.6525 364.214,49.7806 362.996,50.8237 363.368,52.3834 362,51.5476 360.632,52.3834 361.004,50.8237 359.786,49.7806 361.384,49.6525" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,184.672 161.616,186.152 163.214,186.281 161.996,187.324 162.368,188.883 161,188.048 159.632,188.883 160.004,187.324 158.786,186.281 160.384,186.152" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,148.172 213.616,149.652 215.214,149.781 213.996,150.824 214.368,152.383 213,151.548 211.632,152.383 212.004,150.824 210.786,149.781 212.384,149.652" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<polygon points="189,92.972 189.616,94.4525 191.214,94.5806 189.996,95.6237 190.368,97.1834 189,96.3476 187.632,97.1834 188.004,95.6237 186.786,94.5806 188.384,94.4525" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <text x="173.5" y="115.776" font-family="DejaVu Sans" font-size="2.2504" text-anchor="middle" font-weight="bold" fill="#FFFFFF">3</text>
 <text x="190" y="116.776" font-family="DejaVu Sans" font-size="2.2504" text-anchor="middle" font-weight="bold" fill="#FFFFFF">4</text>
 <text x="153" y="113.776" font-family="DejaVu Sans" font-size="2.2504" text-anchor="middle" font-weight="bold" fill="#FFFFFF">21</text>

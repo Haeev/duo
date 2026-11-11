@@ -696,6 +696,7 @@ def controler_histoire(d, carte, fiches):
                 err.append("état %s: le nœud %s de la zone %s est atteint avant l'étape qui l'ouvre (hors antichambre)" % (nom, k, z))
         info.append("histoire, état %s: verrous %s; zones %s" % (nom, ','.join(sorted(ouverts)) or '-', ' '.join('%s %.0f%%' % (z, 100 * p) for z, p in part.items())))
     # 3. la cible de chaque étape, quand elle s'ouvre (ses ancêtres franchis, pas plus)
+    points_des_pieces = {k for s in lire_interieurs() for k in s.get('points', {})}
     nb = 0
     for k, e in etapes.items():
         ouverts = set().union(*[etapes[a]['eff']['verrous'] for a in e['anc']]) if e['anc'] else set()
@@ -707,6 +708,8 @@ def controler_histoire(d, carte, fiches):
                 nn = carte['points'][c]
                 if nn['y'] >= d['taille']['hauteur']:
                     continue  # point d'un intérieur: atteint par sa porte
+            elif c in points_des_pieces:
+                continue  # point d'un intérieur (fichier de la pièce): la règle d'accès le suit, porte comprise
             else:
                 err.append("étape %s: point %s inconnu de la carte" % (k, c)); continue
             nb += 1

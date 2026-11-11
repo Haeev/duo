@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -899,7 +899,8 @@
 <polygon points="362,48.25 362.595,49.6809 364.14,49.8047 362.963,50.8129 363.323,52.3203 362,51.5125 360.677,52.3203 361.037,50.8129 359.86,49.8047 361.405,49.6809" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,184.75 161.595,186.181 163.14,186.305 161.963,187.313 162.323,188.82 161,188.012 159.677,188.82 160.037,187.313 158.86,186.305 160.405,186.181" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,148.25 213.595,149.681 215.14,149.805 213.963,150.813 214.323,152.32 213,151.512 211.677,152.32 212.037,150.813 210.86,149.805 212.405,149.681" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
-<text x="200" y="101.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#2E2A26">1</text>
+<polygon points="189,93.05 189.595,94.4809 191.14,94.6047 189.963,95.6129 190.323,97.1203 189,96.3125 187.677,97.1203 188.037,95.6129 186.86,94.6047 188.405,94.4809" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<text x="198.5" y="101.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#2E2A26">1</text>
 <text x="220" y="102.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#FFFFFF">2</text>
 <text x="173.5" y="115.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#FFFFFF">3</text>
 <text x="190" y="116.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#FFFFFF">4</text>
@@ -922,8 +923,8 @@
 <text x="153" y="113.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#FFFFFF">21</text>
 <text x="161" y="113.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#FFFFFF">22</text>
 <text x="223.5" y="116.712" font-family="DejaVu Sans" font-size="2.0648" text-anchor="middle" font-weight="bold" fill="#FFFFFF">23</text>
-<circle cx="203.418" cy="100.5" r="1.3528" fill="#9B4C3B" stroke="#FFFDF5" stroke-width="0.2136"/>
-<text x="203.418" y="101.034" font-family="DejaVu Sans" font-size="1.4952" text-anchor="middle" font-weight="bold" fill="#FFFFFF">1</text>
+<circle cx="201.709" cy="100.5" r="1.3528" fill="#9B4C3B" stroke="#FFFDF5" stroke-width="0.2136"/>
+<text x="201.709" y="101.034" font-family="DejaVu Sans" font-size="1.4952" text-anchor="middle" font-weight="bold" fill="#FFFFFF">1</text>
 <circle cx="205" cy="101.5" r="1.3528" fill="#3F6F8F" stroke="#FFFDF5" stroke-width="0.2136"/>
 <text x="205" y="102.034" font-family="DejaVu Sans" font-size="1.4952" text-anchor="middle" font-weight="bold" fill="#FFFFFF">2</text>
 <circle cx="212" cy="100.5" r="1.3528" fill="#9B4C3B" stroke="#FFFDF5" stroke-width="0.2136"/>
@@ -982,6 +983,7 @@
 <text x="226" y="62.534" font-family="DejaVu Sans" font-size="1.4952" text-anchor="middle" font-weight="bold" fill="#FFFFFF">56</text>
 <text x="252" y="66.0794" font-family="DejaVu Sans" font-size="1.8512" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.518336" stroke-linejoin="round" opacity="0.9">le clocher</text><text x="252" y="66.0794" font-family="DejaVu Sans" font-size="1.8512" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le clocher</text>
 <text x="189" y="80.0794" font-family="DejaVu Sans" font-size="1.8512" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.518336" stroke-linejoin="round" opacity="0.9">le château d'eau de la halte</text><text x="189" y="80.0794" font-family="DejaVu Sans" font-size="1.8512" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">le château d'eau de la halte</text>
+<text x="189" y="92.452" font-family="DejaVu Sans" font-size="1.8512" text-anchor="middle" font-weight="bold" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.518336" stroke-linejoin="round" opacity="0.9">la grue à eau</text><text x="189" y="92.452" font-family="DejaVu Sans" font-size="1.8512" text-anchor="middle" font-weight="bold" font-style="italic" fill="#2E2A26">la grue à eau</text>
 <text x="177.886" y="100.775" font-family="DejaVu Sans" font-size="1.424" text-anchor="middle" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.39872" stroke-linejoin="round" opacity="0.9">PN garde</text><text x="177.886" y="100.775" font-family="DejaVu Sans" font-size="1.424" text-anchor="middle" font-style="italic" fill="#5A4632">PN garde</text>
 <text x="214" y="97.7088" font-family="DejaVu Sans" font-size="1.424" text-anchor="middle" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.39872" stroke-linejoin="round" opacity="0.9">traversée</text><text x="214" y="97.7088" font-family="DejaVu Sans" font-size="1.424" text-anchor="middle" font-style="italic" fill="#5A4632">traversée</text>
 <text x="259.5" y="99.2088" font-family="DejaVu Sans" font-size="1.424" text-anchor="middle" font-style="italic" fill="none" stroke="#FFFDF5" stroke-width="0.39872" stroke-linejoin="round" opacity="0.9">PN eglise</text><text x="259.5" y="99.2088" font-family="DejaVu Sans" font-size="1.424" text-anchor="middle" font-style="italic" fill="#5A4632">PN eglise</text>

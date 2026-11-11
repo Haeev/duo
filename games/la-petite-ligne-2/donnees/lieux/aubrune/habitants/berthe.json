@@ -37,7 +37,7 @@
   "stands": "mc",
   "voice": "medium",
   "life": {
-    "home": "moulin-grenier",
+    "home": "berthe-lit-p",
     "schedule": [
       {
         "from": 420,
@@ -52,7 +52,7 @@
         "from": 1260,
         "to": 420,
         "at": {
-          "point": "moulin-grenier"
+          "bed": "berthe-lit"
         },
         "activity": "dormir",
         "gesture": null

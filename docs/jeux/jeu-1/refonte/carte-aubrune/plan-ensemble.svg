@@ -785,7 +785,7 @@
 <circle cx="34.5" cy="142" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="231.5" cy="49.7" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
 <circle cx="316" cy="142.8" r="2.2" fill="none" stroke="#5A4632" stroke-width="0.5"/>
-<rect x="185" y="99" width="30" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
+<rect x="185" y="99" width="27" height="4" fill="#D5CCBC" stroke="#5A4632" stroke-width="0.45"/>
 <rect x="215" y="99" width="10" height="6" fill="#B86B4F" stroke="#5A4632" stroke-width="0.45"/>
 <line x1="220" y1="105" x2="220" y2="108" stroke="#CFB489" stroke-width="1.0" stroke-dasharray="0.8 0.6"/>
 <circle cx="220" cy="105" r="1.0" fill="#FFF3C4" stroke="#2E2A26" stroke-width="0.35"/>
@@ -967,7 +967,8 @@
 <polygon points="362,47.5 362.794,49.4078 364.853,49.5729 363.284,50.9172 363.763,52.9271 362,51.85 360.237,52.9271 360.716,50.9172 359.147,49.5729 361.206,49.4078" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="161,184 161.794,185.908 163.853,186.073 162.284,187.417 162.763,189.427 161,188.35 159.237,189.427 159.716,187.417 158.147,186.073 160.206,185.908" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
 <polygon points="213,147.5 213.794,149.408 215.853,149.573 214.284,150.917 214.763,152.927 213,151.85 211.237,152.927 211.716,150.917 210.147,149.573 212.206,149.408" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
-<text x="200" y="102.1" font-family="DejaVu Sans" font-size="3" text-anchor="middle" font-weight="bold" fill="#2E2A26">1</text>
+<polygon points="189,92.3 189.794,94.2078 191.853,94.3729 190.284,95.7172 190.763,97.7271 189,96.65 187.237,97.7271 187.716,95.7172 186.147,94.3729 188.206,94.2078" fill="#F2C230" stroke="#5A4632" stroke-width="0.4"/>
+<text x="198.5" y="102.1" font-family="DejaVu Sans" font-size="3" text-anchor="middle" font-weight="bold" fill="#2E2A26">1</text>
 <text x="220" y="103.1" font-family="DejaVu Sans" font-size="3" text-anchor="middle" font-weight="bold" fill="#FFFFFF">2</text>
 <text x="173.5" y="116.1" font-family="DejaVu Sans" font-size="3" text-anchor="middle" font-weight="bold" fill="#FFFFFF">3</text>
 <text x="190" y="117.1" font-family="DejaVu Sans" font-size="3" text-anchor="middle" font-weight="bold" fill="#FFFFFF">4</text>

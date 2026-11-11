@@ -249,7 +249,7 @@
           "id": "guet",
           "objective": "Cette nuit, dès 22 h 30: une personne sous la tonnelle d'Odette, l'autre à la terrasse du café. Et parlez-vous.",
           "target": {
-            "point": "pl-o"
+            "point": "siege-tonnelle"
           },
           "after": ["sel-odette", "sel-colette"],
           "done": [

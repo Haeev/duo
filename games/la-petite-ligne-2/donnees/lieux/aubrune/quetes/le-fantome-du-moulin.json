@@ -154,7 +154,7 @@
           "id": "premier-guet",
           "objective": "Cette nuit, de 23 h à 2 h, à deux dans la cour du moulin, à la cachette de Léon. Pas un bruit.",
           "target": {
-            "point": "mc"
+            "point": "guet-moulin"
           },
           "done": [
             {
@@ -251,7 +251,7 @@
           "id": "second-guet",
           "objective": "Cette nuit, de 23 h à 2 h, retour au moulin à deux: une personne à la porte, l'autre au portillon. En douceur.",
           "target": {
-            "point": "mc"
+            "point": "guet-moulin"
           },
           "done": [
             {
