@@ -30,4 +30,22 @@
     // Air joué: entrée du carnet de source « tune » que les deux joueurs inscrivent, ou null.
     "tune": null,
   },
+  // Facultatif: le train qui amène l'événement. Il s'arrête à « from », reste à quai jusqu'à
+  // « to », puis repart (recette: src/simulation/monde/README.md, « Trains »). Pour en mettre un,
+  // retire les « // » du bloc ci-dessous.
+  // "train": {
+  //   "pourquoi": "D'où il vient, où il s'arrête et pourquoi là (cohérence du monde).",
+  //   // Véhicules de la tête (côté arrivée) à la queue: modèle du manifeste des décors, tampons
+  //   // avant et arrière depuis le centre (m); "reversed": true pour un véhicule tourné.
+  //   "consist": [{ "model": "railcar", "front": 7.26, "back": 7.26 }],
+  //   // Voie: un tracé de « rails » de la carte; bouts « start » (premier point) ou « end ».
+  //   "track": "ligne",
+  //   "comesFrom": "start",
+  //   "leavesTo": "start",
+  //   // Le centre du véhicule « vehicle » (0: la tête) au droit d'un point de la carte, décalé de « shift » m.
+  //   "stop": { "point": "quai", "vehicle": 0, "shift": 0 },
+  //   // Freinage et démarrage: durée en minutes de jeu, distance en mètres.
+  //   "arrival": { "minutes": 8, "distance": 100 },
+  //   "departure": { "minutes": 8, "distance": 100 },
+  // },
 }

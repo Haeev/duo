@@ -6,7 +6,14 @@
  */
 import * as v from 'valibot';
 import { WEATHERS } from '../../etat/commun';
-import { FileVersionSchema, FiniteSchema, IdSchema, IntSchema, LabelSchema } from './communs';
+import {
+  FileVersionSchema,
+  FiniteSchema,
+  IdSchema,
+  IntSchema,
+  LabelSchema,
+  TextSchema,
+} from './communs';
 import { SEASONS } from './prise';
 import { ConditionSchema, FactKeySchema, FactValueSchema } from './regles';
 
@@ -116,6 +123,54 @@ export const EVENT_KINDS = [
   'other',
 ] as const;
 
+/** Un véhicule d'une rame: le modèle livré et ses tampons, mesurés depuis son centre (m). */
+export const TrainVehicleSchema = v.strictObject({
+  /** Modèle du manifeste des décors (`assets/commun/decors/decors.json`): le rendu seul le lit. */
+  model: IdSchema,
+  /** Du centre au tampon avant (côté +z du modèle), puis au tampon arrière. */
+  front: v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(15)),
+  back: v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(15)),
+  /** Tourné bout pour bout dans la rame (une locomotive qui roule tender en avant). */
+  reversed: v.exactOptional(v.boolean()),
+});
+
+/** Bout d'une voie de la carte (`rails`): son premier point ou son dernier. */
+export const TRACK_ENDS = ['start', 'end'] as const;
+
+/** Arrivée ou départ: la distance parcourue (m) et sa durée (minutes de jeu). */
+const TrainRunSchema = v.strictObject({
+  minutes: v.pipe(FiniteSchema, v.minValue(0.5), v.maxValue(30)),
+  distance: v.pipe(FiniteSchema, v.minValue(10), v.maxValue(400)),
+});
+
+/**
+ * Le train d'un événement (`simulation/monde/trains.ts`): il arrive en ralentissant pour s'arrêter
+ * à l'heure `from` de l'événement, reste à quai jusqu'à `to`, puis repart en accélérant.
+ */
+export const TrainSchema = v.strictObject({
+  /** Pourquoi cette rame, ce sens et cet arrêt (règle « cohérence du monde »). Ignoré du moteur. */
+  pourquoi: TextSchema,
+  /** Les véhicules, de la tête (côté arrivée) à la queue. */
+  consist: v.pipe(v.array(TrainVehicleSchema), v.minLength(1), v.maxLength(8)),
+  /** Voie suivie: identifiant d'un tracé de `rails` de la carte du lieu. */
+  track: IdSchema,
+  /** Bout de la voie d'où il vient, et vers lequel il repart (le même: il rebrousse chemin). */
+  comesFrom: v.picklist(TRACK_ENDS),
+  leavesTo: v.picklist(TRACK_ENDS),
+  /**
+   * Arrêt: le centre du véhicule `vehicle` (0: la tête) au droit du point `point` de la carte,
+   * décalé de `shift` m dans le sens d'arrivée.
+   */
+  stop: v.strictObject({
+    point: IdSchema,
+    vehicle: v.pipe(IntSchema, v.minValue(0), v.maxValue(7)),
+    shift: v.pipe(FiniteSchema, v.minValue(-30), v.maxValue(30)),
+  }),
+  arrival: TrainRunSchema,
+  departure: TrainRunSchema,
+});
+export type TrainDef = v.InferOutput<typeof TrainSchema>;
+
 export const CalendarEventSchema = v.strictObject({
   schema: FileVersionSchema,
   id: IdSchema,
@@ -142,5 +197,7 @@ export const CalendarEventSchema = v.strictObject({
     /** Air joué: les deux joueurs l'entendent et l'inscrivent au carnet (entrée de source `tune`). */
     tune: v.nullable(IdSchema),
   }),
+  /** Le train qui arrive pour l'événement et repart à sa fin (absent: aucun). */
+  train: v.exactOptional(TrainSchema),
 });
 export type CalendarEventDef = v.InferOutput<typeof CalendarEventSchema>;

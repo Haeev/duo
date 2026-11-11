@@ -31,5 +31,15 @@
     "shop": null,
     "scene": null,
     "tune": null
+  },
+  "train": {
+    "pourquoi": "L'autorail vient de l'ouest, seul côté ouvert de la ligne, et s'arrête au milieu du quai, face au banc et à la caisse. Il a une cabine à chaque bout: il repart d'où il vient sans manoeuvre.",
+    "consist": [{ "model": "railcar", "front": 7.26, "back": 7.26 }],
+    "track": "ligne",
+    "comesFrom": "start",
+    "leavesTo": "start",
+    "stop": { "point": "quai", "vehicle": 0, "shift": 0 },
+    "arrival": { "minutes": 8, "distance": 100 },
+    "departure": { "minutes": 8, "distance": 100 }
   }
 }

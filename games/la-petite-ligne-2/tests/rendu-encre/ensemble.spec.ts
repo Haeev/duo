@@ -250,6 +250,73 @@ test('ensemble: le dehors d’Aubrune et la maison du garde', async ({ browser }
   await duo.close();
 });
 
+/** Appelle une méthode de réglage de la sonde chez l'hôte (jour, faits): `false` si refusée. */
+async function probe(
+  side: Side,
+  method: 'setDay' | 'remember',
+  args: readonly unknown[],
+): Promise<void> {
+  const ok = await side.game().evaluate(
+    ([m, a]) => {
+      const sonde = (
+        window as unknown as { __lplSonde?: Record<string, (...x: unknown[]) => boolean> }
+      ).__lplSonde;
+      return sonde?.[m]?.(...a) ?? false;
+    },
+    [method, args] as const,
+  );
+  if (!ok) throw new Error(`sonde: ${method} refusé`);
+}
+
+// Les trains des événements (`rendu/lieu/trains.ts`): le train du samedi à quai à midi et à
+// l'arrivée, l'autorail de 5 h 12 la nuit, vitres allumées, le Contrôleur sur le quai.
+/**
+ * Cadrage des trains: `LPL2_LARGEUR_TRAINS=9` pour regarder roues et marchepieds de près,
+ * `LPL2_LACET_TRAINS=200` pour voir du nord l'ombre portée, `LPL2_HEURE_TRAIN` (minutes) pour la vue à quai.
+ */
+const TRAIN_WIDTH = Number(process.env.LPL2_LARGEUR_TRAINS ?? 24);
+const TRAIN_YAW = Number(process.env.LPL2_LACET_TRAINS ?? 20);
+
+test('ensemble: les trains', async ({ browser }) => {
+  test.skip(ONLY !== null && !ONLY.some((v) => v.startsWith('train')), 'vue non demandée');
+  const duo = await startDuo(browser, 'ensemble-trains', { save: 'aubrune-apres-scene' });
+  const host = duo.host;
+  const day = (await host.world())?.common.day ?? 1;
+  // Le premier samedi à partir du jour de la sauvegarde (la semaine commence un lundi, jour 1).
+  const saturday = day + ((5 - ((day - 1) % 7) + 7) % 7);
+  await probe(host, 'setDay', [saturday]);
+  await probe(host, 'remember', ['aubrune.acte2.fini']);
+  await probe(host, 'remember', ['aubrune.depart.fait']);
+
+  // Midi: la voiture au droit du quai, les deux joueurs au bord du quai devant elle.
+  await both(duo, 201, 100.4);
+  await duo.setMinutes(Number(process.env.LPL2_HEURE_TRAIN ?? 12 * 60));
+  await settle(host, 'aubrune', 4000);
+  await camera(host, TRAIN_YAW, TRAIN_WIDTH);
+  await shot(host, 'train-samedi-a-quai');
+
+  // L'arrivée: la rame ralentit et entre (arrêt à 10 h 04), l'heure posée juste avant l'image.
+  await duo.setMinutes(10 * 60 + 4 - 3);
+  await host.page.setViewportSize({ width: 1366, height: 768 });
+  await host.page.waitForTimeout(1500);
+  measures['train-samedi-arrivee'] = await stats(host);
+  const frame = await host.game().frameElement();
+  await frame.screenshot({
+    path: join(CAPTURES, `${PREFIX}-train-samedi-arrivee.png`),
+    timeout: 120_000,
+  });
+  writeFileSync(FILE, JSON.stringify(measures, null, 1));
+  await host.page.setViewportSize({ width: 240, height: 135 });
+
+  // L'autorail de 5 h 12, à quai la nuit: vitres et lampes allumées, le Contrôleur sur le quai.
+  await duo.setMinutes(5 * 60 + 25);
+  await settle(host, 'aubrune', 4000);
+  await camera(host, TRAIN_YAW, TRAIN_WIDTH);
+  await shot(host, 'autorail-5h12');
+  expect(duo.errors).toEqual([]);
+  await duo.close();
+});
+
 test('ensemble: le wagon du train de nuit', async ({ browser }) => {
   test.skip(ONLY !== null && !ONLY.includes('wagon'), 'vue non demandée');
   const duo = await startDuo(browser, 'ensemble-wagon', { save: 'train-de-nuit-porte' });

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "autorail-du-depart",
+  "name": "Autorail du départ",
+  "kind": "other",
+  "when": {
+    "type": "weekly",
+    "weekday": "monday",
+    "seasons": []
+  },
+  "days": 7,
+  "hours": {
+    "from": 312,
+    "to": 390
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.depart",
+      "equals": "ouvert"
+    }
+  ],
+  "announce": false,
+  "activates": {
+    "facts": [],
+    "villagers": [],
+    "shop": null,
+    "scene": null,
+    "tune": null
+  },
+  "train": {
+    "pourquoi": "Le matin de « En voiture » (fin de l'acte 3), l'autorail attend les deux voyageurs: il reste à quai jusqu'à 6 h 30, au-delà de l'heure où la scène peut encore partir (5 h 12 plus une heure). La scène écrit ses faits et fait monter les joueurs.",
+    "consist": [{ "model": "railcar", "front": 7.26, "back": 7.26 }],
+    "track": "ligne",
+    "comesFrom": "start",
+    "leavesTo": "start",
+    "stop": { "point": "quai", "vehicle": 0, "shift": 0 },
+    "arrival": { "minutes": 8, "distance": 100 },
+    "departure": { "minutes": 8, "distance": 100 }
+  }
+}

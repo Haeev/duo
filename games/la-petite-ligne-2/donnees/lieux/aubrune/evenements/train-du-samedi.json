@@ -31,5 +31,19 @@
     "shop": null,
     "scene": null,
     "tune": "air-sifflet-du-samedi"
+  },
+  "train": {
+    "pourquoi": "Il vient de l'ouest, seul côté ouvert de la ligne (le tunnel est muré), locomotive en tête; la voiture des voyageurs s'arrête au milieu du quai, le fourgon côté passage à niveau sans le barrer, la locomotive au-delà du quai, devant la halte. Aubrune est un bout de ligne: il repart vers l'ouest, refoulé, le chef de train dans la vigie du fourgon.",
+    "consist": [
+      { "model": "tank-engine", "front": 4.46, "back": 4.61 },
+      { "model": "passenger-coach", "front": 6.46, "back": 6.46 },
+      { "model": "luggage-van", "front": 4.96, "back": 4.96 }
+    ],
+    "track": "ligne",
+    "comesFrom": "start",
+    "leavesTo": "start",
+    "stop": { "point": "quai", "vehicle": 1, "shift": 0 },
+    "arrival": { "minutes": 8, "distance": 100 },
+    "departure": { "minutes": 8, "distance": 100 }
   }
 }

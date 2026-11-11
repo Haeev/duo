@@ -74,6 +74,10 @@ Ajouter une culture ou un état: aucune ligne de code. Une culture: sa fiche (`m
 
 Habitants: couché sur un lit (posture `lie`), il prend la pose du joueur qui dort (`personnages/allonge.ts`, `lyingOn`); quand il franchit une porte (saut de plus de `passage.jumpMeters`), il est caché le temps du saut et posé d'un coup de l'autre côté, jamais glissé.
 
+## Trains des événements (`trains.ts`)
+
+La pose de chaque véhicule vient de la simulation (`simulation/monde/trains.ts`, données dans le champ `train` d'un événement); `TrainLayer` la montre dehors, dans un grand lieu dont un événement amène un train. Tous les véhicules du lieu sont créés cachés à l'entrée (modèle du manifeste des décors, sinon une caisse provisoire à leurs mesures), puis posés à chaque image sur le sol affiché, au cap de la voie, à l'heure de l'état lissée. Un modèle à lumière déclarée (`light`) porte une lampe qui suit sa caisse (ajoutée aux lampes du dehors, phase 0: allumée avec les premières) et allume son verre (`vitrage`, `flamme`); ombre portée par chaque caisse; une caisse qui cache un joueur s'ouvre autour de lui (encre) ou s'efface. Coût: un appel et les triangles du modèle par véhicule et par passe (scène, ombre du soleil le jour, ombre de lampe la nuit si une lampe à ombre est proche), aucun programme de plus. Compteurs: `stats().trains`. Ajouter un train: voir `simulation/monde/README.md`.
+
 ## Pièces: un monde clos à l'écran
 
 Les pièces sont rangées côte à côte sur la grille du lieu, hors du dehors, mais on n'en dessine qu'une: celle du joueur local (`espaces.ts`: `Spaces.at`, `shows`, `bounds`). Dedans: son sol, ses murs, ses cloisons, ses meubles et les personnages qui s'y trouvent, sur une nappe sombre et chaude (`ROOM_SETTINGS.backdrop`); ni le dehors, ni les tuiles, ni les pièces voisines, et la vue reste dans ses bornes. Dehors: aucune pièce. Le moteur bascule par `TiledPlace.showRoom` et `PlaceScene.showWhere`.

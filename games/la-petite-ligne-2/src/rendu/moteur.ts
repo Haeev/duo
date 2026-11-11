@@ -86,6 +86,7 @@ import {
 import { fenceRuns, groundField } from './lieu/terrain-rendu';
 import { ROOM_SETTINGS } from './lieu/reglages-pieces';
 import { RELIEF_SETTINGS } from './lieu/reglages-relief';
+import { TrainLayer, type TrainStats } from './lieu/trains';
 import type { TilePlants } from './lieu/tuile';
 import { TILE_SETTINGS, type SurfaceKind } from './lieu/reglages-tuiles';
 import { Daylight, nightShare } from './lumiere';
@@ -146,6 +147,8 @@ export interface RenderStats {
   readonly frameMs: number;
   /** Grand lieu rendu par tuiles (ADR 0022): compteurs par tuile et au total, `null` sinon. */
   readonly tiles: TileStats | null;
+  /** Trains des événements à l'écran (`lieu/trains.ts`), `null` dans un lieu sans train. */
+  readonly trains: TrainStats | null;
 }
 
 export interface GameRenderer {
@@ -284,6 +287,8 @@ class Engine implements GameRenderer {
   private readonly table: Mesh;
   private place: PlaceScene | null = null;
   private tiled: TiledPlace | null = null;
+  /** Trains des événements du lieu (grand lieu dont un événement amène un train), `null` sinon. */
+  private trains: TrainLayer | null = null;
   private readonly fog = new Fog(0x000000, 1e4, 2e4);
   private overview: number | null = null;
   private signature = Number.NaN;
@@ -490,6 +495,7 @@ class Engine implements GameRenderer {
     const cast = this.tripCast;
     if (cast === null) return false;
     if (this.place !== null) this.place.root.visible = false;
+    if (this.trains !== null) this.trains.root.visible = false;
     this.table.visible = false;
     this.trip.root.visible = true;
 
@@ -585,6 +591,12 @@ class Engine implements GameRenderer {
         glassOf: (volume) => place.glassOf(volume),
       },
     );
+    // Dehors, les lampes des trains (éteintes tant que leur véhicule n'est pas là) suivent leur caisse.
+    if (outdoor && this.trains !== null && this.trains.lamps.length > 0)
+      this.lights = {
+        lamps: [...this.lights.lamps, ...this.trains.lamps],
+        windows: this.lights.windows,
+      };
   }
 
   /**
@@ -709,6 +721,8 @@ class Engine implements GameRenderer {
     this.place = null;
     this.tiled?.dispose();
     this.tiled = null;
+    this.trains?.dispose();
+    this.trains = null;
     this.signature = Number.NaN;
     this.harvested = Number.NaN;
     this.mapped = Number.NaN;
@@ -785,6 +799,16 @@ class Engine implements GameRenderer {
       (this.tiled?.relief ?? null) === null ? null : this.groundAt,
     );
     this.scene.add(this.place.root);
+    if (tiled && TrainLayer.wanted(content, id)) {
+      this.trains = new TrainLayer(
+        place,
+        content,
+        this.options.models ?? null,
+        { standIn: this.standInMaterial, ink: this.ink?.volume ?? null },
+        this.groundAt,
+      );
+      this.scene.add(this.trains.root);
+    }
     this.ink?.setGround(
       this.tiled?.groundMap ?? this.place.groundMap,
       place.map.width,
@@ -835,6 +859,8 @@ class Engine implements GameRenderer {
         this.place = null;
         this.tiled?.dispose();
         this.tiled = null;
+        this.trains?.dispose();
+        this.trains = null;
       } else this.loadPlace(placeId);
     }
     // Dans le train: la scène du trajet à la place du lieu (qui se construit derrière).
@@ -961,6 +987,12 @@ class Engine implements GameRenderer {
         this.toCamera,
       );
       this.lightBuildings(dt, world, placeContent);
+    }
+    if (this.trains !== null) {
+      // Dehors seulement: dans une pièce, rien du dehors n'est dessiné.
+      this.trains.root.visible = room === null;
+      this.trains.setCutting(this.ink !== null && room === null);
+      if (room === null) this.trains.update(dt, world, this.subjects, this.toCamera);
     }
     this.updateFog(pose.width);
     if (this.overview !== null) this.poseOverview(pose.x, pose.y, this.overview);
@@ -1163,6 +1195,7 @@ class Engine implements GameRenderer {
       shadows: this.renderer.shadowMap.enabled,
       frameMs: this.frameMs,
       tiles: this.tiled?.stats() ?? null,
+      trains: this.trains?.stats ?? null,
     };
   }
 
@@ -1177,6 +1210,8 @@ class Engine implements GameRenderer {
     this.place = null;
     this.tiled?.dispose();
     this.tiled = null;
+    this.trains?.dispose();
+    this.trains = null;
     this.characters.dispose();
     this.daylight.dispose();
     this.table.geometry.dispose();
