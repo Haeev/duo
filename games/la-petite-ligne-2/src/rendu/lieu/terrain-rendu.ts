@@ -8,6 +8,7 @@ import type { LayerName } from '../encre/couches';
 import { TILE_SIZE, decodeTerrain } from '../../donnees/carte';
 import type { MapDef } from '../../donnees/schemas/lieu';
 import type { Sill } from '../../donnees/seuils';
+import type { KeepOut } from './emprises';
 import {
   DEFAULT_LOOK,
   GROUND_LOOKS,
@@ -46,6 +47,11 @@ export interface GroundField {
   readonly cells: Uint8Array;
   /** Distance (cases, bornée à 255) à la case aménagée la plus proche. */
   readonly wild: Uint8Array;
+  /**
+   * Distance (cases, bornée à 255) au couloir de jeu: 0 partout où l'on peut aller, puis ce qu'il
+   * faut franchir de cases hors jeu (`decor.outside`) pour y revenir. Absente: tout est à 0.
+   */
+  readonly away?: Uint8Array;
 }
 
 /** Hachage entier de deux coordonnées et d'un sel, de 0 à 1 exclu. */
@@ -113,23 +119,40 @@ export function groundField(
         cells[i] = greve;
 
   // Distance à l'aménagé, par vagues depuis toutes les cases aménagées.
-  const wild = new Uint8Array(n).fill(255);
+  const wild = waves(cells, width, height, (code) => BUILT.has(names[code] ?? ''));
+  // Distance au couloir de jeu, par vagues depuis tout ce qui n'est pas hors jeu.
+  const outside: readonly string[] = settings.decor.outside;
+  const away = waves(cells, width, height, (code) => !outside.includes(names[code] ?? ''));
+  return { width, height, names, looks, cells, wild, away };
+}
+
+/** Distance (cases, bornée à 255) de chaque case à la plus proche case de départ, par vagues. */
+function waves(
+  cells: Uint8Array,
+  width: number,
+  height: number,
+  start: (code: number) => boolean,
+): Uint8Array {
+  const n = width * height;
+  const near: number[] = [];
+  const distance = new Uint8Array(n).fill(255);
   const queue: number[] = [];
   for (let i = 0; i < n; i++)
-    if (BUILT.has(names[cells[i] ?? 0] ?? '')) {
-      wild[i] = 0;
+    if (start(cells[i] ?? 0)) {
+      distance[i] = 0;
       queue.push(i);
     }
+  // Le tableau grandit pendant le parcours: l'itérateur suit sa longueur (parcours en largeur).
   for (const i of queue) {
-    const d = (wild[i] ?? 0) + 1;
+    const d = (distance[i] ?? 0) + 1;
     if (d >= 255) continue;
     for (const j of neighbours4(i, width, height, near))
-      if ((wild[j] ?? 0) > d) {
-        wild[j] = d;
+      if ((distance[j] ?? 0) > d) {
+        distance[j] = d;
         queue.push(j);
       }
   }
-  return { width, height, names, looks, cells, wild };
+  return distance;
 }
 
 /** Nature dessinée sous le point (x, y), `null` hors de la carte. */
@@ -173,6 +196,8 @@ export interface TreeItem {
   color: string;
   /** Hauteur du sol sous le tronc (sol en relief), posée à la construction de la tuile; absente: 0. */
   ground?: number;
+  /** Distance (cases) au couloir de jeu (`GroundField.away`); absente: 0, dans le couloir. */
+  away?: number;
 }
 /** Boule (houppier, buisson): centre et demi-tailles. */
 export interface BlobItem {
@@ -232,8 +257,13 @@ export function tileDecor(
   map: Pick<MapDef, 'width' | 'height' | 'graph'>,
   tile: number,
   settings: TileSettings = TILE_SETTINGS,
+  /** Emprises du lieu: aucun arbre ni buisson dans un meuble, un bâtiment, au bord d'un chemin. */
+  keepOut: KeepOut | null = null,
+  /** Faux quand les clôtures sont posées en modèles livrés (`fenceRuns`): pas de piquets en boîtes. */
+  fences = true,
 ): TileDecor {
   const d = settings.decor;
+  const clear = settings.semis.clear;
   const boxes: BoxItem[] = [];
   const trees: TreeItem[] = [];
   const bushes: BlobItem[] = [];
@@ -258,17 +288,22 @@ export function tileDecor(
               : d.treeSparse + (d.treeWild - d.treeSparse) * share;
         if (w >= 2 && r < density) {
           const s = 0.75 + hash01(x, y, 2) * 0.6;
+          const tx = x + 0.2 + hash01(x, y, 3) * 0.6;
+          const tz = y + 0.2 + hash01(x, y, 4) * 0.6;
+          if (keepOut?.free(tx, tz, clear.trees) === false) continue;
           trees.push({
-            x: x + 0.2 + hash01(x, y, 3) * 0.6,
-            z: y + 0.2 + hash01(x, y, 4) * 0.6,
+            x: tx,
+            z: tz,
             trunkRadius: 0.16 * s,
             trunkHeight: 1.7 * s,
             crownRadius: 1.25 * s,
             crownHeight: 1.6 * s,
             color: pick(d.crownColors, hash01(x, y, 5)),
+            away: field.away?.[i] ?? 0,
           });
         } else if (name === 'herbe' && w >= 1 && w <= 4 && r > 1 - d.bushNear) {
           const s = 0.35 + hash01(x, y, 6) * 0.35;
+          if (keepOut?.free(x + 0.5, y + 0.5, clear.bushes) === false) continue;
           bushes.push({
             x: x + 0.5,
             y: s * 0.7,
@@ -292,7 +327,7 @@ export function tileDecor(
           color: d.cropColor,
         });
       } else if (name === 'lisiere') {
-        boxes.push(...edgeDressing(x, y, nameAt, settings));
+        boxes.push(...edgeDressing(x, y, nameAt, settings, fences));
       }
     }
   sleepersOf(map, tile, settings, boxes);
@@ -308,6 +343,7 @@ function edgeDressing(
   y: number,
   nameAt: (x: number, y: number) => string,
   settings: TileSettings,
+  fences: boolean,
 ): BoxItem[] {
   const d = settings.decor;
   const around = [nameAt(x - 1, y), nameAt(x + 1, y), nameAt(x, y - 1), nameAt(x, y + 1)];
@@ -326,6 +362,7 @@ function edgeDressing(
       },
     ];
   if (around.includes('voie')) {
+    if (!fences) return [];
     const out: BoxItem[] = [
       {
         x: x + 0.5,
@@ -377,6 +414,44 @@ function edgeDressing(
       color: d.hedgeColor,
     },
   ];
+}
+
+/** Une clôture le long de la voie: suite de cases de lisière alignées (m, bords compris). */
+export interface FenceRun {
+  readonly x0: number;
+  readonly y0: number;
+  readonly x1: number;
+  readonly y1: number;
+  /** Vrai si elle court d'ouest en est. */
+  readonly alongX: boolean;
+}
+
+/**
+ * Clôtures du lieu (cases de lisière qui longent une voie, comme `edgeDressing`), regroupées en
+ * suites droites: le rendu encré y pose le modèle livré de clôture au lieu de piquets en boîtes.
+ */
+export function fenceRuns(field: GroundField): FenceRun[] {
+  const { width, height, names, cells } = field;
+  const nameAt = (x: number, y: number): string =>
+    x < 0 || y < 0 || x >= width || y >= height ? '' : (names[cells[y * width + x] ?? 0] ?? '');
+  const fenced = (x: number, y: number): boolean => {
+    if (nameAt(x, y) !== 'lisiere') return false;
+    const around = [nameAt(x - 1, y), nameAt(x + 1, y), nameAt(x, y - 1), nameAt(x, y + 1)];
+    return !around.includes('eau') && around.includes('voie');
+  };
+  const runs: FenceRun[] = [];
+  const done = new Uint8Array(width * height);
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++) {
+      if (done[y * width + x] === 1 || !fenced(x, y)) continue;
+      let x1 = x;
+      while (fenced(x1 + 1, y) && done[y * width + x1 + 1] !== 1) x1 += 1;
+      let y1 = y;
+      if (x1 === x) while (fenced(x, y1 + 1) && done[(y1 + 1) * width + x] !== 1) y1 += 1;
+      for (let j = y; j <= y1; j++) for (let i = x; i <= x1; i++) done[j * width + i] = 1;
+      runs.push({ x0: x, y0: y, x1: x1 + 1, y1: y1 + 1, alongX: y1 === y });
+    }
+  return runs;
 }
 
 /** Traverses de la tuile, tous les `sleeperStep` m le long des rails. */
@@ -822,6 +897,8 @@ export function tileSemis(
   map: Pick<MapDef, 'width' | 'height'>,
   tile: number,
   settings: TileSettings = TILE_SETTINGS,
+  /** Emprises du lieu: rien ne pousse dans un meuble, un potager, un bâtiment, ni à cheval sur un bord. */
+  keepOut: KeepOut | null = null,
 ): { pebbles: BlobItem[]; tufts: BoxItem[] } {
   const s = settings.semis;
   const pebbles: BlobItem[] = [];
@@ -839,11 +916,14 @@ export function tileSemis(
       for (let k = 0; k < count && pebbles.length < s.maxPerTile; k++) {
         const size =
           s.pebbleSize[0] + hash01(x * 3 + k, y, 62) * (s.pebbleSize[1] - s.pebbleSize[0]);
+        const px = x + hash01(x, y * 5 + k, 63);
+        const pz = y + hash01(x * 7 + k, y, 64);
+        if (keepOut?.free(px, pz, s.clear.pebbles) === false) continue;
         pebbles.push({
-          x: x + hash01(x, y * 5 + k, 63),
+          x: px,
           // À demi enterré: son milieu est un peu sous le sol.
           y: size * 0.18,
-          z: y + hash01(x * 7 + k, y, 64),
+          z: pz,
           rx: size * (0.8 + hash01(x, y + k, 65) * 0.7),
           ry: size * (0.45 + hash01(x + k, y, 66) * 0.4),
           rz: size * (0.8 + hash01(x - k, y, 67) * 0.7),
@@ -854,9 +934,12 @@ export function tileSemis(
       const thin = (field.wild[i] ?? 0) > s.wildThin ? 0.35 : 1;
       if (grass > 0 && hash01(x, y, 71) < grass * thin && tufts.length < s.maxPerTile) {
         const h = s.tuftHeight[0] + hash01(x, y, 72) * (s.tuftHeight[1] - s.tuftHeight[0]);
+        const tx = x + hash01(x, y, 73);
+        const tz = y + hash01(x, y, 74);
+        if (keepOut?.free(tx, tz, s.clear.tufts) === false) continue;
         tufts.push({
-          x: x + hash01(x, y, 73),
-          z: y + hash01(x, y, 74),
+          x: tx,
+          z: tz,
           base: 0,
           w: s.tuftWidth * (0.8 + hash01(x, y, 75) * 0.6),
           h,

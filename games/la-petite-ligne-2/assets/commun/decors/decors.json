@@ -285,6 +285,8 @@
    },
    "source": "recoltables-aubrune",
    "states": {
+    "far": "ash-tree-far",
+    "shade": "ash-tree-shade",
     "stump": "ash-tree-stump",
     "winter": "ash-tree-winter"
    },
@@ -321,6 +323,8 @@
    },
    "source": "recoltables-aubrune",
    "states": {
+    "far": "ash-tree-b-far",
+    "shade": "ash-tree-b-shade",
     "stump": "ash-tree-stump",
     "winter": "ash-tree-b-winter"
    },
@@ -332,6 +336,56 @@
    "variants": [
     "ash-tree"
    ]
+  },
+  "ash-tree-b-far": {
+   "bottom": 0.0,
+   "budget": 520,
+   "collision": {
+    "r": 0.193,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.292,
+    "h": 5.777,
+    "w": 3.001
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree-b",
+    "state": "far"
+   },
+   "triangles": 481,
+   "trianglesParMateriau": {
+    "ecorce": 50,
+    "feuillage": 431
+   }
+  },
+  "ash-tree-b-shade": {
+   "bottom": 0.0,
+   "budget": 220,
+   "collision": {
+    "r": 0.193,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.553,
+    "h": 5.886,
+    "w": 3.061
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree-b",
+    "state": "shade"
+   },
+   "triangles": 170,
+   "trianglesParMateriau": {
+    "ecorce": 30,
+    "feuillage": 140
+   }
   },
   "ash-tree-b-winter": {
    "bottom": 0.0,
@@ -355,6 +409,56 @@
    "triangles": 312,
    "trianglesParMateriau": {
     "ecorce": 312
+   }
+  },
+  "ash-tree-far": {
+   "bottom": 0.0,
+   "budget": 520,
+   "collision": {
+    "r": 0.21,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.37,
+    "h": 6.297,
+    "w": 3.774
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree",
+    "state": "far"
+   },
+   "triangles": 478,
+   "trianglesParMateriau": {
+    "ecorce": 50,
+    "feuillage": 428
+   }
+  },
+  "ash-tree-shade": {
+   "bottom": 0.0,
+   "budget": 220,
+   "collision": {
+    "r": 0.21,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.63,
+    "h": 6.363,
+    "w": 4.085
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "ash-tree",
+    "state": "shade"
+   },
+   "triangles": 172,
+   "trianglesParMateriau": {
+    "ecorce": 30,
+    "feuillage": 142
    }
   },
   "ash-tree-stump": {
@@ -625,6 +729,8 @@
    },
    "source": "recoltables-aubrune",
    "states": {
+    "far": "birch-tree-far",
+    "shade": "birch-tree-shade",
     "stump": "birch-tree-stump",
     "winter": "birch-tree-winter"
    },
@@ -661,6 +767,8 @@
    },
    "source": "recoltables-aubrune",
    "states": {
+    "far": "birch-tree-b-far",
+    "shade": "birch-tree-b-shade",
     "stump": "birch-tree-stump",
     "winter": "birch-tree-b-winter"
    },
@@ -672,6 +780,56 @@
    "variants": [
     "birch-tree"
    ]
+  },
+  "birch-tree-b-far": {
+   "bottom": 0.0,
+   "budget": 520,
+   "collision": {
+    "r": 0.135,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.903,
+    "h": 5.423,
+    "w": 2.767
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree-b",
+    "state": "far"
+   },
+   "triangles": 381,
+   "trianglesParMateriau": {
+    "ecorce": 50,
+    "feuillage": 331
+   }
+  },
+  "birch-tree-b-shade": {
+   "bottom": 0.0,
+   "budget": 220,
+   "collision": {
+    "r": 0.135,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.092,
+    "h": 5.508,
+    "w": 2.903
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree-b",
+    "state": "shade"
+   },
+   "triangles": 166,
+   "trianglesParMateriau": {
+    "ecorce": 30,
+    "feuillage": 136
+   }
   },
   "birch-tree-b-winter": {
    "bottom": 0.0,
@@ -695,6 +853,56 @@
    "triangles": 352,
    "trianglesParMateriau": {
     "ecorce": 352
+   }
+  },
+  "birch-tree-far": {
+   "bottom": 0.0,
+   "budget": 520,
+   "collision": {
+    "r": 0.15,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 2.891,
+    "h": 5.91,
+    "w": 3.404
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree",
+    "state": "far"
+   },
+   "triangles": 385,
+   "trianglesParMateriau": {
+    "ecorce": 50,
+    "feuillage": 335
+   }
+  },
+  "birch-tree-shade": {
+   "bottom": 0.0,
+   "budget": 220,
+   "collision": {
+    "r": 0.15,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.209,
+    "h": 5.989,
+    "w": 3.67
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "birch-tree",
+    "state": "shade"
+   },
+   "triangles": 169,
+   "trianglesParMateriau": {
+    "ecorce": 30,
+    "feuillage": 139
    }
   },
   "birch-tree-stump": {
@@ -1753,6 +1961,8 @@
    },
    "source": "recoltables-aubrune",
    "states": {
+    "far": "oak-tree-far",
+    "shade": "oak-tree-shade",
     "stump": "oak-tree-stump",
     "winter": "oak-tree-winter"
    },
@@ -1789,6 +1999,8 @@
    },
    "source": "recoltables-aubrune",
    "states": {
+    "far": "oak-tree-b-far",
+    "shade": "oak-tree-b-shade",
     "stump": "oak-tree-stump",
     "winter": "oak-tree-b-winter"
    },
@@ -1800,6 +2012,56 @@
    "variants": [
     "oak-tree"
    ]
+  },
+  "oak-tree-b-far": {
+   "bottom": 0.0,
+   "budget": 520,
+   "collision": {
+    "r": 0.27,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.348,
+    "h": 4.559,
+    "w": 3.834
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree-b",
+    "state": "far"
+   },
+   "triangles": 485,
+   "trianglesParMateriau": {
+    "ecorce": 50,
+    "feuillage": 435
+   }
+  },
+  "oak-tree-b-shade": {
+   "bottom": 0.0,
+   "budget": 220,
+   "collision": {
+    "r": 0.27,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 3.486,
+    "h": 4.481,
+    "w": 4.041
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree-b",
+    "state": "shade"
+   },
+   "triangles": 171,
+   "trianglesParMateriau": {
+    "ecorce": 30,
+    "feuillage": 141
+   }
   },
   "oak-tree-b-winter": {
    "bottom": 0.0,
@@ -1823,6 +2085,56 @@
    "triangles": 312,
    "trianglesParMateriau": {
     "ecorce": 312
+   }
+  },
+  "oak-tree-far": {
+   "bottom": 0.0,
+   "budget": 520,
+   "collision": {
+    "r": 0.3,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 4.085,
+    "h": 5.147,
+    "w": 3.927
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree",
+    "state": "far"
+   },
+   "triangles": 473,
+   "trianglesParMateriau": {
+    "ecorce": 50,
+    "feuillage": 423
+   }
+  },
+  "oak-tree-shade": {
+   "bottom": 0.0,
+   "budget": 220,
+   "collision": {
+    "r": 0.3,
+    "shape": "cylinder"
+   },
+   "family": "arbre",
+   "file": "aubrune-arbres.glb",
+   "size": {
+    "d": 4.207,
+    "h": 5.167,
+    "w": 4.194
+   },
+   "source": "recoltables-aubrune",
+   "stateOf": {
+    "model": "oak-tree",
+    "state": "shade"
+   },
+   "triangles": 165,
+   "trianglesParMateriau": {
+    "ecorce": 30,
+    "feuillage": 135
    }
   },
   "oak-tree-stump": {

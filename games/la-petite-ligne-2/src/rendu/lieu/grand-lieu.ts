@@ -37,6 +37,7 @@ import { createGroundMap } from '../encre/sol';
 import { Occlusion, rayHitsBox, type Vec3 } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { ResourceTracker } from '../ressources';
+import { KeepOut } from './emprises';
 import { GeometryBuilder } from './geometrie';
 import { buildRoom } from './piece-geometrie';
 import { type RoomDef, roomFacades, type RoomObstacle, roomPlan } from './pieces';
@@ -189,6 +190,8 @@ export class TiledPlace {
     private readonly obstacles: readonly RoomObstacle[] = [],
     /** Modèles livrés de la végétation semée (rendu encré); `null`: troncs et boules. */
     plants: TilePlants | null = null,
+    /** Vrai si le lieu pose les clôtures de la voie en modèles livrés: les tuiles n'en font pas. */
+    modelledFences = false,
   ) {
     this.ink = ink;
     this.delivered = delivered;
@@ -288,6 +291,24 @@ export class TiledPlace {
       models,
       relief: this.relief,
       plants: ink === null ? null : plants,
+      fences: !(ink !== null && modelledFences),
+      // Rien ne se sème dans un meuble (un potager en est un), un repère ou un bâtiment.
+      keepOut:
+        ink === null
+          ? null
+          : new KeepOut(
+              this.field,
+              [
+                ...obstacles,
+                ...Object.values(map.buildings ?? {}).map(({ rect }) => ({
+                  x0: rect.x,
+                  z0: rect.y,
+                  x1: rect.x + rect.w,
+                  z1: rect.y + rect.h,
+                })),
+              ],
+              Math.max(...Object.values(settings.semis.clear)),
+            ),
       materials: {
         ground,
         water,
@@ -504,6 +525,9 @@ export class TiledPlace {
     const s = this.settings;
     const builder = new GeometryBuilder();
     for (const mark of Object.values(this.map.landmarks ?? {})) {
+      // Le repère a déjà son volume dans le lieu (le Vieux Chêne est un arbre de la carte, le
+      // clocher fait partie de l'église livrée): le volume provisoire le doublerait.
+      if (this.landmarkShown(mark.x, mark.y)) continue;
       const i = Math.floor(mark.y) * this.field.width + Math.floor(mark.x);
       const wild = this.field.wild[i] ?? 0;
       // Le pied du repère part d'un peu sous le sol en relief: il ne flotte sur aucune pente.
@@ -577,6 +601,21 @@ export class TiledPlace {
     mesh.receiveShadow = true;
     this.outside.add(mesh);
     this.landmarkTriangles = (geometry.index?.count ?? 0) / 3;
+  }
+
+  /** Un meuble de la carte ou un bâtiment livré tient-il déjà la place de ce repère ? */
+  private landmarkShown(x: number, y: number): boolean {
+    const reach = this.settings.landmark.sameAs;
+    for (const o of this.obstacles)
+      if (x > o.x0 - reach && x < o.x1 + reach && y > o.z0 - reach && y < o.z1 + reach) return true;
+    const delivered = this.delivered;
+    if (this.ink === null || delivered === null) return false;
+    for (const [id, building] of Object.entries(this.map.buildings ?? {})) {
+      const { rect } = building;
+      if (x < rect.x || x > rect.x + rect.w || y < rect.y || y > rect.y + rect.h) continue;
+      if (delivered.source.model(delivered.place, id) !== null) return true;
+    }
+    return false;
   }
 
   private blobInto(

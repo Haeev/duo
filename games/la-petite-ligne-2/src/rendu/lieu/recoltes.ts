@@ -27,7 +27,8 @@ import {
 } from './decors-manifeste';
 import type { SceneVolume } from './description';
 import { HARVEST_LOOK, type HarvestLookSettings } from './reglages-recoltes';
-import { DEFAULT_LOOK, GROUND_LOOKS, type SurfaceKind } from './reglages-tuiles';
+import { DEFAULT_LOOK, GROUND_LOOKS, type SurfaceKind, TILE_SETTINGS } from './reglages-tuiles';
+import type { FenceRun } from './terrain-rendu';
 
 type ReadStates = DeepReadonly<BrickStates>;
 type ReadPlace = DeepReadonly<PlaceState>;
@@ -83,6 +84,45 @@ export function placeStates(
     if (prop === undefined) continue;
     const shown = objectState(look, prop.bricks, state.objects[instance.id], settings);
     if (shown !== null) out.set(instance.id, shown);
+  }
+  return out;
+}
+
+/**
+ * Clôtures le long de la voie en modèles livrés (`decor.fenceModel`): des modules de la longueur
+ * du modèle, resserrés pour tomber juste sur la suite de cases. Rien si le modèle n'est pas au
+ * manifeste (les piquets en boîtes des tuiles restent).
+ */
+export function fenceVolumes(
+  runs: readonly FenceRun[],
+  model: string = TILE_SETTINGS.decor.fenceModel,
+  manifest: DecorManifest = DECOR_MANIFEST,
+): SceneVolume[] {
+  const size = manifest.models[model]?.size;
+  if (size === undefined) return [];
+  const out: SceneVolume[] = [];
+  for (const [r, run] of runs.entries()) {
+    const length = run.alongX ? run.x1 - run.x0 : run.y1 - run.y0;
+    const count = Math.max(1, Math.round(length / size.w));
+    const step = length / count;
+    for (let k = 0; k < count; k++) {
+      const along = (k + 0.5) * step;
+      out.push({
+        id: `cloture-${String(r)}-${String(k)}`,
+        model,
+        x: run.alongX ? run.x0 + along : run.x0 + 0.5,
+        y: run.alongX ? run.y0 + 0.5 : run.y0 + along,
+        w: step,
+        h: size.d,
+        rotation: run.alongX ? 0 : 1,
+        base: 0,
+        height: size.h,
+        shape: 'box',
+        occludes: false,
+        aimable: false,
+        scale: step / size.w,
+      });
+    }
   }
   return out;
 }

@@ -12,6 +12,7 @@ import { DOORS, doorSills, type Sill } from '../../donnees/seuils';
 import type { OccluderBox } from '../occultation';
 import { RENDER_SETTINGS } from '../reglages';
 import { DECOR_MANIFEST } from './decors-manifeste';
+import { clearOf, type Footprint } from './emprises';
 import { groundModelOf } from './recoltes';
 import { HARVEST_LOOK } from './reglages-recoltes';
 import { roomStyle } from './reglages-pieces';
@@ -242,13 +243,47 @@ export function describePlace(
   return { id: place.def.id, width, height, volumes, ...(floor === undefined ? {} : { floor }) };
 }
 
-/** Volumes qui changent en cours de partie: meubles posés par les joueurs et objets au sol. */
+/**
+ * Emprises des meubles sous lesquels un objet au sol disparaîtrait: ceux de la carte et ceux que
+ * les joueurs ont posés, s'ils sont plus hauts que `ground.hideHeight` (un potager, un tapis ne
+ * cachent rien). L'emprise est celle du modèle livré quand elle est plus étroite que les cases.
+ */
+export function hidingFootprints(
+  content: Content,
+  place: PlaceContent | undefined,
+  state: DeepReadonly<PlaceState>,
+  settings: StandInSettings = RENDER_SETTINGS.standIn,
+): Footprint[] {
+  const out: Footprint[] = [];
+  const add = (type: string, x: number, y: number, rotation: number): void => {
+    const prop = content.props[type];
+    if (prop === undefined) return;
+    const model = DECOR_MANIFEST.models[prop.model]?.size;
+    if ((model?.h ?? settings.propHeight) < HARVEST_LOOK.ground.hideHeight) return;
+    const w = Math.min(prop.size.w, model?.w ?? prop.size.w);
+    const h = Math.min(prop.size.h, model?.d ?? prop.size.h);
+    const size = footprint({ w, h, rotation: (rotation % 4) as 0 | 1 | 2 | 3 });
+    out.push({ x0: x - size.w / 2, z0: y - size.h / 2, x1: x + size.w / 2, z1: y + size.h / 2 });
+  };
+  for (const object of place?.map.objects ?? [])
+    add(object.type, object.x, object.y, object.rotation);
+  for (const placed of state.placed) add(placed.type, placed.x, placed.y, placed.rotation);
+  return out;
+}
+
+/**
+ * Volumes qui changent en cours de partie: meubles posés par les joueurs et objets au sol.
+ * `place`: le lieu, pour sortir un objet au sol de l'emprise d'un meuble (sous un banc, on ne le
+ * verrait plus); la place de l'état ne change pas, seule celle de l'affichage glisse au bord.
+ */
 export function describeDynamic(
   content: Content,
   state: DeepReadonly<PlaceState>,
   settings: StandInSettings = RENDER_SETTINGS.standIn,
+  place?: PlaceContent,
 ): SceneVolume[] {
   const volumes: SceneVolume[] = [];
+  const hiding = state.ground.length === 0 ? [] : hidingFootprints(content, place, state, settings);
   for (const placed of state.placed) {
     const prop = content.props[placed.type];
     if (prop === undefined) continue;
@@ -273,13 +308,16 @@ export function describeDynamic(
     const model = groundModelOf(content, item.stack.item);
     const size = model === null ? undefined : DECOR_MANIFEST.models[model]?.size;
     const k = HARVEST_LOOK.ground.modelScale;
+    const w = size === undefined ? bundle.w : size.w * k;
+    const h = size === undefined ? bundle.d : size.d * k;
+    const shown = clearOf(item.x, item.y, Math.max(w, h) / 2, HARVEST_LOOK.ground.clearGap, hiding);
     volumes.push({
       id: `sol-${String(item.id)}`,
       model,
-      x: item.x,
-      y: item.y,
-      w: size === undefined ? bundle.w : size.w * k,
-      h: size === undefined ? bundle.d : size.d * k,
+      x: shown.x,
+      y: shown.z,
+      w,
+      h,
       rotation: 0,
       base: 0,
       height: size === undefined ? bundle.h : size.h * k,

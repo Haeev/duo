@@ -411,13 +411,13 @@ class Atelier:
             q = [c + le * t * 1.5, c + tr * t * 0.62, c - le * t * 1.5, c - tr * t * 0.62]
             self.morceau(q, [(0, 1, 3), (1, 2, 3)], mat, couleur, m, garde=True, double=True, envers=couleur, rond=(0, 0.12, 0), sol=True)
 
-    def touffe(self, x, y, z, r, graine, tons, festons=3, segments=9, dome=0.72, dents=0.34, laches=1, fond=0.78):
+    def touffe(self, x, y, z, r, graine, tons, festons=3, segments=9, dome=0.72, dents=0.34, laches=1, fond=0.78, rangs=3, pans_festons=None):
         """Une masse de feuillage: une grande calotte au ton sourd et, posées sur son pourtour et
         son sommet, de plus petites, plus claires, qui la découpent en festons. Chacune est un
         morceau: l'ombre et le trait fin dessinent des paquets de feuilles, pas une boule."""
         base = tons[0]
         sourd = (base[0] * (fond - 0.04), base[1] * (fond + 0.02), base[2] * fond)
-        self.calotte(x, y, z, r, graine, sourd, segments=segments, dome=dome, dents=dents, laches=laches)
+        self.calotte(x, y, z, r, graine, sourd, segments=segments, dome=dome, dents=dents, laches=laches, rangs=rangs)
         for k in range(festons):
             haut = k == festons - 1 and festons > 3
             ang = (k / (1 if haut else festons - (1 if festons > 3 else 0))) * math.tau + tirage(graine * 3.9 + k) * 0.9
@@ -430,7 +430,7 @@ class Atelier:
                 taille,
                 graine * 17 + k * 5 + 1,
                 tons[(k + 1) % len(tons)],
-                segments=max(5, segments - 3),
+                segments=pans_festons or max(5, segments - 3),
                 dome=dome,
                 dents=dents * 0.8,
                 laches=k % 2 if laches else 0,

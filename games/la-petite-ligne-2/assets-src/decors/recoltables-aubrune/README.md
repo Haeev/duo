@@ -14,7 +14,7 @@ Sorties, dans `assets/commun/decors/` (les fiches de meubles de `donnees/commun/
 1. Ouvre `recoltables.toml` et copie l'entrée `[[modeles]]` la plus proche (même `famille`: arbre, buisson, rocher, fleur, bois, repere, parcelle, culture).
 2. Change `id` (anglais, minuscules, traits d'union) et `graine` (elle fixe la forme).
 3. Arbre: choisis ou copie une `[essences.<nom>]` (fût, houppier, teintes, fruits). Culture: `culture` est l'identifiant de sa fiche `donnees/commun/cultures/`, dont le nombre de stades est lu.
-4. Ajoute au besoin `variantes` (autres formes tirées à la pose) et `etats` (`stump`, `winter`, `bare`, `chipped`).
+4. Ajoute au besoin `variantes` (autres formes tirées à la pose) et `etats` (`stump`, `winter`, `bare`, `chipped`; pour un arbre semé, `far` et `shade`: ses versions allégées, réglées par `[allege.far]` et `[allege.shade]`, que le rendu pose loin du couloir de jeu et dont il fait les ombres portées).
    `pose = { cap = true, echelle = [a, b] }`: écarts de pose propres au modèle et à ses variantes, à la place de ceux de la famille (un modèle trop petit à la caméra de jeu se grossit ici, sans retoucher les formes).
 5. Une teinte nouvelle: une ligne dans `[teintes]` (deux ou trois tons, une pièce tire le sien).
 6. `bash construire.sh`: modèles, manifeste et contrôle (budget, sol, matériaux, états attendus par les fiches).
