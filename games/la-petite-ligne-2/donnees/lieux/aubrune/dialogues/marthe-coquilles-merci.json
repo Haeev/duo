@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "marthe-coquilles-merci",
+  "villager": "marthe",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lumignons.coquilles",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "oeuf",
+      "count": 2
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Deux œufs. Je les perce à l'aiguille, je souffle, et voilà deux lumignons de plus. Pour les Delmas: c'est leur première nuit.",
+      "emote": null,
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ne fais pas cette tête. Ma mère vidait les œufs comme ça, et sa mère avant. C'est la seule chose qu'on souffle sans éteindre.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

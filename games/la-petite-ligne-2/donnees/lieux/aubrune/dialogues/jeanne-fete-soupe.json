@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "jeanne-fete-soupe",
+  "villager": "jeanne",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.jeanne",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.jeanne",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.jeanne",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "J'ai parié sur la panade. Trois caramels contre Léon. Si c'est ex aequo, on a décidé qu'on mangeait les caramels à deux.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.jeanne",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Ta moitié et toi, vous avez la louche. C'est vous qui commandez, aujourd'hui. Vous pouvez interdire les poireaux ? Essayez.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.jeanne",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "jeanne",
+      "text": "Je n'aime pas la soupe. Mais j'aime le concours. Alors je goûte en fermant le nez. Ça compte, Honorine l'a dit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

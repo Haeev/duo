@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "leon-veillee-du-quai",
+  "villager": "leon",
+  "priority": 45,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "veillee"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "premiere-veillee"
+        }
+      ]
+    },
+    {
+      "type": "time_is",
+      "from": 1110,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.leon",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.leon",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.leon",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "À la veillée, j'ai le droit de rester jusqu'à neuf heures. Enfin... huit et demie. Enfin... jusqu'à ce que maman me voie bâiller.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.leon",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Ta moitié sait faire des ricochets ? Moi, j'en fais douze. Enfin... sept. Dis-lui de venir au bief, je lui montre les sept.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.leon",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "leon",
+      "text": "Jeanne se cache derrière le banc pour rester plus tard. Moi, je me cache mieux. Enfin... papa m'a trouvé en premier. Mais mieux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

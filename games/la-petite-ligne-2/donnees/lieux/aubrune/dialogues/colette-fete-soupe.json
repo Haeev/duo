@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "colette-fete-soupe",
+  "villager": "colette",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.colette",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.colette",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.colette",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "On l'a faite à quatre mains, Odette et moi. Elle sale, je goûte. Elle dit que je goûte trop. Il faut bien: elle sale trop.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.colette",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Ta moitié et toi, vous jugez. Je ne vous influence pas. Je pose juste ce bol là, sous ton nez. Il est tombé là tout seul.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.colette",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La panade de Berthe est bonne. Voilà, c'est dit. Si tu le répètes à Odette, je nierai, et elle fera semblant de me croire.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

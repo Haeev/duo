@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "id": "l-appel-du-registre",
+  "title": "L'appel du registre",
+  "together": true,
+  "roles": {
+    "a": "Au registre",
+    "b": "À la craie"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "premier-train"
+      },
+      {
+        "type": "time_is",
+        "from": 600,
+        "to": 1140
+      },
+      {
+        "type": "reach",
+        "point": "quai",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "daily"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Veillée du premier train. Ordre du jour: l'appel, la tourte, la lanterne. Dans cet ordre. La tourte peut passer avant, si elle refroidit.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "ambroise",
+      "text": "Il est dix heures et quelques. Je dis « et quelques » exprès: un jour par an, la pendule a le droit de souffler.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Firmin te confie le registre de la halte. Une ligne par âme, une écriture par ligne. Lis les noms tout haut: ta moitié les cochera.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Firmin te confie la craie du tableau des horaires. Ta moitié lit les noms du registre: un trait par « présent ».",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Lis les noms du registre: maintiens.",
+          "done": [],
+          "gesture": {
+            "type": "hold",
+            "seconds": 3
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Au dernier « présent », tire le trait: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "« Présent ! », vingt et une fois, dont une la bouche pleine. Le compte est bon: personne ne manque au quai.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Présente, et la tourte aussi ! C'est celle du quai: on ne la fait que ce jour-là, pour ceux qui attendent un train.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "firmin",
+      "text": "Reste la ligne du bas: « 5 h 12. Hautefonte. S'il est à l'heure. » On la repassera à la craie tous les ans. Il lui faut une devise.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fete.jour",
+          "value": "premier-train",
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

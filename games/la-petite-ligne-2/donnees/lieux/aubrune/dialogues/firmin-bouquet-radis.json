@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "id": "firmin-bouquet-radis",
+  "villager": "firmin",
+  "priority": 56,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.barrieres.bouquet",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "barrieres"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "radis",
+      "count": 3
+    }
+  ],
+  "once": null,
+  "start": "prise",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Des radis. ... Le règlement dit « garnies ». Soit. Fanes en l'air, ça fait un bouquet.",
+      "emote": null,
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Jeanne va en parler pendant dix ans. Honorine dira que ça s'est toujours fait. Les radis de la barrière: c'est parti pour durer.",
+      "emote": null,
+      "next": null
+    },
+    "prise": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "take_item",
+          "item": "radis",
+          "count": 3
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.barrieres.garniture",
+          "value": "radis",
+          "by": "duo"
+        }
+      ],
+      "next": "a1"
+    }
+  }
+}

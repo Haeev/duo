@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "anatole-fete-premier-train",
+  "villager": "anatole",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    },
+    {
+      "type": "time_is",
+      "from": 300,
+      "to": 360
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.anatole",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.anatole",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.anatole",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Une lanterne levée à la nuit tombée. Un coup de cloche. C'est conforme à l'usage de 1987. Je ne pensais pas le revoir.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.anatole",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Votre quai sent la tourte et le feu de bois. Dis à ta moitié que l'arrêt a duré une minute de plus. Motif: l'odeur.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.anatole",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "anatole",
+      "text": "Il y avait une part en bout de table, côté voie. Personne n'a su me dire pour qui. Je l'ai prise. J'étais en retard, de toute façon.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "armand-fete-premier-train",
+  "villager": "armand",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.armand",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.armand",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.armand",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "J'ai fait réciter l'horaire aux enfants. Une seule ligne: 5 h 12, Hautefonte. Enfin... Léon a ajouté « s'il est à l'heure ». Dix sur dix.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.armand",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Ta moitié m'a demandé ce que j'en pensais, du train. Enfin... les tunnels respirent. Je l'ai dit. Je le pense de moins en moins.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.armand",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Devant tout le quai, j'ai répondu « présent » sans bafouiller. Enfin... j'ai dit « présent, enfin ». C'est un progrès.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

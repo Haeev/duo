@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "martial-veillee-du-quai",
+  "villager": "martial",
+  "priority": 45,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "veillee"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "premiere-veillee"
+        }
+      ]
+    },
+    {
+      "type": "time_is",
+      "from": 1110,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.martial",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.martial",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.martial",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Le soir au quai, le dimanche au parvis: j'espère les mêmes têtes. Ici, en tout cas, elles chantent sans que je demande.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.martial",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Ta moitié m'a gardé une place sur le banc. J'ai posé mon vélo contre la halte. Il veille aussi: il a un pneu à plat.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.martial",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "martial",
+      "text": "Six clochers, et un seul quai. Je vous le dis en confidence: c'est le quai qui a la meilleure acoustique.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

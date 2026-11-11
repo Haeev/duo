@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "lucie-veillee-du-quai",
+  "villager": "lucie",
+  "priority": 45,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "veillee"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "premiere-veillee"
+        }
+      ]
+    },
+    {
+      "type": "time_is",
+      "from": 1110,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.lucie",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.lucie",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.lucie",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ha ! À la veillée, je ne distribue rien, je ne photographie rien, je m'assois. Dix minutes. Mon record est de douze.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.lucie",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ta moitié et toi, vous êtes sur toutes mes photos de quai sans le vouloir. Toujours côte à côte. C'est pratique pour le cadrage.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.lucie",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "J'ai toujours une lettre en trop dans ma sacoche, le soir. Je la porte le lendemain, et toute la veillée je me demande ce qu'elle dit.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "id": "margot-fete-lumignons",
+  "villager": "margot",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 120
+    }
+  ],
+  "once": null,
+  "start": "heure",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.margot",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.margot",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.margot",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Paulin a dit non aux lumignons. Il en a fait trois. Un pour lui, un pour moi, un « au cas où ». Je n'ai pas demandé le cas.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.margot",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Ta moitié et toi, passez au gué cette nuit. Paulin vous dira pour qui il allume. Il a répété sa phrase toute la semaine.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.margot",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Une ferme, la nuit, on ne la voit pas. Ce soir, on verra la nôtre depuis le bourg. Trois petites lumières. Ça me fait quelque chose.",
+      "emote": null,
+      "next": null
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1230,
+              "to": 120
+            }
+          ],
+          "next": "nuit"
+        }
+      ],
+      "otherwise": "tour"
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "margot",
+      "text": "Pour la maison qu'on a quittée pour venir ici. Elle était bien aussi. Il faut le dire aux maisons, sinon elles s'inquiètent.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

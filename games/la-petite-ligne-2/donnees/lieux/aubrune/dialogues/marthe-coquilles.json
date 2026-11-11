@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "marthe-coquilles",
+  "villager": "marthe",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.lumignons.coquilles",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Il me faut deux œufs. Pas pour les manger: pour les coquilles. Le dedans ira à Colette, elle en fera une omelette. Rien ne se perd.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

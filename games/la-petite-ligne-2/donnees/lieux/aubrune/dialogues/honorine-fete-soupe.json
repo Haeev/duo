@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "honorine-fete-soupe",
+  "villager": "honorine",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.honorine",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.honorine",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.honorine",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Je préside. Assise, comme les reines et les juges. La doyenne goûte la première, la dernière, et entre les deux si elle veut.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.honorine",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié m'a demandé qui allait gagner. J'ai dit: celle qui me ressert sans que je demande. On m'a resservie deux fois depuis.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.honorine",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Le sel, cette année, je n'y ai pas touché. Je le jure sur la tête de Marthe. Elle a la tête solide.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

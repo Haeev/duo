@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "berthe-fete-soupe",
+  "villager": "berthe",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.berthe",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.berthe",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.berthe",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ma panade. Pain rassis, bouillon, trois heures à petit feu. Ma meule dit que c'est la farine qui fait tout. Elle prêche pour sa paroisse.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.berthe",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Ta moitié a goûté ma marmite, et toi celle des mères. Ou l'inverse. Mettez-vous d'accord, mais goûtez la mienne chaude.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.berthe",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "berthe",
+      "text": "Je ne suis pas venue pour gagner. Je suis venue pour qu'on arrête de dire « c'est du pain mouillé ». Odette l'a dit, je l'ai vue.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

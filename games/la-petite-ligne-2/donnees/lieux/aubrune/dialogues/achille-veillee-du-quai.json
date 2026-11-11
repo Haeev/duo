@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "achille-veillee-du-quai",
+  "villager": "achille",
+  "priority": 45,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "veillee"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "premiere-veillee"
+        }
+      ]
+    },
+    {
+      "type": "time_is",
+      "from": 1110,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.achille",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.achille",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.achille",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Je viens dormir ici, les soirs de veillée: le quai est le seul endroit où l'on trouve ça normal. Réveille-moi s'il passe un train. Ou pas.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.achille",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Ta moitié m'a mis un bol entre les mains. Il était chaud. Je me suis endormi dessus. C'est la plus belle chose de ma semaine.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.achille",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Les soirs de veillée, la pâte lève sans moi. Elle sait que je suis au quai. Une pâte, ça sent ces choses-là. Ça lève mieux.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

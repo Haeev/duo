@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "honorine-marmite",
+  "villager": "honorine",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.concours.marmite",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Votre soupe, sur ma table, avant la louche. Des légumes, de l'eau, du courage. Je goûte tout: j'ai l'estomac de mes vingt ans.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

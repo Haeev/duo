@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "id": "le-concours-de-la-soupe",
+  "kind": "side",
+  "title": "Le Concours de la soupe",
+  "giver": "honorine",
+  "requires": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-fete",
+      "title": "La louche des gardes",
+      "steps": [
+        {
+          "id": "ouverture",
+          "objective": "C'est le Concours de la soupe: retrouve ta moitié sur la place, deux marmites et une doyenne vous y attendent.",
+          "target": {
+            "point": "pl"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "les-marmites-de-la-place"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.ouverture",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.ouverture",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "marmite",
+          "objective": "Honorine veut la soupe des gardes: Margot a le panier, la cuisinière est à la maison. Porte une soupe de légumes à Honorine.",
+          "target": {
+            "villager": "honorine"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "soupe-de-legumes",
+              "count": 1,
+              "villager": "honorine"
+            },
+            {
+              "type": "remembered",
+              "key": "aubrune.fete.jour",
+              "equals": "soupe"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.marmite",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.marmite",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "louche",
+          "objective": "À qui la louche des gardes ? Vous n'avez pas goûté la même marmite: racontez-vous, décidez à deux, puis dis-le à Honorine.",
+          "target": {
+            "villager": "honorine"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "agreed"
+            },
+            {
+              "type": "talked",
+              "dialogue": "honorine-louche",
+              "node": "fin"
+            }
+          ],
+          "decision": {
+            "id": "louche-des-gardes",
+            "options": ["meres", "moulin"]
+          },
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.louche",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.louche",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "palmares",
+          "objective": "À partir de 17 h, à deux sur la place: Honorine proclame le palmarès, et le grand chaudron attend quatre bras.",
+          "target": {
+            "point": "pl"
+          },
+          "after": ["marmite", "louche"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "tous-premiers"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.palmares",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.concours.palmares",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_item",
+              "item": "soupe-aux-herbes",
+              "count": 2,
+              "to": "duo"
+            },
+            {
+              "type": "give_money",
+              "amount": 1000,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "honorine",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "odette",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "colette",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "berthe",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.concours.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

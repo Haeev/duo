@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "id": "la-nuit-des-lumignons",
+  "kind": "side",
+  "title": "La Nuit des lumignons",
+  "giver": "marthe",
+  "requires": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "la-fete",
+      "title": "Une lumière par âme",
+      "steps": [
+        {
+          "id": "ouverture",
+          "objective": "C'est la Nuit des lumignons: retrouve ta moitié sur le parvis, Marthe vous y attend avec la cire et les coquilles.",
+          "target": {
+            "point": "pv"
+          },
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "la-cire-et-la-meche"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.ouverture",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.ouverture",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "coquilles",
+          "objective": "Il manque des coquilles pour les lumignons des derniers arrivés: porte deux œufs à Marthe, sur le parvis.",
+          "target": {
+            "villager": "marthe"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "deliver",
+              "item": "oeuf",
+              "count": 2,
+              "villager": "marthe"
+            },
+            {
+              "type": "remembered",
+              "key": "aubrune.fete.jour",
+              "equals": "lumignons"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.coquilles",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.coquilles",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "pour-qui",
+          "objective": "Pour qui brûlera le lumignon de la barrière ? Décidez à deux, puis dis votre choix à Marthe.",
+          "target": {
+            "villager": "marthe"
+          },
+          "after": ["ouverture"],
+          "done": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "agreed"
+            },
+            {
+              "type": "talked",
+              "dialogue": "marthe-pour-qui",
+              "node": "fin"
+            }
+          ],
+          "decision": {
+            "id": "lumignon-des-gardes",
+            "options": ["partent", "reviennent"]
+          },
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.pour-qui",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.pour-qui",
+              "value": "fait",
+              "by": "duo"
+            }
+          ]
+        },
+        {
+          "id": "allumage",
+          "objective": "À la nuit, dès 20 h 30, à deux au passage à niveau: allumez votre lumignon à la lanterne du garde.",
+          "target": {
+            "point": "pn-s"
+          },
+          "after": ["coquilles", "pour-qui"],
+          "done": [
+            {
+              "type": "scene_seen",
+              "scene": "le-lumignon-de-la-barriere"
+            }
+          ],
+          "together": false,
+          "onStart": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.allumage",
+              "value": "ouvert",
+              "by": "duo"
+            }
+          ],
+          "onDone": [
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.allumage",
+              "value": "fait",
+              "by": "duo"
+            },
+            {
+              "type": "give_plan",
+              "plan": "lanterne"
+            },
+            {
+              "type": "change_bond",
+              "villager": "marthe",
+              "points": 30,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "firmin",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "change_bond",
+              "villager": "honorine",
+              "points": 20,
+              "to": "duo"
+            },
+            {
+              "type": "remember",
+              "key": "aubrune.lumignons.fini",
+              "value": true,
+              "by": "duo"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

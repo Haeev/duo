@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "premiere-veillee-du-quai",
+  "name": "Première veillée du quai",
+  "kind": "festival",
+  "when": {
+    "type": "weekly",
+    "weekday": "monday",
+    "seasons": []
+  },
+  "days": 7,
+  "hours": {
+    "from": 1110,
+    "to": 1320
+  },
+  "conditions": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte3.fini"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.veillee.premiere"
+      }
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "any",
+        "conditions": [
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "barrieres"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "lumignons"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "soupe"
+          },
+          {
+            "type": "remembered",
+            "key": "aubrune.fete.jour",
+            "equals": "premier-train"
+          }
+        ]
+      }
+    }
+  ],
+  "announce": true,
+  "activates": {
+    "facts": [
+      {
+        "key": "aubrune.fete.jour",
+        "value": "premiere-veillee"
+      }
+    ],
+    "villagers": [
+      "firmin",
+      "odette",
+      "basile",
+      "achille",
+      "solange",
+      "mado",
+      "ambroise",
+      "honorine",
+      "marthe",
+      "jeanne",
+      "lucie",
+      "colette",
+      "armand",
+      "paulin",
+      "margot",
+      "leon",
+      "berthe",
+      "barnabe",
+      "martial"
+    ],
+    "shop": null,
+    "scene": "la-veillee-du-quai",
+    "tune": null
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "odette-pommes",
+  "villager": "odette",
+  "priority": 52,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.premier-train.pommes",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "item_in_bag",
+        "item": "pomme",
+        "count": 2
+      }
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "item_in_bag",
+        "item": "pomme-cuite",
+        "count": 1
+      }
+    }
+  ],
+  "once": null,
+  "start": "prise",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Deux pommes de ma réserve d'hiver. Ridées, sucrées: cuites, elles valent de l'or. Le réchaud de la maison fera l'affaire.",
+      "emote": null,
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ne dis pas à Colette d'où elles viennent. Elle le sait. Tout le monde le sait. C'est moi qui l'ai dit à tout le monde.",
+      "emote": null,
+      "next": null
+    },
+    "prise": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "pomme",
+          "count": 2
+        }
+      ],
+      "next": "a1",
+      "otherwise": "plein"
+    },
+    "plein": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Tes poches débordent. Fais de la place: mes pommes d'hiver ne voyagent pas dans les mains.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "id": "les-marmites-de-la-place",
+  "title": "Les marmites de la place",
+  "together": true,
+  "roles": {
+    "a": "À la marmite des mères",
+    "b": "À la marmite du moulin"
+  },
+  "trigger": {
+    "at": null,
+    "when": [
+      {
+        "type": "remembered",
+        "key": "aubrune.fete.jour",
+        "equals": "soupe"
+      },
+      {
+        "type": "time_is",
+        "from": 600,
+        "to": 1020
+      },
+      {
+        "type": "reach",
+        "point": "pl",
+        "who": "both",
+        "radius": 8
+      }
+    ],
+    "repeat": "daily"
+  },
+  "beats": [
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Concours de la soupe d'Aubrune. Règlement: on goûte tout, on ne recrache rien, et la doyenne a toujours raison. C'est moi.",
+      "emote": "joy",
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "odette",
+      "text": "Marmite numéro un: la soupe de nos mères. À quatre mains. Je sale, Colette goûte. On a failli s'entendre.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "berthe",
+      "text": "Marmite numéro deux: la panade du moulin. Du pain d'Achille, du bouillon, et le temps qu'il faut. Ma meule a tout surveillé.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "On te tend une cuillère de la soupe des mères. Du laurier, des petits dés. Ta moitié goûte l'autre marmite, pas celle-ci.",
+      "emote": null,
+      "sound": null,
+      "to": "a",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "On te tend une cuillère de panade. Épaisse, dorée, un goût de croûte. Ta moitié goûte l'autre marmite, pas celle-ci.",
+      "emote": null,
+      "sound": null,
+      "to": "b",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Vous n'avez pas goûté la même soupe. Racontez-vous: il faudra décider à deux à qui va la louche des gardes.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "await",
+      "parts": [
+        {
+          "role": "a",
+          "hint": "Trinque de ta cuillère avec ta moitié: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        },
+        {
+          "role": "b",
+          "hint": "Trinque de ta cuillère avec ta moitié: appuie.",
+          "done": [],
+          "gesture": {
+            "type": "press"
+          }
+        }
+      ],
+      "together": 0.5
+    },
+    {
+      "do": "say",
+      "who": "narrator",
+      "text": "Deux cuillères qui trinquent, ça fait un petit bruit de cloche. Marthe relève la tête.",
+      "emote": null,
+      "sound": "Ting !",
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "say",
+      "who": "honorine",
+      "text": "Et la marmite des gardes ? Un concours où le jury ne risque rien n'est pas un concours. Je veux votre soupe sur ma table.",
+      "emote": null,
+      "sound": null,
+      "to": "both",
+      "seconds": null
+    },
+    {
+      "do": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.fete.jour",
+          "value": "soupe",
+          "by": "duo"
+        }
+      ]
+    }
+  ]
+}

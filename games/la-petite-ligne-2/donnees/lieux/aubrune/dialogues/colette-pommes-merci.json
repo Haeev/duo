@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "colette-pommes-merci",
+  "villager": "colette",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.premier-train.pommes",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "premier-train"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "pomme-cuite",
+      "count": 2
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Deux pommes cuites ! Elles fument encore. Je les mets au bout de la table, côté voie: c'est la place du voyageur.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "On garde toujours une part pour qui arrive en retard. Personne ne sait pour qui. Tout le monde a son idée.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

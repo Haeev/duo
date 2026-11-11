@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "honorine-marmite-merci",
+  "villager": "honorine",
+  "priority": 57,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.concours.marmite",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "soupe"
+    },
+    {
+      "type": "item_in_bag",
+      "item": "soupe-de-legumes",
+      "count": 1
+    }
+  ],
+  "once": null,
+  "start": "a1",
+  "nodes": {
+    "a1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Hmm. ... Hmm ! Les carottes ont du caractère. Les poireaux aussi. On dirait qu'ils se disputent. J'adore.",
+      "emote": "joy",
+      "next": "a2"
+    },
+    "a2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Elle concourt. Catégorie « gardes ». Victoire garantie: c'est moi qui ai fait les catégories.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

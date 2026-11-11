@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "id": "mado-fete-lumignons",
+  "villager": "mado",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 120
+    }
+  ],
+  "once": null,
+  "start": "heure",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.mado",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.mado",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.mado",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "J'ai tordu vingt supports en fil de fer, pour le vent. Marthe a dit merci. Marthe ! Ha ! Je l'ai noté sur l'enclume.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.mado",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Ta moitié s'est brûlé les doigts à la cire ? Non ? Dommage: j'ai une pommade de forge qui sent le goudron. J'adore la prêter.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.mado",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Une forge, c'est un gros lumignon qui fait du bruit. Ce soir, je la laisse rougir, porte ouverte. Ça fera deux lumières.",
+      "emote": null,
+      "next": null
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1230,
+              "to": 120
+            }
+          ],
+          "next": "nuit"
+        }
+      ],
+      "otherwise": "tour"
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "mado",
+      "text": "Sur l'enclume. Pour mon père, qui m'a appris à taper droit. Et pour le fer: on ne le remercie jamais, le fer.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

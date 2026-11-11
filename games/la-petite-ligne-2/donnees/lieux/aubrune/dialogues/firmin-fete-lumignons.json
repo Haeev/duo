@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "id": "firmin-fete-lumignons",
+  "villager": "firmin",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 120
+    }
+  ],
+  "once": null,
+  "start": "heure",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.firmin",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.firmin",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.firmin",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Extinction prévue: aucune. C'est la seule nuit de l'année sans horaire. Je ne sais pas quoi faire de mes mains.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.firmin",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié et toi, vous prendrez la flamme à la lanterne du garde. Elle est allumée depuis vous. Je vérifie tous les soirs.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.firmin",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Trente ans sans lumignons. Marthe gardait les bouts de cierge quand même, dans une boîte à biscuits. Elle dit que c'était pour la cire.",
+      "emote": null,
+      "next": null
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1230,
+              "to": 120
+            }
+          ],
+          "next": "nuit"
+        }
+      ],
+      "otherwise": "tour"
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le mien est sur la lisse, à côté du vôtre. Pour mon oncle. Qu'il parte ou qu'il revienne, il verra de la lumière. Il a horreur du noir.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

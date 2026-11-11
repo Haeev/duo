@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "id": "barnabe-fete-lumignons",
+  "villager": "barnabe",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 120
+    }
+  ],
+  "once": null,
+  "start": "heure",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.barnabe",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.barnabe",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.barnabe",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "J'ai apporté des écorces de châtaignier: ça flotte, ça porte une coquille. Berthe en veut une pour la rivière. Je chante en les taillant.",
+      "emote": null,
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.barnabe",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Ta moitié a une belle voix pour dire « attention, c'est chaud ». On l'entend du bout du parvis. Je la veux dans ma chanson.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.barnabe",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Dans le bois, la nuit, je n'allume jamais rien. Les bêtes n'aiment pas. Ce soir, je leur ai demandé pardon d'avance.",
+      "emote": null,
+      "next": null
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1230,
+              "to": 120
+            }
+          ],
+          "next": "nuit"
+        }
+      ],
+      "otherwise": "tour"
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "barnabe",
+      "text": "Devant la forge, à côté de celui de Mado. Pour les arbres que j'ai couchés. Un bûcheron qui ne dit pas merci, c'est un voleur.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

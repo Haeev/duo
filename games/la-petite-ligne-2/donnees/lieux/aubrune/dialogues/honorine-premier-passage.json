@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "id": "honorine-premier-passage",
+  "villager": "honorine",
+  "priority": 55,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.barrieres.passage",
+      "equals": "ouvert"
+    },
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "barrieres"
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "theirs"
+            }
+          ],
+          "next": "autre"
+        }
+      ],
+      "otherwise": "n1"
+    },
+    "autre": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Ta moitié m'a déjà dit son idée. Je ne te la souffle pas: à toi de dire la tienne.",
+      "emote": null,
+      "next": "n1"
+    },
+    "n1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Quand la lisse remonte, le premier qui passe dessous a droit à un vœu. De mon temps, c'était la doyenne. La doyenne, c'est moi.",
+      "emote": null,
+      "next": "n2"
+    },
+    "n2": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Jeanne prétend que c'est aux enfants: ils ont plus de vœux à faire. Les gardes tranchent. À deux, et à voix haute.",
+      "emote": null,
+      "next": "n3"
+    },
+    "n3": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "doyenne",
+          "text": "La doyenne d'abord.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "premier-passage",
+              "option": "doyenne"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "enfants",
+          "text": "Les enfants d'abord.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "premier-passage",
+              "option": "enfants"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "attendre-1": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Parlez. J'ai attendu trente ans que cette barrière redescende, je peux attendre un quart d'heure.",
+      "emote": null,
+      "next": null
+    },
+    "accord": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "agreed",
+              "option": "doyenne"
+            }
+          ],
+          "next": "accord-doyenne"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "agreed",
+              "option": "enfants"
+            }
+          ],
+          "next": "accord-enfants"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "premier-passage",
+              "state": "split"
+            }
+          ],
+          "next": "desaccord"
+        }
+      ],
+      "otherwise": "une-voix"
+    },
+    "une-voix": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Une voix. Il m'en faut deux, et la même. Va chercher ta moitié, je ne bouge pas d'ici.",
+      "emote": null,
+      "next": null
+    },
+    "desaccord": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Deux gardes, deux avis. Mettez-vous d'accord, et revenez me le dire. Je compte les pétales en attendant.",
+      "emote": null,
+      "next": null
+    },
+    "fin": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Va le dire à Jeanne. Elle a parié sur votre réponse, et je veux voir sa tête.",
+      "emote": null,
+      "next": null
+    },
+    "accord-doyenne": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.barrieres.premier",
+          "value": "doyenne",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-doyenne"
+    },
+    "dit-doyenne": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Sage décision. Mon vœu est prêt depuis 1951. Il a un peu jauni, mais il servira.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "accord-enfants": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.barrieres.premier",
+          "value": "enfants",
+          "by": "duo"
+        }
+      ],
+      "next": "dit-enfants"
+    },
+    "dit-enfants": {
+      "kind": "line",
+      "speaker": "honorine",
+      "text": "Les enfants. Bon. Je passerai deuxième et je ferai deux vœux: personne ne compte les vœux des vieilles.",
+      "emote": "joy",
+      "next": "fin"
+    }
+  }
+}

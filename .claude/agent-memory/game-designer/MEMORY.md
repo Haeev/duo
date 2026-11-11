@@ -400,3 +400,19 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le dialogue `<commerçant>-boutique-fermee` (priorité 1) passe devant le quotidien aux heures de fermeture: la réplique de nuit d'un commerçant ne s'entend pas.
 - Un texte d'« adoré » qui nomme l'objet demande un seul objet adoré dans la fiche, ou une condition sur la valeur du fait (`equals`).
 - Générateur: `gdhab/lib.py` du scratchpad (souvenir à variante, secret à paliers, quotidien par planning, ajout de météo à un quotidien existant); 430 répliques en une passe, un seul refus du validateur d'accords (« vous vous êtes donné »).
+
+## Fêtes et calendrier en données (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Le jour de jeu va d'une aube (6 h) à l'autre: `weekday_is`, `season_is`, le filtre `days` d'un planning et la date d'un événement valent encore après minuit. Les heures d'un événement peuvent passer minuit (10 h à 2 h). Saisons de 14 jours, jour 1 = lundi: le 13 de chaque saison est un samedi (jours 13, 27, 41, 55, puis + 56).
+- Un événement n'écrit que ses faits, à son début: `activates.villagers` et `activates.scene` ne sont lus par rien, aucune condition ne dit « événement en cours ». Présence: lignes de planning (`days`, `seasons`, `when` sur un fait du jour); scènes: `trigger` `daily`; le fait du jour s'efface par un événement du matin (6 h à 10 h, `weekly` avec `days: 7`).
+- `quetes/valider.ts` (`collectFacts`) ne voit pas les faits écrits par les événements: une scène ou une suite qui les attend est refusée. Contournement: un `remember` identique dans la scène d'ouverture.
+- Une étape écrit `aubrune.<suite>.<étape>`: ne jamais donner ce nom à un autre fait (l'étape `bouquet` passait toute seule, la décision `louche` valait « ouvert »).
+- `handOver` ne remet que les `deliver` de premier niveau de `done`: pas de `deliver` dans un `any`. Pour « ceci ou cela », deux dialogues à effet `take_item` qui écrivent un fait. `deliver` plus un fait dans `done`: l'objet n'est remis que ce jour-là.
+- Une réplique de priorité 10 ou plus sans `once` cache l'offre de boutique: un commerçant en fête ne vend pas. Donner sur place ce que l'activité demande (dialogue 52 à effets `give_item`, `otherwise` pour les poches pleines).
+- Deux événements qui démarrent au même pas écrivent leurs faits dans l'ordre des noms de fichiers: dans un essai, ne pas sauter d'un coup par-dessus deux débuts.
+- L'annonce de la veille évalue les conditions de l'événement la veille: une règle `weekly` qui doit sauter un jour de fête serait annoncée à tort. Préférer une fiche `date` par saison (veillée le samedi 6, fête le samedi 13).
+- Plusieurs habitants au même point: le moteur les range en couronne (cinq ou six par point tiennent); `{ "seat": "<banc>" }` en assoit un.
+- Dans un essai, un habitant dit d'abord ses `once` (arrivée 50, cadeau 58): parler jusqu'à entendre le dialogue voulu. Le premier nœud noté est la première réplique (les nœuds d'effets et d'aiguillage ne se voient pas).
+- Cohérence: Honorine a 89 ans, Marthe 76 (pas de souvenir d'enfance commun avant 1941); Paulin est un nouveau venu (pas de « de mon temps »); le registre compte 19 habitants et 2 gardes depuis Martial; ne pas faire dire un secret d'amitié (la meule Marguerite, la chicorée, la montre de Rosalie) dans une réplique sans condition.
+- Garde de l'arbre isolé: un heredoc à parenthèses ou un `cd` vers le scratchpad est refusé. Écrire les scripts par l'outil d'écriture, les lancer depuis l'arbre avec des chemins en arguments.
+- Générateur: `gdfetes/` du scratchpad (`textes.py`: tables de répliques par fête; `fetes.py`: événements, plannings, tournantes, décisions, scènes, suites; il tient le journal de ses fiches et refuse d'écraser les autres). 392 répliques en une passe, un seul texte trop long.

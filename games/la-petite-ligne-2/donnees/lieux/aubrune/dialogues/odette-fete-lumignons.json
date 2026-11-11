@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "id": "odette-fete-lumignons",
+  "villager": "odette",
+  "priority": 45,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.fete.jour",
+      "equals": "lumignons"
+    },
+    {
+      "type": "time_is",
+      "from": 600,
+      "to": 120
+    }
+  ],
+  "once": null,
+  "start": "heure",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.odette",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.odette",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.odette",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Des coquilles d'œuf ! Tu sais ce que ça représente, comme omelettes ? Colette a tout récupéré. On mange à huit heures.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.odette",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Ta moitié verse la cire comme on verse une sauce: du poignet. Ça ne s'apprend pas. Ça se mérite.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.odette",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Je sais pour qui tout le monde allume. Tout le monde. Je ne dirai rien. ... Demande-moi quand même, à la nuit.",
+      "emote": null,
+      "next": null
+    },
+    "heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "time_is",
+              "from": 1230,
+              "to": 120
+            }
+          ],
+          "next": "nuit"
+        }
+      ],
+      "otherwise": "tour"
+    },
+    "nuit": {
+      "kind": "line",
+      "speaker": "odette",
+      "text": "Le mien est sous la tonnelle, à la place du bout. Pour les pensionnaires qui ne sont pas rentrés. La soupe les attend toujours.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

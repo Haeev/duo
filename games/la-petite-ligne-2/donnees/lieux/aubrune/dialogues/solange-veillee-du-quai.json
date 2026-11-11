@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "solange-veillee-du-quai",
+  "villager": "solange",
+  "priority": 45,
+  "when": [
+    {
+      "type": "any",
+      "conditions": [
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "veillee"
+        },
+        {
+          "type": "remembered",
+          "key": "aubrune.fete.jour",
+          "equals": "premiere-veillee"
+        }
+      ]
+    },
+    {
+      "type": "time_is",
+      "from": 1110,
+      "to": 1320
+    }
+  ],
+  "once": null,
+  "start": "tour",
+  "nodes": {
+    "tour": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.solange",
+              "equals": 1
+            }
+          ],
+          "next": "e2"
+        },
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.tour-fete.solange",
+              "equals": 2
+            }
+          ],
+          "next": "e3"
+        }
+      ],
+      "otherwise": "e1"
+    },
+    "e1": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.solange",
+          "value": 1,
+          "by": "duo"
+        }
+      ],
+      "next": "l1"
+    },
+    "l1": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "À la veillée, le bourg se donne en spectacle sur un quai, sans texte et sans metteur en scène. C'est ce que j'ai vu de mieux joué.",
+      "emote": "joy",
+      "next": null
+    },
+    "e2": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.solange",
+          "value": 2,
+          "by": "duo"
+        }
+      ],
+      "next": "l2"
+    },
+    "l2": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Ta moitié a un excellent sens de la réplique. Toi aussi. Mais pas en même temps: vous vous coupez. Travaillez ça.",
+      "emote": null,
+      "next": null
+    },
+    "e3": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.tour-fete.solange",
+          "value": 0,
+          "by": "duo"
+        }
+      ],
+      "next": "l3"
+    },
+    "l3": {
+      "kind": "line",
+      "speaker": "solange",
+      "text": "Jeanne devrait être couchée. Je fais semblant de ne pas la voir derrière le banc. Elle fait semblant d'être un sac postal.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
