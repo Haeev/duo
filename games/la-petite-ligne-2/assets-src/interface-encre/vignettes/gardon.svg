@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Gardon (de profil): poisson blanc trapu, dos gris-vert, flanc d'argent à écailles, œil rouge et nageoires rouges. -->
+  <g transform="translate(0 3) rotate(-12 48 48)">
+    <path d="M68 48 L90 28 Q84 48 90 68 Z" fill="#C5443D"/>
+    <path data-w="0" d="M80 50 L90 68 L72 50 Z" fill="#8F3B34"/>
+    <path d="M36 30 Q42 14 56 26 L54 30 Z" fill="#C5443D"/>
+    <path id="corps" d="M6 50 Q14 26 42 26 Q64 26 74 48 Q64 68 42 70 Q14 70 6 50 Z" fill="#B9B7B0"/>
+    <path data-clip="corps" data-w="0" d="M0 16 L90 16 L90 44 Q50 34 0 42 Z" fill="#638784"/>
+    <path data-clip="corps" data-w="0" d="M0 58 Q40 56 80 50 L80 80 L0 80 Z" fill="#F3EDE0"/>
+    <path data-clip="corps" data-w="0" d="M10 42 Q16 32 30 30 L28 34 Q20 36 13 44 Z" fill="#F7F3EA"/>
+    <g data-teinte="#7C705F" data-w="0.26" fill="none" stroke="#000"><path d="M32 46 q3 -2 6 0 M44 47 q3 -2 6 0 M56 47 q3 -2 6 0 M38 54 q3 -2 6 0 M50 55 q3 -2 6 0 M62 53 q3 -2 6 0 M38 40 q3 -2 6 0 M50 40 q3 -2 6 0"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M22 36 Q29 48 22 62"/>
+    <path d="M30 62 Q38 68 33 76 Q26 70 30 62 Z" fill="#C5443D" data-w="0.6"/>
+    <path d="M54 66 Q62 70 60 78 Q52 74 54 66 Z" fill="#C5443D" data-w="0.6"/>
+    <circle cx="15" cy="46" r="5" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="15.5" cy="46" r="3.2" fill="#C5443D" data-w="0"/>
+    <circle cx="15.8" cy="46" r="1.6" fill="#231A17" data-w="0"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M6 51 L11 52"/>
+  </g>
+</svg>

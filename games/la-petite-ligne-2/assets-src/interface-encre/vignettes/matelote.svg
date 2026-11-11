@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Matelote du bief: cocotte de fonte verte à anses, sauce au vin brun rouge, morceaux de poisson blancs, rondelles de poireau vert pâle, vapeur. -->
+  <g data-w="0.5" fill="none" stroke="#000"><path d="M34 24 Q28 16 34 10 Q38 6 34 2 M50 22 Q56 14 50 8 M64 24 Q58 16 64 10"/></g>
+  <g transform="rotate(-4 48 58)">
+    <path d="M4 48 Q0 56 8 58 L12 54 Q8 52 10 50 Z" fill="#3F6453"/>
+    <path d="M92 48 Q96 56 88 58 L84 54 Q88 52 86 50 Z" fill="#3F6453"/>
+    <path id="cocotte" d="M8 44 Q10 80 48 84 Q86 80 88 44 Z" fill="#3F6453"/>
+    <path data-clip="cocotte" data-w="0" d="M62 40 Q72 80 18 88 L96 96 L96 40 Z" fill="#25392F"/>
+    <path data-clip="cocotte" data-w="0" d="M14 50 L22 50 Q22 64 28 74 Q16 68 14 50 Z" fill="#5E8A72"/>
+    <ellipse cx="48" cy="44" rx="41" ry="12" fill="#5E8A72" data-w="0.8"/>
+    <ellipse id="sauce" cx="48" cy="45" rx="35" ry="8.5" fill="#A85837"/>
+    <ellipse data-clip="sauce" data-w="0" cx="56" cy="49" rx="36" ry="8" fill="#743D2B"/>
+    <path data-clip="sauce" data-w="0" d="M18 44 Q28 39 42 39 Q30 41 22 46 Z" fill="#D98C62"/>
+    <g data-w="0.45" fill="#F3EDE0"><path d="M28 42 Q34 38 38 42 Q34 46 28 44 Z"/><path d="M52 40 Q60 38 62 42 Q58 46 52 44 Z"/><path d="M42 48 Q48 46 50 50 Q46 52 42 50 Z"/></g>
+    <g data-w="0.4" fill="#B9C76A"><ellipse cx="66" cy="47" rx="3.6" ry="2.2"/><ellipse cx="22" cy="48" rx="3.2" ry="2"/><ellipse cx="46" cy="41" rx="3" ry="1.8"/></g>
+    <g data-w="0" fill="#F3EDE0"><ellipse cx="66" cy="47" rx="1.4" ry="0.8"/><ellipse cx="22" cy="48" rx="1.2" ry="0.7"/><ellipse cx="46" cy="41" rx="1.1" ry="0.6"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M66 74 l6 -6 M60 79 l7 -7 M54 82 l5 -5"/></g>
+  </g>
+</svg>

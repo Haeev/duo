@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Rotengle (de profil): poisson haut et plat, dos vert, flancs dorés, toutes les nageoires rouge vif, œil cerclé d'orange. -->
+  <g transform="translate(0 3) rotate(-10 48 48)">
+    <path d="M70 48 L92 26 Q84 48 92 70 Z" fill="#C5443D"/>
+    <path data-w="0" d="M82 52 L92 70 L72 50 Z" fill="#8F3B34"/>
+    <path d="M46 26 Q52 10 64 24 L60 30 Z" fill="#C5443D"/>
+    <path id="corps" d="M8 50 Q16 22 44 22 Q66 24 76 48 Q66 72 44 74 Q16 74 8 50 Z" fill="#F2C55C"/>
+    <path data-clip="corps" data-w="0" d="M0 10 L90 10 L90 40 Q50 32 0 42 Z" fill="#3F6453"/>
+    <path data-clip="corps" data-w="0" d="M0 62 Q40 60 80 52 L80 80 L0 80 Z" fill="#FFE2A0"/>
+    <path data-clip="corps" data-w="0" d="M56 20 Q86 50 40 80 L90 80 L90 20 Z" fill="#D4A33E"/>
+    <path data-clip="corps" data-w="0" d="M12 42 Q18 30 32 27 L30 31 Q22 34 15 44 Z" fill="#FFE2A0"/>
+    <g data-teinte="#8E6A26" data-w="0.26" fill="none" stroke="#000"><path d="M32 46 q3 -2 6 0 M44 46 q3 -2 6 0 M56 47 q3 -2 6 0 M38 55 q3 -2 6 0 M50 56 q3 -2 6 0 M62 54 q3 -2 6 0 M38 37 q3 -2 6 0 M50 37 q3 -2 6 0"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M23 34 Q31 48 23 64"/>
+    <path d="M30 64 Q40 70 34 80 Q26 72 30 64 Z" fill="#C5443D" data-w="0.6"/>
+    <path d="M52 70 Q62 74 60 84 Q50 78 52 70 Z" fill="#C5443D" data-w="0.6"/>
+    <path d="M26 50 Q34 52 36 58 Q28 58 26 50 Z" fill="#C5443D" data-w="0.55"/>
+    <circle cx="16" cy="46" r="5" fill="#F7F3EA" data-w="0.6"/>
+    <circle cx="16.5" cy="46" r="3.2" fill="#D9822E" data-w="0"/>
+    <circle cx="16.8" cy="46" r="1.6" fill="#231A17" data-w="0"/>
+    <path data-w="0.45" fill="none" stroke="#000" d="M8 49 L13 47"/>
+  </g>
+</svg>

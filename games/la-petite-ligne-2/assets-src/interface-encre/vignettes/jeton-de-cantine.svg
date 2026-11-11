@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Jeton de cantine: jeton rond de cuivre terni, percé au centre, rebord en relief, mot « SOUPE » frappé au-dessus du trou, taches brunes. -->
+  <g transform="rotate(8 48 50)">
+    <path id="jeton" d="M48 8 Q86 8 88 48 Q86 88 48 88 Q10 88 8 48 Q10 8 48 8 Z M48 40 Q40 40 40 48 Q40 56 48 56 Q56 56 56 48 Q56 40 48 40 Z" fill="#C0803A" fill-rule="evenodd"/>
+    <path data-clip="jeton" data-w="0" d="M72 10 Q96 66 36 92 L96 96 L96 10 Z" fill="#A85837"/>
+    <path data-clip="jeton" data-w="0" d="M14 44 Q16 22 36 14 Q22 28 22 46 Z" fill="#F2A66E"/>
+    <g data-clip="jeton" data-w="0" fill="#5E4233"><path d="M22 64 Q30 60 32 68 Q26 74 20 70 Z"/><path d="M62 74 Q70 70 72 76 Q66 80 60 78 Z"/></g>
+    <g data-teinte="#743D2B" data-w="0.42" fill="none" stroke="#000"><path d="M48 15 Q81 15 81 48 Q81 81 48 81 Q15 81 15 48 Q15 15 48 15 Z"/></g>
+    <g data-teinte="#743D2B" data-w="0.5" fill="none" stroke="#000"><path d="M28 24 Q24 24 24 27 Q24 30 28 30 Q31 30 31 33 Q31 36 27 36 M38 24 Q34 24 34 30 Q34 36 38 36 Q42 36 42 30 Q42 24 38 24 Z M46 24 L46 33 Q46 36 49 36 Q52 36 52 33 L52 24 M57 36 L57 24 L61 24 Q63 24 63 27 Q63 30 61 30 L57 30 M72 24 L67 24 L67 36 L72 36 M67 30 L71 30"/></g>
+    <g data-teinte="#743D2B" data-w="0.36" fill="none" stroke="#000"><path d="M34 66 L62 66 M38 70 L58 70"/></g>
+    <path data-w="0.35" fill="none" stroke="#000" d="M62 82 l6 -6 M70 78 l5 -5"/>
+  </g>
+</svg>

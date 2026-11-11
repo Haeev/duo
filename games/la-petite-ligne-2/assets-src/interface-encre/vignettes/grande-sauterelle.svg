@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Grande sauterelle verte (de profil, tête à gauche): vert vif, ailes repliées plus longues que le corps, très longues antennes rejetées en arrière, pattes arrière longues et fines, oviscapte en sabre. -->
+  <g data-w="0.55" fill="none" stroke="#000"><path d="M14 40 Q30 10 70 8 Q86 8 92 14 M16 38 Q40 18 76 18"/></g>
+  <g transform="translate(0 6) rotate(-6 48 48)">
+    <g data-w="0.7" fill="none" stroke="#000"><path d="M22 54 L18 68 L12 70 M30 54 L30 68 L24 70"/></g>
+    <path d="M70 56 Q84 56 92 50 Q86 60 72 60 Z" fill="#5F7340" data-w="0.55"/>
+    <path id="corps" d="M14 42 Q16 34 26 34 L70 42 Q76 48 70 56 Q50 58 28 56 Q14 54 14 42 Z" fill="#6E9241"/>
+    <path data-clip="corps" data-w="0" d="M0 50 Q50 50 96 46 L96 80 L0 80 Z" fill="#40592D"/>
+    <path id="aile" d="M30 38 Q60 34 90 40 Q86 46 32 46 Z" fill="#9DBB5B"/>
+    <path data-clip="aile" data-w="0" d="M30 44 Q60 42 92 42 L92 50 L30 50 Z" fill="#6E9241"/>
+    <g data-teinte="#40592D" data-w="0.28" fill="none" stroke="#000"><path d="M36 41 L86 42 M46 39 L74 40"/></g>
+    <path id="cuisse" d="M40 50 Q54 36 70 40 Q72 46 66 50 Q56 54 46 58 Q38 58 40 50 Z" fill="#9DBB5B"/>
+    <path data-clip="cuisse" data-w="0" d="M40 56 Q58 48 76 46 L76 70 L36 70 Z" fill="#6E9241"/>
+    <path d="M66 42 Q72 44 68 48 L48 80 L44 78 Z" fill="#6E9241" data-w="0.6"/>
+    <path data-w="0.6" fill="none" stroke="#000" d="M46 79 L54 82"/>
+    <path id="tete" d="M8 42 Q8 30 18 30 Q26 32 26 44 Q24 56 16 56 Q6 52 8 42 Z" fill="#9DBB5B"/>
+    <path data-clip="tete" data-w="0" d="M20 30 Q30 46 14 58 L30 58 L30 30 Z" fill="#6E9241"/>
+    <circle cx="15" cy="40" r="3.4" fill="#5F7340" data-w="0.5"/>
+    <circle cx="14" cy="39" r="1" fill="#F7F3EA" data-w="0"/>
+  </g>
+</svg>

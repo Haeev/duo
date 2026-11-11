@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Anguille: corps en S, tête à gauche en haut, peau lisse sans écailles, dos olive sombre, ventre jaune pâle, frange de nageoire jusqu'à la queue pointue. -->
+  <path d="M48 26 Q60 30 60 46 Q62 62 74 66 Q84 68 92 58 L90 68 Q80 78 68 74 Q52 68 50 50 Q50 36 44 32 Z" fill="#8D8A4E"/>
+  <path id="corps" d="M6 30 Q10 20 26 20 Q50 20 54 44 Q58 62 72 62 Q82 62 90 56 L88 64 Q80 74 70 74 Q48 74 42 52 Q38 34 26 34 Q16 34 10 40 Q4 38 6 30 Z" fill="#55553E"/>
+  <path data-clip="corps" data-w="0" d="M4 36 Q14 30 26 31 Q42 32 46 52 Q50 70 70 71 Q82 71 92 60 L94 80 L0 80 Z" fill="#FFE2A0"/>
+  <path data-clip="corps" data-w="0" d="M10 28 Q14 22 26 22 L24 25 Q16 25 12 30 Z" fill="#8D8A4E"/>
+  <path data-clip="corps" data-w="0" d="M50 42 Q54 58 66 62 Q56 64 52 56 Z" fill="#8D8A4E"/>
+  <g data-teinte="#2A3A3C" data-w="0.3" fill="none" stroke="#000"><path d="M30 24 Q44 26 48 40 M58 52 Q62 60 72 62"/></g>
+  <path data-w="0.45" fill="none" stroke="#000" d="M18 22 Q21 28 18 34"/>
+  <path d="M20 34 Q26 36 24 42 Q20 40 20 34 Z" fill="#8D8A4E" data-w="0.5"/>
+  <circle cx="11" cy="27" r="3" fill="#F7F3EA" data-w="0.5"/>
+  <circle cx="11.4" cy="27" r="1.5" fill="#231A17" data-w="0"/>
+  <path data-w="0.45" fill="none" stroke="#000" d="M5 32 L10 32"/>
+  <g data-w="0.35" fill="none" stroke="#000"><path d="M62 70 l5 -5 M68 72 l5 -5 M44 60 l5 -5"/></g>
+</svg>

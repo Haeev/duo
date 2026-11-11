@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Sachet de graines de tournesol: bande moutarde, tournesol (couronne jaune, cœur brun), graines rayées noir et blanc. Écrit par generer-sachets.mjs: modifier le script, pas ce fichier. -->
+  <g transform="rotate(-7 48 48)">
+    <path id="sachet" d="M22 18 L30 14 L38 19 L46 13 L54 18 L62 13 L70 18 L74 84 L20 86 Z" fill="#F5E6C6"/>
+    <path data-clip="sachet" data-w="0" d="M60 10 L80 10 L80 90 L40 90 Q66 60 60 10 Z" fill="#DDC59C"/>
+    <g data-clip="sachet" data-teinte="#A88C6C" data-w="0.3" fill="none" stroke="#000"><path d="M22 40 L28 40 M66 46 L72 46 M24 80 L30 74"/></g>
+    <path d="M24 26 L71 24 L72 32 L25 34 Z" fill="#D4A33E" data-w="0.6"/>
+    <path id="fleur" data-w="0.5" d="M48 38 L51 44 L56 40 L56 46 L62 45 L59 50 L65 53 L59 56 L62 61 L56 61 L56 67 L51 63 L48 69 L45 63 L40 67 L40 61 L34 61 L37 56 L31 53 L37 50 L34 45 L40 46 L40 40 L45 44 Z" fill="#F2C55C"/>
+    <path data-clip="fleur" data-w="0" d="M58 38 Q68 62 44 72 L70 72 L70 38 Z" fill="#D4A33E"/>
+    <circle cx="48" cy="53" r="8" fill="#5E4233" data-w="0.5"/>
+    <g data-w="0" fill="#8C5A35"><circle cx="45" cy="51" r="1"/><circle cx="50" cy="50" r="1"/><circle cx="47" cy="55" r="1"/><circle cx="51" cy="55" r="1"/></g>
+    <g data-w="0.4" fill="none" stroke="#000"><path d="M28 81 L40 81"/></g>
+  </g>
+  <g data-w="0.45" fill="#26282E"><path d="M75.6 91 L78 84 L80.4 91 Z"/><path d="M84.6 86 L87 79 L89.4 86 Z"/><path d="M82.6 95 L85 88 L87.4 95 Z"/></g><g data-w="0" fill="#F3EDE0"><path d="M77.6 90.6 L78 85.6 L78.4 90.6 Z"/><path d="M86.6 85.6 L87 80.6 L87.4 85.6 Z"/><path d="M84.6 94.6 L85 89.6 L85.4 94.6 Z"/></g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Pointe de silex: pointe de flèche taillée, pointe en haut, deux ailerons et un pédoncule, bords dentelés, silex gris-bleu à facettes d'éclats et patine blonde. -->
+  <g transform="rotate(14 48 50)">
+    <path id="pointe" d="M48 6 L52 14 L54 14 L56 22 L58 22 L60 32 L62 32 L64 44 L66 44 L68 58 L72 74 L60 66 L54 66 L54 84 L42 84 L42 66 L36 66 L24 74 L28 58 L30 44 L32 44 L34 32 L36 32 L38 22 L40 22 L42 14 L44 14 Z" fill="#8C99A3"/>
+    <path data-clip="pointe" data-w="0" d="M52 4 Q62 50 40 90 L90 90 L90 4 Z" fill="#5A646C"/>
+    <path data-clip="pointe" data-w="0" d="M30 60 Q34 40 44 20 Q42 40 40 64 Z" fill="#B3BEC4"/>
+    <path data-clip="pointe" data-w="0" d="M40 70 L58 70 L58 90 L40 90 Z" fill="#CDBB96"/>
+    <g data-clip="pointe" data-teinte="#5A646C" data-w="0.32" fill="none" stroke="#000"><path d="M48 12 L44 30 L52 46 L46 62 M44 30 L36 40 M52 46 L62 54 M44 30 L56 26 M46 62 L34 60"/></g>
+    <g data-clip="pointe" data-teinte="#8F7F66" data-w="0.3" fill="none" stroke="#000"><path d="M44 72 L52 76 M46 80 L52 78"/></g>
+    <path data-w="0" d="M40 36 L44 24 L42 38 Z" fill="#F7F3EA"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Tournesol (fleur coupée): grand capitule qui remplit la case, couronne de pétales jaunes, gros cœur brun en grains, tige épaisse et feuille en cœur. -->
+  <path d="M48 70 L44 94 L52 94 L54 70 Z" fill="#6E9241"/>
+  <path d="M50 82 Q70 72 86 80 Q76 94 54 88 Z" fill="#6E9241" data-w="0.6"/>
+  <path data-w="0" d="M54 86 Q70 82 84 82 Q74 92 56 90 Z" fill="#40592D"/>
+  <path id="petales" d="M48 4 L54 16 L64 6 L66 20 L80 14 L76 28 L90 28 L82 40 L94 46 L82 52 L90 64 L76 64 L78 78 L64 72 L60 86 L50 76 L42 88 L36 74 L22 80 L24 66 L8 66 L16 54 L4 46 L16 38 L8 26 L22 26 L18 12 L32 18 L34 6 L42 16 Z" fill="#F2C55C"/>
+  <path data-clip="petales" data-w="0" d="M70 6 Q96 60 40 90 L96 96 L96 6 Z" fill="#D4A33E"/>
+  <path data-clip="petales" data-w="0" d="M14 34 Q20 18 36 12 Q26 26 24 40 Z" fill="#FFE2A0"/>
+  <g data-teinte="#8E6A26" data-w="0.3" fill="none" stroke="#000"><path d="M48 10 L48 18 M74 22 L68 28 M86 46 L78 46 M74 70 L68 64 M48 82 L48 74 M22 70 L28 64 M10 46 L18 46 M22 22 L28 28"/></g>
+  <circle id="coeur" cx="48" cy="46" r="20" fill="#5E4233"/>
+  <path data-clip="coeur" data-w="0" d="M58 22 Q76 56 40 70 L80 70 L80 22 Z" fill="#4F3626"/>
+  <g data-w="0" fill="#8C5A35"><circle cx="40" cy="38" r="2"/><circle cx="48" cy="34" r="2"/><circle cx="56" cy="38" r="2"/><circle cx="36" cy="46" r="2"/><circle cx="44" cy="44" r="2"/><circle cx="52" cy="44" r="2"/><circle cx="60" cy="46" r="2"/><circle cx="40" cy="54" r="2"/><circle cx="48" cy="52" r="2"/><circle cx="56" cy="54" r="2"/><circle cx="48" cy="60" r="2"/></g>
+  <path data-w="0" d="M34 40 Q36 32 44 30 Q38 36 37 44 Z" fill="#96704C"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Papillon citron (vu de dessus, ailes ouvertes): ailes pointues jaune citron uni, nervures vert pâle, un point orange au milieu de chaque aile, corps brun, antennes à massue. -->
+  <g transform="rotate(-8 48 50)">
+    <path id="ad" d="M50 40 Q66 18 86 12 Q84 30 76 44 Q64 50 50 46 Z" fill="#F2C55C"/>
+    <path data-clip="ad" data-w="0" d="M86 10 Q80 40 52 46 L90 52 Z" fill="#D4A33E"/>
+    <path id="pd" d="M50 48 Q68 50 78 62 Q78 70 72 74 L74 80 Q62 80 56 72 Q50 64 49 56 Z" fill="#F2C55C"/>
+    <path data-clip="pd" data-w="0" d="M78 56 Q72 80 52 66 L60 90 L90 90 Z" fill="#D4A33E"/>
+    <path id="ag" d="M46 40 Q30 18 10 12 Q12 30 20 44 Q32 50 46 46 Z" fill="#F2C55C"/>
+    <path data-clip="ag" data-w="0" d="M12 16 Q18 26 24 32 Q20 22 14 14 Z" fill="#FFE2A0"/>
+    <path id="pg" d="M46 48 Q28 50 18 62 Q18 70 24 74 L22 80 Q34 80 40 72 Q46 64 47 56 Z" fill="#F2C55C"/>
+    <path data-clip="pg" data-w="0" d="M22 56 Q26 52 34 51 Q26 56 24 62 Z" fill="#FFE2A0"/>
+    <g data-teinte="#93A84E" data-w="0.3" fill="none" stroke="#000"><path d="M46 42 Q30 30 16 18 M46 44 Q32 40 20 40 M50 42 Q66 30 80 18 M50 44 Q64 40 76 40 M46 52 Q32 58 24 70 M50 52 Q64 58 72 70"/></g>
+    <g data-w="0" fill="#D9822E"><circle cx="30" cy="36" r="2"/><circle cx="66" cy="36" r="2"/><circle cx="34" cy="62" r="2.2"/><circle cx="62" cy="62" r="2.2"/></g>
+    <path d="M48 32 Q51 34 51 46 Q51 62 48 70 Q45 62 45 46 Q45 34 48 32 Z" fill="#5E4233" data-w="0.6"/>
+    <circle cx="48" cy="30" r="3.2" fill="#5E4233" data-w="0.55"/>
+    <g data-w="0.5" fill="none" stroke="#000"><path d="M47 28 Q42 18 38 12 M49 28 Q54 18 58 12"/></g>
+    <g data-w="0" fill="#231A17"><circle cx="38" cy="12" r="1.4"/><circle cx="58" cy="12" r="1.4"/></g>
+  </g>
+</svg>

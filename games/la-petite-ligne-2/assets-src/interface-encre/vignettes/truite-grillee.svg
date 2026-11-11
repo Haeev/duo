@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Truite grillée: assiette crème à liseré bleu, truite entière dorée de profil (tête à gauche), bande rose, marques de gril, rondelle de citron. -->
+  <g transform="rotate(-4 48 56)">
+    <ellipse id="assiette" cx="48" cy="60" rx="44" ry="25" fill="#F3EDE0"/>
+    <path data-clip="assiette" data-w="0" d="M66 32 Q84 86 18 92 L96 96 L96 32 Z" fill="#D9CAAE"/>
+    <g data-teinte="#44618A" data-w="0.4" fill="none" stroke="#000"><ellipse cx="48" cy="60" rx="38.5" ry="20.5"/></g>
+    <path d="M70 56 L86 44 Q82 56 86 68 L70 60 Z" fill="#C0803A" data-w="0.6"/>
+    <path id="truite" d="M10 58 Q22 44 44 44 Q64 46 74 58 Q64 70 44 72 Q22 72 10 58 Z" fill="#D4A33E"/>
+    <path data-clip="truite" data-w="0" d="M0 40 L90 40 L90 54 Q50 48 0 56 Z" fill="#C0803A"/>
+    <path data-clip="truite" data-w="0" d="M10 60 Q40 56 76 59 L76 63 Q40 60 10 64 Z" fill="#CC9C96"/>
+    <path data-clip="truite" data-w="0" d="M0 66 Q40 66 80 62 L80 80 L0 80 Z" fill="#F2C55C"/>
+    <g data-clip="truite" data-w="0" fill="#5E4233"><path d="M28 44 L32 44 L26 72 L22 72 Z"/><path d="M42 44 L46 44 L40 72 L36 72 Z"/><path d="M56 44 L60 46 L54 72 L50 72 Z"/></g>
+    <path data-w="0.45" fill="none" stroke="#000" d="M22 50 Q26 58 22 66"/>
+    <circle cx="16" cy="56" r="2.6" fill="#F7F3EA" data-w="0.45"/>
+    <circle cx="16.3" cy="56" r="1.2" fill="#231A17" data-w="0"/>
+    <circle id="citron" cx="70" cy="74" r="9" fill="#F2C55C"/>
+    <circle cx="70" cy="74" r="6.4" fill="#FFE2A0" data-w="0.35"/>
+    <g data-teinte="#D4A33E" data-w="0.32" fill="none" stroke="#000"><path d="M70 68 L70 80 M64 74 L76 74 M66 70 L74 78 M74 70 L66 78"/></g>
+    <g data-w="0.4" fill="#6E9241"><circle cx="34" cy="78" r="1.6"/><circle cx="40" cy="80" r="1.4"/><circle cx="50" cy="40" r="1.4"/></g>
+  </g>
+</svg>

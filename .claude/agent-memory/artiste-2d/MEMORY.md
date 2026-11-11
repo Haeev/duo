@@ -50,3 +50,9 @@
 - Firmin et le Contrôleur portent la même tenue en jeu: le Contrôleur se distingue par le visage long et glabre et le bonnet enfoncé sur les yeux (cahier: « on ne voit jamais ses yeux »), ses expressions passent par la bouche seule.
 - Fiches incohérentes avec l'âge (sourcils gris chez Margot): suivre les cheveux et l'écrire dans la `note`; peau sombre: garder les sourcils clairs de la fiche (bible 2.4).
 - Le cache de modules de Vitest (`node_modules/.vitest-cache`) ne voit pas un SVG ajouté ou retiré derrière `import.meta.glob`: après un portrait nouveau, `pnpm exec vitest run --clearCache` avant le test, sinon faux échec ou faux succès.
+
+## La Petite Ligne 2: vignettes des collections (2026-11-11)
+
+- Le carnet montre une entrée par `itemThumb(thumb)`: `source.item` pour une recette (le plat), sinon l'id de l'entrée (insectes, trésors posés à la main). Planche: `planche-collections.cjs <dossier> <famille>` (44 px sombre et papier). Sachets de fleurs générés par `generer-sachets.mjs`.
+- Petites formes dans un sachet ou une fleur étoilée: `data-w` 0,5 sur la forme, sinon le contour plein en fait une tache noire à 44 px. Pas de `fill-opacity` dans les vignettes: peindre l'ombre avant les motifs, en ton opaque.
+- Un clou à tête ronde vu de face se lit loupe: montrer la tranche de la tête (ellipse sombre décalée) et une tige trapue en biseau. Insectes en diagonale: garder les pattes à moins de 40 du centre, sinon la rotation les coupe.

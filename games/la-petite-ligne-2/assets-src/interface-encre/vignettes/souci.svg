@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Souci (fleur coupée): fleur ronde à pétales serrés sur deux rangs, jaune d'œuf à cœur orange, tige épaisse et feuille allongée. -->
+  <path data-w="0.8" fill="none" stroke="#000" d="M50 60 Q48 78 40 94"/>
+  <path d="M46 78 Q30 76 22 64 Q36 62 46 72 Z" fill="#6E9241" data-w="0.6"/>
+  <path data-w="0" d="M44 74 Q34 70 26 66 Q36 66 46 72 Z" fill="#40592D"/>
+  <path id="rang" d="M48 8 L54 16 L62 10 L64 20 L74 18 L72 28 L82 30 L76 38 L84 44 L76 50 L80 58 L70 58 L70 68 L60 64 L56 72 L48 66 L40 72 L36 64 L26 68 L26 58 L16 58 L20 50 L12 44 L20 38 L14 30 L24 28 L22 18 L32 20 L34 10 L42 16 Z" fill="#FFC264"/>
+  <path data-clip="rang" data-w="0" d="M70 10 Q90 60 40 76 L96 80 L96 10 Z" fill="#D9822E"/>
+  <path data-clip="rang" data-w="0" d="M22 34 Q26 22 38 18 Q30 28 28 38 Z" fill="#FFE6B0"/>
+  <path id="centre" d="M48 22 L54 28 L62 26 L62 34 L70 38 L64 44 L68 52 L58 52 L54 60 L48 54 L42 60 L38 52 L28 52 L32 44 L26 38 L34 34 L34 26 L42 28 Z" fill="#F2A66E"/>
+  <path data-clip="centre" data-w="0" d="M60 22 Q74 50 44 62 L80 62 L80 22 Z" fill="#D9822E"/>
+  <circle cx="48" cy="40" r="7.4" fill="#C0803A" data-w="0.55"/>
+  <g data-w="0" fill="#8E6A26"><circle cx="46" cy="38" r="1.2"/><circle cx="51" cy="40" r="1.2"/><circle cx="47" cy="43" r="1.1"/></g>
+  <g data-teinte="#B8704E" data-w="0.3" fill="none" stroke="#000"><path d="M48 14 L48 20 M70 26 L64 30 M78 44 L70 44 M68 62 L62 56 M28 62 L34 56 M18 44 L26 44 M26 26 L32 30"/></g>
+</svg>

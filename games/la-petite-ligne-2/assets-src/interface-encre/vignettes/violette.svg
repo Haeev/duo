@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Violette (fleur coupée): petite fleur violette à cinq pétales arrondis, cœur blanc à point jaune et fines stries, tige recourbée, feuille en cœur. -->
+  <path data-w="0.7" fill="none" stroke="#000" d="M60 38 Q66 50 58 70 Q52 84 50 94"/>
+  <path id="feuille" d="M50 90 Q26 92 18 74 Q14 58 28 56 Q36 56 40 64 Q46 56 54 62 Q60 72 50 90 Z" fill="#6E9241"/>
+  <path data-clip="feuille" data-w="0" d="M56 58 Q60 84 30 94 L70 94 L70 58 Z" fill="#40592D"/>
+  <g data-clip="feuille" data-teinte="#9DBB5B" data-w="0.3" fill="none" stroke="#000"><path d="M48 88 Q36 76 40 64 M44 80 Q32 76 24 66 M44 80 Q52 74 52 64"/></g>
+  <path id="fleur" d="M46 10 Q56 6 58 16 Q68 10 72 20 Q74 30 64 32 Q74 38 68 48 Q60 54 52 46 Q48 58 38 54 Q30 48 36 38 Q24 40 22 30 Q22 20 34 22 Q34 12 46 10 Z" fill="#A58BB8"/>
+  <path data-clip="fleur" data-w="0" d="M62 10 Q80 40 44 58 L90 60 L90 10 Z" fill="#7E3F55"/>
+  <path data-clip="fleur" data-w="0" d="M26 26 Q30 20 36 22 Q30 26 30 32 Z" fill="#D2DCD8"/>
+  <path data-w="0" d="M48 24 Q56 26 56 34 Q52 40 46 38 Q40 34 42 28 Q44 24 48 24 Z" fill="#F7F3EA"/>
+  <g data-teinte="#45324F" data-w="0.32" fill="none" stroke="#000"><path d="M48 36 L46 46 M51 36 L54 46 M44 32 L34 30 M53 30 L64 26"/></g>
+  <circle cx="49" cy="31" r="2.6" fill="#F2C55C" data-w="0.4"/>
+</svg>

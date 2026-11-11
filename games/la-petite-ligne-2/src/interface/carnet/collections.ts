@@ -32,6 +32,8 @@ export interface FamilyModel {
 
 export interface EntryCellModel {
   readonly id: string;
+  /** Identifiant de la vignette (le plat d'une recette). */
+  readonly thumb: string;
   readonly found: boolean;
   /** `null` tant que l'entrée n'est pas trouvée (silhouette). */
   readonly name: string | null;
@@ -40,6 +42,7 @@ export interface EntryCellModel {
 
 export interface EntryDetailModel {
   readonly id: string;
+  readonly thumb: string;
   readonly found: boolean;
   readonly name: string | null;
   readonly rarity: string;
@@ -75,6 +78,7 @@ function detailOf(entry: CollectionEntryRead, family: CollectionFamily): EntryDe
   const seasons = clueList(entry.clues.seasons, T.seasons);
   return {
     id: entry.id,
+    thumb: entry.thumb ?? entry.id,
     found: entry.found,
     name: entry.found ? shortName(entry.name) : null,
     rarity: entry.found ? T.rarity[entry.rarity] : '',
@@ -125,6 +129,7 @@ export function collectionsModel(
     familyIndex: index,
     cells: entries.map((e) => ({
       id: e.id,
+      thumb: e.thumb ?? e.id,
       found: e.found,
       name: e.found ? shortName(e.name) : null,
       rarity: e.rarity,
@@ -210,7 +215,7 @@ export function createCollectionsTab(
           'aria-label': c.name ?? T.unfound,
         });
         if (c.found && c.name !== null) {
-          node.insertAdjacentHTML('beforeend', itemThumb(c.id, c.name));
+          node.insertAdjacentHTML('beforeend', itemThumb(c.thumb, c.name));
           node.append(el('span', { class: 'nametag', text: c.name }));
         } else node.insertAdjacentHTML('beforeend', silhouette());
         node.addEventListener('click', () => {
@@ -240,7 +245,7 @@ export function createCollectionsTab(
         const big = el('div', { class: `v3d${d.found ? '' : ' v3d--vide'}` });
         big.insertAdjacentHTML(
           'beforeend',
-          d.found && d.name !== null ? itemThumb(d.id, d.name) : silhouette(),
+          d.found && d.name !== null ? itemThumb(d.thumb, d.name) : silhouette(),
         );
         const clues = el('dl', { class: 'indices' });
         for (const c of d.clues)
