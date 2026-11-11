@@ -1,7 +1,8 @@
 // Poids du paquet du jeu par famille de fichiers livrés: une dérive se voit ici avant d'arriver
-// sur le PC du client (Core i3 de 2018, disque inconnu). Les budgets valent le relevé du
-// 2026-11-11 plus une marge d'environ 15 %; les dépasser demande une décision (compresser,
-// charger à la demande, ou relever le budget en le disant). Le code fabriqué a son propre
+// sur le PC du client (graphique intégré, disque inconnu). Les budgets partent du relevé du
+// 2026-11-11, avec la place du contenu d'Aubrune encore attendu (tenues, modèles repris,
+// vignettes); les dépasser demande une décision (compresser, charger à la demande, ou relever
+// le budget en le disant). Le code fabriqué a son propre
 // garde-fou dans `vite.config.ts` (`codeBudget`).
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -24,7 +25,7 @@ interface Family {
 /** Relevé du 2026-11-11 entre parenthèses (Mo de 1 048 576 octets, fichiers). */
 const FAMILIES: readonly Family[] = [
   // (2,28 Mo, 1 383): fiches de données et manifestes, embarqués dans le lot principal.
-  { id: 'données', dirs: ['donnees', 'assets'], ext: '.json', maxBytes: 2.6 * MO, maxFiles: 1600 },
+  { id: 'données', dirs: ['donnees', 'assets'], ext: '.json', maxBytes: 3.2 * MO, maxFiles: 2000 },
   // (2,20 Mo, 26): lot à part (`src/interface/portraits-dessins.ts`).
   {
     id: 'portraits',
@@ -33,13 +34,13 @@ const FAMILIES: readonly Family[] = [
     maxBytes: 2.7 * MO,
     maxFiles: 32,
   },
-  // (3,26 Mo, 162): chargées à la demande, par adresse.
+  // (4,05 Mo, 195 avec les objets d'intérieur): chargées à la demande, par adresse.
   {
     id: 'vignettes',
     dirs: ['assets/commun/interface/vignettes'],
     ext: '.svg',
-    maxBytes: 3.9 * MO,
-    maxFiles: 190,
+    maxBytes: 5.5 * MO,
+    maxFiles: 280,
   },
   // Modèles (Mo, fichiers): bâtiments 13,65 et 28, décors 6,13 et 14, objets 2,01 et 18,
   // personnages 1,20 et 9.
@@ -50,14 +51,14 @@ const FAMILIES: readonly Family[] = [
     maxBytes: 16 * MO,
     maxFiles: 34,
   },
-  { id: 'décors', dirs: ['assets/commun/decors'], ext: '.glb', maxBytes: 7.1 * MO, maxFiles: 17 },
-  { id: 'objets', dirs: ['assets/commun/objets'], ext: '.glb', maxBytes: 2.4 * MO, maxFiles: 22 },
+  { id: 'décors', dirs: ['assets/commun/decors'], ext: '.glb', maxBytes: 8.5 * MO, maxFiles: 22 },
+  { id: 'objets', dirs: ['assets/commun/objets'], ext: '.glb', maxBytes: 3.2 * MO, maxFiles: 30 },
   {
     id: 'personnages',
     dirs: ['assets/commun/personnages'],
     ext: '.glb',
-    maxBytes: 1.4 * MO,
-    maxFiles: 11,
+    maxBytes: 2.2 * MO,
+    maxFiles: 16,
   },
   // (11,09 Mo, 43; sons: 1,17 Mo, 80). Plafond de 12 Mo fixé par la direction sonore (`tests/musique.test.ts`).
   {
@@ -72,13 +73,13 @@ const FAMILIES: readonly Family[] = [
     dirs: ['assets/commun/son'],
     ext: '.ogg',
     skip: ['assets/commun/son/musique'],
-    maxBytes: 1.4 * MO,
-    maxFiles: 95,
+    maxBytes: 1.8 * MO,
+    maxFiles: 120,
   },
 ];
 
 /** Total des fichiers livrés relevés ici (hors code et polices): 43,0 Mo le 2026-11-11. */
-const TOTAL_BUDGET = 49 * MO;
+const TOTAL_BUDGET = 56 * MO;
 
 function filesOf(family: Family): { bytes: number; files: number } {
   let bytes = 0;
