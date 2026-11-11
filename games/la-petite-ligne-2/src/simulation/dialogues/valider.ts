@@ -24,16 +24,15 @@ export function validateDialogueTexts(content: Content): string[] {
   for (const { at, text } of textsOf(content))
     for (const problem of checkAgreementTags(text)) problems.push(`${at}: ${problem}`);
   // La page « boutique » des commerçants porte un nœud réservé (`commerce.ts`).
-  const reserved = DIALOGUES.shopOffer.node;
+  const reserved = [DIALOGUES.shopOffer.node, DIALOGUES.shopClosed.node];
   for (const place of Object.values(content.places)) {
     for (const dialogue of place.dialogues)
-      if (reserved in dialogue.nodes)
-        problems.push(
-          `lieu ${place.def.id}, dialogue ${dialogue.id}: nœud « ${reserved} » réservé`,
-        );
+      for (const node of reserved)
+        if (node in dialogue.nodes)
+          problems.push(`lieu ${place.def.id}, dialogue ${dialogue.id}: nœud « ${node} » réservé`);
     for (const shop of Object.values(place.shops))
       if (shop.talk !== undefined)
-        for (const text of [shop.talk.open, shop.talk.leave])
+        for (const text of [shop.talk.open, shop.talk.leave, shop.lines?.closed ?? ''])
           for (const problem of checkAgreementTags(text))
             problems.push(`lieu ${place.def.id}, commerce ${shop.id}: ${problem}`);
   }

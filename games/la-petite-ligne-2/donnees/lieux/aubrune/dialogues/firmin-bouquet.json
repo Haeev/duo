@@ -10,9 +10,9 @@
       "equals": "ouvert"
     },
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "barrieres"
+      "type": "event_is",
+      "events": ["fete-des-barrieres-fleuries"],
+      "when": "begun"
     }
   ],
   "once": null,

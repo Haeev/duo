@@ -5,9 +5,9 @@
   "priority": 45,
   "when": [
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "premier-train"
+      "type": "event_is",
+      "events": ["veillee-du-premier-train"],
+      "when": "begun"
     },
     {
       "type": "time_is",

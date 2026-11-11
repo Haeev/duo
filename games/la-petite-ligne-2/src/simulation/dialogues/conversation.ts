@@ -18,7 +18,7 @@ import { RULES } from '../regles/reglages';
 import { choiceOf, decisionState } from '../quetes/decisions';
 import { agreeFor } from './accords';
 import { greet } from './amitie';
-import { faceToFace, shopOffered, talkingShop } from './commerce';
+import { faceToFace, shopClosedLine, shopOffered, talkingShop } from './commerce';
 import { exchangeRefusal, type ExchangeRefusal } from './echanges';
 import { DIALOGUES } from './reglages';
 
@@ -192,16 +192,16 @@ function offerShop(sim: SimContext, player: PlayerIndex, dialogue: DialogueDef):
   const talk = sim.world.players[player].talk;
   if (talk === null) return false;
   const again = heardAgain(sim, player, dialogue) && faceToFace(sim, player, talk.villager);
-  if (shopOffered(sim, talk.villager, dialogue, again) === null) return false;
-  talk.node = DIALOGUES.shopOffer.node;
+  let speaker = 'player';
+  if (shopOffered(sim, talk.villager, dialogue, again) !== null)
+    talk.node = DIALOGUES.shopOffer.node;
+  else if (shopClosedLine(sim, talk.villager, dialogue, again) !== null) {
+    // Fermé par un événement: le commerçant le dit, à la place de l'offre.
+    talk.node = DIALOGUES.shopClosed.node;
+    speaker = talk.villager;
+  } else return false;
   sim.touch('players');
-  sim.emit({
-    type: 'talk_page',
-    player,
-    villager: talk.villager,
-    node: talk.node,
-    speaker: 'player',
-  });
+  sim.emit({ type: 'talk_page', player, villager: talk.villager, node: talk.node, speaker });
   return true;
 }
 
@@ -310,7 +310,7 @@ export function talkNext(sim: SimContext, player: PlayerIndex): void {
   const talk = sim.world.players[player].talk;
   const dialogue = currentDialogue(sim, player);
   if (talk === null) return;
-  if (dialogue === null) {
+  if (dialogue === null || talk.node === DIALOGUES.shopClosed.node) {
     endTalk(sim, player);
     return;
   }
@@ -408,6 +408,19 @@ export function talkView(
   if (talk === null) return null;
   if (talk.node === DIALOGUES.shopOffer.node)
     return shopOfferView(content, world, player, talk.villager);
+  if (talk.node === DIALOGUES.shopClosed.node) {
+    const text = talkingShop({ content, world }, talk.villager)?.lines?.closed;
+    if (text === undefined) return null;
+    return {
+      villager: talk.villager,
+      node: talk.node,
+      speaker: talk.villager,
+      text: agreeFor(world, player, text),
+      emote: null,
+      options: [],
+      opens: null,
+    };
+  }
   const dialogue = placeContent(content, world)?.dialogues.find((d) => d.id === talk.dialogue);
   const node = dialogue?.nodes[talk.node];
   if (node === undefined) return null;

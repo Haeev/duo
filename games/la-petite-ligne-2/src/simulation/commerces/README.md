@@ -51,5 +51,6 @@ Chaque achat et chaque vente écrivent dans la mémoire des faits, lue par les d
 1. Répliques de comptoir: champ `lines` de la fiche (`bought`, `sold`, `noMoney`), plus `refusal` (ce qu'il ne rachète pas). L'écran de boutique les dit à l'achat, à la vente et aux refus `not-enough-money` et `not-wanted` (`shopSays`, `shopSaysRefusal`); sans réplique, son texte commun.
 2. Rachat conditionné: `"unlock": <condition>` sur une ligne de `buys` (comme sur `sells`); faux, il n'en veut pas (`not-wanted`).
 3. Commerce conditionné: `"when": [conditions]` sur la fiche; faux, il est fermé partout (comptoir, dialogue, achats, ventes: `shop-closed`).
+   3 bis. Fermé un jour de fête: `"closes": { "shops": "all" }` (ou une liste) dans la fiche de l'événement, du début de la fête à l'aube suivante (`closedByEvent` de `monde/agenda.ts`). Le commerçant le dit en fin de conversation, à la place de l'offre, avec sa réplique `lines.closed` (« Fermé pour la fête »); sans elle, rien de plus. Test court: `tests/agenda-evenements.test.ts`.
 4. En dialogue, « assez d'argent ? »: condition `{ "type": "money_at_least", "amount": <centimes> }` sur une option ou un nœud `branch`.
 5. Rien à toucher au moteur. Test court: `tests/repliques-boutique.test.ts` (échoppe factice).

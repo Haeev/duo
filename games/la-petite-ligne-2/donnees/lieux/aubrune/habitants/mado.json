@@ -56,9 +56,9 @@
         "seasons": ["spring"],
         "when": [
           {
-            "type": "remembered",
-            "key": "aubrune.fete.jour",
-            "equals": "barrieres"
+            "type": "event_is",
+            "events": ["fete-des-barrieres-fleuries"],
+            "when": "begun"
           }
         ],
         "at": {
@@ -74,9 +74,9 @@
         "seasons": ["summer"],
         "when": [
           {
-            "type": "remembered",
-            "key": "aubrune.fete.jour",
-            "equals": "lumignons"
+            "type": "event_is",
+            "events": ["nuit-des-lumignons"],
+            "when": "begun"
           }
         ],
         "at": {
@@ -92,9 +92,9 @@
         "seasons": ["summer"],
         "when": [
           {
-            "type": "remembered",
-            "key": "aubrune.fete.jour",
-            "equals": "lumignons"
+            "type": "event_is",
+            "events": ["nuit-des-lumignons"],
+            "when": "begun"
           }
         ],
         "at": {
@@ -110,9 +110,9 @@
         "seasons": ["autumn"],
         "when": [
           {
-            "type": "remembered",
-            "key": "aubrune.fete.jour",
-            "equals": "soupe"
+            "type": "event_is",
+            "events": ["concours-de-la-soupe"],
+            "when": "begun"
           }
         ],
         "at": {
@@ -128,9 +128,9 @@
         "seasons": ["winter"],
         "when": [
           {
-            "type": "remembered",
-            "key": "aubrune.fete.jour",
-            "equals": "premier-train"
+            "type": "event_is",
+            "events": ["veillee-du-premier-train"],
+            "when": "begun"
           }
         ],
         "at": {
@@ -147,14 +147,19 @@
             "type": "any",
             "conditions": [
               {
-                "type": "remembered",
-                "key": "aubrune.fete.jour",
-                "equals": "veillee"
+                "type": "event_is",
+                "events": [
+                  "veillee-du-quai-printemps",
+                  "veillee-du-quai-ete",
+                  "veillee-du-quai-automne",
+                  "veillee-du-quai-hiver"
+                ],
+                "when": "begun"
               },
               {
-                "type": "remembered",
-                "key": "aubrune.fete.jour",
-                "equals": "premiere-veillee"
+                "type": "event_is",
+                "events": ["premiere-veillee-du-quai"],
+                "when": "begun"
               }
             ]
           }

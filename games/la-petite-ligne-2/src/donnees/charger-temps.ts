@@ -196,11 +196,13 @@ export function validateTimeAndBook(content: Content): string[] {
       const at = `lieux/${placeId}/evenements/${event.id}.json`;
       if (event.when.type === 'date' && event.when.day > content.settings.clock.seasonDays)
         problems.push(`${at}: jour ${String(event.when.day)} au-delà de la saison`);
-      for (const who of event.activates.villagers)
-        if (!villagers.has(who)) problems.push(`${at}: habitant inconnu « ${who} »`);
       const shop = event.activates.shop;
       if (shop !== null && place !== undefined && !(shop in place.shops))
         problems.push(`${at}: commerce inconnu « ${shop} »`);
+      const closed = event.closes?.shops;
+      if (Array.isArray(closed) && place !== undefined)
+        for (const id of closed)
+          if (!(id in place.shops)) problems.push(`${at}: commerce à fermer inconnu « ${id} »`);
       if (event.activates.tune !== null) entryOf(at, event.activates.tune, 'tune');
     }
   }

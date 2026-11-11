@@ -5,9 +5,9 @@
   "priority": 45,
   "when": [
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "soupe"
+      "type": "event_is",
+      "events": ["concours-de-la-soupe"],
+      "when": "begun"
     },
     {
       "type": "time_is",

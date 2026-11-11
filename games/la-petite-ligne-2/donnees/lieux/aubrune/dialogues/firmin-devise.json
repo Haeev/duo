@@ -6,13 +6,20 @@
   "when": [
     {
       "type": "remembered",
-      "key": "aubrune.premier-train.devise",
-      "equals": "ouvert"
+      "key": "aubrune.premier-train.devise"
     },
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "premier-train"
+      "type": "event_is",
+      "events": ["veillee-du-premier-train"],
+      "when": "begun"
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "decision_is",
+        "decision": "devise-de-la-halte",
+        "state": "agreed"
+      }
     }
   ],
   "once": null,

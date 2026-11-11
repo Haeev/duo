@@ -4,11 +4,12 @@
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
-import type { Condition, FactOwner } from '../../donnees/schemas/regles';
+import type { Condition, EventIs, FactOwner } from '../../donnees/schemas/regles';
+import type { CalendarEventDef } from '../../donnees/schemas/temps';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey, type Fact } from '../../etat/progression';
-import { calendarOf } from '../monde/calendrier';
-import { choiceOf, decisionState, decisionTaken } from '../quetes/decisions';
+import { calendarOf, eventDayKey, inHours, occursOn } from '../monde/calendrier';
+import { choiceOf, decisionState, decisionTaken, previousDecision } from '../quetes/decisions';
 import { otherPlayer, playerFactKey } from './memoire';
 
 export interface RuleContext {
@@ -93,6 +94,7 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       const fits = (chosen: string | null): boolean =>
         chosen !== null && (option === undefined || chosen === option);
       if (condition.state === 'agreed') return fits(decisionTaken(world, decision));
+      if (condition.state === 'last') return fits(previousDecision(world, decision));
       if (condition.state === 'split') return decisionState(world, decision) === 'split';
       const mine = condition.state === 'mine';
       return forActor(ctx, (p) => fits(choiceOf(world, decision, mine ? p : p === 0 ? 1 : 0)));
@@ -115,6 +117,46 @@ export function evaluate(ctx: RuleContext, condition: Condition): boolean {
       return condition.seasons.includes(calendarOf(ctx.content, world.common.day).season);
     case 'weekday_is':
       return condition.weekdays.includes(calendarOf(ctx.content, world.common.day).weekday);
+    case 'event_is':
+      return eventIs(ctx, condition.events, condition.when);
+  }
+}
+
+/**
+ * Profondeur des conditions d'événement en cours d'évaluation: les conditions d'un événement
+ * peuvent citer un autre événement (la veillée s'efface un jour de fête). Le chargement refuse
+ * les boucles (`donnees/valider.ts`); cette garde n'est qu'un filet.
+ */
+let eventDepth = 0;
+const MAX_EVENT_DEPTH = 4;
+
+function eventAt(ctx: RuleContext, event: CalendarEventDef, when: EventIs): boolean {
+  const { world, content } = ctx;
+  const { place, day } = world.common;
+  const live = (d: number): boolean =>
+    occursOn(content, event, d) && evaluateAll({ world, content, actor: null }, event.conditions);
+  const begun = world.progress.memory[eventDayKey(place, event.id)]?.v === day;
+  switch (when) {
+    case 'begun':
+      return begun;
+    case 'today':
+      return begun || live(day);
+    case 'on':
+      return inHours(event.hours, world.minutes) && (begun || live(day));
+    case 'tomorrow':
+      return live(day + 1);
+  }
+}
+
+/** Un de ces événements du lieu courant en est-il à ce moment ? */
+function eventIs(ctx: RuleContext, events: readonly string[], when: EventIs): boolean {
+  if (eventDepth >= MAX_EVENT_DEPTH) return false;
+  const list = ctx.content.time.events[ctx.world.common.place] ?? [];
+  eventDepth += 1;
+  try {
+    return list.some((event) => events.includes(event.id) && eventAt(ctx, event, when));
+  } finally {
+    eventDepth -= 1;
   }
 }
 

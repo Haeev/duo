@@ -101,3 +101,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Le carnet des collections (`progress.album.f`) est commun; prises par joueur aux index 5 et 6 du tuple. Une entrée de recette a la source `recipe` (inscrite par `dish_cooked` et `reward_given`), pas `item`.
 - Un système qui réagit aux événements (`sim.events`) ne voit que ceux déjà émis pendant le pas: intentions de tous les systèmes, puis `step` des systèmes placés avant lui dans `SYSTEMS`. Pour tester un système seul: `{ ...contextOf(sim), events: sim.events }` puis `system.step?.(context)`.
 - `findRoute` a deux surcharges: sans `shutDoors` il rend toujours un trajet (les tests s'en servent), avec il peut rendre `null` (seule une porte fermée y mène).
+## La Petite Ligne 2: agenda et données (vérifié le 2026-11-11)
+
+- Un état « du jour » se lit, ne s'écrit pas: condition `event_is` (`on`, `begun`, `today`, `tomorrow`). `begun` repose sur le fait moteur `agenda.<lieu>.<événement>` = jour du début, car les conditions d'un événement, évaluées sur l'état présent, changent dans la soirée (la première veillée vécue efface son propre événement).
+- `remember` n'efface rien: `forget` (`regles/memoire.ts`); le réseau transmet les clés retirées de la mémoire (`drop` de `reseau/progression.ts`).
+- L'interface ignore `outlook_ready` et ne lit pas `common.outlook` (état juste, rien d'affiché au 2026-11-11).
+- Sonde dans un test long: script Python de remplacement sur le fichier de test, lancement filtré (`-t`), puis `git checkout` du fichier. Une commande qui enchaîne `mkdir` puis `cp` hors du scratchpad échoue en bloc: créer les dossiers à part.
+

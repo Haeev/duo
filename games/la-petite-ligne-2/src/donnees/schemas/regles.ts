@@ -30,8 +30,17 @@ export const FACT_OWNERS = ['actor', 'other'] as const;
 export type FactOwner = (typeof FACT_OWNERS)[number];
 
 /** États d'une décision à deux que lit la condition `decision_is`. */
-export const DECISION_IS = ['agreed', 'split', 'mine', 'theirs'] as const;
+export const DECISION_IS = ['agreed', 'split', 'mine', 'theirs', 'last'] as const;
 export type DecisionIs = (typeof DECISION_IS)[number];
+
+/**
+ * Moments d'un événement du calendrier que lit la condition `event_is` (`simulation/monde/`):
+ * `on` en cours (dans ses heures), `begun` commencé aujourd'hui (jusqu'à l'aube suivante, heures
+ * passées comprises), `today` a lieu aujourd'hui (commencé ou à venir), `tomorrow` a lieu demain
+ * (ce qu'annonce la veille).
+ */
+export const EVENT_IS = ['on', 'begun', 'today', 'tomorrow'] as const;
+export type EventIs = (typeof EVENT_IS)[number];
 
 export type Condition =
   | { type: 'all'; conditions: Condition[] }
@@ -54,9 +63,15 @@ export type Condition =
   /**
    * Décision à deux (`simulation/quetes/decisions.ts`): `agreed` les deux choix concordent (sur
    * `option` si elle est donnée), `split` deux avis différents, `mine` celui qui agit a choisi,
-   * `theirs` l'autre a choisi.
+   * `theirs` l'autre a choisi, `last` la décision prise à l'occurrence précédente d'une décision
+   * rejouable (`reopens` de l'étape: « comme l'an dernier »).
    */
   | { type: 'decision_is'; decision: string; state: DecisionIs; option?: string }
+  /**
+   * Un des événements du calendrier du lieu courant (`evenements/<id>.json`) en est à ce moment
+   * (`EVENT_IS`), ses conditions d'histoire comprises.
+   */
+  | { type: 'event_is'; events: string[]; when: EventIs }
   /** Points d'amitié du joueur qui agit avec cet habitant (cahier 4.9: 100 par cœur). */
   | { type: 'bond_at_least'; villager: string; points: number }
   /** Heure de jeu, en minutes depuis minuit (`from` inclus, `to` exclu; la plage peut passer minuit). */
@@ -132,6 +147,11 @@ export const ConditionSchema: v.GenericSchema<Condition> = v.lazy(() =>
       decision: IdSchema,
       state: v.picklist(DECISION_IS),
       option: v.exactOptional(IdSchema),
+    }),
+    v.strictObject({
+      type: v.literal('event_is'),
+      events: v.pipe(v.array(IdSchema), v.minLength(1), v.maxLength(8)),
+      when: v.picklist(EVENT_IS),
     }),
     v.strictObject({
       type: v.literal('bond_at_least'),

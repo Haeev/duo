@@ -8,18 +8,28 @@
  *
  * Tout tient dans la mémoire des faits, donc dans la sauvegarde et chez l'invité, sans état
  * nouveau: `decisions.<id>.j0` et `.j1` (le choix de chacun), `decisions.<id>` (la décision prise).
+ *
+ * Décision rejouable (`reopens` de l'étape: des événements du calendrier): à chaque début d'une
+ * occurrence de l'un d'eux (chaque année pour une fête), elle se rouvre. La décision prise passe
+ * dans `decisions.<id>.precedente` (condition `decision_is` à l'état `last`: « comme l'an
+ * dernier »), les choix de chacun s'effacent.
  */
 import type { Content } from '../../donnees/charger';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
 import type { SimContext } from '../noyau/systemes';
-import { remember } from '../regles/memoire';
+import { forget, remember } from '../regles/memoire';
 
-export const DECISIONS = { memoryPrefix: 'decisions.' } as const;
+export const DECISIONS = { memoryPrefix: 'decisions.', previous: 'precedente' } as const;
 
 export function decisionKey(decision: string, player?: PlayerIndex): string {
   const base = `${DECISIONS.memoryPrefix}${decision}`;
   return player === undefined ? base : `${base}.j${String(player)}`;
+}
+
+/** Le souvenir de la décision prise à l'occurrence précédente (décision rejouable). */
+export function previousDecisionKey(decision: string): string {
+  return `${decisionKey(decision)}.${DECISIONS.previous}`;
 }
 
 function textAt(world: ReadonlyWorld, key: string): string | null {
@@ -39,6 +49,11 @@ export function choiceOf(
 /** L'option prise à deux, `null` tant que la décision n'est pas prise. */
 export function decisionTaken(world: ReadonlyWorld, decision: string): string | null {
   return textAt(world, decisionKey(decision));
+}
+
+/** L'option prise à l'occurrence précédente d'une décision rejouable, `null`: aucune. */
+export function previousDecision(world: ReadonlyWorld, decision: string): string | null {
+  return textAt(world, previousDecisionKey(decision));
 }
 
 /** Où en est la décision: personne n'a choisi, un seul, deux avis, ou prise. */
@@ -61,6 +76,31 @@ export function decisionOptions(content: Content, decision: string): readonly st
         for (const step of chapter.steps)
           if (step.decision?.id === decision) return step.decision.options;
   return null;
+}
+
+/** Les décisions déclarées rejouables à chaque occurrence de cet événement (`reopens`). */
+export function decisionsReopenedBy(content: Content, event: string): string[] {
+  const found: string[] = [];
+  for (const place of Object.values(content.places))
+    for (const line of Object.values(place.quests))
+      for (const chapter of line.chapters)
+        for (const step of chapter.steps)
+          if (step.decision?.reopens?.includes(event) === true) found.push(step.decision.id);
+  return found;
+}
+
+/**
+ * Rouvre une décision rejouable au début d'une nouvelle occurrence de son événement: la décision
+ * prise devient le souvenir de la précédente, les choix de chacun s'effacent. Personne n'avait
+ * rien dit: rien à faire (le souvenir d'avant reste).
+ */
+export function reopenDecision(sim: SimContext, decision: string): void {
+  const memory = sim.world.progress.memory;
+  const keys = [decisionKey(decision), decisionKey(decision, 0), decisionKey(decision, 1)];
+  if (!keys.some((key) => key in memory)) return;
+  const taken = decisionTaken(sim.world, decision);
+  if (taken !== null) remember(sim, previousDecisionKey(decision), taken, 'duo');
+  for (const key of keys) forget(sim, key);
 }
 
 /**

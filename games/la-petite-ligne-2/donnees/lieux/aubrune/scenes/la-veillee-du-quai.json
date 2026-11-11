@@ -11,9 +11,9 @@
     "at": null,
     "when": [
       {
-        "type": "remembered",
-        "key": "aubrune.fete.jour",
-        "equals": "premiere-veillee"
+        "type": "event_is",
+        "events": ["premiere-veillee-du-quai"],
+        "when": "begun"
       },
       {
         "type": "time_is",
@@ -127,12 +127,6 @@
     {
       "do": "effects",
       "effects": [
-        {
-          "type": "remember",
-          "key": "aubrune.fete.jour",
-          "value": "premiere-veillee",
-          "by": "duo"
-        },
         {
           "type": "remember",
           "key": "aubrune.veillee.premiere",

@@ -97,13 +97,16 @@ export const ShopSchema = v.strictObject({
   /**
    * Répliques de comptoir, dites dans l'écran de boutique (`shopSays` de
    * `simulation/commerces/prix.ts`): après un achat du joueur (`bought`), après une vente
-   * (`sold`), quand l'argent manque (`noMoney`). Absente: le texte commun de l'écran.
+   * (`sold`), quand l'argent manque (`noMoney`). Absente: le texte commun de l'écran. `closed`:
+   * dite en fin de conversation (avec `talk`) un jour où un événement ferme le commerce (`closes`
+   * de l'événement: « Fermé pour la fête »); absente, il ne dit rien de plus.
    */
   lines: v.exactOptional(
     v.strictObject({
       bought: v.exactOptional(TextSchema),
       sold: v.exactOptional(TextSchema),
       noMoney: v.exactOptional(TextSchema),
+      closed: v.exactOptional(TextSchema),
     }),
   ),
   /**

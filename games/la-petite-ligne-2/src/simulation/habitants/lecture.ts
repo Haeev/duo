@@ -5,6 +5,7 @@
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { VillagerLifeState } from '../../etat/habitants';
 import { pickDialogue } from '../dialogues/conversation';
+import { closedByEvent } from '../monde/agenda';
 import { inRange, type Look } from './planning';
 import { VILLAGERS } from './reglages';
 
@@ -47,12 +48,13 @@ export function villagerView(look: Look, villager: string): VillagerView | null 
 
 /**
  * Commerce ouvert: son commerçant est à son poste sur une ligne de planning qui tient ce commerce.
- * Un commerçant sans planning suit les heures écrites du commerce.
+ * Un commerçant sans planning suit les heures écrites du commerce. Un événement qui le ferme
+ * (`closes`) l'emporte.
  */
 export function isShopOpen(look: Look, shop: string): boolean {
   const place = look.content.places[look.world.common.place];
   const def = place?.shops[shop];
-  if (place === undefined || def === undefined) return false;
+  if (place === undefined || def === undefined || closedByEvent(look, shop)) return false;
   const keeper = place.villagers.find((v) => v.id === def.keeper);
   const state = look.world.places[look.world.common.place]?.villagers[def.keeper];
   if (keeper === undefined || state === undefined) return false;

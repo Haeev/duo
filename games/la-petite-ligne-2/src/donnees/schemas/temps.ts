@@ -128,19 +128,32 @@ export const CalendarEventSchema = v.strictObject({
   hours: HoursSchema,
   /** Conditions d'histoire (vocabulaire de `regles.ts`); vide: toujours. */
   conditions: v.array(ConditionSchema),
-  /** Annoncé la veille (événement `calendar_announced`). */
+  /**
+   * Annoncé la veille: `common.outlook.events` du lendemain, montré aux deux joueurs avec la météo
+   * (événement `outlook_ready`). Les données le lisent par `event_is` à l'état `tomorrow`.
+   */
   announce: v.boolean(),
+  /**
+   * Ce que l'événement allume. Qui vient se règle dans les plannings des habitants, et une scène
+   * par son déclencheur: tous deux lisent l'événement par la condition `event_is`.
+   */
   activates: v.strictObject({
-    /** Faits écrits au début, au nom du duo. */
+    /** Faits écrits au début, au nom du duo (un état qui doit durer au-delà de la journée). */
     facts: v.array(v.strictObject({ key: FactKeySchema, value: FactValueSchema })),
-    /** Habitants présents pendant l'événement (ceux du lieu, ou des visiteurs venus par le train). */
-    villagers: v.array(IdSchema),
     /** Commerce spécial ouvert (`commerces/<id>.json` du lieu), `null`: aucun. */
     shop: v.nullable(IdSchema),
-    /** Scène jouée au début (moteur des scènes), `null`: aucune. */
-    scene: v.nullable(IdSchema),
     /** Air joué: les deux joueurs l'entendent et l'inscrivent au carnet (entrée de source `tune`). */
     tune: v.nullable(IdSchema),
   }),
+  /**
+   * Commerces du lieu fermés pour la journée, du début de l'événement à l'aube suivante (`all`:
+   * tous): ni achat, ni vente, comptoir et porte compris. Le commerçant le dit en fin de conversation s'il a sa réplique `lines.closed`
+   * (« Fermé pour la fête »). Absent: aucun.
+   */
+  closes: v.exactOptional(
+    v.strictObject({
+      shops: v.union([v.literal('all'), v.pipe(v.array(IdSchema), v.minLength(1))]),
+    }),
+  ),
 });
 export type CalendarEventDef = v.InferOutput<typeof CalendarEventSchema>;

@@ -6,9 +6,9 @@
   "giver": "firmin",
   "requires": [
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "barrieres"
+      "type": "event_is",
+      "events": ["fete-des-barrieres-fleuries"],
+      "when": "begun"
     }
   ],
   "chapters": [
@@ -98,7 +98,8 @@
           ],
           "decision": {
             "id": "premier-passage",
-            "options": ["doyenne", "enfants"]
+            "options": ["doyenne", "enfants"],
+            "reopens": ["fete-des-barrieres-fleuries"]
           },
           "together": false,
           "onStart": [

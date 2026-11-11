@@ -9,6 +9,7 @@ import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey } from '../../etat/progression';
 import { modifiersOf } from '../besoins/jauges';
+import { closedByEvent } from '../monde/agenda';
 import { evaluate, evaluateAll } from '../regles/conditions';
 import { RULES } from '../regles/reglages';
 import { SHOP_TUNING } from './reglages';
@@ -34,9 +35,11 @@ export function isAvailable(look: ShopLook, shop: ShopDef): boolean {
   return shop.when === undefined || evaluateAll({ ...look, actor: null }, shop.when);
 }
 
-/** On y commerce maintenant: tenu (histoire) et ouvert (heures). */
+/** On y commerce maintenant: tenu (histoire), ouvert (heures) et pas fermé par un événement du jour. */
 export function isTrading(look: ShopLook, shop: ShopDef): boolean {
-  return isAvailable(look, shop) && isOpen(shop, look.world.minutes);
+  return (
+    isAvailable(look, shop) && isOpen(shop, look.world.minutes) && !closedByEvent(look, shop.id)
+  );
 }
 
 /** Moments où le commerçant dit sa réplique dans l'écran de boutique. */

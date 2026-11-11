@@ -8,6 +8,7 @@ import { startTalk, talkView } from '../src/simulation/dialogues/conversation';
 import { calendarOf } from '../src/simulation/monde/calendrier';
 import { idleInput, type StepInput } from '../src/simulation/noyau/entrees';
 import type { Sim } from '../src/simulation/noyau/pas';
+import { evaluate } from '../src/simulation/regles/conditions';
 import { remember } from '../src/simulation/regles/memoire';
 import { equipBag, giveItem } from '../src/simulation/sac/actions';
 import { act, contentWith, contextOf, wait } from './aides-l3';
@@ -18,7 +19,20 @@ type Json = Record<string, unknown>;
 
 const AUBRUNE = 'aubrune';
 const YEAR = 56;
-const JOUR = 'aubrune.fete.jour';
+/** Ce que la journée fête, lu dans l'agenda (`event_is`, commencé aujourd'hui): plus aucun fait à écrire. */
+const DAY_EVENTS: Record<string, string[]> = {
+  barrieres: ['fete-des-barrieres-fleuries'],
+  lumignons: ['nuit-des-lumignons'],
+  soupe: ['concours-de-la-soupe'],
+  'premier-train': ['veillee-du-premier-train'],
+  'premiere-veillee': ['premiere-veillee-du-quai'],
+  veillee: [
+    'veillee-du-quai-printemps',
+    'veillee-du-quai-ete',
+    'veillee-du-quai-automne',
+    'veillee-du-quai-hiver',
+  ],
+};
 const LONG_DASHES = new RegExp(`[${String.fromCharCode(0x2013, 0x2014)}]`);
 /** Priorité des répliques de fête: au-dessus du quotidien et des souvenirs, sous toute étape (52 et plus). */
 const FEAST_PRIORITY = 45;
@@ -195,6 +209,21 @@ function fact(sim: Sim, key: string): unknown {
   return sim.world.progress.memory[key]?.v;
 }
 
+/** La fête commencée aujourd'hui (clé de `DAY_EVENTS`), `aucune` sinon. */
+function dayOf(sim: Sim): string {
+  const ctx = { world: sim.world, content: sim.content, actor: null };
+  for (const [id, events] of Object.entries(DAY_EVENTS))
+    if (evaluate(ctx, { type: 'event_is', events, when: 'begun' })) return id;
+  return 'aucune';
+}
+
+/** La décision à deux que déclare une suite de fête, et ses options. */
+function decisionOf(quest: string): { id: string; options: readonly string[] } {
+  for (const chapter of placeOf(content).quests[quest]?.chapters ?? [])
+    for (const step of chapter.steps) if (step.decision !== undefined) return step.decision;
+  throw new Error(`décision de ${quest}`);
+}
+
 /** Aubrune après l'histoire: les vingt sont là, tout est ouvert, les six suites sont finies. */
 function aubrune(extra: readonly string[] = []): Sim {
   const sim = newSim(content);
@@ -352,7 +381,9 @@ describe('fêtes d’Aubrune', () => {
       expect(event?.hours.from, feast.event).toBe(600);
       expect(event?.announce, feast.event).toBe(true);
       expect(JSON.stringify(event?.conditions)).toContain('aubrune.acte3.fini');
-      expect(event?.activates.facts).toEqual([{ key: JOUR, value: feast.id }]);
+      // Rien à écrire ni à effacer: l'agenda dit la fête; les boutiques ferment pour la journée.
+      expect(event?.activates.facts).toEqual([]);
+      expect(event?.closes).toEqual({ shops: 'all' });
       for (const year of [0, 1]) {
         const date = calendarOf(content, feast.day + year * YEAR);
         expect([date.season, date.dayOfSeason, date.weekday], feast.event).toEqual([
@@ -365,8 +396,9 @@ describe('fêtes d’Aubrune', () => {
       // Lieu réel du plan, suite de fête ouverte par le seul fait du jour.
       expect(placeOf(content).map.points[feast.point], feast.point).toBeDefined();
       expect(placeOf(content).quests[feast.quest]?.requires).toEqual([
-        { type: 'remembered', key: JOUR, equals: feast.id },
+        { type: 'event_is', events: [feast.event], when: 'begun' },
       ]);
+      expect(decisionOf(feast.quest)).toMatchObject({ reopens: [feast.event] });
     }
     expect(new Set(seasons).size).toBe(4);
     // La veillée du quai: l'autre samedi de chaque saison (le 6), jamais un jour de fête.
@@ -377,9 +409,11 @@ describe('fêtes d’Aubrune', () => {
     expect(calendarOf(content, 6).weekday).toBe('saturday');
     // Rien de l'histoire ni des six suites ne cite une fête: elles ne bloquent rien.
     for (const quest of QUESTS)
-      expect(JSON.stringify(placeOf(content).quests[quest]).includes('aubrune.fete.'), quest).toBe(
+      expect(JSON.stringify(placeOf(content).quests[quest]).includes('"event_is"'), quest).toBe(
         false,
       );
+    // Plus de fait du jour à écrire chaque matin ni à réécrire dans les scènes.
+    expect(JSON.stringify(placeOf(content)).includes('aubrune.fete.jour')).toBe(false);
   });
 
   it('chacun des 21 habitants a trois répliques par fête et pour la veillée, dont une sur ta moitié', () => {
@@ -409,7 +443,7 @@ describe('fêtes d’Aubrune', () => {
     expect(pages.filter((t) => t.length > 150)).toEqual([]);
     expect(pages.filter((t) => LONG_DASHES.test(t))).toEqual([]);
     // Sous l'histoire et les suites: leurs étapes commencent à 52, celles de l'histoire à 60.
-    const feast = dialogues.filter((d) => JSON.stringify(d.when).includes(JOUR));
+    const feast = dialogues.filter((d) => JSON.stringify(d.when).includes('"event_is"'));
     expect(feast.length).toBeGreaterThanOrEqual(21 * 5);
     expect(feast.filter((d) => d.priority >= 60).map((d) => d.id)).toEqual([]);
   });
@@ -419,11 +453,11 @@ describe('fêtes d’Aubrune', () => {
       const sim = aubrune(['veillee.premiere']);
       const Q = feast.quest;
       dayAt(sim, feast.day, 595);
-      expect(fact(sim, JOUR)).toBe('aucune');
+      expect(dayOf(sim)).toBe('aucune');
       expect(sim.world.progress.quests[Q]).toBeUndefined();
       sim.world.minutes = 600;
       wait(sim, 2);
-      expect(fact(sim, JOUR)).toBe(feast.id);
+      expect(dayOf(sim)).toBe(feast.id);
       expect(sim.world.progress.quests[Q]?.done).toBe(false);
 
       // Tout le bourg s'y rend à pied, et le train du samedi amène Rosalie, qui reste.
@@ -507,13 +541,22 @@ describe('fêtes d’Aubrune', () => {
 
       // Le lendemain, le bourg a rangé; l'an suivant, la fête revient avec ses scènes et son cadeau.
       dayAt(sim, feast.day + 1, 660);
-      expect(fact(sim, JOUR)).toBe('aucune');
+      expect(dayOf(sim)).toBe('aucune');
       expect(talk(sim, 0, 'basile')[0]).not.toContain('-fete-');
       dayAt(sim, feast.day + YEAR, 660);
-      expect(fact(sim, JOUR)).toBe(feast.id);
+      expect(dayOf(sim)).toBe(feast.id);
       both(sim, feast.point);
       wait(sim, 1);
       playScene(sim, feast.opening);
+      // La tradition se rejoue: la décision s'est rouverte au début de la fête, l'an dernier en mémoire.
+      const { id: decided, options } = decisionOf(Q);
+      const other = options.find((o) => o !== option) ?? option;
+      expect(fact(sim, `decisions.${decided}`)).toBeUndefined();
+      expect(fact(sim, `decisions.${decided}.precedente`)).toBe(option);
+      expect(talk(sim, 1, judge, other)).toContain(`${decision}#une-voix`);
+      expect(talk(sim, 0, judge, other)).toContain(`${decision}#fin`);
+      expect(fact(sim, key)).toBe(other);
+      expect(talk(sim, 0, judge).some((s) => s.startsWith(`${decision}#`))).toBe(false);
       for (const p of [0, 1] as const) carry(sim, p, {});
       sim.world.minutes = closingMinute;
       both(sim, closingPoint);
@@ -533,7 +576,7 @@ describe('fêtes d’Aubrune', () => {
     // Les joueurs s'en vont: ni fleurs, ni décision, ni clôture.
     both(sim, 'fc');
     dayAt(sim, feast.day + 1, 660);
-    expect(fact(sim, JOUR)).toBe('aucune');
+    expect(dayOf(sim)).toBe('aucune');
     expect(fact(sim, 'aubrune.barrieres.lisses')).toBe('levees');
     expect(sim.world.progress.quests[feast.quest]?.done).toBe(false);
     carry(sim, 0, { coquelicot: 3 });
@@ -548,7 +591,7 @@ describe('fêtes d’Aubrune', () => {
     const bare = aubrune(['veillee.premiere']);
     delete bare.world.progress.memory['aubrune.soupe.fini'];
     dayAt(bare, 41, 640);
-    expect(fact(bare, JOUR)).toBe('aucune');
+    expect(dayOf(bare)).toBe('aucune');
   });
 
   it('la veillée du quai: la première attend les gardes après l’acte 3, puis revient le samedi', () => {
@@ -558,13 +601,13 @@ describe('fêtes d’Aubrune', () => {
     expect(talk(sim, 0, 'firmin')[0]).toBe('firmin-ce-soir#a1');
     sim.world.minutes = 1111;
     wait(sim, 2);
-    expect(fact(sim, JOUR)).toBe('premiere-veillee');
+    expect(dayOf(sim)).toBe('premiere-veillee');
     wait(sim, 170);
     for (const villager of RESIDENTS)
       expect(distance(sim, villager, 'quai'), villager).toBeLessThan(20);
     // Les joueurs n'y vont pas: elle les attend le lendemain soir.
     dayAt(sim, 18, 1111);
-    expect(fact(sim, JOUR)).toBe('premiere-veillee');
+    expect(dayOf(sim)).toBe('premiere-veillee');
     both(sim, 'quai');
     wait(sim, 1);
     playScene(sim, 'la-veillee-du-quai');
@@ -583,20 +626,20 @@ describe('fêtes d’Aubrune', () => {
     expect(hears(sim, 'anatole', 'anatole-veillee-du-quai', 1)).toHaveLength(1);
     // Le soir suivant, plus de première; le samedi (jour 20), la veillée régulière et son bol.
     dayAt(sim, 19, 1111);
-    expect(fact(sim, JOUR)).toBe('aucune');
+    expect(dayOf(sim)).toBe('aucune');
     dayAt(sim, 20, 700);
     expect(hears(sim, 'rosalie', 'rosalie-veillee-du-quai', 1)).toHaveLength(1);
     for (const p of [0, 1] as const) carry(sim, p, {});
     sim.world.minutes = 1111;
     both(sim, 'quai');
     wait(sim, 2);
-    expect(fact(sim, JOUR)).toBe('veillee');
+    expect(dayOf(sim)).toBe('veillee');
     playScene(sim, 'le-banc-du-samedi');
     expect(count(sim, 0, 'soupe-de-legumes') + count(sim, 1, 'soupe-de-legumes')).toBe(2);
     // Un samedi de fête (jour 27, la Nuit des lumignons), la veillée laisse la place.
     dayAt(sim, 27, 660);
     sim.world.minutes = 1111;
     wait(sim, 2);
-    expect(fact(sim, JOUR)).toBe('lumignons');
+    expect(dayOf(sim)).toBe('lumignons');
   });
 });

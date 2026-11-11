@@ -124,12 +124,15 @@ export const QuestStepSchema = v.strictObject({
    * Décision à deux que l'étape demande (`simulation/quetes/decisions.ts`): chaque joueur choisit
    * une option (effet `choose`), elle n'est prise que si les deux choix concordent; `done` attend
    * alors `{ "type": "decision_is", "decision": "<id>", "state": "agreed" }`. Identifiant unique
-   * dans tout le jeu.
+   * dans tout le jeu. `reopens`: événements du calendrier du lieu à chaque occurrence desquels
+   * elle se rouvre (une tradition rejouée chaque année), la décision d'avant restant lisible par
+   * `decision_is` à l'état `last`. Absent: prise une fois pour toutes.
    */
   decision: v.exactOptional(
     v.strictObject({
       id: IdSchema,
       options: v.pipe(v.array(IdSchema), v.minLength(2), v.maxLength(6)),
+      reopens: v.exactOptional(v.pipe(v.array(IdSchema), v.minLength(1), v.maxLength(8))),
     }),
   ),
   /** Exige les deux joueurs ensemble (réponse 9); sinon, faisable seul. */

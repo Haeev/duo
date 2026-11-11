@@ -25,10 +25,10 @@ Le jour de jeu va d'une aube à l'autre: une nuit de fête et le passage de 5 h 
 
 | Besoin | Fiche | Règle |
 | --- | --- | --- |
-| La fête a lieu | `evenements/<fête>.json` | écrit `aubrune.fete.jour` (`barrieres`, `lumignons`, `soupe`, `premier-train`, `veillee`, `premiere-veillee`) à son début; annoncée la veille |
-| Le bourg range | `evenements/le-bourg-range-la-fete.json` | chaque matin de 6 h à 10 h: `aubrune.fete.jour` = `aucune`, lisses relevées |
-| Qui vient | `habitants/<id>.json` | lignes de planning en tête de fiche: samedi, saison, heures, et le fait du jour; juste après les lignes d'une étape en cours (l'histoire et les suites gardent la main) |
-| Scènes | `scenes/` | déclencheur `daily` (le fait du jour, l'heure, les deux joueurs à 8 m du point): elles se rejouent chaque année |
+| La fête a lieu | `evenements/<fête>.json` | se lit partout par la condition `{ "type": "event_is", "events": ["<fête>"], "when": "begun" }` (commencée aujourd'hui, jusqu'à l'aube); annoncée la veille; ferme les commerces (`closes`) |
+| Le bourg range | `evenements/le-bourg-range-la-fete.json` | chaque matin de 6 h à 10 h: lisses relevées |
+| Qui vient | `habitants/<id>.json` | lignes de planning en tête de fiche: samedi, saison, heures, et `event_is` sur la fête; juste après les lignes d'une étape en cours (l'histoire et les suites gardent la main) |
+| Scènes | `scenes/` | déclencheur `daily` (`event_is` sur la fête, l'heure, les deux joueurs à 8 m du point): elles se rejouent chaque année |
 | La première fois | `quetes/<suite de fête>.json` (`kind: side`) | s'ouvre au début de la fête: ouverture, puis activité et décision en parallèle, puis clôture; les récompenses uniques sont dans sa dernière étape |
 | Répliques | `<habitant>-fete-<fête>`, `<habitant>-veillee-du-quai` | priorité 45, tournante de trois (`aubrune.tour-fete.<habitant>`) |
 | Étapes de fête | demande 52, merci 57, décision 55 | sous l'histoire (60 et plus); elles ne parlent que le jour de la fête |
@@ -37,13 +37,13 @@ Priorités: une réplique de fête (45) passe devant le quotidien (0), les souve
 
 **Ta moitié.** La deuxième réplique de chaque tournante parle de l'autre joueur: elle le taquine, lui prête un mot, ou envoie le chercher (« Va chercher ta moitié », « Dis à ta moitié que... »). Chez les quatre habitants qui recueillent une décision, une réplique vraie s'y ajoute quand l'autre a déjà choisi (« Ta moitié m'a déjà dit son idée. Je ne te la souffle pas. »).
 
-**Rosalie et le Contrôleur.** Les jours de fête, le train du samedi attend la fin de la fête: Rosalie reste jusqu'à 22 h (sa règle de départ lit le fait du jour). Le Contrôleur ne vient à aucune fête: il passe à 5 h 12 la nuit même, quand le bourg dort, et parle de ce qu'il a vu en arrivant (des pétales sur la voie, un lumignon encore allumé, une gamelle sur le banc, la part gardée « pour qui arrive en retard »). Personne d'autre que les gardes ne le voit: la règle de l'histoire tient. Comme son autorail de chaque nuit, ces répliques n'existent qu'une fois le premier départ pour Hautefonte fait.
+**Rosalie et le Contrôleur.** Les jours de fête, le train du samedi attend la fin de la fête: Rosalie reste jusqu'à 22 h (sa règle de départ lit la fête du jour, `event_is`). Le Contrôleur ne vient à aucune fête: il passe à 5 h 12 la nuit même, quand le bourg dort, et parle de ce qu'il a vu en arrivant (des pétales sur la voie, un lumignon encore allumé, une gamelle sur le banc, la part gardée « pour qui arrive en retard »). Personne d'autre que les gardes ne le voit: la règle de l'histoire tient. Comme son autorail de chaque nuit, ces répliques n'existent qu'une fois le premier départ pour Hautefonte fait.
 
-**Les boutiques ferment** un jour de fête: les commerçants sont à la fête dès 10 h. Ce qu'une activité demande d'acheter est donné sur place (le panier de Margot, les pommes d'Odette).
+**Les boutiques ferment** un jour de fête (`"closes": { "shops": "all" }` de la fiche, du début de la fête à l'aube): les commerçants sont à la fête dès 10 h; un commerçant qui a sa réplique `lines.closed` le dit. Ce qu'une activité demande d'acheter est donné sur place (le panier de Margot, les pommes d'Odette).
 
 **Cadeaux.** Le système de cadeaux ne change pas, mais la fête le sert: tout le bourg est au même endroit, et le cadeau de chaque fête est l'objet adoré de quelqu'un (la soupe aux herbes pour Marthe, la tourte du quai pour Odette et Honorine, le billet poinçonné pour le Contrôleur, l'omelette pour Martial, le pain pour Rosalie).
 
-**Ajouter une fête** (sans code): 1. `pnpm nouveau evenement <id> aubrune`: date, heures, et dans `activates.facts` la valeur du jour de `aubrune.fete.jour`. 2. Dans chaque fiche d'habitant, une ligne de planning (`days`, `seasons`, `when` sur cette valeur) vers un point du plan, cinq ou six par point au plus. 3. Deux scènes à déclencheur `daily` (ouverture, clôture), la première réécrit le fait du jour. 4. Un dialogue `<habitant>-fete-<id>` par habitant, priorité 45, sur le modèle de `firmin-fete-barrieres`. 5. Facultatif: une suite `kind: side` ouverte par le fait du jour, pour l'activité, la décision et la récompense de la première fois. 6. Une ligne dans `FEASTS` de `tests/fetes-aubrune.test.ts`.
+**Ajouter une fête** (sans code): 1. `pnpm nouveau evenement <id> aubrune`: date, heures, `closes`. 2. Dans chaque fiche d'habitant, une ligne de planning (`days`, `seasons`, `when` avec `event_is` sur la fête) vers un point du plan, cinq ou six par point au plus. 3. Deux scènes à déclencheur `daily` (ouverture, clôture), sur `event_is`. 4. Un dialogue `<habitant>-fete-<id>` par habitant, priorité 45, sur le modèle de `firmin-fete-barrieres`. 5. Facultatif: une suite `kind: side` ouverte par `event_is`, pour l'activité, la décision (`reopens`: rejouée chaque année) et la récompense de la première fois. 6. Une ligne dans `FEASTS` de `tests/fetes-aubrune.test.ts`.
 
 ## 2. Fête des barrières fleuries (printemps, passage à niveau)
 
@@ -78,7 +78,7 @@ La coutume de l'acte 3: un lumignon à la barrière « pour ceux qui partent ».
 - **Où brûlent les lumières** (20 h 30 à 2 h): Firmin à la barrière (pour son oncle), Jeanne à côté (pour le train de 5 h 12), Odette sous la tonnelle, Basile à l'établi, Achille à la fenêtre du fournil, Solange devant la mercerie, Mado sur l'enclume et Barnabé devant la forge, Ambroise sous la pendule (pour la minute), Honorine sur son seuil (deux: sa marraine, et « pour le plaisir »), Marthe au pied du clocher, Lucie à la boîte aux lettres, Colette sur le tonneau de la terrasse, Armand au lavoir, Paulin et Margot au gué, Léon sur la grève, Berthe au ponton (le sien part sur l'eau), Martial au cimetière (un seul, pour tous), Rosalie sur le tampon de sa locomotive jusqu'à 22 h.
 - **Chaque année**: un pain de minuit par joueur, laissé par Achille sur la lisse.
 - **La première fois**: le plan de la lanterne (`give_plan`, la brique existe; il se trouve aussi en fouille), amitié de Marthe (+30), de Firmin et d'Honorine (+20).
-- **Faits pour le rendu**: `aubrune.fete.jour` = `lumignons` (21 lumières après 20 h 30), `aubrune.lumignons.pour` (`partent`, `reviennent`).
+- **Faits pour le rendu**: `event_is` sur `nuit-des-lumignons` (21 lumières après 20 h 30), `aubrune.lumignons.pour` (`partent`, `reviennent`).
 - **Manques**: un objet et un modèle de lumignon (coquille, flamme, lumière chaude) à 21 emplacements; la table de cire du parvis; une lumière qui dérive au ponton; un air de nuit (la valse de fête ne convient pas à cette nuit-là).
 
 ## 4. Concours de la soupe (automne, place)
@@ -126,12 +126,12 @@ L'anniversaire de la nuit de 5 h 12. Tout le jour sur le quai: la tourte du quai
 
 ## 7. Ce que le moteur ne permet pas encore
 
-1. **Savoir qu'un événement est en cours.** Aucune condition `event_is`, aucun filtre de planning par événement ou par jour de saison. D'où le fait `aubrune.fete.jour`, écrit par la fête et effacé le matin par un second événement. Limite: un duo absent d'Aubrune entre 6 h et 10 h garde le fait de la veille jusqu'à son retour un matin (sans effet visible: les plannings et les répliques lisent aussi le samedi, la saison et l'heure).
-2. **`activates.villagers` et `activates.scene` ne sont lus par aucun système**: la présence passe par les plannings, les scènes par leur déclencheur. Ces champs sont remplis, pour le jour où ils serviront.
-3. **Le contrôle des suites ignore les faits écrits par le calendrier** (`collectFacts` de `quetes/valider.ts` ne parcourt pas les événements): il refuserait toute scène ou suite qui attend le fait du jour. Chaque scène d'ouverture réécrit donc ce fait, à l'identique, pour qu'il le trouve. À corriger dans le contrôle, puis retirer ces six effets.
-4. **Une décision à deux est prise une fois pour toutes**: pas de verdict du concours chaque année. Les quatre décisions sont donc des traditions (qui passe le premier, pour qui brûle la lumière, la louche, la devise). Il faudrait une décision rejouable (un identifiant par année, ou un effet qui la rouvre).
+1. ~~Savoir qu'un événement est en cours.~~ Fait (2026-11-11): condition `event_is` (`on`, `begun`, `today`, `tomorrow`); le fait `aubrune.fete.jour` est retiré.
+2. ~~`activates.villagers` et `activates.scene`~~ Retirés (2026-11-11): la présence passe par les plannings et les scènes par leur déclencheur, qui lisent `event_is`; une seule source pour chaque chose.
+3. ~~Le contrôle des suites ignore les faits écrits par le calendrier.~~ Fait (2026-11-11): `collectFacts` les connaît; les six effets de contournement des scènes sont retirés.
+4. ~~Une décision à deux est prise une fois pour toutes.~~ Fait (2026-11-11): `reopens` de la décision, rouverte à chaque fête, l'an dernier lisible (`decision_is`, `last`); appliqué aux quatre décisions. Reste à écrire les répliques « comme l'an dernier ». Les traditions (qui passe le premier, pour qui brûle la lumière, la louche, la devise) se rejouent donc chaque année.
 5. **Rien ne lit l'année** (`year_is`, jours écoulés depuis un fait): pas de « l'an dernier », pas de cadeau par joueur chaque année dans un dialogue. Les cadeaux annuels passent par l'effet `to: duo` de la clôture.
-6. **Vendre à la fête**: une réplique de priorité 10 ou plus cache l'offre de boutique, et `activates.shop` n'ouvre rien. Les commerces sont fermés de 10 h à la fin de la fête.
+6. **Vendre à la fête**: une réplique de priorité 10 ou plus cache l'offre de boutique, et `activates.shop` n'ouvre rien. Les commerces sont fermés par la règle `closes` de la fiche (2026-11-11), du début de la fête à l'aube; réplique `lines.closed` à écrire par commerçant.
 7. **Une scène ne branche pas**: la clôture ne peut pas dire la décision prise (les répliques, si). Ses gestes sont tenir et appuyer: pas de mini-jeu de rythme pour une fanfare de fête, pas d'objet à poser dans le monde (le lumignon est raconté).
 8. **Pêche de fête**: aucune prise ne peut dépendre d'un fait ou d'un événement (pas de « friture de la veillée »).
 9. **Rendu**: le train de Rosalie à quai, les lisses baissées et les faits de décor ci-dessus ne se voient pas encore.
@@ -146,7 +146,7 @@ L'anniversaire de la nuit de 5 h 12. Tout le jour sur le quai: la tourte du quai
 | Cartes postales | une par fête (barrière fleurie, bourg aux lumignons, les deux marmites, le quai de la veillée) | `give_entry` à la fin de chaque suite de fête; ou un sujet de photo de cible `event` |
 | Tenues à gagner (étiquette `a-gagner`) | couronne de fleurs, tablier du concours, écharpe de la veillée, casquette de garde | `give_piece`: aucune pièce à gagner n'existe au catalogue |
 | Objets | lumignon (posable, lumière), louche des gardes, billet de quai distinct du billet du prologue | cadeaux et décor |
-| Décor de fête, lu sur `aubrune.fete.jour` | guirlandes et treillis des lisses, pétales; 21 lumignons; marmites, grande table, chaudron; lampions, brasero, table du quai, devise à la craie | les quatre fêtes et la veillée |
+| Décor de fête, lu par `event_is` | guirlandes et treillis des lisses, pétales; 21 lumignons; marmites, grande table, chaudron; lampions, brasero, table du quai, devise à la craie | les quatre fêtes et la veillée |
 | Animations | clips des activités `fleurir-la-barriere`, `fondre-les-lumignons`, `veiller-son-lumignon`, `gouter-les-soupes`, `veiller-sur-le-quai`, `veiller-au-quai` | les habitants sont debout, sans geste |
 | Son | la règle `fete` de `src/audio/musique/donnees/musique.json` ne cite que `fete-d-essai`: y ajouter les fêtes et les veillées (neuf identifiants); un air de nuit pour les lumignons; manivelle, cloche du quai, cuillères, chaudron | musique et bruitages des scènes |
 
@@ -162,4 +162,4 @@ L'anniversaire de la nuit de 5 h 12. Tout le jour sur le quai: la tourte du quai
 
 ## 10. Contrôles
 
-`tests/fetes-aubrune.test.ts` (8 essais, environ 15 s): les quatre fêtes tombent un samedi 13, deux années de suite, dans quatre saisons, sur un point du plan; 21 habitants ont 3 répliques par fête et pour la veillée, dont une sur ta moitié, à la priorité 45, en pages de 150 caractères au plus; chaque fête jouée de bout en bout par la simulation (le fait du jour à 10 h, les 20 présents rendus à pied sur place, Rosalie qui reste après le départ du train, ouverture à deux rôles, don sur place, objet remis, décision à une voix puis à deux, tournante entendue, lumières de la nuit, clôture, cadeau et récompense, passage du Contrôleur à 5 h 12, bourg rangé le lendemain, retour l'an suivant); une fête manquée laisse sa suite ouverte et reprend aux radis l'an d'après; sans la guerre de la soupe, pas de concours; la première veillée attend les joueurs d'un soir sur l'autre, puis revient le samedi 6 de la saison; le samedi 13 reste à la fête.
+`tests/fetes-aubrune.test.ts` (8 essais, environ 15 s): les quatre fêtes tombent un samedi 13, deux années de suite, dans quatre saisons, sur un point du plan; 21 habitants ont 3 répliques par fête et pour la veillée, dont une sur ta moitié, à la priorité 45, en pages de 150 caractères au plus; chaque fête jouée de bout en bout par la simulation (la fête commencée à 10 h, les 20 présents rendus à pied sur place, Rosalie qui reste après le départ du train, ouverture à deux rôles, don sur place, objet remis, décision à une voix puis à deux, tournante entendue, lumières de la nuit, clôture, cadeau et récompense, passage du Contrôleur à 5 h 12, bourg rangé le lendemain, retour l'an suivant); une fête manquée laisse sa suite ouverte et reprend aux radis l'an d'après; sans la guerre de la soupe, pas de concours; la première veillée attend les joueurs d'un soir sur l'autre, puis revient le samedi 6 de la saison; le samedi 13 reste à la fête.

@@ -5,9 +5,9 @@
   "priority": 45,
   "when": [
     {
-      "type": "remembered",
-      "key": "aubrune.fete.jour",
-      "equals": "lumignons"
+      "type": "event_is",
+      "events": ["nuit-des-lumignons"],
+      "when": "begun"
     },
     {
       "type": "time_is",
