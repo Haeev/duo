@@ -45,12 +45,19 @@ export const ShopSellSchema = v.strictObject({
 });
 export type ShopSell = v.InferOutput<typeof ShopSellSchema>;
 
+/** Le commerçant ne rachète cette ligne qu'une fois la condition vraie pour ce joueur (fait d'histoire, amitié). */
+const BuyUnlock = { unlock: v.exactOptional(ConditionSchema) } as const;
+
 /** Rachats: par objet précis (prix, ou coefficient du prix de sa famille ici) ou par famille. */
 export const ShopBuySchema = v.union([
-  v.strictObject({ item: IdSchema, price: Price }),
+  v.strictObject({ item: IdSchema, price: Price, ...BuyUnlock }),
   /** Coefficient du prix de la famille de l'objet dans ce même commerce (ligne `family` requise). */
-  v.strictObject({ item: IdSchema, factor: v.pipe(FiniteSchema, v.minValue(0.1), v.maxValue(5)) }),
-  v.strictObject({ family: v.picklist(ITEM_FAMILIES), price: Price }),
+  v.strictObject({
+    item: IdSchema,
+    factor: v.pipe(FiniteSchema, v.minValue(0.1), v.maxValue(5)),
+    ...BuyUnlock,
+  }),
+  v.strictObject({ family: v.picklist(ITEM_FAMILIES), price: Price, ...BuyUnlock }),
 ]);
 export type ShopBuy = v.InferOutput<typeof ShopBuySchema>;
 
@@ -64,6 +71,11 @@ export const ShopSchema = v.strictObject({
   icon: v.exactOptional(IdSchema),
   /** Heures d'ouverture, en minutes depuis minuit; la plage peut passer minuit. */
   hours: v.strictObject({ from: MinuteOfDay, to: MinuteOfDay }),
+  /**
+   * Commerce conditionné par l'histoire: fermé (ni achat ni vente, comptoir compris) tant qu'une
+   * de ces conditions est fausse (le commerçant n'est pas encore arrivé). Absent: toujours tenu.
+   */
+  when: v.exactOptional(v.pipe(v.array(ConditionSchema), v.minLength(1), v.maxLength(8))),
   sells: v.array(ShopSellSchema),
   /** Le plus précis l'emporte: objet, puis famille. Rien d'autre n'est racheté. */
   buys: v.array(ShopBuySchema),
@@ -82,6 +94,18 @@ export const ShopSchema = v.strictObject({
   ),
   /** Ce qu'il dit, avec son caractère, d'un objet qu'il ne rachète pas (« Ça sent la vase. »). */
   refusal: v.exactOptional(TextSchema),
+  /**
+   * Répliques de comptoir, dites dans l'écran de boutique (`shopSays` de
+   * `simulation/commerces/prix.ts`): après un achat du joueur (`bought`), après une vente
+   * (`sold`), quand l'argent manque (`noMoney`). Absente: le texte commun de l'écran.
+   */
+  lines: v.exactOptional(
+    v.strictObject({
+      bought: v.exactOptional(TextSchema),
+      sold: v.exactOptional(TextSchema),
+      noMoney: v.exactOptional(TextSchema),
+    }),
+  ),
   /**
    * Choix offert à la fin de toute conversation avec le commerçant, boutique ouverte, quand le
    * dialogue joué ne l'ouvre pas lui-même (`simulation/dialogues/`): `open` ouvre la boutique,

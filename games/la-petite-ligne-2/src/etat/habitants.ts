@@ -8,8 +8,8 @@ import { IdSchema, IntSchema, PlayerIndexSchema, TickSchema } from '../donnees/s
 
 /** `here`: dans le lieu; `away`: pas encore arrivé ou reparti (hors de la carte, ni visible ni visable). */
 export const PRESENCES = ['here', 'arriving', 'leaving', 'away'] as const;
-/** Posture du corps: debout, en marche, assis sur une vraie place (`seat`). */
-export const POSES = ['stand', 'walk', 'sit'] as const;
+/** Posture du corps: debout, en marche, assis ou couché (`lie`) sur une vraie place (`seat`). */
+export const POSES = ['stand', 'walk', 'sit', 'lie'] as const;
 
 export const VillagerLifeStateSchema = v.strictObject({
   presence: v.picklist(PRESENCES),
@@ -20,7 +20,7 @@ export const VillagerLifeStateSchema = v.strictObject({
   pose: v.picklist(POSES),
   /** Geste joué en boucle à son poste (balayer), `null`: au repos. */
   gesture: v.nullable(IdSchema),
-  /** Place assise tenue: meuble et numéro de place. */
+  /** Place tenue, assise ou couchée (`pose`): meuble et numéro de place. */
   seat: v.nullable(v.tuple([IdSchema, v.pipe(IntSchema, v.minValue(0), v.maxValue(3))])),
   /** Onomatopée au-dessus de la tête jusqu'au pas `emoteUntil`. */
   emote: v.nullable(IdSchema),

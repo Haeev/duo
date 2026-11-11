@@ -7,7 +7,12 @@
  * personne à qui parler.
  */
 import type { Content, PlaceContent } from '../../donnees/charger';
-import type { QuestLineDef, StepCondition, StepEffect } from '../../donnees/schemas/quete';
+import type {
+  QuestLineDef,
+  QuestStepDef,
+  StepCondition,
+  StepEffect,
+} from '../../donnees/schemas/quete';
 import type { Condition, Effect, FactValue } from '../../donnees/schemas/regles';
 import type { SceneDef } from '../../donnees/schemas/scene';
 import { checkAgreementTags } from '../dialogues/accords';
@@ -227,9 +232,56 @@ function checkEffects(env: Env, effects: readonly StepEffect[], at: string): voi
       case 'change_need':
       case 'give_bag':
       case 'open_shop':
+      case 'give_recipe':
+      case 'give_plan':
+      case 'give_entry':
+      case 'give_piece':
+      case 'choose':
         env.base.effect(env.content, e, at, problems);
     }
   }
+}
+
+/** Un dialogue du lieu offre-t-il de choisir cette option (effet `choose`) ? */
+function offersChoice(place: PlaceContent, decision: string, option: string): boolean {
+  const chooses = (effects: readonly Effect[]): boolean =>
+    effects.some((e) => e.type === 'choose' && e.decision === decision && e.option === option);
+  return place.dialogues.some((d) =>
+    Object.values(d.nodes).some(
+      (node) =>
+        (node.kind === 'choice' && node.options.some((o) => chooses(o.effects))) ||
+        (node.kind === 'effects' && chooses(node.effects)),
+    ),
+  );
+}
+
+/** Étape à décision à deux: identifiant unique, options distinctes et offertes, accord attendu. */
+function checkDecisionStep(env: Env, step: QuestStepDef, where: string): void {
+  const { place, problems } = env;
+  const decision = step.decision;
+  if (decision === undefined) return;
+  let declared = 0;
+  for (const other of Object.values(env.content.places))
+    for (const line of Object.values(other.quests))
+      for (const chapter of line.chapters)
+        for (const s of chapter.steps) if (s.decision?.id === decision.id) declared += 1;
+  if (declared > 1)
+    problems.push(`${where}: décision « ${decision.id} » déclarée par plusieurs étapes`);
+  if (new Set(decision.options).size !== decision.options.length)
+    problems.push(`${where}: décision « ${decision.id} », option en double`);
+  for (const option of decision.options)
+    if (!offersChoice(place, decision.id, option))
+      problems.push(
+        `${where}: décision « ${decision.id} », aucun dialogue du lieu n'offre l'option « ${option} » (effet \`choose\`)`,
+      );
+  if (
+    !step.done.some(
+      (c) => c.type === 'decision_is' && c.decision === decision.id && c.state === 'agreed',
+    )
+  )
+    problems.push(
+      `${where}: l'étape déclare la décision « ${decision.id} » sans attendre l'accord (\`decision_is\`, \`agreed\`)`,
+    );
 }
 
 function checkQuest(env: Env, line: QuestLineDef): void {
@@ -280,6 +332,7 @@ function checkQuest(env: Env, line: QuestLineDef): void {
         before: before.get(step.id) ?? earlier,
       });
       checkEffects(env, [...step.onStart, ...step.onDone], where);
+      if (step.decision !== undefined) checkDecisionStep(env, step, where);
       for (const problem of checkAgreementTags(step.objective))
         problems.push(`${where}: ${problem}`);
     });

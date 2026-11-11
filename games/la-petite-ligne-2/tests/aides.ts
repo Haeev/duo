@@ -58,3 +58,15 @@ export function gameContent(): Content {
 export function newSim(content: Content = gameContent(), seed: number = SEED): Sim {
   return createSim(content, createWorld(content, seed, MEMBERS));
 }
+
+/**
+ * La carte brute d'un plan (`planToMap`: grille, terrain, zones, verrous, graphe) avec ce que
+ * l'assemblage du lieu y ajoute (points nommés, meubles, portes vers les intérieurs), pris dans la
+ * carte livrée. Les fiches livrées qui mènent dans un intérieur ou à un poste du plan (un
+ * commerçant derrière son comptoir, un lit, un `reach` dans une pièce) se chargent ainsi sur la
+ * grille brute, avec les intérieurs livrés.
+ */
+export function withAssembly<T extends object>(raw: T, delivered: unknown): T {
+  const { points, objects, doors } = delivered as Record<'points' | 'objects' | 'doors', unknown>;
+  return { ...raw, points, objects, doors };
+}

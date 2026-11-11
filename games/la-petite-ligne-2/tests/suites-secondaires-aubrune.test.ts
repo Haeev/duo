@@ -373,10 +373,14 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     playScene(sim, 'la-baronne-mord');
     expect(fact(sim, 'aubrune.baronne.sortie')).toBe(true);
 
-    // La décision: en parler d'abord ne tranche rien; le choix de l'un vaut pour les deux.
+    // La décision à deux: en parler d'abord ne tranche rien; une seule voix attend l'autre; deux
+    // avis invitent à se mettre d'accord; le même choix des deux la prend.
     expect(talk(sim, 0, 'achille', 'attendre')).not.toContain('achille-decision#fin');
+    expect(talk(sim, 1, 'achille', 'friture')).toContain('achille-decision#une-voix');
+    expect(talk(sim, 0, 'achille', 'relacher')).toContain('achille-decision#desaccord');
     expect(passed(sim, Q)).not.toContain('decision');
-    expect(talk(sim, 1, 'achille', 'friture')).toContain('achille-decision#fin');
+    expect(fact(sim, 'aubrune.baronne.sort')).toBeUndefined();
+    expect(talk(sim, 0, 'achille', 'friture')).toContain('achille-decision#fin');
     expect(fact(sim, 'aubrune.baronne.sort')).toBe('friture');
     expect(talk(sim, 0, 'colette')[0]).toBe('colette-epilogue#a1');
     expect(sim.world.progress.quests[Q]?.done).toBe(true);
@@ -397,7 +401,8 @@ describe('écriture des suites secondaires d’Aubrune', () => {
     remember(contextOf(sim), 'aubrune.baronne.legende', 'fait', 'duo');
     remember(contextOf(sim), 'aubrune.baronne.decision', 'ouvert', 'duo');
     wait(sim, 0.5);
-    expect(talk(sim, 0, 'achille', 'relacher')).toContain('achille-decision#fin');
+    expect(talk(sim, 0, 'achille', 'relacher')).not.toContain('achille-decision#fin');
+    expect(talk(sim, 1, 'achille', 'relacher')).toContain('achille-decision#fin');
     expect(talk(sim, 1, 'colette')[0]).toBe('colette-epilogue#n1');
     expect(sim.world.progress.quests[Q]?.done).toBe(true);
   });

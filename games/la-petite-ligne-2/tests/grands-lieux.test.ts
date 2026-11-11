@@ -24,7 +24,7 @@ import { keyedParts } from '../src/reseau/par-cles';
 import { NET_SETTINGS } from '../src/reseau/reglages';
 import { byteLength, currentPlace, fastMessage, sliceMessage } from '../src/reseau/tranches';
 import { planToMap } from '../outils/plan-vers-lieu';
-import { dataFiles, gameContent, newSim } from './aides';
+import { dataFiles, gameContent, newSim, withAssembly } from './aides';
 
 const PLAN = fileURLToPath(new URL('../donnees/lieux/aubrune/plan.json', import.meta.url));
 
@@ -53,11 +53,12 @@ describe('plan vers lieu (Aubrune)', () => {
 
   it('se charge comme un lieu du jeu (contrôles de cohérence compris)', () => {
     const files = dataFiles();
-    // La carte brute de l'outil n'a pas encore les portes que les intérieurs livrés attendent
-    // (ajoutées par `assembler_lieu.py` du plan): on la charge seule ici; le lieu livré est chargé par `gameContent`.
-    for (const key of Object.keys(files))
-      if (key.startsWith('lieux/aubrune/interieurs/')) Reflect.deleteProperty(files, key);
-    files['lieux/aubrune/carte.json'] = map;
+    // La grille brute de l'outil, avec les points, les meubles et les portes de l'assemblage
+    // (`assembler_lieu.py` du plan): les intérieurs et les fiches livrés s'y chargent tels quels.
+    files['lieux/aubrune/carte.json'] = v.parse(
+      MapSchema,
+      withAssembly(map, files['lieux/aubrune/carte.json']),
+    );
     files['lieux/aubrune/lieu.json'] = {
       schema: 1,
       id: 'aubrune',

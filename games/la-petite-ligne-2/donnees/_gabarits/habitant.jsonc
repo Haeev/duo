@@ -28,8 +28,12 @@
     // Où (jamais dans le vide):
     //   { "point": "<point>" }                        un point de la carte
     //   { "seat": "<meuble>" }                        une vraie place assise (meuble à brique sit)
+    //   { "bed": "<meuble>" }                         couché dans un lit (meuble à brique sleep)
     //   { "object": "<meuble>", "side": "front" }     devant un meuble (la pompe, l'établi)
     //   { "object": "<meuble>", "side": "behind" }    derrière (le comptoir), tourné vers les clients
+    // Le point ou le meuble peut être dans un intérieur (derrière son comptoir, attablé au café,
+    // dans son lit): il y va par les portes, comme un joueur. La nuit dans son lit: "home" est alors
+    // un point de la même pièce que le lit.
     // "activity": nom lu par le rendu; "gesture": clip joué sur place (balayer), ou null.
     // "with": "<habitant>" pour discuter à deux (l'autre doit avoir une ligne qui le nomme).
     // "shop": "<commerce>" ouvre son commerce pendant cette ligne (il doit en être le keeper).

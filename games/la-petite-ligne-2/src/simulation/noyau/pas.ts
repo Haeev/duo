@@ -12,6 +12,7 @@ import { postureOf } from '../briques/postures';
 import { SIM_DT } from './constantes';
 import { freePlayer } from './deblocage';
 import { movePlayers, stopPlayer } from './deplacement';
+import { lockedPieceOf } from '../regles/recompenses';
 import type { Intent, StepInput } from './entrees';
 import type { GameEvent } from './evenements';
 import { advanceClock } from './horloge';
@@ -53,6 +54,11 @@ function coreIntent(sim: SimContext, player: PlayerIndex, intent: Intent): void 
     actor.selected = intent.slot;
     sim.touch('players');
   } else if (intent.type === 'set_look') {
+    const locked = lockedPieceOf(sim.world, sim.content.pieces, intent.look);
+    if (locked !== null) {
+      sim.emit({ type: 'refused', player, reason: 'piece-locked', target: locked });
+      return;
+    }
     actor.name = intent.name;
     actor.look = intent.look;
     if (intent.gender !== undefined) actor.gender = intent.gender;

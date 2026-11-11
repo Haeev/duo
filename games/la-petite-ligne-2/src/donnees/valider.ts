@@ -18,11 +18,28 @@ import type { Condition, Effect } from './schemas/regles';
 import { BOND_KEY_PREFIX_LENGTH } from '../etat/progression';
 import { validateDialogueTexts } from '../simulation/dialogues/valider';
 import { validateVillagerLives } from '../simulation/habitants/valider';
+import { WARDROBE } from '../simulation/regles/recompenses';
+import { decisionOptions } from '../simulation/quetes/decisions';
 import { validateStory } from '../simulation/quetes/valider';
 import { checkRecipes } from '../simulation/cuisine/valider';
 import { validateHousings } from '../simulation/logement/valider';
 import { validatePassages } from '../simulation/lieux/valider';
 import { checkPlans } from '../simulation/fabrication/valider';
+
+/** Décision à deux citée par une condition ou un effet: déclarée par une étape, option connue. */
+function checkDecision(
+  content: Content,
+  decision: string,
+  option: string | undefined,
+  at: string,
+  problems: string[],
+): void {
+  const options = decisionOptions(content, decision);
+  if (options === null)
+    problems.push(`${at}: décision inconnue « ${decision} » (aucune étape ne la déclare)`);
+  else if (option !== undefined && !options.includes(option))
+    problems.push(`${at}: la décision « ${decision} » n'a pas d'option « ${option} »`);
+}
 
 export function checkCondition(
   content: Content,
@@ -48,8 +65,12 @@ export function checkCondition(
       if (!Object.values(content.places).some((p) => p.villagers.some((v) => v.id === c.villager)))
         problems.push(`${at}: habitant inconnu « ${c.villager} »`);
       return;
+    case 'decision_is':
+      checkDecision(content, c.decision, c.option, at, problems);
+      return;
     case 'remembered':
     case 'need_at_least':
+    case 'money_at_least':
     case 'time_is':
     case 'weather_is':
     case 'season_is':
@@ -73,6 +94,36 @@ export function checkEffect(content: Content, e: Effect, at: string, problems: s
         problems.push(`${at}: habitant inconnu « ${e.villager} »`);
       return;
     case 'open_shop':
+      return;
+    case 'give_recipe': {
+      const recipe = content.recipes[e.recipe];
+      if (recipe === undefined) problems.push(`${at}: recette inconnue « ${e.recipe} »`);
+      else if (recipe.known === 'start')
+        problems.push(`${at}: la recette « ${e.recipe} » est connue dès le début`);
+      return;
+    }
+    case 'give_plan': {
+      const plan = content.plans[e.plan];
+      if (plan === undefined) problems.push(`${at}: plan inconnu « ${e.plan} »`);
+      else if (plan.source === 'start')
+        problems.push(`${at}: le plan « ${e.plan} » est connu dès le début`);
+      return;
+    }
+    case 'give_entry':
+      if (!(e.entry in content.book.entries))
+        problems.push(`${at}: entrée de collection inconnue « ${e.entry} »`);
+      return;
+    case 'give_piece': {
+      const piece = content.pieces[e.piece];
+      if (piece === undefined) problems.push(`${at}: pièce de tenue inconnue « ${e.piece} »`);
+      else if (!piece.tags.includes(WARDROBE.lockedTag))
+        problems.push(
+          `${at}: la pièce « ${e.piece} » n'est pas à gagner (étiquette « ${WARDROBE.lockedTag} »)`,
+        );
+      return;
+    }
+    case 'choose':
+      checkDecision(content, e.decision, e.option, at, problems);
       return;
     case 'remember':
     case 'give_money':
@@ -208,6 +259,9 @@ function checkShop(content: Content, place: PlaceContent, shop: ShopDef, problem
   if (!place.villagers.some((v) => v.id === shop.keeper))
     problems.push(`${at}: habitant inconnu « ${shop.keeper} »`);
   for (const problem of shopProblems(content, shop)) problems.push(`${at}: ${problem}`);
+  for (const c of shop.when ?? []) checkCondition(content, c, `${at}, when`, problems);
+  for (const line of [...shop.sells, ...shop.buys])
+    if (line.unlock !== undefined) checkCondition(content, line.unlock, `${at}, unlock`, problems);
 }
 
 /** Ensembles de meubles (`group`): deux meubles au moins, un siège au moins, assez proches pour un repas. */
@@ -287,6 +341,7 @@ function checkPlace(content: Content, place: PlaceContent, problems: string[]): 
     if (o.id.startsWith('pose-'))
       problems.push(`${where}: le préfixe « pose- » est réservé aux meubles posés par les joueurs`);
     objectIds.add(o.id);
+    for (const c of o.when ?? []) checkCondition(content, c, `${where}, when`, problems);
     const prop = content.props[o.type];
     if (prop === undefined) {
       problems.push(`${where}: meuble inconnu « ${o.type} »`);

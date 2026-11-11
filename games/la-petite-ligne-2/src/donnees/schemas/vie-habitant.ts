@@ -16,11 +16,14 @@ const Minute = v.pipe(IntSchema, v.minValue(0), v.maxValue(1440));
 
 /**
  * Où se tient l'activité: jamais dans le vide. Un point de la carte, une place assise d'un meuble
- * à brique `sit`, ou un meuble devant (ou derrière: le comptoir) lequel on travaille.
+ * à brique `sit`, une place couchée d'un meuble à brique `sleep` (son lit, la nuit), ou un meuble
+ * devant (ou derrière: le comptoir) lequel on travaille. Le point ou le meuble peut être dans un
+ * intérieur: l'habitant y va par les portes (`simulation/lieux/traversee.ts`).
  */
 export const SpotSchema = v.union([
   v.strictObject({ point: IdSchema }),
   v.strictObject({ seat: IdSchema }),
+  v.strictObject({ bed: IdSchema }),
   v.strictObject({ object: IdSchema, side: v.picklist(['front', 'behind']) }),
 ]);
 export type Spot = v.InferOutput<typeof SpotSchema>;
@@ -54,7 +57,7 @@ export type ScheduleEntry = v.InferOutput<typeof ScheduleEntrySchema>;
 export const REACTION_ACTS = ['runs', 'dirty', 'gesture'] as const;
 
 export const VillagerLifeSchema = v.strictObject({
-  /** Point de la carte chez lui: il y est la nuit (contrôlé à 3 h). */
+  /** Point de la carte chez lui: il y est la nuit, ou couché dans la même pièce (contrôlé à 3 h). */
   home: IdSchema,
   schedule: v.pipe(v.array(ScheduleEntrySchema), v.minLength(1), v.maxLength(32)),
   /** Onomatopée du premier bonjour du jour à chaque joueur. */

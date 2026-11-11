@@ -57,13 +57,12 @@
           "when": [],
           "effects": [
             {
-              "type": "remember",
-              "key": "aubrune.baronne.sort",
-              "value": "relachee",
-              "by": "duo"
+              "type": "choose",
+              "decision": "baronne",
+              "option": "relachee"
             }
           ],
-          "next": "n3-relacher-1"
+          "next": "accord"
         },
         {
           "id": "friture",
@@ -71,13 +70,12 @@
           "when": [],
           "effects": [
             {
-              "type": "remember",
-              "key": "aubrune.baronne.sort",
-              "value": "friture",
-              "by": "duo"
+              "type": "choose",
+              "decision": "baronne",
+              "option": "friture"
             }
           ],
-          "next": "n3-friture-1"
+          "next": "accord"
         },
         {
           "id": "attendre",
@@ -92,6 +90,82 @@
       "kind": "line",
       "speaker": "achille",
       "text": "Va le dire à Colette. Moi, je reste un peu au bord. Je crois que je n'ai plus sommeil. C'est très inquiétant.",
+      "emote": null,
+      "next": null
+    },
+    "accord-relacher": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.baronne.sort",
+          "value": "relachee",
+          "by": "duo"
+        }
+      ],
+      "next": "n3-relacher-1"
+    },
+    "accord-friture": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "remember",
+          "key": "aubrune.baronne.sort",
+          "value": "friture",
+          "by": "duo"
+        }
+      ],
+      "next": "n3-friture-1"
+    },
+    "accord": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "baronne",
+              "state": "agreed",
+              "option": "relachee"
+            }
+          ],
+          "next": "accord-relacher"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "baronne",
+              "state": "agreed",
+              "option": "friture"
+            }
+          ],
+          "next": "accord-friture"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "baronne",
+              "state": "split"
+            }
+          ],
+          "next": "desaccord"
+        }
+      ],
+      "otherwise": "une-voix"
+    },
+    "une-voix": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Une voix. Il m'en faut deux, et la même. J'attends l'autre, les yeux fermés.",
+      "emote": null,
+      "next": null
+    },
+    "desaccord": {
+      "kind": "line",
+      "speaker": "achille",
+      "text": "Deux voix, deux avis. Mettez-vous d'accord, puis revenez me le dire. Elle attend depuis 1934, elle a le temps.",
       "emote": null,
       "next": null
     }

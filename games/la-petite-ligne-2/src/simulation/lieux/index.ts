@@ -6,10 +6,13 @@
  * qu'à ne pas répéter un événement: rien ne s'y joue.
  */
 import type { WorldState } from '../../etat/monde';
+import { postureOf } from '../briques/postures';
+import { freePlayer } from '../noyau/deblocage';
 import { canWalk } from '../noyau/deplacement';
 import { CORE_TUNING } from '../noyau/reglages-noyau';
 import type { GameSystem, SimContext } from '../noyau/systemes';
 import { doorRefusal, passDoor, touchedDoor } from './portes';
+import { conditionalObjects, refreshPresence } from './presents';
 import { PLACES } from './reglages';
 import { lockCount, locksOf, refreshLockStates } from './verrous';
 
@@ -18,12 +21,17 @@ export { isZoneOpen, zoneViews, zoneAt, reachMask, type ZoneView } from './zones
 export { interiorAt, playerInterior, doorRefusal, passDoor, sillsOf } from './portes';
 export { passageSays } from './passage';
 export { edgePassable, closedLockSet } from './chemins';
+export { absentObjects, isObjectAbsent, isObjectPresent } from './presents';
+export { areaAt, doorChain, type DoorHop } from './traversee';
 
 interface Runtime {
   place: string;
   readonly locks: Uint8Array;
   /** Copie de `locks` au pas précédent (gardée pour ne rien allouer à chaque pas). */
   readonly before: Uint8Array;
+  /** Présence des meubles conditionnés (`when`), et sa copie au pas précédent. */
+  readonly present: Uint8Array;
+  readonly presentBefore: Uint8Array;
   /** Porte refusée à chaque joueur, tant qu'il la touche (un seul refus par approche). */
   readonly refused: [string | null, string | null];
   /**
@@ -45,10 +53,13 @@ function runtimeOf(sim: SimContext): Runtime | null {
       place: sim.world.common.place,
       locks: new Uint8Array(lockCount(place)),
       before: new Uint8Array(lockCount(place)),
+      present: new Uint8Array(conditionalObjects(place).length),
+      presentBefore: new Uint8Array(conditionalObjects(place).length),
       refused: [null, null],
       arrived: [null, null],
     };
     refreshLockStates(sim, place, rt.locks);
+    refreshPresence(sim, place, rt.present);
     runtimes.set(sim.world, rt);
   }
   return rt;
@@ -67,6 +78,29 @@ function watchLocks(sim: SimContext, rt: Runtime): void {
       object: lock.object,
     });
   });
+}
+
+/**
+ * Meubles conditionnés: un événement par meuble qui paraît ou disparaît, et un joueur pris dans
+ * un meuble qui vient de paraître est dégagé sur la case libre la plus proche.
+ */
+function watchObjects(sim: SimContext, rt: Runtime): void {
+  const place = sim.content.places[sim.world.common.place];
+  const state = sim.world.places[sim.world.common.place];
+  if (place === undefined || rt.present.length === 0) return;
+  rt.presentBefore.set(rt.present);
+  if (!refreshPresence(sim, place, rt.present)) return;
+  conditionalObjects(place).forEach((object, i) => {
+    if (rt.presentBefore[i] === rt.present[i]) return;
+    sim.emit({ type: 'map_object_changed', object: object.id, present: rt.present[i] === 1 });
+  });
+  if (state === undefined) return;
+  for (const player of [0, 1] as const) {
+    if (postureOf(state, player) !== null) continue;
+    if (!freePlayer(sim.content, sim.world, player)) continue;
+    sim.touch('players');
+    sim.emit({ type: 'unstuck', player });
+  }
 }
 
 /** Le joueur peut-il repasser une porte en marchant ? Faux tant qu'il tient la direction du dernier passage. */
@@ -113,6 +147,7 @@ export const placeSystem: GameSystem = {
     const rt = runtimeOf(sim);
     if (rt === null) return;
     watchLocks(sim, rt);
+    watchObjects(sim, rt);
     walkThroughDoors(sim, rt);
   },
 };

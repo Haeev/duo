@@ -4,12 +4,12 @@
  * plafond du jour, mémoire des prix. Aucun contenu nommé: tout vient des données du commerce.
  */
 import type { Content } from '../../donnees/charger';
-import type { ShopDef, ShopSell } from '../../donnees/schemas/commerce';
+import type { ShopBuy, ShopDef, ShopSell } from '../../donnees/schemas/commerce';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
 import { bondKey } from '../../etat/progression';
 import { modifiersOf } from '../besoins/jauges';
-import { evaluate } from '../regles/conditions';
+import { evaluate, evaluateAll } from '../regles/conditions';
 import { RULES } from '../regles/reglages';
 import { SHOP_TUNING } from './reglages';
 
@@ -27,6 +27,42 @@ export function shopDef(look: ShopLook, shop: string): ShopDef | null {
 export function isOpen(shop: ShopDef, minutes: number): boolean {
   const { from, to } = shop.hours;
   return from <= to ? minutes >= from && minutes < to : minutes >= from || minutes < to;
+}
+
+/** Commerce tenu: ses conditions d'histoire (`when`) sont vraies. */
+export function isAvailable(look: ShopLook, shop: ShopDef): boolean {
+  return shop.when === undefined || evaluateAll({ ...look, actor: null }, shop.when);
+}
+
+/** On y commerce maintenant: tenu (histoire) et ouvert (heures). */
+export function isTrading(look: ShopLook, shop: ShopDef): boolean {
+  return isAvailable(look, shop) && isOpen(shop, look.world.minutes);
+}
+
+/** Moments où le commerçant dit sa réplique dans l'écran de boutique. */
+export type ShopMoment = 'bought' | 'sold' | 'not-wanted' | 'not-enough-money';
+
+/**
+ * La réplique du commerçant pour ce moment, lue dans la fiche du commerce (`lines`, `refusal`);
+ * `null`: il n'en a pas, l'écran dit son texte commun. `not-wanted` et `not-enough-money` sont
+ * les raisons des refus (`refused`) de même nom.
+ */
+export function shopSays(shop: ShopDef, moment: ShopMoment): string | null {
+  switch (moment) {
+    case 'bought':
+      return shop.lines?.bought ?? null;
+    case 'sold':
+      return shop.lines?.sold ?? null;
+    case 'not-wanted':
+      return shop.refusal ?? null;
+    case 'not-enough-money':
+      return shop.lines?.noMoney ?? null;
+  }
+}
+
+/** La réplique du commerçant devant ce refus, `null` si la raison n'en appelle pas. */
+export function shopSaysRefusal(shop: ShopDef, reason: string): string | null {
+  return reason === 'not-wanted' || reason === 'not-enough-money' ? shopSays(shop, reason) : null;
 }
 
 function roundPrice(cents: number): number {
@@ -54,6 +90,17 @@ export function basePrice(content: Content, shop: ShopDef, item: string): number
     return ref === null ? null : roundPrice(ref * line.factor);
   }
   return family === undefined ? null : familyPrice(shop, family);
+}
+
+/** La ligne de rachat qui s'applique à cet objet: la sienne d'abord, puis celle de sa famille. */
+export function buyLineFor(content: Content, shop: ShopDef, item: string): ShopBuy | null {
+  const family = content.items[item]?.family;
+  let byFamily: ShopBuy | null = null;
+  for (const line of shop.buys) {
+    if ('item' in line && line.item === item) return line;
+    if ('family' in line && line.family === family) byFamily ??= line;
+  }
+  return byFamily;
 }
 
 /** Petit hachage stable (FNV-1a): le même chez l'hôte et chez l'invité, sans `Math.random`. */
@@ -99,6 +146,9 @@ export function offerFor(
 ): Offer | null {
   const base = basePrice(look.content, shop, item);
   if (base === null) return null;
+  // Rachat conditionné par l'histoire: tant que sa condition est fausse, il n'en veut pas.
+  const line = buyLineFor(look.content, shop, item);
+  if (line?.unlock !== undefined && !evaluate({ ...look, actor: player }, line.unlock)) return null;
   const need = dailyNeed(look, shop) === item;
   let factor = need ? SHOP_TUNING.dailyNeedFactor : 1;
   const hearts = heartsWith(look.world, shop.keeper, player);

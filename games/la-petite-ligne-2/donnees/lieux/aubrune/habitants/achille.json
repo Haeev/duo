@@ -88,7 +88,8 @@
         "from": 420,
         "to": 1080,
         "at": {
-          "point": "gr4"
+          "object": "fournil-comptoir",
+          "side": "behind"
         },
         "activity": "vendre-le-pain",
         "gesture": null,

@@ -11,7 +11,14 @@ ne bougent pas), meubles et décor dont le type existe déjà (`donnees/commun/m
 portes et intérieurs (annexe sous le dehors), nœuds de portes et d'intérieurs dans le graphe. Il écrit `carte.json`,
 `lieu.json`, `climat.json`, `interieurs/*.json` et la copie de `plan.json` du lieu, puis prouve qu'aucun verrou ne se contourne: pour chaque
 verrou fermé (avec ceux des actes suivants et les raccourcis), aucun nœud que le graphe dit fermé n'est atteint en
-marchant sur la grille. Rien de tout cela ne se retouche à la main: on corrige le plan et on relance les deux étapes.
+marchant sur la grille. Rien de ce que le script écrit ne se retouche à la main: on corrige le plan et on relance les
+deux étapes.
+
+Ce qui s'ajoute à la main dans les fichiers du lieu est conservé d'une passe à l'autre (`conserver`): tout champ que
+le script n'écrit pas lui-même. Dans un intérieur: l'habillage du rendu (`style`, `rugs`, `windows`); sur un meuble ou
+une porte, d'un intérieur comme de `carte.json`, retrouvés par leur identifiant: les conditions de jeu (`when` d'un
+meuble, `opens` et `says` d'une porte, `group`...). Un meuble ou une porte qui disparaît du plan perd ses ajouts.
+Relancer le script sans toucher au plan ne change donc aucun fichier.
 """
 import json
 import os
@@ -26,8 +33,48 @@ LIEU = os.path.join(PAQUET, 'donnees', 'lieux', 'aubrune')
 ANNEXE_Y = 210  # sous le dehors (208) et son mur
 
 
+# Ce que le script écrit lui-même; tout autre champ trouvé dans un fichier existant a été ajouté à la main.
+ECRITS_PIECE = {'schema', 'id', 'name', 'width', 'height', 'at', 'blocked', 'points', 'objects', 'doors', 'pourquoi'}
+ECRITS_MEUBLE = {'id', 'type', 'x', 'y', 'rotation'}
+ECRITS_PORTE = {'x', 'y', 'facing', 'to'}
+
+
 def gid(s):
     return s.replace('_', '-').lower()
+
+
+def lire(chemin):
+    if not os.path.exists(chemin):
+        return None
+    with open(chemin, encoding='utf-8') as f:
+        return json.load(f)
+
+
+def conserver_elements(objets, portes, ancien, gardes, ecrits=ECRITS_MEUBLE):
+    """Reporte sur les meubles et les portes (retrouvés par identifiant) les champs ajoutés à la main dans `ancien`."""
+    vieux_objets = {o['id']: o for o in ancien.get('objects', [])}
+    for o in objets:
+        for k, v in vieux_objets.get(o['id'], {}).items():
+            if k not in ecrits:
+                o[k] = v
+                gardes.append('%s.%s' % (o['id'], k))
+    for k_porte, d in portes.items():
+        for k, v in (ancien.get('doors') or {}).get(k_porte, {}).items():
+            if k not in ECRITS_PORTE:
+                d[k] = v
+                gardes.append('%s.%s' % (k_porte, k))
+
+
+def conserver(room, ancien, gardes):
+    """La pièce écrite par le script, plus les champs ajoutés à la main dans le fichier existant, dans le même ordre."""
+    if ancien is None:
+        return room
+    conserver_elements(room['objects'], room['doors'], ancien, gardes)
+    ajouts = {k: v for k, v in ancien.items() if k not in ECRITS_PIECE}
+    gardes += ['%s.%s' % (room['id'], k) for k in ajouts]
+    fusion = dict(room, **ajouts)
+    ordre = [k for k in ancien if k in fusion] + [k for k in fusion if k not in ancien]
+    return {k: fusion[k] for k in ordre}
 
 
 def main(brute):
@@ -139,9 +186,12 @@ def main(brute):
     portes = {}
     bats = {b['id']: b for b in plan['batiments']}
     os.makedirs(os.path.join(LIEU, 'interieurs'), exist_ok=True)
+    anciens, gardes = {}, []
     for f in os.listdir(os.path.join(LIEU, 'interieurs')):
         if f.endswith('.json'):
+            anciens[f[:-5]] = lire(os.path.join(LIEU, 'interieurs', f))
             os.remove(os.path.join(LIEU, 'interieurs', f))
+    ancienne_carte = lire(os.path.join(LIEU, 'carte.json')) or {}
     x_cur = 2
     sens_dehors = {'sud': 0, 'est': 1, 'nord': 2, 'ouest': 3}
     for it in plan['interieurs']:
@@ -190,10 +240,13 @@ def main(brute):
             noeuds[p['id']] = loc(p['x'], p['y'])
             if noeud_entree:
                 aretes.append(dict(a=noeud_entree, b=p['id'], kind='interieur', lock=None))
+        room = conserver(room, anciens.get(iid), gardes)
         with open(os.path.join(LIEU, 'interieurs', iid + '.json'), 'w', encoding='utf-8', newline='\n') as f:
             json.dump(room, f, ensure_ascii=False, indent=1)
             f.write('\n')
     carte['doors'] = portes
+    # Dehors, le `pourquoi` d'un meuble vient du plan: celui du fichier n'est pas un ajout.
+    conserver_elements(objets, portes, ancienne_carte, gardes, ECRITS_MEUBLE | {'pourquoi'})
     # Le bâtiment nomme son intérieur de plain-pied quand il est livré; sinon l'identifiant prévu reste.
     for it in plan['interieurs']:
         if it['niveau'] == 0:
@@ -258,6 +311,7 @@ def main(brute):
         if k in noeuds:
             noeuds[k] = dict(pts[k])
     print('points posés sur la case libre la plus proche:', ', '.join(deplaces))
+    print('champs ajoutés à la main, conservés (%d):' % len(gardes), ', '.join(gardes))
 
     with open(os.path.join(LIEU, 'carte.json'), 'w', encoding='utf-8', newline='\n') as f:
         f.write(json.dumps(carte, ensure_ascii=False, separators=(',', ':')) + '\n')

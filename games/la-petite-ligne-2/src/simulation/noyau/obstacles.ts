@@ -9,6 +9,7 @@ import type { PropDef } from '../../donnees/schemas/meuble';
 import type { PlaceState } from '../../etat/lieu';
 import type { DeepReadonly, ReadonlyWorld } from '../../etat/monde';
 import type { Blockers } from './grille';
+import { conditionalObjects, refreshPresence } from '../lieux/presents';
 import { lockCount, markClosedLocks, refreshLockStates } from '../lieux/verrous';
 
 /** Un meuble en place, qu'il vienne de la carte ou d'un joueur. */
@@ -29,6 +30,10 @@ interface Cached {
   readonly locks: Uint8Array;
   /** Objets de la carte qui sont l'obstacle d'un verrou, et l'index de ce verrou. */
   readonly lockObjects: ReadonlyMap<string, number>;
+  /** Présence des meubles conditionnés (`when`) à la dernière construction (1 présent). */
+  readonly present: Uint8Array;
+  /** Meubles conditionnés de la carte, et leur index dans `present`. */
+  readonly conditional: ReadonlyMap<string, number>;
 }
 
 const cache = new WeakMap<PlaceContent, Cached>();
@@ -44,9 +49,14 @@ export function footprintOf(
   return rotation % 2 === 0 ? def.size : { w: def.size.h, h: def.size.w };
 }
 
-/** Un meuble solide bloque, sauf une porte ouverte (brique `open`) ou l'obstacle d'un verrou ouvert. */
+/**
+ * Un meuble solide bloque, sauf une porte ouverte (brique `open`), l'obstacle d'un verrou ouvert
+ * ou un meuble conditionné absent.
+ */
 function blocks(def: PropDef, state: ReadPlace, id: string, cached: Cached): boolean {
   if (!def.solid) return false;
+  const when = cached.conditional.get(id);
+  if (when !== undefined && cached.present[when] !== 1) return false;
   const lock = cached.lockObjects.get(id);
   if (lock !== undefined) return cached.locks[lock] !== 1;
   return state.objects[id]?.open !== true;
@@ -110,12 +120,15 @@ export function placeBlockers(
       // 2: ni ouvert ni fermé, pour forcer la première construction.
       locks: new Uint8Array(lockCount(place)).fill(2),
       lockObjects,
+      present: new Uint8Array(conditionalObjects(place).length).fill(2),
+      conditional: new Map(conditionalObjects(place).map((o, i) => [o.id, i])),
     };
     cache.set(place, cached);
   }
   const locksChanged = refreshLockStates({ content, world }, place, cached.locks);
+  const presenceChanged = refreshPresence({ content, world }, place, cached.present);
   const signature = signatureOf(place, state);
-  if (signature !== cached.signature || locksChanged) {
+  if (signature !== cached.signature || locksChanged || presenceChanged) {
     cached.signature = signature;
     cached.blockers.props.fill(0);
     markClosedLocks(place, cached.locks, cached.blockers.props, place.map.width, place.map.height);

@@ -14,6 +14,8 @@ import { effectTargets } from '../dialogues/echanges';
 import { earn, pay } from '../sac/argent';
 import { removeItem } from '../sac/inventaire';
 import { remember } from './memoire';
+import { giveEntry, givePiece, givePlan, giveRecipe } from './recompenses';
+import { choose } from '../quetes/decisions';
 
 export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect): void {
   switch (effect.type) {
@@ -48,6 +50,21 @@ export function applyEffect(sim: SimContext, actor: PlayerIndex, effect: Effect)
       return;
     case 'open_shop':
       openShop(sim, actor, effect.shop);
+      return;
+    case 'give_recipe':
+      giveRecipe(sim, actor, effect.recipe);
+      return;
+    case 'give_plan':
+      givePlan(sim, actor, effect.plan);
+      return;
+    case 'give_entry':
+      giveEntry(sim, actor, effect.entry);
+      return;
+    case 'give_piece':
+      givePiece(sim, actor, effect.piece);
+      return;
+    case 'choose':
+      choose(sim, actor, effect.decision, effect.option);
       return;
   }
 }

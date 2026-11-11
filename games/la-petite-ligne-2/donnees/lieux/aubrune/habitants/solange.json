@@ -64,7 +64,8 @@
         "from": 420,
         "to": 1170,
         "at": {
-          "point": "gr4"
+          "object": "mercerie-comptoir",
+          "side": "front"
         },
         "activity": "coudre",
         "gesture": null,

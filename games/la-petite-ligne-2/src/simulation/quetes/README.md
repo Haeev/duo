@@ -13,3 +13,15 @@ Une suite (`donnees/lieux/<lieu>/quetes/<id>.json`, schéma `src/donnees/schemas
 - `reglages.ts`: rayons, délais, vitesses (à migrer dans `reglages.json`).
 
 Événements: `quest_opened`, `quest_step_done` (`by`: le joueur au nom de qui elle passe), `quest_done`, `chapter_ended`. Intentions: `quest_track`, `chapter_end_close`. Le système n'évalue que les suites du lieu où l'on joue, tous les `checkEveryTicks` pas.
+
+## Décision à deux (recette)
+
+1. L'étape la déclare: `"decision": { "id": "<décision>", "options": ["<a>", "<b>"] }`, et l'attend: `"done": [{ "type": "decision_is", "decision": "<décision>", "state": "agreed" }]`.
+2. Un dialogue du lieu offre chaque option: `"effects": [{ "type": "choose", "decision": "<décision>", "option": "<a>" }]`.
+3. Après le choix, un nœud `branch` sur `decision_is`: `agreed` (avec `option`: la suite), `split` (le texte invite à se mettre d'accord), sinon une réplique d'attente.
+4. La décision n'est prise que si les deux choix concordent; avant, chacun peut changer d'avis; prise, elle ne bouge plus (`decisions.ts`).
+5. État: trois faits de la mémoire (`decisions.<id>.j0`, `.j1`, `decisions.<id>`), donc sauvegardés et transmis sans rien ajouter. Événement `decision_changed` (`waiting`, `split`, `agreed`), annoncé par l'interface.
+6. Le chargement refuse une décision sans accord attendu, une option qu'aucun dialogue n'offre, un `choose` vers une décision inconnue.
+7. Exemple livré: `la-baronne.json` et `achille-decision.json`. Test court: `tests/decision-a-deux.test.ts`.
+
+Événement `reward_given`: récompenses qui ne sont pas des objets (`regles/recompenses.ts`).

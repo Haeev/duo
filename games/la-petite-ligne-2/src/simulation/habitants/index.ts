@@ -69,11 +69,16 @@ function newLifeState(): VillagerLifeState {
   };
 }
 
-/** Une place est prise par un joueur (brique `sit`) ou par un autre habitant. */
+/** Un joueur tient cette place du meuble: assis (brique `sit`) ou couché (brique `sleep`). */
+function heldByPlayer(place: PlaceState, object: string, index: number): boolean {
+  const states = place.objects[object];
+  return (states?.sit?.[index] ?? null) !== null || (states?.sleep?.[index] ?? null) !== null;
+}
+
+/** Une place est prise par un joueur (briques `sit`, `sleep`) ou par un autre habitant. */
 function seatTakenIn(place: PlaceState, self: string): (object: string, index: number) => boolean {
   return (object, index) => {
-    const player = place.objects[object]?.sit?.[index];
-    if (player !== undefined && player !== null) return true;
+    if (heldByPlayer(place, object, index)) return true;
     for (const [id, other] of Object.entries(place.villagers)) {
       if (id === self) continue;
       const seat = other.life?.seat;
@@ -111,7 +116,7 @@ function settle(
     body.y = goal.seat.y;
     body.facing = goal.seat.facing;
     state.seat = [goal.seat.object, goal.seat.index];
-    state.pose = 'sit';
+    state.pose = goal.seat.pose;
   } else if (goal.facing !== null) body.facing = goal.facing;
   state.activity = entry.activity;
   state.gesture = entry.gesture;
@@ -325,7 +330,8 @@ function walk(
     }
     const dx = target.x - body.x;
     const dy = target.y - body.y;
-    const d = Math.hypot(dx, dy);
+    // Une porte se franchit d'un coup: il arrive devant l'autre porte de la paire.
+    const d = target.jump === true ? 0 : Math.hypot(dx, dy);
     if (d <= budget) {
       body.x = target.x;
       body.y = target.y;
@@ -532,11 +538,8 @@ function liveOne(
     }
   }
   if (state.presence === 'away') return;
-  // Un joueur s'est assis à sa place: il se lève, surpris, et reste à côté.
-  if (
-    state.seat !== null &&
-    (place.objects[state.seat[0]]?.sit?.[state.seat[1]] ?? null) !== null
-  ) {
+  // Un joueur s'est assis (ou couché) à sa place: il se lève, surpris, et reste à côté.
+  if (state.seat !== null && heldByPlayer(place, state.seat[0], state.seat[1])) {
     leaveSeat(sim, state);
     if (rt.goal !== null) {
       body.x = rt.goal.x;

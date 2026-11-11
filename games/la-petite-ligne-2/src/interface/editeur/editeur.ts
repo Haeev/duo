@@ -8,6 +8,7 @@
 import type { Gender, Look } from '../../donnees/schemas/personnage';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { ReadonlyWorld } from '../../etat/monde';
+import { wardrobeOf } from '../../simulation/regles/recompenses';
 import type { Intent } from '../../simulation/noyau/entrees';
 import { el, setText, show, toggle } from '../dom';
 import {
@@ -77,7 +78,8 @@ type BarItem = (typeof BAR)[number];
 
 export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): CharacterEditor {
   const S = EDITOR_SETTINGS;
-  const { data } = deps;
+  // Le catalogue du duo: sans les pièces à gagner pas encore gagnées (relu à chaque ouverture).
+  let data = deps.data;
   const categories = editorCategories(data.catalogue, S);
 
   const canvas = el('canvas', { class: 'lpl-ed__canvas', 'aria-hidden': 'true' });
@@ -497,6 +499,7 @@ export function createCharacterEditor(layer: HTMLElement, deps: EditorDeps): Cha
   return {
     open(nextMode, world, me) {
       const state = world.players[me];
+      data = { ...deps.data, catalogue: wardrobeOf(deps.data.catalogue, world) };
       mode = nextMode;
       player = me;
       const gender = state.gender ?? deps.defaultGender(me);

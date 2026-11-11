@@ -7,6 +7,7 @@
  */
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { BeatDef, GestureDef, SceneDef, SceneRun } from '../../donnees/schemas/scene';
+import { doorChain } from '../lieux/traversee';
 import { bodyCollides } from '../noyau/grille';
 import { placeBlockers } from '../noyau/obstacles';
 import type { SimContext } from '../noyau/systemes';
@@ -239,6 +240,16 @@ function walk(sim: SimContext, run: SceneRun, who: string, to: string, elapsed: 
   walkedAt.set(run, sim.world.tick);
   const point = stageSpot(sim, run, target);
   const body = villager.body;
+  // Il n'est pas dans la pièce de la scène (derrière son comptoir, au lit): il en sort par les
+  // portes et arrive devant la dernière, puis marche. Sans cela il traverserait la carte en ligne droite.
+  const place = sim.content.places[run.place];
+  const chain = place === undefined ? null : doorChain(place, body.x, body.y, point.x, point.y);
+  const last = chain?.[chain.length - 1];
+  if (last !== undefined) {
+    body.x = last.toX;
+    body.y = last.toY;
+    sim.emit({ type: 'villager_door', villager: who, door: last.door });
+  }
   // Il quitte ce qu'il faisait (balayer, être assis): le rendu le fait marcher, pas glisser dans
   // la pose de son activité. Le planning lui rend son poste et son geste après la scène.
   const life = villager.life;

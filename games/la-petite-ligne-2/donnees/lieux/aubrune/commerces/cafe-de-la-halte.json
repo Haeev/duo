@@ -8,6 +8,12 @@
     "from": 420,
     "to": 1320
   },
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.acte2.train"
+    }
+  ],
   "sells": [
     {
       "item": "soupe-de-legumes",

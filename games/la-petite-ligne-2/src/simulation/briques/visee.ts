@@ -11,6 +11,7 @@
 import type { Brick, BrickId } from '../../donnees/schemas/briques';
 import type { PlayerIndex } from '../../donnees/schemas/communs';
 import type { PropDef } from '../../donnees/schemas/meuble';
+import { isObjectPresent } from '../lieux/presents';
 import { isWallCell, type Blockers } from '../noyau/grille';
 import {
   currentBlockers,
@@ -173,7 +174,8 @@ export function aimOf(
       return { action: brick.brick, verb, refusal, tool };
     });
   };
-  for (const object of placeContent.map.objects) considerProp(object);
+  for (const object of placeContent.map.objects)
+    if (isObjectPresent(look, object)) considerProp(object);
   for (const placed of place.placed) considerProp(placed);
 
   if (boarded) return best;

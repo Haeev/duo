@@ -719,3 +719,15 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Végétation semée en vrais modèles: environ 950 triangles par arbre contre 92 pour tronc et boule. Le bois le plus dense d'Aubrune passe de 237 k à 900 k triangles dessinés; instancier par morceau de 16 m (et non par tuile) ramène à 583 k pour 57 appels de plus.
 - Les légendes de terrain des grands lieux ont des natures sans entrée dans `GROUND_LOOKS` (prairie, friche, herbe-rase): lire leur surface par `GROUND_LOOKS[n] ?? DEFAULT_LOOK`, comme `surfaceAt`.
 - `Box3.setFromObject` sur l'objet posé donne une boîte d'occultation juste (variante, cap, échelle, état, relief), sans passer par le manifeste.
+
+## Briques d'Aubrune: intérieurs, récompenses, décisions (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Le graphe des chemins d'un grand lieu contient aussi les nœuds des intérieurs (annexe sous la carte) et des arêtes `porte` longues de 200 m: un trajet d'habitant se calcule pièce par pièce (`habitants/chemins.ts`, `lieux/traversee.ts`: `doorChain`), jamais d'un trait sur le graphe. Une marche de scène ou le coup d'œil des quêtes vers une autre pièce passe aussi par `doorChain`.
+- La source d'Aubrune est `construire_plan.py` (plan.json, SVG, PNG, plan.md): ajouter un meuble à un intérieur est un changement de plan (level designer), pas une retouche de `plan.json`. `assembler_lieu.py` conserve les champs ajoutés à la main (`conserver`): le relancer ne doit rien changer (`git diff` identique avant et après).
+- Carte brute du plan dans un test (`planToMap`): `withAssembly(brute, carte livrée)` de `tests/aides.ts` y greffe points, meubles et portes de l'assemblage; les fiches qui citent un intérieur s'y chargent.
+- JSON de données retouché par script: `json.dump(indent=2)` puis `prettier --write` sur ces seuls fichiers rend le format du dépôt quand le fichier était tout déplié (habitants, quêtes, intérieurs). Pas `plan.json` (objets sur une ligne): le dépliage resterait.
+- Outil Bash isolé: tout heredoc (`python3 - <<EOF`, `cat > f <<EOF`) est refusé; écrire le script par Write dans le scratchpad puis `python3 script.py .`. `git -C` aussi est refusé.
+- État sans schéma nouveau: une décision à deux, une recette donnée, une pièce de tenue gagnée tiennent en faits de `progress.memory` (clé `a.b.c`, quatre segments au plus): sauvegarde et réseau inchangés.
+- Un événement ajouté: ses `case` dans `interface/index.ts` et `interface/cuisine/index.ts` (lint seulement, `tsc` ne le voit pas). Une condition ou un effet ajouté: `donnees/valider.ts` (`checkCondition`, `checkEffect`) et la liste de `quetes/valider.ts` (`checkEffects`).
+- Meuble de carte conditionné (`when`): absent pour la simulation (`lieux/presents.ts`), mais le rendu le dessine tant qu'il ne lit pas `absentObjects`. Posture `lie` d'un habitant: le rendu ne connaît que `sit`.
+
