@@ -26,7 +26,8 @@
         "from": 360,
         "to": 720
       },
-      "weathers": ["clear", "overcast"],
+      "weathers": [],
+      "rainedYesterday": false,
       "seasons": ["summer", "autumn"]
     },
     {
@@ -39,7 +40,8 @@
         "from": 360,
         "to": 720
       },
-      "weathers": ["rain", "mist", "storm", "snow"],
+      "weathers": [],
+      "rainedYesterday": true,
       "seasons": ["summer", "autumn"]
     }
   ]

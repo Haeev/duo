@@ -373,6 +373,59 @@ describe('la draisine: la voie', () => {
     expect(Math.abs(Math.sin(pose.yaw))).toBeLessThan(0.5);
   });
 
+  it('cède la voie à un passant: freine en douceur, attend sans choc, repart au coup de timbre', () => {
+    const sim = aboard();
+    const def = draisine();
+    const at = LAUNCH_X + 45;
+    // Un habitant planté sur la voie, tenu à sa place à chaque pas tant qu'il y est.
+    let walker = true;
+    const keep = (): void => {
+      const villagers = place(sim.world).villagers;
+      if (!walker) {
+        delete villagers['passant-essai'];
+        return;
+      }
+      villagers['passant-essai'] = {
+        met: [false, false],
+        talkingWith: null,
+        body: { x: at, y: TRACK_Y, facing: 0, speed: 0 },
+      };
+    };
+    const events: GameEvent[] = [];
+    let beat = 0;
+    let worst = 0;
+    let last = vehicle(sim).speed;
+    for (let i = 0; i < 16 * SIM_HZ; i++) {
+      keep();
+      const presses: PlayerIndex[] =
+        i < 9 * SIM_HZ && i % Math.round(0.45 * SIM_HZ) === 0 ? [beat++ % 2 === 0 ? 0 : 1] : [];
+      events.push(...tick(sim, presses));
+      const speed = vehicle(sim).speed;
+      // Le dernier pas avant l'arrêt (moins de 0,5 m/s) arrondit à zéro: il ne compte pas.
+      if (speed > 0.5) worst = Math.max(worst, (last - speed) * SIM_HZ);
+      last = speed;
+      // Le tampon avant ne touche jamais le passant (rayon 0,3 m).
+      expect(vehicle(sim).s + def.body.front).toBeLessThan(at - 0.3);
+    }
+    const state = vehicle(sim);
+    expect(state.speed).toBe(0);
+    expect(at - 0.3 - (state.s + def.body.front)).toBeGreaterThan(1);
+    // Freinage doux: jamais plus que le freinage de la fiche (avec la roue libre).
+    expect(worst).toBeLessThan(def.speed.endBrake + def.speed.roll + def.speed.drag * 8 + 0.1);
+    // Pas un « arrêt »: ni événement, ni effets d'arrêt.
+    expect(events.some((e) => e.type === 'vehicle_stopped')).toBe(false);
+    expect(events.some((e) => e.type === 'vehicle_bell')).toBe(false);
+    walker = false;
+    const after: GameEvent[] = [];
+    for (let i = 0; i < 2 * SIM_HZ; i++) {
+      keep();
+      after.push(...tick(sim));
+    }
+    expect(after.filter((e) => e.type === 'vehicle_bell')).toHaveLength(1);
+    expect(vehicle(sim).speed).toBeGreaterThan(1);
+    expect(vehicle(sim).s + def.body.front).toBeGreaterThan(at - 0.3);
+  });
+
   it('les arrêts posent les faits de la suite: aller au passage de l’Église, retour à la halte', () => {
     const sim = aboard();
     const fact = (key: string): unknown => sim.world.progress.memory[key]?.v;

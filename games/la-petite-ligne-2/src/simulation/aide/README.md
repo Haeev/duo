@@ -13,4 +13,4 @@ Cahier 2.4 et CA-23: trois crans par joueur (Normal, Coup de pouce, Grand coup d
 4. Mini-jeu joué sur la machine du joueur puis rejoué par l'hôte: figer `f` dans l'état au départ (comme `help` d'une ligne de pêche), pour que les deux machines jouent la même partie même si le cran change en route.
 5. Test court: le même mini-jeu à deux joueurs, l'un aidé et l'autre non (exemple: `tests/aide.test.ts`).
 
-Déjà branchés: pêche seule (`help` de la ligne), pêche à deux (`rodAid`, `netAid` du combat), cuisine (`windowScaleOf`), filet à insectes (`swingNet`).
+Déjà branchés: pêche seule (`help` de la ligne), pêche à deux (`rodAid`, `netAid` du combat), cuisine (`windowScaleOf`), filet à insectes (`swingNet`), musique jouée (`windowScaleOf`, figée au lancement de l'air).

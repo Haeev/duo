@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "armand-clarinette",
+  "villager": "armand",
+  "priority": 39,
+  "when": [
+    {
+      "type": "remembered",
+      "key": "aubrune.secret-2.armand",
+      "equals": true
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "remembered",
+        "key": "aubrune.armand.clarinette"
+      }
+    }
+  ],
+  "once": null,
+  "start": "n1",
+  "nodes": {
+    "n1": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Les clarinettes. Je les ai gardées sous le bras, au cas où. Enfin, c'est un peu pour ça que je suis là.",
+      "emote": null,
+      "next": "donner"
+    },
+    "donner": {
+      "kind": "effects",
+      "effects": [
+        {
+          "type": "give_item",
+          "item": "clarinette",
+          "count": 1,
+          "to": "duo"
+        },
+        {
+          "type": "remember",
+          "key": "aubrune.armand.clarinette",
+          "value": true,
+          "by": "duo"
+        }
+      ],
+      "next": "merci",
+      "otherwise": "poches"
+    },
+    "merci": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Une pour toi, une pour ta moitié. Qu'on vous écoute, maintenant.",
+      "emote": "joy",
+      "next": null
+    },
+    "poches": {
+      "kind": "line",
+      "speaker": "armand",
+      "text": "Toujours pleines, vos poches. Enfin, je ne suis pas pressé.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

@@ -2,7 +2,7 @@
  * Jugement d'une frappe, pur: le même calcul sur la machine du joueur (pour le son et l'encre
  * immédiats) et chez l'hôte (pour valider). Rien de punitif: une note fausse sonne faux et passe.
  */
-import { MUSIC, type AssistLevel, type Rating, type Verdict } from './reglages';
+import { MUSIC, type Rating, type Verdict } from './reglages';
 
 export interface Windows {
   readonly just: number;
@@ -10,9 +10,12 @@ export interface Windows {
   readonly loose: number;
 }
 
-/** Élargissement des fenêtres: l'aide du joueur et le bonus des besoins, plafonnés. */
-export function windowScaleOf(assist: AssistLevel, needs = 1): number {
-  return Math.max(1, Math.min(MUSIC.maxWindowScale, MUSIC.assist[assist] * needs));
+/**
+ * Élargissement des fenêtres: l'aide du joueur (`assistFactor` de `simulation/aide/`: 1, 1,25 ou
+ * 1,5) et le bonus des besoins, plafonnés.
+ */
+export function windowScaleOf(assist: number, needs = 1): number {
+  return Math.max(1, Math.min(MUSIC.maxWindowScale, assist * needs));
 }
 
 export function windowsOf(scale: number): Windows {

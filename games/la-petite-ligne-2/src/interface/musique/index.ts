@@ -16,7 +16,7 @@ import {
   type DeskView,
   type StageSound,
 } from '../../simulation/musique/poste';
-import { MUSIC, type AssistLevel, type Verdict } from '../../simulation/musique/reglages';
+import { MUSIC, type Verdict } from '../../simulation/musique/reglages';
 import type { Intent } from '../../simulation/noyau/entrees';
 import type { GameEvent } from '../../simulation/noyau/evenements';
 import { formatEuros } from '../../simulation/sac/argent';
@@ -41,8 +41,6 @@ export interface StageOptions {
   readonly sound?: StageSoundPort;
   /** Heure de session commune (`duo.net.sessionTimeMs`); absent: l'horloge de la machine. */
   readonly sessionNow?: () => number;
-  /** Aide réglable de ce joueur (cahier 2.4); absente: cran normal. */
-  readonly assist?: () => AssistLevel;
   readonly reduced?: () => boolean;
   /** Anti-double-appui à l'ouverture du cahier (ms). */
   readonly openGuardMs?: number;
@@ -55,14 +53,6 @@ export interface StageScreen {
   dispose(): void;
 }
 
-/**
- * Cran de l'aide du joueur pour les mini-jeux. Le réglage n'existe pas encore dans les options du
- * carnet: tout le jeu doit le lire ici, et il vaut « normal » tant que rien n'est branché.
- */
-export function assistLevel(source?: () => AssistLevel): AssistLevel {
-  return source?.() ?? 0;
-}
-
 /** Sans carte son (démonstration, essais): l'horloge de l'air suit l'heure de session. */
 export function silentSound(sessionNow: () => number): StageSoundPort {
   let startAt: number | null = null;
@@ -73,6 +63,7 @@ export function silentSound(sessionNow: () => number): StageSoundPort {
     airNow: () => (startAt === null ? null : sessionNow() - startAt),
     note: () => 0,
     sour: () => undefined,
+    level: () => undefined,
     stop() {
       startAt = null;
     },
@@ -115,7 +106,6 @@ export function createStage(options: StageOptions): StageScreen {
     local: () => options.local(),
     send: options.send,
     sessionNow,
-    assist: () => assistLevel(options.assist),
     sound,
   });
   const root = document.createElement('div');

@@ -23,7 +23,8 @@
       "weight": 1,
       "rare": false,
       "hours": null,
-      "weathers": ["clear", "overcast"],
+      "weathers": [],
+      "rainedYesterday": false,
       "seasons": []
     },
     {
@@ -33,7 +34,8 @@
       "weight": 1,
       "rare": false,
       "hours": null,
-      "weathers": ["rain", "mist", "storm", "snow"],
+      "weathers": [],
+      "rainedYesterday": true,
       "seasons": []
     }
   ]

@@ -27,6 +27,13 @@ export const RAIL_VEHICLES = {
   rhythmBlend: 0.5,
   /** Position arrondie à ce pas (m) dans l'empreinte des obstacles. */
   quantum: 0.25,
+  /**
+   * Passant sur la voie (habitant, joueur à pied): regardé jusqu'à `lookahead` devant le tampon
+   * (plus que l'arrêt depuis la vitesse de pointe au freinage `endBrake` de la fiche: 12,8 m pour
+   * la draisine), compté à `side` près du gabarit; le véhicule s'arrête à `gap` de lui, puis
+   * repart quand la voie est libre sur `resume`, en reprenant sa vitesse à `accel` (m/s²).
+   */
+  yield: { lookahead: 18, side: 0.1, gap: 1.2, resume: 2, accel: 1.2 },
 } as const;
 
 export type RailVehicleSettings = typeof RAIL_VEHICLES;

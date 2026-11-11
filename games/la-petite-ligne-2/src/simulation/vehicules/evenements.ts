@@ -49,6 +49,8 @@ export const VEHICLE_EVENTS = [
     vehicle: IdSchema,
     dir: v.picklist([1, -1]),
   }),
+  /** Arrêté devant un passant sur la voie, il repart, voie libre: un petit coup de timbre. */
+  v.strictObject({ type: v.literal('vehicle_bell'), vehicle: IdSchema }),
   /** Un train s'annonce sur sa voie: il est temps de rentrer. */
   v.strictObject({ type: v.literal('vehicle_warning'), vehicle: IdSchema }),
 ] as const;

@@ -31,6 +31,8 @@
   // Tirages par récolte, puis la table: chaque ligne avec ses conditions (heures en minutes
   // depuis minuit, la plage peut passer minuit; météos clear, overcast, rain, mist, snow;
   // saisons; [] = toutes) et son poids. « rare »: poids multiplié par la chance des besoins.
+  // Facultatif: "rainedYesterday" (true: seulement s'il a plu la veille, au moins une heure de
+  // jour; false: seulement après un jour sec; absent: les deux). La rive change après la pluie.
   "rolls": 1,
   "loot": [
     {
@@ -41,6 +43,7 @@
       "rare": false,
       "hours": null,
       "weathers": [],
+      // "rainedYesterday": true,
       "seasons": [],
     },
   ],

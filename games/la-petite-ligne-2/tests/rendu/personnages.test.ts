@@ -6,13 +6,20 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { Catalogue } from '../../src/donnees/schemas/personnage';
 import { Face, leanAngle, strideRate, targetWeights } from '../../src/rendu/personnages/animation';
-import { composeLook, defaultPlayerLook, resolveLook } from '../../src/rendu/personnages/apparence';
+import {
+  composeLook,
+  defaultPlayerLook,
+  resolveLook,
+  withoutSlots,
+} from '../../src/rendu/personnages/apparence';
 import { assemble, type CharacterLibrary, sectionOf } from '../../src/rendu/personnages/assemblage';
 import { loadCharacterLibrary } from '../../src/rendu/personnages/chargement';
 import { AssembledCharacters } from '../../src/rendu/personnages/couche';
 import { CHARACTER_SETTINGS } from '../../src/rendu/personnages/reglages';
 import { createPlaceState, createWorld } from '../../src/simulation/noyau/monde';
-import { gameContent } from '../aides';
+import { lookRevealedKey } from '../../src/simulation/regles/apparence';
+import { gameContent, newSim } from '../aides';
+import { NORTH, put, send } from '../aides-noyau';
 
 const content = gameContent();
 const dir = fileURLToPath(new URL('../../assets/commun/personnages/', import.meta.url));
@@ -292,6 +299,76 @@ describe('couche des personnages', () => {
     expect(layer.stats().figures).toBe(2 + Object.keys(bench.villagers).length);
     layer.dispose();
     expect(layer.stats().figures).toBe(0);
+    expect(root.children.length).toBe(0);
+  });
+});
+
+describe('sans coiffe au lit', () => {
+  it('ôte la coiffe en posture couchée (réglage `lie.removes`) et la remet au lever', () => {
+    const hat = content.catalogue.pieces.find((p) => p.slot === 'hat' && p.hair === 'flat');
+    const hair = content.catalogue.pieces.find((p) => p.slot === 'hair');
+    if (hat === undefined || hair === undefined) throw new Error('catalogue');
+    const look = {
+      shape: 'adult-f-medium',
+      skin: 0,
+      pieces: [
+        { slot: 'hair' as const, id: hair.id, colors: [] },
+        { slot: 'hat' as const, id: hat.id, colors: [] },
+      ],
+    };
+    // Coiffe ôtée: les cheveux qu'elle aplatissait redeviennent libres.
+    const bare = resolveLook(
+      withoutSlots(look, CHARACTER_SETTINGS.lie.removes),
+      content.catalogue,
+      content.morphologies,
+    );
+    expect(bare.pieces.some((p) => p.slot === 'hat')).toBe(false);
+    expect(bare.pieces.find((p) => p.slot === 'hair')?.node).toBe(hair.node);
+    expect(withoutSlots(look, [])).toBe(look);
+    const sim = newSim(content);
+    sim.world.players[0].look = look;
+    sim.world.progress.memory[lookRevealedKey(0)] = { v: true, by: 'duo', day: 1 };
+    const root = new Group();
+    const layer = new AssembledCharacters(
+      { root, playerColors: ['#d9654f', '#4f8fd9'] },
+      { content, onEvent: () => () => undefined },
+      library,
+    );
+    const drawn = (): number => {
+      let count = 0;
+      root.getObjectByName('personnage-player-0')?.traverse((o) => {
+        const mesh = o as Partial<SkinnedMesh>;
+        if (mesh.isSkinnedMesh === true && o.visible)
+          count += mesh.geometry?.getIndex()?.count ?? 0;
+      });
+      return count;
+    };
+    const indices = (resolved: ReturnType<typeof resolveLook>): number => {
+      const g = assemble(resolved, library);
+      const n = (g.body.getIndex()?.count ?? 0) + (g.head?.getIndex()?.count ?? 0);
+      for (const part of [g.body, g.head, g.whole]) part?.dispose();
+      return n;
+    };
+    const dressed = indices(resolveLook(look, content.catalogue, content.morphologies));
+    expect(indices(bare)).not.toBe(dressed);
+    const update = (): void => {
+      const place = sim.world.places[sim.world.common.place];
+      if (place === undefined) throw new Error('lieu');
+      layer.update({ dt: 1 / 60, world: sim.world, place, cameraYaw: 0 });
+    };
+    put(sim, 0, 17, 15.6, NORTH);
+    update();
+    expect(drawn()).toBe(dressed);
+    send(sim, 0, { type: 'use_brick', target: 'lit-double-de-gare', brick: 'sleep' });
+    update();
+    expect(drawn()).toBe(indices(bare));
+    const place = sim.world.places[sim.world.common.place];
+    const beds = place?.objects['lit-double-de-gare']?.sleep;
+    if (beds === undefined) throw new Error('lit');
+    beds[beds.indexOf(0)] = null;
+    update();
+    expect(drawn()).toBe(dressed);
+    layer.dispose();
     expect(root.children.length).toBe(0);
   });
 });

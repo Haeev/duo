@@ -261,6 +261,7 @@
       "audience": "both",
       "placed": false
     },
-    { "on": "vehicle_warning", "sound": "passage-a-niveau", "audience": "both", "placed": false }
+    { "on": "vehicle_warning", "sound": "passage-a-niveau", "audience": "both", "placed": false },
+    { "on": "vehicle_bell", "sound": "clochette-boutique", "audience": "both", "placed": false }
   ]
 }

@@ -37,8 +37,15 @@ import {
 import { bestRating, leadMs, notesOf, songbook } from '../src/simulation/musique/lecture';
 import { botPresses, createPerformance, type Press } from '../src/simulation/musique/local';
 import { createPartnerVoice } from '../src/simulation/musique/partenaire';
-import { createDesk, type Desk, type StageSound } from '../src/simulation/musique/poste';
-import { MUSIC, type AssistLevel } from '../src/simulation/musique/reglages';
+import { ASSIST } from '../src/simulation/aide';
+import { modifiersOf } from '../src/simulation/besoins/jauges';
+import {
+  createDesk,
+  listenGain,
+  type Desk,
+  type StageSound,
+} from '../src/simulation/musique/poste';
+import { MUSIC } from '../src/simulation/musique/reglages';
 import { SIM_DT } from '../src/simulation/noyau/constantes';
 import { idleInput, type Intent } from '../src/simulation/noyau/entrees';
 import type { GameEvent } from '../src/simulation/noyau/evenements';
@@ -115,13 +122,20 @@ interface Heard {
 }
 
 /** Son factice: l'horloge de l'air suit l'heure de session, les notes demandées sont retenues. */
-function fakeSound(now: () => number): StageSound & { heard: Heard[]; soured: number[] } {
+function fakeSound(
+  now: () => number,
+): StageSound & { heard: Heard[]; soured: number[]; levels: number[] } {
   let startAt: number | null = null;
   const heard: Heard[] = [];
   const soured: number[] = [];
+  const levels: number[] = [];
   return {
     heard,
     soured,
+    levels,
+    level(gain) {
+      levels.push(gain);
+    },
     start(spec) {
       startAt = spec.startAtMs;
     },
@@ -157,7 +171,6 @@ function seat(
   world: () => Sim['world'] | null,
   send: (intent: Intent) => void,
   now: () => number,
-  assist: AssistLevel = 0,
 ): Seat {
   const sound = fakeSound(now);
   const desk = createDesk({
@@ -166,7 +179,6 @@ function seat(
     local: player,
     send,
     sessionNow: now,
-    assist: () => assist,
     sound,
   });
   return { desk, sound, presses: [] };
@@ -183,7 +195,7 @@ function robot(seat: Seat): void {
 }
 
 /** Banc sans réseau: la simulation de l'hôte et un poste par joueur, sur une horloge commune. */
-function localBench(sim: Sim, players: readonly PlayerIndex[], assist: AssistLevel = 0) {
+function localBench(sim: Sim, players: readonly PlayerIndex[]) {
   const queue: AuthoredIntent[] = [];
   const now = (): number => sim.world.tick * STEP_MS;
   const seats = new Map<PlayerIndex, Seat>();
@@ -196,7 +208,6 @@ function localBench(sim: Sim, players: readonly PlayerIndex[], assist: AssistLev
         () => sim.world,
         (intent) => queue.push({ player: p, intent }),
         now,
-        assist,
       ),
     );
   const events: GameEvent[] = [];
@@ -277,11 +288,12 @@ describe('musique jouée: jugement', () => {
   });
 
   it('élargit les fenêtres de 25 et 50 % avec l’aide du joueur, sans dépasser le plafond', () => {
-    expect([0, 1, 2].map((level) => windowScaleOf(level as AssistLevel))).toEqual([1, 1.25, 1.5]);
+    const { normal, nudge, big } = ASSIST.factor;
+    expect([normal, nudge, big].map((f) => windowScaleOf(f))).toEqual([1, 1.25, 1.5]);
     const late = MUSIC.windows.near + 20;
-    expect(judge(late, true, windowsOf(windowScaleOf(0)))).toBe('false');
-    expect(judge(late, true, windowsOf(windowScaleOf(2)))).toBe('late');
-    expect(windowScaleOf(2, 3)).toBe(MUSIC.maxWindowScale);
+    expect(judge(late, true, windowsOf(windowScaleOf(normal)))).toBe('false');
+    expect(judge(late, true, windowsOf(windowScaleOf(big)))).toBe('late');
+    expect(windowScaleOf(big, 3)).toBe(MUSIC.maxWindowScale);
   });
 
   it('ne punit jamais: une frappe en l’air ne coûte rien, une mauvaise touche sonne faux et passe', () => {
@@ -399,7 +411,7 @@ describe('musique jouée: où et avec quoi', () => {
     });
   });
 
-  it('un instrument de base ne joue que les trois premiers rangs du cahier', () => {
+  it('un instrument de base ne joue que les trois premiers rangs du cahier, l’amélioré tous', () => {
     const sim = stageSim(content, ['air-factice', MARCH, 'air-valse-de-la-minute']);
     const book = songbook(sim.content, sim.world, 0);
     expect(book.filter((l) => l.allowed).map((l) => l.air.order)).toEqual([1, 2, 3]);
@@ -416,13 +428,11 @@ describe('musique jouée: où et avec quoi', () => {
       reason: 'instrument-too-simple',
       target: 'pupitre-1',
     });
-    // La clarinette (niveau 1) l'ouvre.
+    // La clarinette (niveau 1, cadeau d'Armand) les ouvre tous tant que le second lieu n'existe pas.
     sim.world.players[0].toolbar[0] = { item: 'clarinette', count: 1 };
-    expect(
-      songbook(sim.content, sim.world, 0)
-        .filter((l) => l.allowed)
-        .map((l) => l.air.order),
-    ).toEqual([1, 2, 3, 4, 5, 6]);
+    const all = songbook(sim.content, sim.world, 0);
+    expect(all.length).toBeGreaterThan(6);
+    expect(all.every((l) => l.allowed)).toBe(true);
   });
 });
 
@@ -678,6 +688,76 @@ describe('musique jouée: duo', () => {
     expect(log.entries.filter((entry) => entry.level === 'error')).toEqual([]);
     host.dispose();
     guest.dispose();
+  });
+});
+
+describe('musique jouée: aide réglable et écoute', () => {
+  /** Joue l'air factice seul, chaque note frappée `lateMs` après son instant écrit. */
+  function lateSolo(assist: 'normal' | 'big', lateMs: number) {
+    const sim = stageSim();
+    sim.world.players[0].assist = assist;
+    const bench = localBench(sim, [0]);
+    const mine = seatOf(bench, 0);
+    bench.open(0);
+    mine.desk.move(2);
+    mine.desk.confirm();
+    bench.tick();
+    const view = mine.desk.view();
+    if (view.kind !== 'play') throw new Error('air non lancé');
+    mine.presses = view.mine.notes.map((n) => ({ atMs: n[0] + lateMs, lane: n[1] }));
+    const finished = bench.untilFinished();
+    const validated = bench.events.flatMap((e) => (e.type === 'music_note' ? [e.verdict] : []));
+    return { finished, validated, total: view.mine.notes.length };
+  }
+
+  it('l’aide du joueur (`assistFactor`) élargit ses fenêtres, la même chez lui et chez l’hôte', () => {
+    // Bonus des besoins d'une partie neuve compris: juste au-delà de la fenêtre sans aide.
+    const needs = modifiersOf(content, stageSim().world, 0).minigame;
+    const late = MUSIC.windows.near * needs * 1.15;
+    expect(late).toBeLessThan(MUSIC.windows.near * windowScaleOf(ASSIST.factor.big, needs));
+    const normal = lateSolo('normal', late);
+    const big = lateSolo('big', late);
+    expect(normal.finished.results[0]?.false).toBeGreaterThan(0);
+    expect(big.finished.results[0]).toMatchObject({ near: big.total, false: 0, missed: 0 });
+    expect(big.validated.every((verdict) => verdict === 'late')).toBe(true);
+  });
+
+  it('qui ne joue pas entend l’autre à portée, plus bas de loin, sans écran ouvert', () => {
+    expect(listenGain(0)).toBe(1);
+    expect(listenGain(MUSIC.listen.farM)).toBe(0);
+    const sim = stageSim();
+    const bench = localBench(sim, [0, 1]);
+    const [player, listener] = [seatOf(bench, 0), seatOf(bench, 1)];
+    const mid = (MUSIC.listen.nearM + MUSIC.listen.farM) / 2;
+    Object.assign(sim.world.players[1].body, { x: 18.5 + mid, y: 20 });
+    bench.open(0);
+    player.desk.move(2);
+    player.desk.confirm();
+    bench.tick();
+    const view = player.desk.view();
+    if (view.kind !== 'play') throw new Error('air non lancé');
+    player.presses = botPresses(view.mine.notes, 'perfect');
+    bench.run(3);
+    expect(listener.desk.isOpen()).toBe(false);
+    expect(listener.desk.view().kind).toBe('closed');
+    const level = listener.sound.levels.at(-1) ?? -1;
+    expect(level).toBeGreaterThan(0);
+    expect(level).toBeLessThan(1);
+    expect(level).toBeCloseTo(listenGain(mid), 1);
+    expect(player.sound.levels).toEqual([1]);
+    // Hors de portée: plus rien; revenu près de l'autre: plein volume.
+    Object.assign(sim.world.players[1].body, { x: 18.5 + MUSIC.listen.farM + 5, y: 20 });
+    bench.tick();
+    expect(listener.sound.levels.at(-1)).toBe(0);
+    Object.assign(sim.world.players[1].body, { x: 21.5, y: 20 });
+    bench.tick();
+    expect(listener.sound.levels.at(-1)).toBe(1);
+    bench.untilFinished();
+    // Chaque note de l'autre, programmée à son instant écrit, comme la voix d'un duo.
+    const heard = listener.sound.heard.filter((h) => h.who === 'partner');
+    expect(heard.map((h) => h.atMs)).toEqual(view.mine.notes.map((n) => n[0]));
+    expect(listener.sound.airNow()).toBeNull();
+    expect(listener.desk.view().kind).toBe('closed');
   });
 });
 

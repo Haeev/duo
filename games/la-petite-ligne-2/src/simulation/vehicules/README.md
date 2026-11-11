@@ -2,17 +2,18 @@
 
 Un véhicule de voie à deux places que les joueurs sortent de sa remise et font avancer ensemble. Données: `lieux/<lieu>/vehicules/<id>.json` (schéma `src/donnees/schemas/vehicule.ts`, gabarit `donnees/_gabarits/vehicule.jsonc`). Le moteur ne connaît aucun véhicule par son nom: une autre draisine, un autre lieu s'ajoutent par un fichier.
 
-| Fichier         | Rôle                                                                                                                                           |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.ts`      | le système: coups de balancier (touche d'action à bord), frein, sens, descente, butées, trains, arrêts et leurs effets                         |
-| `pompe.ts`      | brique d'entraînement `pump`: justesse d'un coup, blocage à l'unisson (logique pure)                                                           |
-| `voie.ts`       | pose sur la voie ou dans la remise, places, butées (fiche, bord de carte, verrous d'histoire), arrêts; le tracé est celui de `monde/trains.ts` |
-| `cible.ts`      | touche d'action à pied: la porte de la remise (sortir, rentrer), le bord du véhicule (monter); pur pour la visée, effets chez l'hôte           |
-| `emprise.ts`    | cases prises par un véhicule arrêté (`noyau/obstacles.ts`)                                                                                     |
-| `places.ts`     | qui est à bord (`riddenBy`): lu par le déplacement, la visée et la prédiction de l'invité                                                      |
-| `etat.ts`       | création de l'état, remise au repos à la reprise                                                                                               |
-| `reglages.ts`   | ce qui vaut pour tous les véhicules                                                                                                            |
-| `evenements.ts` | `vehicle_out`, `vehicle_in`, `vehicle_seat`, `vehicle_stroke`, `vehicle_started`, `vehicle_stopped`, `vehicle_turned`, `vehicle_warning`       |
+| Fichier         | Rôle                                                                                                                                                     |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`      | le système: coups de balancier (touche d'action à bord), frein, sens, descente, butées, trains, arrêts et leurs effets                                   |
+| `pompe.ts`      | brique d'entraînement `pump`: justesse d'un coup, blocage à l'unisson (logique pure)                                                                     |
+| `voie.ts`       | pose sur la voie ou dans la remise, places, butées (fiche, bord de carte, verrous d'histoire), arrêts; le tracé est celui de `monde/trains.ts`           |
+| `cible.ts`      | touche d'action à pied: la porte de la remise (sortir, rentrer), le bord du véhicule (monter); pur pour la visée, effets chez l'hôte                     |
+| `passants.ts`   | qui marche sur la voie devant le véhicule (habitant, joueur à pied): place libre jusqu'à lui                                                             |
+| `emprise.ts`    | cases prises par un véhicule arrêté (`noyau/obstacles.ts`)                                                                                               |
+| `places.ts`     | qui est à bord (`riddenBy`): lu par le déplacement, la visée et la prédiction de l'invité                                                                |
+| `etat.ts`       | création de l'état, remise au repos à la reprise                                                                                                         |
+| `reglages.ts`   | ce qui vaut pour tous les véhicules                                                                                                                      |
+| `evenements.ts` | `vehicle_out`, `vehicle_in`, `vehicle_seat`, `vehicle_stroke`, `vehicle_started`, `vehicle_stopped`, `vehicle_turned`, `vehicle_warning`, `vehicle_bell` |
 
 ## Jeu
 
@@ -21,6 +22,7 @@ Un véhicule de voie à deux places que les joueurs sortent de sa remise et font
 - **Frein**: la touche de course, tenue. **Sens**: la même touche, appuyée à l'arrêt, l'inverse; en bout de voie il s'inverse de lui-même. **Descendre**: une direction, à l'arrêt seulement, après avoir lâché les directions (on ne tombe pas du véhicule en arrivant).
 - **Voie**: il suit le tracé de `track` entre les butées `range`, et ne passe jamais une case fermée de la voie (bord de la carte, verrou d'histoire fermé): il freine de lui-même et s'y arrête. Un verrou qui s'ouvre rallonge la ligne, sans rien écrire.
 - **Trains**: un train d'événement sur la même voie, à quai, en marche ou annoncé à moins de `trains.warnMinutes`, interdit de sortir et de monter (refus `train-due`). En balade, l'annonce donne un avertissement (`vehicle_warning`); quand le train entre, le véhicule est rangé d'office et ses passagers posés à côté de la voie, sans dommage (`vehicle_in`, raison `train`). Le train, lui, n'attend jamais: sa pose reste une fonction pure de l'heure.
+- **Passants**: un habitant présent ou un joueur à pied sur la voie, devant (`passants.ts`, réglages `yield`): le véhicule freine en douceur (`endBrake` de la fiche) pour s'arrêter à `yield.gap` de lui, attend sans « s'arrêter » (ni arrêt, ni effets), puis repart quand la voie est libre avec un petit coup de timbre (`vehicle_bell`, son provisoire `clochette-boutique`) et reprend sa vitesse. Jamais de choc. Frein serré ou personne à bord: il ne reprend rien de lui-même. État de séance seulement (rien de sauvegardé ni de transmis en plus).
 - **Arrêts** (`stops`): arrêté à moins de `stopReach` d'un repère, il y est (`vehicle_stopped`); les effets `arrive` de l'arrêt jouent s'il porte quelqu'un (les faits d'une suite: « allez jusqu'au passage, puis revenez »).
 
 ## État, réseau, sauvegarde

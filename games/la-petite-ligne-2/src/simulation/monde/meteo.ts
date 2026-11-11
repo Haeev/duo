@@ -106,6 +106,33 @@ export function wateredOn(content: Content, seed: number, place: string, day: nu
   return false;
 }
 
+/**
+ * Il a plu ce jour-là pendant le jour: une tranche météo de `wateringWeathers` couvre au moins
+ * `minMinutes` entre `dayStart` et `nightStart`. Pur et déterministe (graine, lieu, jour): rien à
+ * sauvegarder ni à transmettre, l'invité calcule la même chose que l'hôte. Condition
+ * `rainedYesterday` des lignes de butin (trouvailles de berge après la pluie).
+ */
+export function rainedOn(
+  content: Content,
+  seed: number,
+  place: string,
+  day: number,
+  minMinutes: number,
+): boolean {
+  if (day < 1) return false;
+  const { dayStart, nightStart } = content.settings.clock;
+  const slots = content.time.file.weatherSlots;
+  const watering = content.time.file.wateringWeathers;
+  for (let slot = 0; slot < slots.length; slot++) {
+    const start = slots[slot] ?? 0;
+    const end = slots[slot + 1] ?? (slots[0] ?? 0) + 1440;
+    const overlap = Math.min(end, nightStart) - Math.max(start, dayStart);
+    if (overlap < minMinutes) continue;
+    if (watering.includes(weatherOfSlot(content, seed, place, day, slot))) return true;
+  }
+  return false;
+}
+
 /** Ambiance de la saison dans ce lieu (rendu, son): une métropole n'a pas celle d'un bourg. */
 export function ambienceOf(content: Content, place: string, day: number): string {
   const climate = content.time.climates[place] ?? content.time.file.defaultClimate;

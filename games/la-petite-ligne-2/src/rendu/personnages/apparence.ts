@@ -90,6 +90,16 @@ export function resolveLook(
   };
 }
 
+/**
+ * Le look sans les pièces de ces emplacements (posture couchée: pas de coiffe sur l'oreiller).
+ * Le même objet si rien n'est ôté, pour garder la géométrie partagée. Une coiffe qui cachait ou
+ * aplatissait les cheveux étant ôtée, `resolveLook` rend les cheveux libres.
+ */
+export function withoutSlots(look: Look, slots: readonly Slot[]): Look {
+  if (slots.length === 0 || !look.pieces.some((entry) => slots.includes(entry.slot))) return look;
+  return { ...look, pieces: look.pieces.filter((entry) => !slots.includes(entry.slot)) };
+}
+
 const SLOT_ORDER: readonly Slot[] = [
   'body',
   'shoes',

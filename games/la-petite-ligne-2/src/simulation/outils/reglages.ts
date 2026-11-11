@@ -23,6 +23,11 @@ export interface HarvestTuning {
   readonly dropSpread: number;
   /** Portée de la forge pour une amélioration ou une réparation payée, au-delà de l'emprise (m). */
   readonly forgeReach: number;
+  /**
+   * Condition `rainedYesterday` d'une ligne de butin: minutes de pluie (`wateringWeathers`) qu'il
+   * faut la veille, entre le lever et la nuit, pour que la rive ait changé.
+   */
+  readonly rainedYesterdayMinutes: number;
 }
 
 export const HARVEST_TUNING: HarvestTuning = {
@@ -34,4 +39,5 @@ export const HARVEST_TUNING: HarvestTuning = {
   cellAhead: 0.7,
   dropSpread: 0.9,
   forgeReach: 1.2,
+  rainedYesterdayMinutes: 60,
 };

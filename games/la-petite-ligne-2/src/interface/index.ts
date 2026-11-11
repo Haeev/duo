@@ -39,7 +39,6 @@ import { createAgendaHud } from './annonce';
 import { fitScale, promptModel } from './modeles';
 import { createFishingOverlay } from './peche/index';
 import { createStage, type StageSoundPort } from './musique/index';
-import type { AssistLevel } from '../simulation/musique/reglages';
 import { spriteMarkup } from './pictos';
 import { UI_TUNING } from './reglages';
 import { fill, refusalText, TEXTS } from './textes';
@@ -101,13 +100,13 @@ export interface InterfaceOptions {
    */
   readonly objectViewer?: ObjectViewer;
   /**
-   * Musique jouée: le son de l'air (`createGameStage` de `audio/musique`), l'heure de session
-   * commune aux deux machines, et l'aide réglable du joueur. Absent: l'air se joue en silence.
+   * Musique jouée: le son de l'air (`createGameStage` de `audio/musique`) et l'heure de session
+   * commune aux deux machines. Absent: l'air se joue en silence. L'aide réglable du joueur se lit
+   * dans l'état (`assistFactor` de `simulation/aide/`).
    */
   readonly stage?: {
     readonly sound: StageSoundPort;
     readonly sessionNow: () => number;
-    readonly assist?: () => AssistLevel;
   };
 }
 
@@ -521,6 +520,7 @@ export function createInterface(options: InterfaceOptions): GameInterface {
       case 'vehicle_stopped':
       case 'vehicle_turned':
       case 'vehicle_warning':
+      case 'vehicle_bell':
       case 'shelter_opened':
       case 'shelter_filled':
       case 'shelter_collected':

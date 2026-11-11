@@ -4,16 +4,13 @@
  * un air.
  *
  * Le cahier fixe: quatre touches (positions de Q, S, D, F), le duo, les airs par niveau
- * d'instrument (3, 6, tous) et l'aide par joueur (0, 25 et 50 %). Le reste (fenêtres, mots,
+ * d'instrument (3, 6, tous) et l'aide par joueur (0, 25 et 50 %: `simulation/aide/`). Le reste (fenêtres, mots,
  * chapeau, amitié des auditeurs) est une proposition du studio, à valider par le game designer.
  */
 
 /** Verdict d'une note: juste, un peu tôt, un peu tard, fausse (trop loin ou mauvaise touche), manquée. */
 export const VERDICTS = ['just', 'early', 'late', 'false', 'missed'] as const;
 export type Verdict = (typeof VERDICTS)[number];
-
-/** Cran de l'aide réglable par joueur (cahier 2.4): normal, coup de pouce, grand coup de pouce. */
-export type AssistLevel = 0 | 1 | 2;
 
 /** Mot gentil de la fin, du plus timide au plus beau: jamais d'échec. */
 export type Rating = 0 | 1 | 2 | 3;
@@ -26,8 +23,6 @@ export interface MusicSettings {
    * sonne juste, un peu tôt ou un peu tard; dans `loose` elle sonne faux; au-delà elle est manquée.
    */
   readonly windows: { readonly just: number; readonly near: number; readonly loose: number };
-  /** Aide réglable: élargissement des fenêtres selon le cran. */
-  readonly assist: readonly [number, number, number];
   /** Plafond de l'élargissement (aide et bonus des besoins réunis). */
   readonly maxWindowScale: number;
   /** Décompte avant la première mesure: tant de temps de l'air, et au moins tant de ms. */
@@ -80,6 +75,12 @@ export interface MusicSettings {
     /** `habitants.<id>.<listened>.j<n>`: dernier jour où cet habitant a écouté ce joueur. */
     readonly listened: string;
   };
+  /**
+   * Celui qui ne joue pas entend l'autre jouer (accompagnement et voix) quand il est à portée:
+   * plein volume jusqu'à `nearM`, puis de moins en moins, plus rien au-delà de `farM` (m). La
+   * musique du lieu se tait quand le niveau dépasse `hushAbove` (de 0 à 1).
+   */
+  readonly listen: { readonly nearM: number; readonly farM: number; readonly hushAbove: number };
   /** Ce que la machine du joueur fait sonner (dB, cents, ms). */
   readonly sound: {
     /** Niveau de la tige `air` de l'enregistrement sous les joueurs: -60 la retire. */
@@ -102,7 +103,6 @@ export interface MusicSettings {
 export const MUSIC: MusicSettings = {
   keys: ['KeyA', 'KeyS', 'KeyD', 'KeyF'],
   windows: { just: 70, near: 150, loose: 280 },
-  assist: [1, 1.25, 1.5],
   maxWindowScale: 2,
   countIn: { beats: 4, minMs: 2400 },
   tailMs: 1200,
@@ -110,7 +110,9 @@ export const MUSIC: MusicSettings = {
   hostSlack: { early: 700, late: 1800 },
   weights: { just: 1, near: 0.8, false: 0.3, missed: 0 },
   ratings: [0.4, 0.65, 0.88],
-  airsPerTier: [3, 6, null],
+  // Cahier 4.5: 3, 6 puis tous. Tant que le second lieu n'existe pas (le seul qui donnerait un
+  // instrument fin), l'instrument amélioré (la clarinette d'Armand) joue tous les airs appris.
+  airsPerTier: [3, null, null],
   duo: { bonus: 1.5, minRating: 1, togetherMs: 400 },
   audience: {
     radius: 9,
@@ -120,6 +122,7 @@ export const MUSIC: MusicSettings = {
   },
   hat: { centsPerListener: [0, 20, 35, 50], maxCents: 400 },
   bond: { points: [1, 2, 3, 4] },
+  listen: { nearM: 4, farM: 18, hushAbove: 0.5 },
   memory: {
     bestPrefix: 'musique.joue.',
     hat: 'musique.chapeau',

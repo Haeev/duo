@@ -10,7 +10,9 @@ import { aimOf } from '../src/simulation/briques/visee';
 import { fieldView } from '../src/simulation/cultures/potager';
 import type { GameEvent } from '../src/simulation/noyau/evenements';
 import type { Sim } from '../src/simulation/noyau/pas';
-import { drawLoot } from '../src/simulation/outils/butin';
+import { rainedOn, weatherOfSlot } from '../src/simulation/monde/meteo';
+import { drawLoot, lootAvailable } from '../src/simulation/outils/butin';
+import { HARVEST_TUNING } from '../src/simulation/outils/reglages';
 import { resourceReady } from '../src/simulation/outils/ressources';
 import { contentWith, contextOf } from './aides-l3';
 import { dataFiles, gameContent, newSim } from './aides';
@@ -227,6 +229,62 @@ describe('ressources du monde', () => {
     sim.world.common.weather = 'rain';
     expect(rares(1)).toBeGreaterThan(80); // poids 1 + 3 sous la pluie, contre 6
     expect(drawLoot(ctx, resource, 1, 1)[0]?.count).toBe(2);
+  });
+
+  it('« il a plu hier » (`rainedYesterday`): la veille, pas le temps du moment; même calcul chez l’invité', () => {
+    const sim = newSim(content);
+    const place = sim.world.common.place;
+    const minutes = HARVEST_TUNING.rainedYesterdayMinutes;
+    const { dayStart, nightStart } = content.settings.clock;
+    const slots = content.time.file.weatherSlots;
+    const watering = content.time.file.wateringWeathers;
+    // Référence directe: une tranche de pluie couvrant au moins une heure du jour.
+    const expected = (day: number): boolean =>
+      slots.some((start, i) => {
+        const end = slots[i + 1] ?? (slots[0] ?? 0) + 1440;
+        const overlap = Math.min(end, nightStart) - Math.max(start, dayStart);
+        return (
+          overlap >= minutes &&
+          watering.includes(weatherOfSlot(content, sim.world.seed, place, day, i))
+        );
+      });
+    let wet = 0;
+    let dry = 0;
+    for (let day = 1; day <= 40 && (wet === 0 || dry === 0); day++) {
+      if (rainedOn(content, sim.world.seed, place, day, minutes)) wet = day;
+      else dry = day;
+      expect(rainedOn(content, sim.world.seed, place, day, minutes)).toBe(expected(day));
+    }
+    expect(wet).toBeGreaterThan(0);
+    expect(dry).toBeGreaterThan(0);
+    const line = {
+      item: 'coquille-de-riviere',
+      min: 2,
+      max: 3,
+      weight: 1,
+      rare: false,
+      hours: null,
+      weathers: [],
+      seasons: [],
+    };
+    const after = { ...line, rainedYesterday: true };
+    const before = { ...line, rainedYesterday: false };
+    // Le lendemain d'un jour de pluie, même sous le soleil: la ligne « après la pluie » s'ouvre.
+    sim.world.common.day = wet + 1;
+    sim.world.common.weather = 'clear';
+    expect(lootAvailable(content, sim.world, after)).toBe(true);
+    expect(lootAvailable(content, sim.world, before)).toBe(false);
+    expect(lootAvailable(content, sim.world, line)).toBe(true);
+    // Le lendemain d'un jour sec, même sous la pluie: seule la ligne « jour sec » s'ouvre.
+    sim.world.common.day = dry + 1;
+    sim.world.common.weather = 'rain';
+    expect(lootAvailable(content, sim.world, after)).toBe(false);
+    expect(lootAvailable(content, sim.world, before)).toBe(true);
+    // Les trouvailles de berge qui le demandent (plan d'Aubrune, section 19) l'utilisent.
+    for (const id of ['coquilles-de-greve', 'limnees-de-l-etang', 'laisse-de-crue', 'girolles'])
+      expect(content.resources[id]?.loot.some((e) => e.rainedYesterday === true)).toBe(true);
+    // Premier jour: pas de veille.
+    expect(rainedOn(content, sim.world.seed, place, 0, minutes)).toBe(false);
   });
 
   it('arbre fruitier: secouer fait tomber les pommes au sol autour de lui', () => {

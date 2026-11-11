@@ -20,7 +20,7 @@ L'état complet (tous les lieux) en JSON, un seul emplacement, écrit par l'hôt
 
 ## Fiche du salon
 
-`label` (40 caractères): `Lieu, jour N, H h MM (Prénom et Prénom)`. Si c'est trop long, les prénoms sautent, puis le nom du lieu est coupé. `progress` (0 à 1, `seance.ts`): étapes franchies sur toutes les étapes des suites principales en actes (`kind: "main"` avec `saga`: aujourd'hui l'histoire d'Aubrune); la plateforme le reprend dans l'historique et le score cumulé. `sessionSummary` résume une séance en trois nombres (jours vécus, étapes de quête franchies, entrées de collection ajoutées) depuis le relevé `tallyOf` de son ouverture; le SDK ne permet pas encore de les envoyer quand la plateforme arrête la séance (voir le compte rendu du 2026-11-11).
+`label` (40 caractères): `Lieu, jour N, H h MM (Prénom et Prénom)`. Si c'est trop long, les prénoms sautent, puis le nom du lieu est coupé. `progress` (0 à 1, `seance.ts`): étapes franchies sur toutes les étapes des suites principales en actes (`kind: "main"` avec `saga`: aujourd'hui l'histoire d'Aubrune); la plateforme le reprend dans l'historique et le score cumulé. `sessionSummary` résume une séance en trois nombres (jours vécus, étapes de quête franchies, entrées de collection ajoutées) depuis le relevé `tallyOf` de son ouverture; `provideSessionSummary` le remet à Duo quand la plateforme arrête la séance (SDK, `results.provideSummary`).
 
 ## Reprise
 

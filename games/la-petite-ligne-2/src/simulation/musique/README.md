@@ -27,10 +27,11 @@ Instrument en main à un endroit où jouer, on ouvre le cahier de fanfare, on ch
 ## Déroulement et messages
 
 1. Touche d'action sur le meuble: `music_opened` (avec les airs appris par le duo). Le premier tient le cahier; l'autre, au même meuble, le rejoint: ce sera un duo.
-2. Chaque machine dit son cran d'aide à l'hôte seul (`music_assist`): aucun événement ne le répète.
+2. Aide réglable: celle de chaque joueur (`assistFactor(world, player)` de `simulation/aide/`, cran envoyé par `set_assist`). L'hôte la fige au lancement de l'air; la machine du joueur lit la même dans l'état au même instant.
 3. Le meneur lance (`music_go`): l'hôte vérifie l'air (appris, à la portée des instruments), fixe le premier temps en pas de simulation et annonce `music_started` (voix de chacun, `startTick`, `startAtMs`).
 4. Chaque machine juge ses frappes et envoie chaque note jugée (`music_note`: rang, touche, écart); l'hôte refait le jugement et l'annonce (`music_note`).
-5. Fin (`music_finished`): mot de chacun, mot commun, auditeurs, chapeau, amitié. `music_leave` range l'instrument à tout moment (`music_closed`); s'éloigner ou changer d'objet en main aussi.
+5. Celui qui ne joue pas l'entend d'où il est (poste en écoute, sans écran): accompagnement et voix de l'autre, par le même chemin que la voix de l'autre dans un duo (`music_started`, puis `music_note`), plein volume jusqu'à `listen.nearM`, de moins en moins jusqu'à `listen.farM`, plus rien au-delà (`StageSound.level`); la musique du lieu se tait au-dessus de `listen.hushAbove`.
+6. Fin (`music_finished`): mot de chacun, mot commun, auditeurs, chapeau, amitié. `music_leave` range l'instrument à tout moment (`music_closed`); s'éloigner ou changer d'objet en main aussi.
 
 Un air en cours n'est ni sauvegardé ni transmis (moins d'une minute, `WeakMap` chez l'hôte). Ce qui reste est en faits de mémoire: `musique.joue.<air>` (meilleur mot du duo), `musique.chapeau.j<n>` (jour du dernier chapeau), `habitants.<id>.concert.j<n>` (dernier jour d'écoute). Ni la sauvegarde ni l'état transmis ne changent de forme.
 
@@ -44,7 +45,7 @@ Un air en cours n'est ni sauvegardé ni transmis (moins d'une minute, `WeakMap` 
 6. La voix de l'autre est programmée d'avance à ses instants écrits, sur l'horloge locale, tant que son dernier verdict connu n'est pas « manquée »: elle tombe donc exactement en mesure.
 7. Les verdicts qui arrivent ensuite corrigent: une note fausse déjà partie s'affaisse (couac), une note manquée fait taire la voix jusqu'à la prochaine réussie, une note réussie apprise moins de 180 ms trop tard se joue encore.
 8. Ce qu'on entend de l'autre a donc une note de retard sur ses silences et ses reprises, jamais sur sa mise en place: c'est le prix d'un duo qui sonne ensemble.
-9. Le cran d'aide ne voyage que de la machine à l'hôte; l'album des collections ne voyageant pas vers l'invité, les airs appris sont annoncés dans `music_opened`.
+9. L'aide se lit dans l'état du joueur (`players[i].assist`), le même chez l'hôte et l'invité; l'album des collections ne voyageant pas vers l'invité, les airs appris sont annoncés dans `music_opened`.
 10. Test: `tests/musique-jouee.test.ts`, « réseau à 50 ms » (mêmes verdicts des deux côtés, voix de l'autre programmée à l'heure).
 
 ## Récompenses (proposition du studio, réglable)
