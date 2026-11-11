@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import mido  # noqa: E402
 
+from airs import AIRS  # noqa: E402
 from aubrune import GAMME, JINGLES, MORCEAUX  # noqa: E402
 from partition import frottements  # noqa: E402
 
@@ -34,7 +35,7 @@ def classes_du_midi(chemin: Path) -> set[int]:
 
 def main() -> int:
     fautes = 0
-    for f in MORCEAUX + JINGLES:
+    for f in MORCEAUX + AIRS + JINGLES:
         r = f()
         m = r[0] if isinstance(r, tuple) else r
         etrangeres = classes_du_midi(MIDI / f"{m.id}.mid") - set(GAMME)

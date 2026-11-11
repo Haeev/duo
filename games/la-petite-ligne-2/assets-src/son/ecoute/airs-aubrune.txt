@@ -1,0 +1,8 @@
+0:00.00 air-marche-de-la-halte: roulement puis la reprise en tutti (à 47 s dans la boucle)
+0:10.80 air-valse-de-la-minute: fin du A à l'accordéon, puis le pont sifflé (à 18 s dans la boucle)
+0:21.60 air-carillon-des-deux-soeurs: fin de la complainte, puis les deux cloches (à 26 s dans la boucle)
+0:32.40 air-chanson-des-marmites: la berceuse reprise à l'accordéon, couvercles (à 26 s dans la boucle)
+0:43.20 air-canon-de-la-repetition: les trois voix du canon (à 10 s dans la boucle)
+0:54.00 air-chant-de-la-coupe: appel du trombone, réponse de la clarinette (à 30 s dans la boucle)
+1:04.80 air-sifflet-du-samedi: le sifflet et le début de la chanson (à 0 s dans la boucle)
+1:15.60 air-sonnerie-de-5h12: la cloche et la première phrase du choral (à 0 s dans la boucle)

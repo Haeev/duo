@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | lot L9 (moteur, babil, sons de base, ambiances jour et nuit), lot musique d'Aubrune (10 morceaux, 7 jingles, régie par table) et deuxième lot d'effets (2026-11-11: pêche, cuisine, déco, cloches, passage à niveau, 5 h 12, porte, boutique, pièces, décision à deux, photo, pas sur bois, eau, gravier, tapis); reste: les points d'accroche listés en fin de document, les 8 airs de la collection |
+| Statut | lot L9 (moteur, babil, sons de base, ambiances jour et nuit), lot musique d'Aubrune (10 morceaux, 7 jingles, régie par table) et deuxième lot d'effets (2026-11-11: pêche, cuisine, déco, cloches, passage à niveau, 5 h 12, porte, boutique, pièces, décision à deux, photo, pas sur bois, eau, gravier, tapis), six points d'accroche branchés (2026-11-11 au matin) et les 8 airs de la collection avec la musique des fêtes (2026-11-11); reste: le bouton « Écouter » du carnet (section Airs), un air propre à chaque fête si le client le souhaite, les bruitages des scènes de fête |
 | Rédaction | sound-designer, 2026-11-10 |
 | Fichiers | sons: `games/la-petite-ligne-2/assets/commun/son/`; sources: `games/la-petite-ligne-2/assets-src/son/`; tables et moteur: `games/la-petite-ligne-2/src/audio/` (README) |
 
@@ -64,9 +64,9 @@ Sources: `assets-src/son/sons_aubrune.py` (une fabrique par son, table `SONS` av
 | `decision_changed` `split` | `decision-desaccord`: do puis la, en suspens, sans reproche | -9 | 2 | aucune | les deux |
 | `photo_taken` | `photo-declic`: déclencheur, rideau, ressort | -8 | 2 | hauteur 3 % | les deux, placé |
 | scène `en-voiture` temps 1, `l-autorail-creme` temps 1 | `cloche-marthe`: trois coups de la grande cloche, juste (sol, tierce majeure), 8,5 s | -10 | 1 | aucune | les deux, dans tout le lieu |
-| (heures sonnées: point d'accroche à venir) | `cloche-marthe-coup`: un coup, 5,5 s | -10 | 1 | aucune | les deux |
+| `clock_struck` (heures pleines de 7 h à 19 h, coup par coup, 3 s d'écart; quatre minutes de retard jusqu'au fait `aubrune.cloche.juste`) | `cloche-marthe-coup`: un coup, 5,5 s | -10 | 1 | aucune | les deux |
 | scène `la-felee-sonne` temps 0 | `cloche-felee`: la petite cloche fendue, partiels désaccordés qui battent, un peu de râpe; drôle, pas inquiétante | -11 | 1 | aucune | les deux |
-| (train qui passe la barrière: point d'accroche à venir) | `passage-a-niveau`: timbre électrique (si 5) frappé 9 fois par seconde, 3,5 s | -13 | 2 | aucune | les deux |
+| `calendar_started` de `train-du-samedi`, `depart-du-train-du-samedi`, `autorail-de-5h12`, `depart-de-l-autorail` (le train passe la barrière) | `passage-a-niveau`: timbre électrique (si 5) frappé 9 fois par seconde, 3,5 s | -13 | 2 | aucune | les deux |
 | scène `la-sonnerie-de-5h12` temps 1, `la-pose-longue` temps 2 | `cinq-douze`: deux coups isolés du même timbre, de loin, puis un roulement grave qu'on peut prendre pour le vent | -8 | 1 | aucune | les deux |
 | pas sur `bois` (plancher), `eau` (gué), `gravier` (galets, ballast), `tapis`; `sable` joue `pas-terre` | `pas-bois`, `pas-eau`, `pas-gravier`, `pas-tapis` (3 variantes chacun) | -10, -15, -12, -15 | 3 | hauteur 5 à 6 %, niveau 1,5 dB | les deux, l'autre placé |
 
@@ -74,14 +74,16 @@ Sources: `assets-src/son/sons_aubrune.py` (une fabrique par son, table `SONS` av
 
 **Mesures** (ffmpeg `ebur128`, fichiers décodés; `assets-src/son/mesures.csv`): sonie momentanée maximale de -16,0 à -19,4 LUFS pour les sons de plus de 0,4 s (sauf `peche-moulinet`, -22,9, limité par la crête de ses cliquets: niveau de jeu -8 dB au lieu de -10), crêtes de -1,2 à -6,9 dBFS; les sons de moins de 0,4 s (pas, découpe, meuble posé, déclic) sont limités par leur crête (-1,3 à -2,4 dBFS), mesurés de -20 à -29 LUFS par une fenêtre plus longue qu'eux, comme les pas du lot L9. Part de l'énergie sous 300 Hz: 0 à 14 % partout, sauf `meuble-poser` (49 à 52 %, sous le plafond de 60 %). Poids: 44 fichiers, 382 Ko. Mémoire décodée: environ 50 s de son mono, soit 9,6 Mo à 48 kHz, dont 30 s pour les cinq cloches et sonneries (candidates à un décodage à la demande si le plafond l'exige).
 
-### Points d'accroche manquants (aucune ligne de code touchée par le son)
+### Points d'accroche (branchés le 2026-11-11 au matin, `src/audio/donnees/evenements.json`, test `tests/audio-accroches.test.ts`)
 
-1. **Surface sous les pas**: `src/main.ts` ne passe pas `surfaceAt` à `createGameAudio`; tous les pas jouent `steps.default` (herbe). À ajouter: `surfaceAt: (x, y) => renderer?.surfaceAt(x, y) ?? null`. La table connaît déjà les noms du rendu (`herbe`, `terre`, `pave`, `sable`, `gravier`, `bois`, `tapis`, `eau`). `vase` et `potager` rendent `terre` (`reglages-tuiles.ts`): un son de vase propre demanderait une surface `vase` dans `SurfaceKind`.
-2. **Gestes de cuisine**: `cook_step_done` ne dit pas la nature de l'étape. L'interface la connaît (`onCue({ type: 'mark', kind })` dans `interface/cuisine/index.ts`) mais `interface/index.ts` (ligne 478) envoie toujours `choix`: y envoyer `cuisine-${kind}` (signaux `cuisine-chop`, `cuisine-stir`, `cuisine-heat` prêts; `season` et `plate` peuvent garder `choix`). Pour que l'autre joueur les entende, ajouter `kind` à `cook_step_done` et une règle par nature.
-3. **Moulinet pendant le combat**: le mini-jeu de pêche est local, aucun événement pendant la tirée: appeler le signal `peche-moulinet` à chaque tour de moulinet (le délai minimal de 200 ms évite l'empilement).
-4. **Tourner un meuble**: `deco_changed` n'a pas d'action de rotation: ajouter `rotate` à la liste (puis une règle vers `meuble-tourner`) ou appeler le signal `meuble-tourner`.
-5. **Cloche des heures**: aucun événement d'heure ronde; un `clock_struck` (heure, nombre de coups) de l'hôte permettrait de jouer `cloche-marthe-coup` coup par coup (la cloche retarde de quatre minutes jusqu'au fait `aubrune.cloche.juste`).
-6. **Passage à niveau**: aucun événement pour un train qui franchit la barrière (visiteur du samedi, autorail): un `crossing_rang` de l'hôte jouerait `passage-a-niveau`.
+| Accroche | Branchement | Son |
+|---|---|---|
+| Surface sous les pas | `main.ts` passe `surfaceAt` (`createSurfaceLookup`, `src/audio/sol.ts`) | `pas-herbe`, `pas-terre`, `pas-pave`, `pas-bois`, `pas-eau`, `pas-gravier`, `pas-tapis` (`vase` et `potager` rendent `terre`) |
+| Gestes de cuisine | l'interface envoie `cuisine-${kind}`; `cook_step_done` porte `kind`, une règle par nature pour l'autre joueur | `cuisine-decoupe`, `cuisine-mijote`, `cuisine-friture` |
+| Moulinet pendant la tirée | signal `peche-moulinet` de l'interface de pêche à chaque tour (délai minimal 200 ms) | `peche-moulinet` |
+| Tourner un meuble | `deco_changed` avec `action: "rotate"` | `meuble-tourner` |
+| Cloche des heures | `clock_struck` de l'hôte (`simulation/monde/cloche.ts`, réglages `reglages-cloche.ts`) | `cloche-marthe-coup` |
+| Passage à niveau | `calendar_started` des quatre passages de train | `passage-a-niveau` |
 
 ## Babil
 
@@ -147,5 +149,39 @@ Réponse 72 du client: « un air différent selon l'heure et la météo, et selo
 ### Niveaux et poids (mesurés, `assets-src/son/musique/mesures.csv`)
 
 - Chaque morceau, tiges additionnées, mesuré par `ebur128` de ffmpeg sur les fichiers décodés: -16,0 à -16,5 LUFS intégrés (cible -16, tolérance 0,7), crêtes vraies de -1,6 à -5,1 dBTP (plafond -1); le rendu corrige son écart avec la mesure de ffmpeg (trois passes). Chaque tige est 1 à 7 dB sous le morceau (mesure ci-dessus) pour que leur somme retombe à -16.
-- Poids: 6,4 Mo pour les 17 fichiers de jeu (cible 12 Mo), Opus mono 36 kbit/s. Mémoire: décodés à 24 kHz, un morceau de 70 s pèse 13 Mo (deux tiges); un morceau résident en plus de celui qui joue: 27 Mo en régime, 40 Mo au pire pendant un fondu (à confirmer contre le plafond de 64 Mo de l'architecture avec le reste du son).
+- Poids: 6,4 Mo pour les 17 fichiers de jeu (11,09 Mo avec les 8 airs de la collection, plafond 12 Mo), Opus mono 36 kbit/s. Mémoire: décodés à 24 kHz, un morceau de 70 s pèse 13 Mo (deux tiges); un morceau résident en plus de celui qui joue: 27 Mo en régime, 40 Mo au pire pendant un fondu (à confirmer contre le plafond de 64 Mo de l'architecture avec le reste du son).
 - Niveau de jeu: musique -6 dB (donc environ -22 LUFS au niveau 1), ambiance -22 dB, jingles -3 à -4 dB (musique reculée de 5 à 10 dB).
+
+### Airs de la collection et musique des fêtes (2026-11-11)
+
+Les huit fiches « Musiques » du carnet ont chacune leur air, au même identifiant dans `musique.json` (le morceau `air-marche-de-la-halte` est l'air de l'entrée `air-marche-de-la-halte`). Partitions: `assets-src/son/musique/airs.py` (liste `AIRS`, rendue par `generer.py` comme les autres morceaux), MIDI dans `assets-src/son/musique/midi/`. Compositions originales, sept notes de sol majeur seulement (vérifié par `verifier_ecriture.py`, aucun frottement), deux tiges `fond` et `air`, boucle sans couture.
+
+| Air (fiche) | Intention | Écriture | Durée | Sonie, crête vraie | Poids |
+|---|---|---|---|---|---|
+| `air-marche-de-la-halte` | fanfare du quai | marche 2/4 à 120: bugle (trompette douce), tuba, cors, caisse claire; le trombone relance un temps avant le motif; trio à la clarinette, reprise en tutti avec glockenspiel | 64 s | -16,2 LUFS, -1,5 dBTP | 590 Ko |
+| `air-valse-de-la-minute` | valse du dernier bal | 3/4 à 135, accordéon; le pont sifflé par Ambroise pendant que la pendule bat (bois très doux); reprise accordéon et clarinette en tierce | 64 s | -16,1, -1,9 | 597 Ko |
+| `air-carillon-des-deux-soeurs` | complainte de la Fêlée | clarinette en mi mineur doux sur harpe et contrebasse à l'archet; puis la grande cloche (sol) et la Fêlée refondue (ré) sonnent juste, en sol, boîte à musique | 64 s | -16,0, -2,0 | 597 Ko |
+| `air-chanson-des-marmites` | berceuse d'Honorine | 3/4 à 100: boîte à musique seule; le bourg la reprend à l'accordéon et à la clarinette en tapant sur les couvercles (cloche de cymbale, tom grave); elle redevient berceuse | 72 s | -16,0, -1,6 | 668 Ko |
+| `air-canon-de-la-repetition` | ritournelle des grenouilles | 4/4 à 120: canon à trois voix à deux mesures d'écart (basson, clarinette, pizzicati) sur un ostinato; chacun s'arrête à son tour; le guiro fait les grenouilles | 64 s | -16,1, -1,7 | 584 Ko |
+| `air-chant-de-la-coupe` | trombone du bief | blues gentil en ré mixolydien (le do naturel seule couleur bleue), 4/4 à 90 en balancement; trombone, puis appel et réponse avec la clarinette; un coup de bois par mesure pour la hache | 64 s | -16,1, -1,5 | 595 Ko |
+| `air-sifflet-du-samedi` | chanson de la draisine | 6/8 à 135: guitare en arpèges qui roulent, brosses sur les éclisses; la chanson commence par deux brèves et une longue, que le sifflet double | 64 s | -16,0, -1,8 | 597 Ko |
+| `air-sonnerie-de-5h12` | hymne de la ligne | le motif du quai en choral à quatre voix: harmonium, puis cor, chœur, tous; la cloche (sol et sa tierce) et un sifflet lointain | 64 s | -16,0, -2,1 | 597 Ko |
+
+Mesures: `controler.py` sur les fichiers décodés (`mesures.csv`), raccord au plus 0,45 fois le centile 99,5 des deuxièmes différences (seuil 4). Poids des airs: 4,8 Mo; total de la musique: 11,09 Mo (plafond 12 Mo). Spectrogrammes et formes d'onde examinés: sections visibles là où elles sont écrites, aucun écrêtage.
+
+**Musique des fêtes** (règles de `musique.json`, placées avant celle du train du samedi, qui tombe le même jour que les fêtes):
+
+| Événement | De jour (aube, matin, après-midi) | Le soir et la nuit |
+|---|---|---|
+| `fete-des-barrieres-fleuries` | `air-marche-de-la-halte` (la fanfare à la barrière) | `fete` (le bal) |
+| `nuit-des-lumignons` | `air-carillon-des-deux-soeurs` (les cierges de Marthe, le parvis) | `air-sonnerie-de-5h12` (l'air de nuit demandé: une lumière pour ceux qui partent) |
+| `concours-de-la-soupe` | `air-chanson-des-marmites` | `fete` (« tous premiers ») |
+| `veillee-du-premier-train` | `air-sifflet-du-samedi` (le jour du train) | `air-sonnerie-de-5h12` (l'anniversaire de 5 h 12) |
+| `premiere-veillee-du-quai`, `veillee-du-quai-<saison>` | `air-valse-de-la-minute` | `air-valse-de-la-minute` |
+| `train-du-samedi` (hors fête) | `air-sifflet-du-samedi` (rythme normal, avec silences) | |
+
+Rythme `long` pour les fêtes et veillées. Test: `tests/airs-aubrune.test.ts` (chaque fiche a son air, ses fichiers durent la boucle annoncée et se décodent; chaque fête et veillée désigne un air livré, de jour et le soir).
+
+**Ce qui manque pour écouter depuis le carnet** (code, hors de ce lot): le bouton « Écouter » de la page d'une musique (`interface/carnet/collections.ts`, `canListen`) n'a ni touche ni action, et la régie (`MusicDirector`) n'a pas de méthode pour jouer un morceau précis. Il faudrait `listen(trackId)` (fondu vers le morceau, rythme `steady`, au-dessus des règles) et `stopListening()` à la fermeture du carnet, appelés avec l'identifiant de l'entrée; aucune donnée de plus n'est nécessaire. Les fiches gardent leur schéma strict (`CollectionEntrySchema`): le lien passe par l'identifiant, pas par un champ de fichier.
+
+**Planche d'écoute**: `assets-src/son/ecoute/airs-aubrune.m4a` (86 s, un extrait de 10 s par air, instants dans `airs-aubrune.txt`), produite par `assets-src/son/musique/planche_airs.py` depuis les fichiers livrés. Copies M4A complètes (hors dépôt): `assets-src/son/musique/ecoute/`.

@@ -31,6 +31,7 @@ from scipy import signal  # noqa: E402
 
 import dsp  # noqa: E402
 import partition  # noqa: E402
+from airs import AIRS  # noqa: E402
 from aubrune import JINGLES, MORCEAUX  # noqa: E402
 from partition import Morceau, ecrire_midi, octave_relative, rendre_pistes  # noqa: E402
 
@@ -186,7 +187,7 @@ def main() -> None:
     index_fichier = SORTIE / "index.json"
     index = json.loads(index_fichier.read_text()) if index_fichier.exists() else {}
     fabriques = []
-    for f in MORCEAUX + JINGLES:
+    for f in MORCEAUX + AIRS + JINGLES:
         nom = f.__name__.replace("_", "-")
         if args.seulement is None or any(s in nom or s == nom for s in args.seulement):
             fabriques.append(f)
