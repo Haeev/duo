@@ -169,6 +169,14 @@ jobs:
       - name: Installation
         run: pnpm install --frozen-lockfile
 
+      # Le contrôle des façades (tests/batiments.test.ts de La Petite Ligne refonte) assemble les
+      # fiches des bâtiments avec numpy; en CI, son absence fait échouer le test au lieu de le sauter.
+      - name: numpy pour les contrôles d'assets
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq python3-numpy
+          python3 -c "import numpy; print('numpy', numpy.__version__)"
+
       - name: Types du jeu
         run: pnpm --filter "./games/$ID" run typecheck
 
