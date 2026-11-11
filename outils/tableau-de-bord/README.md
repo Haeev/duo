@@ -9,7 +9,7 @@ Page web privée où le client suit la refonte de La Petite Ligne: avancement en
 | `index.html` | la page: styles, jetons, noyau `window.TDB` (onglets, données, remarques, dialogues) |
 | `avancement.js`, `questions.js`, `images.js`, `regles.js` | les quatre onglets de l'étape 1 |
 | `carte.js`, `modeles.js` | plan annotable et visionneuse 3D (autre lot); la page marche sans eux |
-| `sons.js`, `sons/` | onglet « Sons et musiques » (ordre 35) et ses fichiers `.m4a` avec `index.json`, fabriqués par `outils/publier-sons.mjs` |
+| `sons.js`, `sons/` | onglet « Sons et musiques » (ordre 35) et ses fichiers `.mp4` avec `index.json`, fabriqués par `outils/publier-sons.mjs` |
 | `images/` | les images de la galerie, publiées à côté de la page |
 | `essai/` | banc d'essai local (fausse base en mémoire, données d'essai, captures). Jamais publié |
 

@@ -92,7 +92,7 @@
           typeof s.id === 'string' &&
           /^[a-z0-9-]+$/.test(s.id) &&
           typeof s.fichier === 'string' &&
-          /^[a-z0-9-]+\.m4a$/.test(s.fichier) &&
+          /^[a-z0-9-]+\.mp4$/.test(s.fichier) &&
           connues.has(s.section),
       )
       .map((s) => ({

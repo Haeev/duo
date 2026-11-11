@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Régénère `outils/tableau-de-bord/sons/` (fichiers .m4a et index.json) à partir du jeu:
+// Régénère `outils/tableau-de-bord/sons/` (fichiers .mp4 et index.json) à partir du jeu:
 // fichiers livrés, tables de sons, règles d'événements, musique et document sonore.
 // Les mots (noms, familles, phrases « où et quand ») sont dans `sons-sources.json`.
-// Le jeu livre de l'OGG, que Safari lit mal: chaque son est réencodé en AAC dans un .m4a.
+// Le jeu livre de l'OGG, que Safari lit mal: chaque son est réencodé en AAC dans un conteneur MP4 (.mp4).
 // Usage: node outils/tableau-de-bord/outils/publier-sons.mjs [--tout]
 //   --tout: réencode tout, même les fichiers déjà à jour.
 import { execFileSync } from 'node:child_process';
@@ -475,7 +475,8 @@ function ajouter(section, entree) {
   }
   const nom = entree.nom ?? CONFIG.noms[id];
   if (!nom) erreurs.push(`nom manquant dans sons-sources.json (noms): « ${id} »`);
-  const fichier = `${id}.m4a`;
+  // La page publiée ne sert pas l'extension .m4a: même conteneur MP4, extension .mp4.
+  const fichier = `${id}.mp4`;
   const sortie = path.join(SORTIE, fichier);
   const canaux = encoder(sources, sortie, mode, gainsDb);
   const ou = assembler(entree.ou);
@@ -654,7 +655,7 @@ writeFileSync(
     {
       jeu: CONFIG.titreJeu,
       genereLe: new Date().toISOString(),
-      format: 'AAC dans un conteneur MP4 (.m4a)',
+      format: 'AAC dans un conteneur MP4 (.mp4)',
       debitKbps: CONFIG.debitKbps,
       nouveauDepuis: CONFIG.nouveauDepuis,
       octets: total,
