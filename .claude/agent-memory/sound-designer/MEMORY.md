@@ -168,3 +168,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Huit airs de 64 à 72 s en deux tiges Opus 36k: 4,8 Mo; la musique d'Aubrune passe à 11,09 Mo sur le plafond de 12 Mo de `controler.py`: le prochain lot devra baisser le débit ou relever le plafond.
 - FluidR3 n'a pas de bugle ni de bugle à pistons: trompette (0:56) jouée entre ré 4 et mi 5, vélocité 70 à 80.
 - Rendu des huit airs: 3 min 20 sur une machine chargée; `--seulement air-` les isole (aucun autre identifiant ne contient « air- »).
+
+## La Petite Ligne (refonte): troisième lot, draisine et musique jouée (vérifié le 2026-11-11)
+
+- `soundForEvent` ne rend que la première règle qui convient: un événement ne peut pas à la fois faire taire un son tenu et en jouer un autre (`vehicle_stopped` en butée). Vérifier qu'un son tenu (`loop`) a toujours sa règle `stop`: `vehicle_warning` jouait `passage-a-niveau` (tenu) sans rien pour le faire taire.
+- Son tenu sans couture dans le format `loop` de `sons.json`: fichier « amorce + corps circulaire + suite » (`sons_lot3.roulement_tenu`), `from` = amorce, `to` = amorce + corps, durées entières en secondes. Contrôle dans Chromium par `AudioBufferSourceNode` en boucle dans un `OfflineAudioContext`: la sortie après `to` égale le fichier depuis `from` (écart nul à 44,1 et 48 kHz).
+- Grincement de bois (balancier, frein): train d'impulsions à cadence glissante (50 à 140 Hz) passé dans 2 ou 3 `dsp.resonateur` (Q 6 à 9, 500 à 2600 Hz); normaliser la sortie à crête 1, sinon il disparaît sous les coups de fer et de bois qu'on lui ajoute.
+- Voix de foule sans paroles (« bravo », « ah ! »): source à harmoniques en 1/k^1,3 et trois formants qui glissent par `dsp.pb_variable(type_="band")`; posée à 0,22 sous des applaudissements, elle se voit au spectrogramme sans dominer.
+- Équilibre de la musique jouée: rendre par le vrai moteur dans Playwright en important les modules par Vite (`await import('/src/audio/musique/scene.ts')` dans `page.evaluate`) trois tiges séparées (accompagnement seul, notes seules avec les tiges à -60 dB); le `PeriodicWave` est normalisé, donc changer les harmoniques change le niveau: remesurer après chaque retouche. Cible retenue: soliste 4,5 dB au-dessus de l'accompagnement, mélange vers -16 LUFS.
+- `outils/tableau-de-bord/outils/publier-sons.mjs` refuse de tourner s'il manque une phrase pour une clé de règle (`on` plus conditions triées, `listeners>0`, `seat=nonnul`) dans `sons-sources.json`; la description d'un effet vient de la cellule « `id`: texte » du document sonore.

@@ -1,10 +1,10 @@
 {
   "jeu": "La Petite Ligne (refonte)",
-  "genereLe": "2026-11-11T09:18:49.100Z",
+  "genereLe": "2026-11-11T12:44:52.270Z",
   "format": "AAC dans un conteneur MP4 (.mp4)",
   "debitKbps": 96,
   "nouveauDepuis": "2026-11-11",
-  "octets": 17430104,
+  "octets": 17841540,
   "sections": [
     {
       "id": "musiques",
@@ -21,6 +21,14 @@
     {
       "id": "peche",
       "titre": "Effets: pêche"
+    },
+    {
+      "id": "draisine",
+      "titre": "Effets: draisine"
+    },
+    {
+      "id": "musique-jouee",
+      "titre": "Effets: musique jouée (applaudissements)"
     },
     {
       "id": "cuisine",
@@ -703,6 +711,289 @@
       ]
     },
     {
+      "id": "effet-epuisette-plonge",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "L'épuisette sort le poisson",
+      "ou": "Quand l'autre sort le poisson avec l'épuisette, à la pêche à deux. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "L'épuisette plonge, remonte en ruisselant, le poisson frétille dans le filet.",
+      "duree": 1.45,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-epuisette-plonge.mp4",
+      "octets": 18455,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/epuisette-plonge.ogg"
+      ]
+    },
+    {
+      "id": "effet-epuisette-rate",
+      "section": "peche",
+      "sorte": "effet",
+      "nom": "L'épuisette plonge à côté",
+      "ou": "Quand l'épuisette plonge à côté du poisson. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "« flouch » mat de l'épuisette vide, deux gouttes.",
+      "duree": 0.8,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-epuisette-rate.mp4",
+      "octets": 9887,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/epuisette-rate.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-balancier",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "Coup de balancier",
+      "ou": "À chaque coup de balancier de la draisine. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Le bras de bois grince sur son palier, la bielle cogne doucement en bout de course.",
+      "duree": 2.06,
+      "boucle": false,
+      "variantes": 3,
+      "canaux": 1,
+      "fichier": "effet-draisine-balancier.mp4",
+      "octets": 16275,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-balancier-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-balancier-2.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-balancier-3.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-bloque",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "Balancier bloqué",
+      "ou": "Quand les deux poussent le balancier de la draisine en même temps. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Choc sourd et rond, court gémissement du bois, sans claquement.",
+      "duree": 0.5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-bloque.mp4",
+      "octets": 4147,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-bloque.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-roulement-moyenne",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "La draisine roule",
+      "ou": "Quand la draisine s'ébranle, et tant qu'elle roule; quand la draisine s'arrête, le roulement se tait; quand un train range la draisine d'office, le roulement se tait. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Roulement tenu, joints qui claquent par paires toutes les secondes (6 m/s).",
+      "duree": 3.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-roulement-moyenne.mp4",
+      "octets": 44951,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-roulement-moyenne.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-roulement-lente",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "La draisine roule doucement",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "Roulement tenu au pas, joints toutes les 2,5 s (2,4 m/s, boucle de 5 s).",
+      "duree": 5.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-roulement-lente.mp4",
+      "octets": 69211,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-roulement-lente.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-roulement-rapide",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "La draisine file",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "Roulement tenu plus clair, joints toutes les 0,75 s (8 m/s, boucle de 3 s).",
+      "duree": 3.55,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-roulement-rapide.mp4",
+      "octets": 44858,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-roulement-rapide.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-joint",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "Joint de rail",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "Tic du fer, cognement du plancher.",
+      "duree": 0.8,
+      "boucle": false,
+      "variantes": 2,
+      "canaux": 1,
+      "fichier": "effet-draisine-joint.mp4",
+      "octets": 4730,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-joint-1.ogg",
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-joint-2.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-frein",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "Frein de la draisine",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "Le levier tombe, le patin de bois frotte la roue, frottement qui ralentit.",
+      "duree": 1.2,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-frein.mp4",
+      "octets": 14912,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-frein.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-butee",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "Arrivée en butée",
+      "ou": "Pas encore branché dans le jeu: rien ne le déclenche pour l'instant.",
+      "branche": false,
+      "description": "Tampon de bois contre la butée, petit rebond.",
+      "duree": 0.65,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-butee.mp4",
+      "octets": 5355,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-butee.ogg"
+      ]
+    },
+    {
+      "id": "effet-draisine-avertissement",
+      "section": "draisine",
+      "sorte": "effet",
+      "nom": "Un train s'annonce",
+      "ou": "Quand un train s'annonce sur la voie de la draisine. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Sifflet de la rame, de loin (sol et ré), un long, un court.",
+      "duree": 3.6,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-draisine-avertissement.mp4",
+      "octets": 43786,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/draisine-avertissement.ogg"
+      ]
+    },
+    {
+      "id": "effet-applaudissements-polis",
+      "section": "musique-jouee",
+      "sorte": "effet",
+      "nom": "Applaudissements polis",
+      "ou": "À la fin d'un air joué devant des habitants, même hésitant. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Cinq personnes, quelques mains.",
+      "duree": 2.5,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-applaudissements-polis.mp4",
+      "octets": 34811,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/applaudissements-polis.ogg"
+      ]
+    },
+    {
+      "id": "effet-applaudissements-chaleureux",
+      "section": "musique-jouee",
+      "sorte": "effet",
+      "nom": "Applaudissements chaleureux",
+      "ou": "À la fin d'un air bien joué devant des habitants. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Huit personnes, un « ah ! » ravi.",
+      "duree": 3.4,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-applaudissements-chaleureux.mp4",
+      "octets": 43181,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/applaudissements-chaleureux.ogg"
+      ]
+    },
+    {
+      "id": "effet-applaudissements-enthousiastes",
+      "section": "musique-jouee",
+      "sorte": "effet",
+      "nom": "Applaudissements enthousiastes",
+      "ou": "À la fin d'un air très bien joué devant des habitants. Les deux joueurs l'entendent.",
+      "branche": true,
+      "description": "Onze personnes, vite, deux « bravo » et un « ah ! » sans paroles.",
+      "duree": 4.4,
+      "boucle": false,
+      "variantes": 1,
+      "canaux": 1,
+      "fichier": "effet-applaudissements-enthousiastes.mp4",
+      "octets": 56877,
+      "ajoutLe": "2026-11-11",
+      "nouveau": true,
+      "sources": [
+        "games/la-petite-ligne-2/assets/commun/son/effets/applaudissements-enthousiastes.ogg"
+      ]
+    },
+    {
       "id": "effet-cuisine-decoupe",
       "section": "cuisine",
       "sorte": "effet",
@@ -890,7 +1181,7 @@
       "section": "portes-boutique",
       "sorte": "effet",
       "nom": "Porte",
-      "ou": "Quand on passe une porte. Les deux joueurs l'entendent.",
+      "ou": "Quand on passe une porte; quand on sort la draisine de sa remise; quand on rentre la draisine dans sa remise. Les deux joueurs l'entendent.",
       "branche": true,
       "description": "Loquet, grincement léger, porte refermée à 0,78 s (couvre le fondu d'entrée).",
       "duree": 1.15,
@@ -1050,7 +1341,7 @@
       "section": "histoire",
       "sorte": "effet",
       "nom": "Sonnerie du passage à niveau",
-      "ou": "Quand arrive « Train du samedi », « Départ du train du samedi », « Autorail de 5 h 12 » ou « Départ de l'autorail » (le train passe la barrière). Les deux joueurs l'entendent.",
+      "ou": "Quand la barrière du passage à niveau s'apprête à baisser, tant qu'elle sonne; quand le train est passé, la sonnerie se tait. Les deux joueurs l'entendent.",
       "branche": true,
       "description": "Timbre électrique (si 5) frappé 9 fois par seconde, 3,5 s.",
       "duree": 4.6,
@@ -1364,7 +1655,7 @@
       "section": "gestes",
       "sorte": "effet",
       "nom": "S'asseoir",
-      "ou": "Quand on s'assoit. Les deux joueurs l'entendent.",
+      "ou": "Quand on s'assoit; quand on monte à bord de la draisine. Les deux joueurs l'entendent.",
       "branche": true,
       "description": "",
       "duree": 0.32,

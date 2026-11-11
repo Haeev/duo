@@ -59,8 +59,15 @@
     },
     { "on": "fish_cast", "sound": "peche-lancer", "audience": "both", "placed": true },
     { "on": "fish_hooked", "sound": "peche-touche", "audience": "both", "placed": true },
+    {
+      "on": "fish_caught",
+      "where": { "together": true },
+      "sound": "epuisette-plonge",
+      "audience": "both",
+      "placed": true
+    },
     { "on": "fish_caught", "sound": "peche-prise", "audience": "both", "placed": true },
-    { "on": "fish_net_missed", "sound": "peche-bouchon", "audience": "both", "placed": true },
+    { "on": "fish_net_missed", "sound": "epuisette-rate", "audience": "both", "placed": true },
     {
       "on": "fish_lost",
       "where": { "reason": "escaped" },
@@ -247,6 +254,56 @@
     },
     { "on": "train_arrived", "sound": "train-arrive", "audience": "both", "placed": false },
     {
+      "on": "music_finished",
+      "where": { "listeners": { "gt": 0 }, "rating": 3 },
+      "sound": "applaudissements-enthousiastes",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "music_finished",
+      "where": { "listeners": { "gt": 0 }, "rating": 2 },
+      "sound": "applaudissements-chaleureux",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "music_finished",
+      "where": { "listeners": { "gt": 0 } },
+      "sound": "applaudissements-polis",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "vehicle_stroke",
+      "where": { "kind": "jam" },
+      "sound": "draisine-bloque",
+      "audience": "both",
+      "placed": true
+    },
+    { "on": "vehicle_stroke", "sound": "draisine-balancier", "audience": "both", "placed": true },
+    {
+      "on": "vehicle_started",
+      "sound": "draisine-roulement-moyenne",
+      "audience": "both",
+      "placed": false
+    },
+    {
+      "on": "vehicle_stopped",
+      "sound": "draisine-roulement-moyenne",
+      "audience": "both",
+      "placed": false,
+      "stop": true
+    },
+    {
+      "on": "vehicle_in",
+      "where": { "reason": "train" },
+      "sound": "draisine-roulement-moyenne",
+      "audience": "both",
+      "placed": false,
+      "stop": true
+    },
+    {
       "on": "vehicle_seat",
       "where": { "seat": { "notNull": true } },
       "sound": "asseoir",
@@ -261,6 +318,11 @@
       "audience": "both",
       "placed": false
     },
-    { "on": "vehicle_warning", "sound": "passage-a-niveau", "audience": "both", "placed": false }
+    {
+      "on": "vehicle_warning",
+      "sound": "draisine-avertissement",
+      "audience": "both",
+      "placed": false
+    }
   ]
 }
