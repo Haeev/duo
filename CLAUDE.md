@@ -59,6 +59,7 @@ Un même rôle peut tourner en plusieurs exemplaires en parallèle (deux devs ga
 - Sobriété (demande du client, 2026-11-10): le studio travaille en continu mais sans brûler le quota. Trois membres en parallèle au plus, deux de préférence; briefs étroits; comptes rendus de 15 lignes; pas de mission dont le résultat ne sert pas l'étape en cours.
 - Outils de génération payants (Meshy, SpriteCook): un budget de crédits dans chaque brief; le membre relève le solde au début et à la fin et liste ses tâches avec leur coût dans le compte rendu.
 - Les fiches évoluent: quand un manque apparaît (outil, convention, piège), le manager met la fiche à jour.
+- Tableau de bord du client (demande du client, 2026-11-11: « oublie pas de toujours garder à jour le suivi, c'est important »): l'Artifact « Suivi de La Petite Ligne » (source `outils/tableau-de-bord/`) est tenu à jour par le manager à chaque lot fusionné ou décision, sans attendre qu'on le demande: avancement et pourcentages, journal, images du jour avec leur note, modèles et sons republiés quand ils changent, questions ouvertes, réponse sous chaque remarque du client. Toute heure écrite y est lue à l'horloge (`TZ=Europe/Paris date`), jamais estimée.
 
 ## Processus de production
 
