@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Cornet de fanfare: laiton, tube enroulé en anneau, trois pistons à bouton de nacre sur le dessus, grand pavillon évasé à droite, embouchure à gauche. -->
+  <g transform="rotate(-8 48 52)">
+    <path d="M2 48 L8 44 L18 48 L18 56 L8 58 Z" fill="#8E6A26" data-w="0.5"/>
+    <path id="anneau" d="M38 36 A22 22 0 1 1 37.9 36 Z M38 46 A12 12 0 1 0 38.1 46 Z" fill-rule="evenodd" fill="#C8A150"/>
+    <path data-clip="anneau" data-w="0" d="M52 42 L66 58 L52 86 L18 86 Q48 84 56 64 Z" fill="#8E6A26"/>
+    <path data-w="0" d="M20 52 Q24 42 34 38 Q26 46 26 56 Z" fill="#F2C55C"/>
+    <path id="pavillon" d="M52 50 L80 10 L84 10 L84 88 L80 88 L52 64 Z" fill="#C8A150"/>
+    <path data-clip="pavillon" data-w="0" d="M72 36 L84 22 L84 96 L56 96 L58 66 Q80 58 72 36 Z" fill="#8E6A26"/>
+    <path data-w="0" d="M58 48 L74 22 Q76 36 72 48 Q66 46 60 56 Z" fill="#F2C55C"/>
+    <ellipse cx="84" cy="49" rx="9" ry="39" fill="#F2C55C" data-w="0.8"/><ellipse cx="86" cy="49" rx="5.5" ry="32" fill="#4F3626" data-w="0.5"/>
+    <g fill="#C8A150" data-w="0.5"><path d="M27 14 h7 v24 h-7 z"/><path d="M39 12 h7 v26 h-7 z"/><path d="M51 14 h7 v24 h-7 z"/></g>
+    <g fill="#F3EDE0" data-w="0.5"><ellipse cx="30.5" cy="13" rx="5.6" ry="2.8"/><ellipse cx="42.5" cy="11" rx="5.6" ry="2.8"/><ellipse cx="54.5" cy="13" rx="5.6" ry="2.8"/></g>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M44 84 l5 -5 M50 88 l5 -5 M38 86 l5 -5"/></g>
+  </g>
+</svg>

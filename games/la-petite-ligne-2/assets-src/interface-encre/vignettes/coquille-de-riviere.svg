@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" data-trait="5.2" data-pas="0.6" data-tremble="0.35" data-halo="3.6">
+  <!-- Coquille de rivière: valve vide d'une mulette, allongée, pointue côté crochet (à gauche), arrondie de l'autre; dehors brun strié par la croissance, dedans nacré en bandes. -->
+  <g transform="rotate(-18 48 50)">
+    <path id="valve" d="M4 46 Q8 36 30 28 Q66 14 88 38 Q94 58 74 72 Q44 88 16 66 Q6 58 4 46 Z" fill="#6E4B30"/>
+    <path data-clip="valve" data-w="0" d="M62 14 L96 14 L96 90 L10 90 Q52 84 66 62 Q78 40 62 14 Z" fill="#4F3626"/>
+    <path id="nacre" d="M16 48 Q20 41 34 36 Q62 26 80 41 Q85 56 68 65 Q44 77 22 62 Q16 56 16 48 Z" fill="#F3EDE0"/>
+    <path data-clip="nacre" data-w="0" d="M52 28 L90 28 L90 80 L20 80 Q56 74 70 58 Q76 44 52 28 Z" fill="#A58BB8"/>
+    <path data-clip="nacre" data-w="0" d="M20 50 Q24 43 38 39 Q30 47 30 57 Z" fill="#F7F3EA"/>
+    <path data-clip="nacre" data-w="0" d="M38 64 Q58 62 70 50 Q70 62 50 70 Z" fill="#CC9C96"/>
+    <path data-clip="nacre" data-w="0" d="M26 55 Q42 57 58 46 Q46 62 28 61 Z" fill="#A9C7D9"/>
+    <g data-clip="valve" data-teinte="#D7A86A" data-w="0.5" fill="none" stroke="#000"><path d="M8 50 Q10 40 32 31 M14 42 Q34 24 62 21 M12 60 Q40 84 72 68 M80 30 Q92 44 86 56"/></g>
+    <path d="M2 46 Q4 38 12 36 Q16 44 12 54 Q4 54 2 46 Z" fill="#96704C" data-w="0.5"/>
+    <g data-w="0.35" fill="none" stroke="#000"><path d="M72 82 l6 -6 M64 86 l6 -6 M80 76 l5 -5"/></g>
+  </g>
+</svg>
