@@ -38,6 +38,10 @@ EYE_Z = H - HEAD_H * 0.56
 UNDERWEAR = "#E4DCCB"
 SKIN = N["peaux"]["porcelaine"]
 W_HEAD = lambda p: {"Head": 1.0}  # noqa: E731
+FIX = N["fixes"]
+# Trait d'encre posé en géométrie (coutures, bords de poche, bord de col): le trait du rendu ne cerne que les
+# silhouettes et les arêtes vives; un détail plaqué ne se lit que par sa teinte.
+INK = tag(ZONE_FIXED, FIX["encre_trait"])
 
 
 def color_of(zone):
@@ -57,6 +61,9 @@ class Body:
         self.arm_x = dims["sh"] / 2 - dims["arm"] / 2
         self.arm_len = SHOULDER_Z - (CROTCH + 0.035)
         self.leg_x = dims["hi"] / 4 + 0.004
+        # Épaules nues (débardeur): le buste monte en pente vers le cou et laisse sortir la boule du bras, au lieu
+        # du haut carré que les manches habillent. Posé le temps de construire la pièce (`with self.nues():`).
+        self.tombantes = False
 
     def torso_rows(self, off):
         B = self.B
@@ -67,6 +74,9 @@ class Body:
             (1.08, (wa + sh) / 2 - 0.005, (B["d_wa"] + B["d_ch"]) / 4, B["belly"] * 0.7), (1.18, sh - 0.015, B["d_ch"] / 2, B["belly"] * 0.2),
             (1.25, sh - 0.004, B["d_ch"] / 2 - 0.004, 0), (1.292, sh * 0.98, B["d_ch"] * 0.46, 0), (1.318, sh * 0.88, B["d_ch"] * 0.41, 0), (1.338, 0.080, 0.068, 0), (1.36, 0.052, 0.050, 0),
         ]
+        if self.tombantes:
+            rows[7:] = [(1.235, sh * 0.90, B["d_ch"] / 2 - 0.004, 0), (1.275, sh * 0.80, B["d_ch"] * 0.45, 0), (1.305, sh * 0.60, B["d_ch"] * 0.40, 0),
+                        (1.325, sh * 0.40, B["d_ch"] * 0.35, 0), (1.338, 0.066, 0.062, 0), (1.36, 0.052, 0.050, 0)]
         return [(z, a + off, b + off, s) for z, a, b, s in rows]
 
     def torso_at(self, z, off=0.0):
@@ -123,6 +133,18 @@ class Body:
             return {L + "UpLeg": 1 - k, L + "Leg": k}
         return w
 
+    def nues(self):
+        """Contexte: le buste aux épaules tombantes (voir __init__)."""
+        body = self
+
+        class Nues:
+            def __enter__(self):
+                body.tombantes = True
+
+            def __exit__(self, *exc):
+                body.tombantes = False
+        return Nues()
+
     # ----- coques ouvertes (vestes, gilets, plastrons, poches): angles en degrés, -90 = milieu du devant, 0 = côté gauche
     def surf(self, z, deg, off):
         """Point du buste à la hauteur z, à l'angle deg, décalé de off depuis la peau."""
@@ -130,11 +152,122 @@ class Body:
         t = math.radians(deg % 360.0)
         return Vector((a * math.cos(t), -s + b * math.sin(t), z))
 
+    def normale(self, z, deg, off=0.0, h=0.05):
+        """Normale du buste lissé (pentes prises sur 2 h de hauteur): la lumière à deux tons du rendu encré coupe
+        alors le vêtement d'une ligne nette, au lieu de tacher chaque facette."""
+        a, b, _ = self.torso_at(z, off)
+        a0, b0, s0 = self.torso_at(z - h, off)
+        a1, b1, s1 = self.torso_at(z + h, off)
+        da, db, ds = (a1 - a0) / (2 * h), (b1 - b0) / (2 * h), (s1 - s0) / (2 * h)
+        t = math.radians(deg % 360.0)
+        c, sn = math.cos(t), math.sin(t)
+        return Vector((c / a, sn / b, -(c * c * da / a + sn * sn * db / b) + sn * ds / b)).normalized()
+
+    def arc(self, z, deg, length, off=0.0):
+        """Angle (degrés) que couvre une longueur posée sur le buste à la hauteur z, autour de l'angle deg."""
+        a, b, _ = self.torso_at(z, off)
+        t = math.radians(deg)
+        return math.degrees(length / math.hypot(a * math.sin(t), b * math.cos(t)))
+
+    def crete(self, x, off, lo=1.26, hi=1.36):
+        """Hauteur où le buste (décalé de off) a la demi-largeur x: la crête de l'épaule pour une bretelle."""
+        for _ in range(40):
+            mid = (lo + hi) / 2
+            if self.torso_at(mid, off)[0] > x:
+                lo = mid
+            else:
+                hi = mid
+        return (lo + hi) / 2
+
+    def meridien(self, deg, dist, off, z0):
+        """Hauteur du point situé à `dist` mètres sous z0 en suivant le buste à l'angle deg (col, revers: une
+        largeur d'étoffe se compte sur la surface, pas en hauteur, sinon elle s'étale sur le plat de l'épaule)."""
+        z, done, step = z0, 0.0, 0.001
+        p = self.surf(z, deg, off)
+        while z > 0.8:
+            q = self.surf(z - step, deg, off)
+            length = (q - p).length
+            if done + length >= dist:  # le point tombe dans ce pas: on y finit au prorata
+                return z - step * (dist - done) / max(length, 1e-9)
+            done += length
+            z, p = z - step, q
+        return z
+
+    def anneaux(self, b, zs, off, n, tg, wfn=None, cap0=False, haut=None, bas=None):
+        """Coque fermée autour du buste, aux hauteurs zs (off: décalage, ou fonction de z), normales lissées.
+        haut, bas: profondeur du bord rentré (None: bord nu)."""
+        offz = off if callable(off) else (lambda z: off)
+        st = []
+        for z in zs:
+            a, d, s = self.torso_at(z, offz(z))
+            st.append((Vector((0, -s, z)), Z, X, a, d))
+        first = len(b.verts) + (n if bas is not None else 0)
+        if bas is not None:
+            st = rim(st, bas, start=True)
+        if haut is not None:
+            st = rim(st, haut, end=True)
+        b.sweep(st, n, tg, wfn or self.w_torso, cap0=cap0)
+        for i, z in enumerate(zs):
+            for j in range(n):
+                b.normals[first + i * n + j] = self.normale(z, 360.0 * j / n, offz(z))
+        return first
+
+    def trait(self, b, path, off, width=0.008, tg=None, wfn=None, lift=0.003):
+        """Trait d'encre posé sur le buste: ruban plat le long de path = [(hauteur, angle)], lift au-dessus de off.
+        Un chemin qui revient à son départ est fermé en anneau."""
+        pts = [self.surf(z, t, off + lift) for z, t in path]
+        nor = [self.normale(z, t, off) for z, t in path]
+        closed = len(pts) > 3 and (pts[0] - pts[-1]).length < 1e-5
+        if closed:
+            pts, nor = pts[:-1], nor[:-1]
+        count = len(pts)
+        left, right = [], []
+        for i, (p, n) in enumerate(zip(pts, nor)):
+            before = pts[(i - 1) % count] if closed else pts[max(i - 1, 0)]
+            after = pts[(i + 1) % count] if closed else pts[min(i + 1, count - 1)]
+            side = n.cross((after - before).normalized()).normalized() * (width / 2)
+            left.append(self._vert(b, p - side, wfn or self.w_torso))
+            right.append(self._vert(b, p + side, wfn or self.w_torso))
+            b.normals[left[-1]] = b.normals[right[-1]] = n
+        for i in range(count if closed else count - 1):
+            k = (i + 1) % count
+            quad = (left[i], left[k], right[k], right[i])
+            face = (b.verts[quad[1]] - b.verts[quad[0]]).cross(b.verts[quad[3]] - b.verts[quad[0]])
+            b.quad(*(quad if face.dot(nor[i]) > 0 else quad[::-1]), tg or INK)
+
+    def plaque(self, b, z0, z1, t0, t1, off, tg, bord=0.007, saillie=0.004, n=3, lisere=None, wfn=None, zfix=None):
+        """Pièce plaquée sur le buste (poche, patte, boucle) entre les hauteurs z0 et z1 et les angles t0 et t1:
+        un champ à la teinte tg, relevé de saillie au-dessus de off (nombre, ou fonction de la hauteur et de l'angle), et un liseré (trait d'encre par défaut) qui redescend
+        s'ancrer dans l'étoffe. n: colonnes du champ (une tous les 8 degrés au plus, sinon la corde s'enfonce).
+        zfix(z, t): hauteur réelle (poche de biais)."""
+        zfix = zfix or (lambda z, t: z)
+        wfn = wfn or self.w_torso
+        offz = off if callable(off) else (lambda z, t: off)
+        off = offz((z0 + z1) / 2, (t0 + t1) / 2)
+        bt = self.arc((z0 + z1) / 2, (t0 + t1) / 2, bord, off) * (1 if t1 > t0 else -1)
+        ts = [t0] + [t0 + bt + (t1 - t0 - 2 * bt) * j / n for j in range(n + 1)] + [t1]
+        zs = [z0, z0 + bord, z1 - bord, z1]
+        rows = []
+        for i, z in enumerate(zs):
+            row = []
+            for j, t in enumerate(ts):
+                edge = i in (0, 3) or j in (0, len(ts) - 1)
+                row.append(self._vert(b, self.surf(zfix(z, t), t, offz(z, t) + (-0.002 if edge else saillie)), wfn))
+                b.normals[row[-1]] = self.normale(zfix(z, t), t, off)
+            rows.append(row)
+        flip = t1 < t0
+        for i in range(3):
+            for j in range(len(ts) - 1):
+                inner = i == 1 and 0 < j < len(ts) - 2
+                quad = (rows[i][j], rows[i][j + 1], rows[i + 1][j + 1], rows[i + 1][j])
+                b.quad(*(quad[::-1] if flip else quad), tg if inner else (lisere or INK))
+
     def coque(self, b, zs, arcs, off, tg, wfn, depth=0.007, zfix=None, bottom=True, top=True, offs=None):
         """Nappe posée sur le buste: rangées aux hauteurs zs, chaque rangée faite des arcs de arcs(z)
         [(angle début, angle fin, points, bord ouvert au début, bord ouvert à la fin)], même nombre de points
         d'une rangée à l'autre. Bords ouverts, ourlet et haut rentrés vers le corps de depth (bord épais).
-        zfix(z, angle): hauteur réelle d'un point (ourlet en pointe); offs(z, angle): décalage propre."""
+        zfix(z, angle): hauteur réelle d'un point (ourlet en pointe); offs(z, angle): décalage propre.
+        Les sommets de la nappe portent la normale du buste lissé (aplat propre), les bords gardent la leur."""
         zfix = zfix or (lambda z, t: z)
         offs = offs or (lambda z, t: off)
 
@@ -147,13 +280,22 @@ class Body:
                 ts = [t0 + (t1 - t0) * j / (n - 1) for j in range(n)]
                 row.append((ts, o0, o1))
             rows.append(row)
-        outer = [[[self._vert(b, point(z, t), wfn) for t in ts] for ts, _, _ in row] for z, row in zip(zs, rows)]
+
+        def skin(z, t):
+            index = self._vert(b, point(z, t), wfn)
+            b.normals[index] = self.normale(zfix(z, t), t, off)
+            return index
+        outer = [[[skin(z, t) for t in ts] for ts, _, _ in row] for z, row in zip(zs, rows)]
         inner = {}
 
         def lip(i, k, j):
             key = (i, k, j)
             if key not in inner:
-                inner[key] = self._vert(b, point(zs[i], rows[i][k][0][j], True), wfn)
+                t = rows[i][k][0][j]
+                inner[key] = self._vert(b, point(zs[i], t, True), wfn)
+                # le bord rentré garde la normale de la nappe: sinon le rendu trace un bout de trait partout où
+                # il se voit de biais (un côté du V et pas l'autre, des crans au col)
+                b.normals[inner[key]] = self.normale(zfix(zs[i], t), t, off)
             return inner[key]
         for i in range(len(zs) - 1):
             for k in range(len(rows[i])):
@@ -225,7 +367,10 @@ class Body:
             st = rim(self.torso_stations(WAIST - spec.get("ourlet", 0.06), col, off), off - 0.006, start=True, bulge=bulge)
         else:
             st = self.torso_stations(hem_z, col, off)
-        st = rim(st, off + 0.006, end=True, bulge=bulge)
+        # Col fermé jusqu'au cou: un bord simplement rentré laissait voir l'intérieur du vêtement entre le col et
+        # le cou (un cran sombre de chaque côté). Le dernier anneau entre dans le cou.
+        c, d, hint, ru, rv = st[-1]
+        st = st[:-1] + [(c, d, hint, ru + bulge, rv + bulge), (Vector((0, 0, c.z + 0.007)), Z, X, 0.040, 0.040)]
         b.sweep(st, 16, tg, self.w_torso, keep=keep)
         sleeve = spec.get("manches", 0.0)
         if sleeve > 0:
@@ -240,33 +385,39 @@ class Body:
                 b.sweep(rim(st, off * 0.85 - 0.002, end=True, bulge=bulge), 10, tg, self.w_arm(s))
         return b
 
-    def armhole(self, z, off, k):
+    def armhole(self, z, off, k, low=1.04):
         """Demi-angle (degrés) de l'emmanchure autour du côté à la hauteur z: la coque s'arrête à la largeur
-        sh/2 - k x bras (l'épaule et le haut du bras restent dehors), 0 sous l'aisselle et au ras du cou."""
+        sh/2 - k x bras (l'épaule et le haut du bras restent dehors), 0 sous l'aisselle (low) et au ras du cou."""
         a = self.torso_at(z, off)[0]
         x_lim = self.B["sh"] / 2 - self.B["arm"] * k
-        fade = smooth(1.04, 1.13, z)
+        fade = smooth(low, low + 0.09, z)
         lim = a - (a - x_lim) * fade
         return 0.0 if fade <= 0 or lim >= a * 0.999 else math.degrees(math.acos(lim / a))
 
     def veste(self, spec, b=None):
         """Gilet, cardigan, veste: coque ouverte au choix (encolure en V, devant ouvert, emmanchures), ourlet en
-        pointe, bandes de côtes, boutons, poches, col et revers, manches."""
+        pointe, bandes de côtes, boutons, poches, col et revers, couture et martingale du dos, manches."""
         b = b or Builder()
         B = self.B
         off = spec["couche"]
-        main = tag(0, color_of(spec["zones"][0]))
+        front_tag = tag(0, color_of(spec["zones"][0]))
         second = tag(1, color_of(spec["zones"][1])) if len(spec["zones"]) > 1 else tag(ZONE_FIXED, FIX["laiton"])
-        hem, col = WAIST - spec.get("ourlet", 0.08), spec.get("col", 1.33)
+        # dos d'une autre étoffe (gilet de costume): troisième zone
+        back = tag(2, color_of(spec["zones"][2])) if len(spec["zones"]) > 2 else front_tag
+        hem, col = WAIST - spec.get("ourlet", 0.08), spec.get("col", 1.336)
         col_v, neck = spec.get("col_v"), spec.get("encolure", 0.0)
         front = spec.get("ouverture", 0.0) / 2
         drop = spec.get("pointes", 0.0)
         holes = spec.get("manches", 0.0) == 0 and spec.get("emmanchure", 0.55) > 0
-        band, rib = spec.get("bande", 0.0), 0.004
-        if len(spec["zones"]) > 2:  # dos d'une autre étoffe (gilet de costume)
-            back = tag(2, color_of(spec["zones"][2]))
-            main_only = main
-            main = lambda c: back if c.y > 0.0 else main_only  # noqa: E731
+        hole_low = spec.get("emmanchure_bas", 1.04)
+        band, rib = spec.get("bande", 0.0), spec.get("cotes", 0.004)
+        hang, straight = spec.get("tombe", 0.0), spec.get("droit", False)
+        seam = spec.get("couture_dos", False)
+
+        def main(c):
+            if seam and c.y > 0 and abs(c.x) < 0.004:
+                return INK
+            return back if c.y > 0.0 else front_tag
 
         def half_open(z):
             w = front
@@ -285,14 +436,18 @@ class Body:
             if not holes:
                 return 0.0
             # trou ouvert ou non selon le corps moyen, pour que toutes les corpulences gardent la même topologie
-            if MEDIUM.armhole(z, off, spec.get("emmanchure", 0.55)) == 0:
+            if MEDIUM.armhole(z, off, spec.get("emmanchure", 0.55), hole_low) == 0:
                 return 0.0
-            return max(1.0, self.armhole(z, off, spec.get("emmanchure", 0.55)))
+            return max(1.0, self.armhole(z, off, spec.get("emmanchure", 0.55), hole_low))
 
         def arcs(z):
             d, p = delta(z), psi(z)
             o = d > 0
-            return [(-90 + d, -p, 7, o, p > 0), (p, 180 - p, 13, p > 0, p > 0), (180 + p, 270 - d, 7, p > 0, o)]
+            if seam:  # couture du milieu du dos: une colonne étroite, à l'encre
+                g = self.arc(z, 90, 0.0045, off)
+                return [(-90 + d, -p, 9, o, p > 0), (p, 90 - g, 7, p > 0, False), (90 - g, 90 + g, 2, False, False),
+                        (90 + g, 180 - p, 7, False, p > 0), (180 + p, 270 - d, 9, p > 0, o)]
+            return [(-90 + d, -p, 9, o, p > 0), (p, 180 - p, 13, p > 0, p > 0), (180 + p, 270 - d, 9, p > 0, o)]
 
         def zfix(z, t):
             if drop <= 0 or z > hem + 0.13:
@@ -302,123 +457,219 @@ class Body:
             notch = 1 - 0.55 * math.exp(-(dt / 7.0) ** 2) if col_v is not None or front > 0 else 1.0
             return z - drop * c ** 3 * notch * (1 - (z - hem) / 0.13)
 
+        hip = self.torso_at(0.89, 0.0)
+
         def offs(z, t):
-            return off + (rib if band and z < hem + band + 1e-6 else 0.0)
-        count = max(4, round((col - hem) / 0.036))
+            o = off + (rib if band and z < hem + band + 1e-6 else 0.0)
+            if hang:  # les devants tombent d'aplomb depuis la poitrine: plus loin du corps devant que sur les côtés
+                o += hang * max(0.0, -math.sin(math.radians(t))) ** 2
+            if straight and z < 0.89:  # sous les hanches la veste tombe droit, elle ne rentre pas sous le bassin
+                now = self.torso_at(z, 0.0)
+                o += max(0.0, hip[0] - now[0]) * abs(math.cos(math.radians(t))) + max(0.0, hip[1] - now[1]) * abs(math.sin(math.radians(t)))
+            return o
+        count = max(4, round((col - hem) / 0.048))  # peu de rangs: les normales lissées font l'aplat, pas le maillage
         zs = [hem + (col - hem) * i / count for i in range(count + 1)]
         if band:
             zs = sorted(set(zs + [hem + band, hem + band + 0.0001]))
+        # rangées aux cassures du profil de l'épaule: la coque suit le vrai buste, le haut porté dessous ne perce pas
+        for z in (1.25, 1.292, 1.318):
+            if z < col - 0.008:
+                zs = sorted([x for x in zs if abs(x - z) > 0.014] + [z])
         self.coque(b, zs, arcs, off, main, self.w_torso, zfix=zfix, offs=offs)
-        # col et revers: bande autour de la nuque, revers posés sur les bords du V
         if spec.get("revers"):
-            top_d = delta(col - 0.001)
-            zc = [col - 0.05, col - 0.025, col + 0.004]
-            self.coque(b, zc, lambda z: [(-90 + top_d + 6, 270 - top_d - 6, 17, True, True)], off + 0.012, main, self.w_torso)
-            low = col_v if col_v is not None else col - 0.16
-            zl = [low + (col - 0.03 - low) * i / 5 for i in range(6)]
-            width = lambda z: 4 + 20 * math.sin(math.pi * min(1.0, (z - low) / (col - 0.03 - low)) ** 0.8)  # noqa: E731
-            self.coque(b, zl, lambda z: [(-90 + delta(z), -90 + delta(z) + width(z), 3, True, True),
-                                          (270 - delta(z) - width(z), 270 - delta(z), 3, True, True)], off + 0.008, main, self.w_torso)
-        # poches plaquées
+            self.col_revers(b, spec, delta, offs, front_tag)
+        if band:  # bord-côte: un trait le sépare du corps du tricot
+            zl = hem + band
+            d0 = delta(zl)
+            self.trait(b, [(zl, -90 + d0 + (360 - 2 * d0) * j / 30) for j in range(31)], off + rib, 0.007, lift=0.002)
+        # poches: plaquées (un champ cerné d'un trait) ou passepoilées (une fente: un trait en biais)
+        welt = spec.get("poches_style", "plaquee") == "passepoil"
         for z0, z1, tc, w in spec.get("poches", []):
             for s in (1, -1):
                 t = -90 + s * tc
-                self.coque(b, [z0, (z0 + z1) / 2, z1], lambda z, t=t, w=w: [(t - w, t + w, 3, True, True)], off + 0.006, main, self.w_torso, depth=0.005)
-        # martingale: demi-ceinture dans le dos, boucle au milieu
+                o = offs((z0 + z1) / 2, t)
+                rise = spec.get("poches_saillie", 0.004)
+                if welt:
+                    self.trait(b, [(z0 + (z1 - z0) * j / 4, t + s * w * (j / 2 - 1)) for j in range(5)], o, 0.008)
+                else:
+                    self.plaque(b, z0, z1, t - s * w, t + s * w, offs, front_tag, saillie=rise, n=max(2, round(2 * w / 8)))
+        # martingale: demi-ceinture cernée d'un trait dans le dos, boucle au milieu
         if spec.get("martingale"):
-            zb = WAIST - 0.035
-            self.coque(b, [zb - 0.013, zb + 0.013], lambda z: [(58, 122, 5, True, True)], off + 0.006, main, self.w_torso, depth=0.005)
-            b.ellipsoid(self.surf(zb, 90, off + 0.011), Vector((0.016, 0.005, 0.014)), second, self.w_torso, n=6, m=3)
+            zb = WAIST + spec.get("martingale_haut", 0.04)
+            self.plaque(b, zb - 0.015, zb + 0.015, 40, 140, off, back, bord=0.006, saillie=0.003, n=12)
+            g = self.arc(zb, 90, 0.019, off)
+            self.plaque(b, zb - 0.02, zb + 0.02, 90 - g, 90 + g, off + 0.002, second, bord=0.005, saillie=0.003, n=1)
         # boutons sur le devant (ou sur le bord gauche d'un devant ouvert)
         n = spec.get("boutons", 0)
         if n:
             z_top = (col_v if col_v is not None else col - 0.06) - 0.025
-            z_bot = hem + 0.035 + (band or 0)
+            z_bot = spec.get("boutons_bas", hem + 0.035 + (band or 0))
             for i in range(n):
                 z = z_top + (z_bot - z_top) * i / max(1, n - 1)
-                t = -90 + (delta(z, 0.012) if front > 0 else 0)
-                p = self.surf(z, t, off + 0.004 + (rib if band and z < hem + band else 0))
-                b.ellipsoid(p, Vector((0.010, 0.005, 0.010)), second, self.w_torso, n=6, m=3)
+                t = -90 + (delta(z, 0.014) if front > 0 else 0)
+                self.pastille(b, self.surf(z, t, offs(z, t)), self.normale(z, t, off), spec.get("bouton", 0.011), second, n=6, height=spec.get("bouton_saillie", 0.004))
         sleeve = spec.get("manches", 0.0)
         if sleeve > 0:
+            so = spec.get("couche_manches", off * 0.85)
             for s in (-1, 1):
                 p0, p1 = self.arm_ends(s)
-                st = limb_stations(p0, p1, B["arm"] / 2, B["arm"] / 2 * 0.9, Z, True, False, off=off * 0.85, t1=sleeve)
+                st = limb_stations(p0, p1, B["arm"] / 2, B["arm"] / 2 * 0.9, Z, True, False, off=so, t1=sleeve)
                 if band:  # poignet en côtes: le dernier tronçon renflé
                     c, d, hint, ru, rv = st[-1]
                     st = [x for x in st[:-1] if (c - x[0]).length > band + 0.004]
                     st += [(c - d * (band + 0.002), d, hint, ru, rv), (c - d * band, d, hint, ru + rib, rv + rib), (c, d, hint, ru + rib, rv + rib)]
-                b.sweep(rim(st, off * 0.85 - 0.002, end=True), 10, main, self.w_arm(s))
+                    ring = [(c - d * (band + 0.008), d, hint, ru + 0.002, rv + 0.002), (c - d * (band + 0.001), d, hint, ru + rib + 0.001, rv + rib + 0.001)]
+                    b.sweep(ring, 10, INK, self.w_arm(s))
+                b.sweep(rim(st, so - 0.002, end=True), 10, front_tag, self.w_arm(s))
         b.weld()
         return b
 
-    def jambes(self, spec):
+    def col_revers(self, b, spec, delta, offs, tg):
+        """Col rabattu autour du cou, en pointes devant, et revers le long du V: deux feuilles posées sur la veste,
+        chacune bordée d'un trait. Les largeurs se comptent sur l'étoffe (méridiens), pas en hauteur."""
+        off = spec["couche"]
+        col, col_v = spec.get("col", 1.336), spec.get("col_v")
+        edge = delta(col - 0.001)  # angle du bord du devant au ras du cou
+        wide, point = spec.get("col_largeur", 0.045), spec.get("col_pointe", 0.04)
+
+        def reach(t):  # largeur du col à l'angle t: plus long aux pointes, près du bord du devant
+            dt = min(abs(((t + 90) % 360) - edge), abs(((t + 90) % 360) - (360 - edge)))
+            return wide + point * math.exp(-(dt / 16.0) ** 2)
+
+        def z_col(k, t):  # k: part de la largeur depuis le cou (1 = bord libre); négatif: le pied de col qui monte
+            return col + 0.012 if k < 0 else self.meridien(t, k * reach(t), off, col)
+
+        def o_col(k, t):
+            return offs(col - 0.03, t) + (-0.004 if k < 0 else 0.004 + 0.008 * min(1.0, k * 2.5))
+        span = [(-90 + edge + 1.5, 270 - edge - 1.5, 23, True, True)]
+        rim_k = 0.82
+        self.coque(b, [1.0, rim_k], lambda k: span, off, INK, self.w_torso, zfix=z_col, offs=o_col, top=False, depth=0.006)
+        self.coque(b, [rim_k, 0.45, 0.12, -1.0], lambda k: span, off, tg, self.w_torso, zfix=z_col, offs=o_col, bottom=False, depth=0.006)
+        if col_v is None:
+            return
+        # revers: du bas du V jusque sous le col, de plus en plus large, bordé d'un trait
+        z_top = col - 0.045
+        zs = [col_v + (z_top - col_v) * i / 5 for i in range(6)]
+        lap = spec.get("revers_largeur", 0.05)
+
+        def width(z):
+            return self.arc(z, -90 + delta(z), lap * ((z - col_v) / (z_top - col_v)) ** 0.8, off)
+
+        def ink(z):
+            return min(width(z) * 0.5, self.arc(z, -90 + delta(z), 0.007, off))
+
+        def o_lap(z, t):
+            return offs(z, t) + 0.007
+        for s in (1, -1):
+            def arc(a0, a1, n, o0, o1, s=s):
+                t0, t1 = -90 + s * a0, -90 + s * a1
+                return (t0, t1, n, o0, o1) if s > 0 else (t1, t0, n, o1, o0)
+            self.coque(b, zs, lambda z: [arc(delta(z), delta(z) + width(z) - ink(z), 3, True, False)], off, tg, self.w_torso, offs=o_lap, depth=0.006)
+            self.coque(b, zs, lambda z: [arc(delta(z) + width(z) - ink(z), delta(z) + width(z), 2, False, True)], off, INK, self.w_torso, offs=o_lap, depth=0.006)
+
+    def jambes(self, spec, bassin=True):
         b = Builder()
         B = self.B
         off = spec["couche"]
         tg = tag(0, color_of(spec["zones"][0]))
-        b.sweep(rim(self.torso_stations(0.775, WAIST + 0.03, off), off - 0.002, end=True), 16, tg, self.w_torso, cap0=True)
+        if bassin:
+            b.sweep(rim(self.torso_stations(0.775, WAIST + 0.03, off), off - 0.002, end=True), 16, tg, self.w_torso, cap0=True)
+        r0, r1 = B["leg"] / 2, B["leg"] / 2 * 0.88
+        if spec.get("droite"):
+            # jambe droite et ample: son côté prolonge la hanche jusqu'en bas (sinon le bassin déborde en boule
+            # au-dessus de deux jambes étroites), à peine resserrée au bas (fuseau, en mètres)
+            r0 = self.torso_at(0.86, 0.0)[0] - self.leg_x
+            r1 = r0 - spec.get("fuseau", 0.02)
+        inner = B["leg"] / 2 * 0.88 + 0.002  # le bas de la jambe se referme sur le tibia
+        t1 = min(spec["longueur"], 0.99)
         for s in (-1, 1):
             q0, q1 = self.leg_ends(s)
-            st = limb_stations(q0, q1, B["leg"] / 2, B["leg"] / 2 * 0.88, X, True, False, off=off, t1=min(spec["longueur"], 0.99))
-            b.sweep(rim(st, off - 0.002, end=True), 10, tg, self.w_leg(s))
+            st = limb_stations(q0, q1, r0, r1, X, True, False, off=off, t1=t1)
+            b.sweep(rim(st, st[-1][3] - inner, end=True), 10, tg, self.w_leg(s))
             cuff = spec.get("revers", 0.0)
-            if cuff:  # revers retroussé au bas de la jambe
-                t1 = min(spec["longueur"], 0.99)
+            if cuff:  # revers retroussé au bas de la jambe: un rouleau franc, plus large que la jambe
+                out = spec.get("revers_saillie", 0.007)
                 t0 = t1 - cuff / (q0 - q1).length
-                st = limb_stations(q0, q1, B["leg"] / 2, B["leg"] / 2 * 0.88, X, False, False, off=off + 0.007, t0=t0, t1=t1, cuts=2)
-                b.sweep(rim(rim(st, 0.008, start=True), 0.009, end=True), 10, tg, self.w_leg(s))
+                st = limb_stations(q0, q1, r0, r1, X, False, False, off=off + out, t0=t0, t1=t1, cuts=2)
+                b.sweep(rim(rim(st, out + 0.001, start=True), out + 0.002, end=True), 10, tg, self.w_leg(s))
         return b
 
     def salopette(self, spec):
-        """Jambes de pantalon, culotte montée par-dessus le haut, bavette, bretelles et boutons."""
-        b = self.jambes(spec)
-        B = self.B
+        """Salopette: jambes droites et amples, bassin près du corps, ceinture qui passe sur le haut, bavette large
+        en trapèze, empiècement du dos, bretelles croisées, boucles et boutons. Tout est sur les seize pans du
+        buste, deux fois plus fins (les hauts dessous ne percent pas) et prend la normale lissée (aplat sans bosse)."""
+        b = self.jambes(spec, bassin=False)
         tg = tag(0, color_of(spec["zones"][0]))
         metal = tag(1, color_of(spec["zones"][1]))
-        up = spec.get("couche_haut", 0.046)
-        # culotte: près du corps aux hanches, montée à la couche d'un dessus vers la taille (pas de ballon aux hanches)
-        st = []
-        for i in range(9):
-            z = 0.80 + (WAIST + 0.035 - 0.80) * i / 8
-            o = spec["couche"] + 0.006 + (up - spec["couche"] - 0.006) * smooth(0.83, 0.95, z)
-            a, d, s = self.torso_at(z, o)
-            st.append((Vector((0, -s, z)), Z, X, a, d))
-        b.sweep(rim(rim(st, 0.01, start=True), 0.008, end=True), 16, tg, self.w_torso)
-        bib_top, half = spec.get("bavette", 1.20), 0.095
+        lo, up = spec["couche"], spec.get("couche_haut", 0.027)
+        top = WAIST + 0.035
+        # bassin: à la couche du pantalon aux hanches, à celle de la bavette dès le bas des hauts (pas de ballon:
+        # le côté monte droit de la hanche à la taille)
+        self.anneaux(b, [0.775, 0.80, 0.86, 0.92, 0.975, top], lambda z: lo + (up - lo) * smooth(0.835, 0.895, z),
+                     32, tg, cap0=True, haut=up - 0.016)
+        # bavette: toute la largeur du devant à la ceinture, puis les côtés rentrent en courbe jusqu'aux coins
+        bib_top = spec.get("bavette", 1.22)
+        half = spec.get("bavette_largeur", 0.5) * self.B["sh"] / 2
 
-        def bib(z):
-            d = math.degrees(math.asin(min(0.95, half / self.torso_at(z, up)[0])))
-            return [(-90 - d, -90 + d, 5, True, True)]
-        zs = [WAIST + 0.02 + (bib_top - WAIST - 0.02) * i / 5 for i in range(6)]
-        self.coque(b, zs, bib, up, tg, self.w_torso, bottom=False)
-        # poche de bavette
-        zp = [bib_top - 0.10, bib_top - 0.07, bib_top - 0.035]
-        self.coque(b, zp, lambda z: [(-90 - 16, -90 + 16, 3, True, True)], up + 0.006, tg, self.w_torso, depth=0.005)
-        # bretelles: du coin de la bavette, par-dessus l'épaule, jusqu'au dos de la culotte
+        def d_bib(z):
+            u = (z - top) / (bib_top - top)
+            d1 = math.degrees(math.asin(min(0.95, half / self.torso_at(z, up)[0])))
+            return d1 + (67.5 - d1) * (1 - u) ** 1.7
+        zs = [top + (bib_top - top) * i / 5 for i in range(6)]
+        self.coque(b, zs, lambda z: [(-90 - d_bib(z), -90 + d_bib(z), 13, True, True)], up, tg, self.w_torso, bottom=False)
+        # poche de bavette, cernée d'un trait
+        pw = self.arc(bib_top - 0.08, -90, spec.get("poche", 0.052), up)
+        self.plaque(b, bib_top - 0.125, bib_top - 0.04, -90 - pw, -90 + pw, up, tg, n=2)
+        # empiècement du dos: petit trapèze où se boutonnent les bretelles
+        yoke = spec.get("dos", 1.105)
+
+        def d_yoke(z):
+            u = (z - top) / (yoke - top)
+            d1 = math.degrees(math.asin(min(0.95, 0.05 / self.torso_at(z, up)[0])))
+            return d1 + (45 - d1) * (1 - u) ** 1.3
+        zs = [top + (yoke - top) * i / 3 for i in range(4)]
+        self.coque(b, zs, lambda z: [(90 - d_yoke(z), 90 + d_yoke(z), 9, True, True)], up, tg, self.w_torso, bottom=False)
+        # bretelles croisées dans le dos: du coin de la bavette, par-dessus l'épaule, au coin opposé de l'empiècement
+        xc = 0.56 * self.B["sh"] / 2
         for s in (1, -1):
-            def theta(z, x, front):
-                a = self.torso_at(z, up)[0]
-                t = math.degrees(math.acos(min(0.99, x / a)))
-                t = -t if front else t
-                return t if s > 0 else 180 - t
-            path = [(bib_top - 0.01, 0.075, True), (1.26, 0.088, True), (1.30, 0.095, True), (1.322, 0.10, True), (1.333, 0.102, None),
-                    (1.322, 0.10, False), (1.30, 0.095, False), (1.25, 0.085, False), (1.17, 0.07, False), (1.08, 0.06, False), (WAIST + 0.02, 0.06, False)]
-            pts = []
-            for z, x, front in path:
-                if front is None:
-                    t = 0.0 if s > 0 else 180.0
-                else:
-                    t = theta(z, x, front)
-                pts.append(self.surf(z, t, up + 0.004))
-            self.strap(b, pts, 0.016, 0.004, tg)
-            corner = self.surf(bib_top - 0.025, theta(bib_top - 0.025, 0.072, True), up + 0.007)
-            b.ellipsoid(corner, Vector((0.011, 0.005, 0.011)), metal, self.w_torso, n=6, m=3)
+            # à plat: 4 mm d'épaisseur en tout, pour qu'une veste passe par-dessus dans le dos; au croisement
+            # les deux bretelles se confondent (même teinte, même plan: rien ne se voit)
+            pts, nor = self.par_dessus(s, half - 0.022, bib_top - 0.035, -0.032, yoke - 0.03, xc, up + 0.002)
+            self.sangle(b, pts, nor, 0.020, 0.002, tg)
+            for p, n, r, h in ((pts[0], nor[0], 0.018, 0.004), (pts[-1], nor[-1], 0.013, 0.002)):  # boucle devant, bouton derrière
+                self.pastille(b, p + n * 0.002, n, r, metal, height=h)
+            # bouton de côté, à la ceinture
+            side = 0.0 if s > 0 else 180.0
+            self.pastille(b, self.surf(WAIST, side, up + 0.001), self.normale(WAIST, side, up), 0.011, metal)
         b.weld()
         return b
 
+    def par_dessus(self, s, x0, z0, x1, z1, xc, off, over=None):
+        """Chemin d'une bretelle du côté s (1 gauche, -1 droit): du devant (demi-largeur x0, hauteur z0),
+        par-dessus l'épaule (crête à la demi-largeur xc), jusqu'au dos (x1, négatif: de l'autre côté; hauteur z1).
+        Rend les points et les normales du buste. over(x): surépaisseur selon la place en largeur (croisement)."""
+        path = []  # (hauteur, angle du côté gauche, demi-largeur signée)
+        za = self.crete(xc / math.cos(math.radians(50)), off)
+        for i in range(5):  # montée du devant
+            z = z0 + (za - z0) * i / 5
+            x = x0 + (xc - x0) * i / 5
+            path.append((z, -math.degrees(math.acos(min(1.0, x / self.torso_at(z, off)[0]))), x))
+        for deg in (-50, -30, -10, 10, 30, 50):  # le dessus de l'épaule, à largeur constante
+            path.append((self.crete(xc / math.cos(math.radians(deg)), off), deg, xc))
+        for i in range(1, 8):  # descente du dos, en biais vers l'autre côté
+            z = za + (z1 - za) * i / 7
+            x = xc + (x1 - xc) * i / 7
+            path.append((z, math.degrees(math.acos(max(-1.0, min(1.0, x / self.torso_at(z, off)[0])))), x))
+        pts, nor = [], []
+        for z, deg, x in path:
+            t = deg if s > 0 else 180.0 - deg
+            o = off + (over(x) if over and deg > 50 else 0.0)
+            pts.append(self.surf(z, t, o))
+            nor.append(self.normale(z, t, off, h=0.02))
+        return pts, nor
+
     def strap(self, b, pts, half_w, half_t, tg, wfn=None):
-        """Bande plate qui suit des points posés sur le buste (bretelle, lien)."""
+        """Bande plate qui suit des points posés sur le devant ou le dos du buste (pan, lien)."""
         wfn = wfn or self.w_torso
         st = []
         for i, p in enumerate(pts):
@@ -428,6 +679,92 @@ class Body:
             out = out.normalized() if out.length > 1e-6 else Z
             st.append((p, d, out, half_t, half_w))
         b.sweep(st, 8, tg, wfn, cap0=True, cap1=True)
+
+    def sangle(self, b, pts, nor, half_w, half_t, tg, wfn=None):
+        """Bande plate le long de points posés sur le buste, à plat sur lui (bretelle)."""
+        st = []
+        for i, (p, n) in enumerate(zip(pts, nor)):
+            d = (pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]).normalized()
+            st.append((p, d, n, half_t, half_w))
+        b.sweep(st, 6, tg, wfn or self.w_torso, cap0=True, cap1=True)
+
+    def pastille(self, b, centre, normal, radius, tg, wfn=None, n=8, height=0.004):
+        """Bouton ou boucle: disque bombé posé à plat sur l'étoffe (un cône bas à n pans, lisible de face)."""
+        u = normal.cross(Z)
+        u = (u if u.length > 1e-4 else normal.cross(X)).normalized()
+        v = normal.cross(u)
+        wfn = wfn or self.w_torso
+        w = wfn(centre)  # un bouton est rigide: tous ses sommets suivent son centre
+        ring = []
+        for j in range(n):
+            a = 2 * math.pi * j / n
+            b.verts.append(centre + (u * math.cos(a) + v * math.sin(a)) * radius - normal * 0.003)
+            b.weights.append(w)
+            ring.append(len(b.verts) - 1)
+        inner = []
+        for j in range(n):
+            a = 2 * math.pi * j / n
+            b.verts.append(centre + (u * math.cos(a) + v * math.sin(a)) * radius * 0.6 + normal * height)
+            b.weights.append(w)
+            inner.append(len(b.verts) - 1)
+        b.verts.append(centre + normal * height)
+        b.weights.append(w)
+        mid = len(b.verts) - 1
+        for j in range(n):
+            k = (j + 1) % n
+            for quad in ((ring[j], ring[k], inner[k], inner[j]), (inner[j], inner[k], mid)):
+                face = (b.verts[quad[1]] - b.verts[quad[0]]).cross(b.verts[quad[2]] - b.verts[quad[0]])
+                b.faces.append(quad if face.dot(normal) > 0 else quad[::-1])
+                b.tags.append(tg)
+
+    def debardeur(self, spec):
+        """Débardeur: coque près du corps à encolure ronde et vraies emmanchures, sur un buste aux épaules nues
+        (la pièce apporte la peau des épaules, de la gorge et du haut du dos: le buste du corps est masqué)."""
+        b = Builder()
+        off = spec["couche"]
+        tg = tag(0, color_of(spec["zones"][0]))
+        skin = tag(ZONE_SKIN, SKIN)
+        hem = WAIST - spec.get("ourlet", 0.05)
+        z_arm = spec.get("emmanchure_bas", 1.14)   # bas de l'emmanchure
+        z_out = spec.get("bretelle_dehors", 1.305)  # hauteur où le bord extérieur de la bretelle passe l'épaule
+        z_top = spec.get("bretelle_dedans", 1.331)  # hauteur où son bord intérieur la passe (le haut de la pièce)
+        z_front, z_back = spec.get("encolure_devant", 1.215), spec.get("encolure_dos", 1.265)
+        with self.nues():
+            # la peau: un buste de plus, des aisselles au cou, qui entre dans le cou
+            zs = [1.10, 1.18, 1.235, 1.275, 1.305, 1.325, 1.338]
+            first = self.anneaux(b, zs, off - 0.009, 12, skin)
+            ring = [first + (len(zs) - 1) * 12 + j for j in range(12)]
+            plug = []
+            for j in range(12):
+                a = 2 * math.pi * j / 12
+                plug.append(self._vert(b, Vector((0.040 * math.cos(a), 0.040 * math.sin(a), 1.352)), self.w_torso))
+            for j in range(12):
+                b.quad(ring[j], ring[(j + 1) % 12], plug[(j + 1) % 12], plug[j], skin)
+            x_out = self.torso_at(z_out, off)[0]
+            x_in = self.torso_at(z_top, off)[0]
+
+            def delta(z, low):  # demi-angle de l'encolure (arrondie) à la hauteur z
+                if z <= low:
+                    return 0.0
+                u = min(1.0, (z - low) / (z_top - low))
+                w = x_in * math.sqrt(1 - (1 - u) ** 2) ** 0.8
+                return math.degrees(math.asin(min(1.0, w / self.torso_at(z, off)[0])))
+
+            def psi(z):  # demi-angle de l'emmanchure
+                if z <= z_arm or z >= z_out:
+                    return 0.0
+                a = self.torso_at(z, off)[0]
+                lim = a - (a - x_out) * smooth(z_arm, z_arm + 0.10, z) ** 0.8
+                return max(0.5, math.degrees(math.acos(min(1.0, lim / a))))
+
+            def arcs(z):
+                df, db, p = delta(z, z_front), delta(z, z_back), psi(z)
+                return [(-90 + df, -p, 5, df > 0, p > 0), (p, 90 - db, 5, p > 0, db > 0),
+                        (90 + db, 180 - p, 5, db > 0, p > 0), (180 + p, 270 - df, 5, p > 0, df > 0)]
+            zs = [hem + (z_arm - hem) * i / 4 for i in range(5)] + [1.175, z_front, z_front + 0.008, 1.245, z_back, z_back + 0.008, 1.285, z_out, 1.316, 1.325, z_top]
+            self.coque(b, zs, arcs, off, tg, self.w_torso, top=False)
+        b.weld()
+        return b
 
     def tablier(self, spec):
         """Tablier à bavette: bavette, devant noué à la taille, poche, lien de cou et nœud dans le dos."""
@@ -454,6 +791,8 @@ class Body:
             span = math.degrees(math.asin(min(0.97, spec.get("largeur", 0.22) / (a + flare))))
             rows.append([Vector(((a + flare) * math.cos(math.radians(-90 + span * (2 * j / 8 - 1))), -s * t + (d + flare) * math.sin(math.radians(-90 + span * (2 * j / 8 - 1))), z)) for j in range(9)])
         b.grid(rows, cloth, ws)
+        # l'envers du pan: de dos il dépasse des hanches, sans envers on ne voyait que son ourlet, un trait en l'air
+        b.grid([[p + Vector((0, 0.004, 0)) for p in reversed(row)] for row in rows], cloth, ws)
         # ourlet et bords épais: une rangée rentrée sous le bas
         lip = [Vector((p.x * 0.97, p.y * 0.95, p.z + 0.004)) for p in rows[0]]
         b.grid([lip, rows[0]], cloth, ws)
@@ -472,7 +811,8 @@ class Body:
         knot = self.surf(WAIST - 0.008, 90, tie + 0.01)
         for s in (1, -1):
             b.ellipsoid(knot + Vector((s * 0.035, 0.004, 0.006)), Vector((0.032, 0.008, 0.018)), trim, self.w_torso, n=8, m=4, rot=(0, 0, s * -8))
-            self.strap(b, [knot + Vector((s * 0.008, 0.006, -0.01)), knot + Vector((s * 0.02, 0.008, -0.07)), knot + Vector((s * 0.03, 0.008, -0.13))], 0.012, 0.003, trim)
+            # les pans du nœud suivent le creux des reins et la hanche (droits, ils se décollaient du dos)
+            self.strap(b, [self.surf(WAIST - 0.008 - dz, 90 - s * a, tie + 0.007) for dz, a in ((0.01, 3), (0.05, 6), (0.09, 9), (0.13, 11))], 0.012, 0.003, trim)
         b.ellipsoid(knot + Vector((0, 0.006, 0)), Vector((0.012, 0.009, 0.013)), trim, self.w_torso, n=6, m=3)
         # lien de cou: des coins de la bavette autour de la nuque
         pts = []
@@ -485,8 +825,40 @@ class Body:
         b.weld()
         return b
 
+    def bande(self, b, path, off, half_w, thick, tg, wfn=None):
+        """Bande d'étoffe à plat sur le buste le long de path = [(hauteur, angle)]: un dessus en trois colonnes
+        (deux lisières et un milieu, pour des rayures qui gardent leurs bords), des chants, deux bouts.
+        tg(centre de face, colonne): étiquette; colonne 1 = le milieu."""
+        wfn = wfn or self.w_torso
+        pts = [self.surf(z, t, off) for z, t in path]
+        nor = [self.normale(z, t, off) for z, t in path]
+        rows = []
+        for i, (p, n) in enumerate(zip(pts, nor)):
+            d = (pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]).normalized()
+            side = n.cross(d).normalized()
+            row = [self._vert(b, p + side * (half_w * k) + n * (thick if abs(k) <= 1.0 else 0.0), wfn) for k in (-1.0001, -1, -0.62, 0.62, 1, 1.0001)]
+            for index in row[1:5]:
+                b.normals[index] = n
+            rows.append(row)
+        for i in range(len(rows) - 1):
+            for j in range(5):
+                quad = (rows[i][j], rows[i + 1][j], rows[i + 1][j + 1], rows[i][j + 1])
+                centre = sum((b.verts[k] for k in quad), Vector()) / 4
+                face = (b.verts[quad[1]] - b.verts[quad[0]]).cross(b.verts[quad[3]] - b.verts[quad[0]])
+                b.faces.append(quad if face.dot(nor[i]) > 0 else quad[::-1])
+                b.tags.append(tg(centre, j - 1))
+        for row, n in ((rows[0], nor[0]), (rows[-1], nor[-1])):  # bouts: un chant qui redescend sur le buste
+            base = [self._vert(b, b.verts[k] - n * thick, wfn) for k in row[1:5]]
+            for j in range(3):
+                quad = (row[1 + j], row[2 + j], base[j + 1], base[j])
+                face = (b.verts[quad[1]] - b.verts[quad[0]]).cross(b.verts[quad[3]] - b.verts[quad[0]])
+                out = b.verts[row[2]] - (pts[1] if row is rows[0] else pts[-2])
+                b.faces.append(quad if face.dot(out) > 0 else quad[::-1])
+                b.tags.append(tg(b.verts[row[2]], 0))
+
     def echarpe(self, spec):
-        """Écharpe: un tour de cou épais et deux pans sur la poitrine, rayures au bout."""
+        """Écharpe: un tour de cou épais et deux pans sur la poitrine, rayés au bout (les rayures gardent une
+        lisière de laine: de la teinte du haut porté dessous, elles ne coupent pas le pan en morceaux)."""
         b = Builder()
         main = tag(0, color_of(spec["zones"][0]))
         stripe = tag(1, color_of(spec["zones"][1])) if len(spec["zones"]) > 1 else main
@@ -505,19 +877,22 @@ class Body:
         st.append(st[0])
         b.sweep(st, 8, main, self.w_torso)
         # pans: l'un long, l'autre plus court par-dessus, rayés au bout
-        for x, low, lift in ((0.050, spec.get("pan", 1.02), 0.010), (-0.030, spec.get("pan", 1.02) + 0.09, 0.022)):
-            pts = []
-            n = 7
+        for x, low, lift in ((0.052, spec.get("pan", 1.02), 0.0), (-0.030, spec.get("pan", 1.02) + 0.09, 0.009)):
+            path = []
+            n = 8
             for i in range(n):
-                z = z0 - 0.035 - (z0 - 0.035 - low) * i / (n - 1)
+                z = z0 - 0.03 - (z0 - 0.03 - low) * i / (n - 1)
                 a = self.torso_at(z, 0.05)[0]
-                t = -90 + math.degrees(math.asin(max(-0.9, min(0.9, x / a))))
-                pts.append(self.surf(z, t, 0.040 + lift))
+                path.append((z, -90 + math.degrees(math.asin(max(-0.9, min(0.9, x / a))))))
 
-            def tg(c, low=low):
+            def tg(c, column, low=low):
                 u = c.z - low
-                return stripe if 0.025 < u < 0.045 or 0.065 < u < 0.08 else main
-            self.strap(b, pts, 0.036, 0.006, tg)
+                return stripe if column == 1 and (0.022 < u < 0.05 or 0.075 < u < 0.10) else main
+            # rangées de plus aux bords des rayures
+            extra = [low + u for u in (0.022, 0.05, 0.075, 0.10)]
+            zs = sorted(set([z for z, _ in path] + extra), reverse=True)
+            angle = lambda z: -90 + math.degrees(math.asin(max(-0.9, min(0.9, x / self.torso_at(z, 0.05)[0]))))  # noqa: E731
+            self.bande(b, [(z, angle(z)) for z in zs], 0.020, 0.038, 0.026 + lift, tg)
         b.weld()
         return b
 
@@ -548,45 +923,72 @@ class Body:
         return b
 
     def sabot(self, spec):
-        """Sabots de bois: coque taillée d'un bloc, pointe relevée, bride de cuir sur le cou-de-pied."""
+        """Sabots de bois: un bloc taillé d'une pièce, profilé du talon au nez (semelle épaisse et plate, dessus
+        bombé, nez pointu et relevé), large bride de cuir sur le cou-de-pied. Plus gros qu'une chaussure (un
+        sabot l'est), pour se lire à l'écran."""
         b = Builder()
         wood, strap = tag(0, color_of(spec["zones"][0])), tag(1, color_of(spec["zones"][1]))
+        k = spec.get("taille", 1.0)
+        # profil: (avance vers l'arrière y, demi-largeur, dessous, dessus), du talon au bout du nez
+        prof = [(0.092, 0.030, 0.012, 0.070), (0.078, 0.056, 0.0, 0.086), (0.030, 0.066, 0.0, 0.092), (-0.030, 0.070, 0.0, 0.100),
+                (-0.085, 0.072, 0.0, 0.102), (-0.135, 0.064, 0.002, 0.092), (-0.175, 0.047, 0.012, 0.080), (-0.205, 0.028, 0.032, 0.076),
+                (-0.224, 0.010, 0.056, 0.074)]
         for s in (-1, 1):
             L = "Left" if s > 0 else "Right"
 
             def wf(p, L=L):
                 k = smooth(0.13, 0.19, p.z)
                 return {L + "Foot": 1 - k, L + "Leg": k}
-            c = Vector((s * self.leg_x, -0.050, 0.058))
+            cx = s * self.leg_x
             start = len(b.verts)
-            b.ellipsoid(c, Vector((0.070, 0.135, 0.066)), wood, wf, n=12, m=7)
-            for i in range(start, len(b.verts)):
-                v = b.verts[i]
-                v.z = max(v.z, 0.0)
-                if v.y < -0.12:  # pointe relevée
-                    v.z += (-0.12 - v.y) * 0.9
-                if v.z > 0.085 and v.y > -0.09:  # entrée du pied: le dessus s'ouvre en dos d'âne
-                    v.z = 0.085 + (v.z - 0.085) * 0.35
-            b.sweep([(Vector((s * self.leg_x, -0.050, z)), Z, X, 0.072 - 0.003 * i, 0.138 - 0.004 * i) for i, z in enumerate((0.0, 0.010, 0.020))], 12, wood, wf, cap0=True)
-            # bride de cuir posée sur le dessus, de part et d'autre du cou-de-pied
+            st = [(Vector((cx, y * k, (lo + hi) / 2 * k)), -Y, X, hw * k, (hi - lo) / 2 * k) for y, hw, lo, hi in prof]
+            b.sweep(st, 10, wood, wf, cap0=True, cap1=True)
+            for i, (y, hw, lo, hi) in enumerate(prof):  # semelle plate: le bas de chaque section s'écrase
+                mid = (lo + hi) / 2 * k
+                for j in range(10):
+                    v = b.verts[start + i * 10 + j]
+                    if v.z < mid:
+                        v.z = lo * k + (v.z - lo * k) * 0.3
+            # bride de cuir: large bande par-dessus le cou-de-pied, d'un flanc à l'autre
+            y, hw, lo, hi = -0.098, 0.0705, 0.0, 0.100
             arc = []
-            for i in range(7):
-                a = math.pi * i / 6
-                arc.append(Vector((s * self.leg_x + 0.074 * math.cos(a), -0.052, 0.07 + 0.045 * math.sin(a))))
-            st = [(p, (arc[min(i + 1, 6)] - arc[max(i - 1, 0)]).normalized(), Y, 0.015, 0.006) for i, p in enumerate(arc)]
+            for i in range(9):
+                a = math.radians(8 + 164 * i / 8)
+                arc.append(Vector((cx + (hw + 0.006) * k * math.cos(a), y * k, ((lo + hi) / 2 + ((hi - lo) / 2 + 0.006) * math.sin(a)) * k)))
+            st = [(p, (arc[min(i + 1, 8)] - arc[max(i - 1, 0)]).normalized(), Y, 0.028 * k, 0.007) for i, p in enumerate(arc)]
             b.sweep(st, 6, strap, wf, cap0=True, cap1=True)
         return b
 
     def skirt_stations(self, spec, top_z):
         hem = spec["bas"]
+        count = spec.get("anneaux", 11)
+        deep = spec.get("profondeur", spec["evasement"]) / spec["evasement"]
         st = []
-        for i in range(11):
-            t = i / 10
+        for i in range(count):
+            t = i / (count - 1)
             z = hem + (top_z - hem) * t
             a, d, s = self.torso_at(max(z, 0.86), spec["couche"])
             flare = spec["evasement"] * smooth(0.0, 1.0, 1 - t) * (1 - t) ** 0.6
-            st.append((Vector((0, -s * t, z)), Z, X, a + flare, d + flare))
+            st.append((Vector((0, -s * t, z)), Z, X, a + flare, d + flare * deep))
         return st
+
+    @staticmethod
+    def w_porte(p):
+        """Poids d'une jupe longue « portée par les jambes »: le bassin jusqu'au pli de l'aine, puis chaque moitié
+        suit la cuisse de son côté, et sous le genou le tibia. Assis, l'étoffe se pose sur les cuisses et retombe
+        des genoux; en course, le bas se soulève avec le mollet, qui sort par l'ourlet au lieu de percer le dos.
+        Le milieu se partage entre les deux jambes (une membrane, comme une étoffe tendue d'un genou à l'autre).
+        Condition: une jupe peu profonde d'avant en arrière sous le genou (`profondeur`), sinon le bas, loin de
+        l'os, s'envole au lieu de suivre."""
+        g = smooth(0.90, 0.78, p.z)
+        q = 0.9 * smooth(KNEE + 0.07, KNEE - 0.09, p.z)
+        k = smooth(-0.035, 0.035, p.x)
+        # en haut, les poids du buste (comme le haut porté par-dessus: la taille ne le perce pas quand il penche)
+        out = {bone: w * (1 - g) for bone, w in Body.w_torso(p).items()}
+        for name, share in (("Left", k), ("Right", 1 - k)):
+            out[name + "UpLeg"] = g * share * (1 - q)
+            out[name + "Leg"] = g * share * q
+        return out
 
     @staticmethod
     def w_skirt(top_z, hem, suivi=None, spread=0.6):
@@ -611,30 +1013,65 @@ class Body:
             return out
         return w
 
+    # Colonnes d'une jupe portée par les jambes: serrées au milieu du devant et du dos, où l'étoffe se partage
+    # entre les deux jambes: le partage tient dans un pli de 7 cm entre les jambes (avec seize pans égaux il
+    # s'étalait sur 28 cm, à 10 degrés du milieu encore sur 13: la jambe d'appui se découvrait en course).
+    PORTEE = [0, 40, 66, 85, 90, 95, 114, 140, 180, 220, 246, 265, 270, 275, 294, 320]
+
+    def doublure(self, b, st, tg, ws, n=16, up=0.60):
+        """Envers d'une jupe portée par les jambes, jusqu'à mi-cuisse: quand l'ourlet se soulève (course, assise),
+        on voit l'intérieur de l'étoffe et non au travers."""
+        inner = [(c, d, hint, ru - 0.003, rv - 0.003) for c, d, hint, ru, rv in st if c.z <= up]
+        b.sweep(inner, n, tg, ws, flip=True, angles=self.PORTEE)
+
     def jupe(self, spec):
         b = Builder()
         top_z = WAIST + 0.03
-        st = rim(rim(self.skirt_stations(spec, top_z), 0.02, start=True), spec["couche"] - 0.002, end=True)
-        b.sweep(st, 16, tag(0, color_of(spec["zones"][0])), self.w_skirt(top_z, spec["bas"], spec.get("suivi")))
+        tg = tag(0, color_of(spec["zones"][0]))
+        st = self.skirt_stations(spec, top_z)
+        if spec.get("portee"):
+            b.sweep(rim(st, spec["couche"] - 0.002, end=True), 16, tg, self.w_porte, angles=self.PORTEE)
+            self.doublure(b, st, tg, self.w_porte)
+        else:
+            st = rim(rim(st, 0.02, start=True), spec["couche"] - 0.002, end=True)
+            b.sweep(st, 16, tg, self.w_skirt(top_z, spec["bas"], spec.get("suivi")))
         return b
 
     def robe(self, spec):
         b = Builder()
-        st = rim(self.skirt_stations(spec, WAIST), 0.02, start=True)
-        ws = self.w_skirt(WAIST, spec["bas"], spec.get("suivi"))
-        b.sweep(st, 16, tag(0, color_of(spec["zones"][0])), ws)
+        st = self.skirt_stations(spec, WAIST)
+        if spec.get("portee"):
+            ws = self.w_porte
+            self.doublure(b, st, tag(0, color_of(spec["zones"][0])), ws)
+        else:
+            st = rim(st, 0.02, start=True)
+            ws = self.w_skirt(WAIST, spec["bas"], spec.get("suivi"))
+        b.sweep(st, 16, tag(0, color_of(spec["zones"][0])), ws, angles=self.PORTEE if spec.get("portee") else None)
         b = self.torse(spec, b, hem_z=WAIST)
         if len(spec["zones"]) > 1:
             trim = tag(1, color_of(spec["zones"][1]))
             off = spec["couche"]
-            if spec.get("col_claudine"):  # col plat arrondi posé sur les épaules, fendu devant
-                self.coque(b, [1.288, 1.312, 1.336], lambda z: [(-90 + 7, 270 - 7, 21, True, True)], off + 0.010, trim, self.w_torso, depth=0.006)
+            if spec.get("col_claudine"):  # col plat à deux lobes ronds, fendu devant, large d'une main sur l'étoffe
+                col = spec.get("col", 1.337)
+
+                def reach(t):
+                    dt = min((t + 90) % 360, 360 - (t + 90) % 360)  # écart au milieu du devant
+                    lobe = 0.058 * math.sqrt(max(0.0, 1 - ((dt - 34) / 34) ** 2)) ** 0.7 if dt < 34 else 0.058
+                    return lobe - 0.014 * smooth(34, 80, dt)
+
+                def z_col(k, t):
+                    return col + 0.008 if k < 0 else self.meridien(t, k * reach(t), off, col)
+
+                def o_col(k, t):
+                    return off + (-0.004 if k < 0 else 0.004 + 0.006 * min(1.0, k * 3))
+                self.coque(b, [1.0, 0.5, 0.12, -1.0], lambda k: [(-90 + 2, 270 - 2, 27, True, True)], off, trim, self.w_torso, zfix=z_col, offs=o_col, depth=0.006)
             if spec.get("ceinture"):
                 self.coque(b, [WAIST - 0.018, WAIST + 0.018], lambda z: [(-90, 270, 21, False, False)], off + 0.007, trim, self.w_torso, depth=0.005)
-                knot = self.surf(WAIST, 90, off + 0.012)
-                for s in (1, -1):
-                    b.ellipsoid(knot + Vector((s * 0.033, 0, 0.004)), Vector((0.03, 0.008, 0.017)), trim, self.w_torso, n=8, m=4, rot=(0, 0, s * -10))
-                b.ellipsoid(knot, Vector((0.011, 0.009, 0.013)), trim, self.w_torso, n=6, m=3)
+                knot = self.surf(WAIST, 90, off + 0.013)
+                for s in (1, -1):  # deux coques et deux pans: un vrai nœud, lisible de dos
+                    b.ellipsoid(knot + Vector((s * 0.046, 0, 0.008)), Vector((0.043, 0.010, 0.026)), trim, self.w_torso, n=8, m=4, rot=(0, s * -16, s * -10))
+                    self.strap(b, [self.surf(WAIST - dz, 90 - s * a, off + 0.013) for dz, a in ((0.01, 3), (0.055, 8), (0.11, 13))], 0.014, 0.003, trim)
+                b.ellipsoid(knot, Vector((0.015, 0.011, 0.016)), trim, self.w_torso, n=6, m=3)
             b.weld()
         return b
 
@@ -675,7 +1112,6 @@ EXPRESSIONS = {
     "blink": dict(brow=(0.0, 0.0), lid=1.0, arc=-1, cheeks=0, mouth=dict(w=0.030, curve=0.008, thick=0.006)),
     "talk": dict(brow=(0.002, 0.0), lid=0.12, arc=0, cheeks=0, mouth=dict(w=0.022, open_top=0.006, open_bot=0.012, thick=0.005)),
 }
-FIX = N["fixes"]
 
 
 def skull(spec):
@@ -824,17 +1260,19 @@ def hair(spec, rig):
 
 
 def casquette(spec, rig):
-    """Casquette plate de campagne: calotte sur le crâne, dessus aplati et avancé, petite visière."""
+    """Casquette plate de campagne: calotte sur le crâne, dessus aplati qui avance en coin sur une courte
+    visière (c'est ce coin qui la distingue d'une casquette de sport), bouton au sommet."""
     tg = tag(0, color_of(spec["zones"][0]))
     front, nape = spec.get("front", 1.625), spec.get("nuque", 1.555)
     b = Builder()
     b.ellipsoid(HEAD_C, HEAD_R, tg, W_HEAD, n=20, m=13, off=0.025)
     top = HEAD_C.z + HEAD_R.z + 0.025
-    for v in b.verts:  # dessus aplati (relevé vers le sommet, jamais plus bas que lui) et avancé vers la visière
+    for v in b.verts:  # dessus aplati, large, qui descend en coin vers l'avant jusqu'au-dessus de la visière
         k = smooth(1.60, 1.70, v.z)
-        v.z += k * ((top + 0.008 - (top - v.z) * 0.55) - v.z)
-        v.y = v.y * (1 + 0.15 * k) - 0.02 * k
-        v.x *= 1 + 0.07 * k
+        f = smooth(0.05, -0.16, v.y)  # 0 derrière, 1 devant
+        v.z += k * ((top + 0.008 - (top - v.z) * 0.55) - v.z) - 0.04 * k * f
+        v.y = v.y * (1 + 0.15 * k) - (0.02 + 0.04 * f) * k
+        v.x *= 1 + 0.10 * k
     b.cut = (Vector((0, 0, (front + nape) / 2)), Vector((0, (front - nape) / (2 * HEAD_R.y), 1.0)))
     crown = b.to_object(spec["id"], rig)
     bpy.context.view_layer.objects.active = crown
@@ -844,9 +1282,11 @@ def casquette(spec, rig):
     mod.use_rim_only = True
     bpy.ops.object.modifier_apply(modifier=mod.name)
     v = Builder()
-    v.ellipsoid(Vector((0, -0.172, front + 0.004)), Vector((0.105, 0.085, 0.008)), tg, W_HEAD, n=12, m=4, rot=(-16, 0, 0))
+    v.ellipsoid(Vector((0, -0.172, front + 0.002)), Vector((0.108, 0.095, 0.009)), tg, W_HEAD, n=12, m=4, rot=(14, 0, 0))
     v.cut = (Vector((0, -0.150, 0)), Vector((0, -1.0, 0)))
-    return join([crown, v.to_object(spec["id"] + "-visiere", rig)], spec["id"])
+    k = Builder()  # le bouton du sommet, où se rejoignent les côtes de la casquette
+    k.ellipsoid(Vector((0, -0.016, top + 0.003)), Vector((0.016, 0.016, 0.007)), tg, W_HEAD, n=8, m=4)
+    return join([crown, v.to_object(spec["id"] + "-visiere", rig), k.to_object(spec["id"] + "-bouton", rig)], spec["id"])
 
 
 def chapeau(spec, rig):
@@ -860,6 +1300,13 @@ def chapeau(spec, rig):
     m3 = Matrix.Rotation(math.radians(-5), 3, "X")
     pivot = Vector((0, 0, base))
     b.verts = [pivot + m3 @ (p - pivot) for p in b.verts]
+    # flanc de la calotte: normales du tour lisse (un aplat net, sans facette claire en travers)
+    for i in range(5, 9):
+        _, rx, ry = prof[i]
+        for j in range(20):
+            a = 2 * math.pi * j / 20
+            flat = Vector((math.cos(a) / rx, math.sin(a) / ry, 0.0)).normalized()
+            b.normals[i * 20 + j] = m3 @ (flat + Z * 0.15).normalized()
     return b.to_object(spec["id"], rig)
 
 
@@ -1037,12 +1484,20 @@ BODIES = {k: Body(v) for k, v in BUILDS.items()}
 def with_builds(fn):
     """Construit la pièce sur le corps moyen, puis sur chaque corpulence et silhouette: ce sont ses cibles de morphose."""
     basis = fn(MEDIUM)
-    return basis, {k: fn(body).verts for k, body in BODIES.items()}
+    others = {k: fn(body) for k, body in BODIES.items()}
+    for k, other in others.items():
+        if len(other.verts) != len(basis.verts):  # une soudure de plus ou de moins: dire laquelle
+            for i in sorted(set(basis.merges) ^ set(other.merges)):
+                where = basis.merges.get(i) or other.merges.get(i)
+                print(f"SOUDURE propre à {'la base' if i in basis.merges else k}: sommet {i} avec {where[0]} en {where[1]}")
+    return basis, {k: other.verts for k, other in others.items()}
 
 
 def covers_of(spec):
     base = spec["base"]
     out = []
+    if base == "debardeur":
+        out.append("torso")
     if base in ("torse", "robe", "veste"):
         open_front = spec.get("ouverture") or spec.get("col_v") is not None
         holes = base == "veste" and spec.get("manches", 0.0) == 0
@@ -1059,7 +1514,7 @@ def covers_of(spec):
 
 
 # Bases construites sur le corps, une fois par corpulence et silhouette (cibles de morphose).
-BODY_BASES = ("torse", "jambes", "jupe", "robe", "galet", "veste", "echarpe", "foulard", "tablier", "salopette", "sabot")
+BODY_BASES = ("torse", "debardeur", "jambes", "jupe", "robe", "galet", "veste", "echarpe", "foulard", "tablier", "salopette", "sabot")
 objects = {}  # id -> (objet, spec, variante à plat)
 b0, morphs = with_builds(lambda body: body.body())
 objects["body-base"] = (b0.to_object("body-base", rig, morphs), {"id": "body-base", "slot": "body", "base": "corps", "zones": [], "tags": []}, None)
@@ -1079,6 +1534,11 @@ for spec in G["pieces"]:
         objects[spec["id"]] = (rigid_from_meshy(spec, rig), spec, None)
     else:
         raise SystemExit(f"{spec['id']}: base inconnue « {base} »")
+
+# Sonde des traversées, à la demande (voir sonde.py): LPL_SONDE="pièce:autre,autre;pièce:autre".
+if os.environ.get("LPL_SONDE"):
+    import sonde  # noqa: E402
+    sonde.run(rig, objects, clips, os.environ["LPL_SONDE"], REGIONS, covers_of)
 
 # ---------------------------------------------------------------- export
 os.makedirs(OUT_GLB, exist_ok=True)

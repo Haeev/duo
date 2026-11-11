@@ -56,9 +56,16 @@ class Builder:
     def __init__(self):
         self.verts, self.weights, self.faces, self.tags = [], [], [], []
         self.cut = None  # (point, normale): ne garder que le côté de la normale (coupe nette)
+        # Normales imposées (indice de sommet -> normale): celles de la forme lisse que la nappe approche. Le
+        # rendu encré n'a que deux tons: sans elles, chaque facette proche de la limite d'ombre fait une tache.
+        # Une face les prend si tous ses sommets en ont; les autres (bords épais) gardent leur normale calculée.
+        self.normals = {}
+        self.merges = {}  # soudures faites (sommet -> sommet gardé, place): pour dire où deux corpulences diffèrent
 
-    def sweep(self, stations, n, tg, wfn, cap0=False, cap1=False, keep=None):
-        """stations: [(centre, direction, repère u, rayon u, rayon v)]; tg: étiquette ou fonction du centre de face."""
+    def sweep(self, stations, n, tg, wfn, cap0=False, cap1=False, keep=None, flip=False, angles=None):
+        """stations: [(centre, direction, repère u, rayon u, rayon v)]; tg: étiquette ou fonction du centre de face.
+        flip: faces tournées vers l'intérieur (doublure d'une jupe, vue quand l'ourlet se soulève).
+        angles: les n angles du tour, en degrés (colonnes resserrées où la forme plie), au lieu de pans égaux."""
         rings = []
         for c, d, hint, ru, rv in stations:
             d = d.normalized()
@@ -66,7 +73,7 @@ class Builder:
             v = d.cross(u)
             ring = []
             for j in range(n):
-                a = 2 * math.pi * j / n
+                a = math.radians(angles[j]) if angles else 2 * math.pi * j / n
                 p = c + u * (ru * math.cos(a)) + v * (rv * math.sin(a))
                 ring.append(len(self.verts))
                 self.verts.append(p)
@@ -75,7 +82,7 @@ class Builder:
         for r0, r1 in zip(rings, rings[1:]):
             for j in range(n):
                 k = (j + 1) % n
-                f = (r0[j], r0[k], r1[k], r1[j])
+                f = (r0[j], r1[j], r1[k], r0[k]) if flip else (r0[j], r0[k], r1[k], r1[j])
                 centre = sum((self.verts[i] for i in f), Vector()) / 4
                 if keep is None or keep(centre, j / n):
                     self.faces.append(f)
@@ -116,16 +123,29 @@ class Builder:
         self.faces.append((a, b, c, d))
         self.tags.append(tg(centre) if callable(tg) else tg)
 
-    def weld(self, digits=7):
+    def weld(self, tol=2e-5):
         """Soude les sommets confondus (bords d'arcs qui se rejoignent). Les coïncidences viennent des formules,
-        donc valent pour toutes les corpulences: la topologie reste la même pour les cibles de morphose."""
-        keep, remap, seen = [], {}, {}
+        donc valent pour toutes les corpulences: la topologie reste la même pour les cibles de morphose.
+        Par distance et non par arrondi: les vecteurs sont en simple précision, deux calculs du même point
+        diffèrent d'un cent-millionième et tombaient parfois de part et d'autre d'un arrondi."""
+        keep, remap, grid = [], {}, {}
+        cell = 1e-4
         for i, p in enumerate(self.verts):
-            key = (round(p.x, digits), round(p.y, digits), round(p.z, digits))
-            if key not in seen:
-                seen[key] = len(keep)
+            cx, cy, cz = math.floor(p.x / cell), math.floor(p.y / cell), math.floor(p.z / cell)
+            found = None
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    for dz in (-1, 0, 1):
+                        for j in grid.get((cx + dx, cy + dy, cz + dz), ()):
+                            if found is None and (self.verts[keep[j]] - p).length < tol:
+                                found = j
+            if found is None:
+                found = len(keep)
                 keep.append(i)
-            remap[i] = seen[key]
+                grid.setdefault((cx, cy, cz), []).append(found)
+            else:
+                self.merges[i] = (keep[found], tuple(round(x, 4) for x in p))
+            remap[i] = found
         faces, tags, known = [], [], set()
         for f, t in zip(self.faces, self.tags):
             g = []
@@ -139,6 +159,10 @@ class Builder:
         self.verts = [self.verts[i] for i in keep]
         self.weights = [self.weights[i] for i in keep]
         self.faces, self.tags = faces, tags
+        normals = {}
+        for i in sorted(self.normals):
+            normals.setdefault(remap[i], self.normals[i])
+        self.normals = normals
 
     def ellipsoid(self, centre, radii, tg, wfn, n=14, m=9, rot=None, off=0.0, keep=None):
         """Ellipsoïde (lobe); rot: angles d'Euler en degrés autour de son centre."""
@@ -180,6 +204,12 @@ class Builder:
                 col.data[li].color = (*rgb, 1.0)
         me.color_attributes.active_color = col
         me.set_sharp_from_angle(angle=math.radians(sharp))
+        if self.normals and not self.cut:
+            loops = []
+            for p in me.polygons:
+                imposed = all(v in self.normals for v in p.vertices)
+                loops += [tuple(self.normals[v]) if imposed else (0.0, 0.0, 0.0) for v in p.vertices]
+            me.normals_split_custom_set(loops)
         mat = bpy.data.materials.get("figurine")
         if mat is None:
             mat = bpy.data.materials.new("figurine")
@@ -208,7 +238,7 @@ class Builder:
             o.shape_key_add(name="Basis")
             for key, positions in morphs.items():
                 if len(positions) != len(me.vertices):
-                    raise SystemExit(f"{name}: la cible {key} n'a pas la topologie de la base")
+                    raise SystemExit(f"{name}: la cible {key} n'a pas la topologie de la base ({len(positions)} sommets contre {len(me.vertices)})")
                 if max((a - b).length for a, b in zip(positions, self.verts)) < 1e-5:
                     continue
                 sk = o.shape_key_add(name=key)

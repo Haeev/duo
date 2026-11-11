@@ -61,8 +61,27 @@ function rootOf() {
 }
 
 /**
+ * Gros plan: la caméra de l'aperçu (orthographique) ne montre que `hauteur` mètres autour de la
+ * hauteur `centre`. Le trait garde son épaisseur à l'écran: on voit la pièce comme à la loupe.
+ */
+function cadrer({ centre, hauteur }, aspect) {
+  const camera = preview.stage.camera;
+  const pitch = Math.atan2(
+    camera.position.y - 0.95,
+    Math.hypot(camera.position.x, camera.position.z),
+  );
+  const mid = (centre - 0.95) * Math.cos(pitch);
+  camera.left = (-hauteur / 2) * aspect;
+  camera.right = (hauteur / 2) * aspect;
+  camera.top = mid + hauteur / 2;
+  camera.bottom = mid - hauteur / 2;
+  camera.updateProjectionMatrix();
+}
+
+/**
  * Une vue: `look` (`shape`, `skin`, `pieces`), `lacet` en degrés (0 de face, 180 de dos),
- * `clip` et `instant` (fraction du clip), `couche` (sur le dos), `largeur` et `hauteur` en points.
+ * `clip` et `instant` (fraction du clip), `couche` (sur le dos), `largeur` et `hauteur` en points,
+ * `cadre` (`centre` et `hauteur` en mètres) pour un gros plan.
  */
 async function vue(v) {
   canvas.width = v.largeur;
@@ -70,6 +89,7 @@ async function vue(v) {
   canvas.style.width = `${v.largeur}px`;
   canvas.style.height = `${v.hauteur}px`;
   preview.resize(v.largeur, v.hauteur);
+  if (v.cadre !== undefined) cadrer(v.cadre, v.largeur / v.hauteur);
   const look = { shape: v.look.shape, skin: v.look.skin ?? 2, pieces: v.look.pieces.map(piece) };
   pose = null;
   preview.setLook(look, false);
@@ -90,7 +110,7 @@ async function vue(v) {
     group.position.set(0, 0.18, 0.85);
   }
   preview.face((v.lacet ?? 0) * DEG);
-  for (let i = 0; i < 12; i += 1) preview.frame(0.5);
+  for (let i = 0; i < 5; i += 1) preview.frame(0.5);
   // L'encre saute des images en rendu logiciel: on redessine jusqu'à un vrai dessin de la pose finale.
   for (let i = 0; i < 40; i += 1) {
     renderer.info.reset();

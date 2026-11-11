@@ -189,7 +189,7 @@
         }
       ],
       "tags": ["ete"],
-      "triangles": 384
+      "triangles": 788
     },
     {
       "id": "accessory-vest",
@@ -240,7 +240,7 @@
         }
       ],
       "tags": ["travail"],
-      "triangles": 964
+      "triangles": 908
     },
     {
       "id": "bottom-trousers",
@@ -690,7 +690,7 @@
         }
       ],
       "tags": ["a-gagner", "mercerie", "froid"],
-      "triangles": 1652
+      "triangles": 1718
     },
     {
       "id": "top-work-jacket",
@@ -712,7 +712,7 @@
         }
       ],
       "tags": ["a-gagner", "travail"],
-      "triangles": 1808
+      "triangles": 1898
     },
     {
       "id": "bottom-corduroy",
@@ -748,7 +748,7 @@
         }
       ],
       "tags": ["a-gagner", "mercerie", "quotidien"],
-      "triangles": 384
+      "triangles": 608
     },
     {
       "id": "bottom-overalls",
@@ -770,7 +770,7 @@
         }
       ],
       "tags": ["a-gagner", "travail"],
-      "triangles": 1732
+      "triangles": 1936
     },
     {
       "id": "dress-sunday",
@@ -792,7 +792,7 @@
         }
       ],
       "tags": ["a-gagner", "fete"],
-      "triangles": 1400
+      "triangles": 1760
     },
     {
       "id": "shoes-clogs",
@@ -832,7 +832,7 @@
         }
       ],
       "tags": ["a-gagner", "mercerie", "quotidien"],
-      "triangles": 320
+      "triangles": 368
     },
     {
       "id": "hat-straw",
@@ -876,7 +876,7 @@
         }
       ],
       "tags": ["a-gagner", "mercerie", "froid"],
-      "triangles": 480
+      "triangles": 500
     },
     {
       "id": "accessory-neckerchief",
@@ -916,7 +916,7 @@
         }
       ],
       "tags": ["a-gagner", "travail"],
-      "triangles": 744
+      "triangles": 888
     }
   ]
 }

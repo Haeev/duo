@@ -117,6 +117,14 @@ arms = 0.98
 torso = 0.97
 
 # ---------------------------------------------------------------- pièces
+# Les couches (champ `couche`, décalage depuis la peau): chaque étage passe sur le précédent sans le percer.
+#   1. près du corps: débardeur 0.017, t-shirt et robes 0.019, pull 0.021, gilet de laine 0.022;
+#   2. gilet sans manches 0.028, salopette 0.026 à 0.027, bretelles jusqu'à 0.031 (par-dessus l'étage 1);
+#   3. veste 0.036 (0.042 devant: elle tombe d'aplomb), par-dessus le gilet, la salopette et ses bretelles;
+#   4. tablier 0.052, par-dessus tout.
+# Les bas se portent sous les hauts (0.008 à 0.016), sauf la salopette. Écart conseillé entre deux étages:
+# 4 mm au moins. Mariages sans solution propre (deux pièces du même étage): gilet sans manches et salopette,
+# gilet sans manches et gilet de laine.
 # Champs communs: id, slot (body, head, hair, top, bottom, dress, shoes, hat, glasses, accessory), base (la forme
 # de départ), zones (1 à 3: id, famille du nuancier, couleur par défaut), tags.
 # Les sections du corps masquées (covers) sont déduites des longueurs: rien à remplir.
@@ -153,17 +161,18 @@ bourrelet = true
 zones = [{ id = "principale", famille = "tissus", defaut = "ardoise" }]
 tags = ["quotidien", "froid"]
 
+# --- base "debardeur": coque près du corps sur un buste aux épaules nues (la pièce apporte la peau des épaules).
+# couche, ourlet comme "torse"; encolure_devant et encolure_dos = hauteur du bas de l'encolure ronde (1.215 et
+# 1.265); emmanchure_bas = bas de l'emmanchure (1.14); bretelle_dehors et bretelle_dedans = hauteurs où les
+# deux bords de la bretelle passent l'épaule (1.305 et 1.331: plus l'écart est grand, plus elle est large).
+# Refait le 2026-11-11 (l'ancien était une coque en boîte aux épaules carrées): même id.
 [[pieces]]
 id = "top-tank"
 nom = "Débardeur"
 slot = "top"
-base = "torse"
+base = "debardeur"
 couche = 0.017
 ourlet = 0.05
-manches = 0.0
-ouverture = 0.0
-col = 1.325
-bourrelet = false
 zones = [{ id = "principale", famille = "tissus", defaut = "craie" }]
 tags = ["ete"]
 
@@ -172,24 +181,39 @@ tags = ["ete"]
 # encolure = demi-largeur du V en haut; ouverture = largeur du devant ouvert sur toute la hauteur;
 # pointes = descente de l'ourlet en pointe sur le devant; emmanchure = trous de bras quand manches = 0
 # (largeur gardée à l'épaule = demi-carrure - emmanchure x bras, 0.55 par défaut, 0 sans trou); bande = hauteur des côtes en bas et aux poignets (0: aucune); boutons = nombre;
-# poches = liste [bas, haut, angle depuis le milieu du devant en degrés, demi-largeur en degrés];
-# revers = col rabattu et revers sur le V; martingale = demi-ceinture et boucle dans le dos.
+# poches = liste [bas, haut, angle depuis le milieu du devant en degrés, demi-largeur en degrés], plaquées et
+# cernées d'un trait, ou poches_style = "passepoil" (une fente: un trait en biais); poches_saillie = relief;
+# revers = col rabattu en pointes et revers sur le V, bordés d'un trait (col_largeur 0.045, col_pointe 0.04,
+# revers_largeur 0.05); martingale = demi-ceinture cernée et boucle dans le dos (martingale_haut = hauteur
+# au-dessus de la taille); couture_dos = couture du milieu du dos, à l'encre; emmanchure_bas = bas du trou de
+# bras (1.04); bouton = rayon (0.011), bouton_saillie = son relief (0.004), boutons_bas = hauteur du dernier;
+# cotes = relief des côtes (0.004);
+# tombe = décalage de plus sur le devant (veste qui tombe d'aplomb, 0); droit = sous les hanches la veste
+# descend droit au lieu de rentrer sous le bassin; couche_manches = décalage des manches (0.85 x couche).
 # Zones: principale, puis boutons (couleurs fixes), puis dos facultatif (dos d'une autre étoffe).
-# Gilet refait le 2026-11-11 (retour du client: l'ancien, une coque en boîte, était « hideux »): même id.
+# Les détails qui doivent se lire (couture, poche, bord de col) sont des traits d'encre en géométrie
+# (teinte fixe `encre_trait`): le trait du rendu ne cerne que les silhouettes et les arêtes vives.
+# Gilet refait le 2026-11-11 (retour du client: l'ancien, une coque en boîte, était « hideux »), puis repris le
+# même jour (dos arrêté à la taille, couture, martingale nette, emmanchures): même id.
 [[pieces]]
 id = "accessory-vest"
 nom = "Gilet sans manches"
 description = "Un gilet boutonné en drap, pointu devant, à porter sur une chemise."
 slot = "accessory"
 base = "veste"
-couche = 0.036
-ourlet = 0.10
-pointes = 0.05
-col = 1.325
-col_v = 1.06
-encolure = 0.062
+couche = 0.028
+ourlet = 0.035
+pointes = 0.055
+col = 1.336
+col_v = 1.10
+encolure = 0.064
+emmanchure_bas = 1.055
 boutons = 4
-poches = [[0.925, 0.955, 30, 9]]
+boutons_bas = 0.95
+bouton = 0.012
+poches = [[0.985, 1.0, 30, 9]]
+poches_style = "passepoil"
+couture_dos = true
 martingale = true
 zones = [{ id = "principale", famille = "tissus", defaut = "bouteille" }, { id = "boutons", famille = "fixes", couleurs = ["laiton", "cuir_sombre", "acier"], defaut = "laiton" }, { id = "dos", famille = "tissus", couleurs = ["anthracite", "encre", "perle", "chocolat", "marine", "lin"], defaut = "anthracite" }]
 tags = ["travail"]
@@ -396,13 +420,17 @@ slot = "top"
 base = "veste"
 couche = 0.022
 ourlet = 0.11
-col = 1.33
+col = 1.336
 col_v = 1.10
 encolure = 0.058
 manches = 0.97
-bande = 0.035
+bande = 0.04
+cotes = 0.0015
 boutons = 5
-poches = [[0.885, 0.945, 33, 10]]
+bouton = 0.010
+bouton_saillie = 0.003
+poches = [[0.93, 1.0, 34, 13]]
+poches_saillie = 0.0015
 zones = [{ id = "principale", famille = "tissus", couleurs = ["moutarde", "bouteille", "lin", "rouille", "marine", "prune", "perle"], defaut = "moutarde" }, { id = "boutons", famille = "fixes", couleurs = ["cuir_sombre", "laiton", "caoutchouc_clair"], defaut = "cuir_sombre" }]
 tags = ["a-gagner", "mercerie", "froid"]
 prix = 2800
@@ -413,20 +441,27 @@ nom = "Veste de travail"
 description = "La veste de toile des ateliers, à revers et grandes poches, faite pour durer."
 slot = "top"
 base = "veste"
-couche = 0.027
-ourlet = 0.15
-col = 1.335
+couche = 0.036
+tombe = 0.006
+droit = true
+ourlet = 0.14
+col = 1.336
 ouverture = 0.05
-col_v = 1.15
-encolure = 0.03
+col_v = 1.13
+encolure = 0.035
 revers = true
 manches = 0.97
+couche_manches = 0.024
 boutons = 4
-poches = [[0.855, 0.945, 31, 13], [1.12, 1.165, 36, 9]]
+bouton = 0.012
+poches = [[0.855, 0.955, 31, 13], [1.105, 1.17, 34, 10]]
+poches_saillie = 0.005
 zones = [{ id = "principale", famille = "tissus", couleurs = ["bleu_de_travail", "marine", "olive", "noisette", "anthracite"], defaut = "bleu_de_travail" }, { id = "boutons", famille = "fixes", couleurs = ["acier", "laiton"], defaut = "acier" }]
 tags = ["a-gagner", "travail"]
 
-# --- base "jambes" (voir plus haut), avec revers = hauteur du revers retroussé au bas.
+# --- base "jambes" (voir plus haut), avec revers = hauteur du revers retroussé au bas, revers_saillie = son
+# épaisseur (0.007), droite = jambe ample dont le côté prolonge la hanche (vrai ou faux), fuseau = resserrement
+# de cette jambe au bas, en mètres (0.02).
 [[pieces]]
 id = "bottom-corduroy"
 nom = "Pantalon de velours"
@@ -434,14 +469,19 @@ description = "Un pantalon de velours côtelé, large, aux revers retroussés: l
 slot = "bottom"
 base = "jambes"
 couche = 0.013
+droite = true
+fuseau = 0.025
 longueur = 0.97
-revers = 0.05
+revers = 0.075
+revers_saillie = 0.011
 zones = [{ id = "principale", famille = "tissus", couleurs = ["noisette", "chocolat", "olive", "bouteille", "ficelle", "rouille"], defaut = "noisette" }]
 tags = ["a-gagner", "mercerie", "travail", "froid"]
 prix = 2400
 
-# --- base "jupe" (voir plus haut), avec suivi = part du mouvement des jambes reprise à l'ourlet (0.5 par défaut;
-# au-delà, l'ourlet suit aussi le tibia sous le genou: obligatoire pour une jupe qui descend sous le genou).
+# --- base "jupe" (voir plus haut). Une jupe qui descend sous le genou est « portée par les jambes »
+# (portee = true): chaque moitié suit la cuisse puis le tibia de son côté, elle se pose sur les cuisses assise
+# et se soulève avec le mollet en course. Il lui faut alors profondeur = évasement d'avant en arrière à l'ourlet,
+# nettement plus petit que evasement (les côtés): 0.08 à 0.10; anneaux = nombre de rangs (11 par défaut).
 [[pieces]]
 id = "bottom-long-skirt"
 nom = "Jupe longue"
@@ -451,24 +491,32 @@ base = "jupe"
 couche = 0.010
 bas = 0.30
 evasement = 0.20
-suivi = 0.92
+profondeur = 0.09
+anneaux = 14
+portee = true
 zones = [{ id = "principale", famille = "tissus", couleurs = ["prune", "marine", "bouteille", "brique", "lin", "ocre"], defaut = "prune" }]
 tags = ["a-gagner", "mercerie", "quotidien"]
 prix = 2200
 
-# --- base "salopette": jambes (champs de "jambes"), culotte montée par-dessus le haut (couche_haut), bavette
-# (hauteur du haut), poche, bretelles et boutons. Zones: toile, puis boutons (couleurs fixes).
+# --- base "salopette": jambes (champs de "jambes"; droite = vrai), bassin près du corps qui monte à la couche
+# de la bavette (couche_haut) pour passer sur le haut, bavette en trapèze (bavette = hauteur du haut,
+# bavette_largeur = part de la carrure en haut, 0.5), poche cernée (poche = demi-largeur, 0.052), empiècement
+# du dos (dos = hauteur du haut, 1.105), bretelles croisées, boucles et boutons.
+# Zones: toile, puis boutons (couleurs fixes).
 [[pieces]]
 id = "bottom-overalls"
 nom = "Salopette"
 description = "La salopette de toile du jardin et de l'atelier, à boutons de laiton."
 slot = "bottom"
 base = "salopette"
-couche = 0.012
+couche = 0.026
+droite = true
+fuseau = 0.03
 longueur = 0.97
-revers = 0.045
-couche_haut = 0.046
-bavette = 1.20
+revers = 0.065
+revers_saillie = 0.009
+couche_haut = 0.027
+bavette = 1.22
 zones = [{ id = "principale", famille = "tissus", couleurs = ["bleu_de_travail", "marine", "olive", "ficelle", "brique"], defaut = "bleu_de_travail" }, { id = "boutons", famille = "fixes", couleurs = ["laiton", "acier"], defaut = "laiton" }]
 tags = ["a-gagner", "travail"]
 
@@ -486,19 +534,23 @@ bouffant = 0.012
 col = 1.337
 bas = 0.36
 evasement = 0.17
-suivi = 0.85
+profondeur = 0.10
+anneaux = 13
+portee = true
 col_claudine = true
 ceinture = true
 zones = [{ id = "principale", famille = "tissus", couleurs = ["ciel", "coquelicot", "rose_ancien", "lilas", "sauge", "marine", "moutarde"], defaut = "ciel" }, { id = "garniture", famille = "tissus", couleurs = ["craie", "lin", "marine", "encre"], defaut = "craie" }]
 tags = ["a-gagner", "fete"]
 
-# --- base "sabot": sabots de bois, bride de cuir. Zones: bois, puis bride (couleurs fixes).
+# --- base "sabot": sabots de bois profilés du talon au nez relevé, large bride de cuir; taille = échelle du
+# sabot (1 = 30 cm de long: un sabot est plus gros qu'une chaussure). Zones: bois, puis bride (couleurs fixes).
 [[pieces]]
 id = "shoes-clogs"
 nom = "Sabots"
 description = "Des sabots de bois taillés d'une pièce, pointe relevée: ils claquent sur les pavés."
 slot = "shoes"
 base = "sabot"
+taille = 1.08
 zones = [{ id = "bois", famille = "tissus", couleurs = ["noisette", "ocre", "ficelle", "chocolat"], defaut = "noisette" }, { id = "bride", famille = "fixes", couleurs = ["cuir_sombre", "cuir"], defaut = "cuir_sombre" }]
 tags = ["a-gagner", "mercerie", "travail"]
 prix = 1600
@@ -566,6 +618,7 @@ couche = 0.052
 bavette = 1.19
 bas = 0.60
 largeur = 0.22
+evasement = 0.025
 suivi = 0.9
 zones = [{ id = "toile", famille = "tissus", couleurs = ["lin", "craie", "ciel", "bleu_de_travail", "ficelle"], defaut = "lin" }, { id = "liens", famille = "tissus", couleurs = ["ficelle", "craie", "coquelicot", "marine"], defaut = "ficelle" }]
 tags = ["a-gagner", "travail"]

@@ -5,5 +5,5 @@ set -euo pipefail
 ICI="$(cd "$(dirname "$0")" && pwd)"
 PAQUET="$(cd "$ICI/../.." && pwd)"
 duo-python "$ICI/construire_catalogue.py" "$PAQUET/assets/commun/personnages" "$PAQUET/donnees/commun/personnages" 2>&1 \
-  | grep -E "^CATALOGUE|Error|Traceback|^  File|SystemExit|introuvable|inconnue" || true
+  | grep -E "^CATALOGUE|^SONDE|Error|Traceback|^  File|SystemExit|introuvable|inconnue|topologie" || true
 python3 "$ICI/verifier_catalogue.py" "$PAQUET/assets/commun/personnages" "$PAQUET/donnees/commun/personnages"
