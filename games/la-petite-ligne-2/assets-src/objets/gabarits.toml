@@ -39,6 +39,7 @@ courrier  = { min = 0.12,  max = 0.45, defaut = { papier = "craie", sceau = "coq
 cle       = { min = 0.04,  max = 0.20, defaut = { metal = "laiton" } }
 provision = { min = 0.08,  max = 0.30, defaut = { principale = "craie", secondaire = "lin", lien = "ficelle" } }
 piece     = { min = 0.015, max = 0.06, defaut = { metal = "laiton" } }
+instrument = { min = 0.20, max = 0.80, defaut = { corps = "laiton", cle = "acier", bouton = "craie", interieur = "encre" } }
 
 [triangles]
 min = 200
@@ -754,3 +755,21 @@ famille = "caillou"
 forme = "fossile"
 taille = 0.09
 couleurs = { pierre = "lauze", eclat = "lin" }
+
+# ---------------------------------------------------------------------------------------------
+# INSTRUMENTS de la fanfare (musique jouée, objets `cornet` et `clarinette`). formes: cornet
+# (couché sur ses pistons, pavillon vers l'avant), clarinette (debout sur son pavillon).
+# ---------------------------------------------------------------------------------------------
+[[objets]]
+id = "cornet"
+famille = "instrument"
+forme = "cornet"
+taille = 0.36
+couleurs = { corps = "laiton", cle = "acier", bouton = "craie", interieur = "encre" }
+
+[[objets]]
+id = "clarinette"
+famille = "instrument"
+forme = "clarinette"
+taille = 0.66
+couleurs = { corps = "chocolat", cle = "acier", bouton = "ficelle", interieur = "encre" }

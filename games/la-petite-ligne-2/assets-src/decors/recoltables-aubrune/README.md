@@ -87,7 +87,21 @@ Pièges vus: deux boîtes jointives au même plan (faces confondues) et le tremb
 
 ## Mobilier repris de l'ancienne chaîne (`mobilier.py`, `aubrune-mobilier.glb`)
 
-Famille `mobilier`: les meubles que des fiches posent encore et qui venaient de l'ancienne chaîne arrondie (retirée, voir `../README.md`), refaits en style encré sous leurs identifiants: `bed-double`, `bed-single`, `chair-farm`, `table-farm`, `wardrobe`, `chest`, `bench-platform`, `tub`, `fence`, `platform-sign`, `water-pump`, et la voiture du train de nuit (`train-*`). Le manifeste reçoit `seat` (assise: hauteur, bord avant), `bed` (couchage) et `top` (plateau). Ajouter: copier l'entrée de la même `sorte`, changer `id` et `graine`; une forme nouvelle est une branche de `_un_meuble`.
+Famille `mobilier`: les meubles que des fiches posent encore et qui venaient de l'ancienne chaîne arrondie (retirée, voir `../README.md`), refaits en style encré sous leurs identifiants: `bed-double`, `bed-single`, `chair-farm`, `table-farm`, `wardrobe`, `chest`, `bench-platform`, `tub`, `fence`, `platform-sign`, `water-pump`, la voiture du train de nuit (`train-*`), et les meubles du bourg `well` (puits), `barrel` (tonneau), `crate` (caisse), `log-pile` (tas de bûches), `bench-farm` (banc de ferme), `sink-stone` (abreuvoir et sa borne-fontaine); puis `crossing-gate` (lisse de passage à niveau, fiche `lisse-de-passage-a-niveau`) et `music-stand` (pupitre de fanfare, fiche `pupitre`). Le manifeste reçoit `seat` (assise: hauteur, bord avant), `bed` (couchage) et `top` (plateau). Ajouter: copier l'entrée de la même `sorte`, changer `id` et `graine`; une forme nouvelle est une branche de `_un_meuble`. Outils de forme: `revolution` (fût autour de y, cercles de fer pris dans le même volume), `bloc_arc` (pierre taillée en arc), `rondin_z` (bûche couchée), `_poutre_x` (poutre à bandes).
+
+## Parties mobiles (nœuds enfants)
+
+Un modèle peut avoir des parties que le jeu fait bouger: dans la forme, `with s.noeud("<nom>", pivot, axe="x", ...)` autour de ce qui bouge. `construire.py` en fait un nœud enfant du modèle dans le GLB, nommé, posé à son pivot (le maillage autour de ce pivot), et le manifeste reçoit `nodes` (`pivot` et les réglages donnés: axe, débattement). Le contrôle vérifie les enfants (noms, pivots) et juge les volumes au repos, parties mobiles comprises.
+
+| Modèle          | Nœud                         | Pivot (m)                     | Mouvement                                    |
+| --------------- | ---------------------------- | ----------------------------- | -------------------------------------------- |
+| `draisine`      | `balancier`                  | (0; 1,54; 0)                  | bascule autour de x, plus ou moins 14 degrés |
+| `draisine`      | `roue-avant`, `roue-arriere` | (0; 0,51; plus ou moins 0,80) | roulent autour de x (rayon 0,25)             |
+| `crossing-gate` | `lisse`                      | (-1,95; 1,00; 0,19)           | autour de z: 0 baissée, +80 degrés levée     |
+
+Attention, côté jeu: `mergeNamed` (`src/rendu/lieu/decors.ts`) fusionne tout le modèle en un seul maillage au chargement; les nœuds enfants y disparaissent (le modèle s'affiche entier, immobile). Pour animer ces parties, le rendu doit fusionner chaque nœud de `nodes` à part et le garder comme enfant nommé.
+
+Draisine: même voie que les trains, les roues se posent sur le rail (dessus à 0,26 m): essieux à 0,51 m, plancher à 0,82 m (au-dessus des roues, boudin compris), bancs à 42 cm du plancher (1,24 m), pivot du balancier à 72 cm du plancher (1,54 m). La fiche `donnees/lieux/aubrune/vehicules/draisine.json` doit passer à `deck` 0,82 et `height` 1,7 (pieds des joueurs sur le plancher), avec les deux valeurs attendues de `tests/rendu/vehicules.test.ts` (0,62 et 0,5): à faire par le dev de la draisine.
 
 | `planche/` | page de contrôle sur le rendu encré du jeu, captures, montage |
 

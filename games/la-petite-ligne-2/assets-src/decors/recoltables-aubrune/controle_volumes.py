@@ -60,10 +60,17 @@ def _accesseur(gltf, binaire, i):
 
 
 def maillage(gltf, binaire, noeud) -> tuple[np.ndarray, np.ndarray, list[str]]:
-    """Positions, triangles (indices) et matériau de chaque triangle, toutes primitives à la suite."""
+    """Positions, triangles (indices) et matériau de chaque triangle, toutes primitives à la suite,
+    parties mobiles comprises (enfants du nœud, au repos: posées à leur translation)."""
     positions, triangles, matieres, base = [], [], [], 0
-    for prim in gltf["meshes"][noeud["mesh"]]["primitives"]:
-        p = _accesseur(gltf, binaire, prim["attributes"]["POSITION"]).astype(np.float64)
+    prims = [(p, np.zeros(3)) for p in gltf["meshes"][noeud["mesh"]]["primitives"]]
+    for i in noeud.get("children", []):
+        enfant = gltf["nodes"][i]
+        if "mesh" in enfant:
+            tr = np.array(enfant.get("translation", [0.0, 0.0, 0.0]), dtype=np.float64)
+            prims += [(p, tr) for p in gltf["meshes"][enfant["mesh"]]["primitives"]]
+    for prim, tr in prims:
+        p = _accesseur(gltf, binaire, prim["attributes"]["POSITION"]).astype(np.float64) + tr
         t = _accesseur(gltf, binaire, prim["indices"]).reshape(-1, 3).astype(np.int64)
         positions.append(p)
         triangles.append(t + base)

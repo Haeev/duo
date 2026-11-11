@@ -1362,6 +1362,13 @@ sorte = "fourgon"
 graine = 919
 pourquoi = "fourgon en queue: bagages par la porte roulante, le chef de train dans la vigie, feux de queue"
 
+[[modeles]]
+id = "draisine"
+famille = "vehicule"
+sorte = "draisine"
+graine = 929
+pourquoi = "draisine à bras de cheminot (2,60 x 1,70 m): roues à boudin sur les rails, plancher à 0,82 m au-dessus des roues, deux bancs face à face, balancier au milieu (nœud `balancier`), roues en nœuds `roue-avant` et `roue-arriere`, levier de frein, lanterne à l'avant"
+
 # ---------------------------------------------------------------- mobilier (mobilier.py)
 # Les meubles de l'ancienne chaîne arrondie (`assets-src/decors/`, retirée le 2026-11-11), refaits
 # en style encré sous les mêmes identifiants: les fiches de `donnees/commun/meubles` n'ont pas
@@ -1427,6 +1434,63 @@ famille = "mobilier"
 sorte = "baignoire"
 graine = 1367
 pourquoi = "baignoire sur pieds de fonte: robinet en col de cygne et ses deux croisillons, bonde sous le bec (aucune fiche ne la pose encore)"
+
+# Meubles du bourg (fiches abreuvoir-de-pierre, banc-de-ferme, caisse, puits, tas-de-buches, tonneau).
+[[modeles]]
+id = "sink-stone"
+famille = "mobilier"
+sorte = "abreuvoir"
+graine = 1401
+pourquoi = "abreuvoir de pierre (1 case): auge d'un bloc creusé sur deux dés, lèvre à 85 cm (à hauteur de mufle), l'eau à 9 cm sous la lèvre"
+
+[[modeles]]
+id = "bench-farm"
+famille = "mobilier"
+sorte = "banc-ferme"
+graine = 1403
+pourquoi = "banc de ferme (2 cases, deux places): plateau épais à 45 cm sur quatre pieds écartés et leurs entretoises, sans dossier (on le pose contre un mur)"
+
+[[modeles]]
+id = "crate"
+famille = "mobilier"
+sorte = "caisse"
+graine = 1409
+pourquoi = "caisse à claire-voie (1 case): lattes, tasseaux d'angle, couvercle de planches à 60 cm où l'on pose les choses, marque au pochoir"
+
+[[modeles]]
+id = "well"
+famille = "mobilier"
+sorte = "puits"
+graine = 1423
+pourquoi = "puits du bourg (2 x 2 cases): margelle de pierre à 80 cm, deux montants, petit toit de tuiles, treuil à manivelle, corde et seau pendu au-dessus de l'eau"
+
+[[modeles]]
+id = "log-pile"
+famille = "mobilier"
+sorte = "tas-de-buches"
+graine = 1427
+pourquoi = "tas de bûches rangé en pyramide (1 case): bouts de bois frais vers l'avant et l'arrière, écorce sur les flancs"
+
+[[modeles]]
+id = "barrel"
+famille = "mobilier"
+sorte = "tonneau"
+graine = 1429
+pourquoi = "tonneau debout (1 case): douelles, quatre cercles de fer, bonde sur le ventre côté avant, fond à 85 cm où l'on pose les choses"
+
+[[modeles]]
+id = "crossing-gate"
+famille = "mobilier"
+sorte = "lisse"
+graine = 1433
+pourquoi = "lisse de passage à niveau relevable (5 x 1 cases, fiche lisse-de-passage-a-niveau): poteau à l'ouest et sa lanterne, lisse rayée rouge et blanc de 4 m dans le nœud `lisse` (axe z au pivot, 0 baissée en travers de la route, 80 degrés levée), contrepoids, fourche d'appui à l'est"
+
+[[modeles]]
+id = "music-stand"
+famille = "mobilier"
+sorte = "pupitre"
+graine = 1439
+pourquoi = "pupitre de fanfare (fiche pupitre): trépied de fer, plateau penché vers l'arrière, cahier ouvert sur deux pages de portées, lu debout de l'avant (+z)"
 
 [[modeles]]
 id = "fence"

@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "lisse-de-passage-a-niveau",
+  "name": "Lisse de passage à niveau",
+  "model": "crossing-gate",
+  "size": {
+    "w": 5,
+    "h": 1
+  },
+  "solid": false,
+  "placeable": false,
+  "series": null,
+  "bricks": []
+}

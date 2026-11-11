@@ -114,6 +114,20 @@ class Atelier:
         self.morceaux = 0
         # (matériau, positions 3x3, normales 3x3, couleurs 3x3)
         self.tris: list[tuple[str, np.ndarray, np.ndarray, np.ndarray]] = []
+        # Parties mobiles: (nom, premier triangle, fin, pivot, réglages pour le jeu).
+        self.noeuds: list[tuple[str, int, int, tuple[float, float, float], dict]] = []
+
+    @contextmanager
+    def noeud(self, nom: str, pivot, **reglages):
+        """Partie mobile (balancier, roue, lisse): ce qui est fait dans ce bloc sort du GLB en nœud
+        enfant `nom` du modèle, son origine au `pivot` (repère du modèle, au repos). Le jeu le
+        trouve par son nom et le fait tourner autour de son origine. `reglages` (axe, débattement)
+        va au manifeste (`nodes`)."""
+        debut = len(self.tris)
+        try:
+            yield
+        finally:
+            self.noeuds.append((nom, debut, len(self.tris), tuple(float(c) for c in pivot), reglages))
 
     @contextmanager
     def groupe(self, matrice: np.ndarray):

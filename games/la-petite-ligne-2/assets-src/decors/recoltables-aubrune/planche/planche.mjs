@@ -207,6 +207,8 @@ async function start() {
       const figure = silhouette(kit.volume);
       figure.position.set(person.x, person.y ?? 0, person.z);
       figure.rotation.y = person.cap ?? 0;
+      // `echelle`: 1,8 / 1,7 pour le mannequin de référence de 1,80 m.
+      figure.scale.setScalar(person.echelle ?? 1);
       scene.add(figure);
     }
     const w = canvas.clientWidth;

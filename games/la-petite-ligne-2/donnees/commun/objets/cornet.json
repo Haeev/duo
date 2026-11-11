@@ -2,6 +2,7 @@
   "schema": 1,
   "id": "cornet",
   "name": "Cornet de fanfare",
+  "model": "cornet",
   "family": "supply",
   "stack": 1,
   "food": null,

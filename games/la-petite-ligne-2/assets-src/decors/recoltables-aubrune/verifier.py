@@ -104,14 +104,27 @@ def main():
         if noeud is None or "mesh" not in noeud:
             erreurs.append(f"{ident}: nœud racine absent de {m['file']}")
             continue
-        if any(k in noeud for k in ("translation", "rotation", "scale", "children")):
-            erreurs.append(f"{ident}: transformation ou enfants sur le nœud (tout doit être appliqué)")
+        if any(k in noeud for k in ("translation", "rotation", "scale")):
+            erreurs.append(f"{ident}: transformation sur le nœud (tout doit être appliqué)")
+        # Parties mobiles (`nodes` du manifeste): enfants directs, nommés, posés à leur pivot, sans
+        # rotation ni échelle au repos. Tout autre enfant est une erreur.
+        enfants = [(g["nodes"][i], g["nodes"][i].get("translation", [0.0, 0.0, 0.0])) for i in noeud.get("children", [])]
+        attendus = m.get("nodes", {})
+        if sorted(e["name"] for e, _ in enfants) != sorted(attendus):
+            erreurs.append(f"{ident}: enfants {[e['name'] for e, _ in enfants]} au lieu des parties mobiles {sorted(attendus)}")
+        for e, tr in enfants:
+            if any(k in e for k in ("rotation", "scale", "children")) or "mesh" not in e:
+                erreurs.append(f"{ident}: partie mobile « {e['name']} » tournée, à l'échelle, sans maillage ou avec des enfants")
+            elif e["name"] in attendus and max(abs(a - b) for a, b in zip(tr, attendus[e["name"]]["pivot"])) > 0.001:
+                erreurs.append(f"{ident}: partie mobile « {e['name']} » posée en {tr}, pivot {attendus[e['name']]['pivot']} au manifeste")
         tris, bas = 0, 1e9
         mini, maxi = [1e9] * 3, [-1e9] * 3
-        for prim in g["meshes"][noeud["mesh"]]["primitives"]:
+        prims = [(p, [0.0, 0.0, 0.0]) for p in g["meshes"][noeud["mesh"]]["primitives"]]
+        prims += [(p, tr) for e, tr in enfants if "mesh" in e for p in g["meshes"][e["mesh"]]["primitives"]]
+        for prim, tr in prims:
             acc = g["accessors"][prim["attributes"]["POSITION"]]
-            mini = [min(a, b) for a, b in zip(mini, acc["min"])]
-            maxi = [max(a, b) for a, b in zip(maxi, acc["max"])]
+            mini = [min(a, b + d) for a, b, d in zip(mini, acc["min"], tr)]
+            maxi = [max(a, b + d) for a, b, d in zip(maxi, acc["max"], tr)]
             attributs = prim["attributes"]
             for voulu in ("POSITION", "NORMAL", "COLOR_0"):
                 if voulu not in attributs:
@@ -119,7 +132,7 @@ def main():
             if "TEXCOORD_0" in attributs:
                 erreurs.append(f"{ident}: UV inutiles (la matière encrée n'en lit pas)")
             tris += g["accessors"][prim["indices"]]["count"] // 3
-            bas = min(bas, g["accessors"][attributs["POSITION"]]["min"][1])
+            bas = min(bas, g["accessors"][attributs["POSITION"]]["min"][1] + tr[1])
         total += tris
         if tris != m["triangles"]:
             erreurs.append(f"{ident}: {tris} triangles dans le GLB, {m['triangles']} au manifeste")

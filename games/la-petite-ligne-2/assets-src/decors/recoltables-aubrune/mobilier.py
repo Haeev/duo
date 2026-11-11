@@ -29,7 +29,7 @@ import math
 import numpy as np
 
 from amenagements import _modele, _table, barre, boite, colonne, glace_reflet, orientees, prisme
-from formes import Atelier, at, ton
+from formes import Atelier, at, entre, penche, ton
 
 
 # ---------------------------------------------------------------------- outils
@@ -393,6 +393,439 @@ def _couchette(s, ctx):
     boite(s, -0.46, 0.46, 0.49, 0.515, 0.35, 0.38, "etoffe", ton(couverture, 0.8), tremble=0.0)
 
 
+# ---------------------------------------------------------------------- volumes de révolution
+def revolution(s: Atelier, profil, pans, mat, couleurs, haut=None, bas=None, phase=0.5, cercles=(), cercle_mat="metal", cercle_couleur=None, saillie=0.011):
+    """Volume fermé autour de l'axe y: `profil` = [(y, rayon)] de bas en haut. `couleurs`: une par
+    pan (douelles), répétée sur la hauteur; `haut`, `bas`: teinte des fonds (None: pas de fond).
+    `phase` 0,5: un milieu de pan face à +z (une bonde, une marque y tombent à plat).
+
+    `cercles` = [(y0, y1)]: cercles de fer en saillie de `saillie`, faits dans le même volume (mêmes
+    sommets, matériau `cercle_mat`): un cercle posé à part serait traversé par les arêtes du fût."""
+    ys = [p[0] for p in profil]
+    rs = [p[1] for p in profil]
+
+    def rayon(y):
+        return float(np.interp(y, ys, rs))
+
+    # Profil complet: (y, rayon, le tronçon au-dessus est-il un cercle). Sans cercle, le profil tel
+    # quel (il peut avoir des marches: deux rayons à la même hauteur, une roue et son boudin).
+    points = sorted({y for y in ys} | {y for c in cercles for y in c}) if cercles else []
+    anneaux = [] if cercles else [(y, r, False) for y, r in profil]
+    for y in points:
+        dans = [c for c in cercles if c[0] - 1e-9 <= y <= c[1] + 1e-9]
+        debut_c = any(abs(c[0] - y) < 1e-9 for c in cercles)
+        fin_c = any(abs(c[1] - y) < 1e-9 for c in cercles)
+        r = rayon(y)
+        if debut_c:
+            anneaux += [(y, r, False), (y, r + saillie, True)]
+        elif fin_c:
+            anneaux += [(y, r + saillie, False), (y, r, False)]
+        else:
+            anneaux.append((y, r, bool(dans)))
+    v, faces, vers, teintes, mats = [], [], [], [], []
+    angles = [(k + phase) / pans * math.tau for k in range(pans)]
+    for y, r, _ in anneaux:
+        v.extend((math.cos(a) * r, y, math.sin(a) * r) for a in angles)
+    for i in range(len(anneaux) - 1):
+        (ya, ra, cercle), (yb, rb, _) = anneaux[i], anneaux[i + 1]
+        dy, dr = yb - ya, rb - ra
+        for k in range(pans):
+            j = (k + 1) % pans
+            faces.append((i * pans + k, i * pans + j, (i + 1) * pans + j, (i + 1) * pans + k))
+            a = (k + 0.5 + phase) / pans * math.tau
+            # Normale du dehors dans le plan du profil: (dy, -dr) en (rayon, y).
+            vers.append(np.array((math.cos(a) * dy, -dr, math.sin(a) * dy)))
+            fer = cercle or (bool(cercles) and dy == 0 and max(ra, rb) > rayon(ya) + saillie / 2)
+            teintes.append(cercle_couleur if fer else couleurs[k % len(couleurs)])
+            mats.append(cercle_mat if fer else mat)
+    for rang, c, signe in ((len(anneaux) - 1, haut, 1.0), (0, bas, -1.0)):
+        if c is not None:
+            faces.append(tuple(rang * pans + k for k in range(pans)))
+            vers.append(np.array((0.0, signe, 0.0)))
+            teintes.append(c)
+            mats.append(mat)
+    faces = orientees(v, faces, vers)
+    premier = True
+    for m in dict.fromkeys(mats):
+        choisies = [i for i, x in enumerate(mats) if x == m]
+        if not premier:
+            s.morceaux -= 1
+        s.morceau(v, [faces[i] for i in choisies], m, [teintes[i] for i in choisies], garde=True)
+        premier = False
+
+
+def bloc_arc(s: Atelier, a0, a1, r_in, r_out, y0, y1, mat, couleur, dedans=None, dessus=None, segments=2, tremble=0.0):
+    """Pierre taillée en arc de cercle autour de l'axe y (margelle): fermée de partout."""
+    v, faces, vers, teintes = [], [], [], []
+    n = segments + 1
+    angles = [a0 + (a1 - a0) * k / segments for k in range(n)]
+    for y, r in ((y0, r_out), (y1, r_out), (y1, r_in), (y0, r_in)):
+        v.extend((math.cos(a) * r, y, math.sin(a) * r) for a in angles)
+    for k in range(segments):
+        am = (angles[k] + angles[k + 1]) / 2
+        radial = np.array((math.cos(am), 0.0, math.sin(am)))
+        for c, (b0, b1) in enumerate(((0, 1), (1, 2), (2, 3), (3, 0))):
+            faces.append((b0 * n + k, b0 * n + k + 1, b1 * n + k + 1, b1 * n + k))
+            vers.append([radial, np.array((0.0, 1.0, 0.0)), -radial, np.array((0.0, -1.0, 0.0))][c])
+            teintes.append([couleur, dessus or couleur, dedans or couleur, couleur][c])
+    for k, signe in ((0, -1.0), (segments, 1.0)):
+        a = angles[k]
+        faces.append((k, n + k, 2 * n + k, 3 * n + k))
+        vers.append(np.array((-math.sin(a), 0.0, math.cos(a))) * signe)
+        teintes.append(couleur)
+    s.morceau(v, orientees(v, faces, vers), mat, teintes, garde=True, tremble=tremble)
+
+
+def rondin_z(s: Atelier, x, y, z0, z1, r, pans, ecorce, bout, mat="bois", phase=0.0, coeur=None):
+    """Bûche couchée le long de z, bouts en bois de coupe, celui de devant (+z) cerclé d'écorce (le
+    liseré sombre du bout dit « bûche » de loin), le coeur plus foncé. `phase` (en pans): rotation de la section;
+    0 met un pan à plat dessous (elle repose sur le sol)."""
+    v, faces, vers, teintes = [], [], [], []
+    angles = [(k + 0.5 + phase) / pans * math.tau - math.pi / 2 for k in range(pans)]
+    for z in (z0, z1):
+        v.extend((x + math.cos(a) * r, y + math.sin(a) * r, z) for a in angles)
+    for k in range(pans):
+        j = (k + 1) % pans
+        a = (k + 1 + phase) / pans * math.tau - math.pi / 2
+        faces.append((k, j, pans + j, pans + k))
+        vers.append(np.array((math.cos(a), math.sin(a), 0.0)))
+        teintes.append(ecorce)
+    for rang, z, signe in ((0, z0, -1.0), (1, z1, 1.0)):
+        # Liseré d'écorce sur le bout de devant seul (celui que la caméra du jeu voit).
+        base = rang * pans
+        if signe > 0:
+            base = len(v)
+            v.extend((x + math.cos(a) * r * 0.8, y + math.sin(a) * r * 0.8, z) for a in angles)
+            for k in range(pans):
+                j = (k + 1) % pans
+                faces.append((rang * pans + k, rang * pans + j, base + j, base + k))
+                vers.append(np.array((0.0, 0.0, signe)))
+                teintes.append(ton(ecorce, 0.8))
+        faces.append(tuple(base + k for k in range(pans)))
+        vers.append(np.array((0.0, 0.0, signe)))
+        teintes.append(bout)
+        if coeur is not None:
+            c = len(v)
+            v.extend((x + math.cos(a) * r * 0.16, y + math.sin(a) * r * 0.16, z + signe * 0.0008) for a in angles[::2])
+            faces.append(tuple(range(c, c + len(angles[::2]))))
+            vers.append(np.array((0.0, 0.0, signe)))
+            teintes.append(coeur)
+    s.morceau(v, orientees(v, faces, vers), mat, teintes, garde=True)
+
+
+# ---------------------------------------------------------------------- meubles du bourg
+def _abreuvoir(s, ctx):
+    """Abreuvoir de pierre: une auge massive d'un seul bloc creusé (lèvre à 85 cm, à hauteur de
+    mufle) sur deux dés bas, l'eau à 11 cm sous la lèvre; derrière, la borne de pierre et sa
+    goulotte de fer qui la remplit (sans elle, d'où viendrait l'eau ?). Tient dans sa case."""
+    pierre = ctx.tons("pierre")
+    for sx in (-1, 1):
+        boite(s, sx * 0.3 - 0.15, sx * 0.3 + 0.15, 0, 0.2, -0.27, 0.27, "pierre", pierre[1], tremble=0.004, dessus=ctx.un("pierre_dessus"))
+    cuve(s,
+         [(0.45, 0.285, 0.05, 0.19), (0.475, 0.305, 0.055, 0.8), (0.48, 0.31, 0.055, 0.85)],
+         [(0.4, 0.235, 0.045, 0.85), (0.385, 0.22, 0.04, 0.74)],
+         "pierre", pierre[0], ton(pierre[2], 0.86), fond=ctx.un("eau_sombre"))
+    # Borne-fontaine au nord, contre l'auge: pilier, chapeau, goulotte coudée au-dessus de l'eau.
+    boite(s, -0.09, 0.09, 0, 1.1, -0.48, -0.318, "pierre", pierre[2 % len(pierre)], tremble=0.003)
+    boite(s, -0.115, 0.115, 1.098, 1.17, -0.495, -0.3, "pierre", pierre[1], tremble=0.003, sans="", dessus=ctx.un("pierre_dessus"))
+    fer = ctx.un("fer")
+    s.tube([(0, 0.98, -0.4, 0.022), (0, 0.98, -0.24, 0.022), (0, 0.955, -0.17, 0.021), (0, 0.9, -0.145, 0.02)], 6, "metal", fer, bouts=(True, True), coupe=ctx.un("noir"))
+    # Le filet d'eau, de la bouche de la goulotte à l'eau de l'auge (il y entre).
+    s.tube([(0, 0.905, -0.145, 0.009), (0, 0.82, -0.143, 0.008), (0, 0.735, -0.14, 0.009)], 5, "vitre", ctx.un("glace"), bouts=(True, True))
+
+
+def _banc_ferme(s, ctx):
+    """Banc de ferme sans dossier: deux planches épaisses (dessus à 45 cm, bord avant à 17 cm) sur
+    quatre pieds écartés dont les tenons affleurent le dessus, et leurs entretoises."""
+    bois = ctx.tons("bois_meuble")
+    for k, (za, zb) in enumerate(((-0.17, -0.0015), (0.0015, 0.17))):
+        boite(s, -0.93, 0.93, 0.39, 0.45, za, zb, "bois", bois[k], tremble=0.0, sans="", dessus=ctx.un("bois_clair", 2 - k))
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            barre(s, (sx * 0.8, 0, sz * 0.15), (sx * 0.71, 0.425, sz * 0.105), 0.03, 6, "bois", bois[1], bouts=(True, True), coupe=ctx.un("bois_coupe"))
+            # Tenon traversant: son bout de bois et son coin affleurent le dessus du plateau.
+            x, z = sx * 0.706, sz * 0.103
+            s.morceau([(x - 0.026, 0.4512, z - 0.022), (x + 0.026, 0.4512, z - 0.022), (x + 0.026, 0.4512, z + 0.022), (x - 0.026, 0.4512, z + 0.022)], [(0, 1, 2, 3)], "bois", ctx.un("bois_coupe", 1), coeur=(x, 0.0, z))
+            s.morceau([(x - 0.004, 0.4515, z - 0.024), (x + 0.004, 0.4515, z - 0.024), (x + 0.004, 0.4515, z + 0.024), (x - 0.004, 0.4515, z + 0.024)], [(0, 1, 2, 3)], "bois", ctx.un("bois_sombre"), coeur=(x, 0.0, z))
+        # Entretoise de bout (dans les deux pieds), à 15 cm du sol.
+        y = 0.15
+        x = sx * (0.8 - 0.09 * y / 0.425)
+        zz = 0.15 - 0.045 * y / 0.425
+        barre(s, (x, y, -zz), (x, y, zz), 0.02, 5, "bois", bois[2 % len(bois)])
+    # Entretoise longue, d'une entretoise de bout à l'autre.
+    barre(s, (-0.784, 0.17, 0.0), (0.784, 0.17, 0.0), 0.018, 5, "bois", bois[1])
+
+
+def _caisse(s, ctx):
+    """Caisse à claire-voie (0,7 x 0,5, couvercle à 60 cm): lattes jointives par trois, tasseaux
+    d'angle, couvercle de trois planches; l'intérieur sombre se voit entre les lattes. Marque au
+    pochoir sur le devant."""
+    clair = ctx.tons("bois_clair")
+    coeur = ton(ctx.un("bois_sombre"), 0.62)
+    boite(s, -0.33, 0.33, 0, 0.578, -0.23, 0.23, "bois", coeur, tremble=0.0)
+    for k, (y0, y1) in enumerate(((0.02, 0.18), (0.21, 0.37), (0.4, 0.556))):
+        for sz in (-1, 1):
+            za, zb = sorted((sz * 0.2312, sz * 0.2492))
+            boite(s, -0.33, 0.33, y0, y1, za, zb, "bois", clair[(k + (sz > 0)) % len(clair)], tremble=0.0, sans="")
+        for sx in (-1, 1):
+            xa, xb = sorted((sx * 0.3312, sx * 0.3492))
+            boite(s, xa, xb, y0, y1, -0.23, 0.23, "bois", clair[(k + 2 + (sx > 0)) % len(clair)], tremble=0.0, sans="")
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            boite(s, sx * 0.338 - 0.022, sx * 0.338 + 0.022, 0, 0.58, sz * 0.238 - 0.022, sz * 0.238 + 0.022, "bois", ctx.un("bois_meuble", sx + sz), tremble=0.0, dessus=ctx.un("bois_coupe"))
+    # Tasseaux du haut et du bas, cloués par-dessus les lattes devant et derrière, entre les montants.
+    for sz in (-1, 1):
+        za, zb = sorted((sz * 0.2496, sz * 0.2616))
+        for y0, y1 in ((0.02, 0.085), (0.49, 0.556)):
+            boite(s, -0.314, 0.314, y0, y1, za, zb, "bois", ctx.un("bois_meuble", 1), tremble=0.0, sans="")
+    for k in range(3):
+        z0 = -0.27 + k * 0.183
+        boite(s, -0.37, 0.37, 0.581, 0.6, z0, z0 + 0.169, "bois", clair[(k + 1) % len(clair)], tremble=0.0, sans="")
+    # Marque au pochoir: un losange et deux traits, peints sur la latte du milieu.
+    encre = ctx.un("fond")
+    s.morceau([(-0.2, 0.29, 0.2502), (-0.14, 0.33, 0.2502), (-0.08, 0.29, 0.2502), (-0.14, 0.25, 0.2502)], [(0, 1, 2, 3)], "etoffe", encre, coeur=(-0.14, 0.29, 0.0))
+    for y in (0.27, 0.31):
+        s.morceau([(-0.03, y - 0.008, 0.2502), (0.2, y - 0.008, 0.2502), (0.2, y + 0.008, 0.2502), (-0.03, y + 0.008, 0.2502)], [(0, 1, 2, 3)], "etoffe", encre, coeur=(0.08, y, 0.0))
+
+
+def _puits(s, ctx):
+    """Puits du bourg (2 x 2 cases): margelle de deux assises de pierre (80 cm, on s'y accoude),
+    l'eau sombre au fond; deux montants posés sur la margelle portent un petit toit de tuiles à
+    deux pans; entre eux le treuil, sa corde enroulée et sa manivelle à l'est; le seau pend à la
+    corde au-dessus de l'eau, prêt à descendre."""
+    pierre = ctx.tons("pierre")
+    sombre = ton(pierre[0], 0.62)
+    n = 8
+    joint = 0.012
+    for k in range(n):
+        a0, a1 = k / n * math.tau + joint, (k + 1) / n * math.tau - joint
+        bloc_arc(s, a0, a1, 0.5, 0.72, 0.0, 0.62, "pierre", pierre[k % len(pierre)], dedans=sombre, tremble=0.003)
+        b0, b1 = a0 + math.pi / n, a1 + math.pi / n
+        bloc_arc(s, b0, b1, 0.48, 0.76, 0.623, 0.8, "pierre", pierre[(k + 1) % len(pierre)], dedans=sombre, dessus=ctx.un("pierre_dessus"), tremble=0.003)
+    # L'eau, au fond du puits (le cuvelage descend dessous: on la voit loin sous la margelle).
+    eau = [(math.cos(k / 12 * math.tau) * 0.496, 0.12, math.sin(k / 12 * math.tau) * 0.496) for k in range(12)]
+    s.morceau(eau, [tuple(range(12))], "pierre", ctx.un("eau_sombre"), coeur=(0, -1, 0))
+    # Montants, posés dans la margelle, jusque sous le toit.
+    bois = ctx.tons("bois_grise")
+    for sx in (-1, 1):
+        boite(s, sx * 0.61 - 0.055, sx * 0.61 + 0.055, 0.785, 2.25, -0.055, 0.055, "bois", bois[0], tremble=0.002)
+    # Toit à deux pans (faîte le long de x à 2,30 m, égouts à 1,92 m): une dalle d'un seul tenant,
+    # rangs de tuiles en bandes de teintes; faîtière posée dessus.
+    tuile = ctx.tons("tuile")
+    e, zf, ye, yf, xl = 0.07, 0.68, 1.92, 2.3, 0.82
+    v, faces, vers, teintes = [], [], [], []
+
+    def pt(x, z, y):
+        v.append((x, y, z))
+        return len(v) - 1
+
+    rangs = 4
+    for sz in (-1, 1):
+        pente = (yf - ye) / zf
+        nrm = np.array((0.0, 1.0, sz * pente))
+        nrm /= np.linalg.norm(nrm)
+        for r in range(rangs):
+            t0, t1 = r / rangs, (r + 1) / rangs
+            za, zb = sz * zf * t0, sz * zf * t1
+            ya, yb = yf - (yf - ye) * t0, yf - (yf - ye) * t1
+            q = [pt(-xl, za, ya), pt(xl, za, ya), pt(xl, zb, yb), pt(-xl, zb, yb)]
+            faces.append(tuple(q))
+            vers.append(nrm)
+            teintes.append(tuile[(r + (sz > 0)) % 3])
+        # Dessous, chant de l'égout, pignons.
+        b = [pt(-xl, 0, yf - e), pt(xl, 0, yf - e), pt(xl, sz * zf, ye - e), pt(-xl, sz * zf, ye - e)]
+        faces.append(tuple(b))
+        vers.append(np.array((0.0, -1.0, -sz * pente)))
+        teintes.append(ctx.un("bois_grise", 1))
+        h = [pt(-xl, sz * zf, ye), pt(xl, sz * zf, ye), pt(xl, sz * zf, ye - e), pt(-xl, sz * zf, ye - e)]
+        faces.append(tuple(h))
+        vers.append(np.array((0.0, 0.0, sz)))
+        teintes.append(tuile[3])
+        for sx in (-1, 1):
+            g = [pt(sx * xl, 0, yf), pt(sx * xl, sz * zf, ye), pt(sx * xl, sz * zf, ye - e), pt(sx * xl, 0, yf - e)]
+            faces.append(tuple(g))
+            vers.append(np.array((sx, 0.0, 0.0)))
+            teintes.append(tuile[3])
+    s.morceau(v, orientees(v, faces, vers), "tuile", teintes, garde=True)
+    barre(s, (-0.8, yf + 0.005, 0), (0.8, yf + 0.005, 0), 0.05, 6, "tuile", tuile[3])
+    # Pignons de planches au droit des montants: ils ferment le dessous du toit de côté. Chacun en
+    # deux moitiés prises dans le montant (une planche entière le traverserait).
+    def sous_toit(z):
+        return yf - e - 0.006 - (yf - ye) * abs(z) / zf
+
+    for sx in (-1, 1):
+        xa, xb = sorted((sx * 0.59, sx * 0.63))
+        for sz in (-1, 1):
+            prisme(s, "x", xa, xb, [(sz * 0.62, sous_toit(0.62)), (sz * 0.02, sous_toit(0.62)), (sz * 0.02, sous_toit(0.02))], "bois", bois[2 % len(bois)])
+    # Treuil: un tambour entre les montants (ses bouts y sont pris), la corde enroulée au milieu.
+    yt = 1.32
+    corde = ctx.un("paille", 1)
+    # Les spires de la corde: des anneaux alternés, clairs et sombres, sur le tambour.
+    spires = 5
+    tambour = [(-0.58, yt, 0, 0.075), (-0.2, yt, 0, 0.075)]
+    for k in range(spires + 1):
+        x = -0.18 + 0.36 * k / spires
+        tambour.append((x, yt, 0, 0.092 if k % 2 == 0 else 0.086))
+    tambour += [(0.2, yt, 0, 0.075), (0.58, yt, 0, 0.075)]
+    pans = 8
+    treuil = ctx.un("bois_meuble", 1)
+    teintes = [treuil] * (2 * pans) + [c for k in range(spires) for c in [corde if k % 2 == 0 else ton(corde, 0.85)] * pans] + [treuil] * (2 * pans) + [ctx.un("bois_coupe")] * 2
+    s.tube(tambour, pans, "bois", teintes, bouts=(True, True))
+    # Linteau entre les têtes des montants, sous le faîte: il tient l'écart des montants.
+    boite(s, -0.57, 0.57, 2.12, 2.2, -0.045, 0.045, "bois", bois[1], tremble=0.0)
+    # Manivelle à l'est: bout d'axe de fer, bras, poignée de bois.
+    fer = ctx.un("fer")
+    barre(s, (0.64, yt, 0), (0.74, yt, 0), 0.022, 6, "metal", fer)
+    barre(s, (0.725, yt, 0), (0.725, yt - 0.2, 0.09), 0.016, 4, "metal", fer)
+    barre(s, (0.71, yt - 0.195, 0.088), (0.82, yt - 0.195, 0.088), 0.022, 6, "bois", ctx.un("bois_meuble"))
+    # Seau cerclé, pendu à la corde au-dessus de l'eau (son fond sous la margelle).
+    yb, hb = 0.74, 0.24
+    revolution(s, [(yb, 0.11), (yb + hb, 0.13)], 10, "bois", ctx.tons("bois_meuble"), haut=ctx.un("eau_sombre"), bas=ctx.un("bois_sombre"),
+               cercles=((yb + 0.03, yb + 0.055), (yb + hb - 0.075, yb + hb - 0.05)), cercle_couleur=fer)
+    # Anse de fer prise dans les douelles au-dessus du cercle haut.
+    anse = [(-0.115, yb + hb - 0.025, 0.0, 0.007), (-0.1, yb + hb + 0.06, 0.0, 0.007), (0.0, yb + hb + 0.095, 0.0, 0.007), (0.1, yb + hb + 0.06, 0.0, 0.007), (0.115, yb + hb - 0.025, 0.0, 0.007)]
+    s.tube(anse, 4, "metal", fer, bouts=(True, True))
+    barre(s, (0.0, yb + hb + 0.099, 0.0), (0.0, yt - 0.082, 0.0), 0.011, 5, "bois", corde)
+
+
+def _tas_de_buches(s, ctx):
+    """Tas de bûches rangé en pyramide (5, 4, 3, 2), bûches couchées le long de z: leurs bouts de
+    bois frais regardent l'avant et l'arrière, l'écorce fait les flancs."""
+    ecorce = ctx.tons("ecorce_chene") + ctx.tons("bois_mort")[:1]
+    coupe = ctx.tons("bois_coupe")
+    pas, rc, pans = 0.15, 0.077, 8
+    ri = rc * math.cos(math.pi / pans)
+    for rang, nombre in enumerate((5, 4, 3, 2)):
+        y = ri + rang * pas * math.sqrt(3) / 2
+        for k in range(nombre):
+            x = (k - (nombre - 1) / 2) * pas
+            g = rang * 7 + k
+            z0 = -0.4 + penche(g * 1.7, 0.035)
+            z1 = 0.4 + penche(g * 2.9, 0.035)
+            # Le rang du bas a un pan à plat sur le sol; au-dessus, la section tourne au hasard.
+            phase = 0.0 if rang == 0 else entre(0.0, 1.0, g * 3.3)
+            rondin_z(s, x, y, z0, z1, rc, pans, ecorce[g % len(ecorce)], coupe[g % len(coupe)], phase=phase, coeur=ton(coupe[g % len(coupe)], 0.82))
+
+
+def _tonneau(s, ctx):
+    """Tonneau debout (85 cm, on pose dessus): douelles de deux tons, ventre, quatre cercles de fer,
+    la bonde sur le ventre côté avant, le fond de planches."""
+    bois = ctx.tons("bois_meuble")
+    profil = [(0.0, 0.25), (0.14, 0.287), (0.425, 0.307), (0.71, 0.287), (0.85, 0.25)]
+    pans = 12
+    revolution(s, profil, pans, "bois", [bois[0], bois[2 % len(bois)], bois[1]], haut=ctx.un("bois_clair", 1), bas=bois[1],
+               cercles=((0.05, 0.1), (0.2, 0.245), (0.605, 0.65), (0.75, 0.8)), cercle_couleur=ctx.un("fer"))
+    # Bonde de bois sur le ventre, face à l'avant.
+    barre(s, (0, 0.425, 0.27), (0, 0.425, 0.318), 0.032, 6, "bois", ctx.un("bois_sombre"), coupe=ctx.un("bois_coupe"))
+    # Fond: deux joints de planches en traits sombres.
+    for x in (-0.07, 0.07):
+        s.morceau([(x - 0.006, 0.8502, -0.22), (x + 0.006, 0.8502, -0.22), (x + 0.006, 0.8502, 0.22), (x - 0.006, 0.8502, 0.22)], [(0, 1, 2, 3)], "bois", ctx.un("bois_sombre"), coeur=(x, 0.0, 0.0))
+
+
+def _poutre_x(s: Atelier, xs, demi_y, demi_z, y, z, mat, couleurs, bouts=None):
+    """Poutre de section rectangulaire le long de x, d'un seul morceau, coupée en tronçons
+    (`xs` croissants), un ton par tronçon (bandes d'une lisse); `bouts`: teinte des deux bouts."""
+    v, faces, vers, teintes = [], [], [], []
+    coins = [(-demi_y, -demi_z), (demi_y, -demi_z), (demi_y, demi_z), (-demi_y, demi_z)]
+    normales = [np.array((0.0, 0.0, -1.0)), np.array((0.0, 1.0, 0.0)), np.array((0.0, 0.0, 1.0)), np.array((0.0, -1.0, 0.0))]
+    for x in xs:
+        v.extend((x, y + dy, z + dz) for dy, dz in coins)
+    for i in range(len(xs) - 1):
+        for k in range(4):
+            j = (k + 1) % 4
+            faces.append((4 * i + k, 4 * i + j, 4 * (i + 1) + j, 4 * (i + 1) + k))
+            vers.append(normales[k])
+            teintes.append(couleurs[i % len(couleurs)])
+    for i, signe in ((0, -1.0), (len(xs) - 1, 1.0)):
+        faces.append(tuple(4 * i + k for k in range(4)))
+        vers.append(np.array((signe, 0.0, 0.0)))
+        teintes.append(bouts if bouts is not None else couleurs[0])
+    s.morceau(v, orientees(v, faces, vers), mat, teintes, garde=True)
+
+
+def _lisse(s, ctx):
+    """Lisse de passage à niveau relevable (5 cases le long de x): socle et poteau à l'ouest, sa
+    lanterne en haut; la lisse rayée rouge et blanc de 4 m, son contrepoids de fonte derrière le
+    pivot, repose baissée dans la fourche à l'est. Le nœud `lisse` tourne autour de z, à son
+    pivot: 0 baissée en travers de la route, +80 degrés levée (le bras monte, le contrepoids
+    descend à côté du poteau, sans le toucher). Avant (+z): le côté de la route d'où l'on arrive."""
+    fer = ctx.tons("fer")
+    px, py, zb = -1.95, 1.0, 0.19
+    boite(s, px - 0.2, px + 0.2, 0, 0.12, -0.18, 0.18, "pierre", ctx.un("pierre", 1), tremble=0.003, dessus=ctx.un("pierre_dessus"))
+    boite(s, px - 0.09, px + 0.09, 0.121, 1.3, -0.09, 0.09, "metal", ctx.un("peint_creme"), tremble=0.0)
+    boite(s, px - 0.11, px + 0.11, 1.301, 1.34, -0.11, 0.11, "metal", fer[0], tremble=0.0, sans="")
+    barre(s, (px, py, 0.05), (px, py, zb), 0.03, 6, "metal", ctx.un("fer_clair"))
+    _lanterne_pn(s, ctx, px, 1.342)
+    # Fourche d'appui à l'est: la lisse baissée y repose, entre ses deux dents.
+    fx = px + 3.85
+    dy = 0.06
+    boite(s, fx - 0.07, fx + 0.07, 0, 0.06, zb - 0.09, zb + 0.09, "pierre", ctx.un("pierre", 2), tremble=0.002, dessus=ctx.un("pierre_dessus"))
+    boite(s, fx - 0.04, fx + 0.04, 0.061, py - dy - 0.004, zb - 0.065, zb + 0.065, "metal", ctx.un("peint_creme"), tremble=0.0)
+    for c in (-1, 1):
+        za, zb_ = sorted((zb + c * 0.045, zb + c * 0.065))
+        boite(s, fx - 0.03, fx + 0.03, py - dy - 0.003, py + 0.04, za, zb_, "metal", fer[0], tremble=0.0, sans="")
+    with s.noeud("lisse", (px, py, zb), axe="z", baissee=0, levee=80):
+        rouge, blanc = ctx.un("feu_rouge"), ctx.un("creme")
+        xs = [px - 0.3, px] + [px + 0.5 * (k + 1) for k in range(8)]
+        _poutre_x(s, xs, dy, 0.04, py, zb, "bois", [fer[1]] + [rouge, blanc] * 4, bouts=blanc)
+        boite(s, px - 0.4, px - 0.18, py - 0.12, py + 0.1, zb - 0.07, zb + 0.07, "metal", fer[0], tremble=0.0, sans="")
+        # Disque rouge bordé de blanc au milieu de la lisse, tourné vers la route.
+        xd = px + 2.0
+        barre(s, (xd, py, zb + 0.041), (xd, py, zb + 0.053), 0.13, 12, "metal", blanc)
+        barre(s, (xd, py, zb + 0.0535), (xd, py, zb + 0.058), 0.095, 12, "metal", rouge)
+
+
+def _lanterne_pn(s, ctx, x, y):
+    """Lanterne du poteau: verre rouge vers la route (+z) et vers la voie, blanc sur les côtés."""
+    fer = ctx.tons("fer")
+    c = 0.065
+    boite(s, x - c - 0.02, x + c + 0.02, y, y + 0.04, -c - 0.02, c + 0.02, "metal", fer[0], tremble=0.0, sans="")
+    v = [(x - c, y + 0.04, -c), (x + c, y + 0.04, -c), (x + c, y + 0.04, c), (x - c, y + 0.04, c)]
+    v += [(px, py + 0.16, pz) for px, py, pz in v]
+    faces = [(0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+    rouge, verre = ctx.un("feu_rouge"), ctx.un("verre_lampe")
+    s.morceau(v, faces, "flamme", [rouge, verre, rouge, verre], coeur=(x, y + 0.12, 0.0))
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            boite(s, x + sx * c - 0.012, x + sx * c + 0.012, y + 0.04, y + 0.2, sz * c - 0.012, sz * c + 0.012, "metal", fer[1], tremble=0.0, sans="y- y+")
+    d = c + 0.05
+    pts = [(x - d, y + 0.2, -d), (x + d, y + 0.2, -d), (x + d, y + 0.2, d), (x - d, y + 0.2, d), (x, y + 0.28, 0.0)]
+    s.morceau(pts, [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4), (0, 3, 2, 1)], "metal", fer[0], coeur=(x, y + 0.23, 0.0))
+    s.octa(0.025, 0.035, 0.025, at(x, y + 0.3, 0.0), "metal", fer[1])
+
+
+def _pupitre(s, ctx):
+    """Pupitre de fanfare: trépied et tige de fer, plateau penché vers l'arrière (on le lit debout,
+    de l'avant), rebord où tient le cahier ouvert; deux pages de portées."""
+    fer = ctx.tons("fer")
+    for k in range(3):
+        a = k / 3 * math.tau + math.pi / 2
+        barre(s, (math.cos(a) * 0.26, 0, math.sin(a) * 0.26), (math.cos(a) * 0.018, 0.36, math.sin(a) * 0.018), 0.012, 5, "metal", fer[0], bouts=(False, True))
+    barre(s, (0, 0.32, 0), (0, 0.41, 0), 0.026, 6, "metal", fer[1])
+    # Tige en deux brins coulissants, serrés par la bague à vis (la hauteur se règle).
+    barre(s, (0, 0.39, 0), (0, 0.735, 0), 0.011, 6, "metal", fer[0])
+    barre(s, (0, 0.745, 0), (0, 1.08, 0), 0.009, 6, "metal", fer[0])
+    barre(s, (0, 0.72, 0), (0, 0.76, 0), 0.02, 6, "metal", fer[1])
+    s.octa(0.016, 0.016, 0.03, at(0, 0.74, 0.035), "metal", ctx.un("laiton"))
+    inc = -0.35
+    with s.groupe(at(0, 1.1, 0.0143, 0, inc)):
+        boite(s, -0.03, 0.03, -0.06, 0.02, -0.04, -0.0065, "metal", fer[1], tremble=0.0, sans="")
+        boite(s, -0.25, 0.25, -0.17, 0.17, -0.006, 0.006, "metal", fer[0], tremble=0.0, sans="")
+        boite(s, -0.25, 0.25, -0.19, -0.171, -0.006, 0.05, "metal", fer[0], tremble=0.0, sans="")
+        papier = ctx.un("papier")
+        encre = ctx.un("fond")
+        for x0, x1 in ((-0.22, -0.006), (0.006, 0.22)):
+            boite(s, x0, x1, -0.165, 0.15, 0.0065, 0.009, "etoffe", papier, tremble=0.0, sans="z-")
+            for portee in range(3):
+                for ligne in range(5):
+                    yl = 0.11 - portee * 0.09 - ligne * 0.012
+                    s.morceau([(x0 + 0.015, yl, 0.0095), (x1 - 0.015, yl, 0.0095), (x1 - 0.015, yl + 0.003, 0.0095), (x0 + 0.015, yl + 0.003, 0.0095)], [(0, 1, 2, 3)], "etoffe", encre, coeur=((x0 + x1) / 2, yl, -1.0))
+                for n in range(4):
+                    xn = x0 + 0.04 + n * (x1 - x0 - 0.06) / 4
+                    yn = 0.11 - portee * 0.09 - 0.012 * ((n * 3 + portee) % 5)
+                    s.morceau([(xn - 0.007, yn - 0.004, 0.0098), (xn + 0.007, yn - 0.004, 0.0098), (xn + 0.007, yn + 0.004, 0.0098), (xn - 0.007, yn + 0.004, 0.0098)], [(0, 1, 2, 3)], "etoffe", encre, coeur=(xn, yn, -1.0))
+
+
 # ---------------------------------------------------------------------- famille
 def _un_meuble(sorte: str, entree: dict, ctx, vide: bool):
     s = Atelier(entree["graine"])
@@ -442,6 +875,26 @@ def _un_meuble(sorte: str, entree: dict, ctx, vide: bool):
     elif sorte == "couchette":
         _couchette(s, ctx)
         notice["bed"] = {"height": 0.48, "places": 1}
+    elif sorte == "abreuvoir":
+        _abreuvoir(s, ctx)
+        notice["top"] = 0.85
+    elif sorte == "banc-ferme":
+        _banc_ferme(s, ctx)
+        notice["seat"] = {"height": 0.45, "front": 0.17}
+    elif sorte == "caisse":
+        _caisse(s, ctx)
+        notice["top"] = 0.6
+    elif sorte == "puits":
+        _puits(s, ctx)
+    elif sorte == "tas-de-buches":
+        _tas_de_buches(s, ctx)
+    elif sorte == "tonneau":
+        _tonneau(s, ctx)
+        notice["top"] = 0.85
+    elif sorte == "lisse":
+        _lisse(s, ctx)
+    elif sorte == "pupitre":
+        _pupitre(s, ctx)
     else:
         raise SystemExit(f"{entree['id']}: sorte de mobilier inconnue « {sorte} »")
     return s, notice

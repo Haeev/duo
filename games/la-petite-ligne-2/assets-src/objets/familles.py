@@ -568,7 +568,53 @@ def provision(spec, c):
     raise ValueError(f"forme de provision inconnue: {f}")
 
 
+# ----------------------------------------------------------------------------------- instruments
+def instrument(spec, c):
+    """Instruments de la fanfare (musique jouée). `cornet`: couché sur ses pistons, pavillon vers
+    l'avant (-Y), embouchure derrière; `clarinette`: debout sur son pavillon, bec en haut."""
+    f = spec["forme"]
+    corps, cle, bouton, dedans = c["corps"], c["cle"], c["bouton"], c["interieur"]
+    if f == "cornet":
+        bell = lathe([(0.006, 0.0), (0.008, 0.05), (0.012, 0.09), (0.02, 0.125), (0.036, 0.15), (0.056, 0.165), (0.058, 0.168)], corps, segs=12).rot(rx=90)
+        mouth = lathe([(0.049, 0.1675), (0.049, 0.1695)], dedans, segs=12).rot(rx=90)
+        parts = [bell, mouth]
+        # Trois pistons debout derrière le pavillon, boutons de nacre.
+        for i in range(3):
+            y = 0.03 + 0.024 * i
+            parts.append(lathe([(0.012, -0.04), (0.011, -0.034), (0.011, 0.034), (0.012, 0.04)], corps, segs=8).move(0, y, 0))
+            parts.append(lathe([(0.0035, 0.04), (0.0035, 0.052)], cle, segs=6).move(0, y, 0))
+            parts.append(lathe([(0.009, 0.052), (0.009, 0.058)], bouton, segs=8).move(0, y, 0))
+        # Tubes: du pavillon au premier piston, la grande boucle sous le pavillon, la branche
+        # d'embouchure vers l'arrière.
+        parts.append(sweep([(0.0, -0.004, 0.0), (0.0, 0.03, 0.0)], 0.0058, corps, segs=6, caps=False))
+        loop = [(0.0, 0.078, -0.015), (0.0, 0.12, -0.015), (0.0, 0.145, -0.036), (0.0, 0.12, -0.058), (0.0, 0.03, -0.058), (0.0, -0.015, -0.048),
+                (0.0, -0.015, -0.03), (0.0, 0.03, -0.022)]
+        parts.append(sweep(loop, 0.0055, corps, segs=6, caps=False))
+        parts.append(sweep([(0.0, 0.054, 0.018), (0.0, 0.12, 0.022), (0.0, 0.19, 0.025)], [0.0055, 0.0048, 0.0042], corps, segs=6, caps=False))
+        parts.append(lathe([(0.0045, 0.0), (0.005, 0.02), (0.011, 0.03), (0.012, 0.034)], cle, segs=8).rot(rx=-90).move(0, 0.188, 0.025))
+        return parts, (0.0, 0.054, -0.02)
+    if f == "clarinette":
+        body = lathe([(0.03, 0.0), (0.031, 0.006), (0.027, 0.02), (0.02, 0.05), (0.0145, 0.09), (0.0135, 0.11), (0.0135, 0.555), (0.0165, 0.56),
+                      (0.0165, 0.6), (0.0135, 0.605), (0.0135, 0.655), (0.012, 0.67), (0.0085, 0.71), (0.004, 0.722)], corps, segs=10)
+        parts = [body]
+        # Bagues de maillechort aux jointures, ligature sur le bec.
+        for z in (0.1, 0.34, 0.553, 0.602, 0.672):
+            r = 0.0168 if z in (0.553, 0.602) else 0.0148 if z != 0.672 else 0.0128
+            parts.append(lathe([(r, z - 0.005), (r, z + 0.005)], cle, segs=10))
+        # Trous et plateaux sur le devant (-Y), une tringle de clés sur le côté.
+        for z in (0.17, 0.22, 0.27, 0.39, 0.44, 0.49):
+            parts.append(lathe([(0.0055, 0.0), (0.0055, 0.003)], dedans if z not in (0.27, 0.49) else cle, segs=8).rot(rx=90).move(0, -0.0125, z))
+        parts.append(sweep([(0.0105, -0.008, 0.14), (0.0105, -0.008, 0.52)], 0.0022, cle, segs=4))
+        for z in (0.15, 0.32, 0.5):
+            parts.append(sweep([(0.0105, -0.008, z), (0.004, -0.0135, z)], 0.0025, cle, segs=4))
+        # Anche de roseau sous le bec (côté +Y).
+        parts.append(box(0.011, 0.003, 0.05, bouton, e=0.4, segs=6, rings=4).move(0, 0.0095, 0.665))
+        return parts, (0.0, 0.0, 0.3)
+    raise ValueError(f"forme d'instrument inconnue: {f}")
+
+
 BUILDERS = {
+    "instrument": instrument,
     "provision": provision,
     "fruit": fruit, "legume": legume, "poisson": poisson, "bocal": bocal, "bouteille": bouteille, "pain": pain, "plat": plat,
     "outil": outil, "sac": sac, "graine": graine, "fleur": fleur, "caillou": caillou, "bois": bois, "courrier": courrier,

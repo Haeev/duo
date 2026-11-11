@@ -33,7 +33,6 @@ const PROPS_WITHOUT_MODEL = [
   'lit-double-essai',
   'porte',
   'pot-de-fleurs-essai',
-  'pupitre',
   'table-essai',
   'tapis-essai',
 ];
@@ -83,7 +82,6 @@ describe('décors livrés', () => {
       expect(Math.abs((box.min.x + box.max.x) / 2), id).toBeLessThan(2.5);
     }
   });
-
 
   it('partage géométrie et matériau entre deux copies', () => {
     // Un modèle encré est fusionné au chargement en un seul maillage: la copie est ce maillage.
