@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "lucie-tradition-lumignon",
+  "villager": "lucie",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.lumignons.pour",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.lucie-tradition-lumignon",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.lumignons.pour",
+              "equals": "partent"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "reviennent"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ha ! Le lumignon pour ceux qui partent: j'y ai pensé en triant le courrier. Toutes ces lettres qui partent. Bon voyage à elles.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ha ! Retour à ceux qui partent. Ça m'arrange: à la Poste, tout part. Rien ne revient, sauf les lettres mal adressées.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "partent"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ha ! Pour ceux qui reviennent. J'ai posé une enveloppe vide à côté du lumignon. Si quelqu'un revient, il aura de quoi écrire.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "lucie",
+      "text": "Ha ! Ceux qui reviennent, cette fois ! J'ai couru l'annoncer sur toute la tournée. Personne chez soi: le bourg était à la barrière.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

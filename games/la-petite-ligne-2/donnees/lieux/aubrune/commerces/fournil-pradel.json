@@ -62,7 +62,8 @@
   "lines": {
     "bought": "Tiens. Porte-le doucement, il dort encore un peu.",
     "sold": "Mmh... c'est beau. Je le paie ce que ça vaut, la pâte me dira merci.",
-    "noMoney": "Il te manque quelques sous. Rien ne presse: ici, tout lève lentement."
+    "noMoney": "Il te manque quelques sous. Rien ne presse: ici, tout lève lentement.",
+    "closed": "Le fournil dort. La pâte a sa fête, elle aussi: elle lève sans moi. Reviens quand le four sera rallumé."
   },
   "talk": {
     "open": "Je regarde ton étal.",

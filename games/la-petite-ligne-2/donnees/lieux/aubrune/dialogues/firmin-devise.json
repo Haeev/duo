@@ -20,6 +20,11 @@
         "decision": "devise-de-la-halte",
         "state": "agreed"
       }
+    },
+    {
+      "type": "days_since",
+      "key": "scenes.aubrune.l-appel-du-registre",
+      "atMost": 0
     }
   ],
   "once": null,
@@ -28,6 +33,28 @@
     "debut": {
       "kind": "branch",
       "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "an-rappel-a-l-heure"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "an-rappel-de-la-place"
+        },
         {
           "when": [
             {
@@ -176,7 +203,7 @@
           "by": "duo"
         }
       ],
-      "next": "dit-a-l-heure"
+      "next": "an-quoi-a-l-heure"
     },
     "dit-a-l-heure": {
       "kind": "line",
@@ -195,12 +222,246 @@
           "by": "duo"
         }
       ],
-      "next": "dit-de-la-place"
+      "next": "an-quoi-de-la-place"
     },
     "dit-de-la-place": {
       "kind": "line",
       "speaker": "firmin",
       "text": "« On a de la place. » ... C'est une bonne devise. Je le dis d'autant plus librement qu'elle est de moi.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-a-l-heure": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "L'an dernier, la halte a pris pour devise « À l'heure, ou presque. » La craie a tenu toute l'année. Le « presque » aussi.",
+      "emote": null,
+      "next": "an-invite-a-l-heure"
+    },
+    "an-invite-a-l-heure": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Article 46: la devise se relit chaque hiver. On la garde, ou on l'efface ? Tranchez à deux. Je tiens la craie.",
+      "emote": null,
+      "next": "an-moitie-a-l-heure"
+    },
+    "an-moitie-a-l-heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-a-l-heure"
+        }
+      ],
+      "otherwise": "an-choix-a-l-heure"
+    },
+    "an-autre-a-l-heure": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié m'a déjà dicté son choix. Je l'ai noté au crayon. Le crayon, ça s'efface: à toi.",
+      "emote": null,
+      "next": "an-choix-a-l-heure"
+    },
+    "an-choix-a-l-heure": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "a-l-heure",
+          "text": "On garde: « À l'heure, ou presque. »",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "devise-de-la-halte",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "de-la-place",
+          "text": "On change: « On a de la place. »",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "devise-de-la-halte",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-a-l-heure": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "an-garde-a-l-heure"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "an-change-a-l-heure"
+        }
+      ],
+      "otherwise": "dit-a-l-heure"
+    },
+    "an-garde-a-l-heure": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "On garde. Je repasse la craie sur les mêmes lettres. Ambroise a vérifié l'heure pendant que j'écrivais. Elle était juste.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-a-l-heure": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "« À l'heure, ou presque. » J'efface ma propre phrase. C'est le règlement: le garde s'efface devant la halte.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-de-la-place": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "L'an dernier, la halte a pris pour devise « On a de la place. » La craie a tenu toute l'année. Personne n'a contredit.",
+      "emote": null,
+      "next": "an-invite-de-la-place"
+    },
+    "an-invite-de-la-place": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Article 46: la devise se relit chaque hiver. On la garde, ou on l'efface ? Tranchez à deux. Je tiens la craie.",
+      "emote": null,
+      "next": "an-moitie-de-la-place"
+    },
+    "an-moitie-de-la-place": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-de-la-place"
+        }
+      ],
+      "otherwise": "an-choix-de-la-place"
+    },
+    "an-autre-de-la-place": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ta moitié m'a déjà dicté son choix. Je l'ai noté au crayon. Le crayon, ça s'efface: à toi.",
+      "emote": null,
+      "next": "an-choix-de-la-place"
+    },
+    "an-choix-de-la-place": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "de-la-place",
+          "text": "On garde: « On a de la place. »",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "devise-de-la-halte",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "a-l-heure",
+          "text": "On change: « À l'heure, ou presque. »",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "devise-de-la-halte",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-de-la-place": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "de-la-place"
+            }
+          ],
+          "next": "an-garde-de-la-place"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "devise-de-la-halte",
+              "state": "last",
+              "option": "a-l-heure"
+            }
+          ],
+          "next": "an-change-de-la-place"
+        }
+      ],
+      "otherwise": "dit-de-la-place"
+    },
+    "an-garde-de-la-place": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "On garde « On a de la place. » Je la repasse en capitales. De la place, il en reste: c'est le principe.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-de-la-place": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "« On a de la place. » Ambroise boudera jusqu'au printemps. Il a de la place pour bouder, lui aussi.",
       "emote": "joy",
       "next": "fin"
     }

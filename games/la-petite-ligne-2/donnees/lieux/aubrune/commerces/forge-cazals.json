@@ -49,7 +49,8 @@
   "lines": {
     "bought": "Ha ! Bonne pioche. Si ça casse, c'est que t'as tapé de travers.",
     "sold": "Pose ça là. Le feu avait faim. Tiens, tes sous !",
-    "noMoney": "Ha ! Pas assez de sous. Le fer attend pas, mais moi si: reviens."
+    "noMoney": "Ha ! Pas assez de sous. Le fer attend pas, mais moi si: reviens.",
+    "closed": "Ha ! La forge est froide, pour une fois. Jour de fête: on tape dans les mains, pas sur l'enclume. Reviens après."
   },
   "talk": {
     "open": "Je regarde ton râtelier.",

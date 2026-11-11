@@ -424,6 +424,15 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Changer la saison d'un fruit pour un seul lieu: nouvelle ressource et nouveau meuble à brique `harvest` (la ressource commune sert aussi au lieu d'essai, dont `recolte.test.ts` secoue l'arbre au printemps), puis le `type` de l'objet dans `carte.json`, les deux `plan.json` et `construire_plan.py`.
 - Le garde de l'outil refuse les commandes Bash à heredoc Python ou qui contiennent « .git »: passer par Edit, et `--exclude-dir='.gi?'` pour le contrôle typographique.
 - Le test « chaque don d'histoire » (`habitants-aubrune.test.ts`) ne compte que `give_recipe`, `give_entry` et les `give_item` de graines ou plants à la fin d'une étape qui retient `"fait"`: toute suite nouvelle (fêtes fusionnées) qui en donne casse le test tant que sa réplique `-don-` manque. Un `give_plan` ou un plat n'y entre pas, mais mérite la même réplique. Lister les manques par un script qui lit `quetes/*.json` et `dialogues/*-don-*.json`.
-- Recette donnée deux fois: l'omelette aux herbes vient des Lettres en retard (Colette) et de la Fête des barrières (Firmin); la réplique du second don le reconnaît.
+- Recettes (2026-11-11): l'omelette aux herbes ne s'apprend qu'à la Fête des barrières (Firmin); les Lettres en retard donnent la tarte aux pommes (la tarte du dimanche de la mère de Colette, dialogue `colette-don-tarte-du-dimanche`).
+
+## Traditions rejouées et fermetures de fête (La Petite Ligne 2, vérifié le 2026-11-11)
+
+- Une décision `reopens` se rouvre au début de l'événement (10 h): son dialogue doit attendre l'étape du jour par `days_since` 0 sur `scenes.aubrune.<scène d'ouverture>` (la valeur du fait de scène est le jour, réécrit à chaque lecture complète). Sinon, la deuxième année, elle passe avant l'ouverture.
+- « Comme l'an dernier »: aiguillage d'entrée sur `decision_is` `last` + `option`, puis un nœud de choix par option passée, avec les mêmes `id` d'options (les essais choisissent par `id`); après l'accord, `last` = option prise (gardée) ou l'autre (changée).
+- Réplique « une fois par joueur et par an » sans `once`: priorité 10 ou plus, `not days_since entendu.<lieu>.<soi-même>` (`of: actor`, `atMost` N) et une fenêtre `days_since` sur le fait daté (un `remember` de même valeur un autre jour réécrit la date).
+- `lines.closed` d'un commerce: une seule chaîne (schéma), dite en fin de conversation tout le jour de fête jusqu'à l'aube: pas de « demain à 7 h » (le lendemain d'une fête est un dimanche).
+- Les textes d'interface (`src/interface/textes.ts`, `fill`) n'ont pas de balise d'accord: tourner neutre. Points médians restants à signaler: `busy`, `not-stuck`, carnet `unknown`, `unknownName`.
+- Dans un essai, Lucie et Martial disent d'abord leur arrivée (`once` 50): parler deux fois avant d'attendre une autre réplique.
 - Collection des fleurs pleine (12, épinglée par `collections-aubrune.test.ts`), et une fleur doit pousser d'une graine et ne pas se revendre: une fleur sauvage (coquelicot) n'y entre pas.
 - Cultures: `stages` en points de pousse (sec 1, arrosé 2); un modèle de culture a `len(stages) + 1` états (`crop-radis`: 3). `economie_aubrune.py` choisit la meilleure culture vendable et donne un tableau par saison (avant/après): l'utiliser pour tout nouveau légume.

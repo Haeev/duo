@@ -172,7 +172,7 @@ Le don passe sous les étapes d'histoire (52 et plus) et devant les souvenirs: i
 | Chant de la coupe | Barnabé |
 | Carillon des deux sœurs et muguet; pot-au-feu du dimanche | Honorine |
 | Tomates farcies; Chanson des marmites; plants de violette | Odette |
-| Truite grillée; perche meunière; omelette aux herbes | Colette |
+| Truite grillée; perche meunière; tarte aux pommes (la tarte du dimanche de sa mère) | Colette |
 | Bouture de rosier | Marthe |
 | Lampe de mineur | Jeanne |
 | Horaire de 1987 | Firmin |

@@ -151,7 +151,8 @@
   "lines": {
     "bought": "Bon choix ! Si on te demande d'où ça vient, dis chez Odette, et dis-le fort.",
     "sold": "Je prends. Prix de l'épicerie: honnête, pas fou. La nouvelle du jour, je te l'offre avec.",
-    "noMoney": "Ta bourse est plus légère que mes nouvelles. Apporte-moi des œufs, et on en reparle."
+    "noMoney": "Ta bourse est plus légère que mes nouvelles. Apporte-moi des œufs, et on en reparle.",
+    "closed": "L'épicerie a tiré son volet. Jour de fête: les nouvelles sont gratuites, et elles sont toutes ici. Le reste se vend un autre jour."
   },
   "talk": {
     "open": "Je regarde ton épicerie.",

@@ -48,7 +48,8 @@
   "lines": {
     "bought": "Et voilà ! Porte-le comme un premier rôle, pas comme un figurant.",
     "sold": "Superbe ! Teinture ou bouton, le public n'y verra que du feu.",
-    "noMoney": "Ta bourse sonne creux, mon public. Reviens après la recette, je te garde la place."
+    "noMoney": "Ta bourse sonne creux, mon public. Reviens après la recette, je te garde la place.",
+    "closed": "Relâche ! La mercerie fait relâche, mon public: toute la troupe est dehors. Reviens après la fête, le rideau se relèvera."
   },
   "talk": {
     "open": "Je regarde tes rayons.",

@@ -20,6 +20,11 @@
         "decision": "lumignon-des-gardes",
         "state": "agreed"
       }
+    },
+    {
+      "type": "days_since",
+      "key": "scenes.aubrune.la-cire-et-la-meche",
+      "atMost": 0
     }
   ],
   "once": null,
@@ -28,6 +33,28 @@
     "debut": {
       "kind": "branch",
       "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "partent"
+            }
+          ],
+          "next": "an-rappel-partent"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "reviennent"
+            }
+          ],
+          "next": "an-rappel-reviennent"
+        },
         {
           "when": [
             {
@@ -176,7 +203,7 @@
           "by": "duo"
         }
       ],
-      "next": "dit-partent"
+      "next": "an-quoi-partent"
     },
     "dit-partent": {
       "kind": "line",
@@ -195,12 +222,246 @@
           "by": "duo"
         }
       ],
-      "next": "dit-reviennent"
+      "next": "an-quoi-reviennent"
     },
     "dit-reviennent": {
       "kind": "line",
       "speaker": "marthe",
       "text": "Pour ceux qui reviennent. Bon. Ça ne s'est jamais fait. Il faut bien que les coutumes commencent un soir.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-partent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "L'an dernier, votre lumignon a brûlé pour ceux qui partent. La coutume. Je l'ai regardé jusqu'à la dernière goutte de cire.",
+      "emote": null,
+      "next": "an-invite-partent"
+    },
+    "an-invite-partent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Cette année, on garde ou on change ? Une coutume tient à ce qu'on la rallume. Tranchez à deux, à voix haute.",
+      "emote": null,
+      "next": "an-moitie-partent"
+    },
+    "an-moitie-partent": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-partent"
+        }
+      ],
+      "otherwise": "an-choix-partent"
+    },
+    "an-autre-partent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié m'a déjà répondu. Je ne te dirai pas quoi. Je ne suis pas Odette.",
+      "emote": null,
+      "next": "an-choix-partent"
+    },
+    "an-choix-partent": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "partent",
+          "text": "Comme l'an dernier: ceux qui partent.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "lumignon-des-gardes",
+              "option": "partent"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "reviennent",
+          "text": "On change: pour ceux qui reviennent.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "lumignon-des-gardes",
+              "option": "reviennent"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-partent": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "partent"
+            }
+          ],
+          "next": "an-garde-partent"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "reviennent"
+            }
+          ],
+          "next": "an-change-partent"
+        }
+      ],
+      "otherwise": "dit-partent"
+    },
+    "an-garde-partent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ceux qui partent, encore. Deux fois de suite: voilà une coutume qui tient. Je n'en attendais pas moins.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-partent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Retour à la coutume. Firmin dira qu'on recule. Moi, je dis qu'on revient. Au fond, ça lui plaira.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-rappel-reviennent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "L'an dernier, votre lumignon a brûlé pour ceux qui reviennent. Firmin l'a regardé toute la nuit. Il ne comptait même pas les minutes.",
+      "emote": null,
+      "next": "an-invite-reviennent"
+    },
+    "an-invite-reviennent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Cette année, on garde ou on change ? Une coutume tient à ce qu'on la rallume. Tranchez à deux, à voix haute.",
+      "emote": null,
+      "next": "an-moitie-reviennent"
+    },
+    "an-moitie-reviennent": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "theirs"
+            }
+          ],
+          "next": "an-autre-reviennent"
+        }
+      ],
+      "otherwise": "an-choix-reviennent"
+    },
+    "an-autre-reviennent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ta moitié m'a déjà répondu. Je ne te dirai pas quoi. Je ne suis pas Odette.",
+      "emote": null,
+      "next": "an-choix-reviennent"
+    },
+    "an-choix-reviennent": {
+      "kind": "choice",
+      "options": [
+        {
+          "id": "reviennent",
+          "text": "Comme l'an dernier: ceux qui reviennent.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "lumignon-des-gardes",
+              "option": "reviennent"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "partent",
+          "text": "On change: pour ceux qui partent.",
+          "when": [],
+          "effects": [
+            {
+              "type": "choose",
+              "decision": "lumignon-des-gardes",
+              "option": "partent"
+            }
+          ],
+          "next": "accord"
+        },
+        {
+          "id": "attendre",
+          "text": "On en parle d'abord.",
+          "when": [],
+          "effects": [],
+          "next": "attendre-1"
+        }
+      ]
+    },
+    "an-quoi-reviennent": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "reviennent"
+            }
+          ],
+          "next": "an-garde-reviennent"
+        },
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "partent"
+            }
+          ],
+          "next": "an-change-reviennent"
+        }
+      ],
+      "otherwise": "dit-reviennent"
+    },
+    "an-garde-reviennent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ceux qui reviennent, deux ans de suite. Une coutume née chez nous. Je l'inscrirai au cahier de la paroisse.",
+      "emote": "joy",
+      "next": "fin"
+    },
+    "an-change-reviennent": {
+      "kind": "line",
+      "speaker": "marthe",
+      "text": "Ceux qui reviennent, cette fois. Firmin a gagné. Ne le lui dites pas trop fort: il a déjà les yeux qui brillent.",
       "emote": "joy",
       "next": "fin"
     }

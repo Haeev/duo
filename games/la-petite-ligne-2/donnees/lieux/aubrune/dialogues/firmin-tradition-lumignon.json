@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "firmin-tradition-lumignon",
+  "villager": "firmin",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.lumignons.pour",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.firmin-tradition-lumignon",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.lumignons.pour",
+              "equals": "partent"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "reviennent"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Le lumignon a brûlé pour ceux qui partent. La coutume. J'ai pensé à ceux qui reviennent quand même: le règlement ne l'interdit pas.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Retour à ceux qui partent. Je respecte. Mais j'ai laissé la lanterne de la barrière allumée une minute de plus. Pour les autres.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "lumignon-des-gardes",
+              "state": "last",
+              "option": "partent"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Pour ceux qui reviennent. Trente ans que j'attendais quelqu'un sur le quai. La flamme a tenu jusqu'à l'autorail. Je l'ai noté.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "firmin",
+      "text": "Ceux qui reviennent, cette année. Je n'ai pas fait campagne. J'ai seulement parlé fort près de Marthe. Ça ne compte pas.",
+      "emote": null,
+      "next": null
+    }
+  }
+}

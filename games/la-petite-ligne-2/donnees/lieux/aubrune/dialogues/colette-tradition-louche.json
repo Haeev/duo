@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "id": "colette-tradition-louche",
+  "villager": "colette",
+  "priority": 35,
+  "when": [
+    {
+      "type": "days_since",
+      "key": "aubrune.concours.laureate",
+      "atLeast": 1,
+      "atMost": 13
+    },
+    {
+      "type": "not",
+      "condition": {
+        "type": "days_since",
+        "key": "entendu.aubrune.colette-tradition-louche",
+        "of": "actor",
+        "atMost": 13
+      }
+    }
+  ],
+  "once": null,
+  "start": "debut",
+  "nodes": {
+    "debut": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "remembered",
+              "key": "aubrune.concours.laureate",
+              "equals": "meres"
+            }
+          ],
+          "next": "a"
+        }
+      ],
+      "otherwise": "b"
+    },
+    "a": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "moulin"
+            }
+          ],
+          "next": "a-change"
+        }
+      ],
+      "otherwise": "a-dit"
+    },
+    "a-dit": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La louche pend entre nos deux cuisines, pile à mi-chemin. Odette mesure tous les matins, pour vérifier.",
+      "emote": null,
+      "next": null
+    },
+    "a-change": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "Revoilà la louche. Je l'ai frottée, Odette l'a frottée: elle brille deux fois. Berthe a perdu avec élégance. Plus que nous.",
+      "emote": null,
+      "next": null
+    },
+    "b": {
+      "kind": "branch",
+      "cases": [
+        {
+          "when": [
+            {
+              "type": "decision_is",
+              "decision": "louche-des-gardes",
+              "state": "last",
+              "option": "meres"
+            }
+          ],
+          "next": "b-change"
+        }
+      ],
+      "otherwise": "b-dit"
+    },
+    "b-dit": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La panade du moulin a gagné. J'ai goûté: c'est juste. Ne le répète pas à Odette, elle me ferait fermer le café.",
+      "emote": null,
+      "next": null
+    },
+    "b-change": {
+      "kind": "line",
+      "speaker": "colette",
+      "text": "La louche nous a quittées pour le moulin. Elle était bien, à notre mur. Elle est mieux là-bas, je crois. Je ne le dirai qu'une fois.",
+      "emote": null,
+      "next": null
+    }
+  }
+}
